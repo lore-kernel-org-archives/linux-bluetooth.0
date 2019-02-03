@@ -2,145 +2,101 @@ Return-Path: <SRS0=2HOV=QK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E92C4151A
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 10:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10019C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 16:48:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34FCE217D6
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 10:53:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1374217D6
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 16:48:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549191212;
-	bh=cDpnie/3NA++qMFM47vqJHjQyKNvp8KoXNI7C7oa4PE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=XjRWSnvovn/Rt5sQt6lpqr64u8/vJ2VlP1SNuI0S4eAffLQW+6htswLRACv/kjfdl
-	 quHfCrR0W18LoSmkrcH2p36JJuhgHl1UE9UbcARp7KZnE90GqULIc5jf1TTokXSTmM
-	 hWqKfhjjgrOyNyherrKwRh7D4Sz6xnuGoTM5/+U0=
+	s=default; t=1549212512;
+	bh=Cg6Dt507I75jmhcvuq9Fm5n/Qm+RVVtIJ85prs4KG6M=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=IqUPZbSqfP3gDOf8WvvH2lwhDsXZtYpzmkZfUqgb0WMOHEtebFIdt6iH9UYoEElLo
+	 Uq+x9Chg3PaOBGmNtzj48q70MCBGvPI7HiJO1tzzqLHsYk4pm0q52DG6UfRfLc/bNf
+	 9GxzQ9/5798hQbop4Q9KxR1CmWzAXRher2S/SGEo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727474AbfBCKx1 (ORCPT
+        id S1727763AbfBCQs1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 Feb 2019 05:53:27 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:44519 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727204AbfBCKx1 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 Feb 2019 05:53:27 -0500
-Received: by mail-lf1-f68.google.com with SMTP id z13so8189491lfe.11;
-        Sun, 03 Feb 2019 02:53:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=mevyq5vjK3YVqqJp1vTJff90i2EWe2ZEZND8e2Khv3Y=;
-        b=ZqQjTXQLj97fnS56vYav5oPziAbKVYLUTb+QP70tz+xxtysL3VxA7wS/S/dVDurHCo
-         LE6Aw4HILI4u9du9T9JQvm712f3Gcnsyyv/tXOZXWIx5D3kc6yqqUl/gP9CSxnorOWv4
-         FAPzpVm/ahH12PIBxGShg2hDWakgJyFJWSpWvX2gXBOJCV/7Uk4CwCrsbvFL4CKhAJ+Z
-         WvtU4Kr4zGsy/3f7oZun3oYx+yKyOp4rgzP/nHaqPgMYc4m6N6qUE3ye6059BlfsHC2h
-         8kQsuZbKEktogfQAw1gxtUKxfPLUJ/s55UlsnC6cNfr3Pt7dSZta7r4eB2ffMZHtSVxW
-         g+gA==
-X-Gm-Message-State: AHQUAuZ8c0+RaAJ9KWCOPQwUg7wSYTFBhHcpYkLFu4524SyxwOzSQB70
-        1n33TX5FTiA5oBqDuKNGhDPAsJVv
-X-Google-Smtp-Source: AHgI3IYvffEjPVmJrnXNBO4tcR1PIGgr0l8J9wPR1E7WKm6XExCLy/cAP8Vq8zAq6or3yeRQq+Tbtg==
-X-Received: by 2002:a19:5601:: with SMTP id k1mr14860890lfb.99.1549191205108;
-        Sun, 03 Feb 2019 02:53:25 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id g20sm687226lfh.33.2019.02.03.02.53.23
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 03 Feb 2019 02:53:24 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1gqFOt-0005Vm-KB; Sun, 03 Feb 2019 11:53:23 +0100
-Date:   Sun, 3 Feb 2019 11:53:23 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Myungho Jung <mhjungk@gmail.com>
-Cc:     Johan Hovold <johan@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Add NULL check for tiocmget() and
- tiocmset()
-Message-ID: <20190203105323.GA4686@localhost>
-References: <20190130053925.GA26699@myunghoj-Precision-5530>
- <20190131154000.GU3691@localhost>
- <20190203063823.GA8228@myunghoj-Precision-5530>
+        Sun, 3 Feb 2019 11:48:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35132 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726963AbfBCQs1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 3 Feb 2019 11:48:27 -0500
+Received: from shuah-t480s.internal (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3EB1321773;
+        Sun,  3 Feb 2019 16:48:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1549212506;
+        bh=Cg6Dt507I75jmhcvuq9Fm5n/Qm+RVVtIJ85prs4KG6M=;
+        h=From:To:Cc:Subject:Date:From;
+        b=MrtyF7zZrh9obhqWWwjjihLW7/bjc5wov/J/2wJiILkSPw7CGeEJBYLJlwCJ+5S8s
+         DRRCszsjm0NEItATSW+cs7Eu4tMXTrNIJy9yJCoRn81Q5d8zcziplRjsQZrPjmb38S
+         uaj5NYh8mjtJ8Vl1S27ZymUNcUeRL2Cp9a4WEpsQ=
+From:   Shuah Khan <shuah@kernel.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
+        viro@zeniv.linux.org.uk
+Cc:     Shuah Khan <shuah@kernel.org>, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3] bluetooth: Fix WARNING in tty_set_termios()
+Date:   Sun,  3 Feb 2019 09:48:25 -0700
+Message-Id: <20190203164825.9621-1-shuah@kernel.org>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190203063823.GA8228@myunghoj-Precision-5530>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, Feb 02, 2019 at 10:38:24PM -0800, Myungho Jung wrote:
-> On Thu, Jan 31, 2019 at 04:40:00PM +0100, Johan Hovold wrote:
-> > On Tue, Jan 29, 2019 at 09:39:28PM -0800, Myungho Jung wrote:
-> > > tiocmget() and tiocmset() operations are optional and some tty drivers
-> > > like pty miss the operations. We need NULL check to prevent from
-> > > dereference.
-> > > 
-> > > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
-> > > ---
-> > >  drivers/bluetooth/hci_ath.c   | 6 ++++++
-> > >  drivers/bluetooth/hci_ldisc.c | 4 ++++
-> > >  2 files changed, 10 insertions(+)
-> > 
-> > Ah, you had already submitted a v2.
-> > 
-> > I still suggest splitting this one in two patches and that you add a
-> > Fixes and stable tag to each so that they both get backported to stable.
-> > 
-> > Also, when resubmitting, make sure to include a short changelog here
-> > below the cut-off line (---).
-> > 
-> > > 
-> > > diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-> > > index d568fbd94d6c..fb9f6323a911 100644
-> > > --- a/drivers/bluetooth/hci_ath.c
-> > > +++ b/drivers/bluetooth/hci_ath.c
-> > > @@ -185,8 +185,14 @@ static int ath_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-> > >  
-> > >  static int ath_setup(struct hci_uart *hu)
-> > >  {
-> > > +	struct tty_struct *tty = hu->tty;
-> > > +
-> > >  	BT_DBG("hu %p", hu);
-> > >  
-> > > +	/* tty driver should support operations to set RTS */
-> > > +	if (!tty->driver->ops->tiocmget || !tty->driver->ops->tiocmset)
-> > > +		return -EOPNOTSUPP;
-> > 
-> > -ENODEV might be more appropriate.
-> > 
-> > Johan
-> 
-> I'll split into 2 seperate patches. So, do I need to add stable tag on each
-> patch like below to be cherry-picked?
-> 
-> Cc: <stable@vger.kernel.org> # <hash>: <summary>
-> 
-> I looked for a good example from mailing list but didn't find one.
+tty_set_termios() has the following WARN_ON which can be triggered with a
+syscall to invoke TIOCSETD __NR_ioctl.
 
-Almost right, the format you use above is actually used to identify
-dependencies for backports.
+WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+                tty->driver->subtype == PTY_TYPE_MASTER);
+Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
 
-You should add a Fixes tag identifying the commit which introduced each
-bug and a stable-cc tag. If you want you can indicate the version after
-a # sign, but that can also be inferred from the fixes tag.
+Johan Hovold said: "The problemm started with
+commit 7721383f4199 ("Bluetooth: hci_uart: Support
+operational speed during setup") which introduced a new way for how
+tty_set_termios() could end up being called for a master pty."
 
-For the hci_ldisc fix I think the tags would be:
+Fix it by by preventing setting the HCI line discipline for PTYs in
+hci_uart_tty_open(). Looked into keying off of tty and ldisc ops, and
+couldn't find any that would be conclusive. Checking tty as such clearly
+tags the reason for rejecting the request to set ldisc.
 
-	Fixes: 2a973dfada2b ("Bluetooth: hci_uart: Add new line discipline enhancements")
-	Cc: stable <stable@vger.kernel.org>     # 4.2
+Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
+Cc: Johan Hovold <johan@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Signed-off-by: Shuah Khan <shuah@kernel.org>
+---
+ drivers/bluetooth/hci_ldisc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-You can use git blame to track down the offending commits.
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index fbf7b4df23ab..a3d313fcc0f2 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -480,6 +480,11 @@ static int hci_uart_tty_open(struct tty_struct *tty)
+ 	if (tty->ops->write == NULL)
+ 		return -EOPNOTSUPP;
+ 
++	/* don't set HCI line discipline on PTYs */
++	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
++	    tty->driver->subtype == PTY_TYPE_MASTER)
++		return -EINVAL;
++
+ 	hu = kzalloc(sizeof(struct hci_uart), GFP_KERNEL);
+ 	if (!hu) {
+ 		BT_ERR("Can't allocate control structure");
+-- 
+2.17.1
 
-This should all be explained here:
-
-	https://www.kernel.org/doc/html/latest/process/submitting-patches.html
-
-Johan
