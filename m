@@ -8,99 +8,124 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32196C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 04:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A92EBC282DB
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 06:38:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0156D2084A
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 04:23:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78D9F21773
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 06:38:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZD9J/kgA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IrNXccpE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726723AbfBCEXz (ORCPT
+        id S1726871AbfBCGi3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 2 Feb 2019 23:23:55 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:39705 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726557AbfBCEXy (ORCPT
+        Sun, 3 Feb 2019 01:38:29 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:34702 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726743AbfBCGi3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 2 Feb 2019 23:23:54 -0500
-Received: by mail-pl1-f193.google.com with SMTP id 101so5239307pld.6;
-        Sat, 02 Feb 2019 20:23:54 -0800 (PST)
+        Sun, 3 Feb 2019 01:38:29 -0500
+Received: by mail-pf1-f196.google.com with SMTP id h3so5317879pfg.1;
+        Sat, 02 Feb 2019 22:38:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=7RbUpPibeswbGRgIY4OwIaY+jlrRtGwiAzTtQkLXwHw=;
-        b=ZD9J/kgAtOtS798CFd+sjuexyJ60rJ8F0z+5264n6CJtjFgzfYd+Vc2CXlUfVXyf80
-         rcZMSQMw1Mg7EZSn3QuJsnmrmHZx3STdN9di73x5oml/9NSHAubfKNdl0R+9xsOyPUSn
-         Ebwlx92wZkL6+Lkvte5x2lqUICakwgwrbNkqAVtP1+pzQzFJ6zNn/Dll+BdmbTF5lCxj
-         H0n3nFLC4CEFnSc36WpO8LDvTqPz7UHj81mEkwXMQY3mkswPn2Kj08qHWqJnvxC/Y7Rq
-         9TRHBP4psmWdVbj6v0nCYkgwck12NIsx4PNsubNYdWVemTE34vRIRMpkntryfpPN8Kue
-         GVaA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=5HfheAJSIQlHyMRAytqF17V6asDCHPQD+Fbosi3E3DQ=;
+        b=IrNXccpE5kRnoRTzacGNFflnnYaDQNE3KeFSbH3yi3DkB+Ny1u17rS6E8pMdtfRT+0
+         3j4ocdAl7la8XQcep4K+Cv53i2KkknRixzWozkrNi3ZvoKPM81MlgnmcBklU2q3+0BS4
+         rxOTUgiyVax7ncXTX5FNXYgNBSPIE9QebmLYeeOXArZIaech3tO4fb0VZlxQQTG7EiHz
+         HdkjtOMznrrcXJjGWuIEhSXJkeQylXQvxjIcQVELX0J2JJMeNkoDyy8dplTaVywPLgv+
+         Q+r1pIAAf2qHcTlICJGASrEermXlUx1h7Bsd9gn3h6c4Z82qkstaFcyM9sjc5gdlisHo
+         xx8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=7RbUpPibeswbGRgIY4OwIaY+jlrRtGwiAzTtQkLXwHw=;
-        b=De/FnonAMAMzpDBy2qhBI6YyTedXwyKJWV+zoU1D3IECPYR96Ov8kY69wggYsHPkiM
-         BpohO0cIyXW058Si3CMmgs9mZhx9oAXLpk0geekvq78cMZWoRjb1irXUN03eKx/lJPWF
-         ZxP7J3nixOVqqCxrbaNEhjDQ/K9aJNWRnriktGtV8xtZf3MsHvFLr0Eep7Zum4OxfwsW
-         rd1AjKS/UNYp33y1G7FWxcYKhbEEx6vXvQ3rxkRSEeW9YDI+ANBFCrj3njNb4IbwklfD
-         XqOBxyNDn6Apg8j6TjGVdjNnSi36OpB5JkAGI+0gCJ8ep9zlfbth/JK9b1JDYNQVFiIJ
-         TVHQ==
-X-Gm-Message-State: AJcUukcZuV9K4qT4Xk1hsc/X2RjVaS21y9n5q5osWKgTTl1CVagYOArb
-        E+eRsv2F/Cy5JKN1FQMCgMprRmMb1ew=
-X-Google-Smtp-Source: ALg8bN70C2k2r1qvwM+29Ns8H5SId3S2Fkr8MN4drw1z0LvBfl6LOq0Ih8mZWfcJKhQVRMDu/yd31Q==
-X-Received: by 2002:a17:902:298a:: with SMTP id h10mr46714537plb.312.1549167833846;
-        Sat, 02 Feb 2019 20:23:53 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=5HfheAJSIQlHyMRAytqF17V6asDCHPQD+Fbosi3E3DQ=;
+        b=g55FqLR53Np6mKZ3U/Dxip1T2eLgaff4SWvZqS6vTfCWyjAul1PacWMzFeK9Y+Epzd
+         BrUuHV4AEhLLg/uRQCGRXCvFkTl8n3WcbSzGMCw858r6THBP0oVgg5twKVQFWZKws6Am
+         5YCgM4LU8oCs5ohHTrTUk0JZyUDlY7i6UVA95CQMFCdMrd75auGY5SBQXzpG0cTSwR4E
+         M7GXblChl+UEUAKGWW0bNCyiTAnibr4/sm1IZEVBgjQQWe/k5PYOJOgiwbvcYVlj7D0p
+         YtQQFekzXX2GWmaNA6vVjobqAe08wzXKcUXr8kq41CBHrLKQzyoL/13zZMKFhVvjdF8u
+         hLDg==
+X-Gm-Message-State: AHQUAuZdG3BTt+bsBWGLz3/4ofo3IpksRuSuCIN/fFT8UuxIqHw560Sv
+        moQzYWZQc0SdNnowt0BlGDs=
+X-Google-Smtp-Source: AHgI3IYDzNC8hrRow1G/ctS2WuXubWXkd1FPw3cD4NKvM9duIIsErqkVhYPNRDjPwKsn4WFG1TNG7A==
+X-Received: by 2002:a63:e74b:: with SMTP id j11mr8663200pgk.397.1549175907854;
+        Sat, 02 Feb 2019 22:38:27 -0800 (PST)
 Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id e9sm15230831pff.5.2019.02.02.20.23.53
+        by smtp.gmail.com with ESMTPSA id s84sm21704138pfi.15.2019.02.02.22.38.26
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 02 Feb 2019 20:23:53 -0800 (PST)
-Date:   Sat, 2 Feb 2019 20:23:51 -0800
+        Sat, 02 Feb 2019 22:38:27 -0800 (PST)
+Date:   Sat, 2 Feb 2019 22:38:24 -0800
 From:   Myungho Jung <mhjungk@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_ldisc: Add NULL check for tty set_termios
- operation
-Message-ID: <20190203042348.GA18582@myunghoj-Precision-5530>
+To:     Johan Hovold <johan@kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Add NULL check for tiocmget() and
+ tiocmset()
+Message-ID: <20190203063823.GA8228@myunghoj-Precision-5530>
+References: <20190130053925.GA26699@myunghoj-Precision-5530>
+ <20190131154000.GU3691@localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20190131154000.GU3691@localhost>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-set_termios should not be NULL so return EOPNOTSUPP if tty driver does
-not support the operation.
+On Thu, Jan 31, 2019 at 04:40:00PM +0100, Johan Hovold wrote:
+> On Tue, Jan 29, 2019 at 09:39:28PM -0800, Myungho Jung wrote:
+> > tiocmget() and tiocmset() operations are optional and some tty drivers
+> > like pty miss the operations. We need NULL check to prevent from
+> > dereference.
+> > 
+> > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+> > ---
+> >  drivers/bluetooth/hci_ath.c   | 6 ++++++
+> >  drivers/bluetooth/hci_ldisc.c | 4 ++++
+> >  2 files changed, 10 insertions(+)
+> 
+> Ah, you had already submitted a v2.
+> 
+> I still suggest splitting this one in two patches and that you add a
+> Fixes and stable tag to each so that they both get backported to stable.
+> 
+> Also, when resubmitting, make sure to include a short changelog here
+> below the cut-off line (---).
+> 
+> > 
+> > diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+> > index d568fbd94d6c..fb9f6323a911 100644
+> > --- a/drivers/bluetooth/hci_ath.c
+> > +++ b/drivers/bluetooth/hci_ath.c
+> > @@ -185,8 +185,14 @@ static int ath_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> >  
+> >  static int ath_setup(struct hci_uart *hu)
+> >  {
+> > +	struct tty_struct *tty = hu->tty;
+> > +
+> >  	BT_DBG("hu %p", hu);
+> >  
+> > +	/* tty driver should support operations to set RTS */
+> > +	if (!tty->driver->ops->tiocmget || !tty->driver->ops->tiocmset)
+> > +		return -EOPNOTSUPP;
+> 
+> -ENODEV might be more appropriate.
+> 
+> Johan
 
-Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
-Signed-off-by: Myungho Jung <mhjungk@gmail.com>
----
- drivers/bluetooth/hci_ldisc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I'll split into 2 seperate patches. So, do I need to add stable tag on each
+patch like below to be cherry-picked?
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index fbf7b4df23ab..44ac2e9494cc 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -474,10 +474,10 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 
- 	BT_DBG("tty %p", tty);
- 
--	/* Error if the tty has no write op instead of leaving an exploitable
--	 * hole
-+	/* Error if the tty has no write or set_termios op instead of leaving an
-+	 * exploitable hole
- 	 */
--	if (tty->ops->write == NULL)
-+	if (tty->ops->write == NULL || tty->ops->set_termios == NULL)
- 		return -EOPNOTSUPP;
- 
- 	hu = kzalloc(sizeof(struct hci_uart), GFP_KERNEL);
--- 
-2.17.1
+Cc: <stable@vger.kernel.org> # <hash>: <summary>
+
+I looked for a good example from mailing list but didn't find one.
+
+Thanks,
+Myungho
 
