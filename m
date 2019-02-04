@@ -2,66 +2,66 @@ Return-Path: <SRS0=J43N=QM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DATE_IN_PAST_24_48,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 574E5C282CC
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 13:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE981C282CB
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 16:03:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FBAE217F9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 13:55:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CD782080F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 16:03:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727164AbfBENzx (ORCPT
+        id S1730235AbfBEQDK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Feb 2019 08:55:53 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:34410 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726276AbfBENzw (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Feb 2019 08:55:52 -0500
-Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B5495CF26A;
-        Tue,  5 Feb 2019 15:03:40 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v3 0/2] Bluetooth: Add NULL check for tiocmget() and
- tiocmset()
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <cover.1549346039.git.mhjungk@gmail.com>
-Date:   Tue, 5 Feb 2019 14:55:50 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <0D421861-FCD6-4AFF-8A0F-DBEE520DB64B@holtmann.org>
-References: <cover.1549346039.git.mhjungk@gmail.com>
-To:     Myungho Jung <mhjungk@gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Tue, 5 Feb 2019 11:03:10 -0500
+Received: from dinodirect.com ([216.245.204.37]:59859 "EHLO homeydesign.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730231AbfBEQDJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 5 Feb 2019 11:03:09 -0500
+X-Greylist: delayed 3765 seconds by postgrey-1.27 at vger.kernel.org; Tue, 05 Feb 2019 11:03:08 EST
+To:     linux-bluetooth@vger.kernel.org
+Subject: Need to retouch your photos?
+Message-ID: <10fed9385af8132d7ea1eb65a2e0621a@coroflot.com>
+Date:   Mon, 04 Feb 2019 12:17:56 +0100
+From:   "Stacy" <tuenkasnzsat@verizon.net>
+Reply-To: foshzhian@sina.com
+MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Myungho,
+Need to retouch your photos?  Deep etching or masking for your photos?
 
-> tiocmget() and tiocmset() operations are optional and some tty drivers
-> like pty miss the operations. Add NULL checks to prevent from
-> dereference.
-> 
-> Myungho Jung (2):
->  Bluetooth: hci_ath: Add NULL check for tiocmget() and tiocmset() in
->    ath_setup()
->  Bluetooth: hci_ldisc: Add NULL check for tiocmget() and tiocmset() in
->    hci_uart_set_flow_control()
-> 
-> drivers/bluetooth/hci_ath.c   | 6 ++++++
-> drivers/bluetooth/hci_ldisc.c | 4 ++++
-> 2 files changed, 10 insertions(+)
+We are the studio who can do those service for your photos.
 
-why are we not enforcing the availability of these in the hci_uart_tty_open?
+Please send photos to start
 
-Regards
+Thanks,
+Stacy
 
-Marcel
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Wordms
+
+
+Seevedtal
 
