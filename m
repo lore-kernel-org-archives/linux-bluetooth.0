@@ -3,28 +3,28 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.5 required=3.0 tests=DATE_IN_PAST_24_48,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE981C282CB
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 16:03:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17096C282CC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 16:08:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CD782080F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 16:03:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDADE2080F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 16:08:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730235AbfBEQDK (ORCPT
+        id S1730269AbfBEQID (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Feb 2019 11:03:10 -0500
-Received: from dinodirect.com ([216.245.204.37]:59859 "EHLO homeydesign.com"
+        Tue, 5 Feb 2019 11:08:03 -0500
+Received: from dinodirect.com ([216.245.204.37]:54508 "EHLO homeydesign.com"
         rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730231AbfBEQDJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Feb 2019 11:03:09 -0500
-X-Greylist: delayed 3765 seconds by postgrey-1.27 at vger.kernel.org; Tue, 05 Feb 2019 11:03:08 EST
+        id S1730268AbfBEQID (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 5 Feb 2019 11:08:03 -0500
+X-Greylist: delayed 4018 seconds by postgrey-1.27 at vger.kernel.org; Tue, 05 Feb 2019 11:08:02 EST
 To:     linux-bluetooth@vger.kernel.org
 Subject: Need to retouch your photos?
-Message-ID: <10fed9385af8132d7ea1eb65a2e0621a@coroflot.com>
-Date:   Mon, 04 Feb 2019 12:17:56 +0100
-From:   "Stacy" <tuenkasnzsat@verizon.net>
+Message-ID: <d66f93fbea86ed991f9232b75d3a88bf@coroflot.com>
+Date:   Mon, 04 Feb 2019 12:18:03 +0100
+From:   "Stacy" <tuenkadnzsat@verizon.net>
 Reply-To: foshzhian@sina.com
 MIME-Version: 1.0
 Content-Type: text/plain; format=flowed; charset="UTF-8"
@@ -60,8 +60,8 @@ Stacy
 
 
 
-Wordms
+Pforzdeim
 
 
-Seevedtal
+Haldberstadt
 
