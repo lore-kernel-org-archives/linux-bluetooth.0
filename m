@@ -2,162 +2,115 @@ Return-Path: <SRS0=YDOl=QL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4AEC282C4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 09:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6DBC282C4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 09:22:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1346720844
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 09:10:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B705C2070C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 09:22:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1549272141;
+	bh=+2BwNSmPpCp7jn6DBtGE4O0IzYiegjR09ggBQR1kPKc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=yVfvai4Wda58OW9cHUbpy2jUqlQpGYP+osy48SaOZbqea9KTeheSg7pY9mnT051XT
+	 rOTdveeY3ddAeWGQBbs0nc0pOZGY+bAAp2JPXSAT34+XuxZlnJx9bJRc/kdz7Nh4xd
+	 aDWTPjA+2slxVnSi9hl1aygtO+Zd3fQw48OBT2dY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728265AbfBDJKt convert rfc822-to-8bit (ORCPT
+        id S1727514AbfBDJWV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Feb 2019 04:10:49 -0500
-Received: from mga11.intel.com ([192.55.52.93]:18516 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726320AbfBDJKt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Feb 2019 04:10:49 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Feb 2019 01:10:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,559,1539673200"; 
-   d="scan'208";a="123739693"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by orsmga003.jf.intel.com with ESMTP; 04 Feb 2019 01:10:48 -0800
-Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Mon, 4 Feb 2019 01:10:48 -0800
-Received: from bgsmsx152.gar.corp.intel.com (10.224.48.50) by
- FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Mon, 4 Feb 2019 01:10:47 -0800
-Received: from bgsmsx109.gar.corp.intel.com ([169.254.10.162]) by
- BGSMSX152.gar.corp.intel.com ([169.254.6.187]) with mapi id 14.03.0415.000;
- Mon, 4 Feb 2019 14:40:45 +0530
-From:   "Panda, Bharat B" <bharat.b.panda@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v2] Bluetooth: Support fast advertising interval
-Thread-Topic: [PATCH v2] Bluetooth: Support fast advertising interval
-Thread-Index: AQHUcDiPVg5fEVUUwE2S8+QBit+So6WFFqSAgEra+vA=
-Date:   Mon, 4 Feb 2019 09:10:44 +0000
-Message-ID: <B42C2A3D4050B547BA40CAE18E023BE64D6A77D0@BGSMSX109.gar.corp.intel.com>
-References: <marcel@holtmann.org>
- <1540895076-6046-1-git-send-email-bharat.b.panda@intel.com>
- <E8D865FD-B17C-4F46-8CC7-6EC6F010D757@holtmann.org>
-In-Reply-To: <E8D865FD-B17C-4F46-8CC7-6EC6F010D757@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMjhmNDgwZGMtMzJmMy00NzUxLTljMzItYTY5NGVjZjI3MDBhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZXVLVlhSaVljb0x5cHdcL1NZdXFaWXpBRm9iQkMybm9DMXkycVNkMFRpb1FYNW0rZVpQbjZCYlVXazluUElYM1UifQ==
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.223.10.10]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Mon, 4 Feb 2019 04:22:21 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:35165 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726928AbfBDJWU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 4 Feb 2019 04:22:20 -0500
+Received: by mail-lf1-f66.google.com with SMTP id l142so1807732lfe.2;
+        Mon, 04 Feb 2019 01:22:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=brRPXCD2jZcrrLhzRAwaT2u92Pni+2Pr+UuI2xoYGXo=;
+        b=KPrhjc6u2IpI9NzCkmxbP1SmZhnSfYn42E4SpysCs+aEs4CVureY9+94xtgb0WAEVI
+         Dgna7OGSEHo0yfNLFU2eFJH6VPPOgSTTqxHFi/dZuLXOH6vph/SO6ZYPBz1o4XBvhrmh
+         c8GWKG1z+6oDfPGfzOkWr0tCjIb09ZfiFYjrVKl/nK9gioiOYnm3GsTbNGyFA89HPvS0
+         i0vxn2zLHDH/czivj/xAjcj70f7rsUJ4Setcd6Vz3L6i9u+I+/WgC8VgmAfUboZtg1j4
+         YUIBeuTfGz2/Tn84nXQQXp0A6+OXHddEFSVj9iA9sRmnP7p+hyHGo8DsksBoddWQRJyb
+         Kk+w==
+X-Gm-Message-State: AHQUAualVR460Y2SvzCGsY6wefs38khS1ZVZAiq67P79hG7x1xArkWAG
+        n1nyWuz8U7Iv80rl0wNPQYk=
+X-Google-Smtp-Source: AHgI3IYoyWWImArGIzOk1jQ66MqjAYCDnkKZ1j2iADFl6EDxxvQfFX4Q+fYbDzrAbBBvU5G0vJkG1Q==
+X-Received: by 2002:a19:4f0c:: with SMTP id d12mr6253662lfb.121.1549272138787;
+        Mon, 04 Feb 2019 01:22:18 -0800 (PST)
+Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
+        by smtp.gmail.com with ESMTPSA id m63-v6sm2895943lje.81.2019.02.04.01.22.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 04 Feb 2019 01:22:17 -0800 (PST)
+Received: from johan by xi.terra with local (Exim 4.91)
+        (envelope-from <johan@kernel.org>)
+        id 1gqaSG-00054o-8x; Mon, 04 Feb 2019 10:22:16 +0100
+Date:   Mon, 4 Feb 2019 10:22:16 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Myungho Jung <mhjungk@gmail.com>
+Cc:     Johan Hovold <johan@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Add NULL check for tiocmget() and
+ tiocmset()
+Message-ID: <20190204092216.GC4686@localhost>
+References: <20190130053925.GA26699@myunghoj-Precision-5530>
+ <20190131154000.GU3691@localhost>
+ <20190203063823.GA8228@myunghoj-Precision-5530>
+ <20190203105323.GA4686@localhost>
+ <20190204072859.nrglf7pfj42itzh5@myunghoj-Precision-5530>
+ <20190204090436.GA3711@myunghoj-Precision-5530>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190204090436.GA3711@myunghoj-Precision-5530>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+On Mon, Feb 04, 2019 at 01:04:37AM -0800, Myungho Jung wrote:
+> On Sun, Feb 03, 2019 at 11:29:00PM -0800, Myungho Jung wrote:
+> > On Sun, Feb 03, 2019 at 11:53:23AM +0100, Johan Hovold wrote:
 
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Wednesday, December 19, 2018 5:00 AM
-> To: Panda, Bharat B <bharat.b.panda@intel.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH v2] Bluetooth: Support fast advertising interval
-> 
-> Hi Bharat,
-> 
-> > Changes made to add support for fast advertising interval as per core
-> > 4.1 specification, section 9.3.11.2.
-> >
-> > A peripheral device entering any of the following GAP modes and
-> > sending either non-connectable advertising events or scannable
-> > undirected advertising events should use adv_fast_interval2(100ms -
-> > 150ms) for adv_fast_period(30s).
-> >         - Non-Discoverable Mode
-> >         - Non-Connectable Mode
-> >         - Limited Discoverable Mode
-> >         - General Discoverable Mode
-> >
-> > Signed-off-by: Bharat Bhusan Panda <bharat.b.panda@intel.com>
-> > ---
-> > include/net/bluetooth/hci_core.h |  2 ++
-> > net/bluetooth/hci_request.c      | 27 +++++++++++++++++++++++++++
-> > 2 files changed, 29 insertions(+)
-> >
-> > diff --git a/include/net/bluetooth/hci_core.h
-> > b/include/net/bluetooth/hci_core.h
-> > index 0db1b9b..868c2fb 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -1491,6 +1491,8 @@ struct hci_mgmt_chan {
-> > #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
-> > #define DISCOV_BREDR_INQUIRY_LEN	0x08
-> > #define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/*
-> msec */
-> > +#define DISCOV_LE_FAST_ADV_INT_MIN	100	/* msec */
-> > +#define DISCOV_LE_FAST_ADV_INT_MAX	150	/* msec */
-> >
-> > void mgmt_fill_version_info(void *ver); int mgmt_new_settings(struct
-> > hci_dev *hdev); diff --git a/net/bluetooth/hci_request.c
-> > b/net/bluetooth/hci_request.c index e8c9ef1..fe43498 100644
-> > --- a/net/bluetooth/hci_request.c
-> > +++ b/net/bluetooth/hci_request.c
-> > @@ -1092,6 +1092,33 @@ void __hci_req_enable_advertising(struct
-> hci_request *req)
-> > 	else
-> > 		cp.type = LE_ADV_NONCONN_IND;
-> >
-> > +	/* As per core 4.1 spec, section 9.3.11.2: A peripheral device
-> > +	 * entering any of the following GAP modes and sending either
-> > +	 * non-connectable advertising events or scannable undirected
-> > +	 * advertising events should use adv_fast_interval2(100ms - 150ms)
-> > +	 * for adv_fast_period(30s).
-> > +	 *
-> > +	 * 	- Non-Discoverable Mode
-> > +	 *	- Non-Connectable Mode
-> > +	 * 	- Limited Discoverable Mode
-> > +	 * 	- General Discoverable Mode
-> > +	 */
-> > +	if (cp.type == LE_ADV_NONCONN_IND || cp.type ==
-> LE_ADV_SCAN_IND) {
-> > +		/* Set the suggested min and max fast advertising interval,
-> > +		 * only if the peripheral device has entered any of the modes
-> > +		 * such as non-discoverable, non-connectable or limited-
-> > +		 * discoverable.
-> > +		 */
-> > +		if (!hci_dev_test_flag(hdev, HCI_DISCOVERABLE) ||
-> > +			!hci_dev_test_flag(hdev, HCI_CONNECTABLE) ||
-> > +			hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
-> {
-> 
-> this is still wrongly indented.
-Sorry for replying late, I have made the correct indentation and submitted v3 for same. Please review.
-> 
-> > +			cp.min_interval =
-> > +				cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MIN);
-> > +			cp.max_interval =
-> > +
-> 	cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MAX);
-> > +		}
-> > +	}
-> > +
-> 
-> Regards
-> 
-> Marcel
+> > > You should add a Fixes tag identifying the commit which introduced each
+> > > bug and a stable-cc tag. If you want you can indicate the version after
+> > > a # sign, but that can also be inferred from the fixes tag.
+> > > 
+> > > For the hci_ldisc fix I think the tags would be:
+> > > 
+> > > 	Fixes: 2a973dfada2b ("Bluetooth: hci_uart: Add new line discipline enhancements")
+> > > 	Cc: stable <stable@vger.kernel.org>     # 4.2
+> > > 
+> > > You can use git blame to track down the offending commits.
+> > > 
+> > > This should all be explained here:
+> > > 
+> > > 	https://www.kernel.org/doc/html/latest/process/submitting-patches.html
 
-Regards,
-Bharat
+> I have one more question. The title of new patches should be version 3 like
+> this?
+> [PATCH v3] Bluetooth: hci_ath: ...
+> [PATCH v3] Bluetooth: hci_ldisc: ...
+> 
+> Or newly start with [PATCH]?
 
+You should keep and increment the revision number even if you split a
+patch (so use v3 for the resend).
+
+I suggest you send both patches in a series (as they are related); take
+a look at git-send-email for a convenient way to do that. 
+
+And always include a brief changelog (below the cut-off line, "---")
+when revising patches.
+
+Johan
