@@ -2,181 +2,134 @@ Return-Path: <SRS0=YDOl=QL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D56C282C4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 15:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DB7C282CB
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 16:43:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33A0A2082E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 15:07:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="U62EGO67";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="FwJS0bBA"
+	by mail.kernel.org (Postfix) with ESMTP id 3E4F520823
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 16:43:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730882AbfBDPHC (ORCPT
+        id S1730051AbfBDQnE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Feb 2019 10:07:02 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:38760 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727217AbfBDPHC (ORCPT
+        Mon, 4 Feb 2019 11:43:04 -0500
+Received: from mail-it1-f199.google.com ([209.85.166.199]:57956 "EHLO
+        mail-it1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727062AbfBDQnE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Feb 2019 10:07:02 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 7F7F1608CD; Mon,  4 Feb 2019 15:07:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1549292820;
-        bh=QvC9eVQc+aAA1+nAkHD2QEh51oF9O2O63lRXpHJ9QlE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=U62EGO67t+bkmSZOH0/gqh2/VcIRwAFNVPLv7hzXWkJ4f5qLgap7JKnv91XxkSduh
-         PPvzwQXBir/8YZ2dZjYISltWXvAXCZ2A0jsxHbT+thtcrx5c5f1ym1SzNWSP/B8wpZ
-         TZ7d1EqUCNwKPY7Z4f49CwrUni36aCfVFAYHpiEM=
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 3D1D56074F;
-        Mon,  4 Feb 2019 15:06:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1549292819;
-        bh=QvC9eVQc+aAA1+nAkHD2QEh51oF9O2O63lRXpHJ9QlE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FwJS0bBA8BZOtXDw8amI/jpb1QnvJIwV/2bjOpYifl1EDqPYRMgDbhJnBVnw6uB4u
-         E6SmfytFnb7byeGQT+LIyUr9oa23ZzfXW7lI6bEyGZgqiPwCCE9ky5V9V/sauVq2RR
-         xmjAs1d9T7ZY1ZQSFR8fKxBWM5+9rCC/NdZvaHuI=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 3D1D56074F
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v11 1/3] Bluetooth: hci_qca: use wait_until_sent() for power pulses
-Date:   Mon,  4 Feb 2019 20:36:41 +0530
-Message-Id: <20190204150643.25165-2-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190204150643.25165-1-bgodavar@codeaurora.org>
-References: <20190204150643.25165-1-bgodavar@codeaurora.org>
+        Mon, 4 Feb 2019 11:43:04 -0500
+Received: by mail-it1-f199.google.com with SMTP id n124so680871itb.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Feb 2019 08:43:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=re1YU5O9KdNA/G1iB7AA+KPR4zLDTcKq4DdGCjFBkCg=;
+        b=uApt7/7gM5yIIm+w+yjLnR76wHI78Plwv/+cq42+jRQcE9JFMfIPBkz8nBt4GiCO5k
+         Y2vxeVbALG3awzU3Krm/38F4Z1JDOtsa1Y5ZPJaPLxxuyn6rHl4LFXyR9xCs7UAK+1hC
+         V7qGxP6Co0Pm5FAsNVIt6yv0c00TxbJqkx6S5f0Z966/Bb1FdiRKMp32MLVoaXZqO1P7
+         9rUsyaQVmI6Fx/mrkF1phdnMaHdrBR/mEKHsHygqHzY+Bc9zUFaLdqjkyZ7N1Kt1qVC7
+         7TEnW/pjD+bAzbqjyhpudpdAV16E2R+hDWLCeurhwXRrBRvOz9/4WVquzNjXz1KP/lSz
+         +kPw==
+X-Gm-Message-State: AHQUAuap7iaBJX8MRZHcMNeG6HNKQ7AlQgARjOx2pGjIaiwtM6e30BSM
+        +buG5eKFJn8iSHkXxeaBuPK64LmUqZ2EBxtwGq/DzIN1uu/t
+X-Google-Smtp-Source: AHgI3IZ/HEShA2YzLqMX1WFJ+PbDC6gJPOjp3vnWatfaOzqz6uRJYbq3/W+Nkmu/O0fwK5CBPOjEd6/Rv9X/4aeDPEkcNYnGU5lM
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a02:97da:: with SMTP id v26mr146691jaj.1.1549298583590;
+ Mon, 04 Feb 2019 08:43:03 -0800 (PST)
+Date:   Mon, 04 Feb 2019 08:43:03 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b9e68e0581142f19@google.com>
+Subject: general protection fault in skb_put
+From:   syzbot <syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-wcn3990 requires a power pulse to turn ON/OFF along with
-regulators. Sometimes we are observing the power pulses are sent
-out with some time delay, due to queuing these commands. This is
-causing synchronization issues with chip, which intern delay the
-chip setup or may end up with communication issues.
+Hello,
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+syzbot found the following crash on:
+
+HEAD commit:    dc4c89997735 Add linux-next specific files for 20190201
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=120a50b0c00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=59aefae07c771af6
+dashboard link: https://syzkaller.appspot.com/bug?extid=65788f9af9d54844389e
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=178e0798c00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11b4f0b0c00000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com
+
+kasan: CONFIG_KASAN_INLINE enabled
+kasan: GPF could be caused by NULL-ptr deref or user memory access
+general protection fault: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 21 Comm: kworker/u4:1 Not tainted 5.0.0-rc4-next-20190201 #25
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events_unbound flush_to_ldisc
+RIP: 0010:skb_put+0x35/0x1d0 net/core/skbuff.c:1698
+Code: 89 f5 41 54 49 89 fc 53 4d 8d b4 24 b8 00 00 00 48 83 ec 08 e8 2c 6a  
+01 fc 4c 89 f2 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 4c  
+89 f0 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 4c
+RSP: 0018:ffff8880a99cfb28 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: ffff8880969a9280 RCX: ffffffff84ef8fa3
+RDX: 0000000000000017 RSI: ffffffff856e9164 RDI: 0000000000000000
+RBP: ffff8880a99cfb58 R08: ffff8880a99c0580 R09: ffffed1015d25bc0
+R10: ffffed1015d25bbf R11: ffff8880ae92ddfb R12: 0000000000000000
+R13: 0000000000000001 R14: 00000000000000b8 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000004b4adc CR3: 000000008e053000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+  skb_put_data include/linux/skbuff.h:2138 [inline]
+  bcsp_unslip_one_byte drivers/bluetooth/hci_bcsp.c:451 [inline]
+  bcsp_recv+0x98f/0x13a0 drivers/bluetooth/hci_bcsp.c:612
+  hci_uart_tty_receive+0x22b/0x530 drivers/bluetooth/hci_ldisc.c:607
+  tty_ldisc_receive_buf+0x164/0x1c0 drivers/tty/tty_buffer.c:465
+  tty_port_default_receive_buf+0x7d/0xb0 drivers/tty/tty_port.c:38
+  receive_buf drivers/tty/tty_buffer.c:481 [inline]
+  flush_to_ldisc+0x228/0x390 drivers/tty/tty_buffer.c:533
+  process_one_work+0x98e/0x1790 kernel/workqueue.c:2257
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2403
+  kthread+0x357/0x430 kernel/kthread.c:247
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
+Modules linked in:
+---[ end trace 6643b2336de1f8b1 ]---
+RIP: 0010:skb_put+0x35/0x1d0 net/core/skbuff.c:1698
+Code: 89 f5 41 54 49 89 fc 53 4d 8d b4 24 b8 00 00 00 48 83 ec 08 e8 2c 6a  
+01 fc 4c 89 f2 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 4c  
+89 f0 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 4c
+RSP: 0018:ffff8880a99cfb28 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: ffff8880969a9280 RCX: ffffffff84ef8fa3
+RDX: 0000000000000017 RSI: ffffffff856e9164 RDI: 0000000000000000
+RBP: ffff8880a99cfb58 R08: ffff8880a99c0580 R09: ffffed1015d25bc0
+R10: ffffed1015d25bbf R11: ffff8880ae92ddfb R12: 0000000000000000
+R13: 0000000000000001 R14: 00000000000000b8 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000004b4adc CR3: 000000008e053000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
 ---
-Changes in v10:
-Updated the wait time to 100 us for power pules.
----
- drivers/bluetooth/hci_qca.c | 38 +++++++++++++++----------------------
- 1 file changed, 15 insertions(+), 23 deletions(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 53ac5ade532b..9a1c0a71b460 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -60,6 +60,7 @@
- #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
- #define IBS_TX_IDLE_TIMEOUT_MS		2000
- #define BAUDRATE_SETTLE_TIMEOUT_MS	300
-+#define POWER_PULSE_TRANS_TIMEOUT_MS	100
- 
- /* susclk rate */
- #define SUSCLK_RATE_32KHZ	32768
-@@ -1013,11 +1014,10 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 		hci_uart_set_baudrate(hu, speed);
- }
- 
--static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
-+static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
- {
--	struct hci_uart *hu = hci_get_drvdata(hdev);
--	struct qca_data *qca = hu->priv;
--	struct sk_buff *skb;
-+	int ret;
-+	int timeout = msecs_to_jiffies(POWER_PULSE_TRANS_TIMEOUT_MS);
- 
- 	/* These power pulses are single byte command which are sent
- 	 * at required baudrate to wcn3990. On wcn3990, we have an external
-@@ -1029,19 +1029,17 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
- 	 * save power. Disabling hardware flow control is mandatory while
- 	 * sending power pulses to SoC.
- 	 */
--	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
--
--	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
--	if (!skb)
--		return -ENOMEM;
-+	bt_dev_dbg(hu->hdev, "sending power pulse %02x to controller", cmd);
- 
-+	serdev_device_write_flush(hu->serdev);
- 	hci_uart_set_flow_control(hu, true);
-+	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
-+	if (ret < 0) {
-+		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
-+		return ret;
-+	}
- 
--	skb_put_u8(skb, cmd);
--	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
--
--	skb_queue_tail(&qca->txq, skb);
--	hci_uart_tx_wakeup(hu);
-+	serdev_device_wait_until_sent(hu->serdev, timeout);
- 
- 	/* Wait for 100 uS for SoC to settle down */
- 	usleep_range(100, 200);
-@@ -1116,7 +1114,6 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 
- static int qca_wcn3990_init(struct hci_uart *hu)
- {
--	struct hci_dev *hdev = hu->hdev;
- 	struct qca_serdev *qcadev;
- 	int ret;
- 
-@@ -1139,12 +1136,12 @@ static int qca_wcn3990_init(struct hci_uart *hu)
- 
- 	/* Forcefully enable wcn3990 to enter in to boot mode. */
- 	host_set_baudrate(hu, 2400);
--	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
-+	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
- 	if (ret)
- 		return ret;
- 
- 	qca_set_speed(hu, QCA_INIT_SPEED);
--	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
-+	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWERON_PULSE);
- 	if (ret)
- 		return ret;
- 
-@@ -1277,13 +1274,8 @@ static const struct qca_vreg_data qca_soc_data = {
- 
- static void qca_power_shutdown(struct hci_uart *hu)
- {
--	struct serdev_device *serdev = hu->serdev;
--	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
--
- 	host_set_baudrate(hu, 2400);
--	hci_uart_set_flow_control(hu, true);
--	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
--	hci_uart_set_flow_control(hu, false);
-+	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
- 	qca_power_setup(hu, false);
- }
- 
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
