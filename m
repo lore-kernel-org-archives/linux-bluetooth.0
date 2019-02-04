@@ -2,155 +2,112 @@ Return-Path: <SRS0=YDOl=QL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB4FC282C4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 07:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F100C282D7
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 08:52:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFBE3214DA
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 07:29:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pd0w+f14"
+	by mail.kernel.org (Postfix) with ESMTP id 34A6120820
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Feb 2019 08:52:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728181AbfBDH3F (ORCPT
+        id S1728084AbfBDIw5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Feb 2019 02:29:05 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:42040 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726185AbfBDH3F (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Feb 2019 02:29:05 -0500
-Received: by mail-pf1-f195.google.com with SMTP id 64so6356698pfr.9;
-        Sun, 03 Feb 2019 23:29:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=RUkqMHnNmtHb0Im8JUQwGSer0RH9yyUW825U9IQLPp4=;
-        b=pd0w+f14zffQ5A6RyTEfG1eh+YFD9yvhAlB1IDC3CQBgMLTeH1H//9LhEV7Shkr2qE
-         b3BmtueKi5mJ3viaeafJF78bEX4XjfLhPWJa9XYNJOUZBNcbmr9Koq/aTYZNweedKabK
-         puT9Yl4EVP93vCiV2UAt/S+bHmAelqMp+LpGqSByaaeo2ut96OdwUluqpOzigEy8l6Nf
-         hIFosxts47cfdbIvPgFR6IZhVTd9ODJyMe3bImOP2WRm860UArXr6AED1SAt6ZUNlczZ
-         InjkY+CpoD8iq9GJa9ZhmaF2anYIy8C5O25kh4+9ft2qXoHtXYp6WTatr7M94EA/XpOG
-         KlRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RUkqMHnNmtHb0Im8JUQwGSer0RH9yyUW825U9IQLPp4=;
-        b=ByCZgorvtNWGZ1tAECbBGXRy3yEfYuB+Jb1qYICqWSTQHtgaJ5bqFKL3fRd5SLp4u7
-         4X8Dk/B854G5H9xOkkrSSPge4ZmEh5M4x8UwFhVIC+CK9BmXQ5yDUQhpp+dXXDaLiGpz
-         /acFYEXQrKiwekULB6kntpVtwXI+2afFri1b6pFzba8FqIu1mGuWguzcGOA5UmebRoU9
-         +lbfX1SPZxindK4DhHMTAJIcGN3XSQlcYkcuy+1MxwgwBF38ud9dA+L2m97JnWsAGnlk
-         CLzZnxQqEoz2+a44T85VbXel3cDTytGF7T8nXUTVKE+LP3LB9H18oGwzUvhZYC5yiM0g
-         4J2g==
-X-Gm-Message-State: AHQUAuZ/mpeJFlDF5w66YG0/3g/e+7pdwe1GM6GX+b3hwN/3+fatVSLS
-        VZfKUW7WiHwbGw4VJmuZCowowYde
-X-Google-Smtp-Source: AHgI3Ibt3c6WFVXApe6VIyX6BEtwZQ3t9mIXdtqJX8RgGnpWRGknQe2HAf8D1Lnd4jYbgUI/muW03g==
-X-Received: by 2002:a65:64c8:: with SMTP id t8mr9340396pgv.31.1549265343925;
-        Sun, 03 Feb 2019 23:29:03 -0800 (PST)
-Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id c9sm34969206pfc.92.2019.02.03.23.29.02
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 03 Feb 2019 23:29:03 -0800 (PST)
-Date:   Sun, 3 Feb 2019 23:29:00 -0800
-From:   Myungho Jung <mhjungk@gmail.com>
-To:     Johan Hovold <johan@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Add NULL check for tiocmget() and
- tiocmset()
-Message-ID: <20190204072859.nrglf7pfj42itzh5@myunghoj-Precision-5530>
-References: <20190130053925.GA26699@myunghoj-Precision-5530>
- <20190131154000.GU3691@localhost>
- <20190203063823.GA8228@myunghoj-Precision-5530>
- <20190203105323.GA4686@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190203105323.GA4686@localhost>
-User-Agent: NeoMutt/20171215
+        Mon, 4 Feb 2019 03:52:57 -0500
+Received: from mga14.intel.com ([192.55.52.115]:10145 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726720AbfBDIw5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 4 Feb 2019 03:52:57 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Feb 2019 00:52:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,559,1539673200"; 
+   d="scan'208";a="121808466"
+Received: from bpanda-all-series.iind.intel.com ([10.223.96.45])
+  by fmsmga008.fm.intel.com with ESMTP; 04 Feb 2019 00:52:56 -0800
+From:   Bharat Bhusan Panda <bharat.b.panda@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: Support fast advertising interval
+Date:   Mon,  4 Feb 2019 14:37:47 +0530
+Message-Id: <1549271267-12393-1-git-send-email-bharat.b.panda@intel.com>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Feb 03, 2019 at 11:53:23AM +0100, Johan Hovold wrote:
-> On Sat, Feb 02, 2019 at 10:38:24PM -0800, Myungho Jung wrote:
-> > On Thu, Jan 31, 2019 at 04:40:00PM +0100, Johan Hovold wrote:
-> > > On Tue, Jan 29, 2019 at 09:39:28PM -0800, Myungho Jung wrote:
-> > > > tiocmget() and tiocmset() operations are optional and some tty drivers
-> > > > like pty miss the operations. We need NULL check to prevent from
-> > > > dereference.
-> > > > 
-> > > > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
-> > > > ---
-> > > >  drivers/bluetooth/hci_ath.c   | 6 ++++++
-> > > >  drivers/bluetooth/hci_ldisc.c | 4 ++++
-> > > >  2 files changed, 10 insertions(+)
-> > > 
-> > > Ah, you had already submitted a v2.
-> > > 
-> > > I still suggest splitting this one in two patches and that you add a
-> > > Fixes and stable tag to each so that they both get backported to stable.
-> > > 
-> > > Also, when resubmitting, make sure to include a short changelog here
-> > > below the cut-off line (---).
-> > > 
-> > > > 
-> > > > diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-> > > > index d568fbd94d6c..fb9f6323a911 100644
-> > > > --- a/drivers/bluetooth/hci_ath.c
-> > > > +++ b/drivers/bluetooth/hci_ath.c
-> > > > @@ -185,8 +185,14 @@ static int ath_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-> > > >  
-> > > >  static int ath_setup(struct hci_uart *hu)
-> > > >  {
-> > > > +	struct tty_struct *tty = hu->tty;
-> > > > +
-> > > >  	BT_DBG("hu %p", hu);
-> > > >  
-> > > > +	/* tty driver should support operations to set RTS */
-> > > > +	if (!tty->driver->ops->tiocmget || !tty->driver->ops->tiocmset)
-> > > > +		return -EOPNOTSUPP;
-> > > 
-> > > -ENODEV might be more appropriate.
-> > > 
-> > > Johan
-> > 
-> > I'll split into 2 seperate patches. So, do I need to add stable tag on each
-> > patch like below to be cherry-picked?
-> > 
-> > Cc: <stable@vger.kernel.org> # <hash>: <summary>
-> > 
-> > I looked for a good example from mailing list but didn't find one.
-> 
-> Almost right, the format you use above is actually used to identify
-> dependencies for backports.
-> 
-> You should add a Fixes tag identifying the commit which introduced each
-> bug and a stable-cc tag. If you want you can indicate the version after
-> a # sign, but that can also be inferred from the fixes tag.
-> 
-> For the hci_ldisc fix I think the tags would be:
-> 
-> 	Fixes: 2a973dfada2b ("Bluetooth: hci_uart: Add new line discipline enhancements")
-> 	Cc: stable <stable@vger.kernel.org>     # 4.2
-> 
-> You can use git blame to track down the offending commits.
-> 
-> This should all be explained here:
-> 
-> 	https://www.kernel.org/doc/html/latest/process/submitting-patches.html
-> 
-> Johan
+Changes made to add support for fast advertising interval as per
+core 4.1 specification, section 9.3.11.2.
 
-Thank you for the explanation. I'll carefully read the page and submit the next
-patch.
+A peripheral device entering any of the following GAP modes and
+sending either non-connectable advertising events or scannable undirected
+advertising events should use adv_fast_interval2(100ms - 150ms)
+for adv_fast_period(30s).
+         - Non-Discoverable Mode
+         - Non-Connectable Mode
+         - Limited Discoverable Mode
+         - General Discoverable Mode
 
-Thanks,
-Myungho
+Signed-off-by: Bharat Bhusan Panda <bharat.b.panda@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_request.c      | 27 +++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0db1b9b..868c2fb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1491,6 +1491,8 @@ struct hci_mgmt_chan {
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
+ #define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
++#define DISCOV_LE_FAST_ADV_INT_MIN	100	/* msec */
++#define DISCOV_LE_FAST_ADV_INT_MAX	150	/* msec */
+ 
+ void mgmt_fill_version_info(void *ver);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index e8c9ef1..9b73061 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1092,6 +1092,33 @@ void __hci_req_enable_advertising(struct hci_request *req)
+ 	else
+ 		cp.type = LE_ADV_NONCONN_IND;
+ 
++	/* As per core 4.1 spec, section 9.3.11.2: A peripheral device
++	 * entering any of the following GAP modes and sending either
++	 * non-connectable advertising events or scannable undirected
++	 * advertising events should use adv_fast_interval2(100ms - 150ms)
++	 * for adv_fast_period(30s).
++	 *
++	 *	- Non-Discoverable Mode
++	 *	- Non-Connectable Mode
++	 *	- Limited Discoverable Mode
++	 *	- General Discoverable Mode
++	 */
++	if (cp.type == LE_ADV_NONCONN_IND || cp.type == LE_ADV_SCAN_IND) {
++		/* Set the suggested min and max fast advertising interval,
++		 * only if the peripheral device has entered any of the modes
++		 * such as non-discoverable, non-connectable or limited-
++		 * discoverable.
++		 */
++		if (!hci_dev_test_flag(hdev, HCI_DISCOVERABLE) ||
++		    !hci_dev_test_flag(hdev, HCI_CONNECTABLE) ||
++		    hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE)) {
++			cp.min_interval =
++				cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MIN);
++			cp.max_interval =
++				cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MAX);
++		}
++	}
++
+ 	cp.own_address_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+ 
+-- 
+1.9.1
+
