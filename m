@@ -2,76 +2,85 @@ Return-Path: <SRS0=J43N=QM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CAEC282C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 02:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A5BC282CB
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 06:43:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1881D20844
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 02:39:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F3DA2080D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Feb 2019 06:43:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tCp/YM+e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726606AbfBECjf convert rfc822-to-8bit (ORCPT
+        id S1726873AbfBEGnF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Feb 2019 21:39:35 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:45120 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725886AbfBECjf (ORCPT
+        Tue, 5 Feb 2019 01:43:05 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:41884 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726416AbfBEGnF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Feb 2019 21:39:35 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 732682BD2D
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Feb 2019 02:39:34 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 6791C2BD3E; Tue,  5 Feb 2019 02:39:34 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 202465] Bluetooth adaptor dies - 0489:e0a2 Foxconn / Hon Hai
-Date:   Tue, 05 Feb 2019 02:39:34 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: jccantele49@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-202465-62941-MfV3aViZKV@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-202465-62941@https.bugzilla.kernel.org/>
-References: <bug-202465-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Tue, 5 Feb 2019 01:43:05 -0500
+Received: by mail-pg1-f196.google.com with SMTP id m1so1005087pgq.8;
+        Mon, 04 Feb 2019 22:43:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=AoCtcolpsDq3ZvsC0O7qKcicqzlwuQY8E2inQ9xRxj4=;
+        b=tCp/YM+ed56uM7agCblTkxfj2QquvOOh02Rq+KD7HLlaomCsUG89rahICi/lGqRBzm
+         NtvhNBdB9UpHq7XqDPajkSPC7jxhXj+fImLeR8j4QZfnFurUe/Rh72EFkbiSB0IeElUW
+         nx2YwVnQaUO/e+5sHvntRIUen5TFlRxUFIQT+MqQC224V1S5kwOIxGneQ47eNaD7pSZc
+         WrcjQQTA9xZFx4mDrSAr/Ngqn2xV3pJ8ENd4AYxHIcEDMQOcadf6/abJ2vCP1at3DKVW
+         ZVBSIg2RU2Ryv8e4Vywqobob3TnE2MfU9TboH3K/V4uIofUHs3leChIrsN5wTODt3iXV
+         J/fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=AoCtcolpsDq3ZvsC0O7qKcicqzlwuQY8E2inQ9xRxj4=;
+        b=R3hxXADSIX16TCXoBMP1NrVoAb+DAL34Z8BuoW5Si5prKaiSQ/g5USQP3BzkE15lhx
+         ygIf3+A9AJ5HrSoeY/FJrSuH2kQ6jIp6j1b0PE872/1MxkFrf51GFIHw+/WRkFF/ARnZ
+         ekMGI0ibBJo0IAmTkWkO4lwhuNRFOcnkyYav70QUMWZfs2mUWpwvvW1fs8uHRtSg6x0D
+         TRMVBV3kheHWyOx+ni6wQ09pZKC9ejRu0WQY5lkAOWwxiSTnzgSTHjM7OBbkz3LFA+Pb
+         YNdfSQ5JDmsJnjLoFfKpyf+7mTxP+Vzreb3v4U4YnFJ+zuJ6nS9HzNdz2b/8SAPD6H0I
+         n3Ew==
+X-Gm-Message-State: AHQUAuYtwr79ugQFqbJdGoRgtE/WGTcmD0Hm0s/NMXfgsMqekGD55LeG
+        mXYw+3rIHFvOn2rdVz8jyDU=
+X-Google-Smtp-Source: AHgI3Ia8QT2QGTQHKAjk55ul7Va9m/0OlbFIv6NIuAZa8VoXX38GTQ7xPAFua1bY7pbhImAxxdFY4w==
+X-Received: by 2002:a63:c444:: with SMTP id m4mr3178253pgg.310.1549348984849;
+        Mon, 04 Feb 2019 22:43:04 -0800 (PST)
+Received: from localhost.localdomain (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
+        by smtp.googlemail.com with ESMTPSA id k24sm2823687pfj.13.2019.02.04.22.43.03
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 04 Feb 2019 22:43:04 -0800 (PST)
+From:   Myungho Jung <mhjungk@gmail.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Myungho Jung <mhjungk@gmail.com>
+Subject: [PATCH v3 0/2] Bluetooth: Add NULL check for tiocmget() and tiocmset()
+Date:   Mon,  4 Feb 2019 22:41:40 -0800
+Message-Id: <cover.1549346039.git.mhjungk@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=202465
+tiocmget() and tiocmset() operations are optional and some tty drivers
+like pty miss the operations. Add NULL checks to prevent from
+dereference.
 
---- Comment #1 from Jacob C (jccantele49@gmail.com) ---
-Given that the issue is not happening in 4.14, I tried (unsuccessfully) adding
-this line to /etc/default/tlp and returning to 4.20.
+Myungho Jung (2):
+  Bluetooth: hci_ath: Add NULL check for tiocmget() and tiocmset() in
+    ath_setup()
+  Bluetooth: hci_ldisc: Add NULL check for tiocmget() and tiocmset() in
+    hci_uart_set_flow_control()
 
-
-# Exclude listed devices from USB autosuspend (separate with spaces).
-# Use lsusb to get the ids.
-# Note: input devices (usbhid) are excluded automatically
-USB_BLACKLIST="0489:e0a2"
-
-
-The issue immediately returned after returning to the 4.20 kernel.
+ drivers/bluetooth/hci_ath.c   | 6 ++++++
+ drivers/bluetooth/hci_ldisc.c | 4 ++++
+ 2 files changed, 10 insertions(+)
 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.17.1
+
