@@ -5,30 +5,30 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 304B8C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 08:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BFCC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 09:07:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F0FD9217F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 08:27:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21EBA20844
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 09:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbfBFI1s convert rfc822-to-8bit (ORCPT
+        id S1728597AbfBFJHX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Feb 2019 03:27:48 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:43702 "EHLO
+        Wed, 6 Feb 2019 04:07:23 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:47782 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726194AbfBFI1s (ORCPT
+        by vger.kernel.org with ESMTP id S1727150AbfBFJHX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Feb 2019 03:27:48 -0500
+        Wed, 6 Feb 2019 04:07:23 -0500
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id A103E2ACC0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Feb 2019 08:27:47 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 1E0752AC28
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Feb 2019 09:07:22 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 952E22AED7; Wed,  6 Feb 2019 08:27:47 +0000 (UTC)
+        id 126622AC9F; Wed,  6 Feb 2019 09:07:22 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 202515] Bluetooth LE Extended Connect returning Command
  Disallowed
-Date:   Wed, 06 Feb 2019 08:27:47 +0000
+Date:   Wed, 06 Feb 2019 09:07:21 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -37,14 +37,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: johan.hedberg@gmail.com
+X-Bugzilla-Who: master.homer@gmail.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-202515-62941-H44wtQtG9m@https.bugzilla.kernel.org/>
+Message-ID: <bug-202515-62941-xtWcK5SV5C@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-202515-62941@https.bugzilla.kernel.org/>
 References: <bug-202515-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -60,16 +60,23 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=202515
 
---- Comment #2 from Johan Hedberg (johan.hedberg@gmail.com) ---
-According to the Bluetooth core spec, HCI_LE_Extended_Create_Connection is
-octet 37, bit 7 in the supported commands mask. In the supported commands that
-your controller returns octet 37 is 0xdf which does have bit 7 set, i.e. it's
-claiming to support the extended version of the command. The way this kind of
-issues are normally worked around is by introducing a so-called quirk flag that
-gets set (usually by the HCI driver) when a problematic controller is
-identified. It might be worth checking first however if there's a newer
-firmware available for your controller - perhaps the issue has already been
-fixed.
+--- Comment #3 from Mathias Tillman (master.homer@gmail.com) ---
+I believe it is using the latest firmware, I haven't been able to find a later
+one than the one mentioned in the kernel log anyway:
+[    6.478466] Bluetooth: hci0: Found device firmware: intel/ibt-18-16-1.sfi
+[    8.361085] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-18-16-1.ddc
+
+And yeah, the controller clearly reports that the Extended Create Connection
+command is available, so it is a bit odd that it's not working correctly. I
+suppose the only way to find out why would be to debug the controller, but I
+have no idea how one would go about doing that.
+
+I haven't found this issue being reported at all, so I don't know if it's just
+my card, or if all of them have this issue. I know the 9260 is commonly used in
+laptops, but I couldn't say to what extent. Perhaps there is someone who has
+this card that could test, and if it is in fact broken, add a quirk as you
+suggested that would force legacy mode?
 
 -- 
 You are receiving this mail because:
