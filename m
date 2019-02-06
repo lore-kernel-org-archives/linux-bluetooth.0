@@ -2,74 +2,73 @@ Return-Path: <SRS0=OPIh=QN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0ADC169C4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA509C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:31:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A5C5217F9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:07:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB2A0218A1
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:31:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727272AbfBFHG4 convert rfc822-to-8bit (ORCPT
+        id S1726804AbfBFHb1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Feb 2019 02:06:56 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:45660 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725897AbfBFHG4 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Feb 2019 02:06:56 -0500
-Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 2900DCF2A4;
-        Wed,  6 Feb 2019 08:14:45 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v3 0/2] Bluetooth: Add NULL check for tiocmget() and
- tiocmset()
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190206063533.GA7402@myunghoj-Precision-5530>
-Date:   Wed, 6 Feb 2019 08:06:54 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <AD78221A-2ABE-4BC2-A63A-F706FD5BC2FE@holtmann.org>
-References: <cover.1549346039.git.mhjungk@gmail.com>
- <0D421861-FCD6-4AFF-8A0F-DBEE520DB64B@holtmann.org>
- <20190206063533.GA7402@myunghoj-Precision-5530>
-To:     Myungho Jung <mhjungk@gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Wed, 6 Feb 2019 02:31:27 -0500
+Received: from mga12.intel.com ([192.55.52.136]:40201 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725897AbfBFHb0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 6 Feb 2019 02:31:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2019 23:31:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,339,1544515200"; 
+   d="scan'208";a="131449162"
+Received: from ingas-nuc1.sea.intel.com ([10.254.59.164])
+  by FMSMGA003.fm.intel.com with ESMTP; 05 Feb 2019 23:31:26 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 0/5] mesh: Save/restore network keys
+Date:   Tue,  5 Feb 2019 23:31:10 -0800
+Message-Id: <20190206073115.28232-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Myungho,
+This set of patches fixes the network key add/update processing.
+Network keys need to be saved to a local node configuration file
+when:
+	- a new node is provisioned
+	- new network key are added by a configuration client
+    - existing network key is updated by a configuration client
+	  during key refresh procedure.
 
->>> tiocmget() and tiocmset() operations are optional and some tty drivers
->>> like pty miss the operations. Add NULL checks to prevent from
->>> dereference.
->>> 
->>> Myungho Jung (2):
->>> Bluetooth: hci_ath: Add NULL check for tiocmget() and tiocmset() in
->>>   ath_setup()
->>> Bluetooth: hci_ldisc: Add NULL check for tiocmget() and tiocmset() in
->>>   hci_uart_set_flow_control()
->>> 
->>> drivers/bluetooth/hci_ath.c   | 6 ++++++
->>> drivers/bluetooth/hci_ldisc.c | 4 ++++
->>> 2 files changed, 10 insertions(+)
->> 
->> why are we not enforcing the availability of these in the hci_uart_tty_open?
-> 
-> Are the operations required on any HCI UART drivers? For now, I found only 5
-> drivers (ath, bcm, intel, mrvl, and qca) are explicitly calling them. So, I'm
-> not sure whether it breaks any existing code with other drivers if returning
-> error in open().
+Also, each saved network key is accompanied by a proper key
+refresh phase setting.
 
-the H:4 spec requires setting flow control. In some cases this is done by the hciattach or btattach utility, but it still means that it is required. So failing on TTYs that don’t support it is just fine.
+Inga Stotland (5):
+  mesh: Separate functions for net key add and update
+  mesh: Add function to restore net key state from storage
+  mesh: Declare internal functions as static
+  mesh: Save key refresh phase state to node config file
+  mesh: Save newly added or updated net key to config file
 
-Regards
+ mesh/cfgmod-server.c |   8 +-
+ mesh/mesh-db.c       | 178 +++++++++++++++++------------
+ mesh/mesh-db.h       |   6 +-
+ mesh/net.c           | 262 ++++++++++++++++++++++++++-----------------
+ mesh/net.h           |  12 +-
+ mesh/node.c          |  19 +++-
+ mesh/storage.c       |  22 ++--
+ mesh/storage.h       |   7 +-
+ 8 files changed, 319 insertions(+), 195 deletions(-)
 
-Marcel
+-- 
+2.17.2
 
