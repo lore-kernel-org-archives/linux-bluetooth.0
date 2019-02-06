@@ -5,30 +5,30 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BFCC169C4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 09:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A4E0C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 09:42:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21EBA20844
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 09:07:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25427218A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 09:42:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728597AbfBFJHX convert rfc822-to-8bit (ORCPT
+        id S1728467AbfBFJmM convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Feb 2019 04:07:23 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:47782 "EHLO
+        Wed, 6 Feb 2019 04:42:12 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:51956 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727150AbfBFJHX (ORCPT
+        by vger.kernel.org with ESMTP id S1727002AbfBFJmM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Feb 2019 04:07:23 -0500
+        Wed, 6 Feb 2019 04:42:12 -0500
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 1E0752AC28
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Feb 2019 09:07:22 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 8A4912B065
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Feb 2019 09:42:11 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 126622AC9F; Wed,  6 Feb 2019 09:07:22 +0000 (UTC)
+        id 7E7902B0AC; Wed,  6 Feb 2019 09:42:11 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 202515] Bluetooth LE Extended Connect returning Command
  Disallowed
-Date:   Wed, 06 Feb 2019 09:07:21 +0000
+Date:   Wed, 06 Feb 2019 09:42:10 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -37,14 +37,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: master.homer@gmail.com
+X-Bugzilla-Who: emil.lenngren@gmail.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-202515-62941-xtWcK5SV5C@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-202515-62941-CBzd9P7Tby@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-202515-62941@https.bugzilla.kernel.org/>
 References: <bug-202515-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -60,23 +60,33 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=202515
 
---- Comment #3 from Mathias Tillman (master.homer@gmail.com) ---
-I believe it is using the latest firmware, I haven't been able to find a later
-one than the one mentioned in the kernel log anyway:
-[    6.478466] Bluetooth: hci0: Found device firmware: intel/ibt-18-16-1.sfi
-[    8.361085] Bluetooth: hci0: Found Intel DDC parameters:
-intel/ibt-18-16-1.ddc
+Emil Lenngren (emil.lenngren@gmail.com) changed:
 
-And yeah, the controller clearly reports that the Extended Create Connection
-command is available, so it is a bit odd that it's not working correctly. I
-suppose the only way to find out why would be to debug the controller, but I
-have no idea how one would go about doing that.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |emil.lenngren@gmail.com
 
-I haven't found this issue being reported at all, so I don't know if it's just
-my card, or if all of them have this issue. I know the 9260 is commonly used in
-laptops, but I couldn't say to what extent. Perhaps there is someone who has
-this card that could test, and if it is in fact broken, add a quirk as you
-suggested that would force legacy mode?
+--- Comment #4 from Emil Lenngren (emil.lenngren@gmail.com) ---
+Command Disallowed does not mean unsupported hci command.
+
+"COMMAND DISALLOWED (0x0C)
+The Command Disallowed error code indicates that the command requested cannot
+be executed because the Controller is in a state where it cannot process this
+command at this time. This error shall not be used for command OpCodes where
+the error code Unknown HCI Command is valid."
+
+It's usually sent if the controller is busy with some operation which can't be
+combined with the one you're trying to execute. For example, some controllers
+only support either BLE scanning or BLE initiating at a time (exposed through
+LE Read Supported States). In that case, it will send Command Disallowed if
+scanning is already active. It could also be that you already have an active
+connection attempt outstanding, in that case it will also send Command
+Disallowed.
+
+You should use the new "btmon" tool which I assume supports decoding LE
+Extended Connect packets. Also try capture the packets before (ideally all the
+way from the hci is brought up) so one knows the whole state and can determine
+if we actually send a command that we are not allowed to in this state.
 
 -- 
 You are receiving this mail because:
