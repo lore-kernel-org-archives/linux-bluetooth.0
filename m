@@ -3,180 +3,347 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D04AC169C4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 14:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E42BC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 15:36:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C6C42075D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 14:52:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC12B2081B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 15:36:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jo1/H+9p"
+	dkim=pass (2048-bit key) header.d=monadnock.ca header.i=@monadnock.ca header.b="B9Z6BU3/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="t/ZOJiOg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730572AbfBFOw3 (ORCPT
+        id S1730209AbfBFPgY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Feb 2019 09:52:29 -0500
-Received: from mail-lf1-f43.google.com ([209.85.167.43]:38978 "EHLO
-        mail-lf1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728323AbfBFOw2 (ORCPT
+        Wed, 6 Feb 2019 10:36:24 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:59803 "EHLO
+        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728064AbfBFPgY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Feb 2019 09:52:28 -0500
-Received: by mail-lf1-f43.google.com with SMTP id m11so1953545lfc.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Feb 2019 06:52:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=UlkHRu46QDnj5Sgyks02uwOphPSabwHqiF5Jhy+Zn38=;
-        b=jo1/H+9pF87xTnU19O2TH2JcLm9OQhFvVmtlazmiqu5llcZeKNF6tAyG7it1Hr1u0G
-         9hMnZg177ATxnvUryImpPe9OT7xRs0+qf69z6diyFGMoqa9PMg7TCqssn6BkW8sxE/2L
-         MtBmeLhqWcn9lDqMDcSggR2ZgkXRKucBil3nV8FCKXnwEGToiFBfcxb3KQbUXj8y/W0h
-         TpvUgpSxDio0ukipIVZLICozsw7UZ7v5hLq4+C2IvUOHfOYigR0mTkslGmaf32f23jfc
-         6FgN3eh8X7esqeCk9YrCuyQ3fj7rpet3AuIs8pjawtMrcCr3oiYLM6J6Kuk37gGwbXTm
-         LZtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=UlkHRu46QDnj5Sgyks02uwOphPSabwHqiF5Jhy+Zn38=;
-        b=so4qOpeekuO4yfjqW/2U5zy/e9QJ5+aHbQEiEO++3ZcKQwGdZFdnaDUs6XOHzGQdts
-         Kb6RBnGaX1LCjjZZshywrLek2FJUzPKUkWqUaZ3YFn4KfHJ1EOxM7tFCbxx8A39IMwe2
-         8sdsPff8ytVzdGBmKx4bSemjJskTksqe3wSi42U28bYGFnLg+TfjqMqpA/acqQrCfU10
-         k4uMV8O2xhMgwKLns9x8uOvKMdnSz+RPYSIba3zbxQy2PErl5TRWjeF9q3tBFP7XsI7L
-         fhODJI9FPqgoHZ4R8pViX5oGtKyusABdXEFGaN4yxRzLZ3Yrt4tj1FshvV/Dm7Me/H9R
-         cnUw==
-X-Gm-Message-State: AHQUAubeFvYCcjbgLzs1HVxEYlEe6zgGaDpz2I4SYv2B9naTEWwudSQ1
-        u6wau4dBM1cY+fc4ulPY+6HP9cF0
-X-Google-Smtp-Source: AHgI3IYrlja98Da1G7PB1NopDZk2Pz8Yh+nJcP10hV5xhN0QbKS+Z3hLM69m+pXt44Eb6QvGlWCnBQ==
-X-Received: by 2002:a19:a345:: with SMTP id m66mr6915599lfe.84.1549464745849;
-        Wed, 06 Feb 2019 06:52:25 -0800 (PST)
-Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
-        by smtp.gmail.com with ESMTPSA id a11sm4309523lff.68.2019.02.06.06.52.24
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 06 Feb 2019 06:52:24 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Wed, 6 Feb 2019 10:36:24 -0500
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailout.nyi.internal (Postfix) with ESMTP id AB9A2220D8;
+        Wed,  6 Feb 2019 10:36:22 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Wed, 06 Feb 2019 10:36:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=monadnock.ca; h=
+        from:to:cc:subject:date:message-id:mime-version
+        :content-transfer-encoding; s=fm3; bh=z8K+kxBVQkWaDWUf4zbBWhMMZL
+        C20b+U/9RlDFdjDs8=; b=B9Z6BU3/9+qxnuUOkqvmQt5JomNpRSM4fBXtqgY2gx
+        k/41l00ZgqXmgcz35Suz3xvsvpMRs5i+P6r9bXRy9Z9qnhKbE6XPVbXWmoCYY2lx
+        wVrC6QMjS5DtrggnWXZHjuom5Tanck+Qw/zt8q5Eow0ZKQjkyL8llahF0bN5s+T3
+        AN73flcEvN3lCxBOKBoso0t6tZNN6TaSDrjxEUoQbROYELyG19744SKK5vH2Nwys
+        JSgdUMOTyC8U9JmbV9oHL840MvLAdEAF4zoMxv44NTZfejBU4wWifcYC8/B0kur0
+        etdpg0zA1PR6ygVkhYMI+CFC7i3g7RYR+QdUn3yc2LYA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=z8K+kxBVQkWaDWUf4
+        zbBWhMMZLC20b+U/9RlDFdjDs8=; b=t/ZOJiOgDBhJAlqtKmvkoZnRRXCvyOzOK
+        KMn8UjiiSDFiu3OO7A6b2WYeAiTax7meZowhqVejAQ+Lmr3/BLQ9OxLI4FTvFV92
+        O7F2Emqkj8kRW0X5N5zFpfjQNwY+SQnddu8+dUzgOz8kl4q7tvfS3OpvIoNjWzh5
+        oLhKnuXrxQ+mSIvXwtKdG2z+G70jXG35rDevPPI7W7WEGuDkEmmr8vznH7c1rNPE
+        mWtae8Q3DjP0e8EzUIc1pP0xAhyGKe6Esy0s9ylyQ87uC9BqC1AeGhd2T0blDoV9
+        SsY7zichRguml5oYUn2Qz7myAv6owrhxI1wwIj/VWdBq4w7M5kvew==
+X-ME-Sender: <xms:9v5aXERPWuJw3_F0nqbiPeZ49MvIOXeeOVxwSyt8h7yTF-8tCUMkwg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedtledrkeekgdejlecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfhuthenuceurghilhhouhhtmecufedt
+    tdenucenucfjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepufhhrg
+    ifnhcupfhotghkuceoshhhrgifnhesmhhonhgrughnohgtkhdrtggrqeenucfkphepvdeg
+    rdehgedrkeeirdduheenucfrrghrrghmpehmrghilhhfrhhomhepshhhrgifnhesmhhonh
+    grughnohgtkhdrtggrnecuvehluhhsthgvrhfuihiivgeptd
+X-ME-Proxy: <xmx:9v5aXG_aXmo-MH7Gve4PMmly5e2Bl6Q8dO16OHAqeDImsyoWRZ_dzQ>
+    <xmx:9v5aXCNGvmV3sekOysWSU1z5ZTaC9bx-4Y1TvpRzlcH5kSqKDssoxA>
+    <xmx:9v5aXBGebap0HoLyj_Q0m_UxuDSh5sOIIIco-4q4fd8KTcMTOxL9nA>
+    <xmx:9v5aXFBbcUFmt5IeDGSUT0PHZbLQz3meEcopcAHV87MYa6TKlV60yw>
+Received: from mobile.monadnock.ca (ip-24-54-86-15.user.start.ca [24.54.86.15])
+        by mail.messagingengine.com (Postfix) with ESMTPA id D6EBDE4314;
+        Wed,  6 Feb 2019 10:36:21 -0500 (EST)
+From:   Shawn Nock <shawn@monadnock.ca>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] gatt: Implement "type" option for Characteristic.WriteValue
-Date:   Wed,  6 Feb 2019 16:52:21 +0200
-Message-Id: <20190206145221.29587-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20190206145221.29587-1-luiz.dentz@gmail.com>
-References: <20190206145221.29587-1-luiz.dentz@gmail.com>
+Cc:     Shawn Nock <shawn@monadnock.ca>
+Subject: [PATCH BlueZ] shared/io-libevent2: Add support for libevent2 based IO handing
+Date:   Wed,  6 Feb 2019 10:30:45 -0500
+Message-Id: <20190206153045.14788-1-shawn@monadnock.ca>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This implements the "type" option as documented.
 ---
- src/gatt-client.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ src/shared/io-libevent2.c | 247 ++++++++++++++++++++++++++++++++++++++
+ src/shared/io.h           |   1 +
+ 2 files changed, 248 insertions(+)
+ create mode 100644 src/shared/io-libevent2.c
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index c0cc3cd38..6bcdecf09 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -389,7 +389,8 @@ fail:
- 	desc->read_op = NULL;
- }
- 
--static int parse_options(DBusMessageIter *iter, uint16_t *offset)
-+static int parse_options(DBusMessageIter *iter, uint16_t *offset,
-+						const char **type)
- {
- 	DBusMessageIter dict;
- 
-@@ -416,6 +417,12 @@ static int parse_options(DBusMessageIter *iter, uint16_t *offset)
- 			dbus_message_iter_get_basic(&value, offset);
- 		}
- 
-+		if (type && strcasecmp(key, "type") == 0) {
-+			if (var != DBUS_TYPE_STRING)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, type);
-+		}
+diff --git a/src/shared/io-libevent2.c b/src/shared/io-libevent2.c
+new file mode 100644
+index 000000000..584e1a021
+--- /dev/null
++++ b/src/shared/io-libevent2.c
+@@ -0,0 +1,247 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2019       Shawn Nock <shawn@monadnock.ca>
++ *  Copyright (C) 2012-2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- 		dbus_message_iter_next(&dict);
- 	}
- 
-@@ -469,7 +476,7 @@ static DBusMessage *descriptor_read_value(DBusConnection *conn,
- 
- 	dbus_message_iter_init(msg, &iter);
- 
--	if (parse_options(&iter, &offset))
-+	if (parse_options(&iter, &offset, NULL))
- 		return btd_error_invalid_args(msg);
- 
- 	if (desc->read_op) {
-@@ -599,7 +606,7 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
- 
- 	dbus_message_iter_next(&iter);
- 
--	if (parse_options(&iter, &offset))
-+	if (parse_options(&iter, &offset, NULL))
- 		return btd_error_invalid_args(msg);
- 
- 	/*
-@@ -933,7 +940,7 @@ static DBusMessage *characteristic_read_value(DBusConnection *conn,
- 
- 	dbus_message_iter_init(msg, &iter);
- 
--	if (parse_options(&iter, &offset))
-+	if (parse_options(&iter, &offset, NULL))
- 		return btd_error_invalid_args(msg);
- 
- 	if (chrc->read_op) {
-@@ -974,6 +981,7 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 	int value_len = 0;
- 	bool supported = false;
- 	uint16_t offset = 0;
-+	const char *type = NULL;
- 
- 	if (!gatt)
- 		return btd_error_failed(msg, "Not connected");
-@@ -991,7 +999,7 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 
- 	dbus_message_iter_next(&iter);
- 
--	if (parse_options(&iter, &offset))
-+	if (parse_options(&iter, &offset, &type))
- 		return btd_error_invalid_args(msg);
- 
- 	/*
-@@ -1005,7 +1013,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 	 *     - If value is larger than MTU - 3: long-write
- 	 *   * "write-without-response" property set -> write command.
- 	 */
--	if ((chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE)) {
-+	if ((!type && (chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE))
-+			|| (type && !strcasecmp(type, "reliable"))) {
- 		supported = true;
- 		chrc->write_op = start_long_write(msg, chrc->value_handle, gatt,
- 						true, value, value_len, offset,
-@@ -1014,7 +1023,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 			return NULL;
- 	}
- 
--	if (chrc->props & BT_GATT_CHRC_PROP_WRITE) {
-+	if ((!type && chrc->props & BT_GATT_CHRC_PROP_WRITE) ||
-+			(type && !strcasecmp(type, "request"))) {
- 		uint16_t mtu;
- 
- 		supported = true;
-@@ -1037,7 +1047,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 			return NULL;
- 	}
- 
--	if (!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
-+	if ((type && strcasecmp(type, "command")) || offset ||
-+			!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
- 		goto fail;
- 
- 	supported = true;
--- 
-2.17.2
-
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <unistd.h>
++#include <errno.h>
++#include <sys/socket.h>
++
++#include <event2/event.h>
++
++#include "src/shared/io.h"
++#include "src/shared/util.h"
++
++struct io {
++  struct event *event;
++  io_callback_func_t read_callback;
++  io_destroy_func_t read_destroy;
++  void *read_data;
++  io_callback_func_t write_callback;
++  io_destroy_func_t write_destroy;
++  void *write_data;
++  io_callback_func_t disconnect_callback;
++  io_destroy_func_t disconnect_destroy;
++  void *disconnect_data;
++};
++
++static struct event_base *g_event_base = NULL;
++
++void io_set_context(void *v) {
++	g_event_base = v;
++}
++
++void io_callback(int fd, short which, void* arg)
++{
++    struct io *io = arg;
++    if (which & EV_READ && io->read_callback) {
++        io->read_callback(io, io->read_data);
++    }
++
++    if (which & EV_WRITE && io->write_callback){
++        io->write_callback(io, io->write_data);
++    }
++
++    if (which & EV_CLOSED && io->disconnect_callback) {
++        io->disconnect_callback(io, io->disconnect_data);
++    }
++}
++
++struct io *io_new(int fd)
++{
++	if (fd < 0) {
++        return NULL;
++    }
++
++	struct io *io = new0(struct io, 1);
++
++	io->event = event_new(g_event_base, fd, EV_READ | EV_WRITE | EV_PERSIST, io_callback, io);
++	if (!io->event) {
++		free(io);
++		return NULL;
++	}
++	event_add(io->event, NULL);
++	return io;
++}
++
++void io_destroy(struct io *io)
++{
++	if (!io)
++		return;
++
++	if (io->event)
++	    event_del(io->event);
++		event_free(io->event);
++
++	free(io);
++}
++
++int io_get_fd(struct io *io)
++{
++	if (!io || !io->event)
++		return -ENOTCONN;
++
++	return event_get_fd(io->event);
++}
++
++bool io_set_close_on_destroy(struct io *io, bool do_close)
++{
++    if (!io || !io->event)
++        return false;
++
++    return true;
++}
++
++static short io_get_events(struct io* io)
++{
++    short which;
++    event_get_assignment(io->event, NULL, NULL, &which, NULL, NULL);
++    return which;
++}
++
++static void io_set_events(struct io* io, short events)
++{
++    struct event_base *base;
++    int fd;
++    event_callback_fn cb;
++    void *arg;
++
++    event_get_assignment(io->event, &base, &fd, NULL, &cb, &arg);
++    int pending = event_pending(io->event, EV_READ | EV_WRITE | EV_CLOSED, NULL);
++
++    if (pending) {
++        event_del(io->event);
++    }
++    event_assign(io->event, base, fd, events, cb, arg);
++    event_add(io->event, NULL);
++}
++
++static void io_update_events(struct io* io, short events, bool enable)
++{
++    short new_ev;
++    short cur = io_get_events(io);
++    if (enable) {
++        new_ev = cur | events;
++    } else {
++        new_ev = cur & ~events;
++    }
++    if (events != new_ev) {
++        io_set_events(io, new_ev);
++    }
++}
++
++bool io_set_read_handler(struct io *io, io_callback_func_t callback,
++                         void *user_data, io_destroy_func_t destroy)
++{
++    if (!io || !io->event)
++        return false;
++
++    if (io->read_destroy) {
++        io->read_destroy(io->read_data);
++    }
++
++    io->read_callback = callback;
++    io->read_destroy = destroy;
++    io->read_data = user_data;
++
++    io_update_events(io, EV_READ, (bool)callback);
++
++	return true;
++}
++
++bool io_set_write_handler(struct io *io, io_callback_func_t callback,
++                          void *user_data, io_destroy_func_t destroy)
++{
++	if (!io || !io->event)
++		return false;
++
++	if (io->write_destroy) {
++	    io->write_destroy(io->write_data);
++	}
++
++    io->write_callback = callback;
++    io->write_destroy = destroy;
++    io->write_data = user_data;
++
++    io_update_events(io, EV_WRITE, (bool)callback);
++
++    return true;
++}
++
++bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
++                               void *user_data, io_destroy_func_t destroy)
++{
++	if (!io || !io->event)
++		return false;
++
++	if (io->disconnect_destroy) {
++	    io->disconnect_destroy(io->disconnect_data);
++	}
++
++    io->disconnect_callback = callback;
++    io->disconnect_destroy = destroy;
++    io->disconnect_data = user_data;
++
++    io_update_events(io, EV_CLOSED, (bool)callback);
++
++	return true;
++}
++
++ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
++{
++	ssize_t ret;
++	int fd;
++
++	if (!io || !io->event)
++		return -ENOTCONN;
++
++	fd = io_get_fd(io);
++	if (fd < 0)
++		return -ENOTCONN;
++
++	do {
++		ret = writev(fd, iov, iovcnt);
++	} while (ret < 0 && errno == EINTR);
++
++	if (ret < 0)
++		return -errno;
++
++	return ret;
++}
++
++bool io_shutdown(struct io *io)
++{
++	int fd;
++
++	if (!io || !io->event)
++		return false;
++
++	fd = io_get_fd(io);
++	if (fd < 0)
++		return false;
++
++	return shutdown(fd, SHUT_RDWR) == 0;
++}
+diff --git a/src/shared/io.h b/src/shared/io.h
+index 8bc1111d0..9a8d54062 100644
+--- a/src/shared/io.h
++++ b/src/shared/io.h
+@@ -45,3 +45,4 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
+ 				void *user_data, io_destroy_func_t destroy);
+ bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
+ 				void *user_data, io_destroy_func_t destroy);
++void io_set_context(void *);
+\ No newline at end of file
+--
+2.20.1
