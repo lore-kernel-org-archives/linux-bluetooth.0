@@ -2,352 +2,176 @@ Return-Path: <SRS0=OPIh=QN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3ECC169C4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 17:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A99FFC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 17:46:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E545B20B1F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 17:38:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=monadnock.ca header.i=@monadnock.ca header.b="YrUPAvgH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vtNuOWsB"
+	by mail.kernel.org (Postfix) with ESMTP id 79370218C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 17:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729912AbfBFRiG (ORCPT
+        id S1729690AbfBFRqE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Feb 2019 12:38:06 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:58329 "EHLO
-        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727082AbfBFRiG (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Feb 2019 12:38:06 -0500
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 91F8421D72;
-        Wed,  6 Feb 2019 12:38:04 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Wed, 06 Feb 2019 12:38:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=monadnock.ca; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm3; bh=AGOD4jyAII/t1myP61b7y++foN
-        h649ZMRP3u9tToVNo=; b=YrUPAvgH6Vqv+JquhfFdJNHF6C8XJKWWK+cVlguCls
-        mlbKBi9rcLHbUe3JPfXzeM19ZsqGbxM+QpCzbkyLUD12CBByPXzKsubH9EW55EIC
-        wzKbayDO6NldFr4ojPvarvzr9JvBr5QS6yBGW9Xpx0l2BKVBIbqDyzuIFSSNI8EQ
-        8xg+GVJIx0HUfOVj9jeUcylkpIpIMOG0P/qEC3lSBICY6lj1jm4QtkNboGYhKs4F
-        VBpBngXNgA12/4ucq8N9+ZEbO3RM6/N+zom3L2ITO+bV+fTqglSZBtL1RZcCvz9J
-        0X2EhMDWnJji0aAHmbPe9zXao+rKj8RXGJTybq5PzHxg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=AGOD4jyAII/t1myP6
-        1b7y++foNh649ZMRP3u9tToVNo=; b=vtNuOWsBe2HnDGoJ1FzENB/wZwlo+AH9A
-        YlHoARd0hkuS74zb/lXO2+Zu6xiX7tXWrLO6HPpMPLhIrMo5tgvgsBZ/vCt6GRRF
-        9GVaaGa/8E6qAEHbnpbGdM9CGqn/an2xZT6KR0pFfz5V63GxcFMaTcxCVAia3uYL
-        sLhcKf2+G6LztBR2d8np1jzKS57SkoyVf6dKiWym3+vTYPYYFJBZiaNuEn5AmGlJ
-        wC1/90gHra/hwJGS74oa5TO7vX9lmRO6wFVpmDNu51q1t68BW49IJ2KonSUqlzO6
-        WCPWYQYEyMfRKWGZIgr3/LXSt54OeHeNVunpIYqcSoT4zdryzpiwQ==
-X-ME-Sender: <xms:fBtbXHo23M5bxPdITFcGMmIxi1i1qEwi2DEXA2Tm5Y0c1Y9HBQv2uw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedtledrkeekgddutdehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfquhhtnecuuegrihhlohhuthemucef
-    tddtnecunecujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefuhh
-    grfihnucfpohgtkhcuoehshhgrfihnsehmohhnrggunhhotghkrdgtrgeqnecukfhppedv
-    gedrheegrdekiedrudehnecurfgrrhgrmhepmhgrihhlfhhrohhmpehshhgrfihnsehmoh
-    hnrggunhhotghkrdgtrgenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:fBtbXOmLuYST_fyvLexfAB7QkFlh6qEA_t8gXeBTAPBITArWvSeiMg>
-    <xmx:fBtbXP0FabSItytu1T8Wzp3zqb36Tq6UFZ0OKiUbMpYAHi0mdHwy9w>
-    <xmx:fBtbXDRpkz8UwLkbGIEOM_HEOV-H7f4QU7LhXchv2xcXA-K8KDK6MQ>
-    <xmx:fBtbXN7fxD3ycQEnhBMaWQ518JEtQfRcdwisgSMwGv7cdo3dyh1v9Q>
-Received: from mobile.monadnock.ca (ip-24-54-86-15.user.start.ca [24.54.86.15])
-        by mail.messagingengine.com (Postfix) with ESMTPA id C703C100BA;
-        Wed,  6 Feb 2019 12:38:03 -0500 (EST)
-From:   Shawn Nock <shawn@monadnock.ca>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Shawn Nock <shawn@monadnock.ca>
-Subject: [PATCH BlueZ v2] shared/io-libevent2: Add support for libevent2 based IO handing
-Date:   Wed,  6 Feb 2019 12:37:48 -0500
-Message-Id: <20190206173748.16765-1-shawn@monadnock.ca>
-X-Mailer: git-send-email 2.20.1
+        Wed, 6 Feb 2019 12:46:04 -0500
+Received: from mga11.intel.com ([192.55.52.93]:30322 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725928AbfBFRqD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 6 Feb 2019 12:46:03 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Feb 2019 09:46:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,340,1544515200"; 
+   d="scan'208";a="122470253"
+Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
+  by fmsmga008.fm.intel.com with ESMTP; 06 Feb 2019 09:46:03 -0800
+Received: from orsmsx114.amr.corp.intel.com (10.22.240.10) by
+ ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Wed, 6 Feb 2019 09:46:03 -0800
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.210]) by
+ ORSMSX114.amr.corp.intel.com ([169.254.8.248]) with mapi id 14.03.0415.000;
+ Wed, 6 Feb 2019 09:46:02 -0800
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Subject: Re: [PATCH BlueZ 1/5] mesh: Separate functions for net key add and
+ update
+Thread-Topic: [PATCH BlueZ 1/5] mesh: Separate functions for net key add and
+ update
+Thread-Index: AQHUve4EBD0YaahL70uk8hHCIC0bqaXTkeQA
+Date:   Wed, 6 Feb 2019 17:46:02 +0000
+Message-ID: <1549475160.20217.6.camel@intel.com>
+References: <20190206073115.28232-1-inga.stotland@intel.com>
+         <20190206073115.28232-2-inga.stotland@intel.com>
+In-Reply-To: <20190206073115.28232-2-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.254.54.166]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <32EC8E916C498C49BFBF4607E4BF6F05@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
-
-Nothing like reading your own work on a mailing list to help find issues. This patch:
-
-- Handles the case where required io_set_context() missing by refusing io_new
-- Postpone setting an event to pending until a handler has been set
-
-src/shared/io-libevent2.c | 246 ++++++++++++++++++++++++++++++++++++++
- src/shared/io.h           |   1 +
- 2 files changed, 247 insertions(+)
- create mode 100644 src/shared/io-libevent2.c
-
-diff --git a/src/shared/io-libevent2.c b/src/shared/io-libevent2.c
-new file mode 100644
-index 000000000..486839520
---- /dev/null
-+++ b/src/shared/io-libevent2.c
-@@ -0,0 +1,246 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2019       Shawn Nock <shawn@monadnock.ca>
-+ *  Copyright (C) 2012-2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <unistd.h>
-+#include <errno.h>
-+#include <sys/socket.h>
-+
-+#include <event2/event.h>
-+
-+#include "src/shared/io.h"
-+#include "src/shared/util.h"
-+
-+struct io {
-+  struct event *event;
-+  io_callback_func_t read_callback;
-+  io_destroy_func_t read_destroy;
-+  void *read_data;
-+  io_callback_func_t write_callback;
-+  io_destroy_func_t write_destroy;
-+  void *write_data;
-+  io_callback_func_t disconnect_callback;
-+  io_destroy_func_t disconnect_destroy;
-+  void *disconnect_data;
-+};
-+
-+static struct event_base *g_event_base = NULL;
-+
-+void io_set_context(void *v) {
-+	g_event_base = v;
-+}
-+
-+void io_callback(int fd, short which, void* arg)
-+{
-+    struct io *io = arg;
-+    if (which & EV_READ && io->read_callback) {
-+        io->read_callback(io, io->read_data);
-+    }
-+
-+    if (which & EV_WRITE && io->write_callback){
-+        io->write_callback(io, io->write_data);
-+    }
-+
-+    if (which & EV_CLOSED && io->disconnect_callback) {
-+        io->disconnect_callback(io, io->disconnect_data);
-+    }
-+}
-+
-+struct io *io_new(int fd)
-+{
-+	if (fd < 0 || !g_event_base) {
-+        return NULL;
-+    }
-+
-+	struct io *io = new0(struct io, 1);
-+
-+	io->event = event_new(g_event_base, fd, EV_PERSIST, io_callback, io);
-+	if (!io->event) {
-+		free(io);
-+		return NULL;
-+	}
-+	return io;
-+}
-+
-+void io_destroy(struct io *io)
-+{
-+	if (!io)
-+		return;
-+
-+	if (io->event)
-+	    event_del(io->event);
-+		event_free(io->event);
-+
-+	free(io);
-+}
-+
-+int io_get_fd(struct io *io)
-+{
-+	if (!io || !io->event)
-+		return -ENOTCONN;
-+
-+	return event_get_fd(io->event);
-+}
-+
-+bool io_set_close_on_destroy(struct io *io, bool do_close)
-+{
-+    if (!io || !io->event)
-+        return false;
-+
-+    return true;
-+}
-+
-+static short io_get_events(struct io* io)
-+{
-+    short which;
-+    event_get_assignment(io->event, NULL, NULL, &which, NULL, NULL);
-+    return which;
-+}
-+
-+static void io_set_events(struct io* io, short events)
-+{
-+    struct event_base *base;
-+    int fd;
-+    event_callback_fn cb;
-+    void *arg;
-+
-+    event_get_assignment(io->event, &base, &fd, NULL, &cb, &arg);
-+    int pending = event_pending(io->event, EV_READ | EV_WRITE | EV_CLOSED, NULL);
-+
-+    if (pending) {
-+        event_del(io->event);
-+    }
-+    event_assign(io->event, base, fd, events, cb, arg);
-+    event_add(io->event, NULL);
-+}
-+
-+static void io_update_events(struct io* io, short events, bool enable)
-+{
-+    short new_ev;
-+    short cur = io_get_events(io);
-+    if (enable) {
-+        new_ev = cur | events;
-+    } else {
-+        new_ev = cur & ~events;
-+    }
-+    if (events != new_ev) {
-+        io_set_events(io, new_ev);
-+    }
-+}
-+
-+bool io_set_read_handler(struct io *io, io_callback_func_t callback,
-+                         void *user_data, io_destroy_func_t destroy)
-+{
-+    if (!io || !io->event)
-+        return false;
-+
-+    if (io->read_destroy) {
-+        io->read_destroy(io->read_data);
-+    }
-+
-+    io->read_callback = callback;
-+    io->read_destroy = destroy;
-+    io->read_data = user_data;
-+
-+    io_update_events(io, EV_READ, (bool)callback);
-+
-+	return true;
-+}
-+
-+bool io_set_write_handler(struct io *io, io_callback_func_t callback,
-+                          void *user_data, io_destroy_func_t destroy)
-+{
-+	if (!io || !io->event)
-+		return false;
-+
-+	if (io->write_destroy) {
-+	    io->write_destroy(io->write_data);
-+	}
-+
-+    io->write_callback = callback;
-+    io->write_destroy = destroy;
-+    io->write_data = user_data;
-+
-+    io_update_events(io, EV_WRITE, (bool)callback);
-+
-+    return true;
-+}
-+
-+bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
-+                               void *user_data, io_destroy_func_t destroy)
-+{
-+	if (!io || !io->event)
-+		return false;
-+
-+	if (io->disconnect_destroy) {
-+	    io->disconnect_destroy(io->disconnect_data);
-+	}
-+
-+    io->disconnect_callback = callback;
-+    io->disconnect_destroy = destroy;
-+    io->disconnect_data = user_data;
-+
-+    io_update_events(io, EV_CLOSED, (bool)callback);
-+
-+	return true;
-+}
-+
-+ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
-+{
-+	ssize_t ret;
-+	int fd;
-+
-+	if (!io || !io->event)
-+		return -ENOTCONN;
-+
-+	fd = io_get_fd(io);
-+	if (fd < 0)
-+		return -ENOTCONN;
-+
-+	do {
-+		ret = writev(fd, iov, iovcnt);
-+	} while (ret < 0 && errno == EINTR);
-+
-+	if (ret < 0)
-+		return -errno;
-+
-+	return ret;
-+}
-+
-+bool io_shutdown(struct io *io)
-+{
-+	int fd;
-+
-+	if (!io || !io->event)
-+		return false;
-+
-+	fd = io_get_fd(io);
-+	if (fd < 0)
-+		return false;
-+
-+	return shutdown(fd, SHUT_RDWR) == 0;
-+}
-diff --git a/src/shared/io.h b/src/shared/io.h
-index 8bc1111d0..9a8d54062 100644
---- a/src/shared/io.h
-+++ b/src/shared/io.h
-@@ -45,3 +45,4 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
- 				void *user_data, io_destroy_func_t destroy);
- bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
- 				void *user_data, io_destroy_func_t destroy);
-+void io_set_context(void *);
-\ No newline at end of file
---
-2.20.1
+SGkgSW5nYSwNCg0KT25lIGFkanVzdG1lbnQgbmVlZGVkIGhlcmUuLi4NCg0KT24gVHVlLCAyMDE5
+LTAyLTA1IGF0IDIzOjMxIC0wODAwLCBJbmdhIFN0b3RsYW5kIHdyb3RlOg0KPiBUaGlzIHNwbGl0
+cyBtZXNoX25ldF9rZXlfYWRkKCkgaW50byB0d28gc2VwYXJhdGUgZnVuY3Rpb25zOg0KPiBtZXNo
+X25ldF9rZXlfYWRkKCkgYW5kIG1lc2hfbmV0X2tleV91cGRhdGUoKS4NCj4gbWVzaF9uZXRfa2V5
+X3VwZGF0ZSgpIGVzc2VudGlhbGx5IHJlcGxhY2VzIG1lc2hfbmV0X2tyX3BoYXNlX29uZSgpDQo+
+IHNpbmNlIHN3aXRjaGluZyB0byBLZXkgUmVmcmVzaCBwaGFzZSBvbmUgY2FuIG9ubHkgYmUgdHJp
+Z2dlcmVkDQo+IGJ5IHN1Y2Nlc3NmdWwgbmV0d29yayBrZXkgdXBkYXRlLg0KPiAtLS0NCj4gIG1l
+c2gvY2ZnbW9kLXNlcnZlci5jIHwgIDggKysrKysrLS0NCj4gIG1lc2gvbmV0LmMgICAgICAgICAg
+IHwgMjQgKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tDQo+ICBtZXNoL25ldC5oICAgICAgICAgICB8
+ICA4ICsrKystLS0tDQo+ICBtZXNoL25vZGUuYyAgICAgICAgICB8ICA0ICsrLS0NCj4gIG1lc2gv
+c3RvcmFnZS5jICAgICAgIHwgIDIgKy0NCj4gIDUgZmlsZXMgY2hhbmdlZCwgMjAgaW5zZXJ0aW9u
+cygrKSwgMjYgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9jZmdtb2Qtc2Vy
+dmVyLmMgYi9tZXNoL2NmZ21vZC1zZXJ2ZXIuYw0KPiBpbmRleCAwNjJiZGFhZjIuLjg5OWJkZGUy
+ZSAxMDA2NDQNCj4gLS0tIGEvbWVzaC9jZmdtb2Qtc2VydmVyLmMNCj4gKysrIGIvbWVzaC9jZmdt
+b2Qtc2VydmVyLmMNCj4gQEAgLTk4MSw4ICs5ODEsMTIgQEAgc3RhdGljIGJvb2wgY2ZnX3Nydl9w
+a3QodWludDE2X3Qgc3JjLCB1aW50MzJfdCBkc3QsDQo+ICAJCWlmIChzaXplICE9IDE4KQ0KPiAg
+CQkJcmV0dXJuIHRydWU7DQo+ICANCj4gLQkJYl9yZXMgPSBtZXNoX25ldF9hZGRfa2V5KG5ldCwg
+b3Bjb2RlID09IE9QX05FVEtFWV9VUERBVEUsDQo+IC0JCQkJCQlsX2dldF9sZTE2KHBrdCksIHBr
+dCArIDIpOw0KPiArCQluZXRfaWR4ID0gbF9nZXRfbGUxNihwa3QpOw0KPiArDQo+ICsJCWlmIChv
+cGNvZGUgPT0gT1BfTkVUS0VZX0FERCkNCj4gKwkJCWJfcmVzID0gbWVzaF9uZXRfYWRkX2tleShu
+ZXQsIG5ldF9pZHgsIHBrdCArIDIpOw0KPiArCQllbHNlDQo+ICsJCQliX3JlcyA9IG1lc2hfbmV0
+X3VwZGF0ZV9rZXkobmV0LCBuZXRfaWR4LCBwa3QgKyAyKTsNCj4gIA0KPiAgCQlsX2RlYnVnKCJO
+ZXRLZXkgQWRkL1VwZGF0ZSAlcyIsDQo+ICAJCQkoYl9yZXMgPT0gTUVTSF9TVEFUVVNfU1VDQ0VT
+UykgPyAic3VjY2VzcyIgOiAiZmFpbCIpOw0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9uZXQuYyBiL21l
+c2gvbmV0LmMNCj4gaW5kZXggOWU1MDlhOGVhLi5iZmMxYTAxYmIgMTAwNjQ0DQo+IC0tLSBhL21l
+c2gvbmV0LmMNCj4gKysrIGIvbWVzaC9uZXQuYw0KPiBAQCAtOTcwLDI3ICs5NzAsMTMgQEAgaW50
+IG1lc2hfbmV0X2RlbF9rZXkoc3RydWN0IG1lc2hfbmV0ICpuZXQsIHVpbnQxNl90IGlkeCkNCj4g
+IAlyZXR1cm4gTUVTSF9TVEFUVVNfU1VDQ0VTUzsNCj4gIH0NCj4gIA0KPiAtaW50IG1lc2hfbmV0
+X2FkZF9rZXkoc3RydWN0IG1lc2hfbmV0ICpuZXQsIGJvb2wgdXBkYXRlLCB1aW50MTZfdCBpZHgs
+DQo+IC0JCQkJCQkJY29uc3Qgdm9pZCAqdmFsdWUpDQo+ICtpbnQgbWVzaF9uZXRfYWRkX2tleShz
+dHJ1Y3QgbWVzaF9uZXQgKm5ldCwgdWludDE2X3QgaWR4LCBjb25zdCB1aW50OF90ICp2YWx1ZSkN
+Cj4gIHsNCj4gLQlpbnQgc3RhdHVzOw0KPiAgCXN0cnVjdCBtZXNoX3N1Ym5ldCAqc3VibmV0Ow0K
+PiAgDQo+ICAJc3VibmV0ID0gbF9xdWV1ZV9maW5kKG5ldC0+c3VibmV0cywgbWF0Y2hfa2V5X2lu
+ZGV4LA0KPiAgCQkJCQkJCUxfVUlOVF9UT19QVFIoaWR4KSk7DQo+ICANCj4gLQlpZiAodXBkYXRl
+KSB7DQo+IC0JCWlmIChzdWJuZXQgJiYgc3VibmV0LT5rcl9waGFzZSA9PSBLRVlfUkVGUkVTSF9Q
+SEFTRV9OT05FKSB7DQo+IC0JCQlsX2luZm8oIlN0YXJ0IGtleSByZWZyZXNoIik7DQo+IC0JCQlz
+dGF0dXMgPSBtZXNoX25ldF9rcl9waGFzZV9vbmUobmV0LCBpZHgsIHZhbHVlKTsNCj4gLQkJCWlm
+IChzdGF0dXMgPT0gTUVTSF9TVEFUVVNfU1VDQ0VTUyAmJg0KPiAtCQkJCSFzdG9yYWdlX25ldF9r
+ZXlfYWRkKG5ldCwgaWR4LA0KPiAtCQkJCQkJdmFsdWUsIEtFWV9SRUZSRVNIX1BIQVNFX09ORSkp
+DQo+IC0JCQkJcmV0dXJuIE1FU0hfU1RBVFVTX1NUT1JBR0VfRkFJTDsNCj4gLQkJfSBlbHNlDQo+
+IC0JCQlyZXR1cm4gTUVTSF9TVEFUVVNfQ0FOTk9UX1VQREFURTsNCj4gLQl9DQo+IC0NCj4gIAlp
+ZiAoc3VibmV0KSB7DQo+ICAJCWlmIChuZXRfa2V5X2NvbmZpcm0oc3VibmV0LT5uZXRfa2V5X2N1
+ciwgdmFsdWUpKQ0KPiAgCQkJcmV0dXJuIE1FU0hfU1RBVFVTX1NVQ0NFU1M7DQo+IEBAIC0zNTcw
+LDcgKzM1NTYsNyBAQCB1aW50OF90IG1lc2hfbmV0X2tleV9yZWZyZXNoX3BoYXNlX2dldChzdHJ1
+Y3QgbWVzaF9uZXQgKm5ldCwgdWludDE2X3QgaWR4LA0KPiAgCXJldHVybiBNRVNIX1NUQVRVU19T
+VUNDRVNTOw0KPiAgfQ0KPiAgDQo+IC1pbnQgbWVzaF9uZXRfa3JfcGhhc2Vfb25lKHN0cnVjdCBt
+ZXNoX25ldCAqbmV0LCB1aW50MTZfdCBpZHgsDQo+ICtpbnQgbWVzaF9uZXRfdXBkYXRlX2tleShz
+dHJ1Y3QgbWVzaF9uZXQgKm5ldCwgdWludDE2X3QgaWR4LA0KPiAgCQkJCQkJCWNvbnN0IHVpbnQ4
+X3QgKnZhbHVlKQ0KPiAgew0KPiAgCXN0cnVjdCBtZXNoX3N1Ym5ldCAqc3VibmV0Ow0KPiBAQCAt
+MzU4MCw3ICszNTY2LDggQEAgaW50IG1lc2hfbmV0X2tyX3BoYXNlX29uZShzdHJ1Y3QgbWVzaF9u
+ZXQgKm5ldCwgdWludDE2X3QgaWR4LA0KPiAgDQo+ICAJc3VibmV0ID0gbF9xdWV1ZV9maW5kKG5l
+dC0+c3VibmV0cywgbWF0Y2hfa2V5X2luZGV4LA0KPiAgCQkJCQkJCUxfVUlOVF9UT19QVFIoaWR4
+KSk7DQo+IC0JaWYgKCFzdWJuZXQpDQo+ICsNCj4gKwlpZiAoIXN1Ym5ldCB8fCAhc3VibmV0LT5r
+cl9waGFzZSA9PSBLRVlfUkVGUkVTSF9QSEFTRV9OT05FKQ0KPiAgCQlyZXR1cm4gTUVTSF9TVEFU
+VVNfQ0FOTk9UX1VQREFURTsNCg0KDQpXZSBuZWVkIHRvIGFsbG93IGZvciAiVXBkYXRlIiBjYWxs
+cyB3aGVyZSB3ZSBoYXZlIGFscmVhZHkgZW50ZXJlZCBQaGFzZSAxLCBidXQgdGhlIENvbmZpZw0K
+Q2xpZW50IGRpZCBub3QgcmVjaWV2ZSBvdXIgTmV0IEtleSBTdGF0dXMgKHJlc3BvbnNlKSBtZXNz
+YWdlLiAgV2UgaGF2ZSBhIGZ1bmN0aW9uIHdlIHVzZSBpbiBOZXQgS2V5IEFkZA0KbmV0X2tleV9j
+b25maXJtKCkgdGhhdCBjaGVja3MgdG8gc2VlIGlmIHRoaXMgaXMgYSB2YWxpZCBidXQgcmVkdW5k
+YW5kdCBjYWxsLCBzbyB0aGF0IHdlDQpjYW4gYWNjZXB0IGl0IChhbmQgcmVzcG9uZCkgd2l0aG91
+dCBjaGFuZ2luZyBzdGF0ZS4gDQoNCj4gIA0KPiAgCWlmIChzdWJuZXQtPm5ldF9rZXlfdXBkKSB7
+DQo+IEBAIC0zNjA2LDYgKzM1OTMsOSBAQCBpbnQgbWVzaF9uZXRfa3JfcGhhc2Vfb25lKHN0cnVj
+dCBtZXNoX25ldCAqbmV0LCB1aW50MTZfdCBpZHgsDQo+ICANCj4gIAlsX2luZm8oImtleSByZWZy
+ZXNoIHBoYXNlIDE6IEtleSBJRCAlZCIsIHN1Ym5ldC0+bmV0X2tleV91cGQpOw0KPiAgDQo+ICsJ
+aWYgKCFzdG9yYWdlX25ldF9rZXlfYWRkKG5ldCwgaWR4LCB2YWx1ZSwgS0VZX1JFRlJFU0hfUEhB
+U0VfT05FKSkNCj4gKwkJcmV0dXJuIE1FU0hfU1RBVFVTX1NUT1JBR0VfRkFJTDsNCj4gKw0KPiAg
+CXN1Ym5ldC0+a3JfcGhhc2UgPSBLRVlfUkVGUkVTSF9QSEFTRV9PTkU7DQo+ICANCj4gIAlyZXR1
+cm4gTUVTSF9TVEFUVVNfU1VDQ0VTUzsNCj4gZGlmZiAtLWdpdCBhL21lc2gvbmV0LmggYi9tZXNo
+L25ldC5oDQo+IGluZGV4IDBlZjAxYjYzZS4uYjI3YTRlNjE0IDEwMDY0NA0KPiAtLS0gYS9tZXNo
+L25ldC5oDQo+ICsrKyBiL21lc2gvbmV0LmgNCj4gQEAgLTI4MCw4ICsyODAsMTAgQEAgYm9vbCBt
+ZXNoX25ldF9zZXRfcmVsYXlfbW9kZShzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgYm9vbCBlbmFibGUs
+IHVpbnQ4X3QgY250LA0KPiAgCQkJCQkJCXVpbnQ4X3QgaW50ZXJ2YWwpOw0KPiAgYm9vbCBtZXNo
+X25ldF9zZXRfZnJpZW5kX21vZGUoc3RydWN0IG1lc2hfbmV0ICpuZXQsIGJvb2wgZW5hYmxlKTsN
+Cj4gIGludCBtZXNoX25ldF9kZWxfa2V5KHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50MTZfdCBu
+ZXRfaWR4KTsNCj4gLWludCBtZXNoX25ldF9hZGRfa2V5KHN0cnVjdCBtZXNoX25ldCAqbmV0LCBi
+b29sIHVwZGF0ZSwNCj4gLQkJCQkJdWludDE2X3QgbmV0X2lkeCwgY29uc3Qgdm9pZCAqa2V5KTsN
+Cj4gK2ludCBtZXNoX25ldF9hZGRfa2V5KHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50MTZfdCBu
+ZXRfaWR4LA0KPiArCQkJCQkJCWNvbnN0IHVpbnQ4X3QgKmtleSk7DQo+ICtpbnQgbWVzaF9uZXRf
+dXBkYXRlX2tleShzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgdWludDE2X3QgbmV0X2lkeCwNCj4gKwkJ
+CQkJCQljb25zdCB1aW50OF90ICprZXkpOw0KPiAgdWludDMyX3QgbWVzaF9uZXRfZ2V0X2l2X2lu
+ZGV4KHN0cnVjdCBtZXNoX25ldCAqbmV0KTsNCj4gIHZvaWQgbWVzaF9uZXRfZ2V0X3NuYl9zdGF0
+ZShzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwNCj4gIAkJCQkJdWludDhfdCAqZmxhZ3MsIHVpbnQzMl90
+ICppdl9pbmRleCk7DQo+IEBAIC0zMzUsOCArMzM3LDYgQEAgdWludDhfdCBtZXNoX25ldF9rZXlf
+cmVmcmVzaF9waGFzZV9zZXQoc3RydWN0IG1lc2hfbmV0ICpuZXQsIHVpbnQxNl90IG5ldF9pZHgs
+DQo+ICAJCQkJCQkJdWludDhfdCB0cmFuc2l0aW9uKTsNCj4gIHVpbnQ4X3QgbWVzaF9uZXRfa2V5
+X3JlZnJlc2hfcGhhc2VfZ2V0KHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50MTZfdCBuZXRfaWR4
+LA0KPiAgCQkJCQkJCXVpbnQ4X3QgKnBoYXNlKTsNCj4gLWludCBtZXNoX25ldF9rcl9waGFzZV9v
+bmUoc3RydWN0IG1lc2hfbmV0ICpuZXQsIHVpbnQxNl90IG5ldF9pZHgsDQo+IC0JCQkJCQkJY29u
+c3QgdWludDhfdCAqa2V5KTsNCj4gIGludCBtZXNoX25ldF9rZXlfcmVmcmVzaF9waGFzZV90d28o
+c3RydWN0IG1lc2hfbmV0ICpuZXQsIHVpbnQxNl90IG5ldF9pZHgpOw0KPiAgaW50IG1lc2hfbmV0
+X2tleV9yZWZyZXNoX2ZpbmlzaChzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgdWludDE2X3QgbmV0X2lk
+eCk7DQo+ICB2b2lkIG1lc2hfbmV0X3NlbmRfc2VnKHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50
+MzJfdCBrZXlfaWQsDQo+IGRpZmYgLS1naXQgYS9tZXNoL25vZGUuYyBiL21lc2gvbm9kZS5jDQo+
+IGluZGV4IGU5MjFiNzJiNy4uMTg0NWY5YTMyIDEwMDY0NA0KPiAtLS0gYS9tZXNoL25vZGUuYw0K
+PiArKysgYi9tZXNoL25vZGUuYw0KPiBAQCAtMTcyNiw4ICsxNzI2LDggQEAgYm9vbCBub2RlX2Fk
+ZF9wZW5kaW5nX2xvY2FsKHN0cnVjdCBtZXNoX25vZGUgKm5vZGUsIHZvaWQgKnByb3Zfbm9kZV9p
+bmZvLA0KPiAgCWlmICghbWVzaF9kYl93cml0ZV9kZXZpY2Vfa2V5KG5vZGUtPmpjb25maWcsIGlu
+Zm8tPmRldmljZV9rZXkpKQ0KPiAgCQlyZXR1cm4gZmFsc2U7DQo+ICANCj4gLQlpZiAobWVzaF9u
+ZXRfYWRkX2tleShub2RlLT5uZXQsIGtyLCBpbmZvLT5uZXRfaW5kZXgsDQo+IC0JCQlpbmZvLT5u
+ZXRfa2V5KSAhPSBNRVNIX1NUQVRVU19TVUNDRVNTKQ0KPiArCWlmIChtZXNoX25ldF9hZGRfa2V5
+KG5vZGUtPm5ldCwgaW5mby0+bmV0X2luZGV4LCBpbmZvLT5uZXRfa2V5KSAhPQ0KPiArCQkJCQkJ
+CU1FU0hfU1RBVFVTX1NVQ0NFU1MpDQo+ICAJCXJldHVybiBmYWxzZTsNCj4gIA0KPiAgCWlmICgh
+c3RvcmFnZV9uZXRfa2V5X2FkZChub2RlLT5uZXQsIGluZm8tPm5ldF9pbmRleCwgaW5mby0+bmV0
+X2tleSwNCj4gZGlmZiAtLWdpdCBhL21lc2gvc3RvcmFnZS5jIGIvbWVzaC9zdG9yYWdlLmMNCj4g
+aW5kZXggM2E2NjE0ZWIyLi4xYjUyMDAwYjAgMTAwNjQ0DQo+IC0tLSBhL21lc2gvc3RvcmFnZS5j
+DQo+ICsrKyBiL21lc2gvc3RvcmFnZS5jDQo+IEBAIC0xMjAsNyArMTIwLDcgQEAgc3RhdGljIGJv
+b2wgcmVhZF9uZXRfa2V5c19jYih1aW50MTZfdCBpZHgsIHVpbnQ4X3QgKmtleSwgdWludDhfdCAq
+bmV3X2tleSwNCj4gIAlpZiAoIW5ldCkNCj4gIAkJcmV0dXJuIGZhbHNlOw0KPiAgDQo+IC0JaWYg
+KG1lc2hfbmV0X2FkZF9rZXkobmV0LCBmYWxzZSwgaWR4LCBrZXkpICE9IE1FU0hfU1RBVFVTX1NV
+Q0NFU1MpDQo+ICsJaWYgKG1lc2hfbmV0X2FkZF9rZXkobmV0LCBpZHgsIGtleSkgIT0gTUVTSF9T
+VEFUVVNfU1VDQ0VTUykNCj4gIAkJcmV0dXJuIGZhbHNlOw0KPiAgCS8qIFRPRE86IGhhbmRsZSBy
+ZXN0b3Jpbmcga2V5IHJlZnJlc2ggcGhhc2UgYW5kIG5ldyBrZXlzICovDQo+ICA=
