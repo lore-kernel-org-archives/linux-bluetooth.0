@@ -6,267 +6,182 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DBAC169C4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C2FAC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:39:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8011218A1
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 027EF218A1
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Feb 2019 07:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728172AbfBFHjC (ORCPT
+        id S1728185AbfBFHjL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Feb 2019 02:39:02 -0500
-Received: from mga03.intel.com ([134.134.136.65]:2402 "EHLO mga03.intel.com"
+        Wed, 6 Feb 2019 02:39:11 -0500
+Received: from mga01.intel.com ([192.55.52.88]:11568 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727103AbfBFHjC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Feb 2019 02:39:02 -0500
+        id S1727103AbfBFHjL (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 6 Feb 2019 02:39:11 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2019 23:39:02 -0800
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Feb 2019 23:39:10 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,339,1544515200"; 
-   d="scan'208";a="131934328"
+   d="scan'208";a="115615995"
 Received: from naram-mobl.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.255.228.86])
-  by orsmga002.jf.intel.com with ESMTP; 05 Feb 2019 23:39:01 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Feb 2019 23:39:10 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 3/5] mesh: Declare internal functions as static
-Date:   Tue,  5 Feb 2019 23:38:59 -0800
-Message-Id: <20190206073859.29084-1-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 4/5] mesh: Save key refresh phase state to node config file
+Date:   Tue,  5 Feb 2019 23:39:08 -0800
+Message-Id: <20190206073908.29138-1-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This renames mesh_net_key_refresh_finish() to key_refresh_finish() and
-mesh_net_key_phase_two() to key_refresh_phase_wo() and changes the
-function declaration to static since they are called only within net.c
+This adds implementation for saving the key refresh phase to
+a node configuration file in JSON format. When the key refresh
+procedure is finished, the old network keys are remove from the
+configuration file.
 ---
- mesh/net.c | 146 ++++++++++++++++++++++++++---------------------------
- mesh/net.h |   2 -
- 2 files changed, 73 insertions(+), 75 deletions(-)
+ mesh/mesh-db.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/mesh-db.h |  2 +-
+ mesh/net.c     |  4 ++++
+ mesh/storage.c |  9 ++++++++
+ mesh/storage.h |  2 ++
+ 5 files changed, 72 insertions(+), 1 deletion(-)
 
+diff --git a/mesh/mesh-db.c b/mesh/mesh-db.c
+index 5c0b72551..b9bbef912 100644
+--- a/mesh/mesh-db.c
++++ b/mesh/mesh-db.c
+@@ -1491,3 +1491,59 @@ bool mesh_db_add_node(json_object *jnode, struct mesh_db_node *node) {
+ 
+ 	return true;
+ }
++
++static void finish_key_refresh(json_object *jobj, uint16_t net_idx)
++{
++	json_object *jarray;
++	int i, len;
++
++	/* Clean up all the bound appkeys */
++	json_object_object_get_ex(jobj, "appKeys", &jarray);
++	if (!jarray)
++		return;
++
++	len = json_object_array_length(jarray);
++
++	for (i = 0; i < len; ++i) {
++		json_object *jentry;
++		uint16_t idx;
++
++		jentry = json_object_array_get_idx(jarray, i);
++
++		if (!get_key_index(jentry, "boundNetKey", &idx))
++			continue;
++
++		if (idx != net_idx)
++			continue;
++
++		json_object_object_del(jentry, "oldKey");
++
++		if (!get_key_index(jentry, "index", &idx))
++			continue;
++	}
++
++}
++
++bool mesh_db_net_key_set_phase(json_object *jobj, uint16_t idx, uint8_t phase)
++{
++	json_object *jarray, *jentry = NULL;
++
++	json_object_object_get_ex(jobj, "netKeys", &jarray);
++
++	if (jarray)
++		jentry = get_key_object(jarray, idx);
++
++	if (!jentry)
++		return false;
++
++	json_object_object_del(jentry, "keyRefresh");
++	json_object_object_add(jentry, "keyRefresh",
++					json_object_new_int(phase));
++
++	if (phase == KEY_REFRESH_PHASE_NONE) {
++		json_object_object_del(jentry, "oldKey");
++		finish_key_refresh(jobj, idx);
++	}
++
++	return true;
++}
+diff --git a/mesh/mesh-db.h b/mesh/mesh-db.h
+index 40e60f72d..db7ea6045 100644
+--- a/mesh/mesh-db.h
++++ b/mesh/mesh-db.h
+@@ -135,7 +135,7 @@ bool mesh_db_app_key_del(json_object *jobj, uint16_t net_idx, uint16_t idx);
+ bool mesh_db_net_key_add(json_object *jobj, uint16_t net_idx,
+ 					const uint8_t key[16], int phase);
+ bool mesh_db_net_key_del(json_object *jobj, uint16_t net_idx);
+-bool mesh_db_write_kr_phase(json_object *jobj, uint16_t net_idx, int phase);
++bool mesh_db_net_key_set_phase(json_object *jobj, uint16_t idx, uint8_t phase);
+ bool mesh_db_write_address(json_object *jobj, uint16_t address);
+ bool mesh_db_write_iv_index(json_object *jobj, uint32_t idx, bool update);
+ void mesh_db_remove_property(json_object *jobj, const char *desc);
 diff --git a/mesh/net.c b/mesh/net.c
-index cf7603053..21f78163a 100644
+index 21f78163a..b85a95cad 100644
 --- a/mesh/net.c
 +++ b/mesh/net.c
-@@ -1016,8 +1016,7 @@ int mesh_net_add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
- 	if (status != MESH_STATUS_SUCCESS)
- 		return status;
+@@ -2656,6 +2656,8 @@ static int key_refresh_phase_two(struct mesh_net *net, uint16_t idx)
+ 	else
+ 		l_queue_foreach(net->friends, frnd_kr_phase2, net);
  
--	if (!storage_net_key_add(net, idx, value,
--					KEY_REFRESH_PHASE_NONE)) {
-+	if (!storage_net_key_add(net, idx, value, KEY_REFRESH_PHASE_NONE)) {
- 		l_queue_remove(net->subnets, subnet);
- 		subnet_free(subnet);
- 		return MESH_STATUS_STORAGE_FAIL;
-@@ -2629,6 +2628,70 @@ static void iv_upd_to(struct l_timeout *upd_timeout, void *user_data)
- 	}
- }
- 
-+
-+static int key_refresh_phase_two(struct mesh_net *net, uint16_t idx)
-+{
-+	struct mesh_subnet *subnet;
-+
-+	if (!net)
-+		return MESH_STATUS_UNSPECIFIED_ERROR;
-+
-+	subnet = l_queue_find(net->subnets, match_key_index,
-+							L_UINT_TO_PTR(idx));
-+
-+	if (!subnet || !subnet->net_key_upd)
-+		return MESH_STATUS_INVALID_NETKEY;
-+
-+	l_info("Key refresh procedure phase 2: start using new net TX keys");
-+	subnet->key_refresh = 1;
-+	subnet->net_key_tx = subnet->net_key_upd;
-+	/* TODO: Provisioner may need to stay in phase three until
-+	 * it hears beacons from all the nodes
-+	 */
-+	subnet->kr_phase = KEY_REFRESH_PHASE_TWO;
-+	set_network_beacon(subnet, net);
-+
-+	if (net->friend_addr)
-+		frnd_key_refresh(net, 2);
-+	else
-+		l_queue_foreach(net->friends, frnd_kr_phase2, net);
-+
-+	return MESH_STATUS_SUCCESS;
-+}
-+
-+static int key_refresh_finish(struct mesh_net *net, uint16_t idx)
-+{
-+	struct mesh_subnet *subnet;
-+
-+	if (!net)
-+		return MESH_STATUS_UNSPECIFIED_ERROR;
-+
-+	subnet = l_queue_find(net->subnets, match_key_index,
-+							L_UINT_TO_PTR(idx));
-+	if (!subnet || !subnet->net_key_upd)
-+		return MESH_STATUS_INVALID_NETKEY;
-+
-+	if (subnet->kr_phase == KEY_REFRESH_PHASE_NONE)
-+		return MESH_STATUS_SUCCESS;
-+
-+	l_info("Key refresh phase 3: use new keys only, discard old ones");
-+
-+	/* Switch to using new keys, discard old ones */
-+	net_key_unref(subnet->net_key_cur);
-+	subnet->net_key_tx = subnet->net_key_cur = subnet->net_key_upd;
-+	subnet->net_key_upd = 0;
-+	subnet->key_refresh = 0;
-+	subnet->kr_phase = KEY_REFRESH_PHASE_NONE;
-+	set_network_beacon(subnet, net);
-+
-+	if (net->friend_addr)
-+		frnd_key_refresh(net, 3);
-+	else
-+		l_queue_foreach(net->friends, frnd_kr_phase3, net);
-+
-+	return MESH_STATUS_SUCCESS;
-+}
-+
- static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 				bool iv_update, bool kr_transition,
- 				bool rxed_key_refresh, bool lpn)
-@@ -2680,11 +2743,11 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 
- 		/* Figure out the key refresh phase */
- 		if (kr_transition) {
-+			l_debug("Beacon based KR phase change");
- 			if (rxed_key_refresh)
--				mesh_net_key_refresh_phase_two(net,
--								subnet->idx);
-+				key_refresh_phase_two(net, subnet->idx);
- 			else
--				mesh_net_key_refresh_finish(net, subnet->idx);
-+				key_refresh_finish(net, subnet->idx);
- 		}
- 
- 		if (!lpn)
-@@ -2717,9 +2780,9 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 	/* Figure out the key refresh phase */
- 	if (kr_transition) {
- 		if (rxed_key_refresh)
--			mesh_net_key_refresh_phase_two(net, subnet->idx);
-+			key_refresh_phase_two(net, subnet->idx);
- 		else
--			mesh_net_key_refresh_finish(net, subnet->idx);
-+			key_refresh_finish(net, subnet->idx);
- 	}
- 
- 	if (!lpn)
-@@ -3588,18 +3651,19 @@ uint8_t mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t idx,
- 
- 	switch (transition) {
- 	case 2:
--		if (mesh_net_key_refresh_phase_two(net, idx)
-+		if (key_refresh_phase_two(net, idx)
- 							!= MESH_STATUS_SUCCESS)
- 			return MESH_STATUS_CANNOT_SET;
- 		break;
- 	case 3:
--		if (mesh_net_key_refresh_finish(net, idx)
-+		if (key_refresh_finish(net, idx)
- 							!= MESH_STATUS_SUCCESS)
- 			return MESH_STATUS_CANNOT_SET;
- 		break;
- 	default:
- 		return MESH_STATUS_CANNOT_SET;
- 	}
++	storage_set_key_refresh_phase(net, idx, KEY_REFRESH_PHASE_TWO);
 +
  	return MESH_STATUS_SUCCESS;
  }
  
-@@ -3669,70 +3733,6 @@ int mesh_net_update_key(struct mesh_net *net, uint16_t idx,
+@@ -2689,6 +2691,8 @@ static int key_refresh_finish(struct mesh_net *net, uint16_t idx)
+ 	else
+ 		l_queue_foreach(net->friends, frnd_kr_phase3, net);
+ 
++	storage_set_key_refresh_phase(net, idx, KEY_REFRESH_PHASE_NONE);
++
  	return MESH_STATUS_SUCCESS;
  }
  
--int mesh_net_key_refresh_phase_two(struct mesh_net *net, uint16_t idx)
--{
--	struct mesh_subnet *subnet;
--
--	if (!net)
--		return MESH_STATUS_UNSPECIFIED_ERROR;
--
--	subnet = l_queue_find(net->subnets, match_key_index,
--							L_UINT_TO_PTR(idx));
--
--	if (!subnet || !subnet->net_key_upd)
--		return MESH_STATUS_INVALID_NETKEY;
--
--	l_info("Key refresh procedure phase 2: start using new net TX keys");
--	subnet->key_refresh = 1;
--	subnet->net_key_tx = subnet->net_key_upd;
--	/* TODO: Provisioner may need to stay in phase three until
--	 * it hears beacons from all the nodes
--	 */
--	subnet->kr_phase = KEY_REFRESH_PHASE_TWO;
--	set_network_beacon(subnet, net);
--
--	if (net->friend_addr)
--		frnd_key_refresh(net, 2);
--	else
--		l_queue_foreach(net->friends, frnd_kr_phase2, net);
--
--	return MESH_STATUS_SUCCESS;
--}
--
--int mesh_net_key_refresh_finish(struct mesh_net *net, uint16_t idx)
--{
--	struct mesh_subnet *subnet;
--
--	if (!net)
--		return MESH_STATUS_UNSPECIFIED_ERROR;
--
--	subnet = l_queue_find(net->subnets, match_key_index,
--							L_UINT_TO_PTR(idx));
--
--	if (!subnet || !subnet->net_key_upd)
--		return MESH_STATUS_INVALID_NETKEY;
--
--	if (subnet->kr_phase == KEY_REFRESH_PHASE_NONE)
--		return MESH_STATUS_SUCCESS;
--
--	l_info("Key refresh phase 3: use new keys only, discard old ones");
--
--	/* Switch to using new keys, discard old ones */
--	net_key_unref(subnet->net_key_cur);
--	subnet->net_key_tx = subnet->net_key_cur = subnet->net_key_upd;
--	subnet->net_key_upd = 0;
--	subnet->key_refresh = 0;
--	subnet->kr_phase = KEY_REFRESH_PHASE_NONE;
--	set_network_beacon(subnet, net);
--
--	if (net->friend_addr)
--		frnd_key_refresh(net, 3);
--	else
--		l_queue_foreach(net->friends, frnd_kr_phase3, net);
--
--	return MESH_STATUS_SUCCESS;
--}
--
- uint16_t mesh_net_get_features(struct mesh_net *net)
+diff --git a/mesh/storage.c b/mesh/storage.c
+index 84f7c6161..e1d86960a 100644
+--- a/mesh/storage.c
++++ b/mesh/storage.c
+@@ -321,6 +321,15 @@ bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
+ 	return mesh_db_write_iv_index(jnode, iv_index, update);
+ }
+ 
++bool storage_set_key_refresh_phase(struct mesh_net *net, uint16_t net_idx,
++								uint8_t phase)
++{
++	struct mesh_node *node = mesh_net_node_get(net);
++	json_object *jnode = node_jconfig_get(node);
++
++	return mesh_db_net_key_set_phase(jnode, net_idx, phase);
++}
++
+ bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq)
  {
- 	uint16_t features = 0;
-diff --git a/mesh/net.h b/mesh/net.h
-index 591a6898e..e040e19fa 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -339,8 +339,6 @@ uint8_t mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t net_idx,
- 							uint8_t transition);
- uint8_t mesh_net_key_refresh_phase_get(struct mesh_net *net, uint16_t net_idx,
- 							uint8_t *phase);
--int mesh_net_key_refresh_phase_two(struct mesh_net *net, uint16_t net_idx);
--int mesh_net_key_refresh_finish(struct mesh_net *net, uint16_t net_idx);
- void mesh_net_send_seg(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index, uint8_t ttl, uint32_t seq,
- 				uint16_t src, uint16_t dst, uint32_t hdr,
+ 	struct mesh_node *node = mesh_net_node_get(net);
+diff --git a/mesh/storage.h b/mesh/storage.h
+index 91299f0a8..7dad2762e 100644
+--- a/mesh/storage.h
++++ b/mesh/storage.h
+@@ -47,3 +47,5 @@ bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
+ 								bool update);
+ bool storage_set_device_key(struct mesh_node *node, uint8_t dev_key[16]);
+ bool storage_set_unicast(struct mesh_node *node, uint16_t unicast);
++bool storage_set_key_refresh_phase(struct mesh_net *net, uint16_t net_idx,
++								uint8_t phase);
 -- 
 2.17.2
 
