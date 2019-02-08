@@ -1,74 +1,110 @@
-Return-Path: <SRS0=okSL=QO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=tsxM=QP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61438C282C2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Feb 2019 23:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35684C282C2
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Feb 2019 00:28:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 284DF2173B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Feb 2019 23:48:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 005132073F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Feb 2019 00:28:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726691AbfBGXs2 convert rfc822-to-8bit (ORCPT
+        id S1726832AbfBHA2U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Feb 2019 18:48:28 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:56792 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726622AbfBGXs2 (ORCPT
+        Thu, 7 Feb 2019 19:28:20 -0500
+Received: from gateway34.websitewelcome.com ([192.185.148.200]:19284 "EHLO
+        gateway34.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726758AbfBHA2U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Feb 2019 18:48:28 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BA5352DB69
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Feb 2019 23:48:27 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id AAB3D2E82B; Thu,  7 Feb 2019 23:48:27 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 202515] Bluetooth LE Extended Connect returning Command
- Disallowed
-Date:   Thu, 07 Feb 2019 23:48:27 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: master.homer@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-202515-62941-i0YCUNQMNt@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-202515-62941@https.bugzilla.kernel.org/>
-References: <bug-202515-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 7 Feb 2019 19:28:20 -0500
+Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
+        by gateway34.websitewelcome.com (Postfix) with ESMTP id 5ABC557F1F6
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Feb 2019 18:28:19 -0600 (CST)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id ru1jgMGLpdnCeru1jgMKFA; Thu, 07 Feb 2019 18:28:19 -0600
+X-Authority-Reason: nr=8
+Received: from [189.250.49.191] (port=46210 helo=embeddedor)
+        by gator4166.hostgator.com with esmtpa (Exim 4.91)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1gru1i-003sDb-L5; Thu, 07 Feb 2019 18:28:18 -0600
+Date:   Thu, 7 Feb 2019 18:28:17 -0600
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH][next] Bluetooth: a2mp: Use struct_size() helper
+Message-ID: <20190208002817.GA15338@embeddedor>
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 189.250.49.191
+X-Source-L: No
+X-Exim-ID: 1gru1i-003sDb-L5
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: (embeddedor) [189.250.49.191]:46210
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=202515
+One of the more common cases of allocation size calculations is finding
+the size of a structure that has a zero-sized array at the end, along
+with memory for some number of elements for that array. For example:
 
---- Comment #14 from Mathias Tillman (master.homer@gmail.com) ---
-Sorry, was too quick to reply. As it turns out, the set ext scanning params
-command *is* required, or it won't find any LE devices properly when scanning -
-it will connect to already paired devices though. 
-As a test I decided to try and remove the set ext scanning params check
-completely, and just send it even though it's reported as being not supported -
-oddly enough this works, and scans are again working properly, so it definitely
-seems like a problem with the controller.
+struct foo {
+    int stuff;
+    struct boo entry[];
+};
 
+size = sizeof(struct foo) + count * sizeof(struct boo);
+instance = alloc(size, GFP_KERNEL)
+
+Instead of leaving these open-coded and prone to type mistakes, we can
+now use the new struct_size() helper:
+
+size = struct_size(instance, entry, count);
+instance = alloc(size, GFP_KERNEL)
+
+This code was detected with the help of Coccinelle.
+
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ net/bluetooth/a2mp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 58fc6333d412..5f918ea18b5a 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -174,7 +174,7 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 			num_ctrl++;
+ 	}
+ 
+-	len = num_ctrl * sizeof(struct a2mp_cl) + sizeof(*rsp);
++	len = struct_size(rsp, cl, num_ctrl);
+ 	rsp = kmalloc(len, GFP_ATOMIC);
+ 	if (!rsp) {
+ 		read_unlock(&hci_dev_list_lock);
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.20.1
+
