@@ -5,30 +5,30 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E65C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Feb 2019 16:16:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F47DC282CB
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Feb 2019 17:36:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D2A420844
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Feb 2019 16:16:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B9A1217D8
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Feb 2019 17:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727272AbfBHQQb convert rfc822-to-8bit (ORCPT
+        id S1727401AbfBHRgC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Feb 2019 11:16:31 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:60274 "EHLO
+        Fri, 8 Feb 2019 12:36:02 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:53532 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726522AbfBHQQb (ORCPT
+        by vger.kernel.org with ESMTP id S1727590AbfBHRfz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Feb 2019 11:16:31 -0500
+        Fri, 8 Feb 2019 12:35:55 -0500
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 8717C2EA41
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Feb 2019 16:16:30 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5F7C52DCE1
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Feb 2019 17:35:55 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 7BA132EA5F; Fri,  8 Feb 2019 16:16:30 +0000 (UTC)
+        id 540222E6AB; Fri,  8 Feb 2019 17:35:55 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 202515] Bluetooth LE Extended Connect returning Command
  Disallowed
-Date:   Fri, 08 Feb 2019 16:16:29 +0000
+Date:   Fri, 08 Feb 2019 17:35:54 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -37,14 +37,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: szymon.janc@gmail.com
+X-Bugzilla-Who: master.homer@gmail.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-202515-62941-uwWkBGbHzt@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-202515-62941-EiI1AP8w5e@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-202515-62941@https.bugzilla.kernel.org/>
 References: <bug-202515-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -60,18 +60,16 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=202515
 
-Szymon Janc (szymon.janc@gmail.com) changed:
+--- Comment #16 from Mathias Tillman (master.homer@gmail.com) ---
+Yeah, that does seem to be the case - it works perfectly fine when it uses the
+extended le Scan command instead of the legacy one. The problem really is that
+the controller only sometimes reports that it supports the set le extended scan
+params command, which causes it to use legacy scan instead. This is most likely
+due to a bug in the firmware.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |szymon.janc@gmail.com
-
---- Comment #15 from Szymon Janc (szymon.janc@gmail.com) ---
-Extended Advertising command are mutually exclusive with legacy commands and
-controller will reject ones if others were already issued. So if one did
-'hcitool lescan' before kernel issued any EA commands, it would lead to
-described behavior of rejecting EA commands with 'Command Disallowed' status
-code.
+However, I am wondering if there realistically are any controllers that only
+support the le extended scan command and not the params one, since they are
+both required to work properly.
 
 -- 
 You are receiving this mail because:
