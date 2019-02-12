@@ -2,119 +2,97 @@ Return-Path: <SRS0=8P1K=QT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F629C282C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 08:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F62C282CA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 15:15:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2EEE2184A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 08:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E82C82075C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 15:15:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RmntlUoN"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="WyMYHKf4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728488AbfBLIgx (ORCPT
+        id S1730633AbfBLPPY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Feb 2019 03:36:53 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:45601 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728413AbfBLIgw (ORCPT
+        Tue, 12 Feb 2019 10:15:24 -0500
+Received: from mail-lj1-f178.google.com ([209.85.208.178]:43917 "EHLO
+        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730011AbfBLPPW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Feb 2019 03:36:52 -0500
-Received: by mail-pl1-f195.google.com with SMTP id r14so945346pls.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Feb 2019 00:36:52 -0800 (PST)
+        Tue, 12 Feb 2019 10:15:22 -0500
+Received: by mail-lj1-f178.google.com with SMTP id o1-v6so2510658ljc.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Feb 2019 07:15:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=HNWXvEaLYcEHS16vyHBT011Dc3SSM/dSNQsgo4Wfpk0=;
-        b=RmntlUoN26+eNXDDKj4vXgjTJY3kqPPtKRI+0s9Nivp5oPWkcHAx8SZRzsyZRnm8hF
-         eXc/gVu5JUx4Q//EsXIsWzSrBRNh/83eZULp1tn1vBepjJpFA9idGfLGMOYullm2FqHo
-         62E9tvhzwqan3tw3DNWOyrwr1bjOijGvESG3Clfw8fBIyhwzQgfOyddcqE51Gigbrd9y
-         lx7GmZLLEqdyJrIALQdskfIcLKtq+xGwJRbbHPrEBABCdu3VMsb4AoBa8KdEUyAgX9kS
-         rR5xT9ua3GOHWncgfamuldWDBae+TLiUwiexQQE2oxeqZecdS2baWKZhX/8R2lVpLfK1
-         lPIA==
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rBFE/qJkwx0r3PCdtI1ax/QbsYySMr8iYKVWk7orY3g=;
+        b=WyMYHKf4J/TjmwOHkcOezwO/N7g4Nf8RBl6Ucn6jCx4lRudVE+mCw2LYbtdr2HjR1I
+         monPlnwbTuEXGT0cRoHSOjTkZzWls84hJ/d/zQrf0y5wpiiAiFe6sE7TS1TCf8gnqWc0
+         STqtn5HsdcMEWReXLsZDyld3M/l1HahRgDCodsa64gv2pxn0XW3CsN0zpfkY0/1ahkVU
+         wjP8JhU13Sgil97RN3dSBKN/NJ7vFdfTcRgDoUeqQ9Eek2a7QD5PR0GZgSt5ZjG9dAFc
+         6jFyss/i3fMMT/bbjoVuHKx9EPc7po4kzOhfP+V/i1misxmHy1dCA4Zz5BC/4t4Q3Mve
+         dWDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=HNWXvEaLYcEHS16vyHBT011Dc3SSM/dSNQsgo4Wfpk0=;
-        b=puCLEVprrQHW8UlwNxvHxSisQdjqYOwLSUHnlru+sDQbiUhIV6kRRSyewAmCnK4uIU
-         HTcCgL01gg+M+KVcyU2NJK8Qz6pUxEbsa9dyhAdWeP84nqtmHzsmrMMsHCF4BnfU4QgT
-         tB8UC5/lhr3M+FzEfDzxVVqG9fgtjQ70IpaE7CDu0or+4C9p1L8mRggoQeJbt03BOYeW
-         MJ/w3Wf9UnwEn2MNUBvvZWoTGBERwpCP8CGWTJSTEzFhqwAH+s/qYBquwYkzPSvOTVek
-         jw5p1d5y/vx2asZ49HWF0A1TG030nZPEuzSaaYbwz0/iRg/G3qqVUYi7AqVh57M/Ui7A
-         egog==
-X-Gm-Message-State: AHQUAuYZi4APZpIo5XmTXakcDgoDldXJt1JNkLt7p++OPS524suaohqg
-        8suJmPrXOvUBO9/OYQ5bJuR7fIUj
-X-Google-Smtp-Source: AHgI3IYTRrFFTbhhTvUrJLJVHZjLbmOvDZB/AUBNgF+d5SSmuLTZQYKB2BtyMl49Jf9XNbPyl5+sOw==
-X-Received: by 2002:a17:902:bf44:: with SMTP id u4mr2870162pls.5.1549960612144;
-        Tue, 12 Feb 2019 00:36:52 -0800 (PST)
-Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id c18sm7465741pfc.63.2019.02.12.00.36.51
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rBFE/qJkwx0r3PCdtI1ax/QbsYySMr8iYKVWk7orY3g=;
+        b=kEIrEacnVpsJrPK4Sb2QI5Gh/yfZDsfkxOs9dW6ndciEE+OdeLKjksyaZN7GUMbIcX
+         I1JvVzDRBsUrm0NgO6VB3FKeE5GjeoTNyLCegwbBQh4PWEIADTwmIFMq3ZgLupuxvWXC
+         WklN5O5x+14QqoI3yL9tNfSp4rhs5AqiY39zKwdcwsU2dS4D1qUx8fr6xBk8oQ1A2pxC
+         JQYYFzMS4Nte+Z7IKmmVOWTDFq7XEexa+1ISJe/FKbStWeXxrsxlfWVh2cVuABzuQEID
+         cg3fbDRPQau9Hkc39yQNCLwVad/IQlQODzRXutOH+8Jc50P+KbxA5FmUvS3Y/vdlcLqV
+         fIJQ==
+X-Gm-Message-State: AHQUAubBRiGPaaaDrWqTUXc/vgu3S2qGEYs5VkX4wuy+m+2YUSxGjmjk
+        FmKsE2+Z7ma2pvfVlvNCHoJzQuTiVEs=
+X-Google-Smtp-Source: AHgI3Ia3wUqrIPKgvf6Sp7JVyK838tD2vlf7uk8L6Kh4vWYsmYaD0ksiPABBBCkrbpIFrzFKp/AfpQ==
+X-Received: by 2002:a2e:834a:: with SMTP id l10-v6mr2829668ljh.42.1549984519947;
+        Tue, 12 Feb 2019 07:15:19 -0800 (PST)
+Received: from localhost.localdomain ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id u11sm2996636lfb.85.2019.02.12.07.15.18
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 12 Feb 2019 00:36:51 -0800 (PST)
-Date:   Tue, 12 Feb 2019 00:36:49 -0800
-From:   Myungho Jung <mhjungk@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: hci_ldisc: Add NULL check for tiocmget() and
- tiocmset()
-Message-ID: <20190212083645.GA7055@myunghoj-Precision-5530>
+        Tue, 12 Feb 2019 07:15:19 -0800 (PST)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH 1/2] build: Fix missing dependency for btpclient
+Date:   Tue, 12 Feb 2019 16:15:14 +0100
+Message-Id: <20190212151515.13436-1-szymon.janc@codecoup.pl>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tiocmget() and tiocmset() operations are optional and some tty drivers
-like pty miss the operations. H4 spec requires the operations to set
-flow control. Return -EOPNOTSUPP in hci_uart_tty_open() if the oprations
-are not supported.
+prog_DEPENDENCIES is computed by automake only if not supplied so we
+must provide all dependencies if provided manually.
 
-Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+This resulted in random build failures:
+
+libtool:   error: cannot find the library 'lib/libbluetooth-internal.la'
+    or unhandled argument 'lib/libbluetooth-internal.la'
+make[1]: *** [Makefile:5436: tools/btpclient] Error 1
 ---
-Changes in v2:
-  - Add NULL check and return error in ath_setup() instead of
-    ath_hci_uart_work()
-  - Remove braces in if statment
+ Makefile.tools | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Changes in v3:
-  - Fix to return -ENODEV
-  - Split into 2 patches
-  - Add stable CC and fixes tags
-
-Changes in v4:
-  - Return error in hci_uart_tty_open()
-
- drivers/bluetooth/hci_ldisc.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index fbf7b4df23ab..3b1e433aa35b 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -474,10 +474,11 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 
- 	BT_DBG("tty %p", tty);
- 
--	/* Error if the tty has no write op instead of leaving an exploitable
--	 * hole
-+	/* Error if the tty has no write or tiocmget or tiocmset op instead of
-+	 * leaving an exploitable hole
- 	 */
--	if (tty->ops->write == NULL)
-+	if (tty->ops->write == NULL || tty->ops->tiocmget == NULL ||
-+	    tty->ops->tiocmset == NULL)
- 		return -EOPNOTSUPP;
- 
- 	hu = kzalloc(sizeof(struct hci_uart), GFP_KERNEL);
+diff --git a/Makefile.tools b/Makefile.tools
+index 1f8271542..0f94bbbe7 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -471,5 +471,5 @@ noinst_PROGRAMS += tools/btpclient
+ tools_btpclient_SOURCES = tools/btpclient.c src/shared/btp.c src/shared/btp.h
+ tools_btpclient_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-ell.la $(ell_ldadd)
+-tools_btpclient_DEPENDENCIES = $(ell_dependencies)
++tools_btpclient_DEPENDENCIES = lib/libbluetooth-internal.la $(ell_dependencies)
+ endif
 -- 
-2.17.1
+2.20.1
 
