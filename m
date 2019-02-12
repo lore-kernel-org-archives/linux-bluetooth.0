@@ -2,143 +2,83 @@ Return-Path: <SRS0=8P1K=QT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 896A7C282C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 18:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1970FC282CA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 23:42:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E0F92073D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 18:04:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549994660;
-	bh=KQ1tAru26ad8K4/nTNyNOSY7OlDarcIC5Lvc6mgtAX4=;
-	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
-	b=Me8iP1eeCE1zs6jwcUPDJay7WeU3TAYW5ekXC4Mz19GSzi9e6CSdWojCxBsHoNeTI
-	 Au48ZCDylNF3bS+Zv52OU1uVrZRlEkZaVLpBS1E9+o9Fx8R6L1vtplvVsgq2Kpm5MN
-	 VsmJCQXlpbL/Z1YqVimZ3spKfwhJbnwgUCLjT6vc=
+	by mail.kernel.org (Postfix) with ESMTP id E392D2084E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 23:42:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728536AbfBLSEO (ORCPT
+        id S1732342AbfBLXmX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Feb 2019 13:04:14 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39974 "EHLO mail.kernel.org"
+        Tue, 12 Feb 2019 18:42:23 -0500
+Received: from mga01.intel.com ([192.55.52.88]:56281 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726975AbfBLSEO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Feb 2019 13:04:14 -0500
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2B6142084E;
-        Tue, 12 Feb 2019 18:04:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1549994652;
-        bh=KQ1tAru26ad8K4/nTNyNOSY7OlDarcIC5Lvc6mgtAX4=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=rJEcvzc2V1tAOeJb1ANqA7c5ymte/3Tgd9JRGPOgOTl6k9iieOEBMf4FLH3tGTVhs
-         Kmhd5MAEY+LRYSpvqYqBwnjuQ+NJ6/w9sl4Z36zw6wKfFTw/vprYE3LIlkW0eXY3ef
-         n6Jzn6nsHjb8e/Uke+kuZaTnVkygnveJpmTxgZik=
-Subject: Re: [PATCH v5] bluetooth: Fix WARNING in tty_set_termios()
-To:     Johan Hovold <johan@kernel.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        viro@zeniv.linux.org.uk, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shuah <shuah@kernel.org>
-References: <20190208230609.23926-1-shuah@kernel.org>
- <20190209094239.GQ4686@localhost>
-From:   shuah <shuah@kernel.org>
-Message-ID: <ba280f2b-9340-0f6b-cd16-e9ff7cc6304f@kernel.org>
-Date:   Tue, 12 Feb 2019 11:04:11 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190209094239.GQ4686@localhost>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1732263AbfBLXmW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Feb 2019 18:42:22 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Feb 2019 15:42:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,362,1544515200"; 
+   d="scan'208";a="319867600"
+Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
+  by fmsmga005.fm.intel.com with ESMTP; 12 Feb 2019 15:42:23 -0800
+Received: from orsmsx154.amr.corp.intel.com (10.22.226.12) by
+ ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Tue, 12 Feb 2019 15:42:22 -0800
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.129]) by
+ ORSMSX154.amr.corp.intel.com ([169.254.11.122]) with mapi id 14.03.0415.000;
+ Tue, 12 Feb 2019 15:42:21 -0800
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Subject: Re: [PATCH BlueZ 0/5 v2] mesh: Save/restore network keys
+Thread-Topic: [PATCH BlueZ 0/5 v2] mesh: Save/restore network keys
+Thread-Index: AQHUvpj/HA7b9kQtkUCY0IFeQu23pKXdYhmA
+Date:   Tue, 12 Feb 2019 23:42:21 +0000
+Message-ID: <1550014939.29883.0.camel@intel.com>
+References: <20190207035537.20375-1-inga.stotland@intel.com>
+In-Reply-To: <20190207035537.20375-1-inga.stotland@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.255.73.84]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4187549E5EAE3645861C08267A7370F3@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2/9/19 2:42 AM, Johan Hovold wrote:
-> On Fri, Feb 08, 2019 at 04:06:09PM -0700, Shuah Khan wrote:
->> tty_set_termios() has the following WARN_ON which can be triggered with a
->> syscall to invoke TIOCSETD __NR_ioctl.
->>
->> WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
->>                  tty->driver->subtype == PTY_TYPE_MASTER);
->> Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
->>
->> "The problem started with commit 7721383f4199 ("Bluetooth: hci_uart: Support
->> operational speed during setup") which introduced a new way for how
->> tty_set_termios() could end up being called for a master pty."
->>
->> Fix hci_uart_tty_open() to check if tty supports set_termios in addition
->> to write and error out, if it doesn't.
->>
->> Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
->> Cc: Johan Hovold <johan@kernel.org>
->> Cc: Marcel Holtmann <marcel@holtmann.org>
->> Cc: Al Viro <viro@zeniv.linux.org.uk>
->> Signed-off-by: Shuah Khan <shuah@kernel.org>
->> ---
->>   drivers/bluetooth/hci_ldisc.c | 6 +++---
->>   1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
->> index fbf7b4df23ab..087ec2268744 100644
->> --- a/drivers/bluetooth/hci_ldisc.c
->> +++ b/drivers/bluetooth/hci_ldisc.c
->> @@ -474,10 +474,10 @@ static int hci_uart_tty_open(struct tty_struct *tty)
->>   
->>   	BT_DBG("tty %p", tty);
->>   
->> -	/* Error if the tty has no write op instead of leaving an exploitable
->> -	 * hole
->> +	/* Error if the tty has no write/set_termios ops instead of leaving
->> +	 * an exploitable hole.
-> 
-> Why do you think that a tty driver not implementing set_termios() is
-> exploitable?
-> 
-> Note that tty_set_termios() handles a missing set_termios() callback
-> just fine without dereferencing a NULL-pointer. >
->>   	 */
->> -	if (tty->ops->write == NULL)
->> +	if (!tty->ops->write || !tty->ops->set_termios)
->>   		return -EOPNOTSUPP;
-> 
-> I know Marcel asked you do implement things like this, but what you're
-> really doing is to try to uphold the invariant that tty_set_termios()
-> should never be called for a pty master. The WARN_ON in that function
-> was put in place to make sure line-disciplines use the correct ioctl
-> helpers (and the commit I pointed you to earlier in the paragraph you
-> quote in the commit message broke that invariant).
-> 
-> I'm afraid this is totally obscured by the above change and misleading
-> comment update.
-> 
-
-We are discussing the right fix for a while now. :)
-
-I did two versions of the patch
-
-1. Check set_termios in hci_uart_tty_open() based on
-Marcel's suggestion
-2. Checks tty type in hci_uart_tty_open()
-
-Both fix the problem I can reproduce on my system, however,
-I think checking tty type is the right way to fix this problem.
-
-The reason is that tty type is the direct and definitive way to
-check if ldisc sets are supported ir unsupported.
-
-Checking set_termios is an indirect way and I am not sure that it
-would work in all cases.
-
-That being said, I will wait for some consensus on how to fix the
-problem, before I send another version of this patch.
-
-thanks,
--- Shuah
-
+UGF0Y2ggc2V0IGFwcGxpZWQNCg0KDQpPbiBXZWQsIDIwMTktMDItMDYgYXQgMTk6NTUgLTA4MDAs
+IEluZ2EgU3RvdGxhbmQgd3JvdGU6DQo+IFJldi4yOiBhZGRyZXNzZWQgQnJpbmEncyBjb21tZW50
+cy4NCj4gDQo+IFRoaXMgc2V0IG9mIHBhdGNoZXMgZml4ZXMgdGhlIG5ldHdvcmsga2V5IGFkZC91
+cGRhdGUgcHJvY2Vzc2luZy4NCj4gTmV0d29yayBrZXlzIG5lZWQgdG8gYmUgc2F2ZWQgdG8gYSBs
+b2NhbCBub2RlIGNvbmZpZ3VyYXRpb24gZmlsZQ0KPiB3aGVuOg0KPiAJLSBhIG5ldyBub2RlIGlz
+IHByb3Zpc2lvbmVkDQo+IAktIG5ldyBuZXR3b3JrIGtleSBhcmUgYWRkZWQgYnkgYSBjb25maWd1
+cmF0aW9uIGNsaWVudA0KPiAgICAgLSBleGlzdGluZyBuZXR3b3JrIGtleSBpcyB1cGRhdGVkIGJ5
+IGEgY29uZmlndXJhdGlvbiBjbGllbnQNCj4gCSAgZHVyaW5nIGtleSByZWZyZXNoIHByb2NlZHVy
+ZS4NCj4gDQo+IEFsc28sIGVhY2ggc2F2ZWQgbmV0d29yayBrZXkgaXMgYWNjb21wYW5pZWQgYnkg
+YSBwcm9wZXIga2V5DQo+IHJlZnJlc2ggcGhhc2Ugc2V0dGluZy4NCj4gDQo+IEluZ2EgU3RvdGxh
+bmQgKDUpOg0KPiAgIG1lc2g6IFNlcGFyYXRlIGZ1bmN0aW9ucyBmb3IgbmV0IGtleSBhZGQgYW5k
+IHVwZGF0ZQ0KPiAgIG1lc2g6IEFkZCBmdW5jdGlvbiB0byByZXN0b3JlIG5ldCBrZXkgc3RhdGUg
+ZnJvbSBzdG9yYWdlDQo+ICAgbWVzaDogRGVjbGFyZSBpbnRlcm5hbCBmdW5jdGlvbnMgYXMgc3Rh
+dGljDQo+ICAgbWVzaDogU2F2ZSBrZXkgcmVmcmVzaCBwaGFzZSBzdGF0ZSB0byBub2RlIGNvbmZp
+ZyBmaWxlDQo+ICAgbWVzaDogU2F2ZSBuZXdseSBhZGRlZCBvciB1cGRhdGVkIG5ldCBrZXkgdG8g
+Y29uZmlnIGZpbGUNCj4gDQo+ICBtZXNoL2NmZ21vZC1zZXJ2ZXIuYyB8ICAgOCArLQ0KPiAgbWVz
+aC9tZXNoLWRiLmMgICAgICAgfCAxNzggKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQ0KPiAg
+bWVzaC9tZXNoLWRiLmggICAgICAgfCAgIDYgKy0NCj4gIG1lc2gvbmV0LmMgICAgICAgICAgIHwg
+MjY4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0NCj4gIG1lc2gv
+bmV0LmggICAgICAgICAgIHwgIDEyICstDQo+ICBtZXNoL25vZGUuYyAgICAgICAgICB8ICAxOSAr
+Ky0NCj4gIG1lc2gvc3RvcmFnZS5jICAgICAgIHwgIDIyICsrLS0NCj4gIG1lc2gvc3RvcmFnZS5o
+ICAgICAgIHwgICA3ICstDQo+ICA4IGZpbGVzIGNoYW5nZWQsIDMyNiBpbnNlcnRpb25zKCspLCAx
+OTQgZGVsZXRpb25zKC0pDQo+IA==
