@@ -1,84 +1,83 @@
-Return-Path: <SRS0=8P1K=QT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=f53w=QU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1970FC282CA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 23:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3875C282C2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Feb 2019 07:44:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E392D2084E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Feb 2019 23:42:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0E99222BA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Feb 2019 07:44:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732342AbfBLXmX (ORCPT
+        id S2388779AbfBMHo4 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Feb 2019 18:42:23 -0500
-Received: from mga01.intel.com ([192.55.52.88]:56281 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732263AbfBLXmW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Feb 2019 18:42:22 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Feb 2019 15:42:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,362,1544515200"; 
-   d="scan'208";a="319867600"
-Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
-  by fmsmga005.fm.intel.com with ESMTP; 12 Feb 2019 15:42:23 -0800
-Received: from orsmsx154.amr.corp.intel.com (10.22.226.12) by
- ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Tue, 12 Feb 2019 15:42:22 -0800
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.129]) by
- ORSMSX154.amr.corp.intel.com ([169.254.11.122]) with mapi id 14.03.0415.000;
- Tue, 12 Feb 2019 15:42:21 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Subject: Re: [PATCH BlueZ 0/5 v2] mesh: Save/restore network keys
-Thread-Topic: [PATCH BlueZ 0/5 v2] mesh: Save/restore network keys
-Thread-Index: AQHUvpj/HA7b9kQtkUCY0IFeQu23pKXdYhmA
-Date:   Tue, 12 Feb 2019 23:42:21 +0000
-Message-ID: <1550014939.29883.0.camel@intel.com>
-References: <20190207035537.20375-1-inga.stotland@intel.com>
-In-Reply-To: <20190207035537.20375-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.255.73.84]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4187549E5EAE3645861C08267A7370F3@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 13 Feb 2019 02:44:56 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:33486 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728713AbfBMHo4 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 13 Feb 2019 02:44:56 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 4518C2BC3C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Feb 2019 07:44:55 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 394632BCDC; Wed, 13 Feb 2019 07:44:55 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 202429] No Bluetooth Adapter on boot - Works after woken up
+ from suspend/sleep - Intel Ac 9260
+Date:   Wed, 13 Feb 2019 07:44:55 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: matt680209@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-202429-62941-bhiLSVRpKy@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-202429-62941@https.bugzilla.kernel.org/>
+References: <bug-202429-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-UGF0Y2ggc2V0IGFwcGxpZWQNCg0KDQpPbiBXZWQsIDIwMTktMDItMDYgYXQgMTk6NTUgLTA4MDAs
-IEluZ2EgU3RvdGxhbmQgd3JvdGU6DQo+IFJldi4yOiBhZGRyZXNzZWQgQnJpbmEncyBjb21tZW50
-cy4NCj4gDQo+IFRoaXMgc2V0IG9mIHBhdGNoZXMgZml4ZXMgdGhlIG5ldHdvcmsga2V5IGFkZC91
-cGRhdGUgcHJvY2Vzc2luZy4NCj4gTmV0d29yayBrZXlzIG5lZWQgdG8gYmUgc2F2ZWQgdG8gYSBs
-b2NhbCBub2RlIGNvbmZpZ3VyYXRpb24gZmlsZQ0KPiB3aGVuOg0KPiAJLSBhIG5ldyBub2RlIGlz
-IHByb3Zpc2lvbmVkDQo+IAktIG5ldyBuZXR3b3JrIGtleSBhcmUgYWRkZWQgYnkgYSBjb25maWd1
-cmF0aW9uIGNsaWVudA0KPiAgICAgLSBleGlzdGluZyBuZXR3b3JrIGtleSBpcyB1cGRhdGVkIGJ5
-IGEgY29uZmlndXJhdGlvbiBjbGllbnQNCj4gCSAgZHVyaW5nIGtleSByZWZyZXNoIHByb2NlZHVy
-ZS4NCj4gDQo+IEFsc28sIGVhY2ggc2F2ZWQgbmV0d29yayBrZXkgaXMgYWNjb21wYW5pZWQgYnkg
-YSBwcm9wZXIga2V5DQo+IHJlZnJlc2ggcGhhc2Ugc2V0dGluZy4NCj4gDQo+IEluZ2EgU3RvdGxh
-bmQgKDUpOg0KPiAgIG1lc2g6IFNlcGFyYXRlIGZ1bmN0aW9ucyBmb3IgbmV0IGtleSBhZGQgYW5k
-IHVwZGF0ZQ0KPiAgIG1lc2g6IEFkZCBmdW5jdGlvbiB0byByZXN0b3JlIG5ldCBrZXkgc3RhdGUg
-ZnJvbSBzdG9yYWdlDQo+ICAgbWVzaDogRGVjbGFyZSBpbnRlcm5hbCBmdW5jdGlvbnMgYXMgc3Rh
-dGljDQo+ICAgbWVzaDogU2F2ZSBrZXkgcmVmcmVzaCBwaGFzZSBzdGF0ZSB0byBub2RlIGNvbmZp
-ZyBmaWxlDQo+ICAgbWVzaDogU2F2ZSBuZXdseSBhZGRlZCBvciB1cGRhdGVkIG5ldCBrZXkgdG8g
-Y29uZmlnIGZpbGUNCj4gDQo+ICBtZXNoL2NmZ21vZC1zZXJ2ZXIuYyB8ICAgOCArLQ0KPiAgbWVz
-aC9tZXNoLWRiLmMgICAgICAgfCAxNzggKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQ0KPiAg
-bWVzaC9tZXNoLWRiLmggICAgICAgfCAgIDYgKy0NCj4gIG1lc2gvbmV0LmMgICAgICAgICAgIHwg
-MjY4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0NCj4gIG1lc2gv
-bmV0LmggICAgICAgICAgIHwgIDEyICstDQo+ICBtZXNoL25vZGUuYyAgICAgICAgICB8ICAxOSAr
-Ky0NCj4gIG1lc2gvc3RvcmFnZS5jICAgICAgIHwgIDIyICsrLS0NCj4gIG1lc2gvc3RvcmFnZS5o
-ICAgICAgIHwgICA3ICstDQo+ICA4IGZpbGVzIGNoYW5nZWQsIDMyNiBpbnNlcnRpb25zKCspLCAx
-OTQgZGVsZXRpb25zKC0pDQo+IA==
+https://bugzilla.kernel.org/show_bug.cgi?id=202429
+
+mattchen (matt680209@gmail.com) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |matt680209@gmail.com
+
+--- Comment #2 from mattchen (matt680209@gmail.com) ---
+Hi,
+
+When you update the BT firmware, have you ever tried power off then power on
+your laptop ?
+Update BT firmware requires power off the BT device and power on again, not
+just suspend or resume.
+
+And did you take below two commit for your testing ?
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/intel/ibt-18-16-1.sfi?id=ae90c3bce108ac623bc0bae44a7b411e4fa42e7c
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/commit/intel/ibt-18-16-1.ddc?id=d8e8163cf7c082bda83887adf246e866919682f9
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
