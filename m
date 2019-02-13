@@ -2,101 +2,127 @@ Return-Path: <SRS0=f53w=QU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B2C3C282C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Feb 2019 15:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF6C4C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Feb 2019 22:49:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3210A222D0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Feb 2019 15:52:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZH/J9sGW"
+	by mail.kernel.org (Postfix) with ESMTP id B7024218AC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Feb 2019 22:49:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392552AbfBMPwJ (ORCPT
+        id S2392483AbfBMWtD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Feb 2019 10:52:09 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:40292 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392550AbfBMPwJ (ORCPT
+        Wed, 13 Feb 2019 17:49:03 -0500
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:47447 "EHLO
+        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726248AbfBMWtC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Feb 2019 10:52:09 -0500
-Received: by mail-ot1-f67.google.com with SMTP id s5so4715043oth.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Feb 2019 07:52:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QOsWmjifz2N2AL5eUzR9VIIz1rTp4j2VNog08FwgyB8=;
-        b=ZH/J9sGW5/8CELAMNZLPRbQLeLCieuckgu4bn9NaVEcxHKkuwr8N6l93H87rN2fMh0
-         19KcNNmneIYdDRWdy1GfT9DIXOs1mc07jdg+6PZ9CE1G+HrN59UmSKWozOJtgj463cF1
-         uzQphAs894B5iIjFDlwjldhrs904RGqOIFmABUAXk6dO1zqW0kofGLznn7sxCeMv2mb1
-         dg7IsIXFTR4laqWe/GSF6wRf+OdpSmOmDerW2KkFiVzL2Z0Wqdqd/uW6e3ptJY+HI4As
-         czF7ElkAzFIR4Gr67x+2CDPLiJqdbSiOahhaLP5+4Ovvp8/vDf/z7ocz3I05AWEFREM0
-         F7FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QOsWmjifz2N2AL5eUzR9VIIz1rTp4j2VNog08FwgyB8=;
-        b=Fa+AnNWvEHZa23F7jTTMnQ5ca/WjDEOtltsyrWiFZuZgOYR0aq0tyT1+peokV6+XjM
-         5kDYPrfJpmkj1iVq/q04bS8kbkoCyAWe0Sz2FgQpJzU3EhxCBUAM+Ebws4us8UMXyw1M
-         34F8Je/wpmdP9dCGVV9zyRVWYMWUV5R3WkeouIMVeqE2QcbSWoxr7p8G8JlDr+7RSrTI
-         hjeKhKBh3M2mC61sl6EJ70LDEcPumkoNz4F4ScExorfWM7CMKeQADcjm4hCRCEGVuRdC
-         LmWQGTKW7QMNK/25c4ohrpJrOfjVH3Jyc4l9J1YzTJjgeOy/V4hFQd2nkJjy5CuuqI8T
-         SOGQ==
-X-Gm-Message-State: AHQUAubZNHqKaUm5NXGWRhCSEYRAn8HQg10rSsXk5OjqicZR8wkQ9uE3
-        eQFC2Gyg1AgeaH5jetguyfnxDse4TBr92e2lLgqmrw==
-X-Google-Smtp-Source: AHgI3IZIQRGZ9cvAy5V1U9uY91StyVf/ZleiYrtexqmeI8Q/nFPc2TOWuZEdBA4TUQmWpWuolwJf83OMqPO5gqWWOh4=
-X-Received: by 2002:a9d:6c84:: with SMTP id c4mr616182otr.242.1550071230634;
- Wed, 13 Feb 2019 07:20:30 -0800 (PST)
+        Wed, 13 Feb 2019 17:49:02 -0500
+Received: by atrey.karlin.mff.cuni.cz (Postfix, from userid 512)
+        id 68E6B802DD; Wed, 13 Feb 2019 23:48:53 +0100 (CET)
+Date:   Wed, 13 Feb 2019 23:48:59 +0100
+From:   Pavel Machek <pavel@ucw.cz>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org,
+        kernel list <linux-kernel@vger.kernel.org>
+Subject: [PATCH] pre-shared passcode: secure pairing for "no keyboard, no
+ display" devices
+Message-ID: <20190213224859.GA7151@amd>
 MIME-Version: 1.0
-References: <20190212151515.13436-1-szymon.janc@codecoup.pl>
-In-Reply-To: <20190212151515.13436-1-szymon.janc@codecoup.pl>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 13 Feb 2019 17:20:17 +0200
-Message-ID: <CABBYNZ+ETBN2zkAaOgNo6MocY27eH+Lw24qysyNJUpCKYVbc2w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] build: Fix missing dependency for btpclient
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Szymon,
-On Tue, Feb 12, 2019 at 5:18 PM Szymon Janc <szymon.janc@codecoup.pl> wrote:
->
-> prog_DEPENDENCIES is computed by automake only if not supplied so we
-> must provide all dependencies if provided manually.
->
-> This resulted in random build failures:
->
-> libtool:   error: cannot find the library 'lib/libbluetooth-internal.la'
->     or unhandled argument 'lib/libbluetooth-internal.la'
-> make[1]: *** [Makefile:5436: tools/btpclient] Error 1
-> ---
->  Makefile.tools | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 1f8271542..0f94bbbe7 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -471,5 +471,5 @@ noinst_PROGRAMS += tools/btpclient
->  tools_btpclient_SOURCES = tools/btpclient.c src/shared/btp.c src/shared/btp.h
->  tools_btpclient_LDADD = lib/libbluetooth-internal.la \
->                                 src/libshared-ell.la $(ell_ldadd)
-> -tools_btpclient_DEPENDENCIES = $(ell_dependencies)
-> +tools_btpclient_DEPENDENCIES = lib/libbluetooth-internal.la $(ell_dependencies)
->  endif
-> --
-> 2.20.1
 
-Applied.
+--9amGYk9869ThD9tj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Luiz Augusto von Dentz
+Hi!
+
+Currently, "no keyboard, no display" devices can be paired, but
+pairing is not secure against active attacker.
+
+Can we do better? Not for the first pairing; but for the next ones --
+yes, I believe we can.
+
+BLE device in this case has internal storage, and Linux running
+there. From factory, random 6-digit number is stored in the
+flash. Legitimate user knows the number, and system is manipulated so
+that pairing passkey will be this pre-shared passkey. After pairing,
+user is allowed to change it.
+
+[Or maybe passkey is 000000 from the factory; this is still win for
+the user, as long as he can change the key to something random in a
+secure cave.]
+
+Fortunately, kernel support for this is rather easy; patch is attached
+below.
+
+Does someone see a security issue with proposal above?
+
+What would be suitable interface for setting pre-shared passkey?
+Module parameter is really easy.
+
+Signed-off-by: Pavel Machek <pavel@denx.de>
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 621146d..7a2b06595 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2674,6 +2674,11 @@ static u8 sc_select_method(struct smp_chan *smp)
+ 	return method;
+ }
+=20
++static int preshared_passkey =3D -1;
++
++module_param(preshared_passkey, int, 0600);
++MODULE_PARM_DESC(preshared_passkey, "Preshared passkey for device w/o keyb=
+oard or display");
++
+ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct smp_cmd_public_key *key =3D (void *) skb->data;
+@@ -2752,9 +2757,11 @@ static int smp_cmd_public_key(struct l2cap_conn *con=
+n, struct sk_buff *skb)
+ 		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
+=20
+ 	if (smp->method =3D=3D DSP_PASSKEY) {
+ 		get_random_bytes(&hcon->passkey_notify,
+ 				 sizeof(hcon->passkey_notify));
++		if (preshared_passkey !=3D -1)
++			hcon->passkey_notify =3D preshared_passkey;
+ 		hcon->passkey_notify %=3D 1000000;
+ 		hcon->passkey_entered =3D 0;
+ 		smp->passkey_round =3D 0;
+ 		if (mgmt_user_passkey_notify(hdev, &hcon->dst, hcon->type,
+
+
+
+
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--9amGYk9869ThD9tj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlxkntsACgkQMOfwapXb+vKt1ACdEdWMXJbwcY4nEoON81kJvwGH
+7K8AoJJDg2oeh8zFZpa3xAMZxzTnpiOO
+=Yhc6
+-----END PGP SIGNATURE-----
+
+--9amGYk9869ThD9tj--
