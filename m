@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61289C10F04
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Feb 2019 23:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BE7C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Feb 2019 23:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3715221928
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Feb 2019 23:20:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5368E21872
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Feb 2019 23:20:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388198AbfBNXUC (ORCPT
+        id S2388108AbfBNXT7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Feb 2019 18:20:02 -0500
-Received: from mailgw02.mediatek.com ([210.61.82.184]:39419 "EHLO
+        Thu, 14 Feb 2019 18:19:59 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:26456 "EHLO
         mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728789AbfBNXUA (ORCPT
+        with ESMTP id S1728936AbfBNXT6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Feb 2019 18:20:00 -0500
-X-UUID: 8ecc2dbf87d64b94b4f8858a697faf2b-20190215
-X-UUID: 8ecc2dbf87d64b94b4f8858a697faf2b-20190215
+        Thu, 14 Feb 2019 18:19:58 -0500
+X-UUID: 90a2c5d5097e4ca69ff77ff0f77a71f2-20190215
+X-UUID: 90a2c5d5097e4ca69ff77ff0f77a71f2-20190215
 Received: from mtkcas06.mediatek.inc [(172.21.101.30)] by mailgw02.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (mhqrelay.mediatek.com ESMTP with TLS)
-        with ESMTP id 1945842484; Fri, 15 Feb 2019 07:19:50 +0800
+        with ESMTP id 607167023; Fri, 15 Feb 2019 07:19:50 +0800
 Received: from MTKCAS06.mediatek.inc (172.21.101.30) by
  mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
  15.0.1395.4; Fri, 15 Feb 2019 07:19:42 +0800
@@ -39,15 +39,15 @@ CC:     <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-mediatek@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH 1/6] dt-bindings: net: bluetooth: add support for MediaTek MT7663U and MT7668U UART devices
-Date:   Fri, 15 Feb 2019 07:19:33 +0800
-Message-ID: <c31b9ed0f2c711f53ad88c96f2d0a1bd22d9de58.1550184473.git.sean.wang@mediatek.com>
+Subject: [PATCH 3/6] Bluetooth: mediatek: fix up an error path to restore bdev->tx_state
+Date:   Fri, 15 Feb 2019 07:19:35 +0800
+Message-ID: <b1a496748170af6a89d8ba19db9412787ef53668.1550184473.git.sean.wang@mediatek.com>
 X-Mailer: git-send-email 1.7.9.5
 In-Reply-To: <cover.1550184473.git.sean.wang@mediatek.com>
 References: <cover.1550184473.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-TM-SNTS-SMTP: D779B2618311713CB527479DA034E29B1828AC39E163F6697A3287C8909486902000:8
+X-TM-SNTS-SMTP: ACAD13D1EF135519F32787DB83F81F87797C5CA104C85759C2350E3BC01C1A222000:8
 X-MTK:  N
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -56,86 +56,33 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-Update binding document with adding support of MT7663U and MT7668U UART
-devices to mediatek-bluetooth.
+Restore bdev->tx_state with clearing bit BTMTKUART_TX_WAIT_VND_EVT
+when there is an error on waiting for the corresponding event.
 
+Fixes: 7237c4c9ec92 ("Bluetooth: mediatek: Add protocol support for MediaTek serial devices")
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- .../bindings/net/mediatek-bluetooth.txt       | 64 +++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ drivers/bluetooth/btmtkuart.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-index 14ceb2a5b4e8..41a7dcc80f5b 100644
---- a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-@@ -33,3 +33,67 @@ Example:
- 			clock-names = "ref";
- 		};
- 	};
-+
-+MediaTek UART based Bluetooth Devices
-+==================================
-+
-+This device is a serial attached device to UART device and thus it must be a
-+child node of the serial node with UART.
-+
-+Please refer to the following documents for generic properties:
-+
-+	Documentation/devicetree/bindings/serial/slave-device.txt
-+
-+Required properties:
-+
-+- compatible:	Must be
-+		  "mediatek,mt7663u-bluetooth": for MT7663U device
-+		  "mediatek,mt7668u-bluetooth": for MT7668U device
-+- vcc-supply:	Main voltage regulator
-+- pinctrl-names: Should be "default", "runtime"
-+- pinctrl-0: Should contain UART RXD low when the device is powered up to
-+	     enter proper bootstrap mode.
-+- pinctrl-1: Should contain UART mode pin ctrl
-+
-+Optional properties:
-+
-+- reset-gpios:	GPIO used to reset the device whose initial state keeps low,
-+		if the GPIO is missing, then board-level design should be
-+		guaranteed.
-+- current-speed:  Current baud rate of the device whose defaults to 921600
-+
-+Example:
-+
-+	uart1_pins_boot: uart1-default {
-+		pins-dat {
-+			pinmux = <MT7623_PIN_81_URXD1_FUNC_GPIO81>;
-+			output-low;
-+		};
-+	};
-+
-+	uart1_pins_runtime: uart1-runtime {
-+		pins-dat {
-+			pinmux = <MT7623_PIN_81_URXD1_FUNC_URXD1>,
-+				 <MT7623_PIN_82_UTXD1_FUNC_UTXD1>;
-+		};
-+	};
-+
-+	uart1: serial@11003000 {
-+		compatible = "mediatek,mt7623-uart",
-+			     "mediatek,mt6577-uart";
-+		reg = <0 0x11003000 0 0x400>;
-+		interrupts = <GIC_SPI 52 IRQ_TYPE_LEVEL_LOW>;
-+		clocks = <&pericfg CLK_PERI_UART1_SEL>,
-+			 <&pericfg CLK_PERI_UART1>;
-+		clock-names = "baud", "bus";
-+
-+		bluetooth {
-+			compatible = "mediatek,mt7663u-bluetooth";
-+			vcc-supply = <&reg_5v>;
-+			reset-gpios = <&pio 24 GPIO_ACTIVE_LOW>;
-+			pinctrl-names = "default", "runtime";
-+			pinctrl-0 = <&uart1_pins_boot>;
-+			pinctrl-1 = <&uart1_pins_runtime>;
-+			current-speed = <921600>;
-+		};
-+	};
+diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
+index b8ea011b82d8..9f8177b216b6 100644
+--- a/drivers/bluetooth/btmtkuart.c
++++ b/drivers/bluetooth/btmtkuart.c
+@@ -115,11 +115,13 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev, u8 op, u8 flag, u16 plen,
+ 				  TASK_INTERRUPTIBLE, HCI_INIT_TIMEOUT);
+ 	if (err == -EINTR) {
+ 		bt_dev_err(hdev, "Execution of wmt command interrupted");
++		clear_bit(BTMTKUART_TX_WAIT_VND_EVT, &bdev->tx_state);
+ 		return err;
+ 	}
+ 
+ 	if (err) {
+ 		bt_dev_err(hdev, "Execution of wmt command timed out");
++		clear_bit(BTMTKUART_TX_WAIT_VND_EVT, &bdev->tx_state);
+ 		return -ETIMEDOUT;
+ 	}
+ 
 -- 
 2.18.0
 
