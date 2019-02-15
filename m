@@ -2,216 +2,95 @@ Return-Path: <SRS0=5uBP=QW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73269C43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Feb 2019 14:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C66DC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Feb 2019 19:31:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4210F2192D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Feb 2019 14:23:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2744E222A1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Feb 2019 19:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/CyYr4U"
+	dkim=pass (2048-bit key) header.d=itmarketsintelligence-com.20150623.gappssmtp.com header.i=@itmarketsintelligence-com.20150623.gappssmtp.com header.b="upUFB3Hj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730314AbfBOOXL (ORCPT
+        id S1731020AbfBOTbR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Feb 2019 09:23:11 -0500
-Received: from mail-ed1-f54.google.com ([209.85.208.54]:42960 "EHLO
-        mail-ed1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729857AbfBOOXL (ORCPT
+        Fri, 15 Feb 2019 14:31:17 -0500
+Received: from mail-qk1-f200.google.com ([209.85.222.200]:42034 "EHLO
+        mail-qk1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730942AbfBOTbR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Feb 2019 09:23:11 -0500
-Received: by mail-ed1-f54.google.com with SMTP id r15so8068519eds.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Feb 2019 06:23:10 -0800 (PST)
+        Fri, 15 Feb 2019 14:31:17 -0500
+Received: by mail-qk1-f200.google.com with SMTP id 207so9024047qkf.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Feb 2019 11:31:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=QhfRqxYC6A3VZBz4LWs2M10bFSSs/3aDBnb+4cZUxTU=;
-        b=W/CyYr4UdJKyxJI4pDm07mzE/gIOF8VrE/zxebkiDkr1JLeACiUPkjR/0pIwURFynL
-         +1FhNHRJ3vYr37rryCf1KQWT6JnSJaLVy6Cz/w2z1IPDYuNfIACgrIw/sBMMgP97vUcD
-         NwMiVXHmSSGK9KQX3plRZJSB2q1dxAfpBpeVZYqC8w+DhwLFO5LzYi6xxnDU/I4dUI7d
-         Sh8IcyH0zqnEONlfilOJ0yUGA2SkJbn2p2MVtMo+Ml4P/HDuTpx6/5Np1JFfxbjCYoge
-         kjetXSHHXdCX3Ta8Y8jqV2avh/wa3TD3SnsdGWNwoCwG/j5aBHQNHa+NTcCVdho7FeEP
-         Jy7Q==
+        d=itmarketsintelligence-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:message-id:date:subject:from:to;
+        bh=Z0tkzToy63MSaLYsw4NHH5Pc9MUwcTwslQQ8+TymNvE=;
+        b=upUFB3Hj+au+/aHwWEuOwCe36hN7s/6YfmAQTcMG/GKjHiF4LFn/w58gC79MWs5Fs1
+         49LkcDJhPK7x40gDYJYMhYbbUraHbT8dUBN/m0OyJ9nWk+HO7/gwqcDEdVNdEdft/ALY
+         7cCbHzpWrRMzJAWLcmvw/GEoOh+TcNiWrHCWpEcey+5uBNSVKLSPgQfRXcUHWwZ/tnt2
+         brKTava+8iTKK6eSFIOCFfMvNt4vTXh89DnFszK9OJmI0uDrfdOsnk6DcBgpYUCBs34m
+         ZLBolnOy8KPprrz2sln1aXp9MZB6oinz/S3pbB6GoxEcpNugkDxjNptACSOlhxuipgjR
+         F2ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=QhfRqxYC6A3VZBz4LWs2M10bFSSs/3aDBnb+4cZUxTU=;
-        b=l6EJHTB2dj4I7NBGpCZ8eV0OJeDThADm48YWbhw/bBKD1MrkpadomgtESKuLh1Uz8G
-         wkIdKcX/NX7arMWAyZAcE2RxfWV4nBqxru2gOy/Fh4UTQ9kUQV+8vviFp5SpHZ9y9fh2
-         +m/n88Ps+S9ZHcHGhRIGsIZgDkgaDSfrud28kp37ZYHS3Gm6cl5R2PFvIDv4ht5KDn83
-         veiSCnJeZLPvldJJi59/lDb5+ZGg9uscuyfT0TCCm6hkjMqL1bUPXIlWw1AINYz7bjpt
-         5PzS+XZn4xQfUU+QzKClc6xgt/yirCARhn26bNU/elFbTeFb04QHWLu2+W71oJ4aXsOY
-         oLiw==
-X-Gm-Message-State: AHQUAubLMc/eiiRMTDwZGW7ATN89kST5i7ZvKMYmcpi8IxL8bjQb4p1m
-        78gijw/+uSo2z7Ps13Tm8mooX1ma
-X-Google-Smtp-Source: AHgI3IZZlvuYjIYgig/MI/nTx3ZBTq2tOKH5mPFE/XBmrME6ZSMB+0mrkYNtxi7qPL1MKP0tkcWAjw==
-X-Received: by 2002:a50:88a1:: with SMTP id d30mr7412922edd.207.1550240588783;
-        Fri, 15 Feb 2019 06:23:08 -0800 (PST)
-Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id v11sm1501333edy.49.2019.02.15.06.23.07
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 15 Feb 2019 06:23:07 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:message-id:date:subject:from:to;
+        bh=Z0tkzToy63MSaLYsw4NHH5Pc9MUwcTwslQQ8+TymNvE=;
+        b=udUyeXPDGP5NXoBUxjyEiAVFLwUEFxrCatz0mKZjnG1CBwmKnspJ6EMri4gJbOgpEn
+         fIXK0RpBKn4EQgVUKxb6tiw5T3KO7UceFnAsUytW8WhsDwH6xFNncL/74hv2CEBOGym2
+         S7hlDKo8qQs0L4LymJxo94rJcSTsjaNIhzEeQRPfQojHFi9gI7gHI78Od3UfBTbIY+TA
+         yPqa4Ppy/ffHdbVZ+MNu8qT/vuSfZqhGNP72XexUAS8OAraTV6XVIo3zd701R/bi+/yU
+         WhCEgX2crKGeU3mWadvg74zk7wJr5A3O1IL2gjtdV39pxPteQ9QS/8RGUelN9VQmc6TP
+         1j1w==
+X-Gm-Message-State: AHQUAubKi0atzMGlHI1dltbLXwtxg8l8J1JVRVTmM1F+s+Pu3e2jZkEh
+        kmJcTq7xmEimAeKC2e9KQQInN82q9wbZ
+X-Google-Smtp-Source: AHgI3Ia5C9r0RNJp6H7r1XuZO+LJrlBXpFiVC8jMLjdSg1wHSY3jYMwtIeTPa9SrrM1+dSxkmFq7vLm7eQ==
+MIME-Version: 1.0
+X-Received: by 2002:a37:d9c2:: with SMTP id q63mr6019596qkl.61.1550259076404;
+ Fri, 15 Feb 2019 11:31:16 -0800 (PST)
+Message-ID: <0000000000008f19760581f3d1cf@google.com>
+Date:   Fri, 15 Feb 2019 19:31:16 +0000
+Subject: Decision makers contact list
+From:   martha.evans@itmarketsintelligence.com
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] client: Add advertise.secondary command
-Date:   Fri, 15 Feb 2019 16:23:01 +0200
-Message-Id: <20190215142301.30909-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20190215142301.30909-1-luiz.dentz@gmail.com>
-References: <20190215142301.30909-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This adds advertose.secondary command which can be used to set a
-secondary channel to advertise.
----
- client/advertising.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- client/advertising.h |  1 +
- client/main.c        | 20 ++++++++++++++++++++
- 3 files changed, 64 insertions(+)
+Would you be interested in targeting Cybersecurity Users across the globe  
+for your Q1 marketing strategy?
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 960cdd62d..72f91b9a5 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -64,6 +64,7 @@ static struct ad {
- 	bool registered;
- 	char *type;
- 	char *local_name;
-+	char *secondary;
- 	uint16_t local_appearance;
- 	uint16_t duration;
- 	uint16_t timeout;
-@@ -441,6 +442,20 @@ static gboolean get_discoverable_timeout(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean secondary_exits(const GDBusPropertyTable *property, void *data)
-+{
-+	return ad.secondary ? TRUE : FALSE;
-+}
-+
-+static gboolean get_secondary(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
-+							&ad.secondary);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable ad_props[] = {
- 	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-@@ -456,6 +471,7 @@ static const GDBusPropertyTable ad_props[] = {
- 	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
- 	{ "Duration", "q", get_duration, NULL, duration_exits },
- 	{ "Timeout", "q", get_timeout, NULL, timeout_exits },
-+	{ "SecondaryChannel", "s", get_secondary, NULL, secondary_exits },
- 	{ }
- };
- 
-@@ -919,3 +935,30 @@ void ad_advertise_timeout(DBusConnection *conn, long int *value)
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
-+
-+void ad_advertise_secondary(DBusConnection *conn, const char *value)
-+{
-+	if (!value) {
-+		if (ad.secondary)
-+			 bt_shell_printf("Secondary Channel: %s\n",
-+							ad.secondary);
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
-+	if (ad.secondary && !strcmp(value, ad.secondary))
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+
-+	free(ad.secondary);
-+
-+	if (value[0] == '\0') {
-+		ad.secondary = NULL;
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
-+	ad.secondary = strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
-+							"SecondaryChannel");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-diff --git a/client/advertising.h b/client/advertising.h
-index fe3a7c8c6..9967e657b 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -41,3 +41,4 @@ void ad_advertise_data(DBusConnection *conn, int argc, char *argv[]);
- void ad_disable_data(DBusConnection *conn);
- void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value);
- void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *value);
-+void ad_advertise_secondary(DBusConnection *conn, const char *value);
-diff --git a/client/main.c b/client/main.c
-index 1f6e04578..2c5b05693 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2479,6 +2479,16 @@ static void cmd_advertise_timeout(int argc, char *argv[])
- 	ad_advertise_timeout(dbus_conn, &value);
- }
- 
-+static void cmd_advertise_secondary(int argc, char *argv[])
-+{
-+	if (argc < 2) {
-+		ad_advertise_secondary(dbus_conn, NULL);
-+		return;
-+	}
-+
-+	ad_advertise_secondary(dbus_conn, argv[1]);
-+}
-+
- static void ad_clear_uuids(void)
- {
- 	ad_disable_uuids(dbus_conn);
-@@ -2530,6 +2540,13 @@ static void ad_clear_timeout(void)
- 	ad_advertise_timeout(dbus_conn, &value);
- }
- 
-+static void ad_clear_secondary(void)
-+{
-+	const char *value = "";
-+
-+	ad_advertise_secondary(dbus_conn, value);
-+}
-+
- static const struct clear_entry ad_clear[] = {
- 	{ "uuids",		ad_clear_uuids },
- 	{ "service",		ad_clear_service },
-@@ -2540,6 +2557,7 @@ static const struct clear_entry ad_clear[] = {
- 	{ "appearance",		ad_clear_appearance },
- 	{ "duration",		ad_clear_duration },
- 	{ "timeout",		ad_clear_timeout },
-+	{ "secondary",		ad_clear_secondary },
- 	{}
- };
- 
-@@ -2583,6 +2601,8 @@ static const struct bt_shell_menu advertise_menu = {
- 			"Set/Get advertise duration" },
- 	{ "timeout", "[seconds]", cmd_advertise_timeout,
- 			"Set/Get advertise timeout" },
-+	{ "secondary", "[1M/2M/Coded]", cmd_advertise_secondary,
-+			"Set/Get advertise secondary channel" },
- 	{ "clear", "[uuids/service/manufacturer/config-name...]", cmd_ad_clear,
- 			"Clear advertise config" },
- 	{ } },
--- 
-2.17.2
+Here is how we can help you:
 
+Security users by vendor: Cisco, Juniper, Check Point, Aruba Networks,  
+Symantec and many others.
+
+Security users by security solution: Email, SIEM, Firewall, UTM, Endpoint,  
+DDoS, IAM, Cloud security, App security, Web security, Vulnerability, VPN,  
+Authentication and many others.
+
+Cloud users of IaaS, PaaS and SaaS: AWS, Azure, Rackspace, vCloud,  
+Salesforce, Jira, ServiceNow, SharePoint, Office 365, Box, Workday,  
+SuccessFactors and many others.
+
+For Channel and Partner: MSP, MSSP and CSP companies decision makers,  
+Industry specific IT security decision makers Banks, Credit unions,  
+Insurance, Education, Healthcare, Retail, Manufacturing, Government, Oil  
+and Gas and many others.
+
+We can customize this list as per your specific technology, revenue size of  
+companies and job titles from those companies.
+
+Await for your positive response!
+
+Thanks,
+Martha Evans
+
+If not, I would be happy to update my notes I just need to hear from you  
+first!
