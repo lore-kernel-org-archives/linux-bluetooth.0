@@ -1,125 +1,169 @@
-Return-Path: <SRS0=5uBP=QW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=BC7s=QX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41052C43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Feb 2019 20:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 543CCC43381
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Feb 2019 15:59:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0862D222D0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Feb 2019 20:37:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D18D0222A3
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Feb 2019 15:59:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSFMwPp8"
+	dkim=pass (1024-bit key) header.d=telfort.nl header.i=@telfort.nl header.b="sTrFeAAn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732344AbfBOUhf (ORCPT
+        id S1730302AbfBPP7O (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Feb 2019 15:37:35 -0500
-Received: from mail-ot1-f42.google.com ([209.85.210.42]:36023 "EHLO
-        mail-ot1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727198AbfBOUhf (ORCPT
+        Sat, 16 Feb 2019 10:59:14 -0500
+Received: from cpsmtpb-ews07.kpnxchange.com ([213.75.39.10]:57633 "EHLO
+        cpsmtpb-ews07.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727151AbfBPP7O (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Feb 2019 15:37:35 -0500
-Received: by mail-ot1-f42.google.com with SMTP id v62so9901160otb.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Feb 2019 12:37:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=+6JiGOh3QW3mbJ0aZUVfrbDI81qGVkMzc9HR81Nzohs=;
-        b=nSFMwPp8hf1qPeZqXuaDGzyo3+l0wFaWYbYv/ru26HuBqiEMg/WKZkWYBeTKD8wuIG
-         Z1jQYaDkMIsh1riwnOwnGyvZ0u1use4EgtQrvEM7T2hPQxBzrLMeMTs2YbZzd8L6exfw
-         AicM146vkAfN+JirL8V1XVBwrCrQSU6mYBYeTWsJ2qOu/vCC94hkxbrUIkM+/PePYS4y
-         3KD4L0RKdCuhDm5fdq7zpFxT26KD9fYJczIobnERYWE1Cv/0AFG6Hg/PJO8CgwWPsgq5
-         Or/KRxBGnO+9eoIuXQonfAECk1VfrfvUEwu3MTaRKyTMAatJS6eRK1+qN9ro6FlrlcpX
-         nb1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=+6JiGOh3QW3mbJ0aZUVfrbDI81qGVkMzc9HR81Nzohs=;
-        b=s+UB/EQ+2i3pSOGPOKT6bveg2Ql3sveDe1//mABSbUqnkWzC5ZdQluJay/Y4ESZfdX
-         PVjzmX22ToW3Z5ucMDbJWp0imvaonD+aWsOoGm6lYdf6kg4aEVWFaEZPrCuvgk5RJsUw
-         RWvUAVkIZmZkz+TIFyHVb9cJSBCjNk7u+UkI+2thD8iZcZkIzwZTpw9cvoaOw5FxwhZa
-         KFGW/2QkzIqDq/1KRKURJ2TCtEC9Vw84TykcnyuRnMbgQsV6emjdquYsJXedUGxg8P0e
-         CaL68NQWtC7KE/ZmQmf5AJFpE8iF8EL6aqTXJ1SE6fT7WhPjBFh7SwtDA632gwKs3jRE
-         giLA==
-X-Gm-Message-State: AHQUAuZEcyIf8GzkhJ4c6zNfi4ZCPiJw+x9nQXB+q33I08zuzCVlWQtZ
-        l1knAcko+NEj3QcxgXbLQRJKN6kS/+GyjX2OszwP6w==
-X-Google-Smtp-Source: AHgI3IZYujY8bYUGbCYclARWy7B9VO/MDcyehXbcY56z5OQPKf2lrZRzZOZLxkGs1+lfKHPUIcvcIpTnE02ZtjlOE+c=
-X-Received: by 2002:aca:c2c4:: with SMTP id s187mr1670687oif.175.1550263053955;
- Fri, 15 Feb 2019 12:37:33 -0800 (PST)
+        Sat, 16 Feb 2019 10:59:14 -0500
+X-Greylist: delayed 781 seconds by postgrey-1.27 at vger.kernel.org; Sat, 16 Feb 2019 10:58:52 EST
+Received: from cpsps-ews16.kpnxchange.com ([10.94.84.197]) by cpsmtpb-ews07.kpnxchange.com with Microsoft SMTPSVC(7.5.7601.17514);
+         Sat, 16 Feb 2019 16:45:50 +0100
+X-Brand: /q/rzKX13g==
+X-KPN-SpamVerdict: e1=0;e2=0;e3=0;e4=(e4=10;e1=10;e2=11;e3=10);EVW:Whi
+        te;BM:NotScanned;FinalVerdict:Clean
+X-CMAE-Analysis: v=2.3 cv=P9LreRIu c=1 sm=1 tr=0
+         a=aUEkS+vox6QZufw8YjIg5Q==:117 a=WlLoZYvoDPkrvwfrrc3pQQ==:17
+         a=IkcTkHD0fZMA:10 a=CFTnQlWoA9kA:10 a=MlH_b6sBIylOUtBgE8EA:9
+         a=P02q-LbC7AcKt7Ge:21 a=3zVQZvEJ6Ab60jIw:21 a=QEXdDO2ut3YA:10
+         a=pHzHmUro8NiASowvMSCR:22 a=Ew2E2A-JSTLzCXPT_086:22
+X-CM-AcctID: kpn@feedback.cloudmark.com
+Received: from CPSMTPM-TLF104.kpnxchange.com ([195.121.3.7]) by cpsps-ews16.kpnxchange.com with Microsoft SMTPSVC(8.5.9600.16384);
+         Sat, 16 Feb 2019 16:45:50 +0100
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+DKIM-Signature: v=1; a=rsa-sha256; d=telfort.nl; s=telfort01;
+        c=relaxed/relaxed; t=1550331950;
+        h=mime-version:date:message-id:subject:from:to:content-type;
+        bh=CUu/Ny3JVxYeYD6nR7VQ6sbUnVuiTfRWn261BFdrJGI=;
+        b=sTrFeAAnMrijndtZfNfk9s9uJWcm73s72TgLojluaAeu6oC+WZXmrgALeAM58wl0w7rtUnYQVPt
+        5KXo1lFD/OrqCTLc8htkLRofek5Ef79QL97rcI0hZgohqeDZrcanfTvMk/DnJJHBNNtYazjJIUxAc
+        chJfqWNgS1zAw/Za9iE=
+Received: from [192.168.188.20] ([145.132.48.198]) by CPSMTPM-TLF104.kpnxchange.com over TLS secured channel with Microsoft SMTPSVC(7.5.7601.17514);
+         Sat, 16 Feb 2019 16:45:50 +0100
+Subject: When connecting to NAP bnep0 can not go up
+From:   Ferry Toth <ftoth@exalondelft.nl>
+To:     linux-bluetooth@vger.kernel.org
+References: <27e70326-9ca5-dadc-e2ac-90fc81c1b167@exalondelft.nl>
+Message-ID: <a776f208-7ca7-3eb5-adce-5756b838a4de@exalondelft.nl>
+Date:   Sat, 16 Feb 2019 16:45:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-From:   =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Date:   Fri, 15 Feb 2019 12:36:57 -0800
-Message-ID: <CA+A7VXUFbUR5h3wDm4dCPHvV4__9r-_608mzsr_3yKDJxmTApQ@mail.gmail.com>
-Subject: Potential QCA9377 firmware bug, spurious command complete event
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>,
-        Linux Upstreaming Team <linux@endlessm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <27e70326-9ca5-dadc-e2ac-90fc81c1b167@exalondelft.nl>
+X-OriginalArrivalTime: 16 Feb 2019 15:45:50.0495 (UTC) FILETIME=[B12D12F0:01D4C60E]
+X-RcptDomain: vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello all,
+I'm trying to make a connection from my Edison (linux 4.19) to my android
+phone (nap), but it seems Edison bnep0 gets removed immediately after
+creation. How can help me diagnose this?
 
-At Endless we are working on enabling a machine with a Qualcomm
-Atheros QCA9377 adapter, and are experiencing problems when scanning
-for BLE devices. btmon shows the ADV_IND and SCAN_RSP events, but no
-device found events are emitted by the kernel, so the user is not able
-to discover any BLE devices. Digging in the code and tracking HCI
-commands being sent to the adapter and their respective command
-complete events, I see the following:
+Initially I tried connman. The bluetooth service appears, but when I try to
+connect I get:
 
-1. All three HCI commands involved with starting a LE active scanning
-procedure (I'm using "btmgmt find -l"), LE_SET_RANDOM_ADDR,
-LE_SET_SCAN_PARAM and LE_SET_SCAN_ENABLE, are queued in hci_dev's skb
-and hci_cmd_work is scheduled and runs, sending LE_SET_RANDOM_ADDR to
-the controller.
+connmanctl> connect bluetooth_43341B001FAC_C462EA01AF74
+Error /net/connman/service/bluetooth_43341B001FAC_C462EA01AF74:
+Input/output error
 
-2. A command complete (CC) event arrives for LE_SET_RANDOM_ADDR, is
-processed by hci_cc_le_set_random_addr, hci_sent_cmd_data runs with no
-errors and hci_cmd_work runs again, sending LE_SET_SCAN_PARAM to the
-controller. All good until this point.
+For testing I switched to the bluez test-network.py script:
 
-3. Another CC event arrives for LE_SET_RANDOM_ADDR, but this time the
-CC opcode does not match the opcode from hdev->sent_cmd (the last HCI
-command sent to the controller) in hci_sent_cmd_data. Nothing is done
-so no real functional problem until this point. But continuing with
-the flow hci_cmd_work runs again and sends LE_SET_SCAN_ENABLE to the
-controller.
+root@edison:~# python3 ./test-network.py C4:62:EA:01:AF:74 nap
+Traceback (most recent call last):
+   File "./test-network.py", line 42, in <module>
+     iface = network.Connect(service)
+   File "/usr/lib/python3.5/site-packages/dbus/proxies.py", line 70, in
+__call__
+     return self._proxy_method(*args, **keywords)
+   File "/usr/lib/python3.5/site-packages/dbus/proxies.py", line 145, in
+__call__
+     **keywords)
+   File "/usr/lib/python3.5/site-packages/dbus/connection.py", line 651, in
+call_blocking
+     message, timeout)
+dbus.exceptions.DBusException: org.bluez.Error.Failed: Input/output error
 
-4. Now the CC event for LE_SET_SCAN_PARAM arrives, but since we
-already sent LE_SET_SCAN_ENABLE the CC opcode does not match the
-opcode from hdev->sent_cmd again in hci_sent_cmd_data, so
-hci_cc_le_set_scan_param never gets to set hdev->le_scan_type. At this
-point the controller is set to do an active scanning (CC reports
-success) but the kernel believes it is a passive scanning.
+Using btmon to log while running above script:
 
-5. The CC event for LE_SET_SCAN_ENABLE arrives and is processed
-successfully, as no other HCI commands were sent in between. The scan
-procedure starts and ADV_IND and ADV_SCAN_RSP PDUs start to arrive,
-but no device found events are sent to userspace since the kernel
-believes this is a passive scanning procedure.
+< ACL Data TX: Handle 12 flags 0x00 dlen 11
+#96 [hci0] 2974.047858
+       Channel: 78 len 7 [PSM 15 mode 0] {chan 0}
+       BNEP: Control (0x01|0)
+          Setup Conn Req (0x01)
+            Size: 0x02
+            Dst: 0x1116(NAP)
+            Src: 0x1115(PANU)
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+#97 [hci0] 2974.049982
+         Num handles: 1
+         Handle: 12
+         Count: 2
+ > ACL Data RX: Handle 12 flags 0x02 dlen 8
+#98 [hci0] 2974.052464
+       Channel: 64 len 4 [PSM 15 mode 0] {chan 0}
+       BNEP: Control (0x01|0)
+          Setup Conn Rsp (0x02)
+            Rsp msg: Operation Successful(0x0000)
+= bluetoothd: bnep: Could not bring up bnep0: Cannot assign requested
+address(99)
+= bluetoothd: connect failed Input/output error
 
-This looks like a controller bug to me, but I may be missing
-something. Has this kind of problem been seen before? If it is indeed
-a controller bug, does any have contacts at Qualcomm-Atheros to report
-it? Feel free to put me in contact with them if that would help.
-Finally, if this is not fixable through a firmware update, does anyone
-have suggestions to work around it in the kernel? This was reproduced
-on a 4.20 kernel.
+And logging with udevadm monitor:
+KERNEL add /devices/pci..../serial0-0/bluetooth/hci0/hci0:12 (bluetooth)
+UDEV   add /devices/pci..../serial0-0/bluetooth/hci0/hci0:12 (bluetooth)
+KERNEL add /devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0 (net)
+KERNEL add
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/rx-0
+(queues)
+KERNEL add
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/tx-0
+(queues)
+KERNEL remove
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/rx-0
+(queues)
+KERNEL[146116.687930] remove
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/tx-0
+(queues)
+KERNEL remove   /devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0
+(net)
+UDEV   add      /devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0
+(net)
+UDEV   add
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/rx-0
+(queues)
+UDEV   add
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/tx-0
+(queues)
+UDEV   remove
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/rx-0
+(queues)
+UDEV  [146116.776687] remove
+/devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0/queues/tx-0
+(queues)
+UDEV   remove   /devices/pci..../serial0-0/bluetooth/hci0/hci0:12/net/bnep0
+(net)
+KERNEL remove   /devices/pci..../serial0-0/bluetooth/hci0/hci0:12
+(bluetooth)
+UDEV   remove   /devices/pci..../serial0-0/bluetooth/hci0/hci0:12
+(bluetooth)
 
-Best regards,
+To me it looks like the kernel already removes the bnep0 device, before 
+user
+space can bring it up.
 
---
-Jo=C3=A3o Paulo Rechi Vita
-http://about.me/jprvita
+And indeed, doing the same from another computer (Ubuntu linux 4.18) I get
+only the kernel and udev add events, the connection is established and the
+remove events appear only after pressing Ctrl-C
+
+What could this be?
+
