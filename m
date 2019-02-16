@@ -3,62 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 543CCC43381
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Feb 2019 15:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC25C43381
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Feb 2019 17:38:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D18D0222A3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Feb 2019 15:59:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A768121B26
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Feb 2019 17:38:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=telfort.nl header.i=@telfort.nl header.b="sTrFeAAn"
+	dkim=pass (1024-bit key) header.d=telfort.nl header.i=@telfort.nl header.b="mJaEvKls"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730302AbfBPP7O (ORCPT
+        id S1730788AbfBPRig (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 16 Feb 2019 10:59:14 -0500
-Received: from cpsmtpb-ews07.kpnxchange.com ([213.75.39.10]:57633 "EHLO
-        cpsmtpb-ews07.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727151AbfBPP7O (ORCPT
+        Sat, 16 Feb 2019 12:38:36 -0500
+Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:60098 "EHLO
+        cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726391AbfBPRif (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 16 Feb 2019 10:59:14 -0500
-X-Greylist: delayed 781 seconds by postgrey-1.27 at vger.kernel.org; Sat, 16 Feb 2019 10:58:52 EST
-Received: from cpsps-ews16.kpnxchange.com ([10.94.84.197]) by cpsmtpb-ews07.kpnxchange.com with Microsoft SMTPSVC(7.5.7601.17514);
-         Sat, 16 Feb 2019 16:45:50 +0100
-X-Brand: /q/rzKX13g==
+        Sat, 16 Feb 2019 12:38:35 -0500
+Received: from cpsps-ews29.kpnxchange.com ([10.94.84.195]) by cpsmtpb-ews08.kpnxchange.com with Microsoft SMTPSVC(7.5.7601.17514);
+         Sat, 16 Feb 2019 18:38:28 +0100
+X-Brand: 7abm2Q==
 X-KPN-SpamVerdict: e1=0;e2=0;e3=0;e4=(e4=10;e1=10;e2=11;e3=10);EVW:Whi
         te;BM:NotScanned;FinalVerdict:Clean
-X-CMAE-Analysis: v=2.3 cv=P9LreRIu c=1 sm=1 tr=0
-         a=aUEkS+vox6QZufw8YjIg5Q==:117 a=WlLoZYvoDPkrvwfrrc3pQQ==:17
+X-CMAE-Analysis: v=2.3 cv=FI3KONgs c=1 sm=1 tr=0
+         a=YL3AR/2x8YElkrFdNIJrSQ==:117 a=WlLoZYvoDPkrvwfrrc3pQQ==:17
          a=IkcTkHD0fZMA:10 a=CFTnQlWoA9kA:10 a=MlH_b6sBIylOUtBgE8EA:9
          a=P02q-LbC7AcKt7Ge:21 a=3zVQZvEJ6Ab60jIw:21 a=QEXdDO2ut3YA:10
-         a=pHzHmUro8NiASowvMSCR:22 a=Ew2E2A-JSTLzCXPT_086:22
 X-CM-AcctID: kpn@feedback.cloudmark.com
-Received: from CPSMTPM-TLF104.kpnxchange.com ([195.121.3.7]) by cpsps-ews16.kpnxchange.com with Microsoft SMTPSVC(8.5.9600.16384);
-         Sat, 16 Feb 2019 16:45:50 +0100
+Received: from CPSMTPM-TLF102.kpnxchange.com ([195.121.3.5]) by cpsps-ews29.kpnxchange.com with Microsoft SMTPSVC(8.5.9600.16384);
+         Sat, 16 Feb 2019 18:38:28 +0100
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 DKIM-Signature: v=1; a=rsa-sha256; d=telfort.nl; s=telfort01;
-        c=relaxed/relaxed; t=1550331950;
+        c=relaxed/relaxed; t=1550338708;
         h=mime-version:date:message-id:subject:from:to:content-type;
-        bh=CUu/Ny3JVxYeYD6nR7VQ6sbUnVuiTfRWn261BFdrJGI=;
-        b=sTrFeAAnMrijndtZfNfk9s9uJWcm73s72TgLojluaAeu6oC+WZXmrgALeAM58wl0w7rtUnYQVPt
-        5KXo1lFD/OrqCTLc8htkLRofek5Ef79QL97rcI0hZgohqeDZrcanfTvMk/DnJJHBNNtYazjJIUxAc
-        chJfqWNgS1zAw/Za9iE=
-Received: from [192.168.188.20] ([145.132.48.198]) by CPSMTPM-TLF104.kpnxchange.com over TLS secured channel with Microsoft SMTPSVC(7.5.7601.17514);
-         Sat, 16 Feb 2019 16:45:50 +0100
-Subject: When connecting to NAP bnep0 can not go up
+        bh=LSD0weoYXXR4qpYYNyUfQKwZPZ/16v/juqVaRglUGkM=;
+        b=mJaEvKlsZjjZaeHlspZyDkLYduGs2s9R3OxQdQ63VC+j0rSFk+floAFqxWObW3MMJEp6NL1uFfw
+        Sa3FDlEw/cRXYPcjkdv7WkPzAEvulA/Wwb3lmjFwa6UWkEupDlOxet5rraf1jHRSJdjZWT1NBCzHc
+        b0hZ+ZZv6kc08hqJZd0=
+Received: from [192.168.188.20] ([145.132.48.198]) by CPSMTPM-TLF102.kpnxchange.com over TLS secured channel with Microsoft SMTPSVC(7.5.7601.17514);
+         Sat, 16 Feb 2019 18:38:28 +0100
 From:   Ferry Toth <ftoth@exalondelft.nl>
+Subject: When connecting to NAP bnep0 can not go up
 To:     linux-bluetooth@vger.kernel.org
 References: <27e70326-9ca5-dadc-e2ac-90fc81c1b167@exalondelft.nl>
-Message-ID: <a776f208-7ca7-3eb5-adce-5756b838a4de@exalondelft.nl>
-Date:   Sat, 16 Feb 2019 16:45:50 +0100
+Message-ID: <81ee645c-f9ae-f1f2-4c3c-89d55c7ccddf@exalondelft.nl>
+Date:   Sat, 16 Feb 2019 18:38:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
 In-Reply-To: <27e70326-9ca5-dadc-e2ac-90fc81c1b167@exalondelft.nl>
-X-OriginalArrivalTime: 16 Feb 2019 15:45:50.0495 (UTC) FILETIME=[B12D12F0:01D4C60E]
+X-OriginalArrivalTime: 16 Feb 2019 17:38:28.0441 (UTC) FILETIME=[6D39CC90:01D4C61E]
 X-RcptDomain: vger.kernel.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -103,12 +101,12 @@ Using btmon to log while running above script:
             Size: 0x02
             Dst: 0x1116(NAP)
             Src: 0x1115(PANU)
- > HCI Event: Number of Completed Packets (0x13) plen 5
+> HCI Event: Number of Completed Packets (0x13) plen 5
 #97 [hci0] 2974.049982
          Num handles: 1
          Handle: 12
          Count: 2
- > ACL Data RX: Handle 12 flags 0x02 dlen 8
+> ACL Data RX: Handle 12 flags 0x02 dlen 8
 #98 [hci0] 2974.052464
        Channel: 64 len 4 [PSM 15 mode 0] {chan 0}
        BNEP: Control (0x01|0)
@@ -157,8 +155,7 @@ KERNEL remove   /devices/pci..../serial0-0/bluetooth/hci0/hci0:12
 UDEV   remove   /devices/pci..../serial0-0/bluetooth/hci0/hci0:12
 (bluetooth)
 
-To me it looks like the kernel already removes the bnep0 device, before 
-user
+To me it looks like the kernel already removes the bnep0 device, before user
 space can bring it up.
 
 And indeed, doing the same from another computer (Ubuntu linux 4.18) I get
@@ -166,4 +163,5 @@ only the kernel and udev add events, the connection is established and the
 remove events appear only after pressing Ctrl-C
 
 What could this be?
+
 
