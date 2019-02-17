@@ -2,79 +2,119 @@ Return-Path: <SRS0=j8AW=QY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAA1C43381
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Feb 2019 18:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCB4C43381
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Feb 2019 22:20:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 879422186A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Feb 2019 18:40:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mykle.com header.i=@mykle.com header.b="IVaxqEX9"
+	by mail.kernel.org (Postfix) with ESMTP id 29C922146E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Feb 2019 22:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726075AbfBQSkT (ORCPT
+        id S1726647AbfBQWU1 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 17 Feb 2019 13:40:19 -0500
-Received: from remail.mykle.com ([18.233.80.45]:40271 "EHLO remail.mykle.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725554AbfBQSkT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 17 Feb 2019 13:40:19 -0500
-X-Greylist: delayed 382 seconds by postgrey-1.27 at vger.kernel.org; Sun, 17 Feb 2019 13:40:19 EST
-Received: from k9.fritz.box (unknown [88.130.155.131])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by remail.mykle.com (Postfix) with ESMTPSA id 5DBF042A49
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Feb 2019 19:33:56 +0100 (CET)
-Authentication-Results: remail.mykle.com; dmarc=none header.from=mykle.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mykle.com; s=mail;
-        t=1550428436; bh=GoC8l7OGEggvIxZ0TyOoH+EMjfTC7n28+MsE2wCkz0E=;
-        h=From:Subject:Date:To:From;
-        b=IVaxqEX9v66itldxrsTuS+9Ab8kcTmzWkP2WmqJNjNV3Yy50glyoPmEXuENJSuHpx
-         j6dqLJ20BidQP3W/T5eC07vERC+Ppk4CXp+sgxVRkAGocGFMWS7zmOLMcXhNEbt0dp
-         4ayRMXLa3h+48bEOwEVOPZ8V4pQlJ8Wfe41QQO/9HDnUSQFm7s1Ijt1BmkeHQkSkHh
-         /joWGTuDTuyeabgPIp4jLSVZCdsEaAIPheVECtlRYHgmDmXHuhmNweY1qn4WsRDyZy
-         jNc9VPY9Y76QB2GqbBvDJr4FcoKfAfDaSP+PCIIZbU87mQcn1SmK0ExNCyevUBrRBn
-         0F8dZVDpjCVIw==
-From:   Mykle James Hansen <mykle@mykle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Backporting BLE+MIDI plugin to bluez 5.43 ?
-Message-Id: <0A7939B9-5570-4EF2-B831-2B2608539970@mykle.com>
-Date:   Sun, 17 Feb 2019 19:33:55 +0100
+        Sun, 17 Feb 2019 17:20:27 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:57578 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726304AbfBQWU1 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 17 Feb 2019 17:20:27 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 642C429F41
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Feb 2019 22:20:26 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 51D9129F48; Sun, 17 Feb 2019 22:20:26 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-X-Mailer: Apple Mail (2.3124)
+Subject: [Bug 199873] Bluetooth 3.0 mouses are automatically disconnected
+ after connected
+Date:   Sun, 17 Feb 2019 22:20:22 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: lkorg@manchestermonkey.co.uk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-199873-62941-2WO3t5fhSu@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-199873-62941@https.bugzilla.kernel.org/>
+References: <bug-199873-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,=20
+https://bugzilla.kernel.org/show_bug.cgi?id=199873
 
-I wonder if anyone here could advise me on a hack.  I=E2=80=99m trying
-to set up a MIDI-over-BLE connection to a Bela-platform host,
-which runs a specific linux distro that prefers bluez v5.43 .
+antK (lkorg@manchestermonkey.co.uk) changed:
 
-However, it appears that MIDI-over-BLE was not added to bluez=20
-until the very next point release, v5.44 .
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |lkorg@manchestermonkey.co.u
+                   |                            |k
 
-For various reasons, it=E2=80=99s difficult for me to build bluez
-from source for this host.  Upgrading the OS would introduce a lot
-of work as well.
+--- Comment #4 from antK (lkorg@manchestermonkey.co.uk) ---
+I too have had the same issue...
 
-So, not knowing the bluez architecture at all, I wonder if it would
-be feasible to somehow extract just the MIDI-plugin component
-of the v5.44 release, and plug that into a 5.43 installation. =20
 
-This would clearly be a hack, but if it=E2=80=99s feasible it would
-save me a lot of time and work.  I just have no idea how to
-do it.  I=E2=80=99ve heard that MIDI is implemented as a plugin in =
-bluez;=20
-that=E2=80=99s what makes me think this might not be totally =
-implausible.
+Notebook: Dell XPS 13 9360
+bios: tested with 2.9.1 and 2.10.0
+OS: Debian stretch 9.8 
+Kernel: 4.9.0-8 debian 4.9.144-3
+Wi-Fi/BT module: Intel Dual Band wirelss AC 8265, rev=0x230
+Firmware: iwlwifi-8265-22.ucode
+BlueZ: 5.43-2+deb9u1
+BT Mouse: Logitech MX anywhere 2s
 
-Thanks in advance for any advice on this,
+------
 
--mykle-=
+When attempting to pair one of 4 things will happen:
+
+1. the bluetooth module locks up and stops responding - time out messages are
+seen in dmesg
+
+2. The wifi will reset but will return to a normal state with a failed
+bluetooth as above
+
+3. wifi and bluetooth will disappear and stop responding but wifi is
+recoverable by invoking rfkill via the wifi hot key ( fn f12 )
+
+4. The entire device stops responding and shortly after the machine will freeze
+- there may be a panic but i can't see it due to lock up ( nothing written to
+logs )
+
+The pairing process will not complete as the device stops responding before
+then.
+
+Resetting the pci device via the /sys interface results in an instant hang
+
+Other two xps devices i have contain ath10k cards and dont seem affected, mouse
+can also be paired to an android device without issue.
+
+tried bios upgrade to no avail. attempted using firmware direct from
+linux-firmware repsitory instead of firmware-iwlwifi package ( 20161130-4 ) no 
+change
+
+only fix i've found for this was to add the bt_coex_active=0 option when
+loading the module ( modprobe: options iwlwifi bt_coex_active=0 )
+
+this allows a connection to occur and for the device to pair however the mouse
+movement on screen seems to be quite jittery at times.
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
