@@ -7,119 +7,137 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8AEC4360F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 21:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A52D1C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 22:05:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E07A521738
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 21:24:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73D0D21900
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 22:05:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mAV7IaKg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d75Mlvqb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730592AbfBRVYa (ORCPT
+        id S1731393AbfBRWE7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Feb 2019 16:24:30 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:44316 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729382AbfBRVY3 (ORCPT
+        Mon, 18 Feb 2019 17:04:59 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:44850 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729530AbfBRWE7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Feb 2019 16:24:29 -0500
-Received: by mail-ot1-f68.google.com with SMTP id g1so30617809otj.11;
-        Mon, 18 Feb 2019 13:24:29 -0800 (PST)
+        Mon, 18 Feb 2019 17:04:59 -0500
+Received: by mail-qt1-f194.google.com with SMTP id n32so20905549qte.11;
+        Mon, 18 Feb 2019 14:04:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=terCZ80LXxA3PBiAEs/Mo83x6p3OLzTXSdBC5o4MSuc=;
-        b=mAV7IaKgmHppncLgCyXV0iacWwMeFxBzJuEEkm1Htp2xc2u8nD/zNXSc3U4amdVtHW
-         0QDRZpacLpOFWaeox1+99V97K1NrRbxAr66xn7pICzQvhpPVzii3H2TDucFzDDjJQ6dh
-         XjgVnCdCBr2fMg8m0pNE3QijIZi/rwlRZqYJLermzMNY5tHX2WQAITb4IweIQ0HHDpaN
-         5G5IOegV8R16jxDKe6NoL5mPUKCnE1wS00oy2h/14nmkXEhW0MYL5An/tgklZHaku07s
-         nIYeIvktuzLA2Xnz89a0CuhgOxSuatfjZj0EOrf4+zAZfYsFrxMIcpJ6oydWjCEX7gyY
-         bveQ==
+        bh=UJEIjvFn5lDWyFGKQ6nt9TMgckGmOcCuBM72TI/2smU=;
+        b=d75MlvqbxFQqce46nPdMbicc+JCmML4ejDSpaQ2ahLgc12VraUb4wVPwzyd7wUYXTv
+         yfis+GaGOHF/1Vw+is5EzYiRLMBO/eH0wMTZ5XHyrkgbqXw901a9NCPlgZv4fa5UrtiK
+         0Tg0SQ3y1z4o5l3re/2cu68hMJjjgk7vGBwoZW2TJDGRJ0R8lANedHQ/PcD53lDtqKgP
+         gbdqmW2sizt3JCjdNLm+2z3qqnZ24g7PhU/qnItzMXCOZzkg2JY/PWEA4QLEnX+e3vyi
+         RBqs6M5yMaLg3kt/gLRdb20iN6RwRd96nhB8mGYnBt3L2MreIeuR0LYIzZAdfPL6oXu1
+         V4QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=terCZ80LXxA3PBiAEs/Mo83x6p3OLzTXSdBC5o4MSuc=;
-        b=e6J4/n8UafiX1PGMrEIqGGL9Nvy81i9UEFiYkbyad3K3lEtryaJgYp0aC12Ph/n7MR
-         HKMoh9xTNqMP2WDO1xaXu+cDSMCwKQpdmw1VziNrY0h56tNRO45f9TY2qBj0YHidOVOe
-         XI01reTzVuJJ15Ux4UMNx1iTspHJZoFxY2cUkLA5RlY9O5WLGbqG7i/CbAA42QNZtjMe
-         nNp/gcVubOzqenavwlbSd+XAKXjYo//nxQvCIWi0f88/T+KF1tlrF8QdxTNcqDNjuJBI
-         fcwREIjUgzdqxSvuz8oeUo9a5dR64zZlMmoOomCqJqh3RJNfQdT5cP4nFw1sajGbgSqS
-         SK7g==
-X-Gm-Message-State: AHQUAuY4DfXmrfuL5EJXFiZAYIBEHhRlzL2J1o3BlTcU/8dRcXCCqoBC
-        D5KWjJUF9OgQ9BbQDfKByO9969HZ9qAWTIomgBw=
-X-Google-Smtp-Source: AHgI3IZ9tYltrd7oxavWl94369EvsyvagdqvhhFtZDEex9gjRs04HZLQ3MXARmAm1kNNKVBhj3eDJpaXVD72nKK2WGs=
-X-Received: by 2002:a05:6830:1193:: with SMTP id u19mr14303938otq.221.1550525069011;
- Mon, 18 Feb 2019 13:24:29 -0800 (PST)
+        bh=UJEIjvFn5lDWyFGKQ6nt9TMgckGmOcCuBM72TI/2smU=;
+        b=CkJ/je2St/xGp/dUNIaUJlRFEAfyezEqxJaZnJ1ND/SmwdZPWynXo/zyCmbjiGegO5
+         VWxdfF8kyew/N6b9JLAS2MlFurS7PVUviFP2YPos4HuhE8s6AxNKfAAxINBROC96NSYL
+         bg8u9uV96zRaHltbqFp11Le30Osa+8it1E/5O9vavatBs0fVbnDYksE4BNbAjvFTngOZ
+         JFsEF+j5IrdO7lUmQmDIi7Kzp/ZrPIGZc1koDcfqEMPHfv94VRn3HOLLISPK+g7UD58F
+         50Q45Cs4AEZGF2xpl7JeMnbH/KMVY3i7yyav8qb/snVcyQLxjTCvayKjfruFhdTjhTpX
+         AAlA==
+X-Gm-Message-State: AHQUAubjQ2gxjVryrbDMESVW52x4rY+BPV0P98TIkuJzE2+hu9JCbPYd
+        +0Tlxo3H2sQiHwuT3qwZoCXV1XA6zNxfYNUBDbk=
+X-Google-Smtp-Source: AHgI3IayEKqP5K/9ta9zQQ8xRffxLB9j+zI0CAuiSixorC6YG4GFoRQVMKpWCGKl5j9r6SK2Zl6rz6NIyfwUBuUzrow=
+X-Received: by 2002:a0c:963d:: with SMTP id 58mr19213670qvx.25.1550527497638;
+ Mon, 18 Feb 2019 14:04:57 -0800 (PST)
 MIME-Version: 1.0
-References: <20190118170232.16142-1-anarsoul@gmail.com> <20190118170232.16142-4-anarsoul@gmail.com>
- <20190218211035.GA28145@bogus>
-In-Reply-To: <20190218211035.GA28145@bogus>
-From:   Vasily Khoruzhick <anarsoul@gmail.com>
-Date:   Mon, 18 Feb 2019 13:24:02 -0800
-Message-ID: <CA+E=qVdq5GORg-t-vVXM3zBxy3Aq93iCE+zmcGgLFBMcnTDgfw@mail.gmail.com>
-Subject: Re: [PATCH 3/8] dt-bindings: net: bluetooth: Add rtl8723bs-bluetooth
-To:     Rob Herring <robh@kernel.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Maxime Ripard <maxime.ripard@bootlin.com>,
-        Chen-Yu Tsai <wens@csie.org>,
+References: <20181221011752.25627-1-sre@kernel.org> <20181221011752.25627-3-sre@kernel.org>
+In-Reply-To: <20181221011752.25627-3-sre@kernel.org>
+From:   Enric Balletbo Serra <eballetbo@gmail.com>
+Date:   Mon, 18 Feb 2019 23:04:46 +0100
+Message-ID: <CAFqH_50kd4TRg6FTNZ-hZAPN14X8t++zY7mobTmPDfre8x59JQ@mail.gmail.com>
+Subject: Re: [PATCH 02/14] ARM: dts: IGEP: Add WiLink UART node
+To:     Sebastian Reichel <sre@kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, devicetree <devicetree@vger.kernel.org>,
-        arm-linux <linux-arm-kernel@lists.infradead.org>,
-        linux-bluetooth@vger.kernel.org
+        Tony Lindgren <tony@atomide.com>,
+        Rob Herring <robh@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Pavel Machek <pavel@ucw.cz>, linux-bluetooth@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Feb 18, 2019 at 1:10 PM Rob Herring <robh@kernel.org> wrote:
->
-> On Fri, Jan 18, 2019 at 09:02:27AM -0800, Vasily Khoruzhick wrote:
-> > Add binding document for bluetooth part of RTL8723BS/RTL8723CS
-> >
-> > Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
-> > ---
-> >  .../bindings/net/rtl8723bs-bluetooth.txt      | 35 +++++++++++++++++++
-> >  1 file changed, 35 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt b/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
-> > new file mode 100644
-> > index 000000000000..8357f242ae4c
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
-> > @@ -0,0 +1,35 @@
-> > +RTL8723BS/RTL8723CS Bluetooth
-> > +---------------------
-> > +
-> > +RTL8723CS/RTL8723CS is WiFi + BT chip. WiFi part is connected over SDIO, while
-> > +BT is connected over serial. It speaks H5 protocol with few extra commands
-> > +to upload firmware and change module speed.
-> > +
-> > +Required properties:
-> > +
-> > + - compatible: should be one of the following:
-> > +   * "realtek,rtl8723bs-bt"
-> > +   * "realtek,rtl8723cs-bt"
-> > +Optional properties:
-> > +
-> > + - device-wake-gpios: GPIO specifier, used to wakeup the BT module (active high)
-> > + - enable-gpios: GPIO specifier, used to enable the BT module (active high)
-> > + - host-wake-gpios: GPIO specifier, used to wakeup the host processor (active high)
-> > + - firmware-postfix: firmware postfix to be used for firmware config
->
-> How is this used?
+Hi Sebastian,
 
-rtl8723bs-bt needs 2 firmware binaries -- one is actual firmware,
-another is firmware config which is specific to the board. If
-firmware-postfix is specified, driver appends it to the name of config
-and requests board-specific config while loading firmware. I.e. if
-'pine64' is specified as firmware-postfix driver will load
-rtl8723bs_config-pine64.bin.
+Sorry to take so long to reply
 
-> Rob
+Missatge de Sebastian Reichel <sre@kernel.org> del dia dv., 21 de des.
+2018 a les 9:05:
 >
+> From: Sebastian Reichel <sebastian.reichel@collabora.com>
+>
+> Add a node for the UART part of WiLink chip.
+>
+> Cc: Enric Balletbo i Serra <enric.balletbo@collabora.com>
+> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+> ---
+> This is compile tested only!
+> ---
+>  arch/arm/boot/dts/omap3-igep0020-rev-f.dts | 8 ++++++++
+>  arch/arm/boot/dts/omap3-igep0030-rev-g.dts | 8 ++++++++
+>  2 files changed, 16 insertions(+)
+>
+> diff --git a/arch/arm/boot/dts/omap3-igep0020-rev-f.dts b/arch/arm/boot/dts/omap3-igep0020-rev-f.dts
+> index 285681d7af49..8bb4298ca05e 100644
+> --- a/arch/arm/boot/dts/omap3-igep0020-rev-f.dts
+> +++ b/arch/arm/boot/dts/omap3-igep0020-rev-f.dts
+> @@ -52,3 +52,11 @@
+>                 interrupts = <17 IRQ_TYPE_EDGE_RISING>; /* gpio 177 */
+>         };
+>  };
+> +
+> +&uart2 {
+> +       bluetooth {
+> +               compatible = "ti,wl1835-st";
+
+That should be "ti,wl1831-st"
+
+> +               enable-gpios = <&gpio5 9 GPIO_ACTIVE_HIGH>; /* gpio 137 */
+> +               max-speed = <300000>;
+> +       };
+> +};
+> diff --git a/arch/arm/boot/dts/omap3-igep0030-rev-g.dts b/arch/arm/boot/dts/omap3-igep0030-rev-g.dts
+> index 1adc73bd2ca0..03be171e9de7 100644
+> --- a/arch/arm/boot/dts/omap3-igep0030-rev-g.dts
+> +++ b/arch/arm/boot/dts/omap3-igep0030-rev-g.dts
+> @@ -74,3 +74,11 @@
+>                 interrupts = <8 IRQ_TYPE_EDGE_RISING>; /* gpio 136 */
+>         };
+>  };
+> +
+> +&uart2 {
+> +       bluetooth {
+> +               compatible = "ti,wl1835-st";
+
+That should be "ti,wl1831-st"
+
+> +               enable-gpios = <&gpio5 9 GPIO_ACTIVE_HIGH>; /* gpio 137 */
+> +               max-speed = <300000>;
+> +       };
+> +};
+> --
+> 2.19.2
+>
+
+Apart from that,
+
+Acked-by: Enric Balletbo i Serra <enric.balletbo@collabora.com>
