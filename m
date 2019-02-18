@@ -6,64 +6,89 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 431EBC43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 12:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF8EC43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 12:58:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C8DE214DA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 12:55:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 976E2217D7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 12:58:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727787AbfBRMzc (ORCPT
+        id S1727657AbfBRM6s convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Feb 2019 07:55:32 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:51072 "EHLO
+        Mon, 18 Feb 2019 07:58:48 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:47866 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726302AbfBRMzc (ORCPT
+        with ESMTP id S1726302AbfBRM6s (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Feb 2019 07:55:32 -0500
+        Mon, 18 Feb 2019 07:58:48 -0500
 Received: from marcel-macpro.fritz.box (p4FF9F361.dip0.t-ipconnect.de [79.249.243.97])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5602BCF2C7;
-        Mon, 18 Feb 2019 14:03:24 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4381ACF2C7;
+        Mon, 18 Feb 2019 14:06:39 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH] Bluetooth: hci_ldisc: Initialize hci_dev before open()
+Subject: Re: [RFC] Bluetooth: Retry configure request if result is
+ L2CAP_CONF_UNKNOWN
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190206175416.4627-1-jcline@redhat.com>
-Date:   Mon, 18 Feb 2019 13:55:30 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+257790c15bcdef6fe00c@syzkaller.appspotmail.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <37BAD6CD-1A0C-4DF2-95E0-2D75D7A75DB8@holtmann.org>
-References: <20190206175416.4627-1-jcline@redhat.com>
-To:     Jeremy Cline <jcline@redhat.com>
+In-Reply-To: <20190208025828.30901-1-andrew.smirnov@gmail.com>
+Date:   Mon, 18 Feb 2019 13:58:45 +0100
+Cc:     linux-bluetooth@vger.kernel.org,
+        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
+        Florian Dollinger <dollinger.florian@gmx.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <3E87E315-0F39-49BA-BD65-2EB0C3A9A782@holtmann.org>
+References: <20190208025828.30901-1-andrew.smirnov@gmail.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jeremy,
+Hi Andrey,
 
-> The hci_dev struct hdev is referenced in work queues and timers started
-> by open() in some protocols. This creates a race between the
-> initialization function and the work or timer which can result hdev
-> being dereferenced while it is still null.
+> Due to:
 > 
-> The syzbot report contains a reliable reproducer which causes a null
-> pointer dereference of hdev in hci_uart_write_work() by making the
-> memory allocation for hdev fail.
+> - current implementation of l2cap_config_rsp() dropping BT
+>   connection if sender of configuration response replied with unknown
+>   option failure (Result=0x0003/L2CAP_CONF_UNKNOWN)
 > 
-> To fix this, ensure hdev is valid from before calling a protocol's
-> open() until after calling a protocol's close().
+> - current implementation of l2cap_build_conf_req() adding
+>   L2CAP_CONF_RFC(0x04) option to initial configure request sent by
+>   the Linux host.
 > 
-> Reported-by: syzbot+257790c15bcdef6fe00c@syzkaller.appspotmail.com
-> Signed-off-by: Jeremy Cline <jcline@redhat.com>
+> devices that do no recongninze L2CAP_CONF_RFC, such as Xbox One S
+> controllers, will get stuck in endless connect -> configure ->
+> disconnect loop, never connect and be generaly unusable.
+> 
+> To avoid this problem add code to do the following:
+> 
+> 1. Store a mask of supported conf option types per connection
+> 
+> 2. Parse the body of response L2CAP_CONF_UNKNOWN and adjust
+>    connection's supported conf option types mask
+> 
+> 3. Retry configuration step the same way it's done for
+>    L2CAP_CONF_UNACCEPT
+> 
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Cc: Pierre-Loup A. Griffais <pgriffais@valvesoftware.com>
+> Cc: Florian Dollinger <dollinger.florian@gmx.de>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
 > ---
-> drivers/bluetooth/hci_ldisc.c | 21 ++++++++++++++-------
-> 1 file changed, 14 insertions(+), 7 deletions(-)
+> 
+> Everyone:
+> 
+> I marked this as an RFC, since I don't have a lot of experience with
+> Bluetooth subsystem and don't have hight degree of confidence about
+> choices made in this patch. I do, however, thins is is good enough to
+> start a discussion about the problem.
 
-patch has been applied to bluetooth-next tree.
+can you take a btmon -w trace.log protocol trace so that I can see where it fails. This seems a really odd behavior of the Xbox controller. We have to be careful in not breaking Bluetooth qualification to just workaround some buggy remote device.
 
 Regards
 
