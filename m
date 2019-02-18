@@ -2,141 +2,115 @@ Return-Path: <SRS0=2sDM=QZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15734C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 20:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3A1C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 21:10:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7234217F9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 20:05:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=davidjohnsummers.uk header.i=@davidjohnsummers.uk header.b="rNyaiSRC"
+	by mail.kernel.org (Postfix) with ESMTP id DA55D2070D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 21:10:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550524239;
+	bh=cciVyw5O4lvXY2g1ad2JMXM9Yge+uqQjZG1+z0+NScE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=abQq7QaQrpEBaCeajV4qP9t02f38avZkgLEea7dP/rVVLHFiOpfmh75I8ScfFiKPg
+	 0FbQQQC/mRg467BuHHQkBMtY9cEPcKcpO0Z30C5VQVBKkiNMBw/ElJDWPyUaxFS3wT
+	 thukJQ+E05BG7ur4dp6v7Y4S2GnAg3l8zRDog2vE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728700AbfBRUFS (ORCPT
+        id S1729382AbfBRVKi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Feb 2019 15:05:18 -0500
-Received: from mail-gw.thundercloud.uk ([149.255.60.88]:59402 "EHLO
-        mail-gw.thundercloud.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728315AbfBRUFR (ORCPT
+        Mon, 18 Feb 2019 16:10:38 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:41906 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726302AbfBRVKh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Feb 2019 15:05:17 -0500
-Received: from mailbsf01.thundercloud.uk (mail-gw.thundercloud.uk [149.255.60.72])
-        by mail-gw.thundercloud.uk (Postfix) with ESMTPS id 2FC1A60A2F50
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Feb 2019 20:05:11 +0000 (GMT)
-X-ASG-Debug-ID: 1550520310-0554131265235350001-Y6scnF
-Received: from cloud706.unlimitedwebhosting.co.uk (no-dns-yet.unlimited.uk.net [149.255.62.7]) by mailbsf01.thundercloud.uk with ESMTP id owO1GuFNhxEW7YlF (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO) for <linux-bluetooth@vger.kernel.org>; Mon, 18 Feb 2019 20:05:10 +0000 (GMT)
-X-Barracuda-Envelope-From: beagleboard@davidjohnsummers.uk
-X-Barracuda-Effective-Source-IP: no-dns-yet.unlimited.uk.net[149.255.62.7]
-X-Barracuda-Apparent-Source-IP: 149.255.62.7
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=davidjohnsummers.uk; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=C2d2fmiKKrJhoMv/UDMiduGVfCU4Ob+h464yXpnSw1s=; b=rNyaiSRCrPwjhAxTXiB6+EZsSx
-        1DGcvv/4eHhwR4+ybf0MnB7V/UzPTtknFJxL1MOkQjxJljmhjr2IcQjsyXzt1kCTV6x/xXSOL3+tO
-        LprymLnXpcpxJrEu4OZJx01Z4KwO2u3uX/KDh7/m3iinGuHhN0QKEs3HByUCCds3yXKLZYCd+291W
-        bLz3/u3tfVrY9oQIKEUm2YDTI0F1hFZ+IDnOYDKe7qloMCIyzCdrTe1H/MuzczLj3+egBcPxbrRtb
-        A5775KB1KVy0RpXGGiXIesQx8Jlkz711g1h0rH4Vj/hmUaB2jvujwYTfHU6sFKRsptZVXXW/e/Sry
-        uRnZnTEw==;
-Received: from [87.114.170.31] (port=58246 helo=[192.168.2.187])
-        by cloud706.unlimitedwebhosting.co.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.91)
-        (envelope-from <beagleboard@davidjohnsummers.uk>)
-        id 1gvpA6-000N2y-9S; Mon, 18 Feb 2019 20:05:10 +0000
-Subject: Re: drivers/bluetooth/Kconfig BT_HCIUART_RTL depends on ACPI
-To:     Marcel Holtmann <marcel@holtmann.org>
-X-ASG-Orig-Subj: Re: drivers/bluetooth/Kconfig BT_HCIUART_RTL depends on ACPI
-Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Stefan Wahren <stefan.wahren@i2se.com>
-References: <9d693bec-56c7-58a1-67b8-ba9edd63989d@davidjohnsummers.uk>
- <07109476-C017-4DC2-98A7-2EE5B53C4AB3@holtmann.org>
-From:   David Summers <beagleboard@davidjohnsummers.uk>
-Message-ID: <54432239-eb3c-45d0-a1a3-a7e5bd0d584d@davidjohnsummers.uk>
-Date:   Mon, 18 Feb 2019 20:05:08 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.3
+        Mon, 18 Feb 2019 16:10:37 -0500
+Received: by mail-ot1-f66.google.com with SMTP id t7so14247240otk.8;
+        Mon, 18 Feb 2019 13:10:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=vfh9VEg4/DD5W56HTE1UyJO7PeETQccNa3gxtKG5ZfU=;
+        b=akheDIgih6T3XPQJs3PUizv1stR3h6fZv8MTN2nmX9TZCRy2n7HYxxrXzwdqe/A4Ts
+         qEKIclRaC9N7MKlwlsJhxGOZcHOFHhTPo0wFY7FGcOWfXRZC5Cthq/V5NuxloYcwRjpP
+         jq9TaPInBteZZqcIDFSZgDGbR6G2uVULHF2ItT2Nj4iIYPfSG1s4nLnf5BxeQWIKohdO
+         jWBdUqX+twr2cnPsgDbbR4HyfDy3XZWaSj9ez6NHqtor2gd7EzrVXohKDimcd2VEHBjc
+         8RZ6DxouhvlgsB2jfDm3lnlfB7cV90HG/6HH0SZcQnHME4IbPyHFUKM/CH/Et9PcV7O5
+         16pg==
+X-Gm-Message-State: AHQUAuYpRsjycf1M2FPTgt9qkrC16omsVIe4cQaXmcXjS1QlSwyZnwGz
+        qKswCpR8xud6yavoLPykzA==
+X-Google-Smtp-Source: AHgI3IaBxXUPWP1IeKYNVsruYCspdQ3LnjBv1J7NyA3zKPf1UcF887+r635FYe1HPhnH9k5lbjcAmQ==
+X-Received: by 2002:a9d:2f64:: with SMTP id h91mr15620192otb.14.1550524236851;
+        Mon, 18 Feb 2019 13:10:36 -0800 (PST)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id d11sm4453324otp.18.2019.02.18.13.10.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 18 Feb 2019 13:10:36 -0800 (PST)
+Date:   Mon, 18 Feb 2019 15:10:35 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Vasily Khoruzhick <anarsoul@gmail.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/8] dt-bindings: net: bluetooth: Add rtl8723bs-bluetooth
+Message-ID: <20190218211035.GA28145@bogus>
+References: <20190118170232.16142-1-anarsoul@gmail.com>
+ <20190118170232.16142-4-anarsoul@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <07109476-C017-4DC2-98A7-2EE5B53C4AB3@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-PH
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - cloud706.unlimitedwebhosting.co.uk
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - davidjohnsummers.uk
-X-Get-Message-Sender-Via: cloud706.unlimitedwebhosting.co.uk: authenticated_id: davidjoh/from_h
-X-Authenticated-Sender: cloud706.unlimitedwebhosting.co.uk: beagleboard@davidjohnsummers.uk
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Barracuda-Connect: no-dns-yet.unlimited.uk.net[149.255.62.7]
-X-Barracuda-Start-Time: 1550520310
-X-Barracuda-Encrypted: ECDHE-RSA-AES256-GCM-SHA384
-X-Barracuda-URL: https://149.255.60.72:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at thundercloud.uk
-X-Barracuda-Scan-Msg-Size: 1700
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Spam-Score: 0.00
-X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=2.0 tests=BSF_SC0_MISMATCH_TO
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.67542
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
-        0.00 BSF_SC0_MISMATCH_TO    Envelope rcpt doesn't match header
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190118170232.16142-4-anarsoul@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 18/02/2019 10:48, Marcel Holtmann wrote:
-> Hi David,
->
->> On Arch Linux Arm, have a couple of people helping with the Tinker Board Patches - think we are close to something that may get passed.
->>
->> Now testing it far more, and a snag, drivers/bluetooth/Kconfig contains:
->>
->> config BT_HCIUART_RTL
->>      bool "Realtek protocol support"
->>      depends on BT_HCIUART
->>      depends on BT_HCIUART_SERDEV
->>      depends on GPIOLIB
->>      depends on ACPI
->>      select BT_HCIUART_3WIRE
->>      select BT_RTL
->>
->> But why does it depend on ACPI? I haven't found a way of setting that in 4.20, used to be in Power Management IIRC - but can't find now.
->>
->> find . -name Kconfig -type f -exec grep "select ACPI" '{}' \;
->>
->> Doesn't find anything to select ACPI …
-> initially we only supported Realtek chips that are described via ACPI. For DT based ones you need to extend this. The Broadcom ones uses this line:
->
-> depends on (!ACPI || SERIAL_DEV_CTRL_TTYPORT)
->
-> Maybe this works here as well.
->
-> Regards
->
-> Marcel
->
-Thanks Marcel,
+On Fri, Jan 18, 2019 at 09:02:27AM -0800, Vasily Khoruzhick wrote:
+> Add binding document for bluetooth part of RTL8723BS/RTL8723CS
+> 
+> Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+> ---
+>  .../bindings/net/rtl8723bs-bluetooth.txt      | 35 +++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt b/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
+> new file mode 100644
+> index 000000000000..8357f242ae4c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
+> @@ -0,0 +1,35 @@
+> +RTL8723BS/RTL8723CS Bluetooth
+> +---------------------
+> +
+> +RTL8723CS/RTL8723CS is WiFi + BT chip. WiFi part is connected over SDIO, while
+> +BT is connected over serial. It speaks H5 protocol with few extra commands
+> +to upload firmware and change module speed.
+> +
+> +Required properties:
+> +
+> + - compatible: should be one of the following:
+> +   * "realtek,rtl8723bs-bt"
+> +   * "realtek,rtl8723cs-bt"
+> +Optional properties:
+> +
+> + - device-wake-gpios: GPIO specifier, used to wakeup the BT module (active high)
+> + - enable-gpios: GPIO specifier, used to enable the BT module (active high)
+> + - host-wake-gpios: GPIO specifier, used to wakeup the host processor (active high)
+> + - firmware-postfix: firmware postfix to be used for firmware config
 
-Happy we have some else on ArchLinux ARM, Stefan Wahren, who has showed 
-an interest in getting these things working. He has (very recently) had 
-a go at and update, available here:
+How is this used?
 
-https://gist.github.com/lategoodbye/79bac99d4f1158a719a48ea3c45eb7f1
-
-Any we have asked someone with a ASUS Tinker Board (S) to test. Stefan changes are good, because he has set up so it uses device tree - which is what we need on ARM. However he has said this was just a hack, so even if it works I expect he'll make more updates.
-
-Hopefully though he'll be able to send a PATCH  in when he is ready.
-
-Regards,
-
-David
+Rob
 
