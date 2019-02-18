@@ -2,138 +2,61 @@ Return-Path: <SRS0=2sDM=QZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 013ECC43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 13:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A21C43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 13:06:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEC0220645
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 13:05:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6431520645
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Feb 2019 13:06:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729750AbfBRNFN convert rfc822-to-8bit (ORCPT
+        id S1730765AbfBRNGI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Feb 2019 08:05:13 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33617 "EHLO
+        Mon, 18 Feb 2019 08:06:08 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:59299 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728900AbfBRNFN (ORCPT
+        with ESMTP id S1728833AbfBRNGI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Feb 2019 08:05:13 -0500
+        Mon, 18 Feb 2019 08:06:08 -0500
 Received: from marcel-macpro.fritz.box (p4FF9F361.dip0.t-ipconnect.de [79.249.243.97])
-        by mail.holtmann.org (Postfix) with ESMTPSA id F4131CF2C7;
-        Mon, 18 Feb 2019 14:13:04 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0DA33CF2C7;
+        Mon, 18 Feb 2019 14:13:59 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 1/6] dt-bindings: net: bluetooth: add support for MediaTek
- MT7663U and MT7668U UART devices
+Subject: Re: [PATCH 2/6] Bluetooth: mediatek: trivial typo fix
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <c31b9ed0f2c711f53ad88c96f2d0a1bd22d9de58.1550184473.git.sean.wang@mediatek.com>
-Date:   Mon, 18 Feb 2019 14:05:11 +0100
-Cc:     Mark Rutland <mark.rutland@arm.com>,
+In-Reply-To: <fe55645efb173ef11cad6e43c194b400226b7a2f.1550184473.git.sean.wang@mediatek.com>
+Date:   Mon, 18 Feb 2019 14:06:05 +0100
+Cc:     robh+dt@kernel.org, mark.rutland@arm.com,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mediatek@lists.infradead.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <0EF74A38-3D1F-4BD1-9B72-78E8720C125D@holtmann.org>
+Message-Id: <E7DDB747-D3D7-4D31-BEA9-9277D95C2687@holtmann.org>
 References: <cover.1550184473.git.sean.wang@mediatek.com>
- <c31b9ed0f2c711f53ad88c96f2d0a1bd22d9de58.1550184473.git.sean.wang@mediatek.com>
-To:     Sean Wang <sean.wang@mediatek.com>,
-        Rob Herring <robh+dt@kernel.org>
+ <fe55645efb173ef11cad6e43c194b400226b7a2f.1550184473.git.sean.wang@mediatek.com>
+To:     Sean Wang <sean.wang@mediatek.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rob,
+Hi Sean,
 
-> Update binding document with adding support of MT7663U and MT7668U UART
-> devices to mediatek-bluetooth.
+> add a trivial typo fix from speicfic to specific
 > 
+> Fixes: 7237c4c9ec92 ("Bluetooth: mediatek: Add protocol support for MediaTek serial devices")
 > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 > ---
-> .../bindings/net/mediatek-bluetooth.txt       | 64 +++++++++++++++++++
-> 1 file changed, 64 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-> index 14ceb2a5b4e8..41a7dcc80f5b 100644
-> --- a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-> @@ -33,3 +33,67 @@ Example:
-> 			clock-names = "ref";
-> 		};
-> 	};
-> +
-> +MediaTek UART based Bluetooth Devices
-> +==================================
-> +
-> +This device is a serial attached device to UART device and thus it must be a
-> +child node of the serial node with UART.
-> +
-> +Please refer to the following documents for generic properties:
-> +
-> +	Documentation/devicetree/bindings/serial/slave-device.txt
-> +
-> +Required properties:
-> +
-> +- compatible:	Must be
-> +		  "mediatek,mt7663u-bluetooth": for MT7663U device
-> +		  "mediatek,mt7668u-bluetooth": for MT7668U device
-> +- vcc-supply:	Main voltage regulator
-> +- pinctrl-names: Should be "default", "runtime"
-> +- pinctrl-0: Should contain UART RXD low when the device is powered up to
-> +	     enter proper bootstrap mode.
-> +- pinctrl-1: Should contain UART mode pin ctrl
-> +
-> +Optional properties:
-> +
-> +- reset-gpios:	GPIO used to reset the device whose initial state keeps low,
-> +		if the GPIO is missing, then board-level design should be
-> +		guaranteed.
-> +- current-speed:  Current baud rate of the device whose defaults to 921600
-> +
-> +Example:
-> +
-> +	uart1_pins_boot: uart1-default {
-> +		pins-dat {
-> +			pinmux = <MT7623_PIN_81_URXD1_FUNC_GPIO81>;
-> +			output-low;
-> +		};
-> +	};
-> +
-> +	uart1_pins_runtime: uart1-runtime {
-> +		pins-dat {
-> +			pinmux = <MT7623_PIN_81_URXD1_FUNC_URXD1>,
-> +				 <MT7623_PIN_82_UTXD1_FUNC_UTXD1>;
-> +		};
-> +	};
-> +
-> +	uart1: serial@11003000 {
-> +		compatible = "mediatek,mt7623-uart",
-> +			     "mediatek,mt6577-uart";
-> +		reg = <0 0x11003000 0 0x400>;
-> +		interrupts = <GIC_SPI 52 IRQ_TYPE_LEVEL_LOW>;
-> +		clocks = <&pericfg CLK_PERI_UART1_SEL>,
-> +			 <&pericfg CLK_PERI_UART1>;
-> +		clock-names = "baud", "bus";
-> +
-> +		bluetooth {
-> +			compatible = "mediatek,mt7663u-bluetooth";
-> +			vcc-supply = <&reg_5v>;
-> +			reset-gpios = <&pio 24 GPIO_ACTIVE_LOW>;
-> +			pinctrl-names = "default", "runtime";
-> +			pinctrl-0 = <&uart1_pins_boot>;
-> +			pinctrl-1 = <&uart1_pins_runtime>;
-> +			current-speed = <921600>;
-> +		};
-> +	};
+> drivers/bluetooth/btmtkuart.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-can you ACK this please.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
