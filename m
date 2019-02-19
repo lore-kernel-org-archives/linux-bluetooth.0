@@ -4,55 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACFFBC4360F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Feb 2019 20:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C79C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Feb 2019 20:07:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 772922147C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Feb 2019 20:06:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A10C921738
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Feb 2019 20:07:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="O8nXH21x"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Du8i1Vhs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729660AbfBSUGw (ORCPT
+        id S1730150AbfBSUGk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Feb 2019 15:06:52 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:41268 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730143AbfBSUGk (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 19 Feb 2019 15:06:40 -0500
-Received: by mail-pg1-f194.google.com with SMTP id m1so10620926pgq.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Feb 2019 12:06:40 -0800 (PST)
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:45010 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730130AbfBSUGj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 19 Feb 2019 15:06:39 -0500
+Received: by mail-pg1-f193.google.com with SMTP id y1so10620210pgk.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Feb 2019 12:06:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=dV4n54u4Vk8nQPIidEsBnddfIzKpZiU37Lp+GMapMQM=;
-        b=O8nXH21xvSsrX1OsDJizzomvsSoTUNm6Z8wxdx3GPRef4zxxMrT5Hw2rBVCnSsUbLP
-         OnkWNZXT9o5Wxd047B4AdPMKRWt+66i0PbfL0w0D3/4h551wtKVf4ko6SQoOOrf/w328
-         dishnro/qOLVq4LAXLHyXHBFKWFYOl6qvjzvQ=
+        bh=x7O823chuOwdyjrTegmRg87S5QWfxcdxN9J6QScvOeg=;
+        b=Du8i1VhsbBYonosBY1sllpKTyt+nlqrFYXaLIrEFlTQySrwNpNJMnTFT6BpbEDNq6q
+         qV3p2REav9YY00msCrq8apL4EkOkba7w1sLS2VCvTwx/fBt74N+43pe2n832W01PIjEH
+         4bGwUctMVEWyEvQx5zT1lSMY7Kdc27wUgkt4g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dV4n54u4Vk8nQPIidEsBnddfIzKpZiU37Lp+GMapMQM=;
-        b=WINWEg+A8lOnc9e87ICSFVJIhZ4ujKJF9Q2PQbGYV7f/o5wXAd98ZFU8tUJrOI3vJg
-         DX82ztjrQZ33TQv01fp9tz/rTXGbuR+jqeOxw3COKyrdoXhRaol3Gk52CAs0W87/PyB0
-         ZIfMNVlUd4uyE0tt7VMiZYfslV1Ff8Z3aAOeYaHcPC62c1PXxs9V/ebEfWzG088r5f9K
-         DkDobcT3RCFLrGObijIeKSCN7qbfxmYGADk52O/Xy9qsMMXU7MDGOE7qkKAw7PhacaU6
-         lIirhieb+GXetx3fmoWnqrJ8zC6C9ovpJ6MZG+yeYv1LzIOaAmcMtSs5ex62KlZW8UBT
-         zBMw==
-X-Gm-Message-State: AHQUAuZlJQw9w/qwgxmpMqj1JzSBfMp682avO4eS9VBPhNjclote2WzN
-        ITFaLAr8/qQNroosiKyMkEGJBA==
-X-Google-Smtp-Source: AHgI3IaziTruyfWBp7Vrqn1lWKCI19vVykxfzVF3UrkKad5S+8MtakmXc+6R+vcrRj2z6+M4dxIIMg==
-X-Received: by 2002:a62:442:: with SMTP id 63mr30538068pfe.156.1550606799734;
-        Tue, 19 Feb 2019 12:06:39 -0800 (PST)
+        bh=x7O823chuOwdyjrTegmRg87S5QWfxcdxN9J6QScvOeg=;
+        b=HQAKdmRWT6WMQ63mIXFd1iajYGfAzYxAeJcjUdEAosBr+FL1QJfLDPbiJubx3OsMYy
+         ZSuM8atDI95TIPKGSnR0OozWaurlJDHnuihLjEb5Lx/CDBfL8ByR4ALka+Pe15c6xk5m
+         JsIY12H0sQ3sV3XrmIHOYzHfdWYCPZBg0fN9/lAA26WQBRs3NAAOXYpI2ZLt7QoghkMd
+         ZljcF/d6r2CGr9wr4P0xqYVxudzlRAkGCvoZUe9lIuDw1sYOZNX1TBPHzRHqvq2Gdy84
+         Uo8+osEOdTMgxddRIzgHpXP7eELQtkB6ObgaLKw6htTM7GqEuIYd6WjDRtFIW06mcv6c
+         tt8A==
+X-Gm-Message-State: AHQUAuadn231ahQgi3Rv74Lrp/zBbbgulvlIvrNvDGquUUtzK+LZlTKr
+        02hdfFzgzitFxSO0va4SXwAUxw==
+X-Google-Smtp-Source: AHgI3IZv/2NgasY3z3Le0dVgABDvS5C3ddDJeSPUJd/+Q33R0P96QGKazaAC+oLLaqc1qDhoXJH5VA==
+X-Received: by 2002:a63:d703:: with SMTP id d3mr25760588pgg.167.1550606798748;
+        Tue, 19 Feb 2019 12:06:38 -0800 (PST)
 Received: from mka.mtv.corp.google.com ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id s73sm50115476pfi.124.2019.02.19.12.06.38
+        by smtp.gmail.com with ESMTPSA id s73sm50115476pfi.124.2019.02.19.12.06.37
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Feb 2019 12:06:39 -0800 (PST)
+        Tue, 19 Feb 2019 12:06:38 -0800 (PST)
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -62,9 +62,9 @@ Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>,
         Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v4 2/3] Bluetooth: btqcomsmd: use HCI_QUIRK_USE_BDADDR_PROPERTY
-Date:   Tue, 19 Feb 2019 12:05:58 -0800
-Message-Id: <20190219200559.13079-3-mka@chromium.org>
+Subject: [PATCH v4 1/3] Bluetooth: Add quirk for reading BD_ADDR from fwnode property
+Date:   Tue, 19 Feb 2019 12:05:57 -0800
+Message-Id: <20190219200559.13079-2-mka@chromium.org>
 X-Mailer: git-send-email 2.21.0.rc0.258.g878e2cd30e-goog
 In-Reply-To: <20190219200559.13079-1-mka@chromium.org>
 References: <20190219200559.13079-1-mka@chromium.org>
@@ -75,92 +75,152 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use the HCI_QUIRK_USE_BDADDR_PROPERTY quirk to let the HCI
-core handle the reading of 'local-bd-address'. With this there
-is no need to set HCI_QUIRK_INVALID_BDADDR, the case of a
-non-existing or invalid fwnode property is handled by the core
-code.
+Add HCI_QUIRK_USE_BDADDR_PROPERTY to allow controllers to retrieve
+the public Bluetooth address from the firmware node property
+'local-bd-address'. If quirk is set and the property does not exist
+or is invalid the controller is marked as unconfigured.
 
 Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Tested-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
 Changes in v4:
-- btqcomsmd_setup(): removed unused variables 'err' and 'btq'
-
-Changes in v3:
 - none
 
+Changes in v3:
+- return no value from hci_dev_get_bd_addr_from_property() since
+  currently nobody uses it anyway
+- use bacpy() in hci_dev_get_bd_addr_from_property()
+- return -EADDRNOTAVAIL if no BD_ADDR is configured or if the driver
+  has no ->set_bdaddr
+
 Changes in v2:
-- removed now unused field 'bdaddr' from struct btqcomsmd
+- added check for return value of ->setup()
+- only read BD_ADDR from the property if it isn't assigned yet. This
+  is needed to support configuration from user space
+- refactored the branch of the new quirk to get rid of 'bd_addr_set'
 - added 'Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>' tag
 ---
- drivers/bluetooth/btqcomsmd.c | 31 +++----------------------------
- 1 file changed, 3 insertions(+), 28 deletions(-)
+ include/net/bluetooth/hci.h | 12 +++++++++++
+ net/bluetooth/hci_core.c    | 43 +++++++++++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c        |  6 ++++--
+ 3 files changed, 59 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index 7df3eed1ef5e9..e0d4c6f1d3ab6 100644
---- a/drivers/bluetooth/btqcomsmd.c
-+++ b/drivers/bluetooth/btqcomsmd.c
-@@ -28,7 +28,6 @@
- struct btqcomsmd {
- 	struct hci_dev *hdev;
- 
--	bdaddr_t bdaddr;
- 	struct rpmsg_endpoint *acl_channel;
- 	struct rpmsg_endpoint *cmd_channel;
- };
-@@ -116,32 +115,17 @@ static int btqcomsmd_close(struct hci_dev *hdev)
- 
- static int btqcomsmd_setup(struct hci_dev *hdev)
- {
--	struct btqcomsmd *btq = hci_get_drvdata(hdev);
- 	struct sk_buff *skb;
--	int err;
- 
- 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 	kfree_skb(skb);
- 
--	/* Devices do not have persistent storage for BD address. If no
--	 * BD address has been retrieved during probe, mark the device
--	 * as having an invalid BD address.
--	 */
--	if (!bacmp(&btq->bdaddr, BDADDR_ANY)) {
--		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
--		return 0;
--	}
--
--	/* When setting a configured BD address fails, mark the device
--	 * as having an invalid BD address.
-+	/* Devices do not have persistent storage for BD address. Retrieve
-+	 * it from the firmware node property.
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c36dc1e20556a..fbba43e9bef5b 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -158,6 +158,18 @@ enum {
  	 */
--	err = qca_set_bdaddr_rome(hdev, &btq->bdaddr);
--	if (err) {
--		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
--		return 0;
--	}
-+	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 	HCI_QUIRK_INVALID_BDADDR,
  
- 	return 0;
++	/* When this quirk is set, the public Bluetooth address
++	 * initially reported by HCI Read BD Address command
++	 * is considered invalid. The public BD Address can be
++	 * specified in the fwnode property 'local-bd-address'.
++	 * If this property does not exist or is invalid controller
++	 * configuration is required before this device can be used.
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 */
++	HCI_QUIRK_USE_BDADDR_PROPERTY,
++
+ 	/* When this quirk is set, the duplicate filtering during
+ 	 * scanning is based on Bluetooth devices addresses. To allow
+ 	 * RSSI based updates, restart scanning if needed.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 26e3d36aee298..d6b2540ba7f8b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -30,6 +30,7 @@
+ #include <linux/rfkill.h>
+ #include <linux/debugfs.h>
+ #include <linux/crypto.h>
++#include <linux/property.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -1355,6 +1356,32 @@ int hci_inquiry(void __user *arg)
+ 	return err;
  }
-@@ -169,15 +153,6 @@ static int btqcomsmd_probe(struct platform_device *pdev)
- 	if (IS_ERR(btq->cmd_channel))
- 		return PTR_ERR(btq->cmd_channel);
  
--	/* The local-bd-address property is usually injected by the
--	 * bootloader which has access to the allocated BD address.
--	 */
--	if (!of_property_read_u8_array(pdev->dev.of_node, "local-bd-address",
--				       (u8 *)&btq->bdaddr, sizeof(bdaddr_t))) {
--		dev_info(&pdev->dev, "BD address %pMR retrieved from device-tree",
--			 &btq->bdaddr);
--	}
--
- 	hdev = hci_alloc_dev();
- 	if (!hdev)
- 		return -ENOMEM;
++/**
++ * hci_dev_get_bd_addr_from_property - Get the Bluetooth Device Address
++ *				       (BD_ADDR) for a HCI device from
++ *				       a firmware node property.
++ * @hdev:	The HCI device
++ *
++ * Search the firmware node for 'local-bd-address'.
++ *
++ * All-zero BD addresses are rejected, because those could be properties
++ * that exist in the firmware tables, but were not updated by the firmware. For
++ * example, the DTS could define 'local-bd-address', with zero BD addresses.
++ */
++static void hci_dev_get_bd_addr_from_property(struct hci_dev *hdev)
++{
++	struct fwnode_handle *fwnode = dev_fwnode(hdev->dev.parent);
++	bdaddr_t ba;
++	int ret;
++
++	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
++					    (u8 *)&ba, sizeof(ba));
++	if (ret < 0 || !bacmp(&ba, BDADDR_ANY))
++		return;
++
++	bacpy(&hdev->public_addr, &ba);
++}
++
+ static int hci_dev_do_open(struct hci_dev *hdev)
+ {
+ 	int ret = 0;
+@@ -1422,6 +1449,22 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 		if (hdev->setup)
+ 			ret = hdev->setup(hdev);
+ 
++		if (ret)
++			goto setup_failed;
++
++		if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
++			if (!bacmp(&hdev->public_addr, BDADDR_ANY))
++				hci_dev_get_bd_addr_from_property(hdev);
++
++			if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
++			    hdev->set_bdaddr)
++				ret = hdev->set_bdaddr(hdev,
++						       &hdev->public_addr);
++			else
++				ret = -EADDRNOTAVAIL;
++		}
++
++setup_failed:
+ 		/* The transport driver can set these quirks before
+ 		 * creating the HCI device or in its setup callback.
+ 		 *
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ccce954f81468..fae84353d030f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -551,7 +551,8 @@ static bool is_configured(struct hci_dev *hdev)
+ 	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
+ 		return false;
+ 
+-	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
++	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
++	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
+ 	    !bacmp(&hdev->public_addr, BDADDR_ANY))
+ 		return false;
+ 
+@@ -566,7 +567,8 @@ static __le32 get_missing_options(struct hci_dev *hdev)
+ 	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
+ 		options |= MGMT_OPTION_EXTERNAL_CONFIG;
+ 
+-	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
++	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
++	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
+ 	    !bacmp(&hdev->public_addr, BDADDR_ANY))
+ 		options |= MGMT_OPTION_PUBLIC_ADDRESS;
+ 
 -- 
 2.21.0.rc0.258.g878e2cd30e-goog
 
