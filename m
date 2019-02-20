@@ -2,122 +2,102 @@ Return-Path: <SRS0=cy5f=Q3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC7BDC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 11:25:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9C1C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 13:01:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C2D3206C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 11:25:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A3962147A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 13:01:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="DvVLRNpd";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="RBJ0ynFo"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="NhN/UtzT";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="NhN/UtzT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726575AbfBTLZe (ORCPT
+        id S1728183AbfBTNBP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Feb 2019 06:25:34 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:50554 "EHLO
+        Wed, 20 Feb 2019 08:01:15 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:50112 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726197AbfBTLZe (ORCPT
+        with ESMTP id S1728176AbfBTNBO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Feb 2019 06:25:34 -0500
+        Wed, 20 Feb 2019 08:01:14 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id C7F9D601EA; Wed, 20 Feb 2019 11:25:32 +0000 (UTC)
+        id E80F460716; Wed, 20 Feb 2019 13:01:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1550661932;
-        bh=h0Vo6ovhZYdyYgbdfk38gIfa4lo+R5R/ObTapMEo7Mw=;
-        h=From:To:Cc:Subject:Date:From;
-        b=DvVLRNpdcHMvplI4fV3uBd1AJgTwZ+9/dJ6AOqJOOPUi6QUbCNmvzat/Os0s6c9wG
-         oEGt5mIleCAbROHvJ5eFXWDmf3UtWOn2JJ7tv4yj87wBjqqPDQh5Sc0LblytwyGhFd
-         xn18PpKKUH8s0bTy9Yo7iGRM6OdvtBeqwuQZiAxU=
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5EFFC60585;
-        Wed, 20 Feb 2019 11:25:28 +0000 (UTC)
+        s=default; t=1550667673;
+        bh=hoSO5XqD8OaR5JQudwk4tpheMFo0FQNoHNbA9yl1ITM=;
+        h=Date:From:To:Cc:Subject:From;
+        b=NhN/UtzT87Z/O50l4xSv7WxE/5h1wukafBn4mSOB95dwHYP6RCw9IxZTmzYDFhGfh
+         JxN4zYhTe79u+CNbTSnwAgvCHCO3C2v4G0xHArVFp8+7eGoR0yJp1rrcIIuwo6iH7z
+         +Vh6qPOkHk8/cfZ759Igv3NaMLlIoH84Kasl3QIw=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 6E56F6034F;
+        Wed, 20 Feb 2019 13:01:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1550661931;
-        bh=h0Vo6ovhZYdyYgbdfk38gIfa4lo+R5R/ObTapMEo7Mw=;
-        h=From:To:Cc:Subject:Date:From;
-        b=RBJ0ynFo1YbjnZ/fwgcnfoBvMW+cfGPAy6Bwzyo3EfHeXxeS0xOb/Y4ZMZY+5WdkD
-         iesk2OammJpxJgbl21ncs66hfAZOqaNj9vU2wViaZRAII0KRbiWccT54xjSj/n7m3v
-         POYhXvMvdwl8r7iOcKT1sY+zMGU+AP8z5yKl1YlA=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 5EFFC60585
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Update baudrate change wait time for wcn3990
-Date:   Wed, 20 Feb 2019 16:55:16 +0530
-Message-Id: <20190220112516.19179-1-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.20.1
+        s=default; t=1550667673;
+        bh=hoSO5XqD8OaR5JQudwk4tpheMFo0FQNoHNbA9yl1ITM=;
+        h=Date:From:To:Cc:Subject:From;
+        b=NhN/UtzT87Z/O50l4xSv7WxE/5h1wukafBn4mSOB95dwHYP6RCw9IxZTmzYDFhGfh
+         JxN4zYhTe79u+CNbTSnwAgvCHCO3C2v4G0xHArVFp8+7eGoR0yJp1rrcIIuwo6iH7z
+         +Vh6qPOkHk8/cfZ759Igv3NaMLlIoH84Kasl3QIw=
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 20 Feb 2019 18:31:13 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Josh Boyer <jwboyer@kernel.org>
+Cc:     Hemantg <hemantg@codeaurora.org>,
+        Linux Firmware <linux-firmware@kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>,
+        Linux-arm Msm <linux-arm-msm@vger.kernel.org>,
+        Nicolas Dechesne <nicolas.dechesne@linaro.org>,
+        Kalle Valo <kvalo@codeaurora.org>
+Subject: Firmware files for QCA BT chip wcn3990
+Message-ID: <26af87bceb0a7c355ba90cce863bfd1e@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch will update the baudrate change request wait time from
-300 ms to 100 ms. When host sends the change baudrate request to
-the controller, controller sets its clock and wait until the
-clocks settle down. Here the Wait time is required for both
-host and controller to be on sync.
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
- drivers/bluetooth/hci_qca.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 5e03504c4e0c..22f3c983f868 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -59,7 +59,8 @@
- 
- #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
- #define IBS_TX_IDLE_TIMEOUT_MS		2000
--#define BAUDRATE_SETTLE_TIMEOUT_MS	300
-+#define ROME_BD_SETTLE_TIMEOUT_MS	300
-+#define WCN3990_BD_SETTLE_TIMEOUT_MS	100
- #define POWER_PULSE_TRANS_TIMEOUT_MS	100
- 
- /* susclk rate */
-@@ -965,8 +966,11 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
- 	struct sk_buff *skb;
-+	struct qca_serdev *qcadev;
-+	unsigned int bd_settling_timeout;
- 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
- 
-+	qcadev = serdev_device_get_drvdata(hu->serdev);
- 	if (baudrate > QCA_BAUDRATE_3200000)
- 		return -EINVAL;
- 
-@@ -989,8 +993,12 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	 * controller will come back after they receive this HCI command
- 	 * then host can communicate with new baudrate to controller
- 	 */
-+	bd_settling_timeout = qcadev->btsoc_type == QCA_WCN3990 ?
-+			       WCN3990_BD_SETTLE_TIMEOUT_MS :
-+			       ROME_BD_SETTLE_TIMEOUT_MS;
-+
- 	set_current_state(TASK_UNINTERRUPTIBLE);
--	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
-+	schedule_timeout(msecs_to_jiffies(bd_settling_timeout));
- 	set_current_state(TASK_RUNNING);
- 
- 	return 0;
+The following changes since commit 
+710963fe53ee3f227556d36839df3858daf6e232:
+
+   Merge https://github.com/ajaykuee/linux-firmware (2019-02-13 07:42:20 
+-0500)
+
+are available in the Git repository at:
+
+   https://github.com/bgodavar/qca_bt_wcn3990_fw.git
+
+for you to fetch changes up to f859d9fda9379205c9bcf2eab11fae68891085ee:
+
+   qca: Add firmware files for BT chip wcn3990. (2019-02-20 18:23:46 
++0530)
+
+----------------------------------------------------------------
+Balakrishna Godavarthi (1):
+       qca: Add firmware files for BT chip wcn3990.
+
+  WHENCE           |   2 +
+  qca/NOTICE.txt   | 334 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------------------------------------------------------------------------------
+  qca/crbtfw21.tlv | Bin 0 -> 177060 bytes
+  qca/crnv21.bin   | Bin 0 -> 4587 bytes
+  4 files changed, 129 insertions(+), 207 deletions(-)
+  create mode 100644 qca/crbtfw21.tlv
+  create mode 100644 qca/crnv21.bin
+
+
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
-
+Regards
+Balakrishna.
