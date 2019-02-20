@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C75CC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B00C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 23:24:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D65F42147A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 978D32089F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 23:24:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726505AbfBTXXi (ORCPT
+        id S1726070AbfBTXYk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Feb 2019 18:23:38 -0500
-Received: from mga02.intel.com ([134.134.136.20]:60708 "EHLO mga02.intel.com"
+        Wed, 20 Feb 2019 18:24:40 -0500
+Received: from mga04.intel.com ([192.55.52.120]:47593 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbfBTXXh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Feb 2019 18:23:37 -0500
+        id S1725989AbfBTXYj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 20 Feb 2019 18:24:39 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2019 15:23:37 -0800
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2019 15:24:39 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,392,1544515200"; 
-   d="scan'208";a="276609241"
+   d="scan'208";a="135084750"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.203.221])
-  by orsmga004.jf.intel.com with ESMTP; 20 Feb 2019 15:23:37 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 20 Feb 2019 15:24:39 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v6 1/1] mesh: Fix for file naming convention
-Date:   Wed, 20 Feb 2019 15:23:34 -0800
-Message-Id: <20190220232334.19863-1-brian.gix@intel.com>
+Subject: [PATCH BlueZ] mesh: Fix for file naming convention
+Date:   Wed, 20 Feb 2019 15:24:35 -0800
+Message-Id: <20190220232435.20272-1-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
