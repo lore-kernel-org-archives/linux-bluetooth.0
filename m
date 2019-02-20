@@ -2,173 +2,125 @@ Return-Path: <SRS0=cy5f=Q3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF8AC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 06:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FB1C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 10:14:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAF622147A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 06:45:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 631D82146E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 10:14:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="phEZ5p1k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730540AbfBTGpF (ORCPT
+        id S1727075AbfBTKOw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Feb 2019 01:45:05 -0500
-Received: from mail-it1-f198.google.com ([209.85.166.198]:33521 "EHLO
-        mail-it1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725890AbfBTGpE (ORCPT
+        Wed, 20 Feb 2019 05:14:52 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:36366 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725885AbfBTKOw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Feb 2019 01:45:04 -0500
-Received: by mail-it1-f198.google.com with SMTP id a184so4845704itc.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Feb 2019 22:45:04 -0800 (PST)
+        Wed, 20 Feb 2019 05:14:52 -0500
+Received: by mail-lj1-f195.google.com with SMTP id g11-v6so20317324ljk.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Feb 2019 02:14:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+drQVATyMJiDf+s8JjeurGDNSIVhCjqreTkGZvf4PPY=;
+        b=phEZ5p1kR2L47gdMLECc01VmbGozi/SISKu/2kqyqSt5gIZwAECgNDJLpx01tlX4V0
+         QP+6+tbuGxi8evXWz1SfKFZrRWx+iEUBM7hfZ6/S8eVy7ILo2fJzq58K7GL3oWPofKZQ
+         9inaSLqBPz4C1cLL33ZKCeHww6wU005Vyc2kpFkNAX9xWgmjmvPrmqbyeqtRNm4fhe8M
+         uNT473MQGv4s41d5BeRilJC7+R8Bs2fFPYXUrw7xTfOUJGMiksaA8U8kzdS/BRWtycPZ
+         RtxAb/EkpxFj9e7CRmMuaQjFf9GrZ72yrvz5h7EkjlPexZu1P/8Me6lo+Zc5je+YGDAo
+         XQ8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=ecDC1cC+bJoHUcNwtURv9W4PAiZVU3CwRNChTN9AMn0=;
-        b=IGKlVfMBrSYgDwkIbU+1HPvwBjnvEmbi+B5Mqt+j6amwggj3UhtW1f9p7j6S0n/zhp
-         jZ2YjKLK9gQmaHOZVDVizkgkm42+dVTEafuhNlvuynTS4X6odwhZ/FHS6kRMCspprOBU
-         aZ0aCqC02StCuXcJGnRWVQjz+/cFcThGG7+xvi03ZgODAr27sHPX0s04UfWa8OzyzZCp
-         iOCczpt4GMfdYD9yelWWB4iAden0g/+AGOQoi3CSFepydN+QeZRHxi8rJxv8pVS+vPNr
-         AmwbbSPnJRmGRcnzivk+9juOQchGBkA+Q9cxSBJQnzbVyW6OsBzQbQhK7kvmBz/V06CS
-         lG7Q==
-X-Gm-Message-State: AHQUAuZZyu8Z9l7wYiIJD2VBn1YwJMlbfiDMB5m1wVJn3lnqxqrs1vHw
-        EI2Lo3zKFWXKrB7287hc57yjbIbNxvJYSc52sFqcIb4b8RsH
-X-Google-Smtp-Source: AHgI3IajuZZ5VhrJhoGXCMYfNJy5kNXbVSXfFqXWuJH5LM6WTgzUSMMnwyRV8Bupq3I7CSkoQ0uifHsJgCRT3Wx49ms4A6lA9Piv
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+drQVATyMJiDf+s8JjeurGDNSIVhCjqreTkGZvf4PPY=;
+        b=eB1EwTGvirVamWJa5lAx97RS7jjLlxnDZea2TBbz0s8LJi6Vcw6Jdc/O8IJHw+pl2p
+         tSftb0m9yY1doFSL3yXge1+1eMHUAWPr8DHyIAh6P8Cf2VjhdlrNoxCeTp3K9obZJiRs
+         n42XjhMF0WwXe7UPhNtdWvRDSGkRnYDHEtY/PFBe3Wl9m1rLmvCWhk2OtvCGLEqjFUvI
+         Zks3wJldmBLRde+wKdeMrwbCi0cKjIebb+TfMKLgOTJrTHhQzmIzRDnUknM94uUTpINC
+         vobY9fahboL72C+hoGU/37/5S3YT6RngP6Lgvr8yzttEPqyPH8rs5rDeB9CePqcXSNi0
+         60Tw==
+X-Gm-Message-State: AHQUAuaWzy/Xg79OIM90/NFSEnPF2yCaDHc7E2fTwUsbhFlZQkfRBJ/K
+        Mv3Je76uxokmxbgPpxK4rIxlvRQgzGA=
+X-Google-Smtp-Source: AHgI3IbIxSsA+ALP8axKjdR54jQ2BWIjk8d+oxOZMc0aPq1o2AB6mY8T414hGOm8CloV1mR4o0wbIw==
+X-Received: by 2002:a2e:5306:: with SMTP id h6-v6mr19562622ljb.67.1550657689769;
+        Wed, 20 Feb 2019 02:14:49 -0800 (PST)
+Received: from localhost.localdomain ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id x19sm3856218lfe.42.2019.02.20.02.14.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 20 Feb 2019 02:14:49 -0800 (PST)
+From:   Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH 1/5] Bluetooth: Expose supported LE states via debugfs
+Date:   Wed, 20 Feb 2019 11:14:24 +0100
+Message-Id: <20190220101428.3086-1-andrzej.kaczmarek@codecoup.pl>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Received: by 2002:a02:9c16:: with SMTP id q22mr19383354jak.13.1550645103855;
- Tue, 19 Feb 2019 22:45:03 -0800 (PST)
-Date:   Tue, 19 Feb 2019 22:45:03 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000096952e05824db245@google.com>
-Subject: KASAN: use-after-free Read in h5_reset_rx
-From:   syzbot <syzbot+899a33dc0fa0dbaf06a6@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+It may be useful for debugging purposes to quickly retrieve supported LE
+stated bit mask for controller.
 
-syzbot found the following crash on:
-
-HEAD commit:    7a92eb7cc1dc Add linux-next specific files for 20190215
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=10b2f400c00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b16fd68f18a50133
-dashboard link: https://syzkaller.appspot.com/bug?extid=899a33dc0fa0dbaf06a6
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+899a33dc0fa0dbaf06a6@syzkaller.appspotmail.com
-
-Bluetooth: Invalid header checksum
-==================================================================
-BUG: KASAN: use-after-free in h5_reset_rx+0xe0/0x100  
-drivers/bluetooth/hci_h5.c:544
-Read of size 8 at addr ffff88809117be18 by task kworker/u4:4/880
-
-CPU: 1 PID: 880 Comm: kworker/u4:4 Not tainted 5.0.0-rc6-next-20190215 #36
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: events_unbound flush_to_ldisc
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
-  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
-  __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:132
-  h5_reset_rx+0xe0/0x100 drivers/bluetooth/hci_h5.c:544
-  h5_rx_3wire_hdr+0x2f5/0x3c0 drivers/bluetooth/hci_h5.c:455
-  h5_recv+0x30a/0x4c0 drivers/bluetooth/hci_h5.c:578
-  hci_uart_tty_receive+0x22b/0x530 drivers/bluetooth/hci_ldisc.c:607
-  tty_ldisc_receive_buf+0x164/0x1c0 drivers/tty/tty_buffer.c:465
-  tty_port_default_receive_buf+0x7d/0xb0 drivers/tty/tty_port.c:38
-  receive_buf drivers/tty/tty_buffer.c:481 [inline]
-  flush_to_ldisc+0x228/0x390 drivers/tty/tty_buffer.c:533
-  process_one_work+0x98e/0x1790 kernel/workqueue.c:2267
-  worker_thread+0x98/0xe40 kernel/workqueue.c:2413
-  kthread+0x357/0x430 kernel/kthread.c:253
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
-
-Allocated by task 6242:
-  save_stack+0x45/0xd0 mm/kasan/common.c:75
-  set_track mm/kasan/common.c:87 [inline]
-  __kasan_kmalloc mm/kasan/common.c:497 [inline]
-  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:470
-  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:511
-  kmem_cache_alloc_trace+0x151/0x760 mm/slab.c:3615
-  kmalloc include/linux/slab.h:548 [inline]
-  kzalloc include/linux/slab.h:743 [inline]
-  h5_open+0x4e4/0x5f0 drivers/bluetooth/hci_h5.c:222
-  hci_uart_set_proto drivers/bluetooth/hci_ldisc.c:686 [inline]
-  hci_uart_tty_ioctl+0x2d4/0xa70 drivers/bluetooth/hci_ldisc.c:748
-  tty_ioctl+0xac9/0x14d0 drivers/tty/tty_io.c:2664
-  vfs_ioctl fs/ioctl.c:46 [inline]
-  file_ioctl fs/ioctl.c:509 [inline]
-  do_vfs_ioctl+0xd6e/0x1390 fs/ioctl.c:696
-  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-  __do_sys_ioctl fs/ioctl.c:720 [inline]
-  __se_sys_ioctl fs/ioctl.c:718 [inline]
-  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 6242:
-  save_stack+0x45/0xd0 mm/kasan/common.c:75
-  set_track mm/kasan/common.c:87 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:459
-  kasan_slab_free+0xe/0x10 mm/kasan/common.c:467
-  __cache_free mm/slab.c:3491 [inline]
-  kfree+0xcf/0x230 mm/slab.c:3816
-  h5_close+0x11a/0x150 drivers/bluetooth/hci_h5.c:266
-  hci_uart_set_proto drivers/bluetooth/hci_ldisc.c:696 [inline]
-  hci_uart_tty_ioctl+0x839/0xa70 drivers/bluetooth/hci_ldisc.c:748
-  tty_ioctl+0xac9/0x14d0 drivers/tty/tty_io.c:2664
-  vfs_ioctl fs/ioctl.c:46 [inline]
-  file_ioctl fs/ioctl.c:509 [inline]
-  do_vfs_ioctl+0xd6e/0x1390 fs/ioctl.c:696
-  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-  __do_sys_ioctl fs/ioctl.c:720 [inline]
-  __se_sys_ioctl fs/ioctl.c:718 [inline]
-  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff88809117bb40
-  which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 728 bytes inside of
-  1024-byte region [ffff88809117bb40, ffff88809117bf40)
-The buggy address belongs to the page:
-page:ffffea0002445e80 count:1 mapcount:0 mapping:ffff88812c3f0ac0 index:0x0  
-compound_mapcount: 0
-flags: 0x1fffc0000010200(slab|head)
-raw: 01fffc0000010200 ffffea000226a888 ffffea000097a788 ffff88812c3f0ac0
-raw: 0000000000000000 ffff88809117a040 0000000100000007 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff88809117bd00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff88809117bd80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ffff88809117be00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                             ^
-  ffff88809117be80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff88809117bf00: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-==================================================================
-
-
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/bluetooth/hci_debugfs.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 51f5b1efc3a5..c0b11ebacf7d 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -679,6 +679,29 @@ static const struct file_operations force_static_address_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
++static int le_states_show(struct seq_file *f, void *ptr)
++{
++	struct hci_dev *hdev = f->private;
++
++	hci_dev_lock(hdev);
++	seq_printf(f, "LE: %8ph\n", hdev->le_states);
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++static int le_states_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, le_states_show, inode->i_private);
++}
++
++static const struct file_operations le_states_fops = {
++	.open		= le_states_open,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
+ static int white_list_show(struct seq_file *f, void *ptr)
+ {
+ 	struct hci_dev *hdev = f->private;
+@@ -956,6 +979,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+ 			    &random_address_fops);
+ 	debugfs_create_file("static_address", 0444, hdev->debugfs, hdev,
+ 			    &static_address_fops);
++	debugfs_create_file("le_states", 0444, hdev->debugfs, hdev,
++			    &le_states_fops);
+ 
+ 	/* For controllers with a public address, provide a debug
+ 	 * option to force the usage of the configured static
+-- 
+2.20.1
+
