@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C03C10F01
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77498C4360F
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 10:14:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA29B2146E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 10:14:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4800B2146E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 10:14:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="YSoBpIS6"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="oEKTrhAN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727067AbfBTKOx (ORCPT
+        id S1727092AbfBTKOx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 20 Feb 2019 05:14:53 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:35246 "EHLO
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:39268 "EHLO
         mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727051AbfBTKOw (ORCPT
+        with ESMTP id S1727055AbfBTKOx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Feb 2019 05:14:52 -0500
-Received: by mail-lj1-f196.google.com with SMTP id j13-v6so20331554ljc.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Feb 2019 02:14:51 -0800 (PST)
+        Wed, 20 Feb 2019 05:14:53 -0500
+Received: by mail-lj1-f196.google.com with SMTP id g80so20291954ljg.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Feb 2019 02:14:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Ux0dtrgyYzTH/OTO5BzOF/t6lK8o01zCWV+BGhQzL5s=;
-        b=YSoBpIS6/Lym9u+Kk63Ku/js8FQsLGeqShRzcmitHJzO19oLjYL5pdjo3Qb1XfzapN
-         aa74Xk/ZOwd0OvUGQB9tGiUPlNP/xDYF/O+DmCBTbqLRs/HVaXFmKb/VOfNuzW2R6qzw
-         OtyLmHE2A/QIF+gxgqwj3WFEzRlDJGftJm6cuw8yYb/cBMCseMdcLKnOmTeKqXKIoYEr
-         bRnF67mOXymP69xLMbxgecdFfopIlcQ5iqXy4Wu5EP0SxFver3Sc/Rbg+AJns/Ck+FdO
-         yEF34TlsNJKK145fqa0DPuxYpYUkxQUl6T6rC4+wSi+kGApZ059EPcmbFIli2jykfZun
-         hgnw==
+        bh=TvL4lojscjufBCQahPKSudRpuzY9MWZTcTvqbJH9sVg=;
+        b=oEKTrhANr4aLnSp4fG1uX0qpDcgHgpkNGupb3f8vw7G2vy6g2QMNzTzOSYGtiWOQGn
+         DAqGwX+3NAesnzrjZyHGVOIVrdJuekwOb/I7N/DmIyROd24eFH/KkDz2wxk6CdoEWF2A
+         bh4cYFklA8zCApwqpCxikFuR3vKxIAeY4v2VItOiv0tv7rq2t6u2IiLCj+j7pcqvxVRJ
+         koN03sO1aHvu5rcf1m7AMB32n0tfpcE2JUTDLWu02Q8Ig3RxnmcVYDZxN79TK+y78Nvp
+         bfW4mNLV5wu6SMstQA8VQS84OiNQIPjuYqY8j0ORKrf+9/An4M4ZxCUSVMUpMdWzMLXD
+         VCQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Ux0dtrgyYzTH/OTO5BzOF/t6lK8o01zCWV+BGhQzL5s=;
-        b=jkk/PDAnrPo80oVaQTt0uz+Cp8da6RbMb9qmLc4USctoljZRjWGTgWRshZwXOOgL3B
-         BxYHIdHw8sLnGOlD/X2r3r2SbQh+Oot6iEhlSPdKPymUu5+CDlqlsD/IcKNAwAIaOEqQ
-         pIPlV+tldt+XoAogJpeuL24FkA73GDq4+j5+n3n3Rwq3AXTLk/leu0ORRh2MY8r7P1i4
-         YBF521lW7q9F3iDbD3HfuZ7HIo886aJZbTUFD4Miv3GMDaxNhgNmxw6VpkBh357NA6/E
-         psLNabGLJmGOsSPqv4PpeILIwKg/oKcb1qywwGGDcqOVfaSA/Bjl9R/B/WzRdWhzUsVr
-         WLkA==
-X-Gm-Message-State: AHQUAubnmvPrDNqqfi1CVsOiVr6fsLy52egJfu+xq5ZzElRC4uSnuWTf
-        JwVYG6xcFPp7dMGamIGE7A+OrsZI8Xk=
-X-Google-Smtp-Source: AHgI3Ib3+ixubkNDk6KvXGeGZROOJLtk1OpGLYT5+IFIyKeMA/jgMLdAR1QONY4RsnxcykoDgUDJKw==
-X-Received: by 2002:a2e:968d:: with SMTP id q13mr20348550lji.189.1550657690494;
-        Wed, 20 Feb 2019 02:14:50 -0800 (PST)
+        bh=TvL4lojscjufBCQahPKSudRpuzY9MWZTcTvqbJH9sVg=;
+        b=IvPEOZ/okG5heCgf1jUeR+rH8RDLaywyQ9dxA4lnyeLDimhY1/bL+vrNaPcpmZnuQq
+         6H3m33mhAjulUYyPJlkbNk1jIvALPGZu9bW8THcqd9+zNgebq3hj4kGqHKyeiBUBmlzs
+         +XZsi1H/385MIK/am8bq/zkcQ5fAeK0McQ+1dXutj72e/7Ts4owfIkz1k2Rm/7wHFNCR
+         /7Pncbz3rnbSaL5IzImu6Yr+/Z4/s1wPOgWQsrgEocShLHurbxnFlSFvKi26R7lTWQUZ
+         HysDyKbkvTA+argiBm66iXfaiBihlobCVcPZF5+eTZNu+BF9uyBi8nBC1WtR1KrZabkE
+         T2EA==
+X-Gm-Message-State: AHQUAuauqxmJMDLOBjLP5Y5m1/B4xzoNIZfsNnSZbaqIsI2yhu88GyJg
+        pqxR6WKwn/85GcFLDcU3t3YHTAqU3j4=
+X-Google-Smtp-Source: AHgI3IaMtXzLqTdcOHPoAqXffE4+9uruXsHbVT1JGcrLaPkuIVSyN0NbHdLxnBCvlMmgZkbGtYG8Rg==
+X-Received: by 2002:a2e:6e09:: with SMTP id j9-v6mr19540151ljc.118.1550657691234;
+        Wed, 20 Feb 2019 02:14:51 -0800 (PST)
 Received: from localhost.localdomain ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id x19sm3856218lfe.42.2019.02.20.02.14.49
+        by smtp.gmail.com with ESMTPSA id x19sm3856218lfe.42.2019.02.20.02.14.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
         Wed, 20 Feb 2019 02:14:50 -0800 (PST)
 From:   Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH 2/5] Bluetooth: Add le_state_supported helper macro
-Date:   Wed, 20 Feb 2019 11:14:25 +0100
-Message-Id: <20190220101428.3086-2-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH 3/5] Bluetooth: Allow new connection if already a slave
+Date:   Wed, 20 Feb 2019 11:14:26 +0100
+Message-Id: <20190220101428.3086-3-andrzej.kaczmarek@codecoup.pl>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190220101428.3086-1-andrzej.kaczmarek@codecoup.pl>
 References: <20190220101428.3086-1-andrzej.kaczmarek@codecoup.pl>
@@ -72,71 +72,34 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This allows for quickly checking if given LE states combination is
-supported by controller. Combination is identified by bit number, as
-defined in Core 5.0, Vol 2, Part E, 7.8.27.
+With this patch it is possible to initiate new connection when there are
+already connections in slave role present. This requires support in the
+controller so need to check LE supported stated bit mask.
 
 Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 ---
- include/net/bluetooth/hci_core.h |  4 ++++
- net/bluetooth/hci_request.c      | 14 +++++++-------
- 2 files changed, 11 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_event.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 094e61e07030..cdbab10fc4a6 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1207,6 +1207,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- /* Extended advertising support */
- #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 609fd6871c5a..d3ac83be0427 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5072,10 +5072,11 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+ 	if (hci_bdaddr_list_lookup(&hdev->blacklist, addr, addr_type))
+ 		return NULL;
  
-+/* LE supportes states and states combinations */
-+#define le_state_supported(dev, bit) ((dev)->le_states[(bit) / 8] & \
-+				      (1 << ((bit) % 8)))
-+
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
+-	/* Most controller will fail if we try to create new connections
+-	 * while we have an existing one in slave role.
++	/* If we have existing connection in slave role, check if controller
++	 * supports Initiating State and Connection State (Slave Role) states
++	 * combination (bit #41 in states mask).
+ 	 */
+-	if (hdev->conn_hash.le_num_slave > 0)
++	if (hdev->conn_hash.le_num_slave > 0 && !(hdev->le_states[5] & 0x02))
+ 		return NULL;
  
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index ca73d36cc149..71c138c56321 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1015,28 +1015,28 @@ static bool is_advertising_allowed(struct hci_dev *hdev, bool connectable)
- 	/* Check le_states if there is any connection in slave role. */
- 	if (hdev->conn_hash.le_num_slave > 0) {
- 		/* Slave connection state and non connectable mode bit 20. */
--		if (!connectable && !(hdev->le_states[2] & 0x10))
-+		if (!connectable && !le_state_supported(hdev, 20))
- 			return false;
- 
- 		/* Slave connection state and connectable mode bit 38
- 		 * and scannable bit 21.
- 		 */
--		if (connectable && (!(hdev->le_states[4] & 0x40) ||
--				    !(hdev->le_states[2] & 0x20)))
-+		if (connectable && (!le_state_supported(hdev, 21) ||
-+				    !le_state_supported(hdev, 38)))
- 			return false;
- 	}
- 
- 	/* Check le_states if there is any connection in master role. */
- 	if (hci_conn_num(hdev, LE_LINK) != hdev->conn_hash.le_num_slave) {
--		/* Master connection state and non connectable mode bit 18. */
--		if (!connectable && !(hdev->le_states[2] & 0x02))
-+		/* Master connection state and non connectable mode bit 17. */
-+		if (!connectable && !le_state_supported(hdev, 17))
- 			return false;
- 
- 		/* Master connection state and connectable mode bit 35 and
- 		 * scannable 19.
- 		 */
--		if (connectable && (!(hdev->le_states[4] & 0x08) ||
--				    !(hdev->le_states[2] & 0x08)))
-+		if (connectable && (!le_state_supported(hdev, 19) ||
-+				    !le_state_supported(hdev, 35)))
- 			return false;
- 	}
- 
+ 	/* If we're not connectable only connect devices that we have in
 -- 
 2.20.1
 
