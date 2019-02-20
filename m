@@ -2,69 +2,63 @@ Return-Path: <SRS0=cy5f=Q3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5392EC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 10:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC7BDC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 11:25:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AC332147C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 10:14:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C2D3206C0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 11:25:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="Qvj5/WxY"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="DvVLRNpd";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="RBJ0ynFo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727145AbfBTKO5 (ORCPT
+        id S1726575AbfBTLZe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Feb 2019 05:14:57 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:38079 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727137AbfBTKO4 (ORCPT
+        Wed, 20 Feb 2019 06:25:34 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:50554 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726197AbfBTLZe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Feb 2019 05:14:56 -0500
-Received: by mail-lj1-f195.google.com with SMTP id j19so19502085ljg.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Feb 2019 02:14:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Ie6KhDPtiwMBa7/R/Fj0hX2uNGEozPAcNdx+S0IP8hQ=;
-        b=Qvj5/WxYPQwFl4Wy7r+41JRzZQP3rKByk/rHkAv8d/+jvpTr0NCYgh6ZK5GDH6zylK
-         KrDiUTCWG40lIBzcRliXGqBlF65CJKzaiEKDj4WJlXidNJg7lgU06NMR1oALGhPrmr74
-         jf1NzjdMdFKwK5npD1pM9/Fa5be/rU6bgKJBL4dTfjOVoBXkSb0knK5jq73RxcUWtWtE
-         xXLNQp0G1SxS7dULbkoacoQoeQ4ZH+uiRFWQ4H+FLQ2oxZp6bdZIqe3roKC2C7oM3ety
-         7JcMtJA+p56F5HAAMosV+8w1EQhvGeA8APX7lhabWThmfPnH/LV0HEmSN4RjxBSKT2yJ
-         9H5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Ie6KhDPtiwMBa7/R/Fj0hX2uNGEozPAcNdx+S0IP8hQ=;
-        b=tS+eQfx4YOqVG+LdV1BF2I2WuvHZz2S34+0TvAmMdJURRDCEVCdXc2LPmRYOwjJlLF
-         wpVi++W0h+MkxychJO9q72PYOhzBCBX+8E4fTrh+Iiqtasg7FEIVhxZuFFsewEEJE2iF
-         o4pt49yqziJrm7cq1AcR63nN0H/O0MqjCpjGYclJpgTdSv1/NNop/1RFmxdo/spKvFUQ
-         PS1HAu/YWaJ6RWcntwh4dVEPyfdA0cqm4By2C5ybmC7evVjjKNNc/V1w2j0KkyjkQmkZ
-         EpIZCMDPGfboEzN1HbATWk8fXiiExliLALL6YjbjZgvOSpy6t3Ff9ObVDzPDzlevOfB6
-         /z7Q==
-X-Gm-Message-State: AHQUAuaLvqRbmEhe6IpgaKt9Ronx+RYMCTS1qXCN5X9GV3WOB84VsPfa
-        SQTtwsCC9Dmk1uYGyDG8OZGNJc3Gsoc=
-X-Google-Smtp-Source: AHgI3IZvQMaIhRexAeSgbF4tXa4XfYOuPoLI8LURM6SSZQJMbZR2gCBC2RPhIwu7j9EQ+eithnaEjA==
-X-Received: by 2002:a2e:3c10:: with SMTP id j16mr853118lja.113.1550657693568;
-        Wed, 20 Feb 2019 02:14:53 -0800 (PST)
-Received: from localhost.localdomain ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id x19sm3856218lfe.42.2019.02.20.02.14.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Feb 2019 02:14:52 -0800 (PST)
-From:   Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH 5/5] Bluetooth: Fix set advertising while scanning
-Date:   Wed, 20 Feb 2019 11:14:28 +0100
-Message-Id: <20190220101428.3086-5-andrzej.kaczmarek@codecoup.pl>
+        Wed, 20 Feb 2019 06:25:34 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id C7F9D601EA; Wed, 20 Feb 2019 11:25:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1550661932;
+        bh=h0Vo6ovhZYdyYgbdfk38gIfa4lo+R5R/ObTapMEo7Mw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=DvVLRNpdcHMvplI4fV3uBd1AJgTwZ+9/dJ6AOqJOOPUi6QUbCNmvzat/Os0s6c9wG
+         oEGt5mIleCAbROHvJ5eFXWDmf3UtWOn2JJ7tv4yj87wBjqqPDQh5Sc0LblytwyGhFd
+         xn18PpKKUH8s0bTy9Yo7iGRM6OdvtBeqwuQZiAxU=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5EFFC60585;
+        Wed, 20 Feb 2019 11:25:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1550661931;
+        bh=h0Vo6ovhZYdyYgbdfk38gIfa4lo+R5R/ObTapMEo7Mw=;
+        h=From:To:Cc:Subject:Date:From;
+        b=RBJ0ynFo1YbjnZ/fwgcnfoBvMW+cfGPAy6Bwzyo3EfHeXxeS0xOb/Y4ZMZY+5WdkD
+         iesk2OammJpxJgbl21ncs66hfAZOqaNj9vU2wViaZRAII0KRbiWccT54xjSj/n7m3v
+         POYhXvMvdwl8r7iOcKT1sY+zMGU+AP8z5yKl1YlA=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 5EFFC60585
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Update baudrate change wait time for wcn3990
+Date:   Wed, 20 Feb 2019 16:55:16 +0530
+Message-Id: <20190220112516.19179-1-bgodavar@codeaurora.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190220101428.3086-1-andrzej.kaczmarek@codecoup.pl>
-References: <20190220101428.3086-1-andrzej.kaczmarek@codecoup.pl>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,65 +66,58 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We can check states supported by controller to determine whether it is
-allowed to advertise while scanning or not.
+This patch will update the baudrate change request wait time from
+300 ms to 100 ms. When host sends the change baudrate request to
+the controller, controller sets its clock and wait until the
+clocks settle down. Here the Wait time is required for both
+host and controller to be on sync.
 
-Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
- net/bluetooth/hci_request.c | 24 +++++++++++++++++++++---
- net/bluetooth/mgmt.c        |  4 +---
- 2 files changed, 22 insertions(+), 6 deletions(-)
+ drivers/bluetooth/hci_qca.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 71c138c56321..5498afec03fb 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1008,9 +1008,27 @@ static bool adv_use_rpa(struct hci_dev *hdev, uint32_t flags)
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 5e03504c4e0c..22f3c983f868 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -59,7 +59,8 @@
  
- static bool is_advertising_allowed(struct hci_dev *hdev, bool connectable)
- {
--	/* If there is no connection we are OK to advertise. */
--	if (hci_conn_num(hdev, LE_LINK) == 0)
--		return true;
-+	/* Check le_states if there is active scanning ongoing */
-+	if (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
-+	    hdev->le_scan_type == LE_SCAN_ACTIVE) {
-+		if (!connectable && !le_state_supported(hdev, 12))
-+			return false;
-+
-+		if (connectable && (!le_state_supported(hdev, 13) ||
-+				    !le_state_supported(hdev, 14)))
-+			return false;
-+	}
-+
-+	/* Check le_states if there is passive scanning ongoing */
-+	if (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
-+	    hdev->le_scan_type == LE_SCAN_PASSIVE) {
-+		if (!connectable && !le_state_supported(hdev, 8))
-+			return false;
-+
-+		if (connectable && (!le_state_supported(hdev, 9) ||
-+				    !le_state_supported(hdev, 10)))
-+			return false;
-+	}
+ #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+ #define IBS_TX_IDLE_TIMEOUT_MS		2000
+-#define BAUDRATE_SETTLE_TIMEOUT_MS	300
++#define ROME_BD_SETTLE_TIMEOUT_MS	300
++#define WCN3990_BD_SETTLE_TIMEOUT_MS	100
+ #define POWER_PULSE_TRANS_TIMEOUT_MS	100
  
- 	/* Check le_states if there is any connection in slave role. */
- 	if (hdev->conn_hash.le_num_slave > 0) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d44681c99341..3072c104888e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4333,9 +4333,7 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ /* susclk rate */
+@@ -965,8 +966,11 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
+ 	struct sk_buff *skb;
++	struct qca_serdev *qcadev;
++	unsigned int bd_settling_timeout;
+ 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+ 
++	qcadev = serdev_device_get_drvdata(hu->serdev);
+ 	if (baudrate > QCA_BAUDRATE_3200000)
+ 		return -EINVAL;
+ 
+@@ -989,8 +993,12 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	 * controller will come back after they receive this HCI command
+ 	 * then host can communicate with new baudrate to controller
  	 */
- 	if (!hdev_is_powered(hdev) ||
- 	    (val == hci_dev_test_flag(hdev, HCI_ADVERTISING) &&
--	     (cp->val == 0x02) == hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE)) ||
--	    (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
--	     hdev->le_scan_type == LE_SCAN_ACTIVE)) {
-+	     (cp->val == 0x02) == hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))) {
- 		bool changed;
++	bd_settling_timeout = qcadev->btsoc_type == QCA_WCN3990 ?
++			       WCN3990_BD_SETTLE_TIMEOUT_MS :
++			       ROME_BD_SETTLE_TIMEOUT_MS;
++
+ 	set_current_state(TASK_UNINTERRUPTIBLE);
+-	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
++	schedule_timeout(msecs_to_jiffies(bd_settling_timeout));
+ 	set_current_state(TASK_RUNNING);
  
- 		if (cp->val) {
+ 	return 0;
 -- 
-2.20.1
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
