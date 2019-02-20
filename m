@@ -2,102 +2,155 @@ Return-Path: <SRS0=cy5f=Q3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9C1C43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 13:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C75CC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A3962147A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 13:01:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="NhN/UtzT";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="NhN/UtzT"
+	by mail.kernel.org (Postfix) with ESMTP id D65F42147A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728183AbfBTNBP (ORCPT
+        id S1726505AbfBTXXi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Feb 2019 08:01:15 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:50112 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728176AbfBTNBO (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Feb 2019 08:01:14 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id E80F460716; Wed, 20 Feb 2019 13:01:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1550667673;
-        bh=hoSO5XqD8OaR5JQudwk4tpheMFo0FQNoHNbA9yl1ITM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=NhN/UtzT87Z/O50l4xSv7WxE/5h1wukafBn4mSOB95dwHYP6RCw9IxZTmzYDFhGfh
-         JxN4zYhTe79u+CNbTSnwAgvCHCO3C2v4G0xHArVFp8+7eGoR0yJp1rrcIIuwo6iH7z
-         +Vh6qPOkHk8/cfZ759Igv3NaMLlIoH84Kasl3QIw=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 6E56F6034F;
-        Wed, 20 Feb 2019 13:01:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1550667673;
-        bh=hoSO5XqD8OaR5JQudwk4tpheMFo0FQNoHNbA9yl1ITM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=NhN/UtzT87Z/O50l4xSv7WxE/5h1wukafBn4mSOB95dwHYP6RCw9IxZTmzYDFhGfh
-         JxN4zYhTe79u+CNbTSnwAgvCHCO3C2v4G0xHArVFp8+7eGoR0yJp1rrcIIuwo6iH7z
-         +Vh6qPOkHk8/cfZ759Igv3NaMLlIoH84Kasl3QIw=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 20 Feb 2019 18:31:13 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Josh Boyer <jwboyer@kernel.org>
-Cc:     Hemantg <hemantg@codeaurora.org>,
-        Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>,
-        Linux-arm Msm <linux-arm-msm@vger.kernel.org>,
-        Nicolas Dechesne <nicolas.dechesne@linaro.org>,
-        Kalle Valo <kvalo@codeaurora.org>
-Subject: Firmware files for QCA BT chip wcn3990
-Message-ID: <26af87bceb0a7c355ba90cce863bfd1e@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+        Wed, 20 Feb 2019 18:23:38 -0500
+Received: from mga02.intel.com ([134.134.136.20]:60708 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725989AbfBTXXh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 20 Feb 2019 18:23:37 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2019 15:23:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,392,1544515200"; 
+   d="scan'208";a="276609241"
+Received: from bgix-dell-lap.sea.intel.com ([10.252.203.221])
+  by orsmga004.jf.intel.com with ESMTP; 20 Feb 2019 15:23:37 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v6 1/1] mesh: Fix for file naming convention
+Date:   Wed, 20 Feb 2019 15:23:34 -0800
+Message-Id: <20190220232334.19863-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+---
+ Makefile.mesh                   | 2 +-
+ mesh/friend.c                   | 2 +-
+ mesh/{net_keys.c => net-keys.c} | 2 +-
+ mesh/{net_keys.h => net-keys.h} | 0
+ mesh/net.c                      | 2 +-
+ mesh/pb-adv.c                   | 2 +-
+ mesh/prov-acceptor.c            | 2 +-
+ mesh/prov-initiator.c           | 2 +-
+ 8 files changed, 7 insertions(+), 7 deletions(-)
+ rename mesh/{net_keys.c => net-keys.c} (99%)
+ rename mesh/{net_keys.h => net-keys.h} (100%)
 
-Hi,
-
-The following changes since commit 
-710963fe53ee3f227556d36839df3858daf6e232:
-
-   Merge https://github.com/ajaykuee/linux-firmware (2019-02-13 07:42:20 
--0500)
-
-are available in the Git repository at:
-
-   https://github.com/bgodavar/qca_bt_wcn3990_fw.git
-
-for you to fetch changes up to f859d9fda9379205c9bcf2eab11fae68891085ee:
-
-   qca: Add firmware files for BT chip wcn3990. (2019-02-20 18:23:46 
-+0530)
-
-----------------------------------------------------------------
-Balakrishna Godavarthi (1):
-       qca: Add firmware files for BT chip wcn3990.
-
-  WHENCE           |   2 +
-  qca/NOTICE.txt   | 334 
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------------------------------------------------------------------------------
-  qca/crbtfw21.tlv | Bin 0 -> 177060 bytes
-  qca/crnv21.bin   | Bin 0 -> 4587 bytes
-  4 files changed, 129 insertions(+), 207 deletions(-)
-  create mode 100644 qca/crbtfw21.tlv
-  create mode 100644 qca/crnv21.bin
-
-
+diff --git a/Makefile.mesh b/Makefile.mesh
+index 28c87a061..76e424b92 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -5,7 +5,7 @@ dbus_DATA += mesh/bluetooth-mesh.conf
+ endif
+ 
+ mesh_sources = mesh/mesh.h mesh/mesh.c \
+-				mesh/net_keys.h mesh/net_keys.c \
++				mesh/net-keys.h mesh/net-keys.c \
+ 				mesh/mesh-io.h mesh/mesh-io.c \
+ 				mesh/error.h mesh/mesh-io-api.h \
+ 				mesh/mesh-io-generic.h \
+diff --git a/mesh/friend.c b/mesh/friend.c
+index d17fde084..1722a2e71 100644
+--- a/mesh/friend.c
++++ b/mesh/friend.c
+@@ -29,7 +29,7 @@
+ #include "mesh/mesh-defs.h"
+ 
+ #include "mesh/mesh.h"
+-#include "mesh/net_keys.h"
++#include "mesh/net-keys.h"
+ #include "mesh/node.h"
+ #include "mesh/net.h"
+ #include "mesh/crypto.h"
+diff --git a/mesh/net_keys.c b/mesh/net-keys.c
+similarity index 99%
+rename from mesh/net_keys.c
+rename to mesh/net-keys.c
+index 6f7b7c18a..84e3982f5 100644
+--- a/mesh/net_keys.c
++++ b/mesh/net-keys.c
+@@ -25,7 +25,7 @@
+ #include <ell/ell.h>
+ 
+ #include "mesh/crypto.h"
+-#include "mesh/net_keys.h"
++#include "mesh/net-keys.h"
+ 
+ #define BEACON_TYPE_SNB		0x01
+ #define KEY_REFRESH		0x01
+diff --git a/mesh/net_keys.h b/mesh/net-keys.h
+similarity index 100%
+rename from mesh/net_keys.h
+rename to mesh/net-keys.h
+diff --git a/mesh/net.c b/mesh/net.c
+index 53010d57f..2adae70c3 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -32,7 +32,7 @@
+ #include "mesh/util.h"
+ 
+ #include "mesh/crypto.h"
+-#include "mesh/net_keys.h"
++#include "mesh/net-keys.h"
+ #include "mesh/mesh.h"
+ #include "mesh/node.h"
+ #include "mesh/net.h"
+diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
+index 57647e184..a6104ca89 100644
+--- a/mesh/pb-adv.c
++++ b/mesh/pb-adv.c
+@@ -39,7 +39,7 @@
+ #include "src/shared/ecc.h"
+ 
+ #include "mesh/util.h"
+-#include "mesh/net_keys.h"
++#include "mesh/net-keys.h"
+ #include "mesh/crypto.h"
+ #include "mesh/net.h"
+ #include "mesh/mesh-io.h"
+diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+index 3d4d93ba4..a8bc2c9cf 100644
+--- a/mesh/prov-acceptor.c
++++ b/mesh/prov-acceptor.c
+@@ -39,7 +39,7 @@
+ #include "src/shared/ecc.h"
+ 
+ #include "mesh/util.h"
+-#include "mesh/net_keys.h"
++#include "mesh/net-keys.h"
+ #include "mesh/crypto.h"
+ #include "mesh/net.h"
+ #include "mesh/error.h"
+diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
+index d915f2aaf..df8884a81 100644
+--- a/mesh/prov-initiator.c
++++ b/mesh/prov-initiator.c
+@@ -39,7 +39,7 @@
+ #include "src/shared/ecc.h"
+ 
+ #include "mesh/util.h"
+-#include "mesh/net_keys.h"
++#include "mesh/net-keys.h"
+ #include "mesh/crypto.h"
+ #include "mesh/net.h"
+ #include "mesh/error.h"
 -- 
-Regards
-Balakrishna.
+2.14.5
+
