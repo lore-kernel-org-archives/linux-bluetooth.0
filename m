@@ -2,121 +2,83 @@ Return-Path: <SRS0=YM4v=Q4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC43C4360F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Feb 2019 12:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD213C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Feb 2019 12:15:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C6C620855
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Feb 2019 12:10:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URQYsnYH"
+	by mail.kernel.org (Postfix) with ESMTP id 7ECED2147A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Feb 2019 12:15:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550751300;
+	bh=olCnI40NNedUTzaRsRnT3YFSc6AGJ5vx7/i+0kihzdE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=2ulOeyM/e5LyiAY7d9ZK3jknzOujqwd4VwHb3IErcIALzgpQM1kQL+YEajenOwcKQ
+	 SF8JzZh8gKukQoCCWtjsvYLcp8pZniXAQMqKe0y8tY45M+jKkKHOtXvt1AmkMq5NIW
+	 QOlYlU0iCX1+5vjQH41zvtVVir4EfYABciB/7eEc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727072AbfBUMKO (ORCPT
+        id S1725845AbfBUMPA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Feb 2019 07:10:14 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:41092 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbfBUMKN (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Feb 2019 07:10:13 -0500
-Received: by mail-ot1-f67.google.com with SMTP id t7so28274868otk.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Feb 2019 04:10:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=hTnamW/zUQ/NnHJGMDM6ZcCNfRSd4bwQFrG8aGBycCs=;
-        b=URQYsnYHmHQi2Ci/iKojax8ovGlKEYyUlZZFyOU62H5jz5INgHLl7qa45GwS75m5xc
-         7G3xmrMCzq56Vv8X/y+7wb+f7BPhpQwFUJjHqtNTZdRQaWOLNNrAW7X5bT0/SxNW++Bb
-         b/xXxodLOxDNBGaRvnfKO1i+MM1hZAUlGbcmTH5ZYcYVTFNJ/aANvDghIioXJubfRPk4
-         UaTTLm/NutTAybAPYQecVZsdrQwya6sCI7Gd3A2Nut7iSKN0nsNJ4286zlg2112PBT9G
-         +zWY1nJDnHtUywM69doRGI8HA1b8hwz84KY9EOs1fc8O0+s4mez5+rVbdi9MWtg+lAhM
-         jopg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=hTnamW/zUQ/NnHJGMDM6ZcCNfRSd4bwQFrG8aGBycCs=;
-        b=CJcEF2ioKPQqI0O2eTFQAo9Uf4EbYHJF48ERd9zlmws5oxh40jsBSbxLr5o19MLfXc
-         nBoQ6l/Vg3TmwchGk/xgDJVLoJHBaDXJ24J9iHtofjy1hvOU+pnIiiUO5e1AMhMjEVNL
-         u7GKD4qPmav0M5cgImcbvZGMc7p7GqAa94OdVnpp6BIptPLpzSJILLdjArVuXXbYbXTv
-         InpqplFYmapdIFdldI32WVsL/pPSZXmzeeQBukHevxaMdCICk7TmaWTw3RG+IbE07F1/
-         +6vDj48J9ZnvQOJlgopGWj9nvkJy2RvAQZP3zWPkGVXtVzf3JMaCR++ih9525+Ec4hf5
-         c0dw==
-X-Gm-Message-State: AHQUAua2KgL60aMKLs9gzLwQYsCYDLJXmD1cTH8pd03t3C972p7HFe+p
-        zEfVp5YJssTGEJQajkBt5VPkClKeewrSDryKVOfWyQ==
-X-Google-Smtp-Source: AHgI3IYaY9Bykhp29/Bp+gXA6RkPBg8pOYfjwmUMrzstwBFsyspyU4ikMVO84beVTBCvFj8f5DtYie6nH0t2AISAvG8=
-X-Received: by 2002:a9d:72c3:: with SMTP id d3mr14085424otk.71.1550751011571;
- Thu, 21 Feb 2019 04:10:11 -0800 (PST)
+        Thu, 21 Feb 2019 07:15:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47218 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725385AbfBUMO7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 21 Feb 2019 07:14:59 -0500
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3C8652086C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Feb 2019 12:14:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1550751299;
+        bh=olCnI40NNedUTzaRsRnT3YFSc6AGJ5vx7/i+0kihzdE=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=syP5iTK0pS4Zww27d/MkCNfwoQBgo8WLklXRefxN1g/MFEA/tBkVRud4Moad1NfNP
+         L5xfqDbor0a9SJhzjqoCi0QJ3kTUx9GM8G8LQd3o2+59kp1QaH5AZ2eIkooIN7qIse
+         t93LckiGpZHH721hnqYzYRHk6sGjdKa19Jmszumo=
+Received: by mail-qt1-f171.google.com with SMTP id z25so9416535qti.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Feb 2019 04:14:59 -0800 (PST)
+X-Gm-Message-State: AHQUAub661V7jxEYCaxELe5Zuh4/LCZrbvDmthBZ0FXHpSkT4UBzly1P
+        iA7edgj2RIsEkpNJwbG6WZ6JFXqW31fNF/5ZTbA=
+X-Google-Smtp-Source: AHgI3IYkEe6ZvBS7Gslzp4gzJr9ppc8/HPEHj2WdpDxgJZFNibZHsgMU0maAM04zrClA5wGzeQZqUv/qWozNExPe2Jg=
+X-Received: by 2002:ac8:1811:: with SMTP id q17mr21245083qtj.166.1550751298478;
+ Thu, 21 Feb 2019 04:14:58 -0800 (PST)
 MIME-Version: 1.0
-References: <20190215142301.30909-1-luiz.dentz@gmail.com>
-In-Reply-To: <20190215142301.30909-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 21 Feb 2019 14:09:59 +0200
-Message-ID: <CABBYNZLrE8TEeRrOzE7YTz9oRTT63nSyxMu9ACAg1SAmU1Moug@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] doc/advertising-api: Add support for setting
- Secondary Channel
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1550636558-16694-1-git-send-email-amit.k.bag@intel.com> <1550636558-16694-2-git-send-email-amit.k.bag@intel.com>
+In-Reply-To: <1550636558-16694-2-git-send-email-amit.k.bag@intel.com>
+From:   Josh Boyer <jwboyer@kernel.org>
+Date:   Thu, 21 Feb 2019 07:14:45 -0500
+X-Gmail-Original-Message-ID: <CA+5PVA4SK5bip=xQHsqwkQ4rUrB4X17LMOxJ2SNHbg9TUNLymw@mail.gmail.com>
+Message-ID: <CA+5PVA4SK5bip=xQHsqwkQ4rUrB4X17LMOxJ2SNHbg9TUNLymw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] linux-firmware: Update firmware file for Intel Bluetooth,9560
+To:     Amit K Bag <amit.k.bag@intel.com>
+Cc:     Linux Firmware <linux-firmware@kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-On Fri, Feb 15, 2019 at 4:23 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Tue, Feb 19, 2019 at 11:26 PM Amit K Bag <amit.k.bag@intel.com> wrote:
 >
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> This patch updates the firmware file for Intel Bluetooth 9560
+> Also it is known as Intel JeffersonPeak (JfP).
 >
-> This enables reading and setting the Secondary Channel/PHY supported
-> by the controller.
+> FW Build: REL0395
+>
+> Release Version: 20.110.0.3
+>
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
 > ---
->  doc/advertising-api.txt | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> index cfce0f9a3..b0565eab2 100644
-> --- a/doc/advertising-api.txt
-> +++ b/doc/advertising-api.txt
-> @@ -129,6 +129,15 @@ Properties string Type
->                         Timeout of the advertisement in seconds. This defines
->                         the lifetime of the advertisement.
->
-> +               string SecondaryChannel [Experimental]
-> +
-> +                       Secondary channel to be used. Primary channel is
-> +                       always set to "1M" except when "Coded" is set.
-> +
-> +                       Possible value: "1M" (default)
-> +                                       "2M"
-> +                                       "Coded"
-> +
->  LE Advertising Manager hierarchy
->  ================================
->
-> @@ -190,3 +199,13 @@ Properties byte ActiveInstances
->                         Possible values: "tx-power"
->                                          "appearance"
->                                          "local-name"
-> +
-> +               array{string} SupportedSecondaryChannels [Experimental]
-> +
-> +                       List of supported Secondary channels. Secondary
-> +                       channels can be used to advertise with the
-> +                       corresponding PHY.
-> +
-> +                       Possible values: "1M"
-> +                                        "2M"
-> +                                        "Coded"
-> --
-> 2.17.2
+>  WHENCE                |   8 ++++----
+>  intel/ibt-17-16-1.sfi | Bin 641280 -> 642664 bytes
+>  intel/ibt-17-2.sfi    | Bin 641280 -> 642664 bytes
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 
-Applied.
+Both patches applied and pushed out.  Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+josh
