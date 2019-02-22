@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B3FC4360F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 00:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F120C43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 00:34:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B24232077B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 00:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E7912083E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 00:34:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EfnqGPOX"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CZMR79TE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726673AbfBVAeO (ORCPT
+        id S1726452AbfBVAeL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Feb 2019 19:34:14 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:38583 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726178AbfBVAeM (ORCPT
+        Thu, 21 Feb 2019 19:34:11 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:37658 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726183AbfBVAeL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Feb 2019 19:34:12 -0500
-Received: by mail-pg1-f195.google.com with SMTP id m2so249079pgl.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Feb 2019 16:34:12 -0800 (PST)
+        Thu, 21 Feb 2019 19:34:11 -0500
+Received: by mail-pl1-f196.google.com with SMTP id q3so242387pll.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Feb 2019 16:34:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=OBVnoqXuO6HFOZ085kg+BDnfHXIhy9OmFMZxP4tCxpw=;
-        b=EfnqGPOXB+Uhq1/DNgFMPxIVt3T3GMCie9YVOIrnCRIlVx3XOSiSvyj2HCPFtVOlQP
-         1mh9XqgjQnMQTy3kMk4IR4CbmdabuKi3QUub2B4kB9rowmtLAYzKjXJLn8Oqx7b0AYyE
-         yMntsAzKhhAdRDaEuFyxnJQ8w8oN/QDj0rXqk=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zY2jb25QAq1g/TE6DFipzC1VS/FPvRjbhYIqEGjdavA=;
+        b=CZMR79TEp6okgbitRKUrx/zE6k1bvOTpS/MJdf4JgULsf7t8svMY7HCb5syEO4GOEw
+         B/zo7Iztup8iB5CN2rh/IeFUIjF94xXCHiJVPZ7+6sLxqxhqVkbWUE/bEz6fM2aU+ZSv
+         UuOkwX3OYX5UmrWRhNAdIBt1Zuq2nko3J0gts=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=OBVnoqXuO6HFOZ085kg+BDnfHXIhy9OmFMZxP4tCxpw=;
-        b=pQRhcwRG354EeVLR0/ipQeTwVP1ChyPaVZJb+xqyAg+hHMun6pBBq1NR10xPems+5W
-         Fuy8kNfu1pqmapSzePv1La9l3FujMNmIEUdMX3QCm3P8UF6O9wo5dpq0omWuB464tJvA
-         ooKeeJG/PkDca599TVlLPmDYuyN7B8dqDNfthBHRgvQhvCax6KuEeDlyvXALTOvQ9qYp
-         fRTBa6XWuw7eT12nLxG1Fxhgjvhlnp/tFMwNQkuwhQ/mZLS8H7+wSkVwBiGidRinzqAk
-         0oWfNgI5N10tLhrBaeJJw6ADdnFkj3jqiHOwSi98nX9NdDNzeyzWcZkQriGKk3zvXi4U
-         v+ng==
-X-Gm-Message-State: AHQUAuZOJ8dc3UJkSW8rJVkMmilrHi/d6MLG/XKFjFrw0W0EyWwRITm8
-        olfNpFNizr8vKcMYAoJO6gzB7Q==
-X-Google-Smtp-Source: AHgI3IbGOJeo1tMct7+tFWXD7jLSXbSNtxVZdnkGfxrjSW81ok1QIOiXQPjcBYhWfdhBjDo0Ual3WA==
-X-Received: by 2002:a62:7086:: with SMTP id l128mr1333899pfc.68.1550795652021;
-        Thu, 21 Feb 2019 16:34:12 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zY2jb25QAq1g/TE6DFipzC1VS/FPvRjbhYIqEGjdavA=;
+        b=JreeSNO4yuufo6c49cFt/j1WDVCtphekhdMJz4+ZeVw36W2WwJ8UHKPsKiXoLnCODU
+         2+1mW22wlCEPEBfiEtPAnNQnhjzVESHd+fmc3WK2+QpJmbYFAjJ6hiiY+VyBhlB3+o29
+         NDgWHvVCP1lGbROmgnfuvTfGqnDS41xx4zL7qFW2lpsIDny2AdU1uAOH75zCFKx6/Vbj
+         p+vTIBZd3/7nUDVQdwTwHIkPOfl6xigk0YOv/aXTrENdSKo4yDt9woZute/kbCvfZoVi
+         nd1oUjVs4VAFwl4VA2+hQoZrTO7OXSKcNrVVIa37f0RY75bQwteQ+3hcKbHmmr+itx2P
+         CX2A==
+X-Gm-Message-State: AHQUAuZuxsYPP9rvcJOXaIBmOpzsPxiD4ucWGvXy0Xup8jDC3lSCLB4U
+        3FvfwvaG6iOPJMcBaqW90CXh3g==
+X-Google-Smtp-Source: AHgI3Ib0CD3XpdWcv9QpJUjgdjW+aFVX0c54CH4gaJNQ02kxILdUJXAW0fFC8DTGWsMsGfuPCO2ylg==
+X-Received: by 2002:a17:902:33c1:: with SMTP id b59mr1345131plc.220.1550795650564;
+        Thu, 21 Feb 2019 16:34:10 -0800 (PST)
 Received: from smtp.gmail.com ([2620:15c:202:1:534:b7c0:a63c:460c])
-        by smtp.gmail.com with ESMTPSA id c3sm269830pfg.53.2019.02.21.16.34.10
+        by smtp.gmail.com with ESMTPSA id c3sm269830pfg.53.2019.02.21.16.34.09
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Feb 2019 16:34:11 -0800 (PST)
+        Thu, 21 Feb 2019 16:34:09 -0800 (PST)
 From:   Brian Norris <briannorris@chromium.org>
 To:     Heiko Stuebner <heiko@sntech.de>,
         Marcel Holtmann <marcel@holtmann.org>,
@@ -66,12 +66,10 @@ Cc:     Rob Herring <robh+dt@kernel.org>,
         Matthias Kaehlcke <mka@chromium.org>,
         Rajat Jain <rajatja@google.com>,
         Brian Norris <briannorris@chromium.org>
-Subject: [PATCH 2/3] dt-bindings: net: btusb: add QCA6174A IDs
-Date:   Thu, 21 Feb 2019 16:34:02 -0800
-Message-Id: <20190222003403.128243-2-briannorris@chromium.org>
+Subject: [PATCH 1/3] Bluetooth: btusb: add QCA6174A compatible properties
+Date:   Thu, 21 Feb 2019 16:34:01 -0800
+Message-Id: <20190222003403.128243-1-briannorris@chromium.org>
 X-Mailer: git-send-email 2.21.0.rc0.258.g878e2cd30e-goog
-In-Reply-To: <20190222003403.128243-1-briannorris@chromium.org>
-References: <20190222003403.128243-1-briannorris@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -79,28 +77,30 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There are two USB PID/VID variations I've seen for this chip, and I want
-to utilize the 'interrupts' property defined here already.
+We may need to specify a GPIO wake pin for this device, so add a
+compatible property for it.
+
+There are at least to USB PID/VID variations of this chip: one with a
+Lite-On ID and one with an Atheros ID.
 
 Signed-off-by: Brian Norris <briannorris@chromium.org>
 ---
- Documentation/devicetree/bindings/net/btusb.txt | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/btusb.txt b/Documentation/devicetree/bindings/net/btusb.txt
-index 37d67926dd6d..43c96c3380a6 100644
---- a/Documentation/devicetree/bindings/net/btusb.txt
-+++ b/Documentation/devicetree/bindings/net/btusb.txt
-@@ -9,6 +9,9 @@ Required properties:
- 		 (more may be added later) are:
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 470ee68555d9..380e6f38c607 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2862,6 +2862,8 @@ static irqreturn_t btusb_oob_wake_handler(int irq, void *priv)
  
- 		  "usb1286,204e" (Marvell 8997)
-+		  "usb0cf3,e300" (Qualcomm QCA6174A)
-+		  "usb04ca,301a" (Qualcomm QCA6174A (Lite-On))
-+
- 
- Also, vendors that use btusb may have device additional properties, e.g:
- Documentation/devicetree/bindings/net/marvell-bt-8xxx.txt
+ static const struct of_device_id btusb_match_table[] = {
+ 	{ .compatible = "usb1286,204e" },
++	{ .compatible = "usb0cf3,e300" }, /* QCA6174A */
++	{ .compatible = "usb04ca,301a" }, /* QCA6174A (Lite-On) */
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, btusb_match_table);
 -- 
 2.21.0.rc0.258.g878e2cd30e-goog
 
