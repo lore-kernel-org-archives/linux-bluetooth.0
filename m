@@ -2,141 +2,110 @@ Return-Path: <SRS0=JVds=Q5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA71EC43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 932AEC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:54:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 981AB206C0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DB7620645
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:54:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="FonEQvjF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726387AbfBVWmG (ORCPT
+        id S1726409AbfBVWyA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Feb 2019 17:42:06 -0500
-Received: from mga06.intel.com ([134.134.136.31]:62282 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725774AbfBVWmF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Feb 2019 17:42:05 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Feb 2019 14:42:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,401,1544515200"; 
-   d="scan'208";a="322661762"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga005.fm.intel.com with ESMTP; 22 Feb 2019 14:42:04 -0800
-Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Fri, 22 Feb 2019 14:42:04 -0800
-Received: from fmsmsx103.amr.corp.intel.com ([169.254.2.115]) by
- fmsmsx120.amr.corp.intel.com ([169.254.15.225]) with mapi id 14.03.0415.000;
- Fri, 22 Feb 2019 14:42:04 -0800
-From:   "Hunt, Preston" <preston.hunt@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] test/example-advertisement: add shutdown code
-Thread-Topic: [PATCH BlueZ] test/example-advertisement: add shutdown code
-Thread-Index: AQHUUcuiqacHtN6PFEK5aqYfERSN+qT7iNuA//+6GYCABFUHgIDtjZIAgAA2gwA=
-Date:   Fri, 22 Feb 2019 22:42:03 +0000
-Message-ID: <064187F9-FB73-4167-9458-242CD0A41B8E@intel.com>
-References: <5EDC8785-AB89-452A-AC80-E31A244A4467@intel.com>
- <CABBYNZKArwJcBQG+45=5VHnQ9aEb1YLz_5Of74K2sRO==VcFYw@mail.gmail.com>
- <2E41061B-EEAD-4AEA-8F2D-BB7A8753D77B@intel.com>
- <69CBFA6F-BD2D-4D2B-BBC3-93C1B83C8ADE@intel.com>
- <203CC3D6-8987-4F56-AE91-2FD642E29FDB@intel.com>
-In-Reply-To: <203CC3D6-8987-4F56-AE91-2FD642E29FDB@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Microsoft-MacOutlook/10.16.1.190220
-x-originating-ip: [10.241.225.165]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <532AE037B07BC2499589A780DB52C572@intel.com>
-Content-Transfer-Encoding: base64
+        Fri, 22 Feb 2019 17:54:00 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43927 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725878AbfBVWx7 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 Feb 2019 17:53:59 -0500
+Received: by mail-pg1-f195.google.com with SMTP id l11so1741442pgq.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Feb 2019 14:53:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nOmkR54mk1YiaV2P4+fXimG34BV3NNX5X3QQIlvQVZg=;
+        b=FonEQvjFE8rinSdK0+YhsK7NSIKGCnlG0bsqQ8t7MJflKAQnIFi7Bzwkh0rYge72WM
+         zgb/8P2VCLv4otyxW9sV36wHKm9BUynifaYI2f04CljuU+ExEsK+ON7RwyP3JlbWQkB7
+         P5ccE83/ZjI3ZXxk17E7ff9sISh959aqZuu7M=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nOmkR54mk1YiaV2P4+fXimG34BV3NNX5X3QQIlvQVZg=;
+        b=OiURQDEV/+B6nX+Knjdp9d7fF55QymUYR+JKNuH0xics12yugOpVy76E7IHmav/tGi
+         ZLTLXSR/f+4IZsAGJYdqRUXjMnitiXuU+8YC4+CdPMCH8TJrz5O8gyv/32xJrqgKb6UI
+         xyVG7bEyMNItBSycKdndK2tKg3PXjJlU8dy3zxG7F3LpCke4R83EWwnrJ/lnSEl5YVle
+         B/GJHPcyet4JyOgyUrm7dH+Zna08PkWtB00xe+Erg/bcdexLfiQrKFKA5J1WK4oPJNar
+         w+VfquHKI4CxORcwFDZ5ZH76a9Nov4S67kqlWPLLX+EcNiUwexHtUgGA4+sd2ZOqLCio
+         d3xw==
+X-Gm-Message-State: AHQUAuYNEE5QE9uO+euePfIcR4J+xOLwbDGhdPSm+WMp+yaWMqP2QxO3
+        8lHb87Dns4hVAcxYcedaPD5TPA==
+X-Google-Smtp-Source: AHgI3IbX30eBxxMnWiJnPiqgNTaN6UZxyKS5qylYNv4mkQAyTqVyKBdygA2Woo5vLcKqD2q0qeQRaQ==
+X-Received: by 2002:a62:d448:: with SMTP id u8mr6554991pfl.105.1550876039259;
+        Fri, 22 Feb 2019 14:53:59 -0800 (PST)
+Received: from smtp.gmail.com ([2620:15c:202:1:534:b7c0:a63c:460c])
+        by smtp.gmail.com with ESMTPSA id g185sm3994995pfc.174.2019.02.22.14.53.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Feb 2019 14:53:58 -0800 (PST)
+From:   Brian Norris <briannorris@chromium.org>
+To:     Heiko Stuebner <heiko@sntech.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Douglas Anderson <dianders@chromium.org>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-rockchip@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, <linux-kernel@vger.kernel.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Rajat Jain <rajatja@google.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Brian Norris <briannorris@chromium.org>
+Subject: [PATCH v2 1/3] Bluetooth: btusb: add QCA6174A compatible properties
+Date:   Fri, 22 Feb 2019 14:53:43 -0800
+Message-Id: <20190222225345.69084-1-briannorris@chromium.org>
+X-Mailer: git-send-email 2.21.0.rc0.258.g878e2cd30e-goog
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGVsbG8sDQoNCkkganVzdCByZWFsaXplZCB0aGF0IHRoaXMgcGF0Y2ggd2hpY2ggSSBoYWQgc3Vi
-bWl0dGVkIG1hbnkgbW9udGhzIGFnbyBuZXZlciBnb3QgYXBwbGllZCB0byB0aGUgbWFzdGVyIGJy
-YW5jaC4gSSB3YXMgd29uZGVyaW5nIGlmIGl0IHNsaXBwZWQgdGhyb3VnaCB0aGUgY3JhY2tzIG9y
-IGlmIHRoZXJlIHdhcyBhbiBpc3N1ZSB3aXRoIGl0LCBpbiB3aGljaCBjYXNlIEkgYW0gaGFwcHkg
-dG8gYWRkcmVzcyBhbnkgY29uY2VybnMuIFRoYW5rIHlvdSENCg0KV2l0aCBiZXN0IHJlZ2FyZHMs
-DQpQcmVzdG9uDQogICAgIA0KICAgIA0KICAgIE9uIDkvMjQvMTgsIDg6NDYgQU0sICJIdW50LCBQ
-cmVzdG9uIiA8cHJlc3Rvbi5odW50QGludGVsLmNvbT4gd3JvdGU6DQogICAgDQogICAgICAgIFRo
-ZSBwcmV2aW91cyBzYW1wbGUgY29kZSBkaWQgbm90IHJlbGVhc2UgYWxsIHJlc291cmNlcyB3aGVu
-IHNodXR0aW5nDQogICAgICAgIGRvd24uIFRoaXMgaXMgZmluZSB3aGVuIGl0J3MgYSBzdGFuZGFs
-b25lIHByb2dyYW0gc2luY2UgUHl0aG9uIHdpbGwgZnJlZQ0KICAgICAgICBhbGwgcmVzb3VyY2Vz
-IGF1dG9tYXRpY2FsbHkgd2hlbiB0aGUgcHJvY2VzcyB0ZXJtaW5hdGVzLiBIb3dldmVyLCBpbiBh
-DQogICAgICAgIGxvbmctcnVubmluZyBwcm9jZXNzLCB0aGlzIHdpbGwgZXZlbnR1YWxseSBjYXVz
-ZSBwcm9ibGVtcy4NCiAgICAgICAgDQogICAgICAgIFRoaXMgY2hhbmdlc2V0IHNob3dzIGhvdyB0
-byBwcm9wZXJseSByZWxlYXNlIGFsbCByZXNvdXJjZXMsIGlmIGFuIG9wdGlvbmFsDQogICAgICAg
-IGNvbW1hbmQgbGluZSAiLS10aW1lb3V0IiBhcmd1bWVudCBpcyB1c2VkLiBUaGUgZGVmYXVsdCBp
-cyBubyB0aW1lb3V0IHRvDQogICAgICAgIG1haW50YWluIGJlaGF2aW9yIG9mIHRoZSBwcmV2aW91
-cyBpbXBsZW1lbnRhdGlvbiAoYWR2ZXJ0aXNlbWVudHMgd2lsbCBydW4NCiAgICAgICAgZm9yZXZl
-cikuDQogICAgICAgIC0tLQ0KICAgICAgICAgdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQgfCA0
-MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0NCiAgICAgICAgIDEg
-ZmlsZSBjaGFuZ2VkLCAzMiBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkNCiAgICAgICAg
-DQogICAgICAgIGRpZmYgLS1naXQgYS90ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudCBiL3Rlc3Qv
-ZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgICAgIGluZGV4IGZkODRlYWMuLjg4YTI3YWIgMTAw
-NzU1DQogICAgICAgIC0tLSBhL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgICAgICsr
-KyBiL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgICAgIEBAIC0yLDE5ICsyLDE4IEBA
-DQogICAgICAgICANCiAgICAgICAgIGZyb20gX19mdXR1cmVfXyBpbXBvcnQgcHJpbnRfZnVuY3Rp
-b24NCiAgICAgICAgIA0KICAgICAgICAraW1wb3J0IGFyZ3BhcnNlDQogICAgICAgICBpbXBvcnQg
-ZGJ1cw0KICAgICAgICAgaW1wb3J0IGRidXMuZXhjZXB0aW9ucw0KICAgICAgICAgaW1wb3J0IGRi
-dXMubWFpbmxvb3AuZ2xpYg0KICAgICAgICAgaW1wb3J0IGRidXMuc2VydmljZQ0KICAgICAgICAt
-DQogICAgICAgIC1pbXBvcnQgYXJyYXkNCiAgICAgICAgK2ltcG9ydCB0aW1lDQogICAgICAgICtp
-bXBvcnQgdGhyZWFkaW5nDQogICAgICAgICANCiAgICAgICAgIHRyeToNCiAgICAgICAgLSAgZnJv
-bSBnaS5yZXBvc2l0b3J5IGltcG9ydCBHT2JqZWN0ICAjIHB5dGhvbjMNCiAgICAgICAgKyAgICBm
-cm9tIGdpLnJlcG9zaXRvcnkgaW1wb3J0IEdPYmplY3QgICMgcHl0aG9uMw0KICAgICAgICAgZXhj
-ZXB0IEltcG9ydEVycm9yOg0KICAgICAgICAtICBpbXBvcnQgZ29iamVjdCBhcyBHT2JqZWN0ICAj
-IHB5dGhvbjINCiAgICAgICAgLQ0KICAgICAgICAtZnJvbSByYW5kb20gaW1wb3J0IHJhbmRpbnQN
-CiAgICAgICAgKyAgICBpbXBvcnQgZ29iamVjdCBhcyBHT2JqZWN0ICAjIHB5dGhvbjINCiAgICAg
-ICAgIA0KICAgICAgICAgbWFpbmxvb3AgPSBOb25lDQogICAgICAgICANCiAgICAgICAgQEAgLTEz
-Niw2ICsxMzUsNyBAQCBjbGFzcyBBZHZlcnRpc2VtZW50KGRidXMuc2VydmljZS5PYmplY3QpOg0K
-ICAgICAgICAgICAgIGRlZiBSZWxlYXNlKHNlbGYpOg0KICAgICAgICAgICAgICAgICBwcmludCgn
-JXM6IFJlbGVhc2VkIScgJSBzZWxmLnBhdGgpDQogICAgICAgICANCiAgICAgICAgKw0KICAgICAg
-ICAgY2xhc3MgVGVzdEFkdmVydGlzZW1lbnQoQWR2ZXJ0aXNlbWVudCk6DQogICAgICAgICANCiAg
-ICAgICAgICAgICBkZWYgX19pbml0X18oc2VsZiwgYnVzLCBpbmRleCk6DQogICAgICAgIEBAIC0x
-NzAsNyArMTcwLDEzIEBAIGRlZiBmaW5kX2FkYXB0ZXIoYnVzKToNCiAgICAgICAgICAgICByZXR1
-cm4gTm9uZQ0KICAgICAgICAgDQogICAgICAgICANCiAgICAgICAgLWRlZiBtYWluKCk6DQogICAg
-ICAgICtkZWYgc2h1dGRvd24odGltZW91dCk6DQogICAgICAgICsgICAgcHJpbnQoJ0FkdmVydGlz
-aW5nIGZvciB7fSBzZWNvbmRzLi4uJy5mb3JtYXQodGltZW91dCkpDQogICAgICAgICsgICAgdGlt
-ZS5zbGVlcCh0aW1lb3V0KQ0KICAgICAgICArICAgIG1haW5sb29wLnF1aXQoKQ0KICAgICAgICAr
-DQogICAgICAgICsNCiAgICAgICAgK2RlZiBtYWluKHRpbWVvdXQ9MCk6DQogICAgICAgICAgICAg
-Z2xvYmFsIG1haW5sb29wDQogICAgICAgICANCiAgICAgICAgICAgICBkYnVzLm1haW5sb29wLmds
-aWIuREJ1c0dNYWluTG9vcChzZXRfYXNfZGVmYXVsdD1UcnVlKQ0KICAgICAgICBAQCAtMTgzLDcg
-KzE4OSw3IEBAIGRlZiBtYWluKCk6DQogICAgICAgICAgICAgICAgIHJldHVybg0KICAgICAgICAg
-DQogICAgICAgICAgICAgYWRhcHRlcl9wcm9wcyA9IGRidXMuSW50ZXJmYWNlKGJ1cy5nZXRfb2Jq
-ZWN0KEJMVUVaX1NFUlZJQ0VfTkFNRSwgYWRhcHRlciksDQogICAgICAgIC0gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICJvcmcuZnJlZWRlc2t0b3AuREJ1cy5Qcm9wZXJ0aWVzIik7
-DQogICAgICAgICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJvcmcuZnJlZWRl
-c2t0b3AuREJ1cy5Qcm9wZXJ0aWVzIikNCiAgICAgICAgIA0KICAgICAgICAgICAgIGFkYXB0ZXJf
-cHJvcHMuU2V0KCJvcmcuYmx1ZXouQWRhcHRlcjEiLCAiUG93ZXJlZCIsIGRidXMuQm9vbGVhbigx
-KSkNCiAgICAgICAgIA0KICAgICAgICBAQCAtMTk4LDcgKzIwNCwyMyBAQCBkZWYgbWFpbigpOg0K
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlcGx5X2hhbmRs
-ZXI9cmVnaXN0ZXJfYWRfY2IsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgZXJyb3JfaGFuZGxlcj1yZWdpc3Rlcl9hZF9lcnJvcl9jYikNCiAgICAgICAgIA0K
-ICAgICAgICAtICAgIG1haW5sb29wLnJ1bigpDQogICAgICAgICsgICAgaWYgdGltZW91dCA+IDA6
-DQogICAgICAgICsgICAgICAgIHRocmVhZGluZy5UaHJlYWQodGFyZ2V0PXNodXRkb3duLCBhcmdz
-PSh0aW1lb3V0LCkpLnN0YXJ0KCkNCiAgICAgICAgKyAgICBlbHNlOg0KICAgICAgICArICAgICAg
-ICBwcmludCgnQWR2ZXJ0aXNpbmcgZm9yZXZlci4uLicpDQogICAgICAgICsNCiAgICAgICAgKyAg
-ICBtYWlubG9vcC5ydW4oKSAgIyBibG9ja3MgdW50aWwgbWFpbmxvb3AucXVpdCgpIGlzIGNhbGxl
-ZA0KICAgICAgICArDQogICAgICAgICsgICAgYWRfbWFuYWdlci5VbnJlZ2lzdGVyQWR2ZXJ0aXNl
-bWVudCh0ZXN0X2FkdmVydGlzZW1lbnQpDQogICAgICAgICsgICAgcHJpbnQoJ0FkdmVydGlzZW1l
-bnQgdW5yZWdpc3RlcmVkJykNCiAgICAgICAgKyAgICBkYnVzLnNlcnZpY2UuT2JqZWN0LnJlbW92
-ZV9mcm9tX2Nvbm5lY3Rpb24odGVzdF9hZHZlcnRpc2VtZW50KQ0KICAgICAgICArDQogICAgICAg
-ICANCiAgICAgICAgIGlmIF9fbmFtZV9fID09ICdfX21haW5fXyc6DQogICAgICAgIC0gICAgbWFp
-bigpDQogICAgICAgICsgICAgcGFyc2VyID0gYXJncGFyc2UuQXJndW1lbnRQYXJzZXIoKQ0KICAg
-ICAgICArICAgIHBhcnNlci5hZGRfYXJndW1lbnQoJy0tdGltZW91dCcsIGRlZmF1bHQ9MCwgdHlw
-ZT1pbnQsIGhlbHA9ImFkdmVydGlzZSAiICsNCiAgICAgICAgKyAgICAgICAgICAgICAgICAgICAg
-ICAgICJmb3IgdGhpcyBtYW55IHNlY29uZHMgdGhlbiBzdG9wLCAwPXJ1biBmb3JldmVyICIgKw0K
-ICAgICAgICArICAgICAgICAgICAgICAgICAgICAgICAgIihkZWZhdWx0OiAwKSIpDQogICAgICAg
-ICsgICAgYXJncyA9IHBhcnNlci5wYXJzZV9hcmdzKCkNCiAgICAgICAgKw0KICAgICAgICArICAg
-IG1haW4oYXJncy50aW1lb3V0KQ0KICAgICAgICAtLSANCiAgICAgICAgMi43LjQNCiAgICAgICAg
-DQogICAgICAgIA0KICAgIA0KICAgIA0KDQo=
+We may need to specify a GPIO wake pin for this device, so add a
+compatible property for it.
+
+There are at least to USB PID/VID variations of this chip: one with a
+Lite-On ID and one with an Atheros ID.
+
+Signed-off-by: Brian Norris <briannorris@chromium.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+---
+v2:
+ * drop leading zeroes from VID, per documented binding
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 470ee68555d9..54cb5f583b1d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2862,6 +2862,8 @@ static irqreturn_t btusb_oob_wake_handler(int irq, void *priv)
+ 
+ static const struct of_device_id btusb_match_table[] = {
+ 	{ .compatible = "usb1286,204e" },
++	{ .compatible = "usbcf3,e300" }, /* QCA6174A */
++	{ .compatible = "usb4ca,301a" }, /* QCA6174A (Lite-On) */
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, btusb_match_table);
+-- 
+2.21.0.rc0.258.g878e2cd30e-goog
+
