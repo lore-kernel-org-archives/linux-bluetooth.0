@@ -1,107 +1,77 @@
-Return-Path: <SRS0=YM4v=Q4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=JVds=Q5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C254CC43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Feb 2019 12:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D679EC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 00:07:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 925842084D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Feb 2019 12:24:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550751863;
-	bh=9ILh9CC7tAgMYKxhVbSPMN3W8MvLdP1MIoUjk+hlmOU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=zIncGVdZetBRG9wkq3RX7kdX+LOwECXrwhJ+i1dBfbp/YoZfjWaZMEgIEprNoC14+
-	 qxeQATN9zUbhHWJoTlZeds9OGG/OPeUjMF5aZEpBiJTFEHIOtaAgmzjoFrdjzforhg
-	 F7Thrgig5tMnASU3xbMQUtx8/FFE93uNNB8MN+IE=
+	by mail.kernel.org (Postfix) with ESMTP id ABB9C20838
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 00:07:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbfBUMYS (ORCPT
+        id S1726415AbfBVAHH convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Feb 2019 07:24:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50722 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725385AbfBUMYS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Feb 2019 07:24:18 -0500
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 156412086C;
-        Thu, 21 Feb 2019 12:24:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550751857;
-        bh=9ILh9CC7tAgMYKxhVbSPMN3W8MvLdP1MIoUjk+hlmOU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=VWztl3NmP2YenaUQp+kkvMmnfKIyKSijEYxlIXnMk17g8YpWk6hkaQRaUF2FniuZP
-         UTu/JWDnhw+y5TtCkmWeKVDr/po/pkzpE94ZXyPOho8uY+XRIGn8LfMJUQMXC6AWwF
-         f+ZnezAR+MOp196StL7xVL7JTK4H1meLXf389ZRw=
-Received: by mail-qt1-f177.google.com with SMTP id d2so5517112qti.11;
-        Thu, 21 Feb 2019 04:24:17 -0800 (PST)
-X-Gm-Message-State: AHQUAuZE+JC8C+LGAq2NKMkV7kZTkusFMFy4b0T5+nVioSTgvnoE3t88
-        Ta/8t1moSbNtnS/xM3Cha+tWQg4Ds2qld/yI5Pw=
-X-Google-Smtp-Source: AHgI3IalFhvinEzqjpSQzBoj4P/usF0v98UMohZfTMKw+h1l8D833+vzZEQQBXokftOJJdYnUV2qcJdbrxVU0Q3bY/0=
-X-Received: by 2002:ac8:23aa:: with SMTP id q39mr30474455qtq.82.1550751856300;
- Thu, 21 Feb 2019 04:24:16 -0800 (PST)
-MIME-Version: 1.0
-References: <26af87bceb0a7c355ba90cce863bfd1e@codeaurora.org>
-In-Reply-To: <26af87bceb0a7c355ba90cce863bfd1e@codeaurora.org>
-From:   Josh Boyer <jwboyer@kernel.org>
-Date:   Thu, 21 Feb 2019 07:24:05 -0500
-X-Gmail-Original-Message-ID: <CA+5PVA4HC-imfDHSECY3PntPRL0SquPmMkC7bzUVrabnJnYQpA@mail.gmail.com>
-Message-ID: <CA+5PVA4HC-imfDHSECY3PntPRL0SquPmMkC7bzUVrabnJnYQpA@mail.gmail.com>
-Subject: Re: Firmware files for QCA BT chip wcn3990
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Hemantg <hemantg@codeaurora.org>,
-        Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>,
-        Linux-arm Msm <linux-arm-msm@vger.kernel.org>,
-        Nicolas Dechesne <nicolas.dechesne@linaro.org>,
-        Kalle Valo <kvalo@codeaurora.org>
+        Thu, 21 Feb 2019 19:07:07 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:54270 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726035AbfBVAHG (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 21 Feb 2019 19:07:06 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 2804031D17
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Feb 2019 00:07:06 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 189AD31DBF; Fri, 22 Feb 2019 00:07:06 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 202465] Bluetooth adaptor dies - 0489:e0a2 Foxconn / Hon Hai
+Date:   Fri, 22 Feb 2019 00:07:06 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: jccantele49@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cf_kernel_version
+Message-ID: <bug-202465-62941-fAr7PHQRTF@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-202465-62941@https.bugzilla.kernel.org/>
+References: <bug-202465-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Feb 20, 2019 at 8:01 AM Balakrishna Godavarthi
-<bgodavar@codeaurora.org> wrote:
->
->
-> Hi,
->
-> The following changes since commit
-> 710963fe53ee3f227556d36839df3858daf6e232:
->
->    Merge https://github.com/ajaykuee/linux-firmware (2019-02-13 07:42:20
-> -0500)
->
-> are available in the Git repository at:
->
->    https://github.com/bgodavar/qca_bt_wcn3990_fw.git
->
-> for you to fetch changes up to f859d9fda9379205c9bcf2eab11fae68891085ee:
->
->    qca: Add firmware files for BT chip wcn3990. (2019-02-20 18:23:46
-> +0530)
->
-> ----------------------------------------------------------------
-> Balakrishna Godavarthi (1):
->        qca: Add firmware files for BT chip wcn3990.
->
->   WHENCE           |   2 +
->   qca/NOTICE.txt   | 334
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------------------------------------------------------------------------------
->   qca/crbtfw21.tlv | Bin 0 -> 177060 bytes
->   qca/crnv21.bin   | Bin 0 -> 4587 bytes
->   4 files changed, 129 insertions(+), 207 deletions(-)
->   create mode 100644 qca/crbtfw21.tlv
->   create mode 100644 qca/crnv21.bin
+https://bugzilla.kernel.org/show_bug.cgi?id=202465
 
-Pulled and pushed out.  Thanks.
+Jacob C (jccantele49@gmail.com) changed:
 
-josh
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+     Kernel Version|4.20.3-1, 4.19.16-1,        |4.20.10-1, 4.19.16-1,
+                   |4.18.16                     |4.18.16
+
+--- Comment #5 from Jacob C (jccantele49@gmail.com) ---
+This issue persists in kernel 4.20.10
+
+I still haven't heard any feedback from anyone on this issue... is there
+something else I need to do?
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
