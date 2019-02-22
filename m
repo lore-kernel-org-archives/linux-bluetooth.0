@@ -2,99 +2,141 @@ Return-Path: <SRS0=JVds=Q5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3ABC43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA71EC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:42:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 952A62075C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:11:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bltQQJBq"
+	by mail.kernel.org (Postfix) with ESMTP id 981AB206C0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 22:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725900AbfBVWLO (ORCPT
+        id S1726387AbfBVWmG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Feb 2019 17:11:14 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:36103 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbfBVWLO (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Feb 2019 17:11:14 -0500
-Received: by mail-ed1-f68.google.com with SMTP id g9so3090532eds.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Feb 2019 14:11:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yuHwDkyo+FE+kx/nk3ypUawi0rYD4PuoS1hwu59DHRQ=;
-        b=bltQQJBq77iVWZX8IQbvi4zj/TVzxkPp4uD+6beKh9il3NgC922hIXmrNvJ5nJKX+R
-         xux+2kSNS3JZM/F762m4oOQhE6QbqSF7CJMR8o2Vra8pC207nD+20jVqx5KocXNGKAg6
-         qrpKUWtRWWVJPdDCI1voshOEkZ2Pje8Qo+Yq0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yuHwDkyo+FE+kx/nk3ypUawi0rYD4PuoS1hwu59DHRQ=;
-        b=nB8oCL32eCLGA3/M9igxI8jlI6zBcI980BT83lwir3je6z7hWBh3U8nOODZe1r/vxt
-         uAylqb/ZSDjFujgKKyPGkLXqJZ1NwBl14g3r8TPM1MZBewEMzzdxy68lsWIx99zS2e1t
-         SPYWlCZ3ztbBlSXji0YjzqnxZaq8TTjwZc6LXQYOlmXRhXJ07jCu1iGCjaph4Me/MZCf
-         2dUmxgGsY9Duaa8na96EJcRPfJzXDqtYh+S+m0lv7sgSLkw6diL8erfom2cUd52YBAm8
-         VAdgUcfgp4EJNCuZFyoH+4KeiWwxoco0nmtFQp8ywbODqWpGiRadfBF1TKnp1cDxvw3D
-         5J/Q==
-X-Gm-Message-State: AHQUAubgf3IrSbDwz0+WjNL3ty07FdEXy7iu5h1c8CD6ukzGmm9RGB5p
-        h6sWpO1x5JR9TK1b1OodZvSOfQ+axoc=
-X-Google-Smtp-Source: AHgI3IbNkpdgyHO881TKg6COyEGLzome8OcVEktiWDwrgMf5A2UZyDxfYQBshJpiHrhzWRIbhGdg3g==
-X-Received: by 2002:a17:906:82c2:: with SMTP id a2mr4469547ejy.8.1550873471761;
-        Fri, 22 Feb 2019 14:11:11 -0800 (PST)
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com. [209.85.208.49])
-        by smtp.gmail.com with ESMTPSA id c20sm690725ede.76.2019.02.22.14.11.10
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Feb 2019 14:11:10 -0800 (PST)
-Received: by mail-ed1-f49.google.com with SMTP id 10so3064187eds.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Feb 2019 14:11:10 -0800 (PST)
-X-Received: by 2002:a05:6402:164a:: with SMTP id s10mr4911135edx.6.1550873469625;
- Fri, 22 Feb 2019 14:11:09 -0800 (PST)
+        Fri, 22 Feb 2019 17:42:06 -0500
+Received: from mga06.intel.com ([134.134.136.31]:62282 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725774AbfBVWmF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 Feb 2019 17:42:05 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Feb 2019 14:42:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,401,1544515200"; 
+   d="scan'208";a="322661762"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by fmsmga005.fm.intel.com with ESMTP; 22 Feb 2019 14:42:04 -0800
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Fri, 22 Feb 2019 14:42:04 -0800
+Received: from fmsmsx103.amr.corp.intel.com ([169.254.2.115]) by
+ fmsmsx120.amr.corp.intel.com ([169.254.15.225]) with mapi id 14.03.0415.000;
+ Fri, 22 Feb 2019 14:42:04 -0800
+From:   "Hunt, Preston" <preston.hunt@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] test/example-advertisement: add shutdown code
+Thread-Topic: [PATCH BlueZ] test/example-advertisement: add shutdown code
+Thread-Index: AQHUUcuiqacHtN6PFEK5aqYfERSN+qT7iNuA//+6GYCABFUHgIDtjZIAgAA2gwA=
+Date:   Fri, 22 Feb 2019 22:42:03 +0000
+Message-ID: <064187F9-FB73-4167-9458-242CD0A41B8E@intel.com>
+References: <5EDC8785-AB89-452A-AC80-E31A244A4467@intel.com>
+ <CABBYNZKArwJcBQG+45=5VHnQ9aEb1YLz_5Of74K2sRO==VcFYw@mail.gmail.com>
+ <2E41061B-EEAD-4AEA-8F2D-BB7A8753D77B@intel.com>
+ <69CBFA6F-BD2D-4D2B-BBC3-93C1B83C8ADE@intel.com>
+ <203CC3D6-8987-4F56-AE91-2FD642E29FDB@intel.com>
+In-Reply-To: <203CC3D6-8987-4F56-AE91-2FD642E29FDB@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/10.16.1.190220
+x-originating-ip: [10.241.225.165]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <532AE037B07BC2499589A780DB52C572@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190222003403.128243-1-briannorris@chromium.org>
- <20190222003403.128243-2-briannorris@chromium.org> <5efc9f02-eeb8-78cc-0f11-13e0010efd46@arm.com>
-In-Reply-To: <5efc9f02-eeb8-78cc-0f11-13e0010efd46@arm.com>
-From:   Brian Norris <briannorris@chromium.org>
-Date:   Fri, 22 Feb 2019 14:10:57 -0800
-X-Gmail-Original-Message-ID: <CA+ASDXOFTYmXHw6DD6f3P-0DfyKGZUt9MANEYZXfBBkiXqikYQ@mail.gmail.com>
-Message-ID: <CA+ASDXOFTYmXHw6DD6f3P-0DfyKGZUt9MANEYZXfBBkiXqikYQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] dt-bindings: net: btusb: add QCA6174A IDs
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Heiko Stuebner <heiko@sntech.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree@vger.kernel.org,
-        Linux Bluetooth mailing list 
-        <linux-bluetooth@vger.kernel.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        "open list:ARM/Rockchip SoC..." <linux-rockchip@lists.infradead.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Rajat Jain <rajatja@google.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Feb 22, 2019 at 1:57 PM Robin Murphy <robin.murphy@arm.com> wrote:
-> On 2019-02-22 12:34 am, Brian Norris wrote:
-> > +               "usb0cf3,e300" (Qualcomm QCA6174A)
-> > +               "usb04ca,301a" (Qualcomm QCA6174A (Lite-On))
->
-> Nit: the USB device binding states that those leading zeroes in the VIDs
-> should be suppressed.
-
-Ah, thanks. Didn't notice that part. I'll remove the zeroes and resend.
-
-Brian
+SGVsbG8sDQoNCkkganVzdCByZWFsaXplZCB0aGF0IHRoaXMgcGF0Y2ggd2hpY2ggSSBoYWQgc3Vi
+bWl0dGVkIG1hbnkgbW9udGhzIGFnbyBuZXZlciBnb3QgYXBwbGllZCB0byB0aGUgbWFzdGVyIGJy
+YW5jaC4gSSB3YXMgd29uZGVyaW5nIGlmIGl0IHNsaXBwZWQgdGhyb3VnaCB0aGUgY3JhY2tzIG9y
+IGlmIHRoZXJlIHdhcyBhbiBpc3N1ZSB3aXRoIGl0LCBpbiB3aGljaCBjYXNlIEkgYW0gaGFwcHkg
+dG8gYWRkcmVzcyBhbnkgY29uY2VybnMuIFRoYW5rIHlvdSENCg0KV2l0aCBiZXN0IHJlZ2FyZHMs
+DQpQcmVzdG9uDQogICAgIA0KICAgIA0KICAgIE9uIDkvMjQvMTgsIDg6NDYgQU0sICJIdW50LCBQ
+cmVzdG9uIiA8cHJlc3Rvbi5odW50QGludGVsLmNvbT4gd3JvdGU6DQogICAgDQogICAgICAgIFRo
+ZSBwcmV2aW91cyBzYW1wbGUgY29kZSBkaWQgbm90IHJlbGVhc2UgYWxsIHJlc291cmNlcyB3aGVu
+IHNodXR0aW5nDQogICAgICAgIGRvd24uIFRoaXMgaXMgZmluZSB3aGVuIGl0J3MgYSBzdGFuZGFs
+b25lIHByb2dyYW0gc2luY2UgUHl0aG9uIHdpbGwgZnJlZQ0KICAgICAgICBhbGwgcmVzb3VyY2Vz
+IGF1dG9tYXRpY2FsbHkgd2hlbiB0aGUgcHJvY2VzcyB0ZXJtaW5hdGVzLiBIb3dldmVyLCBpbiBh
+DQogICAgICAgIGxvbmctcnVubmluZyBwcm9jZXNzLCB0aGlzIHdpbGwgZXZlbnR1YWxseSBjYXVz
+ZSBwcm9ibGVtcy4NCiAgICAgICAgDQogICAgICAgIFRoaXMgY2hhbmdlc2V0IHNob3dzIGhvdyB0
+byBwcm9wZXJseSByZWxlYXNlIGFsbCByZXNvdXJjZXMsIGlmIGFuIG9wdGlvbmFsDQogICAgICAg
+IGNvbW1hbmQgbGluZSAiLS10aW1lb3V0IiBhcmd1bWVudCBpcyB1c2VkLiBUaGUgZGVmYXVsdCBp
+cyBubyB0aW1lb3V0IHRvDQogICAgICAgIG1haW50YWluIGJlaGF2aW9yIG9mIHRoZSBwcmV2aW91
+cyBpbXBsZW1lbnRhdGlvbiAoYWR2ZXJ0aXNlbWVudHMgd2lsbCBydW4NCiAgICAgICAgZm9yZXZl
+cikuDQogICAgICAgIC0tLQ0KICAgICAgICAgdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQgfCA0
+MiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0NCiAgICAgICAgIDEg
+ZmlsZSBjaGFuZ2VkLCAzMiBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMoLSkNCiAgICAgICAg
+DQogICAgICAgIGRpZmYgLS1naXQgYS90ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudCBiL3Rlc3Qv
+ZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgICAgIGluZGV4IGZkODRlYWMuLjg4YTI3YWIgMTAw
+NzU1DQogICAgICAgIC0tLSBhL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgICAgICsr
+KyBiL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgICAgIEBAIC0yLDE5ICsyLDE4IEBA
+DQogICAgICAgICANCiAgICAgICAgIGZyb20gX19mdXR1cmVfXyBpbXBvcnQgcHJpbnRfZnVuY3Rp
+b24NCiAgICAgICAgIA0KICAgICAgICAraW1wb3J0IGFyZ3BhcnNlDQogICAgICAgICBpbXBvcnQg
+ZGJ1cw0KICAgICAgICAgaW1wb3J0IGRidXMuZXhjZXB0aW9ucw0KICAgICAgICAgaW1wb3J0IGRi
+dXMubWFpbmxvb3AuZ2xpYg0KICAgICAgICAgaW1wb3J0IGRidXMuc2VydmljZQ0KICAgICAgICAt
+DQogICAgICAgIC1pbXBvcnQgYXJyYXkNCiAgICAgICAgK2ltcG9ydCB0aW1lDQogICAgICAgICtp
+bXBvcnQgdGhyZWFkaW5nDQogICAgICAgICANCiAgICAgICAgIHRyeToNCiAgICAgICAgLSAgZnJv
+bSBnaS5yZXBvc2l0b3J5IGltcG9ydCBHT2JqZWN0ICAjIHB5dGhvbjMNCiAgICAgICAgKyAgICBm
+cm9tIGdpLnJlcG9zaXRvcnkgaW1wb3J0IEdPYmplY3QgICMgcHl0aG9uMw0KICAgICAgICAgZXhj
+ZXB0IEltcG9ydEVycm9yOg0KICAgICAgICAtICBpbXBvcnQgZ29iamVjdCBhcyBHT2JqZWN0ICAj
+IHB5dGhvbjINCiAgICAgICAgLQ0KICAgICAgICAtZnJvbSByYW5kb20gaW1wb3J0IHJhbmRpbnQN
+CiAgICAgICAgKyAgICBpbXBvcnQgZ29iamVjdCBhcyBHT2JqZWN0ICAjIHB5dGhvbjINCiAgICAg
+ICAgIA0KICAgICAgICAgbWFpbmxvb3AgPSBOb25lDQogICAgICAgICANCiAgICAgICAgQEAgLTEz
+Niw2ICsxMzUsNyBAQCBjbGFzcyBBZHZlcnRpc2VtZW50KGRidXMuc2VydmljZS5PYmplY3QpOg0K
+ICAgICAgICAgICAgIGRlZiBSZWxlYXNlKHNlbGYpOg0KICAgICAgICAgICAgICAgICBwcmludCgn
+JXM6IFJlbGVhc2VkIScgJSBzZWxmLnBhdGgpDQogICAgICAgICANCiAgICAgICAgKw0KICAgICAg
+ICAgY2xhc3MgVGVzdEFkdmVydGlzZW1lbnQoQWR2ZXJ0aXNlbWVudCk6DQogICAgICAgICANCiAg
+ICAgICAgICAgICBkZWYgX19pbml0X18oc2VsZiwgYnVzLCBpbmRleCk6DQogICAgICAgIEBAIC0x
+NzAsNyArMTcwLDEzIEBAIGRlZiBmaW5kX2FkYXB0ZXIoYnVzKToNCiAgICAgICAgICAgICByZXR1
+cm4gTm9uZQ0KICAgICAgICAgDQogICAgICAgICANCiAgICAgICAgLWRlZiBtYWluKCk6DQogICAg
+ICAgICtkZWYgc2h1dGRvd24odGltZW91dCk6DQogICAgICAgICsgICAgcHJpbnQoJ0FkdmVydGlz
+aW5nIGZvciB7fSBzZWNvbmRzLi4uJy5mb3JtYXQodGltZW91dCkpDQogICAgICAgICsgICAgdGlt
+ZS5zbGVlcCh0aW1lb3V0KQ0KICAgICAgICArICAgIG1haW5sb29wLnF1aXQoKQ0KICAgICAgICAr
+DQogICAgICAgICsNCiAgICAgICAgK2RlZiBtYWluKHRpbWVvdXQ9MCk6DQogICAgICAgICAgICAg
+Z2xvYmFsIG1haW5sb29wDQogICAgICAgICANCiAgICAgICAgICAgICBkYnVzLm1haW5sb29wLmds
+aWIuREJ1c0dNYWluTG9vcChzZXRfYXNfZGVmYXVsdD1UcnVlKQ0KICAgICAgICBAQCAtMTgzLDcg
+KzE4OSw3IEBAIGRlZiBtYWluKCk6DQogICAgICAgICAgICAgICAgIHJldHVybg0KICAgICAgICAg
+DQogICAgICAgICAgICAgYWRhcHRlcl9wcm9wcyA9IGRidXMuSW50ZXJmYWNlKGJ1cy5nZXRfb2Jq
+ZWN0KEJMVUVaX1NFUlZJQ0VfTkFNRSwgYWRhcHRlciksDQogICAgICAgIC0gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICJvcmcuZnJlZWRlc2t0b3AuREJ1cy5Qcm9wZXJ0aWVzIik7
+DQogICAgICAgICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJvcmcuZnJlZWRl
+c2t0b3AuREJ1cy5Qcm9wZXJ0aWVzIikNCiAgICAgICAgIA0KICAgICAgICAgICAgIGFkYXB0ZXJf
+cHJvcHMuU2V0KCJvcmcuYmx1ZXouQWRhcHRlcjEiLCAiUG93ZXJlZCIsIGRidXMuQm9vbGVhbigx
+KSkNCiAgICAgICAgIA0KICAgICAgICBAQCAtMTk4LDcgKzIwNCwyMyBAQCBkZWYgbWFpbigpOg0K
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJlcGx5X2hhbmRs
+ZXI9cmVnaXN0ZXJfYWRfY2IsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgZXJyb3JfaGFuZGxlcj1yZWdpc3Rlcl9hZF9lcnJvcl9jYikNCiAgICAgICAgIA0K
+ICAgICAgICAtICAgIG1haW5sb29wLnJ1bigpDQogICAgICAgICsgICAgaWYgdGltZW91dCA+IDA6
+DQogICAgICAgICsgICAgICAgIHRocmVhZGluZy5UaHJlYWQodGFyZ2V0PXNodXRkb3duLCBhcmdz
+PSh0aW1lb3V0LCkpLnN0YXJ0KCkNCiAgICAgICAgKyAgICBlbHNlOg0KICAgICAgICArICAgICAg
+ICBwcmludCgnQWR2ZXJ0aXNpbmcgZm9yZXZlci4uLicpDQogICAgICAgICsNCiAgICAgICAgKyAg
+ICBtYWlubG9vcC5ydW4oKSAgIyBibG9ja3MgdW50aWwgbWFpbmxvb3AucXVpdCgpIGlzIGNhbGxl
+ZA0KICAgICAgICArDQogICAgICAgICsgICAgYWRfbWFuYWdlci5VbnJlZ2lzdGVyQWR2ZXJ0aXNl
+bWVudCh0ZXN0X2FkdmVydGlzZW1lbnQpDQogICAgICAgICsgICAgcHJpbnQoJ0FkdmVydGlzZW1l
+bnQgdW5yZWdpc3RlcmVkJykNCiAgICAgICAgKyAgICBkYnVzLnNlcnZpY2UuT2JqZWN0LnJlbW92
+ZV9mcm9tX2Nvbm5lY3Rpb24odGVzdF9hZHZlcnRpc2VtZW50KQ0KICAgICAgICArDQogICAgICAg
+ICANCiAgICAgICAgIGlmIF9fbmFtZV9fID09ICdfX21haW5fXyc6DQogICAgICAgIC0gICAgbWFp
+bigpDQogICAgICAgICsgICAgcGFyc2VyID0gYXJncGFyc2UuQXJndW1lbnRQYXJzZXIoKQ0KICAg
+ICAgICArICAgIHBhcnNlci5hZGRfYXJndW1lbnQoJy0tdGltZW91dCcsIGRlZmF1bHQ9MCwgdHlw
+ZT1pbnQsIGhlbHA9ImFkdmVydGlzZSAiICsNCiAgICAgICAgKyAgICAgICAgICAgICAgICAgICAg
+ICAgICJmb3IgdGhpcyBtYW55IHNlY29uZHMgdGhlbiBzdG9wLCAwPXJ1biBmb3JldmVyICIgKw0K
+ICAgICAgICArICAgICAgICAgICAgICAgICAgICAgICAgIihkZWZhdWx0OiAwKSIpDQogICAgICAg
+ICsgICAgYXJncyA9IHBhcnNlci5wYXJzZV9hcmdzKCkNCiAgICAgICAgKw0KICAgICAgICArICAg
+IG1haW4oYXJncy50aW1lb3V0KQ0KICAgICAgICAtLSANCiAgICAgICAgMi43LjQNCiAgICAgICAg
+DQogICAgICAgIA0KICAgIA0KICAgIA0KDQo=
