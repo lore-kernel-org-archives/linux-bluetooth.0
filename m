@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4EFC43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 06:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8801FC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 06:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A00D20818
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 06:32:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E90020818
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Feb 2019 06:32:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725927AbfBVGcX (ORCPT
+        id S1725889AbfBVGch (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Feb 2019 01:32:23 -0500
-Received: from mga07.intel.com ([134.134.136.100]:9954 "EHLO mga07.intel.com"
+        Fri, 22 Feb 2019 01:32:37 -0500
+Received: from mga06.intel.com ([134.134.136.31]:62023 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725889AbfBVGcX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Feb 2019 01:32:23 -0500
+        id S1725873AbfBVGcg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 Feb 2019 01:32:36 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Feb 2019 22:32:23 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Feb 2019 22:32:36 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,398,1544515200"; 
-   d="scan'208";a="301674848"
+   d="scan'208";a="301674875"
 Received: from ingas-nuc1.sea.intel.com ([10.251.136.115])
-  by orsmga005.jf.intel.com with ESMTP; 21 Feb 2019 22:32:21 -0800
+  by orsmga005.jf.intel.com with ESMTP; 21 Feb 2019 22:32:28 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 1/3 v2] mesh: Re-arrange node cleanup functions
-Date:   Thu, 21 Feb 2019 22:31:46 -0800
-Message-Id: <20190222063148.4995-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/3 v2] mesh: Cleanup storage save and remove procedures
+Date:   Thu, 21 Feb 2019 22:31:47 -0800
+Message-Id: <20190222063148.4995-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190222063148.4995-1-inga.stotland@intel.com>
 References: <20190222063148.4995-1-inga.stotland@intel.com>
@@ -43,228 +43,194 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Rename node_free() to node_remove() and consolidate clean up operations.
-Change declarations for internally used functions to static.
----
- mesh/mesh.c    | 14 ++++++--------
- mesh/node.c    | 36 ++++++++++++++++++++++++++----------
- mesh/node.h    |  4 ++--
- mesh/storage.c | 12 ++++++------
- 4 files changed, 40 insertions(+), 26 deletions(-)
+To remove a node config directory completely, the directory
+needs to be empty. Both node.json and node,json.bak files must
+are deleted.
 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index c610582c0..0f3c3c9fd 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -362,10 +362,8 @@ static void free_pending_join_call(bool failed)
- 
- 	mesh_agent_remove(join_pending->agent);
- 
--	if (failed) {
--		storage_remove_node_config(join_pending->node);
--		node_free(join_pending->node);
--	}
-+	if (failed)
-+		node_remove(join_pending->node);
- 
- 	l_free(join_pending);
- 	join_pending = NULL;
-@@ -703,13 +701,13 @@ static struct l_dbus_message *attach_call(struct l_dbus *dbus,
- static void setup_network_interface(struct l_dbus_interface *iface)
- {
- 	l_dbus_interface_method(iface, "Join", 0, join_network_call, "",
--				"oay", "app", "uuid");
-+							"oay", "app", "uuid");
- 
- 	l_dbus_interface_method(iface, "Cancel", 0, cancel_join_call, "", "");
- 
- 	l_dbus_interface_method(iface, "Attach", 0, attach_call,
--				"oa(ya(qa{sv}))", "ot", "node", "configuration",
--				"app", "token");
-+					"oa(ya(qa{sv}))", "ot", "node",
-+					"configuration", "app", "token");
- 
- 	/* TODO: Implement Leave method */
- }
-@@ -720,7 +718,7 @@ bool mesh_dbus_init(struct l_dbus *dbus)
- 						setup_network_interface,
- 						NULL, false)) {
- 		l_info("Unable to register %s interface",
--			       MESH_NETWORK_INTERFACE);
-+							MESH_NETWORK_INTERFACE);
- 		return false;
- 	}
- 
+Also, change storage_save_config() type to void to eliminate
+meaningless checks.
+---
+ mesh/node.c    | 14 ++++++++++----
+ mesh/node.h    |  1 +
+ mesh/storage.c | 34 ++++++++++++++++++++++++----------
+ mesh/storage.h |  2 +-
+ 4 files changed, 36 insertions(+), 15 deletions(-)
+
 diff --git a/mesh/node.c b/mesh/node.c
-index c815acf2e..6c5cd9c39 100644
+index 6c5cd9c39..6a7b4a260 100644
 --- a/mesh/node.c
 +++ b/mesh/node.c
-@@ -133,6 +133,7 @@ static bool match_token(const void *a, const void *b)
- 	const struct mesh_node *node = a;
- 	const uint64_t *token = b;
- 	const uint64_t tmp = l_get_u64(node->dev_key);
-+
- 	return *token == tmp;
+@@ -392,8 +392,7 @@ static void cleanup_node(void *data)
+ 		/* Preserve the last sequence number */
+ 		storage_write_sequence_number(net, mesh_net_get_seq_num(net));
+ 
+-		if (storage_save_config(node, true, NULL, NULL))
+-			l_info("Saved final config to %s", node->cfg_file);
++		storage_save_config(node, true, NULL, NULL);
+ 	}
+ 
+ 	free_node_resources(node);
+@@ -958,6 +957,14 @@ void node_id_set(struct mesh_node *node, uint16_t id)
+ 		node->id = id;
  }
  
-@@ -168,6 +169,11 @@ struct mesh_node *node_find_by_uuid(uint8_t uuid[16])
- 	return l_queue_find(nodes, match_device_uuid, uuid);
- }
- 
-+struct mesh_node *node_find_by_token(uint64_t token)
++uint16_t node_id_get(struct mesh_node *node)
 +{
-+	return l_queue_find(nodes, match_token, (void *) &token);
++	if (!node)
++		return 0;
++
++	return node->id;
 +}
 +
- uint8_t *node_uuid_get(struct mesh_node *node)
+ static void attach_io(void *a, void *b)
  {
- 	if (!node)
-@@ -212,7 +218,7 @@ static void free_node_resources(void *data)
- 	struct mesh_node *node = data;
+ 	struct mesh_node *node = a;
+@@ -1757,8 +1764,7 @@ bool node_add_pending_local(struct mesh_node *node, void *prov_node_info,
+ 			return false;
+ 	}
  
- 	/* Unregister io callbacks */
--	if(node->net)
-+	if (node->net)
- 		mesh_net_detach(node->net);
- 	mesh_net_free(node->net);
+-	if (!storage_save_config(node, true, NULL, NULL))
+-		return false;
++	storage_save_config(node, true, NULL, NULL);
  
-@@ -221,6 +227,9 @@ static void free_node_resources(void *data)
- 	l_free(node->app_path);
- 	l_free(node->owner);
- 
-+	if (node->disc_watch)
-+		l_dbus_remove_watch(dbus_get_bus(), node->disc_watch);
+ 	/* Initialize configuration server model */
+ 	mesh_config_srv_init(node, PRIMARY_ELE_IDX);
+diff --git a/mesh/node.h b/mesh/node.h
+index ee1d4a600..954dfca75 100644
+--- a/mesh/node.h
++++ b/mesh/node.h
+@@ -87,6 +87,7 @@ int node_attach(const char *app_path, const char *sender, uint64_t token,
+ 						node_attach_ready_func_t cb);
+ void node_build_attach_reply(struct l_dbus_message *reply, uint64_t token);
+ void node_id_set(struct mesh_node *node, uint16_t node_id);
++uint16_t node_id_get(struct mesh_node *node);
+ bool node_dbus_init(struct l_dbus *bus);
+ void node_cleanup_all(void);
+ void node_jconfig_set(struct mesh_node *node, void *jconfig);
+diff --git a/mesh/storage.c b/mesh/storage.c
+index e79037375..fe3102fba 100644
+--- a/mesh/storage.c
++++ b/mesh/storage.c
+@@ -341,14 +341,14 @@ bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq)
+ 	struct mesh_node *node = mesh_net_node_get(net);
+ 	json_object *jnode = node_jconfig_get(node);
+ 	bool result;
+-	l_debug("");
 +
- 	if (node->path)
- 		l_dbus_object_remove_interface(dbus_get_bus(), node->path,
- 					MESH_NODE_INTERFACE);
-@@ -229,12 +238,20 @@ static void free_node_resources(void *data)
- 	l_free(node);
+ 	result = mesh_db_write_int(jnode, "sequenceNumber", seq);
+ 	if (!result)
+ 		return false;
+ 
+-	result = storage_save_config(node, false, NULL, NULL);
++	storage_save_config(node, false, NULL, NULL);
+ 
+-	return result;
++	return true;
  }
  
--void node_free(struct mesh_node *node)
-+/*
-+ * This function is called to free resources and remove the
-+ * configuration files for the specified node.
-+ */
-+void node_remove(struct mesh_node *node)
+ static bool save_config(json_object *jnode, const char *config_name)
+@@ -408,15 +408,12 @@ static void idle_save_config(void *user_data)
+ 	l_free(info);
+ }
+ 
+-bool storage_save_config(struct mesh_node *node, bool no_wait,
++void storage_save_config(struct mesh_node *node, bool no_wait,
+ 					mesh_status_func_t cb, void *user_data)
  {
+ 	struct write_info *info;
+ 
+ 	info = l_new(struct write_info, 1);
+-	if (!info)
+-		return false;
+-	l_debug("");
+ 	info->jnode = node_jconfig_get(node);
+ 	info->config_name = node_cfg_file_get(node);
+ 	info->cb = cb;
+@@ -426,8 +423,6 @@ bool storage_save_config(struct mesh_node *node, bool no_wait,
+ 		idle_save_config(info);
+ 	else
+ 		l_idle_oneshot(idle_save_config, info, NULL);
+-
+-	return true;
+ }
+ 
+ static int create_dir(const char *dirname)
+@@ -543,7 +538,7 @@ bool storage_create_node_config(struct mesh_node *node, void *data)
+ 
+ 	do {
+ 		l_getrandom(&node_id, 2);
+-		if (!l_queue_find(node_ids, simple_match,
++		if (node_id && !l_queue_find(node_ids, simple_match,
+ 						L_UINT_TO_PTR(node_id)))
+ 			break;
+ 	} while (++num_tries < 10);
+@@ -571,6 +566,8 @@ bool storage_create_node_config(struct mesh_node *node, void *data)
+ 	node_jconfig_set(node, jnode);
+ 	node_cfg_file_set(node, filename);
+ 
++	l_queue_push_tail(node_ids, L_UINT_TO_PTR(node_id));
++
+ 	return true;
+ fail:
+ 	json_object_put(jnode);
+@@ -583,15 +580,20 @@ void storage_remove_node_config(struct mesh_node *node)
+ 	char *cfgname;
+ 	struct json_object *jnode;
+ 	const char *dir_name;
++	uint16_t node_id;
++	size_t len;
++	char *bak;
+ 
  	if (!node)
  		return;
  
- 	l_queue_remove(nodes, node);
-+
-+	if (node->cfg_file)
-+		storage_remove_node_config(node);
-+
- 	free_node_resources(node);
- }
- 
-@@ -364,7 +381,7 @@ bool node_init_from_storage(struct mesh_node *node, void *data)
- 	return true;
- }
- 
--void node_cleanup(void *data)
-+static void cleanup_node(void *data)
- {
- 	struct mesh_node *node = data;
- 	struct mesh_net *net = node->net;
-@@ -379,15 +396,16 @@ void node_cleanup(void *data)
- 			l_info("Saved final config to %s", node->cfg_file);
- 	}
- 
--	if (node->disc_watch)
--		l_dbus_remove_watch(dbus_get_bus(), node->disc_watch);
--
- 	free_node_resources(node);
- }
- 
-+/*
-+ * This function is called to free resources and write the current
-+ * sequence numbers to the configuration file for each known node.
-+ */
- void node_cleanup_all(void)
- {
--	l_queue_destroy(nodes, node_cleanup);
-+	l_queue_destroy(nodes, cleanup_node);
- 	l_dbus_unregister_interface(dbus_get_bus(), MESH_NODE_INTERFACE);
- }
- 
-@@ -1103,9 +1121,7 @@ int node_attach(const char *app_path, const char *sender, uint64_t token,
- 	struct attach_obj_request *req;
- 	struct mesh_node *node;
- 
--	l_debug("");
--
--	node = l_queue_find(nodes, match_token, &token);
-+	node = l_queue_find(nodes, match_token, (void *) &token);
- 	if (!node)
- 		return MESH_ERROR_NOT_FOUND;
- 
-diff --git a/mesh/node.h b/mesh/node.h
-index ab09b14b0..ee1d4a600 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -34,13 +34,14 @@ typedef void (*node_join_ready_func_t) (struct mesh_node *node,
- 						struct mesh_agent *agent);
- 
- struct mesh_node *node_new(void);
--void node_free(struct mesh_node *node);
-+void node_remove(struct mesh_node *node);
- void node_join(const char *app_path, const char *sender, const uint8_t *uuid,
- 						node_join_ready_func_t cb);
- uint8_t *node_uuid_get(struct mesh_node *node);
- struct mesh_net *node_get_net(struct mesh_node *node);
- struct mesh_node *node_find_by_addr(uint16_t addr);
- struct mesh_node *node_find_by_uuid(uint8_t uuid[16]);
-+struct mesh_node *node_find_by_token(uint64_t token);
- bool node_is_provisioned(struct mesh_node *node);
- bool node_app_key_delete(struct mesh_net *net, uint16_t addr,
- 				uint16_t net_idx, uint16_t idx);
-@@ -87,7 +88,6 @@ int node_attach(const char *app_path, const char *sender, uint64_t token,
- void node_build_attach_reply(struct l_dbus_message *reply, uint64_t token);
- void node_id_set(struct mesh_node *node, uint16_t node_id);
- bool node_dbus_init(struct l_dbus *bus);
--void node_cleanup(void *node);
- void node_cleanup_all(void);
- void node_jconfig_set(struct mesh_node *node, void *jconfig);
- void *node_jconfig_get(struct mesh_node *node);
-diff --git a/mesh/storage.c b/mesh/storage.c
-index 0b0582374..e79037375 100644
---- a/mesh/storage.c
-+++ b/mesh/storage.c
-@@ -71,7 +71,7 @@ static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
- 	uint8_t *uuid;
- 
- 	if (!node_init_from_storage(node, db_node)) {
--		node_free(node);
-+		node_remove(node);
- 		return false;
- 	}
- 
-@@ -205,17 +205,17 @@ static bool parse_config(char *in_file, char *out_file, uint16_t node_id)
- 
- 	node = node_new();
- 
--	node_jconfig_set(node, jnode);
--	node_cfg_file_set(node, out_file);
--	node_id_set(node, node_id);
--
- 	result = parse_node(node, jnode);
- 
- 	if (!result) {
++	/* Free the node config json object */
+ 	jnode = node_jconfig_get(node);
+ 	if (jnode)
  		json_object_put(jnode);
--		node_free(node);
-+		node_remove(node);
- 	}
+ 	node_jconfig_set(node, NULL);
  
-+	node_jconfig_set(node, jnode);
-+	node_cfg_file_set(node, out_file);
-+	node_id_set(node, node_id);
++	/* Delete node configuration file */
+ 	cfgname = (char *) node_cfg_file_get(node);
+ 	if (!cfgname)
+ 		return;
+@@ -599,6 +601,15 @@ void storage_remove_node_config(struct mesh_node *node)
+ 	l_debug("Delete node config file %s", cfgname);
+ 	remove(cfgname);
+ 
++	/* Delete the backup file */
++	len = strlen(cfgname) + 5;
++	bak = l_malloc(len);
++	strncpy(bak, cfgname, len);
++	bak = strncat(bak, ".bak", 5);
++	remove(bak);
++	l_free(bak);
 +
- done:
- 	close(fd);
- 	if (str)
++	/* Delete the node directory */
+ 	dir_name = dirname(cfgname);
+ 
+ 	l_debug("Delete directory %s", dir_name);
+@@ -606,4 +617,7 @@ void storage_remove_node_config(struct mesh_node *node)
+ 
+ 	l_free(cfgname);
+ 	node_cfg_file_set(node, NULL);
++
++	node_id = node_id_get(node);
++	l_queue_remove(node_ids, L_UINT_TO_PTR(node_id));
+ }
+diff --git a/mesh/storage.h b/mesh/storage.h
+index 85f7899bc..8b14c8e8e 100644
+--- a/mesh/storage.h
++++ b/mesh/storage.h
+@@ -23,7 +23,7 @@ struct mesh_node;
+ bool storage_load_nodes(const char *dir);
+ bool storage_create_node_config(struct mesh_node *node, void *db_node);
+ void storage_remove_node_config(struct mesh_node *node);
+-bool storage_save_config(struct mesh_node *node, bool no_wait,
++void storage_save_config(struct mesh_node *node, bool no_wait,
+ 					mesh_status_func_t cb, void *user_data);
+ bool storage_model_bind(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 						uint16_t app_idx, bool unbind);
 -- 
 2.17.2
 
