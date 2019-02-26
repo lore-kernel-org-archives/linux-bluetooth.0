@@ -6,99 +6,86 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7B5C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 12:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDDFC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 13:15:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9781C217F9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 12:56:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 868CD21848
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 13:15:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="krVBjOk8"
+	dkim=pass (2048-bit key) header.d=invoxia-com.20150623.gappssmtp.com header.i=@invoxia-com.20150623.gappssmtp.com header.b="QDTMVcNb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726419AbfBZM4j (ORCPT
+        id S1726397AbfBZNPv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Feb 2019 07:56:39 -0500
-Received: from mail-lj1-f180.google.com ([209.85.208.180]:43627 "EHLO
-        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726115AbfBZM4j (ORCPT
+        Tue, 26 Feb 2019 08:15:51 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39265 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbfBZNPu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Feb 2019 07:56:39 -0500
-Received: by mail-lj1-f180.google.com with SMTP id z20so10640470ljj.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Feb 2019 04:56:38 -0800 (PST)
+        Tue, 26 Feb 2019 08:15:50 -0500
+Received: by mail-wm1-f68.google.com with SMTP id z84so2218181wmg.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Feb 2019 05:15:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=F9NiNo/WGSJXqkJo6O664Xvlb31685eGyDVD9Gl8kgY=;
-        b=krVBjOk8LgP7QcTtncNItxp847egNoqS+75pNs5FxkawAELGKa8KP2lDzlNuCVaXBl
-         OlzJLT0uReREG/VuNw9OKOGm9FdokBRY2FlSFDjm93hUZ1X5zR84JIH7twHGRGlCo5xZ
-         et5HuS79tFkmbvdoNx4yC1Q3Jb75lEJ2cVSfKuuBNVrjpUXx8bad2167uT2tWJ6hKiqB
-         jpJmri9x9AMe+MMfBKnKj9tjd86MgnlCOqfwLFrs4EpgMKXsVM9X5bWrCmPIAmsbgdV0
-         TC1w7KO/krEiHvbLpFKTvFbX4TsLaR6LfmxLiDLFNzx6hPFETCWjYXcVB7qZ3nImIHRX
-         GJ2Q==
+        d=invoxia-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=xVjOQUTmA5jPyi8lex0uuNq99GYTW/7i1eQxnT9mM54=;
+        b=QDTMVcNbGtzilmAjZGcZqMQRqgL7Es9cB3jZfR3vXsxLQjmXoGCfRltmX7q+k4Qqkk
+         Z5x4I70EixXiLifUXPXfITJerhfeEPDyrFS0oF/HXRYMUkjzuTs8y6f1Tz5XFU0nH5Qj
+         Cc717AAkZSka2Wu4wNmYccmBAtl37dNdRdoWkKEuu3dSW98mD+UcAHVTH1LFj0YwtPfP
+         Iqsh5+jWFT3/j+hV681GFYD5BpwhIQzOWbzmteK6ABTgGUMazV6HoR3pRQ9f31n2F8Ph
+         2FKUgwYgUcwA1N0CFSiKSPbT5BmQWlNUyp8ggdNX9DTWUivGbFHGqZM1PQLGdoWJAE7Y
+         IcsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=F9NiNo/WGSJXqkJo6O664Xvlb31685eGyDVD9Gl8kgY=;
-        b=OnFHH9PcO0QsUPrxp4qFN+MvxVfDHCq/6gxeXc6EhgCct4KGOagokeBbMgVU3EGm2n
-         sVQpu6aeo609DSSSUAADXuXTXNLf1Huwg4VlrBoR/0qCcRMsiAu8iUzqFvLetqL4Dq+K
-         3CVKnMZYNclKEJmVydVVOUZx8XFa++eoPGB0ZduLxZEz1nQp7FhtQBvgtOfaaCNcpDbg
-         prRSz47OczCKtNXec2caiDWJCOrVvQqBeuCePJWXn8e0rfriFfrfwnGT7ssH9dEc75YP
-         4EI1RQ/cPr6iFBTqGdiZwcmPCfhC1sMxUZTkw3gLx0rmmXsvEjCkc/3Jh5n8+Nq9WjCx
-         4O2Q==
-X-Gm-Message-State: AHQUAuanPjb/pa+o7M+V5WAVGex7tCo+fdZZ0NeqONUohcYUj736sQ8q
-        8hhS1diWTfCqYzX5NTLJoqEwNykH+is=
-X-Google-Smtp-Source: AHgI3Iblf+mAQqOB2gYap1T1GVn9ZlsEqccaeRPkorGWSKckwPbUr31cevUITRSu3CTUb1ZXJaC02Q==
-X-Received: by 2002:a2e:425b:: with SMTP id p88mr12784778lja.78.1551185797166;
-        Tue, 26 Feb 2019 04:56:37 -0800 (PST)
-Received: from localhost.localdomain ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id q1sm3186771lfk.15.2019.02.26.04.56.36
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 26 Feb 2019 04:56:36 -0800 (PST)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=xVjOQUTmA5jPyi8lex0uuNq99GYTW/7i1eQxnT9mM54=;
+        b=RzZMFUELCUJ0Q2eC1Valoq5dfDKc/zYkfCMOdjN2uKVwU/9vjr90ZzGHtFw5WaCcCK
+         mFPouvD87piNZ/UJrc8XDo/viyUNzjdmhvQnt5EqtGhHwETG79IvgmSkPnvpqFsyZJKs
+         YFXwStLXOLUl5bG1dO3mxA6hFDB4r31sHJEf9vAT0x3O6yMjKr+ebsjkEDK0d0jUGlfK
+         0C8B4Zlk+9pKMZkgs3vnxzK2malH7jwxfPwgxQF9vstRPdRkkkJk3XqR7a9A59LeWME8
+         Uwu0PTDxGvhYkSYkb7j/jRZWhYQFnQ54j5a28/427O7IIruQcEResU4n/vuvMNIEYd/p
+         647A==
+X-Gm-Message-State: AHQUAuZGDKrGrzsv7U2fbhtuyO1SRln1BlBa/x/K4etCPDWwATJKh2oj
+        6uVqw8ytQ3yGD5AjZXjM7dqd39imWS0=
+X-Google-Smtp-Source: AHgI3IbfMn9KtTOe2EQmASQ/qrtV4z1a9vYV71QwTbxp9oQQyPdBl1HjU199sEhYke4SKiwffratSQ==
+X-Received: by 2002:a1c:2358:: with SMTP id j85mr2479597wmj.130.1551186948479;
+        Tue, 26 Feb 2019 05:15:48 -0800 (PST)
+Received: from amolinux.invoxia.net (89-158-71-12.rev.numericable.fr. [89.158.71.12])
+        by smtp.gmail.com with ESMTPSA id i16sm9883407wru.16.2019.02.26.05.15.46
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Tue, 26 Feb 2019 05:15:47 -0800 (PST)
+From:   arnaud.mouiche@invoxia.com
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] monitor: Fix LE Set Extended Advertising Parameters TX power decoding
-Date:   Tue, 26 Feb 2019 13:56:29 +0100
-Message-Id: <20190226125629.30277-1-szymon.janc@codecoup.pl>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     Arnaud Mouiche <arnaud.mouiche@invoxia.com>
+Subject: [PATCH] tools/hciattach: TI: Increase the HCI request timeout value
+Date:   Tue, 26 Feb 2019 14:15:14 +0100
+Message-Id: <1551186914-24803-1-git-send-email-arnaud.mouiche@invoxia.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-TX power of 127 has special meaning for this command.
----
- monitor/packet.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+From: Arnaud Mouiche <arnaud.mouiche@invoxia.com>
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 96cacddd5..7f4d6b1ea 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -1115,7 +1115,7 @@ static void print_power_level(int8_t level, const char *type)
- {
- 	print_field("TX power%s%s%s: %d dbm (0x%2.2x)",
- 		type ? " (" : "", type ? type : "", type ? ")" : "",
--								level, level);
-+							level, (uint8_t) level);
- }
+When playing with a TI CC2564c module linked to a RaspberryPI with a
+FTDI UART/USB adapter, the 15ms timeout is not sufficient.
+---
+ tools/hciattach_ti.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
+index 1838394..cb97b06 100644
+--- a/tools/hciattach_ti.c
++++ b/tools/hciattach_ti.c
+@@ -254,7 +254,7 @@ static int brf_send_command_socket(int fd, struct bts_action_send *send_action)
+ 	rq.rparam = response;
+ 	rq.rlen   = sizeof(response);
  
- static void print_host_flow_control(uint8_t enable)
-@@ -6944,7 +6944,10 @@ static void le_set_ext_adv_params_cmd(const void *data, uint8_t size)
- 	print_peer_addr_type("Peer address type", cmd->peer_addr_type);
- 	print_addr("Peer address", cmd->peer_addr, cmd->peer_addr_type);
- 	print_adv_filter_policy("Filter policy", cmd->filter_policy);
--	print_power_level(cmd->tx_power, NULL);
-+	if (cmd->tx_power == 0xff)
-+		print_field("TX power: Host has no preference (0xff)");
-+	else
-+		print_power_level(cmd->tx_power, NULL);
- 
- 	switch (cmd->primary_phy) {
- 	case 0x01:
+-	if (hci_send_req(fd, &rq, 15) < 0) {
++	if (hci_send_req(fd, &rq, 100) < 0) {
+ 		perror("Cannot send hci command to socket");
+ 		return -1;
+ 	}
 -- 
-2.20.1
+2.7.4
 
