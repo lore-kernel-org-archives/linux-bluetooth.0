@@ -2,94 +2,99 @@ Return-Path: <SRS0=ehmo=RB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8346FC43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 13:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A333C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 14:57:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B4982173C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 13:31:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3170217F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 14:57:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AEKuvrwP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726346AbfBZNbx (ORCPT
+        id S1728036AbfBZO5u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Feb 2019 08:31:53 -0500
-Received: from foss.arm.com ([217.140.101.70]:47430 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725954AbfBZNbx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Feb 2019 08:31:53 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B102780D;
-        Tue, 26 Feb 2019 05:31:52 -0800 (PST)
-Received: from [10.1.196.75] (e110467-lin.cambridge.arm.com [10.1.196.75])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EFB23F703;
-        Tue, 26 Feb 2019 05:31:50 -0800 (PST)
-Subject: Re: [PATCH v2 1/3] Bluetooth: btusb: add QCA6174A compatible
- properties
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Brian Norris <briannorris@chromium.org>
-Cc:     Heiko Stuebner <heiko@sntech.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Douglas Anderson <dianders@chromium.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-rockchip@lists.infradead.org,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Rajat Jain <rajatja@google.com>
-References: <20190222225345.69084-1-briannorris@chromium.org>
- <49653AC5-5800-4319-B3C0-0CCA6A920E2C@holtmann.org>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <a23b9467-1c41-e399-f011-8ca183be585d@arm.com>
-Date:   Tue, 26 Feb 2019 13:31:45 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        Tue, 26 Feb 2019 09:57:50 -0500
+Received: from mail-wm1-f51.google.com ([209.85.128.51]:55224 "EHLO
+        mail-wm1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727506AbfBZO5u (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 26 Feb 2019 09:57:50 -0500
+Received: by mail-wm1-f51.google.com with SMTP id a62so2720645wmh.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Feb 2019 06:57:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UVMwYr4trWrwClyLWoyaQdbGqeFC7f01gCpjWthRKW8=;
+        b=AEKuvrwP3tqvJbBlzlUlQ3bcjN2PgZDXy5/xauE6QIUBfqBvYYTViNVZEdT5vxw01T
+         W8pMex5Wgxcc4cklbCWYla/JZNXx6gnSvB5P7UZlcPc5Evc/Rur5CKewrPVm/V/Ot9la
+         XsOnODMiI2UTTLvekV1GaV7z9SF/bI7OCwDohcBdY0bYUbhI65laXG1ZDIzEhO/i2NHh
+         8k5UzSjJ7y9mTr+EAu29mRgyoXRw5sXr1A7D+lEUIAi8rPPj875QKa/gf3YyADJFaAF5
+         1gE1lTiy54Aik65vIqX2D26onYxmmhHGlg12C1sRwbKh9wMSQC7o/aTfqx4fQ1C/iNYT
+         7Zig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UVMwYr4trWrwClyLWoyaQdbGqeFC7f01gCpjWthRKW8=;
+        b=qiK1go0bfr81XEhAVRs2od7k3t0SZqG5ohpkA6qJkbT+kb1q7Bcl/EbTCm2V+P1gkE
+         lvH1MZnzOr7hz0p20cSPM+SCTjz3EDXlguZpmyhK2nFU0BCQREAshOzvqaw9yMZKkQkz
+         6isJrV7sB2TaFth/oJ9E4yKhmjO8JbQ1SSMrGJ7glq77ET2ki9xLvwR53m99hxKT9L+N
+         T5tL4Ao0nS6M7KL6PosvrliUs4lJVne1rSLIPz78Ei5v2gsEPnFaPWCbHX2TAaQrkqql
+         ZiWUEqq5f2TOaSz42P9JMW80jgFg/YfH9srt6I/chqc0Wb8pfUuxPGtJR11nGdQlvKIX
+         yUDw==
+X-Gm-Message-State: AHQUAuZoSTF33SwAGmt/BuzOE1H0pJboPBCVjGJ5UM3uKDKvBZwc85hk
+        Y+H+ksbyz+J7CyWnXXi0aGNTsJ2TRNqGJYt7kZHjxQ==
+X-Google-Smtp-Source: AHgI3IY6yelqOuSsE+hWiPfSP4t9iB/06zpU6ELN7WmOnDpBvQgdHuMmB+F0hTZPUathfLZk9UvV3Owx4lCk+q8mLr8=
+X-Received: by 2002:a1c:9693:: with SMTP id y141mr3058701wmd.33.1551193068244;
+ Tue, 26 Feb 2019 06:57:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <49653AC5-5800-4319-B3C0-0CCA6A920E2C@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CALGdn=JFB0yCgWmmo9iMF740wpUapZ-6rU0OKcF73mM+Xw7XbQ@mail.gmail.com>
+ <1576789.oDElsqhQaV@ix>
+In-Reply-To: <1576789.oDElsqhQaV@ix>
+From:   Edward Jo <challenge.jo@gmail.com>
+Date:   Tue, 26 Feb 2019 23:57:37 +0900
+Message-ID: <CALGdn=L128q8dB+dEfJgm-5mhVB_VvT5P87+CSoR-Z2SCtWw4A@mail.gmail.com>
+Subject: Re: Does BlueZ support the LE only controller which does not have BR/EDR?
+To:     Szymon Janc <szymon.janc@codecoup.pl>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 26/02/2019 09:01, Marcel Holtmann wrote:
-> Hi Brian,
-> 
->> We may need to specify a GPIO wake pin for this device, so add a
->> compatible property for it.
->>
->> There are at least to USB PID/VID variations of this chip: one with a
->> Lite-On ID and one with an Atheros ID.
->>
->> Signed-off-by: Brian Norris <briannorris@chromium.org>
->> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
->> ---
->> v2:
->> * drop leading zeroes from VID, per documented binding
->> ---
->> drivers/bluetooth/btusb.c | 2 ++
->> 1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 470ee68555d9..54cb5f583b1d 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -2862,6 +2862,8 @@ static irqreturn_t btusb_oob_wake_handler(int irq, void *priv)
->>
->> static const struct of_device_id btusb_match_table[] = {
->> 	{ .compatible = "usb1286,204e" },
->> +	{ .compatible = "usbcf3,e300" }, /* QCA6174A */
->> +	{ .compatible = "usb4ca,301a" }, /* QCA6174A (Lite-On) */
-> 
-> are these really proper .compatible USB VID?PID strings. I think they are one letter short.
+Hi Szymon,
 
-Yup - however weird it may end up looking, the usb-device binding says 
-"...with leading zeros suppressed". Blame Open Firmware, I guess ;)
+On Mon, Feb 25, 2019 at 6:12 PM Szymon Janc <szymon.janc@codecoup.pl> wrote:
+>
+> Hello Edward,
+>
+> On Monday, 25 February 2019 09:04:17 CET Edward Jo wrote:
+> > Hi,
+> >
+> > I use CSR chip that support dual mode as LE mode by setting
+> > 'ControllerMode' in main.conf to 'le'. I'd like to use LE only chip
+> > which does not have BR/EDR.
+> >
+> > Does BlueZ support the LE only controller which does not have BR/EDR?
+>
+> Yes it does (I'm using it with nRF52 based controllers running either Apache
+> Mynew or Zephyr). Also, starting 5.44 it also supports LE-only controllers
+> that come without public address - bluetoothd will assign static random
+> address in such case.
+>
+> --
+> pozdrawiam
+> Szymon Janc
+>
+>
 
-Robin.
+Oh. I see. Thank you for your help!
+
+Regards,
+Edward
