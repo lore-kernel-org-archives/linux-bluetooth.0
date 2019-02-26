@@ -2,116 +2,103 @@ Return-Path: <SRS0=ehmo=RB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EA6C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 12:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7B5C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 12:56:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3AB82087C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 12:24:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9781C217F9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 12:56:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="k1GYaAIG";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="VjsGNdmm"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="krVBjOk8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbfBZMYa (ORCPT
+        id S1726419AbfBZM4j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Feb 2019 07:24:30 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:48548 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726063AbfBZMYa (ORCPT
+        Tue, 26 Feb 2019 07:56:39 -0500
+Received: from mail-lj1-f180.google.com ([209.85.208.180]:43627 "EHLO
+        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726115AbfBZM4j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Feb 2019 07:24:30 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 71BCC61B80; Tue, 26 Feb 2019 12:24:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1551183869;
-        bh=EofSkXdyY1237I9DjQUuA1klNbH3TKk8bG1yGaKb6Ok=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=k1GYaAIG1apnq1GbsrVJSzdo9HarNwnDDb3stNUMvD0YrOATWR5oLEqmP8TIRqlKU
-         +K4WvCW1n5BXsgLTQel0IWbqZxL0is+rtRX7gcxFlz1DXbSdZsin/3r7QOFkaAEsH3
-         lfs1R/dTLEwhI5+0wsJUvctrKhEtjVECKuUrXBaU=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 1A41261B6C;
-        Tue, 26 Feb 2019 12:24:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1551183865;
-        bh=EofSkXdyY1237I9DjQUuA1klNbH3TKk8bG1yGaKb6Ok=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VjsGNdmm7GE/cJLB9HBmz25QIBHu0HtPHvaESg5EnUgMMA0xgxlv0TF9u1XFkiqZH
-         pNYsYHVN5Fc0dR3ATfGOepxyJ1qqQGBbQtFw7DZbDv42muNlniHEAHdcz/NeNSuun+
-         Gwdk8Mou0SxQMd05P8DOawWhGOQ1ZPsiN4e9agS0=
+        Tue, 26 Feb 2019 07:56:39 -0500
+Received: by mail-lj1-f180.google.com with SMTP id z20so10640470ljj.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Feb 2019 04:56:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=F9NiNo/WGSJXqkJo6O664Xvlb31685eGyDVD9Gl8kgY=;
+        b=krVBjOk8LgP7QcTtncNItxp847egNoqS+75pNs5FxkawAELGKa8KP2lDzlNuCVaXBl
+         OlzJLT0uReREG/VuNw9OKOGm9FdokBRY2FlSFDjm93hUZ1X5zR84JIH7twHGRGlCo5xZ
+         et5HuS79tFkmbvdoNx4yC1Q3Jb75lEJ2cVSfKuuBNVrjpUXx8bad2167uT2tWJ6hKiqB
+         jpJmri9x9AMe+MMfBKnKj9tjd86MgnlCOqfwLFrs4EpgMKXsVM9X5bWrCmPIAmsbgdV0
+         TC1w7KO/krEiHvbLpFKTvFbX4TsLaR6LfmxLiDLFNzx6hPFETCWjYXcVB7qZ3nImIHRX
+         GJ2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=F9NiNo/WGSJXqkJo6O664Xvlb31685eGyDVD9Gl8kgY=;
+        b=OnFHH9PcO0QsUPrxp4qFN+MvxVfDHCq/6gxeXc6EhgCct4KGOagokeBbMgVU3EGm2n
+         sVQpu6aeo609DSSSUAADXuXTXNLf1Huwg4VlrBoR/0qCcRMsiAu8iUzqFvLetqL4Dq+K
+         3CVKnMZYNclKEJmVydVVOUZx8XFa++eoPGB0ZduLxZEz1nQp7FhtQBvgtOfaaCNcpDbg
+         prRSz47OczCKtNXec2caiDWJCOrVvQqBeuCePJWXn8e0rfriFfrfwnGT7ssH9dEc75YP
+         4EI1RQ/cPr6iFBTqGdiZwcmPCfhC1sMxUZTkw3gLx0rmmXsvEjCkc/3Jh5n8+Nq9WjCx
+         4O2Q==
+X-Gm-Message-State: AHQUAuanPjb/pa+o7M+V5WAVGex7tCo+fdZZ0NeqONUohcYUj736sQ8q
+        8hhS1diWTfCqYzX5NTLJoqEwNykH+is=
+X-Google-Smtp-Source: AHgI3Iblf+mAQqOB2gYap1T1GVn9ZlsEqccaeRPkorGWSKckwPbUr31cevUITRSu3CTUb1ZXJaC02Q==
+X-Received: by 2002:a2e:425b:: with SMTP id p88mr12784778lja.78.1551185797166;
+        Tue, 26 Feb 2019 04:56:37 -0800 (PST)
+Received: from localhost.localdomain ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id q1sm3186771lfk.15.2019.02.26.04.56.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 26 Feb 2019 04:56:36 -0800 (PST)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH] monitor: Fix LE Set Extended Advertising Parameters TX power decoding
+Date:   Tue, 26 Feb 2019 13:56:29 +0100
+Message-Id: <20190226125629.30277-1-szymon.janc@codecoup.pl>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 26 Feb 2019 17:54:24 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hemantg@codeaurora.org
-Subject: Re: [PATCH 2/3] Bluetooth: hci_qca: Move boot delay to
- qca_send_power_pulse()
-In-Reply-To: <c4f0563baa3b61a3bd1725d71517495e@codeaurora.org>
-References: <20190225234954.82942-1-mka@chromium.org>
- <20190225234954.82942-3-mka@chromium.org>
- <c4f0563baa3b61a3bd1725d71517495e@codeaurora.org>
-Message-ID: <0c928a085f4c237c3efe0ad9fda803d9@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-hi Matthias,
+TX power of 127 has special meaning for this command.
+---
+ monitor/packet.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-On 2019-02-26 17:48, Balakrishna Godavarthi wrote:
-> On 2019-02-26 05:19, Matthias Kaehlcke wrote:
->> After sending a power on pulse the driver has a delay of 100ms
->> to allow the host controller to boot. Move the delay into
->> qca_send_power_pulse(), since it is directly related with the
->> power-on pulse.
->> 
->> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->> ---
->>  drivers/bluetooth/hci_qca.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index e4128774e9686..eacc108c422d0 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1036,6 +1036,9 @@ static int qca_send_power_pulse(struct hci_uart
->> *hu, bool on)
->>  	usleep_range(100, 200);
-
-[Bala] : i still doubt do we require this delay.
-
->>  	hci_uart_set_flow_control(hu, false);
->> 
->> +	if (on)
->> +		msleep(100);
->> +
->>  	return 0;
->>  }
->> 
->> @@ -1148,9 +1151,6 @@ static int qca_wcn3990_init(struct hci_uart *hu)
->>  	if (ret)
->>  		return ret;
->> 
->> -	/* Wait for 100 ms for SoC to boot */
->> -	msleep(100);
->> -
->>  	/* Now the device is in ready state to communicate with host.
->>  	 * To sync host with device we need to reopen port.
->>  	 * Without this, we will have RTS and CTS synchronization
-> 
-> Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 96cacddd5..7f4d6b1ea 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -1115,7 +1115,7 @@ static void print_power_level(int8_t level, const char *type)
+ {
+ 	print_field("TX power%s%s%s: %d dbm (0x%2.2x)",
+ 		type ? " (" : "", type ? type : "", type ? ")" : "",
+-								level, level);
++							level, (uint8_t) level);
+ }
+ 
+ static void print_host_flow_control(uint8_t enable)
+@@ -6944,7 +6944,10 @@ static void le_set_ext_adv_params_cmd(const void *data, uint8_t size)
+ 	print_peer_addr_type("Peer address type", cmd->peer_addr_type);
+ 	print_addr("Peer address", cmd->peer_addr, cmd->peer_addr_type);
+ 	print_adv_filter_policy("Filter policy", cmd->filter_policy);
+-	print_power_level(cmd->tx_power, NULL);
++	if (cmd->tx_power == 0xff)
++		print_field("TX power: Host has no preference (0xff)");
++	else
++		print_power_level(cmd->tx_power, NULL);
+ 
+ 	switch (cmd->primary_phy) {
+ 	case 0x01:
 -- 
-Regards
-Balakrishna.
+2.20.1
+
