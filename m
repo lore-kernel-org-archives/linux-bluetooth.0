@@ -3,86 +3,96 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BC6C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 09:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF73C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 09:06:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7716F2173C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 09:01:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CAF421848
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 09:06:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727304AbfBZJBh convert rfc822-to-8bit (ORCPT
+        id S1727554AbfBZJGI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Feb 2019 04:01:37 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:46347 "EHLO
+        Tue, 26 Feb 2019 04:06:08 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:43350 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725941AbfBZJBh (ORCPT
+        with ESMTP id S1727051AbfBZJGI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Feb 2019 04:01:37 -0500
+        Tue, 26 Feb 2019 04:06:08 -0500
 Received: from marcel-macpro.fritz.box (p4FF9F361.dip0.t-ipconnect.de [79.249.243.97])
-        by mail.holtmann.org (Postfix) with ESMTPSA id AEDF4CF2A3;
-        Tue, 26 Feb 2019 10:09:29 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7082CCF2A3;
+        Tue, 26 Feb 2019 10:14:02 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v2 1/3] Bluetooth: btusb: add QCA6174A compatible
- properties
+Subject: Re: [PATCH 1/5] Bluetooth: Expose supported LE states via debugfs
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190222225345.69084-1-briannorris@chromium.org>
-Date:   Tue, 26 Feb 2019 10:01:34 +0100
-Cc:     Heiko Stuebner <heiko@sntech.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Douglas Anderson <dianders@chromium.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-rockchip@lists.infradead.org,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Rajat Jain <rajatja@google.com>,
-        Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20190220101428.3086-1-andrzej.kaczmarek@codecoup.pl>
+Date:   Tue, 26 Feb 2019 10:06:06 +0100
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <49653AC5-5800-4319-B3C0-0CCA6A920E2C@holtmann.org>
-References: <20190222225345.69084-1-briannorris@chromium.org>
-To:     Brian Norris <briannorris@chromium.org>
+Message-Id: <176433CA-5971-48CF-B550-4516D92DD014@holtmann.org>
+References: <20190220101428.3086-1-andrzej.kaczmarek@codecoup.pl>
+To:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+Hi Andrzej,
 
-> We may need to specify a GPIO wake pin for this device, so add a
-> compatible property for it.
+> It may be useful for debugging purposes to quickly retrieve supported LE
+> stated bit mask for controller.
 > 
-> There are at least to USB PID/VID variations of this chip: one with a
-> Lite-On ID and one with an Atheros ID.
-> 
-> Signed-off-by: Brian Norris <briannorris@chromium.org>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 > ---
-> v2:
-> * drop leading zeroes from VID, per documented binding
-> ---
-> drivers/bluetooth/btusb.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> net/bluetooth/hci_debugfs.c | 25 +++++++++++++++++++++++++
+> 1 file changed, 25 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 470ee68555d9..54cb5f583b1d 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2862,6 +2862,8 @@ static irqreturn_t btusb_oob_wake_handler(int irq, void *priv)
+> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+> index 51f5b1efc3a5..c0b11ebacf7d 100644
+> --- a/net/bluetooth/hci_debugfs.c
+> +++ b/net/bluetooth/hci_debugfs.c
+> @@ -679,6 +679,29 @@ static const struct file_operations force_static_address_fops = {
+> 	.llseek		= default_llseek,
+> };
 > 
-> static const struct of_device_id btusb_match_table[] = {
-> 	{ .compatible = "usb1286,204e" },
-> +	{ .compatible = "usbcf3,e300" }, /* QCA6174A */
-> +	{ .compatible = "usb4ca,301a" }, /* QCA6174A (Lite-On) */
+> +static int le_states_show(struct seq_file *f, void *ptr)
+> +{
+> +	struct hci_dev *hdev = f->private;
+> +
+> +	hci_dev_lock(hdev);
+> +	seq_printf(f, "LE: %8ph\n", hdev->le_states);
+> +	hci_dev_unlock(hdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static int le_states_open(struct inode *inode, struct file *file)
+> +{
+> +	return single_open(file, le_states_show, inode->i_private);
+> +}
+> +
+> +static const struct file_operations le_states_fops = {
+> +	.open		= le_states_open,
+> +	.read		= seq_read,
+> +	.llseek		= seq_lseek,
+> +	.release	= single_release,
+> +};
+> +
+> static int white_list_show(struct seq_file *f, void *ptr)
+> {
+> 	struct hci_dev *hdev = f->private;
+> @@ -956,6 +979,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+> 			    &random_address_fops);
+> 	debugfs_create_file("static_address", 0444, hdev->debugfs, hdev,
+> 			    &static_address_fops);
+> +	debugfs_create_file("le_states", 0444, hdev->debugfs, hdev,
+> +			    &le_states_fops);
 
-are these really proper .compatible USB VID?PID strings. I think they are one letter short.
+we have not used le_ prefixed files yet and so maybe better use supported_states here.
 
 Regards
 
