@@ -2,88 +2,153 @@ Return-Path: <SRS0=ehmo=RB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45726C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 20:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E88BAC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 20:20:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D8D992186A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 20:09:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9F542083D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Feb 2019 20:20:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dZzjk32b"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NmoYLBNf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728632AbfBZUJD (ORCPT
+        id S1728811AbfBZUUH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Feb 2019 15:09:03 -0500
-Received: from mail-pf1-f179.google.com ([209.85.210.179]:36517 "EHLO
-        mail-pf1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727054AbfBZUJD (ORCPT
+        Tue, 26 Feb 2019 15:20:07 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:37408 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728729AbfBZUUH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Feb 2019 15:09:03 -0500
-Received: by mail-pf1-f179.google.com with SMTP id n22so6766411pfa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Feb 2019 12:09:03 -0800 (PST)
+        Tue, 26 Feb 2019 15:20:07 -0500
+Received: by mail-pl1-f193.google.com with SMTP id q3so6771610pll.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Feb 2019 12:20:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nvbgkBTzE6DW3B27GZ2U1P+7u2ZflsVz7nzJQehfxaw=;
-        b=dZzjk32boKQzxt+8iYwyNhLx0GbuhTQlarOSfabMsUX4HLnCnd3/uNGmTlgwEzIU91
-         q1qVgAH79q2yEbWaLjHzx3DypYDfcF+B9PEVCHr6fx/3ckkkvpGzPhuElls4rjxpxJn4
-         Y2B0q5cxkuzF93XIQdunp9Q9qhKXxf1Y6xgos=
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=PeRP/XIXjJeB+bcHpX3990hPAkvD/JerCJnp/tHeftA=;
+        b=NmoYLBNfdnmt1EUHhicIBe38EqYKKbaDuZZ4+LPdG6y9hRxlCUGIH5lyJCA6qwLrek
+         rx11IDVvbiNoUSDJ3ftZaKmH406vdzOBv1G9sD+i4MkoMCQcSiDR489iIb+5tQthp/hW
+         hd7Ufw/qv7C1GicODr9zwRRSKzd9ONt207aYI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nvbgkBTzE6DW3B27GZ2U1P+7u2ZflsVz7nzJQehfxaw=;
-        b=om2R8kvlLF5FsFBx5MsN2mpbZ2LjPTqyu7mkjFc6Nin/qpuOn8fOUaV06CFW0WSYVV
-         Ocpa0wu5zVpAClPXMDoGgnV2alEol7eiwTInoTOEH+PED6nIDmp/YiZca/n0+ObNlXzI
-         knPmPKaC8IRP3fbC6LhrDDqB13oqPQUcZyRJjS61EZn3UU3KYE+ftWs4zmCHaUtn8aHE
-         DvrKkrioFc2QBvnc6oWW9/2NR+tYlJsnd1mONfAGvOcB1tlzwG1sBmdpdcR3/MkLo27Z
-         0dwQhxi24hA0+/SItQNkgfTrBhf96s2oO/n7Ot6+oBweGjxcVlwMrihmPV/vYD68pnrV
-         QUCA==
-X-Gm-Message-State: AHQUAuYt+HWoXIToRhMr9Km6g0yPShIMXqKOlhs45eUNSrXOIgDJilOH
-        aPBV8NFeRXQ8VZWvzWhToNUVbw==
-X-Google-Smtp-Source: AHgI3IaPcJW0xwH4ofnUwAazfJy53tdc2IvIYiCIrLYPmuHBQQftilvfFjHor3ogxZQYAOXNg2rRGQ==
-X-Received: by 2002:aa7:8459:: with SMTP id r25mr25740935pfn.65.1551211743044;
-        Tue, 26 Feb 2019 12:09:03 -0800 (PST)
-Received: from mka.mtv.corp.google.com ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id l5sm7637328pfi.97.2019.02.26.12.09.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Feb 2019 12:09:02 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=PeRP/XIXjJeB+bcHpX3990hPAkvD/JerCJnp/tHeftA=;
+        b=K/d1JkpUkFm+QcFwLeOHvX9zTJYSe7Ko1Wdclh0fKOkyWLzWAeb7fuaU+tiZfkuRzn
+         nah8/6/HjtzpxY8GOY/y2kPFGou/4z4VR5r8DCV07p1gWQrKNf3gSKeh703RSapEpAvG
+         sn58T7xOSOhADvmpQ0vC+sVCqNnF9mcCrTacaMNXy1bNYnd/wClWn48h4rjwNFcNa1ze
+         gn0npV9ibeUakf9PEzA9SDTfV9KXn/5tkhXvCLiUhd3P0JdwnqLDXRKLp1tn4rKAMILd
+         ZnscSjEIMkty+amzdVPrknkHheHK7Qu55mIzD74mAvLMvd2pwwlTgIgbusXpyQVrD5RH
+         +NQA==
+X-Gm-Message-State: AHQUAuYXNwv0j8fqbNh8MWBHTakbwn6yIAUuoQvR2JeH+gJA/e+U05KB
+        hCa9zg04GZG2J128G1tiGJsD4w==
+X-Google-Smtp-Source: AHgI3IZPLGt8vnpBeSS7ZCFHcXIj/Bo0ffuAWLuhr7lFbiQtgOdjVzwNguYqtKHWTdHfUQqaxO6eTQ==
+X-Received: by 2002:a17:902:28e9:: with SMTP id f96mr28066773plb.169.1551212407108;
+        Tue, 26 Feb 2019 12:20:07 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id z185sm23972560pfb.17.2019.02.26.12.20.06
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 26 Feb 2019 12:20:06 -0800 (PST)
+Date:   Tue, 26 Feb 2019 12:20:06 -0800
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH 0/2] Reduce delay after sending baudrate request for WCN3990
-Date:   Tue, 26 Feb 2019 12:08:46 -0800
-Message-Id: <20190226200848.154216-1-mka@chromium.org>
-X-Mailer: git-send-email 2.21.0.rc2.261.ga7da99ff1b-goog
+        Hemantg <hemantg@codeaurora.org>
+Subject: Re: [PATCH 2/2] hci_qca: Reduce delay after sending baudrate request
+ for WCN3990
+Message-ID: <20190226202006.GA155681@google.com>
+References: <20190226200848.154216-1-mka@chromium.org>
+ <20190226200848.154216-3-mka@chromium.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190226200848.154216-3-mka@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The current 300ms delay after a baudrate change is extremely long.
-For WCM3990 it is sufficient to wait 10ms after the baudrate change
-request has been sent over the wire.
+On Tue, Feb 26, 2019 at 12:08:48PM -0800, Matthias Kaehlcke wrote:
+> The current 300ms delay after a baudrate change is extremely long.
+> For WCM3990 it is sufficient to wait 10ms after the baudrate change
+> request has been sent over the wire.
+> 
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 28 +++++++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 703e099515f24..fd018cc5605c6 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -59,8 +59,7 @@
+>  
+>  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+>  #define IBS_TX_IDLE_TIMEOUT_MS		2000
+> -#define BAUDRATE_SETTLE_TIMEOUT_MS	300
+> -#define POWER_PULSE_TRANS_TIMEOUT_MS	100
+> +#define CMD_TRANS_TIMEOUT_MS		100
+>  
+>  /* susclk rate */
+>  #define SUSCLK_RATE_32KHZ	32768
+> @@ -964,6 +963,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+>  {
+>  	struct hci_uart *hu = hci_get_drvdata(hdev);
+>  	struct qca_data *qca = hu->priv;
+> +	struct qca_serdev *qcadev;
+>  	struct sk_buff *skb;
+>  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+>  
+> @@ -985,11 +985,25 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+>  	skb_queue_tail(&qca->txq, skb);
+>  	hci_uart_tx_wakeup(hu);
+>  
+> -	/* wait 300ms to change new baudrate on controller side
+> -	 * controller will come back after they receive this HCI command
+> -	 * then host can communicate with new baudrate to controller
+> +	qcadev = serdev_device_get_drvdata(hu->serdev);
+> +
+> +	/* Wait for the baudrate change command to be sent and
+> +	 * processed by the controller.
+>  	 */
+> -	msleep(BAUDRATE_SETTLE_TIMEOUT_MS);
+> +	if (qcadev->btsoc_type == QCA_WCN3990) {
+> +		while (!skb_queue_empty(&qca->txq))
+> +			usleep_range(100, 200);
+> +
+> +		serdev_device_wait_until_sent(hu->serdev,
+> +			      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
 
-Also use msleep() instead of a set_current_state() / schedule_timeout()
-combo.
+note: the above could also be in the common path, personally I don't
+have a strong preference.
 
-Matthias Kaehlcke (2):
-  hci_qca: Use msleep() instead of open coding it
-  hci_qca: Reduce delay after sending baudrate request for WCN3990
+> +
+> +		/* Make sure there is enough time for the BT
+> +		 * controller to process the baudrate change
+> +		*/
+> +		msleep(10);
+> +	} else {
+> +		msleep(300);
 
- drivers/bluetooth/hci_qca.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+I wonder if the non-wcn3990 delay could be reduced too, 300ms seems an
+eternity, however I don't have hardware to validate such a change.
 
--- 
-2.21.0.rc2.261.ga7da99ff1b-goog
+That raises a question: how many different chips are actually
+supported by this driver? In earlier reviews we were frequently
+talking about the ROME family and I assumed it must be a larger
+number, however there are only compatible strings for the qca6174 and
+the wcn3990. If there is only one other controller (or a low number
+of very similar ones that use the same compatible string?) maybe
+Qualcomm could help with testing?
 
+Thanks
+
+Matthias
