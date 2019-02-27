@@ -2,75 +2,85 @@ Return-Path: <SRS0=vyxk=RC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7910DC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 15:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6113C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 18:13:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 53FA9213A2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 15:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85B4F2186A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 18:13:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729782AbfB0PWz convert rfc822-to-8bit (ORCPT
+        id S1728397AbfB0SNF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Feb 2019 10:22:55 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:38732 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727631AbfB0PWz (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Feb 2019 10:22:55 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 9D3112E2D0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Feb 2019 15:22:54 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 9B7F42E2E2; Wed, 27 Feb 2019 15:22:54 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Wed, 27 Feb 2019 13:13:05 -0500
+Received: from mga03.intel.com ([134.134.136.65]:49398 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726356AbfB0SNF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 Feb 2019 13:13:05 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2019 10:13:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,420,1544515200"; 
+   d="scan'208";a="118248042"
+Received: from bgix-dell-lap.sea.intel.com ([10.252.202.228])
+  by orsmga007.jf.intel.com with ESMTP; 27 Feb 2019 10:13:04 -0800
+From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 200039] BT advertising packet wakes up the system from S3 and
- suspend-to-idle
-Date:   Wed, 27 Feb 2019 15:22:52 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: tao@linux.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-200039-62941-gkUm2ixadd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-200039-62941@https.bugzilla.kernel.org/>
-References: <bug-200039-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Cc:     inga.stotland@intel.com, brian.gix@intel.com, marcel@holtmann.org
+Subject: [PATCH BlueZ] mesh: Fix type checking for 32 vs 64 bit systems
+Date:   Wed, 27 Feb 2019 10:12:55 -0800
+Message-Id: <20190227181255.5982-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=200039
+---
+ mesh/cfgmod-server.c | 2 +-
+ mesh/model.c         | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-tao@linux.com changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |tao@linux.com
-
---- Comment #29 from tao@linux.com ---
-This is still an issue for me with 4.20 and an Intel AC-9260 card. If Bluetooth
-is on, my computer will refuse to sleep or begin to sleep before aborting. It
-will freeze if kept in this cycle for long enough.
-
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index 992d4ac6a..9dc82eef6 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -1129,7 +1129,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		gettimeofday(&time_now, NULL);
+ 		time_now.tv_sec -= hb->sub_start;
+ 
+-		if (time_now.tv_sec >= hb->sub_period)
++		if (time_now.tv_sec >= (long int) hb->sub_period)
+ 			time_now.tv_sec = 0;
+ 		else
+ 			time_now.tv_sec = hb->sub_period - time_now.tv_sec;
+diff --git a/mesh/model.c b/mesh/model.c
+index 1e302b73b..5940f6854 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -414,15 +414,15 @@ static void cmplt(uint16_t remote, uint8_t status,
+ 
+ 	gettimeofday(&tx_end, NULL);
+ 	if (tx_end.tv_sec == tx_start.tv_sec) {
+-		l_debug("Duration 0.%zu seconds",
++		l_debug("Duration 0.%6.6lu seconds",
+ 				tx_end.tv_usec - tx_start.tv_usec);
+ 	} else {
+ 		if (tx_start.tv_usec > tx_end.tv_usec)
+-			l_debug("Duration %zu.%zu seconds",
++			l_debug("Duration %lu.%6.6lu seconds",
+ 				tx_end.tv_sec - tx_start.tv_sec - 1,
+ 				tx_end.tv_usec + 1000000 - tx_start.tv_usec);
+ 		else
+-			l_debug("Duration %zu.%zu seconds",
++			l_debug("Duration %lu.%6.6lu seconds",
+ 					tx_end.tv_sec - tx_start.tv_sec,
+ 					tx_end.tv_usec - tx_start.tv_usec);
+ 	}
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.14.5
+
