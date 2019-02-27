@@ -2,73 +2,86 @@ Return-Path: <SRS0=vyxk=RC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B43EC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 20:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16724C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 21:34:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EDBAF20818
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 20:35:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D554F2186A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Feb 2019 21:34:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PfNeTMDq"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="j78GG+Lr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729412AbfB0Uf5 (ORCPT
+        id S1730393AbfB0Vem (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Feb 2019 15:35:57 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45743 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728397AbfB0Uf5 (ORCPT
+        Wed, 27 Feb 2019 16:34:42 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:45228 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730477AbfB0Vek (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Feb 2019 15:35:57 -0500
-Received: by mail-pf1-f194.google.com with SMTP id v21so8539871pfm.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Feb 2019 12:35:57 -0800 (PST)
+        Wed, 27 Feb 2019 16:34:40 -0500
+Received: by mail-ed1-f66.google.com with SMTP id f19so5817679eds.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Feb 2019 13:34:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=GNwThvtjzGpzi0d/OiEgtviNMmvlYQ4OUgMES2ZulRY=;
-        b=PfNeTMDqAOGPJMr+73KPK2ePi0n90oWAeLegQjTvCoRQdh1lkmO/apbcThS5wK72v0
-         KxJWWFmXUcJEMydS6amkjvWwwNoHh/1pTZDa5qk9CcmuLDWTjmk6hICl97x8L2Cuba4Q
-         UU96qkk+T3wvnxGhOBJrg0VpJkj5VSSyX5F94=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=33TM7Cs9TumwVat/O6BjwK7P3AjdXMLeuWOXQzZThW8=;
+        b=j78GG+Lrn1m27fhQUz5AsdhDeKRuAcUJsYc2XG5rZ4ek5f1nzqDYYDs09/lGWkxmDR
+         DGWCAwlGCU1kU/oArEaeCjpCKANvohSRctwMeKX7NASMiT99ct2TZLPoBFnY78sKeVzK
+         UA4X5Ummsm0DWgvmhKg29vBsDo+1uR+a3KCQY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=GNwThvtjzGpzi0d/OiEgtviNMmvlYQ4OUgMES2ZulRY=;
-        b=mA2/nL/M4znDVSQId6rQLtg2n7sOZZpluGXqmjbimXE5HeQgEvzBP7dPp4/lPUrspb
-         hnPy80jDQecwT1nje/FhAp8dF8NXpeYoMBsrVWrpZtSvVGEdyaDOrpykYDth3Mu5Ih9I
-         Eb2oQLUNJNdv9RCZBByuQE9DwPIwibXCF9LPntyyCFhuB1Fai5eKwdX1Ba76dJX/Sw6l
-         imTfBV8ivufNo9530hLQq36a4lBK+zuTeur/bfx5srjV/CmBI4pouMB7tob58RLQQlTj
-         3bP7jbzN4wCzdXmA1+hoCgK4wd+RizhjfT1UGOm78Sj+kNy+vuRhgVCnjNLR44ma8UgL
-         NmPg==
-X-Gm-Message-State: AHQUAuY3qepcRruoBiqzbCq0uibIo4BcgBmNRqpp558qOIYIuS+rif37
-        cQNad8KpOIRimBpFkUrLTgfj8CeVkSE=
-X-Google-Smtp-Source: AHgI3IYjOI5P9YUp6paCrXzbnJMcUQqt4eH1NHHkkVAA+kvlvmnxeDNZPQ8mDOLiSNpMYw2V3A2oRA==
-X-Received: by 2002:a63:8b42:: with SMTP id j63mr4678231pge.79.1551299756740;
-        Wed, 27 Feb 2019 12:35:56 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id a24sm21495528pfn.85.2019.02.27.12.35.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 27 Feb 2019 12:35:56 -0800 (PST)
-Date:   Wed, 27 Feb 2019 12:35:55 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Hemantg <hemantg@codeaurora.org>
-Subject: Re: [PATCH 0/2] Reduce delay after sending baudrate request for
- WCN3990
-Message-ID: <20190227203555.GA192510@google.com>
-References: <20190226200848.154216-1-mka@chromium.org>
- <45D9EB4B-C81A-4970-9ED1-3737A0AF771F@holtmann.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=33TM7Cs9TumwVat/O6BjwK7P3AjdXMLeuWOXQzZThW8=;
+        b=btueH76z2pXo1oTossIJF56hosf/E8Zhg9AQTvY96htIm+MPgosaOEudFSU31vY+zm
+         uOUdfK8flCG1yRO0lpLH42NONZm4cyOkpM+ZkkFxa/jKbMbYIa3vZP+e4iRnEYFR4qGN
+         dGZe5q6RK6hpgkhLxOe/8LfUKEY34xHC2I27F2Sd1Z7JQrq9PciK+ByS+5rEDVPIBdUC
+         HlDDn0DkAq/yGjWoQZsy6ogyOERT/XxBQPTdz7bH/v3bGcl9FEiW9yUEVRTOkGd1pRjC
+         ewBPbOvy22HypSnCARG523TtA52hGdgCZDW1CccI0rv8A9+Xzkz2V/+fA4DtctNOttn1
+         XlLA==
+X-Gm-Message-State: AHQUAuZHr3gYrWnNbpHDseqFeydkSYwj52HHI1UsFYAvmJyrcmzdIdef
+        XtevqNIK4zq6PST7YZ1CPV8y+fv/37M=
+X-Google-Smtp-Source: AHgI3IaipRz5/4Lyp36IEcqqaM1aGlBkqs38gZakSzv5gpOasi46Jt0Iz+7wL7B+Z3bZuK8FgE7Vyw==
+X-Received: by 2002:a17:906:28c4:: with SMTP id p4mr3019863ejd.63.1551303278225;
+        Wed, 27 Feb 2019 13:34:38 -0800 (PST)
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
+        by smtp.gmail.com with ESMTPSA id b29sm4552265eda.48.2019.02.27.13.34.34
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 27 Feb 2019 13:34:36 -0800 (PST)
+Received: by mail-ed1-f44.google.com with SMTP id a16so15238669edn.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Feb 2019 13:34:34 -0800 (PST)
+X-Received: by 2002:a50:a3bc:: with SMTP id s57mr4018952edb.4.1551303274387;
+ Wed, 27 Feb 2019 13:34:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <45D9EB4B-C81A-4970-9ED1-3737A0AF771F@holtmann.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190222225345.69084-1-briannorris@chromium.org> <C908FF06-43F1-4A5C-B80F-0982315DDB6A@holtmann.org>
+In-Reply-To: <C908FF06-43F1-4A5C-B80F-0982315DDB6A@holtmann.org>
+From:   Brian Norris <briannorris@chromium.org>
+Date:   Wed, 27 Feb 2019 13:34:22 -0800
+X-Gmail-Original-Message-ID: <CA+ASDXOG43dRtqzZJuA4ixVvfpt-Wd1rUVMMG3QFRnNGOmY5GA@mail.gmail.com>
+Message-ID: <CA+ASDXOG43dRtqzZJuA4ixVvfpt-Wd1rUVMMG3QFRnNGOmY5GA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] Bluetooth: btusb: add QCA6174A compatible properties
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Heiko Stuebner <heiko@sntech.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Douglas Anderson <dianders@chromium.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        "open list:ARM/Rockchip SoC..." <linux-rockchip@lists.infradead.org>,
+        Linux Bluetooth mailing list 
+        <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Rajat Jain <rajatja@google.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -76,33 +89,37 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marcel,
 
-On Wed, Feb 27, 2019 at 08:48:31AM +0100, Marcel Holtmann wrote:
-> Hi Matthias,
-> 
-> > The current 300ms delay after a baudrate change is extremely long.
-> > For WCM3990 it is sufficient to wait 10ms after the baudrate change
-> > request has been sent over the wire.
-> > 
-> > Also use msleep() instead of a set_current_state() / schedule_timeout()
-> > combo.
-> > 
-> > Matthias Kaehlcke (2):
-> >  hci_qca: Use msleep() instead of open coding it
-> >  hci_qca: Reduce delay after sending baudrate request for WCN3990
-> > 
-> > drivers/bluetooth/hci_qca.c | 30 +++++++++++++++++++++---------
-> > 1 file changed, 21 insertions(+), 9 deletions(-)
-> 
-> patch 1/2 has been applied to bluetooth-next tree.
+On Tue, Feb 26, 2019 at 11:53 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+> > We may need to specify a GPIO wake pin for this device, so add a
+> > compatible property for it.
+> >
+> > There are at least to USB PID/VID variations of this chip: one with a
+> > Lite-On ID and one with an Atheros ID.
+> >
+> > Signed-off-by: Brian Norris <briannorris@chromium.org>
+> > Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> > ---
+> > v2:
+> > * drop leading zeroes from VID, per documented binding
+> > ---
+> > drivers/bluetooth/btusb.c | 2 ++
+> > 1 file changed, 2 insertions(+)
+>
+> all 3 patches have been applied to bluetooth-next tree.
 
-Thanks!
+Thanks! I failed to repeat my comment from v1:
 
-> The patch 2/2 fails to apply.
+"""
+This patch is also required to make this stable, but since it's not
+really tied to the device tree, and it's an existing bug, I sent it
+separately:
 
-Right, the series "Bluetooth: hci_qca: Add delay after power-off
-pulse" that was just applied touches the same code. I'll send a
-rebased version soon.
+  https://lore.kernel.org/patchwork/patch/1044896/
+  Subject: Bluetooth: btusb: request wake pin with NOAUTOEN
+"""
 
-Cheers
+Can you take this one too? Otherwise Scarlet will be less stable
+(possible interrupt storm at boot).
 
-Matthias
+Regards,
+Brian
