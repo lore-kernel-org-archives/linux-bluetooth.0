@@ -1,137 +1,143 @@
-Return-Path: <SRS0=KRcZ=RD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=mQGV=RE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC27C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Feb 2019 23:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB92C10F06
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Mar 2019 02:14:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E745218AE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Feb 2019 23:25:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6145218B0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Mar 2019 02:14:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732500AbfB1XZB (ORCPT
+        id S1729783AbfCACOY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Feb 2019 18:25:01 -0500
-Received: from mga12.intel.com ([192.55.52.136]:36901 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732436AbfB1XY7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Feb 2019 18:24:59 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Feb 2019 15:24:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,425,1544515200"; 
-   d="scan'208";a="324330737"
-Received: from ingas-nuc1.sea.intel.com ([10.254.180.113])
-  by fmsmga005.fm.intel.com with ESMTP; 28 Feb 2019 15:24:59 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] doc/mesh-api: Fix Attach() method signature
-Date:   Thu, 28 Feb 2019 15:24:56 -0800
-Message-Id: <20190228232456.9707-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.17.2
+        Thu, 28 Feb 2019 21:14:24 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:41670 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725896AbfCACOY (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 28 Feb 2019 21:14:24 -0500
+X-UUID: 0318acd61d9b4d9296986d1fdbb00a07-20190301
+X-UUID: 0318acd61d9b4d9296986d1fdbb00a07-20190301
+Received: from mtkmrs01.mediatek.inc [(172.21.131.159)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 97358672; Fri, 01 Mar 2019 10:14:18 +0800
+Received: from mtkcas08.mediatek.inc (172.21.101.126) by
+ mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Fri, 1 Mar 2019 10:14:10 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas08.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Fri, 1 Mar 2019 10:14:10 +0800
+From:   <sean.wang@mediatek.com>
+To:     <robh+dt@kernel.org>, <mark.rutland@arm.com>,
+        <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
+Subject: [PATCH v2 1/2] dt-bindings: net: bluetooth: add support for MediaTek MT7663U and MT7668U UART devices
+Date:   Fri, 1 Mar 2019 10:14:07 +0800
+Message-ID: <937e729bab743a5e1c0f74db789064de2d078241.1551405664.git.sean.wang@mediatek.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <cover.1551405664.git.sean.wang@mediatek.com>
+References: <cover.1551405664.git.sean.wang@mediatek.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-TM-SNTS-SMTP: E4A479C784B4D73BCF107209ED08A0004351E035A710CF03884C6DB4DB123B1D2000:8
+X-MTK:  N
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Correct return arguments for Attach() method.
-Also, fix some grammar and formatting.
----
- doc/mesh-api.txt | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+From: Sean Wang <sean.wang@mediatek.com>
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index e1bc3ee02..0b341a0f9 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -1,4 +1,3 @@
--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
- BlueZ D-Bus Mesh API description
- ********************************
- 
-@@ -12,16 +11,16 @@ Methods:
- 	void Join(object app_defined_root, array{byte}[16] uuid)
- 
- 		This is the first method that an application has to call to
--		become a provisioned node on a mesh network.  The call will
-+		become a provisioned node on a mesh network. The call will
- 		initiate broadcasting of Unprovisioned Device Beacon.
- 
- 		The app_defined_root parameter is a D-Bus object root path of
- 		the application that implements org.bluez.mesh.Application1
- 		interface. The application represents a node where child mesh
- 		elements have their own objects that implement
--		org.bluez.mesh.Element1 interface.  The application hierarchy
-+		org.bluez.mesh.Element1 interface. The application hierarchy
- 		also contains a provision agent object that implements
--		org.bluez.mesh.ProvisionAgent1 interface.  The standard
-+		org.bluez.mesh.ProvisionAgent1 interface. The standard
- 		DBus.ObjectManager interface must be available on the
- 		app_defined_root path.
- 
-@@ -34,8 +33,8 @@ Methods:
- 		Cancels an outstanding provisioning request initiated by Join()
- 		method.
- 
--	(object node, array{byte, array{(uint16, dict}} configuration)
--				Attach(object app_defined_root, uint64 token)
-+	object node, array{byte, array{(uint16, dict)}} configuration
-+			Attach(object app_defined_root, uint64 token)
- 
- 		This is the first method that an application must call to get
- 		access to mesh node functionalities.
-@@ -58,13 +57,13 @@ Methods:
- 		(see Mesh Node Hierarchy section) and current configuration
- 		settings. The return value of configuration parameter is an
- 		array, where each entry is a structure that contains element
--		configuration.  The element configuration structure is organized
-+		configuration. The element configuration structure is organized
- 		as follows:
- 
- 		byte
- 
- 			Element index, identifies the element to which this
--			configuration entry pertians.
-+			configuration entry pertains.
- 
- 		array{struct}
- 
-@@ -140,7 +139,7 @@ Methods:
- 		be returned.
- 
- 		The data parameter is an outgoing message to be encypted by the
--		meshd daemon and sent on.
-+		bluetooth-meshd daemon and sent on.
- 
- 		Possible errors:
- 			org.bluez.mesh.Error.NotAuthorized
-@@ -308,8 +307,8 @@ Methods:
- 	void MessageReceived(uint16 source, uint16 key_index,
- 					boolean subscription, array{byte} data)
- 
--		This method is called by meshd daemon when a message arrives
--		addressed to the application.
-+		This method is called by bluetooth-meshd daemon when a message
-+		arrives addressed to the application.
- 
- 		The source parameter is unicast address of the remote
- 		node-element that sent the message.
-@@ -328,7 +327,7 @@ Methods:
- 
- 	void UpdateModelConfiguration(uint16 model_id, dict config)
- 
--		This method is called by meshd daemon when a model's
-+		This method is called by bluetooth-meshd daemon when a model's
- 		configuration is updated.
- 
- 		The model_id parameter contains BT SIG Model Identifier or, if
+Update binding document with adding support of MT7663U and MT7668U UART
+devices to mediatek-bluetooth.
+
+Reviewed-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+ .../bindings/net/mediatek-bluetooth.txt       | 64 +++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+index 14ceb2a5b4e8..41a7dcc80f5b 100644
+--- a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
++++ b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+@@ -33,3 +33,67 @@ Example:
+ 			clock-names = "ref";
+ 		};
+ 	};
++
++MediaTek UART based Bluetooth Devices
++==================================
++
++This device is a serial attached device to UART device and thus it must be a
++child node of the serial node with UART.
++
++Please refer to the following documents for generic properties:
++
++	Documentation/devicetree/bindings/serial/slave-device.txt
++
++Required properties:
++
++- compatible:	Must be
++		  "mediatek,mt7663u-bluetooth": for MT7663U device
++		  "mediatek,mt7668u-bluetooth": for MT7668U device
++- vcc-supply:	Main voltage regulator
++- pinctrl-names: Should be "default", "runtime"
++- pinctrl-0: Should contain UART RXD low when the device is powered up to
++	     enter proper bootstrap mode.
++- pinctrl-1: Should contain UART mode pin ctrl
++
++Optional properties:
++
++- reset-gpios:	GPIO used to reset the device whose initial state keeps low,
++		if the GPIO is missing, then board-level design should be
++		guaranteed.
++- current-speed:  Current baud rate of the device whose defaults to 921600
++
++Example:
++
++	uart1_pins_boot: uart1-default {
++		pins-dat {
++			pinmux = <MT7623_PIN_81_URXD1_FUNC_GPIO81>;
++			output-low;
++		};
++	};
++
++	uart1_pins_runtime: uart1-runtime {
++		pins-dat {
++			pinmux = <MT7623_PIN_81_URXD1_FUNC_URXD1>,
++				 <MT7623_PIN_82_UTXD1_FUNC_UTXD1>;
++		};
++	};
++
++	uart1: serial@11003000 {
++		compatible = "mediatek,mt7623-uart",
++			     "mediatek,mt6577-uart";
++		reg = <0 0x11003000 0 0x400>;
++		interrupts = <GIC_SPI 52 IRQ_TYPE_LEVEL_LOW>;
++		clocks = <&pericfg CLK_PERI_UART1_SEL>,
++			 <&pericfg CLK_PERI_UART1>;
++		clock-names = "baud", "bus";
++
++		bluetooth {
++			compatible = "mediatek,mt7663u-bluetooth";
++			vcc-supply = <&reg_5v>;
++			reset-gpios = <&pio 24 GPIO_ACTIVE_LOW>;
++			pinctrl-names = "default", "runtime";
++			pinctrl-0 = <&uart1_pins_boot>;
++			pinctrl-1 = <&uart1_pins_runtime>;
++			current-speed = <921600>;
++		};
++	};
 -- 
-2.17.2
+2.18.0
 
