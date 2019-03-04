@@ -2,119 +2,85 @@ Return-Path: <SRS0=2QA5=RH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9862C4360F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 05:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEA5C43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 06:10:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91EE621019
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 05:19:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE53B2082F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 06:10:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhQ91FO5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726037AbfCDFTa (ORCPT
+        id S1725975AbfCDGK0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Mar 2019 00:19:30 -0500
-Received: from rtits2.realtek.com ([211.75.126.72]:52918 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725974AbfCDFTa (ORCPT
+        Mon, 4 Mar 2019 01:10:26 -0500
+Received: from mail-wm1-f50.google.com ([209.85.128.50]:55099 "EHLO
+        mail-wm1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725550AbfCDGKZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Mar 2019 00:19:30 -0500
-Authenticated-By: 
-X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x245HkoV011929, This message is accepted by code: ctaloc0852
-Received: from RS-CAS01.realsil.com.cn (RSFS1.realsil.com.cn[172.29.17.2](maybeforged))
-        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x245HkoV011929
-        (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Mon, 4 Mar 2019 13:17:47 +0800
-Received: from RS-MBS01.realsil.com.cn ([::1]) by RS-CAS01.realsil.com.cn
- ([::1]) with mapi id 14.03.0415.000; Mon, 4 Mar 2019 13:17:46 +0800
-From:   =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-To:     Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-CC:     "anarsoul@gmail.com" <anarsoul@gmail.com>,
-        "beagleboard@davidjohnsummers.uk" <beagleboard@davidjohnsummers.uk>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "maxime.ripard@bootlin.com" <maxime.ripard@bootlin.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "robh@kernel.org" <robh@kernel.org>,
-        "stefan.wahren@i2se.com" <stefan.wahren@i2se.com>,
-        "wens@csie.org" <wens@csie.org>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggMy84XSBkdC1iaW5kaW5nczogbmV0OiBibHVldG9v?= =?utf-8?Q?th:_Add_rtl8723bs-bluetooth?=
-Thread-Topic: [PATCH 3/8] dt-bindings: net: bluetooth: Add
- rtl8723bs-bluetooth
-Thread-Index: AQHU0GuIclVduIKGj0ir7LldTFw7OaX4EjYv///1GgCAAuo4EA==
-Date:   Mon, 4 Mar 2019 05:17:45 +0000
-Message-ID: <0551C926975A174EA8972327741C7889EE6B1490@RS-MBS01.realsil.com.cn>
-References: <CA+E=qVdsU7sBkOQUmMprhD-Sdw7TdFnwFdGCv=4iRe++y1AwOg@mail.gmail.com>
- <20190301201519.21953-1-martin.blumenstingl@googlemail.com>
- <0551C926975A174EA8972327741C7889EE6B1008@RS-MBS01.realsil.com.cn>
- <CAFBinCDFY+fZs2unV1T5Mhh_VVSUfxK75zZXKdanLKG+arRX5g@mail.gmail.com>
-In-Reply-To: <CAFBinCDFY+fZs2unV1T5Mhh_VVSUfxK75zZXKdanLKG+arRX5g@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.29.36.107]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Mon, 4 Mar 2019 01:10:25 -0500
+Received: by mail-wm1-f50.google.com with SMTP id f3so932607wmj.4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Mar 2019 22:10:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=IqMPVY8zf5eTB3U86QouNQZaZRyC3bBKqdGlH7YHfTQ=;
+        b=jhQ91FO52XieVxb3JbU4XHB5QXRGSB2yuT41QPbGQJUAOs+29O86aoHjkGJ3/CKRxW
+         cV4+F2wuq11N78Xm0nKz+vpz8eppT8L7cfJskNcJcyMwULwoKX0l0hxEWP1EF5GfLmbu
+         z0TcUfRxZ9jr0vJXy7z5N1GDCrvCJ6bIY5X5lIeAs+BDCWcf7CPPfLki4GdiCKHh+7QZ
+         Zuqnc0RjqqLpGLVJq27fNa6E/BnLrHenAmZSNobBMVNIahvVjiSTovgsV8W4UkklGhSY
+         mJ/8Gv944qn7UDVsZ2WqOw3FErKuXOd9uwuj5dcnPs4IlMv/wj3GOtcO7DritWYmxCGG
+         GtJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=IqMPVY8zf5eTB3U86QouNQZaZRyC3bBKqdGlH7YHfTQ=;
+        b=Kynwy6JWQOXVlBShgpgjM3rNLgFbKe4IjgPkIuWTri28s8UMxYta5UeFPxgqXMahe3
+         He/gc/FM2A6a5pIvpsUnIL4+5RSG53BNajemaunT4n3WiZzV5t0y3/txagnXo6J3zvc6
+         ZCTpC/8pVMpaezBsCfMiQmwX+xnlNXs7jzOxjgasp5uhIRUD544bOc6HLe5HeMu6j3C6
+         NTPjbnwRTo5it9Gu3eFmPnq5z1Ijrjo02vUkdfLeOHW0xMvO6eCWkf7TXz2YeGqwDQ9y
+         VS1kMrEclU6pKnLzUU5ligCBMnieKmQCkl/n8n/kXsRCZpfEE9b8IM2BG0pRPScEHOAc
+         TYxQ==
+X-Gm-Message-State: AHQUAuaBU8NgRXyUygtcsPcF/7BcStDJTSX4YHmr7BhJgq9VZI6qKYsq
+        zim4QH/i+/F2O+EpBEVRpoQsyqHKgx8YwH8/6f67gsSW
+X-Google-Smtp-Source: AHgI3IZ6U1zUDRLPRlqLTOnXnehJ33zRR3DX9/dnjDHgrgmCMg1rMvsLba33yD7iR27+pJpKGGai60cS4WCNPgKww2c=
+X-Received: by 2002:a7b:c8c8:: with SMTP id f8mr10106008wml.36.1551679823748;
+ Sun, 03 Mar 2019 22:10:23 -0800 (PST)
 MIME-Version: 1.0
+From:   Peter Wagner <wagnerpeter932@gmail.com>
+Date:   Mon, 4 Mar 2019 07:10:13 +0100
+Message-ID: <CAP4jTnWrEUDtV7jAq8E=U-jzPWTm1egC62QdZmneOvETc1_N5A@mail.gmail.com>
+Subject: Is it possible to Switch off the 3Mbit/s EDR mode without disabling
+ the 2Mbit/s EDR mode with Bluez?
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWFydGluLA0KWW91J3JlIHJpZ2h0IGFib3V0IHRoZSBjb25maWcgYmxvYi4NClRoYW5rcyBm
-b3IgeW91ciBpbnZpdGF0aW9uIHRvIHRoZSBkaXNjdXNzaW9uLg0KSW4gbXkgb3B0aW9uLCBzcGVj
-aWZ5aW5nIHRoZSBwcm9wZXJ0aWVzIG9mIHRoZSBjb25uZWN0aW9uIHRvIHRoZSBjaGlwIHdvdWxk
-IGJlIGJldHRlci4NCg0KVGhhbmtzLA0KQlJzLA0KQWxleCBMdS4NCg0KLS0tLS3pgq7ku7bljp/k
-u7YtLS0tLQ0K5Y+R5Lu25Lq6OiBNYXJ0aW4gQmx1bWVuc3RpbmdsIFttYWlsdG86bWFydGluLmJs
-dW1lbnN0aW5nbEBnb29nbGVtYWlsLmNvbV0gDQrlj5HpgIHml7bpl7Q6IDIwMTnlubQz5pyIM+aX
-pSAwOjQ0DQrmlLbku7bkuro6IOmZhuacseS8nw0K5oqE6YCBOiBhbmFyc291bEBnbWFpbC5jb207
-IGJlYWdsZWJvYXJkQGRhdmlkam9obnN1bW1lcnMudWs7IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGRl
-dmljZXRyZWVAdmdlci5rZXJuZWwub3JnOyBqb2hhbi5oZWRiZXJnQGdtYWlsLmNvbTsgbGludXgt
-YXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJu
-ZWwub3JnOyBtYXJjZWxAaG9sdG1hbm4ub3JnOyBtYXJrLnJ1dGxhbmRAYXJtLmNvbTsgbWF4aW1l
-LnJpcGFyZEBib290bGluLmNvbTsgbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgcm9iaEBrZXJuZWwu
-b3JnOyBzdGVmYW4ud2FocmVuQGkyc2UuY29tOyB3ZW5zQGNzaWUub3JnDQrkuLvpopg6IFJlOiBb
-UEFUQ0ggMy84XSBkdC1iaW5kaW5nczogbmV0OiBibHVldG9vdGg6IEFkZCBydGw4NzIzYnMtYmx1
-ZXRvb3RoDQoNCkhpIEFsZXgsDQoNCk9uIFNhdCwgTWFyIDIsIDIwMTkgYXQgMTA6MzAgQU0g6ZmG
-5pyx5LyfIDxhbGV4X2x1QHJlYWxzaWwuY29tLmNuPiB3cm90ZToNCj4NCj4gSGkgTWFydGluLA0K
-PiBUaGFua3MgZm9yIHlvdXIgaW5mb3JtYXRpb24uDQp0aGFuayB5b3UgZm9yIHRoZSBxdWljayBy
-ZXBseSENCg0KPiBUaGUgY29uZmlnIGlzIHJlbGF0ZWQgdG8gZUZ1c2UgaW4gY2hpcHMuIEknbSBz
-b3JyeSB0aGF0IHRoZSBkZXRhaWxzIGNhbid0IGJlIG9wZW4uDQo+IE9ubHkgc29tZSBzcGVjaWFs
-IGNvbmZpZ3VyYXRpb25zIGFyZSByZWxhdGVkIHRvIHRoZSBob3N0IHBsYXRmb3Jtcywgc3VjaCBh
-cyBVQVJUIHdvcmtpbmcgYmF1ZHJhdGUsIGhhcmR3YXJlIGZsb3cgY29udHJvbCwgUENNIHNldHRp
-bmdzLCBldGMuIFRoZXNlIGFyZSB0aGUgc2V0dGluZ3MgZm9yIEhDSSBVQVJUIGFuZCBQQ00gSW50
-ZXJmYWNlLg0KPiBNb3N0IG9mIGNvbmZpZ3VyYXRpb25zIGFyZSBvbmx5IHJlbGV2YW50IHRvIGNo
-aXBzLg0KcGxlYXNlIGxldCBtZSByZXBlYXQgdGhpcyB3aXRoIG15IG93biB3b3JkcyB0byBzZWUg
-aWYgSSB1bmRlcnN0YW5kIHRoZQ0KImNvbmZpZyBibG9iIiBjb3JyZWN0bHkuIEZlZWwgZnJlZSB0
-byBjb3JyZWN0IG1lIGlmIGFueXRoaW5nIGlzIHdyb25nOg0KLSB0aGUgZGF0YSBpbiB0aGUgY29u
-ZmlnIGJsb2IgInBhdGNoZXMiIGVGdXNlIHZhbHVlcyBhdCBydW50aW1lIChub24tcGVyc2lzdGVu
-dCkNCi0gd2Uga25vdyB0aGUgb2Zmc2V0cyBvZiB0aGUgVUFSVF9DT05GSUcsIFBDTV9TRVRUSU5H
-IGFuZCBCRF9BRERSIC0NCnRoZXNlIGNhbiBiZSAiYm9hcmQgc3BlY2lmaWMiIChsaWtlIGJhdWQg
-cmF0ZSwgZmxvdyBjb250cm9sLCAuLi4pDQotIG1vc3Qgb3RoZXIgdmFsdWVzIGZyb20gdGhlICJj
-b25maWcgYmxvYiIgYXJlICJjaGlwIHNwZWNpZmljIiAtDQptZWFuaW5nIHRoZXkgYXJlIGlkZW50
-aWNhbCBmb3IgZWFjaCBib2FyZCBhbmQgdGhleSBvbmx5IGRlcGVuZCBvbiB0aGUNCmNoaXANCg0K
-ZG8geW91IGhhdmUgYW55IHN1Z2dlc3Rpb25zIGhvdyB3ZSBjYW4gc3VwcG9ydCBtdWx0aXBsZSBi
-b2FyZHMgKHRoZQ0KbWFpbiBnb2FsIG9mIHRoaXMgd2hvbGUgZGlzY3Vzc2lvbiBpczogaG93IHRv
-IGRvIHRoaXMgImNvcnJlY3QiKT8NCnNvIGZhciBkaWZmZXJlbnQgYXBwcm9hY2hlcyB3ZXJlIGRp
-c2N1c3NlZCAobm90IG9ubHkgaW4gdGhpcyB0aHJlYWQsDQpidXQgYWxzbyBpbiB0aGUgcGFzdCk6
-DQotIHVzZSBhIHNlcGFyYXRlIGNvbmZpZyBibG9iIGZvciBlYWNoIGJvYXJkLiB0aGlzIG1lYW5z
-IHRoYXQgd2hlbmV2ZXINCmEgbmV3IGJvYXJkIGlzIHN1cHBvcnRlZCAoZm9yIGV4YW1wbGUgYnkg
-YWRkaW5nIGEgLmR0cyBmb3IgaXQgdG8gdGhlDQptYWlubGluZSBrZXJuZWwpIHRoZW4gQmx1ZXRv
-b3RoIHdvbid0IHdvcmsgb3V0LW9mLXRoZS1ib3ggdW5sZXNzIGENCmNvbmZpZyBpcyBwcm92aWRl
-ZC4NCi0gc3BlY2lmeSB0aGUgcHJvcGVydGllcyBvZiB0aGUgY29ubmVjdGlvbiB0byB0aGUgY2hp
-cCAoZm9yIGV4YW1wbGUgYnkNCmFkZGluZyBhIGRldmljZS10cmVlIHByb3BlcnR5IGZvciB0aGUg
-c3BlZWQsIGZsb3cgY29udHJvbCwgLi4uKSBhbmQNCmdlbmVyYXRlIHRoZSBjb25maWcgYmFzZWQg
-b24gdGhlIGRldmljZS10cmVlIHByb3BlcnRpZXMuDQotIChJIGFtIG9wZW4gZm9yIG90aGVyIHN1
-Z2dlc3Rpb25zLCBwbGVhc2UgbGV0IHVzIGtub3cgaWYgeW91IGhhdmUgYW55KQ0KDQpJIHdvdWxk
-IGxpa2UgdG8gaGVhciB5b3VyIG9waW5pb24gb24gdGhpcyB0b3BpYyBhbmQgZXNwZWNpYWxseSB0
-aGUNCnJlYXNvbnMgYmVoaW5kIHlvdXIgc3VnZ2VzdGlvbnMuDQoNCg0KQmVzdCByZWdhcmRzDQpN
-YXJ0aW4NCg0KLS0tLS0tUGxlYXNlIGNvbnNpZGVyIHRoZSBlbnZpcm9ubWVudCBiZWZvcmUgcHJp
-bnRpbmcgdGhpcyBlLW1haWwuDQo=
+Hi,
+
+on a embedded device which is using the qca9377 BT chip I like to use
+Bluetooth classic with the BR and EDR mode.
+For some reason i have to ensure that the 8DPSK modulation type is not used.
+For that reason i have to disable the ACL frame types 3-DH1, 3-DH3 and
+3-DH5 on my embedded device. The mentioned ACL frame types above are
+related to the 3Mbit/s EDR mode.
+So my goal is to switch off the 3Mbit's EDR mode without disabling the
+2Mbit's EDR mode.
+I already tried to switch off this ACL frame types with the deprecated
+hciconfig tool of Bluez version 5.50, but without success. (hciconfig
+-a hci0 ptype DM1,DM3,DM5,DH1,DH3,DH5,2-DH1,2-DH3,2-DH5)
+After a WireShark trace of the pairing process there was still the
+"EDR ACL 3 Mbps Mode": flag "true" in the "Read Remote Supported
+Features" response .
+So is it possible to switch off the 3 Mbit/s EDR mode on the qca9377 BT-Chip?
+
+Best regards,
+
+Peter
