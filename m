@@ -2,223 +2,119 @@ Return-Path: <SRS0=2QA5=RH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF03C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 02:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9862C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 05:19:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9710E20842
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 02:12:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91EE621019
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Mar 2019 05:19:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726034AbfCDCM3 (ORCPT
+        id S1726037AbfCDFTa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 Mar 2019 21:12:29 -0500
-Received: from mail-gw.thundercloud.uk ([149.255.60.82]:56202 "EHLO
-        mail-gw.thundercloud.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726017AbfCDCM2 (ORCPT
+        Mon, 4 Mar 2019 00:19:30 -0500
+Received: from rtits2.realtek.com ([211.75.126.72]:52918 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725974AbfCDFTa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 Mar 2019 21:12:28 -0500
-Received: from mailbsf01.thundercloud.uk (mail-gw.thundercloud.uk [149.255.60.72])
-        by mail-gw.thundercloud.uk (Postfix) with ESMTPS id EA01C6045E5D
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Mar 2019 02:12:26 +0000 (GMT)
-X-ASG-Debug-ID: 1551665545-0554131266b67b20001-Y6scnF
-Received: from cloud706.unlimitedwebhosting.co.uk (no-dns-yet.unlimited.uk.net [149.255.62.7]) by mailbsf01.thundercloud.uk with ESMTP id SuoISRvmkPIIKAMB (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Mon, 04 Mar 2019 02:12:25 +0000 (GMT)
-X-Barracuda-Envelope-From: beagleboard@davidjohnsummers.uk
-X-Barracuda-Effective-Source-IP: no-dns-yet.unlimited.uk.net[149.255.62.7]
-X-Barracuda-Apparent-Source-IP: 149.255.62.7
-Received: from [87.114.170.31] (port=51082 helo=[192.168.2.187])
-        by cloud706.unlimitedwebhosting.co.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.91)
-        (envelope-from <beagleboard@davidjohnsummers.uk>)
-        id 1h0XWI-00072R-6k; Sun, 03 Mar 2019 20:15:34 +0000
-Subject: Re: [PATCH 3/3] ARM: dts: rk3288 Tinker Board (S) add bluetooth
-To:     heiko@sntech.de, robh+dt@kernel.org, mark.rutland@arm.com
-X-ASG-Orig-Subj: Re: [PATCH 3/3] ARM: dts: rk3288 Tinker Board (S) add bluetooth
-Cc:     linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Tony McKahan <tonymckahan@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Vasily Khoruzhick <anarsoul@gmail.com>
-References: <20190217121513.22965-1-beagleboard@davidjohnsummers.uk>
- <20190217121513.22965-4-beagleboard@davidjohnsummers.uk>
-From:   David Summers <beagleboard@davidjohnsummers.uk>
-Message-ID: <4de2979b-0553-300c-fea5-49d68e2b3580@davidjohnsummers.uk>
-Date:   Sun, 3 Mar 2019 20:15:31 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Mon, 4 Mar 2019 00:19:30 -0500
+Authenticated-By: 
+X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x245HkoV011929, This message is accepted by code: ctaloc0852
+Received: from RS-CAS01.realsil.com.cn (RSFS1.realsil.com.cn[172.29.17.2](maybeforged))
+        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x245HkoV011929
+        (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
+        Mon, 4 Mar 2019 13:17:47 +0800
+Received: from RS-MBS01.realsil.com.cn ([::1]) by RS-CAS01.realsil.com.cn
+ ([::1]) with mapi id 14.03.0415.000; Mon, 4 Mar 2019 13:17:46 +0800
+From:   =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
+To:     Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+CC:     "anarsoul@gmail.com" <anarsoul@gmail.com>,
+        "beagleboard@davidjohnsummers.uk" <beagleboard@davidjohnsummers.uk>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "maxime.ripard@bootlin.com" <maxime.ripard@bootlin.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "robh@kernel.org" <robh@kernel.org>,
+        "stefan.wahren@i2se.com" <stefan.wahren@i2se.com>,
+        "wens@csie.org" <wens@csie.org>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggMy84XSBkdC1iaW5kaW5nczogbmV0OiBibHVldG9v?= =?utf-8?Q?th:_Add_rtl8723bs-bluetooth?=
+Thread-Topic: [PATCH 3/8] dt-bindings: net: bluetooth: Add
+ rtl8723bs-bluetooth
+Thread-Index: AQHU0GuIclVduIKGj0ir7LldTFw7OaX4EjYv///1GgCAAuo4EA==
+Date:   Mon, 4 Mar 2019 05:17:45 +0000
+Message-ID: <0551C926975A174EA8972327741C7889EE6B1490@RS-MBS01.realsil.com.cn>
+References: <CA+E=qVdsU7sBkOQUmMprhD-Sdw7TdFnwFdGCv=4iRe++y1AwOg@mail.gmail.com>
+ <20190301201519.21953-1-martin.blumenstingl@googlemail.com>
+ <0551C926975A174EA8972327741C7889EE6B1008@RS-MBS01.realsil.com.cn>
+ <CAFBinCDFY+fZs2unV1T5Mhh_VVSUfxK75zZXKdanLKG+arRX5g@mail.gmail.com>
+In-Reply-To: <CAFBinCDFY+fZs2unV1T5Mhh_VVSUfxK75zZXKdanLKG+arRX5g@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.29.36.107]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190217121513.22965-4-beagleboard@davidjohnsummers.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-PH
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - cloud706.unlimitedwebhosting.co.uk
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - davidjohnsummers.uk
-X-Get-Message-Sender-Via: cloud706.unlimitedwebhosting.co.uk: authenticated_id: davidjoh/from_h
-X-Authenticated-Sender: cloud706.unlimitedwebhosting.co.uk: beagleboard@davidjohnsummers.uk
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Barracuda-Connect: no-dns-yet.unlimited.uk.net[149.255.62.7]
-X-Barracuda-Start-Time: 1551665545
-X-Barracuda-Encrypted: ECDHE-RSA-AES256-GCM-SHA384
-X-Barracuda-URL: https://149.255.60.72:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at thundercloud.uk
-X-Barracuda-Scan-Msg-Size: 4797
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Spam-Score: 0.00
-X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=2.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.68164
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Finally on the patch to give an outline description to Bluetooth on the 
-Tinker Boards.
-
-Synthesis here is harder.
-
-On the one hand, it is non functioning - because although it describes 
-the hardware, it has no compatible flag, and there is no current driver 
-in the kernel.
-
-It should be said though there is a patch for a proposed driver:
-
-https://www.spinics.net/lists/linux-bluetooth/msg78661.html
-
-And if accepted this would give the compatible flag. So should this 
-change wait until that is added?
-
-An alternative approach though arises from what Tony McKahan of Armbian 
-writes
-
-"For the Bluetooth I can confirm _RTS is required"
-
-So this device tree segment is useful - it correctly describes the uart 
-portion of the interface, and that is hard to determine from the ASUS 
-dts. So this is useful information to capture.
-
-On the pinout information of the rtl8723. Two points:
-
-1) information like clock, and voltage supplies, are formally hardware 
-correct, but practically will probably never be applied via bluetooth. 
-Instead its the wifi that brings this hardware up. So should these be 
-supplied if unlikly to be used? I think they should as they formally 
-describe the hardware.
-
-2) Confusion over enable-gpios vs reset-gpios
-
-The second appeared on the bluetooth thread:
-
-https://www.spinics.net/lists/linux-bluetooth/msg78654.html
-
-should this be written:
-
-enable-gpios = <&gpio4 RK_PD5 GPIO_ACTIVE_LOW>;
-
-or
-
-reset-gpios = <&gpio4 RK_PD5 GPIO_ACTIVE_HIGH>;
-
-The datasheet (as available as it is): 
-http://cit.odessa.ua/media/pdf/Intel-Compute-Stick/FN-Link_F23BDSM25-W1.pdf
-
-Says it is BT_RST - BT Reset IN
-
-but the current kernel driver hci_h5 says:
-
-https://github.com/torvalds/linux/blob/master/drivers/bluetooth/hci_h5.c#L989
-
-     { "enable-gpios", &btrtl_enable_gpios, 1 },
-
-And RobH clearly has a view:
-
-https://www.spinics.net/lists/linux-bluetooth/msg79138.html
-
-So there is still some confusion.
-
-Guess its a question of it a partial hardware description, with possible 
-faults, is better than no device tree description of the hardware?
-
-Any views?
-
-
-
-On 17/02/2019 12:15, David Summers wrote:
-> This patch is to add Bluetooth to the ASUS Tinker Board (S) device
-> tree.
->
-> This patch is more contraversal - so probably view it as a request for
-> comments.
->
-> The reason behind this, is this patch does not currently set Bluetooth
-> working on the these boards. The problem is that the
-> bluetooth/hci_h5.c driver, that is used for Realtek serial devices,
-> depends on ACPI. Unfortantly ACPI can not be enabled on armv7 machines
-> such as the TB(S). And so the kernel module for the RTL8723BS
-> Bluetooth can not be loaded.
->
-> However this patch is believed to be an accurate description of the
-> Tinker Board (S) wiring. It is strongly based on the ASUS patch:
->
-> https://github.com/TinkerBoard/debian_kernel/commit/6a3128ade33f758887048578ada61a4b7ab8e678
->
-> As the Bluetooth is connected via a UART and this is wired into uart0,
-> this has been described as a SerDev.
->
-> The ASUS patch mentions the UART_CTS, but not the _RTS. Now as the
-> RTL8723BS has both CTS and RTS on the uart, it has been assumed both
-> are wired into uart0 on the cpu.
->
-> The Bluetooth connection has several wake up pins both device and host
-> and a reset pin. The wiring of these has been described; however how
-> the kernel driver will use these isn't clear. E.g. should HOST_WAKE be
-> an interupt?
->
-> The main reason for asking for comments, is that when it comes time to
-> make the changes to the bluetooth uart code, and add compatible flags,
-> robh has indicated that this will only be accepted with a valid
-> example. So the code below is that example. So I would like comments
-> that this approach is valid, which can be used when the later
-> submission comes.
->
-> Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
-> ---
->   arch/arm/boot/dts/rk3288-tinker.dtsi | 11 +++++++++++
->   1 file changed, 11 insertions(+)
->
-> diff --git a/arch/arm/boot/dts/rk3288-tinker.dtsi b/arch/arm/boot/dts/rk3288-tinker.dtsi
-> index e1796f340eef..931b4c652fdc 100644
-> --- a/arch/arm/boot/dts/rk3288-tinker.dtsi
-> +++ b/arch/arm/boot/dts/rk3288-tinker.dtsi
-> @@ -481,6 +481,17 @@
->   
->   &uart0 {
->   	status = "okay";
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&uart0_xfer>, <&uart0_cts>, <&uart0_rts>;
-> +
-> +	bluetooth {
-> +		clocks = <&rk808 RK808_CLKOUT1>;
-> +		reset-gpios = <&gpio4 RK_PD5 GPIO_ACTIVE_LOW>;
-> +		device-wake-gpios = <&gpio4 RK_PD2 GPIO_ACTIVE_HIGH>;
-> +		host-wake-gpios = <&gpio4 RK_PD7 GPIO_ACTIVE_HIGH>;
-> +		vcc-18-supply = <&vcc_18>;
-> +		vcc-io-supply = <&vcc_io>;
-> +	};
->   };
->   
->   &uart1 {
-
-
+SGkgTWFydGluLA0KWW91J3JlIHJpZ2h0IGFib3V0IHRoZSBjb25maWcgYmxvYi4NClRoYW5rcyBm
+b3IgeW91ciBpbnZpdGF0aW9uIHRvIHRoZSBkaXNjdXNzaW9uLg0KSW4gbXkgb3B0aW9uLCBzcGVj
+aWZ5aW5nIHRoZSBwcm9wZXJ0aWVzIG9mIHRoZSBjb25uZWN0aW9uIHRvIHRoZSBjaGlwIHdvdWxk
+IGJlIGJldHRlci4NCg0KVGhhbmtzLA0KQlJzLA0KQWxleCBMdS4NCg0KLS0tLS3pgq7ku7bljp/k
+u7YtLS0tLQ0K5Y+R5Lu25Lq6OiBNYXJ0aW4gQmx1bWVuc3RpbmdsIFttYWlsdG86bWFydGluLmJs
+dW1lbnN0aW5nbEBnb29nbGVtYWlsLmNvbV0gDQrlj5HpgIHml7bpl7Q6IDIwMTnlubQz5pyIM+aX
+pSAwOjQ0DQrmlLbku7bkuro6IOmZhuacseS8nw0K5oqE6YCBOiBhbmFyc291bEBnbWFpbC5jb207
+IGJlYWdsZWJvYXJkQGRhdmlkam9obnN1bW1lcnMudWs7IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGRl
+dmljZXRyZWVAdmdlci5rZXJuZWwub3JnOyBqb2hhbi5oZWRiZXJnQGdtYWlsLmNvbTsgbGludXgt
+YXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJu
+ZWwub3JnOyBtYXJjZWxAaG9sdG1hbm4ub3JnOyBtYXJrLnJ1dGxhbmRAYXJtLmNvbTsgbWF4aW1l
+LnJpcGFyZEBib290bGluLmNvbTsgbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgcm9iaEBrZXJuZWwu
+b3JnOyBzdGVmYW4ud2FocmVuQGkyc2UuY29tOyB3ZW5zQGNzaWUub3JnDQrkuLvpopg6IFJlOiBb
+UEFUQ0ggMy84XSBkdC1iaW5kaW5nczogbmV0OiBibHVldG9vdGg6IEFkZCBydGw4NzIzYnMtYmx1
+ZXRvb3RoDQoNCkhpIEFsZXgsDQoNCk9uIFNhdCwgTWFyIDIsIDIwMTkgYXQgMTA6MzAgQU0g6ZmG
+5pyx5LyfIDxhbGV4X2x1QHJlYWxzaWwuY29tLmNuPiB3cm90ZToNCj4NCj4gSGkgTWFydGluLA0K
+PiBUaGFua3MgZm9yIHlvdXIgaW5mb3JtYXRpb24uDQp0aGFuayB5b3UgZm9yIHRoZSBxdWljayBy
+ZXBseSENCg0KPiBUaGUgY29uZmlnIGlzIHJlbGF0ZWQgdG8gZUZ1c2UgaW4gY2hpcHMuIEknbSBz
+b3JyeSB0aGF0IHRoZSBkZXRhaWxzIGNhbid0IGJlIG9wZW4uDQo+IE9ubHkgc29tZSBzcGVjaWFs
+IGNvbmZpZ3VyYXRpb25zIGFyZSByZWxhdGVkIHRvIHRoZSBob3N0IHBsYXRmb3Jtcywgc3VjaCBh
+cyBVQVJUIHdvcmtpbmcgYmF1ZHJhdGUsIGhhcmR3YXJlIGZsb3cgY29udHJvbCwgUENNIHNldHRp
+bmdzLCBldGMuIFRoZXNlIGFyZSB0aGUgc2V0dGluZ3MgZm9yIEhDSSBVQVJUIGFuZCBQQ00gSW50
+ZXJmYWNlLg0KPiBNb3N0IG9mIGNvbmZpZ3VyYXRpb25zIGFyZSBvbmx5IHJlbGV2YW50IHRvIGNo
+aXBzLg0KcGxlYXNlIGxldCBtZSByZXBlYXQgdGhpcyB3aXRoIG15IG93biB3b3JkcyB0byBzZWUg
+aWYgSSB1bmRlcnN0YW5kIHRoZQ0KImNvbmZpZyBibG9iIiBjb3JyZWN0bHkuIEZlZWwgZnJlZSB0
+byBjb3JyZWN0IG1lIGlmIGFueXRoaW5nIGlzIHdyb25nOg0KLSB0aGUgZGF0YSBpbiB0aGUgY29u
+ZmlnIGJsb2IgInBhdGNoZXMiIGVGdXNlIHZhbHVlcyBhdCBydW50aW1lIChub24tcGVyc2lzdGVu
+dCkNCi0gd2Uga25vdyB0aGUgb2Zmc2V0cyBvZiB0aGUgVUFSVF9DT05GSUcsIFBDTV9TRVRUSU5H
+IGFuZCBCRF9BRERSIC0NCnRoZXNlIGNhbiBiZSAiYm9hcmQgc3BlY2lmaWMiIChsaWtlIGJhdWQg
+cmF0ZSwgZmxvdyBjb250cm9sLCAuLi4pDQotIG1vc3Qgb3RoZXIgdmFsdWVzIGZyb20gdGhlICJj
+b25maWcgYmxvYiIgYXJlICJjaGlwIHNwZWNpZmljIiAtDQptZWFuaW5nIHRoZXkgYXJlIGlkZW50
+aWNhbCBmb3IgZWFjaCBib2FyZCBhbmQgdGhleSBvbmx5IGRlcGVuZCBvbiB0aGUNCmNoaXANCg0K
+ZG8geW91IGhhdmUgYW55IHN1Z2dlc3Rpb25zIGhvdyB3ZSBjYW4gc3VwcG9ydCBtdWx0aXBsZSBi
+b2FyZHMgKHRoZQ0KbWFpbiBnb2FsIG9mIHRoaXMgd2hvbGUgZGlzY3Vzc2lvbiBpczogaG93IHRv
+IGRvIHRoaXMgImNvcnJlY3QiKT8NCnNvIGZhciBkaWZmZXJlbnQgYXBwcm9hY2hlcyB3ZXJlIGRp
+c2N1c3NlZCAobm90IG9ubHkgaW4gdGhpcyB0aHJlYWQsDQpidXQgYWxzbyBpbiB0aGUgcGFzdCk6
+DQotIHVzZSBhIHNlcGFyYXRlIGNvbmZpZyBibG9iIGZvciBlYWNoIGJvYXJkLiB0aGlzIG1lYW5z
+IHRoYXQgd2hlbmV2ZXINCmEgbmV3IGJvYXJkIGlzIHN1cHBvcnRlZCAoZm9yIGV4YW1wbGUgYnkg
+YWRkaW5nIGEgLmR0cyBmb3IgaXQgdG8gdGhlDQptYWlubGluZSBrZXJuZWwpIHRoZW4gQmx1ZXRv
+b3RoIHdvbid0IHdvcmsgb3V0LW9mLXRoZS1ib3ggdW5sZXNzIGENCmNvbmZpZyBpcyBwcm92aWRl
+ZC4NCi0gc3BlY2lmeSB0aGUgcHJvcGVydGllcyBvZiB0aGUgY29ubmVjdGlvbiB0byB0aGUgY2hp
+cCAoZm9yIGV4YW1wbGUgYnkNCmFkZGluZyBhIGRldmljZS10cmVlIHByb3BlcnR5IGZvciB0aGUg
+c3BlZWQsIGZsb3cgY29udHJvbCwgLi4uKSBhbmQNCmdlbmVyYXRlIHRoZSBjb25maWcgYmFzZWQg
+b24gdGhlIGRldmljZS10cmVlIHByb3BlcnRpZXMuDQotIChJIGFtIG9wZW4gZm9yIG90aGVyIHN1
+Z2dlc3Rpb25zLCBwbGVhc2UgbGV0IHVzIGtub3cgaWYgeW91IGhhdmUgYW55KQ0KDQpJIHdvdWxk
+IGxpa2UgdG8gaGVhciB5b3VyIG9waW5pb24gb24gdGhpcyB0b3BpYyBhbmQgZXNwZWNpYWxseSB0
+aGUNCnJlYXNvbnMgYmVoaW5kIHlvdXIgc3VnZ2VzdGlvbnMuDQoNCg0KQmVzdCByZWdhcmRzDQpN
+YXJ0aW4NCg0KLS0tLS0tUGxlYXNlIGNvbnNpZGVyIHRoZSBlbnZpcm9ubWVudCBiZWZvcmUgcHJp
+bnRpbmcgdGhpcyBlLW1haWwuDQo=
