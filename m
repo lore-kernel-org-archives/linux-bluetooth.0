@@ -2,113 +2,105 @@ Return-Path: <SRS0=u2q6=RI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88BF8C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 00:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4722C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 10:54:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6372C20663
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 00:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91C51206DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 10:54:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9t7Dnny"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726170AbfCEAOj (ORCPT
+        id S1727114AbfCEKy0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Mar 2019 19:14:39 -0500
-Received: from mailgw01.mediatek.com ([210.61.82.183]:19635 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726080AbfCEAOj (ORCPT
+        Tue, 5 Mar 2019 05:54:26 -0500
+Received: from mail-lj1-f174.google.com ([209.85.208.174]:42372 "EHLO
+        mail-lj1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726150AbfCEKy0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Mar 2019 19:14:39 -0500
-X-UUID: be3e14bc7c32431289a16721a5bc2951-20190305
-X-UUID: be3e14bc7c32431289a16721a5bc2951-20190305
-Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (mhqrelay.mediatek.com ESMTP with TLS)
-        with ESMTP id 1835173269; Tue, 05 Mar 2019 08:14:28 +0800
-Received: from MTKCAS06.mediatek.inc (172.21.101.30) by
- mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Tue, 5 Mar 2019 08:14:26 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by MTKCAS06.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Tue, 5 Mar 2019 08:14:26 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH] Bluetooth: mediatek: Fixed incorrect type in assignment
-Date:   Tue, 5 Mar 2019 08:14:25 +0800
-Message-ID: <64582ec6b953c055bc3cf18e7bba18d578f03b0a.1551744635.git.sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
+        Tue, 5 Mar 2019 05:54:26 -0500
+Received: by mail-lj1-f174.google.com with SMTP id d14so7191800ljl.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Mar 2019 02:54:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=UghJTOSdtkY+/mr1kPkE0FOO30MGMt47jYA0aw+M/jA=;
+        b=Q9t7Dnnyu2RTOf7Xt7TX9l0duWnQiHs9NdLHiDBerENAgWos3JU+hvH3ahjrF6q2ae
+         queP0y2GpfK14zoPQXRgOmO04vh/N81fSGnWP9Wik6dyusQf84hGb2VuqS0oU+ZmdvtO
+         sTG/KbTe2gX2Ck+D7wQ8K4JPBzZk+MBcGyufX9/0J4PrD38mxoe8wDcEUg72Uv1tydpz
+         xGBGpA032bAUryK5CgVYpZNOXOt/JV/WpfK4GA1OR2vMMAkj50pTNG+/krOVWwgDyZon
+         mQ1uXH2gZEt/8PYklpYI7CepMlGJ+hks1DVdEJ1+jGCix8FfyKQROo/umx9olh5h3wvg
+         lu2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=UghJTOSdtkY+/mr1kPkE0FOO30MGMt47jYA0aw+M/jA=;
+        b=btVtZZlIw6CauNMQABaDOqvp2rZp0VJqLWjLXTYT9B7AVhPEwqZH125fRjbm16gPUj
+         oRtw2ET3UxEXSzxCKdFpn2+YVy8TC5JsRBaYnEpPNHDjooKczCzzjeAAPmIl88dMLOOe
+         KT6yA1fYgHlb3UFCIRfunpJKCU/No+yIGTI0uDzbgZMH/UDAH76DR39YAXbKL6LnLQsP
+         TZWmzZotLUThjwOmVD3b2ZnWJEwW/2c+ntGtDpZE8rhPzqooXwHTKTtKtp+0IbguJScK
+         7h7TP5NTKlWq5HQIb0EZ7jp20/3/XjkAX9iB1ndrCw9XPksqRRG1h1DIc/t3TyHoelf2
+         1TGg==
+X-Gm-Message-State: APjAAAVDGCehGhZtHAtKwp4N+qgQc3kktMSQTumsp7M3cvp5bb2xoB1I
+        rtBLzscFvOOLr3o9dcqFwxThbdqcBLmvXTfeF3Y=
+X-Google-Smtp-Source: APXvYqyeZxcsKBqi2roWf+820hUQ+STqSTL0lOWePDUeTwEkdooQJ5S/2Pd0G4LOqOQGtwfJOTpdbMIjmmQyE6FYCm8=
+X-Received: by 2002:a2e:6309:: with SMTP id x9mr13007397ljb.75.1551783263808;
+ Tue, 05 Mar 2019 02:54:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-SNTS-SMTP: 83DDCD9DC19CF944796B647AB9E57D80D8BF860060EB7E1CE02B58FE7FC15B492000:8
-X-MTK:  N
+From:   Martin Townsend <mtownsend1973@gmail.com>
+Date:   Tue, 5 Mar 2019 10:54:12 +0000
+Message-ID: <CABatt_z4bC6fGY9+4fLN5JNu7r8VYyEZJ5MvtArS195TpWAjeg@mail.gmail.com>
+Subject: Operating central and peripheral roles concurrently
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Emil Lenngren <emil.lenngren@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+Hi,
 
-Fixed warning: incorrect type in assignment reported by kbuild test robot.
-The detailed warning is shown as below.
+I sent an email November last year about Operating central and
+peripheral roles concurrently
+https://www.spinics.net/lists/linux-bluetooth/msg77673.html
 
-make ARCH=x86_64 allmodconfig
-make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+And although we had the dual roles working thanks to the suggested
+patch the dev team has reported that if the device (central) connects
+to the board (peripheral) first, and then having the board (central)
+connecting to a sensor (peripheral), dual roles work fine.
 
-All warnings (new ones prefixed by >>):
+But the other way around, board (central) connects to a sensor (peripheral),
+advertisements stop being sent and no other device can no longer connect to
+the board (peripheral).
 
-btmtkuart.c:671:18: sparse:    warning: incorrect type in assignment
-			       (different base types)
-btmtkuart.c:671:18: sparse:    expected unsigned int [usertype] baudrate
-btmtkuart.c:671:18: sparse:    got restricted __le32 [usertype]
+Here's the hcidump trace after running 'hciconfig hci0 leadv 1':
 
-sparse warnings: (new ones prefixed by >>)
-btmtkuart.c:671:18: sparse: warning: incorrect type in assignment
-			       (different base types)
-btmtkuart.c:671:18: sparse:    expected unsigned int [usertype] baudrate
-btmtkuart.c:671:18: sparse:    got restricted __le32 [usertype]
+HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
+   0000: 01
+HCI Event: Command Complete (0x0e) plen 4
+   LE Set Advertise Enable (0x08|0x000a) ncmd 1
+   status 0x00
 
-vim +671 drivers/bluetooth/btmtkuart.c
+Then within a second we get the following in hcidump which shows it
+being disabled
 
-   659
-   660	static int btmtkuart_change_baudrate(struct hci_dev *hdev)
-   661	{
-   662		struct btmtkuart_dev *bdev = hci_get_drvdata(hdev);
-   663		struct btmtk_hci_wmt_params wmt_params;
-   664		u32 baudrate;
-   665		u8 param;
-   666		int err;
-   667
-   668		/* Indicate the device to enter the probe state the host is
-   669		 * ready to change a new baudrate.
-   670		 */
- > 671		baudrate = cpu_to_le32(bdev->desired_speed);
-   672		wmt_params.op = MTK_WMT_HIF;
+HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
+   0000: 00
+HCI Event: Command Complete (0x0e) plen 4
+   LE Set Advertise Enable (0x08|0x000a) ncmd 1
+   status 0x00
 
-Fixes: 22eaf6c9946a ("Bluetooth: mediatek: add support for MediaTek MT7663U and MT7668U UART devices")
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
----
- drivers/bluetooth/btmtkuart.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I would really appreciate it if someone could point me to the relevant
+place in the Kernel code where this could be occurring so I can start
+to debug this or even suggest a patch I could try.  The kernel version
+is v4.9.
 
-diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
-index b0b680dd69f4..f5dbeec8e274 100644
---- a/drivers/bluetooth/btmtkuart.c
-+++ b/drivers/bluetooth/btmtkuart.c
-@@ -661,7 +661,7 @@ static int btmtkuart_change_baudrate(struct hci_dev *hdev)
- {
- 	struct btmtkuart_dev *bdev = hci_get_drvdata(hdev);
- 	struct btmtk_hci_wmt_params wmt_params;
--	u32 baudrate;
-+	__le32 baudrate;
- 	u8 param;
- 	int err;
- 
--- 
-2.18.0
+Many Thanks,
 
+Martin.
