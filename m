@@ -2,174 +2,107 @@ Return-Path: <SRS0=u2q6=RI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD2BC43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 12:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 169F3C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 13:16:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 909022082C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 12:26:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EE6720842
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Mar 2019 13:16:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvHjbAva"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="MZSxpKno"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728270AbfCEM0i (ORCPT
+        id S1728306AbfCENQu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Mar 2019 07:26:38 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45439 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728139AbfCEM0e (ORCPT
+        Tue, 5 Mar 2019 08:16:50 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.20]:36025 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727451AbfCENQu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Mar 2019 07:26:34 -0500
-Received: by mail-wr1-f65.google.com with SMTP id w17so9230268wrn.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Mar 2019 04:26:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=9NcOcbYPwEyxuEibdTg1ZSn8tVMyNdks4aTi7ai883k=;
-        b=UvHjbAvaAf85QDRukQc5AtASbohfoffLVcRTLLZlwtOR4jC34mAdJzPrCBeb+2hV/U
-         1Mr+rte1N4UxRd0PE0RKkhC60j7IyJbLH/E+VBAYyhgAryrFyJHUmCi/nYGByOkkKMJ2
-         YFhHHdhxPavXWYXWYSXDtdCmLG0/f4qwtTuFLnfbUnvfCis2/hkDgluF1+13xz2k8u2y
-         oSM3JkhVBlgHdiNm0Qa9M/EhKZPB+9mSY7gTYwGj5gyIv+w+BwL7blqGesh9f6B/FA28
-         fp6wAERCaQktYw4V8y07s97XmvImKHqvB5jTy/fEFSxysCfwFwszI0XRieRn52uUVnYR
-         2lPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=9NcOcbYPwEyxuEibdTg1ZSn8tVMyNdks4aTi7ai883k=;
-        b=BrGHLZ+GXmDJM9K4ydcBRSHiSf4dg+NB/q0RSG7/09pQgXFlC+4uSXD8R/OyICrHCm
-         /X4Ewc0o0GOyfgdA7STRQ+jG7f22knhrVf7Z017Pzm2HkyAldDTbg/OUYSAw2LDaKPlh
-         QCpNchsJrU5BzruG6jN3QUiVlSVytSblX+hhq42YuIzkYJTfwACy4b+RB1nwFCrNscs+
-         ftGgzygj0taR7l6QS0uU1Kd+N5sXyizRpBggFHopd2POtCWn0BPzMVlj82DmGlStvU9M
-         zibSXRdzdJJXtkOv0HZFS2E26E4C1XoI90MZKXPrNGzVuGteDfQgAhceE8+G/XlATpKx
-         KYiw==
-X-Gm-Message-State: APjAAAWxx0sbNX9jk3RmPDlneEJ56p3zg1d7hekUOdPA62i32cOfSemW
-        u6A8sKgNEdH1yXw1SJRLaMg=
-X-Google-Smtp-Source: APXvYqxd+FebX7RjiL+Zg1L7bIIIzaGVThR1w+NQcirrUamNYxyDmz5tFCYIB98NVJwl0r/rt/omfw==
-X-Received: by 2002:adf:ce90:: with SMTP id r16mr16080544wrn.64.1551788792658;
-        Tue, 05 Mar 2019 04:26:32 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id t8sm5966094wmi.21.2019.03.05.04.26.30
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 05 Mar 2019 04:26:31 -0800 (PST)
-Date:   Tue, 5 Mar 2019 13:26:30 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
- HD and LDAC
-Message-ID: <20190305122630.gwnaz3y7ckzqfjfq@pali>
-References: <20190123174504.12350-1-pali.rohar@gmail.com>
- <8D9BABBE-2BBC-4BFE-BF7C-3BE24AF4DD10@holtmann.org>
- <20190123175448.cdkdpnk6i5r4rzjs@pali>
- <20190130081517.GI32745@reaktio.net>
- <20190130120631.usx67zjk4kmbhcla@pali>
- <CABBYNZJ5z_-8KiotL=9fkvq-gLPoqU1LJpaOBv1z4QfZiA3zaA@mail.gmail.com>
- <20190201124353.GK32745@reaktio.net>
- <20190206114300.rxw3ptq7hzathzqe@pali>
- <20190224131907.GV32745@reaktio.net>
+        Tue, 5 Mar 2019 08:16:50 -0500
+X-Greylist: delayed 375 seconds by postgrey-1.27 at vger.kernel.org; Tue, 05 Mar 2019 08:16:49 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1551791808;
+        s=strato-dkim-0002; d=gerhold.net;
+        h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=527GXGoO1BeQ7cCjIV/JsCF7udm6w1ZF0BvOrr9Y4lM=;
+        b=MZSxpKnoTEN4qK5DKJAdVIxnAYWEaejgKW+6FlCe/csp2c7IICmBVTwRqhLK+ikZf9
+        wS6XqdCsAueQzTnFkWUTux+73Lts14kRAXcCsvPHC0wtO7MtPJRVh839MdkrtbrMKn5/
+        0cdnFxVbbj5bjERHja9FpYDkg0fIUBj+3H/ppEiPmwF/6X1J6MSxuIC06aC28CXHK+qP
+        r1Y3cdhG3DOuGJKS8W/PJOM7sDqyXpJP332jW92qEibjQVPxXdsmzf5h08t9EgtCVBEH
+        Sw63QMBIBpaZ9ThsCaFL94IyVeQxLZjsRkgI55trENVwHmUhQCT/G+tdunjroZD8CG61
+        DPCw==
+X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVORvLd4SsytBXQrEOHTIXtc7vtBpb4g=="
+X-RZG-CLASS-ID: mo00
+Received: from localhost.localdomain
+        by smtp.strato.de (RZmta 44.13 AUTH)
+        with ESMTPSA id i03afev25DAXg0d
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Tue, 5 Mar 2019 14:10:33 +0100 (CET)
+From:   Stephan Gerhold <stephan@gerhold.net>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Stephan Gerhold <stephan@gerhold.net>
+Subject: [PATCH 2/2] Bluetooth: btbcm: Add default address for BCM2076B1
+Date:   Tue,  5 Mar 2019 14:09:01 +0100
+Message-Id: <20190305130901.56660-2-stephan@gerhold.net>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190305130901.56660-1-stephan@gerhold.net>
+References: <20190305130901.56660-1-stephan@gerhold.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190224131907.GV32745@reaktio.net>
-User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sunday 24 February 2019 15:19:07 Pasi Kärkkäinen wrote:
-> On Wed, Feb 06, 2019 at 12:43:00PM +0100, Pali Rohár wrote:
-> > On Friday 01 February 2019 14:43:53 Pasi Kärkkäinen wrote:
-> > > Hi,
-> > > 
-> > > On Wed, Jan 30, 2019 at 02:24:11PM +0200, Luiz Augusto von Dentz wrote:
-> > > > Hi Pali, Pasi,
-> > > > On Wed, Jan 30, 2019 at 2:09 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> > > > >
-> > > > > On Wednesday 30 January 2019 10:15:17 Pasi Kärkkäinen wrote:
-> > > > > > On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Rohár wrote:
-> > > > > > > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
-> > > > > > > > Hi Pali,
-> > > > > > > >
-> > > > > > > > > ---
-> > > > > > > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++---
-> > > > > > > > > 1 file changed, 55 insertions(+), 3 deletions(-)
-> > > > > > > > >
-> > > > > > > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-> > > > > > > > > index 18569c895..a21410f5a 100644
-> > > > > > > > > --- a/tools/parser/avdtp.c
-> > > > > > > > > +++ b/tools/parser/avdtp.c
-> > > > > > > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
-> > > > > > > > > {
-> > > > > > > > >         if (vendor == 0x0000004f && vndcodec == 0x0001)
-> > > > > > > > >                 return "aptX";
-> > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0001)
-> > > > > > > > > +               return "FastStream";
-> > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0002)
-> > > > > > > > > +               return "aptX Low Latency";
-> > > > > > > > > +       else if (vendor == 0x000000d7 && vndcodec == 0x0024)
-> > > > > > > > > +               return "aptX HD";
-> > > > > > > > >         else if (vendor == 0x0000012d && vndcodec == 0x00aa)
-> > > > > > > > >                 return "LDAC";
-> > > > > > > > >         return "Unknown???;
-> > > > > > > >
-> > > > > > > > lets keep the focus on btmon support since nobody should be using hcidump anymore.
-> > > > > > >
-> > > > > > > In btmon I already implemented it and patches are now merged. I just
-> > > > > > > found another place where this capability parsing is implemented and
-> > > > > > > based on fact that users still use hcidump I quickly looked at it and
-> > > > > > > implemented this parsing.
-> > > > > > >
-> > > > > >
-> > > > > > I agree, hcidump still comes up on many places (guides, blogs, mailinglist posts, etc),
-> > > > > > so it makes sense to add these patches to hcidump aswell. Especially when the patch is quite small.
-> > > > >
-> > > > > Exactly, people still use hcidump...
-> > > > 
-> > > > Well it is a deprecated tool which we might remove starting on BlueZ
-> > > > 6.x which we would like to do in the very next release, if that
-> > > > doesn't happen than perhaps Id take these patches in for a very last
-> > > > BlueZ 5.x release.
-> > > > 
-> > > > @Marcel: Or you have a better plan? We could do one last 5.x and then
-> > > > start working on removing the deprecated tools/etc.
-> > > > 
-> > > 
-> > > +1 for doing one last 5.x release before deprecating and removing tools etc!
-> > 
-> > Ok, what is the plan? If hcidump is not going to be deleted in upcoming
-> > release, can you take this patch?
-> >
-> 
-> How about applying this patch now, considering it's small, and has value for anyone using hcidump.
-> hcidump then gets removed later whenever the removal of deprecated features/tools starts.
+BCM2076B1 appears to use 20:76:A0:00:56:79 as default address.
+This address is used by at least 5 devices with the AMPAK AP6476
+module and is also suspicious because it starts with the chip name
+2076 (followed by a different revision A0 for some reason).
 
-So... what are plans for next release?
+Add it to the list of default addresses and leave it up to the
+user to configure a valid one.
 
-> Any news about next bluez release?
-> 
-> 
->  
-> > -- 
-> > Pali Rohár
-> > pali.rohar@gmail.com
-> 
-> 
-> Thanks,
-> 
-> -- Pasi
-> 
+Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
+---
+ drivers/bluetooth/btbcm.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index ea1a20a49f91..35394076267b 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -34,6 +34,7 @@
+ 
+ #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+ #define BDADDR_BCM20702A1 (&(bdaddr_t) {{0x00, 0x00, 0xa0, 0x02, 0x70, 0x20}})
++#define BDADDR_BCM2076B1 (&(bdaddr_t) {{0x79, 0x56, 0x00, 0xa0, 0x76, 0x20}})
+ #define BDADDR_BCM43430A0 (&(bdaddr_t) {{0xac, 0x1f, 0x12, 0xa0, 0x43, 0x43}})
+ #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
+ #define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
+@@ -69,6 +70,9 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	 * The address 20:70:02:A0:00:00 indicates a BCM20702A1 controller
+ 	 * with no configured address.
+ 	 *
++	 * The address 20:76:A0:00:56:79 indicates a BCM2076B1 controller
++	 * with no configured address.
++	 *
+ 	 * The address 43:24:B3:00:00:00 indicates a BCM4324B3 controller
+ 	 * with waiting for configuration state.
+ 	 *
+@@ -80,6 +84,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	 */
+ 	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM20702A1) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM2076B1) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0)) {
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+2.21.0
+
