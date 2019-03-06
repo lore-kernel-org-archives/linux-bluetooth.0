@@ -2,160 +2,130 @@ Return-Path: <SRS0=crNx=RJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC8DC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 18:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42495C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 19:55:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7673C20663
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 18:10:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EB7820684
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 19:55:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=foundries-io.20150623.gappssmtp.com header.i=@foundries-io.20150623.gappssmtp.com header.b="UUWUY8UT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I8Q6mYo5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730654AbfCFSKx (ORCPT
+        id S1726928AbfCFTzX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Mar 2019 13:10:53 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:39252 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727214AbfCFSKx (ORCPT
+        Wed, 6 Mar 2019 14:55:23 -0500
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:41302 "EHLO
+        mail-wr1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726525AbfCFTzX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Mar 2019 13:10:53 -0500
-Received: by mail-pg1-f194.google.com with SMTP id h8so9034299pgp.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 10:10:53 -0800 (PST)
+        Wed, 6 Mar 2019 14:55:23 -0500
+Received: by mail-wr1-f48.google.com with SMTP id n2so14814535wrw.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 11:55:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=foundries-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=jcpmHV+k29P1FmsoW1jk0ftdTcORr/OOjVEI1JNI6Kg=;
-        b=UUWUY8UTIGQbsJUjB0DmjYfeJyQoo8LVx0jf5ZgRLEeylIkiAfNZjeKdeuuIcHp8nM
-         LAcENSd9L0uVbhFxcwke7/gXVTl8kmWIRjfEYmTlLdx1hbJeZW4MJvfLpIQplPnRW8Zp
-         08YB/CMbf0ONF0qWB69tDJOkzQ5P7yAMYdnzq/1zGvZC8NjVdY+hkm0zvs/wUL9ep1rW
-         hwzTqaK8PNSEHJglgNQEAJWZv8NCxh3vir4YN3AuCqVB/OD0Yl5ttbOgZ9CT6GgwPbPe
-         eVKXDPVz14eBY0BMJUU7MlC6aIuPwdhjemTIe7ELVFl1xbJpchzE4edayrwkvd0QZ6X1
-         Q7Qg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=w+yZuNgBUM40muWDxfraUcNa3Kzj0k2KB5GTP7aHex4=;
+        b=I8Q6mYo5U5AhlNZTInQc9ltBe2VBfAWrpflJjPFC9zpTc3D889kXiC5uazmYWp9+Br
+         uMmDalvwk94NtGEL1lVpdUGPU/xlfndLrS7LCeK9/P21fNISHHRXUJ+RBHF3GFS69lw/
+         c/LNQsmkKUha3aaEck7gWkzzh/8PG3mdKmKBe1Pu/allmwv7uVFLk2oCad4cgrhvOvae
+         Rf6/0LAFSonwrHF34FgLgHFA2XEABKgQSmig64A+QWQTJD0gvLEOsWM/jH35H8AySrAN
+         OSYU8RidtlvR3kteK0oXDaq+TfT6o3ILQ9RnWJKxD3qVhsqza7F1pV8Yumk3cYHDntY8
+         lFQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=jcpmHV+k29P1FmsoW1jk0ftdTcORr/OOjVEI1JNI6Kg=;
-        b=LgpQfPacSrIx8LNju7xCcqvwFFLFVDKKxT278LarDoDHHraJ4AZHovojTCWU6k9NUi
-         k1brOvy3IF7gyNWjkbh2kWCGevQd9HpDfsPL/mbE5+4g29wNdEmZdGbJJbrr/sK2wfO+
-         UD9Mi4YT1hUGsVRj/ZWIaxPt/0pUX0b2mXQDAWKL85YCsaAtUagDBaH8CFUrkO8T6oi0
-         tvb6Cuy05q7z5arzyvePqgRFfL3TKdmzHaBUZ/IY7PJOsLFEFWhxjViR4ataWKvb7hjo
-         RMw0MDMLinXO6zGaF6Vuq1NE9h9lY+oZUOL57QZjifgPlgan7aOlIDaR2BLT8q/oUuhZ
-         gGeA==
-X-Gm-Message-State: APjAAAWOEz0grZ4HODszMWH3Mz5YG7EcAGD7BwSr1breZvSpO6akvq90
-        oMR4+oUyzFNyq/TFvhXqhmnANg==
-X-Google-Smtp-Source: APXvYqzA8zF2LFIfNzfUiRjvrEC9nzSajUSRU7GRf4Wi4tsu7KstRVHnNx/bmfDjcHGBVzPHahPFRQ==
-X-Received: by 2002:a17:902:7a2:: with SMTP id 31mr1282466plj.246.1551895852338;
-        Wed, 06 Mar 2019 10:10:52 -0800 (PST)
-Received: from [192.168.69.121] (107-198-5-8.lightspeed.irvnca.sbcglobal.net. [107.198.5.8])
-        by smtp.gmail.com with ESMTPSA id r28sm3357487pgl.72.2019.03.06.10.10.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Mar 2019 10:10:51 -0800 (PST)
-Subject: Re: [PATCH 0/3] bluetooth: 6lowpan: multiple peers and addresses
-From:   Michael Scott <mike@foundries.io>
-To:     Josua Mayer <josua.mayer@jm0.eu>, linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        jukka.rissanen@linux.intel.com
-References: <20190208152519.16181-1-josua.mayer@jm0.eu>
- <a0d7f533-964c-7d5b-69be-840c26d05fd8@jm0.eu>
- <12348b37-c8ef-cf4a-a86e-ab09fadbc792@foundries.io>
-Message-ID: <eb35ff67-1ec8-d5b6-05b9-b065ade27335@foundries.io>
-Date:   Wed, 6 Mar 2019 10:10:50 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=w+yZuNgBUM40muWDxfraUcNa3Kzj0k2KB5GTP7aHex4=;
+        b=uX4TKa3Ho6X4WDnqSycx2IoPTMk8pcCEZMZcRiZ+4VsUO2pNsjU46/lz8K7LTIPt/P
+         fuXBpPKj/iSaytiY8cBsFKcPd+/eLRjs2oL2E3ORfJLJlFhsklMkOQQP956CiQVYbJzw
+         ZJJi7JkT+F9TC25CAXpa1w6fWwwA4ZgxQCCN+MaFmKL54InbmWiJwo8lXmzQUWzwueej
+         //9+B+Z5OtQIzYQ7FaoSXTZgYJ5Gigz0q4WhbLEgthal6Vylr1QJKUizVTQPMtd+GzA5
+         4UXzlvQbCrVcR2o4dabxijACtSpCZo7tKV34WJSrGZoVfjFkz+BJ1SnztzhQwsGa9kIX
+         rlDw==
+X-Gm-Message-State: APjAAAUHKmrbq9CyylwBMn+CSif4SFui60Co/QxZeORTEDfHwGq4Gq+c
+        CIb9a6zaj8+7MADl10ZUpdpGEOLOthkp8Ou2/tc=
+X-Google-Smtp-Source: APXvYqwI92nZ4OnGzZfyQM9OkwmPwy98WWNixNCPolJX2/9TMNhunC/Q1/sVuRxQ27hKYa5s4bIIODRQmyQZKnDWVA8=
+X-Received: by 2002:adf:ec07:: with SMTP id x7mr4069987wrn.174.1551902121646;
+ Wed, 06 Mar 2019 11:55:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <12348b37-c8ef-cf4a-a86e-ab09fadbc792@foundries.io>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <CADS+iDUDv=Keo6661q3dY8C5=f+fZtfCe5gdPutO-psc9Pe0UQ@mail.gmail.com>
+ <CAOVXEJ+bEQ=jmqwPEZygzaP7ChtKk2GwLc7183VyiRe5tbOzUQ@mail.gmail.com>
+In-Reply-To: <CAOVXEJ+bEQ=jmqwPEZygzaP7ChtKk2GwLc7183VyiRe5tbOzUQ@mail.gmail.com>
+From:   Yaroslav Isakov <yaroslav.isakov@gmail.com>
+Date:   Wed, 6 Mar 2019 20:55:10 +0100
+Message-ID: <CADS+iDWWxbYkQ=+J8LvOYPZOyuDDxKxf=wxSm1QY_YvGyPD5LQ@mail.gmail.com>
+Subject: Re: Strange SCO problem
+To:     Sathish Narasimman <nsathish41@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Sathish Narasimman <sathish.narasimman@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Josua,
+=D1=81=D1=80, 6 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 09:28, Sathish Nara=
+simman <nsathish41@gmail.com>:
+>
+> Hi,
+>
+Hello, Sathish
+> Intel adapter 9260 and 9265(with the latest Firmware - from
+> Bluetooth-next) supports USB ALT 6 settings and was verified.
+>
+I have only 8260 and 8265. How I can check if they supports ALT 6
+setting? I've checked via lsusb
+lsusb -d 8087:0a2b -v | grep bAlt
+      bAlternateSetting       0
+      bAlternateSetting       0
+      bAlternateSetting       1
+      bAlternateSetting       2
+      bAlternateSetting       3
+      bAlternateSetting       4
+      bAlternateSetting       5
+can't get device qualifier: Resource temporarily unavailable
+can't get debug descriptor: Resource temporarily unavailable
+> Along with backend ofono
+> https://patchwork.freedesktop.org/patch/245272/
+>
+I've based my patches for native backend on your work. Unfortunately,
+I cannot use ofono, as it needs phonesim which is not working on my
+system (and is abandoned long ago...)
 
-On 2/28/19 12:30 PM, Michael Scott wrote:
-> Hi Josua,
+> https://www.spinics.net/lists/linux-bluetooth/msg76982.html
 >
-> On 2/28/19 12:00 PM, Josua Mayer wrote:
->> Ping
->>
->> Did anyone get a chance to look at this yet?
->> @Jukka I have added you in CC since this is about both 6lowpan and ble.
->>
->> Am 08.02.19 um 16:25 schrieb Josua Mayer:
->>> Dear maintainers,
->>>
->>> This patch set deals with an issue I reported earlier this year, where
->>> 1) packets addressed to a non-link-local address
->>> 2) any packets when at least 2 peers are connected
->>> were not delivered if they matched a direct peer i.e. no routing.
->>>
->>> The full explanation of the issue including steps to reproduce are:
->>> https://www.spinics.net/lists/linux-bluetooth/msg78486.html
+> Regards,
+> Sathish N
 >
-> Thank you for submitting these patches!  I've been debugging what 
-> seems to be the very same issue.
 >
-> My setup:
-> - a Linux-based gateway running a fairly recent kernel (4.18) 
-> connected to my local network (and the internet) via wifi/ethernet.
-> - several Zephyr(RTOS)-based devices (mostly Nordic) connected via BLE 
-> 6lowpan to the gateway
-> - the gateway provides DNS64 and NAT64 translation, so that the 
-> IPv6-based nodes can communicate with IPv4 services
->
-> Much as you describe, everything works flawlessly when only 1 BLE 
-> 6lowpan node is connected.
->
-> Once a 2nd node is connected, all non-link local communication fails.  
-> Using tcpdump to watch bt0 interface traffic on the gateway: it 
-> *looks* like the packets are being sent back to the various nodes.  
-> However, on the node side those packets are never received.   The very 
-> second you bring the 2nd node down so that only 1 node is connected, 
-> communication on non-link local IPs is immediately restored.
->
-> NOTE: I can reproduce the same behavior on a 4.20 kernel using my 
-> laptop, so this issue is still valid.
->
-> I should be able to apply these patches to my local setup today or 
-> tomorrow, and I'll write back regarding the experience.
-
-Apologies for the delay, work has been very busy.
-
-I was able to test these patches and everything works well on my end.  
-Feel free to add my Tested-By:
-
-Tested-by: Michael Scott <mike@foundries.io>
-
->
-> Thank you again,
->
-> - Mike
->
->>>
->>> Please comment if I am on the right track here, especially on the
->>> second patch in this series where I am nto completely sure if I found
->>> the right api call to the neighbour cache.
->>>
->>> Josua Mayer (3):
->>>    bluetooth: 6lowpan: search for destination address in all peers
->>>    bluetooth: 6lowpan: check neighbour table for SLAAC
->>>    bluetooth: 6lowpan: always check destination address
->>>
->>>   net/bluetooth/6lowpan.c | 40 ++++++++++++++++++++++++----------------
->>>   1 file changed, 24 insertions(+), 16 deletions(-)
->>>
--- 
-Michael Scott
-Embedded Software Engineer at Foundries.io
-"microPlatforms™ for Connected Products"
-E: mike@foundries.io
-W: https://www.foundries.io
-
+> On Wed, Mar 6, 2019 at 5:15 AM Yaroslav Isakov
+> <yaroslav.isakov@gmail.com> wrote:
+> >
+> > Hello! I'm currently trying to modify pulseaudio to be able to use HFP
+> > profile with mSBC codec on native backend, but found that, while
+> > working de-jure, real sound is completely ruined, so I can barely hear
+> > what is sent over SCO link. I've tried two different Intel adapters
+> > (included in 8260 and 8265 chipset) and KillerWifi (ath10k driver), on
+> > two different PCs with two different headsets, results are mostly the
+> > same, the only difference is that on ath10k words are more or less
+> > distinguishable.
+> >
+> > I've even tested with pulse just for profile setup, and SCO is sent
+> > via modified scotest from bluez, which sends some test sound, manually
+> > encoded via sbcenc (with added h2, of course). I've tried also msbc
+> > branch from bluez-alsa, same result.
+> >
+> > I'm sure that every time socket is connected with setsockopt(fd,
+> > SOL_BLUETOOTH, BT_VOICE, &voice, sizeof(voice));
+> >
+> > I've also tried with this patch
+> > https://www.spinics.net/lists/linux-bluetooth/msg76982.html, with no
+> > luck.
+> >
+> > Any ideas?
