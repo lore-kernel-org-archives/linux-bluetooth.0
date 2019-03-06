@@ -2,103 +2,160 @@ Return-Path: <SRS0=crNx=RJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AE9C10F00
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 18:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC8DC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 18:10:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A1C420663
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 18:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7673C20663
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 18:10:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=foundries-io.20150623.gappssmtp.com header.i=@foundries-io.20150623.gappssmtp.com header.b="UUWUY8UT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730655AbfCFSEF (ORCPT
+        id S1730654AbfCFSKx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Mar 2019 13:04:05 -0500
-Received: from mail-it1-f199.google.com ([209.85.166.199]:40727 "EHLO
-        mail-it1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727594AbfCFSEF (ORCPT
+        Wed, 6 Mar 2019 13:10:53 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:39252 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727214AbfCFSKx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Mar 2019 13:04:05 -0500
-Received: by mail-it1-f199.google.com with SMTP id 127so6219601itk.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 10:04:05 -0800 (PST)
+        Wed, 6 Mar 2019 13:10:53 -0500
+Received: by mail-pg1-f194.google.com with SMTP id h8so9034299pgp.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 10:10:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=foundries-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=jcpmHV+k29P1FmsoW1jk0ftdTcORr/OOjVEI1JNI6Kg=;
+        b=UUWUY8UTIGQbsJUjB0DmjYfeJyQoo8LVx0jf5ZgRLEeylIkiAfNZjeKdeuuIcHp8nM
+         LAcENSd9L0uVbhFxcwke7/gXVTl8kmWIRjfEYmTlLdx1hbJeZW4MJvfLpIQplPnRW8Zp
+         08YB/CMbf0ONF0qWB69tDJOkzQ5P7yAMYdnzq/1zGvZC8NjVdY+hkm0zvs/wUL9ep1rW
+         hwzTqaK8PNSEHJglgNQEAJWZv8NCxh3vir4YN3AuCqVB/OD0Yl5ttbOgZ9CT6GgwPbPe
+         eVKXDPVz14eBY0BMJUU7MlC6aIuPwdhjemTIe7ELVFl1xbJpchzE4edayrwkvd0QZ6X1
+         Q7Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=vP4iacDgbeChJ5VoBpjLxp5xzju9Yppzw6XSjbY71L8=;
-        b=hJ7ApW1jXb1uKbIwtrfLL3vgcYlRI4/yBLCMD2qRjU8NnBP4aUFW9sIViIR2CfP6nu
-         7POm0/iTwzA+TxuDdzb1kWmJMfzyfLG1ub/nlhXda17WpzjRhLXNi+rapFIZoj/JArNC
-         VPXFElRng8/YkINr5O5iAendYDC2oERq7bYc/BZP4yDRLU2JdDClBmHgqJrByUyf2IVu
-         csytiF01xdkFCj/WGnpEvuneCIM1G6rzrzLgsIZP/r+TEEYBTcLNiumC5bcmYTlzxu7U
-         nCDEmkmGWIPgFL1JjBo600FsmYy9lSaytRYV3uT9zOZlm1x4GuHzwhTfshFdlBiNFNG8
-         UP8Q==
-X-Gm-Message-State: APjAAAWJg7FIeiFW7c7yS3fFR+T3izhBAOxRLMtjkJ2ex/iQQi/GqzaO
-        P9KilRaI5HeYY3bFfaL3sB3oKoXdaNDN41ESW6QnMP+ATsmX
-X-Google-Smtp-Source: APXvYqw0sMWdtCfXs08oMDtP89iPqPxLcoiFMV7N6MA3/NmAMWY7vPPzDVtyynWn2S9jG+I9oLSCzoyFWAlzIZUZ3JVbE44ODMUq
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=jcpmHV+k29P1FmsoW1jk0ftdTcORr/OOjVEI1JNI6Kg=;
+        b=LgpQfPacSrIx8LNju7xCcqvwFFLFVDKKxT278LarDoDHHraJ4AZHovojTCWU6k9NUi
+         k1brOvy3IF7gyNWjkbh2kWCGevQd9HpDfsPL/mbE5+4g29wNdEmZdGbJJbrr/sK2wfO+
+         UD9Mi4YT1hUGsVRj/ZWIaxPt/0pUX0b2mXQDAWKL85YCsaAtUagDBaH8CFUrkO8T6oi0
+         tvb6Cuy05q7z5arzyvePqgRFfL3TKdmzHaBUZ/IY7PJOsLFEFWhxjViR4ataWKvb7hjo
+         RMw0MDMLinXO6zGaF6Vuq1NE9h9lY+oZUOL57QZjifgPlgan7aOlIDaR2BLT8q/oUuhZ
+         gGeA==
+X-Gm-Message-State: APjAAAWOEz0grZ4HODszMWH3Mz5YG7EcAGD7BwSr1breZvSpO6akvq90
+        oMR4+oUyzFNyq/TFvhXqhmnANg==
+X-Google-Smtp-Source: APXvYqzA8zF2LFIfNzfUiRjvrEC9nzSajUSRU7GRf4Wi4tsu7KstRVHnNx/bmfDjcHGBVzPHahPFRQ==
+X-Received: by 2002:a17:902:7a2:: with SMTP id 31mr1282466plj.246.1551895852338;
+        Wed, 06 Mar 2019 10:10:52 -0800 (PST)
+Received: from [192.168.69.121] (107-198-5-8.lightspeed.irvnca.sbcglobal.net. [107.198.5.8])
+        by smtp.gmail.com with ESMTPSA id r28sm3357487pgl.72.2019.03.06.10.10.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Mar 2019 10:10:51 -0800 (PST)
+Subject: Re: [PATCH 0/3] bluetooth: 6lowpan: multiple peers and addresses
+From:   Michael Scott <mike@foundries.io>
+To:     Josua Mayer <josua.mayer@jm0.eu>, linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        jukka.rissanen@linux.intel.com
+References: <20190208152519.16181-1-josua.mayer@jm0.eu>
+ <a0d7f533-964c-7d5b-69be-840c26d05fd8@jm0.eu>
+ <12348b37-c8ef-cf4a-a86e-ab09fadbc792@foundries.io>
+Message-ID: <eb35ff67-1ec8-d5b6-05b9-b065ade27335@foundries.io>
+Date:   Wed, 6 Mar 2019 10:10:50 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-X-Received: by 2002:a24:a14:: with SMTP id 20mr6677810itw.23.1551895444846;
- Wed, 06 Mar 2019 10:04:04 -0800 (PST)
-Date:   Wed, 06 Mar 2019 10:04:04 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b7fd51058370d0d9@google.com>
-Subject: BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
-From:   syzbot <syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+In-Reply-To: <12348b37-c8ef-cf4a-a86e-ab09fadbc792@foundries.io>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Josua,
 
-syzbot found the following crash on:
+On 2/28/19 12:30 PM, Michael Scott wrote:
+> Hi Josua,
+>
+> On 2/28/19 12:00 PM, Josua Mayer wrote:
+>> Ping
+>>
+>> Did anyone get a chance to look at this yet?
+>> @Jukka I have added you in CC since this is about both 6lowpan and ble.
+>>
+>> Am 08.02.19 um 16:25 schrieb Josua Mayer:
+>>> Dear maintainers,
+>>>
+>>> This patch set deals with an issue I reported earlier this year, where
+>>> 1) packets addressed to a non-link-local address
+>>> 2) any packets when at least 2 peers are connected
+>>> were not delivered if they matched a direct peer i.e. no routing.
+>>>
+>>> The full explanation of the issue including steps to reproduce are:
+>>> https://www.spinics.net/lists/linux-bluetooth/msg78486.html
+>
+> Thank you for submitting these patches!  I've been debugging what 
+> seems to be the very same issue.
+>
+> My setup:
+> - a Linux-based gateway running a fairly recent kernel (4.18) 
+> connected to my local network (and the internet) via wifi/ethernet.
+> - several Zephyr(RTOS)-based devices (mostly Nordic) connected via BLE 
+> 6lowpan to the gateway
+> - the gateway provides DNS64 and NAT64 translation, so that the 
+> IPv6-based nodes can communicate with IPv4 services
+>
+> Much as you describe, everything works flawlessly when only 1 BLE 
+> 6lowpan node is connected.
+>
+> Once a 2nd node is connected, all non-link local communication fails.  
+> Using tcpdump to watch bt0 interface traffic on the gateway: it 
+> *looks* like the packets are being sent back to the various nodes.  
+> However, on the node side those packets are never received.   The very 
+> second you bring the 2nd node down so that only 1 node is connected, 
+> communication on non-link local IPs is immediately restored.
+>
+> NOTE: I can reproduce the same behavior on a 4.20 kernel using my 
+> laptop, so this issue is still valid.
+>
+> I should be able to apply these patches to my local setup today or 
+> tomorrow, and I'll write back regarding the experience.
 
-HEAD commit:    cf08baa29613 Add linux-next specific files for 20190306
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15bc76c7200000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c8b6073d992e8217
-dashboard link: https://syzkaller.appspot.com/bug?extid=91fd909b6e62ebe06131
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+Apologies for the delay, work has been very busy.
 
-Unfortunately, I don't have any reproducer for this crash yet.
+I was able to test these patches and everything works well on my end.  
+Feel free to add my Tested-By:
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com
+Tested-by: Michael Scott <mike@foundries.io>
 
-BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
-turning off the locking correctness validator.
-CPU: 0 PID: 11902 Comm: kworker/u5:27 Not tainted 5.0.0-next-20190306 #4
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: hci94 hci_power_on
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  add_chain_cache kernel/locking/lockdep.c:2582 [inline]
-  lookup_chain_cache_add kernel/locking/lockdep.c:2656 [inline]
-  validate_chain kernel/locking/lockdep.c:2676 [inline]
-  __lock_acquire.cold+0x250/0x50d kernel/locking/lockdep.c:3692
-  lock_acquire+0x16f/0x3f0 kernel/locking/lockdep.c:4202
-  __flush_work+0x677/0x8a0 kernel/workqueue.c:3034
-  flush_work+0x18/0x20 kernel/workqueue.c:3060
-  hci_dev_do_open+0xa92/0x1780 net/bluetooth/hci_core.c:1543
-  hci_power_on+0x10d/0x580 net/bluetooth/hci_core.c:2173
-  process_one_work+0x98e/0x1790 kernel/workqueue.c:2269
-  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
-  kthread+0x357/0x430 kernel/kthread.c:253
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
+>
+> Thank you again,
+>
+> - Mike
+>
+>>>
+>>> Please comment if I am on the right track here, especially on the
+>>> second patch in this series where I am nto completely sure if I found
+>>> the right api call to the neighbour cache.
+>>>
+>>> Josua Mayer (3):
+>>>    bluetooth: 6lowpan: search for destination address in all peers
+>>>    bluetooth: 6lowpan: check neighbour table for SLAAC
+>>>    bluetooth: 6lowpan: always check destination address
+>>>
+>>>   net/bluetooth/6lowpan.c | 40 ++++++++++++++++++++++++----------------
+>>>   1 file changed, 24 insertions(+), 16 deletions(-)
+>>>
+-- 
+Michael Scott
+Embedded Software Engineer at Foundries.io
+"microPlatforms™ for Connected Products"
+E: mike@foundries.io
+W: https://www.foundries.io
 
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
