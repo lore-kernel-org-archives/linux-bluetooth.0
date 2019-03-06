@@ -2,130 +2,104 @@ Return-Path: <SRS0=crNx=RJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42495C43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 19:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32688C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 22:33:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0EB7820684
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 19:55:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1D2F206DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 22:33:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I8Q6mYo5"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="E1q+mnnw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726928AbfCFTzX (ORCPT
+        id S1726719AbfCFWdK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Mar 2019 14:55:23 -0500
-Received: from mail-wr1-f48.google.com ([209.85.221.48]:41302 "EHLO
-        mail-wr1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726525AbfCFTzX (ORCPT
+        Wed, 6 Mar 2019 17:33:10 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:52506 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726914AbfCFWdJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Mar 2019 14:55:23 -0500
-Received: by mail-wr1-f48.google.com with SMTP id n2so14814535wrw.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 11:55:22 -0800 (PST)
+        Wed, 6 Mar 2019 17:33:09 -0500
+Received: by mail-it1-f194.google.com with SMTP id g17so12219081ita.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 14:33:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=w+yZuNgBUM40muWDxfraUcNa3Kzj0k2KB5GTP7aHex4=;
-        b=I8Q6mYo5U5AhlNZTInQc9ltBe2VBfAWrpflJjPFC9zpTc3D889kXiC5uazmYWp9+Br
-         uMmDalvwk94NtGEL1lVpdUGPU/xlfndLrS7LCeK9/P21fNISHHRXUJ+RBHF3GFS69lw/
-         c/LNQsmkKUha3aaEck7gWkzzh/8PG3mdKmKBe1Pu/allmwv7uVFLk2oCad4cgrhvOvae
-         Rf6/0LAFSonwrHF34FgLgHFA2XEABKgQSmig64A+QWQTJD0gvLEOsWM/jH35H8AySrAN
-         OSYU8RidtlvR3kteK0oXDaq+TfT6o3ILQ9RnWJKxD3qVhsqza7F1pV8Yumk3cYHDntY8
-         lFQA==
+        d=chromium.org; s=google;
+        h=mime-version:content-transfer-encoding:in-reply-to:references:from
+         :subject:cc:to:message-id:user-agent:date;
+        bh=Ay3FzATJ0vHPBQdbtmiR6rFU1zWOfawoZWENuYgFKG0=;
+        b=E1q+mnnwcA/nSnI39aoUKKtZV/jVXTur0l3CW4lU+j9q2Thvgdri5aLN8Tj5rTsX7R
+         aIKnTYM8dyUE2ZZTEsmUaQrh6HgYDGfOw40q/T6R2IPaIs3NFGvv9P1cdM5F8vome6iR
+         Y5jiYoq6DKzacP23f+9/CI8VLSgj+/1jtIUAo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=w+yZuNgBUM40muWDxfraUcNa3Kzj0k2KB5GTP7aHex4=;
-        b=uX4TKa3Ho6X4WDnqSycx2IoPTMk8pcCEZMZcRiZ+4VsUO2pNsjU46/lz8K7LTIPt/P
-         fuXBpPKj/iSaytiY8cBsFKcPd+/eLRjs2oL2E3ORfJLJlFhsklMkOQQP956CiQVYbJzw
-         ZJJi7JkT+F9TC25CAXpa1w6fWwwA4ZgxQCCN+MaFmKL54InbmWiJwo8lXmzQUWzwueej
-         //9+B+Z5OtQIzYQ7FaoSXTZgYJ5Gigz0q4WhbLEgthal6Vylr1QJKUizVTQPMtd+GzA5
-         4UXzlvQbCrVcR2o4dabxijACtSpCZo7tKV34WJSrGZoVfjFkz+BJ1SnztzhQwsGa9kIX
-         rlDw==
-X-Gm-Message-State: APjAAAUHKmrbq9CyylwBMn+CSif4SFui60Co/QxZeORTEDfHwGq4Gq+c
-        CIb9a6zaj8+7MADl10ZUpdpGEOLOthkp8Ou2/tc=
-X-Google-Smtp-Source: APXvYqwI92nZ4OnGzZfyQM9OkwmPwy98WWNixNCPolJX2/9TMNhunC/Q1/sVuRxQ27hKYa5s4bIIODRQmyQZKnDWVA8=
-X-Received: by 2002:adf:ec07:: with SMTP id x7mr4069987wrn.174.1551902121646;
- Wed, 06 Mar 2019 11:55:21 -0800 (PST)
+        h=x-gm-message-state:mime-version:content-transfer-encoding
+         :in-reply-to:references:from:subject:cc:to:message-id:user-agent
+         :date;
+        bh=Ay3FzATJ0vHPBQdbtmiR6rFU1zWOfawoZWENuYgFKG0=;
+        b=RGAe2m7AsYl3tu5q+IOZtpPyt6Mv3ACxSZV5VBogeJxfrpBausdJYl+f8VGA8Bo0Ju
+         oJbAkFy8+DWcdJAelYEoHt4UHwYja+CmsWQmyjsJy0ipyyFrcsfWAGeMWp7Kqrq5ADSw
+         IMwtvlfkhvv0QZSYeSDBen/BTOJgEOegHzfDa9dGicHPG0CbwGykbvcsxBkjHThiYdJY
+         fzFZ0T2QzfQObY+u3elkzceqxXEMNZruLAE3XUbnb5GvOE/D14t/seWngjvNmPVle4ux
+         ALn/dI3XDjcyUPJCsCNV+sOMdLhpNrevCqoqPB5IyjttB9RAbkVoglnBOXFBPMTfqXCo
+         pXXg==
+X-Gm-Message-State: APjAAAWfYffWh+dB579uMyMYdgYTiuA5g4pbeDAJ8yHzN+7Q2hrsDn+3
+        pwQMjQuJOd4QOHxoamO/cA2d0g==
+X-Google-Smtp-Source: APXvYqwXnNs5JijvaF73h7vMK7tuA0+M1Q4vZDcL3M2ooqsCaDusVA0+SnCBrR9Bs9vupT4WzxAN+Q==
+X-Received: by 2002:a24:7041:: with SMTP id f62mr3659797itc.62.1551911588900;
+        Wed, 06 Mar 2019 14:33:08 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:fa53:7765:582b:82b9])
+        by smtp.gmail.com with ESMTPSA id b20sm1104020ioj.12.2019.03.06.14.33.08
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 06 Mar 2019 14:33:08 -0800 (PST)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <CADS+iDUDv=Keo6661q3dY8C5=f+fZtfCe5gdPutO-psc9Pe0UQ@mail.gmail.com>
- <CAOVXEJ+bEQ=jmqwPEZygzaP7ChtKk2GwLc7183VyiRe5tbOzUQ@mail.gmail.com>
-In-Reply-To: <CAOVXEJ+bEQ=jmqwPEZygzaP7ChtKk2GwLc7183VyiRe5tbOzUQ@mail.gmail.com>
-From:   Yaroslav Isakov <yaroslav.isakov@gmail.com>
-Date:   Wed, 6 Mar 2019 20:55:10 +0100
-Message-ID: <CADS+iDWWxbYkQ=+J8LvOYPZOyuDDxKxf=wxSm1QY_YvGyPD5LQ@mail.gmail.com>
-Subject: Re: Strange SCO problem
-To:     Sathish Narasimman <nsathish41@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Sathish Narasimman <sathish.narasimman@intel.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190306162113.8585-1-bgodavar@codeaurora.org>
+References: <20190306162113.8585-1-bgodavar@codeaurora.org>
+From:   Stephen Boyd <swboyd@chromium.org>
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Give enough time to ROME controller to bootup.
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, rjliao@codeaurora.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        johan.hedberg@gmail.com, marcel@holtmann.org
+Message-ID: <155191158734.20095.15990837191526416248@swboyd.mtv.corp.google.com>
+User-Agent: alot/0.8
+Date:   Wed, 06 Mar 2019 14:33:07 -0800
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-=D1=81=D1=80, 6 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 09:28, Sathish Nara=
-simman <nsathish41@gmail.com>:
->
-> Hi,
->
-Hello, Sathish
-> Intel adapter 9260 and 9265(with the latest Firmware - from
-> Bluetooth-next) supports USB ALT 6 settings and was verified.
->
-I have only 8260 and 8265. How I can check if they supports ALT 6
-setting? I've checked via lsusb
-lsusb -d 8087:0a2b -v | grep bAlt
-      bAlternateSetting       0
-      bAlternateSetting       0
-      bAlternateSetting       1
-      bAlternateSetting       2
-      bAlternateSetting       3
-      bAlternateSetting       4
-      bAlternateSetting       5
-can't get device qualifier: Resource temporarily unavailable
-can't get debug descriptor: Resource temporarily unavailable
-> Along with backend ofono
-> https://patchwork.freedesktop.org/patch/245272/
->
-I've based my patches for native backend on your work. Unfortunately,
-I cannot use ofono, as it needs phonesim which is not working on my
-system (and is abandoned long ago...)
+Quoting Balakrishna Godavarthi (2019-03-06 08:21:13)
+> This patch enables enough time to ROME controller to bootup
+> after we bring the enable ping out of reset.
+>=20
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
 
-> https://www.spinics.net/lists/linux-bluetooth/msg76982.html
->
-> Regards,
-> Sathish N
->
->
-> On Wed, Mar 6, 2019 at 5:15 AM Yaroslav Isakov
-> <yaroslav.isakov@gmail.com> wrote:
-> >
-> > Hello! I'm currently trying to modify pulseaudio to be able to use HFP
-> > profile with mSBC codec on native backend, but found that, while
-> > working de-jure, real sound is completely ruined, so I can barely hear
-> > what is sent over SCO link. I've tried two different Intel adapters
-> > (included in 8260 and 8265 chipset) and KillerWifi (ath10k driver), on
-> > two different PCs with two different headsets, results are mostly the
-> > same, the only difference is that on ath10k words are more or less
-> > distinguishable.
-> >
-> > I've even tested with pulse just for profile setup, and SCO is sent
-> > via modified scotest from bluez, which sends some test sound, manually
-> > encoded via sbcenc (with added h2, of course). I've tried also msbc
-> > branch from bluez-alsa, same result.
-> >
-> > I'm sure that every time socket is connected with setsockopt(fd,
-> > SOL_BLUETOOTH, BT_VOICE, &voice, sizeof(voice));
-> >
-> > I've also tried with this patch
-> > https://www.spinics.net/lists/linux-bluetooth/msg76982.html, with no
-> > luck.
-> >
-> > Any ideas?
+Any Fixes tag? And maybe some more explanation or background on where
+150 ms sleep comes from would be useful. Was it determined
+experimentally or did it come from a datasheet somewhere? Does the time
+differ between boards?
+
+>  drivers/bluetooth/hci_qca.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 237aea34b69f..1953b13511e7 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -508,6 +508,8 @@ static int qca_open(struct hci_uart *hu)
+>                 qcadev =3D serdev_device_get_drvdata(hu->serdev);
+>                 if (qcadev->btsoc_type !=3D QCA_WCN3990) {
+>                         gpiod_set_value_cansleep(qcadev->bt_en, 1);
+> +                       /* Controller needs time to bootup. */
+> +                       msleep(150);
+>                 } else {
+>                         hu->init_speed =3D qcadev->init_speed;
+>                         hu->oper_speed =3D qcadev->oper_speed;
