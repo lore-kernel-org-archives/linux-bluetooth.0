@@ -1,116 +1,231 @@
-Return-Path: <SRS0=crNx=RJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Hm6j=RK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD3AC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 22:37:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2EB6C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 00:41:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2F2420663
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Mar 2019 22:37:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A92220684
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 00:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PzPYneUG"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nNz7CBxV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726101AbfCFWhu (ORCPT
+        id S1726408AbfCGAlF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Mar 2019 17:37:50 -0500
-Received: from mail-yw1-f54.google.com ([209.85.161.54]:43705 "EHLO
-        mail-yw1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725793AbfCFWhu (ORCPT
+        Wed, 6 Mar 2019 19:41:05 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:39257 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726386AbfCGAlD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Mar 2019 17:37:50 -0500
-Received: by mail-yw1-f54.google.com with SMTP id u200so11600097ywu.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 14:37:49 -0800 (PST)
+        Wed, 6 Mar 2019 19:41:03 -0500
+Received: by mail-pg1-f195.google.com with SMTP id h8so9792671pgp.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Mar 2019 16:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=sPBcu1XsEHIc/iIqF10mSwam4N3Cp2ypkmMjMTVdJYE=;
-        b=PzPYneUG5G2UNZYFnJSdq3iWXvFS0vX5Fyky/WiycNa0p9wWj9AkWjyUyar0TQbXqt
-         63xnH4jQUlRlc8Ua3RfLxvYcglG4YO/Vquwnfw+3OccqzEY1/TQ5Rj51AQ+UJPYucl0E
-         yq5Q9+Pgpa3cPodK1+wBQSmyzOTpmVTBQaILswgX8JhOGwS/FME2zaLAsYdB9hci37Ye
-         deLEEwfxJxjtx6QVutlttQaQenBIo9lsReIBYsrdmIAx70a2cAHO4BltB06fVFEsFjFB
-         cgoRHqB8Ia7peCAfahD6ViSvPg83xJAy1FmqXd2U2t8uoVkoqzSUrCJ9jURWHICj24yf
-         ehrw==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=MthmIBJFwwjcmfi1mqDbs2C1CNaXAwGGv8neZZfCz18=;
+        b=nNz7CBxV06a4YhD0Cf+C/tC4pov2TuTIyH3Su1sgjZr+v0SXKMehF7AF7LqaJFN1QE
+         kItSnoiPjVbVbmiSlWaSYUieZ3XWkGtWxReAzbuzgYrbkKHTUPZhqmB1zg2d8IiZhivq
+         JIrqsWcVj9+RXAuWbmaGH1NPap5tkQBKyfjE8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=sPBcu1XsEHIc/iIqF10mSwam4N3Cp2ypkmMjMTVdJYE=;
-        b=NdcGy37oAF20lgQbKULUxlEfGh3091lAxPY7Qr1j1XZGrKaOusWKzWmpncZEMz9eKT
-         iEdMc11OuMTLBywrbi6QFPa+khTjHDZbGvwCTY3LFapFsTk6SCEsi9UDIrv7jwKtTpZi
-         kNsGyhheSEMlRd4GqJuPSeQuuCAiUkgYz5+0lEOTzAYlfx2SAKpFtKtis3PrBYJJk7QM
-         8fhS/vPx6nJpTsXkR6jMvdkH8m57TDWqXXMBO+040jqshmU98fyvitW+Z45MYwfaVQYj
-         jZg0DRNhpYk7Q9xBtgeDTxTGI4+AhaPmDpV/5orXDQTeA4p1co8x8aTMC8n8PnwbW4cC
-         3hmw==
-X-Gm-Message-State: APjAAAUjz/bNuVPKuGvYSCU5PgzJlE2eXudAve4fzKS+ERjxyJ39FVJQ
-        5i1MzHsjnWIwKDcf5NAPKdpA3/5mZIWxcTbIsc8ZI4LH
-X-Google-Smtp-Source: APXvYqxnMyrVJgFQoNnjXxI3onIMReBwQypSTHIL4QDl4U1V+j7VkM2IEMDZQTXiSE6qJf704KRIElm4wabDUDsd3e8=
-X-Received: by 2002:a81:2e50:: with SMTP id u77mr7392871ywu.433.1551911868831;
- Wed, 06 Mar 2019 14:37:48 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MthmIBJFwwjcmfi1mqDbs2C1CNaXAwGGv8neZZfCz18=;
+        b=UZMbL6PyaB2gMBNhWtcJlxVNUxx5bg5mLl+ICl0XDPjEJ4iC3MpPl3bLpHE6H1JV8a
+         /ZR45JK8bYMK2s/f/IRruXS+NRmVjDp1YXNoblMWbS/TPVH3Ljb/sgjMKJ5AYyXm4Btm
+         kJ+0Kx0pFfP93WNtIRp53HzPxrpnE7JkGLoTN0x0hUZwLnflc+Q8fO1HaRulj1kXKHma
+         s1VRuf/zO3qk+o1QzodmRtNODOlarST2gIZC2ErEI6tEoAseOGf4gGE//25xk20Eew0K
+         bn4LTFLlCXHV6E3PXQYawgoI+1kYoCQ2cOK7C9wyLFCvs7lWDVTjIUBo3CDcUqtlFO+9
+         eysQ==
+X-Gm-Message-State: APjAAAWZeL6A0fKlKxEJt3PSd3U+LrQHFwhv2A+NLsRG9rsl+YFgFbA+
+        dj6ngSlS2V9sL2/g0qEN5DL8cQ==
+X-Google-Smtp-Source: APXvYqyJB6DSL7PVApjNuCSex4T2W7mcBkCjz2GGpfsjDhKKY/4WLvm7MW34X3NIHKe/JlU+oeL2RQ==
+X-Received: by 2002:aa7:918b:: with SMTP id x11mr10476498pfa.228.1551919261979;
+        Wed, 06 Mar 2019 16:41:01 -0800 (PST)
+Received: from mka.mtv.corp.google.com ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id o76sm8361985pfa.156.2019.03.06.16.41.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Mar 2019 16:41:01 -0800 (PST)
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change vendor event
+Date:   Wed,  6 Mar 2019 16:40:41 -0800
+Message-Id: <20190307004041.38059-3-mka@chromium.org>
+X-Mailer: git-send-email 2.21.0.352.gf09ad66450-goog
+In-Reply-To: <20190307004041.38059-1-mka@chromium.org>
+References: <20190307004041.38059-1-mka@chromium.org>
 MIME-Version: 1.0
-From:   Barry Byford <31baz66@gmail.com>
-Date:   Wed, 6 Mar 2019 22:37:38 +0000
-Message-ID: <CAAu3APbx4njmmBgu4_U=9CEahhK-f8BnhMuAwp0=XgFRZhexvw@mail.gmail.com>
-Subject: Peripheral notifications not showing up
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Firmware download to the WCN3990 often fails with a 'TLV response size
+mismatch' error:
 
-I have a system that comes with BlueZ 5.43 installed on a single board
-computer (SBC). I have downloaded, built and installed various newer
-versions of BlueZ but I am having problems getting them working
-correctly.
+[  133.064659] Bluetooth: hci0: setting up wcn3990
+[  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
+[  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+[  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
+[  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
 
-I have a peripheral (very similar to the gatt server example in the
-test directory) with one characteristic. My example was working before
-upgrading. However after upgrading, when I turn on notification for
-the characteristic it is not showing on the phone.
+This is caused by a vendor event that corresponds to an earlier command
+to change the baudrate. The event is not processed in the context of the
+baudrate change and later interpreted as response to the firmware
+download command (which is also a vendor command), but the driver detects
+that the event doesn't have the expected amount of associated data.
 
-I do see the notification turn up in dbus-monitor but not in btmon.
+More details:
 
-signal time=1551910979.743011 sender=:1.38 -> destination=(null
-destination) serial=339 path=/ukBaz/bluezero/service0001/char0001;
-interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-   string "org.bluez.GattCharacteristic1"
-   array [
-      dict entry(
-         string "Value"
-         variant             array of bytes [
-               78 14
-            ]
-      )
-   ]
-   array [
-   ]
+For the WCN3990 the vendor command for a baudrate change isn't sent as
+synchronous HCI command, because the controller sends the corresponding
+vendor event with the new baudrate. The event is received and decoded
+after the baudrate change of the host port.
 
-I have tried going back to version 5.43 again but now that is not
-working either.
+Identify the 'unused' event when it is received and don't add it to
+the queue of RX frames.
 
-The configure I ran was:
-./configure --prefix=/usr \
-            --mandir=/usr/share/man \
-            --sysconfdir=/etc \
-            --localstatedir=/var \
-            --enable-experimental \
-            --enable-maintainer-mode
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ drivers/bluetooth/hci_qca.c | 54 ++++++++++++++++++++++++++++++++++---
+ 1 file changed, 51 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index ab8e59419dbc4..565681a6a1167 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -30,6 +30,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/clk.h>
++#include <linux/completion.h>
+ #include <linux/debugfs.h>
+ #include <linux/delay.h>
+ #include <linux/device.h>
+@@ -55,6 +56,7 @@
+ #define HCI_MAX_IBS_SIZE	10
+ 
+ #define QCA_IN_BAND_SLEEP_ENABLED	BIT(0)
++#define QCA_DROP_VENDOR_EVENT		BIT(1)
+ 
+ #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+ #define IBS_TX_IDLE_TIMEOUT_MS		2000
+@@ -108,6 +110,7 @@ struct qca_data {
+ 	struct work_struct ws_rx_vote_off;
+ 	struct work_struct ws_tx_vote_off;
+ 	unsigned long flags;
++	struct completion drop_ev_comp;
+ 
+ 	/* For debugging purpose */
+ 	u64 ibs_sent_wacks;
+@@ -474,6 +477,7 @@ static int qca_open(struct hci_uart *hu)
+ 	INIT_WORK(&qca->ws_tx_vote_off, qca_wq_serial_tx_clock_vote_off);
+ 
+ 	qca->hu = hu;
++	init_completion(&qca->drop_ev_comp);
+ 
+ 	/* Assume we start with both sides asleep -- extra wakes OK */
+ 	qca->tx_ibs_state = HCI_IBS_TX_ASLEEP;
+@@ -866,6 +870,33 @@ static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return hci_recv_frame(hdev, skb);
+ }
+ 
++static int qca_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct qca_data *qca = hu->priv;
++
++	if (test_bit(QCA_DROP_VENDOR_EVENT, &qca->flags)) {
++		struct hci_event_hdr *hdr = (void *)skb->data;
++
++		/* For the WCN3990 the vendor command for a baudrate change
++		 * isn't sent as synchronous HCI command, because the
++		 * controller sends the corresponding vendor event with the
++		 * new baudrate. The event is received and properly decoded
++		 * after changing the baudrate of the host port. It needs to
++		 * be dropped, otherwise it can be mis-interpreted as
++		 * response to a later firmware download command (also a
++		 * vendor command).
++		 */
++
++		if (hdr->evt == HCI_EV_VENDOR)
++			complete(&qca->drop_ev_comp);
++
++		return 0;
++	}
++
++	return hci_recv_frame(hdev, skb);
++}
++
+ #define QCA_IBS_SLEEP_IND_EVENT \
+ 	.type = HCI_IBS_SLEEP_IND, \
+ 	.hlen = 0, \
+@@ -890,7 +921,7 @@ static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
+ static const struct h4_recv_pkt qca_recv_pkts[] = {
+ 	{ H4_RECV_ACL,             .recv = qca_recv_acl_data },
+ 	{ H4_RECV_SCO,             .recv = hci_recv_frame    },
+-	{ H4_RECV_EVENT,           .recv = hci_recv_frame    },
++	{ H4_RECV_EVENT,           .recv = qca_recv_event    },
+ 	{ QCA_IBS_WAKE_IND_EVENT,  .recv = qca_ibs_wake_ind  },
+ 	{ QCA_IBS_WAKE_ACK_EVENT,  .recv = qca_ibs_wake_ack  },
+ 	{ QCA_IBS_SLEEP_IND_EVENT, .recv = qca_ibs_sleep_ind },
+@@ -1091,6 +1122,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ {
+ 	unsigned int speed, qca_baudrate;
+ 	struct qca_serdev *qcadev;
++	struct qca_data *qca = hu->priv;
+ 	int ret = 0;
+ 
+ 	if (speed_type == QCA_INIT_SPEED) {
+@@ -1106,8 +1138,11 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		 * changing the baudrate of chip and host.
+ 		 */
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		if (qcadev->btsoc_type == QCA_WCN3990)
++		if (qcadev->btsoc_type == QCA_WCN3990) {
+ 			hci_uart_set_flow_control(hu, true);
++			reinit_completion(&qca->drop_ev_comp);
++			set_bit(QCA_DROP_VENDOR_EVENT, &qca->flags);
++		}
+ 
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+ 		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
+@@ -1118,8 +1153,21 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		host_set_baudrate(hu, speed);
+ 
+ error:
+-		if (qcadev->btsoc_type == QCA_WCN3990)
++		if (qcadev->btsoc_type == QCA_WCN3990) {
+ 			hci_uart_set_flow_control(hu, false);
++
++			/* Wait for the controller to send the vendor event
++			 * for the baudrate change command.
++			 */
++			if (!wait_for_completion_timeout(&qca->drop_ev_comp,
++						 msecs_to_jiffies(100))) {
++				bt_dev_err(hu->hdev,
++					   "Failed to change controller baudrate\n");
++				ret = -EPROTO;
++			}
++
++			clear_bit(QCA_DROP_VENDOR_EVENT, &qca->flags);
++		}
+ 	}
+ 
+ 	return ret;
+-- 
+2.21.0.352.gf09ad66450-goog
 
-To get configure to work without error I needed to install the following:
-sudo apt install glib2.
-sudo apt install libdbus-1-dev libudev-dev libical-dev libreadline-dev
-
-I have tried various variations on this and done a lot of searching
-but don't seem to find an answer.
-Is anyone else seeing this issue?
-Anyone have any suggestions as what I could try?
-
-Thanks in advance,
-Barry
