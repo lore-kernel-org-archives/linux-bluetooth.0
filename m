@@ -2,145 +2,153 @@ Return-Path: <SRS0=Hm6j=RK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CA5C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 16:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D493C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 18:20:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BE6A22081B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 16:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E18AD20675
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 18:20:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MT7ZnhxR"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YpArZAGF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726185AbfCGQfi (ORCPT
+        id S1726329AbfCGSUM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Mar 2019 11:35:38 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38181 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726170AbfCGQfh (ORCPT
+        Thu, 7 Mar 2019 13:20:12 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44070 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726227AbfCGSUM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Mar 2019 11:35:37 -0500
-Received: by mail-pf1-f194.google.com with SMTP id n125so11828291pfn.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2019 08:35:36 -0800 (PST)
+        Thu, 7 Mar 2019 13:20:12 -0500
+Received: by mail-pf1-f195.google.com with SMTP id a3so12052422pff.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2019 10:20:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=9kBUhpBcqYBB4rTIv68teSw5/fyCaCZqoMFAFKzXrQ8=;
-        b=MT7ZnhxRWSJfpEwK5vDdOv2tKwTZ7tTT51aNVcYa9yJBGaGlGaqLJpeaCtS64OMRWW
-         6+A/fEtyNUKctQeyT2OHns+MLNqm8zU52cvwOVdx0cHOZBv0w+CRcL92jkGRUVZHaUtB
-         bjNeCPUHFqnSH/SPolhENwY0/1dSXMK3wmgN4=
+        bh=n8wSLJh3GXdY5a0oY98XTXZmgoXX8BLFR1DAUT44FVc=;
+        b=YpArZAGF2rkH+wl8ZqI3DxIhYtHR6yMZ7TB03z/egkTW+6e/WGDbHZtXl7oWJ+S4uQ
+         +ZpJFwKZxpA/czdyIbbqV8KTN5iJMozcuBteCoRYDnbE+WXT0pwii/Ndb8FwG50Xrenn
+         9+/e9i753OmYF45snSFF612oGQ66pDAftMR8g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=9kBUhpBcqYBB4rTIv68teSw5/fyCaCZqoMFAFKzXrQ8=;
-        b=fAya81xQ5d0PXhxM8fL9uY/ODBl6SYGkmFf8koDr4zumcsD95CUfAta2k+D6raup/6
-         3W7wloRNLHq9ZBfY1sGubcwHbxAwVJNspA9VyR/FXSt+fXsEa7DV0hD0w8Zq2wPH60ex
-         paG7KrjRj+B9iOCNNqDlMrXRf7JyYwYk6SPyF2mVkNodfgYzBH30KhucmAPjMyAuYDuP
-         a8h+FaEknsXmFKfpogetaSwMuXblhid7lRloh3ugz80UyEykCdF2VGGIvqFC2HBmavHu
-         iOrU56p3QStBLI1kJNfnjOdDa9ryMNJm/2p3BHUptPDntelzvbOtMfDi8VSXnC6aJaMi
-         yQpg==
-X-Gm-Message-State: APjAAAU3c8M5iVvjaLFXrHpSxfrvERG64huxbTAhkP7r3yb4HaFtnsh4
-        99lKF0O67PKc9jasm+2trCKH8A==
-X-Google-Smtp-Source: APXvYqx3R1aNmWTZCccyUy75ExBV6RbWl9XTWlZ0Ur++xKR0xmFx6/SHeq9umY18JlPShUT7gxtQkQ==
-X-Received: by 2002:a62:48c1:: with SMTP id q62mr13653902pfi.113.1551976536604;
-        Thu, 07 Mar 2019 08:35:36 -0800 (PST)
+        bh=n8wSLJh3GXdY5a0oY98XTXZmgoXX8BLFR1DAUT44FVc=;
+        b=fw1TIuowtAQYNORZkIkXbbOx7pxyuGRLpvRJxq8zLvUYeoRU7J+aWiMmlG3SkoZ5mt
+         MHB9Nu1mlU0eFgQx5XP0FxFMz778F3zmLaaKCFYzX+BRBGzQy6DTQDxzD5ouqwh/eYO5
+         gT7K0sct6f1opD8PeCFjkST6axyUOHfbPyo87MiSTQEE2zxsVZ/+vkJbAcUlP37w6p+A
+         A5y6aea54U809JOnMHP81CTnAT9bspppSK4RjCgQLOoODXgyxUnjn5z90D4dA6D4F1FF
+         cE0cfOPix41vcs4qTpRaKSAk028K9j3F37HqImioO+xfRHbS/1XxdyBngFPA6r9pObNz
+         2bUw==
+X-Gm-Message-State: APjAAAXbixc6TgptdsHSgTktb1Hfz/0+xnCOqlYUScqGmiFz9xcSGGiv
+        sRnHCZcmhdisEY9umJGzYxGb8PSlpNg=
+X-Google-Smtp-Source: APXvYqxIfc416OIg9O8zgIT6yHYstjjw7WgIBUqIaRMElyhlE2ApvirLqBvWcIyfBKXKgc2yqusqJw==
+X-Received: by 2002:a17:902:7682:: with SMTP id m2mr14431176pll.311.1551982810943;
+        Thu, 07 Mar 2019 10:20:10 -0800 (PST)
 Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id k74sm8692732pfb.172.2019.03.07.08.35.35
+        by smtp.gmail.com with ESMTPSA id s4sm7810922pfe.16.2019.03.07.10.20.10
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 07 Mar 2019 08:35:35 -0800 (PST)
-Date:   Thu, 7 Mar 2019 08:35:35 -0800
+        Thu, 07 Mar 2019 10:20:10 -0800 (PST)
+Date:   Thu, 7 Mar 2019 10:20:09 -0800
 From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         Hemantg <hemantg@codeaurora.org>
-Subject: Re: [PATCH 1/2] Bluetooth: hci_qca: Rename STATE_<flags> to
- QCA_<flags>
-Message-ID: <20190307163535.GA138592@google.com>
+Subject: Re: [PATCH 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change
+ vendor event
+Message-ID: <20190307182009.GB138592@google.com>
 References: <20190307004041.38059-1-mka@chromium.org>
- <20190307004041.38059-2-mka@chromium.org>
+ <20190307004041.38059-3-mka@chromium.org>
+ <ff905fac1e57bcca78c74f1bc3349645@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190307004041.38059-2-mka@chromium.org>
+In-Reply-To: <ff905fac1e57bcca78c74f1bc3349645@codeaurora.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Mar 06, 2019 at 04:40:40PM -0800, Matthias Kaehlcke wrote:
-> Rename STATE_IN_BAND_SLEEP_ENABLED to QCA_IN_BAND_SLEEP_ENABLED.
-> The constant represents a flag (multiple flags can be set at once),
-> not a unique state of the controller or driver. Also use the BIT()
-> macro to specify the position of the flag instead of an integer
-> literal.
+Hi Balakrishna,
+
+On Thu, Mar 07, 2019 at 10:35:08AM +0530, Balakrishna Godavarthi wrote:
+> hi Matthias,
 > 
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 237aea34b69f1..ab8e59419dbc4 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -54,8 +54,7 @@
->  #define HCI_IBS_WAKE_ACK	0xFC
->  #define HCI_MAX_IBS_SIZE	10
->  
-> -/* Controller states */
-> -#define STATE_IN_BAND_SLEEP_ENABLED	1
-> +#define QCA_IN_BAND_SLEEP_ENABLED	BIT(0)
+> On 2019-03-07 06:10, Matthias Kaehlcke wrote:
+> > Firmware download to the WCN3990 often fails with a 'TLV response size
+> > mismatch' error:
+> > 
+> > [  133.064659] Bluetooth: hci0: setting up wcn3990
+> > [  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
+> > [  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+> > [  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
+> > [  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
+> > 
+> > This is caused by a vendor event that corresponds to an earlier command
+> > to change the baudrate. The event is not processed in the context of the
+> > baudrate change and later interpreted as response to the firmware
+> > download command (which is also a vendor command), but the driver
+> > detects
+> > that the event doesn't have the expected amount of associated data.
+> > 
+> > More details:
+> > 
+> > For the WCN3990 the vendor command for a baudrate change isn't sent as
+> > synchronous HCI command, because the controller sends the corresponding
+> > vendor event with the new baudrate. The event is received and decoded
+> > after the baudrate change of the host port.
+> > 
+> > Identify the 'unused' event when it is received and don't add it to
+> > the queue of RX frames.
+> > 
+> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> > ---
+>
+> ...
+>
+> Can you test by reverting this change "94d6671473924".
 
-I realized that the use of BIT() isn't correct here, since the value
-is used with set_bit(), ..., which expect a bit *number*. It should
-probably be an emum starting with 0.
+The issue is still reproducible.
 
-I'll update it in the next revision.
+> We need at least 15ms minimum delay for the soc to change its baud rate and
+> respond to the with command complete event.
 
->  
->  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
->  #define IBS_TX_IDLE_TIMEOUT_MS		2000
-> @@ -775,7 +774,7 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
->  	/* Don't go to sleep in middle of patch download or
->  	 * Out-Of-Band(GPIOs control) sleep is selected.
->  	 */
-> -	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
-> +	if (!test_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
->  		skb_queue_tail(&qca->txq, skb);
->  		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
->  		return 0;
-> @@ -1192,7 +1191,7 @@ static int qca_setup(struct hci_uart *hu)
->  		return ret;
->  
->  	/* Patch downloading has to be done without IBS mode */
-> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-> +	clear_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
->  
->  	if (qcadev->btsoc_type == QCA_WCN3990) {
->  		bt_dev_info(hdev, "setting up wcn3990");
-> @@ -1236,7 +1235,7 @@ static int qca_setup(struct hci_uart *hu)
->  	/* Setup patch / NVM configurations */
->  	ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, soc_ver);
->  	if (!ret) {
-> -		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-> +		set_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
->  		qca_debugfs_init(hdev);
->  	} else if (ret == -ENOENT) {
->  		/* No patch/nvm-config found, run with original fw/config */
-> @@ -1294,7 +1293,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
->  	 * data in skb's.
->  	 */
->  	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
-> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-> +	clear_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
->  	qca_flush(hu);
->  	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
->  
+The baudrate change has clearly been successful when the problem is
+observed, since the host receives the vendor event with the new
+baudrate.
+
+We could increase the delay to 15ms just in case, though in my stress
+tests with 1000s of iterations I didn't observe any problem with the
+baudrate change itself. However if this patch gets landed the delay
+could be removed completely, since we are waiting until the vendor
+event is received with the new baudrate.
+
+> In my previous stress test we have not observed any issues.
+
+Which patches did you use for the stress test?
+
+Did your stack include '78e8fa2972e55 Bluetooth: hci_qca: Deassert RTS
+while baudrate change command' (or equivalent)? It is mainly this
+patch which *exposes* the problem, before it (and with the long delay)
+the controller response was received with the old baudrate and could
+not be decoded ("frame reassembly errors").
+
+Also make sure to test without 'Bluetooth: btqca: inject command
+complete event during fw download'
+(https://lore.kernel.org/patchwork/patch/1027955/), since it affects
+timing and injects extra events. It might seem that it fixes the
+problem, but it just papers over it.
+
+I have my suspicions that the mega-timeout of 300ms for ROME was
+introduced to 'fix' a related issue ...
+
+Cheers
+
+Matthias
