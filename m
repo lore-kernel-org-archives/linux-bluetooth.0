@@ -2,110 +2,140 @@ Return-Path: <SRS0=Hm6j=RK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F763C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 06:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8B6C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 08:13:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F59020675
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 06:52:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5ADC20675
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 08:13:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="JqLlM7eQ";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="LSxHpZI5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J8EruywA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726313AbfCGGwv (ORCPT
+        id S1726102AbfCGINp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Mar 2019 01:52:51 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:38112 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726057AbfCGGwu (ORCPT
+        Thu, 7 Mar 2019 03:13:45 -0500
+Received: from mail-ot1-f52.google.com ([209.85.210.52]:40662 "EHLO
+        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbfCGINp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Mar 2019 01:52:50 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 5763E60316; Thu,  7 Mar 2019 06:52:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1551941570;
-        bh=xMsAy5jX7PfN1+hij6szv5EyTekRG3WhVJp4UcLaYxg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JqLlM7eQBQ0so2KQ+LAG15KVE8p1TEoO3T3EVVOrJe1BbLKUc9t7yh5Z3gWgPXUJf
-         SJAG0kaLvNb6OlN29XwK+NZWhKpePcscX7OJYQoy96VUE8IxCrrk2MpNwce6IxcmhZ
-         C0PGvwhUFQAdqSChtD8RiFDgovY1yO0E6cxdwkuQ=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 98BBE60316;
-        Thu,  7 Mar 2019 06:52:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1551941569;
-        bh=xMsAy5jX7PfN1+hij6szv5EyTekRG3WhVJp4UcLaYxg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LSxHpZI5KA1Ozls2zyFRGI0hSM2JyZF/bY6cre9UQ7WVWBnlypSe1k1Sar2FhvBCR
-         Hpm0anw5TQuGbLDMP5ZA/u1wdkTk/iFbDBgIz2SoUy10F8cibxyz41KSezsW3ZYeSf
-         zjcEM88HJrHbga80CEk+jJrYs0NWdNsirmT0XG1g=
+        Thu, 7 Mar 2019 03:13:45 -0500
+Received: by mail-ot1-f52.google.com with SMTP id v20so13339351otk.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2019 00:13:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=u4+KIUqaMF38+psYgDFe/FIGFxe9nu3lNvyWv0Quicw=;
+        b=J8EruywAnjJ7orhBiByucOvXQhmGJCFPlXDJDD+wTny0Fln1h+Lj1UGT1PBBo7a0WO
+         svmUzb6HzeoxbCuB3FwhzSCYjkx+elzb0sHbzl63MWpY9FnyKZvJFGdS9ObCRdwzYQQ8
+         +GdH+aF8xCSKsL7TKz5NEwArJoiG2+D+WpcpFc/0SAhUPaXpaFvT4oghTb/cvmpTEdJF
+         FwjQ4tNY3DRKaNZPUeisy9vy/EO0nPKb+qHlirznYFKJ0d76RTByA+MvmsVTRrbsygi+
+         ABf/oNhs5/NNpxDq0W22EhH3E8zxQnD+IfzQ9c6q2iCQHG1YLnxOv4RcsucrnGyPOJn2
+         i7qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=u4+KIUqaMF38+psYgDFe/FIGFxe9nu3lNvyWv0Quicw=;
+        b=G45OW+NUAAkDLktu7exZu02sCgMhxiTFlhC26VP6IU/TzLRBnLWm3xwZGWDaRO5Cur
+         BLnSnGyxG03T+dJs0YfBfMu17esJrNBKCxysHlnN4h3zkp22cHTbwi18jClsfeFPXmMJ
+         K67ZGCnbnwDUsoxcetl95Ow229Mtmx0QtVFtYW5yVAvv131x7Ic2Gwh9SBSFR4V6nY+B
+         eH89V5ZDMQiYP8M+SBpdbUwb1Gk5662ICtRuawWm/cGEkaIs8W0yfknPXicXIBAmzEp9
+         Y6ULonzygyZu0VKChGnDM73Eciw7glo8EAWqJzvMBU30hqTqJXBnNFQVlN1MwCzO78HK
+         09jA==
+X-Gm-Message-State: APjAAAXwpKBDCUdwfFAPx6Q9l/hUeun8IjjsdRf/W2Ff6v79HY+bYKXA
+        qeSKGrub904xzNq8eX2T0GIwvXgTyNkGNDk9YrvHyR8gzPU=
+X-Google-Smtp-Source: APXvYqw+pD0ewYUsn1e/7rrUGqJTT8dV9Han8gXffd49nk6N6uqtiqIs4vq0MuGsUJldi/XE5qa2OrI/aKD0/OOPKFQ=
+X-Received: by 2002:a05:6830:1543:: with SMTP id l3mr7473713otp.84.1551946423782;
+ Thu, 07 Mar 2019 00:13:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Thu, 07 Mar 2019 14:52:49 +0800
-From:   rjliao@codeaurora.org
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Stephen Boyd <swboyd@chromium.org>, johan.hedberg@gmail.com,
-        marcel@holtmann.org, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Give enough time to ROME
- controller to bootup.
-In-Reply-To: <a22894cea091ee9945af9c22d6e42051@codeaurora.org>
-References: <20190306162113.8585-1-bgodavar@codeaurora.org>
- <155191158734.20095.15990837191526416248@swboyd.mtv.corp.google.com>
- <a22894cea091ee9945af9c22d6e42051@codeaurora.org>
-Message-ID: <9df1c9cbbe655d4aca9464cf7ca69900@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+References: <AM0PR03MB5076E7A27AB448DE6E97B248CE730@AM0PR03MB5076.eurprd03.prod.outlook.com>
+In-Reply-To: <AM0PR03MB5076E7A27AB448DE6E97B248CE730@AM0PR03MB5076.eurprd03.prod.outlook.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 7 Mar 2019 10:13:31 +0200
+Message-ID: <CABBYNZJV3WWZ6WkNrQpfRhNjL_NCVOB0BXmXZMgHnV=DMA0=yg@mail.gmail.com>
+Subject: Re: iBeacon with the dbus advertising-api
+To:     Marco Okker <marco@epesi.nl>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-在 2019-03-07 14:49，Balakrishna Godavarthi 写道：
-> Hi Stepen,
-> 
-> On 2019-03-07 04:03, Stephen Boyd wrote:
->> Quoting Balakrishna Godavarthi (2019-03-06 08:21:13)
->>> This patch enables enough time to ROME controller to bootup
->>> after we bring the enable ping out of reset.
->>> 
->>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->>> ---
->> 
->> Any Fixes tag? And maybe some more explanation or background on where
->> 150 ms sleep comes from would be useful. Was it determined
->> experimentally or did it come from a datasheet somewhere? Does the 
->> time
->> differ between boards?
->> 
-> [Bala]: this was observed in our stress testing and even the CHIP 
-> firmware team
->         confirmed that BT chip required at least 150 ms to boot up.
-> 
-> @Rocky to confirm my statement.
-> 
->>>  drivers/bluetooth/hci_qca.c | 2 ++
->>>  1 file changed, 2 insertions(+)
->>> 
->>> diff --git a/drivers/bluetooth/hci_qca.c 
->>> b/drivers/bluetooth/hci_qca.c
->>> index 237aea34b69f..1953b13511e7 100644
->>> --- a/drivers/bluetooth/hci_qca.c
->>> +++ b/drivers/bluetooth/hci_qca.c
->>> @@ -508,6 +508,8 @@ static int qca_open(struct hci_uart *hu)
->>>                 qcadev = serdev_device_get_drvdata(hu->serdev);
->>>                 if (qcadev->btsoc_type != QCA_WCN3990) {
->>>                         gpiod_set_value_cansleep(qcadev->bt_en, 1);
->>> +                       /* Controller needs time to bootup. */
->>> +                       msleep(150);
->>>                 } else {
->>>                         hu->init_speed = qcadev->init_speed;
->>>                         hu->oper_speed = qcadev->oper_speed;
+Hi Marco,
+On Wed, Mar 6, 2019 at 5:53 PM Marco Okker <marco@epesi.nl> wrote:
+>
+> Dear Bluez advertising-api developers,
+>
+> I got a problem with the advertising-api. It seems to be impossible to make an iBeacon advertisement with the api.
+> I know it can be done with my bluetooth module because it is possible with the hcitool*.
+>
+> An iBeacon sends the following at the start of an advertisement: 0x0201061aff4c000215.
+>
+> With the advertising-api I am able to advertise a big part of the iBeacon(with the manufacturer data property):
+> 0x1AFF4C0002155E2B092544064DFEB06D66D7AFB0F84C59659D46AC
+>
+> If I modify the bluetooth config(/etc/bluetooth/main.conf) setting "ControllerMode = le"  it will add  0x020104 to the packet(this is the closest I got to an iBeacon):
+> 0x0201041AFF4C0002155E2B092544064DFEB06D66D7AFB0F84C59659D46AC
+>
+> However I can't make the api advertise the following(the most important part at the start of the advertisement(0x020106) can't be done):
+> 0x0201061AFF4C0002155E2B092544064DFEB06D66D7AFB0F84C59659D46AC
+>
+> I have tried all properties of the advertising-api, none of them seem to be able to add "0x020106" at the start of the advertisement.
 
-Yes,ROME firmware needs 150ms to boot up after toggle the BT_EN pin.
+So this is about the so called flags (ad type 0x01), you want it to be
+set as 0x06, as opposed to 0x04, which is:
+
+bit 1: LE General Discoveral Mode
+bit 2: BR/EDR not Supported
+
+I don't think the BR/EDR bit really matter so I guess all you need is
+to switch the discoverable mode, which you can do as follow:
+
+bluetoothctl> power on
+bluetoothctl> advertise.discoverable on
+bluetoothctl> advertise.manufacturer 0x004c [data...]
+bluetoothctl> advertise on
+
+@ MGMT Command: Add Advertising (0x003e) plen 19
+        Instance: 1
+        Flags: 0x00000001
+          Switch into Connectable mode
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 8
+        Company: Apple, Inc. (76)
+        Flags: 0x02
+          LE General Discoverable Mode
+        Scan response length: 0
+
+If the implementation is really pedantic about the BR/EDR flag then
+you should probably attempt to enable it by setting ControllerMode =
+le. If discoverable is not set perhaps you have an old version of
+bluetoothd which don't have support for it, but as I show you above it
+is possible to for Discoverable mode though that means the
+advertisement would work as peripheral role since broadcast cannot
+have flags:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c#n1030
+
+> To summarize, my question is:
+> Can you modify the dbus advertising-api of Bluez so that it is possible to advertise an iBeacon?
+>
+> Greetings,
+> Marco
+>
+> * hcitool example:
+> ############################ 02 01 06 1A FF 4C 00 02 15 # Apple's fixed iBeacon advertising prefix
+> hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 FB 0B 57 A2 82 28 44 CD 91 3A 94 A1 22 BA 12
+> (Source: https://en.wikipedia.org/wiki/IBeacon)
+
+
+
+-- 
+Luiz Augusto von Dentz
