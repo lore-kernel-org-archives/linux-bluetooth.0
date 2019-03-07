@@ -2,102 +2,145 @@ Return-Path: <SRS0=Hm6j=RK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EAEC43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 12:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CA5C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 16:35:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D4AC20835
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 12:17:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE6A22081B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 16:35:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="n5hW/mRF";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="e5d/QFfz"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MT7ZnhxR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbfCGMRX (ORCPT
+        id S1726185AbfCGQfi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Mar 2019 07:17:23 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:59242 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726101AbfCGMRW (ORCPT
+        Thu, 7 Mar 2019 11:35:38 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38181 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726170AbfCGQfh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Mar 2019 07:17:22 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id A5ADC60ADE; Thu,  7 Mar 2019 12:17:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1551961041;
-        bh=RXtIsSNq0sPOCGtmzN0HRVRPkiHYebUNXhndZ5vXhMo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=n5hW/mRFf6SBZZ+M7ILC1BF8N1X3+rFdWOUK1VZ7fYoVYSHsc5ZnsXIzROYDD0a3e
-         OM0E/Q9kTZ1arJ3sc4Q5ygf859TWXadWzyrA9qmTz1xxcI+yozm1xHjhxcdebAog3b
-         Wync9TA5G/1LZM0ebUw3Dq4dpo62XWqznLacqIuE=
-Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: c-hbandi@codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id E67F060ADE;
-        Thu,  7 Mar 2019 12:17:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1551961038;
-        bh=RXtIsSNq0sPOCGtmzN0HRVRPkiHYebUNXhndZ5vXhMo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=e5d/QFfzrQ5KDCmKKO1jV1n3Y4OVwUukPCGAYBRNWpixrZBIuvozswJbLvwYfZLFD
-         0ZRrUaUUlo8iMhBi3UTcaa7yJvm5n1HGW2RDnAStkUTdS9JwUQTpJAskkakcpOHvKV
-         NB9+tkUYlOuwjZcnecq/Z1VZskg5iZcRsMRAopGI=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org E67F060ADE
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
-From:   Harish Bandi <c-hbandi@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
-Subject: [PATCH v1 2/2] dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
-Date:   Thu,  7 Mar 2019 17:46:52 +0530
-Message-Id: <1551961012-23898-3-git-send-email-c-hbandi@codeaurora.org>
-X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1551961012-23898-1-git-send-email-c-hbandi@codeaurora.org>
-References: <1551961012-23898-1-git-send-email-c-hbandi@codeaurora.org>
+        Thu, 7 Mar 2019 11:35:37 -0500
+Received: by mail-pf1-f194.google.com with SMTP id n125so11828291pfn.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2019 08:35:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=9kBUhpBcqYBB4rTIv68teSw5/fyCaCZqoMFAFKzXrQ8=;
+        b=MT7ZnhxRWSJfpEwK5vDdOv2tKwTZ7tTT51aNVcYa9yJBGaGlGaqLJpeaCtS64OMRWW
+         6+A/fEtyNUKctQeyT2OHns+MLNqm8zU52cvwOVdx0cHOZBv0w+CRcL92jkGRUVZHaUtB
+         bjNeCPUHFqnSH/SPolhENwY0/1dSXMK3wmgN4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=9kBUhpBcqYBB4rTIv68teSw5/fyCaCZqoMFAFKzXrQ8=;
+        b=fAya81xQ5d0PXhxM8fL9uY/ODBl6SYGkmFf8koDr4zumcsD95CUfAta2k+D6raup/6
+         3W7wloRNLHq9ZBfY1sGubcwHbxAwVJNspA9VyR/FXSt+fXsEa7DV0hD0w8Zq2wPH60ex
+         paG7KrjRj+B9iOCNNqDlMrXRf7JyYwYk6SPyF2mVkNodfgYzBH30KhucmAPjMyAuYDuP
+         a8h+FaEknsXmFKfpogetaSwMuXblhid7lRloh3ugz80UyEykCdF2VGGIvqFC2HBmavHu
+         iOrU56p3QStBLI1kJNfnjOdDa9ryMNJm/2p3BHUptPDntelzvbOtMfDi8VSXnC6aJaMi
+         yQpg==
+X-Gm-Message-State: APjAAAU3c8M5iVvjaLFXrHpSxfrvERG64huxbTAhkP7r3yb4HaFtnsh4
+        99lKF0O67PKc9jasm+2trCKH8A==
+X-Google-Smtp-Source: APXvYqx3R1aNmWTZCccyUy75ExBV6RbWl9XTWlZ0Ur++xKR0xmFx6/SHeq9umY18JlPShUT7gxtQkQ==
+X-Received: by 2002:a62:48c1:: with SMTP id q62mr13653902pfi.113.1551976536604;
+        Thu, 07 Mar 2019 08:35:36 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id k74sm8692732pfb.172.2019.03.07.08.35.35
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 07 Mar 2019 08:35:35 -0800 (PST)
+Date:   Thu, 7 Mar 2019 08:35:35 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Hemantg <hemantg@codeaurora.org>
+Subject: Re: [PATCH 1/2] Bluetooth: hci_qca: Rename STATE_<flags> to
+ QCA_<flags>
+Message-ID: <20190307163535.GA138592@google.com>
+References: <20190307004041.38059-1-mka@chromium.org>
+ <20190307004041.38059-2-mka@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190307004041.38059-2-mka@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch enables regulators for the Qualcomm Bluetooth wcn3990
-controller.
-Added entry for regulator currents, min and max voltages
+On Wed, Mar 06, 2019 at 04:40:40PM -0800, Matthias Kaehlcke wrote:
+> Rename STATE_IN_BAND_SLEEP_ENABLED to QCA_IN_BAND_SLEEP_ENABLED.
+> The constant represents a flag (multiple flags can be set at once),
+> not a unique state of the controller or driver. Also use the BIT()
+> macro to specify the position of the flag instead of an integer
+> literal.
+> 
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 237aea34b69f1..ab8e59419dbc4 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -54,8 +54,7 @@
+>  #define HCI_IBS_WAKE_ACK	0xFC
+>  #define HCI_MAX_IBS_SIZE	10
+>  
+> -/* Controller states */
+> -#define STATE_IN_BAND_SLEEP_ENABLED	1
+> +#define QCA_IN_BAND_SLEEP_ENABLED	BIT(0)
 
-Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
----
- Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+I realized that the use of BIT() isn't correct here, since the value
+is used with set_bit(), ..., which expect a bit *number*. It should
+probably be an emum starting with 0.
 
-diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-index 824c0e2..6aed68e 100644
---- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-@@ -50,6 +50,18 @@ serial@898000 {
- 		vddxo-supply = <&vreg_l7a_1p8>;
- 		vddrf-supply = <&vreg_l17a_1p3>;
- 		vddch0-supply = <&vreg_l25a_3p3>;
-+		vddio-current = <15000>;
-+		vddxo-current = <80000>;
-+		vddrf-current = <300000>;
-+		vddch0-current = <450000>;
-+		vddio-min-voltage = <1800000>;
-+		vddxo-min-voltage = <1800000>;
-+		vddrf-min-voltage = <1300000>;
-+		vddch0-min-voltage = <3300000>;
-+		vddio-max-voltage = <1900000>;
-+		vddxo-max-voltage = <1900000>;
-+		vddrf-max-voltage = <1350000>;
-+		vddch0-max-voltage = <3400000>;
- 		max-speed = <3200000>;
- 	};
- };
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+I'll update it in the next revision.
 
+>  
+>  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+>  #define IBS_TX_IDLE_TIMEOUT_MS		2000
+> @@ -775,7 +774,7 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+>  	/* Don't go to sleep in middle of patch download or
+>  	 * Out-Of-Band(GPIOs control) sleep is selected.
+>  	 */
+> -	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
+> +	if (!test_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
+>  		skb_queue_tail(&qca->txq, skb);
+>  		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+>  		return 0;
+> @@ -1192,7 +1191,7 @@ static int qca_setup(struct hci_uart *hu)
+>  		return ret;
+>  
+>  	/* Patch downloading has to be done without IBS mode */
+> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> +	clear_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>  
+>  	if (qcadev->btsoc_type == QCA_WCN3990) {
+>  		bt_dev_info(hdev, "setting up wcn3990");
+> @@ -1236,7 +1235,7 @@ static int qca_setup(struct hci_uart *hu)
+>  	/* Setup patch / NVM configurations */
+>  	ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, soc_ver);
+>  	if (!ret) {
+> -		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> +		set_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>  		qca_debugfs_init(hdev);
+>  	} else if (ret == -ENOENT) {
+>  		/* No patch/nvm-config found, run with original fw/config */
+> @@ -1294,7 +1293,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
+>  	 * data in skb's.
+>  	 */
+>  	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> +	clear_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>  	qca_flush(hu);
+>  	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+>  
