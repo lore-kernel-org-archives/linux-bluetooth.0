@@ -2,140 +2,115 @@ Return-Path: <SRS0=Hm6j=RK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8B6C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 08:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2181C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 08:24:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5ADC20675
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 08:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D22F20675
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 08:24:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J8EruywA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gE4t8Ik4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726102AbfCGINp (ORCPT
+        id S1726101AbfCGIYx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Mar 2019 03:13:45 -0500
-Received: from mail-ot1-f52.google.com ([209.85.210.52]:40662 "EHLO
-        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbfCGINp (ORCPT
+        Thu, 7 Mar 2019 03:24:53 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:40695 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725795AbfCGIYw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Mar 2019 03:13:45 -0500
-Received: by mail-ot1-f52.google.com with SMTP id v20so13339351otk.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2019 00:13:44 -0800 (PST)
+        Thu, 7 Mar 2019 03:24:52 -0500
+Received: by mail-ot1-f67.google.com with SMTP id v20so13361387otk.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2019 00:24:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=u4+KIUqaMF38+psYgDFe/FIGFxe9nu3lNvyWv0Quicw=;
-        b=J8EruywAnjJ7orhBiByucOvXQhmGJCFPlXDJDD+wTny0Fln1h+Lj1UGT1PBBo7a0WO
-         svmUzb6HzeoxbCuB3FwhzSCYjkx+elzb0sHbzl63MWpY9FnyKZvJFGdS9ObCRdwzYQQ8
-         +GdH+aF8xCSKsL7TKz5NEwArJoiG2+D+WpcpFc/0SAhUPaXpaFvT4oghTb/cvmpTEdJF
-         FwjQ4tNY3DRKaNZPUeisy9vy/EO0nPKb+qHlirznYFKJ0d76RTByA+MvmsVTRrbsygi+
-         ABf/oNhs5/NNpxDq0W22EhH3E8zxQnD+IfzQ9c6q2iCQHG1YLnxOv4RcsucrnGyPOJn2
-         i7qw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=OXGtXEWtZe+Tx7RGczeg61cvqZhsLm4oKzG0ADiYg6w=;
+        b=gE4t8Ik4a+/RoDbGQ1FkSMJ9AjvPwtv7YvQAGox1mqq4f33QnLbeI+6jeXEf2mnTrD
+         lIcO4DrV1WizfWtJHXCKPkrbPYj9oY3bqZc2L02WVK0CULAO7ghOpTp/A9+pEgB5Ucpm
+         PuzMFcKmyMsJ4TPHQy0KepJQHMpveyOrF7sXHaTPJWZGaJw4EJ9+pgjJcX1myfPl+f5v
+         jbLmUfSYyvidkzpIuaUgYvZBR+q2OBhhSt6nKV5g6toO35Sx7H9kdLkh8crlQ5GWOSpO
+         DxKBdrDDp48OljYtLmqQfuQnO9tYBuzOOobS+bO5Z5RYtpGfrxddpo3SPIz9R11yo2kZ
+         Zypw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=u4+KIUqaMF38+psYgDFe/FIGFxe9nu3lNvyWv0Quicw=;
-        b=G45OW+NUAAkDLktu7exZu02sCgMhxiTFlhC26VP6IU/TzLRBnLWm3xwZGWDaRO5Cur
-         BLnSnGyxG03T+dJs0YfBfMu17esJrNBKCxysHlnN4h3zkp22cHTbwi18jClsfeFPXmMJ
-         K67ZGCnbnwDUsoxcetl95Ow229Mtmx0QtVFtYW5yVAvv131x7Ic2Gwh9SBSFR4V6nY+B
-         eH89V5ZDMQiYP8M+SBpdbUwb1Gk5662ICtRuawWm/cGEkaIs8W0yfknPXicXIBAmzEp9
-         Y6ULonzygyZu0VKChGnDM73Eciw7glo8EAWqJzvMBU30hqTqJXBnNFQVlN1MwCzO78HK
-         09jA==
-X-Gm-Message-State: APjAAAXwpKBDCUdwfFAPx6Q9l/hUeun8IjjsdRf/W2Ff6v79HY+bYKXA
-        qeSKGrub904xzNq8eX2T0GIwvXgTyNkGNDk9YrvHyR8gzPU=
-X-Google-Smtp-Source: APXvYqw+pD0ewYUsn1e/7rrUGqJTT8dV9Han8gXffd49nk6N6uqtiqIs4vq0MuGsUJldi/XE5qa2OrI/aKD0/OOPKFQ=
-X-Received: by 2002:a05:6830:1543:: with SMTP id l3mr7473713otp.84.1551946423782;
- Thu, 07 Mar 2019 00:13:43 -0800 (PST)
+         :message-id:subject:to;
+        bh=OXGtXEWtZe+Tx7RGczeg61cvqZhsLm4oKzG0ADiYg6w=;
+        b=MCaWdqVR33RE1FOJAw1vXyDCI6Maqzy/XHpOme71oY/Frcwl4FrUjC6HuChObqSz6S
+         xXBkysdEZisuB1ugM68YJJR5bpP4WW9+QF32y2d4BO3BtyautM9/SfHYtQdYZA/JUMJ1
+         WvKLAT+A/iV2ksohtpIdfLnqJKW+YQwqjeN8lP4tJFuR9MuOihruDfh3YIXMwg32pkBE
+         I5oO2JKNi4epVoSQmrQA8Xya47g4pIwWangCkxV0ZUGaVKPlYJ+dLJmZH5dAwCIbgTMQ
+         9WYIwN8cENWbbVUMn2Nvvu9O34HJNJSRgNI/QcW+oJwkUFpZmWv3MvOJPIxXumOfCcGb
+         cmqQ==
+X-Gm-Message-State: APjAAAVw9of3C6Mdd9lLyNdM0JxUuzYj/vQKgoRfWTSphZM9sXyMoaEk
+        ss58T6AvUXkjycbz2pp+14IMVSNnHNhAgB9ep0nBkxvQ
+X-Google-Smtp-Source: APXvYqxCmMT5ux4fD3o+bAjA/znAfrtFsKD3D9nSWiNabNZn1ZiFahBLBLAfGnW2fi0CO51P70Hidvf0zBLVdt8rGDk=
+X-Received: by 2002:a05:6830:1543:: with SMTP id l3mr7496376otp.84.1551947091468;
+ Thu, 07 Mar 2019 00:24:51 -0800 (PST)
 MIME-Version: 1.0
-References: <AM0PR03MB5076E7A27AB448DE6E97B248CE730@AM0PR03MB5076.eurprd03.prod.outlook.com>
-In-Reply-To: <AM0PR03MB5076E7A27AB448DE6E97B248CE730@AM0PR03MB5076.eurprd03.prod.outlook.com>
+References: <20190306125224.14427-1-luiz.dentz@gmail.com>
+In-Reply-To: <20190306125224.14427-1-luiz.dentz@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 7 Mar 2019 10:13:31 +0200
-Message-ID: <CABBYNZJV3WWZ6WkNrQpfRhNjL_NCVOB0BXmXZMgHnV=DMA0=yg@mail.gmail.com>
-Subject: Re: iBeacon with the dbus advertising-api
-To:     Marco Okker <marco@epesi.nl>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 7 Mar 2019 10:24:40 +0200
+Message-ID: <CABBYNZJA079QausGy73rwBLQqcXWdY4vTdHKt8HfoKr8KQc41g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter: Fix length calculation of filter UUIDs on
+ big endian
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marco,
-On Wed, Mar 6, 2019 at 5:53 PM Marco Okker <marco@epesi.nl> wrote:
+Hi,
+On Wed, Mar 6, 2019 at 2:52 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Dear Bluez advertising-api developers,
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> I got a problem with the advertising-api. It seems to be impossible to make an iBeacon advertisement with the api.
-> I know it can be done with my bluetooth module because it is possible with the hcitool*.
+> The management interface expect all values to be in little endian
+> thus the length of uuids needs to be converted on big endian.
+> ---
+>  src/adapter.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
-> An iBeacon sends the following at the start of an advertisement: 0x0201061aff4c000215.
+> diff --git a/src/adapter.c b/src/adapter.c
+> index b8a6bb6e2..160a6ca52 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -1602,10 +1602,12 @@ static gboolean start_discovery_timeout(gpointer user_data)
+>         sd_cp = adapter->current_discovery_filter;
 >
-> With the advertising-api I am able to advertise a big part of the iBeacon(with the manufacturer data property):
-> 0x1AFF4C0002155E2B092544064DFEB06D66D7AFB0F84C59659D46AC
+>         DBG("sending MGMT_OP_START_SERVICE_DISCOVERY %d, %d, %d",
+> -                               sd_cp->rssi, sd_cp->type, sd_cp->uuid_count);
+> +                               sd_cp->rssi, sd_cp->type,
+> +                               btohs(sd_cp->uuid_count));
 >
-> If I modify the bluetooth config(/etc/bluetooth/main.conf) setting "ControllerMode = le"  it will add  0x020104 to the packet(this is the closest I got to an iBeacon):
-> 0x0201041AFF4C0002155E2B092544064DFEB06D66D7AFB0F84C59659D46AC
+>         mgmt_send(adapter->mgmt, MGMT_OP_START_SERVICE_DISCOVERY,
+> -                 adapter->dev_id, sizeof(*sd_cp) + sd_cp->uuid_count * 16,
+> +                 adapter->dev_id, sizeof(*sd_cp) +
+> +                 btohs(sd_cp->uuid_count) * 16,
+>                   sd_cp, start_discovery_complete, adapter, NULL);
 >
-> However I can't make the api advertise the following(the most important part at the start of the advertisement(0x020106) can't be done):
-> 0x0201061AFF4C0002155E2B092544064DFEB06D66D7AFB0F84C59659D46AC
+>         return FALSE;
+> @@ -2076,7 +2078,7 @@ static int discovery_filter_to_mgmt_cp(struct btd_adapter *adapter,
 >
-> I have tried all properties of the advertising-api, none of them seem to be able to add "0x020106" at the start of the advertisement.
-
-So this is about the so called flags (ad type 0x01), you want it to be
-set as 0x06, as opposed to 0x04, which is:
-
-bit 1: LE General Discoveral Mode
-bit 2: BR/EDR not Supported
-
-I don't think the BR/EDR bit really matter so I guess all you need is
-to switch the discoverable mode, which you can do as follow:
-
-bluetoothctl> power on
-bluetoothctl> advertise.discoverable on
-bluetoothctl> advertise.manufacturer 0x004c [data...]
-bluetoothctl> advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 19
-        Instance: 1
-        Flags: 0x00000001
-          Switch into Connectable mode
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 8
-        Company: Apple, Inc. (76)
-        Flags: 0x02
-          LE General Discoverable Mode
-        Scan response length: 0
-
-If the implementation is really pedantic about the BR/EDR flag then
-you should probably attempt to enable it by setting ControllerMode =
-le. If discoverable is not set perhaps you have an old version of
-bluetoothd which don't have support for it, but as I show you above it
-is possible to for Discoverable mode though that means the
-advertisement would work as peripheral role since broadcast cannot
-have flags:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c#n1030
-
-> To summarize, my question is:
-> Can you modify the dbus advertising-api of Bluez so that it is possible to advertise an iBeacon?
+>         cp->type = discovery_type;
+>         cp->rssi = rssi;
+> -       cp->uuid_count = uuid_count;
+> +       cp->uuid_count = htobs(uuid_count);
+>         populate_mgmt_filter_uuids(cp->uuids, uuids);
 >
-> Greetings,
-> Marco
+>         g_slist_free(uuids);
+> --
+> 2.17.2
 >
-> * hcitool example:
-> ############################ 02 01 06 1A FF 4C 00 02 15 # Apple's fixed iBeacon advertising prefix
-> hcitool -i hci0 cmd 0x08 0x0008 1E 02 01 1A 1A FF 4C 00 02 15 FB 0B 57 A2 82 28 44 CD 91 3A 94 A1 22 BA 12
-> (Source: https://en.wikipedia.org/wiki/IBeacon)
 
-
+Applied.
 
 -- 
 Luiz Augusto von Dentz
