@@ -2,123 +2,133 @@ Return-Path: <SRS0=I3Ez=RL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDBB2C43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 22:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0069FC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 22:40:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E4242081B
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 22:03:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EvjAmXmP"
+	by mail.kernel.org (Postfix) with ESMTP id BA3E420857
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 22:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726351AbfCHWDp (ORCPT
+        id S1726355AbfCHWkY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Mar 2019 17:03:45 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45923 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726311AbfCHWDp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Mar 2019 17:03:45 -0500
-Received: by mail-pf1-f194.google.com with SMTP id v21so15086296pfm.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Mar 2019 14:03:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=rM6afalI1XD//pr5YZglGO03Vo7d2SccLaqGoTe5TEU=;
-        b=EvjAmXmP7ItQIYEtOes6b9f/xJhGVxgYGVA60g/588+Vuwdr+MqcxIs6WClfn5/zKN
-         y+xyjtS99PuLxLExYfMvwQsfQOAcSEEioudm3T1EIarDhAr0NtXI//tjc8OEz+c5Uti5
-         JeQR55M4Fzo0qF1DvlmLyorVrIAnDfS1uXgUE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=rM6afalI1XD//pr5YZglGO03Vo7d2SccLaqGoTe5TEU=;
-        b=tYeykD2wOLDoMQzPdSckSKGVh4P8xIFu+lY58wwTQgZtFweVRz0l7bQanbN7rS6vOB
-         7F9IBiHGlKC10cDQaV8MH+zEBO9FPLnXwpGt+ED3q2gnVBPiBx0jao9hbIR3VoGK/Qnw
-         02XTIQl0qPvpPi2w6KduxbaPjNEx/Qbk19XOaHhk7iC651k/X68ufxwLldOpeyq832xx
-         CiWko7zzoMPr8Jx4sTY9X8Qt3c1OgKzsOe5ZEvlVKDKn6Sd8QhM5WMylHbSEfaTtSZvX
-         nSTWSN7qVMbtgGsESiHhQG2p31SNhlHYn1DxwIb2rbpl9kD6q4SzseMbkcV677mNtJth
-         /D1A==
-X-Gm-Message-State: APjAAAVh+pbdT07mi4Gh+FHkFBRspKrBc4hKiVOrJe+iRNYiHCyqVLaO
-        B2J9pmwlHozR6wAqRvp6wLRwug==
-X-Google-Smtp-Source: APXvYqw8ppvjM32jAA/OXZGf/m6VI2rRqE4WfrzOq/xnZ80A4iDIoC78Bm34z6gU/0hAGrD4bchfFA==
-X-Received: by 2002:a17:902:20e5:: with SMTP id v34mr21118971plg.319.1552082624646;
-        Fri, 08 Mar 2019 14:03:44 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id v4sm12891256pff.181.2019.03.08.14.03.43
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 08 Mar 2019 14:03:43 -0800 (PST)
-Date:   Fri, 8 Mar 2019 14:03:43 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Hemantg <hemantg@codeaurora.org>
-Subject: Re: [PATCH] Bluetooth: hci_qca: Add helper function to get the chip
- family
-Message-ID: <20190308220343.GC69116@google.com>
-References: <20190308185130.207527-1-mka@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190308185130.207527-1-mka@chromium.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Fri, 8 Mar 2019 17:40:24 -0500
+Received: from mga06.intel.com ([134.134.136.31]:56153 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726334AbfCHWkY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 8 Mar 2019 17:40:24 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Mar 2019 14:40:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,456,1544515200"; 
+   d="scan'208";a="149963509"
+Received: from bgix-dell-lap.sea.intel.com ([10.251.136.138])
+  by fmsmga002.fm.intel.com with ESMTP; 08 Mar 2019 14:40:22 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, brian.gix@intel.com
+Subject: [PATCH BlueZ v2] mesh: Enable local loopback
+Date:   Fri,  8 Mar 2019 14:40:16 -0800
+Message-Id: <20190308224016.9857-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Mar 08, 2019 at 10:51:30AM -0800, Matthias Kaehlcke wrote:
-> Many functions obtain a 'struct qca_serdev' only to read the btsoc_type
-> field. Add a helper function that encapsulates this.
-> 
-> This also fixes crashes observed on platforms with ROME controllers
-> that are instantiated through ldisc and not as serdev clients. The
-> crashes are caused by NULL pointer dereferentiations, which stem from
-> the driver's assumption that a QCA HCI device is always associated with
-> a serdev device.
-> 
-> Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
-> Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 45 +++++++++++++++++++++----------------
->  1 file changed, 26 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 237aea34b69f..241e099473f8 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -174,6 +174,21 @@ static int qca_power_setup(struct hci_uart *hu, bool on);
->  static void qca_power_shutdown(struct hci_uart *hu);
->  static int qca_power_off(struct hci_dev *hdev);
->  
-> +static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
-> +{
-> +	enum qca_btsoc_type soc_type;
-> +
-> +	if (hu->serdev) {
-> +		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
-> +
-> +		soc_type = qsd->btsoc_type;
-> +	} else {
-> +		soc_type = QCA_AR3002;
+Implements mechanism to allow direct messaging between local
+nodes without requiring an external relay node.
+---
+ mesh/net.c | 51 ++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 19 deletions(-)
 
-Actually this is not correct, I think it should be QCA_ROME.
+diff --git a/mesh/net.c b/mesh/net.c
+index 2adae70c3..b173e1c09 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -254,10 +254,24 @@ struct net_decode {
+ 	bool proxy;
+ };
+ 
++struct net_queue_data {
++	struct mesh_io_recv_info *info;
++	struct mesh_net *net;
++	const uint8_t *data;
++	uint8_t *out;
++	size_t out_size;
++	enum _relay_advice relay_advice;
++	uint32_t key_id;
++	uint32_t iv_index;
++	uint16_t len;
++};
++
+ #define FAST_CACHE_SIZE 8
+ static struct l_queue *fast_cache;
+ static struct l_queue *nets;
+ 
++static void net_rx(void *net_ptr, void *user_data);
++
+ static inline struct mesh_subnet *get_primary_subnet(struct mesh_net *net)
+ {
+ 	return l_queue_peek_head(net->subnets);
+@@ -2267,16 +2281,27 @@ static void send_relay_pkt(struct mesh_net *net, uint8_t *data, uint8_t size)
+ static void send_msg_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
+ {
+ 	struct mesh_io *io = net->io;
+-	struct mesh_io_send_info info = {
+-		.type = MESH_IO_TIMING_TYPE_GENERAL,
+-		.u.gen.interval = net->tx_interval,
+-		.u.gen.cnt = net->tx_cnt,
+-		.u.gen.min_delay = DEFAULT_MIN_DELAY,
+-		/* No extra randomization when sending regular mesh messages */
+-		.u.gen.max_delay = DEFAULT_MIN_DELAY
++	struct mesh_io_send_info info;
++	struct net_queue_data net_data = {
++		.info = NULL,
++		.data = packet + 1,
++		.len = size - 1,
++		.relay_advice = RELAY_NONE,
+ 	};
+ 
++	/* Send to local nodes first */
++	l_queue_foreach(nets, net_rx, &net_data);
++
++	if (net_data.relay_advice == RELAY_DISALLOWED)
++		return;
++
+ 	packet[0] = MESH_AD_TYPE_NETWORK;
++	info.type = MESH_IO_TIMING_TYPE_GENERAL;
++	info.u.gen.interval = net->tx_interval;
++	info.u.gen.cnt = net->tx_cnt;
++	info.u.gen.min_delay = DEFAULT_MIN_DELAY;
++	/* No extra randomization when sending regular mesh messages */
++	info.u.gen.max_delay = DEFAULT_MIN_DELAY;
+ 
+ 	mesh_io_send(io, &info, packet, size);
+ }
+@@ -2461,18 +2486,6 @@ static enum _relay_advice packet_received(void *user_data,
+ 		return RELAY_NONE;
+ }
+ 
+-struct net_queue_data {
+-	struct mesh_io_recv_info *info;
+-	struct mesh_net *net;
+-	const uint8_t *data;
+-	uint8_t *out;
+-	size_t out_size;
+-	enum _relay_advice relay_advice;
+-	uint32_t key_id;
+-	uint32_t iv_index;
+-	uint16_t len;
+-};
+-
+ static void net_rx(void *net_ptr, void *user_data)
+ {
+ 	struct net_queue_data *data = user_data;
+-- 
+2.14.5
 
-From commit 6e03126adda3 ("Bluetooth: btqca: Add AR3002 rampatch
-support") I deduce the QCA_AR3002 is part of the ROME family. If
-that's correct we should probably remove 'QCA_AR3002' (in another
-independent patch).
-
-I'll wait with respinning for if there are further comments.
-
-Thanks
-
-Matthias
