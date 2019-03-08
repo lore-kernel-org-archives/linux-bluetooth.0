@@ -2,91 +2,87 @@ Return-Path: <SRS0=I3Ez=RL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE45C10F0C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 07:27:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 182ADC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 12:47:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B70420684
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 07:27:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D54022085A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 12:47:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="TkiE1kDb";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="IZeuzw9/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726355AbfCHH1F convert rfc822-to-8bit (ORCPT
+        id S1726348AbfCHMr4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Mar 2019 02:27:05 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:48236 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726039AbfCHH1E (ORCPT
+        Fri, 8 Mar 2019 07:47:56 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:50240 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726298AbfCHMrz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Mar 2019 02:27:04 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id C13872E614
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Mar 2019 07:27:03 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id AEE102E618; Fri,  8 Mar 2019 07:27:03 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 202429] No Bluetooth Adapter on boot - Works after woken up
- from suspend/sleep - Intel Ac 9260
-Date:   Fri, 08 Mar 2019 07:27:03 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: cordleztoaster@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-202429-62941-4grHZ7HO9L@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-202429-62941@https.bugzilla.kernel.org/>
-References: <bug-202429-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Fri, 8 Mar 2019 07:47:55 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 0EE4E60264; Fri,  8 Mar 2019 12:47:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1552049275;
+        bh=2ZuAtNGZBflxJUzQ1oTHAeG4aHdGAoDOIi230pF+2a0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=TkiE1kDbS36jsY2lg69PiY+Z6YqDhXIMcVhUzt/XDnD0fBD7OPXPFotAm63OQloqw
+         frb8z5E7CwOUMGT50Kx+h8dXKfCnxM1S57sqqZNHUFUFE2Sp2LQ7OfmtkkEtB3+PG5
+         XDAKmTd/q8TjTpnVpnSXE47CiDbuCf3R19jXdbLU=
+Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: c-hbandi@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 24DA460264;
+        Fri,  8 Mar 2019 12:47:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1552049274;
+        bh=2ZuAtNGZBflxJUzQ1oTHAeG4aHdGAoDOIi230pF+2a0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=IZeuzw9/VXIl/0uvOY2TPfQG3DivtPla7k1v0yVhOy8TGLF/FOtdRuNeaouIBpwva
+         UcPosfXBs7NCJMpnAICnunDY1BT1oYHui5/YY31ug3k4Omh4VPmWs8Vqvaqec+GZlM
+         Hv3EZpVGuZe9/sKasB0ho/RReZr7fpaKqZS+97YM=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 24DA460264
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v2 0/2] Enable Bluetooth functionality for wcn3998.
+Date:   Fri,  8 Mar 2019 18:17:37 +0530
+Message-Id: <1552049259-25429-1-git-send-email-c-hbandi@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=202429
+This patch series we add support for wcn3998 BT chip set. This new chipset
+is based from the wcn3990 with minimal power numbers. So here in this patch
+The major difference between wcn3990 and wcn3998 is only power numbers. where
+as init process and fw download is same with wcn3990.So we add new compatible 
+for wcn3998. 
+Removed the Reading of regulator values from dts.
+Added new compatible for wcn3998. 
 
---- Comment #4 from Tp (cordleztoaster@gmail.com) ---
-Intels response on the issue:
+Harish Bandi (2):
+  Bluetooth: hci_qca: Added support for wcn3998
+  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
+    wcn3998
 
-
-Here is a summary of the engineering actions, results of our efforts, and
-recommended next steps:
-
-We were able to track down the same system and reproduce the issue
-We were able to successfully enable our BT device in the system after boot up,
-which points to something in system boot/power sequence preventing BT from
-enabling
-The RTK 3rd party module exhibited the same behavior as our Intel module, which
-points to a system level setting that doesn’t allow for any device to be used
-other than what ships with the platform (Qualcomm card) – thought to be likely
-due to BIOS or Linux Kernel rule setting
-We checked with Lenovo as they used to have a BIOS setting that wouldn’t allow
-another adapter to work (called mutual authentication), but this was removed a
-few years ago
-Unfortunately we cannot debug any further on this as we do not have access to
-the proprietary code needed to do further debug. Our best recommendation is to
-take the engineering debug analysis we have been able to provide above and
-contact Lenovo to determine if they will conduct further testing to determine
-the boot/power up setting that is preventing the BT from being enabled. Please
-be aware that our card was never validated on this platform since it’s not an
-approved platform combination from Lenovo, and so they may not see this issue
-as one that needs to be resolved.
+ .../devicetree/bindings/net/qualcomm-bluetooth.txt | 15 ++++++++
+ drivers/bluetooth/btqca.c                          |  4 +--
+ drivers/bluetooth/btqca.h                          |  3 +-
+ drivers/bluetooth/hci_qca.c                        | 40 ++++++++++++++--------
+ 4 files changed, 45 insertions(+), 17 deletions(-)
 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
