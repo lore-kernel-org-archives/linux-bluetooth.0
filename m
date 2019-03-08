@@ -1,154 +1,81 @@
-Return-Path: <SRS0=Hm6j=RK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=I3Ez=RL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 466B1C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 23:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10580C43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 01:16:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12D7C20851
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Mar 2019 23:30:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Lb/GBvAJ"
+	by mail.kernel.org (Postfix) with ESMTP id DF70920840
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 01:15:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbfCGXam (ORCPT
+        id S1726361AbfCHBP6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Mar 2019 18:30:42 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:36577 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726375AbfCGXal (ORCPT
+        Thu, 7 Mar 2019 20:15:58 -0500
+Received: from mailgw01.mediatek.com ([210.61.82.183]:26097 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726250AbfCHBP4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Mar 2019 18:30:41 -0500
-Received: by mail-pg1-f193.google.com with SMTP id r124so12516623pgr.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Mar 2019 15:30:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=tJqT7pM1IomMnnU+5F6jSTpHjIxUCEOsVig1V79DC/A=;
-        b=Lb/GBvAJlxHamq+q5GpxueAgxMtpkPrCglTjOS/u7MQ7ofVKaFxucj0km7T8Icxgqv
-         a1jTjFy5Y0lijV3UvqXuAslLt0uLrKir/0DFRsuQPMfwjqXmGe7nr9UAEXqFvLyyRo88
-         aBqkD7mLiSo6Ga+UzCVyXU0k8lPUi9hTfX5ao=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=tJqT7pM1IomMnnU+5F6jSTpHjIxUCEOsVig1V79DC/A=;
-        b=Q/dV2L7Q3YmY8uUzL4JrOz6vLNbP42YqY/R0UjkVjBT2QjpIBh1wfg5HNJ1TLhXTj4
-         +UCu0b11YyTdyNUTzLbF+ngUl2kDrhzLfOsboK6n2hrv1+sYWsFxGDMRnNVrhPT7e6oV
-         kW2Te5N1/77JdEP33swkSkc8UMNOhva0AHS1ugUv7QGMhGmdLJdyIGlzNyyMjLR/Gz0A
-         zwTr2hXKy4yOwvAMyD7rN7L2suKVQWAgBSJfUMrMZaBx2EKDyqleVEOZeeRljhdeE/zx
-         pY2IilED9Sc8yDVdBXIcnnn4c62Bv6H3n6QsFscK+otkOYAUJ6CN2x7jBGlnmdJg1nN3
-         QaxA==
-X-Gm-Message-State: APjAAAVNhNHtNS8YUTPGG7dyhJ1K7nVIJL0i74hgztG86aiRZs+zjTJW
-        qbTihw/+rgiyTyNJkYS6JxF6qw==
-X-Google-Smtp-Source: APXvYqxleXeEsD7rVLLcV5YMlWREG7KIPqNWxwr6PvxY/KqhnBJJNNvKhOuRnyAlB83mjt9XzuvVBg==
-X-Received: by 2002:a63:f5f:: with SMTP id 31mr13656075pgp.186.1552001440538;
-        Thu, 07 Mar 2019 15:30:40 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id 8sm9088117pfj.88.2019.03.07.15.30.39
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 07 Mar 2019 15:30:40 -0800 (PST)
-Date:   Thu, 7 Mar 2019 15:30:39 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hemantg <hemantg@codeaurora.org>
-Subject: Re: [PATCH 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change
- vendor event
-Message-ID: <20190307233039.GA69116@google.com>
-References: <20190307004041.38059-1-mka@chromium.org>
- <20190307004041.38059-3-mka@chromium.org>
- <ff905fac1e57bcca78c74f1bc3349645@codeaurora.org>
- <20190307182009.GB138592@google.com>
+        Thu, 7 Mar 2019 20:15:56 -0500
+X-UUID: 625bbc2a5ed544e18c83ba14e30a5170-20190308
+X-UUID: 625bbc2a5ed544e18c83ba14e30a5170-20190308
+Received: from mtkcas06.mediatek.inc [(172.21.101.30)] by mailgw01.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 70079716; Fri, 08 Mar 2019 09:15:47 +0800
+Received: from mtkcas08.mediatek.inc (172.21.101.126) by
+ mtkmbs01n1.mediatek.inc (172.21.101.68) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Fri, 8 Mar 2019 09:15:46 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas08.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Fri, 8 Mar 2019 09:15:46 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <ulf.hansson@linaro.org>
+CC:     <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>, <linux-mmc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
+Subject: [PATCH v1 1/2] mmc: add SDIO identifiers for MediaTek Bluetooth devices
+Date:   Fri, 8 Mar 2019 09:15:43 +0800
+Message-ID: <97d7949c00bd78f8ec282fb9cd380ad161244616.1552007059.git.sean.wang@mediatek.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <cover.1552007058.git.sean.wang@mediatek.com>
+References: <cover.1552007058.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190307182009.GB138592@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-MTK:  N
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 07, 2019 at 10:20:09AM -0800, Matthias Kaehlcke wrote:
-> Hi Balakrishna,
-> 
-> On Thu, Mar 07, 2019 at 10:35:08AM +0530, Balakrishna Godavarthi wrote:
-> > hi Matthias,
-> > 
-> > On 2019-03-07 06:10, Matthias Kaehlcke wrote:
-> > > Firmware download to the WCN3990 often fails with a 'TLV response size
-> > > mismatch' error:
-> > > 
-> > > [  133.064659] Bluetooth: hci0: setting up wcn3990
-> > > [  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
-> > > [  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
-> > > [  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
-> > > [  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
-> > > 
-> > > This is caused by a vendor event that corresponds to an earlier command
-> > > to change the baudrate. The event is not processed in the context of the
-> > > baudrate change and later interpreted as response to the firmware
-> > > download command (which is also a vendor command), but the driver
-> > > detects
-> > > that the event doesn't have the expected amount of associated data.
-> > > 
-> > > More details:
-> > > 
-> > > For the WCN3990 the vendor command for a baudrate change isn't sent as
-> > > synchronous HCI command, because the controller sends the corresponding
-> > > vendor event with the new baudrate. The event is received and decoded
-> > > after the baudrate change of the host port.
-> > > 
-> > > Identify the 'unused' event when it is received and don't add it to
-> > > the queue of RX frames.
-> > > 
-> > > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> > > ---
-> >
-> > ...
-> >
-> > Can you test by reverting this change "94d6671473924".
-> 
-> The issue is still reproducible.
-> 
-> > We need at least 15ms minimum delay for the soc to change its baud rate and
-> > respond to the with command complete event.
-> 
-> The baudrate change has clearly been successful when the problem is
-> observed, since the host receives the vendor event with the new
-> baudrate.
+From: Sean Wang <sean.wang@mediatek.com>
 
-I forgot to mention this earlier: the controller doesn't send a
-command complete event for the command, or at least not a correct
-one.
+The SDIO identifier for MediaTek Bluetooth devices were defined in the
+MediaTek Bluetooth driver. Moving the definitions in MMC header file
+seems common sense.
 
-That's the data that is received:
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+ include/linux/mmc/sdio_ids.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-04 0e 04 01 00 00 00
-            ~~ ~~
+diff --git a/include/linux/mmc/sdio_ids.h b/include/linux/mmc/sdio_ids.h
+index 4332199c71c2..d1a5d5df02f5 100644
+--- a/include/linux/mmc/sdio_ids.h
++++ b/include/linux/mmc/sdio_ids.h
+@@ -59,6 +59,8 @@
+ #define SDIO_DEVICE_ID_MARVELL_8797_F0		0x9128
+ #define SDIO_DEVICE_ID_MARVELL_8887WLAN	0x9134
+ 
++#define SDIO_VENDOR_ID_MEDIATEK			0x037a
++
+ #define SDIO_VENDOR_ID_SIANO			0x039a
+ #define SDIO_DEVICE_ID_SIANO_NOVA_B0		0x0201
+ #define SDIO_DEVICE_ID_SIANO_NICE		0x0202
+-- 
+2.18.0
 
-This is *a* command complete event, but the opcode is 0x0000 instead
-of the earlier command. The same happens for the firmware
-download/read version command, which is the reason why the command
-complete injection mess
-(https://lore.kernel.org/patchwork/patch/1027955/) is needed in one
-way or another.
-
-I wished Qualcomm FW developers would get their act together and:
-
-- send actual command complete events
-- acknowledge a baudrate change request using the current baudrate
-  like Broadcom and Intel chips apparently do
-
-this would have saved countless hours of debugging and implementing
-quirky workarounds ...
-
-Maybe there is hope for future chips (hint, hint)?
