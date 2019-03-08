@@ -2,74 +2,123 @@ Return-Path: <SRS0=I3Ez=RL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D12C43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 01:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63FE5C43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 05:13:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11C4820840
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 01:16:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 293BA20811
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Mar 2019 05:13:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="dVucFrEj";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="dVucFrEj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726278AbfCHBPz (ORCPT
+        id S1726250AbfCHFNR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Mar 2019 20:15:55 -0500
-Received: from mailgw02.mediatek.com ([210.61.82.184]:18622 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726243AbfCHBPz (ORCPT
+        Fri, 8 Mar 2019 00:13:17 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:45120 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725298AbfCHFNQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Mar 2019 20:15:55 -0500
-X-UUID: 4a02e53435cb4136903e2b4cae6e04fb-20190308
-X-UUID: 4a02e53435cb4136903e2b4cae6e04fb-20190308
-Received: from mtkcas08.mediatek.inc [(172.21.101.126)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (mhqrelay.mediatek.com ESMTP with TLS)
-        with ESMTP id 793639250; Fri, 08 Mar 2019 09:15:48 +0800
-Received: from mtkcas08.mediatek.inc (172.21.101.126) by
- mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Fri, 8 Mar 2019 09:15:46 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas08.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Fri, 8 Mar 2019 09:15:46 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <ulf.hansson@linaro.org>
-CC:     <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>, <linux-mmc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH v1 0/2] Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices
-Date:   Fri, 8 Mar 2019 09:15:42 +0800
-Message-ID: <cover.1552007058.git.sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
+        Fri, 8 Mar 2019 00:13:16 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id AEDB16034E; Fri,  8 Mar 2019 05:13:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1552021995;
+        bh=boH7gqwvvNYPPnvKs4lDxycg0Jd5ZPt3IOoDfg1GZgk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=dVucFrEjy4T/ROfPMaKwDftIWO9F+Pz62t9IjlArBeRub5zv5MANWQ/GNKbhCffyu
+         /iTppbQd9x6j/pBjUU3AXe43W+xvN0IarjB3jJwkyQwBDHfAuK21W9EHu7z/Tp8Eky
+         2MxDPQ45FJSSsGhxua1xDeJvKHHgHP7uCCLaiWnU=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id E74CB60316;
+        Fri,  8 Mar 2019 05:13:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1552021995;
+        bh=boH7gqwvvNYPPnvKs4lDxycg0Jd5ZPt3IOoDfg1GZgk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=dVucFrEjy4T/ROfPMaKwDftIWO9F+Pz62t9IjlArBeRub5zv5MANWQ/GNKbhCffyu
+         /iTppbQd9x6j/pBjUU3AXe43W+xvN0IarjB3jJwkyQwBDHfAuK21W9EHu7z/Tp8Eky
+         2MxDPQ45FJSSsGhxua1xDeJvKHHgHP7uCCLaiWnU=
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-SNTS-SMTP: E4D9428DE8EA1E82C66C4D4B9FF6967D0A6D63C51F2F1FB3824CEB45F688F32B2000:8
-X-MTK:  N
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 08 Mar 2019 10:43:14 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        rjliao@codeaurora.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Enable the ldisc for ROME for x86
+ platforms.
+In-Reply-To: <20190307204224.GD138592@google.com>
+References: <20190307101722.25871-1-bgodavar@codeaurora.org>
+ <20190307204224.GD138592@google.com>
+Message-ID: <6e0abe10b3ed44053e92ad6a21c75d93@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+Hi Matthias,
 
-This adds the support of enabling MT7663S and MT7668S SDIO-based Bluetooth function.
+On 2019-03-08 02:12, Matthias Kaehlcke wrote:
+> Hi Balakrishna,
+> 
+> On Thu, Mar 07, 2019 at 03:47:22PM +0530, Balakrishna Godavarthi wrote:
+>> When using btattach to setup Rome over ldisc we observed a crash
+>> in qca_setup as it will try to access the serdev which is not
+>> available in the ldisc proto. This patch will fix the crash by
+>> support both the ldisc and serdev way in the qca hci_uart driver.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> 
+> Oh, I wasn't aware of the instantiation through ldisc and was actually
+> considering to *remove* some of the seemingly unnecessary serdev
+> checks.
+> 
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 47 
+>> ++++++++++++++++++++++---------------
+>>  1 file changed, 28 insertions(+), 19 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 237aea34b69f..0a5c98d46864 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -963,7 +963,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
+>> uint8_t baudrate)
+>>  {
+>>  	struct hci_uart *hu = hci_get_drvdata(hdev);
+>>  	struct qca_data *qca = hu->priv;
+>> -	struct qca_serdev *qcadev;
+>> +	struct qca_serdev *qcadev = NULL;
+> 
+> In many cases the only field that is accessed is qcadev->btsoc_type. I
+> think something like 'qca_get_soc_type(struct hci_dev *hdev / struct
+> hci_uart *hu)' would make things more readable.
+> 
+[Bala]: sure will update this in other patch once this change is landed 
+as this has to
+         go in priority as we have crash coming.
 
-patch 1: add MediaTek SDIO identifiers
-patch 2: add support for MediaTek MT7663S and MT7668S SDIO devices
+> IMO the whole 'qcadev' vs 'qca(_data)' is confusing anyway, in this
+> sense even better if we can make most of the 'qcadev' references
+> disappear.
+> 
+[Bala]: will note this improvement point and do it with the above 
+change.
 
-Sean Wang (2):
-  mmc: add SDIO identifiers for MediaTek Bluetooth devices
-  Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO
-    devices
-
- drivers/bluetooth/Kconfig     |  11 +
- drivers/bluetooth/Makefile    |   1 +
- drivers/bluetooth/btmtksdio.c | 979 ++++++++++++++++++++++++++++++++++
- include/linux/mmc/sdio_ids.h  |   2 +
- 4 files changed, 993 insertions(+)
- create mode 100644 drivers/bluetooth/btmtksdio.c
+> Thanks
+> 
+> Matthias
 
 -- 
-2.18.0
-
+Regards
+Balakrishna.
