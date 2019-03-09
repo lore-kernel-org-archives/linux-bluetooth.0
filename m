@@ -2,110 +2,77 @@ Return-Path: <SRS0=PdJ8=RM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A64F8C43381
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Mar 2019 15:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E6C9C43381
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Mar 2019 18:03:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7173B20836
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Mar 2019 15:47:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A15120645
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Mar 2019 18:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbfCIPrK (ORCPT
+        id S1726435AbfCISDl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 9 Mar 2019 10:47:10 -0500
-Received: from avasout02.plus.net ([212.159.14.17]:54796 "EHLO
-        avasout02.plus.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726286AbfCIPrK (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 9 Mar 2019 10:47:10 -0500
-X-Greylist: delayed 450 seconds by postgrey-1.27 at vger.kernel.org; Sat, 09 Mar 2019 10:47:10 EST
-Received: from localhost.localdomain ([87.114.146.246])
-        by smtp with ESMTP
-        id 2e4PhIi6Rx6b62e4YhgA0R; Sat, 09 Mar 2019 15:39:40 +0000
-X-CM-Score: 0.00
-X-CNFS-Analysis: v=2.3 cv=T4GiscCQ c=1 sm=1 tr=0
- a=DwUJrZpGRQ5ePevJMiNdYw==:117 a=DwUJrZpGRQ5ePevJMiNdYw==:17 a=OLL_FvSJAAAA:8
- a=ViPa0ciWmgWNDZ-_SmcA:9 a=1p1MZfBn9Gu4pFza:21 a=f5_gGt5-OF2vyWa9:21
- a=pUjmoVUizdcA:10 a=6X9rrcGS-_EA:10 a=oIrB72frpwYPwTMnlWqB:22
-From:   David Summers <beagleboard@davidjohnsummers.uk>
-To:     heiko@sntech.de, robh+dt@kernel.org, frowand.list@gmail.com,
-        marcel@holtmann.org, johan.hedberg@gmail.com, anarsoul@gmail.com
-Cc:     David Summers <beagleboard@davidjohnsummers.uk>,
-        linux-rockchip@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/3] arm: dts: rk3288-tinker.dtsi: Add outline Bluetooth support
-Date:   Sat,  9 Mar 2019 15:39:23 +0000
-Message-Id: <20190309153923.22806-3-beagleboard@davidjohnsummers.uk>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190309153923.22806-1-beagleboard@davidjohnsummers.uk>
-References: <20190217121513.22965-1-beagleboard@davidjohnsummers.uk>
- <20190309153923.22806-1-beagleboard@davidjohnsummers.uk>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4wfGxqF2Ir1oYv4R43utEOiZ/s+q84qpG8mM1+LLELkZ885sALm4txqBypubAtDogY9ajkFI/PZsoWv5vNDS5TGyVP0nri9q6b2Ik3E5c5lvvAOIgGVsqx
- Yyc0+P8qwzteyl+mr1iV7rTbrCemaxiNkTi+IsuswB5hBu9PK4vgYnFas3MNfCXg3He7vkvipHZ+wGUU80sSLbnuQxJbST2Bf/w=
+        Sat, 9 Mar 2019 13:03:41 -0500
+Received: from mga17.intel.com ([192.55.52.151]:18304 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726286AbfCISDl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 9 Mar 2019 13:03:41 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Mar 2019 10:03:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,460,1544515200"; 
+   d="scan'208";a="132711434"
+Received: from cjschnei-mobl2.amr.corp.intel.com (HELO bgix-dell-lap.sea.intel.com) ([10.251.149.88])
+  by orsmga003.jf.intel.com with ESMTP; 09 Mar 2019 10:03:40 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, brian.gix@intel.com
+Subject: [PATCH BlueZ 1/1] mesh: Fix uninitialized JSON object pointers
+Date:   Sat,  9 Mar 2019 10:03:38 -0800
+Message-Id: <20190309180338.31873-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch is an outline for bluetooth on the ASUS Tinker Board (S).
-
-Bluetooth is provided my RTL8723BS on these machine, and this is wired
-into UART0.
-
-Here this is performed as a SerDev device.
-
-Now as presented, this does not give functioning bluetooth. The
-updates needed to the device driver:
-
-https://www.spinics.net/lists/linux-bluetooth/msg78661.html
-
-Haven't yet been accepted. So this device tree hook doesn't yet have
-"realtek,rtl8723bs-bt" compatible flag.
-
-It is however still submitted as a patch, as it sets the UART up
-correctly. And so basic communciation can be had with the device. This
-has been confirmed by Tony McKahan @ Armbian, in particular that the
-CTS/RTS is needed.
-
-When Vasily patch is accepted, this will be added as a minor patch on
-top of this patch; as this patch gives the pins needed.
-
-The one oddity, is the RESET pin, it is labeled this way on the
-schematic. However the hci_h5.c driver calls this ENABLE. Here we have
-stuck with the schematic name.
-
-Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
+Fix issue that allowed only a single App Key to be added
+to node by remote config client.
 ---
- arch/arm/boot/dts/rk3288-tinker.dtsi | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ mesh/mesh-db.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/boot/dts/rk3288-tinker.dtsi b/arch/arm/boot/dts/rk3288-tinker.dtsi
-index 0ffab1b7c940..d29f5b34d7e6 100644
---- a/arch/arm/boot/dts/rk3288-tinker.dtsi
-+++ b/arch/arm/boot/dts/rk3288-tinker.dtsi
-@@ -486,6 +486,17 @@
+diff --git a/mesh/mesh-db.c b/mesh/mesh-db.c
+index 2dc13cd65..f4aa6732f 100644
+--- a/mesh/mesh-db.c
++++ b/mesh/mesh-db.c
+@@ -410,7 +410,7 @@ bool mesh_db_read_net_keys(json_object *jobj, mesh_db_net_key_cb cb,
+ bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
+ 							const uint8_t key[16])
+ {
+-	json_object *jarray, *jentry = NULL, *jstring;
++	json_object *jarray = NULL, *jentry = NULL, *jstring;
+ 	char buf[5];
  
- &uart0 {
- 	status = "okay";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart0_xfer>, <&uart0_cts>, <&uart0_rts>;
-+
-+	bluetooth {
-+		clocks = <&rk808 RK808_CLKOUT1>;
-+		reset-gpios = <&gpio4 RK_PD5 GPIO_ACTIVE_HIGH>;
-+		device-wake-gpios = <&gpio4 RK_PD2 GPIO_ACTIVE_HIGH>;
-+		host-wake-gpios = <&gpio4 RK_PD7 GPIO_ACTIVE_HIGH>;
-+		vcc-18-supply = <&vcc_18>;
-+		vcc-io-supply = <&vcc_io>;
-+	};
- };
+ 	json_object_object_get_ex(jobj, "netKeys", &jarray);
+@@ -529,12 +529,10 @@ bool mesh_db_write_device_key(json_object *jnode, uint8_t *key)
+ bool mesh_db_app_key_add(json_object *jobj, uint16_t net_idx, uint16_t app_idx,
+ 							const uint8_t key[16])
+ {
+-	json_object *jarray, *jentry = NULL, *jstring = NULL;
++	json_object *jarray = NULL, *jentry = NULL, *jstring = NULL;
+ 	char buf[5];
  
- &uart1 {
+ 	json_object_object_get_ex(jobj, "appKeys", &jarray);
+-	if (jarray)
+-		return false;
+ 
+ 	if (jarray)
+ 		jentry = get_key_object(jarray, app_idx);
 -- 
-beagleboard@davidjohnsummers.uk
+2.14.5
 
