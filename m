@@ -2,119 +2,110 @@ Return-Path: <SRS0=ax5w=RO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D0D5C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 16:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B7CC43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 16:41:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE087205F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 16:40:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SD8DE+rW"
+	by mail.kernel.org (Postfix) with ESMTP id 6C490205F4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 16:41:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbfCKQkk (ORCPT
+        id S1727147AbfCKQlO convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Mar 2019 12:40:40 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:39843 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726641AbfCKQkk (ORCPT
+        Mon, 11 Mar 2019 12:41:14 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52230 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726675AbfCKQlO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Mar 2019 12:40:40 -0400
-Received: by mail-io1-f65.google.com with SMTP id x3so4601207ior.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2019 09:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WnWR9XdAzDJau/P+RPluhiIPXMOfoTJA7PthoEMDEI0=;
-        b=SD8DE+rWSiMENaYTpCh0nTISgXHLno6A/1lgq7qavstPHNCTT+CBc0y7Ce2zU9GxAH
-         68OBkyHTcuVsWR6d7CcYQU/JZ7QCgWmVEPrxUsK5caTsOyQELHMV7aFEjijFYQPSCkmI
-         lzAS0PPVJ1QqVBuNSrzpM1oqXwW61h9nL2RkSeFmexxzu5hU1t+1S3Mfso+ROrXpwObi
-         64QkvMlzcbCktQcd7dVzG1VGkmjhL/2Us7MNWiVoXfJGHJ8WjwyS9j1s57orUqn8L6jt
-         ajraQGxLzp55PB5VyhiejyZuGXJr7ANhsSNcjS6iBIVPHDUCbLG91UpsdhvmqOhEHFhw
-         vcew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WnWR9XdAzDJau/P+RPluhiIPXMOfoTJA7PthoEMDEI0=;
-        b=baL5eW53OfaQnNsQgcBezwLaqSLytoPDsuJ2KLqAlce5OoWInpLeYSziEYum0MZj3T
-         1FVY/5g+Jgos7hQ8IoYofhvBMfED/C+KBaoTjA+4KhAzjj9hBst9Usz66AhRDssaFEhD
-         y7GFUzf+2RK0LHywVTnVcPV2bFRMuj1lQfagqELyL7UjyaQbP4UDiXEjNOwl0a+zdz9C
-         pNg9IQQuIhGEUThz2oRYSkS3Crem35YozwmmrKtz7QwpDBlK44ZPjdiE2jb6XQTyrWm/
-         3K5iOY650YKexsRWF5sWvSf1O19ZwMlDoJbz5OxlDy+H+ST/wrSlNmNhlBVvjwcBDN4P
-         E/aA==
-X-Gm-Message-State: APjAAAVkUF4GwzEtU1DbM/R3TMisvjOMfMZ+/rk71WEQBvYm6kVsb9CT
-        xhHOb+VMC1jwr88LMmXgTxu7+ahXrhL7fI1UMHFEhA==
-X-Google-Smtp-Source: APXvYqyiiprpPOJpi1vicGhZLoaPK0/DtSewvRD97f9oncxOkYVRUb3dMcKPIyDsgOTHa/7U3n8cliTJ6lnD665+YbM=
-X-Received: by 2002:a5d:834a:: with SMTP id q10mr16400555ior.271.1552322438687;
- Mon, 11 Mar 2019 09:40:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <000000000000032b7f0583d16e0e@google.com> <b17bcabf-5f2c-083a-91a9-6d99f5111a3f@broadcom.com>
-In-Reply-To: <b17bcabf-5f2c-083a-91a9-6d99f5111a3f@broadcom.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 11 Mar 2019 17:40:27 +0100
-Message-ID: <CACT4Y+aT_oeWK5UWy9N76noDEfPTC8q2d8vd+KugE2UXgxpJcQ@mail.gmail.com>
-Subject: Re: general protection fault in skb_put
-To:     James Smart <james.smart@broadcom.com>
-Cc:     syzbot <syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>, jsmart2021@gmail.com,
-        keith.busch@intel.com,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 11 Mar 2019 12:41:14 -0400
+Received: from marcel-macpro.fritz.box (p4FEFC449.dip0.t-ipconnect.de [79.239.196.73])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 6086ECF2C9;
+        Mon, 11 Mar 2019 17:49:11 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH v3 3/3] arm: dts: rk3288-tinker.dtsi: Add outline
+ Bluetooth support
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190309153923.22806-3-beagleboard@davidjohnsummers.uk>
+Date:   Mon, 11 Mar 2019 17:41:12 +0100
+Cc:     Heiko Stuebner <heiko@sntech.de>, Rob Herring <robh+dt@kernel.org>,
+        frowand.list@gmail.com, Johan Hedberg <johan.hedberg@gmail.com>,
+        anarsoul@gmail.com, linux-rockchip@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <C67B8798-ACD1-470B-B69A-650A62AE7982@holtmann.org>
+References: <20190217121513.22965-1-beagleboard@davidjohnsummers.uk>
+ <20190309153923.22806-1-beagleboard@davidjohnsummers.uk>
+ <20190309153923.22806-3-beagleboard@davidjohnsummers.uk>
+To:     David Summers <beagleboard@davidjohnsummers.uk>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Mar 11, 2019 at 5:20 PM 'James Smart' via syzkaller-bugs
-<syzkaller-bugs@googlegroups.com> wrote:
->
-> On 3/11/2019 6:20 AM, syzbot wrote:
-> > syzbot has bisected this bug to:
-> >
-> > commit 97faec531460c949d7120672b8c77e2f41f8d6d7
-> > Author: James Smart <jsmart2021@gmail.com>
-> > Date:   Thu Sep 13 23:17:38 2018 +0000
-> >
-> >     nvme_fc: add 'nvme_discovery' sysfs attribute to fc transport device
-> >
-> > bisection log:
-> > https://syzkaller.appspot.com/x/bisect.txt?x=121f55db200000
-> > start commit:   97faec53 nvme_fc: add 'nvme_discovery' sysfs attribute
-> > to ..
-> > git tree:       linux-next
-> > final crash: https://syzkaller.appspot.com/x/report.txt?x=111f55db200000
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=161f55db200000
-> > kernel config: https://syzkaller.appspot.com/x/.config?x=59aefae07c771af6
-> > dashboard link:
-> > https://syzkaller.appspot.com/bug?extid=65788f9af9d54844389e
-> > userspace arch: amd64
-> > syz repro: https://syzkaller.appspot.com/x/repro.syz?x=178e0798c00000
-> > C reproducer: https://syzkaller.appspot.com/x/repro.c?x=11b4f0b0c00000
-> >
-> > Reported-by: syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com
-> > Fixes: 97faec53 ("nvme_fc: add 'nvme_discovery' sysfs attribute to fc
-> > transport device")
->
-> can someone contact me as to what this thing is doing and how to
-> interpret all the logs.  nvme_fc isn't remotely in any of the logs and
-> doesn't use skb's unless the underlying udev_uevents are using them.
+Hi David,
 
-Hi James,
+> This patch is an outline for bluetooth on the ASUS Tinker Board (S).
+> 
+> Bluetooth is provided my RTL8723BS on these machine, and this is wired
+> into UART0.
+> 
+> Here this is performed as a SerDev device.
+> 
+> Now as presented, this does not give functioning bluetooth. The
+> updates needed to the device driver:
+> 
+> https://www.spinics.net/lists/linux-bluetooth/msg78661.html
+> 
+> Haven't yet been accepted. So this device tree hook doesn't yet have
+> "realtek,rtl8723bs-bt" compatible flag.
+> 
+> It is however still submitted as a patch, as it sets the UART up
+> correctly. And so basic communciation can be had with the device. This
+> has been confirmed by Tony McKahan @ Armbian, in particular that the
+> CTS/RTS is needed.
+> 
+> When Vasily patch is accepted, this will be added as a minor patch on
+> top of this patch; as this patch gives the pins needed.
+> 
+> The one oddity, is the RESET pin, it is labeled this way on the
+> schematic. However the hci_h5.c driver calls this ENABLE. Here we have
+> stuck with the schematic name.
+> 
+> Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
+> ---
+> arch/arm/boot/dts/rk3288-tinker.dtsi | 11 +++++++++++
+> 1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/arm/boot/dts/rk3288-tinker.dtsi b/arch/arm/boot/dts/rk3288-tinker.dtsi
+> index 0ffab1b7c940..d29f5b34d7e6 100644
+> --- a/arch/arm/boot/dts/rk3288-tinker.dtsi
+> +++ b/arch/arm/boot/dts/rk3288-tinker.dtsi
+> @@ -486,6 +486,17 @@
+> 
+> &uart0 {
+> 	status = "okay";
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&uart0_xfer>, <&uart0_cts>, <&uart0_rts>;
+> +
+> +	bluetooth {
+> +		clocks = <&rk808 RK808_CLKOUT1>;
+> +		reset-gpios = <&gpio4 RK_PD5 GPIO_ACTIVE_HIGH>;
+> +		device-wake-gpios = <&gpio4 RK_PD2 GPIO_ACTIVE_HIGH>;
+> +		host-wake-gpios = <&gpio4 RK_PD7 GPIO_ACTIVE_HIGH>;
+> +		vcc-18-supply = <&vcc_18>;
+> +		vcc-io-supply = <&vcc_io>;
+> +	};
+> };
 
-What exactly is unclear/needs interpretation? syzbot did what is
-commonly known as kernel/git bisection process. This is a new feature
-so there can be some rough edges. Hopefully we can improve the
-representation together.
+I need an ACK from Rob for this and also you might want to send the whole series for me to review in full context.
 
-Thanks
+Regards
+
+Marcel
+
