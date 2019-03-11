@@ -2,134 +2,244 @@ Return-Path: <SRS0=ax5w=RO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C4AC43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 18:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E29EC43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 18:38:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E349920643
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 18:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BD4020657
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 18:38:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vhAy/Fna"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XyBS3S//"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727697AbfCKS1o (ORCPT
+        id S1727708AbfCKSiv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Mar 2019 14:27:44 -0400
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:39702 "EHLO
-        mail-wm1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726942AbfCKS1o (ORCPT
+        Mon, 11 Mar 2019 14:38:51 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:37463 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726942AbfCKSir (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Mar 2019 14:27:44 -0400
-Received: by mail-wm1-f42.google.com with SMTP id t124so121322wma.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2019 11:27:43 -0700 (PDT)
+        Mon, 11 Mar 2019 14:38:47 -0400
+Received: by mail-pg1-f194.google.com with SMTP id q206so4703288pgq.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Mar 2019 11:38:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-transfer-encoding:content-language;
-        bh=bl7aw/oUm/PPOXKsj2a/wyaDaO4lzWzQVnA7cADCFgI=;
-        b=vhAy/Fnakcf5RdOUIq+aboaCoFKt5CKdaWUdqy4zLALX2GoZCKNejMI2y1ZssR2H7G
-         1D62uAkTNnoDZLTECjsX+noOPBn05jgt6xqQWQfVvXfhj9Y/2Zjnc+XytrnkRcjfdiKM
-         HojIp5zvHdj/a+5EPwwKQTddTw6VEL2D0RrBpiS+LqgYnl3wEqiBvEgqAruADsbYhm13
-         6WLTXLBjeFHWAswJKSo6yiDmkfk0GIe2qRDlCu6kl/1B0DLJ9xQowq5sV+/IUAm4KRn6
-         PjzFHuCnYf5MWCjC8q/ydkeelCEz3lwSQz18dDlZ1j+j1sfFPOoRt1L6qcqh06wduLLI
-         /afA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=u01bYJ/l9Az44AOBm/0TnoM+YfKDb2HHRe9QKjsfY44=;
+        b=XyBS3S//z9BxOC7Jt8Tg5Qu6SNasXCzvgNJeIOmpAxhtHau/oUIhFFv+TJqpI+eIU6
+         t+fetguqtlPzp716YTZvtcPoI98qsY4JIWFxeX9lNWCm+DPi1Ufnr5+e2LctAxRmcUmy
+         4/+EbQHoF8S1c+erw0ozgHvoq51bDE8quPu7w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-transfer-encoding:content-language;
-        bh=bl7aw/oUm/PPOXKsj2a/wyaDaO4lzWzQVnA7cADCFgI=;
-        b=TQiAYcsnoxvyoLSsEb6HXZPNR4uknpaO9D8WIP+ZCrquHcKBF04Um5enU81YKVTdN8
-         9ItwFcDPTVTHd8Hdc1tIfEn5+HYtPEX9NIqEAF39/QDDyOxDxDXreBVY5GMuvnm1swkm
-         DWgXPecncD7P/HHqp6FF9m8J6WjYukDTijpn5E7kpY4OMz1rNFhDB/E5Mbb8yn6BEwK9
-         U0j+Jc+gyTt5wjaJtalG6y6f1yXaJr7cJtiydVmAW2OA+LIBeJonipE0bRFGG9HDhh79
-         l0FHBH3NBnZNw7cjaldk/0C1x5uqkWBs8zh4CX4q1Mbhu/mySIbVjjXuphcogfavtAbe
-         1VSA==
-X-Gm-Message-State: APjAAAV9wOGdGxqqB2qMhYG99PY8/YUE2LJM6sG2yiCCAJdzf5touYbb
-        cvMlx7UzHma1u7itnXraGltD5ekI
-X-Google-Smtp-Source: APXvYqwrRTlqEKurlJLRPtdRSgyfvfQXVeLtl9H8prh/XE7oO5KL7O9E8OTkRdJmvHmwK7KVzTtovw==
-X-Received: by 2002:a1c:c109:: with SMTP id r9mr42211wmf.36.1552328861534;
-        Mon, 11 Mar 2019 11:27:41 -0700 (PDT)
-Received: from [10.200.101.254] ([137.204.150.11])
-        by smtp.gmail.com with ESMTPSA id o5sm12642132wrv.70.2019.03.11.11.27.39
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=u01bYJ/l9Az44AOBm/0TnoM+YfKDb2HHRe9QKjsfY44=;
+        b=YX6ify6plc6Jv/gegtz2wOILvc5LUWqIDAv7fCVntCou96mC9/pi35vm+jZn+cL651
+         7nELyr8hRgFvrtOMnipQUbVzE9iwqBn2Q8vdcDeYiWUpRvALycivi1nlBlWUmzUYJ11N
+         oyC/nhqy3xhHjSBaafDNkdSX9tgh6vdT/QrRxwzmKkQFPePYovYJQs3zLRcGwPF2evch
+         tAno6/SNNat00i7qfOYSMMLubOBDCgPzneZ+pAUjnpmleFynk5h3Wem2J31CqzHuwGnl
+         JeQ0jKLWNEt4oKStrQ+vY0sb/S1MoF7cyqNFbYU4htKW01qBk81qHtudoFOaavjwEXSF
+         373g==
+X-Gm-Message-State: APjAAAV3UAHhOvkGrUJPNkXtDLmW6QPJ03cgVrGQIOiAY1OHu+FBBoKX
+        cS3OoLWYpxFrlcGL5eT4Zfr/qFLVFk0=
+X-Google-Smtp-Source: APXvYqxzb0T+I55JohejGXhAu4ebNG4pR5Nh68aKCuo1nB7MUfud5suiKaoanMFy+yKS7BmNNNIHww==
+X-Received: by 2002:a63:d54f:: with SMTP id v15mr31247311pgi.318.1552329526045;
+        Mon, 11 Mar 2019 11:38:46 -0700 (PDT)
+Received: from mka.mtv.corp.google.com ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id u8sm8196388pgp.48.2019.03.11.11.38.45
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Mar 2019 11:27:40 -0700 (PDT)
-To:     linux-bluetooth@vger.kernel.org
-From:   Sergio Callegari <sergio.callegari@gmail.com>
-Subject: Issues with rfcomm: rfcomm_bind: Address already in use (98)
-Message-ID: <b371cdcc-dc09-4041-536c-04f60883097d@gmail.com>
-Date:   Mon, 11 Mar 2019 19:27:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Mon, 11 Mar 2019 11:38:45 -0700 (PDT)
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH v2] Bluetooth: hci_qca: Add helper function to get the chip family
+Date:   Mon, 11 Mar 2019 11:38:31 -0700
+Message-Id: <20190311183831.174391-1-mka@chromium.org>
+X-Mailer: git-send-email 2.21.0.360.g471c308f928-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Many functions obtain a 'struct qca_serdev' only to read the btsoc_type
+field. Add a helper function that encapsulates this.
 
-writing with reference to an issue with bluez 5 and rfcomm found in recen=
-t linux=20
-distributions (seen on ubuntu 18.04, 18.10 and fedora >=3D 27).
+This also fixes crashes observed on platforms with ROME controllers
+that are instantiated through ldisc and not as serdev clients. The
+crashes are caused by NULL pointer dereferentiations, which stem from
+the driver's assumption that a QCA HCI device is always associated with
+a serdev device.
 
-Libreoffice uses rfcomm to let a mobile phone using a dedicated applicati=
-on work=20
-as a remote and as a pointer for presentations.
+Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
+Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+Changes in v2:
+- make ROME the default type for non-serdev platforms
+---
+ drivers/bluetooth/hci_qca.c | 45 +++++++++++++++++++++----------------
+ 1 file changed, 26 insertions(+), 19 deletions(-)
 
-This has worked fine until slightly more than 1 year ago, then it has bro=
-ken.
-
-Starting libreoffice impress shuld activate an rfcomm listener for incomi=
-ng=20
-bluetooth connections from the app running on the mobile phone.=C2=A0 How=
-ever, it=20
-does not succeed and an entry is created in the system logs (visible with=
-=20
-journalctl). For instance
-
-bluetoothd[1470]: RFCOMM server failed for LibreOffice Impress Remote:=20
-rfcomm_bind: Address already in use (98).
-
-- libreoffice started supporting bluez 5 a few years ago, and I have=20
-successfully used the remote with bluez 5 (e.g. i ubuntu 17.x)
-
-- libreoffice developers indicate that nothing has changed on their side =
-and I=20
-have confirmed that older versions of Libreoffice have the same issue on =
-recent=20
-distributions.=C2=A0 For this reason, the libreoffice developers are relu=
-ctant to=20
-looking into the bug, and tend to think that the problem may be in a regr=
-ession=20
-or a change of behavior in bluez or in the way in which recent distributi=
-ons=20
-deploy bluez breaking their application.
-
-- distributions appear similarly inactive on the bug until one can actual=
-ly=20
-point at something proving that the issue is on their side.
-
-Unfortunately, the message on the system logs is not detailed enough for =
-me to=20
-try to understand where the issue may lay.
-
-I am thus asking for advice on how to try identifying whether the problem=
- is in=20
-a the bluetooth kernel code, in the bluetoothd daemon code, in the bluez =
-dbus=20
-api, in libreoffice or in the way distributions package and configure blu=
-ez, so=20
-that I can address a bug report to the appropriate developers.
-
-Thanks,
-
-Sergio
-
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 237aea34b69f..4ea995d610d2 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -174,6 +174,21 @@ static int qca_power_setup(struct hci_uart *hu, bool on);
+ static void qca_power_shutdown(struct hci_uart *hu);
+ static int qca_power_off(struct hci_dev *hdev);
+ 
++static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
++{
++	enum qca_btsoc_type soc_type;
++
++	if (hu->serdev) {
++		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
++
++		soc_type = qsd->btsoc_type;
++	} else {
++		soc_type = QCA_ROME;
++	}
++
++	return soc_type;
++}
++
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+ 	/* TODO: Some chipset requires to enable UART clock on client
+@@ -963,7 +978,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
+-	struct qca_serdev *qcadev;
+ 	struct sk_buff *skb;
+ 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+ 
+@@ -985,8 +999,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	skb_queue_tail(&qca->txq, skb);
+ 	hci_uart_tx_wakeup(hu);
+ 
+-	qcadev = serdev_device_get_drvdata(hu->serdev);
+-
+ 	/* Wait for the baudrate change request to be sent */
+ 
+ 	while (!skb_queue_empty(&qca->txq))
+@@ -996,7 +1008,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
+ 
+ 	/* Give the controller time to process the request */
+-	if (qcadev->btsoc_type == QCA_WCN3990)
++	if (qca_soc_type(hu) == QCA_WCN3990)
+ 		msleep(10);
+ 	else
+ 		msleep(300);
+@@ -1072,10 +1084,7 @@ static unsigned int qca_get_speed(struct hci_uart *hu,
+ 
+ static int qca_check_speeds(struct hci_uart *hu)
+ {
+-	struct qca_serdev *qcadev;
+-
+-	qcadev = serdev_device_get_drvdata(hu->serdev);
+-	if (qcadev->btsoc_type == QCA_WCN3990) {
++	if (qca_soc_type(hu) == QCA_WCN3990) {
+ 		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+ 		    !qca_get_speed(hu, QCA_OPER_SPEED))
+ 			return -EINVAL;
+@@ -1091,7 +1100,6 @@ static int qca_check_speeds(struct hci_uart *hu)
+ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ {
+ 	unsigned int speed, qca_baudrate;
+-	struct qca_serdev *qcadev;
+ 	int ret = 0;
+ 
+ 	if (speed_type == QCA_INIT_SPEED) {
+@@ -1099,6 +1107,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		if (speed)
+ 			host_set_baudrate(hu, speed);
+ 	} else {
++		enum qca_btsoc_type soc_type = qca_soc_type(hu);
++
+ 		speed = qca_get_speed(hu, QCA_OPER_SPEED);
+ 		if (!speed)
+ 			return 0;
+@@ -1106,8 +1116,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		/* Disable flow control for wcn3990 to deassert RTS while
+ 		 * changing the baudrate of chip and host.
+ 		 */
+-		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		if (qcadev->btsoc_type == QCA_WCN3990)
++		if (soc_type == QCA_WCN3990)
+ 			hci_uart_set_flow_control(hu, true);
+ 
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+@@ -1119,7 +1128,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		host_set_baudrate(hu, speed);
+ 
+ error:
+-		if (qcadev->btsoc_type == QCA_WCN3990)
++		if (soc_type == QCA_WCN3990)
+ 			hci_uart_set_flow_control(hu, false);
+ 	}
+ 
+@@ -1181,12 +1190,10 @@ static int qca_setup(struct hci_uart *hu)
+ 	struct hci_dev *hdev = hu->hdev;
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+-	struct qca_serdev *qcadev;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 	int ret;
+ 	int soc_ver = 0;
+ 
+-	qcadev = serdev_device_get_drvdata(hu->serdev);
+-
+ 	ret = qca_check_speeds(hu);
+ 	if (ret)
+ 		return ret;
+@@ -1194,7 +1201,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	/* Patch downloading has to be done without IBS mode */
+ 	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+ 
+-	if (qcadev->btsoc_type == QCA_WCN3990) {
++	if (soc_type == QCA_WCN3990) {
+ 		bt_dev_info(hdev, "setting up wcn3990");
+ 
+ 		/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to execute
+@@ -1225,7 +1232,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+ 	}
+ 
+-	if (qcadev->btsoc_type != QCA_WCN3990) {
++	if (soc_type != QCA_WCN3990) {
+ 		/* Get QCA version information */
+ 		ret = qca_read_soc_version(hdev, &soc_ver);
+ 		if (ret)
+@@ -1234,7 +1241,7 @@ static int qca_setup(struct hci_uart *hu)
+ 
+ 	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+ 	/* Setup patch / NVM configurations */
+-	ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, soc_ver);
++	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
+ 	if (!ret) {
+ 		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+ 		qca_debugfs_init(hdev);
+@@ -1250,7 +1257,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	}
+ 
+ 	/* Setup bdaddr */
+-	if (qcadev->btsoc_type == QCA_WCN3990)
++	if (soc_type == QCA_WCN3990)
+ 		hu->hdev->set_bdaddr = qca_set_bdaddr;
+ 	else
+ 		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+-- 
+2.21.0.360.g471c308f928-goog
 
