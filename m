@@ -5,147 +5,149 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B607C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:29:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED62DC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:59:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD5D62083D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C034D2087C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:59:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Cpu2YFT2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZBYG5KyF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726418AbfCLQ3t (ORCPT
+        id S1726630AbfCLQ7b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Mar 2019 12:29:49 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33462 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726174AbfCLQ3t (ORCPT
+        Tue, 12 Mar 2019 12:59:31 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38933 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726451AbfCLQ7a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Mar 2019 12:29:49 -0400
-Received: by mail-pg1-f196.google.com with SMTP id h11so2242001pgl.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 09:29:48 -0700 (PDT)
+        Tue, 12 Mar 2019 12:59:30 -0400
+Received: by mail-pf1-f194.google.com with SMTP id i20so2257428pfo.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 09:59:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=ElZ5ziF/7ZNUJd8C4F1xA5Yjw8p3TB+TlOCx919a/60=;
-        b=Cpu2YFT2U1a1VmuEC1AL+cf/gKesG6Xy+lb0c2T+Io1tJChZsHUT9Fr4u1FAIVi3Ut
-         elGctAgTL+6jTiY1TclMF2xBs8muZ2/h1b70ofSGji9dHaOtHn5hUDtdn3SrUwBpMUH+
-         dAwolHmxQC6jqRfXdFpt6Q1Dykk74dkT7/cic=
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=oZb6CACGM6VZGvUR+Ibx4EQn2QmozkbR6QSAW+dYXLM=;
+        b=ZBYG5KyFEqg9qtHysYtsux5REdr5/Qo34GKc4sM/GAFU9HTtpiNrI2jZ4f1KZ5OUh5
+         h2ckGFXe61F6zTG4AFfpTsqtfdXBwdcR3u8jtCT28kuRymKnTpnfcumMsmEmY96oLqhu
+         fgqobwQchJTVwZs4YQi4R/ZIIxiNjw+rddNCg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ElZ5ziF/7ZNUJd8C4F1xA5Yjw8p3TB+TlOCx919a/60=;
-        b=tu0khWBRTwjcYpZiXb5RjART7+rJqy724RnQ7rPHpIYJd027XnoTd5BTK5bmkXtos/
-         bff7cJDTeUSBFr+aeGTPPmBzGpTs9bh4SdUVCTD+GVDe8JrLp1a4oG9eQxKuGQttxaF0
-         wt6BkFbbtNsXvdXls7Le+nTKVDXnPfIpfCCtADmLO7S8mOpdxbUkPXizHNLniuf8ue3v
-         juHx+AH+ErXSvh7uJZt7i96rAoy1RxKv5FcpcX5bpbySjkzEgzaaPrbB8WMxjujBxGba
-         uUrUFwHqMB5vo4BMWOHo3F1vqAIlo6qcmtaJE5NTF2Svzwwxydo1yua/bRU2r/fD438c
-         NciQ==
-X-Gm-Message-State: APjAAAWYC5RH3vrXm5luJYFAwT2f4NE6NMT/TxssFVyxD5jgk/6P1hU9
-        kp+pFAfJDSxBhyMkr6jynHPpyQ==
-X-Google-Smtp-Source: APXvYqyjF03JpG5V20Q0YKYckhvsn/uggJPJb5oglM17sbMS4wSYpLojTt9fV+ScK8IDmL6Yd9Bw9w==
-X-Received: by 2002:a62:7592:: with SMTP id q140mr39668430pfc.164.1552408188439;
-        Tue, 12 Mar 2019 09:29:48 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=oZb6CACGM6VZGvUR+Ibx4EQn2QmozkbR6QSAW+dYXLM=;
+        b=Zm9VVCdjJroi5m/Rsm2x0sX++gDgphLbHTqXHE07cNAqhGuQJejU6vbRK289jS0Gw5
+         MDY3yltL9DuMTn5AeU/+iYp5av57v7i3kVMiCY6ejJZFtWif7yqBlchze92DQkuSPwkr
+         tAJsPZifpUrBSNm5LxSLQOeO6T6FU1UYE3BFdLUPUpyj15x5GwfiQOPJWg3mLP6a+Xfj
+         OMSFMQpj29NzZ84/co2bVcECL2PMOo6j8yfoJg+SxyOcXY7XyModrL4jIEegLCbGOLws
+         W4aBldWcivjhBSPXgCbzvDWSI8XvpXVUXkTXL4+09uCLfyXyfpBtM6UVUChewAl7Vvv4
+         gbOw==
+X-Gm-Message-State: APjAAAUISYyvq+SCChyX937oYwe2X7owFs6yDWjFREfXN6DYbuonpwSM
+        hHUHnmKJ+q2Ujj2CBavtjxl13g==
+X-Google-Smtp-Source: APXvYqxe5SwJVhPUTSQTsEzA0IpvKFD5QTPFOxGNLcPJAHj5DVSb5/WICaW9jbI6RmUpHtZ9sCWyig==
+X-Received: by 2002:a17:902:8f81:: with SMTP id z1mr41681710plo.265.1552409969614;
+        Tue, 12 Mar 2019 09:59:29 -0700 (PDT)
 Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id a192sm12065351pge.3.2019.03.12.09.29.47
+        by smtp.gmail.com with ESMTPSA id 11sm11887958pfh.131.2019.03.12.09.59.28
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 12 Mar 2019 09:29:47 -0700 (PDT)
-Date:   Tue, 12 Mar 2019 09:29:47 -0700
+        Tue, 12 Mar 2019 09:59:28 -0700 (PDT)
+Date:   Tue, 12 Mar 2019 09:59:28 -0700
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Harish Bandi <c-hbandi@codeaurora.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, anubhavg@codeaurora.org
-Subject: Re: [PATCH v3 1/2] Bluetooth: hci_qca: Added support for wcn3998
-Message-ID: <20190312162947.GC200579@google.com>
+        bgodavar@codeaurora.org, anubhavg@codeaurora.org,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device tree
+ bindings for QTI chip wcn3998
+Message-ID: <20190312165928.GD200579@google.com>
 References: <1552393379-26330-1-git-send-email-c-hbandi@codeaurora.org>
- <1552393379-26330-2-git-send-email-c-hbandi@codeaurora.org>
+ <1552393379-26330-3-git-send-email-c-hbandi@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1552393379-26330-2-git-send-email-c-hbandi@codeaurora.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1552393379-26330-3-git-send-email-c-hbandi@codeaurora.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Harish,
++DT folks
 
-On Tue, Mar 12, 2019 at 05:52:58PM +0530, Harish Bandi wrote:
-> Added new compatible for wcn3998 and corresponding voltage
-> and current values to wcn3998 compatible.
-> Changed driver code to support wcn3998
-> 
+Please add them in future versions (script/scripts/get_maintainer.pl
+<patches> should have listed them)
+
+On Tue, Mar 12, 2019 at 05:52:59PM +0530, Harish Bandi wrote:
+> This patch enables regulators for the Qualcomm Bluetooth wcn3998
+> controller.
+
+No, it doesn't.
+
+The next version should probably say something like "Add compatible
+string for the Qualcomm WCN3998 Bluetooth controller.
+
+Is there any particular reason why QCA drivers folks use 'wcn' instead
+of 'WCN'? The QCA documentations calls it WCN399x, so I'd suggest to
+consistently use the uppercase name in comments and documentation (and
+log messages?).
+
 > Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
 > ---
 > changes in v3:
 > - updated to latest code base.
 
-This is not useful, for future versions please describe what changed
-(e.g. 'specify regulator constraints in the driver instead of the DT')
+This comment is useless, please describe what changed wrt the previous
+version.
 
 > ---
->  drivers/bluetooth/btqca.c   |  4 ++--
->  drivers/bluetooth/btqca.h   |  3 ++-
->  drivers/bluetooth/hci_qca.c | 40 ++++++++++++++++++++++++++--------------
->  3 files changed, 30 insertions(+), 17 deletions(-)
+>  .../devicetree/bindings/net/qualcomm-bluetooth.txt        | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 6122685..70cab13 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -344,7 +344,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  
->  	/* Download rampatch file */
->  	config.type = TLV_TYPE_PATCH;
-> -	if (soc_type == QCA_WCN3990) {
-> +	if (soc_type >= QCA_WCN3990) {
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> index 824c0e2..1221535 100644
+> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> @@ -53,3 +53,18 @@ serial@898000 {
+>  		max-speed = <3200000>;
+>  	};
+>  };
+> +
+> +&blsp1_uart3 {
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&blsp1_uart3_default>;
+> +	status = "okay";
+> +
+> +	bluetooth: wcn3998-bt {
+> +		compatible = "qcom,wcn3998-bt";
+> +		vddio-supply = <&vreg_l6_1p8>;
+> +		vddxo-supply = <&vreg_l5_1p8>;
+> +		vddrf-supply = <&vreg_s5_1p35>;
+> +		vddch0-supply = <&vdd_ch0_3p3>;
+> +		max-speed = <3200000>;
+> +	};
+> +};
+> \ No newline at end of file
 
-That works, but isn't super-clear and might need to be adapted when
-future non-WCN399x controllers are added.
+I think the example isn't really needed since it's essentially the
+same as the one for 'qcom,wcn3990-bt'.
 
-Some possible alternatives:
+But the important part is missing: add the new compatible string under
+´Required properties´. You also want to update the documentation that
+mentiones 'qcom,wcn3990-bt' to 'qcom,wcn399x-bt' (assuming for now
+that other possible WCN399x chips would be similar).
 
-- is_wcn399x(soc_type)
-- have a family (Rome, Cherokee (IIRC this name was used for WCN3990))
-  and a chip id (QCA6174, WCN3990, WCN3998, ...)
-
->  		/* Firmware files to download are based on ROM version.
->  		 * ROM version is derived from last two bytes of soc_ver.
->  		 */
-> @@ -365,7 +365,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  
->  	/* Download NVM configuration */
->  	config.type = TLV_TYPE_NVM;
-> -	if (soc_type == QCA_WCN3990)
-> +	if (soc_type >= QCA_WCN3990)
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/crnv%02x.bin", rom_ver);
->  	else
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index c72c56e..f03d96e 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -132,7 +132,8 @@ enum qca_btsoc_type {
->  	QCA_INVALID = -1,
->  	QCA_AR3002,
->  	QCA_ROME,
-> -	QCA_WCN3990
-> +	QCA_WCN3990,
-> +	QCA_WCN3998
-
-nit: if you add a comma after the last value the line doesn't need to
-be changed when a new type is added in the future.
-
-Is 'WCN3998' specific enough? You mentioned earlier that there are
-multiple WCN3998 variants with different requirements for regulator
-voltages/max currents. Which names does Qualcomm use to distinguish
-between them (e.g. WCN3998-A, WCN3998-B, ...)?
+You mentioned in an earlier version of the series that there are
+multiple WCN3998 variants with different requirements for
+voltage/current. This seems to suggests that multiple compatible
+strings are needed to distinguish between them.
 
 Thanks
 
