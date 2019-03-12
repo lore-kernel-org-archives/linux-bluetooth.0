@@ -2,63 +2,59 @@ Return-Path: <SRS0=Wjv6=RP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B213C4360F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 20:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B02EEC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 20:42:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0196B2175B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 20:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B5DC21734
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 20:42:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ERuvxAx2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kAbiG+x9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727393AbfCLUmi (ORCPT
+        id S1727394AbfCLUml (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Mar 2019 16:42:38 -0400
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:40225 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726534AbfCLUmX (ORCPT
+        Tue, 12 Mar 2019 16:42:41 -0400
+Received: from mail-yw1-f53.google.com ([209.85.161.53]:44812 "EHLO
+        mail-yw1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726697AbfCLUmX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 12 Mar 2019 16:42:23 -0400
-Received: by mail-yw1-f66.google.com with SMTP id u70so3263108ywf.7
+Received: by mail-yw1-f53.google.com with SMTP id c4so3246436ywa.11
         for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 13:42:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:in-reply-to:references:mime-version:date:message-id:subject:to
-         :cc;
-        bh=L3SDyRARfNU7pJbRWNe9TuH+x3npRa8h38TywjUR+48=;
-        b=ERuvxAx2z+FJ3kqE7IdxuLqO6MB/mcmMpH8jDgR6g0mBYl1jD7odLHRmxRncAV89cP
-         7JVyfDta7to8AeXFGBRkhWjuaJHqmOCbNUq0v7+Pk9ifsBpTsXqINQwsWU9JqNssEQ19
-         ld8pqQo3ni97qcPAQjn35tzk43o+T7ezPlgf8=
+        h=from:mime-version:date:message-id:subject:to:cc;
+        bh=WW8DrH/nL/7WHJBmrq7GgUpvZpUNPiMEgwmiPL47BpI=;
+        b=kAbiG+x988k0BMT9NQODTa4FmtKqbKp8czgNwLaIPjk2Rl6JckeAjdYEwatQn+GndB
+         MA6KbblEqjUbNDZZZYMw1HssGutGPVeOYQ8/M3Hji1/N4xVaIH+AnTmok6zJpPa3ILMT
+         n1Gg9ADgIMm8/1834QusgHkASTOAban/ql0qI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:in-reply-to:references:mime-version:date
-         :message-id:subject:to:cc;
-        bh=L3SDyRARfNU7pJbRWNe9TuH+x3npRa8h38TywjUR+48=;
-        b=T5WlEgYHnVfswiF6Oxov072RX/ch+WuJ3nJJlYw2PyXVSHNlTmYClJBhqf1GCyNDoE
-         saLKzQ/SzcRLWWIb02/hUspcgocsJgdDBv/UDxFs4nUV1KTtc436XIjFXhzM7Z8Tgnfd
-         dw0aY/CdpkpMhi/yUAfqSzsdJxJKzgq+Q+hMZhSevFYDBEXu8O94uy4dhADmrbFGyEi7
-         mVXsAkEJ0lII8VNrGTQVP9dc5iQtVAUWUmTZJJotf8lMtbgaMkI6H6V68XGyV+RSV458
-         /8/N+bnKjsN4/hn9dlsJZK8xglUn919Vnpo0C9fBleHYRcWyUOzyz8j10qCC70AAQQmY
-         9heg==
-X-Gm-Message-State: APjAAAXlXF4YCV9xznEeT1jNCR31hTuwDVAPHXeaM9w8FE2zaLYR0mRw
-        uwcKOdi1jjf7+uwI30NZHstkAalJ9xB9p2DfgFLsZQ==
-X-Google-Smtp-Source: APXvYqx4TZfWWEcESLZQ28eYVBeCo37GKO4yIBlE9+ZYkDS7PYSCDANDZWe63/Ol+srr93urPwBFAZ4J+EqDYFzBmTU=
-X-Received: by 2002:a25:4444:: with SMTP id r65mr32704412yba.223.1552423342309;
+        h=x-gm-message-state:from:mime-version:date:message-id:subject:to:cc;
+        bh=WW8DrH/nL/7WHJBmrq7GgUpvZpUNPiMEgwmiPL47BpI=;
+        b=oKaKiqgmKE+gnED1b1wccwBoTTxuA4g3ZxCpqxbdtZ5rBSu+68uSAXz8iPS6vu1GZQ
+         D6nNE5a8i2DNAj8r0XUdHvDlueHkYLXmS/BcDJuvmpbiuzQz7yb8jSUm+XzXtpYathOo
+         O1hGtzKr4aNoEAgRZ3c6A2X7iONTqDGt3cOMg6O5jkpC8/TeV0pBgBmL3nSAYf499+6+
+         RvtUa94T33kv8DhBnTFvA+PJvwNYwOCxLroc5j2lMYt7tbkRaG9x+Di78tJjACkS/kaU
+         25RqpbUKopyh3vr/eGzKSxhQoEyIoC3X8x0UJ0lp5qz/eC1JRut4uH2UHL8fVwm1QbMi
+         hjsQ==
+X-Gm-Message-State: APjAAAX57AIJqZUihGoa5csv7dTNUZEc5fTUjHda/7XEriNLj6DEcYwq
+        mbdZ4aSECp8qjtcEBWSKHcbrkfaxJh2hcZwoFqByKg==
+X-Google-Smtp-Source: APXvYqyC8ex2k1+IuF8NMVO1z1CTxILibfC/HXrrMyIXIcLqz8fcFPDs+4IAmIv23+SogssOJ+PIS4RxLSkFPOQ7WR0=
+X-Received: by 2002:a25:34d3:: with SMTP id b202mr34425337yba.188.1552423342298;
  Tue, 12 Mar 2019 13:42:22 -0700 (PDT)
 Received: from 764776645087 named unknown by gmailapi.google.com with
  HTTPREST; Tue, 12 Mar 2019 13:42:21 -0700
 From:   Matthias Kaehlcke <mka@chromium.org>
 X-Mailer: git-send-email 2.21.0.360.g471c308f928-goog
-In-Reply-To: <20190312204217.73296-1-mka@chromium.org>
-References: <20190312204217.73296-1-mka@chromium.org>
 MIME-Version: 1.0
 Date:   Tue, 12 Mar 2019 13:42:21 -0700
-Message-ID: <CAG5bF+RLTaYbrn8uSpoU+W=PBmNawR6Ov0EOEcfuSymzuini5w@mail.gmail.com>
-Subject: [PATCH v2 1/2] Bluetooth: hci_qca: Rename STATE_<flags> to QCA_<flags>
+Message-ID: <CAG5bF+RRSGq6rQjLzG4SF84pCJw-MP2Sw1aMEsyDojEznwDaSQ@mail.gmail.com>
+Subject: [PATCH v2 0/2] Bluetooth: hci_qca: Fix WCN3990 firmware download
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -73,84 +69,24 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Rename STATE_IN_BAND_SLEEP_ENABLED to QCA_IN_BAND_SLEEP_ENABLED.
-The constant represents a flag (multiple flags can be set at once),
-not a unique state of the controller or driver.
+Firmware download to the WCN3990 often fails with a 'TLV response size
+mismatch' error:
 
-Also make the flag an enum value instead of a pre-processor constant
-(more flags will be added to the enum group by another patch).
+[  133.064659] Bluetooth: hci0: setting up wcn3990
+[  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
+[  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+[  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
+[  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
-Changes in v2:
-- don't use BIT()
-- change to enum type
-- updated commit message
----
- drivers/bluetooth/hci_qca.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+This is caused by a vendor event 'without command' that is misinterpreted.
+Drop the event.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 237aea34b69f..1b7ba9e9e08a 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -54,9 +54,6 @@
- #define HCI_IBS_WAKE_ACK	0xFC
- #define HCI_MAX_IBS_SIZE	10
+Matthias Kaehlcke (2):
+  Bluetooth: hci_qca: Rename STATE_<flags> to QCA_<flags>
+  Bluetooth: hci_qca: wcn3990: Drop baudrate change vendor event
 
--/* Controller states */
--#define STATE_IN_BAND_SLEEP_ENABLED	1
--
- #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
- #define IBS_TX_IDLE_TIMEOUT_MS		2000
- #define CMD_TRANS_TIMEOUT_MS		100
-@@ -67,6 +64,10 @@
- /* Controller debug log header */
- #define QCA_DEBUG_HANDLE	0x2EDC
-
-+enum qca_flags {
-+	QCA_IN_BAND_SLEEP_ENABLED,
-+};
-+
- /* HCI_IBS transmit side sleep protocol states */
- enum tx_ibs_states {
- 	HCI_IBS_TX_ASLEEP,
-@@ -775,7 +776,7 @@ static int qca_enqueue(struct hci_uart *hu, struct
-sk_buff *skb)
- 	/* Don't go to sleep in middle of patch download or
- 	 * Out-Of-Band(GPIOs control) sleep is selected.
- 	 */
--	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
-+	if (!test_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
- 		skb_queue_tail(&qca->txq, skb);
- 		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
- 		return 0;
-@@ -1192,7 +1193,7 @@ static int qca_setup(struct hci_uart *hu)
- 		return ret;
-
- 	/* Patch downloading has to be done without IBS mode */
--	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-+	clear_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
-
- 	if (qcadev->btsoc_type == QCA_WCN3990) {
- 		bt_dev_info(hdev, "setting up wcn3990");
-@@ -1236,7 +1237,7 @@ static int qca_setup(struct hci_uart *hu)
- 	/* Setup patch / NVM configurations */
- 	ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, soc_ver);
- 	if (!ret) {
--		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-+		set_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
- 		qca_debugfs_init(hdev);
- 	} else if (ret == -ENOENT) {
- 		/* No patch/nvm-config found, run with original fw/config */
-@@ -1294,7 +1295,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
- 	 * data in skb's.
- 	 */
- 	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
--	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-+	clear_bit(QCA_IN_BAND_SLEEP_ENABLED, &qca->flags);
- 	qca_flush(hu);
- 	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+ drivers/bluetooth/hci_qca.c | 73 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 63 insertions(+), 10 deletions(-)
 
 -- 
 2.21.0.360.g471c308f928-goog
