@@ -2,152 +2,151 @@ Return-Path: <SRS0=Wjv6=RP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6099C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B607C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:29:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F04782147C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD5D62083D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:29:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=jm0.eu header.i=@jm0.eu header.b="JT89BH5z"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Cpu2YFT2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726418AbfCLQXU (ORCPT
+        id S1726418AbfCLQ3t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Mar 2019 12:23:20 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.162]:21815 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726255AbfCLQXU (ORCPT
+        Tue, 12 Mar 2019 12:29:49 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:33462 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726174AbfCLQ3t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Mar 2019 12:23:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1552407793;
-        s=strato-dkim-0002; d=jm0.eu;
-        h=In-Reply-To:Date:Message-ID:From:References:To:Subject:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=9n+ReJB7oywMpKF0bAqXI1OXMhgsMKs5dgmT9j6loEE=;
-        b=JT89BH5z4vKV+7NFAaEggROX6ADc2fom51n7SqK2BYGIHGLFwSgaUjEjhcmn4P4jv8
-        PmJVsEg3+MeFKRBpRkwjxO2d7Azv/DPt9HnZhEIlaJx+7VJ249MgCH8PtZHSAWkG2V2q
-        wW1meuwdWoaCZwanyD+ZtaBa4tjIpS+mWEHWhujeG68DFsZ18+Mu2qfmT3Ntyeenq1iD
-        OoEnL2PUUYld0KEqS5TIwvPFVbwvb3kmY8eX5q9a4S4Jd7ALEmg8tTh00q8wM3qCH+GL
-        JuNCl+P9TxDGAhTXq2E/gg3JpNOKpH+Ouecp4yK/OK1g+oh+7jalMQmVwb6LuDRzMGEo
-        5WXw==
-X-RZG-AUTH: ":JmMXYEHmdv4HaV2cbPh7iS0wbr/uKIfGM0EPXvQCbXgI7t69COvtkG3ur57iGgK8hiF8DA=="
-X-RZG-CLASS-ID: mo00
-Received: from unipc-suse.home.jm0.eu
-        by smtp.strato.de (RZmta 44.13 DYNA|AUTH)
-        with ESMTPSA id u08fcfv2CGNDx8e
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate)
-        for <linux-bluetooth@vger.kernel.org>;
-        Tue, 12 Mar 2019 17:23:13 +0100 (CET)
-Subject: Re: [PATCH 2/3] bluetooth: 6lowpan: check neighbour table for SLAAC
-To:     linux-bluetooth@vger.kernel.org
-References: <20190208152519.16181-1-josua.mayer@jm0.eu>
- <20190208152519.16181-3-josua.mayer@jm0.eu>
- <20190307104108.GA32563@ccociasx-wtg7.ger.corp.intel.com>
-From:   Josua Mayer <josua.mayer@jm0.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=josua.mayer@jm0.eu; prefer-encrypt=mutual; keydata=
- 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
- Si21CLNeIbliI0CNR5kPUY1ntw1JCOmOjKZm
-Message-ID: <efed7391-4c33-4a22-5d52-ce2bb3b94493@jm0.eu>
-Date:   Tue, 12 Mar 2019 17:23:13 +0100
+        Tue, 12 Mar 2019 12:29:49 -0400
+Received: by mail-pg1-f196.google.com with SMTP id h11so2242001pgl.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 09:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ElZ5ziF/7ZNUJd8C4F1xA5Yjw8p3TB+TlOCx919a/60=;
+        b=Cpu2YFT2U1a1VmuEC1AL+cf/gKesG6Xy+lb0c2T+Io1tJChZsHUT9Fr4u1FAIVi3Ut
+         elGctAgTL+6jTiY1TclMF2xBs8muZ2/h1b70ofSGji9dHaOtHn5hUDtdn3SrUwBpMUH+
+         dAwolHmxQC6jqRfXdFpt6Q1Dykk74dkT7/cic=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ElZ5ziF/7ZNUJd8C4F1xA5Yjw8p3TB+TlOCx919a/60=;
+        b=tu0khWBRTwjcYpZiXb5RjART7+rJqy724RnQ7rPHpIYJd027XnoTd5BTK5bmkXtos/
+         bff7cJDTeUSBFr+aeGTPPmBzGpTs9bh4SdUVCTD+GVDe8JrLp1a4oG9eQxKuGQttxaF0
+         wt6BkFbbtNsXvdXls7Le+nTKVDXnPfIpfCCtADmLO7S8mOpdxbUkPXizHNLniuf8ue3v
+         juHx+AH+ErXSvh7uJZt7i96rAoy1RxKv5FcpcX5bpbySjkzEgzaaPrbB8WMxjujBxGba
+         uUrUFwHqMB5vo4BMWOHo3F1vqAIlo6qcmtaJE5NTF2Svzwwxydo1yua/bRU2r/fD438c
+         NciQ==
+X-Gm-Message-State: APjAAAWYC5RH3vrXm5luJYFAwT2f4NE6NMT/TxssFVyxD5jgk/6P1hU9
+        kp+pFAfJDSxBhyMkr6jynHPpyQ==
+X-Google-Smtp-Source: APXvYqyjF03JpG5V20Q0YKYckhvsn/uggJPJb5oglM17sbMS4wSYpLojTt9fV+ScK8IDmL6Yd9Bw9w==
+X-Received: by 2002:a62:7592:: with SMTP id q140mr39668430pfc.164.1552408188439;
+        Tue, 12 Mar 2019 09:29:48 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id a192sm12065351pge.3.2019.03.12.09.29.47
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 12 Mar 2019 09:29:47 -0700 (PDT)
+Date:   Tue, 12 Mar 2019 09:29:47 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Harish Bandi <c-hbandi@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, anubhavg@codeaurora.org
+Subject: Re: [PATCH v3 1/2] Bluetooth: hci_qca: Added support for wcn3998
+Message-ID: <20190312162947.GC200579@google.com>
+References: <1552393379-26330-1-git-send-email-c-hbandi@codeaurora.org>
+ <1552393379-26330-2-git-send-email-c-hbandi@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <20190307104108.GA32563@ccociasx-wtg7.ger.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <1552393379-26330-2-git-send-email-c-hbandi@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
+Hi Harish,
 
-Am 07.03.19 um 11:41 schrieb Johan Hedberg:
-> Hi Josua,
+On Tue, Mar 12, 2019 at 05:52:58PM +0530, Harish Bandi wrote:
+> Added new compatible for wcn3998 and corresponding voltage
+> and current values to wcn3998 compatible.
+> Changed driver code to support wcn3998
 > 
-> Your patches look fine to me in general, just a very minor thing with
-> this one:
+> Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
+> ---
+> changes in v3:
+> - updated to latest code base.
+
+This is not useful, for future versions please describe what changed
+(e.g. 'specify regulator constraints in the driver instead of the DT')
+
+> ---
+>  drivers/bluetooth/btqca.c   |  4 ++--
+>  drivers/bluetooth/btqca.h   |  3 ++-
+>  drivers/bluetooth/hci_qca.c | 40 ++++++++++++++++++++++++++--------------
+>  3 files changed, 30 insertions(+), 17 deletions(-)
 > 
-> On Fri, Feb 08, 2019, Josua Mayer wrote:
->> +	// use the neighbout cache for matching addresses assigned by SLAAC
-> 
-> C++ comment style isn't used - use /* ... */ instead.
-Will change that, and submit a v2 later today, thanks!
-> 
-> Johan
-> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index 6122685..70cab13 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -344,7 +344,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  
+>  	/* Download rampatch file */
+>  	config.type = TLV_TYPE_PATCH;
+> -	if (soc_type == QCA_WCN3990) {
+> +	if (soc_type >= QCA_WCN3990) {
+
+That works, but isn't super-clear and might need to be adapted when
+future non-WCN399x controllers are added.
+
+Some possible alternatives:
+
+- is_wcn399x(soc_type)
+- have a family (Rome, Cherokee (IIRC this name was used for WCN3990))
+  and a chip id (QCA6174, WCN3990, WCN3998, ...)
+
+>  		/* Firmware files to download are based on ROM version.
+>  		 * ROM version is derived from last two bytes of soc_ver.
+>  		 */
+> @@ -365,7 +365,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  
+>  	/* Download NVM configuration */
+>  	config.type = TLV_TYPE_NVM;
+> -	if (soc_type == QCA_WCN3990)
+> +	if (soc_type >= QCA_WCN3990)
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/crnv%02x.bin", rom_ver);
+>  	else
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index c72c56e..f03d96e 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -132,7 +132,8 @@ enum qca_btsoc_type {
+>  	QCA_INVALID = -1,
+>  	QCA_AR3002,
+>  	QCA_ROME,
+> -	QCA_WCN3990
+> +	QCA_WCN3990,
+> +	QCA_WCN3998
+
+nit: if you add a comma after the last value the line doesn't need to
+be changed when a new type is added in the future.
+
+Is 'WCN3998' specific enough? You mentioned earlier that there are
+multiple WCN3998 variants with different requirements for regulator
+voltages/max currents. Which names does Qualcomm use to distinguish
+between them (e.g. WCN3998-A, WCN3998-B, ...)?
+
+Thanks
+
+Matthias
