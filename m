@@ -2,128 +2,101 @@ Return-Path: <SRS0=Wjv6=RP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1438C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 10:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1A2C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 12:09:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D828206DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 10:39:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c5RKM3LV"
+	by mail.kernel.org (Postfix) with ESMTP id CF42120883
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 12:09:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1552392586;
+	bh=h8O3iXcm/GhHsnAmotZ6jKi9eUWTDBPtpEPiFTTZT44=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=M0S+uFGXJN6HzapgBGu0Z4ExnN+5685bpPMOdvVl/+KquWSFbVQbhOyZX5lR3hRXL
+	 +yAUwJB8jMmRUkEcQyR0r1JSm6ChiiPh7q7ADstRtL00IkHRVAVBaRJGttrr6xwuv+
+	 Ttxo8lWAGtF4wc0ARJ7wMTPrU0HIpO+qHryRj/ns=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725894AbfCLKjn (ORCPT
+        id S1726539AbfCLMJl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Mar 2019 06:39:43 -0400
-Received: from mail-wr1-f51.google.com ([209.85.221.51]:46705 "EHLO
-        mail-wr1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725792AbfCLKjn (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Mar 2019 06:39:43 -0400
-Received: by mail-wr1-f51.google.com with SMTP id i16so2052473wrs.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 03:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:subject:to:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=sVQefnVEp4L+nh4LjO45AvIgIb2bj3mXXfGEpDBvulo=;
-        b=c5RKM3LVsIeJ8pj1ZsNGJrzQFtxNa0WCkX51fTk7XXU1oQ6d6lI8UZawchm5AE4X7Q
-         mx/w4gGQQ+oAkzS5wAjM1arHbuhubA5oFKD9jg4vhIiMLsJv8ohYoTa9m2Gw/XPqyR/s
-         07bGnTZ3vHdTxVercrC477OM4e4x+tgXIOx/0YLAtEeuQYgI73caqbOPMHQUShjwpquz
-         B11zS1uHsmyaAdIqWPL6RghUKIa2PHa2WXOu8EO7pIPBeqnt7YreBVpZba/n+iT7xk1l
-         imJAgF9CygdinOZroccbS09o42e5MT9gDQD9D6UFnqx3mJumd2gg/eKxM8LoTeXrX/be
-         ZWBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=sVQefnVEp4L+nh4LjO45AvIgIb2bj3mXXfGEpDBvulo=;
-        b=rP12KaXgStvZjYJDjPqIIBoqDhzLBjowPV9k32Sry0isq2C3vSvRuzuwy4b/Ra5XJC
-         notc/mbPSx0frZkQgT/xs18kYLjlPfK9zVeNbnrkCuHvSSR7n756o+jJ9C+8dGtlewNx
-         9T2qlRTq2vG7ImO/zLPckyyZPtTFW6pP6R1Xhin/j2J3uLoHtc/1xfWcAOtuEo6SxIxK
-         ef12n3tFIkbo8/qhwQya6/qGZhqyYivxeblTG/jrMqOiREkCFcxUH+F+5tfuBKAvM6NI
-         e1NbmbLG3CIS0nEqnlhvoJ6t+1FZhrXaIzK5OgkCxx0M29abgrb6zZpnHiJKRh7sxl1a
-         qyuQ==
-X-Gm-Message-State: APjAAAXlCNiWA53rl7AdRZmVEbdUd9gZMJARlwIlhZpkEnHpsMTEziJX
-        Ll9lIrZX8+WNzA8X9zua41E1IEbcOrQ=
-X-Google-Smtp-Source: APXvYqxjPFK8w6H5sB7QphoLXr0328aT5QUYX0M3HPLJFyNFAT9OHtNLzidOjH9vb3qIMwnDRlbvbQ==
-X-Received: by 2002:a5d:4f03:: with SMTP id c3mr7980251wru.141.1552387181338;
-        Tue, 12 Mar 2019 03:39:41 -0700 (PDT)
-Received: from localhost.localdomain (cpc119140-heme13-2-0-cust57.9-1.cable.virginm.net. [82.44.198.58])
-        by smtp.gmail.com with ESMTPSA id p6sm28716174wre.63.2019.03.12.03.39.40
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Mar 2019 03:39:40 -0700 (PDT)
-X-Mozilla-News-Host: news://news.gmane.org:119
-From:   Andrea <mariofutire@gmail.com>
-Subject: Help on BLE MIDI Peripheral
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <4439bd7c-3f40-df57-d1f4-914154581fb4@gmail.com>
-Date:   Tue, 12 Mar 2019 10:39:39 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Tue, 12 Mar 2019 08:09:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47900 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725873AbfCLMJl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Mar 2019 08:09:41 -0400
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 51FA520883;
+        Tue, 12 Mar 2019 12:09:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1552392580;
+        bh=h8O3iXcm/GhHsnAmotZ6jKi9eUWTDBPtpEPiFTTZT44=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=t0C/OJCsa2GCcGEiPrXIpoid5t1afTf76YaR4JksMY4XzfiXE70zDtj+FfkeyOZH6
+         1lTH1RZwO+kIm/vNECPuG734bDDGKMb/g7w5WMNbaw6sJfiRf15s5Vqj/dkGbgBUY7
+         EVR2PxddoigNvuIHnxqJl5FbHJZ0AwJ9wT71zZMk=
+Received: by mail-qt1-f173.google.com with SMTP id z17so2183490qtn.4;
+        Tue, 12 Mar 2019 05:09:40 -0700 (PDT)
+X-Gm-Message-State: APjAAAWLwykzBeB4mRWEZisT1tFwJyaSNgVgx/hpevDUyNoaICT2EBWQ
+        iKr0dgq/afKxzrYiVARAHUqZy/PA8jAI/MgmaBY=
+X-Google-Smtp-Source: APXvYqyMCdccq+/Qm+ukfcopRVwgWXClpQg2H2v1axIotX/o/RLnLYzI23lqTS6TnOJlWlPaAz3XbC5KO6nvoHM0yXI=
+X-Received: by 2002:ac8:2d68:: with SMTP id o37mr28721699qta.377.1552392579546;
+ Tue, 12 Mar 2019 05:09:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <84b02324ea2fb251b4037dee8994306a@codeaurora.org>
+In-Reply-To: <84b02324ea2fb251b4037dee8994306a@codeaurora.org>
+From:   Josh Boyer <jwboyer@kernel.org>
+Date:   Tue, 12 Mar 2019 08:09:28 -0400
+X-Gmail-Original-Message-ID: <CA+5PVA5awD_uMvhKR-KdN_io5g3s2YZBVao1Tj6wWtcBUY9W1w@mail.gmail.com>
+Message-ID: <CA+5PVA5awD_uMvhKR-KdN_io5g3s2YZBVao1Tj6wWtcBUY9W1w@mail.gmail.com>
+Subject: Re: Fw files for QCA BT Chip QCA6174
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     Hemantg <hemantg@codeaurora.org>,
+        Linux Firmware <linux-firmware@kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        Linux-arm Msm <linux-arm-msm@vger.kernel.org>,
+        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>,
+        rjliao@codeauroa.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+On Wed, Mar 6, 2019 at 11:40 AM Balakrishna Godavarthi
+<bgodavar@codeaurora.org> wrote:
+>
+>
+> Hi,
+>
+> The following changes since commit
+> 54b0a748c8966c93aaa8726402e0b69cb51cd5d2:
+>
+>    WHENCE: Correct errant entries (2019-02-21 07:21:45 -0500)
+>
+> are available in the Git repository at:
+>
+>    https://github.com/bgodavar/qca6174_bt_fw.git
+>
+> for you to fetch changes up to c99beda7e0368961d024ddc8e45a46f118100cc7:
+>
+>    QCA: Add the fw files for BT Chip QCA6174. (2019-02-25 15:36:36 +0530)
+>
+> ----------------------------------------------------------------
+> Balakrishna Godavarthi (1):
+>        QCA: Add the fw files for BT Chip QCA6174.
+>
+>   WHENCE                    |   2 ++
+>   qca/nvm_00440302.bin      | Bin 0 -> 2010 bytes
+>   qca/rampatch_00440302.bin | Bin 0 -> 64940 bytes
+>   3 files changed, 2 insertions(+)
+>   create mode 100644 qca/nvm_00440302.bin
+>   create mode 100644 qca/rampatch_00440302.bin
 
-I have adapted the python test files in example-gatt-server and example-advertisement to MIDI.
+Pulled and pushed out.
 
-The code is here https://github.com/audetto/ble-midi
-
-I can advertise it properly and in Android I can see the device.
-But after it is selected and the android app create a MIDI Device, it drops after 3-4 seconds.
-
-In Android I have used https://github.com/philburk/android-midisuite which is the reference 
-implementation.
-
-I have added a lot of logging to the code and it does not print anything after the initial 
-advertisement phase.
-
-Application.GetManagedObjects
-GATT application registered
-Advertisement.GetAll
-returning props
-Advertisement registered
-			<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-/org/bluez/example/advertisement0: Released!
-Advertisement unregistered
-
-I would expect the Central to Read some values as in the MIDI BLE spec
-
-"The Central will attempt to read the MIDI I/O characteristic of the Peripheral after establishing a
-connection with the accessory. The accessory shall respond to the initial MIDI I/O characteristic
-read with a packet that has no payload."
-
-And I get the exact same behaviour if I use the wrong UUID for the characteristic, or if I don't add 
-it at all.
-
-I have the feeling the Characteristic is not registered properly.
-
-Here is the key code:
-
-class MIDICharacteristic(egs.Characteristic):
-     def __init__(self, bus, index, service):
-         flags = ['notify', 'read', 'write', 'write-without-response']
-         super().__init__(bus, index, MIDI_CHARACTERISTIC_UUID, flags, service)
-
-and
-
-class MIDIService(egs.Service):
-     def __init__(self, bus, index):
-         super().__init__(bus, index, MIDI_SERVICE_UUID, True)
-         self.add_characteristic(MIDICharacteristic(bus, 0, self))
-
-Is there anything that comes to your mind with these symptoms?
-
-Thank you
-
+josh
