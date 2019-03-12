@@ -2,159 +2,104 @@ Return-Path: <SRS0=Wjv6=RP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9BBC43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 17:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F8CC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 19:18:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C365206DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 17:47:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E68BB214AE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 19:18:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XXfF694R"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=jm0.eu header.i=@jm0.eu header.b="nKejQAWv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727690AbfCLRrJ (ORCPT
+        id S1727282AbfCLTSO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Mar 2019 13:47:09 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46198 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728804AbfCLRrJ (ORCPT
+        Tue, 12 Mar 2019 15:18:14 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.165]:24720 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726501AbfCLTSN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Mar 2019 13:47:09 -0400
-Received: by mail-io1-f68.google.com with SMTP id k21so2813680ior.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 10:47:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WS/zoe9Fq2qDK9lRGH6W30+/oPnf/aVCcbDJGZCBBdU=;
-        b=XXfF694RgGbcN683Zkyd3LiWrPi6C7L7emapJR2qyNEO4NAsgHJsu0w9613q72tCcO
-         K6OESGGQr0YVti0KgrkZD5Pyqb4Zbkeg6CC681Y8YQdvR2RrVeoTuQRuZ7Gc/O8G2zl2
-         mu4Ya8HnO/t958ewUUicnfSqwtCk1zRSwK2dVqbvjGnxGSUW8KaeEuqau7vClbLYssK+
-         2vSE8nTPU6tahuBgwUSoOaIl9emJ5Y5Ll581P/1Uy11SX9fN6ltQtkmHiSuth8EQdT/r
-         twcAuHg2un5X2WeL+GDmi173hUR9EGDLWB/ahONdje3HuTFXRn6CDOJ8RpkjQzt8ac7u
-         L2WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WS/zoe9Fq2qDK9lRGH6W30+/oPnf/aVCcbDJGZCBBdU=;
-        b=YlZcinmZlU9v7vHPt8rUow0j7zr3o/WiGuG4bY/lv4txUuNx3QvjcGqKsaOyQvb4pN
-         /Wu1Tdpw5htAxoRRlM7wxMQPqfvAcyVGdJododVyvUWnu6udKG+dvMNA6kizocblHXKa
-         3ODwoHQoq7mHrZaA4R4dRt/BYRNbEgEJx4FB3ftmVtXpYRl4MGvioiB6s1I0XeEZq4Jc
-         B/IEUyucxvC3qNcN5Pwe1WDkZseYfffHuENL+0vNw20S5477Si5lv48OTbzSTcZcdXPa
-         lVrkM+gNy/E/1YbnCBLvhCLPIciot0DlMyMP6+hvd01Zb2gvRshr21y7z6Bjz4otVlaC
-         t0gg==
-X-Gm-Message-State: APjAAAXO9XHxNHk6VatKqCldvWr+UXMqpd/OUtbieuSHXEbvtjY+S4zO
-        Ni+nhGNNPzuTtTdcN66kaPdiHIEutY+fokBxC68/eg==
-X-Google-Smtp-Source: APXvYqxaLllcVzvKFvg2PP6hT8HjPB97yTjqwMTQObFrdWFnjGfR2/zVHqwzeEljjeGqh9vJkgAi3zMcxOGfdB+CcQM=
-X-Received: by 2002:a6b:3709:: with SMTP id e9mr11117866ioa.282.1552412827423;
- Tue, 12 Mar 2019 10:47:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <000000000000032b7f0583d16e0e@google.com> <b17bcabf-5f2c-083a-91a9-6d99f5111a3f@broadcom.com>
- <CACT4Y+aT_oeWK5UWy9N76noDEfPTC8q2d8vd+KugE2UXgxpJcQ@mail.gmail.com> <a68b264c-d573-87ef-13fb-883c6b0a710c@gmail.com>
-In-Reply-To: <a68b264c-d573-87ef-13fb-883c6b0a710c@gmail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 12 Mar 2019 18:46:56 +0100
-Message-ID: <CACT4Y+aYo14D+o=mUmefw2PzPc3QpF7F4cQq9jK6tXmz5zxg6g@mail.gmail.com>
-Subject: Re: general protection fault in skb_put
-To:     James Smart <jsmart2021@gmail.com>
-Cc:     James Smart <james.smart@broadcom.com>,
-        syzbot <syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>, keith.busch@intel.com,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org,
+        Tue, 12 Mar 2019 15:18:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1552418292;
+        s=strato-dkim-0002; d=jm0.eu;
+        h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=VPnYja39JbhBn6kM9obMLX4zwg5ShrmuKUc2vKNGe1c=;
+        b=nKejQAWv6J0lgQ+1Y98gSeMpopNkcs2XG8LK6kGFyQqQ794naOD6FKARX3HWwzIHU+
+        Tjlkmu+jGb51i0XZ8NFIHQmGyK8zXZjDMifaUjbhUXC2VNEUTb1C9jYA5YkWiXC6l9Fr
+        F7NOGa9xkJCcuvYFWJLMQ2aCqpc5NrqpHNrTn9r8yDzNaC4wPt5FBcmmj5+09vUbKRus
+        AdYaMA6M1XAffv1YCOHrUJrAiH46ktTm1/M+i+IhhzIJuqD2NIBHDIdlU0rXPDHuvJrV
+        LJLhuKi5nuKWHkas1IxYvnHs8tls5wKLCrOyH0wpxPI4/AeBh+Wxmb7HRLRkjlPEXxOZ
+        IwzA==
+X-RZG-AUTH: ":JmMXYEHmdv4HaV2cbPh7iS0wbr/uKIfGM0EPWe8EZQbw/dDJ/fVPBarUSiWB4vmvjrsnNVyh"
+X-RZG-CLASS-ID: mo00
+Received: from unipc-suse.lan
+        by smtp.strato.de (RZmta 44.13 DYNA|AUTH)
+        with ESMTPSA id u08fcfv2CJH3xaB
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Tue, 12 Mar 2019 20:17:03 +0100 (CET)
+From:   Josua Mayer <josua.mayer@jm0.eu>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Josua Mayer <josua.mayer@jm0.eu>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        Michael Scott <mike@foundries.io>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: [PATCH v2 3/3] bluetooth: 6lowpan: always check destination address
+Date:   Tue, 12 Mar 2019 20:16:25 +0100
+Message-Id: <20190312191626.20634-4-josua.mayer@jm0.eu>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190312191626.20634-1-josua.mayer@jm0.eu>
+References: <20190208152519.16181-1-josua.mayer@jm0.eu>
+ <20190312191626.20634-1-josua.mayer@jm0.eu>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Mar 11, 2019 at 7:10 PM James Smart <jsmart2021@gmail.com> wrote:
->
-> On 3/11/2019 9:40 AM, Dmitry Vyukov wrote:
-> > On Mon, Mar 11, 2019 at 5:20 PM 'James Smart' via syzkaller-bugs
-> > <syzkaller-bugs@googlegroups.com> wrote:
-> >>
-> >> On 3/11/2019 6:20 AM, syzbot wrote:
-> >>> syzbot has bisected this bug to:
-> >>>
-> >>> commit 97faec531460c949d7120672b8c77e2f41f8d6d7
-> >>> Author: James Smart <jsmart2021@gmail.com>
-> >>> Date:   Thu Sep 13 23:17:38 2018 +0000
-> >>>
-> >>>      nvme_fc: add 'nvme_discovery' sysfs attribute to fc transport device
-> >>>
-> >>> bisection log:
-> >>> https://syzkaller.appspot.com/x/bisect.txt?x=121f55db200000
-> >>> start commit:   97faec53 nvme_fc: add 'nvme_discovery' sysfs attribute
-> >>> to ..
-> >>> git tree:       linux-next
-> >>> final crash: https://syzkaller.appspot.com/x/report.txt?x=111f55db200000
-> >>> console output: https://syzkaller.appspot.com/x/log.txt?x=161f55db200000
-> >>> kernel config: https://syzkaller.appspot.com/x/.config?x=59aefae07c771af6
-> >>> dashboard link:
-> >>> https://syzkaller.appspot.com/bug?extid=65788f9af9d54844389e
-> >>> userspace arch: amd64
-> >>> syz repro: https://syzkaller.appspot.com/x/repro.syz?x=178e0798c00000
-> >>> C reproducer: https://syzkaller.appspot.com/x/repro.c?x=11b4f0b0c00000
-> >>>
-> >>> Reported-by: syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com
-> >>> Fixes: 97faec53 ("nvme_fc: add 'nvme_discovery' sysfs attribute to fc
-> >>> transport device")
-> >>
-> >> can someone contact me as to what this thing is doing and how to
-> >> interpret all the logs.  nvme_fc isn't remotely in any of the logs and
-> >> doesn't use skb's unless the underlying udev_uevents are using them.
-> >
-> > Hi James,
-> >
-> > What exactly is unclear/needs interpretation? syzbot did what is
-> > commonly known as kernel/git bisection process. This is a new feature
-> > so there can be some rough edges. Hopefully we can improve the
-> > representation together.
-> >
-> > Thanks
-> >
-> Everything is unclear. You're telling me that an error occurred and that
-> you reduced it to the git submit where the error starts appearing.
->
-> Usually there would be something in the base crash, which I'm looking at
-> in https://syzkaller.appspot.com/x/report.txt?x=111f55db200000 which
-> would point back at something in the patch or related to it. There are
-> no relationships.  I can't quite figure out what the base test actually
-> did that generated the failure to see if there's any possible relationship.
->
-> Everything in the base crash stacktrace points to an issue in the
-> bluetooth uart driver doing all the logging - not the patch called out.
+BLE based 6LoWPAN networks are highly constrained in bandwidth.
+Do not take a short-cut, always check if the destination address is
+known to belong to a peer.
 
-Everything up to this point is perfectly correct. So lots of things
-seem to be clear to you ;)
-The base test case is provided in under the "syz/C repro" links in the
-original report and in the bisection results report.
+As a side-effect this also removes any behavioral differences between
+one, and two or more connected peers.
 
-> So this looks like a failure of your infrastructure.
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Tested-by: Michael Scott <mike@foundries.io>
+Signed-off-by: Josua Mayer <josua.mayer@jm0.eu>
+---
+ net/bluetooth/6lowpan.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-I agree that the result seems to be unrelated to the original crash.
-What is the root cause is a good question. You can see the exact
-history of how bisection progressed any why it ended up at the commit
-it ended up over the "bisection log" link.
-Kernel is unfortunately (or fortunately) is not a single-threaded
-deterministic user-space parser library without global state where
-everything can be bisected precisely. There is a very long tail of
-other problems as well. E.g. the same reproducer triggering multiple
-bugs at once, of different bugs at different commit ranges. At the
-same time lots of people asked for bisection of bugs. So this is where
-we are.
-I've started collecting all cases with incorrect bisection results, so
-that we can draw broader conclusions later and bucket common root
-causes:
-https://github.com/google/syzkaller/issues/1051
-Added this case too.
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 29a4f3d65348..0f64e9ef1a3a 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -175,18 +175,6 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 
+ 	BT_DBG("peers %d addr %pI6c rt %p", count, daddr, rt);
+ 
+-	/* If we have multiple 6lowpan peers, then check where we should
+-	 * send the packet. If only one peer exists, then we can send the
+-	 * packet right away.
+-	 */
+-	if (count == 1) {
+-		rcu_read_lock();
+-		peer = list_first_or_null_rcu(&dev->peers, struct lowpan_peer,
+-					      list);
+-		rcu_read_unlock();
+-		return peer;
+-	}
+-
+ 	if (!rt) {
+ 		if (ipv6_addr_any(&lowpan_cb(skb)->gw)) {
+ 			/* There is neither route nor gateway,
+-- 
+2.21.0
+
