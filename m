@@ -1,73 +1,140 @@
-Return-Path: <SRS0=ax5w=RO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Wjv6=RP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F37FC43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 22:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF649C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 09:02:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3374B2087F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Mar 2019 22:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFF84214D8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 09:02:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="KsdqdT2w";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="njMeDzgL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727753AbfCKWVO (ORCPT
+        id S1727468AbfCLJCB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Mar 2019 18:21:14 -0400
-Received: from mga01.intel.com ([192.55.52.88]:33953 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727008AbfCKWVO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Mar 2019 18:21:14 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Mar 2019 15:21:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,468,1544515200"; 
-   d="scan'208";a="281758382"
-Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
-  by orsmga004.jf.intel.com with ESMTP; 11 Mar 2019 15:21:14 -0700
-Received: from orsmsx112.amr.corp.intel.com (10.22.240.13) by
- ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Mon, 11 Mar 2019 15:21:14 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.129]) by
- ORSMSX112.amr.corp.intel.com ([169.254.3.233]) with mapi id 14.03.0415.000;
- Mon, 11 Mar 2019 15:21:13 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v2] mesh: Fix bug with adding more than one app key
-Thread-Topic: [PATCH BlueZ v2] mesh: Fix bug with adding more than one app
- key
-Thread-Index: AQHU2C1sA3xnEBJOgEafJwEQmHVLeqYHdnSA
-Date:   Mon, 11 Mar 2019 22:21:13 +0000
-Message-ID: <1552342871.29289.4.camel@intel.com>
-References: <20190311171059.12298-1-brian.gix@intel.com>
-In-Reply-To: <20190311171059.12298-1-brian.gix@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.251.149.88]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C2C376BA77335146B1E72D0EF344191E@intel.com>
-Content-Transfer-Encoding: base64
+        Tue, 12 Mar 2019 05:02:01 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:41332 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726567AbfCLJCB (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Mar 2019 05:02:01 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 6394A608A5; Tue, 12 Mar 2019 09:02:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1552381320;
+        bh=ms/PVSE9pHRSQV9gS52WL4fevOtx3MfMR2UiOgsEQA0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KsdqdT2w1Tlu5vT7a3AcOf+PgOfWtCZWveBQuRcnf/eEKDkYlrAwh2obVnw40rGNv
+         vgzUr+VKd17YEEK6Sq5sIAWN928emEfGe5I3ngDlYRzgGHpRQcbUBGGIQoy9fIN4RD
+         2ISQ1wrv/JsX7Rjjzi5VjwFKqIzjTIyL1jAtsnms=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 874796028D;
+        Tue, 12 Mar 2019 09:01:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1552381319;
+        bh=ms/PVSE9pHRSQV9gS52WL4fevOtx3MfMR2UiOgsEQA0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=njMeDzgLd5/+v5ksOYTFGgmvCJ2aRRhx9uCg5IftULU+0IQyLynvyVOSejH6CJErJ
+         dQnngN6y82MDusDig+XtgYzr4N50myUyYDzsP5AlSf2qDd7zKFk5BYW5TjPdScTgxm
+         1oeWMneTi8F7TqcZuT5JBr1nGFJKCW0Bw011fHgc=
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Tue, 12 Mar 2019 17:01:59 +0800
+From:   rjliao@codeaurora.org
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Enable the ldisc for ROME for x86
+ platforms.
+In-Reply-To: <20190308185232.GB69116@google.com>
+References: <20190307101722.25871-1-bgodavar@codeaurora.org>
+ <20190307204224.GD138592@google.com>
+ <6e0abe10b3ed44053e92ad6a21c75d93@codeaurora.org>
+ <20190308185232.GB69116@google.com>
+Message-ID: <1042d21dde881e886541d32b8f0dff63@codeaurora.org>
+X-Sender: rjliao@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KDQpPbiBNb24sIDIwMTktMDMtMTEgYXQgMTA6MTAgLTA3MDAsIEJyaWFuIEdpeCB3
-cm90ZToNCj4gRml4ZWQgcHJvYmxlbSB3aGVyZSBpZiB0aGUgYXBwS2V5cyBhcnJheSBhbHJlYWR5
-IGV4aXN0cywgdGhhdCBuZXcgYWRkDQo+IGtleSByZXF1ZXN0cyB3ZXJlIHJlamVjdGVkLg0KPiAt
-LS0NCj4gIG1lc2gvbWVzaC1kYi5jIHwgMiAtLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgZGVsZXRp
-b25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9tZXNoLWRiLmMgYi9tZXNoL21lc2gtZGIu
-Yw0KPiBpbmRleCAyZGMxM2NkNjUuLmQ1ZDE5ZDUyZiAxMDA2NDQNCj4gLS0tIGEvbWVzaC9tZXNo
-LWRiLmMNCj4gKysrIGIvbWVzaC9tZXNoLWRiLmMNCj4gQEAgLTUzMyw4ICs1MzMsNiBAQCBib29s
-IG1lc2hfZGJfYXBwX2tleV9hZGQoanNvbl9vYmplY3QgKmpvYmosIHVpbnQxNl90IG5ldF9pZHgs
-IHVpbnQxNl90IGFwcF9pZHgsDQo+ICAJY2hhciBidWZbNV07DQo+ICANCj4gIAlqc29uX29iamVj
-dF9vYmplY3RfZ2V0X2V4KGpvYmosICJhcHBLZXlzIiwgJmphcnJheSk7DQo+IC0JaWYgKGphcnJh
-eSkNCj4gLQkJcmV0dXJuIGZhbHNlOw0KPiAgDQo+ICAJaWYgKGphcnJheSkNCj4gIAkJamVudHJ5
-ID0gZ2V0X2tleV9vYmplY3QoamFycmF5LCBhcHBfaWR4KTs=
+在 2019-03-09 02:52，Matthias Kaehlcke 写道：
+> On Fri, Mar 08, 2019 at 10:43:14AM +0530, Balakrishna Godavarthi wrote:
+>> Hi Matthias,
+>> 
+>> On 2019-03-08 02:12, Matthias Kaehlcke wrote:
+>> > Hi Balakrishna,
+>> >
+>> > On Thu, Mar 07, 2019 at 03:47:22PM +0530, Balakrishna Godavarthi wrote:
+>> > > When using btattach to setup Rome over ldisc we observed a crash
+>> > > in qca_setup as it will try to access the serdev which is not
+>> > > available in the ldisc proto. This patch will fix the crash by
+>> > > support both the ldisc and serdev way in the qca hci_uart driver.
+>> > >
+>> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> >
+>> > Oh, I wasn't aware of the instantiation through ldisc and was actually
+>> > considering to *remove* some of the seemingly unnecessary serdev
+>> > checks.
+>> >
+>> > > ---
+>> > >  drivers/bluetooth/hci_qca.c | 47
+>> > > ++++++++++++++++++++++---------------
+>> > >  1 file changed, 28 insertions(+), 19 deletions(-)
+>> > >
+>> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> > > index 237aea34b69f..0a5c98d46864 100644
+>> > > --- a/drivers/bluetooth/hci_qca.c
+>> > > +++ b/drivers/bluetooth/hci_qca.c
+>> > > @@ -963,7 +963,7 @@ static int qca_set_baudrate(struct hci_dev
+>> > > *hdev, uint8_t baudrate)
+>> > >  {
+>> > >  	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> > >  	struct qca_data *qca = hu->priv;
+>> > > -	struct qca_serdev *qcadev;
+>> > > +	struct qca_serdev *qcadev = NULL;
+>> >
+>> > In many cases the only field that is accessed is qcadev->btsoc_type. I
+>> > think something like 'qca_get_soc_type(struct hci_dev *hdev / struct
+>> > hci_uart *hu)' would make things more readable.
+>> >
+>> [Bala]: sure will update this in other patch once this change is 
+>> landed as
+>> this has to
+>>         go in priority as we have crash coming.
+> 
+> That's not how things should work, especially for fairly trivial
+> changes. It requires reviewers to first spent time to review the patch
+> that adds clutter and later spend more time to review the one that
+> removes it. It's also easier to get a clean patch merged in the first
+> place, rather than a noisy one.
+> 
+> Anyway, here is my take at it: 
+> https://lore.kernel.org/patchwork/patch/1049014/
+> 
+> Please help with testing for ROME, unless you disagree with the
+> approach.
+> 
+> Thanks
+> 
+> Matthias
+
+Hi Matthias,
+
+I will test your patch and update to you, and you are correct that 
+AR3002 is not part of Rome family, you should use QCA_ROME as the 
+default return of qca_soc_type. Could you also loop me in 
+https://lore.kernel.org/patchwork/patch/1049014/?
+
+Thanks,
+Rocky
