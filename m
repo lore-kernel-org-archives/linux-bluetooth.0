@@ -2,153 +2,159 @@ Return-Path: <SRS0=Wjv6=RP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED62DC43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9BBC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 17:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C034D2087C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 16:59:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C365206DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Mar 2019 17:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZBYG5KyF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XXfF694R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726630AbfCLQ7b (ORCPT
+        id S1727690AbfCLRrJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Mar 2019 12:59:31 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38933 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726451AbfCLQ7a (ORCPT
+        Tue, 12 Mar 2019 13:47:09 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:46198 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728804AbfCLRrJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Mar 2019 12:59:30 -0400
-Received: by mail-pf1-f194.google.com with SMTP id i20so2257428pfo.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 09:59:30 -0700 (PDT)
+        Tue, 12 Mar 2019 13:47:09 -0400
+Received: by mail-io1-f68.google.com with SMTP id k21so2813680ior.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Mar 2019 10:47:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=oZb6CACGM6VZGvUR+Ibx4EQn2QmozkbR6QSAW+dYXLM=;
-        b=ZBYG5KyFEqg9qtHysYtsux5REdr5/Qo34GKc4sM/GAFU9HTtpiNrI2jZ4f1KZ5OUh5
-         h2ckGFXe61F6zTG4AFfpTsqtfdXBwdcR3u8jtCT28kuRymKnTpnfcumMsmEmY96oLqhu
-         fgqobwQchJTVwZs4YQi4R/ZIIxiNjw+rddNCg=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WS/zoe9Fq2qDK9lRGH6W30+/oPnf/aVCcbDJGZCBBdU=;
+        b=XXfF694RgGbcN683Zkyd3LiWrPi6C7L7emapJR2qyNEO4NAsgHJsu0w9613q72tCcO
+         K6OESGGQr0YVti0KgrkZD5Pyqb4Zbkeg6CC681Y8YQdvR2RrVeoTuQRuZ7Gc/O8G2zl2
+         mu4Ya8HnO/t958ewUUicnfSqwtCk1zRSwK2dVqbvjGnxGSUW8KaeEuqau7vClbLYssK+
+         2vSE8nTPU6tahuBgwUSoOaIl9emJ5Y5Ll581P/1Uy11SX9fN6ltQtkmHiSuth8EQdT/r
+         twcAuHg2un5X2WeL+GDmi173hUR9EGDLWB/ahONdje3HuTFXRn6CDOJ8RpkjQzt8ac7u
+         L2WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=oZb6CACGM6VZGvUR+Ibx4EQn2QmozkbR6QSAW+dYXLM=;
-        b=Zm9VVCdjJroi5m/Rsm2x0sX++gDgphLbHTqXHE07cNAqhGuQJejU6vbRK289jS0Gw5
-         MDY3yltL9DuMTn5AeU/+iYp5av57v7i3kVMiCY6ejJZFtWif7yqBlchze92DQkuSPwkr
-         tAJsPZifpUrBSNm5LxSLQOeO6T6FU1UYE3BFdLUPUpyj15x5GwfiQOPJWg3mLP6a+Xfj
-         OMSFMQpj29NzZ84/co2bVcECL2PMOo6j8yfoJg+SxyOcXY7XyModrL4jIEegLCbGOLws
-         W4aBldWcivjhBSPXgCbzvDWSI8XvpXVUXkTXL4+09uCLfyXyfpBtM6UVUChewAl7Vvv4
-         gbOw==
-X-Gm-Message-State: APjAAAUISYyvq+SCChyX937oYwe2X7owFs6yDWjFREfXN6DYbuonpwSM
-        hHUHnmKJ+q2Ujj2CBavtjxl13g==
-X-Google-Smtp-Source: APXvYqxe5SwJVhPUTSQTsEzA0IpvKFD5QTPFOxGNLcPJAHj5DVSb5/WICaW9jbI6RmUpHtZ9sCWyig==
-X-Received: by 2002:a17:902:8f81:: with SMTP id z1mr41681710plo.265.1552409969614;
-        Tue, 12 Mar 2019 09:59:29 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id 11sm11887958pfh.131.2019.03.12.09.59.28
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 12 Mar 2019 09:59:28 -0700 (PDT)
-Date:   Tue, 12 Mar 2019 09:59:28 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Harish Bandi <c-hbandi@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, anubhavg@codeaurora.org,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn3998
-Message-ID: <20190312165928.GD200579@google.com>
-References: <1552393379-26330-1-git-send-email-c-hbandi@codeaurora.org>
- <1552393379-26330-3-git-send-email-c-hbandi@codeaurora.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WS/zoe9Fq2qDK9lRGH6W30+/oPnf/aVCcbDJGZCBBdU=;
+        b=YlZcinmZlU9v7vHPt8rUow0j7zr3o/WiGuG4bY/lv4txUuNx3QvjcGqKsaOyQvb4pN
+         /Wu1Tdpw5htAxoRRlM7wxMQPqfvAcyVGdJododVyvUWnu6udKG+dvMNA6kizocblHXKa
+         3ODwoHQoq7mHrZaA4R4dRt/BYRNbEgEJx4FB3ftmVtXpYRl4MGvioiB6s1I0XeEZq4Jc
+         B/IEUyucxvC3qNcN5Pwe1WDkZseYfffHuENL+0vNw20S5477Si5lv48OTbzSTcZcdXPa
+         lVrkM+gNy/E/1YbnCBLvhCLPIciot0DlMyMP6+hvd01Zb2gvRshr21y7z6Bjz4otVlaC
+         t0gg==
+X-Gm-Message-State: APjAAAXO9XHxNHk6VatKqCldvWr+UXMqpd/OUtbieuSHXEbvtjY+S4zO
+        Ni+nhGNNPzuTtTdcN66kaPdiHIEutY+fokBxC68/eg==
+X-Google-Smtp-Source: APXvYqxaLllcVzvKFvg2PP6hT8HjPB97yTjqwMTQObFrdWFnjGfR2/zVHqwzeEljjeGqh9vJkgAi3zMcxOGfdB+CcQM=
+X-Received: by 2002:a6b:3709:: with SMTP id e9mr11117866ioa.282.1552412827423;
+ Tue, 12 Mar 2019 10:47:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1552393379-26330-3-git-send-email-c-hbandi@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <000000000000032b7f0583d16e0e@google.com> <b17bcabf-5f2c-083a-91a9-6d99f5111a3f@broadcom.com>
+ <CACT4Y+aT_oeWK5UWy9N76noDEfPTC8q2d8vd+KugE2UXgxpJcQ@mail.gmail.com> <a68b264c-d573-87ef-13fb-883c6b0a710c@gmail.com>
+In-Reply-To: <a68b264c-d573-87ef-13fb-883c6b0a710c@gmail.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Tue, 12 Mar 2019 18:46:56 +0100
+Message-ID: <CACT4Y+aYo14D+o=mUmefw2PzPc3QpF7F4cQq9jK6tXmz5zxg6g@mail.gmail.com>
+Subject: Re: general protection fault in skb_put
+To:     James Smart <jsmart2021@gmail.com>
+Cc:     James Smart <james.smart@broadcom.com>,
+        syzbot <syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>, keith.busch@intel.com,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-nvme@lists.infradead.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-+DT folks
+On Mon, Mar 11, 2019 at 7:10 PM James Smart <jsmart2021@gmail.com> wrote:
+>
+> On 3/11/2019 9:40 AM, Dmitry Vyukov wrote:
+> > On Mon, Mar 11, 2019 at 5:20 PM 'James Smart' via syzkaller-bugs
+> > <syzkaller-bugs@googlegroups.com> wrote:
+> >>
+> >> On 3/11/2019 6:20 AM, syzbot wrote:
+> >>> syzbot has bisected this bug to:
+> >>>
+> >>> commit 97faec531460c949d7120672b8c77e2f41f8d6d7
+> >>> Author: James Smart <jsmart2021@gmail.com>
+> >>> Date:   Thu Sep 13 23:17:38 2018 +0000
+> >>>
+> >>>      nvme_fc: add 'nvme_discovery' sysfs attribute to fc transport device
+> >>>
+> >>> bisection log:
+> >>> https://syzkaller.appspot.com/x/bisect.txt?x=121f55db200000
+> >>> start commit:   97faec53 nvme_fc: add 'nvme_discovery' sysfs attribute
+> >>> to ..
+> >>> git tree:       linux-next
+> >>> final crash: https://syzkaller.appspot.com/x/report.txt?x=111f55db200000
+> >>> console output: https://syzkaller.appspot.com/x/log.txt?x=161f55db200000
+> >>> kernel config: https://syzkaller.appspot.com/x/.config?x=59aefae07c771af6
+> >>> dashboard link:
+> >>> https://syzkaller.appspot.com/bug?extid=65788f9af9d54844389e
+> >>> userspace arch: amd64
+> >>> syz repro: https://syzkaller.appspot.com/x/repro.syz?x=178e0798c00000
+> >>> C reproducer: https://syzkaller.appspot.com/x/repro.c?x=11b4f0b0c00000
+> >>>
+> >>> Reported-by: syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com
+> >>> Fixes: 97faec53 ("nvme_fc: add 'nvme_discovery' sysfs attribute to fc
+> >>> transport device")
+> >>
+> >> can someone contact me as to what this thing is doing and how to
+> >> interpret all the logs.  nvme_fc isn't remotely in any of the logs and
+> >> doesn't use skb's unless the underlying udev_uevents are using them.
+> >
+> > Hi James,
+> >
+> > What exactly is unclear/needs interpretation? syzbot did what is
+> > commonly known as kernel/git bisection process. This is a new feature
+> > so there can be some rough edges. Hopefully we can improve the
+> > representation together.
+> >
+> > Thanks
+> >
+> Everything is unclear. You're telling me that an error occurred and that
+> you reduced it to the git submit where the error starts appearing.
+>
+> Usually there would be something in the base crash, which I'm looking at
+> in https://syzkaller.appspot.com/x/report.txt?x=111f55db200000 which
+> would point back at something in the patch or related to it. There are
+> no relationships.  I can't quite figure out what the base test actually
+> did that generated the failure to see if there's any possible relationship.
+>
+> Everything in the base crash stacktrace points to an issue in the
+> bluetooth uart driver doing all the logging - not the patch called out.
 
-Please add them in future versions (script/scripts/get_maintainer.pl
-<patches> should have listed them)
+Everything up to this point is perfectly correct. So lots of things
+seem to be clear to you ;)
+The base test case is provided in under the "syz/C repro" links in the
+original report and in the bisection results report.
 
-On Tue, Mar 12, 2019 at 05:52:59PM +0530, Harish Bandi wrote:
-> This patch enables regulators for the Qualcomm Bluetooth wcn3998
-> controller.
+> So this looks like a failure of your infrastructure.
 
-No, it doesn't.
-
-The next version should probably say something like "Add compatible
-string for the Qualcomm WCN3998 Bluetooth controller.
-
-Is there any particular reason why QCA drivers folks use 'wcn' instead
-of 'WCN'? The QCA documentations calls it WCN399x, so I'd suggest to
-consistently use the uppercase name in comments and documentation (and
-log messages?).
-
-> Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
-> ---
-> changes in v3:
-> - updated to latest code base.
-
-This comment is useless, please describe what changed wrt the previous
-version.
-
-> ---
->  .../devicetree/bindings/net/qualcomm-bluetooth.txt        | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> index 824c0e2..1221535 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> @@ -53,3 +53,18 @@ serial@898000 {
->  		max-speed = <3200000>;
->  	};
->  };
-> +
-> +&blsp1_uart3 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&blsp1_uart3_default>;
-> +	status = "okay";
-> +
-> +	bluetooth: wcn3998-bt {
-> +		compatible = "qcom,wcn3998-bt";
-> +		vddio-supply = <&vreg_l6_1p8>;
-> +		vddxo-supply = <&vreg_l5_1p8>;
-> +		vddrf-supply = <&vreg_s5_1p35>;
-> +		vddch0-supply = <&vdd_ch0_3p3>;
-> +		max-speed = <3200000>;
-> +	};
-> +};
-> \ No newline at end of file
-
-I think the example isn't really needed since it's essentially the
-same as the one for 'qcom,wcn3990-bt'.
-
-But the important part is missing: add the new compatible string under
-´Required properties´. You also want to update the documentation that
-mentiones 'qcom,wcn3990-bt' to 'qcom,wcn399x-bt' (assuming for now
-that other possible WCN399x chips would be similar).
-
-You mentioned in an earlier version of the series that there are
-multiple WCN3998 variants with different requirements for
-voltage/current. This seems to suggests that multiple compatible
-strings are needed to distinguish between them.
-
-Thanks
-
-Matthias
+I agree that the result seems to be unrelated to the original crash.
+What is the root cause is a good question. You can see the exact
+history of how bisection progressed any why it ended up at the commit
+it ended up over the "bisection log" link.
+Kernel is unfortunately (or fortunately) is not a single-threaded
+deterministic user-space parser library without global state where
+everything can be bisected precisely. There is a very long tail of
+other problems as well. E.g. the same reproducer triggering multiple
+bugs at once, of different bugs at different commit ranges. At the
+same time lots of people asked for bisection of bugs. So this is where
+we are.
+I've started collecting all cases with incorrect bisection results, so
+that we can draw broader conclusions later and bucket common root
+causes:
+https://github.com/google/syzkaller/issues/1051
+Added this case too.
