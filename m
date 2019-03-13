@@ -2,70 +2,401 @@ Return-Path: <SRS0=EDUn=RQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1CFC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 21:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E39C10F03
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 22:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30BC92077B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 21:02:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE4182146E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 22:15:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727419AbfCMVCK (ORCPT
+        id S1726691AbfCMWPj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Mar 2019 17:02:10 -0400
-Received: from mailgw01.mediatek.com ([210.61.82.183]:62745 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726551AbfCMVCK (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Mar 2019 17:02:10 -0400
-X-UUID: a55305be4d78409083b06c7e38580593-20190314
-X-UUID: a55305be4d78409083b06c7e38580593-20190314
-Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (mhqrelay.mediatek.com ESMTP with TLS)
-        with ESMTP id 956810082; Thu, 14 Mar 2019 05:02:04 +0800
-Received: from mtkcas07.mediatek.inc (172.21.101.84) by
- mtkmbs01n1.mediatek.inc (172.21.101.68) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Thu, 14 Mar 2019 05:02:02 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas07.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Thu, 14 Mar 2019 05:02:02 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <ulf.hansson@linaro.org>
-CC:     <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>, <linux-mmc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH v1 0/3] add module_sdio_driver and enable a few users
-Date:   Thu, 14 Mar 2019 05:01:57 +0800
-Message-ID: <cover.1552510141.git.sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
-MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+        Wed, 13 Mar 2019 18:15:39 -0400
+Received: from mga14.intel.com ([192.55.52.115]:29916 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726466AbfCMWPi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 13 Mar 2019 18:15:38 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Mar 2019 15:15:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,475,1544515200"; 
+   d="scan'208";a="126732264"
+Received: from bgix-dell-lap.sea.intel.com ([10.251.149.88])
+  by orsmga006.jf.intel.com with ESMTP; 13 Mar 2019 15:15:37 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, brian.gix@intel.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Subject: [PATCH BlueZ] mesh: Add APIs for Provisioner and Config Client
+Date:   Wed, 13 Mar 2019 15:15:26 -0700
+Message-Id: <20190313221526.16890-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+The added D-Bus APIs enable Applications to function in a Provisioner
+Initiator role, and as a Configuration Client.
+---
+ doc/mesh-api.txt | 251 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 239 insertions(+), 12 deletions(-)
 
-Add module_sdio_driver exactly like the function module_usb_drivear offers to
-and enable a few users to eliminate a few lines of boilerplate code per SDIO
-driver.
-
-Sean Wang (3):
-  mmc: sdio: Add helper macro for sdio_driver boilerplate
-  Bluetooth: mediatek: Use module_sdio_driver helper
-  Bluetooth: btsdio: Use module_sdio_driver helper
-
- drivers/bluetooth/btmtksdio.c | 15 +--------------
- drivers/bluetooth/btsdio.c    | 15 +--------------
- include/linux/mmc/sdio_func.h | 12 ++++++++++++
- 3 files changed, 14 insertions(+), 28 deletions(-)
-
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index 0b341a0f9..1d3501403 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -109,6 +109,46 @@ Methods:
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.NotFound
+ 
++	uint64 token, array{byte}[16] device_key
++			CreateNetwork(object app_root, array{byte}[16] uuid,
++			array{byte}[16] net_key)
++		This is the first method that an application calls to become
++		a Provisioner node, and a Configuration Client on a newly
++		created Mesh Network.
++
++		The app_root parameter is a D-Bus object root path of the
++		application that implements org.bluez.mesh.Application1
++		interface, and a org.bluez.mesh.Provisioner1 interface. The
++		application represents a node where child mesh elements have
++		their own objects that implement org.bluez.mesh.Element1
++		interface. The application hierarchy also contains a provision
++		agent object that implements org.bluez.mesh.ProvisionAgent1
++		interface. The standard DBus.ObjectManager interface must be
++		available on the app_root path.
++
++		The uuid parameter is a 16-byte array that contains Device UUID.
++
++		The net_key parameter should be a high entropy random value
++		which will be used as the initial primary network key for this
++		new mesh network.
++
++		The returned token must be preserved by the application in
++		order to authenticate itself to the mesh daemon and attach to
++		the network as a mesh node by calling Attach() method or
++		permanently remove the identity of the mesh node by calling
++		Leave() method.
++
++		The returned device_key must be preserved by the application as
++		the access layer encryption key to communicate with the local
++		node's configuration server and any other foundational models.
++
++		The other information the bluetooth-meshd daemon will preserve
++		about the initial node, is to give it the initial primary
++		unicast address (0x0001) and assign the net_key as the primary
++		network net_index (0x000).
++
++		PossibleErrors:
++			org.bluez.mesh.Error.InvalidArguments
+ 
+ Mesh Node Hierarchy
+ ===================
+@@ -146,6 +186,54 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.NotFound
+ 
++	void SendWithDeviceKey(object element_path, uint16 destination,
++			uint16 net_index, array{byte}[16] key, array{byte} data)
++
++		This method is used to send a message originated by a local
++		model encoded with the specified device key.
++
++		The element_path parameter is the object path of an element from
++		a collection of the application elements (see Mesh Application
++		Hierarchy section).
++
++		The destination parameter contains the destination address. This
++		destination must be a uint16 to a unicast address, or a well
++		known group address.
++
++		The net_index parameter is the subnet index of the network on
++		which the message is to be sent.
++
++		The device_key parameter is the Device Key that was established
++		during provisioning of the remote node.
++
++		The data parameter is an outgoing message to be encypted by the
++		meshd daemon and sent on.
++
++		Possible errors:
++			org.bluez.mesh.Error.InvalidArguments
++			org.bluez.mesh.Error.NotFound
++
++	array{byte} DecryptWithDeviceKey(array{byte}[16] key,
++			array{byte}[13] nonce, array{byte} encrypted_data)
++
++		This method is used to decrypt a message received on the
++		EncryptedMessageReceived method.
++
++		The key parameter is the device key associated with the remote
++		node.
++
++		The nonce parameter is the nonce value received with this
++		message from the EncryptedMessageReceived method.
++
++		The encrypted_data parameter is the data received from the
++		EncryptedMessageReceived method.
++
++		The returned value is the decrypted message, if successful.
++
++		PossibleErrors:
++			org.bluez.mesh.Error.InvalidArguments
++			org.bluez.mesh.Error.Failed
++
+ 	void Publish(object element_path, uint16 model, array{byte} data)
+ 
+ 		This method is used to send a publication originated by a local
+@@ -224,12 +312,68 @@ Properties:
+ 		This property indicates whether the periodic beaconing is
+ 		enabled (true) or disabled (false).
+ 
++	uint8 BeaconFlags [read-only]
++
++		This property may be read at any time to determine the flag
++		field setting on sent and received beacons of the primary
++		network key.
++
++	uint32 IvIndex [read-only]
++
++		This property may be read at any time to determine the IV_Index
++		that the current network is on. This information is only useful
++		for provisioning.
++
+ 	uint32 SecondsSinceLastHeard [read-only]
+ 
+ 		This property may be read at any time to determine the number of
+ 		seconds since mesh network layer traffic was last detected on
+ 		this node's network.
+ 
++Mesh Provisioning Hierarchy
++============================
++Service		org.bluez.mesh
++Interface	org.bluez.mesh.Provisioning1
++Object path	/org/bluez/mesh/node<xxxx>
++		where xxxx is a 4-digit hexadecimal number generated by daemon
++
++Methods:
++	void UnprovisionedScan(uint16 seconds)
++
++		This method is used by the application that supports
++		org.bluez.mesh.Provisioner1 interface to start listening
++		(scanning) for unprovisioned devices in the area. Scanning
++		will continue for the specified number of seconds, or, if 0 is
++		specified, then continuously until UnprovisionedScanCancel() is
++		calledor if AddNode() method is called.
++
++		Each time an unprovisioned beacon is heard, the ScanResult()
++		method on the app will be called with the result.
++
++		PossibleErrors:
++			org.bluez.mesh.Error.NotAuthorized
++
++	void UnprovisionedScanCancel(void)
++
++		This method is used by the application that supports
++		org.bluez.mesh.Provisioner1 interface to stop listening
++		(scanning) for unprovisioned devices in the area.
++
++		PossibleErrors:
++			org.bluez.mesh.Error.NotAuthorized
++
++	void AddNode(array{byte}[16] uuid)
++
++		This method is used by the application that supports
++		org.bluez.mesh.Provisioner1 interface to add the
++		unprovisioned device specified by uuid, to the Network.
++
++		The uuid parameter is a 16-byte array that contains Device UUID
++		of the unprovisioned device to be added to the network.
++
++		PossibleErrors:
++			org.bluez.mesh.Error.InvalidArguments
++			org.bluez.mesh.Error.NotAuthorized
+ 
+ Mesh Application Hierarchy
+ ==========================
+@@ -247,6 +391,7 @@ An example mesh application hierarchy may look like this:
+ 			|   - org.freedesktop.DBus.ObjectManager
+ 			|   - org.bluez.mesh.Application1
+ 			|   - org.bluez.mesh.Attention1 (optional)
++			|   - org.bluez.mesh.Provisioner1 (optional,Provisioner)
+ 			|
+ 			-> /com/example/agent
+ 			| |   - org.bluez.mesh.ProvisionAgent1
+@@ -325,6 +470,24 @@ Methods:
+ 
+ 		The data parameter is the incoming message.
+ 
++	void EncryptedMessageReceived(uint16 source, array{byte}[13] nonce,
++							array{byte} data)
++
++		This method is called by meshd daemon when a message arrives
++		addressed to the application, for which only the application
++		has the Device Key used to encrypt the data payload.
++
++		The source parameter is unicast address of the remote
++		node-element that sent the message.
++
++		The nonce parameter is the 13 octet Nonce value, which must
++		be passed to an internally implimented AES-CCM function with
++		the correct Device Key and data to decrypt the message.
++
++		The data parameter is the encrypted message. To decrypt the
++		message, the application obtain the remote nodes Device Key
++		from a local storage, and decrypt it with the specified nonce.
++
+ 	void UpdateModelConfiguration(uint16 model_id, dict config)
+ 
+ 		This method is called by bluetooth-meshd daemon when a model's
+@@ -383,7 +546,7 @@ Object path	freely definable
+ This is an optional interface that implements health attention timer.
+ 
+ Methods:
+-	void SetTimer(uint8 element_index,  uint16 time)
++	void SetTimer(uint8 element_index, uint16 time)
+ 
+ 		The element_index parameter is the element's index within the
+ 		node where the health server model is hosted.
+@@ -406,6 +569,80 @@ Methods:
+ 			org.bluez.mesh.Error.NotSupported
+ 
+ 
++Mesh Provisioner Hierarchy
++============================
++Service		unique name
++Interface	org.bluez.mesh.Provisioner1
++Object path	freely definable
++
++	int8 rssi, array{byte} data ScanResult()
++		The method is called from the bluetooth-meshd daemon when a
++		unique UUID has been seen during UnprovisionedScan() for
++		unprovsioned devices.
++
++		The rssi return value is a signed, normalized measurement of the
++		signal strength of the recieved unprovisioned beacon.
++
++		The data return value is a variable length byte array, that may
++		have 1, 2 or 3 distinct fields contained in it including the 16
++		byte remote device UUID (always), a 32 bit mask of OOB
++		authentication flags (optional), and a 32 bit URI hash (if URI
++		bit set in OOB mask). Whether these fields exist or not is a
++		decision of the remote device.
++
++		If a beacon with a UUID that has already been reported is
++		recieved by the daemon, it will be silently discarded unless it
++		was recieved at a higher rssi power level.
++
++
++	array{byte}[16] net_key, uint16 net_index, uint8 flags,
++	uint32 iv_index, uint16 unicast
++		RequestProvData(array{byte}[16] device_key)
++
++		This method is implemented by a Provisioner capable application
++		and is called when the remote device has been fully
++		authenticated and confirmed.
++
++		The device_key parameter is the unique key that should be cached
++		to communicate with configuration server on new node.
++
++		Return Parameters are from the Mesh Profile Spec:
++		net_key - Network subnet key on mesh Network
++		net_index - Subnet index of the net_key
++		flags - Flags for IV_Update and Key Refresh
++		iv_index - Current IvIndex being used on the network
++		unicast - Primary Unicast address of the new node
++
++		PossibleErrors:
++			org.bluez.mesh.Error.Abort
++
++	void AddNodeComplete(array{byte}[16] uuid, uint16 unicast, uint8 count)
++
++		This method is called when the node provisioning initiated
++		by an AddNode() method call successfully completed.
++
++		The unicast parameter is the primary address that has been
++		assigned to the new node, and the address of it's config server.
++
++		The count parameter is the number of unicast addresses assigned
++		to the new node.
++
++		The new node may now be sent messages using the credentials
++		supplied by the RequestProvData method.
++
++	void AddNodeFailed(array{byte}[16] uuid, string reason)
++
++		This method is called when the node provisioning initiated by
++		AddNode() has failed. Depending on how far Provisioning
++		proceeded before failing, some cleanup of cached data may be
++		required.
++
++		The reason parameter identifies the reason for provisioning
++		failure. The defined values are: "aborted", "timeout",
++		"bad-pdu", "confirmation-failed", "out-of-resources",
++		"decryption-error", "unexpected-error",
++		"cannot-assign-addresses".
++
+ Provisioning Agent Hierarchy
+ ============================
+ Service		unique name
+@@ -451,9 +688,8 @@ Methods:
+ 		for the Agent to Display, but does not require any additional
+ 		input locally. For instance: "Enter 14939264 on remote device".
+ 
+-		The type parameter indicates the display method.  Allowed values
++		The type parameter indicates the display method. Allowed values
+ 		are:
+-
+ 			"blink" - Locally blink LED
+ 			"beep" - Locally make a noise
+ 			"vibrate" - Locally vibrate
+@@ -471,7 +707,6 @@ Methods:
+ 
+ 		The type parameter indicates the input method. Allowed values
+ 		are:
+-
+ 			"blink" - Enter times remote LED blinked
+ 			"beep" - Enter times remote device beeped
+ 			"vibrate" - Enter times remote device vibrated
+@@ -490,7 +725,6 @@ Methods:
+ 
+ 		The type parameter indicates the input method. Allowed values
+ 		are:
+-
+ 			"static-oob" - return 16 octet array
+ 			"in-alpha" - return 16 octet alpha array
+ 
+@@ -511,7 +745,6 @@ Properties:
+ 	array{string} Capabilities [read-only]
+ 
+ 		An array of strings with the following allowed values:
+-
+ 			"blink"
+ 			"beep"
+ 			"vibrate"
+@@ -528,7 +761,6 @@ Properties:
+ 
+ 		Indicates availability of OOB data. An array of strings with the
+ 		following allowed values:
+-
+ 			"other"
+ 			"uri"
+ 			"machine-code-2d"
+@@ -546,8 +778,3 @@ Properties:
+ 
+ 		Uniform Resource Identifier points to out-of-band (OOB)
+ 		information (e.g., a public key)
+-
+-
+-Mesh Provisioner Hierarchy
+-==========================
+-<TBD>
 -- 
-2.18.0
+2.14.5
 
