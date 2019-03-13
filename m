@@ -4,51 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E88DC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 20:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF5DDC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 21:02:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 153592077B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 20:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6E0B2077B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Mar 2019 21:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727154AbfCMUoF (ORCPT
+        id S1727454AbfCMVCO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Mar 2019 16:44:05 -0400
-Received: from mailgw02.mediatek.com ([210.61.82.184]:54850 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726263AbfCMUoF (ORCPT
+        Wed, 13 Mar 2019 17:02:14 -0400
+Received: from mailgw01.mediatek.com ([210.61.82.183]:60998 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727411AbfCMVCL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Mar 2019 16:44:05 -0400
-X-UUID: 75fa09407f474761890b319349a1ff02-20190314
-X-UUID: 75fa09407f474761890b319349a1ff02-20190314
-Received: from mtkcas09.mediatek.inc [(172.21.101.178)] by mailgw02.mediatek.com
+        Wed, 13 Mar 2019 17:02:11 -0400
+X-UUID: 2ab71b10a60948c39ff39828b95cc6d4-20190314
+X-UUID: 2ab71b10a60948c39ff39828b95cc6d4-20190314
+Received: from mtkcas07.mediatek.inc [(172.21.101.84)] by mailgw01.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (mhqrelay.mediatek.com ESMTP with TLS)
-        with ESMTP id 1971916305; Thu, 14 Mar 2019 04:43:59 +0800
-Received: from MTKMBS01DR.mediatek.inc (172.21.101.111) by
- mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Thu, 14 Mar 2019 04:43:50 +0800
+        with ESMTP id 659138195; Thu, 14 Mar 2019 05:02:04 +0800
 Received: from mtkcas07.mediatek.inc (172.21.101.84) by
- mtkmbs01dr.mediatek.inc (172.21.101.111) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Thu, 14 Mar 2019 04:43:50 +0800
+ mtkmbs01n1.mediatek.inc (172.21.101.68) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Thu, 14 Mar 2019 05:02:03 +0800
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas07.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Thu, 14 Mar 2019 04:43:50 +0800
+ Transport; Thu, 14 Mar 2019 05:02:03 +0800
 From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <ulf.hansson@linaro.org>
 CC:     <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>, <linux-mmc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH] Bluetooth: mediatek: fix uninitialized symbol errors in btmtksdio_rx_packet
-Date:   Thu, 14 Mar 2019 04:43:49 +0800
-Message-ID: <8fb8e6840a39127112597963d665fbe6c21d8b91.1552509647.git.sean.wang@mediatek.com>
+Subject: [PATCH v1 3/3] Bluetooth: btsdio: Use module_sdio_driver helper
+Date:   Thu, 14 Mar 2019 05:02:00 +0800
+Message-ID: <38ca0408d4c189cb8a01820749c10077450c4465.1552510141.git.sean.wang@mediatek.com>
 X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <cover.1552510141.git.sean.wang@mediatek.com>
+References: <cover.1552510141.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-MTK:  N
-X-TM-SNTS-SMTP: 7FF256FA8C5FD05FE0A2728A0DFCD430D3B76E5B217424355972E7CC225323A12000:8
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -56,52 +54,43 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-Fixed all the below warnings. They would probably cause the following
-error handling path would use the uninitialized value and then produce
-unexpected behavior.
+Macro module_sdio_driver is used for drivers whose init and exit paths
+only register and unregister to SDIO API. So remove boilerplate code to
+make code simpler by using module_sdio_driver.
 
-drivers/bluetooth/btmtksdio.c:470:2: warning: ‘old_len’ may be used
-uninitialized in this function [-Wmaybe-uninitialized]
-  print_hex_dump(KERN_ERR, "err sdio rx: ", DUMP_PREFIX_NONE, 4, 1,
-  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          old_data, old_len, true);
-          ~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/bluetooth/btmtksdio.c:376:15: note: ‘old_len’ was declared here
-  unsigned int old_len;
-               ^~~~~~~
-drivers/bluetooth/btmtksdio.c:470:2: warning: ‘old_data’ may be used
-uninitialized in this function [-Wmaybe-uninitialized]
-  print_hex_dump(KERN_ERR, "err sdio rx: ", DUMP_PREFIX_NONE, 4, 1,
-  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          old_data, old_len, true);
-          ~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/bluetooth/btmtksdio.c:375:17: note: ‘old_data’ was declared here
-  unsigned char *old_data;
-                 ^~~~~~~~
-
-Fixes: d74eef2834b5 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Reported-by: Marcel Holtmann <marcel@holtmann.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- drivers/bluetooth/btmtksdio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btsdio.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index b4b8320f279e..23cf63888bac 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -372,8 +372,8 @@ static int btmtksdio_rx_packet(struct btmtksdio_dev *bdev, u16 rx_size)
- 	const struct h4_recv_pkt *pkts = mtk_recv_pkts;
- 	int pkts_count = ARRAY_SIZE(mtk_recv_pkts);
- 	struct mtkbtsdio_hdr *sdio_hdr;
--	unsigned char *old_data;
--	unsigned int old_len;
-+	unsigned char *old_data = NULL;
-+	unsigned int old_len = 0;
- 	int err, i, pad_size;
- 	struct sk_buff *skb;
- 	u16 dlen;
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 282d1af1d3ba..4cfa9abe03c8 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -376,20 +376,7 @@ static struct sdio_driver btsdio_driver = {
+ 	.id_table	= btsdio_table,
+ };
+ 
+-static int __init btsdio_init(void)
+-{
+-	BT_INFO("Generic Bluetooth SDIO driver ver %s", VERSION);
+-
+-	return sdio_register_driver(&btsdio_driver);
+-}
+-
+-static void __exit btsdio_exit(void)
+-{
+-	sdio_unregister_driver(&btsdio_driver);
+-}
+-
+-module_init(btsdio_init);
+-module_exit(btsdio_exit);
++module_sdio_driver(btsdio_driver);
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Generic Bluetooth SDIO driver ver " VERSION);
 -- 
 2.18.0
 
