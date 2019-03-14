@@ -2,67 +2,66 @@ Return-Path: <SRS0=CLw3=RR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 453F2C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 13:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA8EC43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 14:51:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 14CA32184C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 13:43:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 872582075C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 14:51:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l5trZH8S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="COcuh+9d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726875AbfCNNnm (ORCPT
+        id S1726694AbfCNOvK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Mar 2019 09:43:42 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:34071 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726419AbfCNNnm (ORCPT
+        Thu, 14 Mar 2019 10:51:10 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:38464 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726643AbfCNOvK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Mar 2019 09:43:42 -0400
-Received: by mail-ed1-f68.google.com with SMTP id a16so4678305edn.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2019 06:43:41 -0700 (PDT)
+        Thu, 14 Mar 2019 10:51:10 -0400
+Received: by mail-ed1-f65.google.com with SMTP id e10so968866edy.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2019 07:51:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=JQomnKPP8UMo9Idp+Pct2wIlzNp/HFthVCmHrGYK38w=;
-        b=l5trZH8SQBvuu2/rCtRs6LQZ/aP/ohGIzvvbdiYoizsyY+1brjhmXGGpfFnMSmlZ5P
-         dU4vDXHJLaiMlxvDiQofrf9bbtGNPh3r+sR0tKdp+exWn5yXonCn2xuZxOrAXkkd10G5
-         Klce3an2vcHYgUKpYm6ExQJloCt4JSBla26uaoCvn1NWIy6v9wolB+uV6KY56P3hU1Ll
-         wT5tCy1nb+Xdx3yUVJPdntZ9RW7REXr2/CwVupfDR8UKlkX/kGXZL3u3hUE/4lnnivvc
-         M86dBcz9xlexlcRpi9mLFtAQF3n1vfaCYOH09McDCiwrGGQ6x4iFGatXpTXnJURftMB7
-         /vbQ==
+        bh=mAMudjfWH9I0szq3Vpg5WYIVldI/ajl/gQlR4HKW+2s=;
+        b=COcuh+9djAdHce3reK9szbfyMQIbP1MYJ809EVfFyCW8WRy2cLZE/QYAZMZn/0AcKb
+         g2eV4COzQtMZn2ZPO1s0/lGiVN+FoElzFSgAaSLYCuTNfmJdf5MiVf6Gbfm6pX2dCo7z
+         dINNcbIzzmzMkb7Vom0ZmbsKpP8uRj2XBli1NF9C6hr2/h16v6DDLTmrLGDi1CHJmxj2
+         XAewFJYeY6gU10yjALyUJZqAAEjHrj0Q/2+9GNh0yfg4K7lxxacls7jnGRZ2t3eNG01W
+         OF1dGDq29aV0h0sE/eVnAan+x5HcpRfVWf6KEZrVbz9Nle83zlT/YOa3RqS5xl56TdnG
+         5flg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=JQomnKPP8UMo9Idp+Pct2wIlzNp/HFthVCmHrGYK38w=;
-        b=HM2d6VkZ/q8wYAG/JyvIbj1xfVU+qqmRwb9km1svP3GCktqiGPSMjQc7ZqJoT/IM7Q
-         KQtTl1XbTVOYk1vGaK4IwtseNqZmsbJ7OQp/srUq6QXcaHbnnwCq7eYK2Tjf+vkx1xMO
-         GBawJipkyjNwlIkxS7gEoZ1YPgeIpWDvyvm4amfDWJBZ6BdkT6LlPU1Ev8TenxdNcMmA
-         AId/onLfEu6/vJskG3oETEKHQK7AvuJHEUqeejM81i7XL1ks/9NI9Lmxv8/mCANhGC3J
-         WqEpu71kelwCn5rxJYPe/Yf4igMw4D1F3PJWrP7P5eYOqbQKxiWLAd0oyBSYbmjxLhW+
-         kjJA==
-X-Gm-Message-State: APjAAAXkpkA9dFA9IOKdx86rcc5MFODwbt8qRm2Jezp8OCwtEWZ4q3cG
-        xt1d7YaXz0dQrc8MXNojJwfg0WRQlNQ=
-X-Google-Smtp-Source: APXvYqxJhun8SvboGNGLf9M9S7A5ZXMrw3mzaAOC4Njxbz1Dk5+MVeb0/RluNQEFPlZHbwRKIVxcXw==
-X-Received: by 2002:a17:906:442:: with SMTP id e2mr31734531eja.76.1552571020073;
-        Thu, 14 Mar 2019 06:43:40 -0700 (PDT)
+        bh=mAMudjfWH9I0szq3Vpg5WYIVldI/ajl/gQlR4HKW+2s=;
+        b=uOWUOy93ssJlgn+4SsGAL1OrTJ6EoJ2+BdKe27fW1RpkHr2SP/4XccB4JnJpgbNndR
+         NuMVuD9knJ5zKi4YSEVTDiY9oX/mbI9di5vPV8rjwgzNi5igQpFiVgkDuXcgOqd7ECc0
+         E6kdEKUP5Fqw6oKhhqEbs0QmX2D8L6Rxc6zBI72S35e8V8Q6gmJlBMmyquPX16Ntcr8G
+         ccMrE40GgJURvp1KPtFaF5RWKWZ5KhVn+rHWXcH8vAcFW5+oGd27sSwhEz+FUt+dZ0hR
+         IhkR7O/ACOUzkAq7cu/808m2Wg32MW1GZDYdYDGuFizbDzeT2ALOIWvvvDnn3HexzgAu
+         9rEQ==
+X-Gm-Message-State: APjAAAU9dLXuJXYsxqylflCDJQs414N660/cnW9jl0Aq9JxnOgUW2CDy
+        nATNyQ8Gr5B87DXeBZMzleTTSgpderM=
+X-Google-Smtp-Source: APXvYqzKmoXg3HMOB+3izS4ESG1YPMRza/SDSbI7Cukau1pAM+TTYaaITSwoSLe8Lt+nvtN4E1BtRQ==
+X-Received: by 2002:a50:b2c2:: with SMTP id p60mr11556423edd.183.1552575068284;
+        Thu, 14 Mar 2019 07:51:08 -0700 (PDT)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id o42sm1505939edc.49.2019.03.14.06.43.38
+        by smtp.gmail.com with ESMTPSA id e1sm1467213edn.22.2019.03.14.07.51.06
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 14 Mar 2019 06:43:39 -0700 (PDT)
+        Thu, 14 Mar 2019 07:51:07 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix not initializing tx_credits
-Date:   Thu, 14 Mar 2019 15:43:37 +0200
-Message-Id: <20190314134337.26647-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] shared/shell: Fix colors not using proper escape sequence
+Date:   Thu, 14 Mar 2019 16:51:04 +0200
+Message-Id: <20190314145105.25524-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -73,57 +72,44 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-l2cap_le_flowctl_init was reseting the tx_credits which works only for
-outgoing connection since that set the tx_credits on the response, for
-incoming connections that was not the case which leaves the channel
-without any credits causing it to be suspended.
+According to readline documentation \001 and \002 has to be used to
+delimit characters which takes no space:
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  'Applications may indicate that the prompt contains characters that
+  take up no physical screen space when displayed by bracketing a
+  sequence of such characters with the special markers
+  `RL_PROMPT_START_IGNORE' and `RL_PROMPT_END_IGNORE'.'
 ---
- net/bluetooth/l2cap_core.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ src/shared/shell.h | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f17e393b43b4..b53acd6c9a3d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -510,12 +510,12 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
- }
- EXPORT_SYMBOL_GPL(l2cap_chan_set_defaults);
+diff --git a/src/shared/shell.h b/src/shared/shell.h
+index 8b7cb7f30..e14d58381 100644
+--- a/src/shared/shell.h
++++ b/src/shared/shell.h
+@@ -22,14 +22,14 @@
+  */
+ #include <getopt.h>
  
--static void l2cap_le_flowctl_init(struct l2cap_chan *chan)
-+static void l2cap_le_flowctl_init(struct l2cap_chan *chan, u16 tx_credits)
- {
- 	chan->sdu = NULL;
- 	chan->sdu_last_frag = NULL;
- 	chan->sdu_len = 0;
--	chan->tx_credits = 0;
-+	chan->tx_credits = tx_credits;
- 	/* Derive MPS from connection MTU to stop HCI fragmentation */
- 	chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
- 	/* Give enough credits for a full packet */
-@@ -1281,7 +1281,7 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
- 	if (test_and_set_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags))
- 		return;
+-#define COLOR_OFF	"\x1B[0m"
+-#define COLOR_RED	"\x1B[0;91m"
+-#define COLOR_GREEN	"\x1B[0;92m"
+-#define COLOR_YELLOW	"\x1B[0;93m"
+-#define COLOR_BLUE	"\x1B[0;94m"
+-#define COLOR_BOLDGRAY	"\x1B[1;30m"
+-#define COLOR_BOLDWHITE	"\x1B[1;37m"
+-#define COLOR_HIGHLIGHT	"\x1B[1;39m"
++#define COLOR_OFF	"\001\x1B[0m\002"
++#define COLOR_RED	"\001\x1B[0;91m\002"
++#define COLOR_GREEN	"\001\x1B[0;92m\002"
++#define COLOR_YELLOW	"\001\x1B[0;93m\002"
++#define COLOR_BLUE	"\001\x1B[0;94m\002"
++#define COLOR_BOLDGRAY	"\001\x1B[1;30m\002"
++#define COLOR_BOLDWHITE	"\001\x1B[1;37m\002"
++#define COLOR_HIGHLIGHT	"\001\x1B[1;39m\002"
  
--	l2cap_le_flowctl_init(chan);
-+	l2cap_le_flowctl_init(chan, 0);
+ struct bt_shell_menu;
  
- 	req.psm     = chan->psm;
- 	req.scid    = cpu_to_le16(chan->scid);
-@@ -5532,11 +5532,10 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 	chan->dcid = scid;
- 	chan->omtu = mtu;
- 	chan->remote_mps = mps;
--	chan->tx_credits = __le16_to_cpu(req->credits);
- 
- 	__l2cap_chan_add(conn, chan);
- 
--	l2cap_le_flowctl_init(chan);
-+	l2cap_le_flowctl_init(chan, __le16_to_cpu(req->credits));
- 
- 	dcid = chan->scid;
- 	credits = chan->rx_credits;
 -- 
 2.20.1
 
