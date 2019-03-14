@@ -2,138 +2,106 @@ Return-Path: <SRS0=CLw3=RR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 581DEC10F06
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 08:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8523C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 09:00:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F32921852
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 08:20:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E874217F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 09:00:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=bksv.com header.i=@bksv.com header.b="c0qdOJ+R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbfCNIUR (ORCPT
+        id S1726421AbfCNJA2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Mar 2019 04:20:17 -0400
-Received: from lb2-smtp-cloud7.xs4all.net ([194.109.24.28]:40278 "EHLO
-        lb2-smtp-cloud7.xs4all.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726606AbfCNIUR (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Mar 2019 04:20:17 -0400
-Received: from [192.168.2.10] ([212.251.195.8])
-        by smtp-cloud7.xs4all.net with ESMTPA
-        id 4Lb0hpyCdLMwI4Lb3hHn1h; Thu, 14 Mar 2019 09:20:15 +0100
-Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
-To:     Sebastian Reichel <sre@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Tony Lindgren <tony@atomide.com>
-Cc:     Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pavel Machek <pavel@ucw.cz>, linux-bluetooth@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20181221011752.25627-1-sre@kernel.org>
-From:   Hans Verkuil <hverkuil@xs4all.nl>
-Message-ID: <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
-Date:   Thu, 14 Mar 2019 09:20:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20181221011752.25627-1-sre@kernel.org>
-Content-Type: text/plain; charset=utf-8
+        Thu, 14 Mar 2019 05:00:28 -0400
+Received: from mail-eopbgr80097.outbound.protection.outlook.com ([40.107.8.97]:41517
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726284AbfCNJA2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 14 Mar 2019 05:00:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bksv.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FFtjPdngSw4Sq1qRCzM29A0nPhnYWhjm0cggd+cq4Pk=;
+ b=c0qdOJ+RsqRL+Vnr7HQuPwGCa4R4Tt8kv53IpuJyqz4uQ/5Xs6rLK0QTIssNk5HqxtfuDKfB4kI7xgyyEMpH5wMOwyQgCxFZozDuqiLoBwGMdhk92zBcY620h2euwSEmzcqU83ZBdXLRGkXr610hG0MvPC94poMdCdob89kL29k=
+Received: from HE1PR0902MB1833.eurprd09.prod.outlook.com (10.171.95.138) by
+ HE1PR0902MB1770.eurprd09.prod.outlook.com (10.171.97.136) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1709.13; Thu, 14 Mar 2019 09:00:24 +0000
+Received: from HE1PR0902MB1833.eurprd09.prod.outlook.com
+ ([fe80::71ef:2a81:2830:b4cd]) by HE1PR0902MB1833.eurprd09.prod.outlook.com
+ ([fe80::71ef:2a81:2830:b4cd%4]) with mapi id 15.20.1709.011; Thu, 14 Mar 2019
+ 09:00:24 +0000
+From:   Mihai Marinescu <mihai.marinescu@bksv.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Connect to BLE after it has been paired fails
+Thread-Topic: Connect to BLE after it has been paired fails
+Thread-Index: AdTaRBaohrzqJ10qTlabqH+NeWq3gAAACnuw
+Date:   Thu, 14 Mar 2019 09:00:24 +0000
+Message-ID: <HE1PR0902MB1833B3A66DB155B494844C578A4B0@HE1PR0902MB1833.eurprd09.prod.outlook.com>
+References: <HE1PR0902MB1833F26C91C7C9B0B52BCB118A4B0@HE1PR0902MB1833.eurprd09.prod.outlook.com>
+In-Reply-To: <HE1PR0902MB1833F26C91C7C9B0B52BCB118A4B0@HE1PR0902MB1833.eurprd09.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4wfMRW9aN+U9an55TXNhV/UcZ6i+hxGAHn8vFCRsf5MZfZkcgeuIBOZJ3jTrv3EG5ikv3BmIEOc0X6vkblYQAjWCZv6el2QyAFVuo0m2xXDYUQLAJsRyTY
- JZ0cAAezjwWCQeO7iBYHRYU/lyWIo+hsmk/OncWzICuw6HYoauF9Iq3i69Zl09PetaUG7HBdCt8yoG/Y+C1KQNt4l64kQIMxfyGi1YO4gWnm7XfT/7LqO+84
- tpBfgQqzICN/gvCKiMeV3kr4KH48m51RDNttBaOyCgxlQWbHS99/C1WmvciVh0Xd32uvhSwJczZ8grEP9GD/ASazHDry9+bQI2y/tXjUudwaqiYnzAR4b2ND
- 1qeoohTiZVBjdHguaZNKYRCf6Ng3nDXaF/rZnJ644vUsF2kdsLHH3Ac1WVIhBFb+Nv1158kfKzh48k0zwVaHczgdfQh66p9T71PtH1L6GEHLUAha65Bue0LG
- IK7hLdmwpyMFAeF/F2ae4dmUcf3Cc5G3iTHUJQ==
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=mihai.marinescu@bksv.com; 
+x-originating-ip: [152.115.31.4]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c50c6382-a80b-48ef-6f35-08d6a85b7ed5
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600127)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(7193020);SRVR:HE1PR0902MB1770;
+x-ms-traffictypediagnostic: HE1PR0902MB1770:
+x-ms-exchange-purlcount: 3
+x-microsoft-antispam-prvs: <HE1PR0902MB1770E425ACF9E9114D7ED7448A4B0@HE1PR0902MB1770.eurprd09.prod.outlook.com>
+x-forefront-prvs: 09760A0505
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(366004)(39860400002)(376002)(136003)(396003)(365934003)(189003)(199004)(476003)(66066001)(256004)(966005)(81156014)(81166006)(8676002)(5640700003)(186003)(6506007)(478600001)(102836004)(316002)(26005)(14444005)(7696005)(86362001)(76176011)(446003)(11346002)(25786009)(44832011)(7736002)(74316002)(55016002)(305945005)(14454004)(486006)(99286004)(2501003)(6306002)(53936002)(9686003)(33656002)(2351001)(5660300002)(3846002)(6116002)(68736007)(2940100002)(97736004)(105586002)(71200400001)(71190400001)(6916009)(106356001)(8936002)(93156006)(6436002)(2906002)(52536014);DIR:OUT;SFP:1102;SCL:1;SRVR:HE1PR0902MB1770;H:HE1PR0902MB1833.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: bksv.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: oYWorxPDIQoKlMzzLxapXAcGpjzewRWET2//N2dCdvvZ8n37c7Hk2yGLsmylTraPJ0UalJnsCeN0oecZUZn7z5IFz5MHG2zmMhltSLcPlVuGBsb0795cPK3jJjXD8QXaZaM5HQs1IAEXeQhFa4K+f+x7SZEfwl7tMtIJIRmyYMf5nGskGCK220NOiwZVMRpOEuXutdtOumzMHiVluHUcYV5+ZJF336Pi912RY9pveS8wYQz7Zh2jxPN8ONmbXMkSRcnxT0k9Ksky+Q9E5Rifl4qmHmYybTZtnlIFWO6Vh7NSCfl5Cto+UTo8kqpT0gfwOyf2CFuNRM305/15fAfJKGpdzC2coqJnQuBvv/37v0f5/dsI0dHgGBQXe8V9Q1NF5grO4jQPY6uiD32dq42mGe8637UwjJzqX2ztdjISCi0=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: bksv.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c50c6382-a80b-48ef-6f35-08d6a85b7ed5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2019 09:00:24.1309
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 6cce74a3-3975-45e0-9893-b072988b30b6
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0902MB1770
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sebastian,
+Hi,
+I have a device using a module from Laird which includes a Marvell chip, th=
+is module is used from Linux using bluez 5.5 and we have an issue with reco=
+nnecting to an already paired device, here is what we see :
 
-On 12/21/18 2:17 AM, Sebastian Reichel wrote:
-> Hi,
-> 
-> This moves all remaining users of the legacy TI_ST driver to hcill (patches
-> 1-3). Then patches 4-7 convert wl128x-radio driver to a standard platform
-> device driver with support for multiple instances. Patch 7 will result in
-> (userless) TI_ST driver no longer supporting radio at runtime. Patch 8-11 do
-> some cleanups in the wl128x-radio driver. Finally patch 12 removes the TI_ST
-> specific parts from wl128x-radio and adds the required infrastructure to use it
-> with the serdev hcill driver instead. The remaining patches 13 and 14 remove
-> the old TI_ST code.
-> 
-> The new code has been tested on the Motorola Droid 4. For testing the audio
-> should be configured to route Ext to Speaker or Headphone. Then you need to
-> plug headphone, since its cable is used as antenna. For testing there is a
-> 'radio' utility packages in Debian. When you start the utility you need to
-> specify a frequency, since initial get_frequency returns an error:
+We are trying this from an iPhone X using LightBlue Explorer app :
 
-What is the status of this series?
+1. Here is pairing first time which works as it should: https://gist.github=
+.com/donnib/21a2fe4d93b2517d59284e7b361d618f
+2. Here is a log of when we connect to same device while it still connected=
+ to iOS : https://gist.github.com/donnib/58b9aad19b9dfa3534a4891189336955
+3. And here is the most interesting one, we disable Bluetooth on iPhone, we=
+ enable it then we try to connect to the same device again : https://gist.g=
+ithub.com/donnib/a74e151ae42ae6dc674a843f935547fd
 
-Based on some of the replies (from Adam Ford in particular) it appears that
-this isn't ready to be merged, so is a v2 planned?
+We cannot figure out why this problem shows up, any ideas why we can't conn=
+ect after a pair ?
 
-Regards,
+Any ideas would be greatly appreciated.
 
-	Hans
+/Mihai
 
-> 
-> $ radio -f 100.0
-> 
-> Merry Christmas!
-> 
-> -- Sebastian
-> 
-> Sebastian Reichel (14):
->   ARM: dts: LogicPD Torpedo: Add WiLink UART node
->   ARM: dts: IGEP: Add WiLink UART node
->   ARM: OMAP2+: pdata-quirks: drop TI_ST/KIM support
->   media: wl128x-radio: remove module version
->   media: wl128x-radio: remove global radio_disconnected
->   media: wl128x-radio: remove global radio_dev
->   media: wl128x-radio: convert to platform device
->   media: wl128x-radio: use device managed memory allocation
->   media: wl128x-radio: load firmware from ti-connectivity/
->   media: wl128x-radio: simplify fmc_prepare/fmc_release
->   media: wl128x-radio: fix skb debug printing
->   media: wl128x-radio: move from TI_ST to hci_ll driver
->   Bluetooth: btwilink: drop superseded driver
->   misc: ti-st: Drop superseded driver
-> 
->  .../boot/dts/logicpd-torpedo-37xx-devkit.dts  |   8 +
->  arch/arm/boot/dts/omap3-igep0020-rev-f.dts    |   8 +
->  arch/arm/boot/dts/omap3-igep0030-rev-g.dts    |   8 +
->  arch/arm/mach-omap2/pdata-quirks.c            |  52 -
->  drivers/bluetooth/Kconfig                     |  11 -
->  drivers/bluetooth/Makefile                    |   1 -
->  drivers/bluetooth/btwilink.c                  | 350 -------
->  drivers/bluetooth/hci_ll.c                    | 115 ++-
->  drivers/media/radio/wl128x/Kconfig            |   2 +-
->  drivers/media/radio/wl128x/fmdrv.h            |   5 +-
->  drivers/media/radio/wl128x/fmdrv_common.c     | 211 ++--
->  drivers/media/radio/wl128x/fmdrv_common.h     |   4 +-
->  drivers/media/radio/wl128x/fmdrv_v4l2.c       |  55 +-
->  drivers/media/radio/wl128x/fmdrv_v4l2.h       |   2 +-
->  drivers/misc/Kconfig                          |   1 -
->  drivers/misc/Makefile                         |   1 -
->  drivers/misc/ti-st/Kconfig                    |  18 -
->  drivers/misc/ti-st/Makefile                   |   6 -
->  drivers/misc/ti-st/st_core.c                  | 922 ------------------
->  drivers/misc/ti-st/st_kim.c                   | 868 -----------------
->  drivers/misc/ti-st/st_ll.c                    | 169 ----
->  include/linux/ti_wilink_st.h                  | 337 +------
->  22 files changed, 213 insertions(+), 2941 deletions(-)
->  delete mode 100644 drivers/bluetooth/btwilink.c
->  delete mode 100644 drivers/misc/ti-st/Kconfig
->  delete mode 100644 drivers/misc/ti-st/Makefile
->  delete mode 100644 drivers/misc/ti-st/st_core.c
->  delete mode 100644 drivers/misc/ti-st/st_kim.c
->  delete mode 100644 drivers/misc/ti-st/st_ll.c
-> 
+This e-mail is confidential and may be read, copied and used only by the in=
+tended recipient. If you have received it in error, please contact the send=
+er immediately by return e-mail. Please then delete the e-mail and do not d=
+isclose its contents to any other person.
 
