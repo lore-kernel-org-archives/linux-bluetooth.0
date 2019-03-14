@@ -2,172 +2,128 @@ Return-Path: <SRS0=CLw3=RR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63700C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 12:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 453F2C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 13:43:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 28CA521855
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 12:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14CA32184C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 13:43:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G5+FYVVi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l5trZH8S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726932AbfCNMTG (ORCPT
+        id S1726875AbfCNNnm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Mar 2019 08:19:06 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:36085 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726688AbfCNMTG (ORCPT
+        Thu, 14 Mar 2019 09:43:42 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:34071 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726419AbfCNNnm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Mar 2019 08:19:06 -0400
-Received: by mail-it1-f194.google.com with SMTP id h9so4484562itl.1;
-        Thu, 14 Mar 2019 05:19:05 -0700 (PDT)
+        Thu, 14 Mar 2019 09:43:42 -0400
+Received: by mail-ed1-f68.google.com with SMTP id a16so4678305edn.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2019 06:43:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oTUtf7DHMNapR1bLHHVDG7LJIcXxif1N0TzQwlX+4c4=;
-        b=G5+FYVViK7D58YD6RMA5DfXScrAysWzivL/loaA/MJ69IlYFfB2Iz0s6zV2vPnlygH
-         jLvgkHQT2Q41xYPnGpSkADxvHEfkS6jfgdoalLYufhnhDTjNXh19onuxBGul1HxW/iwc
-         vdppNdxoC/OBC7Xcl4YcZ6X59J1CQ5uWh+D0NjyMMoAzIP4asvg/AcId3RjOvG2ti++G
-         5nSe+7xnHtEinWrFyZNtB4o8pjWw8A6HQBhcdH/KyhVRcMiaIu0c4j6FUovGzHkKkIYT
-         0E41sB7kuVw4PWRrYrga9ghueXuNLM/GqEIheCvWIqOZtCIqD5QXjVdWPK8LRWUJ0icd
-         lSqg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JQomnKPP8UMo9Idp+Pct2wIlzNp/HFthVCmHrGYK38w=;
+        b=l5trZH8SQBvuu2/rCtRs6LQZ/aP/ohGIzvvbdiYoizsyY+1brjhmXGGpfFnMSmlZ5P
+         dU4vDXHJLaiMlxvDiQofrf9bbtGNPh3r+sR0tKdp+exWn5yXonCn2xuZxOrAXkkd10G5
+         Klce3an2vcHYgUKpYm6ExQJloCt4JSBla26uaoCvn1NWIy6v9wolB+uV6KY56P3hU1Ll
+         wT5tCy1nb+Xdx3yUVJPdntZ9RW7REXr2/CwVupfDR8UKlkX/kGXZL3u3hUE/4lnnivvc
+         M86dBcz9xlexlcRpi9mLFtAQF3n1vfaCYOH09McDCiwrGGQ6x4iFGatXpTXnJURftMB7
+         /vbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oTUtf7DHMNapR1bLHHVDG7LJIcXxif1N0TzQwlX+4c4=;
-        b=gtVGElPBdI+hyWg9McCKaBEZZRM1lOJ0RNRnHRjnDKcV/f8TOO+//ssW07OOwJv8/6
-         nV+KcZHdcEayKwvknCxQ35tUmyj7GG+FYGyckVd13MGjiFGgxmlvbrc8FeU9FnwSga9y
-         pJsZayOcs+nTQFtfK4beaCNrCqz1p15TKrIHdzo7b/g/JYlO7oFu5UnwrAfrtWGCI57C
-         PvOXMLxgZE9nqpGiilhrDU10sFsaKa15kL+eTt5VPWwnvSAq0nHDKq02xM+K0bTi67C9
-         XmB3uHnqeCdwNlKGYLqZXOFcdHy/2oK52akvBDksJnyl/Vn/5MskK8JTQNP/G66uzqAJ
-         a8TQ==
-X-Gm-Message-State: APjAAAXrL0dvAQvbZdAGSZsUtqIgEJ6JFgmbxEMhj8PhdGcFoapMMlHZ
-        WAI02zPKaggYAdYzzaKzXB+sfc8lMMN2VTk0fsU=
-X-Google-Smtp-Source: APXvYqzyVnFGZXamqKcgQC6vQ6JnprSS4GG5QO6oXogT/Phak4extsCcyYLL9e+J5zpqhwMrjgO0gxxCDeQF2WTzLWk=
-X-Received: by 2002:a02:a903:: with SMTP id n3mr947770jam.3.1552565944487;
- Thu, 14 Mar 2019 05:19:04 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JQomnKPP8UMo9Idp+Pct2wIlzNp/HFthVCmHrGYK38w=;
+        b=HM2d6VkZ/q8wYAG/JyvIbj1xfVU+qqmRwb9km1svP3GCktqiGPSMjQc7ZqJoT/IM7Q
+         KQtTl1XbTVOYk1vGaK4IwtseNqZmsbJ7OQp/srUq6QXcaHbnnwCq7eYK2Tjf+vkx1xMO
+         GBawJipkyjNwlIkxS7gEoZ1YPgeIpWDvyvm4amfDWJBZ6BdkT6LlPU1Ev8TenxdNcMmA
+         AId/onLfEu6/vJskG3oETEKHQK7AvuJHEUqeejM81i7XL1ks/9NI9Lmxv8/mCANhGC3J
+         WqEpu71kelwCn5rxJYPe/Yf4igMw4D1F3PJWrP7P5eYOqbQKxiWLAd0oyBSYbmjxLhW+
+         kjJA==
+X-Gm-Message-State: APjAAAXkpkA9dFA9IOKdx86rcc5MFODwbt8qRm2Jezp8OCwtEWZ4q3cG
+        xt1d7YaXz0dQrc8MXNojJwfg0WRQlNQ=
+X-Google-Smtp-Source: APXvYqxJhun8SvboGNGLf9M9S7A5ZXMrw3mzaAOC4Njxbz1Dk5+MVeb0/RluNQEFPlZHbwRKIVxcXw==
+X-Received: by 2002:a17:906:442:: with SMTP id e2mr31734531eja.76.1552571020073;
+        Thu, 14 Mar 2019 06:43:40 -0700 (PDT)
+Received: from localhost.localdomain ([192.198.151.62])
+        by smtp.gmail.com with ESMTPSA id o42sm1505939edc.49.2019.03.14.06.43.38
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 14 Mar 2019 06:43:39 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: Fix not initializing tx_credits
+Date:   Thu, 14 Mar 2019 15:43:37 +0200
+Message-Id: <20190314134337.26647-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20181221011752.25627-1-sre@kernel.org> <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
-In-Reply-To: <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Thu, 14 Mar 2019 07:18:53 -0500
-Message-ID: <CAHCN7x+KeHBYH-QxAsRNL2KB_qDud2LTqdtjC4FZ08KvxGtEdA@mail.gmail.com>
-Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
-To:     Hans Verkuil <hverkuil@xs4all.nl>
-Cc:     Sebastian Reichel <sre@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Tony Lindgren <tony@atomide.com>,
-        Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-media@vger.kernel.org,
-        Linux-OMAP <linux-omap@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 14, 2019 at 3:21 AM Hans Verkuil <hverkuil@xs4all.nl> wrote:
->
-> Hi Sebastian,
->
-> On 12/21/18 2:17 AM, Sebastian Reichel wrote:
-> > Hi,
-> >
-> > This moves all remaining users of the legacy TI_ST driver to hcill (patches
-> > 1-3). Then patches 4-7 convert wl128x-radio driver to a standard platform
-> > device driver with support for multiple instances. Patch 7 will result in
-> > (userless) TI_ST driver no longer supporting radio at runtime. Patch 8-11 do
-> > some cleanups in the wl128x-radio driver. Finally patch 12 removes the TI_ST
-> > specific parts from wl128x-radio and adds the required infrastructure to use it
-> > with the serdev hcill driver instead. The remaining patches 13 and 14 remove
-> > the old TI_ST code.
-> >
-> > The new code has been tested on the Motorola Droid 4. For testing the audio
-> > should be configured to route Ext to Speaker or Headphone. Then you need to
-> > plug headphone, since its cable is used as antenna. For testing there is a
-> > 'radio' utility packages in Debian. When you start the utility you need to
-> > specify a frequency, since initial get_frequency returns an error:
->
-> What is the status of this series?
->
-> Based on some of the replies (from Adam Ford in particular) it appears that
-> this isn't ready to be merged, so is a v2 planned?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If you can leave the Logic PD Torpedo board alone and don't remove the
-legacy st driver for now, go ahead and migrate the others.  I know
-what you proposed 'should' work on my board, but I don't know why it
-doesn't.  In fact other boards I maintain use your method, but it just
-doesn't work on the Torpedo and I don't know why.  (it's not for lack
-of trying)
+l2cap_le_flowctl_init was reseting the tx_credits which works only for
+outgoing connection since that set the tx_credits on the response, for
+incoming connections that was not the case which leaves the channel
+without any credits causing it to be suspended.
 
-adam
->
-> Regards,
->
->         Hans
->
-> >
-> > $ radio -f 100.0
-> >
-> > Merry Christmas!
-> >
-> > -- Sebastian
-> >
-> > Sebastian Reichel (14):
-> >   ARM: dts: LogicPD Torpedo: Add WiLink UART node
-> >   ARM: dts: IGEP: Add WiLink UART node
-> >   ARM: OMAP2+: pdata-quirks: drop TI_ST/KIM support
-> >   media: wl128x-radio: remove module version
-> >   media: wl128x-radio: remove global radio_disconnected
-> >   media: wl128x-radio: remove global radio_dev
-> >   media: wl128x-radio: convert to platform device
-> >   media: wl128x-radio: use device managed memory allocation
-> >   media: wl128x-radio: load firmware from ti-connectivity/
-> >   media: wl128x-radio: simplify fmc_prepare/fmc_release
-> >   media: wl128x-radio: fix skb debug printing
-> >   media: wl128x-radio: move from TI_ST to hci_ll driver
-> >   Bluetooth: btwilink: drop superseded driver
-> >   misc: ti-st: Drop superseded driver
-> >
-> >  .../boot/dts/logicpd-torpedo-37xx-devkit.dts  |   8 +
-> >  arch/arm/boot/dts/omap3-igep0020-rev-f.dts    |   8 +
-> >  arch/arm/boot/dts/omap3-igep0030-rev-g.dts    |   8 +
-> >  arch/arm/mach-omap2/pdata-quirks.c            |  52 -
-> >  drivers/bluetooth/Kconfig                     |  11 -
-> >  drivers/bluetooth/Makefile                    |   1 -
-> >  drivers/bluetooth/btwilink.c                  | 350 -------
-> >  drivers/bluetooth/hci_ll.c                    | 115 ++-
-> >  drivers/media/radio/wl128x/Kconfig            |   2 +-
-> >  drivers/media/radio/wl128x/fmdrv.h            |   5 +-
-> >  drivers/media/radio/wl128x/fmdrv_common.c     | 211 ++--
-> >  drivers/media/radio/wl128x/fmdrv_common.h     |   4 +-
-> >  drivers/media/radio/wl128x/fmdrv_v4l2.c       |  55 +-
-> >  drivers/media/radio/wl128x/fmdrv_v4l2.h       |   2 +-
-> >  drivers/misc/Kconfig                          |   1 -
-> >  drivers/misc/Makefile                         |   1 -
-> >  drivers/misc/ti-st/Kconfig                    |  18 -
-> >  drivers/misc/ti-st/Makefile                   |   6 -
-> >  drivers/misc/ti-st/st_core.c                  | 922 ------------------
-> >  drivers/misc/ti-st/st_kim.c                   | 868 -----------------
-> >  drivers/misc/ti-st/st_ll.c                    | 169 ----
-> >  include/linux/ti_wilink_st.h                  | 337 +------
-> >  22 files changed, 213 insertions(+), 2941 deletions(-)
-> >  delete mode 100644 drivers/bluetooth/btwilink.c
-> >  delete mode 100644 drivers/misc/ti-st/Kconfig
-> >  delete mode 100644 drivers/misc/ti-st/Makefile
-> >  delete mode 100644 drivers/misc/ti-st/st_core.c
-> >  delete mode 100644 drivers/misc/ti-st/st_kim.c
-> >  delete mode 100644 drivers/misc/ti-st/st_ll.c
-> >
->
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f17e393b43b4..b53acd6c9a3d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -510,12 +510,12 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
+ }
+ EXPORT_SYMBOL_GPL(l2cap_chan_set_defaults);
+ 
+-static void l2cap_le_flowctl_init(struct l2cap_chan *chan)
++static void l2cap_le_flowctl_init(struct l2cap_chan *chan, u16 tx_credits)
+ {
+ 	chan->sdu = NULL;
+ 	chan->sdu_last_frag = NULL;
+ 	chan->sdu_len = 0;
+-	chan->tx_credits = 0;
++	chan->tx_credits = tx_credits;
+ 	/* Derive MPS from connection MTU to stop HCI fragmentation */
+ 	chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
+ 	/* Give enough credits for a full packet */
+@@ -1281,7 +1281,7 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
+ 	if (test_and_set_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags))
+ 		return;
+ 
+-	l2cap_le_flowctl_init(chan);
++	l2cap_le_flowctl_init(chan, 0);
+ 
+ 	req.psm     = chan->psm;
+ 	req.scid    = cpu_to_le16(chan->scid);
+@@ -5532,11 +5532,10 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
+ 	chan->dcid = scid;
+ 	chan->omtu = mtu;
+ 	chan->remote_mps = mps;
+-	chan->tx_credits = __le16_to_cpu(req->credits);
+ 
+ 	__l2cap_chan_add(conn, chan);
+ 
+-	l2cap_le_flowctl_init(chan);
++	l2cap_le_flowctl_init(chan, __le16_to_cpu(req->credits));
+ 
+ 	dcid = chan->scid;
+ 	credits = chan->rx_credits;
+-- 
+2.20.1
+
