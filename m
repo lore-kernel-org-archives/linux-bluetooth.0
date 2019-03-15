@@ -1,218 +1,142 @@
-Return-Path: <SRS0=CLw3=RR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=yo6A=RS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B44C10F06
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 18:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C3AC10F06
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Mar 2019 03:17:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B1B52184C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Mar 2019 18:56:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91EB721873
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Mar 2019 03:17:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QD+gOgBl"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="BkeDYU8b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727472AbfCNS4k (ORCPT
+        id S1727113AbfCODRd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Mar 2019 14:56:40 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:41231 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727213AbfCNS4j (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Mar 2019 14:56:39 -0400
-Received: by mail-pf1-f195.google.com with SMTP id d25so4454301pfn.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Mar 2019 11:56:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=24SeS932k4Lv64ugmBSo8q787ObSwCYuPwVTA5q5L8w=;
-        b=QD+gOgBljNxcPAAbT0oYCfxmhC0yeQ+88x9rOhdKjv5xeQDNJUMDai7bKN5RNTZRjZ
-         TH2dNpA4zJXNLMrb0dGVmr7RoVrwBhyilBLVQ5e0YSR7bFeeBSqZ5EdGv806BDP9AaIQ
-         laymUfmxnxtDOJLIGBFCRQq4LeDQvWroOKaRk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=24SeS932k4Lv64ugmBSo8q787ObSwCYuPwVTA5q5L8w=;
-        b=ThgRKMkZBHZtC4Od31szbcup36/26+MNHNTLyqfUlRTUsurl2mU0pWBfy2y3HYqy4A
-         X99fSdPFcdF971pn8Kq8GW/1revx1lFI87bdSMyGWDFigdh/r1T6Jfq6P0+yJTeYgqvS
-         DXu+aDyqnCoNbQZAWSmMc+Ko7jctjs6L80ff6H0YVfwB/fEzKjuS9mquv8qZMktBQVqa
-         GS0qKnnuFvyuNMQt+nSONYag6H/kpMpfL4lk6XmY7zwuaMuuDJdeopH0SCAFgRT9yRUC
-         P8LTGjIV+6qV41lc+iA+W+Z4O+GE9oU4MEg5Md1VLA1hvJ61lPP6z2+rKAWOLwU+1dco
-         cLZA==
-X-Gm-Message-State: APjAAAX7zBQM5WyN3Rvwxn0UV9ZQchozOCyUTSoh0EVlzRAjln3PfwVv
-        9ZFQi3NPuFf+xbmBfcdEj3pZhw==
-X-Google-Smtp-Source: APXvYqydvR4Xzm9I0F0lBivmaJQHNQD1lI8kcNxjLVuM7jGe5Qtacv9mcFX879GNVgp6dXSHoMn5nQ==
-X-Received: by 2002:a62:70c9:: with SMTP id l192mr50988654pfc.207.1552589798581;
-        Thu, 14 Mar 2019 11:56:38 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id p6sm19829950pgd.69.2019.03.14.11.56.37
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 14 Mar 2019 11:56:37 -0700 (PDT)
-Date:   Thu, 14 Mar 2019 11:56:37 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     c-hbandi@codeaurora.org
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, anubhavg@codeaurora.org,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        devicetree@vger.kernel.org, linux-bluetooth-owner@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn3998
-Message-ID: <20190314185637.GB112750@google.com>
-References: <1552393379-26330-1-git-send-email-c-hbandi@codeaurora.org>
- <1552393379-26330-3-git-send-email-c-hbandi@codeaurora.org>
- <20190312165928.GD200579@google.com>
- <88a923e02073461abb5f3a7674150615@codeaurora.org>
+        Thu, 14 Mar 2019 23:17:33 -0400
+Received: from mail-eopbgr50054.outbound.protection.outlook.com ([40.107.5.54]:44547
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727067AbfCODRd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 14 Mar 2019 23:17:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KloDH9AmzpNITSB1stLZjk/AoMxCSYhJfSZU9MPw0X8=;
+ b=BkeDYU8b+alq3XsYUL2uVDZshOrDEmGTkVTsz7QN4PiSvLZwWNlrrWHDDRbY1IyAmHPSaf4Q1O7fcLgUEWuvVWx8frixYr/nnsI5ATn6F8+nu+befvCdDU1VKHO7O6Q6+iLFyPqonrcat39maLLPKaGDvlLpOeQwqJjDl4BMwKs=
+Received: from VI1PR0402MB3600.eurprd04.prod.outlook.com (52.134.5.23) by
+ VI1PR0402MB3534.eurprd04.prod.outlook.com (52.134.4.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1686.18; Fri, 15 Mar 2019 03:17:29 +0000
+Received: from VI1PR0402MB3600.eurprd04.prod.outlook.com
+ ([fe80::d572:5bb9:4021:1f69]) by VI1PR0402MB3600.eurprd04.prod.outlook.com
+ ([fe80::d572:5bb9:4021:1f69%4]) with mapi id 15.20.1709.011; Fri, 15 Mar 2019
+ 03:17:28 +0000
+From:   Andy Duan <fugang.duan@nxp.com>
+To:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Andy Duan <fugang.duan@nxp.com>
+Subject: [PATCH Bluetooth 1/1] Bluetooth: L2CAP: add return check for security
+ level set
+Thread-Topic: [PATCH Bluetooth 1/1] Bluetooth: L2CAP: add return check for
+ security level set
+Thread-Index: AQHU2t2ee6mCq6YSV0OHq3p6ZHO+bA==
+Date:   Fri, 15 Mar 2019 03:17:28 +0000
+Message-ID: <1552619793-29992-1-git-send-email-fugang.duan@nxp.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: git-send-email 2.7.4
+x-clientproxiedby: HK0PR04CA0012.apcprd04.prod.outlook.com
+ (2603:1096:203:36::24) To VI1PR0402MB3600.eurprd04.prod.outlook.com
+ (2603:10a6:803:a::23)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=fugang.duan@nxp.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [119.31.174.66]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8409844e-cbb3-477f-3ba0-08d6a8f4c108
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:VI1PR0402MB3534;
+x-ms-traffictypediagnostic: VI1PR0402MB3534:
+x-microsoft-exchange-diagnostics: =?iso-8859-1?Q?1;VI1PR0402MB3534;23:HtKZejHiRnosM79pRp+nwr3VhRhrI0c+Rwmis?=
+ =?iso-8859-1?Q?ec7Xl8lfdt/qvAhoEPD6wUjQ06ZKIWTPUGvfJokGEu6g9H6cOUH8vlc0/F?=
+ =?iso-8859-1?Q?oSkPbIzymmDIzoGe1fxVDv1jtv6utF1J4LvBLE74n4PyP8PvdIF+WGrbqj?=
+ =?iso-8859-1?Q?4cfY1pOj1EAiKrjdzYT3Ew2lkmFDVBZUqXrOXOy9b9tuHNoj0BFdnixiJM?=
+ =?iso-8859-1?Q?sL1gEZ+IPjSM7FgcSOn2u83wC3hKgE/IQw4vLh6FfyU39WZ8HADwlg+B7g?=
+ =?iso-8859-1?Q?mUsNAHIeuCC1J6Os68RG4yOjVsG37ghMlfiogi88+4+UvMUs3wzM385Xqe?=
+ =?iso-8859-1?Q?HBtN3Xcq7b5Ab/1HWtXRpOIJaG2baQIgYDdZ0Ebpgo2VBG7ET4EIpAxVw8?=
+ =?iso-8859-1?Q?PUWSgagB55BpeyRuuD3r+xxO2cSwua0J+rcVKTvBZDBC2TMJ03P2Mk3oMn?=
+ =?iso-8859-1?Q?M+YSvb9g4WJC2B3fur+UAwKystzxroEg+rfG82k7AxQ6grcdzG47nL5dRJ?=
+ =?iso-8859-1?Q?WKWdiwzmMa8V251YJ7a4hnqT0E7QytIx7c/bxL6eDRC9lAWb6Ng56laNwM?=
+ =?iso-8859-1?Q?6txc2HU9sX37g4xwAEQIqmAWU+G0BLe9h3FMAsjIiac6PEKenGHMBSDS4Y?=
+ =?iso-8859-1?Q?oG4yH6IAbLOlXcY49ivktDI5foVZrWREIsb7NNDgU5tvy1SMrxdLJ/QEbO?=
+ =?iso-8859-1?Q?2i570C7dydp5GzEPPMrb5R34OirCs6Ve0boPSAnn7n34xrVbHauy+Hq458?=
+ =?iso-8859-1?Q?Rjh1IKPdL3iqrXEVUZhDLVZpM1+kHQbB/YKJouRWn/Eo35k9xHSm1zOX+n?=
+ =?iso-8859-1?Q?z9jXPMahlKPSgf5w76EFF+ozoSTGvSDgGkR9H2driJFM+4qUJDPm8aKjIU?=
+ =?iso-8859-1?Q?whgkVOd1fR4iZUcLinoFsVhwD4AFOIbLspWlKbE0vyh47FPT2UGlVxF67U?=
+ =?iso-8859-1?Q?7O0ry8cE3WHkbN4ficS6Qb/hKOhQRr1SAkK7NM6b2jdkvCpZiemjH3NGqc?=
+ =?iso-8859-1?Q?DtH/1aXgK4o2LBm+vvWr1NelCTIFJnvtup/vbhM6M18xrbh6iXPlixXAt3?=
+ =?iso-8859-1?Q?pK8LtdbZ04YNRLZGxfLiKYemwbX6y2VlFw5uiMVztnZ6JmE5NTKMd2O/WC?=
+ =?iso-8859-1?Q?GullyNfw4K+J3Z57OcDfYJDbL45FQ/mAkDeI+GfiQVHj8dM5Q/CzSs2mzC?=
+ =?iso-8859-1?Q?383ezdbX0M8o4fc1ZJw5TT6HhIKvGvoWAQSd24Ia+at9VDlh4rSfa0I5Fl?=
+ =?iso-8859-1?Q?uOBS1UKeI8KXwKA1sEf?=
+x-microsoft-antispam-prvs: <VI1PR0402MB3534A9BF923B63F72F9FB7EDFF440@VI1PR0402MB3534.eurprd04.prod.outlook.com>
+x-forefront-prvs: 09778E995A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(396003)(366004)(39860400002)(376002)(136003)(189003)(199004)(7736002)(52116002)(50226002)(6486002)(8936002)(2616005)(26005)(186003)(6512007)(102836004)(6506007)(14444005)(68736007)(97736004)(53936002)(386003)(81156014)(486006)(2501003)(6436002)(110136005)(54906003)(316002)(81166006)(4326008)(476003)(99286004)(5660300002)(66066001)(478600001)(3846002)(105586002)(256004)(14454004)(6116002)(25786009)(2906002)(305945005)(86362001)(71200400001)(8676002)(4744005)(36756003)(106356001)(15650500001)(71190400001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3534;H:VI1PR0402MB3600.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: +3ItiC9bsEO23cUXH++fe4v5MN8RI8w+/QGS+MXyHHFu1H/Rr1bLS/DUCjY0TnK/46qZA+ligXXTVokI0PgxLeO+mZOfLpaLbMMOOsX3bBUQZ8fOuEeCNGqWV0oT3sxZH8LOPIun2GnVcC3fj9ypZZwnPSqG0TF++Iz/Uv0KKTaMD3FfCfSp1zyGWHGjJiv5Rl/KCz9i+AkHNVK8+1WpU/GrHPuG7TQAevCekLm+iaEq3PYm089CYamvpZpM6wnRbZE36slzO6Jx8J7snoO+f55uiIVbNMxweK83tYkqY7KXPlwTM4u+EjhvTRZ6xbhigggKzmKJajZ8xS9d862Mk6fHEoEkH5unhAXxfh3z66O2mzRn59tJ6Kxkia/0jWVz3/yawrhz2oPM8TdiSwWudOI+bNhsJuwGCl9SwiUphTk=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <88a923e02073461abb5f3a7674150615@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8409844e-cbb3-477f-3ba0-08d6a8f4c108
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2019 03:17:28.8806
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3534
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Harish,
+From: "Fugang Duan" <fugang.duan@nxp.com>
 
-On Wed, Mar 13, 2019 at 12:00:06PM +0530, c-hbandi@codeaurora.org wrote:
-> Hi Matthias,
-> 
-> 
-> On 2019-03-12 22:29, Matthias Kaehlcke wrote:
-> > +DT folks
-> > 
-> > Please add them in future versions (script/scripts/get_maintainer.pl
-> > <patches> should have listed them)
-> 
-> [Harish] -- Will add them in new version of patches.
-> > 
-> > On Tue, Mar 12, 2019 at 05:52:59PM +0530, Harish Bandi wrote:
-> > > This patch enables regulators for the Qualcomm Bluetooth wcn3998
-> > > controller.
-> > 
-> > No, it doesn't.
-> > 
-> > The next version should probably say something like "Add compatible
-> > string for the Qualcomm WCN3998 Bluetooth controller.
-> > 
-> [Harish] -- From new patch onwards will add all patch
-> version changes and add proper description.
-> 
-> > Is there any particular reason why QCA drivers folks use 'wcn' instead
-> > of 'WCN'? The QCA documentations calls it WCN399x, so I'd suggest to
-> > consistently use the uppercase name in comments and documentation (and
-> > log messages?).
-> > 
-> [Harish] -- I think in DT we need to have small case like wcn,
+Add return check for security level set for socket interface since
+stack will check the return value.
 
-agreed
+Signed-off-by: Fugang Duan <fugang.duan@nxp.com>
+---
+ net/bluetooth/l2cap_sock.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> i think that is the reason it started using in code, comments and dt
-> documentation.
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a3a2cd5..c71b97f 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -793,8 +793,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, =
+int level, int optname,
+=20
+ 		/*change security for LE channels */
+ 		if (chan->scid =3D=3D L2CAP_CID_ATT) {
+-			if (smp_conn_security(conn->hcon, sec.level))
++			if (smp_conn_security(conn->hcon, sec.level)) {
++				err =3D -EINVAL;
+ 				break;
++			}
++
+ 			set_bit(FLAG_PENDING_SECURITY, &chan->flags);
+ 			sk->sk_state =3D BT_CONFIG;
+ 			chan->state =3D BT_CONFIG;
+--=20
+2.7.4
 
-AFAIK there are no hard rules for everything, my suggestion would be:
-
-- use WCN399x
-  - for general comments/documentation
-  - commit messages
-  - in DT context wcn3998-n seems ok
-- use wcn399x
-  - for function and variable names
-  - for compatible strings
-
-For logging: whatever, just be consistent.
-
-> > > Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
-> > > ---
-> > > changes in v3:
-> > > - updated to latest code base.
-> > 
-> > This comment is useless, please describe what changed wrt the previous
-> > version.
-> [Harish] --  added details in v2, and v3 uploaded just to rebase on tip of
-> bluetooth-next
-> for better understanding of code in review. From new patch onwards will add
-> all patch
-> version changes and add proper description.
-> > 
-> > > ---
-> > >  .../devicetree/bindings/net/qualcomm-bluetooth.txt        | 15
-> > > +++++++++++++++
-> > >  1 file changed, 15 insertions(+)
-> > > 
-> > > diff --git
-> > > a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> > > b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> > > index 824c0e2..1221535 100644
-> > > --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> > > +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> > > @@ -53,3 +53,18 @@ serial@898000 {
-> > >  		max-speed = <3200000>;
-> > >  	};
-> > >  };
-> > > +
-> > > +&blsp1_uart3 {
-> > > +	pinctrl-names = "default";
-> > > +	pinctrl-0 = <&blsp1_uart3_default>;
-> > > +	status = "okay";
-> > > +
-> > > +	bluetooth: wcn3998-bt {
-> > > +		compatible = "qcom,wcn3998-bt";
-> > > +		vddio-supply = <&vreg_l6_1p8>;
-> > > +		vddxo-supply = <&vreg_l5_1p8>;
-> > > +		vddrf-supply = <&vreg_s5_1p35>;
-> > > +		vddch0-supply = <&vdd_ch0_3p3>;
-> > > +		max-speed = <3200000>;
-> > > +	};
-> > > +};
-> > > \ No newline at end of file
-> > 
-> > I think the example isn't really needed since it's essentially the
-> > same as the one for 'qcom,wcn3990-bt'.
-> > 
-> > But the important part is missing: add the new compatible string under
-> > ´Required properties´. You also want to update the documentation that
-> > mentiones 'qcom,wcn3990-bt' to 'qcom,wcn399x-bt' (assuming for now
-> > that other possible WCN399x chips would be similar).
-> > 
-> [Harish] -- Will check the DT properties, documentation and update
-> accordingly in new patch.
-> 
-> > You mentioned in an earlier version of the series that there are
-> > multiple WCN3998 variants with different requirements for
-> > voltage/current. This seems to suggests that multiple compatible
-> > strings are needed to distinguish between them.
-> > 
-> [Harish] -- for now we want to add WCN3998 support only, What i mean to say
-> in my earlier
-> explanation that. WCN3990 is base variant and on top of that we have
-> variants like WCN3990,
-> WCN3998 and WCN3998-0,WCN3998-1 like that..
-> So I think wcn399x would make sense for this series.
-
-If the variants have relevant differences between them (like different
-regulator requirements) I think you want unique names, rather than
-'wcn399x' (I was referring to comments/documentation with this
-string).
-
-If there are variants wouldn't your first 'wcn3998' already be a
-'wcn3998-n'? If 'wcn3998' without suffix is used I think it needs to
-be valid for all 'wcn3998-n' variants (it might be less
-power-efficient though than using the variant specific compatible
-string), otherwise things get confusing (a 'wcn3998-2' isn't a
-'wcn3998'?)
-
-Thanks
-
-Matthias
