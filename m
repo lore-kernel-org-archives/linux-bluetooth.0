@@ -2,118 +2,186 @@ Return-Path: <SRS0=QJP1=RU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A02BC43381
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Mar 2019 20:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A8BC43381
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Mar 2019 22:03:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 658CD217F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Mar 2019 20:41:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552855282;
-	bh=64YO2k1ILxmBV1ysSiRPzA847cIs5p+6I7oU1yJDEyA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=LstTcppYl9n1SZRrwLW6NC/6Uph/6ulCZb97A8RueC4EjMkeJ+4/uf54gHRKI/i10
-	 ppehrao43EOp5dwF8vimqUNc2j/GayfVWO6yRHsDimWnL3hAhkAi80Bj/IRWL01KRZ
-	 UDyspyfNSZ2YqVvA+E5nQrrAPkIzWUOB4DcuK1eI=
+	by mail.kernel.org (Postfix) with ESMTP id A33C02087C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Mar 2019 22:03:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAFkCxNR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726493AbfCQUlV (ORCPT
+        id S1727485AbfCQWDE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 17 Mar 2019 16:41:21 -0400
-Received: from mail-lf1-f53.google.com ([209.85.167.53]:34964 "EHLO
-        mail-lf1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725914AbfCQUlV (ORCPT
+        Sun, 17 Mar 2019 18:03:04 -0400
+Received: from mail-yw1-f54.google.com ([209.85.161.54]:46255 "EHLO
+        mail-yw1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726229AbfCQWDD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 17 Mar 2019 16:41:21 -0400
-Received: by mail-lf1-f53.google.com with SMTP id u21so267469lfu.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Mar 2019 13:41:20 -0700 (PDT)
+        Sun, 17 Mar 2019 18:03:03 -0400
+Received: by mail-yw1-f54.google.com with SMTP id v127so11161686ywe.13
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Mar 2019 15:03:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=PO3jNqZCfjilE8Yx097aTy6Y8RYNf8t+1W3KEZZVyYE=;
-        b=e7zUY0UpSQxwGKLa4sa5QMjSPAD3/r1emUajPMXKEKjI4NMMqd7Zc08L/0bifzLXn+
-         EnZssEos21WcIgfluUwJWlaUn6gtjqT2/QWcqQnSLm5V679pP9MyaAWylI2ImDot0enm
-         hSCmICIbaPLnKz8+Qz5gLWzTviTJXqlqd/Das=
+        bh=zRu6S8IpB6lGJZWJ/EtFth6S6/BRofXPEPqFOJBVEBo=;
+        b=CAFkCxNRo4nrPRZ+Ym78SFWgTZ8hoqN2Y3VyYfARcjgFrQrBN0pgvZv0qBVXvv/YoY
+         i57KYy/8ftPml1QjiCAknueaIGBOO7/kx0z/5ivvBQ3fUiGnCbwv2QvJms60e6EIESOz
+         c2VSBnmj6OOD6ED9li/p85eLzKARH5BfAC8OzEd2CslWfx3ovK4iKG67veYk8QkL10xC
+         8get4x9KxgUy8pXgCEqtEo1y8fVfy9GpjSDD4SdfJYqO5g/+R/M9triYcaYi1L4FncSX
+         K8FK/Wt6kjS2ddB5Cf0zQzGL+8AdTSmYqP/xLVsRLbfjNfwSOOQHLXIX44gSkkDzdUb+
+         PhgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=PO3jNqZCfjilE8Yx097aTy6Y8RYNf8t+1W3KEZZVyYE=;
-        b=ixZiaA8e/8Dho//sbWXy9lT4BBjfY+zhHI51/rRf4hVOs/FGgreIwjhycPPmA1aE1p
-         ldBDDjCQ5+tsrRzq3yXuOvTtHaWpZPI3bneDi319lnGBYvwt0KiXSVne1dwRS4uG0KXn
-         7Gmw7Idq3b3XK4Hx4ncYctzmdzbfyIC1qkJ0sclagU+nguRoR9P28dHMbU42oobFRTUO
-         rOmWYER+oPZjMiCigyABuvuss77zCQHAp/Vo2I+9I/gLkGE7krB8tz15INbZwDRUG/Ba
-         WKESaa48PU9mkKpk3eu6U+BnOYO3hYXcKzUxYK4rvVaZONt39u7RfAc6e2ay01krRfUw
-         awSA==
-X-Gm-Message-State: APjAAAXdxwQ75QZ4s9L/TNdKV1w3xgAGQgydeYOrRpN0nMp9fKsT0+iR
-        ui8Y8swIC68ty0/+4Iq8B4c8cX8IjVc=
-X-Google-Smtp-Source: APXvYqxCUe4D3ST13rPxrZAEoCSEkSZ0S0ASofM9+J5QNr2oCbj8XYRWl5BZfWq5frmZgo8k0fTTqg==
-X-Received: by 2002:a19:40cc:: with SMTP id n195mr8207735lfa.150.1552855278747;
-        Sun, 17 Mar 2019 13:41:18 -0700 (PDT)
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com. [209.85.167.54])
-        by smtp.gmail.com with ESMTPSA id q2sm929105lfj.58.2019.03.17.13.41.17
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 17 Mar 2019 13:41:17 -0700 (PDT)
-Received: by mail-lf1-f54.google.com with SMTP id u21so267436lfu.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Mar 2019 13:41:17 -0700 (PDT)
-X-Received: by 2002:ac2:4203:: with SMTP id y3mr7709582lfh.11.1552855277033;
- Sun, 17 Mar 2019 13:41:17 -0700 (PDT)
+        bh=zRu6S8IpB6lGJZWJ/EtFth6S6/BRofXPEPqFOJBVEBo=;
+        b=R86mfkRyiDKfYVChQqQdez55e93kKkPdxhZehKy/rPklrEY0tzUThiosNYXO8AmVnB
+         nHUFt21lrZpJ9E65mEbEvyHb1xVxdPm76ib2wjU+x6NYSmUUCu4aGqaysbYTWQTlomtp
+         bGNrM09CbNU/uUm0BqaWkD2AHia1tjYDKN2MITGrAYWc7aymhn5h5eBpzzIEKF/WoOP/
+         JY56t6hoewr32pjWhMtwasGJtbZDediMNi4P+T2y8dPsptMwxSnkAiiVrtgBYLgMjdXw
+         5KO0Tr/h99BCF6ZKi9FuAH/rweuWPaivpq/jHtYwAEh8GtugcMU19Nehdqa+z7QZCI92
+         SpIg==
+X-Gm-Message-State: APjAAAWAOi5s+UdM89km1kQ+WO2ypaMAD0q5mnF8Wu1gB6tpR2RchoVF
+        +Gy3MklbkVXSKSuXhys+ui14pw2OhtU3df69hib/8xcV
+X-Google-Smtp-Source: APXvYqw+2vAr4NFjV41u7wPMSOrsQZ64u6p6mBbGujDdA2PGmB2x2ymiZ6itwYuqPxe/qzUjo09OikZo1DyedHO7B4U=
+X-Received: by 2002:a81:6705:: with SMTP id b5mr5617023ywc.31.1552860182828;
+ Sun, 17 Mar 2019 15:03:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <0000000000008a1bce057ede3d13@google.com> <0000000000009950e1058447ef43@google.com>
- <CAHk-=wjUrznUSUKN1AXQA9kCStQ3MHFY95ZmeTZ5zYDcvMhBiQ@mail.gmail.com> <CACT4Y+YOWaU8s90joeGB4G1oc-GxrQSDnjpuFOuE4eJd5FHK3g@mail.gmail.com>
-In-Reply-To: <CACT4Y+YOWaU8s90joeGB4G1oc-GxrQSDnjpuFOuE4eJd5FHK3g@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun, 17 Mar 2019 13:41:01 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj_+ObTogs75N++EigJ5RPpu8GL2ma0jasgJxG+t3oPPQ@mail.gmail.com>
-Message-ID: <CAHk-=wj_+ObTogs75N++EigJ5RPpu8GL2ma0jasgJxG+t3oPPQ@mail.gmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in bacpy
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Michal Marek <mmarek@suse.com>,
-        Netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+References: <CAAu3APbx4njmmBgu4_U=9CEahhK-f8BnhMuAwp0=XgFRZhexvw@mail.gmail.com>
+ <CAAu3APbP02yHgtJE6k4D4iQ4ukFRjQhF3rs0A=jPL-J_DZKZMw@mail.gmail.com> <CABBYNZK5jauJ-9aumBsVgwhdYMpf-sJ5A8726+ms-eP7_PNFtA@mail.gmail.com>
+In-Reply-To: <CABBYNZK5jauJ-9aumBsVgwhdYMpf-sJ5A8726+ms-eP7_PNFtA@mail.gmail.com>
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Sun, 17 Mar 2019 22:02:51 +0000
+Message-ID: <CAAu3APamGb5enNZrKC0HvBMt6Erba2z0YU10BsdkGFZGYzVA_Q@mail.gmail.com>
+Subject: Re: Peripheral notifications not showing up
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Mar 17, 2019 at 10:12 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+Hi Luiz,
+
+Thanks for taking a look at this.
+
+On Tue, 12 Mar 2019 at 13:12, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Please see https://github.com/google/syzkaller/blob/master/docs/syzbot.md#bisection
-> it should answer all of your questions. It does 2 and more.
-> And in this case it seems to be working as intended bisecting it to a
-> release tag.
+> Hi Barry,
+>
+> On Fri, Mar 8, 2019 at 11:20 PM Barry Byford <31baz66@gmail.com> wrote:
+> >
+> > I have tried the same experiment on a Raspberry Pi.
+> >
+> > $ uname -a
+> > Linux raspberrypi 4.14.79-v7+ #1159 SMP Sun Nov 4 17:50:20 GMT 2018
+> > armv7l GNU/Linux
+> >
+> > I ran the peripheral code I have and it worked fine on the Raspberry
+> > Pi. I then rebuilt BlueZ 5.43 and reinstalled it and I see the same
+> > issue with getting notificatins.
+> > That is, reading of the characteristic in the Nordic nRF app on my
+> > phone works. However, when I activate notifications I can see the
+> > status change on the peripheral and the notifications show up on the
+> > DBus. The notifications just don't show up in btmon or on my phone.
+>
+> Perhaps is being blocked somehow, you got the StartNotification I
+> suppose? Please make sure the object path matches otherwise it won't
+> work, you may also check how bluetoothctl does handle notifications
+> since that has been working for a while.
 
-No, it's definitely not working as intended.
+My code is working with the default installation of BlueZ that is on
+the board. The issue is when I build a version of BlueZ on the board
+myself.
+This leads me to believe it is not the code I'm running.
 
-You can see it in the bisect log - you don't actually have a single
-"git bisect bad" outside of the initial one that you start bisecting
-with. That's a pretty good sign of bisection being completely broken.
-Yes, it can happen in theory, but in general with a good bisection,
-you should see about as many "good" results as "bad".
 
-I bet that what's going on is that your initial "let's test every
-release" uses a _different_ process than the actual bisection itself
-does.
 
-So if I were you, I'd look at what syzbot does differently during
-bisection vs what it does for that initial "test each release". For
-example, does it do "make clean" in between each build in one case,
-but not the other? Does it do "make oldconfig" vs a fixed config
-generated from scratch every time? Because the fact that you first
-tested 4.10 bad using the "test each release", and then when you do
-bisection, the very commit *before* 4.10 is good (the only difference
-being the EXTRAVERSION and the tag) shows that something went wrong.
+>
+> > Does anyone have any suggestions of how I can debug this?
+>
+> The usual btmon traces and bluetoothd debug logs are normally a good
+> idea to share since there could be some bug, though Ive been testing
+> this regularly with bluetoothctl and that has been stable for a while,
+> at least on master that is.
+>
 
-                      Linus
+Here are the logs.
+https://gist.github.com/ukBaz/b8317f2d76acc6dbf844c2713555974e
+To my untrained eye it looks like the notification is started but it
+never shows up. In the dbus-monitor output below, the notifications
+are on the dbus. I can't tell where they are going missing between the
+dbus and bluetoothd.
+
+
+> > Thanks,
+> > Barry
+> >
+> >
+> > On Wed, 6 Mar 2019 at 22:37, Barry Byford <31baz66@gmail.com> wrote:
+> > >
+> > > Hello,
+> > >
+> > > I have a system that comes with BlueZ 5.43 installed on a single board
+> > > computer (SBC). I have downloaded, built and installed various newer
+> > > versions of BlueZ but I am having problems getting them working
+> > > correctly.
+> > >
+> > > I have a peripheral (very similar to the gatt server example in the
+> > > test directory) with one characteristic. My example was working before
+> > > upgrading. However after upgrading, when I turn on notification for
+> > > the characteristic it is not showing on the phone.
+> > >
+> > > I do see the notification turn up in dbus-monitor but not in btmon.
+> > >
+> > > signal time=1551910979.743011 sender=:1.38 -> destination=(null
+> > > destination) serial=339 path=/ukBaz/bluezero/service0001/char0001;
+> > > interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
+> > >    string "org.bluez.GattCharacteristic1"
+> > >    array [
+> > >       dict entry(
+> > >          string "Value"
+> > >          variant             array of bytes [
+> > >                78 14
+> > >             ]
+> > >       )
+> > >    ]
+> > >    array [
+> > >    ]
+> > >
+> > > I have tried going back to version 5.43 again but now that is not
+> > > working either.
+> > >
+> > > The configure I ran was:
+> > > ./configure --prefix=/usr \
+> > >             --mandir=/usr/share/man \
+> > >             --sysconfdir=/etc \
+> > >             --localstatedir=/var \
+> > >             --enable-experimental \
+> > >             --enable-maintainer-mode
+> > >
+> > >
+> > > To get configure to work without error I needed to install the following:
+> > > sudo apt install glib2.
+> > > sudo apt install libdbus-1-dev libudev-dev libical-dev libreadline-dev
+> > >
+> > > I have tried various variations on this and done a lot of searching
+> > > but don't seem to find an answer.
+> > > Is anyone else seeing this issue?
+> > > Anyone have any suggestions as what I could try?
+> > >
+> > > Thanks in advance,
+> > > Barry
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
