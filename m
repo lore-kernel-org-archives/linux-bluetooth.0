@@ -2,67 +2,124 @@ Return-Path: <SRS0=9Smc=RV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7427C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 17:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE659C43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 18:02:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A108420863
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 17:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B1D920863
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 18:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726914AbfCRRRl convert rfc822-to-8bit (ORCPT
+        id S1727210AbfCRSCm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Mar 2019 13:17:41 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:32905 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726626AbfCRRRl (ORCPT
+        Mon, 18 Mar 2019 14:02:42 -0400
+Received: from mailgw01.mediatek.com ([210.61.82.183]:9362 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727113AbfCRSCk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Mar 2019 13:17:41 -0400
-Received: from marcel-macpro.fritz.box (p4FEFC449.dip0.t-ipconnect.de [79.239.196.73])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0EF0ECF174;
-        Mon, 18 Mar 2019 18:25:40 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v1 0/3] add module_sdio_driver and enable a few users
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <cover.1552510141.git.sean.wang@mediatek.com>
-Date:   Mon, 18 Mar 2019 18:17:39 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, ulf.hansson@linaro.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D233C009-8EA4-4C47-9CB3-A26C74C200D1@holtmann.org>
-References: <cover.1552510141.git.sean.wang@mediatek.com>
-To:     sean.wang@mediatek.com
-X-Mailer: Apple Mail (2.3445.102.3)
+        Mon, 18 Mar 2019 14:02:40 -0400
+X-UUID: fb778ddcda1c47c6892f8acbfe23e1f8-20190319
+X-UUID: fb778ddcda1c47c6892f8acbfe23e1f8-20190319
+Received: from mtkmrs01.mediatek.inc [(172.21.131.159)] by mailgw01.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 1653476042; Tue, 19 Mar 2019 02:02:33 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by
+ mtkmbs02n2.mediatek.inc (172.21.101.101) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Tue, 19 Mar 2019 02:02:31 +0800
+Received: from [172.21.77.33] (172.21.77.33) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Tue, 19 Mar 2019 02:02:31 +0800
+Message-ID: <1552932151.24944.12.camel@mtkswgap22>
+Subject: Re: [PATCH] Bluetooth: mediatek: fix uninitialized symbol errors in
+ btmtksdio_rx_packet
+From:   Sean Wang <sean.wang@mediatek.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     Johan Hedberg <johan.hedberg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Date:   Tue, 19 Mar 2019 02:02:31 +0800
+In-Reply-To: <93CB6259-6FB8-4D3D-9FF3-8EB59499A6A1@holtmann.org>
+References: <8fb8e6840a39127112597963d665fbe6c21d8b91.1552509647.git.sean.wang@mediatek.com>
+         <93CB6259-6FB8-4D3D-9FF3-8EB59499A6A1@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
+Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+X-TM-SNTS-SMTP: 4B749FC33B091D298E4652708FFE71F44A75E42ED23B674999364EEAF587ABDF2000:8
+X-MTK:  N
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
-
-> Add module_sdio_driver exactly like the function module_usb_drivear offers to
-> and enable a few users to eliminate a few lines of boilerplate code per SDIO
-> driver.
+On Mon, 2019-03-18 at 17:55 +0100, Marcel Holtmann wrote:
+> Hi Sean,
 > 
-> Sean Wang (3):
->  mmc: sdio: Add helper macro for sdio_driver boilerplate
->  Bluetooth: mediatek: Use module_sdio_driver helper
->  Bluetooth: btsdio: Use module_sdio_driver helper
+> > Fixed all the below warnings. They would probably cause the following
+> > error handling path would use the uninitialized value and then produce
+> > unexpected behavior.
+> > 
+> > drivers/bluetooth/btmtksdio.c:470:2: warning: ‘old_len’ may be used
+> > uninitialized in this function [-Wmaybe-uninitialized]
+> >  print_hex_dump(KERN_ERR, "err sdio rx: ", DUMP_PREFIX_NONE, 4, 1,
+> >  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >          old_data, old_len, true);
+> >          ~~~~~~~~~~~~~~~~~~~~~~~~
+> > drivers/bluetooth/btmtksdio.c:376:15: note: ‘old_len’ was declared here
+> >  unsigned int old_len;
+> >               ^~~~~~~
+> > drivers/bluetooth/btmtksdio.c:470:2: warning: ‘old_data’ may be used
+> > uninitialized in this function [-Wmaybe-uninitialized]
+> >  print_hex_dump(KERN_ERR, "err sdio rx: ", DUMP_PREFIX_NONE, 4, 1,
+> >  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >          old_data, old_len, true);
+> >          ~~~~~~~~~~~~~~~~~~~~~~~~
+> > drivers/bluetooth/btmtksdio.c:375:17: note: ‘old_data’ was declared here
+> >  unsigned char *old_data;
+> >                 ^~~~~~~~
+> > 
+> > Fixes: d74eef2834b5 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
+> > Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> > Reported-by: Marcel Holtmann <marcel@holtmann.org>
+> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> > ---
+> > drivers/bluetooth/btmtksdio.c | 4 ++--
+> > 1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> > index b4b8320f279e..23cf63888bac 100644
+> > --- a/drivers/bluetooth/btmtksdio.c
+> > +++ b/drivers/bluetooth/btmtksdio.c
+> > @@ -372,8 +372,8 @@ static int btmtksdio_rx_packet(struct btmtksdio_dev *bdev, u16 rx_size)
+> > 	const struct h4_recv_pkt *pkts = mtk_recv_pkts;
+> > 	int pkts_count = ARRAY_SIZE(mtk_recv_pkts);
+> > 	struct mtkbtsdio_hdr *sdio_hdr;
+> > -	unsigned char *old_data;
+> > -	unsigned int old_len;
+> > +	unsigned char *old_data = NULL;
+> > +	unsigned int old_len = 0;
+> > 	int err, i, pad_size;
+> > 	struct sk_buff *skb;
+> > 	u16 dlen;
 > 
-> drivers/bluetooth/btmtksdio.c | 15 +--------------
-> drivers/bluetooth/btsdio.c    | 15 +--------------
-> include/linux/mmc/sdio_func.h | 12 ++++++++++++
-> 3 files changed, 14 insertions(+), 28 deletions(-)
+> or instead just remove this whole old_len + old_data stuff anyway since it is rather pointless. Or at least introduce a proper error path for sdio_readsb since you know when it fails, there is no point in writing the SKB.
+> 
+> Regards
+> 
 
-all 3 patches have been applied to bluetooth-next tree.
+I will remove the old_len and old_data in the next version for the issue
+because the error path for sdio_readsb seems wrong.
 
-Regards
+My initial purpose is that I would like to add a error path for these
+packets which are successful at sdio_readsb but fail at packet format
+parsing. I will update the error path for packet format error in
+a separate patch.
 
-Marcel
+> Marcel
+> 
+
 
