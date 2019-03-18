@@ -2,70 +2,100 @@ Return-Path: <SRS0=9Smc=RV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19600C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 07:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D86C43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 10:27:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D86DF20828
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 07:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0405520850
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 10:27:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZlmwK8ZT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727146AbfCRHtX convert rfc822-to-8bit (ORCPT
+        id S1727174AbfCRK1e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Mar 2019 03:49:23 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:57066 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726973AbfCRHtX (ORCPT
+        Mon, 18 Mar 2019 06:27:34 -0400
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:35573 "EHLO
+        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726922AbfCRK1e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Mar 2019 03:49:23 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 8E9A3284F5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Mar 2019 07:49:22 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 833E42850F; Mon, 18 Mar 2019 07:49:22 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 202963] [REGRESSION][BISECTED] Bluetooth broken on MBP and
- kernel NULL pointer dereference
-Date:   Mon, 18 Mar 2019 07:49:20 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: ronald@innovation.ch
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_regression
-Message-ID: <bug-202963-62941-WC3eoVunjI@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-202963-62941@https.bugzilla.kernel.org/>
-References: <bug-202963-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 18 Mar 2019 06:27:34 -0400
+Received: by mail-ua1-f68.google.com with SMTP id f88so5101855uaf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Mar 2019 03:27:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lPyOpFuMDYq4nVQxiuoCiGmNqu8kfSEGuu3G7u9/04I=;
+        b=ZlmwK8ZTedkD69h3AIUH3+6UQxc9c5+1UGdALtLAbHTb9xW/Rokv7istg6o12o1dM3
+         gozk1Wo9DaR8VIR9c3PnYAImnjIr4fmYA10KRRFEKF/ZpfYq+nSHInGNx9YbjXvhKvYd
+         unmICB7Z8Dfy/tgaFtMIOg6ajrcf5my73OC6evxhCBfyInlXRXBV+ToFhqks6RJOsUpe
+         hIuVOezObYzpT4hziDqoqDZ+pWvyOJ6FdDiiR1sxhTIBdToUGMGSq4lPz4WqhHtXlIqF
+         PPWSOE0KpC9yZCZi3YL7FV2k+gQuTiTD3RJQs8Tqds3fEf2t8ycGBiQWEbwMCBPZZLjs
+         8ayA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lPyOpFuMDYq4nVQxiuoCiGmNqu8kfSEGuu3G7u9/04I=;
+        b=FV4gyt1LjXqIJ59BJTnGItGShN6W3cOD1WfSqGn2MwLs/ROjEjnepkR2yZtq+pJI/B
+         Rw2ih/UxPzvD26CMHYF3f88GGhSFMsqkpKbXIVZZxBpNGrPpk6TIzyesx5HWfidKpiZy
+         FWKzq/LCqSl2ZCoPe6QCqpVLCjljDuFzQ12MjYu/tWOEXsuh/gVhm/wiMLf7ptL27AVm
+         x/qHEP1c08gQDmcfwgSMeYbYyRhh4w193HBWxf0UX0yDOyjqeqpIUNCY68AhF3014qKX
+         Yv+uekWFjFz5mYQ9rrJfpCFMa30pqughxcgusCaR4KD0sPHM3xmy9tdgh5uhRrq7lYeH
+         lfvg==
+X-Gm-Message-State: APjAAAX1D/zvyuFnkNn5jgw8qyCVluUvW+rafAuOGMPif7Uv5jjKqioI
+        HVnl5H1Ys5KXB0j+lv4iuSJZxr415vSKneYOVkRqrg==
+X-Google-Smtp-Source: APXvYqz4NUV0yEUGJvFAljzdalJQ3kRZfNv4ZY7YMUE0h1DYeEH4XaWl+YgSXusbE85cHZey+iZRC0OYn25rXC9+KWo=
+X-Received: by 2002:ab0:7782:: with SMTP id x2mr5359252uar.120.1552904853345;
+ Mon, 18 Mar 2019 03:27:33 -0700 (PDT)
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+References: <cover.1552510141.git.sean.wang@mediatek.com>
+In-Reply-To: <cover.1552510141.git.sean.wang@mediatek.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Mon, 18 Mar 2019 11:26:57 +0100
+Message-ID: <CAPDyKFrvZQBXYU3T=pPYYyx1TEu26U8Z3Nky+n5p8rfkxCqtKw@mail.gmail.com>
+Subject: Re: [PATCH v1 0/3] add module_sdio_driver and enable a few users
+To:     Sean Wang <sean.wang@mediatek.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=202963
+On Wed, 13 Mar 2019 at 22:02, <sean.wang@mediatek.com> wrote:
+>
+> From: Sean Wang <sean.wang@mediatek.com>
+>
+> Add module_sdio_driver exactly like the function module_usb_drivear offers to
+> and enable a few users to eliminate a few lines of boilerplate code per SDIO
+> driver.
+>
+> Sean Wang (3):
+>   mmc: sdio: Add helper macro for sdio_driver boilerplate
+>   Bluetooth: mediatek: Use module_sdio_driver helper
+>   Bluetooth: btsdio: Use module_sdio_driver helper
+>
+>  drivers/bluetooth/btmtksdio.c | 15 +--------------
+>  drivers/bluetooth/btsdio.c    | 15 +--------------
+>  include/linux/mmc/sdio_func.h | 12 ++++++++++++
+>  3 files changed, 14 insertions(+), 28 deletions(-)
+>
+> --
+> 2.18.0
+>
 
-Ronald (ronald@innovation.ch) changed:
+For series:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-         Regression|No                          |Yes
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Kind regards
+Uffe
