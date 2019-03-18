@@ -2,100 +2,121 @@ Return-Path: <SRS0=9Smc=RV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D86C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 10:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CACBEC43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 10:29:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0405520850
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 10:27:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZlmwK8ZT"
+	by mail.kernel.org (Postfix) with ESMTP id A28D420850
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 10:29:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727174AbfCRK1e (ORCPT
+        id S1727239AbfCRK3V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Mar 2019 06:27:34 -0400
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:35573 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726922AbfCRK1e (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Mar 2019 06:27:34 -0400
-Received: by mail-ua1-f68.google.com with SMTP id f88so5101855uaf.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Mar 2019 03:27:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lPyOpFuMDYq4nVQxiuoCiGmNqu8kfSEGuu3G7u9/04I=;
-        b=ZlmwK8ZTedkD69h3AIUH3+6UQxc9c5+1UGdALtLAbHTb9xW/Rokv7istg6o12o1dM3
-         gozk1Wo9DaR8VIR9c3PnYAImnjIr4fmYA10KRRFEKF/ZpfYq+nSHInGNx9YbjXvhKvYd
-         unmICB7Z8Dfy/tgaFtMIOg6ajrcf5my73OC6evxhCBfyInlXRXBV+ToFhqks6RJOsUpe
-         hIuVOezObYzpT4hziDqoqDZ+pWvyOJ6FdDiiR1sxhTIBdToUGMGSq4lPz4WqhHtXlIqF
-         PPWSOE0KpC9yZCZi3YL7FV2k+gQuTiTD3RJQs8Tqds3fEf2t8ycGBiQWEbwMCBPZZLjs
-         8ayA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lPyOpFuMDYq4nVQxiuoCiGmNqu8kfSEGuu3G7u9/04I=;
-        b=FV4gyt1LjXqIJ59BJTnGItGShN6W3cOD1WfSqGn2MwLs/ROjEjnepkR2yZtq+pJI/B
-         Rw2ih/UxPzvD26CMHYF3f88GGhSFMsqkpKbXIVZZxBpNGrPpk6TIzyesx5HWfidKpiZy
-         FWKzq/LCqSl2ZCoPe6QCqpVLCjljDuFzQ12MjYu/tWOEXsuh/gVhm/wiMLf7ptL27AVm
-         x/qHEP1c08gQDmcfwgSMeYbYyRhh4w193HBWxf0UX0yDOyjqeqpIUNCY68AhF3014qKX
-         Yv+uekWFjFz5mYQ9rrJfpCFMa30pqughxcgusCaR4KD0sPHM3xmy9tdgh5uhRrq7lYeH
-         lfvg==
-X-Gm-Message-State: APjAAAX1D/zvyuFnkNn5jgw8qyCVluUvW+rafAuOGMPif7Uv5jjKqioI
-        HVnl5H1Ys5KXB0j+lv4iuSJZxr415vSKneYOVkRqrg==
-X-Google-Smtp-Source: APXvYqz4NUV0yEUGJvFAljzdalJQ3kRZfNv4ZY7YMUE0h1DYeEH4XaWl+YgSXusbE85cHZey+iZRC0OYn25rXC9+KWo=
-X-Received: by 2002:ab0:7782:: with SMTP id x2mr5359252uar.120.1552904853345;
- Mon, 18 Mar 2019 03:27:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1552510141.git.sean.wang@mediatek.com>
-In-Reply-To: <cover.1552510141.git.sean.wang@mediatek.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Mon, 18 Mar 2019 11:26:57 +0100
-Message-ID: <CAPDyKFrvZQBXYU3T=pPYYyx1TEu26U8Z3Nky+n5p8rfkxCqtKw@mail.gmail.com>
-Subject: Re: [PATCH v1 0/3] add module_sdio_driver and enable a few users
-To:     Sean Wang <sean.wang@mediatek.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 18 Mar 2019 06:29:21 -0400
+Received: from mga17.intel.com ([192.55.52.151]:27212 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726813AbfCRK3V (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 18 Mar 2019 06:29:21 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 03:29:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,493,1544515200"; 
+   d="scan'208";a="132530937"
+Received: from spoorthi-h97m-d3h.iind.intel.com ([10.223.96.21])
+  by fmsmga008.fm.intel.com with ESMTP; 18 Mar 2019 03:29:19 -0700
+From:   SpoorthiX K <spoorthix.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Add support for LE ping feature
+Date:   Mon, 18 Mar 2019 16:07:05 +0530
+Message-Id: <1552905425-24048-1-git-send-email-spoorthix.k@intel.com>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 13 Mar 2019 at 22:02, <sean.wang@mediatek.com> wrote:
->
-> From: Sean Wang <sean.wang@mediatek.com>
->
-> Add module_sdio_driver exactly like the function module_usb_drivear offers to
-> and enable a few users to eliminate a few lines of boilerplate code per SDIO
-> driver.
->
-> Sean Wang (3):
->   mmc: sdio: Add helper macro for sdio_driver boilerplate
->   Bluetooth: mediatek: Use module_sdio_driver helper
->   Bluetooth: btsdio: Use module_sdio_driver helper
->
->  drivers/bluetooth/btmtksdio.c | 15 +--------------
->  drivers/bluetooth/btsdio.c    | 15 +--------------
->  include/linux/mmc/sdio_func.h | 12 ++++++++++++
->  3 files changed, 14 insertions(+), 28 deletions(-)
->
-> --
-> 2.18.0
->
+From: SpoorthiX <spoorthix.k@intel.com>
 
-For series:
+Changes made to add HCI Write Authenticated Payload timeout
+command for LE Ping feature.
+As per the Core Specification 5.0 Volume 2 Part E Section 7.3.94,
+the following code changes implements
+HCI Write Authenticated Payload timeout command for LE Ping feature.
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+Signed-off-by: SpoorthiX <spoorthix.k@intel.com>
+---
+ include/net/bluetooth/hci.h |  7 +++++++
+ net/bluetooth/hci_event.c   | 21 +++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-Kind regards
-Uffe
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c36dc1e..ec37c19 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1130,6 +1130,13 @@ struct hci_cp_write_sc_support {
+ 	__u8	support;
+ } __packed;
+ 
++#define HCI_OP_WRITE_AUTH_PAYLOAD_TO    0x0c7c
++struct hci_cp_write_auth_payload_to {
++        __u16     conn_handle;
++        __u16      timeout;
++} __packed;
++
++
+ #define HCI_OP_READ_LOCAL_OOB_EXT_DATA	0x0c7d
+ struct hci_rp_read_local_oob_ext_data {
+ 	__u8     status;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 609fd68..ae14927 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -38,6 +38,7 @@
+ 
+ #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+ 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
++#define AUTHENTICATED_PAYLOAD_TIMEOUT 0x0BB8
+ 
+ /* Handle HCI Event packets */
+ 
+@@ -4815,6 +4816,22 @@ static void hci_disconn_phylink_complete_evt(struct hci_dev *hdev,
+ }
+ #endif
+ 
++static void hci_write_auth_payload_to (struct hci_dev *hdev, struct hci_conn *conn)
++{
++        struct hci_cp_write_auth_payload_to cp;
++
++        /* Check for existing LE link established between local
++         * and remote device, also check the controller capability
++         * for LE Ping.
++         */
++        if ((conn->type == LE_LINK) && (lmp_ping_capable(hdev)))  {
++                cp.conn_handle = cpu_to_le16(conn->handle);
++                cp.timeout = AUTHENTICATED_PAYLOAD_TIMEOUT;
++                hci_send_cmd(conn->hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO,
++			sizeof(cp), &cp);
++        }
++}
++
+ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 			bdaddr_t *bdaddr, u8 bdaddr_type, u8 role, u16 handle,
+ 			u16 interval, u16 latency, u16 supervision_timeout)
+@@ -4972,6 +4989,10 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 		}
+ 	}
+ 
++         /* Set the default Authenticated Payload Timeout after
++          * an LE Link is established.
++          */
++	hci_write_auth_payload_to (hdev, conn);
+ unlock:
+ 	hci_update_background_scan(hdev);
+ 	hci_dev_unlock(hdev);
+-- 
+1.9.1
+
