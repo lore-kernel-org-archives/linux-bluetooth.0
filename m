@@ -2,142 +2,162 @@ Return-Path: <SRS0=3ySR=RW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09373C10F03
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 13:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BBCC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 14:04:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD3ED2147C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 13:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553002324;
-	bh=00f92TBP02CkJzEsfgi5CmTWd49OFGx2hMC1U15IiTg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=dRCu4mI6CkQhXQzE0+F8BdsEYVHC2TPH/WBUNhxMzKsHVQOQFtp+p4sdpBMvsYspO
-	 oxryO3P2nKozvddNKftmQnIRkxDIQj91T0uAiNm/qjUYQvg3v5urPI/Ocp+lSd7OOr
-	 DHplv9aNIXVz17Z0LJfa0LPDp4T13JS3B8AXFxO4=
+	by mail.kernel.org (Postfix) with ESMTP id 31E172075E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 14:04:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="KUHrYCHy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727243AbfCSNb7 (ORCPT
+        id S1726661AbfCSOEL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Mar 2019 09:31:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52538 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726876AbfCSNb7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Mar 2019 09:31:59 -0400
-Received: from earth.universe (dyndsl-091-096-044-185.ewe-ip-backbone.de [91.96.44.185])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F1DBA2083D;
-        Tue, 19 Mar 2019 13:31:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553002318;
-        bh=00f92TBP02CkJzEsfgi5CmTWd49OFGx2hMC1U15IiTg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SdgWxAl7L8PFrQWFiGgsNPDR9mgXfa/e0TZoL0BrKgmXyn0TK6ulCNE6H33vhy+eF
-         yoJn5d41cVXLVj645syk1UtAQaOkRhxggnjq7AOYnTmZTbpELpdN2cHDF/GrHEEmcY
-         +OVt7jBkCnrkUcQ8vmc6JKYz7pPoav+BmJPE0D2A=
-Received: by earth.universe (Postfix, from userid 1000)
-        id 16D5C3C086A; Tue, 19 Mar 2019 14:31:55 +0100 (CET)
-Date:   Tue, 19 Mar 2019 14:31:55 +0100
-From:   Sebastian Reichel <sre@kernel.org>
-To:     Hans Verkuil <hverkuil@xs4all.nl>
-Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Tony Lindgren <tony@atomide.com>,
-        Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pavel Machek <pavel@ucw.cz>, linux-bluetooth@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
-Message-ID: <20190319133154.7tbfafy7pguzw2tk@earth.universe>
-References: <20181221011752.25627-1-sre@kernel.org>
- <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
+        Tue, 19 Mar 2019 10:04:11 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.20]:14710 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726573AbfCSOEL (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 19 Mar 2019 10:04:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1553004245;
+        s=strato-dkim-0002; d=gerhold.net;
+        h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=6g6vRDYHBX5z0y7MblRJQaxAZs5oqEt3D/41qsYr0rM=;
+        b=KUHrYCHyPTf7OhHSTspm6rWldV4mbeX9UrhjuvDxsCxLqOIg0njrhMlAIiDMKh4F2Y
+        Qy9Okrv7ZtlRP+HXWI0D+msPjfvfs7hqXSk4N+Gxoe9/Kzmjv1DNOIV+J8+NCkzkZKQ6
+        MWayQ2xKoKMxjTxiq/xWhe/Ahm7qQXkHv9AJaxak+4uF37az3E6RDmvNwy/4WMDomfI0
+        YJ93YfHhN5K1EEAbfzQWQfP7dNIWCMDWqJas/t0o/AUTYNSLfVNHJjP8raJfJDHwyzlK
+        6YZEg3NIGeCooMlERbVTUlrz07K0Ohq/TzrNbVdnxDECqjFhcB0mJz8jWEHem4prsJ8b
+        kfnA==
+X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVOQ/OcYgojyw4j34+u266EZF6ORJKA0/up1VN"
+X-RZG-CLASS-ID: mo00
+Received: from gerhold.net
+        by smtp.strato.de (RZmta 44.16 AUTH)
+        with ESMTPSA id k0bbe4v2JE44LbI
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Tue, 19 Mar 2019 15:04:04 +0100 (CET)
+Date:   Tue, 19 Mar 2019 15:03:56 +0100
+From:   Stephan Gerhold <stephan@gerhold.net>
+To:     Ferry Toth <ftoth@exalondelft.nl>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/2] Bluetooth: btbcm: Add default address for BCM2076B1
+Message-ID: <20190319140356.GA1076@gerhold.net>
+References: <20190305130901.56660-1-stephan@gerhold.net>
+ <20190305130901.56660-2-stephan@gerhold.net>
+ <7b48753f-f103-f522-68c5-38479feb4552@exalondelft.nl>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="62zbunq3ffyszqqd"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <7b48753f-f103-f522-68c5-38479feb4552@exalondelft.nl>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi,
 
---62zbunq3ffyszqqd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry for the late response. I've been quite busy lately...
 
-Hi Hans,
+On Tue, Mar 05, 2019 at 07:26:14PM +0100, Ferry Toth wrote:
+> 
+> Op 05-03-19 om 14:09 schreef Stephan Gerhold:
+> > BCM2076B1 appears to use 20:76:A0:00:56:79 as default address.
+> > This address is used by at least 5 devices with the AMPAK AP6476
+> > module and is also suspicious because it starts with the chip name
+> > 2076 (followed by a different revision A0 for some reason).
+> With BCM43340 (Edison) it's the same principle. With the fake address I
+> found everything (in user space) seems to work except PAN/NAP (bnep) and no
+> decent error message anywhere making this quite hard to debug.
 
-On Thu, Mar 14, 2019 at 09:20:10AM +0100, Hans Verkuil wrote:
-> On 12/21/18 2:17 AM, Sebastian Reichel wrote:
-> > This moves all remaining users of the legacy TI_ST driver to hcill (pat=
-ches
-> > 1-3). Then patches 4-7 convert wl128x-radio driver to a standard platfo=
-rm
-> > device driver with support for multiple instances. Patch 7 will result =
-in
-> > (userless) TI_ST driver no longer supporting radio at runtime. Patch 8-=
-11 do
-> > some cleanups in the wl128x-radio driver. Finally patch 12 removes the =
-TI_ST
-> > specific parts from wl128x-radio and adds the required infrastructure t=
-o use it
-> > with the serdev hcill driver instead. The remaining patches 13 and 14 r=
-emove
-> > the old TI_ST code.
-> >=20
-> > The new code has been tested on the Motorola Droid 4. For testing the a=
-udio
-> > should be configured to route Ext to Speaker or Headphone. Then you nee=
-d to
-> > plug headphone, since its cable is used as antenna. For testing there i=
-s a
-> > 'radio' utility packages in Debian. When you start the utility you need=
- to
-> > specify a frequency, since initial get_frequency returns an error:
->=20
-> What is the status of this series?
->
-> Based on some of the replies (from Adam Ford in particular) it appears th=
-at
-> this isn't ready to be merged, so is a v2 planned?
+Not familiar with PAN/NAP, but the main reason to avoid default 
+addresses is that they will cause issues as soon as you have two of 
+those devices next to each other.
 
-Yes, a v2 is planned, but I'm super busy at the moment. I don't
-expect to send something for this merge window. Neither LogicPD
-nor IGEP use FM radio, so I can just remove FM support from the
-TI_ST framework. Converting those platforms to hci_ll can be done
-in a different patchset.
+> > Add it to the list of default addresses and leave it up to the
+> > user to configure a valid one.
+> 
+> Which way is the user supposed to configure the valid one?
+> 
 
-If that was the only issue there would be a v2 already. But Marcel
-Holtmann suggested to pass the custom packet data through the BT
-subsystem, which is non-trivial (at least for me) :)
+It took me a while to figure this out - there is not much 
+documentation for this. The following is only based on my own 
+investigations:
 
--- Sebastian
+As far as the kernel is concerned, HCI_QUIRK_INVALID_BDADDR is exposed 
+through the btmgmt API [1]. With the quirk, the BT controller will 
+appear as "unconfigured" controller to userspace, and will have the 
+public address as missing option. As soon as the address is configured 
+with the "Set Public Address Command", the unconfigured controller is
+removed and replaced with a regular controller.
+  Only then it will be usable through bluetoothd.
 
---62zbunq3ffyszqqd
-Content-Type: application/pgp-signature; name="signature.asc"
+The btmgmt API has to be controlled from user space.
+As far as I know, the only tool in bluez to set the public address
+is the "btmgmt" tool:
 
------BEGIN PGP SIGNATURE-----
+  btmgmt -i hci0 public-addr xx:xx:xx:xx:xx:xx
 
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlyQ70QACgkQ2O7X88g7
-+prWdA//Vy7zc3RwtOPcf8fnZpZi5XJmJWA/+h15XD1lwsVp6xBaiIgxbY9/VLjy
-7k4qGuFaGVP73+QBEVgPSZKXKAqIAu4ZKTnjbrpOQIO7TPcffKWHjz9Hjy9Uh48T
-w6Q+wckAzamw93W2Uq6MITl7yIdUTLvk698fWZe/iD96jL7SORvbyLpWwpQztH/J
-z1iYvIzafWUr+VkjmqaSteTwl0gC+L7prdyk4DQHWLtn4Ty5AwgsYkvfqaXju0vm
-gW73gYoFvtFJN1uOf349P20mNYbkCi25llV9tbx1FmfKbwHVLWLGWy35+yVG9sUt
-/NjzFQDJrFjvuGtVkAIQJH7yX3WlMjl6tce4xqiuKcuXp12AJMOrt9nrku8sxc8I
-wuU7F+R9l8yb7jHdWkYYQZcyU31szc9XfmcEyEBPgI2o++i0K4/BDB6rw2dtq9N4
-aM9omX45PZirFKW91zAy85soHpBINWI/pYbS3d2tNeRUnxpzOqnbSmgZvYmgj1T1
-Qy5zWEK4Db4gy27znrGfGlC6D+bPA1SJ063ZBfugv49Il5NpBRBV7bnan0rDO5+Z
-mZURZio8SIX3CY1YnIK694LqOG1adtZns6ioUuA5tPK+T8NkiWHyRA4uHQ4IRFbA
-HVxGiuwsqS5eWwuSJEP8A5mTqT2co8Ez4Y6mBtC2Pdzwt6V5RE0=
-=iW+w
------END PGP SIGNATURE-----
+... will run the "Set Public Address Command" described above.
 
---62zbunq3ffyszqqd--
+However, it was mentioned several times that "btmgmt" is not
+a "stable" tool. In other words, it is not installed by default
+and is only intended for debugging. It may change any time.
+
+There was a related discussion on IRC recently: (I was not involved)
+
+  10:50 <Mis012[m]> sjanc: do I need to convince my distro to package 
+        btmgmt, or will you revert that commit?
+  10:51 <sjanc> Mis012[m]: I'd ask holtmann about this :) but btmgmt 
+        was more like testing tool than real end user tool
+        (ie, no manpages, rather ad-hoc design and command set etc
+  10:53 <sjanc> Mis012[m]: but if you really need this feature,
+        I'd consider starting discussion on mailing list
+        on how this could be handled by bluetoothd
+  10:53 <sjanc> as mentioned, this could be in plugin,
+        either common plugin or maybe platform specific,
+        which would set public address via mgmt api
+  10:54 <sjanc> open point is how bluetootd would extract public address, 
+        which is always platform specific
+  10:55 <holtmann> Mis012[m]: btmgmt is not a stable tool.
+  10:55 <Mis012[m]> holtmann: but it's the only one which can do this
+  10:56 <holtmann> Then add support to bluetoothd for it or do it via an 
+        external tool / daemon. I wrote a long post to the mailing list 
+        about that.
+
+I have such an external daemon for Android (since it does not use bluez) 
+at [2]. It would be easy to refactor it to something more portable.
+
+[1]: https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt
+[2]: https://github.com/me176c-dev/android_device_asus_K013/blob/lineage-16.0/bluetooth/bdaddr.c
+
+> The only way I found is bd_addr (tool from bluez that is not normally
+> built/installed).
+> 
+> Using this tool requires hci0 to be up and bluetoothd to be restarted if
+> that was already running, which is quite inconvenient.
+> 
+
+bdaddr does not use the btmgmt API. It sends vendor-specific commands to 
+the HCI interface. This might be the reason why you need to restart 
+bluetoothd.
+
+With HCI_QUIRK_INVALID_BDADDR set, the BT controller should not show up
+at all in bluetoothctl until its public address is configured.
+It does not matter if bluetoothd is started too early.
+
+> I also saw there was a patch to put the address in dt.
+> 
+> But nowhere did I find a kernel parameter to pass the address. Did I miss
+> something?
+> 
+
+I'm not familiar with setting the address from DT/kernel parameters. 
+Sorry :(
