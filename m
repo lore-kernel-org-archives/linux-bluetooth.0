@@ -1,195 +1,126 @@
-Return-Path: <SRS0=9Smc=RV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=3ySR=RW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB04C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 22:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A005FC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 00:49:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D91B2171F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Mar 2019 22:17:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BF7220989
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 00:49:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMvmNYQF"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="h9jZDqw3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727148AbfCRWRa (ORCPT
+        id S1726487AbfCSAtx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Mar 2019 18:17:30 -0400
-Received: from mail-yw1-f42.google.com ([209.85.161.42]:40509 "EHLO
-        mail-yw1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726973AbfCRWRa (ORCPT
+        Mon, 18 Mar 2019 20:49:53 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:35709 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726579AbfCSAtx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Mar 2019 18:17:30 -0400
-Received: by mail-yw1-f42.google.com with SMTP id p64so10972542ywg.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Mar 2019 15:17:29 -0700 (PDT)
+        Mon, 18 Mar 2019 20:49:53 -0400
+Received: by mail-qt1-f193.google.com with SMTP id h39so20296281qte.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Mar 2019 17:49:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=IrUzAh37ZYp34y3zguSKDwMSiB6crDVsGvoePFOq830=;
-        b=SMvmNYQFp0eeoKxgYk8MB+Bb3LQ2CLMzHaVXPigHoVHSbA6KQr4SD7UiUwvUTe5qnh
-         EkeGq1NYyrJVQ1fyt1rnybkftVTsJEWuZRqBJAQbX9fok5xVVDVgb25Z74j4evn6ZtEO
-         FWk0omfjsJRT3ELBsF5+YYAWd9jJvx02GYi6fsu8u2G2I7m2TmvCscVO4n8WZzwxsMmm
-         dDN8I7NhZcdkMCJey6ybJHG2AFYtxBSizTVcFWzWGz5YUItINj4nNUrrOOXC7wUb14E/
-         DBxKA+hhuzV+nFIxqOEy6RLcHUpL7hbwDfP3JYN9wLFoGNTIq50fNvSjB9lvRNPNM9SB
-         ziFw==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=asrXCS/6vWeWFF7aW3/oea2sdTVH2vDaZZYBDhZyzCk=;
+        b=h9jZDqw39onoRVGAKgdRyNfvVUbW6tPxBrTNpweHbiLUOt3AV1Ian32a1eBggv1B8P
+         FlzxQB6PrF2KFKP/Jeycu8ROs0nqRddL+5AKE+WgeKfsksvm4QRUDCmFYZASC5a0JtJP
+         +LecE1BJj2Ohp4tMbvdFbNDhk4A3INd7l0am8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=IrUzAh37ZYp34y3zguSKDwMSiB6crDVsGvoePFOq830=;
-        b=FkJx3fTKB312z0trdmXWiC1V4CP3CVEexwN2Fe6yU0O1U8tsC6yBIW2/PFWmzQ3cU/
-         AuJU4IiKl3hZbAJHcLRDeZsTM35heQTAuEUNUsJ6kW1qDiLQ7YvV8WGhmJ0MEoN7GYkc
-         QGZ2IgfsHfr5WytlEndWXeiMXZgUNOAWG5RG2gOk1jOGLcbhc8YmftNF+NeRRjSq3uWe
-         yLkLnzMo5bKbnICaKhW4hVdPb6T+wrXBGfbeiHQ4Tc0wFNSh4+QWDQqh7cUtiCJX1Xik
-         KDxrlOUCjMEC7WGIE2cH0IUbIfkXc2FieaY6uVYCzT1bjF9EMF1vrGf/bbxv1eIX+FSR
-         hh/w==
-X-Gm-Message-State: APjAAAWweLqz+c/ImUdULp2bZsLbRBZEfM8ti/kQXBHG5NOcNbsAbHsJ
-        CcIod+sfIP7SoOVfK4Il8suoKP/Vk6c6ybxKr2o8NA==
-X-Google-Smtp-Source: APXvYqx0ynNDjXH1lP/dg03/TxKgRiXvnC81p+Ip6sIOQ40Unqm1it15tvk3LxHYZzzrag9rhYBF7PdWrS77rojQLzY=
-X-Received: by 2002:a81:6705:: with SMTP id b5mr9675149ywc.31.1552947448728;
- Mon, 18 Mar 2019 15:17:28 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=asrXCS/6vWeWFF7aW3/oea2sdTVH2vDaZZYBDhZyzCk=;
+        b=Q2o1usY0eRaO6cHEOy6T/db2fcaedKT+HzrrJ75R9oZkTztaEd5LrfFrUzdMKEIA+s
+         CMjNuy12G4yWK0GqMeCZ4A4lwg8cGe8LONLs18tmUFjIbNJMg/sdMWwYJxQsEf/Y9z0d
+         FyxSU2qADFivm7qQdsBbbbNDYm6shVxMrTfhM2flFQSAAnvndXQ+xF+gUCchsIYK8M2C
+         1U0HDnEaGWv/5qj45e6eFizLxb99A48e8TY5fPCJ/KuGukWpnAa9nL4+TSRfKOqRIBNh
+         8sAtCIZk5fRmtGYoSUyLN2wVdbWsSlQ9Mw1LhGZjizFLliY68ZZrE9xI2f84xQb37bjD
+         yQtg==
+X-Gm-Message-State: APjAAAXmzkeue9PWAcuDVmGKxFg1hGN0tqM30ABO7vZ0zTAnZL+gdcmu
+        4khqlbPymN7ll2ev03ok7oU3KbPWCsKiFeXdqjYvng==
+X-Google-Smtp-Source: APXvYqyrZKawXwTd7SynWZzNSMUKyFOK4pkT+9dqHa/h/ryTaJslvISzZkjcwsJTCKj38h0TjNim9tIMSkDhhTmiBao=
+X-Received: by 2002:a0c:9319:: with SMTP id d25mr2436197qvd.99.1552956592546;
+ Mon, 18 Mar 2019 17:49:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAAu3APbx4njmmBgu4_U=9CEahhK-f8BnhMuAwp0=XgFRZhexvw@mail.gmail.com>
- <CAAu3APbP02yHgtJE6k4D4iQ4ukFRjQhF3rs0A=jPL-J_DZKZMw@mail.gmail.com>
- <CABBYNZK5jauJ-9aumBsVgwhdYMpf-sJ5A8726+ms-eP7_PNFtA@mail.gmail.com> <CAAu3APamGb5enNZrKC0HvBMt6Erba2z0YU10BsdkGFZGYzVA_Q@mail.gmail.com>
-In-Reply-To: <CAAu3APamGb5enNZrKC0HvBMt6Erba2z0YU10BsdkGFZGYzVA_Q@mail.gmail.com>
-From:   Barry Byford <31baz66@gmail.com>
-Date:   Mon, 18 Mar 2019 22:17:17 +0000
-Message-ID: <CAAu3APacBJzqF3GS-u2FB2m7mtH7PaDeHyTxnwOBjgpSQdicmg@mail.gmail.com>
-Subject: Re: Peripheral notifications not showing up
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+References: <20190306162113.8585-1-bgodavar@codeaurora.org>
+ <155191158734.20095.15990837191526416248@swboyd.mtv.corp.google.com>
+ <a22894cea091ee9945af9c22d6e42051@codeaurora.org> <82fdfbd3dc4dbc1b6258dd470afff589@codeaurora.org>
+In-Reply-To: <82fdfbd3dc4dbc1b6258dd470afff589@codeaurora.org>
+From:   Nicolas Boichat <drinkcat@chromium.org>
+Date:   Tue, 19 Mar 2019 08:49:41 +0800
+Message-ID: <CANMq1KDrGYTrYi1UxyfM2ZMw_GmFpFrrTC6acZkKRHtizAT8OA@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Give enough time to ROME
+ controller to bootup.
+To:     rjliao@codeaurora.org
+Cc:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Stephen Boyd <swboyd@chromium.org>, johan.hedberg@gmail.com,
+        marcel@holtmann.org, Matthias Kaehlcke <mka@chromium.org>,
+        lkml <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, Claire Chang <tientzu@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This seems to be a permissions issue. If I run my script with sudo
-then it works.
+On Wed, Mar 13, 2019 at 5:45 PM <rjliao@codeaurora.org> wrote:
+>
+> =E5=9C=A8 2019-03-07 14:49=EF=BC=8CBalakrishna Godavarthi =E5=86=99=E9=81=
+=93=EF=BC=9A
+> > Hi Stepen,
+> >
+> > On 2019-03-07 04:03, Stephen Boyd wrote:
+> >> Quoting Balakrishna Godavarthi (2019-03-06 08:21:13)
+> >>> This patch enables enough time to ROME controller to bootup
+> >>> after we bring the enable ping out of reset.
+> >>>
+> >>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> >>> ---
+> >>
+> >> Any Fixes tag? And maybe some more explanation or background on where
+> >> 150 ms sleep comes from would be useful. Was it determined
+> >> experimentally or did it come from a datasheet somewhere? Does the
+> >> time
+> >> differ between boards?
+> >>
+> > [Bala]: this was observed in our stress testing and even the CHIP
+> > firmware team
+> >         confirmed that BT chip required at least 150 ms to boot up.
+> >
+> > @Rocky to confirm my statement.
+> >
+> >>>  drivers/bluetooth/hci_qca.c | 2 ++
+> >>>  1 file changed, 2 insertions(+)
+> >>>
+> >>> diff --git a/drivers/bluetooth/hci_qca.c
+> >>> b/drivers/bluetooth/hci_qca.c
+> >>> index 237aea34b69f..1953b13511e7 100644
+> >>> --- a/drivers/bluetooth/hci_qca.c
+> >>> +++ b/drivers/bluetooth/hci_qca.c
+> >>> @@ -508,6 +508,8 @@ static int qca_open(struct hci_uart *hu)
+> >>>                 qcadev =3D serdev_device_get_drvdata(hu->serdev);
+> >>>                 if (qcadev->btsoc_type !=3D QCA_WCN3990) {
+> >>>                         gpiod_set_value_cansleep(qcadev->bt_en, 1);
+> >>> +                       /* Controller needs time to bootup. */
+> >>> +                       msleep(150);
+> >>>                 } else {
+> >>>                         hu->init_speed =3D qcadev->init_speed;
+> >>>                         hu->oper_speed =3D qcadev->oper_speed;
+>
+> Hello,
+>
+> Any concern to merge this change? Without this change the Rome cannot up
+> while running the serdev way, we should mainline this change ASAP.
 
-Not quite sure why the build and install is changing the permissions required.
-
-Any thoughts?
-
-On Sun, 17 Mar 2019 at 22:02, Barry Byford <31baz66@gmail.com> wrote:
->
-> Hi Luiz,
->
-> Thanks for taking a look at this.
->
-> On Tue, 12 Mar 2019 at 13:12, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Barry,
-> >
-> > On Fri, Mar 8, 2019 at 11:20 PM Barry Byford <31baz66@gmail.com> wrote:
-> > >
-> > > I have tried the same experiment on a Raspberry Pi.
-> > >
-> > > $ uname -a
-> > > Linux raspberrypi 4.14.79-v7+ #1159 SMP Sun Nov 4 17:50:20 GMT 2018
-> > > armv7l GNU/Linux
-> > >
-> > > I ran the peripheral code I have and it worked fine on the Raspberry
-> > > Pi. I then rebuilt BlueZ 5.43 and reinstalled it and I see the same
-> > > issue with getting notificatins.
-> > > That is, reading of the characteristic in the Nordic nRF app on my
-> > > phone works. However, when I activate notifications I can see the
-> > > status change on the peripheral and the notifications show up on the
-> > > DBus. The notifications just don't show up in btmon or on my phone.
-> >
-> > Perhaps is being blocked somehow, you got the StartNotification I
-> > suppose? Please make sure the object path matches otherwise it won't
-> > work, you may also check how bluetoothctl does handle notifications
-> > since that has been working for a while.
->
-> My code is working with the default installation of BlueZ that is on
-> the board. The issue is when I build a version of BlueZ on the board
-> myself.
-> This leads me to believe it is not the code I'm running.
->
->
->
-> >
-> > > Does anyone have any suggestions of how I can debug this?
-> >
-> > The usual btmon traces and bluetoothd debug logs are normally a good
-> > idea to share since there could be some bug, though Ive been testing
-> > this regularly with bluetoothctl and that has been stable for a while,
-> > at least on master that is.
-> >
->
-> Here are the logs.
-> https://gist.github.com/ukBaz/b8317f2d76acc6dbf844c2713555974e
-> To my untrained eye it looks like the notification is started but it
-> never shows up. In the dbus-monitor output below, the notifications
-> are on the dbus. I can't tell where they are going missing between the
-> dbus and bluetoothd.
->
->
-> > > Thanks,
-> > > Barry
-> > >
-> > >
-> > > On Wed, 6 Mar 2019 at 22:37, Barry Byford <31baz66@gmail.com> wrote:
-> > > >
-> > > > Hello,
-> > > >
-> > > > I have a system that comes with BlueZ 5.43 installed on a single board
-> > > > computer (SBC). I have downloaded, built and installed various newer
-> > > > versions of BlueZ but I am having problems getting them working
-> > > > correctly.
-> > > >
-> > > > I have a peripheral (very similar to the gatt server example in the
-> > > > test directory) with one characteristic. My example was working before
-> > > > upgrading. However after upgrading, when I turn on notification for
-> > > > the characteristic it is not showing on the phone.
-> > > >
-> > > > I do see the notification turn up in dbus-monitor but not in btmon.
-> > > >
-> > > > signal time=1551910979.743011 sender=:1.38 -> destination=(null
-> > > > destination) serial=339 path=/ukBaz/bluezero/service0001/char0001;
-> > > > interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-> > > >    string "org.bluez.GattCharacteristic1"
-> > > >    array [
-> > > >       dict entry(
-> > > >          string "Value"
-> > > >          variant             array of bytes [
-> > > >                78 14
-> > > >             ]
-> > > >       )
-> > > >    ]
-> > > >    array [
-> > > >    ]
-> > > >
-> > > > I have tried going back to version 5.43 again but now that is not
-> > > > working either.
-> > > >
-> > > > The configure I ran was:
-> > > > ./configure --prefix=/usr \
-> > > >             --mandir=/usr/share/man \
-> > > >             --sysconfdir=/etc \
-> > > >             --localstatedir=/var \
-> > > >             --enable-experimental \
-> > > >             --enable-maintainer-mode
-> > > >
-> > > >
-> > > > To get configure to work without error I needed to install the following:
-> > > > sudo apt install glib2.
-> > > > sudo apt install libdbus-1-dev libudev-dev libical-dev libreadline-dev
-> > > >
-> > > > I have tried various variations on this and done a lot of searching
-> > > > but don't seem to find an answer.
-> > > > Is anyone else seeing this issue?
-> > > > Anyone have any suggestions as what I could try?
-> > > >
-> > > > Thanks in advance,
-> > > > Barry
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+Stephen was also asking about a Fixes tag, maybe we should add this?
+Fixes: 05ba533c5c11 ("Bluetooth: hci_qca: Add serdev support")
