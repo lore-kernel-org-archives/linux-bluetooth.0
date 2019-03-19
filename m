@@ -2,128 +2,194 @@ Return-Path: <SRS0=3ySR=RW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E284C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 08:44:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BDAC43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 09:00:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EA2620854
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 08:44:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBkSfETE"
+	by mail.kernel.org (Postfix) with ESMTP id 7362220828
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 09:00:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbfCSIo0 (ORCPT
+        id S1726020AbfCSJAI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Mar 2019 04:44:26 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:35775 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725978AbfCSIo0 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Mar 2019 04:44:26 -0400
-Received: by mail-oi1-f193.google.com with SMTP id j132so12325436oib.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Mar 2019 01:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=+akalMgBBZOAqPJvgQRMrltDQRrS66hy7eLa4C0vXuE=;
-        b=IBkSfETEUwBqd66kYzE7v2Ji+bNq+XXx/eARyCf8LRMYzvEN7DBD41jSi6zlbbbViO
-         wgUeQSNaLp39XOePXxsBG/GjaswA9bpE6VD6asNkvpFWEMfRGd+dS4Ro6buxZ6PT2yan
-         MbeXug8aAeiaUlcyB7fI55pLG9ayiuAwZmjXFkBiCBvlGGXJWkPQ0wQ6g0VZwQ6DVV39
-         PlOMYkbZHmLgxA1KoNMx9tbVlcNWeeNv4E9UHkuGtkh4ru7JVv49F4oABl+AUZBwJDhq
-         wDGRO6URxNJnHfuhQltJY6wa0SDPkcOlFX5u9SmMnjVNOsMRUEKiSavEw6BlAbsHgMOh
-         a3PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=+akalMgBBZOAqPJvgQRMrltDQRrS66hy7eLa4C0vXuE=;
-        b=IFfrCBe7MAHcYBPlAIG8APucCCiS5e5b9W8zYl6sQqg7H0goXKvlhUPaFW+17n9LQ1
-         nZUflnSxII93qiAp9aAztyCqRc9ItNKGwCI7zR83hvsMujfbmwxUHF0T709ZGTIPIBSg
-         I/W0c+ymfB5VCZRPZ7+1S3wfOqQCuvSb4E1JcjMKDMwYoa/hDVxR1gr8TUfCQXVq+M36
-         bgoC5/G75c+L+IwGlMQ9SWXe+UJZZc77qGHpRxl6i5SAbjNcP2sErgUQ88XxXAcikAbV
-         A0fk/nxItNhlcU9eQuhSlNITltm7mLEs293XKyVrZl1iI25IZbnsP6w4xRm8iRY8FAn0
-         ah7g==
-X-Gm-Message-State: APjAAAUQIf5wl8xOJTN0a7o5An9/BPkPjeTvJfgujDNZ1RcFoBKSlFjL
-        3Z/MQE2/7hp0EXNF/fQotn6PKarRxwPsxtVOHd3i8In2
-X-Google-Smtp-Source: APXvYqwhX+n3NT8O3hwRTEONEF8ioP8qkB3X/JxGQT42RmbTQB2gUhMvAwatbA4ODJtCRs5h9FLaPftOQSxXmas/XsQ=
-X-Received: by 2002:aca:4b03:: with SMTP id y3mr703057oia.21.1552985065215;
- Tue, 19 Mar 2019 01:44:25 -0700 (PDT)
+        Tue, 19 Mar 2019 05:00:08 -0400
+Received: from smtp.nue.novell.com ([195.135.221.5]:45985 "EHLO
+        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbfCSJAI (ORCPT
+        <rfc822;groupwise-linux-bluetooth@vger.kernel.org:0:0>);
+        Tue, 19 Mar 2019 05:00:08 -0400
+Received: from linux-vvou.suse.de (unknown.telstraglobal.net [202.47.205.198])
+        by smtp.nue.novell.com with ESMTP (NOT encrypted); Tue, 19 Mar 2019 10:00:05 +0100
+From:   "Cho, Yu-Chen" <acho@suse.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     acho@suse.com, jlee@suse.com
+Subject: [PATCH] hcidump: Add assoc dump function assoc date length check
+Date:   Tue, 19 Mar 2019 16:59:58 +0800
+Message-Id: <20190319085958.6544-1-acho@suse.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20190318161949.21749-1-luiz.dentz@gmail.com>
-In-Reply-To: <20190318161949.21749-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 19 Mar 2019 10:44:12 +0200
-Message-ID: <CABBYNZKbmq1wxCB4AGihThRwsFuHHHBiGzkjNhZ1AvSU3s5YcQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] shared/gatt-client: Add debug for error with
- included services
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+amp_assoc_dump() didn't check the length of amp assoc struct.
+If there is wrong lengh size of assoc date, amp_assoc_dump() and
+amp_dump_chanlist() will read over the size(heap-buffer-overflow).
 
-On Mon, Mar 18, 2019 at 6:19 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This logs errors with included service so it is easier to noticed when
-> they are malformed.
-> ---
->  src/shared/gatt-client.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 1119d1a34..ec1041f66 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -532,12 +532,19 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
->                                 "uuid: %s", handle, start, end, uuid_str);
->
->                 attr = gatt_db_get_attribute(client->db, start);
-> -               if (!attr)
-> +               if (!attr) {
-> +                       util_debug(client->debug_callback, client->debug_data,
-> +                               "Unable to find attribute at 0x%04x", start);
->                         goto failed;
-> +               }
->
->                 attr = gatt_db_insert_included(client->db, handle, attr);
-> -               if (!attr)
-> +               if (!attr) {
-> +                       util_debug(client->debug_callback, client->debug_data,
-> +                               "Unable to add include attribute at 0x%04x",
-> +                               handle);
->                         goto failed;
-> +               }
->
->                 /*
->                  * GATT requires that all include definitions precede
-> @@ -545,8 +552,12 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
->                  * these entries, the correct handle must be assigned to the new
->                  * attribute.
->                  */
-> -               if (gatt_db_attribute_get_handle(attr) != handle)
-> +               if (gatt_db_attribute_get_handle(attr) != handle) {
-> +                       util_debug(client->debug_callback, client->debug_data,
-> +                               "Invalid attribute 0x%04x expect it at 0x%04x",
-> +                               gatt_db_attribute_get_handle(attr), handle);
->                         goto failed;
-> +               }
->         }
->
->  next:
-> --
-> 2.20.1
->
+use t_len to save the length avoid use the wrong size of date.
+---
+ tools/parser/amp.c    | 35 +++++++++++++++++++++++++++--------
+ tools/parser/hci.c    |  4 ++--
+ tools/parser/l2cap.c  |  6 ++++--
+ tools/parser/parser.h |  2 +-
+ 4 files changed, 34 insertions(+), 13 deletions(-)
 
-Applied.
-
+diff --git a/tools/parser/amp.c b/tools/parser/amp.c
+index 7c85fb96c..d3459dfe1 100644
+--- a/tools/parser/amp.c
++++ b/tools/parser/amp.c
+@@ -28,7 +28,8 @@
+ #include "parser.h"
+ #include "lib/amp.h"
+ 
+-static void amp_dump_chanlist(int level, struct amp_tlv *tlv, char *prefix)
++static void amp_dump_chanlist(int level, struct amp_tlv *tlv,
++			      uint16_t t_len, char *prefix)
+ {
+ 	struct amp_chan_list *chan_list = (void *) tlv->val;
+ 	struct amp_country_triplet *triplet;
+@@ -38,6 +39,12 @@ static void amp_dump_chanlist(int level, struct amp_tlv *tlv, char *prefix)
+ 
+ 	printf("%s (number of triplets %d)\n", prefix, num);
+ 
++	if (btohs(tlv->len) > t_len) {
++		p_indent(level+1, 0);
++		printf("Wrong number of triplets\n");
++		num = (t_len - sizeof(*chan_list)) / sizeof(*triplet);
++	}
++
+ 	p_indent(level+2, 0);
+ 
+ 	printf("Country code: %c%c%c\n", chan_list->country_code[0],
+@@ -68,7 +75,7 @@ static void amp_dump_chanlist(int level, struct amp_tlv *tlv, char *prefix)
+ 	}
+ }
+ 
+-void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
++void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len, uint16_t t_len)
+ {
+ 	struct amp_tlv *tlv = (void *) assoc;
+ 
+@@ -76,6 +83,14 @@ void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
+ 	printf("Assoc data [len %d]:\n", len);
+ 
+ 	while (len > sizeof(*tlv)) {
++		if (btohs(tlv->len) > (t_len - sizeof(struct amp_tlv))) {
++			p_indent(level+1, 0);
++			printf("Assoc data get error size\n");
++			t_len -= sizeof(struct amp_tlv);
++		} else {
++			t_len -= sizeof(struct amp_tlv) + btohs(tlv->len);
++		}
++
+ 		uint16_t tlvlen = btohs(tlv->len);
+ 		struct amp_pal_ver *ver;
+ 
+@@ -91,11 +106,13 @@ void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
+ 			break;
+ 
+ 		case A2MP_PREF_CHANLIST_TYPE:
+-			amp_dump_chanlist(level, tlv, "Preferred Chan List");
++			amp_dump_chanlist(level, tlv,
++					  t_len, "Preferred Chan List");
+ 			break;
+ 
+ 		case A2MP_CONNECTED_CHAN:
+-			amp_dump_chanlist(level, tlv, "Connected Chan List");
++			amp_dump_chanlist(level, tlv,
++					  t_len, "Connected Chan List");
+ 			break;
+ 
+ 		case A2MP_PAL_CAP_TYPE:
+@@ -119,9 +136,11 @@ void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
+ 			printf("Unrecognized type %d\n", tlv->type);
+ 			break;
+ 		}
+-
+-		len -= tlvlen + sizeof(*tlv);
+-		assoc += tlvlen + sizeof(*tlv);
+-		tlv = (struct amp_tlv *) assoc;
++		if (btohs(tlv->len) <= t_len) {
++			len -= tlvlen + sizeof(*tlv);
++			assoc += tlvlen + sizeof(*tlv);
++			tlv = (struct amp_tlv *) assoc;
++		} else
++			len = 0;
+ 	}
+ }
+diff --git a/tools/parser/hci.c b/tools/parser/hci.c
+index 41f6fe087..424ff4bd7 100644
+--- a/tools/parser/hci.c
++++ b/tools/parser/hci.c
+@@ -1679,7 +1679,7 @@ static inline void write_remote_amp_assoc_cmd_dump(int level,
+ 	printf("handle 0x%2.2x len_so_far %d remaining_len %d\n", cp->handle,
+ 				cp->length_so_far, cp->remaining_length);
+ 
+-	amp_assoc_dump(level + 1, cp->fragment, frm->len - 5);
++	amp_assoc_dump(level + 1, cp->fragment, frm->len - 5, frm->len - 5);
+ }
+ 
+ static inline void command_dump(int level, struct frame *frm)
+@@ -2662,7 +2662,7 @@ static inline void read_local_amp_assoc_dump(int level, struct frame *frm)
+ 		p_indent(level, frm);
+ 		printf("Error: %s\n", status2str(rp->status));
+ 	} else {
+-		amp_assoc_dump(level + 1, rp->fragment, len);
++		amp_assoc_dump(level + 1, rp->fragment, len, frm->len - 4);
+ 	}
+ }
+ 
+diff --git a/tools/parser/l2cap.c b/tools/parser/l2cap.c
+index e43761cf7..58a23a54c 100644
+--- a/tools/parser/l2cap.c
++++ b/tools/parser/l2cap.c
+@@ -1172,7 +1172,8 @@ static inline void a2mp_assoc_rsp(int level, struct frame *frm, uint16_t len)
+ 
+ 	printf("Get AMP Assoc rsp: id %d status (%d) %s\n",
+ 			h->id, h->status, a2mpstatus2str(h->status));
+-	amp_assoc_dump(level + 1, h->assoc_data, len - sizeof(*h));
++	amp_assoc_dump(level + 1, h->assoc_data,
++		       len - sizeof(*h), frm->len - sizeof(*h));
+ }
+ 
+ static inline void a2mp_create_req(int level, struct frame *frm, uint16_t len)
+@@ -1181,7 +1182,8 @@ static inline void a2mp_create_req(int level, struct frame *frm, uint16_t len)
+ 
+ 	printf("Create Physical Link req: local id %d remote id %d\n",
+ 		   h->local_id, h->remote_id);
+-	amp_assoc_dump(level + 1, h->assoc_data, len - sizeof(*h));
++	amp_assoc_dump(level + 1, h->assoc_data,
++		       len - sizeof(*h), frm->len - sizeof(*h));
+ }
+ 
+ static inline void a2mp_create_rsp(int level, struct frame *frm)
+diff --git a/tools/parser/parser.h b/tools/parser/parser.h
+index b7e1d7568..97c4bbea1 100644
+--- a/tools/parser/parser.h
++++ b/tools/parser/parser.h
+@@ -249,7 +249,7 @@ void ericsson_dump(int level, struct frame *frm);
+ void csr_dump(int level, struct frame *frm);
+ void bpa_dump(int level, struct frame *frm);
+ 
+-void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len);
++void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len, uint16_t t_len);
+ 
+ static inline void parse(struct frame *frm)
+ {
 -- 
-Luiz Augusto von Dentz
+2.21.0
+
