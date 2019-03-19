@@ -2,151 +2,142 @@ Return-Path: <SRS0=3ySR=RW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3AFC43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 13:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09373C10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 13:32:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBDB4206BA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 13:27:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QIcHMZmL"
+	by mail.kernel.org (Postfix) with ESMTP id CD3ED2147C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 13:32:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1553002324;
+	bh=00f92TBP02CkJzEsfgi5CmTWd49OFGx2hMC1U15IiTg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=dRCu4mI6CkQhXQzE0+F8BdsEYVHC2TPH/WBUNhxMzKsHVQOQFtp+p4sdpBMvsYspO
+	 oxryO3P2nKozvddNKftmQnIRkxDIQj91T0uAiNm/qjUYQvg3v5urPI/Ocp+lSd7OOr
+	 DHplv9aNIXVz17Z0LJfa0LPDp4T13JS3B8AXFxO4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727235AbfCSN1s (ORCPT
+        id S1727243AbfCSNb7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Mar 2019 09:27:48 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:34391 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727018AbfCSN1s (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Mar 2019 09:27:48 -0400
-Received: by mail-ed1-f66.google.com with SMTP id a16so16598651edn.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Mar 2019 06:27:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DV0m7h5/PNeL/JGSwpuui2eZRt9q4waJX97/UQLPA54=;
-        b=QIcHMZmLLOrIuE2f1YPYoaM6TtSO7WxdG57UrK3jgdH1kwOerfrvsfkcKTPtll5AEG
-         WqNYfy/OzmWzbiOaPIh/9sDDoduyMr8TpHfkrIFdAxlHMGhxWI74OtMUeXGt7JkQfOze
-         5Ynh1Rn2IJUhMpVBbESrPTgo4iRHGZrc9LLXLEDi1/UZYKwLJ5SO+fX5dqPH21SROmW+
-         Ya2s1Oc+Z2vfqoOOzMG+/it5ys6K0w3Gz4WZr3+UvkM3Hglc7PKvj3U6jhtJc1BUCtVB
-         g8hn6JfVjA55ObW57nmKHzJbIfafFmQgqClzcvyFDSGKIiEPaXvFZWdoWVZFZTqZycT9
-         zfBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DV0m7h5/PNeL/JGSwpuui2eZRt9q4waJX97/UQLPA54=;
-        b=RBYO03VTfiPjwEdoHauVx6evCpacKNVqITS5zT3Lotnbxyh7qS+kjHxEd9swsZVZiF
-         1lJRZhtJ9x8nIPg6AEBwfj6QAGf7ij4gG3mBJBnw1mTqIyfoXW5NMTkh2W9ZPHJesJZm
-         CrN7rBApkcaodeKBW01vJXeilpMTfDFH97k0rIGZxurB8wzSyqq5d7WRlFYkn3p3teWn
-         2FbpadybOnS2BXgHDqFtLtHgXQ6UkeuOBEvRWhyYJIWj5LrhkcfW5SjIsJwVD9ztK1fN
-         PofwUapdT4kqqHOPqQYG6qd289s3ltD7lEgXOjG9G3sSDnqClsD66uQiglceSieTSugn
-         lzmQ==
-X-Gm-Message-State: APjAAAXbc4KsXy1zsPvnQuq/sgDYmO9RKiWtOl6TxkOkL+BBtXcvWq5Y
-        IS+WPStNcNNTIpp5JJ+v9+bdmkDtbjkgBuQqbLspMw==
-X-Google-Smtp-Source: APXvYqyNj+wpFuaShdJcPSIxiz+qa8J4xrpqT/EpWtRzwlIVNbQsDiXrI++4U3CBuzOqk/QGB8fN6tU00Gpj58ZAKvM=
-X-Received: by 2002:a17:906:482:: with SMTP id f2mr14215480eja.68.1553002065716;
- Tue, 19 Mar 2019 06:27:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <0000000000008a1bce057ede3d13@google.com> <0000000000009950e1058447ef43@google.com>
- <CAHk-=wjUrznUSUKN1AXQA9kCStQ3MHFY95ZmeTZ5zYDcvMhBiQ@mail.gmail.com>
- <CACT4Y+YOWaU8s90joeGB4G1oc-GxrQSDnjpuFOuE4eJd5FHK3g@mail.gmail.com> <CAHk-=wj_+ObTogs75N++EigJ5RPpu8GL2ma0jasgJxG+t3oPPQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wj_+ObTogs75N++EigJ5RPpu8GL2ma0jasgJxG+t3oPPQ@mail.gmail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 19 Mar 2019 14:27:32 +0100
-Message-ID: <CACT4Y+ZA4L-x6cZWV6ZaG-2Z-V4MB9PkBQ1gfCCv5Qu=FFejFQ@mail.gmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in bacpy
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     syzbot <syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        Tue, 19 Mar 2019 09:31:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52538 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726876AbfCSNb7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 19 Mar 2019 09:31:59 -0400
+Received: from earth.universe (dyndsl-091-096-044-185.ewe-ip-backbone.de [91.96.44.185])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F1DBA2083D;
+        Tue, 19 Mar 2019 13:31:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1553002318;
+        bh=00f92TBP02CkJzEsfgi5CmTWd49OFGx2hMC1U15IiTg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SdgWxAl7L8PFrQWFiGgsNPDR9mgXfa/e0TZoL0BrKgmXyn0TK6ulCNE6H33vhy+eF
+         yoJn5d41cVXLVj645syk1UtAQaOkRhxggnjq7AOYnTmZTbpELpdN2cHDF/GrHEEmcY
+         +OVt7jBkCnrkUcQ8vmc6JKYz7pPoav+BmJPE0D2A=
+Received: by earth.universe (Postfix, from userid 1000)
+        id 16D5C3C086A; Tue, 19 Mar 2019 14:31:55 +0100 (CET)
+Date:   Tue, 19 Mar 2019 14:31:55 +0100
+From:   Sebastian Reichel <sre@kernel.org>
+To:     Hans Verkuil <hverkuil@xs4all.nl>
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Michal Marek <mmarek@suse.com>,
-        Netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tony Lindgren <tony@atomide.com>,
+        Rob Herring <robh@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Pavel Machek <pavel@ucw.cz>, linux-bluetooth@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
+Message-ID: <20190319133154.7tbfafy7pguzw2tk@earth.universe>
+References: <20181221011752.25627-1-sre@kernel.org>
+ <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="62zbunq3ffyszqqd"
+Content-Disposition: inline
+In-Reply-To: <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Mar 17, 2019 at 9:41 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+
+--62zbunq3ffyszqqd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Hans,
+
+On Thu, Mar 14, 2019 at 09:20:10AM +0100, Hans Verkuil wrote:
+> On 12/21/18 2:17 AM, Sebastian Reichel wrote:
+> > This moves all remaining users of the legacy TI_ST driver to hcill (pat=
+ches
+> > 1-3). Then patches 4-7 convert wl128x-radio driver to a standard platfo=
+rm
+> > device driver with support for multiple instances. Patch 7 will result =
+in
+> > (userless) TI_ST driver no longer supporting radio at runtime. Patch 8-=
+11 do
+> > some cleanups in the wl128x-radio driver. Finally patch 12 removes the =
+TI_ST
+> > specific parts from wl128x-radio and adds the required infrastructure t=
+o use it
+> > with the serdev hcill driver instead. The remaining patches 13 and 14 r=
+emove
+> > the old TI_ST code.
+> >=20
+> > The new code has been tested on the Motorola Droid 4. For testing the a=
+udio
+> > should be configured to route Ext to Speaker or Headphone. Then you nee=
+d to
+> > plug headphone, since its cable is used as antenna. For testing there i=
+s a
+> > 'radio' utility packages in Debian. When you start the utility you need=
+ to
+> > specify a frequency, since initial get_frequency returns an error:
+>=20
+> What is the status of this series?
 >
-> On Sun, Mar 17, 2019 at 10:12 AM Dmitry Vyukov <dvyukov@google.com> wrote:
-> >
-> > Please see https://github.com/google/syzkaller/blob/master/docs/syzbot.md#bisection
-> > it should answer all of your questions. It does 2 and more.
-> > And in this case it seems to be working as intended bisecting it to a
-> > release tag.
->
-> No, it's definitely not working as intended.
->
-> You can see it in the bisect log - you don't actually have a single
-> "git bisect bad" outside of the initial one that you start bisecting
-> with. That's a pretty good sign of bisection being completely broken.
-> Yes, it can happen in theory, but in general with a good bisection,
-> you should see about as many "good" results as "bad".
->
-> I bet that what's going on is that your initial "let's test every
-> release" uses a _different_ process than the actual bisection itself
-> does.
->
-> So if I were you, I'd look at what syzbot does differently during
-> bisection vs what it does for that initial "test each release". For
-> example, does it do "make clean" in between each build in one case,
-> but not the other? Does it do "make oldconfig" vs a fixed config
-> generated from scratch every time? Because the fact that you first
-> tested 4.10 bad using the "test each release", and then when you do
-> bisection, the very commit *before* 4.10 is good (the only difference
-> being the EXTRAVERSION and the tag) shows that something went wrong.
+> Based on some of the replies (from Adam Ford in particular) it appears th=
+at
+> this isn't ready to be merged, so is a v2 planned?
 
+Yes, a v2 is planned, but I'm super busy at the moment. I don't
+expect to send something for this merge window. Neither LogicPD
+nor IGEP use FM radio, so I can just remove FM support from the
+TI_ST framework. Converting those platforms to hci_ll can be done
+in a different patchset.
 
-Well, this is intended behavior for some definition of intended.
-The root cause of what happened here is that syzbot has to disable
-CONFIG_USBIP_VHCI_HCD/CONFIG_BT_HCIVHCI when it crosses v4.10
-boundary. It fixes boot on the release and otherwise no bisection will
-succeed at all.
-It's just happened so that this particular bug is dependent on these
-exact configs and was introduced before v4.10. So it was bisected to
-v4.10. And in this sense it is working as intended.
+If that was the only issue there would be a v2 already. But Marcel
+Holtmann suggested to pass the custom packet data through the BT
+subsystem, which is non-trivial (at least for me) :)
 
-How would you define intended bisection behavior for the situation
-when kernel is build/boot/test broken most of the time, even on
-releases and even on recent releases? ;)
-I guess the 100% fair answer is "the bug happens as far as we could
-test (which is not too far)". And that's what I did initially, but the
-result was way less useful than what we have now.
+-- Sebastian
 
-This and other details of the process are described here:
-https://github.com/google/syzkaller/blob/master/docs/syzbot.md#bisection
-This was the first attempt at giving more transparency into the process.
+--62zbunq3ffyszqqd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I see 2 potential improvements:
-1. (simpler) noting in the bisection log things like disabled configs,
-cherry-picked fixes and other things necessary to repair kernel.
-2. (harder) try to figure out that the bug actually depends on the
-disabled config
-I've added this to https://github.com/google/syzkaller/issues/1051
-But for (2) I would first like to see that this is a common enough
-problem rather then a one-off thing, because it's easier to say than
-to implement that reliably and this can affect bugs completely
-unrelated to the disabled configs due to unavoidable kernel crash
-flakes (and then somebody will need to explain what happened to all
-people asking).
+-----BEGIN PGP SIGNATURE-----
 
-And obviously doing some real testing before merging each commit into
-any kernel tree would help tremendously with bisection long term ;)
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlyQ70QACgkQ2O7X88g7
++prWdA//Vy7zc3RwtOPcf8fnZpZi5XJmJWA/+h15XD1lwsVp6xBaiIgxbY9/VLjy
+7k4qGuFaGVP73+QBEVgPSZKXKAqIAu4ZKTnjbrpOQIO7TPcffKWHjz9Hjy9Uh48T
+w6Q+wckAzamw93W2Uq6MITl7yIdUTLvk698fWZe/iD96jL7SORvbyLpWwpQztH/J
+z1iYvIzafWUr+VkjmqaSteTwl0gC+L7prdyk4DQHWLtn4Ty5AwgsYkvfqaXju0vm
+gW73gYoFvtFJN1uOf349P20mNYbkCi25llV9tbx1FmfKbwHVLWLGWy35+yVG9sUt
+/NjzFQDJrFjvuGtVkAIQJH7yX3WlMjl6tce4xqiuKcuXp12AJMOrt9nrku8sxc8I
+wuU7F+R9l8yb7jHdWkYYQZcyU31szc9XfmcEyEBPgI2o++i0K4/BDB6rw2dtq9N4
+aM9omX45PZirFKW91zAy85soHpBINWI/pYbS3d2tNeRUnxpzOqnbSmgZvYmgj1T1
+Qy5zWEK4Db4gy27znrGfGlC6D+bPA1SJ063ZBfugv49Il5NpBRBV7bnan0rDO5+Z
+mZURZio8SIX3CY1YnIK694LqOG1adtZns6ioUuA5tPK+T8NkiWHyRA4uHQ4IRFbA
+HVxGiuwsqS5eWwuSJEP8A5mTqT2co8Ez4Y6mBtC2Pdzwt6V5RE0=
+=iW+w
+-----END PGP SIGNATURE-----
 
-Even v5.0 is boot broken if I try to enable more configs. So we will
-need to disable more configs in bisection in future as we onboard them
-to syzbot. The current points in time we need to disable various
-configs suspiciously resemble when they were added to syzbot config...
+--62zbunq3ffyszqqd--
