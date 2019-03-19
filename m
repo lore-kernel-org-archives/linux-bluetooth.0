@@ -2,68 +2,108 @@ Return-Path: <SRS0=3ySR=RW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CD4C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 03:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1A3C10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 05:23:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDEBA20872
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 03:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 680582133D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 05:23:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726844AbfCSDeq convert rfc822-to-8bit (ORCPT
+        id S1726067AbfCSFXt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Mar 2019 23:34:46 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41958 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726743AbfCSDeq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Mar 2019 23:34:46 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 8D6032946A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Mar 2019 03:34:45 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 70039294DD; Tue, 19 Mar 2019 03:34:45 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Tue, 19 Mar 2019 01:23:49 -0400
+Received: from mga07.intel.com ([134.134.136.100]:48780 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725862AbfCSFXt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 19 Mar 2019 01:23:49 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 22:23:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,496,1544515200"; 
+   d="scan'208";a="123831415"
+Received: from ubuntu16.iind.intel.com ([10.66.226.199])
+  by orsmga007.jf.intel.com with ESMTP; 18 Mar 2019 22:23:46 -0700
+From:   Chethan T N <chethan.tumkur.narayan@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 199873] Bluetooth 3.0 mouses are automatically disconnected
- after connected
-Date:   Tue, 19 Mar 2019 03:34:44 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kai.heng.feng@canonical.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-199873-62941-RoWMo8DUxz@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-199873-62941@https.bugzilla.kernel.org/>
-References: <bug-199873-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Cc:     Raghuram Hegde <raghuram.hegde@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        stable@vger.kernel.org
+Subject: [PATCH] btusb: Re-program BULK IN URBs once the Intel BT controller  is in operational firmware mode.
+Date:   Tue, 19 Mar 2019 10:53:06 +0530
+Message-Id: <1552972986-32258-1-git-send-email-chethan.tumkur.narayan@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=199873
+From: Raghuram Hegde <raghuram.hegde@intel.com>
 
---- Comment #9 from Kai-Heng Feng (kai.heng.feng@canonical.com) ---
-My intention is to ask you to try adding this entry to pin-code-database.xml:
-<device vendor="logitech far east" type="mouse" pin="0000"/>
+Once Firmware download is complete, BULK IN URBs need not be
+programmed till the Intel Bluetooth controller switches from
+bootloader to operational firmware, as there will not be any data
+sent on BULK IN endpoint.
 
+If BULK IN URBs are programmed during this time, a USB turn-around
+time error is seen for BULK IN tokens. This results in XHCI resetting
+the endpoint data toggle sequence leading to data sequence sync-loss
+between Host XHCI controller and Bluetooth controller.
+
+The following fix is required to prevent data sequence sync-loss:
+Kill the BULK IN URBs once FW download is complete and re-submit them
+after Intel BT controller has booted to operational firmware.
+
+Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/btusb.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ded198328f21..e656acdfd84a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2332,6 +2332,15 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+ 
+ 	bt_dev_info(hdev, "Firmware loaded in %llu usecs", duration);
++
++	/* Once Firmware download is complete, Bulk endpoints will not be
++	 * used until the Bluetooth controller boots with operational
++	 * firmware. If we have the Bulk URBs scheduled when Intel Bluetooth
++	 * controller switches from bootloader to operational firmware, we
++	 * observe Bus Turn-around timeouts for Bulk IN tokens.So, to prevent
++	 * such error condition, kill the URBs scheduled on Bulk endpoint.
++	 */
++	usb_kill_anchored_urbs(&data->bulk_anchor);
+ 
+ done:
+ 	release_firmware(fw);
+@@ -2395,6 +2404,18 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 */
+ 	btintel_set_event_mask(hdev, false);
+ 
++	/* As the Intel bluetooth controller has now booted in operational
++	 * mode, re-program the URBs for BULK IN endpoint
++	 */
++	if (test_bit(BTUSB_BULK_RUNNING, &data->flags)) {
++		err = btusb_submit_bulk_urb(hdev, GFP_NOIO);
++		if (err < 0) {
++			clear_bit(BTUSB_BULK_RUNNING, &data->flags);
++			return err;
++		}
++		btusb_submit_bulk_urb(hdev, GFP_NOIO);
++	}
++
+ 	return 0;
+ }
+ 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.7.4
+
