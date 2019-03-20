@@ -7,75 +7,134 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B24C43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Mar 2019 11:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 303CBC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Mar 2019 11:25:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F232C2184E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Mar 2019 11:17:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00D2F2175B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Mar 2019 11:25:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VIeXqdpr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tkxf9/hy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727661AbfCTLQ7 (ORCPT
+        id S1727918AbfCTLZR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Mar 2019 07:16:59 -0400
-Received: from mail-vs1-f42.google.com ([209.85.217.42]:34897 "EHLO
-        mail-vs1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727612AbfCTLQ7 (ORCPT
+        Wed, 20 Mar 2019 07:25:17 -0400
+Received: from mail-oi1-f180.google.com ([209.85.167.180]:34143 "EHLO
+        mail-oi1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727154AbfCTLZR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Mar 2019 07:16:59 -0400
-Received: by mail-vs1-f42.google.com with SMTP id e1so1229897vsp.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Mar 2019 04:16:59 -0700 (PDT)
+        Wed, 20 Mar 2019 07:25:17 -0400
+Received: by mail-oi1-f180.google.com with SMTP id u12so1492830oiv.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Mar 2019 04:25:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=IVA1+RYQKYtpIGtVIziP0jHDp/GRMFH3nMi37S9Hqm8=;
-        b=VIeXqdpr2Nx2T+kxF1a9jmvIq44UASG1Xd0RKxvf2XVVrSwQYg6LTvYWNz6NFGSE/n
-         q0vNjxLo9SyM1TlSUmNEx2oqCAsGnG/qUB+tT780kwdTlUr7lszNgArLy3iQCIl17fJK
-         bkdNH9kytlSWp8Mw+hl37mJvpH/+jsAnc/2Sog+Bdh0hQO/3p5r1N7vl/ftQyMj8MYlX
-         kQoHS3qwjsT29bCpMfQfPQvpdVjSn0x7VHCdd4YqOt33nPTr0OLDFkzb2vg7bB0IcGlq
-         YYrMS3/ttrLtLgoKyiM1/aXvi3xeuzuSMBgIOnfFZmv932WIAiAk5CSqelRIJ2pFgYdt
-         65xg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ygIkqo8e7QUWA3Rh59LumuZrfemh7IIsBl3fUErbf8M=;
+        b=Tkxf9/hyxRHQGfGFjNwT0nyT/CAY4AVSes4WemHiAhFxENqZWZIsvP/PA9IT8wgEag
+         oNYTFimEfjPoJgmPDDnqlg808nMlaT8h5h4aOmWk6bPhLoi577XlnOA3b2R0VjkLfZH1
+         1ZMjNxmrzMJZrH4LhTQSJ3taFNQThJzk3RM39OuwFfcinxmHYVjN30rflMYJ3Yg9wca8
+         VHfz6QEZJMdrntQ1U8WlxpUX30z50fr6hkvWzyhbiIc02Zi1FtFppgJeqZ2+mFDEuJDj
+         43NY4ZJTEinuhxaUDk/TG3z5AnsQ5MLgXzhlDR3s5qNtD/i3zlaVuxEB5WVoLAvq0tU6
+         Ti+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=IVA1+RYQKYtpIGtVIziP0jHDp/GRMFH3nMi37S9Hqm8=;
-        b=BLupSxAd9vjU+CQt0K56YONDt69N3vOn8i1qUfZtttkTbkJ2LSVHhIoKFVTrc6Re3s
-         XlbcxiB0npDqcOjfsY92s4IS8y7D0NUP68566/ZNqSxrBI1oEp++T0n0o8UB3PeUPcvB
-         HT3Vj24AOAx81c9PhacuYpGNw7b/EMNt+reNfQG/tIIitUPo7dd4qUOc4snvJ3nYPEpI
-         Jjdxnht2eqAYKSJJnN+AKQ3MiWFZZeHOAr5sb8KAfBGYudshXsyZMU1EYnSom0dqvSIc
-         IxnXeGqMYiyAz1G/H9b7I0mkBEjkg851MjZS/QM8GMxhueBEXls3Q2uiKToeN+/XuH7l
-         4iOA==
-X-Gm-Message-State: APjAAAUsYM3ci8Vpt8bth+5KyiKhwfWf5sblJiP+48H+7UBVR3D9GmQN
-        AYZWmCMXBeuWdN/B1psMODXW4se2yuDuGUv0Ch1v46uH
-X-Google-Smtp-Source: APXvYqxf4HCctDBU3I01gC3G5Qg46+5iRPgXk2+yZ7emcrsgSCh5G4K2Tb3vxHKdFFzRWgsPIBQdg56JqNgC1luDFHE=
-X-Received: by 2002:a67:6441:: with SMTP id y62mr4419505vsb.57.1553080618429;
- Wed, 20 Mar 2019 04:16:58 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ygIkqo8e7QUWA3Rh59LumuZrfemh7IIsBl3fUErbf8M=;
+        b=MkoOzYc/tfZMa5bMCDB1dxEuMrfkM680JE/lI+p12QNOluuhFtEmvCrC3UNi5lUI3R
+         PUZxhR03ANnxKIIoBG9S8CueSRJOCHMpqugM1KXT4topcZ4Wjq4CJTon1j5qhG2/R6lX
+         5aTKu4hDxVPwufCCXXgIeF/JhL2BRfA9LVQvVzI71RDlwgWX3wp7w6SpFxQm507V9Caz
+         ErFA0pOqhdCMTokhdgZtUhn3afR3RW3DJ66hewrO5EG1oknP3d3J7SoqlZOTsIfjyZ2q
+         7DpX8IO4MVVnC+03+yl6ZMCWQXgOZ8vGFC5IOfb8c1Tjqcvt7WXlc50261Yg7zlGvAAk
+         2qPg==
+X-Gm-Message-State: APjAAAWsbV+sOm3I5165lG5ny25ZRrMpdJ7m1OjnCwzlqlp+7v7GsUQu
+        bWL42gtIwVa5GG8AEN5SYrwf9rP2RUXtuV++jkE=
+X-Google-Smtp-Source: APXvYqyHWe55sf/uxksZdbKRrI88d7ujVAAJTvYCcfyY3BWLdnyIRkjHw3rNyl40yz4E8HZUlKMdTRXu2lsAX6njisM=
+X-Received: by 2002:aca:abce:: with SMTP id u197mr4875319oie.67.1553081116102;
+ Wed, 20 Mar 2019 04:25:16 -0700 (PDT)
 MIME-Version: 1.0
-From:   Christoph Schweers <christoph.schweers@gmail.com>
-Date:   Wed, 20 Mar 2019 12:16:43 +0100
-Message-ID: <CA+5PdQZ19gL9Rc_mDZ+kOOfyucA8oOLOtdjoNNoD=+Dx=zLxyA@mail.gmail.com>
-Subject: Disable 'Filter duplicates' setting for HCI 'LE Set Scan Enable'
-To:     linux-bluetooth@vger.kernel.org
+References: <CAKWEGV6aTNGcOcfO5xL+H0P95xh=6dOTdCnvNMrGCxpR1G-aJw@mail.gmail.com>
+ <CABBYNZJC8RuGb5sKCDznAZimmVmg9LFhg=gN9T4eUUBLrMUikg@mail.gmail.com>
+In-Reply-To: <CABBYNZJC8RuGb5sKCDznAZimmVmg9LFhg=gN9T4eUUBLrMUikg@mail.gmail.com>
+From:   Yauhen Kharuzhy <jekhor@gmail.com>
+Date:   Wed, 20 Mar 2019 14:25:03 +0300
+Message-ID: <CAKWEGV507EkaQDiY_E+JifUkYRxTmaLDyXQKuGMPiN-HtFzs_Q@mail.gmail.com>
+Subject: Re: bluez: Disable GATT client at non-initiator side?
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+=D0=B2=D1=82, 19 =D0=BC=D0=B0=D1=80. 2019 =D0=B3. =D0=B2 23:22, Luiz August=
+o von Dentz <luiz.dentz@gmail.com>:
+>
+> Hi Yauhen,
+>
+> On Tue, Mar 19, 2019 at 5:07 PM Yauhen Kharuzhy <jekhor@gmail.com> wrote:
+> >
+> > Hello,
+> >
+> > I am trying to implement GATT services with bluez API.
+> >
+> > If external device initiated LE connection to device with bluez
+> > running, bluez start to discover services at initiator and, if one of
+> > characteristics required pairing, request pairing. This is not
+> > intended behaviour for some reason in my case, so I need to disable
+> > GATT client if bluez is not initiator side of the connection, similar
+> > to ReverseServiceDiscovery config option for non-LE.
+> >
+> > Is it possible by any way? As i see code, device_attach_att() function
+> > in src/device.c initializes GATT client unconditionally in both cases.
+> > For debug, I disabled client initializing and this seems works for
+> > external-initiated connections.
+>
+> We could perhaps reuse the same logic to disable the GATT service
+> discovery, though the should not cause any pairing request since the
+> discovery don't actually read any value, apart from characteristic
+> declaration which shall not require authentication.
 
-I would like to disable the 'Filter duplicates' setting at hardware level
-with the HCI Command 'LE Set Scan Enable'.
+Yes, problem really in BATT profile accept stage:
 
-First I tried to tweak the 'DuplicateData' parameter from SetDiscoveryFilter
-(org.bluez.Adapter1), but this doesn't change the value of 'Filter
-duplicates' parameter. btmon shows always that 'Filter duplicates' is
-'Enabled'
+164    16.407237    localhost (jeknotez)    5c:ca:67:f8:3b:11 ()
+ATT    12    Sent Read Request, Handle: 0x0016 (Battery Service:
+Battery Level)
+166    16.466794    5c:ca:67:f8:3b:11 ()    localhost (jeknotez)
+ATT    14    Rcvd Error Response - Insufficient Encryption, Handle:
+0x0016 (Battery Service: Battery Level)
+167    16.467125    localhost (jeknotez)    5c:ca:67:f8:3b:11 ()
+SMP    11    Sent Security Request: AuthReq: Bonding,
+SecureConnection, Reserved
 
-I also searched the debugfs for a proper setting without success.
+=D1=81=D0=B0=D0=BA 20 13:53:42 jeknotez bluetoothd[4945]:
+profiles/battery/battery.c:batt_probe() BATT profile probe
+(74:E0:C9:69:D2:8C)
+=D1=81=D0=B0=D0=BA 20 13:53:42 jeknotez bluetoothd[4945]:
+src/service.c:change_state() 0x5557fcda23b0: device 74:E0:C9:69:D2:8C
+profile batt-profile state changed: unavailable -> disconnected (0)
+=D1=81=D0=B0=D0=BA 20 13:53:42 jeknotez bluetoothd[4945]:
+profiles/battery/battery.c:batt_accept() BATT profile accept
+(74:E0:C9:69:D2:8C)
+=D1=81=D0=B0=D0=BA 20 13:53:42 jeknotez bluetoothd[4945]:
+src/service.c:change_state() 0x5557fcda23b0: device 74:E0:C9:69:D2:8C
+profile batt-profile state changed: disconnected -> connected (0)
 
-Is there any way to change this HCI parameter setting in bluez?
+device_probe_profiles()
+...
+batt_accept()
+  gatt_db_foreach_service()
+    foreach_batt_service()
+      handle_batt_service()
+        gatt_db_service_foreach_char()
+          handle_characteristic()
+                    if (uuid_cmp(GATT_CHARAC_BATTERY_LEVEL, &uuid)) {
+                         handle_battery_level(batt, value_handle);
+                    }
 
 
-Thanks in advance!
-Christoph
+
+--=20
+Yauhen Kharuzhy
