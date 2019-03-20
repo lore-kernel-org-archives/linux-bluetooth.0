@@ -1,539 +1,416 @@
-Return-Path: <SRS0=3ySR=RW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=+K9s=RX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B1AC43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 21:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C61C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Mar 2019 06:48:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A344213F2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Mar 2019 21:00:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74F152184D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Mar 2019 06:48:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727207AbfCSVAs (ORCPT
+        id S1726362AbfCTGsh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Mar 2019 17:00:48 -0400
-Received: from mga17.intel.com ([192.55.52.151]:40460 "EHLO mga17.intel.com"
+        Wed, 20 Mar 2019 02:48:37 -0400
+Received: from mga09.intel.com ([134.134.136.24]:60117 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726627AbfCSVAs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Mar 2019 17:00:48 -0400
+        id S1726169AbfCTGsh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 20 Mar 2019 02:48:37 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Mar 2019 14:00:43 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Mar 2019 23:48:32 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,246,1549958400"; 
-   d="scan'208";a="124053057"
-Received: from bgix-dell-lap.sea.intel.com ([10.251.151.31])
-  by orsmga007.jf.intel.com with ESMTP; 19 Mar 2019 14:00:42 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com, marcel@holtmann.org,
-        luiz.dentz@gmail.com, johan.hedberg@gmail.com
-Subject: [PATCH BlueZ v3 1/1] mesh: Add APIs for Provisioner and Config Client
-Date:   Tue, 19 Mar 2019 14:00:29 -0700
-Message-Id: <20190319210029.24734-2-brian.gix@intel.com>
-X-Mailer: git-send-email 2.14.5
-In-Reply-To: <20190319210029.24734-1-brian.gix@intel.com>
+X-IronPort-AV: E=Sophos;i="5.60,248,1549958400"; 
+   d="scan'208";a="308712578"
+Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
+  by orsmga005.jf.intel.com with ESMTP; 19 Mar 2019 23:48:32 -0700
+Received: from orsmsx158.amr.corp.intel.com (10.22.240.20) by
+ ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Tue, 19 Mar 2019 23:48:31 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.129]) by
+ ORSMSX158.amr.corp.intel.com ([169.254.10.91]) with mapi id 14.03.0415.000;
+ Tue, 19 Mar 2019 23:48:31 -0700
+From:   "Stotland, Inga" <inga.stotland@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Gix, Brian" <brian.gix@intel.com>
+CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Subject: Re: [PATCH BlueZ v3 1/1] mesh: Add APIs for Provisioner and Config
+ Client
+Thread-Topic: [PATCH BlueZ v3 1/1] mesh: Add APIs for Provisioner and Config
+ Client
+Thread-Index: AQHU3pbhBMXeoicfxkqF7G1f3YsBBaYUigMA
+Date:   Wed, 20 Mar 2019 06:48:30 +0000
+Message-ID: <4562230ce67aade420b7c9c173a3771f71ce4868.camel@intel.com>
 References: <20190319210029.24734-1-brian.gix@intel.com>
+         <20190319210029.24734-2-brian.gix@intel.com>
+In-Reply-To: <20190319210029.24734-2-brian.gix@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.251.137.87]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <29C3D92D72EB5841A1CCABF0A48000CA@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The added D-Bus APIs enable Applications to function in a Provisioner
-Initiator role, and as a Configuration Client.
----
- doc/mesh-api.txt | 363 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 348 insertions(+), 15 deletions(-)
-
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 0b341a0f9..85d1f83d2 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -30,6 +30,7 @@ Methods:
- 			org.bluez.mesh.Error.InvalidArguments
- 
- 	void Cancel(void)
-+
- 		Cancels an outstanding provisioning request initiated by Join()
- 		method.
- 
-@@ -109,6 +110,37 @@ Methods:
- 		PossibleErrors:
- 			org.bluez.mesh.Error.NotFound
- 
-+	uint64 token CreateNetwork(object app_root, array{byte}[16] uuid)
-+
-+		This is the first method that an application calls to become
-+		a Provisioner node, and a Configuration Client on a newly
-+		created Mesh Network.
-+
-+		The app_root parameter is a D-Bus object root path of the
-+		application that implements org.bluez.mesh.Application1
-+		interface, and a org.bluez.mesh.Provisioner1 interface. The
-+		application represents a node where child mesh elements have
-+		their own objects that implement org.bluez.mesh.Element1
-+		interface. The application hierarchy also contains a provision
-+		agent object that implements org.bluez.mesh.ProvisionAgent1
-+		interface. The standard DBus.ObjectManager interface must be
-+		available on the app_root path.
-+
-+		The uuid parameter is a 16-byte array that contains Device UUID.
-+
-+		The returned token must be preserved by the application in
-+		order to authenticate itself to the mesh daemon and attach to
-+		the network as a mesh node by calling Attach() method or
-+		permanently remove the identity of the mesh node by calling
-+		Leave() method.
-+
-+		The other information the bluetooth-meshd daemon will preserve
-+		about the initial node, is to give it the initial primary
-+		unicast address (0x0001), and create and assign a net_key as the
-+		primary network net_index (0x000).
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
- 
- Mesh Node Hierarchy
- ===================
-@@ -146,6 +178,30 @@ Methods:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.NotFound
- 
-+	void SendWithDeviceKey(object element_path, uint16 destination,
-+					uint16 net_index, array{byte} data)
-+
-+		This method is used to send a message originated by a local
-+		model encoded with the device key of the remote node.
-+
-+		The element_path parameter is the object path of an element from
-+		a collection of the application elements (see Mesh Application
-+		Hierarchy section).
-+
-+		The destination parameter contains the destination address. This
-+		destination must be a uint16 to a unicast address, or a well
-+		known group address.
-+
-+		The net_index parameter is the subnet index of the network on
-+		which the message is to be sent.
-+
-+		The data parameter is an outgoing message to be encypted by the
-+		meshd daemon and sent on.
-+
-+		Possible errors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotFound
-+
- 	void Publish(object element_path, uint16 model, array{byte} data)
- 
- 		This method is used to send a publication originated by a local
-@@ -224,12 +280,211 @@ Properties:
- 		This property indicates whether the periodic beaconing is
- 		enabled (true) or disabled (false).
- 
-+	uint8 BeaconFlags [read-only]
-+
-+		This property may be read at any time to determine the flag
-+		field setting on sent and received beacons of the primary
-+		network key.
-+
-+	uint32 IvIndex [read-only]
-+
-+		This property may be read at any time to determine the IV_Index
-+		that the current network is on. This information is only useful
-+		for provisioning.
-+
- 	uint32 SecondsSinceLastHeard [read-only]
- 
- 		This property may be read at any time to determine the number of
- 		seconds since mesh network layer traffic was last detected on
- 		this node's network.
- 
-+Mesh Provisioning Hierarchy
-+============================
-+Service		org.bluez.mesh
-+Interface	org.bluez.mesh.Provisioning1
-+Object path	/org/bluez/mesh/node<xxxx>
-+		where xxxx is a 4-digit hexadecimal number generated by daemon
-+
-+Methods:
-+	void UnprovisionedScan(uint16 seconds)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to start listening
-+		(scanning) for unprovisioned devices in the area. Scanning
-+		will continue for the specified number of seconds, or, if 0 is
-+		specified, then continuously until UnprovisionedScanCancel() is
-+		called or if AddNode() method is called.
-+
-+		Each time a unique unprovisioned beacon is heard, the
-+		ScanResult() method on the app will be called with the result.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.NotAuthorized
-+
-+	void UnprovisionedScanCancel(void)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to stop listening
-+		(scanning) for unprovisioned devices in the area.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.NotAuthorized
-+
-+	void AddNode(array{byte}[16] uuid)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to add the
-+		unprovisioned device specified by uuid, to the Network.
-+
-+		The uuid parameter is a 16-byte array that contains Device UUID
-+		of the unprovisioned device to be added to the network.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+
-+	void AddNetKey(uint16 net_index)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to generate and add a new
-+		network subnet key.
-+
-+		The net_index parameter is a 12-bit value (0x001-0xFFF)
-+		specifying which net key to add.
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.AlreadyExists
-+
-+	void UpdateNetKey(uint16 net_index)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to generate a new network
-+		subnet key, and set it's key refresh state to Phase 1.
-+
-+		The net_index parameter is a 12-bit value (0x000-0xFFF)
-+		specifying which net key to update. Note that the subnet must
-+		exist prior to updating.
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.DoesNotExist
-+
-+	void DeleteNetKey(uint16 net_index)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to delete a subnet.
-+
-+		The net_index parameter is a 12-bit value (0x001-0xFFF)
-+		specifying which net key to delete. The primary net key (0x000)
-+		may not be deleted.
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.DoesNotExist
-+
-+	void SetKeyPhase(uint16 net_index, uint8 phase)
-+		This method is used to set the master key update phase of the
-+		given subnet.
-+
-+		The net_index parameter is a 12-bit value (0x000-0xFFF)
-+		specifying which subnet phase to set.
-+
-+		The phase parameter is used to cycle the local key database
-+		through the phases as defined by the Mesh Profile Specification.
-+		Allowed values:
-+			0 - Cancel Key Refresh (May only be called from Phase 1,
-+				and should never be called once the new key has
-+				started propagating)
-+			1 - Invalid Argument (see NetKeyUpdate method)
-+			2 - Go to Phase 2 (May only be called from Phase 1)
-+			3 - Complete Key Refresh procedure (May only be called
-+				from Phase 2)
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.DoesNotExist
-+
-+	void AddAppKey(uint16 net_index, uint16 app_index)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to generate and add a new
-+		application key.
-+
-+		The net_index parameter is a 12-bit value (0x000-0xFFF)
-+		specifying which net key to bind the application key to.
-+
-+		The app_index parameter is a 12-bit value (0x000-0xFFF)
-+		specifying which app key to add.
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.AlreadyExists
-+
-+	void UpdateAppKey(uint16 app_index)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to generate a new
-+		application key.
-+
-+		The app_index parameter is a 12-bit value (0x000-0xFFF)
-+		specifying which app key to update. Note that the subnet that
-+		the key is bound to must exist and be in Phase 1.
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.DoesNotExist
-+
-+	void DeleteAppKey(uint16 app_index)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to delete an application
-+		key.
-+
-+		The app_index parameter is a 12-bit value (0x000-0xFFF)
-+		specifying which app key to delete.
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.DoesNotExist
-+
-+	void DeleteRemoteNode(uint16 primary, uint8 cnt)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to delete a remote node
-+		from the local device key database.
-+
-+		The primary parameter specifies the unicast address of the
-+		the node being deleted, and the number of elements that were
-+		assigned to it.
-+
-+		This call affects the local bluetooth-daemon key database only.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+			org.bluez.mesh.Error.DoesNotExist
- 
- Mesh Application Hierarchy
- ==========================
-@@ -247,6 +502,7 @@ An example mesh application hierarchy may look like this:
- 			|   - org.freedesktop.DBus.ObjectManager
- 			|   - org.bluez.mesh.Application1
- 			|   - org.bluez.mesh.Attention1 (optional)
-+			|   - org.bluez.mesh.Provisioner1 (optional,Provisioner)
- 			|
- 			-> /com/example/agent
- 			| |   - org.bluez.mesh.ProvisionAgent1
-@@ -325,6 +581,22 @@ Methods:
- 
- 		The data parameter is the incoming message.
- 
-+	void DevKeyMessageReceived(uint16 source, uint16 net_index,
-+							array{byte} data)
-+
-+		This method is called by meshd daemon when a message arrives
-+		addressed to the application, which was sent with the remote
-+		node's device key.
-+
-+		The source parameter is unicast address of the remote
-+		node-element that sent the message.
-+
-+		The net_index parameter indicates what subnet the message was
-+		received on, and if a response is required, the same subnet
-+		must be used to send the response.
-+
-+		The data parameter is the incoming message.
-+
- 	void UpdateModelConfiguration(uint16 model_id, dict config)
- 
- 		This method is called by bluetooth-meshd daemon when a model's
-@@ -383,7 +655,7 @@ Object path	freely definable
- This is an optional interface that implements health attention timer.
- 
- Methods:
--	void SetTimer(uint8 element_index,  uint16 time)
-+	void SetTimer(uint8 element_index, uint16 time)
- 
- 		The element_index parameter is the element's index within the
- 		node where the health server model is hosted.
-@@ -406,6 +678,76 @@ Methods:
- 			org.bluez.mesh.Error.NotSupported
- 
- 
-+Mesh Provisioner Hierarchy
-+============================
-+Service		unique name
-+Interface	org.bluez.mesh.Provisioner1
-+Object path	freely definable
-+
-+	ScanResult(int8 rssi, array{byte} data)
-+
-+		The method is called from the bluetooth-meshd daemon when a
-+		unique UUID has been seen during UnprovisionedScan() for
-+		unprovsioned devices.
-+
-+		The rssi parameter is a signed, normalized measurement of the
-+		signal strength of the recieved unprovisioned beacon.
-+
-+		The data parameter is a variable length byte array, that may
-+		have 1, 2 or 3 distinct fields contained in it including the 16
-+		byte remote device UUID (always), a 32 bit mask of OOB
-+		authentication flags (optional), and a 32 bit URI hash (if URI
-+		bit set in OOB mask). Whether these fields exist or not is a
-+		decision of the remote device.
-+
-+		If a beacon with a UUID that has already been reported is
-+		recieved by the daemon, it will be silently discarded unless it
-+		was recieved at a higher rssi power level.
-+
-+
-+	uint16 net_index, uint8 flags, uint32 iv_index, uint16 unicast
-+							RequestProvData()
-+
-+		This method is implemented by a Provisioner capable application
-+		and is called when the remote device has been fully
-+		authenticated and confirmed.
-+
-+		Return Parameters are from the Mesh Profile Spec:
-+		net_index - Subnet index of the net_key
-+		flags - Flags for IV_Update and Key Refresh
-+		iv_index - Current IvIndex being used on the network
-+		unicast - Primary Unicast address of the new node
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.Abort
-+
-+	void AddNodeComplete(array{byte}[16] uuid, uint16 unicast, uint8 count)
-+
-+		This method is called when the node provisioning initiated
-+		by an AddNode() method call successfully completed.
-+
-+		The unicast parameter is the primary address that has been
-+		assigned to the new node, and the address of it's config server.
-+
-+		The count parameter is the number of unicast addresses assigned
-+		to the new node.
-+
-+		The new node may now be sent messages using the credentials
-+		supplied by the RequestProvData method.
-+
-+	void AddNodeFailed(array{byte}[16] uuid, string reason)
-+
-+		This method is called when the node provisioning initiated by
-+		AddNode() has failed. Depending on how far Provisioning
-+		proceeded before failing, some cleanup of cached data may be
-+		required.
-+
-+		The reason parameter identifies the reason for provisioning
-+		failure. The defined values are: "aborted", "timeout",
-+		"bad-pdu", "confirmation-failed", "out-of-resources",
-+		"decryption-error", "unexpected-error",
-+		"cannot-assign-addresses".
-+
- Provisioning Agent Hierarchy
- ============================
- Service		unique name
-@@ -441,6 +783,7 @@ Methods:
- 		the local role is Provisioner.
- 
- 	void DisplayString(string value)
-+
- 		This method is called when the Daemon has something important
- 		for the Agent to Display, but does not require any additional
- 		input locally. For instance: "Enter "ABCDE" on remote device".
-@@ -451,9 +794,8 @@ Methods:
- 		for the Agent to Display, but does not require any additional
- 		input locally. For instance: "Enter 14939264 on remote device".
- 
--		The type parameter indicates the display method.  Allowed values
-+		The type parameter indicates the display method. Allowed values
- 		are:
--
- 			"blink" - Locally blink LED
- 			"beep" - Locally make a noise
- 			"vibrate" - Locally vibrate
-@@ -466,12 +808,11 @@ Methods:
- 
- 	uint32 PromptNumeric(string type)
- 
--		This method is called when the Daemon has requires the user to
--		enter a 1-99999999 digit decimal value.
-+		This method is called when the Daemon requests the user to
-+		enter a decimal value between 1-99999999.
- 
- 		The type parameter indicates the input method. Allowed values
- 		are:
--
- 			"blink" - Enter times remote LED blinked
- 			"beep" - Enter times remote device beeped
- 			"vibrate" - Enter times remote device vibrated
-@@ -483,14 +824,13 @@ Methods:
- 		This agent should prompt the user for specific input. For
- 		instance: "Enter value being displayed by remote device".
- 
--	array{byte} PromptStatic(string type)
-+	array{byte}[16] PromptStatic(string type)
- 
- 		This method is called when the Daemon requires a 16 octet byte
- 		array, as an Out-of-Band authentication.
- 
- 		The type parameter indicates the input method. Allowed values
- 		are:
--
- 			"static-oob" - return 16 octet array
- 			"in-alpha" - return 16 octet alpha array
- 
-@@ -511,7 +851,6 @@ Properties:
- 	array{string} Capabilities [read-only]
- 
- 		An array of strings with the following allowed values:
--
- 			"blink"
- 			"beep"
- 			"vibrate"
-@@ -528,7 +867,6 @@ Properties:
- 
- 		Indicates availability of OOB data. An array of strings with the
- 		following allowed values:
--
- 			"other"
- 			"uri"
- 			"machine-code-2d"
-@@ -546,8 +884,3 @@ Properties:
- 
- 		Uniform Resource Identifier points to out-of-band (OOB)
- 		information (e.g., a public key)
--
--
--Mesh Provisioner Hierarchy
--==========================
--<TBD>
--- 
-2.14.5
-
+SGkgQnJpYW4sDQoNCk9uIFR1ZSwgMjAxOS0wMy0xOSBhdCAxNDowMCAtMDcwMCwgQnJpYW4gR2l4
+IHdyb3RlOg0KPiBUaGUgYWRkZWQgRC1CdXMgQVBJcyBlbmFibGUgQXBwbGljYXRpb25zIHRvIGZ1
+bmN0aW9uIGluIGEgUHJvdmlzaW9uZXINCj4gSW5pdGlhdG9yIHJvbGUsIGFuZCBhcyBhIENvbmZp
+Z3VyYXRpb24gQ2xpZW50Lg0KPiAtLS0NCj4gIGRvYy9tZXNoLWFwaS50eHQgfCAzNjMNCj4gKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLQ0KPiAg
+MSBmaWxlIGNoYW5nZWQsIDM0OCBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4gDQo+
+IGRpZmYgLS1naXQgYS9kb2MvbWVzaC1hcGkudHh0IGIvZG9jL21lc2gtYXBpLnR4dA0KPiBpbmRl
+eCAwYjM0MWEwZjkuLjg1ZDFmODNkMiAxMDA2NDQNCj4gLS0tIGEvZG9jL21lc2gtYXBpLnR4dA0K
+PiArKysgYi9kb2MvbWVzaC1hcGkudHh0DQo+IEBAIC0zMCw2ICszMCw3IEBAIE1ldGhvZHM6DQo+
+ICAJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5JbnZhbGlkQXJndW1lbnRzDQo+ICANCj4gIAl2b2lk
+IENhbmNlbCh2b2lkKQ0KPiArDQo+ICAJCUNhbmNlbHMgYW4gb3V0c3RhbmRpbmcgcHJvdmlzaW9u
+aW5nIHJlcXVlc3QgaW5pdGlhdGVkDQo+IGJ5IEpvaW4oKQ0KPiAgCQltZXRob2QuDQo+ICANCj4g
+QEAgLTEwOSw2ICsxMTAsMzcgQEAgTWV0aG9kczoNCj4gIAkJUG9zc2libGVFcnJvcnM6DQo+ICAJ
+CQlvcmcuYmx1ZXoubWVzaC5FcnJvci5Ob3RGb3VuZA0KPiAgDQo+ICsJdWludDY0IHRva2VuIENy
+ZWF0ZU5ldHdvcmsob2JqZWN0IGFwcF9yb290LCBhcnJheXtieXRlfVsxNl0NCj4gdXVpZCkNCj4g
+Kw0KPiArCQlUaGlzIGlzIHRoZSBmaXJzdCBtZXRob2QgdGhhdCBhbiBhcHBsaWNhdGlvbiBjYWxs
+cyB0bw0KPiBiZWNvbWUNCj4gKwkJYSBQcm92aXNpb25lciBub2RlLCBhbmQgYSBDb25maWd1cmF0
+aW9uIENsaWVudCBvbiBhDQo+IG5ld2x5DQo+ICsJCWNyZWF0ZWQgTWVzaCBOZXR3b3JrLg0KPiAr
+DQo+ICsJCVRoZSBhcHBfcm9vdCBwYXJhbWV0ZXIgaXMgYSBELUJ1cyBvYmplY3Qgcm9vdCBwYXRo
+IG9mDQo+IHRoZQ0KPiArCQlhcHBsaWNhdGlvbiB0aGF0IGltcGxlbWVudHMgb3JnLmJsdWV6Lm1l
+c2guQXBwbGljYXRpb24xDQo+ICsJCWludGVyZmFjZSwgYW5kIGEgb3JnLmJsdWV6Lm1lc2guUHJv
+dmlzaW9uZXIxIGludGVyZmFjZS4NCj4gVGhlDQo+ICsJCWFwcGxpY2F0aW9uIHJlcHJlc2VudHMg
+YSBub2RlIHdoZXJlIGNoaWxkIG1lc2ggZWxlbWVudHMNCj4gaGF2ZQ0KPiArCQl0aGVpciBvd24g
+b2JqZWN0cyB0aGF0IGltcGxlbWVudA0KPiBvcmcuYmx1ZXoubWVzaC5FbGVtZW50MQ0KPiArCQlp
+bnRlcmZhY2UuIFRoZSBhcHBsaWNhdGlvbiBoaWVyYXJjaHkgYWxzbyBjb250YWlucyBhDQo+IHBy
+b3Zpc2lvbg0KPiArCQlhZ2VudCBvYmplY3QgdGhhdCBpbXBsZW1lbnRzDQo+IG9yZy5ibHVlei5t
+ZXNoLlByb3Zpc2lvbkFnZW50MQ0KPiArCQlpbnRlcmZhY2UuIFRoZSBzdGFuZGFyZCBEQnVzLk9i
+amVjdE1hbmFnZXIgaW50ZXJmYWNlDQo+IG11c3QgYmUNCj4gKwkJYXZhaWxhYmxlIG9uIHRoZSBh
+cHBfcm9vdCBwYXRoLg0KPiArDQo+ICsJCVRoZSB1dWlkIHBhcmFtZXRlciBpcyBhIDE2LWJ5dGUg
+YXJyYXkgdGhhdCBjb250YWlucw0KPiBEZXZpY2UgVVVJRC4NCj4gKw0KPiArCQlUaGUgcmV0dXJu
+ZWQgdG9rZW4gbXVzdCBiZSBwcmVzZXJ2ZWQgYnkgdGhlIGFwcGxpY2F0aW9uDQo+IGluDQo+ICsJ
+CW9yZGVyIHRvIGF1dGhlbnRpY2F0ZSBpdHNlbGYgdG8gdGhlIG1lc2ggZGFlbW9uIGFuZA0KPiBh
+dHRhY2ggdG8NCj4gKwkJdGhlIG5ldHdvcmsgYXMgYSBtZXNoIG5vZGUgYnkgY2FsbGluZyBBdHRh
+Y2goKSBtZXRob2QNCj4gb3INCj4gKwkJcGVybWFuZW50bHkgcmVtb3ZlIHRoZSBpZGVudGl0eSBv
+ZiB0aGUgbWVzaCBub2RlIGJ5DQo+IGNhbGxpbmcNCj4gKwkJTGVhdmUoKSBtZXRob2QuDQo+ICsN
+Cj4gKwkJVGhlIG90aGVyIGluZm9ybWF0aW9uIHRoZSBibHVldG9vdGgtbWVzaGQgZGFlbW9uIHdp
+bGwNCj4gcHJlc2VydmUNCj4gKwkJYWJvdXQgdGhlIGluaXRpYWwgbm9kZSwgaXMgdG8gZ2l2ZSBp
+dCB0aGUgaW5pdGlhbA0KPiBwcmltYXJ5DQo+ICsJCXVuaWNhc3QgYWRkcmVzcyAoMHgwMDAxKSwg
+YW5kIGNyZWF0ZSBhbmQgYXNzaWduIGENCj4gbmV0X2tleSBhcyB0aGUNCj4gKwkJcHJpbWFyeSBu
+ZXR3b3JrIG5ldF9pbmRleCAoMHgwMDApLg0KPiArDQo+ICsJCVBvc3NpYmxlRXJyb3JzOg0KPiAr
+CQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuSW52YWxpZEFyZ3VtZW50cw0KPiAgDQo+ICBNZXNoIE5v
+ZGUgSGllcmFyY2h5DQo+ICA9PT09PT09PT09PT09PT09PT09DQo+IEBAIC0xNDYsNiArMTc4LDMw
+IEBAIE1ldGhvZHM6DQo+ICAJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5JbnZhbGlkQXJndW1lbnRz
+DQo+ICAJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5Ob3RGb3VuZA0KPiAgDQo+ICsJdm9pZCBTZW5k
+V2l0aERldmljZUtleShvYmplY3QgZWxlbWVudF9wYXRoLCB1aW50MTYgZGVzdGluYXRpb24sDQo+
+ICsJCQkJCXVpbnQxNiBuZXRfaW5kZXgsIGFycmF5e2J5dGV9DQo+IGRhdGEpDQo+ICsNCj4gKwkJ
+VGhpcyBtZXRob2QgaXMgdXNlZCB0byBzZW5kIGEgbWVzc2FnZSBvcmlnaW5hdGVkIGJ5IGENCj4g
+bG9jYWwNCj4gKwkJbW9kZWwgZW5jb2RlZCB3aXRoIHRoZSBkZXZpY2Uga2V5IG9mIHRoZSByZW1v
+dGUgbm9kZS4NCj4gKw0KPiArCQlUaGUgZWxlbWVudF9wYXRoIHBhcmFtZXRlciBpcyB0aGUgb2Jq
+ZWN0IHBhdGggb2YgYW4NCj4gZWxlbWVudCBmcm9tDQo+ICsJCWEgY29sbGVjdGlvbiBvZiB0aGUg
+YXBwbGljYXRpb24gZWxlbWVudHMgKHNlZSBNZXNoDQo+IEFwcGxpY2F0aW9uDQo+ICsJCUhpZXJh
+cmNoeSBzZWN0aW9uKS4NCj4gKw0KPiArCQlUaGUgZGVzdGluYXRpb24gcGFyYW1ldGVyIGNvbnRh
+aW5zIHRoZSBkZXN0aW5hdGlvbg0KPiBhZGRyZXNzLiBUaGlzDQo+ICsJCWRlc3RpbmF0aW9uIG11
+c3QgYmUgYSB1aW50MTYgdG8gYSB1bmljYXN0IGFkZHJlc3MsIG9yIGENCj4gd2VsbA0KPiArCQlr
+bm93biBncm91cCBhZGRyZXNzLg0KPiArDQo+ICsJCVRoZSBuZXRfaW5kZXggcGFyYW1ldGVyIGlz
+IHRoZSBzdWJuZXQgaW5kZXggb2YgdGhlDQo+IG5ldHdvcmsgb24NCj4gKwkJd2hpY2ggdGhlIG1l
+c3NhZ2UgaXMgdG8gYmUgc2VudC4NCj4gKw0KPiArCQlUaGUgZGF0YSBwYXJhbWV0ZXIgaXMgYW4g
+b3V0Z29pbmcgbWVzc2FnZSB0byBiZQ0KPiBlbmN5cHRlZCBieSB0aGUNCj4gKwkJbWVzaGQgZGFl
+bW9uIGFuZCBzZW50IG9uLg0KPiArDQo+ICsJCVBvc3NpYmxlIGVycm9yczoNCj4gKwkJCW9yZy5i
+bHVlei5tZXNoLkVycm9yLkludmFsaWRBcmd1bWVudHMNCj4gKwkJCW9yZy5ibHVlei5tZXNoLkVy
+cm9yLk5vdEZvdW5kDQo+ICsNCj4gIAl2b2lkIFB1Ymxpc2gob2JqZWN0IGVsZW1lbnRfcGF0aCwg
+dWludDE2IG1vZGVsLCBhcnJheXtieXRlfQ0KPiBkYXRhKQ0KPiAgDQo+ICAJCVRoaXMgbWV0aG9k
+IGlzIHVzZWQgdG8gc2VuZCBhIHB1YmxpY2F0aW9uIG9yaWdpbmF0ZWQgYnkNCj4gYSBsb2NhbA0K
+PiBAQCAtMjI0LDEyICsyODAsMjExIEBAIFByb3BlcnRpZXM6DQo+ICAJCVRoaXMgcHJvcGVydHkg
+aW5kaWNhdGVzIHdoZXRoZXIgdGhlIHBlcmlvZGljIGJlYWNvbmluZw0KPiBpcw0KPiAgCQllbmFi
+bGVkICh0cnVlKSBvciBkaXNhYmxlZCAoZmFsc2UpLg0KPiAgDQo+ICsJdWludDggQmVhY29uRmxh
+Z3MgW3JlYWQtb25seV0NCj4gKw0KPiArCQlUaGlzIHByb3BlcnR5IG1heSBiZSByZWFkIGF0IGFu
+eSB0aW1lIHRvIGRldGVybWluZSB0aGUNCj4gZmxhZw0KPiArCQlmaWVsZCBzZXR0aW5nIG9uIHNl
+bnQgYW5kIHJlY2VpdmVkIGJlYWNvbnMgb2YgdGhlDQo+IHByaW1hcnkNCj4gKwkJbmV0d29yayBr
+ZXkuDQo+ICsNCj4gKwl1aW50MzIgSXZJbmRleCBbcmVhZC1vbmx5XQ0KPiArDQo+ICsJCVRoaXMg
+cHJvcGVydHkgbWF5IGJlIHJlYWQgYXQgYW55IHRpbWUgdG8gZGV0ZXJtaW5lIHRoZQ0KPiBJVl9J
+bmRleA0KPiArCQl0aGF0IHRoZSBjdXJyZW50IG5ldHdvcmsgaXMgb24uIFRoaXMgaW5mb3JtYXRp
+b24gaXMNCj4gb25seSB1c2VmdWwNCj4gKwkJZm9yIHByb3Zpc2lvbmluZy4NCj4gKw0KPiAgCXVp
+bnQzMiBTZWNvbmRzU2luY2VMYXN0SGVhcmQgW3JlYWQtb25seV0NCj4gIA0KPiAgCQlUaGlzIHBy
+b3BlcnR5IG1heSBiZSByZWFkIGF0IGFueSB0aW1lIHRvIGRldGVybWluZSB0aGUNCj4gbnVtYmVy
+IG9mDQo+ICAJCXNlY29uZHMgc2luY2UgbWVzaCBuZXR3b3JrIGxheWVyIHRyYWZmaWMgd2FzIGxh
+c3QNCj4gZGV0ZWN0ZWQgb24NCj4gIAkJdGhpcyBub2RlJ3MgbmV0d29yay4NCj4gIA0KPiArTWVz
+aCBQcm92aXNpb25pbmcgSGllcmFyY2h5DQo+ICs9PT09PT09PT09PT09PT09PT09PT09PT09PT09
+DQo+ICtTZXJ2aWNlCQlvcmcuYmx1ZXoubWVzaA0KPiArSW50ZXJmYWNlCW9yZy5ibHVlei5tZXNo
+LlByb3Zpc2lvbmluZzENCg0KV2UgbWF5IHdhbnQgdG8gY2FsbCB0aGlzIGludGVyZmFjZSAib3Jn
+LmJsdWV6Lm1lc2guTWFuYWdlcjEiLCBiZWNhdXNlDQppdCBjb250YWlucyBtZXRob2RzIHN1cnBh
+c3NpbmcgDQpwcm92aXNpb25pbmcgcHJvY2VkdXJlDQoNCj4gK09iamVjdCBwYXRoCS9vcmcvYmx1
+ZXovbWVzaC9ub2RlPHh4eHg+DQo+ICsJCXdoZXJlIHh4eHggaXMgYSA0LWRpZ2l0IGhleGFkZWNp
+bWFsIG51bWJlciBnZW5lcmF0ZWQgYnkNCj4gZGFlbW9uDQo+ICsNCj4gK01ldGhvZHM6DQo+ICsJ
+dm9pZCBVbnByb3Zpc2lvbmVkU2Nhbih1aW50MTYgc2Vjb25kcykNCj4gKw0KPiArCQlUaGlzIG1l
+dGhvZCBpcyB1c2VkIGJ5IHRoZSBhcHBsaWNhdGlvbiB0aGF0IHN1cHBvcnRzDQo+ICsJCW9yZy5i
+bHVlei5tZXNoLlByb3Zpc2lvbmVyMSBpbnRlcmZhY2UgdG8gc3RhcnQNCj4gbGlzdGVuaW5nDQo+
+ICsJCShzY2FubmluZykgZm9yIHVucHJvdmlzaW9uZWQgZGV2aWNlcyBpbiB0aGUgYXJlYS4NCj4g
+U2Nhbm5pbmcNCj4gKwkJd2lsbCBjb250aW51ZSBmb3IgdGhlIHNwZWNpZmllZCBudW1iZXIgb2Yg
+c2Vjb25kcywgb3IsDQo+IGlmIDAgaXMNCj4gKwkJc3BlY2lmaWVkLCB0aGVuIGNvbnRpbnVvdXNs
+eSB1bnRpbA0KPiBVbnByb3Zpc2lvbmVkU2NhbkNhbmNlbCgpIGlzDQo+ICsJCWNhbGxlZCBvciBp
+ZiBBZGROb2RlKCkgbWV0aG9kIGlzIGNhbGxlZC4NCj4gKw0KPiArCQlFYWNoIHRpbWUgYSB1bmlx
+dWUgdW5wcm92aXNpb25lZCBiZWFjb24gaXMgaGVhcmQsIHRoZQ0KPiArCQlTY2FuUmVzdWx0KCkg
+bWV0aG9kIG9uIHRoZSBhcHAgd2lsbCBiZSBjYWxsZWQgd2l0aCB0aGUNCj4gcmVzdWx0Lg0KPiAr
+DQo+ICsJCVBvc3NpYmxlRXJyb3JzOg0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuTm90QXV0
+aG9yaXplZA0KPiArDQo+ICsJdm9pZCBVbnByb3Zpc2lvbmVkU2NhbkNhbmNlbCh2b2lkKQ0KPiAr
+DQo+ICsJCVRoaXMgbWV0aG9kIGlzIHVzZWQgYnkgdGhlIGFwcGxpY2F0aW9uIHRoYXQgc3VwcG9y
+dHMNCj4gKwkJb3JnLmJsdWV6Lm1lc2guUHJvdmlzaW9uZXIxIGludGVyZmFjZSB0byBzdG9wIGxp
+c3RlbmluZw0KPiArCQkoc2Nhbm5pbmcpIGZvciB1bnByb3Zpc2lvbmVkIGRldmljZXMgaW4gdGhl
+IGFyZWEuDQo+ICsNCj4gKwkJUG9zc2libGVFcnJvcnM6DQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5F
+cnJvci5Ob3RBdXRob3JpemVkDQo+ICsNCj4gKwl2b2lkIEFkZE5vZGUoYXJyYXl7Ynl0ZX1bMTZd
+IHV1aWQpDQo+ICsNCj4gKwkJVGhpcyBtZXRob2QgaXMgdXNlZCBieSB0aGUgYXBwbGljYXRpb24g
+dGhhdCBzdXBwb3J0cw0KPiArCQlvcmcuYmx1ZXoubWVzaC5Qcm92aXNpb25lcjEgaW50ZXJmYWNl
+IHRvIGFkZCB0aGUNCj4gKwkJdW5wcm92aXNpb25lZCBkZXZpY2Ugc3BlY2lmaWVkIGJ5IHV1aWQs
+IHRvIHRoZSBOZXR3b3JrLg0KPiArDQo+ICsJCVRoZSB1dWlkIHBhcmFtZXRlciBpcyBhIDE2LWJ5
+dGUgYXJyYXkgdGhhdCBjb250YWlucw0KPiBEZXZpY2UgVVVJRA0KPiArCQlvZiB0aGUgdW5wcm92
+aXNpb25lZCBkZXZpY2UgdG8gYmUgYWRkZWQgdG8gdGhlIG5ldHdvcmsuDQo+ICsNCj4gKwkJUG9z
+c2libGVFcnJvcnM6DQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5JbnZhbGlkQXJndW1lbnRz
+DQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5Ob3RBdXRob3JpemVkDQo+ICsNCj4gKwl2b2lk
+IEFkZE5ldEtleSh1aW50MTYgbmV0X2luZGV4KQ0KDQoNCkkgc3VnZ2VzdCB3ZSBjaGFuZ2UgdGhp
+cyBtZXRob2QgdG8NCiBBZGROZXRLZXkodWludDE2IGRlc3QsIHVpbnQxNiBuZXRfaW5kZXgpDQoN
+ClNpbmNlIGluIHRoZSBjdXJyZW50IHByb3Bvc2VkIGFwcHJvYWNoIHRoZSBkYWVtb24gaXMgdGhl
+IG9ubHkgZW50aXR5IGluDQpwb3NzZXNzaW9uIG9mIGtleSB2YXVlcywgdGhlIGNvbmZpZ3VyYXRp
+b24gbWVzc2FnZXMgdGhhdCBjb250YWluIHRoZQ0Ka2V5IHZhbHVlcyBpbiB0aGVpciBwYXlsb2Fk
+IHdpbGwgbmVlZCB0byBiZSBnZW5lcmF0ZWQgYnkgdGhlIGRhZW1vbi4NClRoZSBtb2RpZmllZCBt
+ZXRob2Qgd2lsbCBhbGxvdyB0byBzZW5kIHRoZSBuZXR3b3JrIGtleShzKSB0byBhbnkgbm9kZS4N
+CklmIGEgbmV0d29yayBrZXkgc3BlY2lmaWVkIGJ5IHRoZSBuZXRfaW5kZXgsIGRvZXMgbm90IGV4
+aXN0LCBpdCB3aWxsIGJlDQpnZW5lcmF0ZWQgYW5kIHJlY29yZGVkLCBlZmZlY3RpdmVseSBjcmVh
+dGluZyBhIG5ldyBzdWJuZXQuDQpBbHRlcm5hdGl2ZWx5LCB0aGlzIGZ1bmN0aW9uYWxpdHkgY2Fu
+IGJlIGNvdmVyZWQgYnkgdHdvIG1ldGhvZHM6DQpDcmVhdGVTdWJuZXQodWludDE2IG5ldF9pbmRl
+eCkgdG8gZ2VuZXJhdGUgYSBrZXkgdmFsdWUgYW5kDQpBZGROZXRLZXkodWludDE2IGRlc3QsIHVp
+bnQxNiBuZXRfaW5kZXgpIHRvIHNlbmQgdGhlIGtleXMgdG8gYSByZW1vdGUNCm9yIGxvY2FsIG5v
+ZGUNCg0KPiArDQo+ICsJCVRoaXMgbWV0aG9kIGlzIHVzZWQgYnkgdGhlIGFwcGxpY2F0aW9uIHRo
+YXQgc3VwcG9ydHMNCj4gKwkJb3JnLmJsdWV6Lm1lc2guUHJvdmlzaW9uZXIxIGludGVyZmFjZSB0
+byBnZW5lcmF0ZSBhbmQNCj4gYWRkIGEgbmV3DQo+ICsJCW5ldHdvcmsgc3VibmV0IGtleS4NCj4g
+Kw0KPiArCQlUaGUgbmV0X2luZGV4IHBhcmFtZXRlciBpcyBhIDEyLWJpdCB2YWx1ZSAoMHgwMDEt
+MHhGRkYpDQo+ICsJCXNwZWNpZnlpbmcgd2hpY2ggbmV0IGtleSB0byBhZGQuDQo+ICsNCj4gKwkJ
+VGhpcyBjYWxsIGFmZmVjdHMgdGhlIGxvY2FsIGJsdWV0b290aC1kYWVtb24ga2V5DQo+IGRhdGFi
+YXNlIG9ubHkuDQo+ICsNCj4gKwkJUG9zc2libGVFcnJvcnM6DQo+ICsJCQlvcmcuYmx1ZXoubWVz
+aC5FcnJvci5JbnZhbGlkQXJndW1lbnRzDQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5Ob3RB
+dXRob3JpemVkDQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5BbHJlYWR5RXhpc3RzDQo+ICsN
+Cj4gKwl2b2lkIFVwZGF0ZU5ldEtleSh1aW50MTYgbmV0X2luZGV4KQ0KDQpJIHN1Z2dlc3Qgd2Ug
+Y2hhbmdlIHRoaXMgbWV0aG9kIHRvIFVwZGF0ZU5ldEtleSh1aW50MTYgZGVzdCwgdWludDE2DQpu
+ZXRfaW5kZXgpDQpUaGlzIHdpbGwgYWxsb3cgdG8gc2VuZCBhbiB1cGRhdGVkIHZhbHVlIG9mIHRo
+ZSBuZXR3b3JrIGtleSB0byBhbnkNCm5vZGUuIElmIHRoZSB1cGRhdGVkIG5ldHdvcmsga2V5IHZh
+bHVlIHNwZWNpZmllZCBieSB0aGUgbmV0X2luZGV4LCBkb2VzDQpub3QgZXhpc3QsIGl0IHdpbGwg
+YmUgZ2VuZXJhdGVkIGFuZCByZWNvcmRlZC4NCg0KDQo+ICsNCj4gKwkJVGhpcyBtZXRob2QgaXMg
+dXNlZCBieSB0aGUgYXBwbGljYXRpb24gdGhhdCBzdXBwb3J0cw0KPiArCQlvcmcuYmx1ZXoubWVz
+aC5Qcm92aXNpb25lcjEgaW50ZXJmYWNlIHRvIGdlbmVyYXRlIGEgbmV3DQo+IG5ldHdvcmsNCj4g
+KwkJc3VibmV0IGtleSwgYW5kIHNldCBpdCdzIGtleSByZWZyZXNoIHN0YXRlIHRvIFBoYXNlIDEu
+DQo+ICsNCj4gKwkJVGhlIG5ldF9pbmRleCBwYXJhbWV0ZXIgaXMgYSAxMi1iaXQgdmFsdWUgKDB4
+MDAwLTB4RkZGKQ0KPiArCQlzcGVjaWZ5aW5nIHdoaWNoIG5ldCBrZXkgdG8gdXBkYXRlLiBOb3Rl
+IHRoYXQgdGhlDQo+IHN1Ym5ldCBtdXN0DQo+ICsJCWV4aXN0IHByaW9yIHRvIHVwZGF0aW5nLg0K
+PiArDQo+ICsJCVRoaXMgY2FsbCBhZmZlY3RzIHRoZSBsb2NhbCBibHVldG9vdGgtZGFlbW9uIGtl
+eQ0KPiBkYXRhYmFzZSBvbmx5Lg0KPiArDQo+ICsJCVBvc3NpYmxlRXJyb3JzOg0KPiArCQkJb3Jn
+LmJsdWV6Lm1lc2guRXJyb3IuSW52YWxpZEFyZ3VtZW50cw0KPiArCQkJb3JnLmJsdWV6Lm1lc2gu
+RXJyb3IuTm90QXV0aG9yaXplZA0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuRG9lc05vdEV4
+aXN0DQo+ICsNCj4gKwl2b2lkIERlbGV0ZU5ldEtleSh1aW50MTYgbmV0X2luZGV4KQ0KPiArDQo+
+ICsJCVRoaXMgbWV0aG9kIGlzIHVzZWQgYnkgdGhlIGFwcGxpY2F0aW9uIHRoYXQgc3VwcG9ydHMN
+Cj4gKwkJb3JnLmJsdWV6Lm1lc2guUHJvdmlzaW9uZXIxIGludGVyZmFjZSB0byBkZWxldGUgYQ0K
+PiBzdWJuZXQuDQo+ICsNCj4gKwkJVGhlIG5ldF9pbmRleCBwYXJhbWV0ZXIgaXMgYSAxMi1iaXQg
+dmFsdWUgKDB4MDAxLTB4RkZGKQ0KPiArCQlzcGVjaWZ5aW5nIHdoaWNoIG5ldCBrZXkgdG8gZGVs
+ZXRlLiBUaGUgcHJpbWFyeSBuZXQga2V5DQo+ICgweDAwMCkNCj4gKwkJbWF5IG5vdCBiZSBkZWxl
+dGVkLg0KPiArDQo+ICsJCVRoaXMgY2FsbCBhZmZlY3RzIHRoZSBsb2NhbCBibHVldG9vdGgtZGFl
+bW9uIGtleQ0KPiBkYXRhYmFzZSBvbmx5Lg0KPiArDQo+ICsJCVBvc3NpYmxlRXJyb3JzOg0KPiAr
+CQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuSW52YWxpZEFyZ3VtZW50cw0KPiArCQkJb3JnLmJsdWV6
+Lm1lc2guRXJyb3IuTm90QXV0aG9yaXplZA0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuRG9l
+c05vdEV4aXN0DQo+ICsNCj4gKwl2b2lkIFNldEtleVBoYXNlKHVpbnQxNiBuZXRfaW5kZXgsIHVp
+bnQ4IHBoYXNlKQ0KPiArCQlUaGlzIG1ldGhvZCBpcyB1c2VkIHRvIHNldCB0aGUgbWFzdGVyIGtl
+eSB1cGRhdGUgcGhhc2UNCj4gb2YgdGhlDQo+ICsJCWdpdmVuIHN1Ym5ldC4NCj4gKw0KPiArCQlU
+aGUgbmV0X2luZGV4IHBhcmFtZXRlciBpcyBhIDEyLWJpdCB2YWx1ZSAoMHgwMDAtMHhGRkYpDQo+
+ICsJCXNwZWNpZnlpbmcgd2hpY2ggc3VibmV0IHBoYXNlIHRvIHNldC4NCj4gKw0KPiArCQlUaGUg
+cGhhc2UgcGFyYW1ldGVyIGlzIHVzZWQgdG8gY3ljbGUgdGhlIGxvY2FsIGtleQ0KPiBkYXRhYmFz
+ZQ0KPiArCQl0aHJvdWdoIHRoZSBwaGFzZXMgYXMgZGVmaW5lZCBieSB0aGUgTWVzaCBQcm9maWxl
+DQo+IFNwZWNpZmljYXRpb24uDQo+ICsJCUFsbG93ZWQgdmFsdWVzOg0KPiArCQkJMCAtIENhbmNl
+bCBLZXkgUmVmcmVzaCAoTWF5IG9ubHkgYmUgY2FsbGVkIGZyb20NCj4gUGhhc2UgMSwNCj4gKwkJ
+CQlhbmQgc2hvdWxkIG5ldmVyIGJlIGNhbGxlZCBvbmNlIHRoZSBuZXcNCj4ga2V5IGhhcw0KPiAr
+CQkJCXN0YXJ0ZWQgcHJvcGFnYXRpbmcpDQo+ICsJCQkxIC0gSW52YWxpZCBBcmd1bWVudCAoc2Vl
+IE5ldEtleVVwZGF0ZSBtZXRob2QpDQo+ICsJCQkyIC0gR28gdG8gUGhhc2UgMiAoTWF5IG9ubHkg
+YmUgY2FsbGVkIGZyb20NCj4gUGhhc2UgMSkNCj4gKwkJCTMgLSBDb21wbGV0ZSBLZXkgUmVmcmVz
+aCBwcm9jZWR1cmUgKE1heSBvbmx5IGJlDQo+IGNhbGxlZA0KPiArCQkJCWZyb20gUGhhc2UgMikN
+Cj4gKw0KPiArCQlUaGlzIGNhbGwgYWZmZWN0cyB0aGUgbG9jYWwgYmx1ZXRvb3RoLWRhZW1vbiBr
+ZXkNCj4gZGF0YWJhc2Ugb25seS4NCj4gKw0KPiArCQlQb3NzaWJsZUVycm9yczoNCj4gKwkJCW9y
+Zy5ibHVlei5tZXNoLkVycm9yLkludmFsaWRBcmd1bWVudHMNCj4gKwkJCW9yZy5ibHVlei5tZXNo
+LkVycm9yLk5vdEF1dGhvcml6ZWQNCj4gKwkJCW9yZy5ibHVlei5tZXNoLkVycm9yLkRvZXNOb3RF
+eGlzdA0KPiArDQo+ICsJdm9pZCBBZGRBcHBLZXkodWludDE2IG5ldF9pbmRleCwgdWludDE2IGFw
+cF9pbmRleCkNCg0KU2ltaWxhciB0byB0aGUgbmV0d29yayBrZXkgbWV0aG9kcywgbmVlZHMgdG8g
+aW5jbHVkZSBkZXN0IHBhcmFtZXRlciANCg0KPiArDQo+ICsJCVRoaXMgbWV0aG9kIGlzIHVzZWQg
+YnkgdGhlIGFwcGxpY2F0aW9uIHRoYXQgc3VwcG9ydHMNCj4gKwkJb3JnLmJsdWV6Lm1lc2guUHJv
+dmlzaW9uZXIxIGludGVyZmFjZSB0byBnZW5lcmF0ZSBhbmQNCj4gYWRkIGEgbmV3DQo+ICsJCWFw
+cGxpY2F0aW9uIGtleS4NCj4gKw0KPiArCQlUaGUgbmV0X2luZGV4IHBhcmFtZXRlciBpcyBhIDEy
+LWJpdCB2YWx1ZSAoMHgwMDAtMHhGRkYpDQo+ICsJCXNwZWNpZnlpbmcgd2hpY2ggbmV0IGtleSB0
+byBiaW5kIHRoZSBhcHBsaWNhdGlvbiBrZXkNCj4gdG8uDQo+ICsNCj4gKwkJVGhlIGFwcF9pbmRl
+eCBwYXJhbWV0ZXIgaXMgYSAxMi1iaXQgdmFsdWUgKDB4MDAwLTB4RkZGKQ0KPiArCQlzcGVjaWZ5
+aW5nIHdoaWNoIGFwcCBrZXkgdG8gYWRkLg0KPiArDQo+ICsJCVRoaXMgY2FsbCBhZmZlY3RzIHRo
+ZSBsb2NhbCBibHVldG9vdGgtZGFlbW9uIGtleQ0KPiBkYXRhYmFzZSBvbmx5Lg0KPiArDQo+ICsJ
+CVBvc3NpYmxlRXJyb3JzOg0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuSW52YWxpZEFyZ3Vt
+ZW50cw0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuTm90QXV0aG9yaXplZA0KPiArCQkJb3Jn
+LmJsdWV6Lm1lc2guRXJyb3IuQWxyZWFkeUV4aXN0cw0KPiArDQo+ICsJdm9pZCBVcGRhdGVBcHBL
+ZXkodWludDE2IGFwcF9pbmRleCkNCj4gKw0KPiArCQlUaGlzIG1ldGhvZCBpcyB1c2VkIGJ5IHRo
+ZSBhcHBsaWNhdGlvbiB0aGF0IHN1cHBvcnRzDQo+ICsJCW9yZy5ibHVlei5tZXNoLlByb3Zpc2lv
+bmVyMSBpbnRlcmZhY2UgdG8gZ2VuZXJhdGUgYSBuZXcNCj4gKwkJYXBwbGljYXRpb24ga2V5Lg0K
+PiArDQo+ICsJCVRoZSBhcHBfaW5kZXggcGFyYW1ldGVyIGlzIGEgMTItYml0IHZhbHVlICgweDAw
+MC0weEZGRikNCj4gKwkJc3BlY2lmeWluZyB3aGljaCBhcHAga2V5IHRvIHVwZGF0ZS4gTm90ZSB0
+aGF0IHRoZQ0KPiBzdWJuZXQgdGhhdA0KPiArCQl0aGUga2V5IGlzIGJvdW5kIHRvIG11c3QgZXhp
+c3QgYW5kIGJlIGluIFBoYXNlIDEuDQo+ICsNCj4gKwkJVGhpcyBjYWxsIGFmZmVjdHMgdGhlIGxv
+Y2FsIGJsdWV0b290aC1kYWVtb24ga2V5DQo+IGRhdGFiYXNlIG9ubHkuDQo+ICsNCj4gKwkJUG9z
+c2libGVFcnJvcnM6DQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5JbnZhbGlkQXJndW1lbnRz
+DQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5Ob3RBdXRob3JpemVkDQo+ICsJCQlvcmcuYmx1
+ZXoubWVzaC5FcnJvci5Eb2VzTm90RXhpc3QNCj4gKw0KPiArCXZvaWQgRGVsZXRlQXBwS2V5KHVp
+bnQxNiBhcHBfaW5kZXgpDQo+ICsNCj4gKwkJVGhpcyBtZXRob2QgaXMgdXNlZCBieSB0aGUgYXBw
+bGljYXRpb24gdGhhdCBzdXBwb3J0cw0KPiArCQlvcmcuYmx1ZXoubWVzaC5Qcm92aXNpb25lcjEg
+aW50ZXJmYWNlIHRvIGRlbGV0ZSBhbg0KPiBhcHBsaWNhdGlvbg0KPiArCQlrZXkuDQo+ICsNCj4g
+KwkJVGhlIGFwcF9pbmRleCBwYXJhbWV0ZXIgaXMgYSAxMi1iaXQgdmFsdWUgKDB4MDAwLTB4RkZG
+KQ0KPiArCQlzcGVjaWZ5aW5nIHdoaWNoIGFwcCBrZXkgdG8gZGVsZXRlLg0KPiArDQo+ICsJCVRo
+aXMgY2FsbCBhZmZlY3RzIHRoZSBsb2NhbCBibHVldG9vdGgtZGFlbW9uIGtleQ0KPiBkYXRhYmFz
+ZSBvbmx5Lg0KPiArDQo+ICsJCVBvc3NpYmxlRXJyb3JzOg0KPiArCQkJb3JnLmJsdWV6Lm1lc2gu
+RXJyb3IuSW52YWxpZEFyZ3VtZW50cw0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuTm90QXV0
+aG9yaXplZA0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuRG9lc05vdEV4aXN0DQo+ICsNCj4g
+Kwl2b2lkIERlbGV0ZVJlbW90ZU5vZGUodWludDE2IHByaW1hcnksIHVpbnQ4IGNudCkNCg0KTGV0
+J3MgY2FsbCB0aGlzIG1ldGhvZCBEZWxldGVOb2RlKCkNCkRvIHdlIG5lZWQgdG8gc3BlY2lmeSB0
+aGUgZWxlbWVudCBjb3VudD8gDQoNCj4gKw0KPiArCQlUaGlzIG1ldGhvZCBpcyB1c2VkIGJ5IHRo
+ZSBhcHBsaWNhdGlvbiB0aGF0IHN1cHBvcnRzDQo+ICsJCW9yZy5ibHVlei5tZXNoLlByb3Zpc2lv
+bmVyMSBpbnRlcmZhY2UgdG8gZGVsZXRlIGENCj4gcmVtb3RlIG5vZGUNCj4gKwkJZnJvbSB0aGUg
+bG9jYWwgZGV2aWNlIGtleSBkYXRhYmFzZS4NCj4gKw0KPiArCQlUaGUgcHJpbWFyeSBwYXJhbWV0
+ZXIgc3BlY2lmaWVzIHRoZSB1bmljYXN0IGFkZHJlc3Mgb2YNCj4gdGhlDQo+ICsJCXRoZSBub2Rl
+IGJlaW5nIGRlbGV0ZWQsIGFuZCB0aGUgbnVtYmVyIG9mIGVsZW1lbnRzIHRoYXQNCj4gd2VyZQ0K
+PiArCQlhc3NpZ25lZCB0byBpdC4NCj4gKw0KPiArCQlUaGlzIGNhbGwgYWZmZWN0cyB0aGUgbG9j
+YWwgYmx1ZXRvb3RoLWRhZW1vbiBrZXkNCj4gZGF0YWJhc2Ugb25seS4NCj4gKw0KPiArCQlQb3Nz
+aWJsZUVycm9yczoNCj4gKwkJCW9yZy5ibHVlei5tZXNoLkVycm9yLkludmFsaWRBcmd1bWVudHMN
+Cj4gKwkJCW9yZy5ibHVlei5tZXNoLkVycm9yLk5vdEF1dGhvcml6ZWQNCj4gKwkJCW9yZy5ibHVl
+ei5tZXNoLkVycm9yLkRvZXNOb3RFeGlzdA0KPiAgDQo+ICBNZXNoIEFwcGxpY2F0aW9uIEhpZXJh
+cmNoeQ0KPiAgPT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gQEAgLTI0Nyw2ICs1MDIsNyBA
+QCBBbiBleGFtcGxlIG1lc2ggYXBwbGljYXRpb24gaGllcmFyY2h5IG1heSBsb29rDQo+IGxpa2Ug
+dGhpczoNCj4gIAkJCXwgICAtIG9yZy5mcmVlZGVza3RvcC5EQnVzLk9iamVjdE1hbmFnZXINCj4g
+IAkJCXwgICAtIG9yZy5ibHVlei5tZXNoLkFwcGxpY2F0aW9uMQ0KPiAgCQkJfCAgIC0gb3JnLmJs
+dWV6Lm1lc2guQXR0ZW50aW9uMSAob3B0aW9uYWwpDQo+ICsJCQl8ICAgLSBvcmcuYmx1ZXoubWVz
+aC5Qcm92aXNpb25lcjENCj4gKG9wdGlvbmFsLFByb3Zpc2lvbmVyKQ0KPiAgCQkJfA0KPiAgCQkJ
+LT4gL2NvbS9leGFtcGxlL2FnZW50DQo+ICAJCQl8IHwgICAtIG9yZy5ibHVlei5tZXNoLlByb3Zp
+c2lvbkFnZW50MQ0KPiBAQCAtMzI1LDYgKzU4MSwyMiBAQCBNZXRob2RzOg0KPiAgDQo+ICAJCVRo
+ZSBkYXRhIHBhcmFtZXRlciBpcyB0aGUgaW5jb21pbmcgbWVzc2FnZS4NCj4gIA0KPiArCXZvaWQg
+RGV2S2V5TWVzc2FnZVJlY2VpdmVkKHVpbnQxNiBzb3VyY2UsIHVpbnQxNiBuZXRfaW5kZXgsDQo+
+ICsJCQkJCQkJYXJyYXl7Ynl0ZX0NCj4gZGF0YSkNCj4gKw0KPiArCQlUaGlzIG1ldGhvZCBpcyBj
+YWxsZWQgYnkgbWVzaGQgZGFlbW9uIHdoZW4gYSBtZXNzYWdlDQo+IGFycml2ZXMNCj4gKwkJYWRk
+cmVzc2VkIHRvIHRoZSBhcHBsaWNhdGlvbiwgd2hpY2ggd2FzIHNlbnQgd2l0aCB0aGUNCj4gcmVt
+b3RlDQo+ICsJCW5vZGUncyBkZXZpY2Uga2V5Lg0KPiArDQo+ICsJCVRoZSBzb3VyY2UgcGFyYW1l
+dGVyIGlzIHVuaWNhc3QgYWRkcmVzcyBvZiB0aGUgcmVtb3RlDQo+ICsJCW5vZGUtZWxlbWVudCB0
+aGF0IHNlbnQgdGhlIG1lc3NhZ2UuDQo+ICsNCj4gKwkJVGhlIG5ldF9pbmRleCBwYXJhbWV0ZXIg
+aW5kaWNhdGVzIHdoYXQgc3VibmV0IHRoZQ0KPiBtZXNzYWdlIHdhcw0KPiArCQlyZWNlaXZlZCBv
+biwgYW5kIGlmIGEgcmVzcG9uc2UgaXMgcmVxdWlyZWQsIHRoZSBzYW1lDQo+IHN1Ym5ldA0KPiAr
+CQltdXN0IGJlIHVzZWQgdG8gc2VuZCB0aGUgcmVzcG9uc2UuDQo+ICsNCj4gKwkJVGhlIGRhdGEg
+cGFyYW1ldGVyIGlzIHRoZSBpbmNvbWluZyBtZXNzYWdlLg0KPiArDQo+ICAJdm9pZCBVcGRhdGVN
+b2RlbENvbmZpZ3VyYXRpb24odWludDE2IG1vZGVsX2lkLCBkaWN0IGNvbmZpZykNCj4gIA0KPiAg
+CQlUaGlzIG1ldGhvZCBpcyBjYWxsZWQgYnkgYmx1ZXRvb3RoLW1lc2hkIGRhZW1vbiB3aGVuIGEN
+Cj4gbW9kZWwncw0KPiBAQCAtMzgzLDcgKzY1NSw3IEBAIE9iamVjdCBwYXRoCWZyZWVseSBkZWZp
+bmFibGUNCj4gIFRoaXMgaXMgYW4gb3B0aW9uYWwgaW50ZXJmYWNlIHRoYXQgaW1wbGVtZW50cyBo
+ZWFsdGggYXR0ZW50aW9uDQo+IHRpbWVyLg0KPiAgDQo+ICBNZXRob2RzOg0KPiAtCXZvaWQgU2V0
+VGltZXIodWludDggZWxlbWVudF9pbmRleCwgIHVpbnQxNiB0aW1lKQ0KPiArCXZvaWQgU2V0VGlt
+ZXIodWludDggZWxlbWVudF9pbmRleCwgdWludDE2IHRpbWUpDQo+ICANCj4gIAkJVGhlIGVsZW1l
+bnRfaW5kZXggcGFyYW1ldGVyIGlzIHRoZSBlbGVtZW50J3MgaW5kZXgNCj4gd2l0aGluIHRoZQ0K
+PiAgCQlub2RlIHdoZXJlIHRoZSBoZWFsdGggc2VydmVyIG1vZGVsIGlzIGhvc3RlZC4NCj4gQEAg
+LTQwNiw2ICs2NzgsNzYgQEAgTWV0aG9kczoNCj4gIAkJCW9yZy5ibHVlei5tZXNoLkVycm9yLk5v
+dFN1cHBvcnRlZA0KPiAgDQo+ICANCj4gK01lc2ggUHJvdmlzaW9uZXIgSGllcmFyY2h5DQo+ICs9
+PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+ICtTZXJ2aWNlCQl1bmlxdWUgbmFtZQ0KPiAr
+SW50ZXJmYWNlCW9yZy5ibHVlei5tZXNoLlByb3Zpc2lvbmVyMQ0KPiArT2JqZWN0IHBhdGgJZnJl
+ZWx5IGRlZmluYWJsZQ0KPiArDQo+ICsJU2NhblJlc3VsdChpbnQ4IHJzc2ksIGFycmF5e2J5dGV9
+IGRhdGEpDQo+ICsNCj4gKwkJVGhlIG1ldGhvZCBpcyBjYWxsZWQgZnJvbSB0aGUgYmx1ZXRvb3Ro
+LW1lc2hkIGRhZW1vbg0KPiB3aGVuIGENCj4gKwkJdW5pcXVlIFVVSUQgaGFzIGJlZW4gc2VlbiBk
+dXJpbmcgVW5wcm92aXNpb25lZFNjYW4oKQ0KPiBmb3INCj4gKwkJdW5wcm92c2lvbmVkIGRldmlj
+ZXMuDQo+ICsNCj4gKwkJVGhlIHJzc2kgcGFyYW1ldGVyIGlzIGEgc2lnbmVkLCBub3JtYWxpemVk
+IG1lYXN1cmVtZW50DQo+IG9mIHRoZQ0KPiArCQlzaWduYWwgc3RyZW5ndGggb2YgdGhlIHJlY2ll
+dmVkIHVucHJvdmlzaW9uZWQgYmVhY29uLg0KPiArDQo+ICsJCVRoZSBkYXRhIHBhcmFtZXRlciBp
+cyBhIHZhcmlhYmxlIGxlbmd0aCBieXRlIGFycmF5LA0KPiB0aGF0IG1heQ0KPiArCQloYXZlIDEs
+IDIgb3IgMyBkaXN0aW5jdCBmaWVsZHMgY29udGFpbmVkIGluIGl0DQo+IGluY2x1ZGluZyB0aGUg
+MTYNCj4gKwkJYnl0ZSByZW1vdGUgZGV2aWNlIFVVSUQgKGFsd2F5cyksIGEgMzIgYml0IG1hc2sg
+b2YgT09CDQo+ICsJCWF1dGhlbnRpY2F0aW9uIGZsYWdzIChvcHRpb25hbCksIGFuZCBhIDMyIGJp
+dCBVUkkgaGFzaA0KPiAoaWYgVVJJDQo+ICsJCWJpdCBzZXQgaW4gT09CIG1hc2spLiBXaGV0aGVy
+IHRoZXNlIGZpZWxkcyBleGlzdCBvciBub3QNCj4gaXMgYQ0KPiArCQlkZWNpc2lvbiBvZiB0aGUg
+cmVtb3RlIGRldmljZS4NCj4gKw0KPiArCQlJZiBhIGJlYWNvbiB3aXRoIGEgVVVJRCB0aGF0IGhh
+cyBhbHJlYWR5IGJlZW4gcmVwb3J0ZWQNCj4gaXMNCj4gKwkJcmVjaWV2ZWQgYnkgdGhlIGRhZW1v
+biwgaXQgd2lsbCBiZSBzaWxlbnRseSBkaXNjYXJkZWQNCj4gdW5sZXNzIGl0DQo+ICsJCXdhcyBy
+ZWNpZXZlZCBhdCBhIGhpZ2hlciByc3NpIHBvd2VyIGxldmVsLg0KPiArDQo+ICsNCj4gKwl1aW50
+MTYgbmV0X2luZGV4LCB1aW50OCBmbGFncywgdWludDMyIGl2X2luZGV4LCB1aW50MTYgdW5pY2Fz
+dA0KPiArCQkJCQkJCVJlcXVlc3RQcm92RGF0YQ0KPiAoKQ0KPiArDQo+ICsJCVRoaXMgbWV0aG9k
+IGlzIGltcGxlbWVudGVkIGJ5IGEgUHJvdmlzaW9uZXIgY2FwYWJsZQ0KPiBhcHBsaWNhdGlvbg0K
+PiArCQlhbmQgaXMgY2FsbGVkIHdoZW4gdGhlIHJlbW90ZSBkZXZpY2UgaGFzIGJlZW4gZnVsbHkN
+Cj4gKwkJYXV0aGVudGljYXRlZCBhbmQgY29uZmlybWVkLg0KPiArDQo+ICsJCVJldHVybiBQYXJh
+bWV0ZXJzIGFyZSBmcm9tIHRoZSBNZXNoIFByb2ZpbGUgU3BlYzoNCj4gKwkJbmV0X2luZGV4IC0g
+U3VibmV0IGluZGV4IG9mIHRoZSBuZXRfa2V5DQo+ICsJCWZsYWdzIC0gRmxhZ3MgZm9yIElWX1Vw
+ZGF0ZSBhbmQgS2V5IFJlZnJlc2gNCj4gKwkJaXZfaW5kZXggLSBDdXJyZW50IEl2SW5kZXggYmVp
+bmcgdXNlZCBvbiB0aGUgbmV0d29yaw0KPiArCQl1bmljYXN0IC0gUHJpbWFyeSBVbmljYXN0IGFk
+ZHJlc3Mgb2YgdGhlIG5ldyBub2RlDQo+ICsNCj4gKwkJUG9zc2libGVFcnJvcnM6DQo+ICsJCQlv
+cmcuYmx1ZXoubWVzaC5FcnJvci5BYm9ydA0KPiArDQo+ICsJdm9pZCBBZGROb2RlQ29tcGxldGUo
+YXJyYXl7Ynl0ZX1bMTZdIHV1aWQsIHVpbnQxNiB1bmljYXN0LA0KPiB1aW50OCBjb3VudCkNCj4g
+Kw0KPiArCQlUaGlzIG1ldGhvZCBpcyBjYWxsZWQgd2hlbiB0aGUgbm9kZSBwcm92aXNpb25pbmcN
+Cj4gaW5pdGlhdGVkDQo+ICsJCWJ5IGFuIEFkZE5vZGUoKSBtZXRob2QgY2FsbCBzdWNjZXNzZnVs
+bHkgY29tcGxldGVkLg0KPiArDQo+ICsJCVRoZSB1bmljYXN0IHBhcmFtZXRlciBpcyB0aGUgcHJp
+bWFyeSBhZGRyZXNzIHRoYXQgaGFzDQo+IGJlZW4NCj4gKwkJYXNzaWduZWQgdG8gdGhlIG5ldyBu
+b2RlLCBhbmQgdGhlIGFkZHJlc3Mgb2YgaXQncw0KPiBjb25maWcgc2VydmVyLg0KPiArDQo+ICsJ
+CVRoZSBjb3VudCBwYXJhbWV0ZXIgaXMgdGhlIG51bWJlciBvZiB1bmljYXN0IGFkZHJlc3Nlcw0K
+PiBhc3NpZ25lZA0KPiArCQl0byB0aGUgbmV3IG5vZGUuDQo+ICsNCj4gKwkJVGhlIG5ldyBub2Rl
+IG1heSBub3cgYmUgc2VudCBtZXNzYWdlcyB1c2luZyB0aGUNCj4gY3JlZGVudGlhbHMNCj4gKwkJ
+c3VwcGxpZWQgYnkgdGhlIFJlcXVlc3RQcm92RGF0YSBtZXRob2QuDQo+ICsNCj4gKwl2b2lkIEFk
+ZE5vZGVGYWlsZWQoYXJyYXl7Ynl0ZX1bMTZdIHV1aWQsIHN0cmluZyByZWFzb24pDQo+ICsNCj4g
+KwkJVGhpcyBtZXRob2QgaXMgY2FsbGVkIHdoZW4gdGhlIG5vZGUgcHJvdmlzaW9uaW5nDQo+IGlu
+aXRpYXRlZCBieQ0KPiArCQlBZGROb2RlKCkgaGFzIGZhaWxlZC4gRGVwZW5kaW5nIG9uIGhvdyBm
+YXIgUHJvdmlzaW9uaW5nDQo+ICsJCXByb2NlZWRlZCBiZWZvcmUgZmFpbGluZywgc29tZSBjbGVh
+bnVwIG9mIGNhY2hlZCBkYXRhDQo+IG1heSBiZQ0KPiArCQlyZXF1aXJlZC4NCj4gKw0KPiArCQlU
+aGUgcmVhc29uIHBhcmFtZXRlciBpZGVudGlmaWVzIHRoZSByZWFzb24gZm9yDQo+IHByb3Zpc2lv
+bmluZw0KPiArCQlmYWlsdXJlLiBUaGUgZGVmaW5lZCB2YWx1ZXMgYXJlOiAiYWJvcnRlZCIsICJ0
+aW1lb3V0IiwNCj4gKwkJImJhZC1wZHUiLCAiY29uZmlybWF0aW9uLWZhaWxlZCIsICJvdXQtb2Yt
+cmVzb3VyY2VzIiwNCj4gKwkJImRlY3J5cHRpb24tZXJyb3IiLCAidW5leHBlY3RlZC1lcnJvciIs
+DQo+ICsJCSJjYW5ub3QtYXNzaWduLWFkZHJlc3NlcyIuDQo+ICsNCj4gIFByb3Zpc2lvbmluZyBB
+Z2VudCBIaWVyYXJjaHkNCj4gID09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gIFNlcnZp
+Y2UJCXVuaXF1ZSBuYW1lDQo+IEBAIC00NDEsNiArNzgzLDcgQEAgTWV0aG9kczoNCj4gIAkJdGhl
+IGxvY2FsIHJvbGUgaXMgUHJvdmlzaW9uZXIuDQo+ICANCj4gIAl2b2lkIERpc3BsYXlTdHJpbmco
+c3RyaW5nIHZhbHVlKQ0KPiArDQo+ICAJCVRoaXMgbWV0aG9kIGlzIGNhbGxlZCB3aGVuIHRoZSBE
+YWVtb24gaGFzIHNvbWV0aGluZw0KPiBpbXBvcnRhbnQNCj4gIAkJZm9yIHRoZSBBZ2VudCB0byBE
+aXNwbGF5LCBidXQgZG9lcyBub3QgcmVxdWlyZSBhbnkNCj4gYWRkaXRpb25hbA0KPiAgCQlpbnB1
+dCBsb2NhbGx5LiBGb3IgaW5zdGFuY2U6ICJFbnRlciAiQUJDREUiIG9uIHJlbW90ZQ0KPiBkZXZp
+Y2UiLg0KPiBAQCAtNDUxLDkgKzc5NCw4IEBAIE1ldGhvZHM6DQo+ICAJCWZvciB0aGUgQWdlbnQg
+dG8gRGlzcGxheSwgYnV0IGRvZXMgbm90IHJlcXVpcmUgYW55DQo+IGFkZGl0aW9uYWwNCj4gIAkJ
+aW5wdXQgbG9jYWxseS4gRm9yIGluc3RhbmNlOiAiRW50ZXIgMTQ5MzkyNjQgb24gcmVtb3RlDQo+
+IGRldmljZSIuDQo+ICANCj4gLQkJVGhlIHR5cGUgcGFyYW1ldGVyIGluZGljYXRlcyB0aGUgZGlz
+cGxheQ0KPiBtZXRob2QuICBBbGxvd2VkIHZhbHVlcw0KPiArCQlUaGUgdHlwZSBwYXJhbWV0ZXIg
+aW5kaWNhdGVzIHRoZSBkaXNwbGF5IG1ldGhvZC4NCj4gQWxsb3dlZCB2YWx1ZXMNCj4gIAkJYXJl
+Og0KPiAtDQo+ICAJCQkiYmxpbmsiIC0gTG9jYWxseSBibGluayBMRUQNCj4gIAkJCSJiZWVwIiAt
+IExvY2FsbHkgbWFrZSBhIG5vaXNlDQo+ICAJCQkidmlicmF0ZSIgLSBMb2NhbGx5IHZpYnJhdGUN
+Cj4gQEAgLTQ2NiwxMiArODA4LDExIEBAIE1ldGhvZHM6DQo+ICANCj4gIAl1aW50MzIgUHJvbXB0
+TnVtZXJpYyhzdHJpbmcgdHlwZSkNCj4gIA0KPiAtCQlUaGlzIG1ldGhvZCBpcyBjYWxsZWQgd2hl
+biB0aGUgRGFlbW9uIGhhcyByZXF1aXJlcyB0aGUNCj4gdXNlciB0bw0KPiAtCQllbnRlciBhIDEt
+OTk5OTk5OTkgZGlnaXQgZGVjaW1hbCB2YWx1ZS4NCj4gKwkJVGhpcyBtZXRob2QgaXMgY2FsbGVk
+IHdoZW4gdGhlIERhZW1vbiByZXF1ZXN0cyB0aGUgdXNlcg0KPiB0bw0KPiArCQllbnRlciBhIGRl
+Y2ltYWwgdmFsdWUgYmV0d2VlbiAxLTk5OTk5OTk5Lg0KPiAgDQo+ICAJCVRoZSB0eXBlIHBhcmFt
+ZXRlciBpbmRpY2F0ZXMgdGhlIGlucHV0IG1ldGhvZC4gQWxsb3dlZA0KPiB2YWx1ZXMNCj4gIAkJ
+YXJlOg0KPiAtDQo+ICAJCQkiYmxpbmsiIC0gRW50ZXIgdGltZXMgcmVtb3RlIExFRCBibGlua2Vk
+DQo+ICAJCQkiYmVlcCIgLSBFbnRlciB0aW1lcyByZW1vdGUgZGV2aWNlIGJlZXBlZA0KPiAgCQkJ
+InZpYnJhdGUiIC0gRW50ZXIgdGltZXMgcmVtb3RlIGRldmljZSB2aWJyYXRlZA0KPiBAQCAtNDgz
+LDE0ICs4MjQsMTMgQEAgTWV0aG9kczoNCj4gIAkJVGhpcyBhZ2VudCBzaG91bGQgcHJvbXB0IHRo
+ZSB1c2VyIGZvciBzcGVjaWZpYyBpbnB1dC4NCj4gRm9yDQo+ICAJCWluc3RhbmNlOiAiRW50ZXIg
+dmFsdWUgYmVpbmcgZGlzcGxheWVkIGJ5IHJlbW90ZQ0KPiBkZXZpY2UiLg0KPiAgDQo+IC0JYXJy
+YXl7Ynl0ZX0gUHJvbXB0U3RhdGljKHN0cmluZyB0eXBlKQ0KPiArCWFycmF5e2J5dGV9WzE2XSBQ
+cm9tcHRTdGF0aWMoc3RyaW5nIHR5cGUpDQo+ICANCj4gIAkJVGhpcyBtZXRob2QgaXMgY2FsbGVk
+IHdoZW4gdGhlIERhZW1vbiByZXF1aXJlcyBhIDE2DQo+IG9jdGV0IGJ5dGUNCj4gIAkJYXJyYXks
+IGFzIGFuIE91dC1vZi1CYW5kIGF1dGhlbnRpY2F0aW9uLg0KPiAgDQo+ICAJCVRoZSB0eXBlIHBh
+cmFtZXRlciBpbmRpY2F0ZXMgdGhlIGlucHV0IG1ldGhvZC4gQWxsb3dlZA0KPiB2YWx1ZXMNCj4g
+IAkJYXJlOg0KPiAtDQo+ICAJCQkic3RhdGljLW9vYiIgLSByZXR1cm4gMTYgb2N0ZXQgYXJyYXkN
+Cj4gIAkJCSJpbi1hbHBoYSIgLSByZXR1cm4gMTYgb2N0ZXQgYWxwaGEgYXJyYXkNCj4gIA0KPiBA
+QCAtNTExLDcgKzg1MSw2IEBAIFByb3BlcnRpZXM6DQo+ICAJYXJyYXl7c3RyaW5nfSBDYXBhYmls
+aXRpZXMgW3JlYWQtb25seV0NCj4gIA0KPiAgCQlBbiBhcnJheSBvZiBzdHJpbmdzIHdpdGggdGhl
+IGZvbGxvd2luZyBhbGxvd2VkIHZhbHVlczoNCj4gLQ0KPiAgCQkJImJsaW5rIg0KPiAgCQkJImJl
+ZXAiDQo+ICAJCQkidmlicmF0ZSINCj4gQEAgLTUyOCw3ICs4NjcsNiBAQCBQcm9wZXJ0aWVzOg0K
+PiAgDQo+ICAJCUluZGljYXRlcyBhdmFpbGFiaWxpdHkgb2YgT09CIGRhdGEuIEFuIGFycmF5IG9m
+IHN0cmluZ3MNCj4gd2l0aCB0aGUNCj4gIAkJZm9sbG93aW5nIGFsbG93ZWQgdmFsdWVzOg0KPiAt
+DQo+ICAJCQkib3RoZXIiDQo+ICAJCQkidXJpIg0KPiAgCQkJIm1hY2hpbmUtY29kZS0yZCINCj4g
+QEAgLTU0Niw4ICs4ODQsMyBAQCBQcm9wZXJ0aWVzOg0KPiAgDQo+ICAJCVVuaWZvcm0gUmVzb3Vy
+Y2UgSWRlbnRpZmllciBwb2ludHMgdG8gb3V0LW9mLWJhbmQgKE9PQikNCj4gIAkJaW5mb3JtYXRp
+b24gKGUuZy4sIGEgcHVibGljIGtleSkNCj4gLQ0KPiAtDQo+IC1NZXNoIFByb3Zpc2lvbmVyIEhp
+ZXJhcmNoeQ0KPiAtPT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gLTxUQkQ+DQo+IA0KPiAN
+Cg0KDQpJbmdhDQo=
