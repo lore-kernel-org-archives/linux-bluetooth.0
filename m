@@ -2,201 +2,89 @@ Return-Path: <SRS0=3vvc=RY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE5BC43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 09:24:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D49C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 09:29:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7763218A2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 09:24:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="SoN5C+dX"
+	by mail.kernel.org (Postfix) with ESMTP id 95D5921873
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 09:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727942AbfCUJYF (ORCPT
+        id S1728148AbfCUJ3l convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Mar 2019 05:24:05 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.25]:24604 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727898AbfCUJYE (ORCPT
+        Thu, 21 Mar 2019 05:29:41 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:47820 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727870AbfCUJ3l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Mar 2019 05:24:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1553160237;
-        s=strato-dkim-0002; d=gerhold.net;
-        h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=omp4mnoWvSPTJqOxHxlRqglJq5RxWVCAt3GJLM7VnnQ=;
-        b=SoN5C+dX9teZ21qAc0/GFQphAeYq/CmrH4s+WQ19+ucNqkjB9V3HnFMi1mzxgdpy01
-        twORvfzudh4i8pPt4BPMn2VjeJJlCOLLVFlQyZJjbmcas9Q5V8LhzURPQwLK5d7YlYBE
-        dWWp5FKA4dwO8GZIHZtM/tfQpfT0GfdeqtHtQMd0XyVBITBAzYMeQLoHr+UiXokZgPQb
-        XzQnsJfTslJO8TZ93t0wBO7hKZ6YYrfvShlkefQO1RoYgXlPeYa2kkwYaheoeXTqqEOU
-        q7iYeal50fUY8Po5JFyLol7OFdKUNKDBulLmhauEcWt9lsdKd8LzVlHltijN4+wXc7Bw
-        XJvg==
-X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVOQ/OcYgojyw4j34+u26zEodhPgRDZ8f+IczEa4o="
-X-RZG-CLASS-ID: mo00
-Received: from gerhold.net
-        by smtp.strato.de (RZmta 44.16 DYNA|AUTH)
-        with ESMTPSA id k0bbe4v2L9NvVui
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Thu, 21 Mar 2019 10:23:57 +0100 (CET)
-Date:   Thu, 21 Mar 2019 10:23:47 +0100
-From:   Stephan Gerhold <stephan@gerhold.net>
-To:     Ferry Toth <ftoth@exalondelft.nl>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/2] Bluetooth: btbcm: Add default address for BCM2076B1
-Message-ID: <20190321092347.GA921@gerhold.net>
-References: <20190305130901.56660-1-stephan@gerhold.net>
- <20190305130901.56660-2-stephan@gerhold.net>
- <7b48753f-f103-f522-68c5-38479feb4552@exalondelft.nl>
- <20190319140356.GA1076@gerhold.net>
- <0898b45c-b59a-0873-d8fc-1755e5c5e23b@exalondelft.nl>
+        Thu, 21 Mar 2019 05:29:41 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id F249E29C6D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Mar 2019 09:29:39 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id E2CBC29F82; Thu, 21 Mar 2019 09:29:39 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 139041] QCA Bluetooth [0cf3:e007] failed to initialize if
+ Bluez's "[Policy] AutoEnable=true" was set
+Date:   Thu, 21 Mar 2019 09:29:39 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kai.heng.feng@canonical.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-139041-62941-og7W6LLQzq@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-139041-62941@https.bugzilla.kernel.org/>
+References: <bug-139041-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0898b45c-b59a-0873-d8fc-1755e5c5e23b@exalondelft.nl>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Mar 20, 2019 at 10:11:45PM +0100, Ferry Toth wrote:
-> 
-> Op 19-03-19 om 15:03 schreef Stephan Gerhold:
-> > Hi,
-> > 
-> > Sorry for the late response. I've been quite busy lately...
-> Thanks for responding anyway!
-> > 
-> > On Tue, Mar 05, 2019 at 07:26:14PM +0100, Ferry Toth wrote:
-> > > Op 05-03-19 om 14:09 schreef Stephan Gerhold:
-> > > > BCM2076B1 appears to use 20:76:A0:00:56:79 as default address.
-> > > > This address is used by at least 5 devices with the AMPAK AP6476
-> > > > module and is also suspicious because it starts with the chip name
-> > > > 2076 (followed by a different revision A0 for some reason).
-> > > With BCM43340 (Edison) it's the same principle. With the fake address I
-> > > found everything (in user space) seems to work except PAN/NAP (bnep) and no
-> > > decent error message anywhere making this quite hard to debug.
-> > Not familiar with PAN/NAP, but the main reason to avoid default
-> > addresses is that they will cause issues as soon as you have two of
-> > those devices next to each other.
-> 
-> That might be the main issue with other services, but if you have only a
-> single device you won't see this.
-> 
+https://bugzilla.kernel.org/show_bug.cgi?id=139041
 
-Well, the other obvious thing is that it goes against the BT 
-specification if you use an address that is not unique. :)
+--- Comment #4 from Kai-Heng Feng (kai.heng.feng@canonical.com) ---
+Fixed by this commit:
+commit c7e163fe282f34efdf77fb09b333529de97a6a10
+Author: Ethan Hsieh <ethan.hsieh@canonical.com>
+Date:   Fri Oct 7 12:06:42 2016 +0800
 
-But you are right, I've also been using the default address for more 
-than a year, simply because I wasn't aware that the BT controller does 
-not have a proper BT device address. I did not run into any problems.
+    Bluetooth: btusb: Fix atheros firmware download error
 
-> With PAN/NAP I found bnep network device is created and immediately removed,
-> which confuses connman and give no other message than 'I/O error'. Even with
-> only one device.
-> 
-> > > > Add it to the list of default addresses and leave it up to the
-> > > > user to configure a valid one.
-> > > Which way is the user supposed to configure the valid one?
-> > > 
-> > It took me a while to figure this out - there is not much
-> > documentation for this. The following is only based on my own
-> > investigations:
-> > 
-> > As far as the kernel is concerned, HCI_QUIRK_INVALID_BDADDR is exposed
-> > through the btmgmt API [1]. With the quirk, the BT controller will
-> > appear as "unconfigured" controller to userspace, and will have the
-> > public address as missing option. As soon as the address is configured
-> > with the "Set Public Address Command", the unconfigured controller is
-> > removed and replaced with a regular controller.
-> >    Only then it will be usable through bluetoothd.
-> Yes, Andy Shevchenko already discovered we are missing to put the device on
-> the blacklist. I was all ready worried I would get a unconfigured
-> controller. Now I see, that is a good thing. Thanks, this is really useful.
-> > The btmgmt API has to be controlled from user space.
-> > As far as I know, the only tool in bluez to set the public address
-> > is the "btmgmt" tool:
-> > 
-> >    btmgmt -i hci0 public-addr xx:xx:xx:xx:xx:xx
-> > 
-> > ... will run the "Set Public Address Command" described above.
-> Especially in combination with this. I will be documenting this for Edison,
-> so hopefully other can benefit.
-> > However, it was mentioned several times that "btmgmt" is not
-> > a "stable" tool. In other words, it is not installed by default
-> > and is only intended for debugging. It may change any time.
-> > 
-> > There was a related discussion on IRC recently: (I was not involved)
-> > 
-> >    10:50 <Mis012[m]> sjanc: do I need to convince my distro to package
-> >          btmgmt, or will you revert that commit?
-> >    10:51 <sjanc> Mis012[m]: I'd ask holtmann about this :) but btmgmt
-> >          was more like testing tool than real end user tool
-> >          (ie, no manpages, rather ad-hoc design and command set etc
-> >    10:53 <sjanc> Mis012[m]: but if you really need this feature,
-> >          I'd consider starting discussion on mailing list
-> >          on how this could be handled by bluetoothd
-> >    10:53 <sjanc> as mentioned, this could be in plugin,
-> >          either common plugin or maybe platform specific,
-> >          which would set public address via mgmt api
-> >    10:54 <sjanc> open point is how bluetootd would extract public address,
-> >          which is always platform specific
-> >    10:55 <holtmann> Mis012[m]: btmgmt is not a stable tool.
-> >    10:55 <Mis012[m]> holtmann: but it's the only one which can do this
-> >    10:56 <holtmann> Then add support to bluetoothd for it or do it via an
-> >          external tool / daemon. I wrote a long post to the mailing list
-> >          about that.
-> > 
-> > I have such an external daemon for Android (since it does not use bluez)
-> > at [2]. It would be easy to refactor it to something more portable.
-> Do I understand correct: support needs to go into bluetoothd first and then
-> into bluetoothctl?
+    Move usb_autopm_get_interface() ahead of setup_on_usb() to prevent
+    device from sending usb control message in usb suspend mode.
 
-I'm not very familiar with the bluez code base to be honest.
-As far as I know, bluetoothctl only controls bluetoothd, so this sounds 
-correct. The way such a feature would be exposed (command line tool,
-configuration option, ...) would need to be discussed further on the 
-mailing list first.
+    The error message is as below:
 
-> > 
-> > [1]: https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt
-> > [2]: https://github.com/me176c-dev/android_device_asus_K013/blob/lineage-16.0/bluetooth/bdaddr.c
-> > 
-> > > The only way I found is bd_addr (tool from bluez that is not normally
-> > > built/installed).
-> > > 
-> > > Using this tool requires hci0 to be up and bluetoothd to be restarted if
-> > > that was already running, which is quite inconvenient.
-> > > 
-> > bdaddr does not use the btmgmt API. It sends vendor-specific commands to
-> > the HCI interface. This might be the reason why you need to restart
-> > bluetoothd.
-> I see.
-> > 
-> > With HCI_QUIRK_INVALID_BDADDR set, the BT controller should not show up
-> > at all in bluetoothctl until its public address is configured.
-> > It does not matter if bluetoothd is started too early.
-> > 
-> > > I also saw there was a patch to put the address in dt.
-> > > 
-> > > But nowhere did I find a kernel parameter to pass the address. Did I miss
-> > > something?
-> > > 
-> > I'm not familiar with setting the address from DT/kernel parameters.
-> > Sorry :(
-> To me sounds like reading from a configuration file on disk would make more
-> sense.
+    [   83.944103] btusb 1-2:1.1: usb_suspend_interface: status 0
+    [   83.944107] btusb 1-2:1.0: usb_suspend_interface: status 0
+    [   83.960132] usb 1-2: usb auto-suspend, wakeup 0
+    [   83.976156] usb 1-2: usb_suspend_device: status 0
+    [   83.976162] usb 1-2: usb_suspend_both: status 0
+    [  298.689106] Bluetooth: hci0
+    [  298.689399] Bluetooth: hci0: Failed to access otp area (-113)
 
-On my device, the real WiFi/BT address resides on an extra partition 
-with a device-specific file system layout, so a configuration file
-would not really help me personally.
+    Signed-off-by: Ethan Hsieh <ethan.hsieh@canonical.com>
+    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 
-A simple option that would make BT work out of the box for all devices 
-with this quirk would be to generate a random MAC address once,
-and then keep using it across reboots.
-But I'm not sure if such a feature would be accepted for bluez.
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
