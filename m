@@ -7,57 +7,58 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C760C43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 13:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E78E0C43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 13:53:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10C7A20811
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 13:49:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1588218D8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Mar 2019 13:53:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pT2BGtQ3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sGILjlFN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727921AbfCUNtP (ORCPT
+        id S1727944AbfCUNxt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Mar 2019 09:49:15 -0400
-Received: from mail-ot1-f46.google.com ([209.85.210.46]:47009 "EHLO
-        mail-ot1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726787AbfCUNtP (ORCPT
+        Thu, 21 Mar 2019 09:53:49 -0400
+Received: from mail-oi1-f172.google.com ([209.85.167.172]:38111 "EHLO
+        mail-oi1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725985AbfCUNxs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Mar 2019 09:49:15 -0400
-Received: by mail-ot1-f46.google.com with SMTP id c18so5379333otl.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Mar 2019 06:49:15 -0700 (PDT)
+        Thu, 21 Mar 2019 09:53:48 -0400
+Received: by mail-oi1-f172.google.com with SMTP id w137so4681307oiw.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Mar 2019 06:53:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=w/5nTHi+xo9kLdcuD4oVXII+257NF2+5Ug/EnTUefA4=;
-        b=pT2BGtQ30x3UsCswx8HV9FHC9FNkvNlclzG43L1znQ6owxo2hQTtdvp9EXb/MtPDeQ
-         wOldeBvAZeHjwdzA+x54xk+bKM/7rNMJz4+71lquDte3w/Tlm/0EmJk2Xm5E5hPagz9Y
-         v8Igq59kPhKUs2BJLu45eofLzBjYMgW2jjMDWgkReGVf1JLUbDCr+1PZyZaIDhBoMtMw
-         VFd4QeR49DSls3kZHx+HQZTu2tLi+oCqtHOS8tb8lFKLkHQ8068TWy0kSf/GzJ8qRsci
-         o7KvSnrFmG14Lg+6PKyJ++JS8CrPvTgbJw1jsYqKWPn8tnV9Jl4VDkrqv4SkmcIpgab1
-         zJfQ==
+        bh=OqXlgaMcUNnhbj+a/8pU1Old+HZvDEvSvTsFe3+gASs=;
+        b=sGILjlFNWsgMLCWaDZwY3WddGiw8swlw/sdQImDsUj5IpWDQU40WRBw1o73cn7g4L+
+         NpO0QWFT1nsuRwDnQdPPWDFoGfZY3Hae0gxbFy4Jt90+NojWNxYPeeIVP48/zsN2Cd3i
+         bR2up2sVkHPIkVAob0ayLR332fs0X+0xMXEMJpiDUZGJuEPzKzsmeslgsFPFzOVDiBRN
+         Se1rSHrmPmuOQRs2Az/UUJlm626ixhaO/cMHzxJ716cAYWfCiDY62kc8X5y5UlVjm90w
+         tvLLxcST/FtsU1P/xjpvtPDXxcu49L5yNTmtfma6NEKuGNZ9lhUSzbO3ZQfY++yE4YcV
+         T+Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to;
-        bh=w/5nTHi+xo9kLdcuD4oVXII+257NF2+5Ug/EnTUefA4=;
-        b=R0juz/SwnzZrBeWK9IwY9J2GDwpvSMvbWNy4J2IDFPFPsBzc4q8tBQgWIdPXZDh1yh
-         U0C0Ab7Hp2NClgv60zjWV13bvuoI9EqIs58eszbtvkZLch4ZPoSuGPWlvtiEE8gwgx+9
-         dABk9a1rQV/Dxc+bVYOso/yRA0l5RicBv3ToK7DYLbY2uIZlXr+trErDEcjGNbXLtWHx
-         xeer1Y2Sk3rzxn4/eQOP+vAy1xcVln+44SC/nYjFZ5Sdgon/mXbCMXCUdgw5yOHpcsbh
-         fa9cH92j9wNKg/iWhpriN+ONJDeqPmU2tY37aV/eFH70Gd1hNaE66EyxWalpEk5XEkAw
-         tpKA==
-X-Gm-Message-State: APjAAAUYxVzuQFjqUWAxpiz7/LVP1Oht5LE2r6qfl3Q9i96GVX0scCPJ
-        7WMNpEPyiDbRCAQX2fhe0ZbPJ+SLVj/iWxYYZFCU6lcP
-X-Google-Smtp-Source: APXvYqzHOhRsN7oJYorGtzIoLPN80f3zU+cqVQfdSDaNwnPUgqI/w2VN1MRYGiGo+WkFhURSllDfHhoPjU9nB8qJ/9g=
-X-Received: by 2002:a05:6830:1514:: with SMTP id k20mr976897otp.24.1553176154315;
- Thu, 21 Mar 2019 06:49:14 -0700 (PDT)
+        bh=OqXlgaMcUNnhbj+a/8pU1Old+HZvDEvSvTsFe3+gASs=;
+        b=CzJPej7Wtk3GLrTWrhMeuWaZConrgp22AwvYIq+C9qGF9RGlT66ZGAFHi8F2/4mLVY
+         VzcN7Pc2P31/CBkibVP7QILjnkrk1LhYT+HMff2WTe4MmMMT5xUhATNmJaRVLYA1MEM8
+         Xr4zzhH+Rd6EgCN14VUYDUZYlRRfwMrgXMZxqoAOCz8jDFxjrADDSa9CB++DXX45pIe0
+         pKEgZ3EpG/PUuhT5iQlmj6n3Vq2QDstnafkTu6wE+TvrokdtuOwJEr5RuiEZDVUu7OWw
+         XCT6iX1hfurTg270W9rQ5lCOFN9Dey98vchEzB+iH728WkUpOVh7xHYK6ofFJLnj5oyy
+         BV3Q==
+X-Gm-Message-State: APjAAAUzb70ZGVJUH0DLzzzvP+NGLwgjt413UGsYlxcrrufcmyWoleJW
+        1XiOpKfAutSwrYRJ8EgzqVxhk6+O2HbINcVLdnMZ/JxwmAU=
+X-Google-Smtp-Source: APXvYqyZ6IZ6BYWn+gTejTQawLQvqYvHR5rfofuZ3JFuQ2ep8q5xGFAaSHyxCIKrJShKElq9nMqntXUHcNpvsvHfWOo=
+X-Received: by 2002:aca:4344:: with SMTP id q65mr2063663oia.156.1553176428147;
+ Thu, 21 Mar 2019 06:53:48 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAGuyqoGXTArrUiWKkX9AGkUAa0qAhXGn2b5sgPiaDM968MmzQw@mail.gmail.com>
- <CABBYNZKOisJtGZV6fq7h58yhHvw=B_9BqiNLnwgMAP8rdM2jQA@mail.gmail.com> <CAGuyqoFbadJA_2U_s15ZeNUS-Rb12XL76eCmAh=9GFXbdjaZog@mail.gmail.com>
-In-Reply-To: <CAGuyqoFbadJA_2U_s15ZeNUS-Rb12XL76eCmAh=9GFXbdjaZog@mail.gmail.com>
+ <CABBYNZKOisJtGZV6fq7h58yhHvw=B_9BqiNLnwgMAP8rdM2jQA@mail.gmail.com>
+ <CAGuyqoFbadJA_2U_s15ZeNUS-Rb12XL76eCmAh=9GFXbdjaZog@mail.gmail.com> <CAGuyqoHhtZv9ixyn40kotbK+cMbKgp6KZt1EYVPcRS+_rTv4=g@mail.gmail.com>
+In-Reply-To: <CAGuyqoHhtZv9ixyn40kotbK+cMbKgp6KZt1EYVPcRS+_rTv4=g@mail.gmail.com>
 From:   Miguel Sancho <miguel.a.sancho@gmail.com>
-Date:   Thu, 21 Mar 2019 14:49:02 +0100
-Message-ID: <CAGuyqoHhtZv9ixyn40kotbK+cMbKgp6KZt1EYVPcRS+_rTv4=g@mail.gmail.com>
+Date:   Thu, 21 Mar 2019 14:53:36 +0100
+Message-ID: <CAGuyqoHhh-pDgsz-ZTMYhb-FY71JiFaMVHvNCHSf5iTo2NG6eg@mail.gmail.com>
 Subject: Re: BlueZ 5.50: Avoid service discovery in every connection
 To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -66,12 +67,5 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-I find information in the cache about the GATT Characteristics of the
-remote device.
-Under the STORAGEDIR, there are only 2 files:
-1) <local MAC>/<device MAC>/info
-2) <local MAC>/<device MAC>/attributes
-where are the Characteristics cached?
-Thanks
-Miguel
+sorry, I meant I do NOT find information in the cache about the GATT
+Characteristics of the remote device.
