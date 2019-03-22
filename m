@@ -2,101 +2,90 @@ Return-Path: <SRS0=CqyX=RZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD75C43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 04:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18630C43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 07:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFAC821900
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 04:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0D80218E2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 07:01:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="PV+p/k6e";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="PV+p/k6e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FwNp4LtI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726079AbfCVExX (ORCPT
+        id S1727047AbfCVHBZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Mar 2019 00:53:23 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:33440 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725550AbfCVExX (ORCPT
+        Fri, 22 Mar 2019 03:01:25 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:33673 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725974AbfCVHBZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Mar 2019 00:53:23 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id E300E60C72; Fri, 22 Mar 2019 04:53:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1553230402;
-        bh=2V2S0zI3REoNgBHmqjjZbl0J7v7ofo1DgSoFb2MahSw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=PV+p/k6e0a0p2imfrltql/aXm3K5pKY2tQsXPKos3bK/ylpx0HrQYQwue28t3xD8D
-         RUCkQ1OvnaL3wOW5KOky1jeVxtrXmszE9jnnao/5c9/mdvyiQ99LxecBkQ8fHMB1qn
-         z5dcMyddY1PGolRq8ntBo8BoJZ97me3DH63+pvSw=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 179A960E41;
-        Fri, 22 Mar 2019 04:53:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1553230402;
-        bh=2V2S0zI3REoNgBHmqjjZbl0J7v7ofo1DgSoFb2MahSw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=PV+p/k6e0a0p2imfrltql/aXm3K5pKY2tQsXPKos3bK/ylpx0HrQYQwue28t3xD8D
-         RUCkQ1OvnaL3wOW5KOky1jeVxtrXmszE9jnnao/5c9/mdvyiQ99LxecBkQ8fHMB1qn
-         z5dcMyddY1PGolRq8ntBo8BoJZ97me3DH63+pvSw=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Fri, 22 Mar 2019 12:53:22 +0800
-From:   rjliao@codeaurora.org
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Hemantg <hemantg@codeaurora.org>
-Subject: Re: [PATCH] Bluetooth: hci_qca: Fix crash with non-serdev devices
-In-Reply-To: <CAG5bF+TCPc=m_O33RHXHrt34T1Dz1zHLSkXfpxAoOTmrffGJ7w@mail.gmail.com>
-References: <CAG5bF+TCPc=m_O33RHXHrt34T1Dz1zHLSkXfpxAoOTmrffGJ7w@mail.gmail.com>
-Message-ID: <a3fe19f03ac6db1a2b2c376fd2afe43d@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+        Fri, 22 Mar 2019 03:01:25 -0400
+Received: by mail-pg1-f196.google.com with SMTP id b12so874293pgk.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2019 00:01:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=P0BB8X0AFBff4VBY6TK+SCP5T3sAekoVXz1dmhKIDqM=;
+        b=FwNp4LtIXpIjGSQvkC+GApraO+nJY9cW88PsDDkgUKHRtpT0ZPYZquQ71H5z2NKjS8
+         x+RKLhmiKVAGhmftGzjXQh2l0sOl/CzuyQgftGHZz5TK/eINQTqqyAeWw5hXO11IxGP6
+         tKlAlY2YAX5yatvwqeORVFMBEEcMfaCSYzFg/upMrknPxzPHnT0CKe8+FFjq7GeeAFAr
+         7yZ+0PqcZUNf+2YtC2/edp9EFFE47mFaOnW/10M4f6H8FqPRdx8NtQp+UM/oGNRS00of
+         +do9Qy33tjUGInKcmt2GVhf/9mZtr3Wr+rX32gLtdbJzKC6+a5ErhIAsKJK/akzsWaeZ
+         TDkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=P0BB8X0AFBff4VBY6TK+SCP5T3sAekoVXz1dmhKIDqM=;
+        b=MCUZhbnxNrTzcUJOA8v9QWmren3Ep15q7Vje2WiQbTshK9y1SZH8zi7EbZvD8wHWoB
+         aOSWjMnb5YblEcR3kDHkxfqTiccAoRA2HGeAEct+Qk1t+YFp4Xwb0vW0G43nbQyT5efu
+         qI8BV9rSlIONebHD9yQfOoX8m/DeMsC+D/lGGA0HrKEUYCTQdsw8snxhJAirl7vbNTB3
+         f/uqjCS3q0l3obykn5fbovDiAsZsshDr7aXUen1YKlK2h5/fFqLY9DBB0bnLnokK6wLw
+         yuDgu3sYvLh9aU1KSB+EXBvEugYK078Aj8w4h3w1d9wJ+Dtd8IUXH465cLWuOAyovQgH
+         HXiw==
+X-Gm-Message-State: APjAAAXlS0ipvv8K7ndKLawewFf2Mu1kpyyoOemyj9yderugr4RSSChX
+        BbjauLS9ZCXXazYpcdxixJoX2zigTgYWJQ==
+X-Google-Smtp-Source: APXvYqzIknIprnk1zks1Q//EvLz986RZrKS5besy0FJUwHsnU1ZIhl+ilFxy0V0K3JMttT39eBFILw==
+X-Received: by 2002:a63:5858:: with SMTP id i24mr7321744pgm.222.1553238084133;
+        Fri, 22 Mar 2019 00:01:24 -0700 (PDT)
+Received: from dgeissle-mobl.ger.corp.intel.com ([192.55.54.42])
+        by smtp.gmail.com with ESMTPSA id j71sm14330961pfc.6.2019.03.22.00.01.21
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Mar 2019 00:01:23 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH BlueZ] test: Enable test-mesh to send raw vendor commands
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <20190322034927.6247-1-inga.stotland@intel.com>
+Date:   Fri, 22 Mar 2019 09:01:18 +0200
+Cc:     linux-bluetooth@vger.kernel.org,
+        "Gix, Brian" <brian.gix@intel.com>,
+        Luiz Von Dentz <luiz.dentz@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <82D05BF3-3E54-4BB1-B22B-72F1C94051A5@gmail.com>
+References: <20190322034927.6247-1-inga.stotland@intel.com>
+To:     Inga Stotland <inga.stotland@intel.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-在 2019-03-14 07:52，Matthias Kaehlcke 写道：
-> qca_set_baudrate() calls serdev_device_wait_until_sent() assuming that
-> the HCI is always associated with a serdev device. This isn't true for
-> ROME controllers instantiated through ldisc, where the call causes a
-> crash due to a NULL pointer dereferentiation. Only call the function
-> when we have a serdev device. The timeout for ROME devices at the end
-> of qca_set_baudrate() is long enough to be reasonably sure that the
-> command was sent.
-> 
-> Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm
-> Bluetooth chip wcn3990")
-> Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Reported-by: Rocky Liao <rjliao@codeaurora.org>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 4ea995d610d2..714a6a16f9d5 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1004,7 +1004,8 @@ static int qca_set_baudrate(struct hci_dev
-> *hdev, uint8_t baudrate)
->  	while (!skb_queue_empty(&qca->txq))
->  		usleep_range(100, 200);
-> 
-> -	serdev_device_wait_until_sent(hu->serdev,
-> +	if (hu->serdev)
-> +		serdev_device_wait_until_sent(hu->serdev,
->  		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
-> 
->  	/* Give the controller time to process the request */
-Reviewed-by: Rocky Liao <rjliao@codeaurora.org>
-Tested-by: Rocky Liao <rjliao@codeaurora.org>
+Hi Inga,
+
+On 22 Mar 2019, at 5.49, Inga Stotland <inga.stotland@intel.com> wrote:
+> +#       5 - on/off model client menu
+> +#       6 - send raw message
+> +#       7 - exit
+
+Please don=E2=80=99t use numeric identifiers for commands in interactive =
+tools. Use intuitive, human readable strings like we do in the other =
+interactive tools in the tree. Numbers might be convenient for =
+computers, but they=E2=80=99re not particularly human friendly :)
+
+Johan
