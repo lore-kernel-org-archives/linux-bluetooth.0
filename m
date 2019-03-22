@@ -2,100 +2,103 @@ Return-Path: <SRS0=CqyX=RZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F85C43381
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 11:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF3DC43381
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 12:31:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4C5521934
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 11:42:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10099218B0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Mar 2019 12:31:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdxQ97Xd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WDKi5kGg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731479AbfCVLmB (ORCPT
+        id S2390300AbfCVMQ6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Mar 2019 07:42:01 -0400
-Received: from mail-ot1-f48.google.com ([209.85.210.48]:37778 "EHLO
-        mail-ot1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731477AbfCVLmA (ORCPT
+        Fri, 22 Mar 2019 08:16:58 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:35144 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390292AbfCVMQ5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Mar 2019 07:42:00 -0400
-Received: by mail-ot1-f48.google.com with SMTP id c16so1635545otn.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2019 04:42:00 -0700 (PDT)
+        Fri, 22 Mar 2019 08:16:57 -0400
+Received: by mail-it1-f194.google.com with SMTP id w15so2938534itc.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Mar 2019 05:16:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=QhZWYGv065aQiR8Xie1Z2JYuF3Rp9xQ9+N8DIR34cak=;
-        b=IdxQ97XdKNY/b5241HLBOukoGzCiowtQ94AZSKFZQpzVjRIQBznQEy7cOCT7XA424/
-         4Pk/Imi3+KQOge1kBZ2SsIqL5imQjnBOqgAp/+r3uwcj2XYD9Yr+7LOfovyGGGDVkAIZ
-         i7TVuM3XNtWEgKu1Cdd5V1ObQnxedhpUVrMwsE1c9NkEoeeLfXXv+XyT8OKPS7FzJBO0
-         xVM/kiQ867TahRyyeDgNlGUqHTFqJi8Dbox1804kdGqEoqq1AI8wKEptB840boMOlqiL
-         +f8Ku00TUponefYDvDwVeRXkoHRNAShnNTvdqFqaVJlFqP/aIQk/w8IC5ZpU8eM/QNWj
-         Fagw==
+         :cc;
+        bh=YW0V78Vu4h5rSxMfAZ1y6bOUKJxVXX904UGaBFUKQa8=;
+        b=WDKi5kGgQoYwzYVeTQGYAfCluHUyqqkQr4L8XoBUwwRZ3Rg+07S302dhmtQ+U8cm7l
+         T64sdCX78UXmCrajT2z1ppLdxsApxO4uxZBxOFTnwyWEw+tnwsKrJ2UhxFyXM4G+wPUw
+         0UrCAaHqC/wLO1N8dvoxsuLcjUV3ClatF+q/UQGQFpLxhoSF1y3CPuartj6QbQ3yVGio
+         eOFkathweuzmY2hzgwHobGIs1BFTiTcZaiHbO1J2wSsRaKjB5L6MwxiZ4lzY+sz/3MPW
+         uwHa3CUIpQ4FmfXzen4U2NLHa/AcRR562jzCzurIy7A+KTL6C7w7HryfziZNyiMUPr5M
+         mcGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=QhZWYGv065aQiR8Xie1Z2JYuF3Rp9xQ9+N8DIR34cak=;
-        b=MYr7FCnXOpYFGlcR8KCZFsyJ9AMnrKW03jtSVvR0kjhpuzhErzN2UAOLuU0QLmVMXt
-         TnG/mG8mWROAwHHKjwUwKI3e8xj2wEKjkJir7GuvNs6x04OKzONDyLnQQs8WSh9hEiKs
-         9UndIiahEbdOXGUWifG7hb7QzJhitbh67Ph3re5XP+aSGaHUZ/D73dQREOIXn9Sf4cc+
-         pvSACA1qGNf6glQTuUDA4zzsbpAnXyESWc/CnPAq24qjdI7BE+U3UnQ9vl6reFJEn9xP
-         atcvz3a2QP1VUFeRw1/TSqRhh8+TMYdD3kCDizGBPM8+x1ifJWpcPmn4sgrAFbT3Lp8A
-         lNZQ==
-X-Gm-Message-State: APjAAAVR1FdVuZR34R1VSyFFdxPg3n1MUXSNyldtCPBn8btIdd9Bkrbe
-        3fz6+AxLFwnw1MsYITZ9Sp19v4P0fZdp9+uku0XDrn0eIcM=
-X-Google-Smtp-Source: APXvYqwBcfOuseXb3XYsOtkIoVyDA5OX9tIM77wVTzBUq6oVklQbpuGuVNpRPKoKqZ1ZAIti4D10r+/eS19AosQ4ttA=
-X-Received: by 2002:a9d:644c:: with SMTP id m12mr6549992otl.59.1553254919233;
- Fri, 22 Mar 2019 04:41:59 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=YW0V78Vu4h5rSxMfAZ1y6bOUKJxVXX904UGaBFUKQa8=;
+        b=Z5nOKwlmQs7T/fqqIlWuxQ93IAzj93w/4g75LiUtA3knWCWewdelEItMnbvu3UleWG
+         0tQpTK9YvhGPSUihgteQdCcJKuH+ovtXpwcFciF8QqzaGayQzq5sqlgW3EY8yDrwQTKo
+         FLnY8KgOFDBRb2FlMUmsbMN5F4LUDsioYR8ztNVps/RqlM3a/6UZgUGJyYPxYfjpUrq/
+         4W/ubZ/t1XN/hHpGiZUOk5z1KXHYDTpiCDiJamtaB26nJmBRAWCgKdh8+AUCAwutNDrY
+         ULiIdtXzIyNcPiQCqLYhpGH7PWtIW3CB3lDi1fUwBd7fRM60CSJy4/IhDQpeZpvOaOB0
+         Gsug==
+X-Gm-Message-State: APjAAAWOaYNT3lox59sPGS4r74AV2FTMe0OGnN0I/mA5iP/D4qXhNcnX
+        HVJQNpW3tQg55lJJNy/65WL0SLE8GnJjksI+4xtMrw==
+X-Google-Smtp-Source: APXvYqxW+fbLoSgmqWDCRVDgW60p0UzonxKZfDmM1G9AzaUHotxUW5g5bfKL4XCdaufNXQCj6gvKPUNBytz7C3jvfbM=
+X-Received: by 2002:a02:84ab:: with SMTP id f40mr6306106jai.72.1553257015828;
+ Fri, 22 Mar 2019 05:16:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAGuyqoEUrwLa6nVGVKasn=3kTTmJV3oLvUO8-9AsnGn08cQGjQ@mail.gmail.com>
-In-Reply-To: <CAGuyqoEUrwLa6nVGVKasn=3kTTmJV3oLvUO8-9AsnGn08cQGjQ@mail.gmail.com>
-From:   Miguel Sancho <miguel.a.sancho@gmail.com>
-Date:   Fri, 22 Mar 2019 12:41:47 +0100
-Message-ID: <CAGuyqoF=X8SnequTg_LQAB1R4Eu8NuWHd98bMUjfvZBfSWzK7w@mail.gmail.com>
-Subject: Re: BlueZ 5:50: First key sent from Ble device lost after initing bluetoothd
-To:     linux-bluetooth@vger.kernel.org
+References: <0000000000003692760578e651dd@google.com> <0000000000007917ff0584ada6e7@google.com>
+In-Reply-To: <0000000000007917ff0584ada6e7@google.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Fri, 22 Mar 2019 13:16:44 +0100
+Message-ID: <CACT4Y+b0Onk4AB0hkvhXgZPdk+rERFsYAQra681o6QLDH_Ct-g@mail.gmail.com>
+Subject: Re: KASAN: use-after-free Write in hci_sock_release
+To:     syzbot <syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com>
+Cc:     David Miller <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Michal Marek <mmarek@suse.com>,
+        netdev <netdev@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I think, this behavior has to do with the fact that  Hog Report Map
-needs to be requested and processed by bluetoothd in the fist
-connection to the device after bluetoothd is restarted as stated here:
-https://marc.info/?l=3Dlinux-bluetooth&m=3D144793894016748&w=3D2
-Regards
+On Fri, Mar 22, 2019 at 1:04 PM syzbot
+<syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has bisected this bug to:
+>
+> commit c470abd4fde40ea6a0846a2beab642a578c0b8cd
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Sun Feb 19 22:34:00 2017 +0000
+>
+>      Linux 4.10
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1664c6df200000
+> start commit:   c470abd4 Linux 4.10
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7308e68273924137
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b364ed862aa07c74bc62
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152532bb400000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f73320c00000
+>
+> Reported-by: syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com
+> Fixes: c470abd4fde4 ("Linux 4.10")
+>
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-El jue., 21 mar. 2019 a las 10:41, Miguel Sancho
-(<miguel.a.sancho@gmail.com>) escribi=C3=B3:
->
-> Hi,
-> using BlueZ 5.50, I observe that if bluetoothd is re-initialized, the
-> first key from a previously BLE paired device is not being processed.
-> Looking into bluetoothd log, upon first key pressed in the device
-> after bluetoothd re-init, bluetoothd connects to the device and
-> creates the uHID device:
-> bluetoothd[9023]: profiles/input/hog-lib.c:report_map_read_cb() HoG
-> created uHID device
->
-> In the second and further connections, key works fine, this is the
-> only output related to HoG:
->     Line 401: bluetoothd[9023]: src/service.c:change_state() 0xd0b98:
-> device profile input-hog state changed: disconnected -> connected (0)
->     Line 402: bluetoothd[9023]: plugins/policy.c:service_cb() Added
-> input-hog reconnect 0
->
-> Is this expected behavior? Can it be avoided? I wonder whether the
-> uHID device can be created upon bluetoothd initialization instead of
-> waiting to first connection.
->
-> Thanks in advance
->
-> Miguel
+The same story of HCI being broken before v4.10, so this is bisected
+to the release.
