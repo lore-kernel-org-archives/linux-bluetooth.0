@@ -1,118 +1,133 @@
-Return-Path: <SRS0=S2yS=R2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=QAi9=R3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F996C43381
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Mar 2019 20:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F09EC43381
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 24 Mar 2019 09:01:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0990721873
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Mar 2019 20:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 197782171F
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 24 Mar 2019 09:01:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qrWW+ZAP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHGPte7V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727713AbfCWUZV (ORCPT
+        id S1726788AbfCXJBC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 23 Mar 2019 16:25:21 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44000 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbfCWUZV (ORCPT
+        Sun, 24 Mar 2019 05:01:02 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:41513 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726139AbfCXJBC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 23 Mar 2019 16:25:21 -0400
-Received: by mail-pf1-f195.google.com with SMTP id c8so3733175pfd.10;
-        Sat, 23 Mar 2019 13:25:20 -0700 (PDT)
+        Sun, 24 Mar 2019 05:01:02 -0400
+Received: by mail-oi1-f195.google.com with SMTP id v7so4767900oie.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Mar 2019 02:01:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0KQ81DxjOPGjaEtWHLtdrsk+PBSnkB1EK3oNl2i2BSo=;
-        b=qrWW+ZAPE2cG7Ss0cHNcQWIuSgcE+ac6Sx7R5zO6RvEJ7fxOM4s7R2bwTrLXqNzlD0
-         WW4DyjRR4CyFtsekXGzSY7isUx0EnllD2jwbWrHItKQjKVpnwq7hmXt3eo4CyzMgDpHx
-         kPO96e5lP9nntt/d4p71YH7xk2TVv4vivt86ydkuVa+8o3Iw9Dik2Xd8lWUvjfpblfqx
-         RCPyfZudpczOxl9GC0T2oXd1DjAc4ISZSA6NcWLui3UEytjvk/yI5v1xc4+YEevqUtOi
-         ZSZqdJnIqJ2Q9XqfcoqA23OzDWJfulSWvrui9ZxA8fkVOolWUQF2XozZd5CncP0UcOkz
-         gUiw==
+         :cc:content-transfer-encoding;
+        bh=HrhBkbdZIYb0Nlxveks3wb5Eslwv4HiHxjd3d5gQqwo=;
+        b=PHGPte7VIoD9QU8S42vUT8v2Mf83IDtdgvqm9no10mlcFlKLYtd+ZXtjMjWCJ2fIT9
+         wQxMPh8JtTNH+SnRVfIl0E2DXew9GZoxPrQXmMOInW4zxQX9wY6mBaZq9qTzrzH0VhSY
+         VE1xxOQseaJN4tuiw7F3sGYXCb1nXoXZfMA2RZsZY7F7kkoZsp0nD97/g0iOcAGuczen
+         5QIRRNkFdeBEdxkE4dN+t1i5C+UYiO4hNW4TP2+VvZCizZrI/IEplHiLnjCm/QJmDEQU
+         Eu/vq9y2rVXcng6bPeRarwhKc86/C5q+3cCG2NaIhvJP0yE+5TkRD0d5FkLaU0LcFawo
+         /UnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0KQ81DxjOPGjaEtWHLtdrsk+PBSnkB1EK3oNl2i2BSo=;
-        b=S4E8QVUYEjjWhUi/8MALVKAxkpia53+Y3nrHJnxtY6WZWZMt2U62Sb2dmj2SKlBQsn
-         4Z28NFH6gunkeJbVdHLfTqGs25py2IKXX2Gf3Rcgq2xkqvfD39YS0duu2XhfxtPYzq8a
-         PospO6/MkE8LPZPWT1uO7RQmwbMXHlf+gbgjODEEdR+bfn8BrOCS9nx2Gpmmpf/sYa83
-         Yd79qQO8MGduwVkTUgB4MgfgHONWKgB+/vDgkqBlslv6cshcpUC6LOCnIJVO3pH/GF+r
-         fs70yhR9xe/t8EATIiVGGCifpobghajfL1RzRNjtN2gU53t/zmkFWwwNlaBRsAENapti
-         tUrg==
-X-Gm-Message-State: APjAAAUOF69bZrVAMNxf7I0oTRs2eIn9NGSkRnj1dS5wVSAUdLLji3n/
-        B2FVZn2qJjBNwlmf9vfgu3D3ksw1y5OziOQZJeKtciDp
-X-Google-Smtp-Source: APXvYqx9/99LYR4LgVXyvmHt+G3hddxlVU0ASRaA+dPoIiRWrPw6zYSI5aQDP0XWHyo2FWgduDWZSEOwV7ulzy3LTso=
-X-Received: by 2002:a65:610d:: with SMTP id z13mr15858446pgu.104.1553372720524;
- Sat, 23 Mar 2019 13:25:20 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=HrhBkbdZIYb0Nlxveks3wb5Eslwv4HiHxjd3d5gQqwo=;
+        b=XXQS87hXyJrIFnNkbIKcLmju7aea0PHSCC8AOWv5j2ktPgezmSQBJMOj0cHpulg5s/
+         vpQE2/ypH6LJBy5rNBqGVUZWR9lgpXdXbMeFMbbMi7gLcA18+kAsL9Q6XpAAhOg3XHbR
+         SNm903u6CjdF4VHc6UnJDiVNIJFJjna2e/qYM7XCK/1m1/3DbmxDD/6HkxksxIewgaYd
+         35xj4NhDvOmKYehGT8KLfFeoIbG0ZbE0CLJMIIw0+HMFfs9oLvq8tlQiswgMYqaCRoB7
+         7ccby7dgwuIiXLGo48te7f79qXc+Cn7BPsd3jA01a3IQHLBJAGNjOEGnBzYebCGPdrCH
+         NGOw==
+X-Gm-Message-State: APjAAAX4FIxz5ke0W+vw4KUpBGNgdbW6ysQ95ut2rFe+KAFKv03fXVuD
+        iePoliMQz1w6bKFxJt4a7WkLAMfFyTSHBK9CQKX7nUvQx8BI5w==
+X-Google-Smtp-Source: APXvYqxiZljQ8ewIATdSFpDgve5uktgBoDojsggJAvxDCVbQMNeqOqezS5crXqRDJsSwr6qLDFHMj+H7SU0iQ/Cqsjc=
+X-Received: by 2002:aca:4a0a:: with SMTP id x10mr7700973oia.82.1553418061303;
+ Sun, 24 Mar 2019 02:01:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <0000000000003692760578e651dd@google.com> <0000000000007917ff0584ada6e7@google.com>
- <CACT4Y+b0Onk4AB0hkvhXgZPdk+rERFsYAQra681o6QLDH_Ct-g@mail.gmail.com>
-In-Reply-To: <CACT4Y+b0Onk4AB0hkvhXgZPdk+rERFsYAQra681o6QLDH_Ct-g@mail.gmail.com>
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-Date:   Sat, 23 Mar 2019 13:25:08 -0700
-Message-ID: <CAM_iQpVHgHM-5NCE+FNZfpH6CWtYdt8BSmHJj_oa7CLKxYKLQw@mail.gmail.com>
-Subject: Re: KASAN: use-after-free Write in hci_sock_release
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Michal Marek <mmarek@suse.com>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
+References: <20190322034927.6247-1-inga.stotland@intel.com>
+ <82D05BF3-3E54-4BB1-B22B-72F1C94051A5@gmail.com> <2815DD46-4BB1-46DC-881D-1C30200DAED9@intel.com>
+ <E232C390-8571-40A5-9E72-2499E9973959@gmail.com>
+In-Reply-To: <E232C390-8571-40A5-9E72-2499E9973959@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Sun, 24 Mar 2019 11:00:50 +0200
+Message-ID: <CABBYNZLAau4paWF9yoLXzUzmJnVawDiZWaVZUnwZfGqhRsQnMw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] test: Enable test-mesh to send raw vendor commands
+To:     Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     "Gix, Brian" <brian.gix@intel.com>,
+        "Stotland, Inga" <inga.stotland@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Mar 22, 2019 at 5:19 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+Hi Johan, Brian,
+
+On Sat, Mar 23, 2019 at 12:08 PM Johan Hedberg <johan.hedberg@gmail.com> wr=
+ote:
 >
-> On Fri, Mar 22, 2019 at 1:04 PM syzbot
-> <syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com> wrote:
-> >
-> > syzbot has bisected this bug to:
-> >
-> > commit c470abd4fde40ea6a0846a2beab642a578c0b8cd
-> > Author: Linus Torvalds <torvalds@linux-foundation.org>
-> > Date:   Sun Feb 19 22:34:00 2017 +0000
-> >
-> >      Linux 4.10
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1664c6df200000
-> > start commit:   c470abd4 Linux 4.10
-> > git tree:       upstream
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=7308e68273924137
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=b364ed862aa07c74bc62
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152532bb400000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f73320c00000
-> >
-> > Reported-by: syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com
-> > Fixes: c470abd4fde4 ("Linux 4.10")
-> >
-> > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> Hi Brian
 >
-> The same story of HCI being broken before v4.10, so this is bisected
-> to the release.
+> On 22 Mar 2019, at 16.00, Gix, Brian <brian.gix@intel.com> wrote:
+> >>> On 22 Mar 2019, at 5.49, Inga Stotland <inga.stotland@intel.com> wrot=
+e:
+> >>> +#       5 - on/off model client menu
+> >>> +#       6 - send raw message
+> >>> +#       7 - exit
+> >>
+> >> Please don=E2=80=99t use numeric identifiers for commands in interacti=
+ve tools. Use intuitive, human readable strings like we do in the other int=
+eractive tools in the tree. Numbers might be convenient for computers, but =
+they=E2=80=99re not particularly human friendly :)
+> >
+> > We do plan on making better tools, but this is mostly intended as a tes=
+ter script to quickly allow us to test stuff, particularly the d-bus APIs, =
+and demonstrate the way the methods are called from python.
+>
+> Understood, however what I proposed
+>
+>  - Doesn=E2=80=99t take really any extra effort
+>  - Is friendlier to the user
+>  - Is friendlier to the reader of the code (no need to do number lookups =
+to understand the purpose of a branch)
+>  - Is consistent with the rest of the code base
+>
+> =E2=80=A6 so I don=E2=80=99t understand why you wouldn=E2=80=99t want tha=
+t, even if it=E2=80=99s a quick test tool :)
 
-Does syzbot test the latest upstream? Isn't this supposed to be fixed by
++1
 
-commit e20a2e9c42c9e4002d9e338d74e7819e88d77162
-Author: Myungho Jung <mhjungk@gmail.com>
-Date:   Sat Feb 2 16:56:36 2019 -0800
+> I suppose the long-term idea is to provide the same kind of interactive c=
+ommand-line interface as meshctl has provided for provisioner and configura=
+tion client role? In fact, would it make sense to keep using meshctl for th=
+at and hide the detail whether stuff is going via meshd or not?
 
-    Bluetooth: Fix decrementing reference count twice in releasing socket
+There is actually a lot in common to meshctl so I wonder why not
+extend it to work with meshd instead, or we do intend to abandon it? I
+thought its code would be assimilated by meshd and then reworked...
+Anyway our python scripts are just small samples currently and Id say
+we should keep it like that and not have full blow clients since there
+are better tools for it, for instance there exists python bindings for
+BlueZ which might be extended to work with meshd:
 
-?
+https://pypi.org/project/bluezero/
+
+
+
+> Johan
+
+
+
+--=20
+Luiz Augusto von Dentz
