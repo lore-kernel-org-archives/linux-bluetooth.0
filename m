@@ -7,63 +7,86 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7095FC43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Mar 2019 12:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B64C43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Mar 2019 12:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FEC720850
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Mar 2019 12:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29B5E20854
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Mar 2019 12:23:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QkWiKzkN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CN3e0m+C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731029AbfCYMDI (ORCPT
+        id S1731013AbfCYMX4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Mar 2019 08:03:08 -0400
-Received: from mail-vs1-f43.google.com ([209.85.217.43]:41299 "EHLO
-        mail-vs1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730653AbfCYMDI (ORCPT
+        Mon, 25 Mar 2019 08:23:56 -0400
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:34403 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730996AbfCYMX4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Mar 2019 08:03:08 -0400
-Received: by mail-vs1-f43.google.com with SMTP id g187so5175888vsc.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2019 05:03:08 -0700 (PDT)
+        Mon, 25 Mar 2019 08:23:56 -0400
+Received: by mail-pg1-f171.google.com with SMTP id v12so6486836pgq.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Mar 2019 05:23:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=i4Bm3xhFpT51ClzruRyIh+xl4cgRxLuiGnDJqFP6klk=;
-        b=QkWiKzkN/bZDf43fss2Dfw5ujVOqiHc9IQ9NtI7r7pcj6t3dFj5pTyaU5g1kq/2uks
-         ejEOMU3paVSjDS//e1Lr79wowoatrU6m1sP59YODZ/bOAvJ2ANt4k/1dVZy4/tWqJ/qn
-         PMLHe+zWarle4L48oBuwRxGuTY2k+ViaEZ4AbAPJpZ+ucleDAdRgQ1TLulHJHnYaMlOi
-         d6rOCvqJPlGGe1hWmaGQGV1DnIs7RMA/2zNlSy+VQAqts+wqw82qYHUnzR88F5ayhgIF
-         DOjboo0wKdYQP77boN9Z9wkuvbSRLGwcFKSgPilYXQEW+nyPg8GLGiCwAgOgeO/BhKVe
-         jXXQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Kp4QnOKIDPKgIhFgxztrNqWgoXokwhQ3R+1ziVD/5lE=;
+        b=CN3e0m+C5WxTaN5PL1jKpovkBzBWBrxNKEa7Fd5y/w2amdq4s4S3ae7YqRiVqSdvRy
+         WaqtGWKODhVHZqZ/YvYtIA/E4t/4PzQ95IBCuIJ6KM2EeM3lz8X39ptdrbNL49YUUPEo
+         KNRCAsrlG97/bNf+pd62J8iXEYuy25Bz44LTTLoDa3TPIdNoEIOc/odcJvQq6WkyNI4I
+         s2EO8Sr2gG3ltMg5LkT+a7LQk3odc6iU2AVz1LGaiXU0WfdGgtgWJUy23MHWXk2fsooM
+         w2gDM9dbqpwxG9jIlab6bBatnuJd9drE4aAvi1naTLLwzl+nOq65byPbENLA168vs4ad
+         zVEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=i4Bm3xhFpT51ClzruRyIh+xl4cgRxLuiGnDJqFP6klk=;
-        b=AUEH/w4AauxJIDR64erLT+sggBdvb4YfotitLNVUVJz9F1dCkpKQBPH0TEbsCtDvvK
-         wUAWFMo7ZpzayDkNMxEK+p33FN1vfWimz1jVi9mYI6rQz6WIF4sNinDd9GXgURWWIY9X
-         uHvh+OvEns7+7nifJbMxT7zdoejQNLoPC716PM5shP2Q9r/xsM+Wn36G9kzA7Yu7Yb8u
-         EmAHAHlrNwPSsAf0Q6k3dVjrjQI1zQRjGlP3bwjKvQd/wFmNLPJVjL9mtBj+Y8v6RwGk
-         XRawhWkAb06+xi9rG79qfoo0kwfr6POkgdAO6PtWMfwncKqkybQXtw80wQApZV4eDuBS
-         lqJw==
-X-Gm-Message-State: APjAAAUJYKgHqiDRvmtRKq+X4XNNpx6d+cg2lo5owU1qawORZ6dkO6mp
-        PhEAkJgISZXf2DXCkF5bY1XQvwiPjkk/LExxQtZRWLxC
-X-Google-Smtp-Source: APXvYqws8+PSQfaGgSUXOfwb0+xCOFRau5NIG0Xxe6qxDR/FEJyPs8cyHdNCQe5Xe8rEFOJnZFh4EROwr0o+T7spAgk=
-X-Received: by 2002:a67:e3d1:: with SMTP id k17mr249641vsm.86.1553515387438;
- Mon, 25 Mar 2019 05:03:07 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Kp4QnOKIDPKgIhFgxztrNqWgoXokwhQ3R+1ziVD/5lE=;
+        b=nM3gI5sZVnyLMLSExroHl9g8yju6mGtOkGX4/ZA1R6/ApNjZO9v7q42vyp2j8C8tCC
+         All1JzSmpmD53WoYiL0p6KtGXjVT7UiHS3sdbPEh3GPw1NAFNCXyzV/NTyeCQj6PPBJT
+         ElZB2yCHKdG6Er3+utroxs4PvYkLFQcm5lUhhMH+AGckbfGOd0QUEp12h/ehg7sGhBMu
+         hfZw6KjqnqcPoYJ9EZbnLNoReBb+fzVxF8I9h6o4qM+mAmQ6bxsEzz3cXbFJugNX1x7p
+         ZxDfY9zzHJcL1zAad2RzgkgE9WlKAxdMoEe5IblF8Axulc03/PyQDbWSS57K9db1CP7p
+         Lj8w==
+X-Gm-Message-State: APjAAAXci1r9EWD266pUvZ6NklHWK82rpaZ2aPk38kY9KRmf2ADLMWmt
+        s82iznZVXQTC/iysa9MJHsUjvA/x6NjGwDm77EQxbhck
+X-Google-Smtp-Source: APXvYqwrct5b58Mpl36mQQ5o4DRGYA6itcRX9wJoHa3tBAQtEc59TwVtV7FwqAORG9ghvFEwpy/+lscY6DgrUXYWDrY=
+X-Received: by 2002:a62:174c:: with SMTP id 73mr23792722pfx.33.1553516635430;
+ Mon, 25 Mar 2019 05:23:55 -0700 (PDT)
 MIME-Version: 1.0
-From:   Alexandre Augusto <alexandre.a.giron@gmail.com>
-Date:   Mon, 25 Mar 2019 09:02:56 -0300
-Message-ID: <CABLzjm-SLs_AzgS2S=3ogN=P9Jk9OjBuSMaNFTpXawrAsNfe+g@mail.gmail.com>
-Subject: Information about HCI LE Rand command
-To:     linux-bluetooth@vger.kernel.org
+References: <CABLzjm-SLs_AzgS2S=3ogN=P9Jk9OjBuSMaNFTpXawrAsNfe+g@mail.gmail.com>
+In-Reply-To: <CABLzjm-SLs_AzgS2S=3ogN=P9Jk9OjBuSMaNFTpXawrAsNfe+g@mail.gmail.com>
+From:   Emil Lenngren <emil.lenngren@gmail.com>
+Date:   Mon, 25 Mar 2019 13:23:44 +0100
+Message-ID: <CAO1O6sfDYV9q5z2b64SS1MDSuXUYS6fvxQWc00NsX_1qLxEorQ@mail.gmail.com>
+Subject: Re: Information about HCI LE Rand command
+To:     Alexandre Augusto <alexandre.a.giron@gmail.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Alexandre,
 
-I would like to know, if possible, information about the bluez LE Rand
-command (ocf 0x0018) at HCI code. How does it generate the number? Is
-it vendor-specific (or secret)?
+Den m=C3=A5n 25 mars 2019 kl 13:03 skrev Alexandre Augusto
+<alexandre.a.giron@gmail.com>:
+>
+> Hello,
+>
+> I would like to know, if possible, information about the bluez LE Rand
+> command (ocf 0x0018) at HCI code. How does it generate the number? Is
+> it vendor-specific (or secret)?
+
+According to the Bluetooth core specification, it shall be a "A pseudo
+random number generator compliant with [FIPS PUB 140-2]
+(http://csrc.nist.gov/publications/fips/fips140-2/fips1402annexc.pdf)"
+which shall be seeded "with at least the minimum entropy required by
+the pseudo random number generator". What algorithm each Bluetooth
+controller actually uses is therefore vendor specific. I guess most
+controllers will use some SHA-based or AES-based algorithm. Note that
+it is not the host (BlueZ) that generates the number; it just asks the
+controller to generate it for the host.
+
+/Emil
