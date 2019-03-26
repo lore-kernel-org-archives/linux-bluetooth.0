@@ -2,101 +2,99 @@ Return-Path: <SRS0=6DA+=R5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96050C43381
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Mar 2019 10:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D68B4C43381
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Mar 2019 11:46:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 589B72084B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Mar 2019 10:53:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3B2620830
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Mar 2019 11:46:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="LObTVkPh"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="VUPHr0x8";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="VUPHr0x8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726248AbfCZKxa (ORCPT
+        id S1726307AbfCZLqK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Mar 2019 06:53:30 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:44738 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725975AbfCZKx3 (ORCPT
+        Tue, 26 Mar 2019 07:46:10 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:35580 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726140AbfCZLqK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Mar 2019 06:53:29 -0400
-Received: by mail-lf1-f66.google.com with SMTP id u9so8248797lfe.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Mar 2019 03:53:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:organization:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=lGP3KsidIgf9uRydsPN4wsEtEwYAsKY08VxJXJKe9AY=;
-        b=LObTVkPhMAgfvcmSFfU0W+1hXcCnNGa8iWVQkLHJUx7Fa3XsexXUKr2WJzX1pFM6db
-         GfsmyiZaROJCyhTmiObvBeqkuRM2xWPRvCxg10jgt+e81UgIDfll5a+Wy/yA9uQQWck8
-         n/7aaFITjIp/K9yRwfPewKYtksGVMwr4cxQcq4moJDslEzR41JlCy5LJLZ3lzmI5FSTk
-         m8Sfdiy19lstuhb+zYTGmxQJYDMnTMDv9ENCG+rSINTntsBafD374qgh5kA3VjVBxPqC
-         khOV0NZSqo9KVBAMUxlTkzQVsULhalMQgHBMe4BsS5uw07gyViNSgtd3jIDoSHG7SY11
-         Eh5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=lGP3KsidIgf9uRydsPN4wsEtEwYAsKY08VxJXJKe9AY=;
-        b=je3VMNq++/a4UPlhLfxgEFvSqMHCDsL8fnJIYDS2H0zq+W1Yel90PGdnZ1Mp6O1oUu
-         +kTmxnVuW+mALmQQyI/aglbwOCCLfdGTvhGuUrbXofXd38SN64gDX4hkM1Eu2zQIx9HS
-         r2MRKZW1oSscGChWdkzfA5pDQEZit091vTuBJC24GKQQsvXhyLfrNrMggqeWsCk7rELd
-         W1rjb+Tlb5TbQqP3i3t6M14TkGC0HsY4Zp/UdRpBiuyPNyQbe2DsfyePd49irk5jxwMK
-         5FnpC5R0NWOC2NuS8jyq+cHVnlpNI2W1gaSmb/qt6ccD3E4bf8cyeNCjZXaNzIcYhPlv
-         1ufA==
-X-Gm-Message-State: APjAAAWiel3zOCDjqlW7dgSBBP2xCfnV81Rlcgg18p4O/UsIokN/s99I
-        1ASD8sUa8aTBHcKljSqJzqEv5rwXyvQ=
-X-Google-Smtp-Source: APXvYqxWJz+uOL5bDaPfAkjm5OiqXKOZxFedcyrbtqcBa8tkFtOFs6h589fiNm9iIxe7YkD5lLRwKQ==
-X-Received: by 2002:a19:f50f:: with SMTP id j15mr15873708lfb.126.1553597607628;
-        Tue, 26 Mar 2019 03:53:27 -0700 (PDT)
-Received: from ix.localnet ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id t81sm3896129lff.21.2019.03.26.03.53.26
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 26 Mar 2019 03:53:26 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] autopair: Add more common PIN codes for audio devices
-Date:   Tue, 26 Mar 2019 11:53:25 +0100
-Message-ID: <1577665.qXM628sudz@ix>
-Organization: CODECOUP
-In-Reply-To: <66544e21401986edd519e4f6939e405eea5c7397.camel@hadess.net>
-References: <20171127152651.18997-1-hadess@hadess.net> <1511796502.11411.33.camel@hadess.net> <66544e21401986edd519e4f6939e405eea5c7397.camel@hadess.net>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+        Tue, 26 Mar 2019 07:46:10 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id C213D60DB6; Tue, 26 Mar 2019 11:46:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1553600769;
+        bh=aILOW3Gi0D4cOprXtmBb/+ieICbozB2ApsNJQSwQnsc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=VUPHr0x8KaYokN1/4j7A287dzVpqDDPgcMIfk+QYzwfKMCoqKxwsXHWL9qaJcr7sx
+         /WS8dJEjdDFNU8y9ydwshSW7NCu593shLD2UUUnRvMQRsbOh77s6timeH4ZftvPRcB
+         O/OhbCt0eEjfrDzuuCxfkszoV2C9krJCtsJTqFeM=
+Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: c-hbandi@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 4A68960312;
+        Tue, 26 Mar 2019 11:46:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1553600769;
+        bh=aILOW3Gi0D4cOprXtmBb/+ieICbozB2ApsNJQSwQnsc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=VUPHr0x8KaYokN1/4j7A287dzVpqDDPgcMIfk+QYzwfKMCoqKxwsXHWL9qaJcr7sx
+         /WS8dJEjdDFNU8y9ydwshSW7NCu593shLD2UUUnRvMQRsbOh77s6timeH4ZftvPRcB
+         O/OhbCt0eEjfrDzuuCxfkszoV2C9krJCtsJTqFeM=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 4A68960312
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        anubhavg@codeaurora.org, devicetree@vger.kernel.org,
+        mark.rutland@arm.com, robh+dt@kernel.org,
+        Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v5 0/2] Enable Bluetooth functionality for WCN3998.
+Date:   Tue, 26 Mar 2019 17:15:54 +0530
+Message-Id: <1553600756-8264-1-git-send-email-c-hbandi@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+This patch series we add support for WCN3998 BT chip set. This new chip set
+is based from the WCN3990 with minimal power numbers. So here in this patch
+The major difference between wcn3990 and WCN3998 is only power numbers.
+where as init process and fw download is same with wcn3990.
+So we add new compatible for WCN3998. 
+Removed the Reading of regulator values from dts.
+Added new compatible for WCN3998. 
+Changes in V5:
+changed is_qca_soc_type_wcn399x_family to
+qca_is_wcn399x helper function 
+Moved the qca_is_wcn399x function to btqca.c
+modified the DT document for wcn399x as per driver code
+Changes in V4:
+Added is_qca_soc_type_wcn399x_family helper function 
+to get the soc type is wcn399x or not.
+Changes in V3:
+updated to latest code base.
 
-On Monday, 25 March 2019 12:10:52 CET Bastien Nocera wrote:
-> On Mon, 2017-11-27 at 16:28 +0100, Bastien Nocera wrote:
-> > On Mon, 2017-11-27 at 16:26 +0100, Bastien Nocera wrote:
-> > > PIN codes "1111", and "1234" are fairly common PIN codes used for
-> > > audio
-> > > devices such as speakers and headsets. This replaces similar quirks
-> > > already present in gnome-bluetooth's PIN database.
-> > 
-> > V2 of this patch, I've tested it again, and it seems to work in my
-> > tests. I've also added another special case for gaming input devices
-> > and remote controls in a second patch.
-> 
-> The 2 patches in this patchset still apply, and are still relevant.
-> Could those be reviewed and merged, please?
-> 
-> Cheers
+Harish Bandi (2):
+  Bluetooth: hci_qca: Added support for WCN3998
+  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
+    WCN3998
 
-I've must have miss those, sorry for that.
-Both patches are now applied.
-
+ .../devicetree/bindings/net/qualcomm-bluetooth.txt |  5 +--
+ drivers/bluetooth/btqca.c                          | 13 +++++--
+ drivers/bluetooth/btqca.h                          |  8 ++++-
+ drivers/bluetooth/hci_qca.c                        | 40 ++++++++++++++--------
+ 4 files changed, 47 insertions(+), 19 deletions(-)
 
 -- 
-pozdrawiam
-Szymon Janc
-
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
