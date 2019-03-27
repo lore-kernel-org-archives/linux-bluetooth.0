@@ -4,50 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3BAC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EED5C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 19:04:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0D2E2075C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D1A120700
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 19:04:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553713118;
-	bh=MSo0u1jGOEaroxkvuEdEFti/DU0XOeTCR5vg8pBF0Kw=;
+	s=default; t=1553713485;
+	bh=Ual9+Xy9K+wD2y+07e6wC63ZDP5T++hm7vqOMoXExi0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qYmBRtmN9wVVbbxSWFV4oAxIxFkdA9l9WP8pAPswgJjZhUsOrF4CkEhbs0fGXzaO2
-	 xEWjDRK6wbOwI8MbhMh/Hxcw6y0T0H99UufVvC8t3bo/cJxteTYiIN0b+dWfC5vPPN
-	 O3r5TQUZm4I5RUwokTrK7xtxwSANoew5AVM/MIpU=
+	b=xrL2ic8g8BYN0TuICeDknOZHcYXL2WS7j5vI/UbUoY9+pCjHmRLWbnMhsGJiLGXsR
+	 ASig1P56o7mrk1MChxtVaVf/tEi92Mp0+dWoiR0Ru119w06hJY5cnprGZrjQo+EZ3w
+	 tWi1BsEjl6uOGHLRex6tuiWQW7KP/JO7HSteOQ0c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389867AbfC0S6b (ORCPT
+        id S2389340AbfC0TEj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Mar 2019 14:58:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59248 "EHLO mail.kernel.org"
+        Wed, 27 Mar 2019 15:04:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55632 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388767AbfC0SPi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:15:38 -0400
+        id S2388752AbfC0SNE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:13:04 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E003A21741;
-        Wed, 27 Mar 2019 18:15:36 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id EAA5F2147C;
+        Wed, 27 Mar 2019 18:13:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553710537;
-        bh=MSo0u1jGOEaroxkvuEdEFti/DU0XOeTCR5vg8pBF0Kw=;
+        s=default; t=1553710383;
+        bh=Ual9+Xy9K+wD2y+07e6wC63ZDP5T++hm7vqOMoXExi0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=K3agCSO8ZtzFlyTYk0utqwvaUdczJHKSvwYZMojEod2z2XtSY/dn/cFrh/gUuuazj
-         xlTrSB67PF/AqbsAcie33m7kMfKwyO3Mee5AQLTShwskPubGtdn2QM4JZ0TB4zFx7K
-         F4CoJYqn8uTiP3HFoiiFUXC51yOfdeKgpfyuuSYg=
+        b=Rg9iBC3RsBOmqgttF+FXbLS51xaPGIXFyC5UBEKGm+nsVvJTenl/ZI5BxPR+i3A7m
+         /t2D09j63cBY8YrFpfNEIfTdn7I0tWK0IuSaR3orLk200Xu1uuaprxsH8wqhWTIPuB
+         YXFfBckOvghpzNPxPA2YFTK8NoxCA83ktXU/RW4c=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@intel.com>,
+Cc:     Jeremy Cline <jcline@redhat.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 163/192] Bluetooth: Verify that l2cap_get_conf_opt provides large enough buffer
-Date:   Wed, 27 Mar 2019 14:09:55 -0400
-Message-Id: <20190327181025.13507-163-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 092/192] Bluetooth: hci_ldisc: Initialize hci_dev before open()
+Date:   Wed, 27 Mar 2019 14:08:44 -0400
+Message-Id: <20190327181025.13507-92-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190327181025.13507-1-sashal@kernel.org>
 References: <20190327181025.13507-1-sashal@kernel.org>
@@ -59,66 +58,97 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Jeremy Cline <jcline@redhat.com>
 
-[ Upstream commit 7c9cbd0b5e38a1672fcd137894ace3b042dfbf69 ]
+[ Upstream commit 32a7b4cbe93b0a0ef7e63d31ca69ce54736c4412 ]
 
-The function l2cap_get_conf_opt will return L2CAP_CONF_OPT_SIZE + opt->len
-as length value. The opt->len however is in control over the remote user
-and can be used by an attacker to gain access beyond the bounds of the
-actual packet.
+The hci_dev struct hdev is referenced in work queues and timers started
+by open() in some protocols. This creates a race between the
+initialization function and the work or timer which can result hdev
+being dereferenced while it is still null.
 
-To prevent any potential leak of heap memory, it is enough to check that
-the resulting len calculation after calling l2cap_get_conf_opt is not
-below zero. A well formed packet will always return >= 0 here and will
-end with the length value being zero after the last option has been
-parsed. In case of malformed packets messing with the opt->len field the
-length value will become negative. If that is the case, then just abort
-and ignore the option.
+The syzbot report contains a reliable reproducer which causes a null
+pointer dereference of hdev in hci_uart_write_work() by making the
+memory allocation for hdev fail.
 
-In case an attacker uses a too short opt->len value, then garbage will
-be parsed, but that is protected by the unknown option handling and also
-the option parameter size checks.
+To fix this, ensure hdev is valid from before calling a protocol's
+open() until after calling a protocol's close().
 
+Reported-by: syzbot+257790c15bcdef6fe00c@syzkaller.appspotmail.com
+Signed-off-by: Jeremy Cline <jcline@redhat.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/bluetooth/hci_ldisc.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d17a4736e47c..6c873dc549b0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3336,6 +3336,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index ea6238ed5c0e..8776906cafca 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -207,11 +207,11 @@ void hci_uart_init_work(struct work_struct *work)
+ 	err = hci_register_dev(hu->hdev);
+ 	if (err < 0) {
+ 		BT_ERR("Can't register HCI device");
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++		hu->proto->close(hu);
+ 		hdev = hu->hdev;
+ 		hu->hdev = NULL;
+ 		hci_free_dev(hdev);
+-		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+-		hu->proto->close(hu);
+ 		return;
+ 	}
  
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
- 		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
-+		if (len < 0)
-+			break;
+@@ -616,6 +616,7 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
+ static int hci_uart_register_dev(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev;
++	int err;
  
- 		hint  = type & L2CAP_CONF_HINT;
- 		type &= L2CAP_CONF_MASK;
-@@ -3547,6 +3549,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+ 	BT_DBG("");
  
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
- 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
-+		if (len < 0)
-+			break;
+@@ -659,11 +660,22 @@ static int hci_uart_register_dev(struct hci_uart *hu)
+ 	else
+ 		hdev->dev_type = HCI_PRIMARY;
  
- 		switch (type) {
- 		case L2CAP_CONF_MTU:
-@@ -3727,6 +3731,8 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
++	/* Only call open() for the protocol after hdev is fully initialized as
++	 * open() (or a timer/workqueue it starts) may attempt to reference it.
++	 */
++	err = hu->proto->open(hu);
++	if (err) {
++		hu->hdev = NULL;
++		hci_free_dev(hdev);
++		return err;
++	}
++
+ 	if (test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
+ 		return 0;
  
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
- 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
-+		if (len < 0)
-+			break;
+ 	if (hci_register_dev(hdev) < 0) {
+ 		BT_ERR("Can't register HCI device");
++		hu->proto->close(hu);
+ 		hu->hdev = NULL;
+ 		hci_free_dev(hdev);
+ 		return -ENODEV;
+@@ -683,17 +695,12 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 	if (!p)
+ 		return -EPROTONOSUPPORT;
  
- 		switch (type) {
- 		case L2CAP_CONF_RFC:
+-	err = p->open(hu);
+-	if (err)
+-		return err;
+-
+ 	hu->proto = p;
+ 	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
+ 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+-		p->close(hu);
+ 		return err;
+ 	}
+ 
 -- 
 2.19.1
 
