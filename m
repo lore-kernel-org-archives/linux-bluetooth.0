@@ -2,127 +2,153 @@ Return-Path: <SRS0=dIIZ=R6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA85AC43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 17:29:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 318C2C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:05:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5F62206B7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 17:29:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+PL7sF0"
+	by mail.kernel.org (Postfix) with ESMTP id 0257A217F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:05:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1553709955;
+	bh=RjFWTkJ6gpACcsLvmy+kyqlzVKRiTFDE3NNAdDRzJe0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=iDNC7lxOl1X51Rnern7nV6P6DItyB6xmguUG9phLO5Ex/K9+MqqZlUjgr+2Mgsibm
+	 KWeVLTlyJBIOuA1zlZdW4SOlmxWjfdwNB99yI57GRBA6e+KZKx8lGo2w7t0DynN7is
+	 dxNbYbiwJW7L4TndvhqxHnXmgWnzaVYsRlBhtHSw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727695AbfC0R3y (ORCPT
+        id S2387798AbfC0SFy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Mar 2019 13:29:54 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:46401 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726803AbfC0R3x (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Mar 2019 13:29:53 -0400
-Received: by mail-pl1-f193.google.com with SMTP id y6so3642530pll.13;
-        Wed, 27 Mar 2019 10:29:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ea37q5/WEELVBODUr5amsQMBusFYPsUwbRc4D8n2YhU=;
-        b=d+PL7sF0F8fHvXY9H4shGsrsq42svaVVwQ2btOiF77Znehfwo6knr1LyE0xIIsgoiB
-         xQvPfMu4jKufylVjYU5IVvii9myi9m+jflWAZPqfFhotCEG61AeKjkwVDBGxkGwUFsAO
-         iAaJrhErAZeJH9xM5AwdHqFbtAGCgz5ueVgHBY/bsTTfKIZl/dytgpXKwU5MHBvxtnLw
-         fQvCv9SAYyEs6/g/L4xLLT3Ud9v9JaKui0dCovzryxJzWKqBnKnDdB6qrHQr1Fw6jcB8
-         Txg+nyiSzjXBkgOm+4ADR7ErWHrp/y80vsnEFyImmc3MSWCQ8zThS9EY3pJW+ibaG9if
-         0YoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ea37q5/WEELVBODUr5amsQMBusFYPsUwbRc4D8n2YhU=;
-        b=H8Aq0EEcs0v5U9CmIy10qWQ8LwA7b7kaQIosLmQqLum4dE6ynp2cPaBPgnl0WMGfu2
-         rYS6nPaMqwv4qyxUgvbeVcVfxrS2bpXD48F/nUT2a7Xd4ZiJJjmEXLsbVVwX5meugVr2
-         rUkRC6sRVVdo1NzXYioQAAgcaXYNu5QPL0fZgf79d9Bh1N4sKFKgeJbCJRTDxj9XSxUu
-         rU5y/nx69S01nbIoeeZ+9MnnV1DNpAEHgwSjhmd/tYP1IlF+I671luNECoqZ7sQw/FJM
-         bjagsiHYvfGdQhHzkxv+AggaiGocpq6PtQM72ARfaw7dUDzB+KcNV8416aUSjUJpSnQe
-         jR8Q==
-X-Gm-Message-State: APjAAAXsIkECpOHjNDF2hnfZMooqEm3RA+KOUmoWW7L9aE2cpetoFn0R
-        XLtriTj9lZlV3i+cmjniclI4bTH3A4zo5w==
-X-Google-Smtp-Source: APXvYqzr66U7a04tHZL6IJBO8zUl9LsjYFSyeO171aV3rHqoprtCmVv7db3NDqm+qn5yugp9+uHoCQ==
-X-Received: by 2002:a17:902:8692:: with SMTP id g18mr37117967plo.149.1553707793034;
-        Wed, 27 Mar 2019 10:29:53 -0700 (PDT)
-Received: from kkajrew-mobl1.ger.corp.intel.com ([192.55.54.45])
-        by smtp.gmail.com with ESMTPSA id q86sm65962628pfi.171.2019.03.27.10.29.50
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 27 Mar 2019 10:29:51 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH] Add Support for LE Ping feature
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-In-Reply-To: <1553661793-10304-1-git-send-email-spoorthix.k@intel.com>
-Date:   Wed, 27 Mar 2019 18:29:47 +0100
-Cc:     linux-bluetooth@vger.kernel.org,
-        linux-bluetooth-owner@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A7F336FF-1D53-4DC9-94ED-392011649A5E@gmail.com>
-References: <1553661793-10304-1-git-send-email-spoorthix.k@intel.com>
-To:     SpoorthiX K <spoorthix.k@intel.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Wed, 27 Mar 2019 14:05:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47210 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387790AbfC0SFx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:05:53 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EE09D217F9;
+        Wed, 27 Mar 2019 18:05:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1553709952;
+        bh=RjFWTkJ6gpACcsLvmy+kyqlzVKRiTFDE3NNAdDRzJe0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=jDWI3bFaZ1WSNXvfc83hwzAuKjhu+/63MKSe0/TkawbShUWzPityAHZhRt6HZJLGu
+         JqAcC55fSf9X8VdouQB5I+EbF+1PL9ncBs+xL09sTPDOX9aQq5fxAMTGscHJnwQRXW
+         6uvicYhUCX7CTexhHO2ppSp7TM/Acnc5bp04oprQ=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Jeremy Cline <jcline@redhat.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sasha Levin <sashal@kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.0 128/262] Bluetooth: hci_ldisc: Initialize hci_dev before open()
+Date:   Wed, 27 Mar 2019 13:59:43 -0400
+Message-Id: <20190327180158.10245-128-sashal@kernel.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190327180158.10245-1-sashal@kernel.org>
+References: <20190327180158.10245-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Spoorthi,
+From: Jeremy Cline <jcline@redhat.com>
 
-On 27 Mar 2019, at 5.43, SpoorthiX K <spoorthix.k@intel.com> wrote:
-> +#define HCI_OP_WRITE_AUTH_PAYLOAD_TO    0x0c7c
-> +struct hci_cp_write_auth_payload_to {
-> +	__le16	handle;
-> +	__u16	timeout;
+[ Upstream commit 32a7b4cbe93b0a0ef7e63d31ca69ce54736c4412 ]
 
-As Marcel (and now also the build test robot) pointed out this should be =
-__le16.
+The hci_dev struct hdev is referenced in work queues and timers started
+by open() in some protocols. This creates a race between the
+initialization function and the work or timer which can result hdev
+being dereferenced while it is still null.
 
-> #if IS_ENABLED(CONFIG_BT_LEDS)
-> 	struct led_trigger	*power_led;
-> @@ -500,6 +501,7 @@ struct hci_conn {
-> 	__u8		remote_id;
->=20
-> 	unsigned int	sent;
-> +	bool		auth_payload_timeout_set;
+The syzbot report contains a reliable reproducer which causes a null
+pointer dereference of hdev in hci_uart_write_work() by making the
+memory allocation for hdev fail.
 
-Would it make sense to add this to the flags instead of increasing the =
-hci_conn struct size?
+To fix this, ensure hdev is valid from before calling a protocol's
+open() until after calling a protocol's close().
 
-> +	/* Set the default Authenticated Payload Timeout after
-> +	 * an LE Link is established.
+Reported-by: syzbot+257790c15bcdef6fe00c@syzkaller.appspotmail.com
+Signed-off-by: Jeremy Cline <jcline@redhat.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/hci_ldisc.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-The test further below also includes BR/EDR links, i.e. the above =
-comment doesn=E2=80=99t match that.
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index fbf7b4df23ab..4918fefc4a6f 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -207,11 +207,11 @@ void hci_uart_init_work(struct work_struct *work)
+ 	err = hci_register_dev(hu->hdev);
+ 	if (err < 0) {
+ 		BT_ERR("Can't register HCI device");
++		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
++		hu->proto->close(hu);
+ 		hdev = hu->hdev;
+ 		hu->hdev = NULL;
+ 		hci_free_dev(hdev);
+-		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+-		hu->proto->close(hu);
+ 		return;
+ 	}
+ 
+@@ -616,6 +616,7 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
+ static int hci_uart_register_dev(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev;
++	int err;
+ 
+ 	BT_DBG("");
+ 
+@@ -659,11 +660,22 @@ static int hci_uart_register_dev(struct hci_uart *hu)
+ 	else
+ 		hdev->dev_type = HCI_PRIMARY;
+ 
++	/* Only call open() for the protocol after hdev is fully initialized as
++	 * open() (or a timer/workqueue it starts) may attempt to reference it.
++	 */
++	err = hu->proto->open(hu);
++	if (err) {
++		hu->hdev = NULL;
++		hci_free_dev(hdev);
++		return err;
++	}
++
+ 	if (test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
+ 		return 0;
+ 
+ 	if (hci_register_dev(hdev) < 0) {
+ 		BT_ERR("Can't register HCI device");
++		hu->proto->close(hu);
+ 		hu->hdev = NULL;
+ 		hci_free_dev(hdev);
+ 		return -ENODEV;
+@@ -683,17 +695,12 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 	if (!p)
+ 		return -EPROTONOSUPPORT;
+ 
+-	err = p->open(hu);
+-	if (err)
+-		return err;
+-
+ 	hu->proto = p;
+ 	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
+ 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+-		p->close(hu);
+ 		return err;
+ 	}
+ 
+-- 
+2.19.1
 
-> +	 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT =
-should be
-> +	 * sent when the link is active and Encryption is enabled, the =
-conn
-> +	 * type can be either LE or ACL and controller must support LMP =
-Ping.
-> +	 * Ensure for AES-CCM encryption as well.
-> +	 */
-> +	if ((conn->type =3D=3D LE_LINK || conn->type =3D=3D ACL_LINK) &
-
-That =E2=80=98&=E2=80=99 the end should probably be a =E2=80=98&&=E2=80=99=
-, shouldn=E2=80=99t it?
-
-> +	} else {
-> +		conn->state =3D BT_CONNECTED;
-> +		hci_connect_cfm(conn, ev->status);
-> +	}
-
-Why is this being added? Such a transition to BT_CONNECTED state at this =
-point in the code didn=E2=80=99t exist previously, and this doesn=E2=80=99=
-t seem to be related to the new feature.
-
-Johan=
