@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F84C43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3BAC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 251E9205C9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0D2E2075C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553713096;
-	bh=92zrjK9+2OxQcwL86HWfOxqPvfxC31dI70oNFNOH2VA=;
+	s=default; t=1553713118;
+	bh=MSo0u1jGOEaroxkvuEdEFti/DU0XOeTCR5vg8pBF0Kw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=aGIz4PdZoK6r0Ms8MlZw/ciLSylRb5pdb2jtQh+bd9hL3bvqoPebw8xsAMVEcECiS
-	 JbZEF7JUcBgdcW92npApRN3TLIpTs3RbgRYEr+8+f4y6IYdeW8C/82vJZ1gEdzL/Om
-	 fYTo5/L9PSwrpTZeb3o2pd4nFj5vqYn5WB8tCSMQ=
+	b=qYmBRtmN9wVVbbxSWFV4oAxIxFkdA9l9WP8pAPswgJjZhUsOrF4CkEhbs0fGXzaO2
+	 xEWjDRK6wbOwI8MbhMh/Hxcw6y0T0H99UufVvC8t3bo/cJxteTYiIN0b+dWfC5vPPN
+	 O3r5TQUZm4I5RUwokTrK7xtxwSANoew5AVM/MIpU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389949AbfC0S6J (ORCPT
+        id S2389867AbfC0S6b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Mar 2019 14:58:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59330 "EHLO mail.kernel.org"
+        Wed, 27 Mar 2019 14:58:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59248 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389616AbfC0SPl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:15:41 -0400
+        id S2388767AbfC0SPi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:15:38 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3691D2082F;
-        Wed, 27 Mar 2019 18:15:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E003A21741;
+        Wed, 27 Mar 2019 18:15:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553710540;
-        bh=92zrjK9+2OxQcwL86HWfOxqPvfxC31dI70oNFNOH2VA=;
+        s=default; t=1553710537;
+        bh=MSo0u1jGOEaroxkvuEdEFti/DU0XOeTCR5vg8pBF0Kw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M3CNlQauUzdBmzwAvwao2n2fQqUPqt36+zqYK6u7KyWXPQf3cKweiApigZLp0L543
-         uV1c+12u1PFQwt4JyB/J9jO+SZo76mEl8PJkhpYm54Go7piUlCCW8vc/HURyOgDG4V
-         FgJwc8vXLowufBeXruh992LGT9zN3xv/JyAohJ0o=
+        b=K3agCSO8ZtzFlyTYk0utqwvaUdczJHKSvwYZMojEod2z2XtSY/dn/cFrh/gUuuazj
+         xlTrSB67PF/AqbsAcie33m7kMfKwyO3Mee5AQLTShwskPubGtdn2QM4JZ0TB4zFx7K
+         F4CoJYqn8uTiP3HFoiiFUXC51yOfdeKgpfyuuSYg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Myungho Jung <mhjungk@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@intel.com>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 166/192] Bluetooth: hci_uart: Check if socket buffer is ERR_PTR in h4_recv_buf()
-Date:   Wed, 27 Mar 2019 14:09:58 -0400
-Message-Id: <20190327181025.13507-166-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 163/192] Bluetooth: Verify that l2cap_get_conf_opt provides large enough buffer
+Date:   Wed, 27 Mar 2019 14:09:55 -0400
+Message-Id: <20190327181025.13507-163-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190327181025.13507-1-sashal@kernel.org>
 References: <20190327181025.13507-1-sashal@kernel.org>
@@ -59,55 +59,66 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Myungho Jung <mhjungk@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 
-[ Upstream commit 1dc2d785156cbdc80806c32e8d2c7c735d0b4721 ]
+[ Upstream commit 7c9cbd0b5e38a1672fcd137894ace3b042dfbf69 ]
 
-h4_recv_buf() callers store the return value to socket buffer and
-recursively pass the buffer to h4_recv_buf() without protection. So,
-ERR_PTR returned from h4_recv_buf() can be dereferenced, if called again
-before setting the socket buffer to NULL from previous error. Check if
-skb is ERR_PTR in h4_recv_buf().
+The function l2cap_get_conf_opt will return L2CAP_CONF_OPT_SIZE + opt->len
+as length value. The opt->len however is in control over the remote user
+and can be used by an attacker to gain access beyond the bounds of the
+actual packet.
 
-Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
-Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+To prevent any potential leak of heap memory, it is enough to check that
+the resulting len calculation after calling l2cap_get_conf_opt is not
+below zero. A well formed packet will always return >= 0 here and will
+end with the length value being zero after the last option has been
+parsed. In case of malformed packets messing with the opt->len field the
+length value will become negative. If that is the case, then just abort
+and ignore the option.
+
+In case an attacker uses a too short opt->len value, then garbage will
+be parsed, but that is protected by the unknown option handling and also
+the option parameter size checks.
+
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/h4_recv.h | 4 ++++
- drivers/bluetooth/hci_h4.c  | 4 ++++
- 2 files changed, 8 insertions(+)
+ net/bluetooth/l2cap_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/h4_recv.h b/drivers/bluetooth/h4_recv.h
-index b432651f8236..307d82166f48 100644
---- a/drivers/bluetooth/h4_recv.h
-+++ b/drivers/bluetooth/h4_recv.h
-@@ -60,6 +60,10 @@ static inline struct sk_buff *h4_recv_buf(struct hci_dev *hdev,
- 					  const struct h4_recv_pkt *pkts,
- 					  int pkts_count)
- {
-+	/* Check for error from previous call */
-+	if (IS_ERR(skb))
-+		skb = NULL;
-+
- 	while (count) {
- 		int i, len;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d17a4736e47c..6c873dc549b0 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3336,6 +3336,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
  
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index fb97a3bf069b..5d97d77627c1 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -174,6 +174,10 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	u8 alignment = hu->alignment ? hu->alignment : 1;
+ 	while (len >= L2CAP_CONF_OPT_SIZE) {
+ 		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
++		if (len < 0)
++			break;
  
-+	/* Check for error from previous call */
-+	if (IS_ERR(skb))
-+		skb = NULL;
-+
- 	while (count) {
- 		int i, len;
+ 		hint  = type & L2CAP_CONF_HINT;
+ 		type &= L2CAP_CONF_MASK;
+@@ -3547,6 +3549,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
  
+ 	while (len >= L2CAP_CONF_OPT_SIZE) {
+ 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
++		if (len < 0)
++			break;
+ 
+ 		switch (type) {
+ 		case L2CAP_CONF_MTU:
+@@ -3727,6 +3731,8 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
+ 
+ 	while (len >= L2CAP_CONF_OPT_SIZE) {
+ 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
++		if (len < 0)
++			break;
+ 
+ 		switch (type) {
+ 		case L2CAP_CONF_RFC:
 -- 
 2.19.1
 
