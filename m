@@ -2,329 +2,183 @@ Return-Path: <SRS0=dIIZ=R6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8F4C43381
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 10:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A61CCC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 11:14:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1693C2075C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 10:36:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CD572146E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 11:14:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="XmworPG1";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="BiogtWhX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="orcKLOSH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732069AbfC0KgR (ORCPT
+        id S1731920AbfC0LOe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Mar 2019 06:36:17 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:34452 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727936AbfC0KgR (ORCPT
+        Wed, 27 Mar 2019 07:14:34 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55934 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729489AbfC0LOe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Mar 2019 06:36:17 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 4ED2F60F3D; Wed, 27 Mar 2019 10:36:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1553682975;
-        bh=1kAu9FMdSZv3yup+qfNRLQoL6lZc00JcHMhXPNz/+j0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=XmworPG1DSfEREe4MYzij0qqErN2qtMq3/BOUn5KLhBfR30VTQCE6cu5tacoL0JvX
-         71SQLKhLi5q7pofybJ+a2pUDt8n5L5++Qod3IImkbje85wldOLdmvbA4dSErare61z
-         q+HS9SW6pogybvssvgeW+eLbQoiQz8vc7PhmQrv0=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id E951B607C6;
-        Wed, 27 Mar 2019 10:36:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1553682972;
-        bh=1kAu9FMdSZv3yup+qfNRLQoL6lZc00JcHMhXPNz/+j0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=BiogtWhX+9dsojr/nEcu7JIS/2T8LUUGuFYlKefVee7+8XHEoAifF5M6hnVChedVw
-         9MjRFO/NA8q5rI1xIi8Qe/QoN/QgmogEKR0GE3rU+qG6CirKkxNlqOHRaGMomAeIvW
-         nifBy6Jv/KE0AJrBnnt8Mgpa9e12AyggSQuazYNM=
+        Wed, 27 Mar 2019 07:14:34 -0400
+Received: by mail-wm1-f67.google.com with SMTP id o25so15706193wmf.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Mar 2019 04:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=OGmyfdCHp1/nTnK8X6aGTljnzQ8bC2CF5Pe340auTzQ=;
+        b=orcKLOSHaGbkuJWmdHKU4Ghqz099UCbnm1CAPw7PmqI3us7QGNGxKMs1qm7MWJVgd+
+         RD3ViFtOM5gD0hiZtQoOB3GCQV65IhBNnjBg7k/SCig2TBau4kHJlahjeXdmuWfLiuC0
+         /xpdKnVGePypwa36B9GtfeXOxRdRBWWvHBsamDTx4gUsr083QHv6XBAHwQdDN9pVsCoJ
+         PEtAnFWbJm5Ls6FTAGHE/cRSc/cKu9xLI3sJKeNXC9OoISQuZiGxj2ObLHxSBXy8q0u2
+         EdX8LivluXxSJQwwZcfmOcMa0TkrrnV3zDhoIpd3kYZnKBMJKDOV8UvQcydLIYjAlXSl
+         3ezw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=OGmyfdCHp1/nTnK8X6aGTljnzQ8bC2CF5Pe340auTzQ=;
+        b=g89YxkpwjvUYs4cikmaKGKz1gRhgSHa9Mk/U89uPifVhaDHpjWm1lAffL6yuI8Dk9O
+         ODZJJAFatLs0Id1bgQycW/Lx8ou4w9vb5Upd4ZY9wdZfqbakKOO+fu7BZQA41hvvvfVp
+         TmD4rEcGuiYmBedltFF/ulbTVDHMGKXb1mQPtKbaTefc21J4vGunCCJNKyDmjbNya9zY
+         uZOnKcKn/Tk5fmtkRFpSRmusmbmqGrFLMvRPZpd3p8MSeLddSTIlTXq7aoRhZl6G/BGY
+         cwQWoH2y8NH6kLqK93WMBVM82R0DQGeLD1IrwWid3usFYDCExoOLJbkAbyTE0TbOxSjk
+         wX6Q==
+X-Gm-Message-State: APjAAAUyQbRv0U49heWwwHvNLRydGEnW553R8UymxRFCejcPXETrcnUA
+        JJ5NhnpQ6+pZew6rnwkeCXI=
+X-Google-Smtp-Source: APXvYqzQ8SJqKND2349NQcNYviLJodPk8QJlt0gAx+t0SNhA5bA5FKWZjNR11FigiHz43vwhAyp/Hw==
+X-Received: by 2002:a7b:c767:: with SMTP id x7mr12930676wmk.6.1553685272036;
+        Wed, 27 Mar 2019 04:14:32 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id t187sm22735990wma.1.2019.03.27.04.14.30
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 27 Mar 2019 04:14:30 -0700 (PDT)
+Date:   Wed, 27 Mar 2019 12:14:30 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose
+ remote SEP
+Message-ID: <20190327111430.6gliqodnnojsifjd@pali>
+References: <20190122134524.20509-1-luiz.dentz@gmail.com>
+ <CABBYNZLCFpXhbAnVYaA-nVNOY8QRvpR1UZhMHfy-awZxtpSocQ@mail.gmail.com>
+ <20190122175622.dj6riiim6zukpetw@pali>
+ <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
+ <20190127020038.q3hm5h7xl2ku6fse@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 27 Mar 2019 16:06:11 +0530
-From:   Harish Bandi <c-hbandi@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, anubhavg@codeaurora.org,
-        devicetree@vger.kernel.org, mark.rutland@arm.com,
-        robh+dt@kernel.org
-Subject: Re: [PATCH v5 1/2] Bluetooth: hci_qca: Added support for WCN3998
-In-Reply-To: <20190326234403.GZ112750@google.com>
-References: <1553600756-8264-1-git-send-email-c-hbandi@codeaurora.org>
- <1553600756-8264-2-git-send-email-c-hbandi@codeaurora.org>
- <20190326234403.GZ112750@google.com>
-Message-ID: <0bc9e4191ecd2c33bf852bef9ad8ecf2@codeaurora.org>
-X-Sender: c-hbandi@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190127020038.q3hm5h7xl2ku6fse@pali>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+On Sunday 27 January 2019 03:00:38 Pali Rohár wrote:
+> On Wednesday 23 January 2019 13:24:22 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> > On Tue, Jan 22, 2019 at 7:56 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > >
+> > > On Tuesday 22 January 2019 16:20:12 Luiz Augusto von Dentz wrote:
+> > > > Hi Pali,
+> > > > On Tue, Jan 22, 2019 at 3:45 PM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > > >
+> > > > > This adds the possibility to expose remote SEP using MediaEndpoint
+> > > > > interface to allow setting a configuration.
+> > > > > ---
+> > > > >  doc/media-api.txt | 27 +++++++++++++++++++++++++--
+> > > > >  1 file changed, 25 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/doc/media-api.txt b/doc/media-api.txt
+> > > > > index b5ad2db12..af9485342 100644
+> > > > > --- a/doc/media-api.txt
+> > > > > +++ b/doc/media-api.txt
+> > > > > @@ -500,14 +500,23 @@ Properties        object Player [readonly]
+> > > > >  MediaEndpoint1 hierarchy
+> > > > >  ========================
+> > > > >
+> > > > > -Service                unique name
+> > > > > +Service                unique name (Server role)
+> > > > > +               org.bluez (Client role)
+> > > > >  Interface      org.bluez.MediaEndpoint1
+> > > > > -Object path    freely definable
+> > > > > +Object path    freely definable (Server role)
+> > > > > +               [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/sepX
+> > > > > +               (Client role)
+> > > > >
+> > > > >  Methods                void SetConfiguration(object transport, dict properties)
+> > > > >
+> > > > >                         Set configuration for the transport.
+> > > > >
+> > > > > +                       For client role transport must be set with a server
+> > > > > +                       endpoint oject which will be configured and the
+> > > > > +                       properties must contain the following properties:
+> > > > > +
+> > > > > +                               array{byte} Capabilities
+> > > > > +
+> > > > >                 array{byte} SelectConfiguration(array{byte} capabilities)
+> > > > >
+> > > > >                         Select preferable configuration from the supported
+> > > > > @@ -532,6 +541,20 @@ Methods            void SetConfiguration(object transport, dict properties)
+> > > > >                         endpoint, because when this method gets called it has
+> > > > >                         already been unregistered.
+> > > > >
+> > > > > +Properties     string UUID [readonly, optional]:
+> > > > > +
+> > > > > +                       UUID of the profile which the endpoint is for.
+> > > > > +
+> > > > > +               byte Codec [readonly, optional]:
+> > > > > +
+> > > > > +                       Assigned number of codec that the endpoint implements.
+> > > > > +                       The values should match the profile specification which
+> > > > > +                       is indicated by the UUID.
+> > > > > +
+> > > > > +               array{byte} Capabilities [readonly, optional]:
+> > > > > +
+> > > > > +                       Capabilities blob, it is used as it is so the size and
+> > > > > +                       byte order must match.
+> > > > >
+> > > > >  MediaTransport1 hierarchy
+> > > > >  =========================
+> > > > > --
+> > > > > 2.17.2
+> > > >
+> > > > Can you try this set?
+> > >
+> > > Hi! In V3 you added only "a2dp: Add reverse discovery" patch right?
+> > > I tested my setup also with this patch and there is no difference,
+> > > pulseaudio is working fine :-)
+> > >
+> > 
+> > Applied.
+> 
+> Hi! I have one bug report for these patches.
+> 
+> When I manually disconnect A2DP profile, but let HFP active then all SEP
+> paths on D-Bus disappear.
+> 
+>   qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX org.bluez.Device1.DisconnectProfile 0000110b-0000-1000-8000-00805f9b34fb
+> 
+> So pulseaudio would still see bluetooth device as active (because HFP is
+> in use), but does not see any A2DP codec as all remote SEPs from DBus
+> were removed.
+> 
+> It is possible to not remove remote SEPs when A2DP sink profile is
+> manually disconnected?
 
-On 2019-03-27 05:14, Matthias Kaehlcke wrote:
-> On Tue, Mar 26, 2019 at 05:15:55PM +0530, Harish Bandi wrote:
->> Added new compatible for WCN3998 and corresponding voltage
->> and current values to WCN3998 compatible.
->> Changed driver code to support WCN3998
->> 
->> Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
->> ---
->> Changes in V5:
->> - changed is_qca_soc_type_wcn399x_family to
->> - qca_is_wcn399x helper function
->> - moved the qca_is_wcn399x function to btqca.c
->> ---
->>  drivers/bluetooth/btqca.c   | 13 +++++++++++--
->>  drivers/bluetooth/btqca.h   |  8 +++++++-
->>  drivers/bluetooth/hci_qca.c | 40 
->> ++++++++++++++++++++++++++--------------
->>  3 files changed, 44 insertions(+), 17 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->> index 6122685..383e99f 100644
->> --- a/drivers/bluetooth/btqca.c
->> +++ b/drivers/bluetooth/btqca.c
->> @@ -344,7 +344,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
->> baudrate,
->> 
->>  	/* Download rampatch file */
->>  	config.type = TLV_TYPE_PATCH;
->> -	if (soc_type == QCA_WCN3990) {
->> +	if (qca_is_wcn399x(soc_type)) {
->>  		/* Firmware files to download are based on ROM version.
->>  		 * ROM version is derived from last two bytes of soc_ver.
->>  		 */
->> @@ -365,7 +365,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
->> baudrate,
->> 
->>  	/* Download NVM configuration */
->>  	config.type = TLV_TYPE_NVM;
->> -	if (soc_type == QCA_WCN3990)
->> +	if (qca_is_wcn399x(soc_type))
->>  		snprintf(config.fwname, sizeof(config.fwname),
->>  			 "qca/crnv%02x.bin", rom_ver);
->>  	else
->> @@ -410,6 +410,15 @@ int qca_set_bdaddr(struct hci_dev *hdev, const 
->> bdaddr_t *bdaddr)
->>  }
->>  EXPORT_SYMBOL_GPL(qca_set_bdaddr);
->> 
->> +bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
->> +{
->> +	if ((soc_type == QCA_WCN3990) || (soc_type == QCA_WCN3998))
->> +		return true;
->> +
->> +	return false;
->> +}
->> +EXPORT_SYMBOL_GPL(qca_is_wcn399x);
->> +
->>  MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
->>  MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver 
->> " VERSION);
->>  MODULE_VERSION(VERSION);
->> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
->> index 6fdc25d..aca7b0d 100644
->> --- a/drivers/bluetooth/btqca.h
->> +++ b/drivers/bluetooth/btqca.h
->> @@ -132,7 +132,8 @@ enum qca_btsoc_type {
->>  	QCA_INVALID = -1,
->>  	QCA_AR3002,
->>  	QCA_ROME,
->> -	QCA_WCN3990
->> +	QCA_WCN3990,
->> +	QCA_WCN3998,
->>  };
->> 
->>  #if IS_ENABLED(CONFIG_BT_QCA)
->> @@ -142,6 +143,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
->> baudrate,
->>  		   enum qca_btsoc_type soc_type, u32 soc_ver);
->>  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
->>  int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->> +bool qca_is_wcn399x(enum qca_btsoc_type soc_type);
->>  #else
->> 
->>  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const 
->> bdaddr_t *bdaddr)
->> @@ -165,4 +167,8 @@ static inline int qca_set_bdaddr(struct hci_dev 
->> *hdev, const bdaddr_t *bdaddr)
->>  	return -EOPNOTSUPP;
->>  }
->> 
->> +static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
->> +{
->> +	return -EOPNOTSUPP;
-> 
-> This function returns a bool, hence returning an error code is not
-> meaningful here. Just return false.
+Hi Luiz! Have you looked at above problem?
 
-[Harish] - ok will correct it new patch.
-> 
->> +}
->>  #endif
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index 4ea995d..4af580a 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -521,7 +521,7 @@ static int qca_open(struct hci_uart *hu)
->>  	if (hu->serdev) {
->> 
->>  		qcadev = serdev_device_get_drvdata(hu->serdev);
->> -		if (qcadev->btsoc_type != QCA_WCN3990) {
->> +		if (!qca_is_wcn399x(qcadev->btsoc_type)) {
->>  			gpiod_set_value_cansleep(qcadev->bt_en, 1);
->>  		} else {
->>  			hu->init_speed = qcadev->init_speed;
->> @@ -627,7 +627,7 @@ static int qca_close(struct hci_uart *hu)
->> 
->>  	if (hu->serdev) {
->>  		qcadev = serdev_device_get_drvdata(hu->serdev);
->> -		if (qcadev->btsoc_type == QCA_WCN3990)
->> +		if (qca_is_wcn399x(qcadev->btsoc_type))
->>  			qca_power_shutdown(hu);
->>  		else
->>  			gpiod_set_value_cansleep(qcadev->bt_en, 0);
->> @@ -1008,7 +1008,7 @@ static int qca_set_baudrate(struct hci_dev 
->> *hdev, uint8_t baudrate)
->>  		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
->> 
->>  	/* Give the controller time to process the request */
->> -	if (qca_soc_type(hu) == QCA_WCN3990)
->> +	if (qca_is_wcn399x(qca_soc_type(hu)))
->>  		msleep(10);
->>  	else
->>  		msleep(300);
->> @@ -1084,7 +1084,7 @@ static unsigned int qca_get_speed(struct 
->> hci_uart *hu,
->> 
->>  static int qca_check_speeds(struct hci_uart *hu)
->>  {
->> -	if (qca_soc_type(hu) == QCA_WCN3990) {
->> +	if (qca_is_wcn399x(qca_soc_type(hu))) {
->>  		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
->>  		    !qca_get_speed(hu, QCA_OPER_SPEED))
->>  			return -EINVAL;
->> @@ -1116,7 +1116,7 @@ static int qca_set_speed(struct hci_uart *hu, 
->> enum qca_speed_type speed_type)
->>  		/* Disable flow control for wcn3990 to deassert RTS while
->>  		 * changing the baudrate of chip and host.
->>  		 */
->> -		if (soc_type == QCA_WCN3990)
->> +		if (qca_is_wcn399x(soc_type))
->>  			hci_uart_set_flow_control(hu, true);
->> 
->>  		qca_baudrate = qca_get_baudrate_value(speed);
->> @@ -1128,7 +1128,7 @@ static int qca_set_speed(struct hci_uart *hu, 
->> enum qca_speed_type speed_type)
->>  		host_set_baudrate(hu, speed);
->> 
->>  error:
->> -		if (soc_type == QCA_WCN3990)
->> +		if (qca_is_wcn399x(soc_type))
->>  			hci_uart_set_flow_control(hu, false);
->>  	}
->> 
->> @@ -1201,7 +1201,7 @@ static int qca_setup(struct hci_uart *hu)
->>  	/* Patch downloading has to be done without IBS mode */
->>  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> 
->> -	if (soc_type == QCA_WCN3990) {
->> +	if (qca_is_wcn399x(soc_type)) {
->>  		bt_dev_info(hdev, "setting up wcn3990");
->> 
->>  		/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to execute
->> @@ -1232,7 +1232,7 @@ static int qca_setup(struct hci_uart *hu)
->>  		qca_baudrate = qca_get_baudrate_value(speed);
->>  	}
->> 
->> -	if (soc_type != QCA_WCN3990) {
->> +	if (!qca_is_wcn399x(soc_type)) {
->>  		/* Get QCA version information */
->>  		ret = qca_read_soc_version(hdev, &soc_ver);
->>  		if (ret)
->> @@ -1257,7 +1257,7 @@ static int qca_setup(struct hci_uart *hu)
->>  	}
->> 
->>  	/* Setup bdaddr */
->> -	if (soc_type == QCA_WCN3990)
->> +	if (qca_is_wcn399x(soc_type))
->>  		hu->hdev->set_bdaddr = qca_set_bdaddr;
->>  	else
->>  		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
->> @@ -1280,7 +1280,7 @@ static int qca_setup(struct hci_uart *hu)
->>  	.dequeue	= qca_dequeue,
->>  };
->> 
->> -static const struct qca_vreg_data qca_soc_data = {
->> +static const struct qca_vreg_data qca_soc_data_wcn3990 = {
->>  	.soc_type = QCA_WCN3990,
->>  	.vregs = (struct qca_vreg []) {
->>  		{ "vddio",   1800000, 1900000,  15000  },
->> @@ -1291,6 +1291,17 @@ static int qca_setup(struct hci_uart *hu)
->>  	.num_vregs = 4,
->>  };
->> 
->> +static const struct qca_vreg_data qca_soc_data_wcn3998 = {
->> +	.soc_type = QCA_WCN3998,
->> +	.vregs = (struct qca_vreg []) {
->> +		{ "vddio",   1800000, 1900000,  10000  },
->> +		{ "vddxo",   1800000, 1900000,  80000  },
->> +		{ "vddrf",   1300000, 1352000,  300000 },
->> +		{ "vddch0",  3300000, 3300000,  450000 },
->> +	},
->> +	.num_vregs = 4,
->> +};
->> +
->>  static void qca_power_shutdown(struct hci_uart *hu)
->>  {
->>  	struct qca_data *qca = hu->priv;
->> @@ -1424,8 +1435,8 @@ static int qca_serdev_probe(struct serdev_device 
->> *serdev)
->>  	qcadev->serdev_hu.serdev = serdev;
->>  	data = of_device_get_match_data(&serdev->dev);
->>  	serdev_device_set_drvdata(serdev, qcadev);
->> -	if (data && data->soc_type == QCA_WCN3990) {
->> -		qcadev->btsoc_type = QCA_WCN3990;
->> +	if (data && qca_is_wcn399x(data->soc_type)) {
->> +		qcadev->btsoc_type = data->soc_type;
->>  		qcadev->bt_power = devm_kzalloc(&serdev->dev,
->>  						sizeof(struct qca_power),
->>  						GFP_KERNEL);
->> @@ -1489,7 +1500,7 @@ static void qca_serdev_remove(struct 
->> serdev_device *serdev)
->>  {
->>  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
->> 
->> -	if (qcadev->btsoc_type == QCA_WCN3990)
->> +	if (qca_is_wcn399x(qcadev->btsoc_type))
->>  		qca_power_shutdown(&qcadev->serdev_hu);
->>  	else
->>  		clk_disable_unprepare(qcadev->susclk);
->> @@ -1499,7 +1510,8 @@ static void qca_serdev_remove(struct 
->> serdev_device *serdev)
->> 
->>  static const struct of_device_id qca_bluetooth_of_match[] = {
->>  	{ .compatible = "qcom,qca6174-bt" },
->> -	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data},
->> +	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
->> +	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
->>  	{ /* sentinel */ }
->>  };
->>  MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
-> 
-> Besides the return value in the qca_is_wcn399x() stub:
-> 
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-[Harish] - Thanks for reviewing
-
-Thanks,
-Harish
+-- 
+Pali Rohár
+pali.rohar@gmail.com
