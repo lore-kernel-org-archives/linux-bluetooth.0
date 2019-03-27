@@ -2,220 +2,321 @@ Return-Path: <SRS0=dIIZ=R6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF44BC10F00
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 13:39:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE35C43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 16:46:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC82B2082F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 13:39:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E9C82075C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Mar 2019 16:46:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Pb/cBOih";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="k3YKxrmS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728324AbfC0NjJ (ORCPT
+        id S1727469AbfC0Qqo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Mar 2019 09:39:09 -0400
-Received: from mga06.intel.com ([134.134.136.31]:21720 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728530AbfC0NjI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Mar 2019 09:39:08 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Mar 2019 06:39:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,277,1549958400"; 
-   d="scan'208";a="129101397"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 27 Mar 2019 06:39:06 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1h98lm-000ERP-EB; Wed, 27 Mar 2019 21:39:06 +0800
-Date:   Wed, 27 Mar 2019 21:38:58 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     SpoorthiX K <spoorthix.k@intel.com>
-Cc:     kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
-        linux-bluetooth-owner@vger.kernel.org
-Subject: Re: [PATCH] Add Support for LE Ping feature
-Message-ID: <201903272159.3Y6RkM6w%lkp@intel.com>
-References: <1553661793-10304-1-git-send-email-spoorthix.k@intel.com>
+        Wed, 27 Mar 2019 12:46:44 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:43260 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727357AbfC0Qqn (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 Mar 2019 12:46:43 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 3C61D6083E; Wed, 27 Mar 2019 16:46:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1553705202;
+        bh=alcViEHYtmChyf5lp7+HCSXfQBS6Sj48Gr3VyJdqEOc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Pb/cBOihkyy4juO0Rj6BCreV4Co7nOvmhHoMQM/ATwfJANdKwzQCfQH73hGCqEAg8
+         9K6oMKED0aiPCaVmsxWDU9FWw70LaVUmFYS08dxlwig6uy5oT+rRPJ615V5NRNo+0P
+         2h/fO2yxrhAjz6PUzWR+Z1i3d2Vs33WGXAaAgmKA=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id AD6BA607C6;
+        Wed, 27 Mar 2019 16:46:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1553705200;
+        bh=alcViEHYtmChyf5lp7+HCSXfQBS6Sj48Gr3VyJdqEOc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=k3YKxrmSOoIRNXCNYIZ/n17Wrdi59njQTQwEDkVKt/iHuriRQO3k5mlGf08IBouAr
+         vw4IIHHX3Ve/pbOMGKQBiZ7c+73+0bp4Y+Eu1gpq8hp6hUzc+tEiEKoHZlle/wBOP6
+         t61FmXVtp8IopyUX36+M4lT06OCAQsDRJVxVlNgQ=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1553661793-10304-1-git-send-email-spoorthix.k@intel.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 27 Mar 2019 22:16:40 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Harish Bandi <c-hbandi@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        anubhavg@codeaurora.org, devicetree@vger.kernel.org,
+        mark.rutland@arm.com, robh+dt@kernel.org
+Subject: Re: [PATCH v6 1/2] Bluetooth: hci_qca: Added support for WCN3998
+In-Reply-To: <1553689723-21017-2-git-send-email-c-hbandi@codeaurora.org>
+References: <1553689723-21017-1-git-send-email-c-hbandi@codeaurora.org>
+ <1553689723-21017-2-git-send-email-c-hbandi@codeaurora.org>
+Message-ID: <70d687c0ce670ac6d6ad1e92890ca348@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi SpoorthiX,
+Hi Harish,
 
-Thank you for the patch! Perhaps something to improve:
+On 2019-03-27 17:58, Harish Bandi wrote:
+> Added new compatible for WCN3998 and corresponding voltage
+> and current values to WCN3998 compatible.
+> Changed driver code to support WCN3998
+> 
+> Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
+> ---
+> Changes in V6:
+> - changed return value to false in the qca_is_wcn399x()stub
+> ---
+>  drivers/bluetooth/btqca.c   | 13 +++++++++++--
+>  drivers/bluetooth/btqca.h   |  8 +++++++-
+>  drivers/bluetooth/hci_qca.c | 40 
+> ++++++++++++++++++++++++++--------------
+>  3 files changed, 44 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index 6122685..383e99f 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -344,7 +344,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+> baudrate,
+> 
+>  	/* Download rampatch file */
+>  	config.type = TLV_TYPE_PATCH;
+> -	if (soc_type == QCA_WCN3990) {
+> +	if (qca_is_wcn399x(soc_type)) {
+>  		/* Firmware files to download are based on ROM version.
+>  		 * ROM version is derived from last two bytes of soc_ver.
+>  		 */
+> @@ -365,7 +365,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+> baudrate,
+> 
+>  	/* Download NVM configuration */
+>  	config.type = TLV_TYPE_NVM;
+> -	if (soc_type == QCA_WCN3990)
+> +	if (qca_is_wcn399x(soc_type))
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/crnv%02x.bin", rom_ver);
+>  	else
+> @@ -410,6 +410,15 @@ int qca_set_bdaddr(struct hci_dev *hdev, const
+> bdaddr_t *bdaddr)
+>  }
+>  EXPORT_SYMBOL_GPL(qca_set_bdaddr);
+> 
+> +bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+> +{
+> +	if ((soc_type == QCA_WCN3990) || (soc_type == QCA_WCN3998))
+> +		return true;
+> +
+> +	return false;
+> +}
+> +EXPORT_SYMBOL_GPL(qca_is_wcn399x);
+> +
+>  MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+>  MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver
+> " VERSION);
+>  MODULE_VERSION(VERSION);
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index 6fdc25d..0f68c9e7 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -132,7 +132,8 @@ enum qca_btsoc_type {
+>  	QCA_INVALID = -1,
+>  	QCA_AR3002,
+>  	QCA_ROME,
+> -	QCA_WCN3990
+> +	QCA_WCN3990,
+> +	QCA_WCN3998,
+>  };
+> 
+>  #if IS_ENABLED(CONFIG_BT_QCA)
+> @@ -142,6 +143,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+> baudrate,
+>  		   enum qca_btsoc_type soc_type, u32 soc_ver);
+>  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+>  int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> +bool qca_is_wcn399x(enum qca_btsoc_type soc_type);
+>  #else
+> 
+>  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const
+> bdaddr_t *bdaddr)
+> @@ -165,4 +167,8 @@ static inline int qca_set_bdaddr(struct hci_dev
+> *hdev, const bdaddr_t *bdaddr)
+>  	return -EOPNOTSUPP;
+>  }
+> 
+> +static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+> +{
+> +	return false;
+> +}
+>  #endif
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 4ea995d..4af580a 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -521,7 +521,7 @@ static int qca_open(struct hci_uart *hu)
+>  	if (hu->serdev) {
+> 
+>  		qcadev = serdev_device_get_drvdata(hu->serdev);
+> -		if (qcadev->btsoc_type != QCA_WCN3990) {
+> +		if (!qca_is_wcn399x(qcadev->btsoc_type)) {
+>  			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+>  		} else {
+>  			hu->init_speed = qcadev->init_speed;
+> @@ -627,7 +627,7 @@ static int qca_close(struct hci_uart *hu)
+> 
+>  	if (hu->serdev) {
+>  		qcadev = serdev_device_get_drvdata(hu->serdev);
+> -		if (qcadev->btsoc_type == QCA_WCN3990)
+> +		if (qca_is_wcn399x(qcadev->btsoc_type))
+>  			qca_power_shutdown(hu);
+>  		else
+>  			gpiod_set_value_cansleep(qcadev->bt_en, 0);
+> @@ -1008,7 +1008,7 @@ static int qca_set_baudrate(struct hci_dev
+> *hdev, uint8_t baudrate)
+>  		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
+> 
+>  	/* Give the controller time to process the request */
+> -	if (qca_soc_type(hu) == QCA_WCN3990)
+> +	if (qca_is_wcn399x(qca_soc_type(hu)))
+>  		msleep(10);
+>  	else
+>  		msleep(300);
+> @@ -1084,7 +1084,7 @@ static unsigned int qca_get_speed(struct hci_uart 
+> *hu,
+> 
+>  static int qca_check_speeds(struct hci_uart *hu)
+>  {
+> -	if (qca_soc_type(hu) == QCA_WCN3990) {
+> +	if (qca_is_wcn399x(qca_soc_type(hu))) {
+>  		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+>  		    !qca_get_speed(hu, QCA_OPER_SPEED))
+>  			return -EINVAL;
+> @@ -1116,7 +1116,7 @@ static int qca_set_speed(struct hci_uart *hu,
+> enum qca_speed_type speed_type)
+>  		/* Disable flow control for wcn3990 to deassert RTS while
+>  		 * changing the baudrate of chip and host.
+>  		 */
+> -		if (soc_type == QCA_WCN3990)
+> +		if (qca_is_wcn399x(soc_type))
+>  			hci_uart_set_flow_control(hu, true);
+> 
+>  		qca_baudrate = qca_get_baudrate_value(speed);
+> @@ -1128,7 +1128,7 @@ static int qca_set_speed(struct hci_uart *hu,
+> enum qca_speed_type speed_type)
+>  		host_set_baudrate(hu, speed);
+> 
+>  error:
+> -		if (soc_type == QCA_WCN3990)
+> +		if (qca_is_wcn399x(soc_type))
+>  			hci_uart_set_flow_control(hu, false);
+>  	}
+> 
+> @@ -1201,7 +1201,7 @@ static int qca_setup(struct hci_uart *hu)
+>  	/* Patch downloading has to be done without IBS mode */
+>  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> 
+> -	if (soc_type == QCA_WCN3990) {
+> +	if (qca_is_wcn399x(soc_type)) {
+>  		bt_dev_info(hdev, "setting up wcn3990");
 
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on v5.1-rc2 next-20190327]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+[Bala]: nit: if you respin the serie.
+              let us make this "wcn3990" string in the info message as 
+wcn399x or with actual chip name.
 
-url:    https://github.com/0day-ci/linux/commits/SpoorthiX-K/Add-Support-for-LE-Ping-feature/20190327-182038
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+> 
+>  		/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to execute
+> @@ -1232,7 +1232,7 @@ static int qca_setup(struct hci_uart *hu)
+>  		qca_baudrate = qca_get_baudrate_value(speed);
+>  	}
+> 
+> -	if (soc_type != QCA_WCN3990) {
+> +	if (!qca_is_wcn399x(soc_type)) {
+>  		/* Get QCA version information */
+>  		ret = qca_read_soc_version(hdev, &soc_ver);
+>  		if (ret)
+> @@ -1257,7 +1257,7 @@ static int qca_setup(struct hci_uart *hu)
+>  	}
+> 
+>  	/* Setup bdaddr */
+> -	if (soc_type == QCA_WCN3990)
+> +	if (qca_is_wcn399x(soc_type))
+>  		hu->hdev->set_bdaddr = qca_set_bdaddr;
+>  	else
+>  		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+> @@ -1280,7 +1280,7 @@ static int qca_setup(struct hci_uart *hu)
+>  	.dequeue	= qca_dequeue,
+>  };
+> 
+> -static const struct qca_vreg_data qca_soc_data = {
+> +static const struct qca_vreg_data qca_soc_data_wcn3990 = {
+>  	.soc_type = QCA_WCN3990,
+>  	.vregs = (struct qca_vreg []) {
+>  		{ "vddio",   1800000, 1900000,  15000  },
+> @@ -1291,6 +1291,17 @@ static int qca_setup(struct hci_uart *hu)
+>  	.num_vregs = 4,
+>  };
+> 
+> +static const struct qca_vreg_data qca_soc_data_wcn3998 = {
+> +	.soc_type = QCA_WCN3998,
+> +	.vregs = (struct qca_vreg []) {
+> +		{ "vddio",   1800000, 1900000,  10000  },
+> +		{ "vddxo",   1800000, 1900000,  80000  },
+> +		{ "vddrf",   1300000, 1352000,  300000 },
+> +		{ "vddch0",  3300000, 3300000,  450000 },
+> +	},
+> +	.num_vregs = 4,
+> +};
+> +
+>  static void qca_power_shutdown(struct hci_uart *hu)
+>  {
+>  	struct qca_data *qca = hu->priv;
+> @@ -1424,8 +1435,8 @@ static int qca_serdev_probe(struct serdev_device 
+> *serdev)
+>  	qcadev->serdev_hu.serdev = serdev;
+>  	data = of_device_get_match_data(&serdev->dev);
+>  	serdev_device_set_drvdata(serdev, qcadev);
+> -	if (data && data->soc_type == QCA_WCN3990) {
+> -		qcadev->btsoc_type = QCA_WCN3990;
+> +	if (data && qca_is_wcn399x(data->soc_type)) {
+> +		qcadev->btsoc_type = data->soc_type;
+>  		qcadev->bt_power = devm_kzalloc(&serdev->dev,
+>  						sizeof(struct qca_power),
+>  						GFP_KERNEL);
+> @@ -1489,7 +1500,7 @@ static void qca_serdev_remove(struct
+> serdev_device *serdev)
+>  {
+>  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+> 
+> -	if (qcadev->btsoc_type == QCA_WCN3990)
+> +	if (qca_is_wcn399x(qcadev->btsoc_type))
+>  		qca_power_shutdown(&qcadev->serdev_hu);
+>  	else
+>  		clk_disable_unprepare(qcadev->susclk);
+> @@ -1499,7 +1510,8 @@ static void qca_serdev_remove(struct
+> serdev_device *serdev)
+> 
+>  static const struct of_device_id qca_bluetooth_of_match[] = {
+>  	{ .compatible = "qcom,qca6174-bt" },
+> -	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data},
+> +	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
+> +	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+>  	{ /* sentinel */ }
+>  };
+>  MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
 
+Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-sparse warnings: (new ones prefixed by >>)
-
->> net/bluetooth/hci_event.c:3010:28: sparse: incorrect type in assignment (different base types) @@    expected unsigned short [unsigned] [assigned] [usertype] timeout @@    got igned] [assigned] [usertype] timeout @@
-   net/bluetooth/hci_event.c:3010:28:    expected unsigned short [unsigned] [assigned] [usertype] timeout
-   net/bluetooth/hci_event.c:3010:28:    got restricted __le16 [usertype] <noident>
-   include/linux/overflow.h:285:13: sparse: undefined identifier '__builtin_mul_overflow'
-   include/linux/overflow.h:285:13: sparse: incorrect type in conditional
-   include/linux/overflow.h:285:13:    got void
-   include/linux/overflow.h:287:13: sparse: undefined identifier '__builtin_add_overflow'
-   include/linux/overflow.h:287:13: sparse: incorrect type in conditional
-   include/linux/overflow.h:287:13:    got void
-   include/linux/overflow.h:285:13: sparse: not a function <noident>
-   include/linux/overflow.h:285:13: sparse: incorrect type in conditional
-   include/linux/overflow.h:285:13:    got void
-   include/linux/overflow.h:287:13: sparse: not a function <noident>
-   include/linux/overflow.h:287:13: sparse: incorrect type in conditional
-   include/linux/overflow.h:287:13:    got void
-   include/linux/overflow.h:285:13: sparse: call with no type!
-   include/linux/overflow.h:287:13: sparse: call with no type!
-
-vim +3010 net/bluetooth/hci_event.c
-
-  2904	
-  2905	static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
-  2906	{
-  2907		struct hci_ev_encrypt_change *ev = (void *) skb->data;
-  2908		struct hci_conn *conn;
-  2909	
-  2910		BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-  2911	
-  2912		hci_dev_lock(hdev);
-  2913	
-  2914		conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-  2915		if (!conn)
-  2916			goto unlock;
-  2917	
-  2918		if (!ev->status) {
-  2919			if (ev->encrypt) {
-  2920				/* Encryption implies authentication */
-  2921				set_bit(HCI_CONN_AUTH, &conn->flags);
-  2922				set_bit(HCI_CONN_ENCRYPT, &conn->flags);
-  2923				conn->sec_level = conn->pending_sec_level;
-  2924	
-  2925				/* P-256 authentication key implies FIPS */
-  2926				if (conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
-  2927					set_bit(HCI_CONN_FIPS, &conn->flags);
-  2928	
-  2929				if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
-  2930				    conn->type == LE_LINK)
-  2931					set_bit(HCI_CONN_AES_CCM, &conn->flags);
-  2932			} else {
-  2933				clear_bit(HCI_CONN_ENCRYPT, &conn->flags);
-  2934				clear_bit(HCI_CONN_AES_CCM, &conn->flags);
-  2935			}
-  2936		}
-  2937	
-  2938		/* We should disregard the current RPA and generate a new one
-  2939		 * whenever the encryption procedure fails.
-  2940		 */
-  2941		if (ev->status && conn->type == LE_LINK) {
-  2942			hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
-  2943			hci_adv_instances_set_rpa_expired(hdev, true);
-  2944		}
-  2945	
-  2946		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
-  2947	
-  2948		if (ev->status && conn->state == BT_CONNECTED) {
-  2949			if (ev->status == HCI_ERROR_PIN_OR_KEY_MISSING)
-  2950				set_bit(HCI_CONN_AUTH_FAILURE, &conn->flags);
-  2951	
-  2952			hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
-  2953			hci_conn_drop(conn);
-  2954			goto unlock;
-  2955		}
-  2956	
-  2957		/* In Secure Connections Only mode, do not allow any connections
-  2958		 * that are not encrypted with AES-CCM using a P-256 authenticated
-  2959		 * combination key.
-  2960		 */
-  2961		if (hci_dev_test_flag(hdev, HCI_SC_ONLY) &&
-  2962		    (!test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
-  2963		     conn->key_type != HCI_LK_AUTH_COMBINATION_P256)) {
-  2964			hci_connect_cfm(conn, HCI_ERROR_AUTH_FAILURE);
-  2965			hci_conn_drop(conn);
-  2966			goto unlock;
-  2967		}
-  2968	
-  2969		/* Try reading the encryption key size for encrypted ACL links */
-  2970		if (!ev->status && ev->encrypt && conn->type == ACL_LINK) {
-  2971			struct hci_cp_read_enc_key_size cp;
-  2972			struct hci_request req;
-  2973	
-  2974			/* Only send HCI_Read_Encryption_Key_Size if the
-  2975			 * controller really supports it. If it doesn't, assume
-  2976			 * the default size (16).
-  2977			 */
-  2978			if (!(hdev->commands[20] & 0x10)) {
-  2979				conn->enc_key_size = HCI_LINK_KEY_SIZE;
-  2980				goto notify;
-  2981			}
-  2982	
-  2983			hci_req_init(&req, hdev);
-  2984	
-  2985			cp.handle = cpu_to_le16(conn->handle);
-  2986			hci_req_add(&req, HCI_OP_READ_ENC_KEY_SIZE, sizeof(cp), &cp);
-  2987	
-  2988			if (hci_req_run_skb(&req, read_enc_key_size_complete)) {
-  2989				bt_dev_err(hdev, "sending read key size failed");
-  2990				conn->enc_key_size = HCI_LINK_KEY_SIZE;
-  2991				goto notify;
-  2992			}
-  2993	
-  2994			goto unlock;
-  2995		}
-  2996		/* Set the default Authenticated Payload Timeout after
-  2997		 * an LE Link is established. As per Core Spec v5.0, Vol 2, Part B
-  2998		 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
-  2999		 * sent when the link is active and Encryption is enabled, the conn
-  3000		 * type can be either LE or ACL and controller must support LMP Ping.
-  3001		 * Ensure for AES-CCM encryption as well.
-  3002		 */
-  3003		if ((conn->type == LE_LINK || conn->type == ACL_LINK) &
-  3004			lmp_ping_capable(hdev) &&
-  3005			test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
-  3006			test_bit(HCI_CONN_AES_CCM, &conn->flags)) {
-  3007			struct hci_cp_write_auth_payload_to cp;
-  3008	
-  3009			cp.handle = cpu_to_le16(conn->handle);
-> 3010			cp.timeout = cpu_to_le16(hdev->auth_payload_timeout);
-  3011			hci_send_cmd(conn->hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO,
-  3012				     sizeof(cp), &cp);
-  3013		} else {
-  3014			conn->state = BT_CONNECTED;
-  3015			hci_connect_cfm(conn, ev->status);
-  3016		}
-  3017	
-  3018	notify:
-  3019		if (conn->state == BT_CONFIG) {
-  3020			if (!ev->status)
-  3021				conn->state = BT_CONNECTED;
-  3022	
-  3023			hci_connect_cfm(conn, ev->status);
-  3024			hci_conn_drop(conn);
-  3025		} else
-  3026			hci_encrypt_cfm(conn, ev->status, ev->encrypt);
-  3027	
-  3028	unlock:
-  3029		hci_dev_unlock(hdev);
-  3030	}
-  3031	
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+-- 
+Regards
+Balakrishna.
