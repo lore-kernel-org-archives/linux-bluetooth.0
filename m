@@ -2,237 +2,104 @@ Return-Path: <SRS0=kuyC=R7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A47EC43381
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Mar 2019 06:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE9DC43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Mar 2019 13:46:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25DB720811
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Mar 2019 06:35:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 877A1217D7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Mar 2019 13:46:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="NUVj/k7x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725948AbfC1GfX (ORCPT
+        id S1726242AbfC1Nqy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Mar 2019 02:35:23 -0400
-Received: from mga03.intel.com ([134.134.136.65]:39022 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726080AbfC1GfX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Mar 2019 02:35:23 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Mar 2019 23:35:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,278,1549958400"; 
-   d="scan'208";a="126540784"
-Received: from spoorthi-h97m-d3h.iind.intel.com ([10.223.96.21])
-  by orsmga007.jf.intel.com with ESMTP; 27 Mar 2019 23:35:21 -0700
-From:   SpoorthiX K <spoorthix.k@intel.com>
+        Thu, 28 Mar 2019 09:46:54 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:41911 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726275AbfC1Nqx (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 28 Mar 2019 09:46:53 -0400
+Received: by mail-lj1-f194.google.com with SMTP id k8so17683121lja.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Mar 2019 06:46:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:organization:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=3+1mh3DmCm2IZV3Em5Ot/UVI5vyIeFAMzMiv0CnYZ+c=;
+        b=NUVj/k7xpqMld73bIioFoQqFxML01X41bufQCuKWfLz8bDcZVFHh2FTLMfcoIGG4t2
+         Abx4OKZKdic7VF0lgvmQwl5UygUDJqD8gjx76VFHlhgOB0lNnTOFwPIEXxfUCt3iwDCh
+         40vb1FE1hZLPpaBNqbHwJj7P2xz13h7wPyy3UyMnzZD2ONzfPjBBT/OO/2MXq/xpVfX3
+         1zw0Szn/X6F9LzkSsgFGjAzmuRo0x4LG64LYx2RKUnf9XccNS6n2LzORmSQeuDPocMOQ
+         BWrEIDM8jmrTIOPNDr2qPN74xlxJrlxqGaXqrn74UwqYYAvuR2gPyFseD12rbrSieKvH
+         uQbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:organization
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=3+1mh3DmCm2IZV3Em5Ot/UVI5vyIeFAMzMiv0CnYZ+c=;
+        b=HZwgkf41OU84h7S6WOifMax7v4lMFF06kIEJJ23qSNCYYv7EEEIBmmN8GQT9Uhl85D
+         EXjTTL1NkxY6HMYPdQogdhrY1mZLv4Z5bMwTAUKZ5bC0nrN7D0jWTr9k5iGNOZguQDjB
+         3f4QDz44y/4zabL/7+dzLv+k7qpx1Et8JeV/FksMeeBnYyUwn73x3mq1biFRseeSzQLe
+         4tUw3ER6CUKaSd0YLU19iJjWbWiFV4Ta43qRMw+6lKY/AmSdi/jBBN+EptQD7KzCBuwY
+         UcwLfhDbXpD1R1vGOoGBosOriSnEXdRKJwZqJZNBIAIdcPSyCiGaxCfDTV8CsodY/Zaa
+         hnnQ==
+X-Gm-Message-State: APjAAAWCVq2/xX9eWuSqAUPNdqro3OBjhJ3y3kYDk44mSP+qOk2ssX9v
+        QlKvKR8STaJjWwInejpFmxZsfpZO9M0=
+X-Google-Smtp-Source: APXvYqyFFAmmKL66RmOrrwsxKeMj2a1GOBk2rrZ6qsWmor38uSzHz/jdRu907rknWoViyW1irgQulg==
+X-Received: by 2002:a2e:1508:: with SMTP id s8mr23647586ljd.8.1553780810889;
+        Thu, 28 Mar 2019 06:46:50 -0700 (PDT)
+Received: from ix.localnet ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id d1sm2464026lfa.15.2019.03.28.06.46.49
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 28 Mar 2019 06:46:49 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     bharat.b.panda@intel.com
-Subject: [PATCH] Add support for LE Ping Support
-Date:   Thu, 28 Mar 2019 12:13:31 +0530
-Message-Id: <1553755411-4348-1-git-send-email-spoorthix.k@intel.com>
-X-Mailer: git-send-email 1.9.1
+Subject: Re: [PATCH] emulator: Fix handling of Set Event Mask Page 2 Command
+Date:   Thu, 28 Mar 2019 14:46:48 +0100
+Message-ID: <3199979.ZHmQMNjpqu@ix>
+Organization: CODECOUP
+In-Reply-To: <20190327100031.32062-1-szymon.janc@codecoup.pl>
+References: <20190327100031.32062-1-szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+On Wednesday, 27 March 2019 11:00:31 CET Szymon Janc wrote:
+> This command is also valid for BR/EDR only (was introduced in 3.0)
+> and for LE only controllers (Authenticated Payload Timeout Expired
+> Event).
+> ---
+>  emulator/btdev.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index 4d34aee1a..f4c79c2d0 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -3206,8 +3206,8 @@ static void default_cmd(struct btdev *btdev, uint16_t
+> opcode, break;
+> 
+>  	case BT_HCI_CMD_SET_EVENT_MASK_PAGE2:
+> -		if (btdev->type != BTDEV_TYPE_BREDRLE &&
+> -				btdev->type != BTDEV_TYPE_BREDRLE50)
+> +		if (btdev->type == BTDEV_TYPE_BREDR20 ||
+> +				btdev->type == BTDEV_TYPE_AMP)
+>  			goto unsupported;
+>  		semp2 = data;
+>  		memcpy(btdev->event_mask_page2, semp2->mask, 8);
 
-Changes made to add HCI Write Authenticated Payload timeout
-command for LE Ping feature.
-As per the Core Specification 5.0 Volume 2 Part E Section 7.3.94,
-the following code changes implements
-HCI Write Authenticated Payload timeout command for LE Ping feature.
+Applied.
 
-Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
----
- include/net/bluetooth/hci.h      | 10 ++++++++++
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         |  1 +
- net/bluetooth/hci_debugfs.c      | 31 +++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        | 42 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 86 insertions(+)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index fbba43e..4c59e5a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1142,6 +1142,16 @@ struct hci_cp_write_sc_support {
- 	__u8	support;
- } __packed;
- 
-+#define HCI_OP_WRITE_AUTH_PAYLOAD_TO    0x0c7c
-+struct hci_cp_write_auth_payload_to {
-+	__le16  handle;
-+	__le16  timeout;
-+} __packed;
-+struct hci_rp_write_auth_payload_to {
-+	__u8    status;
-+	__le16  handle;
-+} __packed;
-+
- #define HCI_OP_READ_LOCAL_OOB_EXT_DATA	0x0c7d
- struct hci_rp_read_local_oob_ext_data {
- 	__u8     status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 094e61e..06b1ce4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -421,6 +421,7 @@ struct hci_dev {
- 	__u32			rpa_timeout;
- 	struct delayed_work	rpa_expired;
- 	bdaddr_t		rpa;
-+	__u16			auth_payload_timeout;
- 
- #if IS_ENABLED(CONFIG_BT_LEDS)
- 	struct led_trigger	*power_led;
-@@ -683,6 +684,7 @@ enum {
- 	HCI_CONN_NEW_LINK_KEY,
- 	HCI_CONN_SCANNING,
- 	HCI_CONN_AUTH_FAILURE,
-+	HCI_CONN_AUTH_PAYLOAD_TIMEOUT,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d6b2540..29f524d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3193,6 +3193,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	hdev->le_max_tx_time = 0x0148;
- 	hdev->le_max_rx_len = 0x001b;
- 	hdev->le_max_rx_time = 0x0148;
-+	hdev->auth_payload_timeout = 0x0bb8;
- 	hdev->le_max_key_size = SMP_MAX_ENC_KEY_SIZE;
- 	hdev->le_min_key_size = SMP_MIN_ENC_KEY_SIZE;
- 	hdev->le_tx_def_phys = HCI_LE_SET_PHY_1M;
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 51f5b1e..2bc05f7 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -531,6 +531,7 @@ static int sniff_max_interval_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(sniff_max_interval_fops, sniff_max_interval_get,
- 			sniff_max_interval_set, "%llu\n");
- 
- void hci_debugfs_create_bredr(struct hci_dev *hdev)
- {
- 	debugfs_create_file("inquiry_cache", 0444, hdev->debugfs, hdev,
-@@ -941,6 +942,34 @@ static int adv_max_interval_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
- 			adv_max_interval_set, "%llu\n");
- 
-+static int auth_payload_timeout_set(void *data, u64 val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	if (val < 0x0001 || val > 0xffff)
-+		return -EINVAL;
-+	hci_dev_lock(hdev);
-+	hdev->auth_payload_timeout = val;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int auth_payload_timeout_get(void *data, u64 *val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	hci_dev_lock(hdev);
-+	*val = hdev->auth_payload_timeout;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
-+			auth_payload_timeout_get,
-+			auth_payload_timeout_set, "%llu\n");
-+
- DEFINE_QUIRK_ATTRIBUTE(quirk_strict_duplicate_filter,
- 		       HCI_QUIRK_STRICT_DUPLICATE_FILTER);
- DEFINE_QUIRK_ATTRIBUTE(quirk_simultaneous_discovery,
-@@ -992,6 +1021,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
- 			    &adv_min_interval_fops);
- 	debugfs_create_file("adv_max_interval", 0644, hdev->debugfs, hdev,
- 			    &adv_max_interval_fops);
-+	debugfs_create_file("auth_payload_timeout", 0644, hdev->debugfs, hdev,
-+			    &auth_payload_timeout_fops);
- 	debugfs_create_u16("discov_interleaved_timeout", 0644, hdev->debugfs,
- 			   &hdev->discov_interleaved_timeout);
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 609fd68..e599c64 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -564,6 +564,25 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- }
- 
-+static void hci_cc_write_auth_payload_timeout(struct hci_dev *hdev,
-+					      struct sk_buff *skb)
-+{
-+	struct hci_rp_write_auth_payload_to *rp = (void *)skb->data;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-+
-+	if (rp->status)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-+
-+	if (conn)
-+		set_bit(HCI_CONN_AUTH_PAYLOAD_TIMEOUT, &conn->flags);
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_cc_read_local_commands(struct hci_dev *hdev,
- 				       struct sk_buff *skb)
- {
-@@ -2975,6 +2994,25 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		goto unlock;
- 	}
- 
-+	/* Set the default Authenticated Payload Timeout after
-+	 * an LE Link is established. As per Core Spec v5.0, Vol 2, Part B
-+	 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
-+	 * sent when the link is active and Encryption is enabled, the conn
-+	 * type can be either LE or ACL and controller must support LMP Ping.
-+	 * Ensure for AES-CCM encryption as well.
-+	 */
-+	if ((conn->type == LE_LINK || conn->type == ACL_LINK) &&
-+	    lmp_ping_capable(hdev) &&
-+		test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
-+		test_bit(HCI_CONN_AES_CCM, &conn->flags)) {
-+		struct hci_cp_write_auth_payload_to cp;
-+
-+		cp.handle = cpu_to_le16(conn->handle);
-+		cp.timeout = cpu_to_le16(hdev->auth_payload_timeout);
-+		hci_send_cmd(conn->hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO,
-+			     sizeof(cp), &cp);
-+	}
-+
- notify:
- 	if (conn->state == BT_CONFIG) {
- 		if (!ev->status)
-@@ -3170,6 +3208,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 		hci_cc_write_sc_support(hdev, skb);
- 		break;
- 
-+	case HCI_OP_WRITE_AUTH_PAYLOAD_TO:
-+		hci_cc_write_auth_payload_timeout(hdev, skb);
-+		break;
-+
- 	case HCI_OP_READ_LOCAL_VERSION:
- 		hci_cc_read_local_version(hdev, skb);
- 		break;
 -- 
-1.9.1
+pozdrawiam
+Szymon Janc
+
 
