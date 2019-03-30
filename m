@@ -2,70 +2,71 @@ Return-Path: <SRS0=UugF=SB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9773C43381
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Mar 2019 22:37:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F276C43381
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Mar 2019 22:44:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6770E2184D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Mar 2019 22:37:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE6B42146F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Mar 2019 22:44:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U4UE83rn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uaV3Z34K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731003AbfC3WhY (ORCPT
+        id S1731008AbfC3Wof (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 30 Mar 2019 18:37:24 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:39964 "EHLO
+        Sat, 30 Mar 2019 18:44:35 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:38171 "EHLO
         mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730996AbfC3WhY (ORCPT
+        with ESMTP id S1730948AbfC3Woe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 30 Mar 2019 18:37:24 -0400
-Received: by mail-ed1-f67.google.com with SMTP id h22so4991144edw.7;
-        Sat, 30 Mar 2019 15:37:21 -0700 (PDT)
+        Sat, 30 Mar 2019 18:44:34 -0400
+Received: by mail-ed1-f67.google.com with SMTP id q14so5014183edr.5;
+        Sat, 30 Mar 2019 15:44:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pK3plyBmjAV4xHZUQyKdGxR9hXUzh16No6voNcD6UPQ=;
-        b=U4UE83rnFvQfvT+VbJeqdJRGi9/uOCz1Em4L7EqZDuPNZgTOnM7xg2hC4CUfBLe/Hb
-         Ey0Ek+4YSTBO/L3e543W75+r68JZ0E18vHsOxdES9e7hLXygHTua60Mo0xC2kHM4U4fa
-         JRArOFk9scFPQ39UlQUFpPN0fk7YOV8ieQD5KwegVYjt31idE9bw81th0DIIO+n5HCwQ
-         68krMqrzAO+Sn+3q8UjUTrBomvAdWlaeL9m6o/Ngvs6jqQ66HB/m9mANVonezV782fsf
-         gF+2qey8SNdvBys3Y6591GJ2akvcil4MRv9Oub0HnDO/QOwBiqsOgTcGNWn1/kNx1BG7
-         ZgAw==
+        h=subject:from:to:cc:references:openpgp:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language;
+        bh=y5qkv5fOum9QvGSuEiGh6DKKM0OmEEcwYVZymnxcnRw=;
+        b=uaV3Z34Kaai7oqHm+ExN1IepfLJizddMv0kBLaK43r94kxJwqRPqh3ZNVVNOLw+H2a
+         xLyakvwnvU3VkutgePEQK78aLxQ5rkC2XSsAPBtn1ipNTwp1PLBzSUqBSblc1wl/lFKX
+         tY3pkXjiKaeABGysEDL2BkKDruqBB1ifHqsLEy3w/0BZTCsxSFALJN6d/WaqESUtKy6n
+         cgG80LSOEIcowx6n9qVyd3u8OzuFQLe3nYOP6godW0a9BVBnSGmU8sp2zYOWAzbwi3nL
+         QLDbua9krki+cCQXj+Y5MjN9KDc5irOQmH1gdSHOJyB29HU62V3bq2FUsYc01pUTW5c7
+         QXCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+        h=x-gm-message-state:subject:from:to:cc:references:openpgp:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=pK3plyBmjAV4xHZUQyKdGxR9hXUzh16No6voNcD6UPQ=;
-        b=Dm3ymcT9qhh43CQeMklTOuOVXQYpvNkX/0Rp93IhvIRqFU7vOuo9sFeFt7VtCFxN/S
-         awbjk5nQAifIlPVJedbec/J1ocxJgru03A4z8sO6P/A5PWMkVvIraRQblN4V3uL/KJHn
-         tdhMiCSTPaYLEp4pDk/VhUqK5ttOVa4761wRNt6GBHeOebYGzRgPSHVCjW4sSJJW0g8t
-         /ugFVwfNeDqUbsQcoKVPedl8WpTh8IR0u6rkbodyyefBJ/uFfFgbwtaLwczYpOYGCkPp
-         rhU4JNTkwUDTNwyLNu5uAyfGI+ZD+I7/QgaZkYalTBQ0pJmgYZpj0tLMVZwPdF4mCXrF
-         SW2w==
-X-Gm-Message-State: APjAAAUrWWfHnrVa39zyppQUDAhYm+Zy2PFYuE7WUQr3OXnPo+CYJfBW
-        +MDd9aGU5sQ/m0wwS6NM6Wg=
-X-Google-Smtp-Source: APXvYqwpxBdaOB3ibILa8ZpcsHR0wyXBOtZMpUAZRGcRkVJRNMB2qYb6vWk1Q9KrA2A/3PDqz4yNew==
-X-Received: by 2002:a50:97d0:: with SMTP id f16mr35619709edb.287.1553985441257;
-        Sat, 30 Mar 2019 15:37:21 -0700 (PDT)
+         :content-language;
+        bh=y5qkv5fOum9QvGSuEiGh6DKKM0OmEEcwYVZymnxcnRw=;
+        b=GAybVUomQelMvM1XM+n9sfQKTxT3qA6XtE89HL9GT1tb4Xfw3rPT49ITDczSw90GbQ
+         L6lyEeXnpigoLhW758r5hIa1NEVbKYnfipr/PkpHRLsqtT66KrLHyj1iVwH0CfVN3ODO
+         nNcr75B4HfEJ29pnKgLGaeyp0DoQ7Dg2MSIRZYtc/x8i3KQXE2ODKYIhvsKI11XLX+LX
+         UMqQXmYlz8ZR1TeD4NzSdNXIZ/JZ6n+vmFAb5WOUp0wvCoxtJ/FHzTJB7q0oc1xBlD4H
+         9KCYcz1onEge5R1ImGRIIYVEnyK27npKehrH4fP7R4TphvpxCkrJpJpss8yRrhsml8ZH
+         KNVg==
+X-Gm-Message-State: APjAAAVJJuNDjQ9TNlavgOTCvNZjrjTCW290FwVVww5J+sH0ZWy9oQ1B
+        ZuA60kALjDnQi1uF2QPFkriaojHs
+X-Google-Smtp-Source: APXvYqyBYAPlhQ3PmJl3Rjd52cX7R1ijLaQWS4f/eG8BhZfAj+aKAGOzopRyMM2wXgQ8t9I7cmES0g==
+X-Received: by 2002:a17:906:c7c2:: with SMTP id dc2mr30156549ejb.182.1553985871694;
+        Sat, 30 Mar 2019 15:44:31 -0700 (PDT)
 Received: from [192.168.0.61] (xd520f242.cust.hiper.dk. [213.32.242.66])
-        by smtp.gmail.com with ESMTPSA id g27sm1817009edg.77.2019.03.30.15.37.19
+        by smtp.gmail.com with ESMTPSA id a25sm1851158edc.55.2019.03.30.15.44.30
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 30 Mar 2019 15:37:20 -0700 (PDT)
-Subject: Re: [PATCH] net/bluetooth: Fix bound check in event handling
-To:     Dan Carpenter <dan.carpenter@oracle.com>, kbuild@01.org
-Cc:     kbuild-all@01.org, marcel@holtmann.org, johan.hedberg@gmail.com,
-        davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller@googlegroups.com
-References: <20190330071757.GU32613@kadam>
+        Sat, 30 Mar 2019 15:44:30 -0700 (PDT)
+Subject: Re: [PATCH] Bluetooth: hci_event: potential out of bounds parsing ADV
+ events
 From:   Tomas Bortoli <tomasbortoli@gmail.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20190330072511.GA5502@kadam>
+ <f1baaa05-bd1d-f2cf-410a-7073e85412d3@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=tomasbortoli@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFpCTZMBEADNZ1+Ibh0Z4pgGRcd1aOUMbe/YfHktmajjcoTnKmZZunjoUVAl8waeLITd
@@ -110,88 +111,151 @@ Autocrypt: addr=tomasbortoli@gmail.com; prefer-encrypt=mutual; keydata=
  jYpWKYxDTpvsZ0ginUUY993Gb8k/CxjABEMUGVHhQPZ0OzjHIKS6cTzN6ue8bB+CGOLCaQp1
  C0NRT5Tn9zpLxtf5nBExFd/zVENY5vAV2ZbKQdemO54O7j6B9DSgVRrm83GCZxbL4d+qTYBF
  3tSCWw/6SG1F3q9gR9QrSC2YRjCmhijUVEh6FhZwB58TNZ1sEEttrps8TDa5tUd9
-Message-ID: <ede5be42-1113-3873-208b-ca46bee922c3@gmail.com>
-Date:   Sat, 30 Mar 2019 23:37:19 +0100
+Message-ID: <b2a2b63a-c5f0-5d03-7516-668df6049c95@gmail.com>
+Date:   Sat, 30 Mar 2019 23:44:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190330071757.GU32613@kadam>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f1baaa05-bd1d-f2cf-410a-7073e85412d3@gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------57FE852E33794623DFB17A21"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dan,
+This is a multi-part message in MIME format.
+--------------57FE852E33794623DFB17A21
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-On 3/30/19 8:17 AM, Dan Carpenter wrote:
-> [ This is an old warning.  Sorry for missing it earlier.  I would have
->   caught it when the code was merged as well so there was no real risk
->   but it's just awkward.  ]
-> 
-> Hi Tomas,
-> 
-> url:    https://github.com/0day-ci/linux/commits/Tomas-Bortoli/net-bluetooth-Fix-bound-check-in-event-handling/20190301-213647
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-> 
-> smatch warnings:
-> net/bluetooth/hci_event.c:3986 hci_inquiry_result_with_rssi_evt() warn: potential pointer math issue ('info' is a 120 bit pointer)
-> 
-> # https://github.com/0day-ci/linux/commit/00305742c021794f147b348d45eb10ea26e5a514
-> git remote add linux-review https://github.com/0day-ci/linux
-> git remote update linux-review
-> git checkout 00305742c021794f147b348d45eb10ea26e5a514
-> vim +3986 net/bluetooth/hci_event.c
-> 
-> 6039aa73 Gustavo Padovan 2012-05-23  3963  static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev,
-> 807deac2 Gustavo Padovan 2012-05-17  3964  					     struct sk_buff *skb)
-> a9de9248 Marcel Holtmann 2007-10-20  3965  {
-> a9de9248 Marcel Holtmann 2007-10-20  3966  	struct inquiry_data data;
-> a9de9248 Marcel Holtmann 2007-10-20  3967  	int num_rsp = *((__u8 *) skb->data);
-> a9de9248 Marcel Holtmann 2007-10-20  3968  
-> a9de9248 Marcel Holtmann 2007-10-20  3969  	BT_DBG("%s num_rsp %d", hdev->name, num_rsp);
-> a9de9248 Marcel Holtmann 2007-10-20  3970  
-> a9de9248 Marcel Holtmann 2007-10-20  3971  	if (!num_rsp)
-> a9de9248 Marcel Holtmann 2007-10-20  3972  		return;
-> a9de9248 Marcel Holtmann 2007-10-20  3973  
-> d7a5a11d Marcel Holtmann 2015-03-13  3974  	if (hci_dev_test_flag(hdev, HCI_PERIODIC_INQ))
-> 1519cc17 Andre Guedes    2012-03-21  3975  		return;
-> 1519cc17 Andre Guedes    2012-03-21  3976  
-> a9de9248 Marcel Holtmann 2007-10-20  3977  	hci_dev_lock(hdev);
-> a9de9248 Marcel Holtmann 2007-10-20  3978  
-> a9de9248 Marcel Holtmann 2007-10-20  3979  	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
-> 138d22ef Szymon Janc     2011-02-17  3980  		struct inquiry_info_with_rssi_and_pscan_mode *info;
-> 138d22ef Szymon Janc     2011-02-17  3981  		info = (void *) (skb->data + 1);
-> a9de9248 Marcel Holtmann 2007-10-20  3982  
-> e17acd40 Johan Hedberg   2011-03-30  3983  		for (; num_rsp; num_rsp--, info++) {
-> af58925c Marcel Holtmann 2014-07-01  3984  			u32 flags;
-> af58925c Marcel Holtmann 2014-07-01  3985  
-> 00305742 Tomas Bortoli   2019-02-28 @3986  			if ((void *)(info + sizeof(info)) >
->                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> This should be (void *)info + sizeof(info).  The code you have will
-> break for valid uses because the pointer math error.  I notice that
-> this isn't merged into linux-next, but it does seem required.  I am
-> writing a similar fix for a different function.
-> 
-> Another way to write this would be:
-> 
-> 		if ((u8 *)(info + 1) > &skb->data[skb->len]) {
+Hi,
 
-Yeah it hasn't been accepted afaik. Why just + 1 ? Also,
-&skb->data[skb->len] is right after the last byte so the > should rather
-be a >=, I think.
+sorry for the multiple emails but I have checked again the code and
+looks like process_adv_report() reads from ev->data for a size of
+ev->length.
 
-your code looks better (as per pointer casting) but is logically
-different from what I proposed with v2:
+I attach a patch that applies the bound check to both
+hci_le_ext_adv_report_evt() and hci_le_adv_report_evt().
 
-https://lkml.org/lkml/2019/3/4/892
-
-I think the bound check should validate that there is enough data from
-the info pointer to read an entire struct
-inquiry_info_with_rssi_and_pscan_mode.
-
+Let me know your opinion,
 Best regards,
 Tomas
 
+On 3/30/19 10:20 AM, Tomas Bortoli wrote:
+> Hi Dan,
+> 
+> On 3/30/19 8:25 AM, Dan Carpenter wrote:
+>> There is a potential out of bounds if "ev->length" is too high or if the
+>> number of reports are too many.
+>>
+>> Fixes: c215e9397b00 ("Bluetooth: Process extended ADV report event")
+>> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Reviewed-By: Tomas Bortoli <tomasbortoli@gmail.com>
+> 
+>> ---
+>> Not tested.  I suck at pointer math, and I don't know why the protocol
+>> requires a "+ 1".  Please review carefully.
+>>
+>>  net/bluetooth/hci_event.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 609fd6871c5a..ee945b3d12e1 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -5417,6 +5417,7 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>>  {
+>>  	u8 num_reports = skb->data[0];
+>>  	void *ptr = &skb->data[1];
+>> +	void *end = &skb->data[skb->len];
+>>  
+>>  	hci_dev_lock(hdev);
+>>  
+>> @@ -5425,6 +5426,8 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>>  		u8 legacy_evt_type;
+>>  		u16 evt_type;
+>>  
+>> +		if (ptr + sizeof(*ev) + ev->length + 1 > end)
+>> +			break;
+> 
+> Assuming that per each iteration, the while cycle, including the call to
+> process_adv_report() read up to (sizeof(*ev) + ev->length + 1) bytes,
+> 
+> (I don't understand why the +1, but, anyway..)
+> 
+> If the assumption is correct, then the if condition should be:
+> 
+> if (ptr + sizeof(*ev) + ev->length + 1 >= end)
+> 
+> Because as soon as we try to read from the `end` pointer on, we are
+> out-of-bound.. the valid skb bytes end at `end-1` (included)
+> 
+> Note that also hci_le_adv_report_evt() is likely to need the same fix!
+> 
+> 
+>>  		evt_type = __le16_to_cpu(ev->evt_type);
+>>  		legacy_evt_type = ext_evt_type_to_legacy(evt_type);
+>>  		if (legacy_evt_type != LE_ADV_INVALID) {
+>>
+> 
+> 
+> Kind regards,
+> Tomas
+> 
+
+
+--------------57FE852E33794623DFB17A21
+Content-Type: text/x-patch;
+ name="adv.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename="adv.patch"
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 609fd6871c5a..275926e0753e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5345,6 +5345,7 @@ static void hci_le_adv_report_evt(struct hci_dev *h=
+dev, struct sk_buff *skb)
+ {
+ 	u8 num_reports =3D skb->data[0];
+ 	void *ptr =3D &skb->data[1];
++	u8 *end =3D &skb->data[skb->len - 1];
+=20
+ 	hci_dev_lock(hdev);
+=20
+@@ -5352,6 +5353,9 @@ static void hci_le_adv_report_evt(struct hci_dev *h=
+dev, struct sk_buff *skb)
+ 		struct hci_ev_le_advertising_info *ev =3D ptr;
+ 		s8 rssi;
+=20
++		if (ev->data + ev->length > end)
++			break;
++
+ 		if (ev->length <=3D HCI_MAX_AD_LENGTH) {
+ 			rssi =3D ev->data[ev->length];
+ 			process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
+@@ -5417,6 +5421,7 @@ static void hci_le_ext_adv_report_evt(struct hci_de=
+v *hdev, struct sk_buff *skb)
+ {
+ 	u8 num_reports =3D skb->data[0];
+ 	void *ptr =3D &skb->data[1];
++	u8 *end =3D &skb->data[skb->len - 1];
+=20
+ 	hci_dev_lock(hdev);
+=20
+@@ -5425,6 +5430,9 @@ static void hci_le_ext_adv_report_evt(struct hci_de=
+v *hdev, struct sk_buff *skb)
+ 		u8 legacy_evt_type;
+ 		u16 evt_type;
+=20
++		if (ev->data + ev->length > end)
++			break;
++
+ 		evt_type =3D __le16_to_cpu(ev->evt_type);
+ 		legacy_evt_type =3D ext_evt_type_to_legacy(evt_type);
+ 		if (legacy_evt_type !=3D LE_ADV_INVALID) {
+
+--------------57FE852E33794623DFB17A21--
