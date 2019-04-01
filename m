@@ -2,176 +2,121 @@ Return-Path: <SRS0=YUNQ=SD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6738C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92482C43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:07:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DD1B20880
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:07:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 601A720663
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QsbdQ7AD"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Zb+mT81K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730316AbfDARMF (ORCPT
+        id S1730575AbfDASHb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Apr 2019 13:12:05 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:33718 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730303AbfDARME (ORCPT
+        Mon, 1 Apr 2019 14:07:31 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:46457 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729383AbfDASH2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Apr 2019 13:12:04 -0400
-Received: by mail-pf1-f196.google.com with SMTP id i19so4894215pfd.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2019 10:12:03 -0700 (PDT)
+        Mon, 1 Apr 2019 14:07:28 -0400
+Received: by mail-lj1-f193.google.com with SMTP id h21so9033708ljk.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2019 11:07:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=HFIbZQ25f4RzvK0/BsFZbfNQa0GXntCHY2z9L/SWgJU=;
-        b=QsbdQ7ADJEhzkoGPL3+/ra9c5lYN7tOF/Rhc0XBcCxSFoj++biSNDXYvh54PgXw1NQ
-         Nuk0LNQJ0iAo14ZwMyVfsWf4b0OcHfbdPV/Ya4vca67LV85SIK/xRNWEb0FTZukPUxAR
-         iepoSsLDVStcIR/vkbGXAwfnEEuPn4mfG9dBw=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=L1lKCMSu+yUtXpbeonHggfuZodsrR2XdaEg57sCklMY=;
+        b=Zb+mT81K27QtJ9PTbGBiTQ/TpIidhzHhj2JpuWVh3D4wzANvmjxBbZBmL8UOXzsw5N
+         i0KInvK4tJXhQ1mX414TnSR36srYk3WeEAk3MX9DeGzxUzJW3A/SZs+07iP6ilo3biLA
+         AZ6N3zAyuCOKJi9XZHDLtW6SaCwjTGVzR16hI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=HFIbZQ25f4RzvK0/BsFZbfNQa0GXntCHY2z9L/SWgJU=;
-        b=BKg5zd2s7BFq0QMPQ5L8NEaa7plD2y5Exq7pr5A71fG6Le45hvEwaAfFip7srSN4Hy
-         VpfeYAYGN2E4YLfRVOPHVD8odODuUEHuwZVQ8eRRqNI3LW8VxLDsk2G/mk21oZFqZ1EK
-         u9ASxRdouL7VUA90xfrS2KVuaDEfWfdqc+IlQBeuOfYV3G25OyY6Ujuea+gPLElXBU/q
-         QKlfMA6fezyUuXbMPOT1XII9mCqvyF/qiv70AuHWqof2v1q9Vo4dDoKxtKeX6tQ4gl44
-         Ptwg0QyWWRbfpGASUQ3/dstJDjS6CBp2DKq1whx92WFnHTqR2PuUlcAIUKlLOwy5FmMv
-         eQWg==
-X-Gm-Message-State: APjAAAVRSM5iYCZHWhrHIpbeV4qalgI3hlyv7RKDIQGdEp5M3YLXN40R
-        W/m1bekimsKElvLVhxAGRaUc5g==
-X-Google-Smtp-Source: APXvYqxqySrCSoCUBIC5R3add1vmpekUcOQaNrYLLoDpK1yf1i/QvT6jL7sYKDYwmsDThgj6d82GVg==
-X-Received: by 2002:a63:fa46:: with SMTP id g6mr6522937pgk.382.1554138723328;
-        Mon, 01 Apr 2019 10:12:03 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id n22sm12979659pfa.51.2019.04.01.10.12.02
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 01 Apr 2019 10:12:02 -0700 (PDT)
-Date:   Mon, 1 Apr 2019 10:12:02 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hemantg <hemantg@codeaurora.org>
-Subject: Re: [PATCH 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change
- vendor event
-Message-ID: <20190401171202.GH112750@google.com>
-References: <20190307004041.38059-1-mka@chromium.org>
- <20190307004041.38059-3-mka@chromium.org>
- <ff905fac1e57bcca78c74f1bc3349645@codeaurora.org>
- <20190307182009.GB138592@google.com>
- <20190307233039.GA69116@google.com>
- <c985a6712f91930d7c710ca4abb42e80@codeaurora.org>
- <a03acbdc6bfad172fdd65f428ffbe4cf@codeaurora.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L1lKCMSu+yUtXpbeonHggfuZodsrR2XdaEg57sCklMY=;
+        b=RkHQxqiYr4ebHKcdmH5XglsoXoDOEfZjFrdHhXL1nZuinkYWsC8CMpCbQeUNy+O3+4
+         RF5VqjyQ4EG5khuuKsaZXjf7VvCt+EwNoPTwxdX80TsO6PlJO+LTV9hKduDx3zsf+44p
+         3DpQZpJmle9Ke4lNq/QqZvP6wCdMmxW3XSqVe/XaEqPd0oAXUnI1DXEdc5HqB9v+pz/i
+         HSWbxS4WlHJwWdHX5i5m3xIbjZICTVhkq5fUBFjk+SxewR9LSxGgopny022fxxtSc0Je
+         fKR0apr23nkF1a2x8W8PQKjKXMe+JX/5WKrclRatAm+WPH03Dr0eyyqs5SUWm7DLthTX
+         xVSA==
+X-Gm-Message-State: APjAAAXUW3curnZUWo7Bb0ITjsm4EJa1IxlJxwGgcJBhKN/c8p0LOyge
+        lmmpHPkXY2cykXsAk9WFHUOK0ZBSY/w=
+X-Google-Smtp-Source: APXvYqx8gtxbrU8MHIv43VRlm6sG1ZpOo266I7AMr2PAg9uJtopctFWpcA8xtaBCtAWq+mBIYJI3Kw==
+X-Received: by 2002:a2e:9703:: with SMTP id r3mr8570684lji.88.1554142045537;
+        Mon, 01 Apr 2019 11:07:25 -0700 (PDT)
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com. [209.85.167.45])
+        by smtp.gmail.com with ESMTPSA id q2sm2024348lfj.58.2019.04.01.11.07.23
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 01 Apr 2019 11:07:24 -0700 (PDT)
+Received: by mail-lf1-f45.google.com with SMTP id r25so6964067lfn.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Apr 2019 11:07:23 -0700 (PDT)
+X-Received: by 2002:a05:6512:248:: with SMTP id b8mr25322931lfo.140.1554142043372;
+ Mon, 01 Apr 2019 11:07:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a03acbdc6bfad172fdd65f428ffbe4cf@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190222003051.127006-1-briannorris@chromium.org> <CA+ASDXNYZhOeef_7nhZf1GYhdxubE7v+ustG8zDigGHVOYWRFg@mail.gmail.com>
+In-Reply-To: <CA+ASDXNYZhOeef_7nhZf1GYhdxubE7v+ustG8zDigGHVOYWRFg@mail.gmail.com>
+From:   Brian Norris <briannorris@chromium.org>
+Date:   Mon, 1 Apr 2019 11:07:11 -0700
+X-Gmail-Original-Message-ID: <CA+ASDXM9ciP6uxxA1ewhkK-Xh-DSKGzedw1UJH59sC7JsOtHoQ@mail.gmail.com>
+Message-ID: <CA+ASDXM9ciP6uxxA1ewhkK-Xh-DSKGzedw1UJH59sC7JsOtHoQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: request wake pin with NOAUTOEN
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Rajat Jain <rajatja@google.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Apr 01, 2019 at 01:48:23PM +0530, Balakrishna Godavarthi wrote:
-> Hi Matthias,
-> 
-> On 2019-04-01 13:29, Balakrishna Godavarthi wrote:
-> > Hi Matthias,
-> > 
-> > Sorry for the late reply i was on vacation.
-> > 
-> > On 2019-03-08 05:00, Matthias Kaehlcke wrote:
-> > > On Thu, Mar 07, 2019 at 10:20:09AM -0800, Matthias Kaehlcke wrote:
-> > > > Hi Balakrishna,
-> > > > 
-> > > > On Thu, Mar 07, 2019 at 10:35:08AM +0530, Balakrishna Godavarthi
-> > > > wrote:
-> > > > > hi Matthias,
-> > > > >
-> > > > > On 2019-03-07 06:10, Matthias Kaehlcke wrote:
-> > > > > > Firmware download to the WCN3990 often fails with a 'TLV response size
-> > > > > > mismatch' error:
-> > > > > >
-> > > > > > [  133.064659] Bluetooth: hci0: setting up wcn3990
-> > > > > > [  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
-> > > > > > [  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
-> > > > > > [  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
-> > > > > > [  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
-> > > > > >
-> > > > > > This is caused by a vendor event that corresponds to an earlier command
-> > > > > > to change the baudrate. The event is not processed in the context of the
-> > > > > > baudrate change and later interpreted as response to the firmware
-> > > > > > download command (which is also a vendor command), but the driver
-> > > > > > detects
-> > > > > > that the event doesn't have the expected amount of associated data.
-> > > > > >
-> > > > > > More details:
-> > > > > >
-> > > > > > For the WCN3990 the vendor command for a baudrate change isn't sent as
-> > > > > > synchronous HCI command, because the controller sends the corresponding
-> > > > > > vendor event with the new baudrate. The event is received and decoded
-> > > > > > after the baudrate change of the host port.
-> > > > > >
-> > > > > > Identify the 'unused' event when it is received and don't add it to
-> > > > > > the queue of RX frames.
-> > > > > >
-> > > > > > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> > > > > > ---
-> > > > >
-> > > > > ...
-> > > > >
-> > > > > Can you test by reverting this change "94d6671473924".
-> > > > 
-> > > > The issue is still reproducible.
-> > > > 
-> > > > > We need at least 15ms minimum delay for the soc to change its baud rate and
-> > > > > respond to the with command complete event.
-> > > > 
-> > > > The baudrate change has clearly been successful when the problem is
-> > > > observed, since the host receives the vendor event with the new
-> > > > baudrate.
-> > > 
-> > > I forgot to mention this earlier: the controller doesn't send a
-> > > command complete event for the command, or at least not a correct
-> > > one.
-> > > 
-> > > That's the data that is received:
-> > > 
-> > > 04 0e 04 01 00 00 00
-> > >             ~~ ~~
-> > > 
-> > [Bala]: can you share me the command sent and event recevied.
-> >  I see that we receive a command complete event for the baud rate
-> > change command.
-> > 
-> > command sent: 01 48 fc 01 11
-> > vendor specific event: 04 ff 02 92 01
-> > command complete event: 04 0e 04 01 00 00 00.
-> > 
-> > 
-> > 
-> > > This is *a* command complete event, but the opcode is 0x0000 instead
-> > > of the earlier command. The same happens for the firmware
-> > > download/read version command, which is the reason why the command
-> > > complete injection mess
-> > > (https://lore.kernel.org/patchwork/patch/1027955/) is needed in one
-> > > way or another.
-> > > 
-> > [Bala]: fw download approach is different where we use
-> > __hci_cmd_sync() where as here we use hci_uart_tx_wakeup()
-> >         which directly calls the hci_uart_write_work(). so even we
-> > send an valid opcode or not for baudrate change will bot matter.
-> > 
-> [Bala]: i miss understood the comment. Yes your true. in the all vendor
-> commands SoC responds with an 0x0000 opcode.
++ akpm, in case he can help out
 
-And IIUC this is not compliant with the spec, or at least the BT core
-expects the actual opcode to consider the command to be completed.
+Another week, another buggy 5.1 RC.
+
+On Tue, Mar 26, 2019 at 11:48 AM Brian Norris <briannorris@chromium.org> wrote:
+>
+> On Thu, Feb 21, 2019 at 4:30 PM Brian Norris <briannorris@chromium.org> wrote:
+> >
+> > Badly-designed systems might have (for example) active-high wake pins
+> > that default to high (e.g., because of external pull ups) until they
+> > have an active firmware which starts driving it low. This can cause an
+> > interrupt storm in the time between request_irq() and disable_irq().
+> >
+> > We don't support shared interrupts here, so let's just pre-configure the
+> > interrupt to avoid auto-enabling it.
+> >
+> > Fixes: fd913ef7ce61 ("Bluetooth: btusb: Add out-of-band wakeup support")
+> > Signed-off-by: Brian Norris <briannorris@chromium.org>
+>
+> Ping! v5.1 is enabling wake support on Scarlet, and without this
+> patch, that causes interrupt storms at boot. Please apply this patch
+> for v5.1-rc!
+>
+> See also:
+> https://lkml.kernel.org/lkml/CA+ASDXMePkQDRfaSwNGnRYyGdsuvfUCXBtDK79o2mP=1hdNQUA@mail.gmail.com
+
+Ping x 2!
+
+Marcel merged my other series first, which enabled this feature,
+without applying the bugfix (which was sent first). So right now, my
+RK3399/Scarlet board is in very bad shape. Can somebody please merge
+this bugfix for 5.1? If not, I'll probably just send Linus a pull
+request myself.
+
+Original patch link, in case this helps someone:
+
+http://lkml.kernel.org/lkml/20190222003051.127006-1-briannorris@chromium.org
+https://lore.kernel.org/patchwork/patch/1044896/
+
+Thanks,
+Brian
