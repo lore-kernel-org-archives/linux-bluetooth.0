@@ -6,41 +6,55 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E0A2C43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E99C0C43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:45:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2774C20896
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:27:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA15A2086C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 18:45:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728783AbfDAS1X (ORCPT
+        id S1728872AbfDASpY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Apr 2019 14:27:23 -0400
-Received: from mga09.intel.com ([134.134.136.24]:2621 "EHLO mga09.intel.com"
+        Mon, 1 Apr 2019 14:45:24 -0400
+Received: from mga18.intel.com ([134.134.136.126]:36278 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728007AbfDAS1X (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Apr 2019 14:27:23 -0400
+        id S1728799AbfDASpY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 1 Apr 2019 14:45:24 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Apr 2019 11:27:22 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Apr 2019 11:45:23 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,297,1549958400"; 
-   d="scan'208";a="334011917"
+   d="scan'208";a="312246340"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.31.196])
-  by fmsmga005.fm.intel.com with ESMTP; 01 Apr 2019 11:27:22 -0700
+  by orsmga005.jf.intel.com with ESMTP; 01 Apr 2019 11:45:22 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ] build: Check if explicit_bzero is missing
-Date:   Mon,  1 Apr 2019 11:27:20 -0700
-Message-Id: <20190401182720.20549-1-brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 1/1] build: Check if explicit_bzero is missing
+Date:   Mon,  1 Apr 2019 11:45:18 -0700
+Message-Id: <20190401184518.1816-1-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 This check gets around the redefinition of explicit_bzero in ELL
+
+In file included from ell/random.c:34:0:
+ell/missing.h:59:20: error: static declaration of ‘explicit_bzero’ follows non-static declaration
+ static inline void explicit_bzero(void *s, size_t n)
+                    ^~~~~~~~~~~~~~
+In file included from ./ell/util.h:26:0,
+                 from ell/private.h:26,
+                 from ell/random.c:33:
+/usr/include/string.h:435:13: note: previous declaration of ‘explicit_bzero’ was here
+ extern void explicit_bzero (void *__s, size_t __n) __THROW __nonnull ((1));
+             ^~~~~~~~~~~~~~
 ---
  configure.ac | 2 ++
  1 file changed, 2 insertions(+)
