@@ -2,178 +2,100 @@ Return-Path: <SRS0=YUNQ=SD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3070CC43381
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 08:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C872CC43381
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 09:49:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA84E2084B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 08:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9594420896
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Apr 2019 09:49:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="GlM2Khll";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="aPZd9qK5"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="cCke353T";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="lqFL9USf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732045AbfDAITB (ORCPT
+        id S1725880AbfDAJtZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Apr 2019 04:19:01 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:54474 "EHLO
+        Mon, 1 Apr 2019 05:49:25 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:36176 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731919AbfDAITB (ORCPT
+        with ESMTP id S1725820AbfDAJtZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Apr 2019 04:19:01 -0400
+        Mon, 1 Apr 2019 05:49:25 -0400
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 83E9C611BE; Mon,  1 Apr 2019 08:18:50 +0000 (UTC)
+        id 6A2B161B99; Mon,  1 Apr 2019 09:49:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1554106740;
-        bh=IFqV9cJsn6EXiiv4KICZogj/+1WSre0bJ66q0Fl80Kc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=GlM2KhllDReIarOwkvdSUgBaFUso/FUHzqElsE37m64gIoozNZUk/lsDkooRuqSIa
-         58lVv6aKaoxMyW4jpzo+042F2RwzE+AoWvRzFYLlDIFCroiJSOU2J2gFYvB+rXF//v
-         gsBsvw9DgM8c78bBx6IbjJOvxGpybPMmPezOwTpY=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 44B26608FF;
-        Mon,  1 Apr 2019 08:18:24 +0000 (UTC)
+        s=default; t=1554112164;
+        bh=VG3TqCxnl22+Ls83Eg0BsM79wjR3v/RdDX0Zthgp6pQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cCke353Trlq+wRsFl7mgkDdb97SZFfNz31kV3velgd5onDKm37afgO4aij0H7NMAh
+         MY24CdGVGs8onscetkwGdCVgIVqgicwvNnNkZ1NkpP3XijT9l54BgvO6adEGRDCKSH
+         sip5lXurqTUkaA8swSbwAECFozNuj5xGQKk0L40o=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id E6E4A61B89;
+        Mon,  1 Apr 2019 09:49:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1554106726;
-        bh=IFqV9cJsn6EXiiv4KICZogj/+1WSre0bJ66q0Fl80Kc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=aPZd9qK5JmeDIuzBScsSYDW901d6/r7Sg6SehK5whojtxd1Kfep5ioxXucy8YcXYB
-         UE1qoFFEAZgf2NVsFCLcyxuBQ2++5E5fwWPHpA7cNEuezCDm++nFGxNgr80XXZqkAV
-         A4AlW5o9XQ+hVNoYWeKTs5Xt3KG772KqDqinbFso=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 01 Apr 2019 13:48:23 +0530
+        s=default; t=1554112162;
+        bh=VG3TqCxnl22+Ls83Eg0BsM79wjR3v/RdDX0Zthgp6pQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=lqFL9USfwO3J62/FlGCjo8qtQ9Sr8xFfcXNEgATbkokbtq+pXDBtrxnkKBfkRHsSd
+         lTF5yAiAI93+eYyjll7CC4nUY+hQyGQiDJhC3L00OZP5lCAerbWolgmmrUPFtuZ6Mi
+         LfwHKSpWTgYEcCA4QzknVggfQMfOuyxzJylci0H8=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org E6E4A61B89
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hemantg <hemantg@codeaurora.org>
-Subject: Re: [PATCH 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change
- vendor event
-In-Reply-To: <c985a6712f91930d7c710ca4abb42e80@codeaurora.org>
-References: <20190307004041.38059-1-mka@chromium.org>
- <20190307004041.38059-3-mka@chromium.org>
- <ff905fac1e57bcca78c74f1bc3349645@codeaurora.org>
- <20190307182009.GB138592@google.com> <20190307233039.GA69116@google.com>
- <c985a6712f91930d7c710ca4abb42e80@codeaurora.org>
-Message-ID: <a03acbdc6bfad172fdd65f428ffbe4cf@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Claire Chang <tientzu@chromium.org>
+Subject: [PATCH v2] Bluetooth: hci_qca: Give enough time to ROME controller to bootup.
+Date:   Mon,  1 Apr 2019 15:19:08 +0530
+Message-Id: <20190401094908.11460-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+This patch enables enough time to ROME controller to bootup
+after we bring the enable pin out of reset.
 
-On 2019-04-01 13:29, Balakrishna Godavarthi wrote:
-> Hi Matthias,
-> 
-> Sorry for the late reply i was on vacation.
-> 
-> On 2019-03-08 05:00, Matthias Kaehlcke wrote:
->> On Thu, Mar 07, 2019 at 10:20:09AM -0800, Matthias Kaehlcke wrote:
->>> Hi Balakrishna,
->>> 
->>> On Thu, Mar 07, 2019 at 10:35:08AM +0530, Balakrishna Godavarthi 
->>> wrote:
->>> > hi Matthias,
->>> >
->>> > On 2019-03-07 06:10, Matthias Kaehlcke wrote:
->>> > > Firmware download to the WCN3990 often fails with a 'TLV response size
->>> > > mismatch' error:
->>> > >
->>> > > [  133.064659] Bluetooth: hci0: setting up wcn3990
->>> > > [  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
->>> > > [  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
->>> > > [  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
->>> > > [  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
->>> > >
->>> > > This is caused by a vendor event that corresponds to an earlier command
->>> > > to change the baudrate. The event is not processed in the context of the
->>> > > baudrate change and later interpreted as response to the firmware
->>> > > download command (which is also a vendor command), but the driver
->>> > > detects
->>> > > that the event doesn't have the expected amount of associated data.
->>> > >
->>> > > More details:
->>> > >
->>> > > For the WCN3990 the vendor command for a baudrate change isn't sent as
->>> > > synchronous HCI command, because the controller sends the corresponding
->>> > > vendor event with the new baudrate. The event is received and decoded
->>> > > after the baudrate change of the host port.
->>> > >
->>> > > Identify the 'unused' event when it is received and don't add it to
->>> > > the queue of RX frames.
->>> > >
->>> > > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->>> > > ---
->>> >
->>> > ...
->>> >
->>> > Can you test by reverting this change "94d6671473924".
->>> 
->>> The issue is still reproducible.
->>> 
->>> > We need at least 15ms minimum delay for the soc to change its baud rate and
->>> > respond to the with command complete event.
->>> 
->>> The baudrate change has clearly been successful when the problem is
->>> observed, since the host receives the vendor event with the new
->>> baudrate.
->> 
->> I forgot to mention this earlier: the controller doesn't send a
->> command complete event for the command, or at least not a correct
->> one.
->> 
->> That's the data that is received:
->> 
->> 04 0e 04 01 00 00 00
->>             ~~ ~~
->> 
-> [Bala]: can you share me the command sent and event recevied.
->  I see that we receive a command complete event for the baud rate
-> change command.
-> 
-> command sent: 01 48 fc 01 11
-> vendor specific event: 04 ff 02 92 01
-> command complete event: 04 0e 04 01 00 00 00.
-> 
-> 
-> 
->> This is *a* command complete event, but the opcode is 0x0000 instead
->> of the earlier command. The same happens for the firmware
->> download/read version command, which is the reason why the command
->> complete injection mess
->> (https://lore.kernel.org/patchwork/patch/1027955/) is needed in one
->> way or another.
->> 
-> [Bala]: fw download approach is different where we use
-> __hci_cmd_sync() where as here we use hci_uart_tx_wakeup()
->         which directly calls the hci_uart_write_work(). so even we
-> send an valid opcode or not for baudrate change will bot matter.
-> 
-[Bala]: i miss understood the comment. Yes your true. in the all vendor 
-commands SoC responds with an 0x0000 opcode.
+Fixes: 05ba533c5c11 ("Bluetooth: hci_qca: Add serdev support").
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Rocky Liao <rjliao@codeaurora.org>
+Tested-by: Rocky Liao <rjliao@codeaurora.org>
+Tested-by: Claire Chang <tientzu@chromium.org>
+---
+Changes in v2:
+  * added fixes tag in the commit text.
+---
+ drivers/bluetooth/hci_qca.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
->> I wished Qualcomm FW developers would get their act together and:
->> 
->> - send actual command complete events :
->> - acknowledge a baudrate change request using the current baudrate
->>   like Broadcom and Intel chips apparently do
->> 
->> this would have saved countless hours of debugging and implementing
->> quirky workarounds ...
->> 
->> Maybe there is hope for future chips (hint, hint)?
-> 
-> [Bala]: will take this forward to the SoC teams.
-
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 4ea995d610d2..a80c3bc90904 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -523,6 +523,8 @@ static int qca_open(struct hci_uart *hu)
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->btsoc_type != QCA_WCN3990) {
+ 			gpiod_set_value_cansleep(qcadev->bt_en, 1);
++			/* Controller needs time to bootup. */
++			msleep(150);
+ 		} else {
+ 			hu->init_speed = qcadev->init_speed;
+ 			hu->oper_speed = qcadev->oper_speed;
 -- 
-Regards
-Balakrishna.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
