@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E7CC4360F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Apr 2019 20:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC330C10F00
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Apr 2019 20:51:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C01E2084B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Apr 2019 20:15:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88A482082C
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Apr 2019 20:51:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tPnZYsZU"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="4w2GPLcx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725857AbfDBUPk (ORCPT
+        id S1726468AbfDBUvD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Apr 2019 16:15:40 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:45362 "EHLO
+        Tue, 2 Apr 2019 16:51:03 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:47570 "EHLO
         aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725812AbfDBUPj (ORCPT
+        with ESMTP id S1726462AbfDBUvD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Apr 2019 16:15:39 -0400
-X-Greylist: delayed 942 seconds by postgrey-1.27 at vger.kernel.org; Tue, 02 Apr 2019 16:15:38 EDT
+        Tue, 2 Apr 2019 16:51:03 -0400
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x32KDSss137809;
-        Tue, 2 Apr 2019 20:15:34 GMT
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x32JwlOF122869;
+        Tue, 2 Apr 2019 19:59:52 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
  : subject : message-id : references : mime-version : content-type :
  in-reply-to; s=corp-2018-07-02;
- bh=sW61JQS+QVZkRFnCR3ma5ITkO/uFFL1hQ8JexoK2Gwo=;
- b=tPnZYsZUndWvABOQtn6Vo8HbTaNPtNsjCepKq/6kEBExQ3lN1XmeEIzS4U2LjPK9PeK3
- 5EWTNITzzuM8oJwm5mzNADS47/MgP2pEKUOwVf++UCuJag4MsTX+j0tdQE7Nus/A+Cql
- RigENraEJhqm+sguLGMlNi14iDZ975t989ENLUoi8wVvXdPR4N6mpxr99WtTRbmnJKO6
- RxA/CezrX1y34mf/R1AWhWU8bamTQP6wSyzjE0SF7oBQvpriktU9xlck4TUKXSD55sMy
- fW9IyEnsXZ+eqb/EIM94MFa4EmqhkbTAA1/TrWOR9mzJ7o16vuInkCTP35lMDhhO7tTI Bw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2rj0dnksgh-1
+ bh=lTQ0XoQ5cxWmJFtMV1e3DjWjT7ExLvWPdtcrzmIDMXY=;
+ b=4w2GPLcxr/q085LS6HULH6ALpa92uGolDVJ99zjHnC1TWxgH9wPTHn1mWTcUQMXMpn0Q
+ lfF1jlUbVFCv07MbHQqV5KF2Of9vHhwYUfi2TwAb+fXfamHNzYg8HW1PQuIV8R9zj8zx
+ DRFnTlBl+vzkJPSz1hTrvl83es2WCo6vlr7mHrWV4dPD4w8e5fq957z3o9Q8fvgM/lq8
+ EHUkPdwTbLQJGcorCsmk/q/ad4XxtDQM59hPfNRWDOxf0GdjtCQvI+k//kCqsFqS5dGx
+ wrX3UyyChu0o5ED2f0laepTm8Zzf8CnqFxto8Mb+rpd/iOyqgXl2P1mLlnquCL8qREUw YQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2rj0dnknqq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 02 Apr 2019 20:15:33 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x32KDLbQ003068;
-        Tue, 2 Apr 2019 20:13:33 GMT
+        Tue, 02 Apr 2019 19:59:51 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x32JtbKb094102;
+        Tue, 2 Apr 2019 19:55:51 GMT
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2rm8f4y70p-1
+        by userp3030.oracle.com with ESMTP id 2rm8f4pxxy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 02 Apr 2019 20:13:33 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x32KDWDU012652;
-        Tue, 2 Apr 2019 20:13:32 GMT
+        Tue, 02 Apr 2019 19:55:51 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x32Jtmd0000775;
+        Tue, 2 Apr 2019 19:55:48 GMT
 Received: from kadam (/41.202.241.37)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 02 Apr 2019 13:13:31 -0700
-Date:   Tue, 2 Apr 2019 23:13:23 +0300
+        with ESMTP ; Tue, 02 Apr 2019 12:55:47 -0700
+Date:   Tue, 2 Apr 2019 22:55:37 +0300
 From:   Dan Carpenter <dan.carpenter@oracle.com>
 To:     Cong Wang <xiyou.wangcong@gmail.com>
 Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
@@ -64,7 +63,7 @@ Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
         kernel-janitors@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: hci_event: potential out of bounds parsing
  ADV events
-Message-ID: <20190402201322.GG32613@kadam>
+Message-ID: <20190402195537.GF32613@kadam>
 References: <20190330072511.GA5502@kadam>
  <f1baaa05-bd1d-f2cf-410a-7073e85412d3@gmail.com>
  <CAM_iQpVNqyoBirtKg-rbOHsOZCZ0Oz5PTE2sFQnHQnv6s7g2gg@mail.gmail.com>
@@ -79,30 +78,30 @@ X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=6
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904020135
+ engine=8.0.1-1810050000 definitions=main-1904020132
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1904020135
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1904020133
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 On Tue, Apr 02, 2019 at 10:42:38AM -0700, Cong Wang wrote:
-> > Btw, get rid of all the likely/unlikely() macros.  Then the other style
-> > comment would be don't move the "ev = (void *)skb->data;" assignments
-> > around.  It's ok to say:
-> 
-> 
-> Similarly, pskb_may_pull() may reallocate skb's, although very unlikely
-> for bluetooth case (skb's are linear). At least it doesn't harm anything
-> we move the skb->data dereference after pskb_may_pull().
-> 
+> I think these likely()/unlikely() are reasonable, ill-formatted packets
+> are rare cases, normal packets deserve such a special care. We
+> use likely()/unlikely() with pskb_may_pull() in many places in
+> networking subsystem, at least.
 
-It harms readability.
+The likely()/unlikely() annotations are to help the compiler optimize
+the fast path.  They are not there just for decorating the code.  We
+should only use likely()/unlikely() where it makes a difference in
+benchmarking.  Otherwise it's just a style question, right (obviously)?
+And it's better style to write things as simply as possible.
 
 regards,
 dan carpenter
+
 
