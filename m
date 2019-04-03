@@ -2,81 +2,93 @@ Return-Path: <SRS0=5fC3=SF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B815EC4360F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Apr 2019 17:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255A7C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Apr 2019 22:51:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88B402084B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Apr 2019 17:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1BF72075D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Apr 2019 22:51:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t5obEfNc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726218AbfDCRwJ (ORCPT
+        id S1726388AbfDCWvb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Apr 2019 13:52:09 -0400
-Received: from mga02.intel.com ([134.134.136.20]:41991 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726144AbfDCRwJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Apr 2019 13:52:09 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Apr 2019 10:47:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,305,1549958400"; 
-   d="scan'208";a="161097096"
-Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
-  by fmsmga001.fm.intel.com with ESMTP; 03 Apr 2019 10:47:04 -0700
-Received: from orsmsx116.amr.corp.intel.com (10.22.240.14) by
- ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Wed, 3 Apr 2019 10:47:04 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.129]) by
- ORSMSX116.amr.corp.intel.com ([169.254.7.78]) with mapi id 14.03.0415.000;
- Wed, 3 Apr 2019 10:47:04 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "marcel@holtmann.org" <marcel@holtmann.org>
-Subject: Re: [PATCH BlueZ v2 1/1] build: Check if explicit_bzero is missing
-Thread-Topic: [PATCH BlueZ v2 1/1] build: Check if explicit_bzero is missing
-Thread-Index: AQHU6LsX+WzyvF3gVUuhdahQw9f4HqYrLl8A
-Date:   Wed, 3 Apr 2019 17:47:03 +0000
-Message-ID: <1554313622.20501.0.camel@intel.com>
-References: <20190401184518.1816-1-brian.gix@intel.com>
-In-Reply-To: <20190401184518.1816-1-brian.gix@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.251.31.196]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2ABBD683B1F9184BB6B83859B4B75092@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 3 Apr 2019 18:51:31 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:46061 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726193AbfDCWvb (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Apr 2019 18:51:31 -0400
+Received: by mail-pg1-f193.google.com with SMTP id y3so182663pgk.12;
+        Wed, 03 Apr 2019 15:51:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=i71Hlyh8EaHuelWNVV73aUTyWKghZfNb+372daTbEso=;
+        b=t5obEfNcbkOAS7kXOnPUcZOl7Ge/BiOD9A+cKZjAKPyShSiCU2/fA94RxmA2UFDRGc
+         N3KD7pDPQnUzhjGpLLNg7FZXFVVtok8EQEv3RQaKbuRVhOU++y1lv8FRdkwO20lsHHS7
+         S0vz1r29Cnn2BJuAaRZ6O06PisxXHFlfy2z7CdO4W19NPH0B8pwnpCdUlB4ubjGniLeD
+         Dqy5LA/KS3BoJ+XmkjpeE6WUc3xl7h09maErb1hBm4uA6+PclY2DAg+dYdVydipcJ6pd
+         IU/jBVRqZTEMBAkjcx+8J0emQoCBuEUewC3xkgQeTxNmDeJ2i6QwDhzEJBGYDC4jJM0j
+         mxPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=i71Hlyh8EaHuelWNVV73aUTyWKghZfNb+372daTbEso=;
+        b=FGkyYDbTaA7CWM5M4XjuMGK+yP4Lypq22zItC0KbDUrtRHUSDiSyyYLgYIegm7K+gh
+         r1C4Y3W1zD0/0zdyhXrvoauEqMopJ16YWdUjB15BaTxVrikAMiur+ya8TLJuHaOPKqeW
+         r7c9t1GtzUfi5afKX4vYOV+ksSfZ6a2Spnvb8dDeISAnFK8IWqWpaSsQbdBBD2nZlSFx
+         ffhX6HTfWOCYlxtfPXW7XZwvz2jp3kLyBr8y9xlalfsy+1GnOYydWNGpkxVjZrYo/j+N
+         fk4MMgamIknpMFkCzj0fBoQ4sVELEC4md17JEIk4a9DflWC/R/4p4OmCX9F/q+uM/uog
+         tnsw==
+X-Gm-Message-State: APjAAAXSMaDnbP8R//tS7cgTjg3V+CrhWMhgN4vE8eRdHcnwYSrwrQo2
+        jrZJ4NsZWhf2u6353VXzL5spFbTXh0LixLiHtkw5TyBo
+X-Google-Smtp-Source: APXvYqzL+HMTNCLBPEoSpqxpeucnrGVXMHYtqdmlH0fefMVAi9iMP5RqFQ859/8y+b1P0DOIF3FrTdbFy092o2mjwKw=
+X-Received: by 2002:a62:4ec8:: with SMTP id c191mr2147470pfb.138.1554331890618;
+ Wed, 03 Apr 2019 15:51:30 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190330072511.GA5502@kadam> <f1baaa05-bd1d-f2cf-410a-7073e85412d3@gmail.com>
+ <CAM_iQpVNqyoBirtKg-rbOHsOZCZ0Oz5PTE2sFQnHQnv6s7g2gg@mail.gmail.com>
+ <20190402063313.GA32613@kadam> <CAM_iQpW=X2X5A873nSPM7yLBiWZM+rsJk+uMpiOioYPFsFP9vg@mail.gmail.com>
+ <20190402201322.GG32613@kadam>
+In-Reply-To: <20190402201322.GG32613@kadam>
+From:   Cong Wang <xiyou.wangcong@gmail.com>
+Date:   Wed, 3 Apr 2019 15:51:18 -0700
+Message-ID: <CAM_iQpWjwOwawBN3yiZ0F-B-HDSOW8KGfpLGhAsf5yE0A=wtDA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: potential out of bounds parsing ADV events
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-T24gTW9uLCAyMDE5LTA0LTAxIGF0IDExOjQ1IC0wNzAwLCBCcmlhbiBHaXggd3JvdGU6DQo+IFRo
-aXMgY2hlY2sgZ2V0cyBhcm91bmQgdGhlIHJlZGVmaW5pdGlvbiBvZiBleHBsaWNpdF9iemVybyBp
-biBFTEwNCj4gDQo+IEluIGZpbGUgaW5jbHVkZWQgZnJvbSBlbGwvcmFuZG9tLmM6MzQ6MDoNCj4g
-ZWxsL21pc3NpbmcuaDo1OToyMDogZXJyb3I6IHN0YXRpYyBkZWNsYXJhdGlvbiBvZiDigJhleHBs
-aWNpdF9iemVyb+KAmSBmb2xsb3dzIG5vbi1zdGF0aWMgZGVjbGFyYXRpb24NCj4gIHN0YXRpYyBp
-bmxpbmUgdm9pZCBleHBsaWNpdF9iemVybyh2b2lkICpzLCBzaXplX3QgbikNCj4gICAgICAgICAg
-ICAgICAgICAgICBefn5+fn5+fn5+fn5+fg0KPiBJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9lbGwv
-dXRpbC5oOjI2OjAsDQo+ICAgICAgICAgICAgICAgICAgZnJvbSBlbGwvcHJpdmF0ZS5oOjI2LA0K
-PiAgICAgICAgICAgICAgICAgIGZyb20gZWxsL3JhbmRvbS5jOjMzOg0KPiAvdXNyL2luY2x1ZGUv
-c3RyaW5nLmg6NDM1OjEzOiBub3RlOiBwcmV2aW91cyBkZWNsYXJhdGlvbiBvZiDigJhleHBsaWNp
-dF9iemVyb+KAmSB3YXMgaGVyZQ0KPiAgZXh0ZXJuIHZvaWQgZXhwbGljaXRfYnplcm8gKHZvaWQg
-Kl9fcywgc2l6ZV90IF9fbikgX19USFJPVyBfX25vbm51bGwgKCgxKSk7DQo+ICAgICAgICAgICAg
-ICBefn5+fn5+fn5+fn5+fg0KPiAtLS0NCj4gIGNvbmZpZ3VyZS5hYyB8IDIgKysNCj4gIDEgZmls
-ZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9jb25maWd1cmUu
-YWMgYi9jb25maWd1cmUuYWMNCj4gaW5kZXggYWU2NGRkYzBmLi4wYWZlMWU2ZGIgMTAwNjQ0DQo+
-IC0tLSBhL2NvbmZpZ3VyZS5hYw0KPiArKysgYi9jb25maWd1cmUuYWMNCj4gQEAgLTQ2LDYgKzQ2
-LDggQEAgTUlTQ19GTEFHUw0KPiAgQUNfQVJHX0VOQUJMRSh0aHJlYWRzLCBBQ19IRUxQX1NUUklO
-RyhbLS1lbmFibGUtdGhyZWFkc10sDQo+ICAJCVtlbmFibGUgdGhyZWFkaW5nIHN1cHBvcnRdKSwg
-W2VuYWJsZV90aHJlYWRzPSR7ZW5hYmxldmFsfV0pDQo+ICANCj4gK0FDX0NIRUNLX0ZVTkNTKGV4
-cGxpY2l0X2J6ZXJvKQ0KPiArDQo+ICBBQ19DSEVDS19GVU5DKHNpZ25hbGZkLCBkdW1teT15ZXMs
-DQo+ICAJCQlBQ19NU0dfRVJST1Ioc2lnbmFsZmQgc3VwcG9ydCBpcyByZXF1aXJlZCkpDQo+ICAN
-Cg0KUGF0Y2ggQXBwbGllZA==
+On Tue, Apr 2, 2019 at 1:15 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> On Tue, Apr 02, 2019 at 10:42:38AM -0700, Cong Wang wrote:
+> > > Btw, get rid of all the likely/unlikely() macros.  Then the other style
+> > > comment would be don't move the "ev = (void *)skb->data;" assignments
+> > > around.  It's ok to say:
+> >
+> >
+> > Similarly, pskb_may_pull() may reallocate skb's, although very unlikely
+> > for bluetooth case (skb's are linear). At least it doesn't harm anything
+> > we move the skb->data dereference after pskb_may_pull().
+> >
+>
+> It harms readability.
+
+Why? I can't see how it harms readability if you have pskb_may_pull()
+in mind that it potentially reallocates skb->data.
