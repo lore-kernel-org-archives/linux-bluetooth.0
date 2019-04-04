@@ -2,222 +2,138 @@ Return-Path: <SRS0=7owS=SG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C70C4360F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 06:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A86C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 08:06:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E87E3206DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 06:56:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C61A320882
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 08:06:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="c7s0HgGG";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Rh2IKcoY"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VOLE84aC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727096AbfDDG4Y (ORCPT
+        id S1727263AbfDDIGt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Apr 2019 02:56:24 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:46644 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726031AbfDDG4Y (ORCPT
+        Thu, 4 Apr 2019 04:06:49 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:42440 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725904AbfDDIGs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Apr 2019 02:56:24 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 730456049C; Thu,  4 Apr 2019 06:56:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1554360982;
-        bh=ZcOYz2iLYsuN9Xpr09ZbI0cLZncn8oXwA9x0iyLO/3c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=c7s0HgGG73VB43Uj+FONQeSlZ7B/MqpkpDTbUYxfGvj55pRL/UjOMDknUFX4KHng6
-         w/AjjRzKh0TqRLf37AD3vlNr6Z5NaEsDzMeZUCRWSegoAwqxHVL2+fYOnDk4iwiYfG
-         NGv8uvkgU+jwpW9HqMxg/5O3Wi8UdaARRkkB/a20=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id C45D3602F2;
-        Thu,  4 Apr 2019 06:56:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1554360981;
-        bh=ZcOYz2iLYsuN9Xpr09ZbI0cLZncn8oXwA9x0iyLO/3c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Rh2IKcoYazYfGQxQW2OsahVpgBVFXXJE+iznYy4/uyoQIHUpljrXrECSm7+sPSwk4
-         /55n5cNUozT72iJjuQDAakw5sznTIrhcqszkrzwFjDZCtrs0Gcbx1CdM7uhKDLfo6W
-         u6OT0iCpLlv/hTdf8VziXLvCQ4isRyJu2ABzCt0c=
+        Thu, 4 Apr 2019 04:06:48 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x34843XU053161;
+        Thu, 4 Apr 2019 08:06:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=JQaHQoDTj2RZl8EhL/svxKzZ3ITNZ5Ew2+Hlm1vh/64=;
+ b=VOLE84aCU7S2Yqsdeg4ODHSPxAivTpU/0JO95CbzBPb+Tp+HAlW9m3TbssPnJkduVOvZ
+ HGNeHdL0DZdCQPr7BqNeiNF+8hI7OtadQvod5rS8oh7vZbOHAveTLPcw8QJn5chk9ThN
+ WR6LZuFs9o3e+R6MycbLLD0XguCuKGlRjAiA34OG55nG+IRwrnsp+l67w5APkDxr/Iow
+ IB0QJP5gH918B/0bFE/L+lC+aK8/aTWcXjXMWEjsI2vgHBuVSRxPL7aXoaOqxbjMs/cA
+ ujL4nPy0133aZsRiihK6XTU4dRR+FsIUjvleelAH9/Xz3eEIc4jTFOOmQuJv+IL8RqT7 sw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2130.oracle.com with ESMTP id 2rhwyddnn9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 04 Apr 2019 08:06:43 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3485NB3053225;
+        Thu, 4 Apr 2019 08:06:42 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2rm9mjfpcf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 04 Apr 2019 08:06:42 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3486ceg004051;
+        Thu, 4 Apr 2019 08:06:38 GMT
+Received: from kadam (/41.202.241.37)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 04 Apr 2019 01:06:37 -0700
+Date:   Thu, 4 Apr 2019 11:06:27 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Cong Wang <xiyou.wangcong@gmail.com>
+Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_event: potential out of bounds parsing
+ ADV events
+Message-ID: <20190404080627.GG32590@kadam>
+References: <20190330072511.GA5502@kadam>
+ <f1baaa05-bd1d-f2cf-410a-7073e85412d3@gmail.com>
+ <CAM_iQpVNqyoBirtKg-rbOHsOZCZ0Oz5PTE2sFQnHQnv6s7g2gg@mail.gmail.com>
+ <20190402063313.GA32613@kadam>
+ <CAM_iQpW=X2X5A873nSPM7yLBiWZM+rsJk+uMpiOioYPFsFP9vg@mail.gmail.com>
+ <20190402195537.GF32613@kadam>
+ <CAM_iQpU2qwezhk8XdnX+kvUi8Oi0mwNxRuFOo8uGvjZaPZGNWA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 04 Apr 2019 12:26:21 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, hemantg@codeaurora.org
-Subject: Re: [PATCH] Bluetooth: hci_qca: Load customized NVM based on the
- device property
-In-Reply-To: <1554359858-21049-1-git-send-email-rjliao@codeaurora.org>
-References: <1554359858-21049-1-git-send-email-rjliao@codeaurora.org>
-Message-ID: <55299fad8149676f26e5351a1abf0b0f@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAM_iQpU2qwezhk8XdnX+kvUi8Oi0mwNxRuFOo8uGvjZaPZGNWA@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9216 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1904040058
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9216 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904040058
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rocky,
+On Wed, Apr 03, 2019 at 03:55:20PM -0700, Cong Wang wrote:
+> I tried checkpatch.pl, it has no such a complain.
 
-On 2019-04-04 12:07, Rocky Liao wrote:
-> QCA BTSOC nvm is a customized file and different vendor/platoform may 
-> want
-> to have different BTSOC configuration via this file (e.g. Configure SCO 
-> over
-> PCM or I2S, Setting Tx power, etc.) This patch will allow vendors to 
-> download
-> different nvm file by reading a device property as the nvm file name 
-> postfix.
-> 
+Huh?
 
-[Bala]: add the property which your reading to the documentation file.
-         "Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt"
+I sorry, I must have been very unclear if you're asking about
+checkpatch.  Checkpatch is a Perl script.  It's basically like grep.  It
+has no idea about fast paths or benchmarking.  Let me try explain
+better.
 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
->  drivers/bluetooth/btqca.c   | 13 +++++++++----
->  drivers/bluetooth/btqca.h   |  4 ++--
->  drivers/bluetooth/hci_qca.c | 18 +++++++++++++++++-
->  3 files changed, 28 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 6122685..81e42f3 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -332,7 +332,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
-> const bdaddr_t *bdaddr)
->  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
-> 
->  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> -		   enum qca_btsoc_type soc_type, u32 soc_ver)
-> +		   enum qca_btsoc_type soc_type, u32 soc_ver, const char 
-> *nvm_postfix)
->  {
->  	struct rome_config config;
->  	int err;
-> @@ -368,9 +368,14 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
-> baudrate,
->  	if (soc_type == QCA_WCN3990)
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/crnv%02x.bin", rom_ver);
-> -	else
-> -		snprintf(config.fwname, sizeof(config.fwname),
-> -			 "qca/nvm_%08x.bin", soc_ver);
-> +	else {
-> +		if (NULL == nvm_postfix)
-[Bala]:
-        something like this is more readable.
-                 if (nvm_postfix)
-                     append the nvm postfix string.
-                 else
-                     go with an default name.
+The likely/unlikely annotations are there to help optimize branch
+prediction and make the code run faster.  In the real world if you can't
+benchmark or measure or detect a speed improvement then it's not a real
+speed improvement.
 
-> +			snprintf(config.fwname, sizeof(config.fwname),
-> +				 "qca/nvm_%08x.bin", soc_ver);
-> +		else
-> +			snprintf(config.fwname, sizeof(config.fwname),
-> +				 "qca/nvm_%08x_%s.bin", soc_ver, nvm_postfix);
-> +	}
-> 
->  	err = qca_download_firmware(hdev, &config);
->  	if (err < 0) {
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 6fdc25d..60a868f 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -139,7 +139,7 @@ enum qca_btsoc_type {
-> 
->  int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> -		   enum qca_btsoc_type soc_type, u32 soc_ver);
-> +		   enum qca_btsoc_type soc_type, u32 soc_ver, const char 
-> *nvm_postfix);
->  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
->  int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->  #else
-> @@ -150,7 +150,7 @@ static inline int qca_set_bdaddr_rome(struct
-> hci_dev *hdev, const bdaddr_t *bdad
->  }
-> 
->  static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t 
-> baudrate,
-> -				 enum qca_btsoc_type soc_type, u32 soc_ver)
-> +				 enum qca_btsoc_type soc_type, u32 soc_ver, const char 
-> *nvm_postfix)
->  {
->  	return -EOPNOTSUPP;
->  }
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 4ea995d..f495f3b 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -164,6 +164,7 @@ struct qca_serdev {
->  	struct hci_uart	 serdev_hu;
->  	struct gpio_desc *bt_en;
->  	struct clk	 *susclk;
-> +	const char   *nvm_postfix;
+1) HCI events don't happen often enough to where the speed can be easily
+   benchmarked.  In that situation, we just write the code as readably
+   as possible instead of trying to micro optimize it.
 
-[Bala]: nit: add the entry at last is preferred.
+2) The compiler already does common sense branch prediction.  These
+   conditions look straight forward so it probably gets it right.  You
+   should take a look at the object code.  The compiler probably gets
+   it right.  I bet that these annotations don't even affect the
+   compiled code let alone the benchmarking output.
 
->  	enum qca_btsoc_type btsoc_type;
->  	struct qca_power *bt_power;
->  	u32 init_speed;
-> @@ -189,6 +190,17 @@ static enum qca_btsoc_type qca_soc_type(struct
-> hci_uart *hu)
->  	return soc_type;
->  }
-> 
-> +static const char *qca_get_nvm_postfix(struct hci_uart *hu)
-> +{
-> +	if (hu->serdev) {
-> +		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
-> +
-> +		return qsd->nvm_postfix;
-> +	} else {
-> +		return NULL;
-> +	}
-> +}
-> +
->  static void __serial_clock_on(struct tty_struct *tty)
->  {
->  	/* TODO: Some chipset requires to enable UART clock on client
-> @@ -1191,6 +1203,7 @@ static int qca_setup(struct hci_uart *hu)
->  	struct qca_data *qca = hu->priv;
->  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->  	enum qca_btsoc_type soc_type = qca_soc_type(hu);
-> +	const char *nvm_postfix = qca_get_nvm_postfix(hu);
->  	int ret;
->  	int soc_ver = 0;
-> 
-> @@ -1241,7 +1254,7 @@ static int qca_setup(struct hci_uart *hu)
-> 
->  	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
->  	/* Setup patch / NVM configurations */
-> -	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
-> +	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver, 
-> nvm_postfix);
->  	if (!ret) {
->  		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->  		qca_debugfs_init(hdev);
-> @@ -1462,6 +1475,9 @@ static int qca_serdev_probe(struct serdev_device 
-> *serdev)
->  			return PTR_ERR(qcadev->bt_en);
->  		}
-> 
-> +		device_property_read_string(&serdev->dev, "nvm-postfix",
-> +					 &qcadev->nvm_postfix);
-> +
->  		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
->  		if (IS_ERR(qcadev->susclk)) {
->  			dev_err(&serdev->dev, "failed to acquire clk\n");
+So in this case, we are not adding likely and unlikely for their
+intended purpose of improving benchmarks.  I guess we are instead adding
+them just for the human readers?  But most people can immediately see
+that this is an error path so they don't need the annotations.  In fact
+the annotations obscure what the error condition is so they hurt
+readability.  Now there are just too many parentheses to keep track of.
 
--- 
-Regards
-Balakrishna.
+	if (unlikely(!pskb_may_pull(skb, sizeof(*rp))))
+		return;
+
+	if (!pskb_may_pull(skb, sizeof(*rp)))
+		return;
+
+I know this isn't explained in CodingStyle but some things are
+assumed.  In drivers/ about 1.5% of if statements have likely/unlikely
+annotations.  It really is not normal to add it to everything willy-nilly
+for no reason.
+
+regards,
+dan carpenter
