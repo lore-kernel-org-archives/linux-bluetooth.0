@@ -2,117 +2,189 @@ Return-Path: <SRS0=7owS=SG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC1DC4360F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 06:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E15C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 06:38:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2F852147C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 06:35:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B85BB20855
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 06:38:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="3Do1IMXn"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="l7xs+VlC";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="L9LGQkl5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726223AbfDDGfm (ORCPT
+        id S1726122AbfDDGiA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Apr 2019 02:35:42 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:42422 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726112AbfDDGfl (ORCPT
+        Thu, 4 Apr 2019 02:38:00 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:38320 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726058AbfDDGiA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Apr 2019 02:35:41 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x346YW7W177464;
-        Thu, 4 Apr 2019 06:35:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=hI+DrXL8rDYxE0bVyKW6MXyMaZ36TCkmHH2/H/zepas=;
- b=3Do1IMXnWJPnNbTDCUfGAme9LrRgWcdM3Efcc7AK5OTtgOTzRlgJYpA2q1oPEb8CueAw
- TS/qEP8aQAvAwKbIdfwNw1JLoJp0JAHzW5spwQ0C3zdQOBSPa00u2OU48osVUw4rQPuy
- pneAyOQ0vvjdqmiYwUDR7QW2v0LhO/t2XbBe8OAW48a0kuSDkhGqbjCKXo6gZX45HexZ
- DVM9hEWo+xeJ17koKv+49Q5CaknfbWvV+9jE0mnoQ+0aiaYHzkIZk8khS0qwPXWWhBZU
- n1y+cFanlilEvZssoDBAzaEgnlnt65ZZov/JElMPfTMcklE+keTnZTOIQ6wlx/d50HpH 8Q== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 2rhwydd9j5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Apr 2019 06:35:34 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x346XcPp004933;
-        Thu, 4 Apr 2019 06:35:33 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2rm8f6g4ft-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Apr 2019 06:35:33 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x346ZVZY031025;
-        Thu, 4 Apr 2019 06:35:31 GMT
-Received: from kadam (/41.202.241.37)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 03 Apr 2019 23:35:30 -0700
-Date:   Thu, 4 Apr 2019 09:35:21 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Cong Wang <xiyou.wangcong@gmail.com>
-Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_event: potential out of bounds parsing
- ADV events
-Message-ID: <20190404063521.GF32590@kadam>
-References: <20190330072511.GA5502@kadam>
- <f1baaa05-bd1d-f2cf-410a-7073e85412d3@gmail.com>
- <CAM_iQpVNqyoBirtKg-rbOHsOZCZ0Oz5PTE2sFQnHQnv6s7g2gg@mail.gmail.com>
- <20190402063313.GA32613@kadam>
- <CAM_iQpW=X2X5A873nSPM7yLBiWZM+rsJk+uMpiOioYPFsFP9vg@mail.gmail.com>
- <20190402201322.GG32613@kadam>
- <CAM_iQpWjwOwawBN3yiZ0F-B-HDSOW8KGfpLGhAsf5yE0A=wtDA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAM_iQpWjwOwawBN3yiZ0F-B-HDSOW8KGfpLGhAsf5yE0A=wtDA@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9216 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904040046
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9216 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904040046
+        Thu, 4 Apr 2019 02:38:00 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id C926F60850; Thu,  4 Apr 2019 06:37:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1554359878;
+        bh=QHc39TnLMYe3Q5fvIhCrbFFNcYr6BIee6kf28XtTS0M=;
+        h=From:To:Cc:Subject:Date:From;
+        b=l7xs+VlCnHATZbHLm5P3r4AzweZE4qKWXKK6GSTIXJFxscWnQIunclVQ+BN2Y8SJD
+         s43NiXfV3Ro/ZXvafbhRYHwl5/L8WYF6RBXqeIDYLMhs7NKNbT+UxgCFFeA25/hP/o
+         P/iuqY0P14EU1xI0jRrilc76LFlI5tTsfOK5f4nA=
+Received: from rocky-HP-EliteBook-8460p.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 334E260721;
+        Thu,  4 Apr 2019 06:37:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1554359877;
+        bh=QHc39TnLMYe3Q5fvIhCrbFFNcYr6BIee6kf28XtTS0M=;
+        h=From:To:Cc:Subject:Date:From;
+        b=L9LGQkl50uHJ9UHdLJOOFx7fbS4uBmNH9Unqv2sGEbgmbOQASbt/oIm+NbSqJyktw
+         sJUbyx1dHbSxjhqhcoJMvKcNPOssXzXnfrWQs9Mq0bvKKgpSs3vZfgP6rNGkztlEzU
+         HxOTse2XHZT6C8DcXJf8qvebXkJ+F2BDd31pgquQ=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 334E260721
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH] Bluetooth: hci_qca: Load customized NVM based on the device property
+Date:   Thu,  4 Apr 2019 14:37:38 +0800
+Message-Id: <1554359858-21049-1-git-send-email-rjliao@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Apr 03, 2019 at 03:51:18PM -0700, Cong Wang wrote:
-> On Tue, Apr 2, 2019 at 1:15 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> >
-> > On Tue, Apr 02, 2019 at 10:42:38AM -0700, Cong Wang wrote:
-> > > > Btw, get rid of all the likely/unlikely() macros.  Then the other style
-> > > > comment would be don't move the "ev = (void *)skb->data;" assignments
-> > > > around.  It's ok to say:
-> > >
-> > >
-> > > Similarly, pskb_may_pull() may reallocate skb's, although very unlikely
-> > > for bluetooth case (skb's are linear). At least it doesn't harm anything
-> > > we move the skb->data dereference after pskb_may_pull().
-> > >
-> >
-> > It harms readability.
-> 
-> Why? I can't see how it harms readability if you have pskb_may_pull()
-> in mind that it potentially reallocates skb->data.
+QCA BTSOC nvm is a customized file and different vendor/platoform may want
+to have different BTSOC configuration via this file (e.g. Configure SCO over
+PCM or I2S, Setting Tx power, etc.) This patch will allow vendors to download
+different nvm file by reading a device property as the nvm file name postfix.
 
-You're making the code more complicated because you're pretending that
-we didn't linearize the skb data already...  :/
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+ drivers/bluetooth/btqca.c   | 13 +++++++++----
+ drivers/bluetooth/btqca.h   |  4 ++--
+ drivers/bluetooth/hci_qca.c | 18 +++++++++++++++++-
+ 3 files changed, 28 insertions(+), 7 deletions(-)
 
-regards,
-dan carpenter
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 6122685..81e42f3 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -332,7 +332,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-		   enum qca_btsoc_type soc_type, u32 soc_ver)
++		   enum qca_btsoc_type soc_type, u32 soc_ver, const char *nvm_postfix)
+ {
+ 	struct rome_config config;
+ 	int err;
+@@ -368,9 +368,14 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	if (soc_type == QCA_WCN3990)
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crnv%02x.bin", rom_ver);
+-	else
+-		snprintf(config.fwname, sizeof(config.fwname),
+-			 "qca/nvm_%08x.bin", soc_ver);
++	else {
++		if (NULL == nvm_postfix)
++			snprintf(config.fwname, sizeof(config.fwname),
++				 "qca/nvm_%08x.bin", soc_ver);
++		else
++			snprintf(config.fwname, sizeof(config.fwname),
++				 "qca/nvm_%08x_%s.bin", soc_ver, nvm_postfix);
++	}
+ 
+ 	err = qca_download_firmware(hdev, &config);
+ 	if (err < 0) {
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 6fdc25d..60a868f 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -139,7 +139,7 @@ enum qca_btsoc_type {
+ 
+ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-		   enum qca_btsoc_type soc_type, u32 soc_ver);
++		   enum qca_btsoc_type soc_type, u32 soc_ver, const char *nvm_postfix);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ #else
+@@ -150,7 +150,7 @@ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdad
+ }
+ 
+ static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-				 enum qca_btsoc_type soc_type, u32 soc_ver)
++				 enum qca_btsoc_type soc_type, u32 soc_ver, const char *nvm_postfix)
+ {
+ 	return -EOPNOTSUPP;
+ }
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 4ea995d..f495f3b 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -164,6 +164,7 @@ struct qca_serdev {
+ 	struct hci_uart	 serdev_hu;
+ 	struct gpio_desc *bt_en;
+ 	struct clk	 *susclk;
++	const char   *nvm_postfix;
+ 	enum qca_btsoc_type btsoc_type;
+ 	struct qca_power *bt_power;
+ 	u32 init_speed;
+@@ -189,6 +190,17 @@ static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
+ 	return soc_type;
+ }
+ 
++static const char *qca_get_nvm_postfix(struct hci_uart *hu)
++{
++	if (hu->serdev) {
++		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
++
++		return qsd->nvm_postfix;
++	} else {
++		return NULL;
++	}
++}
++
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+ 	/* TODO: Some chipset requires to enable UART clock on client
+@@ -1191,6 +1203,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	const char *nvm_postfix = qca_get_nvm_postfix(hu);
+ 	int ret;
+ 	int soc_ver = 0;
+ 
+@@ -1241,7 +1254,7 @@ static int qca_setup(struct hci_uart *hu)
+ 
+ 	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+ 	/* Setup patch / NVM configurations */
+-	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
++	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver, nvm_postfix);
+ 	if (!ret) {
+ 		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+ 		qca_debugfs_init(hdev);
+@@ -1462,6 +1475,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 			return PTR_ERR(qcadev->bt_en);
+ 		}
+ 
++		device_property_read_string(&serdev->dev, "nvm-postfix",
++					 &qcadev->nvm_postfix);
++
+ 		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+ 		if (IS_ERR(qcadev->susclk)) {
+ 			dev_err(&serdev->dev, "failed to acquire clk\n");
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
