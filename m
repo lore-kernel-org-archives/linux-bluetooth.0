@@ -2,223 +2,103 @@ Return-Path: <SRS0=7owS=SG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B8EC4360F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 10:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00603C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 12:42:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6DDB2075E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 10:00:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="jOmVn4fV";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="OX1I4ZS8"
+	by mail.kernel.org (Postfix) with ESMTP id C09AF2075E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 12:42:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728570AbfDDKAD (ORCPT
+        id S1729596AbfDDMmC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Apr 2019 06:00:03 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:54046 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726694AbfDDKAD (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Apr 2019 06:00:03 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 72A6861926; Thu,  4 Apr 2019 10:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1554372001;
-        bh=uS3tQVq+7k16FrxHJQ1eUQoMO40M6FO3w4lLZ5kIqKg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=jOmVn4fVTJ4sNLQS3zd5zKGP4H5fjv0jIF2p9ZgPwo4kYx2fC0oK17o52FW+h1jj8
-         tkD/ug+8TSIeLWyI5VVS6umanmQhuWgzwyWexI0EG6CmTgFj/DuyP9PBjKhDboWSDi
-         DPPPl67PjlUxSDmeM/z2FbWKqzi3X9wpTgzqCf9k=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id D65A66134E;
-        Thu,  4 Apr 2019 09:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1554371999;
-        bh=uS3tQVq+7k16FrxHJQ1eUQoMO40M6FO3w4lLZ5kIqKg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=OX1I4ZS8ZFFuJbV2Y2BFJpqrjt1yoOfTge6rSSNxYq5JqJSYnWq0wP1Yny9+maBlE
-         1tXdAZ2RCwhCH08I/RY6lfSUPE00Peuj+1Nr2NOQbK/0VazcLepP7aMQbamQ7W1Jad
-         7u9HDPUrLbydPGjXQCarlQRku7p8R5Gz8KFdtdY0=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 04 Apr 2019 15:29:58 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, hemantg@codeaurora.org
-Subject: Re: [PATCH v2 1/2] Bluetooth: hci_qca: Load customized NVM based on
- the device property
-In-Reply-To: <1554368908-22017-1-git-send-email-rjliao@codeaurora.org>
+        Thu, 4 Apr 2019 08:42:02 -0400
+Received: from ns.iliad.fr ([212.27.33.1]:55796 "EHLO ns.iliad.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728858AbfDDMmC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Apr 2019 08:42:02 -0400
+X-Greylist: delayed 566 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Apr 2019 08:42:01 EDT
+Received: from ns.iliad.fr (localhost [127.0.0.1])
+        by ns.iliad.fr (Postfix) with ESMTP id 6EF0020E99;
+        Thu,  4 Apr 2019 14:32:33 +0200 (CEST)
+Received: from [192.168.108.8] (freebox.vlq16.iliad.fr [213.36.7.13])
+        by ns.iliad.fr (Postfix) with ESMTP id 53BEE20B19;
+        Thu,  4 Apr 2019 14:32:33 +0200 (CEST)
+Subject: Re: [PATCH v2 2/2] dt-bindings: net: bluetooth: Add device property
+ nvm-postfix for QCA6174
+To:     Rocky Liao <rjliao@codeaurora.org>, marcel@holtmann.org,
+        johan.hedberg@gmail.com
+Cc:     Matthias Kaehlcke <mka@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        MSM <linux-arm-msm@vger.kernel.org>, bgodavar@codeaurora.org,
+        Rob Herring <robh+dt@kernel.org>
 References: <1554359858-21049-1-git-send-email-rjliao@codeaurora.org>
  <1554368908-22017-1-git-send-email-rjliao@codeaurora.org>
-Message-ID: <874b0a9f23d3857ed2dbcfb7ff84e558@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+ <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
+From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
+Message-ID: <535c74d4-00b1-eef2-578a-8807f4b9f640@free.fr>
+Date:   Thu, 4 Apr 2019 14:32:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: ClamAV using ClamSMTP ; ns.iliad.fr ; Thu Apr  4 14:32:33 2019 +0200 (CEST)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rocky,
++robh
 
-On 2019-04-04 14:38, Rocky Liao wrote:
-> QCA BTSOC nvm is a customized file and different vendor/platoform may 
-> want
-> to have different BTSOC configuration via this file (e.g. Configure SCO
-> over PCM or I2S, Setting Tx power, etc.) This patch will allow vendors 
-> to
-> download different nvm file by reading a device property "nvm-postfix" 
-> as
-> the nvm file name postfix.
-> 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
-> Changes in v2:
->   * added the property to the document file
->     Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->   * fixed coding style warnings
->   * moved the nvm-postfix to the last entry of the qca_serdev
-> ---
->  drivers/bluetooth/btqca.c   | 14 ++++++++++----
->  drivers/bluetooth/btqca.h   |  6 ++++--
->  drivers/bluetooth/hci_qca.c | 19 ++++++++++++++++++-
->  3 files changed, 32 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 6122685..4e89286 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -332,7 +332,8 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
-> const bdaddr_t *bdaddr)
->  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
-> 
->  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> -		   enum qca_btsoc_type soc_type, u32 soc_ver)
-> +		   enum qca_btsoc_type soc_type, u32 soc_ver,
-> +		   const char *nvm_postfix)
->  {
->  	struct rome_config config;
->  	int err;
-> @@ -368,9 +369,14 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
-> baudrate,
->  	if (soc_type == QCA_WCN3990)
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/crnv%02x.bin", rom_ver);
-> -	else
-> -		snprintf(config.fwname, sizeof(config.fwname),
-> -			 "qca/nvm_%08x.bin", soc_ver);
-> +	else {
-> +		if (nvm_postfix)
-> +			snprintf(config.fwname, sizeof(config.fwname),
-> +				 "qca/nvm_%08x_%s.bin", soc_ver, nvm_postfix);
-> +		else
-> +			snprintf(config.fwname, sizeof(config.fwname),
-> +				 "qca/nvm_%08x.bin", soc_ver);
-> +	}
-> 
->  	err = qca_download_firmware(hdev, &config);
->  	if (err < 0) {
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 6fdc25d..0dd6cd0 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -139,7 +139,8 @@ enum qca_btsoc_type {
-> 
->  int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> -		   enum qca_btsoc_type soc_type, u32 soc_ver);
-> +		   enum qca_btsoc_type soc_type, u32 soc_ver,
-> +		   const char *nvm_postfix);
->  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
->  int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->  #else
-> @@ -150,7 +151,8 @@ static inline int qca_set_bdaddr_rome(struct
-> hci_dev *hdev, const bdaddr_t *bdad
->  }
-> 
->  static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t 
-> baudrate,
-> -				 enum qca_btsoc_type soc_type, u32 soc_ver)
-> +				 enum qca_btsoc_type soc_type, u32 soc_ver,
-> +				 const char *nvm_postfix)
->  {
->  	return -EOPNOTSUPP;
->  }
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 4ea995d..560e880 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -168,6 +168,7 @@ struct qca_serdev {
->  	struct qca_power *bt_power;
->  	u32 init_speed;
->  	u32 oper_speed;
-> +	const char *nvm_postfix;
+On 04/04/2019 11:08, Rocky Liao wrote:
 
-[Bala]: I guess your trying to the read the type of communication for 
-SCO.
-         so i would recommend to change this to variable name to 
-sco_com_type or might be to the use understandable name.
-         just an suggestion. Don't respin right away wait for other 
-comments too :)
+> This patchs patch adds an optional device property nvm-postfix to allow the
+> driver to load customized nvm file based on this property
 
+While text /before/ is indeed called a "prefix", text /after/ is not a "postfix",
+but a "suffix".
+
+
+>  Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> index 824c0e2..70cda4b 100644
+> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> @@ -16,6 +16,7 @@ Optional properties for compatible string qcom,qca6174-bt:
+>  
+>   - enable-gpios: gpio specifier used to enable chip
+>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
+> + - nvm-postfix: nvm file postfix to load customized nvm file
+
+The device tree is supposed to describe hardware.
+
+The name of which file to load can hardly be considered part of the HW.
+
+Possible solutions:
+1) derive the file name from the compatible string
+2) pass the name as a module parameter
+3) something else
+
+
+> @@ -39,6 +40,7 @@ serial@7570000 {
+>  
+>  		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+>  		clocks = <&divclk4>;
+> +		nvm-postfix = "i2s";
+>  	};
 >  };
-> 
->  static int qca_power_setup(struct hci_uart *hu, bool on);
-> @@ -189,6 +190,17 @@ static enum qca_btsoc_type qca_soc_type(struct
-> hci_uart *hu)
->  	return soc_type;
->  }
-> 
-> +static const char *qca_get_nvm_postfix(struct hci_uart *hu)
-> +{
-> +	if (hu->serdev) {
-> +		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
-> +
-> +		return qsd->nvm_postfix;
-> +	} else {
-> +		return NULL;
-> +	}
-> +}
-> +
->  static void __serial_clock_on(struct tty_struct *tty)
->  {
->  	/* TODO: Some chipset requires to enable UART clock on client
-> @@ -1191,6 +1203,7 @@ static int qca_setup(struct hci_uart *hu)
->  	struct qca_data *qca = hu->priv;
->  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->  	enum qca_btsoc_type soc_type = qca_soc_type(hu);
-> +	const char *nvm_postfix = qca_get_nvm_postfix(hu);
->  	int ret;
->  	int soc_ver = 0;
-> 
-> @@ -1241,7 +1254,8 @@ static int qca_setup(struct hci_uart *hu)
-> 
->  	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
->  	/* Setup patch / NVM configurations */
-> -	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
-> +	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
-> +			nvm_postfix);
->  	if (!ret) {
->  		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->  		qca_debugfs_init(hdev);
-> @@ -1462,6 +1476,9 @@ static int qca_serdev_probe(struct serdev_device 
-> *serdev)
->  			return PTR_ERR(qcadev->bt_en);
->  		}
-> 
-> +		device_property_read_string(&serdev->dev, "nvm-postfix",
-> +					 &qcadev->nvm_postfix);
-> +
->  		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
->  		if (IS_ERR(qcadev->susclk)) {
->  			dev_err(&serdev->dev, "failed to acquire clk\n");
 
--- 
-Regards
-Balakrishna.
+If one provides the entire suffix, including the underscore, then you can
+simplify the code:
+
+	snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x%s.bin", soc_ver, suffix ? suffix : "");
+
+Regards.
