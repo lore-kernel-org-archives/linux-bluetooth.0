@@ -2,103 +2,233 @@ Return-Path: <SRS0=7owS=SG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00603C4360F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 12:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E893C4360F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 14:52:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C09AF2075E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 12:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0667520855
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Apr 2019 14:52:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="NLvAhuGP";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="DBgpnxye"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729596AbfDDMmC (ORCPT
+        id S1729325AbfDDOwU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Apr 2019 08:42:02 -0400
-Received: from ns.iliad.fr ([212.27.33.1]:55796 "EHLO ns.iliad.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728858AbfDDMmC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Apr 2019 08:42:02 -0400
-X-Greylist: delayed 566 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Apr 2019 08:42:01 EDT
-Received: from ns.iliad.fr (localhost [127.0.0.1])
-        by ns.iliad.fr (Postfix) with ESMTP id 6EF0020E99;
-        Thu,  4 Apr 2019 14:32:33 +0200 (CEST)
-Received: from [192.168.108.8] (freebox.vlq16.iliad.fr [213.36.7.13])
-        by ns.iliad.fr (Postfix) with ESMTP id 53BEE20B19;
-        Thu,  4 Apr 2019 14:32:33 +0200 (CEST)
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: bluetooth: Add device property
- nvm-postfix for QCA6174
-To:     Rocky Liao <rjliao@codeaurora.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com
-Cc:     Matthias Kaehlcke <mka@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        MSM <linux-arm-msm@vger.kernel.org>, bgodavar@codeaurora.org,
-        Rob Herring <robh+dt@kernel.org>
-References: <1554359858-21049-1-git-send-email-rjliao@codeaurora.org>
- <1554368908-22017-1-git-send-email-rjliao@codeaurora.org>
- <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
-From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
-Message-ID: <535c74d4-00b1-eef2-578a-8807f4b9f640@free.fr>
-Date:   Thu, 4 Apr 2019 14:32:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Thu, 4 Apr 2019 10:52:20 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:49748 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728647AbfDDOwU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Apr 2019 10:52:20 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 4439861231; Thu,  4 Apr 2019 14:52:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1554389538;
+        bh=MOa6M+P0/LHESP0j4YbKVYUU6hJ3aNlwasBS+PK5v4g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=NLvAhuGPAr+1wP3hVkBfvNGgkJs1CHbdLvcE+NDt73oXGbJd0UAhn5R1kV9q6AXP4
+         LKmSxt9URLhK5UnXAFTda2G+C05GNCmxCkTix89u4q4+UbMxEiaGWonFvr3nqh9rzi
+         3fSKdXFkpntDO6Td9d6+vto9bvhQQbnvGA6wzHa4=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 259BE6110F;
+        Thu,  4 Apr 2019 14:52:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1554389536;
+        bh=MOa6M+P0/LHESP0j4YbKVYUU6hJ3aNlwasBS+PK5v4g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=DBgpnxye683RDJ9EAsVOBWg1+56kD3LfpPm72YCD6umowFKeR+ROUoH2MlMYp9unK
+         bcOfJVFKnfQ+wWn84uQ/+q0wuIJnKr76ObrWotkHosgfdnBcSwSIKeWf7NyNVnBZcq
+         1SlD5fy/5cheximu4jzanzM+bKHfQInaj4UkgYDc=
 MIME-Version: 1.0
-In-Reply-To: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: ClamAV using ClamSMTP ; ns.iliad.fr ; Thu Apr  4 14:32:33 2019 +0200 (CEST)
+Date:   Thu, 04 Apr 2019 20:22:15 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     c-hbandi@codeaurora.org, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hemantg <hemantg@codeaurora.org>
+Subject: Re: [PATCH 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change
+ vendor event
+In-Reply-To: <20190403161438.GN112750@google.com>
+References: <20190307004041.38059-3-mka@chromium.org>
+ <ff905fac1e57bcca78c74f1bc3349645@codeaurora.org>
+ <20190307182009.GB138592@google.com> <20190307233039.GA69116@google.com>
+ <c985a6712f91930d7c710ca4abb42e80@codeaurora.org>
+ <a03acbdc6bfad172fdd65f428ffbe4cf@codeaurora.org>
+ <20190401171202.GH112750@google.com>
+ <1bebaf0766988a9f27cbbcb9bb35e26f@codeaurora.org>
+ <20190402180501.GK112750@google.com>
+ <1200f5c32e029c603667d66a4c62a634@codeaurora.org>
+ <20190403161438.GN112750@google.com>
+Message-ID: <a3bde5419145e9dccc2886d2d29c9d3f@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-+robh
+Hi Matthias,
 
-On 04/04/2019 11:08, Rocky Liao wrote:
-
-> This patchs patch adds an optional device property nvm-postfix to allow the
-> driver to load customized nvm file based on this property
-
-While text /before/ is indeed called a "prefix", text /after/ is not a "postfix",
-but a "suffix".
-
-
->  Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
->  1 file changed, 2 insertions(+)
+On 2019-04-03 21:44, Matthias Kaehlcke wrote:
+> On Wed, Apr 03, 2019 at 11:53:26AM +0530, Balakrishna Godavarthi wrote:
+>> + Harish to update his findings on wcn3998.
+>> Mean time i will perform a regression to detect the failure.
 > 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> index 824c0e2..70cda4b 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> @@ -16,6 +16,7 @@ Optional properties for compatible string qcom,qca6174-bt:
->  
->   - enable-gpios: gpio specifier used to enable chip
->   - clocks: clock provided to the controller (SUSCLK_32KHZ)
-> + - nvm-postfix: nvm file postfix to load customized nvm file
+> On my system it typically reproduces within a few dozen
+> iterations. Make sure your tree doesn't contain any custom BT patches,
+> even if they just add logging or fix the timeout during
+> initialization. Since this problem is timing sensitive it might get
+> masked. My tree is based on 4.19 LTS with all QCA BT related changes
+> on top:
+> https://chromium.googlesource.com/chromiumos/third_party/kernel/+/refs/heads/chromeos-4.19
+> 
+> I found some problems during initialization easier to reproduce
+> when binding and unbinding the device through sysfs, instead of
+> doing hciconfig up/down, this resembles more the initialization at
+> boot time.
+> 
+[Bala]: I am able to replicate this issue.
+         are you seeing the below error message getting logged on the 
+console in the issue case or an different error message.
+         Bluetooth: hci0: QCA TLV response size mismatch
 
-The device tree is supposed to describe hardware.
+>> On 2019-04-02 23:35, Matthias Kaehlcke wrote:
+>> > On Tue, Apr 02, 2019 at 05:32:54PM +0530, Balakrishna Godavarthi wrote:
+>> > > Hi Matthias,
+>> > >
+>> > > On 2019-04-01 22:42, Matthias Kaehlcke wrote:
+>> > > > On Mon, Apr 01, 2019 at 01:48:23PM +0530, Balakrishna Godavarthi wrote:
+>> > > > > Hi Matthias,
+>> > > > >
+>> > > > > On 2019-04-01 13:29, Balakrishna Godavarthi wrote:
+>> > > > > > Hi Matthias,
+>> > > > > >
+>> > > > > > Sorry for the late reply i was on vacation.
+>> > > > > >
+>> > > > > > On 2019-03-08 05:00, Matthias Kaehlcke wrote:
+>> > > > > > > On Thu, Mar 07, 2019 at 10:20:09AM -0800, Matthias Kaehlcke wrote:
+>> > > > > > > > Hi Balakrishna,
+>> > > > > > > >
+>> > > > > > > > On Thu, Mar 07, 2019 at 10:35:08AM +0530, Balakrishna Godavarthi
+>> > > > > > > > wrote:
+>> > > > > > > > > hi Matthias,
+>> > > > > > > > >
+>> > > > > > > > > On 2019-03-07 06:10, Matthias Kaehlcke wrote:
+>> > > > > > > > > > Firmware download to the WCN3990 often fails with a 'TLV response size
+>> > > > > > > > > > mismatch' error:
+>> > > > > > > > > >
+>> > > > > > > > > > [  133.064659] Bluetooth: hci0: setting up wcn3990
+>> > > > > > > > > > [  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
+>> > > > > > > > > > [  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+>> > > > > > > > > > [  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
+>> > > > > > > > > > [  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
+>> > > > > > > > > >
+>> > > > > > > > > > This is caused by a vendor event that corresponds to an earlier command
+>> > > > > > > > > > to change the baudrate. The event is not processed in the context of the
+>> > > > > > > > > > baudrate change and later interpreted as response to the firmware
+>> > > > > > > > > > download command (which is also a vendor command), but the driver
+>> > > > > > > > > > detects
+>> > > > > > > > > > that the event doesn't have the expected amount of associated data.
+>> > > > > > > > > >
+>> > > > > > > > > > More details:
+>> > > > > > > > > >
+>> > > > > > > > > > For the WCN3990 the vendor command for a baudrate change isn't sent as
+>> > > > > > > > > > synchronous HCI command, because the controller sends the corresponding
+>> > > > > > > > > > vendor event with the new baudrate. The event is received and decoded
+>> > > > > > > > > > after the baudrate change of the host port.
+>> > > > > > > > > >
+>> > > > > > > > > > Identify the 'unused' event when it is received and don't add it to
+>> > > > > > > > > > the queue of RX frames.
+>> > > > > > > > > >
+>> > > > > > > > > > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>> > > > > > > > > > ---
+>> > > > > > > > >
+>> > > > > > > > > ...
+>> > > > > > > > >
+>> > > > > > > > > Can you test by reverting this change "94d6671473924".
+>> > > > > > > >
+>> > > > > > > > The issue is still reproducible.
+>> > > > > > > >
+>> > > > > > > > > We need at least 15ms minimum delay for the soc to change its baud rate and
+>> > > > > > > > > respond to the with command complete event.
+>> > > > > > > >
+>> > > > > > > > The baudrate change has clearly been successful when the problem is
+>> > > > > > > > observed, since the host receives the vendor event with the new
+>> > > > > > > > baudrate.
+>> > > > > > >
+>> > > > > > > I forgot to mention this earlier: the controller doesn't send a
+>> > > > > > > command complete event for the command, or at least not a correct
+>> > > > > > > one.
+>> > > > > > >
+>> > > > > > > That's the data that is received:
+>> > > > > > >
+>> > > > > > > 04 0e 04 01 00 00 00
+>> > > > > > >             ~~ ~~
+>> > > > > > >
+>> > > > > > [Bala]: can you share me the command sent and event recevied.
+>> > > > > >  I see that we receive a command complete event for the baud rate
+>> > > > > > change command.
+>> > > > > >
+>> > > > > > command sent: 01 48 fc 01 11
+>> > > > > > vendor specific event: 04 ff 02 92 01
+>> > > > > > command complete event: 04 0e 04 01 00 00 00.
+>> > > > > >
+>> > > > > >
+>> > > > > >
+>> > > > > > > This is *a* command complete event, but the opcode is 0x0000 instead
+>> > > > > > > of the earlier command. The same happens for the firmware
+>> > > > > > > download/read version command, which is the reason why the command
+>> > > > > > > complete injection mess
+>> > > > > > > (https://lore.kernel.org/patchwork/patch/1027955/) is needed in one
+>> > > > > > > way or another.
+>> > > > > > >
+>> > > > > > [Bala]: fw download approach is different where we use
+>> > > > > > __hci_cmd_sync() where as here we use hci_uart_tx_wakeup()
+>> > > > > >         which directly calls the hci_uart_write_work(). so even we
+>> > > > > > send an valid opcode or not for baudrate change will bot matter.
+>> > > > > >
+>> > > > > [Bala]: i miss understood the comment. Yes your true. in the all
+>> > > > > vendor
+>> > > > > commands SoC responds with an 0x0000 opcode.
+>> > > >
+>> > > > And IIUC this is not compliant with the spec, or at least the BT core
+>> > > > expects the actual opcode to consider the command to be completed.
+>> > >
+>> > > [Bala]: Did you try increasing the the baud rate change timeout to
+>> > > 50ms
+>> > > instead of 10ms.
+>> >
+>> > It is even reproducible with the ROME timeout of 300ms.
+>> >
+>> > The timeout doesn't help here. With 78e8fa2972e5 ("Bluetooth: hci_qca:
+>> > Deassert RTS while baudrate change command") RTS is deasserted during
+>> > the baudrate change, hence the controller only sends the response when
+>> > RTS is asserted again. Before the event resulted in a frame reassembly
+>> > error and the data was discarded.
+>> >
+>> > >         i suspect it is an timing issue.
+>> >
+>> > Timing is certainly also a factor here (the problem isn't seen
+>> > always), but I don't think 'timing issue' is a proper description of
+>> > this issue. The problem is an event that the Bluetooth core doesn't
+>> > expect due to the hack of sending a raw command behind the core's back
+>> > to work around the firmware 'feature' of sending the command response
+>> > with the new baudrate.
+>> >
+>> > Maybe a delay after re-asserting RTS can address is reliably, I don't
+>> > remember if I already experimented with that in the past. If a delay
+>> > can 'fix' the issue reliably I'm open to consider it for the sake of
+>> > simplicity, but only with a detailed comment that describes the
+>> > problem.
+>> 
 
-The name of which file to load can hardly be considered part of the HW.
-
-Possible solutions:
-1) derive the file name from the compatible string
-2) pass the name as a module parameter
-3) something else
-
-
-> @@ -39,6 +40,7 @@ serial@7570000 {
->  
->  		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
->  		clocks = <&divclk4>;
-> +		nvm-postfix = "i2s";
->  	};
->  };
-
-If one provides the entire suffix, including the underscore, then you can
-simplify the code:
-
-	snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x%s.bin", soc_ver, suffix ? suffix : "");
-
-Regards.
+-- 
+Regards
+Balakrishna.
