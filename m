@@ -2,103 +2,249 @@ Return-Path: <SRS0=tQl/=SH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C8CC282CE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Apr 2019 16:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C032CC282CE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Apr 2019 16:47:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 106B421738
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Apr 2019 16:29:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 780A820700
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Apr 2019 16:47:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S7b+LBed"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ieDJmEmc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731500AbfDEQ3K (ORCPT
+        id S1731087AbfDEQrR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Apr 2019 12:29:10 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:42428 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730554AbfDEQ3K (ORCPT
+        Fri, 5 Apr 2019 12:47:17 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:51055 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730565AbfDEQrR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Apr 2019 12:29:10 -0400
-Received: by mail-pf1-f194.google.com with SMTP id w25so2099836pfi.9;
-        Fri, 05 Apr 2019 09:29:10 -0700 (PDT)
+        Fri, 5 Apr 2019 12:47:17 -0400
+Received: by mail-wm1-f67.google.com with SMTP id z11so7468331wmi.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Apr 2019 09:47:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fspO/TVEVGTpRmAtOyB9yj5kFZPJCio5d8wD7/B9/oU=;
-        b=S7b+LBed0zPmKOXX0WE1GNguEoiGI9ka/UArvKmVTSS0I/Kf9gsExfgissLpmJGtDd
-         cdX89VdhdGw9DjIZSwCcOO+5RA4yvtlv6/fYo9/hkWsjGJhRynAAI7Io1g2GBp78tEUz
-         jHXzAZYaGZ+nIunS0QA4smK6oNFGemLID52qhieXTEwGMxXIIjVxNrt/tw8zVz2du+zx
-         7VKp/uDiTBa+dcV7kBiWVuX8Rjlx6yuL4xgcBxqfLyV8PYydSchmccBZ89fQkhGoY8Xt
-         6lMiHszWeGpCMLlbv+y5Q7cZsnVxApQPLn7RQongZfLXN6mgFD5utyyUPM2Tu24pnopE
-         aZ/Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=FNUEjMGu1kRYi8v2ytXrDj+Tfzwg4V9LIJg5m0Ar1TU=;
+        b=ieDJmEmcZflpuEEXxSGwdYc/sx93Lb01f/oKjUCu4s2I7OT7eC75w4ZuNZsqW1l19n
+         YT/fKcD8th45+l/CS7mM0RCmCnNr+VBMrYc146qbC9r1wSuBQgjYND+Oc83KiWZIlpar
+         bna4vWCVQML36mkFGPl3ANgv9h2wPXoWcGHj9A2J9Ue2Yhzeajj4//Hp72reTAIKpCom
+         sg58RxcbSa1a/5UFTpmmPxZ+XkeiBZmcoVzmWjWhYjLTfC5hu3UBSyKHAjVgZ4A05xc8
+         w0I5OY3RwBoS2YkmIOH5U3+0nnm7RVXasbeUfRpOsZn5uCWSBM2dg20T8Ey4RoiPD4FT
+         1qoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fspO/TVEVGTpRmAtOyB9yj5kFZPJCio5d8wD7/B9/oU=;
-        b=Bt+xybMgvDONWfFIr4JExH3qxCxMXbclgtXzUUYlyNTx9te1KlP8lRi/rJxF/aSOEY
-         WPLijrDTuqnWHO+A0Sg3/QIpDIEX6P3wP0qHAOho2wET5pZPN2q5L1jBq2YV1oUsqAuA
-         /02UJUJQjfTwB3YfkoUgAMDzVoARAy1lCfHiYlnBqcEwB4Fw3CXkvOKoWox0TIpHYJI0
-         eJM+zMKcRZQSaSzQRkGxctxiIhU/Rb2LE8VmLKETjRAbqNorA6kS5BYl5orFRO8p9tHi
-         asFRt7IrJwnN/6bW5/vM7HueOQ804eVDQMNE+mkNbOZE+72jysd5L8M/LfP2t/RPlM17
-         XlFg==
-X-Gm-Message-State: APjAAAVeTbm5Uim6CYnJw58uN7C7Ut2d8+UnZsyT2BphDtoySpU9OIHG
-        PCEC46bCTfGyvQf/cFUbnEMwlxNmgUTNw+VExOk=
-X-Google-Smtp-Source: APXvYqyRf+bgSTDMeZWGzx+9hoWLt2+YN2HzfsK4D+ZxKYgXypZilAKSF5/c+9KfTTKPlHOgixibs3Bi401QdkWvSck=
-X-Received: by 2002:a63:c40c:: with SMTP id h12mr1935228pgd.39.1554481749667;
- Fri, 05 Apr 2019 09:29:09 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=FNUEjMGu1kRYi8v2ytXrDj+Tfzwg4V9LIJg5m0Ar1TU=;
+        b=D8bOzHV/5kii2iI6CVvg34D7U0O76G7B/FQVhtWjKZx7FiQqG15KO/CwUC9hq2+CLK
+         AcsMhKmrPZFVs770a7sHlDsyvb71UJmgcHem1wadBwGS3ykIltKB53wR52CkUKn5CICX
+         r+62enXoNg99mb9fms4xXvFLAeCvnj03S+rhRWwFQzJXyM2bMtiasAFDaGkF36KEmP30
+         8nO/NWNIs5FWcf+W97Q1xsGE5R+OKE7LqvPVEAQVaKdBA3A4A/hWlufs6XBJ5RQTyvk8
+         IT0x8adC/Qj4Z2UuFjEg6yttkcLNDUSNu3BrAAqAAYUtp9U3IX7VZE8e20LlC2rSfs7U
+         5CEA==
+X-Gm-Message-State: APjAAAUMWuF3MJa86GN0iNv74HsGVnAHYllksjzxfEj8QJaGzT56eGO5
+        66tbpKpNHRCVIAksd4jHEg0=
+X-Google-Smtp-Source: APXvYqwHsDa5JSNuhhD3qI/HuK4zpAPucl+Rf89spOWtegZoX+MADwS1SMdSqRv9qHA+SaHBEerUpg==
+X-Received: by 2002:a1c:df89:: with SMTP id w131mr6493028wmg.82.1554482835378;
+        Fri, 05 Apr 2019 09:47:15 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id k14sm2971920wmj.26.2019.04.05.09.47.14
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 05 Apr 2019 09:47:14 -0700 (PDT)
+Date:   Fri, 5 Apr 2019 18:47:13 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose
+ remote SEP
+Message-ID: <20190405164713.cvfciulxnby25o3g@pali>
+References: <20190122134524.20509-1-luiz.dentz@gmail.com>
+ <CABBYNZLCFpXhbAnVYaA-nVNOY8QRvpR1UZhMHfy-awZxtpSocQ@mail.gmail.com>
+ <20190122175622.dj6riiim6zukpetw@pali>
+ <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190330072511.GA5502@kadam> <f1baaa05-bd1d-f2cf-410a-7073e85412d3@gmail.com>
- <CAM_iQpVNqyoBirtKg-rbOHsOZCZ0Oz5PTE2sFQnHQnv6s7g2gg@mail.gmail.com>
- <20190402063313.GA32613@kadam> <CAM_iQpW=X2X5A873nSPM7yLBiWZM+rsJk+uMpiOioYPFsFP9vg@mail.gmail.com>
- <20190402201322.GG32613@kadam> <CAM_iQpWjwOwawBN3yiZ0F-B-HDSOW8KGfpLGhAsf5yE0A=wtDA@mail.gmail.com>
- <20190404063521.GF32590@kadam>
-In-Reply-To: <20190404063521.GF32590@kadam>
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-Date:   Fri, 5 Apr 2019 09:28:57 -0700
-Message-ID: <CAM_iQpUgv5HhiPV2P+swHbSfnnhWNTNCLnNAK=WCTcp3HZVTmQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_event: potential out of bounds parsing ADV events
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="5alpeweq3yat3hhw"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Apr 3, 2019 at 11:35 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
->
-> On Wed, Apr 03, 2019 at 03:51:18PM -0700, Cong Wang wrote:
-> > On Tue, Apr 2, 2019 at 1:15 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> > >
-> > > On Tue, Apr 02, 2019 at 10:42:38AM -0700, Cong Wang wrote:
-> > > > > Btw, get rid of all the likely/unlikely() macros.  Then the other style
-> > > > > comment would be don't move the "ev = (void *)skb->data;" assignments
-> > > > > around.  It's ok to say:
-> > > >
-> > > >
-> > > > Similarly, pskb_may_pull() may reallocate skb's, although very unlikely
-> > > > for bluetooth case (skb's are linear). At least it doesn't harm anything
-> > > > we move the skb->data dereference after pskb_may_pull().
-> > > >
-> > >
-> > > It harms readability.
-> >
-> > Why? I can't see how it harms readability if you have pskb_may_pull()
-> > in mind that it potentially reallocates skb->data.
->
-> You're making the code more complicated because you're pretending that
-> we didn't linearize the skb data already...  :/
 
-I am not pretending it, I just want to use a standard networking API
-which covers all cases.
+--5alpeweq3yat3hhw
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wednesday 23 January 2019 13:24:22 Luiz Augusto von Dentz wrote:
+> Hi Pali,
+> On Tue, Jan 22, 2019 at 7:56 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wr=
+ote:
+> >
+> > On Tuesday 22 January 2019 16:20:12 Luiz Augusto von Dentz wrote:
+> > > Hi Pali,
+> > > On Tue, Jan 22, 2019 at 3:45 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > >
+> > > > This adds the possibility to expose remote SEP using MediaEndpoint
+> > > > interface to allow setting a configuration.
+> > > > ---
+> > > >  doc/media-api.txt | 27 +++++++++++++++++++++++++--
+> > > >  1 file changed, 25 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/doc/media-api.txt b/doc/media-api.txt
+> > > > index b5ad2db12..af9485342 100644
+> > > > --- a/doc/media-api.txt
+> > > > +++ b/doc/media-api.txt
+> > > > @@ -500,14 +500,23 @@ Properties        object Player [readonly]
+> > > >  MediaEndpoint1 hierarchy
+> > > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> > > >
+> > > > -Service                unique name
+> > > > +Service                unique name (Server role)
+> > > > +               org.bluez (Client role)
+> > > >  Interface      org.bluez.MediaEndpoint1
+> > > > -Object path    freely definable
+> > > > +Object path    freely definable (Server role)
+> > > > +               [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_X=
+X_XX/sepX
+> > > > +               (Client role)
+> > > >
+> > > >  Methods                void SetConfiguration(object transport, dic=
+t properties)
+> > > >
+> > > >                         Set configuration for the transport.
+> > > >
+> > > > +                       For client role transport must be set with =
+a server
+> > > > +                       endpoint oject which will be configured and=
+ the
+> > > > +                       properties must contain the following prope=
+rties:
+> > > > +
+> > > > +                               array{byte} Capabilities
+> > > > +
+> > > >                 array{byte} SelectConfiguration(array{byte} capabil=
+ities)
+> > > >
+> > > >                         Select preferable configuration from the su=
+pported
+> > > > @@ -532,6 +541,20 @@ Methods            void SetConfiguration(objec=
+t transport, dict properties)
+> > > >                         endpoint, because when this method gets cal=
+led it has
+> > > >                         already been unregistered.
+> > > >
+> > > > +Properties     string UUID [readonly, optional]:
+> > > > +
+> > > > +                       UUID of the profile which the endpoint is f=
+or.
+> > > > +
+> > > > +               byte Codec [readonly, optional]:
+> > > > +
+> > > > +                       Assigned number of codec that the endpoint =
+implements.
+> > > > +                       The values should match the profile specifi=
+cation which
+> > > > +                       is indicated by the UUID.
+> > > > +
+> > > > +               array{byte} Capabilities [readonly, optional]:
+> > > > +
+> > > > +                       Capabilities blob, it is used as it is so t=
+he size and
+> > > > +                       byte order must match.
+> > > >
+> > > >  MediaTransport1 hierarchy
+> > > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> > > > --
+> > > > 2.17.2
+> > >
+> > > Can you try this set?
+> >
+> > Hi! In V3 you added only "a2dp: Add reverse discovery" patch right?
+> > I tested my setup also with this patch and there is no difference,
+> > pulseaudio is working fine :-)
+> >
+>=20
+> Applied.
+>=20
+
+Hello, I have found another problem with this patch series.
+
+I have there Nokia N900 device with Community SSU updates which acts as
+both A2DP sink and A2DP source.
+
+When I scan A2DP capabilities of Nokia N900 I get following output:
+
+$ ./tools/avinfo XX:XX:XX:XX:XX:XX
+Connecting ...=20
+Stream End-Point #1: Audio Source=20
+        Media Codec: SBC
+                Channel Modes: Mono DualChannel Stereo JointStereo
+                Frequencies: 16Khz 32Khz 44.1Khz 48Khz=20
+                Subbands: 4 8
+                Blocks: 4 8 12 16=20
+                Bitpool Range: 2-64
+Stream End-Point #2: Audio Sink=20
+        Media Codec: SBC
+                Channel Modes: Mono DualChannel Stereo JointStereo
+                Frequencies: 16Khz 32Khz 44.1Khz 48Khz=20
+                Subbands: 4 8
+                Blocks: 4 8 12 16=20
+                Bitpool Range: 2-64=20
+
+$ qdbus --system org.bluez
+/
+/org
+/org/bluez
+/org/bluez/hci0
+/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
+/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd2
+/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/player0
+/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1
+/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep2
+/org/bluez/test
+
+So there is one SEP as Audio Source and one SEP as Audio Sink.
+
+But when I ask sep1 and sep2 for UUID via dbus, I get that both are just
+Audio Sinks:
+
+$ qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1 org.b=
+luez.MediaEndpoint1.UUID
+0000110a-0000-1000-8000-00805f9b34fb
+
+$ qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep2 org.b=
+luez.MediaEndpoint1.UUID
+0000110a-0000-1000-8000-00805f9b34fb
+
+So this is a clear bug.
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--5alpeweq3yat3hhw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXKeGjgAKCRCL8Mk9A+RD
+UtJQAJ9fOwtoeSJk/aHYmSf0DV3xzH8KqACeJ7HUc3RnQ6pNn51Dbd36v+FqhEA=
+=nWDJ
+-----END PGP SIGNATURE-----
+
+--5alpeweq3yat3hhw--
