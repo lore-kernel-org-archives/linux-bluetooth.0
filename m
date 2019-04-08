@@ -2,93 +2,95 @@ Return-Path: <SRS0=Ssic=SK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7692CC10F13
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 16:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC181C10F13
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 18:16:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0A0820880
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 16:56:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A21E82084C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 18:16:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="P7tkwX2s"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20150623.gappssmtp.com header.i=@mojatatu-com.20150623.gappssmtp.com header.b="Rha+EuuI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727496AbfDHQ4B (ORCPT
+        id S1726482AbfDHSQW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Apr 2019 12:56:01 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.221]:35359 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726818AbfDHQ4B (ORCPT
+        Mon, 8 Apr 2019 14:16:22 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:34634 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726240AbfDHSQV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Apr 2019 12:56:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1554742556;
-        s=strato-dkim-0002; d=gerhold.net;
-        h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=PvJh8Tf3T9bN5J08Vw30D1BiL/If4YnDk2m4NkJPeOI=;
-        b=P7tkwX2sVQJlcbo+aGMuEHg6xptu73VrzvqZblDF47rSsHEoH3sBLbMqfJKva3lMMb
-        nE4McZsmIGpisC8YRBarmpUtC1dQN68sbqvPc38/8IBVuEdYxw1qprFUhKOHTccNOWIM
-        1F2umenCIGlQq5GDm6HtN07C+V3/RUaaxr17NmdCqhfsEaRoyQmtvX4VFblZP6Rt6wet
-        GqrpoDsica7L9pytXewfJohRjZgReN7Yj4eFAb4GeDGMLGWBrMkUO0yvf3VrP8SaWIQI
-        6+3yL8nwxJ7EGlGBPXLJ9CADdaJsPYQW72QL8Xqa8rBeyJpc4uDejhs5Y5hFbHnyZEXN
-        uB/g==
-X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVOQ/OcYgojyw4j34+u266EZF6ORJDdffYtr3yKg=="
-X-RZG-CLASS-ID: mo00
-Received: from gerhold.net
-        by smtp.strato.de (RZmta 44.18 AUTH)
-        with ESMTPSA id 60b811v38Gtt8OB
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Mon, 8 Apr 2019 18:55:55 +0200 (CEST)
-Date:   Mon, 8 Apr 2019 18:55:43 +0200
-From:   Stephan Gerhold <stephan@gerhold.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: btbcm: Add entry for BCM2076B1 UART
- Bluetooth
-Message-ID: <20190408165542.GA1274@gerhold.net>
-References: <20190305130901.56660-1-stephan@gerhold.net>
+        Mon, 8 Apr 2019 14:16:21 -0400
+Received: by mail-io1-f66.google.com with SMTP id n11so11938964ioh.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2019 11:16:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=0tlyk4FQ6HuHMCUtDzHor1YlbGrEJ0p0O7u2utWEVHM=;
+        b=Rha+EuuIAdeRD0ObtQXs73mustlQl62Ar9SuOSgcoi55uAA3Mds3drrCLyjWrZxGgb
+         WNM2b3fuwV2D+51eD0HtRleMLAxidDjN17+N25U+SMihBqCrTF0fMAqbyUkvkCIPmMHk
+         pkyxyA1wyBphaMV26tTkcrz8tVMhnxrF1dag8Uiw0DoP53Osv/i16GP82+auj+fx8wLB
+         XTDId1mUJnxB4DouoqQ6ESupGEqQS5xCGk4D9Veakus8cSCxR/BE004BVUGDR7SMemVv
+         2tO0UefeTnOivWyMw+EW2Vskl010wkWPGYxWZtpIu61nMLMb4vRSuguLfqWu95YPHTzn
+         GtjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=0tlyk4FQ6HuHMCUtDzHor1YlbGrEJ0p0O7u2utWEVHM=;
+        b=VJ0WrdHSi503Lcqr8DtK/aRaGsnkQkzIA1n0RjhXDmtSxxk+6p11yAL0faXAe/ZpRu
+         zJbAtYXxVXuizW/wBIU/WBBvsYYa/z4Ml2I25VMECIb2ch/sx439uu7O/RQRFdqkhxgF
+         toprbh9q8d1EMVsPrdN9U5SA1Yr5QpiYuQd8Yikm6i1RZjILFltMN/7nacC9ggRV2PBO
+         xr4otyc/POYXoFMkt7gKMW3YOQhA8OmXwjcX7PscbDD3xtIt+97c/zGUQ5jpWDNAA7h+
+         qh7oIrHU1hhaleYQ8AFlxx5GcNfJ84UaxO2unE4FA4VlEYne+NgHJLqU7AfKcuXqx5xO
+         kA8w==
+X-Gm-Message-State: APjAAAX2SeaxHf2/7+enhA5aDR4PP7k+iNlNfI4TjP1sJA/NcI7sqQCC
+        VWMWFnFyzEMUsAVc7Wsu0nWrSg==
+X-Google-Smtp-Source: APXvYqyh2V7+WuzR2EG+LS3PSkNLTvZaQXkhousrfbfZGvtFw7WEcwcRKrENxpTv4uVOqcv6dLEB7Q==
+X-Received: by 2002:a6b:d913:: with SMTP id r19mr7524529ioc.76.1554747381142;
+        Mon, 08 Apr 2019 11:16:21 -0700 (PDT)
+Received: from x220t ([64.26.149.125])
+        by smtp.gmail.com with ESMTPSA id c200sm5372559itc.43.2019.04.08.11.16.20
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 08 Apr 2019 11:16:20 -0700 (PDT)
+Date:   Mon, 8 Apr 2019 14:16:18 -0400
+From:   Alexander Aring <aring@mojatatu.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] 6lowpan: Off by one handling ->nexthdr
+Message-ID: <20190408181618.2m5c3aqlqjmem57j@x220t>
+References: <20190403053416.GA21913@kadam>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190305130901.56660-1-stephan@gerhold.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190403053416.GA21913@kadam>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel, Hi Johan,
+Hi,
 
-On Tue, Mar 05, 2019 at 02:09:00PM +0100, Stephan Gerhold wrote:
-> Add the device ID for the BT/FM/GPS combo chip BCM2076 (rev B1)
-> used in the AMPAK AP6476 WiFi/BT/FM/GPS module.
+On Wed, Apr 03, 2019 at 08:34:16AM +0300, Dan Carpenter wrote:
+> NEXTHDR_MAX is 255.  What happens here is that we take a u8 value
+> "hdr->nexthdr" from the network and then look it up in
+> lowpan_nexthdr_nhcs[].  The problem is that if hdr->nexthdr is 0xff then
+> we read one element beyond the end of the array so the array needs to
+> be one element larger.
 > 
-> Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
-> ---
->  drivers/bluetooth/btbcm.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index d5d6e6e5da3b..ea1a20a49f91 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -333,6 +333,7 @@ struct bcm_subver_table {
->  static const struct bcm_subver_table bcm_uart_subver_table[] = {
->  	{ 0x4103, "BCM4330B1"	},	/* 002.001.003 */
->  	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
-> +	{ 0x4204, "BCM2076B1"	},	/* 002.002.004 */
->  	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
->  	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
->  	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
-> -- 
-> 2.21.0
-> 
+> Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Is there anything I can change in these two patches to get them applied?
-Or should I re-send them?
+Acked-by: Alexander Aring <aring@mojatatu.com>
 
-Thanks,
-Stephan
+Thanks.
+
+- Alex
