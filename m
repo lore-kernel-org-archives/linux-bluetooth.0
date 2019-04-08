@@ -2,94 +2,95 @@ Return-Path: <SRS0=Ssic=SK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A73C282CE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 09:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A869DC282CE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 09:47:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35EF320870
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 09:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 783B120880
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Apr 2019 09:47:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtOjfRHX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rRMG9wWR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726647AbfDHJng (ORCPT
+        id S1726417AbfDHJry (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Apr 2019 05:43:36 -0400
-Received: from mail-ed1-f48.google.com ([209.85.208.48]:38076 "EHLO
-        mail-ed1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726383AbfDHJng (ORCPT
+        Mon, 8 Apr 2019 05:47:54 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:38839 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726388AbfDHJrx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Apr 2019 05:43:36 -0400
-Received: by mail-ed1-f48.google.com with SMTP id d13so1033634edr.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2019 02:43:35 -0700 (PDT)
+        Mon, 8 Apr 2019 05:47:53 -0400
+Received: by mail-oi1-f193.google.com with SMTP id a6so9992151oie.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Apr 2019 02:47:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GETewLcyRzYhqEsFo1MIGBR5W46jXFVLN5JLuZr9IUo=;
-        b=CtOjfRHXjSDGXpRaWalFZVmyTbITFDuUyoQit40inzshN9q+Z/zRPEXx0jpS7v5gvr
-         ClTeqs2JPS+AcwMh3N5d8CB1NWC1OMHrKkbIaRiUxYOq7lgoBgnnUFJxzhKqPOoznDjG
-         8JqZrSKIbspU41VdHRmH2B6mYD/Te+8Eg1vaGhRkLSthY8iUxHthEnGGJHdh1845qVNq
-         9H0YihY0JsQAflqcmq8BmNR72cz9jczkBpkTqNt5XVSspm1BzY8ZIMb7Q7ykaCQWofj0
-         U/yOkHPIu97kF4BA4LyRa/ocgFdQx1lASS+v58F83LwSRrZTmerTJ9uXiWfer4ryO3db
-         hXtg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=90v9QmyHB2Ukb3VY38rQrtqE39xqK7XQuoTuIgGFdM0=;
+        b=rRMG9wWR9RRyDuJHtZFQDoB8Lkki4qRRxLOTLObSyYRREFgQ25JbfXtmjnH5IEbPsn
+         e6PvHMMbkVx/m3Za/HYBSz4y0BEt5pc6ZcA3PWjxtypXJGKUux5Q7iyTpYphqa1mSeNs
+         6x+qPqMdYYf/G+sm6gavtKxbQhP5FLbRROeQWKI/tTVRHUc/A/oCZTntfmXRRQSs1vbG
+         pKqsUsYOUF///Krd0fzxXngTEZDzSF9T+70CDYsJU6LLIoeFqSTYd3lmqC5zOwCVQpxC
+         CBmSi7GRK8usfOABIReXwdASg9FjyJG64wLDLy4uKf8ZqyunorG6IcAseZy8fq2WlQaT
+         5OKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GETewLcyRzYhqEsFo1MIGBR5W46jXFVLN5JLuZr9IUo=;
-        b=TRHzuDEt0+IRUei+k9Yq10CB4+IacLpQkTUONHrUdpKEXBOOD6o78Cf5lEJETTMMwR
-         Hpy1G0q8nMf6ZsGs9Df626OiiWfEh9JtTz8FnL3rd1MtHpHDTm3PhPGEGb63RGgJxz+d
-         Zs5aNVgyLp6aUNhJSrjZKw6jmFTNJlES2anTXyzQhvbHzGeLO3rjQfbM9APhpRoJIlve
-         1gv9lUxG7uWPrqbIosWNPHP20Ypv3qmxLNeELdN2tVmISkxmzB+S8bb9dr3GODDQ015x
-         uMUG0lVhA04QuRU9UZKYOSH2yOPxm3uvO54bDZyNH1TGWOk4XA2YktRBHIZPDBzPmDIj
-         +59g==
-X-Gm-Message-State: APjAAAWMOrOjfQqXLLODXRPtMDIUXQPSZVUkcV+tqsrUvo4ZsLsjR2Xi
-        KszqkqyxnsEXHq8zTGMdpbhlTMQdej0=
-X-Google-Smtp-Source: APXvYqz7gIW+cWnlSoWANmYfsKOybXZwTI2J8DYv++L4UGflO9BEUr+6AMItu5ok4VjXDxR4ojqA5A==
-X-Received: by 2002:a05:6402:1717:: with SMTP id y23mr3767661edu.1.1554716614429;
-        Mon, 08 Apr 2019 02:43:34 -0700 (PDT)
-Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id p4sm2367257edr.55.2019.04.08.02.43.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 08 Apr 2019 02:43:33 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] a2dp: Fix UUID of remote Sinks
-Date:   Mon,  8 Apr 2019 12:43:31 +0300
-Message-Id: <20190408094331.11683-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=90v9QmyHB2Ukb3VY38rQrtqE39xqK7XQuoTuIgGFdM0=;
+        b=rsVal7ZbYDwBO8qREl1KEmhbUkwLlQrq7iijFJFz/4S47jVbMJVDhT1/h1t1EE1ojG
+         bBGu0Oj7DEnu7YbNRtONkyW+UYkfLlSZ2ekdyKupnQ9ACar4JCBgnHODHuupdcBu+Dvi
+         iEFDfgveqI3TTnGRuqziIT0Zb8qhfAQRkFcv8HUO4ULWz5MHunyXXF/9ESaQzVFIyLcX
+         qgn3k16qdTnsMzRAh6/3qPqLEUDYvQqdo/HBXVkNQX5pl659QHGTaeJHTLdjicBZLdvt
+         xToBUGMhXurY6C330Hp7wdsYWvSJbrbqQ0MWEIpIn8EKvsDzAt7CGkLaAG4etrUweGSN
+         e/oQ==
+X-Gm-Message-State: APjAAAVcLqpNNiesFOYea35bsL24youpWLxQXmgRal35AkJpHkETUIbb
+        ofCbUGKcoEJ90kFU0BrknAHmi1+yESzscT8GnqBYHHYX
+X-Google-Smtp-Source: APXvYqy0/P/CkrRMreBcshU64lTsKYlth5FF8wamTGo0L/beP+a+h/7IGNtDVuyo8ZoqHqkx87mCNIa4/Sa6e+ApOU8=
+X-Received: by 2002:aca:adc8:: with SMTP id w191mr15609249oie.110.1554716873130;
+ Mon, 08 Apr 2019 02:47:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190122134524.20509-1-luiz.dentz@gmail.com> <CABBYNZLCFpXhbAnVYaA-nVNOY8QRvpR1UZhMHfy-awZxtpSocQ@mail.gmail.com>
+ <20190122175622.dj6riiim6zukpetw@pali> <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
+ <20190405164713.cvfciulxnby25o3g@pali> <CABBYNZJQvOODiwVcNrDPH7A+5qTM0ZmSHaZ8=+=32CeH1t482A@mail.gmail.com>
+In-Reply-To: <CABBYNZJQvOODiwVcNrDPH7A+5qTM0ZmSHaZ8=+=32CeH1t482A@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 8 Apr 2019 12:47:40 +0300
+Message-ID: <CABBYNZJCOnudwGi6Km=m2SWSvV8v_zz3_Pd-+-ek9H785J4BkQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose
+ remote SEP
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Pali,
 
-Sinks were being reported as Sources.
----
- profiles/audio/a2dp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Apr 8, 2019 at 12:41 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> > $ qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1 org.bluez.MediaEndpoint1.UUID
+> > 0000110a-0000-1000-8000-00805f9b34fb
+> >
+> > $ qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep2 org.bluez.MediaEndpoint1.UUID
+> > 0000110a-0000-1000-8000-00805f9b34fb
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 4001ea0ea..8f141739c 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1686,7 +1686,7 @@ static gboolean get_uuid(const GDBusPropertyTable *property,
- 		uuid = A2DP_SOURCE_UUID;
- 		break;
- 	case AVDTP_SEP_TYPE_SINK:
--		uuid = A2DP_SOURCE_UUID;
-+		uuid = A2DP_SINK_UUID;
- 		break;
- 	default:
- 		uuid = "";
+Btw, 110a is a remote source I wonder if why you were saying they were
+sinks? Or you were referring to the local role?
+
+> > So this is a clear bug.
+>
+> I will send a fix shortly.
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
 -- 
-2.20.1
-
+Luiz Augusto von Dentz
