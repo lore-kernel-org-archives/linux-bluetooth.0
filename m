@@ -2,153 +2,89 @@ Return-Path: <SRS0=4NR/=SL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9844FC10F0E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 14:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B7AC10F0E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 14:26:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6554C2084F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 14:03:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554818605;
-	bh=/iGOLlZ2LmnG4+GxeSSAeOo+q+PkEY1dl+1g+OpPUcY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=tT9y/vN9y607mmlpMIQfqqSmE4hA+tMvtvw0spwxVPLHunCX1RRKKPdS3+kgmVsBV
-	 TfbSsN/ODl4IEWScGIYjHAIYlziqW+7j5fBffDHHdaGb2X2T7p/FL876aD9ckyJFeN
-	 yEpAJ4Z4bOuIW/H/GNkyl+osTApNRhiFVvWMuAw0=
+	by mail.kernel.org (Postfix) with ESMTP id CEE3C20833
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 14:26:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726531AbfDIODU (ORCPT
+        id S1726475AbfDIO0L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Apr 2019 10:03:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52488 "EHLO mail.kernel.org"
+        Tue, 9 Apr 2019 10:26:11 -0400
+Received: from smtp.radex.nl ([178.250.146.7]:33289 "EHLO radex-web.radex.nl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726035AbfDIODU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Apr 2019 10:03:20 -0400
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 03571218D2;
-        Tue,  9 Apr 2019 14:03:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1554818599;
-        bh=/iGOLlZ2LmnG4+GxeSSAeOo+q+PkEY1dl+1g+OpPUcY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=f1Zz//H0Cg2Fs09zpE3QCaKP9yb05zG7iLJTw/GlXp1MVqN4W8c8LCVWoEZ6AEBVf
-         cJJn3Ps5tkf+Rk7ADcN+BU1k0ANiR1DxymmJ92w5eFwPD+f2IS+zAbQzw7CyAwplgx
-         irimpZk4Uu/01NzVkcPelXhYZKoeX2CcNhGb5y7I=
-Received: by mail-qt1-f175.google.com with SMTP id w30so19839419qta.8;
-        Tue, 09 Apr 2019 07:03:18 -0700 (PDT)
-X-Gm-Message-State: APjAAAX/xYR6DkFbAFo//MVYwcgtNblb0rJrxP8ELkmV1mxgmSTh3iG1
-        3OdwhMr9xzVAomCVgZrWmNrxaZyb/KnTliOxSg==
-X-Google-Smtp-Source: APXvYqyM1Tx6vJxXx8cKc8TxTrSOj9IYi5Zc7ZXbQ30spZ1kCR6fFeW4/jgz39Hu1EQR2VTkmD3CLad6R/scmcN5d9I=
-X-Received: by 2002:a0c:b919:: with SMTP id u25mr29990006qvf.216.1554818598130;
- Tue, 09 Apr 2019 07:03:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <1554359858-21049-1-git-send-email-rjliao@codeaurora.org>
- <1554368908-22017-1-git-send-email-rjliao@codeaurora.org> <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
- <535c74d4-00b1-eef2-578a-8807f4b9f640@free.fr> <319cbb5f23ed3d9f1ae77c697001378d@codeaurora.org>
-In-Reply-To: <319cbb5f23ed3d9f1ae77c697001378d@codeaurora.org>
-From:   Rob Herring <robh+dt@kernel.org>
-Date:   Tue, 9 Apr 2019 09:03:07 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqKLL8x63wzpi2tfNfvVe5TX=Uxz+owPZbhevhW-84bDAA@mail.gmail.com>
-Message-ID: <CAL_JsqKLL8x63wzpi2tfNfvVe5TX=Uxz+owPZbhevhW-84bDAA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: bluetooth: Add device property
- nvm-postfix for QCA6174
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     Marc Gonzalez <marc.w.gonzalez@free.fr>,
+        id S1726001AbfDIO0L (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 9 Apr 2019 10:26:11 -0400
+X-Greylist: delayed 571 seconds by postgrey-1.27 at vger.kernel.org; Tue, 09 Apr 2019 10:26:10 EDT
+Received: from ferry-quad.fritz.box (cust-178-250-146-69.breedbanddelft.nl [178.250.146.69])
+        by radex-web.radex.nl (Postfix) with ESMTPS id 830212404C;
+        Tue,  9 Apr 2019 16:16:37 +0200 (CEST)
+Received: from ferry by ferry-quad.fritz.box with local (Exim 4.91)
+        (envelope-from <ferry@exalondelft.nl>)
+        id 1hDrYD-00054f-AI; Tue, 09 Apr 2019 16:16:37 +0200
+From:   Ferry Toth <ftoth@exalondelft.nl>
+Cc:     andriy.shevchenko@linux.intel.com, wagi@monom.org,
+        Ferry Toth <ftoth@exalondelft.nl>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btbcm: Add default address for BCM43341B
+Date:   Tue,  9 Apr 2019 16:15:50 +0200
+Message-Id: <20190409141550.19458-1-ftoth@exalondelft.nl>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Apr 9, 2019 at 5:15 AM Rocky Liao <rjliao@codeaurora.org> wrote:
->
-> On 2019-04-04 20:32, Marc Gonzalez wrote:
-> > +robh
-> >
-> > On 04/04/2019 11:08, Rocky Liao wrote:
-> >
-> >> This patchs patch adds an optional device property nvm-postfix to
-> >> allow the
-> >> driver to load customized nvm file based on this property
-> >
-> > While text /before/ is indeed called a "prefix", text /after/ is not a
-> > "postfix",
-> > but a "suffix".
-> >
-> >
-> >>  Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
-> >>  1 file changed, 2 insertions(+)
-> >>
-> >> diff --git
-> >> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> index 824c0e2..70cda4b 100644
-> >> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> @@ -16,6 +16,7 @@ Optional properties for compatible string
-> >> qcom,qca6174-bt:
-> >>
-> >>   - enable-gpios: gpio specifier used to enable chip
-> >>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
-> >> + - nvm-postfix: nvm file postfix to load customized nvm file
-> >
-> > The device tree is supposed to describe hardware.
-> >
-> > The name of which file to load can hardly be considered part of the HW.
-> >
-> > Possible solutions:
-> > 1) derive the file name from the compatible string
-> > 2) pass the name as a module parameter
-> > 3) something else
-> >
-> >
-> >> @@ -39,6 +40,7 @@ serial@7570000 {
-> >>
-> >>              enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-> >>              clocks = <&divclk4>;
-> >> +            nvm-postfix = "i2s";
-> >>      };
-> >>  };
-> >
-> > If one provides the entire suffix, including the underscore, then you
-> > can
-> > simplify the code:
-> >
-> >       snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x%s.bin",
-> > soc_ver, suffix ? suffix : "");
-> >
-> > Regards
-> .
-> Hi Marc,
->
-> The major purpose for that property is about the BT audio bus type, can
-> it be considered as part of the HW? If yes maybe we can use a property
-> name "audio-bus" to reflect that.
->
-> If not then I will adopt the solution 1 to add a new compatible string
-> "{ .compatible = "qcom,qca6174-bt-i2s" }" and load specific nvm for this
-> compatible string, please feel free to let me know if any other
-> concerns.
+The BCM43341B has the default MAC address 43:34:1B:00:1F:AC if none
+is given. This address was found when enabling Bluetooth on multiple
+Intel Edison modules. It also contains the sequence 43341B, the name
+the chip identifies itself as. Using the same BD_ADDR is problematic
+when having multiple Intel Edison modules in each others range.
+The default address also has the LAA (locally administered address)
+bit set which prevents a BNEP device from being created, needed for
+BT tethering.
 
-I don't think the suggestion was to add the nvm string to the
-compatible, but rather compatible strings serve as a map key. Having
-board specific firmware files for wifi/bt is pretty common, but
-parameters for 'i2s' is a bit strange. So a better explanation of what
-parameters this contains would help. How/when does it vary, for
-example?
+Add this to the list of black listed default MAC addresses and let
+the user configure a valid one using f.i.
+`btmgmt -i hci0 public-addr xx:xx:xx:xx:xx:xx`
 
-Also, if it is only a handful of parameters, making them DT properties
-is preferred.
+Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Ferry Toth <ftoth@exalondelft.nl>
+---
+ drivers/bluetooth/btbcm.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Rob
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index d5d6e6e5da3b..62d3aa2b26f6 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -37,6 +37,7 @@
+ #define BDADDR_BCM43430A0 (&(bdaddr_t) {{0xac, 0x1f, 0x12, 0xa0, 0x43, 0x43}})
+ #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
+ #define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
++#define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
+ 
+ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ {
+@@ -82,7 +83,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM20702A1) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1) ||
+-	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0)) {
++	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+ 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+ 			    &bda->bdaddr);
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+-- 
+2.19.1
+
