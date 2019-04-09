@@ -2,102 +2,112 @@ Return-Path: <SRS0=4NR/=SL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2273C10F0E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 15:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BA6C10F0E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 16:36:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8C332084F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 15:26:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36E832133D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Apr 2019 16:36:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Cv/MNIaA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726626AbfDIP0L (ORCPT
+        id S1726576AbfDIQgh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Apr 2019 11:26:11 -0400
-Received: from smtp.radex.nl ([178.250.146.7]:33297 "EHLO radex-web.radex.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726456AbfDIP0L (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Apr 2019 11:26:11 -0400
-X-Greylist: delayed 507 seconds by postgrey-1.27 at vger.kernel.org; Tue, 09 Apr 2019 11:26:10 EDT
-Received: from [192.168.1.22] (cust-178-250-146-69.breedbanddelft.nl [178.250.146.69])
-        by radex-web.radex.nl (Postfix) with ESMTPS id B9AC224052;
-        Tue,  9 Apr 2019 17:17:41 +0200 (CEST)
-Subject: Re: [PATCH] Bluetooth: btbcm: Add default address for BCM43341B
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     wagi@monom.org, Marcel Holtmann <marcel@holtmann.org>,
+        Tue, 9 Apr 2019 12:36:37 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:33423 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726372AbfDIQgh (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 9 Apr 2019 12:36:37 -0400
+Received: by mail-pf1-f196.google.com with SMTP id h5so5418512pfo.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Apr 2019 09:36:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ZbMpZbRnUTFEXDQLgX9+Zlogt63k0YgCAkVAWzWlJ8w=;
+        b=Cv/MNIaAjoMU8AOj0RLccvJL39r1bG77lFm3QHBfTn8Too7t3iBmPJu7Z5WXJYPvSN
+         8FmeOqqbP6XNNNip5Tvukw2mXXaaPKYdGrwaGMOoAq5LUd3HHD+h1W/Euzm+fy8sMhut
+         dLZjM80j1R/uUk8GkFTnaDHKBbPB60c1kl2/E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ZbMpZbRnUTFEXDQLgX9+Zlogt63k0YgCAkVAWzWlJ8w=;
+        b=dCZEIyeTKX4J5iT8SdT9zcpbJd6w+Mel2Wsi1ciMzHPjLexW/cPdQdMhGqj/n4sitj
+         f9zki0dq/2mYIiC0db/befuMSeMMIW3dAa+PNwH5LRMJDroV2e5NxTVnK4II34v5strx
+         XnHa4ayNY/R+S9CrjVYv4wQkybquETEiQ+O45KkylSlqIO9bs7EpmXBIwtf/5PgcHhdP
+         eth5R4EtBbvR3psB5y/t+PWiBYeA4d7WF4Ly/mylJFPgsCJvFfSKj2aTeG9W9vpNtvlX
+         k1pBD+XodcqPyGA7FHkmHp044InscQjpF/8RG1V0pyb+E1ImlAjAKRA1YfHvrCN+ar29
+         AWWA==
+X-Gm-Message-State: APjAAAW9OlsFU1wk+fiaWeUk0InHJY17HUbcOUtxmpf4rqkPugKm3D/1
+        0pq/DQ1ZGrLLwx+a8sfrOl/t5mHJ9hRhGA==
+X-Google-Smtp-Source: APXvYqxFQCSBZ9faeE/pcs9NfTyUcYpEw+BGg89qI/c2JnmDDN/k5RkNq9NmHjfYQgXhIvcSYmyRvA==
+X-Received: by 2002:a63:e402:: with SMTP id a2mr36262869pgi.268.1554827796585;
+        Tue, 09 Apr 2019 09:36:36 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id l2sm34708768pgl.2.2019.04.09.09.36.35
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 09 Apr 2019 09:36:35 -0700 (PDT)
+Date:   Tue, 9 Apr 2019 09:36:35 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     c-hbandi@codeaurora.org, Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190409141550.19458-1-ftoth@exalondelft.nl>
- <20190409144511.GO9224@smile.fi.intel.com>
-From:   Ferry Toth <ftoth@exalondelft.nl>
-Message-ID: <c9d4f373-8c2c-19cf-54c1-e3f0fa6b083d@exalondelft.nl>
-Date:   Tue, 9 Apr 2019 17:17:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hemantg <hemantg@codeaurora.org>
+Subject: Re: [PATCH 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change
+ vendor event
+Message-ID: <20190409163635.GU112750@google.com>
+References: <20190307182009.GB138592@google.com>
+ <20190307233039.GA69116@google.com>
+ <c985a6712f91930d7c710ca4abb42e80@codeaurora.org>
+ <a03acbdc6bfad172fdd65f428ffbe4cf@codeaurora.org>
+ <20190401171202.GH112750@google.com>
+ <1bebaf0766988a9f27cbbcb9bb35e26f@codeaurora.org>
+ <20190402180501.GK112750@google.com>
+ <1200f5c32e029c603667d66a4c62a634@codeaurora.org>
+ <20190403161438.GN112750@google.com>
+ <a3bde5419145e9dccc2886d2d29c9d3f@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <20190409144511.GO9224@smile.fi.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a3bde5419145e9dccc2886d2d29c9d3f@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Thu, Apr 04, 2019 at 08:22:15PM +0530, Balakrishna Godavarthi wrote:
+> Hi Matthias,
+> 
+> On 2019-04-03 21:44, Matthias Kaehlcke wrote:
+> > On Wed, Apr 03, 2019 at 11:53:26AM +0530, Balakrishna Godavarthi wrote:
+> > > + Harish to update his findings on wcn3998.
+> > > Mean time i will perform a regression to detect the failure.
+> > 
+> > On my system it typically reproduces within a few dozen
+> > iterations. Make sure your tree doesn't contain any custom BT patches,
+> > even if they just add logging or fix the timeout during
+> > initialization. Since this problem is timing sensitive it might get
+> > masked. My tree is based on 4.19 LTS with all QCA BT related changes
+> > on top:
+> > https://chromium.googlesource.com/chromiumos/third_party/kernel/+/refs/heads/chromeos-4.19
+> > 
+> > I found some problems during initialization easier to reproduce
+> > when binding and unbinding the device through sysfs, instead of
+> > doing hciconfig up/down, this resembles more the initialization at
+> > boot time.
+> > 
+> [Bala]: I am able to replicate this issue.
+>         are you seeing the below error message getting logged on the console
+> in the issue case or an different error message.
+>         Bluetooth: hci0: QCA TLV response size mismatch
 
-Op 09-04-19 om 16:45 schreef Andy Shevchenko:
-> On Tue, Apr 09, 2019 at 04:15:50PM +0200, Ferry Toth wrote:
->> The BCM43341B has the default MAC address 43:34:1B:00:1F:AC if none
->> is given. This address was found when enabling Bluetooth on multiple
->> Intel Edison modules. It also contains the sequence 43341B, the name
->> the chip identifies itself as. Using the same BD_ADDR is problematic
->> when having multiple Intel Edison modules in each others range.
->> The default address also has the LAA (locally administered address)
->> bit set which prevents a BNEP device from being created, needed for
->> BT tethering.
->>
->> Add this to the list of black listed default MAC addresses and let
->> the user configure a valid one using f.i.
->> `btmgmt -i hci0 public-addr xx:xx:xx:xx:xx:xx`
->>
-> Thank you!
->
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
->
-> P.S. It seems the To: field was empty, dunno if it prevents bots to parse the
-> original message.
->
-Sorry, is my first kernel patch. Seems it has been picked up by 
-marc.info and gmane, so I hope those are representative.
->> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
->> Signed-off-by: Ferry Toth <ftoth@exalondelft.nl>
->> ---
->>   drivers/bluetooth/btbcm.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->> index d5d6e6e5da3b..62d3aa2b26f6 100644
->> --- a/drivers/bluetooth/btbcm.c
->> +++ b/drivers/bluetooth/btbcm.c
->> @@ -37,6 +37,7 @@
->>   #define BDADDR_BCM43430A0 (&(bdaddr_t) {{0xac, 0x1f, 0x12, 0xa0, 0x43, 0x43}})
->>   #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
->>   #define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
->> +#define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
->>   
->>   int btbcm_check_bdaddr(struct hci_dev *hdev)
->>   {
->> @@ -82,7 +83,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
->>   	    !bacmp(&bda->bdaddr, BDADDR_BCM20702A1) ||
->>   	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
->>   	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1) ||
->> -	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0)) {
->> +	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
->> +	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
->>   		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
->>   			    &bda->bdaddr);
->>   		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
->> -- 
->> 2.19.1
->>
+Yes, that's the error message. The size doesn't match because the
+driver expects a TLV response but gets a baud rate response.
