@@ -2,464 +2,296 @@ Return-Path: <SRS0=/qBL=SM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F333C10F11
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 10:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7F9C10F11
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 15:53:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 340DE206B7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 10:23:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gEqXSoiL"
+	by mail.kernel.org (Postfix) with ESMTP id 86E6920830
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 15:53:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729002AbfDJKX4 (ORCPT
+        id S1731328AbfDJPxZ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Apr 2019 06:23:56 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:36666 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726799AbfDJKX4 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Apr 2019 06:23:56 -0400
-Received: by mail-ed1-f67.google.com with SMTP id u57so896437edm.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2019 03:23:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zlpPcWjIEuS/91TSlMW5f8BmtzzkrusreJOG0HJ1+h0=;
-        b=gEqXSoiLFYjMcwL3hjP/y1S2MyVudsnevJ+AFtVSVnymYv50C9isiVv1O6KFVw037j
-         pDWjMqZ7SVFTgT8NkyixJvWdTH8NfkqDwhV4mLnyomntg/y1CV5/n1qEPZop8R42KvD3
-         LFOWfh7xR+H/JxhnbbPQk96ojCneUVtASkgbVTE1CxJ+sgmjhhQFHMVxtKpebLDT/EWl
-         e+50ViGa8qZz0PsXg7GKhIesqAZtF98rxgv5kANjMiyrV5Ksue6XNbfFf+0Bu+sGs+pw
-         9/wkF5lNC03uqckYOJJ52KA7YRBuFztTlGvFSQZP4rv0zR1sWE1WkYWzUes1w9KPh435
-         jjFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zlpPcWjIEuS/91TSlMW5f8BmtzzkrusreJOG0HJ1+h0=;
-        b=QFHxHl0jeCncv8GlDKXm6ZuIZw9NnDV0WRKSPi5583bqBQCQQ5vEUJiOFO9IVCXloB
-         8cpUX67EML0F2KV+Wu3hThQv2jEorHC9scSS0klg1Jh1kVhYgQU3zwdAH0BHmYtyognX
-         omtYLs0/Z46+1YI/R/EEcqJdPWlGmQTzFHbqrxwkX0Cn9/dP5TV0XJFGbWiDzPd3F+ZN
-         gj8a/8accc1pVTvZt2pl4cfCK3OGqv+dY3oO2YNSH03+zMyJ+2WB4w/BORwPpCyURjHr
-         iKaRAJLy8WhC4ox6yaF1Uqla6lORr/L91tAsOB99SxxR9KRGulEdSuJS2VAweqzpQREJ
-         TCeQ==
-X-Gm-Message-State: APjAAAXJcH9Flb6Hna1G2cqD9R9oNqd5EPH7ZzMs+eZHAiylclQuHQa5
-        fLsBE8pr5+fxsv2pH/cFvsHjmsMt2qg=
-X-Google-Smtp-Source: APXvYqxhvXXuFbfs/h/pbw4DFn/BXDuHpQof4aDhJ/UW5gSSU8EvM4baFicSZRjrxqeIFp/Vsa3YqQ==
-X-Received: by 2002:a50:eb4d:: with SMTP id z13mr27279500edp.200.1554891833803;
-        Wed, 10 Apr 2019 03:23:53 -0700 (PDT)
-Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id p20sm10076738edq.62.2019.04.10.03.23.52
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 10 Apr 2019 03:23:52 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-db: Simplify attribute lookup
-Date:   Wed, 10 Apr 2019 13:23:50 +0300
-Message-Id: <20190410102350.27781-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.20.1
+        Wed, 10 Apr 2019 11:53:25 -0400
+Received: from mga18.intel.com ([134.134.136.126]:46046 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730219AbfDJPxY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 10 Apr 2019 11:53:24 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Apr 2019 08:53:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,332,1549958400"; 
+   d="scan'208";a="163109530"
+Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
+  by fmsmga001.fm.intel.com with ESMTP; 10 Apr 2019 08:53:23 -0700
+Received: from orsmsx159.amr.corp.intel.com (10.22.240.24) by
+ ORSMSX104.amr.corp.intel.com (10.22.225.131) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Wed, 10 Apr 2019 08:53:23 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
+ ORSMSX159.amr.corp.intel.com ([169.254.11.86]) with mapi id 14.03.0415.000;
+ Wed, 10 Apr 2019 08:53:23 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH BlueZ] mesh: Create and store random token per node
+Thread-Topic: [PATCH BlueZ] mesh: Create and store random token per node
+Thread-Index: AQHU6zfSCUuskt4eWUe+S//3GBneKqY1lHeA
+Date:   Wed, 10 Apr 2019 15:53:22 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4376CAF5D3E@ORSMSX103.amr.corp.intel.com>
+References: <20190404224314.10694-1-brian.gix@intel.com>
+In-Reply-To: <20190404224314.10694-1-brian.gix@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMTY5MWY1NTgtMTBmNi00YjMxLWEyOTYtN2Q2YTczMzE4NDVhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoieGF5U0FMVXpHaitwMVwvTlwvY1I4RWNTTWs1SjVzWTNLeVMrTGpQamtWYk1FWmpBWjgxNXZWbCszQ21kN1BxQzBcLyJ9
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-originating-ip: [10.22.254.140]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This consolidates attribute lookup into gatt_db_foreach_in_range and
-instead of using custom code for each operation.
----
- src/shared/gatt-db.c | 251 +++++++++++++++++--------------------------
- src/shared/gatt-db.h |   6 ++
- 2 files changed, 105 insertions(+), 152 deletions(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 7b8d72325..dcfb2093e 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1126,53 +1126,24 @@ bool gatt_db_service_get_claimed(struct gatt_db_attribute *attrib)
- 	return attrib->service->claimed;
- }
- 
-+static void read_by_group_type(struct gatt_db_attribute *attribute,
-+						void *user_data)
-+{
-+	struct queue *queue = user_data;
-+
-+	queue_push_tail(queue, attribute);
-+}
-+
- void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
- 							const bt_uuid_t type,
- 							struct queue *queue)
- {
--	const struct queue_entry *services_entry;
--	struct gatt_db_service *service;
--	uint16_t grp_start, grp_end, uuid_size;
--
--	uuid_size = 0;
--
--	services_entry = queue_get_entries(db->services);
--
--	while (services_entry) {
--		service = services_entry->data;
--
--		if (!service->active)
--			goto next_service;
--
--		if (bt_uuid_cmp(&type, &service->attributes[0]->uuid))
--			goto next_service;
--
--		grp_start = service->attributes[0]->handle;
--		grp_end = grp_start + service->num_handles - 1;
--
--		if (grp_end < start_handle || grp_start > end_handle)
--			goto next_service;
--
--		if (grp_start < start_handle || grp_start > end_handle)
--			goto next_service;
--
--		if (!uuid_size)
--			uuid_size = service->attributes[0]->value_len;
--		else if (uuid_size != service->attributes[0]->value_len)
--			return;
--
--		queue_push_tail(queue, service->attributes[0]);
--
--next_service:
--		services_entry = services_entry->next;
--	}
-+	gatt_db_foreach_service_in_range(db, &type, read_by_group_type, queue,
-+						start_handle, end_handle);
- }
- 
- struct find_by_type_value_data {
--	bt_uuid_t uuid;
--	uint16_t start_handle;
--	uint16_t end_handle;
- 	gatt_db_attribute_cb_t func;
- 	void *user_data;
- 	const void *value;
-@@ -1183,39 +1154,19 @@ struct find_by_type_value_data {
- static void find_by_type(struct gatt_db_attribute *attribute, void *user_data)
- {
- 	struct find_by_type_value_data *search_data = user_data;
--	struct gatt_db_service *service = attribute->service;
--	int i;
--
--	if (!service->active)
--		return;
--
--	for (i = 0; i < service->num_handles; i++) {
--		attribute = service->attributes[i];
- 
--		if (!attribute)
--			continue;
--
--		if ((attribute->handle < search_data->start_handle) ||
--				(attribute->handle > search_data->end_handle))
--			continue;
--
--		if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
--			continue;
--
--		/* TODO: fix for read-callback based attributes */
--		if (search_data->value) {
--			if (search_data->value_len != attribute->value_len)
--				continue;
--
--			if (memcmp(attribute->value, search_data->value,
--					search_data->value_len)) {
--				continue;
--			}
--		}
-+	/* TODO: fix for read-callback based attributes */
-+	if (search_data->value) {
-+		if (search_data->value_len != attribute->value_len)
-+			return;
- 
--		search_data->num_of_res++;
--		search_data->func(attribute, search_data->user_data);
-+		if (memcmp(attribute->value, search_data->value,
-+					search_data->value_len))
-+			return;
- 	}
-+
-+	search_data->num_of_res++;
-+	search_data->func(attribute, search_data->user_data);
- }
- 
- unsigned int gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
-@@ -1228,13 +1179,10 @@ unsigned int gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
- 
- 	memset(&data, 0, sizeof(data));
- 
--	data.uuid = *type;
--	data.start_handle = start_handle;
--	data.end_handle = end_handle;
- 	data.func = func;
- 	data.user_data = user_data;
- 
--	gatt_db_foreach_service_in_range(db, NULL, find_by_type, &data,
-+	gatt_db_foreach_in_range(db, type, find_by_type, &data,
- 						start_handle, end_handle);
- 
- 	return data.num_of_res;
-@@ -1251,52 +1199,22 @@ unsigned int gatt_db_find_by_type_value(struct gatt_db *db,
- {
- 	struct find_by_type_value_data data;
- 
--	data.uuid = *type;
--	data.start_handle = start_handle;
--	data.end_handle = end_handle;
- 	data.func = func;
- 	data.user_data = user_data;
- 	data.value = value;
- 	data.value_len = value_len;
- 
--	gatt_db_foreach_service_in_range(db, NULL, find_by_type, &data,
-+	gatt_db_foreach_in_range(db, type, find_by_type, &data,
- 						start_handle, end_handle);
- 
- 	return data.num_of_res;
- }
- 
--struct read_by_type_data {
--	struct queue *queue;
--	bt_uuid_t uuid;
--	uint16_t start_handle;
--	uint16_t end_handle;
--};
--
- static void read_by_type(struct gatt_db_attribute *attribute, void *user_data)
- {
--	struct read_by_type_data *search_data = user_data;
--	struct gatt_db_service *service = attribute->service;
--	int i;
--
--	if (!service->active)
--		return;
--
--	for (i = 0; i < service->num_handles; i++) {
--		attribute = service->attributes[i];
--		if (!attribute)
--			continue;
--
--		if (attribute->handle < search_data->start_handle)
--			continue;
-+	struct queue *queue = user_data;
- 
--		if (attribute->handle > search_data->end_handle)
--			return;
--
--		if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
--			continue;
--
--		queue_push_tail(search_data->queue, attribute);
--	}
-+	queue_push_tail(queue, attribute);
- }
- 
- void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
-@@ -1304,59 +1222,24 @@ void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
- 						const bt_uuid_t type,
- 						struct queue *queue)
- {
--	struct read_by_type_data data;
--	data.uuid = type;
--	data.start_handle = start_handle;
--	data.end_handle = end_handle;
--	data.queue = queue;
--
--	gatt_db_foreach_service_in_range(db, NULL, read_by_type, &data,
-+	gatt_db_foreach_in_range(db, &type, read_by_type, queue,
- 						start_handle, end_handle);
- }
- 
- 
--struct find_information_data {
--	struct queue *queue;
--	uint16_t start_handle;
--	uint16_t end_handle;
--};
--
- static void find_information(struct gatt_db_attribute *attribute,
- 						void *user_data)
- {
--	struct find_information_data *search_data = user_data;
--	struct gatt_db_service *service = attribute->service;
--	int i;
-+	struct queue *queue = user_data;
- 
--	if (!service->active)
--		return;
--
--	for (i = 0; i < service->num_handles; i++) {
--		attribute = service->attributes[i];
--		if (!attribute)
--			continue;
--
--		if (attribute->handle < search_data->start_handle)
--			continue;
--
--		if (attribute->handle > search_data->end_handle)
--			return;
--
--		queue_push_tail(search_data->queue, attribute);
--	}
-+	queue_push_tail(queue, attribute);
- }
- 
- void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
- 							struct queue *queue)
- {
--	struct find_information_data data;
--
--	data.start_handle = start_handle;
--	data.end_handle = end_handle;
--	data.queue = queue;
--
--	gatt_db_foreach_service_in_range(db, NULL, find_information, &data,
-+	gatt_db_foreach_in_range(db, NULL, find_information, queue,
- 						start_handle, end_handle);
- }
- 
-@@ -1373,29 +1256,71 @@ struct foreach_data {
- 	const bt_uuid_t *uuid;
- 	void *user_data;
- 	uint16_t start, end;
-+	bool attr;
- };
- 
- static void foreach_service_in_range(void *data, void *user_data)
- {
- 	struct gatt_db_service *service = data;
-+	struct gatt_db_attribute *attribute = service->attributes[0];
- 	struct foreach_data *foreach_data = user_data;
--	uint16_t svc_start, svc_end;
- 	bt_uuid_t uuid;
- 
-+	if (foreach_data->uuid) {
-+		gatt_db_attribute_get_service_uuid(attribute, &uuid);
-+		if (bt_uuid_cmp(&uuid, foreach_data->uuid)) {
-+			/* Compare with attribute UUID in case it is a lookup
-+			 * by group type.
-+			 */
-+			if (bt_uuid_cmp(&attribute->uuid, foreach_data->uuid))
-+				return;
-+		}
-+	}
-+
-+	foreach_data->func(service->attributes[0], foreach_data->user_data);
-+}
-+
-+static void foreach_in_range(void *data, void *user_data)
-+{
-+	struct gatt_db_service *service = data;
-+	struct foreach_data *foreach_data = user_data;
-+	uint16_t svc_start, svc_end;
-+	int i;
-+
-+	if (!service->active)
-+		return;
-+
- 	gatt_db_service_get_handles(service, &svc_start, &svc_end);
- 
- 	/* Check if service is within requested range */
- 	if (svc_start > foreach_data->end || svc_end < foreach_data->start)
- 		return;
- 
--	if (foreach_data->uuid) {
--		gatt_db_attribute_get_service_uuid(service->attributes[0],
--									&uuid);
--		if (bt_uuid_cmp(&uuid, foreach_data->uuid))
-+	if (!foreach_data->attr) {
-+		if (svc_start < foreach_data->start ||
-+					svc_start > foreach_data->end)
- 			return;
-+		return foreach_service_in_range(data, user_data);
- 	}
- 
--	foreach_data->func(service->attributes[0], foreach_data->user_data);
-+	for (i = 0; i < service->num_handles; i++) {
-+		struct gatt_db_attribute *attribute = service->attributes[i];
-+
-+		if (!attribute)
-+			continue;
-+
-+		if (attribute->handle < foreach_data->start)
-+			continue;
-+
-+		if (attribute->handle > foreach_data->end)
-+			return;
-+
-+		if (foreach_data->uuid && bt_uuid_cmp(foreach_data->uuid,
-+							&attribute->uuid))
-+			continue;
-+
-+		foreach_data->func(attribute, foreach_data->user_data);
-+	}
- }
- 
- void gatt_db_foreach_service_in_range(struct gatt_db *db,
-@@ -1415,8 +1340,30 @@ void gatt_db_foreach_service_in_range(struct gatt_db *db,
- 	data.user_data = user_data;
- 	data.start = start_handle;
- 	data.end = end_handle;
-+	data.attr = false;
-+
-+	queue_foreach(db->services, foreach_in_range, &data);
-+}
-+
-+void gatt_db_foreach_in_range(struct gatt_db *db, const bt_uuid_t *uuid,
-+						gatt_db_attribute_cb_t func,
-+						void *user_data,
-+						uint16_t start_handle,
-+						uint16_t end_handle)
-+{
-+	struct foreach_data data;
-+
-+	if (!db || !func || start_handle > end_handle)
-+		return;
-+
-+	data.func = func;
-+	data.uuid = uuid;
-+	data.user_data = user_data;
-+	data.start = start_handle;
-+	data.end = end_handle;
-+	data.attr = true;
- 
--	queue_foreach(db->services, foreach_service_in_range, &data);
-+	queue_foreach(db->services, foreach_in_range, &data);
- }
- 
- void gatt_db_service_foreach(struct gatt_db_attribute *attrib,
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 398d69ad8..08f037428 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -168,6 +168,12 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
- void gatt_db_foreach_service(struct gatt_db *db, const bt_uuid_t *uuid,
- 						gatt_db_attribute_cb_t func,
- 						void *user_data);
-+void gatt_db_foreach_in_range(struct gatt_db *db, const bt_uuid_t *uuid,
-+						gatt_db_attribute_cb_t func,
-+						void *user_data,
-+						uint16_t start_handle,
-+						uint16_t end_handle);
-+
- void gatt_db_foreach_service_in_range(struct gatt_db *db,
- 						const bt_uuid_t *uuid,
- 						gatt_db_attribute_cb_t func,
--- 
-2.20.1
+> -----Original Message-----
+> From: Gix, Brian
+> Sent: Thursday, April 4, 2019 3:43 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: Gix, Brian <brian.gix@intel.com>
+> Subject: [PATCH BlueZ] mesh: Create and store random token per node
+> 
+> Fix issue with device key being used as a token. Token now seperate, and
+> with a portable representation in the node database.
+> ---
+>  mesh/mesh-db.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  mesh/mesh-db.h |  2 ++
+>  mesh/mesh.c    |  6 +++---
+>  mesh/node.c    | 22 ++++++++++++++++++++--
+>  mesh/node.h    |  2 ++
+>  mesh/storage.c |  5 +++++
+>  6 files changed, 70 insertions(+), 5 deletions(-)
+> 
+> diff --git a/mesh/mesh-db.c b/mesh/mesh-db.c index f1bf8d8fa..64e33cd91
+> 100644
+> --- a/mesh/mesh-db.c
+> +++ b/mesh/mesh-db.c
+> @@ -51,6 +51,21 @@ static bool get_int(json_object *jobj, const char
+> *keyword, int *value)
+>  	return true;
+>  }
+> 
+> +static bool add_u64_value(json_object *jobject, const char *desc,
+> +					const uint8_t u64[8])
+> +{
+> +	json_object *jstring;
+> +	char hexstr[17];
+> +
+> +	hex2str((uint8_t *) u64, 8, hexstr, 17);
+> +	jstring = json_object_new_string(hexstr);
+> +	if (!jstring)
+> +		return false;
+> +
+> +	json_object_object_add(jobject, desc, jstring);
+> +	return true;
+> +}
+> +
+>  static bool add_key_value(json_object *jobject, const char *desc,
+>  					const uint8_t key[16])
+>  {
+> @@ -257,6 +272,24 @@ bool mesh_db_read_iv_index(json_object *jobj,
+> uint32_t *idx, bool *update)
+>  	return true;
+>  }
+> 
+> +bool mesh_db_read_token(json_object *jobj, uint8_t token[8]) {
+> +	json_object *jvalue;
+> +	char *str;
+> +
+> +	if (!token)
+> +		return false;
+> +
+> +	if (!json_object_object_get_ex(jobj, "token", &jvalue))
+> +		return false;
+> +
+> +	str = (char *)json_object_get_string(jvalue);
+> +	if (!str2hex(str, strlen(str), token, 8))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16])  {
+>  	json_object *jvalue;
+> @@ -515,6 +548,11 @@ bool mesh_db_write_device_key(json_object
+> *jnode, uint8_t *key)
+>  	return add_key_value(jnode, "deviceKey", key);  }
+> 
+> +bool mesh_db_write_token(json_object *jnode, uint8_t *token) {
+> +	return add_u64_value(jnode, "token", token); }
+> +
+>  bool mesh_db_app_key_add(json_object *jobj, uint16_t net_idx, uint16_t
+> app_idx,
+>  							const uint8_t key[16])
+>  {
+> diff --git a/mesh/mesh-db.h b/mesh/mesh-db.h index b9af1203b..06aba1f31
+> 100644
+> --- a/mesh/mesh-db.h
+> +++ b/mesh/mesh-db.h
+> @@ -104,6 +104,7 @@ bool mesh_db_read_node(json_object *jobj,
+> mesh_db_node_cb cb, void *user_data);  bool
+> mesh_db_add_node(json_object *jnode, struct mesh_db_node *node);
+> bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool
+> *update);  bool mesh_db_read_device_key(json_object *jobj, uint8_t
+> key_buf[16]);
+> +bool mesh_db_read_token(json_object *jobj, uint8_t token[8]);
+>  bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
+>  							uint16_t *interval);
+>  bool mesh_db_write_net_transmit(json_object *jobj, uint8_t cnt, @@ -
+> 113,6 +114,7 @@ bool mesh_db_read_net_keys(json_object *jobj,
+> mesh_db_net_key_cb cb,  bool mesh_db_read_app_keys(json_object
+> *jobj, mesh_db_app_key_cb cb,
+>  							void *user_data);
+>  bool mesh_db_write_device_key(json_object *jobj, uint8_t *key);
+> +bool mesh_db_write_token(json_object *jobj, uint8_t *token);
+>  bool mesh_db_write_network_key(json_object *jobj, uint16_t idx, uint8_t
+> *key,
+>  						uint8_t *new_key, int
+> phase);
+>  bool mesh_db_write_app_key(json_object *jobj, uint16_t net_idx, diff --git
+> a/mesh/mesh.c b/mesh/mesh.c index a0a9a7c8e..e7eef0473 100644
+> --- a/mesh/mesh.c
+> +++ b/mesh/mesh.c
+> @@ -487,7 +487,7 @@ static bool prov_complete_cb(void *user_data,
+> uint8_t status,
+>  	struct l_dbus_message *msg;
+>  	const char *owner;
+>  	const char *path;
+> -	const uint8_t *dev_key;
+> +	const uint8_t *token;
+> 
+>  	l_debug("Provisioning complete %s", prov_status_str(status));
+> 
+> @@ -506,13 +506,13 @@ static bool prov_complete_cb(void *user_data,
+> uint8_t status,
+>  		return false;
+>  	}
+> 
+> -	dev_key = node_get_device_key(join_pending->node);
+> +	token = node_get_token(join_pending->node);
+> 
+>  	msg = l_dbus_message_new_method_call(dbus, owner, path,
+> 
+> 	MESH_APPLICATION_INTERFACE,
+>  						"JoinComplete");
+> 
+> -	l_dbus_message_set_arguments(msg, "t", l_get_u64(dev_key));
+> +	l_dbus_message_set_arguments(msg, "t", l_get_be64(token));
+> 
+>  	l_dbus_send(dbus_get_bus(), msg);
+> 
+> diff --git a/mesh/node.c b/mesh/node.c
+> index 79221b5e2..dae9a4b79 100644
+> --- a/mesh/node.c
+> +++ b/mesh/node.c
+> @@ -91,6 +91,7 @@ struct mesh_node {
+>  	} relay;
+>  	uint8_t dev_uuid[16];
+>  	uint8_t dev_key[16];
+> +	uint8_t token[8];
+>  	uint8_t num_ele;
+>  	uint8_t ttl;
+>  	uint8_t lpn;
+> @@ -132,7 +133,7 @@ static bool match_token(const void *a, const void *b)
+> {
+>  	const struct mesh_node *node = a;
+>  	const uint64_t *token = b;
+> -	const uint64_t tmp = l_get_u64(node->dev_key);
+> +	const uint64_t tmp = l_get_be64(node->token);
+> 
+>  	return *token == tmp;
+>  }
+> @@ -453,6 +454,19 @@ const uint8_t *node_get_device_key(struct
+> mesh_node *node)
+>  		return node->dev_key;
+>  }
+> 
+> +void node_set_token(struct mesh_node *node, uint8_t token[8]) {
+> +	memcpy(node->token, token, 8);
+> +}
+> +
+> +const uint8_t *node_get_token(struct mesh_node *node) {
+> +	if (!node)
+> +		return NULL;
+> +	else
+> +		return node->token;
+> +}
+> +
+>  uint8_t node_get_num_elements(struct mesh_node *node)  {
+>  	return node->num_ele;
+> @@ -1059,7 +1073,7 @@ static void get_managed_objects_attach_cb(struct
+> l_dbus_message *msg,
+>  	struct attach_obj_request *req = user_data;
+>  	struct mesh_node *node = req->node;
+>  	const char *path;
+> -	uint64_t token = l_get_u64(node->dev_key);
+> +	uint64_t token = l_get_be64(node->token);
+>  	uint8_t num_ele;
+> 
+>  	if (l_dbus_message_is_error(msg)) {
+> @@ -1748,6 +1762,10 @@ bool node_add_pending_local(struct mesh_node
+> *node, void *prov_node_info,
+>  	node->primary = info->unicast;
+>  	mesh_net_register_unicast(node->net, info->unicast, node-
+> >num_ele);
+> 
+> +	l_getrandom(node->token, sizeof(node->token));
+> +	if (!mesh_db_write_token(node->jconfig, node->token))
+> +		return false;
+> +
+>  	memcpy(node->dev_key, info->device_key, 16);
+>  	if (!mesh_db_write_device_key(node->jconfig, info->device_key))
+>  		return false;
+> diff --git a/mesh/node.h b/mesh/node.h
+> index 954dfca75..ebc82ffb8 100644
+> --- a/mesh/node.h
+> +++ b/mesh/node.h
+> @@ -47,6 +47,8 @@ bool node_app_key_delete(struct mesh_net *net,
+> uint16_t addr,
+>  				uint16_t net_idx, uint16_t idx);
+>  uint16_t node_get_primary(struct mesh_node *node);  uint16_t
+> node_get_primary_net_idx(struct mesh_node *node);
+> +void node_set_token(struct mesh_node *node, uint8_t token[8]); const
+> +uint8_t *node_get_token(struct mesh_node *node);
+>  void node_set_device_key(struct mesh_node *node, uint8_t key[16]);
+> const uint8_t *node_get_device_key(struct mesh_node *node);  void
+> node_set_num_elements(struct mesh_node *node, uint8_t num_ele); diff
+> --git a/mesh/storage.c b/mesh/storage.c index f04e3ec89..8a70b5696 100644
+> --- a/mesh/storage.c
+> +++ b/mesh/storage.c
+> @@ -156,6 +156,11 @@ static bool parse_node(struct mesh_node *node,
+> json_object *jnode)
+>  	if (!mesh_db_read_net_keys(jnode, read_net_keys_cb, net))
+>  		return false;
+> 
+> +	if (!mesh_db_read_token(jnode, key_buf))
+> +		return false;
+> +
+> +	node_set_token(node, key_buf);
+> +
+>  	if (!mesh_db_read_device_key(jnode, key_buf))
+>  		return false;
+> 
+> --
+> 2.14.5
 
+Applied
