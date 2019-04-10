@@ -2,180 +2,201 @@ Return-Path: <SRS0=/qBL=SM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BE4C10F14
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 08:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD02EC10F14
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 09:28:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 37F442084B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 08:29:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FF842083E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 09:28:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Is3bxtnZ"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="d4hvGje3";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="UVmemI1n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729118AbfDJI3c (ORCPT
+        id S1729310AbfDJJ2G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Apr 2019 04:29:32 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:39178 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729045AbfDJI3c (ORCPT
+        Wed, 10 Apr 2019 05:28:06 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:33672 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727583AbfDJJ2F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Apr 2019 04:29:32 -0400
-Received: by mail-wm1-f68.google.com with SMTP id n25so1558229wmk.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2019 01:29:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=0sXLJF2JE9mF3B0kRJ1ZYJizdzJQ7aB4P2Lz0zQfxJ4=;
-        b=Is3bxtnZZUZGzHtPQLCWOBjDc1QzG8ctCiUdu4ytkJZn1qsv4hfzIk51dAUyd1WWYM
-         7jWnanpc4K6H4JcJnBuIQnQIhgaeIBh/kbdHxxzUgALm0xHxApZ42BiXzAO1yXMbr3It
-         cAw6BFBN+XWAR+RdZQP6W1kYT+1gKqw+w4p/AQ3ELrFVHMocBzbH0+lcQV3cgV4GeiFX
-         I0csm6Fhm12E/uGKW3PttMyjSTGVTiSoSG1kdRWW9EYvMcKxmqUbPEOSrgYAPk2EfsXA
-         uoPzWdoQ9JkbjJFtzWHwHEQVTjZdM21R7TdW3w6mQ0CRjN9pvI9ujEdZzTgmTPQxreHb
-         ogzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=0sXLJF2JE9mF3B0kRJ1ZYJizdzJQ7aB4P2Lz0zQfxJ4=;
-        b=g/eBseR1kyNxO73fEtB0KpOK1YlK1sLP62YZQNm50p94SFcZl0o5fUIDG+kY+kIt8m
-         GXo8cqcD+xN5eWTDahlste5TDs3cGSqu4+FrNZ0jz35TRC5W7CKSSzaGrv0ATKA4pG6i
-         JJDxLmEZ2ClvZepYvsD38HMq0A6/yBz+rTcE2x6tUPAtfbeqLIaW6GfX+38qLGdvk7Ap
-         /JbFbJrkwBf0yR4IQVaDZCqdr0pEArsDbg7n4OKKRRXh6si6hObBa06J2FtRTefia+y+
-         FwiTAWB65igyQEgNeSJ8qxMyf4Cs/R8wRZtwSIOwjYX99+e6bmNN2g8yTw34HkwHgyYY
-         N4Lg==
-X-Gm-Message-State: APjAAAUSLsG89pZ4AbIUp4toHdutWUAHKjJQEFwgwqW7S7rVx+vkKuGO
-        725UGJ1xHDSlnZKEYd3RcWUVGRy2
-X-Google-Smtp-Source: APXvYqz9AAUen+RdEYH0nD8f4LG2g8t3ozue0bNljVoI9mQDx1y258D8zIyefXVR+clUb0lTbdJF3Q==
-X-Received: by 2002:a05:600c:211a:: with SMTP id u26mr1955318wml.74.1554884970054;
-        Wed, 10 Apr 2019 01:29:30 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id z74sm7946354wmc.2.2019.04.10.01.29.28
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 10 Apr 2019 01:29:29 -0700 (PDT)
-Date:   Wed, 10 Apr 2019 10:29:24 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
- HD and LDAC
-Message-ID: <20190410082924.exo2oihzd7w2oz3e@pali>
-References: <20190123174504.12350-1-pali.rohar@gmail.com>
- <8D9BABBE-2BBC-4BFE-BF7C-3BE24AF4DD10@holtmann.org>
- <20190123175448.cdkdpnk6i5r4rzjs@pali>
- <20190130081517.GI32745@reaktio.net>
- <20190130120631.usx67zjk4kmbhcla@pali>
- <CABBYNZJ5z_-8KiotL=9fkvq-gLPoqU1LJpaOBv1z4QfZiA3zaA@mail.gmail.com>
- <20190201124353.GK32745@reaktio.net>
- <20190206114300.rxw3ptq7hzathzqe@pali>
- <20190224131907.GV32745@reaktio.net>
- <20190305122630.gwnaz3y7ckzqfjfq@pali>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190305122630.gwnaz3y7ckzqfjfq@pali>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Wed, 10 Apr 2019 05:28:05 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 0E69360FF3; Wed, 10 Apr 2019 09:28:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1554888484;
+        bh=iDxB1nyDECSqWjnngbEZI2x6uq5t781WRASfh4Q/YbA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=d4hvGje3kah5HjyHPGvXjpTdaAsawRQxUgdX2NwqtKeaZBPQnOW71N762HUO/Hgcc
+         koE4TFzEgRHj84wrMDDitylmv5zj2JBezoBhWyshjXeAW1vbZVNYbv785YIfmS8LJ1
+         jcJcBvNQM9HcPQRExwp4CsdkYcEULv7U+BLQM+uA=
+Received: from rocky-HP-EliteBook-8460p.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5590460EA5;
+        Wed, 10 Apr 2019 09:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1554888481;
+        bh=iDxB1nyDECSqWjnngbEZI2x6uq5t781WRASfh4Q/YbA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=UVmemI1ng7AraZCaHG09ba/TNI5eLBnr5N0GqwHFhRJGqJUr3A+zCwj3Xu2c9Eeay
+         qS4mjcHXfyeAPN1QXS1wePbC++rppKeUAAGrncl8BGXsvtuei60VxUumI4dS0GXvET
+         ER3CZwyJXtfwmBGGZ22H75a1zBimRnuYuO5adUu4=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 5590460EA5
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, thierry.escande@linaro.org
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v3 1/2] Bluetooth: hci_qca: Load customized NVM based on the device property
+Date:   Wed, 10 Apr 2019 17:27:31 +0800
+Message-Id: <1554888451-17518-1-git-send-email-rjliao@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <1554368908-22017-1-git-send-email-rjliao@codeaurora.org>
+References: <1554368908-22017-1-git-send-email-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tuesday 05 March 2019 13:26:30 Pali Rohár wrote:
-> On Sunday 24 February 2019 15:19:07 Pasi Kärkkäinen wrote:
-> > On Wed, Feb 06, 2019 at 12:43:00PM +0100, Pali Rohár wrote:
-> > > On Friday 01 February 2019 14:43:53 Pasi Kärkkäinen wrote:
-> > > > Hi,
-> > > > 
-> > > > On Wed, Jan 30, 2019 at 02:24:11PM +0200, Luiz Augusto von Dentz wrote:
-> > > > > Hi Pali, Pasi,
-> > > > > On Wed, Jan 30, 2019 at 2:09 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> > > > > >
-> > > > > > On Wednesday 30 January 2019 10:15:17 Pasi Kärkkäinen wrote:
-> > > > > > > On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Rohár wrote:
-> > > > > > > > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
-> > > > > > > > > Hi Pali,
-> > > > > > > > >
-> > > > > > > > > > ---
-> > > > > > > > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++---
-> > > > > > > > > > 1 file changed, 55 insertions(+), 3 deletions(-)
-> > > > > > > > > >
-> > > > > > > > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-> > > > > > > > > > index 18569c895..a21410f5a 100644
-> > > > > > > > > > --- a/tools/parser/avdtp.c
-> > > > > > > > > > +++ b/tools/parser/avdtp.c
-> > > > > > > > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
-> > > > > > > > > > {
-> > > > > > > > > >         if (vendor == 0x0000004f && vndcodec == 0x0001)
-> > > > > > > > > >                 return "aptX";
-> > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0001)
-> > > > > > > > > > +               return "FastStream";
-> > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0002)
-> > > > > > > > > > +               return "aptX Low Latency";
-> > > > > > > > > > +       else if (vendor == 0x000000d7 && vndcodec == 0x0024)
-> > > > > > > > > > +               return "aptX HD";
-> > > > > > > > > >         else if (vendor == 0x0000012d && vndcodec == 0x00aa)
-> > > > > > > > > >                 return "LDAC";
-> > > > > > > > > >         return "Unknown???;
-> > > > > > > > >
-> > > > > > > > > lets keep the focus on btmon support since nobody should be using hcidump anymore.
-> > > > > > > >
-> > > > > > > > In btmon I already implemented it and patches are now merged. I just
-> > > > > > > > found another place where this capability parsing is implemented and
-> > > > > > > > based on fact that users still use hcidump I quickly looked at it and
-> > > > > > > > implemented this parsing.
-> > > > > > > >
-> > > > > > >
-> > > > > > > I agree, hcidump still comes up on many places (guides, blogs, mailinglist posts, etc),
-> > > > > > > so it makes sense to add these patches to hcidump aswell. Especially when the patch is quite small.
-> > > > > >
-> > > > > > Exactly, people still use hcidump...
-> > > > > 
-> > > > > Well it is a deprecated tool which we might remove starting on BlueZ
-> > > > > 6.x which we would like to do in the very next release, if that
-> > > > > doesn't happen than perhaps Id take these patches in for a very last
-> > > > > BlueZ 5.x release.
-> > > > > 
-> > > > > @Marcel: Or you have a better plan? We could do one last 5.x and then
-> > > > > start working on removing the deprecated tools/etc.
-> > > > > 
-> > > > 
-> > > > +1 for doing one last 5.x release before deprecating and removing tools etc!
-> > > 
-> > > Ok, what is the plan? If hcidump is not going to be deleted in upcoming
-> > > release, can you take this patch?
-> > >
-> > 
-> > How about applying this patch now, considering it's small, and has value for anyone using hcidump.
-> > hcidump then gets removed later whenever the removal of deprecated features/tools starts.
-> 
-> So... what are plans for next release?
+QCA BTSOC NVM is a customized firmware file and different vendors may
+want to have different BTSOC configuration (e.g. Configure SCO over PCM
+or I2S, Setting Tx power, etc.) via this file. This patch will allow
+vendors to download different NVM firmware file by reading a device
+property "firmware-name".
 
-Marcel, Luiz, can you comment next steps? It is waiting there for your
-info here for more than 2 months.
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+Changes in v3:
+  * added firmware-name instead of nvm-postfix to specify full firmware name
+---
+ drivers/bluetooth/btqca.c   | 14 ++++++++++----
+ drivers/bluetooth/btqca.h   |  6 ++++--
+ drivers/bluetooth/hci_qca.c | 19 ++++++++++++++++++-
+ 3 files changed, 32 insertions(+), 7 deletions(-)
 
-> > Any news about next bluez release?
-> > 
-> > 
-> >  
-> > > -- 
-> > > Pali Rohár
-> > > pali.rohar@gmail.com
-> > 
-> > 
-> > Thanks,
-> > 
-> > -- Pasi
-> > 
-> 
-
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 6122685..645a893 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -332,7 +332,8 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-		   enum qca_btsoc_type soc_type, u32 soc_ver)
++		   enum qca_btsoc_type soc_type, u32 soc_ver,
++		   const char *firmware_name)
+ {
+ 	struct rome_config config;
+ 	int err;
+@@ -368,9 +369,14 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	if (soc_type == QCA_WCN3990)
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crnv%02x.bin", rom_ver);
+-	else
+-		snprintf(config.fwname, sizeof(config.fwname),
+-			 "qca/nvm_%08x.bin", soc_ver);
++	else {
++		if (firmware_name)
++			snprintf(config.fwname, sizeof(config.fwname),
++				 "qca/%s", firmware_name);
++		else
++			snprintf(config.fwname, sizeof(config.fwname),
++				 "qca/nvm_%08x.bin", soc_ver);
++	}
+ 
+ 	err = qca_download_firmware(hdev, &config);
+ 	if (err < 0) {
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 6fdc25d..41dc806 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -139,7 +139,8 @@ enum qca_btsoc_type {
+ 
+ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-		   enum qca_btsoc_type soc_type, u32 soc_ver);
++		   enum qca_btsoc_type soc_type, u32 soc_ver,
++		   const char *firmware_name);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ #else
+@@ -150,7 +151,8 @@ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdad
+ }
+ 
+ static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-				 enum qca_btsoc_type soc_type, u32 soc_ver)
++				 enum qca_btsoc_type soc_type, u32 soc_ver,
++				 const char *firmware_name)
+ {
+ 	return -EOPNOTSUPP;
+ }
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 4ea995d..9b8d4d7 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -168,6 +168,7 @@ struct qca_serdev {
+ 	struct qca_power *bt_power;
+ 	u32 init_speed;
+ 	u32 oper_speed;
++	const char *firmware_name;
+ };
+ 
+ static int qca_power_setup(struct hci_uart *hu, bool on);
+@@ -189,6 +190,17 @@ static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
+ 	return soc_type;
+ }
+ 
++static const char *qca_get_firmware_name(struct hci_uart *hu)
++{
++	if (hu->serdev) {
++		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
++
++		return qsd->firmware_name;
++	} else {
++		return NULL;
++	}
++}
++
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+ 	/* TODO: Some chipset requires to enable UART clock on client
+@@ -1191,6 +1203,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	const char *firmware_name = qca_get_firmware_name(hu);
+ 	int ret;
+ 	int soc_ver = 0;
+ 
+@@ -1241,7 +1254,8 @@ static int qca_setup(struct hci_uart *hu)
+ 
+ 	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+ 	/* Setup patch / NVM configurations */
+-	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
++	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
++			firmware_name);
+ 	if (!ret) {
+ 		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+ 		qca_debugfs_init(hdev);
+@@ -1462,6 +1476,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 			return PTR_ERR(qcadev->bt_en);
+ 		}
+ 
++		device_property_read_string(&serdev->dev, "firmware-name",
++					 &qcadev->firmware_name);
++
+ 		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+ 		if (IS_ERR(qcadev->susclk)) {
+ 			dev_err(&serdev->dev, "failed to acquire clk\n");
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
