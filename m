@@ -1,185 +1,96 @@
-Return-Path: <SRS0=/qBL=SM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=EB+V=SN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E4AC10F11
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 20:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AEA7C10F11
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Apr 2019 01:43:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18AE72084B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Apr 2019 20:52:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FDEC20850
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Apr 2019 01:43:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726448AbfDJUwM (ORCPT
+        id S1726600AbfDKBnI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Apr 2019 16:52:12 -0400
-Received: from mga04.intel.com ([192.55.52.120]:18688 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726215AbfDJUwM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Apr 2019 16:52:12 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Apr 2019 13:52:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,334,1549958400"; 
-   d="scan'208";a="163183613"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
-  by fmsmga001.fm.intel.com with ESMTP; 10 Apr 2019 13:52:11 -0700
-Received: from orsmsx162.amr.corp.intel.com (10.22.240.85) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Wed, 10 Apr 2019 13:52:10 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
- ORSMSX162.amr.corp.intel.com ([169.254.3.253]) with mapi id 14.03.0415.000;
- Wed, 10 Apr 2019 13:52:11 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Subject: RE: [PATCH BlueZ 1/1] mesh: Add APIs for Provisioner and Config
- Client
-Thread-Topic: [PATCH BlueZ 1/1] mesh: Add APIs for Provisioner and Config
- Client
-Thread-Index: AQHU4QLDxGfmM+pzakmP4WCPaPyd3KYnonSAgANyz4CAA2J0AIAAE1gAgAe+K4D//6mz0A==
-Date:   Wed, 10 Apr 2019 20:52:10 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4376CAF6FFE@ORSMSX103.amr.corp.intel.com>
-References: <20190322225754.27039-1-brian.gix@intel.com>
- <20190322225754.27039-2-brian.gix@intel.com>
- <20190401104213.vpqhgw55leg6olza@scytale>
- <DEBB0CAA2616974FAE35E4B560B9A4376CAE27AA@ORSMSX103.amr.corp.intel.com>
- <20190405190304.swhyog5zefvq37e2@kynes>
- <D6866572D7A1DB48A0D22000C21836C76CFD7997@ORSMSX103.amr.corp.intel.com>
- <20190410182645.r7lprmpz3jfggill@kynes>
-In-Reply-To: <20190410182645.r7lprmpz3jfggill@kynes>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMTU5ZmQyNmUtMTNiZS00ZGQ1LThmOWItZjk0MTIxZWJlODEwIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiRE9aaFdYT0hyUURmUjAyZHFJVlhTSWZrdG9jTlBaOGZpTDhFXC9KcWlrNzFTbjRVN3E0NVFZN05odWR3a011NGsifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.140]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 10 Apr 2019 21:43:08 -0400
+Received: from mail-it1-f199.google.com ([209.85.166.199]:60217 "EHLO
+        mail-it1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbfDKBnH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 10 Apr 2019 21:43:07 -0400
+Received: by mail-it1-f199.google.com with SMTP id 75so4260070itz.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Apr 2019 18:43:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=CoAqwgkJTZGzhrINrMhNBhLM2XrD+z6ak1UE+j6qdNA=;
+        b=QBTa7XL7foCx2mCHGRyb0Mujjl4DtekTypmh3hTnKPiVJ4b3qJDs7jk4eSC/0/s36K
+         uawnliGgH/76BnJJnZWRZ2zZItuljtUF5we3vRd/UUGvbvU8tDEDgF6yeAU4p5boO/9a
+         djatE80Ao0q9gbH2a3cTxQOdYxYI9zY5mCE0QXSc2W7wLNtcwMXx536jvN7kwtf+SLZk
+         asS+LYmeGhrL3pGPBKtorlq7T92HI9PSVI0lvvGrd4+5/qJB6H+DegjQFRIMSHG4ttYY
+         TymNzuiP+a3nySYn+yAVAQRHOw5G+jhafEUCMZja0sKY6B2eEZsZq8/Gtdvba+AEj+Jw
+         EAgQ==
+X-Gm-Message-State: APjAAAX92UQIjwivpZZtfvGl2IgNdxp7qAlwDVoqSeKjIpJ26l8NRlKS
+        Z1gSVp3zreT4iAzAI5qFbMFk7R0nvsAi0Kbi6QHVHHzxHyyf
+X-Google-Smtp-Source: APXvYqwI14HeeShtsJgRzzVTmduxOBHZd181aUzkxgDkHozaJaiO/h0W6D6jSBmhZXmN5gGQhUUHDXQiCHuaq5XBrMWfC+CXhO32
 MIME-Version: 1.0
+X-Received: by 2002:a24:7f52:: with SMTP id r79mr1646970itc.33.1554946987067;
+ Wed, 10 Apr 2019 18:43:07 -0700 (PDT)
+Date:   Wed, 10 Apr 2019 18:43:07 -0700
+In-Reply-To: <000000000000b7fd51058370d0d9@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000cf0d860586374ecb@google.com>
+Subject: Re: BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
+From:   syzbot <syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGFsLA0KDQo+IEZyb206IE1pY2hhbCBMb3dhcy1SemVjaG9uZWsgDQo+IA0KPiBPbiAw
-NC8wNSwgU3RvdGxhbmQsIEluZ2Egd3JvdGU6DQo+ID4gPiBJbWFnaW5lIGFuIGV4aXN0aW5nIG5l
-dHdvcmsgcHJvdmlzaW9uZWQgYnkgc29tZW9uZSBlbHNlLCAoLi4uKSBXZQ0KPiA+ID4gd291bGQg
-bGlrZSB0byBhZGQgYSBMaW51eC1iYXNlZCBkZXZpY2UgdG8gdGhhdCBuZXR3b3JrLiAoLi4uKSBU
-bw0KPiA+ID4gYWNoaWV2ZSB0aGF0LCB3ZSBuZWVkIHNvbWUga2luZCBvZiBBUEkgdGhhdCBhbGxv
-d3MgcHJvdmlzaW9uaW5nDQo+ID4gPiBtZXNoZCBsb2NhbGx5LCBpZGVhbGx5IHZpYSBELUJ1cy4N
-Cj4gPg0KPiA+IFRvIG1lLCB0aGlzIHNjZW5hcmlvIHNlZW1zIHRvIG1lIG1vcmUgbGlrZSAiaW1w
-b3J0IHRoZSBub2RlIiByYXRoZXINCj4gPiB0aGFuICJwcm92aXNpb24gdGhlIGRldmljZSIuDQo+
-IA0KPiBZZXMsIGluZGVlZC4gSGF2aW5nIGFuIEFQSSB0byBpbXBvcnQgYSBjb21wbGV0ZSBub2Rl
-IGludG8gdGhlIGRhZW1vbg0KPiB3b3VsZCBiZSBlbm91Z2guIEJ1dCBub3RlIHRoYXQgc3VjaCBh
-biBpbXBvcnQgd291bGQgbmVlZCB0byBjb250YWluLCBhbmQNCj4gKmFsbCogdGhlIGtleXMsIGRl
-dmljZSBrZXkgaW5jbHVkZWQuDQoNCkkgdGhpbmsgdGhpcyBpcyB0aGUgY29uY2x1c2lvbiB3ZSBh
-cmUgY29taW5nIHRvIGFzIHdlbGwuICBBbiBpbXBvcnQgd291bGQgYmUgYSAiVGhpcmQgV2F5IiAo
-YWZ0ZXIgIkNyZWF0ZU5ldHdvcmsiIGFuZCAiSm9pbiIpIHRvIGJyaW5nIGEgbm9kZSBpbnRvIGV4
-aXN0ZW5jZSwgYW5kIGl0IHdvdWxkIGJlIGNyZWF0ZWQgYmFzaWNhbGx5IGZyb20gIkFsbCBpbmZv
-cm1hdGlvbiBjdXJyZW50bHkgc3RvcmVkIGluIHRoZSBub2RlLmpzb24gZmlsZSIgZXhjZXB0IGZv
-ciB0aGUgdG9rZW4sIGFuZCB0aGUgaW50ZXJuYWwgb2JqZWN0IHBhdGgsIHdoaWNoIHdvdWxkIGJl
-IGdlbmVyYXRlZCBpbiB0aGUgZGFlbW9uIHRvIGVuc3VyZSBubyBjb2xsaXNpb25zLiAgSW4gYWRk
-aXRpb24gdG8gdGhlIGtleXMsIEkgdGhpbmsgd2Ugd2lsbCBuZWVkIGFsbCBvZiB0aGUgYmluZGlu
-Z3MvcHViL3N1Yi9zZXEvaXZfaW5kZXgva3IvZmVhdHVyZXMvdW5pY2FzdC91dWlkIGFzIHdlbGws
-IHNpbmNlIHRoZSB1bmRlcnN0YW5kaW5nIGhlcmUgd2lsbCBiZSB0aGF0IHRoaXMgbm9kZSBhbHJl
-YWR5IGV4aXN0cyBvbiB0aGUgbmV0d29yaywgYW5kIHRodXMgYWxsIG9mIHRoaXMgaW5mb3JtYXRp
-b24gd2lsbCBiZSBhc3N1bWVkIHZhbGlkIGluIGFueSBjb3BpZXMgb2YgYSByZW1vdGUgQ29uZmln
-IENsaWVudHMgZnVsbCBtZXNoIENvbmZpZ3VyYXRpb24gZGF0YWJhc2UuDQoNCj4gDQo+ID4gV2Ug
-Y291bGQgZG8gdGhhdCB3aXRoIGVpdGhlciBhIG5ldyBJbXBvcnQoZGljdCBjb2ZpZ3VyYXRpb24p
-IG1ldGhvZCwNCj4gPiB3aGVyZSBjb25maWd1cmF0aW9uIGlzIGEgZGljdGlvbmFyeSB0aGF0IGNv
-bnRhaW5zIGFsbCB0aGUgcHJlc2V0DQo+ID4gdmFsdWVzIChuZXRrZXlzLCB1dWlkLCB1bmljYXN0
-LCBldGMpLiBUaGlzIG1ldGhvZCBpcyBkaWZmZXJlbnQgZnJvbQ0KPiA+IENyZWF0ZSgpIHNpbmNl
-IHRoZSBuZXRrZXlzIGFyZSBjb21pbmcgZnJvbSB0aGUgIm91dHNpZGUiLg0KPiANCj4gWWVzLCB0
-aGF0IHdvdWxkIGRvLCBidXQgdGhlcmUgc2VlbSB0byBiZSBzb21lIG9iamVjdGlvbnMgdG8gcGFz
-c2luZyBrZXlzDQo+IG92ZXIgREJ1cy4NCg0KVGhlIG9iamVjdGlvbiBpcyBtb3JlIHRvIHRoZSBk
-YWVtb24gZXhwb3NpbmcgdG8gdGhlIGFwcGxpY2F0aW9uIGtleXMgdW5kZXIgdGhlIGRhZW1vbidz
-IGNvbnRyb2wsIGFzIGEgbWF0dGVyIG9mIG5vcm1hbCBvcGVyYXRpb24uICBBbiBJbXBvcnQgb3Bl
-cmF0aW9uLCBvbiB0aGUgb3RoZXIgaGFuZCwgaXMgYW4gYXBwbGljYXRpb24gcGFzc2luZyBrZXlz
-ICp0byogdGhlIGRhZW1vbiwgcmVxdWVzdGluZyB0aGF0IHRoZXkgYmUgbWFkZSBpbnRvIGEgbG9j
-YWxseSBtYW5hZ2VkIG5vZGUuDQoNCj4gDQo+ID4gVGhlIGN1cnJlbnQgYXBwcm9hY2ggaXMgdG8g
-a2VlcCBhbGwgdGhlIG5ldGtleXMgYW5kIGFwcGtleXMgd2l0aGluIHRoZQ0KPiA+IGRhZW1vbiB3
-aXRob3V0IGV2ZXIgZXhwb3NpbmcgdGhlbSB0byBhbiBhcHBsaWNhdGlvbi4NCj4gDQo+IFllYWgs
-IEkga25vdy4gSSBqdXN0IGRvbid0IHRoaW5rIGl0J3MgcHJhY3RpY2FsIHRvIGFzc3VtZSB0aGlz
-LCBiZWNhdXNlIG9mIHRoZQ0KPiB1c2UgY2FzZXMgbWVudGlvbmVkIGVhcmxpZXIgaW4gdGhpcyB0
-aHJlYWQuIEkgc3Ryb25nbHkgZmVlbCB0aGVyZSBpcyBhIG5lZWQgZm9yIGENCj4gY2VudHJhbGl6
-ZWQgZGF0YWJhc2UsIGhhbmRsZWQgb3V0c2lkZSBvZiB0aGUgZGFlbW9uLCBpZGVhbGx5IG9uIGEg
-c29tZSBraW5kDQo+IG9mIGludGVybmV0IHNlcnZlci4NCg0KSSBkb24ndCB0aGluayBhbnlvbmUg
-aXMgcmVqZWN0aW5nIHRoZSBpZGVhIHRoYXQgZXhwb3J0L2ltcG9ydCBuZWVkcyB0byBiZSBzdXBw
-b3J0ZWQgaW4gc29tZSBmYXNoaW9uLi4uIEp1c3QgdGhhdCB3ZSBuZWVkIHRvIHJlY29nbml6ZSB0
-aGF0Og0KMS4gVGhlIGRhZW1vbiBuZWVkcyBwZXJtYW5lbnQgYWNjZXNzIHRvIGFsbCBrZXlzIGF0
-IGFsbCB0aW1lcyBpbnRlcm5hbGx5IGZvciBhbGwgbm9kZXMgaXQgaXMgaGFuZGxpbmcNCjIuICBJ
-bXBvcnRpbmcvRXhwb3J0aW5nIHdpbGwgYmUgYW4gIkV4Y2VwdGlvbmFsIENhc2UiIHdoaWNoIHdp
-bGwgYmUgbmVlZGVkLCBidXQgcmFyZWx5Lg0KDQo+IA0KPiA+IEFsdGVybmF0aXZlbHksIElmIGEg
-bm9kZSBoYXMgYmVlbiBjcmVhdGVkIGFuZCBjb25maWd1cmVkIGJ5IGEgdGhpcmQNCj4gPiBwYXJ0
-eSB0aGVuIGFkZGluZyBpdCB0byB0aGUgZXhpc3RpbmcgbWVzaGQgbWFuYWdlbWVudCBjb3VsZCBi
-ZQ0KPiA+IGFjaGlldmVkIGJ5IHRyYW5zY3JpYmluZyBpdHMgY29uZmlndXJhdGlvbiBpbnRvIGEg
-bWVzaGQgaW50ZXJuYWwNCj4gPiBzdG9yYWdlIGZvcm1hdCAod2hpY2ggaXMgaW4ganNvbiByZWFk
-YWJsZSBmb3JtIGFuZCBjb3VsZCBiZQ0KPiA+IHBvdGVudGlhbGx5IGV4cG9zZWQgYXMgYSBzY2hl
-bWEpLg0KPiANCj4gVGhhdCdzIHRydWUsIGJ1dCB0aGlzIHdvdWxkIGFsc28gbWVhbiB0aGF0IHRo
-ZSBzdG9yYWdlIGZvcm1hdCBiZWNvbWVzIGFuDQo+IEFQSS4NCj4gDQo+IEkgZG9uJ3QgdGhpbmsg
-dGhpcyBpcyBhIGdvb2QgaWRlYSwgSSdkIHJhdGhlciBhbGxvdyB0aGUgZGFlbW9uIHRvIG1vZGlm
-eSBzdG9yYWdlDQo+IGZvcm1hdCBmcmVlbHkgKHdpdGggYSBwcm9wZXIgbWlncmF0aW9uIGZyb20g
-b2xkZXIgdmVyc2lvbnMsIG9mIGNvdXJzZSkuDQo+IEVzcGVjaWFsbHkgY29uc2lkZXJpbmcgdGhh
-dCB3aGlsZSBKU09OIHdvcmtzIGZvciBub3csIEkgdGhpbmsgaW4gYSBsb25nIHJ1bg0KPiBub2Rl
-IGRhdGEgc2hvdWxkIGJlIHN0b3JlZCBpbiBzb21lIGtpbmQgb2YgdHJhbnNhY3Rpb25hbCBkYXRh
-YmFzZS4NCg0KSSBhbHNvIGFncmVlIHRoYXQgdGhlICJJbXBvcnQgQVBJIiBzaG91bGQgYmUgZ2Vu
-ZXJpYyBlbm91Z2ggc28gdGhhdCAqaG93KiB0aGUgZGFlbW9uIGNob29zZXMgdG8gbWFpbnRhaW4g
-aXQncyBpbnRlcm5hbCBkYXRhYmFzZXMgY2FuIGJlIGVudGlyZWx5IGhpZGRlbiBmcm9tIHRoZSBh
-cHBsaWNhdGlvbnMgdXNpbmcgdGhlIGQtYnVzIEFQSXMuICANCg0KSSBoYXZlIG5vIG9waW5pb24g
-b24gd2hldGhlciB0aGlzICJJbXBvcnQgQVBJIiB1c2VzIEQtQnVzIGRpY3Rpb25hcmllcywgb3Ig
-YSB3ZWxsLWRvY3VtZW50ZWQgSlNPTiBzY2hlbWEuIA0KDQo+IA0KPiA+ID4gTW9yZW92ZXIsIHNp
-bmNlIHRoZSBBdHRhY2goKSB0b2tlbiBhbHJlYWR5IHRyYXZlbHMgdGhyb3VnaCB0aGUgYnVzDQo+
-ID4gPiAoLi4uKQ0KPiA+IEp1c3QgaGF2aW5nIHRoZSB0b2tlbiBpcyBub3QgZW5vdWdoOiB0aGVy
-ZSBhcmUgc29tZSBjaGVja2luZw0KPiA+IG1lY2hhbmlzbXMgKGFuZCBJIGJlbGlldmUgdGhleSBu
-ZWVkIHRvIGJlIGV4dGVuZGVkKSB0byBjaGVjayB0aGUNCj4gPiB2YWxpZGl0eSBvZiB0aGUgYXR0
-YWNoaW5nIGFwcGxpY2F0aW9uLg0KPiANCj4gQXMgZmFyIGFzIEkgY2FuIHNlZSwgdGhlc2UgY2hl
-Y2tzIG1vc3RseSBjb25jZXJuIGNvbXBvc2l0aW9uIGRhdGENCj4gKGVsZW1lbnRzL21vZGVscyBp
-biBwYXJ0aWN1bGFyKSwgYW5kIHRoaXMgY2FuIGJlIGVhc2lseSBxdWVyaWVkLiBNZXNoDQo+IGRh
-ZW1vbiBkb2Vzbid0IHNlZW0gdG8gdXNlIGFueSBhZGRpdGlvbmFsIHNlY3JldHMgYmVzaWRlcyB0
-aGUgdG9rZW4uDQoNClRoaXMgaXMgYSBmYWlyIGFuZCBjb3JyZWN0IHN0YXRlbWVudC4NCg0KPiAN
-Cj4gU28gZnJvbSB3aGF0IEkgZ2F0aGVyLCB0aGUgZGFlbW9uIGFscmVhZHkgZGVwZW5kcyBvbiB0
-aGUgYnVzIGJlaW5nDQo+IHNlY3VyZSwgYW5kIEkgZG9uJ3Qgc2VlIGFueSBwcmFjdGljYWwgZGlm
-ZmVyZW5jZSBiZXR3ZWVuIGV4Y2hhbmdlIG9mIHRva2Vucw0KPiBhbmQgZXhjaGFuZ2Ugb2Yga2V5
-cy4NCg0KVGhlIHRoZW9yeSBvZiBvcGVyYXRpb24gaGVyZSBpcyB0aGF0IG9uY2UgYSBub2RlIGlz
-IGZvcm1lZCwgdGhlIG9ubHkgZGF0YSB0aGF0IG5lZWRzIHRvIGJlIHN0b3JlZCBieSB0aGUgYXBw
-bGljYXRpb24gaXMgdGhlIHRva2VuLiAgVGhlIGFwcGxpY2F0aW9uIGtub3dzIG5vbmUgb2YgdGhl
-aXIgYXBwbGljYXRpb24sIG5ldHdvcmssIG9yIGRldmljZSBrZXlzIChhbiBpbXBvcnQgYXBwbGlj
-YXRpb24gYXNpZGUpLiAgU28gaWYgYW4gQXBwbGljYXRpb24gaXMgY29tcHJvbWlzZWQsIHRoZSB0
-b2tlbiB3aWxsIGFsbG93IGFuIGF0dGFja2VyIHRvIG1hc3F1ZXJhZGUgYXMgdGhlIGNvbXByb21p
-c2VkIG5vZGUvYXBwbGljYXRpb24sIGJ1dCB0aGV5IHdpbGwgc3RpbGwgbm90IGhhdmUgYWNjZXNz
-IHRvIG5ldHdvcmsga2V5cywgYW5kIHdpbGwgbm90IGJlIGFibGUgdG8gbWFzcXVlcmFkZSBhcyB0
-aGUgQ29uZmlnIFNlcnZlciBvZiB0aGUgY29tcHJvbWlzZWQgbm9kZS4NCg0KVGhlIGJyZWFjaCB3
-aWxsIGJlIGNvbnRhaW5lZCBhdCB0aGUgYWNjZXNzIGxheWVyIG9mIHRoZSBjb21wcm9taXNlZCBu
-b2RlLg0KDQo+IA0KPiA+ID4gPiBNb3N0IG9mIHlvdXIgcmVjb21tZW5kYXRpb24gZGlyZWN0bHkg
-YWZmZWN0IHRoZSBzZWN1cml0eSBvZiB0aGUNCj4gPiA+ID4gS2V5cywgYW5kIHdoZXRoZXIgdGhl
-eSBnZXQgcGFzc2VkIHZpYSBELUJ1cy4uLiAgQW5kIHRoaXMgaXMNCj4gPiA+ID4gc29tZXRoaW5n
-IHRoYXQgSSB3b3VsZCAqbm90KiBkbyB3aXRob3V0IHRoZSBPSyBmcm9tIE1hcmNlbA0KPiA+ID4g
-PiBIb2x0bWFubiAoLi4uKQ0KPiA+ID4gQ291bGQgeW91IHBsZWFzZSBwb2ludCBtZSB0byB0aGUg
-cmVsZXZhbnQgdGhyZWFkPyBJIGtub3cgSSdtIGxhdGUgdG8NCj4gPiA+IGhlIHBhcnR5IGFuZCB3
-b3VsZCB2ZXJ5IG11Y2ggbGlrZSB0byBjYXRjaCB1cCwgYXMgbXVjaCBhcyBJIGNhbi4NCj4gPiBU
-aGlzIHdhcyBhIHZlcmJhbCBkaXNjdXNzaW9uIEkgYmVsaWV2ZS4NCj4gDQo+IE9oLi4uIENvdWxk
-IHNvbWVvbmUgKEJyaWFuPyBNYXJjZWw/KSBwbGVhc2Ugc3VtbWFyaXplIHRoZSBtYWluIHBvaW50
-cw0KPiB0aGVuPyBJdCdzIGhhcmQgdG8gYXJndWUgYWJvdXQgYXJndW1lbnRzIEkgY2Fubm90IHBv
-c3NpYmx5IGtub3cgOigNCg0KV2l0aG91dCBkZWZpbmluZyB3aGF0IGtpbmQgb2YgdW5kZXJseWlu
-ZyAiS2V5IENoYWluIiBvciAiS2V5IFJpbmciIHNlY3VyaXR5IG1lY2hhbmlzbXMgdGhhdCBtaWdo
-dCBiZSBhdmFpbGFibGUgdG8gdGhlIGRhZW1vbiwgdGhlIGdlbmVyYWwgaWRlYSBpcyB0aGF0IHVu
-ZGVyIG5vcm1hbCBvcGVyYXRpbmcgY29uZGl0aW9ucywgdGhlICJLZWVwZXIgb2YgdGhlIEtleXMi
-IGlzIGFsd2F5cyB0aGUgRGFlbW9uLiAgVGhlIGRhZW1vbiBhbHJlYWR5IHJlcXVpcmVzIGFjY2Vz
-cyB0byBhbGwgb2YgdGhlIGtleXMuIEFuZCBhbGxvd2luZyBhdmVyYWdlIEFwcGxpY2F0aW9ucyB0
-byAqYWxzbyogaGF2ZSBhY2Nlc3MgdG8gdGhlIGtleXMgZnVuZGFtZW50YWxseSByZWR1Y2VzIHNl
-Y3VyaXR5IGJ5IGluY3JlYXNpbmcgdGhlIG51bWJlciBvZiBrZXkgY29waWVzIHRoYXQgbXVzdCBi
-ZSBtYWludGFpbmVkLCBhbmQgYnkgcHV0dGluZyB0aGUgbGV2ZWwgb2YgbG9jYWwga2V5IHNlY3Vy
-aXR5IG91dHNpZGUgdGhlIGRpcmVjdCBjb250cm9sIG9mIHRoZSBkYWVtb24uDQoNCg0KQlIsDQpC
-cmlhbiBHaXgNCg==
+syzbot has found a reproducer for the following crash on:
+
+HEAD commit:    771acc7e Bluetooth: btusb: request wake pin with NOAUTOEN
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15f58add200000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4fb64439e07a1ec0
+dashboard link: https://syzkaller.appspot.com/bug?extid=91fd909b6e62ebe06131
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11770a8f200000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128c945b200000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com
+
+BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
+turning off the locking correctness validator.
+CPU: 0 PID: 1174 Comm: kworker/u5:0 Not tainted 5.1.0-rc4+ #63
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: hci1 hci_power_on
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  add_chain_cache kernel/locking/lockdep.c:2591 [inline]
+  lookup_chain_cache_add kernel/locking/lockdep.c:2665 [inline]
+  validate_chain kernel/locking/lockdep.c:2685 [inline]
+  __lock_acquire.cold+0x250/0x50d kernel/locking/lockdep.c:3701
+  lock_acquire+0x16f/0x3f0 kernel/locking/lockdep.c:4211
+  __mutex_lock_common kernel/locking/mutex.c:925 [inline]
+  __mutex_lock+0xf7/0x1310 kernel/locking/mutex.c:1072
+  mutex_lock_nested+0x16/0x20 kernel/locking/mutex.c:1087
+  hci_dev_do_close+0x317/0xf20 net/bluetooth/hci_core.c:1696
+  hci_power_on+0x1d2/0x580 net/bluetooth/hci_core.c:2191
+  process_one_work+0x98e/0x1790 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x357/0x430 kernel/kthread.c:253
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
+
