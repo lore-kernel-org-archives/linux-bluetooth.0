@@ -2,81 +2,85 @@ Return-Path: <SRS0=EB+V=SN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C24C10F14
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Apr 2019 12:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94029C10F14
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Apr 2019 21:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FC702064B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Apr 2019 12:14:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61BC52184B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Apr 2019 21:50:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfDKMOB (ORCPT
+        id S1727149AbfDKVuq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Apr 2019 08:14:01 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:52541 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726536AbfDKMOB (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Apr 2019 08:14:01 -0400
-Received: by mail-io1-f69.google.com with SMTP id p143so4708792iod.19
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Apr 2019 05:14:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=cR60vCMLhHRTpswjZfhooIP8Hma1vPgin0AXvYMDh0s=;
-        b=LuPzabPNRgGhquwjXTNLcambLGh1N9LVWW0CPvKffVnTFize47NY7+/e96VgjAjTDG
-         DeVFwNuwwkh8KKxbFaCXZqxQOZrywZmZZaD3TOmt2E25mryo72T4Egfx2wF6Rk+WEZsa
-         OECJDkbeMikx9bgsf9+b2OOyzokAI2OJUyW7k+FF4djpSni92JsTdRtxaqZYN7pOgOXD
-         ecVlO2PfNjzODb6UYciWS6YCTE6vKrgmmfDAhNWlzsrMru3yvflklDtfaSvpAKtCkp9o
-         dMTshl9uwjw+RBSDSK9EmPdVkr0pPQihr+5iWb57Ek9dShiBNW4jFvh/kxrotdwAcVXV
-         p0mg==
-X-Gm-Message-State: APjAAAV5b9fhZyrj4PzrSJBNlAEo16cbn5tXMvEMq494h/LsmLmtAnkh
-        Q2yz6iKp1Mc3G09Z0MH8YStUMUyFKk9Otmi6jaIRIU61qGlt
-X-Google-Smtp-Source: APXvYqzK1P71Q/BRcrCT6iNrGNC8OrRFpihfnoYN3tGWPzEpTjqOgdt44TUuZDljqoC9+mI4MT7gzGGh5pO17DnrV81P4PMA4l0i
-MIME-Version: 1.0
-X-Received: by 2002:a24:cac6:: with SMTP id k189mr1833557itg.24.1554984840761;
- Thu, 11 Apr 2019 05:14:00 -0700 (PDT)
-Date:   Thu, 11 Apr 2019 05:14:00 -0700
-In-Reply-To: <000000000000b7fd51058370d0d9@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000109c700586401f48@google.com>
+        Thu, 11 Apr 2019 17:50:46 -0400
+Received: from gate.crashing.org ([63.228.1.57]:43015 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726857AbfDKVuq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Apr 2019 17:50:46 -0400
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by gate.crashing.org (8.14.1/8.14.1) with ESMTP id x3BLoK1R006767;
+        Thu, 11 Apr 2019 16:50:21 -0500
+Message-ID: <068bf2f6512c10fd4ca71ea6017e27fa5928d166.camel@kernel.crashing.org>
 Subject: Re: BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
-From:   syzbot <syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com>
-To:     benh@kernel.crashing.org, davem@davemloft.net,
-        gregkh@linuxfoundation.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org, rafael@kernel.org,
+From:   Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To:     davem@davemloft.net, gregkh@linuxfoundation.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        netdev@vger.kernel.org, rafael@kernel.org,
         syzkaller-bugs@googlegroups.com, tj@kernel.org,
         torvalds@linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Date:   Fri, 12 Apr 2019 07:50:20 +1000
+In-Reply-To: <000000000000109c700586401f48@google.com>
+References: <000000000000109c700586401f48@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this bug to:
+On Thu, 2019-04-11 at 05:14 -0700, syzbot wrote:
+> syzbot has bisected this bug to:
+> 
+> commit 726e41097920a73e4c7c33385dcc0debb1281e18
+> Author: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Date:   Tue Jul 10 00:29:10 2018 +0000
+> 
+>      drivers: core: Remove glue dirs from sysfs earlier
 
-commit 726e41097920a73e4c7c33385dcc0debb1281e18
-Author: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date:   Tue Jul 10 00:29:10 2018 +0000
+Greg, any idea what this is ? The log isn't terribly readable. The
+above patch fixes a real bug that causes use after free and memory
+corruption under some circumstances. I wonder if the BT stack is itself
+manipulating stale objects ?
 
-     drivers: core: Remove glue dirs from sysfs earlier
+Ben.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15f69eaf200000
-start commit:   771acc7e Bluetooth: btusb: request wake pin with NOAUTOEN
-git tree:       upstream
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=17f69eaf200000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13f69eaf200000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4fb64439e07a1ec0
-dashboard link: https://syzkaller.appspot.com/bug?extid=91fd909b6e62ebe06131
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11770a8f200000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128c945b200000
+> bisection log:  
+> https://syzkaller.appspot.com/x/bisect.txt?x=15f69eaf200000
+> start commit:   771acc7e Bluetooth: btusb: request wake pin with
+> NOAUTOEN
+> git tree:       upstream
+> final crash:    
+> https://syzkaller.appspot.com/x/report.txt?x=17f69eaf200000
+> console output: 
+> https://syzkaller.appspot.com/x/log.txt?x=13f69eaf200000
+> kernel config:  
+> https://syzkaller.appspot.com/x/.config?x=4fb64439e07a1ec0
+> dashboard link: 
+> https://syzkaller.appspot.com/bug?extid=91fd909b6e62ebe06131
+> syz repro:      
+> https://syzkaller.appspot.com/x/repro.syz?x=11770a8f200000
+> C reproducer:   
+> https://syzkaller.appspot.com/x/repro.c?x=128c945b200000
+> 
+> Reported-by: syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com
+> Fixes: 726e41097920 ("drivers: core: Remove glue dirs from sysfs
+> earlier")
+> 
+> For information about bisection process see: 
+> https://goo.gl/tpsmEJ#bisection
 
-Reported-by: syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com
-Fixes: 726e41097920 ("drivers: core: Remove glue dirs from sysfs earlier")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
