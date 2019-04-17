@@ -2,107 +2,72 @@ Return-Path: <SRS0=DUSx=ST=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 775FDC282DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD33EC282DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 20:16:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4210A20663
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:52:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qxnMSiw7"
+	by mail.kernel.org (Postfix) with ESMTP id A7FCE20651
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 20:16:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729939AbfDQSwX (ORCPT
+        id S1730361AbfDQUQg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Apr 2019 14:52:23 -0400
-Received: from mail-pg1-f169.google.com ([209.85.215.169]:36962 "EHLO
-        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727340AbfDQSwX (ORCPT
+        Wed, 17 Apr 2019 16:16:36 -0400
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:53784 "EHLO
+        smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725848AbfDQUQf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Apr 2019 14:52:23 -0400
-Received: by mail-pg1-f169.google.com with SMTP id e6so12418977pgc.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2019 11:52:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TxYsYXozaJ4ud8f2A7S4XO7GpeX0MbslYzMkCJgNp+U=;
-        b=qxnMSiw7M4dsxTPg+j8QK0DnA72j//umn9wPSCgoMuKxBeSZQiWpJaOY6e9TpX6ktI
-         cE7UcKAKTUoiz04eFeV48N2MY7RF6pYeekeJksv9HuT6Esr1RyqJChsLT9zAAn13OBxS
-         VHmSSaSQjLxZXlv6r+ZqDtg9OmWlS24Ivb634Y5zcJrd6+D+t0PGvKl5MGlqyCNNEgXF
-         ouuFxynaHe9++Yx5DErWt0jLsvQpwrWDw2Dv5lGye4iWf1vmW/xPfCA6kLecRwMW5M5h
-         WKAiu56lKH4AkFqGTedGyFkWE0ifttldFpguvzoInxtizgUNtB8kr/9ednOewC2TGAIo
-         zW4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TxYsYXozaJ4ud8f2A7S4XO7GpeX0MbslYzMkCJgNp+U=;
-        b=oZcgU2IgwiMtamSxV/0K3nzzaBpD2yPpIHkBXUy7qFt8H84f9rxbzHRrOBzOB3LMpe
-         7Np7leyi80iIL5O2aV/ONN+e+V/y/kGbgGFGfUQ+BWGzT5BdMJsEDZGA30IHKhdut+YV
-         ORwiWnFHKss/GxWYjinUhE2y88zluDRvqokhYs7ezOpbGiGvPmPSF5gBs0Nj4uYUjs9J
-         y3K43ey9pTZhZr4Zd+sjIL8Tr/0+biUkHccOsB25wNYFbrYxOhgvJOq9treEnoClQ5a7
-         vuS7/QW7TYxHX1ABPmZUP4i6q01+HqzWbo+sO/J5oOqydqex29Hj3NtAlE6vH7ngdcoH
-         +1aQ==
-X-Gm-Message-State: APjAAAWvLbHp4E4cD0TNlljq9ENCdK6T0u+lZK2pL+fmq6KGHYD1vMd6
-        lFOVu19czKB/MNauHtGFwjY2rzTYHSAFFEof7SU=
-X-Google-Smtp-Source: APXvYqyqtGwgb1ZJYyWdO7YldEQCABBBentSZ4SCNx6EeeDHghlpdH3VaeSelvSkn0p81B5uaT8BRvShMJTUdUnKaks=
-X-Received: by 2002:a65:5342:: with SMTP id w2mr62292576pgr.220.1555527142668;
- Wed, 17 Apr 2019 11:52:22 -0700 (PDT)
+        Wed, 17 Apr 2019 16:16:35 -0400
+Received: from cpe-2606-a000-111b-405a-0-0-0-188a.dyn6.twc.com ([2606:a000:111b:405a::188a] helo=localhost)
+        by smtp.tuxdriver.com with esmtpsa (TLSv1:AES256-SHA:256)
+        (Exim 4.63)
+        (envelope-from <nhorman@tuxdriver.com>)
+        id 1hGqyD-0002cQ-EE; Wed, 17 Apr 2019 16:15:55 -0400
+Date:   Wed, 17 Apr 2019 16:15:21 -0400
+From:   Neil Horman <nhorman@tuxdriver.com>
+To:     David Miller <davem@davemloft.net>
+Cc:     arnd@arndb.de, ralf@linux-mips.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, socketcan@hartkopp.net,
+        mkl@pengutronix.de, gerrit@erg.abdn.ac.uk, alex.aring@gmail.com,
+        stefan@datenfreihafen.org, kuznet@ms2.inr.ac.ru,
+        yoshfuji@linux-ipv6.org, vyasevich@gmail.com,
+        marcelo.leitner@gmail.com, andrew.hendry@gmail.com,
+        edumazet@google.com, willemb@google.com, deepa.kernel@gmail.com,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-x25@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
+Message-ID: <20190417201521.GB15487@hmswarspite.think-freely.org>
+References: <20190416203620.539628-1-arnd@arndb.de>
+ <20190417093523.GA15487@hmswarspite.think-freely.org>
+ <20190417.102112.382636552216165456.davem@davemloft.net>
 MIME-Version: 1.0
-References: <87ee5fc2175747e1a7cf5b50bad819d4@ausx13mpc124.AMER.DELL.COM>
- <CAO1O6seYhTMHrgCQ+9gPCo_UOtXfhh9mRCVoUosP_Eq0FXD=sw@mail.gmail.com>
- <bcaa44382c80428ba59b743678be0b18@ausx13mpc120.AMER.DELL.COM>
- <CAO1O6sebmS8P0EVVL=U+eFFq+u0NdtbHUP0dO1D+LPa4vXOWqg@mail.gmail.com> <f3d5e376e4364350b06b665d4351fac9@ausx13mpc120.AMER.DELL.COM>
-In-Reply-To: <f3d5e376e4364350b06b665d4351fac9@ausx13mpc120.AMER.DELL.COM>
-From:   Emil Lenngren <emil.lenngren@gmail.com>
-Date:   Wed, 17 Apr 2019 20:52:12 +0200
-Message-ID: <CAO1O6sc4UD2QVaTt9sbO6e7GzdnqN++SzwhphX5CUX0CeHZGKQ@mail.gmail.com>
-Subject: Re: Pairing failure with BLE 4.0
-To:     YouRen.Chen@dellteam.com,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Cc:     Jared.Dominguez@dell.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190417.102112.382636552216165456.davem@davemloft.net>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+On Wed, Apr 17, 2019 at 10:21:12AM -0700, David Miller wrote:
+> From: Neil Horman <nhorman@tuxdriver.com>
+> Date: Wed, 17 Apr 2019 05:35:23 -0400
+> 
+> > Acked-by: Neil Horman <nhorman@tuxdriver.com>
+> 
+> Neil, please quote appropriately in the future.
+> 
+> I have to scroll through all of those pages of quoted patch just to
+> see this one line.
+> 
+> Thank you.
+> 
+Sorry, completely forgot to snip.  Will remember in the future
+Neil
 
-Den ons 17 apr. 2019 kl 20:46 skrev <YouRen.Chen@dellteam.com>:
-> > Could you try remove these two lines at
-> > https://github.com/torvalds/linux/blob/v5.0/net/bluetooth/smp.c#L693
-> > to see if it works (also make sure by looking at the log later that those bits
-> > were not set in the Key Distribution field)?:
-> > local_dist |= SMP_DIST_LINK_KEY;
-> > remote_dist |= SMP_DIST_LINK_KEY;
-> >
-> > We have seen the exact same problem when Android 6 was released.
-> > However they have a workaround that they don't set the LinkKey bit if they
-> > suspect the device doesn't support it. I think they look at the advertising data
-> > which indicates in the flags that it doesn't support BR/EDR. I think BlueZ
-> > should do the same to workaround these incompatibility issues.
-> >
-> > /Emil
->
-> Sorry for the late response, the pairing process succeeds when the two
-> lines are removed from smp.c. I'm inquiring whether we have a patch
-> that already addresses this issue and if not, how it can be implemented.
-
-Good. Tell me if you need help with the patch on the peripheral side.
-
-> Just to make sure I understand this correctly, the PN557W sees the Link
-> Bit and returns Invalid Parameters because the bit is nonzero, correct?
-> This causes the pairing process to fail. By commenting out those two
-> lines, we are telling the master to not set the link bit to 1 before sending
-> the parameters?
->
-> /Joey
-
-Exactly.
-
-/Emil
