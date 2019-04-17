@@ -2,178 +2,159 @@ Return-Path: <SRS0=DUSx=ST=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59F3C282DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 17:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 951D2C282DC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:17:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A503420663
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 17:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6447D20674
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:17:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/LQaQ3X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731227AbfDQR6x (ORCPT
+        id S1731728AbfDQSRI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Apr 2019 13:58:53 -0400
-Received: from mga02.intel.com ([134.134.136.20]:12716 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726751AbfDQR6x (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Apr 2019 13:58:53 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Apr 2019 10:58:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,362,1549958400"; 
-   d="scan'208";a="224390197"
-Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
-  by orsmga001.jf.intel.com with ESMTP; 17 Apr 2019 10:58:51 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
- ORSMSX104.amr.corp.intel.com ([169.254.4.183]) with mapi id 14.03.0415.000;
- Wed, 17 Apr 2019 10:58:51 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Subject: RE: [PATCH BlueZ v5 1/1] mesh: Add APIs for Provisioner and Config
- Client
-Thread-Topic: [PATCH BlueZ v5 1/1] mesh: Add APIs for Provisioner and Config
- Client
-Thread-Index: AQHU88R1+Q+URVzudUSwAtCzCAe+DKZAUQcAgABN2rA=
-Date:   Wed, 17 Apr 2019 17:58:51 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4376CAFE9DF@ORSMSX103.amr.corp.intel.com>
-References: <20190415194946.13121-1-brian.gix@intel.com>
- <20190415194946.13121-2-brian.gix@intel.com>
- <20190417055132.scxvzhusx2suasdv@kynes>
-In-Reply-To: <20190417055132.scxvzhusx2suasdv@kynes>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiM2ViMzJiNzItNzJjNC00MzE3LWFhY2UtNThhZGE1OTE3NTVhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiS003Vm8zWktFb2lcL2xuTFplYWFMOTBWNjkraWFTdE14UFwvZkpOUEl3MlcxWHZ0djk0dTE1RDdCdVwvcUVuV3VvOCJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.138]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 17 Apr 2019 14:17:08 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:43545 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731553AbfDQSRI (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 17 Apr 2019 14:17:08 -0400
+Received: by mail-ed1-f65.google.com with SMTP id j20so11593951edq.10;
+        Wed, 17 Apr 2019 11:17:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AJeTHwTwb8vGBxNBrIwAiVdkarwJcmD/pjQiHsFA/Pg=;
+        b=g/LQaQ3XnSfnvEkYz3R3Bk4l1neiwGVlUXXoCOYH7KvHki2CTiX3ClcQFGMvJihAyk
+         O+jqyp/iq6OGms/gOIhLyAeKxLv2hSAALia2LJGHSfCWYGvBkY+U7qBycTn0B8cO1rm8
+         03qFMvdqpPO3D9C1PlQHw6OmC3fIZjB2dpWusn5TAuQZ/SrUHAeXG9Bjg9WaRKUnjoI0
+         udeLcbgXaA+dMod3HS9orKM2qeoZkKNEYjcSAFqz7jmPB9sX2r9H6ruFHJHRkwOrEF4J
+         QVbIicOk8pa0Ey2nJuK+mzzS6aouBJ3P1Cq4RT5v1sZWx1/FYv7jymomFXQ1GG0wGEHT
+         IFYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AJeTHwTwb8vGBxNBrIwAiVdkarwJcmD/pjQiHsFA/Pg=;
+        b=kQPFqM5Xk2EyH8LyTydw6TtJ0DXolqFLD0dE25X+mW17Qf2zPmseKNYnt/188HGmS4
+         i3eN+iO0TsbcPJ3SCngWLzbfF/18n1VLI4sng3url6UE34Xw2vrt2VqkOTdU3kl8L9Iy
+         lOWMKEQowUu3/p/W5QmQe+AsKUCVfBdl+/Y+KnnP6vKEDzO5fl/vZd8NRldc8z92sRWj
+         ZAgjeiVamIVeFUwwp1Vpo1gg/+P560YXyKKfoKq+PLSgxoWhjGO7jXMpqeVwLAe5tcFf
+         xPo+jCdCjPmftZ99YCFMdLhnfsDt2ZKqqNJuYx8KOMFPAS+ZH1LfcSHOrUXzYF1pLBlj
+         Nzww==
+X-Gm-Message-State: APjAAAVk6EnR1/KwSQexlC7hcoLS1r+lbjCyUUIGp98Lom0NtNoWrnW0
+        LygfVJRFrN4JwMFFBnw9QBN8r6QmEV318ypx6YA5I290
+X-Google-Smtp-Source: APXvYqwJiDXdOD9fDVAYsZiRQUC1Sj7f9Q3QoXOg17bEaAkbsktjWj0BJyElUjYy9qJlMb1C7cYnHj/788fAGR7Ffgg=
+X-Received: by 2002:a17:906:828b:: with SMTP id h11mr47646366ejx.1.1555525025455;
+ Wed, 17 Apr 2019 11:17:05 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190416203620.539628-1-arnd@arndb.de> <CAF=yD-K89Z2ea_iakjfP98GnfU-yXts8LU4GW3Rr_etJ+r92pw@mail.gmail.com>
+ <CAK8P3a2z5QT7VooQPytx-C+Z_+kxzqmWmB8x-ow9PaApPuFY8g@mail.gmail.com>
+In-Reply-To: <CAK8P3a2z5QT7VooQPytx-C+Z_+kxzqmWmB8x-ow9PaApPuFY8g@mail.gmail.com>
+From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date:   Wed, 17 Apr 2019 14:16:29 -0400
+Message-ID: <CAF=yD-KCE46P4BniBXM_OgXL8hHwr4U-3hFxXRy70hBkbwY6Kg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Gerrit Renker <gerrit@erg.abdn.ac.uk>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Andrew Hendry <andrew.hendry@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Willem de Bruijn <willemb@google.com>,
+        Deepa Dinamani <deepa.kernel@gmail.com>,
+        Network Development <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-hams@vger.kernel.org,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-x25@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGFsLA0KDQo+IEZyb206IE1pY2hhbCBMb3dhcy1SemVjaG9uZWsNCj4gPiArCSB1aW50
-NjQgdG9rZW4gSW1wb3J0TG9jYWxOb2RlKHN0cmluZyBjb25maWdfZmlsZSkNCj4gDQo+IEkgYW0g
-c29tZXdoYXQgdW5jb21mb3J0YWJsZSB3aXRoIHBhc3NpbmcgYSBmaWxlIHBhdGggaGVyZS4gVGhl
-IGNhbGxlciB3b3VsZA0KPiBuZWVkIHRvIGNyZWF0ZSBhIHRlbXBvcmFyeSBmaWxlLCB3aGljaCBp
-cyBhIGxpdHRsZSBjdW1iZXJzb21lLCBhbmQgbWlnaHQgZmFpbCBpZg0KPiB0aGUgZGFlbW9uIGlz
-IHJ1bm5pbmcgb24gYW5vdGhlciBtYWNoaW5lLg0KPiANCj4gTm90IHN1cmUgd2hhdCBhcmUgdGhl
-IHNpemUgY29uc3RyYWludHMgKGlmIGFueSksIGJ1dCBJIHRoaW5rIGl0IG1pZ2h0IGJlIGJldHRl
-cg0KPiB0byBwYXNzIHRoZSBKU09OIGFzIGEgc3RyaW5nLg0KDQpJbmRlZWQsIHRoaXMgaGFzIGJl
-ZW4gZGlzY3Vzc2VkIGludGVybmFsbHkgYXMgd2VsbCwgYW5kIGlzIHN0aWxsIHN1YmplY3QgdG8g
-dGhlIGNoYW5nZSB5b3UgbWVudGlvbi4gV2UgYXJlIHN0aWxsIHdhaXQ4aW5nIGZvciBpbnB1dCBm
-cm9tIGFsbCBzdGFrZWhvbGRlcnMsIGFuZCB5b3VyIHByZWZlcmVuY2UgaXMgbm90ZWQuDQoNCiAN
-Cj4gPiArCXZvaWQgQWRkTmV0S2V5KG9iamVjdCBlbGVtZW50X3BhdGgsIHVpbnQxNiBkZXN0aW5h
-dGlvbiwNCj4gPiArCQkJdWludDE2IHN1Ym5ldF9pbmRleCwgdWludDE2IG5ldF9pbmRleCwgYm9v
-bGVhbg0KPiB1cGRhdGUpDQo+ID4gKC4uLikNCj4gPiArCXZvaWQgQWRkQXBwS2V5KG9iamVjdCBl
-bGVtZW50X3BhdGgsIHVpbnQxNiBkZXN0aW5hdGlvbiwNCj4gPiArCQkJdWludDE2IGFwcF9pbmRl
-eCwgdWludDE2IG5ldF9pbmRleCwgYm9vbGVhbiB1cGRhdGUpDQo+DQo+IElmIEkgdW5kZXJzdGFu
-ZCBjb3JyZWN0bHksIHRoZXNlIGFyZSBjb252ZW5pZW5jZSBmdW5jdGlvbnMgZm9yDQo+IFNlbmRX
-aXRoRGV2aWNlS2V5LCBzbyB0aGF0IHRoZSBhcHBsaWNhdGlvbiB3b3VsZG4ndCBuZWVkIHRvIGNv
-bnN0cnVjdA0KPiBhY2Nlc3MgcGF5bG9hZHMgZm9yIGNvbmZpZ3VyYXRpb24gbWVzc2FnZXM/DQo+
-IA0KPiBJZiBzbywgSSBndWVzcyB3ZSB3aWxsIG5lZWQgbW9yZSBmdW5jdGlvbnMgbGlrZSB0aGF0
-LCBpZGVhbGx5IHRvIGNvdmVyIGFsbA0KPiBtZXNzYWdlcyBtZW50aW9uZWQgaW4gc2VjdGlvbiA0
-LjMuNCBvZiB0aGUgbWVzaCBwcm9maWxlPw0KDQpUaGVzZSB0d28gZnVuY3Rpb25zIGFyZSBleHBs
-aWNpdGx5IHNlcGFyYXRlZCBvdXQgZnJvbSB0aGUgcmVzdCBvZiB0aGUgc2VjdGlvbiA0LjMuNCBt
-ZXNzYWdlcyBpbiBvcmRlciB0byBrZWVwIHRoZSBzZWN1cml0eSBvZiB0aGUga2V5cyBpbiB0aGUg
-aGFuZHMgb2YgdGhlIGRhZW1vbi4gVGhlIGFvb19pbmRleCBhbmQgbmV0X2luZGV4IG11c3QgYWxy
-ZWFkeSBiZSBwcmVzZW50IGluIHRoZSBub2RlJ3Mga2V5IGRhdGFiYXNlLCBhbmQgZm9yIHRoZXNl
-ICg0IHRvdGFsKSBDb25maWcgQ2xpZW50IG1lc3NhZ2UncywgdGhlIE9UQSBBY2Nlc3MgbGF5ZXIg
-bWVzc2FnZSB3aWxsIGJlIGNvbXBvc2VkIGJ5IHRoZSBkYWVtb24uDQoNClRoZSBtZXNzYWdlcyB3
-aGVyZSBrZXlzIGFyZSBleHBsaWNpdGx5IHNlbnQgb3Zlci10aGUtYWlyIGFyZSB0aGUgb25seSAg
-bWVzc2FnZXMgd2UgYW50aWNpcGF0ZSBwcm92aWRpbmcgc3BlY2lmaWMgRC1CdXMgbWV0aG9kcyBm
-b3IgdG8gbWluaW1pemUgRC1CdXMgQVBJIGJsb2F0Lg0KDQoNCg0KPiANCj4gSSB3b3VsZCBzdWdn
-ZXN0IGEgZmV3IHRoaW5nczoNCj4gIC0gbmFtZSB0aGVzZSBmdW5jdGlvbnMgaW4gdGhlIHNhbWUg
-d2F5IGFzIHRoZSBjb3JyZXNwb25kaW5nIG1lc3NhZ2UNCj4gIC0gcG9zc2libHkgZXh0cmFjdCB0
-aGVzZSBpbnRvIG9yZy5ibHVlei5tZXNoLkNvbmZpZ0NsaWVudDEgYW5kDQo+ICAgIG9yZy5ibHVl
-ei5tZXNoLkhlYWx0aENsaWVudDEgaW50ZXJmYWNlcywgc28gdGhhdCB3ZSBkb24ndCBuZWVkIHRv
-DQo+ICAgIG5hbWUgZnVuY3Rpb25zICJDb25maWdBcHBLZXlBcHAiLCBqdXN0ICJBcHBLZXlBcHAi
-DQo+ICAtIHBvc3NpYmx5IGFkZCBjb3JyZXNwb25kaW5nICIqIFN0YXR1cygpIiBjYWxscyB0byBh
-cHBsaWNhdGlvbg0KPiAgICBoaWVyYXJjaHk7IHNlZSB0aGUgcXVlc3Rpb24gYmVsb3cgYWJvdXQg
-RGV2S2V5TWVzc2FnZVJlY2VpdmVkDQoNCldlIG1heSB3YW50IHRvIHJlbmFtZSB0aGUgbWV0aG9k
-IGNhbGwgdG8gc3BlY2lmaWNhbGx5IGFja25vd2xlZGdlIHRoYXQgdGhleSBhcmUgQ29uZmlnIENs
-aWVudCBtb2RlbCBtZXNzYWdlcy4NCg0KPiANCj4gPiArCXZvaWQgSW1wb3J0UmVtb3RlTm9kZSh1
-aW50MTYgcHJpbWFyeSwgdWludDggY291bnQsDQo+ID4gKwkJCQkJYXJyYXl7Ynl0ZX1bMTZdIGRl
-dmljZV9rZXkpDQo+ID4gKw0KPiA+ICsJCVRoaXMgbWV0aG9kIGlzIHVzZWQgYnkgdGhlIGFwcGxp
-Y2F0aW9uIHRvIGltcG9ydCBhIHJlbW90ZQ0KPiBub2RlDQo+ID4gKwkJdGhhdCBoYXMgYmVlbiBw
-cm92aXNpb25lZCBieSBhbiBleHRlcm5hbCBwcm9jZXNzLg0KPiA+ICsNCj4gPiArCQlUaGUgcHJp
-bWFyeSBwYXJhbWV0ZXIgc3BlY2lmaWVzIHRoZSB1bmljYXN0IGFkZHJlc3Mgb2YgdGhlDQo+ID4g
-KwkJdGhlIG5vZGUgYmVpbmcgaW1wb3J0ZWQuDQo+ID4gKw0KPiA+ICsJCVRoZSBjb3VudCBwYXJh
-bWV0ZXIgc3BlY2lmaWVzIHRoZSBudW1iZXIgb2YgZWxlbWVudHMgdGhhdA0KPiBhcmUNCj4gPiAr
-CQlhc3NpZ25lZCB0byB0aGlzIHJlbW90ZSBub2RlLg0KPiA+ICsNCj4gPiArCQlUaGUgZGV2aWNl
-X2tleSBwYXJhbWV0ZXIgaXMgdGhlIGFjY2VzcyBsYXllciBrZXkgdGhhdCB3aWxsIGJlDQo+ID4g
-KwkJd2lsbCB1c2VkIHRvIGRlY3J5cHQgcHJpdmxlZGdlZCBtZXNzYWdlcyBmcm9tIHRoaXMgcmVt
-b3RlDQo+IG5vZGUuDQo+ID4gKw0KPiA+ICsJCVBvc3NpYmxlRXJyb3JzOg0KPiA+ICsJCQlvcmcu
-Ymx1ZXoubWVzaC5FcnJvci5JbnZhbGlkQXJndW1lbnRzDQo+ID4gKw0KPiANCj4gPiArCXZvaWQg
-RGVsZXRlUmVtb3RlTm9kZSh1aW50MTYgcHJpbWFyeSwgdWludDggY291bnQpDQo+ID4gKC4uLikN
-Cj4gPiArCQlUaGUgY291bnQgcGFyYW1ldGVyIHNwZWNpZmllcyB0aGUgbnVtYmVyIG9mIGVsZW1l
-bnRzIHRoYXQNCj4gd2VyZQ0KPiA+ICsJCWFzc2lnbmVkIHRvIHRoZSByZW1vdGUgbm9kZS4NCj4g
-DQo+IERvIHdlIG5lZWQgdGhlIGNvdW50IGhlcmU/IEkgdGhpbmsgdGhlIGRhZW1vbiBrbm93cyB0
-aGF0IGFscmVhZHkuDQoNClRoZSBkYWVtb24gb25seSBleHBsaWNpdGx5IGtub3dzIHRoZSBlbGVt
-ZW50IGNvdW50IG9mICpsb2NhbCogbm9kZXMuICBUaGUgY29tcG9zaXRpb24gZGF0YSAodGhhdCBp
-cyBpbXBvcnRhbnQgdG8gdGhlIENvbmZpZyBDbGllbnQgQXBwKSBvZiByZW1vdGUgbm9kZXMgaXMg
-bm90IHN0b3JlZCB3aXRoaW4gdGhlIGRhZW1vbiBzcGFjZS4gIFRoaXMgaXMgb25seSB0byBsb2Fk
-IHRoZSBtYXBwaW5ncyBvZiBSZW1vdGUgTm9kZSBkZXZpY2Uga2V5cywgYW5kIHdoaWNoIFVuaWNh
-c3QgYWRkcmVzc2VzIHRoYXQgdGhleSBtYXAgdG8uIEFsbCBhZGRpdGlvbmFsIHJlbW90ZSBub2Rl
-IGRhdGEgaXMgc3RvcmVkIGFzIG5lZWRlZCBieSB0aGUgQXBwLiBUaGlzIGRvZXMgaG93ZXZlciBh
-dCBsZWFzdCBrZWVwIG1vcmUgdGhhbiBvbmUgdmVyc2lvbiBvZiBlYWNoIHVuaWNhc3QgYWRkcmVz
-cyBmcm9tIGJlaW5nIGNsYWltZWQgYnkgbW9yZSB0aGFuIG9uZSByZW1vdGUgbm9kZS4NCg0KDQo+
-IA0KPiA+ICsJdm9pZCBTZW5kV2l0aERldmljZUtleShvYmplY3QgZWxlbWVudF9wYXRoLCB1aW50
-MTYgZGVzdGluYXRpb24sDQo+ID4gKwkJCQkJdWludDE2IG5ldF9pbmRleCwgYXJyYXl7Ynl0ZX0g
-ZGF0YSkNCj4gPiArDQo+ID4gKwkJVGhpcyBtZXRob2QgaXMgdXNlZCB0byBzZW5kIGEgbWVzc2Fn
-ZSBvcmlnaW5hdGVkIGJ5IGEgbG9jYWwNCj4gPiArCQltb2RlbCBlbmNvZGVkIHdpdGggdGhlIGRl
-dmljZSBrZXkgb2YgdGhlIHJlbW90ZSBub2RlLg0KPiA+ICguLi4pDQo+ID4gKwl2b2lkIERldktl
-eU1lc3NhZ2VSZWNlaXZlZCh1aW50MTYgc291cmNlLCB1aW50MTYgbmV0X2luZGV4LA0KPiA+ICsJ
-CQkJCQkJYXJyYXl7Ynl0ZX0gZGF0YSkNCj4gPiArDQo+ID4gKwkJVGhpcyBtZXRob2QgaXMgY2Fs
-bGVkIGJ5IG1lc2hkIGRhZW1vbiB3aGVuIGEgbWVzc2FnZQ0KPiBhcnJpdmVzDQo+ID4gKwkJYWRk
-cmVzc2VkIHRvIHRoZSBhcHBsaWNhdGlvbiwgd2hpY2ggd2FzIHNlbnQgd2l0aCB0aGUNCj4gcmVt
-b3RlDQo+ID4gKwkJbm9kZSdzIGRldmljZSBrZXkuDQo+IA0KPiBDb3JyZWN0IG1lIGlmIEknbSB3
-cm9uZywgYnV0IGl0IHNlZW1zIHRoYXQgdGhlc2UgdHdvIGFyZSBub3QgcmVxdWlyZWQgdG8NCj4g
-c3VwcG9ydCBmb3VuZGF0aW9uIG1vZGVscz8NCg0KSW5pdGlhbGx5LCB0aGV5IGFyZSBuZWVkIHRv
-IHN1cHBvcnQgdGhlIENvbmZpZyBDbGllbnQgZm91bmRhdGlvbmFsIG1vZGVsLiBJdCBpcyB0cnVl
-IHRoYXQgdGhlIENvbmZpZyBTZXJ2ZXIgb2YgZWFjaCBub2RlIGlzIGhhbmRsZWQgaW50ZXJuYWxs
-eSBieSB0aGUgZGFlbW9uLg0KDQpUaGUgZXh0ZXJuYWwgQ29uZmlnIENsaWVudCBBcHAgaXMgcmVz
-cG9uc2libGUgZm9yOg0KKiBkZWNpZGluZyAqd2hlbiogdG8gc2VuZCBBcHAgYW5kIE5ldCBrZXkg
-YWRkcyBhbmQgdXBkYXRlcw0KKiBzZW5kaW5nIGFsbCBwdWIvc3ViL2JpbmRpbmcvZmVhdHVyZSBz
-ZXR0aW5ncw0KDQpzbyBpbiB0aGlzIGNhc2UsIHRoZSBjb250cm9sbGluZyBDb25maWcgQ2xpZW50
-IEFwcCB3aWxsIGJlIGNvbXBvc2luZyBhbGwgQ29uZmlnIENsaWVudCBtZXNzYWdlcyAoZXhjZXB0
-IGZvciBPVEEga2V5IG1lc3NhZ2VzKQ0KDQo+IA0KPiBJSVJDLCByZXF1ZXN0cyBjb21pbmcgaW50
-byB0aGUgZGFlbW9uIGZyb20gYSByZW1vdGUgQ29uZmlnIENsaWVudCBhcmUNCj4gaGFuZGxlZCBp
-bnRlcm5hbGx5IGFuZCB0aGVuIHBhc3NlZCB0byB0aGUgYXBwbGljYXRpb24gdmlhDQo+IFVwZGF0
-ZU1vZGVsQ29uZmlndWF0aW9uKCkgYW5kIGZyaWVuZHMsIHdoaWxlIG91dGdvaW5nIHJlcXVlc3Rz
-IGFyZSB0byBiZQ0KPiBoYW5kbGVkIGJ5IEFkZE5ldEtleSgpLCBldGMuPw0KPiANCj4gT24gdGhl
-IG90aGVyIGhhbmQsIG5vZGVzIG1pZ2h0IGltcGxlbWVudCB2ZW5kb3IgbW9kZWxzIHVzaW5nIGRl
-dmljZQ0KPiBzZWN1cml0eSwgc28gSSBndWVzcyB0aGVzZSBmdW5jdGlvbnMgYXJlIG1lYW50IGZv
-ciB0aGlzIHVzZSBjYXNlPw0KDQpJZiBub3QgYnkgdGhlIGN1cnJlbnQgc3BlYyByZXZpc2lvbiwg
-SSBiZWxpZXZlIGl0IHdpbGwgYmUgcG9zc2libGUgZm9yIG90aGVyIG1vZGVscyB0byBzZW5kIG1l
-c3NhZ2VzIHdpdGggZGV2X2tleSBzZWN1cml0eSwgYWx0aG91Z2ggdGhhdCBkb2VzIGFzc3VtZSBD
-b25maWcgQ2xpZW50IGxldmVsIHByaXZsZWRnZXMuDQoNCj4gDQo+IEFsc28sIEkgd291bGQgc3Vn
-Z2VzdCBhIHNtYWxsIHJlbmFtZSB0byBrZWVwIHRoaW5ncyBhIGJpdCBtb3JlDQo+IGNvbnNpc3Rl
-bnQ6DQo+ICAtIGlmIFNlbmRXaXRoRGV2aWNlS2V5KCksIHRoZW4gJ01lc3NhZ2VSZWNlaXZlZFdp
-dGhEZXZpY2VLZXkoKQ0KPiAgLSBpZiBEZXZLZXlNZXNzYWdlUmVkZWl2ZWQoKSwgdGhlbiAnRGV2
-S2V5U2VuZCgpDQo+IA0KPiBidXQgaW4gZ2VuZXJhbCwgSSdkIHJhdGhlciByZW5hbWUgdGhlIG9y
-aWdpbmFsIFNlbmQvTWVzc2FnZVJlY2VpdmVkLCBzbyB0aGF0DQo+IHdlIGVuZCB1cCB3aXRoOg0K
-PiAgLSBTZW5kQXBwbGljYXRpb25NZXNzYWdlICsgQXBwbGljYXRpb25NZXNzYWdlUmVjZWl2ZWQN
-Cj4gIC0gU2VuZERldmljZU1lc3NhZ2UgKyBEZXZpY2VNZXNzYWdlUmVjZWl2ZWQNCj4gIC0gU2Vu
-ZENvbnRyb2xNZXNzYWdlICsgQ29udHJvbE1lc3NhZ2VSZWNlaXZlZCAoYnV0IEkgZG9uJ3Qgc2Vl
-IGEgbmVlZA0KPiAgICB0byBleHBvc2UgdGhpcyB0byBhcHBsaWNhdGlvbiwgYXQgbGVhc3Qgbm90
-IGF0IHRoZSBtb21lbnQpDQoNCg0KVGhhdCBzZWVtcyByZWFzb25hYmxlLiBXZSB3aWxsIHJld29y
-ayBmb3IgbmFtaW5nIGNvbnNpc3RlbmN5Lg0KDQpJIGFtIG5vdCBzdXJlIHRoZXJlIGFyZSAqYW55
-KiBjb250cm9sIG1lc3NhZ2VzIHRoYXQgSSB3b3VsZCBleHBvc2UgdG8gYW55IG9mIHRoZSBBcHBz
-LiAgQ2VydGFpbmx5IG5vbmUgb2YgdGhlIGV4aXN0aW5nIHNldCBvZiBjb250cm9sIG1lc3NhZ2Vz
-LCBhbmQgSSB3b3JyeSB0aGF0IGV4cG9zaW5nIHRoZSBDb250cm9sIGludGVyZmFjZSB3b3VsZCBi
-ZSBzZWVuIGFzIGFuIGludml0YXRpb24gZm9yICJWZW5kb3IgVXNhZ2UiIHdoaWNoIGNvdWxkIGJl
-IGRpZmZpY3VsdCB0byBiYWNrIG91dCBsYXRlci4NCg0K
+On Wed, Apr 17, 2019 at 12:19 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Wed, Apr 17, 2019 at 4:46 PM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> > On Tue, Apr 16, 2019 at 4:38 PM Arnd Bergmann <arnd@arndb.de> wrote:
+> > > The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
+> > > socket protocol handlers, and all of those end up calling the same
+> > > sock_get_timestamp()/sock_get_timestampns() helper functions, which
+> > > results in a lot of duplicate code.
+> > >
+> > > With the introduction of 64-bit time_t on 32-bit architectures, this
+> > > gets worse, as we then need four different ioctl commands in each
+> > > socket protocol implementation.
+> > >
+> > > To simplify that, let's add a new .gettstamp() operation in
+> > > struct proto_ops, and move ioctl implementation into the common
+> > > sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
+> > > through.
+> > >
+> > > We can reuse the sock_get_timestamp() implementation, but generalize
+> > > it so it can deal with both native and compat mode, as well as
+> > > timeval and timespec structures.
+> > >
+> > > Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> > > Link: https://lore.kernel.org/lkml/CAK8P3a038aDQQotzua_QtKGhq8O9n+rdiz2=WDCp82ys8eUT+A@mail.gmail.com/
+> > > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > > ---
+> > > v2: reworked to not break sparc64 support
+> >
+> > From the discussion of v1 I thought you planned to unconditionally
+> > call sock_gettstamp() for all protocols, avoiding the need to plumb in
+> > all these new callbacks?
+> >
+> > That is more concise, though this closer to the existing behavior. So,
+> > fine either way.
+>
+> Thanks for the reminder. I have definitely waited too long before revisiting
+> this series, and only had a vague recollection of that discussion but could
+> not find it in the logs (found it now, and the Link I quoted...).
+>
+> I would prefer to get this series into the coming merge window, and
+> probably don't have time to rework it completely by then, so I hope
+> the current version is ok.
+
+Absolutely. This is a great simplification either way.
+
+> I also found your comment on lock_sock(), which could be easily
+> added inside of sock_gettstamp() if you think we should have that.
+
+To remind, the issue is that sock_enable_timestamp should update both
+sk_flags and net_enable_timestamp as one atomic operation, by holding
+the socket lock. The lock is held when called from a setsockopt path.
+And from some ioctl() implementations. The syzkaller reproducer
+triggered through inet_release, so the most widely used paths are
+buggy today.
+
+Since the current state is inconsistent already, we can defer the fix.
+I expect that it is now safe to add a lock around this logic without
+triggering lockdep issues in any of the numerous paths. But just in
+case, it still seems safer to do that in a separate patch that we can
+revert or rework independent from this, if that would prove necessary.
+
+> There is one more issue I just noticed (I dropped the necessary
+> sock_read_timestamp()), so I have to repost the series anyway
+> to fix that.
+
+Instead of reading sk->sk_stamp directly? Yes, makes sense.
