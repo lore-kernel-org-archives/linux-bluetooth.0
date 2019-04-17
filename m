@@ -7,126 +7,102 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 062B1C282DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 775FDC282DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:52:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B912320663
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4210A20663
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 18:52:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIE8lH+M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qxnMSiw7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729566AbfDQSms (ORCPT
+        id S1729939AbfDQSwX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Apr 2019 14:42:48 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:37917 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727340AbfDQSms (ORCPT
+        Wed, 17 Apr 2019 14:52:23 -0400
+Received: from mail-pg1-f169.google.com ([209.85.215.169]:36962 "EHLO
+        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727340AbfDQSwX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Apr 2019 14:42:48 -0400
-Received: by mail-oi1-f196.google.com with SMTP id a6so20858256oie.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2019 11:42:47 -0700 (PDT)
+        Wed, 17 Apr 2019 14:52:23 -0400
+Received: by mail-pg1-f169.google.com with SMTP id e6so12418977pgc.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Apr 2019 11:52:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=yN7AFswgTcE+Un2CcZhERcBuwBWVGfeNJ8aSaTMcGxU=;
-        b=RIE8lH+MB6Urc2Ju+hXtBk4OtKHKp4Y4AJT3rZMM/Q4l7f/sQb/10JjfVPiDOWwQ/l
-         1q3XO2TW1P4wueTEqRsWUDGYD/YmdXPB+HNCEIKDs3extpRRXWMdmxYLn6qFcjDXc23h
-         U8cGurLDwM6rti05wTIbQVKK3jlTSMFXcsmHRXZPQxu9tdmrtLcb3r+aa3JPnR9/YKPV
-         H2FnzyAJyEUKxjlLC9J0IH929l0SUNKNHqyC4gQqeuH0NbxkdEoW331pFI8bqOz/x7yG
-         EXyNSUIs+RIOVL5fGoWaae5oK62EJPV+dU1qFY1xPCgpoqNOZjOtE/qkmgBA9qefTQbw
-         g40w==
+        bh=TxYsYXozaJ4ud8f2A7S4XO7GpeX0MbslYzMkCJgNp+U=;
+        b=qxnMSiw7M4dsxTPg+j8QK0DnA72j//umn9wPSCgoMuKxBeSZQiWpJaOY6e9TpX6ktI
+         cE7UcKAKTUoiz04eFeV48N2MY7RF6pYeekeJksv9HuT6Esr1RyqJChsLT9zAAn13OBxS
+         VHmSSaSQjLxZXlv6r+ZqDtg9OmWlS24Ivb634Y5zcJrd6+D+t0PGvKl5MGlqyCNNEgXF
+         ouuFxynaHe9++Yx5DErWt0jLsvQpwrWDw2Dv5lGye4iWf1vmW/xPfCA6kLecRwMW5M5h
+         WKAiu56lKH4AkFqGTedGyFkWE0ifttldFpguvzoInxtizgUNtB8kr/9ednOewC2TGAIo
+         zW4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yN7AFswgTcE+Un2CcZhERcBuwBWVGfeNJ8aSaTMcGxU=;
-        b=nsbqUXb6E2U459r2R5fFmjTAjb/ASkDiUiBaFm2eRzx29GoKvluLxqU2CC5M0o7wxj
-         jOY6Q1AAIqvkkiwIORxeTWwrCZEaMUNrytUuyswhjiLAixBGBWiIuUj88z27ZJniwzE6
-         HXfjyvkOjGCT9N2Y6AO2iT7jSSw+obdQCNgblw7fpZFiwC+52S01Yuo+23F8XI0QaZRH
-         wBSrGIBEV5sDY2+qlq5Ccd29oG2WoyHhsYJ862fK9sFnttnIB8GFmQxMLzuBmogHYWyf
-         CvAgnSq19dvfvVg7swpvPSHvi2gridBN1oooBEIc6It+/W2YyjZOCVYZE827lL0bUvEj
-         7F1w==
-X-Gm-Message-State: APjAAAUW5aLJyLgGZWmbbD+I+bCsNBebvDM7Ht3EkD9ZBiBOz39Y/LMD
-        a6ljP5jRCb157DNGFwNv5Gb5KNiPpm5D/gF5dKw=
-X-Google-Smtp-Source: APXvYqwu167XSGs+qilRg0myBU9veTTRko+f1Oz44kCee7Tx7h3UcanI8yqRYqtRsW/cDVAMeDrD9gcvKU/R1FCa0xM=
-X-Received: by 2002:aca:adc8:: with SMTP id w191mr44736oie.110.1555526567264;
- Wed, 17 Apr 2019 11:42:47 -0700 (PDT)
+        bh=TxYsYXozaJ4ud8f2A7S4XO7GpeX0MbslYzMkCJgNp+U=;
+        b=oZcgU2IgwiMtamSxV/0K3nzzaBpD2yPpIHkBXUy7qFt8H84f9rxbzHRrOBzOB3LMpe
+         7Np7leyi80iIL5O2aV/ONN+e+V/y/kGbgGFGfUQ+BWGzT5BdMJsEDZGA30IHKhdut+YV
+         ORwiWnFHKss/GxWYjinUhE2y88zluDRvqokhYs7ezOpbGiGvPmPSF5gBs0Nj4uYUjs9J
+         y3K43ey9pTZhZr4Zd+sjIL8Tr/0+biUkHccOsB25wNYFbrYxOhgvJOq9treEnoClQ5a7
+         vuS7/QW7TYxHX1ABPmZUP4i6q01+HqzWbo+sO/J5oOqydqex29Hj3NtAlE6vH7ngdcoH
+         +1aQ==
+X-Gm-Message-State: APjAAAWvLbHp4E4cD0TNlljq9ENCdK6T0u+lZK2pL+fmq6KGHYD1vMd6
+        lFOVu19czKB/MNauHtGFwjY2rzTYHSAFFEof7SU=
+X-Google-Smtp-Source: APXvYqyqtGwgb1ZJYyWdO7YldEQCABBBentSZ4SCNx6EeeDHghlpdH3VaeSelvSkn0p81B5uaT8BRvShMJTUdUnKaks=
+X-Received: by 2002:a65:5342:: with SMTP id w2mr62292576pgr.220.1555527142668;
+ Wed, 17 Apr 2019 11:52:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190416193241.GA10277@amd>
-In-Reply-To: <20190416193241.GA10277@amd>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 17 Apr 2019 21:42:37 +0300
-Message-ID: <CABBYNZK92AH7fnQJ7ikz=nvroVN9AKQDNZ07es2V52kRP0RL=g@mail.gmail.com>
-Subject: Re: Gatt server with random address does not work (everything is ok
- with public address)
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <87ee5fc2175747e1a7cf5b50bad819d4@ausx13mpc124.AMER.DELL.COM>
+ <CAO1O6seYhTMHrgCQ+9gPCo_UOtXfhh9mRCVoUosP_Eq0FXD=sw@mail.gmail.com>
+ <bcaa44382c80428ba59b743678be0b18@ausx13mpc120.AMER.DELL.COM>
+ <CAO1O6sebmS8P0EVVL=U+eFFq+u0NdtbHUP0dO1D+LPa4vXOWqg@mail.gmail.com> <f3d5e376e4364350b06b665d4351fac9@ausx13mpc120.AMER.DELL.COM>
+In-Reply-To: <f3d5e376e4364350b06b665d4351fac9@ausx13mpc120.AMER.DELL.COM>
+From:   Emil Lenngren <emil.lenngren@gmail.com>
+Date:   Wed, 17 Apr 2019 20:52:12 +0200
+Message-ID: <CAO1O6sc4UD2QVaTt9sbO6e7GzdnqN++SzwhphX5CUX0CeHZGKQ@mail.gmail.com>
+Subject: Re: Pairing failure with BLE 4.0
+To:     YouRen.Chen@dellteam.com,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Cc:     Jared.Dominguez@dell.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pavel,
+Hi,
 
-On Tue, Apr 16, 2019 at 10:35 PM Pavel Machek <pavel@ucw.cz> wrote:
+Den ons 17 apr. 2019 kl 20:46 skrev <YouRen.Chen@dellteam.com>:
+> > Could you try remove these two lines at
+> > https://github.com/torvalds/linux/blob/v5.0/net/bluetooth/smp.c#L693
+> > to see if it works (also make sure by looking at the log later that those bits
+> > were not set in the Key Distribution field)?:
+> > local_dist |= SMP_DIST_LINK_KEY;
+> > remote_dist |= SMP_DIST_LINK_KEY;
+> >
+> > We have seen the exact same problem when Android 6 was released.
+> > However they have a workaround that they don't set the LinkKey bit if they
+> > suspect the device doesn't support it. I think they look at the advertising data
+> > which indicates in the flags that it doesn't support BR/EDR. I think BlueZ
+> > should do the same to workaround these incompatibility issues.
+> >
+> > /Emil
 >
-> Hi!
+> Sorry for the late response, the pairing process succeeds when the two
+> lines are removed from smp.c. I'm inquiring whether we have a patch
+> that already addresses this issue and if not, how it can be implemented.
+
+Good. Tell me if you need help with the patch on the peripheral side.
+
+> Just to make sure I understand this correctly, the PN557W sees the Link
+> Bit and returns Invalid Parameters because the bit is nonzero, correct?
+> This causes the pairing process to fail. By commenting out those two
+> lines, we are telling the master to not set the link bit to 1 before sending
+> the parameters?
 >
-> I adapted example-gatt-server for a project... and it works ok
-> (thanks), as long as public address is used. I could not configure
-> random address in main.conf, so I'm doing it with btmgmt:
+> /Joey
 
-Have you tried setting Privacy = device?
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/main.conf#n71
+Exactly.
 
-> #!/bin/bash
-> (
->     echo power off
->     sleep .1
->     echo le on
->     sleep .1
->     echo bredr off
->     sleep .1
->     echo static-addr c2:34:56:78:90:ab
->     #echo public-addr 00:1A:7D:DA:71:11
->     #echo static-addr c2:34:56:78:90:ab
->     sleep .1
->     echo connectable on
->     sleep .1
->     echo pairable on
->     sleep .1
-> #    echo discov on
->     sleep .1
-> #    echo advertising on
->     sleep .1
->     sleep .1
->     echo power on
-> ) | sudo ../bluez/tools/btmgmt
-> sleep 2
->
-> With random address, it does not work: lescan from other machine
-> detects right address, and I can connect, but that's it, services
-> can't be listed.
-
-bluetoothd don't really know that you have set a static address like
-that, anyway I don't know what exactly is not working so it very hard
-to give any instruction with such vague description of the problem.
-
-> I'm using 4.19 kernel on one side and current -next on the other side,
-> with bluez e4cf43fc62b4e4dbabc72d4e44e095d7a9087992, Fri Sep 7
-> 16:25:44 2018.
->
-> And it seems I'm not the only one having this problem:
-> https://stackoverflow.com/questions/50707914/setup-bluez-gatt-server-with-random-address
->
-> Any ideas how to debug that? Does configuration with random address
-> work for you? Is there chance update to latest versions helps?
-
-Look at privacy, if that doesn't work then collect the journal logs
-and btmon traces, etc.
-
-
--- 
-Luiz Augusto von Dentz
+/Emil
