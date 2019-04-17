@@ -1,250 +1,188 @@
-Return-Path: <SRS0=OOew=SS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=DUSx=ST=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EA6C10F13
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Apr 2019 22:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A1CC10F12
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 05:51:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B80802173C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Apr 2019 22:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D948A20835
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 05:51:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="sPXmx8YH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727942AbfDPWlC (ORCPT
+        id S1728378AbfDQFvj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Apr 2019 18:41:02 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:43553 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727136AbfDPWlC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Apr 2019 18:41:02 -0400
-X-Greylist: delayed 426 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Apr 2019 18:40:57 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 7AE53204198;
-        Wed, 17 Apr 2019 00:33:49 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id GbqKz4pLBTus; Wed, 17 Apr 2019 00:33:42 +0200 (CEST)
-Received: from [192.168.48.23] (host-45-58-224-183.dyn.295.ca [45.58.224.183])
-        by smtp.infotech.no (Postfix) with ESMTPA id 07E86204195;
-        Wed, 17 Apr 2019 00:33:36 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v3 00/26] compat_ioctl: cleanups
-To:     Arnd Bergmann <arnd@arndb.de>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org, y2038@lists.linaro.org,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Karsten Keil <isdn@linux-pingi.de>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
-        devel@driverdev.osuosl.org, linux-integrity@vger.kernel.org,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux1394-devel@lists.sourceforge.net,
-        amd-gfx@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, linux-ppp@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-s390@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
-        alsa-devel@alsa-project.org
-References: <20190416202013.4034148-1-arnd@arndb.de>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <c379ed8d-1f33-e391-a1b5-810da77605f2@interlog.com>
-Date:   Tue, 16 Apr 2019 18:33:35 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Wed, 17 Apr 2019 01:51:39 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:36278 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725814AbfDQFvi (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 17 Apr 2019 01:51:38 -0400
+Received: by mail-lf1-f68.google.com with SMTP id u17so17898761lfi.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Apr 2019 22:51:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=9RrPbM4P7rTk+ASxuWQtUNCk66bGsR4+F4v1wsjPaiM=;
+        b=sPXmx8YHQqU+rZDcJrvfp8WKm/2m9ZUQm6Zq64cgMoh51TeKej5Ikm2ffntElfD2x2
+         hU/DDLCjSvNEzpwE03NzCbI/cvep8Q5vq/y/E6AlVBN81j+qrOioZvVCM18aiyXei32w
+         Yr3J/HmtdvFD6PUnvsY18BHvKd1HcPQ3kN7eC1FB8+jtQwZLGokbGIMY4iGMOVUTzv9O
+         Cu/H4R+6YKSq+zQuGPpT4ALuiphyxru4pWjSSVtDdwlDq/aH1S0FtoP8AEuJjQi3bM8B
+         zhs9q7BwOeO+2rcj48q/5Bepb4Z8VzYRUqjQmC+PThdBfTLg86MIwRR2NWS01KRqeaAa
+         0anA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=9RrPbM4P7rTk+ASxuWQtUNCk66bGsR4+F4v1wsjPaiM=;
+        b=UfD3rMBzz5ETdexZG/MXC3wbsZb+OhGvq136/DbsWtMh2I3e3EkD/9/1rZravh8i32
+         j+65BOaUU+1Xq5VIj+8brR2AqeSgYreNNnXyR6r5w744K34osapPrBYi4qIPQ31GEEyG
+         rc6YKCRGlCESSAx8f56h1RBhfH4M1IyEcpg3tJBHso5UI1Q8HQCxaUuUGMdQySRqbKoI
+         RDHMAKa1AnqvsbaFfKlUDHfPHafO8Sd5H4pjgCbfwve0w20f6tg29R7mrBEInC+b7wZz
+         nWwdqh63zbEFpfiGLecn6UZfIcUYhQjhyTWxC7YR4rd+T/DPNWKfwJKTX5AaAm5z/sKi
+         nqFA==
+X-Gm-Message-State: APjAAAWmcVbOmwsdT8kEoq1B+A+ihuMg8B2YgE1dyrT5PvwfZuQX+RdX
+        XNs9AMbpNBRAPvtdkTKyx6aApQ==
+X-Google-Smtp-Source: APXvYqxjL5Py3nOii9HCUanVwcfd9m7dDWnxNErntIYAvev3uVKc5j4Na+NqlbutktRZ5/lFjswCUw==
+X-Received: by 2002:ac2:5505:: with SMTP id j5mr10425234lfk.121.1555480296068;
+        Tue, 16 Apr 2019 22:51:36 -0700 (PDT)
+Received: from kynes (apn-31-2-19-253.dynamic.gprs.plus.pl. [31.2.19.253])
+        by smtp.gmail.com with ESMTPSA id q12sm3415599lfa.37.2019.04.16.22.51.34
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 16 Apr 2019 22:51:35 -0700 (PDT)
+Date:   Wed, 17 Apr 2019 07:51:32 +0200
+From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
+        <michal.lowas-rzechonek@silvair.com>
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com,
+        marcel@holtmann.org, johan.hedberg@gmail.com
+Subject: Re: [PATCH BlueZ v5 1/1] mesh: Add APIs for Provisioner and Config
+ Client
+Message-ID: <20190417055132.scxvzhusx2suasdv@kynes>
+Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
+        linux-bluetooth@vger.kernel.org, inga.stotland@intel.com,
+        marcel@holtmann.org, johan.hedberg@gmail.com
+References: <20190415194946.13121-1-brian.gix@intel.com>
+ <20190415194946.13121-2-brian.gix@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190416202013.4034148-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190415194946.13121-2-brian.gix@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2019-04-16 4:19 p.m., Arnd Bergmann wrote:
-> Hi Al,
-> 
-> It took me way longer than I had hoped to revisit this series, see
-> https://lore.kernel.org/lkml/20180912150142.157913-1-arnd@arndb.de/
-> for the previously posted version.
-> 
-> I've come to the point where all conversion handlers and most
-> COMPATIBLE_IOCTL() entries are gone from this file, but for
-> now, this series only has the parts that have either been reviewed
-> previously, or that are simple enough to include.
-> 
-> The main missing piece is the SG_IO/SG_GET_REQUEST_TABLE conversion.
-> I'll post the patches I made for that later, as they need more
-> testing and review from the scsi maintainers.
+Hi Brian,
 
-Perhaps you could look at the document in this url:
-     http://sg.danny.cz/sg/sg_v40.html
+First of all, thank you for taking my comments into consideration!
 
-It is work-in-progress to modernize the SCSI generic driver. It
-extends ioctl(sg_fd, SG_IO, &pt_obj) to additionally accept the sg v4
-interface as defined in include/uapi/linux/bsg.h . Currently only the
-bsg driver uses the sg v4 interface. Since struct sg_io_v4 is all
-explicitly sized integers, I'm guessing it is immune "compat" problems.
-[I can see no reference to bsg nor struct sg_io_v4 in the current
-fs/compat_ioctl.c file.]
+On 04/15, Brian Gix wrote:
+> +	 uint64 token ImportLocalNode(string config_file)
 
-Other additions described in the that document are these new ioctls:
-   - SG_IOSUBMIT    ultimately to replace write(sg_fd, ...)
-   - SG_IORECEIVE              to replace read(sg_fd, ...)
-   - SG_IOABORT     abort SCSI cmd in progress; new functionality
-   - SG_SET_GET_EXTENDED   has associated struct sg_extended_info
+I am somewhat uncomfortable with passing a file path here. The caller
+would need to create a temporary file, which is a little cumbersome, and
+might fail if the daemon is running on another machine.
 
-The first three take a pointer to a struct sg_io_hdr (v3 interface) or
-a struct sg_io_v4 object. Both objects start with a 32 bit integer:
-'S' identifies the v3 interface while 'Q' identifies the v4 interface.
+Not sure what are the size constraints (if any), but I think it might be
+better to pass the JSON as a string.
 
-The SG_SET_GET_EXTENDED ioctl takes a pointer to a struct
-sg_extended_info object which contains explicitly sized integers so it
-may also be immune from "compat" problems. The ioctls section (13) of
-that document referenced above has a table showing how many "sets and
-gets" are hiding in the SG_SET_GET_EXTENDED ioctl.
+> +	void AddNetKey(object element_path, uint16 destination,
+> +			uint16 subnet_index, uint16 net_index, boolean update)
+> (...)
+> +	void AddAppKey(object element_path, uint16 destination,
+> +			uint16 app_index, uint16 net_index, boolean update)
 
-BTW No change is proposed for this case:
-     ioctl(normal_block_device, SG_IO, &sg_v3_obj)
-which is handled by block/scsi_ioctl.c
+If I understand correctly, these are convenience functions for
+SendWithDeviceKey, so that the application wouldn't need to construct
+access payloads for configuration messages?
+
+If so, I guess we will need more functions like that, ideally to cover
+all messages mentioned in section 4.3.4 of the mesh profile?
+
+I would suggest a few things:
+ - name these functions in the same way as the corresponding message
+ - possibly extract these into org.bluez.mesh.ConfigClient1 and
+   org.bluez.mesh.HealthClient1 interfaces, so that we don't need to
+   name functions "ConfigAppKeyApp", just "AppKeyApp"
+ - possibly add corresponding "* Status()" calls to application
+   hierarchy; see the question below about DevKeyMessageReceived
+
+> +	void ImportRemoteNode(uint16 primary, uint8 count,
+> +					array{byte}[16] device_key)
+> +
+> +		This method is used by the application to import a remote node
+> +		that has been provisioned by an external process.
+> +
+> +		The primary parameter specifies the unicast address of the
+> +		the node being imported.
+> +
+> +		The count parameter specifies the number of elements that are
+> +		assigned to this remote node.
+> +
+> +		The device_key parameter is the access layer key that will be
+> +		will used to decrypt privledged messages from this remote node.
+> +
+> +		PossibleErrors:
+> +			org.bluez.mesh.Error.InvalidArguments
+> +
+
+> +	void DeleteRemoteNode(uint16 primary, uint8 count)
+> (...)
+> +		The count parameter specifies the number of elements that were
+> +		assigned to the remote node.
+
+Do we need the count here? I think the daemon knows that already.
+
+> +	void SendWithDeviceKey(object element_path, uint16 destination,
+> +					uint16 net_index, array{byte} data)
+> +
+> +		This method is used to send a message originated by a local
+> +		model encoded with the device key of the remote node.
+> (...)
+> +	void DevKeyMessageReceived(uint16 source, uint16 net_index,
+> +							array{byte} data)
+> +
+> +		This method is called by meshd daemon when a message arrives
+> +		addressed to the application, which was sent with the remote
+> +		node's device key.
+
+Correct me if I'm wrong, but it seems that these two are not required to
+support foundation models?
+
+IIRC, requests coming into the daemon from a remote Config Client are
+handled internally and then passed to the application via
+UpdateModelConfiguation() and friends, while outgoing requests are to be
+handled by AddNetKey(), etc.?
+
+On the other hand, nodes might implement vendor models using device
+security, so I guess these functions are meant for this use case?
+
+Also, I would suggest a small rename to keep things a bit more
+consistent:
+ - if SendWithDeviceKey(), then 'MessageReceivedWithDeviceKey()
+ - if DevKeyMessageRedeived(), then 'DevKeySend()
+
+but in general, I'd rather rename the original Send/MessageReceived, so
+that we end up with:
+ - SendApplicationMessage + ApplicationMessageReceived
+ - SendDeviceMessage + DeviceMessageReceived
+ - SendControlMessage + ControlMessageReceived (but I don't see a need
+   to expose this to application, at least not at the moment)
 
 
-This would be a good time for me to address any "compat" concerns in the
-proposed sg driver update.
-
-Doug Gilbert
-
-
-> I hope you can still take these for the coming merge window, unless
-> new problems come up.
-> 
->        Arnd
-> 
-> Arnd Bergmann (26):
->    compat_ioctl: pppoe: fix PPPOEIOCSFWD handling
->    compat_ioctl: move simple ppp command handling into driver
->    compat_ioctl: avoid unused function warning for do_ioctl
->    compat_ioctl: move PPPIOCSCOMPRESS32 to ppp-generic.c
->    compat_ioctl: move PPPIOCSPASS32/PPPIOCSACTIVE32 to ppp_generic.c
->    compat_ioctl: handle PPPIOCGIDLE for 64-bit time_t
->    compat_ioctl: move rtc handling into rtc-dev.c
->    compat_ioctl: add compat_ptr_ioctl()
->    compat_ioctl: move drivers to compat_ptr_ioctl
->    compat_ioctl: use correct compat_ptr() translation in drivers
->    ceph: fix compat_ioctl for ceph_dir_operations
->    compat_ioctl: move more drivers to compat_ptr_ioctl
->    compat_ioctl: move tape handling into drivers
->    compat_ioctl: move ATYFB_CLK handling to atyfb driver
->    compat_ioctl: move isdn/capi ioctl translation into driver
->    compat_ioctl: move rfcomm handlers into driver
->    compat_ioctl: move hci_sock handlers into driver
->    compat_ioctl: remove HCIUART handling
->    compat_ioctl: remove HIDIO translation
->    compat_ioctl: remove translation for sound ioctls
->    compat_ioctl: remove IGNORE_IOCTL()
->    compat_ioctl: remove /dev/random commands
->    compat_ioctl: remove joystick ioctl translation
->    compat_ioctl: remove PCI ioctl translation
->    compat_ioctl: remove /dev/raw ioctl translation
->    compat_ioctl: remove last RAID handling code
-> 
->   Documentation/networking/ppp_generic.txt    |   2 +
->   arch/um/drivers/hostaudio_kern.c            |   1 +
->   drivers/android/binder.c                    |   2 +-
->   drivers/char/ppdev.c                        |  12 +-
->   drivers/char/random.c                       |   1 +
->   drivers/char/tpm/tpm_vtpm_proxy.c           |  12 +-
->   drivers/crypto/qat/qat_common/adf_ctl_drv.c |   2 +-
->   drivers/dma-buf/dma-buf.c                   |   4 +-
->   drivers/dma-buf/sw_sync.c                   |   2 +-
->   drivers/dma-buf/sync_file.c                 |   2 +-
->   drivers/firewire/core-cdev.c                |  12 +-
->   drivers/gpu/drm/amd/amdkfd/kfd_chardev.c    |   2 +-
->   drivers/hid/hidraw.c                        |   4 +-
->   drivers/hid/usbhid/hiddev.c                 |  11 +-
->   drivers/hwtracing/stm/core.c                |  12 +-
->   drivers/ide/ide-tape.c                      |  31 +-
->   drivers/iio/industrialio-core.c             |   2 +-
->   drivers/infiniband/core/uverbs_main.c       |   4 +-
->   drivers/isdn/capi/capi.c                    |  31 +
->   drivers/isdn/i4l/isdn_ppp.c                 |  14 +-
->   drivers/media/rc/lirc_dev.c                 |   4 +-
->   drivers/mfd/cros_ec_dev.c                   |   4 +-
->   drivers/misc/cxl/flash.c                    |   8 +-
->   drivers/misc/genwqe/card_dev.c              |  23 +-
->   drivers/misc/mei/main.c                     |  22 +-
->   drivers/misc/vmw_vmci/vmci_host.c           |   2 +-
->   drivers/mtd/ubi/cdev.c                      |  36 +-
->   drivers/net/ppp/ppp_generic.c               |  99 +++-
->   drivers/net/ppp/pppoe.c                     |   7 +
->   drivers/net/ppp/pptp.c                      |   3 +
->   drivers/net/tap.c                           |  12 +-
->   drivers/nvdimm/bus.c                        |   4 +-
->   drivers/nvme/host/core.c                    |   2 +-
->   drivers/pci/switch/switchtec.c              |   2 +-
->   drivers/platform/x86/wmi.c                  |   2 +-
->   drivers/rpmsg/rpmsg_char.c                  |   4 +-
->   drivers/rtc/dev.c                           |  13 +-
->   drivers/rtc/rtc-vr41xx.c                    |  10 +
->   drivers/s390/char/tape_char.c               |  41 +-
->   drivers/sbus/char/display7seg.c             |   2 +-
->   drivers/sbus/char/envctrl.c                 |   4 +-
->   drivers/scsi/3w-xxxx.c                      |   4 +-
->   drivers/scsi/cxlflash/main.c                |   2 +-
->   drivers/scsi/esas2r/esas2r_main.c           |   2 +-
->   drivers/scsi/megaraid/megaraid_mm.c         |  28 +-
->   drivers/scsi/osst.c                         |  34 +-
->   drivers/scsi/pmcraid.c                      |   4 +-
->   drivers/scsi/st.c                           |  35 +-
->   drivers/staging/android/ion/ion.c           |   4 +-
->   drivers/staging/pi433/pi433_if.c            |  12 +-
->   drivers/staging/vme/devices/vme_user.c      |   2 +-
->   drivers/tee/tee_core.c                      |   2 +-
->   drivers/usb/class/cdc-wdm.c                 |   2 +-
->   drivers/usb/class/usbtmc.c                  |   4 +-
->   drivers/usb/core/devio.c                    |  16 +-
->   drivers/usb/gadget/function/f_fs.c          |  12 +-
->   drivers/vfio/vfio.c                         |  39 +-
->   drivers/vhost/net.c                         |  12 +-
->   drivers/vhost/scsi.c                        |  12 +-
->   drivers/vhost/test.c                        |  12 +-
->   drivers/vhost/vsock.c                       |  12 +-
->   drivers/video/fbdev/aty/atyfb_base.c        |  12 +-
->   drivers/virt/fsl_hypervisor.c               |   2 +-
->   fs/btrfs/super.c                            |   2 +-
->   fs/ceph/dir.c                               |   1 +
->   fs/ceph/file.c                              |   2 +-
->   fs/compat_ioctl.c                           | 602 +-------------------
->   fs/fat/file.c                               |  13 +-
->   fs/fuse/dev.c                               |   2 +-
->   fs/notify/fanotify/fanotify_user.c          |   2 +-
->   fs/userfaultfd.c                            |   2 +-
->   include/linux/fs.h                          |   7 +
->   include/linux/if_pppox.h                    |   2 +
->   include/linux/mtio.h                        |  58 ++
->   include/uapi/linux/ppp-ioctl.h              |   2 +
->   include/uapi/linux/ppp_defs.h               |  14 +
->   net/bluetooth/hci_sock.c                    |  21 +-
->   net/bluetooth/rfcomm/sock.c                 |  14 +-
->   net/l2tp/l2tp_ppp.c                         |   3 +
->   net/rfkill/core.c                           |   2 +-
->   sound/core/oss/pcm_oss.c                    |   4 +
->   sound/oss/dmasound/dmasound_core.c          |   2 +
->   82 files changed, 452 insertions(+), 1034 deletions(-)
->   create mode 100644 include/linux/mtio.h
-> 
-
+regards
+-- 
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
