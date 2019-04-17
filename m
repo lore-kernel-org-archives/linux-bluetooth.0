@@ -2,44 +2,70 @@ Return-Path: <SRS0=DUSx=ST=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE14FC282DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 10:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D67F1C282DC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 14:46:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AA9420835
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 10:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A827C2173C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Apr 2019 14:46:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="odKzzrxn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731454AbfDQKBA (ORCPT
+        id S1732595AbfDQOqp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Apr 2019 06:01:00 -0400
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:46491 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726237AbfDQKA7 (ORCPT
+        Wed, 17 Apr 2019 10:46:45 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:33007 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732570AbfDQOqo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Apr 2019 06:00:59 -0400
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=bjornoya.blackshift.org)
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <mkl@pengutronix.de>)
-        id 1hGhML-0005iM-T5; Wed, 17 Apr 2019 12:00:05 +0200
-Received: from [IPv6:2a03:f580:87bc:d400:61a6:cf3c:f77c:6bd5] (unknown [IPv6:2a03:f580:87bc:d400:61a6:cf3c:f77c:6bd5])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits)
-         client-signature RSA-PSS (4096 bits))
-        (Client CN "mkl@blackshift.org", Issuer "StartCom Class 1 Client CA" (not verified))
-        (Authenticated sender: mkl@blackshift.org)
-        by smtp.blackshift.org (Postfix) with ESMTPSA id 393283FDEB4;
-        Wed, 17 Apr 2019 10:00:00 +0000 (UTC)
+        Wed, 17 Apr 2019 10:46:44 -0400
+Received: by mail-ed1-f68.google.com with SMTP id d55so20438332ede.0;
+        Wed, 17 Apr 2019 07:46:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Bf4zNrzh2HkCHcZSsf9zz0Z1oL3V3Ad5eDuXP2p14ic=;
+        b=odKzzrxnQ9EYWq6uD+DQnFOpPcurA3nck/SXHUSMYUJez3Y0KpPhsx2XNKlAaUEJYL
+         WJwIHMBIq7GmzNs6cIHEfQUR4Zx97jNe9f5NgaGEBD0PoeLF4FeHbWyafZOvU/t5wkEv
+         h0O/UosinViUOzAFrA3zPyaQokySQhmDoy5e8tmAWF3/xa17HddL2nD7x6uXIXnnO+J9
+         PDtWhmHKD0Yo3Og7BZytiFzMHkwkfs6qzjgrHWUM+K8REQOUOejNa2/4SM0MGbKGqKfO
+         sqorVInZJnSv/IEpkZ+xVPOrB6gm0RJPULyS5eoxNAaQs9A81xBcKlVCH7Vc/K2BK4G5
+         DzRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Bf4zNrzh2HkCHcZSsf9zz0Z1oL3V3Ad5eDuXP2p14ic=;
+        b=ktheEa3RdqCHYuaiy4pxLqKY5Pkk17kNOSBecv1BZXuf0Ly+ZcyGgsq3We3ttF4zAp
+         QGj6B9YBVd3VymrU64y4RTPHmDu7Pi7j9/dBlvLyoWHm6hOjLdL8ROkJ55xgAKLL03V1
+         kp2iNHTpb49cgxrnPT8ELiwetW77YJEvB0lVC9F7Mm2R7xnq22zniQdyOVW4kYZ0MNxZ
+         qLHRX/l2i4k2h6Hl725YAKJ3D/+pVwi0aQIW6hJ14Op2ghMU0Up9MO9STL/a1R09kypE
+         87vGA+7CjQxnR7HZPiSCRvR/dgV08riRDMH8QmABDNeQWzNtmWJrhPWmp9nsWwwQfB0L
+         zRYw==
+X-Gm-Message-State: APjAAAVVMS+V2KMggzWQgSUfC0sNuo0LQXhuCgNY68FuzBa3fdvJs+M+
+        OfUHnPndkZks1SJVJHPZnzCgbL9+E7yttwu/R6g=
+X-Google-Smtp-Source: APXvYqwyeoDTEjC2wXAuDiIUTxh8+7P42PyGOb8MRlQq4tyvB0KSytD27BMLneDt/lyd0wL12hTNBDxaMwPGGGyrKk8=
+X-Received: by 2002:aa7:d391:: with SMTP id x17mr71392edq.287.1555512400978;
+ Wed, 17 Apr 2019 07:46:40 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190416203620.539628-1-arnd@arndb.de>
+In-Reply-To: <20190416203620.539628-1-arnd@arndb.de>
+From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date:   Wed, 17 Apr 2019 10:46:05 -0400
+Message-ID: <CAF=yD-K89Z2ea_iakjfP98GnfU-yXts8LU4GW3Rr_etJ+r92pw@mail.gmail.com>
 Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
-To:     Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Ralf Baechle <ralf@linux-mips.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
         Gerrit Renker <gerrit@erg.abdn.ac.uk>,
         Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -51,180 +77,47 @@ To:     Arnd Bergmann <arnd@arndb.de>,
         Andrew Hendry <andrew.hendry@gmail.com>,
         Eric Dumazet <edumazet@google.com>,
         Willem de Bruijn <willemb@google.com>,
-        Deepa Dinamani <deepa.kernel@gmail.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-x25@vger.kernel.org
-References: <20190416203620.539628-1-arnd@arndb.de>
-From:   Marc Kleine-Budde <mkl@pengutronix.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mkl@pengutronix.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4eabda4b-d08e-ae29-b3df-0971e909fe9c@pengutronix.de>
-Date:   Wed, 17 Apr 2019 11:59:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190416203620.539628-1-arnd@arndb.de>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A"
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+        Deepa Dinamani <deepa.kernel@gmail.com>,
+        Network Development <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
+        dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A
-Content-Type: multipart/mixed; boundary="bhFxmOk9TZicUAH3UPosBJuXCCeMCMkUw";
- protected-headers="v1"
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>,
- Ralf Baechle <ralf@linux-mips.org>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Oliver Hartkopp <socketcan@hartkopp.net>,
- Gerrit Renker <gerrit@erg.abdn.ac.uk>, Alexander Aring
- <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>,
- Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Vlad Yasevich <vyasevich@gmail.com>, Neil Horman <nhorman@tuxdriver.com>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Andrew Hendry <andrew.hendry@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Willem de Bruijn <willemb@google.com>,
- Deepa Dinamani <deepa.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
- linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
-Message-ID: <4eabda4b-d08e-ae29-b3df-0971e909fe9c@pengutronix.de>
-Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
-References: <20190416203620.539628-1-arnd@arndb.de>
-In-Reply-To: <20190416203620.539628-1-arnd@arndb.de>
-
---bhFxmOk9TZicUAH3UPosBJuXCCeMCMkUw
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: quoted-printable
-
-On 4/16/19 10:32 PM, Arnd Bergmann wrote:
+On Tue, Apr 16, 2019 at 4:38 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
 > The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
 > socket protocol handlers, and all of those end up calling the same
 > sock_get_timestamp()/sock_get_timestampns() helper functions, which
 > results in a lot of duplicate code.
->=20
+>
 > With the introduction of 64-bit time_t on 32-bit architectures, this
 > gets worse, as we then need four different ioctl commands in each
 > socket protocol implementation.
->=20
+>
 > To simplify that, let's add a new .gettstamp() operation in
 > struct proto_ops, and move ioctl implementation into the common
 > sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
 > through.
->=20
+>
 > We can reuse the sock_get_timestamp() implementation, but generalize
 > it so it can deal with both native and compat mode, as well as
 > timeval and timespec structures.
->=20
+>
 > Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
-> Link: https://lore.kernel.org/lkml/CAK8P3a038aDQQotzua_QtKGhq8O9n+rdiz2=
-=3DWDCp82ys8eUT+A@mail.gmail.com/
+> Link: https://lore.kernel.org/lkml/CAK8P3a038aDQQotzua_QtKGhq8O9n+rdiz2=WDCp82ys8eUT+A@mail.gmail.com/
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> v2: reworked to not break sparc64 support
 
-For the CAN part:
+From the discussion of v1 I thought you planned to unconditionally
+call sock_gettstamp() for all protocols, avoiding the need to plumb in
+all these new callbacks?
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                  | Marc Kleine-Budde           |
-Industrial Linux Solutions        | Phone: +49-231-2826-924     |
-Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
-Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
-
-
---bhFxmOk9TZicUAH3UPosBJuXCCeMCMkUw--
-
---oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEmvEkXzgOfc881GuFWsYho5HknSAFAly2+RsACgkQWsYho5Hk
-nSA+5Qf/TdRQd9Jb+CrEOmRTXkDOy+oG5Q4lOH8kTGLGuVcufVKYrWxNazF2WNAU
-uiohTFCKRBHADN7QSPuJcj5bKF/zAva4tIOEI+P/E/kJKklBF0JwPc676SmkUaop
-mMat6DD+JbjBkUVVGum0QxcuvTX870gX//xOhwjjEZDwx9nphQ0LJHas6t675WJY
-/gM4YTaSzuGCMsh65dduYl3d2UG0a1X4S8JtOgoBniszfkJYDxd2TAhZdur/tCq6
-C3WtdnLh3NvCFu6Q4HDaBrXqgtv0/n1pX0zko+TNiNv0ETTx8bbHztafQBR/xWIt
-W2DtCx2TmAr9FxU5oK3tnc5OO9QiFg==
-=MQJ6
------END PGP SIGNATURE-----
-
---oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A--
+That is more concise, though this closer to the existing behavior. So,
+fine either way.
