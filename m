@@ -2,249 +2,131 @@ Return-Path: <SRS0=AkUh=SV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D29FC282DA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Apr 2019 19:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A944CC282DA
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Apr 2019 19:46:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 583F02171F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Apr 2019 19:35:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BEF920663
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Apr 2019 19:46:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UIrWbjJ0"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="Qe+bNI5v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726934AbfDSTfs (ORCPT
+        id S1725989AbfDSTqW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Apr 2019 15:35:48 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51574 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726248AbfDSTfr (ORCPT
+        Fri, 19 Apr 2019 15:46:22 -0400
+Received: from mail-lf1-f45.google.com ([209.85.167.45]:34364 "EHLO
+        mail-lf1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725860AbfDSTqW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Apr 2019 15:35:47 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 4so7198162wmf.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2019 12:35:45 -0700 (PDT)
+        Fri, 19 Apr 2019 15:46:22 -0400
+Received: by mail-lf1-f45.google.com with SMTP id h5so4718926lfm.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Apr 2019 12:46:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=8refgkCJ2d03ouxPRYA8g+PBkPVf5HShopTar0Cuivg=;
-        b=UIrWbjJ0GB7icjtAgWZAs/a+InDmzyf6T5Zqyf+1kNi/f/D5Ok4fTZm6tJoLlbiJU8
-         x/d/pzmisssNqLl1HApWy/82VV3P5aqjayuS6FCTV+vI++0KbEChR6lNtEBo7MTe7qeb
-         jHGSvdwi19AfZLH8ymJop6fEWKODYFBbdE4RO9O1nhXiYC+3/2ID1oI9imvVbwcbkEUd
-         dMCkTeCjWF3EYSvLGA9s10BQvzZmxY0F6aUtIw1LGvOaVv6Y+491DtbHotqFLkM8BSm6
-         qJXwKDraQEdTo7N+CbJdbDfUuLRHjZrZ7F7pEwN9H06zeDyoY2wGpRh/5GdLthyBy/Jl
-         5FQw==
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y7JaleO6PEFNWQBR76zy6Alcg1i3m7o3IdB4Ltmp080=;
+        b=Qe+bNI5vd8j/9yQyRw+wa2cXYnmaBhkkEl8qxHZ+4UjP47SFTHoo+vmIB9IZQKx/xh
+         zK5WIG2Rc+jXC1jE/vZO3TymAu0Y0tWE7VWAna9PbgZs+PGYIqghUvZRNL6pCo5WmC9B
+         LtUmmuZQ+bYsva3GhcIIuXP6aqH42GdSKC4zN200Jx3TTotkcjqGk1zO/3V0cftmJuRR
+         S0t0KJqh8CeVIMdxMvmZQsu7/Id83m9TfQtMsMNG4Rps88RimIphog7kzPN1uMsTbBrt
+         EUUvvaFmrL0tsMBNc70qXTI4hSesjOtK648XUwgA3/kPVkG2cINIwMKP2AwdxVexp6Z0
+         0V/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=8refgkCJ2d03ouxPRYA8g+PBkPVf5HShopTar0Cuivg=;
-        b=MMxAkhpuxDiY/D2vEmcK8rT0PulssSqT9G9e4f0W0ijHE7IeSBZ9ZBWwZAIvc6wNaE
-         C2hsd809eZqyeJzjf4v6YtOozsAy4b13Jumey1TjrpoGQB7FmwX9Wt9EfOtfpZrNibgD
-         wqIjHwBksMIUSPGpmbfshHjVOlLAtKrcYAgH0xn1TAXxMnpo3NBYG4fkSLNApICPRwoy
-         eqYy+4tOOo8ZwW1CFtbxka2ZI/o3i0QRog9dgSIuMmtuT50LlpqFXydzXWEiNuE43MaH
-         uGCsaIREchPxSsaogcyQNbNLfJlqCK/76udEvyUuuzRNKGV01PoF5kL1Ew1xD3Ogg+kL
-         hDvA==
-X-Gm-Message-State: APjAAAXfO9p4PO1jA/t4bsnqJM+iYWD6uXiwNRp57dJnHI12ewI9qnRC
-        WDToYo4KsOPj9AamGCujGV4sngxY
-X-Google-Smtp-Source: APXvYqzNbO9d74chVWRYCivgTH14pfXSoX+HnFHB4261AdropNwMu6+7HrkgI/A7poKbs7xvE66ycw==
-X-Received: by 2002:a1c:5543:: with SMTP id j64mr2299040wmb.37.1555671721714;
-        Fri, 19 Apr 2019 04:02:01 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id b11sm4491884wru.61.2019.04.19.04.02.00
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y7JaleO6PEFNWQBR76zy6Alcg1i3m7o3IdB4Ltmp080=;
+        b=okURXzOi4E+eGf0KlCQqYcqlxd2ZT0/0K3lNXlBZHaToM6RkQJ6uDeGrER923sXL3Q
+         5baxhlgvnQwIJNWRrVAFgwXOgqizn8LcqXvlUClbiJNeO1AHHg3qAV2rwbiHSFChmcq1
+         thS7tsaxZRhIbOIi7nA9iKcu2rBd9GNHkNREnWelGu8GZNlHSE7UuD59wjQAHvp58hxd
+         tcc1Jbz/cYg833KP4Mf6FAzjefM3a3JUdcjHpWRcJgdFh5BgNb+PSTVfUoG6OLKvUnwS
+         JVgoJ3qwFfFvK6WkdUWbYBW6eIigkxI95yxFeSAdErg7Svo6ESfXLNkr318k08JclhsB
+         q9RA==
+X-Gm-Message-State: APjAAAXg0VjWvf3jkpvtShroh/bTMPSN129p+/btqrrXwihzjZBtC/8/
+        6pF/DbPpWJ83hA8mVdzMllRJw9kS1BY=
+X-Google-Smtp-Source: APXvYqwSkhh2KUImRwv8pCRKPk33cnF+i9h1iItOJX59mG59Vq3cuuQrveRrrYtEVeqtsEo+qYX1Zw==
+X-Received: by 2002:ac2:5315:: with SMTP id c21mr2051232lfh.25.1555671110162;
+        Fri, 19 Apr 2019 03:51:50 -0700 (PDT)
+Received: from localhost.localdomain ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id s2sm1047332lfp.20.2019.04.19.03.51.49
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 19 Apr 2019 04:02:00 -0700 (PDT)
-Date:   Fri, 19 Apr 2019 13:01:59 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose
- remote SEP
-Message-ID: <20190419110159.7tec3yejhh4lnokb@pali>
-References: <20190122134524.20509-1-luiz.dentz@gmail.com>
- <CABBYNZLCFpXhbAnVYaA-nVNOY8QRvpR1UZhMHfy-awZxtpSocQ@mail.gmail.com>
- <20190122175622.dj6riiim6zukpetw@pali>
- <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
- <20190127020038.q3hm5h7xl2ku6fse@pali>
- <20190327111430.6gliqodnnojsifjd@pali>
- <20190419080348.fbgs55qqs3j2yovb@pali>
- <CABBYNZLNBFVNh42eQ-SDeRPKpS96AUdOsoN3jqZgHSvHfRwxOQ@mail.gmail.com>
+        Fri, 19 Apr 2019 03:51:49 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH] build: Bump glib dependency to 2.32
+Date:   Fri, 19 Apr 2019 12:51:46 +0200
+Message-Id: <20190419105146.29272-1-szymon.janc@codecoup.pl>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="up6v2ytndp3avjvt"
-Content-Disposition: inline
-In-Reply-To: <CABBYNZLNBFVNh42eQ-SDeRPKpS96AUdOsoN3jqZgHSvHfRwxOQ@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+make --no-print-directory all-am
+  CC       client/main.o
+In file included from /usr/include/glib-2.0/glib/gasyncqueue.h:32,
+                 from /usr/include/glib-2.0/glib.h:32,
+                 from client/main.c:36:
+/usr/include/glib-2.0/glib/gthread.h: In function ‘g_rec_mutex_locker_new’:
+/usr/include/glib-2.0/glib/gthread.h:390:3: error: ‘g_rec_mutex_lock’ is deprecated: Not available before 2.32 [-Werror=deprecated-declarations]
+   g_rec_mutex_lock (rec_mutex);
+   ^~~~~~~~~~~~~~~~
+/usr/include/glib-2.0/glib/gthread.h:196:17: note: declared here
+ void            g_rec_mutex_lock                (GRecMutex      *rec_mutex);
+                 ^~~~~~~~~~~~~~~~
+/usr/include/glib-2.0/glib/gthread.h: In function ‘g_rec_mutex_locker_free’:
+/usr/include/glib-2.0/glib/gthread.h:405:3: error: ‘g_rec_mutex_unlock’ is deprecated: Not available before 2.32 [-Werror=deprecated-declarations]
+   g_rec_mutex_unlock ((GRecMutex *) locker);
+   ^~~~~~~~~~~~~~~~~~
+/usr/include/glib-2.0/glib/gthread.h:200:17: note: declared here
+ void            g_rec_mutex_unlock              (GRecMutex      *rec_mutex);
+                 ^~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make[1]: *** [Makefile:6579: client/main.o] Error 1
+---
+ acinclude.m4 | 4 ++--
+ configure.ac | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
---up6v2ytndp3avjvt
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/acinclude.m4 b/acinclude.m4
+index bc39c6d73..4565f77e3 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -23,8 +23,8 @@ AC_DEFUN([COMPILER_FLAGS], [
+ 		with_cflags="$with_cflags -Wswitch-enum"
+ 		with_cflags="$with_cflags -Wformat -Wformat-security"
+ 		with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
+-		with_cflags="$with_cflags -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
+-		with_cflags="$with_cflags -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_28"
++		with_cflags="$with_cflags -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_32"
++		with_cflags="$with_cflags -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_32"
+ 	fi
+ 	AC_SUBST([WARNING_CFLAGS], $with_cflags)
+ ])
+diff --git a/configure.ac b/configure.ac
+index 0afe1e6db..1b4ef77f7 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -62,8 +62,8 @@ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 
+ AC_CHECK_HEADERS(linux/types.h linux/if_alg.h)
+ 
+-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
+-				AC_MSG_ERROR(GLib >= 2.28 is required))
++PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.32, dummy=yes,
++				AC_MSG_ERROR(GLib >= 2.32 is required))
+ AC_SUBST(GLIB_CFLAGS)
+ AC_SUBST(GLIB_LIBS)
+ 
+-- 
+2.20.1
 
-On Friday 19 April 2019 13:04:01 Luiz Augusto von Dentz wrote:
-> Hi Pali,
->=20
-> On Fri, Apr 19, 2019 at 11:03 AM Pali Roh=C3=A1r <pali.rohar@gmail.com> w=
-rote:
-> >
-> > On Wednesday 27 March 2019 12:14:30 Pali Roh=C3=A1r wrote:
-> > > On Sunday 27 January 2019 03:00:38 Pali Roh=C3=A1r wrote:
-> > > > On Wednesday 23 January 2019 13:24:22 Luiz Augusto von Dentz wrote:
-> > > > > Hi Pali,
-> > > > > On Tue, Jan 22, 2019 at 7:56 PM Pali Roh=C3=A1r <pali.rohar@gmail=
-=2Ecom> wrote:
-> > > > > >
-> > > > > > On Tuesday 22 January 2019 16:20:12 Luiz Augusto von Dentz wrot=
-e:
-> > > > > > > Hi Pali,
-> > > > > > > On Tue, Jan 22, 2019 at 3:45 PM Luiz Augusto von Dentz
-> > > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > > > > > >
-> > > > > > > > This adds the possibility to expose remote SEP using MediaE=
-ndpoint
-> > > > > > > > interface to allow setting a configuration.
-> > > > > > > > ---
-> > > > > > > >  doc/media-api.txt | 27 +++++++++++++++++++++++++--
-> > > > > > > >  1 file changed, 25 insertions(+), 2 deletions(-)
-> > > > > > > >
-> > > > > > > > diff --git a/doc/media-api.txt b/doc/media-api.txt
-> > > > > > > > index b5ad2db12..af9485342 100644
-> > > > > > > > --- a/doc/media-api.txt
-> > > > > > > > +++ b/doc/media-api.txt
-> > > > > > > > @@ -500,14 +500,23 @@ Properties        object Player [read=
-only]
-> > > > > > > >  MediaEndpoint1 hierarchy
-> > > > > > > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > > > > > > >
-> > > > > > > > -Service                unique name
-> > > > > > > > +Service                unique name (Server role)
-> > > > > > > > +               org.bluez (Client role)
-> > > > > > > >  Interface      org.bluez.MediaEndpoint1
-> > > > > > > > -Object path    freely definable
-> > > > > > > > +Object path    freely definable (Server role)
-> > > > > > > > +               [variable prefix]/{hci0,hci1,...}/dev_XX_XX=
-_XX_XX_XX_XX/sepX
-> > > > > > > > +               (Client role)
-> > > > > > > >
-> > > > > > > >  Methods                void SetConfiguration(object transp=
-ort, dict properties)
-> > > > > > > >
-> > > > > > > >                         Set configuration for the transport.
-> > > > > > > >
-> > > > > > > > +                       For client role transport must be s=
-et with a server
-> > > > > > > > +                       endpoint oject which will be config=
-ured and the
-> > > > > > > > +                       properties must contain the followi=
-ng properties:
-> > > > > > > > +
-> > > > > > > > +                               array{byte} Capabilities
-> > > > > > > > +
-> > > > > > > >                 array{byte} SelectConfiguration(array{byte}=
- capabilities)
-> > > > > > > >
-> > > > > > > >                         Select preferable configuration fro=
-m the supported
-> > > > > > > > @@ -532,6 +541,20 @@ Methods            void SetConfigurati=
-on(object transport, dict properties)
-> > > > > > > >                         endpoint, because when this method =
-gets called it has
-> > > > > > > >                         already been unregistered.
-> > > > > > > >
-> > > > > > > > +Properties     string UUID [readonly, optional]:
-> > > > > > > > +
-> > > > > > > > +                       UUID of the profile which the endpo=
-int is for.
-> > > > > > > > +
-> > > > > > > > +               byte Codec [readonly, optional]:
-> > > > > > > > +
-> > > > > > > > +                       Assigned number of codec that the e=
-ndpoint implements.
-> > > > > > > > +                       The values should match the profile=
- specification which
-> > > > > > > > +                       is indicated by the UUID.
-> > > > > > > > +
-> > > > > > > > +               array{byte} Capabilities [readonly, optiona=
-l]:
-> > > > > > > > +
-> > > > > > > > +                       Capabilities blob, it is used as it=
- is so the size and
-> > > > > > > > +                       byte order must match.
-> > > > > > > >
-> > > > > > > >  MediaTransport1 hierarchy
-> > > > > > > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> > > > > > > > --
-> > > > > > > > 2.17.2
-> > > > > > >
-> > > > > > > Can you try this set?
-> > > > > >
-> > > > > > Hi! In V3 you added only "a2dp: Add reverse discovery" patch ri=
-ght?
-> > > > > > I tested my setup also with this patch and there is no differen=
-ce,
-> > > > > > pulseaudio is working fine :-)
-> > > > > >
-> > > > >
-> > > > > Applied.
-> > > >
-> > > > Hi! I have one bug report for these patches.
-> > > >
-> > > > When I manually disconnect A2DP profile, but let HFP active then al=
-l SEP
-> > > > paths on D-Bus disappear.
-> > > >
-> > > >   qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX or=
-g.bluez.Device1.DisconnectProfile 0000110b-0000-1000-8000-00805f9b34fb
-> > > >
-> > > > So pulseaudio would still see bluetooth device as active (because H=
-FP is
-> > > > in use), but does not see any A2DP codec as all remote SEPs from DB=
-us
-> > > > were removed.
-> > > >
-> > > > It is possible to not remove remote SEPs when A2DP sink profile is
-> > > > manually disconnected?
-> > >
-> > > Hi Luiz! Have you looked at above problem?
-> >
-> > Hi! This one problem is still there.
->=20
-> This should have been fixed:
->=20
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3D9f7659a44=
-601e043bdb6724b0ab4f3f59c46e9fe
-
-Hi! It is still not fixed. I have that commit applied (it is in master
-branch), but SEPs still disappears from dbus after calling
-DisconnectProfile 0000110b-0000-1000-8000-00805f9b34fb as described
-above; even HFP/HSP is still active.
-
-Can you reproduce that problem?
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---up6v2ytndp3avjvt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXLmqpQAKCRCL8Mk9A+RD
-UvOyAJ90cZFp5fal+b/DKbqk84i1ilY5iQCeLVi7eimUHzREKqCvQtOSGO+hJc8=
-=6fTt
------END PGP SIGNATURE-----
-
---up6v2ytndp3avjvt--
