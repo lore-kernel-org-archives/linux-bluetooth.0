@@ -2,112 +2,63 @@ Return-Path: <SRS0=/BwN=SY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B75C282E1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Apr 2019 09:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BFEC10F11
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Apr 2019 15:25:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9457420685
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Apr 2019 09:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B301720859
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Apr 2019 15:25:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727217AbfDVJUq (ORCPT
+        id S1727818AbfDVPZ5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Apr 2019 05:20:46 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:34259 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726724AbfDVJUp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Apr 2019 05:20:45 -0400
-Received: from 61-220-137-37.hinet-ip.hinet.net ([61.220.137.37] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-        (Exim 4.76)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1hIV7y-00027o-PN; Mon, 22 Apr 2019 09:20:43 +0000
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>
-Subject: [PATCH 2/2] Bluetooth: btusb: Disable LE Advertising on system suspend
-Date:   Mon, 22 Apr 2019 17:20:34 +0800
-Message-Id: <20190422092034.21461-2-kai.heng.feng@canonical.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190422092034.21461-1-kai.heng.feng@canonical.com>
-References: <20190422092034.21461-1-kai.heng.feng@canonical.com>
+        Mon, 22 Apr 2019 11:25:57 -0400
+Received: from mga01.intel.com ([192.55.52.88]:54228 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726943AbfDVPZ5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 22 Apr 2019 11:25:57 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Apr 2019 08:25:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,382,1549958400"; 
+   d="scan'208";a="166831812"
+Received: from ingas-nuc1.sea.intel.com ([10.251.133.14])
+  by fmsmga001.fm.intel.com with ESMTP; 22 Apr 2019 08:25:56 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Fix structure memeber initialization
+Date:   Mon, 22 Apr 2019 08:25:55 -0700
+Message-Id: <20190422152555.5072-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-System may freeze during suspend, and it's caused by btusb early wakeup:
-
-kernel: pci_pm_suspend(): hcd_pci_suspend+0x0/0x30 returns -16
-kernel: dpm_run_callback(): pci_pm_suspend+0x0/0x130 returns -16
-kernel: PM: Device 0000:00:14.0 failed to suspend async: error -16
-kernel: PM: Some devices failed to suspend, or early wake event detected
-kernel: usb usb1: usb resume
-kernel: hub 1-0:1.0: hub_resume
-kernel: usb usb1-port1: status 0507 change 0000
-kernel: usb usb1-port6: status 0103 change 0004
-kernel: usb usb1-port10: status 0107 change 0000
-
-where btusb is connecte to usb1-port6.
-
-The expirement shows that the early wakeup is caused by LE Advertising
-packet.
-
-Disabling it via event mask can prevent the issue from happening.
-
-BugLink: https://bugs.launchpad.net/bugs/1823029
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+This fixes incorrectly reversed assignment of "friend" value in
+convert_node_to_storage()
 ---
- drivers/bluetooth/btusb.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ mesh/node.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 10c8f9872ee5..f03fcf5687e4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -490,6 +490,7 @@ struct btusb_data {
- 	int (*setup_on_usb)(struct hci_dev *hdev);
+diff --git a/mesh/node.c b/mesh/node.c
+index e7016ce75..157991dad 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -1297,7 +1297,7 @@ static void convert_node_to_storage(struct mesh_node *node,
  
- 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-+	bool suspended;
- };
+ 	memcpy(db_node->uuid, node->dev_uuid, 16);
  
- static inline void btusb_free_frags(struct btusb_data *data)
-@@ -3316,12 +3317,18 @@ static void btusb_disconnect(struct usb_interface *intf)
- static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
-+	struct hci_dev *hdev = data->hdev;
- 
- 	BT_DBG("intf %p", intf);
- 
- 	if (data->suspend_count++)
- 		return 0;
- 
-+	if (!PMSG_IS_AUTO(message)) {
-+		hci_disable_le_advertising(hdev);
-+		data->suspended = true;
-+	}
-+
- 	spin_lock_irq(&data->txlock);
- 	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
- 		set_bit(BTUSB_SUSPENDING, &data->flags);
-@@ -3427,6 +3434,11 @@ static int btusb_resume(struct usb_interface *intf)
- 	spin_unlock_irq(&data->txlock);
- 	schedule_work(&data->work);
- 
-+	if (data->suspended) {
-+		hci_enable_le_advertising(hdev);
-+		data->suspended = false;
-+	}
-+
- 	return 0;
- 
- failed:
+-	node->friend = db_node->modes.friend;
++	db_node->modes.friend = node->friend;
+ 	db_node->modes.relay.state = node->relay.mode;
+ 	db_node->modes.relay.cnt = node->relay.cnt;
+ 	db_node->modes.relay.interval = node->relay.interval;
 -- 
-2.17.1
+2.17.2
 
