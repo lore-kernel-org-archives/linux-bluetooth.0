@@ -2,114 +2,78 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9500FC10F03
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 18:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 052B0C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 19:38:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69E122183E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 18:17:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ZdyOese+"
+	by mail.kernel.org (Postfix) with ESMTP id D5A1821738
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 19:38:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726057AbfDWSRF (ORCPT
+        id S1726075AbfDWTii convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 14:17:05 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:45224 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725945AbfDWSRF (ORCPT
+        Tue, 23 Apr 2019 15:38:38 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:48553 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbfDWTii (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 14:17:05 -0400
-Received: by mail-pf1-f193.google.com with SMTP id e24so7877807pfi.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2019 11:17:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=67uVuMgweM7hUxYBRr+BCXFyj4G9EQBA3cdpWpXKaUY=;
-        b=ZdyOese++U6yeDFK4JwiA7/1PzuxGxjnF0t2+t+qEzOFW47+bQRmtSe/6Z1e9d8EQR
-         tFzSSJCcVyNk2k/gv/7GZffJOL8w/kYZwUbko77BbllKGrBxzXZ6M5o23b1tLu2QJl7x
-         LetVKFxM1fdJur996HbIIM8x0RNfqQsJoBQbY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=67uVuMgweM7hUxYBRr+BCXFyj4G9EQBA3cdpWpXKaUY=;
-        b=rMbfGBUgKu+Zjg0Bv+VasTWYd6CBiM6BbBgJRVJmKNqKUpMoYod4+FR5Y/ZixqTOuc
-         87Be/9P2luyehkmq8xuHoT10tMsIFKTQFEvh28z4q7u5c9At6PVnn4Ju4VIBEHNFp+9C
-         kcbbgIrRwCTQcbUnon9ao0taQIS2JUDiU6kZ4RtUYsHfQPXJ7Hlrclniog5RSJ9f5WoY
-         EifrMTJzTqgt4jE4Z8a6WaDUn+sRsdtlc123GYWtskOitmp7SOF57XLPaYKJtdLCw05A
-         df6ZtFVCCk+Q4iIN4+5VVA8LCy6xWjHGXXHu4vfuJ5PlOL9gRH+I8cE6dKaeU6uiqhoh
-         SM0w==
-X-Gm-Message-State: APjAAAWOYt5Jqp73PWc8gWEVFsPnFlFRR6aVLORTfqAmAX+RMvlbeOPB
-        mPjx0I2wb6Y4ZjetTDG9azigqA==
-X-Google-Smtp-Source: APXvYqzD46PxqMHlhoWOEjSl1bU63TPbnxkk8L1P/uaVGwlvas59aOEYHWzRDpRvUGVntBoDEjx0Yg==
-X-Received: by 2002:a63:5057:: with SMTP id q23mr26246814pgl.30.1556043425076;
-        Tue, 23 Apr 2019 11:17:05 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id z21sm22805381pfn.139.2019.04.23.11.17.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Apr 2019 11:17:04 -0700 (PDT)
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tue, 23 Apr 2019 15:38:38 -0400
+Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
+        by mail.holtmann.org (Postfix) with ESMTPSA id AB019CF2E8;
+        Tue, 23 Apr 2019 21:46:47 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH] Bluetooth: hci_qca: Fix crash with non-serdev devices
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190423181653.147804-1-mka@chromium.org>
+Date:   Tue, 23 Apr 2019 21:38:36 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>,
         Hemantg <hemantg@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH] Bluetooth: hci_qca: Fix crash with non-serdev devices
-Date:   Tue, 23 Apr 2019 11:16:52 -0700
-Message-Id: <20190423181653.147804-1-mka@chromium.org>
-X-Mailer: git-send-email 2.21.0.593.g511ec345e18-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Rocky Liao <rjliao@codeaurora.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <5BD8642B-7178-431B-B851-68E374752751@holtmann.org>
+References: <20190423181653.147804-1-mka@chromium.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-qca_set_baudrate() calls serdev_device_wait_until_sent() assuming that
-the HCI is always associated with a serdev device. This isn't true for
-ROME controllers instantiated through ldisc, where the call causes a
-crash due to a NULL pointer dereferentiation. Only call the function
-when we have a serdev device. The timeout for ROME devices at the end
-of qca_set_baudrate() is long enough to be reasonably sure that the
-command was sent.
+Hi Matthias,
 
-Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
-Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reported-by: Rocky Liao <rjliao@codeaurora.org>
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-Reviewed-by: Rocky Liao <rjliao@codeaurora.org>
-Tested-by: Rocky Liao <rjliao@codeaurora.org>
-Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
-Changes in v2:
-- first version got corrupted for some reason, this should apply
-- added 'Reviewed-by' tags from Rocky abd Balakrishna
-- added 'Tested-by' tag from Rocky
----
- drivers/bluetooth/hci_qca.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> qca_set_baudrate() calls serdev_device_wait_until_sent() assuming that
+> the HCI is always associated with a serdev device. This isn't true for
+> ROME controllers instantiated through ldisc, where the call causes a
+> crash due to a NULL pointer dereferentiation. Only call the function
+> when we have a serdev device. The timeout for ROME devices at the end
+> of qca_set_baudrate() is long enough to be reasonably sure that the
+> command was sent.
+> 
+> Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
+> Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> Reported-by: Rocky Liao <rjliao@codeaurora.org>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> Reviewed-by: Rocky Liao <rjliao@codeaurora.org>
+> Tested-by: Rocky Liao <rjliao@codeaurora.org>
+> Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+> Changes in v2:
+> - first version got corrupted for some reason, this should apply
+> - added 'Reviewed-by' tags from Rocky abd Balakrishna
+> - added 'Tested-by' tag from Rocky
+> ---
+> drivers/bluetooth/hci_qca.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index a80c3bc90904..7f75652686fe 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1006,7 +1006,8 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	while (!skb_queue_empty(&qca->txq))
- 		usleep_range(100, 200);
- 
--	serdev_device_wait_until_sent(hu->serdev,
-+	if (hu->serdev)
-+		serdev_device_wait_until_sent(hu->serdev,
- 		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
- 
- 	/* Give the controller time to process the request */
--- 
-2.21.0.593.g511ec345e18-goog
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
