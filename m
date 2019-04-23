@@ -2,120 +2,64 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 953E8C10F03
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB86BC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:35:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C0A821773
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94CB620643
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728688AbfDWQ2e convert rfc822-to-8bit (ORCPT
+        id S1728476AbfDWQfW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 12:28:34 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34390 "EHLO
+        Tue, 23 Apr 2019 12:35:22 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53860 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727656AbfDWQ2e (ORCPT
+        with ESMTP id S1727180AbfDWQfV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 12:28:34 -0400
+        Tue, 23 Apr 2019 12:35:21 -0400
 Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 20F41CF2E8;
-        Tue, 23 Apr 2019 18:36:43 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7DBF4CF2DA;
+        Tue, 23 Apr 2019 18:43:29 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 2/2] Bluetooth: btusb: Disable LE Advertising on system
- suspend
+Subject: Re: [RFC v1] Bluetooth: hci_core: Don't stop BT if the BD address
+ missing in dts
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190422092034.21461-2-kai.heng.feng@canonical.com>
-Date:   Tue, 23 Apr 2019 18:28:32 +0200
+In-Reply-To: <20190418132123.12816-1-bgodavar@codeaurora.org>
+Date:   Tue, 23 Apr 2019 18:35:18 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <3E3982D2-2912-4467-A8BF-C0BE53C9B82C@holtmann.org>
-References: <20190422092034.21461-1-kai.heng.feng@canonical.com>
- <20190422092034.21461-2-kai.heng.feng@canonical.com>
-To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
+        Matthias Kaehlcke <mka@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <371A1719-7CDD-4940-9D6F-0F3339FA50E6@holtmann.org>
+References: <20190418132123.12816-1-bgodavar@codeaurora.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kai-Heng,
+Hi Balakrishna,
 
-> System may freeze during suspend, and it's caused by btusb early wakeup:
+> When flag HCI_QUIRK_USE_BDADDR_PROPERTY is set, we will read the
+> bluetooth address from dts. If the bluetooth address node is missing
+> from the dts we will enable it controller UNCONFIGURED state.
+> This patch enables the normal flow even if the BD address is missing
+> from the dts tree.
 > 
-> kernel: pci_pm_suspend(): hcd_pci_suspend+0x0/0x30 returns -16
-> kernel: dpm_run_callback(): pci_pm_suspend+0x0/0x130 returns -16
-> kernel: PM: Device 0000:00:14.0 failed to suspend async: error -16
-> kernel: PM: Some devices failed to suspend, or early wake event detected
-> kernel: usb usb1: usb resume
-> kernel: hub 1-0:1.0: hub_resume
-> kernel: usb usb1-port1: status 0507 change 0000
-> kernel: usb usb1-port6: status 0103 change 0004
-> kernel: usb usb1-port10: status 0107 change 0000
-> 
-> where btusb is connecte to usb1-port6.
-> 
-> The expirement shows that the early wakeup is caused by LE Advertising
-> packet.
-> 
-> Disabling it via event mask can prevent the issue from happening.
-> 
-> BugLink: https://bugs.launchpad.net/bugs/1823029
-> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
-> drivers/bluetooth/btusb.c | 12 ++++++++++++
-> 1 file changed, 12 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 10c8f9872ee5..f03fcf5687e4 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -490,6 +490,7 @@ struct btusb_data {
-> 	int (*setup_on_usb)(struct hci_dev *hdev);
-> 
-> 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-> +	bool suspended;
-> };
-> 
-> static inline void btusb_free_frags(struct btusb_data *data)
-> @@ -3316,12 +3317,18 @@ static void btusb_disconnect(struct usb_interface *intf)
-> static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
-> {
-> 	struct btusb_data *data = usb_get_intfdata(intf);
-> +	struct hci_dev *hdev = data->hdev;
-> 
-> 	BT_DBG("intf %p", intf);
-> 
-> 	if (data->suspend_count++)
-> 		return 0;
-> 
-> +	if (!PMSG_IS_AUTO(message)) {
-> +		hci_disable_le_advertising(hdev);
-> +		data->suspended = true;
-> +	}
-> +
-> 	spin_lock_irq(&data->txlock);
-> 	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
-> 		set_bit(BTUSB_SUSPENDING, &data->flags);
-> @@ -3427,6 +3434,11 @@ static int btusb_resume(struct usb_interface *intf)
-> 	spin_unlock_irq(&data->txlock);
-> 	schedule_work(&data->work);
-> 
-> +	if (data->suspended) {
-> +		hci_enable_le_advertising(hdev);
-> +		data->suspended = false;
-> +	}
-> +
-> 	return 0;
+> net/bluetooth/hci_core.c | 2 --
+> 1 file changed, 2 deletions(-)
 
-this is a clear NAK. Please stop hacking things.
-
-Lets use hci_suspend_dev and hci_resume_dev and make it actually do something to disable the events for advertising.
+can I get an ACK for this one?
 
 Regards
 
