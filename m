@@ -3,66 +3,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED93C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0042DC10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:10:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 05109204FD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:09:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAE51208E4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:10:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728851AbfDWRJL (ORCPT
+        id S1728962AbfDWRKb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 13:09:11 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:59645 "EHLO
+        Tue, 23 Apr 2019 13:10:31 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56404 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728490AbfDWRJK (ORCPT
+        with ESMTP id S1727740AbfDWRKb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 13:09:10 -0400
+        Tue, 23 Apr 2019 13:10:31 -0400
 Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A91B5CF2E8;
-        Tue, 23 Apr 2019 19:17:19 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 682CCCF2F8;
+        Tue, 23 Apr 2019 19:18:39 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH] Bluetooth: btbcm: Add default address for BCM43341B
+Subject: Re: [PATCH net] 6lowpan: Off by one handling ->nexthdr
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190409141550.19458-1-ftoth@exalondelft.nl>
-Date:   Tue, 23 Apr 2019 19:09:08 +0200
-Cc:     andriy.shevchenko@linux.intel.com, Daniel Wagner <wagi@monom.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20190403053416.GA21913@kadam>
+Date:   Tue, 23 Apr 2019 19:10:28 +0200
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <4A3856F7-29F1-47A9-BFDB-B4B07E9BA720@holtmann.org>
-References: <20190409141550.19458-1-ftoth@exalondelft.nl>
-To:     Ferry Toth <ftoth@exalondelft.nl>
+Message-Id: <18F5B032-F127-4EB9-8DB8-F760C6455431@holtmann.org>
+References: <20190403053416.GA21913@kadam>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ferry,
+Hi Dan,
 
-> The BCM43341B has the default MAC address 43:34:1B:00:1F:AC if none
-> is given. This address was found when enabling Bluetooth on multiple
-> Intel Edison modules. It also contains the sequence 43341B, the name
-> the chip identifies itself as. Using the same BD_ADDR is problematic
-> when having multiple Intel Edison modules in each others range.
-> The default address also has the LAA (locally administered address)
-> bit set which prevents a BNEP device from being created, needed for
-> BT tethering.
+> NEXTHDR_MAX is 255.  What happens here is that we take a u8 value
+> "hdr->nexthdr" from the network and then look it up in
+> lowpan_nexthdr_nhcs[].  The problem is that if hdr->nexthdr is 0xff then
+> we read one element beyond the end of the array so the array needs to
+> be one element larger.
 > 
-> Add this to the list of black listed default MAC addresses and let
-> the user configure a valid one using f.i.
-> `btmgmt -i hci0 public-addr xx:xx:xx:xx:xx:xx`
-> 
-> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Signed-off-by: Ferry Toth <ftoth@exalondelft.nl>
+> Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
-> drivers/bluetooth/btbcm.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
+> This is the only place which uses the NEXTHDR_MAX define, so I considered
+> changing that to 256 instead.  Either fix would work.
+> 
+> net/6lowpan/nhc.c  | 2 +-
+> 1 files changed, 1 insertions(+), 1 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
