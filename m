@@ -2,115 +2,93 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE35C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 15:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42367C10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 15:45:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25394218C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 15:41:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C3DD218CD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 15:45:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727829AbfDWPlW (ORCPT
+        id S1728005AbfDWPpx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 11:41:22 -0400
-Received: from mga01.intel.com ([192.55.52.88]:5083 "EHLO mga01.intel.com"
+        Tue, 23 Apr 2019 11:45:53 -0400
+Received: from mga14.intel.com ([192.55.52.115]:53419 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727703AbfDWPlW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 11:41:22 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1728581AbfDWPpw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 23 Apr 2019 11:45:52 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Apr 2019 08:41:21 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Apr 2019 08:45:51 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,386,1549958400"; 
-   d="scan'208";a="145168963"
+   d="scan'208";a="164108913"
 Received: from stinkbox.fi.intel.com (HELO stinkbox) ([10.237.72.174])
-  by fmsmga007.fm.intel.com with SMTP; 23 Apr 2019 08:41:18 -0700
-Received: by stinkbox (sSMTP sendmail emulation); Tue, 23 Apr 2019 18:41:17 +0300
-Date:   Tue, 23 Apr 2019 18:41:17 +0300
-From:   Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Kay Sievers <kay.sievers@vrfy.org>,
-        Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 BlueZ] hid2hci: Fix udev rules for linux-4.14+
-Message-ID: <20190423154117.GV1747@intel.com>
-References: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
- <20181204204117.14964-1-ville.syrjala@linux.intel.com>
- <20181205070621.GE16346@kroah.com>
- <20181205154032.GT9144@intel.com>
- <20181205192036.GB434@kroah.com>
- <20181205194051.GU9144@intel.com>
- <20181205194916.GA20809@kroah.com>
+  by fmsmga002.fm.intel.com with SMTP; 23 Apr 2019 08:45:49 -0700
+Received: by stinkbox (sSMTP sendmail emulation); Tue, 23 Apr 2019 18:45:49 +0300
+From:   Ville Syrjala <ville.syrjala@linux.intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH BlueZ 1/2] hid2hci: Fix EALREADY handling after libusb removal
+Date:   Tue, 23 Apr 2019 18:45:48 +0300
+Message-Id: <20190423154549.31677-1-ville.syrjala@linux.intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181205194916.GA20809@kroah.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Dec 05, 2018 at 08:49:16PM +0100, Greg Kroah-Hartman wrote:
-> On Wed, Dec 05, 2018 at 09:40:51PM +0200, Ville Syrj‰l‰ wrote:
-> > On Wed, Dec 05, 2018 at 08:20:36PM +0100, Greg Kroah-Hartman wrote:
-> > > On Wed, Dec 05, 2018 at 05:40:32PM +0200, Ville Syrj‰l‰ wrote:
-> > > > On Wed, Dec 05, 2018 at 08:06:21AM +0100, Greg Kroah-Hartman wrote:
-> > > > > On Tue, Dec 04, 2018 at 10:41:17PM +0200, Ville Syrjala wrote:
-> > > > > > From: Ville Syrj‰l‰ <ville.syrjala@linux.intel.com>
-> > > > > > 
-> > > > > > Since commit 1455cf8dbfd0 ("driver core: emit uevents when
-> > > > > > device is bound to a driver") the kernel started emitting
-> > > > > > "bind" and "unbind" uevents which confuse the hid2hci
-> > > > > > udev rules.
-> > > > > > 
-> > > > > > The symptoms on an affected machine (Dell E5400 in my case)
-> > > > > > include bluetooth devices not appearing and udev hogging
-> > > > > > the cpu as it's busy processing a constant stream of these
-> > > > > > "bind"+"unbind" uevents.
-> > > > > 
-> > > > > What is causing a "stream" of bind and unbind events?  This only happens
-> > > > > when a device is attached to a driver or removed from a driver, which is
-> > > > > caused by something else happening.
-> > > > 
-> > > > Not sure if it's just due to this thing causing devices to
-> > > > appear/disappear during bind/unbind events or what.
-> > > 
-> > > Someone has to be telling the kernel to bind/unbind from a driver to
-> > > a device, it doesn't do it on its own.  Look at your other rules/scripts
-> > > for that.
-> > > 
-> > > Also note that the kernel has been doing this for over a year now (since
-> > > 4.l4), what just happened in 4.19 to cause this to be an issue?
-> > 
-> > It became an issue for me after I got a machine that suffers from
-> > this. The regression has been present ever since commit 1455cf8dbfd0
-> > ("driver core: emit uevents when device is bound to a driver").
-> > 
-> > You need a Dell E5400 or something similar to see it since those
-> > have these magic bluetooth devices or whatever.
-> 
-> What does the kernel log say is going on?  Is the device "bouncing" from
-> being added/removed from the system all the time?
+From: Ville Syrj√§l√§ <ville.syrjala@linux.intel.com>
 
-I totally forgot about this until another bluez update happened
-and the CPU hog came back.
+usb_control_msg() used to return the number bytes transferred wheras
+the replacement (control_message()) just returns 0 vs. error. This
+means the EALREADY handling is now broken. So let's just remove the
+EALREADY handling entirely.
 
-I had another look at this and I suppose the problem is caused by
-USBFS_IOCTL_DISCONNECT being called for every bind/unbind event.
-So I think this patch is still the right way to go.
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Fixes: e3cc40084ce4 ("tools: Remove libusb dependency from hid2hci")
+---
+ tools/hid2hci.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
-I did find a few more bugs in hid2hci but those don't actually make
-any real difference here. I'll send separate patches for those anyway.
-
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 1e0f7aa2ab8b..206a5af032ae 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -111,10 +111,7 @@ static int usb_switch_csr(int fd, enum mode mode)
+ 	err = control_message(fd, USB_ENDPOINT_OUT | USB_TYPE_VENDOR  |
+ 							USB_RECIP_DEVICE,
+ 						0, mode, 0, NULL, 0, 10000);
+-	if (err == 0) {
+-		err = -1;
+-		errno = EALREADY;
+-	} else if (errno == ETIMEDOUT)
++	if (err < 0 && errno == ETIMEDOUT)
+ 		err = 0;
+ 
+ 	return err;
+@@ -255,13 +252,8 @@ static int usb_switch_dell(int fd, enum mode mode)
+ 				USB_REQ_SET_CONFIGURATION,
+ 				0x7f | (0x03 << 8), 0,
+ 				report, sizeof(report), 5000);
+-	if (err == 0) {
+-		err = -1;
+-		errno = EALREADY;
+-	} else {
+-		if (errno == ETIMEDOUT)
+-			err = 0;
+-	}
++	if (err < 0 && errno == ETIMEDOUT)
++		err = 0;
+ 
+ 	return err;
+ }
 -- 
-Ville Syrj‰l‰
-Intel
+2.21.0
+
