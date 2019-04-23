@@ -2,76 +2,118 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66852C10F03
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45807C10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:58:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41284206BA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:31:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1565220835
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:58:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hFtB6KCr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729323AbfDWRbo (ORCPT
+        id S1728447AbfDWR55 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 13:31:44 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34001 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727745AbfDWRbo (ORCPT
+        Tue, 23 Apr 2019 13:57:57 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:41646 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726655AbfDWR55 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 13:31:44 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id AAAD7CF2DA;
-        Tue, 23 Apr 2019 19:39:53 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH][next] Bluetooth: Use struct_size() helper
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190328173029.GA13869@embeddedor>
-Date:   Tue, 23 Apr 2019 19:31:42 +0200
+        Tue, 23 Apr 2019 13:57:57 -0400
+Received: by mail-pl1-f193.google.com with SMTP id d9so1970366pls.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2019 10:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=/c0VAKrebet1xFE4ZU1kPtC1ZGWlTTNfkUjUjXJ3LZM=;
+        b=hFtB6KCreBGR8DZW+qEJrdmY1IL41Vvs2Rk5vLtADjR87ILeChYUJVnfrD87iv4mz5
+         PaEjFj/BEZaihxLokafZ2voGsNqYPGCnr6na0Z3uKKeQZemqluiZB/9ZOjCQ25DnAHn2
+         AbQ5fIbMiq5ME0P4iyg1z9iTeBCVlnf4IGilw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=/c0VAKrebet1xFE4ZU1kPtC1ZGWlTTNfkUjUjXJ3LZM=;
+        b=G6OaA+azpaWjm4l+JCsiqzgv+2Pabezh86hQ1j0gxp5z5wN4NtZgNMZfZZVrjcM36c
+         lHxJkdJAij1gEY5+Jn4ABmlilW3fTqguWKDWgNAoY+ycZxisbY8LtKpNZFpkeqfUeG49
+         SdTYHiF6UtPlAkAeY8x8jZcJveD70r3XpsnvLR8rSXdc5uP742XqGbqf7prWC6se1BnE
+         7mUq3+heLAndObC9K0JaYaocyAF5Mi60u6I6wRzqBSxkzehLf/2U6CHPnnXh3536ppOK
+         y28wBVUf+ojWmOscCb1yFUIzlftceU3NjPT3CW0/FclZxOsQ3icnk+OJcv8BU6YyyoZV
+         ZHGA==
+X-Gm-Message-State: APjAAAWvrPvaSRCpgbLeRdrXdr2yK7dh2E8kw/5jrqFGmhIfQCGbbFw+
+        Ws88PlKvIxr/T10k4coDJpV/Zw==
+X-Google-Smtp-Source: APXvYqyqs1i2BjOCruFSSkhGKAZ8/YSOp7QUwwQ3VnkcmFF/1pz4s0QsF3zqQU2lr9q6/pTd5bb86Q==
+X-Received: by 2002:a17:902:7b8e:: with SMTP id w14mr9341109pll.202.1556042276306;
+        Tue, 23 Apr 2019 10:57:56 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id r87sm28704099pfa.71.2019.04.23.10.57.55
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 23 Apr 2019 10:57:55 -0700 (PDT)
+Date:   Tue, 23 Apr 2019 10:57:54 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <6A0620E9-3A76-419F-984A-65BF0D961839@holtmann.org>
-References: <20190328173029.GA13869@embeddedor>
-To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: Re: [PATCH] Bluetooth: hci_qca: Fix crash with non-serdev devices
+Message-ID: <20190423175754.GC112750@google.com>
+References: <CAG5bF+TCPc=m_O33RHXHrt34T1Dz1zHLSkXfpxAoOTmrffGJ7w@mail.gmail.com>
+ <32C292F9-34DF-436F-896E-A219D961218F@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <32C292F9-34DF-436F-896E-A219D961218F@holtmann.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Gustavo,
+On Tue, Apr 23, 2019 at 07:26:40PM +0200, Marcel Holtmann wrote:
+> Hi Matthias,
+> 
+> > qca_set_baudrate() calls serdev_device_wait_until_sent() assuming that
+> > the HCI is always associated with a serdev device. This isn't true for
+> > ROME controllers instantiated through ldisc, where the call causes a
+> > crash due to a NULL pointer dereferentiation. Only call the function
+> > when we have a serdev device. The timeout for ROME devices at the end
+> > of qca_set_baudrate() is long enough to be reasonably sure that the
+> > command was sent.
+> > 
+> > Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm
+> > Bluetooth chip wcn3990")
+> > Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > Reported-by: Rocky Liao <rjliao@codeaurora.org>
+> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> > ---
+> > drivers/bluetooth/hci_qca.c | 3 ++-
+> > 1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> > index 4ea995d610d2..714a6a16f9d5 100644
+> > --- a/drivers/bluetooth/hci_qca.c
+> > +++ b/drivers/bluetooth/hci_qca.c
+> > @@ -1004,7 +1004,8 @@ static int qca_set_baudrate(struct hci_dev
+> > *hdev, uint8_t baudrate)
+> > 	while (!skb_queue_empty(&qca->txq))
+> > 		usleep_range(100, 200);
+> > 
+> > -	serdev_device_wait_until_sent(hu->serdev,
+> > +	if (hu->serdev)
+> > +		serdev_device_wait_until_sent(hu->serdev,
+> > 		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
+> 
+> somehow I get a malformed patch when I try to apply it. Can you send a new version against bluetooth-next with all tags added.
 
-> One of the more common cases of allocation size calculations is finding
-> the size of a structure that has a zero-sized array at the end, along
-> with memory for some number of elements for that array. For example:
-> 
-> struct foo {
->    int stuff;
->    struct boo entry[];
-> };
-> 
-> size = sizeof(struct foo) + count * sizeof(struct boo);
-> 
-> Instead of leaving these open-coded and prone to type mistakes, we can
-> now use the new struct_size() helper:
-> 
-> size = struct_size(instance, entry, count);
-> 
-> This code was detected with the help of Coccinelle.
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> ---
-> net/bluetooth/mgmt.c | 11 ++++-------
-> 1 file changed, 4 insertions(+), 7 deletions(-)
+Dunno what happened there, I'll send a new version with the tags in a
+bit.
 
-patch has been applied to bluetooth-next tree.
+Thanks
 
-Regards
-
-Marcel
-
+Matthias
