@@ -2,149 +2,189 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A76CC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4C8C10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:22:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2DF8208E4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD5882175B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:22:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728426AbfDWQRk convert rfc822-to-8bit (ORCPT
+        id S1728572AbfDWQWJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 12:17:40 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:56033 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726655AbfDWQRk (ORCPT
+        Tue, 23 Apr 2019 12:22:09 -0400
+Received: from mail-it1-f197.google.com ([209.85.166.197]:40347 "EHLO
+        mail-it1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728560AbfDWQWJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 12:17:40 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1C36ACF2DA;
-        Tue, 23 Apr 2019 18:25:48 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 0/2] Quirk to enable QCA9377 to discover BLE devices
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190423072236.24999-1-jprvita@endlessm.com>
-Date:   Tue, 23 Apr 2019 18:17:37 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        ytkim@qca.qualcomm.com, "David S. Miller" <davem@davemloft.net>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux@endlessm.com,
-        =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D4B5C1C6-0A7A-4666-A1D2-D7A42BD5EABA@holtmann.org>
-References: <20190423072236.24999-1-jprvita@endlessm.com>
-To:     =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Tue, 23 Apr 2019 12:22:09 -0400
+Received: by mail-it1-f197.google.com with SMTP id j8so487658ita.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2019 09:22:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=YncEbg9ZhXb+5O+uJ7Ce4S6rOwaZKK+qKUv3Yy+tRLI=;
+        b=p1C5mbuQ8+CwrF4zrjI7e8BALgpckiwTx1SfYQJhWV+kOo/hrcvVCcacNfk+SqPEKz
+         LzvlVGPQKCepyfkEdTXeyakqFgi2MxOY5QM6jaeqEEZdnrc+MvxZEp3SZ/gPlf5M9gf0
+         0Dxl0gh910YyloyfiBSPan5YDAItefPLDXs5FokjUZazPqne7rlJGSvQvIjR/nN3RDGt
+         WBO9gXoNo+oLF9x/UubHWKvhTz1Hj38o73Ylys9+pXa1WNtcsIcBnY7n59c4QWKmw5/J
+         lp0YLnZilXKnAd81WczKS+/RScFuoSTiMMLXWvLPWjMbFsvyfAKUlTm8NdONGr88/pFK
+         w51g==
+X-Gm-Message-State: APjAAAXcrUzAnqyLC7X9CFQdyp+X/OvA2x8veVAyjhTpxMGQJYdsad/9
+        ZScsjfXx0Jx/gEcdPH+iwLrwTB6lM15UUr6cg9WU/7beV5GL
+X-Google-Smtp-Source: APXvYqyo3pkQ09VVSg4igpwnfDZdO5VFlJqh9SJyoraK28mi0z7IRaJbdMnMg2gZjxUW85E38hAGuRSGPKrkR+zGRFSwXm8V8fdS
+MIME-Version: 1.0
+X-Received: by 2002:a5d:9152:: with SMTP id y18mr1742205ioq.165.1556036528324;
+ Tue, 23 Apr 2019 09:22:08 -0700 (PDT)
+Date:   Tue, 23 Apr 2019 09:22:08 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000876c89058734fc71@google.com>
+Subject: KASAN: use-after-free Read in rfcomm_dlc_open (2)
+From:   syzbot <syzbot+0b0fd24d40f358830891@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, gustavo@embeddedor.com,
+        johan.hedberg@gmail.com, keescook@chromium.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, tiny.windzz@gmail.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joao Paulo,
+Hello,
 
-> As reported previously on [1], it is currently not possible to discover
-> BLE devices with QCA9377 controllers. When trying to start an active
-> scanning procedure with this controller, three commands are queued,
-> LE_SET_RANDOM_ADDR, LE_SET_SCAN_PARAM and LE_SET_SCAN_ENABLE. After the
-> first command is sent to the controller, a command complete event for it
-> is received, and the second command is sent, an extra command complete
-> for the first command is received. At this point the kernel sends the
-> next command and fails to process the command complete event for the
-> LE_SET_SCAN_PARAM command, because when it arrives it does not match the
-> last command that was sent. This makes hdev->le_scan_type never be
-> updated and the kernel behaves as if a passive scanning procedure was
-> being performed, thus no device found events are sent to userspace.
-> 
-> [1] https://www.spinics.net/lists/linux-bluetooth/msg79102.html
-> 
-> I have received no replies on the previous report and on further
-> attempts to contact the QCA addresses that have submitted Bluetooth
-> firmware blobs to linux-firmware upstream. This series avoids the
-> problem described above, but I believe ideally the controller should not
-> be sending this extra command complete event.
-> 
-> I'm not 100% sure if the approach taken here is the best way to work
-> around this problem in the kernel, as I am not super familiar with the
-> HCI layer. I'll be happy to hear suggestions of better approaches.
-> 
-> Full logs from btmon can be found bellow this message, and the extra
-> command complete event can be seen at timestamp 27.420131.
+syzbot found the following crash on:
 
-so can we get a fixed firmware from Qualcomm? Or at least some ROM patches for it?
+HEAD commit:    432bc230 Merge branch 'hsr-next'
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=169eb223200000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4f97fc6e35679794
+dashboard link: https://syzkaller.appspot.com/bug?extid=0b0fd24d40f358830891
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
 
-> Best regards,
-> 
-> João Paulo Rechi Vita (2):
->  Bluetooth: Create new HCI_QUIRK_WAIT_FOR_MATCHING_CC
->  Bluetooth: Set HCI_QUIRK_WAIT_FOR_MATCHING_CC for QCA9377
-> 
-> drivers/bluetooth/btusb.c        | 9 +++++++++
-> include/net/bluetooth/hci.h      | 4 ++++
-> include/net/bluetooth/hci_core.h | 1 +
-> net/bluetooth/hci_core.c         | 3 +++
-> net/bluetooth/hci_event.c        | 4 ++++
-> 5 files changed, 21 insertions(+)
-> 
-> -- 
-> 2.20.1
-> 
-> Bluetooth monitor ver 5.50
-> = Note: Linux version 5.0.0+ (x86_64)                                  0.352340
-> = Note: Bluetooth subsystem version 2.22                               0.352343
-> = New Index: 80:C5:F2:8F:87:84 (Primary,USB,hci0)               [hci0] 0.352344
-> = Open Index: 80:C5:F2:8F:87:84                                 [hci0] 0.352345
-> = Index Info: 80:C5:F2:8F:87:84 (Qualcomm)                      [hci0] 0.352346
-> @ MGMT Open: bluetoothd (privileged) version 1.14             {0x0001} 0.352347
-> @ MGMT Open: btmon (privileged) version 1.14                  {0x0002} 0.352366
-> @ MGMT Open: btmgmt (privileged) version 1.14                {0x0003} 27.302164
-> @ MGMT Command: Start Discovery (0x0023) plen 1       {0x0003} [hci0] 27.302310
->        Address type: 0x06
->          LE Public
->          LE Random
-> < HCI Command: LE Set Random Address (0x08|0x0005) plen 6   #1 [hci0] 27.302496
->        Address: 15:60:F2:91:B2:24 (Non-Resolvable)
->> HCI Event: Command Complete (0x0e) plen 4                 #2 [hci0] 27.419117
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7  #3 [hci0] 27.419244
->        Type: Active (0x01)
->        Interval: 11.250 msec (0x0012)
->        Window: 11.250 msec (0x0012)
->        Own address type: Random (0x01)
->        Filter policy: Accept all advertisement (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                 #4 [hci0] 27.420131
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
+Unfortunately, I don't have any reproducer for this crash yet.
 
-so we really need to ignore this command complete and not start ahead with the next command. Especially since we really only support one command at a time right now.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+0b0fd24d40f358830891@syzkaller.appspotmail.com
 
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2      #5 [hci0] 27.420259
->        Scanning: Enabled (0x01)
->        Filter duplicates: Enabled (0x01)
->> HCI Event: Command Complete (0x0e) plen 4                 #6 [hci0] 27.420969
->      LE Set Scan Parameters (0x08|0x000b) ncmd 1
->        Status: Success (0x00)
+==================================================================
+BUG: KASAN: use-after-free in rfcomm_dlc_get  
+net/bluetooth/rfcomm/core.c:360 [inline]
+BUG: KASAN: use-after-free in __rfcomm_dlc_open  
+net/bluetooth/rfcomm/core.c:396 [inline]
+BUG: KASAN: use-after-free in rfcomm_dlc_open+0xc85/0xd60  
+net/bluetooth/rfcomm/core.c:431
+Read of size 1 at addr ffff888096921444 by task syz-executor.1/12781
 
-We need for this command complete to arrive and only then continue with LE Set Scan Enable. We don’t need a quirk for it. Just add support for dealing with unexpected command complete opcodes. And print a big error if that happens.
+CPU: 1 PID: 12781 Comm: syz-executor.1 Not tainted 5.1.0-rc4+ #140
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
+  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+  __asan_report_load1_noabort+0x14/0x20 mm/kasan/generic_report.c:129
+  rfcomm_dlc_get net/bluetooth/rfcomm/core.c:360 [inline]
+  __rfcomm_dlc_open net/bluetooth/rfcomm/core.c:396 [inline]
+  rfcomm_dlc_open+0xc85/0xd60 net/bluetooth/rfcomm/core.c:431
+  rfcomm_sock_connect+0x38a/0x4b0 net/bluetooth/rfcomm/sock.c:416
+  __sys_connect+0x266/0x330 net/socket.c:1808
+  __do_sys_connect net/socket.c:1819 [inline]
+  __se_sys_connect net/socket.c:1816 [inline]
+  __x64_sys_connect+0x73/0xb0 net/socket.c:1816
+  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x458c29
+Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 7b b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f730c7eac78 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458c29
+RDX: 000000000000000e RSI: 0000000020000040 RDI: 0000000000000004
+RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f730c7eb6d4
+R13: 00000000004beff7 R14: 00000000004d0098 R15: 00000000ffffffff
 
->> HCI Event: Command Complete (0x0e) plen 4                 #7 [hci0] 27.421983
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> @ MGMT Event: Command Complete (0x0001) plen 4        {0x0003} [hci0] 27.422059
->      Start Discovery (0x0023) plen 1
->        Status: Success (0x00)
->        Address type: 0x06
->          LE Public
->          LE Random
+Allocated by task 12282:
+  save_stack+0x45/0xd0 mm/kasan/common.c:75
+  set_track mm/kasan/common.c:87 [inline]
+  __kasan_kmalloc mm/kasan/common.c:497 [inline]
+  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:470
+  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:511
+  __do_kmalloc_node mm/slab.c:3688 [inline]
+  __kmalloc_node_track_caller+0x4e/0x70 mm/slab.c:3702
+  __kmalloc_reserve.isra.0+0x40/0xf0 net/core/skbuff.c:142
+  __alloc_skb+0x10b/0x5e0 net/core/skbuff.c:210
+  alloc_skb include/linux/skbuff.h:1056 [inline]
+  netlink_alloc_large_skb net/netlink/af_netlink.c:1182 [inline]
+  netlink_sendmsg+0x97b/0xd70 net/netlink/af_netlink.c:1900
+  sock_sendmsg_nosec net/socket.c:651 [inline]
+  sock_sendmsg+0xdd/0x130 net/socket.c:661
+  ___sys_sendmsg+0x3e2/0x930 net/socket.c:2260
+  __sys_sendmmsg+0x1bf/0x4d0 net/socket.c:2355
+  __do_sys_sendmmsg net/socket.c:2384 [inline]
+  __se_sys_sendmmsg net/socket.c:2381 [inline]
+  __x64_sys_sendmmsg+0x9d/0x100 net/socket.c:2381
+  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Regards
+Freed by task 12282:
+  save_stack+0x45/0xd0 mm/kasan/common.c:75
+  set_track mm/kasan/common.c:87 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:459
+  kasan_slab_free+0xe/0x10 mm/kasan/common.c:467
+  __cache_free mm/slab.c:3500 [inline]
+  kfree+0xcf/0x230 mm/slab.c:3823
+  skb_free_head+0x93/0xb0 net/core/skbuff.c:559
+  skb_release_data+0x576/0x7a0 net/core/skbuff.c:579
+  skb_release_all+0x4d/0x60 net/core/skbuff.c:633
+  __kfree_skb net/core/skbuff.c:647 [inline]
+  consume_skb net/core/skbuff.c:707 [inline]
+  consume_skb+0xe2/0x380 net/core/skbuff.c:701
+  netlink_unicast_kernel net/netlink/af_netlink.c:1311 [inline]
+  netlink_unicast+0x53e/0x720 net/netlink/af_netlink.c:1336
+  netlink_sendmsg+0x8ae/0xd70 net/netlink/af_netlink.c:1925
+  sock_sendmsg_nosec net/socket.c:651 [inline]
+  sock_sendmsg+0xdd/0x130 net/socket.c:661
+  ___sys_sendmsg+0x3e2/0x930 net/socket.c:2260
+  __sys_sendmmsg+0x1bf/0x4d0 net/socket.c:2355
+  __do_sys_sendmmsg net/socket.c:2384 [inline]
+  __se_sys_sendmmsg net/socket.c:2381 [inline]
+  __x64_sys_sendmmsg+0x9d/0x100 net/socket.c:2381
+  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Marcel
+The buggy address belongs to the object at ffff888096921300
+  which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 324 bytes inside of
+  512-byte region [ffff888096921300, ffff888096921500)
+The buggy address belongs to the page:
+page:ffffea00025a4840 count:1 mapcount:0 mapping:ffff88812c3f0940  
+index:0xffff888096921d00
+flags: 0x1fffc0000000200(slab)
+raw: 01fffc0000000200 ffffea000285acc8 ffffea00021aaa88 ffff88812c3f0940
+raw: ffff888096921d00 ffff888096921080 0000000100000003 0000000000000000
+page dumped because: kasan: bad access detected
 
+Memory state around the buggy address:
+  ffff888096921300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff888096921380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ffff888096921400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                            ^
+  ffff888096921480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff888096921500: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
