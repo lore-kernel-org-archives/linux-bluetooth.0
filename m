@@ -6,110 +6,256 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73482C282E1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 19:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECCCC10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 20:08:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D2E921738
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 19:42:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DD8221850
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 20:08:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726869AbfDWTmm convert rfc822-to-8bit (ORCPT
+        id S1726083AbfDWUIV convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 15:42:42 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:33230 "EHLO
+        Tue, 23 Apr 2019 16:08:21 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:54342 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725945AbfDWTmm (ORCPT
+        with ESMTP id S1726043AbfDWUIV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 15:42:42 -0400
+        Tue, 23 Apr 2019 16:08:21 -0400
 Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5B2BDCF2E8;
-        Tue, 23 Apr 2019 21:50:51 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 110B7CF2E8;
+        Tue, 23 Apr 2019 22:16:30 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [Patch net v2 1/3] bluetooth: validate HCI_EVENT_PKT packet
- carefully
+Subject: Re: [RFC] Bluetooth: Retry configure request if result is
+ L2CAP_CONF_UNKNOWN
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190403230835.1174-2-xiyou.wangcong@gmail.com>
-Date:   Tue, 23 Apr 2019 21:42:40 +0200
-Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        syzbot+cec7a50c412a2c03f8f5@syzkaller.appspotmail.com,
-        syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com,
+In-Reply-To: <20190208025828.30901-1-andrew.smirnov@gmail.com>
+Date:   Tue, 23 Apr 2019 22:08:19 +0200
+Cc:     linux-bluetooth@vger.kernel.org,
+        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
+        Florian Dollinger <dollinger.florian@gmx.de>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Tomas Bortoli <tomasbortoli@gmail.com>
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <5F6E057E-4897-4F74-9FA4-0CB41222DB5F@holtmann.org>
-References: <20190403230835.1174-1-xiyou.wangcong@gmail.com>
- <20190403230835.1174-2-xiyou.wangcong@gmail.com>
-To:     Cong Wang <xiyou.wangcong@gmail.com>
+Message-Id: <D53F2ED9-E0E6-4290-9E3E-864D2AF43572@holtmann.org>
+References: <20190208025828.30901-1-andrew.smirnov@gmail.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Cong,
+Hi Andrey,
 
-> hci_event_packet() blindly assumes all packets are sane, at least
-> for packets allocated via vhci_get_user() path this is not true.
-> We have to check if we access skb data out-of-bound with
-> pskb_may_pull() before each skb->data dereference on RX path.
+> Due to:
 > 
-> Reported-and-tested-by: syzbot+cec7a50c412a2c03f8f5@syzkaller.appspotmail.com
-> Reported-and-tested-by: syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com
+> - current implementation of l2cap_config_rsp() dropping BT
+>   connection if sender of configuration response replied with unknown
+>   option failure (Result=0x0003/L2CAP_CONF_UNKNOWN)
+> 
+> - current implementation of l2cap_build_conf_req() adding
+>   L2CAP_CONF_RFC(0x04) option to initial configure request sent by
+>   the Linux host.
+> 
+> devices that do no recongninze L2CAP_CONF_RFC, such as Xbox One S
+> controllers, will get stuck in endless connect -> configure ->
+> disconnect loop, never connect and be generaly unusable.
+> 
+> To avoid this problem add code to do the following:
+> 
+> 1. Store a mask of supported conf option types per connection
+> 
+> 2. Parse the body of response L2CAP_CONF_UNKNOWN and adjust
+>    connection's supported conf option types mask
+> 
+> 3. Retry configuration step the same way it's done for
+>    L2CAP_CONF_UNACCEPT
+> 
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Cc: Pierre-Loup A. Griffais <pgriffais@valvesoftware.com>
+> Cc: Florian Dollinger <dollinger.florian@gmx.de>
 > Cc: Marcel Holtmann <marcel@holtmann.org>
 > Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: Dan Carpenter <dan.carpenter@oracle.com>
-> Reviewed-by: Tomas Bortoli <tomasbortoli@gmail.com>
-> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
 > ---
-> net/bluetooth/hci_event.c | 262 +++++++++++++++++++++++++++++++-------
-> 1 file changed, 218 insertions(+), 44 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 609fd6871c5a..2fef70c0bffe 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2331,10 +2331,13 @@ static void hci_cs_switch_role(struct hci_dev *hdev, u8 status)
+> Everyone:
 > 
-> static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> -	__u8 status = *((__u8 *) skb->data);
-> 	struct discovery_state *discov = &hdev->discovery;
-> 	struct inquiry_entry *e;
-> +	__u8 status;
+> I marked this as an RFC, since I don't have a lot of experience with
+> Bluetooth subsystem and don't have hight degree of confidence about
+> choices made in this patch. I do, however, thins is is good enough to
+> start a discussion about the problem.
 > 
-> +	if (unlikely(!pskb_may_pull(skb, 1)))
-> +		return;
-> +	status = *((__u8 *)skb->data);
-> 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> 
-> 	hci_conn_check_pending(hdev);
-> @@ -2391,14 +2394,21 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> static void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	struct inquiry_data data;
-> -	struct inquiry_info *info = (void *) (skb->data + 1);
-> -	int num_rsp = *((__u8 *) skb->data);
-> +	struct inquiry_info *info;
-> +	int num_rsp;
-> 
-> 	BT_DBG("%s num_rsp %d", hdev->name, num_rsp);
-> 
-> +	if (unlikely(!pskb_may_pull(skb, 1)))
-> +		return;
-> +	num_rsp = *((__u8 *)skb->data);
-> 	if (!num_rsp)
-> 		return;
-> 
-> +	if (unlikely(!pskb_may_pull(skb, 1 + num_rsp * sizeof(*info))))
-> +		return;
-> +	info = (void *)(skb->data + 1);
-> +
-> 	if (hci_dev_test_flag(hdev, HCI_PERIODIC_INQ))
-> 		return;
+> Thanks,
+> Andrey Smirnov
 
-this really looks like we better create a macro for this. It is repetitive code that can be turned into just a macro usage.
+so it seems that the remote side claims to support Streaming Mode and that is why we are trying to set it up.
+
+> ACL Data RX: Handle 12 flags 0x02 dlen 16
+      L2CAP: Information Response (0x0b) ident 1 len 8
+        Type: Extended features supported (0x0002)
+        Result: Success (0x0000)
+        Features: 0x00000010
+          Streaming Mode
+
+And that is why we do this.
+
+< ACL Data TX: Handle 12 flags 0x00 dlen 23
+      L2CAP: Configure Request (0x04) ident 2 len 15
+        Destination CID: 64
+        Flags: 0x0000
+        Option: Retransmission and Flow Control (0x04) [mandatory]
+          Mode: Basic (0x00)
+          TX window size: 0
+          Max transmit: 0
+          Retransmission timeout: 0
+          Monitor timeout: 0
+          Maximum PDU size: 0
+
+> ACL Data RX: Handle 12 flags 0x02 dlen 15
+      L2CAP: Configure Response (0x05) ident 2 len 7
+        Source CID: 64
+        Flags: 0x0000
+        Result: Failure - unknown options (0x0003)
+        04
+
+So btmon needs a patch to decide the failed option octet here. We really want do provide a human description of the failed option.
+
+> 
+> include/net/bluetooth/l2cap.h |  1 +
+> net/bluetooth/l2cap_core.c    | 58 ++++++++++++++++++++++++++++++-----
+> 2 files changed, 51 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 093aedebdf0c..6898bba5d9a8 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -632,6 +632,7 @@ struct l2cap_conn {
+> 	unsigned int		mtu;
+> 
+> 	__u32			feat_mask;
+> +	__u32			known_options;
+> 	__u8			remote_fixed_chan;
+> 	__u8			local_fixed_chan;
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index f17e393b43b4..49be98b6de72 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3243,8 +3243,10 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+> 		rfc.monitor_timeout = 0;
+> 		rfc.max_pdu_size    = 0;
+> 
+> -		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> -				   (unsigned long) &rfc, endptr - ptr);
+> +		if (chan->conn->known_options & BIT(L2CAP_CONF_RFC)) {
+> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> +					   (unsigned long)&rfc, endptr - ptr);
+> +		}
+> 		break;
+> 
+> 	case L2CAP_MODE_ERTM:
+> @@ -3263,8 +3265,10 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+> 		rfc.txwin_size = min_t(u16, chan->tx_win,
+> 				       L2CAP_DEFAULT_TX_WINDOW);
+> 
+> -		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> -				   (unsigned long) &rfc, endptr - ptr);
+> +		if (chan->conn->known_options & BIT(L2CAP_CONF_RFC)) {
+> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> +					   (unsigned long)&rfc, endptr - ptr);
+> +		}
+> 
+> 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
+> 			l2cap_add_opt_efs(&ptr, chan, endptr - ptr);
+> @@ -3295,8 +3299,10 @@ static int l2cap_build_conf_req(struct l2cap_chan *chan, void *data, size_t data
+> 			     L2CAP_FCS_SIZE);
+> 		rfc.max_pdu_size = cpu_to_le16(size);
+> 
+> -		l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> -				   (unsigned long) &rfc, endptr - ptr);
+> +		if (chan->conn->known_options & BIT(L2CAP_CONF_RFC)) {
+> +			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
+> +					   (unsigned long)&rfc, endptr - ptr);
+> +		}
+> 
+> 		if (test_bit(FLAG_EFS_ENABLE, &chan->flags))
+> 			l2cap_add_opt_efs(&ptr, chan, endptr - ptr);
+> @@ -3550,11 +3556,47 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+> 	void *endptr = data + size;
+> 	int type, olen;
+> 	unsigned long val;
+> +	const bool unknown_options = *result == L2CAP_CONF_UNKNOWN;
+> 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
+> 	struct l2cap_conf_efs efs;
+> 
+> 	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
+> 
+> +	/* throw out any old stored conf requests */
+> +	*result = L2CAP_CONF_SUCCESS;
+> +
+> +	if (unknown_options) {
+> +		const u8 *option_type = rsp;
+> +
+> +		if (!len) {
+> +			/* If no list of unknown option types is
+> +			 * provided there's nothing for us to do
+> +			 */
+> +			return -ECONNREFUSED;
+> +		}
+> +
+> +		while (len--) {
+> +			BT_DBG("chan %p, unknown option type: %u", chan,
+> +			       *option_type);
+> +			/* "...Hints shall not be included in the
+> +			 * Response and shall not be the sole cause
+> +			 * for rejecting the Request.."
+> +			 */
+> +			if (*option_type & L2CAP_CONF_HINT)
+> +				return -ECONNREFUSED;
+> +			/* Make sure option type is one of the types
+> +			 * supported/used in configure requests
+> +			 */
+> +			if (*option_type < L2CAP_CONF_MTU ||
+> +			    *option_type > L2CAP_CONF_EWS)
+> +				return -ECONNREFUSED;
+> +
+> +			chan->conn->known_options &= ~BIT(*option_type++);
+> +		}
+> +
+> +		return l2cap_build_conf_req(chan, data, size);
+> +	}
+> +
+> 	while (len >= L2CAP_CONF_OPT_SIZE) {
+> 		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
+> 		if (len < 0)
+> @@ -4240,6 +4282,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+> 		}
+> 		goto done;
+> 
+> +	case L2CAP_CONF_UNKNOWN:
+> 	case L2CAP_CONF_UNACCEPT:
+> 		if (chan->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
+> 			char req[64];
+> @@ -4249,8 +4292,6 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+> 				goto done;
+> 			}
+> 
+> -			/* throw out any old stored conf requests */
+> -			result = L2CAP_CONF_SUCCESS;
+> 			len = l2cap_parse_conf_rsp(chan, rsp->data, len,
+> 						   req, sizeof(req), &result);
+> 			if (len < 0) {
+
+So I really wonder if we want to combine CONF_UNKNOWN and CONF_UNACCEPT actually here. It might be better to do them as separate handlers.
+
+Frankly it might be enough if the option code 0x04 is marked as not supported, then just clear
+
+	conn->feat_mask &= ~(L2CAP_FEAT_ERTM | L2CAP_FEAT_STREAMING);
+
+There is really no point for us known about all unsupported / unknown options. Unless we understand them, then don’t bother. Just keep it simple.
 
 Regards
 
