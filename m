@@ -1,180 +1,235 @@
-Return-Path: <SRS0=/BwN=SY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C409CC10F11
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Apr 2019 20:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F46C10F14
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 07:23:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87133204EC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Apr 2019 20:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 342502077C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 07:23:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Igpy/2K4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhqYpduB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729832AbfDVUGc (ORCPT
+        id S1726423AbfDWHXG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Apr 2019 16:06:32 -0400
-Received: from mout.gmx.net ([212.227.15.19]:33235 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732289AbfDVUG3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Apr 2019 16:06:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1555963583;
-        bh=63y9FsQSH/3hN6yI2OoIBjNoXaH+fyW99Fq3ecVomPo=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=Igpy/2K4gL0TKy4AXAubIVgPVqnptQSPH5ZO38mr1RqAibDE1dTUhcKy7WttUC3k2
-         6F8un32O86x5DxltCL19jinlrZo2PwubKQ917U+tQVvKntoASqsn7yw23hbG6ksc9f
-         DsrCfI4H4glEYZTvqnvaaU1ko7nnebwVXFa9PEj0=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.188.28] ([37.5.251.40]) by mail.gmx.com (mrgmx002
- [212.227.17.190]) with ESMTPSA (Nemesis) id 0MHoC5-1hFcvq2M3B-003eEL; Mon, 22
- Apr 2019 22:06:23 +0200
-Subject: Re: [RFC] Bluetooth: Retry configure request if result is
- L2CAP_CONF_UNKNOWN
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org,
-        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20190208025828.30901-1-andrew.smirnov@gmail.com>
- <3E87E315-0F39-49BA-BD65-2EB0C3A9A782@holtmann.org>
- <CAHQ1cqH+TCrU+7NE7iiiUwUsCQjfHs8hjKe24b7bj9A3R5GNWw@mail.gmail.com>
- <CAHQ1cqHL+CjXhp4TadAQ5fZNbcxpnkNSxC+TaZ=Be_-giP_60A@mail.gmail.com>
-From:   Florian Dollinger <dollinger.florian@gmx.de>
-Message-ID: <fcdc7234-627c-dff1-d702-c574c975be54@gmx.de>
-Date:   Mon, 22 Apr 2019 22:06:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Tue, 23 Apr 2019 03:23:06 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:34412 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725888AbfDWHXD (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 23 Apr 2019 03:23:03 -0400
+Received: by mail-pg1-f193.google.com with SMTP id v12so7151150pgq.1;
+        Tue, 23 Apr 2019 00:23:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=XoGcBhzMOQmRsEUerCGTGxvJxKBI0mfLgUxTBjjEjHY=;
+        b=NhqYpduBypo7MY0/4J6+ts3/MGBcud2ymd3IwwIxlql5XqNA7/4OyjDZhGZyTpfNXf
+         9/lkv7UON7fm4OOxIvobwfthxWenm40lfay0jxXjqwztcO2aju0UKdzDNtmPd8mtYhg/
+         Tpn8+x0uQyiVmrsVY9pI0qxWkJWTWNrfot0GcX/t+KVwLM5GYfYLfxhJmUyLUHwByzK9
+         PK3MoZOvqCjU8dY4dG2mLAGUwHfKUmxNiVnQfip1K2V961dl0ir0ZwTBkzvsSeesVCaV
+         ttG9+ZSz+VymmQfmA5ENWxvaaZZArsmSA15fRmK6Q9/D9Yl95MLm5KljWPdb8NM9FXwa
+         6iGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=XoGcBhzMOQmRsEUerCGTGxvJxKBI0mfLgUxTBjjEjHY=;
+        b=C1uHcf1U0XiFOHsX3U33VXjeCm5sxL2OzgNjMKJbJkyh/MHK55yuVpLPXlKuRTIGjc
+         zvdGYtCnAKRtDxw3PQI64ubgFbInPluAlgplCbY61hHabfkGTxTWpn7HaUasz0bRQNzg
+         8kP5CgtHTfC4jyRs2kAFPa059ya1VbAGNWyXvYsHVJza1Ku2or1WMFaLKhPdOwJ3EgFN
+         G/1aMy0zsj8S+ySFR9JikoteElzh1ZYKH7VDp+sojKg41hxqtSGCMYzSSZl9roHOC8fd
+         2N2wZwzNHp7shi0f6ubqOjb8J79ghB7XYvw1gPF2vsDzlCdEDLIrx+TC0lwgDZiEn2O4
+         WM0g==
+X-Gm-Message-State: APjAAAWsWkeofSbjiGra/BRSW+Wbs0ZD2U+Q1vaKybFZYmqNAMxUbI7g
+        Xubj4yCV1uLEkzA1a6KfqsTK9Ei7ZK8MoQ==
+X-Google-Smtp-Source: APXvYqyCJJOVlEEYDd8zVWIHZjXKX+/5nEWhloC3WZ23ybn7yMUZ/kyl04xY89H8Ps+h1iZUt2GCDA==
+X-Received: by 2002:a63:4a5f:: with SMTP id j31mr21618772pgl.369.1556004181976;
+        Tue, 23 Apr 2019 00:23:01 -0700 (PDT)
+Received: from localhost.localdomain (123-204-46-122.static.seed.net.tw. [123.204.46.122])
+        by smtp.gmail.com with ESMTPSA id p20sm12560594pgj.86.2019.04.23.00.22.59
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Apr 2019 00:23:01 -0700 (PDT)
+From:   "=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=" <jprvita@gmail.com>
+X-Google-Original-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     bgodavar@codeaurora.org, ytkim@qca.qualcomm.com,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux@endlessm.com,
+        =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
+Subject: [PATCH 1/2] Bluetooth: Create new HCI_QUIRK_WAIT_FOR_MATCHING_CC
+Date:   Tue, 23 Apr 2019 15:22:35 +0800
+Message-Id: <20190423072236.24999-2-jprvita@endlessm.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190423072236.24999-1-jprvita@endlessm.com>
+References: <20190423072236.24999-1-jprvita@endlessm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHQ1cqHL+CjXhp4TadAQ5fZNbcxpnkNSxC+TaZ=Be_-giP_60A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-HK
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:7bFnrIv76tGZtQsu6OfpZuPG3cQxSCS9qEKELVrdyesv9NseZtw
- etAuwBatsnvDxBLY7CxBCgwbxi9Hi6jAmzFXxnFsrHzBJucRGMmiKFQ8tA5crhw3Z1N0pNx
- vLbw51V2VHNvjRxyRiqF9pocKuWdz4jMWQ6GTWwBcQ3nDX1nvFmthU0y3X/U4JXgGOEUYRj
- X1H5yoGiNoarVvmSkyBXA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FBGRglgPBGA=:eUaeTqtve9TciyQlx0hMZl
- WdyisiqEGSw62jmc5Fm+lO4kaS/5iaMbDWZho+H2wgUFTsxHh+am17H0EkWdChB3u56ElApNN
- 7ehfpFtk4Dde2zuL60VfiDUY5BHG3zCcxsLcsL7NtuzFE/aUD/I9GamPeSplcaLw29ckJNzHp
- IGxTvnsGLoO+JFdctLagxFO/XtQajiehZriJLDiQqoyTmiILCniFAa0PfDQa9AbKq7kILU8E1
- JRxXO0Fv8quoTU0NFCMFnz9mApwUyxuZM+TcHnkE/9c6iQa5laWdtWItmYaJWeBFYh3gVxBao
- yTjP1oOZohzbP8fJ1pixk0sYWErCjSwiyt5fYAhZAtTea9WiM+gxk6iB1OzGiGER++KcBwwfd
- OlFvEBADxWKiehtVxwo7AH0FesOPtX/KJ88u/veJ7+Ejo9EmBK5nx4iR8TW8BJOXtg0nwRB2n
- s5wlXklSXpkY56y1uY7xH6AQi1+qRT9pxyELS6BekFqL0EQ20tRaTXJQi3qNLwIWkMxO7Ervu
- OYrFNavC7BQw/rqzR/7r56GEWsYaXR9a5klrvEyrTsrW0nYJDImmr487MG+AdkYX3qh2JF5EV
- kPrX3AVRaKVCoQT1zVbrBa1DVUKVqA/JNTcXhkqlm1Kf36qhQh/wfTgBW5zhnmWvhFZZdJ+Qh
- J93UC1DHLxuNhCZC2DvKR5QF1XdS4mznSfyJzTiirHNKtCZ5j02FhVYNqfWR8FAw0WoJ1juaS
- VWIriu0abLkO+OeREndtHPtaSWnxdavwUh+36BFDsl1i28XFEY4CK4CdfCoguTX9XDD7dGkK6
- z0kQ0yHA1qq0090k+huf+6S+nzGuO2/CnZqdfM1/j89IyIPf/G/XT2anDPtRDk8Gj4kEdc3S5
- QRl9zc2GKmarHtaeK2XKi4oVykn8CYDFc8VNEB+DP2VxUsNpZQlRd2Be5E/5UKIajbQQGFigv
- /GU3bQQyE/g==
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I think in essence this is the same as my patch from Jan 2018 here:
-https://raw.githubusercontent.com/atar-axis/xpadneo/master/misc/kernel_pat=
-ches/0001-fix_bluetooth_reconnect.patch
+This commit creates a new quirk, HCI_QUIRK_WAIT_FOR_MATCHING_CC, which
+when set makes the kernel not send the next queued HCI command until a
+command complete arrives for the last HCI command sent to the
+controller.
 
-Right? That's maybe why I am in CC :D
-If yes, then I can fully confirm that this works as one would expect.
+This avoids a state of confusion where the kernel believes a passive
+scanning procedure is being performed while in fact controller is
+performing an active scanning procedure, as requested by userspace and
+the kernel.
 
-Let me copy&paste my patch description here:
+This state of confusion is achieved when some buggy controllers send an
+extra command complete event for the LE_SET_RANDOM_ADDR after the kernel
+already sent the next queued command (LE_SET_SCAN_PARAM, for starting an
+active scanning procedure), as shown at timestamp 27.420131 on the btmon
+logs bellow.
 
-=2D--
+Bluetooth monitor ver 5.50
+= Note: Linux version 5.0.0+ (x86_64)                                  0.352340
+= Note: Bluetooth subsystem version 2.22                               0.352343
+= New Index: 80:C5:F2:8F:87:84 (Primary,USB,hci0)               [hci0] 0.352344
+= Open Index: 80:C5:F2:8F:87:84                                 [hci0] 0.352345
+= Index Info: 80:C5:F2:8F:87:84 (Qualcomm)                      [hci0] 0.352346
+@ MGMT Open: bluetoothd (privileged) version 1.14             {0x0001} 0.352347
+@ MGMT Open: btmon (privileged) version 1.14                  {0x0002} 0.352366
+@ MGMT Open: btmgmt (privileged) version 1.14                {0x0003} 27.302164
+@ MGMT Command: Start Discovery (0x0023) plen 1       {0x0003} [hci0] 27.302310
+        Address type: 0x06
+          LE Public
+          LE Random
+< HCI Command: LE Set Random Address (0x08|0x0005) plen 6   #1 [hci0] 27.302496
+        Address: 15:60:F2:91:B2:24 (Non-Resolvable)
+> HCI Event: Command Complete (0x0e) plen 4                 #2 [hci0] 27.419117
+      LE Set Random Address (0x08|0x0005) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7  #3 [hci0] 27.419244
+        Type: Active (0x01)
+        Interval: 11.250 msec (0x0012)
+        Window: 11.250 msec (0x0012)
+        Own address type: Random (0x01)
+        Filter policy: Accept all advertisement (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                 #4 [hci0] 27.420131
+      LE Set Random Address (0x08|0x0005) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2      #5 [hci0] 27.420259
+        Scanning: Enabled (0x01)
+        Filter duplicates: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4                 #6 [hci0] 27.420969
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                 #7 [hci0] 27.421983
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+@ MGMT Event: Command Complete (0x0001) plen 4        {0x0003} [hci0] 27.422059
+      Start Discovery (0x0023) plen 1
+        Status: Success (0x00)
+        Address type: 0x06
+          LE Public
+          LE Random
+@ MGMT Event: Discovering (0x0013) plen 2             {0x0003} [hci0] 27.422067
+        Address type: 0x06
+          LE Public
+          LE Random
+        Discovery: Enabled (0x01)
+@ MGMT Event: Discovering (0x0013) plen 2             {0x0002} [hci0] 27.422067
+        Address type: 0x06
+          LE Public
+          LE Random
+        Discovery: Enabled (0x01)
+@ MGMT Event: Discovering (0x0013) plen 2             {0x0001} [hci0] 27.422067
+        Address type: 0x06
+          LE Public
+          LE Random
+        Discovery: Enabled (0x01)
 
-The current L2CAP implementation does not change any options if the
-other side respons with "unknown options", but does if "unaccepted
-options" is the answer. It is up to the implementation to decide on the
-effort spent on config negotiations, therefore the current
-implementation is  correct at this point - but [...] devices like [the]
-Xbox One S controller [is] not useable this way.
-  A workaround for many users therefore is to disable_ertm, since this
-is [in this case] the option which is unknown. I would prefer to try it
-again with altered options instead of globally disable ERTM.
+In this situation the kernel ends up not processing the command complete
+event for LE_SET_SCAN_PARAM, so hdev->le_scan_type is never updated to
+active scanning and no device found events are generated for
+ADV_SCAN_RSP PDUs. This makes impossible to discover BTLE devices with
+these controllers.
 
-In result, I suggest the following patch. It simply adds a new case
-(L2CAP_CONF_UNKNOWN), which does nothing but falling through to
-L2CAP_CONF_UNACCEPT.
+Signed-off-by: João Paulo Rechi Vita <jprvita@endlessm.com>
+---
+ include/net/bluetooth/hci.h      | 4 ++++
+ include/net/bluetooth/hci_core.h | 1 +
+ net/bluetooth/hci_core.c         | 3 +++
+ net/bluetooth/hci_event.c        | 4 ++++
+ 4 files changed, 12 insertions(+)
 
-=2D--
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index fbba43e9bef5..f100e9d566a0 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -204,6 +204,10 @@ enum {
+ 	 *
+ 	 */
+ 	HCI_QUIRK_NON_PERSISTENT_SETUP,
++
++	/* When this quirk is set, no pending HCI commands will be sent until a
++	 * matching command complete for the last command is received. */
++	HCI_QUIRK_WAIT_FOR_MATCHING_CC,
+ };
+ 
+ /* HCI device flags */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 094e61e07030..85bed4e916d3 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -364,6 +364,7 @@ struct hci_dev {
+ 	struct sk_buff_head	cmd_q;
+ 
+ 	struct sk_buff		*sent_cmd;
++	__u8			sent_cmd_pending_cc;
+ 
+ 	struct mutex		req_lock;
+ 	wait_queue_head_t	req_wait_q;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d6b2540ba7f8..95ab8f9f2514 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4383,6 +4383,8 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+ 		return;
+ 	}
+ 
++	hdev->sent_cmd_pending_cc = 0;
++
+ 	/* If the command succeeded and there's still more commands in
+ 	 * this request the request is not yet complete.
+ 	 */
+@@ -4493,6 +4495,7 @@ static void hci_cmd_work(struct work_struct *work)
+ 
+ 		hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
+ 		if (hdev->sent_cmd) {
++			hdev->sent_cmd_pending_cc = 1;
+ 			atomic_dec(&hdev->cmd_cnt);
+ 			hci_send_frame(hdev, skb);
+ 			if (test_bit(HCI_RESET, &hdev->flags))
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 609fd6871c5a..1abbca8ce1c2 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3404,6 +3404,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 	hci_req_cmd_complete(hdev, *opcode, *status, req_complete,
+ 			     req_complete_skb);
+ 
++	if (hdev->sent_cmd_pending_cc &&
++	    test_bit(HCI_QUIRK_WAIT_FOR_MATCHING_CC, &hdev->quirks))
++		return;
++
+ 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
+ 		queue_work(hdev->workqueue, &hdev->cmd_work);
+ }
+-- 
+2.20.1
 
-Cheers,
-Florian Dollinger (atar-axis)
-
-On 21.03.19 00:08, Andrey Smirnov wrote:
-> On Mon, Feb 18, 2019 at 8:57 PM Andrey Smirnov <andrew.smirnov@gmail.com=
-> wrote:
->>
->> On Mon, Feb 18, 2019 at 4:58 AM Marcel Holtmann <marcel@holtmann.org> w=
-rote:
->>>
->>> Hi Andrey,
->>>
->>>> Due to:
->>>>
->>>> - current implementation of l2cap_config_rsp() dropping BT
->>>>    connection if sender of configuration response replied with unknow=
-n
->>>>    option failure (Result=3D0x0003/L2CAP_CONF_UNKNOWN)
->>>>
->>>> - current implementation of l2cap_build_conf_req() adding
->>>>    L2CAP_CONF_RFC(0x04) option to initial configure request sent by
->>>>    the Linux host.
->>>>
->>>> devices that do no recongninze L2CAP_CONF_RFC, such as Xbox One S
->>>> controllers, will get stuck in endless connect -> configure ->
->>>> disconnect loop, never connect and be generaly unusable.
->>>>
->>>> To avoid this problem add code to do the following:
->>>>
->>>> 1. Store a mask of supported conf option types per connection
->>>>
->>>> 2. Parse the body of response L2CAP_CONF_UNKNOWN and adjust
->>>>     connection's supported conf option types mask
->>>>
->>>> 3. Retry configuration step the same way it's done for
->>>>     L2CAP_CONF_UNACCEPT
->>>>
->>>> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
->>>> Cc: Pierre-Loup A. Griffais <pgriffais@valvesoftware.com>
->>>> Cc: Florian Dollinger <dollinger.florian@gmx.de>
->>>> Cc: Marcel Holtmann <marcel@holtmann.org>
->>>> Cc: Johan Hedberg <johan.hedberg@gmail.com>
->>>> Cc: linux-bluetooth@vger.kernel.org
->>>> Cc: linux-kernel@vger.kernel.org
->>>> ---
->>>>
->>>> Everyone:
->>>>
->>>> I marked this as an RFC, since I don't have a lot of experience with
->>>> Bluetooth subsystem and don't have hight degree of confidence about
->>>> choices made in this patch. I do, however, thins is is good enough to
->>>> start a discussion about the problem.
->>>
->>> can you take a btmon -w trace.log protocol trace so that I can see whe=
-re it fails. This seems a really odd behavior of the Xbox controller. We h=
-ave to be careful in not breaking Bluetooth qualification to just workarou=
-nd some buggy remote device.
->>>
->>
->> Sure, n/p, both "failure" (behavior before this patch) and "success"
->> (behavior with the patch) cases on my machine are available here:
->>
->> https://gist.github.com/ndreys/2b74094933601978e200af1ff0a55372
->>
->> Let me know if that's not accessible to you.
->>
->
-> Marcel, did you have a chance to look at the logs?
->
-> Thanks,
-> Andrey Smirnov
->
