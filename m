@@ -2,86 +2,69 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D3FAC10F03
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED93C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:09:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 47C06218D2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:07:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05109204FD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:09:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729340AbfDWRGw convert rfc822-to-8bit (ORCPT
+        id S1728851AbfDWRJL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 13:06:52 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:40589 "EHLO
+        Tue, 23 Apr 2019 13:09:11 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:59645 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728880AbfDWRGw (ORCPT
+        with ESMTP id S1728490AbfDWRJK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 13:06:52 -0400
+        Tue, 23 Apr 2019 13:09:10 -0400
 Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7B2E9CF2DA;
-        Tue, 23 Apr 2019 19:14:59 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id A91B5CF2E8;
+        Tue, 23 Apr 2019 19:17:19 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device property
- firmware-name for QCA6174
+Subject: Re: [PATCH] Bluetooth: btbcm: Add default address for BCM43341B
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
-Date:   Tue, 23 Apr 2019 19:06:48 +0200
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
+In-Reply-To: <20190409141550.19458-1-ftoth@exalondelft.nl>
+Date:   Tue, 23 Apr 2019 19:09:08 +0200
+Cc:     andriy.shevchenko@linux.intel.com, Daniel Wagner <wagi@monom.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        thierry.escande@linaro.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A85D7982-E000-4A5F-9927-CA36E0BA60F2@holtmann.org>
-References: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
- <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <4A3856F7-29F1-47A9-BFDB-B4B07E9BA720@holtmann.org>
+References: <20190409141550.19458-1-ftoth@exalondelft.nl>
+To:     Ferry Toth <ftoth@exalondelft.nl>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rocky,
+Hi Ferry,
 
-> This patch adds an optional device property "firmware-name" to allow the
-> driver to load customized nvm firmware file based on this property.
+> The BCM43341B has the default MAC address 43:34:1B:00:1F:AC if none
+> is given. This address was found when enabling Bluetooth on multiple
+> Intel Edison modules. It also contains the sequence 43341B, the name
+> the chip identifies itself as. Using the same BD_ADDR is problematic
+> when having multiple Intel Edison modules in each others range.
+> The default address also has the LAA (locally administered address)
+> bit set which prevents a BNEP device from being created, needed for
+> BT tethering.
 > 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> Add this to the list of black listed default MAC addresses and let
+> the user configure a valid one using f.i.
+> `btmgmt -i hci0 public-addr xx:xx:xx:xx:xx:xx`
+> 
+> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Ferry Toth <ftoth@exalondelft.nl>
 > ---
-> Changes in v3:
->  * added firmware-name instead of nvm-postfix to specify full firmware name
-> ---
-> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
-> 1 file changed, 2 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> index 824c0e2..2bcea50 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> @@ -16,6 +16,7 @@ Optional properties for compatible string qcom,qca6174-bt:
-> 
->  - enable-gpios: gpio specifier used to enable chip
->  - clocks: clock provided to the controller (SUSCLK_32KHZ)
-> + - firmware-name: specify the name of nvm firmware to load
-> 
-> Required properties for compatible string qcom,wcn3990-bt:
-> 
-> @@ -39,6 +40,7 @@ serial@7570000 {
-> 
-> 		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-> 		clocks = <&divclk4>;
-> +		firmware-name = "nvm_00440302.bin";
-> 	};
+> drivers/bluetooth/btbcm.c | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
 
-and how is this a firmware-name property. Wouldn’t this be more like nvm-file or something along these lines. This really needs to be cleared with Rob to pick the right property name.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
