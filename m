@@ -2,118 +2,138 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45807C10F03
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8CBC10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:58:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1565220835
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:58:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hFtB6KCr"
+	by mail.kernel.org (Postfix) with ESMTP id 2CAEC20835
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 17:58:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728447AbfDWR55 (ORCPT
+        id S1727737AbfDWR66 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 13:57:57 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:41646 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726655AbfDWR55 (ORCPT
+        Tue, 23 Apr 2019 13:58:58 -0400
+Received: from gateway34.websitewelcome.com ([192.185.150.107]:32659 "EHLO
+        gateway34.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727656AbfDWR66 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 13:57:57 -0400
-Received: by mail-pl1-f193.google.com with SMTP id d9so1970366pls.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2019 10:57:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=/c0VAKrebet1xFE4ZU1kPtC1ZGWlTTNfkUjUjXJ3LZM=;
-        b=hFtB6KCreBGR8DZW+qEJrdmY1IL41Vvs2Rk5vLtADjR87ILeChYUJVnfrD87iv4mz5
-         PaEjFj/BEZaihxLokafZ2voGsNqYPGCnr6na0Z3uKKeQZemqluiZB/9ZOjCQ25DnAHn2
-         AbQ5fIbMiq5ME0P4iyg1z9iTeBCVlnf4IGilw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=/c0VAKrebet1xFE4ZU1kPtC1ZGWlTTNfkUjUjXJ3LZM=;
-        b=G6OaA+azpaWjm4l+JCsiqzgv+2Pabezh86hQ1j0gxp5z5wN4NtZgNMZfZZVrjcM36c
-         lHxJkdJAij1gEY5+Jn4ABmlilW3fTqguWKDWgNAoY+ycZxisbY8LtKpNZFpkeqfUeG49
-         SdTYHiF6UtPlAkAeY8x8jZcJveD70r3XpsnvLR8rSXdc5uP742XqGbqf7prWC6se1BnE
-         7mUq3+heLAndObC9K0JaYaocyAF5Mi60u6I6wRzqBSxkzehLf/2U6CHPnnXh3536ppOK
-         y28wBVUf+ojWmOscCb1yFUIzlftceU3NjPT3CW0/FclZxOsQ3icnk+OJcv8BU6YyyoZV
-         ZHGA==
-X-Gm-Message-State: APjAAAWvrPvaSRCpgbLeRdrXdr2yK7dh2E8kw/5jrqFGmhIfQCGbbFw+
-        Ws88PlKvIxr/T10k4coDJpV/Zw==
-X-Google-Smtp-Source: APXvYqyqs1i2BjOCruFSSkhGKAZ8/YSOp7QUwwQ3VnkcmFF/1pz4s0QsF3zqQU2lr9q6/pTd5bb86Q==
-X-Received: by 2002:a17:902:7b8e:: with SMTP id w14mr9341109pll.202.1556042276306;
-        Tue, 23 Apr 2019 10:57:56 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id r87sm28704099pfa.71.2019.04.23.10.57.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 23 Apr 2019 10:57:55 -0700 (PDT)
-Date:   Tue, 23 Apr 2019 10:57:54 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
+        Tue, 23 Apr 2019 13:58:58 -0400
+X-Greylist: delayed 1304 seconds by postgrey-1.27 at vger.kernel.org; Tue, 23 Apr 2019 13:58:57 EDT
+Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
+        by gateway34.websitewelcome.com (Postfix) with ESMTP id 97CC1D1298
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Apr 2019 12:37:12 -0500 (CDT)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id IzM0hnuaaYTGMIzM0hu9jQ; Tue, 23 Apr 2019 12:37:12 -0500
+X-Authority-Reason: nr=8
+Received: from [189.250.127.223] (port=52518 helo=[192.168.43.131])
+        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.91)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1hIzLz-003AWp-HS; Tue, 23 Apr 2019 12:37:12 -0500
+Subject: Re: [PATCH][next] Bluetooth: Use struct_size() helper
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>
-Subject: Re: [PATCH] Bluetooth: hci_qca: Fix crash with non-serdev devices
-Message-ID: <20190423175754.GC112750@google.com>
-References: <CAG5bF+TCPc=m_O33RHXHrt34T1Dz1zHLSkXfpxAoOTmrffGJ7w@mail.gmail.com>
- <32C292F9-34DF-436F-896E-A219D961218F@holtmann.org>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190328173029.GA13869@embeddedor>
+ <6A0620E9-3A76-419F-984A-65BF0D961839@holtmann.org>
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gustavo@embeddedor.com; keydata=
+ mQINBFssHAwBEADIy3ZoPq3z5UpsUknd2v+IQud4TMJnJLTeXgTf4biSDSrXn73JQgsISBwG
+ 2Pm4wnOyEgYUyJd5tRWcIbsURAgei918mck3tugT7AQiTUN3/5aAzqe/4ApDUC+uWNkpNnSV
+ tjOx1hBpla0ifywy4bvFobwSh5/I3qohxDx+c1obd8Bp/B/iaOtnq0inli/8rlvKO9hp6Z4e
+ DXL3PlD0QsLSc27AkwzLEc/D3ZaqBq7ItvT9Pyg0z3Q+2dtLF00f9+663HVC2EUgP25J3xDd
+ 496SIeYDTkEgbJ7WYR0HYm9uirSET3lDqOVh1xPqoy+U9zTtuA9NQHVGk+hPcoazSqEtLGBk
+ YE2mm2wzX5q2uoyptseSNceJ+HE9L+z1KlWW63HhddgtRGhbP8pj42bKaUSrrfDUsicfeJf6
+ m1iJRu0SXYVlMruGUB1PvZQ3O7TsVfAGCv85pFipdgk8KQnlRFkYhUjLft0u7CL1rDGZWDDr
+ NaNj54q2CX9zuSxBn9XDXvGKyzKEZ4NY1Jfw+TAMPCp4buawuOsjONi2X0DfivFY+ZsjAIcx
+ qQMglPtKk/wBs7q2lvJ+pHpgvLhLZyGqzAvKM1sVtRJ5j+ARKA0w4pYs5a5ufqcfT7dN6TBk
+ LXZeD9xlVic93Ju08JSUx2ozlcfxq+BVNyA+dtv7elXUZ2DrYwARAQABtCxHdXN0YXZvIEEu
+ IFIuIFNpbHZhIDxndXN0YXZvQGVtYmVkZGVkb3IuY29tPokCPQQTAQgAJwUCWywcDAIbIwUJ
+ CWYBgAULCQgHAgYVCAkKCwIEFgIDAQIeAQIXgAAKCRBHBbTLRwbbMZ6tEACk0hmmZ2FWL1Xi
+ l/bPqDGFhzzexrdkXSfTTZjBV3a+4hIOe+jl6Rci/CvRicNW4H9yJHKBrqwwWm9fvKqOBAg9
+ obq753jydVmLwlXO7xjcfyfcMWyx9QdYLERTeQfDAfRqxir3xMeOiZwgQ6dzX3JjOXs6jHBP
+ cgry90aWbaMpQRRhaAKeAS14EEe9TSIly5JepaHoVdASuxklvOC0VB0OwNblVSR2S5i5hSsh
+ ewbOJtwSlonsYEj4EW1noQNSxnN/vKuvUNegMe+LTtnbbocFQ7dGMsT3kbYNIyIsp42B5eCu
+ JXnyKLih7rSGBtPgJ540CjoPBkw2mCfhj2p5fElRJn1tcX2McsjzLFY5jK9RYFDavez5w3lx
+ JFgFkla6sQHcrxH62gTkb9sUtNfXKucAfjjCMJ0iuQIHRbMYCa9v2YEymc0k0RvYr43GkA3N
+ PJYd/vf9vU7VtZXaY4a/dz1d9dwIpyQARFQpSyvt++R74S78eY/+lX8wEznQdmRQ27kq7BJS
+ R20KI/8knhUNUJR3epJu2YFT/JwHbRYC4BoIqWl+uNvDf+lUlI/D1wP+lCBSGr2LTkQRoU8U
+ 64iK28BmjJh2K3WHmInC1hbUucWT7Swz/+6+FCuHzap/cjuzRN04Z3Fdj084oeUNpP6+b9yW
+ e5YnLxF8ctRAp7K4yVlvA7kCDQRbLBwMARAAsHCE31Ffrm6uig1BQplxMV8WnRBiZqbbsVJB
+ H1AAh8tq2ULl7udfQo1bsPLGGQboJSVN9rckQQNahvHAIK8ZGfU4Qj8+CER+fYPp/MDZj+t0
+ DbnWSOrG7z9HIZo6PR9z4JZza3Hn/35jFggaqBtuydHwwBANZ7A6DVY+W0COEU4of7CAahQo
+ 5NwYiwS0lGisLTqks5R0Vh+QpvDVfuaF6I8LUgQR/cSgLkR//V1uCEQYzhsoiJ3zc1HSRyOP
+ otJTApqGBq80X0aCVj1LOiOF4rrdvQnj6iIlXQssdb+WhSYHeuJj1wD0ZlC7ds5zovXh+FfF
+ l5qH5RFY/qVn3mNIVxeO987WSF0jh+T5ZlvUNdhedGndRmwFTxq2Li6GNMaolgnpO/CPcFpD
+ jKxY/HBUSmaE9rNdAa1fCd4RsKLlhXda+IWpJZMHlmIKY8dlUybP+2qDzP2lY7kdFgPZRU+e
+ zS/pzC/YTzAvCWM3tDgwoSl17vnZCr8wn2/1rKkcLvTDgiJLPCevqpTb6KFtZosQ02EGMuHQ
+ I6Zk91jbx96nrdsSdBLGH3hbvLvjZm3C+fNlVb9uvWbdznObqcJxSH3SGOZ7kCHuVmXUcqoz
+ ol6ioMHMb+InrHPP16aVDTBTPEGwgxXI38f7SUEn+NpbizWdLNz2hc907DvoPm6HEGCanpcA
+ EQEAAYkCJQQYAQgADwUCWywcDAIbDAUJCWYBgAAKCRBHBbTLRwbbMdsZEACUjmsJx2CAY+QS
+ UMebQRFjKavwXB/xE7fTt2ahuhHT8qQ/lWuRQedg4baInw9nhoPE+VenOzhGeGlsJ0Ys52sd
+ XvUjUocKgUQq6ekOHbcw919nO5L9J2ejMf/VC/quN3r3xijgRtmuuwZjmmi8ct24TpGeoBK4
+ WrZGh/1hAYw4ieARvKvgjXRstcEqM5thUNkOOIheud/VpY+48QcccPKbngy//zNJWKbRbeVn
+ imua0OpqRXhCrEVm/xomeOvl1WK1BVO7z8DjSdEBGzbV76sPDJb/fw+y+VWrkEiddD/9CSfg
+ fBNOb1p1jVnT2mFgGneIWbU0zdDGhleI9UoQTr0e0b/7TU+Jo6TqwosP9nbk5hXw6uR5k5PF
+ 8ieyHVq3qatJ9K1jPkBr8YWtI5uNwJJjTKIA1jHlj8McROroxMdI6qZ/wZ1ImuylpJuJwCDC
+ ORYf5kW61fcrHEDlIvGc371OOvw6ejF8ksX5+L2zwh43l/pKkSVGFpxtMV6d6J3eqwTafL86
+ YJWH93PN+ZUh6i6Rd2U/i8jH5WvzR57UeWxE4P8bQc0hNGrUsHQH6bpHV2lbuhDdqo+cM9eh
+ GZEO3+gCDFmKrjspZjkJbB5Gadzvts5fcWGOXEvuT8uQSvl+vEL0g6vczsyPBtqoBLa9SNrS
+ VtSixD1uOgytAP7RWS474w==
+Message-ID: <b53b9438-fe17-327f-afe4-b72608a4b305@embeddedor.com>
+Date:   Tue, 23 Apr 2019 12:37:06 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <6A0620E9-3A76-419F-984A-65BF0D961839@holtmann.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <32C292F9-34DF-436F-896E-A219D961218F@holtmann.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 189.250.127.223
+X-Source-L: No
+X-Exim-ID: 1hIzLz-003AWp-HS
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.43.131]) [189.250.127.223]:52518
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 9
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Apr 23, 2019 at 07:26:40PM +0200, Marcel Holtmann wrote:
-> Hi Matthias,
+
+
+On 4/23/19 12:31 PM, Marcel Holtmann wrote:
+> Hi Gustavo,
 > 
-> > qca_set_baudrate() calls serdev_device_wait_until_sent() assuming that
-> > the HCI is always associated with a serdev device. This isn't true for
-> > ROME controllers instantiated through ldisc, where the call causes a
-> > crash due to a NULL pointer dereferentiation. Only call the function
-> > when we have a serdev device. The timeout for ROME devices at the end
-> > of qca_set_baudrate() is long enough to be reasonably sure that the
-> > command was sent.
-> > 
-> > Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm
-> > Bluetooth chip wcn3990")
-> > Reported-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > Reported-by: Rocky Liao <rjliao@codeaurora.org>
-> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> > ---
-> > drivers/bluetooth/hci_qca.c | 3 ++-
-> > 1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > index 4ea995d610d2..714a6a16f9d5 100644
-> > --- a/drivers/bluetooth/hci_qca.c
-> > +++ b/drivers/bluetooth/hci_qca.c
-> > @@ -1004,7 +1004,8 @@ static int qca_set_baudrate(struct hci_dev
-> > *hdev, uint8_t baudrate)
-> > 	while (!skb_queue_empty(&qca->txq))
-> > 		usleep_range(100, 200);
-> > 
-> > -	serdev_device_wait_until_sent(hu->serdev,
-> > +	if (hu->serdev)
-> > +		serdev_device_wait_until_sent(hu->serdev,
-> > 		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
+[..]
+>>
+>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+>> ---
+>> net/bluetooth/mgmt.c | 11 ++++-------
+>> 1 file changed, 4 insertions(+), 7 deletions(-)
 > 
-> somehow I get a malformed patch when I try to apply it. Can you send a new version against bluetooth-next with all tags added.
+> patch has been applied to bluetooth-next tree.
+> 
 
-Dunno what happened there, I'll send a new version with the tags in a
-bit.
+Awesome.
 
-Thanks
-
-Matthias
+Thanks, Marcel.
+--
+Gustavo
