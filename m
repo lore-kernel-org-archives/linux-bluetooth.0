@@ -2,64 +2,65 @@ Return-Path: <SRS0=r7wX=SZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB86BC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3422FC10F03
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94CB620643
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:35:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B4B0217D9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Apr 2019 16:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728476AbfDWQfW (ORCPT
+        id S1729263AbfDWQgx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Apr 2019 12:35:22 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:53860 "EHLO
+        Tue, 23 Apr 2019 12:36:53 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:55193 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727180AbfDWQfV (ORCPT
+        with ESMTP id S1729000AbfDWQgw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Apr 2019 12:35:21 -0400
+        Tue, 23 Apr 2019 12:36:52 -0400
 Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7DBF4CF2DA;
-        Tue, 23 Apr 2019 18:43:29 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id BD661CF2DA;
+        Tue, 23 Apr 2019 18:45:00 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [RFC v1] Bluetooth: hci_core: Don't stop BT if the BD address
- missing in dts
+Subject: Re: [PATCH v1 0/4] Add a couple of enhancements to btmtksdio
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190418132123.12816-1-bgodavar@codeaurora.org>
-Date:   Tue, 23 Apr 2019 18:35:18 +0200
+In-Reply-To: <cover.1555577565.git.sean.wang@mediatek.com>
+Date:   Tue, 23 Apr 2019 18:36:49 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <371A1719-7CDD-4940-9D6F-0F3339FA50E6@holtmann.org>
-References: <20190418132123.12816-1-bgodavar@codeaurora.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <43F9EB53-7994-4727-948D-29D455C4F19B@holtmann.org>
+References: <cover.1555577565.git.sean.wang@mediatek.com>
+To:     Sean Wang <sean.wang@mediatek.com>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Hi Sean,
 
-> When flag HCI_QUIRK_USE_BDADDR_PROPERTY is set, we will read the
-> bluetooth address from dts. If the bluetooth address node is missing
-> from the dts we will enable it controller UNCONFIGURED state.
-> This patch enables the normal flow even if the BD address is missing
-> from the dts tree.
+> First three are all minor changes and the final one adds a runtime pm support to
+> enter a lower power state for decreasing power dissipation when there is idle
+> traffic in SDIO transport for a while.
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> net/bluetooth/hci_core.c | 2 --
-> 1 file changed, 2 deletions(-)
+> Sean Wang (4):
+>  Bluetooth: btmtksdio: Drop newline with bt_dev logging macros
+>  Bluetooth: btmtksdio: Add a bit definition for CHLPCR
+>  Bluetooth: btmtksdio: Fix hdev->stat.byte_rx accumulation
+>  Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth
+> 
+> drivers/bluetooth/btmtksdio.c | 161 ++++++++++++++++++++++++++++++++--
+> 1 file changed, 153 insertions(+), 8 deletions(-)
 
-can I get an ACK for this one?
+all 4 patches have been applied to bluetooth-next tree.
 
 Regards
 
