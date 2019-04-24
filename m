@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C75D6C10F11
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 05:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58FF7C282E1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 06:07:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89373218D2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 05:44:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B9B020685
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 06:07:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FH8ytm+a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E33uz/07"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729652AbfDXFoG (ORCPT
+        id S1729728AbfDXGH2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Apr 2019 01:44:06 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:39453 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726232AbfDXFoG (ORCPT
+        Wed, 24 Apr 2019 02:07:28 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36723 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729421AbfDXGH1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Apr 2019 01:44:06 -0400
-Received: by mail-pl1-f194.google.com with SMTP id e92so6903970plb.6;
-        Tue, 23 Apr 2019 22:44:05 -0700 (PDT)
+        Wed, 24 Apr 2019 02:07:27 -0400
+Received: by mail-pf1-f193.google.com with SMTP id z5so8726944pfn.3;
+        Tue, 23 Apr 2019 23:07:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=IiXtlO6niFYpM6EjXh62i96EKrFWcQNkd8zOBC+aQvw=;
-        b=FH8ytm+a1E8I7taWaFH/M2z1nw06+/TaGKbUInJRL/5lWb+cunnbIt9ozET8c2KkWb
-         QD0mmetNb7a7oA3R5Re4KPTDqYVPrRMyD+BcbyCIQ7O9xWJ5Q0T8P1ApBnknp8Ns3eWj
-         YW2tR8Nlw9hgzZVlFX2qXmldkA4sdPnDzeYSywCejoH91HVLocydkAAq9AmmBH4/cASo
-         QtAT+acowsKM+x3E57sqTjJACPqJifzMNijsC2PKsvFZAyxp0+ublI9On7jYw0BB2SN7
-         4aQeorLzO53t96fmGsxqM+H+6P6lHchnjGDT0kbCMR8yuKYa3TnszdBQs9LkiIJ/JTb7
-         1fgQ==
+        bh=/OBCxPpDNlfLikJPHkq8su0X6sCDwSJYZOlK2co5u+M=;
+        b=E33uz/07emgzHUi2w76zkAoa45DJQFQwMsFr81jDCSyXBtJGJ1AnV0OE5rY9TFi1th
+         y4ypA8bCG2C6ZFGyyWjO52whqWNqSEn/vr0UlhT4NRKfJMjVHH2Z03VCSwv+KG8qv3A/
+         5UA9YeeLY9wN4JJBP8Bxpiu1Js8R2WCrrGu1TQ3AA6zzxZNCK3V0Ujpjv/OygUVC7lC5
+         SfHYepuOc/cnjCdePrfCRnQU/hLoaHXb3yMn7WEczaPPv1femO5ijMX40i1llZCTEoqD
+         qio787j5jDuUO0D05LdEuS4YwgUcbY3AEOr5UcnGXMBF6YBx94JkVxKTHZq4OOjXIdF3
+         smcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IiXtlO6niFYpM6EjXh62i96EKrFWcQNkd8zOBC+aQvw=;
-        b=bljQduu5TWQuDqQQjyJ5t8+EozyhIlXFKvclaOeQNnPL08tbNd6ohQofu8D/et21AH
-         hbN5yJfzPIKyJ/QehSvdKKr8IaFm9uvmOkSdNwgmX624Ze6PsAdBKVey9RjhuQOXGWgG
-         wALnyv3rUKM/AsvmGV0IgIpLbp6Opm89ZiJl+E809XM4Bbvl8QHyxNfIXRzPSUOXP/VL
-         aXxmxEpWV1segjuY6muocdMY+gAQl3irRNlJeG0z1ZRARdDRKHrOwFAtx3po5Mv/G9Qx
-         kEH52BtXj0RAArLxiAjMIzBlwW6d9hmUheH4wC9/c/pWIjN59kvMYzS55C8bHywGV926
-         78UQ==
-X-Gm-Message-State: APjAAAWcf3hKgOwadMAKdws9cnmhzHBdywHzRIStgSTqgV/eGfI7nlQB
-        3YaLFGMRN0+QGQmrvzrEnEA=
-X-Google-Smtp-Source: APXvYqx48dOkQmEm1tNCTqDI4mtaxlvHziD9+umgMT12Os+WeD+ehjYsoNK61nzXA01l9vvfedGn3g==
-X-Received: by 2002:a17:902:102a:: with SMTP id b39mr30745264pla.188.1556084645103;
-        Tue, 23 Apr 2019 22:44:05 -0700 (PDT)
+        bh=/OBCxPpDNlfLikJPHkq8su0X6sCDwSJYZOlK2co5u+M=;
+        b=JqehEVxqoSUX5c8nB3ElbnO0IaSnlSWxWzl/sWdItFJtnSWVdFMYAUsiwfw2FvEeWC
+         QTqJ4IEB5CFMoV9VChJ7wZP7X1vy7hKRCu0wrQkRxM1lTZs+dGrSwQp5q2aHOFlqGY1N
+         mVwdX3/GKJafNPbS6x/tFxPJSznZxRE4P4Nn2BUBkiSzCvCUj7f2QQr3Fb76bGV5F6pB
+         kixOoI8x8enznBQxdWhcnjcLS/+q8hw/A2VcOGqDpBr/dZsA0q9pjNUOQJyVbtn+IYy+
+         h6r5mh3BKYgL8zLh9mUdA76XhKbzBwbFSU322wN6xalU61mrvPIktAjoMxFD+ju8F+5a
+         sJcA==
+X-Gm-Message-State: APjAAAWr1rqcWdUZpSQ2Z87tD2kspkuR+6pdEKQ4WOnZhnkz7kyqhRpj
+        rZ3gu5mY6cCtmLwIC7f8Ndk=
+X-Google-Smtp-Source: APXvYqy/O0JQzjjblqGNotUsLpJ9R0WzVy8grdM23q6+D9NAtlZZPC1YdA/HLkx4YrsgWl7Z8cYwOw==
+X-Received: by 2002:a63:e048:: with SMTP id n8mr28984710pgj.41.1556086046324;
+        Tue, 23 Apr 2019 23:07:26 -0700 (PDT)
 Received: from localhost.localdomain (123-204-46-122.static.seed.net.tw. [123.204.46.122])
-        by smtp.gmail.com with ESMTPSA id b14sm22871913pfi.92.2019.04.23.22.44.01
+        by smtp.gmail.com with ESMTPSA id d67sm1607621pfa.35.2019.04.23.23.07.23
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Apr 2019 22:44:04 -0700 (PDT)
+        Tue, 23 Apr 2019 23:07:25 -0700 (PDT)
 From:   "=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=" <jprvita@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
@@ -67,11 +67,11 @@ Cc:     bgodavar@codeaurora.org, ytkim@qca.qualcomm.com,
         linux-kernel@vger.kernel.org, linux@endlessm.com,
         =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
 Subject: [PATCH] Bluetooth: Ignore CC events not matching the last HCI command
-Date:   Wed, 24 Apr 2019 13:43:35 +0800
-Message-Id: <20190424054335.30044-1-jprvita@endlessm.com>
+Date:   Wed, 24 Apr 2019 14:07:04 +0800
+Message-Id: <20190424060704.22721-1-jprvita@endlessm.com>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <CA+A7VXWMgx44=747MES=EvkLdrtQgyF3e+h5v7vQaAsHxbcedw@mail.gmail.com>
-References: <CA+A7VXWMgx44=747MES=EvkLdrtQgyF3e+h5v7vQaAsHxbcedw@mail.gmail.com>
+In-Reply-To: <20190424054335.30044-1-jprvita@endlessm.com>
+References: <20190424054335.30044-1-jprvita@endlessm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -164,14 +164,14 @@ Signed-off-by: João Paulo Rechi Vita <jprvita@endlessm.com>
  1 file changed, 13 insertions(+)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 609fd6871c5a..13fb124d04a4 100644
+index 609fd6871c5a..b349fc2b4123 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
 @@ -3071,6 +3071,19 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
  	*opcode = __le16_to_cpu(ev->opcode);
  	*status = skb->data[sizeof(*ev)];
  
-+	if (opcode != HCI_OP_RESET && !hci_sent_cmd_data(hdev, *opcode)) {
++	if (*opcode != HCI_OP_RESET && !hci_sent_cmd_data(hdev, *opcode)) {
 +		/* Some buggy controllers generate an extra command complete
 +		 * event for the previous command after a new commend was
 +		 * already sent, so if the opcode does not match the last sent
