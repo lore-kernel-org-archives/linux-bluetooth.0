@@ -2,107 +2,70 @@ Return-Path: <SRS0=Tr5+=S2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D02C10F11
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 10:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD71C10F11
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 10:26:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89A672175B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 10:24:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72E3821773
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 10:26:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726405AbfDXKYo convert rfc822-to-8bit (ORCPT
+        id S1727428AbfDXK0w convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Apr 2019 06:24:44 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44739 "EHLO
+        Wed, 24 Apr 2019 06:26:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53204 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726168AbfDXKYo (ORCPT
+        with ESMTP id S1726135AbfDXK0v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Apr 2019 06:24:44 -0400
+        Wed, 24 Apr 2019 06:26:51 -0400
 Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D4A05CF350;
-        Wed, 24 Apr 2019 12:32:52 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3EDABCF351;
+        Wed, 24 Apr 2019 12:35:01 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 0/5] isdn: deprecate non-mISDN drivers
+Subject: Re: [PATCH] Bluetooth: btintel: improvement: mask vendor events from
+ controller
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAK8P3a1ViEZmK-+rpYgpFkJHs+7XoNCTuK1iHcgSrZXaOJedLQ@mail.gmail.com>
-Date:   Wed, 24 Apr 2019 12:24:41 +0200
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Karsten Keil <isdn@linux-pingi.de>,
-        Networking <netdev@vger.kernel.org>,
-        isdn4linux@listserv.isdn4linux.de, Paul Bolle <pebolle@tiscali.nl>,
-        Holger Schurig <holgerschurig@googlemail.com>,
-        Tilman Schmidt <tilman@imap.cc>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        gigaset307x-common@lists.sourceforge.net,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1556097059-31577-1-git-send-email-amit.k.bag@intel.com>
+Date:   Wed, 24 Apr 2019 12:26:50 +0200
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <FBF10E1F-2D3D-4FFC-8F8C-5969A2F2A475@holtmann.org>
-References: <20190423151143.464992-1-arnd@arndb.de>
- <20190423.193735.412590692063607790.davem@davemloft.net>
- <CAK8P3a1ViEZmK-+rpYgpFkJHs+7XoNCTuK1iHcgSrZXaOJedLQ@mail.gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
+Message-Id: <1F2562C9-0C63-410E-957C-1C79CA86A02E@holtmann.org>
+References: <1556097059-31577-1-git-send-email-amit.k.bag@intel.com>
+To:     Amit K Bag <amit.k.bag@intel.com>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Arnd,
+Hi Amit,
 
->>> When isdn4linux came up in the context of another patch series, I
->>> remembered that we had discussed removing it a while ago.
->> 
->> This seems long overdue to me.
->> 
->> Could you please respin against net-next and I'll just apply this?
+> This patch mask unnecessary event notifications from controller to host
 > 
-> Ok. I'll send a pull request then, which should make it easier to deal with
-> the file removals, as I'm never sure whether 'git format-patch -D' patches
-> make it across the list correctly, at least I had problems applying them
-> in the past.
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> ---
+> drivers/bluetooth/btintel.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I added a few fixups as in the diff below in the meantime, to deal
-> with build regressions from the last patch. In particular, the BT_CMTP
-> (CIP) code also needs to be moved into staging along with the CAPI
-> core. From what I can find, this was originally used for dial-up
-> internet connections with 'Bluefritz' ISDN hardware, but it stopped
-> working many years ago and is no longer useful with after the
-> public network shutdown either.
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 5270d5513201..7e5cdd37cc1f 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -313,7 +313,7 @@ EXPORT_SYMBOL_GPL(btintel_load_ddc_config);
 > 
->     Arnd
-> 
-> 
-> diff --git a/drivers/staging/isdn/Kconfig b/drivers/staging/isdn/Kconfig
-> index 77e1b80af716..29d13fcd9e2b 100644
-> --- a/drivers/staging/isdn/Kconfig
-> +++ b/drivers/staging/isdn/Kconfig
-> @@ -1,5 +1,6 @@
-> menuconfig ISDN_CAPI
->  tristate "CAPI 2.0 subsystem"
-> + depends on NET && NETDEVICES
->  help
->    This provides CAPI (the Common ISDN Application Programming
->    Interface) Version 2.0, a standard making it easy for programs to
-> @@ -23,6 +24,7 @@ source "drivers/staging/isdn/gigaset/Kconfig"
-> 
-> source "drivers/staging/isdn/hysdn/Kconfig"
-> 
-> +source "drivers/staging/isdn/cmtp/Kconfig"
-> 
-> endif # ISDN_CAPI
+> int btintel_set_event_mask(struct hci_dev *hdev, bool debug)
+> {
+> -	u8 mask[8] = { 0x87, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+> +	u8 mask[8] = { 0x01, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+> 	struct sk_buff *skb;
+> 	int err;
 
-NAK.
-
-I do not care about isdn4linux, but this is a purely CAPI based driver. So removing (or moving to staging) CAPI support seems rather premature.
-
-Maybe someone would have started talking to us before trying to move this into staging. It is a maintained driver. That it is rather simple and hasn’t seen patches in a long time, doesn’t mean it is not maintained and staging material. I see no reason to tell any user to enable staging tree to get CMTP support.
+so I enabled actually many more events to ensure we get proper output in btmon in case something happens. So you need to be more specific why we want to not enable these events for our hardware.
 
 Regards
 
