@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDE3C10F11
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 09:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD6BC10F11
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 09:54:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C65D42148D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 09:53:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3534E218B0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 09:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727776AbfDXJxs (ORCPT
+        id S1727640AbfDXJyI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Apr 2019 05:53:48 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:47836 "EHLO
+        Wed, 24 Apr 2019 05:54:08 -0400
+Received: from smtp.nue.novell.com ([195.135.221.5]:57739 "EHLO
         smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726655AbfDXJxs (ORCPT
+        with ESMTP id S1726375AbfDXJyI (ORCPT
         <rfc822;groupwise-linux-bluetooth@vger.kernel.org:0:0>);
-        Wed, 24 Apr 2019 05:53:48 -0400
+        Wed, 24 Apr 2019 05:54:08 -0400
 Received: from linux-vvou.suse.de (unknown.telstraglobal.net [202.47.205.198])
-        by smtp.nue.novell.com with ESMTP (NOT encrypted); Wed, 24 Apr 2019 11:53:45 +0200
+        by smtp.nue.novell.com with ESMTP (NOT encrypted); Wed, 24 Apr 2019 11:54:05 +0200
 From:   "Cho, Yu-Chen" <acho@suse.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     acho@suse.com, jlee@suse.com
-Subject: [PATCH BlueZ] hcidump: Add assoc dump function assoc date length check
-Date:   Wed, 24 Apr 2019 17:53:35 +0800
-Message-Id: <20190424095335.10378-1-acho@suse.com>
+Subject: [PATCH BlueZ] tool/hcidump: Fix memory leak with malformed packet
+Date:   Wed, 24 Apr 2019 17:53:57 +0800
+Message-Id: <20190424095357.10438-1-acho@suse.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -36,160 +36,34 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-amp_assoc_dump() didn't check the length of amp assoc struct.
-If there is wrong length size of assoc date, amp_assoc_dump() and
-amp_dump_chanlist() will read over the size(heap-buffer-overflow).
-
-use t_len to save the length avoid use the wrong size of date.
+Do not allow to read more than allocated data buffer size.
+Because of the buffer is malloc(HCI_MAX_FRAME_SIZE),
+so there is heap buffer overflow if read the size more than
+HCI_MAX_FRAME_SIZE and fd size is larger than HCI_MAX_FRAME_SIZE.
 ---
- tools/parser/amp.c    | 35 +++++++++++++++++++++++++++--------
- tools/parser/hci.c    |  4 ++--
- tools/parser/l2cap.c  |  6 ++++--
- tools/parser/parser.h |  2 +-
- 4 files changed, 34 insertions(+), 13 deletions(-)
+ tools/hcidump.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/tools/parser/amp.c b/tools/parser/amp.c
-index 7c85fb96c..d3459dfe1 100644
---- a/tools/parser/amp.c
-+++ b/tools/parser/amp.c
-@@ -28,7 +28,8 @@
- #include "parser.h"
- #include "lib/amp.h"
- 
--static void amp_dump_chanlist(int level, struct amp_tlv *tlv, char *prefix)
-+static void amp_dump_chanlist(int level, struct amp_tlv *tlv,
-+			      uint16_t t_len, char *prefix)
+diff --git a/tools/hcidump.c b/tools/hcidump.c
+index 33d429b6c..6cc55404d 100644
+--- a/tools/hcidump.c
++++ b/tools/hcidump.c
+@@ -105,6 +105,15 @@ struct pktlog_hdr {
+ static inline int read_n(int fd, char *buf, int len)
  {
- 	struct amp_chan_list *chan_list = (void *) tlv->val;
- 	struct amp_country_triplet *triplet;
-@@ -38,6 +39,12 @@ static void amp_dump_chanlist(int level, struct amp_tlv *tlv, char *prefix)
- 
- 	printf("%s (number of triplets %d)\n", prefix, num);
- 
-+	if (btohs(tlv->len) > t_len) {
-+		p_indent(level+1, 0);
-+		printf("Wrong number of triplets\n");
-+		num = (t_len - sizeof(*chan_list)) / sizeof(*triplet);
-+	}
+ 	int t = 0, w;
++	off_t fsize, currentpos, startpos;
 +
- 	p_indent(level+2, 0);
- 
- 	printf("Country code: %c%c%c\n", chan_list->country_code[0],
-@@ -68,7 +75,7 @@ static void amp_dump_chanlist(int level, struct amp_tlv *tlv, char *prefix)
- 	}
- }
- 
--void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
-+void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len, uint16_t t_len)
- {
- 	struct amp_tlv *tlv = (void *) assoc;
- 
-@@ -76,6 +83,14 @@ void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
- 	printf("Assoc data [len %d]:\n", len);
- 
- 	while (len > sizeof(*tlv)) {
-+		if (btohs(tlv->len) > (t_len - sizeof(struct amp_tlv))) {
-+			p_indent(level+1, 0);
-+			printf("Assoc data get error size\n");
-+			t_len -= sizeof(struct amp_tlv);
-+		} else {
-+			t_len -= sizeof(struct amp_tlv) + btohs(tlv->len);
-+		}
++	currentpos = lseek(fd, 0, SEEK_CUR);
++	fsize = lseek(fd, 0, SEEK_END);
++	lseek(fd, currentpos, SEEK_SET);
++	fsize -= currentpos;
 +
- 		uint16_t tlvlen = btohs(tlv->len);
- 		struct amp_pal_ver *ver;
++	if (fsize > HCI_MAX_FRAME_SIZE && len > HCI_MAX_FRAME_SIZE)
++		return -1;
  
-@@ -91,11 +106,13 @@ void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
- 			break;
- 
- 		case A2MP_PREF_CHANLIST_TYPE:
--			amp_dump_chanlist(level, tlv, "Preferred Chan List");
-+			amp_dump_chanlist(level, tlv,
-+					  t_len, "Preferred Chan List");
- 			break;
- 
- 		case A2MP_CONNECTED_CHAN:
--			amp_dump_chanlist(level, tlv, "Connected Chan List");
-+			amp_dump_chanlist(level, tlv,
-+					  t_len, "Connected Chan List");
- 			break;
- 
- 		case A2MP_PAL_CAP_TYPE:
-@@ -119,9 +136,11 @@ void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
- 			printf("Unrecognized type %d\n", tlv->type);
- 			break;
- 		}
--
--		len -= tlvlen + sizeof(*tlv);
--		assoc += tlvlen + sizeof(*tlv);
--		tlv = (struct amp_tlv *) assoc;
-+		if (btohs(tlv->len) <= t_len) {
-+			len -= tlvlen + sizeof(*tlv);
-+			assoc += tlvlen + sizeof(*tlv);
-+			tlv = (struct amp_tlv *) assoc;
-+		} else
-+			len = 0;
- 	}
- }
-diff --git a/tools/parser/hci.c b/tools/parser/hci.c
-index 41f6fe087..424ff4bd7 100644
---- a/tools/parser/hci.c
-+++ b/tools/parser/hci.c
-@@ -1679,7 +1679,7 @@ static inline void write_remote_amp_assoc_cmd_dump(int level,
- 	printf("handle 0x%2.2x len_so_far %d remaining_len %d\n", cp->handle,
- 				cp->length_so_far, cp->remaining_length);
- 
--	amp_assoc_dump(level + 1, cp->fragment, frm->len - 5);
-+	amp_assoc_dump(level + 1, cp->fragment, frm->len - 5, frm->len - 5);
- }
- 
- static inline void command_dump(int level, struct frame *frm)
-@@ -2662,7 +2662,7 @@ static inline void read_local_amp_assoc_dump(int level, struct frame *frm)
- 		p_indent(level, frm);
- 		printf("Error: %s\n", status2str(rp->status));
- 	} else {
--		amp_assoc_dump(level + 1, rp->fragment, len);
-+		amp_assoc_dump(level + 1, rp->fragment, len, frm->len - 4);
- 	}
- }
- 
-diff --git a/tools/parser/l2cap.c b/tools/parser/l2cap.c
-index e43761cf7..58a23a54c 100644
---- a/tools/parser/l2cap.c
-+++ b/tools/parser/l2cap.c
-@@ -1172,7 +1172,8 @@ static inline void a2mp_assoc_rsp(int level, struct frame *frm, uint16_t len)
- 
- 	printf("Get AMP Assoc rsp: id %d status (%d) %s\n",
- 			h->id, h->status, a2mpstatus2str(h->status));
--	amp_assoc_dump(level + 1, h->assoc_data, len - sizeof(*h));
-+	amp_assoc_dump(level + 1, h->assoc_data,
-+		       len - sizeof(*h), frm->len - sizeof(*h));
- }
- 
- static inline void a2mp_create_req(int level, struct frame *frm, uint16_t len)
-@@ -1181,7 +1182,8 @@ static inline void a2mp_create_req(int level, struct frame *frm, uint16_t len)
- 
- 	printf("Create Physical Link req: local id %d remote id %d\n",
- 		   h->local_id, h->remote_id);
--	amp_assoc_dump(level + 1, h->assoc_data, len - sizeof(*h));
-+	amp_assoc_dump(level + 1, h->assoc_data,
-+		       len - sizeof(*h), frm->len - sizeof(*h));
- }
- 
- static inline void a2mp_create_rsp(int level, struct frame *frm)
-diff --git a/tools/parser/parser.h b/tools/parser/parser.h
-index b7e1d7568..97c4bbea1 100644
---- a/tools/parser/parser.h
-+++ b/tools/parser/parser.h
-@@ -249,7 +249,7 @@ void ericsson_dump(int level, struct frame *frm);
- void csr_dump(int level, struct frame *frm);
- void bpa_dump(int level, struct frame *frm);
- 
--void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len);
-+void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len, uint16_t t_len);
- 
- static inline void parse(struct frame *frm)
- {
+ 	while (len > 0) {
+ 		if ((w = read(fd, buf, len)) < 0) {
 -- 
 2.21.0
 
