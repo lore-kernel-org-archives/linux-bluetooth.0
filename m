@@ -2,99 +2,151 @@ Return-Path: <SRS0=Tr5+=S2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09673C282CE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 14:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67444C10F11
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 14:56:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7E58218FD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 14:31:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37C042084F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Apr 2019 14:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730635AbfDXOax convert rfc822-to-8bit (ORCPT
+        id S1732381AbfDXO4S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Apr 2019 10:30:53 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:54916 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725978AbfDXOax (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Apr 2019 10:30:53 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0B4D5CF353;
-        Wed, 24 Apr 2019 16:39:00 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 0/5] isdn: deprecate non-mISDN drivers
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAK8P3a2FLrGXh9iv4eWBX8D_zb7rq5YDErkzDjjHbA5JENHVGw@mail.gmail.com>
-Date:   Wed, 24 Apr 2019 16:30:49 +0200
-Cc:     Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Karsten Keil <isdn@linux-pingi.de>,
-        Networking <netdev@vger.kernel.org>,
-        isdn4linux@listserv.isdn4linux.de, Paul Bolle <pebolle@tiscali.nl>,
-        Holger Schurig <holgerschurig@googlemail.com>,
-        Tilman Schmidt <tilman@imap.cc>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        gigaset307x-common@lists.sourceforge.net,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D5B4825C-88DE-4011-8C2C-141214486861@holtmann.org>
-References: <20190423151143.464992-1-arnd@arndb.de>
- <20190423.193735.412590692063607790.davem@davemloft.net>
- <CAK8P3a1ViEZmK-+rpYgpFkJHs+7XoNCTuK1iHcgSrZXaOJedLQ@mail.gmail.com>
- <FBF10E1F-2D3D-4FFC-8F8C-5969A2F2A475@holtmann.org>
- <CAK8P3a2FLrGXh9iv4eWBX8D_zb7rq5YDErkzDjjHbA5JENHVGw@mail.gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Wed, 24 Apr 2019 10:56:18 -0400
+Received: from mga18.intel.com ([134.134.136.126]:25569 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731258AbfDXO4R (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Apr 2019 10:56:17 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Apr 2019 07:56:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,390,1549958400"; 
+   d="scan'208";a="340376736"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by fmsmga005.fm.intel.com with ESMTP; 24 Apr 2019 07:56:15 -0700
+Received: from orsmsx163.amr.corp.intel.com (10.22.240.88) by
+ ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Wed, 24 Apr 2019 07:56:15 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
+ ORSMSX163.amr.corp.intel.com ([169.254.9.163]) with mapi id 14.03.0415.000;
+ Wed, 24 Apr 2019 07:56:15 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: RE: [PATCH BlueZ] mesh: Add remote dev key support and cleanup
+Thread-Topic: [PATCH BlueZ] mesh: Add remote dev key support and cleanup
+Thread-Index: AQHU+iqeuEkS+gmemU2IJ0mshT/LNKZLeSOA///m1GA=
+Date:   Wed, 24 Apr 2019 14:56:14 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4376CB05944@ORSMSX103.amr.corp.intel.com>
+References: <20190423231624.19302-1-brian.gix@intel.com>
+ <20190424085945.zmniib4vpy2uiyql@kynes>
+In-Reply-To: <20190424085945.zmniib4vpy2uiyql@kynes>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYjJlZDFlNWYtNzIxZC00YzFkLTgxZDEtZWYxMWFiNTg1ODVkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidGdnUUZDeWFwaTBXRDB4cjAxaXFiWnRIV3ljK3ZIbHVmdEJpSWpmU1lqS3VIMUp6TDBtN204Rjhhc3RoWkhHOCJ9
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-originating-ip: [10.22.254.138]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Arnd,
-
->>>>> When isdn4linux came up in the context of another patch series, I
->>>>> remembered that we had discussed removing it a while ago.
->> 
->> NAK.
->> 
->> I do not care about isdn4linux, but this is a purely CAPI based driver. So removing (or moving to staging)
->> CAPI support seems rather premature.
->> 
->> Maybe someone would have started talking to us before trying to move this into staging. It is a
->> maintained driver. That it is rather simple and hasn’t seen patches in a long time, doesn’t mean
->> it is not maintained and staging material. I see no reason to tell any user to enable staging tree
->> to get CMTP support.
-> 
-> I can definitely leave out the last patch from the series if we know
-> that there are
-> still users on CMTP. I searched around for a bit but could not find
-> any indication
-> what this is still used for, if anything.
-
-I would prefer if we leave CAPI support and with that CMTP mainstream and not move that to staging. For isdn4linux, I have no objections to move that to staging since mISDN was suppose to replace it anyway.
-
-> What I found were a couple of references of the driver no longer working
-> about 10 years ago:
-> 
-> https://wiki.ubuntuusers.de/Archiv/Bluetooth/BlueFritz%21/
-> https://www.opensuse-forum.de/thread/2776-erledigt-suse-11-2-und-bluefritz/
-> 
-> Is anyone using cmtp for voice or fax services? The use cases from before 2009
-> that I could find were usually dial-up networking, but that seems pointless now
-> if the only way to get an ISDN connection is to have it routed over
-> the internet.
-
-I still have the hardware and last time I checked it worked just fine. However you need to set up a proper pairing with the hardware. However that has nothing to do with CMTP since that is just a CAPI message transport protocol.
-
-You can use it for voice and fax service as long as you have the right codecs in place. At the end of the day CAPI is an API for ISDN. And CMTP just being a transport, all ISDN services are possible given the right software / application.
-
-Regards
-
-Marcel
-
+SGkgTWljaGFsLA0KDQo+IEZyb206IE1pY2hhxYIgTG93YXMtUnplY2hvbmVrIFttYWlsdG86bWlj
+aGFsLmxvd2FzLXJ6ZWNob25la0BzaWx2YWlyLmNvbV0NCj4gPiArdHJ5X3JlbW90ZToNCj4gPiAr
+CS8qIFRyeSByZW1vdGUgZGV2aWNlIGtleSBpZiBhdmFpbGFibGUgKi8NCj4gPiArCWRldl9rZXkg
+PSBub2RlX2dldF9yZW1vdGVfZGV2aWNlX2tleShub2RlLCBzcmMpOw0KPiA+ICsJaWYgKCFkZXZf
+a2V5KQ0KPiA+ICsJCXJldHVybiAtMTsNCj4gPiArDQo+ID4gKwlpZiAobWVzaF9jcnlwdG9fcGF5
+bG9hZF9kZWNyeXB0KE5VTEwsIDAsIGRhdGEsIHNpemUsIHN6bWljdCwgc3JjLA0KPiA+ICsJCQkJ
+CWRzdCwga2V5X2lkLCBzZXEsIGl2X2lkeCwgb3V0LA0KPiBkZXZfa2V5KSkNCj4gPiArCQlyZXR1
+cm4gQVBQX0lEWF9ERVZfUk1UOw0KPiA+ICsNCj4gV2hhdCdzIHRoZSBwdXJwb3NlIG9mIEFQUF9J
+RFhfREVWX1JNVD8NCg0KQXBwIEluZGV4IGlzIGFuIGludGVybmFsIHdheSB0byB0cmFjayB3aGlj
+aCBjcmVkZW50aWFscyB3ZXJlIHVzZWQgdG8gZGVjcnlwdCBhIG1lc3NhZ2UuICBJbiB0aGVvcnks
+IGlmIHRoZSBpbmNvbWluZyBtZXNzYWdlIHVzZWQgdGhlIGxvY2FsIGRldmljZSBrZXksIHRoZW4g
+dGhlIG1lc3NhZ2UgaXMgYWRkcmVzc2VkIHRvIG9uZSBvZiB0aGUgbG9jYWwgc2VydmVycywgYW5k
+IGlmIHRoZSBpbmNvbWluZyBtZXNzYWdlIHdhcyBkZWNyeXB0ZWQgYnkgYSAqcmVtb3RlKiBkZXZp
+Y2Uga2V5IGl0IHNob3VsZCBiZSBhZGRyZXNzZWQgdG8gYSBsb2NhbCBDbGllbnQgKGFzIGEgcmVz
+cG9uc2UgZnJvbSBhIHJlbW90ZSBzZXJ2ZXIpLg0KDQpIb3dldmVyLCBhbHNvIGltcG9ydGFudGx5
+LCBpZiBhIG1lc3NhZ2UgdGhhdCByZXF1aXJlcyBhIHJlc3BvbnNlIGlzIHJlY2VpdmVkIG9uICph
+bnkqIGtleSAobG9jYWwgZGV2LCByZW1vdGUgZGV2LCBvciBBcHAgS2V5KSB0aGUgcmVzcG9uc2Ug
+aXMgc3VwcG9zZWQgdG8gYmUgc2VudCB3aXRoIHRoZSBzYW1lIGtleS4NCg0KVG8gZW5hYmxlIHRo
+YXQsIHdlIG5lZWQgdG8gZGlmZmVyZW50aWF0ZSBiZXR3ZWVuIHRoZSB0d28gcG9zc2libGUgZGV2
+aWNlIGtleXMuDQoNCkluIGFueSBjYXNlLCB0aGVzZSAiTWFnaWMgTnVtYmVycyIgYXJlIGludGVy
+bmFsIHVzZSBvbmx5LCBhbmQgZG8gbm90IHNob3cgdXAgb24gdGhlIGV4dGVybmFsIGludGVyZmFj
+ZS4gIFdoZW4gKnNlbmRpbmcqIERldiBLZXkgbWVzc2FnZSBmcm9tIHRoZSBBcHBsaWNhdGlvbiwg
+d2Ugd2lsbCB0cnkgdGhlIHJlbW90ZSBub2RlcyBkZXZpY2Uga2V5IGZpcnN0LCBhbmQgaWYgaXQg
+ZG9lcyBub3QgZXhpc3Qgd2UgZmFsbCBiYWNrIHRvIHRoZSBsb2NhbCBrZXkuDQoNCj4gDQo+IEkn
+bSBub3QgYSBmYW4gb2YgbWFnaWMgdmFsdWVzIChhbmQgSSBob3BlIEFQUF9JRFhfREVWIGdvZXMg
+YXdheSBhZnRlcncgd2UNCj4gbWFuYWdlIHRvIGltcGxlbWVudCBwcm9wb3NlZCBDb25maWcvUHJv
+dmlzaW9uaW5nIEFQSSksIGJ1dCBhdCBsZWFzdA0KPiBBUFBfSURYX0RFViBpcyB1c2VkIHRvIGlu
+ZGljYXRlICdwcml2aWxlZ2VkJyBsb29wYmFjayBtZXNzYWdlcy4NCj4gDQo+IEFkZGluZyBJRFhf
+REVWX1JNVCBkb2Vzbid0IHNlZW0gbmVjZXNzYXJ5Lg0KPiANCj4gPiBkaWZmIC0tZ2l0IGEvbWVz
+aC9ub2RlLmMgYi9tZXNoL25vZGUuYyBpbmRleCAxNTc5OTFkYWQuLmZlMDQ4ODEwOA0KPiA+IDEw
+MDY0NA0KPiA+IC0tLSBhL21lc2gvbm9kZS5jDQo+ID4gKysrIGIvbWVzaC9ub2RlLmMNCj4gPiBA
+QCAtNTQsNiArNTQsOCBAQA0KPiA+ICAjZGVmaW5lIERFRkFVTFRfQ1JQTCAxMA0KPiA+ICAjZGVm
+aW5lIERFRkFVTFRfU0VRVUVOQ0VfTlVNQkVSIDANCj4gPg0KPiA+ICsjZGVmaW5lIFJFTU9URV9D
+QUNIRV9MRU4gNQ0KPiBCeSB0aGUgd2F5OiB3aHkgdGhlIGxpbWl0cyBoZXJlIGFyZSBzZXQgc28g
+bG93IChhbmQgdGhlcmUgZG9lc24ndCBzZWVtIHRvIGJlDQo+IGEgd2F5IHRvIGNoYW5nZSB0aGVt
+Li4uKT8gSSBkb24ndCB0aGluayB3ZSBzaG91bGQgcHV0IGFydGlmaWNpYWwgY29uc3RyYWludHMg
+b24NCj4gbmV0d29yayBzaXplLCBzbyBib3RoIENSUEwgYW5kIHJlbW90ZSBjYWNoZSBjb3VsZCBz
+YWZlbHkgYmUgc2V0IHRvIGNvdmVyIGZ1bGwNCj4gdW5pY2FzdCBzcGFjZSAoMzI3NjgpLiBJbiBh
+bnkgcHJhY3RpY2FsIGFwcGxpY2F0aW9uLCB0aGUgZGV2aWNlIHJ1bm5pbmcgTGludXggKw0KPiBi
+bHVldG9vdGggd2lsbCBoYXZlIG1vcmUgdGhhbiBlbm91Z2ggUkFNIGZvciB0aGlzLg0KDQpVbmRl
+ciBub3JtYWwgY2lyY3Vtc3RhbmNlcyAoYSBub24tUHJvdmlzaW9uZXIgbm9kZSBmb3IgZXhhbXBs
+ZSkgVGhlcmUgd2lsbCBvbmx5IGV2ZXIgYmUgdGhlIGxvY2FsIGRldmljZSBrZXkgYXZhaWxhYmxl
+LCBhbmQgc28gdGhlIHNpemUgb2YgdGhlIHJlbW90ZSBjYWNoZSBpcyBtb290Lg0KDQpXaGVuIGJl
+aW5nIHVzZWQgYXMgYSBDb25maWcgQ2xpZW50LCB3ZSBhcmUganVzdCB0cnlpbmcgdG8gYXZvaWQg
+cmVvcGVuaW5nIHRoZSBmaWxlIHRvIGZldGNoIHRoZSBkZXZpY2Uga2V5IHRvIGRlY29kZSB0aGUg
+ZXhwZWN0ZWQgcmVzcG9uc2UuICBJIHdhcyB0aGlua2luZyBvZiBhY3R1YWxseSBtYWtpbmcgaXQg
+KnNtYWxsZXIqLCBidXQgdGhlcmUgd2lsbCBiZSB0aW1lcyAobGlrZSBkdXJpbmcgYSBrZXkgdXBk
+YXRlKSB0aGF0IG11bHRpcGxlIG1lc3NhZ2VzIHRvIG11bHRpcGxlIHNlcnZlcnMgd2lsbCBiZSAi
+aW4gZmxpZ2h0IiBzaW11bHRhbmVvdXNseS4gSG93ZXZlciBpbiBtb3N0IGNhc2VzIHRoZSBjb25m
+aWd1cmF0aW9uIG1lc3NhZ2VzIGFyZSByYXJlbHkgdXNlZCBvdXRzaWRlIG9mIGluaXRpYWwgbm9k
+ZSBzZXR1cC4NCg0KDQoNCj4gDQo+IEdldHRpbmcgcmlkIG9mIHRoZXNlIGNvbnN0cmFpbnRzIHdv
+dWxkIG1ha2UgdGhlIGltcGxlbWVudGF0aW9uDQo+IHN1YnN0aWFudGlhbGx5IHNpbXBsZXIgKG5v
+IE1SVSwgZm9yIGV4YW1wbGUpLg0KDQoNCkluY3JlYXNpbmcgdGhlIENhY2hlIGluY3JlYXNlcyAo
+aW4gYW4gb3Blbi1lbmRlZCB3YXksIGRlcGVuZGluZyBvbiBudW1iZXIgb2YgcmVtb3RlIG5vZGVz
+KSBSQU0gdXNhZ2UgZm9yIHNvbWV0aGluZyB0aGF0IGFzIHN0YXRlZCBhYm92ZSBpcyByYXJlbHkg
+dXNlZC4gIEFsbCB0aGUgZGV2aWNlIGtleXMgYXJlIGFsd2F5cyBhdmFpbGFibGUuLi4gIHRoZXkg
+anVzdCBtYXkgbmVlZCB0byBiZSByZWFkIGludG8gUkFNIGZyb20gc3RvcmFnZS4NCg0KPiANCj4g
+RllJLCB3ZSdyZSBydW5uaW5nIG5ldHdvcmtzIHdpdGggY291cGxlcyBvZiBodW5kcmVkcyBkZXZp
+Y2VzLCBhbmQgcGxhbiB0bw0KPiBleHBhbmQgdGhlbSBldmVuIGZ1cnRoZXIuDQo+IA0KPiA+ICsv
+KiBUaGlzIGlzIGEgdGhyZWFkLXNhZmUgYWx3YXlzIG1hbGxvY2VkIHZlcnNpb24gb2YgZGlybmFt
+ZSB3aGljaA0KPiA+ICt3aWxsIHdvcmsNCj4gPiArICogcmVnYXJkbGVzcyBvZiB3aGljaCB1bmRl
+cmx5aW5nIGRpcm5hbWUgaW1wbGltZW50YXRpb24gaXMgdXNlZCAgKi8NCj4gPiArc3RhdGljIGNo
+YXIgKmFsbG9jX2Rpcm5hbWUoY29uc3QgY2hhciAqcGF0aCkgew0KPiBJIHdhcyB1bmRlciBpbXBy
+ZXNzaW9uIHRoYXQgbWVzaCBkYWVtb24gb3BlcmF0ZXMgaW5zaWRlIGEgbWFpbiBsb29wLCBzbyBp
+dA0KPiBkb2Vzbid0IG5lZWQgdG8gd29ycnkgYWJvdXQgdGhyZWFkIHNhZmV0eT8NCj4gDQo+ID4g
+K2Jvb2wgc3RvcmFnZV9nZXRfcmVtb3RlX2Rldl9rZXkoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwg
+dWludDE2X3QNCj4gdW5pY2FzdCwNCj4gPiArCQkJCQkJCXVpbnQ4X3QgZGV2X2tleVsxNl0pDQo+
+ID4gK3sNCj4gPiAoLi4uKQ0KPiA+ICsJZGlyX25hbWUgPSBhbGxvY19kaXJuYW1lKGNmZ25hbWUp
+Ow0KPiBJIGRvbid0IHNlZSB3aHkgdGhlIHJlbW90ZSBrZXkgc3RvcmFnZSBzaG91bGQgYmUga2Vw
+dCBzZXBhcmF0ZWx5IChhbmQgaW4NCj4gYmluYXJ5IGZpbGVzPykgZnJvbSB0aGUgbWFpbiBub2Rl
+IGpzb24uIEl0IG1ha2VzIHRoZSBpbXBsZW1lbnRhdGlvbiBtdWNoDQo+IG1vcmUgY29tcGxpY2F0
+ZWQsIGFzIHlvdSBuZWVkIHRvIHdvcnJ5IGFib3V0IGRpcmVjdG9yaWVzIGV0Yy4NCj4gDQo+IEkg
+YmVsaWV2aWUgdGhhdCBrZWVwaW5nIHJlbW90ZSBrZXlzIGluIHRoZSBzYW1lIHBsYWNlLCBhcyBh
+IEpTT04gb2JqZWN0LA0KPiB3b3VsZCBiZSBtdWNoIHNpbXBsZXIuDQoNCkFnYWluLCB0aGlzIGNy
+ZWF0ZXMgYW4gb3Blbi1lbmRlZCBSQU0gcmVxdWlyZW1lbnQgdGhhdCBkZXBlbmRzIG9uIHRoZSBl
+eGlzdGVuY2Ugb2YgZXh0ZXJuYWwgcmVzb3VyY2VzLi4uLiAgV2hhdCBpZiB0aGVyZSBhcmUgb25s
+eSAxMCByZW1vdGUgbm9kZXM/ICBEbyB3ZSBzdGlsbCBjb21taXQgZW5vdWdoIFJBTSB0byBoYW5k
+bGUgMzIsNzY3IHJlbW90ZSBub2RlcyBqdXN0IGluIGNhc2U/ICBUaGlzIGltcGxlbWVudGF0aW9u
+IGxlYXZlIHRoZSBvcGVuLWVuZGVkIGJ1cmRlbiBvZiBzdG9yYWdlIG91dCBvZiBSQU0sIGFuZCBh
+Y2tub3dsZWRnZXMgdGhhdCBDb25maWcgbWVzc2FnZXMsIHdoaWxlIGltcG9ydGFudCwgYXJlIG5v
+dCB0aGUgcmVndWxhciB0cmFmZmljLi4uICBUaGluZ3MgbGlrZSBnZW5lcmljIE9uL09mZiBhbmQg
+TGV2ZWwgbWVzc2FnZXMgc2hvdWxkIG1ha2UgdXAgOTklIG9mIG5vcm1hbCB0cmFmZmljLCBhbmQg
+dGhvc2UgYXJlIHNlbnQgd2l0aCBub3JtYWwgQXBwIEtleXMuDQoNCg0KPiANCj4gcmVnYXJkcw0K
+PiAtLQ0KPiBNaWNoYcWCIExvd2FzLVJ6ZWNob25layA8bWljaGFsLmxvd2FzLXJ6ZWNob25la0Bz
+aWx2YWlyLmNvbT4NCj4gU2lsdmFpciBodHRwOi8vc2lsdmFpci5jb20NCj4gSmFzbm9nw7Nyc2th
+IDQ0LCAzMS0zNTggS3Jha293LCBQT0xBTkQNCg==
