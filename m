@@ -3,161 +3,131 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5973EC43219
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6D0C43218
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:35:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8A0520891
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:26:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9644820717
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:35:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726417AbfDYQ0z convert rfc822-to-8bit (ORCPT
+        id S1726338AbfDYQfR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Apr 2019 12:26:55 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:47007 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726542AbfDYQ0v (ORCPT
+        Thu, 25 Apr 2019 12:35:17 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:58206 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbfDYQfR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Apr 2019 12:26:51 -0400
-Received: from mail-pf1-f198.google.com ([209.85.210.198])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1hJhD0-0001Qf-1L
-        for linux-bluetooth@vger.kernel.org; Thu, 25 Apr 2019 16:26:50 +0000
-Received: by mail-pf1-f198.google.com with SMTP id b11so267957pfo.15
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2019 09:26:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=1oiqi9G6Np0kNTcVBRPgMIfw8IbqDIQ5obuFDLuIjEc=;
-        b=hnVQXqmxG1INj8UZshogaSHdB2UvLpWkpPzGcdadgg8F5Ck5rkMXwQGLQVpp6yVLoQ
-         D4KATNWombbp9LSaanL8NnoFyDy6MRp1knvSXKIZwZQt97s7+SQs/gFWD7GdwgWczbBq
-         u28MBsJMxUG/H07q6C/hdJahaEgGXnDK2cu9kMsTkE6z98wX/loHQckTZ5THXc+C5SJ0
-         nALcESYZj6hw6VBw9MkqMLuUVJHfEpCF52g4GdIIXT9owurSXJS6tv8+bgb6FggHkWQG
-         tHFOxVlbhok3KGHk5iMI/UwrMT9ssxNwEBkYEen0NimEDJUtjf/cXjdydqEZlixfIP6M
-         aSkw==
-X-Gm-Message-State: APjAAAUab+rf+GaupJRyiOQKHeDnRT220dvBnxBE3fc+qh4716JGsnHt
-        v92Dnue1JprvxHdzjm9S61QOG1KwDPVRQ3RxTGrLgJ/1uVIb9tU7o7flVgJgRbkW8Lx4HYfcrBd
-        rEdfuKYH7F7ivxl+VtZL/+oSLWR1cF16aJXb/RdH5V7jZ3g==
-X-Received: by 2002:a17:902:1007:: with SMTP id b7mr40578748pla.48.1556209608300;
-        Thu, 25 Apr 2019 09:26:48 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxy4GUwHxcf74vURkXiIR3S8ygpe5IPfdux4g26IO1WSU7WUQ92IfICcKyqCL2iROoYnNCB2w==
-X-Received: by 2002:a17:902:1007:: with SMTP id b7mr40578677pla.48.1556209607611;
-        Thu, 25 Apr 2019 09:26:47 -0700 (PDT)
-Received: from [192.168.1.220] (220-133-187-190.HINET-IP.hinet.net. [220.133.187.190])
-        by smtp.gmail.com with ESMTPSA id p26sm49851298pfa.49.2019.04.25.09.26.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Apr 2019 09:26:46 -0700 (PDT)
+        Thu, 25 Apr 2019 12:35:17 -0400
+Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 6B420CEE84;
+        Thu, 25 Apr 2019 18:43:26 +0200 (CEST)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
 Subject: Re: [PATCH 2/2] Bluetooth: btusb: Disable LE Advertising on system
  suspend
-From:   Kai Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <3E3982D2-2912-4467-A8BF-C0BE53C9B82C@holtmann.org>
-Date:   Fri, 26 Apr 2019 00:27:32 +0800
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <0AA2825C-2286-4A72-AA88-5E57BC55DFE8@canonical.com>
+Date:   Thu, 25 Apr 2019 18:35:14 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <0AA2825C-2286-4A72-AA88-5E57BC55DFE8@canonical.com>
+Message-Id: <77B76631-C261-4142-AFAA-65586B5C2E56@holtmann.org>
 References: <20190422092034.21461-1-kai.heng.feng@canonical.com>
  <20190422092034.21461-2-kai.heng.feng@canonical.com>
  <3E3982D2-2912-4467-A8BF-C0BE53C9B82C@holtmann.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
+ <0AA2825C-2286-4A72-AA88-5E57BC55DFE8@canonical.com>
+To:     Kai Heng Feng <kai.heng.feng@canonical.com>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Kai-Heng,
 
-> On Apr 24, 2019, at 12:28 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>> System may freeze during suspend, and it's caused by btusb early wakeup:
+>>> 
+>>> kernel: pci_pm_suspend(): hcd_pci_suspend+0x0/0x30 returns -16
+>>> kernel: dpm_run_callback(): pci_pm_suspend+0x0/0x130 returns -16
+>>> kernel: PM: Device 0000:00:14.0 failed to suspend async: error -16
+>>> kernel: PM: Some devices failed to suspend, or early wake event detected
+>>> kernel: usb usb1: usb resume
+>>> kernel: hub 1-0:1.0: hub_resume
+>>> kernel: usb usb1-port1: status 0507 change 0000
+>>> kernel: usb usb1-port6: status 0103 change 0004
+>>> kernel: usb usb1-port10: status 0107 change 0000
+>>> 
+>>> where btusb is connecte to usb1-port6.
+>>> 
+>>> The expirement shows that the early wakeup is caused by LE Advertising
+>>> packet.
+>>> 
+>>> Disabling it via event mask can prevent the issue from happening.
+>>> 
+>>> BugLink: https://bugs.launchpad.net/bugs/1823029
+>>> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>>> ---
+>>> drivers/bluetooth/btusb.c | 12 ++++++++++++
+>>> 1 file changed, 12 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>> index 10c8f9872ee5..f03fcf5687e4 100644
+>>> --- a/drivers/bluetooth/btusb.c
+>>> +++ b/drivers/bluetooth/btusb.c
+>>> @@ -490,6 +490,7 @@ struct btusb_data {
+>>> 	int (*setup_on_usb)(struct hci_dev *hdev);
+>>> 
+>>> 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+>>> +	bool suspended;
+>>> };
+>>> 
+>>> static inline void btusb_free_frags(struct btusb_data *data)
+>>> @@ -3316,12 +3317,18 @@ static void btusb_disconnect(struct usb_interface *intf)
+>>> static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+>>> {
+>>> 	struct btusb_data *data = usb_get_intfdata(intf);
+>>> +	struct hci_dev *hdev = data->hdev;
+>>> 
+>>> 	BT_DBG("intf %p", intf);
+>>> 
+>>> 	if (data->suspend_count++)
+>>> 		return 0;
+>>> 
+>>> +	if (!PMSG_IS_AUTO(message)) {
+>>> +		hci_disable_le_advertising(hdev);
+>>> +		data->suspended = true;
+>>> +	}
+>>> +
+>>> 	spin_lock_irq(&data->txlock);
+>>> 	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
+>>> 		set_bit(BTUSB_SUSPENDING, &data->flags);
+>>> @@ -3427,6 +3434,11 @@ static int btusb_resume(struct usb_interface *intf)
+>>> 	spin_unlock_irq(&data->txlock);
+>>> 	schedule_work(&data->work);
+>>> 
+>>> +	if (data->suspended) {
+>>> +		hci_enable_le_advertising(hdev);
+>>> +		data->suspended = false;
+>>> +	}
+>>> +
+>>> 	return 0;
+>> 
+>> this is a clear NAK. Please stop hacking things.
+>> 
+>> Lets use hci_suspend_dev and hci_resume_dev and make it actually do something to disable the events for advertising.
 > 
-> Hi Kai-Heng,
+> Do you mean hci_disable_le_advertising() should be called by hci_suspend_dev(), which should be called by btusb_suspend()?
 > 
->> System may freeze during suspend, and it's caused by btusb early wakeup:
->> 
->> kernel: pci_pm_suspend(): hcd_pci_suspend+0x0/0x30 returns -16
->> kernel: dpm_run_callback(): pci_pm_suspend+0x0/0x130 returns -16
->> kernel: PM: Device 0000:00:14.0 failed to suspend async: error -16
->> kernel: PM: Some devices failed to suspend, or early wake event detected
->> kernel: usb usb1: usb resume
->> kernel: hub 1-0:1.0: hub_resume
->> kernel: usb usb1-port1: status 0507 change 0000
->> kernel: usb usb1-port6: status 0103 change 0004
->> kernel: usb usb1-port10: status 0107 change 0000
->> 
->> where btusb is connecte to usb1-port6.
->> 
->> The expirement shows that the early wakeup is caused by LE Advertising
->> packet.
->> 
->> Disabling it via event mask can prevent the issue from happening.
->> 
->> BugLink: https://bugs.launchpad.net/bugs/1823029
->> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
->> ---
->> drivers/bluetooth/btusb.c | 12 ++++++++++++
->> 1 file changed, 12 insertions(+)
->> 
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 10c8f9872ee5..f03fcf5687e4 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -490,6 +490,7 @@ struct btusb_data {
->> 	int (*setup_on_usb)(struct hci_dev *hdev);
->> 
->> 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
->> +	bool suspended;
->> };
->> 
->> static inline void btusb_free_frags(struct btusb_data *data)
->> @@ -3316,12 +3317,18 @@ static void btusb_disconnect(struct usb_interface *intf)
->> static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->> {
->> 	struct btusb_data *data = usb_get_intfdata(intf);
->> +	struct hci_dev *hdev = data->hdev;
->> 
->> 	BT_DBG("intf %p", intf);
->> 
->> 	if (data->suspend_count++)
->> 		return 0;
->> 
->> +	if (!PMSG_IS_AUTO(message)) {
->> +		hci_disable_le_advertising(hdev);
->> +		data->suspended = true;
->> +	}
->> +
->> 	spin_lock_irq(&data->txlock);
->> 	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
->> 		set_bit(BTUSB_SUSPENDING, &data->flags);
->> @@ -3427,6 +3434,11 @@ static int btusb_resume(struct usb_interface *intf)
->> 	spin_unlock_irq(&data->txlock);
->> 	schedule_work(&data->work);
->> 
->> +	if (data->suspended) {
->> +		hci_enable_le_advertising(hdev);
->> +		data->suspended = false;
->> +	}
->> +
->> 	return 0;
-> 
-> this is a clear NAK. Please stop hacking things.
-> 
-> Lets use hci_suspend_dev and hci_resume_dev and make it actually do something to disable the events for advertising.
+> I’ve tried calling hci_suspend_dev() without disabling advertising, the issue still presents.
 
-Do you mean hci_disable_le_advertising() should be called by hci_suspend_dev(), which should be called by btusb_suspend()?
+we have to define what the behavior of hci_suspend_dev is suppose to be. In general you want to wake up from LE Advertising, but most likely only ones that are passing the whitelist. Same goes for BR/EDR and HID wakeups btw.
 
-I’ve tried calling hci_suspend_dev() without disabling advertising, the issue still presents.
+Anyway this is the way to go since I will not allow doing any hacking from a HCI transport driver. And that is what btusb.c is. It is just a transport, it is not suppose to know anything about HCI internals unless told from the core.
 
-Kai-Heng 
+Regards
 
-> 
-> Regards
-> 
-> Marcel
+Marcel
 
