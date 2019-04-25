@@ -2,132 +2,163 @@ Return-Path: <SRS0=UcDi=S3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6D0C43218
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E951C43218
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:46:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9644820717
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:35:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B553B20891
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 16:46:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="FJqIQTcn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbfDYQfR convert rfc822-to-8bit (ORCPT
+        id S1726546AbfDYQqr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Apr 2019 12:35:17 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:58206 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725941AbfDYQfR (ORCPT
+        Thu, 25 Apr 2019 12:46:47 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44439 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726338AbfDYQqr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Apr 2019 12:35:17 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 6B420CEE84;
-        Thu, 25 Apr 2019 18:43:26 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 2/2] Bluetooth: btusb: Disable LE Advertising on system
- suspend
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <0AA2825C-2286-4A72-AA88-5E57BC55DFE8@canonical.com>
-Date:   Thu, 25 Apr 2019 18:35:14 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <77B76631-C261-4142-AFAA-65586B5C2E56@holtmann.org>
-References: <20190422092034.21461-1-kai.heng.feng@canonical.com>
- <20190422092034.21461-2-kai.heng.feng@canonical.com>
- <3E3982D2-2912-4467-A8BF-C0BE53C9B82C@holtmann.org>
- <0AA2825C-2286-4A72-AA88-5E57BC55DFE8@canonical.com>
-To:     Kai Heng Feng <kai.heng.feng@canonical.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Thu, 25 Apr 2019 12:46:47 -0400
+Received: by mail-pf1-f195.google.com with SMTP id y13so177206pfm.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2019 09:46:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=p/IQSSk/LXWTRzdszIj6+hfd6gppMjKJokTDca/mb6g=;
+        b=FJqIQTcnUv/bBkHre6QVurdXsLIzsGHPiHhQsfrtMnIiTxT30TYHcQlPthaIMuMxzO
+         YUQEP4wuoJCJCJvwTIB+739EKOXA+mo+YttjPV7ugw5XvTRHLN01UXMaDqaI1hp/w85W
+         kjAGW6Ed4poW9L2fWG1bwFvdi01vxVKybb3lI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=p/IQSSk/LXWTRzdszIj6+hfd6gppMjKJokTDca/mb6g=;
+        b=jDgpauA420NWbX3BtXoYRCpfdzxT+Un8izmEOyt3hvx0TedzC2wNhu+85Y7r4IIWaG
+         5CDTv1sHKhjv79TwKwth9zcvtG/W3Nn3+mmSU9g3ae1tdQE9eVfKqsekMqiPuCPMWXdm
+         ZZBvBtoKllOt430VlJRROz47a50e6s7mNG2SrgqFLJ1Z1cRTegAxzO/34id+G+hfx78r
+         DU51rSOzw36vTpOlkauyKsyNnTaI3ahSQUSZMED4kqM4DyOPt8E2hgu1ILoQe1EA1Sww
+         9SGE0nv07siX8O7ZDM2YZmNKSFlPJ015wBXLFgG21jOuds1e9CGiGDyjZZrJzaiAWYN6
+         m/0w==
+X-Gm-Message-State: APjAAAXsl40D4E3HjrnRP0MIVmjQeFM0dIc7AIGxgHYDPp3BltvFxtLI
+        I5IqnTuEMx5hhBlONshfz03x7g==
+X-Google-Smtp-Source: APXvYqyhpUHLP1UZ+vFp9LZmFFNV0dHmtiDDg8IPR26/GOv9X6L9/jv7yTIrxerJE3qC78EUmyI0Pw==
+X-Received: by 2002:a63:750c:: with SMTP id q12mr38387096pgc.133.1556210806225;
+        Thu, 25 Apr 2019 09:46:46 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id n5sm24764349pgp.80.2019.04.25.09.46.45
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 25 Apr 2019 09:46:45 -0700 (PDT)
+Date:   Thu, 25 Apr 2019 09:46:44 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Harish Bandi <c-hbandi@codeaurora.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, anubhavg@codeaurora.org,
+        devicetree@vger.kernel.org, mark.rutland@arm.com,
+        robh+dt@kernel.org
+Subject: Re: [PATCH v7 1/2] Bluetooth: hci_qca: Added support for WCN3998
+Message-ID: <20190425164644.GG112750@google.com>
+References: <1556194416-30842-1-git-send-email-c-hbandi@codeaurora.org>
+ <1556194416-30842-2-git-send-email-c-hbandi@codeaurora.org>
+ <08C6CC93-45C7-468E-AFC3-251507FA678E@holtmann.org>
+ <2172b21d6b936c0befca1a608ae297c1@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2172b21d6b936c0befca1a608ae297c1@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kai-Heng,
-
->>> System may freeze during suspend, and it's caused by btusb early wakeup:
->>> 
->>> kernel: pci_pm_suspend(): hcd_pci_suspend+0x0/0x30 returns -16
->>> kernel: dpm_run_callback(): pci_pm_suspend+0x0/0x130 returns -16
->>> kernel: PM: Device 0000:00:14.0 failed to suspend async: error -16
->>> kernel: PM: Some devices failed to suspend, or early wake event detected
->>> kernel: usb usb1: usb resume
->>> kernel: hub 1-0:1.0: hub_resume
->>> kernel: usb usb1-port1: status 0507 change 0000
->>> kernel: usb usb1-port6: status 0103 change 0004
->>> kernel: usb usb1-port10: status 0107 change 0000
->>> 
->>> where btusb is connecte to usb1-port6.
->>> 
->>> The expirement shows that the early wakeup is caused by LE Advertising
->>> packet.
->>> 
->>> Disabling it via event mask can prevent the issue from happening.
->>> 
->>> BugLink: https://bugs.launchpad.net/bugs/1823029
->>> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
->>> ---
->>> drivers/bluetooth/btusb.c | 12 ++++++++++++
->>> 1 file changed, 12 insertions(+)
->>> 
->>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>> index 10c8f9872ee5..f03fcf5687e4 100644
->>> --- a/drivers/bluetooth/btusb.c
->>> +++ b/drivers/bluetooth/btusb.c
->>> @@ -490,6 +490,7 @@ struct btusb_data {
->>> 	int (*setup_on_usb)(struct hci_dev *hdev);
->>> 
->>> 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
->>> +	bool suspended;
->>> };
->>> 
->>> static inline void btusb_free_frags(struct btusb_data *data)
->>> @@ -3316,12 +3317,18 @@ static void btusb_disconnect(struct usb_interface *intf)
->>> static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->>> {
->>> 	struct btusb_data *data = usb_get_intfdata(intf);
->>> +	struct hci_dev *hdev = data->hdev;
->>> 
->>> 	BT_DBG("intf %p", intf);
->>> 
->>> 	if (data->suspend_count++)
->>> 		return 0;
->>> 
->>> +	if (!PMSG_IS_AUTO(message)) {
->>> +		hci_disable_le_advertising(hdev);
->>> +		data->suspended = true;
->>> +	}
->>> +
->>> 	spin_lock_irq(&data->txlock);
->>> 	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
->>> 		set_bit(BTUSB_SUSPENDING, &data->flags);
->>> @@ -3427,6 +3434,11 @@ static int btusb_resume(struct usb_interface *intf)
->>> 	spin_unlock_irq(&data->txlock);
->>> 	schedule_work(&data->work);
->>> 
->>> +	if (data->suspended) {
->>> +		hci_enable_le_advertising(hdev);
->>> +		data->suspended = false;
->>> +	}
->>> +
->>> 	return 0;
->> 
->> this is a clear NAK. Please stop hacking things.
->> 
->> Lets use hci_suspend_dev and hci_resume_dev and make it actually do something to disable the events for advertising.
+On Thu, Apr 25, 2019 at 07:10:51PM +0530, Harish Bandi wrote:
+> Hi Marcel,
 > 
-> Do you mean hci_disable_le_advertising() should be called by hci_suspend_dev(), which should be called by btusb_suspend()?
+> On 2019-04-25 18:17, Marcel Holtmann wrote:
+> > Hi Harish,
+> > 
+> > > Added new compatible for WCN3998 and corresponding voltage
+> > > and current values to WCN3998 compatible.
+> > > Changed driver code to support WCN3998
+> > > 
+> > > Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
+> > > Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> > > ---
+> > > Changes in V7:
+> > > - Initialized rom_ver to 0 to fix compiler warning
+> > > ---
+> > > drivers/bluetooth/btqca.c   | 12 +++++++++---
+> > > drivers/bluetooth/btqca.h   |  8 +++++++-
+> > > drivers/bluetooth/hci_qca.c | 40
+> > > ++++++++++++++++++++++++++--------------
+> > > 3 files changed, 42 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> > > index 6122685..495a52f 100644
+> > > --- a/drivers/bluetooth/btqca.c
+> > > +++ b/drivers/bluetooth/btqca.c
+> > > @@ -336,7 +336,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t
+> > > baudrate,
+> > > {
+> > > 	struct rome_config config;
+> > > 	int err;
+> > > -	u8 rom_ver;
+> > > +	u8 rom_ver = 0;
+> > 
+> > what is this change for?
+> [Harish] - kbuild test robot gave compiler warning. So initialized.
+> drivers/bluetooth/btqca.c:369:3: warning: 'rom_ver' may be used
+> uninitialized in this function [-Wmaybe-uninitialized]
 > 
-> I’ve tried calling hci_suspend_dev() without disabling advertising, the issue still presents.
+> > 
+> > > 	bt_dev_dbg(hdev, "QCA setup on UART");
+> > > 
+> > > @@ -344,7 +344,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t
+> > > baudrate,
+> > > 
+> > > 	/* Download rampatch file */
+> > > 	config.type = TLV_TYPE_PATCH;
+> > > -	if (soc_type == QCA_WCN3990) {
+> > > +	if (qca_is_wcn399x(soc_type)) {
+> > > 		/* Firmware files to download are based on ROM version.
+> > > 		 * ROM version is derived from last two bytes of soc_ver.
+> > > 		 */
+> > > @@ -365,7 +365,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t
+> > > baudrate,
+> > > 
+> > > 	/* Download NVM configuration */
+> > > 	config.type = TLV_TYPE_NVM;
+> > > -	if (soc_type == QCA_WCN3990)
+> > > +	if (qca_is_wcn399x(soc_type))
+> > > 		snprintf(config.fwname, sizeof(config.fwname),
+> > > 			 "qca/crnv%02x.bin", rom_ver);
+> > > 	else
+> > > @@ -410,6 +410,12 @@ int qca_set_bdaddr(struct hci_dev *hdev, const
+> > > bdaddr_t *bdaddr)
+> > > }
+> > > EXPORT_SYMBOL_GPL(qca_set_bdaddr);
+> > > 
+> > > +bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+> > > +{
+> > > +	return ((soc_type == QCA_WCN3990) || (soc_type == QCA_WCN3998));
+> > 
+> > no () needed around soc_type = check.
+> 
+> [Harish]  - OK, will change it.
+> > 
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(qca_is_wcn399x);
+> > > +
+> > 
+> > Why is this exported. Make this an inline function in btqca.h.
+> [Harish] - This was used in btqca.c also to check the soc_type
 
-we have to define what the behavior of hci_suspend_dev is suppose to be. In general you want to wake up from LE Advertising, but most likely only ones that are passing the whitelist. Same goes for BR/EDR and HID wakeups btw.
-
-Anyway this is the way to go since I will not allow doing any hacking from a HCI transport driver. And that is what btusb.c is. It is just a transport, it is not suppose to know anything about HCI internals unless told from the core.
-
-Regards
-
-Marcel
-
+true, but this is still possible with an inline function in btqca.h.
