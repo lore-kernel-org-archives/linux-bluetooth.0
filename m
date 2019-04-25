@@ -2,295 +2,104 @@ Return-Path: <SRS0=UcDi=S3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F9CC10F03
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 12:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6392CC282E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 12:14:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 126F12084B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 12:03:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30E19218FD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 12:14:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Hjsl2JcF";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Hjsl2JcF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728719AbfDYMD0 convert rfc822-to-8bit (ORCPT
+        id S1729560AbfDYMNz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Apr 2019 08:03:26 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:54928 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726303AbfDYMD0 (ORCPT
+        Thu, 25 Apr 2019 08:13:55 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:55778 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726229AbfDYMNy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Apr 2019 08:03:26 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E0D05CEE14;
-        Thu, 25 Apr 2019 14:11:34 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH] v6 Add support for LE ping feature
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1556180337-21898-1-git-send-email-spoorthix.k@intel.com>
-Date:   Thu, 25 Apr 2019 14:03:23 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <531CC196-CA08-4F84-BF39-99762282D19C@holtmann.org>
-References: <1556180337-21898-1-git-send-email-spoorthix.k@intel.com>
-To:     SpoorthiX K <spoorthix.k@intel.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Thu, 25 Apr 2019 08:13:54 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id E1DE460790; Thu, 25 Apr 2019 12:13:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1556194433;
+        bh=xUiUZFGhDt5pQwMSFZX/Z8qWbJAU91u2+smb8LUX2aQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Hjsl2JcFsJGmwPMAdrBB0ddsVcWeieKFEYqQgl/v1zjqv6IGGp01Zrbe1VIE+5j6P
+         NOAEHUfUwM6xIYgCfvb+VKADx4FeJQADJeltQD4zFDfKLkz0YnBjT87FNHDP7GSpiG
+         MGW+N8j2MZj4LGgznG6hGUOTYuqUFEXvxFSbrkCQ=
+Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: c-hbandi@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 458FC6034D;
+        Thu, 25 Apr 2019 12:13:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1556194433;
+        bh=xUiUZFGhDt5pQwMSFZX/Z8qWbJAU91u2+smb8LUX2aQ=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Hjsl2JcFsJGmwPMAdrBB0ddsVcWeieKFEYqQgl/v1zjqv6IGGp01Zrbe1VIE+5j6P
+         NOAEHUfUwM6xIYgCfvb+VKADx4FeJQADJeltQD4zFDfKLkz0YnBjT87FNHDP7GSpiG
+         MGW+N8j2MZj4LGgznG6hGUOTYuqUFEXvxFSbrkCQ=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 458FC6034D
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        anubhavg@codeaurora.org, devicetree@vger.kernel.org,
+        mark.rutland@arm.com, robh+dt@kernel.org,
+        Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v7 0/2] Enable Bluetooth functionality for WCN3998.
+Date:   Thu, 25 Apr 2019 17:43:34 +0530
+Message-Id: <1556194416-30842-1-git-send-email-c-hbandi@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Spoorthi,
+This patch series we add support for WCN3998 BT chip set. This new chip set
+is based from the WCN3990 with minimal power numbers. So here in this patch
+The major difference between wcn3990 and WCN3998 is only power numbers.
+where as init process and fw download is same with wcn3990.
+So we add new compatible for WCN3998. 
+Removed the Reading of regulator values from dts.
+Added new compatible for WCN3998.
+Changes in V6:
+Initialized rom_ver to 0 to fix compiler warning 
+Changed Commit text for DT patch
+Changes in V6:
+changed return value to false in the qca_is_wcn399x()stub
+Changes in V5:
+changed is_qca_soc_type_wcn399x_family to
+qca_is_wcn399x helper function 
+Moved the qca_is_wcn399x function to btqca.c
+modified the DT document for wcn399x as per driver code
+Changes in V4:
+Added is_qca_soc_type_wcn399x_family helper function 
+to get the soc type is wcn399x or not.
+Changes in V3:
+updated to latest code base.
 
-> Changes made to add HCI Write Authenticated Payload timeout
-> command for LE Ping feature.
-> As per the Core Specification 5.0 Volume 2 Part E Section 7.3.94,
-> the following code changes implements
-> HCI Write Authenticated Payload timeout command for LE Ping feature.
-> 
-> Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
-> ---
-> include/net/bluetooth/hci.h      | 11 +++++++++
-> include/net/bluetooth/hci_core.h |  2 ++
-> net/bluetooth/hci_core.c         |  1 +
-> net/bluetooth/hci_debugfs.c      | 31 ++++++++++++++++++++++++
-> net/bluetooth/hci_event.c        | 51 ++++++++++++++++++++++++++++++++++++++++
-> 5 files changed, 96 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index c36dc1e..6340e9f 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -284,6 +284,7 @@ enum {
-> #define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
-> #define HCI_LE_CONN_TIMEOUT	msecs_to_jiffies(20000)	/* 20 seconds */
-> #define HCI_LE_AUTOCONN_TIMEOUT	msecs_to_jiffies(4000)	/* 4 seconds */
-> +#define HCI_AUTH_PAYLOAD_TIMEOUT msecs_to_jiffies(30000)/* 30 seconds */
-> 
-> /* HCI data types */
-> #define HCI_COMMAND_PKT		0x01
-> @@ -1130,6 +1131,16 @@ struct hci_cp_write_sc_support {
-> 	__u8	support;
-> } __packed;
-> 
-> +#define HCI_OP_WRITE_AUTH_PAYLOAD_TO    0x0c7c
-> +struct hci_cp_write_auth_payload_to {
-> +	__le16  handle;
-> +	__le16  timeout;
-> +} __packed;
-> +struct hci_rp_write_auth_payload_to {
-> +	__u8    status;
-> +	__le16  handle;
-> +} __packed;
-> +
-> #define HCI_OP_READ_LOCAL_OOB_EXT_DATA	0x0c7d
-> struct hci_rp_read_local_oob_ext_data {
-> 	__u8     status;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index e5ea633..72f3b31 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -421,6 +421,7 @@ struct hci_dev {
-> 	__u32			rpa_timeout;
-> 	struct delayed_work	rpa_expired;
-> 	bdaddr_t		rpa;
-> +	__u16			auth_payload_timeout;
+Harish Bandi (2):
+  Bluetooth: hci_qca: Added support for WCN3998
+  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
+    WCN3998
 
-Move it after conn_info_max_page.
+ .../devicetree/bindings/net/qualcomm-bluetooth.txt |  5 +--
+ drivers/bluetooth/btqca.c                          | 12 +++++--
+ drivers/bluetooth/btqca.h                          |  8 ++++-
+ drivers/bluetooth/hci_qca.c                        | 40 ++++++++++++++--------
+ 4 files changed, 45 insertions(+), 20 deletions(-)
 
-> 
-> #if IS_ENABLED(CONFIG_BT_LEDS)
-> 	struct led_trigger	*power_led;
-> @@ -499,6 +500,7 @@ struct hci_conn {
-> 	__u8		remote_id;
-> 
-> 	unsigned int	sent;
-> +	__u16		auth_payload_timeout;
-
-Move it after setting.
-
-> 
-> 	struct sk_buff_head data_q;
-> 	struct list_head chan_list;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 7352fe8..402bbf9 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3147,6 +3147,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 	hdev->le_max_tx_time = 0x0148;
-> 	hdev->le_max_rx_len = 0x001b;
-> 	hdev->le_max_rx_time = 0x0148;
-> +	hdev->auth_payload_timeout = 0x0bb8;
-> 	hdev->le_max_key_size = SMP_MAX_ENC_KEY_SIZE;
-> 	hdev->le_min_key_size = SMP_MIN_ENC_KEY_SIZE;
-> 	hdev->le_tx_def_phys = HCI_LE_SET_PHY_1M;
-
-Move this after hdev->conn_info_max_page. And as mentioned before, define DEFAULT_AUTH_PAYLOAD_TIMEOUT constant.
-
-> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-> index 51f5b1e..bb67f4a 100644
-> --- a/net/bluetooth/hci_debugfs.c
-> +++ b/net/bluetooth/hci_debugfs.c
-> @@ -941,6 +941,35 @@ static int adv_max_interval_get(void *data, u64 *val)
-> DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
-> 			adv_max_interval_set, "%llu\n");
-> 
-> +static int auth_payload_timeout_set(void *data, u64 val)
-> +{
-> +	struct hci_dev *hdev = data;
-> +
-> +	if (val < 0x0001 || val > 0xffff)
-> +		return -EINVAL;
-> +
-> +	hci_dev_lock(hdev);
-> +	hdev->auth_payload_timeout = val;
-> +	hci_dev_unlock(hdev);
-> +
-> +	return 0;
-> +}
-> +
-> +static int auth_payload_timeout_get(void *data, u64 *val)
-> +{
-> +	struct hci_dev *hdev = data;
-> +
-> +	hci_dev_lock(hdev);
-> +	*val = hdev->auth_payload_timeout;
-> +	hci_dev_unlock(hdev);
-> +
-> +	return 0;
-> +}
-> +
-> +DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
-> +			auth_payload_timeout_get,
-> +			auth_payload_timeout_set, "%llu\n");
-> +
-> DEFINE_QUIRK_ATTRIBUTE(quirk_strict_duplicate_filter,
-> 		       HCI_QUIRK_STRICT_DUPLICATE_FILTER);
-> DEFINE_QUIRK_ATTRIBUTE(quirk_simultaneous_discovery,
-> @@ -994,6 +1023,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
-> 			    &adv_max_interval_fops);
-> 	debugfs_create_u16("discov_interleaved_timeout", 0644, hdev->debugfs,
-> 			   &hdev->discov_interleaved_timeout);
-> +	debugfs_create_file("auth_payload_timeout", 0644, hdev->debugfs, hdev,
-> +			    &auth_payload_timeout_fops);
-> 
-> 	debugfs_create_file("quirk_strict_duplicate_filter", 0644,
-> 			    hdev->debugfs, hdev,
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index ac2826c..065528e 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -579,6 +579,33 @@ static void hci_cc_read_local_commands(struct hci_dev *hdev,
-> 		memcpy(hdev->commands, rp->commands, sizeof(hdev->commands));
-> }
-> 
-> +static void hci_cc_write_auth_payload_timeout(struct hci_dev *hdev,
-> +					      struct sk_buff *skb)
-> +{
-> +	struct hci_rp_write_auth_payload_to *rp = (void *)skb->data;
-> +	struct hci_conn *conn;
-> +
-> +	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-> +
-> +	if (rp->status)
-> +		return;
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-> +
-> +	if (!conn)
-> +		goto unlock;
-> +
-> +	if (conn->state == BT_CONNECTED) {
-> +		hci_conn_hold(conn);
-> +		conn->auth_payload_timeout = HCI_AUTH_PAYLOAD_TIMEOUT;
-> +		hci_conn_drop(conn);
-> +	}
-
-So I have no idea what this is doing. It is clearly not tested code. Unless you are BT_CONNECTED, you will never be encrypted and never reach this state. And then you are setting the value to HCI_AUTH_PAYLOAD_TIMEOUT. How is that even remotely correct. You suppose to set the value that was actually chosen by the write command which can obviously differ based on what you set via debugfs.
-
-> +unlock:
-> +	hci_dev_unlock(hdev);
-
-	if (rp->status)
-		return;
-
-	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO);
-	if (!sent)
-		return;
-
-	hci_dev_lock(hdev);
-
-	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-	if (!conn)
-		conn->auth_payload_timeout = get_unaligned_le16(sent + 2);
-		
-	hci_dev_unlock(hdev);
-
-> +}
-> +
-> static void hci_cc_read_local_features(struct hci_dev *hdev,
-> 				       struct sk_buff *skb)
-> {
-> @@ -2975,6 +3002,26 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 		goto unlock;
-> 	}
-> 
-> +	/* Set the default Authenticated Payload Timeout after
-> +	 * an LE Link is established. As per Core Spec v5.0, Vol 2, Part B
-> +	 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
-> +	 * sent when the link is active and Encryption is enabled, the conn
-> +	 * type can be either LE or ACL and controller must support LMP Ping.
-> +	 * Ensure for AES-CCM encryption as well.
-> +	 */
-> +
-> +	if ((conn->type == LE_LINK || conn->type == ACL_LINK) &&
-> +	    (hdev->le_features[0] & HCI_LE_PING) &&
-> +	     lmp_ping_capable(hdev) &&
-> +		test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
-> +		test_bit(HCI_CONN_AES_CCM, &conn->flags)) {
-
-I have said multiple times now that the indentation is wrong here. Please read CodingStyle and the network subsystem specific rules when it comes to indentation.
-
-This statement is also wrong !!!
-
-> +		struct hci_cp_write_auth_payload_to cp;
-> +
-> +		cp.handle = cpu_to_le16(conn->handle);
-> +		cp.timeout = cpu_to_le16(hdev->auth_payload_timeout);
-> +		hci_send_cmd(conn->hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO,
-> +			     sizeof(cp), &cp);
-> +	}
-
-	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
-	    test_bit(HCI_CONN_AES_CCM, &conn->flags) &&
-	    ((conn->type == ACL_LINK && lmp_ping_capable(hdev)) ||
-	     (conn->type == LE_LINK && (hdev->le_features[0] & HCI_LE_PING))) {
-		..
-	}
-		
-
-> notify:
-> 	if (conn->state == BT_CONFIG) {
-> 		if (!ev->status)
-> @@ -3178,6 +3225,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 		hci_cc_read_local_commands(hdev, skb);
-> 		break;
-> 
-
-I would also handle the READ_AUTH_PAYLOAD_TO since it clearly will update the value of the connection correctly.
-
-> +	case HCI_OP_WRITE_AUTH_PAYLOAD_TO:
-> +		hci_cc_write_auth_payload_timeout(hdev, skb);
-> +		break;
-> +
-> 	case HCI_OP_READ_LOCAL_FEATURES:
-> 		hci_cc_read_local_features(hdev, skb);
-> 		break;
-
-Regards
-
-Marcel
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
