@@ -2,221 +2,331 @@ Return-Path: <SRS0=UcDi=S3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64390C282E3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 06:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C003C10F03
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 08:00:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2587D217D7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 06:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE350217D7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 08:00:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzNmHUMw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="us9vRrlY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729806AbfDYGiW (ORCPT
+        id S1728674AbfDYIAW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Apr 2019 02:38:22 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:47068 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729765AbfDYGiV (ORCPT
+        Thu, 25 Apr 2019 04:00:22 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:41104 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726380AbfDYIAW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Apr 2019 02:38:21 -0400
-Received: by mail-pg1-f193.google.com with SMTP id n2so1526126pgg.13;
-        Wed, 24 Apr 2019 23:38:21 -0700 (PDT)
+        Thu, 25 Apr 2019 04:00:22 -0400
+Received: by mail-ot1-f66.google.com with SMTP id g8so4657868otk.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Apr 2019 01:00:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=UE33d0Ymq1NTCt2baLLnIAWXqXK1Ph+80pSpkWrWxZM=;
-        b=DzNmHUMwzqcYW2IiR0nM6Lw0ZOGN1bk0gsLETose7za7zYFG+y3sDTYTkRyLFJE1y0
-         q3XrqwC/H6dtJ0+M67INvgdXE53NhoJ41h4Zf4cQ9NbUXnef2xf1bEZlJgB+3k9w2+ZH
-         Sj7JDT0cveNNMaGm5nN6zWWY4WC9RrYM3V/fTBEg+bYS2QS7f+QQ/XJzE6G8+te9PQHn
-         NjUUTK1vf0FWNlY8RdsTSUvHmKWWcK1Y7Lfch2cNVzpV3AjR661qTnLugT6jIxMpl3Em
-         AwJLP0PB+RUfvkKAbBwYs0Ywx9U8w8W0zq4KWYndPuNMuJEgDn8uO7F802rhepBgBvQt
-         /M4w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=mF3xaO74VhX4XyzAXuNHB000X4Ka8Teh3SvThqR7zk4=;
+        b=us9vRrlYJw4167SRLx09xMVWOLiRt0wFL9fPEZGzjLZYql7lIWl8bfa+KxMWzRjxYW
+         2Cd2VQ9zmT2ZByD5o09+Do7lCd2zhJC9DO2SM02XHaWc8p5lWaPu1CSeld7xTzRULiNO
+         roFp7ZsuxfwbmTGw7qiWFtTA1AL/trFRjm2j9FPdE49mRL8SpC8xB8HsvsX3GlBKqHfl
+         V42r4tEvzLuJZwgPOWgew7PMaYzPZXKJn49UtCbjm52jKz60Z1tkJJsR0uP+mJojSV9x
+         5mCLMW3SMDurK5/YwZY/ihkehCAwOgJtYbRQ3XK8YRMXePzQ6x+NP19IM8ikEC3yWIaI
+         Bebg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=UE33d0Ymq1NTCt2baLLnIAWXqXK1Ph+80pSpkWrWxZM=;
-        b=aykmJCu7fN2tPStpilDNyuO6s+zRVY92HQgh3R5KTd0bBM/aa7zIzg3bz52NARqCQA
-         UxMwwpk8k34ZGJlu+ZPPRQFqve47dlf1bYolbouTI9y3zpxUpip3md+9CEkRFyLJoPz4
-         FgUqoj6TN1VhyZtNyB9DwuAF2uexojzI3HKgDxVyTJP9KTIwaD8mQZZtSEc+bsE+iejB
-         msoATEtuOPq7PXZg1Cdqmm2vvxlT6zL7rdro/qp0ihixKIn6sJtSqXWXcDw35Vxu+Ant
-         r8jFOgUOCXUTyVRsY2sNq3NZK/JETU+9pEWSCl0PoCqW1Pq4ufGyQQ+n2QsQGanVrNx8
-         Hp/w==
-X-Gm-Message-State: APjAAAWw3JIQ3Ei69lEFLyb1nTzaLsZg7m0wFUX/zj3yto+IgwDkrXsj
-        SKH8KCMivpM/T5IlAhfMI4BffM8WaUKBMA==
-X-Google-Smtp-Source: APXvYqyMZFFHUrb346oRdrwdfOKIStVM1XzcIzf8X4OohMBt+qmDFEs6U7+uJOQm9f8SEElg3XdqTA==
-X-Received: by 2002:a62:ed05:: with SMTP id u5mr37500310pfh.63.1556174300219;
-        Wed, 24 Apr 2019 23:38:20 -0700 (PDT)
-Received: from kiddo.endlessm-sf.com (123-204-46-122.static.seed.net.tw. [123.204.46.122])
-        by smtp.gmail.com with ESMTPSA id d69sm40705886pfg.24.2019.04.24.23.38.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Apr 2019 23:38:19 -0700 (PDT)
-From:   "=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=" <jprvita@gmail.com>
-X-Google-Original-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     bgodavar@codeaurora.org, ytkim@qca.qualcomm.com,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@endlessm.com,
-        =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
-Subject: [PATCH] Bluetooth: Ignore CC events not matching the last HCI command
-Date:   Thu, 25 Apr 2019 14:38:12 +0800
-Message-Id: <20190425063812.14509-1-jprvita@endlessm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <CA+A7VXVa9pFizfQ8C8QUS=3=YDjojmScOKPS=Yhcx-w8G=wsVw@mail.gmail.com>
-References: <CA+A7VXVa9pFizfQ8C8QUS=3=YDjojmScOKPS=Yhcx-w8G=wsVw@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=mF3xaO74VhX4XyzAXuNHB000X4Ka8Teh3SvThqR7zk4=;
+        b=lYlhHYBKIYbvbGkw9T2i/mMdLYwg92yXHd29MybDn98TKfSm7nONgM715v1e514FNc
+         9c8/6Ze55dA1bEowgBHyvYtdZX7IF51PBIBCEMbwwH7MbGGC15e5szdKNvV8Fd0KQYM/
+         APxlSbGpGMthPyUgEkiIaX6GYqvSJpEZRLB1M6MTb2x0FmPfTj1JV2vTi3Uskhlcr7r8
+         xZOMCDAYJf6+zMNgRz7GLKKqBysGgTo6Oq24uQGvxzEn7OjLh83wcJhj7F3VRRP6Yu6/
+         igTYH88erF42LdeHmmee9VDn3+ekS7ONMXBz52jhuM6tSKkmWX0r1va7++GusulQA1Cg
+         kyIw==
+X-Gm-Message-State: APjAAAWuiROE27WDYgjL+hNKqoifR37bjyo/8uJJr9ltJDhqceEllzPW
+        cHjuSeux7dDlp8+3YaqDlHFsoGqnJjBdc+OPLQDxVoff
+X-Google-Smtp-Source: APXvYqxQZJYu0xiY1x8lFM/txgF+jteuIABVPMOhTkQ5bQERLc5sujy7jFLky9qHLs12GoERp1TmvJyE6Cwv3WgKMis=
+X-Received: by 2002:a9d:53cc:: with SMTP id i12mr1749909oth.242.1556179221020;
+ Thu, 25 Apr 2019 01:00:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190424083921.15679-1-luiz.dentz@gmail.com> <CABBYNZLcpo_Dx3X9pmKGeqSNFDLKZAqd==6wL5qcthGiqg-EeA@mail.gmail.com>
+ <20190424165721.fs7ylixjscqjmqmb@pali>
+In-Reply-To: <20190424165721.fs7ylixjscqjmqmb@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 25 Apr 2019 11:00:07 +0300
+Message-ID: <CABBYNZL=8sigG=Sg-0ZdJSCd6KvW1OEAzS0uxTDcFD_fiRUmLw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] a2dp: Store last used endpoint
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This commit makes the kernel not send the next queued HCI command until
-a command complete arrives for the last HCI command sent to the
-controller. This change avoids a problem with some buggy controllers
-(seen on two SKUs of QCA9377) that send an extra command complete event
-for the previous command after the kernel had already sent a new HCI
-command to the controller.
+Hi Pali,
 
-The problem was reproduced when starting an active scanning procedure,
-where an extra command complete event arrives for the LE_SET_RANDOM_ADDR
-command. When this happends the kernel ends up not processing the
-command complete for the following commmand, LE_SET_SCAN_PARAM, and
-ultimately behaving as if a passive scanning procedure was being
-performed, when in fact controller is performing an active scanning
-procedure. This makes it impossible to discover BLE devices as no device
-found events are sent to userspace.
+On Wed, Apr 24, 2019 at 7:57 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrot=
+e:
+>
+> On Wednesday 24 April 2019 12:42:22 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> >
+> > On Wed, Apr 24, 2019 at 11:39 AM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > >
+> > > This stores the last used endpoint whenever it is considered open and
+> > > then prefer to use it when attempting to reconnect.
+> > > ---
+> > >  profiles/audio/a2dp.c | 104 ++++++++++++++++++++++++++++++++++++----=
+--
+> > >  1 file changed, 91 insertions(+), 13 deletions(-)
+> > >
+> > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > > index 8f141739c..78b02dc84 100644
+> > > --- a/profiles/audio/a2dp.c
+> > > +++ b/profiles/audio/a2dp.c
+> > > @@ -147,6 +147,7 @@ struct a2dp_channel {
+> > >         unsigned int auth_id;
+> > >         struct avdtp *session;
+> > >         struct queue *seps;
+> > > +       struct a2dp_remote_sep *last_used;
+> > >  };
+> > >
+> > >  static GSList *servers =3D NULL;
+> > > @@ -860,6 +861,60 @@ static gboolean open_ind(struct avdtp *session, =
+struct avdtp_local_sep *sep,
+> > >         return TRUE;
+> > >  }
+> > >
+> > > +static bool match_remote_sep(const void *data, const void *user_data=
+)
+> > > +{
+> > > +       const struct a2dp_remote_sep *sep =3D data;
+> > > +       const struct avdtp_remote_sep *rsep =3D user_data;
+> > > +
+> > > +       return sep->sep =3D=3D rsep;
+> > > +}
+> > > +
+> > > +static void store_last_used(struct a2dp_channel *chan,
+> > > +                                       struct avdtp_remote_sep *rsep=
+)
+> > > +{
+> > > +       GKeyFile *key_file;
+> > > +       char filename[PATH_MAX];
+> > > +       char dst_addr[18];
+> > > +       char value[4];
+> > > +       char *data;
+> > > +       size_t len =3D 0;
+> > > +
+> > > +       ba2str(device_get_address(chan->device), dst_addr);
+> > > +
+> > > +       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
+> > > +               btd_adapter_get_storage_dir(device_get_adapter(chan->=
+device)),
+> > > +               dst_addr);
+> > > +       key_file =3D g_key_file_new();
+> > > +       g_key_file_load_from_file(key_file, filename, 0, NULL);
+> > > +
+> > > +       sprintf(value, "%02hhx", avdtp_get_seid(rsep));
+> > > +
+> > > +       g_key_file_set_string(key_file, "Endpoints", "LastUsed", valu=
+e);
+> > > +
+> > > +       data =3D g_key_file_to_data(key_file, &len, NULL);
+> > > +       g_file_set_contents(filename, data, len, NULL);
+> > > +
+> > > +       g_free(data);
+> > > +       g_key_file_free(key_file);
+> > > +}
+> > > +
+> > > +static void update_last_used(struct a2dp_channel *chan,
+> > > +                                               struct avdtp_stream *=
+stream)
+> > > +{
+> > > +       struct avdtp_remote_sep *rsep;
+> > > +       struct a2dp_remote_sep *sep;
+> > > +
+> > > +       rsep =3D avdtp_stream_get_remote_sep(stream);
+> > > +
+> > > +       /* Update last used */
+> > > +       sep =3D queue_find(chan->seps, match_remote_sep, rsep);
+> > > +       if (chan->last_used =3D=3D sep)
+> > > +               return;
+> > > +
+> > > +       chan->last_used =3D sep;
+> > > +       store_last_used(chan, rsep);
+> > > +}
+> > > +
+> > >  static void open_cfm(struct avdtp *session, struct avdtp_local_sep *=
+sep,
+> > >                         struct avdtp_stream *stream, struct avdtp_err=
+or *err,
+> > >                         void *user_data)
+> > > @@ -884,7 +939,8 @@ static void open_cfm(struct avdtp *session, struc=
+t avdtp_local_sep *sep,
+> > >                 setup->err =3D err;
+> > >                 if (setup->start)
+> > >                         finalize_resume(setup);
+> > > -       }
+> > > +       } else if (setup->chan)
+> > > +               update_last_used(setup->chan, stream);
+> > >
+> > >         finalize_config(setup);
+> > >
+> > > @@ -1077,14 +1133,6 @@ static gboolean close_ind(struct avdtp *sessio=
+n, struct avdtp_local_sep *sep,
+> > >         return TRUE;
+> > >  }
+> > >
+> > > -static bool match_remote_sep(const void *data, const void *user_data=
+)
+> > > -{
+> > > -       const struct a2dp_remote_sep *sep =3D data;
+> > > -       const struct avdtp_remote_sep *rsep =3D user_data;
+> > > -
+> > > -       return sep->sep =3D=3D rsep;
+> > > -}
+> > > -
+> > >  static struct a2dp_remote_sep *find_remote_sep(struct a2dp_channel *=
+chan,
+> > >                                                 struct a2dp_sep *sep)
+> > >  {
+> > > @@ -1791,19 +1839,28 @@ done:
+> > >         queue_push_tail(chan->seps, sep);
+> > >  }
+> > >
+> > > +static bool match_seid(const void *data, const void *user_data)
+> > > +{
+> > > +       const struct a2dp_remote_sep *sep =3D data;
+> > > +       const uint8_t *seid =3D user_data;
+> > > +
+> > > +       return avdtp_get_seid(sep->sep) =3D=3D *seid;
+> > > +}
+> > > +
+> > >  static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key=
+_file,
+> > >                                                                 char =
+**seids)
+> > >  {
+> > >         struct avdtp_remote_sep *sep;
+> > > +       uint8_t seid;
+> > > +       char *value;
+> > >
+> > >         if (!seids)
+> > >                 return;
+> > >
+> > >         for (; *seids; seids++) {
+> > > -               uint8_t seid;
+> > >                 uint8_t type;
+> > >                 uint8_t codec;
+> > > -               char *value, caps[256];
+> > > +               char caps[256];
+> > >                 uint8_t data[128];
+> > >                 int i, size;
+> > >                 GSList *l =3D NULL;
+> > > @@ -1847,6 +1904,15 @@ static void load_remote_sep(struct a2dp_channe=
+l *chan, GKeyFile *key_file,
+> > >
+> > >                 register_remote_sep(sep, chan);
+> > >         }
+> > > +
+> > > +       value =3D g_key_file_get_string(key_file, "Endpoints", "LastU=
+sed", NULL);
+> > > +       if (!value)
+> > > +               return;
+> > > +
+> > > +       if (sscanf(value, "%02hhx", &seid) !=3D 1)
+> > > +               return;
+> > > +
+> > > +       chan->last_used =3D queue_find(chan->seps, match_seid, &seid)=
+;
+> > >  }
+> > >
+> > >  static void load_remote_seps(struct a2dp_channel *chan)
+> > > @@ -2355,8 +2421,12 @@ done:
+> > >  static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList =
+*list,
+> > >                                         const char *sender)
+> > >  {
+> > > +       struct a2dp_sep *first =3D NULL;
+> > > +       struct a2dp_channel *chan =3D find_channel(session);
+> > > +
+> > >         for (; list; list =3D list->next) {
+> > >                 struct a2dp_sep *sep =3D list->data;
+> > > +               struct avdtp_remote_sep *rsep;
+> > >
+> > >                 /* Use sender's endpoint if available */
+> > >                 if (sender) {
+> > > @@ -2370,14 +2440,22 @@ static struct a2dp_sep *a2dp_find_sep(struct =
+avdtp *session, GSList *list,
+> > >                                 continue;
+> > >                 }
+> > >
+> > > -               if (avdtp_find_remote_sep(session, sep->lsep) =3D=3D =
+NULL)
+> > > +               rsep =3D avdtp_find_remote_sep(session, sep->lsep);
+> > > +               if (!rsep)
+> > >                         continue;
+> > >
+> > > +               /* Locate last used if set */
+> > > +               if (chan->last_used) {
+> > > +                       if (chan->last_used->sep =3D=3D rsep)
+> > > +                               return sep;
+> > > +                       first =3D sep;
+> > > +               }
+> > > +
+> > >                 return sep;
+> > >
+> > >         }
+> > >
+> > > -       return NULL;
+> > > +       return first;
+> > >  }
+> > >
+> > >  static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8=
+_t type,
+> > > --
+> > > 2.20.1
+> >
+> > Can you give this a try, it should make the daemon remember what was
+> > the last endpoint used (locally the remote selection we cannot really
+> > control).
+>
+> Great, I will try it. Remote selection is done by remote device so this
+> really cannot be controlled.
+>
+> I have there another suggestion for improvement. bluez support
+> registering more endpoints for one codec. I'm going to use it for
+> registering one SBC endpoint with fixed bitpool as UHQ profile and
+> another with lower bitpool values. To distinguish in pulseaudio between
+> low and high quality of SBC. Seems that bluez sometimes try to only
+> select only one endpoint, even there are more and do not try another if
+> first one selection fails (e.g. because remote capability of bitpool is
+> too low and our local selection needs higher). Could be bluez modified
+> to try another local endpoint if there are more registered until some
+> accept capabilities?
 
-This problem is reproducible on 100% of the attempts on the affected
-controllers. The extra command complete event can be seen at timestamp
-27.420131 on the btmon logs bellow.
+Well that was actually one of the reason Ive recommended not
+registering more than one endpoint for the same codec, we should
+perhaps fix that since those endpoints can belong to different
+processes but if we do insist to have PA with multiple SBC endpoints
+that means it would not be backward compatible since it may try to
+configure with UHQ as it should be higher priority, besides having a
+higher fixed range means we can no longer reduce the quality at
+runtime, but perhaps there is a way to make it work if PA detects it
+has multiple endpoints that could be used it could just switch to
+normal quality if UHQ cannot be used, this is actually beneficial in
+terms of latency as well since we don't have extra D-Bus round trips
+asking different endpoints.
 
-Bluetooth monitor ver 5.50
-= Note: Linux version 5.0.0+ (x86_64)                                  0.352340
-= Note: Bluetooth subsystem version 2.22                               0.352343
-= New Index: 80:C5:F2:8F:87:84 (Primary,USB,hci0)               [hci0] 0.352344
-= Open Index: 80:C5:F2:8F:87:84                                 [hci0] 0.352345
-= Index Info: 80:C5:F2:8F:87:84 (Qualcomm)                      [hci0] 0.352346
-@ MGMT Open: bluetoothd (privileged) version 1.14             {0x0001} 0.352347
-@ MGMT Open: btmon (privileged) version 1.14                  {0x0002} 0.352366
-@ MGMT Open: btmgmt (privileged) version 1.14                {0x0003} 27.302164
-@ MGMT Command: Start Discovery (0x0023) plen 1       {0x0003} [hci0] 27.302310
-        Address type: 0x06
-          LE Public
-          LE Random
-< HCI Command: LE Set Random Address (0x08|0x0005) plen 6   #1 [hci0] 27.302496
-        Address: 15:60:F2:91:B2:24 (Non-Resolvable)
-> HCI Event: Command Complete (0x0e) plen 4                 #2 [hci0] 27.419117
-      LE Set Random Address (0x08|0x0005) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7  #3 [hci0] 27.419244
-        Type: Active (0x01)
-        Interval: 11.250 msec (0x0012)
-        Window: 11.250 msec (0x0012)
-        Own address type: Random (0x01)
-        Filter policy: Accept all advertisement (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                 #4 [hci0] 27.420131
-      LE Set Random Address (0x08|0x0005) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2      #5 [hci0] 27.420259
-        Scanning: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                 #6 [hci0] 27.420969
-      LE Set Scan Parameters (0x08|0x000b) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                 #7 [hci0] 27.421983
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-@ MGMT Event: Command Complete (0x0001) plen 4        {0x0003} [hci0] 27.422059
-      Start Discovery (0x0023) plen 1
-        Status: Success (0x00)
-        Address type: 0x06
-          LE Public
-          LE Random
-@ MGMT Event: Discovering (0x0013) plen 2             {0x0003} [hci0] 27.422067
-        Address type: 0x06
-          LE Public
-          LE Random
-        Discovery: Enabled (0x01)
-@ MGMT Event: Discovering (0x0013) plen 2             {0x0002} [hci0] 27.422067
-        Address type: 0x06
-          LE Public
-          LE Random
-        Discovery: Enabled (0x01)
-@ MGMT Event: Discovering (0x0013) plen 2             {0x0001} [hci0] 27.422067
-        Address type: 0x06
-          LE Public
-          LE Random
-        Discovery: Enabled (0x01)
 
-Signed-off-by: João Paulo Rechi Vita <jprvita@endlessm.com>
----
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_core.c         | 5 +++++
- net/bluetooth/hci_event.c        | 3 +++
- 3 files changed, 9 insertions(+)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 094e61e07030..85bed4e916d3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -364,6 +364,7 @@ struct hci_dev {
- 	struct sk_buff_head	cmd_q;
- 
- 	struct sk_buff		*sent_cmd;
-+	__u8			sent_cmd_pending_cc;
- 
- 	struct mutex		req_lock;
- 	wait_queue_head_t	req_wait_q;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d6b2540ba7f8..37893b0c6077 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4380,9 +4380,13 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
- 		if (test_bit(HCI_INIT, &hdev->flags) && opcode == HCI_OP_RESET)
- 			hci_resend_last(hdev);
- 
-+		bt_dev_err(hdev,
-+			   "unexpected CC event for opcode 0x%4.4x", opcode);
- 		return;
- 	}
- 
-+	hdev->sent_cmd_pending_cc = 0;
-+
- 	/* If the command succeeded and there's still more commands in
- 	 * this request the request is not yet complete.
- 	 */
-@@ -4493,6 +4497,7 @@ static void hci_cmd_work(struct work_struct *work)
- 
- 		hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
- 		if (hdev->sent_cmd) {
-+			hdev->sent_cmd_pending_cc = 1;
- 			atomic_dec(&hdev->cmd_cnt);
- 			hci_send_frame(hdev, skb);
- 			if (test_bit(HCI_RESET, &hdev->flags))
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 609fd6871c5a..7541a4bc9444 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3404,6 +3404,9 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 	hci_req_cmd_complete(hdev, *opcode, *status, req_complete,
- 			     req_complete_skb);
- 
-+	if (hdev->sent_cmd_pending_cc)
-+		return;
-+
- 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
- 		queue_work(hdev->workqueue, &hdev->cmd_work);
- }
--- 
-2.20.1
-
+--=20
+Luiz Augusto von Dentz
