@@ -2,204 +2,128 @@ Return-Path: <SRS0=UcDi=S3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A60FC10F03
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 11:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D15C282E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 11:09:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C4BF214AE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 11:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 824EA214AE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Apr 2019 11:09:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729210AbfDYLIA convert rfc822-to-8bit (ORCPT
+        id S1730701AbfDYLJB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Apr 2019 07:08:00 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:32998 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726124AbfDYLIA (ORCPT
+        Thu, 25 Apr 2019 07:09:01 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:40456 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725935AbfDYLJB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Apr 2019 07:08:00 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 47D02CF35C;
-        Thu, 25 Apr 2019 13:16:09 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH] Bluetooth: Ignore CC events not matching the last HCI
- command
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190425063812.14509-1-jprvita@endlessm.com>
-Date:   Thu, 25 Apr 2019 13:07:57 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, bgodavar@codeaurora.org,
-        ytkim@qca.qualcomm.com, "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@endlessm.com,
-        =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
+        Thu, 25 Apr 2019 07:09:01 -0400
+Received: by mail-qk1-f196.google.com with SMTP id w20so12724794qka.7;
+        Thu, 25 Apr 2019 04:09:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=+9b+va5qRp1P2e6+CDCSoTfNbUEAY+YmGN5WIBQ1fRQ=;
+        b=GqoZicgzAvMNMoHR7/kPrAGBvEm3IrB8xISeAeEflqcVDOItuAClT6lcnA8bo7vGTl
+         nEtmdTNQ2ZS+Qwlq9xaHMKgM/+R0CSm8AZVwxbtmcCyGgQXqJ1WW+lV3PGM87r3YyJtJ
+         bwMpytS1NVNVR6YdACGtrtweNF4FiLBAKEvHfl4SzIAG/6XnwVGC3YnsWdYhIjGn3bm1
+         iW7eZjQGs6JCNZNxvLdplv8zcEBolAKQGGU/D15dNvUIOyfE4XpDnl4dI6gGsr4X5lmX
+         WFBOtcH+1iLg5p4oA+tbaFJ/Lg+NZmbExcZQB5fL64tLHp4v0gC6ziHylTdzY8W/oPXF
+         uUYA==
+X-Gm-Message-State: APjAAAV+EjaRMtgmcJMY/qPoNp7L0sMHQInm0yeBF7CFLhuoNtkgIjl7
+        OZRKPwmur+/XGbmIr9arK1k2x2gZOT4k1MUnOBk=
+X-Google-Smtp-Source: APXvYqw0CZPiWFZ8gKf2hZAEH/N9HtP/XH7SGT2VExRdj+QhBmct/tWWYd2du+xIsH9Oupi7jM9tAN4Jt+JqIcpG9Ok=
+X-Received: by 2002:a37:49ce:: with SMTP id w197mr20415796qka.330.1556190540273;
+ Thu, 25 Apr 2019 04:09:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190423151143.464992-1-arnd@arndb.de> <20190423.193735.412590692063607790.davem@davemloft.net>
+ <CAK8P3a1ViEZmK-+rpYgpFkJHs+7XoNCTuK1iHcgSrZXaOJedLQ@mail.gmail.com>
+ <FBF10E1F-2D3D-4FFC-8F8C-5969A2F2A475@holtmann.org> <CAK8P3a2FLrGXh9iv4eWBX8D_zb7rq5YDErkzDjjHbA5JENHVGw@mail.gmail.com>
+ <D5B4825C-88DE-4011-8C2C-141214486861@holtmann.org>
+In-Reply-To: <D5B4825C-88DE-4011-8C2C-141214486861@holtmann.org>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 25 Apr 2019 13:08:41 +0200
+Message-ID: <CAK8P3a2bZpnv+NGQxiA3t_LB8e+so4Nkab5kuTcGjgn8i+f=BA@mail.gmail.com>
+Subject: Re: [PATCH 0/5] isdn: deprecate non-mISDN drivers
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Networking <netdev@vger.kernel.org>,
+        isdn4linux@listserv.isdn4linux.de, Paul Bolle <pebolle@tiscali.nl>,
+        Holger Schurig <holgerschurig@googlemail.com>,
+        Tilman Schmidt <tilman@imap.cc>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        gigaset307x-common@lists.sourceforge.net,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C4118FC8-1589-44D5-97C4-E18892448985@holtmann.org>
-References: <CA+A7VXVa9pFizfQ8C8QUS=3=YDjojmScOKPS=Yhcx-w8G=wsVw@mail.gmail.com>
- <20190425063812.14509-1-jprvita@endlessm.com>
-To:     =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joao,
+On Wed, Apr 24, 2019 at 4:30 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Arnd,
+>
+> >>>>> When isdn4linux came up in the context of another patch series, I
+> >>>>> remembered that we had discussed removing it a while ago.
+> >>
+> >> NAK.
+> >>
+> >> I do not care about isdn4linux, but this is a purely CAPI based driver. So removing (or moving to staging)
+> >> CAPI support seems rather premature.
+> >>
+> >> Maybe someone would have started talking to us before trying to move this into staging. It is a
+> >> maintained driver. That it is rather simple and hasn’t seen patches in a long time, doesn’t mean
+> >> it is not maintained and staging material. I see no reason to tell any user to enable staging tree
+> >> to get CMTP support.
+> >
+> > I can definitely leave out the last patch from the series if we know
+> > that there are
+> > still users on CMTP. I searched around for a bit but could not find
+> > any indication
+> > what this is still used for, if anything.
+>
+> I would prefer if we leave CAPI support and with that CMTP mainstream and not move
+> that to staging. For isdn4linux, I have no objections to move that to staging since
+> mISDN was suppose to replace it anyway.
 
-> This commit makes the kernel not send the next queued HCI command until
-> a command complete arrives for the last HCI command sent to the
-> controller. This change avoids a problem with some buggy controllers
-> (seen on two SKUs of QCA9377) that send an extra command complete event
-> for the previous command after the kernel had already sent a new HCI
-> command to the controller.
-> 
-> The problem was reproduced when starting an active scanning procedure,
-> where an extra command complete event arrives for the LE_SET_RANDOM_ADDR
-> command. When this happends the kernel ends up not processing the
-> command complete for the following commmand, LE_SET_SCAN_PARAM, and
-> ultimately behaving as if a passive scanning procedure was being
-> performed, when in fact controller is performing an active scanning
-> procedure. This makes it impossible to discover BLE devices as no device
-> found events are sent to userspace.
-> 
-> This problem is reproducible on 100% of the attempts on the affected
-> controllers. The extra command complete event can be seen at timestamp
-> 27.420131 on the btmon logs bellow.
-> 
-> Bluetooth monitor ver 5.50
-> = Note: Linux version 5.0.0+ (x86_64)                                  0.352340
-> = Note: Bluetooth subsystem version 2.22                               0.352343
-> = New Index: 80:C5:F2:8F:87:84 (Primary,USB,hci0)               [hci0] 0.352344
-> = Open Index: 80:C5:F2:8F:87:84                                 [hci0] 0.352345
-> = Index Info: 80:C5:F2:8F:87:84 (Qualcomm)                      [hci0] 0.352346
-> @ MGMT Open: bluetoothd (privileged) version 1.14             {0x0001} 0.352347
-> @ MGMT Open: btmon (privileged) version 1.14                  {0x0002} 0.352366
-> @ MGMT Open: btmgmt (privileged) version 1.14                {0x0003} 27.302164
-> @ MGMT Command: Start Discovery (0x0023) plen 1       {0x0003} [hci0] 27.302310
->        Address type: 0x06
->          LE Public
->          LE Random
-> < HCI Command: LE Set Random Address (0x08|0x0005) plen 6   #1 [hci0] 27.302496
->        Address: 15:60:F2:91:B2:24 (Non-Resolvable)
->> HCI Event: Command Complete (0x0e) plen 4                 #2 [hci0] 27.419117
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7  #3 [hci0] 27.419244
->        Type: Active (0x01)
->        Interval: 11.250 msec (0x0012)
->        Window: 11.250 msec (0x0012)
->        Own address type: Random (0x01)
->        Filter policy: Accept all advertisement (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                 #4 [hci0] 27.420131
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2      #5 [hci0] 27.420259
->        Scanning: Enabled (0x01)
->        Filter duplicates: Enabled (0x01)
->> HCI Event: Command Complete (0x0e) plen 4                 #6 [hci0] 27.420969
->      LE Set Scan Parameters (0x08|0x000b) ncmd 1
->        Status: Success (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                 #7 [hci0] 27.421983
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> @ MGMT Event: Command Complete (0x0001) plen 4        {0x0003} [hci0] 27.422059
->      Start Discovery (0x0023) plen 1
->        Status: Success (0x00)
->        Address type: 0x06
->          LE Public
->          LE Random
-> @ MGMT Event: Discovering (0x0013) plen 2             {0x0003} [hci0] 27.422067
->        Address type: 0x06
->          LE Public
->          LE Random
->        Discovery: Enabled (0x01)
-> @ MGMT Event: Discovering (0x0013) plen 2             {0x0002} [hci0] 27.422067
->        Address type: 0x06
->          LE Public
->          LE Random
->        Discovery: Enabled (0x01)
-> @ MGMT Event: Discovering (0x0013) plen 2             {0x0001} [hci0] 27.422067
->        Address type: 0x06
->          LE Public
->          LE Random
->        Discovery: Enabled (0x01)
-> 
-> Signed-off-by: João Paulo Rechi Vita <jprvita@endlessm.com>
-> ---
-> include/net/bluetooth/hci_core.h | 1 +
-> net/bluetooth/hci_core.c         | 5 +++++
-> net/bluetooth/hci_event.c        | 3 +++
-> 3 files changed, 9 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 094e61e07030..85bed4e916d3 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -364,6 +364,7 @@ struct hci_dev {
-> 	struct sk_buff_head	cmd_q;
-> 
-> 	struct sk_buff		*sent_cmd;
-> +	__u8			sent_cmd_pending_cc;
+Sure, I can rework the patch to leave the CAPI subsystem and only move the
+other three drivers (avm, hysdn, gigaset) into staging to see if
+anyone uses them.
 
-is there anything wrong with a bool type? And frankly using a flag seems more safe than just a boolean.
+> > What I found were a couple of references of the driver no longer working
+> > about 10 years ago:
+> >
+> > https://wiki.ubuntuusers.de/Archiv/Bluetooth/BlueFritz%21/
+> > https://www.opensuse-forum.de/thread/2776-erledigt-suse-11-2-und-bluefritz/
+> >
+> > Is anyone using cmtp for voice or fax services? The use cases from before 2009
+> > that I could find were usually dial-up networking, but that seems pointless now
+> > if the only way to get an ISDN connection is to have it routed over
+> > the internet.
+>
+> I still have the hardware and last time I checked it worked just fine. However
+> you need to set up a proper pairing with the hardware. However that has nothing
+> to do with CMTP since that is just a CAPI message transport protocol.
+>
+> You can use it for voice and fax service as long as you have the right codecs in
+> place. At the end of the day CAPI is an API for ISDN. And CMTP just being a
+> transport, all ISDN services are possible given the right software / application.
 
-> 
-> 	struct mutex		req_lock;
-> 	wait_queue_head_t	req_wait_q;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index d6b2540ba7f8..37893b0c6077 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -4380,9 +4380,13 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
-> 		if (test_bit(HCI_INIT, &hdev->flags) && opcode == HCI_OP_RESET)
-> 			hci_resend_last(hdev);
-> 
-> +		bt_dev_err(hdev,
-> +			   "unexpected CC event for opcode 0x%4.4x", opcode);
+That does not answer my question. It's clear that you can do all those things
+with CAPI and CMTP, but what I was trying to find out is whether anyone still
+does.
 
-Have you tested this? This will cause many error from tools like hciconfig or hcitool.
+The gigaset driver is similar here, you can use it for any kind of wireless ISDN
+communication, but apparently there is little use for that without a physical
+ISDN connection.
 
-> 		return;
-> 	}
-> 
-> +	hdev->sent_cmd_pending_cc = 0;
-> +
-> 	/* If the command succeeded and there's still more commands in
-> 	 * this request the request is not yet complete.
-> 	 */
-> @@ -4493,6 +4497,7 @@ static void hci_cmd_work(struct work_struct *work)
-> 
-> 		hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
-> 		if (hdev->sent_cmd) {
-> +			hdev->sent_cmd_pending_cc = 1;
-> 			atomic_dec(&hdev->cmd_cnt);
-> 			hci_send_frame(hdev, skb);
-> 			if (test_bit(HCI_RESET, &hdev->flags))
-
-Fun part is actually that even commands injected via hcitool etc. will be added to the sent_cmd queue unless they are vendor specific commands. However some manufactures choose to use command complete for their vendor commands as well (others don’t).
-
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 609fd6871c5a..7541a4bc9444 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3404,6 +3404,9 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 	hci_req_cmd_complete(hdev, *opcode, *status, req_complete,
-> 			     req_complete_skb);
-> 
-> +	if (hdev->sent_cmd_pending_cc)
-> +		return;
-> +
-> 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
-> 		queue_work(hdev->workqueue, &hdev->cmd_work);
-
-I rather see this done super cleanly. We have a pending cmd request from the kernel, make sure it gets answered with the corresponding command complete or command status and not just some other event. If there is a command complete or command status for a command that we don’t have pending, then ignore.
-
-Frankly, you are just hacking around here.
-
-Regards
-
-Marcel
-
+      Arnd
