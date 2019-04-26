@@ -2,155 +2,134 @@ Return-Path: <SRS0=Ml/a=S4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9927DC43218
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 17:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FEEC43218
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 17:45:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C7762084F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 17:01:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 822A0214C6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 17:45:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1556300733;
+	bh=TJ9Ao1gs7rboatKj0SDIWvYfHAvad3BH3lbXj244RBc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=DZ5qklByCgc2p7sqIDegfL4180KMAferGFtKLxXRKvBHXlARP9kSEN9MMffjwGUYv
+	 lNzow4HdPly1gbVkjvr86B/XpkI6BG9YtHl/K60uk8W+6/EQsKFVmsvA4qJutKADGM
+	 7UeEBp5uSBmywErJcGaxLD49sCxCVf1r7iDl+7fg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726434AbfDZRBp convert rfc822-to-8bit (ORCPT
+        id S1726362AbfDZRp1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Apr 2019 13:01:45 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:57780 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726193AbfDZRBp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Apr 2019 13:01:45 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id EE2B7CEEAE;
-        Fri, 26 Apr 2019 19:09:54 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH v3] Bluetooth: Ignore CC events not matching the last HCI
- command
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190426085635.3363-1-jprvita@endlessm.com>
-Date:   Fri, 26 Apr 2019 19:01:43 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, bgodavar@codeaurora.org,
-        ytkim@qca.qualcomm.com, "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@endlessm.com,
-        =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <39A065B6-DA45-497F-9EC4-CA1AD42FCDDA@holtmann.org>
-References: <CA+A7VXWss=RAXMYb9FfWi=xPCF4Fg+A5tAbYX594HPX2b151fQ@mail.gmail.com>
- <20190426085635.3363-1-jprvita@endlessm.com>
-To:     =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Fri, 26 Apr 2019 13:45:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59172 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726049AbfDZRp0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Apr 2019 13:45:26 -0400
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7FF7D214C6;
+        Fri, 26 Apr 2019 17:45:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1556300725;
+        bh=TJ9Ao1gs7rboatKj0SDIWvYfHAvad3BH3lbXj244RBc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=TbHi5QoWcFd132aTWvqI4L9De/6u1TcQmyhQJqClEs+lkH4xfLZfMCYDyTVQ6qJC8
+         syKGdl5O1Rute4fTl9abClJc/Y5E+i8bi35zDZ4WHmLA//DUMSpYn+YTB6aWM+htxn
+         1jgmXT3n+bhhqDahRW7WPusoYbfofTucCYJKJ+Uo=
+Received: by mail-qt1-f181.google.com with SMTP id b3so4981928qtc.12;
+        Fri, 26 Apr 2019 10:45:25 -0700 (PDT)
+X-Gm-Message-State: APjAAAUKRqAh5iADCyB5pDspIhzgj1c+MVREmMVncJH+CYHRIFadLvJZ
+        H2fxydm585e55eJHOz+OrIau1KUIoQ3QHLnCsA==
+X-Google-Smtp-Source: APXvYqykkGdyDAIhYDVs+O8Z15OaGvMDo5X0PHkNH1tYzfoRLO6wxp8WXJMZ66oEHyunou7CmZc9FFKXd/4T/E4LEBk=
+X-Received: by 2002:a0c:fe65:: with SMTP id b5mr11141066qvv.106.1556300724826;
+ Fri, 26 Apr 2019 10:45:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
+ <1554888476-17560-1-git-send-email-rjliao@codeaurora.org> <A85D7982-E000-4A5F-9927-CA36E0BA60F2@holtmann.org>
+ <7e0cf9ba98260309c43d9d6e63dead6c@codeaurora.org>
+In-Reply-To: <7e0cf9ba98260309c43d9d6e63dead6c@codeaurora.org>
+From:   Rob Herring <robh+dt@kernel.org>
+Date:   Fri, 26 Apr 2019 12:45:12 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqLnM4XqQTCT7VTUSmukujz0VHJoCbXMF2--RmTEx_LZww@mail.gmail.com>
+Message-ID: <CAL_JsqLnM4XqQTCT7VTUSmukujz0VHJoCbXMF2--RmTEx_LZww@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device property
+ firmware-name for QCA6174
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Thierry Escande <thierry.escande@linaro.org>,
+        netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joao,
+On Wed, Apr 24, 2019 at 1:19 AM Rocky Liao <rjliao@codeaurora.org> wrote:
+>
+> On 2019-04-24 01:06, Marcel Holtmann wrote:
+> > Hi Rocky,
+> >
+> >> This patch adds an optional device property "firmware-name" to allow
+> >> the
+> >> driver to load customized nvm firmware file based on this property.
+> >>
+> >> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> >> ---
+> >> Changes in v3:
+> >>  * added firmware-name instead of nvm-postfix to specify full firmware
+> >> name
+> >> ---
+> >> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
+> >> 1 file changed, 2 insertions(+)
+> >>
+> >> diff --git
+> >> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> >> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> >> index 824c0e2..2bcea50 100644
+> >> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> >> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> >> @@ -16,6 +16,7 @@ Optional properties for compatible string
+> >> qcom,qca6174-bt:
+> >>
+> >>  - enable-gpios: gpio specifier used to enable chip
+> >>  - clocks: clock provided to the controller (SUSCLK_32KHZ)
+> >> + - firmware-name: specify the name of nvm firmware to load
+> >>
+> >> Required properties for compatible string qcom,wcn3990-bt:
+> >>
+> >> @@ -39,6 +40,7 @@ serial@7570000 {
+> >>
+> >>              enable-gpios =3D <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+> >>              clocks =3D <&divclk4>;
+> >> +            firmware-name =3D "nvm_00440302.bin";
+> >>      };
+> >
+> > and how is this a firmware-name property. Wouldn=E2=80=99t this be more=
+ like
+> > nvm-file or something along these lines. This really needs to be
+> > cleared with Rob to pick the right property name.
+> >
+> > Regards
+> >
+> > Marcel
+>
+> Hi Rob,
+>
+> Are you OK to use a property name "nvm-file" or "firmware-nvm-file"?
+> Actually we have two firmware files, one is the patch file which is
+> common to all of the products, the other is the nvm file which is
+> customized. Using a "nvm-file" or "firmware-nvm-file" property name
+> would be more clear.
 
-> This commit makes the kernel not send the next queued HCI command until
-> a command complete arrives for the last HCI command sent to the
-> controller. This change avoids a problem with some buggy controllers
-> (seen on two SKUs of QCA9377) that send an extra command complete event
-> for the previous command after the kernel had already sent a new HCI
-> command to the controller.
-> 
-> The problem was reproduced when starting an active scanning procedure,
-> where an extra command complete event arrives for the LE_SET_RANDOM_ADDR
-> command. When this happends the kernel ends up not processing the
-> command complete for the following commmand, LE_SET_SCAN_PARAM, and
-> ultimately behaving as if a passive scanning procedure was being
-> performed, when in fact controller is performing an active scanning
-> procedure. This makes it impossible to discover BLE devices as no device
-> found events are sent to userspace.
-> 
-> This problem is reproducible on 100% of the attempts on the affected
-> controllers. The extra command complete event can be seen at timestamp
-> 27.420131 on the btmon logs bellow.
-> 
-> Bluetooth monitor ver 5.50
-> = Note: Linux version 5.0.0+ (x86_64)                                  0.352340
-> = Note: Bluetooth subsystem version 2.22                               0.352343
-> = New Index: 80:C5:F2:8F:87:84 (Primary,USB,hci0)               [hci0] 0.352344
-> = Open Index: 80:C5:F2:8F:87:84                                 [hci0] 0.352345
-> = Index Info: 80:C5:F2:8F:87:84 (Qualcomm)                      [hci0] 0.352346
-> @ MGMT Open: bluetoothd (privileged) version 1.14             {0x0001} 0.352347
-> @ MGMT Open: btmon (privileged) version 1.14                  {0x0002} 0.352366
-> @ MGMT Open: btmgmt (privileged) version 1.14                {0x0003} 27.302164
-> @ MGMT Command: Start Discovery (0x0023) plen 1       {0x0003} [hci0] 27.302310
->        Address type: 0x06
->          LE Public
->          LE Random
-> < HCI Command: LE Set Random Address (0x08|0x0005) plen 6   #1 [hci0] 27.302496
->        Address: 15:60:F2:91:B2:24 (Non-Resolvable)
->> HCI Event: Command Complete (0x0e) plen 4                 #2 [hci0] 27.419117
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7  #3 [hci0] 27.419244
->        Type: Active (0x01)
->        Interval: 11.250 msec (0x0012)
->        Window: 11.250 msec (0x0012)
->        Own address type: Random (0x01)
->        Filter policy: Accept all advertisement (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                 #4 [hci0] 27.420131
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2      #5 [hci0] 27.420259
->        Scanning: Enabled (0x01)
->        Filter duplicates: Enabled (0x01)
->> HCI Event: Command Complete (0x0e) plen 4                 #6 [hci0] 27.420969
->      LE Set Scan Parameters (0x08|0x000b) ncmd 1
->        Status: Success (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                 #7 [hci0] 27.421983
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> @ MGMT Event: Command Complete (0x0001) plen 4        {0x0003} [hci0] 27.422059
->      Start Discovery (0x0023) plen 1
->        Status: Success (0x00)
->        Address type: 0x06
->          LE Public
->          LE Random
-> @ MGMT Event: Discovering (0x0013) plen 2             {0x0003} [hci0] 27.422067
->        Address type: 0x06
->          LE Public
->          LE Random
->        Discovery: Enabled (0x01)
-> @ MGMT Event: Discovering (0x0013) plen 2             {0x0002} [hci0] 27.422067
->        Address type: 0x06
->          LE Public
->          LE Random
->        Discovery: Enabled (0x01)
-> @ MGMT Event: Discovering (0x0013) plen 2             {0x0001} [hci0] 27.422067
->        Address type: 0x06
->          LE Public
->          LE Random
->        Discovery: Enabled (0x01)
-> 
-> Signed-off-by: João Paulo Rechi Vita <jprvita@endlessm.com>
-> ---
-> include/net/bluetooth/hci.h |  2 ++
-> net/bluetooth/hci_core.c    |  5 +++++
-> net/bluetooth/hci_event.c   | 12 ++++++++++++
-> net/bluetooth/hci_request.c |  4 ----
-> net/bluetooth/hci_request.h |  4 ++++
-> 5 files changed, 23 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index fbba43e9bef5..883a8c25ccfb 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -221,6 +221,8 @@ enum {
-> 	HCI_RAW,
-> 
-> 	HCI_RESET,
-> +
-> +	HCI_CMD_PENDING,
-> };
+'firmware-name' is the standard name for specifying firmware file names.
 
-no new flags here please. This is userspace visible use the hdev->dev_flags.
-
-Regards
-
-Marcel
-
+Rob
