@@ -2,134 +2,88 @@ Return-Path: <SRS0=Ml/a=S4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FEEC43218
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 17:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6876C43219
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 20:50:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 822A0214C6
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 17:45:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E10D2086A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 20:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556300733;
-	bh=TJ9Ao1gs7rboatKj0SDIWvYfHAvad3BH3lbXj244RBc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=DZ5qklByCgc2p7sqIDegfL4180KMAferGFtKLxXRKvBHXlARP9kSEN9MMffjwGUYv
-	 lNzow4HdPly1gbVkjvr86B/XpkI6BG9YtHl/K60uk8W+6/EQsKFVmsvA4qJutKADGM
-	 7UeEBp5uSBmywErJcGaxLD49sCxCVf1r7iDl+7fg=
+	s=default; t=1556311814;
+	bh=GthxEJ5iSdNo68ZWeeQ3saP4TVjGgTFhhan+giZ7IZ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=gMFRXu6uYei3Qz20wxWcfxZCWxBsU3sZOJmfXXnZujYZ7eLpJXj5+h+k8K6Jgaqp4
+	 WDlYtlVCI6IRi1m7KbF8JpwhOg7Gl+RUlPr/aWkC4SXGq9wvpTuMiUsqQ/SNF0ZajH
+	 i8hC/XwKwcHk1+k6KZbioOb4hWr3QQ69qPHRWSzs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbfDZRp1 (ORCPT
+        id S1726935AbfDZUuH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Apr 2019 13:45:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59172 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726049AbfDZRp0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Apr 2019 13:45:26 -0400
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7FF7D214C6;
-        Fri, 26 Apr 2019 17:45:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1556300725;
-        bh=TJ9Ao1gs7rboatKj0SDIWvYfHAvad3BH3lbXj244RBc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=TbHi5QoWcFd132aTWvqI4L9De/6u1TcQmyhQJqClEs+lkH4xfLZfMCYDyTVQ6qJC8
-         syKGdl5O1Rute4fTl9abClJc/Y5E+i8bi35zDZ4WHmLA//DUMSpYn+YTB6aWM+htxn
-         1jgmXT3n+bhhqDahRW7WPusoYbfofTucCYJKJ+Uo=
-Received: by mail-qt1-f181.google.com with SMTP id b3so4981928qtc.12;
-        Fri, 26 Apr 2019 10:45:25 -0700 (PDT)
-X-Gm-Message-State: APjAAAUKRqAh5iADCyB5pDspIhzgj1c+MVREmMVncJH+CYHRIFadLvJZ
-        H2fxydm585e55eJHOz+OrIau1KUIoQ3QHLnCsA==
-X-Google-Smtp-Source: APXvYqykkGdyDAIhYDVs+O8Z15OaGvMDo5X0PHkNH1tYzfoRLO6wxp8WXJMZ66oEHyunou7CmZc9FFKXd/4T/E4LEBk=
-X-Received: by 2002:a0c:fe65:: with SMTP id b5mr11141066qvv.106.1556300724826;
- Fri, 26 Apr 2019 10:45:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
- <1554888476-17560-1-git-send-email-rjliao@codeaurora.org> <A85D7982-E000-4A5F-9927-CA36E0BA60F2@holtmann.org>
- <7e0cf9ba98260309c43d9d6e63dead6c@codeaurora.org>
-In-Reply-To: <7e0cf9ba98260309c43d9d6e63dead6c@codeaurora.org>
-From:   Rob Herring <robh+dt@kernel.org>
-Date:   Fri, 26 Apr 2019 12:45:12 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqLnM4XqQTCT7VTUSmukujz0VHJoCbXMF2--RmTEx_LZww@mail.gmail.com>
-Message-ID: <CAL_JsqLnM4XqQTCT7VTUSmukujz0VHJoCbXMF2--RmTEx_LZww@mail.gmail.com>
+        Fri, 26 Apr 2019 16:50:07 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:33694 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725966AbfDZUuH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Apr 2019 16:50:07 -0400
+Received: by mail-ot1-f66.google.com with SMTP id j10so3836998otq.0;
+        Fri, 26 Apr 2019 13:50:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=QNbysvp/LuY/94pU51W8fskOUVWUjWKtQqWNOsTdOxQ=;
+        b=GgYvQC4ombmbeW0F8v7kjROkFzx3y5CUTays+Z6frg73gwWhDLla2kk3Ma05oGXV9O
+         nVG/4vjWb0HZM0Ui5rrh5ff2QeJoqMBZdQoavFXWgfQ++bR+s+ARRZ4LdEDKbV9Mo5L/
+         oAyK9jRkaruTxRcWtlAbsTVJrN80HUbKuoQm5RQnYKxICAN++C5gxAUy2ByIbEAgyMe9
+         EMi2R0yqW74TvEj9fG/AORxFoCUU5j5iGxnW3Q1jU4wlyY0QKCYCcPlsEA2HEDiBUmWz
+         MxNRcnE+ECQ6q6AvihBdPO0MPov9aBzPL8ojXhCpA+wn5bI5VMlsp+JePRm4EFJcgpOO
+         bBOQ==
+X-Gm-Message-State: APjAAAXkQcAa1IVuhGW5VIN/Dtpk3RieeZJU5XugQaDhDgxiGrbl79G0
+        1M7/NyAuKRLyeqA8ptdn4Q==
+X-Google-Smtp-Source: APXvYqwKGI81Nk3lEDA9EW6l8iRg5p11nZQUlg6X1cRp0JzdG1WON3LtpfXm7BBAjhZTHoYwqRPKiA==
+X-Received: by 2002:a9d:1:: with SMTP id 1mr30316585ota.276.1556311806306;
+        Fri, 26 Apr 2019 13:50:06 -0700 (PDT)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id 30sm12265862otq.62.2019.04.26.13.50.05
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 26 Apr 2019 13:50:05 -0700 (PDT)
+Date:   Fri, 26 Apr 2019 15:50:05 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, thierry.escande@linaro.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        Rocky Liao <rjliao@codeaurora.org>
 Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device property
  firmware-name for QCA6174
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Thierry Escande <thierry.escande@linaro.org>,
-        netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <20190426205005.GA675@bogus>
+References: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
+ <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Apr 24, 2019 at 1:19 AM Rocky Liao <rjliao@codeaurora.org> wrote:
->
-> On 2019-04-24 01:06, Marcel Holtmann wrote:
-> > Hi Rocky,
-> >
-> >> This patch adds an optional device property "firmware-name" to allow
-> >> the
-> >> driver to load customized nvm firmware file based on this property.
-> >>
-> >> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> >> ---
-> >> Changes in v3:
-> >>  * added firmware-name instead of nvm-postfix to specify full firmware
-> >> name
-> >> ---
-> >> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
-> >> 1 file changed, 2 insertions(+)
-> >>
-> >> diff --git
-> >> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> index 824c0e2..2bcea50 100644
-> >> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> >> @@ -16,6 +16,7 @@ Optional properties for compatible string
-> >> qcom,qca6174-bt:
-> >>
-> >>  - enable-gpios: gpio specifier used to enable chip
-> >>  - clocks: clock provided to the controller (SUSCLK_32KHZ)
-> >> + - firmware-name: specify the name of nvm firmware to load
-> >>
-> >> Required properties for compatible string qcom,wcn3990-bt:
-> >>
-> >> @@ -39,6 +40,7 @@ serial@7570000 {
-> >>
-> >>              enable-gpios =3D <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-> >>              clocks =3D <&divclk4>;
-> >> +            firmware-name =3D "nvm_00440302.bin";
-> >>      };
-> >
-> > and how is this a firmware-name property. Wouldn=E2=80=99t this be more=
- like
-> > nvm-file or something along these lines. This really needs to be
-> > cleared with Rob to pick the right property name.
-> >
-> > Regards
-> >
-> > Marcel
->
-> Hi Rob,
->
-> Are you OK to use a property name "nvm-file" or "firmware-nvm-file"?
-> Actually we have two firmware files, one is the patch file which is
-> common to all of the products, the other is the nvm file which is
-> customized. Using a "nvm-file" or "firmware-nvm-file" property name
-> would be more clear.
+On Wed, 10 Apr 2019 17:27:56 +0800, Rocky Liao wrote:
+> This patch adds an optional device property "firmware-name" to allow the
+> driver to load customized nvm firmware file based on this property.
+> 
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+> Changes in v3:
+>   * added firmware-name instead of nvm-postfix to specify full firmware name
+> ---
+>  Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
 
-'firmware-name' is the standard name for specifying firmware file names.
-
-Rob
+Reviewed-by: Rob Herring <robh@kernel.org>
