@@ -4,52 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AB5C43219
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Apr 2019 01:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9F6C43218
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Apr 2019 01:47:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E65A0214C6
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Apr 2019 01:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82A0621537
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Apr 2019 01:47:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556329213;
-	bh=PaBdpQYTDkeWTBvbme9CHTRjkjUnvPZZFO9sENKgmY8=;
+	s=default; t=1556329625;
+	bh=8UdnhDRDCXVmHeHGWPfuIs+09ukLnHnS9IVuTpCx35Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=z79//Ly1i9vqik32Yi7BOLraTeyXpthqePXnaBIpjUGJMn/1fsBuGCVVmNGA5q/f/
-	 g1bEmuTuYDAwM4lIHIPy1AYGntC8kfPc7FK0Uda95UIDOv4v3Zx2ixxlWUoK0rMPDQ
-	 3iKar/IiTZusMCH7+x1jhl7jre7A7DLj+f6lC66w=
+	b=lbP1yzOEciN6330ZOLBJJbuQ8zJK4HxShhYFW2RCc4DlYPJ3ujr2hVmUJJlekIRSe
+	 RhdVVB5TGZnE4gex7VNazZ+ehnUMcBM77su1zgY2hqrDTRLEnAHcwjM4NDZgTA8NI2
+	 x3EGJDWR4XM3Kf7dBjiOtDZD8pGU+iLa/1AsxOO0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727917AbfD0BkM (ORCPT
+        id S1728927AbfD0Bq4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Apr 2019 21:40:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43616 "EHLO mail.kernel.org"
+        Fri, 26 Apr 2019 21:46:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47306 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727914AbfD0BkK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Apr 2019 21:40:10 -0400
+        id S1728147AbfD0BnI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Apr 2019 21:43:08 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EFF342146E;
-        Sat, 27 Apr 2019 01:40:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 36FDC215EA;
+        Sat, 27 Apr 2019 01:43:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1556329209;
-        bh=PaBdpQYTDkeWTBvbme9CHTRjkjUnvPZZFO9sENKgmY8=;
+        s=default; t=1556329387;
+        bh=8UdnhDRDCXVmHeHGWPfuIs+09ukLnHnS9IVuTpCx35Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=J07/zRDj3MHI7weQepHMMOpu5ME/Ary/HYhwMGxuH8creH7bMm0R9PtsyF1Wf4Z/r
-         6Tbbbi7OooGLynHRD7/jJmrHfv2OCYLIvJlHM1MS/jdw488DX6AwuSmTfjhngScHoq
-         qdeBnZhUsEdv6QmSf5S0UE5AcQY64eZdIDngJWqI=
+        b=DQTRR33/4j/mpnfCv5N+D01MD0Mod3hbPTgbNa1jjkK56eta4Fe1vcMYkfdon4AQS
+         g6XuCxCDfY4TcljcSCof96Ws9PZlNKvV2TbzYmjIR1Ju1DeOHSQeRQDAFYSyifL+ak
+         85RHpRhG8ifvliSVLa3aH4hFD3DZ85pKqvWrfV/g=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Brian Norris <briannorris@chromium.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.0 60/79] Bluetooth: btusb: request wake pin with NOAUTOEN
-Date:   Fri, 26 Apr 2019 21:38:19 -0400
-Message-Id: <20190427013838.6596-60-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 24/32] Bluetooth: btusb: request wake pin with NOAUTOEN
+Date:   Fri, 26 Apr 2019 21:42:15 -0400
+Message-Id: <20190427014224.8274-24-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190427013838.6596-1-sashal@kernel.org>
-References: <20190427013838.6596-1-sashal@kernel.org>
+In-Reply-To: <20190427014224.8274-1-sashal@kernel.org>
+References: <20190427014224.8274-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -82,10 +83,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4761499db9ee..470ee68555d9 100644
+index b8dffe937f4f..dae8723dde8c 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -2885,6 +2885,7 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+@@ -2893,6 +2893,7 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
  		return 0;
  	}
  
@@ -93,7 +94,7 @@ index 4761499db9ee..470ee68555d9 100644
  	ret = devm_request_irq(&hdev->dev, irq, btusb_oob_wake_handler,
  			       0, "OOB Wake-on-BT", data);
  	if (ret) {
-@@ -2899,7 +2900,6 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+@@ -2907,7 +2908,6 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
  	}
  
  	data->oob_wake_irq = irq;
