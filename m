@@ -1,89 +1,106 @@
-Return-Path: <SRS0=Ml/a=S4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=3gzF=S5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6876C43219
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 20:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AB5C43219
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Apr 2019 01:40:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E10D2086A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Apr 2019 20:50:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E65A0214C6
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Apr 2019 01:40:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556311814;
-	bh=GthxEJ5iSdNo68ZWeeQ3saP4TVjGgTFhhan+giZ7IZ0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=gMFRXu6uYei3Qz20wxWcfxZCWxBsU3sZOJmfXXnZujYZ7eLpJXj5+h+k8K6Jgaqp4
-	 WDlYtlVCI6IRi1m7KbF8JpwhOg7Gl+RUlPr/aWkC4SXGq9wvpTuMiUsqQ/SNF0ZajH
-	 i8hC/XwKwcHk1+k6KZbioOb4hWr3QQ69qPHRWSzs=
+	s=default; t=1556329213;
+	bh=PaBdpQYTDkeWTBvbme9CHTRjkjUnvPZZFO9sENKgmY8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=z79//Ly1i9vqik32Yi7BOLraTeyXpthqePXnaBIpjUGJMn/1fsBuGCVVmNGA5q/f/
+	 g1bEmuTuYDAwM4lIHIPy1AYGntC8kfPc7FK0Uda95UIDOv4v3Zx2ixxlWUoK0rMPDQ
+	 3iKar/IiTZusMCH7+x1jhl7jre7A7DLj+f6lC66w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726935AbfDZUuH (ORCPT
+        id S1727917AbfD0BkM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Apr 2019 16:50:07 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:33694 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725966AbfDZUuH (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Apr 2019 16:50:07 -0400
-Received: by mail-ot1-f66.google.com with SMTP id j10so3836998otq.0;
-        Fri, 26 Apr 2019 13:50:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=QNbysvp/LuY/94pU51W8fskOUVWUjWKtQqWNOsTdOxQ=;
-        b=GgYvQC4ombmbeW0F8v7kjROkFzx3y5CUTays+Z6frg73gwWhDLla2kk3Ma05oGXV9O
-         nVG/4vjWb0HZM0Ui5rrh5ff2QeJoqMBZdQoavFXWgfQ++bR+s+ARRZ4LdEDKbV9Mo5L/
-         oAyK9jRkaruTxRcWtlAbsTVJrN80HUbKuoQm5RQnYKxICAN++C5gxAUy2ByIbEAgyMe9
-         EMi2R0yqW74TvEj9fG/AORxFoCUU5j5iGxnW3Q1jU4wlyY0QKCYCcPlsEA2HEDiBUmWz
-         MxNRcnE+ECQ6q6AvihBdPO0MPov9aBzPL8ojXhCpA+wn5bI5VMlsp+JePRm4EFJcgpOO
-         bBOQ==
-X-Gm-Message-State: APjAAAXkQcAa1IVuhGW5VIN/Dtpk3RieeZJU5XugQaDhDgxiGrbl79G0
-        1M7/NyAuKRLyeqA8ptdn4Q==
-X-Google-Smtp-Source: APXvYqwKGI81Nk3lEDA9EW6l8iRg5p11nZQUlg6X1cRp0JzdG1WON3LtpfXm7BBAjhZTHoYwqRPKiA==
-X-Received: by 2002:a9d:1:: with SMTP id 1mr30316585ota.276.1556311806306;
-        Fri, 26 Apr 2019 13:50:06 -0700 (PDT)
-Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id 30sm12265862otq.62.2019.04.26.13.50.05
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 26 Apr 2019 13:50:05 -0700 (PDT)
-Date:   Fri, 26 Apr 2019 15:50:05 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
-        johan.hedberg@gmail.com, thierry.escande@linaro.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        Rocky Liao <rjliao@codeaurora.org>
-Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device property
- firmware-name for QCA6174
-Message-ID: <20190426205005.GA675@bogus>
-References: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
- <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
+        Fri, 26 Apr 2019 21:40:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43616 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727914AbfD0BkK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Apr 2019 21:40:10 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EFF342146E;
+        Sat, 27 Apr 2019 01:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1556329209;
+        bh=PaBdpQYTDkeWTBvbme9CHTRjkjUnvPZZFO9sENKgmY8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=J07/zRDj3MHI7weQepHMMOpu5ME/Ary/HYhwMGxuH8creH7bMm0R9PtsyF1Wf4Z/r
+         6Tbbbi7OooGLynHRD7/jJmrHfv2OCYLIvJlHM1MS/jdw488DX6AwuSmTfjhngScHoq
+         qdeBnZhUsEdv6QmSf5S0UE5AcQY64eZdIDngJWqI=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Brian Norris <briannorris@chromium.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Sasha Levin <sashal@kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.0 60/79] Bluetooth: btusb: request wake pin with NOAUTOEN
+Date:   Fri, 26 Apr 2019 21:38:19 -0400
+Message-Id: <20190427013838.6596-60-sashal@kernel.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190427013838.6596-1-sashal@kernel.org>
+References: <20190427013838.6596-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 10 Apr 2019 17:27:56 +0800, Rocky Liao wrote:
-> This patch adds an optional device property "firmware-name" to allow the
-> driver to load customized nvm firmware file based on this property.
-> 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
-> Changes in v3:
->   * added firmware-name instead of nvm-postfix to specify full firmware name
-> ---
->  Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
->  1 file changed, 2 insertions(+)
-> 
+From: Brian Norris <briannorris@chromium.org>
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+[ Upstream commit 771acc7e4a6e5dba779cb1a7fd851a164bc81033 ]
+
+Badly-designed systems might have (for example) active-high wake pins
+that default to high (e.g., because of external pull ups) until they
+have an active firmware which starts driving it low.  This can cause an
+interrupt storm in the time between request_irq() and disable_irq().
+
+We don't support shared interrupts here, so let's just pre-configure the
+interrupt to avoid auto-enabling it.
+
+Fixes: fd913ef7ce61 ("Bluetooth: btusb: Add out-of-band wakeup support")
+Fixes: 5364a0b4f4be ("arm64: dts: rockchip: move QCA6174A wakeup pin into its USB node")
+Signed-off-by: Brian Norris <briannorris@chromium.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/btusb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 4761499db9ee..470ee68555d9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2885,6 +2885,7 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+ 		return 0;
+ 	}
+ 
++	irq_set_status_flags(irq, IRQ_NOAUTOEN);
+ 	ret = devm_request_irq(&hdev->dev, irq, btusb_oob_wake_handler,
+ 			       0, "OOB Wake-on-BT", data);
+ 	if (ret) {
+@@ -2899,7 +2900,6 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+ 	}
+ 
+ 	data->oob_wake_irq = irq;
+-	disable_irq(irq);
+ 	bt_dev_info(hdev, "OOB Wake-on-BT configured at IRQ %u", irq);
+ 	return 0;
+ }
+-- 
+2.19.1
+
