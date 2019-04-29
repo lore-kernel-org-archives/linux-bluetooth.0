@@ -2,246 +2,108 @@ Return-Path: <SRS0=fAjn=S7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A95CC43219
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 12:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EB9C004C9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 15:09:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 429822087B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 12:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 073EF205ED
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 15:09:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANGSXzea"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iV0l7/Db"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727974AbfD2MDI (ORCPT
+        id S1728518AbfD2PJr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Apr 2019 08:03:08 -0400
-Received: from mail-ed1-f54.google.com ([209.85.208.54]:38102 "EHLO
-        mail-ed1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728024AbfD2MDI (ORCPT
+        Mon, 29 Apr 2019 11:09:47 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:37428 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728253AbfD2PJr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Apr 2019 08:03:08 -0400
-Received: by mail-ed1-f54.google.com with SMTP id w11so2161507edl.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2019 05:03:07 -0700 (PDT)
+        Mon, 29 Apr 2019 11:09:47 -0400
+Received: by mail-oi1-f193.google.com with SMTP id k6so8576311oic.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2019 08:09:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=XrMZZaRE0/qbQkSetLW3CffdqpM8Oxe6NMPPfynTHKI=;
-        b=ANGSXzeawu/i2GUTnt+VXC16+14Ac/biK1/6gWEz+cRB48HCxA4WykrFQ3hZJ6vg/h
-         PQaPruOoQc7Be+Ve/PBHHJM0lNOM64/+OAke2R/L1ZZ7kpJSHWjNcw+aHB5EycIBCj3w
-         AMwyRS/PYJOIpQjHMs+Cmutc2gTu+apq6ui+E9FxRwpYEMJnB5cFRX0ATvO3Lu3YAoa2
-         KGBpAauMPKi8BNToZ8Nxn8CUAL02DzKaLYuEyHH1j9X0G9+sOiL/lXDF9agc5rufcOGy
-         UCMkkyB/yO2b9mXQynJFjmDRFl3U4WmT6GyykEAJ4d8lk7+3IsXtJOMEgnUi0WtoKSCc
-         1wIg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=R1QkfhVqGp9HK9Gc4LEj6zs6sL/ELk3UtfFFbhYAPiU=;
+        b=iV0l7/DbDyz/K2cT13k/nuGfSv6OpZ7jqf/7N4TIbxIePw9BVDP8gMace72Usu61wh
+         NzfWfMlkmIgvFi/w0sZRVbEplDjCrsPmxP/n4Rdic5wfLmLi5sSpmmAj80idsUuE6tBF
+         Bw5l2BkqJOTQJNOvwko3XWOjJ37oSjhfj6OEU7fPsFS4xHRWKh6UGEMLyghDQJTSN6S1
+         M/IgX9fkVEpbZqfeABptrWzAa6ImH8utmmzj5poMwSw4L/r4puEgZ9P1ozhU+kbdilJw
+         iexlcEC9+HAPP2t5HKlzbYeRcONyeHL0zhctFPqQVuUKC+ty9rb0mNAZjDpIi3kp0Oh6
+         WM7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=XrMZZaRE0/qbQkSetLW3CffdqpM8Oxe6NMPPfynTHKI=;
-        b=W1F9XevfqzybZHmOYq8RnYTBZX1NawtJohCp4E+JpA6hU9o5WFQpAOgD/m0wXetiH0
-         HZSddluDEGLgb/0KIR+2Y2fp2RlBpz8ffYhBeMfxHs0tFLJExpBpo66YnYYPBAuYVRwF
-         LL1UrdjuHZ9JH0wXRPFGil984ZcizwFwR5uhV084IOOKKHqjopz8EwsLay6oCloA4yRl
-         mEpdjSwNJ6HHpQrTuuTqtZQGsk5/kXSI11nQNPShybdUYmxNMw5ZhZYlYeL97T9fmyve
-         AMvvKv7bQYidTuM2Sxwi1s9G9frE88sDRjHPZxMq6Sf5LsZQEI2pz0gF3YJQTBJ0X+7/
-         M3Jg==
-X-Gm-Message-State: APjAAAW5naHf53rBLG3Ani9rrZdbaJN7+CVsvs447kr3GSZIGfCCkIGo
-        wWDO7C/wtBo+TNvzOsntSISt14s6C2A=
-X-Google-Smtp-Source: APXvYqyH7N3Uwb02JXYdoPkvS0UFc5b98mj11co/gDiKDq2VrPOcjyOBUp4mVi6li5B1cWv2Dnoz8A==
-X-Received: by 2002:a50:b1d1:: with SMTP id n17mr12699931edd.131.1556539385878;
-        Mon, 29 Apr 2019 05:03:05 -0700 (PDT)
-Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id 10sm5783306ejn.37.2019.04.29.05.03.04
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 29 Apr 2019 05:03:04 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/3] a2dp: Fix not calling SelectConfiguration on other available endpoints
-Date:   Mon, 29 Apr 2019 15:02:59 +0300
-Message-Id: <20190429120259.17880-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190429120259.17880-1-luiz.dentz@gmail.com>
-References: <20190429120259.17880-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=R1QkfhVqGp9HK9Gc4LEj6zs6sL/ELk3UtfFFbhYAPiU=;
+        b=hVT+74lBzoS0KblvZ2GZ+N6sD0jEKctim8sgGwieR5Xv6SMtCU3tUb2PHov077nsgM
+         VC4iWbkxDZ6nJRV8YoUk5xGecUZpolnkVBYThMlzAAf/wVbbTSNRN0ianOMWd3rqrFQK
+         z/TMxT/DoM/bUFPX7/U6m48A0YwWDOs2y437u2lPb0eRmatqIg0LlgJvDqIB1MlZrgHX
+         Lkeof1qBIuLzJmeuZxAtzHFG8wd5oxHq2LgH5enm825cj1FMlJ2txVAwbXIMy/0FFwux
+         AZ8LM83UeaT/UMMcBmu7w31hiBPQ4P/r/uIQbUycfvEg2lq+st3BimQBKt1X+A/Pv2YC
+         ktDQ==
+X-Gm-Message-State: APjAAAXb4hHOpifrKVQJp+PKEbANP24lvCQ8BsDAHiSx+2W3ulrNAHQp
+        N3QPZOOK2YmgG0S3CrAN3DkvZuYeC+cSWeHoeec=
+X-Google-Smtp-Source: APXvYqznxKqtjzxhZxjde1JPWwCpQ5O/38N8aLzpj60D/aDJ5FFvMzWipM5c48We28f2bsT1aPeT9WjtdZqLjAfTELE=
+X-Received: by 2002:aca:d984:: with SMTP id q126mr16923670oig.108.1556550586225;
+ Mon, 29 Apr 2019 08:09:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190429111441.20481-1-troels.d.hoffmeyer@gmail.com> <20190429111441.20481-2-troels.d.hoffmeyer@gmail.com>
+In-Reply-To: <20190429111441.20481-2-troels.d.hoffmeyer@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 29 Apr 2019 18:09:33 +0300
+Message-ID: <CABBYNZKUR30FQXTpRhkkDC+XivCthrLacSAtkCCBKT9GXynQQg@mail.gmail.com>
+Subject: Re: [PATCH Bluez 1/1] advertising: Timeout of 0 should not fire a
+ callback Setting a timeout of 0 on an advertisement should let the
+ advertisement run forever. The client was released immediately after,
+ although the advertisement was still in the air.
+To:     Troels Dalsgaard Hoffmeyer <troels.d.hoffmeyer@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Troels,
 
-Endpoint may not be able to select a valid configuration but there could
-be other endpoints available that could be used, so instead of just
-using the first match this collects all the matching endpoints and put
-them into a queue (ordered by priority) then proceed to next endpoint
-only failing if none of the available endpoits can select a valid
-configuration.
----
- profiles/audio/a2dp.c | 77 ++++++++++++++++++++++++++++---------------
- 1 file changed, 50 insertions(+), 27 deletions(-)
+On Mon, Apr 29, 2019 at 2:16 PM Troels Dalsgaard Hoffmeyer
+<troels.d.hoffmeyer@gmail.com> wrote:
+>
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index a23abdd97..4d378a91a 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -105,6 +105,7 @@ struct a2dp_setup_cb {
- struct a2dp_setup {
- 	struct a2dp_channel *chan;
- 	struct avdtp *session;
-+	struct queue *eps;
- 	struct a2dp_sep *sep;
- 	struct a2dp_remote_sep *rsep;
- 	struct avdtp_stream *stream;
-@@ -2406,23 +2407,44 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
- 
- static void select_cb(struct a2dp_setup *setup, void *ret, int size)
- {
--	if (size < 0) {
--		DBG("Endpoint replied an invalid configuration");
-+	struct avdtp_service_capability *service;
-+	struct avdtp_media_codec_capability *codec;
-+	int err;
-+
-+	if (size) {
-+		caps_add_codec(&setup->caps, setup->sep->codec, ret, size);
- 		goto done;
- 	}
- 
--	caps_add_codec(&setup->caps, setup->sep->codec, ret, size);
-+	setup->sep = queue_pop_head(setup->eps);
-+	if (!setup->sep) {
-+		error("Unable to select a valid configuration");
-+		queue_destroy(setup->eps, NULL);
-+		goto done;
-+	}
-+
-+	setup->rsep = find_remote_sep(setup->chan, setup->sep);
-+	service = avdtp_get_codec(setup->rsep->sep);
-+	codec = (struct avdtp_media_codec_capability *) service->data;
-+
-+	err = setup->sep->endpoint->select_configuration(setup->sep,
-+					codec->data,
-+					service->length - sizeof(*codec),
-+					setup_ref(setup),
-+					select_cb, setup->sep->user_data);
-+	if (err == 0)
-+		return;
- 
- done:
- 	finalize_select(setup);
- 	setup_unref(setup);
- }
- 
--static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
-+static struct queue *a2dp_find_eps(struct avdtp *session, GSList *list,
- 					const char *sender)
- {
--	struct a2dp_sep *first = NULL;
- 	struct a2dp_channel *chan = find_channel(session);
-+	struct queue *seps = NULL;
- 
- 	for (; list; list = list->next) {
- 		struct a2dp_sep *sep = list->data;
-@@ -2444,26 +2466,25 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
- 		if (!rsep)
- 			continue;
- 
--		/* Locate last used if set */
--		if (chan->last_used) {
--			if (chan->last_used->sep == rsep)
--				return sep;
--			first = sep;
--			continue;
--		}
-+		if (!seps)
-+			seps = queue_new();
- 
--		return sep;
-+		/* Prepend last used so it is preferred over others */
-+		if (chan->last_used && chan->last_used->sep == rsep)
-+			queue_push_head(seps, sep);
-+		else
-+			queue_push_tail(seps, sep);
- 
- 	}
- 
--	return first;
-+	return seps;
- }
- 
--static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8_t type,
-+static struct queue *a2dp_select_eps(struct avdtp *session, uint8_t type,
- 					const char *sender)
- {
- 	struct a2dp_server *server;
--	struct a2dp_sep *sep;
-+	struct queue *seps;
- 	GSList *l;
- 
- 	server = find_server(servers, avdtp_get_adapter(session));
-@@ -2473,11 +2494,11 @@ static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8_t type,
- 	l = type == AVDTP_SEP_TYPE_SINK ? server->sources : server->sinks;
- 
- 	/* Check sender's seps first */
--	sep = a2dp_find_sep(session, l, sender);
--	if (sep != NULL)
--		return sep;
-+	seps = a2dp_find_eps(session, l, sender);
-+	if (seps != NULL)
-+		return seps;
- 
--	return a2dp_find_sep(session, l, NULL);
-+	return a2dp_find_eps(session, l, NULL);
- }
- 
- static void store_remote_sep(void *data, void *user_data)
-@@ -2580,13 +2601,13 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
- {
- 	struct a2dp_setup *setup;
- 	struct a2dp_setup_cb *cb_data;
--	struct a2dp_sep *sep;
-+	struct queue *eps;
- 	struct avdtp_service_capability *service;
- 	struct avdtp_media_codec_capability *codec;
- 	int err;
- 
--	sep = a2dp_select_sep(session, type, sender);
--	if (!sep) {
-+	eps = a2dp_select_eps(session, type, sender);
-+	if (!eps) {
- 		error("Unable to select SEP");
- 		return 0;
- 	}
-@@ -2599,8 +2620,9 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
- 	cb_data->select_cb = cb;
- 	cb_data->user_data = user_data;
- 
--	setup->sep = sep;
--	setup->rsep = find_remote_sep(setup->chan, sep);
-+	setup->eps = eps;
-+	setup->sep = queue_pop_head(eps);
-+	setup->rsep = find_remote_sep(setup->chan, setup->sep);
- 
- 	if (setup->rsep == NULL) {
- 		error("Could not find remote sep");
-@@ -2610,10 +2632,11 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
- 	service = avdtp_get_codec(setup->rsep->sep);
- 	codec = (struct avdtp_media_codec_capability *) service->data;
- 
--	err = sep->endpoint->select_configuration(sep, codec->data,
-+	err = setup->sep->endpoint->select_configuration(setup->sep,
-+					codec->data,
- 					service->length - sizeof(*codec),
- 					setup_ref(setup),
--					select_cb, sep->user_data);
-+					select_cb, setup->sep->user_data);
- 	if (err == 0)
- 		return cb_data->id;
- 
+Please rework the commit message, the subject should be rather short
+and you should put some stuff in the description.
+
+> ---
+>  src/advertising.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/advertising.c b/src/advertising.c
+> index 2f187edcf..26e24ee01 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -587,8 +587,10 @@ static bool parse_timeout(DBusMessageIter *iter,
+>         if (client->to_id)
+>                 g_source_remove(client->to_id);
+>
+> -       client->to_id = g_timeout_add_seconds(client->timeout, client_timeout,
+> -                                                               client);
+> +       if(client->timeout > 0) {
+> +               client->to_id = g_timeout_add_seconds(client->timeout, client_timeout,
+> +                                                                                                                                               client);
+> +       }
+>
+>         return true;
+>  }
+
+While I do agree we should handle timeout 0 as no timeout the reason
+you are hitting this in the first place is a misused of the API where
+you are setting a Timeout parameter when there shouldn't be one.
+
 -- 
-2.20.1
-
+Luiz Augusto von Dentz
