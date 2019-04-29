@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE79C04AA6
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 12:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A95CC43219
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 12:03:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C9692087B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 12:03:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 429822087B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 12:03:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UEJpuqKM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANGSXzea"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728079AbfD2MDH (ORCPT
+        id S1727974AbfD2MDI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Apr 2019 08:03:07 -0400
-Received: from mail-ed1-f45.google.com ([209.85.208.45]:40758 "EHLO
-        mail-ed1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727992AbfD2MDG (ORCPT
+        Mon, 29 Apr 2019 08:03:08 -0400
+Received: from mail-ed1-f54.google.com ([209.85.208.54]:38102 "EHLO
+        mail-ed1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728024AbfD2MDI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Apr 2019 08:03:06 -0400
-Received: by mail-ed1-f45.google.com with SMTP id e56so2591113ede.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2019 05:03:05 -0700 (PDT)
+        Mon, 29 Apr 2019 08:03:08 -0400
+Received: by mail-ed1-f54.google.com with SMTP id w11so2161507edl.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2019 05:03:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=ziLQF++THfmGlS5v4VvJuBeywwctjd7oWnZg0WevTus=;
-        b=UEJpuqKM9O9bZYcyL878YZpRn+W5pnvSn7bNxCbcdeQ6/yhQWp5kcuyr58g8B8Qg0E
-         eZqdFKgsel38IwMjzr/W7zpdh0ACBghDtO1/sg4lHQsl3uK3e2VgpAJXTbXDML2bw2wI
-         eUBDAONqycTeEaR3Y3Knr+33sqMAZDFOs7gOYczIeClfGEBQwTey1BgtnklL8Y0qIxbQ
-         YkSnH1l//XQisGemSew/9vk7PSxcMlGtdkyf27uGD2omgba5PdhUH6qIdI6DGrPuNXLa
-         NOAsKjH7vQCUEsv70elAfXrHage41XpmU7jfC0AKfxMCVucMkzY64JTzcMxDBiMZmto1
-         HgiA==
+        bh=XrMZZaRE0/qbQkSetLW3CffdqpM8Oxe6NMPPfynTHKI=;
+        b=ANGSXzeawu/i2GUTnt+VXC16+14Ac/biK1/6gWEz+cRB48HCxA4WykrFQ3hZJ6vg/h
+         PQaPruOoQc7Be+Ve/PBHHJM0lNOM64/+OAke2R/L1ZZ7kpJSHWjNcw+aHB5EycIBCj3w
+         AMwyRS/PYJOIpQjHMs+Cmutc2gTu+apq6ui+E9FxRwpYEMJnB5cFRX0ATvO3Lu3YAoa2
+         KGBpAauMPKi8BNToZ8Nxn8CUAL02DzKaLYuEyHH1j9X0G9+sOiL/lXDF9agc5rufcOGy
+         UCMkkyB/yO2b9mXQynJFjmDRFl3U4WmT6GyykEAJ4d8lk7+3IsXtJOMEgnUi0WtoKSCc
+         1wIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ziLQF++THfmGlS5v4VvJuBeywwctjd7oWnZg0WevTus=;
-        b=JMyxJaaKPBR/pd7RFg9h4hnvTv8EeapMkYJKW/pK+2xlEoSVe/vyD8cdc53WYGd5dS
-         qtJ+vYn1PYkug67ej1fSVe7T5mJKRfhRdn+2nRGH4AD4+4o53MEB8GqVWdu6Q7dpL/oV
-         I5TzyhFUuklfXdmND/La5gbcKabrMzxamW1QZ+6cQyqxOuRv002VZSrEKFrA9m+nS1c/
-         70/7W6pfQgmuQr+YO887cI3ud7EucVjD1YcWLAxgKvdnRPukDDHA5lc72Cd96QfcMiGo
-         XlgoN6D0FkSLR328no0N+TkMjVrZ6EMD1y8YGVACXUrWSkEMnFL6MyLo/ZjlBREQ2qOj
-         RtoQ==
-X-Gm-Message-State: APjAAAU4D5XtQAhfTLNSId1wiGiY8rGasJI342yFPKSe5cknXJ71iX5x
-        NADpLFP4/1FQnigHsxbKyKwyDpuPPPk=
-X-Google-Smtp-Source: APXvYqycyTVXrU1AvzGpN853T2dexPguCUPbSGWlXyAOMLZlt8Vbbs3WQlHjpwlmxd6rHLkivMMbEA==
-X-Received: by 2002:a50:9785:: with SMTP id e5mr14563195edb.94.1556539384166;
-        Mon, 29 Apr 2019 05:03:04 -0700 (PDT)
+        bh=XrMZZaRE0/qbQkSetLW3CffdqpM8Oxe6NMPPfynTHKI=;
+        b=W1F9XevfqzybZHmOYq8RnYTBZX1NawtJohCp4E+JpA6hU9o5WFQpAOgD/m0wXetiH0
+         HZSddluDEGLgb/0KIR+2Y2fp2RlBpz8ffYhBeMfxHs0tFLJExpBpo66YnYYPBAuYVRwF
+         LL1UrdjuHZ9JH0wXRPFGil984ZcizwFwR5uhV084IOOKKHqjopz8EwsLay6oCloA4yRl
+         mEpdjSwNJ6HHpQrTuuTqtZQGsk5/kXSI11nQNPShybdUYmxNMw5ZhZYlYeL97T9fmyve
+         AMvvKv7bQYidTuM2Sxwi1s9G9frE88sDRjHPZxMq6Sf5LsZQEI2pz0gF3YJQTBJ0X+7/
+         M3Jg==
+X-Gm-Message-State: APjAAAW5naHf53rBLG3Ani9rrZdbaJN7+CVsvs447kr3GSZIGfCCkIGo
+        wWDO7C/wtBo+TNvzOsntSISt14s6C2A=
+X-Google-Smtp-Source: APXvYqyH7N3Uwb02JXYdoPkvS0UFc5b98mj11co/gDiKDq2VrPOcjyOBUp4mVi6li5B1cWv2Dnoz8A==
+X-Received: by 2002:a50:b1d1:: with SMTP id n17mr12699931edd.131.1556539385878;
+        Mon, 29 Apr 2019 05:03:05 -0700 (PDT)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id 10sm5783306ejn.37.2019.04.29.05.03.02
+        by smtp.gmail.com with ESMTPSA id 10sm5783306ejn.37.2019.04.29.05.03.04
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 29 Apr 2019 05:03:03 -0700 (PDT)
+        Mon, 29 Apr 2019 05:03:04 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/3] doc/settings-storage: Document LastUsed Endpoints entry
-Date:   Mon, 29 Apr 2019 15:02:58 +0300
-Message-Id: <20190429120259.17880-2-luiz.dentz@gmail.com>
+Subject: [PATCH v3 3/3] a2dp: Fix not calling SelectConfiguration on other available endpoints
+Date:   Mon, 29 Apr 2019 15:02:59 +0300
+Message-Id: <20190429120259.17880-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190429120259.17880-1-luiz.dentz@gmail.com>
 References: <20190429120259.17880-1-luiz.dentz@gmail.com>
@@ -74,36 +74,174 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Document the use of LastUsed entry inside Endpoints group.
+Endpoint may not be able to select a valid configuration but there could
+be other endpoints available that could be used, so instead of just
+using the first match this collects all the matching endpoints and put
+them into a queue (ordered by priority) then proceed to next endpoint
+only failing if none of the available endpoits can select a valid
+configuration.
 ---
- doc/settings-storage.txt | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ profiles/audio/a2dp.c | 77 ++++++++++++++++++++++++++++---------------
+ 1 file changed, 50 insertions(+), 27 deletions(-)
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 44b0b4961..f595f9817 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -169,7 +169,9 @@ In "Attributes" group GATT database is stored using attribute handle as key
- all data required to re-create given attribute. ":" is used to separate fields.
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index a23abdd97..4d378a91a 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -105,6 +105,7 @@ struct a2dp_setup_cb {
+ struct a2dp_setup {
+ 	struct a2dp_channel *chan;
+ 	struct avdtp *session;
++	struct queue *eps;
+ 	struct a2dp_sep *sep;
+ 	struct a2dp_remote_sep *rsep;
+ 	struct avdtp_stream *stream;
+@@ -2406,23 +2407,44 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
  
- In "Endpoints" group A2DP remote endpoints are stored using the seid as key
--(hexadecimal format) and ":" is used to separate fields.
-+(hexadecimal format) and ":" is used to separate fields. It may also contain
-+an entry which key is set to "LastUsed" which represented the last endpoint
-+used.
+ static void select_cb(struct a2dp_setup *setup, void *ret, int size)
+ {
+-	if (size < 0) {
+-		DBG("Endpoint replied an invalid configuration");
++	struct avdtp_service_capability *service;
++	struct avdtp_media_codec_capability *codec;
++	int err;
++
++	if (size) {
++		caps_add_codec(&setup->caps, setup->sep->codec, ret, size);
+ 		goto done;
+ 	}
  
- [General] group contains:
+-	caps_add_codec(&setup->caps, setup->sep->codec, ret, size);
++	setup->sep = queue_pop_head(setup->eps);
++	if (!setup->sep) {
++		error("Unable to select a valid configuration");
++		queue_destroy(setup->eps, NULL);
++		goto done;
++	}
++
++	setup->rsep = find_remote_sep(setup->chan, setup->sep);
++	service = avdtp_get_codec(setup->rsep->sep);
++	codec = (struct avdtp_media_codec_capability *) service->data;
++
++	err = setup->sep->endpoint->select_configuration(setup->sep,
++					codec->data,
++					service->length - sizeof(*codec),
++					setup_ref(setup),
++					select_cb, setup->sep->user_data);
++	if (err == 0)
++		return;
  
-@@ -220,6 +222,9 @@ Sample Attributes section:
- 					followed by codec type and its
- 					capabilies as hexadecimal encoded
- 					string.
-+	LastUsed:<xx>		String	LastUsed has one field which is the
-+					endpoint ID as hexadecimal encoded
-+					string.
+ done:
+ 	finalize_select(setup);
+ 	setup_unref(setup);
+ }
  
- Info file format
- ================
+-static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
++static struct queue *a2dp_find_eps(struct avdtp *session, GSList *list,
+ 					const char *sender)
+ {
+-	struct a2dp_sep *first = NULL;
+ 	struct a2dp_channel *chan = find_channel(session);
++	struct queue *seps = NULL;
+ 
+ 	for (; list; list = list->next) {
+ 		struct a2dp_sep *sep = list->data;
+@@ -2444,26 +2466,25 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+ 		if (!rsep)
+ 			continue;
+ 
+-		/* Locate last used if set */
+-		if (chan->last_used) {
+-			if (chan->last_used->sep == rsep)
+-				return sep;
+-			first = sep;
+-			continue;
+-		}
++		if (!seps)
++			seps = queue_new();
+ 
+-		return sep;
++		/* Prepend last used so it is preferred over others */
++		if (chan->last_used && chan->last_used->sep == rsep)
++			queue_push_head(seps, sep);
++		else
++			queue_push_tail(seps, sep);
+ 
+ 	}
+ 
+-	return first;
++	return seps;
+ }
+ 
+-static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8_t type,
++static struct queue *a2dp_select_eps(struct avdtp *session, uint8_t type,
+ 					const char *sender)
+ {
+ 	struct a2dp_server *server;
+-	struct a2dp_sep *sep;
++	struct queue *seps;
+ 	GSList *l;
+ 
+ 	server = find_server(servers, avdtp_get_adapter(session));
+@@ -2473,11 +2494,11 @@ static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8_t type,
+ 	l = type == AVDTP_SEP_TYPE_SINK ? server->sources : server->sinks;
+ 
+ 	/* Check sender's seps first */
+-	sep = a2dp_find_sep(session, l, sender);
+-	if (sep != NULL)
+-		return sep;
++	seps = a2dp_find_eps(session, l, sender);
++	if (seps != NULL)
++		return seps;
+ 
+-	return a2dp_find_sep(session, l, NULL);
++	return a2dp_find_eps(session, l, NULL);
+ }
+ 
+ static void store_remote_sep(void *data, void *user_data)
+@@ -2580,13 +2601,13 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
+ {
+ 	struct a2dp_setup *setup;
+ 	struct a2dp_setup_cb *cb_data;
+-	struct a2dp_sep *sep;
++	struct queue *eps;
+ 	struct avdtp_service_capability *service;
+ 	struct avdtp_media_codec_capability *codec;
+ 	int err;
+ 
+-	sep = a2dp_select_sep(session, type, sender);
+-	if (!sep) {
++	eps = a2dp_select_eps(session, type, sender);
++	if (!eps) {
+ 		error("Unable to select SEP");
+ 		return 0;
+ 	}
+@@ -2599,8 +2620,9 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
+ 	cb_data->select_cb = cb;
+ 	cb_data->user_data = user_data;
+ 
+-	setup->sep = sep;
+-	setup->rsep = find_remote_sep(setup->chan, sep);
++	setup->eps = eps;
++	setup->sep = queue_pop_head(eps);
++	setup->rsep = find_remote_sep(setup->chan, setup->sep);
+ 
+ 	if (setup->rsep == NULL) {
+ 		error("Could not find remote sep");
+@@ -2610,10 +2632,11 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
+ 	service = avdtp_get_codec(setup->rsep->sep);
+ 	codec = (struct avdtp_media_codec_capability *) service->data;
+ 
+-	err = sep->endpoint->select_configuration(sep, codec->data,
++	err = setup->sep->endpoint->select_configuration(setup->sep,
++					codec->data,
+ 					service->length - sizeof(*codec),
+ 					setup_ref(setup),
+-					select_cb, sep->user_data);
++					select_cb, setup->sep->user_data);
+ 	if (err == 0)
+ 		return cb_data->id;
+ 
 -- 
 2.20.1
 
