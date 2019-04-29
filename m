@@ -2,382 +2,157 @@ Return-Path: <SRS0=fAjn=S7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A9CC43219
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 19:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD27C43219
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 23:21:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FECD215EA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 19:51:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A40292067D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Apr 2019 23:21:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QbQJ9nLl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729307AbfD2TvQ (ORCPT
+        id S1728997AbfD2XVl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Apr 2019 15:51:16 -0400
-Received: from mga02.intel.com ([134.134.136.20]:27048 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728928AbfD2TvQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Apr 2019 15:51:16 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Apr 2019 12:45:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,410,1549958400"; 
-   d="scan'208";a="144648066"
-Received: from ingas-nuc1.sea.intel.com ([10.252.200.123])
-  by fmsmga008.fm.intel.com with ESMTP; 29 Apr 2019 12:45:13 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 3/4] mesh: Consolidate processing of mesh element properties
-Date:   Mon, 29 Apr 2019 12:45:08 -0700
-Message-Id: <20190429194509.3378-4-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20190429194509.3378-1-inga.stotland@intel.com>
-References: <20190429194509.3378-1-inga.stotland@intel.com>
+        Mon, 29 Apr 2019 19:21:41 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42773 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728748AbfD2XVl (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 29 Apr 2019 19:21:41 -0400
+Received: by mail-pf1-f193.google.com with SMTP id w25so6074395pfi.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Apr 2019 16:21:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xbhGzYYnhHF5ZeRWa6OLUpz8tEN0PJq7GYYSb0RjNJg=;
+        b=QbQJ9nLlmgPEXDHAUhfEQJ7+Rp/Ze9/aRmRQrHPwu+VtBcrfqkvwv1VPTMi0OnWnuO
+         YqiM198R1ZzNwSFg2BvdIBDxVjKv8nJyR2NOBt/6/FTX1YB1dFs7+4f8PU0Qn/zHK9B8
+         31Rf1PxuYwZfk5cmbMllS7oPdC37lujKLyZ4Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xbhGzYYnhHF5ZeRWa6OLUpz8tEN0PJq7GYYSb0RjNJg=;
+        b=JymA6b3YehBmXaChtITJhElJTZ1zgwjt6R4uDdQAJbDxrsdCXIoVf0IWVE5QCUfI6r
+         +Q+hby2z0hiNR4+bbliIVhKsDcRzbU5vYA7FWhBLANnjXSI8Jm8stjOTxVsa9bVoLkXy
+         WkPZ+arn+fxmfuc26rswx8iwCrERrF4hvT6bj6muWWYTuJSU7Uyo88pdQhD+i76mi65m
+         dMcrsDZLxXz4AmP27bm5ohtLdLN7GqsNpJF27sW2DMuQoblDLM1Y8i6VJnNRdL3xNOGR
+         yC6F32XoOo3onqsuZXl/wMgyCQyXICpG/5ZM+PFKwoefY/95Se2AIXW0XYr9gMFl6rDN
+         60Cw==
+X-Gm-Message-State: APjAAAWA3omwlDOUm1+0coJVHnObfYpOjELjVwbLOCp6Nds14kH4S3dr
+        vLq+8tacHFb8kvu9Dmy7yxWEMA==
+X-Google-Smtp-Source: APXvYqwNFIfIwYAgoTW/lNg8BKpDIaRiDrn351eYLHa+SPhyCsbCU6O8Y+yAbBn5u5T8ulECg2iwCQ==
+X-Received: by 2002:a63:8dc8:: with SMTP id z191mr26749131pgd.9.1556580101013;
+        Mon, 29 Apr 2019 16:21:41 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id f20sm70040595pff.176.2019.04.29.16.21.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Apr 2019 16:21:40 -0700 (PDT)
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH v3 1/2] Bluetooth: hci_qca: Rename STATE_<flags> to QCA_<flags>
+Date:   Mon, 29 Apr 2019 16:21:30 -0700
+Message-Id: <20190429232131.183049-1-mka@chromium.org>
+X-Mailer: git-send-email 2.21.0.593.g511ec345e18-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Consolidate functions to parse and process properties of mesh
-element objects. Also, add validation of element composition
-when processing Attach() method.
----
- mesh/node.c | 269 ++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 167 insertions(+), 102 deletions(-)
+Rename STATE_IN_BAND_SLEEP_ENABLED to QCA_IBS_ENABLED. The constant
+represents a flag (multiple flags can be set at once), not a unique
+state of the controller or driver.
 
-diff --git a/mesh/node.c b/mesh/node.c
-index a9eb41e87..0c2fc7262 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -147,6 +147,14 @@ static bool match_element_idx(const void *a, const void *b)
- 	return (element->idx == index);
- }
+Also make the flag an enum value instead of a pre-processor constant
+(more flags will be added to the enum group by another patch).
+
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+Changes in v3:
+- rename STATE_IN_BAND_SLEEP_ENABLED to QCA_IBS_ENABLED
+
+Changes in v2:
+- don't use BIT()
+- change to enum type
+- updated commit message
+---
+ drivers/bluetooth/hci_qca.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index c53ee8d8ca15..57322c42bb2d 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -54,9 +54,6 @@
+ #define HCI_IBS_WAKE_ACK	0xFC
+ #define HCI_MAX_IBS_SIZE	10
  
-+static bool match_model_id(const void *a, const void *b)
-+{
-+	const struct mesh_model *mod = a;
-+	uint32_t mod_id = L_PTR_TO_UINT(b);
-+
-+	return mod_id == mesh_model_get_model_id(mod);
-+}
-+
- static bool match_element_path(const void *a, const void *b)
- {
- 	const struct node_element *element = a;
-@@ -1029,20 +1037,115 @@ static void app_disc_cb(struct l_dbus *bus, void *user_data)
- 	}
- }
+-/* Controller states */
+-#define STATE_IN_BAND_SLEEP_ENABLED	1
+-
+ #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+ #define IBS_TX_IDLE_TIMEOUT_MS		2000
+ #define CMD_TRANS_TIMEOUT_MS		100
+@@ -67,6 +64,10 @@
+ /* Controller debug log header */
+ #define QCA_DEBUG_HANDLE	0x2EDC
  
--static bool validate_element_properties(struct mesh_node *node,
--					const char *path,
--					struct l_dbus_message_iter *properties)
++enum qca_flags {
++	QCA_IBS_ENABLED,
++};
 +
-+static bool validate_model_property(struct node_element *ele,
-+					struct l_dbus_message_iter *property,
-+					uint8_t *num_models, bool vendor)
-+{
-+	struct l_dbus_message_iter ids;
-+	uint16_t mod_id, vendor_id;
-+	uint8_t count;
-+	const char *signature = !vendor ? "aq" : "a(qq)";
-+
-+	if (!l_dbus_message_iter_get_variant(property, signature, &ids)) {
-+		/* Allow empty elements */
-+		if (l_queue_length(ele->models) == 0) {
-+			*num_models = 0;
-+			return true;
-+		} else
-+			return false;
-+	}
-+
-+	count = 0;
-+	if (!vendor) {
-+		/* Bluetooth SIG defined models */
-+		while (l_dbus_message_iter_next_entry(&ids, &mod_id)) {
-+			struct mesh_model *mod;
-+			uint32_t m = mod_id;
-+
-+			/* Skip internally implemented models */
-+			if (m == CONFIG_SRV_MODEL)
-+				continue;
-+
-+			mod = l_queue_find(ele->models, match_model_id,
-+					L_UINT_TO_PTR(VENDOR_ID_MASK | mod_id));
-+			if (!mod)
-+				return false;
-+			count++;
-+		}
-+	} else {
-+		/* Vendor defined models */
-+		while (l_dbus_message_iter_next_entry(&ids, &vendor_id,
-+								&mod_id)) {
-+			struct mesh_model *mod;
-+
-+			mod = l_queue_find(ele->models, match_model_id,
-+				L_UINT_TO_PTR((vendor_id << 16) | mod_id));
-+			if (!mod)
-+				return false;
-+			count++;
-+		}
-+	}
-+
-+	*num_models = count;
-+	return true;
-+}
-+
-+static void get_models_from_properties(struct node_element *ele,
-+					struct l_dbus_message_iter *property,
-+								bool vendor)
-+{
-+	struct l_dbus_message_iter ids;
-+	uint16_t mod_id, vendor_id;
-+	const char *signature = !vendor ? "aq" : "a(qq)";
-+
-+	if (!ele->models)
-+		ele->models = l_queue_new();
-+
-+	if (!l_dbus_message_iter_get_variant(property, signature, &ids))
-+		return;
-+
-+	/* Bluetooth SIG defined models */
-+	if (!vendor) {
-+		while (l_dbus_message_iter_next_entry(&ids, &mod_id)) {
-+			struct mesh_model *mod;
-+			uint32_t m = mod_id;
-+
-+			/* Skip internally implemented models */
-+			if (m == CONFIG_SRV_MODEL)
-+				continue;
-+
-+			mod = mesh_model_new(ele->idx, mod_id);
-+			l_queue_push_tail(ele->models, mod);
-+		}
-+		return;
-+	}
-+
-+	/* Vendor defined models */
-+	while (l_dbus_message_iter_next_entry(&ids, &vendor_id, &mod_id)) {
-+		struct mesh_model *mod;
-+
-+		mod = mesh_model_vendor_new(ele->idx, vendor_id, mod_id);
-+		l_queue_push_tail(ele->models, mod);
-+	}
-+}
-+
-+static bool get_element_properties(struct mesh_node *node, const char *path,
-+					struct l_dbus_message_iter *properties,
-+								bool create_new)
- {
--	uint8_t ele_idx;
- 	struct node_element *ele;
- 	const char *key;
--	struct l_dbus_message_iter variant;
-+	struct l_dbus_message_iter var;
- 	bool have_index = false;
-+	uint8_t idx, mod_cnt, vendor_cnt;
+ /* HCI_IBS transmit side sleep protocol states */
+ enum tx_ibs_states {
+ 	HCI_IBS_TX_ASLEEP,
+@@ -792,7 +793,7 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ 	/* Don't go to sleep in middle of patch download or
+ 	 * Out-Of-Band(GPIOs control) sleep is selected.
+ 	 */
+-	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
++	if (!test_bit(QCA_IBS_ENABLED, &qca->flags)) {
+ 		skb_queue_tail(&qca->txq, skb);
+ 		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+ 		return 0;
+@@ -1202,7 +1203,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		return ret;
  
- 	l_debug("path %s", path);
+ 	/* Patch downloading has to be done without IBS mode */
+-	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++	clear_bit(QCA_IBS_ENABLED, &qca->flags);
  
--	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
-+	while (l_dbus_message_iter_next_entry(properties, &key, &var)) {
- 		if (!strcmp(key, "Index")) {
-+			if (!l_dbus_message_iter_get_variant(&var, "y", &idx))
-+				return false;
- 			have_index = true;
- 			break;
- 		}
-@@ -1053,20 +1156,66 @@ static bool validate_element_properties(struct mesh_node *node,
- 		return false;
- 	}
- 
--	if (!l_dbus_message_iter_get_variant(&variant, "y", &ele_idx))
--		return false;
-+	if (!create_new) {
-+		/* Validate composition: check the element index */
-+		ele = l_queue_find(node->elements, match_element_idx,
-+							L_UINT_TO_PTR(idx));
-+		if (!ele) {
-+			l_debug("Element with index %u not found", idx);
-+			return false;
-+		}
-+	} else {
-+		ele = l_new(struct node_element, 1);
-+		ele->location = DEFAULT_LOCATION;
-+		ele->idx = idx;
-+	}
- 
--	ele = l_queue_find(node->elements, match_element_idx,
--							L_UINT_TO_PTR(ele_idx));
-+	mod_cnt = 0;
-+	vendor_cnt = 0;
- 
--	if (!ele) {
--		l_debug("Element with index %u not found", ele_idx);
--		return false;
-+	while (l_dbus_message_iter_next_entry(properties, &key, &var)) {
-+		if (!strcmp(key, "Location")) {
-+			uint8_t loc;
-+
-+			l_dbus_message_iter_get_variant(&var, "q", &loc);
-+
-+			/* Validate composition: location match */
-+			if (!create_new && (ele->location != loc))
-+				return false;
-+
-+			ele->location = loc;
-+
-+		} else if (!strcmp(key, "Models")) {
-+
-+			if (create_new)
-+				get_models_from_properties(ele, &var, false);
-+			else if (!validate_model_property(ele, &var, &mod_cnt,
-+									false))
-+				return false;
-+
-+		} else if (!strcmp(key, "VendorModels")) {
-+
-+			if (create_new)
-+				get_models_from_properties(ele, &var, true);
-+			else if (!validate_model_property(ele, &var,
-+							&vendor_cnt, true))
-+				return false;
-+		}
- 	}
- 
--	/* TODO: validate models */
-+	if (create_new) {
-+		l_queue_push_tail(node->elements, ele);
-+	} else {
-+		/* Account for internal Configuration Server model */
-+		if (idx == 0)
-+			mod_cnt += 1;
- 
--	ele->path = l_strdup(path);
-+		/* Validate composition: number of models must match */
-+		if (l_queue_length(ele->models) != (mod_cnt + vendor_cnt))
-+			return false;
-+
-+		ele->path = l_strdup(path);
-+	}
- 
- 	return true;
- }
-@@ -1101,8 +1250,8 @@ static void get_managed_objects_attach_cb(struct l_dbus_message *msg,
- 			if (strcmp(MESH_ELEMENT_INTERFACE, interface))
- 				continue;
- 
--			if (!validate_element_properties(node, path,
--								&properties))
-+			if (!get_element_properties(node, path, &properties,
-+									false))
- 				goto fail;
- 
- 			num_ele++;
-@@ -1173,90 +1322,6 @@ int node_attach(const char *app_path, const char *sender, uint64_t token,
- 
- }
- 
--static void add_model_from_properties(struct node_element *ele,
--					struct l_dbus_message_iter *property)
--{
--	struct l_dbus_message_iter ids;
--	uint16_t model_id;
--	int i = 0;
--
--	if (!ele->models)
--		ele->models = l_queue_new();
--
--	if (!l_dbus_message_iter_get_variant(property, "aq", &ids))
--		return;
--
--	while (l_dbus_message_iter_next_entry(&ids, &model_id)) {
--		struct mesh_model *mod;
--		l_debug("model_id %4.4x", model_id);
--		mod = mesh_model_new(ele->idx, model_id);
--		l_queue_push_tail(ele->models, mod);
--		i++;
--		if (i > 3)
--			break;
--	}
--}
--
--static void add_vendor_model_from_properties(struct node_element *ele,
--					struct l_dbus_message_iter *property)
--{
--	struct l_dbus_message_iter ids;
--	uint16_t v;
--	uint16_t m;
--
--	if (!ele->models)
--		ele->models = l_queue_new();
--
--	if (!l_dbus_message_iter_get_variant(property, "a(qq)", &ids))
--		return;
--
--	while (l_dbus_message_iter_next_entry(&ids, &v, &m)) {
--		struct mesh_model *mod;
--
--		mod = mesh_model_vendor_new(ele->idx, v, m);
--		l_queue_push_tail(ele->models, mod);
--	}
--}
--
--static bool get_element_properties(struct mesh_node *node, const char *path,
--					struct l_dbus_message_iter *properties)
--{
--	struct node_element *ele;
--	const char *key;
--	struct l_dbus_message_iter variant;
--	bool have_index = false;
--
--	l_debug("path %s", path);
--
--	ele = l_new(struct node_element, 1);
--	ele->location = DEFAULT_LOCATION;
--
--	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
--		if (!strcmp(key, "Index")) {
--			if (!l_dbus_message_iter_get_variant(&variant, "y",
--								&ele->idx))
--				return false;
--			have_index = true;
--		} else if (!strcmp(key, "Location")) {
--			l_dbus_message_iter_get_variant(&variant, "q",
--								&ele->location);
--		} else if (!strcmp(key, "Models")) {
--			add_model_from_properties(ele, &variant);
--		} else if (!strcmp(key, "VendorModels")) {
--			add_vendor_model_from_properties(ele, &variant);
--		}
--	}
--
--	if (!have_index) {
--		l_debug("Mandatory property \"Index\" not found");
--		return false;
--	}
--
--	l_queue_push_tail(node->elements, ele);
--
--	return true;
--}
--
- static bool get_app_properties(struct mesh_node *node, const char *path,
- 					struct l_dbus_message_iter *properties)
- {
-@@ -1418,7 +1483,7 @@ static void get_managed_objects_join_cb(struct l_dbus_message *msg,
- 
- 			if (!strcmp(MESH_ELEMENT_INTERFACE, interface)) {
- 				res = get_element_properties(node, path,
--								&properties);
-+							&properties, true);
- 				if (!res)
- 					goto fail;
+ 	if (qca_is_wcn399x(soc_type)) {
+ 		bt_dev_info(hdev, "setting up wcn3990");
+@@ -1246,7 +1247,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	/* Setup patch / NVM configurations */
+ 	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
+ 	if (!ret) {
+-		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++		set_bit(QCA_IBS_ENABLED, &qca->flags);
+ 		qca_debugfs_init(hdev);
+ 	} else if (ret == -ENOENT) {
+ 		/* No patch/nvm-config found, run with original fw/config */
+@@ -1315,7 +1316,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	 * data in skb's.
+ 	 */
+ 	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+-	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++	clear_bit(QCA_IBS_ENABLED, &qca->flags);
+ 	qca_flush(hu);
+ 	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
  
 -- 
-2.17.2
+2.21.0.593.g511ec345e18-goog
 
