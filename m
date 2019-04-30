@@ -2,90 +2,143 @@ Return-Path: <SRS0=EsMn=TA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB97C43219
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 15:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9825C43219
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 15:38:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62F1821734
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 15:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AB5320652
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 15:38:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="cOkggsWs"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="C4rmJC+X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726915AbfD3PIT (ORCPT
+        id S1726203AbfD3PiO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Apr 2019 11:08:19 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.217]:14865 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726050AbfD3PIS (ORCPT
+        Tue, 30 Apr 2019 11:38:14 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:39969 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726028AbfD3PiN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Apr 2019 11:08:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1556636896;
-        s=strato-dkim-0002; d=gerhold.net;
-        h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=rfOSW7kFy1K4hs8GGHboqP2vTbwLIlmzqd+wayFLZZQ=;
-        b=cOkggsWsCaCBx06Zw037bpzmUUUzGUvNt9s1JapLRCSmAXf/CtACEbW56tJVEV5BOW
-        PHjd0ECyJxssIAju2AQjZMJylh0A4pAWkcFQdCLseHUvdnBehWpf18bhi3xxeCHU/AGH
-        WAK8rhLqiemGQvSwi2buXmgYD7pzymdCYoXde+tkD9xI4ADvczT/riIkIeN0DAztxzkT
-        N/NoWSPXQLAzTWacS6N6TKC/ziCBwewpfu12gOrqzgYX76SUzZueBBp1TIH1hskEDAA6
-        wNAMO+PUu7WbHFx2cYxHjaDyHCkE0JXxWX8RFLBUVwFTeCMLMZVD86H8u3ayvUHD5uEA
-        SiCA==
-X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVOQ/OcYgojyw4j34+u266EZF6ORJL3vVgtqsm"
-X-RZG-CLASS-ID: mo00
-Received: from gerhold.net
-        by smtp.strato.de (RZmta 44.18 AUTH)
-        with ESMTPSA id 50b061v3UF59XmP
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Tue, 30 Apr 2019 17:05:09 +0200 (CEST)
-Date:   Tue, 30 Apr 2019 17:04:56 +0200
-From:   Stephan Gerhold <stephan@gerhold.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: btbcm: Add default address for BCM2076B1
-Message-ID: <20190430150456.GA50466@gerhold.net>
-References: <20190305130901.56660-1-stephan@gerhold.net>
- <20190305130901.56660-2-stephan@gerhold.net>
+        Tue, 30 Apr 2019 11:38:13 -0400
+Received: by mail-pf1-f196.google.com with SMTP id u17so3278630pfn.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2019 08:38:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=wPaz7sqrWKUrAtzAW5vMHcrXvc4YTXq+0idwbiux/gM=;
+        b=C4rmJC+XSY4dbiYlCJ9sE0hN+VEOgE8eclZCOX5S/it0Lxv0FKZ+0ZwUHzFvGPITPM
+         ALgP1FKitRss2z9qwuanmIaLFveIosysjk1wk/Rfo0ZJ0+M95gHnLyKTsnvwSB7/kpDO
+         U+FU8nkAPAPjjNHAgyiNmlx2uYi9lG/daXEFI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=wPaz7sqrWKUrAtzAW5vMHcrXvc4YTXq+0idwbiux/gM=;
+        b=pf8eF+XonvSgVcDXz6ttbVW2KbEoIapcSwrRwXJLw3OmY3oaEmh7bKgSXJ9195nGo6
+         2RxLFEaGWc14Dwx27DDfuTxYaZNrfq1o7CbLTCsfFOvrkcxzxNAd29fN0Q4RHZEPjR/u
+         nnVipCLfm6Q91aJ9BVJNgAgz8gft5hxz9kk+SMaaD+g6Wa5IWuFLxIDOaq92Yk9UZRiK
+         5ZcgYAdQaNCL64kIbtTxRDHZa+qYHoRc3gWuBzOzI92sE+yetlKRWGMXDFlLC8H8kPOy
+         y+idQl1RP2Ttu8TFWpAXqr02Lfk2WapP1qF9lV7s+KQkz5GYJTYrOjRwvw7RCYNPfy+S
+         0wew==
+X-Gm-Message-State: APjAAAWJzndBIujkRfcaF88iMnUknpYGS1GX7CkjP85wY+eWS6icBzkC
+        G6PQcjhzcwApqt+YkwxXHHPOqg==
+X-Google-Smtp-Source: APXvYqzo8CUIafc4ViWksQdqXju1j8i5Z4JiKxGkUqzM/8ztPOvg4GMF59dfYlIKdYxG321+3bvr0w==
+X-Received: by 2002:a62:27c2:: with SMTP id n185mr23839241pfn.51.1556638693191;
+        Tue, 30 Apr 2019 08:38:13 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id z16sm4572022pfa.42.2019.04.30.08.38.12
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 30 Apr 2019 08:38:12 -0700 (PDT)
+Date:   Tue, 30 Apr 2019 08:38:11 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     kbuild test robot <lkp@intel.com>
+Cc:     kbuild-all@01.org, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: Re: [PATCH v8] Bluetooth: btqca: inject command complete event
+ during fw download
+Message-ID: <20190430153811.GK112750@google.com>
+References: <20190430001024.209688-1-mka@chromium.org>
+ <201904301409.dhHyM2xm%lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190305130901.56660-2-stephan@gerhold.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <201904301409.dhHyM2xm%lkp@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel, Hi Johan,
-
-On Tue, Mar 05, 2019 at 02:09:01PM +0100, Stephan Gerhold wrote:
-> BCM2076B1 appears to use 20:76:A0:00:56:79 as default address.
-> This address is used by at least 5 devices with the AMPAK AP6476
-> module and is also suspicious because it starts with the chip name
-> 2076 (followed by a different revision A0 for some reason).
+On Tue, Apr 30, 2019 at 02:27:33PM +0800, kbuild test robot wrote:
+> Hi Matthias,
 > 
-> Add it to the list of default addresses and leave it up to the
-> user to configure a valid one.
+> Thank you for the patch! Yet something to improve:
 > 
-> Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
-> ---
->  drivers/bluetooth/btbcm.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> [auto build test ERROR on bluetooth-next/master]
+> [also build test ERROR on next-20190429]
+> [cannot apply to v5.1-rc7]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 > 
+> url:    https://github.com/0day-ci/linux/commits/Matthias-Kaehlcke/Bluetooth-btqca-inject-command-complete-event-during-fw-download/20190430-125407
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+> config: xtensa-allyesconfig (attached as .config)
+> compiler: xtensa-linux-gcc (GCC) 8.1.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=8.1.0 make.cross ARCH=xtensa 
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    drivers/bluetooth/btqca.c: In function 'qca_inject_cmd_complete_event':
+> >> drivers/bluetooth/btqca.c:286:18: error: 'QCA_HCI_CC_SUCCESS' undeclared (first use in this function); did you mean 'QCA_HCI_CC_OPCODE'?
+>      skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+>                      ^~~~~~~~~~~~~~~~~~
+>                      QCA_HCI_CC_OPCODE
+>    drivers/bluetooth/btqca.c:286:18: note: each undeclared identifier is reported only once for each function it appears in
+> 
+> vim +286 drivers/bluetooth/btqca.c
+> 
+>    267	
+>    268	static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+>    269	{
+>    270		struct hci_event_hdr *hdr;
+>    271		struct hci_ev_cmd_complete *evt;
+>    272		struct sk_buff *skb;
+>    273	
+>    274		skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
+>    275		if (!skb)
+>    276			return -ENOMEM;
+>    277	
+>    278		hdr = skb_put(skb, sizeof(*hdr));
+>    279		hdr->evt = HCI_EV_CMD_COMPLETE;
+>    280		hdr->plen = sizeof(*evt) + 1;
+>    281	
+>    282		evt = skb_put(skb, sizeof(*evt));
+>    283		evt->ncmd = 1;
+>    284		evt->opcode = HCI_OP_NOP;
+>    285	
+>  > 286		skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
 
-As far as I can tell, you have applied the first patch of this series,
-but forgot about this one. :)
+Oh, I changed it in my tree, but somehow missed to include this file
+in the commit ...
 
-It does not apply as-is anymore since you applied the patch from
-Ferry Toth first, but it still applies cleanly with with 
-"git am --3way".
+I'll fix it in the next version. Since I expect the change to remain
+controversial I'll wait a bit for other comments before sending out
+v9.
 
-Is that fine for you or should I re-send it on top of latest
-bluetooth-next?
+Thanks
 
-Thanks,
-Stephan
+Matthias
