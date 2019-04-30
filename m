@@ -2,102 +2,109 @@ Return-Path: <SRS0=EsMn=TA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26498C43219
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 10:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1906BC43219
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 10:30:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E27E221734
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 10:27:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB43D2080C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 10:30:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlrY/Cdi"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="a8aw8xTV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbfD3K1A (ORCPT
+        id S1726436AbfD3KaJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Apr 2019 06:27:00 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38301 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726129AbfD3K1A (ORCPT
+        Tue, 30 Apr 2019 06:30:09 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:46134 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726129AbfD3KaJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Apr 2019 06:27:00 -0400
-Received: by mail-wr1-f66.google.com with SMTP id k16so20383297wrn.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2019 03:26:59 -0700 (PDT)
+        Tue, 30 Apr 2019 06:30:09 -0400
+Received: by mail-lj1-f193.google.com with SMTP id h21so12224148ljk.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2019 03:30:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=mUWyVObWu+Z8SB6h1iZyBU31qHTWfOI9jy2T9pt47fE=;
-        b=AlrY/CdiLxP2iY49KVdEYs1PystkPKBEm3dkghHL7YjVgDDYpmkXxRkYiD9oiePaTt
-         vBWerT3vMr9a+7MWhcDpMobGr9GHUt0NBC4jQKiSptF85I3CGo4xkucjgcv5l/M5MV0x
-         6+p+JDRX7iMCwfcZgJzGB42UR1+yqri1bulOvZoT9E/uQillNDkMkhHtEuUP5FZSwiYs
-         1yn0yZs5yk9+XIrpGpfLEdQykpym7GjzjPoNAtif3QFZSZQXgXT6S1rfO+1JCDAuQMOc
-         YTiCjduWJEpJqbhfYKX++e3O9nr3C+0MKz/EYVpIERPsalCXZRs+em9jSBmtCvrP4Pxh
-         TtpQ==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QvDfH04UqCTz4k85+OXxY0UiEq9xfrn3D1VbDTW93vI=;
+        b=a8aw8xTVwnt5dJZo8dC9En5w/GfqrEYKytdlo3vWbXS+y6aepuUgl2ernAsqaFCbdV
+         jvZtiWRjhWK5rng7c26M6qQbKc4Ze8AMErTCdQIqDuPv7xtvJ3kKGFB1UWUGjFxyRdJY
+         F1S2UbBap3DaHDzG1jm0JrYtV36IlbUYmIQXvIi/hFPj3PUcpbwCxERMnKJUnpihkWp3
+         ZjZ7TDuD13i7oZhsDV19sF06NyZOMp2THrAWktooVk4e9EX+ScScqgQzKm1vb8FG4Xuq
+         MbyhQNgn/D0adQcMVPr9DbU8ID/Bz75+fKPuudhKwAGwx12PitcW91m1rXhbny157CX8
+         sswA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=mUWyVObWu+Z8SB6h1iZyBU31qHTWfOI9jy2T9pt47fE=;
-        b=p9wwlD32VwGBZp1TqzofwkQYKnXUDBqlNZ+mhBsmIWW5NJpNSe8YHGE/BxDO3zATS+
-         lgR9ste+YLIMO4S2nQtetuKo1tOxpS+Mrh7vwGadTyP9hdLrUPxGFhm1hpcB4HW98Vhz
-         ahJM1YpXPf6GvDQNJRTcEvAtj6km6rACb8xq4xipXKNoc4TD7VmDLdbH1S9A7jVt7fUu
-         zDjkno0dKLidGPaNFeXnL2FaN0W41ST7OYlrNw8cw5sORxs9dJyZ3C6SZz9a3/ps0G0i
-         QaAeqmXJ+MK5CccHy2GZv1/gBDTUx5f+E+Ip/aXBJuaHfCAMSZElUsWn3Qvrknb5/D3B
-         vaOg==
-X-Gm-Message-State: APjAAAWPKVjBMJezckh7f6rfFdrXFmZLPWF5sJ8azAZ/XIGfBwyEV7XR
-        e/GvakfaEF/o8AFBjQFRmfwhGP8g
-X-Google-Smtp-Source: APXvYqwe0KJtOBTETWAySJ5ukA3AH9emeV58OpeYJTakLeeQFraMTEYSQWZZ7fJc3fJQG51CKqPsig==
-X-Received: by 2002:a5d:4308:: with SMTP id h8mr33434805wrq.22.1556620018825;
-        Tue, 30 Apr 2019 03:26:58 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id q3sm4672498wrc.45.2019.04.30.03.26.58
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 30 Apr 2019 03:26:58 -0700 (PDT)
-Date:   Tue, 30 Apr 2019 12:26:57 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Sebastian Reichel <sre@kernel.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] a2dp: Fix not calling SelectConfiguration on
- other available endpoints
-Message-ID: <20190430102657.biqv6icyqww7jf5y@pali>
-References: <20190429120259.17880-1-luiz.dentz@gmail.com>
- <20190429120259.17880-3-luiz.dentz@gmail.com>
- <CABBYNZK1LRANfR6cwu+xbLsvy4EnB+ZPS78JNK04mJ=pwTGSDw@mail.gmail.com>
- <20190429163916.ngdqk437xbuahl4k@pali>
- <20190430102432.qo6pflsj75ktr34x@earth.universe>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QvDfH04UqCTz4k85+OXxY0UiEq9xfrn3D1VbDTW93vI=;
+        b=YxVB/k4a3a+FdOYogShJhIC5qYNzxmjD2+bbndFqoJzybZQi78GWdRroBbgjSIc3c2
+         cwkqP+2V+JOT5bbqmdeHEEJLtFbQwzNwApaezzGoo1HCLMapdJCtSe0JYecGYIOxrsLz
+         eJKiKE4M6LJ9mWSV1Eg0NpjoyHVYsET2YPrn1yMUncjEEU7D9OAQ62Wk+XPAc3/uCB0V
+         4MZMY5irRoFMIOr1LxjsJVdJaWAsjeQJV8shs20ZtN8oajhf0lEPblgROcRxWYs4RD30
+         eh3zq2y2goYQIIaF41bmXTFgnqQts4JiivX1ZqFWC9hu6B7G7p0JXVOGUIWHsdSvslNY
+         84Qw==
+X-Gm-Message-State: APjAAAVV+fj7yR++0acKI4NF5Kucpch11yNw0WY+6AIwUOdy1s0FfDmf
+        9++4T7K96iC5rNjHLn+ySEVOtMwptso=
+X-Google-Smtp-Source: APXvYqzBnxt9JYb9Fj5E991HumfUNFcEIHDLKi3ScWm096CL+srXVURlvOUrRi8hAx5DyNkMrbJtzA==
+X-Received: by 2002:a2e:88c5:: with SMTP id a5mr13300164ljk.5.1556620207103;
+        Tue, 30 Apr 2019 03:30:07 -0700 (PDT)
+Received: from scytale.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id z2sm3733277lji.77.2019.04.30.03.30.05
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Apr 2019 03:30:06 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [PATCH v2] a2dp: Fixed warn_unused_result warning
+Date:   Tue, 30 Apr 2019 12:30:00 +0200
+Message-Id: <20190430103001.30661-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190430102432.qo6pflsj75ktr34x@earth.universe>
-User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tuesday 30 April 2019 12:24:32 Sebastian Reichel wrote:
-> Hi,
-> 
-> On Mon, Apr 29, 2019 at 06:39:16PM +0200, Pali Rohár wrote:
-> > Btw, for future patches please directly CC them to me as I'm not
-> > subscribed to list and either extracting them from '> ' quotes or
-> > finding them in web archive is quite impractical.
-> 
-> FYI (not against your point, just making your life a bit easier):
-> linux-bluetooth is on lore.kernel.org, which provides an mbox
-> download:
-> 
-> https://lore.kernel.org/linux-bluetooth/20190429120259.17880-1-luiz.dentz@gmail.com/T/#t
+This used to break builds when using maintainer mode via
+./bootstrap-configure:
 
-I have not know about it. I used marc.info, there is "Download RAW":
-https://marc.info/?l=linux-bluetooth&m=155653938929963&w=2
+profiles/audio/a2dp.c:1775:2: error: ignoring return value of
+    ‘asprintf’, declared with attribute warn_unused_result
+    [-Werror=unused-result]
+  asprintf(&sep->path, "%s/sep%d",
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+ profiles/audio/a2dp.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 8f141739c..5f5ad508d 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1772,8 +1772,15 @@ static void register_remote_sep(void *data, void *user_data)
+ 	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
+ 		goto done;
+ 
+-	asprintf(&sep->path, "%s/sep%d", device_get_path(chan->device),
+-							avdtp_get_seid(rsep));
++	if (asprintf(&sep->path, "%s/sep%d",
++				device_get_path(chan->device),
++				avdtp_get_seid(rsep)) < 0) {
++		error("Could not allocate path for remote sep %s/sep%d",
++				device_get_path(chan->device),
++				avdtp_get_seid(rsep));
++		sep->path = NULL;
++		goto done;
++	}
+ 
+ 	if (g_dbus_register_interface(btd_get_dbus_connection(),
+ 				sep->path, MEDIA_ENDPOINT_INTERFACE,
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+2.19.1
+
