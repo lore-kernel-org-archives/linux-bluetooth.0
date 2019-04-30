@@ -2,110 +2,106 @@ Return-Path: <SRS0=EsMn=TA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5A3C43219
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 09:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9871C43219
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 10:24:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9043D2080C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 09:47:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="iYXB6J/V"
+	by mail.kernel.org (Postfix) with ESMTP id 9EB852080C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Apr 2019 10:24:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1556619876;
+	bh=g5xduG0M1i8LmswLyio4BtyWSLQN+yUFyjOdD60a+ko=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=tbY3c4VkxkHshgzYc0/RFUG0ZORpetqcr2NyRInjKKButVjbElKAkkuLsEWqhUOi8
+	 vMpUZ0rV/5k8WaW8hV9UOsnoe+dlszfMtirPVezGBeIwaWB2B4nxvPu61acI4sCmZg
+	 858c6fAb5+GGTfD79o+QRLtGmL4KMc1Loo7cTSlY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726436AbfD3Jrq (ORCPT
+        id S1726736AbfD3KYg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Apr 2019 05:47:46 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:36111 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726012AbfD3Jrp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Apr 2019 05:47:45 -0400
-Received: by mail-lf1-f67.google.com with SMTP id u17so10367430lfi.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Apr 2019 02:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=JjRNJLtUSgoC+0R1X+gJCjM1Wi008HGHt7YHZf4XgkA=;
-        b=iYXB6J/VoFudtx7g9T6jE+6EwQVtbpu4wq/fGjNpskBPuejplTSfUnWPCEaRsyfBC0
-         TSssm+yVCPZgmuEYelwOM2QOvy1lDDVAXqeZmr+lfzhXlqo2csZnNh41Mg4nS2W6/WMF
-         esQWu4W9KxLGXvL3nnvoCC1Uuw9dHl4JfwUx4/c+380HW/MSpDScHvW5q9d4YElRjgfQ
-         mkIGbXiF6qa5Sm8lRLQha/Ib3+onrM850QdVDHomTo2VW/ouh/ygo/iNzsGywnzcJhqX
-         MLOqKBcr3+Ogoy121PZ3H5xSE1aEqHEyPh0vPPkZE492NNNCbF2PYegZ9CT+ZA0KXPY3
-         voxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=JjRNJLtUSgoC+0R1X+gJCjM1Wi008HGHt7YHZf4XgkA=;
-        b=TLXUut9XlkOj7dN9nXQ4c7XNj/zf+GZ2N5VRTP83nnrzHDSYBcc5IhXKTN6pek3eOP
-         2NVJIcOoaI1hDg5DWq6CnWI/sA7ODJZxpnaWOlTcsBm9qkF7bAWtign2iKfNsPEQj+2T
-         LrD4q8vJVhW+CsryLk4yjismDcWfFHkuCAt6sYWR9gr76i1ORMc7tlEOC78JrR78y3yh
-         /9Jf4b4axswjrLFkhE+O85ZycHAg+qgSqTDvMynmJOX3OAFFUX3va9ZEj4MGbrpa/OUh
-         ulD6NPAMC9geruS+zxHAatytO0z6uIbsrmDEU3XfHEGygDlYlNy79b7hN10/F+uaThiw
-         8MbA==
-X-Gm-Message-State: APjAAAXXkg5GcT7/uHdlqtKvt/cqSL/7jZ8moK3kHK2tOM0XbX0ftIdZ
-        6pYqb8BZtmtyIEOpz+shsoFDDoFmVE8cZrXHXrQ70w==
-X-Google-Smtp-Source: APXvYqyITLnmQJ+7Hzal6w1MfsjxAxO4ZSI9zUpgM5sr4oQ5VDIpVeIJf/bcme89ZmAawfOp6MiY84RDIcltg3zg1Bc=
-X-Received: by 2002:ac2:4943:: with SMTP id o3mr4577935lfi.61.1556617663486;
- Tue, 30 Apr 2019 02:47:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190430094446.26135-1-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190430094446.26135-1-michal.lowas-rzechonek@silvair.com>
-From:   "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Date:   Tue, 30 Apr 2019 12:47:31 +0300
-Message-ID: <CACumGO+O22aUhb8J-R5pf=hzG8Two-3KzC62+A9Sfg9D0oY8OA@mail.gmail.com>
-Subject: Re: [PATCH] a2dp: Fixed warn_unused_result warning
-To:     =?UTF-8?Q?Micha=C5=82_Lowas=2DRzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
+        Tue, 30 Apr 2019 06:24:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40228 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726129AbfD3KYg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Apr 2019 06:24:36 -0400
+Received: from earth.universe (dyndsl-037-138-093-097.ewe-ip-backbone.de [37.138.93.97])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1115F2080C;
+        Tue, 30 Apr 2019 10:24:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1556619875;
+        bh=g5xduG0M1i8LmswLyio4BtyWSLQN+yUFyjOdD60a+ko=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=uWROAV1A6/jHZerIIAaTvzxs+/vmVpHA80/CujN+0ypzxV7uJoKCLgc76n7Zwa+0i
+         PrKfxmWlWRHgv3JbS/o9qHQn44ErNcrsiwYvR1rKbZM6aAmtXCJHymifBfv5tcQYgV
+         NCfWJUwgQr7nRPB6DXtug/A6sbYy/NPwoltdqZFE=
+Received: by earth.universe (Postfix, from userid 1000)
+        id B9B653C0866; Tue, 30 Apr 2019 12:24:32 +0200 (CEST)
+Date:   Tue, 30 Apr 2019 12:24:32 +0200
+From:   Sebastian Reichel <sre@kernel.org>
+To:     Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v3 3/3] a2dp: Fix not calling SelectConfiguration on
+ other available endpoints
+Message-ID: <20190430102432.qo6pflsj75ktr34x@earth.universe>
+References: <20190429120259.17880-1-luiz.dentz@gmail.com>
+ <20190429120259.17880-3-luiz.dentz@gmail.com>
+ <CABBYNZK1LRANfR6cwu+xbLsvy4EnB+ZPS78JNK04mJ=pwTGSDw@mail.gmail.com>
+ <20190429163916.ngdqk437xbuahl4k@pali>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="xjnt3g6y64ofsdy3"
+Content-Disposition: inline
+In-Reply-To: <20190429163916.ngdqk437xbuahl4k@pali>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Micha=C5=82,
 
-On Tue, Apr 30, 2019 at 12:45 PM Micha=C5=82 Lowas-Rzechonek
-<michal.lowas-rzechonek@silvair.com> wrote:
->
-> This used to break builds when using maintainer mode via
-> ./bootstrap-configure
+--xjnt3g6y64ofsdy3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, could you include the compiler error in the commit message.
+Hi,
 
-> ---
->  profiles/audio/a2dp.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 8f141739c..5f5ad508d 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -1772,8 +1772,15 @@ static void register_remote_sep(void *data, void *=
-user_data)
->         if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
->                 goto done;
->
-> -       asprintf(&sep->path, "%s/sep%d", device_get_path(chan->device),
-> -                                                       avdtp_get_seid(rs=
-ep));
-> +       if (asprintf(&sep->path, "%s/sep%d",
-> +                               device_get_path(chan->device),
-> +                               avdtp_get_seid(rsep)) < 0) {
-> +               error("Could not allocate path for remote sep %s/sep%d",
-> +                               device_get_path(chan->device),
-> +                               avdtp_get_seid(rsep));
-> +               sep->path =3D NULL;
-> +               goto done;
-> +       }
->
->         if (g_dbus_register_interface(btd_get_dbus_connection(),
->                                 sep->path, MEDIA_ENDPOINT_INTERFACE,
-> --
-> 2.19.1
->
+On Mon, Apr 29, 2019 at 06:39:16PM +0200, Pali Roh=E1r wrote:
+> Btw, for future patches please directly CC them to me as I'm not
+> subscribed to list and either extracting them from '> ' quotes or
+> finding them in web archive is quite impractical.
+
+FYI (not against your point, just making your life a bit easier):
+linux-bluetooth is on lore.kernel.org, which provides an mbox
+download:
+
+https://lore.kernel.org/linux-bluetooth/20190429120259.17880-1-luiz.dentz@g=
+mail.com/T/#t
+
+-- Sebastian
+
+--xjnt3g6y64ofsdy3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlzIIl0ACgkQ2O7X88g7
++po0Ug//R4uz37I8OBz9peiVR3DV4euIr2z1vChW+hkG9Iv6T+BPL6Bf9A0EneLl
+rjTZCACoONSYYbo8Xs6GCu1uXSal1qjEVgsjFPG7ZGUsS5pQ7Pkkx0W7JZZdQLI7
+dx1ZAZf1pRgESG41ySAwOS4IIhMKfVVqa3TbmJiXO2TDFagioHwBCrKrhudoCXy+
+8hBh0L+xA3Lq/TVh/fw6ny5LeCoLjdeWy2S8/qcFioGIGBPAxPqCKXOwzckwzWhR
+24zbCxc8BVrXOR3ISMAEvw4efGr7j4sgXGiqZ16Blm+oL+tOJvlQn84naUEo9UmF
+NQ1la6ucdUWES3umAJGenCgtYb4ck/ymF22iCRdeISysFMAxM0ue7u5D/JRnzPXA
+g6J25I/nLgDMTcfwRd+lPEj/Y3geK8jVNIJb20T6n5bvGkDZzLbuI4LXs2pBpiCW
+/VLceZtXQvTSdF8dNs0vUmx6kXTdnEQdtrjJjXDVaXS+ciMFb+p1A68xzXaoeOjZ
+lD1naZNfmMipQqSUvvFQBfMLomHoMfZCxUpJ3qcG0RzX7SEI9rx8rAPQqqCH5aCY
+FnbclWrBfasM+k53Mw/WLxx+2YNI2toS6TfsHhFZq6oE+guhDuEcA9C0hmpug2UT
+qJiQ7F/CPEfYhdj3uzbiodSUmUXZpo6tQX7oHUNAQDGW5uiZDvI=
+=G7xc
+-----END PGP SIGNATURE-----
+
+--xjnt3g6y64ofsdy3--
