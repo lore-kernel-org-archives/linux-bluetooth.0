@@ -2,331 +2,96 @@ Return-Path: <SRS0=qzIG=TC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75725C04AA9
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 May 2019 21:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52844C43219
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 May 2019 21:33:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D87620651
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 May 2019 21:14:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bq0BLqdC"
+	by mail.kernel.org (Postfix) with ESMTP id 24A752081C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 May 2019 21:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726175AbfEBVOw (ORCPT
+        id S1726053AbfEBVdz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 May 2019 17:14:52 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53464 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726150AbfEBVOv (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 May 2019 17:14:51 -0400
-Received: by mail-wm1-f66.google.com with SMTP id q15so4733145wmf.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 May 2019 14:14:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=DxSt98mhdGNKUbvlz8tVaQPKEp/jJkqoM7oXvqmOx48=;
-        b=Bq0BLqdCL4XeNeyi6ZI5hUfivR0kj//bKV+G3kGHVigXaaO1f1UatK5xx4Y2XhrV9T
-         uICH3bhiD4ww5gtIrb20ooKRLaMYheXr4RjsI+0EbiK0AAE+f9dwAd8pm5gO+QPTt9iE
-         hbNC0J0grwxJpQI8+njmO1Ouccm7hliLR2Z5bqu5cvd1PTepYeTlezdXQi9sYY2gle/B
-         NiKZyJabiMEXH7QgQuKrjA/rEnzcIO8DOpb9bnzjkq9iAadHBRiSKVfOY+SZEltJLzr1
-         x1qAgqFWwHMNeogzny27DSU7IBJiVQjtKv8RxlN4GFBozh3kAz2d6LuPXRf0Bm81swCb
-         C5ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=DxSt98mhdGNKUbvlz8tVaQPKEp/jJkqoM7oXvqmOx48=;
-        b=fhx6kDU23zgQmIlDvHFbZDBk/deHbnHxschywqtH7pqruL9NiuEgucdDQ5G4AQIVpW
-         4GLGFeVnoXXobF4Eu7h4yo8P3G5kpQPW5VERfkaZo5C5bRrcfmjiegB73BHuCJEV/lor
-         4higOBG1CcvWv2G8393ZmQdzaDSqEEmgA9wzoXhOOoLtuZGBpHgw4CHctImWSzr8CwMd
-         dJxgYckbICafsGJNe7aiMXKcdikYXRUVzakCLEl0LaSDEjtWMzd8kXIlQOsL+J9jYot2
-         Ta5P6TR9bJM80VAQwL2vYfts1xeV55gDoGlYvOEpRhm3H2VdiTr389CxPtihgwHsWPlq
-         ZCLQ==
-X-Gm-Message-State: APjAAAXn7CJGFopMMbUrJm3D1qt4e1wYuTS/iR7yPZEsbIKw6FBQcMD7
-        0Yax55c9OuwvOcq03X6du38=
-X-Google-Smtp-Source: APXvYqzEhMSxna5FnV7gyFt72ShImSM9CoKf0TcVDnhL1rfeKm40G9kU6+FhBvI3IhXX5UTVBvEXUQ==
-X-Received: by 2002:a1c:7d10:: with SMTP id y16mr3701082wmc.83.1556831689575;
-        Thu, 02 May 2019 14:14:49 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id w15sm536505wrg.43.2019.05.02.14.14.48
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 02 May 2019 14:14:48 -0700 (PDT)
-Date:   Thu, 2 May 2019 23:14:47 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/2] a2dp: Store last used endpoint
-Message-ID: <20190502211447.5xxrrjvxoeiurh3p@pali>
-References: <20190424083921.15679-1-luiz.dentz@gmail.com>
- <CABBYNZLcpo_Dx3X9pmKGeqSNFDLKZAqd==6wL5qcthGiqg-EeA@mail.gmail.com>
- <20190424165721.fs7ylixjscqjmqmb@pali>
+        Thu, 2 May 2019 17:33:55 -0400
+Received: from mga07.intel.com ([134.134.136.100]:1923 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726022AbfEBVdz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 May 2019 17:33:55 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 May 2019 14:33:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,423,1549958400"; 
+   d="scan'208";a="139414343"
+Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
+  by orsmga008.jf.intel.com with ESMTP; 02 May 2019 14:33:54 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
+ ORSMSX109.amr.corp.intel.com ([169.254.11.52]) with mapi id 14.03.0415.000;
+ Thu, 2 May 2019 14:33:54 -0700
+From:   "Stotland, Inga" <inga.stotland@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Gix, Brian" <brian.gix@intel.com>
+Subject: Re: [PATCH] mesh: Use node uuids as storage directory names
+Thread-Topic: [PATCH] mesh: Use node uuids as storage directory names
+Thread-Index: AQHVAOfn6Uj6E2dJ502n6ceKparuCKZYmPSAgAAnugCAABBSgA==
+Date:   Thu, 2 May 2019 21:33:54 +0000
+Message-ID: <89be788e4efdd963e39370b0311d8f2a53c2e13c.camel@intel.com>
+References: <20190502130630.13890-1-michal.lowas-rzechonek@silvair.com>
+         <a716514ec5be59e7e177c9a256238e314b4599d9.camel@intel.com>
+         <20190502203526.mfglyyzsoudp6mtw@kynes>
+In-Reply-To: <20190502203526.mfglyyzsoudp6mtw@kynes>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.251.151.94]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7C9773B2CFF056499E5A562FA134D91A@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="s7ojmddsc5vv2btj"
-Content-Disposition: inline
-In-Reply-To: <20190424165721.fs7ylixjscqjmqmb@pali>
-User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-
---s7ojmddsc5vv2btj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wednesday 24 April 2019 18:57:21 Pali Roh=C3=A1r wrote:
-> On Wednesday 24 April 2019 12:42:22 Luiz Augusto von Dentz wrote:
-> > Hi Pali,
-> >=20
-> > On Wed, Apr 24, 2019 at 11:39 AM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > >
-> > > This stores the last used endpoint whenever it is considered open and
-> > > then prefer to use it when attempting to reconnect.
-> > > ---
-> > >  profiles/audio/a2dp.c | 104 ++++++++++++++++++++++++++++++++++++----=
---
-> > >  1 file changed, 91 insertions(+), 13 deletions(-)
-> > >
-> > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> > > index 8f141739c..78b02dc84 100644
-> > > --- a/profiles/audio/a2dp.c
-> > > +++ b/profiles/audio/a2dp.c
-> > > @@ -147,6 +147,7 @@ struct a2dp_channel {
-> > >         unsigned int auth_id;
-> > >         struct avdtp *session;
-> > >         struct queue *seps;
-> > > +       struct a2dp_remote_sep *last_used;
-> > >  };
-> > >
-> > >  static GSList *servers =3D NULL;
-> > > @@ -860,6 +861,60 @@ static gboolean open_ind(struct avdtp *session, =
-struct avdtp_local_sep *sep,
-> > >         return TRUE;
-> > >  }
-> > >
-> > > +static bool match_remote_sep(const void *data, const void *user_data)
-> > > +{
-> > > +       const struct a2dp_remote_sep *sep =3D data;
-> > > +       const struct avdtp_remote_sep *rsep =3D user_data;
-> > > +
-> > > +       return sep->sep =3D=3D rsep;
-> > > +}
-> > > +
-> > > +static void store_last_used(struct a2dp_channel *chan,
-> > > +                                       struct avdtp_remote_sep *rsep)
-> > > +{
-> > > +       GKeyFile *key_file;
-> > > +       char filename[PATH_MAX];
-> > > +       char dst_addr[18];
-> > > +       char value[4];
-> > > +       char *data;
-> > > +       size_t len =3D 0;
-> > > +
-> > > +       ba2str(device_get_address(chan->device), dst_addr);
-> > > +
-> > > +       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-> > > +               btd_adapter_get_storage_dir(device_get_adapter(chan->=
-device)),
-> > > +               dst_addr);
-> > > +       key_file =3D g_key_file_new();
-> > > +       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> > > +
-> > > +       sprintf(value, "%02hhx", avdtp_get_seid(rsep));
-> > > +
-> > > +       g_key_file_set_string(key_file, "Endpoints", "LastUsed", valu=
-e);
-> > > +
-> > > +       data =3D g_key_file_to_data(key_file, &len, NULL);
-> > > +       g_file_set_contents(filename, data, len, NULL);
-> > > +
-> > > +       g_free(data);
-> > > +       g_key_file_free(key_file);
-> > > +}
-> > > +
-> > > +static void update_last_used(struct a2dp_channel *chan,
-> > > +                                               struct avdtp_stream *=
-stream)
-> > > +{
-> > > +       struct avdtp_remote_sep *rsep;
-> > > +       struct a2dp_remote_sep *sep;
-> > > +
-> > > +       rsep =3D avdtp_stream_get_remote_sep(stream);
-> > > +
-> > > +       /* Update last used */
-> > > +       sep =3D queue_find(chan->seps, match_remote_sep, rsep);
-> > > +       if (chan->last_used =3D=3D sep)
-> > > +               return;
-> > > +
-> > > +       chan->last_used =3D sep;
-> > > +       store_last_used(chan, rsep);
-> > > +}
-> > > +
-> > >  static void open_cfm(struct avdtp *session, struct avdtp_local_sep *=
-sep,
-> > >                         struct avdtp_stream *stream, struct avdtp_err=
-or *err,
-> > >                         void *user_data)
-> > > @@ -884,7 +939,8 @@ static void open_cfm(struct avdtp *session, struc=
-t avdtp_local_sep *sep,
-> > >                 setup->err =3D err;
-> > >                 if (setup->start)
-> > >                         finalize_resume(setup);
-> > > -       }
-> > > +       } else if (setup->chan)
-> > > +               update_last_used(setup->chan, stream);
-> > >
-> > >         finalize_config(setup);
-> > >
-> > > @@ -1077,14 +1133,6 @@ static gboolean close_ind(struct avdtp *sessio=
-n, struct avdtp_local_sep *sep,
-> > >         return TRUE;
-> > >  }
-> > >
-> > > -static bool match_remote_sep(const void *data, const void *user_data)
-> > > -{
-> > > -       const struct a2dp_remote_sep *sep =3D data;
-> > > -       const struct avdtp_remote_sep *rsep =3D user_data;
-> > > -
-> > > -       return sep->sep =3D=3D rsep;
-> > > -}
-> > > -
-> > >  static struct a2dp_remote_sep *find_remote_sep(struct a2dp_channel *=
-chan,
-> > >                                                 struct a2dp_sep *sep)
-> > >  {
-> > > @@ -1791,19 +1839,28 @@ done:
-> > >         queue_push_tail(chan->seps, sep);
-> > >  }
-> > >
-> > > +static bool match_seid(const void *data, const void *user_data)
-> > > +{
-> > > +       const struct a2dp_remote_sep *sep =3D data;
-> > > +       const uint8_t *seid =3D user_data;
-> > > +
-> > > +       return avdtp_get_seid(sep->sep) =3D=3D *seid;
-> > > +}
-> > > +
-> > >  static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key=
-_file,
-> > >                                                                 char =
-**seids)
-> > >  {
-> > >         struct avdtp_remote_sep *sep;
-> > > +       uint8_t seid;
-> > > +       char *value;
-> > >
-> > >         if (!seids)
-> > >                 return;
-> > >
-> > >         for (; *seids; seids++) {
-> > > -               uint8_t seid;
-> > >                 uint8_t type;
-> > >                 uint8_t codec;
-> > > -               char *value, caps[256];
-> > > +               char caps[256];
-> > >                 uint8_t data[128];
-> > >                 int i, size;
-> > >                 GSList *l =3D NULL;
-> > > @@ -1847,6 +1904,15 @@ static void load_remote_sep(struct a2dp_channe=
-l *chan, GKeyFile *key_file,
-> > >
-> > >                 register_remote_sep(sep, chan);
-> > >         }
-> > > +
-> > > +       value =3D g_key_file_get_string(key_file, "Endpoints", "LastU=
-sed", NULL);
-> > > +       if (!value)
-> > > +               return;
-> > > +
-> > > +       if (sscanf(value, "%02hhx", &seid) !=3D 1)
-> > > +               return;
-> > > +
-> > > +       chan->last_used =3D queue_find(chan->seps, match_seid, &seid);
-> > >  }
-> > >
-> > >  static void load_remote_seps(struct a2dp_channel *chan)
-> > > @@ -2355,8 +2421,12 @@ done:
-> > >  static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList =
-*list,
-> > >                                         const char *sender)
-> > >  {
-> > > +       struct a2dp_sep *first =3D NULL;
-> > > +       struct a2dp_channel *chan =3D find_channel(session);
-> > > +
-> > >         for (; list; list =3D list->next) {
-> > >                 struct a2dp_sep *sep =3D list->data;
-> > > +               struct avdtp_remote_sep *rsep;
-> > >
-> > >                 /* Use sender's endpoint if available */
-> > >                 if (sender) {
-> > > @@ -2370,14 +2440,22 @@ static struct a2dp_sep *a2dp_find_sep(struct =
-avdtp *session, GSList *list,
-> > >                                 continue;
-> > >                 }
-> > >
-> > > -               if (avdtp_find_remote_sep(session, sep->lsep) =3D=3D =
-NULL)
-> > > +               rsep =3D avdtp_find_remote_sep(session, sep->lsep);
-> > > +               if (!rsep)
-> > >                         continue;
-> > >
-> > > +               /* Locate last used if set */
-> > > +               if (chan->last_used) {
-> > > +                       if (chan->last_used->sep =3D=3D rsep)
-> > > +                               return sep;
-> > > +                       first =3D sep;
-> > > +               }
-> > > +
-> > >                 return sep;
-> > >
-> > >         }
-> > >
-> > > -       return NULL;
-> > > +       return first;
-> > >  }
-> > >
-> > >  static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8=
-_t type,
-> > > --
-> > > 2.20.1
-> >=20
-> > Can you give this a try, it should make the daemon remember what was
-> > the last endpoint used (locally the remote selection we cannot really
-> > control).
->=20
-> Great, I will try it.
-
-Seems that it does not work as expected when there are more SEPs for one
-codec.
-
-Before bluez chose first registered endpoint which matched codec. Now in
-git master is bluez choosing last registered endpoint which matched
-codec. So before it was SBC at highest quality, now it is SBC at lowest
-quality.
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---s7ojmddsc5vv2btj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXMtdxAAKCRCL8Mk9A+RD
-Uj8EAKDL8udqopenwdMEpQpiP9Z53SISYQCgtURk2t8Z+4SsOnYMuJdFEYqqE30=
-=JQq8
------END PGP SIGNATURE-----
-
---s7ojmddsc5vv2btj--
+T24gVGh1LCAyMDE5LTA1LTAyIGF0IDIyOjM1ICswMjAwLCBtaWNoYWwubG93YXMtcnplY2hvbmVr
+QHNpbHZhaXIuY29tDQp3cm90ZToNCj4gSGkgSW5nYSwNCj4gDQo+IE9uIDA1LzAyLCBTdG90bGFu
+ZCwgSW5nYSB3cm90ZToNCj4gRGV2aWNlIFVVSUQgaXMgYXNzb2NpYXRlZCB3aXRoIGEgbWVzaC1i
+YXNlZCBhcHBsaWNhdGlvbiBhbmQsIGFzIHN1Y2gsDQo+IGlzIGltbXV0YWJsZS4NCj4gDQo+IEhv
+d2V2ZXIsIHRoZSBzYW1lIGFwcGxpY2F0aW9uIChvciB3ZSBjYW4gY2FsbCBpdCBkZXZpY2UpIGNh
+biBiZQ0KPiBzaW11bHRhbmVvdXNseSBwcm92aXNpb25lZCBvbiBkaWZmZXJlbnQgbWVzaCBuZXR3
+b3JrcyAoZS5nLiwgaG9tZSBhbmQNCj4gb2ZmaWNlIG5ldHdvcmtzKSwgd2hpY2ggbWVhbnMgdGhh
+dCBpdCBuZWVkcyB0byBiZSByZXByZXNlbnRlZCBhcyBhDQo+IHVuaXF1ZSBtZXNoIG5vZGUgYW5k
+IGl0cyBjb25maWd1cmF0aW9uIGhhcyB0byBiZSBzdG9yZWQgaW4gdW5pcXVlDQo+IGRpc3RpbmN0
+IGxvY2F0aW9uLiAgSGVuY2UgdGhlIG5lZWQgZm9yIGEgdW5pcXVlIG5vZGUgSUQgdGhhdCBpcyBu
+b3QNCj4gYmFzZWQgb24gZGV2aWNlIFVVSUQuDQo+IDMuMTAuMyBzYXlzIHRoYXQ6DQo+IA0KPiAi
+KC4uLikgZWFjaCBub2RlIHNoYWxsIGJlIGFzc2lnbmVkIGEgMTI4LWJpdCBVVUlEIGtub3duIGFz
+IHRoZSBEZXZpY2UNCj4gVVVJRC4gRGV2aWNlIG1hbnVmYWN0dXJlcnMgc2hhbGwgZm9sbG93IHRo
+ZSBzdGFuZGFyZCBVVUlEIGZvcm1hdCBhcw0KPiBkZWZpbmVkIGluIFtSRkM0MTIyXSBhbmQgZ2Vu
+ZXJhdGlvbiBwcm9jZWR1cmUgdG8gZW5zdXJlIHRoZQ0KPiB1bmlxdWVuZXNzDQo+IG9mIGVhY2gg
+RGV2aWNlIFVVSUQiDQo+IA0KPiBTbyBJIHRoaW5rIHRoZSBVVUlEIGlzIGFzc2lnbmVkIHRvICpu
+b2RlcyosIG5vdCAqYXBwbGljYXRpb25zKg0KPiBjb250cm9sbGluZyB0aGVtPyBJIGRvbid0IHRo
+aW5rIGl0J3MgbGVnYWwgdG8gY3JlYXRlIHR3byBkaWZmZXJlbnQNCj4gbm9kZXMgd2l0aCB0aGUg
+c2FtZSBVVUlELg0KPiANCg0KWW91IGFyZSBjb3JyZWN0LCBhIGRldmljZSBVVUlEIGlzIGEgbm9k
+ZSBhdHRyaWJ1dGUsIG5vdCBhcHBsaWNhdGlvbidzLg0KDQpJIGFtIG5vdCBzdXJlIHdoZXRoZXIg
+aXQncyB0cnVseSAiaWxsZWdhbCIgdG8gaGF2ZSBub2RlcyB3aXRoIHRoZSBzYW1lDQpVVUlEcyBm
+cm9tIGEgcmVtb3RlIFByb3Zpc2lvbmVyIHBlcnNwZWN0aXZlIChzaW5jZSBpdCBoYXMgbm8gY29u
+dHJvbA0Kb3Zlcg0KdGhlIFVVSUQgdmFsdWUgaW4gdGhlIHVucG92aXNpb25lZCBkZXZpY2UgYmVh
+Y29uIGFuZCBJIGFtIG5vdCBhd2FyZSBvZg0KYW55DQplcnJvciBjb2RlIHRoYXQgYSBQcm92aXNp
+b25lciBjYW4gc2VuZCBpbmRpY2F0aW5nIGEgbmFtZSBjb2xsaXNpb24pLg0KDQpIb3dldmVyLCBm
+cm9tIGEgbG9jYWwgbm9kZSBub2RlIHBlcnNwZWN0aXZlLCB5b3UgYXJlIGFic29sdXRlbHkNCmNv
+cnJlY3Q6DQpVVUlEcyBzaG91bGQgYmUgdW5pcXVlLg0KDQpTbywgSm9pbigpIG1ldGhvZCB3aWxs
+IGhhdmUgdG8gY2hlY2sgaWYgYSBkaXJlY3RvcnkgbmFtZSB3aXRoIHRoZQ0Kc3VwcGxpZWQNClVV
+SUQgdmFsdWUgYWxyZWFkeSBleGlzdHMgYW5kLCBpZiBzbywgZmFpbCB3aXRoICJBbHJlYWR5RXhp
+c3RzIiBlcnJvci4NClRoZSBtZXNoLWFwaS50eHQgZG9jIHNob3VsZCBiZSB1cGRhdGVkIGFjY29y
+ZGluZ2x5Lg0KDQpBbHNvLCBpZiB0aGUgZGlyZWN0b3J5IG5hbWUgY29udGFpbnMgdGhlIHV1aWQg
+dmFsdWUsIHRoZW4gd2UgcHJvYmFibHkNCmRvbid0DQpuZWVkIHRoZSBkdXBsaWNhdGUgdmFsdWUg
+aW4gdGhlIEpTT04gZmlsZSBzaW5jZSBpdCBjYW4gYmUgZGVyaXZlZCBmcm9tDQp0aGUNCmRpcmVj
+dG9yeSBuYW1lLg0KDQo+IFRvIGNvdmVyIHRoZSB1c2UgY2FzZSB5b3UgbWVudGlvbmVkLCBJIHRo
+aW5rIHRoZSBhcHBsaWNhdGlvbiB3b3VsZA0KPiBuZWVkDQo+IHRvIGtlZXAgdHJhY2sgb2YgdHdv
+IFVVSURzLCBhbmQgQXR0YWNoKCkgaXRzZWxmIHRvIGJvdGggLSB3aGljaCBpcw0KPiBjZXJ0YWlu
+bHkgcG9zc2libGUuDQo+IA0KPiByZWdhcmRzDQo+IA0K
