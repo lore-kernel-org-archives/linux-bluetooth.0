@@ -1,97 +1,233 @@
-Return-Path: <SRS0=qzIG=TC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=8q+o=TD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52844C43219
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 May 2019 21:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E9DC43219
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 06:17:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24A752081C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 May 2019 21:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A04E22081C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 06:17:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9fGzbO9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726053AbfEBVdz (ORCPT
+        id S1726537AbfECGRr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 May 2019 17:33:55 -0400
-Received: from mga07.intel.com ([134.134.136.100]:1923 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726022AbfEBVdz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 May 2019 17:33:55 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 May 2019 14:33:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,423,1549958400"; 
-   d="scan'208";a="139414343"
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by orsmga008.jf.intel.com with ESMTP; 02 May 2019 14:33:54 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
- ORSMSX109.amr.corp.intel.com ([169.254.11.52]) with mapi id 14.03.0415.000;
- Thu, 2 May 2019 14:33:54 -0700
-From:   "Stotland, Inga" <inga.stotland@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Gix, Brian" <brian.gix@intel.com>
-Subject: Re: [PATCH] mesh: Use node uuids as storage directory names
-Thread-Topic: [PATCH] mesh: Use node uuids as storage directory names
-Thread-Index: AQHVAOfn6Uj6E2dJ502n6ceKparuCKZYmPSAgAAnugCAABBSgA==
-Date:   Thu, 2 May 2019 21:33:54 +0000
-Message-ID: <89be788e4efdd963e39370b0311d8f2a53c2e13c.camel@intel.com>
-References: <20190502130630.13890-1-michal.lowas-rzechonek@silvair.com>
-         <a716514ec5be59e7e177c9a256238e314b4599d9.camel@intel.com>
-         <20190502203526.mfglyyzsoudp6mtw@kynes>
-In-Reply-To: <20190502203526.mfglyyzsoudp6mtw@kynes>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.251.151.94]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7C9773B2CFF056499E5A562FA134D91A@intel.com>
-Content-Transfer-Encoding: base64
+        Fri, 3 May 2019 02:17:47 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:54525 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725768AbfECGRq (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 3 May 2019 02:17:46 -0400
+Received: by mail-wm1-f66.google.com with SMTP id b10so5629868wmj.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 May 2019 23:17:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=yUFz1pPuhLmhYPDG80QoNb+aEbDoRhs7gdTEGMj9ocs=;
+        b=d9fGzbO92yiXoXLC9LPzLUVE//tJdaZA31XssAE93LpbtCXw+wI5zKDF7FRtFy8XUs
+         zSnRFcn9kDDfNJgm3Zsaoo1s9C4k3l+b71bC5DE4ou8XX+dM3CqM8g7EqsSf1mHXgjL4
+         3dHruuMYgDCw/NLlvWuyRvnkQE9QeLBsf+LxW/NtRJk/GNiwPlaaYngvs9ri48aqyjwt
+         yrdGmKKZPADSkjzHOaAif9nIt+9Utlpkjo3HGbhsVHz7uhrUHUd5JmhvTmJYp5r50st1
+         tqweIYkd+onXgwims1GPS8+D7v+l+2V8I/skwJ8SgFY5Wgde3O2lihYqF/4p9/hPmCR0
+         M0Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=yUFz1pPuhLmhYPDG80QoNb+aEbDoRhs7gdTEGMj9ocs=;
+        b=g9uDCokgUHkP35NYtCmk41GAaClatmEuB75i3SjdNhL+/aB6y/vwftj9a+ZaTYJGFk
+         dEhkvnMOLniLhljyu9jXh9a5rnZoPsTXV1JyiwpRNJ2aMkODFYWNjcTXUK7mV/yWpcFQ
+         ZBrFXGYZpF/003PG8qG94pGs0VEGY6UJ0fGM7kxe/ZZ3/6MKMOrukWUixMi6AAV8skd3
+         xFNe2zVEbs4934yYM2BghB8gN0efs3BDUU7gf4SL8SQEHswHGdBJuXppyf0lnFNBF9JH
+         0pPzL7FT7TobTF8SSelpne3DqVdQHs9yoIqZjTuocAd0FxedC7V3e1/O+DiOooxSArbC
+         B1FA==
+X-Gm-Message-State: APjAAAVaTV3Vt1GYgZpGTQvwiPRfpoq1jFg1+MmL0bjpaSXr2SytxSC+
+        +7yQ+ZIlgKjxrcwxEf4gmu4bW1CY
+X-Google-Smtp-Source: APXvYqwWMcVBMB087iWeF7Q3BMMrucfEWLnpUHNosW5evliEyMf6BwSreMDZa9COWPsngL4DPgOzaw==
+X-Received: by 2002:a1c:304:: with SMTP id 4mr2676844wmd.39.1556864263554;
+        Thu, 02 May 2019 23:17:43 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id y4sm1079503wmj.20.2019.05.02.23.17.41
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 02 May 2019 23:17:42 -0700 (PDT)
+Date:   Fri, 3 May 2019 08:17:41 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose
+ remote SEP
+Message-ID: <20190503061741.jw4lcyfi2cetrxrt@pali>
+References: <20190122134524.20509-1-luiz.dentz@gmail.com>
+ <CABBYNZLCFpXhbAnVYaA-nVNOY8QRvpR1UZhMHfy-awZxtpSocQ@mail.gmail.com>
+ <20190122175622.dj6riiim6zukpetw@pali>
+ <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="hjmg7yxxfk7bbtt4"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-T24gVGh1LCAyMDE5LTA1LTAyIGF0IDIyOjM1ICswMjAwLCBtaWNoYWwubG93YXMtcnplY2hvbmVr
-QHNpbHZhaXIuY29tDQp3cm90ZToNCj4gSGkgSW5nYSwNCj4gDQo+IE9uIDA1LzAyLCBTdG90bGFu
-ZCwgSW5nYSB3cm90ZToNCj4gRGV2aWNlIFVVSUQgaXMgYXNzb2NpYXRlZCB3aXRoIGEgbWVzaC1i
-YXNlZCBhcHBsaWNhdGlvbiBhbmQsIGFzIHN1Y2gsDQo+IGlzIGltbXV0YWJsZS4NCj4gDQo+IEhv
-d2V2ZXIsIHRoZSBzYW1lIGFwcGxpY2F0aW9uIChvciB3ZSBjYW4gY2FsbCBpdCBkZXZpY2UpIGNh
-biBiZQ0KPiBzaW11bHRhbmVvdXNseSBwcm92aXNpb25lZCBvbiBkaWZmZXJlbnQgbWVzaCBuZXR3
-b3JrcyAoZS5nLiwgaG9tZSBhbmQNCj4gb2ZmaWNlIG5ldHdvcmtzKSwgd2hpY2ggbWVhbnMgdGhh
-dCBpdCBuZWVkcyB0byBiZSByZXByZXNlbnRlZCBhcyBhDQo+IHVuaXF1ZSBtZXNoIG5vZGUgYW5k
-IGl0cyBjb25maWd1cmF0aW9uIGhhcyB0byBiZSBzdG9yZWQgaW4gdW5pcXVlDQo+IGRpc3RpbmN0
-IGxvY2F0aW9uLiAgSGVuY2UgdGhlIG5lZWQgZm9yIGEgdW5pcXVlIG5vZGUgSUQgdGhhdCBpcyBu
-b3QNCj4gYmFzZWQgb24gZGV2aWNlIFVVSUQuDQo+IDMuMTAuMyBzYXlzIHRoYXQ6DQo+IA0KPiAi
-KC4uLikgZWFjaCBub2RlIHNoYWxsIGJlIGFzc2lnbmVkIGEgMTI4LWJpdCBVVUlEIGtub3duIGFz
-IHRoZSBEZXZpY2UNCj4gVVVJRC4gRGV2aWNlIG1hbnVmYWN0dXJlcnMgc2hhbGwgZm9sbG93IHRo
-ZSBzdGFuZGFyZCBVVUlEIGZvcm1hdCBhcw0KPiBkZWZpbmVkIGluIFtSRkM0MTIyXSBhbmQgZ2Vu
-ZXJhdGlvbiBwcm9jZWR1cmUgdG8gZW5zdXJlIHRoZQ0KPiB1bmlxdWVuZXNzDQo+IG9mIGVhY2gg
-RGV2aWNlIFVVSUQiDQo+IA0KPiBTbyBJIHRoaW5rIHRoZSBVVUlEIGlzIGFzc2lnbmVkIHRvICpu
-b2RlcyosIG5vdCAqYXBwbGljYXRpb25zKg0KPiBjb250cm9sbGluZyB0aGVtPyBJIGRvbid0IHRo
-aW5rIGl0J3MgbGVnYWwgdG8gY3JlYXRlIHR3byBkaWZmZXJlbnQNCj4gbm9kZXMgd2l0aCB0aGUg
-c2FtZSBVVUlELg0KPiANCg0KWW91IGFyZSBjb3JyZWN0LCBhIGRldmljZSBVVUlEIGlzIGEgbm9k
-ZSBhdHRyaWJ1dGUsIG5vdCBhcHBsaWNhdGlvbidzLg0KDQpJIGFtIG5vdCBzdXJlIHdoZXRoZXIg
-aXQncyB0cnVseSAiaWxsZWdhbCIgdG8gaGF2ZSBub2RlcyB3aXRoIHRoZSBzYW1lDQpVVUlEcyBm
-cm9tIGEgcmVtb3RlIFByb3Zpc2lvbmVyIHBlcnNwZWN0aXZlIChzaW5jZSBpdCBoYXMgbm8gY29u
-dHJvbA0Kb3Zlcg0KdGhlIFVVSUQgdmFsdWUgaW4gdGhlIHVucG92aXNpb25lZCBkZXZpY2UgYmVh
-Y29uIGFuZCBJIGFtIG5vdCBhd2FyZSBvZg0KYW55DQplcnJvciBjb2RlIHRoYXQgYSBQcm92aXNp
-b25lciBjYW4gc2VuZCBpbmRpY2F0aW5nIGEgbmFtZSBjb2xsaXNpb24pLg0KDQpIb3dldmVyLCBm
-cm9tIGEgbG9jYWwgbm9kZSBub2RlIHBlcnNwZWN0aXZlLCB5b3UgYXJlIGFic29sdXRlbHkNCmNv
-cnJlY3Q6DQpVVUlEcyBzaG91bGQgYmUgdW5pcXVlLg0KDQpTbywgSm9pbigpIG1ldGhvZCB3aWxs
-IGhhdmUgdG8gY2hlY2sgaWYgYSBkaXJlY3RvcnkgbmFtZSB3aXRoIHRoZQ0Kc3VwcGxpZWQNClVV
-SUQgdmFsdWUgYWxyZWFkeSBleGlzdHMgYW5kLCBpZiBzbywgZmFpbCB3aXRoICJBbHJlYWR5RXhp
-c3RzIiBlcnJvci4NClRoZSBtZXNoLWFwaS50eHQgZG9jIHNob3VsZCBiZSB1cGRhdGVkIGFjY29y
-ZGluZ2x5Lg0KDQpBbHNvLCBpZiB0aGUgZGlyZWN0b3J5IG5hbWUgY29udGFpbnMgdGhlIHV1aWQg
-dmFsdWUsIHRoZW4gd2UgcHJvYmFibHkNCmRvbid0DQpuZWVkIHRoZSBkdXBsaWNhdGUgdmFsdWUg
-aW4gdGhlIEpTT04gZmlsZSBzaW5jZSBpdCBjYW4gYmUgZGVyaXZlZCBmcm9tDQp0aGUNCmRpcmVj
-dG9yeSBuYW1lLg0KDQo+IFRvIGNvdmVyIHRoZSB1c2UgY2FzZSB5b3UgbWVudGlvbmVkLCBJIHRo
-aW5rIHRoZSBhcHBsaWNhdGlvbiB3b3VsZA0KPiBuZWVkDQo+IHRvIGtlZXAgdHJhY2sgb2YgdHdv
-IFVVSURzLCBhbmQgQXR0YWNoKCkgaXRzZWxmIHRvIGJvdGggLSB3aGljaCBpcw0KPiBjZXJ0YWlu
-bHkgcG9zc2libGUuDQo+IA0KPiByZWdhcmRzDQo+IA0K
+
+--hjmg7yxxfk7bbtt4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wednesday 23 January 2019 13:24:22 Luiz Augusto von Dentz wrote:
+> Hi Pali,
+> On Tue, Jan 22, 2019 at 7:56 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wr=
+ote:
+> >
+> > On Tuesday 22 January 2019 16:20:12 Luiz Augusto von Dentz wrote:
+> > > Hi Pali,
+> > > On Tue, Jan 22, 2019 at 3:45 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > >
+> > > > This adds the possibility to expose remote SEP using MediaEndpoint
+> > > > interface to allow setting a configuration.
+> > > > ---
+> > > >  doc/media-api.txt | 27 +++++++++++++++++++++++++--
+> > > >  1 file changed, 25 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/doc/media-api.txt b/doc/media-api.txt
+> > > > index b5ad2db12..af9485342 100644
+> > > > --- a/doc/media-api.txt
+> > > > +++ b/doc/media-api.txt
+> > > > @@ -500,14 +500,23 @@ Properties        object Player [readonly]
+> > > >  MediaEndpoint1 hierarchy
+> > > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> > > >
+> > > > -Service                unique name
+> > > > +Service                unique name (Server role)
+> > > > +               org.bluez (Client role)
+> > > >  Interface      org.bluez.MediaEndpoint1
+> > > > -Object path    freely definable
+> > > > +Object path    freely definable (Server role)
+> > > > +               [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_X=
+X_XX/sepX
+> > > > +               (Client role)
+> > > >
+> > > >  Methods                void SetConfiguration(object transport, dic=
+t properties)
+> > > >
+> > > >                         Set configuration for the transport.
+> > > >
+> > > > +                       For client role transport must be set with =
+a server
+> > > > +                       endpoint oject which will be configured and=
+ the
+> > > > +                       properties must contain the following prope=
+rties:
+> > > > +
+> > > > +                               array{byte} Capabilities
+> > > > +
+> > > >                 array{byte} SelectConfiguration(array{byte} capabil=
+ities)
+> > > >
+> > > >                         Select preferable configuration from the su=
+pported
+> > > > @@ -532,6 +541,20 @@ Methods            void SetConfiguration(objec=
+t transport, dict properties)
+> > > >                         endpoint, because when this method gets cal=
+led it has
+> > > >                         already been unregistered.
+> > > >
+> > > > +Properties     string UUID [readonly, optional]:
+> > > > +
+> > > > +                       UUID of the profile which the endpoint is f=
+or.
+> > > > +
+> > > > +               byte Codec [readonly, optional]:
+> > > > +
+> > > > +                       Assigned number of codec that the endpoint =
+implements.
+> > > > +                       The values should match the profile specifi=
+cation which
+> > > > +                       is indicated by the UUID.
+> > > > +
+> > > > +               array{byte} Capabilities [readonly, optional]:
+> > > > +
+> > > > +                       Capabilities blob, it is used as it is so t=
+he size and
+> > > > +                       byte order must match.
+> > > >
+> > > >  MediaTransport1 hierarchy
+> > > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> > > > --
+> > > > 2.17.2
+> > >
+> > > Can you try this set?
+> >
+> > Hi! In V3 you added only "a2dp: Add reverse discovery" patch right?
+> > I tested my setup also with this patch and there is no difference,
+> > pulseaudio is working fine :-)
+> >
+>=20
+> Applied.
+>=20
+
+Now I found another bug. The whole codec switching does not work with
+some Ausdom headset. When pulseaudio try to switch codec profile it just
+get from bluez org.bluez.Error.Failed: Invalid argument DBus error
+message. And in bluez log is just: avdtp_close: Invalid argument
+
+In btmon I'm seeing following output:
+
+< ACL Data TX: Handle 35 flags 0x00 dlen 7              #4093 [hci0] 112.87=
+9357
+      Channel: 2242 len 3 [PSM 0 mode 0] {chan 0}
+        60 09 04                                         `..            =20
+> HCI Event: Number of Completed Packets (0x13) plen 5  #4094 [hci0] 112.87=
+9474
+        Num handles: 1
+        Handle: 35
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5  #4095 [hci0] 112.88=
+3600
+        Num handles: 1
+        Handle: 35
+        Count: 2
+> HCI Event: Number of Completed Packets (0x13) plen 5  #4096 [hci0] 112.88=
+4598
+        Num handles: 1
+        Handle: 35
+        Count: 1
+> ACL Data RX: Handle 35 flags 0x02 dlen 6              #4097 [hci0] 112.90=
+6614
+      Channel: 66 len 2 [PSM 0 mode 0] {chan 0}
+        62 09                                            b.             =20
+=3D bluetoothd: avdtp_close: Invalid argument                          112.=
+908009
+
+Any idea why that avdp_close is failing?
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--hjmg7yxxfk7bbtt4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXMvdAgAKCRCL8Mk9A+RD
+Um7uAJ4o+7Xgxb41GHlynBcMJIKtWxUIJQCeJoGKKc67dWBmBYDiVn8QodcsOIg=
+=vZB0
+-----END PGP SIGNATURE-----
+
+--hjmg7yxxfk7bbtt4--
