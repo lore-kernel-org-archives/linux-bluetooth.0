@@ -2,66 +2,67 @@ Return-Path: <SRS0=8q+o=TD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2372EC43219
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAF75C004C9
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 09:45:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E564F2075C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 09:45:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BA3B2075C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 09:45:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e4ohBhoM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y3Pyjkys"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727350AbfECJpB (ORCPT
+        id S1727341AbfECJpC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 May 2019 05:45:01 -0400
-Received: from mail-lj1-f173.google.com ([209.85.208.173]:45621 "EHLO
-        mail-lj1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726047AbfECJpA (ORCPT
+        Fri, 3 May 2019 05:45:02 -0400
+Received: from mail-lj1-f177.google.com ([209.85.208.177]:40873 "EHLO
+        mail-lj1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727091AbfECJpC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 May 2019 05:45:00 -0400
-Received: by mail-lj1-f173.google.com with SMTP id w12so4651296ljh.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 May 2019 02:44:59 -0700 (PDT)
+        Fri, 3 May 2019 05:45:02 -0400
+Received: by mail-lj1-f177.google.com with SMTP id d15so4685207ljc.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 May 2019 02:45:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=2EQOjhQ2HFe6BUiqvi74ZBwVWlvks5nOvCz0Wil3vdY=;
-        b=e4ohBhoMJm9gMStBmsEbep/Vju43xud7im2CZJ9SlbRzOxxDJTRySeb7jkuFXZ4lG8
-         Tdulhq2GUQSjjZSCxODNiOiWx5ELJ1Ia3FrYdQnjzUqVDoqkRzb+etYq98jnitX/aBE3
-         FBtMAA4rdq2dlV5FvOsQ54Jopy+Mk+zIc2U/Rv8uPDMRIz5fbaCb16jy0I26Gm7KFkcD
-         dW1+gLKl6EXu7ULoUXrFoeDbNOqhFhiQxhzj+fpOf3yoZX/Gf9HE7nFpXw/OUqjLoSIk
-         Z7hZpvZqFSYKUB+O/Vez0a/Tf/JbpB3mEJwzHWpNepDvNMQ+6hfMpomsGYPRncwxwupO
-         LhlA==
+        bh=PKfHLwdp3HTpr4wDPj6GvUhL8qlD/m+3Q24qyqOWALo=;
+        b=Y3Pyjkys0IWiUa2RNNQEtYs2qZKLrYYwon6I+CBCbCqItFctFz8Yxy4xKHuvR7d2Gr
+         cDHzSbaV3P4x93/5fxz5tzsZgA5XvJxXf7pndXQSCdI67WF34gb/kj5nkPG/hgwlCCMm
+         jK/0jQdprnsOOrJ2USMpWgif8Y9dKHVVKmbMlHrk67PAR1GvYA2HHLAFPdZ/8lrmMA2/
+         LRHiwTq3Y5LJzv8WLkeCinaDiAayfjv1tdHliBpNERPXOmBd3FIcT5WhrLfxk7uHZI8D
+         pTFTNx2DERM6+Zw3DgZUjB2MzVAmAbqonCgYgfm2uV986/XpCMWANlPrgJ71hfXG2QtZ
+         ZzSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2EQOjhQ2HFe6BUiqvi74ZBwVWlvks5nOvCz0Wil3vdY=;
-        b=GUSkZtwdzcalELg0ih+kfFKFu48pwqLP8JI1Yn09+iPHI5hLHJ7BiCcKEpd6A1uZKJ
-         PVfCup1SH3hEklme0yEBt/BdMQkl3ADVD2qQ+bsO/QuvTFzw5ziun+bw0gdakqVix2P4
-         2JR8zoGz0l3yzZ23/EjowdDizcUxLzFTnQtZQZyYcLWsRBugRVqBFLdbZuhqkLOwTnmz
-         HiXV1KVTOe59lOnYd8JIyG7z15j+w/DZlKVZo+lSyt2OE2+cHnHvJWW0poHlOXR54NH0
-         AekjyIt8V5iZqb6xPE4Kwdo30a2HnNE4u8cKUpfnlpGNsWVFBLukLd8gvWzw4M0rhoep
-         KKtw==
-X-Gm-Message-State: APjAAAWBADmoinucNQXkUzeQK3wqzbnHgW8iJNwqGDpuvO8abFjJyfeM
-        61uTZo8W3PBLCUVn8bXKj0gP0RzkEMk9iA==
-X-Google-Smtp-Source: APXvYqxDUFmo3Y1yNLCAzJ8k/dCaXcOSOjumw2tOyBkgy5/ptF4CdEu7Nque7DoXEdcqQZ4KZZeziA==
-X-Received: by 2002:a2e:85d2:: with SMTP id h18mr4442984ljj.128.1556876698090;
-        Fri, 03 May 2019 02:44:58 -0700 (PDT)
+        bh=PKfHLwdp3HTpr4wDPj6GvUhL8qlD/m+3Q24qyqOWALo=;
+        b=koiKtilSHM6S8xBFsG05sYJ1iqO9AjyKMP/uVTEGLXxpLh4TPMlNC4UANVk+GtTE1k
+         ktU1NLi0GeY62G9XLlJpbWzhc1ro1s6tTDMWlz9QigHxuvMEJRw5Fi88s6t+QvjWHSyo
+         DQtX873AhklWJUw46sHa5tW1p85SaH08ebm1ZicVBlexV6EH4sHrTM83gALVbY5EoE13
+         /Jxf4er/sY3J2z5ExpBVnqhJLz7q0W5XWijRIbOLd9az9j0ypx1lFRTNBa/oA+u9ahti
+         zy9+n975dBAiX97QKJXDgiwpam4GsvFKk9636e8gA54pZsSESgYmkLFd4fkV2XMGPIW7
+         HwLQ==
+X-Gm-Message-State: APjAAAXgO7N2ZnRWY3gkV4/gWAit6dk/3ngY9HJwIe/enG8HXpn7JlLP
+        ISzJWRetjgOUStQBpFnbj44sxZGAoK9EkQ==
+X-Google-Smtp-Source: APXvYqzeG0/dT2D5oadLOOPCD908nnTBadOhW8QkE7rMUYqlGlcUeKnQVzF7YTj2jDPP2RUx8ODZjA==
+X-Received: by 2002:a2e:6510:: with SMTP id z16mr4484238ljb.185.1556876699432;
+        Fri, 03 May 2019 02:44:59 -0700 (PDT)
 Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
-        by smtp.gmail.com with ESMTPSA id e19sm376455lfd.36.2019.05.03.02.44.56
+        by smtp.gmail.com with ESMTPSA id e19sm376455lfd.36.2019.05.03.02.44.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 03 May 2019 02:44:57 -0700 (PDT)
+        Fri, 03 May 2019 02:44:58 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/4] a2dp: Try aborting when switching endpoints
-Date:   Fri,  3 May 2019 12:44:52 +0300
-Message-Id: <20190503094454.23774-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/4] a2dp: Update last used on open indication
+Date:   Fri,  3 May 2019 12:44:53 +0300
+Message-Id: <20190503094454.23774-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503094454.23774-1-luiz.dentz@gmail.com>
 References: <20190503094454.23774-1-luiz.dentz@gmail.com>
@@ -74,43 +75,85 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If ongoing stream cannot be closed try aborting since the setup may
-still be ongoing.
+This updates the last used endpoint also when receiving an open
+request from the remote end.
 ---
- profiles/audio/a2dp.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ profiles/audio/a2dp.c | 55 +++++++++++++++++++++++--------------------
+ 1 file changed, 29 insertions(+), 26 deletions(-)
 
 diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 74ada3bbe..d0913b1ec 100644
+index d0913b1ec..2ce7c06cb 100644
 --- a/profiles/audio/a2dp.c
 +++ b/profiles/audio/a2dp.c
-@@ -1257,6 +1257,11 @@ static void abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	if (!setup)
- 		return;
- 
-+	if (setup->reconfigure) {
-+		g_timeout_add(RECONFIGURE_TIMEOUT, a2dp_reconfigure, setup);
-+		return;
-+	}
-+
- 	setup_unref(setup);
+@@ -836,32 +836,6 @@ static void getconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 		DBG("Source %p: Set_Configuration_Cfm", sep);
  }
  
-@@ -1642,8 +1647,12 @@ static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
+-static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+-				struct avdtp_stream *stream, uint8_t *err,
+-				void *user_data)
+-{
+-	struct a2dp_sep *a2dp_sep = user_data;
+-	struct a2dp_setup *setup;
+-
+-	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+-		DBG("Sink %p: Open_Ind", sep);
+-	else
+-		DBG("Source %p: Open_Ind", sep);
+-
+-	setup = a2dp_setup_get(session);
+-	if (!setup)
+-		return FALSE;
+-
+-	setup->stream = stream;
+-
+-	if (setup->reconfigure)
+-		setup->reconfigure = FALSE;
+-
+-	finalize_config(setup);
+-
+-	return TRUE;
+-}
+-
+ static bool match_remote_sep(const void *data, const void *user_data)
+ {
+ 	const struct a2dp_remote_sep *sep = data;
+@@ -916,6 +890,35 @@ static void update_last_used(struct a2dp_channel *chan,
+ 	store_last_used(chan, rsep);
+ }
  
- 			err = avdtp_close(chan->session, tmp->stream, FALSE);
- 			if (err < 0) {
--				error("avdtp_close: %s", strerror(-err));
--				goto fail;
-+				err = avdtp_abort(chan->session, tmp->stream);
-+				if (err < 0) {
-+					error("avdtp_abort: %s",
-+							strerror(-err));
-+					goto fail;
-+				}
- 			}
- 
- 			setup->reconfigure = TRUE;
++static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream, uint8_t *err,
++				void *user_data)
++{
++	struct a2dp_sep *a2dp_sep = user_data;
++	struct a2dp_setup *setup;
++
++	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
++		DBG("Sink %p: Open_Ind", sep);
++	else
++		DBG("Source %p: Open_Ind", sep);
++
++	setup = a2dp_setup_get(session);
++	if (!setup)
++		return FALSE;
++
++	setup->stream = stream;
++
++	if (!err && setup->chan)
++		update_last_used(setup->chan, stream);
++
++	if (setup->reconfigure)
++		setup->reconfigure = FALSE;
++
++	finalize_config(setup);
++
++	return TRUE;
++}
++
+ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 			struct avdtp_stream *stream, struct avdtp_error *err,
+ 			void *user_data)
 -- 
 2.20.1
 
