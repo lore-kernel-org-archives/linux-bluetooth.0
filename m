@@ -2,156 +2,95 @@ Return-Path: <SRS0=8q+o=TD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60582C43219
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 07:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5912AC04AAA
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 08:45:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3237020675
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 07:58:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B9DA2089E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 08:45:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="DRWkNWGA";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ap9zuQAH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qpEkDWad"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbfECH40 (ORCPT
+        id S1727353AbfECIpw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 May 2019 03:56:26 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:35232 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725777AbfECH40 (ORCPT
+        Fri, 3 May 2019 04:45:52 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:44086 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727315AbfECIpw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 May 2019 03:56:26 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 4D0A7611FA; Fri,  3 May 2019 07:56:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1556870184;
-        bh=aDusQfMCjBF3dgdzRMthBxZkCv+AeRrwz8Z7d1VTjKo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=DRWkNWGAu7exQ3h4FFMC4HoxLk3WlgQ/prXDPdGrKGq5XEuvhLMmnMIPJ1UONp8JC
-         IdJpXD8luIkdRlg7tK31E6NdUm18rXc2veqcjehjof7wFxNnycWsn374j87pL4PYKx
-         S5ZJI5UEoCvkrtHRpSkMAyzXyE5mlDnEnPQ304r4=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 27FBB61112;
-        Fri,  3 May 2019 07:56:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1556870183;
-        bh=aDusQfMCjBF3dgdzRMthBxZkCv+AeRrwz8Z7d1VTjKo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ap9zuQAHsDHkRvSiCgmkJ2xd96WFTtPhOLcWJKSupjL2AXB/QnOa3Uiscn8bktcLW
-         O97hFHWI9+1QUfaKMxREaqDRACQuVHq+3rgFBBnFdhz14nHSTQ/AhQDpBq1Qa/92Lo
-         lzvQm+MogmNpc7fsLW72XQ3a/D8ky3sau1reA4Zk=
+        Fri, 3 May 2019 04:45:52 -0400
+Received: by mail-lf1-f68.google.com with SMTP id n134so2047974lfn.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 May 2019 01:45:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=sJGE92oE4Jz1YOV4GEYgBupNI6ZSiaKwlyuNmR0DgWE=;
+        b=qpEkDWadIgMacLRn2JNe4hh4txhx7Xu49+nJaTvoxD83LTxKUSAHF19Yui5Uxb77Pl
+         JaVSSkJDjOlP52ih9SxG/7Vj+b7ttoYl9LvsF7Fd6CDlQzywHPoQrOrSD8sNB/+jNBVZ
+         i0BJO7mDLeKNUG2ijAFVS3uw1A7bhMagz559TyJl3kM1ITFPQtNPPw+uDUSAa7Mlsn1q
+         xXfkY4GJJSptuxjHBVeVNmPJIa1mkHE8BYuvgCMVTseG1oDj3gyTDUNSocSbJoZPqsfo
+         q81GRoiz6nDYFYRnLWE5xFg7OoFxmLCQplNaQyZ6e1HYLgX12CIuLhjA1YjiL4NsiohX
+         +wkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=sJGE92oE4Jz1YOV4GEYgBupNI6ZSiaKwlyuNmR0DgWE=;
+        b=J2Ph7083It0koxaXuTtbOHPVyGB10xazq1Wyxwqr5YTASY8Xii3UOd/pGWNjfFDh/C
+         YJsqMTzWylZEuCkin1TRzNHjZeUxNVfwgUPLUTK1sxSRbN6satxCAfv58ClRv2xo9gZ4
+         HVGMRMTEzKEq9U+co9SzWyrt3aH5SJTadOcKu3cqtKZz1LnQStgv/qGo93MJpckbPl5m
+         xi5s7okLUsgHJEcMO4aSLMfNTztYNB+ho0nli6+k6gjUMBZUGGrICCD9YhL/dnzDdZc/
+         eq+hFaivQ6XEwWjGxvIHKECt10PKpKHqWC7m9lhj2hMNv+La0GNkQyVxbpQjkTpNHlWO
+         VhjA==
+X-Gm-Message-State: APjAAAXfJg2n8bc4IR97zfjx4oEDW3kzHLM7ia2bf/BGKEKV1Qr3Eo0r
+        npGhHOakrCT9NXroPPzPOVHoJWCj31DmGQ==
+X-Google-Smtp-Source: APXvYqx0y0skk64X9NIqZDwXul5mMpLSMyA04U2jy5PXGJpHJOVQxb7rQhGOJ+lM9Am3vuqX/fx8kw==
+X-Received: by 2002:ac2:51da:: with SMTP id u26mr4466647lfm.32.1556873149869;
+        Fri, 03 May 2019 01:45:49 -0700 (PDT)
+Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
+        by smtp.gmail.com with ESMTPSA id h26sm311360lfm.11.2019.05.03.01.45.48
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 03 May 2019 01:45:48 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/3] a2dp: Fix crash when endpoint respond with an error
+Date:   Fri,  3 May 2019 11:45:45 +0300
+Message-Id: <20190503084547.15743-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-Date:   Fri, 03 May 2019 15:56:23 +0800
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Thierry Escande <thierry.escande@linaro.org>,
-        netdev <netdev@vger.kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        linux-kernel@vger.kernel.org,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        linux-bluetooth-owner@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device property
- firmware-name for QCA6174
-In-Reply-To: <60C7AC89-37B6-441C-9349-BCB15717EB2C@holtmann.org>
-References: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
- <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
- <A85D7982-E000-4A5F-9927-CA36E0BA60F2@holtmann.org>
- <7e0cf9ba98260309c43d9d6e63dead6c@codeaurora.org>
- <CAL_JsqLnM4XqQTCT7VTUSmukujz0VHJoCbXMF2--RmTEx_LZww@mail.gmail.com>
- <60C7AC89-37B6-441C-9349-BCB15717EB2C@holtmann.org>
-Message-ID: <17221139821fb6ee35f3119df7405401@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 2019-04-27 13:59, Marcel Holtmann wrote:
-> Hi Rob,
-> 
->>>>> This patch adds an optional device property "firmware-name" to 
->>>>> allow
->>>>> the
->>>>> driver to load customized nvm firmware file based on this property.
->>>>> 
->>>>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
->>>>> ---
->>>>> Changes in v3:
->>>>> * added firmware-name instead of nvm-postfix to specify full 
->>>>> firmware
->>>>> name
->>>>> ---
->>>>> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
->>>>> 1 file changed, 2 insertions(+)
->>>>> 
->>>>> diff --git
->>>>> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->>>>> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->>>>> index 824c0e2..2bcea50 100644
->>>>> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->>>>> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->>>>> @@ -16,6 +16,7 @@ Optional properties for compatible string
->>>>> qcom,qca6174-bt:
->>>>> 
->>>>> - enable-gpios: gpio specifier used to enable chip
->>>>> - clocks: clock provided to the controller (SUSCLK_32KHZ)
->>>>> + - firmware-name: specify the name of nvm firmware to load
->>>>> 
->>>>> Required properties for compatible string qcom,wcn3990-bt:
->>>>> 
->>>>> @@ -39,6 +40,7 @@ serial@7570000 {
->>>>> 
->>>>>             enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
->>>>>             clocks = <&divclk4>;
->>>>> +            firmware-name = "nvm_00440302.bin";
->>>>>     };
->>>> 
->>>> and how is this a firmware-name property. Wouldn’t this be more like
->>>> nvm-file or something along these lines. This really needs to be
->>>> cleared with Rob to pick the right property name.
->>>> 
->>>> Regards
->>>> 
->>>> Marcel
->>> 
->>> Hi Rob,
->>> 
->>> Are you OK to use a property name "nvm-file" or "firmware-nvm-file"?
->>> Actually we have two firmware files, one is the patch file which is
->>> common to all of the products, the other is the nvm file which is
->>> customized. Using a "nvm-file" or "firmware-nvm-file" property name
->>> would be more clear.
->> 
->> 'firmware-name' is the standard name for specifying firmware file 
->> names.
-> 
-> but it is not a firmware file, it is a NVM file. What happens if in
-> the future they need a firmware file and a NVM file?
-> 
-> Regards
-> 
-> Marcel
+If endpoint respond with an error the callback will be called with size
+set to -1 not 0.
+---
+ profiles/audio/a2dp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-We won't need to specify a rampatch firmware file in future as it's a 
-same file for all the boards with same chip, only the NVM firmware file 
-may have board differences. NVM file is also one of the firmware files 
-so I think it should be OK to use "firmware-name" property to specify 
-it.
-
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index d0676b577..74ada3bbe 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2418,7 +2418,7 @@ static void select_cb(struct a2dp_setup *setup, void *ret, int size)
+ 	struct avdtp_media_codec_capability *codec;
+ 	int err;
+ 
+-	if (size) {
++	if (size >= 0) {
+ 		caps_add_codec(&setup->caps, setup->sep->codec, ret, size);
+ 		goto done;
+ 	}
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
-Forum,
-a Linux Foundation Collaborative Project
+2.20.1
+
