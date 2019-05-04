@@ -1,78 +1,71 @@
-Return-Path: <SRS0=8q+o=TD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=nVHi=TE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A66C43219
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 10:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82762C43219
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 May 2019 17:16:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 931AC206C3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 May 2019 10:24:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45FB6206DF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 May 2019 17:16:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pi3OmTv9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NA3LXZRi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727078AbfECKYj (ORCPT
+        id S1726905AbfEDRQB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 May 2019 06:24:39 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33852 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbfECKYi (ORCPT
+        Sat, 4 May 2019 13:16:01 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35257 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726320AbfEDRQB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 May 2019 06:24:38 -0400
-Received: by mail-wm1-f66.google.com with SMTP id b67so8521629wmg.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 May 2019 03:24:35 -0700 (PDT)
+        Sat, 4 May 2019 13:16:01 -0400
+Received: by mail-wr1-f68.google.com with SMTP id h15so6046879wrb.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 04 May 2019 10:15:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=fELrRaeq2I+A4B7eNFAwiFHlJbzfWnB5wagetc2ot2A=;
-        b=pi3OmTv9w4oTzPpW/1W6uT0YVs7a9DnOR+t04C3sx6d2EMei5hmHKE6rOxk3cJF4vA
-         WoOGswcomG0cIAQfAIrNcVdOFGZxYhF2tWnXnRBCbNRWM0fTKKlHVj8dcI41QS8NFWS+
-         NUirrXTJAgMyNU+NzGL8tV6TZYb6B1YYSReQcVxFTpNgU1sNmFT++W9gYnTuoztPubFQ
-         yLkP0M9D4pJYYG8OnpYz/s3UJ1jKRId7ypHDTMP3H23tfXItQhTJIXTzp1qb/3Q88WcO
-         d8OLYufEIroyT1sEZnwlYhnTgyFB4ecfJO3gzt3LNH1iPoH/AnRQpGX2nwXZPS+9uGeV
-         BL4Q==
+        h=date:from:to:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=H67xNX2AqTNoWbo8PTMVhFSrmab2VRGkLcplzdy7i6U=;
+        b=NA3LXZRi27JGzC5JWbMWeO1mS9EJfQKVif9/4z3EH9eQqGk+i6m0nU5JWb2YR94yw0
+         0QP9GNKXPd/v+BvSYeBStLK9EI7e4WUoncOqL2yVcU04oZgtQiwblOyib6LkhuxsZ1Ug
+         79uQfildDN66nbO19j7cPbmZo8mpjSq7aXGAeC7qiIpCdimimi4lk3JsjkacyYrhDhJz
+         zql/zugRJMTf2tkA+f/eV31Mb2ZS1TE+6x7xpprobYKKc1yuSKnvcB58cyZFhqIAxRi2
+         GXblOZOp+ZEtdTOl9F8BsVXkIeIO5p5ftHWFNVSSt0DelbgJNnYAvqHOToJNv57lOV+z
+         GA2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=fELrRaeq2I+A4B7eNFAwiFHlJbzfWnB5wagetc2ot2A=;
-        b=cxYYGYMnWncUys/BEDcKEqKnZVLZzyKHrTNhh+WPXC22JiGdiiHmtlJBEO3r6o5hpe
-         o2narmZBxiCxUEWaBYuoZjz39QsjbHYhUneuSD4SzEthdjHaqtZDDZzUXXZm1cJnWvOF
-         2y9THXu6/ckPm5nCWs5PzBxIcEJnsNOqniCZYHJQ/gtjS5an3qeklD7eMtGa7GKQt9H0
-         Caljj1mKYHXj28MUTKt6fQ33bsSNfL1TRjo8BiP7hhs5d9/XGuvhszyTZCSytSiOibRV
-         KZ/4tHMh7YrF2xuptaI+sreY9hJWvkhWYNLdJldsnUhWQMCoToWca3kmh0xVIio07wfv
-         TqAQ==
-X-Gm-Message-State: APjAAAWvTcvIFdwrZ9i/0qODnJWPifi+QyU2jax39020/HdqNr8OqoPZ
-        64em65mCdvYmRhvSq7mE9RA=
-X-Google-Smtp-Source: APXvYqwTHyfv70iQKRvEp/dy0VKGTegKgiYcSg7WzxaGjZStqD+KEKDkq51l0AsyaXCao/A9hqEqDg==
-X-Received: by 2002:a1c:d7:: with SMTP id 206mr6106991wma.69.1556879075170;
-        Fri, 03 May 2019 03:24:35 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=H67xNX2AqTNoWbo8PTMVhFSrmab2VRGkLcplzdy7i6U=;
+        b=hqVqrxRNVtR3pV7Lu9lXtBBhVedLqcAg5EdUYYF0eWylXcZcJj4TFpu/5YAal3IMj6
+         J5Nkv3V9BZFeNLiROxR2HHCFRUPxKpJnoOZ/mtodBw8Sn/mfpC7y+7sCM5dd3trU2ecq
+         NXIqIAVgZClSMQM6yT1x1lf9qIpZXvNAUP1w6ym8PMEgbtzuwTLI8YrCUSvf9Y+5oHPf
+         l4a+pHvM/WmgC25yyBy67iJOkxKnaI5xri5JPX/HEqJMMKWSYxot3yGPKljz/PbOD0Ky
+         RYALzBgf6JE48R3o5AHbBXynX+V7o2tD7yMwGz/2ef4tFD2ET8Vxmiqm3Qdzs+J0Vrt+
+         wgkQ==
+X-Gm-Message-State: APjAAAVrxYrBVoec00ksUvWVcCMGf/uoslpNfYAVkddBllV0/z+zVXqL
+        9EOK6GXVlQGZxYl481CtJaS1XCSrBLc=
+X-Google-Smtp-Source: APXvYqyptHrJjZ2/OXy62RlUnLJmMRlUNIFE2cvJZV6Cm28+2lrNE5tCsAnpEr+1C4Rhc5MagD/geQ==
+X-Received: by 2002:a05:6000:1201:: with SMTP id e1mr12087916wrx.49.1556990158558;
+        Sat, 04 May 2019 10:15:58 -0700 (PDT)
 Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id c63sm1756902wma.29.2019.05.03.03.24.33
+        by smtp.gmail.com with ESMTPSA id b11sm10640281wmh.29.2019.05.04.10.15.57
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 03 May 2019 03:24:34 -0700 (PDT)
-Date:   Fri, 3 May 2019 12:24:33 +0200
+        Sat, 04 May 2019 10:15:57 -0700 (PDT)
+Date:   Sat, 4 May 2019 19:15:50 +0200
 From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/2] a2dp: Store last used endpoint
-Message-ID: <20190503102433.knpny3hak3hchjnw@pali>
-References: <20190424083921.15679-1-luiz.dentz@gmail.com>
- <CABBYNZLcpo_Dx3X9pmKGeqSNFDLKZAqd==6wL5qcthGiqg-EeA@mail.gmail.com>
- <20190424165721.fs7ylixjscqjmqmb@pali>
- <20190503100705.dsb6svexse3mhldd@pali>
- <CABBYNZLXektdnPLxq9uCNKGoS417jwi5C2q4eV0TecP1+naOfA@mail.gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: HCI Set custom bandwidth for AuriStream SCO codec
+Message-ID: <20190504171550.llqfv5674gxd3bnn@pali>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="mgtotarqgtawfrhi"
+        protocol="application/pgp-signature"; boundary="4u4kv4z6rwjwab6y"
 Content-Disposition: inline
-In-Reply-To: <CABBYNZLXektdnPLxq9uCNKGoS417jwi5C2q4eV0TecP1+naOfA@mail.gmail.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -80,295 +73,253 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 
---mgtotarqgtawfrhi
+--4u4kv4z6rwjwab6y
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Friday 03 May 2019 13:18:10 Luiz Augusto von Dentz wrote:
-> Hi Pali,
->=20
-> On Fri, May 3, 2019 at 1:07 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wro=
-te:
-> >
-> > On Wednesday 24 April 2019 18:57:21 Pali Roh=C3=A1r wrote:
-> > > On Wednesday 24 April 2019 12:42:22 Luiz Augusto von Dentz wrote:
-> > > > Hi Pali,
-> > > >
-> > > > On Wed, Apr 24, 2019 at 11:39 AM Luiz Augusto von Dentz
-> > > > <luiz.dentz@gmail.com> wrote:
-> > > > >
-> > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > > >
-> > > > > This stores the last used endpoint whenever it is considered open=
- and
-> > > > > then prefer to use it when attempting to reconnect.
-> > > > > ---
-> > > > >  profiles/audio/a2dp.c | 104 ++++++++++++++++++++++++++++++++++++=
-------
-> > > > >  1 file changed, 91 insertions(+), 13 deletions(-)
-> > > > >
-> > > > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> > > > > index 8f141739c..78b02dc84 100644
-> > > > > --- a/profiles/audio/a2dp.c
-> > > > > +++ b/profiles/audio/a2dp.c
-> > > > > @@ -147,6 +147,7 @@ struct a2dp_channel {
-> > > > >         unsigned int auth_id;
-> > > > >         struct avdtp *session;
-> > > > >         struct queue *seps;
-> > > > > +       struct a2dp_remote_sep *last_used;
-> > > > >  };
-> > > > >
-> > > > >  static GSList *servers =3D NULL;
-> > > > > @@ -860,6 +861,60 @@ static gboolean open_ind(struct avdtp *sessi=
-on, struct avdtp_local_sep *sep,
-> > > > >         return TRUE;
-> > > > >  }
-> > > > >
-> > > > > +static bool match_remote_sep(const void *data, const void *user_=
-data)
-> > > > > +{
-> > > > > +       const struct a2dp_remote_sep *sep =3D data;
-> > > > > +       const struct avdtp_remote_sep *rsep =3D user_data;
-> > > > > +
-> > > > > +       return sep->sep =3D=3D rsep;
-> > > > > +}
-> > > > > +
-> > > > > +static void store_last_used(struct a2dp_channel *chan,
-> > > > > +                                       struct avdtp_remote_sep *=
-rsep)
-> > > > > +{
-> > > > > +       GKeyFile *key_file;
-> > > > > +       char filename[PATH_MAX];
-> > > > > +       char dst_addr[18];
-> > > > > +       char value[4];
-> > > > > +       char *data;
-> > > > > +       size_t len =3D 0;
-> > > > > +
-> > > > > +       ba2str(device_get_address(chan->device), dst_addr);
-> > > > > +
-> > > > > +       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-> > > > > +               btd_adapter_get_storage_dir(device_get_adapter(ch=
-an->device)),
-> > > > > +               dst_addr);
-> > > > > +       key_file =3D g_key_file_new();
-> > > > > +       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> > > > > +
-> > > > > +       sprintf(value, "%02hhx", avdtp_get_seid(rsep));
-> > > > > +
-> > > > > +       g_key_file_set_string(key_file, "Endpoints", "LastUsed", =
-value);
-> > > > > +
-> > > > > +       data =3D g_key_file_to_data(key_file, &len, NULL);
-> > > > > +       g_file_set_contents(filename, data, len, NULL);
-> > > > > +
-> > > > > +       g_free(data);
-> > > > > +       g_key_file_free(key_file);
-> > > > > +}
-> > > > > +
-> > > > > +static void update_last_used(struct a2dp_channel *chan,
-> > > > > +                                               struct avdtp_stre=
-am *stream)
-> > > > > +{
-> > > > > +       struct avdtp_remote_sep *rsep;
-> > > > > +       struct a2dp_remote_sep *sep;
-> > > > > +
-> > > > > +       rsep =3D avdtp_stream_get_remote_sep(stream);
-> > > > > +
-> > > > > +       /* Update last used */
-> > > > > +       sep =3D queue_find(chan->seps, match_remote_sep, rsep);
-> > > > > +       if (chan->last_used =3D=3D sep)
-> > > > > +               return;
-> > > > > +
-> > > > > +       chan->last_used =3D sep;
-> > > > > +       store_last_used(chan, rsep);
-> > > > > +}
-> > > > > +
-> > > > >  static void open_cfm(struct avdtp *session, struct avdtp_local_s=
-ep *sep,
-> > > > >                         struct avdtp_stream *stream, struct avdtp=
-_error *err,
-> > > > >                         void *user_data)
-> > > > > @@ -884,7 +939,8 @@ static void open_cfm(struct avdtp *session, s=
-truct avdtp_local_sep *sep,
-> > > > >                 setup->err =3D err;
-> > > > >                 if (setup->start)
-> > > > >                         finalize_resume(setup);
-> > > > > -       }
-> > > > > +       } else if (setup->chan)
-> > > > > +               update_last_used(setup->chan, stream);
-> > > > >
-> > > > >         finalize_config(setup);
-> > > > >
-> > > > > @@ -1077,14 +1133,6 @@ static gboolean close_ind(struct avdtp *se=
-ssion, struct avdtp_local_sep *sep,
-> > > > >         return TRUE;
-> > > > >  }
-> > > > >
-> > > > > -static bool match_remote_sep(const void *data, const void *user_=
-data)
-> > > > > -{
-> > > > > -       const struct a2dp_remote_sep *sep =3D data;
-> > > > > -       const struct avdtp_remote_sep *rsep =3D user_data;
-> > > > > -
-> > > > > -       return sep->sep =3D=3D rsep;
-> > > > > -}
-> > > > > -
-> > > > >  static struct a2dp_remote_sep *find_remote_sep(struct a2dp_chann=
-el *chan,
-> > > > >                                                 struct a2dp_sep *=
-sep)
-> > > > >  {
-> > > > > @@ -1791,19 +1839,28 @@ done:
-> > > > >         queue_push_tail(chan->seps, sep);
-> > > > >  }
-> > > > >
-> > > > > +static bool match_seid(const void *data, const void *user_data)
-> > > > > +{
-> > > > > +       const struct a2dp_remote_sep *sep =3D data;
-> > > > > +       const uint8_t *seid =3D user_data;
-> > > > > +
-> > > > > +       return avdtp_get_seid(sep->sep) =3D=3D *seid;
-> > > > > +}
-> > > > > +
-> > > > >  static void load_remote_sep(struct a2dp_channel *chan, GKeyFile =
-*key_file,
-> > > > >                                                                 c=
-har **seids)
-> > > > >  {
-> > > > >         struct avdtp_remote_sep *sep;
-> > > > > +       uint8_t seid;
-> > > > > +       char *value;
-> > > > >
-> > > > >         if (!seids)
-> > > > >                 return;
-> > > > >
-> > > > >         for (; *seids; seids++) {
-> > > > > -               uint8_t seid;
-> > > > >                 uint8_t type;
-> > > > >                 uint8_t codec;
-> > > > > -               char *value, caps[256];
-> > > > > +               char caps[256];
-> > > > >                 uint8_t data[128];
-> > > > >                 int i, size;
-> > > > >                 GSList *l =3D NULL;
-> > > > > @@ -1847,6 +1904,15 @@ static void load_remote_sep(struct a2dp_ch=
-annel *chan, GKeyFile *key_file,
-> > > > >
-> > > > >                 register_remote_sep(sep, chan);
-> > > > >         }
-> > > > > +
-> > > > > +       value =3D g_key_file_get_string(key_file, "Endpoints", "L=
-astUsed", NULL);
-> > > > > +       if (!value)
-> > > > > +               return;
-> > > > > +
-> > > > > +       if (sscanf(value, "%02hhx", &seid) !=3D 1)
-> > > > > +               return;
-> > > > > +
-> > > > > +       chan->last_used =3D queue_find(chan->seps, match_seid, &s=
-eid);
-> > > > >  }
-> > > > >
-> > > > >  static void load_remote_seps(struct a2dp_channel *chan)
-> > > > > @@ -2355,8 +2421,12 @@ done:
-> > > > >  static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSL=
-ist *list,
-> > > > >                                         const char *sender)
-> > > > >  {
-> > > > > +       struct a2dp_sep *first =3D NULL;
-> > > > > +       struct a2dp_channel *chan =3D find_channel(session);
-> > > > > +
-> > > > >         for (; list; list =3D list->next) {
-> > > > >                 struct a2dp_sep *sep =3D list->data;
-> > > > > +               struct avdtp_remote_sep *rsep;
-> > > > >
-> > > > >                 /* Use sender's endpoint if available */
-> > > > >                 if (sender) {
-> > > > > @@ -2370,14 +2440,22 @@ static struct a2dp_sep *a2dp_find_sep(str=
-uct avdtp *session, GSList *list,
-> > > > >                                 continue;
-> > > > >                 }
-> > > > >
-> > > > > -               if (avdtp_find_remote_sep(session, sep->lsep) =3D=
-=3D NULL)
-> > > > > +               rsep =3D avdtp_find_remote_sep(session, sep->lsep=
-);
-> > > > > +               if (!rsep)
-> > > > >                         continue;
-> > > > >
-> > > > > +               /* Locate last used if set */
-> > > > > +               if (chan->last_used) {
-> > > > > +                       if (chan->last_used->sep =3D=3D rsep)
-> > > > > +                               return sep;
-> > > > > +                       first =3D sep;
-> > > > > +               }
-> > > > > +
-> > > > >                 return sep;
-> > > > >
-> > > > >         }
-> > > > >
-> > > > > -       return NULL;
-> > > > > +       return first;
-> > > > >  }
-> > > > >
-> > > > >  static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, u=
-int8_t type,
-> > > > > --
-> > > > > 2.20.1
-> > > >
-> > > > Can you give this a try, it should make the daemon remember what was
-> > > > the last endpoint used (locally the remote selection we cannot real=
-ly
-> > > > control).
-> > >
-> > > Great, I will try it.
-> >
-> > Now I run 'sudo grep LastUsed -r /var/lib/bluetooth/' and see that this
-> > properly is stored only for one device. So seems that bluetoothd does
-> > not always stores LastUsed information.
-> >
-> > E.g. when I called and successfully connected device via command
-> >
-> > $ qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX org.bl=
-uez.Device1.ConnectProfile 0000110a-0000-1000-8000-00805f9b34fb
-> >
-> > and later disconnected, I have not found anything via above grep.
->=20
-> Is this with the latest set?
+Hello,
 
-git master +
-wget -q 'https://lore.kernel.org/linux-bluetooth/20190503084547.15743-1-lui=
-z.dentz@gmail.com/t.mbox.gz' -O - | gunzip | git am
+I found out that more bluetooth headsets supports AuriStream codec in
+bluetooth HSP/HFP profile. It is proprietary CSR codec described as some
+ADPCM variant with better quality as default CVSD codec.
 
-> Were there any failures in the configuration?
+Headset announce their support by sending command AT+CSRSF, in sixth
+number with first or second bit set (counted from zero). E.g.:
 
-No, at least do not see it in console.
+  AT+CSRSF=3D0,0,0,0,0,7
 
-> (note that you need su/root to list /var/lib/bluetooth/)
+Codec is then selected by host with sending:
 
-I know, that is why sudo grep
+  +CSRFN: (6,4)
+  OK
 
-> /var/lib/bluetooth/B8:8A:60:D8:17:D7/cache/08:DF:1F:D9:2A:93:43:LastUsed=
-=3D01
-> /var/lib/bluetooth/B8:8A:60:D8:17:D7/cache/B4:CD:27:F0:8D:0A:60:LastUsed=
-=3D04
-> /var/lib/bluetooth/B8:8A:60:D8:17:D7/cache/94:20:53:2E:08:CE:24:LastUsed=
-=3D05
->=20
+And answer from headset is acknowledged by another:
+
+  OK
+
+
+Problem is that on Linux after issuing these AT commands I cannot longer
+connect to SCO socket. connect() fails with Protocol Error.
+
+And in btmon is following error:
+
+    > HCI Event: Synchronous Connect Complete (0x2c) plen 17
+            Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
+
+
+In some CSR SKD is example how to activate it and there is code which
+seems to sets following HCI connection parameters:
+
+  syncPktTypes =3D 0x003F
+  bandwidth =3D 4000
+  max_latency =3D 16
+  voice_settings =3D 0x63
+  retx_effort =3D 2
+
+I figured out that voice_settings can be configured via setsockopt()
+SOL_BLUETOOTH + BT_VOICE. But for some unknown reason linux kernel
+accept only two whitelisted values: 0x0003 and 0x0060.
+
+So I tried to set 0x0003 value (BT_VOICE_TRANSPARENT).
+
+In btmon I saw that kernel really changed "Air Coding Format" from CVSD
+to Transparent, but I still got same "Invalid LMP Parameters" error.
+
+I tried to remove that whilelist from BT_VOICE option via patch below:
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 9a580999ca57..06db91de4f23 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -231,7 +231,7 @@ static int sco_connect(struct sock *sk)
+ 	else
+ 		type =3D SCO_LINK;
+=20
+-	if (sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT &&
++	if ((sco_pi(sk)->setting & SCO_AIRMODE_MASK) =3D=3D SCO_AIRMODE_TRANSP &&
+ 	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
+ 		err =3D -EOPNOTSUPP;
+ 		goto done;
+@@ -836,13 +836,6 @@ static int sco_sock_setsockopt(struct socket *sock, in=
+t level, int optname,
+ 			break;
+ 		}
+=20
+-		/* Explicitly check for these values */
+-		if (voice.setting !=3D BT_VOICE_TRANSPARENT &&
+-		    voice.setting !=3D BT_VOICE_CVSD_16BIT) {
+-			err =3D -EINVAL;
+-			break;
+-		}
+-
+ 		sco_pi(sk)->setting =3D voice.setting;
+ 		break;
+=20
+
+Btmon now really showed Settings as 0x63, but still did not worked.
+Again exactly same HCI error.
+
+Next I tried hacking linux kernel to customize packet type and max
+latency. But even I changed these values I still got that HCI error.
+
+After I changed tx_bandwidth and rx_bandwidth to 4000 (as described in
+above connection parameters), connect() syscall for that SCO socket
+succeeded and I started getting voice microphone data on that socket.
+
+And it worked also with voice settings 0x0003 with active in-kernel
+whitelist.
+
+Patch which is needed is following: Change bandwidth to 4000:
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index bd4978ce8c45..2dd4d0412971 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -283,8 +283,8 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
+=20
+ 	cp.handle   =3D cpu_to_le16(handle);
+=20
+-	cp.tx_bandwidth   =3D cpu_to_le32(0x00001f40);
+-	cp.rx_bandwidth   =3D cpu_to_le32(0x00001f40);
++	cp.tx_bandwidth   =3D cpu_to_le32(4000);
++	cp.rx_bandwidth   =3D cpu_to_le32(4000);
+ 	cp.voice_setting  =3D cpu_to_le16(conn->setting);
+=20
+ 	switch (conn->setting & SCO_AIRMODE_MASK) {
+
+I have really no idea what it does with headset. But without this patch
+I'm not able to switch HSP codec from CVSD to AuriStream.
+
+Is somebody able to explain how above change can allow opening SCO
+socket?
+
+Because without it I'm not able to activate AuriStream codec, could you
+consider allowing userspace (via some setsockopt=C5=88 to change bandwidth?
+Because now it is hardcoded in kernel source code.
+
+For more details here is btmon output with default bandwidth which is
+failing:
+
+  $ sudo ./monitor/btmon
+  Bluetooth monitor ver 5.50
+  =3D Note: Linux version 4.9.0-9-amd64 (x86_64)
+  =3D Note: Bluetooth subsystem version 2.22
+  =3D New Index: XX:XX:XX:XX:XX:XX (Primary,USB,hci0)
+  =3D Open Index: XX:XX:XX:XX:XX:XX
+  =3D Index Info: XX:XX:XX:XX:XX:XX (Intel Corp.)
+  @ MGMT Open: bluetoothd (privileged) version 1.14
+  @ MGMT Open: btmon (privileged) version 1.14
+  < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+          Handle: 34
+          Transmit bandwidth: 8000
+          Receive bandwidth: 8000
+          Max latency: 13
+          Setting: 0x0003
+            Input Coding: Linear
+            Input Data Format: 1's complement
+            Input Sample Size: 8-bit
+            # of bits padding at MSB: 0
+            Air Coding Format: Transparent Data
+          Retransmission effort: Optimize for link quality (0x02)
+          Packet type: 0x0380
+            3-EV3 may not be used
+            2-EV5 may not be used
+            3-EV5 may not be used
+  > HCI Event: Command Status (0x0f) plen 4
+        Setup Synchronous Connection (0x01|0x0028) ncmd 1
+          Status: Success (0x00)
+  > HCI Event: Max Slots Change (0x1b) plen 3
+          Handle: 34
+          Max slots: 1
+  > HCI Event: Synchronous Connect Complete (0x2c) plen 17
+          Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
+          Handle: 34
+          Address: XX:XX:XX:XX:XX:XX (Creative Technology, Ltd.)
+          Link type: eSCO (0x02)
+          Transmission interval: 0x00
+          Retransmission window: 0x00
+          RX packet length: 0
+          TX packet length: 0
+          Air mode: u-law log (0x00)
+  > HCI Event: Max Slots Change (0x1b) plen 3
+          Handle: 34
+          Max slots: 5
+
+And here is btmon output with above kernel patch which changes bandwidth to=
+ 4000:
+
+  $ sudo ./monitor/btmon
+  Bluetooth monitor ver 5.50
+  =3D Note: Linux version 4.9.0-9-amd64 (x86_64)
+  =3D Note: Bluetooth subsystem version 2.22
+  =3D New Index: XX:XX:XX:XX:XX:XX (Primary,USB,hci0)
+  =3D Open Index: XX:XX:XX:XX:XX:XX
+  =3D Index Info: XX:XX:XX:XX:XX:XX (Intel Corp.)
+  @ MGMT Open: bluetoothd (privileged) version 1.14
+  @ MGMT Open: btmon (privileged) version 1.14
+  < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+          Handle: 34
+          Transmit bandwidth: 4000
+          Receive bandwidth: 4000
+          Max latency: 13
+          Setting: 0x0003
+            Input Coding: Linear
+            Input Data Format: 1's complement
+            Input Sample Size: 8-bit
+            # of bits padding at MSB: 0
+            Air Coding Format: Transparent Data
+          Retransmission effort: Optimize for link quality (0x02)
+          Packet type: 0x0380
+            3-EV3 may not be used
+            2-EV5 may not be used
+            3-EV5 may not be used
+  > HCI Event: Command Status (0x0f) plen 4
+        Setup Synchronous Connection (0x01|0x0028) ncmd 1
+          Status: Success (0x00)
+  > HCI Event: Max Slots Change (0x1b) plen 3
+          Handle: 34
+          Max slots: 1
+  > HCI Event: Synchronous Connect Complete (0x2c) plen 17
+          Status: Success (0x00)
+          Handle: 38
+          Address: XX:XX:XX:XX:XX:XX (Creative Technology, Ltd.)
+          Link type: eSCO (0x02)
+          Transmission interval: 0x10
+          Retransmission window: 0x02
+          RX packet length: 40
+          TX packet length: 40
+          Air mode: Transparent (0x03)
+  < SCO Data TX: Handle 38 flags 0x00 dlen 48
+  < ACL Data TX: Handle 34 flags 0x00 dlen 18
+        Channel: 105 len 14 [PSM 0 mode 0] {chan 0}
+          61 ef 15 0d 0a 2b 56 47 4d 3d 34 0d 0a d4        a....+VGM=3D4...
+  > HCI Event: Number of Completed Packets (0x13) plen 5
+          Num handles: 1
+          Handle: 34
+          Count: 1
+  > SCO Data RX: Handle 38 flags 0x00 dlen 24
+  > SCO Data RX: Handle 38 flags 0x00 dlen 24
+  > SCO Data RX: Handle 38 flags 0x00 dlen 24
+  < SCO Data TX: Handle 38 flags 0x00 dlen 48
+  > HCI Event: Max Slots Change (0x1b) plen 3
+          Handle: 34
+          Max slots: 5
+
+=2E.. and SCO data are coming on SCO socket.
 
 --=20
 Pali Roh=C3=A1r
 pali.rohar@gmail.com
 
---mgtotarqgtawfrhi
+--4u4kv4z6rwjwab6y
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXMwW3AAKCRCL8Mk9A+RD
-UqFGAKDIU6KwRbf8dtAxWYTI0/D5VvDn6gCgnQSWtj2jiVty29eMNN/8k+n/ojA=
-=J+Tw
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXM3IuAAKCRCL8Mk9A+RD
+UpQPAKC7ulOOBj3Dp04viWerhXxuz6YYnwCgp744dl3is16IOBdgtT/1cjilAhQ=
+=0s5K
 -----END PGP SIGNATURE-----
 
---mgtotarqgtawfrhi--
+--4u4kv4z6rwjwab6y--
