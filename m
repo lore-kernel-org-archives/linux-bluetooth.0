@@ -3,65 +3,111 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D9FC004C9
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 May 2019 17:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D50B6C004C9
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 May 2019 17:33:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A415F20675
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 May 2019 17:29:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B19E820675
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 May 2019 17:33:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727896AbfEER3w (ORCPT
+        id S1727924AbfEERdB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 May 2019 13:29:52 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:57368 "EHLO
+        Sun, 5 May 2019 13:33:01 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52995 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726905AbfEER3w (ORCPT
+        with ESMTP id S1726905AbfEERdB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 May 2019 13:29:52 -0400
+        Sun, 5 May 2019 13:33:01 -0400
 Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 40D77CEE02;
-        Sun,  5 May 2019 19:38:04 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id BA6BBCEE02;
+        Sun,  5 May 2019 19:41:12 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH RESEND] Bluetooth: btbcm: Add default address for
- BCM2076B1
+Subject: Re: [PATCH v3 2/2] dt-bindings: net: bluetooth: Add device property
+ firmware-name for QCA6174
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190501071820.6404-1-stephan@gerhold.net>
-Date:   Sun, 5 May 2019 19:29:49 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <33CCCE49-ADC6-4A24-9EAC-07D11671F67E@holtmann.org>
-References: <863F9BB0-25C7-4A9B-8D91-2A2D2690D13D@holtmann.org>
- <20190501071820.6404-1-stephan@gerhold.net>
-To:     Stephan Gerhold <stephan@gerhold.net>
+In-Reply-To: <17221139821fb6ee35f3119df7405401@codeaurora.org>
+Date:   Sun, 5 May 2019 19:32:58 +0200
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Thierry Escande <thierry.escande@linaro.org>,
+        netdev <netdev@vger.kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-kernel@vger.kernel.org,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        linux-bluetooth-owner@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <874D1677-BE9F-454C-AA95-39E3F3716300@holtmann.org>
+References: <1554368908-22017-2-git-send-email-rjliao@codeaurora.org>
+ <1554888476-17560-1-git-send-email-rjliao@codeaurora.org>
+ <A85D7982-E000-4A5F-9927-CA36E0BA60F2@holtmann.org>
+ <7e0cf9ba98260309c43d9d6e63dead6c@codeaurora.org>
+ <CAL_JsqLnM4XqQTCT7VTUSmukujz0VHJoCbXMF2--RmTEx_LZww@mail.gmail.com>
+ <60C7AC89-37B6-441C-9349-BCB15717EB2C@holtmann.org>
+ <17221139821fb6ee35f3119df7405401@codeaurora.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
 X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Stephan,
+Hi Rocky,
 
-> BCM2076B1 appears to use 20:76:A0:00:56:79 as default address.
-> This address is used by at least 5 devices with the AMPAK AP6476
-> module and is also suspicious because it starts with the chip name
-> 2076 (followed by a different revision A0 for some reason).
+>>>>>> This patch adds an optional device property "firmware-name" to allow
+>>>>>> the
+>>>>>> driver to load customized nvm firmware file based on this property.
+>>>>>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+>>>>>> ---
+>>>>>> Changes in v3:
+>>>>>> * added firmware-name instead of nvm-postfix to specify full firmware
+>>>>>> name
+>>>>>> ---
+>>>>>> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 2 ++
+>>>>>> 1 file changed, 2 insertions(+)
+>>>>>> diff --git
+>>>>>> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>>>>>> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>>>>>> index 824c0e2..2bcea50 100644
+>>>>>> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>>>>>> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>>>>>> @@ -16,6 +16,7 @@ Optional properties for compatible string
+>>>>>> qcom,qca6174-bt:
+>>>>>> - enable-gpios: gpio specifier used to enable chip
+>>>>>> - clocks: clock provided to the controller (SUSCLK_32KHZ)
+>>>>>> + - firmware-name: specify the name of nvm firmware to load
+>>>>>> Required properties for compatible string qcom,wcn3990-bt:
+>>>>>> @@ -39,6 +40,7 @@ serial@7570000 {
+>>>>>>            enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+>>>>>>            clocks = <&divclk4>;
+>>>>>> +            firmware-name = "nvm_00440302.bin";
+>>>>>>    };
+>>>>> and how is this a firmware-name property. Wouldn’t this be more like
+>>>>> nvm-file or something along these lines. This really needs to be
+>>>>> cleared with Rob to pick the right property name.
+>>>>> Regards
+>>>>> Marcel
+>>>> Hi Rob,
+>>>> Are you OK to use a property name "nvm-file" or "firmware-nvm-file"?
+>>>> Actually we have two firmware files, one is the patch file which is
+>>>> common to all of the products, the other is the nvm file which is
+>>>> customized. Using a "nvm-file" or "firmware-nvm-file" property name
+>>>> would be more clear.
+>>> 'firmware-name' is the standard name for specifying firmware file names.
+>> but it is not a firmware file, it is a NVM file. What happens if in
+>> the future they need a firmware file and a NVM file?
+>> Regards
+>> Marcel
 > 
-> Add it to the list of default addresses and leave it up to the
-> user to configure a valid one.
-> 
-> Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
-> ---
-> (rebased on latest bluetooth-next)
-> 
-> drivers/bluetooth/btbcm.c | 5 +++++
-> 1 file changed, 5 insertions(+)
+> We won't need to specify a rampatch firmware file in future as it's a same file for all the boards with same chip, only the NVM firmware file may have board differences. NVM file is also one of the firmware files so I think it should be OK to use "firmware-name" property to specify it.
 
-patch has been applied to bluetooth-next tree.
+ok then, but I need patches that apply cleanly against bluetooth-next.
 
 Regards
 
