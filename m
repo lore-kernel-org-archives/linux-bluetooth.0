@@ -1,325 +1,303 @@
-Return-Path: <SRS0=nVHi=TE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=kkCe=TF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82762C43219
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 May 2019 17:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F66CC004C9
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 May 2019 17:25:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45FB6206DF
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 May 2019 17:16:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NA3LXZRi"
+	by mail.kernel.org (Postfix) with ESMTP id D6C09205F4
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 May 2019 17:25:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726905AbfEDRQB (ORCPT
+        id S1727034AbfEERZz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 May 2019 13:16:01 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35257 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726320AbfEDRQB (ORCPT
+        Sun, 5 May 2019 13:25:55 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:51269 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726905AbfEERZz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 May 2019 13:16:01 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h15so6046879wrb.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 04 May 2019 10:15:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=H67xNX2AqTNoWbo8PTMVhFSrmab2VRGkLcplzdy7i6U=;
-        b=NA3LXZRi27JGzC5JWbMWeO1mS9EJfQKVif9/4z3EH9eQqGk+i6m0nU5JWb2YR94yw0
-         0QP9GNKXPd/v+BvSYeBStLK9EI7e4WUoncOqL2yVcU04oZgtQiwblOyib6LkhuxsZ1Ug
-         79uQfildDN66nbO19j7cPbmZo8mpjSq7aXGAeC7qiIpCdimimi4lk3JsjkacyYrhDhJz
-         zql/zugRJMTf2tkA+f/eV31Mb2ZS1TE+6x7xpprobYKKc1yuSKnvcB58cyZFhqIAxRi2
-         GXblOZOp+ZEtdTOl9F8BsVXkIeIO5p5ftHWFNVSSt0DelbgJNnYAvqHOToJNv57lOV+z
-         GA2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=H67xNX2AqTNoWbo8PTMVhFSrmab2VRGkLcplzdy7i6U=;
-        b=hqVqrxRNVtR3pV7Lu9lXtBBhVedLqcAg5EdUYYF0eWylXcZcJj4TFpu/5YAal3IMj6
-         J5Nkv3V9BZFeNLiROxR2HHCFRUPxKpJnoOZ/mtodBw8Sn/mfpC7y+7sCM5dd3trU2ecq
-         NXIqIAVgZClSMQM6yT1x1lf9qIpZXvNAUP1w6ym8PMEgbtzuwTLI8YrCUSvf9Y+5oHPf
-         l4a+pHvM/WmgC25yyBy67iJOkxKnaI5xri5JPX/HEqJMMKWSYxot3yGPKljz/PbOD0Ky
-         RYALzBgf6JE48R3o5AHbBXynX+V7o2tD7yMwGz/2ef4tFD2ET8Vxmiqm3Qdzs+J0Vrt+
-         wgkQ==
-X-Gm-Message-State: APjAAAVrxYrBVoec00ksUvWVcCMGf/uoslpNfYAVkddBllV0/z+zVXqL
-        9EOK6GXVlQGZxYl481CtJaS1XCSrBLc=
-X-Google-Smtp-Source: APXvYqyptHrJjZ2/OXy62RlUnLJmMRlUNIFE2cvJZV6Cm28+2lrNE5tCsAnpEr+1C4Rhc5MagD/geQ==
-X-Received: by 2002:a05:6000:1201:: with SMTP id e1mr12087916wrx.49.1556990158558;
-        Sat, 04 May 2019 10:15:58 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id b11sm10640281wmh.29.2019.05.04.10.15.57
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 04 May 2019 10:15:57 -0700 (PDT)
-Date:   Sat, 4 May 2019 19:15:50 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: HCI Set custom bandwidth for AuriStream SCO codec
-Message-ID: <20190504171550.llqfv5674gxd3bnn@pali>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="4u4kv4z6rwjwab6y"
-Content-Disposition: inline
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Sun, 5 May 2019 13:25:55 -0400
+Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 84565CEE02;
+        Sun,  5 May 2019 19:34:07 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH] v7 Add support for LE ping feature
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1556597465-21783-1-git-send-email-spoorthix.k@intel.com>
+Date:   Sun, 5 May 2019 19:25:53 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <E76A1D30-87DF-4A83-B9AD-C7DCC193EB6C@holtmann.org>
+References: <1556597465-21783-1-git-send-email-spoorthix.k@intel.com>
+To:     SpoorthiX K <spoorthix.k@intel.com>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Spoorthi,
 
---4u4kv4z6rwjwab6y
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Changes made to add HCI Write Authenticated Payload timeout
+> command for LE Ping feature.
+> As per the Core Specification 5.0 Volume 2 Part E Section 7.3.94,
+> the following code changes implements
+> HCI Write Authenticated Payload timeout command for LE Ping feature.
+> 
+> Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+> ---
+> include/net/bluetooth/hci.h      | 20 +++++++++++
+> include/net/bluetooth/hci_core.h |  5 +++
+> net/bluetooth/hci_core.c         |  1 +
+> net/bluetooth/hci_debugfs.c      | 31 ++++++++++++++++
+> net/bluetooth/hci_event.c        | 76 ++++++++++++++++++++++++++++++++++++++++
+> 5 files changed, 133 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index c36dc1e..56d5236 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -1130,6 +1130,26 @@ struct hci_cp_write_sc_support {
+> 	__u8	support;
+> } __packed;
+> 
+> +#define HCI_OP_READ_AUTH_PAYLOAD_TO    0x0c7b
+> +struct hci_cp_read_auth_payload_to {
+> +	__le16  handle;
+> +} __packed;
+> +struct hci_rp_read_auth_payload_to {
+> +	__u8    status;
+> +	__le16  handle;
+> +	__le16  timeout;
+> +} __packed;
+> +
+> +#define HCI_OP_WRITE_AUTH_PAYLOAD_TO    0x0c7c
+> +struct hci_cp_write_auth_payload_to {
+> +	__le16  handle;
+> +	__le16  timeout;
+> +} __packed;
+> +struct hci_rp_write_auth_payload_to {
+> +	__u8    status;
+> +	__le16  handle;
+> +} __packed;
+> +
+> #define HCI_OP_READ_LOCAL_OOB_EXT_DATA	0x0c7d
+> struct hci_rp_read_local_oob_ext_data {
+> 	__u8     status;
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index e5ea633..e8990fe 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -197,6 +197,9 @@ struct adv_info {
+> #define DEFAULT_CONN_INFO_MIN_AGE	1000
+> #define DEFAULT_CONN_INFO_MAX_AGE	3000
+> 
+> +/* Default authenticated payload timeout 30000ms/30s */
+> +#define DEFAULT_AUTH_PAYLOAD_TIMEOUT	0x0bb8
+> +
 
-Hello,
+is this the default value from the specification? And scarp 3000ms/30s conversion. Just say 30s.
 
-I found out that more bluetooth headsets supports AuriStream codec in
-bluetooth HSP/HFP profile. It is proprietary CSR codec described as some
-ADPCM variant with better quality as default CVSD codec.
+> struct amp_assoc {
+> 	__u16	len;
+> 	__u16	offset;
+> @@ -272,6 +275,7 @@ struct hci_dev {
+> 	__u16		discov_interleaved_timeout;
+> 	__u16		conn_info_min_age;
+> 	__u16		conn_info_max_age;
+> +	__u16		auth_payload_timeout;
+> 	__u8		ssp_debug_mode;
+> 	__u8		hw_error_code;
+> 	__u32		clock;
+> @@ -477,6 +481,7 @@ struct hci_conn {
+> 	__u16		disc_timeout;
+> 	__u16		conn_timeout;
+> 	__u16		setting;
+> +	__u16		auth_payload_timeout;
+> 	__u16		le_conn_min_interval;
+> 	__u16		le_conn_max_interval;
+> 	__u16		le_conn_interval;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 7352fe8..7959ee7 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3156,6 +3156,7 @@ struct hci_dev *hci_alloc_dev(void)
+> 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
+> 	hdev->conn_info_min_age = DEFAULT_CONN_INFO_MIN_AGE;
+> 	hdev->conn_info_max_age = DEFAULT_CONN_INFO_MAX_AGE;
+> +	hdev->auth_payload_timeout = DEFAULT_AUTH_PAYLOAD_TIMEOUT;
+> 
+> 	mutex_init(&hdev->lock);
+> 	mutex_init(&hdev->req_lock);
+> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+> index 51f5b1e..bb67f4a 100644
+> --- a/net/bluetooth/hci_debugfs.c
+> +++ b/net/bluetooth/hci_debugfs.c
+> @@ -941,6 +941,35 @@ static int adv_max_interval_get(void *data, u64 *val)
+> DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
+> 			adv_max_interval_set, "%llu\n");
+> 
+> +static int auth_payload_timeout_set(void *data, u64 val)
+> +{
+> +	struct hci_dev *hdev = data;
+> +
+> +	if (val < 0x0001 || val > 0xffff)
+> +		return -EINVAL;
+> +
+> +	hci_dev_lock(hdev);
+> +	hdev->auth_payload_timeout = val;
+> +	hci_dev_unlock(hdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static int auth_payload_timeout_get(void *data, u64 *val)
+> +{
+> +	struct hci_dev *hdev = data;
+> +
+> +	hci_dev_lock(hdev);
+> +	*val = hdev->auth_payload_timeout;
+> +	hci_dev_unlock(hdev);
+> +
+> +	return 0;
+> +}
+> +
+> +DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
+> +			auth_payload_timeout_get,
+> +			auth_payload_timeout_set, "%llu\n");
+> +
+> DEFINE_QUIRK_ATTRIBUTE(quirk_strict_duplicate_filter,
+> 		       HCI_QUIRK_STRICT_DUPLICATE_FILTER);
+> DEFINE_QUIRK_ATTRIBUTE(quirk_simultaneous_discovery,
+> @@ -994,6 +1023,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+> 			    &adv_max_interval_fops);
+> 	debugfs_create_u16("discov_interleaved_timeout", 0644, hdev->debugfs,
+> 			   &hdev->discov_interleaved_timeout);
+> +	debugfs_create_file("auth_payload_timeout", 0644, hdev->debugfs, hdev,
+> +			    &auth_payload_timeout_fops);
+> 
+> 	debugfs_create_file("quirk_strict_duplicate_filter", 0644,
+> 			    hdev->debugfs, hdev,
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index ac2826c..2593b4b 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -545,6 +545,54 @@ static void hci_cc_write_sc_support(struct hci_dev *hdev, struct sk_buff *skb)
+> 	hci_dev_unlock(hdev);
+> }
+> 
 
-Headset announce their support by sending command AT+CSRSF, in sixth
-number with first or second bit set (counted from zero). E.g.:
+On hci_conn creation the hcon->auth_payload_time needs to be set to DEFAULT_AUTH_PAYLOAD_TIMEOUT as well.
 
-  AT+CSRSF=3D0,0,0,0,0,7
+> +static void hci_cc_read_auth_payload_timeout(struct hci_dev *hdev,
+> +					     struct sk_buff *skb)
+> +{
+> +	struct hci_rp_read_auth_payload_to *rp = (void *)skb->data;
+> +	struct hci_conn *conn;
+> +
+> +	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+> +
+> +	if (rp->status)
+> +		return;
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
+> +
 
-Codec is then selected by host with sending:
+Remove this empty line.
 
-  +CSRFN: (6,4)
-  OK
+> +	if (conn)
+> +		conn->auth_payload_timeout = __le16_to_cpu(rp->timeout);
+> +
+> +	hci_dev_unlock(hdev);
+> +}
+> +
+> +static void hci_cc_write_auth_payload_timeout(struct hci_dev *hdev,
+> +					      struct sk_buff *skb)
+> +{
+> +	struct hci_rp_write_auth_payload_to *rp = (void *)skb->data;
+> +	struct hci_conn *conn;
+> +	void *sent;
+> +
+> +	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+> +
+> +	if (rp->status)
+> +		return;
+> +
+> +	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO);
+> +	if (!sent)
+> +		return;
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
+> +
 
-And answer from headset is acknowledged by another:
+Remove this empty line.
 
-  OK
+> +	if (conn)
+> +		conn->auth_payload_timeout = get_unaligned_le16(sent + 2);
+> +
+> +	hci_dev_unlock(hdev);
+> +}
+> +
+> static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+> {
+> 	struct hci_rp_read_local_version *rp = (void *) skb->data;
+> @@ -2975,6 +3023,26 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 		goto unlock;
+> 	}
+> 
+> +	/* Set the default Authenticated Payload Timeout after
+> +	 * an LE Link is established. As per Core Spec v5.0, Vol 2, Part B
+> +	 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
+> +	 * sent when the link is active and Encryption is enabled, the conn
+> +	 * type can be either LE or ACL and controller must support LMP Ping.
+> +	 * Ensure for AES-CCM encryption as well.
+> +	 */
+> +
 
+Remove this empty line.
 
-Problem is that on Linux after issuing these AT commands I cannot longer
-connect to SCO socket. connect() fails with Protocol Error.
+> +	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
+> +	    test_bit(HCI_CONN_AES_CCM, &conn->flags) &&
+> +	    ((conn->type == ACL_LINK && lmp_ping_capable(hdev)) ||
+> +	     (conn->type == LE_LINK && (hdev->le_features[0] & HCI_LE_PING)))) {
+> +		struct hci_cp_write_auth_payload_to cp;
+> +
+> +		cp.handle = cpu_to_le16(conn->handle);
+> +		cp.timeout = cpu_to_le16(hdev->auth_payload_timeout);
+> +		hci_send_cmd(conn->hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO,
+> +			     sizeof(cp), &cp);
+> +	}
+> +
+> notify:
+> 	if (conn->state == BT_CONFIG) {
+> 		if (!ev->status)
+> @@ -3170,6 +3238,14 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+> 		hci_cc_write_sc_support(hdev, skb);
+> 		break;
+> 
+> +	case HCI_OP_READ_AUTH_PAYLOAD_TO:
+> +		hci_cc_read_auth_payload_timeout(hdev, skb);
+> +		break;
+> +
+> +	case HCI_OP_WRITE_AUTH_PAYLOAD_TO:
+> +		hci_cc_write_auth_payload_timeout(hdev, skb);
+> +		break;
+> +
+> 	case HCI_OP_READ_LOCAL_VERSION:
+> 		hci_cc_read_local_version(hdev, skb);
+> 		break;
 
-And in btmon is following error:
+Regards
 
-    > HCI Event: Synchronous Connect Complete (0x2c) plen 17
-            Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
+Marcel
 
-
-In some CSR SKD is example how to activate it and there is code which
-seems to sets following HCI connection parameters:
-
-  syncPktTypes =3D 0x003F
-  bandwidth =3D 4000
-  max_latency =3D 16
-  voice_settings =3D 0x63
-  retx_effort =3D 2
-
-I figured out that voice_settings can be configured via setsockopt()
-SOL_BLUETOOTH + BT_VOICE. But for some unknown reason linux kernel
-accept only two whitelisted values: 0x0003 and 0x0060.
-
-So I tried to set 0x0003 value (BT_VOICE_TRANSPARENT).
-
-In btmon I saw that kernel really changed "Air Coding Format" from CVSD
-to Transparent, but I still got same "Invalid LMP Parameters" error.
-
-I tried to remove that whilelist from BT_VOICE option via patch below:
-
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 9a580999ca57..06db91de4f23 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -231,7 +231,7 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type =3D SCO_LINK;
-=20
--	if (sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT &&
-+	if ((sco_pi(sk)->setting & SCO_AIRMODE_MASK) =3D=3D SCO_AIRMODE_TRANSP &&
- 	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
- 		err =3D -EOPNOTSUPP;
- 		goto done;
-@@ -836,13 +836,6 @@ static int sco_sock_setsockopt(struct socket *sock, in=
-t level, int optname,
- 			break;
- 		}
-=20
--		/* Explicitly check for these values */
--		if (voice.setting !=3D BT_VOICE_TRANSPARENT &&
--		    voice.setting !=3D BT_VOICE_CVSD_16BIT) {
--			err =3D -EINVAL;
--			break;
--		}
--
- 		sco_pi(sk)->setting =3D voice.setting;
- 		break;
-=20
-
-Btmon now really showed Settings as 0x63, but still did not worked.
-Again exactly same HCI error.
-
-Next I tried hacking linux kernel to customize packet type and max
-latency. But even I changed these values I still got that HCI error.
-
-After I changed tx_bandwidth and rx_bandwidth to 4000 (as described in
-above connection parameters), connect() syscall for that SCO socket
-succeeded and I started getting voice microphone data on that socket.
-
-And it worked also with voice settings 0x0003 with active in-kernel
-whitelist.
-
-Patch which is needed is following: Change bandwidth to 4000:
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index bd4978ce8c45..2dd4d0412971 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -283,8 +283,8 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
-=20
- 	cp.handle   =3D cpu_to_le16(handle);
-=20
--	cp.tx_bandwidth   =3D cpu_to_le32(0x00001f40);
--	cp.rx_bandwidth   =3D cpu_to_le32(0x00001f40);
-+	cp.tx_bandwidth   =3D cpu_to_le32(4000);
-+	cp.rx_bandwidth   =3D cpu_to_le32(4000);
- 	cp.voice_setting  =3D cpu_to_le16(conn->setting);
-=20
- 	switch (conn->setting & SCO_AIRMODE_MASK) {
-
-I have really no idea what it does with headset. But without this patch
-I'm not able to switch HSP codec from CVSD to AuriStream.
-
-Is somebody able to explain how above change can allow opening SCO
-socket?
-
-Because without it I'm not able to activate AuriStream codec, could you
-consider allowing userspace (via some setsockopt=C5=88 to change bandwidth?
-Because now it is hardcoded in kernel source code.
-
-For more details here is btmon output with default bandwidth which is
-failing:
-
-  $ sudo ./monitor/btmon
-  Bluetooth monitor ver 5.50
-  =3D Note: Linux version 4.9.0-9-amd64 (x86_64)
-  =3D Note: Bluetooth subsystem version 2.22
-  =3D New Index: XX:XX:XX:XX:XX:XX (Primary,USB,hci0)
-  =3D Open Index: XX:XX:XX:XX:XX:XX
-  =3D Index Info: XX:XX:XX:XX:XX:XX (Intel Corp.)
-  @ MGMT Open: bluetoothd (privileged) version 1.14
-  @ MGMT Open: btmon (privileged) version 1.14
-  < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
-          Handle: 34
-          Transmit bandwidth: 8000
-          Receive bandwidth: 8000
-          Max latency: 13
-          Setting: 0x0003
-            Input Coding: Linear
-            Input Data Format: 1's complement
-            Input Sample Size: 8-bit
-            # of bits padding at MSB: 0
-            Air Coding Format: Transparent Data
-          Retransmission effort: Optimize for link quality (0x02)
-          Packet type: 0x0380
-            3-EV3 may not be used
-            2-EV5 may not be used
-            3-EV5 may not be used
-  > HCI Event: Command Status (0x0f) plen 4
-        Setup Synchronous Connection (0x01|0x0028) ncmd 1
-          Status: Success (0x00)
-  > HCI Event: Max Slots Change (0x1b) plen 3
-          Handle: 34
-          Max slots: 1
-  > HCI Event: Synchronous Connect Complete (0x2c) plen 17
-          Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
-          Handle: 34
-          Address: XX:XX:XX:XX:XX:XX (Creative Technology, Ltd.)
-          Link type: eSCO (0x02)
-          Transmission interval: 0x00
-          Retransmission window: 0x00
-          RX packet length: 0
-          TX packet length: 0
-          Air mode: u-law log (0x00)
-  > HCI Event: Max Slots Change (0x1b) plen 3
-          Handle: 34
-          Max slots: 5
-
-And here is btmon output with above kernel patch which changes bandwidth to=
- 4000:
-
-  $ sudo ./monitor/btmon
-  Bluetooth monitor ver 5.50
-  =3D Note: Linux version 4.9.0-9-amd64 (x86_64)
-  =3D Note: Bluetooth subsystem version 2.22
-  =3D New Index: XX:XX:XX:XX:XX:XX (Primary,USB,hci0)
-  =3D Open Index: XX:XX:XX:XX:XX:XX
-  =3D Index Info: XX:XX:XX:XX:XX:XX (Intel Corp.)
-  @ MGMT Open: bluetoothd (privileged) version 1.14
-  @ MGMT Open: btmon (privileged) version 1.14
-  < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
-          Handle: 34
-          Transmit bandwidth: 4000
-          Receive bandwidth: 4000
-          Max latency: 13
-          Setting: 0x0003
-            Input Coding: Linear
-            Input Data Format: 1's complement
-            Input Sample Size: 8-bit
-            # of bits padding at MSB: 0
-            Air Coding Format: Transparent Data
-          Retransmission effort: Optimize for link quality (0x02)
-          Packet type: 0x0380
-            3-EV3 may not be used
-            2-EV5 may not be used
-            3-EV5 may not be used
-  > HCI Event: Command Status (0x0f) plen 4
-        Setup Synchronous Connection (0x01|0x0028) ncmd 1
-          Status: Success (0x00)
-  > HCI Event: Max Slots Change (0x1b) plen 3
-          Handle: 34
-          Max slots: 1
-  > HCI Event: Synchronous Connect Complete (0x2c) plen 17
-          Status: Success (0x00)
-          Handle: 38
-          Address: XX:XX:XX:XX:XX:XX (Creative Technology, Ltd.)
-          Link type: eSCO (0x02)
-          Transmission interval: 0x10
-          Retransmission window: 0x02
-          RX packet length: 40
-          TX packet length: 40
-          Air mode: Transparent (0x03)
-  < SCO Data TX: Handle 38 flags 0x00 dlen 48
-  < ACL Data TX: Handle 34 flags 0x00 dlen 18
-        Channel: 105 len 14 [PSM 0 mode 0] {chan 0}
-          61 ef 15 0d 0a 2b 56 47 4d 3d 34 0d 0a d4        a....+VGM=3D4...
-  > HCI Event: Number of Completed Packets (0x13) plen 5
-          Num handles: 1
-          Handle: 34
-          Count: 1
-  > SCO Data RX: Handle 38 flags 0x00 dlen 24
-  > SCO Data RX: Handle 38 flags 0x00 dlen 24
-  > SCO Data RX: Handle 38 flags 0x00 dlen 24
-  < SCO Data TX: Handle 38 flags 0x00 dlen 48
-  > HCI Event: Max Slots Change (0x1b) plen 3
-          Handle: 34
-          Max slots: 5
-
-=2E.. and SCO data are coming on SCO socket.
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---4u4kv4z6rwjwab6y
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXM3IuAAKCRCL8Mk9A+RD
-UpQPAKC7ulOOBj3Dp04viWerhXxuz6YYnwCgp744dl3is16IOBdgtT/1cjilAhQ=
-=0s5K
------END PGP SIGNATURE-----
-
---4u4kv4z6rwjwab6y--
