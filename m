@@ -2,347 +2,674 @@ Return-Path: <SRS0=wqlf=TG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE21C04A6B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 May 2019 15:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D8EC04A6B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 May 2019 20:11:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29D2D20C01
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 May 2019 15:16:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lfKjlNpt"
+	by mail.kernel.org (Postfix) with ESMTP id 372B520675
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 May 2019 20:11:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726721AbfEFPQ6 (ORCPT
+        id S1726329AbfEFUL0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 May 2019 11:16:58 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:36100 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726236AbfEFPQ5 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 May 2019 11:16:57 -0400
-Received: by mail-wm1-f68.google.com with SMTP id n25so2012214wmi.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 May 2019 08:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=F0i10Jw3M+vsAeSXT8HFJH74Zz5r4rT/hqr40ftUxCE=;
-        b=lfKjlNptwSUK/bkcSKKQZn1+ScOPUgPC8ycHBQp3tlsL4DxvKfR4sIqag7Sy/OeSTm
-         BSDOGFunb/zpuXhHELk2AfJRCpWul74tl4vxQSKmr4eSBrAx/pbEfc6k1hBNfHJ4vwlg
-         0ntVycmkjMd4Ni0REl3LYJGojYb0IdYCtjXd6RvyhkK4SD1fdc0LMuPjPwq2IxMnFNGw
-         t0Ger698VmP68o/BY1MUT3Af9uZGGL3c/Pw7w1tfGIELzCiCXqcgB0h195RnmlYBg7kk
-         gTZqMvpOgBwtLkABGjpPKjhw3z6R9mMlhBj53AmgNzGu4O/s3O6umCK+v/DG/y2Wt/cH
-         uOAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=F0i10Jw3M+vsAeSXT8HFJH74Zz5r4rT/hqr40ftUxCE=;
-        b=GjnWfjvgpitwavPLw71aLbnvObxfzU16Z7CWpu8li6TMbdwwkMGlmGp9fEPSiqXm4v
-         GbAonBDLdxgpVIXmMqjUD1BYs/vknB6VN1zRFxUguSqGgSQ9bEUyPh/EEpSd7XNn9A2+
-         O214tquAgFqWZw/RPDO/8bYL6t+SXB4byUo5ZMaV4C1HQoIUL7fjQxb44EpcdIDA8m0Q
-         2miYuLOAi+gZYPe/G4mq9iZhpziTCccxYENCwELT8gzPZx4HGT2gFH8+f8e+OHtgPmZ5
-         aGQZJagQhfjgXn6xgD6ItaZM7Jq02+hT7xNUqyh3N+nBcLzqplF3HilfuwhYeYhwZSBt
-         nSkQ==
-X-Gm-Message-State: APjAAAXFrFiaJPS95DOTi8O5RQswseKvVmHdGNhsBEugDxCfMx/752Ge
-        sVKHEw+lTKsG7BK8kqJQJK7vifnD
-X-Google-Smtp-Source: APXvYqyGS8RGCWB4Rt7TBl4GV/SIRq1nThYA+LMmMKqFJMikMjFfDrL9uQOymYItPo7iW2vEjw49Jw==
-X-Received: by 2002:a1c:e916:: with SMTP id q22mr17062337wmc.148.1557155815265;
-        Mon, 06 May 2019 08:16:55 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id t18sm20120801wrg.19.2019.05.06.08.16.51
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 06 May 2019 08:16:52 -0700 (PDT)
-Date:   Mon, 6 May 2019 17:16:51 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+        Mon, 6 May 2019 16:11:26 -0400
+Received: from mga11.intel.com ([192.55.52.93]:18821 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726268AbfEFUL0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 6 May 2019 16:11:26 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 May 2019 13:11:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,439,1549958400"; 
+   d="scan'208";a="344441643"
+Received: from bgix-dell-lap.sea.intel.com ([10.251.135.253])
+  by fmsmga006.fm.intel.com with ESMTP; 06 May 2019 13:11:24 -0700
+From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Pavel Machek <pavel@ucw.cz>
-Subject: Re: HCI Set custom bandwidth for AuriStream SCO codec
-Message-ID: <20190506151651.pu2us2fgsf7w2vos@pali>
-References: <20190504171550.llqfv5674gxd3bnn@pali>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="dnvpdqw2rzp4oal2"
-Content-Disposition: inline
-In-Reply-To: <20190504171550.llqfv5674gxd3bnn@pali>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Cc:     inga.stotland@intel.com, brian.gix@intel.com
+Subject: [PATCH BlueZ v2] mesh: Add key storage
+Date:   Mon,  6 May 2019 13:11:16 -0700
+Message-Id: <20190506201116.12400-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This implements internal key storage add/delete/fetch for the three
+basic key types managed in Mesh: Network, Application and Device.
 
---dnvpdqw2rzp4oal2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This key storage is separate from keys assigned to nodes within the
+mesh, and are used to support Configuration Client functionality.
+---
+ Makefile.mesh  |   1 +
+ mesh/keyring.c | 315 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/keyring.h |  49 +++++++++
+ mesh/node.c    |  13 +++
+ mesh/node.h    |   2 +
+ mesh/storage.c |  92 ++++++++++++-----
+ mesh/storage.h |  16 +++
+ 7 files changed, 460 insertions(+), 28 deletions(-)
+ create mode 100644 mesh/keyring.c
+ create mode 100644 mesh/keyring.h
 
-Ccing more people...
+diff --git a/Makefile.mesh b/Makefile.mesh
+index 61fb40936..cefb72aed 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -25,6 +25,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
+ 				mesh/agent.h mesh/agent.c \
+ 				mesh/prov-acceptor.c mesh/prov-initiator.c \
+ 				mesh/pb-adv.h mesh/pb-adv.c \
++				mesh/keyring.h mesh/keyring.c \
+ 				mesh/mesh-defs.h
+ libexec_PROGRAMS += mesh/bluetooth-meshd
+ 
+diff --git a/mesh/keyring.c b/mesh/keyring.c
+new file mode 100644
+index 000000000..6fca047fd
+--- /dev/null
++++ b/mesh/keyring.c
+@@ -0,0 +1,315 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <errno.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <dirent.h>
++#include <libgen.h>
++
++#include <ell/ell.h>
++
++#include "mesh/mesh-defs.h"
++
++#include "mesh/net.h"
++#include "mesh/storage.h"
++#include "mesh/keyring.h"
++#include "mesh/mesh.h"
++#include "mesh/node.h"
++
++const char *dev_key_dir = "dev_keys";
++const char *app_key_dir = "app_keys";
++const char *net_key_dir = "net_keys";
++
++bool keyring_put_net_key(struct mesh_node *node, uint16_t net_idx,
++						struct keyring_net_key *key)
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++	int fd;
++	bool result = false;
++
++	if (!node || !key)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(net_key_dir) + 2 + 4;
++	key_file = l_malloc(len);
++	snprintf(key_file, len, "%s/%s", node_path, net_key_dir);
++	storage_create_dir(key_file);
++	snprintf(key_file, len, "%s/%s/%3.3x", node_path, net_key_dir, net_idx);
++	l_debug("Put Net Key %s", key_file);
++
++	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
++	if (fd) {
++		if (write(fd, key, sizeof(*key)) == sizeof(*key))
++			result = true;
++
++		close(fd);
++	}
++
++	l_free(key_file);
++	return result;
++}
++
++bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
++				uint16_t net_idx, struct keyring_app_key *key)
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++	int fd;
++	bool result = false;
++
++	if (!node || !key)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(app_key_dir) + 2 + 4;
++	key_file = l_malloc(len);
++	snprintf(key_file, len, "%s/%s", node_path, app_key_dir);
++	storage_create_dir(key_file);
++	snprintf(key_file, len, "%s/%s/%3.3x", node_path, app_key_dir, app_idx);
++	l_debug("Put App Key %s", key_file);
++
++	fd = open(key_file, O_RDONLY);
++	if (fd) {
++		struct keyring_app_key old_key;
++
++		if (read(fd, &old_key, sizeof(*key)) == sizeof(*key)) {
++			if (old_key.net_idx != net_idx) {
++				close(fd);
++				goto done;
++			}
++		}
++		close(fd);
++	}
++
++	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
++	if (write(fd, key, sizeof(*key)) == sizeof(*key))
++		result = true;
++
++	close(fd);
++
++done:
++	l_free(key_file);
++	return result;
++}
++
++bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
++					uint8_t count, uint8_t dev_key[16])
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++	int fd, i;
++	bool result = true;
++
++	if (!node)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(dev_key_dir) + 2 + 5;
++	key_file = l_malloc(len);
++	snprintf(key_file, len, "%s/%s", node_path, dev_key_dir);
++	storage_create_dir(key_file);
++
++	for (i = 0; i < count; i++) {
++		snprintf(key_file, len, "%s/%s/%4.4x", node_path, dev_key_dir,
++				unicast + i);
++		l_debug("Put Dev Key %s", key_file);
++
++		fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
++		if (fd) {
++			if (write(fd, dev_key, 16) != 16)
++				result = false;
++
++			close(fd);
++		} else
++			result = false;
++	}
++
++	l_free(key_file);
++	return result;
++}
++
++bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
++						struct keyring_net_key *key)
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++	int fd;
++	bool result = false;
++
++	if (!node || !key)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(net_key_dir) + 2 + 4;
++	key_file = l_malloc(len);
++	snprintf(key_file, len, "%s/%s/%3.3x", node_path, net_key_dir, net_idx);
++
++	fd = open(key_file, O_RDONLY);
++	if (fd) {
++		if (read(fd, key, sizeof(*key)) == sizeof(*key))
++			result = true;
++
++		close(fd);
++	}
++
++	l_free(key_file);
++	return result;
++}
++
++bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
++						struct keyring_app_key *key)
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++	int fd;
++	bool result = false;
++
++	if (!node || !key)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(app_key_dir) + 2 + 4;
++	key_file = l_malloc(len);
++	snprintf(key_file, len, "%s/%s/%3.3x", node_path, app_key_dir, app_idx);
++
++	fd = open(key_file, O_RDONLY);
++	if (fd) {
++		if (read(fd, key, sizeof(*key)) == sizeof(*key))
++			result = true;
++
++		close(fd);
++	}
++
++	l_free(key_file);
++	return result;
++}
++
++bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
++							uint8_t dev_key[16])
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++	int fd;
++	bool result = false;
++
++	if (!node)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(dev_key_dir) + 2 + 5;
++	key_file = l_malloc(len);
++	snprintf(key_file, len, "%s/%s/%4.4x", node_path, dev_key_dir, unicast);
++
++	fd = open(key_file, O_RDONLY);
++	if (fd) {
++		if (read(fd, dev_key, 16) == 16)
++			result = true;
++
++		close(fd);
++	}
++
++	l_free(key_file);
++	return result;
++}
++
++bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx)
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++
++	if (!node)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(net_key_dir) + 2 + 4;
++	key_file = l_malloc(len);
++
++	snprintf(key_file, len, "%s/%s/%3.3x", node_path, net_key_dir, net_idx);
++	l_debug("RM Net Key %s", key_file);
++	remove(key_file);
++
++	/* TODO: See if it is easiest to delete all bound App keys here */
++	/* TODO: see nftw() */
++
++	l_free(key_file);
++	return true;
++}
++
++bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx)
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++
++	if (!node)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(app_key_dir) + 2 + 4;
++	key_file = l_malloc(len);
++
++	snprintf(key_file, len, "%s/%s/%3.3x", node_path, app_key_dir, app_idx);
++	l_debug("RM App Key %s", key_file);
++	remove(key_file);
++
++	l_free(key_file);
++	return true;
++}
++
++bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
++								uint8_t count)
++{
++	char *node_path;
++	char *key_file;
++	size_t len;
++	int i;
++
++	if (!node)
++		return false;
++
++	node_path = storage_path_get(node);
++	len = strlen(node_path) + strlen(dev_key_dir) + 2 + 5;
++	key_file = l_malloc(len);
++
++	for (i = 0; i < count; i++) {
++		snprintf(key_file, len, "%s/%s/%4.4x", node_path, dev_key_dir,
++								unicast + i);
++		l_debug("RM Dev Key %s", key_file);
++		remove(key_file);
++	}
++
++	l_free(key_file);
++	return true;
++}
+diff --git a/mesh/keyring.h b/mesh/keyring.h
+new file mode 100644
+index 000000000..167191013
+--- /dev/null
++++ b/mesh/keyring.h
+@@ -0,0 +1,49 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++struct keyring_net_key {
++	uint16_t net_idx;
++	uint8_t phase;
++	uint8_t old_key[16];
++	uint8_t new_key[16];
++};
++
++struct keyring_app_key {
++	uint16_t app_idx;
++	uint16_t net_idx;
++	uint8_t old_key[16];
++	uint8_t new_key[16];
++};
++
++bool keyring_put_net_key(struct mesh_node *node, uint16_t net_idx,
++						struct keyring_net_key *key);
++bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
++						struct keyring_net_key *key);
++bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx);
++bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
++				uint16_t net_idx, struct keyring_app_key *key);
++bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
++						struct keyring_app_key *key);
++bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx);
++bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
++							uint8_t dev_key[16]);
++bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
++					uint8_t count, uint8_t dev_key[16]);
++bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
++								uint8_t count);
+diff --git a/mesh/node.c b/mesh/node.c
+index 774d03d45..e95ceb9a1 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -79,6 +79,7 @@ struct mesh_node {
+ 	char *path;
+ 	void *jconfig;
+ 	char *cfg_file;
++	char *node_path;
+ 	uint32_t disc_watch;
+ 	time_t upd_sec;
+ 	uint32_t seq_number;
+@@ -235,6 +236,8 @@ static void free_node_resources(void *data)
+ 	l_free(node->comp);
+ 	l_free(node->app_path);
+ 	l_free(node->owner);
++	l_free(node->cfg_file);
++	l_free(node->node_path);
+ 
+ 	if (node->disc_watch)
+ 		l_dbus_remove_watch(dbus_get_bus(), node->disc_watch);
+@@ -1883,6 +1886,16 @@ char *node_cfg_file_get(struct mesh_node *node)
+ 	return node->cfg_file;
+ }
+ 
++void node_path_set(struct mesh_node *node, char *path)
++{
++	node->node_path = path;
++}
++
++char *node_path_get(struct mesh_node *node)
++{
++	return node->node_path;
++}
++
+ struct mesh_net *node_get_net(struct mesh_node *node)
+ {
+ 	return node->net;
+diff --git a/mesh/node.h b/mesh/node.h
+index 20b60099e..d6a4cd96c 100644
+--- a/mesh/node.h
++++ b/mesh/node.h
+@@ -97,3 +97,5 @@ void node_jconfig_set(struct mesh_node *node, void *jconfig);
+ void *node_jconfig_get(struct mesh_node *node);
+ void node_cfg_file_set(struct mesh_node *node, char *cfg);
+ char *node_cfg_file_get(struct mesh_node *node);
++void node_path_set(struct mesh_node *node, char *path);
++char *node_path_get(struct mesh_node *node);
+diff --git a/mesh/storage.c b/mesh/storage.c
+index 8a70b5696..9e1e42443 100644
+--- a/mesh/storage.c
++++ b/mesh/storage.c
+@@ -28,6 +28,7 @@
+ #include <unistd.h>
+ #include <dirent.h>
+ #include <libgen.h>
++#include <ftw.h>
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -61,6 +62,20 @@ static bool simple_match(const void *a, const void *b)
+ 	return a == b;
+ }
+ 
++/* This is a thread-safe always malloced version of dirname which will work
++ * regardless of which underlying dirname implimentation is used
++ */
++static char *alloc_dirname(const char *path)
++{
++	char *tmp = l_strdup(path);
++	char *dir;
++
++	dir = dirname(tmp);
++	strncpy(tmp, dir, strlen(path) + 1);
++
++	return tmp;
++}
++
+ static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
+ {
+ 	struct mesh_node *node = user_data;
+@@ -483,7 +498,7 @@ void storage_save_config(struct mesh_node *node, bool no_wait,
+ 		l_idle_oneshot(idle_save_config, info, NULL);
+ }
+ 
+-static int create_dir(const char *dirname)
++int storage_create_dir(const char *dirname)
+ {
+ 	struct stat st;
+ 	char dir[PATH_MAX + 1], *prev, *next;
+@@ -524,7 +539,7 @@ bool storage_load_nodes(const char *dir_name)
+ 	DIR *dir;
+ 	struct dirent *entry;
+ 
+-	create_dir(dir_name);
++	storage_create_dir(dir_name);
+ 	dir = opendir(dir_name);
+ 	if (!dir) {
+ 		l_error("Failed to open mesh node storage directory: %s",
+@@ -634,15 +649,47 @@ fail:
+ 	return false;
+ }
+ 
++char *storage_path_get(struct mesh_node *node)
++{
++	char *node_path = node_path_get(node);
++
++	if (!node_path) {
++		char *cfgname = (char *) node_cfg_file_get(node);
++
++		if (!cfgname)
++			return NULL;
++
++		node_path = alloc_dirname(cfgname);
++		node_path_set(node, node_path);
++	}
++
++	return node_path;
++}
++
++static int del_fobject(const char *fpath, const struct stat *sb, int typeflag,
++						struct FTW *ftwbuf)
++{
++	switch (typeflag) {
++	case FTW_DP:
++		rmdir(fpath);
++		l_debug("RMDIR %s", fpath);
++		break;
++
++	case FTW_SL:
++	default:
++		remove(fpath);
++		l_debug("RM %s", fpath);
++		break;
++	}
++	return 0;
++}
++
+ /* Permanently remove node configuration */
+ void storage_remove_node_config(struct mesh_node *node)
+ {
+-	char *cfgname;
++	char *node_path, *mesh_path, *mesh_name;
+ 	struct json_object *jnode;
+-	const char *dir_name;
+ 	uint16_t node_id;
+-	size_t len;
+-	char *bak;
+ 
+ 	if (!node)
+ 		return;
+@@ -653,31 +700,20 @@ void storage_remove_node_config(struct mesh_node *node)
+ 		json_object_put(jnode);
+ 	node_jconfig_set(node, NULL);
+ 
+-	/* Delete node configuration file */
+-	cfgname = (char *) node_cfg_file_get(node);
+-	if (!cfgname)
+-		return;
+-
+-	l_debug("Delete node config file %s", cfgname);
+-	remove(cfgname);
++	node_path = storage_path_get(node);
++	l_debug("Delete node config %s", node_path);
+ 
+-	/* Delete the backup file */
+-	len = strlen(cfgname) + 5;
+-	bak = l_malloc(len);
+-	strncpy(bak, cfgname, len);
+-	bak = strncat(bak, ".bak", 5);
+-	remove(bak);
+-	l_free(bak);
+-
+-	/* Delete the node directory */
+-	dir_name = dirname(cfgname);
+-
+-	l_debug("Delete directory %s", dir_name);
+-	rmdir(dir_name);
++	/* Make sure path name of node follows expected guidelines */
++	mesh_path = alloc_dirname(node_path);
++	mesh_name = basename(mesh_path);
++	if (strcmp(mesh_name, "mesh"))
++		goto done;
+ 
+-	l_free(cfgname);
+-	node_cfg_file_set(node, NULL);
++	nftw(node_path, del_fobject, 5, FTW_DEPTH | FTW_PHYS);
+ 
+ 	node_id = node_id_get(node);
+ 	l_queue_remove(node_ids, L_UINT_TO_PTR(node_id));
++
++done:
++	l_free(mesh_path);
+ }
+diff --git a/mesh/storage.h b/mesh/storage.h
+index d71d11b8e..feb67d103 100644
+--- a/mesh/storage.h
++++ b/mesh/storage.h
+@@ -20,6 +20,20 @@
+ struct mesh_net;
+ struct mesh_node;
+ 
++struct net_key_storage {
++	uint16_t net_idx;
++	uint8_t phase;
++	uint8_t old_key[16];
++	uint8_t new_key[16];
++};
++
++struct app_key_storage {
++	uint16_t app_idx;
++	uint16_t net_idx;
++	uint8_t old_key[16];
++	uint8_t new_key[16];
++};
++
+ bool storage_load_nodes(const char *dir);
+ bool storage_create_node_config(struct mesh_node *node, void *db_node);
+ void storage_remove_node_config(struct mesh_node *node);
+@@ -49,3 +63,5 @@ bool storage_set_device_key(struct mesh_node *node, uint8_t dev_key[16]);
+ bool storage_set_unicast(struct mesh_node *node, uint16_t unicast);
+ bool storage_set_key_refresh_phase(struct mesh_net *net, uint16_t net_idx,
+ 								uint8_t phase);
++int storage_create_dir(const char *dirname);
++char *storage_path_get(struct mesh_node *node);
+-- 
+2.14.5
 
-do you have idea why for custom SCO HFP codec is needed to change
-Transmit and Receive bandwidth in HCI Setup Synchronous Connection
-packet?
-
-And how to expose API for userspace applications so they can change
-hardcoded kernel bandwidth? Why is there value 8000?
-
-Without changing hardcoded value 8000 to 4000 I'm unable to open SCO
-socket for AuriStream codec in HFP profile.
-
-On Saturday 04 May 2019 19:15:50 Pali Roh=C3=A1r wrote:
-> Hello,
->=20
-> I found out that more bluetooth headsets supports AuriStream codec in
-> bluetooth HSP/HFP profile. It is proprietary CSR codec described as some
-> ADPCM variant with better quality as default CVSD codec.
->=20
-> Headset announce their support by sending command AT+CSRSF, in sixth
-> number with first or second bit set (counted from zero). E.g.:
->=20
->   AT+CSRSF=3D0,0,0,0,0,7
->=20
-> Codec is then selected by host with sending:
->=20
->   +CSRFN: (6,4)
->   OK
->=20
-> And answer from headset is acknowledged by another:
->=20
->   OK
->=20
->=20
-> Problem is that on Linux after issuing these AT commands I cannot longer
-> connect to SCO socket. connect() fails with Protocol Error.
->=20
-> And in btmon is following error:
->=20
->     > HCI Event: Synchronous Connect Complete (0x2c) plen 17
->             Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
->=20
->=20
-> In some CSR SKD is example how to activate it and there is code which
-> seems to sets following HCI connection parameters:
->=20
->   syncPktTypes =3D 0x003F
->   bandwidth =3D 4000
->   max_latency =3D 16
->   voice_settings =3D 0x63
->   retx_effort =3D 2
->=20
-> I figured out that voice_settings can be configured via setsockopt()
-> SOL_BLUETOOTH + BT_VOICE. But for some unknown reason linux kernel
-> accept only two whitelisted values: 0x0003 and 0x0060.
->=20
-> So I tried to set 0x0003 value (BT_VOICE_TRANSPARENT).
->=20
-> In btmon I saw that kernel really changed "Air Coding Format" from CVSD
-> to Transparent, but I still got same "Invalid LMP Parameters" error.
->=20
-> I tried to remove that whilelist from BT_VOICE option via patch below:
->=20
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 9a580999ca57..06db91de4f23 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -231,7 +231,7 @@ static int sco_connect(struct sock *sk)
->  	else
->  		type =3D SCO_LINK;
-> =20
-> -	if (sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT &&
-> +	if ((sco_pi(sk)->setting & SCO_AIRMODE_MASK) =3D=3D SCO_AIRMODE_TRANSP =
-&&
->  	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
->  		err =3D -EOPNOTSUPP;
->  		goto done;
-> @@ -836,13 +836,6 @@ static int sco_sock_setsockopt(struct socket *sock, =
-int level, int optname,
->  			break;
->  		}
-> =20
-> -		/* Explicitly check for these values */
-> -		if (voice.setting !=3D BT_VOICE_TRANSPARENT &&
-> -		    voice.setting !=3D BT_VOICE_CVSD_16BIT) {
-> -			err =3D -EINVAL;
-> -			break;
-> -		}
-> -
->  		sco_pi(sk)->setting =3D voice.setting;
->  		break;
-> =20
->=20
-> Btmon now really showed Settings as 0x63, but still did not worked.
-> Again exactly same HCI error.
->=20
-> Next I tried hacking linux kernel to customize packet type and max
-> latency. But even I changed these values I still got that HCI error.
->=20
-> After I changed tx_bandwidth and rx_bandwidth to 4000 (as described in
-> above connection parameters), connect() syscall for that SCO socket
-> succeeded and I started getting voice microphone data on that socket.
->=20
-> And it worked also with voice settings 0x0003 with active in-kernel
-> whitelist.
->=20
-> Patch which is needed is following: Change bandwidth to 4000:
->=20
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index bd4978ce8c45..2dd4d0412971 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -283,8 +283,8 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 hand=
-le)
-> =20
->  	cp.handle   =3D cpu_to_le16(handle);
-> =20
-> -	cp.tx_bandwidth   =3D cpu_to_le32(0x00001f40);
-> -	cp.rx_bandwidth   =3D cpu_to_le32(0x00001f40);
-> +	cp.tx_bandwidth   =3D cpu_to_le32(4000);
-> +	cp.rx_bandwidth   =3D cpu_to_le32(4000);
->  	cp.voice_setting  =3D cpu_to_le16(conn->setting);
-> =20
->  	switch (conn->setting & SCO_AIRMODE_MASK) {
->=20
-> I have really no idea what it does with headset. But without this patch
-> I'm not able to switch HSP codec from CVSD to AuriStream.
->=20
-> Is somebody able to explain how above change can allow opening SCO
-> socket?
->=20
-> Because without it I'm not able to activate AuriStream codec, could you
-> consider allowing userspace (via some setsockopt=C5=88 to change bandwidt=
-h?
-> Because now it is hardcoded in kernel source code.
->=20
-> For more details here is btmon output with default bandwidth which is
-> failing:
->=20
->   $ sudo ./monitor/btmon
->   Bluetooth monitor ver 5.50
->   =3D Note: Linux version 4.9.0-9-amd64 (x86_64)
->   =3D Note: Bluetooth subsystem version 2.22
->   =3D New Index: XX:XX:XX:XX:XX:XX (Primary,USB,hci0)
->   =3D Open Index: XX:XX:XX:XX:XX:XX
->   =3D Index Info: XX:XX:XX:XX:XX:XX (Intel Corp.)
->   @ MGMT Open: bluetoothd (privileged) version 1.14
->   @ MGMT Open: btmon (privileged) version 1.14
->   < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->           Handle: 34
->           Transmit bandwidth: 8000
->           Receive bandwidth: 8000
->           Max latency: 13
->           Setting: 0x0003
->             Input Coding: Linear
->             Input Data Format: 1's complement
->             Input Sample Size: 8-bit
->             # of bits padding at MSB: 0
->             Air Coding Format: Transparent Data
->           Retransmission effort: Optimize for link quality (0x02)
->           Packet type: 0x0380
->             3-EV3 may not be used
->             2-EV5 may not be used
->             3-EV5 may not be used
->   > HCI Event: Command Status (0x0f) plen 4
->         Setup Synchronous Connection (0x01|0x0028) ncmd 1
->           Status: Success (0x00)
->   > HCI Event: Max Slots Change (0x1b) plen 3
->           Handle: 34
->           Max slots: 1
->   > HCI Event: Synchronous Connect Complete (0x2c) plen 17
->           Status: Invalid LMP Parameters / Invalid LL Parameters (0x1e)
->           Handle: 34
->           Address: XX:XX:XX:XX:XX:XX (Creative Technology, Ltd.)
->           Link type: eSCO (0x02)
->           Transmission interval: 0x00
->           Retransmission window: 0x00
->           RX packet length: 0
->           TX packet length: 0
->           Air mode: u-law log (0x00)
->   > HCI Event: Max Slots Change (0x1b) plen 3
->           Handle: 34
->           Max slots: 5
->=20
-> And here is btmon output with above kernel patch which changes bandwidth =
-to 4000:
->=20
->   $ sudo ./monitor/btmon
->   Bluetooth monitor ver 5.50
->   =3D Note: Linux version 4.9.0-9-amd64 (x86_64)
->   =3D Note: Bluetooth subsystem version 2.22
->   =3D New Index: XX:XX:XX:XX:XX:XX (Primary,USB,hci0)
->   =3D Open Index: XX:XX:XX:XX:XX:XX
->   =3D Index Info: XX:XX:XX:XX:XX:XX (Intel Corp.)
->   @ MGMT Open: bluetoothd (privileged) version 1.14
->   @ MGMT Open: btmon (privileged) version 1.14
->   < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->           Handle: 34
->           Transmit bandwidth: 4000
->           Receive bandwidth: 4000
->           Max latency: 13
->           Setting: 0x0003
->             Input Coding: Linear
->             Input Data Format: 1's complement
->             Input Sample Size: 8-bit
->             # of bits padding at MSB: 0
->             Air Coding Format: Transparent Data
->           Retransmission effort: Optimize for link quality (0x02)
->           Packet type: 0x0380
->             3-EV3 may not be used
->             2-EV5 may not be used
->             3-EV5 may not be used
->   > HCI Event: Command Status (0x0f) plen 4
->         Setup Synchronous Connection (0x01|0x0028) ncmd 1
->           Status: Success (0x00)
->   > HCI Event: Max Slots Change (0x1b) plen 3
->           Handle: 34
->           Max slots: 1
->   > HCI Event: Synchronous Connect Complete (0x2c) plen 17
->           Status: Success (0x00)
->           Handle: 38
->           Address: XX:XX:XX:XX:XX:XX (Creative Technology, Ltd.)
->           Link type: eSCO (0x02)
->           Transmission interval: 0x10
->           Retransmission window: 0x02
->           RX packet length: 40
->           TX packet length: 40
->           Air mode: Transparent (0x03)
->   < SCO Data TX: Handle 38 flags 0x00 dlen 48
->   < ACL Data TX: Handle 34 flags 0x00 dlen 18
->         Channel: 105 len 14 [PSM 0 mode 0] {chan 0}
->           61 ef 15 0d 0a 2b 56 47 4d 3d 34 0d 0a d4        a....+VGM=3D4.=
-=2E.
->   > HCI Event: Number of Completed Packets (0x13) plen 5
->           Num handles: 1
->           Handle: 34
->           Count: 1
->   > SCO Data RX: Handle 38 flags 0x00 dlen 24
->   > SCO Data RX: Handle 38 flags 0x00 dlen 24
->   > SCO Data RX: Handle 38 flags 0x00 dlen 24
->   < SCO Data TX: Handle 38 flags 0x00 dlen 48
->   > HCI Event: Max Slots Change (0x1b) plen 3
->           Handle: 34
->           Max slots: 5
->=20
-> ... and SCO data are coming on SCO socket.
->=20
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---dnvpdqw2rzp4oal2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXNBP3gAKCRCL8Mk9A+RD
-UpQ8AKC5BaWg29wUslqp3i95Ptx9T2yU7ACgn2Ug5n1nnYCmmqcRKjNdRG4AP1o=
-=x6K+
------END PGP SIGNATURE-----
-
---dnvpdqw2rzp4oal2--
