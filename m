@@ -2,121 +2,167 @@ Return-Path: <SRS0=jYet=TH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=FROM_LOCAL_DIGITS,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE264C004C9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 08:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 214DDC004C9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 09:10:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB34D204FD
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 08:53:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t6gp+jRg"
+	by mail.kernel.org (Postfix) with ESMTP id E482820C01
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 09:10:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727124AbfEGIxA (ORCPT
+        id S1726464AbfEGJKH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 May 2019 04:53:00 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55737 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726457AbfEGIxA (ORCPT
+        Tue, 7 May 2019 05:10:07 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:48158 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726268AbfEGJKH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 May 2019 04:53:00 -0400
-Received: by mail-wm1-f67.google.com with SMTP id y2so19035251wmi.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 May 2019 01:52:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Wih2OIcyYsKXpou6CruU54CO0xxCtxd4QblQ3s8rmLc=;
-        b=t6gp+jRgeijmWyt+aRY1MyTzJXMbnDC3U+pLAyc/YR9EtQrL/tNAQGBuXV1EKXwveL
-         MIMqIiBXtFJuiWNRpcwgEjI+fY5oLLw7OhWcIWbxtaRlfT5h1r1EM/ZNnmoFJquhCvNr
-         JO8/6VI94T2JEBaGjdBZpPGLacOnAeuq+mDgUbZtGwU9CJUnkJrCbmI0Mq09Z7/Qjysn
-         MSWvwlT6RVMIHw8TET9t9SO/mNZ5/Xt7r3xIGmtgATZJF3zCAhzQg/sGLesTRzbTzm9x
-         62EinAZbfpEFwFfD4Wn/QCfaE8qcW0r+EywPRwmQKCYDl77EOm82or1jWX2c8XnEsqIJ
-         yDFw==
+        Tue, 7 May 2019 05:10:07 -0400
+Received: by mail-io1-f72.google.com with SMTP id l6so4715465ioc.15
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 May 2019 02:10:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Wih2OIcyYsKXpou6CruU54CO0xxCtxd4QblQ3s8rmLc=;
-        b=CkYcLUKuTgK57qADp+uwdgSqN38AO/ljtSxlwVy1ROjDiuGyTW1iTvUg7I2BPdE98u
-         XkCafOkrJzWCMeIXBzp2Z9Y8HNV5XALSxjoriQp8gySEU5FsPCWkzI7zlzqPHlG8elfe
-         /8ZdfkA3/Me/x6xSjkqWriRrWrXJtgh0PP/e1oKfJKJQm494LMkD+Q6IUXAJXYsxddCz
-         M07EARnvFD4qDkpWLSomusaEuyb79B01HaM/BHgdIgqOdv7hKEAa1TrpqcB0cGrWvuvn
-         XnpMUkFgFjtjgCQ7n2wOyKT/J+XPnQnlyTqUwodxVWr32TDRJ5Kt984FJI6I2sKXxEJB
-         nwUw==
-X-Gm-Message-State: APjAAAUwU6Mcp/5l+wARy4NZ2yEqRDJcQxI4URftF999qz0w5XH8JTHx
-        WTCGQY36FxutpaqeKHpflJE=
-X-Google-Smtp-Source: APXvYqwui+pUfR6sks2IZdmMpux2FLNX9ocXdpgPkbrgh5xDwore2wVzKH5E1j3rjl0LIZiM0cYUzQ==
-X-Received: by 2002:a1c:f311:: with SMTP id q17mr20381804wmq.144.1557219178165;
-        Tue, 07 May 2019 01:52:58 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id c11sm10564904wmb.12.2019.05.07.01.52.56
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 07 May 2019 01:52:56 -0700 (PDT)
-Date:   Tue, 7 May 2019 10:52:55 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3 6/6] a2dp: Reword LastUsed
-Message-ID: <20190507085255.zplj5ddopl3z5n2v@pali>
-References: <20190506124310.19151-1-luiz.dentz@gmail.com>
- <20190506124310.19151-6-luiz.dentz@gmail.com>
- <CABBYNZJ4+Be+sAXVAL_96qov5Go3BpRwmJtkdOVXC4apfL2K9A@mail.gmail.com>
- <20190506130225.smlwgw5cgvhdb35v@pali>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=wGj8QD5gKJW43OuUYpH6pO7J5gHO+g1GMqUge+gSVCw=;
+        b=sRfYadiHweAbM3otyWH2tI8zc+zeB4GVGt8ZVqdrSYddUlb50SsLYswTseCD9tV/y1
+         /+NIgoWdwb3PKgWJpyvOom6PGRrLuJg+7FbIo/f3iWw9nYHjZD4SrE8Wy37+MZS4cZav
+         IVrzj3xWE/mTtqwgJHPPcwCmrFMZB4f7Tbj13cs06ZVDraU526QinJbSUpNGtN9Ik2zM
+         yCJLBzCUiD6YAS9uuOC0JVW7X4pR6RUSRkEGlcBkRjrehO9szH9wg//uLWKBpC1oDCFs
+         +4FuWGoCgizxRkI4sXZptroCJYdpBjaUsrU98+p4GlkQj/4CBmZE+QPJUpttbV4bukWl
+         q3Kw==
+X-Gm-Message-State: APjAAAXbD9BHGlPP3hhfW9kB0fn/Hp3wNP7f3V7vEhFqgKDW65j/ks7B
+        Rpfw8KbkAZYKtKR+GJLBGgxK74ZFgS3BE4CCiIqKle+yWzIb
+X-Google-Smtp-Source: APXvYqxDW5QCZU/EC3UQeUBZbnYC491FuIKbQhdZyD6oz6ReScipKY22VF2GVnlNUccnTQrfJH2EAiIxRFO/ATvrnpwvlaT00zLt
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="l6z2737yuj66s7ou"
-Content-Disposition: inline
-In-Reply-To: <20190506130225.smlwgw5cgvhdb35v@pali>
-User-Agent: NeoMutt/20170113 (1.7.2)
+X-Received: by 2002:a24:7595:: with SMTP id y143mr7969814itc.42.1557220205903;
+ Tue, 07 May 2019 02:10:05 -0700 (PDT)
+Date:   Tue, 07 May 2019 02:10:05 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000035c756058848954a@google.com>
+Subject: KASAN: use-after-free Read in hci_cmd_timeout
+From:   syzbot <syzbot+19a9f729f05272857487@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello,
 
---l6z2737yuj66s7ou
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+syzbot found the following crash on:
 
-On Monday 06 May 2019 15:02:25 Pali Roh=C3=A1r wrote:
-> On Monday 06 May 2019 15:46:03 Luiz Augusto von Dentz wrote:
-> > Hi Pali,
-> >=20
-> > I hope this fixes the problems you have been seeing, it should at
-> > least take care of the issues with wrong order of SelectConfiguration
-> > and restoring the exact same endpoint used last time.
->=20
-> Hi Luiz! Great, this should make bluez to be more deterministic.
+HEAD commit:    83a50840 Merge tag 'seccomp-v5.1-rc8' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b99b60a00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ef1b87b455c397cf
+dashboard link: https://syzkaller.appspot.com/bug?extid=19a9f729f05272857487
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
 
-Hi! Now I looked at it and in cache file I see:
+Unfortunately, I don't have any reproducer for this crash yet.
 
-LastUsed=3D04:01
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+19a9f729f05272857487@syzkaller.appspotmail.com
 
-What would happen when A2DP application (e.g. pulseaudio) register DBus
-endpoints in different order? Or e.g. do not register some endpoints due
-to missing codec librayr (aptX).
+==================================================================
+BUG: KASAN: use-after-free in hci_cmd_timeout+0x212/0x220  
+net/bluetooth/hci_core.c:2617
+Read of size 2 at addr ffff88809fa9ca08 by task kworker/1:1/22
 
-I guess that in this case LastUsed information stops working...
+CPU: 1 PID: 22 Comm: kworker/1:1 Not tainted 5.1.0-rc7+ #94
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events hci_cmd_timeout
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
+  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+  __asan_report_load_n_noabort+0xf/0x20 mm/kasan/generic_report.c:142
+  hci_cmd_timeout+0x212/0x220 net/bluetooth/hci_core.c:2617
+  process_one_work+0x98e/0x1790 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x357/0x430 kernel/kthread.c:253
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
 
-Should not be there stored rather dbus endpoint name identifier?
+Allocated by task 8319:
+  save_stack+0x45/0xd0 mm/kasan/common.c:75
+  set_track mm/kasan/common.c:87 [inline]
+  __kasan_kmalloc mm/kasan/common.c:497 [inline]
+  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:470
+  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:511
+  __do_kmalloc_node mm/slab.c:3687 [inline]
+  __kmalloc_node_track_caller+0x4e/0x70 mm/slab.c:3701
+  __kmalloc_reserve.isra.0+0x40/0xf0 net/core/skbuff.c:140
+  __alloc_skb+0x10b/0x5e0 net/core/skbuff.c:208
+  alloc_skb include/linux/skbuff.h:1058 [inline]
+  bt_skb_alloc include/net/bluetooth/bluetooth.h:339 [inline]
+  hci_prepare_cmd+0x30/0x230 net/bluetooth/hci_request.c:287
+  hci_req_add_ev+0xb0/0x210 net/bluetooth/hci_request.c:321
+  __hci_cmd_sync_ev+0xfc/0x1c0 net/bluetooth/hci_request.c:133
+  __hci_cmd_sync+0x37/0x50 net/bluetooth/hci_request.c:182
+  btintel_enter_mfg+0x2e/0x90 drivers/bluetooth/btintel.c:82
+  ag6xx_setup+0x106/0x820 drivers/bluetooth/hci_ag6xx.c:180
+  hci_uart_setup+0x1c4/0x490 drivers/bluetooth/hci_ldisc.c:418
+  hci_dev_do_open+0x78c/0x1780 net/bluetooth/hci_core.c:1450
+  hci_power_on+0x10d/0x580 net/bluetooth/hci_core.c:2173
+  process_one_work+0x98e/0x1790 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x357/0x430 kernel/kthread.c:253
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
 
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
+Freed by task 8319:
+  save_stack+0x45/0xd0 mm/kasan/common.c:75
+  set_track mm/kasan/common.c:87 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:459
+  kasan_slab_free+0xe/0x10 mm/kasan/common.c:467
+  __cache_free mm/slab.c:3499 [inline]
+  kfree+0xcf/0x230 mm/slab.c:3822
+  skb_free_head+0x93/0xb0 net/core/skbuff.c:557
+  skb_release_data+0x576/0x7a0 net/core/skbuff.c:577
+  skb_release_all+0x4d/0x60 net/core/skbuff.c:631
+  __kfree_skb net/core/skbuff.c:645 [inline]
+  kfree_skb net/core/skbuff.c:663 [inline]
+  kfree_skb+0xe8/0x390 net/core/skbuff.c:657
+  hci_dev_do_open+0xb2b/0x1780 net/bluetooth/hci_core.c:1552
+  hci_power_on+0x10d/0x580 net/bluetooth/hci_core.c:2173
+  process_one_work+0x98e/0x1790 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x357/0x430 kernel/kthread.c:253
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
 
---l6z2737yuj66s7ou
-Content-Type: application/pgp-signature; name="signature.asc"
+The buggy address belongs to the object at ffff88809fa9ca00
+  which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 8 bytes inside of
+  512-byte region [ffff88809fa9ca00, ffff88809fa9cc00)
+The buggy address belongs to the page:
+page:ffffea00027ea700 count:1 mapcount:0 mapping:ffff8880aa400940 index:0x0
+flags: 0x1fffc0000000200(slab)
+raw: 01fffc0000000200 ffffea00023039c8 ffffea00026f9488 ffff8880aa400940
+raw: 0000000000000000 ffff88809fa9c000 0000000100000006 0000000000000000
+page dumped because: kasan: bad access detected
 
------BEGIN PGP SIGNATURE-----
+Memory state around the buggy address:
+  ffff88809fa9c900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff88809fa9c980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> ffff88809fa9ca00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                       ^
+  ffff88809fa9ca80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff88809fa9cb00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXNFHZQAKCRCL8Mk9A+RD
-UkNWAJ9NF2vbHFHhWgcBa1Uamx5sx4EMDACeI81hBG9AVINT4H/JRdT2wPjSdSY=
-=4SYd
------END PGP SIGNATURE-----
 
---l6z2737yuj66s7ou--
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
