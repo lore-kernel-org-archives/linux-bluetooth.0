@@ -2,515 +2,292 @@ Return-Path: <SRS0=jYet=TH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EBEFC004C9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 04:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4D0C004C9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 06:54:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3413720825
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 04:24:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C79B20989
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 06:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbfEGEYh (ORCPT
+        id S1726412AbfEGGyl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 May 2019 00:24:37 -0400
-Received: from mga05.intel.com ([192.55.52.43]:4547 "EHLO mga05.intel.com"
+        Tue, 7 May 2019 02:54:41 -0400
+Received: from mga12.intel.com ([192.55.52.136]:34813 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725926AbfEGEYh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 May 2019 00:24:37 -0400
+        id S1726253AbfEGGyl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 May 2019 02:54:41 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 May 2019 21:24:36 -0700
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 May 2019 23:54:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,440,1549958400"; 
-   d="scan'208";a="142101236"
-Received: from ingas-nuc1.sea.intel.com ([10.251.157.158])
-  by orsmga006.jf.intel.com with ESMTP; 06 May 2019 21:24:36 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
+Received: from spoorthi-h97m-d3h.iind.intel.com ([10.223.96.21])
+  by fmsmga005.fm.intel.com with ESMTP; 06 May 2019 23:54:37 -0700
+From:   SpoorthiX K <spoorthix.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Add CreateNetwork method() implementation
-Date:   Mon,  6 May 2019 21:24:33 -0700
-Message-Id: <20190507042433.22190-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.17.2
+Cc:     marcel@holtmann.org
+Subject: [PATCH] v7 Add support for LE ping feature
+Date:   Tue,  7 May 2019 12:33:38 +0530
+Message-Id: <1557212618-11745-1-git-send-email-spoorthix.k@intel.com>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements CreateNetwork() method on org.bluez.mesh.Network1
-interface. Invoking this method generates a self-provisioned
-local node associated with a brand new mesh network. This new
-network is bare bones: only one network key is defined. The new node
-assumes the role of mesh network manager and will be able to use
-soon to be implemented methods of org.bluez.mesh.Management1 interface
-to provision remote nodes into its network and to add/update/remove
-network and application keys.
----
- mesh/mesh.c |  70 ++++++++++++++++-
- mesh/node.c | 217 ++++++++++++++++++++++++++++++++++------------------
- mesh/node.h |   8 +-
- 3 files changed, 217 insertions(+), 78 deletions(-)
+From: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index a084f9200..b062f44d6 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -112,7 +112,7 @@ static void start_io(uint16_t index)
+Changes made to add HCI Write Authenticated Payload timeout
+command for LE Ping feature.
+As per the Core Specification 5.0 Volume 2 Part E Section 7.3.94,
+the following code changes implements
+HCI Write Authenticated Payload timeout command for LE Ping feature.
+
+Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+---
+ include/net/bluetooth/hci.h      | 20 +++++++++++
+ include/net/bluetooth/hci_core.h |  4 +++
+ net/bluetooth/hci_conn.c         |  3 ++
+ net/bluetooth/hci_core.c         |  1 +
+ net/bluetooth/hci_debugfs.c      | 31 +++++++++++++++++
+ net/bluetooth/hci_event.c        | 72 ++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 131 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c36dc1e..6e7934b 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1130,6 +1130,26 @@ struct hci_cp_write_sc_support {
+ 	__u8	support;
+ } __packed;
  
- 	l_debug("Started mesh (io %p) on hci %u", mesh.io, index);
- 
--	node_attach_io(io);
-+	node_attach_io_all(io);
- }
- 
- /* Used for any outbound traffic that doesn't have Friendship Constraints */
-@@ -491,7 +491,7 @@ static bool prov_complete_cb(void *user_data, uint8_t status,
- 	path = join_pending->app_path;
- 
- 	if (status == PROV_ERR_SUCCESS &&
--	    !node_add_pending_local(join_pending->node, info, mesh.io))
-+	    !node_add_pending_local(join_pending->node, info))
- 		status = PROV_ERR_UNEXPECTED_ERR;
- 
- 	if (status != PROV_ERR_SUCCESS) {
-@@ -499,6 +499,7 @@ static bool prov_complete_cb(void *user_data, uint8_t status,
- 		return false;
- 	}
- 
-+	node_attach_io(join_pending->node, mesh.io);
- 	token = node_get_token(join_pending->node);
- 
- 	msg = l_dbus_message_new_method_call(dbus, owner, path,
-@@ -694,6 +695,69 @@ static struct l_dbus_message *leave_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
-+static void create_network_ready_cb(void *user_data, int status,
-+							struct mesh_node *node)
-+{
-+	struct l_dbus_message *reply;
-+	struct l_dbus_message *pending_msg;
-+	const uint8_t *token;
++#define HCI_OP_READ_AUTH_PAYLOAD_TO    0x0c7b
++struct hci_cp_read_auth_payload_to {
++	__le16  handle;
++} __packed;
++struct hci_rp_read_auth_payload_to {
++	__u8    status;
++	__le16  handle;
++	__le16  timeout;
++} __packed;
 +
-+	pending_msg = l_queue_find(pending_queue, simple_match, user_data);
-+	if (!pending_msg)
++#define HCI_OP_WRITE_AUTH_PAYLOAD_TO    0x0c7c
++struct hci_cp_write_auth_payload_to {
++	__le16  handle;
++	__le16  timeout;
++} __packed;
++struct hci_rp_write_auth_payload_to {
++	__u8    status;
++	__le16  handle;
++} __packed;
++
+ #define HCI_OP_READ_LOCAL_OOB_EXT_DATA	0x0c7d
+ struct hci_rp_read_local_oob_ext_data {
+ 	__u8     status;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e5ea633..7dfe6ff 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -196,6 +196,8 @@ struct adv_info {
+ /* Default min/max age of connection information (1s/3s) */
+ #define DEFAULT_CONN_INFO_MIN_AGE	1000
+ #define DEFAULT_CONN_INFO_MAX_AGE	3000
++/* Default authenticated payload timeout 30s */
++#define DEFAULT_AUTH_PAYLOAD_TIMEOUT   0x0bb8
+ 
+ struct amp_assoc {
+ 	__u16	len;
+@@ -272,6 +274,7 @@ struct hci_dev {
+ 	__u16		discov_interleaved_timeout;
+ 	__u16		conn_info_min_age;
+ 	__u16		conn_info_max_age;
++	__u16		auth_payload_timeout;
+ 	__u8		ssp_debug_mode;
+ 	__u8		hw_error_code;
+ 	__u32		clock;
+@@ -477,6 +480,7 @@ struct hci_conn {
+ 	__u16		disc_timeout;
+ 	__u16		conn_timeout;
+ 	__u16		setting;
++	__u16		auth_payload_timeout;
+ 	__u16		le_conn_min_interval;
+ 	__u16		le_conn_max_interval;
+ 	__u16		le_conn_interval;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index bd4978c..eb27299 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -520,6 +520,9 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
+ 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+ 
++	/* Set Default Authenticated payload timeout to 30s*/
++	conn->auth_payload_timeout = DEFAULT_AUTH_PAYLOAD_TIMEOUT;
++
+ 	if (conn->role == HCI_ROLE_MASTER)
+ 		conn->out = true;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7352fe8..7959ee7 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3156,6 +3156,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
+ 	hdev->conn_info_min_age = DEFAULT_CONN_INFO_MIN_AGE;
+ 	hdev->conn_info_max_age = DEFAULT_CONN_INFO_MAX_AGE;
++	hdev->auth_payload_timeout = DEFAULT_AUTH_PAYLOAD_TIMEOUT;
+ 
+ 	mutex_init(&hdev->lock);
+ 	mutex_init(&hdev->req_lock);
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 51f5b1e..bb67f4a 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -941,6 +941,35 @@ static int adv_max_interval_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
+ 			adv_max_interval_set, "%llu\n");
+ 
++static int auth_payload_timeout_set(void *data, u64 val)
++{
++	struct hci_dev *hdev = data;
++
++	if (val < 0x0001 || val > 0xffff)
++		return -EINVAL;
++
++	hci_dev_lock(hdev);
++	hdev->auth_payload_timeout = val;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++static int auth_payload_timeout_get(void *data, u64 *val)
++{
++	struct hci_dev *hdev = data;
++
++	hci_dev_lock(hdev);
++	*val = hdev->auth_payload_timeout;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
++			auth_payload_timeout_get,
++			auth_payload_timeout_set, "%llu\n");
++
+ DEFINE_QUIRK_ATTRIBUTE(quirk_strict_duplicate_filter,
+ 		       HCI_QUIRK_STRICT_DUPLICATE_FILTER);
+ DEFINE_QUIRK_ATTRIBUTE(quirk_simultaneous_discovery,
+@@ -994,6 +1023,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+ 			    &adv_max_interval_fops);
+ 	debugfs_create_u16("discov_interleaved_timeout", 0644, hdev->debugfs,
+ 			   &hdev->discov_interleaved_timeout);
++	debugfs_create_file("auth_payload_timeout", 0644, hdev->debugfs, hdev,
++			    &auth_payload_timeout_fops);
+ 
+ 	debugfs_create_file("quirk_strict_duplicate_filter", 0644,
+ 			    hdev->debugfs, hdev,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ac2826c..90e3727 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -579,6 +579,51 @@ static void hci_cc_read_local_commands(struct hci_dev *hdev,
+ 		memcpy(hdev->commands, rp->commands, sizeof(hdev->commands));
+ }
+ 
++static void hci_cc_read_auth_payload_timeout(struct hci_dev *hdev,
++					     struct sk_buff *skb)
++{
++	struct hci_rp_read_auth_payload_to *rp = (void *)skb->data;
++	struct hci_conn *conn;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++
++	if (rp->status)
 +		return;
 +
-+	if (status != MESH_ERROR_NONE) {
-+		reply = dbus_error(pending_msg, status, NULL);
-+		goto done;
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
++	if (conn)
++		conn->auth_payload_timeout = __le16_to_cpu(rp->timeout);
++
++	hci_dev_unlock(hdev);
++}
++
++static void hci_cc_write_auth_payload_timeout(struct hci_dev *hdev,
++					      struct sk_buff *skb)
++{
++	struct hci_rp_write_auth_payload_to *rp = (void *)skb->data;
++	struct hci_conn *conn;
++	void *sent;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++
++	if (rp->status)
++		return;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO);
++	if (!sent)
++		return;
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
++	if (conn)
++		conn->auth_payload_timeout = get_unaligned_le16(sent + 2);
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_cc_read_local_features(struct hci_dev *hdev,
+ 				       struct sk_buff *skb)
+ {
+@@ -2975,6 +3020,25 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		goto unlock;
+ 	}
+ 
++	/* Set the default Authenticated Payload Timeout after
++	 * an LE Link is established. As per Core Spec v5.0, Vol 2, Part B
++	 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
++	 * sent when the link is active and Encryption is enabled, the conn
++	 * type can be either LE or ACL and controller must support LMP Ping.
++	 * Ensure for AES-CCM encryption as well.
++	 */
++	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags) &&
++	    test_bit(HCI_CONN_AES_CCM, &conn->flags) &&
++	    ((conn->type == ACL_LINK && lmp_ping_capable(hdev)) ||
++	     (conn->type == LE_LINK && (hdev->le_features[0] & HCI_LE_PING)))) {
++		struct hci_cp_write_auth_payload_to cp;
++
++		cp.handle = cpu_to_le16(conn->handle);
++		cp.timeout = cpu_to_le16(hdev->auth_payload_timeout);
++		hci_send_cmd(conn->hdev, HCI_OP_WRITE_AUTH_PAYLOAD_TO,
++			     sizeof(cp), &cp);
 +	}
 +
-+	node_attach_io(node, mesh.io);
-+
-+	reply = l_dbus_message_new_method_return(pending_msg);
-+	token = node_get_token(node);
-+
-+	l_debug();
-+	l_dbus_message_set_arguments(reply, "t", l_get_be64(token));
-+
-+done:
-+	l_dbus_send(dbus_get_bus(), reply);
-+	l_queue_remove(pending_queue, pending_msg);
-+}
-+
-+static struct l_dbus_message *create_network_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	const char *app_path, *sender;
-+	struct l_dbus_message_iter iter_uuid;
-+	struct l_dbus_message *pending_msg;
-+	uint8_t *uuid;
-+	uint32_t n;
-+
-+	l_debug("Create network request");
-+
-+	if (!l_dbus_message_get_arguments(msg, "oay", &app_path,
-+								&iter_uuid))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (!l_dbus_message_iter_get_fixed_array(&iter_uuid, &uuid, &n)
-+								|| n != 16)
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
-+							"Bad device UUID");
-+
-+	sender = l_dbus_message_get_sender(msg);
-+	pending_msg = l_dbus_message_ref(msg);
-+	if (!pending_queue)
-+		pending_queue = l_queue_new();
-+
-+	l_queue_push_tail(pending_queue, pending_msg);
-+
-+	node_create(app_path, sender, uuid, create_network_ready_cb,
-+								pending_msg);
-+
-+	return NULL;
-+}
-+
- static void setup_network_interface(struct l_dbus_interface *iface)
- {
- 	l_dbus_interface_method(iface, "Join", 0, join_network_call, "",
-@@ -707,6 +771,8 @@ static void setup_network_interface(struct l_dbus_interface *iface)
+ notify:
+ 	if (conn->state == BT_CONFIG) {
+ 		if (!ev->status)
+@@ -3170,6 +3234,14 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_write_sc_support(hdev, skb);
+ 		break;
  
- 	l_dbus_interface_method(iface, "Leave", 0, leave_call, "", "t",
- 								"token");
-+	l_dbus_interface_method(iface, "CreateNetwork", 0, create_network_call,
-+					"t", "oay", "token", "app", "uuid");
- }
- 
- bool mesh_dbus_init(struct l_dbus *dbus)
-diff --git a/mesh/node.c b/mesh/node.c
-index 774d03d45..11cfdab1c 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -48,6 +48,11 @@
- #define MESH_NODE_PATH_PREFIX "/node"
- #define MESH_ELEMENT_PATH_PREFIX "/ele"
- 
-+/* Default values for a new locally created node */
-+#define DEFAULT_NEW_UNICAST 0x0001
-+#define DEFAULT_IV_INDEX 0x0000
-+#define DEFAULT_PRIMARY_NET_INDEX 0x0000
++	case HCI_OP_READ_AUTH_PAYLOAD_TO:
++		hci_cc_read_auth_payload_timeout(hdev, skb);
++		break;
 +
- /* Default element location: unknown */
- #define DEFAULT_LOCATION 0x0000
- 
-@@ -56,6 +61,7 @@
- 
- #define REQUEST_TYPE_JOIN 0
- #define REQUEST_TYPE_ATTACH 1
-+#define REQUEST_TYPE_CREATE 2
- 
- struct node_element {
- 	char *path;
-@@ -996,8 +1002,14 @@ static void attach_io(void *a, void *b)
- 		mesh_net_attach(node->net, io);
- }
- 
--/* Register callbacks for io */
--void node_attach_io(struct mesh_io *io)
-+/* Register callback for the node's io */
-+void node_attach_io(struct mesh_node *node, struct mesh_io *io)
-+{
-+	attach_io(node, io);
-+}
++	case HCI_OP_WRITE_AUTH_PAYLOAD_TO:
++		hci_cc_write_auth_payload_timeout(hdev, skb);
++		break;
 +
-+/* Register callbacks for all nodes io */
-+void node_attach_io_all(struct mesh_io *io)
- {
- 	l_queue_foreach(nodes, attach_io, io);
- }
-@@ -1368,6 +1380,60 @@ static bool get_app_properties(struct mesh_node *node, const char *path,
- 	return true;
- }
- 
-+static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
-+				bool ivu, uint32_t iv_idx, uint8_t dev_key[16],
-+				uint16_t net_key_idx, uint8_t net_key[16])
-+{
-+	node->net = mesh_net_new(node);
-+
-+	if (!nodes)
-+		nodes = l_queue_new();
-+
-+	l_queue_push_tail(nodes, node);
-+
-+	if (!storage_set_iv_index(node->net, iv_idx, ivu))
-+		return false;
-+
-+	mesh_net_set_iv_index(node->net, iv_idx, ivu);
-+
-+	if (!mesh_db_write_uint16_hex(node->jconfig, "unicastAddress",
-+								unicast))
-+		return false;
-+
-+	l_getrandom(node->token, sizeof(node->token));
-+	if (!mesh_db_write_token(node->jconfig, node->token))
-+		return false;
-+
-+	memcpy(node->dev_key, dev_key, 16);
-+	if (!mesh_db_write_device_key(node->jconfig, dev_key))
-+		return false;
-+
-+	node->primary = unicast;
-+	mesh_net_register_unicast(node->net, unicast, node->num_ele);
-+
-+	if (mesh_net_add_key(node->net, net_key_idx, net_key) !=
-+							MESH_STATUS_SUCCESS)
-+		return false;
-+
-+	if (kr) {
-+		/* Duplicate net key, if the key refresh is on */
-+		if (mesh_net_update_key(node->net, net_key_idx, net_key) !=
-+							MESH_STATUS_SUCCESS)
-+			return false;
-+
-+		if (!mesh_db_net_key_set_phase(node->jconfig, net_key_idx,
-+							KEY_REFRESH_PHASE_TWO))
-+			return false;
-+	}
-+
-+	storage_save_config(node, true, NULL, NULL);
-+
-+	/* Initialize configuration server model */
-+	mesh_config_srv_init(node, PRIMARY_ELE_IDX);
-+
-+	return true;
-+}
-+
- static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- {
- 	struct l_dbus_message_iter objects, interfaces;
-@@ -1379,6 +1445,8 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 	bool is_new;
- 	uint8_t num_ele;
- 
-+	is_new = (req->type != REQUEST_TYPE_ATTACH);
-+
- 	if (l_dbus_message_is_error(msg)) {
- 		l_error("Failed to get app's dbus objects");
- 		goto fail;
-@@ -1389,8 +1457,6 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 		goto fail;
- 	}
- 
--	is_new = (req->type != REQUEST_TYPE_ATTACH);
--
- 	if (is_new) {
- 		node = l_new(struct mesh_node, 1);
- 		node->elements = l_queue_new();
-@@ -1459,7 +1525,22 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 		goto fail;
- 	}
- 
--	if (req->type == REQUEST_TYPE_JOIN) {
-+	if (req->type == REQUEST_TYPE_ATTACH) {
-+		node_ready_func_t cb = req->cb;
-+
-+		if (num_ele != node->num_ele)
-+			goto fail;
-+
-+		if (register_node_object(node)) {
-+			struct l_dbus *bus = dbus_get_bus();
-+
-+			node->disc_watch = l_dbus_add_disconnect_watch(bus,
-+					node->owner, app_disc_cb, node, NULL);
-+			cb(req->user_data, MESH_ERROR_NONE, node);
-+		} else
-+			goto fail;
-+
-+	} else if (req->type == REQUEST_TYPE_JOIN) {
- 		node_join_ready_func_t cb = req->cb;
- 
- 		if (!agent) {
-@@ -1467,6 +1548,7 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 						MESH_PROVISION_AGENT_INTERFACE);
- 			goto fail;
- 		}
-+
- 		node->num_ele = num_ele;
- 		set_defaults(node);
- 		memcpy(node->dev_uuid, req->data, 16);
-@@ -1475,20 +1557,30 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 			goto fail;
- 
- 		cb(node, agent);
-+
- 	} else {
-+		/* Callback for create node request */
- 		node_ready_func_t cb = req->cb;
-+		uint8_t dev_key[16];
-+		uint8_t net_key[16];
- 
--		if (num_ele != node->num_ele)
-+		node->num_ele = num_ele;
-+		set_defaults(node);
-+		memcpy(node->dev_uuid, req->data, 16);
-+
-+		if (!create_node_config(node))
- 			goto fail;
- 
--		if (register_node_object(node)) {
--			struct l_dbus *bus = dbus_get_bus();
-+		/* Generate device and primary network keys */
-+		l_getrandom(dev_key, sizeof(dev_key));
-+		l_getrandom(net_key, sizeof(net_key));
- 
--			node->disc_watch = l_dbus_add_disconnect_watch(bus,
--					node->owner, app_disc_cb, node, NULL);
--			cb(req->user_data, MESH_ERROR_NONE, node);
--		} else
-+		if (!add_local_node(node, DEFAULT_NEW_UNICAST, false, false,
-+					DEFAULT_IV_INDEX, dev_key,
-+					DEFAULT_PRIMARY_NET_INDEX, net_key))
- 			goto fail;
-+
-+		cb(req->user_data, MESH_ERROR_NONE, node);
- 	}
- 
- 	return;
-@@ -1496,15 +1588,8 @@ fail:
- 	if (agent)
- 		mesh_agent_remove(agent);
- 
--	if (is_new && node)
--		free_node_resources(node);
--
--	if (req->type == REQUEST_TYPE_JOIN) {
--		node_join_ready_func_t cb = req->cb;
--
--		cb(NULL, NULL);
--
--	} else {
-+	if (!is_new) {
-+		/* Handle failed Attach request */
- 		node_ready_func_t cb = req->cb;
- 
- 		l_queue_foreach(node->elements, free_element_path, NULL);
-@@ -1514,6 +1599,21 @@ fail:
- 		l_free(node->owner);
- 		node->owner = NULL;
- 		cb(req->user_data, MESH_ERROR_FAILED, node);
-+
-+	} else {
-+		/* Handle failed Join and Create requests */
-+		if (node)
-+			free_node_resources(node);
-+
-+		if (req->type == REQUEST_TYPE_JOIN) {
-+			node_join_ready_func_t cb = req->cb;
-+
-+			cb(NULL, NULL);
-+		} else {
-+			node_ready_func_t cb = req->cb;
-+
-+			cb(req->user_data, MESH_ERROR_FAILED, NULL);
-+		}
- 	}
- }
- 
-@@ -1573,6 +1673,26 @@ void node_join(const char *app_path, const char *sender, const uint8_t *uuid,
- 					req, l_free);
- }
- 
-+void node_create(const char *app_path, const char *sender, const uint8_t *uuid,
-+					node_ready_func_t cb, void *user_data)
-+{
-+	struct managed_obj_request *req;
-+
-+	l_debug("");
-+
-+	req = l_new(struct managed_obj_request, 1);
-+	req->data = (void *) uuid;
-+	req->cb = cb;
-+	req->user_data = user_data;
-+	req->type = REQUEST_TYPE_CREATE;
-+
-+	l_dbus_method_call(dbus_get_bus(), sender, app_path,
-+					L_DBUS_INTERFACE_OBJECT_MANAGER,
-+					"GetManagedObjects", NULL,
-+					get_managed_objects_cb,
-+					req, l_free);
-+}
-+
- static void build_element_config(void *a, void *b)
- {
- 	struct node_element *ele = a;
-@@ -1804,63 +1924,14 @@ const char *node_get_element_path(struct mesh_node *node, uint8_t ele_idx)
- 	return ele->path;
- }
- 
--bool node_add_pending_local(struct mesh_node *node, void *prov_node_info,
--							struct mesh_io *io)
-+bool node_add_pending_local(struct mesh_node *node, void *prov_node_info)
- {
- 	struct mesh_prov_node_info *info = prov_node_info;
- 	bool kr = !!(info->flags & PROV_FLAG_KR);
- 	bool ivu = !!(info->flags & PROV_FLAG_IVU);
- 
--	node->net = mesh_net_new(node);
--
--	if (!nodes)
--		nodes = l_queue_new();
--
--	l_queue_push_tail(nodes, node);
--
--	if (!storage_set_iv_index(node->net, info->iv_index, ivu))
--		return false;
--
--	mesh_net_set_iv_index(node->net, info->iv_index, ivu);
--
--	if (!mesh_db_write_uint16_hex(node->jconfig, "unicastAddress",
--								info->unicast))
--		return false;
--
--	node->primary = info->unicast;
--	mesh_net_register_unicast(node->net, info->unicast, node->num_ele);
--
--	l_getrandom(node->token, sizeof(node->token));
--	if (!mesh_db_write_token(node->jconfig, node->token))
--		return false;
--
--	memcpy(node->dev_key, info->device_key, 16);
--	if (!mesh_db_write_device_key(node->jconfig, info->device_key))
--		return false;
--
--	if (mesh_net_add_key(node->net, info->net_index, info->net_key) !=
--							MESH_STATUS_SUCCESS)
--		return false;
--
--	if (kr) {
--		/* Duplicate net key, if the key refresh is on */
--		if (mesh_net_update_key(node->net, info->net_index,
--				info->net_key) != MESH_STATUS_SUCCESS)
--			return false;
--
--		if (!mesh_db_net_key_set_phase(node->jconfig, info->net_index,
--							KEY_REFRESH_PHASE_TWO))
--			return false;
--	}
--
--	storage_save_config(node, true, NULL, NULL);
--
--	/* Initialize configuration server model */
--	mesh_config_srv_init(node, PRIMARY_ELE_IDX);
--
--	mesh_net_attach(node->net, io);
--
--	return true;
-+	return add_local_node(node, info->unicast, kr, ivu, info->iv_index,
-+			info->device_key, info->net_index, info->net_key);
- }
- 
- void node_jconfig_set(struct mesh_node *node, void *jconfig)
-diff --git a/mesh/node.h b/mesh/node.h
-index 20b60099e..f051a4519 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -82,13 +82,15 @@ uint8_t node_friend_mode_get(struct mesh_node *node);
- uint32_t node_seq_cache(struct mesh_node *node);
- const char *node_get_element_path(struct mesh_node *node, uint8_t ele_idx);
- const char *node_get_owner(struct mesh_node *node);
--bool node_add_pending_local(struct mesh_node *node, void *info,
--							struct mesh_io *io);
--void node_attach_io(struct mesh_io *io);
-+bool node_add_pending_local(struct mesh_node *node, void *info);
-+void node_attach_io_all(struct mesh_io *io);
-+void node_attach_io(struct mesh_node *node, struct mesh_io *io);
- int node_attach(const char *app_path, const char *sender, uint64_t token,
- 					node_ready_func_t cb, void *user_data);
- void node_build_attach_reply(struct mesh_node *node,
- 						struct l_dbus_message *reply);
-+void node_create(const char *app_path, const char *sender, const uint8_t *uuid,
-+					node_ready_func_t cb, void *user_data);
- void node_id_set(struct mesh_node *node, uint16_t node_id);
- uint16_t node_id_get(struct mesh_node *node);
- bool node_dbus_init(struct l_dbus *bus);
+ 	case HCI_OP_READ_LOCAL_VERSION:
+ 		hci_cc_read_local_version(hdev, skb);
+ 		break;
 -- 
-2.17.2
+1.9.1
 
