@@ -2,718 +2,352 @@ Return-Path: <SRS0=jYet=TH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A887C004C9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 17:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F38BC004C9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 18:19:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51397205ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 17:27:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C479A2054F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 May 2019 18:19:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726947AbfEGR1L (ORCPT
+        id S1726578AbfEGSTS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 May 2019 13:27:11 -0400
-Received: from mga11.intel.com ([192.55.52.93]:60599 "EHLO mga11.intel.com"
+        Tue, 7 May 2019 14:19:18 -0400
+Received: from mga09.intel.com ([134.134.136.24]:42035 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726369AbfEGR1K (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 May 2019 13:27:10 -0400
+        id S1725859AbfEGSTS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 May 2019 14:19:18 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 May 2019 10:27:09 -0700
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 May 2019 11:14:43 -0700
 X-ExtLoop1: 1
-Received: from bgix-dell-lap.sea.intel.com ([10.255.87.84])
-  by orsmga007.jf.intel.com with ESMTP; 07 May 2019 10:27:08 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v4] mesh: Add key storage
-Date:   Tue,  7 May 2019 10:27:01 -0700
-Message-Id: <20190507172701.20726-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.14.5
+Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
+  by orsmga002.jf.intel.com with ESMTP; 07 May 2019 11:14:43 -0700
+Received: from orsmsx123.amr.corp.intel.com (10.22.240.116) by
+ ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Tue, 7 May 2019 11:14:43 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
+ ORSMSX123.amr.corp.intel.com ([169.254.1.141]) with mapi id 14.03.0415.000;
+ Tue, 7 May 2019 11:14:42 -0700
+From:   "Stotland, Inga" <inga.stotland@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "Gix, Brian" <brian.gix@intel.com>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ v2] mesh: Use node uuids as storage directory names
+Thread-Topic: [PATCH BlueZ v2] mesh: Use node uuids as storage directory
+ names
+Thread-Index: AQHVBKSBoxfCTAKQO0SggeC/q0gv86ZgbYqA
+Date:   Tue, 7 May 2019 18:14:42 +0000
+Message-ID: <61272d671c67dd3e774c9f951c961f5030d8e328.camel@intel.com>
+References: <20190507071340.20675-1-michal.lowas-rzechonek@silvair.com>
+In-Reply-To: <20190507071340.20675-1-michal.lowas-rzechonek@silvair.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.251.137.51]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0B1DB511470B6442ADC39CE2B6E481D4@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements internal key storage add/delete/fetch for the three
-basic key types managed in Mesh: Network, Application and Device.
-
-This key storage is separate from keys assigned to nodes within the
-mesh, and are used to support Configuration Client functionality.
----
- Makefile.mesh  |   1 +
- mesh/README    |  35 ++++++-
- mesh/keyring.c | 315 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/keyring.h |  49 +++++++++
- mesh/node.c    |  17 +++-
- mesh/node.h    |   2 +
- mesh/storage.c |  95 ++++++++++++-----
- mesh/storage.h |   2 +
- 8 files changed, 485 insertions(+), 31 deletions(-)
- create mode 100644 mesh/keyring.c
- create mode 100644 mesh/keyring.h
-
-diff --git a/Makefile.mesh b/Makefile.mesh
-index 61fb40936..cefb72aed 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -25,6 +25,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/agent.h mesh/agent.c \
- 				mesh/prov-acceptor.c mesh/prov-initiator.c \
- 				mesh/pb-adv.h mesh/pb-adv.c \
-+				mesh/keyring.h mesh/keyring.c \
- 				mesh/mesh-defs.h
- libexec_PROGRAMS += mesh/bluetooth-meshd
- 
-diff --git a/mesh/README b/mesh/README
-index 151a1e6a1..029e45068 100644
---- a/mesh/README
-+++ b/mesh/README
-@@ -37,8 +37,39 @@ Each subdirectory contains the following files:
- 		provisioner/configuration client
- 	- node.json.bak:
- 		a backup that the last known good node configuration.
-+	- seq_num:
-+		File containing next sequence number to use
-+	- seq_num.bak:
-+		Backup of the Sequence number. This may be larger than the
-+		actual sequence number being used at runtime, to prevent re-use 		of sequence numbers in the event of an unexpected restart.
-+	- ./rpl/:
-+		Directory to store the sequence numbers of remote nodes, as
-+		required by Replay Protection List (RPL) parameters.
-+		- xxxx:
-+			Files named for remote Unicast addresses, and contain
-+			last received iv_index + seq_num from each SRC address.
-+	- ./dev_keys/:
-+		Directory to store remote Device keys. This is only created/used
-+		by Configuration Client (Network administration) nodes.
-+		- xxxx:
-+			Files named for remote Unicast addresses, and contains
-+			16 octet key.
-+	- ./net_keys/:
-+		Directory to store network subnet keys. This is only
-+		created/used by Configuration Client (Network administration)
-+		nodes.
-+		- xxx:
-+			Files named for subnet index, and contains key refresh
-+			phase, and old/new versions of the key.
-+	- ./app_keys/:
-+		Directory to store application keys. This is only created/used
-+		by Configuration Client (Network administration) nodes.
-+		- xxx:
-+			Files named for application index, and contains bound
-+			subnet index, and old/new versions of the key.
- 
--The files are in JSON format.
-+The node.json and node.json.bak are in JSON format. All other files are stored
-+in little endian binary format.
- 
- Information
- ===========
-@@ -47,4 +78,4 @@ Mailing lists:
- 	linux-bluetooth@vger.kernel.org
- 
- For additional information about the project visit BlueZ web site:
--	http://www.bluez.org
-\ No newline at end of file
-+	http://www.bluez.org
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-new file mode 100644
-index 000000000..6fca047fd
---- /dev/null
-+++ b/mesh/keyring.c
-@@ -0,0 +1,315 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <dirent.h>
-+#include <libgen.h>
-+
-+#include <ell/ell.h>
-+
-+#include "mesh/mesh-defs.h"
-+
-+#include "mesh/net.h"
-+#include "mesh/storage.h"
-+#include "mesh/keyring.h"
-+#include "mesh/mesh.h"
-+#include "mesh/node.h"
-+
-+const char *dev_key_dir = "dev_keys";
-+const char *app_key_dir = "app_keys";
-+const char *net_key_dir = "net_keys";
-+
-+bool keyring_put_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key)
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+	int fd;
-+	bool result = false;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(net_key_dir) + 2 + 4;
-+	key_file = l_malloc(len);
-+	snprintf(key_file, len, "%s/%s", node_path, net_key_dir);
-+	storage_create_dir(key_file);
-+	snprintf(key_file, len, "%s/%s/%3.3x", node_path, net_key_dir, net_idx);
-+	l_debug("Put Net Key %s", key_file);
-+
-+	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
-+	if (fd) {
-+		if (write(fd, key, sizeof(*key)) == sizeof(*key))
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	l_free(key_file);
-+	return result;
-+}
-+
-+bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
-+				uint16_t net_idx, struct keyring_app_key *key)
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+	int fd;
-+	bool result = false;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(app_key_dir) + 2 + 4;
-+	key_file = l_malloc(len);
-+	snprintf(key_file, len, "%s/%s", node_path, app_key_dir);
-+	storage_create_dir(key_file);
-+	snprintf(key_file, len, "%s/%s/%3.3x", node_path, app_key_dir, app_idx);
-+	l_debug("Put App Key %s", key_file);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd) {
-+		struct keyring_app_key old_key;
-+
-+		if (read(fd, &old_key, sizeof(*key)) == sizeof(*key)) {
-+			if (old_key.net_idx != net_idx) {
-+				close(fd);
-+				goto done;
-+			}
-+		}
-+		close(fd);
-+	}
-+
-+	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
-+	if (write(fd, key, sizeof(*key)) == sizeof(*key))
-+		result = true;
-+
-+	close(fd);
-+
-+done:
-+	l_free(key_file);
-+	return result;
-+}
-+
-+bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+					uint8_t count, uint8_t dev_key[16])
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+	int fd, i;
-+	bool result = true;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(dev_key_dir) + 2 + 5;
-+	key_file = l_malloc(len);
-+	snprintf(key_file, len, "%s/%s", node_path, dev_key_dir);
-+	storage_create_dir(key_file);
-+
-+	for (i = 0; i < count; i++) {
-+		snprintf(key_file, len, "%s/%s/%4.4x", node_path, dev_key_dir,
-+				unicast + i);
-+		l_debug("Put Dev Key %s", key_file);
-+
-+		fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
-+		if (fd) {
-+			if (write(fd, dev_key, 16) != 16)
-+				result = false;
-+
-+			close(fd);
-+		} else
-+			result = false;
-+	}
-+
-+	l_free(key_file);
-+	return result;
-+}
-+
-+bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key)
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+	int fd;
-+	bool result = false;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(net_key_dir) + 2 + 4;
-+	key_file = l_malloc(len);
-+	snprintf(key_file, len, "%s/%s/%3.3x", node_path, net_key_dir, net_idx);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd) {
-+		if (read(fd, key, sizeof(*key)) == sizeof(*key))
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	l_free(key_file);
-+	return result;
-+}
-+
-+bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
-+						struct keyring_app_key *key)
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+	int fd;
-+	bool result = false;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(app_key_dir) + 2 + 4;
-+	key_file = l_malloc(len);
-+	snprintf(key_file, len, "%s/%s/%3.3x", node_path, app_key_dir, app_idx);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd) {
-+		if (read(fd, key, sizeof(*key)) == sizeof(*key))
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	l_free(key_file);
-+	return result;
-+}
-+
-+bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+							uint8_t dev_key[16])
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+	int fd;
-+	bool result = false;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(dev_key_dir) + 2 + 5;
-+	key_file = l_malloc(len);
-+	snprintf(key_file, len, "%s/%s/%4.4x", node_path, dev_key_dir, unicast);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd) {
-+		if (read(fd, dev_key, 16) == 16)
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	l_free(key_file);
-+	return result;
-+}
-+
-+bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx)
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(net_key_dir) + 2 + 4;
-+	key_file = l_malloc(len);
-+
-+	snprintf(key_file, len, "%s/%s/%3.3x", node_path, net_key_dir, net_idx);
-+	l_debug("RM Net Key %s", key_file);
-+	remove(key_file);
-+
-+	/* TODO: See if it is easiest to delete all bound App keys here */
-+	/* TODO: see nftw() */
-+
-+	l_free(key_file);
-+	return true;
-+}
-+
-+bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx)
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(app_key_dir) + 2 + 4;
-+	key_file = l_malloc(len);
-+
-+	snprintf(key_file, len, "%s/%s/%3.3x", node_path, app_key_dir, app_idx);
-+	l_debug("RM App Key %s", key_file);
-+	remove(key_file);
-+
-+	l_free(key_file);
-+	return true;
-+}
-+
-+bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+								uint8_t count)
-+{
-+	char *node_path;
-+	char *key_file;
-+	size_t len;
-+	int i;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = storage_path_get(node);
-+	len = strlen(node_path) + strlen(dev_key_dir) + 2 + 5;
-+	key_file = l_malloc(len);
-+
-+	for (i = 0; i < count; i++) {
-+		snprintf(key_file, len, "%s/%s/%4.4x", node_path, dev_key_dir,
-+								unicast + i);
-+		l_debug("RM Dev Key %s", key_file);
-+		remove(key_file);
-+	}
-+
-+	l_free(key_file);
-+	return true;
-+}
-diff --git a/mesh/keyring.h b/mesh/keyring.h
-new file mode 100644
-index 000000000..167191013
---- /dev/null
-+++ b/mesh/keyring.h
-@@ -0,0 +1,49 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+struct keyring_net_key {
-+	uint16_t net_idx;
-+	uint8_t phase;
-+	uint8_t old_key[16];
-+	uint8_t new_key[16];
-+};
-+
-+struct keyring_app_key {
-+	uint16_t app_idx;
-+	uint16_t net_idx;
-+	uint8_t old_key[16];
-+	uint8_t new_key[16];
-+};
-+
-+bool keyring_put_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key);
-+bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key);
-+bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx);
-+bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
-+				uint16_t net_idx, struct keyring_app_key *key);
-+bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
-+						struct keyring_app_key *key);
-+bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx);
-+bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+							uint8_t dev_key[16]);
-+bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+					uint8_t count, uint8_t dev_key[16]);
-+bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+								uint8_t count);
-diff --git a/mesh/node.c b/mesh/node.c
-index 774d03d45..dc09a11f7 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -79,6 +79,7 @@ struct mesh_node {
- 	char *path;
- 	void *jconfig;
- 	char *cfg_file;
-+	char *node_path;
- 	uint32_t disc_watch;
- 	time_t upd_sec;
- 	uint32_t seq_number;
-@@ -235,6 +236,8 @@ static void free_node_resources(void *data)
- 	l_free(node->comp);
- 	l_free(node->app_path);
- 	l_free(node->owner);
-+	l_free(node->cfg_file);
-+	l_free(node->node_path);
- 
- 	if (node->disc_watch)
- 		l_dbus_remove_watch(dbus_get_bus(), node->disc_watch);
-@@ -1875,7 +1878,8 @@ void *node_jconfig_get(struct mesh_node *node)
- 
- void node_cfg_file_set(struct mesh_node *node, char *cfg)
- {
--	node->cfg_file = cfg;
-+	l_free(node->cfg_file);
-+	node->cfg_file = l_strdup(cfg);
- }
- 
- char *node_cfg_file_get(struct mesh_node *node)
-@@ -1883,6 +1887,17 @@ char *node_cfg_file_get(struct mesh_node *node)
- 	return node->cfg_file;
- }
- 
-+void node_path_set(struct mesh_node *node, char *path)
-+{
-+	l_free(node->node_path);
-+	node->node_path = l_strdup(path);
-+}
-+
-+char *node_path_get(struct mesh_node *node)
-+{
-+	return node->node_path;
-+}
-+
- struct mesh_net *node_get_net(struct mesh_node *node)
- {
- 	return node->net;
-diff --git a/mesh/node.h b/mesh/node.h
-index 20b60099e..d6a4cd96c 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -97,3 +97,5 @@ void node_jconfig_set(struct mesh_node *node, void *jconfig);
- void *node_jconfig_get(struct mesh_node *node);
- void node_cfg_file_set(struct mesh_node *node, char *cfg);
- char *node_cfg_file_get(struct mesh_node *node);
-+void node_path_set(struct mesh_node *node, char *path);
-+char *node_path_get(struct mesh_node *node);
-diff --git a/mesh/storage.c b/mesh/storage.c
-index 8a70b5696..799ed4734 100644
---- a/mesh/storage.c
-+++ b/mesh/storage.c
-@@ -28,6 +28,7 @@
- #include <unistd.h>
- #include <dirent.h>
- #include <libgen.h>
-+#include <ftw.h>
- 
- #include <sys/types.h>
- #include <sys/stat.h>
-@@ -61,6 +62,20 @@ static bool simple_match(const void *a, const void *b)
- 	return a == b;
- }
- 
-+/* This is a thread-safe always malloced version of dirname which will work
-+ * regardless of which underlying dirname() implementation is used.
-+ */
-+static char *alloc_dirname(const char *path)
-+{
-+	char *tmp = l_strdup(path);
-+	char *dir;
-+
-+	dir = dirname(tmp);
-+	strncpy(tmp, dir, strlen(path) + 1);
-+
-+	return tmp;
-+}
-+
- static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
- {
- 	struct mesh_node *node = user_data;
-@@ -483,7 +498,7 @@ void storage_save_config(struct mesh_node *node, bool no_wait,
- 		l_idle_oneshot(idle_save_config, info, NULL);
- }
- 
--static int create_dir(const char *dirname)
-+int storage_create_dir(const char *dirname)
- {
- 	struct stat st;
- 	char dir[PATH_MAX + 1], *prev, *next;
-@@ -524,7 +539,7 @@ bool storage_load_nodes(const char *dir_name)
- 	DIR *dir;
- 	struct dirent *entry;
- 
--	create_dir(dir_name);
-+	storage_create_dir(dir_name);
- 	dir = opendir(dir_name);
- 	if (!dir) {
- 		l_error("Failed to open mesh node storage directory: %s",
-@@ -634,15 +649,50 @@ fail:
- 	return false;
- }
- 
-+char *storage_path_get(struct mesh_node *node)
-+{
-+	char *node_path = node_path_get(node);
-+
-+	if (!node_path) {
-+		char *cfgname = (char *) node_cfg_file_get(node);
-+
-+		if (!cfgname)
-+			return NULL;
-+
-+		node_path = alloc_dirname(cfgname);
-+		node_path_set(node, node_path);
-+		l_free(node_path);
-+
-+		return node_path_get(node);
-+	}
-+
-+	return node_path;
-+}
-+
-+static int del_fobject(const char *fpath, const struct stat *sb, int typeflag,
-+						struct FTW *ftwbuf)
-+{
-+	switch (typeflag) {
-+	case FTW_DP:
-+		rmdir(fpath);
-+		l_debug("RMDIR %s", fpath);
-+		break;
-+
-+	case FTW_SL:
-+	default:
-+		remove(fpath);
-+		l_debug("RM %s", fpath);
-+		break;
-+	}
-+	return 0;
-+}
-+
- /* Permanently remove node configuration */
- void storage_remove_node_config(struct mesh_node *node)
- {
--	char *cfgname;
-+	char *node_path, *mesh_path, *mesh_name;
- 	struct json_object *jnode;
--	const char *dir_name;
- 	uint16_t node_id;
--	size_t len;
--	char *bak;
- 
- 	if (!node)
- 		return;
-@@ -653,31 +703,20 @@ void storage_remove_node_config(struct mesh_node *node)
- 		json_object_put(jnode);
- 	node_jconfig_set(node, NULL);
- 
--	/* Delete node configuration file */
--	cfgname = (char *) node_cfg_file_get(node);
--	if (!cfgname)
--		return;
--
--	l_debug("Delete node config file %s", cfgname);
--	remove(cfgname);
-+	node_path = storage_path_get(node);
-+	l_debug("Delete node config %s", node_path);
- 
--	/* Delete the backup file */
--	len = strlen(cfgname) + 5;
--	bak = l_malloc(len);
--	strncpy(bak, cfgname, len);
--	bak = strncat(bak, ".bak", 5);
--	remove(bak);
--	l_free(bak);
--
--	/* Delete the node directory */
--	dir_name = dirname(cfgname);
--
--	l_debug("Delete directory %s", dir_name);
--	rmdir(dir_name);
-+	/* Make sure path name of node follows expected guidelines */
-+	mesh_path = alloc_dirname(node_path);
-+	mesh_name = basename(mesh_path);
-+	if (strcmp(mesh_name, "mesh"))
-+		goto done;
- 
--	l_free(cfgname);
--	node_cfg_file_set(node, NULL);
-+	nftw(node_path, del_fobject, 5, FTW_DEPTH | FTW_PHYS);
- 
- 	node_id = node_id_get(node);
- 	l_queue_remove(node_ids, L_UINT_TO_PTR(node_id));
-+
-+done:
-+	l_free(mesh_path);
- }
-diff --git a/mesh/storage.h b/mesh/storage.h
-index d71d11b8e..4cfeaa7f4 100644
---- a/mesh/storage.h
-+++ b/mesh/storage.h
-@@ -49,3 +49,5 @@ bool storage_set_device_key(struct mesh_node *node, uint8_t dev_key[16]);
- bool storage_set_unicast(struct mesh_node *node, uint16_t unicast);
- bool storage_set_key_refresh_phase(struct mesh_net *net, uint16_t net_idx,
- 								uint8_t phase);
-+int storage_create_dir(const char *dirname);
-+char *storage_path_get(struct mesh_node *node);
--- 
-2.14.5
-
+SGkgTWljaGHFgiwNCg0KT24gVHVlLCAyMDE5LTA1LTA3IGF0IDA5OjEzICswMjAwLCBNaWNoYcWC
+IExvd2FzLVJ6ZWNob25layB3cm90ZToNCj4gSW5zdGVhZCBvZiBrZWVwaW5nIHRyYWNrIG9mIHVu
+aXF1ZSAxNmJpdCBub2RlIGlkZW50aWZpZXJzLCByZXVzZSB0aGVpcg0KPiBVVUlEcyB0byBjcmVh
+dGUgYm90aCBzdG9yYWdlIGRpcmVjdG9yaWVzIGFuZCBkYnVzIG9iamVjdHMuDQo+IA0KPiBCZWNh
+dXNlIG9mIHRoYXQ6DQo+ICAtIFVVSUQgaXMgbm8gbG9uZ2VyIHN0b3JlZCBpbiB0aGUgSlNPTiBm
+aWxlLCBpdCdzIGluZmVycmVkIGZyb20gdGhlDQo+ICAgIGRpcmVjdG9yeSBuYW1lIGluc3RlYWQN
+Cj4gIC0gSm9pbigpLCBDcmVhdGVOZXR3b3JrKCkgYW5kIEltcG9ydExvY2FsTm9kZSgpIEFQSXMg
+cmV0dXJuIGFuIGVycm9yIGlmDQo+ICAgIGdpdmVuIFVVSUQgYWxyZWFkeSByZWdpc3RlcmVkIHdp
+dGhpbiB0aGUgZGFlbW9uDQo+IC0tLQ0KPiAgZG9jL21lc2gtYXBpLnR4dCB8ICAyNiArKysrKysr
+Ky0tLQ0KPiAgbWVzaC9SRUFETUUgICAgICB8ICAgNyArKy0NCj4gIG1lc2gvbWVzaC1kYi5jICAg
+fCAgIDQgLS0NCj4gIG1lc2gvbWVzaC1kYi5oICAgfCAgIDEgLQ0KPiAgbWVzaC9tZXNoLmMgICAg
+ICB8ICAgNyArKysNCj4gIG1lc2gvbm9kZS5jICAgICAgfCAgMzkgKysrKysrLS0tLS0tLS0tLS0N
+Cj4gIG1lc2gvbm9kZS5oICAgICAgfCAgIDIgKy0NCj4gIG1lc2gvc3RvcmFnZS5jICAgfCAxMDkg
+KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gIDggZmls
+ZXMgY2hhbmdlZCwgODQgaW5zZXJ0aW9ucygrKSwgMTExIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlm
+ZiAtLWdpdCBhL2RvYy9tZXNoLWFwaS50eHQgYi9kb2MvbWVzaC1hcGkudHh0DQo+IGluZGV4IDgx
+ZDFhMzI4OC4uMTEyOTkwYTVkIDEwMDY0NA0KPiAtLS0gYS9kb2MvbWVzaC1hcGkudHh0DQo+ICsr
+KyBiL2RvYy9tZXNoLWFwaS50eHQNCj4gQEAgLTI0LDEwICsyNCwxNCBAQCBNZXRob2RzOg0KPiAg
+CQlEQnVzLk9iamVjdE1hbmFnZXIgaW50ZXJmYWNlIG11c3QgYmUgYXZhaWxhYmxlIG9uIHRoZQ0K
+PiAgCQlhcHBfZGVmaW5lZF9yb290IHBhdGguDQo+ICANCj4gLQkJVGhlIHV1aWQgcGFyYW1ldGVy
+IGlzIGEgMTYtYnl0ZSBhcnJheSB0aGF0IGNvbnRhaW5zIERldmljZSBVVUlELg0KPiArCQlUaGUg
+dXVpZCBwYXJhbWV0ZXIgaXMgYSAxNi1ieXRlIGFycmF5IHRoYXQgY29udGFpbnMgRGV2aWNlIFVV
+SUQuIFRoaXMNCj4gKwkJVVVJRCBtdXN0IGJlIHVuaXF1ZSAoYXQgbGVhc3QgZnJvbSB0aGUgZGFl
+bW9uIHBlcnNwZWN0aXZlKSwgdGhlcmVmb3JlDQo+ICsJCWF0dGVtcHRpbmcgdG8gY2FsbCB0aGlz
+IGZ1bmN0aW9uIHVzaW5nIGFscmVhZHkgcmVnaXN0ZXJlZCBVVUlEIHJlc3VsdHMNCj4gKwkJaW4g
+YW4gZXJyb3IuDQo+ICANCj4gIAkJUG9zc2libGVFcnJvcnM6DQo+ICAJCQlvcmcuYmx1ZXoubWVz
+aC5FcnJvci5JbnZhbGlkQXJndW1lbnRzDQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5BbHJl
+YWR5RXhpc3RzLA0KPiAgDQo+ICAJdm9pZCBDYW5jZWwodm9pZCkNCj4gIA0KPiBAQCAtMTI3LDcg
+KzEzMSwxMCBAQCBNZXRob2RzOg0KPiAgCQlpbnRlcmZhY2UuIFRoZSBzdGFuZGFyZCBEQnVzLk9i
+amVjdE1hbmFnZXIgaW50ZXJmYWNlIG11c3QgYmUNCj4gIAkJYXZhaWxhYmxlIG9uIHRoZSBhcHBf
+cm9vdCBwYXRoLg0KPiAgDQo+IC0JCVRoZSB1dWlkIHBhcmFtZXRlciBpcyBhIDE2LWJ5dGUgYXJy
+YXkgdGhhdCBjb250YWlucyBEZXZpY2UgVVVJRC4NCj4gKwkJVGhlIHV1aWQgcGFyYW1ldGVyIGlz
+IGEgMTYtYnl0ZSBhcnJheSB0aGF0IGNvbnRhaW5zIERldmljZSBVVUlELiBUaGlzDQo+ICsJCVVV
+SUQgbXVzdCBiZSB1bmlxdWUgKGF0IGxlYXN0IGZyb20gdGhlIGRhZW1vbiBwZXJzcGVjdGl2ZSks
+IHRoZXJlZm9yZQ0KPiArCQlhdHRlbXB0aW5nIHRvIGNhbGwgdGhpcyBmdW5jdGlvbiB1c2luZyBh
+bHJlYWR5IHJlZ2lzdGVyZWQgVVVJRCByZXN1bHRzDQo+ICsJCWluIGFuIGVycm9yLg0KPiAgDQo+
+ICAJCVRoZSByZXR1cm5lZCB0b2tlbiBtdXN0IGJlIHByZXNlcnZlZCBieSB0aGUgYXBwbGljYXRp
+b24gaW4NCj4gIAkJb3JkZXIgdG8gYXV0aGVudGljYXRlIGl0c2VsZiB0byB0aGUgbWVzaCBkYWVt
+b24gYW5kIGF0dGFjaCB0bw0KPiBAQCAtMTQyLDYgKzE0OSw3IEBAIE1ldGhvZHM6DQo+ICANCj4g
+IAkJUG9zc2libGVFcnJvcnM6DQo+ICAJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5JbnZhbGlkQXJn
+dW1lbnRzDQo+ICsJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5BbHJlYWR5RXhpc3RzLA0KPiAgDQo+
+ICAJIHVpbnQ2NCB0b2tlbiBJbXBvcnRMb2NhbE5vZGUoc3RyaW5nIGpzb25fZGF0YSkNCj4gIA0K
+PiBAQCAtMTYwLDggKzE2OCwxMiBAQCBNZXRob2RzOg0KPiAgCQlwZXJtYW5lbnRseSByZW1vdmUg
+dGhlIGlkZW50aXR5IG9mIHRoZSBtZXNoIG5vZGUgYnkgY2FsbGluZw0KPiAgCQlMZWF2ZSgpIG1l
+dGhvZC4NCj4gIA0KPiArCQlJdCBpcyBhbiBlcnJvciB0byBhdHRlbXB0IGltcG9ydGluZyBhIG5v
+ZGUgd2l0aCBhbHJlYWR5IHJlZ2lzdGVyZWQNCj4gKwkJRGV2aWNlIFVVSUQuDQo+ICsNCj4gIAkJ
+UG9zc2libGVFcnJvcnM6DQo+ICAJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5JbnZhbGlkQXJndW1l
+bnRzLA0KPiArCQkJb3JnLmJsdWV6Lm1lc2guRXJyb3IuQWxyZWFkeUV4aXN0cw0KPiAgCQkJb3Jn
+LmJsdWV6Lm1lc2guRXJyb3IuTm90Rm91bmQsDQo+ICAJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5G
+YWlsZWQNCj4gIA0KPiBAQCAtMTY5LDggKzE4MSw5IEBAIE1lc2ggTm9kZSBIaWVyYXJjaHkNCj4g
+ID09PT09PT09PT09PT09PT09PT0NCj4gIFNlcnZpY2UJCW9yZy5ibHVlei5tZXNoDQo+ICBJbnRl
+cmZhY2UJb3JnLmJsdWV6Lm1lc2guTm9kZTENCj4gLU9iamVjdCBwYXRoCS9vcmcvYmx1ZXovbWVz
+aC9ub2RlPHh4eHg+DQo+IC0JCXdoZXJlIHh4eHggaXMgYSA0LWRpZ2l0IGhleGFkZWNpbWFsIG51
+bWJlciBnZW5lcmF0ZWQgYnkgZGFlbW9uDQo+ICtPYmplY3QgcGF0aAkvb3JnL2JsdWV6L21lc2gv
+bm9kZTx1dWlkPg0KPiArCQl3aGVyZSA8dXVpZD4gaXMgdGhlIERldmljZSBVVUlEIHBhc3NlZCB0
+byBKb2luKCksIENyZWF0ZU5ldHdvcmsoKSBvcg0KPiArCQlJbXBvcnRMb2NhbE5vZGUoKQ0KPiAg
+DQo+ICBNZXRob2RzOg0KPiAgCXZvaWQgU2VuZChvYmplY3QgZWxlbWVudF9wYXRoLCB1aW50MTYg
+ZGVzdGluYXRpb24sIHVpbnQxNiBrZXlfaW5kZXgsDQo+IEBAIC0zMzQsOCArMzQ3LDkgQEAgTWVz
+aCBQcm92aXNpb25pbmcgSGllcmFyY2h5DQo+ICA9PT09PT09PT09PT09PT09PT09PT09PT09PT09
+DQo+ICBTZXJ2aWNlCQlvcmcuYmx1ZXoubWVzaA0KPiAgSW50ZXJmYWNlCW9yZy5ibHVlei5tZXNo
+Lk1hbmFnZW1lbnQxDQo+IC1PYmplY3QgcGF0aAkvb3JnL2JsdWV6L21lc2gvbm9kZTx4eHh4Pg0K
+PiAtCQl3aGVyZSB4eHh4IGlzIGEgNC1kaWdpdCBoZXhhZGVjaW1hbCBudW1iZXIgZ2VuZXJhdGVk
+IGJ5IGRhZW1vbg0KPiArT2JqZWN0IHBhdGgJL29yZy9ibHVlei9tZXNoL25vZGU8dXVpZD4NCj4g
+KwkJd2hlcmUgPHV1aWQ+IGlzIHRoZSBEZXZpY2UgVVVJRCBwYXNzZWQgdG8gSm9pbigpLCBDcmVh
+dGVOZXR3b3JrKCkgb3INCj4gKwkJSW1wb3J0TG9jYWxOb2RlKCkNCj4gIA0KPiAgTWV0aG9kczoN
+Cj4gIAl2b2lkIFVucHJvdmlzaW9uZWRTY2FuKHVpbnQxNiBzZWNvbmRzKQ0KPiBkaWZmIC0tZ2l0
+IGEvbWVzaC9SRUFETUUgYi9tZXNoL1JFQURNRQ0KPiBpbmRleCAxNTFhMWU2YTEuLmNhMjIzYTZk
+OCAxMDA2NDQNCj4gLS0tIGEvbWVzaC9SRUFETUUNCj4gKysrIGIvbWVzaC9SRUFETUUNCj4gQEAg
+LTI2LDkgKzI2LDggQEAgU3RvcmFnZQ0KPiAgRGVmYXVsdCBzdG9yYWdlIGRpcmVjdG9yeSBpcyAv
+dmFyL2xpYi9ibHVldG9vdGgvbWVzaC4NCj4gIA0KPiAgVGhlIGRpcmVjdG9yeSBjb250YWlucyB0
+aGUgcHJvdmlzaW9uZWQgbm9kZXMgY29uZmlndXJhdGlvbnMuDQo+IC1FYWNoIG5vZGUgaGFzIGl0
+cyBvd24gc3ViZGlyZWN0b3J5LCBuYW1lZCB3aXRoIGEgNC1kaWdpdCAoaGV4YWRlY2ltYWwpDQo+
+IC1pZGVudGlmaWNhdG9yIHRoYXQgaXMgaW50ZXJuYWxseSBnZW5lcmF0ZWQgYnkgdGhlIG1lc2gg
+ZGFlbW9uIGF0IHRoZSB0aW1lDQo+IC1vZiB0aGUgbm9kZSBwcm92aXNpb25pbmcuDQo+ICtFYWNo
+IG5vZGUgaGFzIGl0cyBvd24gc3ViZGlyZWN0b3J5LCBuYW1lZCBhZnRlciBub2RlJ3MgRGV2aWNl
+IFVVSUQgKDMyLWRpZ2l0DQo+ICtoZXhhZGVjaW1hbCBzdHJpbmcpIHRoYXQgaXMgZ2VuZXJhdGVk
+IGJ5IHRoZSBhcHBsaWNhdGlvbiB0aGF0IGNyZWF0ZWQgYSBub2RlLg0KPiAgDQo+ICBFYWNoIHN1
+YmRpcmVjdG9yeSBjb250YWlucyB0aGUgZm9sbG93aW5nIGZpbGVzOg0KPiAgCS0gbm9kZS5qc29u
+Og0KPiBAQCAtNDcsNCArNDYsNCBAQCBNYWlsaW5nIGxpc3RzOg0KPiAgCWxpbnV4LWJsdWV0b290
+aEB2Z2VyLmtlcm5lbC5vcmcNCj4gIA0KPiAgRm9yIGFkZGl0aW9uYWwgaW5mb3JtYXRpb24gYWJv
+dXQgdGhlIHByb2plY3QgdmlzaXQgQmx1ZVogd2ViIHNpdGU6DQo+IC0JaHR0cDovL3d3dy5ibHVl
+ei5vcmcNCj4gXCBObyBuZXdsaW5lIGF0IGVuZCBvZiBmaWxlDQo+ICsJaHR0cDovL3d3dy5ibHVl
+ei5vcmcNCj4gZGlmZiAtLWdpdCBhL21lc2gvbWVzaC1kYi5jIGIvbWVzaC9tZXNoLWRiLmMNCj4g
+aW5kZXggNjRlMzNjZDkxLi4wMWFlNjMxNDYgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbWVzaC1kYi5j
+DQo+ICsrKyBiL21lc2gvbWVzaC1kYi5jDQo+IEBAIC0xNDY2LDEwICsxNDY2LDYgQEAgYm9vbCBt
+ZXNoX2RiX2FkZF9ub2RlKGpzb25fb2JqZWN0ICpqbm9kZSwgc3RydWN0IG1lc2hfZGJfbm9kZSAq
+bm9kZSkgew0KPiAgCWlmICghbWVzaF9kYl93cml0ZV91aW50MTZfaGV4KGpub2RlLCAiY3JwbCIs
+IG5vZGUtPmNycGwpKQ0KPiAgCQlyZXR1cm4gZmFsc2U7DQo+ICANCj4gLQkvKiBEZXZpY2UgVVVJ
+RCAqLw0KPiAtCWlmICghYWRkX2tleV92YWx1ZShqbm9kZSwgIlVVSUQiLCBub2RlLT51dWlkKSkN
+Cj4gLQkJcmV0dXJuIGZhbHNlOw0KPiAtDQo+ICAJLyogRmVhdHVyZXM6IHJlbGF5LCBMUE4sIGZy
+aWVuZCwgcHJveHkqLw0KPiAgCWlmICghbWVzaF9kYl93cml0ZV9yZWxheV9tb2RlKGpub2RlLCBt
+b2Rlcy0+cmVsYXkuc3RhdGUsDQo+ICAJCQkJCQltb2Rlcy0+cmVsYXkuY250LA0KPiBkaWZmIC0t
+Z2l0IGEvbWVzaC9tZXNoLWRiLmggYi9tZXNoL21lc2gtZGIuaA0KPiBpbmRleCAwNmFiYTFmMzEu
+LjE5OTEzMTQ4ZSAxMDA2NDQNCj4gLS0tIGEvbWVzaC9tZXNoLWRiLmgNCj4gKysrIGIvbWVzaC9t
+ZXNoLWRiLmgNCj4gQEAgLTc2LDcgKzc2LDYgQEAgc3RydWN0IG1lc2hfZGJfbm9kZSB7DQo+ICAJ
+dWludDE2X3QgdW5pY2FzdDsNCj4gIAl1aW50OF90IHR0bDsNCj4gIAlzdHJ1Y3QgbF9xdWV1ZSAq
+ZWxlbWVudHM7DQo+IC0JdWludDhfdCB1dWlkWzE2XTsNCj4gIH07DQo+ICANCj4gIHN0cnVjdCBt
+ZXNoX2RiX3Byb3Ygew0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9tZXNoLmMgYi9tZXNoL21lc2guYw0K
+PiBpbmRleCBhMDg0ZjkyMDAuLjRkNjVmMjY2YSAxMDA2NDQNCj4gLS0tIGEvbWVzaC9tZXNoLmMN
+Cj4gKysrIGIvbWVzaC9tZXNoLmMNCj4gQEAgLTU3Nyw2ICs1NzcsMTMgQEAgc3RhdGljIHN0cnVj
+dCBsX2RidXNfbWVzc2FnZSAqam9pbl9uZXR3b3JrX2NhbGwoc3RydWN0IGxfZGJ1cyAqZGJ1cywN
+Cj4gIAkJCQkJCQkiQmFkIGRldmljZSBVVUlEIik7DQo+ICAJfQ0KPiAgDQo+ICsJaWYgKG5vZGVf
+ZmluZF9ieV91dWlkKGpvaW5fcGVuZGluZy0+dXVpZCkpIHsNCj4gKwkJbF9mcmVlKGpvaW5fcGVu
+ZGluZyk7DQo+ICsJCWpvaW5fcGVuZGluZyA9IE5VTEw7DQo+ICsJCXJldHVybiBkYnVzX2Vycm9y
+KG1zZywgTUVTSF9FUlJPUl9BTFJFQURZX0VYSVNUUywNCj4gKwkJCQkJCQkiTm9kZSBhbHJlYWR5
+IGV4aXN0cyIpOw0KPiArCX0NCj4gKw0KPiAgCXNlbmRlciA9IGxfZGJ1c19tZXNzYWdlX2dldF9z
+ZW5kZXIobXNnKTsNCj4gIA0KPiAgCWpvaW5fcGVuZGluZy0+c2VuZGVyID0gbF9zdHJkdXAoc2Vu
+ZGVyKTsNCj4gZGlmZiAtLWdpdCBhL21lc2gvbm9kZS5jIGIvbWVzaC9ub2RlLmMNCj4gaW5kZXgg
+Nzc0ZDAzZDQ1Li5hZDQ0NGI1YzUgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbm9kZS5jDQo+ICsrKyBi
+L21lc2gvbm9kZS5jDQo+IEBAIC0yMSw2ICsyMSw3IEBADQo+ICAjaW5jbHVkZSA8Y29uZmlnLmg+
+DQo+ICAjZW5kaWYNCj4gIA0KPiArI2RlZmluZSBfR05VX1NPVVJDRQ0KPiAgI2luY2x1ZGUgPHN0
+ZGlvLmg+DQo+ICAjaW5jbHVkZSA8c3lzL3RpbWUuaD4NCj4gICNpbmNsdWRlIDxlbGwvZWxsLmg+
+DQo+IEBAIC04Myw3ICs4NCw2IEBAIHN0cnVjdCBtZXNoX25vZGUgew0KPiAgCXRpbWVfdCB1cGRf
+c2VjOw0KPiAgCXVpbnQzMl90IHNlcV9udW1iZXI7DQo+ICAJdWludDMyX3Qgc2VxX21pbl9jYWNo
+ZTsNCj4gLQl1aW50MTZfdCBpZDsNCj4gIAlib29sIHByb3Zpc2lvbmVyOw0KPiAgCXVpbnQxNl90
+IHByaW1hcnk7DQo+ICAJc3RydWN0IG5vZGVfY29tcG9zaXRpb24gKmNvbXA7DQo+IEBAIC05Miw3
+ICs5Miw3IEBAIHN0cnVjdCBtZXNoX25vZGUgew0KPiAgCQl1aW50OF90IGNudDsNCj4gIAkJdWlu
+dDhfdCBtb2RlOw0KPiAgCX0gcmVsYXk7DQo+IC0JdWludDhfdCBkZXZfdXVpZFsxNl07DQo+ICsJ
+dWludDhfdCB1dWlkWzE2XTsNCj4gIAl1aW50OF90IGRldl9rZXlbMTZdOw0KPiAgCXVpbnQ4X3Qg
+dG9rZW5bOF07DQo+ICAJdWludDhfdCBudW1fZWxlOw0KPiBAQCAtMTI2LDcgKzEyNiw3IEBAIHN0
+YXRpYyBib29sIG1hdGNoX2RldmljZV91dWlkKGNvbnN0IHZvaWQgKmEsIGNvbnN0IHZvaWQgKmIp
+DQo+ICAJY29uc3Qgc3RydWN0IG1lc2hfbm9kZSAqbm9kZSA9IGE7DQo+ICAJY29uc3QgdWludDhf
+dCAqdXVpZCA9IGI7DQo+ICANCj4gLQlyZXR1cm4gKG1lbWNtcChub2RlLT5kZXZfdXVpZCwgdXVp
+ZCwgMTYpID09IDApOw0KPiArCXJldHVybiAobWVtY21wKG5vZGUtPnV1aWQsIHV1aWQsIDE2KSA9
+PSAwKTsNCj4gIH0NCj4gIA0KPiAgc3RhdGljIGJvb2wgbWF0Y2hfdG9rZW4oY29uc3Qgdm9pZCAq
+YSwgY29uc3Qgdm9pZCAqYikNCj4gQEAgLTE4NywxNSArMTg3LDE2IEBAIHVpbnQ4X3QgKm5vZGVf
+dXVpZF9nZXQoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSkNCj4gIHsNCj4gIAlpZiAoIW5vZGUpDQo+
+ICAJCXJldHVybiBOVUxMOw0KPiAtCXJldHVybiBub2RlLT5kZXZfdXVpZDsNCj4gKwlyZXR1cm4g
+bm9kZS0+dXVpZDsNCj4gIH0NCj4gIA0KPiAtc3RydWN0IG1lc2hfbm9kZSAqbm9kZV9uZXcodm9p
+ZCkNCj4gK3N0cnVjdCBtZXNoX25vZGUgKm5vZGVfbmV3KGNvbnN0IHVpbnQ4X3QgdXVpZFsxNl0p
+DQo+ICB7DQo+ICAJc3RydWN0IG1lc2hfbm9kZSAqbm9kZTsNCj4gIA0KPiAgCW5vZGUgPSBsX25l
+dyhzdHJ1Y3QgbWVzaF9ub2RlLCAxKTsNCj4gIAlub2RlLT5uZXQgPSBtZXNoX25ldF9uZXcobm9k
+ZSk7DQo+ICsJbWVtY3B5KG5vZGUtPnV1aWQsIHV1aWQsIHNpemVvZihub2RlLT51dWlkKSk7DQo+
+ICANCj4gIAlpZiAoIW5vZGVzKQ0KPiAgCQlub2RlcyA9IGxfcXVldWVfbmV3KCk7DQo+IEBAIC0z
+ODIsOCArMzgzLDYgQEAgYm9vbCBub2RlX2luaXRfZnJvbV9zdG9yYWdlKHN0cnVjdCBtZXNoX25v
+ZGUgKm5vZGUsIHZvaWQgKmRhdGEpDQo+ICANCj4gIAlub2RlLT5wcmltYXJ5ID0gZGJfbm9kZS0+
+dW5pY2FzdDsNCj4gIA0KPiAtCW1lbWNweShub2RlLT5kZXZfdXVpZCwgZGJfbm9kZS0+dXVpZCwg
+MTYpOw0KPiAtDQo+ICAJLyogSW5pdGlhbGl6ZSBjb25maWd1cmF0aW9uIHNlcnZlciBtb2RlbCAq
+Lw0KPiAgCW1lc2hfY29uZmlnX3Nydl9pbml0KG5vZGUsIFBSSU1BUllfRUxFX0lEWCk7DQo+ICAN
+Cj4gQEAgLTk3MywyMCArOTcyLDYgQEAgZmFpbDoNCj4gIAlyZXR1cm4gZmFsc2U7DQo+ICB9DQo+
+ICANCj4gLXZvaWQgbm9kZV9pZF9zZXQoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDE2X3Qg
+aWQpDQo+IC17DQo+IC0JaWYgKG5vZGUpDQo+IC0JCW5vZGUtPmlkID0gaWQ7DQo+IC19DQo+IC0N
+Cj4gLXVpbnQxNl90IG5vZGVfaWRfZ2V0KHN0cnVjdCBtZXNoX25vZGUgKm5vZGUpDQo+IC17DQo+
+IC0JaWYgKCFub2RlKQ0KPiAtCQlyZXR1cm4gMDsNCj4gLQ0KPiAtCXJldHVybiBub2RlLT5pZDsN
+Cj4gLX0NCj4gLQ0KPiAgc3RhdGljIHZvaWQgYXR0YWNoX2lvKHZvaWQgKmEsIHZvaWQgKmIpDQo+
+ICB7DQo+ICAJc3RydWN0IG1lc2hfbm9kZSAqbm9kZSA9IGE7DQo+IEBAIC0xMDA1LDkgKzk5MCwx
+MyBAQCB2b2lkIG5vZGVfYXR0YWNoX2lvKHN0cnVjdCBtZXNoX2lvICppbykNCj4gIC8qIFJlZ2lz
+dGVyIG5vZGUgb2JqZWN0IHdpdGggRC1CdXMgKi8NCj4gIHN0YXRpYyBib29sIHJlZ2lzdGVyX25v
+ZGVfb2JqZWN0KHN0cnVjdCBtZXNoX25vZGUgKm5vZGUpDQo+ICB7DQo+IC0Jbm9kZS0+cGF0aCA9
+IGxfbWFsbG9jKHN0cmxlbihNRVNIX05PREVfUEFUSF9QUkVGSVgpICsgNSk7DQo+ICsJY2hhciB1
+dWlkWzMzXTsNCj4gIA0KPiAtCXNucHJpbnRmKG5vZGUtPnBhdGgsIDEwLCBNRVNIX05PREVfUEFU
+SF9QUkVGSVggIiU0LjR4Iiwgbm9kZS0+aWQpOw0KPiArCWlmICghaGV4MnN0cihub2RlLT51dWlk
+LCBzaXplb2Yobm9kZS0+dXVpZCksIHV1aWQsIHNpemVvZih1dWlkKSkpDQo+ICsJCXJldHVybiBm
+YWxzZTsNCj4gKw0KPiArCWlmIChhc3ByaW50Zigmbm9kZS0+cGF0aCwgTUVTSF9OT0RFX1BBVEhf
+UFJFRklYICIlcyIsIHV1aWQpIDwgMCkNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiAgDQo+ICAJaWYg
+KCFsX2RidXNfb2JqZWN0X2FkZF9pbnRlcmZhY2UoZGJ1c19nZXRfYnVzKCksIG5vZGUtPnBhdGgs
+DQo+ICAJCQkJCU1FU0hfTk9ERV9JTlRFUkZBQ0UsIG5vZGUpKQ0KPiBAQCAtMTIzMiw4ICsxMjIx
+LDYgQEAgc3RhdGljIHZvaWQgY29udmVydF9ub2RlX3RvX3N0b3JhZ2Uoc3RydWN0IG1lc2hfbm9k
+ZSAqbm9kZSwNCj4gIAlkYl9ub2RlLT5tb2Rlcy5scG4gPSBub2RlLT5scG47DQo+ICAJZGJfbm9k
+ZS0+bW9kZXMucHJveHkgPSBub2RlLT5wcm94eTsNCj4gIA0KPiAtCW1lbWNweShkYl9ub2RlLT51
+dWlkLCBub2RlLT5kZXZfdXVpZCwgMTYpOw0KPiAtDQo+ICAJZGJfbm9kZS0+bW9kZXMuZnJpZW5k
+ID0gbm9kZS0+ZnJpZW5kOw0KPiAgCWRiX25vZGUtPm1vZGVzLnJlbGF5LnN0YXRlID0gbm9kZS0+
+cmVsYXkubW9kZTsNCj4gIAlkYl9ub2RlLT5tb2Rlcy5yZWxheS5jbnQgPSBub2RlLT5yZWxheS5j
+bnQ7DQo+IEBAIC0xNDY5LDcgKzE0NTYsNyBAQCBzdGF0aWMgdm9pZCBnZXRfbWFuYWdlZF9vYmpl
+Y3RzX2NiKHN0cnVjdCBsX2RidXNfbWVzc2FnZSAqbXNnLCB2b2lkICp1c2VyX2RhdGEpDQo+ICAJ
+CX0NCj4gIAkJbm9kZS0+bnVtX2VsZSA9IG51bV9lbGU7DQo+ICAJCXNldF9kZWZhdWx0cyhub2Rl
+KTsNCj4gLQkJbWVtY3B5KG5vZGUtPmRldl91dWlkLCByZXEtPmRhdGEsIDE2KTsNCj4gKwkJbWVt
+Y3B5KG5vZGUtPnV1aWQsIHJlcS0+ZGF0YSwgMTYpOw0KPiAgDQo+ICAJCWlmICghY3JlYXRlX25v
+ZGVfY29uZmlnKG5vZGUpKQ0KPiAgCQkJZ290byBmYWlsOw0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9u
+b2RlLmggYi9tZXNoL25vZGUuaA0KPiBpbmRleCAyMGI2MDA5OWUuLjFiZTRkZTFkYSAxMDA2NDQN
+Cj4gLS0tIGEvbWVzaC9ub2RlLmgNCj4gKysrIGIvbWVzaC9ub2RlLmgNCj4gQEAgLTMzLDcgKzMz
+LDcgQEAgdHlwZWRlZiB2b2lkICgqbm9kZV9yZWFkeV9mdW5jX3QpICh2b2lkICp1c2VyX2RhdGEs
+IGludCBzdGF0dXMsDQo+ICB0eXBlZGVmIHZvaWQgKCpub2RlX2pvaW5fcmVhZHlfZnVuY190KSAo
+c3RydWN0IG1lc2hfbm9kZSAqbm9kZSwNCj4gIAkJCQkJCXN0cnVjdCBtZXNoX2FnZW50ICphZ2Vu
+dCk7DQo+ICANCj4gLXN0cnVjdCBtZXNoX25vZGUgKm5vZGVfbmV3KHZvaWQpOw0KPiArc3RydWN0
+IG1lc2hfbm9kZSAqbm9kZV9uZXcoY29uc3QgdWludDhfdCB1dWlkWzE2XSk7DQo+ICB2b2lkIG5v
+ZGVfcmVtb3ZlKHN0cnVjdCBtZXNoX25vZGUgKm5vZGUpOw0KPiAgdm9pZCBub2RlX2pvaW4oY29u
+c3QgY2hhciAqYXBwX3BhdGgsIGNvbnN0IGNoYXIgKnNlbmRlciwgY29uc3QgdWludDhfdCAqdXVp
+ZCwNCj4gIAkJCQkJCW5vZGVfam9pbl9yZWFkeV9mdW5jX3QgY2IpOw0KPiBkaWZmIC0tZ2l0IGEv
+bWVzaC9zdG9yYWdlLmMgYi9tZXNoL3N0b3JhZ2UuYw0KPiBpbmRleCA4YTcwYjU2OTYuLjZkYzI1
+MTM0NCAxMDA2NDQNCj4gLS0tIGEvbWVzaC9zdG9yYWdlLmMNCj4gKysrIGIvbWVzaC9zdG9yYWdl
+LmMNCj4gQEAgLTQ1LDYgKzQ1LDcgQEANCj4gICNpbmNsdWRlICJtZXNoL21vZGVsLmgiDQo+ICAj
+aW5jbHVkZSAibWVzaC9tZXNoLWRiLmgiDQo+ICAjaW5jbHVkZSAibWVzaC9zdG9yYWdlLmgiDQo+
+ICsjaW5jbHVkZSAibWVzaC91dGlsLmgiDQo+ICANCj4gIHN0cnVjdCB3cml0ZV9pbmZvIHsNCj4g
+IAlqc29uX29iamVjdCAqam5vZGU7DQo+IEBAIC01NCwxMiArNTUsNiBAQCBzdHJ1Y3Qgd3JpdGVf
+aW5mbyB7DQo+ICB9Ow0KPiAgDQo+ICBzdGF0aWMgY29uc3QgY2hhciAqc3RvcmFnZV9kaXI7DQo+
+IC1zdGF0aWMgc3RydWN0IGxfcXVldWUgKm5vZGVfaWRzOw0KPiAtDQo+IC1zdGF0aWMgYm9vbCBz
+aW1wbGVfbWF0Y2goY29uc3Qgdm9pZCAqYSwgY29uc3Qgdm9pZCAqYikNCj4gLXsNCj4gLQlyZXR1
+cm4gYSA9PSBiOw0KPiAtfQ0KPiAgDQo+ICBzdGF0aWMgYm9vbCByZWFkX25vZGVfY2Ioc3RydWN0
+IG1lc2hfZGJfbm9kZSAqZGJfbm9kZSwgdm9pZCAqdXNlcl9kYXRhKQ0KPiAgew0KPiBAQCAtMTcx
+LDcgKzE2Niw3IEBAIHN0YXRpYyBib29sIHBhcnNlX25vZGUoc3RydWN0IG1lc2hfbm9kZSAqbm9k
+ZSwganNvbl9vYmplY3QgKmpub2RlKQ0KPiAgCXJldHVybiB0cnVlOw0KPiAgfQ0KPiAgDQo+IC1z
+dGF0aWMgYm9vbCBwYXJzZV9jb25maWcoY2hhciAqaW5fZmlsZSwgY2hhciAqb3V0X2ZpbGUsIHVp
+bnQxNl90IG5vZGVfaWQpDQo+ICtzdGF0aWMgYm9vbCBwYXJzZV9jb25maWcoY2hhciAqaW5fZmls
+ZSwgY2hhciAqb3V0X2ZpbGUsIGNvbnN0IHVpbnQ4X3QgdXVpZFsxNl0pDQo+ICB7DQo+ICAJaW50
+IGZkOw0KPiAgCWNoYXIgKnN0cjsNCj4gQEAgLTIwOCw3ICsyMDMsNyBAQCBzdGF0aWMgYm9vbCBw
+YXJzZV9jb25maWcoY2hhciAqaW5fZmlsZSwgY2hhciAqb3V0X2ZpbGUsIHVpbnQxNl90IG5vZGVf
+aWQpDQo+ICAJaWYgKCFqbm9kZSkNCj4gIAkJZ290byBkb25lOw0KPiAgDQo+IC0Jbm9kZSA9IG5v
+ZGVfbmV3KCk7DQo+ICsJbm9kZSA9IG5vZGVfbmV3KHV1aWQpOw0KPiAgDQo+ICAJcmVzdWx0ID0g
+cGFyc2Vfbm9kZShub2RlLCBqbm9kZSk7DQo+ICANCj4gQEAgLTIxOSw3ICsyMTQsNiBAQCBzdGF0
+aWMgYm9vbCBwYXJzZV9jb25maWcoY2hhciAqaW5fZmlsZSwgY2hhciAqb3V0X2ZpbGUsIHVpbnQx
+Nl90IG5vZGVfaWQpDQo+ICANCj4gIAlub2RlX2pjb25maWdfc2V0KG5vZGUsIGpub2RlKTsNCj4g
+IAlub2RlX2NmZ19maWxlX3NldChub2RlLCBvdXRfZmlsZSk7DQo+IC0Jbm9kZV9pZF9zZXQobm9k
+ZSwgbm9kZV9pZCk7DQo+ICANCj4gIGRvbmU6DQo+ICAJY2xvc2UoZmQpOw0KPiBAQCAtNTMzLDQ0
+ICs1MjcsNDEgQEAgYm9vbCBzdG9yYWdlX2xvYWRfbm9kZXMoY29uc3QgY2hhciAqZGlyX25hbWUp
+DQo+ICAJfQ0KPiAgDQo+ICAJc3RvcmFnZV9kaXIgPSBkaXJfbmFtZTsNCj4gLQlub2RlX2lkcyA9
+IGxfcXVldWVfbmV3KCk7DQo+ICANCj4gIAl3aGlsZSAoKGVudHJ5ID0gcmVhZGRpcihkaXIpKSAh
+PSBOVUxMKSB7DQo+IC0JCWNoYXIgbmFtZV9idWZbUEFUSF9NQVhdOw0KPiAtCQljaGFyICpmaWxl
+bmFtZTsNCj4gLQkJdWludDMyX3Qgbm9kZV9pZDsNCj4gLQkJc2l6ZV90IGxlbjsNCj4gKwkJY2hh
+ciAqY2ZnOw0KPiArCQljaGFyICpiYWs7DQo+ICsJCXVpbnQ4X3QgdXVpZFsxNl07DQo+ICANCj4g
+IAkJaWYgKGVudHJ5LT5kX3R5cGUgIT0gRFRfRElSKQ0KPiAgCQkJY29udGludWU7DQo+ICANCj4g
+LQkJaWYgKHNzY2FuZihlbnRyeS0+ZF9uYW1lLCAiJTA0eCIsICZub2RlX2lkKSAhPSAxKQ0KPiAr
+CQlpZiAoIXN0cjJoZXgoZW50cnktPmRfbmFtZSwgc3RybGVuKGVudHJ5LT5kX25hbWUpLCB1dWlk
+LCBzaXplb2YodXVpZCkpKQ0KPiAgCQkJY29udGludWU7DQo+ICANCj4gLQkJc25wcmludGYobmFt
+ZV9idWYsIFBBVEhfTUFYLCAiJXMvJXMvbm9kZS5qc29uIiwgZGlyX25hbWUsDQo+IC0JCQkJCQkJ
+CWVudHJ5LT5kX25hbWUpOw0KPiAtDQo+IC0JCWxfcXVldWVfcHVzaF90YWlsKG5vZGVfaWRzLCBM
+X1VJTlRfVE9fUFRSKG5vZGVfaWQpKTsNCj4gLQ0KPiAtCQlsZW4gPSBzdHJsZW4obmFtZV9idWYp
+Ow0KPiAtCQlmaWxlbmFtZSA9IGxfbWFsbG9jKGxlbiArIDEpOw0KPiAtDQo+IC0JCXN0cm5jcHko
+ZmlsZW5hbWUsIG5hbWVfYnVmLCBsZW4gKyAxKTsNCj4gKwkJaWYgKGFzcHJpbnRmKCZjZmcsICIl
+cy8lcy9ub2RlLmpzb24iLCBkaXJfbmFtZSwNCj4gKwkJCQkJCWVudHJ5LT5kX25hbWUpIDwgMCkN
+Cj4gKwkJCWNvbnRpbnVlOw0KPiAgDQo+IC0JCWlmIChwYXJzZV9jb25maWcobmFtZV9idWYsIGZp
+bGVuYW1lLCBub2RlX2lkKSkNCj4gKwkJaWYgKHBhcnNlX2NvbmZpZyhjZmcsIGNmZywgdXVpZCkp
+DQo+ICAJCQljb250aW51ZTsNCj4gIA0KPiAgCQkvKiBGYWxsLWJhY2sgdG8gQmFja3VwIHZlcnNp
+b24gKi8NCj4gLQkJc25wcmludGYobmFtZV9idWYsIFBBVEhfTUFYLCAiJXMvJXMvbm9kZS5qc29u
+LmJhayIsIGRpcl9uYW1lLA0KPiAtCQkJCQkJCQllbnRyeS0+ZF9uYW1lKTsNCj4gKwkJaWYgKGFz
+cHJpbnRmKCZiYWssICIlcy8lcy9ub2RlLmpzb24uYmFrIiwgZGlyX25hbWUsDQo+ICsJCQkJCQll
+bnRyeS0+ZF9uYW1lKSA8IDApIHsNCj4gKwkJCWxfZnJlZShjZmcpOw0KPiArCQkJY29udGludWU7
+DQo+ICsJCX0NCj4gIA0KPiAtCQlpZiAocGFyc2VfY29uZmlnKG5hbWVfYnVmLCBmaWxlbmFtZSwg
+bm9kZV9pZCkpIHsNCj4gLQkJCXJlbW92ZShmaWxlbmFtZSk7DQo+IC0JCQlyZW5hbWUobmFtZV9i
+dWYsIGZpbGVuYW1lKTsNCj4gKwkJaWYgKHBhcnNlX2NvbmZpZyhiYWssIGNmZywgdXVpZCkpIHsN
+Cj4gKwkJCXJlbW92ZShjZmcpOw0KPiArCQkJcmVuYW1lKGJhaywgY2ZnKTsNCj4gKwkJCWxfZnJl
+ZShjZmcpOw0KPiAgCQkJY29udGludWU7DQo+ICAJCX0NCj4gIA0KPiAtCQlsX2ZyZWUoZmlsZW5h
+bWUpOw0KPiArCQlsX2ZyZWUoY2ZnKTsNCj4gKwkJbF9mcmVlKGJhayk7DQo+ICAJfQ0KPiAgDQo+
+ICAJcmV0dXJuIHRydWU7DQo+IEBAIC01NzksMTIgKzU3MCwxMCBAQCBib29sIHN0b3JhZ2VfbG9h
+ZF9ub2Rlcyhjb25zdCBjaGFyICpkaXJfbmFtZSkNCj4gIGJvb2wgc3RvcmFnZV9jcmVhdGVfbm9k
+ZV9jb25maWcoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdm9pZCAqZGF0YSkNCj4gIHsNCj4gIAlz
+dHJ1Y3QgbWVzaF9kYl9ub2RlICpkYl9ub2RlID0gZGF0YTsNCj4gLQl1aW50MTZfdCBub2RlX2lk
+Ow0KPiAtCXVpbnQ4X3QgbnVtX3RyaWVzID0gMDsNCj4gKwljaGFyIHV1aWRbMzNdOw0KPiAgCWNo
+YXIgbmFtZV9idWZbUEFUSF9NQVhdOw0KPiAgCWNoYXIgKmZpbGVuYW1lOw0KPiAgCWpzb25fb2Jq
+ZWN0ICpqbm9kZTsNCj4gLQlzaXplX3QgbGVuOw0KPiAgDQo+ICAJaWYgKCFzdG9yYWdlX2RpcikN
+Cj4gIAkJcmV0dXJuIGZhbHNlOw0KPiBAQCAtNTk0LDI4ICs1ODMsMTggQEAgYm9vbCBzdG9yYWdl
+X2NyZWF0ZV9ub2RlX2NvbmZpZyhzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB2b2lkICpkYXRhKQ0K
+PiAgCWlmICghbWVzaF9kYl9hZGRfbm9kZShqbm9kZSwgZGJfbm9kZSkpDQo+ICAJCXJldHVybiBm
+YWxzZTsNCj4gIA0KPiAtCWRvIHsNCj4gLQkJbF9nZXRyYW5kb20oJm5vZGVfaWQsIDIpOw0KPiAt
+CQlpZiAobm9kZV9pZCAmJiAhbF9xdWV1ZV9maW5kKG5vZGVfaWRzLCBzaW1wbGVfbWF0Y2gsDQo+
+IC0JCQkJCQlMX1VJTlRfVE9fUFRSKG5vZGVfaWQpKSkNCj4gLQkJCWJyZWFrOw0KPiAtCX0gd2hp
+bGUgKCsrbnVtX3RyaWVzIDwgMTApOw0KPiAtDQo+IC0JaWYgKG51bV90cmllcyA9PSAxMCkNCj4g
+LQkJbF9lcnJvcigiRmFpbGVkIHRvIGdlbmVyYXRlIHVuaXF1ZSBub2RlIElEIik7DQo+IC0NCj4g
+LQlub2RlX2lkX3NldChub2RlLCBub2RlX2lkKTsNCj4gKwlpZiAoIWhleDJzdHIobm9kZV91dWlk
+X2dldChub2RlKSwgMTYsIHV1aWQsIHNpemVvZih1dWlkKSkpDQo+ICsJCXJldHVybiBmYWxzZTsN
+Cj4gIA0KPiAtCXNucHJpbnRmKG5hbWVfYnVmLCBQQVRIX01BWCwgIiVzLyUwNHgiLCBzdG9yYWdl
+X2Rpciwgbm9kZV9pZCk7DQo+ICsJc25wcmludGYobmFtZV9idWYsIFBBVEhfTUFYLCAiJXMvJXMi
+LCBzdG9yYWdlX2RpciwgdXVpZCk7DQo+ICANCj4gIAkvKiBDcmVhdGUgYSBuZXcgZGlyZWN0b3J5
+IGFuZCBub2RlLmpzb24gZmlsZSAqLw0KPiAgCWlmIChta2RpcihuYW1lX2J1ZiwgMDc1NSkgIT0g
+MCkNCj4gIAkJZ290byBmYWlsOw0KPiAgDQo+IC0JbGVuID0gc3RybGVuKG5hbWVfYnVmKSArIHN0
+cmxlbigiL25vZGUuanNvbiIpICsgMTsNCj4gLQlmaWxlbmFtZSA9IGxfbWFsbG9jKGxlbik7DQo+
+ICsJaWYgKGFzcHJpbnRmKCZmaWxlbmFtZSwgIiVzL25vZGUuanNvbiIsIG5hbWVfYnVmKSA8IDAp
+DQo+ICsJCWdvdG8gZmFpbDsNCj4gIA0KPiAtCXNucHJpbnRmKGZpbGVuYW1lLCBsZW4sICIlcy9u
+b2RlLmpzb24iLCBuYW1lX2J1Zik7DQo+ICAJbF9kZWJ1ZygiTmV3IG5vZGUgY29uZmlnICVzIiwg
+ZmlsZW5hbWUpOw0KPiAgDQo+ICAJaWYgKCFzYXZlX2NvbmZpZyhqbm9kZSwgZmlsZW5hbWUpKSB7
+DQo+IEBAIC02MjYsOCArNjA1LDYgQEAgYm9vbCBzdG9yYWdlX2NyZWF0ZV9ub2RlX2NvbmZpZyhz
+dHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB2b2lkICpkYXRhKQ0KPiAgCW5vZGVfamNvbmZpZ19zZXQo
+bm9kZSwgam5vZGUpOw0KPiAgCW5vZGVfY2ZnX2ZpbGVfc2V0KG5vZGUsIGZpbGVuYW1lKTsNCj4g
+IA0KPiAtCWxfcXVldWVfcHVzaF90YWlsKG5vZGVfaWRzLCBMX1VJTlRfVE9fUFRSKG5vZGVfaWQp
+KTsNCj4gLQ0KPiAgCXJldHVybiB0cnVlOw0KPiAgZmFpbDoNCj4gIAlqc29uX29iamVjdF9wdXQo
+am5vZGUpOw0KPiBAQCAtNjM3LDExICs2MTQsOSBAQCBmYWlsOg0KPiAgLyogUGVybWFuZW50bHkg
+cmVtb3ZlIG5vZGUgY29uZmlndXJhdGlvbiAqLw0KPiAgdm9pZCBzdG9yYWdlX3JlbW92ZV9ub2Rl
+X2NvbmZpZyhzdHJ1Y3QgbWVzaF9ub2RlICpub2RlKQ0KPiAgew0KPiAtCWNoYXIgKmNmZ25hbWU7
+DQo+ICsJY2hhciAqY2ZnOw0KPiAgCXN0cnVjdCBqc29uX29iamVjdCAqam5vZGU7DQo+ICAJY29u
+c3QgY2hhciAqZGlyX25hbWU7DQo+IC0JdWludDE2X3Qgbm9kZV9pZDsNCj4gLQlzaXplX3QgbGVu
+Ow0KPiAgCWNoYXIgKmJhazsNCj4gIA0KPiAgCWlmICghbm9kZSkNCj4gQEAgLTY1NCwzMCArNjI5
+LDI2IEBAIHZvaWQgc3RvcmFnZV9yZW1vdmVfbm9kZV9jb25maWcoc3RydWN0IG1lc2hfbm9kZSAq
+bm9kZSkNCj4gIAlub2RlX2pjb25maWdfc2V0KG5vZGUsIE5VTEwpOw0KPiAgDQo+ICAJLyogRGVs
+ZXRlIG5vZGUgY29uZmlndXJhdGlvbiBmaWxlICovDQo+IC0JY2ZnbmFtZSA9IChjaGFyICopIG5v
+ZGVfY2ZnX2ZpbGVfZ2V0KG5vZGUpOw0KPiAtCWlmICghY2ZnbmFtZSkNCj4gKwljZmcgPSBub2Rl
+X2NmZ19maWxlX2dldChub2RlKTsNCj4gKwlpZiAoIWNmZykNCj4gIAkJcmV0dXJuOw0KPiAgDQo+
+IC0JbF9kZWJ1ZygiRGVsZXRlIG5vZGUgY29uZmlnIGZpbGUgJXMiLCBjZmduYW1lKTsNCj4gLQly
+ZW1vdmUoY2ZnbmFtZSk7DQo+ICsJbF9kZWJ1ZygiRGVsZXRlIG5vZGUgY29uZmlnIGZpbGUgJXMi
+LCBjZmcpOw0KPiArCXJlbW92ZShjZmcpOw0KPiAgDQo+ICAJLyogRGVsZXRlIHRoZSBiYWNrdXAg
+ZmlsZSAqLw0KPiAtCWxlbiA9IHN0cmxlbihjZmduYW1lKSArIDU7DQo+IC0JYmFrID0gbF9tYWxs
+b2MobGVuKTsNCj4gLQlzdHJuY3B5KGJhaywgY2ZnbmFtZSwgbGVuKTsNCj4gLQliYWsgPSBzdHJu
+Y2F0KGJhaywgIi5iYWsiLCA1KTsNCj4gLQlyZW1vdmUoYmFrKTsNCj4gLQlsX2ZyZWUoYmFrKTsN
+Cj4gKwlpZiAoYXNwcmludGYoJmJhaywgIiVzLmJhayIsIGNmZykpDQo+ICsJew0KPiArCQlyZW1v
+dmUoYmFrKTsNCj4gKwkJbF9mcmVlKGJhayk7DQo+ICsJfQ0KPiAgDQo+ICAJLyogRGVsZXRlIHRo
+ZSBub2RlIGRpcmVjdG9yeSAqLw0KPiAtCWRpcl9uYW1lID0gZGlybmFtZShjZmduYW1lKTsNCj4g
+KwlkaXJfbmFtZSA9IGRpcm5hbWUoY2ZnKTsNCj4gIA0KPiAgCWxfZGVidWcoIkRlbGV0ZSBkaXJl
+Y3RvcnkgJXMiLCBkaXJfbmFtZSk7DQo+ICAJcm1kaXIoZGlyX25hbWUpOw0KPiAgDQo+IC0JbF9m
+cmVlKGNmZ25hbWUpOw0KPiArCWxfZnJlZShjZmcpOw0KPiAgCW5vZGVfY2ZnX2ZpbGVfc2V0KG5v
+ZGUsIE5VTEwpOw0KPiAtDQo+IC0Jbm9kZV9pZCA9IG5vZGVfaWRfZ2V0KG5vZGUpOw0KPiAtCWxf
+cXVldWVfcmVtb3ZlKG5vZGVfaWRzLCBMX1VJTlRfVE9fUFRSKG5vZGVfaWQpKTsNCj4gIH0NCj4g
+DQoNClRoaXMgbG9va3MgZ29vZC4gVGVzdGVkIHRoZSBwYXRjaCwgd29ya3MgYXMgZXhwZWN0ZWQu
+DQoNClRoYW5rcywNCkluZ2ENCg==
