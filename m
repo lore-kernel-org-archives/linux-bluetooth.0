@@ -2,427 +2,95 @@ Return-Path: <SRS0=Q31N=TJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E54FC04AB1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 May 2019 17:58:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2615C04AB1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 May 2019 19:11:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 543282085A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 May 2019 17:58:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B3C920656
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 May 2019 19:11:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="oBDwJ0sD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726736AbfEIR6R (ORCPT
+        id S1726714AbfEITLk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 May 2019 13:58:17 -0400
-Received: from mga04.intel.com ([192.55.52.120]:65363 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726558AbfEIR6Q (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 May 2019 13:58:16 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 May 2019 10:58:16 -0700
-X-ExtLoop1: 1
-Received: from bgix-dell-lap.sea.intel.com ([10.251.10.18])
-  by fmsmga004.fm.intel.com with ESMTP; 09 May 2019 10:58:16 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v5 2/2] mesh: Add key storage
-Date:   Thu,  9 May 2019 10:57:39 -0700
-Message-Id: <20190509175739.16891-3-brian.gix@intel.com>
-X-Mailer: git-send-email 2.14.5
-In-Reply-To: <20190509175739.16891-1-brian.gix@intel.com>
+        Thu, 9 May 2019 15:11:40 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:37037 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726620AbfEITLk (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 9 May 2019 15:11:40 -0400
+Received: by mail-lf1-f65.google.com with SMTP id h126so2356684lfh.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 May 2019 12:11:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:date:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=U0P9XFjYm3AUa4GTdhBQBlitfwmftJFA3SrNmoWTmro=;
+        b=oBDwJ0sDKMpuwIyIuuKzGk8OlVd6Z79UwSIM+Ajvy82IXByT1nItaxwiESEVE0xuTh
+         0UQUAor9THQgmZnnjFWchNF+pUOiyahISijiAYA7MFlLyi3IqKjYAp+0Iov1VgujOMVw
+         s2I1hMhvCARUFM4/vWY6INScwat3geH3BlZkRJrXlK/XzL6cHS+SUsR7fsM36JgwJybS
+         PMnb164W8em3lQBOflFvh2K7JQIF/rT0o5Le+d3wY7fcsnZaiPUyffLxCPTtYz1As3Ws
+         6Nn6/Ff0rrDCuOGDOdl1yqRbaGW9ID/ydNFFp5fPefsLi4+JNGLkN3TYP8seU8TQMwid
+         pvCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:date:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=U0P9XFjYm3AUa4GTdhBQBlitfwmftJFA3SrNmoWTmro=;
+        b=ZPTsm9Bsstwdk2WNMleled5AeZRo3UZV49haiCma8iwep5ISrnvOnlwD+BLnHLaDsc
+         ee719RElw36Fw/HkdDaBF7w4GBosi6VCzU60pNP0RpQKd7zgOrxW7/PvSj5/8F7jqFmj
+         rvtY0IQdNFFTDF0+MuPW7hOa9a9tgAWs7OptK5lDQhS4dr0q/1Wp/rpnaIHP9yUACs4X
+         szpAU5X52qvzG+AgTPY249Bung2J/Nbchpe/AiAkrXqrOww8FmspuknPltdndNS0R2V0
+         GRWpbtjNiN5yAYFzE64UIcMpeb9SZgPNs8eR9mt5OHDaEQN45iaSzLrOURHn5W3GzwE5
+         ElCw==
+X-Gm-Message-State: APjAAAVfWRI/AEsHpY6AB+h36HyZ87H1XjMLGqDX6rjy9vMtZxMVz+Gk
+        XGjFyKPv32O0c7lylpk+j6vnHw==
+X-Google-Smtp-Source: APXvYqzQrPLk67SKdDDkmJ2NRZ7qQcudKcvo75p1ESfo9JoelMSIQQ98aJGWHnTALE9/4Iauzs+rZA==
+X-Received: by 2002:ac2:523a:: with SMTP id i26mr3397658lfl.118.1557429098521;
+        Thu, 09 May 2019 12:11:38 -0700 (PDT)
+Received: from kynes (apn-31-2-19-253.dynamic.gprs.plus.pl. [31.2.19.253])
+        by smtp.gmail.com with ESMTPSA id e19sm679693lfd.36.2019.05.09.12.11.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 09 May 2019 12:11:37 -0700 (PDT)
+From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
+        <michal.lowas-rzechonek@silvair.com>
+X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
+Date:   Thu, 9 May 2019 21:11:35 +0200
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: Re: [PATCH BlueZ v5 2/2] mesh: Add key storage
+Message-ID: <20190509191135.y6rbo5ziv6hrxxah@kynes>
+Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
+        linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
 References: <20190509175739.16891-1-brian.gix@intel.com>
+ <20190509175739.16891-3-brian.gix@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190509175739.16891-3-brian.gix@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements internal key storage add/delete/fetch for the three
-basic key types managed in Mesh: Network, Application and Device.
+Hi again,
 
-This key storage is separate from keys assigned to nodes within the
-mesh, and are used to support Configuration Client functionality.
----
- Makefile.mesh  |   1 +
- mesh/keyring.c | 297 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/keyring.h |  49 ++++++++++
- 3 files changed, 347 insertions(+)
- create mode 100644 mesh/keyring.c
- create mode 100644 mesh/keyring.h
+On 05/09, Brian Gix wrote:
+> +	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
+> +	if (fd > 0) {
+Hm. I might be mistaken, since I'm not that much familiar with systemd
+internals, but 'back in the day' daemons were expected to close their
+stdin, leaving descriptor #0 free for reuse.
 
-diff --git a/Makefile.mesh b/Makefile.mesh
-index 76e424b92..bccd4d946 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -25,6 +25,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/agent.h mesh/agent.c \
- 				mesh/prov-acceptor.c mesh/prov-initiator.c \
- 				mesh/pb-adv.h mesh/pb-adv.c \
-+				mesh/keyring.h mesh/keyring.c \
- 				mesh/mesh-defs.h
- libexec_PROGRAMS += mesh/bluetooth-meshd
- 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-new file mode 100644
-index 000000000..0ca53b0f8
---- /dev/null
-+++ b/mesh/keyring.c
-@@ -0,0 +1,297 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <dirent.h>
-+#include <libgen.h>
-+
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+
-+#include <ell/ell.h>
-+
-+#include "mesh/mesh-defs.h"
-+
-+#include "mesh/net.h"
-+#include "mesh/keyring.h"
-+#include "mesh/mesh.h"
-+#include "mesh/node.h"
-+
-+const char *dev_key_dir = "/dev_keys";
-+const char *app_key_dir = "/app_keys";
-+const char *net_key_dir = "/net_keys";
-+
-+bool keyring_put_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key)
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+	bool result = false;
-+	int fd;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+
-+	if (strlen(node_path) + strlen(net_key_dir) + 1 + 3 >= PATH_MAX)
-+		return false;
-+
-+	snprintf(key_file, PATH_MAX, "%s%s", node_path, net_key_dir);
-+	mkdir(key_file, 0755);
-+	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, net_key_dir,
-+								net_idx);
-+	l_debug("Put Net Key %s", key_file);
-+
-+	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
-+	if (fd > 0) {
-+		if (write(fd, key, sizeof(*key)) == sizeof(*key))
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	return result;
-+}
-+
-+bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
-+				uint16_t net_idx, struct keyring_app_key *key)
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+	bool result = false;
-+	int fd;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+
-+	if (strlen(node_path) + strlen(app_key_dir) + 1 + 3 >= PATH_MAX)
-+		return false;
-+
-+	snprintf(key_file, PATH_MAX, "%s%s", node_path, app_key_dir);
-+	mkdir(key_file, 0755);
-+	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, app_key_dir,
-+								app_idx);
-+	l_debug("Put App Key %s", key_file);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd > 0) {
-+		struct keyring_app_key old_key;
-+
-+		if (read(fd, &old_key, sizeof(old_key)) == sizeof(old_key)) {
-+			if (old_key.net_idx != net_idx) {
-+				close(fd);
-+				return false;
-+			}
-+		}
-+		close(fd);
-+	}
-+
-+	fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
-+	if (fd > 0) {
-+		if (write(fd, key, sizeof(*key)) == sizeof(*key))
-+			result = true;
-+	}
-+	close(fd);
-+
-+	return result;
-+}
-+
-+bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+					uint8_t count, uint8_t dev_key[16])
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+	bool result = true;
-+	int fd, i;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+
-+	if (strlen(node_path) + strlen(dev_key_dir) + 1 + 4 >= PATH_MAX)
-+		return false;
-+
-+	snprintf(key_file, PATH_MAX, "%s%s", node_path, dev_key_dir);
-+	mkdir(key_file, 0755);
-+
-+	for (i = 0; i < count; i++) {
-+		snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
-+						dev_key_dir, unicast + i);
-+		l_debug("Put Dev Key %s", key_file);
-+
-+		fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC);
-+		if (fd > 0) {
-+			if (write(fd, dev_key, 16) != 16)
-+				result = false;
-+
-+			close(fd);
-+		} else
-+			result = false;
-+	}
-+
-+	return result;
-+}
-+
-+bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key)
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+	bool result = false;
-+	int fd;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, net_key_dir,
-+								net_idx);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd > 0) {
-+		if (read(fd, key, sizeof(*key)) == sizeof(*key))
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	return result;
-+}
-+
-+bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
-+						struct keyring_app_key *key)
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+	bool result = false;
-+	int fd;
-+
-+	if (!node || !key)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, app_key_dir,
-+								app_idx);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd > 0) {
-+		if (read(fd, key, sizeof(*key)) == sizeof(*key))
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	return result;
-+}
-+
-+bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+							uint8_t dev_key[16])
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+	bool result = false;
-+	int fd;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+	snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path, dev_key_dir,
-+								unicast);
-+
-+	fd = open(key_file, O_RDONLY);
-+	if (fd > 0) {
-+		if (read(fd, dev_key, 16) == 16)
-+			result = true;
-+
-+		close(fd);
-+	}
-+
-+	return result;
-+}
-+
-+bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx)
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, net_key_dir,
-+								net_idx);
-+	l_debug("RM Net Key %s", key_file);
-+	remove(key_file);
-+
-+	/* TODO: See if it is easiest to delete all bound App keys here */
-+	/* TODO: see nftw() */
-+
-+	return true;
-+}
-+
-+bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx)
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, app_key_dir,
-+								app_idx);
-+	l_debug("RM App Key %s", key_file);
-+	remove(key_file);
-+
-+	return true;
-+}
-+
-+bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+								uint8_t count)
-+{
-+	char *node_path;
-+	char key_file[PATH_MAX];
-+	int i;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = node_path_get(node);
-+	for (i = 0; i < count; i++) {
-+		snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
-+						dev_key_dir, unicast + i);
-+		l_debug("RM Dev Key %s", key_file);
-+		remove(key_file);
-+	}
-+
-+	return true;
-+}
-diff --git a/mesh/keyring.h b/mesh/keyring.h
-new file mode 100644
-index 000000000..167191013
---- /dev/null
-+++ b/mesh/keyring.h
-@@ -0,0 +1,49 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+struct keyring_net_key {
-+	uint16_t net_idx;
-+	uint8_t phase;
-+	uint8_t old_key[16];
-+	uint8_t new_key[16];
-+};
-+
-+struct keyring_app_key {
-+	uint16_t app_idx;
-+	uint16_t net_idx;
-+	uint8_t old_key[16];
-+	uint8_t new_key[16];
-+};
-+
-+bool keyring_put_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key);
-+bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
-+						struct keyring_net_key *key);
-+bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx);
-+bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
-+				uint16_t net_idx, struct keyring_app_key *key);
-+bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
-+						struct keyring_app_key *key);
-+bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx);
-+bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+							uint8_t dev_key[16]);
-+bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+					uint8_t count, uint8_t dev_key[16]);
-+bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
-+								uint8_t count);
+regards
 -- 
-2.14.5
-
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
