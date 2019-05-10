@@ -3,150 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26645C04A6B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 May 2019 15:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1076C04AB2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 May 2019 16:16:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 022452175B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 May 2019 15:38:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCBE32070D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 May 2019 16:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727530AbfEJPiv convert rfc822-to-8bit (ORCPT
+        id S1727603AbfEJQQS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 May 2019 11:38:51 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:39092 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727346AbfEJPiv (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 May 2019 11:38:51 -0400
-Received: from marcel-macpro.fritz.box (p4FF9FD9B.dip0.t-ipconnect.de [79.249.253.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5207FCF182;
-        Fri, 10 May 2019 17:47:04 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHCN7x+2t++EifqQ17kyzW0=NnnQ4A1HeFvE4pEzJ02cXwy+LA@mail.gmail.com>
-Date:   Fri, 10 May 2019 17:38:48 +0200
-Cc:     Sebastian Reichel <sre@kernel.org>,
-        Hans Verkuil <hverkuil@xs4all.nl>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Tony Lindgren <tony@atomide.com>,
-        Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-media@vger.kernel.org,
-        Linux-OMAP <linux-omap@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4C83753E-205B-42CE-AF85-74674B311151@holtmann.org>
-References: <20181221011752.25627-1-sre@kernel.org>
- <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
- <20190319133154.7tbfafy7pguzw2tk@earth.universe>
- <CAHCN7xLZFLs=ed539bwuT6s-n6SDof-um7B3AeErQ2ChztC26A@mail.gmail.com>
- <CAHCN7xLQ=h3bfwS=uTfjSpOtv9qWbic0=_51WJz9KmX7v8+vmw@mail.gmail.com>
- <FCCA9B3E-80AD-416E-B6E4-85E90721881E@holtmann.org>
- <CAHCN7x+2t++EifqQ17kyzW0=NnnQ4A1HeFvE4pEzJ02cXwy+LA@mail.gmail.com>
-To:     Adam Ford <aford173@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Fri, 10 May 2019 12:16:18 -0400
+Received: from mga18.intel.com ([134.134.136.126]:13843 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727271AbfEJQQS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 May 2019 12:16:18 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 May 2019 09:15:15 -0700
+X-ExtLoop1: 1
+Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
+  by fmsmga005.fm.intel.com with ESMTP; 10 May 2019 09:15:14 -0700
+Received: from orsmsx121.amr.corp.intel.com (10.22.225.226) by
+ ORSMSX104.amr.corp.intel.com (10.22.225.131) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Fri, 10 May 2019 09:15:14 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
+ ORSMSX121.amr.corp.intel.com ([169.254.10.91]) with mapi id 14.03.0415.000;
+ Fri, 10 May 2019 09:15:14 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "hadess@hadess.net" <hadess@hadess.net>
+Subject: Re: Build Warnings, BlueZ TIP, Fedora-30
+Thread-Topic: Build Warnings, BlueZ TIP, Fedora-30
+Thread-Index: AQHVBdM7qJSYRVHedk2EmjO9QNxIP6Zkh7QAgAB5FQA=
+Date:   Fri, 10 May 2019 16:15:14 +0000
+Message-ID: <1557504912.4778.3.camel@intel.com>
+References: <1557343285.14401.4.camel@intel.com>
+         <603f5710ed4711308901ff4322925b6a33cf0f71.camel@hadess.net>
+In-Reply-To: <603f5710ed4711308901ff4322925b6a33cf0f71.camel@hadess.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.251.146.146]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <186EA209C31172429F6B07A5C4F67800@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Adam,
-
->>>>>>> This moves all remaining users of the legacy TI_ST driver to hcill (patches
->>>>>>> 1-3). Then patches 4-7 convert wl128x-radio driver to a standard platform
->>>>>>> device driver with support for multiple instances. Patch 7 will result in
->>>>>>> (userless) TI_ST driver no longer supporting radio at runtime. Patch 8-11 do
->>>>>>> some cleanups in the wl128x-radio driver. Finally patch 12 removes the TI_ST
->>>>>>> specific parts from wl128x-radio and adds the required infrastructure to use it
->>>>>>> with the serdev hcill driver instead. The remaining patches 13 and 14 remove
->>>>>>> the old TI_ST code.
->>>>>>> 
->>>>>>> The new code has been tested on the Motorola Droid 4. For testing the audio
->>>>>>> should be configured to route Ext to Speaker or Headphone. Then you need to
->>>>>>> plug headphone, since its cable is used as antenna. For testing there is a
->>>>>>> 'radio' utility packages in Debian. When you start the utility you need to
->>>>>>> specify a frequency, since initial get_frequency returns an error:
->>>>>> 
->>>>>> What is the status of this series?
->>>>>> 
->>>>>> Based on some of the replies (from Adam Ford in particular) it appears that
->>>>>> this isn't ready to be merged, so is a v2 planned?
->>>>> 
->>>>> Yes, a v2 is planned, but I'm super busy at the moment. I don't
->>>>> expect to send something for this merge window. Neither LogicPD
->>>>> nor IGEP use FM radio, so I can just remove FM support from the
->>>>> TI_ST framework. Converting those platforms to hci_ll can be done
->>>>> in a different patchset.
->>>>> 
->>>>> If that was the only issue there would be a v2 already. But Marcel
->>>>> Holtmann suggested to pass the custom packet data through the BT
->>>>> subsystem, which is non-trivial (at least for me) :)
->>>> 
->>>> I am running some tests today on the wl1283-st on the Logic PD Torpedo
->>>> board.  Tony had suggested a few options, so I'm going to try those.
->>>> Looking at those today.  If/when you have a V2, please CC me on it. If
->>>> it's been posted, can you send me a link?  I would really like to see
->>>> the st-kim driver go away so I'd like to resolve the issues with the
->>>> torpedo board.
->>> 
->>> I have run a bunch of tests on the 5.1 kernel.  I am able to get the
->>> firmware to load now and the hci0 goes up.  I was able to establish a
->>> BLE connection to a TI Sensor Tag and read and write data to it with
->>> good success on the wl1283.
->>> 
->>> Unfortunately, when I tried to do some more extensive testing over
->>> classic Bluetooth, I got an error that repeats itself at seemingly
->>> random intervals:
->>>     Bluetooth: hci0: Frame reassembly failed (-84)
->>> 
->>> I can still scan and pair, but these Frame reassembly failed errors
->>> appear to come and go.
->> 
->> there are only 3 places in h4_recv_buf that return EILSEQ. Just add an extra printk to these to figure out which one it is. Maybe it is just extra packet types that we need to handle. If it is not the packet type one, print what packet we have that is causing this.
->> 
-> 
-> I added some code around
-> 
-> /* Check for invalid packet type */
->    if (!skb) {
->     printk("Check for invalid packet type %x\n", (unsigned int)
-> (&pkts[i])->type);
->     return ERR_PTR(-EILSEQ);
-> }
-> 
-> I don't know if I did it right or I am reading the packet type
-> correctly, but the frame reassembly errors are being caught here.
-> 
-> [  408.519165] Check for invalid packet type ff
-> [  408.523559] Bluetooth: hci0: Frame reassembly failed (-84)
-
-so now we need to figure our on how to handle HCI_VENDOR_PKT.
-
-#define LL_RECV_VENDOR \
-	.type = HCI_VENDOR_PKT, \
-	.hlen = aaa, \
-	.loff = bbb, \
-	.lsize = ccc, \
-	.maxlen = ddd
-
-static const struct h4_recv_pkt ll_recv_pkts[] = {
-	...
-	{ LL_RECV_WAKE_ACK,  .recv = ll_recv_frame  },
-	{ LL_RECV_VENDOR,    .recv = hci_recv_diag  },
-};
-
-Can you hexdump the data inside the skb and we can figure out what it uses for the header and size.
-
-In hci_bcm.c there are a few examples of fixed size packets and bpa10x.c contains one where it follows an actual header definition. Also hci_nokia.c contains a few for their packets.
-
-Regards
-
-Marcel
-
+SGkgQmFzdGllbiwNCg0KT24gRnJpLCAyMDE5LTA1LTEwIGF0IDExOjAxICswMjAwLCBCYXN0aWVu
+IE5vY2VyYSB3cm90ZToNCj4gT24gV2VkLCAyMDE5LTA1LTA4IGF0IDE5OjIxICswMDAwLCBHaXgs
+IEJyaWFuIHdyb3RlOg0KPiA+IFRoZXNlIDMgbmV3IGJ1aWxkIHdhcm5pbmdzIHNob3dlZCB1cCB3
+aGVuIEkgdXBncmFkZWQgb25lIG9mIG15DQo+ID4gZGV2aWNlcyB0byBGZWRvcmEgMzAuDQo+ID4g
+DQo+ID4gVGhleSBhcmUgYWxsIGluIHRoZSBBbmRyb2lkIHN1YnRyZWUuDQo+IA0KPiBJIHNlbnQg
+cGF0Y2hlcyBmb3IgdGhvc2UgdG8gdGhlIGxpc3QgeWVzdGVyZGF5LCB3b3VsZCBiZSBuaWNlIGlm
+IHlvdQ0KPiBjb3VsZCB0ZXN0IHRoZW0uIFRoZXkgd2VyZSBvbmx5IGNvbXBpbGUtdGVzdGVkLg0K
+DQpJIGhhdmUgcmV2aWV3ZWQgeW91ciB0aHJlZSBhbmRyb2lkIHBhdGNoZXMsIGFuZCB0aGluayB0
+aGV5IHdpbGwgd29yayBjb3JyZWN0bHkuDQoNCkkgZG8gbm90IGhhdmUgdGhlIGFiaWxpdHkgYXQg
+dGhlIG1vbWVudCB0byBidWlsZC10ZXN0IHRoZW0gdW50aWwgbGF0ZXIgdG9kYXkgKFBhY2lmaWMg
+Q29hc3QgVVMgdGltZSAoUERUKSkgYW5kDQpkbyBub3QgaGF2ZSB0aGUgYWJpbGl0eSB0byBydW4g
+dGVzdCB0aGVtIGF0IGFsbC4NCg0KQnV0IGluIG15IG9waW5pb24sIHNob3VsZCB0aGV5IGJ1aWxk
+IGNvcnJlY3RseSBvbiBGZWRvcmEtMzAsIHRoZXkgZGVzZXJ2ZSB0byBiZSBhcHBsaWVkLg0KDQpu
+b3RlOiAgVGhvc2Ugd2VyZSBqdXN0IDMgb2YgOCBwYXRjaGVzIGluIHlvdXIgc2V0LCBhbmQgSSBo
+YXZlIG5vdCByZXZpZXdlZCB0aGUgb3RoZXJzLg==
