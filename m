@@ -1,73 +1,71 @@
-Return-Path: <SRS0=f8/T=TK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=93VI=TL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1076C04AB2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 May 2019 16:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BFB8C04AB1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 May 2019 06:43:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCBE32070D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 May 2019 16:16:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECC722173B
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 May 2019 06:43:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lacomidadelperro.com header.i=@lacomidadelperro.com header.b="BfTNZPAA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727603AbfEJQQS (ORCPT
+        id S1727045AbfEKGnj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 May 2019 12:16:18 -0400
-Received: from mga18.intel.com ([134.134.136.126]:13843 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727271AbfEJQQS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 May 2019 12:16:18 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 May 2019 09:15:15 -0700
-X-ExtLoop1: 1
-Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
-  by fmsmga005.fm.intel.com with ESMTP; 10 May 2019 09:15:14 -0700
-Received: from orsmsx121.amr.corp.intel.com (10.22.225.226) by
- ORSMSX104.amr.corp.intel.com (10.22.225.131) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Fri, 10 May 2019 09:15:14 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.76]) by
- ORSMSX121.amr.corp.intel.com ([169.254.10.91]) with mapi id 14.03.0415.000;
- Fri, 10 May 2019 09:15:14 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "hadess@hadess.net" <hadess@hadess.net>
-Subject: Re: Build Warnings, BlueZ TIP, Fedora-30
-Thread-Topic: Build Warnings, BlueZ TIP, Fedora-30
-Thread-Index: AQHVBdM7qJSYRVHedk2EmjO9QNxIP6Zkh7QAgAB5FQA=
-Date:   Fri, 10 May 2019 16:15:14 +0000
-Message-ID: <1557504912.4778.3.camel@intel.com>
-References: <1557343285.14401.4.camel@intel.com>
-         <603f5710ed4711308901ff4322925b6a33cf0f71.camel@hadess.net>
-In-Reply-To: <603f5710ed4711308901ff4322925b6a33cf0f71.camel@hadess.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.251.146.146]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <186EA209C31172429F6B07A5C4F67800@intel.com>
-Content-Transfer-Encoding: base64
+        Sat, 11 May 2019 02:43:39 -0400
+Received: from hv21svg058.neubox.net ([174.136.37.116]:44598 "EHLO
+        hv21svg058.neubox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726849AbfEKGnj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 May 2019 02:43:39 -0400
+X-Greylist: delayed 1354 seconds by postgrey-1.27 at vger.kernel.org; Sat, 11 May 2019 02:43:38 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=lacomidadelperro.com; s=default; h=Sender:Content-Type:MIME-Version:
+        Message-ID:Reply-To:From:Date:Subject:To:Cc:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=3ONYXKIuTVMiVwxYdZEqrU0QM6sQOtN8y8/ts636rQA=; b=BfTNZPAAWLDAARDMFCrZ8DLGv
+        adjyIC3QpFdBwrCylNMSyW13f4ZzgxPRoXVo/W/zaMYT9oHPpkUKdZBsj3VXWPxq6uxVIWQmqDG7+
+        9N2kw+j9pwy4Va5IALkItULNi1eSvOAEnkKNyNmcGeCNPz86QvibbBeSGTa+VoZ+bJ/VEgpmciMwQ
+        m49eU8BYPsxPw/Rgpql7kdVthWJtB9/vG7bumlkWHqx7oWDacCot1K1+jY3t0ejHKi18oagphNATq
+        s7Q4hNDY4SelfW0/3j52/D/ocAClGdqaTy1MjBRiS9lQBSVE91q5M6PlTXEYQ3r/1khfhPUY2koJN
+        vc1Gfm9lA==;
+Received: from wwwlacom by hv21svg058.neubox.net with local (Exim 4.91)
+        (envelope-from <wwwlacom@hv21svg058.neubox.net>)
+        id 1hPLNY-00GYDU-7f
+        for linux-bluetooth@vger.kernel.org; Sat, 11 May 2019 01:21:04 -0500
+To:     linux-bluetooth@vger.kernel.org
+Subject: =?UTF-8?Q?=C2=A1Gracias,_su_mensaje_fue_enviado_con_=C3=A9xito!_-_La_Comi?=  =?UTF-8?Q?da_del_Perro?=
+X-PHP-Script: www.lacomidadelperro.com/index.php for 185.130.184.204
+Date:   Sat, 11 May 2019 06:21:03 +0000
+From:   La Comida del Perro <Hola@lacomidadelperro.com>
+Reply-To: La Comida del Perro <Hola@lacomidadelperro.com>
+Message-ID: <60a637fbbf5fbd7f1bd18a6568ab293e@www.lacomidadelperro.com>
+X-Mailer: PHPMailer 5.2.22 (https://github.com/PHPMailer/PHPMailer)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - hv21svg058.neubox.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [847 498] / [47 12]
+X-AntiAbuse: Sender Address Domain - hv21svg058.neubox.net
+X-Get-Message-Sender-Via: hv21svg058.neubox.net: authenticated_id: wwwlacom/from_h
+X-Authenticated-Sender: hv21svg058.neubox.net: Hola@lacomidadelperro.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-From-Rewrite: unmodified, already matched
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgQmFzdGllbiwNCg0KT24gRnJpLCAyMDE5LTA1LTEwIGF0IDExOjAxICswMjAwLCBCYXN0aWVu
-IE5vY2VyYSB3cm90ZToNCj4gT24gV2VkLCAyMDE5LTA1LTA4IGF0IDE5OjIxICswMDAwLCBHaXgs
-IEJyaWFuIHdyb3RlOg0KPiA+IFRoZXNlIDMgbmV3IGJ1aWxkIHdhcm5pbmdzIHNob3dlZCB1cCB3
-aGVuIEkgdXBncmFkZWQgb25lIG9mIG15DQo+ID4gZGV2aWNlcyB0byBGZWRvcmEgMzAuDQo+ID4g
-DQo+ID4gVGhleSBhcmUgYWxsIGluIHRoZSBBbmRyb2lkIHN1YnRyZWUuDQo+IA0KPiBJIHNlbnQg
-cGF0Y2hlcyBmb3IgdGhvc2UgdG8gdGhlIGxpc3QgeWVzdGVyZGF5LCB3b3VsZCBiZSBuaWNlIGlm
-IHlvdQ0KPiBjb3VsZCB0ZXN0IHRoZW0uIFRoZXkgd2VyZSBvbmx5IGNvbXBpbGUtdGVzdGVkLg0K
-DQpJIGhhdmUgcmV2aWV3ZWQgeW91ciB0aHJlZSBhbmRyb2lkIHBhdGNoZXMsIGFuZCB0aGluayB0
-aGV5IHdpbGwgd29yayBjb3JyZWN0bHkuDQoNCkkgZG8gbm90IGhhdmUgdGhlIGFiaWxpdHkgYXQg
-dGhlIG1vbWVudCB0byBidWlsZC10ZXN0IHRoZW0gdW50aWwgbGF0ZXIgdG9kYXkgKFBhY2lmaWMg
-Q29hc3QgVVMgdGltZSAoUERUKSkgYW5kDQpkbyBub3QgaGF2ZSB0aGUgYWJpbGl0eSB0byBydW4g
-dGVzdCB0aGVtIGF0IGFsbC4NCg0KQnV0IGluIG15IG9waW5pb24sIHNob3VsZCB0aGV5IGJ1aWxk
-IGNvcnJlY3RseSBvbiBGZWRvcmEtMzAsIHRoZXkgZGVzZXJ2ZSB0byBiZSBhcHBsaWVkLg0KDQpu
-b3RlOiAgVGhvc2Ugd2VyZSBqdXN0IDMgb2YgOCBwYXRjaGVzIGluIHlvdXIgc2V0LCBhbmQgSSBo
-YXZlIG5vdCByZXZpZXdlZCB0aGUgb3RoZXJzLg==
+Muchas Gracias por Contactarnos en Breve le enviaremos un mensaje para resolver sus dudas y comentarios.
+
+Saludos
+
