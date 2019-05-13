@@ -4,47 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 975F5C04AA7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 May 2019 10:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED7B1C04AA7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 May 2019 10:19:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C137720989
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 May 2019 10:18:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B138920989
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 May 2019 10:19:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=jm0.eu header.i=@jm0.eu header.b="Ny/RSSSh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=jm0.eu header.i=@jm0.eu header.b="MpPWGdoU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728318AbfEMKSG (ORCPT
+        id S1728773AbfEMKTB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 May 2019 06:18:06 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.164]:19829 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727339AbfEMKSG (ORCPT
+        Mon, 13 May 2019 06:19:01 -0400
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.84]:15683 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727690AbfEMKTB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 May 2019 06:18:06 -0400
-X-Greylist: delayed 388 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 May 2019 06:18:04 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1557742683;
+        Mon, 13 May 2019 06:19:01 -0400
+X-Greylist: delayed 421 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 May 2019 06:18:58 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1557742737;
         s=strato-dkim-0002; d=jm0.eu;
         h=In-Reply-To:Date:Message-ID:References:Cc:To:Subject:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=VqHUtb0ucGZ+m1KHJbhXIR6vcH/kXyofBf+zeOz8O6A=;
-        b=Ny/RSSSh+m6FH2Ag/6lWkuCtuGwd2aNXmeFDLpfcUxxM3x8QwLT/6v6MWt28O9/ot2
-        GNse7vwgE1REdNpl64dKa1IwHt4IFnkVxAS1IQdxd1KmOtIv5hp+sxbXHAPEo0Y+22E/
-        Cc/5S1okkO5kqVFwyYUXqouybpmGGsAmQTQLU0LLj6WmdkIOOurRMh1Q5VcZeFyZhc2X
-        2roxHrnWZdBoMDzeXZb9/5vSLLdV2DJz1jesC3xmMmT+TUmv64cxmxhYxgYZp51a3rIw
-        Iw9jZqXEJbdk7tXyuiiXAtqYG0oSeD+xq1Jswl14y/Jp45+ulvHUFP5TbQQ8DZd3mmnF
-        RRtw==
+        bh=KHvW0Kz/L+viwG9UJjfSWUo7RH8IAZjzXok80U7Ni38=;
+        b=MpPWGdoUZg4RmOH5kB+XL6hcXy1S8kDfnz0vtTKdYX3+AsfnN67K1GTuuAqKQOEDze
+        dUO0X3kkKhy3zA2EWLYr0Du8NRNxNQp8d7wRSP+dN2PIAkWoMo59Lp3accpiqdO05gKB
+        WUfpe9So2KMWLUmk4P4zgXq5AgzYeBCt8CMA3goDgZIZE1UE182JvqqFOwvCE1Wx5tpm
+        StjLw8Rynw/KvZoYSZHQs+HHPnx5CJXIwL7i6Srn0R7Nepxn1AO9LG5dGyf9CssLkJLH
+        yketDs+PKzW5ILEibkSthO78Cbcko2tHxQWWpW7RL2CsUsK5fZKgzv2RXNsrBbz9Klcd
+        ppkg==
 X-RZG-AUTH: ":JmMXYEHmdv4HaV2cbPh7iS0wbr/uKIfGM0EPXvQCbXgI7t69COvtk81MihidtEo/aQAAqA=="
 X-RZG-CLASS-ID: mo00
 Received: from [192.168.2.163]
         by smtp.strato.de (RZmta 44.18 DYNA|AUTH)
-        with ESMTPSA id y08c83v4DABsgEc
+        with ESMTPSA id y08c83v4DAClgEv
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
         (Client did not present a certificate);
-        Mon, 13 May 2019 12:11:54 +0200 (CEST)
+        Mon, 13 May 2019 12:12:47 +0200 (CEST)
 From:   Josua Mayer <josua.mayer@jm0.eu>
-Subject: [PATCH RESEND v2 1/3] bluetooth: 6lowpan: search for destination
- address in all peers
+Subject: [PATCH RESEND v2 2/3] bluetooth: 6lowpan: check neighbour table for
+ SLAAC
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Josua Mayer <josua.mayer@jm0.eu>,
         Jukka Rissanen <jukka.rissanen@linux.intel.com>,
@@ -129,8 +129,8 @@ Autocrypt: addr=josua.mayer@jm0.eu; prefer-encrypt=mutual; keydata=
  mMfWyGrdZKGF2NEw/YYSEXUNWd09Kgaptm/aDE/F84SIZQc8JK5LuV5lXxyC4epvwwLXOV6H
  jZLDGlel7HcUgLAU+lcuQJ3HfS0OocdheDfxGNivl/4+t0UMMiUqx11h8mNYn/02NwihLhMJ
  Si21CLNeIbliI0CNR5kPUY1ntw1JCOmOjKZm
-Message-ID: <49febed7-d4bb-6774-4338-c5a8ec565778@jm0.eu>
-Date:   Mon, 13 May 2019 12:11:54 +0200
+Message-ID: <fe6f7db8-d20f-3dd4-3cfa-c9864d0c6f38@jm0.eu>
+Date:   Mon, 13 May 2019 12:12:47 +0200
 MIME-Version: 1.0
 In-Reply-To: <20190312191626.20634-1-josua.mayer@jm0.eu>
 Content-Type: text/plain; charset=utf-8
@@ -141,49 +141,58 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Handle overlooked case where the target address is assigned to a peer
-and neither route nor gateway exist.
+Like any IPv6 capable device, 6LNs can have multiple addresses assigned
+using SLAAC and made known through neighbour advertisements.
+After checking the destination address against all peers link-local
+addresses, consult the neighbour cache for additional known addresses.
 
-For one peer, no checks are performed to see if it is meant to receive
-packets for a given address.
+RFC7668 defines the scope of Neighbor Advertisements in Section 3.2.3:
+1. "A Bluetooth LE 6LN MUST NOT register its link-local address"
+2. "A Bluetooth LE 6LN MUST register its non-link-local addresses with
+the 6LBR by sending Neighbor Solicitation (NS) messages ..."
 
-As soon as there is a second peer however, checks are performed
-to deal with routes and gateways for handling complex setups with
-multiple hops to a target address.
-This logic assumed that no route and no gateway imply that the
-destination address can not be reached, which is false in case of a
-direct peer.
+Due to these constranits both the link-local addresses tracked in the
+list of 6lowpan peers, and the neighbour cache have to be used when
+identifying the 6lowpan peer for a destination address.
 
 Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Tested-by: Michael Scott <mike@foundries.io>
 Signed-off-by: Josua Mayer <josua.mayer@jm0.eu>
 ---
- net/bluetooth/6lowpan.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/bluetooth/6lowpan.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index a7cd23f00bde..50530561da98 100644
+index 50530561da98..29a4f3d65348 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -187,10 +187,16 @@ static inline struct lowpan_peer
+@@ -171,6 +171,7 @@ static inline struct lowpan_peer
 *peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 	struct in6_addr *nexthop;
+ 	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
+ 	int count = atomic_read(&dev->peer_count);
++	struct neighbour *neigh;
+  	BT_DBG("peers %d addr %pI6c rt %p", count, daddr, rt);
+ @@ -222,6 +223,20 @@ static inline struct lowpan_peer
+*peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 		}
  	}
-  	if (!rt) {
--		nexthop = &lowpan_cb(skb)->gw;
--
--		if (ipv6_addr_any(nexthop))
--			return NULL;
-+		if (ipv6_addr_any(&lowpan_cb(skb)->gw)) {
-+			/* There is neither route nor gateway,
-+			 * probably the destination is a direct peer.
-+			 */
-+			nexthop = daddr;
-+		} else {
-+			/* There is a known gateway
-+			 */
-+			nexthop = &lowpan_cb(skb)->gw;
+ +	/* use the neighbour cache for matching addresses assigned by SLAAC
++	 */
++	neigh = __ipv6_neigh_lookup(dev->netdev, nexthop);
++	if (neigh) {
++		list_for_each_entry_rcu(peer, &dev->peers, list) {
++			if (!memcmp(neigh->ha, peer->lladdr, ETH_ALEN)) {
++				neigh_release(neigh);
++				rcu_read_unlock();
++				return peer;
++			}
 +		}
- 	} else {
- 		nexthop = rt6_nexthop(rt, daddr);
- -- 2.21.0
++		neigh_release(neigh);
++	}
++
+ 	rcu_read_unlock();
+  	return NULL;
+-- 
+2.21.0
 
