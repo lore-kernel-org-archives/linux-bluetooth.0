@@ -1,284 +1,169 @@
-Return-Path: <SRS0=zNJH=TN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=jb0q=TO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D164FC04AA7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 May 2019 19:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 251B5C04AB4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 May 2019 09:35:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CE43208C2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 May 2019 19:32:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9369821473
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 May 2019 09:35:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=temperror (0-bit key) header.d=phytec.in header.i=@phytec.in header.b="PLxWvxey"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726605AbfEMTct (ORCPT
+        id S1726148AbfENJfo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 May 2019 15:32:49 -0400
-Received: from mga01.intel.com ([192.55.52.88]:15476 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726290AbfEMTcs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 May 2019 15:32:48 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 May 2019 12:32:48 -0700
-X-ExtLoop1: 1
-Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
-  by fmsmga006.fm.intel.com with ESMTP; 13 May 2019 12:32:48 -0700
-Received: from orsmsx122.amr.corp.intel.com (10.22.225.227) by
- ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Mon, 13 May 2019 12:32:47 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.182]) by
- ORSMSX122.amr.corp.intel.com ([169.254.11.150]) with mapi id 14.03.0415.000;
- Mon, 13 May 2019 12:32:47 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v6 1/2] mesh: Reconfigure node storage tree
-Thread-Topic: [PATCH BlueZ v6 1/2] mesh: Reconfigure node storage tree
-Thread-Index: AQHVBq7ebGJyXTHAMUu1KO3+WoHFt6Zp7UKA
-Date:   Mon, 13 May 2019 19:32:47 +0000
-Message-ID: <1557775965.22613.0.camel@intel.com>
-References: <20190509213321.19822-1-brian.gix@intel.com>
-         <20190509213321.19822-2-brian.gix@intel.com>
-In-Reply-To: <20190509213321.19822-2-brian.gix@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.251.7.218]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6834CEBD9536B1418CDBC1956ED1FD33@intel.com>
-Content-Transfer-Encoding: base64
+        Tue, 14 May 2019 05:35:44 -0400
+Received: from mickerik.phytec.de ([195.145.39.210]:55830 "EHLO
+        mickerik.phytec.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725916AbfENJfo (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 May 2019 05:35:44 -0400
+X-Greylist: delayed 902 seconds by postgrey-1.27 at vger.kernel.org; Tue, 14 May 2019 05:35:43 EDT
+DKIM-Signature: v=1; a=rsa-sha256; d=phytec.in; s=a1; c=relaxed/simple;
+        q=dns/txt; i=@phytec.in; t=1557825640; x=1560417640;
+        h=From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=sA1f8i3PASKtePuhE0MCqJ3LZWpu9MuERm+dUvz9ink=;
+        b=PLxWvxeyTrbaWcpoQzaG6XWgIqq1AEKfRXDxVElLwQRZJgz17YrD2NgEHc6Mnpwe
+        Oz0P1WH9aGMa+eH7/Z7nLN09xUU6OGHglvQKp0BggFbhLoMlWhx2gKQXFl/Q2YgT
+        IUQKdgPeC06sg7rJzy3TOqXtB4bKDbo/jtUrEC3Ym/8=;
+X-AuditID: c39127d2-6d5ff70000000df6-08-5cda8868260f
+Received: from tumirnix.phytec.de (tumirnix.phytec.de [172.16.0.38])
+        by mickerik.phytec.de (PHYTEC Mail Gateway) with SMTP id 2B.5C.03574.8688ADC5; Tue, 14 May 2019 11:20:40 +0200 (CEST)
+Received: from [192.168.1.15] ([106.51.130.232])
+          by tumirnix.phytec.de (IBM Domino Release 9.0.1FP7)
+          with ESMTP id 2019051411202949-24 ;
+          Tue, 14 May 2019 11:20:29 +0200 
+From:   Shaik Mahaboob Nazeer <nazeer.m@phytec.in>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Jonas Remmert <j.remmert@phytec.de>
+Subject: Issue with mesh provisioning.
+Message-ID: <33a1f056-12c2-1aaa-4172-ea1fba341428@phytec.in>
+Date:   Tue, 14 May 2019 14:50:26 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+X-MIMETrack: Itemize by SMTP Server on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 14.05.2019 11:20:30,
+        Serialize by Router on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 14.05.2019 11:20:30,
+        Serialize complete at 14.05.2019 11:20:30
+X-TNEFEvaluated: 1
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMLMWRmVeSWpSXmKPExsWyRoBBTTej41aMwb1D8hZzrvUxOzB6fN4k
+        F8AYxWWTkpqTWZZapG+XwJXx6NcUloLFShXNl1exNTCuku5i5OCQEDCRWNNX0MXIxSEksIdR
+        4uvdx4wQzilGicd9a1i7GDk52AQMJLbOOsgOYosIKEs823eYCcRmFlCXOHJpCViNsICaxMF/
+        CxhBbF4BG4nP7z+C1bAIqEqcaDrJAmKLCkRInHm/ggWiRlDi5MwnLCDLJARamSRm/NgN1iAh
+        ICRxevFZZogF8hLb385hhln2Z94lKFtc4taT+UwTGAVmIZk1C0nLLCQts5C0LGBkWcUolJuZ
+        nJ1alJmtV5BRWZKarJeSuokRGJSHJ6pf2sHYN8fjEKMAB6MSD++LyJsxQqyJZcWVuYcYJTiY
+        lUR4oxRvxAjxpiRWVqUW5ccXleakFh9ilOZgURLn3cBbEiYkkJ5YkpqdmlqQWgSTZeLglGpg
+        nHux8Uz/d2btvq4b9xP5/fS5qmq3rSp+luLUvbiTQVTBKyTfMHROwewlveliL7qcOsSL+Z8f
+        szJp51sqZaMaWsrTLbsqrzdjuzy7NP8LdR2Rxcbllzy61fKYqnzup1ta/lEXmN5WtP16YJ1W
+        uH5ou379441zGnLXKYkEvF9yN+jw1eU2N5RYijMSDbWYi4oTAS/bWm1GAgAA
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-UGF0Y2gtc2V0IGFwcGxpZWQNCg0KDQpPbiBUaHUsIDIwMTktMDUtMDkgYXQgMTQ6MzMgLTA3MDAs
-IEJyaWFuIEdpeCB3cm90ZToNCj4gQWRkIGEgdHJlZSBzdHJ1Y3R1cmUgdG8gYSBub2RlcyBkYXRh
-IHN0b3JhZ2UsIGluIG9yZGVyIHRvIHNhZmVseSBoYW5kbGUNCj4gUmVwbGF5IFByb3RlY3Rpb24g
-bGlzdCwgUmVmYWN0b3IgbG9jYWwgU2VxdWVuY2UgTnVtYmVycywgYW5kIGFkZCBLZXkNCj4gc3Rv
-cmFnZSBmb3IgQ29uZmlnIENsaWVudCBub2Rlcy4NCj4gLS0tDQo+ICBtZXNoL1JFQURNRSAgICB8
-ICAzNCArKysrKysrKysrKysrLQ0KPiAgbWVzaC9ub2RlLmMgICAgfCAgMTYgKysrKy0tLQ0KPiAg
-bWVzaC9ub2RlLmggICAgfCAgIDQgKy0NCj4gIG1lc2gvc3RvcmFnZS5jIHwgMTQ0ICsrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgNCBm
-aWxlcyBjaGFuZ2VkLCAxMzEgaW5zZXJ0aW9ucygrKSwgNjcgZGVsZXRpb25zKC0pDQo+IA0KPiBk
-aWZmIC0tZ2l0IGEvbWVzaC9SRUFETUUgYi9tZXNoL1JFQURNRQ0KPiBpbmRleCBjYTIyM2E2ZDgu
-LjgyZmQ1YTAxNyAxMDA2NDQNCj4gLS0tIGEvbWVzaC9SRUFETUUNCj4gKysrIGIvbWVzaC9SRUFE
-TUUNCj4gQEAgLTM2LDggKzM2LDQwIEBAIEVhY2ggc3ViZGlyZWN0b3J5IGNvbnRhaW5zIHRoZSBm
-b2xsb3dpbmcgZmlsZXM6DQo+ICAJCXByb3Zpc2lvbmVyL2NvbmZpZ3VyYXRpb24gY2xpZW50DQo+
-ICAJLSBub2RlLmpzb24uYmFrOg0KPiAgCQlhIGJhY2t1cCB0aGF0IHRoZSBsYXN0IGtub3duIGdv
-b2Qgbm9kZSBjb25maWd1cmF0aW9uLg0KPiArCS0gc2VxX251bToNCj4gKwkJRmlsZSBjb250YWlu
-aW5nIG5leHQgc2VxdWVuY2UgbnVtYmVyIHRvIHVzZQ0KPiArCS0gc2VxX251bS5iYWs6DQo+ICsJ
-CUJhY2t1cCBvZiB0aGUgc2VxdWVuY2UgbnVtYmVyLiBUaGlzIG1heSBiZSBsYXJnZXIgdGhhbiB0
-aGUNCj4gKwkJYWN0dWFsIHNlcXVlbmNlIG51bWJlciBiZWluZyB1c2VkIGF0IHJ1bnRpbWUsIHRv
-IHByZXZlbnQgcmUtdXNlDQo+ICsJCW9mIHNlcXVlbmNlIG51bWJlcnMgaW4gdGhlIGV2ZW50IG9m
-IGFuIHVuZXhwZWN0ZWQgcmVzdGFydC4NCj4gKwktIC4vcnBsLzoNCj4gKwkJRGlyZWN0b3J5IHRv
-IHN0b3JlIHRoZSBzZXF1ZW5jZSBudW1iZXJzIG9mIHJlbW90ZSBub2RlcywgYXMNCj4gKwkJcmVx
-dWlyZWQgYnkgUmVwbGF5IFByb3RlY3Rpb24gTGlzdCAoUlBMKSBwYXJhbWV0ZXJzLg0KPiArCQkt
-IHh4eHg6DQo+ICsJCQlGaWxlcyBuYW1lZCBmb3IgcmVtb3RlIFVuaWNhc3QgYWRkcmVzc2VzLCBh
-bmQgY29udGFpbg0KPiArCQkJbGFzdCByZWNlaXZlZCBpdl9pbmRleCArIHNlcV9udW0gZnJvbSBl
-YWNoIFNSQyBhZGRyZXNzLg0KPiArCS0gLi9kZXZfa2V5cy86DQo+ICsJCURpcmVjdG9yeSB0byBz
-dG9yZSByZW1vdGUgRGV2aWNlIGtleXMuIFRoaXMgaXMgb25seSBjcmVhdGVkL3VzZWQNCj4gKwkJ
-YnkgQ29uZmlndXJhdGlvbiBDbGllbnQgKE5ldHdvcmsgYWRtaW5pc3RyYXRpb24pIG5vZGVzLg0K
-PiArCQktIHh4eHg6DQo+ICsJCQlGaWxlcyBuYW1lZCBmb3IgcmVtb3RlIFVuaWNhc3QgYWRkcmVz
-c2VzLCBhbmQgY29udGFpbnMNCj4gKwkJCTE2IG9jdGV0IGtleS4NCj4gKwktIC4vbmV0X2tleXMv
-Og0KPiArCQlEaXJlY3RvcnkgdG8gc3RvcmUgbmV0d29yayBzdWJuZXQga2V5cy4gVGhpcyBpcyBv
-bmx5DQo+ICsJCWNyZWF0ZWQvdXNlZCBieSBDb25maWd1cmF0aW9uIENsaWVudCAoTmV0d29yayBh
-ZG1pbmlzdHJhdGlvbikNCj4gKwkJbm9kZXMuDQo+ICsJCS0geHh4Og0KPiArCQkJRmlsZXMgbmFt
-ZWQgZm9yIHN1Ym5ldCBpbmRleCwgYW5kIGNvbnRhaW5zIGtleSByZWZyZXNoDQo+ICsJCQlwaGFz
-ZSwgYW5kIG9sZC9uZXcgdmVyc2lvbnMgb2YgdGhlIGtleS4NCj4gKwktIC4vYXBwX2tleXMvOg0K
-PiArCQlEaXJlY3RvcnkgdG8gc3RvcmUgYXBwbGljYXRpb24ga2V5cy4gVGhpcyBpcyBvbmx5IGNy
-ZWF0ZWQvdXNlZA0KPiArCQlieSBDb25maWd1cmF0aW9uIENsaWVudCAoTmV0d29yayBhZG1pbmlz
-dHJhdGlvbikgbm9kZXMuDQo+ICsJCS0geHh4Og0KPiArCQkJRmlsZXMgbmFtZWQgZm9yIGFwcGxp
-Y2F0aW9uIGluZGV4LCBhbmQgY29udGFpbnMgYm91bmQNCj4gKwkJCXN1Ym5ldCBpbmRleCwgYW5k
-IG9sZC9uZXcgdmVyc2lvbnMgb2YgdGhlIGtleS4NCj4gIA0KPiAtVGhlIGZpbGVzIGFyZSBpbiBK
-U09OIGZvcm1hdC4NCj4gK1RoZSBub2RlLmpzb24gYW5kIG5vZGUuanNvbi5iYWsgYXJlIGluIEpT
-T04gZm9ybWF0LiBBbGwgb3RoZXIgZmlsZXMgYXJlIHN0b3JlZA0KPiAraW4gbGl0dGxlIGVuZGlh
-biBiaW5hcnkgZm9ybWF0Lg0KPiAgDQo+ICBJbmZvcm1hdGlvbg0KPiAgPT09PT09PT09PT0NCj4g
-ZGlmZiAtLWdpdCBhL21lc2gvbm9kZS5jIGIvbWVzaC9ub2RlLmMNCj4gaW5kZXggNTkwNGIxMTZj
-Li42Zjk1YzhkMWMgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbm9kZS5jDQo+ICsrKyBiL21lc2gvbm9k
-ZS5jDQo+IEBAIC03OSw3ICs3OSw3IEBAIHN0cnVjdCBtZXNoX25vZGUgew0KPiAgCWNoYXIgKm93
-bmVyOw0KPiAgCWNoYXIgKnBhdGg7DQo+ICAJdm9pZCAqamNvbmZpZzsNCj4gLQljaGFyICpjZmdf
-ZmlsZTsNCj4gKwljaGFyICpub2RlX3BhdGg7DQo+ICAJdWludDMyX3QgZGlzY193YXRjaDsNCj4g
-IAl0aW1lX3QgdXBkX3NlYzsNCj4gIAl1aW50MzJfdCBzZXFfbnVtYmVyOw0KPiBAQCAtMjM2LDYg
-KzIzNiw3IEBAIHN0YXRpYyB2b2lkIGZyZWVfbm9kZV9yZXNvdXJjZXModm9pZCAqZGF0YSkNCj4g
-IAlsX2ZyZWUobm9kZS0+Y29tcCk7DQo+ICAJbF9mcmVlKG5vZGUtPmFwcF9wYXRoKTsNCj4gIAls
-X2ZyZWUobm9kZS0+b3duZXIpOw0KPiArCWxfZnJlZShub2RlLT5ub2RlX3BhdGgpOw0KPiAgDQo+
-ICAJaWYgKG5vZGUtPmRpc2Nfd2F0Y2gpDQo+ICAJCWxfZGJ1c19yZW1vdmVfd2F0Y2goZGJ1c19n
-ZXRfYnVzKCksIG5vZGUtPmRpc2Nfd2F0Y2gpOw0KPiBAQCAtMjU5LDcgKzI2MCw3IEBAIHZvaWQg
-bm9kZV9yZW1vdmUoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSkNCj4gIA0KPiAgCWxfcXVldWVfcmVt
-b3ZlKG5vZGVzLCBub2RlKTsNCj4gIA0KPiAtCWlmIChub2RlLT5jZmdfZmlsZSkNCj4gKwlpZiAo
-bm9kZS0+bm9kZV9wYXRoKQ0KPiAgCQlzdG9yYWdlX3JlbW92ZV9ub2RlX2NvbmZpZyhub2RlKTsN
-Cj4gIA0KPiAgCWZyZWVfbm9kZV9yZXNvdXJjZXMobm9kZSk7DQo+IEBAIC0zOTUsNyArMzk2LDcg
-QEAgc3RhdGljIHZvaWQgY2xlYW51cF9ub2RlKHZvaWQgKmRhdGEpDQo+ICAJc3RydWN0IG1lc2hf
-bmV0ICpuZXQgPSBub2RlLT5uZXQ7DQo+ICANCj4gIAkvKiBTYXZlIGxvY2FsIG5vZGUgY29uZmln
-dXJhdGlvbiAqLw0KPiAtCWlmIChub2RlLT5jZmdfZmlsZSkgew0KPiArCWlmIChub2RlLT5ub2Rl
-X3BhdGgpIHsNCj4gIA0KPiAgCQkvKiBQcmVzZXJ2ZSB0aGUgbGFzdCBzZXF1ZW5jZSBudW1iZXIg
-Ki8NCj4gIAkJc3RvcmFnZV93cml0ZV9zZXF1ZW5jZV9udW1iZXIobmV0LCBtZXNoX25ldF9nZXRf
-c2VxX251bShuZXQpKTsNCj4gQEAgLTE4NTksMTQgKzE4NjAsMTUgQEAgdm9pZCAqbm9kZV9qY29u
-ZmlnX2dldChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlKQ0KPiAgCXJldHVybiBub2RlLT5qY29uZmln
-Ow0KPiAgfQ0KPiAgDQo+IC12b2lkIG5vZGVfY2ZnX2ZpbGVfc2V0KHN0cnVjdCBtZXNoX25vZGUg
-Km5vZGUsIGNoYXIgKmNmZykNCj4gK3ZvaWQgbm9kZV9wYXRoX3NldChzdHJ1Y3QgbWVzaF9ub2Rl
-ICpub2RlLCBjaGFyICpwYXRoKQ0KPiAgew0KPiAtCW5vZGUtPmNmZ19maWxlID0gY2ZnOw0KPiAr
-CWxfZnJlZShub2RlLT5ub2RlX3BhdGgpOw0KPiArCW5vZGUtPm5vZGVfcGF0aCA9IGxfc3RyZHVw
-KHBhdGgpOw0KPiAgfQ0KPiAgDQo+IC1jaGFyICpub2RlX2NmZ19maWxlX2dldChzdHJ1Y3QgbWVz
-aF9ub2RlICpub2RlKQ0KPiArY2hhciAqbm9kZV9wYXRoX2dldChzdHJ1Y3QgbWVzaF9ub2RlICpu
-b2RlKQ0KPiAgew0KPiAtCXJldHVybiBub2RlLT5jZmdfZmlsZTsNCj4gKwlyZXR1cm4gbm9kZS0+
-bm9kZV9wYXRoOw0KPiAgfQ0KPiAgDQo+ICBzdHJ1Y3QgbWVzaF9uZXQgKm5vZGVfZ2V0X25ldChz
-dHJ1Y3QgbWVzaF9ub2RlICpub2RlKQ0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9ub2RlLmggYi9tZXNo
-L25vZGUuaA0KPiBpbmRleCAxYmU0ZGUxZGEuLjExOTRmZjgzNyAxMDA2NDQNCj4gLS0tIGEvbWVz
-aC9ub2RlLmgNCj4gKysrIGIvbWVzaC9ub2RlLmgNCj4gQEAgLTk1LDUgKzk1LDUgQEAgYm9vbCBu
-b2RlX2RidXNfaW5pdChzdHJ1Y3QgbF9kYnVzICpidXMpOw0KPiAgdm9pZCBub2RlX2NsZWFudXBf
-YWxsKHZvaWQpOw0KPiAgdm9pZCBub2RlX2pjb25maWdfc2V0KHN0cnVjdCBtZXNoX25vZGUgKm5v
-ZGUsIHZvaWQgKmpjb25maWcpOw0KPiAgdm9pZCAqbm9kZV9qY29uZmlnX2dldChzdHJ1Y3QgbWVz
-aF9ub2RlICpub2RlKTsNCj4gLXZvaWQgbm9kZV9jZmdfZmlsZV9zZXQoc3RydWN0IG1lc2hfbm9k
-ZSAqbm9kZSwgY2hhciAqY2ZnKTsNCj4gLWNoYXIgKm5vZGVfY2ZnX2ZpbGVfZ2V0KHN0cnVjdCBt
-ZXNoX25vZGUgKm5vZGUpOw0KPiArdm9pZCBub2RlX3BhdGhfc2V0KHN0cnVjdCBtZXNoX25vZGUg
-Km5vZGUsIGNoYXIgKnBhdGgpOw0KPiArY2hhciAqbm9kZV9wYXRoX2dldChzdHJ1Y3QgbWVzaF9u
-b2RlICpub2RlKTsNCj4gZGlmZiAtLWdpdCBhL21lc2gvc3RvcmFnZS5jIGIvbWVzaC9zdG9yYWdl
-LmMNCj4gaW5kZXggMjU4MGNiZTdmLi5mNGUyM2JmNDkgMTAwNjQ0DQo+IC0tLSBhL21lc2gvc3Rv
-cmFnZS5jDQo+ICsrKyBiL21lc2gvc3RvcmFnZS5jDQo+IEBAIC0yOCw2ICsyOCw3IEBADQo+ICAj
-aW5jbHVkZSA8dW5pc3RkLmg+DQo+ICAjaW5jbHVkZSA8ZGlyZW50Lmg+DQo+ICAjaW5jbHVkZSA8
-bGliZ2VuLmg+DQo+ICsjaW5jbHVkZSA8ZnR3Lmg+DQo+ICANCj4gICNpbmNsdWRlIDxzeXMvdHlw
-ZXMuaD4NCj4gICNpbmNsdWRlIDxzeXMvc3RhdC5oPg0KPiBAQCAtNDksMTMgKzUwLDMwIEBADQo+
-ICANCj4gIHN0cnVjdCB3cml0ZV9pbmZvIHsNCj4gIAlqc29uX29iamVjdCAqam5vZGU7DQo+IC0J
-Y29uc3QgY2hhciAqY29uZmlnX25hbWU7DQo+ICsJY29uc3QgY2hhciAqbm9kZV9wYXRoOw0KPiAg
-CXZvaWQgKnVzZXJfZGF0YTsNCj4gIAltZXNoX3N0YXR1c19mdW5jX3QgY2I7DQo+ICB9Ow0KPiAg
-DQo+ICtzdGF0aWMgY29uc3QgY2hhciAqY2ZnX25hbWUgPSAiL25vZGUuanNvbiI7DQo+ICtzdGF0
-aWMgY29uc3QgY2hhciAqYmFrX2V4dCA9ICIuYmFrIjsNCj4gK3N0YXRpYyBjb25zdCBjaGFyICp0
-bXBfZXh0ID0gIi50bXAiOw0KPiAgc3RhdGljIGNvbnN0IGNoYXIgKnN0b3JhZ2VfZGlyOw0KPiAg
-DQo+ICsvKiBUaGlzIGlzIGEgdGhyZWFkLXNhZmUgYWx3YXlzIG1hbGxvY2VkIHZlcnNpb24gb2Yg
-ZGlybmFtZSB3aGljaCB3aWxsIHdvcmsNCj4gKyAqIHJlZ2FyZGxlc3Mgb2Ygd2hpY2ggdW5kZXJs
-eWluZyBkaXJuYW1lKCkgaW1wbGVtZW50YXRpb24gaXMgdXNlZC4NCj4gKyAqLw0KPiArc3RhdGlj
-IGNoYXIgKmFsbG9jX2Rpcm5hbWUoY29uc3QgY2hhciAqcGF0aCkNCj4gK3sNCj4gKwljaGFyICp0
-bXAgPSBsX3N0cmR1cChwYXRoKTsNCj4gKwljaGFyICpkaXI7DQo+ICsNCj4gKwlkaXIgPSBkaXJu
-YW1lKHRtcCk7DQo+ICsJc3RybmNweSh0bXAsIGRpciwgc3RybGVuKHBhdGgpICsgMSk7DQo+ICsN
-Cj4gKwlyZXR1cm4gdG1wOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgYm9vbCByZWFkX25vZGVfY2Io
-c3RydWN0IG1lc2hfZGJfbm9kZSAqZGJfbm9kZSwgdm9pZCAqdXNlcl9kYXRhKQ0KPiAgew0KPiAg
-CXN0cnVjdCBtZXNoX25vZGUgKm5vZGUgPSB1c2VyX2RhdGE7DQo+IEBAIC0xNjYsNyArMTg0LDcg
-QEAgc3RhdGljIGJvb2wgcGFyc2Vfbm9kZShzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCBqc29uX29i
-amVjdCAqam5vZGUpDQo+ICAJcmV0dXJuIHRydWU7DQo+ICB9DQo+ICANCj4gLXN0YXRpYyBib29s
-IHBhcnNlX2NvbmZpZyhjaGFyICppbl9maWxlLCBjaGFyICpvdXRfZmlsZSwgY29uc3QgdWludDhf
-dCB1dWlkWzE2XSkNCj4gK3N0YXRpYyBib29sIHBhcnNlX2NvbmZpZyhjaGFyICppbl9maWxlLCBj
-aGFyICpvdXRfZGlyLCBjb25zdCB1aW50OF90IHV1aWRbMTZdKQ0KPiAgew0KPiAgCWludCBmZDsN
-Cj4gIAljaGFyICpzdHI7DQo+IEBAIC0yMTMsNyArMjMxLDcgQEAgc3RhdGljIGJvb2wgcGFyc2Vf
-Y29uZmlnKGNoYXIgKmluX2ZpbGUsIGNoYXIgKm91dF9maWxlLCBjb25zdCB1aW50OF90IHV1aWRb
-MTZdKQ0KPiAgCX0NCj4gIA0KPiAgCW5vZGVfamNvbmZpZ19zZXQobm9kZSwgam5vZGUpOw0KPiAt
-CW5vZGVfY2ZnX2ZpbGVfc2V0KG5vZGUsIG91dF9maWxlKTsNCj4gKwlub2RlX3BhdGhfc2V0KG5v
-ZGUsIG91dF9kaXIpOw0KPiAgDQo+ICBkb25lOg0KPiAgCWNsb3NlKGZkKTsNCj4gQEAgLTQzMCwx
-NSArNDQ4LDEyIEBAIHN0YXRpYyBib29sIHNhdmVfY29uZmlnKGpzb25fb2JqZWN0ICpqbm9kZSwg
-Y29uc3QgY2hhciAqY29uZmlnX25hbWUpDQo+ICBzdGF0aWMgdm9pZCBpZGxlX3NhdmVfY29uZmln
-KHZvaWQgKnVzZXJfZGF0YSkNCj4gIHsNCj4gIAlzdHJ1Y3Qgd3JpdGVfaW5mbyAqaW5mbyA9IHVz
-ZXJfZGF0YTsNCj4gLQlzaXplX3QgbGVuID0gc3RybGVuKGluZm8tPmNvbmZpZ19uYW1lKSArIDU7
-DQo+IC0JY2hhciAqdG1wID0gbF9tYWxsb2MobGVuKTsNCj4gLQljaGFyICpiYWsgPSBsX21hbGxv
-YyhsZW4pOw0KPiArCWNoYXIgKnRtcCwgKmJhaywgKmNmZzsNCj4gIAlib29sIHJlc3VsdCA9IGZh
-bHNlOw0KPiAgDQo+IC0Jc3RybmNweSh0bXAsIGluZm8tPmNvbmZpZ19uYW1lLCBsZW4pOw0KPiAt
-CXN0cm5jcHkoYmFrLCBpbmZvLT5jb25maWdfbmFtZSwgbGVuKTsNCj4gLQl0bXAgPSBzdHJuY2F0
-KHRtcCwgIi50bXAiLCA1KTsNCj4gLQliYWsgPSBzdHJuY2F0KGJhaywgIi5iYWsiLCA1KTsNCj4g
-KwljZmcgPSBsX3N0cmR1cF9wcmludGYoIiVzJXMiLCBpbmZvLT5ub2RlX3BhdGgsIGNmZ19uYW1l
-KTsNCj4gKwl0bXAgPSBsX3N0cmR1cF9wcmludGYoIiVzJXMiLCBjZmcsIHRtcF9leHQpOw0KPiAr
-CWJhayA9IGxfc3RyZHVwX3ByaW50ZigiJXMlcyIsIGNmZywgYmFrX2V4dCk7DQo+ICAJcmVtb3Zl
-KHRtcCk7DQo+ICANCj4gIAlsX2RlYnVnKCJTdG9yYWdlLVdyb3RlIik7DQo+IEBAIC00NDYsMTMg
-KzQ2MSwxNCBAQCBzdGF0aWMgdm9pZCBpZGxlX3NhdmVfY29uZmlnKHZvaWQgKnVzZXJfZGF0YSkN
-Cj4gIA0KPiAgCWlmIChyZXN1bHQpIHsNCj4gIAkJcmVtb3ZlKGJhayk7DQo+IC0JCXJlbmFtZShp
-bmZvLT5jb25maWdfbmFtZSwgYmFrKTsNCj4gLQkJcmVuYW1lKHRtcCwgaW5mby0+Y29uZmlnX25h
-bWUpOw0KPiArCQlyZW5hbWUoY2ZnLCBiYWspOw0KPiArCQlyZW5hbWUodG1wLCBjZmcpOw0KPiAg
-CX0NCj4gIA0KPiAgCXJlbW92ZSh0bXApOw0KPiAgCWxfZnJlZSh0bXApOw0KPiAgCWxfZnJlZShi
-YWspOw0KPiArCWxfZnJlZShjZmcpOw0KPiAgDQo+ICAJaWYgKGluZm8tPmNiKQ0KPiAgCQlpbmZv
-LT5jYihpbmZvLT51c2VyX2RhdGEsIHJlc3VsdCk7DQo+IEBAIC00NjcsNyArNDgzLDcgQEAgdm9p
-ZCBzdG9yYWdlX3NhdmVfY29uZmlnKHN0cnVjdCBtZXNoX25vZGUgKm5vZGUsIGJvb2wgbm9fd2Fp
-dCwNCj4gIA0KPiAgCWluZm8gPSBsX25ldyhzdHJ1Y3Qgd3JpdGVfaW5mbywgMSk7DQo+ICAJaW5m
-by0+am5vZGUgPSBub2RlX2pjb25maWdfZ2V0KG5vZGUpOw0KPiAtCWluZm8tPmNvbmZpZ19uYW1l
-ID0gbm9kZV9jZmdfZmlsZV9nZXQobm9kZSk7DQo+ICsJaW5mby0+bm9kZV9wYXRoID0gbm9kZV9w
-YXRoX2dldChub2RlKTsNCj4gIAlpbmZvLT5jYiA9IGNiOw0KPiAgCWluZm8tPnVzZXJfZGF0YSA9
-IHVzZXJfZGF0YTsNCj4gIA0KPiBAQCAtNTE3LDYgKzUzMyw3IEBAIGJvb2wgc3RvcmFnZV9sb2Fk
-X25vZGVzKGNvbnN0IGNoYXIgKmRpcl9uYW1lKQ0KPiAgew0KPiAgCURJUiAqZGlyOw0KPiAgCXN0
-cnVjdCBkaXJlbnQgKmVudHJ5Ow0KPiArCXNpemVfdCBwYXRoX2xlbiA9IHN0cmxlbihkaXJfbmFt
-ZSkgKyBzdHJsZW4oY2ZnX25hbWUpICsgc3RybGVuKGJha19leHQpOw0KPiAgDQo+ICAJY3JlYXRl
-X2RpcihkaXJfbmFtZSk7DQo+ICAJZGlyID0gb3BlbmRpcihkaXJfbmFtZSk7DQo+IEBAIC01Mjks
-MzMgKzU0NiwzNyBAQCBib29sIHN0b3JhZ2VfbG9hZF9ub2Rlcyhjb25zdCBjaGFyICpkaXJfbmFt
-ZSkNCj4gIAlzdG9yYWdlX2RpciA9IGRpcl9uYW1lOw0KPiAgDQo+ICAJd2hpbGUgKChlbnRyeSA9
-IHJlYWRkaXIoZGlyKSkgIT0gTlVMTCkgew0KPiAtCQljaGFyICpjZmc7DQo+IC0JCWNoYXIgKmJh
-azsNCj4gKwkJY2hhciAqZGlyLCAqY2ZnLCAqYmFrOw0KPiAgCQl1aW50OF90IHV1aWRbMTZdOw0K
-PiArCQlzaXplX3Qgbm9kZV9sZW47DQo+ICANCj4gIAkJaWYgKGVudHJ5LT5kX3R5cGUgIT0gRFRf
-RElSKQ0KPiAgCQkJY29udGludWU7DQo+ICANCj4gLQkJaWYgKCFzdHIyaGV4KGVudHJ5LT5kX25h
-bWUsIHN0cmxlbihlbnRyeS0+ZF9uYW1lKSwgdXVpZCwgc2l6ZW9mKHV1aWQpKSkNCj4gKwkJLyog
-Q2hlY2sgcGF0aCBsZW5ndGggKi8NCj4gKwkJbm9kZV9sZW4gPSBzdHJsZW4oZW50cnktPmRfbmFt
-ZSk7DQo+ICsJCWlmIChwYXRoX2xlbiArIG5vZGVfbGVuICsgMSA+PSBQQVRIX01BWCkNCj4gIAkJ
-CWNvbnRpbnVlOw0KPiAgDQo+IC0JCWNmZyA9IGxfc3RyZHVwX3ByaW50ZigiJXMvJXMvbm9kZS5q
-c29uIiwgZGlyX25hbWUsIGVudHJ5LT5kX25hbWUpOw0KPiAtDQo+IC0JCWlmIChwYXJzZV9jb25m
-aWcoY2ZnLCBjZmcsIHV1aWQpKQ0KPiArCQlpZiAoIXN0cjJoZXgoZW50cnktPmRfbmFtZSwgbm9k
-ZV9sZW4sIHV1aWQsIHNpemVvZih1dWlkKSkpDQo+ICAJCQljb250aW51ZTsNCj4gIA0KPiAtCQkv
-KiBGYWxsLWJhY2sgdG8gQmFja3VwIHZlcnNpb24gKi8NCj4gLQkJYmFrID0gbF9zdHJkdXBfcHJp
-bnRmKCIlcy8lcy9ub2RlLmpzb24uYmFrIiwgZGlyX25hbWUsIGVudHJ5LT5kX25hbWUpOw0KPiAr
-CQlkaXIgPSBsX3N0cmR1cF9wcmludGYoIiVzLyVzIiwgZGlyX25hbWUsIGVudHJ5LT5kX25hbWUp
-Ow0KPiArCQljZmcgPSBsX3N0cmR1cF9wcmludGYoIiVzJXMiLCBkaXIsIGNmZ19uYW1lKTsNCj4g
-IA0KPiAtCQlpZiAocGFyc2VfY29uZmlnKGJhaywgY2ZnLCB1dWlkKSkgew0KPiAtCQkJcmVtb3Zl
-KGNmZyk7DQo+IC0JCQlyZW5hbWUoYmFrLCBjZmcpOw0KPiAtCQkJbF9mcmVlKGNmZyk7DQo+IC0J
-CQljb250aW51ZTsNCj4gLQkJfQ0KPiArCQlpZiAoIXBhcnNlX2NvbmZpZyhjZmcsIGRpciwgdXVp
-ZCkpIHsNCj4gIA0KPiArCQkJLyogRmFsbC1iYWNrIHRvIEJhY2t1cCB2ZXJzaW9uICovDQo+ICsJ
-CQliYWsgPSBsX3N0cmR1cF9wcmludGYoIiVzJXMiLCBjZmcsIGJha19leHQpOw0KPiArDQo+ICsJ
-CQlpZiAocGFyc2VfY29uZmlnKGJhaywgZGlyLCB1dWlkKSkgew0KPiArCQkJCXJlbW92ZShjZmcp
-Ow0KPiArCQkJCXJlbmFtZShiYWssIGNmZyk7DQo+ICsJCQl9DQo+ICsJCQlsX2ZyZWUoYmFrKTsN
-Cj4gKwkJfQ0KPiAgCQlsX2ZyZWUoY2ZnKTsNCj4gLQkJbF9mcmVlKGJhayk7DQo+ICsJCWxfZnJl
-ZShkaXIpOw0KPiAgCX0NCj4gIA0KPiAgCXJldHVybiB0cnVlOw0KPiBAQCAtNTY2LDggKzU4Nyw4
-IEBAIGJvb2wgc3RvcmFnZV9jcmVhdGVfbm9kZV9jb25maWcoc3RydWN0IG1lc2hfbm9kZSAqbm9k
-ZSwgdm9pZCAqZGF0YSkNCj4gIAlzdHJ1Y3QgbWVzaF9kYl9ub2RlICpkYl9ub2RlID0gZGF0YTsN
-Cj4gIAljaGFyIHV1aWRbMzNdOw0KPiAgCWNoYXIgbmFtZV9idWZbUEFUSF9NQVhdOw0KPiAtCWNo
-YXIgKmZpbGVuYW1lOw0KPiAgCWpzb25fb2JqZWN0ICpqbm9kZTsNCj4gKwlzaXplX3QgbWF4X2xl
-biA9IHN0cmxlbihjZmdfbmFtZSkgKyBzdHJsZW4oYmFrX2V4dCk7DQo+ICANCj4gIAlpZiAoIXN0
-b3JhZ2VfZGlyKQ0KPiAgCQlyZXR1cm4gZmFsc2U7DQo+IEBAIC01NzgsMjUgKzU5OSwyNiBAQCBi
-b29sIHN0b3JhZ2VfY3JlYXRlX25vZGVfY29uZmlnKHN0cnVjdCBtZXNoX25vZGUgKm5vZGUsIHZv
-aWQgKmRhdGEpDQo+ICAJCXJldHVybiBmYWxzZTsNCj4gIA0KPiAgCWlmICghaGV4MnN0cihub2Rl
-X3V1aWRfZ2V0KG5vZGUpLCAxNiwgdXVpZCwgc2l6ZW9mKHV1aWQpKSkNCj4gLQkJcmV0dXJuIGZh
-bHNlOw0KPiArCQlnb3RvIGZhaWw7DQo+ICANCj4gIAlzbnByaW50ZihuYW1lX2J1ZiwgUEFUSF9N
-QVgsICIlcy8lcyIsIHN0b3JhZ2VfZGlyLCB1dWlkKTsNCj4gIA0KPiArCWlmIChzdHJsZW4obmFt
-ZV9idWYpICsgbWF4X2xlbiA+PSBQQVRIX01BWCkNCj4gKwkJZ290byBmYWlsOw0KPiArDQo+ICAJ
-LyogQ3JlYXRlIGEgbmV3IGRpcmVjdG9yeSBhbmQgbm9kZS5qc29uIGZpbGUgKi8NCj4gIAlpZiAo
-bWtkaXIobmFtZV9idWYsIDA3NTUpICE9IDApDQo+ICAJCWdvdG8gZmFpbDsNCj4gIA0KPiAtCWZp
-bGVuYW1lID0gbF9zdHJkdXBfcHJpbnRmKCIlcy9ub2RlLmpzb24iLCBuYW1lX2J1Zik7DQo+ICsJ
-bm9kZV9wYXRoX3NldChub2RlLCBuYW1lX2J1Zik7DQo+ICANCj4gLQlsX2RlYnVnKCJOZXcgbm9k
-ZSBjb25maWcgJXMiLCBmaWxlbmFtZSk7DQo+ICsJc25wcmludGYobmFtZV9idWYsIFBBVEhfTUFY
-LCAiJXMvJXMlcyIsIHN0b3JhZ2VfZGlyLCB1dWlkLCBjZmdfbmFtZSk7DQo+ICsJbF9kZWJ1Zygi
-TmV3IG5vZGUgY29uZmlnICVzIiwgbmFtZV9idWYpOw0KPiAgDQo+IC0JaWYgKCFzYXZlX2NvbmZp
-Zyhqbm9kZSwgZmlsZW5hbWUpKSB7DQo+IC0JCWxfZnJlZShmaWxlbmFtZSk7DQo+ICsJaWYgKCFz
-YXZlX2NvbmZpZyhqbm9kZSwgbmFtZV9idWYpKQ0KPiAgCQlnb3RvIGZhaWw7DQo+IC0JfQ0KPiAg
-DQo+ICAJbm9kZV9qY29uZmlnX3NldChub2RlLCBqbm9kZSk7DQo+IC0Jbm9kZV9jZmdfZmlsZV9z
-ZXQobm9kZSwgZmlsZW5hbWUpOw0KPiAgDQo+ICAJcmV0dXJuIHRydWU7DQo+ICBmYWlsOg0KPiBA
-QCAtNjA0LDEzICs2MjYsMjkgQEAgZmFpbDoNCj4gIAlyZXR1cm4gZmFsc2U7DQo+ICB9DQo+ICAN
-Cj4gK3N0YXRpYyBpbnQgZGVsX2ZvYmplY3QoY29uc3QgY2hhciAqZnBhdGgsIGNvbnN0IHN0cnVj
-dCBzdGF0ICpzYiwgaW50IHR5cGVmbGFnLA0KPiArCQkJCQkJc3RydWN0IEZUVyAqZnR3YnVmKQ0K
-PiArew0KPiArCXN3aXRjaCAodHlwZWZsYWcpIHsNCj4gKwljYXNlIEZUV19EUDoNCj4gKwkJcm1k
-aXIoZnBhdGgpOw0KPiArCQlsX2RlYnVnKCJSTURJUiAlcyIsIGZwYXRoKTsNCj4gKwkJYnJlYWs7
-DQo+ICsNCj4gKwljYXNlIEZUV19TTDoNCj4gKwlkZWZhdWx0Og0KPiArCQlyZW1vdmUoZnBhdGgp
-Ow0KPiArCQlsX2RlYnVnKCJSTSAlcyIsIGZwYXRoKTsNCj4gKwkJYnJlYWs7DQo+ICsJfQ0KPiAr
-CXJldHVybiAwOw0KPiArfQ0KPiArDQo+ICAvKiBQZXJtYW5lbnRseSByZW1vdmUgbm9kZSBjb25m
-aWd1cmF0aW9uICovDQo+ICB2b2lkIHN0b3JhZ2VfcmVtb3ZlX25vZGVfY29uZmlnKHN0cnVjdCBt
-ZXNoX25vZGUgKm5vZGUpDQo+ICB7DQo+IC0JY2hhciAqY2ZnOw0KPiArCWNoYXIgKm5vZGVfcGF0
-aCwgKm1lc2hfcGF0aCwgKm1lc2hfbmFtZTsNCj4gIAlzdHJ1Y3QganNvbl9vYmplY3QgKmpub2Rl
-Ow0KPiAtCWNvbnN0IGNoYXIgKmRpcl9uYW1lOw0KPiAtCWNoYXIgKmJhazsNCj4gIA0KPiAgCWlm
-ICghbm9kZSkNCj4gIAkJcmV0dXJuOw0KPiBAQCAtNjIxLDI1ICs2NTksMTcgQEAgdm9pZCBzdG9y
-YWdlX3JlbW92ZV9ub2RlX2NvbmZpZyhzdHJ1Y3QgbWVzaF9ub2RlICpub2RlKQ0KPiAgCQlqc29u
-X29iamVjdF9wdXQoam5vZGUpOw0KPiAgCW5vZGVfamNvbmZpZ19zZXQobm9kZSwgTlVMTCk7DQo+
-ICANCj4gLQkvKiBEZWxldGUgbm9kZSBjb25maWd1cmF0aW9uIGZpbGUgKi8NCj4gLQljZmcgPSBu
-b2RlX2NmZ19maWxlX2dldChub2RlKTsNCj4gLQlpZiAoIWNmZykNCj4gLQkJcmV0dXJuOw0KPiAt
-DQo+IC0JbF9kZWJ1ZygiRGVsZXRlIG5vZGUgY29uZmlnIGZpbGUgJXMiLCBjZmcpOw0KPiAtCXJl
-bW92ZShjZmcpOw0KPiAtDQo+IC0JLyogRGVsZXRlIHRoZSBiYWNrdXAgZmlsZSAqLw0KPiAtCWJh
-ayA9IGxfc3RyZHVwX3ByaW50ZigiJXMuYmFrIiwgY2ZnKTsNCj4gLQlyZW1vdmUoYmFrKTsNCj4g
-LQlsX2ZyZWUoYmFrKTsNCj4gKwlub2RlX3BhdGggPSBub2RlX3BhdGhfZ2V0KG5vZGUpOw0KPiAr
-CWxfZGVidWcoIkRlbGV0ZSBub2RlIGNvbmZpZyAlcyIsIG5vZGVfcGF0aCk7DQo+ICANCj4gLQkv
-KiBEZWxldGUgdGhlIG5vZGUgZGlyZWN0b3J5ICovDQo+IC0JZGlyX25hbWUgPSBkaXJuYW1lKGNm
-Zyk7DQo+ICsJLyogTWFrZSBzdXJlIHBhdGggbmFtZSBvZiBub2RlIGZvbGxvd3MgZXhwZWN0ZWQg
-Z3VpZGVsaW5lcyAqLw0KPiArCW1lc2hfcGF0aCA9IGFsbG9jX2Rpcm5hbWUobm9kZV9wYXRoKTsN
-Cj4gKwltZXNoX25hbWUgPSBiYXNlbmFtZShtZXNoX3BhdGgpOw0KPiArCWlmIChzdHJjbXAobWVz
-aF9uYW1lLCAibWVzaCIpKQ0KPiArCQlnb3RvIGRvbmU7DQo+ICANCj4gLQlsX2RlYnVnKCJEZWxl
-dGUgZGlyZWN0b3J5ICVzIiwgZGlyX25hbWUpOw0KPiAtCXJtZGlyKGRpcl9uYW1lKTsNCj4gKwlu
-ZnR3KG5vZGVfcGF0aCwgZGVsX2ZvYmplY3QsIDUsIEZUV19ERVBUSCB8IEZUV19QSFlTKTsNCj4g
-IA0KPiAtCWxfZnJlZShjZmcpOw0KPiAtCW5vZGVfY2ZnX2ZpbGVfc2V0KG5vZGUsIE5VTEwpOw0K
-PiArZG9uZToNCj4gKwlsX2ZyZWUobWVzaF9wYXRoKTsNCj4gIH0=
+hi,
+
+-> We tried Zephyr Mesh onoff example on nrf52 eval kit to test the Mesh Functionality.For provisioning of the node
+   we are using meshctl, built from the latest current master of the bluez source.So during the provisioning of the node when we
+   start the "meshctl" and run the "discover-unprovisioned on" we are able to get the Device UUID for the provisioning.
+
+   Later when we try to provision the node using the "provision <UUID>" command it initiate the provision and does not wait
+   for the user to enter OOB .You can find the log as below.
+   /*******************************************/
+   $meshctl
+   Waiting to connect to bluetoothd...Reading prov_db.json and local_node.json
+   from /home/nazeer/.config/meshctl directory
+   [meshctl]# discover-unprovisioned on
+   SetDiscoveryFilter success
+   Discovery started
+   Adapter property changed
+   [CHG] Controller 00:1B:DC:06:96:17 Discovering: yes
+             Mesh Provisioning Service (00001827-0000-1000-8000-00805f9b34fb)
+             Device UUID: 81f5d3bd49fa00000000000000000000
+             OOB: 0000
+   [meshctl]# provision 81f5d3bd49fa00000000000000000000
+   Trying to connect Device FA:49:BD:D3:F5:81 Zephyr
+   Adapter property changed
+   [CHG] Controller 00:1B:DC:06:96:17 Discovering: no
+   Connection successful 
+   Services resolved yes
+   Found matching char: path
+   /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0011, uuid
+   00002adb-0000-1000-8000-00805f9b34fb
+   Found matching char: path
+   /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0013, uuid
+   00002adc-0000-1000-8000-00805f9b34fb
+   Start notification on
+   /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0013
+   Characteristic property changed
+   /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0013
+   AcquireNotify success: fd 7 MTU 69
+   Notify for Mesh Provisioning Out Data started
+   Open-Node: 0x55aca5ac1220
+   Open-Prov: 0x55aca5abfb40
+   Open-Prov: proxy 0x55aca5ac3d10
+   Initiated provisioning
+   Characteristic property changed
+   /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0011
+   AcquireWrite success: fd 8 MTU 69
+   GATT-TX:     03 00 10
+   GATT-RX:     03 01 04 00 01 00 00 06 00 18 00 00 00
+   Got provisioning data (12 bytes)
+                01 04 00 01 00 00 06 00 18 00 00 00
+   GATT-TX:     03 02 00 00 02 04 06
+   GATT-TX:     03 03 76 4a b7 61 52 e1 72 9c b0 cc 95 ad 62 22
+   GATT-TX:     8b 65 8f 2a dd 2c 79 a0 ec 5e 8e db a5 65 1b 76
+   GATT-TX:     dd cf 63 4d 17 aa a0 a4 ea d4 5e 17 2e a6 18 8e
+   GATT-TX:     19 83 56 97 cd c9 81 50 15 ff 47 37 de 92 3a 80
+   GATT-TX:     30 64
+   [Zephyr]#
+  /********************************************/
+
+-> Later we tried to remove the OOB security from the zephyr onoff code and tried to do provisioning again,linux-bluetooth@vger.kernel.org 
+   but this time it completely fails to start provisioning.Please find the log as below
+  /**********************************/
+  meshctl]# provision 81f5d3bd49fa00000000000000000000
+  Trying to connect Device FA:49:BD:D3:F5:81 Zephyr
+  Adapter property changed
+  [CHG] Controller 00:1B:DC:06:96:17 Discovering: no
+  Connection successful
+  Services resolved yes
+  Found matching char: path
+  /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0011, uuid
+  00002adb-0000-1000-8000-00805f9b34fb
+  Found matching char: path
+  /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0013, uuid
+  00002adc-0000-1000-8000-00805f9b34fb
+  Start notification on
+  /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0013
+  Characteristic property changed
+  /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0013
+  AcquireNotify success: fd 7 MTU 69
+  Notify for Mesh Provisioning Out Data started
+  Failed to start provisioning
+  Attempting to disconnect from FA:49:BD:D3:F5:81
+  Characteristic property changed
+  /org/bluez/hci0/dev_FA_49_BD_D3_F5_81/service0010/char0013
+  Services resolved no
+  [meshctl]#
+  /**************************************/
+
+Could you elaborate a little on the status of the current master of bluez in regards to BLE mesh, is it usable or should we look to older versions?
+
+Do you know if there is a common issue while provisioning of the node with the current master and
+is there anything that need to be configured before provisioning? 
+
+-- 
+Thanks and Regards
