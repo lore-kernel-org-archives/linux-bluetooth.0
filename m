@@ -2,100 +2,65 @@ Return-Path: <SRS0=jb0q=TO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AFADC04AB4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 May 2019 20:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3205C04AB4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 May 2019 22:54:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B7A020881
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 May 2019 20:15:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BC0320879
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 May 2019 22:54:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726424AbfENUPr (ORCPT
+        id S1726221AbfENWyK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 May 2019 16:15:47 -0400
-Received: from mga05.intel.com ([192.55.52.43]:13417 "EHLO mga05.intel.com"
+        Tue, 14 May 2019 18:54:10 -0400
+Received: from mga03.intel.com ([134.134.136.65]:22776 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726490AbfENUPq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 May 2019 16:15:46 -0400
+        id S1726148AbfENWyJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 May 2019 18:54:09 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 May 2019 13:15:46 -0700
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 May 2019 15:54:09 -0700
 X-ExtLoop1: 1
-Received: from bgix-dell-lap.sea.intel.com ([10.251.7.218])
-  by fmsmga007.fm.intel.com with ESMTP; 14 May 2019 13:15:46 -0700
-From:   Brian Gix <brian.gix@intel.com>
+Received: from ingas-nuc1.sea.intel.com ([10.252.138.236])
+  by orsmga003.jf.intel.com with ESMTP; 14 May 2019 15:54:09 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com,
-        michal.lowas-rzechonek@silvair.com
-Subject: [PATCH BlueZ 3/3] mesh: Save generated Net and Dev keys in KeyRing
-Date:   Tue, 14 May 2019 13:15:25 -0700
-Message-Id: <20190514201525.16067-4-brian.gix@intel.com>
-X-Mailer: git-send-email 2.14.5
-In-Reply-To: <20190514201525.16067-1-brian.gix@intel.com>
-References: <20190514201525.16067-1-brian.gix@intel.com>
+Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 0/2] Start implementing mesh Management interface
+Date:   Tue, 14 May 2019 15:54:05 -0700
+Message-Id: <20190514225407.29594-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When creating a network from scratch, we need to save all
-keys that are created into the KeyRing for use by Config
-Client application.
----
- mesh/node.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+This patch set ads a sketleton for org.bluez.mesh.Management1 interface.
+Also, adds check for the existence of the provisioning agent for an
+attaching node: this information will be further used to validate
+number of method calls on Management interface
 
-diff --git a/mesh/node.c b/mesh/node.c
-index 3618595b3..5318e2b69 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -35,6 +35,7 @@
- #include "mesh/mesh-db.h"
- #include "mesh/provision.h"
- #include "mesh/storage.h"
-+#include "mesh/keyring.h"
- #include "mesh/appkey.h"
- #include "mesh/model.h"
- #include "mesh/cfgmod.h"
-@@ -1549,8 +1550,8 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 	} else {
- 		/* Callback for create node request */
- 		node_ready_func_t cb = req->cb;
-+		struct keyring_net_key net_key;
- 		uint8_t dev_key[16];
--		uint8_t net_key[16];
- 
- 		node->num_ele = num_ele;
- 		set_defaults(node);
-@@ -1561,11 +1562,22 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 
- 		/* Generate device and primary network keys */
- 		l_getrandom(dev_key, sizeof(dev_key));
--		l_getrandom(net_key, sizeof(net_key));
-+		l_getrandom(net_key.old_key, sizeof(net_key.old_key));
-+		net_key.net_idx = DEFAULT_PRIMARY_NET_INDEX;
-+		net_key.phase = 0;
- 
- 		if (!add_local_node(node, DEFAULT_NEW_UNICAST, false, false,
--					DEFAULT_IV_INDEX, dev_key,
--					DEFAULT_PRIMARY_NET_INDEX, net_key))
-+						DEFAULT_IV_INDEX, dev_key,
-+						DEFAULT_PRIMARY_NET_INDEX,
-+							net_key.old_key))
-+			goto fail;
-+
-+		if (!keyring_put_remote_dev_key(node, DEFAULT_NEW_UNICAST,
-+							num_ele, dev_key))
-+			goto fail;
-+
-+		if (!keyring_put_net_key(node, DEFAULT_PRIMARY_NET_INDEX,
-+								&net_key))
- 			goto fail;
- 
- 		cb(req->user_data, MESH_ERROR_NONE, node);
+Inga Stotland (2):
+  mesh: Add check for org.bluez.mesh.Provisioner1 interface
+  mesh: Add skeleton for org.bluez.mesh.Management1 interface
+
+ Makefile.mesh  |   1 +
+ mesh/dbus.c    |  12 ++-
+ mesh/error.h   |   1 +
+ mesh/manager.c | 266 +++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/manager.h |  20 ++++
+ mesh/mesh.h    |   4 +-
+ mesh/node.c    |   5 +-
+ 7 files changed, 303 insertions(+), 6 deletions(-)
+ create mode 100644 mesh/manager.c
+ create mode 100644 mesh/manager.h
+
 -- 
-2.14.5
+2.21.0
 
