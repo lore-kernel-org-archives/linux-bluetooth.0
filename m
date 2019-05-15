@@ -2,51 +2,51 @@ Return-Path: <SRS0=OL4k=TP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91505C04E53
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7F5C46470
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 12:13:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F02420843
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA5B6206BF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 12:13:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730552AbfEOL4M (ORCPT
+        id S1728628AbfEOMNJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 May 2019 07:56:12 -0400
-Received: from atl4mhob13.registeredsite.com ([209.17.115.51]:51964 "EHLO
-        atl4mhob13.registeredsite.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730999AbfEOL4L (ORCPT
+        Wed, 15 May 2019 08:13:09 -0400
+Received: from atl4mhob04.registeredsite.com ([209.17.115.42]:38592 "EHLO
+        atl4mhob04.registeredsite.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726571AbfEOMNI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 May 2019 07:56:11 -0400
+        Wed, 15 May 2019 08:13:08 -0400
 Received: from mailpod.hostingplatform.com (atl4qobmail02pod5.registeredsite.com [10.30.71.85])
-        by atl4mhob13.registeredsite.com (8.14.4/8.14.4) with ESMTP id x4FBu7wk027987
+        by atl4mhob04.registeredsite.com (8.14.4/8.14.4) with ESMTP id x4FCD53m007455
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2019 07:56:07 -0400
-Received: (qmail 139360 invoked by uid 0); 15 May 2019 11:56:07 -0000
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2019 08:13:06 -0400
+Received: (qmail 50749 invoked by uid 0); 15 May 2019 12:13:05 -0000
 X-TCPREMOTEIP: 208.85.15.155
 X-Authenticated-UID: sbrown@opensat.com
 Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@208.85.15.155)
-  by 0 with ESMTPA; 15 May 2019 11:56:07 -0000
+  by 0 with ESMTPA; 15 May 2019 12:13:05 -0000
 Received: from localhost (localhost [127.0.0.1])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 630B0154042F;
-        Wed, 15 May 2019 07:56:06 -0400 (EDT)
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 645021540278;
+        Wed, 15 May 2019 08:13:04 -0400 (EDT)
 X-Virus-Scanned: Debian amavisd-new at ewol.com
 Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
         by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id ih4uINjXV6CC; Wed, 15 May 2019 07:55:59 -0400 (EDT)
+        with ESMTP id fquKLuDlD87q; Wed, 15 May 2019 08:12:58 -0400 (EDT)
 Received: from z230.lan (z230.lan [192.168.1.3])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id D5FCE1540278;
-        Wed, 15 May 2019 07:55:59 -0400 (EDT)
-Message-ID: <07f90b48d482ff6bb88be4734b41a08ac5a98592.camel@ewol.com>
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 1CF3215400CE;
+        Wed, 15 May 2019 08:12:58 -0400 (EDT)
+Message-ID: <4fa544fa04d907de54ab713eb0d0901593d2687e.camel@ewol.com>
 Subject: Re: Issue with mesh provisioning.
 From:   Steve Brown <sbrown@ewol.com>
 To:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
 Cc:     Shaik Mahaboob Nazeer <nazeer.m@phytec.in>,
         linux-bluetooth@vger.kernel.org,
         Jonas Remmert <j.remmert@phytec.de>
-Date:   Wed, 15 May 2019 07:55:59 -0400
+Date:   Wed, 15 May 2019 08:12:58 -0400
 In-Reply-To: <CACumGOKJckqHDsB==1MwNFOtZVtduRPZhTmtbQT-fTaztuv+dQ@mail.gmail.com>
 References: <33a1f056-12c2-1aaa-4172-ea1fba341428@phytec.in>
          <a133a8d46955c9c3d248cf06e52d445a82ed7621.camel@ewol.com>
@@ -61,48 +61,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Luiz,
+Hi Luiz,
 
-Some more:
+Would this be an appropriate fix.
 
-The recvmsg call at tools/mesh/gatt.c:417 returns -1 and
-errno 11 "Resource temporarily unavailable"
+It seems to solve the problem.
 
-The log follows. The first read succeeded, but the second fails.
+diff --git a/tools/mesh/gatt.c b/tools/mesh/gatt.c
+index 2269a20cf..0a942d4eb 100644
+--- a/tools/mesh/gatt.c
++++ b/tools/mesh/gatt.c
+@@ -415,8 +415,11 @@ static bool sock_read(struct io *io, bool prov, void *user_data)
+ 	msg.msg_iovlen = 1;
+ 
+ 	while ((len = recvmsg(fd, &msg, MSG_DONTWAIT))) {
+-		if (len <= 0)
++		if (len <= 0) {
++			if (errno == EAGAIN)
++				break;
+ 			return false;
++		}
+ 
+ 		res = buf;
+ 		len_sar = mesh_gatt_sar(&res, len);
 
-======================
+If so, I'll submit a patch.
 
-[CHG] Controller 00:1A:7D:DA:71:14 Discovering: no
-Connection successful
-Services resolved yes
-Found matching char: path /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0011, uuid 00002adb-0000-1000-8000-00805f9b34fb
-Found matching char: path /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0013, uuid 00002adc-0000-1000-8000-00805f9b34fb
-Start notification on /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0013
-Characteristic property changed /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0013
-AcquireNotify success: fd 7 MTU 69
-Notify for Mesh Provisioning Out Data started
-Open-Node: 0x555776243190
-Open-Prov: 0x555776234250
-Open-Prov: proxy 0x55577623f3f0
-Initiated provisioning
-Characteristic property changed /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0011
-AcquireWrite success: fd 8 MTU 69
-GATT-TX:	 03 00 10 
-sock_read len: 13
-GATT-RX:	 03 01 04 00 01 00 00 06 00 18 00 00 00 
-sock_read len_sar: 13
-Got provisioning data (12 bytes)
-	 01 04 00 01 00 00 06 00 18 00 00 00 
-GATT-TX:	 03 02 00 00 02 04 06 
-GATT-TX:	 03 03 e4 ae 6e 5e fc b7 b9 63 74 f0 ca 71 89 c4 
-GATT-TX:	 af 00 a2 fd f8 74 1d fd 87 74 8a 86 20 91 bd ed 
-GATT-TX:	 54 87 6b 63 5d ec 42 1f 19 fb 1a c9 05 88 b0 be 
-GATT-TX:	 91 80 97 ce c4 f3 b0 79 72 12 e9 bb 81 a2 8e ed 
-GATT-TX:	 a5 6b 
-sock_read len: -1
-sock_read error 11 Resource temporarily unavailable[Zephyr]# quit
-
-=================
+Steve
 
 On Wed, 2019-05-15 at 13:48 +0300, Von Dentz, Luiz wrote:
 > Hi Steve,
