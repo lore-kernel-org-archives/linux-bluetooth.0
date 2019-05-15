@@ -2,195 +2,188 @@ Return-Path: <SRS0=OL4k=TP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E043BC04E84
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91505C04E53
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:56:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A704420657
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:53:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="aUFcPFAP";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="EdtPLgV7"
+	by mail.kernel.org (Postfix) with ESMTP id 4F02420843
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:56:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730994AbfEOLxU (ORCPT
+        id S1730552AbfEOL4M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 May 2019 07:53:20 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:36522 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730983AbfEOLTl (ORCPT
+        Wed, 15 May 2019 07:56:12 -0400
+Received: from atl4mhob13.registeredsite.com ([209.17.115.51]:51964 "EHLO
+        atl4mhob13.registeredsite.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730999AbfEOL4L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 May 2019 07:19:41 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 3B615611DC; Wed, 15 May 2019 11:19:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1557919179;
-        bh=ttr2xmvM52sCyNpkVv5zDVmk1ljobJDPrByM3R11jRY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aUFcPFAPLg6qXk44y4Irrk2TF9lEpM3XeQguMeoeLFbdDxdvZOLYKq2yXua0TJzw1
-         Rb3P0KNXUyZ0D+fWBFsEjgn5lrdz390J7dPgPdmtsMLp6rAwum5D7lr3kKp25sWe9d
-         KKMlI+8bDxWE1Lt6+E4bfZpXHPKeLpI3Hu3HAPO8=
-Received: from rocky-HP-EliteBook-8460p.wlan.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao@codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 7C17960CF1;
-        Wed, 15 May 2019 11:19:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1557919176;
-        bh=ttr2xmvM52sCyNpkVv5zDVmk1ljobJDPrByM3R11jRY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EdtPLgV75AeYe41YGMg7P/pin5N8SyT+RQ1G2MX8xD2C5vn9honkFsMIpe0w4JDeM
-         LIo1ftqix7yIWHU0+EerWvyjUJl6aEs8G3dzDLqZt9DrtvBXQeIoCCTd/Dyb8eB4tM
-         Q+7Qf0OXWCbtz7oeh5o7GkXW83SIwGHTC06IEAIM=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 7C17960CF1
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
-        johan.hedberg@gmail.com, thierry.escande@linaro.org
-Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v5 1/2] Bluetooth: hci_qca: Load customized NVM based on the device property
-Date:   Wed, 15 May 2019 19:19:21 +0800
-Message-Id: <1557919161-11010-1-git-send-email-rjliao@codeaurora.org>
-X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1557631148-5120-1-git-send-email-rjliao@codeaurora.org>
-References: <1557631148-5120-1-git-send-email-rjliao@codeaurora.org>
+        Wed, 15 May 2019 07:56:11 -0400
+Received: from mailpod.hostingplatform.com (atl4qobmail02pod5.registeredsite.com [10.30.71.85])
+        by atl4mhob13.registeredsite.com (8.14.4/8.14.4) with ESMTP id x4FBu7wk027987
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2019 07:56:07 -0400
+Received: (qmail 139360 invoked by uid 0); 15 May 2019 11:56:07 -0000
+X-TCPREMOTEIP: 208.85.15.155
+X-Authenticated-UID: sbrown@opensat.com
+Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@208.85.15.155)
+  by 0 with ESMTPA; 15 May 2019 11:56:07 -0000
+Received: from localhost (localhost [127.0.0.1])
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 630B0154042F;
+        Wed, 15 May 2019 07:56:06 -0400 (EDT)
+X-Virus-Scanned: Debian amavisd-new at ewol.com
+Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
+        by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id ih4uINjXV6CC; Wed, 15 May 2019 07:55:59 -0400 (EDT)
+Received: from z230.lan (z230.lan [192.168.1.3])
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id D5FCE1540278;
+        Wed, 15 May 2019 07:55:59 -0400 (EDT)
+Message-ID: <07f90b48d482ff6bb88be4734b41a08ac5a98592.camel@ewol.com>
+Subject: Re: Issue with mesh provisioning.
+From:   Steve Brown <sbrown@ewol.com>
+To:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+Cc:     Shaik Mahaboob Nazeer <nazeer.m@phytec.in>,
+        linux-bluetooth@vger.kernel.org,
+        Jonas Remmert <j.remmert@phytec.de>
+Date:   Wed, 15 May 2019 07:55:59 -0400
+In-Reply-To: <CACumGOKJckqHDsB==1MwNFOtZVtduRPZhTmtbQT-fTaztuv+dQ@mail.gmail.com>
+References: <33a1f056-12c2-1aaa-4172-ea1fba341428@phytec.in>
+         <a133a8d46955c9c3d248cf06e52d445a82ed7621.camel@ewol.com>
+         <0ec70f654132923489ee2603fe9ac885ac547830.camel@ewol.com>
+         <CACumGOKJckqHDsB==1MwNFOtZVtduRPZhTmtbQT-fTaztuv+dQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.1-2 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QCA BTSOC NVM is a customized firmware file and different vendors may
-want to have different BTSOC configuration (e.g. Configure SCO over PCM
-or I2S, Setting Tx power, etc.) via this file. This patch will allow
-vendors to download different NVM firmware file by reading a device
-property "firmware-name".
+Luiz,
 
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
----
-Changes in v5:
-  * Made the change applicable to the wcn399x series chip sets
----
- drivers/bluetooth/btqca.c   |  8 ++++++--
- drivers/bluetooth/btqca.h   |  6 ++++--
- drivers/bluetooth/hci_qca.c | 19 ++++++++++++++++++-
- 3 files changed, 28 insertions(+), 5 deletions(-)
+Some more:
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index cc12eec..a78b80e 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -332,7 +332,8 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
- 
- int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
--		   enum qca_btsoc_type soc_type, u32 soc_ver)
-+		   enum qca_btsoc_type soc_type, u32 soc_ver,
-+		   const char *firmware_name)
- {
- 	struct rome_config config;
- 	int err;
-@@ -365,7 +366,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 
- 	/* Download NVM configuration */
- 	config.type = TLV_TYPE_NVM;
--	if (qca_is_wcn399x(soc_type))
-+	if (firmware_name)
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/%s", firmware_name);
-+	else if (qca_is_wcn399x(soc_type))
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/crnv%02x.bin", rom_ver);
- 	else
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index 4c4fe2b..8c037bb 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -140,7 +140,8 @@ enum qca_btsoc_type {
- 
- int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
--		   enum qca_btsoc_type soc_type, u32 soc_ver);
-+		   enum qca_btsoc_type soc_type, u32 soc_ver,
-+		   const char *firmware_name);
- int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
- int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
-@@ -155,7 +156,8 @@ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdad
- }
- 
- static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
--				 enum qca_btsoc_type soc_type, u32 soc_ver)
-+				 enum qca_btsoc_type soc_type, u32 soc_ver,
-+				 const char *firmware_name)
- {
- 	return -EOPNOTSUPP;
- }
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 57322c4..9590602 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -169,6 +169,7 @@ struct qca_serdev {
- 	struct qca_power *bt_power;
- 	u32 init_speed;
- 	u32 oper_speed;
-+	const char *firmware_name;
- };
- 
- static int qca_power_setup(struct hci_uart *hu, bool on);
-@@ -190,6 +191,17 @@ static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
- 	return soc_type;
- }
- 
-+static const char *qca_get_firmware_name(struct hci_uart *hu)
-+{
-+	if (hu->serdev) {
-+		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
-+
-+		return qsd->firmware_name;
-+	} else {
-+		return NULL;
-+	}
-+}
-+
- static void __serial_clock_on(struct tty_struct *tty)
- {
- 	/* TODO: Some chipset requires to enable UART clock on client
-@@ -1195,6 +1207,7 @@ static int qca_setup(struct hci_uart *hu)
- 	struct qca_data *qca = hu->priv;
- 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
-+	const char *firmware_name = qca_get_firmware_name(hu);
- 	int ret;
- 	int soc_ver = 0;
- 
-@@ -1245,7 +1258,8 @@ static int qca_setup(struct hci_uart *hu)
- 
- 	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
- 	/* Setup patch / NVM configurations */
--	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
-+	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
-+			firmware_name);
- 	if (!ret) {
- 		set_bit(QCA_IBS_ENABLED, &qca->flags);
- 		qca_debugfs_init(hdev);
-@@ -1477,6 +1491,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 			return PTR_ERR(qcadev->bt_en);
- 		}
- 
-+		device_property_read_string(&serdev->dev, "firmware-name",
-+					 &qcadev->firmware_name);
-+
- 		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
- 		if (IS_ERR(qcadev->susclk)) {
- 			dev_err(&serdev->dev, "failed to acquire clk\n");
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+The recvmsg call at tools/mesh/gatt.c:417 returns -1 and
+errno 11 "Resource temporarily unavailable"
+
+The log follows. The first read succeeded, but the second fails.
+
+======================
+
+[CHG] Controller 00:1A:7D:DA:71:14 Discovering: no
+Connection successful
+Services resolved yes
+Found matching char: path /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0011, uuid 00002adb-0000-1000-8000-00805f9b34fb
+Found matching char: path /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0013, uuid 00002adc-0000-1000-8000-00805f9b34fb
+Start notification on /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0013
+Characteristic property changed /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0013
+AcquireNotify success: fd 7 MTU 69
+Notify for Mesh Provisioning Out Data started
+Open-Node: 0x555776243190
+Open-Prov: 0x555776234250
+Open-Prov: proxy 0x55577623f3f0
+Initiated provisioning
+Characteristic property changed /org/bluez/hci0/dev_D0_09_F0_18_BF_38/service0010/char0011
+AcquireWrite success: fd 8 MTU 69
+GATT-TX:	 03 00 10 
+sock_read len: 13
+GATT-RX:	 03 01 04 00 01 00 00 06 00 18 00 00 00 
+sock_read len_sar: 13
+Got provisioning data (12 bytes)
+	 01 04 00 01 00 00 06 00 18 00 00 00 
+GATT-TX:	 03 02 00 00 02 04 06 
+GATT-TX:	 03 03 e4 ae 6e 5e fc b7 b9 63 74 f0 ca 71 89 c4 
+GATT-TX:	 af 00 a2 fd f8 74 1d fd 87 74 8a 86 20 91 bd ed 
+GATT-TX:	 54 87 6b 63 5d ec 42 1f 19 fb 1a c9 05 88 b0 be 
+GATT-TX:	 91 80 97 ce c4 f3 b0 79 72 12 e9 bb 81 a2 8e ed 
+GATT-TX:	 a5 6b 
+sock_read len: -1
+sock_read error 11 Resource temporarily unavailable[Zephyr]# quit
+
+=================
+
+On Wed, 2019-05-15 at 13:48 +0300, Von Dentz, Luiz wrote:
+> Hi Steve,
+> 
+> That specific patch doesn't change the meshctl, the following one
+> does:
+> 
+> commit d6eec1b67d6d9e3336b7e3cd8f655baf408d864a
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Mon Nov 19 17:35:54 2018 +0200
+> 
+>     meshctl: Switch from write to sendmsg for Acquire*
+> 
+>     Use sendmsg with MSG_NOSIGNAL to prevent crashes involving
+> SIGPIPE.
+> 
+> Not sure what is the problem with that since we just switch from a
+> pipe to a socketpair.
+> 
+> On Wed, May 15, 2019 at 1:01 PM Steve Brown <sbrown@ewol.com> wrote:
+> > On Tue, 2019-05-14 at 15:25 -0400, Steve Brown wrote:
+> > > On Tue, 2019-05-14 at 14:50 +0530, Shaik Mahaboob Nazeer wrote:
+> > > > hi,
+> > > > 
+> > > > -> We tried Zephyr Mesh onoff example on nrf52 eval kit to test
+> > > > the
+> > > > Mesh Functionality.For provisioning of the node
+> > > >    we are using meshctl, built from the latest current master
+> > > > of
+> > > > the
+> > > > bluez source.So during the provisioning of the node when we
+> > > >    start the "meshctl" and run the "discover-unprovisioned on"
+> > > > we
+> > > > are
+> > > > able to get the Device UUID for the provisioning.
+> > > > 
+> > > >    Later when we try to provision the node using the "provision
+> > > > <UUID>" command it initiate the provision and does not wait
+> > > >    for the user to enter OOB .You can find the log as below.
+> > > >    /*******************************************/
+> > > > 
+> > > 
+> > > --- snip ---
+> > > 
+> > > >   /**************************************/
+> > > > 
+> > > > Could you elaborate a little on the status of the current
+> > > > master of
+> > > > bluez in regards to BLE mesh, is it usable or should we look to
+> > > > older
+> > > > versions?
+> > > > 
+> > > > Do you know if there is a common issue while provisioning of
+> > > > the
+> > > > node
+> > > > with the current master and
+> > > > is there anything that need to be configured before
+> > > > provisioning?
+> > > > 
+> > > I get the same results.
+> > > 
+> > > I check out 48a2c3db1ccff28a615fac56066ca7d721f98d0a
+> > > 
+> > > That was the last time I used meshctl.
+> > > 
+> > > It requests an oob string and completes provisioning.
+> > > 
+> > > Steve
+> > > 
+> > 
+> > I bisected to
+> > 
+> > commit 91df85690cc1943e46ef90561dd1ac0d673ee3d7
+> > Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > Date:   Mon Nov 19 15:36:15 2018 +0200
+> > 
+> >     client: Switch from write to sendmsg for Acquire*
+> > 
+> >     Use sendmsg with MSG_NOSIGNAL to prevent crashes involving
+> > SIGPIPE.
+> > 
+> > 
+> > 
 
