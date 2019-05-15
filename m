@@ -2,154 +2,117 @@ Return-Path: <SRS0=OL4k=TP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E60E9C04E84
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C735C04E87
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:52:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C2E072053B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:52:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D04520645
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 May 2019 11:52:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Mvv9nKYr";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="GEYhs9TR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728580AbfEOLwD (ORCPT
+        id S1731093AbfEOLUZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 May 2019 07:52:03 -0400
-Received: from atl4mhob10.registeredsite.com ([209.17.115.48]:57438 "EHLO
-        atl4mhob10.registeredsite.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730702AbfEOLUw (ORCPT
+        Wed, 15 May 2019 07:20:25 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:36882 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730723AbfEOLUY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 May 2019 07:20:52 -0400
-Received: from mailpod.hostingplatform.com (atl4qobmail01pod5.registeredsite.com [10.30.71.94])
-        by atl4mhob10.registeredsite.com (8.14.4/8.14.4) with ESMTP id x4FBKmqs020266
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2019 07:20:48 -0400
-Received: (qmail 124969 invoked by uid 0); 15 May 2019 11:20:48 -0000
-X-TCPREMOTEIP: 208.85.15.155
-X-Authenticated-UID: sbrown@opensat.com
-Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@208.85.15.155)
-  by 0 with ESMTPA; 15 May 2019 11:20:48 -0000
-Received: from localhost (localhost [127.0.0.1])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 7A8C6154042F;
-        Wed, 15 May 2019 07:20:47 -0400 (EDT)
-X-Virus-Scanned: Debian amavisd-new at ewol.com
-Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
-        by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id PgYJn_JX1QMB; Wed, 15 May 2019 07:20:45 -0400 (EDT)
-Received: from z230.lan (z230.lan [192.168.1.3])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 6346815400CE;
-        Wed, 15 May 2019 07:20:45 -0400 (EDT)
-Message-ID: <2b5dd24120ef11d9047747f17280d847ea574ab9.camel@ewol.com>
-Subject: Re: Issue with mesh provisioning.
-From:   Steve Brown <sbrown@ewol.com>
-To:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Cc:     Shaik Mahaboob Nazeer <nazeer.m@phytec.in>,
-        linux-bluetooth@vger.kernel.org,
-        Jonas Remmert <j.remmert@phytec.de>
-Date:   Wed, 15 May 2019 07:20:45 -0400
-In-Reply-To: <CACumGOKJckqHDsB==1MwNFOtZVtduRPZhTmtbQT-fTaztuv+dQ@mail.gmail.com>
-References: <33a1f056-12c2-1aaa-4172-ea1fba341428@phytec.in>
-         <a133a8d46955c9c3d248cf06e52d445a82ed7621.camel@ewol.com>
-         <0ec70f654132923489ee2603fe9ac885ac547830.camel@ewol.com>
-         <CACumGOKJckqHDsB==1MwNFOtZVtduRPZhTmtbQT-fTaztuv+dQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.1-2 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Wed, 15 May 2019 07:20:24 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 92DA761215; Wed, 15 May 2019 11:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1557919223;
+        bh=gT9Zsd4mm/mksa2ZcTTNqgNLgRWHQcjN3/GXq1JPhV4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Mvv9nKYr8MjayA4vtg5xhNrl25S81Y5LaNNmr9f/7DcDQCYR+1cJxufh9spenDnxa
+         OnmG17wjkhtOszue3T3ccBy93/jUrs7eJrog63VxAUh5nalbJNLUP+Js8xFZTiUHWy
+         CXpSGA1gFpCF4xP+R1ppD+cagq+72SFQs4yH1DAU=
+Received: from rocky-HP-EliteBook-8460p.wlan.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 7E9CD60A24;
+        Wed, 15 May 2019 11:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1557919220;
+        bh=gT9Zsd4mm/mksa2ZcTTNqgNLgRWHQcjN3/GXq1JPhV4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=GEYhs9TRg3yB8UwwjmZdn7YqF7dQRRj48V0Ji1aNTIRSbVkkYWV1/QEfjc/XZwMnG
+         La4vtAoQOK5F863CrLBKdi3D+18PcEILyx5MLlM3OMdftWW21MVVva8CaibF1Msvmf
+         QT6taReYVpmTRGmZQEtYJRKysUtjm3+1MGaqBDK4=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 7E9CD60A24
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, thierry.escande@linaro.org
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v5 2/2] dt-bindings: net: bluetooth: Add device property firmware-name for QCA6174
+Date:   Wed, 15 May 2019 19:20:03 +0800
+Message-Id: <1557919203-11055-1-git-send-email-rjliao@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <1557631185-5167-1-git-send-email-rjliao@codeaurora.org>
+References: <1557631185-5167-1-git-send-email-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+This patch adds an optional device property "firmware-name" to allow the
+driver to load customized nvm firmware file based on this property.
 
-My bad. I misinterpreted the bisect. It's the following commit.
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+Reviewed-by: Rob Herring <robh@kernel.org>
+---
+Changes in v5:
+  * Made the change applicable to the wcn399x series chip sets
+---
+ Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-d6eec1b67d6d9e3336b7e3cd8f655baf408d864a
-meshctl: Switch from write to sendmsg for Acquire*
-
-
-
-On Wed, 2019-05-15 at 13:48 +0300, Von Dentz, Luiz wrote:
-> Hi Steve,
-> 
-> That specific patch doesn't change the meshctl, the following one
-> does:
-> 
-> commit d6eec1b67d6d9e3336b7e3cd8f655baf408d864a
-> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Date:   Mon Nov 19 17:35:54 2018 +0200
-> 
->     meshctl: Switch from write to sendmsg for Acquire*
-> 
->     Use sendmsg with MSG_NOSIGNAL to prevent crashes involving
-> SIGPIPE.
-> 
-> Not sure what is the problem with that since we just switch from a
-> pipe to a socketpair.
-> 
-> On Wed, May 15, 2019 at 1:01 PM Steve Brown <sbrown@ewol.com> wrote:
-> > On Tue, 2019-05-14 at 15:25 -0400, Steve Brown wrote:
-> > > On Tue, 2019-05-14 at 14:50 +0530, Shaik Mahaboob Nazeer wrote:
-> > > > hi,
-> > > > 
-> > > > -> We tried Zephyr Mesh onoff example on nrf52 eval kit to test
-> > > > the
-> > > > Mesh Functionality.For provisioning of the node
-> > > >    we are using meshctl, built from the latest current master
-> > > > of
-> > > > the
-> > > > bluez source.So during the provisioning of the node when we
-> > > >    start the "meshctl" and run the "discover-unprovisioned on"
-> > > > we
-> > > > are
-> > > > able to get the Device UUID for the provisioning.
-> > > > 
-> > > >    Later when we try to provision the node using the "provision
-> > > > <UUID>" command it initiate the provision and does not wait
-> > > >    for the user to enter OOB .You can find the log as below.
-> > > >    /*******************************************/
-> > > > 
-> > > 
-> > > --- snip ---
-> > > 
-> > > >   /**************************************/
-> > > > 
-> > > > Could you elaborate a little on the status of the current
-> > > > master of
-> > > > bluez in regards to BLE mesh, is it usable or should we look to
-> > > > older
-> > > > versions?
-> > > > 
-> > > > Do you know if there is a common issue while provisioning of
-> > > > the
-> > > > node
-> > > > with the current master and
-> > > > is there anything that need to be configured before
-> > > > provisioning?
-> > > > 
-> > > I get the same results.
-> > > 
-> > > I check out 48a2c3db1ccff28a615fac56066ca7d721f98d0a
-> > > 
-> > > That was the last time I used meshctl.
-> > > 
-> > > It requests an oob string and completes provisioning.
-> > > 
-> > > Steve
-> > > 
-> > 
-> > I bisected to
-> > 
-> > commit 91df85690cc1943e46ef90561dd1ac0d673ee3d7
-> > Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > Date:   Mon Nov 19 15:36:15 2018 +0200
-> > 
-> >     client: Switch from write to sendmsg for Acquire*
-> > 
-> >     Use sendmsg with MSG_NOSIGNAL to prevent crashes involving
-> > SIGPIPE.
-> > 
-> > 
-> > 
+diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+index 7ef6118..68b67d9 100644
+--- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
++++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+@@ -17,6 +17,7 @@ Optional properties for compatible string qcom,qca6174-bt:
+ 
+  - enable-gpios: gpio specifier used to enable chip
+  - clocks: clock provided to the controller (SUSCLK_32KHZ)
++ - firmware-name: specify the name of nvm firmware to load
+ 
+ Required properties for compatible string qcom,wcn399x-bt:
+ 
+@@ -28,6 +29,7 @@ Required properties for compatible string qcom,wcn399x-bt:
+ Optional properties for compatible string qcom,wcn399x-bt:
+ 
+  - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
++ - firmware-name: specify the name of nvm firmware to load
+ 
+ Examples:
+ 
+@@ -40,6 +42,7 @@ serial@7570000 {
+ 
+ 		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+ 		clocks = <&divclk4>;
++		firmware-name = "nvm_00440302.bin";
+ 	};
+ };
+ 
+@@ -52,5 +55,6 @@ serial@898000 {
+ 		vddrf-supply = <&vreg_l17a_1p3>;
+ 		vddch0-supply = <&vreg_l25a_3p3>;
+ 		max-speed = <3200000>;
++		firmware-name = "crnv21.bin";
+ 	};
+ };
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
