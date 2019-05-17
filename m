@@ -2,76 +2,86 @@ Return-Path: <SRS0=oIVb=TR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4004EC04AB4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 May 2019 10:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D80C04AB4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 May 2019 20:18:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 065A6204EC
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 May 2019 10:13:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SCyushfA"
+	by mail.kernel.org (Postfix) with ESMTP id 63D052082E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 May 2019 20:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728564AbfEQKNt (ORCPT
+        id S1727757AbfEQUSJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 May 2019 06:13:49 -0400
-Received: from mail-wr1-f45.google.com ([209.85.221.45]:38838 "EHLO
-        mail-wr1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727573AbfEQKNt (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 May 2019 06:13:49 -0400
-Received: by mail-wr1-f45.google.com with SMTP id d18so6510950wrs.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2019 03:13:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=p6W5323R5Qtutz7aBvuUQgMu1YBdN8N2j0dn/NzXtps=;
-        b=SCyushfAdRtgxjJe7Lz3uOSk4AvOSYLMt5Ee0v+TpA1lT/6D0xew6CZ8LXzAeX9ll6
-         TUO/Tpvu4TlOkUtoeu+eMx8j4dXRmhkKyqkS01a/tH2b2vtGXrEQwgQPwTtcQzACecX6
-         ahOiyspUbCqjKZH4jXSnWzGEO513iHkBjaQIMv3o0D72rRnqnsct0d3K9/Ugqq9uQzsJ
-         cZnaM84hmIVVTRVFOwtYRCcp4WjIx08aEGCCBe1j6M4n3N4qmnYuovGO1pDrFtZtLejq
-         74zGa8WFPqQqvXgYzbkdkUfmg6Xf1cdfBA3O/Z5TfUDJWbLg/3uo2qpvSyz0EEo5RiGH
-         ouCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=p6W5323R5Qtutz7aBvuUQgMu1YBdN8N2j0dn/NzXtps=;
-        b=JKpj9eZSbG6eiVSgbxXc6euOgBjtnzZ4dNdT1s+z6XnVttm5oFxu0pb7+S/7rxwxDP
-         rVBmZWBec9o5+7jfLa6uHHCt96n3UzSWBwX/QgU7hXg08lARpfw8PWNOCgBOZFQML3+F
-         sE/oPuEjDwuwQmFN9yAJvfpgVKpUTGTNQtu2LDwMbPhzNfpuWBhOnjQPriR2mrsh8dHk
-         Clla8WmCGTY4M9147bFrscSuWxLrLVVIelkWbv1/hZpp/ptDuk113FSaj30mDz70abUz
-         lEOs6BahSFFGas0/rd+zP04aoMDIQn8etXmB0pDohXlKDknAcZ0OXZEtZQz1aHO+FM5U
-         8NRA==
-X-Gm-Message-State: APjAAAXdJRXf5Lwyvz7hYdZwVg7hWBYlWGYbIo2kYV3RCJGybyaeCzKU
-        LeexJ46odu6HQq9qKauVaP5SlKrB
-X-Google-Smtp-Source: APXvYqzP70uA0dBS0kxzmjy/9rvLgBbfgLJ+tqPfZNz2rxn7bvkFyHXiYLE8mKnz26UPTk4c9TPKJg==
-X-Received: by 2002:a5d:45c1:: with SMTP id b1mr23429955wrs.252.1558088027614;
-        Fri, 17 May 2019 03:13:47 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id l8sm10405441wrw.56.2019.05.17.03.13.46
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 17 May 2019 03:13:47 -0700 (PDT)
-Date:   Fri, 17 May 2019 12:13:46 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: Kernel 5.1.1 broke bluez/pulseaudio audio
-Message-ID: <20190517101346.ffhzjdtg5kwvjreo@pali>
+        Fri, 17 May 2019 16:18:09 -0400
+Received: from mga12.intel.com ([192.55.52.136]:40233 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727626AbfEQUSI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 17 May 2019 16:18:08 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 May 2019 13:18:08 -0700
+X-ExtLoop1: 1
+Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
+  by orsmga006.jf.intel.com with ESMTP; 17 May 2019 13:18:08 -0700
+Received: from orsmsx160.amr.corp.intel.com (10.22.226.43) by
+ ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Fri, 17 May 2019 13:18:07 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.182]) by
+ ORSMSX160.amr.corp.intel.com ([169.254.13.155]) with mapi id 14.03.0415.000;
+ Fri, 17 May 2019 13:18:07 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+Subject: Re: [PATCH BlueZ 0/2] mesh source code housekeeping
+Thread-Topic: [PATCH BlueZ 0/2] mesh source code housekeeping
+Thread-Index: AQHVC1B+FuF+dnRza0C9IClMBjHRx6ZwOfyA
+Date:   Fri, 17 May 2019 20:18:06 +0000
+Message-ID: <1558124285.4039.0.camel@intel.com>
+References: <20190515190019.19710-1-inga.stotland@intel.com>
+In-Reply-To: <20190515190019.19710-1-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.24.9.116]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <039FAAD58CB0D144BC62277B3136D3D6@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-FYI, linux kernel 5.1.1 somehow broke support for audio via bluez and
-pulseaudio. See more details in pulseaudio ticket:
-https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/674
+UGF0Y2gtc2V0IGFwcGxpZWQNCg0KT24gV2VkLCAyMDE5LTA1LTE1IGF0IDEyOjAwIC0wNzAwLCBJ
+bmdhIFN0b3RsYW5kIHdyb3RlOg0KPiBUaGlzIHBhdGNoIHNldCB1cGRhdGVzIGNvcHlyaWdodCBk
+YXRlcyBvbiB0aGUgZmlsZXMgdGhhdCBoYXZlIGJlZW4gbW9kaWZpZWQNCj4gaW4gMjAxOSBhbmQg
+Y2xlYW5zIHVwIHRoZSBpbmNsdWRlbGlzdHMgaW4gc291cmNlIGZpbGVzLg0KPiANCj4gSW5nYSBT
+dG90bGFuZCAoMik6DQo+ICAgbWVzaDogVXBkYXRlIGNvcHlyaWdodCBkYXRlcw0KPiAgIG1lc2g6
+IFJlbW92ZSB1bm5lY2Vzc2FyeSBpbmNsdWRlcyBmcm9tIC5jIGZpbGVzDQo+IA0KPiAgbWVzaC9h
+Z2VudC5jICAgICAgICAgICB8ICAzICstLQ0KPiAgbWVzaC9hcHBrZXkuYyAgICAgICAgICB8ICA0
+ICstLS0NCj4gIG1lc2gvYXBwa2V5LmggICAgICAgICAgfCAgMiArLQ0KPiAgbWVzaC9jZmdtb2Qt
+c2VydmVyLmMgICB8ICA3ICstLS0tLS0NCj4gIG1lc2gvY3J5cHRvLmMgICAgICAgICAgfCAgNCAr
+LS0tDQo+ICBtZXNoL2RidXMuYyAgICAgICAgICAgIHwgMTAgLS0tLS0tLS0tLQ0KPiAgbWVzaC9l
+cnJvci5oICAgICAgICAgICB8ICAyICstDQo+ICBtZXNoL2ZyaWVuZC5jICAgICAgICAgIHwgIDgg
+Ky0tLS0tLS0NCj4gIG1lc2gva2V5cmluZy5jICAgICAgICAgfCAgNyArLS0tLS0tDQo+ICBtZXNo
+L21haW4uYyAgICAgICAgICAgIHwgIDcgLS0tLS0tLQ0KPiAgbWVzaC9tZXNoLWRiLmMgICAgICAg
+ICB8ICAzICstLQ0KPiAgbWVzaC9tZXNoLWRiLmggICAgICAgICB8ICAyICstDQo+ICBtZXNoL21l
+c2gtZGVmcy5oICAgICAgIHwgIDIgKy0NCj4gIG1lc2gvbWVzaC1pby1nZW5lcmljLmMgfCAgNiAr
+LS0tLS0NCj4gIG1lc2gvbWVzaC1pby5jICAgICAgICAgfCAgMiAtLQ0KPiAgbWVzaC9tZXNoLmMg
+ICAgICAgICAgICB8ICA1ICsrLS0tDQo+ICBtZXNoL21vZGVsLmMgICAgICAgICAgIHwgIDIgKy0N
+Cj4gIG1lc2gvbmV0LWtleXMuYyAgICAgICAgfCAgMyArLS0NCj4gIG1lc2gvbmV0LWtleXMuaCAg
+ICAgICAgfCAgMiArLQ0KPiAgbWVzaC9uZXQuYyAgICAgICAgICAgICB8IDExICsrLS0tLS0tLS0t
+DQo+ICBtZXNoL25ldC5oICAgICAgICAgICAgIHwgIDIgKy0NCj4gIG1lc2gvbm9kZS5jICAgICAg
+ICAgICAgfCAgNiArKy0tLS0NCj4gIG1lc2gvbm9kZS5oICAgICAgICAgICAgfCAgMiArLQ0KPiAg
+bWVzaC9wYi1hZHYuYyAgICAgICAgICB8IDE4ICstLS0tLS0tLS0tLS0tLS0tLQ0KPiAgbWVzaC9w
+cm92LWFjY2VwdG9yLmMgICB8IDE4ICsrLS0tLS0tLS0tLS0tLS0tLQ0KPiAgbWVzaC9wcm92LWlu
+aXRpYXRvci5jICB8IDE4ICsrLS0tLS0tLS0tLS0tLS0tLQ0KPiAgbWVzaC9zdG9yYWdlLmMgICAg
+ICAgICB8IDEzICsrKy0tLS0tLS0tLS0NCj4gIG1lc2gvc3RvcmFnZS5oICAgICAgICAgfCAgMiAr
+LQ0KPiAgbWVzaC91dGlsLmMgICAgICAgICAgICB8ICA2ICstLS0tLQ0KPiAgMjkgZmlsZXMgY2hh
+bmdlZCwgMzMgaW5zZXJ0aW9ucygrKSwgMTQ0IGRlbGV0aW9ucygtKQ0KPiA=
