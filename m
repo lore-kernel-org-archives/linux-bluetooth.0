@@ -2,394 +2,114 @@ Return-Path: <SRS0=xYxd=TV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6A4C04AAF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 17:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0510C04AAF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 19:46:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1D53217D8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 17:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3CAD21479
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 19:46:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fw5gIjLJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728309AbfEURBt (ORCPT
+        id S1727440AbfEUTqD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 May 2019 13:01:49 -0400
-Received: from mga03.intel.com ([134.134.136.65]:15125 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728271AbfEURBt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 May 2019 13:01:49 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 May 2019 10:01:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,495,1549958400"; 
-   d="scan'208";a="174083557"
-Received: from bgix-dell-lap.sea.intel.com ([10.255.78.4])
-  by fmsmga002.fm.intel.com with ESMTP; 21 May 2019 10:01:45 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ] mesh: Add App and Net Key Refresh keyring back-end
-Date:   Tue, 21 May 2019 10:01:35 -0700
-Message-Id: <20190521170135.32057-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.14.5
+        Tue, 21 May 2019 15:46:03 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33261 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727275AbfEUTqD (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 21 May 2019 15:46:03 -0400
+Received: by mail-pl1-f194.google.com with SMTP id g21so854037plq.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2019 12:46:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=lyXh2Bb2d9vjZwPG8os8xjTMOsIMYKTtLXK80D2Apf0=;
+        b=fw5gIjLJvlJAYHrD854Ke0JnpyHVVy0N7xYc+nEjGEzsrBwkCNj0Lb+R9q8ifyazXp
+         ItsR12w7AYH+xnlejHn1aQKMTvP87aY4g1ti6nafELgXkX5sFecNO14vrpyi5b0htUrV
+         fOxfYHpf9MLWky9BOxyMVZ92S1I3xE91lCt7A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=lyXh2Bb2d9vjZwPG8os8xjTMOsIMYKTtLXK80D2Apf0=;
+        b=qTvZkMBQSbR9qBevLkJ3SIe8B8lEt4mJ2g6PCO/j62hXHDExJwGBuDIAoRAVVgfnjj
+         l916/PK3e/JsSWG0x2418d4QU9JpxIZJdnstFe7bw2ASi/AlfrxD/Hzy7ldqwhzKkF+/
+         cCEjPMU+TiybQ+JpVMbKLgTq3LUJG6VX4lSRHdameCDYlGCzdYiEE5tffa23tpwYstV+
+         u+m/kpJXw3ZIM9yjSQzNDtynj4RXiqrPcntQ6Pvkap6rMTYAGOoZKWu2QDgTysn9h668
+         AyPtGrXE8D4az8z81on2ClyRmE7TbTPQ47hsSQbfNbBlc5eFfguUOTnFegvbyDAkjMV5
+         uDmQ==
+X-Gm-Message-State: APjAAAUrAyNPDEWgGzmB83E8hPb74cU/6gv7XgOtg0U9dJxNdd/Ndz4p
+        dnLF65aBpOm+BFwUu3T0+lQYHg==
+X-Google-Smtp-Source: APXvYqyStfrCj0r842nGnfm4OalgeT8c2Jdohtw5CB3fLZ1V3cwsjW4Nv7mqrX+HMliweGfKciYahQ==
+X-Received: by 2002:a17:902:8f8d:: with SMTP id z13mr17922307plo.166.1558467962156;
+        Tue, 21 May 2019 12:46:02 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id u11sm23604007pfh.130.2019.05.21.12.46.01
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 21 May 2019 12:46:01 -0700 (PDT)
+Date:   Tue, 21 May 2019 12:46:00 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: Re: [PATCH v3 2/2] Bluetooth: hci_qca: wcn3990: Drop baudrate change
+ vendor event
+Message-ID: <20190521194600.GI40515@google.com>
+References: <20190429232131.183049-1-mka@chromium.org>
+ <20190429232131.183049-2-mka@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190429232131.183049-2-mka@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fill in skeleton App Key and Net Key KeyRing methods that are affected
-by the Key Refresh Procedure.
----
- doc/mesh-api.txt |   2 +
- mesh/manager.c   | 198 ++++++++++++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 170 insertions(+), 30 deletions(-)
+On Mon, Apr 29, 2019 at 04:21:31PM -0700, Matthias Kaehlcke wrote:
+> Firmware download to the WCN3990 often fails with a 'TLV response size
+> mismatch' error:
+> 
+> [  133.064659] Bluetooth: hci0: setting up wcn3990
+> [  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
+> [  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+> [  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
+> [  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
+> 
+> This is caused by a vendor event that corresponds to an earlier command
+> to change the baudrate. The event is not processed in the context of the
+> baudrate change and is later interpreted as response to the firmware
+> download command (which is also a vendor command), but the driver detects
+> that the event doesn't have the expected amount of associated data.
+> 
+> More details:
+> 
+> For the WCN3990 the vendor command for a baudrate change isn't sent as
+> synchronous HCI command, because the controller sends the corresponding
+> vendor event with the new baudrate. The event is received and decoded
+> after the baudrate change of the host port.
+> 
+> Identify the 'unused' event when it is received and don't add it to
+> the queue of RX frames.
+> 
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 112990a5d..9644553e8 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -434,6 +434,7 @@ Methods:
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.DoesNotExist
-+			org.bluez.mesh.Error.Busy
- 
- 	void DeleteSubnet(uint16 net_index)
- 
-@@ -527,6 +528,7 @@ Methods:
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
- 			org.bluez.mesh.Error.DoesNotExist
-+			org.bluez.mesh.Error.Busy
- 
- 	void DeleteAppKey(uint16 app_index)
- 
-diff --git a/mesh/manager.c b/mesh/manager.c
-index d990ceec2..8ef32d735 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -24,9 +24,12 @@
- #define _GNU_SOURCE
- #include <ell/ell.h>
- 
-+#include "mesh/mesh-defs.h"
- #include "mesh/dbus.h"
- #include "mesh/error.h"
- #include "mesh/mesh.h"
-+#include "mesh/node.h"
-+#include "mesh/keyring.h"
- #include "mesh/manager.h"
- 
- static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
-@@ -86,51 +89,110 @@ static struct l_dbus_message *cancel_scan_call(struct l_dbus *dbus,
- 	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
- }
- 
-+static struct l_dbus_message *store_new_subnet(struct mesh_node *node,
-+					struct l_dbus_message *msg,
-+					uint16_t net_idx, uint8_t *new_key)
-+{
-+	struct keyring_net_key key;
-+
-+	if (net_idx > MAX_KEY_IDX)
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (keyring_get_net_key(node, net_idx, &key)) {
-+		/* Allow redundent calls only if they match */
-+		if (!memcmp(key.old_key, new_key, 16))
-+			return l_dbus_message_new_method_return(msg);
-+
-+		return dbus_error(msg, MESH_ERROR_ALREADY_EXISTS, NULL);
-+	}
-+
-+	memcpy(key.old_key, new_key, 16);
-+	key.net_idx = net_idx;
-+	key.phase = KEY_REFRESH_PHASE_NONE;
-+
-+	if (!keyring_put_net_key(node, net_idx, &key))
-+		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
-+}
-+
- static struct l_dbus_message *create_subnet_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
-+	uint8_t key[16];
- 	uint16_t net_idx;
- 
--	if (!l_dbus_message_get_arguments(msg, "q", &net_idx))
-+	if (!l_dbus_message_get_arguments(msg, "q", &net_idx) || !net_idx)
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	/* Generate key and submit */
-+	l_getrandom(key, sizeof(key));
-+
-+	return store_new_subnet(node, msg, net_idx, key);
- }
- 
- static struct l_dbus_message *update_subnet_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
-+	struct keyring_net_key key;
- 	uint16_t net_idx;
- 
--	if (!l_dbus_message_get_arguments(msg, "q", &net_idx))
-+	if (!l_dbus_message_get_arguments(msg, "q", &net_idx) ||
-+						net_idx > MAX_KEY_IDX)
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	if (!keyring_get_net_key(node, net_idx, &key))
-+		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
-+
-+	switch (key.phase) {
-+	case KEY_REFRESH_PHASE_NONE:
-+		/* Generate Key and update phase */
-+		l_getrandom(key.new_key, sizeof(key.new_key));
-+		key.phase = KEY_REFRESH_PHASE_ONE;
-+		if (!keyring_put_net_key(node, net_idx, &key))
-+			return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+		/* Fall Through */
-+
-+	case KEY_REFRESH_PHASE_ONE:
-+		/* Allow redundent calls to start Key Refresh */
-+		return l_dbus_message_new_method_return(msg);
-+
-+	default:
-+		break;
-+	}
-+
-+	/* All other phases mean KR already in progress over-the-air */
-+	return dbus_error(msg, MESH_ERROR_BUSY, "KR in progress");
- }
- 
- static struct l_dbus_message *delete_subnet_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
- 	uint16_t net_idx;
- 
--	if (!l_dbus_message_get_arguments(msg, "q", &net_idx))
-+	if (!l_dbus_message_get_arguments(msg, "q", &net_idx) ||
-+						net_idx > MAX_KEY_IDX)
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	keyring_del_net_key(node, net_idx);
-+
-+	return l_dbus_message_new_method_return(msg);
- }
- 
- static struct l_dbus_message *import_subnet_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	uint16_t net_idx;
-+	struct mesh_node *node = user_data;
- 	struct l_dbus_message_iter iter_key;
-+	uint16_t net_idx;
- 	uint8_t *key;
- 	uint32_t n;
- 
-@@ -142,55 +204,116 @@ static struct l_dbus_message *import_subnet_call(struct l_dbus *dbus,
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
- 							"Bad network key");
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	return store_new_subnet(node, msg, net_idx, key);
-+}
-+
-+static struct l_dbus_message *store_new_appkey(struct mesh_node *node,
-+					struct l_dbus_message *msg,
-+					uint16_t net_idx, uint16_t app_idx,
-+					uint8_t *new_key)
-+{
-+	struct keyring_net_key net_key;
-+	struct keyring_app_key app_key;
-+
-+	if (net_idx > MAX_KEY_IDX || app_idx > MAX_KEY_IDX)
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (!keyring_get_net_key(node, net_idx, &net_key))
-+		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
-+
-+	if (keyring_get_app_key(node, app_idx, &app_key)) {
-+		/* Allow redundent calls with identical data */
-+		if (!memcmp(app_key.old_key, new_key, 16) &&
-+						app_key.net_idx == net_idx)
-+			return l_dbus_message_new_method_return(msg);
-+
-+		return dbus_error(msg, MESH_ERROR_ALREADY_EXISTS, NULL);
-+	}
-+
-+	memcpy(app_key.old_key, new_key, 16);
-+	app_key.net_idx = net_idx;
-+	app_key.app_idx = app_idx;
-+
-+	if (!keyring_put_app_key(node, app_idx, net_idx, &app_key))
-+		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
- }
- 
- static struct l_dbus_message *create_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
- 	uint16_t net_idx, app_idx;
-+	uint8_t key[16];
- 
- 	if (!l_dbus_message_get_arguments(msg, "qq", &net_idx, &app_idx))
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	l_getrandom(key, sizeof(key));
-+
-+	return store_new_appkey(node, msg, net_idx, app_idx, key);
- }
- 
- static struct l_dbus_message *update_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	uint16_t net_idx, app_idx;
-+	struct mesh_node *node = user_data;
-+	struct keyring_net_key net_key;
-+	struct keyring_app_key app_key;
-+	uint16_t app_idx;
- 
--	if (!l_dbus_message_get_arguments(msg, "qq", &net_idx, &app_idx))
-+	if (!l_dbus_message_get_arguments(msg, "q", &app_idx) ||
-+						app_idx > MAX_KEY_IDX)
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	if (!keyring_get_app_key(node, app_idx, &app_key) ||
-+			!keyring_get_net_key(node, app_key.net_idx, &net_key))
-+		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
-+
-+	switch (net_key.phase) {
-+	case KEY_REFRESH_PHASE_NONE:
-+	case KEY_REFRESH_PHASE_ONE:
-+		/* Generate Key if in acceptable phase */
-+		l_getrandom(app_key.new_key, sizeof(app_key.new_key));
-+		if (!keyring_put_app_key(node, app_idx, app_key.net_idx,
-+								&app_key))
-+			return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+		return l_dbus_message_new_method_return(msg);
-+
-+	default:
-+		break;
-+	}
-+
-+	/* Don't allow Updates from invalid phase */
-+	return dbus_error(msg, MESH_ERROR_BUSY, "KR in progress");
- }
- 
- static struct l_dbus_message *delete_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	uint16_t net_idx, app_idx;
-+	struct mesh_node *node = user_data;
-+	uint16_t app_idx;
- 
--	if (!l_dbus_message_get_arguments(msg, "qq", &net_idx, &app_idx))
-+	if (!l_dbus_message_get_arguments(msg, "q", &app_idx))
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	keyring_del_app_key(node, app_idx);
-+
-+	return l_dbus_message_new_method_return(msg);
- }
- 
- static struct l_dbus_message *import_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	uint16_t net_idx, app_idx;
-+	struct mesh_node *node = user_data;
- 	struct l_dbus_message_iter iter_key;
-+	uint16_t net_idx, app_idx;
- 	uint8_t *key;
- 	uint32_t n;
- 
-@@ -203,22 +326,37 @@ static struct l_dbus_message *import_appkey_call(struct l_dbus *dbus,
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
- 							"Bad application key");
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	return store_new_appkey(node, msg, net_idx, app_idx, key);
- }
- 
- static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
-+	struct keyring_net_key key;
- 	uint16_t net_idx;
- 	uint8_t phase;
- 
--	if (!l_dbus_message_get_arguments(msg, "qy", &net_idx, &phase))
-+	if (!l_dbus_message_get_arguments(msg, "qy", &net_idx, &phase) ||
-+					phase == KEY_REFRESH_PHASE_ONE ||
-+					phase > KEY_REFRESH_PHASE_THREE)
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	if (!keyring_get_net_key(node, net_idx, &key))
-+		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
-+
-+	if (phase == KEY_REFRESH_PHASE_THREE &&
-+					key.phase != KEY_REFRESH_PHASE_NONE) {
-+		memcpy(key.old_key, key.new_key, 16);
-+		key.phase = KEY_REFRESH_PHASE_NONE;
-+	} else
-+		key.phase = phase;
-+
-+	if (!keyring_put_net_key(node, net_idx, &key))
-+		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
- }
- 
- static void setup_management_interface(struct l_dbus_interface *iface)
-@@ -242,9 +380,9 @@ static void setup_management_interface(struct l_dbus_interface *iface)
- 	l_dbus_interface_method(iface, "CreateAppKey", 0, create_appkey_call,
- 					"", "qq", "", "net_index", "app_index");
- 	l_dbus_interface_method(iface, "UpdateAppKey", 0, update_appkey_call,
--					"", "qq", "", "net_index", "app_index");
-+					"", "q", "", "app_index");
- 	l_dbus_interface_method(iface, "DeleteAppKey", 0, delete_appkey_call,
--					"", "qq", "", "net_index", "app_index");
-+					"", "q", "", "app_index");
- 	l_dbus_interface_method(iface, "ImportAppKey", 0, import_appkey_call,
- 				"", "qqay", "", "net_index", "app_index",
- 								"app_key");
--- 
-2.14.5
+Harish Bandi <c-hbandi@codeaurora.org> privately reported to me that
+he sees frame reassembly errors with this patch and WCN3998. He
+didn't provide any more details yet, so at this point we only know
+that there appears to be some difference between WCN3990 and WCN3998
+wrt firmware download.
 
+For now let's limit this fix to WCN3990. We can revisit WCN3998 later
+if it is confirmed that it has the same problem.
