@@ -6,30 +6,30 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA3D1C072B5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 20:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820E3C072B5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 20:47:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C812217D7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 20:45:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D446217D7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 20:47:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727319AbfEUUpv convert rfc822-to-8bit (ORCPT
+        id S1727428AbfEUUrj convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 May 2019 16:45:51 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41390 "EHLO
+        Tue, 21 May 2019 16:47:39 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41596 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726766AbfEUUpv (ORCPT
+        by vger.kernel.org with ESMTP id S1727222AbfEUUri (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 May 2019 16:45:51 -0400
+        Tue, 21 May 2019 16:47:38 -0400
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 0FD4828B06
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2019 20:45:50 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 338B228B08
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2019 20:47:38 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id F2B8028B10; Tue, 21 May 2019 20:45:49 +0000 (UTC)
+        id 27ADB28B09; Tue, 21 May 2019 20:47:38 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 203643] [REGRESSION][BISECTED] Sixaxis gamepad no longer
  connects via Bluetooth
-Date:   Tue, 21 May 2019 20:45:49 +0000
+Date:   Tue, 21 May 2019 20:47:37 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -44,8 +44,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-203643-62941-jt7cGN5kTs@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-203643-62941-RpEznnvImm@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-203643-62941@https.bugzilla.kernel.org/>
 References: <bug-203643-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -61,31 +61,10 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=203643
 
-Fabrice Bellet (fabrice@bellet.info) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |fabrice@bellet.info
-
---- Comment #4 from Fabrice Bellet (fabrice@bellet.info) ---
-I confirm the bug related to this commit, and to its backported version in
-5.0.15. My device is a Sony DR-BT21G headset. 
-
-With this commit, the hcidump reports this error message:
-
-> ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 3 scid 0x0041
- < ACL data: handle 256 flags 0x00 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0041 result 3 status 0
-      Connection refused - security block
-
-Without it, the hcidump reports a successful connection:
-
- > ACL data: handle 256 flags 0x02 dlen 12
-     L2CAP(s): Connect req: psm 3 scid 0x0041
- < ACL data: handle 256 flags 0x00 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0041 result 0 status 0
-      Connection successful
+--- Comment #5 from Fabrice Bellet (fabrice@bellet.info) ---
+Created attachment 282895
+  --> https://bugzilla.kernel.org/attachment.cgi?id=282895&action=edit
+hcidump of a failed connection
 
 -- 
 You are receiving this mail because:
