@@ -1,34 +1,54 @@
-Return-Path: <SRS0=asem=TU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=xYxd=TV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=0.1 required=3.0 tests=DATE_IN_PAST_03_06,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.3 required=3.0 tests=ADVANCE_FEE_4_NEW,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC7CC04AAC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 May 2019 18:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68666C04AAC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 00:41:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9309D214DA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 May 2019 18:32:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F6382173E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 00:41:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=prvtceo.com header.i=@prvtceo.com header.b="ow/ERziZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726222AbfETScd (ORCPT
+        id S1726913AbfEUAle (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 May 2019 14:32:33 -0400
-Received: from westpalmbeachmassagegroup.com ([45.35.221.60]:54703 "EHLO
-        wolfgangdigital.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726207AbfETScc (ORCPT
+        Mon, 20 May 2019 20:41:34 -0400
+Received: from tbjjbihbhfbge.turbo-smtp.net ([199.187.175.164]:52092 "EHLO
+        tbjjbihbhfbge.turbo-smtp.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726586AbfEUAle (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 May 2019 14:32:32 -0400
-To:     linux-bluetooth@vger.kernel.org
-Subject: Print your logo
-Message-ID: <9a9432a4179b8dfcd12d6e64f0c017e1@esquire.com>
-Date:   Mon, 20 May 2019 17:02:20 +0200
-From:   "Heather" <heather@usblogo.space>
-Reply-To: flashdrive@aliyun.com
+        Mon, 20 May 2019 20:41:34 -0400
+X-Greylist: delayed 400 seconds by postgrey-1.27 at vger.kernel.org; Mon, 20 May 2019 20:41:34 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=prvtceo.com; s=turbo-smtp; x=1559004094; h=DomainKey-Signature:
+        Received:Received:From:To:Reply-To:Date:Subject:MIME-Version:
+        Content-Type:Content-Transfer-Encoding:Message-ID; bh=yaFByruOHl
+        6XCemn3h4Q3qflYZzccIYjAI7dmiSV3y8=; b=ow/ERziZYrK3xcCYoxPyU1AlLu
+        6NVzNoguDfnYdZKpgPy6mZbEDwjRJQYZQ+Re1P38LCcKFgUcP0pYI9pUUpF2xZOq
+        gU0+xhavm4/mnItgpVRIB/uyraAhwOCFCNf1/NRsmE/bnGUn4CCDaIvfiEDQlA0o
+        9qsDvnQUX/BDn7nx0=
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws;
+        s=turbo-smtp; d=prvtceo.com;
+        h=Received:Received:X-TurboSMTP-Tracking:From:To:Reply-To:Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-ID;
+        b=J5DvXd72Bj9Aohj5qslx+w0s9d5+vgBjB5y76aeUhKCUL02eNwZOEcEYvoH68y
+        NwrJ3VIU9Tu8kfgniYlFbAQUzPsJo2uYyXPuN44s5lFq5zPal3LMZucJ5/b0T5cj
+        hh8lLx0pt47PspXW9Y5p6Jyi15gypgKVH7nq+XB0Wnw+s=;
+Received: (qmail 33962 invoked from network); 21 May 2019 00:34:54 -0000
+Received: from ?UNAVAILABLE? (HELO WINCGRMJ0DM0ON) (authenticated@202.229.120.134)  by turbo-smtp.com with SMTP; 21 May 2019 00:34:54 -0000
+X-TurboSMTP-Tracking: 5044516154
+From:   "=?utf-8?Q?Dave=20Lin?=" <dave@prvtceo.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-To: dav@royalptb.com
+Date:   Mon, 20 May 2019 17:34:39 -0700
+Subject: =?utf-8?Q?Mutual=20Benefit?=
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Message-ID: <WINCGRMJ0DM0ONee9c52e4790c45bf994babdcfb6d35ca@WINCGRMJ0DM0ON>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -36,36 +56,14 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-I didn’t know if you had received my email from last week?
+I am contacting you with regards to using your last name for funds claim of=
+ long dormant funds belonging to a late depositor . Let me know if you are =
+interested for more details .=0D
+=0D
+ Best Regards
 
-We manufacture ALL custom LOGO and branded products – over 300,000 to
-choose from.
+=0D
+=0D
+David Lin
 
-The most asked about product that we make, is the custom printed USB flash
-drives!
-We can print your logo on them and load your digital images, videos and
-files!
-
-Here is what we include:
--Any size memory you need: 64MB up to 128GB
--We will print your logo on both sides, just ask!
--Very Low Order Minimums
--Need them quickly?  Not a problem, we offer Rush Service
-
-Email over a copy of your logo and we will create a design mock up for you
-at no cost!
-
-Our higher memory sizes are a really good option right now!
-
-Pricing is low right now, so let us know what you need and we will get you
-a quick quote.
-
-We always offer great rates for schools and nonprofits as well.
-
-Let us know what you would like quoted?
-
-Regards,
-
-Heather Millons
-Custom USB Account Manager
 
