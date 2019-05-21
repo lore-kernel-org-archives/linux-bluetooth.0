@@ -2,76 +2,92 @@ Return-Path: <SRS0=xYxd=TV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D19D7C04AAF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 12:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D3B1C04AAF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 13:51:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B8BA20862
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 12:53:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3uEbQQQ"
+	by mail.kernel.org (Postfix) with ESMTP id EE9B521019
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 May 2019 13:51:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727251AbfEUMxD (ORCPT
+        id S1728490AbfEUNvm convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 May 2019 08:53:03 -0400
-Received: from mail-it1-f170.google.com ([209.85.166.170]:34996 "EHLO
-        mail-it1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726344AbfEUMxD (ORCPT
+        Tue, 21 May 2019 09:51:42 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:35720 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728045AbfEUNvl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 May 2019 08:53:03 -0400
-Received: by mail-it1-f170.google.com with SMTP id u186so4504962ith.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2019 05:53:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=zWHQ32VI1Y2R+luv2fNTT89KWnLaiAHxjRtX2t4MpbI=;
-        b=B3uEbQQQ1DfhSwuf48asgHGGxQilFcacWxQRBSCY0t+ggO2+l+ktHEnFLYeieK+Ip6
-         YtVxZjqN6WDDLlu3pT+erlr8jtVGFkGQ1XGOFo0tv2j9oQgbv8pHlkkJ6U5T63IYM3Po
-         J4JNmykZdYMyfHkuQfvCWDGrJeYzCgmGx9ccRvrKVogEcFwPgtbsqt7siY4NssgjWzME
-         67+FJ3BxJsnN9XZ+1fWbkGxdICk1a6MDV5RRwMWZcDi4j5Zr2BKmWB/pDx3iGf0C/+dS
-         aOfI835jyiPndeG2AlkqSgsptgygfiygQlJbvz7ltava8RfGfmlc5B/LbCmVjgA2JiaB
-         jwNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=zWHQ32VI1Y2R+luv2fNTT89KWnLaiAHxjRtX2t4MpbI=;
-        b=Mfv0hTMQU1FynsHADvi8P1LbJA2kkB4EcEf19X21l7NlnNa0kl7FgVBgwxRDTP6zna
-         8XWLrGq7qZpp94xK2jj9wm8zhwQHrvDRM18zd1k/9Vb/9oJTLoPmUxYeW3Mwtgu53VTt
-         7F38ddZatFENGI8NTT+5zRC/vo/zySndoHYA8LsvQAFqa5KIZZE9sp7ASrhlAupqYh/1
-         QIS4lrUIP0B8xKcaswBKquEpG2OuP0T+TJCMuMG1iX1mA3Y/CAxgFKA1DAxiSprkpbPa
-         gCE7n303jB1wrGn7zDUY7ojKq7ch1qSVgFDAIUz6aFz+5j/Z0r7IY8fRlQegcKAgH88n
-         JtEg==
-X-Gm-Message-State: APjAAAWXum8YXQOMghCSnm/5WYwMTCDdd/T/LnAjzphWWztegK3DV/b1
-        ZkI7Hz4it4PtnuD7oMMz3OTVsILci//PNYWLZ4z2UcBJDLQ=
-X-Google-Smtp-Source: APXvYqxMVgkGPIYWySRoKGzCX3Ocho1bG17ZNth7npGCShqs8GMDawl3ZKCrN62HMr19NkZlB7znnZYeYjaAfWdEPiY=
-X-Received: by 2002:a24:3a50:: with SMTP id m77mr3720898itm.110.1558443182115;
- Tue, 21 May 2019 05:53:02 -0700 (PDT)
-MIME-Version: 1.0
-From:   Roland Vet <vet.roland@gmail.com>
-Date:   Tue, 21 May 2019 14:52:51 +0200
-Message-ID: <CAJURbm_RGyMgYCAyzfpQ76q9YwsOjcOtM7PtZykWegaftb28DQ@mail.gmail.com>
-Subject: Bluez does not recognise AAC codec for AKG Y500
+        Tue, 21 May 2019 09:51:41 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id DEA7028A3F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2019 13:51:40 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id D31A228A2D; Tue, 21 May 2019 13:51:40 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 203661] New: Connection to bluetooth mouse lost after
+ idle/reboot
+Date:   Tue, 21 May 2019 13:51:38 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: mnl@mnl.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-203661-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=203661
 
-I was told it was best to report this here. I'm having issues using
-the AAC codec and using `avinfo' bluez does not seem to recognise any
-audio sink codec except SBC for my AKG Y500.
+            Bug ID: 203661
+           Summary: Connection to bluetooth mouse lost after idle/reboot
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.0.16
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: mnl@mnl.de
+        Regression: No
 
-More info:
-https://github.com/EHfive/pulseaudio-modules-bt/issues/57#issuecomment-493776263
+After upgrading to kernel 5.0.16 (Fedora29) the connection to my bluetooth
+mouse (M555b) is lost after idle or reboot. I have to reconnect the device.
 
-Don't know what else to report, hope this is enough to be useful. If
-there are any other useful logs to report please let me know.
+In the journal, I find that the device was removed.
 
-Greetings.
+If I don't reconnect, bluetoothctl constantly reports "connection on",
+"connection off", "connection on", connection off"...
+
+(Though not the smae, there seem to be more problems with bluetooth in 5.0.16
+https://www.reddit.com/r/Fedora/comments/bp6ddq/my_bluetooth_isnt_working_in_kernel_5016/)
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
