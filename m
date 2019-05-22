@@ -2,99 +2,97 @@ Return-Path: <SRS0=CsNs=TW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE33C282CE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B823EC282CE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:42:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE1E520868
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AA3820856
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:42:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558554171;
+	bh=9gu/ehZ6l8f0SZ+JITBMqr2JTBHP/QbQzVgj0ArK6VU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=2Mb8ayUj4NdlCKopzSnt4XQSVnCFJrzshxmHkXNJrKi0V9Wc+fbmvm6l2XAZ16AJL
+	 SasCe2efHn9d4T06xvEGCyNO0ZbLHLALuNQzYVGnZKSkt4fC2vWyl9iAQR6TZOCXjO
+	 +2WHx9kt5RFeWKrdGrp99Y9vD35mkSg77/szmJJw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729700AbfEVTLs convert rfc822-to-8bit (ORCPT
+        id S1732699AbfEVTmt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 May 2019 15:11:48 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:52278 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729555AbfEVTLs (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 May 2019 15:11:48 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5806F201CB
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2019 19:11:47 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 5652420408; Wed, 22 May 2019 19:11:47 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 203643] [REGRESSION][BISECTED] Sixaxis gamepad no longer
- connects via Bluetooth
-Date:   Wed, 22 May 2019 19:11:46 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: irherder@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-203643-62941-1hBEfs3owA@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203643-62941@https.bugzilla.kernel.org/>
-References: <bug-203643-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 22 May 2019 15:42:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51314 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732254AbfEVT2g (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 May 2019 15:28:36 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 841DF204FD;
+        Wed, 22 May 2019 19:28:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558553316;
+        bh=9gu/ehZ6l8f0SZ+JITBMqr2JTBHP/QbQzVgj0ArK6VU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=pf+9DVJRsDjODhezZpISX61jFRnKKF5RMYBs8Lu3dw40X8tkX6QW8Q3dIrYi28Ad9
+         i/3A4ZjLd8mXQbIiUJl0A1FGy1aiRRQkni7/Rx8Qd0SnQ90+aheoDWSaONEPStUE8w
+         IfPZR2j0U06IP/448QAKbVm73UAvIcykTN5yTRIA=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Claire Chang <tientzu@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sasha Levin <sashal@kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 079/244] Bluetooth: hci_qca: Give enough time to ROME controller to bootup.
+Date:   Wed, 22 May 2019 15:23:45 -0400
+Message-Id: <20190522192630.24917-79-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190522192630.24917-1-sashal@kernel.org>
+References: <20190522192630.24917-1-sashal@kernel.org>
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203643
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-Andriy Perevortkin (irherder@gmail.com) changed:
+[ Upstream commit 7f09d5a6c33be66a5ca19bf9dd1c2d90c5dfcf0d ]
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |irherder@gmail.com
+This patch enables enough time to ROME controller to bootup
+after we bring the enable pin out of reset.
 
---- Comment #10 from Andriy Perevortkin (irherder@gmail.com) ---
-Sadly the RFC patch above does not fix it for me, the revert does
-The device is edifier w330nb headset.
+Fixes: 05ba533c5c11 ("Bluetooth: hci_qca: Add serdev support").
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Rocky Liao <rjliao@codeaurora.org>
+Tested-by: Rocky Liao <rjliao@codeaurora.org>
+Tested-by: Claire Chang <tientzu@chromium.org>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/hci_qca.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-hcidump fragment of failed connection:
-
-> HCI Event: Link Key Request (0x17) plen 6
-    bdaddr 5C:C6:E9:11:B1:20
-< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
-    bdaddr 5C:C6:E9:11:B1:20 key 9290EB1424E3A352C43F17C8499A3670
-> HCI Event: Command Complete (0x0e) plen 10
-    Link Key Request Reply (0x01|0x000b) ncmd 1
-    status 0x00 bdaddr 5C:C6:E9:11:B1:20
-> HCI Event: Encrypt Change (0x08) plen 4
-    status 0x00 handle 256 encrypt 0x01
-< HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2
-> ACL data: handle 256 flags 0x02 dlen 12
-    L2CAP(s): Connect req: psm 25 scid 0x0580
-< ACL data: handle 256 flags 0x00 dlen 16
-    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0580 result 3 status 0
-      Connection refused - security block
-> HCI Event: Command Complete (0x0e) plen 7
-    Read Encryption Key Size (0x05|0x0008) ncmd 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 256 packets 1
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 256 reason 0x13
-    Reason: Remote User Terminated Connection
-
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index f0d593c3fa728..77004c29da089 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -504,6 +504,8 @@ static int qca_open(struct hci_uart *hu)
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->btsoc_type != QCA_WCN3990) {
+ 			gpiod_set_value_cansleep(qcadev->bt_en, 1);
++			/* Controller needs time to bootup. */
++			msleep(150);
+ 		} else {
+ 			hu->init_speed = qcadev->init_speed;
+ 			hu->oper_speed = qcadev->oper_speed;
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.20.1
+
