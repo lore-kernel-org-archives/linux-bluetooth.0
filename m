@@ -2,97 +2,114 @@ Return-Path: <SRS0=CsNs=TW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.1 required=3.0 tests=DATE_IN_PAST_06_12,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B823EC282CE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA719C282CE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:49:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AA3820856
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:42:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558554171;
-	bh=9gu/ehZ6l8f0SZ+JITBMqr2JTBHP/QbQzVgj0ArK6VU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2Mb8ayUj4NdlCKopzSnt4XQSVnCFJrzshxmHkXNJrKi0V9Wc+fbmvm6l2XAZ16AJL
-	 SasCe2efHn9d4T06xvEGCyNO0ZbLHLALuNQzYVGnZKSkt4fC2vWyl9iAQR6TZOCXjO
-	 +2WHx9kt5RFeWKrdGrp99Y9vD35mkSg77/szmJJw=
+	by mail.kernel.org (Postfix) with ESMTP id C428820862
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:49:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732699AbfEVTmt (ORCPT
+        id S1732416AbfEVTtK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 May 2019 15:42:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51314 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732254AbfEVT2g (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 May 2019 15:28:36 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 841DF204FD;
-        Wed, 22 May 2019 19:28:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558553316;
-        bh=9gu/ehZ6l8f0SZ+JITBMqr2JTBHP/QbQzVgj0ArK6VU=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pf+9DVJRsDjODhezZpISX61jFRnKKF5RMYBs8Lu3dw40X8tkX6QW8Q3dIrYi28Ad9
-         i/3A4ZjLd8mXQbIiUJl0A1FGy1aiRRQkni7/Rx8Qd0SnQ90+aheoDWSaONEPStUE8w
-         IfPZR2j0U06IP/448QAKbVm73UAvIcykTN5yTRIA=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Claire Chang <tientzu@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 079/244] Bluetooth: hci_qca: Give enough time to ROME controller to bootup.
-Date:   Wed, 22 May 2019 15:23:45 -0400
-Message-Id: <20190522192630.24917-79-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190522192630.24917-1-sashal@kernel.org>
-References: <20190522192630.24917-1-sashal@kernel.org>
+        Wed, 22 May 2019 15:49:10 -0400
+Received: from 107-174-234-49-host.colocrossing.com ([107.174.234.49]:55392
+        "EHLO venetian.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731090AbfEVTtJ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 May 2019 15:49:09 -0400
+X-Greylist: delayed 19808 seconds by postgrey-1.27 at vger.kernel.org; Wed, 22 May 2019 15:49:06 EDT
+To:     linux-bluetooth@vger.kernel.org
+Subject: Use logo on USB drive
+Message-ID: <d9f7ff204353aa8d492a8eb9c49dd3c3@walgreens.com>
+Date:   Wed, 22 May 2019 12:48:07 +0200
+From:   "David" <david@usbcustom.site>
+Reply-To: jensanke@aliyun.com
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+Content-Type: text/plain; format=flowed; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Hi,
 
-[ Upstream commit 7f09d5a6c33be66a5ca19bf9dd1c2d90c5dfcf0d ]
+Not sure if you received my last email?
 
-This patch enables enough time to ROME controller to bootup
-after we bring the enable pin out of reset.
+Are you interested in purchasing your LOGO promotional and marketing
+products for your company?
+We produce USB Drives with your Logo Printed or artwork printed to be used
+for gifts or marketing.
+Here is more info from our website:
 
-Fixes: 05ba533c5c11 ("Bluetooth: hci_qca: Add serdev support").
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Rocky Liao <rjliao@codeaurora.org>
-Tested-by: Rocky Liao <rjliao@codeaurora.org>
-Tested-by: Claire Chang <tientzu@chromium.org>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/bluetooth/hci_qca.c | 2 ++
- 1 file changed, 2 insertions(+)
+We can pre-load your media files, images, presentations and files onto the
+drives for you.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f0d593c3fa728..77004c29da089 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -504,6 +504,8 @@ static int qca_open(struct hci_uart *hu)
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
- 		if (qcadev->btsoc_type != QCA_WCN3990) {
- 			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-+			/* Controller needs time to bootup. */
-+			msleep(150);
- 		} else {
- 			hu->init_speed = qcadev->init_speed;
- 			hu->oper_speed = qcadev->oper_speed;
--- 
-2.20.1
+Some reasons to get the USB drives from us:
+We make Custom Shaped USB drives in the shape of your logo, product or
+anything you like.
+Our USB drives are Eco-friendly
+We supply USB drives to Fortune 100 companies.
+We have over 150 styles and colors to choose from.
+People will keep the USB drive you give them and show it to others
+increasing your marketing value
+
+Please click
+to see all of our stock models and get a quote.
+
+If you are nonprofit, have further discounts for schools and charities.
+
+Thanks,
+David
+USB Drive Specialist
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+http://walgreens.com/mail/link.php?M=29715888&N=3584&L=29&F=T
 
