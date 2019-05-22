@@ -2,161 +2,99 @@ Return-Path: <SRS0=CsNs=TW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A77C46470
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 16:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE33C282CE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:11:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 28A2020881
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 16:20:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE1E520868
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:11:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729946AbfEVQUJ (ORCPT
+        id S1729700AbfEVTLs convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 May 2019 12:20:09 -0400
-Received: from mga12.intel.com ([192.55.52.136]:54788 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728638AbfEVQUJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 May 2019 12:20:09 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 May 2019 09:20:08 -0700
-X-ExtLoop1: 1
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by fmsmga007.fm.intel.com with ESMTP; 22 May 2019 09:20:08 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.182]) by
- ORSMSX109.amr.corp.intel.com ([169.254.11.251]) with mapi id 14.03.0415.000;
- Wed, 22 May 2019 09:20:08 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ] mesh: Add App and Net Key Refresh keyring back-end
-Thread-Topic: [PATCH BlueZ] mesh: Add App and Net Key Refresh keyring
- back-end
-Thread-Index: AQHVD/bgEYgjioJrZ0O+xrFGHkWFPKZ3KOkAgACg74A=
-Date:   Wed, 22 May 2019 16:20:07 +0000
-Message-ID: <1558542005.332.15.camel@intel.com>
-References: <20190521170135.32057-1-brian.gix@intel.com>
-         <cac7634e3fae82e060728b9cfe096a31a9e86c70.camel@intel.com>
-In-Reply-To: <cac7634e3fae82e060728b9cfe096a31a9e86c70.camel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.255.78.4]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D2638AB44F949A47983A29B1A230709A@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 22 May 2019 15:11:48 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:52278 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729555AbfEVTLs (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 May 2019 15:11:48 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5806F201CB
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2019 19:11:47 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 5652420408; Wed, 22 May 2019 19:11:47 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 203643] [REGRESSION][BISECTED] Sixaxis gamepad no longer
+ connects via Bluetooth
+Date:   Wed, 22 May 2019 19:11:46 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: irherder@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-203643-62941-1hBEfs3owA@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203643-62941@https.bugzilla.kernel.org/>
+References: <bug-203643-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgSW5nYS4uLiBJIHdpbGwgY29ycmVjdCB0aGUgdmFyaW91cyBzcGVsbGluZyBpc3N1ZXMsIGFu
-ZCBwZXJoYXBzIGFsc28gc2VnbWVudCB0aGUgcGF0Y2hlcyBhcyB5b3Ugc3VnZ2VzdA0KDQpPbiBU
-dWUsIDIwMTktMDUtMjEgYXQgMjM6NDQgLTA3MDAsIFN0b3RsYW5kLCBJbmdhIHdyb3RlOg0KPiBP
-biBUdWUsIDIwMTktMDUtMjEgYXQgMTA6MDEgLTA3MDAsIEJyaWFuIEdpeCB3cm90ZToNCj4gPiAN
-Cj4gPiArCXN0cnVjdCBtZXNoX25vZGUgKm5vZGUgPSB1c2VyX2RhdGE7DQo+ID4gKwl1aW50OF90
-IGtleVsxNl07DQo+ID4gIAl1aW50MTZfdCBuZXRfaWR4Ow0KPiA+ICANCj4gPiAtCWlmICghbF9k
-YnVzX21lc3NhZ2VfZ2V0X2FyZ3VtZW50cyhtc2csICJxIiwgJm5ldF9pZHgpKQ0KPiA+ICsJaWYg
-KCFsX2RidXNfbWVzc2FnZV9nZXRfYXJndW1lbnRzKG1zZywgInEiLCAmbmV0X2lkeCkgfHwNCj4g
-PiAhbmV0X2lkeCkNCj4gDQo+IA0KPiBNYXliZSB1c2UgZXhwbGljaXQgdmFsdWUgZm9yIG5ldF9p
-ZHggY2hlY2ssIGkuZS4sIA0KPiBuZXRfaWR4ID09IE1FU0hfUFJJTUFSWV9ORVRfSU5ERVhfREVG
-QVVMVA0KPiANCj4gQ3VycmVudGx5IERFRkFVTFRfUFJJTUFSWV9ORVRfSU5ERVggaXMgZGVmaW5l
-ZCBpbiBub2RlLmMNCj4gV0Ugc2hvdWxkIG1vdmUgaXQgaW50byBtZXNoLWRlZnMuaCBhbmQgcmVu
-YW1lIGFjY29yZGluZ2x5DQoNCkkgY2FuIGRvIHRoaXMuLi4gIEFsdGhvdWdoIEkgZG9uJ3Qga25v
-dyB0aGF0IHdlIHdpbGwgZXZlciBoYXZlIGFueSBvdGhlciBOZXQgSW5kZXggZXhjZXB0IDAgZXZl
-ciBiZSBkZWZpbmVkIGJ5DQp0aGUgc3BlYyBhcyAiUHJpbWFyeSIuDQoNCj4gDQo+ID4gLQlpZiAo
-IWxfZGJ1c19tZXNzYWdlX2dldF9hcmd1bWVudHMobXNnLCAicSIsICZuZXRfaWR4KSkNCj4gPiAr
-CWlmICghbF9kYnVzX21lc3NhZ2VfZ2V0X2FyZ3VtZW50cyhtc2csICJxIiwgJm5ldF9pZHgpIHx8
-DQo+ID4gKwkJCQkJCW5ldF9pZHggPiBNQVhfS0VZX0lEWCkNCj4gPiAgCQlyZXR1cm4gZGJ1c19l
-cnJvcihtc2csIE1FU0hfRVJST1JfSU5WQUxJRF9BUkdTLCBOVUxMKTsNCj4gPiAgDQo+ID4gLQkv
-KiBUT0RPICovDQo+ID4gLQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfTk9UX0lN
-UExFTUVOVEVELCBOVUxMKTsNCj4gPiArCWlmICgha2V5cmluZ19nZXRfbmV0X2tleShub2RlLCBu
-ZXRfaWR4LCAma2V5KSkNCj4gPiArCQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1Jf
-RE9FU19OT1RfRVhJU1QsDQo+ID4gTlVMTCk7DQo+ID4gKw0KPiA+ICsJc3dpdGNoIChrZXkucGhh
-c2UpIHsNCj4gPiArCWNhc2UgS0VZX1JFRlJFU0hfUEhBU0VfTk9ORToNCj4gPiArCQkvKiBHZW5l
-cmF0ZSBLZXkgYW5kIHVwZGF0ZSBwaGFzZSAqLw0KPiA+ICsJCWxfZ2V0cmFuZG9tKGtleS5uZXdf
-a2V5LCBzaXplb2Yoa2V5Lm5ld19rZXkpKTsNCj4gPiArCQlrZXkucGhhc2UgPSBLRVlfUkVGUkVT
-SF9QSEFTRV9PTkU7DQo+IA0KPiBsaW5lIGJyZWFrPw0KPiANCj4gPiArCQlpZiAoIWtleXJpbmdf
-cHV0X25ldF9rZXkobm9kZSwgbmV0X2lkeCwgJmtleSkpDQo+ID4gKwkJCXJldHVybiBkYnVzX2Vy
-cm9yKG1zZywgTUVTSF9FUlJPUl9GQUlMRUQsDQo+ID4gTlVMTCk7DQo+IA0KPiBXb3VsZG4ndCB3
-ZSB3YW50IHRvIHJldmVydCB0aGUga2V5IHBoYXNlIGJhY2sgdG8gS0VZX1JFRlJFU0hfUEhBU0Vf
-Tk9ORQ0KPiBpbiBjYXNlIG9mIGZhaWx1cmU/DQoNCkkgZG9uJ3QgdGhpbmsgdGhpcyBpcyBuZWNj
-ZXNzYXJ5LiBUaGlzIGlzIHRoZSBvbmx5IHBsYWNlIGluIHRoZSBmdW5jdGlvbiB3aGVyZSBhICpD
-aGFuZ2UqIGlzIG1hZGUgdG8gdGhlDQpwZXJzaXN0ZW50IGRhdGEuLi4gIElmIGl0IGZhaWxzIHRo
-ZW4gaXQgZmFpbHMsIGFuZCB0aGUgb2xkIGRhdGEgd2lsbCBzdGlsbCBiZSB0aGVyZS4NCg0KDQoN
-Cj4gDQo+ID4gK3N0YXRpYyBzdHJ1Y3QgbF9kYnVzX21lc3NhZ2UgKnN0b3JlX25ld19hcHBrZXko
-c3RydWN0IG1lc2hfbm9kZQ0KPiA+ICpub2RlLA0KPiA+ICsJCQkJCXN0cnVjdCBsX2RidXNfbWVz
-c2FnZSAqbXNnLA0KPiA+ICsJCQkJCXVpbnQxNl90IG5ldF9pZHgsIHVpbnQxNl90DQo+ID4gYXBw
-X2lkeCwNCj4gPiArCQkJCQl1aW50OF90ICpuZXdfa2V5KQ0KPiA+ICt7DQo+ID4gKwlzdHJ1Y3Qg
-a2V5cmluZ19uZXRfa2V5IG5ldF9rZXk7DQo+ID4gKwlzdHJ1Y3Qga2V5cmluZ19hcHBfa2V5IGFw
-cF9rZXk7DQo+ID4gKw0KPiA+ICsJaWYgKG5ldF9pZHggPiBNQVhfS0VZX0lEWCB8fCBhcHBfaWR4
-ID4gTUFYX0tFWV9JRFgpDQo+ID4gKwkJcmV0dXJuIGRidXNfZXJyb3IobXNnLCBNRVNIX0VSUk9S
-X0lOVkFMSURfQVJHUywgTlVMTCk7DQo+ID4gKw0KPiA+ICsJaWYgKCFrZXlyaW5nX2dldF9uZXRf
-a2V5KG5vZGUsIG5ldF9pZHgsICZuZXRfa2V5KSkNCj4gPiArCQlyZXR1cm4gZGJ1c19lcnJvciht
-c2csIE1FU0hfRVJST1JfRE9FU19OT1RfRVhJU1QsDQo+ID4gTlVMTCk7DQo+IA0KPiBOVUxMIC0+
-ICJCb3VuZCBuZXQga2V5IG5vdCBmb3VuZCINCj4gQWxzbywgSSBkb24ndCB0aGluayAib3JnLmJs
-dWV6Lm1lc2guRXJyb3IuRG9lc05vdEV4aXN0IiBlcnJvciBpcw0KPiBkb2N1bWVudGVkIGluIG1l
-c2gtYXBpLnR4dCBmb3IgZWl0aGVyIENyZWF0ZUFwcEtleSgpIG9yIEltcG9ydEFwcEtleSgpLA0K
-PiBuZWVkcyB0byBiZSBhZGRlZC4NCg0KV2lsbCBhZGQNCg0KPiANCj4gPiANCj4gPiAgc3RhdGlj
-IHN0cnVjdCBsX2RidXNfbWVzc2FnZSAqdXBkYXRlX2FwcGtleV9jYWxsKHN0cnVjdCBsX2RidXMN
-Cj4gPiAqZGJ1cywNCj4gPiAgCQkJCQkJc3RydWN0IGxfZGJ1c19tZXNzYWdlDQo+ID4gKm1zZywN
-Cj4gPiAgCQkJCQkJdm9pZCAqdXNlcl9kYXRhKQ0KPiA+ICB7DQo+ID4gLQl1aW50MTZfdCBuZXRf
-aWR4LCBhcHBfaWR4Ow0KPiA+ICsJc3RydWN0IG1lc2hfbm9kZSAqbm9kZSA9IHVzZXJfZGF0YTsN
-Cj4gPiArCXN0cnVjdCBrZXlyaW5nX25ldF9rZXkgbmV0X2tleTsNCj4gPiArCXN0cnVjdCBrZXly
-aW5nX2FwcF9rZXkgYXBwX2tleTsNCj4gPiArCXVpbnQxNl90IGFwcF9pZHg7DQo+ID4gIA0KPiA+
-IC0JaWYgKCFsX2RidXNfbWVzc2FnZV9nZXRfYXJndW1lbnRzKG1zZywgInFxIiwgJm5ldF9pZHgs
-DQo+ID4gJmFwcF9pZHgpKQ0KPiA+ICsJaWYgKCFsX2RidXNfbWVzc2FnZV9nZXRfYXJndW1lbnRz
-KG1zZywgInEiLCAmYXBwX2lkeCkgfHwNCj4gPiArCQkJCQkJYXBwX2lkeCA+IE1BWF9LRVlfSURY
-KQ0KPiA+ICAJCXJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJPUl9JTlZBTElEX0FSR1Ms
-IE5VTEwpOw0KPiA+ICANCj4gPiAtCS8qIFRPRE8gKi8NCj4gPiAtCXJldHVybiBkYnVzX2Vycm9y
-KG1zZywgTUVTSF9FUlJPUl9OT1RfSU1QTEVNRU5URUQsIE5VTEwpOw0KPiA+ICsJaWYgKCFrZXly
-aW5nX2dldF9hcHBfa2V5KG5vZGUsIGFwcF9pZHgsICZhcHBfa2V5KSB8fA0KPiA+ICsJCQkha2V5
-cmluZ19nZXRfbmV0X2tleShub2RlLCBhcHBfa2V5Lm5ldF9pZHgsDQo+ID4gJm5ldF9rZXkpKQ0K
-PiA+ICsJCXJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJPUl9ET0VTX05PVF9FWElTVCwN
-Cj4gPiBOVUxMKTsNCj4gPiArDQo+ID4gKwlzd2l0Y2ggKG5ldF9rZXkucGhhc2UpIHsNCj4gPiAr
-CWNhc2UgS0VZX1JFRlJFU0hfUEhBU0VfTk9ORToNCj4gPiArCWNhc2UgS0VZX1JFRlJFU0hfUEhB
-U0VfT05FOg0KPiANCj4gV2hhdCBpZiB0aGUgbmV0IGtleSBpcyBpbiBrZXkgcmVmcmVzaCBwaGFz
-ZSBvbmUgYW5kIFRoaXMgbWV0aG9kIGhhcw0KPiBiZWVuIGNhbGxlZCBtcmUgdGhhbiBvbmNlPyBp
-LmUuLCBkbyB3ZSB3YW50IHRvIHByb3RlY3QgdGhlIGFwcGxpY2F0aW9uDQo+IGZyb20gcG90ZW50
-aWFsbHkgb3ZlcndyaXRpbmcgYWxyZWFkeSB1cGRhdGVkIGFwcGxpY2F0aW9uIGtleT8NCg0KV2Vs
-bCwgQXBwbGljYXRpb24ga2V5cyBkb24ndCBhY3R1YWxseSBoYXZlIGEgcGhhc2UuLi4gIEl0IGlz
-IGluaGVyaXRlZCBmcm9tIHRoZSBib3VuZCBuZXQga2V5LiBUaGUgY29udHJvbGxpbmcNCkNvbmZp
-ZyBDbGllbnQgYXBwIG5lZWRzIHRvIHNldCB1cCAqYWxsKiB0aGUgdXBkYXRlcyBpbiB0aGUga2V5
-cmluZyBiZWZvcmUgc3RhcnRpbmcgdG8gc2VuZCB0aGUgdXBkYXRlcyB0byB0aGUNCnJlbW90ZSBu
-b2Rlcy4gIFdlIGNhbiB3YXJuIGluIHRoZSBtZXNoLWFwaS50eHQgdGhlIGNvcnJlY3Qgb3JkZXIg
-b2YgdGhpbmdzLCBidXQgYXMgbG9uZyBhcyB0aGUgQXBwIGRvZXMgbm90DQpzdGFydCBzZW5kaW5n
-IHRoZSB1cGRhdGVzIG92ZXItdGhlLWFpciwgdGhlcmUgaXMgbm8gcHJvYmxlbSB3aXRoIFVwZGF0
-aW5nIHRoZSBrZXktcmluZydzIEFwcCBLZXkgcmVkdW5kYW50bHkNCnByaW9yIHRvIHN0YXJ0aW5n
-IHRvIHByb3BhZ2F0ZS4gIEFzIGxvbmcgYXMgdGhlICpzcGVjKiBpcyBmb2xsb3dlZCwgd2UgZG9u
-J3QgaGF2ZSBhIHByb2JsZW0uICANCg0KDQo+IA0KPiA+IA0KPiA+ICBzdGF0aWMgc3RydWN0IGxf
-ZGJ1c19tZXNzYWdlICpzZXRfa2V5X3BoYXNlX2NhbGwoc3RydWN0IGxfZGJ1cw0KPiA+ICpkYnVz
-LA0KPiA+ICAJCQkJCQlzdHJ1Y3QgbF9kYnVzX21lc3NhZ2UNCj4gPiAqbXNnLA0KPiA+ICAJCQkJ
-CQl2b2lkICp1c2VyX2RhdGEpDQo+ID4gIHsNCj4gPiArCXN0cnVjdCBtZXNoX25vZGUgKm5vZGUg
-PSB1c2VyX2RhdGE7DQo+ID4gKwlzdHJ1Y3Qga2V5cmluZ19uZXRfa2V5IGtleTsNCj4gPiAgCXVp
-bnQxNl90IG5ldF9pZHg7DQo+ID4gIAl1aW50OF90IHBoYXNlOw0KPiA+ICANCj4gPiAtCWlmICgh
-bF9kYnVzX21lc3NhZ2VfZ2V0X2FyZ3VtZW50cyhtc2csICJxeSIsICZuZXRfaWR4LCAmcGhhc2Up
-KQ0KPiA+ICsJaWYgKCFsX2RidXNfbWVzc2FnZV9nZXRfYXJndW1lbnRzKG1zZywgInF5IiwgJm5l
-dF9pZHgsICZwaGFzZSkNCj4gPiA+ID4gDQo+ID4gDQo+ID4gKwkJCQkJcGhhc2UgPT0gS0VZX1JF
-RlJFU0hfUEhBU0VfT05FDQo+ID4gPiA+IA0KPiA+IA0KPiA+ICsJCQkJCXBoYXNlID4NCj4gPiBL
-RVlfUkVGUkVTSF9QSEFTRV9USFJFRSkNCj4gPiAgCQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1F
-U0hfRVJST1JfSU5WQUxJRF9BUkdTLCBOVUxMKTsNCj4gPiAgDQo+ID4gLQkvKiBUT0RPICovDQo+
-ID4gLQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfTk9UX0lNUExFTUVOVEVELCBO
-VUxMKTsNCj4gPiArCWlmICgha2V5cmluZ19nZXRfbmV0X2tleShub2RlLCBuZXRfaWR4LCAma2V5
-KSkNCj4gPiArCQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfRE9FU19OT1RfRVhJ
-U1QsDQo+ID4gTlVMTCk7DQo+ID4gKw0KPiA+ICsJaWYgKHBoYXNlID09IEtFWV9SRUZSRVNIX1BI
-QVNFX1RIUkVFICYmDQo+ID4gKwkJCQkJa2V5LnBoYXNlICE9DQo+ID4gS0VZX1JFRlJFU0hfUEhB
-U0VfTk9ORSkgew0KPiA+ICsJCW1lbWNweShrZXkub2xkX2tleSwga2V5Lm5ld19rZXksIDE2KTsN
-Cj4gPiArCQlrZXkucGhhc2UgPSBLRVlfUkVGUkVTSF9QSEFTRV9OT05FOw0KPiA+ICsJfSBlbHNl
-DQo+ID4gKwkJa2V5LnBoYXNlID0gcGhhc2U7DQo+ID4gKw0KPiA+ICsJaWYgKCFrZXlyaW5nX3B1
-dF9uZXRfa2V5KG5vZGUsIG5ldF9pZHgsICZrZXkpKQ0KPiA+ICsJCXJldHVybiBkYnVzX2Vycm9y
-KG1zZywgTUVTSF9FUlJPUl9GQUlMRUQsIE5VTEwpOw0KPiANCj4gUmVzdG9yZSB0aGUgcGhhc2Ug
-dG8gdGhlIHByZXZpb3VzIHZhbHVlIGluIGNhc2Ugb2YgZmFpbHVyZT8NCg0KDQpBcyB3aXRoIHRo
-ZSBhYm92ZSBjb21tZW50LCBhIGZhaWx1cmUgaXMgYSBmYWlsdXJlLi4uIElmIHRoaXMgbWV0aG9k
-IGZhaWxzIGZvciAqYW55KiByZWFzb24sIGl0IG1lYW5zIG5vdGhpbmcNCmFib3V0IHRoZSBrZXlz
-IHdlcmUgdXBkYXRlZCwgc28gdGhlcmUgaXMgbm90aGluZyB0byByZXN0b3JlLg0KDQo+IA0KPiA+
-IA0KPiBUaGFuayB5b3UsDQo+IA0KPiANCj4gSW5nYQ==
+https://bugzilla.kernel.org/show_bug.cgi?id=203643
+
+Andriy Perevortkin (irherder@gmail.com) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |irherder@gmail.com
+
+--- Comment #10 from Andriy Perevortkin (irherder@gmail.com) ---
+Sadly the RFC patch above does not fix it for me, the revert does
+The device is edifier w330nb headset.
+
+hcidump fragment of failed connection:
+
+> HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 5C:C6:E9:11:B1:20
+< HCI Command: Link Key Request Reply (0x01|0x000b) plen 22
+    bdaddr 5C:C6:E9:11:B1:20 key 9290EB1424E3A352C43F17C8499A3670
+> HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Reply (0x01|0x000b) ncmd 1
+    status 0x00 bdaddr 5C:C6:E9:11:B1:20
+> HCI Event: Encrypt Change (0x08) plen 4
+    status 0x00 handle 256 encrypt 0x01
+< HCI Command: Read Encryption Key Size (0x05|0x0008) plen 2
+> ACL data: handle 256 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 25 scid 0x0580
+< ACL data: handle 256 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x0580 result 3 status 0
+      Connection refused - security block
+> HCI Event: Command Complete (0x0e) plen 7
+    Read Encryption Key Size (0x05|0x0008) ncmd 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 256 packets 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 256 reason 0x13
+    Reason: Remote User Terminated Connection
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
