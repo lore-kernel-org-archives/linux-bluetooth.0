@@ -4,51 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2FEC282DC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B26C46470
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:51:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1F9D2081C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A7ED2081C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 19:51:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558554712;
-	bh=+emL6wAQkP+GDqX7SW2N6KhPmXp11SOc6Q8U+zzJafQ=;
+	s=default; t=1558554715;
+	bh=JN7DAyu81eNfQKpvA28BwDa3RsDFP+X9/NVf49fRkp4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=lvQjJAKA5blrcBv8fJwTR40SV855GjxBhZSPURAeDrNOOdwAZlY6SpObVTOKWy1o2
-	 HCf8PA7Gr7GbvloINjpLgPk9ur6GNUJ8j+i7+YUR6DbHDVldeWLdqcoTJhzFqT/W1/
-	 YuzflqbdoMZnPIDrS/L/52WrNQsQvzGVvi0wYe4o=
+	b=Xsz2OPKoOCiKev09+wmtT5E/3HqN4Q+6X5gyQjXlLbi2D+6Y07qRbD1yl+2CXdw+X
+	 JbCzWnG+dxhqwRXXOTpcbN7lC4SjqlaPtEuapjSSUvFIf55wNXRuj9Egi/8IJEAkE5
+	 Xy96rSerwgDoI7GPHvJcxAtye4Vbkw7bdAW5UwHc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731955AbfEVT0X (ORCPT
+        id S1731645AbfEVTvz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 May 2019 15:26:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47900 "EHLO mail.kernel.org"
+        Wed, 22 May 2019 15:51:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47860 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731948AbfEVT0X (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 May 2019 15:26:23 -0400
+        id S1731206AbfEVT0W (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 May 2019 15:26:22 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C7AF121881;
-        Wed, 22 May 2019 19:26:21 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9D26121473;
+        Wed, 22 May 2019 19:26:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558553182;
-        bh=+emL6wAQkP+GDqX7SW2N6KhPmXp11SOc6Q8U+zzJafQ=;
+        s=default; t=1558553181;
+        bh=JN7DAyu81eNfQKpvA28BwDa3RsDFP+X9/NVf49fRkp4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=0pvqCdrKgoupxfpft0YbPSUYvaGTmkBel2e30L0YE5oeuw6ztDHQ35nx1bbe5JHPy
-         D6w+lzHETbJVXSWlUvAXh+Dpz3wOgZcMNHnCzI/PkKw3vWz4NVwKC38G0BWij1lRfe
-         IxmVujlUTA1RK2UOTtl3s73pAObEiBQ65vAj2Pmc=
+        b=s/Ajm/rlyI/BJGYwnEn5m+kG+xMBEskC/pUY72BQFHpWlM2Twcw8VReZymZFYEvnT
+         Yj2VehG5NqRAhBSxalMMK5z4hTMuPjr4EIEBM1r2Xjx13fPpOQIItpnwfCuKdIkQuD
+         BSLozu9gT2E7CmXHOPkD24XqlUeEA1+b/1PvK2no=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ferry Toth <ftoth@exalondelft.nl>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+Cc:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Claire Chang <tientzu@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.0 098/317] Bluetooth: btbcm: Add default address for BCM43341B
-Date:   Wed, 22 May 2019 15:19:59 -0400
-Message-Id: <20190522192338.23715-98-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.0 097/317] Bluetooth: hci_qca: Give enough time to ROME controller to bootup.
+Date:   Wed, 22 May 2019 15:19:58 -0400
+Message-Id: <20190522192338.23715-97-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190522192338.23715-1-sashal@kernel.org>
 References: <20190522192338.23715-1-sashal@kernel.org>
@@ -61,54 +62,37 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Ferry Toth <ftoth@exalondelft.nl>
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-[ Upstream commit 5035726128cd2e3813ee44deedb9898509edb232 ]
+[ Upstream commit 7f09d5a6c33be66a5ca19bf9dd1c2d90c5dfcf0d ]
 
-The BCM43341B has the default MAC address 43:34:1B:00:1F:AC if none
-is given. This address was found when enabling Bluetooth on multiple
-Intel Edison modules. It also contains the sequence 43341B, the name
-the chip identifies itself as. Using the same BD_ADDR is problematic
-when having multiple Intel Edison modules in each others range.
-The default address also has the LAA (locally administered address)
-bit set which prevents a BNEP device from being created, needed for
-BT tethering.
+This patch enables enough time to ROME controller to bootup
+after we bring the enable pin out of reset.
 
-Add this to the list of black listed default MAC addresses and let
-the user configure a valid one using f.i.
-`btmgmt -i hci0 public-addr xx:xx:xx:xx:xx:xx`
-
-Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Ferry Toth <ftoth@exalondelft.nl>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Fixes: 05ba533c5c11 ("Bluetooth: hci_qca: Add serdev support").
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Rocky Liao <rjliao@codeaurora.org>
+Tested-by: Rocky Liao <rjliao@codeaurora.org>
+Tested-by: Claire Chang <tientzu@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btbcm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_qca.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index d5d6e6e5da3bf..62d3aa2b26f60 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -37,6 +37,7 @@
- #define BDADDR_BCM43430A0 (&(bdaddr_t) {{0xac, 0x1f, 0x12, 0xa0, 0x43, 0x43}})
- #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
- #define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
-+#define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
- 
- int btbcm_check_bdaddr(struct hci_dev *hdev)
- {
-@@ -82,7 +83,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM20702A1) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1) ||
--	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0)) {
-+	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
-+	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
- 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
- 			    &bda->bdaddr);
- 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index f036c8f98ea33..97bc17670b7aa 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -508,6 +508,8 @@ static int qca_open(struct hci_uart *hu)
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->btsoc_type != QCA_WCN3990) {
+ 			gpiod_set_value_cansleep(qcadev->bt_en, 1);
++			/* Controller needs time to bootup. */
++			msleep(150);
+ 		} else {
+ 			hu->init_speed = qcadev->init_speed;
+ 			hu->oper_speed = qcadev->oper_speed;
 -- 
 2.20.1
 
