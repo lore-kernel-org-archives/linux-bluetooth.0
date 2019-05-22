@@ -2,71 +2,37 @@ Return-Path: <SRS0=CsNs=TW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 729E3C072A4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 05:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9128C072A4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 05:33:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 461482075B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 05:21:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4TZ9d/S"
+	by mail.kernel.org (Postfix) with ESMTP id B2E3920862
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 May 2019 05:33:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbfEVFVZ (ORCPT
+        id S1728420AbfEVFds (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 May 2019 01:21:25 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44352 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725796AbfEVFVY (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 May 2019 01:21:24 -0400
-Received: by mail-pf1-f195.google.com with SMTP id g9so668634pfo.11;
-        Tue, 21 May 2019 22:21:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=A3GSMoFtIIu9gnm2oZly2q3vAs35Rn87VGmbBuylL+M=;
-        b=X4TZ9d/S3vWo07LOsHAjPNORAxOtuouzOUHa/G4iQLPSL3hN57UsUh84AqVWgiI+vU
-         P971S7BBSPaOD1ahjKh73WlKDa2S5ntc6IP5Nomo4ZSE5e8hotTFimwaYiAzCboEUhRr
-         Tco+ybvVge8XTmAys+Ta82JbS7udrsqPCFrOJ21LaKBF7gltIqugG6ngpe/rGchSxGlg
-         6EY7ICyUFhZ5ZrbaSD3vqHnxFXGLPaLcDhTtSEWblZCRb21QXOpxoQuYYHRSvVi4B+KI
-         0jdHwZ9KKFFe6BC+M7dXeRtfeEn+rxt5K/aqFCcCBaJVMqO2oqmHyCED8VyPbg2NDyP8
-         vmCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=A3GSMoFtIIu9gnm2oZly2q3vAs35Rn87VGmbBuylL+M=;
-        b=NJwxJ0b+OH7hyFjZ49jQSSLaFB8rK8NkqPnYqTCRxvh6EGyXdccI47v0n34hi3/Vx/
-         RAhYwNlWBtFk13TwkErqoPuO9JSwVUwLopeJAoY04YTrg41slLlBj5oekA1ANrZrBYdq
-         IHeP49/PLqrsphbWszUAVCS3Crhi1wKAUHMm0Jl+oxSSDZQKVZTbRLCuWHa00yXw4Gr6
-         56XMVgdkU+cwuzj7Gg5RKgBKi0sXOFq3g2u7j9k6HpFGHg8EX/0dfRyOE/WoSVzBpNmb
-         0b+GXXHFF3tyxme76ZdbiL8WbT7VP9lgjFOvwl1Ju3KDT4H6WcD2xjCH9RB3J3F/tX+6
-         P3CA==
-X-Gm-Message-State: APjAAAUr1G2Ho+b3HbJu7w3k0QkxLYniAsbxTYpilIZRhdJuqKPJSUcK
-        gG4OYCsyaArP6JDHX88wA+E=
-X-Google-Smtp-Source: APXvYqxSZ7EXEUPmJF3/IZH6oaVimhi52QTGFi31kHkYhOmIkXSS1LnhSRqDHbj40ar84kakjRjwjw==
-X-Received: by 2002:a63:9a52:: with SMTP id e18mr88157840pgo.335.1558502483806;
-        Tue, 21 May 2019 22:21:23 -0700 (PDT)
-Received: from anarsoul-thinkpad.lan (216-71-213-236.dyn.novuscom.net. [216.71.213.236])
-        by smtp.gmail.com with ESMTPSA id d9sm28138152pgj.34.2019.05.21.22.21.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 May 2019 22:21:23 -0700 (PDT)
-From:   Vasily Khoruzhick <anarsoul@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Vasily Khoruzhick <anarsoul@gmail.com>, stable@vger.kernel.org
-Subject: [PATCH] Revert "Bluetooth: Align minimum encryption key size for LE and BR/EDR connections"
-Date:   Tue, 21 May 2019 22:20:02 -0700
-Message-Id: <20190522052002.10411-1-anarsoul@gmail.com>
+        Wed, 22 May 2019 01:33:48 -0400
+Received: from mga05.intel.com ([192.55.52.43]:63614 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725801AbfEVFds (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 May 2019 01:33:48 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 May 2019 22:33:47 -0700
+X-ExtLoop1: 1
+Received: from ingas-nuc1.sea.intel.com ([10.254.190.110])
+  by orsmga007.jf.intel.com with ESMTP; 21 May 2019 22:33:47 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 0/2] mesh: Clean up D-Bus message references
+Date:   Tue, 21 May 2019 22:33:37 -0700
+Message-Id: <20190522053339.6289-1-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -75,52 +41,17 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This reverts commit d5bb334a8e171b262e48f378bd2096c0ea458265.
+This set of patches cleans up the usage of l_dbus_message_ref() and
+l_dbus_message_unref() in the mesh daemon
 
-This commit breaks some HID devices, see [1] for details
+Inga Stotland (2):
+  mesh: Unreference pending D-Bus messages
+  mesh: Remove unnecessary message ref/unref in agent.c
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203643
+ mesh/agent.c | 16 ----------------
+ mesh/mesh.c  |  8 +++++---
+ 2 files changed, 5 insertions(+), 19 deletions(-)
 
-Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
-Cc: stable@vger.kernel.org
----
- include/net/bluetooth/hci_core.h | 3 ---
- net/bluetooth/hci_conn.c         | 8 --------
- 2 files changed, 11 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 05b1b96f4d9e..094e61e07030 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -190,9 +190,6 @@ struct adv_info {
- 
- #define HCI_MAX_SHORT_NAME_LENGTH	10
- 
--/* Min encryption key size to match with SMP */
--#define HCI_MIN_ENC_KEY_SIZE		7
--
- /* Default LE RPA expiry time, 15 minutes */
- #define HCI_DEFAULT_RPA_TIMEOUT		(15 * 60)
- 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3cf0764d5793..bd4978ce8c45 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1276,14 +1276,6 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
- 	    !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
- 		return 0;
- 
--	/* The minimum encryption key size needs to be enforced by the
--	 * host stack before establishing any L2CAP connections. The
--	 * specification in theory allows a minimum of 1, but to align
--	 * BR/EDR and LE transports, a minimum of 7 is chosen.
--	 */
--	if (conn->enc_key_size < HCI_MIN_ENC_KEY_SIZE)
--		return 0;
--
- 	return 1;
- }
- 
 -- 
 2.21.0
 
