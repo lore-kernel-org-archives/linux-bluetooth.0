@@ -2,51 +2,103 @@ Return-Path: <SRS0=5U9h=TX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE5DC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 13:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 081F8C282DE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 14:53:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1127E21019
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 13:03:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE64820863
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 14:53:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRHvzn19"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730549AbfEWNDB (ORCPT
+        id S1730796AbfEWOxK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 May 2019 09:03:01 -0400
-Received: from relay1-d.mail.gandi.net ([217.70.183.193]:34395 "EHLO
-        relay1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726310AbfEWNDB (ORCPT
+        Thu, 23 May 2019 10:53:10 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:39347 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730672AbfEWOxK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 May 2019 09:03:01 -0400
-X-Originating-IP: 83.155.44.161
-Received: from classic (mon69-7-83-155-44-161.fbx.proxad.net [83.155.44.161])
-        (Authenticated sender: hadess@hadess.net)
-        by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id 0E6CF24001C;
-        Thu, 23 May 2019 13:02:54 +0000 (UTC)
-Message-ID: <79f883b5639c3031fcc05eacac4cef2e5e2d0523.camel@hadess.net>
-Subject: Re: [PATCH v2] Fix cups backend location
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Ludwig Nussel <ludwig.nussel@suse.de>,
-        linux-bluetooth@vger.kernel.org
-Date:   Thu, 23 May 2019 15:02:53 +0200
-In-Reply-To: <20190523122805.10235-1-ludwig.nussel@suse.de>
-References: <20190523122805.10235-1-ludwig.nussel@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.2 (3.32.2-1.fc30) 
+        Thu, 23 May 2019 10:53:10 -0400
+Received: by mail-oi1-f194.google.com with SMTP id v2so4572965oie.6;
+        Thu, 23 May 2019 07:53:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=O0uMxTnfP+/hXCIQ74nquohFY3NHJwYjI26x2LR70Ak=;
+        b=BRHvzn19h6XsCYeXK2+Hm/earZgXCKqh2N+cMhHkzUUXjOr4bvlgcM7cS24sm+3fX6
+         c2IYYOpSiKLaXSmd3oOaeUdw4c8uBS1nvNlZapWxM/Gi0frS2ESpejabL/II9CrInDg/
+         ufkR0hZkSgGt2ljA1G/r+JOBV9s4rxm+fntnNtgszJjoI5R2cQ5i/fNCWp5MBvUB/1rs
+         GwV5E6lmOJGYEhDzfjpM84QENK1jn486uB9X5nWHeL7igPdQBLNbDZCsbfLCtzKIV1v2
+         K1ZVytKnFlrSuDFy6nIMoe5VfFn4WZ2vHhJmrDYUz+iiEmXVLXKNEqMzqvQ67dZPmJF4
+         ZL6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=O0uMxTnfP+/hXCIQ74nquohFY3NHJwYjI26x2LR70Ak=;
+        b=qFN6BCFrQdM0w/Ip8GExf4wP1M2mnEXmKvAjuTyNGMBiJiUKzhSk97X7c6dDXQYdwg
+         Re/a+eavmJMor2W/COGDsI8TWLJ+tNNU5yvcngAX3LrIM5KLwDSefssGAus8FLlcZ80G
+         ma3JChMqstWH3VIz69yGkLncR/MUj9yZZUJgLpBjuUM61yEq4uGNSowUsIRZ3sJXl4c2
+         w6j4eCdKn967CE2HFfxSwPqtBgqQdan0F5BNoEaC6Zfi46YLh2aXi45/8O7wkpMRWd9Z
+         QJjDkv/PrLBvzdwAOVa6hYaw0dDMYgzFW0hGvrh9Kz2JutL0d5ux1IJsz1HziJuIHHOv
+         Wl9g==
+X-Gm-Message-State: APjAAAW7X3EoqY5nDKiO7lRDCs4VdUmsr5Vjr3OdjafqFTUFBvwbhVeN
+        4Bu41besxhVp3n79yYca/M81In1/nDrU071RKjM=
+X-Google-Smtp-Source: APXvYqyzXzvZ6yPDb95ZsCQV9OIWIjHaIxtlrVTQrzcdpGSR/hUJcheMvHFjq5q3jn+oK5EXFvNa6tEZz7x32gv3Iuk=
+X-Received: by 2002:aca:efc6:: with SMTP id n189mr3048044oih.34.1558623189175;
+ Thu, 23 May 2019 07:53:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20190522052002.10411-1-anarsoul@gmail.com> <6BD1D3F7-E2F2-4B2D-9479-06E27049133C@holtmann.org>
+ <7B7F362B-6C8B-4112-8772-FB6BC708ABF5@holtmann.org>
+In-Reply-To: <7B7F362B-6C8B-4112-8772-FB6BC708ABF5@holtmann.org>
+From:   Vasily Khoruzhick <anarsoul@gmail.com>
+Date:   Thu, 23 May 2019 07:52:43 -0700
+Message-ID: <CA+E=qVfopSA90vG2Kkh+XzdYdNn=M-hJN_AptW=R+B5v3HB9eA@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: Align minimum encryption key size for
+ LE and BR/EDR connections"
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 2019-05-23 at 14:28 +0200, Ludwig Nussel wrote:
-> The default upstream location for backends is
-> $exec_prefix/lib/cups/backend, see
-> https://github.com/apple/cups/blob/master/config-scripts/cups-directories.m4
-> https://github.com/apple/cups/blob/master/backend/Makefile
+On Wed, May 22, 2019 at 12:08 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Vasily,
+>
+> >> This reverts commit d5bb334a8e171b262e48f378bd2096c0ea458265.
+> >>
+> >> This commit breaks some HID devices, see [1] for details
+> >>
+> >> https://bugzilla.kernel.org/show_bug.cgi?id=203643
+> >>
+> >> Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+> >> Cc: stable@vger.kernel.org
+> >
+> > let me have a look at this. Maybe there is a missing initialization for older HID devices that we need to handle. Do you happen to have the full btmon binary trace from controller initialization to connection attempt for me?
+> >
+> > Are both devices Bluetooth 2.1 or later device that are supporting Secure Simple Pairing? Or is one of them a Bluetooth 2.0 or earlier device?
+>
+> I am almost certain that you have a Bluetooth 2.0 mouse. I made a really stupid mistake in the key size check logic and forgot to bind it to SSP support. Can you please check the patch that I just send you.
+>
+> https://lore.kernel.org/linux-bluetooth/20190522070540.48895-1-marcel@holtmann.org/T/#u
 
-Looks good!
+This patch fixes the issue for me. Thanks!
 
+>
+> Regards
+>
+> Marcel
+>
