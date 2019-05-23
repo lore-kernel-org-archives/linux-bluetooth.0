@@ -2,71 +2,104 @@ Return-Path: <SRS0=5U9h=TX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A4FCC04AAC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 08:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A590AC282DE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 12:07:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2CD2021019
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 08:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F0B020881
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 12:07:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727434AbfEWIid convert rfc822-to-8bit (ORCPT
+        id S1729762AbfEWMHG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 May 2019 04:38:33 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:43776 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726070AbfEWIid (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 May 2019 04:38:33 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 97C4328382
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2019 08:38:32 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 8BB5B283A5; Thu, 23 May 2019 08:38:32 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 203643] [REGRESSION][BISECTED] Sixaxis gamepad no longer
- connects via Bluetooth
-Date:   Thu, 23 May 2019 08:38:31 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pbrobinson@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-203643-62941-C1mlrdKdWl@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203643-62941@https.bugzilla.kernel.org/>
-References: <bug-203643-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 23 May 2019 08:07:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59712 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729430AbfEWMHF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 May 2019 08:07:05 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id DFC55AD3E;
+        Thu, 23 May 2019 12:07:04 +0000 (UTC)
+Subject: Re: [PATCH] Fix cups backend location
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Bastien Nocera <hadess@hadess.net>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20190412140803.28622-1-ludwig.nussel@suse.de>
+ <CABBYNZ+4Mgp0h2YusoEVK64a-uTXdarANc+Tm-KKpjR1=9h2cg@mail.gmail.com>
+ <6339c67c82a7e425a3c3cee415626cf32e080144.camel@hadess.net>
+From:   Ludwig Nussel <ludwig.nussel@suse.de>
+Organization: SUSE Linux GmbH
+Message-ID: <afc28fae-b1ef-24f6-4878-33205bccb947@suse.de>
+Date:   Thu, 23 May 2019 14:07:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+In-Reply-To: <6339c67c82a7e425a3c3cee415626cf32e080144.camel@hadess.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203643
+Bastien Nocera schrieb:
+> On Mon, 2019-04-15 at 10:52 +0300, Luiz Augusto von Dentz wrote:
+>> Hi Bastien,
+>>
+>> On Fri, Apr 12, 2019 at 5:11 PM Ludwig Nussel <ludwig.nussel@suse.de>
+>> wrote:
+>>> ---
+>>>   Makefile.tools | 5 ++++-
+>>>   1 file changed, 4 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/Makefile.tools b/Makefile.tools
+>>> index 7d5361bcd..9f8a0b87b 100644
+>>> --- a/Makefile.tools
+>>> +++ b/Makefile.tools
+>>> @@ -436,7 +436,10 @@ endif
+>>>   endif
+>>>
+>>>   if CUPS
+>>> -cupsdir = $(libdir)/cups/backend
+>>> +# need to use upstream location here which is
+>>> $exec_prefix/lib/cups/backend, see
+>>> +#
+>>> https://github.com/apple/cups/blob/master/config-scripts/cups-directories.m4
+>>> +# https://github.com/apple/cups/blob/master/backend/Makefile
+>>> +cupsdir = $(exec_prefix)/lib/cups/backend
+>>>
+>>>   cups_PROGRAMS = profiles/cups/bluetooth
+>>
+>> Any feedback on these changes?
+> 
+> The Fedora package has been doing that manually for 11 years, so, yes
+> that looks correct.
+> 
+> It should probably be using the output of
+> "cups-config --serverbin" instead, but given how hard that is with
+> autotools, this is probably fine. I'd mention it in the commend instead
+> of linking at the code though.
 
---- Comment #13 from Peter Robinson (pbrobinson@gmail.com) ---
-(In reply to didierg from comment #12)
-> For my Logitech BT 2.0 mouse, this bug is fixed by Fedora kernel 5.1.4.
+The output of cups-config doesn't give a hint about exec_prefix vs
+libdir though. Since reading through those files I linked was what I
+did to understand what the correct value was, I thought mentioning
+them would help the text person.
+So what comment should I put to get this patch accepted? Looks like none
+like before was ok for years after all :-)
 
-For reference to others Fedora pulled in the RFC patch to the Fedora 5.1.4
-build.
+I'm not really up to spending a day crafting M4 macros for the perfect
+cups special arrangement.
+
+cu
+Ludwig
 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+  (o_   Ludwig Nussel
+  //\
+  V_/_  http://www.suse.com/
+SUSE Linux GmbH, GF: Felix Imendörffer, Mary Higgins, Sri Rasiah,
+HRB 21284 (AG Nürnberg)
