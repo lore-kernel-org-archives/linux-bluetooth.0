@@ -2,109 +2,108 @@ Return-Path: <SRS0=5U9h=TX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FDBC282E1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 20:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 732E3C282E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 21:18:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C7D5206A3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 20:32:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 443272177E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 21:18:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XR+v5mVn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJjSs1Ym"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388131AbfEWUc2 (ORCPT
+        id S2387810AbfEWVSo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 May 2019 16:32:28 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:40340 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387936AbfEWUc2 (ORCPT
+        Thu, 23 May 2019 17:18:44 -0400
+Received: from mail-vk1-f180.google.com ([209.85.221.180]:43530 "EHLO
+        mail-vk1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387785AbfEWVSo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 May 2019 16:32:28 -0400
-Received: by mail-ed1-f66.google.com with SMTP id j12so10984566eds.7;
-        Thu, 23 May 2019 13:32:27 -0700 (PDT)
+        Thu, 23 May 2019 17:18:44 -0400
+Received: by mail-vk1-f180.google.com with SMTP id h72so1665590vkh.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2019 14:18:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=g7G2zfRcxVCdlSQ+5QRs10qg+zaDyoLuwyhOZFdKLzQ=;
-        b=XR+v5mVn8dF+FSKd4omRz9GH5MSOgKMhUBex7SuFKuqwzcdJN6s/bOJfxmfBexCE8t
-         z/AM+7qwkCdFxImCL//TjsErNO4hQT1/9Vt20eO8X0DT8HVA/1rp5JeASLbCkghDpnC6
-         FdJ1Uv4XX6Y1DROJPFKLjv3FBjnpDzgN8AddKeKFh25YIvddYgfj5YrVzhMusEIOU6bm
-         DZdVzu3ErBqjqI5peKXnpa3Du5g3KTQT82b1YDslG6l3IyAM3QDc1Z2pN0vNTMib7r8s
-         Uq/T5cMuc+LnD9NZt6CnSwNHqr4GIi6H9bfcBXc/5vIVNA+G8lIFVees07z9ow9Qt1Gd
-         rguA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=QyHNrUNeMazF6mWb9H8ygEL5bietKjDcesYfcxi7eSE=;
+        b=XJjSs1YmTmGrpv/CS5Tvvhcwladt10Q/MIyFSc2t5wJyeBcTYWlJ3V3qDrO+jq1uHZ
+         Y6Ju7GmgtS4BKDQBRSF9c4slJ7/q8SupTjIMzSOcEDd6lYC9l0pOyTw5rpuVlFEdupOw
+         MMfq4WhPfwPDJ8EogDWnDSuAQVPjKTmmif9KJvQNhEx+Ho2WFLLUXGO3Q3OKg3bXzP3r
+         Kr2M5zVp1r0qZK5TqJfvgUQrVWit++AJuJxRLJT8tITrBtntWeElPzkWayoM70UImS4c
+         EfHM98T8F25Kz8p06B7cvVVuLq7EWdJJDqTayn1cUzRvm+XDoERZNDTVnNc8qzQgjPeW
+         RN9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=g7G2zfRcxVCdlSQ+5QRs10qg+zaDyoLuwyhOZFdKLzQ=;
-        b=OSSy6jSSF+MRMWlR6U2oMOd92HUHnbzTby7bIJghHfv/hL6jXecVe5LbTB40qQg02P
-         pKZOWNQpepq6U/HQpyG7BObgxImz0vXBBbKCdHmAuMbywVlinZyQ5/h/xcRKz7+FEh25
-         SBG0nEEXu+pDHD/8OcQ+h2xplJt/fel+vnGyixF0IaSgppn85sxVOG8hmhNK7gQEa3Ps
-         d3HRBZwrrn7mgs1c83rU62s0JV7Gg1pvd44D2WdN8DshteEJz/yDxbIm4aJdQJCA5Xsm
-         GZRO0puqLA07yTlQcHrRys93vVDhAawnnJDEiPVWR+JNRPJf7oz/cjyvr99/omqFj8xV
-         3uyw==
-X-Gm-Message-State: APjAAAXhyzIok8MOtmo/YMvxR3WdFxkcQMxxp4P+sOeKntBGhlZ24vVm
-        llYen0F0sIqIrMIp8y2RnCA=
-X-Google-Smtp-Source: APXvYqwDY0FQKLmzFaFEp0K8x/qHhuFE3EB6OsqT0WR2pex/enXzFSlkZbsX7Zr1K6AHxXpt9IFAFw==
-X-Received: by 2002:a50:fc97:: with SMTP id f23mr98891493edq.104.1558643546300;
-        Thu, 23 May 2019 13:32:26 -0700 (PDT)
-Received: from kiddo.lan ([2601:602:9400:ac45::eee])
-        by smtp.gmail.com with ESMTPSA id i45sm136751eda.67.2019.05.23.13.32.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 23 May 2019 13:32:25 -0700 (PDT)
-From:   "=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=" <jprvita@gmail.com>
-X-Google-Original-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux@endlessm.com,
-        =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>
-Subject: [PATCH] Bluetooth: Add new 13d3:3501 QCA_ROME device
-Date:   Thu, 23 May 2019 13:32:02 -0700
-Message-Id: <20190523203202.26957-2-jprvita@endlessm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190523203202.26957-1-jprvita@endlessm.com>
-References: <20190523203202.26957-1-jprvita@endlessm.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:content-transfer-encoding;
+        bh=QyHNrUNeMazF6mWb9H8ygEL5bietKjDcesYfcxi7eSE=;
+        b=GVQM0qI1Hvm11XWeiAY7Zf6nUWLOx12ZO/jIiDw+CT2/ESFC8AfSuASqNs/fGObdFj
+         Fllge4d9jPHPrvwRenK+lXclXS7zhbpf0d+O3cF+2H9xhUW4VkMIaiTXPYSupHR0OPnC
+         qOeziXw0/QWgaKgitMk7lk+WujXMcDMEp1Lc6KBgYqC91lv006FSUKQsrB4LelXVwmAG
+         EjEECL9meZtBaXXZRxdFj7v/clJuI5IMUD5J8Csj07AJvG4JoQDUmZWMMtQJ6BVCTLFe
+         HeJLDFUVVR7Z7QMc2JuBHqv0KOwyz7LuofW8Rh17R0qNl95EBIyI+8utpu5pckc1w9el
+         o/uQ==
+X-Gm-Message-State: APjAAAUgzzv4VanPxjd1kHYPULQSVY0RKqCDyqXeFLs1oOWGZN79eZxE
+        G4tQBFCY2YKCcApKU5xJlYf2vNKYvzM/bb7tgXUpFzDW
+X-Google-Smtp-Source: APXvYqxnMCv1hx8ffp7GBObRKIAMC1TMQbtzr8UxW9Soj8m41H/BajQoTYPj7skQxxjR/bPasfoA4zq5RiKpxBKBMxw=
+X-Received: by 2002:a1f:2157:: with SMTP id h84mr2731323vkh.84.1558646322689;
+ Thu, 23 May 2019 14:18:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <CAOJ+TdvyHxe7OAgzJsg7Ar1QmoSyWuGqWn0b2rbFXq7xW3B6yA@mail.gmail.com>
+In-Reply-To: <CAOJ+TdvyHxe7OAgzJsg7Ar1QmoSyWuGqWn0b2rbFXq7xW3B6yA@mail.gmail.com>
+From:   Moreno <morrolinux@gmail.com>
+Date:   Thu, 23 May 2019 23:18:31 +0200
+Message-ID: <CAOJ+Tdv3o=gNDPvRmj27aO6tAgk7A+T+H3DZF0LEfNHLBj8Vng@mail.gmail.com>
+Subject: Re: a2dp sink delay via AVDTP
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Without the QCA ROME setup routine this adapter fails to establish a SCO
-connection.
+bump? Anyone know what I'm talking about?
 
-T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3501 Rev=00.01
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#=0x0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#=0x1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Signed-off-by: João Paulo Rechi Vita <jprvita@endlessm.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Il giorno mar 21 mag 2019 alle ore 12:00 Moreno <morrolinux@gmail.com>
+ha scritto:
+>
+> Hi,
+>
+> I am building an ffmpeg-based audio sink system to use a Raspberry Pi
+> as a bluetooth speaker.
+>
+> Since the audio takes quite a long time to get past the processing on
+> the Pi, I need to tell the bluetooth "client" device how much delay
+> should be added (eg. for video playback) for it to be in sync.
+>
+> I've looked at the code and it looks like it's fully supported, but I
+> don't understand how to signal bluez (running a2dp sbc sink profile)
+> an extra latency for the source device to be aware.
+>
+> Can anyone help?
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7db48ae65cd2..ff44622ea10d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -280,6 +280,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x04ca, 0x3016), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x04ca, 0x301a), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x13d3, 0x3496), .driver_info = BTUSB_QCA_ROME },
-+	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME },
- 
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
--- 
-2.20.1
 
+
+--=20
+
+per il supporto tecnico rivolgersi a
+Moreno Razzoli
+__________________________
+
+       Avvertenze ai sensi del D.Lgs.196 del 30/06/2003 Le
+informazioni contenute in questo messaggio di posta elettronica e/o
+files allegati, sono da considerarsi strettamente riservati. Il loro
+utilizzo =C3=A8 consentito esclusivamente al destinatario del messaggio,
+per le finalit=C3=A0  indicate nello stesso. Costituisce violazione ai
+principi dettati dal D.Lgs. 196/2003: trattenere il messaggio stesso,
+divulgarlo anche in parte, distribuirlo ad altri soggetti, copiarlo o
+utilizzarlo per finalit=C3=A0  diverse. Qualora riceveste questo messaggio
+senza esserne il destinatario Vi preghiamo cortesemente di darcene
+notizia via e-mail e di procedere alla distruzione del messaggio
+stesso, cancellandolo dal Vostro sistema. Grazie.
