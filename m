@@ -2,77 +2,77 @@ Return-Path: <SRS0=5U9h=TX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20267C282CE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 02:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF39C04AAC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 05:01:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE393217D4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 02:51:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BAAD20881
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 05:01:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=orcam.com header.i=@orcam.com header.b="G3e4eS73"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730028AbfEWCvp convert rfc822-to-8bit (ORCPT
+        id S1725814AbfEWFB5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 May 2019 22:51:45 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:44552 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729877AbfEWCvn (ORCPT
+        Thu, 23 May 2019 01:01:57 -0400
+Received: from mail-it1-f177.google.com ([209.85.166.177]:55529 "EHLO
+        mail-it1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725786AbfEWFB5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 May 2019 22:51:43 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 9386826E3A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2019 02:51:42 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 8830727D29; Thu, 23 May 2019 02:51:42 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 203685] failed to load firmware after resume
-Date:   Thu, 23 May 2019 02:51:41 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rui.zhang@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: blocked
-Message-ID: <bug-203685-62941-7x91u45nsK@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203685-62941@https.bugzilla.kernel.org/>
-References: <bug-203685-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 23 May 2019 01:01:57 -0400
+Received: by mail-it1-f177.google.com with SMTP id g24so620070iti.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2019 22:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=orcam.com; s=google;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=C3YNwHBPpN/3o9lMqMjvGGD3UlCg5M0ySs1gfCHX4gk=;
+        b=G3e4eS735Ax+86OwS+/ihjGnbcsclC3S1maIceAs4zz3Je3+n9v4tlZXT7xRbhDR7r
+         PtYvI6C+D0oHJ/4115QoaE5lweIgAlKEmbnZrsK4lLWH8M4j3wrglv9VkGW52OM6YRms
+         ioxidB8Lywy88cbVainRqSz1bbzc/Mjs/sThY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=C3YNwHBPpN/3o9lMqMjvGGD3UlCg5M0ySs1gfCHX4gk=;
+        b=Mi8MobSgJoFABhzcgNfCpS1ekXi1sdgXAAvUr5f0q4LTvto81GTZb7lnbUVPObCLWF
+         JsLvQLt+XqS+MzC0ugSvF8oUawsGeoZ43o1vwpVO3VwAIaKy80A6NgIdcSSpj+oi7B0Z
+         LpNIpa8D0sdiw5KuBy69ymx+h+5kmop1cYyRZu8CqyLr4YXzgvP70Zdg/cJr5RM91SrV
+         9KtHCqEehCzah9DG5+0if597pcfVu7kWwFqvo7gag8tBv9N3vUi4lztkeFt6jFS/V/7U
+         YwjSQFjMNxNSL4j7Ta6nzHhMKmaC7il/lXejYjKqzyqWPA3MkKFiRSYYhK/b/qjcQuc4
+         4b5A==
+X-Gm-Message-State: APjAAAVMgqrvtbxfz9B5g0RNyFe706A1OB2tZilBJNi+LaAnAoLg17u9
+        xIUEUGWmUxs8NH213ZrNK42v8w5jJZUoDFUFAb6x07EzO0o=
+X-Google-Smtp-Source: APXvYqxGwftN2ihnDfehl4VpqGGVQFv7lNSTH5WxiNCAmPI371Lvche2blYQ4xsle0efykxgVvOIzgFxVpfrI3Oksn4=
+X-Received: by 2002:a24:6294:: with SMTP id d142mr11869540itc.102.1558587716081;
+ Wed, 22 May 2019 22:01:56 -0700 (PDT)
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+From:   Ordit Gross <ordit.gross@orcam.com>
+Date:   Thu, 23 May 2019 08:01:45 +0300
+Message-ID: <CAB+bgRa-YE9oFP0bTHd9BCO+C4VudHH_eTNf9Xn-14VrUVT6-A@mail.gmail.com>
+Subject: failed Message Integrity Check (MIC)
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203685
+hi all,
+we have an application acting as gatt server, using bluez 5.47.
+we just purchased a sniffer.
+** when a client connects (mobile), I can see pairing (AES) process
+taking place, all encrypted packets that follow show up as decrypted
+incorrectly (bad MIC), but no disconnection occur.
 
-Zhang Rui (rui.zhang@intel.com) changed:
+** connecting to a specific phone (android LG G6), after pairing takes
+place we see several encrypted packets that show up as decrypted
+incorrectly (bad MIC), then connection is dropped with "Connection
+Terminated due to MIC Failure (0x3d)"
+Device Disconnected:  reason 0
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Blocks|                            |178231
-
---- Comment #1 from Zhang Rui (rui.zhang@intel.com) ---
-This happens on a HP kabylake-r laptop.
-
-
-Referenced Bugs:
-
-https://bugzilla.kernel.org/show_bug.cgi?id=178231
-[Bug 178231] Meta-bug: Linux suspend-to-mem and freeze performance optimization
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+1. Is MIC being calculated in bluez? is kernel involved in this process?
+2. How could it be other devices don't drop the connection?
+I'm having a hard time understanding how could that problem arise..
+and how to solve this..
+any help would be appreciated
