@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A264BC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 16:14:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF8D4C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 16:14:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84B372177E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 16:14:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB15E21773
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 May 2019 16:14:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731267AbfEWQOE (ORCPT
+        id S1731273AbfEWQOF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 May 2019 12:14:04 -0400
+        Thu, 23 May 2019 12:14:05 -0400
 Received: from mga07.intel.com ([134.134.136.100]:39551 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730782AbfEWQOD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 May 2019 12:14:03 -0400
+        id S1731269AbfEWQOF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 May 2019 12:14:05 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 May 2019 09:14:03 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 May 2019 09:14:04 -0700
 X-ExtLoop1: 1
 Received: from bgix-dell-lap.sea.intel.com ([10.255.78.4])
-  by orsmga002.jf.intel.com with ESMTP; 23 May 2019 09:14:03 -0700
+  by orsmga002.jf.intel.com with ESMTP; 23 May 2019 09:14:04 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v3 4/6] mesh: Implement App Key keyring storage handling
-Date:   Thu, 23 May 2019 09:13:27 -0700
-Message-Id: <20190523161329.13017-5-brian.gix@intel.com>
+Subject: [PATCH BlueZ v3 5/6] mesh: Implement Key Refresh Phasing in keyring
+Date:   Thu, 23 May 2019 09:13:28 -0700
+Message-Id: <20190523161329.13017-6-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20190523161329.13017-1-brian.gix@intel.com>
 References: <20190523161329.13017-1-brian.gix@intel.com>
@@ -41,162 +41,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Implements following org.bluez.mesh.Management1 methods:
-CreateAppKey()
-ImportAppKey()
-UpdateAppKey()
-DeleteAppKey()
+CompleteAppKeyUpdate()
+SetKeyPhase()
 
-These methods are used to maintain App Key keyring storage.
+These methods are used to maintain Key Refresh settings
+in the keyring storage.
 ---
- mesh/manager.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 71 insertions(+), 15 deletions(-)
+ mesh/manager.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 50 insertions(+), 3 deletions(-)
 
 diff --git a/mesh/manager.c b/mesh/manager.c
-index e0cad8c3f..c79c873f2 100644
+index c79c873f2..234ab5e2f 100644
 --- a/mesh/manager.c
 +++ b/mesh/manager.c
-@@ -209,51 +209,108 @@ static struct l_dbus_message *import_subnet_call(struct l_dbus *dbus,
- 	return store_new_subnet(node, msg, net_idx, key);
+@@ -289,6 +289,34 @@ static struct l_dbus_message *update_appkey_call(struct l_dbus *dbus,
+ 	return l_dbus_message_new_method_return(msg);
  }
  
-+static struct l_dbus_message *store_new_appkey(struct mesh_node *node,
-+					struct l_dbus_message *msg,
-+					uint16_t net_idx, uint16_t app_idx,
-+					uint8_t *new_key)
++static struct l_dbus_message *complete_update_appkey_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
 +{
-+	struct keyring_net_key net_key;
-+	struct keyring_app_key app_key;
-+
-+	if (net_idx > MAX_KEY_IDX || app_idx > MAX_KEY_IDX)
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (!keyring_get_net_key(node, net_idx, &net_key))
-+		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST,
-+						"Bound net key not found");
-+
-+	if (keyring_get_app_key(node, app_idx, &app_key)) {
-+		/* Allow redundant calls with identical values */
-+		if (!memcmp(app_key.old_key, new_key, 16) &&
-+						app_key.net_idx == net_idx)
-+			return l_dbus_message_new_method_return(msg);
-+
-+		return dbus_error(msg, MESH_ERROR_ALREADY_EXISTS, NULL);
-+	}
-+
-+	memcpy(app_key.old_key, new_key, 16);
-+	memcpy(app_key.new_key, new_key, 16);
-+	app_key.net_idx = net_idx;
-+	app_key.app_idx = app_idx;
-+
-+	if (!keyring_put_app_key(node, app_idx, net_idx, &app_key))
-+		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
-+}
-+
- static struct l_dbus_message *create_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
- 	uint16_t net_idx, app_idx;
-+	uint8_t key[16];
- 
- 	if (!l_dbus_message_get_arguments(msg, "qq", &net_idx, &app_idx))
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	l_getrandom(key, sizeof(key));
-+
-+	return store_new_appkey(node, msg, net_idx, app_idx, key);
- }
- 
- static struct l_dbus_message *update_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	uint16_t net_idx, app_idx;
 +	struct mesh_node *node = user_data;
 +	struct keyring_net_key net_key;
 +	struct keyring_app_key app_key;
 +	uint16_t app_idx;
- 
--	if (!l_dbus_message_get_arguments(msg, "qq", &net_idx, &app_idx))
++
 +	if (!l_dbus_message_get_arguments(msg, "q", &app_idx) ||
 +			app_idx > MAX_KEY_IDX)
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
++
 +	if (!keyring_get_app_key(node, app_idx, &app_key) ||
 +			!keyring_get_net_key(node, app_key.net_idx, &net_key))
 +		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
 +
-+	if (net_key.phase != KEY_REFRESH_PHASE_ONE)
-+		return dbus_error(msg, MESH_ERROR_FAILED, "Invalid Phase");
++	if (net_key.phase != KEY_REFRESH_PHASE_TWO)
++		return dbus_error(msg, MESH_ERROR_FAILED, "Invalid phase");
 +
-+	/* Generate Key if in acceptable phase */
-+	l_getrandom(app_key.new_key, sizeof(app_key.new_key));
++	memcpy(app_key.old_key, app_key.new_key, 16);
 +
 +	if (!keyring_put_app_key(node, app_idx, app_key.net_idx, &app_key))
 +		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
 +
 +	return l_dbus_message_new_method_return(msg);
- }
- 
++}
++
  static struct l_dbus_message *delete_appkey_call(struct l_dbus *dbus,
  						struct l_dbus_message *msg,
  						void *user_data)
+@@ -330,14 +358,30 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
+ 						struct l_dbus_message *msg,
+ 						void *user_data)
  {
--	uint16_t net_idx, app_idx;
 +	struct mesh_node *node = user_data;
-+	uint16_t app_idx;
++	struct keyring_net_key key;
+ 	uint16_t net_idx;
+ 	uint8_t phase;
  
--	if (!l_dbus_message_get_arguments(msg, "qq", &net_idx, &app_idx))
-+	if (!l_dbus_message_get_arguments(msg, "q", &app_idx))
+-	if (!l_dbus_message_get_arguments(msg, "qy", &net_idx, &phase))
++	if (!l_dbus_message_get_arguments(msg, "qy", &net_idx, &phase) ||
++					phase == KEY_REFRESH_PHASE_ONE ||
++					phase > KEY_REFRESH_PHASE_THREE)
  		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
  
 -	/* TODO */
 -	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	keyring_del_app_key(node, app_idx);
++	if (!keyring_get_net_key(node, net_idx, &key))
++		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
++
++	if (phase == KEY_REFRESH_PHASE_THREE &&
++					key.phase != KEY_REFRESH_PHASE_NONE) {
++		memcpy(key.old_key, key.new_key, 16);
++		key.phase = KEY_REFRESH_PHASE_NONE;
++	} else
++		key.phase = phase;
++
++	if (!keyring_put_net_key(node, net_idx, &key))
++		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
 +
 +	return l_dbus_message_new_method_return(msg);
  }
  
- static struct l_dbus_message *import_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	uint16_t net_idx, app_idx;
-+	struct mesh_node *node = user_data;
- 	struct l_dbus_message_iter iter_key;
-+	uint16_t net_idx, app_idx;
- 	uint8_t *key;
- 	uint32_t n;
- 
-@@ -266,8 +323,7 @@ static struct l_dbus_message *import_appkey_call(struct l_dbus *dbus,
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
- 							"Bad application key");
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	return store_new_appkey(node, msg, net_idx, app_idx, key);
- }
- 
- static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
-@@ -305,9 +361,9 @@ static void setup_management_interface(struct l_dbus_interface *iface)
- 	l_dbus_interface_method(iface, "CreateAppKey", 0, create_appkey_call,
+ static void setup_management_interface(struct l_dbus_interface *iface)
+@@ -362,6 +406,9 @@ static void setup_management_interface(struct l_dbus_interface *iface)
  					"", "qq", "", "net_index", "app_index");
  	l_dbus_interface_method(iface, "UpdateAppKey", 0, update_appkey_call,
--					"", "qq", "", "net_index", "app_index");
-+						"", "q", "", "app_index");
+ 						"", "q", "", "app_index");
++	l_dbus_interface_method(iface, "CompleteAppKeyUpdate", 0,
++					complete_update_appkey_call, "", "q",
++							"", "app_index");
  	l_dbus_interface_method(iface, "DeleteAppKey", 0, delete_appkey_call,
--					"", "qq", "", "net_index", "app_index");
-+						"", "q", "", "app_index");
+ 						"", "q", "", "app_index");
  	l_dbus_interface_method(iface, "ImportAppKey", 0, import_appkey_call,
- 				"", "qqay", "", "net_index", "app_index",
- 								"app_key");
 -- 
 2.14.5
 
