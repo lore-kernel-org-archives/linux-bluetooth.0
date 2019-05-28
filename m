@@ -2,148 +2,194 @@ Return-Path: <SRS0=Ljem=T4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A155C04AB6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 May 2019 20:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC213C04AB6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 May 2019 21:43:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D287208CB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 May 2019 20:54:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73A5721670
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 May 2019 21:43:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/88Y4xj"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IKn0m+Tk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727511AbfE1Uy5 (ORCPT
+        id S1727969AbfE1Vn3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 May 2019 16:54:57 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:32970 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726523AbfE1Uy5 (ORCPT
+        Tue, 28 May 2019 17:43:29 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44258 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726492AbfE1Vn3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 May 2019 16:54:57 -0400
-Received: by mail-pf1-f193.google.com with SMTP id z28so63671pfk.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 May 2019 13:54:57 -0700 (PDT)
+        Tue, 28 May 2019 17:43:29 -0400
+Received: by mail-pf1-f195.google.com with SMTP id g9so105588pfo.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 May 2019 14:43:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=0pmw899+pptG3Q9+Pg72xOhxHG5C/1h5ZC62Ak+ZjHk=;
-        b=I/88Y4xjt3vuZvcpleBS7NAPM0TrB+TP6YEfLLz0i0mjDhiJSVXL+dbCNOEUG3vl90
-         3uRV7VEgDiaeFBQ+UAJN1bFRa5uOHCPLESwIWOVG1lquJgwgk81rfuTwxLY+eDRotQ/I
-         JzfrI9FSMPSLL406eoLb+80EMibNAiwIYOGIbFEAgOUnlak4szn1K4OItfk7C4M2Vpl9
-         +dfmyFw+yue6x5rd46SXZVdo1Ahn/DecLz5PXUiCKKMHMKFq5WpLnV12815ZqCEWhPnB
-         Khxza55WX9KhEuxAJ72oKPOO5sF40Gftux9NoK8FxtzwBdxr5g0bBV/EjEtYGF4onBJm
-         fdvg==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VF/qoO5e2HVpIlhn/mmGk7lZp4pfCGkV4Ihi5vvSYDo=;
+        b=IKn0m+Tk1bSnkFM9KxvqyXEuO7j86eRr9dYnyvU71UsJ/A0l6xAyLFmwwxvkDmQHke
+         CmG0MqJz6jUo6PQ0hryGNd05youGUlz/4uc3Xd7LlY2+HQ2Hou40eDGwXvIf2pnCK2JN
+         TTvbLgOnLPf0NnwQwZ89fEtw3aqy2cCd5vOac=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=0pmw899+pptG3Q9+Pg72xOhxHG5C/1h5ZC62Ak+ZjHk=;
-        b=fHleNGv3ERE4NNH5pfjmCZfotkDD1jocdMvrKfncm4Qc1/LB2x4yExFsOjEilKthSy
-         Y5u6pklUVhSWHf/4xV+RY4tM+y+edUthCWHLSWgFxef3Jn5HRPt3QrtxyS9MiAs1UNM1
-         6b1T22KguZaYzvURSb4GH+OVf7YerHBiHoi26uJPGU1kGxDcQov+4agY8eMEp5JOKla1
-         cZ96ib4+G7PHf0XLaI0rAcOycu0t9gmRQheSIWkuDRC2ViAmnh4Ji8Sh68MaWCp5Q2n5
-         JhQY7T+MnM+tt6CBjEpDkc4sgFKSl+vgjxQhOdHXwgci8zrgT3gVrqmqKEBE/LLoPrFX
-         hc8A==
-X-Gm-Message-State: APjAAAVKrZrHlmM66yQlQB4lGypmIEhU4/20mhp+ik7Wl+malxZGUyOT
-        YGtk0pF0t4Qb6rSPLJoJ3a2NnSpAbXU=
-X-Google-Smtp-Source: APXvYqzTbLuUGZWbJg9OpsKuDpwPPn/gx/ZaIa94TjQdpKtSIK81F7E6nLz94IV0SaUR4Evq7Yxq+w==
-X-Received: by 2002:a17:90a:25ca:: with SMTP id k68mr8496325pje.14.1559076896511;
-        Tue, 28 May 2019 13:54:56 -0700 (PDT)
-Received: from [192.168.1.13] ([172.103.152.101])
-        by smtp.gmail.com with ESMTPSA id i7sm15283606pfo.19.2019.05.28.13.54.55
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VF/qoO5e2HVpIlhn/mmGk7lZp4pfCGkV4Ihi5vvSYDo=;
+        b=qlxtDDTp/6liqdcyhTcoV8LOD4KH1sDTLm2KpsJJ9ov7BojL+Y9u+Ejt3nE+yfSLeG
+         Jdf0iMpx1Y55lSZ98y/ixS77ZBqEbeR3/T2kG4Jq6Cc9WsAZ0RCCObVk8E5HDxKrvTfG
+         OmQk5l/BEQ7xGU1JQCk9+zFtx/GWVYQm3l3rjfJ+NojlpPApJ9OjB0y8MoRN5IzLrcyE
+         HnRvrNh9es5Bqv+dMwNE+nhKeFBWAbZvBYGJgs3A80YZdBqdOQKZ5QupbrMgJHpJXhpF
+         1oOqrDwpphCJQ6odsyBSIVCKZI6T9/0j4+2qdbO8cbU2d0/Ckf9tEDqmekZ4iv64K2ZO
+         ZYvQ==
+X-Gm-Message-State: APjAAAVcTfSwsn7VTY2liId/5IH2SbyA3CfpMLeGuj7jpseVGqjIvxGf
+        FIapTML4FOeO/5FDEzhfltQbrQ==
+X-Google-Smtp-Source: APXvYqzNnwHUdmFzAV7cj1qhRtUlHOZ7yJt8VDOR+MHPaHygtEyir13Kcuiz619o961D3hVZTbNCVw==
+X-Received: by 2002:a63:1b56:: with SMTP id b22mr40840014pgm.87.1559079808326;
+        Tue, 28 May 2019 14:43:28 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id h7sm9223657pfo.108.2019.05.28.14.43.27
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 May 2019 13:54:55 -0700 (PDT)
-To:     linux-bluetooth@vger.kernel.org
-From:   David Frey <dpfrey@gmail.com>
-Subject: bluetoothctl "advertise on" fails
-Message-ID: <ae0ac0fb-faae-edaa-7205-9ef9d6b03edd@gmail.com>
-Date:   Tue, 28 May 2019 13:54:55 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        Tue, 28 May 2019 14:43:27 -0700 (PDT)
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH v9] Bluetooth: btqca: inject command complete event during fw download
+Date:   Tue, 28 May 2019 14:43:22 -0700
+Message-Id: <20190528214322.171922-1-mka@chromium.org>
+X-Mailer: git-send-email 2.22.0.rc1.257.g3120a18244-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-I have an embedded system running Yocto Linux and a desktop using Arch
-Linux.  Bluez is 5.50 in both cases. I'm using the same Cypress CYW20719
-Bluetooth chipset connected via a UART.  On the embedded system, running
-"advertise on" in bluetoothctl fails with the error message:
+Latest qualcomm chips are not sending an command complete event for
+every firmware packet sent to chip. They only respond with a vendor
+specific event for the last firmware packet. This optimization will
+decrease the BT ON time. Due to this we are seeing a timeout error
+message logs on the console during firmware download. Now we are
+injecting a command complete event once we receive an vendor specific
+event for the last RAM firmware packet.
 
-"Failed to register advertisement: org.bluez.Error.NotPermitted"
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Tested-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+Changes in v9:
+- define QCA_HCI_CC_SUCCESS (again)
+- use QCA_HCI_CC_OPCODE instead of HCI_OP_NOP
 
-I dug into the source code a bit and I suspect that the error is being
-produced in register_advertisement() from advertising.c:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c?h=5.50#n1135
+Changes in v8:
+- renamed QCA_HCI_CC_SUCCESS to QCA_HCI_CC_OPCODE
+- use 0xFC00 as opcode of the injected event instead of 0
+- added Matthias' tags from the v7 review
+---
+ drivers/bluetooth/btqca.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btqca.h |  4 ++++
+ 2 files changed, 42 insertions(+), 1 deletion(-)
 
-On my Linux PC, running "advertise on" is successful.
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index cc12eecd9e4d..711ce526e03c 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct rome_config *config,
+ 		 * In case VSE is skipped, only the last segment is acked.
+ 		 */
+ 		config->dnld_mode = tlv_patch->download_mode;
++		config->dnld_type = config->dnld_mode;
+ 
+ 		BT_DBG("Total Length           : %d bytes",
+ 		       le32_to_cpu(tlv_patch->total_size));
+@@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
+ 	return err;
+ }
+ 
++static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
++{
++	struct hci_event_hdr *hdr;
++	struct hci_ev_cmd_complete *evt;
++	struct sk_buff *skb;
++
++	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	hdr = skb_put(skb, sizeof(*hdr));
++	hdr->evt = HCI_EV_CMD_COMPLETE;
++	hdr->plen = sizeof(*evt) + 1;
++
++	evt = skb_put(skb, sizeof(*evt));
++	evt->ncmd = 1;
++	evt->opcode = QCA_HCI_CC_OPCODE;
++
++	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
++
++	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
++
++	return hci_recv_frame(hdev, skb);
++}
++
+ static int qca_download_firmware(struct hci_dev *hdev,
+ 				  struct rome_config *config)
+ {
+@@ -297,11 +323,22 @@ static int qca_download_firmware(struct hci_dev *hdev,
+ 		ret = qca_tlv_send_segment(hdev, segsize, segment,
+ 					    config->dnld_mode);
+ 		if (ret)
+-			break;
++			goto out;
+ 
+ 		segment += segsize;
+ 	}
+ 
++	/* Latest qualcomm chipsets are not sending a command complete event
++	 * for every fw packet sent. They only respond with a vendor specific
++	 * event for the last packet. This optimization in the chip will
++	 * decrease the BT in initialization time. Here we will inject a command
++	 * complete event to avoid a command timeout error message.
++	 */
++	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
++	    config->dnld_type == ROME_SKIP_EVT_VSE))
++		return qca_inject_cmd_complete_event(hdev);
++
++out:
+ 	release_firmware(fw);
+ 
+ 	return ret;
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 4c4fe2b5b7b7..718de9608ff1 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -41,6 +41,9 @@
+ #define QCA_WCN3990_POWERON_PULSE	0xFC
+ #define QCA_WCN3990_POWEROFF_PULSE	0xC0
+ 
++#define QCA_HCI_CC_OPCODE		0xFC00
++#define QCA_HCI_CC_SUCCESS		0x00
++
+ enum qca_baudrate {
+ 	QCA_BAUDRATE_115200 	= 0,
+ 	QCA_BAUDRATE_57600,
+@@ -82,6 +85,7 @@ struct rome_config {
+ 	char fwname[64];
+ 	uint8_t user_baud_rate;
+ 	enum rome_tlv_dnld_mode dnld_mode;
++	enum rome_tlv_dnld_mode dnld_type;
+ };
+ 
+ struct edl_event_hdr {
+-- 
+2.22.0.rc1.257.g3120a18244-goog
 
-The error message in the code is "Maximum advertisements reached", so I
-decided to pursue that.  I ran the command "dbus-send --system
---print-reply --type=method_call --dest=org.bluez /
-org.freedesktop.DBus.ObjectManager.GetManagedObjects" on both the
-embedded system and the PC.
-
-This is the snippet from the embedded system that I think is pertinent:
-dict entry(
-   string "org.bluez.LEAdvertisingManager1"
-   array [
-      dict entry(
-         string "ActiveInstances"
-         variant                         byte 0
-      )
-      dict entry(
-         string "SupportedInstances"
-         variant                         byte 0
-      )
-      dict entry(
-         string "SupportedIncludes"
-         variant                         array [
-               string "local-name"
-            ]
-      )
-   ]
-)
-
-And the corresponding snippet from the PC:
-dict entry(
-   string "org.bluez.LEAdvertisingManager1"
-   array [
-      dict entry(
-         string "ActiveInstances"
-         variant                         byte 0
-      )
-      dict entry(
-         string "SupportedInstances"
-         variant                         byte 5
-      )
-      dict entry(
-         string "SupportedIncludes"
-         variant                         array [
-               string "tx-power"
-               string "appearance"
-               string "local-name"
-            ]
-      )
-   ]
-)
-
-I'm not sure what "SupportedIncludes" really means, but I immediately
-noticed that the value for "SupportedInstances" on the embedded system
-is 0 while the on the PC it's 5.
-
-Why are these values different?  Please let me know if there is any
-other information that would be useful.
-
-Thanks,
-David
