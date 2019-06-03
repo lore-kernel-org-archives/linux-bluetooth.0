@@ -2,178 +2,231 @@ Return-Path: <SRS0=tYwc=UC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A9EC04AB5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BF8C04AB5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 882BF2808F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:12:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A32E0280BC
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:48:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2VLqzkC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSQxxfup"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727674AbfFCKMO (ORCPT
+        id S1727412AbfFCKst (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Jun 2019 06:12:14 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:41989 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726653AbfFCKMO (ORCPT
+        Mon, 3 Jun 2019 06:48:49 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:42921 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727190AbfFCKst (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Jun 2019 06:12:14 -0400
-Received: by mail-ot1-f65.google.com with SMTP id i2so14532065otr.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2019 03:12:14 -0700 (PDT)
+        Mon, 3 Jun 2019 06:48:49 -0400
+Received: by mail-ed1-f66.google.com with SMTP id z25so238557edq.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2019 03:48:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=S2m2hL69k1HEgZYF8JZAhpToxs/d9BIMlLdbdqg2zN4=;
-        b=X2VLqzkCxQHsla5e33nzi0OTdmwHw9U5709VBULoQ3dP3egHvKM0XQ5mChBy3C4CKe
-         MJtWbQfFUHm8HnEpntDpGprFEDtevJNPTehmXGRzNl/jbic2HIuJ4uQavr6GQF8s1Ebn
-         9ifHwWcWswTBoO7yw5S4+cvN09cWXf3aL333QLDO8oltZhMRV0nSLIvpxU4XV8dKBvZ4
-         ocXzBrdxi4oIoaHDcmlStkEq6RmToD6UvVRROL9nbcEAgPHZ1CLd8JDM+92hS/lMtLNf
-         /ruAh7KveY/tPhQ1TmAyZGxPFIKfGDfDvVNAUORYHvtsotcSZOw4qIQpjKtbFvblNlyn
-         DFwA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6HrdzLpThnp4XMqVvFHU1y9LanmyXQ0RXfMKTA3VGb0=;
+        b=hSQxxfupcksBMBFs/Bjmjts/dewpWV+GgQm6c/3S5YNRypejgArCUrIh47/IrOoNbd
+         jp91AwQO1UoK/KdmDy6X5e3xhpoLt1m5GiyBomca5N/ctix5BgByeRePXhqGHhqdM0gN
+         NRnsMLK3kSHIXtALQNnkeYWgUg5zHewzMSJITJsxvb1lFME7xdRDQgmaEdEMXO1oHTim
+         p7YZ+4bQm7ISAYss3GVLaSzVZKQUID0UcWFw4NspFeZ5XjsjKa9H1xzV+CmnRRAeoex8
+         ylMeqaBZafyYHhalBmEdE7LiCyLSgDhYEZwjnlbblLczjVteFxL3N7KmGoccq1Jz18KK
+         ASig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=S2m2hL69k1HEgZYF8JZAhpToxs/d9BIMlLdbdqg2zN4=;
-        b=sDHMitwl694ldLe34c7pQeYr4Q7jCTw7UbYrESCCrBaSxiB3Qt9DK9hYco5XxFXi1R
-         83LDvJbt5pqn7akeEMt0Jx1bQFZuMdbqEI7Shour84m7lInmHr3QInOGqU1ij9CFg6sK
-         sGt2QOWpe8CvxjbrAWsnPZE12gxTcdIRJl7UxMpK0rpkHwZoEb3fzDfmzbqZlUb6hL3N
-         v0VRw7UOW+IB1WZct51bmkxtFx+fHqlhgDuyCjGrPkgMgiRW1Tjl5y+ecbGGQJLy1M1A
-         iddMi3mbrwT6JG5ia6eYBGTwqZbKYplALSH/kD1x91uZw8aU9RB0POUfOYen9RZUc/86
-         LipQ==
-X-Gm-Message-State: APjAAAV3j0enJdCE2nD38WNbcuGtQajpiR0gneoWMUz/+P5ce6iWRuT2
-        fm5MpcMqQDY3BCXpJ5hPDK+ZQymmaLU03MmY3ZwcK9C4woA=
-X-Google-Smtp-Source: APXvYqzPB73JJXK5fN+nTnKCz51QnvoAWdFNJS5tS7A8HFY5EcWmKyzhNEE0ybIhwMiiZtBDqE0rmRWAw9UKjJqJbG0=
-X-Received: by 2002:a9d:6a15:: with SMTP id g21mr622026otn.28.1559556733272;
- Mon, 03 Jun 2019 03:12:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190529121405.18357-1-luiz.dentz@gmail.com>
-In-Reply-To: <20190529121405.18357-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6HrdzLpThnp4XMqVvFHU1y9LanmyXQ0RXfMKTA3VGb0=;
+        b=hD4r0RwiMraNwIByQfh+paZVCi7lC9oVP3ocnXMPcrmGCLu41sSEJ6+UhaJytA82r4
+         2s1sfTL+f0g6ZDi0v9VQG0YEGBkY0AMdZupBSO1io9JPwD8e4aAcSppuyVuJxEpirDnA
+         RPtolzGjk9AQ30r155RJ77NScpzQwxJK+hgEdM2G8IA4FjAuTXcmhtHaYTdPxzZVzx7O
+         3lRCyv7YQihjSxHU+V3BI4P18OtdT8vB77thM6N85F67aERMHl2YxYPhbsVOKuT4jnZ2
+         4rI96lb9FwPTkn8py15s97LWK8VyWd51P6YKDBTHwUYhKDIrWjuuM7EG3rg6ckdnQuhJ
+         oJ6w==
+X-Gm-Message-State: APjAAAUGLQdLjtgwFQTH3B/3hMZc0/kwN81gKcwWpI2BsyZFU/9udU2n
+        ITcx8Y2Vpfux3ML6rddBwYNlUYWPJCY=
+X-Google-Smtp-Source: APXvYqzGSiWWwQJZuN4/LJRpCuR9dRV9s9rr9X+t1H3Pii8f8v7hNX8kTgFtaPBKojNwLtkmIcSCKQ==
+X-Received: by 2002:a50:a7a5:: with SMTP id i34mr27769584edc.294.1559558926376;
+        Mon, 03 Jun 2019 03:48:46 -0700 (PDT)
+Received: from localhost.localdomain ([192.198.151.62])
+        by smtp.gmail.com with ESMTPSA id d90sm3926207edd.96.2019.06.03.03.48.45
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 03 Jun 2019 03:48:45 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 3 Jun 2019 13:12:01 +0300
-Message-ID: <CABBYNZL84du-OQdpbtuDa_t_MShF24Lm8ccPjDtCSm0fBT0Dpg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] main.conf: Make ReverseServiceDiscovery work with LE
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC 1/2] Bluetooth: Use controller sets when available
+Date:   Mon,  3 Jun 2019 13:48:42 +0300
+Message-Id: <20190603104843.26848-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, May 29, 2019 at 3:14 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This makes ReverseServiceDiscovery work properly with LE connection by
-> disabling the GATT client functionality which makes one able to setup a
-> system to operate in peripheral role only mode.
-> ---
->  src/device.c  | 9 +++++++--
->  src/hcid.h    | 2 +-
->  src/main.c    | 4 ++--
->  src/main.conf | 8 +++++---
->  4 files changed, 15 insertions(+), 8 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index 8ddfa28ff..263f60aea 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -4933,6 +4933,11 @@ static void gatt_client_init(struct btd_device *device)
->  {
->         gatt_client_cleanup(device);
->
-> +       if (!device->connect && !main_opts.reverse_discovery) {
-> +               DBG("Reverse service discovery disabled: skipping GATT client");
-> +               return;
-> +       }
-> +
->         device->client = bt_gatt_client_new(device->db, device->att,
->                                                         device->att_mtu);
->         if (!device->client) {
-> @@ -5814,7 +5819,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
->                 bonding_request_free(bonding);
->         } else if (!state->svc_resolved) {
->                 if (!device->browse && !device->discov_timer &&
-> -                               main_opts.reverse_sdp) {
-> +                               main_opts.reverse_discovery) {
->                         /* If we are not initiators and there is no currently
->                          * active discovery or discovery timer, set discovery
->                          * timer */
-> @@ -5858,7 +5863,7 @@ unsigned int device_wait_for_svc_complete(struct btd_device *dev,
->
->         dev->svc_callbacks = g_slist_prepend(dev->svc_callbacks, cb);
->
-> -       if (state->svc_resolved || !main_opts.reverse_sdp)
-> +       if (state->svc_resolved || !main_opts.reverse_discovery)
->                 cb->idle_id = g_idle_add(svc_idle_cb, cb);
->         else if (dev->discov_timer > 0) {
->                 g_source_remove(dev->discov_timer);
-> diff --git a/src/hcid.h b/src/hcid.h
-> index 1eb3c5ac2..adea85ce2 100644
-> --- a/src/hcid.h
-> +++ b/src/hcid.h
-> @@ -43,7 +43,7 @@ struct main_opts {
->         uint32_t        discovto;
->         uint8_t         privacy;
->
-> -       gboolean        reverse_sdp;
-> +       gboolean        reverse_discovery;
->         gboolean        name_resolv;
->         gboolean        debug_keys;
->         gboolean        fast_conn;
-> diff --git a/src/main.c b/src/main.c
-> index 696728320..1a6ab36a3 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -367,7 +367,7 @@ static void parse_config(GKeyFile *config)
->                 DBG("%s", err->message);
->                 g_clear_error(&err);
->         } else
-> -               main_opts.reverse_sdp = boolean;
-> +               main_opts.reverse_discovery = boolean;
->
->         boolean = g_key_file_get_boolean(config, "General",
->                                                 "NameResolving", &err);
-> @@ -456,7 +456,7 @@ static void init_defaults(void)
->         main_opts.class = 0x000000;
->         main_opts.pairto = DEFAULT_PAIRABLE_TIMEOUT;
->         main_opts.discovto = DEFAULT_DISCOVERABLE_TIMEOUT;
-> -       main_opts.reverse_sdp = TRUE;
-> +       main_opts.reverse_discovery = TRUE;
->         main_opts.name_resolv = TRUE;
->         main_opts.debug_keys = FALSE;
->
-> diff --git a/src/main.conf b/src/main.conf
-> index b2f843c75..40687a755 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -30,9 +30,11 @@
->  #DeviceID = bluetooth:1234:5678:abcd
->
->  # Do reverse service discovery for previously unknown devices that connect to
-> -# us. This option is really only needed for qualification since the BITE tester
-> -# doesn't like us doing reverse SDP for some test cases (though there could in
-> -# theory be other useful purposes for this too). Defaults to 'true'.
-> +# us. For BR/EDR this option is really only needed for qualification since the
-> +# BITE tester doesn't like us doing reverse SDP for some test cases, for LE
-> +# this disables the GATT client functionally so it can be used in system which
-> +# can only operate as peripheral.
-> +# Defaults to 'true'.
->  #ReverseServiceDiscovery = true
->
->  # Enable name resolving after inquiry. Set it to 'false' if you don't need
-> --
-> 2.21.0
+This makes use of controller sets when using Extended Advertising
+feature thus offloading the scheduling to the controller.
 
-Applied.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_conn.c    |  2 +-
+ net/bluetooth/hci_core.c    |  3 ++-
+ net/bluetooth/hci_request.c | 40 ++++++++++++++++++++++++++++++-------
+ net/bluetooth/hci_request.h |  2 +-
+ 4 files changed, 37 insertions(+), 10 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index bd4978ce8c45..1d2fa24d752f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -912,7 +912,7 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 				    sizeof(cp), &cp);
+ 		}
+ 
+-		__hci_req_enable_ext_advertising(req);
++		__hci_req_enable_ext_advertising(req, 0x00);
+ 	} else {
+ 		struct hci_cp_le_set_adv_param cp;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d6b2540ba7f8..9547354a9773 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2829,7 +2829,7 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+ 		memset(adv_instance->scan_rsp_data, 0,
+ 		       sizeof(adv_instance->scan_rsp_data));
+ 	} else {
+-		if (hdev->adv_instance_cnt >= HCI_MAX_ADV_INSTANCES ||
++		if (hdev->adv_instance_cnt >= hdev->le_num_of_adv_sets ||
+ 		    instance < 1 || instance > HCI_MAX_ADV_INSTANCES)
+ 			return -EOVERFLOW;
+ 
+@@ -3197,6 +3197,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->le_min_key_size = SMP_MIN_ENC_KEY_SIZE;
+ 	hdev->le_tx_def_phys = HCI_LE_SET_PHY_1M;
+ 	hdev->le_rx_def_phys = HCI_LE_SET_PHY_1M;
++	hdev->le_num_of_adv_sets = HCI_MAX_ADV_INSTANCES;
+ 
+ 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
+ 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index ca73d36cc149..5970d77f9911 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1596,7 +1596,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	cp.own_addr_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+ 	cp.tx_power = 127;
+-	cp.handle = 0;
++	cp.handle = instance;
+ 
+ 	if (flags & MGMT_ADV_FLAG_SEC_2M) {
+ 		cp.primary_phy = HCI_ADV_PHY_1M;
+@@ -1638,11 +1638,21 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	return 0;
+ }
+ 
+-void __hci_req_enable_ext_advertising(struct hci_request *req)
++int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance)
+ {
++	struct hci_dev *hdev = req->hdev;
+ 	struct hci_cp_le_set_ext_adv_enable *cp;
+ 	struct hci_cp_ext_adv_set *adv_set;
+ 	u8 data[sizeof(*cp) + sizeof(*adv_set) * 1];
++	struct adv_info *adv_instance;
++
++	if (instance > 0) {
++		adv_instance = hci_find_adv_instance(hdev, instance);
++		if (!adv_instance)
++			return -EINVAL;
++	} else {
++		adv_instance = NULL;
++	}
+ 
+ 	cp = (void *) data;
+ 	adv_set = (void *) cp->data;
+@@ -1654,11 +1664,23 @@ void __hci_req_enable_ext_advertising(struct hci_request *req)
+ 
+ 	memset(adv_set, 0, sizeof(*adv_set));
+ 
+-	adv_set->handle = 0;
++	adv_set->handle = instance;
++
++	/* Set duration per instance since controller is responsible for
++	 * scheduling it.
++	 */
++	if (adv_instance && adv_instance->duration) {
++		u16 duration = adv_instance->duration * MSEC_PER_SEC;
++
++		/* Time = N * 10 ms */
++		adv_set->duration = cpu_to_le16(duration / 10);
++	}
+ 
+ 	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_ENABLE,
+ 		    sizeof(*cp) + sizeof(*adv_set) * cp->num_of_sets,
+ 		    data);
++
++	return 0;
+ }
+ 
+ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
+@@ -1674,7 +1696,7 @@ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
+ 		return err;
+ 
+ 	__hci_req_update_scan_rsp_data(req, instance);
+-	__hci_req_enable_ext_advertising(req);
++	__hci_req_enable_ext_advertising(req, instance);
+ 
+ 	return 0;
+ }
+@@ -1718,10 +1740,13 @@ int __hci_req_schedule_adv_instance(struct hci_request *req, u8 instance,
+ 		adv_instance->remaining_time =
+ 				adv_instance->remaining_time - timeout;
+ 
+-	hdev->adv_instance_timeout = timeout;
+-	queue_delayed_work(hdev->req_workqueue,
++	/* Only use work for scheduling instaces with legacy advertising */
++	if (!ext_adv_capable(hdev)) {
++		hdev->adv_instance_timeout = timeout;
++		queue_delayed_work(hdev->req_workqueue,
+ 			   &hdev->adv_instance_expire,
+ 			   msecs_to_jiffies(timeout * 1000));
++	}
+ 
+ 	/* If we're just re-scheduling the same instance again then do not
+ 	 * execute any HCI commands. This happens when a single instance is
+@@ -2739,7 +2764,8 @@ static int powered_update_hci(struct hci_request *req, unsigned long opt)
+ 				if (!ext_adv_capable(hdev))
+ 					__hci_req_enable_advertising(req);
+ 				else if (!err)
+-					__hci_req_enable_ext_advertising(req);
++					__hci_req_enable_ext_advertising(req,
++									 0x00);
+ 			}
+ 		} else if (!list_empty(&hdev->adv_instances)) {
+ 			struct adv_info *adv_instance;
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 692cc8b13368..ea4191c76fb3 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -82,7 +82,7 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
+ 
+ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
+ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
+-void __hci_req_enable_ext_advertising(struct hci_request *req);
++int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance);
+ void __hci_req_clear_ext_adv_sets(struct hci_request *req);
+ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ 			   bool use_rpa, struct adv_info *adv_instance,
 -- 
-Luiz Augusto von Dentz
+2.21.0
+
