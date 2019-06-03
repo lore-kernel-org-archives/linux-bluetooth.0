@@ -8,62 +8,64 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BF8C04AB5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:48:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 649B2C28CC6
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:48:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A32E0280BC
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:48:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DDBA280BC
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jun 2019 10:48:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSQxxfup"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EctMQ4ok"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727412AbfFCKst (ORCPT
+        id S1727415AbfFCKst (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Mon, 3 Jun 2019 06:48:49 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:42921 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727190AbfFCKst (ORCPT
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:36507 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727403AbfFCKst (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 3 Jun 2019 06:48:49 -0400
-Received: by mail-ed1-f66.google.com with SMTP id z25so238557edq.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2019 03:48:47 -0700 (PDT)
+Received: by mail-ed1-f65.google.com with SMTP id a8so26292063edx.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2019 03:48:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=6HrdzLpThnp4XMqVvFHU1y9LanmyXQ0RXfMKTA3VGb0=;
-        b=hSQxxfupcksBMBFs/Bjmjts/dewpWV+GgQm6c/3S5YNRypejgArCUrIh47/IrOoNbd
-         jp91AwQO1UoK/KdmDy6X5e3xhpoLt1m5GiyBomca5N/ctix5BgByeRePXhqGHhqdM0gN
-         NRnsMLK3kSHIXtALQNnkeYWgUg5zHewzMSJITJsxvb1lFME7xdRDQgmaEdEMXO1oHTim
-         p7YZ+4bQm7ISAYss3GVLaSzVZKQUID0UcWFw4NspFeZ5XjsjKa9H1xzV+CmnRRAeoex8
-         ylMeqaBZafyYHhalBmEdE7LiCyLSgDhYEZwjnlbblLczjVteFxL3N7KmGoccq1Jz18KK
-         ASig==
+        bh=55qif/+sqWE4Xb0B5Cxr17PZ9yp4wdN9b2ryTniK8Ns=;
+        b=EctMQ4okKDCSGw+Fn/+vr+fngPWuTZELGo1rnm34gMUbLSSwWVI5y6yAhwlsLg18N7
+         NOyBiewEoCfCbdlV9K1JegJ+YBbJ5UFhQdTST7ErBFli39+PH9nFGVn7mdEEjDlngMEU
+         s5dkbD75Ssy19y8ZYdSzu6GTgQi+WMr5mqrAkQokkRdaF3dVIotug+c527oQf766Y9K4
+         pLhMg0CoqWV+ucfYsK9qFDY4hxO4qzZGJIbiO24usjIT05IPohHlMVH6pG+qLgNf3mf/
+         AmBW54QTMBuyXTVer3Cs5LQNJKO9OZ3gnyuuGffwXxZnhiIemsKFeXFMegHJgFNKHahF
+         SuZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=6HrdzLpThnp4XMqVvFHU1y9LanmyXQ0RXfMKTA3VGb0=;
-        b=hD4r0RwiMraNwIByQfh+paZVCi7lC9oVP3ocnXMPcrmGCLu41sSEJ6+UhaJytA82r4
-         2s1sfTL+f0g6ZDi0v9VQG0YEGBkY0AMdZupBSO1io9JPwD8e4aAcSppuyVuJxEpirDnA
-         RPtolzGjk9AQ30r155RJ77NScpzQwxJK+hgEdM2G8IA4FjAuTXcmhtHaYTdPxzZVzx7O
-         3lRCyv7YQihjSxHU+V3BI4P18OtdT8vB77thM6N85F67aERMHl2YxYPhbsVOKuT4jnZ2
-         4rI96lb9FwPTkn8py15s97LWK8VyWd51P6YKDBTHwUYhKDIrWjuuM7EG3rg6ckdnQuhJ
-         oJ6w==
-X-Gm-Message-State: APjAAAUGLQdLjtgwFQTH3B/3hMZc0/kwN81gKcwWpI2BsyZFU/9udU2n
-        ITcx8Y2Vpfux3ML6rddBwYNlUYWPJCY=
-X-Google-Smtp-Source: APXvYqzGSiWWwQJZuN4/LJRpCuR9dRV9s9rr9X+t1H3Pii8f8v7hNX8kTgFtaPBKojNwLtkmIcSCKQ==
-X-Received: by 2002:a50:a7a5:: with SMTP id i34mr27769584edc.294.1559558926376;
-        Mon, 03 Jun 2019 03:48:46 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=55qif/+sqWE4Xb0B5Cxr17PZ9yp4wdN9b2ryTniK8Ns=;
+        b=fKWFiLNzUTDmy0L7oB5Aqfg0ZII37MS54u2rINl9dp56YKBPZWFDlXaeTNq6LiYUNN
+         EHhcYk6NieBrcqBFmnmfGU8NjQiwrUJmazz+JoEHRUAA2iin2VVVo0PPWvE6t2qizyUl
+         WPZM0dQaFDgDO4i1KDTKoS21A9ckhV/qhzNKHdrJ/I8/vDYfJS04nfcnq3OqGDqKx1HF
+         LlwX/ZP2eIS0mxIkr4RLfXjJ+yU/d2P8IkwKRp7j4KVqMyNa9nZWSxt+bjQrXjahMebh
+         3qIiKZU2Ysb3a3cnn73mMo2R6yZLVOO+Ly8zhWgYWd+b0PVHhDXAF1jXyhbaObZiEXoe
+         glGg==
+X-Gm-Message-State: APjAAAWGunxpDspRSngWxwxnFIZ2vrLSh8cH3taj4BN7RJ2MjDFA9Qgn
+        APlwSM9A6Gxqhbuu/cffFSfOrwEz2os=
+X-Google-Smtp-Source: APXvYqxNvLdT810YTxkgrKimz5jpZfkTc4lP8zVu7ijBS67WmsM0YqwYcYXC7XRCi2+oKjn6p2KMFw==
+X-Received: by 2002:a17:906:3594:: with SMTP id o20mr16534985ejb.73.1559558927511;
+        Mon, 03 Jun 2019 03:48:47 -0700 (PDT)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id d90sm3926207edd.96.2019.06.03.03.48.45
+        by smtp.gmail.com with ESMTPSA id d90sm3926207edd.96.2019.06.03.03.48.46
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 03 Jun 2019 03:48:45 -0700 (PDT)
+        Mon, 03 Jun 2019 03:48:46 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/2] Bluetooth: Use controller sets when available
-Date:   Mon,  3 Jun 2019 13:48:42 +0300
-Message-Id: <20190603104843.26848-1-luiz.dentz@gmail.com>
+Subject: [RFC 2/2] Bluetooth: L2CAP: Check bearer type on __l2cap_global_chan_by_addr
+Date:   Mon,  3 Jun 2019 13:48:43 +0300
+Message-Id: <20190603104843.26848-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190603104843.26848-1-luiz.dentz@gmail.com>
+References: <20190603104843.26848-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -73,160 +75,57 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes use of controller sets when using Extended Advertising
-feature thus offloading the scheduling to the controller.
+The spec defines PSM and LE_PSM as different domains so a listen on the
+same PSM is valid if the address type points to a different bearer.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_conn.c    |  2 +-
- net/bluetooth/hci_core.c    |  3 ++-
- net/bluetooth/hci_request.c | 40 ++++++++++++++++++++++++++++++-------
- net/bluetooth/hci_request.h |  2 +-
- 4 files changed, 37 insertions(+), 10 deletions(-)
+ net/bluetooth/l2cap_core.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index bd4978ce8c45..1d2fa24d752f 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -912,7 +912,7 @@ static void hci_req_directed_advertising(struct hci_request *req,
- 				    sizeof(cp), &cp);
- 		}
- 
--		__hci_req_enable_ext_advertising(req);
-+		__hci_req_enable_ext_advertising(req, 0x00);
- 	} else {
- 		struct hci_cp_le_set_adv_param cp;
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d6b2540ba7f8..9547354a9773 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2829,7 +2829,7 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
- 		memset(adv_instance->scan_rsp_data, 0,
- 		       sizeof(adv_instance->scan_rsp_data));
- 	} else {
--		if (hdev->adv_instance_cnt >= HCI_MAX_ADV_INSTANCES ||
-+		if (hdev->adv_instance_cnt >= hdev->le_num_of_adv_sets ||
- 		    instance < 1 || instance > HCI_MAX_ADV_INSTANCES)
- 			return -EOVERFLOW;
- 
-@@ -3197,6 +3197,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	hdev->le_min_key_size = SMP_MIN_ENC_KEY_SIZE;
- 	hdev->le_tx_def_phys = HCI_LE_SET_PHY_1M;
- 	hdev->le_rx_def_phys = HCI_LE_SET_PHY_1M;
-+	hdev->le_num_of_adv_sets = HCI_MAX_ADV_INSTANCES;
- 
- 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
- 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index ca73d36cc149..5970d77f9911 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1596,7 +1596,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 	cp.own_addr_type = own_addr_type;
- 	cp.channel_map = hdev->le_adv_channel_map;
- 	cp.tx_power = 127;
--	cp.handle = 0;
-+	cp.handle = instance;
- 
- 	if (flags & MGMT_ADV_FLAG_SEC_2M) {
- 		cp.primary_phy = HCI_ADV_PHY_1M;
-@@ -1638,11 +1638,21 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 	return 0;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b53acd6c9a3d..8da73ca8c111 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -168,11 +168,18 @@ static struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn,
+ 	return c;
  }
  
--void __hci_req_enable_ext_advertising(struct hci_request *req)
-+int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance)
+-static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src)
++static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src,
++						      u8 src_type)
  {
-+	struct hci_dev *hdev = req->hdev;
- 	struct hci_cp_le_set_ext_adv_enable *cp;
- 	struct hci_cp_ext_adv_set *adv_set;
- 	u8 data[sizeof(*cp) + sizeof(*adv_set) * 1];
-+	struct adv_info *adv_instance;
+ 	struct l2cap_chan *c;
+ 
+ 	list_for_each_entry(c, &chan_list, global_l) {
++		if (src_type == BDADDR_BREDR && c->src_type != BDADDR_BREDR)
++			continue;
 +
-+	if (instance > 0) {
-+		adv_instance = hci_find_adv_instance(hdev, instance);
-+		if (!adv_instance)
-+			return -EINVAL;
-+	} else {
-+		adv_instance = NULL;
-+	}
- 
- 	cp = (void *) data;
- 	adv_set = (void *) cp->data;
-@@ -1654,11 +1664,23 @@ void __hci_req_enable_ext_advertising(struct hci_request *req)
- 
- 	memset(adv_set, 0, sizeof(*adv_set));
- 
--	adv_set->handle = 0;
-+	adv_set->handle = instance;
++		if (src_type != BDADDR_BREDR && c->src_type == BDADDR_BREDR)
++			continue;
 +
-+	/* Set duration per instance since controller is responsible for
-+	 * scheduling it.
-+	 */
-+	if (adv_instance && adv_instance->duration) {
-+		u16 duration = adv_instance->duration * MSEC_PER_SEC;
-+
-+		/* Time = N * 10 ms */
-+		adv_set->duration = cpu_to_le16(duration / 10);
-+	}
+ 		if (c->sport == psm && !bacmp(&c->src, src))
+ 			return c;
+ 	}
+@@ -185,7 +192,7 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
  
- 	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_ENABLE,
- 		    sizeof(*cp) + sizeof(*adv_set) * cp->num_of_sets,
- 		    data);
-+
-+	return 0;
- }
+ 	write_lock(&chan_list_lock);
  
- int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
-@@ -1674,7 +1696,7 @@ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
- 		return err;
+-	if (psm && __l2cap_global_chan_by_addr(psm, src)) {
++	if (psm && __l2cap_global_chan_by_addr(psm, src, chan->src_type)) {
+ 		err = -EADDRINUSE;
+ 		goto done;
+ 	}
+@@ -209,7 +216,8 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
  
- 	__hci_req_update_scan_rsp_data(req, instance);
--	__hci_req_enable_ext_advertising(req);
-+	__hci_req_enable_ext_advertising(req, instance);
- 
- 	return 0;
- }
-@@ -1718,10 +1740,13 @@ int __hci_req_schedule_adv_instance(struct hci_request *req, u8 instance,
- 		adv_instance->remaining_time =
- 				adv_instance->remaining_time - timeout;
- 
--	hdev->adv_instance_timeout = timeout;
--	queue_delayed_work(hdev->req_workqueue,
-+	/* Only use work for scheduling instaces with legacy advertising */
-+	if (!ext_adv_capable(hdev)) {
-+		hdev->adv_instance_timeout = timeout;
-+		queue_delayed_work(hdev->req_workqueue,
- 			   &hdev->adv_instance_expire,
- 			   msecs_to_jiffies(timeout * 1000));
-+	}
- 
- 	/* If we're just re-scheduling the same instance again then do not
- 	 * execute any HCI commands. This happens when a single instance is
-@@ -2739,7 +2764,8 @@ static int powered_update_hci(struct hci_request *req, unsigned long opt)
- 				if (!ext_adv_capable(hdev))
- 					__hci_req_enable_advertising(req);
- 				else if (!err)
--					__hci_req_enable_ext_advertising(req);
-+					__hci_req_enable_ext_advertising(req,
-+									 0x00);
- 			}
- 		} else if (!list_empty(&hdev->adv_instances)) {
- 			struct adv_info *adv_instance;
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 692cc8b13368..ea4191c76fb3 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -82,7 +82,7 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
- 
- int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
- int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
--void __hci_req_enable_ext_advertising(struct hci_request *req);
-+int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance);
- void __hci_req_clear_ext_adv_sets(struct hci_request *req);
- int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
- 			   bool use_rpa, struct adv_info *adv_instance,
+ 		err = -EINVAL;
+ 		for (p = start; p <= end; p += incr)
+-			if (!__l2cap_global_chan_by_addr(cpu_to_le16(p), src)) {
++			if (!__l2cap_global_chan_by_addr(cpu_to_le16(p), src,
++							 chan->src_type)) {
+ 				chan->psm   = cpu_to_le16(p);
+ 				chan->sport = cpu_to_le16(p);
+ 				err = 0;
 -- 
 2.21.0
 
