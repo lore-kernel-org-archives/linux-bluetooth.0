@@ -2,75 +2,71 @@ Return-Path: <SRS0=Orb+=UD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3047DC282CE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jun 2019 12:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34992C282CE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jun 2019 20:29:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F1F420665
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jun 2019 12:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D44120862
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jun 2019 20:29:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727699AbfFDM0o (ORCPT
+        id S1726179AbfFDU3F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jun 2019 08:26:44 -0400
-Received: from relay7-d.mail.gandi.net ([217.70.183.200]:47429 "EHLO
-        relay7-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726994AbfFDM0o (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jun 2019 08:26:44 -0400
-X-Originating-IP: 83.155.44.161
-Received: from classic (mon69-7-83-155-44-161.fbx.proxad.net [83.155.44.161])
-        (Authenticated sender: hadess@hadess.net)
-        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id 768CF20006;
-        Tue,  4 Jun 2019 12:26:40 +0000 (UTC)
-Message-ID: <eed1d21883c605b92abe2b13cf658454444c9d39.camel@hadess.net>
-Subject: Re: [RFC] Bluetooth: Check key sizes only when Secure Simple
- Pairing is enabled
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Vasily Khoruzhick <anarsoul@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
-Date:   Tue, 04 Jun 2019 14:26:39 +0200
-In-Reply-To: <CA+E=qVcW0aQ=D_0bvEbTL9VA5P_2iykbZpNr2xH8P-eHB3FSog@mail.gmail.com>
-References: <20190522070540.48895-1-marcel@holtmann.org>
-         <CA+E=qVcW0aQ=D_0bvEbTL9VA5P_2iykbZpNr2xH8P-eHB3FSog@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.2 (3.32.2-1.fc30) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 4 Jun 2019 16:29:05 -0400
+Received: from mga18.intel.com ([134.134.136.126]:10752 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725933AbfFDU3F (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 4 Jun 2019 16:29:05 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Jun 2019 13:29:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,550,1549958400"; 
+   d="scan'208";a="181680735"
+Received: from bgix-dell-lap.sea.intel.com ([10.254.84.39])
+  by fmsmga002.fm.intel.com with ESMTP; 04 Jun 2019 13:29:04 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, brian.gix@intel.com,
+        ludwig.nussel@suse.de, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Subject: [PATCH BlueZ v4 0/3] mesh - Service and Installation
+Date:   Tue,  4 Jun 2019 13:28:49 -0700
+Message-Id: <20190604202852.12656-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 2019-05-23 at 07:53 -0700, Vasily Khoruzhick wrote:
-> On Wed, May 22, 2019 at 12:05 AM Marcel Holtmann <marcel@holtmann.org
-> > wrote:
-> > The encryption is only mandatory to be enforced when both sides are
-> > using
-> > Secure Simple Pairing and this means the key size check makes only
-> > sense
-> > in that case.
-> > 
-> > On legacy Bluetooth 2.0 and earlier devices like mice the
-> > encryption was
-> > optional and thus causing an issue if the key size check is not
-> > bound to
-> > using Secure Simple Pairing.
-> > 
-> > Fixes: d5bb334a8e17 ("Bluetooth: Align minimum encryption key size
-> > for LE and BR/EDR connections")
-> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> > Cc: stable@vger.kernel.org
-> 
-> Tested-by: Vasily Khoruzhick <anarsoul@gmail.com>
+This patch set of changes from Inga and Ludwig are needed to install
+the bluetooth-mesh daemon as a systemd service, with access to D-bus.
 
-I've asked for this patch to be included in the current Fedora release:
-https://lists.fedoraproject.org/archives/list/kernel@lists.fedoraproject.org/thread/YE5OGFZRDJL2TFJK3RWU7AAWV3PFRMNB/
+Ludwig's patch from April fixes a problem with installation locations
+for *all* of BlueZ, and Inga's adds the bluetooth-mesh service.
 
-Hopefully, that means that it gets a bit more testing and gets merged upstream.
 
-Cheers
+Inga Stotland (2):
+  build: Add support for systemd bluetooth-mesh service
+  mesh: Do not daemonize, run in foreground or as service
+
+Ludwig Nussel (1):
+  install: Fix installations to pkglibexecdir
+
+ Makefile.am                    |  4 ++--
+ Makefile.mesh                  | 16 +++++++++++++---
+ Makefile.obexd                 |  2 +-
+ Makefile.tools                 |  2 +-
+ mesh/bluetooth-mesh.service.in | 17 +++++++++++++++++
+ mesh/main.c                    | 17 ++++++-----------
+ mesh/org.bluez.mesh.service    |  5 +++++
+ 7 files changed, 45 insertions(+), 18 deletions(-)
+ create mode 100644 mesh/bluetooth-mesh.service.in
+ create mode 100644 mesh/org.bluez.mesh.service
+
+-- 
+2.14.5
 
