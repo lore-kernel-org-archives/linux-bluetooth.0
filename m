@@ -2,135 +2,194 @@ Return-Path: <SRS0=rXBD=UF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1AEC04AB5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jun 2019 07:05:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08360C04AB5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jun 2019 09:40:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0AB672083D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jun 2019 07:05:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1FAA20872
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jun 2019 09:40:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="JZ/uwpBP"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="KyuiZ5xR";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="mcN0LhTU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725769AbfFFHFV (ORCPT
+        id S1727846AbfFFJkm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jun 2019 03:05:21 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:34398 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725267AbfFFHFV (ORCPT
+        Thu, 6 Jun 2019 05:40:42 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:54536 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727359AbfFFJkm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jun 2019 03:05:21 -0400
-Received: by mail-lf1-f65.google.com with SMTP id y198so748395lfa.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jun 2019 00:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=I6eoTCRoGN1ihLZussVO2rXcsg0C8cDyb8f3ygQYUWY=;
-        b=JZ/uwpBP2I2N58XOyP8kKUjmb07hd0gllBDpg42NJdQ6ZAKRNDdAsdm0Bz/lLIgagQ
-         +ZpZittQNWgfkkXQYioe1XCIkEeiGVjap34NWCe12Y5t5DO0idU6WAkFDl2lnBd4Ahf1
-         klTMq8418rJJ9TlsZKfy26IrrYA1NfTpqpRsb7rwKCT9zTbnvQiyuYmzmypbPl3IqNHq
-         WRfmQhTUvforqE8yAQOgwPYnz4NxSMiKtGeoAdXncXowJdpYTALrODJ4wPMcTQpGvQEs
-         maBCWTdxAsX5jsQvLeVLN/RJWIOqHB6OJoO8u83hZcBtq4GrByi/+EdFWJMa+4C6Txi8
-         3KwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=I6eoTCRoGN1ihLZussVO2rXcsg0C8cDyb8f3ygQYUWY=;
-        b=TMmPuyOWamTTIWXpMz7si+44DUrCNvryPXNGnB5EFUpjCMtAGatexXV9wwzN8CUtuq
-         5r7vvwv6ujzNCHadoCsBVFGvho4NB05dHw/FXNjM+8TyjwBQkPd9xF2GFyqhQcf7sLKB
-         9c1tgDSlwW4sYUaxdEgN4JQSmpBZRGzbC/maDE+Ya7tFc5GUTrZuNOMVkA/1hk1KSA2y
-         cHfGw5HmEC5oqWmohMnGMUpeFMe0HCo7ukmuVeOfQiC6IJS9Dr3TSJJ89sfNtst3VZj2
-         Npke26/A+XT5olksnM84SUAjlYceJ3TpeVbOiCXCScfaIY1PUVVQXiHZ0wE3RiRL0PRL
-         uj9g==
-X-Gm-Message-State: APjAAAXrKRy3VNNKJf7kwPbSy6+11zSRQJwcFh9R3aSsytv2C1DhRNrf
-        cCxr8NsjtyrkkR9krsNyXYKDIA==
-X-Google-Smtp-Source: APXvYqzQ2Tsy6YGq96nWs24t4dTYqO+FjpcUTxLh+PoIoWJxQ8j4pwPMlU/PYxRKTBzLJts81N6D6A==
-X-Received: by 2002:a19:710b:: with SMTP id m11mr17947740lfc.135.1559804719157;
-        Thu, 06 Jun 2019 00:05:19 -0700 (PDT)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id o184sm159391lfo.37.2019.06.06.00.05.17
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 06 Jun 2019 00:05:18 -0700 (PDT)
-From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
-        <michal.lowas-rzechonek@silvair.com>
-X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@mlowasrzechonek2133>
-Date:   Thu, 6 Jun 2019 09:05:14 +0200
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-Cc:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Gix, Brian" <brian.gix@intel.com>
-Subject: Re: [PATCH BlueZ 0/3] Json storage refactor
-Message-ID: <20190606070514.izogw3k3u3moqwv3@mlowasrzechonek2133>
-Mail-Followup-To: "Stotland, Inga" <inga.stotland@intel.com>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Gix, Brian" <brian.gix@intel.com>
-References: <20190605130106.32372-1-jakub.witowski@silvair.com>
- <88230761cfc7650ab44f76f81189d78d3d439aad.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <88230761cfc7650ab44f76f81189d78d3d439aad.camel@intel.com>
-User-Agent: NeoMutt/20180716
+        Thu, 6 Jun 2019 05:40:42 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id A85A260255; Thu,  6 Jun 2019 09:40:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1559814040;
+        bh=rU0t5RwiWywQmmpKFOVVHDpMxEFOcbC7Tl57m2Sd1TQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=KyuiZ5xRgJDS/p/VT/bIem9IZCtN6GKm+aFqiRTFygSTy4AaNeapiV1RKUm+EUb4i
+         7naYLW5hqm/KlPRl2C+mtYGVYYDPm4S64shIEW3BvRFAoiP4aGVP5BHQBce0Cbz5Ny
+         Tbf2hMOuDiC7Mp2o0KkoHI6KDbgwB1j53C8IiNH4=
+Received: from rocky-HP-EliteBook-8460p.wlan.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5FCCD60850;
+        Thu,  6 Jun 2019 09:40:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1559814039;
+        bh=rU0t5RwiWywQmmpKFOVVHDpMxEFOcbC7Tl57m2Sd1TQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mcN0LhTU2ZJcitqVqgU6eio1E6DbzWelfbTBMemyU1TMquYeGV9/01j1dhhZPNkX2
+         vy1qkH6CvEmZtS7LZlN5NSVD7AjTVwGSuPY5cd8pZR+hzd0fiXeyb3pQSXP/P7b3xc
+         2KQ10gaydNRSKSEODQ0nH3Zj6i3ESlncuTpp8EbA=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 5FCCD60850
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, thierry.escande@linaro.org
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v6 1/2] Bluetooth: hci_qca: Load customized NVM based on the device property
+Date:   Thu,  6 Jun 2019 17:40:30 +0800
+Message-Id: <1559814030-13833-1-git-send-email-rjliao@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <1557919161-11010-1-git-send-email-rjliao@codeaurora.org>
+References: <1557919161-11010-1-git-send-email-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+QCA BTSOC NVM is a customized firmware file and different vendors may
+want to have different BTSOC configuration (e.g. Configure SCO over PCM
+or I2S, Setting Tx power, etc.) via this file. This patch will allow
+vendors to download different NVM firmware file by reading a device
+property "firmware-name".
 
-On 06/05, Stotland, Inga wrote:
-> On Wed, 2019-06-05 at 15:01 +0200, Jakub Witowski wrote:
-> > Netwrk keys, application keys and elements with models have been
-> > simplified in json storage file. Arrays objects are no longer
-> > required.
-> The proposed change would be okay if not for the fact that we plan to
-> re-use the same code for storing the information database for
-> provisioner/configuration client. That puts constraints on the format
-> in which the json data is stored.
-Could you please elaborate?
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+Changes in v6:
+  * Added read firmware-name property for both QCA6174 and WCN399X
+---
+ drivers/bluetooth/btqca.c   |  8 ++++++--
+ drivers/bluetooth/btqca.h   |  6 ++++--
+ drivers/bluetooth/hci_qca.c | 18 +++++++++++++++++-
+ 3 files changed, 27 insertions(+), 5 deletions(-)
 
-The patchset doesn't change much in terms of JSON format, it just
-replaces thing like:
-
-    "netKeys": [
-        { "index": "0000", <params...> },
-        { "index": "0001", <params...> }
-    ],
-    "elements": [
-        { "elementIndex": 0, <params...> }
-    ]
-
-with:
-
-    "netKeys": {
-        "0000": { <params> },
-        "0001": { <params> }
-    },
-    "elements": {
-        "0": { <params...> }
-    }
-
-The latter format should allow storing exactly the same information, but in a
-slightly more straightforward manner.
-
-> (...) use customized routines to implement them.
-> That should allow you to keep local node configuration in your own
-> format.
-We would very much like to avoid vendor patches. From our POV the whole
-point of open source collaboration is to make the *mainline* usable for
-as many people as possible.
-
-regards
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index cc12eec..a78b80e 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -332,7 +332,8 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-		   enum qca_btsoc_type soc_type, u32 soc_ver)
++		   enum qca_btsoc_type soc_type, u32 soc_ver,
++		   const char *firmware_name)
+ {
+ 	struct rome_config config;
+ 	int err;
+@@ -365,7 +366,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+-	if (qca_is_wcn399x(soc_type))
++	if (firmware_name)
++		snprintf(config.fwname, sizeof(config.fwname),
++			 "qca/%s", firmware_name);
++	else if (qca_is_wcn399x(soc_type))
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crnv%02x.bin", rom_ver);
+ 	else
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 4c4fe2b..8c037bb 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -140,7 +140,8 @@ enum qca_btsoc_type {
+ 
+ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-		   enum qca_btsoc_type soc_type, u32 soc_ver);
++		   enum qca_btsoc_type soc_type, u32 soc_ver,
++		   const char *firmware_name);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+@@ -155,7 +156,8 @@ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdad
+ }
+ 
+ static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+-				 enum qca_btsoc_type soc_type, u32 soc_ver)
++				 enum qca_btsoc_type soc_type, u32 soc_ver,
++				 const char *firmware_name)
+ {
+ 	return -EOPNOTSUPP;
+ }
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 57322c4..05ee0a1 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -169,6 +169,7 @@ struct qca_serdev {
+ 	struct qca_power *bt_power;
+ 	u32 init_speed;
+ 	u32 oper_speed;
++	const char *firmware_name;
+ };
+ 
+ static int qca_power_setup(struct hci_uart *hu, bool on);
+@@ -190,6 +191,17 @@ static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
+ 	return soc_type;
+ }
+ 
++static const char *qca_get_firmware_name(struct hci_uart *hu)
++{
++	if (hu->serdev) {
++		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
++
++		return qsd->firmware_name;
++	} else {
++		return NULL;
++	}
++}
++
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+ 	/* TODO: Some chipset requires to enable UART clock on client
+@@ -1195,6 +1207,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	const char *firmware_name = qca_get_firmware_name(hu);
+ 	int ret;
+ 	int soc_ver = 0;
+ 
+@@ -1245,7 +1258,8 @@ static int qca_setup(struct hci_uart *hu)
+ 
+ 	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+ 	/* Setup patch / NVM configurations */
+-	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver);
++	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
++			firmware_name);
+ 	if (!ret) {
+ 		set_bit(QCA_IBS_ENABLED, &qca->flags);
+ 		qca_debugfs_init(hdev);
+@@ -1439,6 +1453,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 	qcadev->serdev_hu.serdev = serdev;
+ 	data = of_device_get_match_data(&serdev->dev);
+ 	serdev_device_set_drvdata(serdev, qcadev);
++	device_property_read_string(&serdev->dev, "firmware-name",
++					 &qcadev->firmware_name);
+ 	if (data && qca_is_wcn399x(data->soc_type)) {
+ 		qcadev->btsoc_type = data->soc_type;
+ 		qcadev->bt_power = devm_kzalloc(&serdev->dev,
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
