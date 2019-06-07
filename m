@@ -4,62 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00967C2BCA1
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5F4C2BCA1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 15:26:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C880A2089E
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 106F32133D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 15:26:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ilyM+cxh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xab7iA0P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729794AbfFGPXw (ORCPT
+        id S1729642AbfFGP0M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jun 2019 11:23:52 -0400
-Received: from mail-ot1-f52.google.com ([209.85.210.52]:45987 "EHLO
-        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728287AbfFGPXw (ORCPT
+        Fri, 7 Jun 2019 11:26:12 -0400
+Received: from mail-ot1-f45.google.com ([209.85.210.45]:32993 "EHLO
+        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729118AbfFGP0M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jun 2019 11:23:52 -0400
-Received: by mail-ot1-f52.google.com with SMTP id n2so2168687otl.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2019 08:23:51 -0700 (PDT)
+        Fri, 7 Jun 2019 11:26:12 -0400
+Received: by mail-ot1-f45.google.com with SMTP id p4so2234578oti.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2019 08:26:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=SIynrcBU2opRbYQHu+rzQ51GzaMTNMtb96Ffxxpg3Lw=;
-        b=ilyM+cxhfMfaScMm47P9h8nWu+alF4oQRItQveIKebuQO0ItdtIfRpgHDB7kfkSNpF
-         A8TdymxqUdOsuNGi7KQGTlB/6MYYH0s7tgXK7sFQK+g84BsDONPwgJnr/46+T5Azk+DJ
-         n8J58YuxA9MAjFc60sSSd5E6nSyLxZKfNE9GjsSPe2Or0asHD4VIKlm5IT0tIdwvh215
-         wxqhiZnZrd2yLdLJDUZrsLWK7olyCoJVwf64PSfDnjMT/ZzumxFWGd+echHs5JgyRUZ3
-         N6Xjj7Ebg/ZWUy2bjEbP4E7ErIsTAcx9Ot62TM/KcjN7elmNZsTjypT9RWud+mTttHec
-         AiSQ==
+        bh=oqkqK40ngbU0ZTTKPO2ff75rwvhxwLKkLy757CmB4PY=;
+        b=Xab7iA0PcFEZ/GQ2w8cop7B3szq6wia61i/EOqqIKyGns8dXfYolvNhQmVs4rYcQCs
+         dd2+Ewu8Ir/V7ZJu9UdrvATe97B382ChDtBaaRS9Eagq2x2margTkbGYYPsLGE7LZSIV
+         h9M+93MSvehs66CMGvXbopTi5HUHNmiKx8NrTCxjJ25AX5NUDYAQbs5k6LFgvfWHTewQ
+         AUE/YVO3r0xhr9I2uyLuXhn9MIVW75ICKZ0zbQYIKKzQPdVsezLihxJvt8LM7B2UO/Tk
+         KmlgGeGBYlXr9Od//rd1Tyj7+s0ST23oBTnzOUOaxTZjM8WL4ufPOVi2Yra1u+o3B3wz
+         hvAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=SIynrcBU2opRbYQHu+rzQ51GzaMTNMtb96Ffxxpg3Lw=;
-        b=L5z4XSG5wxkwcMFvKxwEIXuhlRTffgrJllhSUJJKxsUz7/sdFL9I5KaDr5d8QIgX+q
-         YDTGqkmfgcJcqZM/MwTiy6Z00MCc1aOhxkMF0azmC3r3uCgE+t5wMDqvAJ51bd94NNXs
-         NiHDarxQEAWPcvpTlbnbKc5+yLp3oVsst4pnIqOtFesUP+y3DSOT5awOjKObE1Zl0a2z
-         FMm3QJmNf1RZUsTEgh0I+SZS50DsYrUXNR+Wb1x+H07VH7Qqin+XlraTsH2CZReruFtV
-         Nf6zMpTYg3X92E/fskj87U2IGNFl3huQ9iXGiK7fXzV7MFrqLP9NijFa8D3o+1igVtIF
-         2ybQ==
-X-Gm-Message-State: APjAAAUhOA0bbBl45SpZbdwJBddDqvIiDO39YaYUhJoFDQRH0npmDAQ7
-        ERp6rF/k2Jlm8L81EJESYcOYuTs6Qv/mkrl3YBeiCBaw
-X-Google-Smtp-Source: APXvYqy5A1T2XAH1eBotXvm+qRXnRLqGtNrQEHUsmpxhrFD3WmecoMXDIqNGz1hCCMNz4ykctBGVR8mDGf86fYqM1Ck=
-X-Received: by 2002:aca:e44b:: with SMTP id b72mr4274363oih.108.1559921031223;
- Fri, 07 Jun 2019 08:23:51 -0700 (PDT)
+        bh=oqkqK40ngbU0ZTTKPO2ff75rwvhxwLKkLy757CmB4PY=;
+        b=EzFEbBC21b/BrWHDe716SJICSyikmz+seonFUETwOsxjqiMuo/CqanJB/5fDQCc7jM
+         Knn5rkOEVo6qAdNXDkWFc0erMnKOIBTrwrWJ9XT1SgtMDJasQK4fFX4h6/9Dwe33AHPo
+         mFk7KUVrSFTa/Lndcxkj5+3p7MCmEIhZmYAhbui+NxJLD9n5VaNG/J/VNsM/0oUs5/ov
+         yuVlREfy4LM9lO/ak6SVy8ydLjrBBm7xGWKGf6EYue68q6dE7zH20nChpgbGv9CjiqJ4
+         k3UWdjRsEwYgWjWAiH9KeUn5VL2JU8zmWb+y5iw/NfNRbJbtMr2Q3DkuLhB7DcigkGRW
+         ePzQ==
+X-Gm-Message-State: APjAAAX2ghnKLMPXQDcx/mcKX0TatTwOl8PleoHqbjF2ReTrqn/T/xn4
+        QZGDeI4FS9tLFmPUDzEf8aDvYvCWGhbi/bjh9c4=
+X-Google-Smtp-Source: APXvYqyM4y99ONpsE/LDduGy3YnK3+z/NT7SascR/siHWB8Bc/32QGDePcsKUUQTqEdlQ1YaaXptRcVvZqYZouA/gRs=
+X-Received: by 2002:a9d:6217:: with SMTP id g23mr20203328otj.11.1559921171771;
+ Fri, 07 Jun 2019 08:26:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190518190618.m7rdkthvpz4agxd2@pali> <CABBYNZ+8YX-zBnUaYKLX2=OdJ-GUQ4y4V0EhGsN+uecKEpFBeA@mail.gmail.com>
- <20190519122223.gabew7qfftihlbic@pali> <20190607130021.ntd3dfd6nzmuy3m3@pali>
-In-Reply-To: <20190607130021.ntd3dfd6nzmuy3m3@pali>
+References: <20190513170550.bsbr2mh7w36hj7io@pali> <20190607125800.trsx2o3njaiaitu2@pali>
+In-Reply-To: <20190607125800.trsx2o3njaiaitu2@pali>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 7 Jun 2019 18:23:41 +0300
-Message-ID: <CABBYNZKQ0WYTH4Oa_eFv11Ok8=42oY_GPFzN-D6UqfeNsvaXug@mail.gmail.com>
-Subject: Re: bluez A2DP socket reliability
+Date:   Fri, 7 Jun 2019 18:26:02 +0300
+Message-ID: <CABBYNZLtgaCi5VGHapsKQG4iAC33ySow3AuH0Qkx8iCo3LcZDg@mail.gmail.com>
+Subject: Re: bluez - check for new a2dp features
 To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -71,54 +70,42 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Pali,
 
-On Fri, Jun 7, 2019 at 4:00 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrote=
+On Fri, Jun 7, 2019 at 3:58 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrote=
 :
 >
-> On Sunday 19 May 2019 14:22:23 Pali Roh=C3=A1r wrote:
-> > On Sunday 19 May 2019 11:13:09 Luiz Augusto von Dentz wrote:
-> > > Hi Pali,
-> > >
-> > > On Sat, May 18, 2019 at 11:12 PM Pali Roh=C3=A1r <pali.rohar@gmail.co=
-m> wrote:
-> > > >
-> > > > Hello! How is L2CAP layer of bluetooth socket used for A2DP audio
-> > > > transfer configured in bluez? It is reliable with big/infinite
-> > > > retransmit count? Or in best-effort manner and some packets may be
-> > > > dropped? And it is possible to change between these two modes for
-> > > > application which uses bluez DBUS API? I'm asking because some A2DP
-> > > > audio codecs are designed to deal with packet loss and for those co=
-decs
-> > > > it would be probably better to configure L2CAP socket to unreliable
-> > > > mode.
-> > >
-> > > We don't use ERTM with AVDTP, both signaling and transport sockets ar=
-e
-> > > using basic mode which don't support retransmissions, there the
-> > > concept of flush timeout which iirc we don't currently it.
+> On Monday 13 May 2019 19:05:50 Pali Roh=C3=A1r wrote:
+> > Hello!
 > >
-> > On bluez.org site there is no information how to use bluez sockets and
-> > the only documentation/tutorial which I found on internet was this:
+> > In current git bluez master repository are new features related to A2DP=
+.
+> > E.g. support for codec switching or fallback to other local dbus
+> > endpoints when current selected rejected connection...
 > >
-> >   https://people.csail.mit.edu/albert/bluez-intro/x559.html
+> > Moreover codec switching support is behind experimental runtime switch.
 > >
-> > I do not know how up-to-date it is, but seems that by default bluez
-> > L2CAP sockets are reliable and to change them to unreliable mode it is
-> > needed to issue OGF_HOST_CTL / OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT (0x28)
-> > request. As default is zero =3D infinity =3D reliable connection.
+> > For pulseaudio a2dp module I need to do runtime check if above features
+> > are supported by currently running bluez instance (which registered to
+> > dbus org.bluez. It is needed to ensure that pulseaudio does not
+> > introduce regression for older bluez version without above new A2DP
+> > features.
 > >
-> > I do not understand low level bluetooth details, but is ERTM related to
-> > OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT?
+> > But currently I have not found any way how to detect if bluez supports
+> > codec switching or if it has support for trying another local SEP for
+> > connection.
 > >
-> > So what are default settings for L2CAP socket used by AVDTP/A2DP
-> > profiles which are transferred to user application via DBUS?
+> > So, could you please export e.g. bluez version as dbus property? And
+> > also property if codec switching is supported and enabled by that
+> > experimental flag?
 >
-> Hi! Do you have any idea about OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT? It is
-> related to ERTM or not?
+> Hello, I would like to ask for some possibility to export these
+> information. Without them it is not really possible to have stable
+> implementation which would work with both old and new bluez version.
 
-The OCF usually describes an HCI command which may affect the entire
-ACL connection, ERTM is a L2CAP channel mode that includes
-retransmissions. The A2DP stream transport doesn't ERTM so no
-retransmissions shall take place.
+I wonder what you are talking about since your changes do have checks
+for when endpoints are detected, isn't that enough to detect if one
+can switch codecs or not? This logic used to work just fine last time
+I tested it.
+
 
 --=20
 Luiz Augusto von Dentz
