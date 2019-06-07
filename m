@@ -2,168 +2,114 @@ Return-Path: <SRS0=bh0L=UG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22936C2BCA1
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 13:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E51DDC2BCA1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 15:04:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1E2B208E3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 13:07:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B593620840
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 15:04:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sq5Hzstu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khbRymck"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728522AbfFGNHn (ORCPT
+        id S1729004AbfFGPEB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jun 2019 09:07:43 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33349 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727566AbfFGNHn (ORCPT
+        Fri, 7 Jun 2019 11:04:01 -0400
+Received: from mail-ot1-f45.google.com ([209.85.210.45]:39892 "EHLO
+        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728464AbfFGPEB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jun 2019 09:07:43 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n9so2141831wru.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2019 06:07:41 -0700 (PDT)
+        Fri, 7 Jun 2019 11:04:01 -0400
+Received: by mail-ot1-f45.google.com with SMTP id r21so2129651otq.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2019 08:04:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=9EdIUKQ1/TsMUI/d7kfSgUq9bkts48YQROzFErv1XLo=;
-        b=Sq5HzstulkAHDwxI0o44mhggbnQFhBJsv0nrh7TJ3xms2BHr074/88kziImL0+kIg4
-         DTiDJuQf4LheaqdnzsKw2WEu4HAhTPHh2kZbTmO+aXCCaWB2I0QThDIFgG6FlTsIoQlR
-         3plgcpC3rJepbUf5rjtWm+kZ24XwKC89LaZjeoQskBVtMF3uaBkEkKAlu+mHMwyI4DtZ
-         MkMApYH9j7G++udvQldL2YQV133c07DnOM/zhENZZy5stxaKjIPeYu3ZQ1Ri1dl6kn7b
-         6xu43MrveP0lrqAuIBvcCWQrNqjqSDZm+u7mglvrQEq+tehVxuVj1nsE1vCKnlUh3/iL
-         xnnA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bset/w0T2uxEYdgdK6IJlzbHrr81AMBFg++BAKqs2VU=;
+        b=khbRymcklKB0mBQmnuMgJXUOJfg8/UN+3uj0KL+0Y9O0oUTPBLQ3tWpi0SQeHgjQ/W
+         sCgqXomfUhIh8zq0gQ/ZgFR4jGmwnn0BfvfdS2YgAYzLRK5C+6OK4jaGBrNCvcCVo+84
+         LZY18LT0scs96UidI9Rs2ATHbKoNUC7PcG4cgf8G7871p9v92zqGRCXRkHb4VWLpCklc
+         BgsonAphyu6aikiwLQcq97i1OvG7QjEWrPmFb3Gt7uUrgn6kusSsdwu8JIuQswiFDhdG
+         9HnRNYsdc+wtIizJMwn/vyifoFrhgaqQHGwrm21k1WWQPqz5/sz0Q9vdi3BqEiv6lzJZ
+         DmCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=9EdIUKQ1/TsMUI/d7kfSgUq9bkts48YQROzFErv1XLo=;
-        b=OxX6Gp90sPw8z7lrdqswZfNACLi1v7LAgErVrDNj+YSKIAo/ttq6zCUH+AieVcTMZP
-         FCpP10/pYB+o/lAOCeiTJFMQ6VuwFa5s4pOhbvfl5WoG2+YmodGweeTQyr7zGq03V45m
-         kosaNQ+lM/CCAiBVmfdhL++BWXLeLzYdkjxmFVlEtwb1PjfnsNkoyKLio/aOjEt0NbYV
-         zNGJhd4YHyvSspE78AhSQXOGiJ/ocl573FL2A4VSSqhhuZNGwwlbK+1OhhE3Ae3mw4jy
-         2FYcqNLyKur+pzDVT8Tt55hSHmd3/gK9V3Xo8RSzLw5Nqp3EScS108QYlmAN5U4qw3yg
-         9AEw==
-X-Gm-Message-State: APjAAAXKghcK7+erPBKYq6YR3mtsyD/xBjsC8wxSz7XBxg4JOz9vnMOy
-        LcX6p05NMeUVlpQYLw3Oq3k=
-X-Google-Smtp-Source: APXvYqzOaclqDpXqPg8z5zkhbObGhbB6RR5rTCB0nBrlgo4jF7zp8z7e1uy7Dh7wkYzTSQVJ2Wdomg==
-X-Received: by 2002:a5d:498a:: with SMTP id r10mr33882408wrq.28.1559912860895;
-        Fri, 07 Jun 2019 06:07:40 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id o14sm1973652wrp.77.2019.06.07.06.07.39
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 07 Jun 2019 06:07:40 -0700 (PDT)
-Date:   Fri, 7 Jun 2019 15:07:39 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
- HD and LDAC
-Message-ID: <20190607130739.j25oqqj624anmcqr@pali>
-References: <8D9BABBE-2BBC-4BFE-BF7C-3BE24AF4DD10@holtmann.org>
- <20190123175448.cdkdpnk6i5r4rzjs@pali>
- <20190130081517.GI32745@reaktio.net>
- <20190130120631.usx67zjk4kmbhcla@pali>
- <CABBYNZJ5z_-8KiotL=9fkvq-gLPoqU1LJpaOBv1z4QfZiA3zaA@mail.gmail.com>
- <20190201124353.GK32745@reaktio.net>
- <20190206114300.rxw3ptq7hzathzqe@pali>
- <20190224131907.GV32745@reaktio.net>
- <20190305122630.gwnaz3y7ckzqfjfq@pali>
- <20190410082924.exo2oihzd7w2oz3e@pali>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bset/w0T2uxEYdgdK6IJlzbHrr81AMBFg++BAKqs2VU=;
+        b=V9l65jyeZtVjcy+s1xiMJUaU81ZWIbYri/L9DepgW2l/TE9WL3salVLMmUHUBTs9CQ
+         Ar0MaedkvSjh6zGXmwjxF0VEwQ6gK/UKCMMax6hvgwo4D820U3ZvoWWcaWhqedqawS/X
+         iOcurl2xilz1FxcHk37ExfBAzKReow8/lFaEmnxx/AJhdeHBOuTKFgYJYLQVyHsew144
+         XYM+mE8+sTB/7BFBX3F4wGRYWOT4dePJKULFL1q/a2womoK6wF9u6cYBhkq1vETye4SH
+         yAVkhzWKXMshyXVHgFhiesrbrfNehwLq9qqmgs24DMkrWZE0dcUjKwHh5IViawQb7aP1
+         Bz6Q==
+X-Gm-Message-State: APjAAAXFIadrAUVzoN+oeOpwuNAGBtVAfB4LArvBkoIt84gXCSxuPqLn
+        fPDWKFJDUJG9R8JP/5Ky06MQv+0PuXTup/ugdRBj1WIAjUw=
+X-Google-Smtp-Source: APXvYqwyyP3qFVcHnKVikRWMNb6NHqqn6plTtzwmj0McGhstLomRf34iJpNYw9pj1hNT5T62j9Jl37+vOP4IZPhyjeQ=
+X-Received: by 2002:a05:6830:199:: with SMTP id q25mr5643545ota.79.1559919839928;
+ Fri, 07 Jun 2019 08:03:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190410082924.exo2oihzd7w2oz3e@pali>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190519101854.2ygwxeqbixappks4@pali> <20190607125916.wswblh5nxrx7hapm@pali>
+In-Reply-To: <20190607125916.wswblh5nxrx7hapm@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 7 Jun 2019 18:03:50 +0300
+Message-ID: <CABBYNZ+JPvvk1eACkp+cM9MtDZq+M78QLAtFcq-qrhR+8DsjnA@mail.gmail.com>
+Subject: Re: Is BT_VOICE_TRANSPARENT correctly defined?
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wednesday 10 April 2019 10:29:24 Pali Rohár wrote:
-> On Tuesday 05 March 2019 13:26:30 Pali Rohár wrote:
-> > On Sunday 24 February 2019 15:19:07 Pasi Kärkkäinen wrote:
-> > > On Wed, Feb 06, 2019 at 12:43:00PM +0100, Pali Rohár wrote:
-> > > > On Friday 01 February 2019 14:43:53 Pasi Kärkkäinen wrote:
-> > > > > Hi,
-> > > > > 
-> > > > > On Wed, Jan 30, 2019 at 02:24:11PM +0200, Luiz Augusto von Dentz wrote:
-> > > > > > Hi Pali, Pasi,
-> > > > > > On Wed, Jan 30, 2019 at 2:09 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> > > > > > >
-> > > > > > > On Wednesday 30 January 2019 10:15:17 Pasi Kärkkäinen wrote:
-> > > > > > > > On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Rohár wrote:
-> > > > > > > > > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
-> > > > > > > > > > Hi Pali,
-> > > > > > > > > >
-> > > > > > > > > > > ---
-> > > > > > > > > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++---
-> > > > > > > > > > > 1 file changed, 55 insertions(+), 3 deletions(-)
-> > > > > > > > > > >
-> > > > > > > > > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-> > > > > > > > > > > index 18569c895..a21410f5a 100644
-> > > > > > > > > > > --- a/tools/parser/avdtp.c
-> > > > > > > > > > > +++ b/tools/parser/avdtp.c
-> > > > > > > > > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
-> > > > > > > > > > > {
-> > > > > > > > > > >         if (vendor == 0x0000004f && vndcodec == 0x0001)
-> > > > > > > > > > >                 return "aptX";
-> > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0001)
-> > > > > > > > > > > +               return "FastStream";
-> > > > > > > > > > > +       else if (vendor == 0x0000000a && vndcodec == 0x0002)
-> > > > > > > > > > > +               return "aptX Low Latency";
-> > > > > > > > > > > +       else if (vendor == 0x000000d7 && vndcodec == 0x0024)
-> > > > > > > > > > > +               return "aptX HD";
-> > > > > > > > > > >         else if (vendor == 0x0000012d && vndcodec == 0x00aa)
-> > > > > > > > > > >                 return "LDAC";
-> > > > > > > > > > >         return "Unknown???;
-> > > > > > > > > >
-> > > > > > > > > > lets keep the focus on btmon support since nobody should be using hcidump anymore.
-> > > > > > > > >
-> > > > > > > > > In btmon I already implemented it and patches are now merged. I just
-> > > > > > > > > found another place where this capability parsing is implemented and
-> > > > > > > > > based on fact that users still use hcidump I quickly looked at it and
-> > > > > > > > > implemented this parsing.
-> > > > > > > > >
-> > > > > > > >
-> > > > > > > > I agree, hcidump still comes up on many places (guides, blogs, mailinglist posts, etc),
-> > > > > > > > so it makes sense to add these patches to hcidump aswell. Especially when the patch is quite small.
-> > > > > > >
-> > > > > > > Exactly, people still use hcidump...
-> > > > > > 
-> > > > > > Well it is a deprecated tool which we might remove starting on BlueZ
-> > > > > > 6.x which we would like to do in the very next release, if that
-> > > > > > doesn't happen than perhaps Id take these patches in for a very last
-> > > > > > BlueZ 5.x release.
-> > > > > > 
-> > > > > > @Marcel: Or you have a better plan? We could do one last 5.x and then
-> > > > > > start working on removing the deprecated tools/etc.
-> > > > > > 
-> > > > > 
-> > > > > +1 for doing one last 5.x release before deprecating and removing tools etc!
-> > > > 
-> > > > Ok, what is the plan? If hcidump is not going to be deleted in upcoming
-> > > > release, can you take this patch?
-> > > >
-> > > 
-> > > How about applying this patch now, considering it's small, and has value for anyone using hcidump.
-> > > hcidump then gets removed later whenever the removal of deprecated features/tools starts.
-> > 
-> > So... what are plans for next release?
-> 
-> Marcel, Luiz, can you comment next steps? It is waiting there for your
-> info here for more than 2 months.
+Hi Pali,
 
-PING!
+On Fri, Jun 7, 2019 at 4:43 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrote=
+:
+>
+> On Sunday 19 May 2019 12:18:54 Pali Roh=C3=A1r wrote:
+> > Hello!
+> >
+> > Now I'm looking at BT_VOICE_TRANSPARENT definition which comes from fil=
+e
+> > include/net/bluetooth/bluetooth.h and it has value 0x0003. It is really
+> > correct? Because it means following format:
+> >
+> >   Linear Coding, 8-bit without padding bits, 1's complement
+> >
+> > I think that usage of 1's complement is not easy as there is no C type
+> > which matches it. Should not it be 2's complement or rather Unsigned
+> > type?
+> >
+> > Seems that main usage of BT_VOICE_TRANSPARENT is mSBC codec and I doubt
+> > that it uses 1's complement signed format (specially as it should be
+> > modification of SBC codec which encode bytes as unsigned type).
+> >
+> > There is another define BT_VOICE_CVSD_16BIT with value 0x0060 which
+> > seems to be correct as it means Linear Coding, 16-bit without padding
+> > bits, 2's complement and encoded by CVSD codec.
+>
+> Hello, can somebody look at this BT_VOICE_TRANSPARENT definition and
+> verify that it really should be defined as unsigned or 2's complement?
 
--- 
-Pali Rohár
-pali.rohar@gmail.com
+Are you talking about these:
+
+https://elixir.bootlin.com/linux/latest/source/include/net/bluetooth/blueto=
+oth.h#L119
+
+Which is used in ofono:
+
+https://github.com/DynamicDevices/ofono/blob/master/src/handsfree-audio.c#L=
+93
+
+Afaik these values work as intended with mSBC/WBS.
+
+--=20
+Luiz Augusto von Dentz
