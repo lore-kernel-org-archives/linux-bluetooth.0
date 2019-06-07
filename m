@@ -5,100 +5,117 @@ X-Spam-Level:
 X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D20CC2BCA1
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 12:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E7EC2BCA1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 13:00:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DA91206BB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 12:59:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CB82206BB
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jun 2019 13:00:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EvTWAGgm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C82K68eb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728012AbfFGM7T (ORCPT
+        id S1728124AbfFGNAY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jun 2019 08:59:19 -0400
-Received: from mail-wr1-f42.google.com ([209.85.221.42]:38595 "EHLO
-        mail-wr1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727574AbfFGM7T (ORCPT
+        Fri, 7 Jun 2019 09:00:24 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:39913 "EHLO
+        mail-wr1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727512AbfFGNAY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jun 2019 08:59:19 -0400
-Received: by mail-wr1-f42.google.com with SMTP id d18so2086259wrs.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2019 05:59:18 -0700 (PDT)
+        Fri, 7 Jun 2019 09:00:24 -0400
+Received: by mail-wr1-f48.google.com with SMTP id x4so2078419wrt.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2019 06:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
+        h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to
          :user-agent;
-        bh=Fj6vkYSd2ePxtJn7Pl0RDPTxpFXA2cryHKqyfEQNKsY=;
-        b=EvTWAGgmvkm75H1vJmbfvVCkEvgvEckip+Da3jQka9ASHeyxZ3m8lSpaxPjZMA/X9J
-         32r6NRzyPjiVuYUKe92PuFke4iWt09C86OcwntRNnebCZs5tIel22eF1c+GHzhebpE6Z
-         xI6rmIMsNzc7MomH/1MZkZ3LzlCarK3NZdVKr0r9nhR5HRneoZPLsFUxDZkGcHX9DfHL
-         2IMSnuohaPO1FJMP1f5Qr5KD9PacLgZ+d4nRzduAGgcD8ltziszuTy5FzJbI4ArWVnmg
-         Aza6uc1BdyiiJ/ys9k4u4rNy3Q/U2a1OOQih/GysifjGkkDlRynzn4uGg8bmUZh4WUWd
-         AWNg==
+        bh=Kr5qNrj1U8lY2eMrZQRvJqB88jkRz5SlxohT508ePT0=;
+        b=C82K68eb+F+pX4/iIE0Tgx8v4Y04XkostjS57JsNOJwAcLmEcMNnT6UdaOalUHyCFc
+         UY4kfq/I3MtBjqyGi3iPBA1sOO2IVcMjSd/gothrO5cORlvFnz1/zIf6TX+Oi2cCHtKy
+         4dwtSvyFyxIbwJ+I16d58UHd6chIEgAs4xVUweTH/wl8k64L2jufFuFkBcGkmKrPW0mJ
+         YZ5jTvlNlE7Go/gDlHV0kwiclT0Bc3gnGZcI1672p0b2WOYB/sDFGuxge/oAkiJqdv6O
+         kYz8QBp5xoKJLcR1p3a/Q42IFTlCGGbnqjSmmu6JzJcFHFP9fVqLiMntZHknTTpwuhm/
+         +cdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=Fj6vkYSd2ePxtJn7Pl0RDPTxpFXA2cryHKqyfEQNKsY=;
-        b=LczZ4x9MLh0enr00dGZ7IIYGPwoKjQaxqoSKJpiOfdfScTYeJBopFCITxk1VEW98Wq
-         4/6dnlS6dn2BzNM9Xnv+KwJNWfFJ8qhbOn8Ny4deDfKjakqC108y3gXqIZIIRoJ34wEQ
-         cwKRCwvkt78GjzeX2+9innkkoJYGdXMGebI6Z+MBwKdVX7vRoWlNho2ix9FBfHt7Pf2c
-         nWMjrVl1XrieyH6aV3Aff68IsodoD3+IvXTJVdWFHpzE9ioAH50cckZOJZG+ov0fG7/G
-         mt1f/l2ffBnLtAkFodNbOUh80VyTD2NFBsIXLDb4zy0M/46BZ36S2QR9UzDpWgE6B5z5
-         V7+g==
-X-Gm-Message-State: APjAAAUvnzdlWhvAy5XV8ZAgomxJOfytMo8V7nAo0t7sqQu3KIXDGeZf
-        1qVrsQPHfLGabAk2o7eJWxiA20tfX/A=
-X-Google-Smtp-Source: APXvYqzylklCGhvuh+O5WtLlgMLK8ka/ZEORwfhzlAa/+UPxd32SnbXV4EaJSleqCSxhwnURNfH6ew==
-X-Received: by 2002:adf:9023:: with SMTP id h32mr33970325wrh.95.1559912357553;
-        Fri, 07 Jun 2019 05:59:17 -0700 (PDT)
+        bh=Kr5qNrj1U8lY2eMrZQRvJqB88jkRz5SlxohT508ePT0=;
+        b=CYDmVNEkpPre5zo/0habdCkU7eW2nD3GjNPWywRuAJy2JTFWVpQ01Vxat9QNBw2Zl/
+         lChIXS9Q5zOOD6yFGla+E2qHuKaY3qvL1Hn7bUSolfqV53pIPgsL4QiMiDKVndMGSfqm
+         tNWTwD7EfUtjgTi79tR0LWCbiy+tlV/8k5BnrmWZyHGmYoe2lD5XFhU23tbE3JoJBXl9
+         bql4qBXGGIjBvrkXnuzA+K1MobUUzWc1nbbeBFM/2k7iM1i0JQXN42ZFnzNe0TSrBhB8
+         WN52s1ftNrPv6B6T0NYxDxnvCYXY1Zxb8Cyt0nsMc2IBti6iU8eI1tKmzTeksQVC6Gos
+         /rMg==
+X-Gm-Message-State: APjAAAW8PxoEbYlpU7ZHUnzrd5TrKaH3Sb451ijeMi2ZYQIQ/22pw1z1
+        mf5HYzQEZWyfJE91xdQiUM76rNJQC8Y=
+X-Google-Smtp-Source: APXvYqw5rwMha4vwYzeGOaEjvQEcAIbra5UQJLnZpDi3YivfSMbou/ypDBJ7LnUpcoS4gT0NsB3qzA==
+X-Received: by 2002:adf:c654:: with SMTP id u20mr7644817wrg.271.1559912423203;
+        Fri, 07 Jun 2019 06:00:23 -0700 (PDT)
 Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id r2sm1830978wma.26.2019.06.07.05.59.16
-        for <linux-bluetooth@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id v15sm2140356wrt.25.2019.06.07.06.00.22
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 07 Jun 2019 05:59:16 -0700 (PDT)
-Date:   Fri, 7 Jun 2019 14:59:16 +0200
+        Fri, 07 Jun 2019 06:00:22 -0700 (PDT)
+Date:   Fri, 7 Jun 2019 15:00:21 +0200
 From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: Re: Is BT_VOICE_TRANSPARENT correctly defined?
-Message-ID: <20190607125916.wswblh5nxrx7hapm@pali>
-References: <20190519101854.2ygwxeqbixappks4@pali>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: Re: bluez A2DP socket reliability
+Message-ID: <20190607130021.ntd3dfd6nzmuy3m3@pali>
+References: <20190518190618.m7rdkthvpz4agxd2@pali>
+ <CABBYNZ+8YX-zBnUaYKLX2=OdJ-GUQ4y4V0EhGsN+uecKEpFBeA@mail.gmail.com>
+ <20190519122223.gabew7qfftihlbic@pali>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190519101854.2ygwxeqbixappks4@pali>
+In-Reply-To: <20190519122223.gabew7qfftihlbic@pali>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sunday 19 May 2019 12:18:54 Pali Rohár wrote:
-> Hello!
+On Sunday 19 May 2019 14:22:23 Pali Rohár wrote:
+> On Sunday 19 May 2019 11:13:09 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> > 
+> > On Sat, May 18, 2019 at 11:12 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > >
+> > > Hello! How is L2CAP layer of bluetooth socket used for A2DP audio
+> > > transfer configured in bluez? It is reliable with big/infinite
+> > > retransmit count? Or in best-effort manner and some packets may be
+> > > dropped? And it is possible to change between these two modes for
+> > > application which uses bluez DBUS API? I'm asking because some A2DP
+> > > audio codecs are designed to deal with packet loss and for those codecs
+> > > it would be probably better to configure L2CAP socket to unreliable
+> > > mode.
+> > 
+> > We don't use ERTM with AVDTP, both signaling and transport sockets are
+> > using basic mode which don't support retransmissions, there the
+> > concept of flush timeout which iirc we don't currently it.
 > 
-> Now I'm looking at BT_VOICE_TRANSPARENT definition which comes from file
-> include/net/bluetooth/bluetooth.h and it has value 0x0003. It is really
-> correct? Because it means following format:
+> On bluez.org site there is no information how to use bluez sockets and
+> the only documentation/tutorial which I found on internet was this:
 > 
->   Linear Coding, 8-bit without padding bits, 1's complement
+>   https://people.csail.mit.edu/albert/bluez-intro/x559.html
 > 
-> I think that usage of 1's complement is not easy as there is no C type
-> which matches it. Should not it be 2's complement or rather Unsigned
-> type?
+> I do not know how up-to-date it is, but seems that by default bluez
+> L2CAP sockets are reliable and to change them to unreliable mode it is
+> needed to issue OGF_HOST_CTL / OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT (0x28)
+> request. As default is zero = infinity = reliable connection.
 > 
-> Seems that main usage of BT_VOICE_TRANSPARENT is mSBC codec and I doubt
-> that it uses 1's complement signed format (specially as it should be
-> modification of SBC codec which encode bytes as unsigned type).
+> I do not understand low level bluetooth details, but is ERTM related to
+> OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT?
 > 
-> There is another define BT_VOICE_CVSD_16BIT with value 0x0060 which
-> seems to be correct as it means Linear Coding, 16-bit without padding
-> bits, 2's complement and encoded by CVSD codec.
+> So what are default settings for L2CAP socket used by AVDTP/A2DP
+> profiles which are transferred to user application via DBUS?
 
-Hello, can somebody look at this BT_VOICE_TRANSPARENT definition and
-verify that it really should be defined as unsigned or 2's complement?
+Hi! Do you have any idea about OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT? It is
+related to ERTM or not?
 
 -- 
 Pali Rohár
