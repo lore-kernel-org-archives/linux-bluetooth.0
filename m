@@ -2,177 +2,148 @@ Return-Path: <SRS0=gL6M=UJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A520CC31E40
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 14:54:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01108C31E41
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 16:06:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E50620859
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 14:54:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C703820820
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 16:06:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jyuQcYv+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389841AbfFJOyH (ORCPT
+        id S2391449AbfFJQG6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jun 2019 10:54:07 -0400
-Received: from mail-it1-f200.google.com ([209.85.166.200]:55051 "EHLO
-        mail-it1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389123AbfFJOyH (ORCPT
+        Mon, 10 Jun 2019 12:06:58 -0400
+Received: from mail-wm1-f49.google.com ([209.85.128.49]:34615 "EHLO
+        mail-wm1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391372AbfFJQG6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jun 2019 10:54:07 -0400
-Received: by mail-it1-f200.google.com with SMTP id n81so141826ita.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2019 07:54:06 -0700 (PDT)
+        Mon, 10 Jun 2019 12:06:58 -0400
+Received: by mail-wm1-f49.google.com with SMTP id w9so251124wmd.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2019 09:06:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:subject:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=CaGA49BNdswYorM8WQAqFGos1AkNpcg/BifLW9C5DQU=;
+        b=jyuQcYv+DCYRfmdPMZ1akl+AWVbWE0jQtVwOuBD9Flebp3TK6pOGhL7wfD37RTu/bv
+         fxCS2Qu10JmZMfjryujJq0gcxxZUdgnhgnw5vpz+XRkEKIErAC49apqtL8VXDt0hJsd3
+         /FKps9Y5Dt/YDjVFsmQ8jzv8Q9C73Ka8iEqGxpVj0jwtdN0Szq44EaDt641b423iRgHz
+         1p4wcICd4occAQh5xGMEt8oot7pSBDXmSCdbItfBe0rEc+eYS0tW77n2xzY4ZQ7r8MyX
+         N6Rvjv6A0dPJsJTWRafFn98Gwy2PDt4PpCOWQ8ow4NAIJOyJ08OPO6U8UnIuHBh0e3mn
+         z6Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=pR/lX6upYTN7oLpDXNAj1RULtz2NNsKYuEMTxGjiiNs=;
-        b=DRn8pE2iByUw1tmjF3LvmbhvFE3aNK3dqLyYJUjrHNksUDn61lSj/SaBdwDG7WqKY5
-         04IjbqT2Crer0RYyU2zbZfcjIxSkOt1Gy6FL7JlLu1C44tbxf5+LE6aAFBv0iUE8UTor
-         P5CkD0J7yWbh5f7+nDd5oaoGACQGQl39iKVlGChkd34vm4Al/QXsgDnAX0teMHEoe/GH
-         4BBKOg1LvVp/E52aXEI7qP2Cgvir5TnbDJSyc/OW345KNpfXkFYjHCDIYNUHKHe8wAvS
-         PRdTiTgYzRLiu9XXL0TB4EVbl8oW7BENbc81VJAz0RMGf8KP/qYYhQe+LBz/uMlJ8pfH
-         Fc9g==
-X-Gm-Message-State: APjAAAXHQPk9cxyxMem23tHqd5ZvMmvOvkfy1Jv74I++sgPzF2k4X9kM
-        FMgdxwG+2DvAppKfzeN9Bbd6lJzdVwXkjfWZn09mPTZ1YZIJ
-X-Google-Smtp-Source: APXvYqytFAYUICLEM4+lMx4UH7184LYVFDGiDmcQiFqyD8xDKekWsiRUitH2pZ25t5OESdonAF3MGXeYMB4TYKbch2CFqoKC8XUR
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=CaGA49BNdswYorM8WQAqFGos1AkNpcg/BifLW9C5DQU=;
+        b=b2G1SvyTx8kv4YbCYfLrJYpd07xWMFVIt3aUTn9VynAl0XbsvgD2jVP36m87otu4L/
+         XR21hum+8VAbYLB1pdpC0SXAroyEGLYIme5Kh+Smfb1jghGIdrvPrjVqOwlVdYHZ2fiY
+         2L7CbuqR3xVgK1ejQQcmo6HwXNWgrlbjnxUR0D/nhVFhLfN1nlsdbOgpvRPpX+jLx30d
+         5p/kLv1qLqzGrm22M1HFhcbNN+9kX5z/lXGMQbBGOID+sGwVOtvQPIOzbGNPhhGMIytk
+         x+s5NiHVOLSVC/iXt1tVTisS7eOdEoFq+0/HbF2Q8h9XOpF5TwDHuQdNgm3WAGf4CuCZ
+         bnLQ==
+X-Gm-Message-State: APjAAAWlsmmxAzPJ7cqN9sH+K9Q/h5s9OXAs+BMHHaQCtoVqckBwD8vp
+        y881uJsodheovFYxlyT0BZeI2Vnu
+X-Google-Smtp-Source: APXvYqwHY0MIBU39Z4KOxM/BeXXLSa85bGxVrou/Ptj7ZUnqqASr4pP8w9yWTu4dkHBPsi/AHI33Zg==
+X-Received: by 2002:a1c:c907:: with SMTP id f7mr14467644wmb.142.1560182815697;
+        Mon, 10 Jun 2019 09:06:55 -0700 (PDT)
+Received: from [192.168.102.9] (97.205.83.79.rev.sfr.net. [79.83.205.97])
+        by smtp.gmail.com with ESMTPSA id l8sm4022942wrg.40.2019.06.10.09.06.54
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Jun 2019 09:06:54 -0700 (PDT)
+From:   =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
+Subject: Re: bluez A2DP socket reliability
+To:     =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20190518190618.m7rdkthvpz4agxd2@pali>
+ <CABBYNZ+8YX-zBnUaYKLX2=OdJ-GUQ4y4V0EhGsN+uecKEpFBeA@mail.gmail.com>
+ <20190519122223.gabew7qfftihlbic@pali> <20190607130021.ntd3dfd6nzmuy3m3@pali>
+ <CABBYNZKQ0WYTH4Oa_eFv11Ok8=42oY_GPFzN-D6UqfeNsvaXug@mail.gmail.com>
+ <20190610105130.un3muj4knwoua5cb@pali>
+Message-ID: <b7e5978c-7ebc-82ad-2c44-878712cd14cd@gmail.com>
+Date:   Mon, 10 Jun 2019 18:06:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Received: by 2002:a02:938f:: with SMTP id z15mr45355127jah.108.1560178446420;
- Mon, 10 Jun 2019 07:54:06 -0700 (PDT)
-Date:   Mon, 10 Jun 2019 07:54:06 -0700
-In-Reply-To: <0000000000002f9ef4058848f26d@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000015d213058af95a5f@google.com>
-Subject: Re: KASAN: use-after-free Read in kfree_skb (3)
-From:   syzbot <syzbot+dcb1305dd05699c40640@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+In-Reply-To: <20190610105130.un3muj4knwoua5cb@pali>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+Hi,
 
-HEAD commit:    d1fdb6d8 Linux 5.2-rc4
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=138bdc01a00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fa9f7e1b6a8bb586
-dashboard link: https://syzkaller.appspot.com/bug?extid=dcb1305dd05699c40640
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c787f2a00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e32801a00000
+Le 10/06/2019 à 12:51, Pali Rohár a écrit :
+> On Friday 07 June 2019 18:23:41 Luiz Augusto von Dentz wrote:
+>> Hi Pali,
+>>
+>> On Fri, Jun 7, 2019 at 4:00 PM Pali Rohár<pali.rohar@gmail.com>  wrote:
+>>> On Sunday 19 May 2019 14:22:23 Pali Rohár wrote:
+>>>> On Sunday 19 May 2019 11:13:09 Luiz Augusto von Dentz wrote:
+>>>>> Hi Pali,
+>>>>>
+>>>>> On Sat, May 18, 2019 at 11:12 PM Pali Rohár<pali.rohar@gmail.com>  wrote:
+>>>>>> Hello! How is L2CAP layer of bluetooth socket used for A2DP audio
+>>>>>> transfer configured in bluez? It is reliable with big/infinite
+>>>>>> retransmit count? Or in best-effort manner and some packets may be
+>>>>>> dropped? And it is possible to change between these two modes for
+>>>>>> application which uses bluez DBUS API? I'm asking because some A2DP
+>>>>>> audio codecs are designed to deal with packet loss and for those codecs
+>>>>>> it would be probably better to configure L2CAP socket to unreliable
+>>>>>> mode.
+>>>>> We don't use ERTM with AVDTP, both signaling and transport sockets are
+>>>>> using basic mode which don't support retransmissions, there the
+>>>>> concept of flush timeout which iirc we don't currently it.
+>>>> On bluez.org site there is no information how to use bluez sockets and
+>>>> the only documentation/tutorial which I found on internet was this:
+>>>>
+>>>>    https://people.csail.mit.edu/albert/bluez-intro/x559.html
+>>>>
+>>>> I do not know how up-to-date it is, but seems that by default bluez
+>>>> L2CAP sockets are reliable and to change them to unreliable mode it is
+>>>> needed to issue OGF_HOST_CTL / OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT (0x28)
+>>>> request. As default is zero = infinity = reliable connection.
+>>>>
+>>>> I do not understand low level bluetooth details, but is ERTM related to
+>>>> OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT?
+>>>>
+>>>> So what are default settings for L2CAP socket used by AVDTP/A2DP
+>>>> profiles which are transferred to user application via DBUS?
+>>> Hi! Do you have any idea about OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT? It is
+>>> related to ERTM or not?
+>> The OCF usually describes an HCI command which may affect the entire
+>> ACL connection, ERTM is a L2CAP channel mode that includes
+>> retransmissions. The A2DP stream transport doesn't ERTM so no
+>> retransmissions shall take place.
+> Fine, no retransmission is good for A2DP.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+dcb1305dd05699c40640@syzkaller.appspotmail.com
+I am not sure there is no retransmission with current implementation.
+AFAIU, ERTM and automatic flush timeout are not linked. ERTM operates at 
+L2CAP level while automatic flush timeout [1] operates at ACL level.
+When I read the automatic flush timeout set for an A2DP SBC connection 
+it returns 0, which means that the connection uses an infinite timeout. 
+So, even if higher levels set packets as flushable, the ACL policy 
+requests baseband to indefinitely try to send data [3]:
+   "The default Flush Timeout shall be infinite,
+     i.e. re-transmissions are carried out until
+     physical link loss occurs. This is also
+     referred to as a 'reliable channel.'"
 
-==================================================================
-BUG: KASAN: use-after-free in atomic_read  
-include/asm-generic/atomic-instrumented.h:26 [inline]
-BUG: KASAN: use-after-free in refcount_read include/linux/refcount.h:43  
-[inline]
-BUG: KASAN: use-after-free in skb_unref include/linux/skbuff.h:1016 [inline]
-BUG: KASAN: use-after-free in kfree_skb+0x38/0x390 net/core/skbuff.c:690
-Read of size 4 at addr ffff88808d7fb2d4 by task kworker/u4:3/189
+[1] Bluetooth core Vol 2, Part E, 6.19
+[2] Bluetooth core Vol 2, Part E, 7.3.29
+[3] Bluetooth core Vol 2, Part B, 7.6.3
 
-CPU: 0 PID: 189 Comm: kworker/u4:3 Not tainted 5.2.0-rc4 #25
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: events_unbound flush_to_ldisc
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:188
-  __kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
-  kasan_report+0x12/0x20 mm/kasan/common.c:614
-  check_memory_region_inline mm/kasan/generic.c:185 [inline]
-  check_memory_region+0x123/0x190 mm/kasan/generic.c:191
-  kasan_check_read+0x11/0x20 mm/kasan/common.c:94
-  atomic_read include/asm-generic/atomic-instrumented.h:26 [inline]
-  refcount_read include/linux/refcount.h:43 [inline]
-  skb_unref include/linux/skbuff.h:1016 [inline]
-  kfree_skb+0x38/0x390 net/core/skbuff.c:690
-  bcsp_recv+0x2d8/0x13a0 drivers/bluetooth/hci_bcsp.c:608
-  hci_uart_tty_receive+0x225/0x530 drivers/bluetooth/hci_ldisc.c:592
-  tty_ldisc_receive_buf+0x15f/0x1c0 drivers/tty/tty_buffer.c:465
-  tty_port_default_receive_buf+0x7d/0xb0 drivers/tty/tty_port.c:38
-  receive_buf drivers/tty/tty_buffer.c:481 [inline]
-  flush_to_ldisc+0x222/0x390 drivers/tty/tty_buffer.c:533
-  process_one_work+0x989/0x1790 kernel/workqueue.c:2269
-  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
-  kthread+0x354/0x420 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-Allocated by task 189:
-  save_stack+0x23/0x90 mm/kasan/common.c:71
-  set_track mm/kasan/common.c:79 [inline]
-  __kasan_kmalloc mm/kasan/common.c:489 [inline]
-  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:462
-  kasan_slab_alloc+0xf/0x20 mm/kasan/common.c:497
-  slab_post_alloc_hook mm/slab.h:437 [inline]
-  slab_alloc_node mm/slab.c:3269 [inline]
-  kmem_cache_alloc_node+0x131/0x710 mm/slab.c:3579
-  __alloc_skb+0xd5/0x5e0 net/core/skbuff.c:194
-  alloc_skb include/linux/skbuff.h:1054 [inline]
-  bt_skb_alloc include/net/bluetooth/bluetooth.h:339 [inline]
-  bcsp_recv+0x8c1/0x13a0 drivers/bluetooth/hci_bcsp.c:670
-  hci_uart_tty_receive+0x225/0x530 drivers/bluetooth/hci_ldisc.c:592
-  tty_ldisc_receive_buf+0x15f/0x1c0 drivers/tty/tty_buffer.c:465
-  tty_port_default_receive_buf+0x7d/0xb0 drivers/tty/tty_port.c:38
-  receive_buf drivers/tty/tty_buffer.c:481 [inline]
-  flush_to_ldisc+0x222/0x390 drivers/tty/tty_buffer.c:533
-  process_one_work+0x989/0x1790 kernel/workqueue.c:2269
-  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
-  kthread+0x354/0x420 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-Freed by task 8808:
-  save_stack+0x23/0x90 mm/kasan/common.c:71
-  set_track mm/kasan/common.c:79 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:451
-  kasan_slab_free+0xe/0x10 mm/kasan/common.c:459
-  __cache_free mm/slab.c:3432 [inline]
-  kmem_cache_free+0x86/0x260 mm/slab.c:3698
-  kfree_skbmem net/core/skbuff.c:620 [inline]
-  kfree_skbmem+0xc5/0x150 net/core/skbuff.c:614
-  __kfree_skb net/core/skbuff.c:677 [inline]
-  kfree_skb net/core/skbuff.c:694 [inline]
-  kfree_skb+0xf0/0x390 net/core/skbuff.c:688
-  bcsp_recv+0x2d8/0x13a0 drivers/bluetooth/hci_bcsp.c:608
-  hci_uart_tty_receive+0x225/0x530 drivers/bluetooth/hci_ldisc.c:592
-  tiocsti drivers/tty/tty_io.c:2195 [inline]
-  tty_ioctl+0x921/0x14a0 drivers/tty/tty_io.c:2571
-  vfs_ioctl fs/ioctl.c:46 [inline]
-  file_ioctl fs/ioctl.c:509 [inline]
-  do_vfs_ioctl+0xd5f/0x1380 fs/ioctl.c:696
-  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-  __do_sys_ioctl fs/ioctl.c:720 [inline]
-  __se_sys_ioctl fs/ioctl.c:718 [inline]
-  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-  do_syscall_64+0xfd/0x680 arch/x86/entry/common.c:301
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff88808d7fb200
-  which belongs to the cache skbuff_head_cache of size 224
-The buggy address is located 212 bytes inside of
-  224-byte region [ffff88808d7fb200, ffff88808d7fb2e0)
-The buggy address belongs to the page:
-page:ffffea000235fec0 refcount:1 mapcount:0 mapping:ffff88821b6f6540  
-index:0x0
-flags: 0x1fffc0000000200(slab)
-raw: 01fffc0000000200 ffffea000256f0c8 ffffea0002a49888 ffff88821b6f6540
-raw: 0000000000000000 ffff88808d7fb0c0 000000010000000c 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff88808d7fb180: fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc fc
-  ffff88808d7fb200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ffff88808d7fb280: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-                                                  ^
-  ffff88808d7fb300: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
-  ffff88808d7fb380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+-- 
+Frédéric Danis                       Embedded Linux Consultant
+frederic.danis.oss@gmail.com
 
