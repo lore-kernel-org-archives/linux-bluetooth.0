@@ -2,128 +2,167 @@ Return-Path: <SRS0=gL6M=UJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9A7C28CC5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 03:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 801F8C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 08:46:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A41720859
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 03:56:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45311207E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 08:46:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vayc/Y3G"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="eCZRJZ47"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387499AbfFJD4L (ORCPT
+        id S2387974AbfFJIqM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Jun 2019 23:56:11 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36483 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387457AbfFJD4L (ORCPT
+        Mon, 10 Jun 2019 04:46:12 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:40957 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387753AbfFJIqM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Jun 2019 23:56:11 -0400
-Received: by mail-pf1-f194.google.com with SMTP id u22so4459840pfm.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Jun 2019 20:56:10 -0700 (PDT)
+        Mon, 10 Jun 2019 04:46:12 -0400
+Received: by mail-lf1-f68.google.com with SMTP id a9so6035700lff.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2019 01:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=NXq7+5TLKvAkQ8XL+jNtNPrlKW2Do4NcJRGZ+dP5KsQ=;
-        b=Vayc/Y3G0FTfIUOeKVLrMawJZXo0PZDM0yVgttDFkF8a1YYOP5Wft9gEXMu2UrVvvS
-         QkLNnf3txosc64G5eGurPtpsrb7Bf65fIuazuWiuM/GxeZIcQUcVlRmfU9Ab/Tqh6XMV
-         IdFKn2Ohn4rOtjPchhAqycy04KKPH/1myc/zyvwxV7GNfRXli6iDTFUiV0XgG9MWgQLp
-         dPOsRvmIVpb+IqypmFYmU5nt4nmGQdKHMp+P34EV6ahXHN241WKpaX52k2685Ory4prx
-         /O4X9UBiRnp6RavLAxGnj8of4UFebYvRf1gE6nUwVyZyUu94CEOJQMZQ01JL0DFRRf2U
-         7MOw==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=97mC0ujECaK1ek/SEaIvj1B2ByIZ+LViPxrsOGv4wvs=;
+        b=eCZRJZ47kVT2RRWZtgYzI9ZfSGpKfo0swuyGb/iib2rYbpgpstVqnn8ZTlQMIVnFkz
+         e55noVWNYe9dtcDh0Svuz8KMJpLC7MoCSJvv4AJIEcXJP0jjnaJzq59dY1s2WHSjhlp1
+         LQ1xceALoctJg9XX8bjOMWehKSHDCumgTo0e429vrrps/KPr9WKhO8QXD0cB2h8TTUKG
+         bGDT4M7jx1O1iP8Uu2pHWunB+NIB316Cs7RYKyKo6Qhb4oQ2xOs33sz+5p6HGLQ/dc7Z
+         NxapZND/DcgliqaaIGKaJogcHXi4wKhjlDbvHNI5RjGpdSwxgMPqrr0x+HNv49WhKkgM
+         Bb7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=NXq7+5TLKvAkQ8XL+jNtNPrlKW2Do4NcJRGZ+dP5KsQ=;
-        b=sFEAZV6AFyrAEXQ1wbimiXjLXLfutrntutBMgPbu7WvqodRCt6o3sDZ+AFhGRlJDff
-         wKwnfUw1Sv0EaNADQ+GJPBz6kRfGaczNkjG9bbIhT/A4geooR9+oZe7Dr0o+FLeZUnX7
-         cF7FyTeeB6pMg8UTmTDGsm0RUyEHRBj9/EY7QGIm8VgwDpsjHeHuEi2QI+z1oALoY5qS
-         pax+1g6QM0vP/1B2/FGpRNueIW/RcYFRqQeaUGjhsKRd2Xr+BfsXZncP78HChQ780yIL
-         PfJQOdeTHp9yimMy8uZ/olroE4DdIkIADvuu32ILSp7U7i8P6c1TIfS8ktYar7G9P/mU
-         UsHw==
-X-Gm-Message-State: APjAAAXxpu+9+aRt6KJsr+8rFcCop3rxrIeRnTESZkCUXwCgicooyjWK
-        Jp1383lpNp8M9K4PiTiTz+myC33W
-X-Google-Smtp-Source: APXvYqyPJmpoVMULyuorglg1NSHeoeaAyeOKRemWMqpq/pqSwgD9rcKob9kb0p/EHxgQ6Ft7idvwjA==
-X-Received: by 2002:a63:d70b:: with SMTP id d11mr13961822pgg.178.1560138969819;
-        Sun, 09 Jun 2019 20:56:09 -0700 (PDT)
-Received: from [192.168.1.13] ([172.103.152.101])
-        by smtp.gmail.com with ESMTPSA id x25sm9196866pfm.48.2019.06.09.20.56.08
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 09 Jun 2019 20:56:08 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=97mC0ujECaK1ek/SEaIvj1B2ByIZ+LViPxrsOGv4wvs=;
+        b=O3YiHmysf0T4bZvUQ5rlsgYMIbwwxTSduVnYDvLdqgG39WQusZ01pGlZPbPjqfYoan
+         1tSusnxABdP4ROjMVrDOKOP0FcR6UnlNZwCJaOLE/Hu0os/XTf5aAQ/o7YeEPlzqr/Xj
+         XCQgJHUSmCzlO/E8lkqpNHSjM2+RSRW7cPszpx+jXWf6E8jfvaSYFY/9YTNAh/ph2mCC
+         UWWF69slW2Tqo9XgY9uVX9sGaY1oQVrrbw9Ja+SNrnpPDmhMiDpUTDRavnB6sZeQhDwH
+         DR2+2I1IUmdzkxB4VWIov/NBAt5hhhmYb7qC+/fB6Npyj3SFz/MQpsp/uCv8Rg6F1HBK
+         lDfg==
+X-Gm-Message-State: APjAAAUIJsHk5L05nNN+t5Hv6U4/bwjUtnsNsmIx0ynRd8ihE83xdUNP
+        /gwE2nXbXW0O71GOxcq0nPK3Hllayul/8w==
+X-Google-Smtp-Source: APXvYqwAXS5mXOKJejRt1JUKMk00+8ffnccO9jmlGtT8iqqo6jj9LpInPAY1af9HCx1lmIQbO/HxgQ==
+X-Received: by 2002:a19:6703:: with SMTP id b3mr34463412lfc.153.1560156370685;
+        Mon, 10 Jun 2019 01:46:10 -0700 (PDT)
+Received: from localhost.localdomain ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id b25sm1861856lff.42.2019.06.10.01.46.09
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 10 Jun 2019 01:46:10 -0700 (PDT)
+From:   Jakub Witowski <jakub.witowski@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-From:   David Frey <dpfrey@gmail.com>
-Subject: Interacting with a TI SensorTag CC2650
-Message-ID: <40541478-bb40-b6ae-5b3d-22adb41588f0@gmail.com>
-Date:   Sun, 9 Jun 2019 20:56:07 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+Cc:     Brian Gix <brian.gix@intel.com>,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v3] mesh: Fix segmentation fault after adding second netkey via NET_KEY_ADD opcode
+Date:   Mon, 10 Jun 2019 10:46:05 +0200
+Message-Id: <20190610084605.11411-1-jakub.witowski@silvair.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Segmentation fault was caused by passing subnet pointer to the
+start_network_beacon() which was NULL
+---
+ mesh/net.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
-I have a Texas Instruments SensorTag (model CC2650) that acts as a BLE
-device.  I'm trying to interact with it from a PC running Bluez.
-Specifically, I'm trying to read the IR temperature sensor.
-
-Assumptions:
-- The PC is running Bluez 5.50 on top of a recent Linux kernel
-- There is a LE capable adapter (hci0) which is powered on
-- Discovery has not yet been activated, so no devices are currently known
-
-Here is what I *think* I need to do to make this work.  Please correct
-me if I'm wrong or if there is a better way to do the same thing.
-
-- Register a handler for the "InterfacesAdded" signal on the Bluez
-object manager
-- Call the StartDiscovery() method on the Adapter1 interface of hci0
-- In the "InterfaceAdded" handler, check if any of the interfaces being
-added are org.bluez.Device1.  If it is, then check that the path
-contains "hci0" because we don't want to pick up objects on other adapters.
-- For devices found, check if the "Name" property is set to "CC2650
-SensorTag".  Ideally, the device would advertise it's service UUIDs and
-then you could register a profile object via org.bluez.GattManager1's
-RegisterApplication(), but this is not possible because the SensorTag
-doesn't seem to include the service UUIDs in it's advertising payload.
-- When a matching device is found according to the search above, call
-the Connect() method on the Device1 interface.  This will cause all of
-the services, characteristics and descriptors to be populated into the
-object manager
-- Wait for the IR temperature service UUID to appear in my
-"InterfacesAdded" callback
-- Wait for all of the relevant characteristics and descriptors to be
-reported in my "InterfacesAdded" callback
-- Use the ReadValue() method on the org.bluez.GattCharacteristic1
-interface to read from the appropriate object
-
-
-The above describes the steps that I think are necessary for a simple
-read of the value.  Once I want to enable notifications, I think it gets
-slightly more complicated because there are multiple characteristics in
-play.
-
-Things that seem strange to me:
-- I find it surprising that the way to watch for a newly scanned device
-on a specific adapter is to monitor every interface that is added to
-bluez and then manually filter to see if it's a device on hci0.  Is
-there no better way to do this?
-- Do I need to track all of the characteristics and descriptors that
-pass through the "InterfacesAdded" handler so that I ensure that I wait
-long enough before trying to access the characteristics of a service?
-
-Thanks,
-David
+diff --git a/mesh/net.c b/mesh/net.c
+index c7aff9ab4..fdd38e7ce 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -977,27 +977,28 @@ int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
+ 	return MESH_STATUS_SUCCESS;
+ }
+ 
+-static int add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
++static struct mesh_subnet *add_key(struct mesh_net *net, uint16_t idx,
++							const uint8_t *value)
+ {
+ 	struct mesh_subnet *subnet;
+ 
+ 	subnet = subnet_new(net, idx);
+ 	if (!subnet)
+-		return MESH_STATUS_INSUFF_RESOURCES;
++		return NULL;
+ 
+ 	subnet->net_key_tx = subnet->net_key_cur = net_key_add(value);
+ 	if (!subnet->net_key_cur) {
+ 		l_free(subnet);
+-		return MESH_STATUS_INSUFF_RESOURCES;
++		return NULL;
+ 	}
+ 
+ 	if (!create_secure_beacon(net, subnet, subnet->snb.beacon + 1) ||
+ 				!l_queue_push_tail(net->subnets, subnet)) {
+ 		subnet_free(subnet);
+-		return MESH_STATUS_INSUFF_RESOURCES;
++		return NULL;
+ 	}
+ 
+-	return MESH_STATUS_SUCCESS;
++	return subnet;
+ }
+ 
+ /*
+@@ -1007,7 +1008,6 @@ static int add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
+ int mesh_net_add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
+ {
+ 	struct mesh_subnet *subnet;
+-	int status;
+ 
+ 	subnet = l_queue_find(net->subnets, match_key_index,
+ 							L_UINT_TO_PTR(idx));
+@@ -1019,9 +1019,9 @@ int mesh_net_add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
+ 			return MESH_STATUS_IDX_ALREADY_STORED;
+ 	}
+ 
+-	status = add_key(net, idx, value);
+-	if (status != MESH_STATUS_SUCCESS)
+-		return status;
++	subnet = add_key(net, idx, value);
++	if (!subnet)
++		return MESH_STATUS_INSUFF_RESOURCES;
+ 
+ 	if (!storage_net_key_add(net, idx, value, false)) {
+ 		l_queue_remove(net->subnets, subnet);
+@@ -2490,7 +2490,7 @@ static void net_rx(void *net_ptr, void *user_data)
+ 	int8_t rssi = 0;
+ 
+ 	key_id = net_key_decrypt(net->iv_index, data->data, data->len,
+-								&out, &out_size);
++							&out, &out_size);
+ 
+ 	if (!key_id)
+ 		return;
+@@ -3017,7 +3017,6 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
+ 					const uint8_t *new_key, uint8_t phase)
+ {
+ 	struct mesh_subnet *subnet;
+-	int status;
+ 
+ 	subnet = l_queue_find(net->subnets, match_key_index,
+ 							L_UINT_TO_PTR(idx));
+@@ -3032,8 +3031,8 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
+ 	if (phase != KEY_REFRESH_PHASE_NONE && !new_key)
+ 		return false;
+ 
+-	status = add_key(net, idx, key);
+-	if (status != MESH_STATUS_SUCCESS)
++	subnet = add_key(net, idx, key);
++	if (!subnet)
+ 		return false;
+ 
+ 	subnet = l_queue_find(net->subnets, match_key_index,
+-- 
+2.20.1
 
