@@ -2,167 +2,137 @@ Return-Path: <SRS0=gL6M=UJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 801F8C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 08:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 669C6C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 10:51:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45311207E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 08:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EE26206BB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jun 2019 10:51:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="eCZRJZ47"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MClQ4N4O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387974AbfFJIqM (ORCPT
+        id S2389516AbfFJKve (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jun 2019 04:46:12 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:40957 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387753AbfFJIqM (ORCPT
+        Mon, 10 Jun 2019 06:51:34 -0400
+Received: from mail-wm1-f48.google.com ([209.85.128.48]:40578 "EHLO
+        mail-wm1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389426AbfFJKve (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jun 2019 04:46:12 -0400
-Received: by mail-lf1-f68.google.com with SMTP id a9so6035700lff.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2019 01:46:11 -0700 (PDT)
+        Mon, 10 Jun 2019 06:51:34 -0400
+Received: by mail-wm1-f48.google.com with SMTP id v19so43943wmj.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2019 03:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=97mC0ujECaK1ek/SEaIvj1B2ByIZ+LViPxrsOGv4wvs=;
-        b=eCZRJZ47kVT2RRWZtgYzI9ZfSGpKfo0swuyGb/iib2rYbpgpstVqnn8ZTlQMIVnFkz
-         e55noVWNYe9dtcDh0Svuz8KMJpLC7MoCSJvv4AJIEcXJP0jjnaJzq59dY1s2WHSjhlp1
-         LQ1xceALoctJg9XX8bjOMWehKSHDCumgTo0e429vrrps/KPr9WKhO8QXD0cB2h8TTUKG
-         bGDT4M7jx1O1iP8Uu2pHWunB+NIB316Cs7RYKyKo6Qhb4oQ2xOs33sz+5p6HGLQ/dc7Z
-         NxapZND/DcgliqaaIGKaJogcHXi4wKhjlDbvHNI5RjGpdSwxgMPqrr0x+HNv49WhKkgM
-         Bb7Q==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=1AprxLh5aOOnhZywN53A2N1mIL16pEeWCtpt7xVlSr8=;
+        b=MClQ4N4O3u7TleNmr3+kf9KyEgDL6rPJXrdaT50lRkJpNI1feliLiLVruUFBRYy+y4
+         6gLcyXzP5rQEPWqz3jySykR+TU/xVffPTTz9wDA0JfQJTQ6qfP063Ckx7ZEvklIGhvL3
+         Rloj494ddqXuJedEDFgJz3GA/qQc5pn9xBHbVB5PDnCpeTcG/LYQOKdXqshXo+CbBg2g
+         /TrgueDuP7ELXy+81uGqFVXG2YeoykR89E2gv9QXv7LqT/aYGFBFcVOjJidL6vGyxjUi
+         AM+chloliR/fztzrJviZlhdv8iKyci5W770lBUCjLTl4v2ZqR8T/KNEYdGW7XJNEVunv
+         jiXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=97mC0ujECaK1ek/SEaIvj1B2ByIZ+LViPxrsOGv4wvs=;
-        b=O3YiHmysf0T4bZvUQ5rlsgYMIbwwxTSduVnYDvLdqgG39WQusZ01pGlZPbPjqfYoan
-         1tSusnxABdP4ROjMVrDOKOP0FcR6UnlNZwCJaOLE/Hu0os/XTf5aAQ/o7YeEPlzqr/Xj
-         XCQgJHUSmCzlO/E8lkqpNHSjM2+RSRW7cPszpx+jXWf6E8jfvaSYFY/9YTNAh/ph2mCC
-         UWWF69slW2Tqo9XgY9uVX9sGaY1oQVrrbw9Ja+SNrnpPDmhMiDpUTDRavnB6sZeQhDwH
-         DR2+2I1IUmdzkxB4VWIov/NBAt5hhhmYb7qC+/fB6Npyj3SFz/MQpsp/uCv8Rg6F1HBK
-         lDfg==
-X-Gm-Message-State: APjAAAUIJsHk5L05nNN+t5Hv6U4/bwjUtnsNsmIx0ynRd8ihE83xdUNP
-        /gwE2nXbXW0O71GOxcq0nPK3Hllayul/8w==
-X-Google-Smtp-Source: APXvYqwAXS5mXOKJejRt1JUKMk00+8ffnccO9jmlGtT8iqqo6jj9LpInPAY1af9HCx1lmIQbO/HxgQ==
-X-Received: by 2002:a19:6703:: with SMTP id b3mr34463412lfc.153.1560156370685;
-        Mon, 10 Jun 2019 01:46:10 -0700 (PDT)
-Received: from localhost.localdomain ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id b25sm1861856lff.42.2019.06.10.01.46.09
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 10 Jun 2019 01:46:10 -0700 (PDT)
-From:   Jakub Witowski <jakub.witowski@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Brian Gix <brian.gix@intel.com>,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v3] mesh: Fix segmentation fault after adding second netkey via NET_KEY_ADD opcode
-Date:   Mon, 10 Jun 2019 10:46:05 +0200
-Message-Id: <20190610084605.11411-1-jakub.witowski@silvair.com>
-X-Mailer: git-send-email 2.20.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=1AprxLh5aOOnhZywN53A2N1mIL16pEeWCtpt7xVlSr8=;
+        b=XLKUxjLO6WA9xZYj448v5ZjJVG3HWjKfAIG2kT4U6zo+B0MFLEAtntuP6dMw/0XxoY
+         Tk43PXNrC/maOFmO49tHuWMTaD19sbTC7A+pf8VbrUkGb127rYGowQJvb4JUeSAV2opw
+         RBQlXejDue/u8Gpb5l1rJJREXs4wkU2f6x4m81P+F2liqsPQv75WWqlCL/6VZeR2TAZj
+         WsbeebFPaXn94h66A3rGM4ubGbYom7t8mMWjsTZ3gQ/4vDF8hUJMMpom+PvMs9YXrwWm
+         drM4ZRDs7CZqLzBvmO+/OH+cLGjMS4sGmJk2NqGJsRRlU8QK+Uzmh0rm/lZKbQ+aaQ2p
+         4Ong==
+X-Gm-Message-State: APjAAAUx6QnbRRET7OFgwr3b3hJURDhILy4tYXfMxlWfKG64rDQ4huDS
+        nt7LpS2NuftAnq50Dwonhm4pFhrRbxk=
+X-Google-Smtp-Source: APXvYqzFI0sdjHj6mQayZXaBH1lT+wW1qZxFm3bXjPj6x7ozLzgNNhFiDRfN1en0fWCgizwvHIZxpQ==
+X-Received: by 2002:a1c:2e16:: with SMTP id u22mr12812178wmu.80.1560163891772;
+        Mon, 10 Jun 2019 03:51:31 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id b203sm10912029wmd.41.2019.06.10.03.51.30
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 10 Jun 2019 03:51:30 -0700 (PDT)
+Date:   Mon, 10 Jun 2019 12:51:30 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez A2DP socket reliability
+Message-ID: <20190610105130.un3muj4knwoua5cb@pali>
+References: <20190518190618.m7rdkthvpz4agxd2@pali>
+ <CABBYNZ+8YX-zBnUaYKLX2=OdJ-GUQ4y4V0EhGsN+uecKEpFBeA@mail.gmail.com>
+ <20190519122223.gabew7qfftihlbic@pali>
+ <20190607130021.ntd3dfd6nzmuy3m3@pali>
+ <CABBYNZKQ0WYTH4Oa_eFv11Ok8=42oY_GPFzN-D6UqfeNsvaXug@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZKQ0WYTH4Oa_eFv11Ok8=42oY_GPFzN-D6UqfeNsvaXug@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Segmentation fault was caused by passing subnet pointer to the
-start_network_beacon() which was NULL
----
- mesh/net.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+On Friday 07 June 2019 18:23:41 Luiz Augusto von Dentz wrote:
+> Hi Pali,
+> 
+> On Fri, Jun 7, 2019 at 4:00 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> >
+> > On Sunday 19 May 2019 14:22:23 Pali Rohár wrote:
+> > > On Sunday 19 May 2019 11:13:09 Luiz Augusto von Dentz wrote:
+> > > > Hi Pali,
+> > > >
+> > > > On Sat, May 18, 2019 at 11:12 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > > > >
+> > > > > Hello! How is L2CAP layer of bluetooth socket used for A2DP audio
+> > > > > transfer configured in bluez? It is reliable with big/infinite
+> > > > > retransmit count? Or in best-effort manner and some packets may be
+> > > > > dropped? And it is possible to change between these two modes for
+> > > > > application which uses bluez DBUS API? I'm asking because some A2DP
+> > > > > audio codecs are designed to deal with packet loss and for those codecs
+> > > > > it would be probably better to configure L2CAP socket to unreliable
+> > > > > mode.
+> > > >
+> > > > We don't use ERTM with AVDTP, both signaling and transport sockets are
+> > > > using basic mode which don't support retransmissions, there the
+> > > > concept of flush timeout which iirc we don't currently it.
+> > >
+> > > On bluez.org site there is no information how to use bluez sockets and
+> > > the only documentation/tutorial which I found on internet was this:
+> > >
+> > >   https://people.csail.mit.edu/albert/bluez-intro/x559.html
+> > >
+> > > I do not know how up-to-date it is, but seems that by default bluez
+> > > L2CAP sockets are reliable and to change them to unreliable mode it is
+> > > needed to issue OGF_HOST_CTL / OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT (0x28)
+> > > request. As default is zero = infinity = reliable connection.
+> > >
+> > > I do not understand low level bluetooth details, but is ERTM related to
+> > > OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT?
+> > >
+> > > So what are default settings for L2CAP socket used by AVDTP/A2DP
+> > > profiles which are transferred to user application via DBUS?
+> >
+> > Hi! Do you have any idea about OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT? It is
+> > related to ERTM or not?
+> 
+> The OCF usually describes an HCI command which may affect the entire
+> ACL connection, ERTM is a L2CAP channel mode that includes
+> retransmissions. The A2DP stream transport doesn't ERTM so no
+> retransmissions shall take place.
 
-diff --git a/mesh/net.c b/mesh/net.c
-index c7aff9ab4..fdd38e7ce 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -977,27 +977,28 @@ int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
- 	return MESH_STATUS_SUCCESS;
- }
- 
--static int add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
-+static struct mesh_subnet *add_key(struct mesh_net *net, uint16_t idx,
-+							const uint8_t *value)
- {
- 	struct mesh_subnet *subnet;
- 
- 	subnet = subnet_new(net, idx);
- 	if (!subnet)
--		return MESH_STATUS_INSUFF_RESOURCES;
-+		return NULL;
- 
- 	subnet->net_key_tx = subnet->net_key_cur = net_key_add(value);
- 	if (!subnet->net_key_cur) {
- 		l_free(subnet);
--		return MESH_STATUS_INSUFF_RESOURCES;
-+		return NULL;
- 	}
- 
- 	if (!create_secure_beacon(net, subnet, subnet->snb.beacon + 1) ||
- 				!l_queue_push_tail(net->subnets, subnet)) {
- 		subnet_free(subnet);
--		return MESH_STATUS_INSUFF_RESOURCES;
-+		return NULL;
- 	}
- 
--	return MESH_STATUS_SUCCESS;
-+	return subnet;
- }
- 
- /*
-@@ -1007,7 +1008,6 @@ static int add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
- int mesh_net_add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
- {
- 	struct mesh_subnet *subnet;
--	int status;
- 
- 	subnet = l_queue_find(net->subnets, match_key_index,
- 							L_UINT_TO_PTR(idx));
-@@ -1019,9 +1019,9 @@ int mesh_net_add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
- 			return MESH_STATUS_IDX_ALREADY_STORED;
- 	}
- 
--	status = add_key(net, idx, value);
--	if (status != MESH_STATUS_SUCCESS)
--		return status;
-+	subnet = add_key(net, idx, value);
-+	if (!subnet)
-+		return MESH_STATUS_INSUFF_RESOURCES;
- 
- 	if (!storage_net_key_add(net, idx, value, false)) {
- 		l_queue_remove(net->subnets, subnet);
-@@ -2490,7 +2490,7 @@ static void net_rx(void *net_ptr, void *user_data)
- 	int8_t rssi = 0;
- 
- 	key_id = net_key_decrypt(net->iv_index, data->data, data->len,
--								&out, &out_size);
-+							&out, &out_size);
- 
- 	if (!key_id)
- 		return;
-@@ -3017,7 +3017,6 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
- 					const uint8_t *new_key, uint8_t phase)
- {
- 	struct mesh_subnet *subnet;
--	int status;
- 
- 	subnet = l_queue_find(net->subnets, match_key_index,
- 							L_UINT_TO_PTR(idx));
-@@ -3032,8 +3031,8 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
- 	if (phase != KEY_REFRESH_PHASE_NONE && !new_key)
- 		return false;
- 
--	status = add_key(net, idx, key);
--	if (status != MESH_STATUS_SUCCESS)
-+	subnet = add_key(net, idx, key);
-+	if (!subnet)
- 		return false;
- 
- 	subnet = l_queue_find(net->subnets, match_key_index,
+Fine, no retransmission is good for A2DP.
+
+And how it is with delivering packets? It is possible that may be
+delivered to other side in wrong order?
+
 -- 
-2.20.1
-
+Pali Rohár
+pali.rohar@gmail.com
