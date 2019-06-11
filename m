@@ -2,65 +2,87 @@ Return-Path: <SRS0=I8Nx=UK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F2D6C31E44
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jun 2019 21:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FF2C46477
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jun 2019 22:01:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D97F2086D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jun 2019 21:36:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E8DF205ED
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jun 2019 22:01:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560290485;
+	bh=Bt0HGRGv8d5bwQwnCiqo8yLA4cyS97HZ5bEY2lqzYXU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=eu+dhFCc27Hy7ghIqc5lYjzbglu+05Hz2WqzO8+NnTHNcaXEP9beYbmtrdBXtxims
+	 z5EEZwdBLki+LqGblzwvqw3iQL+njFRVmJxw8eFXmHjPar/yfxpeqzdd+ewgNco6zD
+	 YLo/W9DZZ0HpIb6SDYfNn6XvvJWH7288M9nShgwY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436517AbfFKVg3 convert rfc822-to-8bit (ORCPT
+        id S2436649AbfFKWBV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Jun 2019 17:36:29 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41151 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403793AbfFKVg3 (ORCPT
+        Tue, 11 Jun 2019 18:01:21 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:42818 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407758AbfFKWBV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Jun 2019 17:36:29 -0400
-Received: from marcel-macpro.fritz.box (p5B3D2A37.dip0.t-ipconnect.de [91.61.42.55])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0FD02CF169;
-        Tue, 11 Jun 2019 23:44:52 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] Revert "Bluetooth: Align minimum encryption key size for
- LE and BR/EDR connections"
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CA+E=qVdLOS9smt-nBxg9Lon0iTZr87kONSp-XPKj9tqB4bvnqw@mail.gmail.com>
-Date:   Tue, 11 Jun 2019 23:36:26 +0200
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        stable@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <723142BB-8217-4A01-A2B9-F527174FDC0F@holtmann.org>
-References: <20190522052002.10411-1-anarsoul@gmail.com>
- <6BD1D3F7-E2F2-4B2D-9479-06E27049133C@holtmann.org>
- <7B7F362B-6C8B-4112-8772-FB6BC708ABF5@holtmann.org>
- <CA+E=qVfopSA90vG2Kkh+XzdYdNn=M-hJN_AptW=R+B5v3HB9eA@mail.gmail.com>
- <CA+E=qVdLOS9smt-nBxg9Lon0iTZr87kONSp-XPKj9tqB4bvnqw@mail.gmail.com>
-To:     Vasily Khoruzhick <anarsoul@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Tue, 11 Jun 2019 18:01:21 -0400
+Received: by mail-qt1-f195.google.com with SMTP id s15so16463633qtk.9;
+        Tue, 11 Jun 2019 15:01:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=wVRjad9Fc8BILg/+DYBhqnoHZfByaIOMm77zfoBIfY0=;
+        b=uZheCOttbqblvyIMZwReeWp+JKZkUKNnu2dE7PFC6Ayj4XeuMQmtYZ7WfswaYJbQcF
+         vOGVbYTmuPxAMwyLC004S0bLmcYiboju7syJ7Mtk+B+50jjdMzQ+YrNHZh1SYSrxY+VL
+         /gb2QmzjjonwcTtZyBQI1OseExiibPQbdd7ATSHuyf4ESdngBp/2CsZ8+5V5mfvir+8s
+         LLf1GDzvcJYS9r6YT2OUn0qoIp/bJDutb8gsV10YK/nesxcS/Ri44EE3kKZV7VsPrXbr
+         HkH1F+DJ/NG22BGf6czObAZ5M96xGGQzxOWUTwLi6vCiQkbsQIV7HNk9KwMFlwAXLq4x
+         oAGQ==
+X-Gm-Message-State: APjAAAUW+2mrC6Zwr9mHJnEewB70KZwGWWg6N/sVLhUr6jD2t/fwnqYF
+        wKhc9t86sFPVMhWLqKvXig==
+X-Google-Smtp-Source: APXvYqxq+ctalxr4J055wzK7JBghbqhScsopOPimJQptlh5w/Pu3JDApOeKWxso3z1UIm9uUmO+OTw==
+X-Received: by 2002:ac8:c45:: with SMTP id l5mr50644561qti.63.1560290480260;
+        Tue, 11 Jun 2019 15:01:20 -0700 (PDT)
+Received: from localhost ([64.188.179.199])
+        by smtp.gmail.com with ESMTPSA id g5sm8812899qta.77.2019.06.11.15.01.19
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 11 Jun 2019 15:01:19 -0700 (PDT)
+Date:   Tue, 11 Jun 2019 16:01:17 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     mark.rutland@arm.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+        thierry.escande@linaro.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, c-hbandi@codeaurora.org
+Subject: Re: [PATCH v6 2/2] dt-bindings: net: bluetooth: Add device property
+ firmware-name for QCA6174
+Message-ID: <20190611220117.GA31601@bogus>
+References: <1557919203-11055-1-git-send-email-rjliao@codeaurora.org>
+ <1559814055-13872-1-git-send-email-rjliao@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1559814055-13872-1-git-send-email-rjliao@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vasily,
+On Thu, Jun 06, 2019 at 05:40:55PM +0800, Rocky Liao wrote:
+> This patch adds an optional device property "firmware-name" to allow the
+> driver to load customized nvm firmware file based on this property.
+> 
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+> Changes in v6:
+>   * Added read firmware-name property for both QCA6174 and WCN399X
+> ---
+>  Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-> Can we get this revert merged into stable branches? Bluetooth HID has
-> been broken for many devices for quite a while now and RFC patch that
-> fixes the breakage hasn't seen any movement for almost a month.
-
-lets send the RFC patch upstream since it got enough feedback that it fixes the issue.
-
-Regards
-
-Marcel
-
+Reviewed-by: Rob Herring <robh@kernel.org>
