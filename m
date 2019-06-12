@@ -2,130 +2,153 @@ Return-Path: <SRS0=F5zp=UL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20400C31E46
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jun 2019 10:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D82C31E46
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jun 2019 21:00:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EBBC12080A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jun 2019 10:05:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B039208C2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jun 2019 21:00:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhM7yhZ7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZ0vagWu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731954AbfFLKFE (ORCPT
+        id S2389155AbfFLVAz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jun 2019 06:05:04 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:41892 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731837AbfFLKFE (ORCPT
+        Wed, 12 Jun 2019 17:00:55 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:37677 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388338AbfFLVAy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jun 2019 06:05:04 -0400
-Received: by mail-pl1-f194.google.com with SMTP id s24so6423070plr.8;
-        Wed, 12 Jun 2019 03:05:03 -0700 (PDT)
+        Wed, 12 Jun 2019 17:00:54 -0400
+Received: by mail-io1-f66.google.com with SMTP id e5so14191413iok.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2019 14:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=gcDvik9+KpaYGNhLdOFj21bkRuHqN/0qSRW+OLH4t8o=;
-        b=HhM7yhZ7ia7xDPhEU1Jv5AWvfd0HzaBZjuY4Oc7cNiazWjv16Aa1UmpMsj9yT+rC2R
-         cCuDSTK9xesfChyiZyV9D2yihvd52pNjgjo6vQX0BdoBUEp0ON5mQRguueGM/7Fb6DwI
-         zrvjysyFn1N2Gmz+ojP/7pirWleYt5PwmnWc4Zl0CaxGIhBRVWkb2Hq98R2dfmqJhFU2
-         cBCcYNlUAiX2CFKHo2zF6RcO2dIrWfjRzRYiZubVgOgOlhC4y/f8jYQdzUFLdYQzI2x/
-         LMUjuatuN69pf2dXmPu02dyGXndwyovHUMKLzVOIsWmrriB5thmKkEHdo5/H7E8hH+X2
-         HumA==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=8Z50PCYi7BpYPOGOES2ISDGkR9G8GR1+pGaM6ck4I2c=;
+        b=iZ0vagWudsIhuwdGUtW3p7V4ZcTxg3Odz4y4KmdbJI1B1Pbrift9Wrf0nza3Y11cNW
+         Ee+8/Ag+OpZ+l6erz3zq3CU6dPinWxRWClLDdLBDmiG3o/DCssj4pxhsOb5ybvhdkEtt
+         8vuBtO50JSDOSoH4ylOhhN6bSZf22HrZTuFeCtqfRtThf8Y3CGwnrz9cjWnzbaD+hN/i
+         BBhItQJKIIdJYj3+Ff6TB4wbjDSYbBv3CLqo1cknAkrhzpL9G7IUx+39Eg5YqcODMnfL
+         5+ikDa9vUb4PNyvVkJhB38jFCQTfAdTLZsaYgCHaph0+UXD17tYdqq9nngXQaNv+btr3
+         GMYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=gcDvik9+KpaYGNhLdOFj21bkRuHqN/0qSRW+OLH4t8o=;
-        b=lON6ufAOVWXUY50LvAfxfBhO9nrmj/+5x9HuKLhR7T7Fwy3bW0QIfsjndnOTdCnm3o
-         hWJqwW6OHnvnizWegGua1krNc0OB2S3FxxxK5OBXivpYzRLZwUD0GBMOz3mqY6xYJQtA
-         TIpfjscn5gfouYEVvd7q5A4/eepM/SkhEQhy4s/n/rr70EHqXqfvjzMYIoDr1dl5ePmC
-         icGLwxMaeGqp9bXa+z6tSSwDFtjOKk5It4i7kqCYl+jYrCw3z0w3/irL8w4OEdHu0zV/
-         Ic6Qv2E0Xej6sMU7PPJORLT2t254drEIZWfmhFeblvIdfjj7aD5RPKqYkgSHfoOzEVhU
-         SqYg==
-X-Gm-Message-State: APjAAAWVXmIPexPMyGIh/OMxpxdswKFfuqwV8XvABv/wt3HUcdqzAKu8
-        GY1OOM2mVWaYZEovcqWRhEBEl8eHQE792w==
-X-Google-Smtp-Source: APXvYqySl9pxjkn+PTm7IbgW5at2rXe1yZ7PJw+AN8G3EHc+LUA/4hmQDPSHZpW778MQr27Lxx2ydg==
-X-Received: by 2002:a17:902:2926:: with SMTP id g35mr35288254plb.269.1560333903409;
-        Wed, 12 Jun 2019 03:05:03 -0700 (PDT)
-Received: from jhedberg-mac01.fi.intel.com ([192.55.54.42])
-        by smtp.gmail.com with ESMTPSA id p2sm14958413pfb.118.2019.06.12.03.04.59
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=8Z50PCYi7BpYPOGOES2ISDGkR9G8GR1+pGaM6ck4I2c=;
+        b=QvSJHaFy34mxSKe9/QriEfFPncnDhMVVOBLpdmGs7EuX1Xu7y06EhEpxa3BLndTjgX
+         IToq8jpi7QgqB4VIoegkyqgTSUi9e0lHZ2ZfhHrGclKq6cyBkNOypkHG+X9cAwey9GXz
+         wq31m1w9TGVJ86tSg3A+RsE2uRp8wF8WM2XYf3XHLhBkojTXACnyDBdjr9m1qGra2iV0
+         1RriKWF35vtbF/U/Aqg4MfXA3QwxnXJvPgUo4gk1zl7vRJwV5fqM1Y9oa2SwjuTQvaIn
+         XyCFtMVjpMAxYRPbaC16Sij9gNTMdtWAVxhoWN0r9YswxPn3W4hh/IxjSQJus/6UZBg+
+         Xk0Q==
+X-Gm-Message-State: APjAAAVRnYRF7ggajAJfybGmdLke5bOKBgBb/O4lfWwZgk7GKEfo/fFY
+        dbquF0ZDb9eEBLgbweiTWfA2p/Ro
+X-Google-Smtp-Source: APXvYqyJp1mzIQ++HUTaZk2yXrQ91UBugRgRU2Mv2jSbw3AlZ1EyGXMlmXSH0JTIYIaOrc9664mp3A==
+X-Received: by 2002:a6b:e608:: with SMTP id g8mr8474849ioh.88.1560373254029;
+        Wed, 12 Jun 2019 14:00:54 -0700 (PDT)
+Received: from [192.168.0.125] ([8.39.228.178])
+        by smtp.gmail.com with ESMTPSA id p10sm373340iob.54.2019.06.12.14.00.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 03:05:02 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] Revert "Bluetooth: Align minimum encryption key size for
- LE and BR/EDR connections"
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-In-Reply-To: <9ad95905975e09646f0f2aa967140881cbbe3477.camel@hadess.net>
-Date:   Wed, 12 Jun 2019 13:04:57 +0300
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Vasily Khoruzhick <anarsoul@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        stable@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <77E07614-6F68-4661-BC6D-2BD610DBD62A@gmail.com>
-References: <20190522052002.10411-1-anarsoul@gmail.com>
- <6BD1D3F7-E2F2-4B2D-9479-06E27049133C@holtmann.org>
- <7B7F362B-6C8B-4112-8772-FB6BC708ABF5@holtmann.org>
- <CA+E=qVfopSA90vG2Kkh+XzdYdNn=M-hJN_AptW=R+B5v3HB9eA@mail.gmail.com>
- <CA+E=qVdLOS9smt-nBxg9Lon0iTZr87kONSp-XPKj9tqB4bvnqw@mail.gmail.com>
- <723142BB-8217-4A01-A2B9-F527174FDC0F@holtmann.org>
- <20190612070701.GA13320@kroah.com>
- <9ad95905975e09646f0f2aa967140881cbbe3477.camel@hadess.net>
-To:     Bastien Nocera <hadess@hadess.net>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Wed, 12 Jun 2019 14:00:53 -0700 (PDT)
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+From:   csonsino <csonsino@gmail.com>
+Subject: [PATCH 1/1] bluetooth: validate BLE connection interval updates
+Message-ID: <f9176553-d4d5-c2e0-ecd7-937cac0d8098@gmail.com>
+Date:   Wed, 12 Jun 2019 15:00:52 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Problem: The Linux bluetooth stack yields complete control over the BLE
+connection interval to the remote device.
 
-On 12 Jun 2019, at 12.38, Bastien Nocera <hadess@hadess.net> wrote:
->=20
-> On Wed, 2019-06-12 at 09:07 +0200, Greg Kroah-Hartman wrote:
->> On Tue, Jun 11, 2019 at 11:36:26PM +0200, Marcel Holtmann wrote:
->>> Hi Vasily,
->>>=20
->>>> Can we get this revert merged into stable branches? Bluetooth HID
->>>> has
->>>> been broken for many devices for quite a while now and RFC patch
->>>> that
->>>> fixes the breakage hasn't seen any movement for almost a month.
->>>=20
->>> lets send the RFC patch upstream since it got enough feedback that
->>> it fixes the issue.
->>=20
->> According to Hans, the workaround did not work.
->=20
-> Is it possible that those folks were running Fedora, and using a
-> version of bluetoothd without a fix for using dbus-broker as the D-Bus
-> daemon implementation?
->=20
-> I backported the fix in an update last week:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1711594
+The Linux bluetooth stack provides access to the BLE connection interval
+min and max values through /sys/kernel/debug/bluetooth/hci0/
+conn_min_interval and /sys/kernel/debug/bluetooth/hci0/conn_max_interval.
+These values are used for initial BLE connections, but the remote device
+has the ability to request a connection parameter update. In the event
+that the remote side requests to change the connection interval, the Linux
+kernel currently only validates that the desired value is within the
+acceptable range in the bluetooth specification (6 - 3200, corresponding to
+7.5ms - 4000ms). There is currently no validation that the desired value
+requested by the remote device is within the min/max limits specified in
+the conn_min_interval/conn_max_interval configurations. This essentially
+leads to Linux yielding complete control over the connection interval to
+the remote device.
 
-I don=E2=80=99t know if that=E2=80=99s the case, but at least based on =
-the comment here:
+The proposed patch adds a verification step to the connection parameter
+update mechanism, ensuring that the desired value is within the min/max
+bounds of the current connection. If the desired value is outside of the
+current connection min/max values, then the connection parameter update
+request is rejected and the negative response is returned to the remote
+device. Recall that the initial connection is established using the local
+conn_min_interval/conn_max_interval values, so this allows the Linux
+administrator to retain control over the BLE connection interval.
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D203643#c10
+The one downside that I see is that the current default Linux values for
+conn_min_interval and conn_max_interval typically correspond to 30ms and
+50ms respectively. If this change were accepted, then it is feasible that
+some devices would no longer be able to negotiate to their desired
+connection interval values. This might be remedied by setting the default
+Linux conn_min_interval and conn_max_interval values to the widest
+supported range (6 - 3200 / 7.5ms - 4000ms). This could lead to the same
+behavior as the current implementation, where the remote device could
+request to change the connection interval value to any value that is
+permitted by the bluetooth specification, and Linux would accept the
+desired value.
 
-it looks like there=E2=80=99s still a race with controllers that do =
-support reading the encryption key size. The peer device may send an =
-L2CAP Connect Request before we=E2=80=99ve completed reading the key =
-size, in which case we=E2=80=99d still reject the request. For making =
-this work again I=E2=80=99m not aware of any other quick solution than a =
-revert.
+Signed-off-by: Carey Sonsino <csonsino@gmail.com>
 
-Johan
+---
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ef9928d7b4fb..e5d69ae5eda1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5576,6 +5576,11 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev,
+ 		return send_conn_param_neg_reply(hdev, handle,
+ 						 HCI_ERROR_UNKNOWN_CONN_ID);
+ 
++	if (min < hcon->le_conn_min_interval ||
++	    max > hcon->le_conn_max_interval)
++		return send_conn_param_neg_reply(hdev, handle,
++						 HCI_ERROR_INVALID_LL_PARAMS);
++
+ 	if (hci_check_conn_params(min, max, latency, timeout))
+ 		return send_conn_param_neg_reply(hdev, handle,
+ 						 HCI_ERROR_INVALID_LL_PARAMS);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2146e0f3b6f8..1cea68108dba 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5246,7 +5246,14 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
+ 
+ 	memset(&rsp, 0, sizeof(rsp));
+ 
+-	err = hci_check_conn_params(min, max, latency, to_multiplier);
++	if (min < hcon->le_conn_min_interval ||
++	    max > hcon->le_conn_max_interval) {
++		BT_DBG("requested connection interval exceeds current bounds.");
++		err = -EINVAL;
++	} else {
++		err = hci_check_conn_params(min, max, latency, to_multiplier);
++	}
++
+ 	if (err)
+ 		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
+ 	else
