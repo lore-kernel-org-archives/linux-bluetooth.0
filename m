@@ -1,102 +1,87 @@
-Return-Path: <SRS0=I8Nx=UK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=F5zp=UL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4113DC31E44
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jun 2019 23:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A90C31E49
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jun 2019 07:07:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 213E120872
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jun 2019 23:16:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 597592082C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jun 2019 07:07:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560323234;
+	bh=GtigtzkEAHr+VEjATWqUUDT5Nt8U4B4G0dSmvG/CfD4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=hy/Pz4IKsbTI5BA5lagksKz4TYBJr1dVjJkEYN3jA4nm/WMn3jVgPeZTY4pcTGXPz
+	 DdXNDGzGKY/GbhX36HeiHhCc2RPbFUob3AqA6gNvW6F04VfguPhzsNuwXtJpGiJiVK
+	 j2owKj1RlWfRVi3WnVcMxRpZOWIlEAKR3qe5s0R4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407312AbfFKXQp (ORCPT
+        id S2407905AbfFLHHG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Jun 2019 19:16:45 -0400
-Received: from mga03.intel.com ([134.134.136.65]:24911 "EHLO mga03.intel.com"
+        Wed, 12 Jun 2019 03:07:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42018 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728264AbfFKXQp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Jun 2019 19:16:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Jun 2019 16:16:44 -0700
-X-ExtLoop1: 1
-Received: from drenteri-mobl1.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.252.193.193])
-  by orsmga005.jf.intel.com with ESMTP; 11 Jun 2019 16:16:44 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 1/1] mesh: Remove redundant checks when adding a net key
-Date:   Tue, 11 Jun 2019 16:16:43 -0700
-Message-Id: <20190611231643.25165-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.0
+        id S2407185AbfFLHHF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 12 Jun 2019 03:07:05 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CCD5B205ED;
+        Wed, 12 Jun 2019 07:07:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560323224;
+        bh=GtigtzkEAHr+VEjATWqUUDT5Nt8U4B4G0dSmvG/CfD4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Y9ZY+szQVuDeeYvSNyGaG6WXfZrwHvAkiNTdcNhJCvGNtkQZy7XsIlOzYpumLZxBa
+         SmhNYffk8n3TlA8fYmSael5PHZyDaHygbZTycIRZRD9z+cpBHZFwYSO0zFJBKRMzow
+         s1Gf4jbf7iY1fEGuyBkzQJrYjZ3h9uBRk2fZqx98=
+Date:   Wed, 12 Jun 2019 09:07:01 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Vasily Khoruzhick <anarsoul@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] Revert "Bluetooth: Align minimum encryption key size for
+ LE and BR/EDR connections"
+Message-ID: <20190612070701.GA13320@kroah.com>
+References: <20190522052002.10411-1-anarsoul@gmail.com>
+ <6BD1D3F7-E2F2-4B2D-9479-06E27049133C@holtmann.org>
+ <7B7F362B-6C8B-4112-8772-FB6BC708ABF5@holtmann.org>
+ <CA+E=qVfopSA90vG2Kkh+XzdYdNn=M-hJN_AptW=R+B5v3HB9eA@mail.gmail.com>
+ <CA+E=qVdLOS9smt-nBxg9Lon0iTZr87kONSp-XPKj9tqB4bvnqw@mail.gmail.com>
+ <723142BB-8217-4A01-A2B9-F527174FDC0F@holtmann.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <723142BB-8217-4A01-A2B9-F527174FDC0F@holtmann.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch cleans up redundant checks in sdd_key() and mesh_net_set_key():
-no need to check the result of l_queue_push_tail() and not need to check
-if subnet is valid after it was successfully created.
----
- mesh/net.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+On Tue, Jun 11, 2019 at 11:36:26PM +0200, Marcel Holtmann wrote:
+> Hi Vasily,
+> 
+> > Can we get this revert merged into stable branches? Bluetooth HID has
+> > been broken for many devices for quite a while now and RFC patch that
+> > fixes the breakage hasn't seen any movement for almost a month.
+> 
+> lets send the RFC patch upstream since it got enough feedback that it fixes the issue.
 
-diff --git a/mesh/net.c b/mesh/net.c
-index fdd38e7ce..a597b8794 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -992,12 +992,13 @@ static struct mesh_subnet *add_key(struct mesh_net *net, uint16_t idx,
- 		return NULL;
- 	}
- 
--	if (!create_secure_beacon(net, subnet, subnet->snb.beacon + 1) ||
--				!l_queue_push_tail(net->subnets, subnet)) {
-+	if (!create_secure_beacon(net, subnet, subnet->snb.beacon + 1)) {
- 		subnet_free(subnet);
- 		return NULL;
- 	}
- 
-+	l_queue_push_tail(net->subnets, subnet);
-+
- 	return subnet;
- }
- 
-@@ -3018,11 +3019,6 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
- {
- 	struct mesh_subnet *subnet;
- 
--	subnet = l_queue_find(net->subnets, match_key_index,
--							L_UINT_TO_PTR(idx));
--	if (subnet)
--		return false;
--
- 	/* Current key must be always present */
- 	if (!key)
- 		return false;
-@@ -3031,12 +3027,13 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
- 	if (phase != KEY_REFRESH_PHASE_NONE && !new_key)
- 		return false;
- 
--	subnet = add_key(net, idx, key);
--	if (!subnet)
--		return false;
--
-+	/* Check if the subnet with the specified index already exists */
- 	subnet = l_queue_find(net->subnets, match_key_index,
- 							L_UINT_TO_PTR(idx));
-+	if (subnet)
-+		return false;
-+
-+	subnet = add_key(net, idx, key);
- 	if (!subnet)
- 		return false;
- 
--- 
-2.21.0
+According to Hans, the workaround did not work.
 
+So can we just get this reverted so that people's machines go back to
+working?
+
+thanks,
+
+greg k-h
