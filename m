@@ -2,106 +2,106 @@ Return-Path: <SRS0=QTJ/=UM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD0DC31E45
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jun 2019 15:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225AFC31E4A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jun 2019 16:36:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 623062175B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jun 2019 15:39:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="R4DCkEnd"
+	by mail.kernel.org (Postfix) with ESMTP id EFBC620644
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jun 2019 16:36:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560443783;
+	bh=mZOzCqx3eT/+VtqG9suaVNKtiI7GMTR02WnJhf2gRy0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ujcC+6XrLpDzJU1fh3rkFF3gxxjxK33geQ6uIaGzCtQCUHKbpLCVAshz5gNiwzKoQ
+	 5rtANxIxAqi4ISc2Ljz+jYTUd2e3Vb7MdTbQFKBGF7+U8keDhIlX7SdNQTzeTIn6XY
+	 NYybndDV1x/ihfnkM+hCTs26ahhui90myhixcfhc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729292AbfFMPjV (ORCPT
+        id S2392590AbfFMQgO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jun 2019 11:39:21 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:36154 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731924AbfFMJy5 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jun 2019 05:54:57 -0400
-Received: by mail-lj1-f193.google.com with SMTP id i21so17905394ljj.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jun 2019 02:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:organization:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Bo0tl4a9UGSBPcbP4Y30bgplmG5Z1+NSNsMybiRZb7I=;
-        b=R4DCkEnd4Y3yQO97WipeO+Sc/LyC6XTodOrHDEvFCknwoHSWzdBGOoGSFwlYs/DOMY
-         TqHJcCaroG9/bnMCpg74iMM4CFP6KzveOa07a/q5ZflJtUHiDFmsrBP3tDpjm0mKEHuo
-         MnYmexQ6QZ834yU86BvoGdqNCbeq9BoVqVjYsyuewPrwc4TRDUf0BlcNY+pYdFSuRIXo
-         h0lBMYmkIusX9aLkCAXSF0YT3u8cg+efrsG052OlxM3ZR9CcE2YE9Wdf527lI8ij65zN
-         2PsZLW+6lhn4IyXPHiCtDXj0dD02zk2u5XKLAzceLuJTYuhAKZ+2LmnkhNNyMIP9eWE8
-         JMRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=Bo0tl4a9UGSBPcbP4Y30bgplmG5Z1+NSNsMybiRZb7I=;
-        b=lovG4KlreJ6hbIgLYz5gjVnmwhFITwWP3FPiirnqqkDHQ9LW/nQrov4VncrmzfEIpZ
-         blPrsZI4fTgpqi3pms/rxmca3oEm//dwjAjQVdb4/grr5atDdiPtBcJv3p7QSyIvpSi5
-         OcNi7Go6OvadmpMr0z+PlZMYu1Z+SBn6wxiwD/9jNW1JXy0XAK18xnFn+StsdZygsBlZ
-         rfvFxJONU/fVzA/VI3jLn+mtNSwDjLTknjoc5HuxQ2TD1QPo/pSJn5hvqmhvtjZBx2Eh
-         KhiaaUm4WVHrsOexEU6gWpl2MrAA0bs3O0X+qv8r5OowtyvHCOC1rK/mGjZHxRSik3H/
-         eeag==
-X-Gm-Message-State: APjAAAWeJS8/WHhCmgpD0cPxRXaWCtbU5A0TM8VM5FNlrKV7hNpydYJU
-        qhjMpB/QCdP9lKqb8hU3bdtQVAXmIF8=
-X-Google-Smtp-Source: APXvYqzVuN0VBstuICWqF5aGrT8wmRdtME/OV15Io4xfPTvXyi0shr+LAV0TDl4yXhMeyO6tYQ9fWw==
-X-Received: by 2002:a2e:9188:: with SMTP id f8mr27382036ljg.33.1560419695304;
-        Thu, 13 Jun 2019 02:54:55 -0700 (PDT)
-Received: from ix.localnet ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id z12sm502317lfg.67.2019.06.13.02.54.53
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 13 Jun 2019 02:54:54 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] sixaxis: Fix another problem with already setup devices
-Date:   Thu, 13 Jun 2019 11:54:51 +0200
-Message-ID: <2507772.q0OjLXfh9R@ix>
-Organization: CODECOUP
-In-Reply-To: <20190607065411.28502-1-hadess@hadess.net>
-References: <20190607065411.28502-1-hadess@hadess.net>
+        Thu, 13 Jun 2019 12:36:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53624 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730692AbfFMHfV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 13 Jun 2019 03:35:21 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3C5FF20866;
+        Thu, 13 Jun 2019 07:35:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560411320;
+        bh=mZOzCqx3eT/+VtqG9suaVNKtiI7GMTR02WnJhf2gRy0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=L7rovxjtpPBh+rST+d1xo73WMv0KBX5MDbgsTQh7mHqvXrQA5Bht5or9M6z3fwWDb
+         8dNJQ9iXX4kQeXKdALwOpKoYwYqfEyvdvlEDie8W/4iAmAoJ9nxB2K0MkD4TtND6n5
+         fgNjBkIt1eUhepgTsPvpsXC5xGcdIYRj8bdIdWb8=
+Date:   Thu, 13 Jun 2019 09:35:18 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Hans de Goede <hdegoede@redhat.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org, Jeremy Cline <jeremy@jcline.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Bluetooth regression breaking BT connection for all 2.0 and
+ older devices in 5.0.15+, 5.1.x and master
+Message-ID: <20190613073518.GA16436@kroah.com>
+References: <af8cf6f4-4979-2f6f-68ed-e5b368b17ec7@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <af8cf6f4-4979-2f6f-68ed-e5b368b17ec7@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
-
-On Friday, 7 June 2019 08:54:10 CEST Bastien Nocera wrote:
-> If the device went through any kind of pairing once, it might have been
-> set as trusted. Make sure to set the device as untrusted before starting
-> the cable pairing authorization so that we don't exit early from
-> process_auth_queue() (which considers trusted devices to be paired).
-> ---
->  plugins/sixaxis.c | 1 +
->  1 file changed, 1 insertion(+)
+On Mon, Jun 10, 2019 at 03:31:55PM +0200, Hans de Goede wrote:
+> Hi All,
 > 
-> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index fed68d2d8..12638829b 100644
-> --- a/plugins/sixaxis.c
-> +++ b/plugins/sixaxis.c
-> @@ -365,6 +365,7 @@ static bool setup_device(int fd, const char *sysfs_path,
+> First of all this is a known issue and it seems a fix is in the works,
+> but what I do not understand is why the commit causing this has not
+> simply been reverted until the fix is done, esp. for the 5.0.x
+> stable series where this was introduced in 5.0.15.
 > 
->  	btd_device_device_set_name(device, cp->name);
->  	btd_device_set_pnpid(device, cp->source, cp->vid, cp->pid, cp-
->version);
-> +	btd_device_set_trusted(device, false);
->  	btd_device_set_temporary(device, true);
+> The problem I'm talking about is commit d5bb334a8e17 ("Bluetooth: Align
+> minimum encryption key size for LE and BR/EDR connections"):
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d5bb334a8e171b262e48f378bd2096c0ea458265
+> basically completely breaking all somewhat older (and some current cheap
+> no-name) bluetooth devices:
 > 
->  	closure = g_new0(struct authentication_closure, 1);
+> A revert of this was first proposed on May 22nd:
+> https://lore.kernel.org/netdev/CA+E=qVfopSA90vG2Kkh+XzdYdNn=M-hJN_AptW=R+B5v3HB9eA@mail.gmail.com/T/
+> We are 18 days further now and this problem still exists, including in the
+> 5.0.15+ and 5.1.x stable kernels.
+> 
+> A solution has been suggested: https://lore.kernel.org/linux-bluetooth/20190522070540.48895-1-marcel@holtmann.org/T/#u
+> and at least the Fedora 5.1.4+ kernels now carry this as a temporary fix,
+> but as of today I do not see a fix nor a revert in Torvald's tree yet and
+> neither does there seem to be any fix in the 5.0.x and 5.1.x stable series.
+> 
+> In the mean time we are getting a lot of bug reports about this:
+> https://bugzilla.kernel.org/show_bug.cgi?id=203643
+> https://bugzilla.redhat.com/show_bug.cgi?id=1711468
+> https://bugzilla.redhat.com/show_bug.cgi?id=1713871
+> https://bugzilla.redhat.com/show_bug.cgi?id=1713980
+> 
+> And some reporters:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1713871#c4
+> Are indicating that the Fedora kernels with the workaround included
+> still do not work...
+> 
+> As such I would like to suggest that we just revert the troublesome
+> commit for now and re-add it when we have a proper fix.
 
-Both patches applied, thanks.
+I've now reverted this as it does not seem to be going anywhere anytime
+soon.  After the mess gets sorted out in Linus's tree, if someone could
+send stable@vger the commit ids that should be applied, I will be glad
+to do so.
 
+thanks,
 
--- 
-pozdrawiam
-Szymon Janc
-
-
+greg k-h
