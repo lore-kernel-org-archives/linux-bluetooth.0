@@ -2,315 +2,98 @@ Return-Path: <SRS0=cJ+v=UN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678AEC31E4C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42317C31E4B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 12:45:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FC312073F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:31:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08DCF21473
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 12:45:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="LH5xKxeB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbfFNHbl (ORCPT
+        id S1727654AbfFNMpU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jun 2019 03:31:41 -0400
-Received: from mga17.intel.com ([192.55.52.151]:64176 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725846AbfFNHbl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jun 2019 03:31:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jun 2019 00:31:38 -0700
-X-ExtLoop1: 1
-Received: from jrissane-mobl.ger.corp.intel.com (HELO jrissane-mobl1.fi.intel.com) ([10.237.67.34])
-  by FMSMGA003.fm.intel.com with ESMTP; 14 Jun 2019 00:31:36 -0700
-Message-ID: <dc047560cd3ff0cced5cdb911362d5d8e13c633b.camel@linux.intel.com>
-Subject: Re: [PATCH] 6lowpan: no need to check return value of
- debugfs_create functions
-From:   Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexander Aring <alex.aring@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Date:   Fri, 14 Jun 2019 10:31:35 +0300
-In-Reply-To: <20190614071423.GA18533@kroah.com>
-References: <20190614071423.GA18533@kroah.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.2 (3.32.2-1.fc30) 
+        Fri, 14 Jun 2019 08:45:20 -0400
+Received: from mail-lf1-f51.google.com ([209.85.167.51]:43530 "EHLO
+        mail-lf1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726874AbfFNMpU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Jun 2019 08:45:20 -0400
+Received: by mail-lf1-f51.google.com with SMTP id j29so1631937lfk.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2019 05:45:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nJHV00xMC56jxW7Ns4G5WUx+UCTKF182nDYqVbfVK6s=;
+        b=LH5xKxeB5qitei/VprVm1cmTB7Yi13VfbgqEOM4rJ4JHy7kPcTWSZRuZAYaf85H9c3
+         Z8XeZdyRx4QBJWJUY8SkR1srT02khIDvIZbYHh1UYMesJXOEsUP4ZcpV4je+kE58EGdO
+         PF6v2nuu1Q4dtiKwyAM6Gt2t69ohnK5P94Hxe3zqUxVqaf24d3ziPgGZugbS9OAZOhHQ
+         CzAh9SIEpEZQFSVgLvLgW4rXf/DRtU6+PfzSMkl99d/cW/4uvvwgandk5umHqIgI8zWK
+         ijr2a7ncVSE+QuM6PyKQYSSeupHr6YOgalhYJeJWptEUkr8mMJQyzJPKrGfC43Mt+6w2
+         wICw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nJHV00xMC56jxW7Ns4G5WUx+UCTKF182nDYqVbfVK6s=;
+        b=e0xb8tzPlsJ1unwBEy3cLmpf2Yrm10J0Vb2nSZ1HqnNgOhDntiS6g3Kp8vxD2D0IYp
+         c+rp3WFD4s9squPKLrTzmzpJAMV+zy966llcQJfGSMc8uKpAc+BD+2M6KchvN4iIM4f6
+         zSQuMaPOXgDVu59ctuvDFMc0/+MWjp2dRY2U6JIiGygFJRRUCWVoK3hFgdL0jrdG+hi0
+         NI7d7NDpwAvL3u3UoUi4HAUA6G4rNvRKGvYLmYsBhSPr026gp/X+/GaGPDW4rqbxAV50
+         F6ZOzIQPNrRJypR20VAnmofE9A3yRpDCLO6z3IOTF+q0AzDGeYeOcXE8WbHwFc+3aNP8
+         29JA==
+X-Gm-Message-State: APjAAAUsIVjA4i4lzsIp0gRHm9GWQ5wYSvTGLFBjsK4SPC/BW5RBSAlJ
+        gWaXwQh9jOgibjcI7hGJ1z/b00hlej/ReA==
+X-Google-Smtp-Source: APXvYqzpXN4FRMOi1nMmSw8MTFQTw0LMQpxpWaZ5HvYlF7/c7Gmf0ufvF96Lav6M+IgktPcYTeF6DQ==
+X-Received: by 2002:a05:6512:51c:: with SMTP id o28mr31284057lfb.67.1560516318120;
+        Fri, 14 Jun 2019 05:45:18 -0700 (PDT)
+Received: from localhost.localdomain ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id v4sm572722lji.103.2019.06.14.05.45.16
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 14 Jun 2019 05:45:17 -0700 (PDT)
+From:   Jakub Witowski <jakub.witowski@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC 0/3] Import local node
+Date:   Fri, 14 Jun 2019 14:45:08 +0200
+Message-Id: <20190614124512.19062-1-jakub.witowski@silvair.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Greg,
+Hello,
+I have implemented importing local node functionality.
+Please comment what do You think about this solution.
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+I'm still working on it but for now I didn't noticed any side effects.
 
-Cheers,
-Jukka
+BR,
+Jakub Witowski
 
-On Fri, 2019-06-14 at 09:14 +0200, Greg Kroah-Hartman wrote:
-> When calling debugfs functions, there is no need to ever check the
-> return value.  The function can work or not, but the code logic
-> should
-> never do something different based on this.
-> 
-> Because we don't care if debugfs works or not, this trickles back a
-> bit
-> so we can clean things up by making some functions return void
-> instead
-> of an error value that is never going to fail.
-> 
-> Cc: Alexander Aring <alex.aring@gmail.com>
-> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: linux-wpan@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
->  net/6lowpan/6lowpan_i.h | 16 ++-----
->  net/6lowpan/core.c      |  8 +---
->  net/6lowpan/debugfs.c   | 97 +++++++++++--------------------------
-> ----
->  3 files changed, 32 insertions(+), 89 deletions(-)
-> 
-> diff --git a/net/6lowpan/6lowpan_i.h b/net/6lowpan/6lowpan_i.h
-> index 53cf446ce2e3..01853cec0209 100644
-> --- a/net/6lowpan/6lowpan_i.h
-> +++ b/net/6lowpan/6lowpan_i.h
-> @@ -18,24 +18,16 @@ extern const struct ndisc_ops lowpan_ndisc_ops;
->  int addrconf_ifid_802154_6lowpan(u8 *eui, struct net_device *dev);
->  
->  #ifdef CONFIG_6LOWPAN_DEBUGFS
-> -int lowpan_dev_debugfs_init(struct net_device *dev);
-> +void lowpan_dev_debugfs_init(struct net_device *dev);
->  void lowpan_dev_debugfs_exit(struct net_device *dev);
->  
-> -int __init lowpan_debugfs_init(void);
-> +void __init lowpan_debugfs_init(void);
->  void lowpan_debugfs_exit(void);
->  #else
-> -static inline int lowpan_dev_debugfs_init(struct net_device *dev)
-> -{
-> -	return 0;
-> -}
-> -
-> +static inline void lowpan_dev_debugfs_init(struct net_device *dev) {
-> }
->  static inline void lowpan_dev_debugfs_exit(struct net_device *dev) {
-> }
->  
-> -static inline int __init lowpan_debugfs_init(void)
-> -{
-> -	return 0;
-> -}
-> -
-> +static inline void __init lowpan_debugfs_init(void) { }
->  static inline void lowpan_debugfs_exit(void) { }
->  #endif /* CONFIG_6LOWPAN_DEBUGFS */
->  
-> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-> index 2d68351f1ac4..a068757eabaf 100644
-> --- a/net/6lowpan/core.c
-> +++ b/net/6lowpan/core.c
-> @@ -42,9 +42,7 @@ int lowpan_register_netdevice(struct net_device
-> *dev,
->  	if (ret < 0)
->  		return ret;
->  
-> -	ret = lowpan_dev_debugfs_init(dev);
-> -	if (ret < 0)
-> -		unregister_netdevice(dev);
-> +	lowpan_dev_debugfs_init(dev);
->  
->  	return ret;
->  }
-> @@ -152,9 +150,7 @@ static int __init lowpan_module_init(void)
->  {
->  	int ret;
->  
-> -	ret = lowpan_debugfs_init();
-> -	if (ret < 0)
-> -		return ret;
-> +	lowpan_debugfs_init();
->  
->  	ret = register_netdevice_notifier(&lowpan_notifier);
->  	if (ret < 0) {
-> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
-> index f5a8eec9d7a3..1c140af06d52 100644
-> --- a/net/6lowpan/debugfs.c
-> +++ b/net/6lowpan/debugfs.c
-> @@ -163,11 +163,11 @@ static const struct file_operations
-> lowpan_ctx_pfx_fops = {
->  	.release	= single_release,
->  };
->  
-> -static int lowpan_dev_debugfs_ctx_init(struct net_device *dev,
-> -				       struct dentry *ctx, u8 id)
-> +static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
-> +					struct dentry *ctx, u8 id)
->  {
->  	struct lowpan_dev *ldev = lowpan_dev(dev);
-> -	struct dentry *dentry, *root;
-> +	struct dentry *root;
->  	char buf[32];
->  
->  	WARN_ON_ONCE(id > LOWPAN_IPHC_CTX_TABLE_SIZE);
-> @@ -175,34 +175,18 @@ static int lowpan_dev_debugfs_ctx_init(struct
-> net_device *dev,
->  	sprintf(buf, "%d", id);
->  
->  	root = debugfs_create_dir(buf, ctx);
-> -	if (!root)
-> -		return -EINVAL;
->  
-> -	dentry = debugfs_create_file_unsafe("active", 0644, root,
-> -					    &ldev->ctx.table[id],
-> -					    &lowpan_ctx_flag_active_fop
-> s);
-> -	if (!dentry)
-> -		return -EINVAL;
-> +	debugfs_create_file("active", 0644, root, &ldev->ctx.table[id],
-> +			    &lowpan_ctx_flag_active_fops);
->  
-> -	dentry = debugfs_create_file_unsafe("compression", 0644, root,
-> -					    &ldev->ctx.table[id],
-> -					    &lowpan_ctx_flag_c_fops);
-> -	if (!dentry)
-> -		return -EINVAL;
-> -
-> -	dentry = debugfs_create_file("prefix", 0644, root,
-> -				     &ldev->ctx.table[id],
-> -				     &lowpan_ctx_pfx_fops);
-> -	if (!dentry)
-> -		return -EINVAL;
-> +	debugfs_create_file("compression", 0644, root, &ldev-
-> >ctx.table[id],
-> +			    &lowpan_ctx_flag_c_fops);
->  
-> -	dentry = debugfs_create_file_unsafe("prefix_len", 0644, root,
-> -					    &ldev->ctx.table[id],
-> -					    &lowpan_ctx_plen_fops);
-> -	if (!dentry)
-> -		return -EINVAL;
-> +	debugfs_create_file("prefix", 0644, root, &ldev->ctx.table[id],
-> +			    &lowpan_ctx_pfx_fops);
->  
-> -	return 0;
-> +	debugfs_create_file("prefix_len", 0644, root, &ldev-
-> >ctx.table[id],
-> +			    &lowpan_ctx_plen_fops);
->  }
->  
->  static int lowpan_context_show(struct seq_file *file, void *offset)
-> @@ -242,64 +226,39 @@ static int lowpan_short_addr_get(void *data,
-> u64 *val)
->  DEFINE_DEBUGFS_ATTRIBUTE(lowpan_short_addr_fops,
-> lowpan_short_addr_get, NULL,
->  			 "0x%04llx\n");
->  
-> -static int lowpan_dev_debugfs_802154_init(const struct net_device
-> *dev,
-> +static void lowpan_dev_debugfs_802154_init(const struct net_device
-> *dev,
->  					  struct lowpan_dev *ldev)
->  {
-> -	struct dentry *dentry, *root;
-> +	struct dentry *root;
->  
->  	if (!lowpan_is_ll(dev, LOWPAN_LLTYPE_IEEE802154))
-> -		return 0;
-> +		return;
->  
->  	root = debugfs_create_dir("ieee802154", ldev->iface_debugfs);
-> -	if (!root)
-> -		return -EINVAL;
-> -
-> -	dentry = debugfs_create_file_unsafe("short_addr", 0444, root,
-> -					    lowpan_802154_dev(dev)-
-> >wdev->ieee802154_ptr,
-> -					    &lowpan_short_addr_fops);
-> -	if (!dentry)
-> -		return -EINVAL;
->  
-> -	return 0;
-> +	debugfs_create_file("short_addr", 0444, root,
-> +			    lowpan_802154_dev(dev)->wdev-
-> >ieee802154_ptr,
-> +			    &lowpan_short_addr_fops);
->  }
->  
-> -int lowpan_dev_debugfs_init(struct net_device *dev)
-> +void lowpan_dev_debugfs_init(struct net_device *dev)
->  {
->  	struct lowpan_dev *ldev = lowpan_dev(dev);
-> -	struct dentry *contexts, *dentry;
-> -	int ret, i;
-> +	struct dentry *contexts;
-> +	int i;
->  
->  	/* creating the root */
->  	ldev->iface_debugfs = debugfs_create_dir(dev->name,
-> lowpan_debugfs);
-> -	if (!ldev->iface_debugfs)
-> -		goto fail;
->  
->  	contexts = debugfs_create_dir("contexts", ldev->iface_debugfs);
-> -	if (!contexts)
-> -		goto remove_root;
-> -
-> -	dentry = debugfs_create_file("show", 0644, contexts,
-> -				     &lowpan_dev(dev)->ctx,
-> -				     &lowpan_context_fops);
-> -	if (!dentry)
-> -		goto remove_root;
-> -
-> -	for (i = 0; i < LOWPAN_IPHC_CTX_TABLE_SIZE; i++) {
-> -		ret = lowpan_dev_debugfs_ctx_init(dev, contexts, i);
-> -		if (ret < 0)
-> -			goto remove_root;
-> -	}
->  
-> -	ret = lowpan_dev_debugfs_802154_init(dev, ldev);
-> -	if (ret < 0)
-> -		goto remove_root;
-> +	debugfs_create_file("show", 0644, contexts, &lowpan_dev(dev)-
-> >ctx,
-> +			    &lowpan_context_fops);
->  
-> -	return 0;
-> +	for (i = 0; i < LOWPAN_IPHC_CTX_TABLE_SIZE; i++)
-> +		lowpan_dev_debugfs_ctx_init(dev, contexts, i);
->  
-> -remove_root:
-> -	lowpan_dev_debugfs_exit(dev);
-> -fail:
-> -	return -EINVAL;
-> +	lowpan_dev_debugfs_802154_init(dev, ldev);
->  }
->  
->  void lowpan_dev_debugfs_exit(struct net_device *dev)
-> @@ -307,13 +266,9 @@ void lowpan_dev_debugfs_exit(struct net_device
-> *dev)
->  	debugfs_remove_recursive(lowpan_dev(dev)->iface_debugfs);
->  }
->  
-> -int __init lowpan_debugfs_init(void)
-> +void __init lowpan_debugfs_init(void)
->  {
->  	lowpan_debugfs = debugfs_create_dir("6lowpan", NULL);
-> -	if (!lowpan_debugfs)
-> -		return -EINVAL;
-> -
-> -	return 0;
->  }
->  
->  void lowpan_debugfs_exit(void)
+Jakub Witowski (2):
+  mesh: Added functionality of import local node
+  mesh: Allow to import multiple network keys
+
+Michał Lowas-Rzechonek (1):
+  mesh: Added ImportLocalNode call
+
+ doc/mesh-api.txt |   2 +-
+ mesh/keyring.h   |   1 +
+ mesh/mesh.c      |  55 ++++-
+ mesh/model.c     |   5 +-
+ mesh/node.c      | 543 +++++++++++++++++++++++++++++++++++++++++++----
+ mesh/node.h      |   4 +-
+ 6 files changed, 566 insertions(+), 44 deletions(-)
+
+-- 
+2.20.1
 
