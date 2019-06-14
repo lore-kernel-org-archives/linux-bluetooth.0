@@ -2,298 +2,154 @@ Return-Path: <SRS0=cJ+v=UN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D814C31E4C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00296C31E44
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:16:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CA6421473
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:14:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560496469;
-	bh=Bal5P6iL++TbtPSugW6o43ucYjkt1vU2cph9JyWx3qo=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=HDvXzb2yRj1F7cTcQqm6dS4svSGwv5CfZitKUNV2b3HMtjukVeGWGmCbCGP3wRxu3
-	 NHXb/GDkHZujn+0R9fipnNbv5dlJ1FyJElTRHQ34OK+D9RHv/gKaakD4HnQYPsVD8t
-	 wQ6wDOgf9Y5vNTRdY0MH85P94U29aZ5kytrCLWDY=
+	by mail.kernel.org (Postfix) with ESMTP id AF2E42133D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:16:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9+ayhA5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725944AbfFNHO1 (ORCPT
+        id S1725923AbfFNHQ2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jun 2019 03:14:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44496 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725837AbfFNHO1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jun 2019 03:14:27 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 98F052133D;
-        Fri, 14 Jun 2019 07:14:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560496466;
-        bh=Bal5P6iL++TbtPSugW6o43ucYjkt1vU2cph9JyWx3qo=;
-        h=Date:From:To:Cc:Subject:From;
-        b=c2EbpKDwOIZf3I8CzmUw+kigFOOFCBa4OXSolNx24mJujqKv3WIGk6870uqsJermo
-         5jiNRazFqEgUbdRVGYHRLR3PhFE/oskLDLKvVcS4TnhxgY5zbrWyGVIs1VVNkjhXvn
-         /Ku95deQUUJysn78f/aR0mKUH7miXCXKn/TshtZ8=
-Date:   Fri, 14 Jun 2019 09:14:23 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH] 6lowpan: no need to check return value of debugfs_create
- functions
-Message-ID: <20190614071423.GA18533@kroah.com>
+        Fri, 14 Jun 2019 03:16:28 -0400
+Received: from mail-wm1-f42.google.com ([209.85.128.42]:40048 "EHLO
+        mail-wm1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbfFNHQ2 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Jun 2019 03:16:28 -0400
+Received: by mail-wm1-f42.google.com with SMTP id v19so1144705wmj.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2019 00:16:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=bVAjztn4WgDKNgLQRExic9ECI/X5eMVwfyuZMAwh6wE=;
+        b=a9+ayhA5zK+Jg8SPV2IwJbEPmZS8/pRds4JpencJnMolDwZM0WfAPDroASuNFXajHJ
+         PbufjUL/dkjciNaKTmOOKFjX1uOg146LYC8C8rH7/VJzAxiK5kDxy+0ygwN0ymej80yB
+         FUGfE5yTG/Yge4z+PJ7XlB1luhzoVO7xTCETMuMF3Dbmpf+UTnjfz2Gg33nl54se37lW
+         0uNrwBUiuB6VOL7k5CWmkg88SVJ5d/zqjx8i+5tfNuxB1RtBD0vilWEuMr60RtyUK1vW
+         jTq2e42UyY8D15KxWiHMI5ItV+z7PGp4IMQyQCNdO7MEoNisvoB1FNjRwHOD4Nhsvuk4
+         wLZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=bVAjztn4WgDKNgLQRExic9ECI/X5eMVwfyuZMAwh6wE=;
+        b=sLMGQ4XBYzZmVWzYj8j7lwLq04Xa8StIzchvfHcQGmdaaxs2M1WHkZgJOOdCCalOeM
+         KA1hwbnlEhl+GNmBbacuw/bXqDep36iGg9VgcTFqy/pEaNfVr6HXSyvI+c/LS9y/E0l3
+         8Bsv2rAXX5WOvKbLk/KK4k3s/I58+Oc0NQN+7TVflYSY27LW1NJFg3h6/ontx2NIoBJP
+         VDoS5U/frnjMxa4pjjGM0I3KdJ2yzYaOnTFIYHV880iwBXLMfnBVBFAjjUeZK8PPOI0A
+         6JArihWXGqmpzsLjUyMy1VAdugaP2x0glMUUueW2mb6GqWw9y3udhsvwfIAEphWp3EAU
+         PAHA==
+X-Gm-Message-State: APjAAAWzxX5TiniEo7VrofcLxvkjuQZIF6XyXNfQnOczzV2tYBsOaKZU
+        rMDvEKM8orO7BI8e3pWM9xavdWWMCac=
+X-Google-Smtp-Source: APXvYqxRAMcwT4Y9keCOaME2nwaqKTHKK+MPE3qGucB21EUiUl7B5Nz40N+qonSPOGG0fy+QosSIvw==
+X-Received: by 2002:a1c:e90f:: with SMTP id q15mr6964425wmc.89.1560496583734;
+        Fri, 14 Jun 2019 00:16:23 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id u5sm2636928wmc.32.2019.06.14.00.16.22
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 14 Jun 2019 00:16:23 -0700 (PDT)
+Date:   Fri, 14 Jun 2019 09:16:22 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     =?utf-8?B?RnLDqWTDqXJpYw==?= Danis <frederic.danis.oss@gmail.com>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez A2DP socket reliability
+Message-ID: <20190614071622.wyra2hhkpzpt7i4z@pali>
+References: <20190518190618.m7rdkthvpz4agxd2@pali>
+ <CABBYNZ+8YX-zBnUaYKLX2=OdJ-GUQ4y4V0EhGsN+uecKEpFBeA@mail.gmail.com>
+ <20190519122223.gabew7qfftihlbic@pali>
+ <20190607130021.ntd3dfd6nzmuy3m3@pali>
+ <CABBYNZKQ0WYTH4Oa_eFv11Ok8=42oY_GPFzN-D6UqfeNsvaXug@mail.gmail.com>
+ <20190610105130.un3muj4knwoua5cb@pali>
+ <b7e5978c-7ebc-82ad-2c44-878712cd14cd@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-User-Agent: Mutt/1.12.0 (2019-05-25)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b7e5978c-7ebc-82ad-2c44-878712cd14cd@gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When calling debugfs functions, there is no need to ever check the
-return value.  The function can work or not, but the code logic should
-never do something different based on this.
+On Monday 10 June 2019 18:06:53 Frédéric Danis wrote:
+> Hi,
+> 
+> Le 10/06/2019 à 12:51, Pali Rohár a écrit :
+> > On Friday 07 June 2019 18:23:41 Luiz Augusto von Dentz wrote:
+> > > Hi Pali,
+> > > 
+> > > On Fri, Jun 7, 2019 at 4:00 PM Pali Rohár<pali.rohar@gmail.com>  wrote:
+> > > > On Sunday 19 May 2019 14:22:23 Pali Rohár wrote:
+> > > > > On Sunday 19 May 2019 11:13:09 Luiz Augusto von Dentz wrote:
+> > > > > > Hi Pali,
+> > > > > > 
+> > > > > > On Sat, May 18, 2019 at 11:12 PM Pali Rohár<pali.rohar@gmail.com>  wrote:
+> > > > > > > Hello! How is L2CAP layer of bluetooth socket used for A2DP audio
+> > > > > > > transfer configured in bluez? It is reliable with big/infinite
+> > > > > > > retransmit count? Or in best-effort manner and some packets may be
+> > > > > > > dropped? And it is possible to change between these two modes for
+> > > > > > > application which uses bluez DBUS API? I'm asking because some A2DP
+> > > > > > > audio codecs are designed to deal with packet loss and for those codecs
+> > > > > > > it would be probably better to configure L2CAP socket to unreliable
+> > > > > > > mode.
+> > > > > > We don't use ERTM with AVDTP, both signaling and transport sockets are
+> > > > > > using basic mode which don't support retransmissions, there the
+> > > > > > concept of flush timeout which iirc we don't currently it.
+> > > > > On bluez.org site there is no information how to use bluez sockets and
+> > > > > the only documentation/tutorial which I found on internet was this:
+> > > > > 
+> > > > >    https://people.csail.mit.edu/albert/bluez-intro/x559.html
+> > > > > 
+> > > > > I do not know how up-to-date it is, but seems that by default bluez
+> > > > > L2CAP sockets are reliable and to change them to unreliable mode it is
+> > > > > needed to issue OGF_HOST_CTL / OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT (0x28)
+> > > > > request. As default is zero = infinity = reliable connection.
+> > > > > 
+> > > > > I do not understand low level bluetooth details, but is ERTM related to
+> > > > > OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT?
+> > > > > 
+> > > > > So what are default settings for L2CAP socket used by AVDTP/A2DP
+> > > > > profiles which are transferred to user application via DBUS?
+> > > > Hi! Do you have any idea about OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT? It is
+> > > > related to ERTM or not?
+> > > The OCF usually describes an HCI command which may affect the entire
+> > > ACL connection, ERTM is a L2CAP channel mode that includes
+> > > retransmissions. The A2DP stream transport doesn't ERTM so no
+> > > retransmissions shall take place.
+> > Fine, no retransmission is good for A2DP.
+> 
+> I am not sure there is no retransmission with current implementation.
+> AFAIU, ERTM and automatic flush timeout are not linked. ERTM operates at
+> L2CAP level while automatic flush timeout [1] operates at ACL level.
+> When I read the automatic flush timeout set for an A2DP SBC connection it
+> returns 0, which means that the connection uses an infinite timeout. So,
+> even if higher levels set packets as flushable, the ACL policy requests
+> baseband to indefinitely try to send data [3]:
+>   "The default Flush Timeout shall be infinite,
+>     i.e. re-transmissions are carried out until
+>     physical link loss occurs. This is also
+>     referred to as a 'reliable channel.'"
+> 
+> [1] Bluetooth core Vol 2, Part E, 6.19
+> [2] Bluetooth core Vol 2, Part E, 7.3.29
+> [3] Bluetooth core Vol 2, Part B, 7.6.3
 
-Because we don't care if debugfs works or not, this trickles back a bit
-so we can clean things up by making some functions return void instead
-of an error value that is never going to fail.
+Mhm... I feeling quite lost. Is A2DP socket reliable with enabled
+retransmission or not?
 
-Cc: Alexander Aring <alex.aring@gmail.com>
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- net/6lowpan/6lowpan_i.h | 16 ++-----
- net/6lowpan/core.c      |  8 +---
- net/6lowpan/debugfs.c   | 97 +++++++++++------------------------------
- 3 files changed, 32 insertions(+), 89 deletions(-)
-
-diff --git a/net/6lowpan/6lowpan_i.h b/net/6lowpan/6lowpan_i.h
-index 53cf446ce2e3..01853cec0209 100644
---- a/net/6lowpan/6lowpan_i.h
-+++ b/net/6lowpan/6lowpan_i.h
-@@ -18,24 +18,16 @@ extern const struct ndisc_ops lowpan_ndisc_ops;
- int addrconf_ifid_802154_6lowpan(u8 *eui, struct net_device *dev);
- 
- #ifdef CONFIG_6LOWPAN_DEBUGFS
--int lowpan_dev_debugfs_init(struct net_device *dev);
-+void lowpan_dev_debugfs_init(struct net_device *dev);
- void lowpan_dev_debugfs_exit(struct net_device *dev);
- 
--int __init lowpan_debugfs_init(void);
-+void __init lowpan_debugfs_init(void);
- void lowpan_debugfs_exit(void);
- #else
--static inline int lowpan_dev_debugfs_init(struct net_device *dev)
--{
--	return 0;
--}
--
-+static inline void lowpan_dev_debugfs_init(struct net_device *dev) { }
- static inline void lowpan_dev_debugfs_exit(struct net_device *dev) { }
- 
--static inline int __init lowpan_debugfs_init(void)
--{
--	return 0;
--}
--
-+static inline void __init lowpan_debugfs_init(void) { }
- static inline void lowpan_debugfs_exit(void) { }
- #endif /* CONFIG_6LOWPAN_DEBUGFS */
- 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 2d68351f1ac4..a068757eabaf 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -42,9 +42,7 @@ int lowpan_register_netdevice(struct net_device *dev,
- 	if (ret < 0)
- 		return ret;
- 
--	ret = lowpan_dev_debugfs_init(dev);
--	if (ret < 0)
--		unregister_netdevice(dev);
-+	lowpan_dev_debugfs_init(dev);
- 
- 	return ret;
- }
-@@ -152,9 +150,7 @@ static int __init lowpan_module_init(void)
- {
- 	int ret;
- 
--	ret = lowpan_debugfs_init();
--	if (ret < 0)
--		return ret;
-+	lowpan_debugfs_init();
- 
- 	ret = register_netdevice_notifier(&lowpan_notifier);
- 	if (ret < 0) {
-diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
-index f5a8eec9d7a3..1c140af06d52 100644
---- a/net/6lowpan/debugfs.c
-+++ b/net/6lowpan/debugfs.c
-@@ -163,11 +163,11 @@ static const struct file_operations lowpan_ctx_pfx_fops = {
- 	.release	= single_release,
- };
- 
--static int lowpan_dev_debugfs_ctx_init(struct net_device *dev,
--				       struct dentry *ctx, u8 id)
-+static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
-+					struct dentry *ctx, u8 id)
- {
- 	struct lowpan_dev *ldev = lowpan_dev(dev);
--	struct dentry *dentry, *root;
-+	struct dentry *root;
- 	char buf[32];
- 
- 	WARN_ON_ONCE(id > LOWPAN_IPHC_CTX_TABLE_SIZE);
-@@ -175,34 +175,18 @@ static int lowpan_dev_debugfs_ctx_init(struct net_device *dev,
- 	sprintf(buf, "%d", id);
- 
- 	root = debugfs_create_dir(buf, ctx);
--	if (!root)
--		return -EINVAL;
- 
--	dentry = debugfs_create_file_unsafe("active", 0644, root,
--					    &ldev->ctx.table[id],
--					    &lowpan_ctx_flag_active_fops);
--	if (!dentry)
--		return -EINVAL;
-+	debugfs_create_file("active", 0644, root, &ldev->ctx.table[id],
-+			    &lowpan_ctx_flag_active_fops);
- 
--	dentry = debugfs_create_file_unsafe("compression", 0644, root,
--					    &ldev->ctx.table[id],
--					    &lowpan_ctx_flag_c_fops);
--	if (!dentry)
--		return -EINVAL;
--
--	dentry = debugfs_create_file("prefix", 0644, root,
--				     &ldev->ctx.table[id],
--				     &lowpan_ctx_pfx_fops);
--	if (!dentry)
--		return -EINVAL;
-+	debugfs_create_file("compression", 0644, root, &ldev->ctx.table[id],
-+			    &lowpan_ctx_flag_c_fops);
- 
--	dentry = debugfs_create_file_unsafe("prefix_len", 0644, root,
--					    &ldev->ctx.table[id],
--					    &lowpan_ctx_plen_fops);
--	if (!dentry)
--		return -EINVAL;
-+	debugfs_create_file("prefix", 0644, root, &ldev->ctx.table[id],
-+			    &lowpan_ctx_pfx_fops);
- 
--	return 0;
-+	debugfs_create_file("prefix_len", 0644, root, &ldev->ctx.table[id],
-+			    &lowpan_ctx_plen_fops);
- }
- 
- static int lowpan_context_show(struct seq_file *file, void *offset)
-@@ -242,64 +226,39 @@ static int lowpan_short_addr_get(void *data, u64 *val)
- DEFINE_DEBUGFS_ATTRIBUTE(lowpan_short_addr_fops, lowpan_short_addr_get, NULL,
- 			 "0x%04llx\n");
- 
--static int lowpan_dev_debugfs_802154_init(const struct net_device *dev,
-+static void lowpan_dev_debugfs_802154_init(const struct net_device *dev,
- 					  struct lowpan_dev *ldev)
- {
--	struct dentry *dentry, *root;
-+	struct dentry *root;
- 
- 	if (!lowpan_is_ll(dev, LOWPAN_LLTYPE_IEEE802154))
--		return 0;
-+		return;
- 
- 	root = debugfs_create_dir("ieee802154", ldev->iface_debugfs);
--	if (!root)
--		return -EINVAL;
--
--	dentry = debugfs_create_file_unsafe("short_addr", 0444, root,
--					    lowpan_802154_dev(dev)->wdev->ieee802154_ptr,
--					    &lowpan_short_addr_fops);
--	if (!dentry)
--		return -EINVAL;
- 
--	return 0;
-+	debugfs_create_file("short_addr", 0444, root,
-+			    lowpan_802154_dev(dev)->wdev->ieee802154_ptr,
-+			    &lowpan_short_addr_fops);
- }
- 
--int lowpan_dev_debugfs_init(struct net_device *dev)
-+void lowpan_dev_debugfs_init(struct net_device *dev)
- {
- 	struct lowpan_dev *ldev = lowpan_dev(dev);
--	struct dentry *contexts, *dentry;
--	int ret, i;
-+	struct dentry *contexts;
-+	int i;
- 
- 	/* creating the root */
- 	ldev->iface_debugfs = debugfs_create_dir(dev->name, lowpan_debugfs);
--	if (!ldev->iface_debugfs)
--		goto fail;
- 
- 	contexts = debugfs_create_dir("contexts", ldev->iface_debugfs);
--	if (!contexts)
--		goto remove_root;
--
--	dentry = debugfs_create_file("show", 0644, contexts,
--				     &lowpan_dev(dev)->ctx,
--				     &lowpan_context_fops);
--	if (!dentry)
--		goto remove_root;
--
--	for (i = 0; i < LOWPAN_IPHC_CTX_TABLE_SIZE; i++) {
--		ret = lowpan_dev_debugfs_ctx_init(dev, contexts, i);
--		if (ret < 0)
--			goto remove_root;
--	}
- 
--	ret = lowpan_dev_debugfs_802154_init(dev, ldev);
--	if (ret < 0)
--		goto remove_root;
-+	debugfs_create_file("show", 0644, contexts, &lowpan_dev(dev)->ctx,
-+			    &lowpan_context_fops);
- 
--	return 0;
-+	for (i = 0; i < LOWPAN_IPHC_CTX_TABLE_SIZE; i++)
-+		lowpan_dev_debugfs_ctx_init(dev, contexts, i);
- 
--remove_root:
--	lowpan_dev_debugfs_exit(dev);
--fail:
--	return -EINVAL;
-+	lowpan_dev_debugfs_802154_init(dev, ldev);
- }
- 
- void lowpan_dev_debugfs_exit(struct net_device *dev)
-@@ -307,13 +266,9 @@ void lowpan_dev_debugfs_exit(struct net_device *dev)
- 	debugfs_remove_recursive(lowpan_dev(dev)->iface_debugfs);
- }
- 
--int __init lowpan_debugfs_init(void)
-+void __init lowpan_debugfs_init(void)
- {
- 	lowpan_debugfs = debugfs_create_dir("6lowpan", NULL);
--	if (!lowpan_debugfs)
--		return -EINVAL;
--
--	return 0;
- }
- 
- void lowpan_debugfs_exit(void)
 -- 
-2.22.0
-
+Pali Rohár
+pali.rohar@gmail.com
