@@ -2,241 +2,315 @@ Return-Path: <SRS0=cJ+v=UN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE751C31E4B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 678AEC31E4C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:31:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D144B2073F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FC312073F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jun 2019 07:31:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726457AbfFNHYU (ORCPT
+        id S1726283AbfFNHbl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jun 2019 03:24:20 -0400
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:42289 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726278AbfFNHYU (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jun 2019 03:24:20 -0400
-Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <sha@pengutronix.de>)
-        id 1hbgYz-0000qW-RE; Fri, 14 Jun 2019 09:23:53 +0200
-Received: from sha by dude.hi.pengutronix.de with local (Exim 4.92)
-        (envelope-from <sha@pengutronix.de>)
-        id 1hbgYz-0006Np-4e; Fri, 14 Jun 2019 09:23:53 +0200
-From:   Sascha Hauer <s.hauer@pengutronix.de>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        Loic Poulain <loic.poulain@intel.com>, kernel@pengutronix.de,
-        Sascha Hauer <s.hauer@pengutronix.de>
-Subject: [PATCH 3/3] Bluetooth: hci_mrvl: Add serdev support
-Date:   Fri, 14 Jun 2019 09:23:51 +0200
-Message-Id: <20190614072351.17390-4-s.hauer@pengutronix.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190614072351.17390-1-s.hauer@pengutronix.de>
-References: <20190614072351.17390-1-s.hauer@pengutronix.de>
+        Fri, 14 Jun 2019 03:31:41 -0400
+Received: from mga17.intel.com ([192.55.52.151]:64176 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725846AbfFNHbl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Jun 2019 03:31:41 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jun 2019 00:31:38 -0700
+X-ExtLoop1: 1
+Received: from jrissane-mobl.ger.corp.intel.com (HELO jrissane-mobl1.fi.intel.com) ([10.237.67.34])
+  by FMSMGA003.fm.intel.com with ESMTP; 14 Jun 2019 00:31:36 -0700
+Message-ID: <dc047560cd3ff0cced5cdb911362d5d8e13c633b.camel@linux.intel.com>
+Subject: Re: [PATCH] 6lowpan: no need to check return value of
+ debugfs_create functions
+From:   Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexander Aring <alex.aring@gmail.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org
+Date:   Fri, 14 Jun 2019 10:31:35 +0300
+In-Reply-To: <20190614071423.GA18533@kroah.com>
+References: <20190614071423.GA18533@kroah.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.2 (3.32.2-1.fc30) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds serdev support to the Marvell hci uart driver. Only basic
-serdev support, none of the fancier features like regulator or enable
-GPIO support is added for now.
+Hi Greg,
 
-Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
----
- .../bindings/net/marvell-bluetooth.txt        | 25 +++++++
- drivers/bluetooth/Kconfig                     |  1 +
- drivers/bluetooth/hci_mrvl.c                  | 69 ++++++++++++++++++-
- 3 files changed, 94 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/devicetree/bindings/net/marvell-bluetooth.txt
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-diff --git a/Documentation/devicetree/bindings/net/marvell-bluetooth.txt b/Documentation/devicetree/bindings/net/marvell-bluetooth.txt
-new file mode 100644
-index 000000000000..0e2842296032
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/marvell-bluetooth.txt
-@@ -0,0 +1,25 @@
-+Marvell Bluetooth Chips
-+-----------------------
-+
-+This documents the binding structure and common properties for serial
-+attached Marvell Bluetooth devices. The following chips are included in
-+this binding:
-+
-+* Marvell 88W8897 Bluetooth devices
-+
-+Required properties:
-+ - compatible: should be:
-+    "mrvl,88w8897"
-+
-+Optional properties:
-+None so far
-+
-+Example:
-+
-+&serial0 {
-+	compatible = "ns16550a";
-+	...
-+	bluetooth {
-+		compatible = "mrvl,88w8897";
-+	};
-+};
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index b9c34ff9a0d3..a3fafd781aa1 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -237,6 +237,7 @@ config BT_HCIUART_AG6XX
- config BT_HCIUART_MRVL
- 	bool "Marvell protocol support"
- 	depends on BT_HCIUART
-+	depends on BT_HCIUART_SERDEV
- 	select BT_HCIUART_H4
- 	help
- 	  Marvell is serial protocol for communication between Bluetooth
-diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-index a0a74362455e..f98e5cc343b2 100644
---- a/drivers/bluetooth/hci_mrvl.c
-+++ b/drivers/bluetooth/hci_mrvl.c
-@@ -13,6 +13,8 @@
- #include <linux/firmware.h>
- #include <linux/module.h>
- #include <linux/tty.h>
-+#include <linux/of.h>
-+#include <linux/serdev.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -40,6 +42,10 @@ struct mrvl_data {
- 	u8 id, rev;
- };
- 
-+struct mrvl_serdev {
-+	struct hci_uart hu;
-+};
-+
- struct hci_mrvl_pkt {
- 	__le16 lhs;
- 	__le16 rhs;
-@@ -49,6 +55,7 @@ struct hci_mrvl_pkt {
- static int mrvl_open(struct hci_uart *hu)
- {
- 	struct mrvl_data *mrvl;
-+	int ret;
- 
- 	BT_DBG("hu %p", hu);
- 
-@@ -62,7 +69,18 @@ static int mrvl_open(struct hci_uart *hu)
- 	set_bit(STATE_CHIP_VER_PENDING, &mrvl->flags);
- 
- 	hu->priv = mrvl;
-+
-+	if (hu->serdev) {
-+		ret = serdev_device_open(hu->serdev);
-+		if (ret)
-+			goto err;
-+	}
-+
- 	return 0;
-+err:
-+	kfree(mrvl);
-+
-+	return ret;
- }
- 
- static int mrvl_close(struct hci_uart *hu)
-@@ -71,6 +89,9 @@ static int mrvl_close(struct hci_uart *hu)
- 
- 	BT_DBG("hu %p", hu);
- 
-+	if (hu->serdev)
-+		serdev_device_close(hu->serdev);
-+
- 	skb_queue_purge(&mrvl->txq);
- 	skb_queue_purge(&mrvl->rawq);
- 	kfree_skb(mrvl->rx_skb);
-@@ -342,7 +363,11 @@ static int mrvl_setup(struct hci_uart *hu)
- 	/* Let the final ack go out before switching the baudrate */
- 	hci_uart_wait_until_sent(hu);
- 
--	hci_uart_set_baudrate(hu, 3000000);
-+	if (hu->serdev)
-+		serdev_device_set_baudrate(hu->serdev, 3000000);
-+	else
-+		hci_uart_set_baudrate(hu, 3000000);
-+
- 	hci_uart_set_flow_control(hu, false);
- 
- 	err = mrvl_load_firmware(hu->hdev, "mrvl/uart8897_bt.bin");
-@@ -365,12 +390,54 @@ static const struct hci_uart_proto mrvl_proto = {
- 	.dequeue	= mrvl_dequeue,
- };
- 
-+static int mrvl_serdev_probe(struct serdev_device *serdev)
-+{
-+	struct mrvl_serdev *mrvldev;
-+
-+	mrvldev = devm_kzalloc(&serdev->dev, sizeof(*mrvldev), GFP_KERNEL);
-+	if (!mrvldev)
-+		return -ENOMEM;
-+
-+	mrvldev->hu.serdev = serdev;
-+	serdev_device_set_drvdata(serdev, mrvldev);
-+
-+	return hci_uart_register_device(&mrvldev->hu, &mrvl_proto);
-+}
-+
-+static void mrvl_serdev_remove(struct serdev_device *serdev)
-+{
-+	struct mrvl_serdev *mrvldev = serdev_device_get_drvdata(serdev);
-+
-+	hci_uart_unregister_device(&mrvldev->hu);
-+}
-+
-+#ifdef CONFIG_OF
-+static const struct of_device_id mrvl_bluetooth_of_match[] = {
-+	{ .compatible = "mrvl,88w8897" },
-+	{ },
-+};
-+MODULE_DEVICE_TABLE(of, mrvl_bluetooth_of_match);
-+#endif
-+
-+static struct serdev_device_driver mrvl_serdev_driver = {
-+	.probe = mrvl_serdev_probe,
-+	.remove = mrvl_serdev_remove,
-+	.driver = {
-+		.name = "hci_uart_mrvl",
-+		.of_match_table = of_match_ptr(mrvl_bluetooth_of_match),
-+	},
-+};
-+
- int __init mrvl_init(void)
- {
-+	serdev_device_driver_register(&mrvl_serdev_driver);
-+
- 	return hci_uart_register_proto(&mrvl_proto);
- }
- 
- int __exit mrvl_deinit(void)
- {
-+	serdev_device_driver_unregister(&mrvl_serdev_driver);
-+
- 	return hci_uart_unregister_proto(&mrvl_proto);
- }
--- 
-2.20.1
+Cheers,
+Jukka
+
+On Fri, 2019-06-14 at 09:14 +0200, Greg Kroah-Hartman wrote:
+> When calling debugfs functions, there is no need to ever check the
+> return value.  The function can work or not, but the code logic
+> should
+> never do something different based on this.
+> 
+> Because we don't care if debugfs works or not, this trickles back a
+> bit
+> so we can clean things up by making some functions return void
+> instead
+> of an error value that is never going to fail.
+> 
+> Cc: Alexander Aring <alex.aring@gmail.com>
+> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: linux-wpan@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+>  net/6lowpan/6lowpan_i.h | 16 ++-----
+>  net/6lowpan/core.c      |  8 +---
+>  net/6lowpan/debugfs.c   | 97 +++++++++++--------------------------
+> ----
+>  3 files changed, 32 insertions(+), 89 deletions(-)
+> 
+> diff --git a/net/6lowpan/6lowpan_i.h b/net/6lowpan/6lowpan_i.h
+> index 53cf446ce2e3..01853cec0209 100644
+> --- a/net/6lowpan/6lowpan_i.h
+> +++ b/net/6lowpan/6lowpan_i.h
+> @@ -18,24 +18,16 @@ extern const struct ndisc_ops lowpan_ndisc_ops;
+>  int addrconf_ifid_802154_6lowpan(u8 *eui, struct net_device *dev);
+>  
+>  #ifdef CONFIG_6LOWPAN_DEBUGFS
+> -int lowpan_dev_debugfs_init(struct net_device *dev);
+> +void lowpan_dev_debugfs_init(struct net_device *dev);
+>  void lowpan_dev_debugfs_exit(struct net_device *dev);
+>  
+> -int __init lowpan_debugfs_init(void);
+> +void __init lowpan_debugfs_init(void);
+>  void lowpan_debugfs_exit(void);
+>  #else
+> -static inline int lowpan_dev_debugfs_init(struct net_device *dev)
+> -{
+> -	return 0;
+> -}
+> -
+> +static inline void lowpan_dev_debugfs_init(struct net_device *dev) {
+> }
+>  static inline void lowpan_dev_debugfs_exit(struct net_device *dev) {
+> }
+>  
+> -static inline int __init lowpan_debugfs_init(void)
+> -{
+> -	return 0;
+> -}
+> -
+> +static inline void __init lowpan_debugfs_init(void) { }
+>  static inline void lowpan_debugfs_exit(void) { }
+>  #endif /* CONFIG_6LOWPAN_DEBUGFS */
+>  
+> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> index 2d68351f1ac4..a068757eabaf 100644
+> --- a/net/6lowpan/core.c
+> +++ b/net/6lowpan/core.c
+> @@ -42,9 +42,7 @@ int lowpan_register_netdevice(struct net_device
+> *dev,
+>  	if (ret < 0)
+>  		return ret;
+>  
+> -	ret = lowpan_dev_debugfs_init(dev);
+> -	if (ret < 0)
+> -		unregister_netdevice(dev);
+> +	lowpan_dev_debugfs_init(dev);
+>  
+>  	return ret;
+>  }
+> @@ -152,9 +150,7 @@ static int __init lowpan_module_init(void)
+>  {
+>  	int ret;
+>  
+> -	ret = lowpan_debugfs_init();
+> -	if (ret < 0)
+> -		return ret;
+> +	lowpan_debugfs_init();
+>  
+>  	ret = register_netdevice_notifier(&lowpan_notifier);
+>  	if (ret < 0) {
+> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+> index f5a8eec9d7a3..1c140af06d52 100644
+> --- a/net/6lowpan/debugfs.c
+> +++ b/net/6lowpan/debugfs.c
+> @@ -163,11 +163,11 @@ static const struct file_operations
+> lowpan_ctx_pfx_fops = {
+>  	.release	= single_release,
+>  };
+>  
+> -static int lowpan_dev_debugfs_ctx_init(struct net_device *dev,
+> -				       struct dentry *ctx, u8 id)
+> +static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
+> +					struct dentry *ctx, u8 id)
+>  {
+>  	struct lowpan_dev *ldev = lowpan_dev(dev);
+> -	struct dentry *dentry, *root;
+> +	struct dentry *root;
+>  	char buf[32];
+>  
+>  	WARN_ON_ONCE(id > LOWPAN_IPHC_CTX_TABLE_SIZE);
+> @@ -175,34 +175,18 @@ static int lowpan_dev_debugfs_ctx_init(struct
+> net_device *dev,
+>  	sprintf(buf, "%d", id);
+>  
+>  	root = debugfs_create_dir(buf, ctx);
+> -	if (!root)
+> -		return -EINVAL;
+>  
+> -	dentry = debugfs_create_file_unsafe("active", 0644, root,
+> -					    &ldev->ctx.table[id],
+> -					    &lowpan_ctx_flag_active_fop
+> s);
+> -	if (!dentry)
+> -		return -EINVAL;
+> +	debugfs_create_file("active", 0644, root, &ldev->ctx.table[id],
+> +			    &lowpan_ctx_flag_active_fops);
+>  
+> -	dentry = debugfs_create_file_unsafe("compression", 0644, root,
+> -					    &ldev->ctx.table[id],
+> -					    &lowpan_ctx_flag_c_fops);
+> -	if (!dentry)
+> -		return -EINVAL;
+> -
+> -	dentry = debugfs_create_file("prefix", 0644, root,
+> -				     &ldev->ctx.table[id],
+> -				     &lowpan_ctx_pfx_fops);
+> -	if (!dentry)
+> -		return -EINVAL;
+> +	debugfs_create_file("compression", 0644, root, &ldev-
+> >ctx.table[id],
+> +			    &lowpan_ctx_flag_c_fops);
+>  
+> -	dentry = debugfs_create_file_unsafe("prefix_len", 0644, root,
+> -					    &ldev->ctx.table[id],
+> -					    &lowpan_ctx_plen_fops);
+> -	if (!dentry)
+> -		return -EINVAL;
+> +	debugfs_create_file("prefix", 0644, root, &ldev->ctx.table[id],
+> +			    &lowpan_ctx_pfx_fops);
+>  
+> -	return 0;
+> +	debugfs_create_file("prefix_len", 0644, root, &ldev-
+> >ctx.table[id],
+> +			    &lowpan_ctx_plen_fops);
+>  }
+>  
+>  static int lowpan_context_show(struct seq_file *file, void *offset)
+> @@ -242,64 +226,39 @@ static int lowpan_short_addr_get(void *data,
+> u64 *val)
+>  DEFINE_DEBUGFS_ATTRIBUTE(lowpan_short_addr_fops,
+> lowpan_short_addr_get, NULL,
+>  			 "0x%04llx\n");
+>  
+> -static int lowpan_dev_debugfs_802154_init(const struct net_device
+> *dev,
+> +static void lowpan_dev_debugfs_802154_init(const struct net_device
+> *dev,
+>  					  struct lowpan_dev *ldev)
+>  {
+> -	struct dentry *dentry, *root;
+> +	struct dentry *root;
+>  
+>  	if (!lowpan_is_ll(dev, LOWPAN_LLTYPE_IEEE802154))
+> -		return 0;
+> +		return;
+>  
+>  	root = debugfs_create_dir("ieee802154", ldev->iface_debugfs);
+> -	if (!root)
+> -		return -EINVAL;
+> -
+> -	dentry = debugfs_create_file_unsafe("short_addr", 0444, root,
+> -					    lowpan_802154_dev(dev)-
+> >wdev->ieee802154_ptr,
+> -					    &lowpan_short_addr_fops);
+> -	if (!dentry)
+> -		return -EINVAL;
+>  
+> -	return 0;
+> +	debugfs_create_file("short_addr", 0444, root,
+> +			    lowpan_802154_dev(dev)->wdev-
+> >ieee802154_ptr,
+> +			    &lowpan_short_addr_fops);
+>  }
+>  
+> -int lowpan_dev_debugfs_init(struct net_device *dev)
+> +void lowpan_dev_debugfs_init(struct net_device *dev)
+>  {
+>  	struct lowpan_dev *ldev = lowpan_dev(dev);
+> -	struct dentry *contexts, *dentry;
+> -	int ret, i;
+> +	struct dentry *contexts;
+> +	int i;
+>  
+>  	/* creating the root */
+>  	ldev->iface_debugfs = debugfs_create_dir(dev->name,
+> lowpan_debugfs);
+> -	if (!ldev->iface_debugfs)
+> -		goto fail;
+>  
+>  	contexts = debugfs_create_dir("contexts", ldev->iface_debugfs);
+> -	if (!contexts)
+> -		goto remove_root;
+> -
+> -	dentry = debugfs_create_file("show", 0644, contexts,
+> -				     &lowpan_dev(dev)->ctx,
+> -				     &lowpan_context_fops);
+> -	if (!dentry)
+> -		goto remove_root;
+> -
+> -	for (i = 0; i < LOWPAN_IPHC_CTX_TABLE_SIZE; i++) {
+> -		ret = lowpan_dev_debugfs_ctx_init(dev, contexts, i);
+> -		if (ret < 0)
+> -			goto remove_root;
+> -	}
+>  
+> -	ret = lowpan_dev_debugfs_802154_init(dev, ldev);
+> -	if (ret < 0)
+> -		goto remove_root;
+> +	debugfs_create_file("show", 0644, contexts, &lowpan_dev(dev)-
+> >ctx,
+> +			    &lowpan_context_fops);
+>  
+> -	return 0;
+> +	for (i = 0; i < LOWPAN_IPHC_CTX_TABLE_SIZE; i++)
+> +		lowpan_dev_debugfs_ctx_init(dev, contexts, i);
+>  
+> -remove_root:
+> -	lowpan_dev_debugfs_exit(dev);
+> -fail:
+> -	return -EINVAL;
+> +	lowpan_dev_debugfs_802154_init(dev, ldev);
+>  }
+>  
+>  void lowpan_dev_debugfs_exit(struct net_device *dev)
+> @@ -307,13 +266,9 @@ void lowpan_dev_debugfs_exit(struct net_device
+> *dev)
+>  	debugfs_remove_recursive(lowpan_dev(dev)->iface_debugfs);
+>  }
+>  
+> -int __init lowpan_debugfs_init(void)
+> +void __init lowpan_debugfs_init(void)
+>  {
+>  	lowpan_debugfs = debugfs_create_dir("6lowpan", NULL);
+> -	if (!lowpan_debugfs)
+> -		return -EINVAL;
+> -
+> -	return 0;
+>  }
+>  
+>  void lowpan_debugfs_exit(void)
 
