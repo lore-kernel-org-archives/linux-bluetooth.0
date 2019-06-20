@@ -2,181 +2,99 @@ Return-Path: <SRS0=XOEH=UT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE1DC4646B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 09:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 635C7C43613
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 09:25:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C36A32083B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 09:17:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4780E2084A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 09:25:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725937AbfFTJRg (ORCPT
+        id S1726140AbfFTJZu convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jun 2019 05:17:36 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:51883 "EHLO
+        Thu, 20 Jun 2019 05:25:50 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60599 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725912AbfFTJRg (ORCPT
+        with ESMTP id S1725875AbfFTJZu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Jun 2019 05:17:36 -0400
-Received: from localhost.localdomain (p4FEFC3D2.dip0.t-ipconnect.de [79.239.195.210])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0AA34CEFA2;
-        Thu, 20 Jun 2019 11:26:02 +0200 (CEST)
+        Thu, 20 Jun 2019 05:25:50 -0400
+Received: from marcel-macpro.fritz.box (p4FEFC3D2.dip0.t-ipconnect.de [79.239.195.210])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4FFC9CEFA2;
+        Thu, 20 Jun 2019 11:34:16 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: Bluetooth regression breaking BT connection for all 2.0 and older
+ devices in 5.0.15+, 5.1.x and master
 From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     anarsoul@gmail.com, fin4478@hotmail.com
-Subject: [RFC] Bluetooth: Fix regression with minimum encryption key size alignment
-Date:   Thu, 20 Jun 2019 11:17:31 +0200
-Message-Id: <20190620091731.5823-1-marcel@holtmann.org>
-X-Mailer: git-send-email 2.21.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190613073518.GA16436@kroah.com>
+Date:   Thu, 20 Jun 2019 11:25:48 +0200
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Jeremy Cline <jeremy@jcline.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <99BA793B-E069-4974-8194-5C69616109FA@holtmann.org>
+References: <af8cf6f4-4979-2f6f-68ed-e5b368b17ec7@redhat.com>
+ <20190613073518.GA16436@kroah.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When trying to align the minimum encryption key size requirement for
-Bluetooth connections, it turns out doing this in a central location
-in the HCI connection handling code is not possible.
+Hi Greg,
 
-Original Bluetooth version up to 2.0 used a security model where the
-L2CAP service would enforce authentication and encryption. Starting
-with Bluetooth 2.1 and Secure Simple Pairing that model has changed
-into that the connection initiator is responsible for providing an
-encrypted ACL link before any L2CAP communication can happen.
+>> First of all this is a known issue and it seems a fix is in the works,
+>> but what I do not understand is why the commit causing this has not
+>> simply been reverted until the fix is done, esp. for the 5.0.x
+>> stable series where this was introduced in 5.0.15.
+>> 
+>> The problem I'm talking about is commit d5bb334a8e17 ("Bluetooth: Align
+>> minimum encryption key size for LE and BR/EDR connections"):
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d5bb334a8e171b262e48f378bd2096c0ea458265
+>> basically completely breaking all somewhat older (and some current cheap
+>> no-name) bluetooth devices:
+>> 
+>> A revert of this was first proposed on May 22nd:
+>> https://lore.kernel.org/netdev/CA+E=qVfopSA90vG2Kkh+XzdYdNn=M-hJN_AptW=R+B5v3HB9eA@mail.gmail.com/T/
+>> We are 18 days further now and this problem still exists, including in the
+>> 5.0.15+ and 5.1.x stable kernels.
+>> 
+>> A solution has been suggested: https://lore.kernel.org/linux-bluetooth/20190522070540.48895-1-marcel@holtmann.org/T/#u
+>> and at least the Fedora 5.1.4+ kernels now carry this as a temporary fix,
+>> but as of today I do not see a fix nor a revert in Torvald's tree yet and
+>> neither does there seem to be any fix in the 5.0.x and 5.1.x stable series.
+>> 
+>> In the mean time we are getting a lot of bug reports about this:
+>> https://bugzilla.kernel.org/show_bug.cgi?id=203643
+>> https://bugzilla.redhat.com/show_bug.cgi?id=1711468
+>> https://bugzilla.redhat.com/show_bug.cgi?id=1713871
+>> https://bugzilla.redhat.com/show_bug.cgi?id=1713980
+>> 
+>> And some reporters:
+>> https://bugzilla.redhat.com/show_bug.cgi?id=1713871#c4
+>> Are indicating that the Fedora kernels with the workaround included
+>> still do not work...
+>> 
+>> As such I would like to suggest that we just revert the troublesome
+>> commit for now and re-add it when we have a proper fix.
+> 
+> I've now reverted this as it does not seem to be going anywhere anytime
+> soon.  After the mess gets sorted out in Linus's tree, if someone could
+> send stable@vger the commit ids that should be applied, I will be glad
+> to do so.
 
-Now connecting Bluetooth 2.1 or later devices with Bluetooth 2.0 and
-before devices are causing a regression. The encryption key size
-check needs to be moved out of the HCI connection handling into the
-L2CAP channel setup.
+this took a while to get fixed since some of the is really old code. I just posted a fix that I think covers all corner cases.
 
-To achieve this, the current check inside hci_conn_security() has
-been moved into l2cap_check_enc_key_size() helper function and then
-called from four decisions point inside L2CAP to cover all combinations
-of Secure Simple Pairing enabled devices and device using legacy
-pairing and legacy service security model.
+https://lore.kernel.org/linux-bluetooth/20190620091731.5823-1-marcel@holtmann.org/T/#u
 
-Fixes: d5bb334a8e17 ("Bluetooth: Align minimum encryption key size for LE and BR/EDR connections")
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=203643
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Cc: stable@vger.kernel.org
----
- net/bluetooth/hci_conn.c   | 18 +++++++++---------
- net/bluetooth/l2cap_core.c | 33 ++++++++++++++++++++++++++++-----
- 2 files changed, 37 insertions(+), 14 deletions(-)
+If I can get a few people to test this, that would be great. Thanks.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3cf0764d5793..15d1cb5aee18 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1276,14 +1276,6 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
- 	    !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
- 		return 0;
- 
--	/* The minimum encryption key size needs to be enforced by the
--	 * host stack before establishing any L2CAP connections. The
--	 * specification in theory allows a minimum of 1, but to align
--	 * BR/EDR and LE transports, a minimum of 7 is chosen.
--	 */
--	if (conn->enc_key_size < HCI_MIN_ENC_KEY_SIZE)
--		return 0;
--
- 	return 1;
- }
- 
-@@ -1400,8 +1392,16 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
- 		return 0;
- 
- encrypt:
--	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags))
-+	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags)) {
-+		/* Ensure that the encryption key size has been read,
-+		 * otherwise stall the upper layer responses.
-+		 */
-+		if (!conn->enc_key_size)
-+			return 0;
-+
-+		/* Nothing else needed, all requirements are met */
- 		return 1;
-+	}
- 
- 	hci_conn_encrypt(conn);
- 	return 0;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b53acd6c9a3d..9f77432dbe38 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1341,6 +1341,21 @@ static void l2cap_request_info(struct l2cap_conn *conn)
- 		       sizeof(req), &req);
- }
- 
-+static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
-+{
-+	/* The minimum encryption key size needs to be enforced by the
-+	 * host stack before establishing any L2CAP connections. The
-+	 * specification in theory allows a minimum of 1, but to align
-+	 * BR/EDR and LE transports, a minimum of 7 is chosen.
-+	 *
-+	 * This check might also be called for unencrypted connections
-+	 * that have no key size requirements. Ensure that the link is
-+	 * actually encrypted before enforcing a key size.
-+	 */
-+	return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
-+		hcon->enc_key_size > HCI_MIN_ENC_KEY_SIZE);
-+}
-+
- static void l2cap_do_start(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -1358,9 +1373,14 @@ static void l2cap_do_start(struct l2cap_chan *chan)
- 	if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
- 		return;
- 
--	if (l2cap_chan_check_security(chan, true) &&
--	    __l2cap_no_conn_pending(chan))
-+	if (!l2cap_chan_check_security(chan, true) ||
-+	    !__l2cap_no_conn_pending(chan))
-+		return;
-+
-+	if (l2cap_check_enc_key_size(conn->hcon))
- 		l2cap_start_connection(chan);
-+	else
-+		__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
- }
- 
- static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
-@@ -1439,7 +1459,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 				continue;
- 			}
- 
--			l2cap_start_connection(chan);
-+			if (l2cap_check_enc_key_size(conn->hcon))
-+				l2cap_start_connection(chan);
-+			else
-+				l2cap_chan_close(chan, ECONNREFUSED);
- 
- 		} else if (chan->state == BT_CONNECT2) {
- 			struct l2cap_conn_rsp rsp;
-@@ -7490,7 +7513,7 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		}
- 
- 		if (chan->state == BT_CONNECT) {
--			if (!status)
-+			if (!status && l2cap_check_enc_key_size(hcon))
- 				l2cap_start_connection(chan);
- 			else
- 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
-@@ -7499,7 +7522,7 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 			struct l2cap_conn_rsp rsp;
- 			__u16 res, stat;
- 
--			if (!status) {
-+			if (!status && l2cap_check_enc_key_size(hcon)) {
- 				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
- 					res = L2CAP_CR_PEND;
- 					stat = L2CAP_CS_AUTHOR_PEND;
--- 
-2.21.0
+Regards
+
+Marcel
 
