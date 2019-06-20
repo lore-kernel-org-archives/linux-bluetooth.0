@@ -1,102 +1,182 @@
-Return-Path: <SRS0=h9/h=US=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=XOEH=UT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC75C31E5B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jun 2019 17:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE1DC4646B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 09:17:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 527752147A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jun 2019 17:45:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="fBv6ni2U"
+	by mail.kernel.org (Postfix) with ESMTP id C36A32083B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 09:17:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726175AbfFSRpy (ORCPT
+        id S1725937AbfFTJRg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Jun 2019 13:45:54 -0400
-Received: from mail-lj1-f173.google.com ([209.85.208.173]:34434 "EHLO
-        mail-lj1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726047AbfFSRpx (ORCPT
+        Thu, 20 Jun 2019 05:17:36 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:51883 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725912AbfFTJRg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Jun 2019 13:45:53 -0400
-Received: by mail-lj1-f173.google.com with SMTP id p17so75762ljg.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jun 2019 10:45:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=HSFi2tztquZU7FOcFToXGAxv4ImJGlvwfLgiw6MVkVQ=;
-        b=fBv6ni2UqjMqcB6IksyhmW0psUWOYCv2eLzj00wx2t17HFReTeeNF1QIGnqkVHUoDH
-         gy2Ibk2hioH1OKhc2PhXnsW0w/cGM6yTKBF2taTMDGb4RvfhOtZdU7F7GexPgpFI6QvY
-         Yj6pzUl6Tnxp2AiTB8zAtfdp2rpM/A9PGyBsXj0XyH9jTsQIujgbt48XlP2r/UymhACP
-         zQP5hyKriUc19jIWdH7ecM1hbEbuIw9a9r4Dj/gda0eBSVamdo+hTNLAXhcJbz2qitV2
-         pob6zGARfMNgNrq2C9Lsrs5tWMlInpyekRfavBcMERA+fL2sX/taXhWk01bW7N3nuxm1
-         Hi6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=HSFi2tztquZU7FOcFToXGAxv4ImJGlvwfLgiw6MVkVQ=;
-        b=DrG/6RvMNL+gayAUw28BBbhsLDcP0uT56++v6YkNUILE7zs51HJVXJNEBklLPF1CVj
-         rsjdqpwya2v4jw0PpKUaJucZXHA2lnQQKTFL8HTVvtaY/8HkWQbC6fjk30lO25xWuNUt
-         s8ZNXDWQPvPurApJEUmN7MKrD8XoNNTUcqRciObjqma4IefVMShB1u0IoqYl8C+a8GvW
-         vdLdk5OT5LTiZSLDFrFN9DGKRdFWVN+qbkJ7MMJSQFPMgql8MTFD9my/lBqLSRGap/pY
-         BCmR2CIPWYwKi2uLa0SvRZSn1C5Im9oT52XaXuGWkpz7kz+4aiJFJcEhGoCib2Q3dnBq
-         EhNQ==
-X-Gm-Message-State: APjAAAUiXLz/F4+FQ1avPGlztJIVpEmfzBseZAg0AosUl8ygP3oz/g0f
-        PMfPt2QAMVBd0OiUdbe4hMW4OQ==
-X-Google-Smtp-Source: APXvYqxzR55FL/xUi79jJkeRRzgZjr4He//M9JMc+Ti2XpV08I4nbmHXbtiitW6EJTWue5D3Y05+Ww==
-X-Received: by 2002:a2e:94ca:: with SMTP id r10mr8205132ljh.196.1560966351725;
-        Wed, 19 Jun 2019 10:45:51 -0700 (PDT)
-Received: from kynes (apn-46-76-45-65.dynamic.gprs.plus.pl. [46.76.45.65])
-        by smtp.gmail.com with ESMTPSA id r17sm1990698ljb.77.2019.06.19.10.45.50
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 19 Jun 2019 10:45:51 -0700 (PDT)
-From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
-        <michal.lowas-rzechonek@silvair.com>
-X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
-Date:   Wed, 19 Jun 2019 19:45:49 +0200
-To:     Grzegorz =?utf-8?Q?Ko=C5=82odziejczyk?= 
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Cc:     Jakub Witowski <jakub.witowski@silvair.com>,
-        linux-bluetooth@vger.kernel.org,
-        Inga Stotland <inga.stotland@intel.com>,
-        Brian Gix <brian.gix@intel.com>
-Subject: Re: [PATCH v2] mesh: Return dbus error code on Leave() with invalit
- token given
-Message-ID: <20190619174549.tqfqkgwu6yfq3tmr@kynes>
-Mail-Followup-To: Grzegorz =?utf-8?Q?Ko=C5=82odziejczyk?= <grzegorz.kolodziejczyk@codecoup.pl>,
-        Jakub Witowski <jakub.witowski@silvair.com>,
-        linux-bluetooth@vger.kernel.org,
-        Inga Stotland <inga.stotland@intel.com>,
-        Brian Gix <brian.gix@intel.com>
-References: <20190619074851.24039-1-jakub.witowski@silvair.com>
- <CALevQMaSheh9nY88L53bV==vS=7V0DBY6wFtf+A=UyHDnjYS=g@mail.gmail.com>
+        Thu, 20 Jun 2019 05:17:36 -0400
+Received: from localhost.localdomain (p4FEFC3D2.dip0.t-ipconnect.de [79.239.195.210])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0AA34CEFA2;
+        Thu, 20 Jun 2019 11:26:02 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     anarsoul@gmail.com, fin4478@hotmail.com
+Subject: [RFC] Bluetooth: Fix regression with minimum encryption key size alignment
+Date:   Thu, 20 Jun 2019 11:17:31 +0200
+Message-Id: <20190620091731.5823-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALevQMaSheh9nY88L53bV==vS=7V0DBY6wFtf+A=UyHDnjYS=g@mail.gmail.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Grzegorz,
+When trying to align the minimum encryption key size requirement for
+Bluetooth connections, it turns out doing this in a central location
+in the HCI connection handling code is not possible.
 
-On 06/19, Grzegorz Kołodziejczyk wrote:
-> You have commit message typo "invalit".
+Original Bluetooth version up to 2.0 used a security model where the
+L2CAP service would enforce authentication and encryption. Starting
+with Bluetooth 2.1 and Secure Simple Pairing that model has changed
+into that the connection initiator is responsible for providing an
+encrypted ACL link before any L2CAP communication can happen.
 
-And you top-post ;)
+Now connecting Bluetooth 2.1 or later devices with Bluetooth 2.0 and
+before devices are causing a regression. The encryption key size
+check needs to be moved out of the HCI connection handling into the
+L2CAP channel setup.
 
+To achieve this, the current check inside hci_conn_security() has
+been moved into l2cap_check_enc_key_size() helper function and then
+called from four decisions point inside L2CAP to cover all combinations
+of Secure Simple Pairing enabled devices and device using legacy
+pairing and legacy service security model.
+
+Fixes: d5bb334a8e17 ("Bluetooth: Align minimum encryption key size for LE and BR/EDR connections")
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=203643
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Cc: stable@vger.kernel.org
+---
+ net/bluetooth/hci_conn.c   | 18 +++++++++---------
+ net/bluetooth/l2cap_core.c | 33 ++++++++++++++++++++++++++++-----
+ 2 files changed, 37 insertions(+), 14 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3cf0764d5793..15d1cb5aee18 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1276,14 +1276,6 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
+ 	    !test_bit(HCI_CONN_ENCRYPT, &conn->flags))
+ 		return 0;
+ 
+-	/* The minimum encryption key size needs to be enforced by the
+-	 * host stack before establishing any L2CAP connections. The
+-	 * specification in theory allows a minimum of 1, but to align
+-	 * BR/EDR and LE transports, a minimum of 7 is chosen.
+-	 */
+-	if (conn->enc_key_size < HCI_MIN_ENC_KEY_SIZE)
+-		return 0;
+-
+ 	return 1;
+ }
+ 
+@@ -1400,8 +1392,16 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
+ 		return 0;
+ 
+ encrypt:
+-	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags))
++	if (test_bit(HCI_CONN_ENCRYPT, &conn->flags)) {
++		/* Ensure that the encryption key size has been read,
++		 * otherwise stall the upper layer responses.
++		 */
++		if (!conn->enc_key_size)
++			return 0;
++
++		/* Nothing else needed, all requirements are met */
+ 		return 1;
++	}
+ 
+ 	hci_conn_encrypt(conn);
+ 	return 0;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b53acd6c9a3d..9f77432dbe38 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1341,6 +1341,21 @@ static void l2cap_request_info(struct l2cap_conn *conn)
+ 		       sizeof(req), &req);
+ }
+ 
++static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
++{
++	/* The minimum encryption key size needs to be enforced by the
++	 * host stack before establishing any L2CAP connections. The
++	 * specification in theory allows a minimum of 1, but to align
++	 * BR/EDR and LE transports, a minimum of 7 is chosen.
++	 *
++	 * This check might also be called for unencrypted connections
++	 * that have no key size requirements. Ensure that the link is
++	 * actually encrypted before enforcing a key size.
++	 */
++	return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
++		hcon->enc_key_size > HCI_MIN_ENC_KEY_SIZE);
++}
++
+ static void l2cap_do_start(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -1358,9 +1373,14 @@ static void l2cap_do_start(struct l2cap_chan *chan)
+ 	if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
+ 		return;
+ 
+-	if (l2cap_chan_check_security(chan, true) &&
+-	    __l2cap_no_conn_pending(chan))
++	if (!l2cap_chan_check_security(chan, true) ||
++	    !__l2cap_no_conn_pending(chan))
++		return;
++
++	if (l2cap_check_enc_key_size(conn->hcon))
+ 		l2cap_start_connection(chan);
++	else
++		__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
+ }
+ 
+ static inline int l2cap_mode_supported(__u8 mode, __u32 feat_mask)
+@@ -1439,7 +1459,10 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 				continue;
+ 			}
+ 
+-			l2cap_start_connection(chan);
++			if (l2cap_check_enc_key_size(conn->hcon))
++				l2cap_start_connection(chan);
++			else
++				l2cap_chan_close(chan, ECONNREFUSED);
+ 
+ 		} else if (chan->state == BT_CONNECT2) {
+ 			struct l2cap_conn_rsp rsp;
+@@ -7490,7 +7513,7 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 		}
+ 
+ 		if (chan->state == BT_CONNECT) {
+-			if (!status)
++			if (!status && l2cap_check_enc_key_size(hcon))
+ 				l2cap_start_connection(chan);
+ 			else
+ 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
+@@ -7499,7 +7522,7 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 res, stat;
+ 
+-			if (!status) {
++			if (!status && l2cap_check_enc_key_size(hcon)) {
+ 				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 					res = L2CAP_CR_PEND;
+ 					stat = L2CAP_CS_AUTHOR_PEND;
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+2.21.0
+
