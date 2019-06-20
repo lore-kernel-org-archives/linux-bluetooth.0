@@ -2,149 +2,115 @@ Return-Path: <SRS0=XOEH=UT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3853BC48BE3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 18:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D792C43613
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 23:48:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 170CC20665
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 18:31:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 160FC2070B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jun 2019 23:48:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ufw/PJFb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726432AbfFTSbZ (ORCPT
+        id S1725936AbfFTXsj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jun 2019 14:31:25 -0400
-Received: from mga09.intel.com ([134.134.136.24]:28328 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725985AbfFTSbY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Jun 2019 14:31:24 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Jun 2019 11:31:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,397,1557212400"; 
-   d="scan'208";a="335584130"
-Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
-  by orsmga005.jf.intel.com with ESMTP; 20 Jun 2019 11:31:23 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX104.amr.corp.intel.com ([169.254.4.70]) with mapi id 14.03.0439.000;
- Thu, 20 Jun 2019 11:31:22 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v2 2/2] mesh: Changed --index option to --io
-Thread-Topic: [PATCH BlueZ v2 2/2] mesh: Changed --index option to --io
-Thread-Index: AQHVJpG1uOAtsOjPt0GAoWe4x+cTQ6alVOsA
-Date:   Thu, 20 Jun 2019 18:31:21 +0000
-Message-ID: <1561055480.4417.29.camel@intel.com>
-References: <20190619112503.3398-1-michal.lowas-rzechonek@silvair.com>
-         <20190619112503.3398-3-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190619112503.3398-3-michal.lowas-rzechonek@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.184.211]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <76DF2174810A1247AFD0670FF147CEC6@intel.com>
-Content-Transfer-Encoding: base64
+        Thu, 20 Jun 2019 19:48:39 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:34313 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725886AbfFTXsi (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 20 Jun 2019 19:48:38 -0400
+Received: by mail-pg1-f195.google.com with SMTP id p10so2414773pgn.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2019 16:48:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=WDSF4/5gIVl0q/Y5kiKBD3WGHCnc11W4/O/uCS0I/xg=;
+        b=Ufw/PJFbsYXI8fOZsVIqLo22TA9EiF422kbGLdL+GtmV9GYxEMoZLsgBfUehldafHK
+         DwlaqrKbEXctGNF14IKuHKmEzHZ3V0fLle49ySPaYpo7lRjNPmU6WeGIcLiRE4H2Z5LA
+         MTn66GPaJo9t12paeyfP7xC+C43MElFRknKdg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=WDSF4/5gIVl0q/Y5kiKBD3WGHCnc11W4/O/uCS0I/xg=;
+        b=o5uJXJnNgGmrkyhvEdtyf4xe2jJtStkxDrO71R9QoPSq1qjAdDEDfhl1F09dlv/pg9
+         B0GhxJ3ZGJWdaeLPMLC6kn0IAsFIJyAaDCWfIvRmVGH8OuLY3DfiavxmqeoANXB+EoQo
+         Rgv6uo2ehmFZtx4lm9ockzBZVUwHGOKhEX+Mr8M+A1k/qEwCgu93q1e5wETdo5VV1Y9G
+         TUwsoS79p+4NCsngADIxv7nZ3gnFDHp54sK8AskFkZV+ISEf6UYsxuufxaSCcJs9ZpOX
+         jfPQdToAsju/zSmRm95eqNYG0HU2TGXLnq+znWMGoyjP4hNF6ooC4LO8AZ8slVMlYDSm
+         Givw==
+X-Gm-Message-State: APjAAAVylz/MmVuBlYwwy9RtvFNtR4IMaVg+oz/bFKj1enkdskX7+Ubz
+        +dbxnoHzDgSMsiU20KsRoLUcyw==
+X-Google-Smtp-Source: APXvYqzIk9C3mS84uBO304CxiZE9GF2WsdzLUO9sky2JMwefoEHmlCFHyQZmwBXXx3F2T8RaRqV8tg==
+X-Received: by 2002:a17:90a:fa18:: with SMTP id cm24mr2312229pjb.120.1561074518183;
+        Thu, 20 Jun 2019 16:48:38 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id d123sm577407pfc.144.2019.06.20.16.48.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Jun 2019 16:48:37 -0700 (PDT)
+Date:   Thu, 20 Jun 2019 16:48:35 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: Re: [PATCH v4] Bluetooth: hci_qca: wcn3990: Drop baudrate change
+ vendor event
+Message-ID: <20190620234835.GZ137143@google.com>
+References: <20190521195307.23874-1-mka@chromium.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190521195307.23874-1-mka@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGHFgiwNCg0KVGhpcyBwYXRjaCBtYXkgbmVlZCBmdXJ0aGVyIGRpc2N1c3Npb24uICBJ
-IHVuZGVyc3RhbmQgd2hhdCB5b3UgYXJlIHRyeWluZyB0byBkbywgYW5kIGRvIG5vdA0KZGlzYWdy
-ZWUgd2l0aCBpdCBwZXIgc2UsIGJ1dCB3ZSBhcmUgYXR0ZW1wdGluZyB0byBrZWVwIHdpdGggcHJl
-Y2lkZW5jZSBvZiBibHVldG9vdGhkIGFuZA0KdGhlIHZhcmlvdXMgdG9vbHMgYW5kIHRlc3RzLiAg
-LWkgY3VycmVudGx5IGlzIHVzZWQgdG8gc3BlY2lmeSB0aGUgY29udHJvbGxlciwgc28gd2UgbWF5
-IHdhbnQgYQ0KZGlmZmVyZW50IHN0YXJ0dXAgb3B0aW9uIHRvIGZvcmNlIHRoZSBkYWVtb24gdG8g
-Y2hvb3NlIGJhc2VkIG9uIHRoZSBzdXBwb3J0ZWQgY29udHJvbGxlcg0KY2FwYWJpbGl0aWVzLCBi
-dXQgb25seSBpZiB3ZSBhcmUgZ29pbmcgdGhyb3VnaCB0aGUgTUdNVCBsaXN0IG9mIGNvbnRyb2xs
-ZXJzLg0KDQpJIHRoaW5rIC1pIHNob3VsZCBiYXNpY2FsbHkgYmUgbGVmdCB0aGUgc2FtZSAoYWx0
-aG91Z2ggdGhlIGNvbnRyb2xsZXIgaXRzZWxmIG1heSBuZWVkIHRvIGJlDQpxdWVyaWVkIGJlZm9y
-ZSBkZWNpZGluZyB3aGF0ICJjb250cm9sbGVyIHR5cGUiIGl0IGlzLiBIb3dldmVyLCBpZiBNR01U
-IGlzIGRvaW5nIGFsbCB0aGUgQ2FwDQpldmFsdWF0aW9uLCBpdCBjYW4gZG8gdGhhdCBieSBpdHNl
-bGYuICANCg0KDQpPbiBXZWQsIDIwMTktMDYtMTkgYXQgMTM6MjUgKzAyMDAsIE1pY2hhxYIgTG93
-YXMtUnplY2hvbmVrIHdyb3RlOg0KPiBUaGlzIGFsbG93cyBzcGVjaWZ5aW5nIGlvIHR5cGUgYW5k
-IG9wdGlvbnMgd2hlbiBpbnZva2luZyB0aGUgZGFlbW9uLg0KPiANCj4gQnkgZGVmYXVsdCwgbWVz
-aGQgcnVucyB3aXRoIE1FU0hfSU9fVFlQRV9HRU5FUklDIGFuZCB0cmllcyB0byBhdHRhY2ggdG8N
-Cj4gdGhlIGZpcnN0IGF2YWlsYWJsZSBIQ0kgaW50ZXJmYWNlLg0KPiAtLS0NCj4gIG1lc2gvbWFp
-bi5jIHwgNzMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
-LS0tLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCA1NiBpbnNlcnRpb25zKCspLCAxNyBkZWxldGlvbnMo
-LSkNCj4gDQo+IGRpZmYgLS1naXQgYS9tZXNoL21haW4uYyBiL21lc2gvbWFpbi5jDQo+IGluZGV4
-IDI2MmUzZGE0OC4uMjMzZDk1ZjMwIDEwMDY0NA0KPiAtLS0gYS9tZXNoL21haW4uYw0KPiArKysg
-Yi9tZXNoL21haW4uYw0KPiBAQCAtMzgsNyArMzgsNyBAQA0KPiAgI2luY2x1ZGUgIm1lc2gvbWVz
-aC1pby5oIg0KPiAgDQo+ICBzdGF0aWMgY29uc3Qgc3RydWN0IG9wdGlvbiBtYWluX29wdGlvbnNb
-XSA9IHsNCj4gLQl7ICJpbmRleCIsCXJlcXVpcmVkX2FyZ3VtZW50LAlOVUxMLCAnaScgfSwNCj4g
-Kwl7ICJpbyIsCQlyZXF1aXJlZF9hcmd1bWVudCwJTlVMTCwgJ2knIH0sDQo+ICAJeyAiY29uZmln
-IiwJb3B0aW9uYWxfYXJndW1lbnQsCU5VTEwsICdjJyB9LA0KPiAgCXsgIm5vZGV0YWNoIiwJbm9f
-YXJndW1lbnQsCQlOVUxMLCAnbicgfSwNCj4gIAl7ICJkZWJ1ZyIsCW5vX2FyZ3VtZW50LAkJTlVM
-TCwgJ2QnIH0sDQo+IEBAIC00OSwxNiArNDksMjIgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBvcHRp
-b24gbWFpbl9vcHRpb25zW10gPSB7DQo+ICANCj4gIHN0YXRpYyB2b2lkIHVzYWdlKHZvaWQpDQo+
-ICB7DQo+IC0JbF9pbmZvKCIiKTsNCj4gLQlsX2luZm8oIlVzYWdlOlxuIg0KPiArCWZwcmludGYo
-c3RkZXJyLA0KPiArCQkiVXNhZ2U6XG4iDQo+ICAJICAgICAgICJcdGJsdWV0b290aC1tZXNoZCBb
-b3B0aW9uc11cbiIpOw0KPiAtCWxfaW5mbygiT3B0aW9uczpcbiINCj4gLQkgICAgICAgIlx0LS1p
-bmRleCA8aGNpbnVtPiAgVXNlIHNwZWNpZmllZCBjb250cm9sbGVyXG4iDQo+ICsJZnByaW50Zihz
-dGRlcnIsDQo+ICsJCSJPcHRpb25zOlxuIg0KPiArCSAgICAgICAiXHQtLWlvPTxpbz4gICAgICAg
-ICBVc2Ugc3BlY2lmaWVkIGlvXG4iDQo+ICAJICAgICAgICJcdC0tY29uZmlnICAgICAgICAgIENv
-bmZpZ3VyYXRpb24gZGlyZWN0b3J5XG4iDQo+ICAJICAgICAgICJcdC0tbm9kZXRhY2ggICAgICAg
-IFJ1biBpbiBmb3JlZ3JvdW5kXG4iDQo+ICAJICAgICAgICJcdC0tZGVidWcgICAgICAgICAgIEVu
-YWJsZSBkZWJ1ZyBvdXRwdXRcbiINCj4gIAkgICAgICAgIlx0LS1kYnVzLWRlYnVnICAgICAgRW5h
-YmxlIEQtQnVzIGRlYnVnZ2luZ1xuIg0KPiAgCSAgICAgICAiXHQtLWhlbHAgICAgICAgICAgICBT
-aG93ICVzIGluZm9ybWF0aW9uXG4iLCBfX2Z1bmNfXyk7DQo+ICsJZnByaW50ZihzdGRlcnIsDQo+
-ICsJICAgICAgICJpbzpcbiINCj4gKwkgICAgICAgIlx0Z2VuZXJpY1s6PGluZGV4Pl1cbiINCj4g
-KwkgICAgICAgIlx0XHRVc2UgZ2VuZXJpYyBIQ0kgaW8gb24gaW50ZXJmYWNlIGhjaTxpbmRleD4s
-IG9yIHRoZSBmaXJzdFxuIg0KPiArCSAgICAgICAiXHRcdGF2YWlsYWJsZVxuIik7DQo+ICB9DQo+
-ICANCj4gIHN0YXRpYyB2b2lkIGRvX2RlYnVnKGNvbnN0IGNoYXIgKnN0ciwgdm9pZCAqdXNlcl9k
-YXRhKQ0KPiBAQCAtMTA3LDYgKzExMywzNyBAQCBzdGF0aWMgdm9pZCBzaWduYWxfaGFuZGxlcih1
-aW50MzJfdCBzaWdubywgdm9pZCAqdXNlcl9kYXRhKQ0KPiAgCXRlcm1pbmF0ZWQgPSB0cnVlOw0K
-PiAgfQ0KPiAgDQo+ICtzdGF0aWMgYm9vbCBwYXJzZV9pbyhjb25zdCBjaGFyICpvcHRhcmcsIGVu
-dW0gbWVzaF9pb190eXBlICp0eXBlLCB2b2lkICoqb3B0cykNCj4gK3sNCj4gKwlpZiAoc3Ryc3Ry
-KG9wdGFyZywgImdlbmVyaWMiKSA9PSBvcHRhcmcpIHsNCj4gKwkJaW50ICppbmRleCA9IGxfbmV3
-KGludCwgMSk7DQo+ICsNCj4gKwkJKnR5cGUgPSBNRVNIX0lPX1RZUEVfR0VORVJJQzsNCj4gKwkJ
-Km9wdHMgPSBpbmRleDsNCj4gKw0KPiArCQlvcHRhcmcgKz0gc3RybGVuKCJnZW5lcmljIik7DQo+
-ICsJCWlmICghKm9wdGFyZykgew0KPiArCQkJKmluZGV4ID0gTUdNVF9JTkRFWF9OT05FOw0KPiAr
-CQkJcmV0dXJuIHRydWU7DQo+ICsJCX0NCj4gKw0KPiArCQlpZiAoKm9wdGFyZyAhPSAnOicpDQo+
-ICsJCQlyZXR1cm4gZmFsc2U7DQo+ICsNCj4gKwkJb3B0YXJnKys7DQo+ICsNCj4gKwkJaWYgKHNz
-Y2FuZihvcHRhcmcsICJoY2klZCIsIGluZGV4KSA9PSAxKQ0KPiArCQkJcmV0dXJuIHRydWU7DQo+
-ICsNCj4gKwkJaWYgKHNzY2FuZihvcHRhcmcsICIlZCIsIGluZGV4KSA9PSAxKQ0KPiArCQkJcmV0
-dXJuIHRydWU7DQo+ICsNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArCX0NCj4gKw0KPiArCXJldHVy
-biBmYWxzZTsNCj4gK30NCj4gKw0KPiAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkN
-Cj4gIHsNCj4gIAlpbnQgc3RhdHVzOw0KPiBAQCAtMTE0LDcgKzE1MSw4IEBAIGludCBtYWluKGlu
-dCBhcmdjLCBjaGFyICphcmd2W10pDQo+ICAJYm9vbCBkYnVzX2RlYnVnID0gZmFsc2U7DQo+ICAJ
-c3RydWN0IGxfZGJ1cyAqZGJ1cyA9IE5VTEw7DQo+ICAJY29uc3QgY2hhciAqY29uZmlnX2RpciA9
-IE5VTEw7DQo+IC0JaW50IGluZGV4ID0gTUdNVF9JTkRFWF9OT05FOw0KPiArCWVudW0gbWVzaF9p
-b190eXBlIGlvX3R5cGUgPSBNRVNIX0lPX1RZUEVfTk9ORTsNCj4gKwl2b2lkICppb19vcHRzID0g
-TlVMTDsNCj4gIA0KPiAgCWlmICghbF9tYWluX2luaXQoKSkNCj4gIAkJcmV0dXJuIC0xOw0KPiBA
-QCAtMTIzLDcgKzE2MSw2IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQo+ICAN
-Cj4gIAlmb3IgKDs7KSB7DQo+ICAJCWludCBvcHQ7DQo+IC0JCWNvbnN0IGNoYXIgKnN0cjsNCj4g
-IA0KPiAgCQlvcHQgPSBnZXRvcHRfbG9uZyhhcmdjLCBhcmd2LCAiaTpjOm5kYmgiLCBtYWluX29w
-dGlvbnMsIE5VTEwpOw0KPiAgCQlpZiAob3B0IDwgMCkNCj4gQEAgLTEzMSwxOCArMTY4LDExIEBA
-IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQo+ICANCj4gIAkJc3dpdGNoIChvcHQp
-IHsNCj4gIAkJY2FzZSAnaSc6DQo+IC0JCQlpZiAoc3RybGVuKG9wdGFyZykgPiAzICYmICFzdHJu
-Y21wKG9wdGFyZywgImhjaSIsIDMpKQ0KPiAtCQkJCXN0ciA9IG9wdGFyZyArIDM7DQo+IC0JCQll
-bHNlDQo+IC0JCQkJc3RyID0gb3B0YXJnOw0KPiAtCQkJaWYgKCFpc2RpZ2l0KCpzdHIpKSB7DQo+
-IC0JCQkJbF9lcnJvcigiSW52YWxpZCBjb250cm9sbGVyIGluZGV4IHZhbHVlIik7DQo+ICsJCQlp
-ZiAoIXBhcnNlX2lvKG9wdGFyZywgJmlvX3R5cGUsICZpb19vcHRzKSkgew0KPiArCQkJCWxfZXJy
-b3IoIkludmFsaWQgaW86ICVzIiwgb3B0YXJnKTsNCj4gIAkJCQlzdGF0dXMgPSBFWElUX0ZBSUxV
-UkU7DQo+ICAJCQkJZ290byBkb25lOw0KPiAgCQkJfQ0KPiAtDQo+IC0JCQlpbmRleCA9IGF0b2ko
-c3RyKTsNCj4gLQ0KPiAgCQkJYnJlYWs7DQo+ICAJCWNhc2UgJ24nOg0KPiAgCQkJZGV0YWNoZWQg
-PSBmYWxzZTsNCj4gQEAgLTE2Nyw4ICsxOTcsMTQgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIg
-KmFyZ3ZbXSkNCj4gIAkJfQ0KPiAgCX0NCj4gIA0KPiArCWlmICgoaW9fdHlwZSA9PSBNRVNIX0lP
-X1RZUEVfTk9ORSkgJiYgIWlvX29wdHMpIHsNCj4gKwkJaW50ICppbmRleCA9IGxfbmV3KGludCwg
-MSk7DQo+ICsJCSppbmRleCA9IE1HTVRfSU5ERVhfTk9ORTsNCj4gKwkJaW9fdHlwZSA9IE1FU0hf
-SU9fVFlQRV9HRU5FUklDOw0KPiArCQlpb19vcHRzID0gaW5kZXg7DQo+ICsJfQ0KPiAgDQo+IC0J
-aWYgKCFtZXNoX2luaXQoY29uZmlnX2RpciwgTUVTSF9JT19UWVBFX0dFTkVSSUMsICZpbmRleCkp
-IHsNCj4gKwlpZiAoIW1lc2hfaW5pdChjb25maWdfZGlyLCBpb190eXBlLCBpb19vcHRzKSkgew0K
-PiAgCQlsX2Vycm9yKCJGYWlsZWQgdG8gaW5pdGlhbGl6ZSBtZXNoIik7DQo+ICAJCXN0YXR1cyA9
-IEVYSVRfRkFJTFVSRTsNCj4gIAkJZ290byBkb25lOw0KPiBAQCAtMTk4LDYgKzIzNCw5IEBAIGlu
-dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQo+ICAJc3RhdHVzID0gbF9tYWluX3J1bl93
-aXRoX3NpZ25hbChzaWduYWxfaGFuZGxlciwgTlVMTCk7DQo+ICANCj4gIGRvbmU6DQo+ICsJaWYg
-KGlvX29wdHMpDQo+ICsJCWxfZnJlZShpb19vcHRzKTsNCj4gKw0KPiAgCW1lc2hfY2xlYW51cCgp
-Ow0KPiAgCWxfZGJ1c19kZXN0cm95KGRidXMpOw0KPiAgCWxfbWFpbl9leGl0KCk7
+On Tue, May 21, 2019 at 12:53:07PM -0700, Matthias Kaehlcke wrote:
+> Firmware download to the WCN3990 often fails with a 'TLV response size
+> mismatch' error:
+> 
+> [  133.064659] Bluetooth: hci0: setting up wcn3990
+> [  133.489150] Bluetooth: hci0: QCA controller version 0x02140201
+> [  133.495245] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+> [  133.507214] Bluetooth: hci0: QCA TLV response size mismatch
+> [  133.513265] Bluetooth: hci0: QCA Failed to download patch (-84)
+> 
+> This is caused by a vendor event that corresponds to an earlier command
+> to change the baudrate. The event is not processed in the context of the
+> baudrate change and is later interpreted as response to the firmware
+> download command (which is also a vendor command), but the driver detects
+> that the event doesn't have the expected amount of associated data.
+> 
+> More details:
+> 
+> For the WCN3990 the vendor command for a baudrate change isn't sent as
+> synchronous HCI command, because the controller sends the corresponding
+> vendor event with the new baudrate. The event is received and decoded
+> after the baudrate change of the host port.
+> 
+> Identify the 'unused' event when it is received and don't add it to
+> the queue of RX frames.
+> 
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+
+ping
+
+Firmware download on WCN3990 is know to be broken for about 6
+months. Can we please either apply this patch or discuss possible
+alternatives? Doing nothing isn't really a great option :/ As
+mentioned earlier one alternative could be a delay at the right place
+with a comment why it is needed.
+
+Thanks
+
+Matthias
