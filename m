@@ -2,108 +2,239 @@ Return-Path: <SRS0=Kt1c=UU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DC5C43613
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B3FC43613
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jun 2019 09:12:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 882E320673
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jun 2019 08:59:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=endlessm-com.20150623.gappssmtp.com header.i=@endlessm-com.20150623.gappssmtp.com header.b="U/ePaK8t"
+	by mail.kernel.org (Postfix) with ESMTP id 28C06208C3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jun 2019 09:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbfFUI7B (ORCPT
+        id S1726414AbfFUJMJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jun 2019 04:59:01 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:37355 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726055AbfFUI7A (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jun 2019 04:59:00 -0400
-Received: by mail-pl1-f195.google.com with SMTP id bh12so2676167plb.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2019 01:59:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=endlessm-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4bJVSAowx8t/cxxp9cv6smvKfxDPXT8u9MmQ6mO3sDU=;
-        b=U/ePaK8tXP07xOTAuQcgBMObbVfGYNIWLv5JXHrC5etbmv0PLidyI7dGDcGub6NzPk
-         OHv9lW6GFHNXgrfDj3m5lUrYq1hQlVS1+MI3Lz7lHy2yCepJdruSBdccuJLfeIADbSNu
-         Ccq1sF1hvqdVW1wrYIylCbqe7GPkJsxHr739eJ/wDxzC68wt98mFKeubQM0N68ieAJXb
-         j731IoJKsTNL8rtnpEK5uXS78IuzD3DLUChHI/tD53j9VR3p03GFKeTGEyHUTQtGiCkn
-         DnVqEDj9m6TEjx4X8Ie79gZWjBtRuh70od7VZ8woEvshnFl5tqGU0wNflNQ5Bq4olbzn
-         oWbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4bJVSAowx8t/cxxp9cv6smvKfxDPXT8u9MmQ6mO3sDU=;
-        b=VOK15WOOZ3sVfui02dCO7F+ipw+M80V94eB1yJlY4in2dbBzHTAWUGvkHUoa7EGik6
-         q0aM3l4XFkxd+FVWnkhQKsjamBuBPqJUWCC4a/nC3agt+aDUeE+0DoYeMDV5Xzk1LNoB
-         N4gvJwr4k9muZFruhZfymEnlox/CtfauvrHKyykhw9toh9yGzeXBWfxuo2o9aF0TgYjZ
-         xgATUe/Qur6TLU0YsrYFiMRHVjo8TyJn5VCy59VCCM68eScjDTPxfdYC+Px+kcEVikgC
-         FvCYZW/REqH88D83TUZiVhKfyDk02KAPxqH4JvgGl5jpS7rhVd4mBhEWE1LAlzCVaJpF
-         ylkA==
-X-Gm-Message-State: APjAAAWnsgLOXKJGXBeWoYaKJyaCPLWqDD9/qUOb1lCp00ZdN34ojVYk
-        /LoVyz0pD7KrEpDlfo3l7GYGnw==
-X-Google-Smtp-Source: APXvYqx8jg2L3co0DYC0wN++64bpnfJeWPOTJom1WsTagX1aHyyqtbHPWcDS6G7HVNDTWBpYaIuMIA==
-X-Received: by 2002:a17:902:583:: with SMTP id f3mr66988266plf.137.1561107539850;
-        Fri, 21 Jun 2019 01:58:59 -0700 (PDT)
-Received: from localhost.localdomain (123-204-46-122.static.seed.net.tw. [123.204.46.122])
-        by smtp.gmail.com with ESMTPSA id y19sm1796356pfe.150.2019.06.21.01.58.57
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 21 Jun 2019 01:58:59 -0700 (PDT)
-From:   Jian-Hong Pan <jian-hong@endlessm.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Daniel Drake <drake@endlessm.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jian-Hong Pan <jian-hong@endlessm.com>
-Subject: [PATCH] Bluetooth: btrtl: HCI reset on close for RTL8822BE
-Date:   Fri, 21 Jun 2019 16:58:40 +0800
-Message-Id: <20190621085840.6341-1-jian-hong@endlessm.com>
-X-Mailer: git-send-email 2.22.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Fri, 21 Jun 2019 05:12:09 -0400
+Received: from mga12.intel.com ([192.55.52.136]:43673 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726404AbfFUJMJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 21 Jun 2019 05:12:09 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Jun 2019 02:12:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; 
+   d="scan'208";a="154396522"
+Received: from spoorthi-h97m-d3h.iind.intel.com ([10.223.96.21])
+  by orsmga008.jf.intel.com with ESMTP; 21 Jun 2019 02:12:08 -0700
+From:   spoorthix.k@intel.com
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] LE Privacy implementation
+Date:   Fri, 21 Jun 2019 14:51:41 +0530
+Message-Id: <1561108901-9475-1-git-send-email-spoorthix.k@intel.com>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Realtek RTL8822BE BT chip on ASUS X420FA cannot be turned on correctly
-after on-off several times.  Bluetooth daemon sets BT mode failed when
-this issue happens.
+From: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
 
-bluetoothd[1576]: Failed to set mode: Failed (0x03)
+As per Core specification 5.0, Vol 2, Part E, Section 7.8.38,
+following code changes implements LE add device to Resolving List.
+< HCI Command: LE Set Scan Pa.. (0x08|0x000b) plen 7  #3 [hci0] 06:08:22.083786
+        Type: Active (0x01)
+        Interval: 22.500 msec (0x0024)
+        Window: 11.250 msec (0x0012)
+        Own address type: Random (0x01)
+        Filter policy: Accept all advertisement (0x00)
+> HCI Event: Command Complete (0x0e) plen 4           #4 [hci0] 06:08:22.084498
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Add Devic.. (0x08|0x0027) plen 39  #26 [hci0] 06:08:30.646867
+        Address type: Random (0x01)
+        Address: E8:E9:93:AD:7E:A2 (Static)
+        Peer identity resolving key: 704baf18bc90ffffb83c2d40d2b0ffff
+        Local identity resolving key: 8e4902a3ffffffff0040af18bc90ffff
+> HCI Event: Command Complete (0x0e) plen 4          #27 [hci0] 06:08:30.647408
+      LE Add Device To Resolving List (0x08|0x0027) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan P.. (0x08|0x000b) plen 7  #28 [hci0] 06:08:30.647456
+        Type: Passive (0x00)
+        Interval: 60.000 msec (0x0060)
+        Window: 30.000 msec (0x0030)
+        Own address type: Public (0x00)
+        Filter policy: Accept all advertisement, inc. directed unresolved RPA (0x02)
+> HCI Event: Command Complete (0x0e) plen 4          #29 [hci0] 06:08:30.648901
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Create Co.. (0x08|0x000d) plen 25  #43 [hci0] 06:08:31.142393
+        Scan interval: 60.000 msec (0x0060)
+        Scan window: 60.000 msec (0x0060)
+        Filter policy: White list is not used (0x00)
+> HCI Event: Command Status (0x0f) plen 4            #44 [hci0] 06:08:31.144909
+      LE Create Connection (0x08|0x000d) ncmd 2
+        Status: Success (0x00)
+@ MGMT Command: Add Device (0x0033) plen 8      {0x0001} [hci0] 06:08:40.939043
+        LE Address: E8:E9:93:AD:7E:A2 (Static)
+        Action: Auto-connect remote device (0x02)
 
-If BT is tunred off, then turned on again, it works correctly again.
-This patch makes RTL8822BE BT reset on close to fix this issue.
-
-Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
+Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
 ---
- drivers/bluetooth/btrtl.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci.h |   1 +
+ net/bluetooth/hci_request.c | 119 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 119 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 208feef63de4..7e9930f0f231 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -608,10 +608,11 @@ int btrtl_download_firmware(struct hci_dev *hdev,
- 	case RTL_ROM_LMP_8723A:
- 	case RTL_ROM_LMP_3499:
- 		return btrtl_setup_rtl8723a(hdev, btrtl_dev);
-+	case RTL_ROM_LMP_8822B:
-+		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 	case RTL_ROM_LMP_8723B:
- 	case RTL_ROM_LMP_8821A:
- 	case RTL_ROM_LMP_8761A:
--	case RTL_ROM_LMP_8822B:
- 		return btrtl_setup_rtl8723b(hdev, btrtl_dev);
- 	default:
- 		rtl_dev_info(hdev, "rtl: assuming no firmware upload needed\n");
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c36dc1e..99a38cf36 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -420,6 +420,7 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_LL_PRIVACY		0x40
+ #define HCI_LE_PHY_2M			0x01
+ #define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_EXT_ADV			0x10
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index ca73d36..d4ecf71 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -773,6 +773,119 @@ static u8 update_white_list(struct hci_request *req)
+ 	return 0x01;
+ }
+ 
++static void add_to_resolve_list(struct hci_request *req,
++				struct hci_conn_params *params)
++{
++	struct hci_cp_le_add_to_resolv_list cp;
++	struct bdaddr_list_with_irk *entry;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return;
++
++	cp.bdaddr_type = params->addr_type;
++	bacpy(&cp.bdaddr, &params->addr);
++	memcpy(entry->peer_irk, cp.peer_irk, 16);
++	memcpy(entry->local_irk, cp.local_irk, 16);
++	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST, sizeof(cp), &cp);
++}
++
++static u8 update_resolve_list(struct hci_request *req)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_conn_params *params;
++	struct bdaddr_list *b;
++	uint8_t resolve_list_entries = 0;
++
++	/* Go through the current white list programmed into the
++	 * controller one by one and check if that address is still
++	 * in the list of pending connections or list of devices to
++	 * report. If not present in either list, then queue the
++	 * command to remove it from the controller.
++	 */
++	list_for_each_entry(b, &hdev->le_resolv_list, list) {
++		/* If the device is neither in pend_le_conns nor
++		 * pend_le_reports then remove it from the whitelist.
++		 */
++		if (!hci_pend_le_action_lookup(&hdev->pend_le_conns,
++                                               &b->bdaddr, b->bdaddr_type) &&
++                    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
++                                               &b->bdaddr, b->bdaddr_type)) {
++                        struct hci_cp_le_del_from_resolv_list cp;
++
++                        cp.bdaddr_type = b->bdaddr_type;
++                        bacpy(&cp.bdaddr, &b->bdaddr);
++
++                        hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
++                                    sizeof(cp), &cp);
++                        continue;
++                }
++
++                if (hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
++                        /* White list can not be used with RPAs */
++                        return 0x00;
++                }
++
++                resolve_list_entries++;
++        }
++
++       /* Since all no longer valid white list entries have been
++        * removed, walk through the list of pending connections
++        * and ensure that any new device gets programmed into
++        * the controller.
++        *
++        * If the list of the devices is larger than the list of
++        * available white list entries in the controller, then
++        * just abort and return filer policy value to not use the
++        * white list.
++        */
++       list_for_each_entry(params, &hdev->pend_le_conns, action) {
++               if (hci_bdaddr_list_lookup(&hdev->le_resolv_list,
++                                          &params->addr, params->addr_type))
++                       continue;
++
++                if (resolve_list_entries >= hdev->le_resolv_list_size) {
++                        /* Select filter policy to accept all advertising */
++                        return 0x00;
++                }
++
++                if (hci_find_irk_by_addr(hdev, &params->addr,
++                                         params->addr_type)) {
++                        /* White list can not be used with RPAs */
++                        return 0x02;
++                }
++
++                resolve_list_entries++;
++                add_to_resolve_list(req, params);
++        }
++
++        /* After adding all new pending connections, walk through
++         * the list of pending reports and also add these to the
++         * white list if there is still space.
++        */
++        list_for_each_entry(params, &hdev->pend_le_reports, action) {
++                if (hci_bdaddr_list_lookup(&hdev->le_resolv_list,
++                                           &params->addr, params->addr_type))
++                        continue;
++
++                if (resolve_list_entries >= hdev->le_resolv_list_size) {
++                        /* Select filter policy to accept all advertising */
++                        return 0x00;
++                }
++
++                if (hci_find_irk_by_addr(hdev, &params->addr,
++                                         params->addr_type)) {
++                        /* White list can not be used with RPAs */
++                        return 0x02;
++                }
++
++                resolve_list_entries++;
++                add_to_resolve_list(req, params);
++        }
++       /* Select filter policy to use white list */
++        return 0x02;
++}
++
+ static bool scan_use_rpa(struct hci_dev *hdev)
+ {
+ 	return hci_dev_test_flag(hdev, HCI_PRIVACY);
+@@ -876,7 +989,11 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	 * happen before enabling scanning. The controller does
+ 	 * not allow white list modification while scanning.
+ 	 */
+-	filter_policy = update_white_list(req);
++
++	if (!(hdev->le_features[0] & HCI_LE_LL_PRIVACY))
++		filter_policy = update_white_list(req);
++	else
++		filter_policy = update_resolve_list(req);
+ 
+ 	/* When the controller is using random resolvable addresses and
+ 	 * with that having LE privacy enabled, then controllers with
 -- 
-2.20.1
+1.9.1
 
