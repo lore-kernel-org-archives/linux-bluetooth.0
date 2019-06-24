@@ -2,116 +2,157 @@ Return-Path: <SRS0=obUF=UX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B929C48BE8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 06:24:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B66C43613
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 07:27:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 71E8121537
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 06:24:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=endlessm-com.20150623.gappssmtp.com header.i=@endlessm-com.20150623.gappssmtp.com header.b="ZjvM1TUi"
+	by mail.kernel.org (Postfix) with ESMTP id 5042E20674
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 07:27:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727625AbfFXGYg (ORCPT
+        id S1727170AbfFXH1V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Jun 2019 02:24:36 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:42471 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727618AbfFXGYf (ORCPT
+        Mon, 24 Jun 2019 03:27:21 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:36856 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727157AbfFXH1K (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Jun 2019 02:24:35 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q10so6889223pff.9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jun 2019 23:24:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=endlessm-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Pbnnd8izcGZKojl0PAuQtOXrWbhGmDWvjwa6KZ4Vaic=;
-        b=ZjvM1TUi/T4fCBeNXp+wj0GMAZG9W7FexedmAEwr1vitPQqPi7joKlwvTdV04cadzX
-         N8VEemayP0VA1MPMhMCF+AFWWGCgBvqWd/PhyqPUsPbPdAe47lgAhW0+QDNOyTePWMlo
-         nExvIHIOD02U8k6fMCrK/z+G3oQhZfHuCyNYNEKuotXFJsNzNiupZ3YKSBU2YzBjGiIi
-         rThnJz85t8oA7Jucp6u3j+j/kq6we+WgzdHh/cQI2A2eSMZiTQBP2JYXnlMJjzo28g8S
-         aXaIdl0wlQ4BeHDzYvEyFsrY1i9lpNXbbUB7Rv5UY8x8Msj1+FGGvfIYmpPNb4Fntk60
-         WhQg==
+        Mon, 24 Jun 2019 03:27:10 -0400
+Received: by mail-io1-f69.google.com with SMTP id k21so20924561ioj.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2019 00:27:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Pbnnd8izcGZKojl0PAuQtOXrWbhGmDWvjwa6KZ4Vaic=;
-        b=H4gzGWXzEiKagNzhqfjk107+tBKmnVwI4IG4awPq3Ke5PLfm0j+L1EZnkuSsKvfnET
-         L7ufAF8Lrosv1YdLtK+4YING/ny0MonfGXGyy3U0VlDjhOGTfF5LtQg20t94R0hFCq7p
-         gBS7iWVpsEXIGdLX2HX+QGsPXq2HOeuZ/m4NLvo2vdu7Av4WgyXU6sbrZ010auhZxqjx
-         Wg2H2eSiDTdUeCdj4kcVKBgIZVeI/S9JNmulAoXcJumER8YAaF49PtWK0ESAvssNgHfC
-         EF6qs6rvmXXHgpHrwEm5sqtPSzd2MiIeUxHeMJcBZX6yUTFuhp7JN3S1DZsUH30G5sTN
-         gUAQ==
-X-Gm-Message-State: APjAAAW73LZymREkSllOXrDA9MJ0xZQ9aajmeLSmpZrL3wGutC/UCz/x
-        UwAyRWbX7nFcAibR6uFIhF35aQ==
-X-Google-Smtp-Source: APXvYqzQQmPP8obThfTh2+jCJaqjHof51Bt4ABhyWSpN/apoVyHKuqn4uUHUbCTA38hKsdrNsLNzww==
-X-Received: by 2002:a17:90a:2385:: with SMTP id g5mr23432400pje.12.1561357474818;
-        Sun, 23 Jun 2019 23:24:34 -0700 (PDT)
-Received: from starnight.endlessm-sf.com (123-204-46-122.static.seed.net.tw. [123.204.46.122])
-        by smtp.gmail.com with ESMTPSA id r15sm14517333pfc.162.2019.06.23.23.24.32
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 23 Jun 2019 23:24:34 -0700 (PDT)
-From:   Jian-Hong Pan <jian-hong@endlessm.com>
-To:     Daniel Drake <drake@endlessm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jian-Hong Pan <jian-hong@endlessm.com>
-Subject: [PATCH v2] Bluetooth: btrtl: HCI reset on close for Realtek BT chip
-Date:   Mon, 24 Jun 2019 14:21:16 +0800
-Message-Id: <20190624062114.20303-1-jian-hong@endlessm.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <CAD8Lp44RP+ugBcDYkap3tUL1NSq+knGJbO9A6UAmCtcjPgxTQQ@mail.gmail.com>
-References: <CAD8Lp44RP+ugBcDYkap3tUL1NSq+knGJbO9A6UAmCtcjPgxTQQ@mail.gmail.com>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=YIBl5sn+qEAnvVG9RktF5oSe3uviRA0QejfBS359Mi8=;
+        b=suPRby/5V1e29gceCwNhW2Z7WDyL7LwLh1xIZk42z1aQC2KEsDUFnl7AmfM6lmnD1a
+         y4YThrUXdzhzfh7iuFg6SkPr0PtPHXwvFbKr3R8sbPVTQYw65w1F6Vi9kXPIVWcRAoJ0
+         LNo+zFU0CzzvyL+SsbCFVaCH5K2H7SzJ3mAb/u6jBlwJN3DQ9Nmje+NrbtwcxFBneZn5
+         Z32g1B26Pe6TAEut7SIkOovJpMZjyL5qrVW4jqMRYaHMnj6GcxESWd2X/IOAwrSnoKwf
+         TMT8ma3pxHmvHiexFY0ZoJgscNkItj57E1yTuT3WlXfL52pjoaI8G4MsLK6Q/hWwy10J
+         SZcw==
+X-Gm-Message-State: APjAAAU8sE6FISomSgPADYnPbX5zJM1+slHam9BKeSQjc70h1MPXSDDB
+        Wiizp+Al4nL7f/hYiJZIEYyobfoL9KoYDMYhA1VxVkK7FPfn
+X-Google-Smtp-Source: APXvYqw/SDM0pKIz2hztVK7kLGs1klUZUsrSE68p3+ZOknK6Pl2jz+INUj5tzF/BdQlh2jd5BSMqVorSU4vh1DYf07VoFiDkG6ah
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a6b:6b14:: with SMTP id g20mr40168187ioc.28.1561361228957;
+ Mon, 24 Jun 2019 00:27:08 -0700 (PDT)
+Date:   Mon, 24 Jun 2019 00:27:08 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006b1779058c0cbdda@google.com>
+Subject: memory leak in h4_recv_buf
+From:   syzbot <syzbot+97388eb9d31b997fe1d0@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Realtek RTL8822BE BT chip on ASUS X420FA cannot be turned on correctly
-after on-off several times. Bluetooth daemon sets BT mode failed when
-this issue happens.
+Hello,
 
-bluetoothd[1576]: Failed to set mode: Failed (0x03)
+syzbot found the following crash on:
 
-If BT is tunred off, then turned on again, it works correctly again.
+HEAD commit:    abf02e29 Merge tag 'pm-5.2-rc6' of git://git.kernel.org/pu..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1054e6b2a00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=56f1da14935c3cce
+dashboard link: https://syzkaller.appspot.com/bug?extid=97388eb9d31b997fe1d0
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1073d8aaa00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17b36fbea00000
 
-According to the vendor driver, the HCI_QUIRK_RESET_ON_CLOSE flag is set
-during probing. So, this patch makes Realtek's BT reset on close to fix
-this issue.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+97388eb9d31b997fe1d0@syzkaller.appspotmail.com
 
-Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
+program
+BUG: memory leak
+unreferenced object 0xffff88810991fa00 (size 224):
+   comm "syz-executor739", pid 7080, jiffies 4294949854 (age 18.640s)
+   hex dump (first 32 bytes):
+     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+   backtrace:
+     [<00000000da42c09f>] kmemleak_alloc_recursive  
+include/linux/kmemleak.h:43 [inline]
+     [<00000000da42c09f>] slab_post_alloc_hook mm/slab.h:439 [inline]
+     [<00000000da42c09f>] slab_alloc_node mm/slab.c:3269 [inline]
+     [<00000000da42c09f>] kmem_cache_alloc_node+0x153/0x2a0 mm/slab.c:3579
+     [<00000000f6fbcf84>] __alloc_skb+0x6e/0x210 net/core/skbuff.c:194
+     [<00000000ea93fc4c>] alloc_skb include/linux/skbuff.h:1054 [inline]
+     [<00000000ea93fc4c>] bt_skb_alloc include/net/bluetooth/bluetooth.h:339  
+[inline]
+     [<00000000ea93fc4c>] h4_recv_buf+0x26d/0x450  
+drivers/bluetooth/hci_h4.c:182
+     [<00000000e0312475>] h4_recv+0x51/0xb0 drivers/bluetooth/hci_h4.c:116
+     [<00000000ebf11fab>] hci_uart_tty_receive+0xba/0x200  
+drivers/bluetooth/hci_ldisc.c:592
+     [<0000000095e1216e>] tiocsti drivers/tty/tty_io.c:2195 [inline]
+     [<0000000095e1216e>] tty_ioctl+0x81c/0xa30 drivers/tty/tty_io.c:2571
+     [<000000009fa523f0>] vfs_ioctl fs/ioctl.c:46 [inline]
+     [<000000009fa523f0>] file_ioctl fs/ioctl.c:509 [inline]
+     [<000000009fa523f0>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
+     [<000000000cebb5d9>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
+     [<000000001630008a>] __do_sys_ioctl fs/ioctl.c:720 [inline]
+     [<000000001630008a>] __se_sys_ioctl fs/ioctl.c:718 [inline]
+     [<000000001630008a>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
+     [<00000000c62091e3>] do_syscall_64+0x76/0x1a0  
+arch/x86/entry/common.c:301
+     [<000000005c213625>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+BUG: memory leak
+unreferenced object 0xffff8881204f4400 (size 1024):
+   comm "syz-executor739", pid 7080, jiffies 4294949854 (age 18.640s)
+   hex dump (first 32 bytes):
+     6c 69 62 75 64 65 76 00 fe ed ca fe 28 00 00 00  libudev.....(...
+     28 00 00 00 a0 00 00 00 52 ca da 77 00 00 00 00  (.......R..w....
+   backtrace:
+     [<0000000034504843>] kmemleak_alloc_recursive  
+include/linux/kmemleak.h:43 [inline]
+     [<0000000034504843>] slab_post_alloc_hook mm/slab.h:439 [inline]
+     [<0000000034504843>] slab_alloc_node mm/slab.c:3269 [inline]
+     [<0000000034504843>] kmem_cache_alloc_node_trace+0x15b/0x2a0  
+mm/slab.c:3597
+     [<0000000056d30eb5>] __do_kmalloc_node mm/slab.c:3619 [inline]
+     [<0000000056d30eb5>] __kmalloc_node_track_caller+0x38/0x50  
+mm/slab.c:3634
+     [<00000000df40176c>] __kmalloc_reserve.isra.0+0x40/0xb0  
+net/core/skbuff.c:138
+     [<0000000035340e64>] __alloc_skb+0xa0/0x210 net/core/skbuff.c:206
+     [<00000000ea93fc4c>] alloc_skb include/linux/skbuff.h:1054 [inline]
+     [<00000000ea93fc4c>] bt_skb_alloc include/net/bluetooth/bluetooth.h:339  
+[inline]
+     [<00000000ea93fc4c>] h4_recv_buf+0x26d/0x450  
+drivers/bluetooth/hci_h4.c:182
+     [<00000000e0312475>] h4_recv+0x51/0xb0 drivers/bluetooth/hci_h4.c:116
+     [<00000000ebf11fab>] hci_uart_tty_receive+0xba/0x200  
+drivers/bluetooth/hci_ldisc.c:592
+     [<0000000095e1216e>] tiocsti drivers/tty/tty_io.c:2195 [inline]
+     [<0000000095e1216e>] tty_ioctl+0x81c/0xa30 drivers/tty/tty_io.c:2571
+     [<000000009fa523f0>] vfs_ioctl fs/ioctl.c:46 [inline]
+     [<000000009fa523f0>] file_ioctl fs/ioctl.c:509 [inline]
+     [<000000009fa523f0>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
+     [<000000000cebb5d9>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
+     [<000000001630008a>] __do_sys_ioctl fs/ioctl.c:720 [inline]
+     [<000000001630008a>] __se_sys_ioctl fs/ioctl.c:718 [inline]
+     [<000000001630008a>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
+     [<00000000c62091e3>] do_syscall_64+0x76/0x1a0  
+arch/x86/entry/common.c:301
+     [<000000005c213625>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+
+
 ---
-v2:
- - According to the vendor driver, it makes "all" Realtek's BT reset on
-   close. So, this version makes it the same.
- - Change to the new subject for all Realtek BT chips.
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- drivers/bluetooth/btrtl.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 208feef63de4..be6d5f7e1e44 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -630,6 +630,10 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
- 		return PTR_ERR(btrtl_dev);
- 
- 	ret = btrtl_download_firmware(hdev, btrtl_dev);
-+	/* According to the vendor driver, BT must be reset on close to avoid
-+	 * firmware crash since kernel v3.7.1.
-+	 */
-+	set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 
- 	btrtl_free(btrtl_dev);
- 
--- 
-2.22.0
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
