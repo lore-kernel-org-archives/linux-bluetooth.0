@@ -2,157 +2,101 @@ Return-Path: <SRS0=obUF=UX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B66C43613
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 07:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F10FC43613
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 07:32:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5042E20674
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 07:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74BEB20663
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 07:32:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="z/X62Zll"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727170AbfFXH1V (ORCPT
+        id S1727778AbfFXHcf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Jun 2019 03:27:21 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:36856 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727157AbfFXH1K (ORCPT
+        Mon, 24 Jun 2019 03:32:35 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:35269 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726323AbfFXHcf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Jun 2019 03:27:10 -0400
-Received: by mail-io1-f69.google.com with SMTP id k21so20924561ioj.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2019 00:27:09 -0700 (PDT)
+        Mon, 24 Jun 2019 03:32:35 -0400
+Received: by mail-lf1-f68.google.com with SMTP id a25so9262390lfg.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2019 00:32:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=UumPiBjFTuL4dc3jLD4Cp7hwqG00noau7fcysxyeln0=;
+        b=z/X62ZllUYMeC6RxHmhMUL6UUeX9Q7o/xCv5QjkvYGPdcY7aUK6AddgjQ7s+ury1L+
+         fcUr9DCbLSI03yMN0RnophG8ct/zDklyffj/K2DmhV3Gs1kBLK8HyUHbCuiCzFVQBCmm
+         A7oZABkahT0/5oC/JU6w5AkEIq7V55ic33p08X+i0IBZrg9DRueMvFlEOmaDD4F+MzUg
+         LYKIiDffup0Uglu4+Qa8CICiOvvo+mz0RwFqEapUZDQPKYPhrL71zsWoRWzwGsiqp9ah
+         TcAaNLSzPznbRlWdyyJR/zDs0IyfmO1q4uTZ6tERanWslH8NmK98pprpt7ZOahIwZFzC
+         IFAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=YIBl5sn+qEAnvVG9RktF5oSe3uviRA0QejfBS359Mi8=;
-        b=suPRby/5V1e29gceCwNhW2Z7WDyL7LwLh1xIZk42z1aQC2KEsDUFnl7AmfM6lmnD1a
-         y4YThrUXdzhzfh7iuFg6SkPr0PtPHXwvFbKr3R8sbPVTQYw65w1F6Vi9kXPIVWcRAoJ0
-         LNo+zFU0CzzvyL+SsbCFVaCH5K2H7SzJ3mAb/u6jBlwJN3DQ9Nmje+NrbtwcxFBneZn5
-         Z32g1B26Pe6TAEut7SIkOovJpMZjyL5qrVW4jqMRYaHMnj6GcxESWd2X/IOAwrSnoKwf
-         TMT8ma3pxHmvHiexFY0ZoJgscNkItj57E1yTuT3WlXfL52pjoaI8G4MsLK6Q/hWwy10J
-         SZcw==
-X-Gm-Message-State: APjAAAU8sE6FISomSgPADYnPbX5zJM1+slHam9BKeSQjc70h1MPXSDDB
-        Wiizp+Al4nL7f/hYiJZIEYyobfoL9KoYDMYhA1VxVkK7FPfn
-X-Google-Smtp-Source: APXvYqw/SDM0pKIz2hztVK7kLGs1klUZUsrSE68p3+ZOknK6Pl2jz+INUj5tzF/BdQlh2jd5BSMqVorSU4vh1DYf07VoFiDkG6ah
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=UumPiBjFTuL4dc3jLD4Cp7hwqG00noau7fcysxyeln0=;
+        b=LyrMzb5WD0J63QYiCaeN4EzRRp0oWP+fog/oFmHgl7Ec1z+SW5kOONeIZ7w7+Eh5D7
+         oF68tD+VyLSr6ZdBqfEe1zZJ/CCOb0DeW2A3vMZ2D97SnAFfWV60iLWJOWrhjvtLZ8gn
+         lAfIdTVroPdOC4vmBeftiluqNsvqBA8NHZyXE/Otc8JaPKMsrXgzkFBtYvZ8s42lJ71n
+         jBOZdKdnKS1LrFwlWy1z5tekDXqJM/kZHnza/uQC24xEQ1RumuE3or/8zljsLIMYJT5M
+         lBqlnN1Q/QJzyit0J5WnMhVu++zDDpa8uG5B+QOcDXF+oeJxZSfmlDds6+lDokbKlD+X
+         XZlA==
+X-Gm-Message-State: APjAAAWE2QYggwiyWZj/o3PVEk8iYqx+AOyBaSacfa/rwxtn6I2S4GWK
+        ecTOhkgxwGFBzCZf4hisVko+hLVeDCk=
+X-Google-Smtp-Source: APXvYqy6fonhV6uIi0ABWk00dCwJgHIU/ph6SwyLRb7PmlX922nvlQK9+TpRjhjdddsp02b6JTxqHg==
+X-Received: by 2002:ac2:42ca:: with SMTP id n10mr34724988lfl.121.1561361554011;
+        Mon, 24 Jun 2019 00:32:34 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id k4sm1609873ljg.59.2019.06.24.00.32.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 24 Jun 2019 00:32:33 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 0/2] mesh: Move HCI handling to mesh-io-generic
+Date:   Mon, 24 Jun 2019 09:32:27 +0200
+Message-Id: <20190624073229.8652-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-X-Received: by 2002:a6b:6b14:: with SMTP id g20mr40168187ioc.28.1561361228957;
- Mon, 24 Jun 2019 00:27:08 -0700 (PDT)
-Date:   Mon, 24 Jun 2019 00:27:08 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006b1779058c0cbdda@google.com>
-Subject: memory leak in h4_recv_buf
-From:   syzbot <syzbot+97388eb9d31b997fe1d0@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+This version of the patchset addresses Brian's comments.
+Thanks for the review!
 
-syzbot found the following crash on:
+First patch has a few style/convention corrections.
 
-HEAD commit:    abf02e29 Merge tag 'pm-5.2-rc6' of git://git.kernel.org/pu..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1054e6b2a00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=56f1da14935c3cce
-dashboard link: https://syzkaller.appspot.com/bug?extid=97388eb9d31b997fe1d0
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1073d8aaa00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17b36fbea00000
+Second patch now introduces --io option, but leaves --index working as
+it used to.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+97388eb9d31b997fe1d0@syzkaller.appspotmail.com
+Michał Lowas-Rzechonek (2):
+  mesh: Move HCI handling to mesh-io-generic
+  mesh: Added --io option
 
-program
-BUG: memory leak
-unreferenced object 0xffff88810991fa00 (size 224):
-   comm "syz-executor739", pid 7080, jiffies 4294949854 (age 18.640s)
-   hex dump (first 32 bytes):
-     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-   backtrace:
-     [<00000000da42c09f>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<00000000da42c09f>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<00000000da42c09f>] slab_alloc_node mm/slab.c:3269 [inline]
-     [<00000000da42c09f>] kmem_cache_alloc_node+0x153/0x2a0 mm/slab.c:3579
-     [<00000000f6fbcf84>] __alloc_skb+0x6e/0x210 net/core/skbuff.c:194
-     [<00000000ea93fc4c>] alloc_skb include/linux/skbuff.h:1054 [inline]
-     [<00000000ea93fc4c>] bt_skb_alloc include/net/bluetooth/bluetooth.h:339  
-[inline]
-     [<00000000ea93fc4c>] h4_recv_buf+0x26d/0x450  
-drivers/bluetooth/hci_h4.c:182
-     [<00000000e0312475>] h4_recv+0x51/0xb0 drivers/bluetooth/hci_h4.c:116
-     [<00000000ebf11fab>] hci_uart_tty_receive+0xba/0x200  
-drivers/bluetooth/hci_ldisc.c:592
-     [<0000000095e1216e>] tiocsti drivers/tty/tty_io.c:2195 [inline]
-     [<0000000095e1216e>] tty_ioctl+0x81c/0xa30 drivers/tty/tty_io.c:2571
-     [<000000009fa523f0>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<000000009fa523f0>] file_ioctl fs/ioctl.c:509 [inline]
-     [<000000009fa523f0>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000000cebb5d9>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<000000001630008a>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<000000001630008a>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<000000001630008a>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000c62091e3>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000005c213625>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+ Makefile.mesh          |   1 +
+ mesh/main.c            |  96 +++++++++++++++----
+ mesh/mesh-io-api.h     |   3 +-
+ mesh/mesh-io-generic.c |  63 ++++++++-----
+ mesh/mesh-io.c         |  15 ++-
+ mesh/mesh-io.h         |   2 +-
+ mesh/mesh-mgmt.c       | 204 +++++++++++++++++++++++++++++++++++++++++
+ mesh/mesh-mgmt.h       |  23 +++++
+ mesh/mesh.c            | 189 +++-----------------------------------
+ mesh/mesh.h            |   4 +-
+ 10 files changed, 370 insertions(+), 230 deletions(-)
+ create mode 100644 mesh/mesh-mgmt.c
+ create mode 100644 mesh/mesh-mgmt.h
 
-BUG: memory leak
-unreferenced object 0xffff8881204f4400 (size 1024):
-   comm "syz-executor739", pid 7080, jiffies 4294949854 (age 18.640s)
-   hex dump (first 32 bytes):
-     6c 69 62 75 64 65 76 00 fe ed ca fe 28 00 00 00  libudev.....(...
-     28 00 00 00 a0 00 00 00 52 ca da 77 00 00 00 00  (.......R..w....
-   backtrace:
-     [<0000000034504843>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<0000000034504843>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<0000000034504843>] slab_alloc_node mm/slab.c:3269 [inline]
-     [<0000000034504843>] kmem_cache_alloc_node_trace+0x15b/0x2a0  
-mm/slab.c:3597
-     [<0000000056d30eb5>] __do_kmalloc_node mm/slab.c:3619 [inline]
-     [<0000000056d30eb5>] __kmalloc_node_track_caller+0x38/0x50  
-mm/slab.c:3634
-     [<00000000df40176c>] __kmalloc_reserve.isra.0+0x40/0xb0  
-net/core/skbuff.c:138
-     [<0000000035340e64>] __alloc_skb+0xa0/0x210 net/core/skbuff.c:206
-     [<00000000ea93fc4c>] alloc_skb include/linux/skbuff.h:1054 [inline]
-     [<00000000ea93fc4c>] bt_skb_alloc include/net/bluetooth/bluetooth.h:339  
-[inline]
-     [<00000000ea93fc4c>] h4_recv_buf+0x26d/0x450  
-drivers/bluetooth/hci_h4.c:182
-     [<00000000e0312475>] h4_recv+0x51/0xb0 drivers/bluetooth/hci_h4.c:116
-     [<00000000ebf11fab>] hci_uart_tty_receive+0xba/0x200  
-drivers/bluetooth/hci_ldisc.c:592
-     [<0000000095e1216e>] tiocsti drivers/tty/tty_io.c:2195 [inline]
-     [<0000000095e1216e>] tty_ioctl+0x81c/0xa30 drivers/tty/tty_io.c:2571
-     [<000000009fa523f0>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<000000009fa523f0>] file_ioctl fs/ioctl.c:509 [inline]
-     [<000000009fa523f0>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000000cebb5d9>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<000000001630008a>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<000000001630008a>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<000000001630008a>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000c62091e3>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000005c213625>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+-- 
+2.19.1
 
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
