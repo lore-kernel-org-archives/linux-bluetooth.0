@@ -2,74 +2,143 @@ Return-Path: <SRS0=obUF=UX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD7FC43613
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 17:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 613B7C43613
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 17:41:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88DF420657
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 17:12:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F70220645
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 17:41:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732311AbfFXRMg convert rfc822-to-8bit (ORCPT
+        id S1727543AbfFXRlp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Jun 2019 13:12:36 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:58324 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731061AbfFXRMf (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Jun 2019 13:12:35 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 0B32528998
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2019 17:12:35 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id F363F28A0D; Mon, 24 Jun 2019 17:12:34 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Mon, 24 Jun 2019 13:41:45 -0400
+Received: from mga12.intel.com ([192.55.52.136]:27641 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726730AbfFXRlp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 Jun 2019 13:41:45 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jun 2019 10:41:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,412,1557212400"; 
+   d="scan'208";a="166394614"
+Received: from ingas-nuc1.sea.intel.com ([10.254.44.156])
+  by orsmga006.jf.intel.com with ESMTP; 24 Jun 2019 10:41:44 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Mon, 24 Jun 2019 17:12:30 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: raestloz@posteo.net
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-biZzk4zfPU@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/1] mesh: Modify check of the node directory name upon removal
+Date:   Mon, 24 Jun 2019 10:41:42 -0700
+Message-Id: <20190624174142.15920-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+This removes check for "mesh" as the parent directory name and, instead,
+verifies that the node configuration directory name is the hexadecimal
+string representating the node's UUID.
+---
+ mesh/storage.c | 39 +++++++++++++--------------------------
+ 1 file changed, 13 insertions(+), 26 deletions(-)
 
---- Comment #30 from raestloz@posteo.net ---
-Well, I tried to build a custom kernel (4.19.55) with my bcdDevice and LMP
-subversion included in the btusb.c file. 
-
-btmon shows promise, hcitool dev actually shows a device, but dmesg | grep
-tooth reveals that I'm stuck at HCI_OP_READ_LOCAL_VERSION, apparently it times
-out, reading hci0: command 0x1001 tx timeout and CSR: Local version failed
-(-110)
-
+diff --git a/mesh/storage.c b/mesh/storage.c
+index 1a9945aa8..54c985559 100644
+--- a/mesh/storage.c
++++ b/mesh/storage.c
+@@ -53,20 +53,6 @@ static const char *bak_ext = ".bak";
+ static const char *tmp_ext = ".tmp";
+ static const char *storage_dir;
+ 
+-/* This is a thread-safe always malloced version of dirname which will work
+- * regardless of which underlying dirname() implementation is used.
+- */
+-static char *alloc_dirname(const char *path)
+-{
+-	char *tmp = l_strdup(path);
+-	char *dir;
+-
+-	dir = dirname(tmp);
+-	strncpy(tmp, dir, strlen(path) + 1);
+-
+-	return tmp;
+-}
+-
+ static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
+ {
+ 	struct mesh_node *node = user_data;
+@@ -486,20 +472,20 @@ void storage_save_config(struct mesh_node *node, bool no_wait,
+ 		l_idle_oneshot(idle_save_config, info, NULL);
+ }
+ 
+-static int create_dir(const char *dirname)
++static int create_dir(const char *dir_name)
+ {
+ 	struct stat st;
+ 	char dir[PATH_MAX + 1], *prev, *next;
+ 	int err;
+ 
+-	err = stat(dirname, &st);
++	err = stat(dir_name, &st);
+ 	if (!err && S_ISREG(st.st_mode))
+ 		return 0;
+ 
+ 	memset(dir, 0, PATH_MAX + 1);
+ 	strcat(dir, "/");
+ 
+-	prev = strchr(dirname, '/');
++	prev = strchr(dir_name, '/');
+ 
+ 	while (prev) {
+ 		next = strchr(prev + 1, '/');
+@@ -517,7 +503,7 @@ static int create_dir(const char *dirname)
+ 		prev = next;
+ 	}
+ 
+-	mkdir(dirname, 0755);
++	mkdir(dir_name, 0755);
+ 
+ 	return 0;
+ }
+@@ -640,7 +626,8 @@ static int del_fobject(const char *fpath, const struct stat *sb, int typeflag,
+ /* Permanently remove node configuration */
+ void storage_remove_node_config(struct mesh_node *node)
+ {
+-	char *node_path, *mesh_path, *mesh_name;
++	char *node_path, *node_name;
++	char uuid[33];
+ 	struct json_object *jnode;
+ 
+ 	if (!node)
+@@ -656,13 +643,13 @@ void storage_remove_node_config(struct mesh_node *node)
+ 	l_debug("Delete node config %s", node_path);
+ 
+ 	/* Make sure path name of node follows expected guidelines */
+-	mesh_path = alloc_dirname(node_path);
+-	mesh_name = basename(mesh_path);
+-	if (strcmp(mesh_name, "mesh"))
+-		goto done;
++	if (!hex2str(node_uuid_get(node), 16, uuid, sizeof(uuid)))
++		return;
+ 
+-	nftw(node_path, del_fobject, 5, FTW_DEPTH | FTW_PHYS);
++	node_name = basename(node_path);
+ 
+-done:
+-	l_free(mesh_path);
++	if (strcmp(node_name, uuid))
++		return;
++
++	nftw(node_path, del_fobject, 5, FTW_DEPTH | FTW_PHYS);
+ }
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.21.0
+
