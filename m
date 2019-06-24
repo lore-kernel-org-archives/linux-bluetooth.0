@@ -2,654 +2,116 @@ Return-Path: <SRS0=obUF=UX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEXHASH_WORD,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A978C43613
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 05:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B929C48BE8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 06:24:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E60AF208CA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 05:14:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561353260;
-	bh=WVNKx0tYiANqz2FaJ2yV2xhEga4WYHdc62JG/TrbIrc=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=GuWZ+n7MtjunK4cs37Gc2thzu2Bmx1i9YSufwWn1y4VtFD/QJpCsyrALpzSdbj+ee
-	 oT1tFiLjJTAOutclVT24E0KvV2TJD9CT7sNAAWFEwBJYNgUBDzKGv6hUu56Ct+KVOZ
-	 b2ZABYJFiEgQZFSBwKI8/vmB7tZAtkTheH9txDTM=
+	by mail.kernel.org (Postfix) with ESMTP id 71E8121537
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jun 2019 06:24:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=endlessm-com.20150623.gappssmtp.com header.i=@endlessm-com.20150623.gappssmtp.com header.b="ZjvM1TUi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727314AbfFXFOO (ORCPT
+        id S1727625AbfFXGYg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Jun 2019 01:14:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51808 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726312AbfFXFON (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Jun 2019 01:14:13 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CF47E208C3;
-        Mon, 24 Jun 2019 05:14:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561353249;
-        bh=WVNKx0tYiANqz2FaJ2yV2xhEga4WYHdc62JG/TrbIrc=;
-        h=Date:From:To:Cc:Subject:From;
-        b=QPi5rz3dTYxuIzPKl/md+Uhqfp/fCzG96LoWm1YxGsRDWOVld5aO+ejbPmRAmx7ge
-         r0hCPCTEPJ4sax3m35mnZnZg7BZh7yOJT8HDTj9JSQYBKEfrUF0D5gWShojZpHJgqm
-         9EsA8Ezl5hSvGSCLTPs0lTaWlY+kmmU7gTv6DksY=
-Date:   Sun, 23 Jun 2019 22:14:07 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
+        Mon, 24 Jun 2019 02:24:36 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:42471 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727618AbfFXGYf (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 Jun 2019 02:24:35 -0400
+Received: by mail-pf1-f194.google.com with SMTP id q10so6889223pff.9
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jun 2019 23:24:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=endlessm-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Pbnnd8izcGZKojl0PAuQtOXrWbhGmDWvjwa6KZ4Vaic=;
+        b=ZjvM1TUi/T4fCBeNXp+wj0GMAZG9W7FexedmAEwr1vitPQqPi7joKlwvTdV04cadzX
+         N8VEemayP0VA1MPMhMCF+AFWWGCgBvqWd/PhyqPUsPbPdAe47lgAhW0+QDNOyTePWMlo
+         nExvIHIOD02U8k6fMCrK/z+G3oQhZfHuCyNYNEKuotXFJsNzNiupZ3YKSBU2YzBjGiIi
+         rThnJz85t8oA7Jucp6u3j+j/kq6we+WgzdHh/cQI2A2eSMZiTQBP2JYXnlMJjzo28g8S
+         aXaIdl0wlQ4BeHDzYvEyFsrY1i9lpNXbbUB7Rv5UY8x8Msj1+FGGvfIYmpPNb4Fntk60
+         WhQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Pbnnd8izcGZKojl0PAuQtOXrWbhGmDWvjwa6KZ4Vaic=;
+        b=H4gzGWXzEiKagNzhqfjk107+tBKmnVwI4IG4awPq3Ke5PLfm0j+L1EZnkuSsKvfnET
+         L7ufAF8Lrosv1YdLtK+4YING/ny0MonfGXGyy3U0VlDjhOGTfF5LtQg20t94R0hFCq7p
+         gBS7iWVpsEXIGdLX2HX+QGsPXq2HOeuZ/m4NLvo2vdu7Av4WgyXU6sbrZ010auhZxqjx
+         Wg2H2eSiDTdUeCdj4kcVKBgIZVeI/S9JNmulAoXcJumER8YAaF49PtWK0ESAvssNgHfC
+         EF6qs6rvmXXHgpHrwEm5sqtPSzd2MiIeUxHeMJcBZX6yUTFuhp7JN3S1DZsUH30G5sTN
+         gUAQ==
+X-Gm-Message-State: APjAAAW73LZymREkSllOXrDA9MJ0xZQ9aajmeLSmpZrL3wGutC/UCz/x
+        UwAyRWbX7nFcAibR6uFIhF35aQ==
+X-Google-Smtp-Source: APXvYqzQQmPP8obThfTh2+jCJaqjHof51Bt4ABhyWSpN/apoVyHKuqn4uUHUbCTA38hKsdrNsLNzww==
+X-Received: by 2002:a17:90a:2385:: with SMTP id g5mr23432400pje.12.1561357474818;
+        Sun, 23 Jun 2019 23:24:34 -0700 (PDT)
+Received: from starnight.endlessm-sf.com (123-204-46-122.static.seed.net.tw. [123.204.46.122])
+        by smtp.gmail.com with ESMTPSA id r15sm14517333pfc.162.2019.06.23.23.24.32
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sun, 23 Jun 2019 23:24:34 -0700 (PDT)
+From:   Jian-Hong Pan <jian-hong@endlessm.com>
+To:     Daniel Drake <drake@endlessm.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Loic Poulain <loic.poulain@intel.com>,
-        Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-Cc:     linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Reminder: 27 open syzbot bugs in bluetooth subsystem
-Message-ID: <20190624051407.GC30702@sol.localdomain>
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jian-Hong Pan <jian-hong@endlessm.com>
+Subject: [PATCH v2] Bluetooth: btrtl: HCI reset on close for Realtek BT chip
+Date:   Mon, 24 Jun 2019 14:21:16 +0800
+Message-Id: <20190624062114.20303-1-jian-hong@endlessm.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <CAD8Lp44RP+ugBcDYkap3tUL1NSq+knGJbO9A6UAmCtcjPgxTQQ@mail.gmail.com>
+References: <CAD8Lp44RP+ugBcDYkap3tUL1NSq+knGJbO9A6UAmCtcjPgxTQQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[This email was generated by a script.  Let me know if you have any suggestions
-to make it better.]
-
-Of the currently open syzbot reports against the upstream kernel, I've manually
-marked 27 of them as possibly being bugs in the bluetooth subsystem.  I've
-listed these reports below, sorted by an algorithm that tries to list first the
-reports most likely to be still valid, important, and actionable.
-
-Of these 27 bugs, 12 were seen in mainline in the last week.
-
-Of these 27 bugs, 3 were bisected to commits from the following people:
-
-	Loic Poulain <loic.poulain@intel.com>
-	Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-
-If you believe a bug is no longer valid, please close the syzbot report by
-sending a '#syz fix', '#syz dup', or '#syz invalid' command in reply to the
-original thread, as explained at https://goo.gl/tpsmEJ#status
-
-If you believe I misattributed a bug to the bluetooth subsystem, please let me
-know, and if possible forward the report to the correct people or mailing list.
-
-Here are the bugs:
-
---------------------------------------------------------------------------------
-Title:              WARNING in tty_set_termios
-Last occurred:      0 days ago
-Reported:           162 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
-Original thread:    https://lkml.kernel.org/lkml/000000000000bcd434057f4eb905@google.com/T/#u
-
-This bug has a C reproducer.
-
-This bug was bisected to:
-
-	commit 162f812f23bab583f5d514ca0e4df67797ac9cdf
-	Author: Loic Poulain <loic.poulain@intel.com>
-	Date:   Mon Sep 19 14:29:27 2016 +0000
-
-	  Bluetooth: hci_uart: Add Marvell support
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000bcd434057f4eb905@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING: refcount bug in kobject_get
-Last occurred:      1 day ago
-Reported:           286 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=06c8522152c9325bf0f1a3dc5b33d1b95a47431f
-Original thread:    https://lkml.kernel.org/lkml/00000000000037743205757f33ac@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+b74b8b6e712f33454561@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000037743205757f33ac@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in kernfs_get
-Last occurred:      0 days ago
-Reported:           286 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=b52dec65c1aaaec9b3893458b13a3304303de321
-Original thread:    https://lkml.kernel.org/lkml/000000000000f921ae05757f567c@google.com/T/#u
-
-This bug has a C reproducer.
-
-The original thread for this bug received 1 reply, 235 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+3dcb532381f98c86aeb1@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000f921ae05757f567c@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in skb_put
-Last occurred:      2 days ago
-Reported:           139 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=9abc0fdcdea0effb7b27984dbc1f336155cdad3f
-Original thread:    https://lkml.kernel.org/lkml/000000000000b9e68e0581142f19@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug received 4 replies; the last was 103 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+65788f9af9d54844389e@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000b9e68e0581142f19@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
-Last occurred:      1 day ago
-Reported:           109 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=381cb436fe60dc03d7fd2a092b46d7f09542a72a
-Original thread:    https://lkml.kernel.org/lkml/000000000000b7fd51058370d0d9@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug received 1 reply, 73 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+91fd909b6e62ebe06131@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000b7fd51058370d0d9@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: slab-out-of-bounds Read in hci_event_packet
-Last occurred:      1 day ago
-Reported:           167 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=d708485af9edc3af35f3b4d554e827c6c8bf6b0f
-Original thread:    https://lkml.kernel.org/lkml/000000000000696949057ee26e44@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+cec7a50c412a2c03f8f5@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000696949057ee26e44@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in kfree_skb (3)
-Last occurred:      1 day ago
-Reported:           47 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=db842327c655eab57b1755f661f1ab677d94e0bb
-Original thread:    https://lkml.kernel.org/lkml/0000000000002f9ef4058848f26d@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+dcb1305dd05699c40640@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000002f9ef4058848f26d@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in kernfs_add_one
-Last occurred:      7 days ago
-Reported:           280 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=c10f2ca5722a78c613e9ccd45af7877f5debf0ad
-Original thread:    https://lkml.kernel.org/lkml/000000000000bf6bd30575fec528@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+db1637662f412ac0d556@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000bf6bd30575fec528@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in rfcomm_dlc_exists
-Last occurred:      4 days ago
-Reported:           334 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=93ca265e594ab40b3d0e819cf24ba39e75d71fd6
-Original thread:    https://lkml.kernel.org/lkml/00000000000026c18a0571b9b0de@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+728bead095cef3335bb6@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000026c18a0571b9b0de@google.com
-
---------------------------------------------------------------------------------
-Title:              memory leak in bcsp_recv
-Last occurred:      2 days ago
-Reported:           29 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=84f71cc91e3c76e86a37858f87f0807ee8294deb
-Original thread:    https://lkml.kernel.org/lkml/00000000000013d4880589b9c7d3@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+98162c885993b72f19c4@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000013d4880589b9c7d3@google.com
-
---------------------------------------------------------------------------------
-Title:              memory leak in get_device_parent
-Last occurred:      2 days ago
-Reported:           27 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=63d2295ec374cc088d03cc83ad9c7a372a3d02e9
-Original thread:    https://lkml.kernel.org/lkml/0000000000009b950f0589e804b3@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+02e97e2ad931a981e568@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000009b950f0589e804b3@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in hci_cmd_timeout
-Last occurred:      4 days ago
-Reported:           47 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=cb23ebfc8f304f510fb717cb783fe8b496c7ffb1
-Original thread:    https://lkml.kernel.org/lkml/00000000000035c756058848954a@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+19a9f729f05272857487@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000035c756058848954a@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: unable to handle kernel NULL pointer dereference in hci_uart_set_flow_control
-Last occurred:      94 days ago
-Reported:           94 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
-Original thread:    https://lkml.kernel.org/lkml/00000000000017690505849d6b3c@google.com/T/#u
-
-This bug has a C reproducer.
-
-This bug was bisected to:
-
-	commit 162f812f23bab583f5d514ca0e4df67797ac9cdf
-	Author: Loic Poulain <loic.poulain@intel.com>
-	Date:   Mon Sep 19 14:29:27 2016 +0000
-
-	  Bluetooth: hci_uart: Add Marvell support
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000017690505849d6b3c@google.com
-
---------------------------------------------------------------------------------
-Title:              KMSAN: uninit-value in hci_event_packet
-Last occurred:      57 days ago
-Reported:           71 days ago
-Branches:           Mainline (with KMSAN patches)
-Dashboard link:     https://syzkaller.appspot.com/bug?id=fac3d7b25f0e5f3899e4b0dcec32bb3177c95718
-Original thread:    https://lkml.kernel.org/lkml/0000000000005bb0ae05867271c1@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+4918ee47ac82d51de00d@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000005bb0ae05867271c1@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in qca_setup
-Last occurred:      132 days ago
-Reported:           132 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=62aaa13b8b6bba7f5bca8c0defef34b9a1623135
-Original thread:    https://lkml.kernel.org/lkml/0000000000002996510581a1487e@google.com/T/#u
-
-This bug has a C reproducer.
-
-This bug was bisected to:
-
-	commit 0ff252c1976da5d80db1377eb39b551931e61826
-	Author: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-	Date:   Mon Aug 10 21:24:17 2015 +0000
-
-	  Bluetooth: hciuart: Add support QCA chipset for UART
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+8c0dbf8843bb75efaa05@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000002996510581a1487e@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: slab-out-of-bounds Read in bacpy
-Last occurred:      53 days ago
-Reported:           167 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=3acd1155d48a5acc5d76711568b04926945a6885
-Original thread:    https://lkml.kernel.org/lkml/0000000000008a1bce057ede3d13@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug received 6 replies; the last was 96 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000008a1bce057ede3d13@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING: ODEBUG bug in rfcomm_dlc_free
-Last occurred:      45 days ago
-Reported:           327 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=97b7072a02091741ffc58f97884ab91565fd97ce
-Original thread:    https://lkml.kernel.org/lkml/00000000000086f39e057245c3ac@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+1f6d4ad860c650c2f215@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000086f39e057245c3ac@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Write in hci_sock_release
-Last occurred:      170 days ago
-Reported:           243 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=47befb59c610a69f024db20b927dea80c88fc045
-Original thread:    https://lkml.kernel.org/lkml/0000000000003692760578e651dd@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug received 3 replies; the last was 90 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000003692760578e651dd@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in rfcomm_dlc_open (2)
-Last occurred:      33 days ago
-Reported:           61 days ago
-Branches:           net and net-next
-Dashboard link:     https://syzkaller.appspot.com/bug?id=19321b91aa70d43289d580eb8cbf21e6aecef64f
-Original thread:    https://lkml.kernel.org/lkml/000000000000876c89058734fc71@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+0b0fd24d40f358830891@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000876c89058734fc71@google.com
-
---------------------------------------------------------------------------------
-Title:              INFO: trying to register non-static key in hci_uart_send_frame
-Last occurred:      66 days ago
-Reported:           115 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=8aa05f314c1391e788221378935286690d49f482
-Original thread:    https://lkml.kernel.org/lkml/0000000000001913600582f91f5b@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+a8587ba69fc78395d947@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000001913600582f91f5b@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in kernfs_activate
-Last occurred:      68 days ago
-Reported:           47 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=059379fb4ac22ac01d4f2d658aaa6043ff021f42
-Original thread:    https://lkml.kernel.org/lkml/000000000000fd5e300588491545@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+1202f8882e4f4881d814@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000fd5e300588491545@google.com
-
---------------------------------------------------------------------------------
-Title:              INFO: trying to register non-static key in hci_uart_flush
-Last occurred:      133 days ago
-Reported:           132 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=9b359a901fde7f3eacc17249cbd613d35612e9aa
-Original thread:    https://lkml.kernel.org/lkml/0000000000006941590581a15637@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+e8cd9d8b4dfedf394390@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000006941590581a15637@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING: ODEBUG bug in hci_uart_tty_close
-Last occurred:      127 days ago
-Reported:           125 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=94b6786a5d26079c82301b2ec235ca4717884f4e
-Original thread:    https://lkml.kernel.org/lkml/0000000000005455bf058225e9c0@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+9fd324c8c2176a6022d3@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000005455bf058225e9c0@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in rfcomm_dlc_exists
-Last occurred:      51 days ago
-Reported:           47 days ago
-Branches:           net-next
-Dashboard link:     https://syzkaller.appspot.com/bug?id=1c4e5c426ab13696077aa6d0c67596e074605ffd
-Original thread:    https://lkml.kernel.org/lkml/0000000000009c83b005884900cf@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one has replied to the original thread for this bug yet.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+362be51217ce29d215bc@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000009c83b005884900cf@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in rfcomm_dlc_open
-Last occurred:      52 days ago
-Reported:           47 days ago
-Branches:           net-next
-Dashboard link:     https://syzkaller.appspot.com/bug?id=05e856115d50ca3d56e1fbea58b612a78877be65
-
-Unfortunately, this bug does not have a reproducer.
-
-For some reason the syzbot dashboard doesn't contain a link to the original
-thread for this bug, so my script couldn't provide a link to it in this
-reminder.  Try searching for the bug title.
-
---------------------------------------------------------------------------------
-Title:              WARNING in lockdep_register_key
-Last occurred:      98 days ago
-Reported:           113 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=5f34c586def64408fb57ee0fd898da67efda36c3
-Original thread:    https://lkml.kernel.org/lkml/000000000000baab660583172b5c@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+072814ec793ff1946da1@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000baab660583172b5c@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in idr_remove
-Last occurred:      131 days ago
-Reported:           131 days ago
-Branches:           linux-next
-Dashboard link:     https://syzkaller.appspot.com/bug?id=669469483cd7be33607ad681073484750f6f4c60
-Original thread:    https://lkml.kernel.org/lkml/00000000000023a7e70581b71894@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+3d07f0ffd652af4f49e6@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000023a7e70581b71894@google.com
+Realtek RTL8822BE BT chip on ASUS X420FA cannot be turned on correctly
+after on-off several times. Bluetooth daemon sets BT mode failed when
+this issue happens.
+
+bluetoothd[1576]: Failed to set mode: Failed (0x03)
+
+If BT is tunred off, then turned on again, it works correctly again.
+
+According to the vendor driver, the HCI_QUIRK_RESET_ON_CLOSE flag is set
+during probing. So, this patch makes Realtek's BT reset on close to fix
+this issue.
+
+Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
+---
+v2:
+ - According to the vendor driver, it makes "all" Realtek's BT reset on
+   close. So, this version makes it the same.
+ - Change to the new subject for all Realtek BT chips.
+
+ drivers/bluetooth/btrtl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 208feef63de4..be6d5f7e1e44 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -630,6 +630,10 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ 		return PTR_ERR(btrtl_dev);
+ 
+ 	ret = btrtl_download_firmware(hdev, btrtl_dev);
++	/* According to the vendor driver, BT must be reset on close to avoid
++	 * firmware crash since kernel v3.7.1.
++	 */
++	set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+ 
+ 	btrtl_free(btrtl_dev);
+ 
+-- 
+2.22.0
 
