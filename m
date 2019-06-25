@@ -2,89 +2,152 @@ Return-Path: <SRS0=Xyfj=UY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96956C48BD5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 16:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC60C48BD4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 17:32:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75B76208E3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 16:33:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6F5E20883
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 17:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727034AbfFYQdn convert rfc822-to-8bit (ORCPT
+        id S1731942AbfFYRcl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jun 2019 12:33:43 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:45210 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726420AbfFYQdn (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jun 2019 12:33:43 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id C781328397
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2019 16:33:42 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id B4BAD28426; Tue, 25 Jun 2019 16:33:42 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 203643] [REGRESSION][BISECTED] Sixaxis gamepad no longer
- connects via Bluetooth
-Date:   Tue, 25 Jun 2019 16:33:41 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: bluesun654@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-203643-62941-XlLj0iNUY3@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203643-62941@https.bugzilla.kernel.org/>
-References: <bug-203643-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 25 Jun 2019 13:32:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41254 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727652AbfFYRcl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 25 Jun 2019 13:32:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5ED6822387A;
+        Tue, 25 Jun 2019 17:32:35 +0000 (UTC)
+Received: from rules.brq.redhat.com (unknown [10.43.2.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 58C975D9D3;
+        Tue, 25 Jun 2019 17:32:33 +0000 (UTC)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com,
+        stable@vger.kernel.org, Loic Poulain <loic.poulain@intel.com>,
+        Ilya Faenson <ifaenson@broadcom.com>
+Subject: [PATCH] Bluetooth: hci_ldisc: check for missing tty operations
+Date:   Tue, 25 Jun 2019 19:32:15 +0200
+Message-Id: <20190625173215.25999-1-vdronov@redhat.com>
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 25 Jun 2019 17:32:40 +0000 (UTC)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203643
+Certain ttys lack operations (eg: pty_unix98_ops) which still can be
+called by certain hci uart proto (eg: mrvl, ath). Currently this leads
+to execution at address 0x0. Fix this by adding checks for missing tty
+operations.
 
-Scall (bluesun654@gmail.com) changed:
+Link: https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
+Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
+Cc: stable@vger.kernel.org # v2.6.39+
+Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+---
+ drivers/bluetooth/hci_ath.c   |  7 ++++-
+ drivers/bluetooth/hci_ldisc.c | 58 ++++++++++++++++++++---------------
+ 2 files changed, 39 insertions(+), 26 deletions(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |bluesun654@gmail.com
-
---- Comment #20 from Scall (bluesun654@gmail.com) ---
-(In reply to Andriy Perevortkin from comment #10)
-> Sadly the RFC patch above does not fix it for me, the revert does
-> The device is edifier w330nb headset.
-
-It also did not fix it for my two Sony DualShock 4 Wave Blue CUH-ZCT1 (the
-issue was reproducible with both), although it did for the following devices:
-* Sony DualShock 4 Glacier White CUH-ZCT1 (same generation as the Wave Blue
-ones);
-* Microsoft Bluetooth Mobile Keyboard 6000;
-* Memteq Bluetooth Optical Mouse.
-
-The only way to solve the issue for my two DualShock 4 Wave Blue was to revert
-the culprit commit, just like it has been done recently ->
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v5.1.10&id=b528880e8b0167c34cb36c1b4e6165192f76267c
-
-Just to confirm that patch does not work for all devices.
-
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index a55be205b91a..92d9bded5880 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -49,7 +49,12 @@ struct ath_vendor_cmd {
+ 
+ static int ath_wakeup_ar3k(struct tty_struct *tty)
+ {
+-	int status = tty->driver->ops->tiocmget(tty);
++	int status;
++
++	if (!(tty->driver->ops->tiocmget && tty->driver->ops->tiocmset))
++		return TIOCM_CTS;
++
++	status = tty->driver->ops->tiocmget(tty);
+ 
+ 	if (status & TIOCM_CTS)
+ 		return status;
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index c84f985f348d..29b4970f9bca 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -307,32 +307,40 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+ 		BT_DBG("Disabling hardware flow control: %s",
+ 		       status ? "failed" : "success");
+ 
+-		/* Clear RTS to prevent the device from sending */
+-		/* Most UARTs need OUT2 to enable interrupts */
+-		status = tty->driver->ops->tiocmget(tty);
+-		BT_DBG("Current tiocm 0x%x", status);
+-
+-		set &= ~(TIOCM_OUT2 | TIOCM_RTS);
+-		clear = ~set;
+-		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+-		       TIOCM_OUT2 | TIOCM_LOOP;
+-		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+-			 TIOCM_OUT2 | TIOCM_LOOP;
+-		status = tty->driver->ops->tiocmset(tty, set, clear);
+-		BT_DBG("Clearing RTS: %s", status ? "failed" : "success");
++		if (tty->driver->ops->tiocmget && tty->driver->ops->tiocmset) {
++			/* Clear RTS to prevent the device from sending */
++			/* Most UARTs need OUT2 to enable interrupts */
++			status = tty->driver->ops->tiocmget(tty);
++			BT_DBG("Current tiocm 0x%x", status);
++
++			set &= ~(TIOCM_OUT2 | TIOCM_RTS);
++			clear = ~set;
++			set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++			       TIOCM_OUT2 | TIOCM_LOOP;
++			clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++			         TIOCM_OUT2 | TIOCM_LOOP;
++			status = tty->driver->ops->tiocmset(tty, set, clear);
++			BT_DBG("Clearing RTS: %s",
++			       status ? "failed" : "success");
++		} else
++			BT_DBG("Terminal RTS control is not present");
+ 	} else {
+-		/* Set RTS to allow the device to send again */
+-		status = tty->driver->ops->tiocmget(tty);
+-		BT_DBG("Current tiocm 0x%x", status);
+-
+-		set |= (TIOCM_OUT2 | TIOCM_RTS);
+-		clear = ~set;
+-		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+-		       TIOCM_OUT2 | TIOCM_LOOP;
+-		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+-			 TIOCM_OUT2 | TIOCM_LOOP;
+-		status = tty->driver->ops->tiocmset(tty, set, clear);
+-		BT_DBG("Setting RTS: %s", status ? "failed" : "success");
++		if (tty->driver->ops->tiocmget && tty->driver->ops->tiocmset) {
++			/* Set RTS to allow the device to send again */
++			status = tty->driver->ops->tiocmget(tty);
++			BT_DBG("Current tiocm 0x%x", status);
++
++			set |= (TIOCM_OUT2 | TIOCM_RTS);
++			clear = ~set;
++			set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++			       TIOCM_OUT2 | TIOCM_LOOP;
++			clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++			         TIOCM_OUT2 | TIOCM_LOOP;
++			status = tty->driver->ops->tiocmset(tty, set, clear);
++			BT_DBG("Setting RTS: %s",
++			       status ? "failed" : "success");
++		} else
++			BT_DBG("Terminal RTS control is not present");
+ 
+ 		/* Re-enable hardware flow control */
+ 		ktermios = tty->termios;
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.20.1
+
