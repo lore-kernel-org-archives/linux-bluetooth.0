@@ -2,72 +2,68 @@ Return-Path: <SRS0=Xyfj=UY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6FFC48BD5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 08:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76491C48BD5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 11:25:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4BEF204EC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 08:32:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 407A020656
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jun 2019 11:25:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=endlessm-com.20150623.gappssmtp.com header.i=@endlessm-com.20150623.gappssmtp.com header.b="GAvjog6f"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Z9TP+jrA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730463AbfFYIcS (ORCPT
+        id S1728841AbfFYLZi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jun 2019 04:32:18 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36078 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729607AbfFYIcR (ORCPT
+        Tue, 25 Jun 2019 07:25:38 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:35064 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727887AbfFYLZi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jun 2019 04:32:17 -0400
-Received: by mail-pg1-f195.google.com with SMTP id f21so8598831pgi.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2019 01:32:17 -0700 (PDT)
+        Tue, 25 Jun 2019 07:25:38 -0400
+Received: by mail-lf1-f66.google.com with SMTP id a25so12367585lfg.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2019 04:25:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=endlessm-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=9eMlPVY24HiKoID6dzydanFhmPA3RfckjVd3enlhBYw=;
-        b=GAvjog6fXTPDm8Zj/MWi+YqqZvAXOnu6RbEkNm5o349sRyL41W4ik/hRY7MZ9xx+Zj
-         r+V8ygpCfaszrP2WT6vlf1gDMbfTIs6+qs5J326zeINqVZZwq8Vf7W6723NjW72iLWIx
-         6yuJ1584bkhDREJNIlLoAoShh0kDZZ0uf6vrqc5AdAVNJHk+rlQ0r9NYo727QxUYthpT
-         hKfzg66UwBRtiZMHKY6+q5n6qOJINCNxIDrudolIg/5so4DrZaQjwBuExdv8TC8axN1Y
-         lctI9cz/YQHcsY/eJ0s/O/2ESh/2GN0Kv39qjif83PqLKjwhz8/chzwX5YcX8e8EYr1/
-         lFvg==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=c/PpAKWApr2iPqAv22nVepO/MPcRLHhRovvaZUJ0fQo=;
+        b=Z9TP+jrASdP3rw6+Cx7FjEq6HQqr4SbtlSSW6jFuz89486R6s+WfuipxLd57JSL1A1
+         bgo6fFZ7Oci4aWa9Wg0TS0AJ2kdpma5f4RISq++FMLuvVtdJy8laEhLB1/8RkFtr6zIa
+         jZks7voBbWSOR9KozTsQhz59dR3Tg1lvlQ5SFM3Zrratc8lORPPrGcJntHJTl6/g+xCR
+         bz7y/gHePkLPyYwQpmETmIcliRNXxi8PMvDCH0b8/5iKfwsm+whk/2tHu+Yrz0dXThWy
+         dQcIrdlkNaQuAQQBNs0JHalZZu1lyORggj/QPxycghl/6sJGw+S513xs13WqKyfjbXA1
+         3o4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=9eMlPVY24HiKoID6dzydanFhmPA3RfckjVd3enlhBYw=;
-        b=HqbytdbMbvEG+w2a07H+bcWlJ115vDWZaSC6b3hm1B3Ajp1NsRzt/2erNiCRuaIde5
-         yQvH7Z6zt4WC1X+GMZl+5kYIDXG81GxVQQPIX3x428nIMNPbbOkTeapamxwDMNxAxd22
-         zm/ZG4ATIxfQDyBKn3RaOkPa2ZG3C12YCu4ai6CnuzU77xS5OhzI8OIbGDce8pu6BQ2j
-         pJt/puSeDf4M8rmtBj+N14iXrVqgiWWpCjSbq3wgZb+7kjvMx5Fcl7Dwl975i7KQNBT2
-         S+lbUNLZmCGUEROkPL8lgLG6x7PFaDdThzkgJTnkTUr8QZaRs4EvWrkhmrn5KTQRWbtI
-         s8Sw==
-X-Gm-Message-State: APjAAAVHNxbv65N1acUS69pYIRFUn+M3p7MieiI6xd4T0sV8z3UjugTH
-        0R0+sV1jf9I9YV6fOd1oigDlFg==
-X-Google-Smtp-Source: APXvYqygKfikzR6BYrFJoIc7Gzyz3ec9Ws4XQBmlsZcPC5rySKVVebr0h4ft47XGnakA39G74h7DNw==
-X-Received: by 2002:a17:90a:ca0f:: with SMTP id x15mr29575281pjt.82.1561451536737;
-        Tue, 25 Jun 2019 01:32:16 -0700 (PDT)
-Received: from localhost.localdomain (123-204-46-122.static.seed.net.tw. [123.204.46.122])
-        by smtp.gmail.com with ESMTPSA id v13sm14533710pfe.105.2019.06.25.01.32.14
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=c/PpAKWApr2iPqAv22nVepO/MPcRLHhRovvaZUJ0fQo=;
+        b=SeEPGG6WlTQgVFTsbVAGeMccAcPnaiymO7Uy+kN3vmShbw/YrRnhU6fFKJPcnPqz0Y
+         HHxfG72kNZ1msfCoaAjn3D5RFubyE4wyfiEp+e2eIaf3KWZK7Dn4jppogSr4n8CEpCHf
+         2gtwkcOrXykd/JqFv4bqqu5iUZOgBe+uxgwSvx4CvexLcXBz4EYSWQQ5LtRSeBq5CEmI
+         5mfMeV5btshPMqobZDMAs82uAygsmmcRLcEyZf4/r3gnhroq6arcQBUJeXAOB4VMgGge
+         QSbczBFAfvc8bEctTlS/2MdgnCGiDb75sFzW4fzhKGi4T/mIdO2eDcg78CTt3UKZd2JS
+         Fd8g==
+X-Gm-Message-State: APjAAAWZj27f0rxxyHtJ7IF8FQh6mmaezi2OpFNPSx51rzMVehk5mfrM
+        9BDQX5+x1xhpkFNChSvGOIo/8+eyl2Y=
+X-Google-Smtp-Source: APXvYqyy+8J8O6KeverQ9GbOqfbUKlVcuSlolvkqR9D+USG7TCRgvCxhZfD8ZGnt2uonRW0VFVhybQ==
+X-Received: by 2002:ac2:5981:: with SMTP id w1mr13712250lfn.48.1561461936351;
+        Tue, 25 Jun 2019 04:25:36 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id i195sm1895799lfi.87.2019.06.25.04.25.35
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 25 Jun 2019 01:32:16 -0700 (PDT)
-From:   Jian-Hong Pan <jian-hong@endlessm.com>
-To:     Daniel Drake <drake@endlessm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jian-Hong Pan <jian-hong@endlessm.com>
-Subject: [PATCH v3] Bluetooth: btrtl: HCI reset on close for Realtek BT chip
-Date:   Tue, 25 Jun 2019 16:30:51 +0800
-Message-Id: <20190625083051.7525-1-jian-hong@endlessm.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <B8AD29F1-444A-4BB7-8C12-9C31EB974D11@holtmann.org>
-References: <B8AD29F1-444A-4BB7-8C12-9C31EB974D11@holtmann.org>
+        Tue, 25 Jun 2019 04:25:35 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Brian Gix <brian.gix@intel.com>,
+        Jakub Witowski <jakub.witowski@silvair.com>
+Subject: [PATCH BlueZ] mesh: Honor IV Update flag in app layer crypto
+Date:   Tue, 25 Jun 2019 13:25:30 +0200
+Message-Id: <20190625112530.21870-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -75,105 +71,52 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Realtek RTL8822BE BT chip on ASUS X420FA cannot be turned on correctly
-after on-off several times. Bluetooth daemon sets BT mode failed when
-this issue happens. Scanning must be active while turning off for this
-bug to be hit.
-
-bluetoothd[1576]: Failed to set mode: Failed (0x03)
-
-If BT is turned off, then turned on again, it works correctly again.
-
-According to the vendor driver, the HCI_QUIRK_RESET_ON_CLOSE flag is set
-during probing. So, this patch makes Realtek's BT reset on close to fix
-this issue.
-
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=203429
-Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
+Since IV Index is used in application nonces, we need to honor IV Update
+flag not only in network layer crypto, but also in application layer.
+Otherwise, we cannot decode application payloads from nodes that are in
+IV Update state.
 ---
-v2:
- - According to the vendor driver, it makes "all" Realtek's BT reset on
-   close. So, this version makes it the same.
- - Change to the new subject for all Realtek BT chips.
+ mesh/net.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-v3:
- - Fix the commit message and add the bug link.
- - Have btrtl_shutdown_realtek() which sends HCI reset command and as
-   the callback function of hdev->shutdown for Realtek BT instead of
-   setting HCI_QUIRK_RESET_ON_CLOSE flag.
-
- drivers/bluetooth/btrtl.c | 20 ++++++++++++++++++++
- drivers/bluetooth/btrtl.h |  6 ++++++
- drivers/bluetooth/btusb.c |  1 +
- 3 files changed, 27 insertions(+)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 208feef63de4..d04b443cad1f 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -637,6 +637,26 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
- }
- EXPORT_SYMBOL_GPL(btrtl_setup_realtek);
+diff --git a/mesh/net.c b/mesh/net.c
+index a597b8794..1aa1c4cfa 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -2489,6 +2489,14 @@ static void net_rx(void *net_ptr, void *user_data)
+ 	size_t out_size;
+ 	uint32_t key_id;
+ 	int8_t rssi = 0;
++	uint32_t iv_index;
++	bool iv_flag = !!(net->iv_index & 1);
++	bool iv_pkt = !!(data->data[0] & 0x80);
++
++	if (iv_pkt == iv_flag)
++		iv_index = net->iv_index;
++	else
++		iv_index = net->iv_index - 1;
  
-+int btrtl_shutdown_realtek(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	int ret;
-+
-+	/* According to the vendor driver, BT must be reset on close to avoid
-+	 * firmware crash.
-+	 */
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		ret = PTR_ERR(skb);
-+		bt_dev_err(hdev, "HCI reset during shutdown failed");
-+		return ret;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btrtl_shutdown_realtek);
-+
- static unsigned int btrtl_convert_baudrate(u32 device_baudrate)
- {
- 	switch (device_baudrate) {
-diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-index f1676144fce8..10ad40c3e42c 100644
---- a/drivers/bluetooth/btrtl.h
-+++ b/drivers/bluetooth/btrtl.h
-@@ -55,6 +55,7 @@ void btrtl_free(struct btrtl_device_info *btrtl_dev);
- int btrtl_download_firmware(struct hci_dev *hdev,
- 			    struct btrtl_device_info *btrtl_dev);
- int btrtl_setup_realtek(struct hci_dev *hdev);
-+int btrtl_shutdown_realtek(struct hci_dev *hdev);
- int btrtl_get_uart_settings(struct hci_dev *hdev,
- 			    struct btrtl_device_info *btrtl_dev,
- 			    unsigned int *controller_baudrate,
-@@ -83,6 +84,11 @@ static inline int btrtl_setup_realtek(struct hci_dev *hdev)
- 	return -EOPNOTSUPP;
- }
+ 	key_id = net_key_decrypt(net->iv_index, data->data, data->len,
+ 							&out, &out_size);
+@@ -2504,16 +2512,10 @@ static void net_rx(void *net_ptr, void *user_data)
+ 		rssi = data->info->rssi;
+ 	}
  
-+static inline int btrtl_shutdown_realtek(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
- 					  struct btrtl_device_info *btrtl_dev,
- 					  unsigned int *controller_baudrate,
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 50aed5259c2b..342e1de6bcba 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3184,6 +3184,7 @@ static int btusb_probe(struct usb_interface *intf,
- #ifdef CONFIG_BT_HCIBTUSB_RTL
- 	if (id->driver_info & BTUSB_REALTEK) {
- 		hdev->setup = btrtl_setup_realtek;
-+		hdev->shutdown = btrtl_shutdown_realtek;
- 
- 		/* Realtek devices lose their updated firmware over suspend,
- 		 * but the USB hub doesn't notice any status change.
+-	relay_advice = packet_received(net, key_id, net->iv_index,
++	relay_advice = packet_received(net, key_id, iv_index,
+ 							out, out_size, rssi);
+ 	if (relay_advice > data->relay_advice) {
+-		bool iv_flag = !!(net->iv_index & 1);
+-		bool iv_pkt = !!(data->data[0] & 0x80);
+-
+-		data->iv_index = net->iv_index;
+-		if (iv_pkt != iv_flag)
+-			data->iv_index--;
+-
++		data->iv_index = iv_index;
+ 		data->relay_advice = relay_advice;
+ 		data->key_id = key_id;
+ 		data->net = net;
 -- 
-2.22.0
+2.19.1
 
