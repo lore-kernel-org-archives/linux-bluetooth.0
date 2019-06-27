@@ -2,99 +2,108 @@ Return-Path: <SRS0=8pQu=U2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A71FC48BD6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 15:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE53C48BD9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 17:20:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2DC72054F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 15:58:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="uDBBLAUQ"
+	by mail.kernel.org (Postfix) with ESMTP id 3B1DA20659
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 17:20:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726513AbfF0P6T (ORCPT
+        id S1726514AbfF0RUh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jun 2019 11:58:19 -0400
-Received: from mail-lf1-f54.google.com ([209.85.167.54]:44918 "EHLO
-        mail-lf1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726370AbfF0P6T (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jun 2019 11:58:19 -0400
-Received: by mail-lf1-f54.google.com with SMTP id r15so1903049lfm.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2019 08:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=HpCMC7TUABljT51JTu3RzvvF/L5Hk52YfzurL3ch5qI=;
-        b=uDBBLAUQ+rVcFp6lupJGvpjiC73gK/CN4ikpiXKWxEJEO0Q3MMoKXT+V7zLYSgQSgs
-         zZYKf1a4rcAHuw6qgEOX8myAjPXlkZivIGwPYuTbkb1QkYsmnxzZrNHcEMnpzbYTybCI
-         BWdyGefQ3esZO/U21nseXGoNXX6rP9cUeHZ4/kMbLdBqopbVhfLnwh31mxpKITbQnQP/
-         +Rag2/80hCnmByQjhNOCN4W35RpMpvkcxsneygNq0/Cg+A5FrdE0Mdo5tZ/vwOciK4O3
-         Sv1bX1Ih92IlCZYPWCQJpNskUcAWtzUlrYa+pEQK4ItnJmDpoYyHW8w3jkfSI0Sehu+K
-         jfIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=HpCMC7TUABljT51JTu3RzvvF/L5Hk52YfzurL3ch5qI=;
-        b=OhkxX70O81hxBZx6HxieuQHgAjZCwtEsW5pK/lxzW7bDsjjcYY/JWIci/6vDvDoh7I
-         PGrMrT7BjHnL9Lb67lohVgPJ7BxTrFfVOltzqYR8iyauMKKrmgl7McFvHZYafomddSWB
-         hdo8voSopsRzYBlGj+f60pQ9omQYHbWVPIaKePB6yVBtvCN1TeRG7V2YJRxaNfwf+Yp8
-         Z0vuy1dSSPny4mmkzcDxbcNXufjk9Mn1ek4ROm92faE1hCiqUBheDLqXj6hB0oB1Opa9
-         +9FwbYadDpTcR0RJ9GBamo+aKATnX62BHwXxiZhTtD1/lizeYU/qjIcIjpEEMKHaW3ts
-         bqqQ==
-X-Gm-Message-State: APjAAAWHRp5fcAInvj3S/E/vZLUNVDZB9UERBC+XQmVNh1bGt7Yv6AGx
-        ejymbacNOZTGHlPyDT0ugDVOuscACho=
-X-Google-Smtp-Source: APXvYqwIAdBraE9de9Hc8u7VGMJO+qv4B6Une4t9V6vxC3jLhhIm8M+opVrDvTaTzmvAq/pWl3vhlg==
-X-Received: by 2002:a19:490d:: with SMTP id w13mr2421367lfa.58.1561651096924;
-        Thu, 27 Jun 2019 08:58:16 -0700 (PDT)
-Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
-        by smtp.gmail.com with ESMTPSA id y12sm500761lfy.36.2019.06.27.08.58.15
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 27 Jun 2019 08:58:16 -0700 (PDT)
-Date:   Thu, 27 Jun 2019 17:58:14 +0200
-From:   Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v3 2/2] mesh: Use current IV Index when relaying
-Message-ID: <20190627155814.iyxx3a6vezpvlney@kynes>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
+        Thu, 27 Jun 2019 13:20:37 -0400
+Received: from mga09.intel.com ([134.134.136.24]:59490 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726502AbfF0RUh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 27 Jun 2019 13:20:37 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 10:20:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,424,1557212400"; 
+   d="scan'208";a="170488629"
+Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
+  by FMSMGA003.fm.intel.com with ESMTP; 27 Jun 2019 10:20:36 -0700
+Received: from orsmsx161.amr.corp.intel.com (10.22.240.84) by
+ ORSMSX109.amr.corp.intel.com (10.22.240.7) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 27 Jun 2019 10:20:36 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
+ ORSMSX161.amr.corp.intel.com ([169.254.4.81]) with mapi id 14.03.0439.000;
+ Thu, 27 Jun 2019 10:20:36 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ v3 1/2] mesh: Fixed handling of IVI flag in app
+ layer
+Thread-Topic: [PATCH BlueZ v3 1/2] mesh: Fixed handling of IVI flag in app
+ layer
+Thread-Index: AQHVLLun/UkyRLA3qk+2vV86WCLBk6awNSMA
+Date:   Thu, 27 Jun 2019 17:20:36 +0000
+Message-ID: <1561656034.7802.7.camel@intel.com>
 References: <20190627074043.22891-1-michal.lowas-rzechonek@silvair.com>
- <20190627074043.22891-3-michal.lowas-rzechonek@silvair.com>
- <DEBB0CAA2616974FAE35E4B560B9A4376CBB1464@ORSMSX103.amr.corp.intel.com>
+         <20190627074043.22891-2-michal.lowas-rzechonek@silvair.com>
+In-Reply-To: <20190627074043.22891-2-michal.lowas-rzechonek@silvair.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.255.80.171]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9E381C635F58964E8285101D4BCADB5B@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4376CBB1464@ORSMSX103.amr.corp.intel.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Brian,
-
-On 06/27, Gix, Brian wrote:
-> I don't think this is correct.  *relayed* packets must preserve the
-> originators IV_Index...
-
-Correct. I realized my mistake and quoted the appropriate section of the
-spec - there is a message about it on the list.
-
-The other patch stands, though - as it happens, our network is in the
-middle of IV Update at the moment and I've been getting failures about
-decrypting application payloads.
-
-cheers
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+UGF0Y2ggYXBwbGllZCwgVGhhbmtzLg0KDQoNCk9uIFRodSwgMjAxOS0wNi0yNyBhdCAwOTo0MCAr
+MDIwMCwgTWljaGHFgiBMb3dhcy1SemVjaG9uZWsgd3JvdGU6DQo+IFNpbmNlIElWIEluZGV4IGlz
+IHVzZWQgaW4gYXBwbGljYXRpb24gbm9uY2VzLCB3ZSBuZWVkIHRvIGhvbm9yIElWSSBmbGFnDQo+
+IG5vdCBvbmx5IGluIG5ldHdvcmsgbGF5ZXIgY3J5cHRvLCBidXQgYWxzbyBpbiBhcHBsaWNhdGlv
+biBsYXllci4NCj4gDQo+IFRoaXMgbWVhbnMgdGhhdCBpZiBJVkkgZmllbGQgb2YgaW5jb21pbmcg
+cGFja2V0IGlzIGRpZmZlcmVudCB0aGFuIGluDQo+IGN1cnJlbnQgSVYgSW5kZXgsIHRyeSB0byBk
+ZWNvZGUgKmJvdGgqIG5ldCBhbmQgYXBwIGxheWVycyB1c2luZyBJViBJbmRleA0KPiBkZWNyZWFz
+ZWQgYnkgb25lLg0KPiAtLS0NCj4gIG1lc2gvbmV0LWtleXMuYyB8ICA2IC0tLS0tLQ0KPiAgbWVz
+aC9uZXQuYyAgICAgIHwgMTcgKysrKysrKystLS0tLS0tLS0NCj4gIDIgZmlsZXMgY2hhbmdlZCwg
+OCBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9tZXNo
+L25ldC1rZXlzLmMgYi9tZXNoL25ldC1rZXlzLmMNCj4gaW5kZXggMjVmNGNhZWI3Li41YmU3ZTBi
+NTggMTAwNjQ0DQo+IC0tLSBhL21lc2gvbmV0LWtleXMuYw0KPiArKysgYi9tZXNoL25ldC1rZXlz
+LmMNCj4gQEAgLTIwOSwxMiArMjA5LDYgQEAgc3RhdGljIHZvaWQgZGVjcnlwdF9uZXRfcGt0KHZv
+aWQgKmEsIHZvaWQgKmIpDQo+ICB1aW50MzJfdCBuZXRfa2V5X2RlY3J5cHQodWludDMyX3QgaXZf
+aW5kZXgsIGNvbnN0IHVpbnQ4X3QgKnBrdCwgc2l6ZV90IGxlbiwNCj4gIAkJCQkJdWludDhfdCAq
+KnBsYWluLCBzaXplX3QgKnBsYWluX2xlbikNCj4gIHsNCj4gLQlib29sIGl2X2ZsYWcgPSAhIShp
+dl9pbmRleCAmIDEpOw0KPiAtCWJvb2wgaXZfcGt0ID0gISEocGt0WzBdICYgMHg4MCk7DQo+IC0N
+Cj4gLQlpZiAoaXZfcGt0ICE9IGl2X2ZsYWcpDQo+IC0JCWl2X2luZGV4LS07DQo+IC0NCj4gIAkv
+KiBJZiB3ZSBhbHJlYWR5IHN1Y2Nlc3NmdWxseSBkZWNyeXB0ZWQgdGhpcyBwYWNrZXQsIHVzZSBj
+YWNoZWQgZGF0YSAqLw0KPiAgCWlmIChjYWNoZV9pZCAmJiBjYWNoZV9sZW4gPT0gbGVuICYmICFt
+ZW1jbXAocGt0LCBjYWNoZV9wa3QsIGxlbikpIHsNCj4gIAkJLyogSVYgSW5kZXggbXVzdCBtYXRj
+aCB3aGF0IHdhcyB1c2VkIHRvIGRlY3J5cHQgKi8NCj4gZGlmZiAtLWdpdCBhL21lc2gvbmV0LmMg
+Yi9tZXNoL25ldC5jDQo+IGluZGV4IGE1OTdiODc5NC4uYTU2OTNmMTU0IDEwMDY0NA0KPiAtLS0g
+YS9tZXNoL25ldC5jDQo+ICsrKyBiL21lc2gvbmV0LmMNCj4gQEAgLTI0ODksOCArMjQ4OSwxMyBA
+QCBzdGF0aWMgdm9pZCBuZXRfcngodm9pZCAqbmV0X3B0ciwgdm9pZCAqdXNlcl9kYXRhKQ0KPiAg
+CXNpemVfdCBvdXRfc2l6ZTsNCj4gIAl1aW50MzJfdCBrZXlfaWQ7DQo+ICAJaW50OF90IHJzc2kg
+PSAwOw0KPiArCWJvb2wgaXZpX25ldCA9ICEhKG5ldC0+aXZfaW5kZXggJiAxKTsNCj4gKwlib29s
+IGl2aV9wa3QgPSAhIShkYXRhLT5kYXRhWzBdICYgMHg4MCk7DQo+ICANCj4gLQlrZXlfaWQgPSBu
+ZXRfa2V5X2RlY3J5cHQobmV0LT5pdl9pbmRleCwgZGF0YS0+ZGF0YSwgZGF0YS0+bGVuLA0KPiAr
+CS8qIGlmIElWSSBmbGFnIGRpZmZlcnMsIHVzZSBwcmV2aW91cyBJViBJbmRleCAqLw0KPiArCXVp
+bnQzMl90IGl2X2luZGV4ID0gbmV0LT5pdl9pbmRleCAtIChpdmlfcGt0IF4gaXZpX25ldCk7DQo+
+ICsNCj4gKwlrZXlfaWQgPSBuZXRfa2V5X2RlY3J5cHQoaXZfaW5kZXgsIGRhdGEtPmRhdGEsIGRh
+dGEtPmxlbiwNCj4gIAkJCQkJCQkmb3V0LCAmb3V0X3NpemUpOw0KPiAgDQo+ICAJaWYgKCFrZXlf
+aWQpDQo+IEBAIC0yNTA0LDE2ICsyNTA5LDEwIEBAIHN0YXRpYyB2b2lkIG5ldF9yeCh2b2lkICpu
+ZXRfcHRyLCB2b2lkICp1c2VyX2RhdGEpDQo+ICAJCXJzc2kgPSBkYXRhLT5pbmZvLT5yc3NpOw0K
+PiAgCX0NCj4gIA0KPiAtCXJlbGF5X2FkdmljZSA9IHBhY2tldF9yZWNlaXZlZChuZXQsIGtleV9p
+ZCwgbmV0LT5pdl9pbmRleCwNCj4gKwlyZWxheV9hZHZpY2UgPSBwYWNrZXRfcmVjZWl2ZWQobmV0
+LCBrZXlfaWQsIGl2X2luZGV4LA0KPiAgCQkJCQkJCW91dCwgb3V0X3NpemUsIHJzc2kpOw0KPiAg
+CWlmIChyZWxheV9hZHZpY2UgPiBkYXRhLT5yZWxheV9hZHZpY2UpIHsNCj4gLQkJYm9vbCBpdl9m
+bGFnID0gISEobmV0LT5pdl9pbmRleCAmIDEpOw0KPiAtCQlib29sIGl2X3BrdCA9ICEhKGRhdGEt
+PmRhdGFbMF0gJiAweDgwKTsNCj4gLQ0KPiAtCQlkYXRhLT5pdl9pbmRleCA9IG5ldC0+aXZfaW5k
+ZXg7DQo+IC0JCWlmIChpdl9wa3QgIT0gaXZfZmxhZykNCj4gLQkJCWRhdGEtPml2X2luZGV4LS07
+DQo+IC0NCj4gKwkJZGF0YS0+aXZfaW5kZXggPSBpdl9pbmRleDsNCj4gIAkJZGF0YS0+cmVsYXlf
+YWR2aWNlID0gcmVsYXlfYWR2aWNlOw0KPiAgCQlkYXRhLT5rZXlfaWQgPSBrZXlfaWQ7DQo+ICAJ
+CWRhdGEtPm5ldCA9IG5ldDs=
