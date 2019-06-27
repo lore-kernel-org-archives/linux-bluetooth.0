@@ -2,102 +2,99 @@ Return-Path: <SRS0=8pQu=U2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F73C48BD6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 15:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A71FC48BD6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 15:58:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1677420656
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 15:38:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2DC72054F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 15:58:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="uDBBLAUQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbfF0PiT convert rfc822-to-8bit (ORCPT
+        id S1726513AbfF0P6T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jun 2019 11:38:19 -0400
-Received: from mga07.intel.com ([134.134.136.100]:53161 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726470AbfF0PiT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jun 2019 11:38:19 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 08:38:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,424,1557212400"; 
-   d="scan'208";a="361198575"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
-  by fmsmga006.fm.intel.com with ESMTP; 27 Jun 2019 08:38:18 -0700
-Received: from orsmsx124.amr.corp.intel.com (10.22.240.120) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 27 Jun 2019 08:38:18 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX124.amr.corp.intel.com ([169.254.2.150]) with mapi id 14.03.0439.000;
- Thu, 27 Jun 2019 08:38:18 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>,
+        Thu, 27 Jun 2019 11:58:19 -0400
+Received: from mail-lf1-f54.google.com ([209.85.167.54]:44918 "EHLO
+        mail-lf1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726370AbfF0P6T (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 27 Jun 2019 11:58:19 -0400
+Received: by mail-lf1-f54.google.com with SMTP id r15so1903049lfm.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2019 08:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=HpCMC7TUABljT51JTu3RzvvF/L5Hk52YfzurL3ch5qI=;
+        b=uDBBLAUQ+rVcFp6lupJGvpjiC73gK/CN4ikpiXKWxEJEO0Q3MMoKXT+V7zLYSgQSgs
+         zZYKf1a4rcAHuw6qgEOX8myAjPXlkZivIGwPYuTbkb1QkYsmnxzZrNHcEMnpzbYTybCI
+         BWdyGefQ3esZO/U21nseXGoNXX6rP9cUeHZ4/kMbLdBqopbVhfLnwh31mxpKITbQnQP/
+         +Rag2/80hCnmByQjhNOCN4W35RpMpvkcxsneygNq0/Cg+A5FrdE0Mdo5tZ/vwOciK4O3
+         Sv1bX1Ih92IlCZYPWCQJpNskUcAWtzUlrYa+pEQK4ItnJmDpoYyHW8w3jkfSI0Sehu+K
+         jfIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=HpCMC7TUABljT51JTu3RzvvF/L5Hk52YfzurL3ch5qI=;
+        b=OhkxX70O81hxBZx6HxieuQHgAjZCwtEsW5pK/lxzW7bDsjjcYY/JWIci/6vDvDoh7I
+         PGrMrT7BjHnL9Lb67lohVgPJ7BxTrFfVOltzqYR8iyauMKKrmgl7McFvHZYafomddSWB
+         hdo8voSopsRzYBlGj+f60pQ9omQYHbWVPIaKePB6yVBtvCN1TeRG7V2YJRxaNfwf+Yp8
+         Z0vuy1dSSPny4mmkzcDxbcNXufjk9Mn1ek4ROm92faE1hCiqUBheDLqXj6hB0oB1Opa9
+         +9FwbYadDpTcR0RJ9GBamo+aKATnX62BHwXxiZhTtD1/lizeYU/qjIcIjpEEMKHaW3ts
+         bqqQ==
+X-Gm-Message-State: APjAAAWHRp5fcAInvj3S/E/vZLUNVDZB9UERBC+XQmVNh1bGt7Yv6AGx
+        ejymbacNOZTGHlPyDT0ugDVOuscACho=
+X-Google-Smtp-Source: APXvYqwIAdBraE9de9Hc8u7VGMJO+qv4B6Une4t9V6vxC3jLhhIm8M+opVrDvTaTzmvAq/pWl3vhlg==
+X-Received: by 2002:a19:490d:: with SMTP id w13mr2421367lfa.58.1561651096924;
+        Thu, 27 Jun 2019 08:58:16 -0700 (PDT)
+Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
+        by smtp.gmail.com with ESMTPSA id y12sm500761lfy.36.2019.06.27.08.58.15
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 27 Jun 2019 08:58:16 -0700 (PDT)
+Date:   Thu, 27 Jun 2019 17:58:14 +0200
+From:   Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ v3 2/2] mesh: Use current IV Index when relaying
+Message-ID: <20190627155814.iyxx3a6vezpvlney@kynes>
+Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH BlueZ v3 2/2] mesh: Use current IV Index when relaying
-Thread-Topic: [PATCH BlueZ v3 2/2] mesh: Use current IV Index when relaying
-Thread-Index: AQHVLLum3Lk9ZQv0r0GsXMB/v28S/qavoLnQ
-Date:   Thu, 27 Jun 2019 15:38:17 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4376CBB1464@ORSMSX103.amr.corp.intel.com>
 References: <20190627074043.22891-1-michal.lowas-rzechonek@silvair.com>
  <20190627074043.22891-3-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190627074043.22891-3-michal.lowas-rzechonek@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjZhMGU3NGUtYTFlYS00Y2YxLThkYTMtZjVlY2E0N2Q5NDU4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiazV2UGpIZzMwc0Vmcm5ZV1FGYUx4cWRjT3VlbzJyM0t4MUZOUGhZTXFZdjkxTXhyRUtZaW8yS0cxK0wrbEZuZyJ9
-x-originating-ip: [10.22.254.140]
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: 8BIT
+ <DEBB0CAA2616974FAE35E4B560B9A4376CBB1464@ORSMSX103.amr.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4376CBB1464@ORSMSX103.amr.corp.intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michal,
+Brian,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Michal Lowas-Rzechonek
-> Sent: Thursday, June 27, 2019 12:41 AM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Gix, Brian <brian.gix@intel.com>
-> Subject: [PATCH BlueZ v3 2/2] mesh: Use current IV Index when relaying
-> 
-> If we are in IV Update state, packets shall be transmitted using IV Index - 1,
-> including relayed packets.
-> ---
->  mesh/net.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/mesh/net.c b/mesh/net.c
-> index a5693f154..0a6ff8eac 100644
-> --- a/mesh/net.c
-> +++ b/mesh/net.c
-> @@ -2512,7 +2512,7 @@ static void net_rx(void *net_ptr, void *user_data)
->  	relay_advice = packet_received(net, key_id, iv_index,
->  							out, out_size, rssi);
->  	if (relay_advice > data->relay_advice) {
-> -		data->iv_index = iv_index;
-> +		data->iv_index = mesh_net_get_iv_index(net);
+On 06/27, Gix, Brian wrote:
+> I don't think this is correct.  *relayed* packets must preserve the
+> originators IV_Index...
 
-I don't think this is correct.  *relayed* packets must preserve the originators IV_Index...
+Correct. I realized my mistake and quoted the appropriate section of the
+spec - there is a message about it on the list.
 
-At most, two different IV_Index values are considered valid at any time in the mesh.  Each node has it's own sense as to what the *Network* IV_Index is, and it shall accept that IV_Index, and 1 less...  With this difference reflected in the IVI bit of the first octet.
+The other patch stands, though - as it happens, our network is in the
+middle of IV Update at the moment and I've been getting failures about
+decrypting application payloads.
 
-When acting as a relay, incoming messages must be one of these two settings to be recognized, but after decrementing TTL and re-encrypting, the IV_Index of the original sender must be preserved.  The iv_index is part of both the Network nonce and the Access layer nonce.  If a relay uses a different nonce than the originator (SRC), then the receiving DST device will be unable to decrypt the Access layer using the same nonce as the repackaged Network layer.
-
-
-
->  		data->relay_advice = relay_advice;
->  		data->key_id = key_id;
->  		data->net = net;
-> --
-> 2.19.1
-
+cheers
+-- 
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
