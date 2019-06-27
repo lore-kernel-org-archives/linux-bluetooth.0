@@ -2,75 +2,66 @@ Return-Path: <SRS0=8pQu=U2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E481EC48BD3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 00:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6789C48BD7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 03:33:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B749520815
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 00:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F49A2054F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 03:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbfF0AWL convert rfc822-to-8bit (ORCPT
+        id S1726825AbfF0DdZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Jun 2019 20:22:11 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:57690 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726489AbfF0AWL (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Jun 2019 20:22:11 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 7086128A0A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2019 00:22:10 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 64F1428A10; Thu, 27 Jun 2019 00:22:10 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Wed, 26 Jun 2019 23:33:25 -0400
+Received: from mga12.intel.com ([192.55.52.136]:10350 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726447AbfF0DdZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 26 Jun 2019 23:33:25 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jun 2019 20:33:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,422,1557212400"; 
+   d="scan'208";a="164586086"
+Received: from ingas-nuc1.sea.intel.com ([10.255.82.90])
+  by orsmga003.jf.intel.com with ESMTP; 26 Jun 2019 20:33:23 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 203997] [REGRESSION] Unable to connect BT audio device on
- 5.1.15
-Date:   Thu, 27 Jun 2019 00:22:09 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rjmx@rjmx.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-203997-62941-R4491CDOHs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203997-62941@https.bugzilla.kernel.org/>
-References: <bug-203997-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     brian.gix@intel.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 0/4] Model publication fixes
+Date:   Wed, 26 Jun 2019 20:33:16 -0700
+Message-Id: <20190627033320.8898-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203997
+This set of patches cleans up miscellaneous code redundancies in model.c,
+fixes virtual address labels housekeeping, fixes checks for model
+publication removal (i.e., for unassigned address in the config message),
+fixes return values (few cases where an integer error code is to be
+returned, but boolean "false" was returned instead)
 
-Ron Murray (rjmx@rjmx.net) changed:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |rjmx@rjmx.net
+Inga Stotland (4):
+  mesh: Clean up model.c and cfg-server.c
+  mesh: Fix virtual address processing
+  mesh: Fix and clean up model publicaation code
+  test: test-mesh - Correctly stop periodic publication
 
---- Comment #1 from Ron Murray (rjmx@rjmx.net) ---
-Had same problem here with my Beats Wireless 810(?) headphones.
-Reverting to kernel 5.1.14 fixed the problem.
+ mesh/cfgmod-server.c |  47 +++---
+ mesh/model.c         | 360 ++++++++++++++++++-------------------------
+ mesh/model.h         |  38 ++---
+ test/test-mesh       |   8 +-
+ 4 files changed, 187 insertions(+), 266 deletions(-)
 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.21.0
+
