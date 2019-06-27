@@ -2,136 +2,106 @@ Return-Path: <SRS0=8pQu=U2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBD2C48BE4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 19:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C342C48BE7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 19:56:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FF3620665
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 19:51:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C6E1208CB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 19:56:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="WzwyZXdF"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="k2JzJbNV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726463AbfF0Tvc (ORCPT
+        id S1726498AbfF0T44 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jun 2019 15:51:32 -0400
-Received: from mail-lj1-f182.google.com ([209.85.208.182]:33787 "EHLO
-        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbfF0Tvc (ORCPT
+        Thu, 27 Jun 2019 15:56:56 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:45189 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726476AbfF0T44 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jun 2019 15:51:32 -0400
-Received: by mail-lj1-f182.google.com with SMTP id h10so3618190ljg.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2019 12:51:31 -0700 (PDT)
+        Thu, 27 Jun 2019 15:56:56 -0400
+Received: by mail-lj1-f194.google.com with SMTP id m23so3578295lje.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2019 12:56:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+        h=from:date:to:cc:subject:message-id:mail-followup-to:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=s2c+W2/SVlHdbnOy1whLfgvdhAVTw2338QXZ3gZBx84=;
-        b=WzwyZXdFJqLfUbZen3Qzf3jGXr06QMvpZpWdmijhE7W4/U+gg70hZi2vsXoIS1ib6L
-         eHjP9kBAEv1zV7+z2joJ4HwY6pIqfxEXyUjSV3ExQVUpqxfnGeIUrcTRn4jpOQl6x4Ut
-         n8NGMoaXmtfgdPzOeLjdB8KdmYmDm4K2Z9sO7IybCDxolNVJ+tvGizMtD8GiAS0fbTwP
-         VTXo1S/K5V77eJILz0xZeZU6mYoRlAkNWeKNZTSWIb+Qx6p/4Y45P8zeh2BlOa46Z5Tp
-         qpM0C3P6VHeBjeNyfNSNEs2rO7xrFW2eSaWuvwsG5WXFIYUPIlA2v+xxWIb6azznKcwa
-         WlIg==
+        bh=aEey46qs5ZtoQZkQRW2ywNMMwsNQlvnxMDLg9ZnZjiw=;
+        b=k2JzJbNVnIKN/cTzlgT9VFoSgElGBCvodbLKsU2hnOmWYMrz6s20xpvfDis58YxkEn
+         XUe6nkKcumjyVy32NaC2aSs5DnrZOjA24ikp/JnGpUTlbeFbiN7Io3R8CyP16JMwJgm1
+         /Ka6t4nXeuEYW0sj/+kO+1Jmmi/FMq/VBhwREXlNah+hyBu+OtAIAJwMCCcf7o7zTFJm
+         rajESCuh3AyKF5pvhxDUvaZbXJsobVnIy3XXojtJ4kmA2btHCUSWj1LMiYah1yjU3xBq
+         rIWO2kWlqIdInVaQtgvzQ+B8RKV4Wx97sbMgQ4pu0ewgmsRcTfOCuUZiI2/xI9Dh/zVT
+         7rQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
+        h=x-gm-message-state:from:date:to:cc:subject:message-id
          :mail-followup-to:references:mime-version:content-disposition
          :content-transfer-encoding:in-reply-to:user-agent;
-        bh=s2c+W2/SVlHdbnOy1whLfgvdhAVTw2338QXZ3gZBx84=;
-        b=YvNEUDsWBvxvqR2XLqX2qTB3Kl8IBIauO4QurtL98gN6jG1r9JYRKe0S8HDxBV9mm1
-         8MHihKILWVhQAOT0BNEkO3lqI/XpSYLlxUDvr0/l6k4Qr5QH2HAGVhWrBvkFQ40M6a2T
-         x9YWeapN76YmZUR0/pz138nKxPPWar3Gtc/1hDxen0AvgEHRlAW4iDHsSPoCM8SRJg/Z
-         qPRNJHoHdgSFV9l2otoP99Q0bhexVlMit1howKMBX6dYb97RzVV75zAZcvf9HlLTYnnx
-         Pd2GRhJ1cVy/PPE8Uc6eyJEH5IRFjDJkHYpFZ2DiO2uIim0L9TMfrlfiHYQR5F9xBNZf
-         lzuw==
-X-Gm-Message-State: APjAAAWlWiYwKuyBMJ5MzJcf7iOZ7T3sE3RPIZJT+o0FNldTSznw7lyn
-        2o3sAVjm7dwfxeXIFGyDtqVjpg==
-X-Google-Smtp-Source: APXvYqzyEsaOS/XuRPPRs/zwJ9Lns75it7IoecbdRFB7/bYaHAtyLGt153itmsLkrizIcd15f2XYfA==
-X-Received: by 2002:a2e:534a:: with SMTP id t10mr3622570ljd.109.1561665090513;
-        Thu, 27 Jun 2019 12:51:30 -0700 (PDT)
+        bh=aEey46qs5ZtoQZkQRW2ywNMMwsNQlvnxMDLg9ZnZjiw=;
+        b=cXWI5eL3Xbhvsf91KSk1CGxsxhSWC1UOkfb1yLAdSNSMu0ifQmh8+Pl2OdtRRxcrsg
+         fxVMXEHHkFVrOp2y2d9RZ6fIJ/hyczFP4eWRQC6b78+qkeT6UgGkidmTSlnUFHd+2xwx
+         n9to/J+kUx+5Ky25I/+/0hojZuWe8td+z+Pbjt70I5Ch9k9wldNUeysHCoMjJbU30jtt
+         WvBFcr+3c5JxNfs0v+gAjnzce25dVgtlPtun1uoVB0YZKvrjoYlS1em+HFtVz4DbV0Lk
+         krCMzGup4+KUH72yYm1ZjuCbJOqmfkyOQmNlyvGCPOSQDZpkBcJI0x0lSfiisV+HcPym
+         5qhA==
+X-Gm-Message-State: APjAAAXYq/i2e1qGufO2jjVUdIi5KOMq+QEbW8iTPL9X/0Upvm0WH/EY
+        5N7hqCFOlC4aT9wMZinxsKcn+w==
+X-Google-Smtp-Source: APXvYqwzK4jEhjFkUzDJ599JxFCONXA1uTyoNLvj8kNbVnHl0D6u6N26QMSyN6mCp+3h2PLh/U2lbw==
+X-Received: by 2002:a2e:6c14:: with SMTP id h20mr3859327ljc.38.1561665414378;
+        Thu, 27 Jun 2019 12:56:54 -0700 (PDT)
 Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
-        by smtp.gmail.com with ESMTPSA id 199sm664393ljf.44.2019.06.27.12.51.28
+        by smtp.gmail.com with ESMTPSA id d65sm16525lfd.72.2019.06.27.12.56.52
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 27 Jun 2019 12:51:29 -0700 (PDT)
-Date:   Thu, 27 Jun 2019 21:51:27 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
+        Thu, 27 Jun 2019 12:56:53 -0700 (PDT)
+From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
         <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Was: mesh: Added ImportLocalNode call with its API --> Multiple
- Methods?
-Message-ID: <20190627195127.payxcdeexiamsi24@kynes>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <20190625143855.29889-1-jakub.witowski@silvair.com>
- <1561568468.22940.16.camel@intel.com>
- <14abe0f2129a2334d32aa14f2167380a5208880b.camel@intel.com>
- <CAMCw4t3pXTbtt05RD694jzF_MNT_J9dcFMtA7iuD4ujZT9FDbg@mail.gmail.com>
- <1561660267.7802.29.camel@intel.com>
+X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
+Date:   Thu, 27 Jun 2019 21:56:51 +0200
+To:     Inga Stotland <inga.stotland@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Subject: Re: [PATCH BlueZ 2/4] mesh: Fix virtual address processing
+Message-ID: <20190627195651.7cilfv7aswyobdk4@kynes>
+Mail-Followup-To: Inga Stotland <inga.stotland@intel.com>,
+        linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
+References: <20190627033320.8898-1-inga.stotland@intel.com>
+ <20190627033320.8898-3-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1561660267.7802.29.camel@intel.com>
+In-Reply-To: <20190627033320.8898-3-inga.stotland@intel.com>
 User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi everyone,
+Hi Inga,
 
-On 06/27, Gix, Brian wrote:
-> I am starting to think we may need multiple methods here to deal with
-> the desired use cases:
+On 06/26, Inga Stotland wrote:
+> diff --git a/mesh/model.c b/mesh/model.c
+> index 9fd3aac6c..219371090 100644
+> --- a/mesh/model.c
+> +++ b/mesh/model.c
+> @@ -55,10 +55,10 @@ struct mesh_model {
+>  };
+>  
+>  struct mesh_virtual {
+> -	uint32_t id; /*Identifier of internally stored addr, min val 0x10000 */
+> -	uint16_t ota;
+> +	uint32_t id; /* Internal ID of a stored virtual addr, min val 0x10000 */
+>  	uint16_t ref_cnt;
+> -	uint8_t addr[16];
+> +	uint16_t v_addr; /* 16-bit virtual address, used in messages */
 
-I don't like this. Back in the day we discussed that we'd like to avoid
-D-Bus API bloat...
-
-> * ImportNodeProvData()
-> (...)
-> The daemon method would perform a GetManagedObject of the calling
-> application, to create a node.json with all of the Composition data,
-> elements, models, features, etc.
-
-While the initial idea was indeed about importing the whole node,
-including configuration, models etc., during implementation we figured
-that the reason to do it is to eventually Attach() to such a node - it
-doesn't make sense to import something you wouldn't use.
-
-If so, then you need to have an appropriate application anyway, which
-the daemon can simply query for all the needed info, as it does at the
-moment during Join() and CreateNetwork() calls. This nicely fits into
-REQUEST_TYPE processing in get_managed_objects_cb().
-
-This results in smaller API and *significantly* simpler code. As you
-mentioned, doing a full migration is complicated.
-
-> * MigrateNode()
-> This method would be what Inga and I had originally envisioned for the
-> ImportLocalNode() call... It would contain *all* the information that
-> a pre-existing node had... including preconfigured pub/sub, features,
-> Sequence value that reflected that this node already existed elsewhere
-> on the mesh, but was simply being migrated to this device, etc.
-
-The application can do all the configuration using loopback Config
-Server messages, so I don't think we need a Migrate() call at all. The
-application already receives current node configuration when
-Attach()ing, so it can determine if something needs to be reconfigured.
-
-And again, you would need an Attach()able application anyway, so all the
-information would need to be duplicated in application's D-Bus
-interfaces and in the JSON passed to Migrate() call. This seems like a
-violation of DRY principle.
+Maybe nitpicking, but I would call this field just 'addr'.
 
 regards
 -- 
