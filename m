@@ -2,77 +2,100 @@ Return-Path: <SRS0=h1rX=U3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD46C4321A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 14:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6686CC4321A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 17:18:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 398882086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 14:33:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27385208C4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 17:18:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="AvGpx5GK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726818AbfF1OdR (ORCPT
+        id S1726497AbfF1RSt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jun 2019 10:33:17 -0400
-Received: from mga09.intel.com ([134.134.136.24]:26338 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726711AbfF1OdR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Jun 2019 10:33:17 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Jun 2019 07:33:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,428,1557212400"; 
-   d="scan'208";a="153385640"
-Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
-  by orsmga007.jf.intel.com with ESMTP; 28 Jun 2019 07:33:15 -0700
-Received: from orsmsx161.amr.corp.intel.com (10.22.240.84) by
- ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 28 Jun 2019 07:33:15 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX161.amr.corp.intel.com ([169.254.4.81]) with mapi id 14.03.0439.000;
- Fri, 28 Jun 2019 07:33:15 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
+        Fri, 28 Jun 2019 13:18:49 -0400
+Received: from mail-lf1-f53.google.com ([209.85.167.53]:43508 "EHLO
+        mail-lf1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726443AbfF1RSt (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 28 Jun 2019 13:18:49 -0400
+Received: by mail-lf1-f53.google.com with SMTP id j29so4430311lfk.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2019 10:18:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=Jn+5vBmHqSJS3qpAyk/O56B7fjRzVlbPtxiwOZe4gZQ=;
+        b=AvGpx5GKVVDnmX3gWHwPhzSs4hLfCIot/4lMLiFR/U8qKgxDKA5XMkdrtaZS0FinUr
+         aHzosQTChbSX/Tn0KTcEkbM5cukI47Bnxm1ZzbsCfb0RZcOhiks81ftiQ0oAL2Ub6HH8
+         0zOsKN1/g/btmigGE6zk7d25zXzRtw60o1b9OCpPn4vfPHwXd0mSYsiAGyxw2bDgn4dM
+         5Whb4tyYzDWlgv0QNOfTi/4bYY5cAeLQjYrVNxc7VepevPxoasHt/VLEBtWKlbO3pRtC
+         Um9w6V4BkrKRSYirIrUbC+/FdN/aKKr3rrA4185J3mE9kWVzvqvXqiDFsfg3ghv7ntpt
+         R1zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=Jn+5vBmHqSJS3qpAyk/O56B7fjRzVlbPtxiwOZe4gZQ=;
+        b=AfjCY/DYWNT0STMTBQQDIzHSO8ehTX7fTvnEBY87/N5INf9pLR53OM07SLZg5H+JWW
+         anQUOfniNow0X/oeHxjTF+hZpqFVNchs0mXZ2QJ2CGPmtyK/eGWMvxMVXcJ50KH3+uZw
+         LTrjaEVDwGPkFqvBZfctDQb3yofysEAwNc7JPFXKudXTEp71JqCNRqR6/vQXMKnjfZRH
+         YBgAC2V+nzROkmR2rhH24S1/LcSavPtvCbe5LFX50lS0PQCKANaoS9RrUNcpR/uea16V
+         LCufpZ88QUfyFDwvWhvwaJ//d2XKcrYygLMxSTG+Ss3mOu0McGQkcxrxS9/MqAujr/AI
+         SVJw==
+X-Gm-Message-State: APjAAAVsKMz8YocPFjD20bV+y6TBrQ3EcAMOYf95N85RCWM+pY5vQeN8
+        WyWD5hOYxCu3WPtPXmnqSDt2jA==
+X-Google-Smtp-Source: APXvYqysEbS3XdvUIec+myr+F6+vn9eR2wshlLn7xaaipuiuzxbcQEUop/GYcxHDeiHfPK7imFnZzA==
+X-Received: by 2002:ac2:46ef:: with SMTP id q15mr5653300lfo.63.1561742327374;
+        Fri, 28 Jun 2019 10:18:47 -0700 (PDT)
+Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
+        by smtp.gmail.com with ESMTPSA id k4sm915621ljj.41.2019.06.28.10.18.45
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 28 Jun 2019 10:18:46 -0700 (PDT)
+Date:   Fri, 28 Jun 2019 19:18:44 +0200
+From:   "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
 Subject: Re: [PATCH BlueZ 2/3] mesh: Add DevKeySend call
-Thread-Topic: [PATCH BlueZ 2/3] mesh: Add DevKeySend call
-Thread-Index: AQHVLbBTXkZCBJk6F0mOJ2IaxbXQY6axhQEAgAARy4A=
-Date:   Fri, 28 Jun 2019 14:33:14 +0000
-Message-ID: <1561732393.7802.50.camel@intel.com>
+Message-ID: <20190628171844.3jy7lvwewff2i7c6@kynes>
+Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
 References: <20190628125205.21411-1-michal.lowas-rzechonek@silvair.com>
-         <20190628125205.21411-3-michal.lowas-rzechonek@silvair.com>
-         <20190628132932.bhcvcx4tzlfkertu@mlowasrzechonek2133>
-In-Reply-To: <20190628132932.bhcvcx4tzlfkertu@mlowasrzechonek2133>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.255.80.171]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A4EF12F16735534F891A1D5D5AE7CFE8@intel.com>
-Content-Transfer-Encoding: base64
+ <20190628125205.21411-3-michal.lowas-rzechonek@silvair.com>
+ <20190628132932.bhcvcx4tzlfkertu@mlowasrzechonek2133>
+ <1561732393.7802.50.camel@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1561732393.7802.50.camel@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-DQpIaSBNaWNoYcWCLA0KDQpPbiBGcmksIDIwMTktMDYtMjggYXQgMTU6MjkgKzAyMDAsIE1pY2hh
-xYIgTG93YXMtUnplY2hvbmVrIHdyb3RlOg0KPiBIaSwNCj4gDQo+IE9uIDA2LzI4LCBNaWNoYcWC
-IExvd2FzLVJ6ZWNob25layB3cm90ZToNCj4gPiArCWlmICghbF9kYnVzX21lc3NhZ2VfZ2V0X2Fy
-Z3VtZW50cyhtc2csICJvcXFheSIsICZlbGVfcGF0aCwgJmRzdCwNCj4gPiArCQkJCQkJCSZuZXRf
-aWR4LCAmaXRlcl9kYXRhKSkNCj4gPiArCQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJS
-T1JfSU5WQUxJRF9BUkdTLCBOVUxMKTsNCj4gDQo+IEkgaGF2ZSBhIHF1ZXN0aW9uIGhlcmU6IHdo
-YXQncyB0aGUgaWRlYSBiZWhpbmQgbmV0X2luZGV4IGFyZ3VtZW50IGluDQo+IHRoaXMgQVBJPyBU
-aGVyZSBpcyBubyBzdWNoIGFyZ3VtZW50IGluIHJlZ3VsYXIgU2VuZCgpIGNhbGwsIGFuZCBJIGRv
-bid0DQoNClVubGlrZSBBcHAgS2V5cywgRGV2aWNlIGtleXMgZG8gbm90IGhhdmUgYSBib3VuZCBO
-ZXQgS2V5Li4uICBUaGV5IGNhbiBiZSBzZW50IG9uICphbnkqIG5ldHdvcmsga2V5LiAgU28gd2hp
-bGUNCnNlbmRpbmcgYSBtZXNzYWdlIG9uIGEgc3BlY2lmaWMgQXBwIGluZGV4IGltcGxpZXMgdGhl
-IE5ldCBLZXkgdG8gdXNlLCB0aGUgRGV2IEtleSBzZW5kIGRvZXMgbm90LCBhbmQgc28gbmVlZHMN
-Cml0IHRvIGJlIGV4cGxpY2l0Lg0KDQoNCg0KPiBxdWl0ZSBnZXQgd2h5Lg0KPiANCj4gcmVnYXJk
-cw==
+Brian,
+
+On 06/28, Gix, Brian wrote:
+> > I have a question here: what's the idea behind net_index argument in
+> > this API? There is no such argument in regular Send() call, and I don't
+> 
+> Unlike App Keys, Device keys do not have a bound Net Key...
+
+Right. Thanks for the explanation (and patience...).  I'll send v2 after
+the weekend.
+
+regards
+-- 
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
