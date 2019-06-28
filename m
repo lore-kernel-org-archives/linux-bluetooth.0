@@ -1,43 +1,68 @@
-Return-Path: <SRS0=8pQu=U2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=h1rX=U3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61068C4321A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 22:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 392B0C4321A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 08:27:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F4F62084B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jun 2019 22:48:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08983206E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 08:27:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Pusb56gW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726657AbfF0Wsu (ORCPT
+        id S1726487AbfF1I1l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jun 2019 18:48:50 -0400
-Received: from mga17.intel.com ([192.55.52.151]:6157 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726633AbfF0Wsu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jun 2019 18:48:50 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 15:48:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,425,1557212400"; 
-   d="scan'208";a="183556400"
-Received: from ingas-nuc1.sea.intel.com ([10.252.196.161])
-  by fmsmga001.fm.intel.com with ESMTP; 27 Jun 2019 15:48:50 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
+        Fri, 28 Jun 2019 04:27:41 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:42285 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726420AbfF1I1l (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 28 Jun 2019 04:27:41 -0400
+Received: by mail-lj1-f194.google.com with SMTP id t28so5102302lje.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2019 01:27:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=taGITA357wIMKN3VMOqDRaULLXphypJbE/xMWkRW44c=;
+        b=Pusb56gWmuI1f2APtY+2k0i1IEsir+e8J9mUqojudUCjHqeA3KbHAoeZmitZ3i5sxB
+         wvAq7sBq5V48EUd/EVuwrRAd+EQVOtAyvHdVjmcXsEvDnKhwKKY2CL0JJNlNhY4IOQMQ
+         e6s1wqxw3NiTOyqUrdpLxluwRIcr4CERWTBGQV8Rh3BpXMEPapl78xxbpVROyhDp3PnK
+         s62GDNiaRT/usINm9jFC3ui3KMVVUkDcimE86esGUy8I7NyYFYT6fEenjTc/jqVmh8il
+         FNy5mt0EBEfYI7alaOvuKZxuo+W1CDKP7paNfsp1mLCrVMVQtvCW2uvDgSYLlDamJjcE
+         oQoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=taGITA357wIMKN3VMOqDRaULLXphypJbE/xMWkRW44c=;
+        b=s8DJqA35Izd7PCNb5dFiQAUY1+WSdUwL9fTo/g2zS7fefVsuoZKuZnYa3bafPHoUd8
+         6duyoMMd0/pLMvqi6urEPJ6kI9KEVwQn2tue68VJATPUIp6CvfhxwTA7xZATl3qeCNtz
+         fNY9lS2eJ/BNrxxDaTtJ/W13ZfCIw7t/apUnzcps247Mh7n+z07IA1kFtgE5HQYYcvUu
+         Q9nibkMXd8pnnkg633NPpPk0RN1bTWcY4rjzbb2qluiVpCWoLVnA/9tq7IJgkVSxWW7a
+         gMJpxuRYVDGejmPgm2h01CuUJQAxGgMru4MwXkU3bTtsAywbgW9lnuaEfAffaoA6um4A
+         P0Qg==
+X-Gm-Message-State: APjAAAUokzdlhCv91OFW+5WREPR+R4/pcY++t0zi7mVr+YgI8VodN1i0
+        m9dMRc/z6fOsSDcRah5HI87BBYj2FNA=
+X-Google-Smtp-Source: APXvYqz3hefqtJQSvA5zeePpxqRRhT32xTUZHA9TYhlDnxe+xjOj/QaQG8wXs7/tmR3WWcAktN2xuw==
+X-Received: by 2002:a2e:551d:: with SMTP id j29mr5484516ljb.213.1561710459215;
+        Fri, 28 Jun 2019 01:27:39 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id g4sm408098lfb.31.2019.06.28.01.27.37
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 28 Jun 2019 01:27:38 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, michal.lowas-rzechonek@silvair.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 4/4 v2] test: test-mesh - Correctly stop periodic publication
-Date:   Thu, 27 Jun 2019 15:48:45 -0700
-Message-Id: <20190627224845.20762-5-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190627224845.20762-1-inga.stotland@intel.com>
-References: <20190627224845.20762-1-inga.stotland@intel.com>
+Cc:     Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/2] mesh: Fix D-Bus node path
+Date:   Fri, 28 Jun 2019 10:27:33 +0200
+Message-Id: <20190628082734.18809-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -45,37 +70,34 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This changes the order of checks for an updated publication period:
-check for zero address first, and if this is the case, stop sending
-the periodic model publications.
+According to doc/mesh-api.txt, node object should be located at
+/org/bluez/mesh/node.
 ---
- test/test-mesh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ mesh/node.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/test/test-mesh b/test/test-mesh
-index c075a642b..4d515e186 100755
---- a/test/test-mesh
-+++ b/test/test-mesh
-@@ -606,15 +606,15 @@ class OnOffServer(Model):
+diff --git a/mesh/node.c b/mesh/node.c
+index c2feaee52..45383b7d5 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -47,7 +47,6 @@
+ #define MIN_COMP_SIZE 14
  
- 	def set_publication(self, period):
+ #define MESH_NODE_PATH_PREFIX "/node"
+-#define MESH_ELEMENT_PATH_PREFIX "/ele"
  
--		# We do not handle ms in this example
--		if period < 1000:
--			return
--
- 		self.pub_period = period
- 		if period == 0:
- 			self.timer.cancel()
- 			return
+ /* Default values for a new locally created node */
+ #define DEFAULT_NEW_UNICAST 0x0001
+@@ -1021,7 +1020,8 @@ static bool register_node_object(struct mesh_node *node)
+ 	if (!hex2str(node->uuid, sizeof(node->uuid), uuid, sizeof(uuid)))
+ 		return false;
  
-+		# We do not handle ms in this example
-+		if period < 1000:
-+			return
-+
- 		self.timer.start(period/1000, self.publish)
+-	node->path = l_strdup_printf(MESH_NODE_PATH_PREFIX "%s", uuid);
++	node->path = l_strdup_printf(BLUEZ_MESH_PATH MESH_NODE_PATH_PREFIX
++								"%s", uuid);
  
- 	def publish(self):
+ 	if (!l_dbus_object_add_interface(dbus_get_bus(), node->path,
+ 					MESH_NODE_INTERFACE, node))
 -- 
-2.21.0
+2.19.1
 
