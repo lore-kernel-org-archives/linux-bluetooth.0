@@ -6,18 +6,18 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78472C5B579
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 23:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A51C4321A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 23:01:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 443AF208E3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 23:01:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CE332086D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jun 2019 23:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727030AbfF1XBp (ORCPT
+        id S1726822AbfF1XBq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jun 2019 19:01:45 -0400
-Received: from mga06.intel.com ([134.134.136.31]:53752 "EHLO mga06.intel.com"
+        Fri, 28 Jun 2019 19:01:46 -0400
+Received: from mga06.intel.com ([134.134.136.31]:53753 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727013AbfF1XBp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1727022AbfF1XBp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 28 Jun 2019 19:01:45 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -25,15 +25,15 @@ Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Jun 2019 16:01:44 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,429,1557212400"; 
-   d="scan'208";a="314271647"
+   d="scan'208";a="314271653"
 Received: from ingas-nuc1.sea.intel.com ([10.252.196.161])
   by orsmga004.jf.intel.com with ESMTP; 28 Jun 2019 16:01:44 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 1/4 v3] mesh: Clean up model.c and cfg-server.c
-Date:   Fri, 28 Jun 2019 16:01:39 -0700
-Message-Id: <20190628230142.16367-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/4 v3] mesh: Fix virtual address processing
+Date:   Fri, 28 Jun 2019 16:01:40 -0700
+Message-Id: <20190628230142.16367-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190628230142.16367-1-inga.stotland@intel.com>
 References: <20190628230142.16367-1-inga.stotland@intel.com>
@@ -44,617 +44,371 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This removes a number of redundancies, fixes naming conventions and
-style.
+This tightens up the accounting for locally stored virtual addresses.
+Alos, use meaningful variable names to identify components of a
+mesh virtual address.
 ---
- mesh/cfgmod-server.c |  47 ++++++--------
- mesh/model.c         | 143 ++++++++++++++++---------------------------
- mesh/model.h         |  30 ++++-----
- 3 files changed, 87 insertions(+), 133 deletions(-)
+ mesh/model.c | 173 +++++++++++++++++++++++----------------------------
+ mesh/model.h |   6 +-
+ 2 files changed, 78 insertions(+), 101 deletions(-)
 
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 060d7f4e4..634ac006b 100644
---- a/mesh/cfgmod-server.c
-+++ b/mesh/cfgmod-server.c
-@@ -58,6 +58,7 @@ static void send_pub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
- 	msg[n++] = ttl;
- 	msg[n++] = period;
- 	msg[n++] = retransmit;
-+
- 	if (mod_id < 0x10000 || mod_id > VENDOR_ID_MASK) {
- 		l_put_le16(mod_id, msg + n);
- 		n += 2;
-@@ -68,8 +69,7 @@ static void send_pub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		n += 2;
- 	}
- 
--	mesh_model_send(node, dst, src,
--			APP_IDX_DEV, DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
- }
- 
- static bool config_pub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
-@@ -121,8 +121,6 @@ static bool config_pub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- 	int status;
- 	bool cred_flag, b_virt = false;
- 	bool vendor = false;
--	struct mesh_model_pub *pub;
--	uint8_t ele_idx;
- 
- 	switch (size) {
- 	default:
-@@ -168,6 +166,7 @@ static bool config_pub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		vendor = true;
- 		break;
- 	}
-+
- 	ele_addr = l_get_le16(pkt);
- 	pub_addr = pkt + 2;
- 
-@@ -204,22 +203,16 @@ static bool config_pub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		goto done;
- 	}
- 
--	if (status != MESH_STATUS_SUCCESS)
--		goto done;
--
--	ele_idx = node_get_element_idx(node, ele_addr);
--	pub = mesh_model_pub_get(node, ele_idx, mod_id, &status);
--
--	if (pub) {
-+	if (status == MESH_STATUS_SUCCESS) {
- 		struct mesh_db_pub db_pub = {
- 			.virt = b_virt,
- 			.addr = ota,
- 			.idx = idx,
- 			.ttl = ttl,
--			.credential = pub->credential,
-+			.credential = cred_flag,
- 			.period = period,
--			.count = pub->retransmit >> 5,
--			.interval = ((0x1f & pub->retransmit) + 1) * 50
-+			.count = retransmit >> 5,
-+			.interval = ((0x1f & retransmit) + 1) * 50
- 		};
- 
- 		if (b_virt)
-@@ -270,8 +263,8 @@ static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
- 	uint16_t ele_addr;
- 	uint32_t mod_id;
- 	uint16_t n = 0;
--	int ret = 0;
--	uint8_t *status;
-+	int status;
-+	uint8_t *msg_status;
- 	uint16_t buf_size;
- 	uint8_t msg[5 + sizeof(uint16_t) * MAX_GRP_PER_MOD];
- 
-@@ -286,7 +279,7 @@ static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
- 	case 4:
- 		mod_id = l_get_le16(pkt + 2);
- 		n = mesh_model_opcode_set(OP_CONFIG_MODEL_SUB_LIST, msg);
--		status = msg + n;
-+		msg_status = msg + n;
- 		msg[n++] = 0;
- 		l_put_le16(ele_addr, msg + n);
- 		n += 2;
-@@ -299,7 +292,7 @@ static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		mod_id = l_get_le16(pkt + 2) << 16;
- 		mod_id |= l_get_le16(pkt + 4);
- 		n = mesh_model_opcode_set(OP_CONFIG_VEND_MODEL_SUB_LIST, msg);
--		status = msg + n;
-+		msg_status = msg + n;
- 		msg[n++] = 0;
- 		l_put_le16(ele_addr, msg + n);
- 		n += 2;
-@@ -311,13 +304,13 @@ static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
- 	}
- 
- 	buf_size = sizeof(uint16_t) * MAX_GRP_PER_MOD;
--	ret = mesh_model_sub_get(node, ele_addr, mod_id, msg + n, buf_size,
-+	status = mesh_model_sub_get(node, ele_addr, mod_id, msg + n, buf_size,
- 									&size);
- 
--	if (!ret)
-+	if (status == MESH_STATUS_SUCCESS)
- 		n += size;
--	else if (ret > 0)
--		*status = ret;
-+
-+	*msg_status = (uint8_t) status;
- 
- 	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
- 	return true;
-@@ -361,9 +354,9 @@ static void config_sub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- {
- 	uint16_t grp, ele_addr;
- 	bool unreliable = !!(opcode & OP_UNRELIABLE);
--	uint32_t mod_id, func;
-+	uint32_t mod_id;
- 	const uint8_t *addr = NULL;
--	int status = 0;
-+	int status = MESH_STATUS_SUCCESS;
- 	bool vendor = false;
- 
- 	switch (size) {
-@@ -408,6 +401,7 @@ static void config_sub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		mod_id |= l_get_le16(pkt + 20);
- 		break;
- 	}
-+
- 	ele_addr = l_get_le16(pkt);
- 
- 	if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL) {
-@@ -416,10 +410,9 @@ static void config_sub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- 	} else
- 		grp = UNASSIGNED_ADDRESS;
- 
--	func = opcode & ~OP_UNRELIABLE;
--	switch (func) {
-+	switch (opcode & ~OP_UNRELIABLE) {
- 	default:
--		l_debug("Bad opcode: %x", func);
-+		l_debug("Bad opcode: %x", opcode);
- 		return;
- 
- 	case OP_CONFIG_MODEL_SUB_DELETE_ALL:
 diff --git a/mesh/model.c b/mesh/model.c
-index f29ad9af2..9fd3aac6c 100644
+index 9fd3aac6c..30932cff2 100644
 --- a/mesh/model.c
 +++ b/mesh/model.c
-@@ -152,7 +152,7 @@ static struct mesh_model *get_model(struct mesh_node *node, uint8_t ele_idx,
+@@ -55,10 +55,10 @@ struct mesh_model {
+ };
  
- 	models = node_get_element_models(node, ele_idx, status);
- 	if (!models) {
--		*status = MESH_STATUS_INVALID_ADDRESS;
-+		*status = MESH_STATUS_INVALID_MODEL;
- 		return NULL;
- 	}
+ struct mesh_virtual {
+-	uint32_t id; /*Identifier of internally stored addr, min val 0x10000 */
+-	uint16_t ota;
++	uint32_t id; /* Internal ID of a stored virtual addr, min val 0x10000 */
+ 	uint16_t ref_cnt;
+-	uint8_t addr[16];
++	uint16_t addr; /* 16-bit virtual address, used in messages */
++	uint8_t label[16]; /* 128 bit label UUID */
+ };
  
-@@ -164,19 +164,18 @@ static struct mesh_model *get_model(struct mesh_node *node, uint8_t ele_idx,
+ /* These struct is used to pass lots of params to l_queue_foreach */
+@@ -128,12 +128,12 @@ static bool find_virt_by_id(const void *a, const void *b)
+ 	return virt->id == id;
  }
  
- static struct mesh_model *find_model(struct mesh_node *node, uint16_t addr,
--						uint32_t mod_id, int *fail)
-+						uint32_t mod_id, int *status)
+-static bool find_virt_by_addr(const void *a, const void *b)
++static bool find_virt_by_label(const void *a, const void *b)
  {
- 	int ele_idx;
+ 	const struct mesh_virtual *virt = a;
+-	const uint8_t *addr = b;
++	const uint8_t *label = b;
  
- 	ele_idx = node_get_element_idx(node, addr);
- 
- 	if (ele_idx < 0) {
--		if (fail)
--			*fail = MESH_STATUS_INVALID_ADDRESS;
-+		*status = MESH_STATUS_INVALID_ADDRESS;
- 		return NULL;
- 	}
- 
--	return get_model(node, (uint8_t) ele_idx, mod_id, fail);
-+	return get_model(node, (uint8_t) ele_idx, mod_id, status);
+-	return memcmp(virt->addr, addr, 16) == 0;
++	return memcmp(virt->label, label, 16) == 0;
  }
  
- static uint32_t pub_period_to_ms(uint8_t pub_period)
-@@ -429,16 +428,6 @@ static void cmplt(uint16_t remote, uint8_t status,
- 	}
- }
+ static bool match_model_id(const void *a, const void *b)
+@@ -324,7 +324,7 @@ static void forward_model(void *a, void *b)
+ 			 * Map Virtual addresses to a usable namespace that
+ 			 * prevents us for forwarding a false positive
+ 			 * (multiple Virtual Addresses that map to the same
+-			 * u16 OTA addr)
++			 * 16-bit virtual address identifier)
+ 			 */
+ 			fwd->has_dst = true;
+ 			dst = virt->id;
+@@ -381,12 +381,12 @@ static int virt_packet_decrypt(struct mesh_net *net, const uint8_t *data,
+ 		struct mesh_virtual *virt = v->data;
+ 		int decrypt_idx;
  
--static bool pub_frnd_cred(struct mesh_node *node, uint16_t src, uint32_t mod_id)
--{
--	struct mesh_model *mod = find_model(node, src, mod_id, NULL);
--
--	if (!mod || !mod->pub)
--		return false;
--
--	return (mod->pub->credential != 0);
--}
--
+-		if (virt->ota != dst)
++		if (virt->addr != dst)
+ 			continue;
+ 
+ 		decrypt_idx = appkey_packet_decrypt(net, szmict, seq,
+ 							iv_idx, src, dst,
+-							virt->addr, 16, key_id,
++							virt->label, 16, key_id,
+ 							data, size, out);
+ 
+ 		if (decrypt_idx >= 0) {
+@@ -430,7 +430,7 @@ static void cmplt(uint16_t remote, uint8_t status,
+ 
  static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
  		uint32_t dst, uint8_t key_id, const uint8_t *key,
- 		uint8_t *aad, uint8_t ttl, const void *msg, uint16_t msg_len)
-@@ -463,22 +452,17 @@ static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
+-		uint8_t *aad, uint8_t ttl, const void *msg, uint16_t msg_len)
++		uint8_t *label, uint8_t ttl, const void *msg, uint16_t msg_len)
+ {
+ 	bool ret = false;
+ 	uint32_t iv_index, seq_num;
+@@ -452,7 +452,7 @@ static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
  	iv_index = mesh_net_get_iv_index(net);
  
  	seq_num = mesh_net_get_seq_num(net);
--	if (!mesh_crypto_payload_encrypt(aad, msg, out, msg_len,
--				src, dst, key_id,
--				seq_num, iv_index,
--				szmic, key)) {
-+	if (!mesh_crypto_payload_encrypt(aad, msg, out, msg_len, src, dst,
-+				key_id, seq_num, iv_index, szmic, key)) {
+-	if (!mesh_crypto_payload_encrypt(aad, msg, out, msg_len, src, dst,
++	if (!mesh_crypto_payload_encrypt(label, msg, out, msg_len, src, dst,
+ 				key_id, seq_num, iv_index, szmic, key)) {
  		l_error("Failed to Encrypt Payload");
  		goto done;
- 	}
+@@ -568,12 +568,37 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
  
- 	/* print_packet("Encrypted with", key, 16); */
- 
--	ret = mesh_net_app_send(net, credential,
--				src, dst, key_id, ttl,
--				seq_num, iv_index,
--				szmic,
--				out, out_len,
--				cmplt, NULL);
-+	ret = mesh_net_app_send(net, credential, src, dst, key_id, ttl,
-+					seq_num, iv_index, szmic, out, out_len,
-+								cmplt, NULL);
- done:
- 	l_free(out);
- 	return ret;
-@@ -489,10 +473,6 @@ static void remove_pub(struct mesh_node *node, struct mesh_model *mod)
- 	l_free(mod->pub);
- 	mod->pub = NULL;
- 
--	/*
--	 * TODO: Instead of reporting  period of 0, report publication
--	 * address as unassigned
--	 */
- 	if (!mod->cbs)
- 		/* External models */
- 		config_update_model_pub_period(node, mod->ele_idx, mod->id, 0);
-@@ -539,16 +519,16 @@ static void model_bind_idx(struct mesh_node *node, struct mesh_model *mod,
  }
  
- static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
--				uint16_t app_idx, bool unbind)
-+						uint16_t app_idx, bool unbind)
- {
--	int fail;
-+	int status;
- 	struct mesh_model *mod;
- 	bool is_present;
- 
--	mod = find_model(node, addr, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 	if (!mod) {
- 		l_debug("Model not found");
--		return fail;
-+		return status;
- 	}
- 
- 	id = (id >= VENDOR_ID_MASK) ? (id & 0xffff) : id;
-@@ -889,6 +869,7 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
- 	uint8_t key_id;
- 	const uint8_t *key;
- 	bool result;
-+	int status;
- 
- 	/* print_packet("Mod Tx", msg, msg_len); */
- 
-@@ -899,7 +880,7 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
- 	if (src == 0)
- 		src = mesh_net_get_address(net);
- 
--	mod = find_model(node, src, mod_id, NULL);
-+	mod = find_model(node, src, mod_id, &status);
- 	if (!mod) {
- 		l_debug("model %x not found", mod_id);
- 		return MESH_ERROR_NOT_FOUND;
-@@ -942,7 +923,7 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
- 	l_debug("(%x) %p", mod->pub->idx, key);
- 	l_debug("key_id %x", key_id);
- 
--	result = msg_send(node, pub_frnd_cred(node, src, mod_id), src,
-+	result = msg_send(node, mod->pub->credential != 0, src,
- 				dst, key_id, key, aad, ttl, msg, msg_len);
- 
- 	return result ? MESH_ERROR_NONE : MESH_ERROR_FAILED;
-@@ -994,21 +975,12 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			uint8_t ttl, uint8_t period, uint8_t retransmit,
- 			bool b_virt, uint16_t *dst)
- {
--	int fail = MESH_STATUS_SUCCESS;
--	int ele_idx;
- 	struct mesh_model *mod;
--	int result;
--
--	ele_idx = node_get_element_idx(node, addr);
--
--	if (ele_idx < 0) {
--		fail = MESH_STATUS_INVALID_ADDRESS;
--		return false;
--	}
-+	int status;
- 
--	mod = get_model(node, (uint8_t) ele_idx, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 	if (!mod)
--		return fail;
-+		return status;
- 
- 	if (id == CONFIG_SRV_MODEL || id == CONFIG_CLI_MODEL)
- 		return MESH_STATUS_INVALID_PUB_PARAM;
-@@ -1016,15 +988,15 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (!appkey_have_key(node_get_net(node), idx))
- 		return MESH_STATUS_INVALID_APPKEY;
- 
--	result = set_pub(mod, mod_addr, idx, cred_flag, ttl, period, retransmit,
-+	status = set_pub(mod, mod_addr, idx, cred_flag, ttl, period, retransmit,
- 								b_virt, dst);
- 
--	if (result != MESH_STATUS_SUCCESS)
--		return result;
-+	if (status != MESH_STATUS_SUCCESS)
-+		return status;
- 
- 	/*
- 	 * If the publication address is set to unassigned address value,
--	 * remove publication
-+	 * remove the publication
- 	 */
- 	if (IS_UNASSIGNED(*dst))
- 		remove_pub(node, mod);
-@@ -1036,18 +1008,18 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	}
- 
- 	/* External model */
--	config_update_model_pub_period(node, ele_idx, id,
-+	config_update_model_pub_period(node, mod->ele_idx, id,
- 						pub_period_to_ms(period));
- 
- 	return MESH_STATUS_SUCCESS;
- }
- 
--struct mesh_model_pub *mesh_model_pub_get(struct mesh_node *node,
--				 uint8_t ele_idx, uint32_t mod_id, int *status)
-+struct mesh_model_pub *mesh_model_pub_get(struct mesh_node *node, uint16_t addr,
-+						uint32_t mod_id, int *status)
- {
- 	struct mesh_model *mod;
- 
--	mod = get_model(node, ele_idx, mod_id, status);
-+	mod = find_model(node, addr, mod_id, status);
- 	if (!mod)
- 		return NULL;
- 
-@@ -1102,7 +1074,7 @@ static void restore_model_state(struct mesh_model *mod)
- 	if (l_queue_isempty(mod->bindings) || !mod->cbs->bind) {
- 		for (b = l_queue_get_entries(mod->bindings); b; b = b->next) {
- 			if (cbs->bind(L_PTR_TO_UINT(b->data), ACTION_ADD) !=
--				MESH_STATUS_SUCCESS)
-+							MESH_STATUS_SUCCESS)
- 				break;
- 		}
- 	}
-@@ -1170,18 +1142,18 @@ int mesh_model_binding_add(struct mesh_node *node, uint16_t addr, uint32_t id,
- int mesh_model_get_bindings(struct mesh_node *node, uint16_t addr, uint32_t id,
- 				uint8_t *buf, uint16_t buf_size, uint16_t *size)
- {
--	int fail;
-+	int status;
- 	struct mesh_model *mod;
- 	const struct l_queue_entry *entry;
- 	uint16_t n;
- 	uint32_t idx_pair;
- 	int i;
- 
--	mod = find_model(node, addr, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 
- 	if (!mod) {
- 		*size = 0;
--		return fail;
-+		return status;
- 	}
- 
- 	entry = l_queue_get_entries(mod->bindings);
-@@ -1197,11 +1169,13 @@ int mesh_model_get_bindings(struct mesh_node *node, uint16_t addr, uint32_t id,
- 		} else {
- 			idx_pair <<= 12;
- 			idx_pair += app_idx;
++static struct mesh_virtual *add_virtual(const uint8_t *v)
++{
++	struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
++						find_virt_by_label, v);
 +
- 			/* Unlikely, but check for overflow*/
- 			if ((n + 3) > buf_size) {
- 				l_warn("Binding list too large");
- 				goto done;
- 			}
++	if (virt) {
++		virt->ref_cnt++;
++		return virt;
++	}
 +
- 			l_put_le32(idx_pair, buf);
- 			buf += 3;
- 			n += 3;
-@@ -1218,21 +1192,20 @@ int mesh_model_get_bindings(struct mesh_node *node, uint16_t addr, uint32_t id,
- 
- done:
- 	*size = n;
--
- 	return MESH_STATUS_SUCCESS;
- }
- 
- int mesh_model_sub_get(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			uint8_t *buf, uint16_t buf_size, uint16_t *size)
++	virt = l_new(struct mesh_virtual, 1);
++
++	if (!mesh_crypto_virtual_addr(v, &virt->addr)) {
++		l_free(virt);
++		return NULL;
++	}
++
++	memcpy(virt->label, v, 16);
++	virt->ref_cnt++;
++	virt->id = virt_id_next++;
++	l_queue_push_head(mesh_virtuals, virt);
++
++	return virt;
++}
++
+ static int set_pub(struct mesh_model *mod, const uint8_t *mod_addr,
+ 			uint16_t idx, bool cred_flag, uint8_t ttl,
+ 			uint8_t period, uint8_t retransmit, bool b_virt,
+ 			uint16_t *dst)
  {
--	int fail = MESH_STATUS_SUCCESS;
-+	int status;
- 	int16_t n;
- 	struct mesh_model *mod;
- 	const struct l_queue_entry *entry;
- 
--	mod = find_model(node, addr, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 	if (!mod)
--		return fail;
-+		return status;
- 
- 	entry = l_queue_get_entries(mod->subs);
- 	*size = 0;
-@@ -1254,36 +1227,27 @@ int mesh_model_sub_get(struct mesh_node *node, uint16_t addr, uint32_t id,
- int mesh_model_sub_add(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			const uint8_t *group, bool b_virt, uint16_t *dst)
- {
--	int fail = MESH_STATUS_SUCCESS;
--	int ele_idx = -1;
-+	int status;
- 	struct mesh_model *mod;
- 
--	ele_idx = node_get_element_idx(node, addr);
--
--	if (!node || ele_idx < 0) {
--		fail = MESH_STATUS_INVALID_ADDRESS;
--		return false;
--	}
--
--	mod = get_model(node, (uint8_t) ele_idx, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 	if (!mod)
--		return fail;
-+		return status;
- 
- 	return add_sub(node_get_net(node), mod, group, b_virt, dst);
--	/* TODO: communicate to registered models that sub has changed */
- }
- 
- int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			const uint8_t *group, bool b_virt, uint16_t *dst)
- {
--	int fail = MESH_STATUS_SUCCESS;
-+	int status;
- 	struct l_queue *virtuals, *subs;
- 	struct mesh_virtual *virt;
- 	struct mesh_model *mod;
- 
--	mod = find_model(node, addr, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 	if (!mod)
--		return fail;
-+		return status;
- 
- 	subs = mod->subs;
- 	virtuals = mod->virtuals;
-@@ -1306,10 +1270,10 @@ int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
- 		}
- 	}
- 
--	fail = mesh_model_sub_add(node, addr, id, group, b_virt, dst);
-+	status = mesh_model_sub_add(node, addr, id, group, b_virt, dst);
- 
--	if (fail) {
--		/* Adding new group failed, so revert to old list */
-+	if (status != MESH_STATUS_SUCCESS) {
-+		/* Adding new group failed, so revert to old lists */
- 		l_queue_destroy(mod->subs, NULL);
- 		mod->subs = subs;
- 		l_queue_destroy(mod->virtuals, unref_virt);
-@@ -1324,23 +1288,24 @@ int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			mesh_net_dst_unreg(net,
- 					(uint16_t) L_PTR_TO_UINT(entry->data));
- 
-+		/* Destroy old lists */
- 		l_queue_destroy(subs, NULL);
- 		l_queue_destroy(virtuals, unref_virt);
- 	}
- 
--	return fail;
-+	return status;
- }
- 
- int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			const uint8_t *group, bool b_virt, uint16_t *dst)
- {
--	int fail = MESH_STATUS_SUCCESS;
-+	int status;
+-	struct mesh_virtual *virt;
++	struct mesh_virtual *virt = NULL;
  	uint16_t grp;
- 	struct mesh_model *mod;
  
--	mod = find_model(node, addr, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 	if (!mod)
--		return fail;
-+		return status;
+ 	if (dst) {
+@@ -583,35 +608,30 @@ static int set_pub(struct mesh_model *mod, const uint8_t *mod_addr,
+ 			*dst = l_get_le16(mod_addr);
+ 	}
+ 
+-	if (b_virt && !mesh_crypto_virtual_addr(mod_addr, &grp))
+-		return MESH_STATUS_STORAGE_FAIL;
++	if (b_virt) {
++		virt = add_virtual(mod_addr);
++		if (!virt)
++			return MESH_STATUS_STORAGE_FAIL;
++
++	}
+ 
+-	/* If old publication was Virtual, remove it */
++	/* If the old publication address is virtual, remove it from lists */
+ 	if (mod->pub && mod->pub->addr >= VIRTUAL_BASE) {
+-		virt = l_queue_find(mod->virtuals, find_virt_by_id,
++		struct mesh_virtual *old_virt;
++
++		old_virt = l_queue_find(mod->virtuals, find_virt_by_id,
+ 						L_UINT_TO_PTR(mod->pub->addr));
+-		if (virt) {
+-			l_queue_remove(mod->virtuals, virt);
+-			unref_virt(virt);
++		if (old_virt) {
++			l_queue_remove(mod->virtuals, old_virt);
++			unref_virt(old_virt);
+ 		}
+ 	}
+ 
+ 	mod->pub = l_new(struct mesh_model_pub, 1);
  
  	if (b_virt) {
- 		struct mesh_virtual *virt;
-@@ -1368,14 +1333,14 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
- 
- int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
+-		virt = l_queue_find(mesh_virtuals, find_virt_by_addr, mod_addr);
+-		if (!virt) {
+-			virt = l_new(struct mesh_virtual, 1);
+-			virt->id = virt_id_next++;
+-			virt->ota = grp;
+-			memcpy(virt->addr, mod_addr, sizeof(virt->addr));
+-			l_queue_push_head(mesh_virtuals, virt);
+-		} else {
+-			grp = virt->ota;
+-		}
+-
+-		virt->ref_cnt++;
+ 		l_queue_push_head(mod->virtuals, virt);
++		grp = virt->addr;
+ 		mod->pub->addr = virt->id;
+ 	} else {
+ 		grp = l_get_le16(mod_addr);
+@@ -643,28 +663,15 @@ static int set_pub(struct mesh_model *mod, const uint8_t *mod_addr,
+ static int add_sub(struct mesh_net *net, struct mesh_model *mod,
+ 			const uint8_t *group, bool b_virt, uint16_t *dst)
  {
--	int fail = MESH_STATUS_SUCCESS;
-+	int status;
- 	struct mesh_model *mod;
- 	const struct l_queue_entry *entry;
+-	struct mesh_virtual *virt;
++	struct mesh_virtual *virt = NULL;
+ 	uint16_t grp;
+ 
+ 	if (b_virt) {
+-		virt = l_queue_find(mesh_virtuals, find_virt_by_addr, group);
+-		if (!virt) {
+-			if (!mesh_crypto_virtual_addr(group, &grp))
+-				return MESH_STATUS_STORAGE_FAIL;
+-
+-			virt = l_new(struct mesh_virtual, 1);
+-			virt->id = virt_id_next++;
+-			virt->ota = grp;
+-			memcpy(virt->addr, group, sizeof(virt->addr));
+-
+-			if (!l_queue_push_head(mesh_virtuals, virt))
+-				return MESH_STATUS_STORAGE_FAIL;
+-		} else {
+-			grp = virt->ota;
+-		}
++		virt = add_virtual(group);
++		if (!virt)
++			return MESH_STATUS_STORAGE_FAIL;
+ 
+-		virt->ref_cnt++;
+-		l_queue_push_head(mod->virtuals, virt);
++		grp = virt->addr;
+ 	} else {
+ 		grp = l_get_le16(group);
+ 	}
+@@ -675,9 +682,16 @@ static int add_sub(struct mesh_net *net, struct mesh_model *mod,
+ 	if (!mod->subs)
+ 		mod->subs = l_queue_new();
+ 
+-	if (l_queue_find(mod->subs, simple_match, L_UINT_TO_PTR(grp)))
+-		/* Group already exists */
++	/* Check if this group already exists */
++	if (l_queue_find(mod->subs, simple_match, L_UINT_TO_PTR(grp))) {
++		if (b_virt)
++			unref_virt(virt);
++
+ 		return MESH_STATUS_SUCCESS;
++	}
++
++	if (b_virt)
++		l_queue_push_head(mod->virtuals, virt);
+ 
+ 	l_queue_push_tail(mod->subs, L_UINT_TO_PTR(grp));
+ 
+@@ -864,7 +878,7 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
  	struct mesh_net *net = node_get_net(node);
+ 	struct mesh_model *mod;
+ 	uint32_t target;
+-	uint8_t *aad = NULL;
++	uint8_t *label = NULL;
+ 	uint16_t dst;
+ 	uint8_t key_id;
+ 	const uint8_t *key;
+@@ -896,18 +910,18 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
+ 	target = mod->pub->addr;
  
--	mod = find_model(node, addr, id, &fail);
-+	mod = find_model(node, addr, id, &status);
- 	if (!mod)
--		return fail;
-+		return status;
+ 	if (IS_UNASSIGNED(target))
+-		return false;
++		return MESH_ERROR_DOES_NOT_EXIST;
  
- 	entry = l_queue_get_entries(mod->subs);
+ 	if (target >= VIRTUAL_BASE) {
+-		struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
+-				find_virt_by_id,
+-				L_UINT_TO_PTR(target));
++		struct mesh_virtual *virt;
  
-@@ -1386,7 +1351,7 @@ int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
- 	l_queue_destroy(mod->virtuals, unref_virt);
- 	mod->virtuals = l_queue_new();
++		virt = l_queue_find(mesh_virtuals, find_virt_by_id,
++						L_UINT_TO_PTR(target));
+ 		if (!virt)
+-			return false;
++			return MESH_ERROR_NOT_FOUND;
  
--	return fail;
-+	return MESH_STATUS_SUCCESS;
+-		aad = virt->addr;
+-		dst = virt->ota;
++		label = virt->label;
++		dst = virt->addr;
+ 	} else {
+ 		dst = target;
+ 	}
+@@ -924,7 +938,7 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
+ 	l_debug("key_id %x", key_id);
+ 
+ 	result = msg_send(node, mod->pub->credential != 0, src,
+-				dst, key_id, key, aad, ttl, msg, msg_len);
++				dst, key_id, key, label, ttl, msg, msg_len);
+ 
+ 	return result ? MESH_ERROR_NONE : MESH_ERROR_FAILED;
+ 
+@@ -1063,7 +1077,6 @@ struct mesh_model *mesh_model_vendor_new(uint8_t ele_idx, uint16_t vendor_id,
+ /* Internal models only */
+ static void restore_model_state(struct mesh_model *mod)
+ {
+-
+ 	const struct mesh_model_ops *cbs;
+ 	const struct l_queue_entry *b;
+ 
+@@ -1310,10 +1323,10 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	if (b_virt) {
+ 		struct mesh_virtual *virt;
+ 
+-		virt = l_queue_find(mod->virtuals, find_virt_by_addr, group);
++		virt = l_queue_find(mod->virtuals, find_virt_by_label, group);
+ 		if (virt) {
+ 			l_queue_remove(mod->virtuals, virt);
+-			grp = virt->ota;
++			grp = virt->addr;
+ 			unref_virt(virt);
+ 		} else {
+ 			if (!mesh_crypto_virtual_addr(group, &grp))
+@@ -1505,39 +1518,6 @@ bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size,
+ 	return true;
  }
  
- struct mesh_model *mesh_model_setup(struct mesh_node *node, uint8_t ele_idx,
+-void mesh_model_add_virtual(struct mesh_node *node, const uint8_t *v)
+-{
+-	struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
+-						find_virt_by_addr, v);
+-
+-	if (virt) {
+-		virt->ref_cnt++;
+-		return;
+-	}
+-
+-	virt = l_new(struct mesh_virtual, 1);
+-
+-	if (!mesh_crypto_virtual_addr(v, &virt->ota)) {
+-		l_free(virt);
+-		return; /* Storage Failure */
+-	}
+-
+-	memcpy(virt->addr, v, 16);
+-	virt->ref_cnt++;
+-	virt->id = virt_id_next++;
+-	l_queue_push_head(mesh_virtuals, virt);
+-}
+-
+-void mesh_model_del_virtual(struct mesh_node *node, uint32_t va24)
+-{
+-	struct mesh_virtual *virt = l_queue_remove_if(mesh_virtuals,
+-						find_virt_by_id,
+-						L_UINT_TO_PTR(va24));
+-
+-	if (virt)
+-		unref_virt(virt);
+-}
+-
+ void model_build_config(void *model, void *msg_builder)
+ {
+ 	struct l_dbus_message_builder *builder = msg_builder;
+@@ -1588,4 +1568,5 @@ void mesh_model_init(void)
+ void mesh_model_cleanup(void)
+ {
+ 	l_queue_destroy(mesh_virtuals, l_free);
++	mesh_virtuals = NULL;
+ }
 diff --git a/mesh/model.h b/mesh/model.h
-index fd0b25f31..6094eaf59 100644
+index 6094eaf59..f0f97ee0b 100644
 --- a/mesh/model.h
 +++ b/mesh/model.h
-@@ -90,40 +90,36 @@ uint32_t mesh_model_get_model_id(const struct mesh_model *model);
- bool mesh_model_register(struct mesh_node *node, uint8_t ele_idx,
- 			uint32_t mod_id, const struct mesh_model_ops *cbs,
- 							void *user_data);
-+struct mesh_model *mesh_model_setup(struct mesh_node *node, uint8_t ele_idx,
-+								void *data);
- struct mesh_model_pub *mesh_model_pub_get(struct mesh_node *node,
--				uint8_t ele_idx, uint32_t mod_id, int *status);
-+				uint16_t addr, uint32_t mod_id, int *status);
- int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			const uint8_t *mod_addr, uint16_t idx, bool cred_flag,
- 			uint8_t ttl, uint8_t period, uint8_t retransmit,
- 			bool b_virt, uint16_t *dst);
--struct mesh_model *mesh_model_setup(struct mesh_node *node, uint8_t ele_idx,
--								void *data);
+@@ -24,7 +24,7 @@ struct mesh_model;
+ #define MAX_BINDINGS	10
+ #define MAX_GRP_PER_MOD	10
  
- int mesh_model_binding_add(struct mesh_node *node, uint16_t addr, uint32_t id,
--						uint16_t app_idx);
-+								uint16_t idx);
- int mesh_model_binding_del(struct mesh_node *node, uint16_t addr, uint32_t id,
--						uint16_t idx);
-+								uint16_t idx);
- int mesh_model_get_bindings(struct mesh_node *node, uint16_t addr, uint32_t id,
- 				uint8_t *buf, uint16_t buf_len, uint16_t *size);
- int mesh_model_sub_add(struct mesh_node *node, uint16_t addr, uint32_t id,
--						const uint8_t *grp, bool b_virt,
--						uint16_t *dst);
-+				const uint8_t *grp, bool b_virt, uint16_t *dst);
- int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
--						const uint8_t *grp, bool b_virt,
--						uint16_t *dst);
-+				const uint8_t *grp, bool b_virt, uint16_t *dst);
- int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id);
- int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
--						const uint8_t *grp, bool b_virt,
--						uint16_t *dst);
-+				const uint8_t *grp, bool b_virt, uint16_t *dst);
- int mesh_model_sub_get(struct mesh_node *node, uint16_t addr, uint32_t id,
- 			uint8_t *buf, uint16_t buf_size, uint16_t *size);
- uint16_t mesh_model_cfg_blk(uint8_t *pkt);
--bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t target,
-+bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					uint16_t app_idx, uint8_t ttl,
- 					const void *msg, uint16_t msg_len);
--int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
--				uint16_t src, uint8_t ttl,
--				const void *msg, uint16_t msg_len);
-+int mesh_model_publish(struct mesh_node *node, uint32_t mod_id, uint16_t src,
-+				uint8_t ttl, const void *msg, uint16_t msg_len);
- bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
+-#define	VIRTUAL_BASE			0x10000
++#define VIRTUAL_BASE			0x10000
+ 
+ #define MESH_MAX_ACCESS_PAYLOAD		380
+ 
+@@ -124,14 +124,10 @@ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
  			uint32_t seq, uint32_t iv_index, uint8_t ttl,
  			uint16_t src, uint16_t dst, uint8_t key_id,
-@@ -137,8 +133,8 @@ void mesh_model_add_virtual(struct mesh_node *node, const uint8_t *v);
- void mesh_model_del_virtual(struct mesh_node *node, uint32_t va24);
- void mesh_model_list_virtual(struct mesh_node *node);
+ 			const uint8_t *data, uint16_t size);
+-
+ void mesh_model_app_key_generate_new(struct mesh_node *node, uint16_t net_idx);
+ void mesh_model_app_key_delete(struct mesh_node *node, struct l_queue *models,
+ 								uint16_t idx);
+ struct l_queue *mesh_model_get_appkeys(struct mesh_node *node);
+-void mesh_model_add_virtual(struct mesh_node *node, const uint8_t *v);
+-void mesh_model_del_virtual(struct mesh_node *node, uint32_t va24);
+-void mesh_model_list_virtual(struct mesh_node *node);
  uint16_t mesh_model_opcode_set(uint32_t opcode, uint8_t *buf);
--bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size,
--					uint32_t *opcode, uint16_t *n);
-+bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size, uint32_t *opcode,
-+								uint16_t *n);
- void model_build_config(void *model, void *msg_builder);
- 
- void mesh_model_init(void);
+ bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size, uint32_t *opcode,
+ 								uint16_t *n);
 -- 
 2.21.0
 
