@@ -2,42 +2,71 @@ Return-Path: <SRS0=/Akc=U5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD349C5B576
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Jun 2019 06:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1CCC5B576
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Jun 2019 22:14:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CE65208E3
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Jun 2019 06:44:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5A99208C3
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Jun 2019 22:14:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pfGmHY7m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726520AbfF3GoA (ORCPT
+        id S1727136AbfF3WOW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Jun 2019 02:44:00 -0400
-Received: from mga07.intel.com ([134.134.136.100]:7276 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726500AbfF3GoA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Jun 2019 02:44:00 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jun 2019 23:43:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,434,1557212400"; 
-   d="scan'208";a="314543836"
-Received: from ingas-nuc1.sea.intel.com ([10.254.64.161])
-  by orsmga004.jf.intel.com with ESMTP; 29 Jun 2019 23:43:58 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, michal.lowas-rzechonek@silvair.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 2/4 v4] mesh: Fix virtual address processing
-Date:   Sat, 29 Jun 2019 23:43:54 -0700
-Message-Id: <20190630064356.12660-3-inga.stotland@intel.com>
+        Sun, 30 Jun 2019 18:14:22 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38421 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726040AbfF3WOV (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 30 Jun 2019 18:14:21 -0400
+Received: by mail-wm1-f65.google.com with SMTP id s15so13806338wmj.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Jun 2019 15:14:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zt6k+megrNsbdnpdb+H0HjlcGwQEvMQjnXiBoWbLH+I=;
+        b=pfGmHY7mFc4K4NX3kGi/A4QJOeT9WQK9O3+57QgLc8LmpSQg4ulSEFA9TIjZcK3f3q
+         VTqARfmMRoe11jkwNkKyAfSuXvo3Mm/egGHibk/OKWBR3XlS1gg7UcE+/8QjHTyqoLMh
+         AYu/WbvfO/645eOts0+AOlmIuNbPWOGXPVFhqF3a64FJGopMZKcTri8dHGLK3nHNK0GT
+         z5pAjRrPpg8C9/ieTQCqTkXJJiRWNQdfXH++eO6LiKtcBG8+A0wlG0A/xXttITGX4cpP
+         /J5q4nxSPQC3pJmqpzkRYiAuA+LhGSjdzQ5ADheGYPbo5MtDbMtaalfIAnKBd3R1aSy0
+         KS0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zt6k+megrNsbdnpdb+H0HjlcGwQEvMQjnXiBoWbLH+I=;
+        b=mSCj3y3ZkLM9H0M4bsL3SNGcLubXewIuKPrZPiH1e/O2s3r8oxp9G1kNHnlzKyaYsB
+         K3f/bPp584LplhLp8WA18WeQQuI31cnGmV1u7vqUcr1A4L1CJTlBriSb76lsTSXrZwLB
+         gHe5CQlYH0121MANll+rUew4MHDmftmSB0iBtab1IYLM/fsH6L/7jM70bWxuJtHM81us
+         44caklZZoKmE5jOLuVKLXnOB7K/tsSH5jg0JCzIBRoad/X81zR1TRhMlk1r1J9U0GTKh
+         O7lazLTwbghnSC6FcoyODsgJVuwOUYzUEdt1e4tc447FN1VPfQJJzphVVwEuVXOqkwtp
+         BS5g==
+X-Gm-Message-State: APjAAAXFQAbTrbfUmUYWdbyIvukDKS65IxGIUTOAGIIiKbQwO7wGnoZb
+        Ptm11FRfLGAErIFIlQ6PjHY=
+X-Google-Smtp-Source: APXvYqwPmJWPh6TnsKk6OBAOk8LAuzdHJFVotesSEUN4u90uoWHqm0m2+cYejEfSNmzjS2b+PmI68A==
+X-Received: by 2002:a1c:f20f:: with SMTP id s15mr13992644wmc.33.1561932859657;
+        Sun, 30 Jun 2019 15:14:19 -0700 (PDT)
+Received: from morpheus.roving-it.com.com (2.e.6.5.c.a.a.1.a.8.0.3.1.e.3.c.1.8.6.2.1.1.b.f.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:fb11:2681:c3e1:308a:1aac:56e2])
+        by smtp.googlemail.com with ESMTPSA id u6sm9120804wml.9.2019.06.30.15.14.17
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sun, 30 Jun 2019 15:14:18 -0700 (PDT)
+From:   Peter Robinson <pbrobinson@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     Peter Robinson <pbrobinson@gmail.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Subject: [PATCH] Bluetooth: btsdio: Do not bind to non-removable BCM4356
+Date:   Sun, 30 Jun 2019 23:14:08 +0100
+Message-Id: <20190630221408.8509-1-pbrobinson@gmail.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190630064356.12660-1-inga.stotland@intel.com>
-References: <20190630064356.12660-1-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -45,371 +74,28 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This tightens up the accounting for locally stored virtual addresses.
-Alos, use meaningful variable names to identify components of a
-mesh virtual address.
----
- mesh/model.c | 173 +++++++++++++++++++++++----------------------------
- mesh/model.h |   6 +-
- 2 files changed, 78 insertions(+), 101 deletions(-)
+BCM4356 devices soldered onto the PCB (non-removable) use an UART
+connection for bluetooth, such as the Rock960, but it also advertise
+btsdio support as a sdio function.
 
-diff --git a/mesh/model.c b/mesh/model.c
-index 9fd3aac6c..205ba0197 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -55,10 +55,10 @@ struct mesh_model {
- };
- 
- struct mesh_virtual {
--	uint32_t id; /*Identifier of internally stored addr, min val 0x10000 */
--	uint16_t ota;
-+	uint32_t id; /* Internal ID of a stored virtual addr, min val 0x10000 */
- 	uint16_t ref_cnt;
--	uint8_t addr[16];
-+	uint16_t addr; /* 16-bit virtual address, used in messages */
-+	uint8_t label[16]; /* 128 bit label UUID */
- };
- 
- /* These struct is used to pass lots of params to l_queue_foreach */
-@@ -128,12 +128,12 @@ static bool find_virt_by_id(const void *a, const void *b)
- 	return virt->id == id;
- }
- 
--static bool find_virt_by_addr(const void *a, const void *b)
-+static bool find_virt_by_label(const void *a, const void *b)
- {
- 	const struct mesh_virtual *virt = a;
--	const uint8_t *addr = b;
-+	const uint8_t *label = b;
- 
--	return memcmp(virt->addr, addr, 16) == 0;
-+	return memcmp(virt->label, label, 16) == 0;
- }
- 
- static bool match_model_id(const void *a, const void *b)
-@@ -324,7 +324,7 @@ static void forward_model(void *a, void *b)
- 			 * Map Virtual addresses to a usable namespace that
- 			 * prevents us for forwarding a false positive
- 			 * (multiple Virtual Addresses that map to the same
--			 * u16 OTA addr)
-+			 * 16-bit virtual address identifier)
- 			 */
- 			fwd->has_dst = true;
- 			dst = virt->id;
-@@ -381,12 +381,12 @@ static int virt_packet_decrypt(struct mesh_net *net, const uint8_t *data,
- 		struct mesh_virtual *virt = v->data;
- 		int decrypt_idx;
- 
--		if (virt->ota != dst)
-+		if (virt->addr != dst)
- 			continue;
- 
- 		decrypt_idx = appkey_packet_decrypt(net, szmict, seq,
- 							iv_idx, src, dst,
--							virt->addr, 16, key_id,
-+							virt->label, 16, key_id,
- 							data, size, out);
- 
- 		if (decrypt_idx >= 0) {
-@@ -430,7 +430,7 @@ static void cmplt(uint16_t remote, uint8_t status,
- 
- static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
- 		uint32_t dst, uint8_t key_id, const uint8_t *key,
--		uint8_t *aad, uint8_t ttl, const void *msg, uint16_t msg_len)
-+		uint8_t *label, uint8_t ttl, const void *msg, uint16_t msg_len)
- {
- 	bool ret = false;
- 	uint32_t iv_index, seq_num;
-@@ -452,7 +452,7 @@ static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
- 	iv_index = mesh_net_get_iv_index(net);
- 
- 	seq_num = mesh_net_get_seq_num(net);
--	if (!mesh_crypto_payload_encrypt(aad, msg, out, msg_len, src, dst,
-+	if (!mesh_crypto_payload_encrypt(label, msg, out, msg_len, src, dst,
- 				key_id, seq_num, iv_index, szmic, key)) {
- 		l_error("Failed to Encrypt Payload");
- 		goto done;
-@@ -568,12 +568,37 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
- 
- }
- 
-+static struct mesh_virtual *add_virtual(const uint8_t *v)
-+{
-+	struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
-+						find_virt_by_label, v);
-+
-+	if (virt) {
-+		virt->ref_cnt++;
-+		return virt;
-+	}
-+
-+	virt = l_new(struct mesh_virtual, 1);
-+
-+	if (!mesh_crypto_virtual_addr(v, &virt->addr)) {
-+		l_free(virt);
-+		return NULL;
-+	}
-+
-+	memcpy(virt->label, v, 16);
-+	virt->ref_cnt = 1;
-+	virt->id = virt_id_next++;
-+	l_queue_push_head(mesh_virtuals, virt);
-+
-+	return virt;
-+}
-+
- static int set_pub(struct mesh_model *mod, const uint8_t *mod_addr,
- 			uint16_t idx, bool cred_flag, uint8_t ttl,
- 			uint8_t period, uint8_t retransmit, bool b_virt,
- 			uint16_t *dst)
- {
--	struct mesh_virtual *virt;
-+	struct mesh_virtual *virt = NULL;
- 	uint16_t grp;
- 
- 	if (dst) {
-@@ -583,35 +608,30 @@ static int set_pub(struct mesh_model *mod, const uint8_t *mod_addr,
- 			*dst = l_get_le16(mod_addr);
- 	}
- 
--	if (b_virt && !mesh_crypto_virtual_addr(mod_addr, &grp))
--		return MESH_STATUS_STORAGE_FAIL;
-+	if (b_virt) {
-+		virt = add_virtual(mod_addr);
-+		if (!virt)
-+			return MESH_STATUS_STORAGE_FAIL;
-+
-+	}
- 
--	/* If old publication was Virtual, remove it */
-+	/* If the old publication address is virtual, remove it from lists */
- 	if (mod->pub && mod->pub->addr >= VIRTUAL_BASE) {
--		virt = l_queue_find(mod->virtuals, find_virt_by_id,
-+		struct mesh_virtual *old_virt;
-+
-+		old_virt = l_queue_find(mod->virtuals, find_virt_by_id,
- 						L_UINT_TO_PTR(mod->pub->addr));
--		if (virt) {
--			l_queue_remove(mod->virtuals, virt);
--			unref_virt(virt);
-+		if (old_virt) {
-+			l_queue_remove(mod->virtuals, old_virt);
-+			unref_virt(old_virt);
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+CC: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+---
+ drivers/bluetooth/btsdio.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 83748b7b2033..fd9571d5fdac 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -286,6 +286,7 @@ static int btsdio_probe(struct sdio_func *func,
+ 		switch (func->device) {
+ 		case SDIO_DEVICE_ID_BROADCOM_43341:
+ 		case SDIO_DEVICE_ID_BROADCOM_43430:
++		case SDIO_DEVICE_ID_BROADCOM_4356:
+ 			return -ENODEV;
  		}
  	}
- 
- 	mod->pub = l_new(struct mesh_model_pub, 1);
- 
- 	if (b_virt) {
--		virt = l_queue_find(mesh_virtuals, find_virt_by_addr, mod_addr);
--		if (!virt) {
--			virt = l_new(struct mesh_virtual, 1);
--			virt->id = virt_id_next++;
--			virt->ota = grp;
--			memcpy(virt->addr, mod_addr, sizeof(virt->addr));
--			l_queue_push_head(mesh_virtuals, virt);
--		} else {
--			grp = virt->ota;
--		}
--
--		virt->ref_cnt++;
- 		l_queue_push_head(mod->virtuals, virt);
-+		grp = virt->addr;
- 		mod->pub->addr = virt->id;
- 	} else {
- 		grp = l_get_le16(mod_addr);
-@@ -643,28 +663,15 @@ static int set_pub(struct mesh_model *mod, const uint8_t *mod_addr,
- static int add_sub(struct mesh_net *net, struct mesh_model *mod,
- 			const uint8_t *group, bool b_virt, uint16_t *dst)
- {
--	struct mesh_virtual *virt;
-+	struct mesh_virtual *virt = NULL;
- 	uint16_t grp;
- 
- 	if (b_virt) {
--		virt = l_queue_find(mesh_virtuals, find_virt_by_addr, group);
--		if (!virt) {
--			if (!mesh_crypto_virtual_addr(group, &grp))
--				return MESH_STATUS_STORAGE_FAIL;
--
--			virt = l_new(struct mesh_virtual, 1);
--			virt->id = virt_id_next++;
--			virt->ota = grp;
--			memcpy(virt->addr, group, sizeof(virt->addr));
--
--			if (!l_queue_push_head(mesh_virtuals, virt))
--				return MESH_STATUS_STORAGE_FAIL;
--		} else {
--			grp = virt->ota;
--		}
-+		virt = add_virtual(group);
-+		if (!virt)
-+			return MESH_STATUS_STORAGE_FAIL;
- 
--		virt->ref_cnt++;
--		l_queue_push_head(mod->virtuals, virt);
-+		grp = virt->addr;
- 	} else {
- 		grp = l_get_le16(group);
- 	}
-@@ -675,9 +682,16 @@ static int add_sub(struct mesh_net *net, struct mesh_model *mod,
- 	if (!mod->subs)
- 		mod->subs = l_queue_new();
- 
--	if (l_queue_find(mod->subs, simple_match, L_UINT_TO_PTR(grp)))
--		/* Group already exists */
-+	/* Check if this group already exists */
-+	if (l_queue_find(mod->subs, simple_match, L_UINT_TO_PTR(grp))) {
-+		if (b_virt)
-+			unref_virt(virt);
-+
- 		return MESH_STATUS_SUCCESS;
-+	}
-+
-+	if (b_virt)
-+		l_queue_push_head(mod->virtuals, virt);
- 
- 	l_queue_push_tail(mod->subs, L_UINT_TO_PTR(grp));
- 
-@@ -864,7 +878,7 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
- 	struct mesh_net *net = node_get_net(node);
- 	struct mesh_model *mod;
- 	uint32_t target;
--	uint8_t *aad = NULL;
-+	uint8_t *label = NULL;
- 	uint16_t dst;
- 	uint8_t key_id;
- 	const uint8_t *key;
-@@ -896,18 +910,18 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
- 	target = mod->pub->addr;
- 
- 	if (IS_UNASSIGNED(target))
--		return false;
-+		return MESH_ERROR_DOES_NOT_EXIST;
- 
- 	if (target >= VIRTUAL_BASE) {
--		struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
--				find_virt_by_id,
--				L_UINT_TO_PTR(target));
-+		struct mesh_virtual *virt;
- 
-+		virt = l_queue_find(mesh_virtuals, find_virt_by_id,
-+						L_UINT_TO_PTR(target));
- 		if (!virt)
--			return false;
-+			return MESH_ERROR_NOT_FOUND;
- 
--		aad = virt->addr;
--		dst = virt->ota;
-+		label = virt->label;
-+		dst = virt->addr;
- 	} else {
- 		dst = target;
- 	}
-@@ -924,7 +938,7 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
- 	l_debug("key_id %x", key_id);
- 
- 	result = msg_send(node, mod->pub->credential != 0, src,
--				dst, key_id, key, aad, ttl, msg, msg_len);
-+				dst, key_id, key, label, ttl, msg, msg_len);
- 
- 	return result ? MESH_ERROR_NONE : MESH_ERROR_FAILED;
- 
-@@ -1063,7 +1077,6 @@ struct mesh_model *mesh_model_vendor_new(uint8_t ele_idx, uint16_t vendor_id,
- /* Internal models only */
- static void restore_model_state(struct mesh_model *mod)
- {
--
- 	const struct mesh_model_ops *cbs;
- 	const struct l_queue_entry *b;
- 
-@@ -1310,10 +1323,10 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (b_virt) {
- 		struct mesh_virtual *virt;
- 
--		virt = l_queue_find(mod->virtuals, find_virt_by_addr, group);
-+		virt = l_queue_find(mod->virtuals, find_virt_by_label, group);
- 		if (virt) {
- 			l_queue_remove(mod->virtuals, virt);
--			grp = virt->ota;
-+			grp = virt->addr;
- 			unref_virt(virt);
- 		} else {
- 			if (!mesh_crypto_virtual_addr(group, &grp))
-@@ -1505,39 +1518,6 @@ bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size,
- 	return true;
- }
- 
--void mesh_model_add_virtual(struct mesh_node *node, const uint8_t *v)
--{
--	struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
--						find_virt_by_addr, v);
--
--	if (virt) {
--		virt->ref_cnt++;
--		return;
--	}
--
--	virt = l_new(struct mesh_virtual, 1);
--
--	if (!mesh_crypto_virtual_addr(v, &virt->ota)) {
--		l_free(virt);
--		return; /* Storage Failure */
--	}
--
--	memcpy(virt->addr, v, 16);
--	virt->ref_cnt++;
--	virt->id = virt_id_next++;
--	l_queue_push_head(mesh_virtuals, virt);
--}
--
--void mesh_model_del_virtual(struct mesh_node *node, uint32_t va24)
--{
--	struct mesh_virtual *virt = l_queue_remove_if(mesh_virtuals,
--						find_virt_by_id,
--						L_UINT_TO_PTR(va24));
--
--	if (virt)
--		unref_virt(virt);
--}
--
- void model_build_config(void *model, void *msg_builder)
- {
- 	struct l_dbus_message_builder *builder = msg_builder;
-@@ -1588,4 +1568,5 @@ void mesh_model_init(void)
- void mesh_model_cleanup(void)
- {
- 	l_queue_destroy(mesh_virtuals, l_free);
-+	mesh_virtuals = NULL;
- }
-diff --git a/mesh/model.h b/mesh/model.h
-index 6094eaf59..f0f97ee0b 100644
---- a/mesh/model.h
-+++ b/mesh/model.h
-@@ -24,7 +24,7 @@ struct mesh_model;
- #define MAX_BINDINGS	10
- #define MAX_GRP_PER_MOD	10
- 
--#define	VIRTUAL_BASE			0x10000
-+#define VIRTUAL_BASE			0x10000
- 
- #define MESH_MAX_ACCESS_PAYLOAD		380
- 
-@@ -124,14 +124,10 @@ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
- 			uint32_t seq, uint32_t iv_index, uint8_t ttl,
- 			uint16_t src, uint16_t dst, uint8_t key_id,
- 			const uint8_t *data, uint16_t size);
--
- void mesh_model_app_key_generate_new(struct mesh_node *node, uint16_t net_idx);
- void mesh_model_app_key_delete(struct mesh_node *node, struct l_queue *models,
- 								uint16_t idx);
- struct l_queue *mesh_model_get_appkeys(struct mesh_node *node);
--void mesh_model_add_virtual(struct mesh_node *node, const uint8_t *v);
--void mesh_model_del_virtual(struct mesh_node *node, uint32_t va24);
--void mesh_model_list_virtual(struct mesh_node *node);
- uint16_t mesh_model_opcode_set(uint32_t opcode, uint8_t *buf);
- bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size, uint32_t *opcode,
- 								uint16_t *n);
 -- 
 2.21.0
 
