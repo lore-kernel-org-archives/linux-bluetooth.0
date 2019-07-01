@@ -2,116 +2,99 @@ Return-Path: <SRS0=E8Rw=U6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC69FC0650E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 20:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A509C5B578
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 20:08:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80AFC21721
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 20:00:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="G9H3Ri65"
+	by mail.kernel.org (Postfix) with ESMTP id EC369206A3
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 20:08:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbfGAUA3 (ORCPT
+        id S1726652AbfGAUI6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Jul 2019 16:00:29 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:38744 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726586AbfGAUA3 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Jul 2019 16:00:29 -0400
-Received: by mail-lj1-f196.google.com with SMTP id r9so14496195ljg.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2019 13:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=9UU94f82JSzX3YHKOwlgRBln+7Hg6rn7BOoVRDULvnk=;
-        b=G9H3Ri65HkNRr09Mnj0ZISNCtr87Xy/IcIM+0H0aTQTPQJKj9aBsaOVdPG1CkjtPBM
-         SeED3ckerUd3VYxgvdGzJUdFzI6B8muZqF6V3H1Pl+DVisehhuIo2zshm/YGei+ipWoh
-         7CVtQP56/LCEzganaDUnI6cFHMAABfqoOgySsCSMfGmdF6wGUNa+rW64uGWiBreUvFzm
-         Elq3YJUvajnVNcCEdi99Dhj8NnbvOihWX1QqWs1U5YMqM1Ztfa+LdU2WU490pWAF3nNB
-         2dHCW4FDBhuwkpJXby5EVDJN0rFTzaeA6aglX7FCwFvyBvxKhNCLRDJmfobQ/OLPSC3Y
-         KLfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=9UU94f82JSzX3YHKOwlgRBln+7Hg6rn7BOoVRDULvnk=;
-        b=CcLM8/i/HgO1w4w7o1FHYdCvjMrFqSpaw2vVSqQQ9MwndawkGAP5N1xRwN8JPogMIx
-         q3wxr2H6fdns+PCY83+vXfY0FkjfjijdZHZt5ZjnIBohCmR3/+v9OazfkdjT/ftqpYkt
-         awyOIupLarzKxt2NXMgBxYSyhA5AevB24BFduRaOWBdVU2kWjLwMI5PEunJ5CRbBHezb
-         0VUEnzsTjqlDpp4plVmqOaJ7zdl9weS2bi40fp55/jTcPLQczH2jsfWb3xQ/w/xigV5L
-         GLtKPtg5JJJKpFH/QtiGykp/5+B/k22gjtrIhN1YjMkmGkz0U5X90IdQ26G3jyY/d+rC
-         su7A==
-X-Gm-Message-State: APjAAAXuhvmx2J1KNBvfktdBLBWb0UcHSEK7rylLbcKUMg3Lwg0RtyGL
-        qkhB1Cv0DlQAXhDP9vLVOGfnyPnhshg=
-X-Google-Smtp-Source: APXvYqwmEr3slAW6OCXX8g2loZEGk5c4m/mzn2+cGnD4wsyQrO2lRkn9Lm59T5lNZHpVNaMXuiyriw==
-X-Received: by 2002:a2e:9a96:: with SMTP id p22mr14916458lji.57.1562011227367;
-        Mon, 01 Jul 2019 13:00:27 -0700 (PDT)
-Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
-        by smtp.gmail.com with ESMTPSA id x19sm3389284ljb.6.2019.07.01.13.00.25
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 01 Jul 2019 13:00:26 -0700 (PDT)
-Date:   Mon, 1 Jul 2019 22:00:24 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
+        Mon, 1 Jul 2019 16:08:58 -0400
+Received: from mga05.intel.com ([192.55.52.43]:41115 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726586AbfGAUI6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 1 Jul 2019 16:08:58 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Jul 2019 13:08:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,440,1557212400"; 
+   d="scan'208";a="362376754"
+Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
+  by fmsmga006.fm.intel.com with ESMTP; 01 Jul 2019 13:08:57 -0700
+Received: from orsmsx155.amr.corp.intel.com (10.22.240.21) by
+ ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 1 Jul 2019 13:08:57 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
+ ORSMSX155.amr.corp.intel.com ([169.254.7.237]) with mapi id 14.03.0439.000;
+ Mon, 1 Jul 2019 13:08:57 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
         <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Stotland, Inga" <inga.stotland@intel.com>
 Subject: Re: [PATCH BlueZ 2/3] mesh: Add DevKeySend call
-Message-ID: <20190701200024.btxrfm2ndanzx7tm@kynes>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
+Thread-Topic: [PATCH BlueZ 2/3] mesh: Add DevKeySend call
+Thread-Index: AQHVLbBTXkZCBJk6F0mOJ2IaxbXQY6axhQEAgAARy4CABRJpAIAAAmAA
+Date:   Mon, 1 Jul 2019 20:08:56 +0000
+Message-ID: <1562011734.458.14.camel@intel.com>
 References: <20190628125205.21411-1-michal.lowas-rzechonek@silvair.com>
- <20190628125205.21411-3-michal.lowas-rzechonek@silvair.com>
- <20190628132932.bhcvcx4tzlfkertu@mlowasrzechonek2133>
- <1561732393.7802.50.camel@intel.com>
+         <20190628125205.21411-3-michal.lowas-rzechonek@silvair.com>
+         <20190628132932.bhcvcx4tzlfkertu@mlowasrzechonek2133>
+         <1561732393.7802.50.camel@intel.com>
+         <20190701200024.btxrfm2ndanzx7tm@kynes>
+In-Reply-To: <20190701200024.btxrfm2ndanzx7tm@kynes>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.255.80.171]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9D986203C798CE4A9827D335B8818A5F@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1561732393.7802.50.camel@intel.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
-
-On 06/28, Gix, Brian wrote:
-> Unlike App Keys, Device keys do not have a bound Net Key...  They can
-> be sent on *any* network key.  So while sending a message on a
-> specific App index implies the Net Key to use, the Dev Key send does
-> not, and so needs it to be explicit.
-
-After digging through the code, I've noticed that at the moment
-bluetooth-meshd doesn't really support sending messages using
-non-primary network key - this is because of internal API limitations
-(see the TODO next to send_seg function in net.c).
-
-Would it be OK for me to start implementing SendDevKey API in a way that
-always uses the primary subnet, like it's currently done with
-application keys? The same applies to calling DevKeyMessageReceived() on
-the application side.
-
-I am aware that a node is supposed to respond using the same subnet that
-a request was sent through, but it's not that simple to implement in one
-shot...
-
-I'd very much like to add subnet support as well, but such a patch would
-be much, much larger - I think I would need to modify internal APIs to
-use mesh_subnet struct instead of mesh_net, and do it in many, many
-places.
-
-regards
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+SGkgTWljaGHFgiwNCg0KT24gTW9uLCAyMDE5LTA3LTAxIGF0IDIyOjAwICswMjAwLCBtaWNoYWwu
+bG93YXMtcnplY2hvbmVrQHNpbHZhaXIuY29tIHdyb3RlOg0KPiBIaSBCcmlhbiwNCj4gDQo+IE9u
+IDA2LzI4LCBHaXgsIEJyaWFuIHdyb3RlOg0KPiA+IFVubGlrZSBBcHAgS2V5cywgRGV2aWNlIGtl
+eXMgZG8gbm90IGhhdmUgYSBib3VuZCBOZXQgS2V5Li4uICBUaGV5IGNhbg0KPiA+IGJlIHNlbnQg
+b24gKmFueSogbmV0d29yayBrZXkuICBTbyB3aGlsZSBzZW5kaW5nIGEgbWVzc2FnZSBvbiBhDQo+
+ID4gc3BlY2lmaWMgQXBwIGluZGV4IGltcGxpZXMgdGhlIE5ldCBLZXkgdG8gdXNlLCB0aGUgRGV2
+IEtleSBzZW5kIGRvZXMNCj4gPiBub3QsIGFuZCBzbyBuZWVkcyBpdCB0byBiZSBleHBsaWNpdC4N
+Cj4gDQo+IEFmdGVyIGRpZ2dpbmcgdGhyb3VnaCB0aGUgY29kZSwgSSd2ZSBub3RpY2VkIHRoYXQg
+YXQgdGhlIG1vbWVudA0KPiBibHVldG9vdGgtbWVzaGQgZG9lc24ndCByZWFsbHkgc3VwcG9ydCBz
+ZW5kaW5nIG1lc3NhZ2VzIHVzaW5nDQo+IG5vbi1wcmltYXJ5IG5ldHdvcmsga2V5IC0gdGhpcyBp
+cyBiZWNhdXNlIG9mIGludGVybmFsIEFQSSBsaW1pdGF0aW9ucw0KPiAoc2VlIHRoZSBUT0RPIG5l
+eHQgdG8gc2VuZF9zZWcgZnVuY3Rpb24gaW4gbmV0LmMpLg0KPiANCj4gV291bGQgaXQgYmUgT0sg
+Zm9yIG1lIHRvIHN0YXJ0IGltcGxlbWVudGluZyBTZW5kRGV2S2V5IEFQSSBpbiBhIHdheSB0aGF0
+DQo+IGFsd2F5cyB1c2VzIHRoZSBwcmltYXJ5IHN1Ym5ldCwgbGlrZSBpdCdzIGN1cnJlbnRseSBk
+b25lIHdpdGgNCj4gYXBwbGljYXRpb24ga2V5cz8gVGhlIHNhbWUgYXBwbGllcyB0byBjYWxsaW5n
+IERldktleU1lc3NhZ2VSZWNlaXZlZCgpIG9uDQo+IHRoZSBhcHBsaWNhdGlvbiBzaWRlLg0KDQpX
+aGVuIHRoaXMgY29kZSB3YXMgb3JpZ2luYWxseSB3cml0dGVuLCBpdCBvbmx5IHN1cHBvcnRlZCBh
+IHNpbmdsZSBzdWJuZXQuDQoNCkkgaGF2ZSBubyBwcm9ibGVtIHdpdGggZnVuY3Rpb25hbGl0eSBi
+ZWluZyBhZGRlZCBncmFkdWFsbHksIGJ1dCB3ZSBkbyBldmVudHVhbGx5DQpuZWVkIHRvIGJlIGFi
+bGUgc2VuZCAqZXZlcnl0aGluZyogaW5jbHVkaW5nIGFsbCBzZWdtZW50cyBvbiB0aGUgcmVxdWVz
+dGVkDQpzdWJuZXQgKG5vdCBuZWNjZXNzYXJpbHkgdGhlIHByaW1hcnkgc3VibmV0KS4gIEFuZCB0
+aGVyZSB3aWxsIGJlIHRoZSBwcm9ibGVtIHRoYXQNCm5vZGVzIG1heSBleGlzdCB0aGF0IGRvIG5v
+dCBldmVuIGhhdmUgdGhlIHByaW1hcnkgc3VibmV0IGtleS4NCg0KPiANCj4gSSBhbSBhd2FyZSB0
+aGF0IGEgbm9kZSBpcyBzdXBwb3NlZCB0byByZXNwb25kIHVzaW5nIHRoZSBzYW1lIHN1Ym5ldCB0
+aGF0DQo+IGEgcmVxdWVzdCB3YXMgc2VudCB0aHJvdWdoLCBidXQgaXQncyBub3QgdGhhdCBzaW1w
+bGUgdG8gaW1wbGVtZW50IGluIG9uZQ0KPiBzaG90Li4uDQo+IA0KPiBJJ2QgdmVyeSBtdWNoIGxp
+a2UgdG8gYWRkIHN1Ym5ldCBzdXBwb3J0IGFzIHdlbGwsIGJ1dCBzdWNoIGEgcGF0Y2ggd291bGQN
+Cj4gYmUgbXVjaCwgbXVjaCBsYXJnZXIgLSBJIHRoaW5rIEkgd291bGQgbmVlZCB0byBtb2RpZnkg
+aW50ZXJuYWwgQVBJcyB0bw0KPiB1c2UgbWVzaF9zdWJuZXQgc3RydWN0IGluc3RlYWQgb2YgbWVz
+aF9uZXQsIGFuZCBkbyBpdCBpbiBtYW55LCBtYW55DQo+IHBsYWNlcy4NCg0KDQpGb3J3YXJkIHBy
+b2dyZXNzIGlzIGZvcndhcmQgcHJvZ3Jlc3MuIEkgZG9uJ3QgdGhpbmsgYW55IGltcHJvdmVtZW50
+cyB3aWxsIGJlDQpyZWplY3RlZCB1bmxlc3MgdGhleSBmdW5kdW1lbnRhbGx5IHJlc3RyaWN0IG91
+ciBmdXR1cmUgYWJpbGl0eSB0byBtYWtlIHRoaW5ncw0KMTAwJSBjb3JyZWN0Lg0KDQoNCj4gDQo+
+IHJlZ2FyZHM=
