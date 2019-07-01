@@ -2,111 +2,89 @@ Return-Path: <SRS0=E8Rw=U6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F120C0650E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 07:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F86C0650F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 07:45:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 012ED20652
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 07:15:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61499208E4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Jul 2019 07:45:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=endlessm-com.20150623.gappssmtp.com header.i=@endlessm-com.20150623.gappssmtp.com header.b="UdrWy5ns"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727841AbfGAHPZ convert rfc822-to-8bit (ORCPT
+        id S1727359AbfGAHpx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Jul 2019 03:15:25 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:40480 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727173AbfGAHPZ (ORCPT
+        Mon, 1 Jul 2019 03:45:53 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:46054 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727168AbfGAHpu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Jul 2019 03:15:25 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id C95B128518
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2019 07:15:24 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id BDDE728555; Mon,  1 Jul 2019 07:15:24 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 203997] [REGRESSION] Unable to connect BT audio device on
- 5.1.15
-Date:   Mon, 01 Jul 2019 07:15:23 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: matias.karhumaa@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-203997-62941-FDKBI4ez5w@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203997-62941@https.bugzilla.kernel.org/>
-References: <bug-203997-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 1 Jul 2019 03:45:50 -0400
+Received: by mail-qk1-f196.google.com with SMTP id s22so10229417qkj.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2019 00:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=endlessm-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+o+3A6MehkTrwlHzPltAkDqnU8gp0GmaahhvYz3RFyM=;
+        b=UdrWy5ns7RKotFmMefez/oD/AycEJAzAu1LjvzFxXzIV4kW8lF6C5E/yvkt5ySrF2j
+         VZDVpG1ExkBJNYT4TPy37N15aHPWJOKrG0nY9m4OjJLRSTfTGqcpMiJnTdMJsEmz+Wvp
+         k9akBzRMejSTu+YvWpnerRXCUEi7t8r6qcHD8BX0XETVMQXi0yDhP7wJf3HiIxA7M11z
+         l/qTa/6tXlTHU7hBV6uY0/UktA+siFSqUlbatFBKeu7DEyO7kMrEUwX12d0HM0dHm0MB
+         Qe+bwPd7IUi30U/ZSU50pUaYEzBaHpIS4/QJE/CAxYsfIeyBM4LDj9P1KUP01THV2dp7
+         pnFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+o+3A6MehkTrwlHzPltAkDqnU8gp0GmaahhvYz3RFyM=;
+        b=VDURiLUHHTB28AyGzpAqvbKZAs5bx2Fi5zeRcsuRY9s5jVaZIGad/S874RyA2GZFr/
+         AruxqCL2SPIzeBPMBpmzmDntNHyiuv54Yfp8/mNcWgf9/Ge0BKQVynyl9SEPZ3G8Ifxt
+         UAQxw2GySXnVmBCd8oPB9Dk0dv6elwk46nEoPnpfbF6HWYFEc+RCOwFaaBV7LFKh7e3y
+         XXBaysMB/nfvpgNHPfa8uRTnGRGfseNf1k2rKW+f9j/eb/3nXru7inVbhFp1Lgp3yjmT
+         9dLymvzD/iPYe4QdGJQGST842qJmRjMHHjlDoOQdqu+6zN5qBrh/5QuuOYKFkz99yrcX
+         dlEg==
+X-Gm-Message-State: APjAAAUaq2lYs7xExy9na58BptEUAYoYBVtRYYjjANJMrOIXxTfpw0GX
+        EhxUJCcYhuvvBpE6y7z1e0cQ+z5fY16EYxyxSl0fSA==
+X-Google-Smtp-Source: APXvYqyXMdwt3gy6gqvDfkjOmeiiPp0dk+UezJGobEGYLzx6o98gaaTwQAzlig0mzlY7lUACwRRaawq+a4PtpXv8WBg=
+X-Received: by 2002:a37:6808:: with SMTP id d8mr18821969qkc.478.1561967149291;
+ Mon, 01 Jul 2019 00:45:49 -0700 (PDT)
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+References: <B8AD29F1-444A-4BB7-8C12-9C31EB974D11@holtmann.org> <20190625083051.7525-1-jian-hong@endlessm.com>
+In-Reply-To: <20190625083051.7525-1-jian-hong@endlessm.com>
+From:   Daniel Drake <drake@endlessm.com>
+Date:   Mon, 1 Jul 2019 15:45:38 +0800
+Message-ID: <CAD8Lp44ZZZGf58XKZ1PFJrC5UqdQ17v17-nnEYC-Ro0-G_u1=Q@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: btrtl: HCI reset on close for Realtek BT chip
+To:     Jian-Hong Pan <jian-hong@endlessm.com>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Linux Bluetooth mailing list 
+        <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203997
+On Tue, Jun 25, 2019 at 4:32 PM Jian-Hong Pan <jian-hong@endlessm.com> wrote:
+> Realtek RTL8822BE BT chip on ASUS X420FA cannot be turned on correctly
+> after on-off several times. Bluetooth daemon sets BT mode failed when
+> this issue happens. Scanning must be active while turning off for this
+> bug to be hit.
+>
+> bluetoothd[1576]: Failed to set mode: Failed (0x03)
+>
+> If BT is turned off, then turned on again, it works correctly again.
+>
+> According to the vendor driver, the HCI_QUIRK_RESET_ON_CLOSE flag is set
+> during probing. So, this patch makes Realtek's BT reset on close to fix
+> this issue.
+>
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=203429
+> Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
 
---- Comment #8 from Matias Karhumaa (matias.karhumaa@gmail.com) ---
-Ah, I think recent regression fix [1] caused another bug:
-
---snip--
-static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
-{
-        /* The minimum encryption key size needs to be enforced by the
-         * host stack before establishing any L2CAP connections. The
-         * specification in theory allows a minimum of 1, but to align
-         * BR/EDR and LE transports, a minimum of 7 is chosen.
-         *
-         * This check might also be called for unencrypted connections
-         * that have no key size requirements. Ensure that the link is
-         * actually encrypted before enforcing a key size.
-         */
-        return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
-                hcon->enc_key_size > HCI_MIN_ENC_KEY_SIZE);
-}
---snip--
-
-If Encryption key size is 7, L2CAP connection will fail. I think it should be
-something like this:
-
-In l2cap_core.c
-
-static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
-{
-        /* The minimum encryption key size needs to be enforced by the
-         * host stack before establishing any L2CAP connections. The
-         * specification in theory allows a minimum of 1, but to align
-         * BR/EDR and LE transports, a minimum of 7 is chosen.
-         *
-         * This check might also be called for unencrypted connections
-         * that have no key size requirements. Ensure that the link is
-         * actually encrypted before enforcing a key size.
-         */
-        return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
-                hcon->enc_key_size >= HCI_MIN_ENC_KEY_SIZE);
-}
---snip--
-
-Could you test the fix?
-
-[1]:
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/net/bluetooth?id=693cd8ce3f882524a5d06f7800dd8492411877b3
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Reviewed-by: Daniel Drake <drake@endlessm.com>
