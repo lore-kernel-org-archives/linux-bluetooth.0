@@ -2,193 +2,98 @@ Return-Path: <SRS0=p1bJ=U7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B008C5B57D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 05:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF0AC06510
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F1862146F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 05:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13FC020836
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="M1rBaS4Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726150AbfGBFoK (ORCPT
+        id S1727031AbfGBJHi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Jul 2019 01:44:10 -0400
-Received: from mga18.intel.com ([134.134.136.126]:13590 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725775AbfGBFoK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Jul 2019 01:44:10 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Jul 2019 22:43:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,442,1557212400"; 
-   d="p7s'?scan'208";a="362503411"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by fmsmga006.fm.intel.com with ESMTP; 01 Jul 2019 22:43:45 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX110.amr.corp.intel.com ([169.254.10.97]) with mapi id 14.03.0439.000;
- Mon, 1 Jul 2019 22:43:44 -0700
-From:   "Stotland, Inga" <inga.stotland@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "Gix, Brian" <brian.gix@intel.com>
-CC:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Was: mesh: Added ImportLocalNode call with its API --> Multiple
- Methods?
-Thread-Topic: Was: mesh: Added ImportLocalNode call with its API -->
- Multiple Methods?
-Thread-Index: AQHVLRZ+HR5m7dtU/Eek/jPgfEZlzKawXpWAgAE4cgCABGCzAIAAbrAAgADm1AA=
-Date:   Tue, 2 Jul 2019 05:43:44 +0000
-Message-ID: <ee594d462e6ca16ef9a0f5f0f46b614316afa86d.camel@intel.com>
-References: <20190625143855.29889-1-jakub.witowski@silvair.com>
-         <1561568468.22940.16.camel@intel.com>
-         <14abe0f2129a2334d32aa14f2167380a5208880b.camel@intel.com>
-         <CAMCw4t3pXTbtt05RD694jzF_MNT_J9dcFMtA7iuD4ujZT9FDbg@mail.gmail.com>
-         <1561660267.7802.29.camel@intel.com>
-         <20190627195127.payxcdeexiamsi24@kynes>
-         <1561732182.7802.47.camel@intel.com>
-         <20190701092052.24dxntjvvdcylp6r@mlowasrzechonek2133>
-         <DEBB0CAA2616974FAE35E4B560B9A4376CBB4F18@ORSMSX103.amr.corp.intel.com>
-In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4376CBB4F18@ORSMSX103.amr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.252.207.138]
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-BlY5LriF69VgIMtwnw5b"
+        Tue, 2 Jul 2019 05:07:38 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:35851 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726213AbfGBJHi (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Jul 2019 05:07:38 -0400
+Received: by mail-lf1-f66.google.com with SMTP id q26so10849627lfc.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2019 02:07:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mp3ZY1Zbmk6NFA2H80XeWFYbrVsJdT8lY/Wlq0J2yjo=;
+        b=M1rBaS4QLPGqStqsLt2DUr4LAd1jg0Y9ps3I4e1tH+XmZDS+XGsvMfnw4CUY3asmOC
+         A2rD1MteTRN/gEXSH6DM/RASS9r7SbJuf9H0rUD1B4Zeby9QT2NM5ztmcRls7s2+6eiB
+         PadkBjONSEwGvGmX+pEQaE0orKlTsx0oaVQPK4nKinbp7/0ko1lgaRAmGSUCnMWMTgLO
+         hw3b7YmVHiyt/6jUQtJRKLhc+qUAqNmTsllPq5ot+TA5LmuI+BwTCsHRIYoJqLSyc1AK
+         KEKPbSnrsI+6pTdazyGdatT4YekV4FnSE64W/k7M74VpQsDwp+cTbHALUX+/110h7y+i
+         ttAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mp3ZY1Zbmk6NFA2H80XeWFYbrVsJdT8lY/Wlq0J2yjo=;
+        b=TWjxBY6oRrxwWRmXvFwwnAIcggnF5jkLjp3E9/BGofRyXY+zHgqIolS3XgfpNWqSnx
+         YjZhHDmko+oxXdHWC5s2/v3eQfgBqVTSc9YgUloJav92LiPwSWnXMiiNY0qvieGuHdyz
+         ZqzAkrzERA7RZhQkMoFZxygwTW+cvOAe1e5UwAXQk4oYqlX2zTZFXSKv1Io9ESWEPeps
+         vGGTJn4GXL9iaf4Imk0mk0HRfqcFYAkcPBx17mrUL6AlfXjYq/AuRpRwXiNj521SsiFS
+         Gq8T1uh77kpPH7J3KuGZ4OCWHiLUAbbcmJ+7OebHf97QhouK1NEt1M+6ZG7TD/FZyBRF
+         Kg+g==
+X-Gm-Message-State: APjAAAVT6Lp0gQ7QBHj1hUG/bVHnjTSbjpILyMT0eRzQthMYpKBn1tLr
+        sCn/IK0WfBxrj1kH4T+nWFB7SoizWh4=
+X-Google-Smtp-Source: APXvYqwtVgK8e2FPhj/NFMib7PmBvgcVBaRHsEYOVLqljquv655os6n3vAG/iIkmRddxba0ohdySeg==
+X-Received: by 2002:ac2:5189:: with SMTP id u9mr14405268lfi.189.1562058455700;
+        Tue, 02 Jul 2019 02:07:35 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id 2sm3684904lji.94.2019.07.02.02.07.34
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 02 Jul 2019 02:07:35 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 0/3] Add possibility to use remote device keys
+Date:   Tue,  2 Jul 2019 11:07:28 +0200
+Message-Id: <20190702090731.30852-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-BlY5LriF69VgIMtwnw5b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This patchset adds support for sending and receiving messages encrypted
+with remote device keys.
 
-Hi Brian, Michal, Jakub,
+This plugs a 'leak' in the API where it was possible to exchange such
+messages using Send()/MessageReceived() API by using 0x7fff app key
+index.
 
-On Mon, 2019-07-01 at 08:57 -0700, Gix, Brian wrote:
-> Hi Michal.
->=20
-> > > We can perhaps "Overload" this functionality by allowing a
-> > > minimal
-> > > JSON with only Prov Data parts, if we are looking for a
-> > > Provisioning
-> > > shortcut, and always requiring the ObjectManager calls fetch the
-> > > Composition (if the JSON was minimal) and to Sanity check the
-> > > Composition (if the JSON contains a fully developed/configured
-> > > Migrated node).
-> >=20
-> > Ok, that sounds better. We could start by implementing the
-> > "Provisoining
-> > shortcut" variant, and add full-blown migration when it's needed.
-> >=20
-> > Would that be OK from your POV?
->=20
-> This would be OK for me.  How about Inga?
->=20
-> BR,=20
-> Brian
+In order to allow the application to receive responses from a local
+Config Server model, messages originating from a local node and
+encrypted using local device key are also forwarded to the application
+via D-Bus (assuming they were not handled by one of internal models).
 
+Michał Lowas-Rzechonek (3):
+  mesh: Split APP_IDX_DEV into APP_IDX_DEV_LOCAL and APP_IDX_DEV_REMOTE
+  mesh: Implement DevKeySend() method on Node interface
+  mesh: Handle messages encrypted with a remote device key
 
-So what is the final versionof the ImportLocalNode() will look like?
+ mesh/cfgmod-server.c | 15 +++----
+ mesh/model.c         | 93 +++++++++++++++++++++++++++++++++++++-------
+ mesh/net.h           | 10 +++--
+ mesh/node.c          | 59 +++++++++++++++++++++++++++-
+ 4 files changed, 150 insertions(+), 27 deletions(-)
 
-uint64 token ImportLocalNode(object app_path, array{byte} uuid, string
-config_data)
+-- 
+2.19.1
 
-or
-
-uint64 token ImportLocalNode(object app_path, array{byte} uuid, byte
-config_data_type, string config_data)
-
-where config_data_type indicates the format of config_data (json, xml,
-etc)
-
-A bit clunky, but, if we want to keep everything wrapped in one method
-call, I don't see a way around this.
-
-Also, my feeling is that app_path =3D NULL shuold be allowed. In this
-case node/app configuration is incurred solely from config_data, daemon
-will check for the presence of all the mandatory settings.
-In case both app_path and fully fleshed config_data are provided, a
-series of checks will need to be performed to validate the coherncy of
-the configuration.
-
-Best regards,
-Inga
-=20
-
-
---=-BlY5LriF69VgIMtwnw5b
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-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
-k3sf6w6ZKbZbz2V54rncMEXM3N/P4C6ZHZR0XYqh5m1vWxZYYVzTuDEH1C8W+b3KzldrAgMBAAGj
-ggIwMIICLDAdBgNVHQ4EFgQUcdzZH9M8OSxLujP+AToiD5oYMRkwHwYDVR0jBBgwFoAU2kEjnFqP
-ca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVw
-b3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIu
-Y3JsMIGeBggrBgEFBQcBAQSBkTCBjjAhBggrBgEFBQcwAYYVaHR0cDovL29jc3AuaW50ZWwuY29t
-MGkGCCsGAQUFBzAChl1odHRwOi8vd3d3LmludGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRl
-cy9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIwQ0ElMjA0Qi5jcnQwCwYDVR0P
-BAQDAgeAMDwGCSsGAQQBgjcVBwQvMC0GJSsGAQQBgjcVCIbDjHWEmeVRg/2BKIWOn1OCkcAJZ4He
-vTmV8EMCAWQCAQkwHwYDVR0lBBgwFgYIKwYBBQUHAwQGCisGAQQBgjcKAwwwKQYJKwYBBAGCNxUK
-BBwwGjAKBggrBgEFBQcDBDAMBgorBgEEAYI3CgMMMEsGA1UdEQREMEKgJwYKKwYBBAGCNxQCA6AZ
-DBdpbmdhLnN0b3RsYW5kQGludGVsLmNvbYEXaW5nYS5zdG90bGFuZEBpbnRlbC5jb20wDQYJKoZI
-hvcNAQEFBQADggEBALnl11xd+3X6fVS0VAKeoF0jCPLFZLCk4jMFifFzY2md3MLjVIB3lE5ffNnS
-mjG9ErOO6as95K6D6hzCJMqNodOyVPRSrMNey0tzFAPLRG3s2bgfmOcvYr4O3WmpDMx8YmH6O2YI
-3Xxjyp11aXl5pk6VjpZV/hjN1jwZ/c/X00KsjoMB8mGSBvbwnV0EFQUJ99xsAlqQ4edj2T9z6pF1
-WX189YL64c/t3a9LWNaT2CWbBZLIFoor9TpZsIj0lGObmGA76JKn5yxN+jzxhWIAzPi5KKYgJ9EU
-FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
-MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
-ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
-ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
-CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwNzAyMDU0MzEyWjAjBgkqhkiG9w0BCQQxFgQU
-bMedp57+cibIxkxnTnY+Jy5oEcswDQYJKoZIhvcNAQEBBQAEggEAcWG3KQcfmYw0reWiws6+iGpt
-QLloP4b0trN87QTDKVlZmF31QmRxZLc/DFbqvR/nhnYi4EEiLYdP52X4lcFezjKpXFGzLRK++d/L
-UsfvH2zcrWCj4fyWiXGA3UtmrD5/bw2f4ZruHuJDDA8IKClF4tYkwWt4Pty/JTBHULl+IL5q99MK
-+d2GAR+L0AmVIgg80ftvB/ZQd8UrSm1FjS2BIAi52bsbM+yeyDMkpiApjRcpoq7KPcGrOxKJ+249
-Aax/By0OW52LttBJCajGWUQlZP1hSLXKug/qkNAKTJRkvRGv0KTHmZBNOFjUTW/v5PnXQpfOcfNi
-j90sCj3wbfIMMwAAAAAAAA==
-
-
---=-BlY5LriF69VgIMtwnw5b--
