@@ -7,33 +7,29 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC70C06511
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 14:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B5BC06510
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 14:35:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 891D82063F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 14:20:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C97C3206A3
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 14:35:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727140AbfGBOTO (ORCPT
+        id S1726544AbfGBOfS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Jul 2019 10:19:14 -0400
-Received: from mx1.emlix.com ([188.40.240.192]:57588 "EHLO mx1.emlix.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727109AbfGBOTM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Jul 2019 10:19:12 -0400
-X-Greylist: delayed 320 seconds by postgrey-1.27 at vger.kernel.org; Tue, 02 Jul 2019 10:19:12 EDT
-Received: from mailer.emlix.com (unknown [81.20.119.6])
-        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.emlix.com (Postfix) with ESMTPS id EC37F60AF8;
-        Tue,  2 Jul 2019 16:13:50 +0200 (CEST)
-From:   Philipp Puschmann <philipp.puschmann@emlix.com>
-To:     marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Philipp Puschmann <philipp.puschmann@emlix.com>
-Subject: [PATCH] Bluetooth: serdev: hci_ll: set operational frequency earlier
-Date:   Tue,  2 Jul 2019 16:13:37 +0200
-Message-Id: <20190702141337.10528-1-philipp.puschmann@emlix.com>
+        Tue, 2 Jul 2019 10:35:18 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52705 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725940AbfGBOfS (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Jul 2019 10:35:18 -0400
+Received: from localhost.localdomain (p4FEFC3D2.dip0.t-ipconnect.de [79.239.195.210])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 6A44DCF182;
+        Tue,  2 Jul 2019 16:43:47 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH v5.2-rc6] Bluetooth: Fix faulty expression for minimum encryption key size check
+Date:   Tue,  2 Jul 2019 16:35:09 +0200
+Message-Id: <20190702143510.5003-1-marcel@holtmann.org>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -42,81 +38,36 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Uploading the firmware needs quite a few seconds if done at 115200 kbps. So set
-the operational frequency, usually 3 MHz, before uploading the firmware.
+From: Matias Karhumaa <matias.karhumaa@gmail.com>
 
-I have successfully tested this with a wl1837mod.
+Fixes minimum encryption key size check so that HCI_MIN_ENC_KEY_SIZE
+is also allowed as stated in the comment.
 
-Signed-off-by: Philipp Puschmann <philipp.puschmann@emlix.com>
+This bug caused connection problems with devices having maximum
+encryption key size of 7 octets (56-bit).
+
+Fixes: 693cd8ce3f88 ("Bluetooth: Fix regression with minimum encryption key size alignment")
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=203997
+Signed-off-by: Matias Karhumaa <matias.karhumaa@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/hci_ll.c | 39 ++++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 18 deletions(-)
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index c04f5f9e1ed0..cbd7bc539d5e 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -601,6 +601,13 @@ static int ll_setup(struct hci_uart *hu)
- 
- 	serdev_device_set_flow_control(serdev, true);
- 
-+	if (hu->oper_speed)
-+		speed = hu->oper_speed;
-+	else if (hu->proto->oper_speed)
-+		speed = hu->proto->oper_speed;
-+	else
-+		speed = 0;
-+
- 	do {
- 		/* Reset the Bluetooth device */
- 		gpiod_set_value_cansleep(lldev->enable_gpio, 0);
-@@ -612,6 +619,20 @@ static int ll_setup(struct hci_uart *hu)
- 			return err;
- 		}
- 
-+		if (speed) {
-+			__le32 speed_le = cpu_to_le32(speed);
-+			struct sk_buff *skb;
-+
-+			skb = __hci_cmd_sync(hu->hdev,
-+					     HCI_VS_UPDATE_UART_HCI_BAUDRATE,
-+					     sizeof(speed_le), &speed_le,
-+					     HCI_INIT_TIMEOUT);
-+			if (!IS_ERR(skb)) {
-+				kfree_skb(skb);
-+				serdev_device_set_baudrate(serdev, speed);
-+			}
-+		}
-+
- 		err = download_firmware(lldev);
- 		if (!err)
- 			break;
-@@ -636,25 +657,7 @@ static int ll_setup(struct hci_uart *hu)
- 	}
- 
- 	/* Operational speed if any */
--	if (hu->oper_speed)
--		speed = hu->oper_speed;
--	else if (hu->proto->oper_speed)
--		speed = hu->proto->oper_speed;
--	else
--		speed = 0;
--
--	if (speed) {
--		__le32 speed_le = cpu_to_le32(speed);
--		struct sk_buff *skb;
- 
--		skb = __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
--				     sizeof(speed_le), &speed_le,
--				     HCI_INIT_TIMEOUT);
--		if (!IS_ERR(skb)) {
--			kfree_skb(skb);
--			serdev_device_set_baudrate(serdev, speed);
--		}
--	}
- 
- 	return 0;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9f77432dbe38..5406d7cd46ad 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1353,7 +1353,7 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon)
+ 	 * actually encrypted before enforcing a key size.
+ 	 */
+ 	return (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags) ||
+-		hcon->enc_key_size > HCI_MIN_ENC_KEY_SIZE);
++		hcon->enc_key_size >= HCI_MIN_ENC_KEY_SIZE);
  }
+ 
+ static void l2cap_do_start(struct l2cap_chan *chan)
 -- 
 2.20.1
 
