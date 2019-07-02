@@ -2,183 +2,106 @@ Return-Path: <SRS0=p1bJ=U7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8484C06510
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 18:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED2FFC06510
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 19:22:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5B1620989
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 18:15:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C569421852
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 19:22:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uI3os6/C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfGBSPP (ORCPT
+        id S1727071AbfGBTWj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Jul 2019 14:15:15 -0400
-Received: from mga14.intel.com ([192.55.52.115]:51870 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726329AbfGBSPP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Jul 2019 14:15:15 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Jul 2019 11:15:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,444,1557212400"; 
-   d="scan'208";a="247363325"
-Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
-  by orsmga001.jf.intel.com with ESMTP; 02 Jul 2019 11:15:14 -0700
-Received: from orsmsx163.amr.corp.intel.com (10.22.240.88) by
- ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 2 Jul 2019 11:15:14 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX163.amr.corp.intel.com ([169.254.9.84]) with mapi id 14.03.0439.000;
- Tue, 2 Jul 2019 11:15:14 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v2 1/3] mesh: Split APP_IDX_DEV into
- APP_IDX_DEV_LOCAL and APP_IDX_DEV_REMOTE
-Thread-Topic: [PATCH BlueZ v2 1/3] mesh: Split APP_IDX_DEV into
- APP_IDX_DEV_LOCAL and APP_IDX_DEV_REMOTE
-Thread-Index: AQHVMLWgTjA1HbPNjEShm4vSAC4rI6a4GBmA
-Date:   Tue, 2 Jul 2019 18:15:13 +0000
-Message-ID: <1562091311.23933.6.camel@intel.com>
-References: <20190702090731.30852-1-michal.lowas-rzechonek@silvair.com>
-         <20190702090731.30852-2-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190702090731.30852-2-michal.lowas-rzechonek@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.20.71]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DD98338EB3E8AE4CBD0DE94E4044A6A8@intel.com>
-Content-Transfer-Encoding: base64
+        Tue, 2 Jul 2019 15:22:39 -0400
+Received: from mail-ot1-f52.google.com ([209.85.210.52]:46282 "EHLO
+        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726291AbfGBTWj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Jul 2019 15:22:39 -0400
+Received: by mail-ot1-f52.google.com with SMTP id z23so18362511ote.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2019 12:22:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Fi62SFA1si7wJ3y5KVsmEnWdEJ30bS62Jt3Mc4SRsjU=;
+        b=uI3os6/C/t+vM+B++XwsUfIofaXLjsk0xLi9xSzBZCn8ZfS3oZJe9dXjBmnNlrk9dK
+         gt5WxoLeOwinNQsZND7Ei0jOdPIaSok90wFoclsx3q9Zu7CkYqW81wY8Ul2i6MsAoXPo
+         wThbIFej/BHaQWcBsjry/CFVvt0b/rTiMg1GPLk07YAdj4/sD14rQqDDXg7W/fDvvGer
+         SywuFq3gLV6p4TVXc7qXyN+0Tn22p9/kCEpZ7mNMkadZ88yoJ0lq4yMB0xkyeNKRmM5T
+         8UoB/ogtZFb5s6GIrYT2FNZ/TlXad7VKNormso1qdEPoty1WoPcRk3j961mRwz05DgLN
+         shZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Fi62SFA1si7wJ3y5KVsmEnWdEJ30bS62Jt3Mc4SRsjU=;
+        b=fdSbV4xzcMmwXGchAW5KJcOGJCDplS2iEjSEPcTBGVAVyUHdMG8ow/8iuSl3TV+zu7
+         ogPE/dnTbw/J7TBbdVd3vmVufTnuyxeXsuAZEKhjGT5M8CT7gZJHVJIueUYugZT+hAyE
+         86D+7YsoBR0S74YRZHQY5Fw+yoA2nFCB3Icdg6CQFk+IbJbjXRTF8rCxYX0BCQNqoE0s
+         xoPEPRo11ljkNE51Q+SfmAMyzz/qvGV0aS3/p+syyOfESTrBhxpMdU+iDeT9nlgpiNIK
+         gtDyR5jwFWFhtAGlZrEH80WxNAFvdMbl57q0cOQvk1F1T9seqnm0m1W+rBkSBBKJgaTF
+         o7hA==
+X-Gm-Message-State: APjAAAXrb0JM8mx3DPmVP3K5oYkFXu5idrXrBDSKet/QJCx7YzESyzPu
+        tqES6o7LD0F099zj8i4G7+uzN3o1CQRLCNhkYxA=
+X-Google-Smtp-Source: APXvYqwDnAKavJ3s8Xg6uXoUd26fBPzvw+/uv9bHdiib3Iv/wz/EztQY0lvpeMSiYEssOmwfIoavBahsGINxpq8Uf3U=
+X-Received: by 2002:a05:6830:199:: with SMTP id q25mr24012958ota.79.1562095358224;
+ Tue, 02 Jul 2019 12:22:38 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAEzhej0YJ6b+=nFXHiiZPJnSdOm=F_OaXR5kWFjvbw2107X94Q@mail.gmail.com>
+In-Reply-To: <CAEzhej0YJ6b+=nFXHiiZPJnSdOm=F_OaXR5kWFjvbw2107X94Q@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 2 Jul 2019 22:22:26 +0300
+Message-ID: <CABBYNZL-0mXtoQ1vUs=SWcBywET1y6A_xfd4KjTVLoE5gyp8vA@mail.gmail.com>
+Subject: Re: BlueZ Central to Peripheral latency issue
+To:     Mathias Baert <mathiasrobaert@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        subhoshankar.basu@ugent.be, Jeroen.Hoebeke@ugent.be
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-DQpIaSBNaWNoYcWCLA0KDQpUaGlzIHBhdGNoIGZhaWxzIGNoZWNrIHBhdGNoLCBwbHVzIG90aGVy
-IGlzc3VlczoNCg0KV0FSTklORzpMT05HX0xJTkU6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzDQoj
-Nzk6IEZJTEU6IG1lc2gvbW9kZWwuYzozMTA6DQorCWlmIChmd2QtPmlkeCAhPSBBUFBfSURYX0RF
-Vl9MT0NBTCAmJiAhaGFzX2JpbmRpbmcobW9kLT5iaW5kaW5ncywgZndkLT5pZHgpKQ0KDQpXQVJO
-SU5HOkxPTkdfTElORTogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMNCiMxMTk6IEZJTEU6IG1lc2gv
-bW9kZWwuYzoxMzg2Og0KKwkJbF9xdWV1ZV9wdXNoX2hlYWQobW9kLT5iaW5kaW5ncywgTF9VSU5U
-X1RPX1BUUihBUFBfSURYX0RFVl9MT0NBTCkpOw0KDQpXQVJOSU5HOkxPTkdfTElORTogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMNCiMxMjU6IEZJTEU6IG1lc2gvbW9kZWwuYzoxMzkxOg0KKwkJbF9x
-dWV1ZV9wdXNoX2hlYWQobW9kLT5iaW5kaW5ncywgTF9VSU5UX1RPX1BUUihBUFBfSURYX0RFVl9M
-T0NBTCkpOw0KDQp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDEyNSBsaW5lcyBjaGVja2Vk
-DQoNCg0KT24gVHVlLCAyMDE5LTA3LTAyIGF0IDExOjA3ICswMjAwLCBNaWNoYcWCIExvd2FzLVJ6
-ZWNob25layB3cm90ZToNCj4gVGhpcyBpcyBuZWVkZWQgdG8gZGlzdGluZ3Vpc2ggaW5jb21pbmcg
-bWVzc2FnZXMgZW5jcnlwdGVkIHVzaW5nIGEgZGV2aWNlDQo+IGtleTogaWYgdGhlIGtleSBpcyBs
-b2NhbCwgdGhlIG1lc3NhZ2UgY2FuIGJlIGZvcndhcmRlZCB0byBpbnRlcm5hbA0KPiBtb2RlbHMu
-IElmIHRoZSBrZXkgaXMgYSBrbm93biByZW1vdGUgb25lLCBpdCB3aWxsIGJlIGZvcndhcmRlZCB0
-byB0aGUNCj4gYXBwbGljYXRpb24gdmlhIERldktleU1lc3NhZ2VSZWNlaXZlZCgpIEFQSS4NCj4g
-LS0tDQo+ICBtZXNoL2NmZ21vZC1zZXJ2ZXIuYyB8IDE1ICsrKysrKysrLS0tLS0tLQ0KPiAgbWVz
-aC9tb2RlbC5jICAgICAgICAgfCAyMCArKysrKysrKysrKy0tLS0tLS0tLQ0KPiAgbWVzaC9uZXQu
-aCAgICAgICAgICAgfCAxMCArKysrKystLS0tDQo+ICAzIGZpbGVzIGNoYW5nZWQsIDI1IGluc2Vy
-dGlvbnMoKyksIDIwIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL21lc2gvY2ZnbW9k
-LXNlcnZlci5jIGIvbWVzaC9jZmdtb2Qtc2VydmVyLmMNCj4gaW5kZXggNjM0YWMwMDZiLi5hODQ5
-YjVlOTkgMTAwNjQ0DQo+IC0tLSBhL21lc2gvY2ZnbW9kLXNlcnZlci5jDQo+ICsrKyBiL21lc2gv
-Y2ZnbW9kLXNlcnZlci5jDQo+IEBAIC02OSw3ICs2OSw4IEBAIHN0YXRpYyB2b2lkIHNlbmRfcHVi
-X3N0YXR1cyhzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCBzcmMsIHVpbnQxNl90IGRz
-dCwNCj4gIAkJbiArPSAyOw0KPiAgCX0NCj4gIA0KPiAtCW1lc2hfbW9kZWxfc2VuZChub2RlLCBk
-c3QsIHNyYywgQVBQX0lEWF9ERVYsIERFRkFVTFRfVFRMLCBtc2csIG4pOw0KPiArCW1lc2hfbW9k
-ZWxfc2VuZChub2RlLCBkc3QsIHNyYywgQVBQX0lEWF9ERVZfTE9DQUwsIERFRkFVTFRfVFRMLA0K
-PiArCQkJCQkJCQltc2csIG4pOw0KPiAgfQ0KPiAgDQo+ICBzdGF0aWMgYm9vbCBjb25maWdfcHVi
-X2dldChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCBzcmMsIHVpbnQxNl90IGRzdCwN
-Cj4gQEAgLTI1NCw3ICsyNTUsNyBAQCBzdGF0aWMgdm9pZCBzZW5kX3N1Yl9zdGF0dXMoc3RydWN0
-IG1lc2hfbm9kZSAqbm9kZSwgdWludDE2X3Qgc3JjLCB1aW50MTZfdCBkc3QsDQo+ICAJCW4gKz0g
-MjsNCj4gIAl9DQo+ICANCj4gLQltZXNoX21vZGVsX3NlbmQobm9kZSwgZHN0LCBzcmMsIEFQUF9J
-RFhfREVWLCBERUZBVUxUX1RUTCwgbXNnLCBuKTsNCj4gKwltZXNoX21vZGVsX3NlbmQobm9kZSwg
-ZHN0LCBzcmMsIEFQUF9JRFhfREVWX0xPQ0FMLCBERUZBVUxUX1RUTCwgbXNnLCBuKTsNCj4gIH0N
-Cj4gIA0KPiAgc3RhdGljIGJvb2wgY29uZmlnX3N1Yl9nZXQoc3RydWN0IG1lc2hfbm9kZSAqbm9k
-ZSwgdWludDE2X3Qgc3JjLCB1aW50MTZfdCBkc3QsDQo+IEBAIC0zMTIsNyArMzEzLDcgQEAgc3Rh
-dGljIGJvb2wgY29uZmlnX3N1Yl9nZXQoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDE2X3Qg
-c3JjLCB1aW50MTZfdCBkc3QsDQo+ICANCj4gIAkqbXNnX3N0YXR1cyA9ICh1aW50OF90KSBzdGF0
-dXM7DQo+ICANCj4gLQltZXNoX21vZGVsX3NlbmQobm9kZSwgZHN0LCBzcmMsIEFQUF9JRFhfREVW
-LCBERUZBVUxUX1RUTCwgbXNnLCBuKTsNCj4gKwltZXNoX21vZGVsX3NlbmQobm9kZSwgZHN0LCBz
-cmMsIEFQUF9JRFhfREVWX0xPQ0FMLCBERUZBVUxUX1RUTCwgbXNnLCBuKTsNCj4gIAlyZXR1cm4g
-dHJ1ZTsNCj4gIH0NCj4gIA0KPiBAQCAtNDg3LDcgKzQ4OCw3IEBAIHN0YXRpYyB2b2lkIHNlbmRf
-bW9kZWxfYXBwX3N0YXR1cyhzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCBzcmMsDQo+
-ICAJbF9wdXRfbGUxNihpZCwgbXNnICsgbik7DQo+ICAJbiArPSAyOw0KPiAgDQo+IC0JbWVzaF9t
-b2RlbF9zZW5kKG5vZGUsIGRzdCwgc3JjLCBBUFBfSURYX0RFViwgREVGQVVMVF9UVEwsIG1zZywg
-bik7DQo+ICsJbWVzaF9tb2RlbF9zZW5kKG5vZGUsIGRzdCwgc3JjLCBBUFBfSURYX0RFVl9MT0NB
-TCwgREVGQVVMVF9UVEwsIG1zZywgbik7DQo+ICB9DQo+ICANCj4gIHN0YXRpYyB2b2lkIG1vZGVs
-X2FwcF9saXN0KHN0cnVjdCBtZXNoX25vZGUgKm5vZGUsIHVpbnQxNl90IHNyYywgdWludDE2X3Qg
-ZHN0LA0KPiBAQCAtNTQwLDcgKzU0MSw3IEBAIHN0YXRpYyB2b2lkIG1vZGVsX2FwcF9saXN0KHN0
-cnVjdCBtZXNoX25vZGUgKm5vZGUsIHVpbnQxNl90IHNyYywgdWludDE2X3QgZHN0LA0KPiAgDQo+
-ICAJaWYgKHJlc3VsdCA+PSAwKSB7DQo+ICAJCSpzdGF0dXMgPSByZXN1bHQ7DQo+IC0JCW1lc2hf
-bW9kZWxfc2VuZChub2RlLCBkc3QsIHNyYywgQVBQX0lEWF9ERVYsIERFRkFVTFRfVFRMLA0KPiAr
-CQltZXNoX21vZGVsX3NlbmQobm9kZSwgZHN0LCBzcmMsIEFQUF9JRFhfREVWX0xPQ0FMLCBERUZB
-VUxUX1RUTCwNCj4gIAkJCQkJCQkJbXNnLCBuKTsNCj4gIAl9DQo+ICANCj4gQEAgLTc1OCw3ICs3
-NTksNyBAQCBzdGF0aWMgYm9vbCBjZmdfc3J2X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQzMl90IGRz
-dCwNCj4gIAl1aW50MTZfdCBpbnRlcnZhbDsNCj4gIAl1aW50MTZfdCBuOw0KPiAgDQo+IC0JaWYg
-KGlkeCAhPSBBUFBfSURYX0RFVikNCj4gKwlpZiAoaWR4ICE9IEFQUF9JRFhfREVWX0xPQ0FMKQ0K
-PiAgCQlyZXR1cm4gZmFsc2U7DQo+ICANCj4gIAlpZiAobWVzaF9tb2RlbF9vcGNvZGVfZ2V0KHBr
-dCwgc2l6ZSwgJm9wY29kZSwgJm4pKSB7DQo+IEBAIC0xMjU5LDcgKzEyNjAsNyBAQCBzdGF0aWMg
-Ym9vbCBjZmdfc3J2X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQzMl90IGRzdCwNCj4gIAlpZiAobikg
-ew0KPiAgCQkvKiBwcmludF9wYWNrZXQoIkFwcCBUeCIsIGxvbmdfbXNnID8gbG9uZ19tc2cgOiBt
-c2csIG4pOyAqLw0KPiAgCQltZXNoX21vZGVsX3NlbmQobm9kZSwgdW5pY2FzdCwgc3JjLA0KPiAt
-CQkJCUFQUF9JRFhfREVWLCBERUZBVUxUX1RUTCwNCj4gKwkJCQlBUFBfSURYX0RFVl9MT0NBTCwg
-REVGQVVMVF9UVEwsDQo+ICAJCQkJbG9uZ19tc2cgPyBsb25nX21zZyA6IG1zZywgbik7DQo+ICAJ
-fQ0KPiAgCWxfZnJlZShsb25nX21zZyk7DQo+IGRpZmYgLS1naXQgYS9tZXNoL21vZGVsLmMgYi9t
-ZXNoL21vZGVsLmMNCj4gaW5kZXggNzQwMWRjZWNiLi5lMDlkYmQzNjQgMTAwNjQ0DQo+IC0tLSBh
-L21lc2gvbW9kZWwuYw0KPiArKysgYi9tZXNoL21vZGVsLmMNCj4gQEAgLTMwNiw3ICszMDYsOCBA
-QCBzdGF0aWMgdm9pZCBmb3J3YXJkX21vZGVsKHZvaWQgKmEsIHZvaWQgKmIpDQo+ICAJYm9vbCBy
-ZXN1bHQ7DQo+ICANCj4gIAlsX2RlYnVnKCJtb2RlbCAlOC44eCB3aXRoIGlkeCAlMy4zeCIsIG1v
-ZC0+aWQsIGZ3ZC0+aWR4KTsNCj4gLQlpZiAoZndkLT5pZHggIT0gQVBQX0lEWF9ERVYgJiYgIWhh
-c19iaW5kaW5nKG1vZC0+YmluZGluZ3MsIGZ3ZC0+aWR4KSkNCj4gKw0KPiArCWlmIChmd2QtPmlk
-eCAhPSBBUFBfSURYX0RFVl9MT0NBTCAmJiAhaGFzX2JpbmRpbmcobW9kLT5iaW5kaW5ncywgZndk
-LT5pZHgpKQ0KPiAgCQlyZXR1cm47DQo+ICANCj4gIAlkc3QgPSBmd2QtPmRzdDsNCj4gQEAgLTM1
-NiwxNSArMzU3LDE2IEBAIHN0YXRpYyBpbnQgZGV2X3BhY2tldF9kZWNyeXB0KHN0cnVjdCBtZXNo
-X25vZGUgKm5vZGUsIGNvbnN0IHVpbnQ4X3QgKmRhdGEsDQo+ICAJCQkJdWludDE2X3QgZHN0LCB1
-aW50OF90IGtleV9pZCwgdWludDMyX3Qgc2VxLA0KPiAgCQkJCXVpbnQzMl90IGl2X2lkeCwgdWlu
-dDhfdCAqb3V0KQ0KPiAgew0KPiAtCWNvbnN0IHVpbnQ4X3QgKmRldl9rZXk7DQo+ICsJdWludDhf
-dCBkZXZfa2V5WzE2XTsNCj4gKwljb25zdCB1aW50OF90ICprZXk7DQoNCllvdSBoYXZlIHJlbmFt
-ZWQgZGV2X2tleSAtLT4ga2V5LCBhbmQgbm8gbG9uZ2VyIHVzZSBkZXZfa2V5IHRoYXQgSSBjYW4g
-c2VlIGhlcmUuLi4gIHdoaWNoIHdpbGwgY2F1c2UgaXQncyBvd24NCmJ1aWxkIHdhcm5pbmc6DQoN
-Cm1lc2gvbW9kZWwuYzogSW4gZnVuY3Rpb24g4oCYZGV2X3BhY2tldF9kZWNyeXB04oCZOg0KbWVz
-aC9tb2RlbC5jOjM2MDoxMDogZXJyb3I6IHVudXNlZCB2YXJpYWJsZSDigJhkZXZfa2V54oCZIFst
-V2Vycm9yPXVudXNlZC12YXJpYWJsZV0NCiAgdWludDhfdCBkZXZfa2V5WzE2XTsNCiAgICAgICAg
-ICBefn5+fn5+DQpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycw0KDQoN
-Cj4gIA0KPiAtCWRldl9rZXkgPSBub2RlX2dldF9kZXZpY2Vfa2V5KG5vZGUpOw0KPiAtCWlmICgh
-ZGV2X2tleSkNCj4gKwlrZXkgPSBub2RlX2dldF9kZXZpY2Vfa2V5KG5vZGUpOw0KPiArCWlmICgh
-a2V5KQ0KPiAgCQlyZXR1cm4gZmFsc2U7DQo+ICANCj4gIAlpZiAobWVzaF9jcnlwdG9fcGF5bG9h
-ZF9kZWNyeXB0KE5VTEwsIDAsIGRhdGEsIHNpemUsIHN6bWljdCwgc3JjLA0KPiAtCQkJCQlkc3Qs
-IGtleV9pZCwgc2VxLCBpdl9pZHgsIG91dCwgZGV2X2tleSkpDQo+IC0JCXJldHVybiBBUFBfSURY
-X0RFVjsNCj4gKwkJCQkJZHN0LCBrZXlfaWQsIHNlcSwgaXZfaWR4LCBvdXQsIGtleSkpDQo+ICsJ
-CXJldHVybiBBUFBfSURYX0RFVl9MT0NBTDsNCj4gIA0KPiAgCXJldHVybiAtMTsNCj4gIH0NCj4g
-QEAgLTk1Miw3ICs5NTQsNyBAQCBib29sIG1lc2hfbW9kZWxfc2VuZChzdHJ1Y3QgbWVzaF9ub2Rl
-ICpub2RlLCB1aW50MTZfdCBzcmMsIHVpbnQxNl90IHRhcmdldCwNCj4gIAlpZiAoSVNfVU5BU1NJ
-R05FRCh0YXJnZXQpKQ0KPiAgCQlyZXR1cm4gZmFsc2U7DQo+ICANCj4gLQlpZiAoYXBwX2lkeCA9
-PSBBUFBfSURYX0RFVikgew0KPiArCWlmIChhcHBfaWR4ID09IEFQUF9JRFhfREVWX0xPQ0FMKSB7
-DQo+ICAJCWtleSA9IG5vZGVfZ2V0X2RldmljZV9rZXkobm9kZSk7DQo+ICAJCWlmICgha2V5KQ0K
-PiAgCQkJcmV0dXJuIGZhbHNlOw0KPiBAQCAtMTM4MSwxMiArMTM4MywxMiBAQCBzdHJ1Y3QgbWVz
-aF9tb2RlbCAqbWVzaF9tb2RlbF9zZXR1cChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50OF90
-IGVsZV9pZHgsDQo+ICAJCWlmIChlbGVfaWR4ICE9IFBSSU1BUllfRUxFX0lEWCkNCj4gIAkJCXJl
-dHVybiBOVUxMOw0KPiAgDQo+IC0JCWxfcXVldWVfcHVzaF9oZWFkKG1vZC0+YmluZGluZ3MsIExf
-VUlOVF9UT19QVFIoQVBQX0lEWF9ERVYpKTsNCj4gKwkJbF9xdWV1ZV9wdXNoX2hlYWQobW9kLT5i
-aW5kaW5ncywgTF9VSU5UX1RPX1BUUihBUFBfSURYX0RFVl9MT0NBTCkpOw0KPiAgCQlyZXR1cm4g
-bW9kOw0KPiAgCX0NCj4gIA0KPiAgCWlmIChkYl9tb2QtPmlkID09IENPTkZJR19DTElfTU9ERUwp
-IHsNCj4gLQkJbF9xdWV1ZV9wdXNoX2hlYWQobW9kLT5iaW5kaW5ncywgTF9VSU5UX1RPX1BUUihB
-UFBfSURYX0RFVikpOw0KPiArCQlsX3F1ZXVlX3B1c2hfaGVhZChtb2QtPmJpbmRpbmdzLCBMX1VJ
-TlRfVE9fUFRSKEFQUF9JRFhfREVWX0xPQ0FMKSk7DQo+ICAJCXJldHVybiBtb2Q7DQo+ICAJfQ0K
-PiAgDQo+IGRpZmYgLS1naXQgYS9tZXNoL25ldC5oIGIvbWVzaC9uZXQuaA0KPiBpbmRleCBmMTkw
-MjQ3NjYuLjgzNDcxMmQ4ZCAxMDA2NDQNCj4gLS0tIGEvbWVzaC9uZXQuaA0KPiArKysgYi9tZXNo
-L25ldC5oDQo+IEBAIC0zNywxMCArMzcsMTIgQEAgc3RydWN0IG1lc2hfbm9kZTsNCj4gICNkZWZp
-bmUgU0VRX01BU0sJMHhmZmZmZmYNCj4gIA0KPiAgI2RlZmluZSBDUkVERkxBR19NQVNLCTB4MTAw
-MA0KPiAtI2RlZmluZSBBUFBfSURYX01BU0sJMHgwZmZmDQo+IC0jZGVmaW5lIEFQUF9JRFhfREVW
-CTB4N2ZmZg0KPiAtI2RlZmluZSBBUFBfSURYX0FOWQkweDgwMDANCj4gLSNkZWZpbmUgQVBQX0lE
-WF9ORVQJMHhmZmZmDQo+ICsNCj4gKyNkZWZpbmUgQVBQX0lEWF9NQVNLCQkweDBmZmYNCj4gKyNk
-ZWZpbmUgQVBQX0lEWF9ERVZfUkVNT1RFCTB4NmZmZg0KPiArI2RlZmluZSBBUFBfSURYX0RFVl9M
-T0NBTAkweDdmZmYNCj4gKyNkZWZpbmUgQVBQX0lEWF9BTlkJCTB4ODAwMA0KPiArI2RlZmluZSBB
-UFBfSURYX05FVAkJMHhmZmZmDQoNClNpbmNlIHRoaXMgcGF0Y2gtc2V0IG5lZWRzIHRvIGJlIHJl
-LXNwdW4sIEluZ2Egd2FzIGhvcGluZyB5b3UgY291bGQgYWxzbyByZW1vdmUgdGhlIHVudXNlZCBj
-cnVmdCBBUFBfSURYX05FVA0KYWx0b2dldGhlci4uLg0KDQoNCj4gIA0KPiAgI2RlZmluZSBORVRf
-SURYX0lOVkFMSUQJMHhmZmZmDQo+ICAjZGVmaW5lIE5FVF9OSURfSU5WQUxJRAkweGZm
+Hi Mathias,
+
+On Tue, Jul 2, 2019 at 3:33 PM Mathias Baert <mathiasrobaert@gmail.com> wrote:
+>
+> Hi,
+>
+> We are using the BlueZ 5.48 version on a Raspberry PI with Raspbian Stretch 9.1.
+>
+> The setup is this PI connected with a Nordic Semiconductor nRF52840
+> device, via an IPv6 over BLE connection. The connection is using a
+> connection interval of 7.5 ms. Via throughput measurements with iperf,
+> both ways (central to peripheral and peripheral to central), we are
+> able to achieve maximally ~ 100 kbps (using the 1 Mbps PHY).
+>
+> However, when looking into individual packet exchanges, we notice a
+> significant delay (up to 1 sec) in the RTT when pinging from the
+> peripheral to the BlueZ central and back. We also see a huge
+> fluctuation in this value and it also depends on the intervals at
+> which the pings are fired (lower throughput gives a much higher
+> average individual latency). When firing ping packets at a 1 sec
+> interval, it is definitely visible.
+>
+> When looking into this, we found that the latency between the
+> peripheral and the central is quite stable and low enough. But the
+> latency between the central and peripheral is fluctuating a lot and is
+> generally quite high. Is this something you have noticed before? We
+> think that it could be a scheduling issue on the kernel, where higher
+> throughput gives more priority to Bluetooth communication?
+
+So I assume this is using the experimental IPSP support with Zephyr as
+peripheral? Usually, the Linux side is quite a bit more complex so it
+is not surprising it can take more time but not 1 sec. so it got to be
+something that is causing the extra lag, perhaps you can paste the
+actual commands you are using to ping one another.
+
+-- 
+Luiz Augusto von Dentz
