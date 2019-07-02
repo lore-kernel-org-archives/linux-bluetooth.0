@@ -2,189 +2,94 @@ Return-Path: <SRS0=p1bJ=U7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BB8C06511
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E578DC06510
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 12:30:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0208820836
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB81C21721
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 12:30:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="V+JsypLC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uxHZsNiz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727080AbfGBJHm (ORCPT
+        id S1726917AbfGBMay (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Jul 2019 05:07:42 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:43889 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbfGBJHm (ORCPT
+        Tue, 2 Jul 2019 08:30:54 -0400
+Received: from mail-lj1-f175.google.com ([209.85.208.175]:42457 "EHLO
+        mail-lj1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726167AbfGBMay (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Jul 2019 05:07:42 -0400
-Received: by mail-lf1-f67.google.com with SMTP id j29so10802259lfk.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2019 02:07:40 -0700 (PDT)
+        Tue, 2 Jul 2019 08:30:54 -0400
+Received: by mail-lj1-f175.google.com with SMTP id t28so16684703lje.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2019 05:30:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=BeXoiUBzZvgGk5KhM0sX1cYz05NrTFzD5DM8ZErxb8o=;
-        b=V+JsypLCgxGKUYZWi3e1DTFTUI23xQdcdfYLqe+0I0uER4vne5L4r5lTFkxI0iZrZB
-         02yv8l0HhhbMRcKfX2AUeCJxJoASvWXcWdfSyrmdPhAK6U7rSRhbctdzE4ldh5VGPmHO
-         s2PweUJ4rj6IQKG8Xed+swdWTzALjdTEOTEXRhcCyBgr71pqAqFaoOyTu9WQH6vuXNS/
-         236sIxInIOzPfcju7zLeLdX/2/e8GN3EX+IAuN4QCKiHwJ1jX2rdvnm15NpRcFlXbUe0
-         0JLzSEwpgjfsgFJMIu4s5s4hc2H1GmVgYOkz9ozyD2HNqkY1XrmtjlfGo/c8VgDAZVfl
-         VEgQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=cLNP/sosMDd8EoWilGG4yKpNq20kQJtoc5CsHx4SqSU=;
+        b=uxHZsNizCEDjuprQU2iQehvqQSd53AiMSkSRVvG1YlJ+NHs2J9VGBuuKZfhJoilrZ0
+         xYr7Kr73hUxrXTeC/LEoja3DpNkhEUU6oveq9A62Q7x9Y3mqc4kPft7lxVfktt3Zci4G
+         YZMenea6du89cpxZVnqYoBEL/cBQTlhrC/ofB86sM4Zt+IrPBOeIXwFaF7whVfp8JS8v
+         lq4a2CuccxZv3y/31Ta4kYe3Xm7AUJi6gbl6tyHSg8zWvpt2nCZAUGiuvnadISnNkLAO
+         goAeNP0de3Pdi2a5/wHcwVfDvFhq1TEqliy6Jj2sj+/73hSeTb4rEM+gRGN21CwYSw8S
+         Qe6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=BeXoiUBzZvgGk5KhM0sX1cYz05NrTFzD5DM8ZErxb8o=;
-        b=CSyAaymG6aK0Cp5XnDwKDueNdHaXdN7YKcblaHRczGzzH1N2raoAtF88kcMok6pK/J
-         ub+xxZMqxHWDb8rNGAfB0PV2yqK8wMnIRcg+ej+5FEgDUZlZwfZu8EEB1WFdRaEyWdlJ
-         bIFNbE4qsVfspDOcKWQoTXUFfmJV84Yqj4t1h28w/eNrpBUh7vVB0PAZkohN3UMpKln1
-         twrkzhb28AOYJE+o1hDcVOI4PONlYhyJ2W2kaN5XGUSD2A5smWDQHZ8bXOFq0doMmdrt
-         Yxxow5JyfGJydXlDmjqYsHnxn/LcgNwTDzhIWWWzdU++Cqh94hKaJeJ0LBXGpNjc7W9f
-         RufQ==
-X-Gm-Message-State: APjAAAX7ToYFOODKL9kFB//lgxqc7QoOCtb0zQG0iG6ujm8g4ThQFnMx
-        xBriGgWc/A3axkQ/djPpTFBx6LkGRzE=
-X-Google-Smtp-Source: APXvYqxgb3XYeOq1PzJaus9+5Fh/8qkRK5xRTJEAptm2CaEqv29Iq/ZJSI1PB+G6RwnY/1HuWTy9aQ==
-X-Received: by 2002:ac2:5310:: with SMTP id c16mr7845014lfh.119.1562058459487;
-        Tue, 02 Jul 2019 02:07:39 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id 2sm3684904lji.94.2019.07.02.02.07.38
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 02:07:38 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Inga Stotland <inga.stotland@intel.com>,
-        Jakub Witowski <jakub.witowski@silvair.com>
-Subject: [PATCH BlueZ v2 3/3] mesh: Handle messages encrypted with a remote device key
-Date:   Tue,  2 Jul 2019 11:07:31 +0200
-Message-Id: <20190702090731.30852-4-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190702090731.30852-1-michal.lowas-rzechonek@silvair.com>
-References: <20190702090731.30852-1-michal.lowas-rzechonek@silvair.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=cLNP/sosMDd8EoWilGG4yKpNq20kQJtoc5CsHx4SqSU=;
+        b=KRPFmCRwvwzP9KYkaN+ZV0BM9x0iyn9W41fj7U8/WjPGo5MEkTOEBOpWo96eO2+rPJ
+         ddKCI8pEk1s4oMm333qA0mzv2AD2h/yFfj9/jmUIkxzfz4Qb1xAROEoLLaJOANoypdCP
+         Zw7QeSk7bVC1dM35oIqIvW8OsuYUe5/P8YdNQ/6tSC846aqdZFbwbQ0L1n87s3ROAAJF
+         14H0xpkmwCaSYfkBZiQuNHkkpG8GMYtcKzK53l/9wt5Kj7vR59V0FePyYwHsPh5NwOny
+         LtXIn2mgQISR/d1bN1ULX47lKBWkUR7QOqnvHB+yL+axv/fsjtJQQeDpMKjh6k8P9GXZ
+         eaSg==
+X-Gm-Message-State: APjAAAVAeMOjXJ+eBNnyoaMkkFqjpjI10R9WP872RJ2f72pkRo9ID2GZ
+        IG29c/hIrxdI/5dSwgU5JM0WDiDU+7XjYdv97j9yvUU3
+X-Google-Smtp-Source: APXvYqwjmumvoTiEBYmKXfwionqGDlevL1Vcbdn+BU2QrAH9S/nuUSyKgi415ktPdpY3vdS1yGzGC/7U6qykZaLvvXs=
+X-Received: by 2002:a2e:b0d0:: with SMTP id g16mr17085850ljl.161.1562070651895;
+ Tue, 02 Jul 2019 05:30:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Mathias Baert <mathiasrobaert@gmail.com>
+Date:   Tue, 2 Jul 2019 14:30:41 +0200
+Message-ID: <CAEzhej0YJ6b+=nFXHiiZPJnSdOm=F_OaXR5kWFjvbw2107X94Q@mail.gmail.com>
+Subject: BlueZ Central to Peripheral latency issue
+To:     linux-bluetooth@vger.kernel.org
+Cc:     subhoshankar.basu@ugent.be, Jeroen.Hoebeke@ugent.be
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds ability to receive messages encrypted using known remote
-device key. Such a key must be added to the node's keyring using
-ImportRemoteNode() method of org.bluez.mesh.Management1 interface.
+Hi,
 
-Decrypted messages are then forwarded to the application using
-DevKeyMessageReceived() D-Bus API.
+We are using the BlueZ 5.48 version on a Raspberry PI with Raspbian Stretch 9.1.
 
-Also, messages originating from a local node and encrypted using local
-device key are forwarde to the application as well, if they weren't
-handled by internal model. This allows e.g. receiving status messages
-from a local Config Server in the application.
----
- mesh/model.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 61 insertions(+), 4 deletions(-)
+The setup is this PI connected with a Nordic Semiconductor nRF52840
+device, via an IPv6 over BLE connection. The connection is using a
+connection interval of 7.5 ms. Via throughput measurements with iperf,
+both ways (central to peripheral and peripheral to central), we are
+able to achieve maximally ~ 100 kbps (using the 1 Mbps PHY).
 
-diff --git a/mesh/model.c b/mesh/model.c
-index 0d44ea72e..e9b8a8ce2 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -39,6 +39,7 @@
- #include "mesh/dbus.h"
- #include "mesh/util.h"
- #include "mesh/model.h"
-+#include "mesh/keyring.h"
- 
- /* Divide and round to ceiling (up) to calculate segment count */
- #define CEILDIV(val, div) (((val) + (div) - 1) / (div))
-@@ -368,6 +369,14 @@ static int dev_packet_decrypt(struct mesh_node *node, const uint8_t *data,
- 					dst, key_id, seq, iv_idx, out, key))
- 		return APP_IDX_DEV_LOCAL;
- 
-+	if (!keyring_get_remote_dev_key(node, src, dev_key))
-+		return -1;
-+
-+	key = dev_key;
-+	if (mesh_crypto_payload_decrypt(NULL, 0, data, size, szmict, src,
-+					dst, key_id, seq, iv_idx, out, key))
-+		return APP_IDX_DEV_REMOTE;
-+
- 	return -1;
- }
- 
-@@ -694,6 +703,47 @@ static int add_sub(struct mesh_net *net, struct mesh_model *mod,
- 	return MESH_STATUS_SUCCESS;
- }
- 
-+static void send_dev_key_msg_rcvd(struct mesh_node *node, uint8_t ele_idx,
-+					uint16_t src, uint16_t net_idx,
-+					uint16_t size, const uint8_t *data)
-+{
-+	struct l_dbus *dbus = dbus_get_bus();
-+	struct l_dbus_message *msg;
-+	struct l_dbus_message_builder *builder;
-+	const char *owner;
-+	const char *path;
-+
-+	owner = node_get_owner(node);
-+	path = node_get_element_path(node, ele_idx);
-+	if (!path || !owner)
-+		return;
-+
-+	l_debug("Send \"DevKeyMessageReceived\"");
-+
-+	msg = l_dbus_message_new_method_call(dbus, owner, path,
-+						MESH_ELEMENT_INTERFACE,
-+						"DevKeyMessageReceived");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+
-+	if (!l_dbus_message_builder_append_basic(builder, 'q', &src))
-+		goto error;
-+
-+	if (!l_dbus_message_builder_append_basic(builder, 'q', &net_idx))
-+		goto error;
-+
-+	if (!dbus_append_byte_array(builder, data, size))
-+		goto error;
-+
-+	if (!l_dbus_message_builder_finalize(builder))
-+		goto error;
-+
-+	l_dbus_send(dbus, msg);
-+
-+error:
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
- static void send_msg_rcvd(struct mesh_node *node, uint8_t ele_idx, bool is_sub,
- 					uint16_t src, uint16_t key_idx,
- 					uint16_t size, const uint8_t *data)
-@@ -842,10 +892,17 @@ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
- 		 * Cycle through external models if the message has not been
- 		 * handled by internal models
- 		 */
--		if (forward.has_dst && !forward.done)
--			send_msg_rcvd(node, i, is_subscription, src,
--					forward.idx, forward.size,
--					forward.data);
-+		if (forward.has_dst && !forward.done) {
-+			if ((decrypt_idx & APP_IDX_MASK) == decrypt_idx)
-+				send_msg_rcvd(node, i, is_subscription, src,
-+						forward.idx, forward.size,
-+						forward.data);
-+			else if (decrypt_idx == APP_IDX_DEV_REMOTE ||
-+				(decrypt_idx == APP_IDX_DEV_LOCAL &&
-+				 mesh_net_is_local_address(net, src)))
-+				send_dev_key_msg_rcvd(node, i, src, 0,
-+						forward.size, forward.data);
-+		}
- 
- 		/*
- 		 * Either the message has been processed internally or
--- 
-2.19.1
+However, when looking into individual packet exchanges, we notice a
+significant delay (up to 1 sec) in the RTT when pinging from the
+peripheral to the BlueZ central and back. We also see a huge
+fluctuation in this value and it also depends on the intervals at
+which the pings are fired (lower throughput gives a much higher
+average individual latency). When firing ping packets at a 1 sec
+interval, it is definitely visible.
 
+When looking into this, we found that the latency between the
+peripheral and the central is quite stable and low enough. But the
+latency between the central and peripheral is fluctuating a lot and is
+generally quite high. Is this something you have noticed before? We
+think that it could be a scheduling issue on the kernel, where higher
+throughput gives more priority to Bluetooth communication?
+
+Thanks in advance.
+
+Kind regards,
+
+Mathias Baert
