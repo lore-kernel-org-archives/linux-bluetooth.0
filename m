@@ -2,65 +2,38 @@ Return-Path: <SRS0=p1bJ=U7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57738C06510
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 12:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC70C06511
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 14:20:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B02220836
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 12:31:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="OsZd951X"
+	by mail.kernel.org (Postfix) with ESMTP id 891D82063F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 14:20:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbfGBMbt (ORCPT
+        id S1727140AbfGBOTO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Jul 2019 08:31:49 -0400
-Received: from mail-lf1-f54.google.com ([209.85.167.54]:32812 "EHLO
-        mail-lf1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726167AbfGBMbt (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Jul 2019 08:31:49 -0400
-Received: by mail-lf1-f54.google.com with SMTP id y17so11274059lfe.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2019 05:31:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5MSlXkZ98fkMfYO0+u0lbBPmhe8KOuptU1C+b+RcwPo=;
-        b=OsZd951XzTkhFQ3H1uzmvyG0donuXbGy4kcASbLFaAwa7mkvijZ3H1vq5BhqGZIBiw
-         l86hKGXl+c9OneEnEQaQq1w/E/xLePXZyT+H5CXXbvhJX6chup4yASwQXeViInHKzWou
-         3+cazDTYknIrPGDvQ4qsS2Ufe+FjK7vM77pRF6Yh972Vq3jIAkrO4R5nSZaSAtVR6mZL
-         SYblocWavLF5OWfSynYkZt/ZtXVoP4CNJpFGhdtgztsNwwa96wSO+QhyPczqOrptvsJk
-         mUhIo2a3LWMXiKUbSxmKJf6AliPdL2SD6+9tKa6Vh1qaJ8LiSfItVi/fjhRXuhf7RICY
-         9LKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5MSlXkZ98fkMfYO0+u0lbBPmhe8KOuptU1C+b+RcwPo=;
-        b=NlKeeErcMcKub+BoEYFdDTwsttSRfLGCIuBZFjdHI3bBkU56f3g+PgKArkXb9RM7kc
-         lh2IqJsdSDnN5Qt0yyf98+dnUIvrB9VYArjiTD+uLkKE/tbz+Cam2zQTOILIxhyrn4gk
-         3SH11uQiNKaHHpjwxm9vv8A/ORB8hUj93c1+skApMHA+DIpp8XQrs1krtpVe9DvA5qbq
-         D0/6PBV4kNufyPEwJt8mDRWer3cAaszKrlRNNaUmn0FAzPLGkKcbAJH595PTGbkB74sF
-         bS1J9NmJSvc7Jf58+cj9wGhfxGk9PEnC3KclsLjFAsMpfGqIxBGlM3n79wd7DutJKSEH
-         wfAw==
-X-Gm-Message-State: APjAAAVIl198mDRCNwTsEoO+B+187Lh7bh0uQzR1vPG9mZBUejoIHV4X
-        Onzfr40dcPiQKu1kPrzxGsSuBHsgKJc=
-X-Google-Smtp-Source: APXvYqxA/s/SwsNJhbTohjiVqBZvwbZfpfNrKZX2qDsTPcz0/rGoYkE9iVsKr06+RSO6XbbLu2ZqXA==
-X-Received: by 2002:ac2:44b1:: with SMTP id c17mr14434792lfm.87.1562070706916;
-        Tue, 02 Jul 2019 05:31:46 -0700 (PDT)
-Received: from localhost.localdomain ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id d4sm2989981lfi.91.2019.07.02.05.31.45
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 05:31:46 -0700 (PDT)
-From:   Jakub Witowski <jakub.witowski@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2] mesh: Allow to set-up the CRPL with application
-Date:   Tue,  2 Jul 2019 14:31:41 +0200
-Message-Id: <20190702123141.19673-1-jakub.witowski@silvair.com>
+        Tue, 2 Jul 2019 10:19:14 -0400
+Received: from mx1.emlix.com ([188.40.240.192]:57588 "EHLO mx1.emlix.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727109AbfGBOTM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Jul 2019 10:19:12 -0400
+X-Greylist: delayed 320 seconds by postgrey-1.27 at vger.kernel.org; Tue, 02 Jul 2019 10:19:12 EDT
+Received: from mailer.emlix.com (unknown [81.20.119.6])
+        (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.emlix.com (Postfix) with ESMTPS id EC37F60AF8;
+        Tue,  2 Jul 2019 16:13:50 +0200 (CEST)
+From:   Philipp Puschmann <philipp.puschmann@emlix.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Philipp Puschmann <philipp.puschmann@emlix.com>
+Subject: [PATCH] Bluetooth: serdev: hci_ll: set operational frequency earlier
+Date:   Tue,  2 Jul 2019 16:13:37 +0200
+Message-Id: <20190702141337.10528-1-philipp.puschmann@emlix.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -69,72 +42,81 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds an optional CRPL property to org.bluez.mesh.Application1
-interface, allowing to indicate the depth of reply protection list.
----
- doc/mesh-api.txt |  4 ++++
- mesh/node.c      | 18 +++++++++++++-----
- 2 files changed, 17 insertions(+), 5 deletions(-)
+Uploading the firmware needs quite a few seconds if done at 115200 kbps. So set
+the operational frequency, usually 3 MHz, before uploading the firmware.
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 4e0a8bff1..893a1a6c0 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -724,6 +724,10 @@ Properties:
+I have successfully tested this with a wl1837mod.
+
+Signed-off-by: Philipp Puschmann <philipp.puschmann@emlix.com>
+---
+ drivers/bluetooth/hci_ll.c | 39 ++++++++++++++++++++------------------
+ 1 file changed, 21 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index c04f5f9e1ed0..cbd7bc539d5e 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -601,6 +601,13 @@ static int ll_setup(struct hci_uart *hu)
  
- 		A 16-bit vendor-assigned product version identifier
+ 	serdev_device_set_flow_control(serdev, true);
  
-+	uint16 CRPL [read-only, optional]
++	if (hu->oper_speed)
++		speed = hu->oper_speed;
++	else if (hu->proto->oper_speed)
++		speed = hu->proto->oper_speed;
++	else
++		speed = 0;
 +
-+		A 16-bit minimum number of replay protection list entries
-+
- 
- Mesh Element Hierarchy
- ======================
-diff --git a/mesh/node.c b/mesh/node.c
-index 7383793d9..adc2aa93e 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -1312,10 +1312,6 @@ static bool create_node_config(struct mesh_node *node)
- static void set_defaults(struct mesh_node *node)
- {
- 	/* TODO: these values should come from mesh.conf */
--	if (!node->comp)
--		node->comp = l_new(struct node_composition, 1);
--
--	node->comp->crpl = DEFAULT_CRPL;
- 	node->lpn = MESH_MODE_UNSUPPORTED;
- 	node->proxy = MESH_MODE_UNSUPPORTED;
- 	node->friend = MESH_MODE_UNSUPPORTED;
-@@ -1338,8 +1334,10 @@ static bool get_app_properties(struct mesh_node *node, const char *path,
- 
- 	l_debug("path %s", path);
- 
--	if (is_new)
-+	if (is_new) {
- 		node->comp = l_new(struct node_composition, 1);
-+		node->comp->crpl = DEFAULT_CRPL;
-+	}
- 
- 	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
- 
-@@ -1372,6 +1370,16 @@ static bool get_app_properties(struct mesh_node *node, const char *path,
- 				return false;
- 
- 			node->comp->vid = value;
-+
-+		} else if (!strcmp(key, "CRPL")) {
-+			if (!l_dbus_message_iter_get_variant(&variant, "q",
-+									&value))
-+				return false;
-+
-+			if (!is_new && node->comp->crpl != value)
-+				return false;
-+
-+			node->comp->crpl = value;
+ 	do {
+ 		/* Reset the Bluetooth device */
+ 		gpiod_set_value_cansleep(lldev->enable_gpio, 0);
+@@ -612,6 +619,20 @@ static int ll_setup(struct hci_uart *hu)
+ 			return err;
  		}
+ 
++		if (speed) {
++			__le32 speed_le = cpu_to_le32(speed);
++			struct sk_buff *skb;
++
++			skb = __hci_cmd_sync(hu->hdev,
++					     HCI_VS_UPDATE_UART_HCI_BAUDRATE,
++					     sizeof(speed_le), &speed_le,
++					     HCI_INIT_TIMEOUT);
++			if (!IS_ERR(skb)) {
++				kfree_skb(skb);
++				serdev_device_set_baudrate(serdev, speed);
++			}
++		}
++
+ 		err = download_firmware(lldev);
+ 		if (!err)
+ 			break;
+@@ -636,25 +657,7 @@ static int ll_setup(struct hci_uart *hu)
  	}
  
+ 	/* Operational speed if any */
+-	if (hu->oper_speed)
+-		speed = hu->oper_speed;
+-	else if (hu->proto->oper_speed)
+-		speed = hu->proto->oper_speed;
+-	else
+-		speed = 0;
+-
+-	if (speed) {
+-		__le32 speed_le = cpu_to_le32(speed);
+-		struct sk_buff *skb;
+ 
+-		skb = __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
+-				     sizeof(speed_le), &speed_le,
+-				     HCI_INIT_TIMEOUT);
+-		if (!IS_ERR(skb)) {
+-			kfree_skb(skb);
+-			serdev_device_set_baudrate(serdev, speed);
+-		}
+-	}
+ 
+ 	return 0;
+ }
 -- 
 2.20.1
 
