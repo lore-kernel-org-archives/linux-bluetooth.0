@@ -2,68 +2,66 @@ Return-Path: <SRS0=p1bJ=U7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A696C06513
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 598D4C06510
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 19E152089C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32D352146F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 09:07:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="C4rTUtoT"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="mxPQfyVt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727060AbfGBJHk (ORCPT
+        id S1727063AbfGBJHl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Jul 2019 05:07:40 -0400
-Received: from mail-lj1-f182.google.com ([209.85.208.182]:45937 "EHLO
-        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbfGBJHk (ORCPT
+        Tue, 2 Jul 2019 05:07:41 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:40736 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727051AbfGBJHl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Jul 2019 05:07:40 -0400
-Received: by mail-lj1-f182.google.com with SMTP id m23so16056581lje.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2019 02:07:38 -0700 (PDT)
+        Tue, 2 Jul 2019 05:07:41 -0400
+Received: by mail-lf1-f68.google.com with SMTP id a9so10854050lff.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2019 02:07:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=FGv0+l9EN9XHcTZlrDiOAypQLNcTB9TX2ylvy7LwU/E=;
-        b=C4rTUtoTK9mEMd6OoO58SQniZIebN9p8v8b0Yo9vFKrEgrhLgZOsgMS86lthQeS4J3
-         ak1S0iLZNjSFsSxAEXm4SJEmYfIKVDCf1/ZnAeGA/VXRzmRTLgQ+foW0vu/c2WRVjbU9
-         jDZsnaZOz210gPb9e/i0K+7pR+bVVFcUCrsUNZtAkSnmfiCsF3Wzl1ZZWBccjAbP4u0D
-         EjpCH+tjeXL4yCG6UVxwQrFFwEdsdGA0nC2H8W7PzfavN6UCPG8maiC7A12GCsyOwf54
-         Ud3+tihcoLHEtNEJvHgovm9LgPagqInoWhBPqnyXPuVaNoRfh15wzu9O0xKk8C1SAACg
-         m8bQ==
+        bh=X2yvGcNd3VFkpWPJB4E+orVbnbAcNpqbk/LQhJJLXyk=;
+        b=mxPQfyVt+BmxlNUF4chdaifkkPI0tndCSKtVBiwTCI7ih7LsH+8w613MjN/ihQhGaZ
+         KxkoJYgFeUVfKjKn0d28ZnMrWAwGyZDoFySvw3ZF38uC6365z0Ed7QK6v8Svh8gj0suL
+         DYW5Of1QRglRKQs3oSCmixL4ACWKfsxXzI9Y2kDv4HvOiDDfNRZ1wIj9JrlBgVFQHr2E
+         /ENiBE4CigrHnNe3jHta+hHMw990xWixT8nFiI6S04lZORXO8OspZgTgdO9/RNFk0lFE
+         M4qgxrd4plIzVzS23QM4ypZAGuJxHyJquNZUkZ139TNmBOMHSxzwwR0WbUfB5+5Vvyyg
+         DIuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FGv0+l9EN9XHcTZlrDiOAypQLNcTB9TX2ylvy7LwU/E=;
-        b=QG3B087ULlCcjxqzf9Nu3skBJUaux8rHxFHAWLgjrR5kTTHGfP5c2IRZrhkA6TedQn
-         E8QWjNfT7J9BIFIM+M48yKy2XszDmpTV7krfkXUZp9nwJmHbaAcFprVPhlN1o3j7cCW2
-         ZM6k8KoTrhwa/2ORjMmgGMQxJCcCoQ18NPicWDSxiHAdaJ1AqZV80OvL3dYH4XKBnAmB
-         cB+uaCLO/dmmU0KbJSTOQd9H/Jm/V7jkpLuVqEJQ7cuejQZBiPK5N1e7rR2WzGuhVOIp
-         JQKUtcjHfvC121IjUVSOlPJIy1W9rYRk10ro4aE0rEiKToarhKUx3jnYnZVt58KaiJ7S
-         xEYA==
-X-Gm-Message-State: APjAAAX1B7rHosOWZbgSj3jXZSgKgJl+nBIi3WG+hgukJrggPSzjvcAn
-        pMyki8hqaihM3kcludLbB3hsgH4Q934=
-X-Google-Smtp-Source: APXvYqzYxVakQrz44J6qJtXkkov2KPZuZocnG9qFc0bB/s6k08R4uICUTqE1aDYh3feqd1Ay7jIjlw==
-X-Received: by 2002:a2e:96d0:: with SMTP id d16mr16859546ljj.14.1562058457409;
-        Tue, 02 Jul 2019 02:07:37 -0700 (PDT)
+        bh=X2yvGcNd3VFkpWPJB4E+orVbnbAcNpqbk/LQhJJLXyk=;
+        b=ATXL5Nl+To6JkRkycHN6S+AfM+GaG8dYwBq28w74ippixaHdjo+2YLnlZPGwNwWr3l
+         GEXQxA9mpGuN4gY9ro//RhuN7dcHa+pB+oyu2o+MorqGuMazR6b9xm377Y75qdwpi27M
+         JBUR9aTf7afxP+1/nbqDOXz+1lhGexGFsjS/ssJ6O8F+Z9cERyQDtfdax0qS95zZlNnT
+         tg3AL6h+L0aSVUI6lJDNMetHvT9ok/zA1YmpBVEyKt7nLbgGiiijXNJrDl+C5emEkqni
+         7aWMrCkzjvemkG4ESW56Aq/HTCXxvkS7jFdbf/d5zkxPPRy2ZcrIrjU1YVDvsVQ4DLQe
+         E8Lg==
+X-Gm-Message-State: APjAAAUMeZuP2kNXxTNOJmrPvNJp5JbExDApve1F/qf7srSmmfY3+csn
+        8AAgcg3pV/F0Yt/WmwQ6eEEmneWdfCw=
+X-Google-Smtp-Source: APXvYqzGuwX6WEUe4dcxBWLomkZXBOVftefKHDMafh/S8zBoNGVGT4PeZs1LQxVEpqslREI9Lmg/Hw==
+X-Received: by 2002:a19:9156:: with SMTP id y22mr13639592lfj.43.1562058458523;
+        Tue, 02 Jul 2019 02:07:38 -0700 (PDT)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id 2sm3684904lji.94.2019.07.02.02.07.36
+        by smtp.gmail.com with ESMTPSA id 2sm3684904lji.94.2019.07.02.02.07.37
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 02:07:36 -0700 (PDT)
+        Tue, 02 Jul 2019 02:07:38 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Inga Stotland <inga.stotland@intel.com>,
-        Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v2 1/3] mesh: Split APP_IDX_DEV into APP_IDX_DEV_LOCAL and APP_IDX_DEV_REMOTE
-Date:   Tue,  2 Jul 2019 11:07:29 +0200
-Message-Id: <20190702090731.30852-2-michal.lowas-rzechonek@silvair.com>
+Cc:     Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v2 2/3] mesh: Implement DevKeySend() method on Node interface
+Date:   Tue,  2 Jul 2019 11:07:30 +0200
+Message-Id: <20190702090731.30852-3-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190702090731.30852-1-michal.lowas-rzechonek@silvair.com>
 References: <20190702090731.30852-1-michal.lowas-rzechonek@silvair.com>
@@ -74,165 +72,131 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is needed to distinguish incoming messages encrypted using a device
-key: if the key is local, the message can be forwarded to internal
-models. If the key is a known remote one, it will be forwarded to the
-application via DevKeyMessageReceived() API.
----
- mesh/cfgmod-server.c | 15 ++++++++-------
- mesh/model.c         | 20 +++++++++++---------
- mesh/net.h           | 10 ++++++----
- 3 files changed, 25 insertions(+), 20 deletions(-)
+This patch implements D-Bus DevKeySend() method of org.bluez.mesh.Node1
+interface, allowing the application to send messages encrypted using
+a known remote device key.
 
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 634ac006b..a849b5e99 100644
---- a/mesh/cfgmod-server.c
-+++ b/mesh/cfgmod-server.c
-@@ -69,7 +69,8 @@ static void send_pub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		n += 2;
- 	}
- 
--	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL,
-+								msg, n);
- }
- 
- static bool config_pub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
-@@ -254,7 +255,7 @@ static void send_sub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		n += 2;
- 	}
- 
--	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL, msg, n);
- }
- 
- static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
-@@ -312,7 +313,7 @@ static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
- 
- 	*msg_status = (uint8_t) status;
- 
--	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL, msg, n);
- 	return true;
- }
- 
-@@ -487,7 +488,7 @@ static void send_model_app_status(struct mesh_node *node, uint16_t src,
- 	l_put_le16(id, msg + n);
- 	n += 2;
- 
--	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL, msg, n);
- }
- 
- static void model_app_list(struct mesh_node *node, uint16_t src, uint16_t dst,
-@@ -540,7 +541,7 @@ static void model_app_list(struct mesh_node *node, uint16_t src, uint16_t dst,
- 
- 	if (result >= 0) {
- 		*status = result;
--		mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL,
-+		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL,
- 								msg, n);
- 	}
- 
-@@ -758,7 +759,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 	uint16_t interval;
- 	uint16_t n;
- 
--	if (idx != APP_IDX_DEV)
-+	if (idx != APP_IDX_DEV_LOCAL)
- 		return false;
- 
- 	if (mesh_model_opcode_get(pkt, size, &opcode, &n)) {
-@@ -1259,7 +1260,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 	if (n) {
- 		/* print_packet("App Tx", long_msg ? long_msg : msg, n); */
- 		mesh_model_send(node, unicast, src,
--				APP_IDX_DEV, DEFAULT_TTL,
-+				APP_IDX_DEV_LOCAL, DEFAULT_TTL,
- 				long_msg ? long_msg : msg, n);
- 	}
- 	l_free(long_msg);
+At the moment the call ignores net_index argument and sends messages
+using the primary subnet.
+
+Also, it's no longer possible to use 'magic' key_index value 0x7fff
+(denoting local device key) when calling regular Send(). Applications
+should use DevKeySend() instead.
+---
+ mesh/model.c |  8 ++++++-
+ mesh/node.c  | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 64 insertions(+), 3 deletions(-)
+
 diff --git a/mesh/model.c b/mesh/model.c
-index 7401dcecb..e09dbd364 100644
+index e09dbd364..0d44ea72e 100644
 --- a/mesh/model.c
 +++ b/mesh/model.c
-@@ -306,7 +306,8 @@ static void forward_model(void *a, void *b)
- 	bool result;
- 
- 	l_debug("model %8.8x with idx %3.3x", mod->id, fwd->idx);
--	if (fwd->idx != APP_IDX_DEV && !has_binding(mod->bindings, fwd->idx))
-+
-+	if (fwd->idx != APP_IDX_DEV_LOCAL && !has_binding(mod->bindings, fwd->idx))
- 		return;
- 
- 	dst = fwd->dst;
-@@ -356,15 +357,16 @@ static int dev_packet_decrypt(struct mesh_node *node, const uint8_t *data,
- 				uint16_t dst, uint8_t key_id, uint32_t seq,
- 				uint32_t iv_idx, uint8_t *out)
+@@ -941,6 +941,7 @@ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t target,
+ 					const void *msg, uint16_t msg_len)
  {
--	const uint8_t *dev_key;
+ 	uint8_t key_id;
 +	uint8_t dev_key[16];
-+	const uint8_t *key;
+ 	const uint8_t *key;
  
--	dev_key = node_get_device_key(node);
--	if (!dev_key)
-+	key = node_get_device_key(node);
-+	if (!key)
- 		return false;
- 
- 	if (mesh_crypto_payload_decrypt(NULL, 0, data, size, szmict, src,
--					dst, key_id, seq, iv_idx, out, dev_key))
--		return APP_IDX_DEV;
-+					dst, key_id, seq, iv_idx, out, key))
-+		return APP_IDX_DEV_LOCAL;
- 
- 	return -1;
- }
-@@ -952,7 +954,7 @@ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t target,
- 	if (IS_UNASSIGNED(target))
- 		return false;
- 
--	if (app_idx == APP_IDX_DEV) {
-+	if (app_idx == APP_IDX_DEV_LOCAL) {
- 		key = node_get_device_key(node);
+ 	/* print_packet("Mod Tx", msg, msg_len); */
+@@ -959,7 +960,12 @@ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t target,
  		if (!key)
  			return false;
-@@ -1381,12 +1383,12 @@ struct mesh_model *mesh_model_setup(struct mesh_node *node, uint8_t ele_idx,
- 		if (ele_idx != PRIMARY_ELE_IDX)
- 			return NULL;
  
--		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV));
-+		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV_LOCAL));
- 		return mod;
- 	}
- 
- 	if (db_mod->id == CONFIG_CLI_MODEL) {
--		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV));
-+		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV_LOCAL));
- 		return mod;
- 	}
- 
-diff --git a/mesh/net.h b/mesh/net.h
-index f19024766..834712d8d 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -37,10 +37,12 @@ struct mesh_node;
- #define SEQ_MASK	0xffffff
- 
- #define CREDFLAG_MASK	0x1000
--#define APP_IDX_MASK	0x0fff
--#define APP_IDX_DEV	0x7fff
--#define APP_IDX_ANY	0x8000
--#define APP_IDX_NET	0xffff
+-		l_debug("(%x)", app_idx);
++		key_id = APP_ID_DEV;
++	} else if (app_idx == APP_IDX_DEV_REMOTE) {
++		if (!keyring_get_remote_dev_key(node, target, dev_key))
++			return false;
 +
-+#define APP_IDX_MASK		0x0fff
-+#define APP_IDX_DEV_REMOTE	0x6fff
-+#define APP_IDX_DEV_LOCAL	0x7fff
-+#define APP_IDX_ANY		0x8000
-+#define APP_IDX_NET		0xffff
++		key = dev_key;
+ 		key_id = APP_ID_DEV;
+ 	} else {
+ 		key = appkey_get_key(node_get_net(node), app_idx, &key_id);
+diff --git a/mesh/node.c b/mesh/node.c
+index 9acf153d9..316b889e8 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -1959,7 +1959,11 @@ static struct l_dbus_message *send_call(struct l_dbus *dbus,
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 							"Incorrect data");
  
- #define NET_IDX_INVALID	0xffff
- #define NET_NID_INVALID	0xff
+-	if (!mesh_model_send(node, src, dst, app_idx,
++	if ((app_idx & APP_IDX_MASK) != app_idx)
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
++						"Invalid key_index");
++
++	if (!mesh_model_send(node, src, dst, app_idx & APP_IDX_MASK,
+ 				mesh_net_get_default_ttl(node->net), data, len))
+ 		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
+ 
+@@ -1969,6 +1973,53 @@ static struct l_dbus_message *send_call(struct l_dbus *dbus,
+ 	return reply;
+ }
+ 
++static struct l_dbus_message *dev_key_send_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
++{
++	struct mesh_node *node = user_data;
++	const char *sender, *ele_path;
++	struct l_dbus_message_iter iter_data;
++	struct node_element *ele;
++	uint16_t dst, net_idx, src;
++	uint8_t *data;
++	uint32_t len;
++	struct l_dbus_message *reply;
++
++	l_debug("DevKeySend");
++
++	sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node->owner))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
++
++	if (!l_dbus_message_get_arguments(msg, "oqqay", &ele_path, &dst,
++							&net_idx, &iter_data))
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
++
++	ele = l_queue_find(node->elements, match_element_path, ele_path);
++	if (!ele)
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
++							"Element not found");
++
++	src = node_get_primary(node) + ele->idx;
++
++	if (!l_dbus_message_iter_get_fixed_array(&iter_data, &data, &len) ||
++					!len || len > MESH_MAX_ACCESS_PAYLOAD)
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
++							"Incorrect data");
++
++	/* TODO: use net_idx */
++	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE,
++				mesh_net_get_default_ttl(node->net), data, len))
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
++
++	reply = l_dbus_message_new_method_return(msg);
++	l_dbus_message_set_arguments(reply, "");
++
++	return reply;
++}
++
+ static struct l_dbus_message *publish_call(struct l_dbus *dbus,
+ 						struct l_dbus_message *msg,
+ 						void *user_data)
+@@ -2074,7 +2125,11 @@ static void setup_node_interface(struct l_dbus_interface *iface)
+ {
+ 	l_dbus_interface_method(iface, "Send", 0, send_call, "", "oqqay",
+ 						"element_path", "destination",
+-						"key", "data");
++						"key_index", "data");
++	l_dbus_interface_method(iface, "DevKeySend", 0, dev_key_send_call,
++						"", "oqqay", "element_path",
++						"destination", "net_index",
++						"data");
+ 	l_dbus_interface_method(iface, "Publish", 0, publish_call, "", "oqay",
+ 					"element_path", "model_id", "data");
+ 	l_dbus_interface_method(iface, "VendorPublish", 0, vendor_publish_call,
 -- 
 2.19.1
 
