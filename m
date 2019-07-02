@@ -2,163 +2,131 @@ Return-Path: <SRS0=p1bJ=U7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE75C5B57D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 05:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B008C5B57D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 05:44:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B502721479
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 05:24:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F1862146F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Jul 2019 05:44:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725802AbfGBFYB (ORCPT
+        id S1726150AbfGBFoK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Jul 2019 01:24:01 -0400
-Received: from mga02.intel.com ([134.134.136.20]:35925 "EHLO mga02.intel.com"
+        Tue, 2 Jul 2019 01:44:10 -0400
+Received: from mga18.intel.com ([134.134.136.126]:13590 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725789AbfGBFYA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Jul 2019 01:24:00 -0400
+        id S1725775AbfGBFoK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Jul 2019 01:44:10 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Jul 2019 22:23:35 -0700
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Jul 2019 22:43:44 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,442,1557212400"; 
-   d="p7s'?scan'208";a="166063799"
-Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
-  by orsmga003.jf.intel.com with ESMTP; 01 Jul 2019 22:23:35 -0700
-Received: from orsmsx123.amr.corp.intel.com (10.22.240.116) by
- ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 1 Jul 2019 22:23:34 -0700
+   d="p7s'?scan'208";a="362503411"
+Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
+  by fmsmga006.fm.intel.com with ESMTP; 01 Jul 2019 22:43:45 -0700
 Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX123.amr.corp.intel.com ([169.254.1.46]) with mapi id 14.03.0439.000;
- Mon, 1 Jul 2019 22:23:34 -0700
+ ORSMSX110.amr.corp.intel.com ([169.254.10.97]) with mapi id 14.03.0439.000;
+ Mon, 1 Jul 2019 22:43:44 -0700
 From:   "Stotland, Inga" <inga.stotland@intel.com>
-To:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "Gix, Brian" <brian.gix@intel.com>
+CC:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] mesh: Allow to set-up the CRPL with application
-Thread-Topic: [PATCH] mesh: Allow to set-up the CRPL with application
-Thread-Index: AQHVMAIfSSEJOTZgEEqXsSD6WFMDw6a3QeUA
-Date:   Tue, 2 Jul 2019 05:23:33 +0000
-Message-ID: <c043adad8ba346ab95278d753be314cea54ec83e.camel@intel.com>
-References: <20190701114239.8792-1-jakub.witowski@silvair.com>
-In-Reply-To: <20190701114239.8792-1-jakub.witowski@silvair.com>
+Subject: Re: Was: mesh: Added ImportLocalNode call with its API --> Multiple
+ Methods?
+Thread-Topic: Was: mesh: Added ImportLocalNode call with its API -->
+ Multiple Methods?
+Thread-Index: AQHVLRZ+HR5m7dtU/Eek/jPgfEZlzKawXpWAgAE4cgCABGCzAIAAbrAAgADm1AA=
+Date:   Tue, 2 Jul 2019 05:43:44 +0000
+Message-ID: <ee594d462e6ca16ef9a0f5f0f46b614316afa86d.camel@intel.com>
+References: <20190625143855.29889-1-jakub.witowski@silvair.com>
+         <1561568468.22940.16.camel@intel.com>
+         <14abe0f2129a2334d32aa14f2167380a5208880b.camel@intel.com>
+         <CAMCw4t3pXTbtt05RD694jzF_MNT_J9dcFMtA7iuD4ujZT9FDbg@mail.gmail.com>
+         <1561660267.7802.29.camel@intel.com>
+         <20190627195127.payxcdeexiamsi24@kynes>
+         <1561732182.7802.47.camel@intel.com>
+         <20190701092052.24dxntjvvdcylp6r@mlowasrzechonek2133>
+         <DEBB0CAA2616974FAE35E4B560B9A4376CBB4F18@ORSMSX103.amr.corp.intel.com>
+In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4376CBB4F18@ORSMSX103.amr.corp.intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.252.207.138]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-0S/YZf1fDba4DdqdE0lD"
+        protocol="application/x-pkcs7-signature"; boundary="=-BlY5LriF69VgIMtwnw5b"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-0S/YZf1fDba4DdqdE0lD
+--=-BlY5LriF69VgIMtwnw5b
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+Hi Brian, Michal, Jakub,
 
-On Mon, 2019-07-01 at 13:42 +0200, Jakub Witowski wrote:
-> This implementation adds possibility of adding CRPL to the node
-> via application in the same way as CIP VID or PID.
-
-Basically, you're exposing CRPL as a property so let's rephrase
-the commit message as something like:
-"This adds an optional CRPL property to org.bluez.mesh.Application1
-interface, allowing to indicate the depth of reply protection list."
-
-> ---
->  doc/mesh-api.txt |  4 ++++
->  mesh/node.c      | 12 ++++++++++--
->  2 files changed, 14 insertions(+), 2 deletions(-)
+On Mon, 2019-07-01 at 08:57 -0700, Gix, Brian wrote:
+> Hi Michal.
 >=20
-> diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-> index 4e0a8bff1..45fc431fa 100644
-> --- a/doc/mesh-api.txt
-> +++ b/doc/mesh-api.txt
-> @@ -724,6 +724,10 @@ Properties:
-> =20
->  		A 16-bit vendor-assigned product version identifier
-> =20
-> +	uint16 CRPL [read-only]
+> > > We can perhaps "Overload" this functionality by allowing a
+> > > minimal
+> > > JSON with only Prov Data parts, if we are looking for a
+> > > Provisioning
+> > > shortcut, and always requiring the ObjectManager calls fetch the
+> > > Composition (if the JSON was minimal) and to Sanity check the
+> > > Composition (if the JSON contains a fully developed/configured
+> > > Migrated node).
+> >=20
+> > Ok, that sounds better. We could start by implementing the
+> > "Provisoining
+> > shortcut" variant, and add full-blown migration when it's needed.
+> >=20
+> > Would that be OK from your POV?
+>=20
+> This would be OK for me.  How about Inga?
+>=20
+> BR,=20
+> Brian
 
-[read-only] -> [read-only, optional]
 
-I'd prefer this to be an optional property. If not found, the daemon
-uses its default setting (see comment below)
+So what is the final versionof the ImportLocalNode() will look like?
 
-> +
-> +		A 16-bit reply protection value
+uint64 token ImportLocalNode(object app_path, array{byte} uuid, string
+config_data)
 
- A 16-bit minimum number of replay protection list entries
+or
 
-> +
-> =20
->  Mesh Element Hierarchy
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> diff --git a/mesh/node.c b/mesh/node.c
-> index 4e35bb3ff..9372d540a 100644
-> --- a/mesh/node.c
-> +++ b/mesh/node.c
-> @@ -55,7 +55,6 @@
->  /* Default element location: unknown */
->  #define DEFAULT_LOCATION 0x0000
-> =20
-> -#define DEFAULT_CRPL 10
+uint64 token ImportLocalNode(object app_path, array{byte} uuid, byte
+config_data_type, string config_data)
 
-Let's keep the default value and make the property optional.
+where config_data_type indicates the format of config_data (json, xml,
+etc)
 
->  #define DEFAULT_SEQUENCE_NUMBER 0
-> =20
->  #define REQUEST_TYPE_JOIN 0
-> @@ -1302,7 +1301,6 @@ static void set_defaults(struct mesh_node
-> *node)
->  	if (!node->comp)
->  		node->comp =3D l_new(struct node_composition, 1);
-> =20
-> -	node->comp->crpl =3D DEFAULT_CRPL;
+A bit clunky, but, if we want to keep everything wrapped in one method
+call, I don't see a way around this.
 
-Let's remove the node->comp allocation here altogether.
-Instead, in get_app_properties, add the default value setting:
+Also, my feeling is that app_path =3D NULL shuold be allowed. In this
+case node/app configuration is incurred solely from config_data, daemon
+will check for the presence of all the mandatory settings.
+In case both app_path and fully fleshed config_data are provided, a
+series of checks will need to be performed to validate the coherncy of
+the configuration.
 
-if (is_new) {
-  	node->comp =3D l_new(struct node_composition, 1);
-	node->comp->crpl =3D DEFAULT_CRPL;
-}
+Best regards,
+Inga
+=20
 
-If CRPL property is present, the default is overwritten.
 
->  	node->lpn =3D MESH_MODE_UNSUPPORTED;
->  	node->proxy =3D MESH_MODE_UNSUPPORTED;
->  	node->friend =3D MESH_MODE_UNSUPPORTED;
-> @@ -1359,6 +1357,16 @@ static bool get_app_properties(struct
-> mesh_node *node, const char *path,
->  				return false;
-> =20
->  			node->comp->vid =3D value;
-> +
-> +		} else if (!strcmp(key, "CRPL")) {
-> +			if (!l_dbus_message_iter_get_variant(&variant,
-> "q",
-> +								=09
-> &value))
-> +				return false;
-> +
-> +			if (!is_new && node->comp->crpl !=3D value)
-> +				return false;
-> +
-> +			node->comp->crpl =3D value;
->  		}
->  	}
-> =20
-
---=-0S/YZf1fDba4DdqdE0lD
+--=-BlY5LriF69VgIMtwnw5b
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -214,13 +182,13 @@ FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
 MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
 ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
 ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
-CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwNzAyMDUyMzMwWjAjBgkqhkiG9w0BCQQxFgQU
-MBzZ3lMfV5l0HKQVbmrLBx4Vyy8wDQYJKoZIhvcNAQEBBQAEggEAr7QSnb/cTI/F+t5bRkOQaq81
-yngeRXXhebnaHJEu+E5/rRbNz3SPaszWFiAPy6Y9Bn6apy4cgs2o31L77cQV6DfN8JT4CRprgXSI
-Yx6w8J9Uai+8aHojnY1VEyN1TL95LpIo0ODJ58cTDKSQL1xTPecj3ObbiUWruPuN2QKNQjuUnwXa
-Oj+/fNlzsfgcfaBh8rplbl2kPmIDWE5XsATHrRiRbBtZEXetedXU/2R+7/24DNKLYIlotEmaEe/C
-n8EDP4LJNyOzveprlmmbrJiCQhp8wZzmKolJ55DjgfCyRli6oP0tKf7EWKcS8Uw6YmTz/ss1MIlS
-Nwx6S5X4CPPQ/wAAAAAAAA==
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwNzAyMDU0MzEyWjAjBgkqhkiG9w0BCQQxFgQU
+bMedp57+cibIxkxnTnY+Jy5oEcswDQYJKoZIhvcNAQEBBQAEggEAcWG3KQcfmYw0reWiws6+iGpt
+QLloP4b0trN87QTDKVlZmF31QmRxZLc/DFbqvR/nhnYi4EEiLYdP52X4lcFezjKpXFGzLRK++d/L
+UsfvH2zcrWCj4fyWiXGA3UtmrD5/bw2f4ZruHuJDDA8IKClF4tYkwWt4Pty/JTBHULl+IL5q99MK
++d2GAR+L0AmVIgg80ftvB/ZQd8UrSm1FjS2BIAi52bsbM+yeyDMkpiApjRcpoq7KPcGrOxKJ+249
+Aax/By0OW52LttBJCajGWUQlZP1hSLXKug/qkNAKTJRkvRGv0KTHmZBNOFjUTW/v5PnXQpfOcfNi
+j90sCj3wbfIMMwAAAAAAAA==
 
 
---=-0S/YZf1fDba4DdqdE0lD--
+--=-BlY5LriF69VgIMtwnw5b--
