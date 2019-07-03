@@ -2,99 +2,115 @@ Return-Path: <SRS0=/JiD=VA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EC5C0650E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C97A6C0650E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:56:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24AA62189E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:44:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E633218A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:56:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZifXsYXG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXVDzu3y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725943AbfGCMoh (ORCPT
+        id S1726305AbfGCM4N (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 08:44:37 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:44774 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbfGCMoh (ORCPT
+        Wed, 3 Jul 2019 08:56:13 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43525 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725847AbfGCM4M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 08:44:37 -0400
-Received: by mail-oi1-f195.google.com with SMTP id e189so1905044oib.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 05:44:36 -0700 (PDT)
+        Wed, 3 Jul 2019 08:56:12 -0400
+Received: by mail-wr1-f65.google.com with SMTP id p13so2669118wru.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 05:56:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=HUulj4iGse+VuxzoWrXa27W9vQmHvUNyvKyAgRRe7JA=;
-        b=ZifXsYXGitIdnvSwcduQ3hp3Yn2R8Rhgg3E3zCpkbmxGCl/lA11lrQ8XhgtiJ1FfTY
-         38uNywhKyEvfekKprJ5Wep0j8an7NkjRKmNouh7Xh4sasfws+3zKiuD+MmT0P3X3MRhb
-         x5ErBlCezg9+aahyyCacBS8AoyeelmZjzUxshB859ZbfHohHI9469GAirXF51pl2xf94
-         L53fUIeRHpGad0VcXE0MQQuxhBfBeq7ozPh1h1R0LHHuhNBYtnttpLUqNvTlHwOfS6Le
-         EqNkIcvU5BKXbm1fZ1Q3m7cX+dJEmtJV4pRvGoumAQ+jP5dNcHvhnYUZjM6QRkMPSEIe
-         gYdQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=wy7UWXPsz2MtPtDmCt3z/3SEmwu3EzorqJejYq39Lwk=;
+        b=iXVDzu3yM3/+MpMmARaKcAb/VQWtpNpb4PB3VXZzwlIvlfsw1RRVlaXr7BkvfuRMzH
+         Q+S26ZZScEYT2ZqfZ08KesUUZ0aQfMFK7LltJKr2jzcyyToHpQzmlmQi5ye6MCac45pl
+         NH4N/VSO8K9bvpJwB8mEXlnr7qkknSU7VZYOBDcjsbdnB1zKndz90hnV9nfeuF83Faay
+         Ou5WApa5vxnGpLYSqY2oEOAXAjtGqc59W6MYeklcu23v3t1FoDfMux2wis7b0BF9h3cp
+         HwCHBlWBUdeeVMFCNInOY/kL/R0EmQxAm3NeQRmDc/R5Pp+gH9+dZQWDpQBKGZtULfdT
+         V8ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=HUulj4iGse+VuxzoWrXa27W9vQmHvUNyvKyAgRRe7JA=;
-        b=e9gRb+iRXfWVhBH2bl/V141u4MSsv3OSb06p1wzcDzjc9I+dQ1xOZRGKY0JtcojN2A
-         xaiFiv36zVFYGdjS5ismceFRqTZamyVpAfb1vexZYvkeB0emiB24CtGPEFcwajWAwRwj
-         Jz+t8TBUSZ22rPkbKwCKdEYQrARNrYCR6rQmvPeN8bgMO9wzs9MIZryjREqu1dh1gSCC
-         2j/1RG3FibZG3EF3NNTdWKgolQThbGhdOILaB2mi2RjKqowqiwYmQGsfmD8ACm795ZRr
-         8FgHhFpWTdW8YDl+wWXc5pIxdHQ1Gk1rPMm7VhsentdEk4cRMx/br2pOJhEBBs3uTxP9
-         nfkw==
-X-Gm-Message-State: APjAAAUVApK5GhuwM93s11efysKkcyeXUsv5nFP/oUfHAmJnUFZd8vLv
-        jTYaPl2yjffHPO1kZ+NwqYjqU+4Dp2o7b7WQInBBqBWrKcnMKg==
-X-Google-Smtp-Source: APXvYqxh/H56EEJayqVc/mWOHtS3FvsisCx8lG7TnHxFa/AILHukXsoBG6CxlJ5GjaMaGPgWMyO6YZIti6nVXLNc+Bc=
-X-Received: by 2002:a05:6808:f:: with SMTP id u15mr6797006oic.21.1562157876440;
- Wed, 03 Jul 2019 05:44:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190619160320.kwumolq6sgetfuzf@pali> <20190703103902.2llvxp4nrmia2wkc@pali>
-In-Reply-To: <20190703103902.2llvxp4nrmia2wkc@pali>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 3 Jul 2019 15:44:24 +0300
-Message-ID: <CABBYNZ+nKPBD7+keXqBy-yrwJqJ8kc3ovCxdhTpZQ7idphHdpg@mail.gmail.com>
-Subject: Re: bluez: avctp_connect_cb(): BT_IO_OPT_IMTU for omtu?
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=wy7UWXPsz2MtPtDmCt3z/3SEmwu3EzorqJejYq39Lwk=;
+        b=RwxZmi0hvZz6D77Bn+HyqkWQ3+Owd6PjOGiGfjLAZxF0u9VZr7+pdpOWTiROlaVoru
+         JHgjdZxcOTQWKlc0cRSRqjjTAjC7gwJXqU3tUztPD4FivwcBJEsl6V14d/+xaWM40J8N
+         89wxPSrowfkoMHxNskMlJu3XUVdnuD+Ov+DflvPnLPbft187gTdTHszjgV7dklMAEBXt
+         kwrYBUbYQuQgyYsMCgp90/Kzdx90xZwETUASI7RKtLrSosKoLiOnkhS/9m9scZQmuHcE
+         Rg0jwi1LaFLfW4eWebv+JLl8kabSxEjdycJdrHfdLIvrW2TrfEHaohcLIft/TvcFSSdq
+         GjQg==
+X-Gm-Message-State: APjAAAU+UgCONFNVhYpQdEHe30pVcJkQGW9AcptWw5SYTIAXWUx2/4Rp
+        GKWa66WJIw89VecmQrsL28o=
+X-Google-Smtp-Source: APXvYqw96/9LTA/QX67ctmaPSIDN3w0XD6xqtRZuSCEY0/kdtYP3XNL0V9Y1/tArgduX+TyDmo4ZYA==
+X-Received: by 2002:a5d:6949:: with SMTP id r9mr27526985wrw.73.1562158570507;
+        Wed, 03 Jul 2019 05:56:10 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id f204sm3427715wme.18.2019.07.03.05.56.09
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 03 Jul 2019 05:56:09 -0700 (PDT)
+Date:   Wed, 3 Jul 2019 14:56:08 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: bluez - check for new a2dp features
+Message-ID: <20190703125608.nl72umoinhg2kh6k@pali>
+References: <20190513170550.bsbr2mh7w36hj7io@pali>
+ <20190607125800.trsx2o3njaiaitu2@pali>
+ <CABBYNZLtgaCi5VGHapsKQG4iAC33ySow3AuH0Qkx8iCo3LcZDg@mail.gmail.com>
+ <20190607153715.w5exsodd25qxc6xv@pali>
+ <CABBYNZ+gPRkAgFAeeoSqZ7tp5fYimGdju9JSuSpn_kL+f9hJhQ@mail.gmail.com>
+ <20190608105924.qmauvrwyz7nofx74@pali>
+ <20190608111553.65s6yoyhmusmr3pc@pali>
+ <20190622161837.37mjlsirpoql2plj@pali>
+ <CABBYNZK-L0NfuR9Qq8Vj9Q7nxmgurzkimayJHSKV+kTJ7D_tUA@mail.gmail.com>
+ <20190622170933.lxuftoxmvtv7ssfo@pali>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190622170933.lxuftoxmvtv7ssfo@pali>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pali,
+On Saturday 22 June 2019 19:09:33 Pali Rohár wrote:
+> On Saturday 22 June 2019 20:01:15 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> > 
+> > I think a better idea would be that we introduce something specific to
+> > that, such as the SEID being returned so the next time around you may
+> > restore a SEID, this may actually make more sense perhaps if we reuse
+> > the RegisterApplication semantics:
+> > 
+> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n464
+> > 
+> > That means it is no longer required to call RegisterEndpoint as many
+> > times as there are endpoints since that is time-consuming due to the
+> > D-Bus round trips, instead, the endpoint are discovered with the use
+> > of ObjectManager, if the method doesn't exist then you just fall back
+> > to the old mechanism since it might be an old daemon.
+> 
+> Hi! If I understand it correctly, pulseaudio would register itself via
+> new dbus method and bluez daemon then discover A2DP SEP endpoints
+> automatically, right? And if that new dbus method does not exist
+> pulseaudio would know that in system is running old bluez version
+> without codec switching support. Seems it is perfectly fine solution.
 
-On Wed, Jul 3, 2019 at 1:39 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrote=
-:
->
-> On Wednesday 19 June 2019 18:03:20 Pali Roh=C3=A1r wrote:
-> > Hello, in bluez source code is function avctp_connect_cb() with
-> > following code:
-> >
-> >       bt_io_get(chan, &gerr,
-> >                       BT_IO_OPT_DEST, &address,
-> >                       BT_IO_OPT_IMTU, &imtu,
-> >                       BT_IO_OPT_IMTU, &omtu,
-> >                       BT_IO_OPT_INVALID);
-> >
-> > Why is BT_IO_OPT_IMTU used for retrieving omtu? Should not be there
-> > BT_IO_OPT_OMTU for retrieving omtu? Seems like a typo: imtu vs omtu.
-> >
-> > Above code was introduced in commit b5666a3747 (AVCTP: Allocate memory
-> > to hold incoming/outgoing PDUs).
->
-> Hello, I would like to remind this question. It above code bluez correct?
+Hi Luiz! Do you have some patches ready for testing?
 
-Fixed:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3Db2fd4c7e1ec=
-f715a0f56e0a4534329db9b4e44b1
-
---=20
-Luiz Augusto von Dentz
+-- 
+Pali Rohár
+pali.rohar@gmail.com
