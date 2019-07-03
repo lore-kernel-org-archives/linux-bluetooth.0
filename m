@@ -2,201 +2,99 @@ Return-Path: <SRS0=/JiD=VA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A09C06513
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 11:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EC5C0650E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:44:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BBA6218A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 11:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24AA62189E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:44:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="aBdp1Le+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZifXsYXG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727031AbfGCLm0 (ORCPT
+        id S1725943AbfGCMoh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 07:42:26 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50999 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726255AbfGCLm0 (ORCPT
+        Wed, 3 Jul 2019 08:44:37 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:44774 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725830AbfGCMoh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 07:42:26 -0400
-Received: by mail-wm1-f68.google.com with SMTP id n9so1880513wmi.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 04:42:25 -0700 (PDT)
+        Wed, 3 Jul 2019 08:44:37 -0400
+Received: by mail-oi1-f195.google.com with SMTP id e189so1905044oib.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 05:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=04Eb9elhOj68//16YIJYMI/8ksDXbThE7RRBQsTmu8w=;
-        b=aBdp1Le+zjf+ADI8AVclGelJYfNxx3127EYuTRFGXARIL4RreTe+Hq1eAQpLCRT5AP
-         9UW9u3uPC+thkY3mnNdw7AHYRulIIJzN+KtEIDQWD5IHLKwHCxDsJ7QIdX6mxWJI84EO
-         0CZwO19k7jHFg1vK1utGCLaLizt//vknwzmPoiGQgGd71fc4XFiITFf0X8hFtiinDu6f
-         SA8D/MWYwYNvRn213+2zG/GkTbmE972ibDOH/752GvfhhqHZtc4RMUTAW3OLxmS0q0Ka
-         vxmwHRlP4KOe/s8bGzi96a8CfjGZKdTFHdsmGzAz0Z8X6F/SO4zGT1IBkSWK9gCasewT
-         QsRg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=HUulj4iGse+VuxzoWrXa27W9vQmHvUNyvKyAgRRe7JA=;
+        b=ZifXsYXGitIdnvSwcduQ3hp3Yn2R8Rhgg3E3zCpkbmxGCl/lA11lrQ8XhgtiJ1FfTY
+         38uNywhKyEvfekKprJ5Wep0j8an7NkjRKmNouh7Xh4sasfws+3zKiuD+MmT0P3X3MRhb
+         x5ErBlCezg9+aahyyCacBS8AoyeelmZjzUxshB859ZbfHohHI9469GAirXF51pl2xf94
+         L53fUIeRHpGad0VcXE0MQQuxhBfBeq7ozPh1h1R0LHHuhNBYtnttpLUqNvTlHwOfS6Le
+         EqNkIcvU5BKXbm1fZ1Q3m7cX+dJEmtJV4pRvGoumAQ+jP5dNcHvhnYUZjM6QRkMPSEIe
+         gYdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=04Eb9elhOj68//16YIJYMI/8ksDXbThE7RRBQsTmu8w=;
-        b=Ga2RQ8SKr+ZODo45GcprjiKQJRMRYTBQBilyPf2Uz+9pO15boJa96a2Q09sH0Gm5+l
-         TfQ+WEmL2SCYJY2vonkI3oJ7vNFq5WCUmK9A1Jw/cdRxjRZGmZdNARm9zzZmu7zCU1lH
-         t/46YPhhDOXH8B/aAbJx5MQHGiECJnIJubdmiRHcREE9bk/JUiBdhcZdGq4AX6rhllHS
-         YdapZ8PMt+Xt++p+j1I9k7vEDnASEXNr6fmFskfVt3haENiY1yeYJ4iPN94DH6ocLnzG
-         usjO0R5soE0duSgX60FGWGT8IWhJS6mhi6N9R5s16YsKa4BSiwnbLlax7LV/2ZvX35NZ
-         WEEQ==
-X-Gm-Message-State: APjAAAVy+fpRqjX+SUUUYfVTvZtHdJ+a0Rm1te2uJp/LWE/D2+tqjMEb
-        atRG4t+1kSQqZPkchm5SO6N7I+ERepM=
-X-Google-Smtp-Source: APXvYqwEct3o1mrir3HxvKGVFL5WepQLV1C3m+hZVZPWbpd6S3vcpvzgKY0iAdxRf0DmslbsMXH2Dw==
-X-Received: by 2002:a1c:b457:: with SMTP id d84mr8416012wmf.153.1562154143949;
-        Wed, 03 Jul 2019 04:42:23 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id x6sm2556816wru.0.2019.07.03.04.42.22
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 03 Jul 2019 04:42:23 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v4 3/3] mesh: Handle messages encrypted with a remote device key
-Date:   Wed,  3 Jul 2019 13:42:14 +0200
-Message-Id: <20190703114214.22320-4-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190703114214.22320-1-michal.lowas-rzechonek@silvair.com>
-References: <20190703114214.22320-1-michal.lowas-rzechonek@silvair.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=HUulj4iGse+VuxzoWrXa27W9vQmHvUNyvKyAgRRe7JA=;
+        b=e9gRb+iRXfWVhBH2bl/V141u4MSsv3OSb06p1wzcDzjc9I+dQ1xOZRGKY0JtcojN2A
+         xaiFiv36zVFYGdjS5ismceFRqTZamyVpAfb1vexZYvkeB0emiB24CtGPEFcwajWAwRwj
+         Jz+t8TBUSZ22rPkbKwCKdEYQrARNrYCR6rQmvPeN8bgMO9wzs9MIZryjREqu1dh1gSCC
+         2j/1RG3FibZG3EF3NNTdWKgolQThbGhdOILaB2mi2RjKqowqiwYmQGsfmD8ACm795ZRr
+         8FgHhFpWTdW8YDl+wWXc5pIxdHQ1Gk1rPMm7VhsentdEk4cRMx/br2pOJhEBBs3uTxP9
+         nfkw==
+X-Gm-Message-State: APjAAAUVApK5GhuwM93s11efysKkcyeXUsv5nFP/oUfHAmJnUFZd8vLv
+        jTYaPl2yjffHPO1kZ+NwqYjqU+4Dp2o7b7WQInBBqBWrKcnMKg==
+X-Google-Smtp-Source: APXvYqxh/H56EEJayqVc/mWOHtS3FvsisCx8lG7TnHxFa/AILHukXsoBG6CxlJ5GjaMaGPgWMyO6YZIti6nVXLNc+Bc=
+X-Received: by 2002:a05:6808:f:: with SMTP id u15mr6797006oic.21.1562157876440;
+ Wed, 03 Jul 2019 05:44:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190619160320.kwumolq6sgetfuzf@pali> <20190703103902.2llvxp4nrmia2wkc@pali>
+In-Reply-To: <20190703103902.2llvxp4nrmia2wkc@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 3 Jul 2019 15:44:24 +0300
+Message-ID: <CABBYNZ+nKPBD7+keXqBy-yrwJqJ8kc3ovCxdhTpZQ7idphHdpg@mail.gmail.com>
+Subject: Re: bluez: avctp_connect_cb(): BT_IO_OPT_IMTU for omtu?
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds ability to receive messages encrypted using known remote
-device key. Such a key must be added to the node's keyring using
-ImportRemoteNode() method of org.bluez.mesh.Management1 interface.
+Hi Pali,
 
-Decrypted messages are then forwarded to the application using
-DevKeyMessageReceived() D-Bus API.
+On Wed, Jul 3, 2019 at 1:39 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrote=
+:
+>
+> On Wednesday 19 June 2019 18:03:20 Pali Roh=C3=A1r wrote:
+> > Hello, in bluez source code is function avctp_connect_cb() with
+> > following code:
+> >
+> >       bt_io_get(chan, &gerr,
+> >                       BT_IO_OPT_DEST, &address,
+> >                       BT_IO_OPT_IMTU, &imtu,
+> >                       BT_IO_OPT_IMTU, &omtu,
+> >                       BT_IO_OPT_INVALID);
+> >
+> > Why is BT_IO_OPT_IMTU used for retrieving omtu? Should not be there
+> > BT_IO_OPT_OMTU for retrieving omtu? Seems like a typo: imtu vs omtu.
+> >
+> > Above code was introduced in commit b5666a3747 (AVCTP: Allocate memory
+> > to hold incoming/outgoing PDUs).
+>
+> Hello, I would like to remind this question. It above code bluez correct?
 
-Also, messages originating from a local node and encrypted using local
-device key are forwarde to the application as well, if they weren't
-handled by internal model. This allows e.g. receiving status messages
-from a local Config Server in the application.
----
- mesh/model.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 63 insertions(+), 6 deletions(-)
+Fixed:
 
-diff --git a/mesh/model.c b/mesh/model.c
-index aae913d92..0ea45987f 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -308,7 +308,7 @@ static void forward_model(void *a, void *b)
- 
- 	l_debug("model %8.8x with idx %3.3x", mod->id, fwd->idx);
- 
--	if (fwd->idx != APP_IDX_DEV_LOCAL &&
-+	if (fwd->idx != APP_IDX_DEV_LOCAL && fwd->idx != APP_IDX_DEV_REMOTE &&
- 					!has_binding(mod->bindings, fwd->idx))
- 		return;
- 
-@@ -359,16 +359,25 @@ static int dev_packet_decrypt(struct mesh_node *node, const uint8_t *data,
- 				uint16_t dst, uint8_t key_id, uint32_t seq,
- 				uint32_t iv_idx, uint8_t *out)
- {
-+	uint8_t dev_key[16];
- 	const uint8_t *key;
- 
- 	key = node_get_device_key(node);
- 	if (!key)
--		return false;
-+		return -1;
- 
- 	if (mesh_crypto_payload_decrypt(NULL, 0, data, size, szmict, src,
- 					dst, key_id, seq, iv_idx, out, key))
- 		return APP_IDX_DEV_LOCAL;
- 
-+	if (!keyring_get_remote_dev_key(node, src, dev_key))
-+		return -1;
-+
-+	key = dev_key;
-+	if (mesh_crypto_payload_decrypt(NULL, 0, data, size, szmict, src,
-+					dst, key_id, seq, iv_idx, out, key))
-+		return APP_IDX_DEV_REMOTE;
-+
- 	return -1;
- }
- 
-@@ -695,6 +704,47 @@ static int add_sub(struct mesh_net *net, struct mesh_model *mod,
- 	return MESH_STATUS_SUCCESS;
- }
- 
-+static void send_dev_key_msg_rcvd(struct mesh_node *node, uint8_t ele_idx,
-+					uint16_t src, uint16_t net_idx,
-+					uint16_t size, const uint8_t *data)
-+{
-+	struct l_dbus *dbus = dbus_get_bus();
-+	struct l_dbus_message *msg;
-+	struct l_dbus_message_builder *builder;
-+	const char *owner;
-+	const char *path;
-+
-+	owner = node_get_owner(node);
-+	path = node_get_element_path(node, ele_idx);
-+	if (!path || !owner)
-+		return;
-+
-+	l_debug("Send \"DevKeyMessageReceived\"");
-+
-+	msg = l_dbus_message_new_method_call(dbus, owner, path,
-+						MESH_ELEMENT_INTERFACE,
-+						"DevKeyMessageReceived");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+
-+	if (!l_dbus_message_builder_append_basic(builder, 'q', &src))
-+		goto error;
-+
-+	if (!l_dbus_message_builder_append_basic(builder, 'q', &net_idx))
-+		goto error;
-+
-+	if (!dbus_append_byte_array(builder, data, size))
-+		goto error;
-+
-+	if (!l_dbus_message_builder_finalize(builder))
-+		goto error;
-+
-+	l_dbus_send(dbus, msg);
-+
-+error:
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
- static void send_msg_rcvd(struct mesh_node *node, uint8_t ele_idx, bool is_sub,
- 					uint16_t src, uint16_t key_idx,
- 					uint16_t size, const uint8_t *data)
-@@ -843,10 +893,17 @@ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
- 		 * Cycle through external models if the message has not been
- 		 * handled by internal models
- 		 */
--		if (forward.has_dst && !forward.done)
--			send_msg_rcvd(node, i, is_subscription, src,
--					forward.idx, forward.size,
--					forward.data);
-+		if (forward.has_dst && !forward.done) {
-+			if ((decrypt_idx & APP_IDX_MASK) == decrypt_idx)
-+				send_msg_rcvd(node, i, is_subscription, src,
-+						forward.idx, forward.size,
-+						forward.data);
-+			else if (decrypt_idx == APP_IDX_DEV_REMOTE ||
-+				(decrypt_idx == APP_IDX_DEV_LOCAL &&
-+				 mesh_net_is_local_address(net, src)))
-+				send_dev_key_msg_rcvd(node, i, src, 0,
-+						forward.size, forward.data);
-+		}
- 
- 		/*
- 		 * Either the message has been processed internally or
--- 
-2.19.1
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3Db2fd4c7e1ec=
+f715a0f56e0a4534329db9b4e44b1
 
+--=20
+Luiz Augusto von Dentz
