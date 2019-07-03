@@ -2,156 +2,124 @@ Return-Path: <SRS0=/JiD=VA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F36C06513
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 15:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D2BC0650E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 15:42:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A18420828
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 15:38:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1424320828
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 15:42:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuJAOdiS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbfGCPix (ORCPT
+        id S1726574AbfGCPmY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 11:38:53 -0400
-Received: from mga07.intel.com ([134.134.136.100]:23501 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726490AbfGCPix (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 11:38:53 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Jul 2019 08:38:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,446,1557212400"; 
-   d="scan'208";a="362680586"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Jul 2019 08:38:48 -0700
-Received: from orsmsx114.amr.corp.intel.com (10.22.240.10) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 3 Jul 2019 08:38:47 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX114.amr.corp.intel.com ([169.254.8.90]) with mapi id 14.03.0439.000;
- Wed, 3 Jul 2019 08:38:47 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v4 2/3] mesh: Implement DevKeySend() method on
- Node interface
-Thread-Topic: [PATCH BlueZ v4 2/3] mesh: Implement DevKeySend() method on
- Node interface
-Thread-Index: AQHVMZRt1L2S8+osHk2FDDJRJMCnNKa5fPyA
-Date:   Wed, 3 Jul 2019 15:38:46 +0000
-Message-ID: <1562168325.23933.19.camel@intel.com>
-References: <20190703114214.22320-1-michal.lowas-rzechonek@silvair.com>
-         <20190703114214.22320-3-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190703114214.22320-3-michal.lowas-rzechonek@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.20.71]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C1B946F48D36154DA521E1658FF146F2@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 3 Jul 2019 11:42:24 -0400
+Received: from mail-lj1-f173.google.com ([209.85.208.173]:37981 "EHLO
+        mail-lj1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725847AbfGCPmY (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Jul 2019 11:42:24 -0400
+Received: by mail-lj1-f173.google.com with SMTP id r9so2959669ljg.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 08:42:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3Rl5YsWuXvm0A9remVWH5uW4uJNb+4Ce5S6Bje5EH/8=;
+        b=AuJAOdiSsJGjLjd5aftoICUwWFpW1/+Ve0E0rI2+g8aqL086tHXeDSHCkwEKdQHcsK
+         Vf2TfYk1Xcw+9TJdiKw77Zrnnex1S9Nl+Bj1cCVCnGoGaz7AZIDA3dMQybwsYgUzGIDn
+         HlvDUS0iwaqRV8Ai9MxMOzwqD0igTElFfNmIY9MnKQIGQbwe1ojrgCutiLiBCuwd7781
+         SUxeMEeSi13yIT3EHScBmBPE5l/b9uU2YZ+9wDI/dPfSe/dNiN59aSKrZxHzByR4TO+3
+         PRxrbiFE1vo5M7ilLGBMc8vDDtL6D2HUsPtQxLRMFNFT904bmepbvcbZQcPYp+xFxqcB
+         ThHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3Rl5YsWuXvm0A9remVWH5uW4uJNb+4Ce5S6Bje5EH/8=;
+        b=rJxSuCP4xX7z50zmiIgWACTOOWjRxeVb0rC1DI6T1SZljXGonq9MPZOPoLdpzMPLlV
+         +w07BcF4FABHT4M+tv9bREH5/gDGoDhBX0Mfyyyv6S57eozwAdMhGtQfRfSTOva8h+tn
+         Eog4Ke63VagT/UY5hgQVvga7MWnK21wr4D4EauTFQThpVkNqO+rcWbz5ahkmNvt2XcYq
+         3ULzDHeezOqRFvoxo27urVsjpbbLj0ljD3VqDrzAIPviCGdshyMusIEe82H1mPN93g3/
+         x7jDA3nNY+1RRXWrkWRP0Km7dfMZgBhjgMPYWs70V+ulqPGwmZjtIuEjGjgNEQ4n/1rh
+         f9gA==
+X-Gm-Message-State: APjAAAWejYtfDpva2JZo9tSSqjlpo4OAE+zvcsZGDlShOtYMwNmQ2uOO
+        1E67ldpIyyVWOWCWYoC7c+RRGOxsU6e7fA==
+X-Google-Smtp-Source: APXvYqz4jZWsW+0eAehH7H4kNAHLyPbV9qhYeJLQqW0QwmJPiAqe7kSfbLbSBhq09mYcl/h/GBrrpw==
+X-Received: by 2002:a2e:6c14:: with SMTP id h20mr21969115ljc.38.1562168541386;
+        Wed, 03 Jul 2019 08:42:21 -0700 (PDT)
+Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
+        by smtp.gmail.com with ESMTPSA id h4sm545207ljj.31.2019.07.03.08.42.20
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 03 Jul 2019 08:42:20 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] att: Return error in case Exchange MTU is used over BR/EDR link
+Date:   Wed,  3 Jul 2019 18:42:18 +0300
+Message-Id: <20190703154219.6988-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-T24gV2VkLCAyMDE5LTA3LTAzIGF0IDEzOjQyICswMjAwLCBNaWNoYcWCIExvd2FzLVJ6ZWNob25l
-ayB3cm90ZToNCj4gVGhpcyBwYXRjaCBpbXBsZW1lbnRzIEQtQnVzIERldktleVNlbmQoKSBtZXRo
-b2Qgb2Ygb3JnLmJsdWV6Lm1lc2guTm9kZTENCj4gaW50ZXJmYWNlLCBhbGxvd2luZyB0aGUgYXBw
-bGljYXRpb24gdG8gc2VuZCBtZXNzYWdlcyBlbmNyeXB0ZWQgdXNpbmcNCj4gYSBrbm93biByZW1v
-dGUgZGV2aWNlIGtleS4NCj4gDQo+IEF0IHRoZSBtb21lbnQgdGhlIGNhbGwgaWdub3JlcyBuZXRf
-aW5kZXggYXJndW1lbnQgYW5kIHNlbmRzIG1lc3NhZ2VzDQo+IHVzaW5nIHRoZSBwcmltYXJ5IHN1
-Ym5ldC4NCj4gDQo+IEFsc28sIGl0J3Mgbm8gbG9uZ2VyIHBvc3NpYmxlIHRvIHVzZSAnbWFnaWMn
-IGtleV9pbmRleCB2YWx1ZSAweDdmZmYNCj4gKGRlbm90aW5nIGxvY2FsIGRldmljZSBrZXkpIHdo
-ZW4gY2FsbGluZyByZWd1bGFyIFNlbmQoKS4gQXBwbGljYXRpb25zDQo+IHNob3VsZCB1c2UgRGV2
-S2V5U2VuZCgpIGluc3RlYWQuDQo+IC0tLQ0KPiAgbWVzaC9tb2RlbC5jIHwgIDkgKysrKysrKy0N
-Cj4gIG1lc2gvbm9kZS5jICB8IDU5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrLS0NCj4gIDIgZmlsZXMgY2hhbmdlZCwgNjUgaW5zZXJ0aW9ucygrKSwg
-MyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9tZXNoL21vZGVsLmMgYi9tZXNoL21v
-ZGVsLmMNCj4gaW5kZXggNTk4NjE1YzVlLi5hYWU5MTNkOTIgMTAwNjQ0DQo+IC0tLSBhL21lc2gv
-bW9kZWwuYw0KPiArKysgYi9tZXNoL21vZGVsLmMNCj4gQEAgLTM5LDYgKzM5LDcgQEANCj4gICNp
-bmNsdWRlICJtZXNoL2RidXMuaCINCj4gICNpbmNsdWRlICJtZXNoL3V0aWwuaCINCj4gICNpbmNs
-dWRlICJtZXNoL21vZGVsLmgiDQo+ICsjaW5jbHVkZSAibWVzaC9rZXlyaW5nLmgiDQo+ICANCj4g
-IC8qIERpdmlkZSBhbmQgcm91bmQgdG8gY2VpbGluZyAodXApIHRvIGNhbGN1bGF0ZSBzZWdtZW50
-IGNvdW50ICovDQo+ICAjZGVmaW5lIENFSUxESVYodmFsLCBkaXYpICgoKHZhbCkgKyAoZGl2KSAt
-IDEpIC8gKGRpdikpDQo+IEBAIC05NDEsNiArOTQyLDcgQEAgYm9vbCBtZXNoX21vZGVsX3NlbmQo
-c3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDE2X3Qgc3JjLCB1aW50MTZfdCB0YXJnZXQsDQo+
-ICAJCQkJCWNvbnN0IHZvaWQgKm1zZywgdWludDE2X3QgbXNnX2xlbikNCj4gIHsNCj4gIAl1aW50
-OF90IGtleV9pZDsNCj4gKwl1aW50OF90IGRldl9rZXlbMTZdOw0KPiAgCWNvbnN0IHVpbnQ4X3Qg
-KmtleTsNCj4gIA0KPiAgCS8qIHByaW50X3BhY2tldCgiTW9kIFR4IiwgbXNnLCBtc2dfbGVuKTsg
-Ki8NCj4gQEAgLTk1OSw3ICs5NjEsMTIgQEAgYm9vbCBtZXNoX21vZGVsX3NlbmQoc3RydWN0IG1l
-c2hfbm9kZSAqbm9kZSwgdWludDE2X3Qgc3JjLCB1aW50MTZfdCB0YXJnZXQsDQo+ICAJCWlmICgh
-a2V5KQ0KPiAgCQkJcmV0dXJuIGZhbHNlOw0KPiAgDQo+IC0JCWxfZGVidWcoIigleCkiLCBhcHBf
-aWR4KTsNCj4gKwkJa2V5X2lkID0gQVBQX0lEX0RFVjsNCj4gKwl9IGVsc2UgaWYgKGFwcF9pZHgg
-PT0gQVBQX0lEWF9ERVZfUkVNT1RFKSB7DQo+ICsJCWlmICgha2V5cmluZ19nZXRfcmVtb3RlX2Rl
-dl9rZXkobm9kZSwgdGFyZ2V0LCBkZXZfa2V5KSkNCj4gKwkJCXJldHVybiBmYWxzZTsNCj4gKw0K
-PiArCQlrZXkgPSBkZXZfa2V5Ow0KPiAgCQlrZXlfaWQgPSBBUFBfSURfREVWOw0KPiAgCX0gZWxz
-ZSB7DQo+ICAJCWtleSA9IGFwcGtleV9nZXRfa2V5KG5vZGVfZ2V0X25ldChub2RlKSwgYXBwX2lk
-eCwgJmtleV9pZCk7DQo+IGRpZmYgLS1naXQgYS9tZXNoL25vZGUuYyBiL21lc2gvbm9kZS5jDQo+
-IGluZGV4IDFkY2I3NGI0Zi4uNzEzM2Y1YjJkIDEwMDY0NA0KPiAtLS0gYS9tZXNoL25vZGUuYw0K
-PiArKysgYi9tZXNoL25vZGUuYw0KPiBAQCAtMTk3NCw3ICsxOTc0LDExIEBAIHN0YXRpYyBzdHJ1
-Y3QgbF9kYnVzX21lc3NhZ2UgKnNlbmRfY2FsbChzdHJ1Y3QgbF9kYnVzICpkYnVzLA0KPiAgCQly
-ZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfSU5WQUxJRF9BUkdTLA0KPiAgCQkJCQkJ
-CSJJbmNvcnJlY3QgZGF0YSIpOw0KPiAgDQo+IC0JaWYgKCFtZXNoX21vZGVsX3NlbmQobm9kZSwg
-c3JjLCBkc3QsIGFwcF9pZHgsDQo+ICsJaWYgKChhcHBfaWR4ICYgQVBQX0lEWF9NQVNLKSAhPSBh
-cHBfaWR4KQ0KPiArCQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfSU5WQUxJRF9B
-UkdTLA0KPiArCQkJCQkJIkludmFsaWQga2V5X2luZGV4Iik7DQo+ICsNCj4gKwlpZiAoIW1lc2hf
-bW9kZWxfc2VuZChub2RlLCBzcmMsIGRzdCwgYXBwX2lkeCAmIEFQUF9JRFhfTUFTSywNCj4gIAkJ
-CQltZXNoX25ldF9nZXRfZGVmYXVsdF90dGwobm9kZS0+bmV0KSwgZGF0YSwgbGVuKSkNCj4gIAkJ
-cmV0dXJuIGRidXNfZXJyb3IobXNnLCBNRVNIX0VSUk9SX0ZBSUxFRCwgTlVMTCk7DQo+ICANCj4g
-QEAgLTE5ODQsNiArMTk4OCw1MyBAQCBzdGF0aWMgc3RydWN0IGxfZGJ1c19tZXNzYWdlICpzZW5k
-X2NhbGwoc3RydWN0IGxfZGJ1cyAqZGJ1cywNCj4gIAlyZXR1cm4gcmVwbHk7DQo+ICB9DQo+ICAN
-Cj4gK3N0YXRpYyBzdHJ1Y3QgbF9kYnVzX21lc3NhZ2UgKmRldl9rZXlfc2VuZF9jYWxsKHN0cnVj
-dCBsX2RidXMgKmRidXMsDQo+ICsJCQkJCQlzdHJ1Y3QgbF9kYnVzX21lc3NhZ2UgKm1zZywNCj4g
-KwkJCQkJCXZvaWQgKnVzZXJfZGF0YSkNCj4gK3sNCj4gKwlzdHJ1Y3QgbWVzaF9ub2RlICpub2Rl
-ID0gdXNlcl9kYXRhOw0KPiArCWNvbnN0IGNoYXIgKnNlbmRlciwgKmVsZV9wYXRoOw0KPiArCXN0
-cnVjdCBsX2RidXNfbWVzc2FnZV9pdGVyIGl0ZXJfZGF0YTsNCj4gKwlzdHJ1Y3Qgbm9kZV9lbGVt
-ZW50ICplbGU7DQo+ICsJdWludDE2X3QgZHN0LCBuZXRfaWR4LCBzcmM7DQo+ICsJdWludDhfdCAq
-ZGF0YTsNCj4gKwl1aW50MzJfdCBsZW47DQo+ICsJc3RydWN0IGxfZGJ1c19tZXNzYWdlICpyZXBs
-eTsNCj4gKw0KPiArCWxfZGVidWcoIkRldktleVNlbmQiKTsNCj4gKw0KPiArCXNlbmRlciA9IGxf
-ZGJ1c19tZXNzYWdlX2dldF9zZW5kZXIobXNnKTsNCj4gKw0KPiArCWlmIChzdHJjbXAoc2VuZGVy
-LCBub2RlLT5vd25lcikpDQo+ICsJCXJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJPUl9O
-T1RfQVVUSE9SSVpFRCwgTlVMTCk7DQo+ICsNCj4gKwlpZiAoIWxfZGJ1c19tZXNzYWdlX2dldF9h
-cmd1bWVudHMobXNnLCAib3FxYXkiLCAmZWxlX3BhdGgsICZkc3QsDQo+ICsJCQkJCQkJJm5ldF9p
-ZHgsICZpdGVyX2RhdGEpKQ0KPiArCQlyZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1Jf
-SU5WQUxJRF9BUkdTLCBOVUxMKTsNCj4gKw0KPiArCWVsZSA9IGxfcXVldWVfZmluZChub2RlLT5l
-bGVtZW50cywgbWF0Y2hfZWxlbWVudF9wYXRoLCBlbGVfcGF0aCk7DQo+ICsJaWYgKCFlbGUpDQo+
-ICsJCXJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJPUl9OT1RfRk9VTkQsDQo+ICsJCQkJ
-CQkJIkVsZW1lbnQgbm90IGZvdW5kIik7DQo+ICsNCj4gKwlzcmMgPSBub2RlX2dldF9wcmltYXJ5
-KG5vZGUpICsgZWxlLT5pZHg7DQo+ICsNCj4gKwlpZiAoIWxfZGJ1c19tZXNzYWdlX2l0ZXJfZ2V0
-X2ZpeGVkX2FycmF5KCZpdGVyX2RhdGEsICZkYXRhLCAmbGVuKSB8fA0KPiArCQkJCQkhbGVuIHx8
-IGxlbiA+IE1FU0hfTUFYX0FDQ0VTU19QQVlMT0FEKQ0KPiArCQlyZXR1cm4gZGJ1c19lcnJvciht
-c2csIE1FU0hfRVJST1JfSU5WQUxJRF9BUkdTLA0KPiArCQkJCQkJCSJJbmNvcnJlY3QgZGF0YSIp
-Ow0KPiArDQo+ICsJLyogVE9ETzogdXNlIG5ldF9pZHggKi8NCj4gKwlpZiAoIW1lc2hfbW9kZWxf
-c2VuZChub2RlLCBzcmMsIGRzdCwgQVBQX0lEWF9ERVZfUkVNT1RFLA0KPiArCQkJCW1lc2hfbmV0
-X2dldF9kZWZhdWx0X3R0bChub2RlLT5uZXQpLCBkYXRhLCBsZW4pKQ0KPiArCQlyZXR1cm4gZGJ1
-c19lcnJvcihtc2csIE1FU0hfRVJST1JfTk9UX0ZPVU5ELCBOVUxMKTsNCj4gKw0KPiArCXJlcGx5
-ID0gbF9kYnVzX21lc3NhZ2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKTsNCj4gKwlsX2RidXNfbWVz
-c2FnZV9zZXRfYXJndW1lbnRzKHJlcGx5LCAiIik7DQo+ICsNCj4gKwlyZXR1cm4gcmVwbHk7DQoN
-ClRoaXMgaXMgdGVjaG5pY2FsbHkgY29ycmVjdCwgYnV0IGlmIEkgYXBwbHksIEkgd2lsbCBiZSBk
-ZWxldGluZyByZXBsYXkgbG9jYWwgYW5kIHJlZHVjaW5nIHRoZSBhYm92ZSB0aHJlZSBsaW5lcw0K
-dG8ganVzdDoNCg0KcmV0dXJuIGxfZGJ1c19tZXNzYWdlX25ld19tZXRob2RfcmV0dXJuKG1zZyk7
-DQoNCndoaWNoIGlzIG91ciBwcmVmZXJlZCBzdGFuZGFyZCBvZiBzdWNjZXNzZnVsIHJldHVybnMg
-d2l0aCBubyBwYXJhbWV0ZXJzLg0KDQoNCg0KPiArfQ0KPiArDQo+ICBzdGF0aWMgc3RydWN0IGxf
-ZGJ1c19tZXNzYWdlICpwdWJsaXNoX2NhbGwoc3RydWN0IGxfZGJ1cyAqZGJ1cywNCj4gIAkJCQkJ
-CXN0cnVjdCBsX2RidXNfbWVzc2FnZSAqbXNnLA0KPiAgCQkJCQkJdm9pZCAqdXNlcl9kYXRhKQ0K
-PiBAQCAtMjA4OSw3ICsyMTQwLDExIEBAIHN0YXRpYyB2b2lkIHNldHVwX25vZGVfaW50ZXJmYWNl
-KHN0cnVjdCBsX2RidXNfaW50ZXJmYWNlICppZmFjZSkNCj4gIHsNCj4gIAlsX2RidXNfaW50ZXJm
-YWNlX21ldGhvZChpZmFjZSwgIlNlbmQiLCAwLCBzZW5kX2NhbGwsICIiLCAib3FxYXkiLA0KPiAg
-CQkJCQkJImVsZW1lbnRfcGF0aCIsICJkZXN0aW5hdGlvbiIsDQo+IC0JCQkJCQkia2V5IiwgImRh
-dGEiKTsNCj4gKwkJCQkJCSJrZXlfaW5kZXgiLCAiZGF0YSIpOw0KPiArCWxfZGJ1c19pbnRlcmZh
-Y2VfbWV0aG9kKGlmYWNlLCAiRGV2S2V5U2VuZCIsIDAsIGRldl9rZXlfc2VuZF9jYWxsLA0KPiAr
-CQkJCQkJIiIsICJvcXFheSIsICJlbGVtZW50X3BhdGgiLA0KPiArCQkJCQkJImRlc3RpbmF0aW9u
-IiwgIm5ldF9pbmRleCIsDQo+ICsJCQkJCQkiZGF0YSIpOw0KPiAgCWxfZGJ1c19pbnRlcmZhY2Vf
-bWV0aG9kKGlmYWNlLCAiUHVibGlzaCIsIDAsIHB1Ymxpc2hfY2FsbCwgIiIsICJvcWF5IiwNCj4g
-IAkJCQkJImVsZW1lbnRfcGF0aCIsICJtb2RlbF9pZCIsICJkYXRhIik7DQo+ICAJbF9kYnVzX2lu
-dGVyZmFjZV9tZXRob2QoaWZhY2UsICJWZW5kb3JQdWJsaXNoIiwgMCwgdmVuZG9yX3B1Ymxpc2hf
-Y2FsbCw=
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+In case of BR/EDR the L2CAP MTU negotion is used instead:
+
+  BLUETOOTH CORE SPECIFICATION Version 5.1 | Vol 3, Part G page 2370
+  4.3.1 Exchange MTU
+
+  This sub-procedure shall not be used on a BR/EDR physical link since
+  the MTU size is negotiated using L2CAP channel configuration
+  procedures.
+---
+ src/shared/att.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 04577eddd..0ea6d55bd 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -836,6 +836,22 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 		if (!opcode_match(notify->opcode, opcode))
+ 			continue;
+ 
++		/* BLUETOOTH CORE SPECIFICATION Version 5.1 | Vol 3, Part G
++		 * page 2370
++		 *
++		 * 4.3.1 Exchange MTU
++		 *
++		 * This sub-procedure shall not be used on a BR/EDR physical
++		 * link since the MTU size is negotiated using L2CAP channel
++		 * configuration procedures.
++		 */
++		if (bt_att_get_link_type(att) == BT_ATT_LINK_BREDR) {
++			switch (opcode) {
++			case BT_ATT_OP_MTU_REQ:
++				goto not_supported;
++			}
++		}
++
+ 		found = true;
+ 
+ 		if (notify->callback)
+@@ -847,6 +863,7 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 			break;
+ 	}
+ 
++not_supported:
+ 	/*
+ 	 * If this was not a command and no handler was registered for it,
+ 	 * respond with "Not Supported"
+-- 
+2.21.0
+
