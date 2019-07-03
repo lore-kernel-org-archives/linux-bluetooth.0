@@ -2,149 +2,204 @@ Return-Path: <SRS0=/JiD=VA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73537C0650E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 15:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B1BC0650E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 16:03:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 481F6218A0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 15:45:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E37742189E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 16:03:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cc36IrPc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726736AbfGCPp0 (ORCPT
+        id S1726989AbfGCQDe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 11:45:26 -0400
-Received: from mga06.intel.com ([134.134.136.31]:27658 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725847AbfGCPp0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 11:45:26 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Jul 2019 08:45:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,446,1557212400"; 
-   d="scan'208";a="166022148"
-Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
-  by fmsmga007.fm.intel.com with ESMTP; 03 Jul 2019 08:45:25 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX106.amr.corp.intel.com ([169.254.1.113]) with mapi id 14.03.0439.000;
- Wed, 3 Jul 2019 08:45:24 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v4 3/3] mesh: Handle messages encrypted with a
- remote device key
-Thread-Topic: [PATCH BlueZ v4 3/3] mesh: Handle messages encrypted with a
- remote device key
-Thread-Index: AQHVMZRs+4eCeG3eF0ycWZvV9eNijKa5ftUA
-Date:   Wed, 3 Jul 2019 15:45:24 +0000
-Message-ID: <1562168722.23933.25.camel@intel.com>
-References: <20190703114214.22320-1-michal.lowas-rzechonek@silvair.com>
-         <20190703114214.22320-4-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190703114214.22320-4-michal.lowas-rzechonek@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.20.71]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <141795BDD029C8418BB1C5AC50F6668C@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 3 Jul 2019 12:03:34 -0400
+Received: from mail-ot1-f41.google.com ([209.85.210.41]:43519 "EHLO
+        mail-ot1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726430AbfGCQDe (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Jul 2019 12:03:34 -0400
+Received: by mail-ot1-f41.google.com with SMTP id q10so2879718otk.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 09:03:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eDFGkL7VjsuAcgmtrlZJY21ER8SsIoV81ls3l3HqYDU=;
+        b=cc36IrPcBioXYqPXBqie3kDWrlgXkMraIaWb5xUoEjpEMrPWHDzaqEJ4AvAKc3EqE9
+         eWrGZgvhs3FKZt320H9+vJxUFDo4Pn0TIjhbOj8//xei+AT/j49N7svAysKtPzYYv08E
+         kdealVfhOnMXV77YvTRGAIfRkkabZ0qWHUwDGU867iDDZ432ZciJhs6VTKajVjWzf3tR
+         gyGfy6OWT+enmENz6BMdbPqDjkijofpPnoBAxKSIZ+Jf9kC0sZWIEGudBFSje5tnP6dm
+         RrrHINaNOyIYwFZp8BKtD5NkTXrIth5aLXWFuFArJMon9D3iGmOOTw7kRmsW149eFZTn
+         NAkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eDFGkL7VjsuAcgmtrlZJY21ER8SsIoV81ls3l3HqYDU=;
+        b=g1B+cm66Vx+GDYa0p+SvdTAfr311Wmb7mhlorKYupgPzRSuHcy5K/BF4aLx/iyJ5qS
+         GWtpdFaWN+tyNLcmcALIuJk/O6czYECGpviKCvQjOZK1gFLdTG7GBB0MOGVQ9DsMbH8v
+         fH240BAfpz4LGoeKkMs0YxRamZl54+8Crn3CuoxdDmANgtuhbPI+NuQEfCgiIXGmXTf7
+         2gxHA4WnqlmMTLSQBiBVM/Je9r8177IaD94zB3lwk+0E7kUWWX6WfKgh+2PYIqsGqBKu
+         rrvJ7Iq6grFB5Cqn7Uszye8pkg1F73hdGI5oATJLzCxl8ucw2W92sIHGsFtVJ9jZEefV
+         L0gg==
+X-Gm-Message-State: APjAAAWqR3qB//cPI+oU+gI0dYh4PR6QRpfvNTnNWnGDjwx1w6SD4Af5
+        B/mJXcmYKkVQXgC4PDUV4EbJtyR0+Ks9hu8DdYYkDxxJQe8=
+X-Google-Smtp-Source: APXvYqw/ytKqdXoxPEum/pG+up7xFu0+StnAEc8WanupyMap3DWpUtwg/8GG5HluceO2esgu4DOBxG21BBMkYTFsTF8=
+X-Received: by 2002:a05:6830:199:: with SMTP id q25mr28625359ota.79.1562169812897;
+ Wed, 03 Jul 2019 09:03:32 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAK_dC=N+YvA1mH5XJDO-P3CV38NbK6UiLrBQe9na-AT8yraVAA@mail.gmail.com>
+ <CABBYNZKf5=Kvi21Q=HH8f2KLo0qCTe1U=DeY2QfEGi46m-5x3w@mail.gmail.com> <CAK_dC=OsbyNdFtC6tqhPy1nh6KB6A6BF5u0nEi9obUhLJ5FW8A@mail.gmail.com>
+In-Reply-To: <CAK_dC=OsbyNdFtC6tqhPy1nh6KB6A6BF5u0nEi9obUhLJ5FW8A@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 3 Jul 2019 19:03:20 +0300
+Message-ID: <CABBYNZJO9z2jfJoSn7awJttVUqxUNxpcvJ_yPb-7s_CQq0RBFg@mail.gmail.com>
+Subject: Re: PTS test case (GATT/SR/UNS/BI-01-C) fails with Bluez 5.50
+To:     Edward Fung <jjsheepman@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-T24gV2VkLCAyMDE5LTA3LTAzIGF0IDEzOjQyICswMjAwLCBNaWNoYcWCIExvd2FzLVJ6ZWNob25l
-ayB3cm90ZToNCj4gVGhpcyBhZGRzIGFiaWxpdHkgdG8gcmVjZWl2ZSBtZXNzYWdlcyBlbmNyeXB0
-ZWQgdXNpbmcga25vd24gcmVtb3RlDQo+IGRldmljZSBrZXkuIFN1Y2ggYSBrZXkgbXVzdCBiZSBh
-ZGRlZCB0byB0aGUgbm9kZSdzIGtleXJpbmcgdXNpbmcNCj4gSW1wb3J0UmVtb3RlTm9kZSgpIG1l
-dGhvZCBvZiBvcmcuYmx1ZXoubWVzaC5NYW5hZ2VtZW50MSBpbnRlcmZhY2UuDQo+IA0KPiBEZWNy
-eXB0ZWQgbWVzc2FnZXMgYXJlIHRoZW4gZm9yd2FyZGVkIHRvIHRoZSBhcHBsaWNhdGlvbiB1c2lu
-Zw0KPiBEZXZLZXlNZXNzYWdlUmVjZWl2ZWQoKSBELUJ1cyBBUEkuDQo+IA0KPiBBbHNvLCBtZXNz
-YWdlcyBvcmlnaW5hdGluZyBmcm9tIGEgbG9jYWwgbm9kZSBhbmQgZW5jcnlwdGVkIHVzaW5nIGxv
-Y2FsDQo+IGRldmljZSBrZXkgYXJlIGZvcndhcmRlIHRvIHRoZSBhcHBsaWNhdGlvbiBhcyB3ZWxs
-LCBpZiB0aGV5IHdlcmVuJ3QNCj4gaGFuZGxlZCBieSBpbnRlcm5hbCBtb2RlbC4gVGhpcyBhbGxv
-d3MgZS5nLiByZWNlaXZpbmcgc3RhdHVzIG1lc3NhZ2VzDQo+IGZyb20gYSBsb2NhbCBDb25maWcg
-U2VydmVyIGluIHRoZSBhcHBsaWNhdGlvbi4NCj4gLS0tDQo+ICBtZXNoL21vZGVsLmMgfCA2OSAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tDQo+ICAx
-IGZpbGUgY2hhbmdlZCwgNjMgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkNCj4gDQo+IGRp
-ZmYgLS1naXQgYS9tZXNoL21vZGVsLmMgYi9tZXNoL21vZGVsLmMNCj4gaW5kZXggYWFlOTEzZDky
-Li4wZWE0NTk4N2YgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbW9kZWwuYw0KPiArKysgYi9tZXNoL21v
-ZGVsLmMNCj4gQEAgLTMwOCw3ICszMDgsNyBAQCBzdGF0aWMgdm9pZCBmb3J3YXJkX21vZGVsKHZv
-aWQgKmEsIHZvaWQgKmIpDQo+ICANCj4gIAlsX2RlYnVnKCJtb2RlbCAlOC44eCB3aXRoIGlkeCAl
-My4zeCIsIG1vZC0+aWQsIGZ3ZC0+aWR4KTsNCj4gIA0KPiAtCWlmIChmd2QtPmlkeCAhPSBBUFBf
-SURYX0RFVl9MT0NBTCAmJg0KPiArCWlmIChmd2QtPmlkeCAhPSBBUFBfSURYX0RFVl9MT0NBTCAm
-JiBmd2QtPmlkeCAhPSBBUFBfSURYX0RFVl9SRU1PVEUgJiYNCj4gIAkJCQkJIWhhc19iaW5kaW5n
-KG1vZC0+YmluZGluZ3MsIGZ3ZC0+aWR4KSkNCj4gIAkJcmV0dXJuOw0KPiAgDQo+IEBAIC0zNTks
-MTYgKzM1OSwyNSBAQCBzdGF0aWMgaW50IGRldl9wYWNrZXRfZGVjcnlwdChzdHJ1Y3QgbWVzaF9u
-b2RlICpub2RlLCBjb25zdCB1aW50OF90ICpkYXRhLA0KPiAgCQkJCXVpbnQxNl90IGRzdCwgdWlu
-dDhfdCBrZXlfaWQsIHVpbnQzMl90IHNlcSwNCj4gIAkJCQl1aW50MzJfdCBpdl9pZHgsIHVpbnQ4
-X3QgKm91dCkNCj4gIHsNCj4gKwl1aW50OF90IGRldl9rZXlbMTZdOw0KPiAgCWNvbnN0IHVpbnQ4
-X3QgKmtleTsNCj4gIA0KPiAgCWtleSA9IG5vZGVfZ2V0X2RldmljZV9rZXkobm9kZSk7DQo+ICAJ
-aWYgKCFrZXkpDQo+IC0JCXJldHVybiBmYWxzZTsNCj4gKwkJcmV0dXJuIC0xOw0KPiAgDQo+ICAJ
-aWYgKG1lc2hfY3J5cHRvX3BheWxvYWRfZGVjcnlwdChOVUxMLCAwLCBkYXRhLCBzaXplLCBzem1p
-Y3QsIHNyYywNCj4gIAkJCQkJZHN0LCBrZXlfaWQsIHNlcSwgaXZfaWR4LCBvdXQsIGtleSkpDQo+
-ICAJCXJldHVybiBBUFBfSURYX0RFVl9MT0NBTDsNCj4gIA0KPiArCWlmICgha2V5cmluZ19nZXRf
-cmVtb3RlX2Rldl9rZXkobm9kZSwgc3JjLCBkZXZfa2V5KSkNCj4gKwkJcmV0dXJuIC0xOw0KPiAr
-DQo+ICsJa2V5ID0gZGV2X2tleTsNCj4gKwlpZiAobWVzaF9jcnlwdG9fcGF5bG9hZF9kZWNyeXB0
-KE5VTEwsIDAsIGRhdGEsIHNpemUsIHN6bWljdCwgc3JjLA0KPiArCQkJCQlkc3QsIGtleV9pZCwg
-c2VxLCBpdl9pZHgsIG91dCwga2V5KSkNCj4gKwkJcmV0dXJuIEFQUF9JRFhfREVWX1JFTU9URTsN
-Cj4gKw0KPiAgCXJldHVybiAtMTsNCj4gIH0NCj4gIA0KPiBAQCAtNjk1LDYgKzcwNCw0NyBAQCBz
-dGF0aWMgaW50IGFkZF9zdWIoc3RydWN0IG1lc2hfbmV0ICpuZXQsIHN0cnVjdCBtZXNoX21vZGVs
-ICptb2QsDQo+ICAJcmV0dXJuIE1FU0hfU1RBVFVTX1NVQ0NFU1M7DQo+ICB9DQo+ICANCj4gK3N0
-YXRpYyB2b2lkIHNlbmRfZGV2X2tleV9tc2dfcmN2ZChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1
-aW50OF90IGVsZV9pZHgsDQo+ICsJCQkJCXVpbnQxNl90IHNyYywgdWludDE2X3QgbmV0X2lkeCwN
-Cj4gKwkJCQkJdWludDE2X3Qgc2l6ZSwgY29uc3QgdWludDhfdCAqZGF0YSkNCj4gK3sNCj4gKwlz
-dHJ1Y3QgbF9kYnVzICpkYnVzID0gZGJ1c19nZXRfYnVzKCk7DQo+ICsJc3RydWN0IGxfZGJ1c19t
-ZXNzYWdlICptc2c7DQo+ICsJc3RydWN0IGxfZGJ1c19tZXNzYWdlX2J1aWxkZXIgKmJ1aWxkZXI7
-DQo+ICsJY29uc3QgY2hhciAqb3duZXI7DQo+ICsJY29uc3QgY2hhciAqcGF0aDsNCj4gKw0KPiAr
-CW93bmVyID0gbm9kZV9nZXRfb3duZXIobm9kZSk7DQo+ICsJcGF0aCA9IG5vZGVfZ2V0X2VsZW1l
-bnRfcGF0aChub2RlLCBlbGVfaWR4KTsNCj4gKwlpZiAoIXBhdGggfHwgIW93bmVyKQ0KPiArCQly
-ZXR1cm47DQo+ICsNCj4gKwlsX2RlYnVnKCJTZW5kIFwiRGV2S2V5TWVzc2FnZVJlY2VpdmVkXCIi
-KTsNCj4gKw0KPiArCW1zZyA9IGxfZGJ1c19tZXNzYWdlX25ld19tZXRob2RfY2FsbChkYnVzLCBv
-d25lciwgcGF0aCwNCj4gKwkJCQkJCU1FU0hfRUxFTUVOVF9JTlRFUkZBQ0UsDQo+ICsJCQkJCQki
-RGV2S2V5TWVzc2FnZVJlY2VpdmVkIik7DQo+ICsNCj4gKwlidWlsZGVyID0gbF9kYnVzX21lc3Nh
-Z2VfYnVpbGRlcl9uZXcobXNnKTsNCj4gKw0KPiArCWlmICghbF9kYnVzX21lc3NhZ2VfYnVpbGRl
-cl9hcHBlbmRfYmFzaWMoYnVpbGRlciwgJ3EnLCAmc3JjKSkNCj4gKwkJZ290byBlcnJvcjsNCj4g
-Kw0KPiArCWlmICghbF9kYnVzX21lc3NhZ2VfYnVpbGRlcl9hcHBlbmRfYmFzaWMoYnVpbGRlciwg
-J3EnLCAmbmV0X2lkeCkpDQo+ICsJCWdvdG8gZXJyb3I7DQo+ICsNCj4gKwlpZiAoIWRidXNfYXBw
-ZW5kX2J5dGVfYXJyYXkoYnVpbGRlciwgZGF0YSwgc2l6ZSkpDQo+ICsJCWdvdG8gZXJyb3I7DQo+
-ICsNCj4gKwlpZiAoIWxfZGJ1c19tZXNzYWdlX2J1aWxkZXJfZmluYWxpemUoYnVpbGRlcikpDQo+
-ICsJCWdvdG8gZXJyb3I7DQo+ICsNCj4gKwlsX2RidXNfc2VuZChkYnVzLCBtc2cpOw0KPiArDQo+
-ICtlcnJvcjoNCj4gKwlsX2RidXNfbWVzc2FnZV9idWlsZGVyX2Rlc3Ryb3koYnVpbGRlcik7DQoN
-CkkgdGhpbmsgdGhlcmUgaXMgYSBwb3RlbnRpYWwgbWVtb3J5IGxlYWssIG5vdCBqdXN0IGhlcmUg
-YnV0IGluIHRoZSBvdGhlciBtZXRob2RzIHRoYXQgdXNlIHRoaXMgdGVjaG5pcXVlIHRvDQpjb25z
-dHJ1Y3QgbWV0aG9kIGNhbGxzIHRvIHRoZSBBcHAgIChzb3JyeSBJIGRpZCBub3QgY2F0Y2ggdGhp
-cyBpbiBlYXJsaWVyIHNpdHVhdGlvbnMpDQoNClRvIGdldCB0byB0aGUgZXJyb3IgbGFiZWwsIHdl
-IHdpbGwgaGF2ZSBhICJtc2ciIHdoaWNoIGlzIG5ldmVyIHNlbnQgb3IgZnJlZWQuLi4gICBJIHRo
-aW5rIGhlcmUsIGFuZCBldmVyeSB3aGVyZQ0KZWxzZSB3aGVyZSB3ZSBoYXZlIGEgcG90ZW50aWFs
-bHkgZmFpbGVkIGJ1aWxkZXIsIFdlIG5lZWQgdG8gY2FsbCBsX2RidXNfbWVzc2FnZV91bnJlZiht
-c2cpIGlmIHdlIGRvbid0IGVuZCB1cA0Kc2VuZGluZyB0aGUgbXNnLg0KDQpCdXQgSSB3b3VsZCBs
-aWtlIEluZ2EncyBvcGluaW9uIG9uIHRoaXMganVkZ2VtZW50IG9uIHRoaXMgYXMgd2VsbC4NCg0K
-T3RoZXJ3aXNlLCBJIHRoaW5rIEkgd2lsbCBiZSByZWFkeSB0byBhcHBseSB0aGlzIHdob2xlIHBh
-dGNoLXNldC4NCg0KDQo+ICt9DQo+ICsNCj4gIHN0YXRpYyB2b2lkIHNlbmRfbXNnX3JjdmQoc3Ry
-dWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDhfdCBlbGVfaWR4LCBib29sIGlzX3N1YiwNCj4gIAkJ
-CQkJdWludDE2X3Qgc3JjLCB1aW50MTZfdCBrZXlfaWR4LA0KPiAgCQkJCQl1aW50MTZfdCBzaXpl
-LCBjb25zdCB1aW50OF90ICpkYXRhKQ0KPiBAQCAtODQzLDEwICs4OTMsMTcgQEAgYm9vbCBtZXNo
-X21vZGVsX3J4KHN0cnVjdCBtZXNoX25vZGUgKm5vZGUsIGJvb2wgc3ptaWN0LCB1aW50MzJfdCBz
-ZXEwLA0KPiAgCQkgKiBDeWNsZSB0aHJvdWdoIGV4dGVybmFsIG1vZGVscyBpZiB0aGUgbWVzc2Fn
-ZSBoYXMgbm90IGJlZW4NCj4gIAkJICogaGFuZGxlZCBieSBpbnRlcm5hbCBtb2RlbHMNCj4gIAkJ
-ICovDQo+IC0JCWlmIChmb3J3YXJkLmhhc19kc3QgJiYgIWZvcndhcmQuZG9uZSkNCj4gLQkJCXNl
-bmRfbXNnX3JjdmQobm9kZSwgaSwgaXNfc3Vic2NyaXB0aW9uLCBzcmMsDQo+IC0JCQkJCWZvcndh
-cmQuaWR4LCBmb3J3YXJkLnNpemUsDQo+IC0JCQkJCWZvcndhcmQuZGF0YSk7DQo+ICsJCWlmIChm
-b3J3YXJkLmhhc19kc3QgJiYgIWZvcndhcmQuZG9uZSkgew0KPiArCQkJaWYgKChkZWNyeXB0X2lk
-eCAmIEFQUF9JRFhfTUFTSykgPT0gZGVjcnlwdF9pZHgpDQo+ICsJCQkJc2VuZF9tc2dfcmN2ZChu
-b2RlLCBpLCBpc19zdWJzY3JpcHRpb24sIHNyYywNCj4gKwkJCQkJCWZvcndhcmQuaWR4LCBmb3J3
-YXJkLnNpemUsDQo+ICsJCQkJCQlmb3J3YXJkLmRhdGEpOw0KPiArCQkJZWxzZSBpZiAoZGVjcnlw
-dF9pZHggPT0gQVBQX0lEWF9ERVZfUkVNT1RFIHx8DQo+ICsJCQkJKGRlY3J5cHRfaWR4ID09IEFQ
-UF9JRFhfREVWX0xPQ0FMICYmDQo+ICsJCQkJIG1lc2hfbmV0X2lzX2xvY2FsX2FkZHJlc3MobmV0
-LCBzcmMpKSkNCj4gKwkJCQlzZW5kX2Rldl9rZXlfbXNnX3JjdmQobm9kZSwgaSwgc3JjLCAwLA0K
-PiArCQkJCQkJZm9yd2FyZC5zaXplLCBmb3J3YXJkLmRhdGEpOw0KPiArCQl9DQo+ICANCj4gIAkJ
-LyoNCj4gIAkJICogRWl0aGVyIHRoZSBtZXNzYWdlIGhhcyBiZWVuIHByb2Nlc3NlZCBpbnRlcm5h
-bGx5IG9y
+Hi Edward,
+
+On Wed, Jul 3, 2019 at 6:35 PM Edward Fung <jjsheepman@gmail.com> wrote:
+>
+> Hello Luiz,
+>
+> Yes, this is the same test with 3 different errors reported by the
+> PTS. The HCI commands for each error code are included as below.
+> Thanks!
+>
+> Test case : GATT/SR/UNS/BI-01-C started
+> - Running test case with ATT bearer setup over BR/EDR.
+> - BR/EDR Connection setup successfully.
+> - BR Security not initiated due to TSPX_security_enabled value.
+> - Sending an ATT request with an unsupported opcode.
+> - Received data 0116-0102-01
+> - Invalid request handle received. Expected=0x0000 Received =0x201.
+> - Connection terminated successfully.
+>      -Final Verdict: FAIL
+> GATT/SR/UNS/BI-01-C finished
+>
+> > ACL data: handle 12 flags 0x02 dlen 24
+>     L2CAP(d): cid 0x0040 len 20 [psm 31]
+>       ATT: Prepare Write req (0x16)
+>         attr handle 0x0201, value offset 0x0403
+>         part attr value  0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x0c 0x0d
+> 0x0e 0x0f 0x10 0x11 0x12 0x13
+> < ACL data: handle 12 flags 0x00 dlen 9
+>     L2CAP(d): cid 0x0040 len 5 [psm 31]
+>       ATT: Error (0x01)
+>         Error: Invalid handle (1)
+>         Prepare Write req (0x16) on handle 0x0201
+
+Weird does the prepare don't require to return the handle on the
+error? The spec don't seem to mention that.
+
+> > ACL data: handle 12 flags 0x02 dlen 18
+>     L2CAP(d): cid 0x0040 len 14 [psm 31]
+>       ATT: Read By Group resp (0x11)
+>         attr handle 0x0001, end group handle 0x0007
+>         value 0x00 0x18
+>         attr handle 0x0010, end group handle 0x0015
+>         value 0x01 0x18
+> < ACL data: handle 12 flags 0x00 dlen 11
+>     L2CAP(d): cid 0x0040 len 7 [psm 31]
+>       ATT: Read By Group req (0x10)
+>         start 0x0016, end 0xffff
+>         type-uuid 0x2800
+> Test case : GATT/SR/UNS/BI-01-C started
+> - Running test case with ATT bearer setup over BR/EDR.
+> - BR/EDR Connection setup successfully.
+> - BR Security not initiated due to TSPX_security_enabled value.
+> - Sending an ATT request with an unsupported opcode.
+> - Received data 010E-0000-01
+> - Invalid Error Code received. Expected=0x06 Received =0x1.
+> - Connection terminated successfully.
+>      -Final Verdict: FAIL
+> GATT/SR/UNS/BI-01-C finished
+>
+> > ACL data: handle 12 flags 0x02 dlen 19
+>     L2CAP(d): cid 0x0040 len 15 [psm 31]
+>       ATT: Read Multi req (0x0e)
+>         Handles
+>         handle 0x0201
+>         handle 0x0403
+>         handle 0x0605
+>         handle 0x0807
+>         handle 0x0a09
+>         handle 0x0c0b
+>         handle 0x0e0d
+> < ACL data: handle 12 flags 0x00 dlen 9
+>     L2CAP(d): cid 0x0040 len 5 [psm 31]
+>       ATT: Error (0x01)
+>         Error: Invalid handle (1)
+>         Read Multi req (0x0e) on handle 0x0000
+
+Here I think we do have to set the handle and we are not doing it,
+this is probably an error on our side but invalidate the first error
+since there we would be doing exactly what this failure is suggesting.
+
+> > ACL data: handle 12 flags 0x02 dlen 18
+>     L2CAP(d): cid 0x0040 len 14 [psm 31]
+>       ATT: Read By Group resp (0x11)
+>         attr handle 0x0001, end group handle 0x0007
+>         value 0x00 0x18
+>         attr handle 0x0010, end group handle 0x0015
+>         value 0x01 0x18
+> < ACL data: handle 12 flags 0x00 dlen 11
+>     L2CAP(d): cid 0x0040 len 7 [psm 31]
+>       ATT: Read By Group req (0x10)
+>         start 0x0016, end 0xffff
+>         type-uuid 0x2800
+>
+> Test case : GATT/SR/UNS/BI-01-C started
+> - Running test case with ATT bearer setup over BR/EDR.
+> - BR/EDR Connection setup successfully.
+> - BR Security not initiated due to TSPX_security_enabled value.
+> - Sending an ATT request with an unsupported opcode.
+> - Received data 010C-0000-04
+> - Invalid Error Code received. Expected=0x06 Received =0x4.
+> - Connection terminated successfully.
+>      -Final Verdict: FAIL
+> GATT/SR/UNS/BI-01-C finished
+> > ACL data: handle 11 flags 0x02 dlen 22
+>     L2CAP(d): cid 0x0040 len 18 [psm 31]
+>       ATT: Read Blob req (0x0c)
+>         handle 0x0201 offset 0x0403
+> < ACL data: handle 11 flags 0x00 dlen 9
+>     L2CAP(d): cid 0x0040 len 5 [psm 31]
+>       ATT: Error (0x01)
+>         Error: Invalid PDU (4)
+>         Read Blob req (0x0c) on handle 0x0000
+
+And here as well, we should be setting the handle as in the first
+occurrence, but it is saying we should return request not supported
+instead?
+
+> > ACL data: handle 11 flags 0x02 dlen 18
+>     L2CAP(d): cid 0x0040 len 14 [psm 31]
+>       ATT: Read By Group resp (0x11)
+>         attr handle 0x0001, end group handle 0x0007
+>         value 0x00 0x18
+>         attr handle 0x0010, end group handle 0x0015
+>         value 0x01 0x18
+> < ACL data: handle 11 flags 0x00 dlen 11
+>     L2CAP(d): cid 0x0040 len 7 [psm 31]
+>       ATT: Read By Group req (0x10)
+>         start 0x0016, end 0xffff
+>         type-uuid 0x2800
+
+
+
+
+--
+Luiz Augusto von Dentz
