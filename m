@@ -2,127 +2,102 @@ Return-Path: <SRS0=/JiD=VA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FDCC5B578
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 07:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6F1C0650E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 07:17:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DEA22187F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 07:16:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 092E721897
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 07:17:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="il90hIxr"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="oTRAOxTi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727004AbfGCHQa (ORCPT
+        id S1727186AbfGCHRE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 03:16:30 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:34599 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726670AbfGCHQa (ORCPT
+        Wed, 3 Jul 2019 03:17:04 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:46807 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726490AbfGCHRD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 03:16:30 -0400
-Received: by mail-io1-f66.google.com with SMTP id k8so2434142iot.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 00:16:29 -0700 (PDT)
+        Wed, 3 Jul 2019 03:17:03 -0400
+Received: by mail-lj1-f195.google.com with SMTP id v24so1183891ljg.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 00:17:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VYk1mTpxOcxV9rsqnHZcildiyIj9DSxFTTmwzh/7YFg=;
-        b=il90hIxrz/XtDmxxchp/HnMvb/7w6nqNCnbj7LpZqvY4HlOQdaDgHuS8kltpGQ//72
-         ACQYh5h00/uJhHhrU0sFJ12rgLpCfpihSmbzRclEsYDEOptNdocdM1XIOTnm+4Ht3bl9
-         DOHjosAZBiKc6zj5V5ZdXrejAEX7Wi32BXeDqhd0zZfbzewc8ASgpZHuBJ+dyFDgb7EP
-         OO+d5ZKrEzjY3hvwEOZX52d3CoJAHAxyHXlVl6i1aXq9Bp4JoKyqdn1IAPoJ1VkPFDFs
-         +10/RcbjVHPIRkUuukpD9ZQMYU9ckY9C3kyJNH5TMVv+ZpOZGoqBr9Xch9L+VIATy0Ap
-         iLzA==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=B8Zkh3mNDdOpw0jIt3tQhu0ugaNbqE0N5/0eIGnZgGQ=;
+        b=oTRAOxTittJEKicG8zry7F32LHp/y0/pzVCHxZY1wT+H3pGgKRHPzPNV80yTjlNBmq
+         WcOEm9CqIORxssZD8oQLOm53/8GT9GyW1YG7BORiQvkd91mPj53ucOVuSZFdB1YvsIPc
+         BzRHFTDvi8JcUENWpMW/lIu55VauMV/epmXs/ypubLDB4fcJ8dIkFOJoQ1RIDICqv6g9
+         M03ns3Jx4jQNRoJdy6n+MclQ8nIvebz+tqVCKIKgjV96OXb1c7q5iFezA8a2+4lfDZG/
+         qCFurQV0oMlpDDLYhLggSogHC8Ce78DEu5Uvr2MD51juoegSJ2Iqo6ra0qgyQYYKapbE
+         NOAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VYk1mTpxOcxV9rsqnHZcildiyIj9DSxFTTmwzh/7YFg=;
-        b=FgS5FKb+WrKbov5tJf7NsLFLRjJkLEZrz7uxivs5a/pAg8x7hwfRVyWa54NdFTGMQm
-         ReNI742gKGWoCTtgPfN2Qg9OHO/T6ssZXjc8MtvWpC5eOD6aHeN09zaPPvRZbvj9IoTS
-         1ePVH5+Hbf2ZlzU+CudJYuC1eAYnODApn2apBkmy655NUemfAlsmMrsrrDp4mwVJXkB4
-         usDQMgLW6LQ5jeLNYjMNis8cK+jr2JMm2gmBv4ClQKUC1Oe/KRcopxL5ZbhroLdN0v3e
-         GrASC3rNDToHFy1gC28vi4spaLhnboXnE0bpwQCr82jFJrbaSyC77VGEAZRZPbq0Gapr
-         I1hg==
-X-Gm-Message-State: APjAAAV/OhD0WAAYoNwFYN8Sf8xXRuqJViLqIaTlyg9HOr4zq+6/Q6Lf
-        V6x9uL0gQiwv7zRyk3VgIbkma5lNnEyZ23KZQZg=
-X-Google-Smtp-Source: APXvYqzoFmzZf++VkAJNrKBKApI3xCPp3CVA+d+51huvpV8YlCnZom0S9K13TZOHy6Tg8yrhVqd5TLB25cHPz5+qKZM=
-X-Received: by 2002:a02:b68f:: with SMTP id i15mr40331527jam.107.1562138188656;
- Wed, 03 Jul 2019 00:16:28 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=B8Zkh3mNDdOpw0jIt3tQhu0ugaNbqE0N5/0eIGnZgGQ=;
+        b=fj8pREYxEs+PLSCS0ugtgesI7dZP/X3c70BDbNnQaeE4x2kE9RV9yhOUu/WSQflmgR
+         t7jQeJtdEgj5BgTkHDND1Itg8cEkkRCfGxkUTIGwlXnsthUMPFu9zft7U5rYK3YUnTV9
+         tXxo9UoRxchdSJB00Ehckd55dsjWb7bGg8l7rJ1oLGCZiWEyyTHrEITvcmhoYFFJDOUX
+         MlRo2/Z0DdqPohScXX5G4XeLeQWaYt+keZUBOr5tW66chyR7fHw3+4vlt7wBFUxdUP9u
+         jZTZc8fqYqeDS32WzNpJtn/jcl0wQK0AZC6RVZyWWPBA9K2qeITRBkOD2KeINGK7IqNM
+         qYrg==
+X-Gm-Message-State: APjAAAUgZyXB1CpP/xCKwao77HsF7ZHmjYi8XBDUzcSH2tJffcq6g8kk
+        OrgrFIAQVU33U2oaVrBiIyyTCMA+9zY=
+X-Google-Smtp-Source: APXvYqxHjmPv+n9PtLRgXfn8EkW8cY46ftO4OLYhkwcc3MX5rbWAvtUUCFlUbkkXOFICsfiqHUSWeg==
+X-Received: by 2002:a2e:89c8:: with SMTP id c8mr9802300ljk.70.1562138220491;
+        Wed, 03 Jul 2019 00:17:00 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id l11sm281364lfc.18.2019.07.03.00.16.59
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 03 Jul 2019 00:16:59 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 0/3] Add possibility to use remote device keys
+Date:   Wed,  3 Jul 2019 09:16:53 +0200
+Message-Id: <20190703071656.6342-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-References: <20190630221408.8509-1-pbrobinson@gmail.com> <D78E9769-8AFA-4BA1-AF16-CE4E4F08B14A@linaro.org>
-In-Reply-To: <D78E9769-8AFA-4BA1-AF16-CE4E4F08B14A@linaro.org>
-From:   Peter Robinson <pbrobinson@gmail.com>
-Date:   Wed, 3 Jul 2019 08:16:16 +0100
-Message-ID: <CALeDE9MX5wY9OPjwQ3BqL+CYTJWRqnwJPv2GY7ecShKc1B=yDg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btsdio: Do not bind to non-removable BCM4356
-To:     Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jul 3, 2019 at 2:45 AM Manivannan Sadhasivam
-<manivannan.sadhasivam@linaro.org> wrote:
->
-> Hi Peter,
->
-> On 1 July 2019 3:44:08 AM IST, Peter Robinson <pbrobinson@gmail.com> wrote:
-> >BCM4356 devices soldered onto the PCB (non-removable) use an UART
-> >connection for bluetooth, such as the Rock960, but it also advertise
-> >btsdio support as a sdio function.
->
-> Sorry, I don't get the point of this patch. What if BCM4356 is used in different configuration on some other platform (using SDIO for Bluetooth but still soldered on the PCB)? I haven't seen any such but just curious what if!
++Fixed build/checkpatch errors
++Removed unused APP_IDX_NET and APP_IDX_ANY
 
-Without if you get duplicated interfaces, the SDIO one of which
-doesn't work and causes confusion:
 
-hci1:   Type: Primary  Bus: UART
-        BD Address: CC:4B:73:04:2F:1D  ACL MTU: 1021:8  SCO MTU: 64:1
-        UP RUNNING
-        RX bytes:1749 acl:0 sco:0 events:89 errors:0
-        TX bytes:2950 acl:0 sco:0 commands:89 errors:0
+This patchset adds support for sending and receiving messages encrypted
+with remote device keys.
 
-hci0:   Type: Primary  Bus: SDIO
-        BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
-        DOWN
-        RX bytes:0 acl:0 sco:0 events:0 errors:0
-        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+This plugs a 'leak' in the API where it was possible to exchange such
+messages using Send()/MessageReceived() API by using 0x7fff app key
+index.
 
-It was the same work around/fix that was used for a number of other
-devices, see commits b4cdaba27424 and 70ecdd3d8b36.
+In order to allow the application to receive responses from a local
+Config Server model, messages originating from a local node and
+encrypted using local device key are also forwarded to the application
+via D-Bus (assuming they were not handled by one of internal models).
 
-Peter
+Michał Lowas-Rzechonek (3):
+  mesh: Split APP_IDX_DEV into APP_IDX_DEV_LOCAL and APP_IDX_DEV_REMOTE
+  mesh: Implement DevKeySend() method on Node interface
+  mesh: Handle messages encrypted with a remote device key
 
-> Thanks,
-> Mani
-> >
-> >Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
-> >CC: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-> >---
-> > drivers/bluetooth/btsdio.c | 1 +
-> > 1 file changed, 1 insertion(+)
-> >
-> >diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-> >index 83748b7b2033..fd9571d5fdac 100644
-> >--- a/drivers/bluetooth/btsdio.c
-> >+++ b/drivers/bluetooth/btsdio.c
-> >@@ -286,6 +286,7 @@ static int btsdio_probe(struct sdio_func *func,
-> >               switch (func->device) {
-> >               case SDIO_DEVICE_ID_BROADCOM_43341:
-> >               case SDIO_DEVICE_ID_BROADCOM_43430:
-> >+              case SDIO_DEVICE_ID_BROADCOM_4356:
-> >                       return -ENODEV;
-> >               }
-> >       }
->
-> --
-> Sent from my Android device with K-9 Mail. Please excuse my brevity.
+ mesh/cfgmod-server.c | 15 +++----
+ mesh/model.c         | 96 +++++++++++++++++++++++++++++++++++++-------
+ mesh/net.h           |  8 ++--
+ mesh/node.c          | 59 ++++++++++++++++++++++++++-
+ 4 files changed, 151 insertions(+), 27 deletions(-)
+
+-- 
+2.19.1
+
