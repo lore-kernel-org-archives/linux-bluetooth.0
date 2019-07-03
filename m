@@ -2,103 +2,151 @@ Return-Path: <SRS0=/JiD=VA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.9 required=3.0 tests=FROM_LOCAL_DIGITS,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,HEXHASH_WORD,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1475C0650E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AED27C06513
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 13:12:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AAA6218A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 12:59:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atO8Ptv8"
+	by mail.kernel.org (Postfix) with ESMTP id 91EDB218A0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 13:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726900AbfGCM7I (ORCPT
+        id S1726870AbfGCNMG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 08:59:08 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33511 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725847AbfGCM7H (ORCPT
+        Wed, 3 Jul 2019 09:12:06 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:42195 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726255AbfGCNMG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 08:59:07 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n9so2733306wru.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 05:59:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=HfKtndbUUkdzNrNjom1D3JuyiXLqJs7Ey9F9Icz4/JM=;
-        b=atO8Ptv82la1ibaEcC2YbR7lRmXieW6nArOgNxRx/F8sd1uwZa5qBoi6eywNAVGJE9
-         fhvNbEt1vExHHhPfO30jRix23BO9vx4mcs8myKW77BTnWxPQV8Y06qyr0bjFwSlNQMzR
-         NFKpgeVDtR3wJiPc3IsRf9Clq7B6L1hHpW60r59HuVeH7wHD+f/m0+aOrqRsld1iTXca
-         AdAG0f3te+ofnr3Qa9wvIIEH9zfEial3o61P3QAOR8+QZo1Zii9ZmorKclhOwkk3MSJi
-         er5oAIv7UMJnPc6MfX+bqxODm7CRHsQEv7ypLNZzxpR/oYF2v87hHhvf8VVysXzmzDJn
-         vrgw==
+        Wed, 3 Jul 2019 09:12:06 -0400
+Received: by mail-io1-f71.google.com with SMTP id f22so2566543ioj.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 06:12:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=HfKtndbUUkdzNrNjom1D3JuyiXLqJs7Ey9F9Icz4/JM=;
-        b=dseaIb9eiv0FBm8yvF/cb8QEkxNVcIsB5Kq+2nkidZXLFcF6Aqb5HoEhj3vR7dNtzx
-         EfFp4dHE6Q4+ygbNLl4dGqoq9+LwABw4spN7053XjbTLxHNbOAhCm7Ql2W3zVbpkSyTU
-         TaFs++xO5AZ0FN8a/omw1E0ARPtlMzrAIulhf7FHWqxJMfj4AtSwUgzJk1uB7IgVypqG
-         39NEdvHqH8IiGRKGAf5xzeQn/UcYHHA7lv2BICtB8YL6nWqE1dIqP9NeeKk4R/NUnnX4
-         uMpvC4MoeX+nMjjDtYa8L0s8k6W22VVHlU7GlS4Q/lvRKuOWAixnXg+0HndK3n+Euj2Z
-         Hr6A==
-X-Gm-Message-State: APjAAAVd1QW9dl+fFrSNYfH+wNGVAX1TCKQVBk52qQc79mXix2TpH1oK
-        wiPR3HY8mDWQH9C7SN2lh4E=
-X-Google-Smtp-Source: APXvYqzJgeFYGLwVHODTDEB7TIA9guL1kAAk9ybNdDUrmaTyC8x08lS/PoaDtxlZJTIJJXUtV+2gXw==
-X-Received: by 2002:a5d:4d81:: with SMTP id b1mr31294281wru.27.1562158745732;
-        Wed, 03 Jul 2019 05:59:05 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id k63sm2659872wmb.2.2019.07.03.05.59.04
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 03 Jul 2019 05:59:05 -0700 (PDT)
-Date:   Wed, 3 Jul 2019 14:59:04 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez: install a2dp-codecs.h file
-Message-ID: <20190703125904.4fywymmawb52bxb7@pali>
-References: <20190324142058.neuunjf46lgwcrgh@pali>
- <20190406145222.so7oyma2gme67pfn@pali>
- <CABBYNZJvs8SEGVcQPO7ZdkLoKAkWJmjton3wZqOn++u=J6m5=A@mail.gmail.com>
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=0LKzWy3rKCKUf2ADkmhCBlAO8nooReUA+k7uMtJw9z8=;
+        b=Q/F9SD5jaxZeTwoT6SKMRh1iwv3+fLo12tCuxsZXYqjnwwzm2lldEOGFDpU63TwgIR
+         hs+9MR4jrkFEaQnQyEaU3aX8EOfCuRunGp2uG5uwo1ooW+zUkqxVF9NDownjn2I2vIvG
+         cm4UzZbRcPZR3/XzTl5wXgDtCYpx+ZakPkQYilijMYCQ8hJ0HtDWQDreIc5q6Rl/9nUN
+         ROpMnVHcIDiiubkL3mtvO7cZTka+2sRVnKZuX2EVUvn9JgILrEr3xDpW6YfS4eBzOC6C
+         OJfqYTDs7EO/gfXohcudGaDWiYskAcwvK0y3BW6GYLBcViDD6ALwbEhjAzdFXb0f42rM
+         lRcw==
+X-Gm-Message-State: APjAAAWJKRvPXY7CgDkFPrbkQAPZmxEjdCqZ9lOG3X+eawuXhA5yKthJ
+        ZyCxq11qMK19NTUfkdgVCwDBvYaRlECBcll2cceWD2GBMRK6
+X-Google-Smtp-Source: APXvYqzjw5aaitiWWD6dEocipz83t7ATXlepPRhnUXEFvzDxK0lxT2Q2XJhDNQIEV9xnvLBTPgvvzofYGptzSTHYKvri+paEh/nX
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZJvs8SEGVcQPO7ZdkLoKAkWJmjton3wZqOn++u=J6m5=A@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+X-Received: by 2002:a02:b696:: with SMTP id i22mr10221274jam.87.1562159525386;
+ Wed, 03 Jul 2019 06:12:05 -0700 (PDT)
+Date:   Wed, 03 Jul 2019 06:12:05 -0700
+In-Reply-To: <00000000000035c756058848954a@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000097dfa5058cc69be3@google.com>
+Subject: Re: KASAN: use-after-free Read in hci_cmd_timeout
+From:   syzbot <syzbot+19a9f729f05272857487@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Monday 15 April 2019 10:58:53 Luiz Augusto von Dentz wrote:
-> Hi Pali,
-> 
-> On Sat, Apr 6, 2019 at 5:54 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> >
-> > On Sunday 24 March 2019 15:20:58 Pali Rohár wrote:
-> > > Hello, some projects like pulseaudio is re-using a2dp-codecs.h file. It
-> > > has own private copy of it. To simplify sharing this file between
-> > > projects, what do you think about exposing this file as part of bluez
-> > > API? That make install would install this file into system and other
-> > > projects like pulseaudio could depends on it.
-> >
-> > Hello, any idea about exporting this a2dp-codecs.h file?
-> 
-> We don't actually need it in BlueZ, well except for BlueZ for Android
-> which apparently has no users. But we could have a way to fetch it in
-> PulseAudio, afaik that was something similar going on some year back.
+syzbot has found a reproducer for the following crash on:
 
-BlueZ itself needs it for avinfo tool (tools/avinfo.c). And also it is
-used in profiles/audio/a2dp.c file.
+HEAD commit:    eca94432 Bluetooth: Fix faulty expression for minimum encr..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1006cc8ba00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f6451f0da3d42d53
+dashboard link: https://syzkaller.appspot.com/bug?extid=19a9f729f05272857487
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=125b7999a00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=176deefba00000
 
--- 
-Pali Rohár
-pali.rohar@gmail.com
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+19a9f729f05272857487@syzkaller.appspotmail.com
+
+Bluetooth: hci0: command 0xfc11 tx timeout
+==================================================================
+BUG: KASAN: use-after-free in hci_cmd_timeout+0x1fe/0x220  
+net/bluetooth/hci_core.c:2614
+Read of size 8 at addr ffff88809e8a3c48 by task kworker/0:5/9461
+
+CPU: 0 PID: 9461 Comm: kworker/0:5 Not tainted 5.2.0-rc7+ #40
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events hci_cmd_timeout
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:188
+  __kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+  kasan_report+0x12/0x20 mm/kasan/common.c:614
+  __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:132
+  hci_cmd_timeout+0x1fe/0x220 net/bluetooth/hci_core.c:2614
+  process_one_work+0x989/0x1790 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x354/0x420 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+Allocated by task 9446:
+  save_stack+0x23/0x90 mm/kasan/common.c:71
+  set_track mm/kasan/common.c:79 [inline]
+  __kasan_kmalloc mm/kasan/common.c:489 [inline]
+  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:462
+  kasan_slab_alloc+0xf/0x20 mm/kasan/common.c:497
+  slab_post_alloc_hook mm/slab.h:437 [inline]
+  slab_alloc mm/slab.c:3326 [inline]
+  kmem_cache_alloc+0x11a/0x6f0 mm/slab.c:3488
+  skb_clone+0x154/0x3d0 net/core/skbuff.c:1321
+  hci_cmd_work+0xe0/0x2a0 net/bluetooth/hci_core.c:4495
+  process_one_work+0x989/0x1790 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x354/0x420 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+Freed by task 1501:
+  save_stack+0x23/0x90 mm/kasan/common.c:71
+  set_track mm/kasan/common.c:79 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:451
+  kasan_slab_free+0xe/0x10 mm/kasan/common.c:459
+  __cache_free mm/slab.c:3432 [inline]
+  kmem_cache_free+0x86/0x260 mm/slab.c:3698
+  kfree_skbmem net/core/skbuff.c:620 [inline]
+  kfree_skbmem+0xc5/0x150 net/core/skbuff.c:614
+  __kfree_skb net/core/skbuff.c:677 [inline]
+  kfree_skb net/core/skbuff.c:694 [inline]
+  kfree_skb+0xf0/0x390 net/core/skbuff.c:688
+  hci_dev_do_open+0xb20/0x1760 net/bluetooth/hci_core.c:1550
+  hci_power_on+0x10d/0x580 net/bluetooth/hci_core.c:2171
+  process_one_work+0x989/0x1790 kernel/workqueue.c:2269
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
+  kthread+0x354/0x420 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+The buggy address belongs to the object at ffff88809e8a3b80
+  which belongs to the cache skbuff_head_cache of size 224
+The buggy address is located 200 bytes inside of
+  224-byte region [ffff88809e8a3b80, ffff88809e8a3c60)
+The buggy address belongs to the page:
+page:ffffea00027a28c0 refcount:1 mapcount:0 mapping:ffff88821baabb40  
+index:0x0
+flags: 0x1fffc0000000200(slab)
+raw: 01fffc0000000200 ffffea00027b2d08 ffffea00021b83c8 ffff88821baabb40
+raw: 0000000000000000 ffff88809e8a3040 000000010000000c 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff88809e8a3b00: fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc fc
+  ffff88809e8a3b80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ffff88809e8a3c00: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+                                               ^
+  ffff88809e8a3c80: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
+  ffff88809e8a3d00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
