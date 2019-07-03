@@ -2,124 +2,135 @@ Return-Path: <SRS0=/JiD=VA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D380C0650E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 13:30:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A99C0650E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 13:57:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FB8421881
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 13:30:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 575F9218A6
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Jul 2019 13:57:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ITUELWQ6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXU/rndw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726217AbfGCNaK (ORCPT
+        id S1726574AbfGCN5j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 09:30:10 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53037 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbfGCNaK (ORCPT
+        Wed, 3 Jul 2019 09:57:39 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:38872 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725830AbfGCN5j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 09:30:10 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s3so2231276wms.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 06:30:09 -0700 (PDT)
+        Wed, 3 Jul 2019 09:57:39 -0400
+Received: by mail-oi1-f195.google.com with SMTP id v186so2140975oie.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2019 06:57:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=NEuhUrqutmFnz0leHhb1ElCCXd63yvDXYOTr0xCZQZ4=;
-        b=ITUELWQ6fYqnWblB+iBJH/SfglySKaXjcx4RI7iNuxG6RR+hIAiHPx0kZaN2m8TSpZ
-         QI728i5dD8Cv05cuoPu0ZFTfx4N0tg9iUekANf8efqrERM+pWgL5N7BT7pWXYdoKcxcy
-         GAI0Jg9KOCprVbWGpN4sDNZZuY22TMxJibtGBntqY2LwkHUlaQlaiZe/+2nXeT18NsLw
-         f7PBj7T34teZLgUA+IoJYTebW3lpOpbRcpMyIGtvt8MBgGAMGbalRLTd73aUuw2VIQRs
-         +qXKFM7g+kGAlCTG83YgsQS/U0XeHSb0UowEpB8JYuXK+YcOq4OnQOQxsBUyJWt9qza4
-         xpFw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aVioX7hOzYLxkEQcAa41j8McAZVZ6Doyqy8mLYj3wp8=;
+        b=fXU/rndw1G9snzliQfadbxj4eRL/m6mkpsw5wfQlcJwLeOpp1uFt+1XEAvQ4njVbp1
+         riBWKfBSiM/Yg1fPE7fdueklDkDxtCeqzsh5lRBku3d/OlxHD8fQn7rg7gixX6+R/SzM
+         YewrZimokwo6SupkWZRbEnxBIdvDcFhTtwUHZ/tDanSkY+Z5S8BcSPRkDlYTC363RClF
+         xacOE+HFSD37QOzTICrqqyMIr8nJ/fYoyRG9UnA+H+ec2ZUStD7IsqujSQ9PW1ARfmlK
+         H9Em2DKnUPrDK4Dw9pPZ3HlFeZ7y+1ciyqRiJu3dLEOfVXIL7GlUFykZg6htK1Lis4ok
+         qbng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=NEuhUrqutmFnz0leHhb1ElCCXd63yvDXYOTr0xCZQZ4=;
-        b=AEjqpokqIO4BaXV2f6pHY6ExJV16/OtRyu3BugDHcCQdX0A5D/oOTjTdWCbFxd1kHg
-         Dn4yfrQlpoog5aALtNoUEUcZv5xQuPA17116ugEdhcVeepRLrFMmUaWssfFQN2nIeKQP
-         gkwPKqeHizsfJ7G80cvJIknO2H/f+S6xBZ4eVJT4U452u15MsF0phYgPABFzOFhocJPa
-         ddLaE27Jshdps4CXV6trbYCuD9ceVqsiksplbvIPZDoJ8ZjZUXSh66qs8xrYX3uYTr3/
-         kAaREyZukZ/VqdEWEC7A8G2BcUqSYoKAHuq61+vP9Uwe/Sz7bGEfNv5g0eaLLrSRhR61
-         goCQ==
-X-Gm-Message-State: APjAAAV7RP4X3pZoGsVSPAZbf3QsvlxmSCX8JaugwGSFH8Ph5bJLOFhr
-        Hc52yfh+ktnqPWlY1vNhrEA=
-X-Google-Smtp-Source: APXvYqx7COkMXShAXhxaiHLl/+o5Tp2vdt8UBN9mHi0nE60itRsgpF9Y2zDoXqkt7lscL7VtVEbjtw==
-X-Received: by 2002:a05:600c:2503:: with SMTP id d3mr2906330wma.41.1562160608493;
-        Wed, 03 Jul 2019 06:30:08 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id c1sm3557014wrh.1.2019.07.03.06.30.07
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 03 Jul 2019 06:30:07 -0700 (PDT)
-Date:   Wed, 3 Jul 2019 15:30:07 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez - check for new a2dp features
-Message-ID: <20190703133007.ydmxz7sgtwibhznl@pali>
-References: <CABBYNZLtgaCi5VGHapsKQG4iAC33ySow3AuH0Qkx8iCo3LcZDg@mail.gmail.com>
- <20190607153715.w5exsodd25qxc6xv@pali>
- <CABBYNZ+gPRkAgFAeeoSqZ7tp5fYimGdju9JSuSpn_kL+f9hJhQ@mail.gmail.com>
- <20190608105924.qmauvrwyz7nofx74@pali>
- <20190608111553.65s6yoyhmusmr3pc@pali>
- <20190622161837.37mjlsirpoql2plj@pali>
- <CABBYNZK-L0NfuR9Qq8Vj9Q7nxmgurzkimayJHSKV+kTJ7D_tUA@mail.gmail.com>
- <20190622170933.lxuftoxmvtv7ssfo@pali>
- <20190703125608.nl72umoinhg2kh6k@pali>
- <CABBYNZL55sB=zG1zkHvTwmTJuSxHwEJ_a+9PjehVpW54tYe9BQ@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aVioX7hOzYLxkEQcAa41j8McAZVZ6Doyqy8mLYj3wp8=;
+        b=E+N/3srwF4GdHwl7Qdrd1diq10AByc8SUecLwIt1cMjmKWJUPTg/nV3+sJhgQJeEm5
+         FKfe+4YMM2UaeM7e1qLEmL9oMnZI8GldrcC4rSG6f3hCICYgpqGHnUV0/ppJucp/uXU2
+         eueePIX4RvQ86uoV1SbBk33NgfYV8Aglm5Zekru/ynxQytHOo1wm0YtsdEmMVpQJi5+t
+         ZTxkZAJUGt5LhLoLTbGiJFwDmUokL3zsW8vCD6lfF4octQqFkjChOHXrij07zv2tSOVY
+         /wAl55UoLZysmdaGxUgJFuDvNZ6pohCByGJf0cOLGjEeuWd9Wgx2hz/qZ4CgUKIMY34X
+         Vv5w==
+X-Gm-Message-State: APjAAAVVwAzoVM6HbzHhAgYpty/jrh0CCOgh2nOOFTGYVDBOzSAlH6HT
+        MXx+8gun7I2cDC/Dd6BHtP5P6BzYA9MD+XV6EyEmfSyX6CI=
+X-Google-Smtp-Source: APXvYqx2fw/Fn/qXgWpTyb0O1FZ9+1wjj+f45uuA6looQaF9aMhubSAYrsJvOMlBzowfqti37+i8XwDcQYQZU5xw37o=
+X-Received: by 2002:a54:4f89:: with SMTP id g9mr7435952oiy.110.1562162258541;
+ Wed, 03 Jul 2019 06:57:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZL55sB=zG1zkHvTwmTJuSxHwEJ_a+9PjehVpW54tYe9BQ@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190603104843.26848-1-luiz.dentz@gmail.com> <20190603104843.26848-2-luiz.dentz@gmail.com>
+In-Reply-To: <20190603104843.26848-2-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 3 Jul 2019 16:57:25 +0300
+Message-ID: <CABBYNZLFxgB_smaNq=0HzH0BxqKS08dsrw=ZNSv05xFkE7F75g@mail.gmail.com>
+Subject: Re: [RFC 2/2] Bluetooth: L2CAP: Check bearer type on __l2cap_global_chan_by_addr
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wednesday 03 July 2019 16:26:37 Luiz Augusto von Dentz wrote:
-> Hi Pali,
-> 
-> On Wed, Jul 3, 2019 at 3:56 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> >
-> > On Saturday 22 June 2019 19:09:33 Pali Rohár wrote:
-> > > On Saturday 22 June 2019 20:01:15 Luiz Augusto von Dentz wrote:
-> > > > Hi Pali,
-> > > >
-> > > > I think a better idea would be that we introduce something specific to
-> > > > that, such as the SEID being returned so the next time around you may
-> > > > restore a SEID, this may actually make more sense perhaps if we reuse
-> > > > the RegisterApplication semantics:
-> > > >
-> > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n464
-> > > >
-> > > > That means it is no longer required to call RegisterEndpoint as many
-> > > > times as there are endpoints since that is time-consuming due to the
-> > > > D-Bus round trips, instead, the endpoint are discovered with the use
-> > > > of ObjectManager, if the method doesn't exist then you just fall back
-> > > > to the old mechanism since it might be an old daemon.
-> > >
-> > > Hi! If I understand it correctly, pulseaudio would register itself via
-> > > new dbus method and bluez daemon then discover A2DP SEP endpoints
-> > > automatically, right? And if that new dbus method does not exist
-> > > pulseaudio would know that in system is running old bluez version
-> > > without codec switching support. Seems it is perfectly fine solution.
-> >
-> > Hi Luiz! Do you have some patches ready for testing?
-> 
-> Not yet, will try to arrange time for implementing it next week.
+Hi Marcel, Johan,
 
-Ok, I will wait for them.
+On Mon, Jun 3, 2019 at 1:48 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> The spec defines PSM and LE_PSM as different domains so a listen on the
+> same PSM is valid if the address type points to a different bearer.
+>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/l2cap_core.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index b53acd6c9a3d..8da73ca8c111 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -168,11 +168,18 @@ static struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn,
+>         return c;
+>  }
+>
+> -static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src)
+> +static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src,
+> +                                                     u8 src_type)
+>  {
+>         struct l2cap_chan *c;
+>
+>         list_for_each_entry(c, &chan_list, global_l) {
+> +               if (src_type == BDADDR_BREDR && c->src_type != BDADDR_BREDR)
+> +                       continue;
+> +
+> +               if (src_type != BDADDR_BREDR && c->src_type == BDADDR_BREDR)
+> +                       continue;
+> +
+>                 if (c->sport == psm && !bacmp(&c->src, src))
+>                         return c;
+>         }
+> @@ -185,7 +192,7 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
+>
+>         write_lock(&chan_list_lock);
+>
+> -       if (psm && __l2cap_global_chan_by_addr(psm, src)) {
+> +       if (psm && __l2cap_global_chan_by_addr(psm, src, chan->src_type)) {
+>                 err = -EADDRINUSE;
+>                 goto done;
+>         }
+> @@ -209,7 +216,8 @@ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm)
+>
+>                 err = -EINVAL;
+>                 for (p = start; p <= end; p += incr)
+> -                       if (!__l2cap_global_chan_by_addr(cpu_to_le16(p), src)) {
+> +                       if (!__l2cap_global_chan_by_addr(cpu_to_le16(p), src,
+> +                                                        chan->src_type)) {
+>                                 chan->psm   = cpu_to_le16(p);
+>                                 chan->sport = cpu_to_le16(p);
+>                                 err = 0;
+> --
+> 2.21.0
+
+Any chance to review this one.
 
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+Luiz Augusto von Dentz
