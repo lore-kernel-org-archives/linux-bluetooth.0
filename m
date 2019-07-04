@@ -2,66 +2,68 @@ Return-Path: <SRS0=WywE=VB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A77BDC0651C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 074FBC06513
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B6ED2082E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6B342082E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="g15GhW3x"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="ObmdglxR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727729AbfGDMds (ORCPT
+        id S1727778AbfGDMdu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jul 2019 08:33:48 -0400
-Received: from mail-lj1-f178.google.com ([209.85.208.178]:42512 "EHLO
-        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727768AbfGDMdr (ORCPT
+        Thu, 4 Jul 2019 08:33:50 -0400
+Received: from mail-lj1-f170.google.com ([209.85.208.170]:38542 "EHLO
+        mail-lj1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727768AbfGDMdu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jul 2019 08:33:47 -0400
-Received: by mail-lj1-f178.google.com with SMTP id t28so5988658lje.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2019 05:33:46 -0700 (PDT)
+        Thu, 4 Jul 2019 08:33:50 -0400
+Received: by mail-lj1-f170.google.com with SMTP id r9so6012139ljg.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2019 05:33:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=zlw8L5+yskUSC4tHVm2lBZcPGopq19rqAKLUeoXmxvo=;
-        b=g15GhW3xaff0syWftJzjBVevBcvoL4e+AHWLhKjL7BWV+hQewrQYW48TzhLVToSpZn
-         Z5BBZYzlmdfXSU4akXbtLMjRhdZ1r5oZFQ1V0r5i7Es2raVGHcXNGaIbYQHaBBxNxcxo
-         MJEE4B0aQgGbeJs/nTwO3PAjFwBencb+tNWXq1uTXbQ35QbA0iXvRdfgRo/ZWhuH4rNf
-         At9hBpEPtva1K8eFHJyxjaFdKddXD8UxqvL8CmjjL4N0Dgt58rMFDcbW6Tu54KbGc6Lq
-         TC/H47me+UkW2BOXe6R+/mcNAQ9vInhW0eiIa6ptDhlkK+An0CqX163YGdRUtRverLzF
-         XM4Q==
+        bh=Y0x1q6cQo2g2hFMvC+gSWekWjYxT4SCAgFqeS+gZNTo=;
+        b=ObmdglxRqM5ux/VpucTk4hFa/4m0nk8qXNXcsyB7GOyhpA4jtW3WaNErZ1esV0zFI+
+         kRhCycqIu+fo9HPAnl7TOH6ssVyJGQQ6eDPybi/PC5zH/aiapr3paDEZ6Sp9nV2d3+OM
+         mQldTMiXcWIDqkAiD2YTqnGqoMwqMzji06lcUlDC8Ql0hSaMEGjJcSvqiShRYb2dwiIN
+         rT1h1upHmp8wsO8DyC4/yMdNxG3+HTdFRJHaL1UInL7FpAhkvAyBwFEo1qIvCzTDNM8f
+         bA5gG8OAi7o3tvcZ7M5k3T6R9Fp+Gva4ufF5aWGjMXU3cx5j6JU87EjTngsjc5oI2lgz
+         ACFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=zlw8L5+yskUSC4tHVm2lBZcPGopq19rqAKLUeoXmxvo=;
-        b=BPGVdTGkJszP1sj1x6WdOwe5MrOJB+Y5yfUzD+jmfhjlXa44b+VfMGCTuu+uyw6LZR
-         g9FRnFSbHHyN4LmYHdbmIWC9DpTmT0KwsEkzfz7cqVf8kHpzwMPF1IgddOLAr7QNSUTT
-         Y7lGKeg1AMP7x7btqTnoCMCcNhoFAcSy/4p+EwUo5ba7MrmN2zioLyeBFJS1UxfFJhqS
-         RKmkIaXZ6PQDCc6ttFOdCNMkP526vSrFkRN7juGcZ+rDxAsEH2zwB1lp4+YDKNzI95NX
-         NyjgYIDcuBEjbPlw1cFJu7YB5LvUkqD2AzpwV9tqcR/DovCnOFtMXP6jP9lD9MdDERcG
-         wWHA==
-X-Gm-Message-State: APjAAAWFrT7dzkeRzewwQSQTHTSO3TXsaKHuN9SP7x1ctzwkvIqPrPvX
-        SuGPbryNvpl521KVx7U31DoaImkVkuk=
-X-Google-Smtp-Source: APXvYqwMcMlUXfOhYf2CIMaKYMSQqNAgkA6T3Su+3+tvJFPa0phIwN1d1puQ+PhIf4SowrTCLfZ9EQ==
-X-Received: by 2002:a2e:298a:: with SMTP id p10mr24159244ljp.74.1562243625490;
-        Thu, 04 Jul 2019 05:33:45 -0700 (PDT)
+        bh=Y0x1q6cQo2g2hFMvC+gSWekWjYxT4SCAgFqeS+gZNTo=;
+        b=J9CkdE5SS4mifEZMmU1Xf4QOeLXMfWYuW36Fp7XsxhmWKP+aFJnVj/UdP5bndJ6Bn+
+         +Hn2r5wgNehMumsoWbqyXRsmTRbkK1ilMP8WlJJer+mVvHQS5eKNt7t7/TCoqtv0w1NP
+         Iz6lGq4n0YDEF8esMPQQB4SWOf3icMQDPIKrgziSDwMhEh0la85sH5s+CMe+bv5efMhU
+         xsYN/1DqSvhyBn7XiMdRSd34Ah4NGz0LlbgVOKcadPY/CgmWh59zXBlro4DwPaNgVmbz
+         Bs76s3sVZN/kqKUPj9n/pZ9130W8oPqiBdnaVEaDEwnVy3vUlRTogtFqCN2CS+RMHi+Y
+         YFdg==
+X-Gm-Message-State: APjAAAWXrm3wNcrIa9iYwOgQAqCPD+0+O1or7wJ6sO77zEViHkPEmfKM
+        L0emsT7V/qGk1Jd/3i0xiWZCy9eYC9M=
+X-Google-Smtp-Source: APXvYqxx4ezBfm5DyL2kHtiKKjXaS21JhGPDIT4SJKdWHaLAQjTuqtTwiJxZi8e5NJWMM6eQYjePAw==
+X-Received: by 2002:a2e:6e0c:: with SMTP id j12mr24438079ljc.123.1562243627276;
+        Thu, 04 Jul 2019 05:33:47 -0700 (PDT)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id g68sm1126151ljg.47.2019.07.04.05.33.44
+        by smtp.gmail.com with ESMTPSA id g68sm1126151ljg.47.2019.07.04.05.33.46
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 04 Jul 2019 05:33:44 -0700 (PDT)
+        Thu, 04 Jul 2019 05:33:46 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v5 2/5] mesh: Cleanup D-Bus method returns with empty result
-Date:   Thu,  4 Jul 2019 14:33:35 +0200
-Message-Id: <20190704123338.5988-3-michal.lowas-rzechonek@silvair.com>
+Cc:     Inga Stotland <inga.stotland@intel.com>,
+        Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v5 3/5] mesh: Split APP_IDX_DEV into APP_IDX_DEV_LOCAL and APP_IDX_DEV_REMOTE
+Date:   Thu,  4 Jul 2019 14:33:36 +0200
+Message-Id: <20190704123338.5988-4-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190704123338.5988-1-michal.lowas-rzechonek@silvair.com>
 References: <20190704123338.5988-1-michal.lowas-rzechonek@silvair.com>
@@ -72,74 +74,165 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This is needed to distinguish incoming messages encrypted using a device
+key: if the key is local, the message can be forwarded to internal
+models. If the key is a known remote one, it will be forwarded to the
+application via DevKeyMessageReceived() API.
 ---
- mesh/node.c | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+ mesh/cfgmod-server.c | 15 ++++++++-------
+ mesh/model.c         | 22 +++++++++++++---------
+ mesh/net.h           |  8 ++++----
+ 3 files changed, 25 insertions(+), 20 deletions(-)
 
-diff --git a/mesh/node.c b/mesh/node.c
-index 1dcb74b4f..53876ef5a 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -1949,7 +1949,6 @@ static struct l_dbus_message *send_call(struct l_dbus *dbus,
- 	uint16_t dst, app_idx, src;
- 	uint8_t *data;
- 	uint32_t len;
--	struct l_dbus_message *reply;
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index 634ac006b..a849b5e99 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -69,7 +69,8 @@ static void send_pub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 		n += 2;
+ 	}
  
- 	l_debug("Send");
- 
-@@ -1978,10 +1977,7 @@ static struct l_dbus_message *send_call(struct l_dbus *dbus,
- 				mesh_net_get_default_ttl(node->net), data, len))
- 		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
- 
--	reply = l_dbus_message_new_method_return(msg);
--	l_dbus_message_set_arguments(reply, "");
--
--	return reply;
-+	return l_dbus_message_new_method_return(msg);
+-	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL,
++								msg, n);
  }
  
- static struct l_dbus_message *publish_call(struct l_dbus *dbus,
-@@ -1995,7 +1991,6 @@ static struct l_dbus_message *publish_call(struct l_dbus *dbus,
- 	struct node_element *ele;
- 	uint8_t *data;
- 	uint32_t len;
--	struct l_dbus_message *reply;
- 	int result;
+ static bool config_pub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
+@@ -254,7 +255,7 @@ static void send_sub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 		n += 2;
+ 	}
  
- 	l_debug("Publish");
-@@ -2027,10 +2022,7 @@ static struct l_dbus_message *publish_call(struct l_dbus *dbus,
- 	if (result != MESH_ERROR_NONE)
- 		return dbus_error(msg, result, NULL);
- 
--	reply = l_dbus_message_new_method_return(msg);
--	l_dbus_message_set_arguments(reply, "");
--
--	return reply;
-+	return l_dbus_message_new_method_return(msg);
+-	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL, msg, n);
  }
  
- static struct l_dbus_message *vendor_publish_call(struct l_dbus *dbus,
-@@ -2046,7 +2038,6 @@ static struct l_dbus_message *vendor_publish_call(struct l_dbus *dbus,
- 	struct node_element *ele;
- 	uint8_t *data = NULL;
- 	uint32_t len;
--	struct l_dbus_message *reply;
- 	int result;
+ static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
+@@ -312,7 +313,7 @@ static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
  
- 	l_debug("Publish");
-@@ -2079,10 +2070,7 @@ static struct l_dbus_message *vendor_publish_call(struct l_dbus *dbus,
- 	if (result != MESH_ERROR_NONE)
- 		return dbus_error(msg, result, NULL);
+ 	*msg_status = (uint8_t) status;
  
--	reply = l_dbus_message_new_method_return(msg);
--	l_dbus_message_set_arguments(reply, "");
--
--	return reply;
-+	return  l_dbus_message_new_method_return(msg);
+-	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL, msg, n);
+ 	return true;
  }
  
- static void setup_node_interface(struct l_dbus_interface *iface)
+@@ -487,7 +488,7 @@ static void send_model_app_status(struct mesh_node *node, uint16_t src,
+ 	l_put_le16(id, msg + n);
+ 	n += 2;
+ 
+-	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL, msg, n);
+ }
+ 
+ static void model_app_list(struct mesh_node *node, uint16_t src, uint16_t dst,
+@@ -540,7 +541,7 @@ static void model_app_list(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 
+ 	if (result >= 0) {
+ 		*status = result;
+-		mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL,
++		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, DEFAULT_TTL,
+ 								msg, n);
+ 	}
+ 
+@@ -758,7 +759,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 	uint16_t interval;
+ 	uint16_t n;
+ 
+-	if (idx != APP_IDX_DEV)
++	if (idx != APP_IDX_DEV_LOCAL)
+ 		return false;
+ 
+ 	if (mesh_model_opcode_get(pkt, size, &opcode, &n)) {
+@@ -1259,7 +1260,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 	if (n) {
+ 		/* print_packet("App Tx", long_msg ? long_msg : msg, n); */
+ 		mesh_model_send(node, unicast, src,
+-				APP_IDX_DEV, DEFAULT_TTL,
++				APP_IDX_DEV_LOCAL, DEFAULT_TTL,
+ 				long_msg ? long_msg : msg, n);
+ 	}
+ 	l_free(long_msg);
+diff --git a/mesh/model.c b/mesh/model.c
+index 868fe9e52..ee26a8105 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -306,7 +306,9 @@ static void forward_model(void *a, void *b)
+ 	bool result;
+ 
+ 	l_debug("model %8.8x with idx %3.3x", mod->id, fwd->idx);
+-	if (fwd->idx != APP_IDX_DEV && !has_binding(mod->bindings, fwd->idx))
++
++	if (fwd->idx != APP_IDX_DEV_LOCAL &&
++					!has_binding(mod->bindings, fwd->idx))
+ 		return;
+ 
+ 	dst = fwd->dst;
+@@ -356,15 +358,15 @@ static int dev_packet_decrypt(struct mesh_node *node, const uint8_t *data,
+ 				uint16_t dst, uint8_t key_id, uint32_t seq,
+ 				uint32_t iv_idx, uint8_t *out)
+ {
+-	const uint8_t *dev_key;
++	const uint8_t *key;
+ 
+-	dev_key = node_get_device_key(node);
+-	if (!dev_key)
++	key = node_get_device_key(node);
++	if (!key)
+ 		return false;
+ 
+ 	if (mesh_crypto_payload_decrypt(NULL, 0, data, size, szmict, src,
+-					dst, key_id, seq, iv_idx, out, dev_key))
+-		return APP_IDX_DEV;
++					dst, key_id, seq, iv_idx, out, key))
++		return APP_IDX_DEV_LOCAL;
+ 
+ 	return -1;
+ }
+@@ -942,7 +944,7 @@ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t target,
+ 	if (IS_UNASSIGNED(target))
+ 		return false;
+ 
+-	if (app_idx == APP_IDX_DEV) {
++	if (app_idx == APP_IDX_DEV_LOCAL) {
+ 		key = node_get_device_key(node);
+ 		if (!key)
+ 			return false;
+@@ -1371,12 +1373,14 @@ struct mesh_model *mesh_model_setup(struct mesh_node *node, uint8_t ele_idx,
+ 		if (ele_idx != PRIMARY_ELE_IDX)
+ 			return NULL;
+ 
+-		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV));
++		l_queue_push_head(mod->bindings,
++					L_UINT_TO_PTR(APP_IDX_DEV_LOCAL));
+ 		return mod;
+ 	}
+ 
+ 	if (db_mod->id == CONFIG_CLI_MODEL) {
+-		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV));
++		l_queue_push_head(mod->bindings,
++					L_UINT_TO_PTR(APP_IDX_DEV_LOCAL));
+ 		return mod;
+ 	}
+ 
+diff --git a/mesh/net.h b/mesh/net.h
+index f19024766..8848e6df0 100644
+--- a/mesh/net.h
++++ b/mesh/net.h
+@@ -37,10 +37,10 @@ struct mesh_node;
+ #define SEQ_MASK	0xffffff
+ 
+ #define CREDFLAG_MASK	0x1000
+-#define APP_IDX_MASK	0x0fff
+-#define APP_IDX_DEV	0x7fff
+-#define APP_IDX_ANY	0x8000
+-#define APP_IDX_NET	0xffff
++
++#define APP_IDX_MASK		0x0fff
++#define APP_IDX_DEV_REMOTE	0x6fff
++#define APP_IDX_DEV_LOCAL	0x7fff
+ 
+ #define NET_IDX_INVALID	0xffff
+ #define NET_NID_INVALID	0xff
 -- 
 2.19.1
 
