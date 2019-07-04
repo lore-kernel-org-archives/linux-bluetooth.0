@@ -2,126 +2,89 @@ Return-Path: <SRS0=WywE=VB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7571C5B578
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 00:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA58C0650E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 04:08:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9494C218A0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 00:16:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EEF02082E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 04:08:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=temperror (0-bit key) header.d=phytec.in header.i=@phytec.in header.b="eA3dWLAi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727439AbfGDAQl (ORCPT
+        id S1725855AbfGDEIH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Jul 2019 20:16:41 -0400
-Received: from mga12.intel.com ([192.55.52.136]:63746 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727100AbfGDAQl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Jul 2019 20:16:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Jul 2019 17:16:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,449,1557212400"; 
-   d="scan'208";a="247792369"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
-  by orsmga001.jf.intel.com with ESMTP; 03 Jul 2019 17:16:40 -0700
-Received: from orsmsx155.amr.corp.intel.com (10.22.240.21) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 3 Jul 2019 17:16:40 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.135]) by
- ORSMSX155.amr.corp.intel.com ([169.254.7.237]) with mapi id 14.03.0439.000;
- Wed, 3 Jul 2019 17:16:40 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-CC:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-Subject: Re: [PATCH BlueZ] mesh: Fix clean up of node's DBUS assosiated
- resources
-Thread-Topic: [PATCH BlueZ] mesh: Fix clean up of node's DBUS assosiated
- resources
-Thread-Index: AQHVMfOMn7/f5crSdUyoyl/ZdJKo76a6DO8A
-Date:   Thu, 4 Jul 2019 00:16:39 +0000
-Message-ID: <1562199398.23933.40.camel@intel.com>
-References: <20190703230244.20229-1-inga.stotland@intel.com>
-In-Reply-To: <20190703230244.20229-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.20.71]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E61CB77A81B4774CA97CB902CA80C226@intel.com>
-Content-Transfer-Encoding: base64
+        Thu, 4 Jul 2019 00:08:07 -0400
+Received: from mickerik.phytec.de ([195.145.39.210]:50212 "EHLO
+        mickerik.phytec.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725766AbfGDEIH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Jul 2019 00:08:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; d=phytec.in; s=a1; c=relaxed/simple;
+        q=dns/txt; i=@phytec.in; t=1562213286; x=1564805286;
+        h=From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=q5+UW86mkCNDOaASBatsP9CwxGLgRWb/1nAQU1uGigw=;
+        b=eA3dWLAiJ82mCPPw/rncFEW0d/0+RGkWgxEWnCRxZaqBAZRvoLtEuQPDUC/lXWTv
+        8LLpn5xt3nniE3+qAT+fKbnY15OTJTZtljajipOcwJJpIC5RAu3La6SijiSwX9GE
+        g/FzoDDwalzFYjq+X2bvm4jMJDhh6C6T6Q0s6fWchP4=;
+X-AuditID: c39127d2-193ff70000001aee-19-5d1d7ba63260
+Received: from tumirnix.phytec.de (tumirnix.phytec.de [172.16.0.38])
+        by mickerik.phytec.de (PHYTEC Mail Gateway) with SMTP id C2.DA.06894.6AB7D1D5; Thu,  4 Jul 2019 06:08:06 +0200 (CEST)
+X-Disclaimed: 1
 MIME-Version: 1.0
+Sensitivity: 
+Importance: Normal
+X-Priority: 3 (Normal)
+In-Reply-To: 
+References: 
+Subject: Testing Bluetooth Mesh with python
+From:   Mahaboob Nazeer SK <nazeer.m@phytec.in>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <OFCEFD7E67.77A1AF25-ONC125842D.001694FD-C125842D.001694FE@phytec.de>
+Date:   Thu, 4 Jul 2019 06:06:39 +0200
+X-Mailer: Lotus Domino Web Server Release 9.0.1FP7 August  17, 2016
+X-MIMETrack: Serialize by http on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 04.07.2019 06:06:39,
+        Serialize complete at 04.07.2019 06:06:39,
+        Serialize by Router on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 04.07.2019 06:06:39
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrLLMWRmVeSWpSXmKPExsWyRoBBTXdZtWyswfwWGYs51/qYHRg9Pm+S
+        C2CM4rJJSc3JLEst0rdL4Mro+zKPtWAxc8WMTQkNjPuYuhg5OSQETCT2z53N1sXIxSEksIdR
+        YunrLawQCX6JT39a2UBsXgFBiZMzn7CA2MICvBKb3s5mBLE5BYQkOq52QtWLSUxY94u5i5ED
+        KM4rMeGfNUhYSIBH4tWG/YwQrdoSz849BrPZBHQlVl54CGaLCChLPNt3mAliVaDEhKu/wNay
+        CKhI3J6zE+pOZ4nFfy6wgNwpIdDAJNFyeQkLyC5mAXWJ9fOEQGqYgeYvW/iaeQKj0CwkV89C
+        qJqFpGoBI/MqRqHczOTs1KLMbL2CjMqS1GS9lNRNjMAgPTxR/dIOxr45HocYmTgYDzFKcDAr
+        ifB+/y0TK8SbklhZlVqUH19UmpNafIhRmoNFSZx3A29JmJBAemJJanZqakFqEUyWiYNTqoGx
+        4sjOuUGXZV1lFnGpT3dYNGfuWc81rFF5FR8dllyLfKP61ODyAg+3xE05lnkbtVuqnI/zVt+/
+        oPzjxbvzcUWtTQ6rOv/WbDy340Ox0XfBP7Yziu1Elwp3btLz2xz07H1QfMOxvkPqcw5MKru2
+        /tYGPa7MmI1zDOzyfI6+0eOtq7jxYU+dJ1OkEktxRqKhFnNRcSIAO041L0ACAAA=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBbcGxpZWQNCg0KT24gV2VkLCAyMDE5LTA3LTAzIGF0IDE2OjAyIC0wNzAwLCBJbmdhIFN0b3Rs
-YW5kIHdyb3RlOg0KPiBUaGlzIGNvbnNvbGlkYXRlcyBtdWx0aXBsZSBwbGFjZXMgd2hlcmUgbm9k
-ZSdzIG9iamVjdCBwYXRocywNCj4gaW50ZXJmYWNlcywgZXRjLiBhcmUgZGUtYWxsb2NhdGVkLCBp
-bnRvIG9uZSByb3V0aW5lOg0KPiBmcmVlX25vZGVfZGJ1c19yZXNvdXJjZXMoKS4NCj4gVGhpcyBh
-bHNvIGFkZHJlc3NlcyBtZW1vcnkgbGVha3MgYXNzb3NpYXRlZCB3aXRoIGluY29uc2lzdGVudCBm
-cmVlaW5nDQo+IG9mIG9iamVjdCBwYXRoIHN0cmluZ3MuDQo+IC0tLQ0KPiAgbWVzaC9ub2RlLmMg
-fCA2NiArKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDI5IGluc2VydGlvbnMoKyksIDM3IGRlbGV0aW9ucygtKQ0K
-PiANCj4gZGlmZiAtLWdpdCBhL21lc2gvbm9kZS5jIGIvbWVzaC9ub2RlLmMNCj4gaW5kZXggYWRj
-MmFhOTNlLi42N2UwZGQwMTQgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbm9kZS5jDQo+ICsrKyBiL21l
-c2gvbm9kZS5jDQo+IEBAIC0yMjYsMzQgKzIyNiw0NiBAQCBzdGF0aWMgdm9pZCBlbGVtZW50X2Zy
-ZWUodm9pZCAqZGF0YSkNCj4gIAlsX2ZyZWUoZWxlbWVudCk7DQo+ICB9DQo+ICANCj4gLXN0YXRp
-YyB2b2lkIGZyZWVfbm9kZV9yZXNvdXJjZXModm9pZCAqZGF0YSkNCj4gK3N0YXRpYyB2b2lkIGZy
-ZWVfbm9kZV9kYnVzX3Jlc291cmNlcyhzdHJ1Y3QgbWVzaF9ub2RlICpub2RlKQ0KPiAgew0KPiAt
-CXN0cnVjdCBtZXNoX25vZGUgKm5vZGUgPSBkYXRhOw0KPiArCWlmICghbm9kZSkNCj4gKwkJcmV0
-dXJuOw0KPiAgDQo+IC0JLyogVW5yZWdpc3RlciBpbyBjYWxsYmFja3MgKi8NCj4gLQlpZiAobm9k
-ZS0+bmV0KQ0KPiAtCQltZXNoX25ldF9kZXRhY2gobm9kZS0+bmV0KTsNCj4gLQltZXNoX25ldF9m
-cmVlKG5vZGUtPm5ldCk7DQo+ICsJaWYgKG5vZGUtPmRpc2Nfd2F0Y2gpIHsNCj4gKwkJbF9kYnVz
-X3JlbW92ZV93YXRjaChkYnVzX2dldF9idXMoKSwgbm9kZS0+ZGlzY193YXRjaCk7DQo+ICsJCW5v
-ZGUtPmRpc2Nfd2F0Y2ggPSAwOw0KPiArCX0NCj4gIA0KPiAtCWxfcXVldWVfZGVzdHJveShub2Rl
-LT5lbGVtZW50cywgZWxlbWVudF9mcmVlKTsNCj4gLQlsX2ZyZWUobm9kZS0+Y29tcCk7DQo+IC0J
-bF9mcmVlKG5vZGUtPmFwcF9wYXRoKTsNCj4gKwlsX3F1ZXVlX2ZvcmVhY2gobm9kZS0+ZWxlbWVu
-dHMsIGZyZWVfZWxlbWVudF9wYXRoLCBOVUxMKTsNCj4gIAlsX2ZyZWUobm9kZS0+b3duZXIpOw0K
-PiAtCWxfZnJlZShub2RlLT5ub2RlX3BhdGgpOw0KPiAtDQo+IC0JaWYgKG5vZGUtPmRpc2Nfd2F0
-Y2gpDQo+IC0JCWxfZGJ1c19yZW1vdmVfd2F0Y2goZGJ1c19nZXRfYnVzKCksIG5vZGUtPmRpc2Nf
-d2F0Y2gpOw0KPiArCW5vZGUtPm93bmVyID0gTlVMTDsNCj4gKwlsX2ZyZWUobm9kZS0+YXBwX3Bh
-dGgpOw0KPiArCW5vZGUtPmFwcF9wYXRoID0gTlVMTDsNCj4gIA0KPiAgCWlmIChub2RlLT5wYXRo
-KSB7DQo+ICAJCWxfZGJ1c19vYmplY3RfcmVtb3ZlX2ludGVyZmFjZShkYnVzX2dldF9idXMoKSwg
-bm9kZS0+cGF0aCwNCj4gIAkJCQkJCQlNRVNIX05PREVfSU5URVJGQUNFKTsNCj4gIA0KPiAgCQls
-X2RidXNfb2JqZWN0X3JlbW92ZV9pbnRlcmZhY2UoZGJ1c19nZXRfYnVzKCksIG5vZGUtPnBhdGgs
-DQo+IC0JCQkJCSAgICAgICBNRVNIX01BTkFHRU1FTlRfSU5URVJGQUNFKTsNCj4gKwkJCQkJCU1F
-U0hfTUFOQUdFTUVOVF9JTlRFUkZBQ0UpOw0KPiArCQlsX2ZyZWUobm9kZS0+cGF0aCk7DQo+ICsJ
-CW5vZGUtPnBhdGggPSBOVUxMOw0KPiAgCX0NCj4gK30NCj4gIA0KPiAtCWxfZnJlZShub2RlLT5w
-YXRoKTsNCj4gK3N0YXRpYyB2b2lkIGZyZWVfbm9kZV9yZXNvdXJjZXModm9pZCAqZGF0YSkNCj4g
-K3sNCj4gKwlzdHJ1Y3QgbWVzaF9ub2RlICpub2RlID0gZGF0YTsNCj4gIA0KPiArCS8qIFVucmVn
-aXN0ZXIgaW8gY2FsbGJhY2tzICovDQo+ICsJaWYgKG5vZGUtPm5ldCkNCj4gKwkJbWVzaF9uZXRf
-ZGV0YWNoKG5vZGUtPm5ldCk7DQo+ICsJbWVzaF9uZXRfZnJlZShub2RlLT5uZXQpOw0KPiArDQo+
-ICsJbF9xdWV1ZV9kZXN0cm95KG5vZGUtPmVsZW1lbnRzLCBlbGVtZW50X2ZyZWUpOw0KPiArCWxf
-ZnJlZShub2RlLT5jb21wKTsNCj4gKw0KPiArCWZyZWVfbm9kZV9kYnVzX3Jlc291cmNlcyhub2Rl
-KTsNCj4gIAlsX2ZyZWUobm9kZSk7DQo+ICB9DQo+ICANCj4gQEAgLTEwMzMsMjQgKzEwNDUsOSBA
-QCBzdGF0aWMgdm9pZCBhcHBfZGlzY19jYihzdHJ1Y3QgbF9kYnVzICpidXMsIHZvaWQgKnVzZXJf
-ZGF0YSkNCj4gIAlsX2luZm8oIkFwcCAlcyBkaXNjb25uZWN0ZWQgKCV1KSIsIG5vZGUtPm93bmVy
-LCBub2RlLT5kaXNjX3dhdGNoKTsNCj4gIA0KPiAgCW5vZGUtPmRpc2Nfd2F0Y2ggPSAwOw0KPiAt
-DQo+IC0JbF9xdWV1ZV9mb3JlYWNoKG5vZGUtPmVsZW1lbnRzLCBmcmVlX2VsZW1lbnRfcGF0aCwg
-TlVMTCk7DQo+IC0NCj4gLQlsX2ZyZWUobm9kZS0+b3duZXIpOw0KPiAtCW5vZGUtPm93bmVyID0g
-TlVMTDsNCj4gLQ0KPiAtCWlmIChub2RlLT5wYXRoKSB7DQo+IC0JCWxfZGJ1c19vYmplY3RfcmVt
-b3ZlX2ludGVyZmFjZShkYnVzX2dldF9idXMoKSwgbm9kZS0+cGF0aCwNCj4gLQkJCQkJCQlNRVNI
-X05PREVfSU5URVJGQUNFKTsNCj4gLQ0KPiAtCQlsX2RidXNfb2JqZWN0X3JlbW92ZV9pbnRlcmZh
-Y2UoZGJ1c19nZXRfYnVzKCksIG5vZGUtPnBhdGgsDQo+IC0JCQkJCQlNRVNIX01BTkFHRU1FTlRf
-SU5URVJGQUNFKTsNCj4gLQkJbF9mcmVlKG5vZGUtPmFwcF9wYXRoKTsNCj4gLQkJbm9kZS0+YXBw
-X3BhdGggPSBOVUxMOw0KPiAtCX0NCj4gKwlmcmVlX25vZGVfZGJ1c19yZXNvdXJjZXMobm9kZSk7
-DQo+ICB9DQo+ICANCj4gLQ0KPiAgc3RhdGljIGJvb2wgdmFsaWRhdGVfbW9kZWxfcHJvcGVydHko
-c3RydWN0IG5vZGVfZWxlbWVudCAqZWxlLA0KPiAgCQkJCQlzdHJ1Y3QgbF9kYnVzX21lc3NhZ2Vf
-aXRlciAqcHJvcGVydHksDQo+ICAJCQkJCXVpbnQ4X3QgKm51bV9tb2RlbHMsIGJvb2wgdmVuZG9y
-KQ0KPiBAQCAtMTYxMSwxNCArMTYwOCw5IEBAIGZhaWw6DQo+ICAJCS8qIEhhbmRsZSBmYWlsZWQg
-QXR0YWNoIHJlcXVlc3QgKi8NCj4gIAkJbm9kZV9yZWFkeV9mdW5jX3QgY2IgPSByZXEtPmNiOw0K
-PiAgDQo+IC0JCWxfcXVldWVfZm9yZWFjaChub2RlLT5lbGVtZW50cywgZnJlZV9lbGVtZW50X3Bh
-dGgsIE5VTEwpOw0KPiAtCQlsX2ZyZWUobm9kZS0+YXBwX3BhdGgpOw0KPiAtCQlub2RlLT5hcHBf
-cGF0aCA9IE5VTEw7DQo+ICsJCWZyZWVfbm9kZV9kYnVzX3Jlc291cmNlcyhub2RlKTsNCj4gIA0K
-PiAtCQlsX2ZyZWUobm9kZS0+b3duZXIpOw0KPiAtCQlub2RlLT5vd25lciA9IE5VTEw7DQo+ICAJ
-CWNiKHJlcS0+dXNlcl9kYXRhLCBNRVNIX0VSUk9SX0ZBSUxFRCwgbm9kZSk7DQo+IC0NCj4gIAl9
-IGVsc2Ugew0KPiAgCQkvKiBIYW5kbGUgZmFpbGVkIEpvaW4gYW5kIENyZWF0ZSByZXF1ZXN0cyAq
-Lw0KPiAgCQlpZiAobm9kZSk=
+Hi,
+
+We are using Zephyr Mesh onoff example on nrf52 eval kit to test the Mesh F=
+unctionality.For provisioning of the
+node we are using meshctl tool.
+
+But is there any other way to provision a node using a python script.I foun=
+d a test-mesh script in the test folder=20
+of bluez stack ,but i was unable to provision and test a node with it.Could=
+ you share a test procedure if any.
+
+--
+Thanks
+
+
+
+
+
