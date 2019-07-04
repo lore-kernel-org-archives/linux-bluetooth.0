@@ -2,107 +2,144 @@ Return-Path: <SRS0=WywE=VB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FDCC0651C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6008C06513
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CA652082E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A15D2082E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Jul 2019 12:33:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="i1n5EjwI"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="boBnnQQ/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727770AbfGDMdq (ORCPT
+        id S1727776AbfGDMdr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Jul 2019 08:33:46 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:42990 "EHLO
+        Thu, 4 Jul 2019 08:33:47 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:46831 "EHLO
         mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727768AbfGDMdp (ORCPT
+        with ESMTP id S1727698AbfGDMdq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Jul 2019 08:33:45 -0400
-Received: by mail-lj1-f194.google.com with SMTP id t28so5988576lje.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2019 05:33:44 -0700 (PDT)
+        Thu, 4 Jul 2019 08:33:46 -0400
+Received: by mail-lj1-f194.google.com with SMTP id v24so5991698ljg.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2019 05:33:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U3doyi/oIBgrWoo6lZoqBf/FoW6Brbnlh7rxX+qhdko=;
-        b=i1n5EjwI7BaD/0KEJc19WE4SYCU3oVzyqpx25zbKDL5kTB4+6fY3S5oTLYRw4rrEmP
-         b7CHpfN5o5EURn8Il9W+vt1fgiKS+d4F+kRdT7TtT0UT+TqB04OKgWsnwO8OPO6XFp4k
-         gcGrSrAFN8FLRhVeNWwlZRJOZHSAclnY9HPoB3HuXQelHLs6f+1ohmI9vSngAotfc7IH
-         QSZrFglHVvqGCmsHXuvXJpw9dwoeu525LkvJ40KhaTDbcFoMQL1vwh5eQGoH3mPQTPoM
-         +Ue34NeQBROeIfMTMZUda/vTDm2S6OzWhOtp+G/9KHQmGcMfKzWB/McXc86bK7qafkOH
-         mJDA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Hfn5WItLjDEvtXacOrZrP/C8lF0XtOwOiop6cRRDn0o=;
+        b=boBnnQQ/kktuCq57qazE39WyLNn7rj3Q2YubyYqwBw8OhAmJWyj1+M4uCWDm3MRsZ5
+         4CmQ3XGDfv1Xb1lYLBWOR3BmCWIBnY1YQrqxXLgVg1oy5Uao7EKQ0B+rP3HU4xNfAhkW
+         GoCYL7p1f28HC/PWSpAA/iZBDseSuMZ7V4KCdrhI3ljy/ikELUBkX8Db+JJR8pO6Zfms
+         rCgs69Ltu4+PNzl0Su63TWCEZjZBdaq2usJWmeXHylF+cvmps9MgatGy3pxQTT1BzLwx
+         sBTHLvbu3tk5g9ZkEU0fInBblsip/PfIePPnmVjN/VS8k1Jf81CYSZog2K70eYr1j64Q
+         Jkmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U3doyi/oIBgrWoo6lZoqBf/FoW6Brbnlh7rxX+qhdko=;
-        b=Wo9wn7M+SCEjTKOP8U3jNAtFcPibRHyF1/lT19lzj8fcL+bP83QJ/j6dNFc6s2UdE6
-         MUT0vaqE/urINibRqZOl4yDPc8gaENVknJPDafHl+hBTEf1BZNagZH6yTDcSLUrYhIbe
-         aokCNQuto0wwDKfX3QcvdPW6IBWLQpax4ZE0U8zflMnUYVoJsrYy4buiD93ib3SfcBNM
-         hEtuWPbHluA3HZmJzTYRvEhN2SRTpxR7nV7ldyk7rh7H38Z7rEi7+uznq05KCtr79JKZ
-         bhmUbJCMf12r4nEZQq1SXndph9WUSmgAKqRIEpIVfPmqz/kGLAp7f4uFRJPwuPLBmqzU
-         asUQ==
-X-Gm-Message-State: APjAAAXG9aa8lv34QelYqdiMLjGZdLlI6WiI5rcCj843qRShvJvM+fy2
-        YeQJg7xTohvQ7+JwAx1fZxM9qqVXDFM=
-X-Google-Smtp-Source: APXvYqwN9dRGZakh1bNTLJLLmgNnyAMikb2jQzHQhGHJWFIqrPWy0cuAMDvL3RA+enUt6tdfov5phg==
-X-Received: by 2002:a2e:9758:: with SMTP id f24mr8508856ljj.58.1562243623210;
-        Thu, 04 Jul 2019 05:33:43 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Hfn5WItLjDEvtXacOrZrP/C8lF0XtOwOiop6cRRDn0o=;
+        b=noxTvX0VILxb0qUWAuKRCDPuzFkfPonlA12yNwHNJ8tS3iiz5If163GsCyABbti7Hj
+         SHignz1vJFo54nw6r8ri1ksUeQzxpMP1KYsrMD0NhKgdKwK0qVBkqCBw3i/uR/ooSx8d
+         WuF8c1kTX5eLUCXUiNV94skfwb2htMYd8gL3vR1HsvPhky+iS2Noa5DLZztrrNJnzQlp
+         llOy5DACQuqES8IdFCmEL0DkYhhBZ1GBcj4bB3lO6adRFT6MDcKymgrl4TlZsVzlxnfG
+         bBi8N4J+1XuGhWZEMEJxZ6H4NZDC7FCSb6I6no8+i03/XpV5xTvOPgp8RaJ//oKqelVA
+         0I2A==
+X-Gm-Message-State: APjAAAWA01em/0o2w3dz1b8xfppbVnu7YeLmVSp/pzoeJ/ubFKUzoZx6
+        5TNaviJecFhgr1Ja2/nNdTJD2620xA4=
+X-Google-Smtp-Source: APXvYqwikterp6c7TDTdYbl9eCCz6zUl67wpHDM7LvzF0bZycmWKwSd2L3DlnBgYYT+zkvQU2GpE/A==
+X-Received: by 2002:a2e:9147:: with SMTP id q7mr5589021ljg.19.1562243624449;
+        Thu, 04 Jul 2019 05:33:44 -0700 (PDT)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id g68sm1126151ljg.47.2019.07.04.05.33.42
-        for <linux-bluetooth@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id g68sm1126151ljg.47.2019.07.04.05.33.43
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 04 Jul 2019 05:33:42 -0700 (PDT)
+        Thu, 04 Jul 2019 05:33:43 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 0/5]  Add possibility to use remote device keys
-Date:   Thu,  4 Jul 2019 14:33:33 +0200
-Message-Id: <20190704123338.5988-1-michal.lowas-rzechonek@silvair.com>
+Cc:     Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v5 1/5] mesh: Cleanup l_dbus_message_... API usage in models
+Date:   Thu,  4 Jul 2019 14:33:34 +0200
+Message-Id: <20190704123338.5988-2-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190704123338.5988-1-michal.lowas-rzechonek@silvair.com>
+References: <20190704123338.5988-1-michal.lowas-rzechonek@silvair.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-+Fix build/checkpatch errors
-+Remove unused APP_IDX_NET and APP_IDX_ANY
-+Fix handling of incoming packets marked with APP_IDX_DEV_REMOTE
-+Fix usage of l_dbus_message_new_method_return
-+Fix usage of l_dbus_message_builder APIs
+---
+ mesh/model.c | 34 ++++++++++++----------------------
+ 1 file changed, 12 insertions(+), 22 deletions(-)
 
-
-This patchset adds support for sending and receiving messages encrypted
-with remote device keys.
-
-This plugs a 'loophole' in the API where it was possible to exchange
-such messages using Send()/MessageReceived() API by using 0x7fff app key
-index.
-
-In order to allow the application to receive responses from a local
-Config Server model, messages originating from a local node and
-encrypted using local device key are also forwarded to the application
-via D-Bus (assuming they were not handled by one of internal models).
-
-Michał Lowas-Rzechonek (5):
-  mesh: Cleanup l_dbus_message_... API usage in models
-  mesh: Cleanup D-Bus method returns with empty result
-  mesh: Split APP_IDX_DEV into APP_IDX_DEV_LOCAL and APP_IDX_DEV_REMOTE
-  mesh: Implement DevKeySend() method on Node interface
-  mesh: Handle messages encrypted with a remote device key
-
- mesh/cfgmod-server.c |  15 +++---
- mesh/model.c         | 124 ++++++++++++++++++++++++++++++-------------
- mesh/net.h           |   8 +--
- mesh/node.c          |  71 +++++++++++++++++++------
- 4 files changed, 154 insertions(+), 64 deletions(-)
-
+diff --git a/mesh/model.c b/mesh/model.c
+index 7401dcecb..868fe9e52 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -249,10 +249,10 @@ static void config_update_model_pub_period(struct mesh_node *node,
+ 								&period);
+ 
+ 	l_dbus_message_builder_leave_array(builder);
+-	if (l_dbus_message_builder_finalize(builder))
+-		l_dbus_send(dbus, msg);
+-
++	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
++
++	l_dbus_send(dbus, msg);
+ }
+ 
+ static void append_dict_uint16_array(struct l_dbus_message_builder *builder,
+@@ -291,10 +291,10 @@ static void config_update_model_bindings(struct mesh_node *node,
+ 	append_dict_uint16_array(builder, mod->bindings, "Bindings");
+ 
+ 	l_dbus_message_builder_leave_array(builder);
+-	if (l_dbus_message_builder_finalize(builder))
+-		l_dbus_send(dbus, msg);
+-
++	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
++
++	l_dbus_send(dbus, msg);
+ }
+ 
+ static void forward_model(void *a, void *b)
+@@ -714,25 +714,15 @@ static void send_msg_rcvd(struct mesh_node *node, uint8_t ele_idx, bool is_sub,
+ 
+ 	builder = l_dbus_message_builder_new(msg);
+ 
+-	if (!l_dbus_message_builder_append_basic(builder, 'q', &src))
+-		goto error;
++	l_dbus_message_builder_append_basic(builder, 'q', &src);
++	l_dbus_message_builder_append_basic(builder, 'q', &key_idx);
++	l_dbus_message_builder_append_basic(builder, 'b', &is_sub);
++	dbus_append_byte_array(builder, data, size);
+ 
+-	if (!l_dbus_message_builder_append_basic(builder, 'q', &key_idx))
+-		goto error;
+-
+-	if (!l_dbus_message_builder_append_basic(builder, 'b', &is_sub))
+-		goto error;
+-
+-	if (!dbus_append_byte_array(builder, data, size))
+-		goto error;
+-
+-	if (!l_dbus_message_builder_finalize(builder))
+-		goto error;
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
+ 
+ 	l_dbus_send(dbus, msg);
+-
+-error:
+-	l_dbus_message_builder_destroy(builder);
+ }
+ 
+ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
 -- 
 2.19.1
 
