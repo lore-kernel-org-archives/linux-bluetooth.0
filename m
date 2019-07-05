@@ -2,118 +2,204 @@ Return-Path: <SRS0=EGv/=VC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF38C46499
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 07:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4492BC46499
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 07:33:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D4C3218BA
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 07:29:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C63B218C3
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 07:33:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXL5pa5r"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="BihSJiKe";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="QBOBVX4D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726436AbfGEH32 (ORCPT
+        id S1727651AbfGEHds (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jul 2019 03:29:28 -0400
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:35171 "EHLO
-        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725863AbfGEH32 (ORCPT
+        Fri, 5 Jul 2019 03:33:48 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:43210 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725862AbfGEHds (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jul 2019 03:29:28 -0400
-Received: by mail-yw1-f68.google.com with SMTP id o7so1404042ywi.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2019 00:29:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hAJyrHvDZtwVuzH3RZAjPqQlRNu6PlXAJBAkOhCsREI=;
-        b=AXL5pa5r5cP8W/9U1FoxwLwzKbMklToYjsWZiNFSioVm4Dqk74eEqoo2HUjQ/q1ni3
-         IPY1Y095lTwiaibV0HDnV3bv7VzsdQ5/e7Btt+ib3FWrXu7LVD8jNBOuFEbXTaMr0Pr0
-         KHTSNJ3EaiCiKezQhQZnbTfzZZbf99MSkbTFijvC/XkC90LBxEXz0tGvu/0GMrTv/scq
-         fetDi5bNy7db9ykKen4fWHc3k7l60Cu8oP45TQIT+ZzU4z6t41sOcv177hJKQsYpcnwT
-         vXRtwx1SD2An4Ii99RTwda9HPBWyL6O4Pg2G1eAvxxzWdVoX0p4f1i1YLagJ3NxzWdzl
-         wOcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hAJyrHvDZtwVuzH3RZAjPqQlRNu6PlXAJBAkOhCsREI=;
-        b=c8fAjR/snu08E8FQX3eQfpkTLk6c/eNsV1O1WGWx3WeMUdPkYqmHe12YezRgtW7wfA
-         MhcLRswj1O2EwLTId2/1ncujL9+ixt/votgFoJW0irkk0ixIuLXZdJ7JYDMC2I7CsyIQ
-         YRcoaREfxxnxfvYDctLKfvzQ94L9zPniH6ruihWLhsx03/NNP9+OxbsKQr9OrHuKLa2U
-         Ol0rSmfzIdry74GM4j907CwzZTcXntG24NewKNaehy76RWZWZ6td1P3s4NhauGUbwPGe
-         t6jNmbrczXQRqLWrA5V4AyD35QkArZBhHbdxR9eKi1D0q8GV5IUq1m5QkjoMi7OICQ14
-         hyRQ==
-X-Gm-Message-State: APjAAAXzTHtDFw3ISUwdMM+y5jIxPVUsLlqWvlQxlbw40KDfkGcWcosR
-        obLic97IwJr6fgKjOlogg11j1IqMT7tNbNxMwYE=
-X-Google-Smtp-Source: APXvYqzTehM0xDk4zYc71Ik4uZjo0c1rlu9UKUTmiFwZQif5b9soJoxSG9KH6Cr13Mr4ytA6+yCwcP1+oHrklHSB9Z4=
-X-Received: by 2002:a81:6586:: with SMTP id z128mr1206754ywb.12.1562311767825;
- Fri, 05 Jul 2019 00:29:27 -0700 (PDT)
+        Fri, 5 Jul 2019 03:33:48 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 8488260AA8; Fri,  5 Jul 2019 07:33:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1562312027;
+        bh=nPMhnj+zcNooc/1ChtGLQSB7ksNEaj/QPLBEWR76RO0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=BihSJiKeUDChR6i3Dp7K6l69lFTP6+7D7jDvkYQ4xNGZdjp+87ihRex3SwcxuVlOA
+         7rEvma0l9tyeikvl41PXuopht8chWiBSiyboifQCdgg+Bjgm0wki4niVK26LyjMMj0
+         0zYkqVR8c/7wh8B0e8hs4qlLmM9mveQEvUHHryLM=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id ABF54607EB;
+        Fri,  5 Jul 2019 07:33:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1562312026;
+        bh=nPMhnj+zcNooc/1ChtGLQSB7ksNEaj/QPLBEWR76RO0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=QBOBVX4Dag+b/K6K7G8Iza+n8Ph3SCMq4bPS0cIlgZuF5oTo2gb+epe0RRCFAmH6w
+         vN3y/S+/ltKWEH8NS0Jrk7FidcVwwBAhCGJV+Cimb/xiCbWuWgTpdeAibIXvk7JVAs
+         gOBRFRYZFF6HAZPcOT9SsAle7zI+lwNlFCJ8I5Os=
 MIME-Version: 1.0
-References: <20190704212644.GA13491@n14xzu>
-In-Reply-To: <20190704212644.GA13491@n14xzu>
-From:   Barry Byford <31baz66@gmail.com>
-Date:   Fri, 5 Jul 2019 08:29:16 +0100
-Message-ID: <CAAu3APaed3UXY646Vr+2WyKhFRoohDV=7=aeD6sANf9N4BJw-A@mail.gmail.com>
-Subject: Re: Missing manual? - GAP Central connecting to multiple peripherals.
-To:     John Whitmore <arigead@gmail.com>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 05 Jul 2019 13:03:46 +0530
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org
+Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, anubhavg@codeaurora.org
+Subject: Doubt/issue in hci_dev_do_close
+In-Reply-To: <a75d686f28a2c73562e9bbf5b601d37c@codeaurora.org>
+References: <1553689723-21017-2-git-send-email-c-hbandi@codeaurora.org>
+ <201903290535.u5TF12SC%lkp@intel.com> <20190328212320.GF112750@google.com>
+ <a75d686f28a2c73562e9bbf5b601d37c@codeaurora.org>
+Message-ID: <e0f4f7acffb3abd2c0d1790a7cd79905@codeaurora.org>
+X-Sender: c-hbandi@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello John,
 
-There are various Python examples available in the tree under the test
-directory:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test
+Hi Marcel/Bluetooth Maintainers,
 
-There are a number of Python libraries that have been implemented to
-help with what you are looking to do.
-There is a list of some of them at:
-https://github.com/ukBaz/python-bluezero/wiki
+In hci_dev_do_close first it is sending vendor specific shutdown routine 
+and then after some operations it is sending
+the hci_reset command.
+However in vendor specific shutdown routine if vendor already powered 
+off the vendor chip. In those cases it will not
+send the HCI_RESET command. That may lead to bug or some cleanup 
+operations not done properly in Chip.
+Is there any specific reason why it is sending vendor specific shutdown 
+routine first and then sending HCI_RESET command.
 
-I hope that helps.
 
-Regards,
-Barry
+int hci_dev_do_close(struct hci_dev *hdev)
+{
+	bool auto_off;
 
-On Thu, 4 Jul 2019 at 22:32, John Whitmore <arigead@gmail.com> wrote:
->
-> BLE at the wrong end of a learning curve and trying to piece things together.
->
-> Perhaps I could just give a rough outline of the project. I want a Linux
-> device to listen for advertisements from a particular BLE sensor and connect
-> to those sensors, as and when they appear. Once connected, the Linux device
-> can send commands to the sensor, to turn on/off an LED or request sensor data
-> from each of the connected sensors.
->
-> The Linux kernel is 4.15 is an Ubuntu 16.04 based system.
->
-> I was looking at the latest bluez-5.50 doc directory but didn't see a file for
-> gap.txt, but adapter-api.txt looks like the API I'm looking for.
->
-> I'm trying to do this from Python, so currently thinking of using DBus
-> interface, another learning curve to address.
->
-> So after all that a specific bluex questions. I'm missing things, and possibly
-> incorrectly assuming that I need a certain kernel specified for bluez5.50, but
-> can't see any mention of versions of bluez relating to versions of kernel.
->
-> Secondly bluez-5.50 appears to be building an applicaiton, so I assume that
-> application has to be running to interface to Linux Kernel bluetooth stack and
-> handle the DBus API. So bluez should be a system service just started on
-> powerup?
->
-> Thanks for any help, I get the impression that this list is predominately for
-> guts of the Linux Kernel's bluetooth stack, but user side list is hard to
-> find.
->
-> Thanks again
->
-> John
+	BT_DBG("%s %p", hdev->name, hdev);
+
+	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+	    test_bit(HCI_UP, &hdev->flags)) {
+		/* Execute vendor specific shutdown routine */
+		if (hdev->shutdown)
+			hdev->shutdown(hdev);
+	}
+
+	cancel_delayed_work(&hdev->power_off);
+
+	hci_request_cancel_all(hdev);
+	hci_req_sync_lock(hdev);
+
+	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+		cancel_delayed_work_sync(&hdev->cmd_timer);
+		hci_req_sync_unlock(hdev);
+		return 0;
+	}
+
+	hci_leds_update_powered(hdev, false);
+
+	/* Flush RX and TX works */
+	flush_work(&hdev->tx_work);
+	flush_work(&hdev->rx_work);
+
+	if (hdev->discov_timeout > 0) {
+		hdev->discov_timeout = 0;
+		hci_dev_clear_flag(hdev, HCI_DISCOVERABLE);
+		hci_dev_clear_flag(hdev, HCI_LIMITED_DISCOVERABLE);
+	}
+
+	if (hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE))
+		cancel_delayed_work(&hdev->service_cache);
+
+	if (hci_dev_test_flag(hdev, HCI_MGMT)) {
+		struct adv_info *adv_instance;
+
+		cancel_delayed_work_sync(&hdev->rpa_expired);
+
+		list_for_each_entry(adv_instance, &hdev->adv_instances, list)
+			cancel_delayed_work_sync(&adv_instance->rpa_expired_cb);
+	}
+
+	/* Avoid potential lockdep warnings from the *_flush() calls by
+	 * ensuring the workqueue is empty up front.
+	 */
+	drain_workqueue(hdev->workqueue);
+
+	hci_dev_lock(hdev);
+
+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+
+	auto_off = hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF);
+
+	if (!auto_off && hdev->dev_type == HCI_PRIMARY &&
+	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+	    hci_dev_test_flag(hdev, HCI_MGMT))
+		__mgmt_power_off(hdev);
+
+	hci_inquiry_cache_flush(hdev);
+	hci_pend_le_actions_clear(hdev);
+	hci_conn_hash_flush(hdev);
+	hci_dev_unlock(hdev);
+
+	smp_unregister(hdev);
+
+	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
+
+	if (hdev->flush)
+		hdev->flush(hdev);
+
+	/* Reset device */
+	skb_queue_purge(&hdev->cmd_q);
+	atomic_set(&hdev->cmd_cnt, 1);
+	if (test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks) &&
+	    !auto_off && !hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
+		set_bit(HCI_INIT, &hdev->flags);
+		__hci_req_sync(hdev, hci_reset_req, 0, HCI_CMD_TIMEOUT, NULL);
+		clear_bit(HCI_INIT, &hdev->flags);
+	}
+
+	/* flush cmd  work */
+	flush_work(&hdev->cmd_work);
+
+	/* Drop queues */
+	skb_queue_purge(&hdev->rx_q);
+	skb_queue_purge(&hdev->cmd_q);
+	skb_queue_purge(&hdev->raw_q);
+
+	/* Drop last sent command */
+	if (hdev->sent_cmd) {
+		cancel_delayed_work_sync(&hdev->cmd_timer);
+		kfree_skb(hdev->sent_cmd);
+		hdev->sent_cmd = NULL;
+	}
+
+	clear_bit(HCI_RUNNING, &hdev->flags);
+	hci_sock_dev_event(hdev, HCI_DEV_CLOSE);
+
+	/* After this point our queues are empty
+	 * and no tasks are scheduled. */
+	hdev->close(hdev);
+
+	/* Clear flags */
+	hdev->flags &= BIT(HCI_RAW);
+	hci_dev_clear_volatile_flags(hdev);
+
+	/* Controller radio is available but is currently powered down */
+	hdev->amp_status = AMP_STATUS_POWERED_DOWN;
+
+	memset(hdev->eir, 0, sizeof(hdev->eir));
+	memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
+	bacpy(&hdev->random_addr, BDADDR_ANY);
+
+	hci_req_sync_unlock(hdev);
+
+	hci_dev_put(hdev);
+	return 0;
+}
