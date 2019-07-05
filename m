@@ -2,118 +2,209 @@ Return-Path: <SRS0=EGv/=VC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A40C5B57D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 05:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6EBC5B57D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 06:58:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E48821850
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 05:31:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=HubbellIncorporated.onmicrosoft.com header.i=@HubbellIncorporated.onmicrosoft.com header.b="EWi7Aahp"
+	by mail.kernel.org (Postfix) with ESMTP id 1BA8121670
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 06:58:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727436AbfGEFbp (ORCPT
+        id S1726004AbfGEG6e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jul 2019 01:31:45 -0400
-Received: from mx0a-00126502.pphosted.com ([148.163.149.67]:46488 "EHLO
-        mx0a-00126502.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725772AbfGEFbo (ORCPT
+        Fri, 5 Jul 2019 02:58:34 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:36634 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725894AbfGEG6e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jul 2019 01:31:44 -0400
-X-Greylist: delayed 606 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Jul 2019 01:31:43 EDT
-Received: from pps.filterd (m0100722.ppops.net [127.0.0.1])
-        by mx0a-00126502.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x655LZGd001153
-        for <linux-bluetooth@vger.kernel.org>; Fri, 5 Jul 2019 01:21:37 -0400
-Received: from nam01-bn3-obe.outbound.protection.outlook.com (mail-bn3nam01lp2053.outbound.protection.outlook.com [104.47.33.53])
-        by mx0a-00126502.pphosted.com with ESMTP id 2thq1r949p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2019 01:21:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=HubbellIncorporated.onmicrosoft.com;
- s=selector2-HubbellIncorporated-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=S1e7hhEdjA4jUDCweUFGMkfH8a0mm15cduxi+MbvO5Q=;
- b=EWi7AahpqjD7nN5j//UvBbTeCKKAp+At3cJdBIfPc8GBceGmsXML2wshzqn/q25iiJ+DM4zpDwLy2C/Xx34jH+v7P6slBsCRET7qbmQsuoKue8s/lgEUCl2JR6+D8c8bXUtIc7tIL0vIKKzEi+NS9jvJYFyGcqhg6AMasYTrhxk=
-Received: from BYAPR18MB2406.namprd18.prod.outlook.com (20.179.91.87) by
- BYAPR18MB2903.namprd18.prod.outlook.com (20.179.58.218) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Fri, 5 Jul 2019 05:21:33 +0000
-Received: from BYAPR18MB2406.namprd18.prod.outlook.com
- ([fe80::2dc4:3268:a9a7:327d]) by BYAPR18MB2406.namprd18.prod.outlook.com
- ([fe80::2dc4:3268:a9a7:327d%6]) with mapi id 15.20.2052.010; Fri, 5 Jul 2019
- 05:21:33 +0000
-From:   "V, Arunkumar" <avenkatramani@hubbell.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Bluez communication with iPhone
-Thread-Topic: RE: Bluez communication with iPhone
-Thread-Index: AdUy8RDTYAzm+V0eRXurvZ2DiO7dbA==
-Date:   Fri, 5 Jul 2019 05:21:33 +0000
-Message-ID: <BYAPR18MB2406B91235BF8B369D286A6FB7F50@BYAPR18MB2406.namprd18.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [182.65.180.178]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f0e1f7a3-a34d-4aea-4987-08d70108a527
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:BYAPR18MB2903;
-x-ms-traffictypediagnostic: BYAPR18MB2903:
-x-microsoft-antispam-prvs: <BYAPR18MB29031BCF66B69E8C67348F68B7F50@BYAPR18MB2903.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 008960E8EC
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(396003)(136003)(376002)(39850400004)(366004)(189003)(199004)(71190400001)(71200400001)(486006)(25786009)(229853002)(66946007)(76116006)(64756008)(66556008)(66476007)(186003)(73956011)(66446008)(102836004)(53546011)(7696005)(6916009)(3480700005)(6506007)(26005)(52536014)(55236004)(14444005)(316002)(476003)(256004)(5660300002)(99286004)(478600001)(66066001)(6246003)(2351001)(14454004)(3846002)(6116002)(53936002)(68736007)(74316002)(2501003)(305945005)(7736002)(4744005)(81166006)(81156014)(8676002)(8936002)(2906002)(5640700003)(9686003)(33656002)(6436002)(55016002)(86362001);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR18MB2903;H:BYAPR18MB2406.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: hubbell.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: +11ntkRCUXnb4/qhaLNkHOx3GSvX8BfAVNePm4wIdax6mn3KX+YFCgUb6qPWqdcd/eUcYQWGBIv6GzdjJny+rbiYiYYlBV+Aat0lILg0+XRZV/1+BoXH+qZH8+UAZc7He42En4bVZrLdnOTIOCWwMqJwh4hvcdarFCheicsKqQm8BR6wy3K4JbNRed58YCi7Jbu8UhkbN8oRTsuL8T7fGGmZskLXZryUSZfDWJRNzJ/e9r0iKtejYOcWOJsWNtOcd2JgpOAvYvZQkJtw3CJ9UWNW+edJ82o0+L5+8ZKhIFZVdJhVd5CKudk+sM1A6+KyUf02Dpk4oyFGBWOOOxmUpvdeuei5YiJRu7FYaU4eXUruJ5BwxBBEd+iexscBc+X2D0ovh3nXxd6VLZvJc9QjTrsr9OLfocW8hQGLBfT18PY=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: hubbell.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0e1f7a3-a34d-4aea-4987-08d70108a527
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jul 2019 05:21:33.5387
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b984e578-dd3f-4fcd-afea-1c381ab634f3
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: avenkatramani@hubbell.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2903
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-05_01:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=944 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907050068
+        Fri, 5 Jul 2019 02:58:34 -0400
+Received: from mail-pf1-f199.google.com ([209.85.210.199])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <kai.heng.feng@canonical.com>)
+        id 1hjIAy-0006Ya-KP
+        for linux-bluetooth@vger.kernel.org; Fri, 05 Jul 2019 06:58:32 +0000
+Received: by mail-pf1-f199.google.com with SMTP id g21so5042911pfb.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2019 23:58:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=eZqEf7xmNMA5rKDyuD/VrM2oNxltKYjl6KQelNpHGU0=;
+        b=EoqcT1KkKaRl+2E8ePV7eSodtF6Pw0HQ0zKqCOHFjFn0ZR1cjzqD3qzK46KcVLXJ38
+         SeQsXX42BSXty/guG6Mw6gWcKXYE+4TI6UEkeE4DUtaCpHNl4i3MdOZx9r1iBICG8hQC
+         RTkNyT6HhbRTg/yybU0uL9i7vQ8XRD5zdEZceuq9sKHEa8TpaBRUpt+aBY9smko8gG6K
+         7372roO54Au3mH7WfAHUt81gySnNz2dcyURrdBBPQ4gnnB+BFCekhvEyXDbp0M0r9Nbc
+         GOGLXnZKdAqp1abN99ppSi/H5xGtR9v6h7tahYHgJGCe+Fs5gYUuBwzjJaxk8WvN4On/
+         cfxw==
+X-Gm-Message-State: APjAAAVRz3RBS8UbtTNg+DKHQHY/sDNX22YWW3zYa3u/pz6EBAaGFcA/
+        cHVD0fSNxY+nIMBpiuE2ClxjyY3WZCHYYhhRQdOJU4o8FNOlke65WkQVlAHQvu20jQw32K9qR/a
+        9waLzJXk+GRGYYfrOiROs3/hKylQR7Vr7PesQrLiiuTkRHQ==
+X-Received: by 2002:a17:902:44f:: with SMTP id 73mr3214082ple.192.1562309911067;
+        Thu, 04 Jul 2019 23:58:31 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxBm9SG0ZQzZ64kySYWGAdtvXFMn9O0/qVGQhPZocuEH4uFbJqztt2EWTn/JflEVJBdM4+NcA==
+X-Received: by 2002:a17:902:44f:: with SMTP id 73mr3214051ple.192.1562309910800;
+        Thu, 04 Jul 2019 23:58:30 -0700 (PDT)
+Received: from 2001-b011-380f-3511-154d-4126-51e3-28cb.dynamic-ip6.hinet.net (2001-b011-380f-3511-154d-4126-51e3-28cb.dynamic-ip6.hinet.net. [2001:b011:380f:3511:154d:4126:51e3:28cb])
+        by smtp.gmail.com with ESMTPSA id 196sm8945565pfy.167.2019.07.04.23.58.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Jul 2019 23:58:30 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii;
+        delsp=yes;
+        format=flowed
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v2 1/2] Bluetooth: Disable LE Advertising in
+ hci_suspend_dev()
+From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
+In-Reply-To: <329E5979-6716-4776-9B1A-1859998D19D0@canonical.com>
+Date:   Fri, 5 Jul 2019 14:58:27 +0800
+Cc:     Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <E5997B89-4FEF-4FD5-BA4E-852E39DCFA75@canonical.com>
+References: <20190430092544.13653-1-kai.heng.feng@canonical.com>
+ <329E5979-6716-4776-9B1A-1859998D19D0@canonical.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+at 11:00, Kai Heng Feng <kai.heng.feng@canonical.com> wrote:
 
-Hi team,
+> Hi Marcel,
+>
+> at 5:25 PM, Kai-Heng Feng <kai.heng.feng@canonical.com> wrote:
+>
+>> LE Advertising may wake up system during system-wide sleep, disable it
+>> to prevent this issue from happening.
+>>
+>> Do the reverse in hci_resume_dev().
+>
+> Do you have any suggestion for this patch?
 
-Any update on the BLE iPhone communication.
+Please let me know where I can do further improvement.
 
-Regards,
-Arunkumar.V
+This can solve a hard freeze during system suspend.
+
+Kai-Heng
+
+>
+> Kai-Heng
+>
+>> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>> ---
+>> v2:
+>> - Abstract away enabling/disabling LE advertising from btusb.
+>>
+>>  include/net/bluetooth/hci_core.h |  1 +
+>>  net/bluetooth/hci_core.c         | 47 ++++++++++++++++++++++++++++++++
+>>  2 files changed, 48 insertions(+)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h  
+>> b/include/net/bluetooth/hci_core.h
+>> index 094e61e07030..65574943131d 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -269,6 +269,7 @@ struct hci_dev {
+>>  	__u16		le_max_rx_time;
+>>  	__u8		le_max_key_size;
+>>  	__u8		le_min_key_size;
+>> +	__u8		le_events[8];
+>>  	__u16		discov_interleaved_timeout;
+>>  	__u16		conn_info_min_age;
+>>  	__u16		conn_info_max_age;
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index d6b2540ba7f8..7c19e3b9294c 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -412,6 +412,49 @@ static void hci_setup_event_mask(struct hci_request  
+>> *req)
+>>  	hci_req_add(req, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
+>>  }
+>>
+>> +static int hci_enable_le_advertising_req(struct hci_request *req,  
+>> unsigned long opt)
+>> +{
+>> +	struct hci_dev *hdev = req->hdev;
+>> +	u8 events[8];
+>> +	memcpy(events, hdev->le_events, sizeof(events));
+>> +
+>> +	hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
+>> +			events);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int hci_disable_le_advertising_req(struct hci_request *req,  
+>> unsigned long opt)
+>> +{
+>> +	struct hci_dev *hdev = req->hdev;
+>> +
+>> +	u8 events[8];
+>> +	memcpy(events, hdev->le_events, sizeof(events));
+>> +
+>> +	events[0] &= ~(u8)0x02;	/* LE Advertising Report */
+>> +
+>> +	hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
+>> +			events);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int hci_enable_le_advertising(struct hci_dev *hdev)
+>> +{
+>> +	if (!lmp_le_capable(hdev))
+>> +		return 0;
+>> +
+>> +	return __hci_req_sync(hdev, hci_enable_le_advertising_req, 0,  
+>> HCI_CMD_TIMEOUT, NULL);
+>> +}
+>> +
+>> +static int hci_disable_le_advertising(struct hci_dev *hdev)
+>> +{
+>> +	if (!lmp_le_capable(hdev))
+>> +		return 0;
+>> +
+>> +	return __hci_req_sync(hdev, hci_disable_le_advertising_req, 0,  
+>> HCI_CMD_TIMEOUT, NULL);
+>> +}
+>> +
+>>  static int hci_init2_req(struct hci_request *req, unsigned long opt)
+>>  {
+>>  	struct hci_dev *hdev = req->hdev;
+>> @@ -772,6 +815,8 @@ static int hci_init3_req(struct hci_request *req,  
+>> unsigned long opt)
+>>  		}
+>>
+>>  		hci_set_le_support(req);
+>> +
+>> +		memcpy(hdev->le_events, events, sizeof(events));
+>>  	}
+>>
+>>  	/* Read features beyond page 1 if available */
+>> @@ -3431,6 +3476,7 @@ EXPORT_SYMBOL(hci_unregister_dev);
+>>  /* Suspend HCI device */
+>>  int hci_suspend_dev(struct hci_dev *hdev)
+>>  {
+>> +	hci_disable_le_advertising(hdev);
+>>  	hci_sock_dev_event(hdev, HCI_DEV_SUSPEND);
+>>  	return 0;
+>>  }
+>> @@ -3440,6 +3486,7 @@ EXPORT_SYMBOL(hci_suspend_dev);
+>>  int hci_resume_dev(struct hci_dev *hdev)
+>>  {
+>>  	hci_sock_dev_event(hdev, HCI_DEV_RESUME);
+>> +	hci_enable_le_advertising(hdev);
+>>  	return 0;
+>>  }
+>>  EXPORT_SYMBOL(hci_resume_dev);
+>> -- 
+>> 2.17.1
 
 
-
-From: V, Arunkumar=20
-Sent: 03 July 2019 10:58 AM
-To: linux-bluetooth@vger.kernel.org
-Subject: Bluez communication with iPhone
-
-Hi Team,
-I am using BlueZ 5.49. I am trying to run test/example - example-advertisem=
-ent.py with gatt profile.
-How to set the advertising flag which property/data field to set? Any examp=
-le on setting flags as general discovery, with LE only.
-I am facing issue with the iPhone connectivity - connection not happing (wi=
-th android working well).
-Thanks in advice.
-Regards,
-Arunkumar.V
