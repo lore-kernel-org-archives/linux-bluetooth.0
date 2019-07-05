@@ -2,209 +2,134 @@ Return-Path: <SRS0=EGv/=VC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6EBC5B57D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 06:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41619C5B57D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 07:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BA8121670
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 06:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B214921670
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Jul 2019 07:01:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=temperror (0-bit key) header.d=phytec.in header.i=@phytec.in header.b="G1S+XdZo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726004AbfGEG6e (ORCPT
+        id S1727159AbfGEHBD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Jul 2019 02:58:34 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:36634 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725894AbfGEG6e (ORCPT
+        Fri, 5 Jul 2019 03:01:03 -0400
+Received: from mickerik.phytec.de ([195.145.39.210]:62406 "EHLO
+        mickerik.phytec.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726012AbfGEHBC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Jul 2019 02:58:34 -0400
-Received: from mail-pf1-f199.google.com ([209.85.210.199])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1hjIAy-0006Ya-KP
-        for linux-bluetooth@vger.kernel.org; Fri, 05 Jul 2019 06:58:32 +0000
-Received: by mail-pf1-f199.google.com with SMTP id g21so5042911pfb.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2019 23:58:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=eZqEf7xmNMA5rKDyuD/VrM2oNxltKYjl6KQelNpHGU0=;
-        b=EoqcT1KkKaRl+2E8ePV7eSodtF6Pw0HQ0zKqCOHFjFn0ZR1cjzqD3qzK46KcVLXJ38
-         SeQsXX42BSXty/guG6Mw6gWcKXYE+4TI6UEkeE4DUtaCpHNl4i3MdOZx9r1iBICG8hQC
-         RTkNyT6HhbRTg/yybU0uL9i7vQ8XRD5zdEZceuq9sKHEa8TpaBRUpt+aBY9smko8gG6K
-         7372roO54Au3mH7WfAHUt81gySnNz2dcyURrdBBPQ4gnnB+BFCekhvEyXDbp0M0r9Nbc
-         GOGLXnZKdAqp1abN99ppSi/H5xGtR9v6h7tahYHgJGCe+Fs5gYUuBwzjJaxk8WvN4On/
-         cfxw==
-X-Gm-Message-State: APjAAAVRz3RBS8UbtTNg+DKHQHY/sDNX22YWW3zYa3u/pz6EBAaGFcA/
-        cHVD0fSNxY+nIMBpiuE2ClxjyY3WZCHYYhhRQdOJU4o8FNOlke65WkQVlAHQvu20jQw32K9qR/a
-        9waLzJXk+GRGYYfrOiROs3/hKylQR7Vr7PesQrLiiuTkRHQ==
-X-Received: by 2002:a17:902:44f:: with SMTP id 73mr3214082ple.192.1562309911067;
-        Thu, 04 Jul 2019 23:58:31 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxBm9SG0ZQzZ64kySYWGAdtvXFMn9O0/qVGQhPZocuEH4uFbJqztt2EWTn/JflEVJBdM4+NcA==
-X-Received: by 2002:a17:902:44f:: with SMTP id 73mr3214051ple.192.1562309910800;
-        Thu, 04 Jul 2019 23:58:30 -0700 (PDT)
-Received: from 2001-b011-380f-3511-154d-4126-51e3-28cb.dynamic-ip6.hinet.net (2001-b011-380f-3511-154d-4126-51e3-28cb.dynamic-ip6.hinet.net. [2001:b011:380f:3511:154d:4126:51e3:28cb])
-        by smtp.gmail.com with ESMTPSA id 196sm8945565pfy.167.2019.07.04.23.58.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Jul 2019 23:58:30 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii;
-        delsp=yes;
-        format=flowed
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: Disable LE Advertising in
- hci_suspend_dev()
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <329E5979-6716-4776-9B1A-1859998D19D0@canonical.com>
-Date:   Fri, 5 Jul 2019 14:58:27 +0800
-Cc:     Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <E5997B89-4FEF-4FD5-BA4E-852E39DCFA75@canonical.com>
-References: <20190430092544.13653-1-kai.heng.feng@canonical.com>
- <329E5979-6716-4776-9B1A-1859998D19D0@canonical.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Fri, 5 Jul 2019 03:01:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; d=phytec.in; s=a1; c=relaxed/simple;
+        q=dns/txt; i=@phytec.in; t=1562310061; x=1564902061;
+        h=From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=AuLlZ7zAbVOzaA7+iV6q0y45tQK8OT1Izx2ZUdwQM30=;
+        b=G1S+XdZoC62bl/s9W9bz95WV6JD2ds6GKHkTOC++ubTJ169r2qaqpP7d+mTRfnPp
+        xUydMOuge2jWmSrzPK+9cEevfsPiWD1DMhLVjTi1hR88z8LPwatMw+I12u0qnsP1
+        Ex8NuCbXeBBCfbHf26ir9ASWFqm6MCQfTwNscA+BOtQ=;
+X-AuditID: c39127d2-193ff70000001aee-f9-5d1ef5ad150b
+Received: from tumirnix.phytec.de (tumirnix.phytec.de [172.16.0.38])
+        by mickerik.phytec.de (PHYTEC Mail Gateway) with SMTP id 60.F0.06894.DA5FE1D5; Fri,  5 Jul 2019 09:01:01 +0200 (CEST)
+MIME-Version: 1.0
+X-Disclaimed: 1
+Sensitivity: 
+Importance: Normal
+X-Priority: 3 (Normal)
+In-Reply-To: <47E2CBA9-0E7D-46D7-AB94-E27B54AAE110@intel.com>
+References: <47E2CBA9-0E7D-46D7-AB94-E27B54AAE110@intel.com>,
+        <OFCEFD7E67.77A1AF25-ONC125842D.001694FD-C125842D.001694FE@phytec.de>
+Subject: Re: Testing Bluetooth Mesh with python
+From:   Mahaboob Nazeer SK <nazeer.m@phytec.in>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Jonas Remmert <J.Remmert@phytec.de>
+Message-ID: <OFA0EEF328.803EDE57-ONC125842E.002572A3-C125842E.002668F9@phytec.de>
+Date:   Fri, 5 Jul 2019 08:59:32 +0200
+X-Mailer: Lotus Domino Web Server Release 9.0.1FP7 August  17, 2016
+X-MIMETrack: Serialize by http on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 05.07.2019 08:59:32,
+        Serialize complete at 05.07.2019 08:59:32,
+        Serialize by Router on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 05.07.2019 08:59:32
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrGLMWRmVeSWpSXmKPExsWyRoBBTXftV7lYg0frVCxWzFjNZjHnWh+z
+        A5PH4j0vmTw+b5ILYIrisklJzcksSy3St0vgymg4NYe14DFPxYtZD9kbGOdxdTFyckgImEhs
+        n9DF3MXIxSEksIdR4uL/dhaQBK+AoMTJmU9YIIr4JT79aWUDsYUFeCU2vZ3NCGJzCghJdFzt
+        ZIWoEZOYsO4XM0TcVmJRy2cWiKGtjBLzl/9kh2jWl9i7bgtYEZuArsTKCw/BBokIqElcvH4A
+        LM4skCfxd/J8ZogjAiXmrVkBtoBFQEXi+9Q97BDLnCUW/7kAtkBCoIFJ4tDjbUxdjBxAzeoS
+        6+cJQczRlli28DXzBEbhWUj+mYVQNQtJ1QJG5lWMQrmZydmpRZnZegUZlSWpyXopqZsYgWF9
+        eKL6pR2MfXM8DjEycTAeYpTgYFYS4f3+WyZWiDclsbIqtSg/vqg0J7X4EKM0B4uSOO8G3pIw
+        IYH0xJLU7NTUgtQimCwTB6dUAyMnn6HAi98NS6KV1pY0nJ9bNcHlVdGxjcXT7ss1b5He+mmS
+        8420c9z9OX+WX7SYdLifQb5eiSk48Igfd/zp/D/H/+8yM52ccsFh+h89Qz/z4me7GFea78+4
+        msOZfKzEfhWb1M151a3PBVNmlJp0nhOJTfWrqb+4Pta/mXPmq3QWRgMFue23/iuxFGckGmox
+        FxUnAgCEOz84WQIAAA==
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-at 11:00, Kai Heng Feng <kai.heng.feng@canonical.com> wrote:
+Hi Brian,
 
-> Hi Marcel,
->
-> at 5:25 PM, Kai-Heng Feng <kai.heng.feng@canonical.com> wrote:
->
->> LE Advertising may wake up system during system-wide sleep, disable it
->> to prevent this issue from happening.
->>
->> Do the reverse in hci_resume_dev().
->
-> Do you have any suggestion for this patch?
+Thank you for that information.It's good to know.=20
 
-Please let me know where I can do further improvement.
+Do you have any expected timeline like when this could=20
+be pushed out.
 
-This can solve a hard freeze during system suspend.
-
-Kai-Heng
-
->
-> Kai-Heng
->
->> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
->> ---
->> v2:
->> - Abstract away enabling/disabling LE advertising from btusb.
->>
->>  include/net/bluetooth/hci_core.h |  1 +
->>  net/bluetooth/hci_core.c         | 47 ++++++++++++++++++++++++++++++++
->>  2 files changed, 48 insertions(+)
->>
->> diff --git a/include/net/bluetooth/hci_core.h  
->> b/include/net/bluetooth/hci_core.h
->> index 094e61e07030..65574943131d 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -269,6 +269,7 @@ struct hci_dev {
->>  	__u16		le_max_rx_time;
->>  	__u8		le_max_key_size;
->>  	__u8		le_min_key_size;
->> +	__u8		le_events[8];
->>  	__u16		discov_interleaved_timeout;
->>  	__u16		conn_info_min_age;
->>  	__u16		conn_info_max_age;
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index d6b2540ba7f8..7c19e3b9294c 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -412,6 +412,49 @@ static void hci_setup_event_mask(struct hci_request  
->> *req)
->>  	hci_req_add(req, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
->>  }
->>
->> +static int hci_enable_le_advertising_req(struct hci_request *req,  
->> unsigned long opt)
->> +{
->> +	struct hci_dev *hdev = req->hdev;
->> +	u8 events[8];
->> +	memcpy(events, hdev->le_events, sizeof(events));
->> +
->> +	hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
->> +			events);
->> +
->> +	return 0;
->> +}
->> +
->> +static int hci_disable_le_advertising_req(struct hci_request *req,  
->> unsigned long opt)
->> +{
->> +	struct hci_dev *hdev = req->hdev;
->> +
->> +	u8 events[8];
->> +	memcpy(events, hdev->le_events, sizeof(events));
->> +
->> +	events[0] &= ~(u8)0x02;	/* LE Advertising Report */
->> +
->> +	hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
->> +			events);
->> +
->> +	return 0;
->> +}
->> +
->> +static int hci_enable_le_advertising(struct hci_dev *hdev)
->> +{
->> +	if (!lmp_le_capable(hdev))
->> +		return 0;
->> +
->> +	return __hci_req_sync(hdev, hci_enable_le_advertising_req, 0,  
->> HCI_CMD_TIMEOUT, NULL);
->> +}
->> +
->> +static int hci_disable_le_advertising(struct hci_dev *hdev)
->> +{
->> +	if (!lmp_le_capable(hdev))
->> +		return 0;
->> +
->> +	return __hci_req_sync(hdev, hci_disable_le_advertising_req, 0,  
->> HCI_CMD_TIMEOUT, NULL);
->> +}
->> +
->>  static int hci_init2_req(struct hci_request *req, unsigned long opt)
->>  {
->>  	struct hci_dev *hdev = req->hdev;
->> @@ -772,6 +815,8 @@ static int hci_init3_req(struct hci_request *req,  
->> unsigned long opt)
->>  		}
->>
->>  		hci_set_le_support(req);
->> +
->> +		memcpy(hdev->le_events, events, sizeof(events));
->>  	}
->>
->>  	/* Read features beyond page 1 if available */
->> @@ -3431,6 +3476,7 @@ EXPORT_SYMBOL(hci_unregister_dev);
->>  /* Suspend HCI device */
->>  int hci_suspend_dev(struct hci_dev *hdev)
->>  {
->> +	hci_disable_le_advertising(hdev);
->>  	hci_sock_dev_event(hdev, HCI_DEV_SUSPEND);
->>  	return 0;
->>  }
->> @@ -3440,6 +3486,7 @@ EXPORT_SYMBOL(hci_suspend_dev);
->>  int hci_resume_dev(struct hci_dev *hdev)
->>  {
->>  	hci_sock_dev_event(hdev, HCI_DEV_RESUME);
->> +	hci_enable_le_advertising(hdev);
->>  	return 0;
->>  }
->>  EXPORT_SYMBOL(hci_resume_dev);
->> -- 
->> 2.17.1
+--
+Thanks
 
 
+
+
+
+
+-----linux-bluetooth-owner@vger.kernel.org wrote: -----
+To: Mahaboob Nazeer SK <nazeer.m@phytec.in>
+From: "Gix, Brian"=20
+Sent by: linux-bluetooth-owner@vger.kernel.org
+Date: 07/05/2019 12:10AM
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Testing Bluetooth Mesh with python
+
+Hello,
+
+> On Jul 3, 2019, at 9:08 PM, Mahaboob Nazeer SK <nazeer.m@phytec.in> wrote:
+>=20
+> Hi,
+>=20
+> We are using Zephyr Mesh onoff example on nrf52 eval kit to test the Mesh=
+ Functionality.For provisioning of the
+> node we are using meshctl tool.
+>=20
+> But is there any other way to provision a node using a python script.I fo=
+und a test-mesh script in the test folder=20
+> of bluez stack ,but i was unable to provision and test a node with it.Cou=
+ld you share a test procedure if any.
+
+We are in the process of coding the Management1 D-Bus interface which inclu=
+des many of the method calls required for Provisioner support.  The test-me=
+sh python script does *not* work with the meshctl tool, which uses a GATT b=
+ased architecture.
+
+The D-Bus interface (as described in the doc/mesh-api.txt) works with the b=
+luetooth-meshd daemon which is currently being built out, and it is entirel=
+y built on Advertisement (non-GATT) based communication with other nodes.
+
+The methods required for the Provisioner side are not quite ready to be pus=
+hed out.
+
+
+>=20
+> --
+> Thanks
+>=20
+>=20
+>=20
+>=20
+>=20
