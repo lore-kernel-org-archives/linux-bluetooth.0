@@ -3,81 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4587C468AD
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBBDEC0650E
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9B2D216B7
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A77321670
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726898AbfGFKv0 (ORCPT
+        id S1727020AbfGFKve (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Jul 2019 06:51:26 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:58029 "EHLO
+        Sat, 6 Jul 2019 06:51:34 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:38817 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbfGFKvY (ORCPT
+        with ESMTP id S1725926AbfGFKvc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Jul 2019 06:51:24 -0400
+        Sat, 6 Jul 2019 06:51:32 -0400
 Received: from [192.168.0.113] (CMPC-089-239-107-172.CNet.Gawex.PL [89.239.107.172])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C3C90CF164;
-        Sat,  6 Jul 2019 12:59:54 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 409D1CF165;
+        Sat,  6 Jul 2019 13:00:03 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v3] Bluetooth: btrtl: HCI reset on close for Realtek BT
- chip
+Subject: Re: [PATCH] Bluetooth: btsdio: Do not bind to non-removable BCM4356
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190625083051.7525-1-jian-hong@endlessm.com>
-Date:   Sat, 6 Jul 2019 12:51:22 +0200
-Cc:     Daniel Drake <drake@endlessm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20190630221408.8509-1-pbrobinson@gmail.com>
+Date:   Sat, 6 Jul 2019 12:51:31 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 Content-Transfer-Encoding: 7bit
-Message-Id: <3544D13C-5774-45C4-B266-71FC1C254BA0@holtmann.org>
-References: <B8AD29F1-444A-4BB7-8C12-9C31EB974D11@holtmann.org>
- <20190625083051.7525-1-jian-hong@endlessm.com>
-To:     Jian-Hong Pan <jian-hong@endlessm.com>
+Message-Id: <984E204F-216E-48FC-8066-9111F7388171@holtmann.org>
+References: <20190630221408.8509-1-pbrobinson@gmail.com>
+To:     Peter Robinson <pbrobinson@gmail.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jian-Hong,
+Hi Peter,
 
-> Realtek RTL8822BE BT chip on ASUS X420FA cannot be turned on correctly
-> after on-off several times. Bluetooth daemon sets BT mode failed when
-> this issue happens. Scanning must be active while turning off for this
-> bug to be hit.
+> BCM4356 devices soldered onto the PCB (non-removable) use an UART
+> connection for bluetooth, such as the Rock960, but it also advertise
+> btsdio support as a sdio function.
 > 
-> bluetoothd[1576]: Failed to set mode: Failed (0x03)
-> 
-> If BT is turned off, then turned on again, it works correctly again.
-> 
-> According to the vendor driver, the HCI_QUIRK_RESET_ON_CLOSE flag is set
-> during probing. So, this patch makes Realtek's BT reset on close to fix
-> this issue.
-> 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=203429
-> Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
+> Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+> CC: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 > ---
-> v2:
-> - According to the vendor driver, it makes "all" Realtek's BT reset on
->   close. So, this version makes it the same.
-> - Change to the new subject for all Realtek BT chips.
-> 
-> v3:
-> - Fix the commit message and add the bug link.
-> - Have btrtl_shutdown_realtek() which sends HCI reset command and as
->   the callback function of hdev->shutdown for Realtek BT instead of
->   setting HCI_QUIRK_RESET_ON_CLOSE flag.
-> 
-> drivers/bluetooth/btrtl.c | 20 ++++++++++++++++++++
-> drivers/bluetooth/btrtl.h |  6 ++++++
-> drivers/bluetooth/btusb.c |  1 +
-> 3 files changed, 27 insertions(+)
+> drivers/bluetooth/btsdio.c | 1 +
+> 1 file changed, 1 insertion(+)
 
 patch has been applied to bluetooth-next tree.
 
