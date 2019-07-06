@@ -2,119 +2,136 @@ Return-Path: <SRS0=OJUr=VD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64018C0650E
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 19:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CE2C48BDA
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 23:23:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B7B62075C
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 19:47:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AECC20830
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 23:23:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726966AbfGFTrp convert rfc822-to-8bit (ORCPT
+        id S1727009AbfGFXXL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Jul 2019 15:47:45 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:53489 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726921AbfGFTrp (ORCPT
+        Sat, 6 Jul 2019 19:23:11 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:33636 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726469AbfGFXXL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Jul 2019 15:47:45 -0400
-Received: from [192.168.1.175] (apn-37-247-209-172.dynamic.gprs.plus.pl [37.247.209.172])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 288F5CF165;
-        Sat,  6 Jul 2019 21:54:20 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v7 0/2] Bluetooth: btusb: Add protocol support for
- MediaTek USB devices
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1559433769-23749-1-git-send-email-sean.wang@mediatek.com>
-Date:   Sat, 6 Jul 2019 21:45:31 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <CB48D0A4-0564-42A6-847F-08E64AAF4842@holtmann.org>
-References: <1559433769-23749-1-git-send-email-sean.wang@mediatek.com>
-To:     Sean Wang <sean.wang@mediatek.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Sat, 6 Jul 2019 19:23:11 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212])
+        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <colin.king@canonical.com>)
+        id 1hju1M-00069E-GQ; Sat, 06 Jul 2019 23:23:08 +0000
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190624144757.1285-1-colin.king@canonical.com>
+ <B6A1CB42-C239-42CA-B14E-483A02B930EB@holtmann.org>
+From:   Colin Ian King <colin.king@canonical.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=colin.king@canonical.com; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH][next] 6lowpan: fix off-by-one comparison of index id with
+ LOWPAN_IPHC_CTX_TABLE_SIZE
+Message-ID: <f09c07d6-9a16-3acf-dd07-4b7bfcd732f3@canonical.com>
+Date:   Sun, 7 Jul 2019 00:23:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <B6A1CB42-C239-42CA-B14E-483A02B930EB@holtmann.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+On 06/07/2019 11:51, Marcel Holtmann wrote:
+> Hi Colin,
+> 
+>> The WARN_ON_ONCE check on id is off-by-one, it should be greater or equal
+>> to LOWPAN_IPHC_CTX_TABLE_SIZE and not greater than. Fix this.
+>>
+>> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+>> ---
+>> net/6lowpan/debugfs.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+>> index 1c140af06d52..a510bed8165b 100644
+>> --- a/net/6lowpan/debugfs.c
+>> +++ b/net/6lowpan/debugfs.c
+>> @@ -170,7 +170,7 @@ static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
+>> 	struct dentry *root;
+>> 	char buf[32];
+>>
+>> -	WARN_ON_ONCE(id > LOWPAN_IPHC_CTX_TABLE_SIZE);
+>> +	WARN_ON_ONCE(id >= LOWPAN_IPHC_CTX_TABLE_SIZE);
+> 
+> this patch no longer applied cleanly to bluetooth-next. Can you send me an updated version.
 
-> v7:
-> * rebase to latest code base.
-> 
-> v6:
-> * fix drivers/bluetooth/btusb.c:2683:2-3: Unneeded semicolon based reported by [1]
-> * update power-on sequence with adding neccesary tci sleep comand to set up
->  low-power environmnet and a delay to wait the device to be stable.
-> * sort variables declarations in reverse xmas order.
-> 
-> [1]
-> http://lists.infradead.org/pipermail/linux-mediatek/2019-January/017017.html
-> 
-> v5:
-> * rebase to latest code base.
-> * change the subject prefix.
-> * change the place the firmware located at.
-> 
-> v4:
-> * use new BTUSB_TX_WAIT_VND_EVT instead of BTMTKUSB_TX_WAIT_VND_EVT
->  to avoid definition conflict and to fix bulk data transfer fails.
-> * use the bluetooth-next as the base
-> 
-> v3:
-> add fixes and enhancements based on [1]
-> * reuse flags and evt_skb btusb already had
-> * add ctrl_anchor and the corresponding handling
-> * apply mtk specific recv function
-> * add more comments explaining wmt ctrl urbs behavior.
-> 
-> [1]
-> http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014724.html
-> 
-> v2:
-> 
-> add fixes and enhancements based on [1]
-> * include /sys/kernel/debug/usb/devices portion in the commit message.
-> * turn default into n for config BT_HCIBTUSB_MTK in Kconfig
-> * only add MediaTek support to btusb.c
-> * drop cmd_sync callback usage
-> * use __hci_cmd_send to send WMT commands
-> * add wait event handling similar to what is being done in btmtkuart.c
-> * submit a control IN URB similar to interrupt IN URB on demand for the WMT
->  commands during setup 
-> * add cosmetic changes
-> 
-> [1]
-> http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014650.html
-> http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014656.html
-> 
-> v1:
-> 
-> This adds the support of enabling MT7668U and MT7663U Bluetooth
-> function running on the top of btusb driver. The patch also adds
-> a newly created file mtkbt.c able to be reused independently from
-> the transport type such as UART, USB and SDIO.
-> 
-> Sean Wang (2):
->  Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB
->    devices
->  Bluetooth: btusb: Add protocol support for MediaTek MT7663U USB
->    devices
-> 
-> drivers/bluetooth/Kconfig |  11 +
-> drivers/bluetooth/btusb.c | 581 ++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 592 insertions(+)
+I'm confused by this, I just applied it OK on bluetooth-next [1] on the
+head 9ce67c3235be71e8cf922a9b3d0b7359ed3f4ce5, am I applying this to the
+wrong repo/branch?
 
-both patches have been applied to bluetooth-next tree.
+[1]
+git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
 
-Regards
 
-Marcel
+Colin
+
+> 
+> Regards
+> 
+> Marcel
+> 
 
