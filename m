@@ -6,65 +6,73 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEAB2C468AE
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4957C0650E
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E1B321670
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD58321670
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:51:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726978AbfGFKva (ORCPT
+        id S1726729AbfGFKvT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Jul 2019 06:51:30 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42489 "EHLO
+        Sat, 6 Jul 2019 06:51:19 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:59394 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbfGFKv2 (ORCPT
+        with ESMTP id S1725926AbfGFKvS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Jul 2019 06:51:28 -0400
+        Sat, 6 Jul 2019 06:51:18 -0400
 Received: from [192.168.0.113] (CMPC-089-239-107-172.CNet.Gawex.PL [89.239.107.172])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0F854CF164;
-        Sat,  6 Jul 2019 12:59:58 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 891EBCEFAE;
+        Sat,  6 Jul 2019 12:59:48 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v6 1/2] Bluetooth: hci_qca: Load customized NVM based on
- the device property
+Subject: Re: [PATCH v9] Bluetooth: btqca: inject command complete event during
+ fw download
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1559814030-13833-1-git-send-email-rjliao@codeaurora.org>
-Date:   Sat, 6 Jul 2019 12:51:26 +0200
-Cc:     robh+dt@kernel.org, mark.rutland@arm.com,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        thierry.escande@linaro.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, c-hbandi@codeaurora.org
+In-Reply-To: <20190528214322.171922-1-mka@chromium.org>
+Date:   Sat, 6 Jul 2019 12:51:16 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>
 Content-Transfer-Encoding: 7bit
-Message-Id: <AFA918FD-04AF-47C0-A6B4-6B53CF824054@holtmann.org>
-References: <1557919161-11010-1-git-send-email-rjliao@codeaurora.org>
- <1559814030-13833-1-git-send-email-rjliao@codeaurora.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
+Message-Id: <AE7AB525-CFAC-411E-A615-54AF4E6B645E@holtmann.org>
+References: <20190528214322.171922-1-mka@chromium.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rocky,
+Hi Matthias,
 
-> QCA BTSOC NVM is a customized firmware file and different vendors may
-> want to have different BTSOC configuration (e.g. Configure SCO over PCM
-> or I2S, Setting Tx power, etc.) via this file. This patch will allow
-> vendors to download different NVM firmware file by reading a device
-> property "firmware-name".
+> Latest qualcomm chips are not sending an command complete event for
+> every firmware packet sent to chip. They only respond with a vendor
+> specific event for the last firmware packet. This optimization will
+> decrease the BT ON time. Due to this we are seeing a timeout error
+> message logs on the console during firmware download. Now we are
+> injecting a command complete event once we receive an vendor specific
+> event for the last RAM firmware packet.
 > 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> Tested-by: Matthias Kaehlcke <mka@chromium.org>
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 > ---
-> Changes in v6:
->  * Added read firmware-name property for both QCA6174 and WCN399X
+> Changes in v9:
+> - define QCA_HCI_CC_SUCCESS (again)
+> - use QCA_HCI_CC_OPCODE instead of HCI_OP_NOP
+> 
+> Changes in v8:
+> - renamed QCA_HCI_CC_SUCCESS to QCA_HCI_CC_OPCODE
+> - use 0xFC00 as opcode of the injected event instead of 0
+> - added Matthias' tags from the v7 review
 > ---
-> drivers/bluetooth/btqca.c   |  8 ++++++--
-> drivers/bluetooth/btqca.h   |  6 ++++--
-> drivers/bluetooth/hci_qca.c | 18 +++++++++++++++++-
-> 3 files changed, 27 insertions(+), 5 deletions(-)
+> drivers/bluetooth/btqca.c | 39 ++++++++++++++++++++++++++++++++++++++-
+> drivers/bluetooth/btqca.h |  4 ++++
+> 2 files changed, 42 insertions(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
