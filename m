@@ -2,88 +2,93 @@ Return-Path: <SRS0=OJUr=VD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B12F7C0650E
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 15:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFCCC0650E
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 15:39:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9028220665
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 15:19:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1140C20838
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 15:39:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="a1FBXno5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726696AbfGFPTE (ORCPT
+        id S1726887AbfGFPjN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Jul 2019 11:19:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32814 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726446AbfGFPTE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Jul 2019 11:19:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 83CDC86658;
-        Sat,  6 Jul 2019 15:19:03 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 38CF717102;
-        Sat,  6 Jul 2019 15:19:03 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 081E44E9E2;
-        Sat,  6 Jul 2019 15:19:02 +0000 (UTC)
-Date:   Sat, 6 Jul 2019 11:19:02 -0400 (EDT)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com,
-        stable@vger.kernel.org, Loic Poulain <loic.poulain@intel.com>,
-        Ilya Faenson <ifaenson@broadcom.com>
-Message-ID: <1938318038.39428333.1562426342706.JavaMail.zimbra@redhat.com>
-In-Reply-To: <37673EE8-2391-425D-9957-D6FDAEFB03FA@holtmann.org>
-References: <20190625173215.25999-1-vdronov@redhat.com> <37673EE8-2391-425D-9957-D6FDAEFB03FA@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: hci_ldisc: check for missing tty operations
+        Sat, 6 Jul 2019 11:39:13 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:45171 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726522AbfGFPjN (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 6 Jul 2019 11:39:13 -0400
+Received: by mail-lj1-f194.google.com with SMTP id m23so11870760lje.12
+        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Jul 2019 08:39:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lEzKKzK5fk/Bt6kVYxicW2d3oYJ/0z0xpzJO67okGCQ=;
+        b=a1FBXno5jAlKNzFEl2+nItxp4J1XVF7HZVrsXMTkwQ50PXehFrdvm27Qp0gsYBiC3r
+         MoYTgSBF+AstdphlEnGBLnVZznhexQYczNl9BmLmtR2Qd1tg02e2QmwpMr7rET3L/wca
+         LVlDkR/Su9WF+7mWPeYSG49W0+l7tBZNw3CmK42V22TPi9FcrHaHlP9BjpjBg0FwPqF3
+         DOWLJpu9f1VWvpjHJZtjGlgmY1X6t1nLvRiRNLwGJVZma0CvxRTXrNKxrUGRvsEy7dwa
+         fLcwHaJVa/PdQ3fqRmVSHdM6mEK9+UnOpwveT/2B5Xbb3K1WUS+19Xn1BG1cwYIt3mWM
+         myMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lEzKKzK5fk/Bt6kVYxicW2d3oYJ/0z0xpzJO67okGCQ=;
+        b=A5wP4bxFrliLJax2DbH48bOM6qrB6dgAJr6grxZ9y9tUpRysCGPOpv/zkZv+4pT2os
+         /8IYAg3uEB0b8axKz/i2xWzUNocPQlLUINivILurN5IZB/+uNeiAqpAeJ6uBDDDqrpKX
+         KGi2T5JnsPskz8DpNP9FujmUN/JRR0RxVJcByQoKzHJGvh/jZMJcELYa6nUkn9qjX1Ex
+         BOgBTsGmYsYLIhd6CbJeQTy0mleyhkuwa2nV//LVqYztXUucU6Z5n0s5zL3IG4YxKcCz
+         8cgwHRrNMNt+F4tW3Pf/alNp4VGrhvo+VX0UCdMVjcB00LRjugfyOIULPXIoInAelP1s
+         x/Iw==
+X-Gm-Message-State: APjAAAXh+XHFQWJhRrqIbluopPMIOCcCQCzl1yIi2SMfieqcTx8bcoYX
+        F/2dLTHCHbQhFzERdf6R7CLbQB8bhGs=
+X-Google-Smtp-Source: APXvYqxUH3GkZ949Kta7xP2yg0QYAUofppPoalm9vrHo4p0yuE733DpXWN5y3cUcNwnZMCATQzPj6w==
+X-Received: by 2002:a2e:7c14:: with SMTP id x20mr5262647ljc.56.1562427550972;
+        Sat, 06 Jul 2019 08:39:10 -0700 (PDT)
+Received: from kynes.internet.domowy (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
+        by smtp.gmail.com with ESMTPSA id u9sm1910609lfk.64.2019.07.06.08.39.09
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 06 Jul 2019 08:39:10 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v4 0/1] Add --io command line argument
+Date:   Sat,  6 Jul 2019 17:39:03 +0200
+Message-Id: <20190706153904.12009-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.2.20, 10.4.195.25]
-Thread-Topic: Bluetooth: hci_ldisc: check for missing tty operations
-Thread-Index: Y6PSNA1ggdS0XuGkMbW9gMaqSx7KUg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Sat, 06 Jul 2019 15:19:03 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello, Marcel,
+Continuing the refactoring started in 12b984d1d, this patch adds --io
+option to bluetooth-meshd, so that the user is able to select mesh-io
+implementation.
 
-I totally agree, the same came to my mind some time after sending the patch.
-Let me send a v2 in a while with drivers checking for needed tty operations
-presence.
+Compared to v3, this moves option parsing from main into mesh-io-api.
 
-Best regards,
-Vladis Dronov | Red Hat, Inc. | The Core Kernel | Senior Software Engineer
+Michał Lowas-Rzechonek (1):
+  mesh: Added --io option
 
------ Original Message -----
-> From: "Marcel Holtmann" <marcel@holtmann.org>
-> To: "Vladis Dronov" <vdronov@redhat.com>
-> Cc: "Johan Hedberg" <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-> syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com, stable@vger.kernel.org, "Loic Poulain"
-> <loic.poulain@intel.com>, "Ilya Faenson" <ifaenson@broadcom.com>
-> Sent: Saturday, July 6, 2019 12:35:39 PM
-> Subject: Re: [PATCH] Bluetooth: hci_ldisc: check for missing tty operations
-> 
-> Hi Vladis,
-> 
-> > Certain ttys lack operations (eg: pty_unix98_ops) which still can be
-> > called by certain hci uart proto (eg: mrvl, ath). Currently this leads
-> > to execution at address 0x0. Fix this by adding checks for missing tty
-> > operations.
-> 
-> so I really prefer that we just fail setting the line discipline. These
-> drivers need to check that the underlying transport has all the operations
-> available they need. We can not just ignore them.
-> 
-> Regards
-> 
-> Marcel
+ mesh/main.c            | 48 +++++++++++++++++++++++++++---------------
+ mesh/mesh-io-api.h     |  2 ++
+ mesh/mesh-io-generic.c | 30 ++++++++++++++++++++++++++
+ mesh/mesh-io.c         |  9 ++++++--
+ mesh/mesh-io.h         |  2 +-
+ mesh/mesh.c            |  4 ++--
+ mesh/mesh.h            |  2 +-
+ 7 files changed, 74 insertions(+), 23 deletions(-)
+
+-- 
+2.22.0
+
