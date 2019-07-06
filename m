@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E17C6C468AE
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CFFC468AD
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:35:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C48B621670
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:22:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B59B20863
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 10:35:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725971AbfGFKWt convert rfc822-to-8bit (ORCPT
+        id S1726001AbfGFKfn convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Jul 2019 06:22:49 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:56979 "EHLO
+        Sat, 6 Jul 2019 06:35:43 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:41425 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbfGFKWt (ORCPT
+        with ESMTP id S1725926AbfGFKfn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Jul 2019 06:22:49 -0400
+        Sat, 6 Jul 2019 06:35:43 -0400
 Received: from [192.168.0.113] (CMPC-089-239-107-172.CNet.Gawex.PL [89.239.107.172])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 52590CEFAE;
-        Sat,  6 Jul 2019 12:31:19 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4AA75CEFAE;
+        Sat,  6 Jul 2019 12:44:12 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: Doubt/issue in hci_dev_do_close
+Subject: Re: [PATCH] Bluetooth: hci_ldisc: check for missing tty operations
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <e0f4f7acffb3abd2c0d1790a7cd79905@codeaurora.org>
-Date:   Sat, 6 Jul 2019 12:22:46 +0200
-Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, anubhavg@codeaurora.org
+In-Reply-To: <20190625173215.25999-1-vdronov@redhat.com>
+Date:   Sat, 6 Jul 2019 12:35:39 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com,
+        stable@vger.kernel.org, Loic Poulain <loic.poulain@intel.com>,
+        Ilya Faenson <ifaenson@broadcom.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <DCD19998-CDAF-4665-BEBC-8A8CAA16E554@holtmann.org>
-References: <1553689723-21017-2-git-send-email-c-hbandi@codeaurora.org>
- <201903290535.u5TF12SC%lkp@intel.com> <20190328212320.GF112750@google.com>
- <a75d686f28a2c73562e9bbf5b601d37c@codeaurora.org>
- <e0f4f7acffb3abd2c0d1790a7cd79905@codeaurora.org>
-To:     Harish Bandi <c-hbandi@codeaurora.org>
+Message-Id: <37673EE8-2391-425D-9957-D6FDAEFB03FA@holtmann.org>
+References: <20190625173215.25999-1-vdronov@redhat.com>
+To:     Vladis Dronov <vdronov@redhat.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Harish,
+Hi Vladis,
 
-> In hci_dev_do_close first it is sending vendor specific shutdown routine and then after some operations it is sending
-> the hci_reset command.
-> However in vendor specific shutdown routine if vendor already powered off the vendor chip. In those cases it will not
-> send the HCI_RESET command. That may lead to bug or some cleanup operations not done properly in Chip.
-> Is there any specific reason why it is sending vendor specific shutdown routine first and then sending HCI_RESET command.
+> Certain ttys lack operations (eg: pty_unix98_ops) which still can be
+> called by certain hci uart proto (eg: mrvl, ath). Currently this leads
+> to execution at address 0x0. Fix this by adding checks for missing tty
+> operations.
 
-are you setting HCI_QUIRK_RESET_ON_CLOSE and trying to use hdev->shutdown at the same time. That is not how this is suppose to be used. The HCI_QUIRK_RESET_ON_CLOSE is just for old Bluetooth 1.0b USB devices.
+so I really prefer that we just fail setting the line discipline. These drivers need to check that the underlying transport has all the operations available they need. We can not just ignore them.
 
 Regards
 
