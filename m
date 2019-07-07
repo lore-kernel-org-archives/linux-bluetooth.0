@@ -5,30 +5,30 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2982C48BDB
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Jul 2019 11:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58627C48BDB
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Jul 2019 11:43:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8433D20830
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Jul 2019 11:33:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 253642082F
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Jul 2019 11:43:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726273AbfGGLdu convert rfc822-to-8bit (ORCPT
+        id S1726046AbfGGLn5 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 7 Jul 2019 07:33:50 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:38092 "EHLO
+        Sun, 7 Jul 2019 07:43:57 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:38346 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725774AbfGGLdt (ORCPT
+        by vger.kernel.org with ESMTP id S1726302AbfGGLn5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 7 Jul 2019 07:33:49 -0400
+        Sun, 7 Jul 2019 07:43:57 -0400
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 11A7C2837E
-        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Jul 2019 11:33:49 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 802B028397
+        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Jul 2019 11:43:56 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 01BEC2850D; Sun,  7 Jul 2019 11:33:48 +0000 (UTC)
+        id 745CF28420; Sun,  7 Jul 2019 11:43:56 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 203997] [REGRESSION] Unable to connect BT audio device on
  5.1.15
-Date:   Sun, 07 Jul 2019 11:33:48 +0000
+Date:   Sun, 07 Jul 2019 11:43:55 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -37,14 +37,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: matias.karhumaa@gmail.com
+X-Bugzilla-Who: sgh@sgh.dk
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-203997-62941-hoMXq3dp0g@https.bugzilla.kernel.org/>
+Message-ID: <bug-203997-62941-FoeYeRtCpq@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-203997-62941@https.bugzilla.kernel.org/>
 References: <bug-203997-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -60,14 +60,12 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=203997
 
---- Comment #13 from Matias Karhumaa (matias.karhumaa@gmail.com) ---
-Eivind and Martin, thanks for testing!
+--- Comment #15 from Søren Holm (sgh@sgh.dk) ---
+(In reply to Jan Steffens from comment #14)
+> If you're running 5.1.16-arch1, please note that the patch has been
+> backported into this release.
 
-Søren, could it be that for some reason now headset is able to create
-connection? In your previous btmon trace we can see that headset was trying to
-connect HFP but failed because your SDP records did not have record for HFP AG.
-Then your machine tried to connect but failed because of the bug introduced in
-5.1.15.
+I do - then that is why. Sorry for the noise.
 
 -- 
 You are receiving this mail because:
