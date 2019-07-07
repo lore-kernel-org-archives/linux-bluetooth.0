@@ -1,137 +1,256 @@
-Return-Path: <SRS0=OJUr=VD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=ATBr=VE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CE2C48BDA
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 23:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BC6C48BDA
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Jul 2019 08:07:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AECC20830
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Jul 2019 23:23:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E7472083B
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Jul 2019 08:07:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tbSYhZyx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727009AbfGFXXL (ORCPT
+        id S1727142AbfGGIHy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Jul 2019 19:23:11 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:33636 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726469AbfGFXXL (ORCPT
+        Sun, 7 Jul 2019 04:07:54 -0400
+Received: from mail-pl1-f180.google.com ([209.85.214.180]:46318 "EHLO
+        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726330AbfGGIHy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Jul 2019 19:23:11 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212])
-        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <colin.king@canonical.com>)
-        id 1hju1M-00069E-GQ; Sat, 06 Jul 2019 23:23:08 +0000
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190624144757.1285-1-colin.king@canonical.com>
- <B6A1CB42-C239-42CA-B14E-483A02B930EB@holtmann.org>
-From:   Colin Ian King <colin.king@canonical.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=colin.king@canonical.com; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH][next] 6lowpan: fix off-by-one comparison of index id with
- LOWPAN_IPHC_CTX_TABLE_SIZE
-Message-ID: <f09c07d6-9a16-3acf-dd07-4b7bfcd732f3@canonical.com>
-Date:   Sun, 7 Jul 2019 00:23:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sun, 7 Jul 2019 04:07:54 -0400
+Received: by mail-pl1-f180.google.com with SMTP id c2so5056854plz.13;
+        Sun, 07 Jul 2019 01:07:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition:user-agent;
+        bh=Rv/kL2Omk+edBiwz5S+x4MbxCi8H0KU1MTVaMm2hiC4=;
+        b=tbSYhZyxy4VN2B535WEqXqNOuy3v4JWLUEgOmj3gR45on0QcOpL++ZEkmH6UHsten4
+         WHME+zq+dC9Nm1IeZ+IsJYScg8KlrOa7j9kYvrfyPuTOHdeFThmHBlLEBluEq7fas025
+         GwUSBDCfMBdi6DkEDWDOqerffqnfcMNkuDR4o3r9j7ikt8GbuIgBkb3o2uyC8J9hUUzS
+         yEvoIH1YEFlpl8wKZNcP86x9VVR361VU58JGBZDBHnJXIux9uZJx32u3HgoeJzBpFzuy
+         aCeqdRFgUdThPMX9Jg2Ly9tH2uUbrqATz8l8a4+mmYChUpGos5gwpQPFT1xvIZFVZgC0
+         jNlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:mime-version:content-disposition:user-agent;
+        bh=Rv/kL2Omk+edBiwz5S+x4MbxCi8H0KU1MTVaMm2hiC4=;
+        b=VhnngMHhH1ztv8KGWxjvzC/eSrdHK4qfojza1NStEMTmNkaF9mCLRseya4GIZDhXlA
+         nKXTMLDtPfcsnyiyvh46HYyNI3cjrXhoWpco/h1gYQRFHYxjCK61bx4WV/JYT2F7ko6n
+         KEIlzhdkVVCXvkUsHLHe4dqVSxL2rI7lRzHpJbnhd7WIyThcoanYSVqlXrs3Np6LH5Il
+         uGZabEba+Jg1Bpg7+fAyn5eMzwFoppS6wWEWEgk8m/ZKiyyQliVfianxyv6uonjkoHnI
+         enNeTE6S05JLhTgH1iKmjlWkWgzap4Zpg4M5eQm6dRFU5tvGmOjlwtAYO8Bjgl7vLX+u
+         Ugjg==
+X-Gm-Message-State: APjAAAVmiKFb9Y3tt0ScDgVcp3IslhRxMULx797VfgIUZ3/lqZSRjHop
+        eH7jLczIy9SbHBWcQYlQlsgcXlEI09888Q==
+X-Google-Smtp-Source: APXvYqxV2t64gi+6tY+KhV5pbjpHoWytjrfpVVcnQ2jG/R7QyYr9Ouw5fe+jIoH+3mC59fWFw769Dg==
+X-Received: by 2002:a17:902:e40f:: with SMTP id ci15mr15608143plb.103.1562486873469;
+        Sun, 07 Jul 2019 01:07:53 -0700 (PDT)
+Received: from localhost ([134.134.139.77])
+        by smtp.gmail.com with ESMTPSA id p19sm21031733pfn.99.2019.07.07.01.07.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 07 Jul 2019 01:07:52 -0700 (PDT)
+Date:   Sun, 7 Jul 2019 11:07:49 +0300
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2019-07-07
+Message-ID: <20190707080749.GA26799@lazarenk-mobl.amr.corp.intel.com>
+Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-In-Reply-To: <B6A1CB42-C239-42CA-B14E-483A02B930EB@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Nq2Wo0NMKNjxTN9z"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 06/07/2019 11:51, Marcel Holtmann wrote:
-> Hi Colin,
-> 
->> The WARN_ON_ONCE check on id is off-by-one, it should be greater or equal
->> to LOWPAN_IPHC_CTX_TABLE_SIZE and not greater than. Fix this.
->>
->> Signed-off-by: Colin Ian King <colin.king@canonical.com>
->> ---
->> net/6lowpan/debugfs.c | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
->> index 1c140af06d52..a510bed8165b 100644
->> --- a/net/6lowpan/debugfs.c
->> +++ b/net/6lowpan/debugfs.c
->> @@ -170,7 +170,7 @@ static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
->> 	struct dentry *root;
->> 	char buf[32];
->>
->> -	WARN_ON_ONCE(id > LOWPAN_IPHC_CTX_TABLE_SIZE);
->> +	WARN_ON_ONCE(id >= LOWPAN_IPHC_CTX_TABLE_SIZE);
-> 
-> this patch no longer applied cleanly to bluetooth-next. Can you send me an updated version.
 
-I'm confused by this, I just applied it OK on bluetooth-next [1] on the
-head 9ce67c3235be71e8cf922a9b3d0b7359ed3f4ce5, am I applying this to the
-wrong repo/branch?
+--Nq2Wo0NMKNjxTN9z
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[1]
-git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+Hi Dave,
 
+Here's the main bluetooth-next pull request for 5.3:
 
-Colin
+ - Added support for new devices from Qualcomm, Realtek and Broadcom and
+   MediaTek
+ - Various fixes to 6LoWPAN
+ - Fix L2CAP PSM namespace separation for LE & BR/EDR
+ - Fix behavior with Microsoft Surface Precision Mouse
+ - Added support for LE Ping feature
+ - Fix L2CAP Disconnect response handling if received in wrong state
 
-> 
-> Regards
-> 
-> Marcel
-> 
+Please let me know if there are any issues pulling. Thanks.
 
+Johan
+
+---
+The following changes since commit 23f30c41c732fe9800f4a2d545b37c9515d35ad6:
+
+  Merge branch 'mlx5-TLS-TX-HW-offload-support' (2019-07-05 16:42:00 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
+
+for you to fetch changes up to 9ce67c3235be71e8cf922a9b3d0b7359ed3f4ce5:
+
+  Bluetooth: btusb: Add protocol support for MediaTek MT7663U USB devices (=
+2019-07-06 21:44:25 +0200)
+
+----------------------------------------------------------------
+Balakrishna Godavarthi (1):
+      Bluetooth: btqca: inject command complete event during fw download
+
+Dan Carpenter (1):
+      Bluetooth: hidp: NUL terminate a string in the compat ioctl
+
+Fabian Schindlatz (2):
+      Bluetooth: hci_ll: Refactor download_firmware
+      Bluetooth: Cleanup formatting and coding style
+
+Greg Kroah-Hartman (1):
+      6lowpan: no need to check return value of debugfs_create functions
+
+Jian-Hong Pan (1):
+      Bluetooth: btrtl: HCI reset on close for Realtek BT chip
+
+Josua Mayer (3):
+      Bluetooth: 6lowpan: search for destination address in all peers
+      Bluetooth: 6lowpan: check neighbour table for SLAAC
+      Bluetooth: 6lowpan: always check destination address
+
+Jo=E3o Paulo Rechi Vita (2):
+      Bluetooth: Add new 13d3:3501 QCA_ROME device
+      Bluetooth: Add new 13d3:3491 QCA_ROME device
+
+Larry Finger (1):
+      Bluetooth:: btrtl: Add support for RTL8723DU
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: Use controller sets when available
+      Bluetooth: L2CAP: Check bearer type on __l2cap_global_chan_by_addr
+
+Matias Karhumaa (1):
+      Bluetooth: Check state in l2cap_disconnect_rsp
+
+Matthias Kaehlcke (1):
+      Bluetooth: hci_qca: wcn3990: Drop baudrate change vendor event
+
+Neil Armstrong (1):
+      Bluetooth: btbcm: Add entry for BCM4359C0 UART bluetooth
+
+Peter Robinson (1):
+      Bluetooth: btsdio: Do not bind to non-removable BCM4356
+
+Philipp Puschmann (1):
+      Bluetooth: hci_ll: set operational frequency earlier
+
+Rocky Liao (2):
+      Bluetooth: hci_qca: Load customized NVM based on the device property
+      dt-bindings: net: bluetooth: Add device property firmware-name for QC=
+A6174
+
+Sascha Hauer (3):
+      Bluetooth: hci_ldisc: Add function to wait for characters to be sent
+      Bluetooth: hci_mrvl: Wait for final ack before switching baudrate
+      Bluetooth: hci_mrvl: Add serdev support
+
+Sean Wang (6):
+      dt-bindings: net: bluetooth: add boot-gpios property to UART-based de=
+vice
+      dt-bindings: net: bluetooth: add clock property to UART-based device
+      Bluetooth: btmtkuart: add an implementation for boot-gpios property
+      Bluetooth: btmtkuart: add an implementation for clock osc property
+      Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devic=
+es
+      Bluetooth: btusb: Add protocol support for MediaTek MT7663U USB devic=
+es
+
+Spoorthi Ravishankar Koppad (1):
+      Bluetooth: Add support for LE ping feature
+
+Szymon Janc (1):
+      Bluetooth: Add SMP workaround Microsoft Surface Precision Mouse bug
+
+Tomas Bortoli (1):
+      Bluetooth: hci_bcsp: Fix memory leak in rx_skb
+
+csonsino (1):
+      Bluetooth: validate BLE connection interval updates
+
+ .../devicetree/bindings/net/marvell-bluetooth.txt  |  25 +
+ .../devicetree/bindings/net/mediatek-bluetooth.txt |  17 +
+ .../devicetree/bindings/net/qualcomm-bluetooth.txt |   4 +
+ drivers/bluetooth/Kconfig                          |  12 +
+ drivers/bluetooth/bpa10x.c                         |   3 +-
+ drivers/bluetooth/btbcm.c                          |   1 +
+ drivers/bluetooth/btmtkuart.c                      |  51 +-
+ drivers/bluetooth/btqca.c                          |  47 +-
+ drivers/bluetooth/btqca.h                          |  10 +-
+ drivers/bluetooth/btrtl.c                          |  28 +
+ drivers/bluetooth/btrtl.h                          |   6 +
+ drivers/bluetooth/btsdio.c                         |   1 +
+ drivers/bluetooth/btusb.c                          | 584 +++++++++++++++++=
+++++
+ drivers/bluetooth/hci_bcsp.c                       |   5 +
+ drivers/bluetooth/hci_ldisc.c                      |   8 +
+ drivers/bluetooth/hci_ll.c                         | 109 ++--
+ drivers/bluetooth/hci_mrvl.c                       |  72 ++-
+ drivers/bluetooth/hci_qca.c                        |  73 ++-
+ drivers/bluetooth/hci_uart.h                       |   1 +
+ include/net/bluetooth/hci.h                        |  20 +
+ include/net/bluetooth/hci_core.h                   |   4 +
+ net/6lowpan/6lowpan_i.h                            |  16 +-
+ net/6lowpan/core.c                                 |   8 +-
+ net/6lowpan/debugfs.c                              |  97 +---
+ net/bluetooth/6lowpan.c                            |  41 +-
+ net/bluetooth/hci_conn.c                           |   5 +-
+ net/bluetooth/hci_core.c                           |   4 +-
+ net/bluetooth/hci_debugfs.c                        |  31 ++
+ net/bluetooth/hci_event.c                          |  77 +++
+ net/bluetooth/hci_request.c                        |  40 +-
+ net/bluetooth/hci_request.h                        |   2 +-
+ net/bluetooth/hidp/core.c                          |   2 +-
+ net/bluetooth/hidp/sock.c                          |   1 +
+ net/bluetooth/l2cap_core.c                         |  29 +-
+ net/bluetooth/smp.c                                |  13 +
+ 35 files changed, 1266 insertions(+), 181 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/marvell-bluetooth=
+=2Etxt
+
+--Nq2Wo0NMKNjxTN9z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl0hqFIACgkQJCP2+/mo
+1BKyeA//c6xz+zg5tr7qZjHRnFedwfr5OS1zmRapAd1XI3roPT/WVXEX5Ey7jixN
+cM7D7vvHmy0eBifO5Tiy3sE5IeY6AJWu04fPol0WD1T1gTYK/i2msb+u6/+WwKgk
+XNxpmcDfP3RYV2jScg8gum62QjwH8C7va8MMUm/mmt777qK5EuRA2ZhpREP6MkVA
+WYkCnHZr6RQOurP96ntAi9Wn2FjlAgBWl2+MBvAHMmS9zr+Cf0zW9/o1ZtbhLx9P
+/0XO6oIbhw1sHcqIrsM+tkey6mk/e1eeip/dyBsiwbD1NIEu/EnVX18s0CBIVQ86
+WAgRa13c16/Irc2LTOgcVdcRnpVVWI1WVL9UrwfND8/2HZ4y7mbBe8e/qmRVQaq3
+ra7Z3s7Dg4ZEduD5789I57nW7nGxnx6QXAFzwuLLBN/yd2Jg5uGtn2QVggduNfCB
+aqJO1RTUKTB59ch9dcXjoTOGa0FL55sQNItavRKntdcdbiApoghQB4HeI37weFuL
++1yZojvEKeAPQwfCq21bc4glrllOee+vy8J1mmaIIKw1dC9lyzNrMZhcmHJ3qXda
+dBDxSHWxNqfOYdcwN/6ShLSWFAmu8bX0b6TvK8VTH2HVN8y/GGUqpRpx+WbHr+h2
+z4Vd2lggDcyhjH8zcYwzfLsXHD+hLKAhr7Y7ZRbPetfgdocDQnc=
+=tEbq
+-----END PGP SIGNATURE-----
+
+--Nq2Wo0NMKNjxTN9z--
