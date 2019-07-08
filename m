@@ -2,123 +2,104 @@ Return-Path: <SRS0=sF93=VF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CE7C606C7
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jul 2019 18:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A24CC606C7
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jul 2019 19:29:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F48121852
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jul 2019 18:22:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="EJER6KPO"
+	by mail.kernel.org (Postfix) with ESMTP id 57AB320644
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Jul 2019 19:29:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733206AbfGHSWQ (ORCPT
+        id S1728114AbfGHT35 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Jul 2019 14:22:16 -0400
-Received: from mail-lf1-f43.google.com ([209.85.167.43]:36772 "EHLO
-        mail-lf1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732117AbfGHSWQ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Jul 2019 14:22:16 -0400
-Received: by mail-lf1-f43.google.com with SMTP id q26so11596982lfc.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jul 2019 11:22:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=rCy9lTyFlchYxHM7RHUu+DdDngvtOzKKharJdmOjoSQ=;
-        b=EJER6KPO5TqRmtx8cmrGzr+uWdqR/Fakn1AlWksUSMv4ISsvmZo7Sl3IW2Ro9iEekL
-         2M8wT3dWD6S004h0JJ3BjByCETVSvdKF+HHDITZN8ZcmsOEj7HbiHYOH3vXwPP9S4m2n
-         /zLdKDl5bAzfiocvpAiZbNZAz1YMLVG1RZXcfG2Yi6bKkM/s5IKHSGM+HGNTiGoNW1Yh
-         mZUKVtxA3GysVQQsc277FRsNK0hDe6STQpP5sWv4o6dlZyXwXgZZyy+FYRlNTI53dNIb
-         tIY+LxlGu25g+b/+KQz8BRDDawmCBS3C6S6eOrUrRU2sYXpKi9RA8nQjGDtfR3N9JUWc
-         Ejcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=rCy9lTyFlchYxHM7RHUu+DdDngvtOzKKharJdmOjoSQ=;
-        b=c5XWLnY1iKwgZnJYNS1IPu6Yi3noIiQ3Ipalvq9Z41KVW1N9a5D90fqcdXJ7JQ7Fgu
-         q0wD507zApi5yBnK3IKAyw2udeTpEbBYHmuzI1hiUIbZcXpLD1gR1Qj+Qee0mGidPGKf
-         HwR6CI9iLyGvbhqUm7rNiy8hNSh1aMZq19PgkQfQ2NS/GP25OyiYU920eGJUsrpXxwXP
-         Yr2OOWt15h4x2Z+4BDfr1sRnL/XwVM5xkF6S6Jta4qTOxtaCEwJCbZ45xJT/cUJqjo6A
-         1sixqHgjXiz5jJzbwNZ9RoMY2zrQcwbaAW8p9sHQvvmha/9ldAdr2TnINuiAbMP1I/nJ
-         d+aA==
-X-Gm-Message-State: APjAAAV2UM1bUOAT49g57JpUFxtWnC+m68pbi2AjgiIVVGepdUNJoHwf
-        Sb3NmPlxeGyyePfKXM6r4vbHXA==
-X-Google-Smtp-Source: APXvYqwWW0M13zEVcFQvEBInoUUnRYzJJaCBdkhJI48ENBNRuPs5PewtVG4uuMmp4TabL0xsA8P+lw==
-X-Received: by 2002:ac2:4466:: with SMTP id y6mr5083374lfl.0.1562610134457;
-        Mon, 08 Jul 2019 11:22:14 -0700 (PDT)
-Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
-        by smtp.gmail.com with ESMTPSA id l11sm3182157lfc.18.2019.07.08.11.22.12
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 08 Jul 2019 11:22:13 -0700 (PDT)
-From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
-        <michal.lowas-rzechonek@silvair.com>
-X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
-Date:   Mon, 8 Jul 2019 20:22:11 +0200
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-Cc:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Gix, Brian" <brian.gix@intel.com>
-Subject: Re: [RFC BlueZ 0/1] Validate element indexation
-Message-ID: <20190708182211.yxkucondnw5x6ay7@kynes>
-Mail-Followup-To: "Stotland, Inga" <inga.stotland@intel.com>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Gix, Brian" <brian.gix@intel.com>
-References: <20190708141314.13950-1-jakub.witowski@silvair.com>
- <65651744c67ae13bd95ffac88fae42f0f6c16c61.camel@intel.com>
+        Mon, 8 Jul 2019 15:29:57 -0400
+Received: from mga04.intel.com ([192.55.52.120]:11838 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726072AbfGHT35 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Jul 2019 15:29:57 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jul 2019 12:29:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,466,1557212400"; 
+   d="scan'208";a="165545052"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 08 Jul 2019 12:29:56 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1hkZKl-0006PT-RJ; Tue, 09 Jul 2019 03:29:55 +0800
+Date:   Tue, 9 Jul 2019 03:29:51 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Matthias Kaehlcke <mka@chromium.org>
+Subject: [bluetooth-next:for-upstream 6/34] drivers/bluetooth/btqca.c:271:21:
+ sparse: sparse: incorrect type in assignment (different base types)
+Message-ID: <201907090348.Rdvwytaq%lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <65651744c67ae13bd95ffac88fae42f0f6c16c61.camel@intel.com>
-User-Agent: NeoMutt/20180716
+X-Patchwork-Hint: ignore
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Inga, Jakub,
+tree:   https://kernel.googlesource.com/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+head:   9ce67c3235be71e8cf922a9b3d0b7359ed3f4ce5
+commit: 32646db8cc2862a14788de1bb4c365d0a27fb532 [6/34] Bluetooth: btqca: inject command complete event during fw download
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-rc1-7-g2b96cd8-dirty
+        git checkout 32646db8cc2862a14788de1bb4c365d0a27fb532
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
 
-On 07/08, Stotland, Inga wrote:
-> I agree that the validation for the gaps is needed. Interesting point
-> about max number of elements...
-> 
-> I wonder if a better check woul be to we to add to construct
-> composition data as a validation point to make sure it fits in mesh
-> message. Plus, an additional strict check can be done when Attach
-> method is called: stored composition can be byte compared to the one
-> dynamically generated from collected properties...
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
 
-If I read that correctly, this means we would need a way to build
-Composition Data on the fly, during get_manager_object_cb processing.
 
-I think it would be possible to get rid of validate_model_property
-function - instead, we could build a temporary mesh_node instance
-using information provided by the application as-is, and then:
+sparse warnings: (new ones prefixed by >>)
 
-- in case of existing nodes, generate Composition Data from both
-  existing and temporary instances, and byte-compare the two
+>> drivers/bluetooth/btqca.c:271:21: sparse: sparse: incorrect type in assignment (different base types) @@    expected restricted __le16 [usertype] opcode @@    got e] opcode @@
+>> drivers/bluetooth/btqca.c:271:21: sparse:    expected restricted __le16 [usertype] opcode
+>> drivers/bluetooth/btqca.c:271:21: sparse:    got int
 
-- in case of new nodes, simply save the temporary instace to 'nodes'
-  list
+vim +271 drivers/bluetooth/btqca.c
 
-All of that assumes that Composition Data generationchecks that:
- - everything fits into a buffer (this is already done)
- - mandatory models are present
- - indexation is OK
+   254	
+   255	static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+   256	{
+   257		struct hci_event_hdr *hdr;
+   258		struct hci_ev_cmd_complete *evt;
+   259		struct sk_buff *skb;
+   260	
+   261		skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
+   262		if (!skb)
+   263			return -ENOMEM;
+   264	
+   265		hdr = skb_put(skb, sizeof(*hdr));
+   266		hdr->evt = HCI_EV_CMD_COMPLETE;
+   267		hdr->plen = sizeof(*evt) + 1;
+   268	
+   269		evt = skb_put(skb, sizeof(*evt));
+   270		evt->ncmd = 1;
+ > 271		evt->opcode = QCA_HCI_CC_OPCODE;
+   272	
+   273		skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+   274	
+   275		hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
+   276	
+   277		return hci_recv_frame(hdev, skb);
+   278	}
+   279	
 
-I think this would make things slightly more consistent, and we would
-get rid of most "is_new" checks during attach/join/create/import.
-
-regard
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
