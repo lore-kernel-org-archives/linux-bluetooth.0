@@ -2,138 +2,100 @@ Return-Path: <SRS0=Cqm8=VG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C810BC73C42
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jul 2019 12:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3D4C73C50
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jul 2019 14:52:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D75020861
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jul 2019 12:14:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CE84214AF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Jul 2019 14:52:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nd6wiijh"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kJQaPdBP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbfGIMOM (ORCPT
+        id S1726238AbfGIOw3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Jul 2019 08:14:12 -0400
-Received: from mail-lj1-f178.google.com ([209.85.208.178]:35890 "EHLO
-        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbfGIMOL (ORCPT
+        Tue, 9 Jul 2019 10:52:29 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:32773 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbfGIOw3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Jul 2019 08:14:11 -0400
-Received: by mail-lj1-f178.google.com with SMTP id i21so19347543ljj.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2019 05:14:10 -0700 (PDT)
+        Tue, 9 Jul 2019 10:52:29 -0400
+Received: by mail-pf1-f193.google.com with SMTP id g2so4630350pfq.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2019 07:52:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:from:to:references:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=vogCuJAB6KE5xKRg3WODS+hWFr72Sp+76GmzsjR59X4=;
-        b=Nd6wiijhZDj3EreZVnB0jFGjfjlgv9aRByBPU2Bi62GmblXWrX7reM7R2TiMKrX74t
-         uc6Gb5rInOVrqvA6qoX0wjg+qVMRPI8HJbF6s7S2GK45A3GAbz5iyL0pLkhjR8xaBQDL
-         f7g4zf577eMGufsoqZjvyTqOh7+FOTq6oYjTnmj6omeML1U0s4p39XSHK3oMa1+s8VtF
-         WubYnpqcGwgQ9TTP35bW/ztDBik+n6VY9Yd7oiO1ny8R29tQFOfOq2EQe77qX+Ul6EiM
-         gNBtAGQrTx9bktO7cRnk1DXtjHeeRNYwb5abHsHTQuj+sS1gn4BmWWhIpKgRZRqrSNfZ
-         Sr2A==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=bOo5FIdECv8Dk1vdDxbdUDP2ytSbYy3HpCn39a/nI1k=;
+        b=kJQaPdBPe6uBds+wMPLAlAq5MTB/OwElJ+xLcT72OmqhYnRuOQpKFDauzlKzCNTH/o
+         Ab2W9s8Hl8l3WQo4KCWreQ6Fe/7COl70EYhwAYBBnwb3wbGV2Mr//c+c3dGHDV3zAc71
+         Iod2Yn8Vuo56S91zQ4wNLIB3q/UAZZkHE6IGY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vogCuJAB6KE5xKRg3WODS+hWFr72Sp+76GmzsjR59X4=;
-        b=isKLn1tPFvaLwQYqI9WzCrVy9Tp8oHBmPCSosRVeKHqovDJU5R+IWeJVIOZf5kwJHC
-         SxiWhtHHou1phTm2ubp5t9WSTEH44/IENXo6nBsLbgAkONTCX0APBKl2ucfqRlfb71tO
-         G4bcQ+UyXVKCRuth7a0p/gidhB1uMA7YWBlD+NRi89xg5QKmcoBXRspmXVR3Z7DbK1bv
-         +i8mUZFqLBIpFw2doXFo9dJjKWmUW8P2Ixn+qr2SvRmUmXX0k2v3U4y5cRTQjjv3rZsn
-         ku+FOZhdi5ggK6MeLyITF2xHDC8M3Lslq9DyyWurffBKpCLTskkzx9sjc65Ba+gOZLPf
-         9giw==
-X-Gm-Message-State: APjAAAUl8DLUvbYtSkaU9eTh28RjXRUK2bpK4BfZHvQBPiqW2NOBjlqF
-        i16hCusPotJXigzDzA2kh/A=
-X-Google-Smtp-Source: APXvYqwCVfy7OZ/2gtuh1I4ztaRYOrYLmTN7lhLApM/vSH96Lqr31FxhX6Sypt9K6D3wnT3QHAilTA==
-X-Received: by 2002:a2e:814e:: with SMTP id t14mr14088869ljg.167.1562674449689;
-        Tue, 09 Jul 2019 05:14:09 -0700 (PDT)
-Received: from elitebook.lan (ip-194-187-74-233.konfederacka.maverick.com.pl. [194.187.74.233])
-        by smtp.googlemail.com with ESMTPSA id h1sm2889017lfj.21.2019.07.09.05.14.08
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Jul 2019 05:14:08 -0700 (PDT)
-Subject: Re: bluetoothctl: list-attributes doesn't list services from
- example-gatt-server
-From:   =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-References: <c6e32190-c23d-2311-10f0-b5dcd58784bf@gmail.com>
-Message-ID: <c08604d7-5708-ed37-9e55-93e67e06a3da@gmail.com>
-Date:   Tue, 9 Jul 2019 14:14:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.2
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=bOo5FIdECv8Dk1vdDxbdUDP2ytSbYy3HpCn39a/nI1k=;
+        b=kfbczYLJb2myIaDOh6b06RFcMdIz7hXg46sXVrcR1X1WymjseY/7N6J8jzWbKpqMDZ
+         Nb/xsh7wmOYb7XvhC1eB8Rb/AVCd8PxBY2u5tIn2us5E9Fdki3iAyod9SQnuozpziK+z
+         iWm7HtHFUnC+OxjOfWC9nZh273qHM8uLThrNZPf9yzyEF09kzUvFDJnoWiFXnw0W8K69
+         h4sOcvbjZmP9GAXlmMyhB3CkJ9oGIMEvHiullA37bWkvkjBU3r13CyS1oj1ZFHtxUHos
+         oBplj6gfIAnCU9Qyx/RdVNCItxlZKxfjyGv5LCyBis6v6eVuLwVClsF/GGl8AO7K7D+e
+         u+Qw==
+X-Gm-Message-State: APjAAAWfsve0UqQFkU/A4y+sIG7u3LKt5Y2ESwFN680LGgk14dBlNm2k
+        y5fMyNZbarI7gbZ/05XnuUcOPzJoOBs=
+X-Google-Smtp-Source: APXvYqwyZy2W00cKZ0x6dz1QCQ2SgqR3O+dVRvJoge+fK1hcKgny3UXngSqShbK6ZpcrsQ87pfiLRw==
+X-Received: by 2002:a63:4e60:: with SMTP id o32mr2076697pgl.68.1562683948679;
+        Tue, 09 Jul 2019 07:52:28 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id t9sm3022920pji.18.2019.07.09.07.52.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 09 Jul 2019 07:52:28 -0700 (PDT)
+Date:   Tue, 9 Jul 2019 07:52:24 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Wei Yongjun <weiyongjun1@huawei.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH -next] Bluetooth: hci_qca: Use kfree_skb() instead of
+ kfree()
+Message-ID: <20190709145224.GO250418@google.com>
+References: <20190709013530.11865-1-weiyongjun1@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <c6e32190-c23d-2311-10f0-b5dcd58784bf@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190709013530.11865-1-weiyongjun1@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 07.07.2019 12:14, Rafał Miłecki wrote:
-> I decided to test GATT. On elitebook I started:
-> ./test/example-gatt-server
-> and waited to let matebook refresh all info.
+On Tue, Jul 09, 2019 at 01:35:30AM +0000, Wei Yongjun wrote:
+> Use kfree_skb() instead of kfree() to free sk_buff.
 > 
-> After that I got:
+> Fixes: 2faa3f15fa2f ("Bluetooth: hci_qca: wcn3990: Drop baudrate change vendor event")
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> ---
+>  drivers/bluetooth/hci_qca.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> [elitebook]# info 20:16:B9:D8:A9:3B
-> Device 20:16:B9:D8:A9:3B (public)
->          Name: elitebook
->          Alias: elitebook
->          Class: 0x001c010c
->          Icon: computer
->          Paired: yes
->          Trusted: yes
->          Blocked: no
->          Connected: yes
->          LegacyPairing: no
->          UUID: IrMC Sync                 (00001104-0000-1000-8000-00805f9b34fb)
->          UUID: OBEX Object Push          (00001105-0000-1000-8000-00805f9b34fb)
->          UUID: OBEX File Transfer        (00001106-0000-1000-8000-00805f9b34fb)
->          UUID: Headset                   (00001108-0000-1000-8000-00805f9b34fb)
->          UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
->          UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34fb)
->          UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
->          UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
->          UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
->          UUID: Phonebook Access Server   (0000112f-0000-1000-8000-00805f9b34fb)
->          UUID: Message Access Server     (00001132-0000-1000-8000-00805f9b34fb)
->          UUID: Message Notification Se.. (00001133-0000-1000-8000-00805f9b34fb)
->          UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
->          UUID: Heart Rate                (0000180d-0000-1000-8000-00805f9b34fb)
->          UUID: Battery Service           (0000180f-0000-1000-8000-00805f9b34fb)
->          UUID: Vendor specific           (00005005-0000-1000-8000-0002ee000001)
->          UUID: Vendor specific           (12345678-1234-5678-1234-56789abcdef0)
->          Modalias: usb:v1D6Bp0246d0532
-> 
-> That seems all correct for now. Test example-gatt-server registers
-> Heart Rate, Battery & Test services. All of them appeared as expected.
-> 
-> My problem is that I can't list GATT attributes. I don't any output.
-> Is there anything I'm doing incorrectly?
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 9a5c9c1f9484..cbae86e55aed 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -909,7 +909,7 @@ static int qca_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+>  		if (hdr->evt == HCI_EV_VENDOR)
+>  			complete(&qca->drop_ev_comp);
+>  
+> -		kfree(skb);
+> +		kfree_skb(skb);
+>  
+>  		return 0;
+>  	}
 
-I decided to test nRF Connect Android app. It showed something
-interesting about my bluetooth devices. It nicely displays & parses
-advertising data.
+Good catch, thanks!
 
-Logitech M590 advertises:
-0x01 Flags
-0x03 Complete List of 16-bit Service Class UUIDs
-0x09 Complete Local Name
-0x0A Tx Power Level
-0x19 Appearance
-
-BlueZ on "elitebook" advertises:
-0xFF Manufacturer Specific Data
-or to say precisely:
-0x1BFF750042040180AE78BDBC0B7E307ABDBC0B7E2F01000000000000
-
-Any idea/hint why BlueZ 5.30 on my "elitebook" notebook doesn't
-advertise more data?
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
