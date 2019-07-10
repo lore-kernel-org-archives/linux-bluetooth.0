@@ -6,121 +6,125 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D29C74A2B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 15:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C89C74A2B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 16:53:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D29F2064A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 15:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68DB720665
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 16:53:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728323AbfGJP6V (ORCPT
+        id S1727683AbfGJQxk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jul 2019 11:58:21 -0400
-Received: from mga03.intel.com ([134.134.136.65]:20541 "EHLO mga03.intel.com"
+        Wed, 10 Jul 2019 12:53:40 -0400
+Received: from mga03.intel.com ([134.134.136.65]:24932 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727377AbfGJP6U (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jul 2019 11:58:20 -0400
+        id S1726957AbfGJQxj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 10 Jul 2019 12:53:39 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jul 2019 08:58:19 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jul 2019 09:53:39 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,475,1557212400"; 
-   d="p7s'?scan'208";a="176881156"
-Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
-  by orsmga002.jf.intel.com with ESMTP; 10 Jul 2019 08:58:19 -0700
-Received: from orsmsx112.amr.corp.intel.com (10.22.240.13) by
- ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 10 Jul 2019 08:58:19 -0700
+   d="p7s'?scan'208";a="193111080"
+Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
+  by fmsmga002.fm.intel.com with ESMTP; 10 Jul 2019 09:53:38 -0700
+Received: from orsmsx153.amr.corp.intel.com (10.22.226.247) by
+ ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 10 Jul 2019 09:53:38 -0700
 Received: from orsmsx103.amr.corp.intel.com ([169.254.5.44]) by
- ORSMSX112.amr.corp.intel.com ([169.254.3.118]) with mapi id 14.03.0439.000;
- Wed, 10 Jul 2019 08:58:18 -0700
+ ORSMSX153.amr.corp.intel.com ([169.254.12.99]) with mapi id 14.03.0439.000;
+ Wed, 10 Jul 2019 09:53:37 -0700
 From:   "Stotland, Inga" <inga.stotland@intel.com>
 To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
+        <michal.lowas-rzechonek@silvair.com>
+CC:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Gix, Brian" <brian.gix@intel.com>
-Subject: Re: [PATCH BlueZ 4/9] mesh: Generalize mesh-config APIs
-Thread-Topic: [PATCH BlueZ 4/9] mesh: Generalize mesh-config APIs
-Thread-Index: AQHVNt2/MW9GDe22gkC1tEIiumBj16bD7ImAgAB7wYCAAA/mgA==
-Date:   Wed, 10 Jul 2019 15:58:18 +0000
-Message-ID: <777f20a73b67ad91d1234c0674df6ff4ae95024c.camel@intel.com>
+Subject: Re: [PATCH BlueZ 6/9] mesh: Define storage format specific
+ read/write routines
+Thread-Topic: [PATCH BlueZ 6/9] mesh: Define storage format specific
+ read/write routines
+Thread-Index: AQHVNt3Aor4cw0IYJkqr20V9gkOC2KbD8IiAgACXHoA=
+Date:   Wed, 10 Jul 2019 16:53:37 +0000
+Message-ID: <e8479618084fb5056188c86939f911cf144f8be8.camel@intel.com>
 References: <20190710050959.7321-1-inga.stotland@intel.com>
-         <20190710050959.7321-5-inga.stotland@intel.com>
-         <20190710073827.5ktzlyynztmebiv6@mlowasrzechonek2133>
-         <20190710150123.veutvrmbhx5v7phg@kynes>
-In-Reply-To: <20190710150123.veutvrmbhx5v7phg@kynes>
+         <20190710050959.7321-7-inga.stotland@intel.com>
+         <20190710075245.2koao3eyj22wbj7s@mlowasrzechonek2133>
+In-Reply-To: <20190710075245.2koao3eyj22wbj7s@mlowasrzechonek2133>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.254.108.59]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-aNRxZWsBdAY+LzaBRXl8"
+        protocol="application/x-pkcs7-signature"; boundary="=-mBygGUXl9RgBMH910b83"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-aNRxZWsBdAY+LzaBRXl8
+--=-mBygGUXl9RgBMH910b83
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Michal,
 
-On Wed, 2019-07-10 at 17:01 +0200, Micha=C5=82 Lowas-Rzechonek wrote:
-> On 07/10, Micha=C5=82 Lowas-Rzechonek wrote:
-> > mesh-config.h:
-> >     union mesh_config;
+On Wed, 2019-07-10 at 09:52 +0200, Micha=C5=82 Lowas-Rzechonek wrote:
+> On 07/09, Inga Stotland wrote:
+> > This adds the following generic APIs to mesh-config.h
+> >     void *mesh_config_create_config(void);
+> >     void mesh_config_release_config(void *config);
+> >     void *mesh_config_get_config(const char *dir);
+> >     void *mesh_config_get_config_backup(const char *dir);
+> >     bool mesh_config_restore_backup(const char *dir);
+> >     bool mesh_config_save_config(const char *dir, void *cfg);
 > >=20
-> >     union mesh_config *mesh_config_create_config(void);
-> >     void mesh_config_release_config(union mesh_config *config);
-> >=20
-> > mesh-config-json.c:
-> >     union mesh_config {
-> >         json_object *json
-> >     };
-> >=20
-> >     union mesh_config *mesh_config_create_config(void)
-> >     {
-> >         return (union mesh_config*)json_object_new_object();
-> >     }
-> >=20
-> >     void mesh_config_release_config(union mesh_config *cfg)
-> >     {
-> >         json_object *jnode =3D (json_object *)cfg;
-> >=20
-> >         if (!cfg)
-> >             return;
-> >=20
-> >         json_object_put(jnode);
-> >     }
+> > The implementation of these API routines depends on the
+> > underlying storage directory structure and can be specific to
+> > a chosen configuration file format.
 >=20
-> Or even simpler, since we don't even need to define the mesh_config:
+> I don't like the assumption that each node is stored in a separate
+> file,
+> and there needs to be a backup file.
 >=20
-> mesh-config.h
->     struct mesh_config;
+> One of the storage formats I had in mind is a single transactional
+> database (some flavor of berkeley db, or maybe even sqlite) that
+> would
+> hold all the nodes.
 >=20
->     struct mesh_config *mesh_config_create_config(void);
->     void mesh_config_release_config(struct mesh_config *config);
+> With this in mind, how about:
 >=20
->     struct mesh_config *mesh_config_create_config(void)
->     {
->         return (struct mesh_config*)json_object_new_object();
->     }
+>     union mesh_config *mesh_config_create_config(const uint8_t
+> uuid[16]);
+>     bool mesh_config_save(union mesh_config *cfg);
 >=20
->     void mesh_config_release_config(struct mesh_config *cfg)
->     {
->         json_object *jnode =3D (json_object *)cfg;
->     }
+> and to iterate over saved nodes:
+>     typedef struct mesh_node *(*mesh_node_load_cb)(union mesh_config
+> *cfg,
+>                                                     const uint8_t
+> uuid[16],
+>                                                     void *user_data);
 >=20
+>     void mesh_config_load_nodes(mesh_node_load_cb cb, void
+> *user_data);
+>=20
+> and move file/directory handling from storage.c to mesh-config-
+> json.c?
+>=20
+>=20
+> regards
 
-I agree. Defining structure forward is better.
-Inga
 
---=-aNRxZWsBdAY+LzaBRXl8
+If we do away with the notion that each node has its own directory,
+this means that entire node parsing procedure needs to be pushed into
+the corresponding mesh-config-<specific> implementation and storage.c
+becomes obsolete.
+
+=20
+
+--=-mBygGUXl9RgBMH910b83
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -176,13 +180,13 @@ FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
 MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
 ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
 ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
-CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwNzEwMTU1ODE3WjAjBgkqhkiG9w0BCQQxFgQU
-pP/uqpcx43i8D6gkuJoiIWHMVUMwDQYJKoZIhvcNAQEBBQAEggEABAjU9ZTl4BYFsfM9GdmOTHaL
-TSSZvpJaPMgFfYNGrkQAAW2WDkfO/3sC7nACiWa/JO0mnWDPf4x2wXGs7ZGdpcTjerIQDEDVKJa+
-NXcMJIWMSZv4/uNQfZi1F57S8zbwDgFFh1DfTkbrINkK+LsbVX+dqq+zwkxAz0mprRqO/vov65YT
-I1ywRMU3HVcpymrZ5Hei9EfTSRr6jrov/ij+0Yy8RaVf4agi3lukB9/UKjqDxPWKDK/UE3zSnWd+
-rTkKrNxQEjWWEE4g+v48PYsre2BB/KNKnTY1yJ8pUjX4eoL2HN+5e+HasQLJ7aZR8AxgEtw2hlIJ
-rINJTZGK8YXjpwAAAAAAAA==
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwNzEwMTY1MzM3WjAjBgkqhkiG9w0BCQQxFgQU
+2GM+0K+knnZHD7YD4r5Vmu91pzkwDQYJKoZIhvcNAQEBBQAEggEAnbqJfVYHxXziR7kM6M18HXZe
+7mYGFvTooyvyW+w8GCu4K79ECP93lgj8odQRMH4bLHqbwOtLNY2ALB2cAkyZxow4wfyKJLpI08TX
++Mm5y/bPI2TOMbr0jQIUS9JKri0Hm3jTCqZ9KP/wq5/Gy+7GiAUSlINsqm8ozHBk27yi03kaiBb4
+yD6CAq+KbSMXAZ5VXmJin6vrPENi9dAXBTw0+52Qvxa57MU641kNiAKsvLpX0S7EwgB2tqqmL7xA
+a2XZIww2hoOsh4/YS0pchPfC/C6LnCrAmJUDpiPP8/5/TQsi+kYDSJ4m7jdOE7//IANzwAno3/fY
+Gf+lQ7M4U00TywAAAAAAAA==
 
 
---=-aNRxZWsBdAY+LzaBRXl8--
+--=-mBygGUXl9RgBMH910b83--
