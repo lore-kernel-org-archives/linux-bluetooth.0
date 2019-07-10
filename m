@@ -2,92 +2,132 @@ Return-Path: <SRS0=sCKx=VH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_STARTS_WITH_NUMS,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F05C004EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 10:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4346BC74A2B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 15:01:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 282E12054F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 10:01:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C82E2087F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 15:01:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XggheSc/"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="M9W/6Mub"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726198AbfGJKBk (ORCPT
+        id S1727641AbfGJPB3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jul 2019 06:01:40 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36215 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbfGJKBk (ORCPT
+        Wed, 10 Jul 2019 11:01:29 -0400
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:33436 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725956AbfGJPB3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jul 2019 06:01:40 -0400
-Received: by mail-pf1-f194.google.com with SMTP id r7so872596pfl.3;
-        Wed, 10 Jul 2019 03:01:39 -0700 (PDT)
+        Wed, 10 Jul 2019 11:01:29 -0400
+Received: by mail-lj1-f182.google.com with SMTP id h10so2443157ljg.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2019 08:01:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=oWhtY7VF/0YooGxc360oDSKbTlfpEs5lWHS7BPIJPpE=;
-        b=XggheSc/+S6dLAW40vhmTzXkKUDOqr9tyfJ5zD3xq/tu1SgkFHnK+aFANAOmfCWS3S
-         2bJUU8amJzfZXEmb4XfDXVH2KUML2cmstd17z7NvMXJsifB+Bea1qtnpjm4bqq9zSfq1
-         uolPrZr5tJZu0Lbm1O+eC6qzDKh14uU7fnYs0QbAipXykXS5tUbEi4TLDyWCBFlQ4mnt
-         ZNCrC1tPYzV31MNzFKS8E05R08OZhTD5pfYbbe1Lj+0oqUndnKdU7s/hOS24XVYPmwtC
-         9Bo3Oz9WZI+n+t86yC+MXN9pCt+JIYiCC/yg2+gBYgV3zRON2EcXRuuNBof1XX3/vKxn
-         hDYA==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=gyHdlxQUuHTKCDEz8RfXTpWvMUdjCx+KDbjik5V/FOU=;
+        b=M9W/6MubhCFx6bdbLbZYXe2mTlFO8JgO+N5dfw+RCosfJ6q4u8IkZ/rIzMGLkB0cnW
+         /D7HkiB7zMSj4GnRmQhSkfE/8TN3rm4GffzFnwSwUpC51ydT9SaGr0JZP9crhfOU4YSr
+         txHWdote5iUt9dAMQO+9dxdUgKBCsLDDW5H68wOVYRBL7oWYVQjQ+sPR85sy8Ime4Obm
+         efqf9uHAjCKnBnGRaZxYHUzyWVLeo2VrIQMJESE1425kkwAUTWL125ahX+H59pWmIMYo
+         baxyj5YDDCPVXmciHCqAI9xEwriIzyBQ2NkBTHXN8Vh/3Oyy11f5pRjxqUcLlmmmA7lQ
+         tUzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=oWhtY7VF/0YooGxc360oDSKbTlfpEs5lWHS7BPIJPpE=;
-        b=aZ/qkHlRGnVOI+x4/6jIGIhNoiQtGVOCfhm5P6k7mvwAIseA1arS1rJBaMhYCIjQl/
-         xEtTrd2JPaNw/2XS71vjOb2Q84IZnwZ/QPzvC8kKph+E5h9SPQYEqFFB0p+TS4bKME/0
-         ubULt8ZxuiNdUyi08wUHAuJ5Lchme6YTARxzYtVyn+w6IGy49R6tBxJvquX0xITwTGYt
-         MzcqVPBJoXsEW66sXRa+KDg0vMbs7imnllq7iBVJATHBrIKHFKc0EfSILNFik4KpaLqq
-         JkTIvAocc7Sn+E7oaSirvMAFwHjFoBNuDWXyS9MDJqsxLlrAoaZEKeTAZJ78+XTBGa6n
-         QkyA==
-X-Gm-Message-State: APjAAAV7kKOhx7hk3+X8gbenQoHfd0HuZzEwrcwalnN7wvUtm05EQ/y6
-        9pQ6dRC4uNIFWIP9aCcnC7yZxJOiPuL9+A==
-X-Google-Smtp-Source: APXvYqxZX+YQAsBXt0Kso/g+3zS8tfNPCvsalPjlDDWX3WD2ie+I3ehs36sH4zgMVmOJ2Hyy5xJwPw==
-X-Received: by 2002:a17:90a:77c5:: with SMTP id e5mr5735940pjs.109.1562752898936;
-        Wed, 10 Jul 2019 03:01:38 -0700 (PDT)
-Received: from sheetal-Inspiron-5537.domain.name ([103.68.35.254])
-        by smtp.googlemail.com with ESMTPSA id c5sm1704424pgq.80.2019.07.10.03.01.35
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 10 Jul 2019 03:01:37 -0700 (PDT)
-From:   sheetalsingala <2396sheetal@gmail.com>
-To:     marcel@holtman.org
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sheetalsingala <2396sheetal@gmail.com>
-Subject: [PATCH 2/2] Fixed a brace styling issue
-Date:   Wed, 10 Jul 2019 15:31:26 +0530
-Message-Id: <20190710100126.1519-1-2396sheetal@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:date:from:to:subject:message-id:mail-followup-to
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=gyHdlxQUuHTKCDEz8RfXTpWvMUdjCx+KDbjik5V/FOU=;
+        b=X7OSep/YHZIYiwS1NUprzqSaTiEeThVaFb7pJsmd3OWMI7eRJPM+nKY1tqB/5tfK9Z
+         XyIuG8Cfu3sKDz2OBUcCahL7+ZQGHwTgZGAsZkWdOEo347o7FxLKQAJ1zgcOu7efwe4j
+         Px9C1bSlte41VksfFTMeQ1ix6fVKFT0K9CD/tHp90RxSNZxkcHL4LT15Lwa3es0pv5NK
+         GDjra6WP62zLV0CkPrOQwPZ85DdWr01z+T2JisbL3dPhsOoAj3+yhhAp12Toh2bl+LHS
+         3ac7WQQEeSAh+DH5w80eFoj/L++LriQNLdszrhiWdkEOxj6J7xcLTSkUPpBLcVvQ+hOR
+         zjkQ==
+X-Gm-Message-State: APjAAAWbrGbmxh2odNieqaMrr/rioY4rxF5gODytimQ/NhEZhz3b4oOQ
+        IKqHfI0A2KT2GGo+e+baGtmwWA==
+X-Google-Smtp-Source: APXvYqw2OA9AQM4/tebeWN704WX0Nd0gNWrQIYkiqfQ7xeQlJXvhhfTsUFIIYUDOMqVY2/K97PL42Q==
+X-Received: by 2002:a2e:3008:: with SMTP id w8mr18342273ljw.13.1562770886793;
+        Wed, 10 Jul 2019 08:01:26 -0700 (PDT)
+Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
+        by smtp.gmail.com with ESMTPSA id o24sm506466ljg.6.2019.07.10.08.01.24
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 10 Jul 2019 08:01:25 -0700 (PDT)
+Date:   Wed, 10 Jul 2019 17:01:23 +0200
+From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
+        <michal.lowas-rzechonek@silvair.com>
+To:     Inga Stotland <inga.stotland@intel.com>,
+        linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
+        jakub.witowski@silvair.com
+Subject: Re: [PATCH BlueZ 4/9] mesh: Generalize mesh-config APIs
+Message-ID: <20190710150123.veutvrmbhx5v7phg@kynes>
+Mail-Followup-To: Inga Stotland <inga.stotland@intel.com>,
+        linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
+        jakub.witowski@silvair.com
+References: <20190710050959.7321-1-inga.stotland@intel.com>
+ <20190710050959.7321-5-inga.stotland@intel.com>
+ <20190710073827.5ktzlyynztmebiv6@mlowasrzechonek2133>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190710073827.5ktzlyynztmebiv6@mlowasrzechonek2133>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fixed a coding style issue
+On 07/10, Michał Lowas-Rzechonek wrote:
+> mesh-config.h:
+>     union mesh_config;
+> 
+>     union mesh_config *mesh_config_create_config(void);
+>     void mesh_config_release_config(union mesh_config *config);
+> 
+> mesh-config-json.c:
+>     union mesh_config {
+>         json_object *json
+>     };
+> 
+>     union mesh_config *mesh_config_create_config(void)
+>     {
+>         return (union mesh_config*)json_object_new_object();
+>     }
+> 
+>     void mesh_config_release_config(union mesh_config *cfg)
+>     {
+>         json_object *jnode = (json_object *)cfg;
+> 
+>         if (!cfg)
+>             return;
+> 
+>         json_object_put(jnode);
+>     }
 
-Signed-off-by: Sheetal Singala <2396sheetal@gmail.com>
----
- drivers/bluetooth/btintel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Or even simpler, since we don't even need to define the mesh_config:
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index bb99c8653aab..4a8b812605f3 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -18,7 +18,7 @@
- 
- #define VERSION "0.1"
- 
--#define BDADDR_INTEL (&(bdaddr_t) {{0x00, 0x8b, 0x9e, 0x19, 0x03, 0x00}})
-+#define BDADDR_INTEL (&(bdaddr_t) {0x00, 0x8b, 0x9e, 0x19, 0x03, 0x00})
- 
- int btintel_check_bdaddr(struct hci_dev *hdev)
- {
+mesh-config.h
+    struct mesh_config;
+
+    struct mesh_config *mesh_config_create_config(void);
+    void mesh_config_release_config(struct mesh_config *config);
+
+    struct mesh_config *mesh_config_create_config(void)
+    {
+        return (struct mesh_config*)json_object_new_object();
+    }
+
+    void mesh_config_release_config(struct mesh_config *cfg)
+    {
+        json_object *jnode = (json_object *)cfg;
+    }
+
 -- 
-2.17.1
-
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
