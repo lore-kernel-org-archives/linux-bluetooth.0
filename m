@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E18C73C6E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 05:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB876C73C6D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 05:10:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69CF020838
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 05:10:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B80A220844
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 05:10:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbfGJFKC (ORCPT
+        id S1726121AbfGJFKE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jul 2019 01:10:02 -0400
+        Wed, 10 Jul 2019 01:10:04 -0400
 Received: from mga18.intel.com ([134.134.136.126]:28140 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726020AbfGJFKC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jul 2019 01:10:02 -0400
+        id S1726020AbfGJFKD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 10 Jul 2019 01:10:03 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 22:10:01 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 22:10:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,473,1557212400"; 
-   d="scan'208";a="189050272"
+   d="scan'208";a="189050296"
 Received: from ingas-nuc1.sea.intel.com ([10.254.182.100])
-  by fmsmga004.fm.intel.com with ESMTP; 09 Jul 2019 22:10:01 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 09 Jul 2019 22:10:03 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, michal.lowas-rzechonek@silvair.com,
         jakub.witowski@silvair.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 1/9] mesh: Move network config setup from storage.c to node.c
-Date:   Tue,  9 Jul 2019 22:09:51 -0700
-Message-Id: <20190710050959.7321-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/9] mesh: Rename mesh-db.c to mesh-config-json.c
+Date:   Tue,  9 Jul 2019 22:09:52 -0700
+Message-Id: <20190710050959.7321-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190710050959.7321-1-inga.stotland@intel.com>
 References: <20190710050959.7321-1-inga.stotland@intel.com>
@@ -45,115 +45,117 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This commit moves initialization of configuration parameters
-for node->net when the local node state is restored from stored
-configuration. Old location: storage.c, new locaiton node.c.
+This moves mesh-db.h to mesh-config.h and mesh-db.c to mesh-config-json.c.
+mesh-config.h declares common APIs for storing mesh node configuration.
+mesh-config-json.c defines the APIs for JSOn specific storage.
+This allows for future parallel implementation a different (not JSON-based)
+mechanism of storing node configuration.
 ---
- mesh/node.c    | 28 ++++++++++++++++++++++++++++
- mesh/storage.c | 39 ---------------------------------------
- 2 files changed, 28 insertions(+), 39 deletions(-)
+ Makefile.mesh                          | 2 +-
+ mesh/cfgmod-server.c                   | 3 +--
+ mesh/{mesh-db.c => mesh-config-json.c} | 3 +--
+ mesh/{mesh-db.h => mesh-config.h}      | 0
+ mesh/model.c                           | 2 +-
+ mesh/node.c                            | 2 +-
+ mesh/storage.c                         | 3 +--
+ 7 files changed, 6 insertions(+), 9 deletions(-)
+ rename mesh/{mesh-db.c => mesh-config-json.c} (99%)
+ rename mesh/{mesh-db.h => mesh-config.h} (100%)
 
+diff --git a/Makefile.mesh b/Makefile.mesh
+index 1ace507af..502ba2a47 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -25,7 +25,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
+ 				mesh/provision.h mesh/prov.h \
+ 				mesh/model.h mesh/model.c \
+ 				mesh/cfgmod.h mesh/cfgmod-server.c \
+-				mesh/mesh-db.h mesh/mesh-db.c \
++				mesh/mesh-config.h mesh/mesh-config-json.c \
+ 				mesh/util.h mesh/util.c \
+ 				mesh/dbus.h mesh/dbus.c \
+ 				mesh/agent.h mesh/agent.c \
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index a19ddc72e..486c87307 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -32,8 +32,7 @@
+ #include "mesh/appkey.h"
+ #include "mesh/model.h"
+ #include "mesh/storage.h"
+-#include "mesh/mesh-db.h"
+-
++#include "mesh/mesh-config.h"
+ #include "mesh/cfgmod.h"
+ 
+ #define CFG_MAX_MSG_LEN 380
+diff --git a/mesh/mesh-db.c b/mesh/mesh-config-json.c
+similarity index 99%
+rename from mesh/mesh-db.c
+rename to mesh/mesh-config-json.c
+index e0a000261..35d0bd27e 100644
+--- a/mesh/mesh-db.c
++++ b/mesh/mesh-config-json.c
+@@ -31,8 +31,7 @@
+ 
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+-
+-#include "mesh/mesh-db.h"
++#include "mesh/mesh-config.h"
+ 
+ #define CHECK_KEY_IDX_RANGE(x) (((x) >= 0) && ((x) <= 4095))
+ 
+diff --git a/mesh/mesh-db.h b/mesh/mesh-config.h
+similarity index 100%
+rename from mesh/mesh-db.h
+rename to mesh/mesh-config.h
+diff --git a/mesh/model.c b/mesh/model.c
+index e08f95b71..0474762e0 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -30,7 +30,7 @@
+ #include "mesh/mesh.h"
+ #include "mesh/crypto.h"
+ #include "mesh/node.h"
+-#include "mesh/mesh-db.h"
++#include "mesh/mesh-config.h"
+ #include "mesh/net.h"
+ #include "mesh/appkey.h"
+ #include "mesh/cfgmod.h"
 diff --git a/mesh/node.c b/mesh/node.c
-index 1f781cfe9..a2d95dacf 100644
+index a2d95dacf..06e809706 100644
 --- a/mesh/node.c
 +++ b/mesh/node.c
-@@ -375,6 +375,7 @@ bool node_init_from_storage(struct mesh_node *node, void *data)
- {
- 	struct mesh_db_node *db_node = data;
- 	unsigned int num_ele;
-+	uint8_t mode;
- 
- 	node->comp = l_new(struct node_composition, 1);
- 	node->comp->cid = db_node->cid;
-@@ -407,6 +408,33 @@ bool node_init_from_storage(struct mesh_node *node, void *data)
- 
- 	node->primary = db_node->unicast;
- 
-+	mesh_net_set_seq_num(node->net, node->seq_number);
-+	mesh_net_set_default_ttl(node->net, node->ttl);
-+
-+	mode = node->proxy;
-+	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
-+		mesh_net_set_proxy_mode(node->net, mode == MESH_MODE_ENABLED);
-+
-+	mode = node->lpn;
-+	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
-+		mesh_net_set_friend_mode(node->net, mode == MESH_MODE_ENABLED);
-+
-+	mode = node->relay.mode;
-+	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
-+		mesh_net_set_relay_mode(node->net, mode == MESH_MODE_ENABLED,
-+					node->relay.cnt, node->relay.interval);
-+
-+	mode = node->beacon;
-+	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
-+		mesh_net_set_beacon_mode(node->net, mode == MESH_MODE_ENABLED);
-+
-+	if (!IS_UNASSIGNED(node->primary) &&
-+		!mesh_net_register_unicast(node->net, node->primary, num_ele))
-+		return false;
-+
-+	if (node->uuid)
-+		mesh_net_id_uuid_set(node->net, node->uuid);
-+
- 	/* Initialize configuration server model */
- 	mesh_config_srv_init(node, PRIMARY_ELE_IDX);
- 
+@@ -31,7 +31,7 @@
+ #include "mesh/mesh-defs.h"
+ #include "mesh/mesh.h"
+ #include "mesh/net.h"
+-#include "mesh/mesh-db.h"
++#include "mesh/mesh-config.h"
+ #include "mesh/provision.h"
+ #include "mesh/storage.h"
+ #include "mesh/keyring.h"
 diff --git a/mesh/storage.c b/mesh/storage.c
-index 0f2b77fde..2b7804242 100644
+index 2b7804242..bba2ef348 100644
 --- a/mesh/storage.c
 +++ b/mesh/storage.c
-@@ -56,51 +56,12 @@ static const char *storage_dir;
- static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
- {
- 	struct mesh_node *node = user_data;
--	struct mesh_net *net;
--	uint32_t seq_number;
--	uint8_t ttl, mode, cnt, num_ele;
--	uint16_t unicast, interval;
--	uint8_t *uuid;
+@@ -22,7 +22,6 @@
+ #endif
  
- 	if (!node_init_from_storage(node, db_node)) {
- 		node_remove(node);
- 		return false;
- 	}
- 
--	net = node_get_net(node);
--	seq_number = node_get_sequence_number(node);
--	mesh_net_set_seq_num(net, seq_number);
--	ttl = node_default_ttl_get(node);
--	mesh_net_set_default_ttl(net, ttl);
--
--	mode = node_proxy_mode_get(node);
--	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
--		mesh_net_set_proxy_mode(net, mode == MESH_MODE_ENABLED);
--
--	mode = node_friend_mode_get(node);
--	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
--		mesh_net_set_friend_mode(net, mode == MESH_MODE_ENABLED);
--
--	mode = node_relay_mode_get(node, &cnt, &interval);
--	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
--		mesh_net_set_relay_mode(net, mode == MESH_MODE_ENABLED, cnt,
--								interval);
--
--	mode = node_beacon_mode_get(node);
--	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
--		mesh_net_set_beacon_mode(net, mode == MESH_MODE_ENABLED);
--
--	unicast = db_node->unicast;
--	num_ele = node_get_num_elements(node);
--
--	if (!IS_UNASSIGNED(unicast) &&
--		!mesh_net_register_unicast(net, unicast, num_ele))
--		return false;
--
--	uuid = node_uuid_get(node);
--	if (uuid)
--		mesh_net_id_uuid_set(net, uuid);
--
- 	return true;
- }
+ #define _GNU_SOURCE
+-//#include <errno.h>
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <unistd.h>
+@@ -37,7 +36,7 @@
+ #include "mesh/node.h"
+ #include "mesh/net.h"
+ #include "mesh/appkey.h"
+-#include "mesh/mesh-db.h"
++#include "mesh/mesh-config.h"
+ #include "mesh/util.h"
+ #include "mesh/storage.h"
  
 -- 
 2.21.0
