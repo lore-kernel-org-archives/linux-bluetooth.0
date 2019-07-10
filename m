@@ -2,144 +2,122 @@ Return-Path: <SRS0=sCKx=VH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6BCC73C7C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 07:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCD1C73C7C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 07:52:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA7B720651
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 07:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7042820693
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Jul 2019 07:52:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="wrNc50jL"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="HZNHQNLh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726272AbfGJHic (ORCPT
+        id S1727193AbfGJHwv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Jul 2019 03:38:32 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:39612 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726132AbfGJHic (ORCPT
+        Wed, 10 Jul 2019 03:52:51 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45110 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727118AbfGJHwv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Jul 2019 03:38:32 -0400
-Received: by mail-lj1-f196.google.com with SMTP id v18so1047362ljh.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2019 00:38:30 -0700 (PDT)
+        Wed, 10 Jul 2019 03:52:51 -0400
+Received: by mail-wr1-f67.google.com with SMTP id f9so1296366wre.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2019 00:52:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:mail-followup-to:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=CZDxR4xgfgD0Xnp8CDS9w0flO3T8ocjdBsGpxn2o0ms=;
-        b=wrNc50jLxfAg1bK3CpFw7ewu8Ck51Rh8A+4hiVjGNcktaL+LX4NlnZUZHwAYOWgHg9
-         UbDRgZNxsKR75x7KjPXG9xoXr3Mezo/mQejHikOXVMoHkkxKDctU7O+fbVtpkCCnJpZy
-         QNZjh1g8cp/GrC10e2+gfhj3O9e8ZwuMlQc2PUapPVuUd4c8QWLgor72xIPeiqxnuOBX
-         WSe3v3vtb8UvEHQR5J3Ryn6J002BUPrsst5fdedJgRNCgkCgt6DEjdWzrKqW/t+CGepF
-         Whc3UCsq6DiE7hcGpAepgHIQQWRwkQV4+/O9ImtzSWaCBHJxr48e7CnXky6qytfEk6Q8
-         LlIw==
+        bh=kxfsIK/azxtf+dkgnH9i+nHGvgqgPlzs2CH//OPWnZ8=;
+        b=HZNHQNLhMH5trFthpdaha1PHNG8G5IwEJaNcS3oySGqzUPziJa23k2eaNKxfi7wW2H
+         dnGsVyECBwyg744d3IyyI2pV/D+9u4qUqqnDDtXSJkG4JLxLC+HftsCUnNx494P1arG/
+         1RbUjT7IiinI4TmaDC0yNkmdlZV0bByYkNpPubcSA8KS6VxCbB0Ru+HFsri9ZyMFmlvX
+         FsvAAvXxpBRBMukXOZrI47vo/LMENqiCyz37nMbtq7hudwvl8vQvkWy03sUDOvb6MBFS
+         0eeDojvxmvWfYNeZIy9GHGZpT12g5K8ab/Q6BpkiWegjYANHYD5PloW9BuD5/sZGoT+S
+         DxCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id
          :mail-followup-to:references:mime-version:content-disposition
          :content-transfer-encoding:in-reply-to:user-agent;
-        bh=CZDxR4xgfgD0Xnp8CDS9w0flO3T8ocjdBsGpxn2o0ms=;
-        b=MJXmlNJ0ldZc2pG/WE+AkPXLikImNxaWlMVaS4RLxnTpHI/kC4g+8FQgX4oToJGAjm
-         wZeDdZiaNdFrQECHH+6uyClpx2uHwRQsuy/fMfrMiftMm3ClnOj4U6r+qzkyr5yLQX1T
-         qNcefgLOaabyncu9ZfslDVW0HsKwLLY4GDVmAEERjtrn7daTmfRgyN4BQZt6LfqaemJl
-         53IF7bbGwrGWaK5wIAqNmIZdArOCN+24U89QFz/QwYbz2jNnU9OCiLAajjsyzVD5qZfD
-         n4VhvkSgmxMua4/DjnFKWpGlHRnjdXAqLKMo7Usfdd+07e2hiUsaoxOUk+u7I59XWDYl
-         pCpA==
-X-Gm-Message-State: APjAAAVNHEErat7tQOXmQ6CNAu2+tEvsnkY6yO038Ck8ytbkj/KKJQH1
-        BEOQgcz1zqLtBkyUtAtkqV3yoQ==
-X-Google-Smtp-Source: APXvYqyC8o5o+WFJpGgw/IVEkvxOcIE8AGkTD7DCkZcaHFU/8uBC+Lj0kh9K+wdqLkgluEDMK+OxOA==
-X-Received: by 2002:a2e:995a:: with SMTP id r26mr16476166ljj.107.1562744310199;
-        Wed, 10 Jul 2019 00:38:30 -0700 (PDT)
+        bh=kxfsIK/azxtf+dkgnH9i+nHGvgqgPlzs2CH//OPWnZ8=;
+        b=TkoNWMOgAFBWZcPqN2PiTKaSTQr03R8moNDpR6TI3+5dCYZj4mLvhfSHngFUn5tQ4A
+         T7+xPNf3TY9GhSNrFTEA19VfVwl+yvI+4cbyoPWGHXMVBo+1NAKPFYqoJfmrEloOfpYY
+         GMsli1ZnU4m08rPfl3DyC/RGJ34Ge8Pw0io9lLSzkY8ljY+CvATvUxZ6wOXKccUiuEF/
+         hjjf9Mr3ypO5ZkwDRBNEq287p9pGTgQHfpqskBA50t4/bQsSv14hhoPv6OvOQq2fY02m
+         8kTSAws6nFsXB7g8gDV5BkhkhQ2OYyvGNv3ixeDNxEKf1xNJBgBGApk168jRo/g6f5Je
+         I+gQ==
+X-Gm-Message-State: APjAAAX4jdTcwlYKfh1pn5G0piuDpaCX38/UPQKsR232Z64TV7YAmBYA
+        e9X8uVdmqUi7gIU9OBv9zZZlIQ==
+X-Google-Smtp-Source: APXvYqx7dPbGJjxOL/QcsfJlwRe5oRYFBnlEEo8/0UubeDEhxtKlUuI5SeoYv0ZN3A2mQgesUQ/2SQ==
+X-Received: by 2002:a5d:6908:: with SMTP id t8mr30836125wru.147.1562745168762;
+        Wed, 10 Jul 2019 00:52:48 -0700 (PDT)
 Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id n124sm228454lfd.46.2019.07.10.00.38.29
+        by smtp.gmail.com with ESMTPSA id g11sm1442478wrq.92.2019.07.10.00.52.47
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 10 Jul 2019 00:38:29 -0700 (PDT)
-Date:   Wed, 10 Jul 2019 09:38:27 +0200
+        Wed, 10 Jul 2019 00:52:48 -0700 (PDT)
+Date:   Wed, 10 Jul 2019 09:52:45 +0200
 From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
         <michal.lowas-rzechonek@silvair.com>
 To:     Inga Stotland <inga.stotland@intel.com>
 Cc:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
         jakub.witowski@silvair.com
-Subject: Re: [PATCH BlueZ 4/9] mesh: Generalize mesh-config APIs
-Message-ID: <20190710073827.5ktzlyynztmebiv6@mlowasrzechonek2133>
+Subject: Re: [PATCH BlueZ 6/9] mesh: Define storage format specific
+ read/write routines
+Message-ID: <20190710075245.2koao3eyj22wbj7s@mlowasrzechonek2133>
 Mail-Followup-To: Inga Stotland <inga.stotland@intel.com>,
         linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
         jakub.witowski@silvair.com
 References: <20190710050959.7321-1-inga.stotland@intel.com>
- <20190710050959.7321-5-inga.stotland@intel.com>
+ <20190710050959.7321-7-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190710050959.7321-5-inga.stotland@intel.com>
+In-Reply-To: <20190710050959.7321-7-inga.stotland@intel.com>
 User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
-
 On 07/09, Inga Stotland wrote:
-> This changes argument for each mesh-config API to use void* as
-> a pointer to a node configuration object. This makes usage of JSON
-> opaque for the rest of the code and allows to plug in a non-JSON
-> configuration storage implementation.
-> ---
->  mesh/mesh-config-json.c | 228 +++++++++++++++++++++++-----------------
->  mesh/mesh-config.h      | 107 +++++++++----------
->  2 files changed, 180 insertions(+), 155 deletions(-)
-> 
-> diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-> index 8fcb8afe3..5ca086ad0 100644
-> --- a/mesh/mesh-config-json.c
-> +++ b/mesh/mesh-config-json.c
-> @@ -252,10 +252,14 @@ static json_object *jarray_key_del(json_object *jarray, int16_t idx)
->  	return jarray_new;
->  }
->  
-> -bool mesh_config_read_iv_index(json_object *jobj, uint32_t *idx, bool *update)
-> +bool mesh_config_read_iv_index(void *cfg, uint32_t *idx, bool *update)
+> This adds the following generic APIs to mesh-config.h
+>     void *mesh_config_create_config(void);
+>     void mesh_config_release_config(void *config);
+>     void *mesh_config_get_config(const char *dir);
+>     void *mesh_config_get_config_backup(const char *dir);
+>     bool mesh_config_restore_backup(const char *dir);
+>     bool mesh_config_save_config(const char *dir, void *cfg);
+>
+> The implementation of these API routines depends on the
+> underlying storage directory structure and can be specific to
+> a chosen configuration file format.
 
-I'm not a fan of using void* for polymorphism. While there are places
-this makes sense (e.g. user_data pointers in callbacks), I think we
-should try to avoid this in our APIs.
+I don't like the assumption that each node is stored in a separate file,
+and there needs to be a backup file.
 
-Since the proposed patch assumes that we would switch backends during
-the build, and you can't have two different config formats compiled in
-at the same time, how about this:
+One of the storage formats I had in mind is a single transactional
+database (some flavor of berkeley db, or maybe even sqlite) that would
+hold all the nodes.
 
-mesh-config.h:
-    union mesh_config;
+With this in mind, how about:
 
-    union mesh_config *mesh_config_create_config(void);
-    void mesh_config_release_config(union mesh_config *config);
+    union mesh_config *mesh_config_create_config(const uint8_t uuid[16]);
+    bool mesh_config_save(union mesh_config *cfg);
 
-mesh-config-json.c:
-    union mesh_config {
-        json_object *json
-    };
+and to iterate over saved nodes:
+    typedef struct mesh_node *(*mesh_node_load_cb)(union mesh_config *cfg,
+                                                    const uint8_t uuid[16],
+                                                    void *user_data);
 
-    union mesh_config *mesh_config_create_config(void)
-    {
-        return (union mesh_config*)json_object_new_object();
-    }
+    void mesh_config_load_nodes(mesh_node_load_cb cb, void *user_data);
 
-    void mesh_config_release_config(union mesh_config *cfg)
-    {
-        json_object *jnode = (json_object *)cfg;
+and move file/directory handling from storage.c to mesh-config-json.c?
 
-        if (!cfg)
-            return;
 
-        json_object_put(jnode);
-    }
-
-etc.
-
+regards
 -- 
 Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
 Silvair http://silvair.com
