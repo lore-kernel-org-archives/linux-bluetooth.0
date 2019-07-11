@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE3D3C742A2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jul 2019 23:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F717C742A2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jul 2019 23:00:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AA38208E4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jul 2019 23:00:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20571208E4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jul 2019 23:00:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730432AbfGKXAr (ORCPT
+        id S1730434AbfGKXAv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Jul 2019 19:00:47 -0400
+        Thu, 11 Jul 2019 19:00:51 -0400
 Received: from mga18.intel.com ([134.134.136.126]:38699 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730428AbfGKXAr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Jul 2019 19:00:47 -0400
+        id S1730428AbfGKXAv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Jul 2019 19:00:51 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Jul 2019 16:00:46 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Jul 2019 16:00:50 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,480,1557212400"; 
-   d="scan'208";a="166516286"
+   d="scan'208";a="166516308"
 Received: from bgix-dell-lap.sea.intel.com ([10.255.80.129])
-  by fmsmga008.fm.intel.com with ESMTP; 11 Jul 2019 16:00:46 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 11 Jul 2019 16:00:50 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     inga.stotland@intel.com, michal.lowas-rzechonek@silvair.com,
         brian.gix@intel.com
-Subject: [PATCH BlueZ v2 7/9] mesh: Implement DBus Provisioning methods
-Date:   Thu, 11 Jul 2019 15:59:50 -0700
-Message-Id: <20190711225952.1599-8-brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 8/9] mesh: Convert provisioning pkts to packed structs
+Date:   Thu, 11 Jul 2019 15:59:51 -0700
+Message-Id: <20190711225952.1599-9-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20190711225952.1599-1-brian.gix@intel.com>
 References: <20190711225952.1599-1-brian.gix@intel.com>
@@ -43,377 +43,852 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements the Interface and Methods for:
-UnprovisionedScan()
-UnprovisionedScanCancel()
-AddNode()
+Provisioning packets are defined in the specification
+as packed big endian structures. Instead of specifying
+an octet array, we now use struct matching the spec.
 ---
- mesh/manager.c | 304 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 296 insertions(+), 8 deletions(-)
+ mesh/crypto.c         |   8 +--
+ mesh/crypto.h         |   8 +--
+ mesh/mesh.c           |   2 +-
+ mesh/mesh.h           |   3 +-
+ mesh/pb-adv.c         |  79 +++++++++++++++++--------
+ mesh/prov-acceptor.c  | 156 +++++++++++++++++++++++++++-----------------------
+ mesh/prov-initiator.c |  94 +++++++++++++++---------------
+ mesh/prov.h           |  51 ++++++++++++++++-
+ 8 files changed, 247 insertions(+), 154 deletions(-)
 
-diff --git a/mesh/manager.c b/mesh/manager.c
-index ca3562512..77d7b7516 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -28,19 +28,202 @@
- #include "mesh/dbus.h"
- #include "mesh/error.h"
- #include "mesh/mesh.h"
-+#include "mesh/mesh-io.h"
- #include "mesh/node.h"
-+#include "mesh/net.h"
- #include "mesh/keyring.h"
-+#include "mesh/agent.h"
-+#include "mesh/provision.h"
- #include "mesh/manager.h"
+diff --git a/mesh/crypto.c b/mesh/crypto.c
+index 3fa0df246..a4679d88e 100644
+--- a/mesh/crypto.c
++++ b/mesh/crypto.c
+@@ -102,8 +102,8 @@ bool mesh_crypto_aes_cmac(const uint8_t key[16], const uint8_t *msg,
  
-+struct add_data{
-+	struct l_dbus_message *msg;
-+	struct mesh_agent *agent;
-+	struct mesh_node *node;
-+	uint32_t disc_watch;
-+	uint16_t primary;
-+	uint16_t net_idx;
-+	uint8_t num_ele;
+ bool mesh_crypto_aes_ccm_encrypt(const uint8_t nonce[13], const uint8_t key[16],
+ 					const uint8_t *aad, uint16_t aad_len,
+-					const uint8_t *msg, uint16_t msg_len,
+-					uint8_t *out_msg,
++					const void *msg, uint16_t msg_len,
++					void *out_msg,
+ 					void *out_mic, size_t mic_size)
+ {
+ 	void *cipher;
+@@ -128,8 +128,8 @@ bool mesh_crypto_aes_ccm_encrypt(const uint8_t nonce[13], const uint8_t key[16],
+ 
+ bool mesh_crypto_aes_ccm_decrypt(const uint8_t nonce[13], const uint8_t key[16],
+ 				const uint8_t *aad, uint16_t aad_len,
+-				const uint8_t *enc_msg, uint16_t enc_msg_len,
+-				uint8_t *out_msg,
++				const void *enc_msg, uint16_t enc_msg_len,
++				void *out_msg,
+ 				void *out_mic, size_t mic_size)
+ {
+ 	void *cipher;
+diff --git a/mesh/crypto.h b/mesh/crypto.h
+index ffd312231..3e6815a35 100644
+--- a/mesh/crypto.h
++++ b/mesh/crypto.h
+@@ -22,13 +22,13 @@
+ 
+ bool mesh_crypto_aes_ccm_encrypt(const uint8_t nonce[13], const uint8_t key[16],
+ 					const uint8_t *aad, uint16_t aad_len,
+-					const uint8_t *msg, uint16_t msg_len,
+-					uint8_t *out_msg,
++					const void *msg, uint16_t msg_len,
++					void *out_msg,
+ 					void *out_mic, size_t mic_size);
+ bool mesh_crypto_aes_ccm_decrypt(const uint8_t nonce[13], const uint8_t key[16],
+ 				const uint8_t *aad, uint16_t aad_len,
+-				const uint8_t *enc_msg, uint16_t enc_msg_len,
+-				uint8_t *out_msg,
++				const void *enc_msg, uint16_t enc_msg_len,
++				void *out_msg,
+ 				void *out_mic, size_t mic_size);
+ bool mesh_aes_ecb_one(const uint8_t key[16],
+ 			const uint8_t plaintext[16], uint8_t encrypted[16]);
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index 62c80c0f3..b9e3162eb 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -86,7 +86,7 @@ static bool simple_match(const void *a, const void *b)
+ /* Used for any outbound traffic that doesn't have Friendship Constraints */
+ /* This includes Beacons, Provisioning and unrestricted Network Traffic */
+ bool mesh_send_pkt(uint8_t count, uint16_t interval,
+-					uint8_t *data, uint16_t len)
++					void *data, uint16_t len)
+ {
+ 	struct mesh_io_send_info info = {
+ 		.type = MESH_IO_TIMING_TYPE_GENERAL,
+diff --git a/mesh/mesh.h b/mesh/mesh.h
+index 2ef77b57d..78d4d4926 100644
+--- a/mesh/mesh.h
++++ b/mesh/mesh.h
+@@ -37,8 +37,7 @@ void mesh_cleanup(void);
+ bool mesh_dbus_init(struct l_dbus *dbus);
+ 
+ const char *mesh_status_str(uint8_t err);
+-bool mesh_send_pkt(uint8_t count, uint16_t interval, uint8_t *data,
+-								uint16_t len);
++bool mesh_send_pkt(uint8_t count, uint16_t interval, void *data, uint16_t len);
+ bool mesh_send_cancel(const uint8_t *filter, uint8_t len);
+ bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data);
+ void mesh_unreg_prov_rx(prov_rx_cb_t cb);
+diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
+index 4d85ee72e..6b4a70052 100644
+--- a/mesh/pb-adv.c
++++ b/mesh/pb-adv.c
+@@ -63,6 +63,36 @@ struct pb_adv_session {
+ 
+ #define PB_ADV_MTU	24
+ 
++struct pb_ack {
++	uint8_t ad_type;
++	uint32_t link_id;
++	uint8_t trans_num;
++	uint8_t opcode;
++} __packed;
++
++struct pb_open_req{
++	uint8_t ad_type;
++	uint32_t link_id;
++	uint8_t trans_num;
++	uint8_t opcode;
 +	uint8_t uuid[16];
-+};
++} __packed;
 +
-+static int8_t scan_rssi;
-+static uint8_t scan_uuid[16];
-+static struct mesh_node *scan_node;
-+static struct l_timeout *scan_timeout;
-+static struct add_data *add_pending;
++struct pb_open_cfm{
++	uint8_t ad_type;
++	uint32_t link_id;
++	uint8_t trans_num;
++	uint8_t opcode;
++} __packed;
 +
-+static void scan_cancel(struct l_timeout *timeout, void *user_data)
++struct pb_close_ind {
++	uint8_t ad_type;
++	uint32_t link_id;
++	uint8_t trans_num;
++	uint8_t opcode;
++	uint8_t reason;
++} __packed;
++
+ static struct pb_adv_session *pb_session = NULL;
+ 
+ static const uint8_t filter[1] = { MESH_AD_TYPE_PROVISION };
+@@ -150,7 +180,7 @@ static void tx_timeout(struct l_timeout *timeout, void *user_data)
+ 	cb(user_data, 1);
+ }
+ 
+-static void pb_adv_tx(void *user_data, uint8_t *data, uint16_t len)
++static void pb_adv_tx(void *user_data, void *data, uint16_t len)
+ {
+ 	struct pb_adv_session *session = user_data;
+ 
+@@ -165,55 +195,56 @@ static void pb_adv_tx(void *user_data, uint8_t *data, uint16_t len)
+ 
+ static void send_open_req(struct pb_adv_session *session)
+ {
+-	uint8_t open_req[23] = { MESH_AD_TYPE_PROVISION };
++	struct pb_open_req open_req = { MESH_AD_TYPE_PROVISION };
+ 
+-	l_put_be32(session->link_id, open_req + 1);
+-	open_req[1 + 4] = 0;
+-	open_req[1 + 4 + 1] = PB_ADV_OPEN_REQ;
+-	memcpy(open_req + 7, session->uuid, 16);
++	l_put_be32(session->link_id, &open_req.link_id);
++	open_req.trans_num = 0;
++	open_req.opcode = PB_ADV_OPEN_REQ;
++	memcpy(open_req.uuid, session->uuid, 16);
+ 
+ 	mesh_send_cancel(filter, sizeof(filter));
+-	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, open_req,
+-						sizeof(open_req));
++	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_req,
++							sizeof(open_req));
+ }
+ 
+ static void send_open_cfm(struct pb_adv_session *session)
+ {
+-	uint8_t open_cfm[7] = { MESH_AD_TYPE_PROVISION };
++	struct pb_open_cfm open_cfm = { MESH_AD_TYPE_PROVISION };
+ 
+-	l_put_be32(session->link_id, open_cfm + 1);
+-	open_cfm[1 + 4] = 0;
+-	open_cfm[1 + 4 + 1] = PB_ADV_OPEN_CFM; /* OPEN_CFM */
++	l_put_be32(session->link_id, &open_cfm.link_id);
++	open_cfm.trans_num = 0;
++	open_cfm.opcode = PB_ADV_OPEN_CFM;
+ 
+ 	mesh_send_cancel(filter, sizeof(filter));
+-	mesh_send_pkt(5, 100, open_cfm, sizeof(open_cfm));
++	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_cfm,
++							sizeof(open_cfm));
+ }
+ 
+ static void send_ack(struct pb_adv_session *session, uint8_t trans_num)
+ {
+-	uint8_t ack[7] = { MESH_AD_TYPE_PROVISION };
++	struct pb_ack ack = { MESH_AD_TYPE_PROVISION };
+ 
+-	l_put_be32(session->link_id, ack + 1);
+-	ack[1 + 4] = trans_num;
+-	ack[1 + 4 + 1] = PB_ADV_ACK;
++	l_put_be32(session->link_id, &ack.link_id);
++	ack.trans_num = trans_num;
++	ack.opcode = PB_ADV_ACK;
+ 
+-	mesh_send_pkt(1, 100, ack, sizeof(ack));
++	mesh_send_pkt(1, 100, &ack, sizeof(ack));
+ }
+ 
+ static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
+ {
+-	uint8_t close_ind[8] = { MESH_AD_TYPE_PROVISION };
++	struct pb_close_ind close_ind = { MESH_AD_TYPE_PROVISION };
+ 
+ 	if (!pb_session || pb_session != session)
+ 		return;
+ 
+-	l_put_be32(session->link_id, close_ind + 1);
+-	close_ind[5] = 0;
+-	close_ind[6] = PB_ADV_CLOSE;
+-	close_ind[7] = reason;
++	l_put_be32(session->link_id, &close_ind.link_id);
++	close_ind.trans_num = 0;
++	close_ind.opcode = PB_ADV_CLOSE;
++	close_ind.reason = reason;
+ 
+ 	mesh_send_cancel(filter, sizeof(filter));
+-	mesh_send_pkt(10, 100, close_ind, sizeof(close_ind));
++	mesh_send_pkt(10, 100, &close_ind, sizeof(close_ind));
+ }
+ 
+ static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
+diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+index 111340db3..57eb1e750 100644
+--- a/mesh/prov-acceptor.c
++++ b/mesh/prov-acceptor.c
+@@ -232,15 +232,15 @@ static uint32_t digit_mod(uint8_t power)
+ static void number_cb(void *user_data, int err, uint32_t number)
+ {
+ 	struct mesh_prov_acceptor *rx_prov = user_data;
+-	uint8_t out[2];
++	struct prov_fail_msg msg;
+ 
+ 	if (prov != rx_prov)
+ 		return;
+ 
+ 	if (err) {
+-		out[0] = PROV_FAILED;
+-		out[1] = PROV_ERR_UNEXPECTED_ERR;
+-		prov->trans_tx(prov->trans_data, out, 2);
++		msg.opcode = PROV_FAILED;
++		msg.reason = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 		return;
+ 	}
+ 
+@@ -248,22 +248,22 @@ static void number_cb(void *user_data, int err, uint32_t number)
+ 	l_put_be32(number, prov->rand_auth_workspace + 28);
+ 	l_put_be32(number, prov->rand_auth_workspace + 44);
+ 	prov->material |= MAT_RAND_AUTH;
+-	out[0] = PROV_INP_CMPLT;
+-	prov->trans_tx(prov->trans_data, out, 1);
++	msg.opcode = PROV_INP_CMPLT;
++	prov->trans_tx(prov->trans_data, &msg.opcode, 1);
+ }
+ 
+ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ {
+ 	struct mesh_prov_acceptor *rx_prov = user_data;
+-	uint8_t out[2];
++	struct prov_fail_msg msg;
+ 
+ 	if (prov != rx_prov)
+ 		return;
+ 
+ 	if (err || !key || len != 16) {
+-		out[0] = PROV_FAILED;
+-		out[1] = PROV_ERR_UNEXPECTED_ERR;
+-		prov->trans_tx(prov->trans_data, out, 2);
++		msg.opcode = PROV_FAILED;
++		msg.reason = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 		return;
+ 	}
+ 
+@@ -276,15 +276,15 @@ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ static void priv_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ {
+ 	struct mesh_prov_acceptor *rx_prov = user_data;
+-	uint8_t out[2];
++	struct prov_fail_msg msg;
+ 
+ 	if (prov != rx_prov)
+ 		return;
+ 
+ 	if (err || !key || len != 32) {
+-		out[0] = PROV_FAILED;
+-		out[1] = PROV_ERR_UNEXPECTED_ERR;
+-		prov->trans_tx(prov->trans_data, out, 2);
++		msg.opcode = PROV_FAILED;
++		msg.reason = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 		return;
+ 	}
+ 
+@@ -301,13 +301,53 @@ static void priv_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ 		acp_credentials(prov);
+ }
+ 
++static void send_caps(struct mesh_prov_acceptor *prov)
 +{
-+	struct mesh_node *node = user_data;
-+	struct mesh_io *io;
-+	struct mesh_net *net;
++	struct prov_caps_msg msg;
 +
-+	l_debug("scan_cancel");
++	msg.opcode = PROV_CAPS;
++	memcpy(&msg.caps, &prov->conf_inputs.caps,
++			sizeof(prov->conf_inputs.caps));
 +
-+	if (scan_timeout)
-+		l_timeout_remove(scan_timeout);
-+
-+	net = node_get_net(node);
-+	io = mesh_net_get_io(net);
-+	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_PROV_BEACON);
-+	scan_node = NULL;
-+	scan_timeout = NULL;
++	prov->state = ACP_PROV_CAPS_SENT;
++	prov->expected = PROV_START;
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
 +}
 +
-+static void free_pending_add_call()
++static void send_pub_key(struct mesh_prov_acceptor *prov)
 +{
-+	if (!add_pending)
-+		return;
++	struct prov_pub_key_msg msg;
 +
-+	if (add_pending->disc_watch)
-+		l_dbus_remove_watch(dbus_get_bus(),
-+						add_pending->disc_watch);
-+
-+	mesh_agent_remove(add_pending->agent);
-+
-+	l_free(add_pending);
-+	add_pending = NULL;
++	msg.opcode = PROV_PUB_KEY;
++	memcpy(msg.pub_key, prov->conf_inputs.dev_pub_key, sizeof(msg.pub_key));
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
 +}
 +
-+static void prov_disc_cb(struct l_dbus *bus, void *user_data)
++static void send_conf(struct mesh_prov_acceptor *prov)
 +{
-+	if (!add_pending)
-+		return;
++	struct prov_conf_msg msg;
 +
-+	initiator_cancel(add_pending);
-+	add_pending->disc_watch = 0;
-+
-+	free_pending_add_call();
++	msg.opcode = PROV_CONFIRM;
++	mesh_crypto_aes_cmac(prov->calc_key, prov->rand_auth_workspace, 32,
++								msg.conf);
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
 +}
 +
-+static void send_add_failed(const char *owner, const char *path,
-+							uint8_t status)
++static void send_rand(struct mesh_prov_acceptor *prov)
 +{
-+	struct l_dbus *dbus = dbus_get_bus();
-+	struct l_dbus_message_builder *builder;
-+	struct l_dbus_message *msg;
++	struct prov_rand_msg msg;
 +
-+	msg = l_dbus_message_new_method_call(dbus, owner, path,
-+						MESH_PROVISIONER_INTERFACE,
-+						"AddNodeFailed");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+	dbus_append_byte_array(builder, add_pending->uuid, 16);
-+	l_dbus_message_builder_append_basic(builder, 's',
-+						mesh_prov_status_str(status));
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+	l_dbus_send(dbus, msg);
-+
-+	free_pending_add_call();
++	msg.opcode = PROV_RANDOM;
++	memcpy(msg.rand, prov->rand_auth_workspace, sizeof(msg.rand));
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
 +}
 +
-+static bool add_cmplt(void *user_data, uint8_t status,
-+					struct mesh_prov_node_info *info)
-+{
-+	struct add_data *pending = user_data;
-+	struct mesh_node *node = pending->node;
-+	struct l_dbus *dbus = dbus_get_bus();
-+	struct l_dbus_message_builder *builder;
-+	struct l_dbus_message *msg;
-+	bool result;
+ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ {
+ 	struct mesh_prov_acceptor *rx_prov = user_data;
+ 	struct mesh_prov_node_info *info;
+-	uint8_t *out;
++	struct prov_fail_msg fail;
+ 	uint8_t type = *data++;
+-	uint8_t fail_code[2];
+ 	uint32_t oob_key;
+ 	uint64_t decode_mic;
+ 	bool result;
+@@ -323,7 +363,7 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		return;
+ 	} else if (type > prov->expected || type < prov->previous) {
+ 		l_error("Expected %2.2x, Got:%2.2x", prov->expected, type);
+-		fail_code[1] = PROV_ERR_UNEXPECTED_PDU;
++		fail.reason = PROV_ERR_UNEXPECTED_PDU;
+ 		goto failure;
+ 	}
+ 
+@@ -331,25 +371,14 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 					len != expected_pdu_size[type]) {
+ 		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
+ 			len, expected_pdu_size[type], type);
+-		fail_code[1] = PROV_ERR_INVALID_FORMAT;
++		fail.reason = PROV_ERR_INVALID_FORMAT;
+ 		goto failure;
+ 	}
+ 
+ 	switch (type){
+ 	case PROV_INVITE: /* Prov Invite */
+-		/* Prov Capabilities */
+-		out = l_malloc(1 + sizeof(struct mesh_net_prov_caps));
+-		out[0] = PROV_CAPS;
+-		memcpy(out + 1, &prov->conf_inputs.caps,
+-					sizeof(prov->conf_inputs.caps));
+-
+ 		prov->conf_inputs.invite.attention = data[0];
+-
+-		prov->state = ACP_PROV_CAPS_SENT;
+-		prov->expected = PROV_START;
+-		prov->trans_tx(prov->trans_data,
+-				out, sizeof(prov->conf_inputs.caps) + 1);
+-		l_free(out);
++		send_caps(prov);
+ 		break;
+ 
+ 	case PROV_START: /* Prov Start */
+@@ -359,7 +388,7 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		if (prov->conf_inputs.start.algorithm ||
+ 				prov->conf_inputs.start.pub_key > 1 ||
+ 				prov->conf_inputs.start.auth_method > 3) {
+-			fail_code[1] = PROV_ERR_INVALID_FORMAT;
++			fail.reason = PROV_ERR_INVALID_FORMAT;
+ 			goto failure;
+ 		}
+ 
+@@ -369,7 +398,7 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 				mesh_agent_request_private_key(prov->agent,
+ 							priv_key_cb, prov);
+ 			} else {
+-				fail_code[1] = PROV_ERR_INVALID_PDU;
++				fail.reason = PROV_ERR_INVALID_PDU;
+ 				goto failure;
+ 			}
+ 		} else {
+@@ -395,13 +424,8 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 
+ 		acp_credentials(prov);
+ 
+-		if (!prov->conf_inputs.start.pub_key) {
+-			out = l_malloc(65);
+-			out[0] = PROV_PUB_KEY;
+-			memcpy(out + 1, prov->conf_inputs.dev_pub_key, 64);
+-			prov->trans_tx(prov->trans_data, out, 65);
+-			l_free(out);
+-		}
++		if (!prov->conf_inputs.start.pub_key)
++			send_pub_key(prov);
+ 
+ 		/* Start Step 3 */
+ 		switch (prov->conf_inputs.start.auth_method) {
+@@ -413,10 +437,10 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		case 1:
+ 			/* Auth Type 3c - Static OOB */
+ 			/* Prompt Agent for Static OOB */
+-			fail_code[1] = mesh_agent_request_static(prov->agent,
++			fail.reason = mesh_agent_request_static(prov->agent,
+ 					static_cb, prov);
+ 
+-			if (fail_code[1])
++			if (fail.reason)
+ 				goto failure;
+ 
+ 			break;
+@@ -434,17 +458,17 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 			if (prov->conf_inputs.start.auth_action ==
+ 							PROV_ACTION_OUT_ALPHA) {
+ 				/* TODO: Construst NUL-term string to pass */
+-				fail_code[1] = mesh_agent_display_string(
++				fail.reason = mesh_agent_display_string(
+ 					prov->agent, NULL, NULL, prov);
+ 			} else {
+ 				/* Ask Agent to Display U32 */
+-				fail_code[1] = mesh_agent_display_number(
++				fail.reason = mesh_agent_display_number(
+ 					prov->agent, false,
+ 					prov->conf_inputs.start.auth_action,
+ 					oob_key, NULL, prov);
+ 			}
+ 
+-			if (fail_code[1])
++			if (fail.reason)
+ 				goto failure;
+ 
+ 			break;
+@@ -454,17 +478,17 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 			/* Prompt Agent for Input OOB */
+ 			if (prov->conf_inputs.start.auth_action ==
+ 							PROV_ACTION_IN_ALPHA) {
+-				fail_code[1] = mesh_agent_prompt_alpha(
++				fail.reason = mesh_agent_prompt_alpha(
+ 					prov->agent,
+ 					static_cb, prov);
+ 			} else {
+-				fail_code[1] = mesh_agent_prompt_number(
++				fail.reason = mesh_agent_prompt_number(
+ 					prov->agent, false,
+ 					prov->conf_inputs.start.auth_action,
+ 					number_cb, prov);
+ 			}
+ 
+-			if (fail_code[1])
++			if (fail.reason)
+ 				goto failure;
+ 
+ 			break;
+@@ -474,22 +498,14 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		break;
+ 
+ 	case PROV_CONFIRM: /* Confirmation */
+-		out = l_malloc(17);
+-		out[0] = PROV_CONFIRM;
+-
+-		/* Calculate and Send our Confirmation */
+-		mesh_crypto_aes_cmac(prov->calc_key, prov->rand_auth_workspace,
+-								32, out + 1);
+-		prov->trans_tx(prov->trans_data, out, 17);
+-		l_free(out);
+-
+ 		/* Save Provisioners confirmation for later compare */
+ 		memcpy(prov->confirm, data, 16);
+ 		prov->expected = PROV_RANDOM;
 +
-+	if (pending != add_pending)
-+		return false;
++		send_conf(prov);
+ 		break;
+ 
+ 	case PROV_RANDOM: /* Random Value */
+-		out = l_malloc(17);
+ 		/* Calculate Session key (needed later) while data is fresh */
+ 		mesh_crypto_prov_prov_salt(prov->salt, data,
+ 						prov->rand_auth_workspace,
+@@ -500,20 +516,17 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		/* Calculate expected Provisioner Confirm */
+ 		memcpy(prov->rand_auth_workspace + 16, data, 16);
+ 		mesh_crypto_aes_cmac(prov->calc_key,
+-				prov->rand_auth_workspace + 16, 32, out);
++					prov->rand_auth_workspace + 16, 32,
++					prov->calc_key);
+ 
+ 		/* Compare our calculation with Provisioners */
+-		if (memcmp(out, prov->confirm, 16)) {
+-			fail_code[1] = PROV_ERR_CONFIRM_FAILED;
+-			l_free(out);
++		if (memcmp(prov->calc_key, prov->confirm, 16)) {
++			fail.reason = PROV_ERR_CONFIRM_FAILED;
+ 			goto failure;
+ 		}
+ 
+ 		/* Send Random value we used */
+-		out[0] = PROV_RANDOM;
+-		memcpy(out + 1, prov->rand_auth_workspace, 16);
+-		prov->trans_tx(prov->trans_data, out, 17);
+-		l_free(out);
++		send_rand(prov);
+ 		prov->expected = PROV_DATA;
+ 		break;
+ 
+@@ -533,7 +546,7 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		/* Validate that the data hasn't been messed with in transit */
+ 		if (l_get_be64(data + 25) != decode_mic) {
+ 			l_error("Provisioning Failed-MIC compare");
+-			fail_code[1] = PROV_ERR_DECRYPT_FAILED;
++			fail.reason = PROV_ERR_DECRYPT_FAILED;
+ 			goto failure;
+ 		}
+ 
+@@ -556,7 +569,7 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 					prov->rand_auth_workspace, 1);
+ 			goto cleanup;
+ 		} else {
+-			fail_code[1] = PROV_ERR_UNEXPECTED_ERR;
++			fail.reason = PROV_ERR_UNEXPECTED_ERR;
+ 			goto failure;
+ 		}
+ 		break;
+@@ -570,14 +583,15 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		goto cleanup;
+ 	}
+ 
+-	prov->previous = type;
++	if (prov)
++		prov->previous = type;
+ 	return;
+ 
+ failure:
+-	fail_code[0] = PROV_FAILED;
+-	prov->trans_tx(prov->trans_data, fail_code, 2);
++	fail.opcode = PROV_FAILED;
++	prov->trans_tx(prov->trans_data, &fail, sizeof(fail));
+ 	if (prov->cmplt)
+-		prov->cmplt(prov->caller_data, fail_code[1], NULL);
++		prov->cmplt(prov->caller_data, fail.reason, NULL);
+ 	prov->cmplt = NULL;
+ 
+ cleanup:
+diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
+index 208225f08..eb59f53f1 100644
+--- a/mesh/prov-initiator.c
++++ b/mesh/prov-initiator.c
+@@ -155,7 +155,7 @@ static void int_prov_open(void *user_data, prov_trans_tx_t trans_tx,
+ 				void *trans_data, uint8_t transport)
+ {
+ 	struct mesh_prov_initiator *rx_prov = user_data;
+-	uint8_t invite[] = { PROV_INVITE, 30 };
++	struct prov_invite_msg msg = { PROV_INVITE, { 30 }};
+ 
+ 	/* Only one provisioning session may be open at a time */
+ 	if (rx_prov != prov)
+@@ -181,8 +181,8 @@ static void int_prov_open(void *user_data, prov_trans_tx_t trans_tx,
+ 	prov->state = INT_PROV_INVITE_SENT;
+ 	prov->expected = PROV_CAPS;
+ 
+-	prov->conf_inputs.invite.attention = invite[1];
+-	prov->trans_tx(prov->trans_data, invite, sizeof(invite));
++	prov->conf_inputs.invite.attention = msg.invite.attention;
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 	return;
+ }
+ 
+@@ -268,15 +268,15 @@ static void calc_local_material(const uint8_t *random)
+ static void number_cb(void *user_data, int err, uint32_t number)
+ {
+ 	struct mesh_prov_initiator *rx_prov = user_data;
+-	uint8_t out[2];
++	struct prov_fail_msg msg;
+ 
+ 	if (prov != rx_prov)
+ 		return;
+ 
+ 	if (err) {
+-		out[0] = PROV_FAILED;
+-		out[1] = PROV_ERR_UNEXPECTED_ERR;
+-		prov->trans_tx(prov->trans_data, out, 2);
++		msg.opcode = PROV_FAILED;
++		msg.reason = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 		return;
+ 	}
+ 
+@@ -289,15 +289,15 @@ static void number_cb(void *user_data, int err, uint32_t number)
+ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ {
+ 	struct mesh_prov_initiator *rx_prov = user_data;
+-	uint8_t out[2];
++	struct prov_fail_msg msg;
+ 
+ 	if (prov != rx_prov)
+ 		return;
+ 
+ 	if (err || !key || len != 16) {
+-		out[0] = PROV_FAILED;
+-		out[1] = PROV_ERR_UNEXPECTED_ERR;
+-		prov->trans_tx(prov->trans_data, out, 2);
++		msg.opcode = PROV_FAILED;
++		msg.reason = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 		return;
+ 	}
+ 
+@@ -309,15 +309,15 @@ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ static void pub_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ {
+ 	struct mesh_prov_initiator *rx_prov = user_data;
+-	uint8_t out[2];
++	struct prov_fail_msg msg;
+ 
+ 	if (prov != rx_prov)
+ 		return;
+ 
+ 	if (err || !key || len != 64) {
+-		out[0] = PROV_FAILED;
+-		out[1] = PROV_ERR_UNEXPECTED_ERR;
+-		prov->trans_tx(prov->trans_data, out, 2);
++		msg.opcode = PROV_FAILED;
++		msg.reason = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 		return;
+ 	}
+ 
+@@ -330,45 +330,45 @@ static void pub_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ 
+ static void send_pub_key(struct mesh_prov_initiator *prov)
+ {
+-	uint8_t out[65];
++	struct prov_pub_key_msg msg;
+ 
+-	out[0] = PROV_PUB_KEY;
+-	memcpy(out + 1, prov->conf_inputs.prv_pub_key, 64);
+-	prov->trans_tx(prov->trans_data, out, 65);
++	msg.opcode = PROV_PUB_KEY;
++	memcpy(msg.pub_key, prov->conf_inputs.prv_pub_key, 64);
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 	prov->state = INT_PROV_KEY_SENT;
+ }
+ 
+ static void send_confirm(struct mesh_prov_initiator *prov)
+ {
+-	uint8_t out[17];
++	struct prov_conf_msg msg;
+ 
+-	out[0] = PROV_CONFIRM;
++	msg.opcode = PROV_CONFIRM;
+ 	mesh_crypto_aes_cmac(prov->calc_key, prov->rand_auth_workspace,
+-			32, out + 1);
+-	prov->trans_tx(prov->trans_data, out, 17);
++			32, msg.conf);
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 	prov->state = INT_PROV_CONF_SENT;
+ 	prov->expected = PROV_CONFIRM;
+ }
+ 
+ static void send_random(struct mesh_prov_initiator *prov)
+ {
+-	uint8_t out[17];
++	struct prov_rand_msg msg;
+ 
+-	out[0] = PROV_RANDOM;
+-	memcpy(out + 1, prov->rand_auth_workspace, 16);
+-	prov->trans_tx(prov->trans_data, out, 17);
++	msg.opcode = PROV_RANDOM;
++	memcpy(msg.rand, prov->rand_auth_workspace, sizeof(msg.rand));
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+ 	prov->state = INT_PROV_RAND_SENT;
+ 	prov->expected = PROV_RANDOM;
+ }
+ 
+ void initiator_prov_data(uint16_t net_idx, uint16_t primary, void *caller_data)
+ {
++	struct prov_data_msg prov_data;
++	struct prov_fail_msg prov_fail;
+ 	struct keyring_net_key key;
+ 	struct mesh_net *net;
+-	uint64_t mic;
+ 	uint32_t iv_index;
+ 	uint8_t snb_flags;
+-	uint8_t out[34];
+ 
+ 	if (!prov || caller_data != prov->caller_data)
+ 		return;
+@@ -388,7 +388,7 @@ void initiator_prov_data(uint16_t net_idx, uint16_t primary, void *caller_data)
+ 
+ 	/* Fill Prov Data Structure */
+ 	if (!keyring_get_net_key(prov->node, net_idx, &key)) {
+-		out[1] = PROV_ERR_UNEXPECTED_ERR;
++		prov_fail.reason = PROV_ERR_UNEXPECTED_ERR;
+ 		goto failure;
+ 	}
+ 
+@@ -396,36 +396,36 @@ void initiator_prov_data(uint16_t net_idx, uint16_t primary, void *caller_data)
+ 	prov->net_idx = net_idx;
+ 	mesh_net_get_snb_state(net, &snb_flags, &iv_index);
+ 
+-	out[0] = PROV_DATA;
++	prov_data.opcode = PROV_DATA;
+ 
+ 	if (key.phase == KEY_REFRESH_PHASE_TWO) {
+-		memcpy(out + 1, key.new_key, 16);
++		memcpy(&prov_data.data.net_key, key.new_key, 16);
+ 		snb_flags |= PROV_FLAG_KR;
+ 	} else
+-		memcpy(out + 1, key.old_key, 16);
++		memcpy(&prov_data.data.net_key, key.old_key, 16);
+ 
+-	l_put_be16(net_idx, out + 1 + 16);
+-	l_put_u8(snb_flags, out + 1 + 16 + 2);
+-	l_put_be32(iv_index, out + 1 + 16 + 2 + 1);
+-	l_put_be16(primary, out + 1 + 16 + 2 + 1 + 4);
++	l_put_be16(net_idx, &prov_data.data.net_idx);
++	l_put_u8(snb_flags, &prov_data.data.flags);
++	l_put_be32(iv_index, &prov_data.data.iv_index);
++	l_put_be16(primary, &prov_data.data.primary);
+ 
+-	print_packet("ProvData", out + 1, 25);
++	print_packet("ProvData", &prov_data.data, sizeof(prov_data.data));
+ 	/* Encrypt Prov Data */
+ 	mesh_crypto_aes_ccm_encrypt(prov->s_nonce, prov->s_key,
+ 			NULL, 0,
+-			out + 1,
+-			25,
+-			out + 1,
+-			&mic, sizeof(mic));
+-	print_packet("EncData", out + 1, 25 + 8);
+-	prov->trans_tx(prov->trans_data, out, 34);
++			&prov_data.data,
++			sizeof(prov_data.data),
++			&prov_data.data,
++			NULL, sizeof(prov_data.mic));
++	print_packet("EncdData", &prov_data.data, sizeof(prov_data) - 1);
++	prov->trans_tx(prov->trans_data, &prov_data, sizeof(prov_data));
+ 	prov->state = INT_PROV_DATA_SENT;
+ 	return;
+ 
+ failure:
+-	l_debug("Failing... %d", out[1]);
+-	out[0] = PROV_FAILED;
+-	prov->trans_tx(prov->trans_data, out, 2);
++	l_debug("Failing... %d", prov_fail.reason);
++	prov_fail.opcode = PROV_FAILED;
++	prov->trans_tx(prov->trans_data, &prov_fail, sizeof(prov_fail));
+ 	/* TODO: Call Complete Callback (Fail)*/
+ }
+ 
+diff --git a/mesh/prov.h b/mesh/prov.h
+index 61ec08e10..11b20b31f 100644
+--- a/mesh/prov.h
++++ b/mesh/prov.h
+@@ -48,7 +48,7 @@ enum mesh_prov_mode {
+ 
+ struct mesh_prov;
+ 
+-typedef void (*prov_trans_tx_t)(void *trans_data, uint8_t *data, uint16_t len);
++typedef void (*prov_trans_tx_t)(void *trans_data, void *data, uint16_t len);
+ typedef void (*mesh_prov_open_func_t)(void *user_data, prov_trans_tx_t trans_tx,
+ 					void *trans_data, uint8_t trans_type);
+ 
+@@ -63,6 +63,11 @@ struct prov_invite {
+ 	uint8_t attention;
+ } __packed;
+ 
++struct prov_invite_msg {
++	uint8_t opcode;
++	struct prov_invite invite;
++} __packed;
 +
-+	if (status != PROV_ERR_SUCCESS) {
-+		send_add_failed(node_get_owner(node), node_get_app_path(node),
-+									status);
-+		return false;
-+	}
+ struct prov_start {
+ 	uint8_t algorithm;
+ 	uint8_t pub_key;
+@@ -71,6 +76,50 @@ struct prov_start {
+ 	uint8_t auth_size;
+ } __packed;
+ 
++struct prov_caps_msg {
++	uint8_t opcode;
++	struct mesh_net_prov_caps caps;
++} __packed;
 +
-+	result = keyring_put_remote_dev_key(add_pending->node, info->unicast,
-+					info->num_ele, info->device_key);
++struct prov_start_msg {
++	uint8_t opcode;
++	struct prov_start start;
++} __packed;
 +
-+	if (!result) {
-+		send_add_failed(node_get_owner(node), node_get_app_path(node),
-+						PROV_ERR_CANT_ASSIGN_ADDR);
-+		return false;
-+	}
++struct prov_pub_key_msg {
++	uint8_t opcode;
++	uint8_t pub_key[64];
++} __packed;
 +
-+	msg = l_dbus_message_new_method_call(dbus, node_get_owner(node),
-+						node_get_app_path(node),
-+						MESH_PROVISIONER_INTERFACE,
-+						"AddNodeComplete");
++struct prov_conf_msg {
++	uint8_t opcode;
++	uint8_t conf[16];
++} __packed;
 +
-+	builder = l_dbus_message_builder_new(msg);
-+	dbus_append_byte_array(builder, add_pending->uuid, 16);
-+	l_dbus_message_builder_append_basic(builder, 'q', &info->unicast);
-+	l_dbus_message_builder_append_basic(builder, 'y', &info->num_ele);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
++struct prov_rand_msg {
++	uint8_t opcode;
++	uint8_t rand[16];
++} __packed;
 +
-+	l_dbus_send(dbus, msg);
-+
-+	free_pending_add_call();
-+
-+	return true;
-+}
-+
-+static void mgr_prov_data (struct l_dbus_message *reply, void *user_data)
-+{
-+	struct add_data *pending = user_data;
++struct prov_data {
++	uint8_t net_key[16];
 +	uint16_t net_idx;
++	uint8_t flags;
++	uint32_t iv_index;
 +	uint16_t primary;
++} __packed;
 +
-+	if (pending != add_pending)
-+		return;
++struct prov_data_msg {
++	uint8_t opcode;
++	struct prov_data data;
++	uint64_t mic;
++} __packed;
 +
-+	if (l_dbus_message_is_error(reply))
-+		return;
++struct prov_fail_msg {
++	uint8_t opcode;
++	uint8_t reason;
++} __packed;
 +
-+	if (!l_dbus_message_get_arguments(reply, "qq", &net_idx, &primary))
-+		return;
-+
-+	add_pending->primary = primary;
-+	add_pending->net_idx = net_idx;
-+	initiator_prov_data(net_idx, primary, add_pending);
-+}
-+
-+static bool add_data_get(void *user_data, uint8_t num_ele)
-+{
-+	struct add_data *pending = user_data;
-+	struct l_dbus_message *msg;
-+	struct l_dbus *dbus;
-+	const char *app_path;
-+	const char *sender;
-+
-+	if (pending != add_pending)
-+		return false;
-+
-+	dbus = dbus_get_bus();
-+	app_path = node_get_app_path(add_pending->node);
-+	sender = node_get_owner(add_pending->node);
-+
-+	msg = l_dbus_message_new_method_call(dbus, sender, app_path,
-+						MESH_PROVISIONER_INTERFACE,
-+						"RequestProvData");
-+
-+	l_dbus_message_set_arguments(msg, "y", num_ele);
-+	l_dbus_send_with_reply(dbus, msg, mgr_prov_data, add_pending, NULL);
-+
-+	add_pending->num_ele = num_ele;
-+
-+	return true;
-+}
-+
- static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
- 	struct l_dbus_message_iter iter_uuid;
-+	struct l_dbus_message *reply;
- 	uint8_t *uuid;
- 	uint32_t n;
- 
--	l_debug("Add node request");
-+	l_debug("AddNode request");
- 
- 	if (!l_dbus_message_get_arguments(msg, "ay", &iter_uuid))
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-@@ -50,8 +233,47 @@ static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
- 							"Bad device UUID");
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	/* Allow AddNode to cancel Scanning if from the same node */
-+	if (scan_node) {
-+		if (scan_node != node)
-+			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
-+
-+		scan_cancel(NULL, node);
-+	}
-+
-+	/* Invoke Prov Initiator */
-+
-+	add_pending = l_new(struct add_data, 1);
-+	memcpy(add_pending->uuid, uuid, 16);
-+	add_pending->node = node;
-+	add_pending->agent = node_get_agent(node);;
-+
-+	if (!node_is_provisioner(node) || (add_pending->agent == NULL)) {
-+		l_info("Provisioner: %d", node_is_provisioner(node));
-+		l_info("Agent: %p", add_pending->agent);
-+		reply = dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED,
-+							"Missing Interfaces");
-+		goto fail;
-+	}
-+
-+
-+	if (!initiator_start(PB_ADV, uuid, 99, 0, 60, add_pending->agent,
-+				add_data_get, add_cmplt, node, add_pending)) {
-+		reply = dbus_error(msg, MESH_ERROR_FAILED,
-+				"Failed to start provisioning initiator");
-+		goto fail;
-+	}
-+
-+	add_pending->disc_watch = l_dbus_add_disconnect_watch(dbus,
-+						node_get_owner(node),
-+						prov_disc_cb, NULL, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
-+
-+fail:
-+	l_free(add_pending);
-+	add_pending = NULL;
-+	return reply;
- }
- 
- 
-@@ -97,25 +319,91 @@ static struct l_dbus_message *delete_node_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
-+static void prov_beacon_recv(void *user_data, struct mesh_io_recv_info *info,
-+					const uint8_t *data, uint16_t len)
-+{
-+	struct mesh_node *node = user_data;
-+	struct l_dbus_message_builder *builder;
-+	struct l_dbus_message *msg;
-+	struct l_dbus *dbus;
-+	int16_t rssi;
-+
-+	if (scan_node != node || len < sizeof(scan_uuid) + 2 || data[1] != 0x00)
-+		return;
-+
-+	if (!memcmp(data + 2, scan_uuid, sizeof(scan_uuid))) {
-+		if (info->rssi <= scan_rssi)
-+			return;
-+	}
-+
-+	memcpy(scan_uuid, data + 2, sizeof(scan_uuid));
-+	scan_rssi = info->rssi;
-+	rssi = info->rssi;
-+
-+	dbus = dbus_get_bus();
-+	msg = l_dbus_message_new_method_call(dbus, node_get_owner(node),
-+						node_get_app_path(node),
-+						MESH_PROVISIONER_INTERFACE,
-+						"ScanResult");
-+
-+	builder = l_dbus_message_builder_new(msg);
-+	l_dbus_message_builder_append_basic(builder, 'n', &rssi);
-+	dbus_append_byte_array(builder, data + 2, len -2);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+
-+	l_dbus_send(dbus, msg);
-+}
-+
- static struct l_dbus_message *start_scan_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-+	struct mesh_node *node = user_data;
- 	uint16_t duration;
-+	struct mesh_io *io;
-+	struct mesh_net *net;
- 
- 	if (!l_dbus_message_get_arguments(msg, "q", &duration))
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
- 
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	if (scan_node && scan_node != node)
-+		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
-+
-+	if (!node_is_provisioner(node))
-+		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
-+
-+	if (scan_timeout)
-+		l_timeout_remove(scan_timeout);
-+
-+	memset(scan_uuid, 0, sizeof(scan_uuid));
-+	scan_rssi = -128;
-+	scan_timeout = NULL;
-+	net = node_get_net(node);
-+	io = mesh_net_get_io(net);
-+	scan_node = node;
-+	mesh_io_register_recv_cb(io, MESH_IO_FILTER_PROV_BEACON,
-+						prov_beacon_recv, node);
-+
-+	if (duration)
-+		scan_timeout = l_timeout_create(duration, scan_cancel,
-+								node, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
- }
- 
- static struct l_dbus_message *cancel_scan_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	/* TODO */
--	return dbus_error(msg, MESH_ERROR_NOT_IMPLEMENTED, NULL);
-+	struct mesh_node *node = user_data;
-+
-+	if (scan_node != node)
-+		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
-+
-+	scan_cancel(NULL, node);
-+
-+	return l_dbus_message_new_method_return(msg);
- }
- 
- static struct l_dbus_message *store_new_subnet(struct mesh_node *node,
-@@ -416,7 +704,7 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
- static void setup_management_interface(struct l_dbus_interface *iface)
- {
- 	l_dbus_interface_method(iface, "AddNode", 0, add_node_call, "", "ay",
--								"", "uuid");
-+								"uuid");
- 	l_dbus_interface_method(iface, "ImportRemoteNode", 0, import_node_call,
- 						"", "qyay", "", "primary",
- 						"count", "dev_key");
+ struct conf_input {
+ 	struct prov_invite		invite;
+ 	struct mesh_net_prov_caps	caps;
 -- 
 2.14.5
 
