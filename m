@@ -1,298 +1,121 @@
-Return-Path: <SRS0=ssTf=VI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=25t8=VJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F61C742A2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jul 2019 23:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C50F9C742A5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 03:21:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DFC34208E4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Jul 2019 23:00:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FE95214AF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 03:21:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGGOiAYW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730436AbfGKXA4 (ORCPT
+        id S1729250AbfGLDV1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Jul 2019 19:00:56 -0400
-Received: from mga18.intel.com ([134.134.136.126]:38699 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730428AbfGKXA4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Jul 2019 19:00:56 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Jul 2019 16:00:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,480,1557212400"; 
-   d="scan'208";a="166516326"
-Received: from bgix-dell-lap.sea.intel.com ([10.255.80.129])
-  by fmsmga008.fm.intel.com with ESMTP; 11 Jul 2019 16:00:55 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, michal.lowas-rzechonek@silvair.com,
-        brian.gix@intel.com
-Subject: [PATCH BlueZ v2 9/9] test: This extends the mesh tool to exercise Provisioning methods
-Date:   Thu, 11 Jul 2019 15:59:52 -0700
-Message-Id: <20190711225952.1599-10-brian.gix@intel.com>
-X-Mailer: git-send-email 2.14.5
-In-Reply-To: <20190711225952.1599-1-brian.gix@intel.com>
-References: <20190711225952.1599-1-brian.gix@intel.com>
+        Thu, 11 Jul 2019 23:21:27 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:37043 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729051AbfGLDV1 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Jul 2019 23:21:27 -0400
+Received: by mail-io1-f65.google.com with SMTP id q22so17329488iog.4;
+        Thu, 11 Jul 2019 20:21:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=E7LVm4En99ffCjdSQOlCLFmZyKo+5KgGT1Gs50j8hsM=;
+        b=XGGOiAYWv7/LtWLb3fFHsucku023HvaBW9ern8zt9rFe1AyknFN0kxKFPziFQZPpU0
+         mSUbPmiUxLZBClWysvQHFmJPzjerUGcZmDtQtON9UMZ2C4htBoznEEz2/vFFy/yVuJja
+         T34RRf3SsfRNEsmhwekzCfWrfFfgARA567579Dr0mc521R6E52gp2ayCzNst2yQphWtb
+         SAT8Oq/dYdNEQwYhy2DLsF34PcwbUmqh8/5rJ58NESmddmsnlgfyv8urPDxPtMjHgLqU
+         fWnoeLnir4pIqAFryiTPsmzaD4bprxfXiinlG6R4m1tet7HqDGByU4JAdYYEUeQ+yvoL
+         /dlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=E7LVm4En99ffCjdSQOlCLFmZyKo+5KgGT1Gs50j8hsM=;
+        b=ZhCnIr/Q7nDEWK8KIAfFSsiwrRSsYsyQPNu9MZO3imuX04BHYmjkRY8Sw9vL8R/WRH
+         wZT4ZT2GaIGr/XvOiXDr2G7yBGejZF+Fh6thZcQgx6yrq+a3QwqgmOlFVPHl3+6rksfU
+         OcPWAboKl56bAWTbtssKvk0slhRbLVtpYc1GX+gGSNOFJPoUYPJn0LhO0NHZoHPH0HtM
+         YzOeCpJqhlxrq4zxGbiRm5rI04q0UL5MMwU/WndaNDrup/H6Td7HRMBDPHOmWE/YxX70
+         iEa0O3FrsD5fb+LR+98LDv/TYaRqtix7/3TDBgYKhffZrsuqxDpMq1wP9NGGEKKkpcEv
+         avHQ==
+X-Gm-Message-State: APjAAAUBQbOmuk7yvAq3RegLmxGu53NUgIuamYQdIPXYXVb0uU+4j9BQ
+        bCQxoXsxGDT3DzphAEkelL2IaiJR6QAxdl1tjHU=
+X-Google-Smtp-Source: APXvYqyp5Ity6hBV3CWvEX0wudD0bshEvgzA9ul3uS1sRHoTyhwVoN3ni1XDKQh+sLTxNA7FAuOIv5IQ476yGT3CIBY=
+X-Received: by 2002:a02:8814:: with SMTP id r20mr9020971jai.115.1562901686256;
+ Thu, 11 Jul 2019 20:21:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190522013045.21678-1-andrew.smirnov@gmail.com>
+In-Reply-To: <20190522013045.21678-1-andrew.smirnov@gmail.com>
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Thu, 11 Jul 2019 20:21:14 -0700
+Message-ID: <CAHQ1cqF+8i1RPi77pXhGv4GRMoWMC0PpvJcEWcKH1O+CKuGWpg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Retry configure request if result is L2CAP_CONF_UNKNOWN
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org,
+        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
+        Florian Dollinger <dollinger.florian@gmx.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Note:  This script is *not* a suitable tool for expanding into
-a Mesh Provisioner. It is only intended to demonstrate the arguments
-and methods required.
----
- test/test-mesh | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 113 insertions(+)
+On Tue, May 21, 2019 at 6:31 PM Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
+>
+> Due to:
+>
+>  * Current implementation of l2cap_config_rsp() dropping BT
+>    connection if sender of configuration response replied with unknown
+>    option failure (Result=0x0003/L2CAP_CONF_UNKNOWN)
+>
+>  * Current implementation of l2cap_build_conf_req() adding
+>    L2CAP_CONF_RFC(0x04) option to initial configure request sent by
+>    the Linux host.
+>
+> devices that do no recongninze L2CAP_CONF_RFC, such as Xbox One S
+> controllers, will get stuck in endless connect -> configure ->
+> disconnect loop, never connect and be generaly unusable.
+>
+> To avoid this problem add code to do the following:
+>
+>  1. Parse the body of response L2CAP_CONF_UNKNOWN and, in case of
+>     unsupported option being RFC, clear L2CAP_FEAT_ERTM and
+>     L2CAP_FEAT_STREAMING from connection's feature mask (in order to
+>     prevent RFC option from being added going forward)
+>
+>  2. Retry configuration step the same way it's done for
+>     L2CAP_CONF_UNACCEPT
+>
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> Cc: Pierre-Loup A. Griffais <pgriffais@valvesoftware.com>
+> Cc: Florian Dollinger <dollinger.florian@gmx.de>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> ---
+>
+> Changes since [v1]:
+>
+>    - Patch simplified to simply clear L2CAP_FEAT_ERTM |
+>      L2CAP_FEAT_STREAMING from feat_mask when device flags RFC options
+>      as unknown
+>
+> [v1] lore.kernel.org/r/20190208025828.30901-1-andrew.smirnov@gmail.com
+>
 
-diff --git a/test/test-mesh b/test/test-mesh
-index 4d515e186..6e9196366 100755
---- a/test/test-mesh
-+++ b/test/test-mesh
-@@ -24,10 +24,13 @@
- # The main menu:
- #       token
- #       create
-+#       scan
-+#       add
- #       join
- #       attach
- #       remove
- #       dest
-+#       uuid
- #       app-index
- #       client-menu
- #       exit
-@@ -50,6 +53,16 @@
- #            for the runtime of the test, and may be used in future
- #            attach requests.
- #
-+#     scan
-+#            Scan for unprovisioned devices
-+#
-+#     add
-+#            Adds a remote node to a mesh network that we have provisioning
-+#            authorization to. The test prompts for a remote devices
-+#            UUID, and supplies an Agent that will handle the interaction,
-+#            and provide the provisioning data which will complete to
-+#            process.
-+#
- #     join
- #            Request provisioning of a device to become a node
- #            on a mesh network. The test generates device UUID
-@@ -145,9 +158,11 @@ MESH_SERVICE_NAME = 'org.bluez.mesh'
- DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
- DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
- 
-+MESH_MGR_IFACE = 'org.bluez.mesh.Management1'
- MESH_NETWORK_IFACE = 'org.bluez.mesh.Network1'
- MESH_NODE_IFACE = 'org.bluez.mesh.Node1'
- MESH_APPLICATION_IFACE = 'org.bluez.mesh.Application1'
-+MESH_PROV_IFACE = 'org.bluez.mesh.Provisioner1'
- MESH_ELEMENT_IFACE = 'org.bluez.mesh.Element1'
- 
- APP_COMPANY_ID = 0x05f1
-@@ -160,6 +175,7 @@ app = None
- bus = None
- mainloop = None
- node = None
-+node_mgr = None
- mesh_net = None
- 
- dst_addr = 0x0000
-@@ -170,6 +186,10 @@ token = None
- have_token = False
- attached = False
- 
-+# Remote device UUID
-+have_uuid = False
-+remote_uuid = None
-+
- # Menu housekeeping
- MAIN_MENU = 0
- ON_OFF_CLIENT_MENU = 1
-@@ -179,6 +199,7 @@ INPUT_TOKEN = 1
- INPUT_DEST_ADDRESS = 2
- INPUT_APP_KEY_INDEX = 3
- INPUT_MESSAGE_PAYLOAD = 4
-+INPUT_UUID = 5
- 
- menus = []
- current_menu = None
-@@ -226,6 +247,17 @@ def set_token(str_value):
- 	token = numpy.uint64(input_number)
- 	have_token = True
- 
-+def set_uuid(str_value):
-+	global remote_uuid
-+	global have_uuid
-+
-+	if len(str_value) != 32:
-+		raise_error('Expected 32 digits')
-+		return
-+
-+	remote_uuid = bytearray.fromhex(str_value)
-+	have_uuid = True
-+
- def array_to_string(b_array):
- 	str_value = ""
- 	for b in b_array:
-@@ -248,6 +280,18 @@ def attach(token):
- 					reply_handler=attach_app_cb,
- 					error_handler=attach_app_error_cb)
- 
-+def scan_cb():
-+	print('Scan procedure started')
-+
-+def scan_error_cb(reason):
-+	print('Scan procedure failed ', reason)
-+
-+def add_cb():
-+	print('AddNode procedure started')
-+
-+def add_error_cb(reason):
-+	print('AddNode procedure failed ', reason)
-+
- def join_cb():
- 	print('Join procedure started')
- 
-@@ -306,6 +350,9 @@ def attach_app_cb(node_path, dict_array):
- 
- 	obj = bus.get_object(MESH_SERVICE_NAME, node_path)
- 
-+	global node_mgr
-+	node_mgr = dbus.Interface(obj, MESH_MGR_IFACE)
-+
- 	global node
- 	node = dbus.Interface(obj, MESH_NODE_IFACE)
- 
-@@ -392,6 +439,8 @@ class Application(dbus.service.Object):
- 				'CompanyID': dbus.UInt16(APP_COMPANY_ID),
- 				'ProductID': dbus.UInt16(APP_PRODUCT_ID),
- 				'VersionID': dbus.UInt16(APP_VERSION_ID)
-+			},
-+			MESH_PROV_IFACE: {
- 			}
- 		}
- 
-@@ -424,6 +473,35 @@ class Application(dbus.service.Object):
- 	def JoinFailed(self, value):
- 		print(set_error('JoinFailed '), value)
- 
-+	@dbus.service.method(MESH_PROV_IFACE,
-+					in_signature="nay", out_signature="")
-+	def ScanResult(self, rssi, uuid):
-+		uuid_str = array_to_string(uuid)
-+		print(set_yellow('ScanResult RSSI ')
-+					+ set_green(format(rssi, 'd'))
-+					+ ' ' + uuid_str)
-+
-+	@dbus.service.method(MESH_PROV_IFACE,
-+					in_signature="y", out_signature="qq")
-+	def RequestProvData(self, count):
-+		print('RequestProvData for Ele_Cnt '
-+					+ set_green(format(count, 'd')))
-+		return dbus.Struct((dbus.UInt16(0), dbus.UInt16(678)))
-+
-+	@dbus.service.method(MESH_PROV_IFACE,
-+					in_signature="ayqy", out_signature="")
-+	def AddNodeComplete(self, uuid, unicast, count):
-+		uuid_str = array_to_string(uuid)
-+		print(set_yellow('AddNodeComplete of node ')
-+					+ set_green(format(unicast, '04x'))
-+					+ ' uuid ' + uuid_str)
-+
-+	@dbus.service.method(MESH_PROV_IFACE,
-+					in_signature="ays", out_signature="")
-+
-+	def AddNodeFailed(self, uuid, value):
-+		print(set_error('AddNodeFailed '), value)
-+
- 
- class Element(dbus.service.Object):
- 	PATH_BASE = '/example/ele'
-@@ -768,6 +846,10 @@ class MainMenu(Menu):
- 						self.__cmd_set_token),
- 			'create': MenuItem(' - create mesh network',
- 						self.__cmd_create),
-+			'scan': MenuItem(' - scan for near unprovisioned devs',
-+						self.__cmd_scan),
-+			'add': MenuItem(' - add device to mesh network',
-+						self.__cmd_add),
- 			'join': MenuItem(' - join mesh network',
- 						self.__cmd_join),
- 			'attach': MenuItem(' - attach mesh node',
-@@ -776,6 +858,8 @@ class MainMenu(Menu):
- 						self.__cmd_remove),
- 			'dest': MenuItem(' - set destination address',
- 						self.__cmd_set_dest),
-+			'uuid': MenuItem(' - set remote uuid',
-+						self.__cmd_set_uuid),
- 			'app-index': MenuItem(' - set AppKey index',
- 						self.__cmd_set_app_idx),
- 			'vendor-send': MenuItem(' - send raw vendor message',
-@@ -809,6 +893,12 @@ class MainMenu(Menu):
- 		user_input = INPUT_DEST_ADDRESS
- 		print(set_cyan('Enter 4-digit hex destination address:'))
- 
-+	def __cmd_set_uuid(self):
-+		global user_input
-+
-+		user_input = INPUT_UUID
-+		print(set_cyan('Enter 32-digit hex remote UUID:'))
-+
- 	def __cmd_set_app_idx(self):
- 		global user_input
- 
-@@ -851,6 +941,26 @@ class MainMenu(Menu):
- 			reply_handler=join_cb,
- 			error_handler=join_error_cb)
- 
-+	def __cmd_scan(self):
-+
-+		print(set_yellow('Scanning...'))
-+		node_mgr.UnprovisionedScan(0, reply_handler=add_cb,
-+						error_handler=add_error_cb)
-+
-+	def __cmd_add(self):
-+		global user_input
-+		if agent == None:
-+			print(set_error('Provisioning agent not found'))
-+			return
-+
-+		uuid_str = array_to_string(remote_uuid)
-+		caps = ["in-numeric"]
-+		oob = ["other"]
-+
-+		print(set_yellow('Adding dev UUID ') + set_green(uuid_str))
-+		node_mgr.AddNode(remote_uuid, reply_handler=add_cb,
-+						error_handler=add_error_cb)
-+
- 	def __cmd_attach(self):
- 		if have_token == False:
- 			print(set_error('Token is not set'))
-@@ -887,6 +997,8 @@ class MainMenu(Menu):
- 
- 		if user_input == INPUT_TOKEN:
- 			set_token(str_value)
-+		elif user_input == INPUT_UUID:
-+			set_uuid(str_value)
- 		elif user_input == INPUT_DEST_ADDRESS:
- 			res = set_value(str_value, 4, 4)
- 			if is_error() != True:
-@@ -977,6 +1089,7 @@ def main():
- 	mesh_net = dbus.Interface(bus.get_object(MESH_SERVICE_NAME,
- 						"/org/bluez/mesh"),
- 						MESH_NETWORK_IFACE)
-+
- 	mesh_net.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
- 
- 	app = Application(bus)
--- 
-2.14.5
+Pinging the status of this. Marcel, do you have any feedback on v2?
 
+Thanks,
+Andrey Smirnov
