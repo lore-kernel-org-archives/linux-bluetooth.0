@@ -2,161 +2,150 @@ Return-Path: <SRS0=25t8=VJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C98C742D1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 17:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B07CC742D2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 18:59:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4ED720665
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 17:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5BEA21783
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 18:59:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726984AbfGLRZT (ORCPT
+        id S1727118AbfGLS7e convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Jul 2019 13:25:19 -0400
-Received: from mga03.intel.com ([134.134.136.65]:4976 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726976AbfGLRZT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Jul 2019 13:25:19 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Jul 2019 10:25:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,483,1557212400"; 
-   d="p7s'?scan'208";a="166732450"
-Received: from orsmsx107.amr.corp.intel.com ([10.22.240.5])
-  by fmsmga008.fm.intel.com with ESMTP; 12 Jul 2019 10:25:18 -0700
-Received: from orsmsx126.amr.corp.intel.com (10.22.240.126) by
- ORSMSX107.amr.corp.intel.com (10.22.240.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 12 Jul 2019 10:25:17 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.44]) by
- ORSMSX126.amr.corp.intel.com ([169.254.4.77]) with mapi id 14.03.0439.000;
- Fri, 12 Jul 2019 10:25:17 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Subject: Re: [PATCH BlueZ] emulator: Fix condition check in btdev_create()
-Thread-Topic: [PATCH BlueZ] emulator: Fix condition check in btdev_create()
-Thread-Index: AQHVMjZP1PNno1uJN0Os50PXWr8CXabHvnWA
-Date:   Fri, 12 Jul 2019 17:25:17 +0000
-Message-ID: <6d4bf5321409c4d348dd653dce82bda31eff2bcc.camel@intel.com>
-References: <20190704070110.13815-1-inga.stotland@intel.com>
-In-Reply-To: <20190704070110.13815-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.34.100]
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-ruL3LuIaqHuDkOoy9B3G"
-MIME-Version: 1.0
+        Fri, 12 Jul 2019 14:59:34 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:47754 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727028AbfGLS7d (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 12 Jul 2019 14:59:33 -0400
+Received: from [192.168.22.73] (unknown [157.25.100.178])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 94B09CF2CB;
+        Fri, 12 Jul 2019 21:07:59 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: HCI Set custom bandwidth for AuriStream SCO codec
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190708210616.x2dlnzjhnplu37bz@pali>
+Date:   Fri, 12 Jul 2019 20:59:22 +0200
+Cc:     Pavel Machek <pavel@ucw.cz>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D0A44CC7-CABC-408A-894E-AAD700FA9B0D@holtmann.org>
+References: <20190506151651.pu2us2fgsf7w2vos@pali>
+ <20190516183429.ql3hxtnmiabcq7tj@pali>
+ <CABBYNZLJB0bK7o=Tvf9mhb5U41xAin6SdPY9=76AuEvpEiA_8g@mail.gmail.com>
+ <20190519082305.q7y4gpmdhvx3vzvo@pali>
+ <CABBYNZJKO07p-8ufP7=4WUYS1oLhnsKY_pnP6-0SbVzi=CYZsQ@mail.gmail.com>
+ <20190519212157.GB31403@amd> <20190607130245.mv4ch6dxnuptzdki@pali>
+ <ED456CCA-CF85-48D9-B7E9-9B0BF02A32FC@holtmann.org>
+ <20190708122512.qqfvtm455ltxxg3h@pali>
+ <E4A6E61C-DE37-4E5D-9401-71CCE4AE2419@holtmann.org>
+ <20190708210616.x2dlnzjhnplu37bz@pali>
+To:     =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-ruL3LuIaqHuDkOoy9B3G
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Pali,
 
-Applied.
+>>>>>>>>> to be honest, I would rather see WBS implementation finally
+>>>>>>>>> reach PA before we start digging into this.
+>>>>>>>> 
+>>>>>>>> First I want to finish improving A2DP codec support in pulseaudio. Later
+>>>>>>>> I can look at HSP/HFP profiles. Ideally it should have modular/plugin
+>>>>>>>> extensible design. So the aim is that adding new codec would be very
+>>>>>>>> simple, without need to hack something related to mSBC/WBC, AuriStream
+>>>>>>>> or any other codec.
+>>>>>>> 
+>>>>>>> Well HSP don't have support for codec negotiation, but yes a modular
+>>>>>>> design is probably recommended.
+>>>>>>> 
+>>>>>>>> But for AuriStream I need to set custom SCO parameters as described
+>>>>>>>> below and currently kernel does not support it. This is why I'm asking
+>>>>>>>> how kernel can export for userspace configuration of SCO parameters...
+>>>>>>> 
+>>>>>>> We can always come up with socket options but we got to see the value
+>>>>>>> it would bring since AuriStream don't look that popular among
+>>>>>>> headsets, at least Ive never seem any device advertising it like
+>>>>>>> apt-X, etc.
+>>>>>> 
+>>>>>> Pali clearly has such device and he is willing to work on it. Surely
+>>>>>> that means it is popular enough to be supported...?
+>>>>> 
+>>>>> Just put AT+CSRSF=0,0,0,0,0,7 to google search and you would see that
+>>>>> not only I have such device...
+>>>>> 
+>>>>> So I would really would like to see that kernel finally stops blocking
+>>>>> usage of this AuriStream codec.
+>>>> 
+>>>> we need to figure out on how we do the kernel API to allow you this specific setting.
+>>> 
+>>> Hi Marcel! Kernel API for userspace should be simple. Just add two
+>>> ioctls for retrieving and setting structure with custom parameters:
+>>> 
+>>> syncPktTypes = 0x003F
+>>> bandwidth = 4000
+>>> max_latency = 16
+>>> voice_settings = 0x63
+>>> retx_effort = 2
+>>> 
+>>> Or add more ioctls, one ioctl per parameter. There is already only ioctl
+>>> for voice settings and moreover it is whitelisted only for two values.
+>> 
+>> it is not that simple actually. Most profiles define a certain set of parameters and then they try to configure better settings and only fallback to a specification defined default as last resort.
+> 
+> Ok. I see that there is another "example" configuration for AuriStream
+> with just different syncPktTypes = 0x02BF and bandwidth = 3850.
+> 
+> So it really is not simple as it can be seen.
 
-On Thu, 2019-07-04 at 00:01 -0700, Inga Stotland wrote:
-> This fixes a case where logical '||' was used with constant operand
-> and the condition check always resulted in true.
->=20
-> Was: if (type =3D=3D BTDEV_TYPE_BREDRLE || type =3D=3D BTDEV_TYPE_LE
->                                         || BTDEV_TYPE_BREDRLE50)
-> Fixed: if (type =3D=3D BTDEV_TYPE_BREDRLE || type =3D=3D BTDEV_TYPE_LE
->                                         || type =3D=3D
-> BTDEV_TYPE_BREDRLE50)
-> ---
->  emulator/btdev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/emulator/btdev.c b/emulator/btdev.c
-> index f4c79c2d0..38d5b3b1f 100644
-> --- a/emulator/btdev.c
-> +++ b/emulator/btdev.c
-> @@ -645,7 +645,7 @@ struct btdev *btdev_create(enum btdev_type type,
-> uint16_t id)
->  	memset(btdev, 0, sizeof(*btdev));
-> =20
->  	if (type =3D=3D BTDEV_TYPE_BREDRLE || type =3D=3D BTDEV_TYPE_LE
-> -				|| BTDEV_TYPE_BREDRLE50) {
-> +				|| type =3D=3D BTDEV_TYPE_BREDRLE50) {
->  		btdev->crypto =3D bt_crypto_new();
->  		if (!btdev->crypto) {
->  			free(btdev);
+currently the stepping for mSBC and CVSD are hard-coded in esco_param_cvsd and esco_param_msbc arrays in hci_conn.c and then selected by the ->setting parameter.
 
---=-ruL3LuIaqHuDkOoy9B3G
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+So either we provide an new socket option (for example BT_VOICE_EXT) or we extend BT_VOICE to allow providing the needed information. However this needs to be flexible array size since we should then be able to encode multiple stepping that are tried in order.
 
-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
-/2uO+36toXJIrkRSOXG2qYEzQI5kZ0sbLp1dcxHIXP6hMhpL7+m2bT6VgQIDAQABo4ICKTCCAiUw
-HQYDVR0OBBYEFIZVvEpBGkcRsJgSGlrm4o7AsTA9MB8GA1UdIwQYMBaAFB5pKrTcKP5HGE4hCz+8
-rBEv8Jj1MGUGA1UdHwReMFwwWqBYoFaGVGh0dHA6Ly93d3cuaW50ZWwuY29tL3JlcG9zaXRvcnkv
-Q1JML0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3VpbmclMjBDQSUyMDRBLmNybDCBnwYI
-KwYBBQUHAQEEgZIwgY8waQYIKwYBBQUHMAKGXWh0dHA6Ly93d3cuaW50ZWwuY29tL3JlcG9zaXRv
-cnkvY2VydGlmaWNhdGVzL0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3VpbmclMjBDQSUy
-MDRBLmNydDAiBggrBgEFBQcwAYYWaHR0cDovL29jc3AuaW50ZWwuY29tLzALBgNVHQ8EBAMCB4Aw
-PAYJKwYBBAGCNxUHBC8wLQYlKwYBBAGCNxUIhsOMdYSZ5VGD/YEohY6fU4KRwAlngd69OZXwQwIB
-ZAIBCTAfBgNVHSUEGDAWBggrBgEFBQcDBAYKKwYBBAGCNwoDDDApBgkrBgEEAYI3FQoEHDAaMAoG
-CCsGAQUFBwMEMAwGCisGAQQBgjcKAwwwQwYDVR0RBDwwOqAjBgorBgEEAYI3FAIDoBUME2JyaWFu
-LmdpeEBpbnRlbC5jb22BE2JyaWFuLmdpeEBpbnRlbC5jb20wDQYJKoZIhvcNAQEFBQADggEBACuN
-3bQTKWnPqjCfAI95E3JEdS7jc7y7fY2FiTcofo0hiDYjZ97kdpZo7BwqWvOcMEPWfst7YQyy4naa
-uS8RvC2+BM8rYtvYj0uvUj/AbwZTnlQILUtyOykV3GzyauRwq6H3fPpZeOrMbbHSsJICjGvoAUQ1
-aOiV1qgLYnlrTzis6UQx+7JjzYkmRajfnMR1NcD5rNa5n8CcmvwrhYxPptvyo9FKMw5Dtwri7DUs
-7bl/ls14Ie8Sf8LLJBwGUOMWtDcEToMqjBZgPhC/6CBuI74UfFLbOt9tg6QMNFtbCy5H8HQUjq+P
-tLltdkaAwpAE894tf9fUhD+oz7s/o6NV49IxggIXMIICEwIBATCBkDB5MQswCQYDVQQGEwJVUzEL
-MAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQKExFJbnRlbCBDb3Jwb3Jh
-dGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSA0QQITMwAAyrfo
-9lLjvkm/BgAAAADKtzAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMTkwNzEyMTcyNTE1WjAjBgkqhkiG9w0BCQQxFgQUtJwgN62tUw+wOnPHEH6v
-SSYWSpgwDQYJKoZIhvcNAQEBBQAEggEAiFiYpxVUZbLbALIGxM2gZ51vcy7Wo3uoll+JCwSFMkek
-0ev3leoOaIg2HhEcvdakr7yvN0g2IimrMC2L+mToDYO4ehXBjHThU0Gi0TKVPIyb1tjop0OFF+g1
-2IFQiWPyzi2t15UuRW+gV9VG3RbQzYNrFbW+zOwookbqWxELNKp/dQRNYke9R8soqwnRSpv7GV25
-aUSwv0sL8BV/8ZVPzYsZOlt8rSop2bd4LivHwamle5Mftdd2Q0YZHZQEAOYJPWKjbOFPMEwRmQT/
-30L12GL4xccuIn+vHOetKyeh2KAFfW4RIp7i7lOzKLr5vu2VkrtPEFZOdB7yOLxudlzyIwAAAAAA
-AA==
+My preference is that we extend BT_VOICE and not introduce a new socket option. So feel free to propose how we can load the full tables into the SCO socket. I mean we are not really far off actually. The only difference is that currently the tables are in the hci_conn.c file and selected by the provided voice->setting. However nothing really stops us from providing the full table via user space.
 
+>>>> We have kept is really simple since there was only CVSD and mSBC as of now.
+>>> 
+>>> Seems that custom codecs are already widely used, so it would be great
+>>> it Linux kernel allows to use also other codecs in future without need
+>>> to explicitly whitelist them.
+>> 
+>> This is an overstatement. I see only one custom codec being used. Unless you have heard from others. However as stated above, I think we need to provide an array of settings that are similar defined to what the HFP spec does. Then we just load the whole set into the kernel.
+> 
+> CVSD and mSBC are in use. IIRC specification also mandates ulaw a alaw
+> codecs but I have not seen it used. Has somebody tried to implement it?
+> I think just replacing voice_settings should be enough as encoding /
+> decoding should be done in bluetooth firmware / hardware.
+> 
+> And then there is AuriStream which based on google results it supported
+> by lot of headsets.
+> 
+> So at least 3 different codecs are widely supported by headset.
 
---=-ruL3LuIaqHuDkOoy9B3G--
+The ulaw and alaw air codecs are in theory possible, but nobody in the history of Bluetooth has used them. So just ignore that part of the specification. For air codecs you have either CVSD or transparent. And then with transparent you get mSBC and AuriStream.
+
+>>>> I am also curious on what the assumptions are for the USB driver alternate settings are when using a different codec.
+>>> 
+>>> I did all above tests and kernel changes with USB bluetooth chip which
+>>> is integrated in notebook's combo bt+wifi intel minipci-e card.
+>> 
+>> Good to know. Since for mSBC in theory they need a new alternate settings that wasn’t really available.
+> 
+> I understood that both mSBC and AuriStream uses "transparent" mode of
+> transport and bluetooth chip itself does not know if it transmit mSBC or
+> AuriStream as it does not do any encoding…
+
+That is true, but still for transparent codec they defined a new alternate setting for USB.
+
+Regards
+
+Marcel
+
