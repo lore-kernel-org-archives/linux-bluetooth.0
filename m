@@ -2,120 +2,156 @@ Return-Path: <SRS0=25t8=VJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C50F9C742A5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 03:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A41CC742AB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 05:10:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FE95214AF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 03:21:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4A2820863
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Jul 2019 05:10:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGGOiAYW"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="WRRri5Rd";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="mRcxNEGL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729250AbfGLDV1 (ORCPT
+        id S1725889AbfGLFKD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Jul 2019 23:21:27 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:37043 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729051AbfGLDV1 (ORCPT
+        Fri, 12 Jul 2019 01:10:03 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:52360 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725846AbfGLFKD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Jul 2019 23:21:27 -0400
-Received: by mail-io1-f65.google.com with SMTP id q22so17329488iog.4;
-        Thu, 11 Jul 2019 20:21:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E7LVm4En99ffCjdSQOlCLFmZyKo+5KgGT1Gs50j8hsM=;
-        b=XGGOiAYWv7/LtWLb3fFHsucku023HvaBW9ern8zt9rFe1AyknFN0kxKFPziFQZPpU0
-         mSUbPmiUxLZBClWysvQHFmJPzjerUGcZmDtQtON9UMZ2C4htBoznEEz2/vFFy/yVuJja
-         T34RRf3SsfRNEsmhwekzCfWrfFfgARA567579Dr0mc521R6E52gp2ayCzNst2yQphWtb
-         SAT8Oq/dYdNEQwYhy2DLsF34PcwbUmqh8/5rJ58NESmddmsnlgfyv8urPDxPtMjHgLqU
-         fWnoeLnir4pIqAFryiTPsmzaD4bprxfXiinlG6R4m1tet7HqDGByU4JAdYYEUeQ+yvoL
-         /dlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E7LVm4En99ffCjdSQOlCLFmZyKo+5KgGT1Gs50j8hsM=;
-        b=ZhCnIr/Q7nDEWK8KIAfFSsiwrRSsYsyQPNu9MZO3imuX04BHYmjkRY8Sw9vL8R/WRH
-         wZT4ZT2GaIGr/XvOiXDr2G7yBGejZF+Fh6thZcQgx6yrq+a3QwqgmOlFVPHl3+6rksfU
-         OcPWAboKl56bAWTbtssKvk0slhRbLVtpYc1GX+gGSNOFJPoUYPJn0LhO0NHZoHPH0HtM
-         YzOeCpJqhlxrq4zxGbiRm5rI04q0UL5MMwU/WndaNDrup/H6Td7HRMBDPHOmWE/YxX70
-         iEa0O3FrsD5fb+LR+98LDv/TYaRqtix7/3TDBgYKhffZrsuqxDpMq1wP9NGGEKKkpcEv
-         avHQ==
-X-Gm-Message-State: APjAAAUBQbOmuk7yvAq3RegLmxGu53NUgIuamYQdIPXYXVb0uU+4j9BQ
-        bCQxoXsxGDT3DzphAEkelL2IaiJR6QAxdl1tjHU=
-X-Google-Smtp-Source: APXvYqyp5Ity6hBV3CWvEX0wudD0bshEvgzA9ul3uS1sRHoTyhwVoN3ni1XDKQh+sLTxNA7FAuOIv5IQ476yGT3CIBY=
-X-Received: by 2002:a02:8814:: with SMTP id r20mr9020971jai.115.1562901686256;
- Thu, 11 Jul 2019 20:21:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190522013045.21678-1-andrew.smirnov@gmail.com>
-In-Reply-To: <20190522013045.21678-1-andrew.smirnov@gmail.com>
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Thu, 11 Jul 2019 20:21:14 -0700
-Message-ID: <CAHQ1cqF+8i1RPi77pXhGv4GRMoWMC0PpvJcEWcKH1O+CKuGWpg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Retry configure request if result is L2CAP_CONF_UNKNOWN
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org,
-        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
-        Florian Dollinger <dollinger.florian@gmx.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 12 Jul 2019 01:10:03 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 02B6C60E57; Fri, 12 Jul 2019 05:10:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1562908202;
+        bh=sp1zrY6tI6nLZSfX2Dy3oIETFmAKxX/GMLFBpZYAIZc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=WRRri5RdzYmb6F17tz9byUaYYTd5iP2LQIUWR4E7/RCF07Hqep1gT+wq7TWhsH9Rp
+         4qLh3NUhNVJO5RDKt6WQk33Euh0ZjBgOXGlz1eTLUPDG0m+MHTXzfVG+2GSj+EAiuf
+         MRdrM600H7xgeBTfs4cRdIMOWM8G9ZPDVztQWg6c=
+Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: c-hbandi@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 45696606DC;
+        Fri, 12 Jul 2019 05:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1562908201;
+        bh=sp1zrY6tI6nLZSfX2Dy3oIETFmAKxX/GMLFBpZYAIZc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=mRcxNEGLcJk+CM5xf04oskXmefOqedGx4gHF/Plgh1Mx02/mqVUttw3sea9axUrZI
+         y5C+0aXTRxpebOQURwPWeVtFDjbMUM+hAypgEyR4bb/Eep3ikt8YpzKZRVFodmd/Qn
+         oVdeZs0ugzkX9muvwFT25xDP72KUbGlU9LuZWRoo=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 45696606DC
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Send VS pre shutdown command.
+Date:   Fri, 12 Jul 2019 10:39:40 +0530
+Message-Id: <1562908180-7468-1-git-send-email-c-hbandi@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, May 21, 2019 at 6:31 PM Andrey Smirnov <andrew.smirnov@gmail.com> wrote:
->
-> Due to:
->
->  * Current implementation of l2cap_config_rsp() dropping BT
->    connection if sender of configuration response replied with unknown
->    option failure (Result=0x0003/L2CAP_CONF_UNKNOWN)
->
->  * Current implementation of l2cap_build_conf_req() adding
->    L2CAP_CONF_RFC(0x04) option to initial configure request sent by
->    the Linux host.
->
-> devices that do no recongninze L2CAP_CONF_RFC, such as Xbox One S
-> controllers, will get stuck in endless connect -> configure ->
-> disconnect loop, never connect and be generaly unusable.
->
-> To avoid this problem add code to do the following:
->
->  1. Parse the body of response L2CAP_CONF_UNKNOWN and, in case of
->     unsupported option being RFC, clear L2CAP_FEAT_ERTM and
->     L2CAP_FEAT_STREAMING from connection's feature mask (in order to
->     prevent RFC option from being added going forward)
->
->  2. Retry configuration step the same way it's done for
->     L2CAP_CONF_UNACCEPT
->
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> Cc: Pierre-Loup A. Griffais <pgriffais@valvesoftware.com>
-> Cc: Florian Dollinger <dollinger.florian@gmx.de>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->
-> Changes since [v1]:
->
->    - Patch simplified to simply clear L2CAP_FEAT_ERTM |
->      L2CAP_FEAT_STREAMING from feat_mask when device flags RFC options
->      as unknown
->
-> [v1] lore.kernel.org/r/20190208025828.30901-1-andrew.smirnov@gmail.com
->
+WCN399x chips are coex chips, it needs a VS pre shutdown
+command while turning off the BT. So that chip can inform
+BT is OFF to other active clients.
 
-Pinging the status of this. Marcel, do you have any feedback on v2?
+Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
+---
+ drivers/bluetooth/btqca.c   | 21 +++++++++++++++++++++
+ drivers/bluetooth/btqca.h   |  7 +++++++
+ drivers/bluetooth/hci_qca.c |  3 +++
+ 3 files changed, 31 insertions(+)
 
-Thanks,
-Andrey Smirnov
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 81a5c45..2221935 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -99,6 +99,27 @@ static int qca_send_reset(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	int err;
++
++	bt_dev_dbg(hdev, "QCA pre shutdown cmd");
++
++	skb = __hci_cmd_sync(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
++				NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "QCA preshutdown_cmd failed (%d)", err);
++		return err;
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
++
+ static void qca_tlv_check_data(struct rome_config *config,
+ 				const struct firmware *fw)
+ {
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 6a291a7..69c5315 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -13,6 +13,7 @@
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+ #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+ #define MAX_SIZE_PER_TLV_SEGMENT	(243)
++#define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+ 
+ #define EDL_CMD_REQ_RES_EVT		(0x00)
+ #define EDL_PATCH_VER_RES_EVT		(0x19)
+@@ -135,6 +136,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   const char *firmware_name);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
++int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
+ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+ {
+ 	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3998;
+@@ -167,4 +169,9 @@ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+ {
+ 	return false;
+ }
++
++static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
++{
++	return -EOPNOTSUPP;
++}
+ #endif
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index cbae86e..16db6c0 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1383,6 +1383,9 @@ static int qca_power_off(struct hci_dev *hdev)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 
++	/* Perform pre shutdown command */
++	qca_send_pre_shutdown_cmd(hdev);
++
+ 	qca_power_shutdown(hu);
+ 	return 0;
+ }
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
