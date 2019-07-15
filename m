@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28CDEC76195
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE4BC76191
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:17:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EBEA621841
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA9A620868
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:17:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563200216;
-	bh=AIScPPIYSfK6jsLJFhkajw+WDalE7mFiKPye5mWn2vQ=;
+	s=default; t=1563200234;
+	bh=zCNqmRsIrfkKLauR/xi8cjfB1cuIG0NmwcE6Nd8GDmI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ADcumaUCkOyzTv/N4zDzrsbS+rX6nsiSsqKINuOd1gIXU+x+/6i/DNrnfTx7c6Z0n
-	 KcAhyv6q/LyosF0AUAqC2rtbIBFaYC7ZPacr+w3R9GldMiLG+ox+HteOq0neRDlGmB
-	 T0ysfXRfy8GN20tceYTpYfBrwX5NbPWSVhdQeTWk=
+	b=zxRWuZdNK5YL70pzI9RGZnUy9BkYTHRhcxeAVsTgxKeUL8XGu229cJB8qNMDGuqpR
+	 +CgSuWc2Ip+M4wWRIhwUwqVtdajP3NV63PzXidn0k+tH9mlJA8A77OWbEbGiQzcM+l
+	 GLU92RzT5CIEgGANnsA5hi57CKg/wDj3T+vhy0dA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389757AbfGOOQp (ORCPT
+        id S2389467AbfGOORI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:16:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34530 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:17:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35704 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388880AbfGOOQo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:16:44 -0400
+        id S1731682AbfGOORG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:17:06 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 114502083D;
-        Mon, 15 Jul 2019 14:16:39 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E2B852081C;
+        Mon, 15 Jul 2019 14:17:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200203;
-        bh=AIScPPIYSfK6jsLJFhkajw+WDalE7mFiKPye5mWn2vQ=;
+        s=default; t=1563200225;
+        bh=zCNqmRsIrfkKLauR/xi8cjfB1cuIG0NmwcE6Nd8GDmI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ss93CXvI3Bhci5rOJFEQy4mDdCyOwytdZ+WAameCvFYNKfJh8RHTlwWuE9HsJFY56
-         TkxXKrN/uKfFvN01NjL/TLGmQtPzlfFrNm+oy+/C1yuhXLJbIXCj1m3Qdp0wobmjyv
-         8u7YlJT224gyn5tk6Aixq16f8ioGxRoBxMxvdu0w=
+        b=rc7i6tfelcUBA63sZ7KmOsSzih31JdCtgYcuFTx5D9Ws/1/dkt+p4++8agcwPfiWo
+         gVSz8hNDRtABozVA0Fqtv2OqD0NM5+B5+jDweUk9sRY5cDAVN2ntGsDFVM24TCm89j
+         YpWSyJHyjq+x7Et9F9ciVYAuJ/EErlNKjp/ZX+IM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Josua Mayer <josua.mayer@jm0.eu>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Michael Scott <mike@foundries.io>,
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.1 207/219] Bluetooth: 6lowpan: search for destination address in all peers
-Date:   Mon, 15 Jul 2019 10:03:28 -0400
-Message-Id: <20190715140341.6443-207-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.1 211/219] Bluetooth: hidp: NUL terminate a string in the compat ioctl
+Date:   Mon, 15 Jul 2019 10:03:32 -0400
+Message-Id: <20190715140341.6443-211-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715140341.6443-1-sashal@kernel.org>
 References: <20190715140341.6443-1-sashal@kernel.org>
@@ -62,57 +60,52 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Josua Mayer <josua.mayer@jm0.eu>
+From: Dan Carpenter <dan.carpenter@oracle.com>
 
-[ Upstream commit b188b03270b7f8568fc714101ce82fbf5e811c5a ]
+[ Upstream commit dcae9052ebb0c5b2614de620323d615fcbfda7f8 ]
 
-Handle overlooked case where the target address is assigned to a peer
-and neither route nor gateway exist.
+This change is similar to commit a1616a5ac99e ("Bluetooth: hidp: fix
+buffer overflow") but for the compat ioctl.  We take a string from the
+user and forgot to ensure that it's NUL terminated.
 
-For one peer, no checks are performed to see if it is meant to receive
-packets for a given address.
+I have also changed the strncpy() in to strscpy() in hidp_setup_hid().
+The difference is the strncpy() doesn't necessarily NUL terminate the
+destination string.  Either change would fix the problem but it's nice
+to take a belt and suspenders approach and do both.
 
-As soon as there is a second peer however, checks are performed
-to deal with routes and gateways for handling complex setups with
-multiple hops to a target address.
-This logic assumed that no route and no gateway imply that the
-destination address can not be reached, which is false in case of a
-direct peer.
-
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Tested-by: Michael Scott <mike@foundries.io>
-Signed-off-by: Josua Mayer <josua.mayer@jm0.eu>
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/6lowpan.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/bluetooth/hidp/core.c | 2 +-
+ net/bluetooth/hidp/sock.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index a7cd23f00bde..50530561da98 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -187,10 +187,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 	}
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index a442e21f3894..5abd423b55fa 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -775,7 +775,7 @@ static int hidp_setup_hid(struct hidp_session *session,
+ 	hid->version = req->version;
+ 	hid->country = req->country;
  
- 	if (!rt) {
--		nexthop = &lowpan_cb(skb)->gw;
--
--		if (ipv6_addr_any(nexthop))
--			return NULL;
-+		if (ipv6_addr_any(&lowpan_cb(skb)->gw)) {
-+			/* There is neither route nor gateway,
-+			 * probably the destination is a direct peer.
-+			 */
-+			nexthop = daddr;
-+		} else {
-+			/* There is a known gateway
-+			 */
-+			nexthop = &lowpan_cb(skb)->gw;
-+		}
- 	} else {
- 		nexthop = rt6_nexthop(rt, daddr);
+-	strncpy(hid->name, req->name, sizeof(hid->name));
++	strscpy(hid->name, req->name, sizeof(hid->name));
  
+ 	snprintf(hid->phys, sizeof(hid->phys), "%pMR",
+ 		 &l2cap_pi(session->ctrl_sock->sk)->chan->src);
+diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
+index 2151913892ce..03be6a4baef3 100644
+--- a/net/bluetooth/hidp/sock.c
++++ b/net/bluetooth/hidp/sock.c
+@@ -192,6 +192,7 @@ static int hidp_sock_compat_ioctl(struct socket *sock, unsigned int cmd, unsigne
+ 		ca.version = ca32.version;
+ 		ca.flags = ca32.flags;
+ 		ca.idle_to = ca32.idle_to;
++		ca32.name[sizeof(ca32.name) - 1] = '\0';
+ 		memcpy(ca.name, ca32.name, 128);
+ 
+ 		csock = sockfd_lookup(ca.ctrl_sock, &err);
 -- 
 2.20.1
 
