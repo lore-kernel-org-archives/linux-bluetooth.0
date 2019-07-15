@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CDDEC7618F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3305C7618F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA579217D8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7CD321537
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:27:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563200859;
-	bh=NWUqE5VnRlpTgHO9CNrtXb3nmzdm/vcFLakPeSkMr/c=;
+	s=default; t=1563200866;
+	bh=akGUhKVSHFGT8s4X5fyVfQB6wkOhTdhGrZbORvz2OMo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=dyjoydizdjrWEzbYOgYtT3g5nJuB5Eaa7gTQo9oO8hz9YXtcF42N6IOt65zWr9cbw
-	 0zOXLWzIXX1JI9vf65BHP86jIWTduQhRkoA5k/kcx3+aPkQIp9R2CNsZ7WtAnZu1wh
-	 lkckVsVmwyqpdXMGTHwT6RJo+GTt7DskJxPfE8mo=
+	b=llwKvBTqVW4GuIw88FS5FKVkvkgDX9GX6BHk4xbF8wUBaL5dCwOzvoe7CuysxAiTN
+	 fv11NeEmUrlgX8Jv4fvbgs5uzr3knZV46IiCksDQbg9rM9vs8dXo0Pbho2Wcnx0NEj
+	 lW/+sT96NDh6g1gTtFTqipVy5PwXi0ZDI3W6Ysxw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390622AbfGOO1j (ORCPT
+        id S2391494AbfGOO1q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:27:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37126 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:27:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37360 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390431AbfGOO1i (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:27:38 -0400
+        id S2390332AbfGOO1p (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:27:45 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B019321851;
-        Mon, 15 Jul 2019 14:27:35 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2A90821842;
+        Mon, 15 Jul 2019 14:27:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200857;
-        bh=NWUqE5VnRlpTgHO9CNrtXb3nmzdm/vcFLakPeSkMr/c=;
+        s=default; t=1563200864;
+        bh=akGUhKVSHFGT8s4X5fyVfQB6wkOhTdhGrZbORvz2OMo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ac1AURh62n7UT06ew18EwI95czf5RSoz/xJ+5KqhOBW4tuoZgKK0gtLUc7ZYQZIrI
-         KuIBspBMZPMNyrvodr/t+FPZsI3P/aqBBS5pA6CQ13vyCkHrDdVd3zOp/bbhFWkibq
-         ugy+p+b6T3o/xB8kpBfUmnjjayL+iBP3JsZJej8Q=
+        b=UVUZJT+99YFeDQVFOu4LFP+JWcECDl6OREs0MfnNJnKGvle4ULUFQ5nz2pwwCkf3o
+         ZS3fLzE9QXyDlXGTIfr7m5weiFOcVpI6gw8zkMIbrXXrXy0AF/cVou069E6uq6Hm+B
+         7NJsPwGrbVBPtVtGymxuQm3eGcuR2yIKwwf8Nxvs=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
-        syzbot+98162c885993b72f19c4@syzkaller.appspotmail.com,
+Cc:     Josua Mayer <josua.mayer@jm0.eu>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        Michael Scott <mike@foundries.io>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 146/158] Bluetooth: hci_bcsp: Fix memory leak in rx_skb
-Date:   Mon, 15 Jul 2019 10:17:57 -0400
-Message-Id: <20190715141809.8445-146-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 149/158] Bluetooth: 6lowpan: search for destination address in all peers
+Date:   Mon, 15 Jul 2019 10:18:00 -0400
+Message-Id: <20190715141809.8445-149-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
 References: <20190715141809.8445-1-sashal@kernel.org>
@@ -61,39 +62,57 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tomas Bortoli <tomasbortoli@gmail.com>
+From: Josua Mayer <josua.mayer@jm0.eu>
 
-[ Upstream commit 4ce9146e0370fcd573f0372d9b4e5a211112567c ]
+[ Upstream commit b188b03270b7f8568fc714101ce82fbf5e811c5a ]
 
-Syzkaller found that it is possible to provoke a memory leak by
-never freeing rx_skb in struct bcsp_struct.
+Handle overlooked case where the target address is assigned to a peer
+and neither route nor gateway exist.
 
-Fix by freeing in bcsp_close()
+For one peer, no checks are performed to see if it is meant to receive
+packets for a given address.
 
-Signed-off-by: Tomas Bortoli <tomasbortoli@gmail.com>
-Reported-by: syzbot+98162c885993b72f19c4@syzkaller.appspotmail.com
+As soon as there is a second peer however, checks are performed
+to deal with routes and gateways for handling complex setups with
+multiple hops to a target address.
+This logic assumed that no route and no gateway imply that the
+destination address can not be reached, which is false in case of a
+direct peer.
+
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Tested-by: Michael Scott <mike@foundries.io>
+Signed-off-by: Josua Mayer <josua.mayer@jm0.eu>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/hci_bcsp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/bluetooth/6lowpan.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 1a7f0c82fb36..66fe1e6dc631 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -759,6 +759,11 @@ static int bcsp_close(struct hci_uart *hu)
- 	skb_queue_purge(&bcsp->rel);
- 	skb_queue_purge(&bcsp->unrel);
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4e2576fc0c59..357475cceec6 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -187,10 +187,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 	}
  
-+	if (bcsp->rx_skb) {
-+		kfree_skb(bcsp->rx_skb);
-+		bcsp->rx_skb = NULL;
-+	}
-+
- 	kfree(bcsp);
- 	return 0;
- }
+ 	if (!rt) {
+-		nexthop = &lowpan_cb(skb)->gw;
+-
+-		if (ipv6_addr_any(nexthop))
+-			return NULL;
++		if (ipv6_addr_any(&lowpan_cb(skb)->gw)) {
++			/* There is neither route nor gateway,
++			 * probably the destination is a direct peer.
++			 */
++			nexthop = daddr;
++		} else {
++			/* There is a known gateway
++			 */
++			nexthop = &lowpan_cb(skb)->gw;
++		}
+ 	} else {
+ 		nexthop = rt6_nexthop(rt, daddr);
+ 
 -- 
 2.20.1
 
