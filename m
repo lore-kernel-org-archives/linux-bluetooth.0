@@ -4,53 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6832C7618F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 018CCC76196
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:16:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7263C206B8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:03:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C62E9217D8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:16:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563199407;
-	bh=zCNqmRsIrfkKLauR/xi8cjfB1cuIG0NmwcE6Nd8GDmI=;
+	s=default; t=1563200189;
+	bh=NWUqE5VnRlpTgHO9CNrtXb3nmzdm/vcFLakPeSkMr/c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=dwFDQGHKUji3PkeI6TAwJSPxYT5bnci+EPdYm7f8HRUwhWRVKEf/W7Zy6CTYrnP4v
-	 vB4wMEZowoGF5XPcj9KDLliIWvBDrw96l4iiDnCIr2Pla8Irxz5vM1jlm9zdNBV2O8
-	 oTnLGUK9HSblFsXhssqmCxGj2MTqgdqhpFSxxEqI=
+	b=s46izt5EhtHpiTDF32LCTYd7bwwj7j8RQqto0vd3aQjnlfAxcBiCLiPeTyAtWHmTX
+	 dWYFrObIBKyYFnUC9yWp5ETg94CJ7NzsHWemFL/8varVCU/sP/6C2mUSPghTF/u/MA
+	 d0IDyj+0O5G44M5iwVyjJsHAHMdjhqwZ0HsRb0EM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733155AbfGOOCd (ORCPT
+        id S2389209AbfGOOQ2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:02:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45926 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:16:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33656 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732787AbfGOOCc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:02:32 -0400
+        id S1731290AbfGOOQ2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:16:28 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 63D5A2083D;
-        Mon, 15 Jul 2019 14:02:30 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F348E2081C;
+        Mon, 15 Jul 2019 14:16:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563199351;
-        bh=zCNqmRsIrfkKLauR/xi8cjfB1cuIG0NmwcE6Nd8GDmI=;
+        s=default; t=1563200187;
+        bh=NWUqE5VnRlpTgHO9CNrtXb3nmzdm/vcFLakPeSkMr/c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=N8DqZA50IkwbSOX6kbdOSkbNRoGRGa9r2+Y5ZW1MzXOXwk8vS0izgUJUxbkvaujwi
-         wyDJHNZZzvmfZjT7ZJmoxaOf7jF9Vf3gVlg2i83oiBTAmqL6GeF9YGRPXluOA795PT
-         xEiULhQkIBs5QBEdnjKEm1XVYI7oDibCWO5Sw0Co=
+        b=okhLWEFOEC8j3a5g4YRDf1T+60m2z7WC6iTSV5AC/P83MTQUAALRnaTN4UpdR1qpg
+         4NNpplFPLauPjOWIdCuT1CBuR3eX1wtBfyZMcqZokikJ05L7CKnjC8B8IJwp/2lBxu
+         8pB9wzNtKdX2309h4nS9INIKRI6hmyXKv+BJIyns=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+Cc:     Tomas Bortoli <tomasbortoli@gmail.com>,
+        syzbot+98162c885993b72f19c4@syzkaller.appspotmail.com,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 241/249] Bluetooth: hidp: NUL terminate a string in the compat ioctl
-Date:   Mon, 15 Jul 2019 09:46:46 -0400
-Message-Id: <20190715134655.4076-241-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.1 204/219] Bluetooth: hci_bcsp: Fix memory leak in rx_skb
+Date:   Mon, 15 Jul 2019 10:03:25 -0400
+Message-Id: <20190715140341.6443-204-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
-References: <20190715134655.4076-1-sashal@kernel.org>
+In-Reply-To: <20190715140341.6443-1-sashal@kernel.org>
+References: <20190715140341.6443-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,52 +61,39 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dan Carpenter <dan.carpenter@oracle.com>
+From: Tomas Bortoli <tomasbortoli@gmail.com>
 
-[ Upstream commit dcae9052ebb0c5b2614de620323d615fcbfda7f8 ]
+[ Upstream commit 4ce9146e0370fcd573f0372d9b4e5a211112567c ]
 
-This change is similar to commit a1616a5ac99e ("Bluetooth: hidp: fix
-buffer overflow") but for the compat ioctl.  We take a string from the
-user and forgot to ensure that it's NUL terminated.
+Syzkaller found that it is possible to provoke a memory leak by
+never freeing rx_skb in struct bcsp_struct.
 
-I have also changed the strncpy() in to strscpy() in hidp_setup_hid().
-The difference is the strncpy() doesn't necessarily NUL terminate the
-destination string.  Either change would fix the problem but it's nice
-to take a belt and suspenders approach and do both.
+Fix by freeing in bcsp_close()
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Tomas Bortoli <tomasbortoli@gmail.com>
+Reported-by: syzbot+98162c885993b72f19c4@syzkaller.appspotmail.com
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hidp/core.c | 2 +-
- net/bluetooth/hidp/sock.c | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_bcsp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index a442e21f3894..5abd423b55fa 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -775,7 +775,7 @@ static int hidp_setup_hid(struct hidp_session *session,
- 	hid->version = req->version;
- 	hid->country = req->country;
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 1a7f0c82fb36..66fe1e6dc631 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -759,6 +759,11 @@ static int bcsp_close(struct hci_uart *hu)
+ 	skb_queue_purge(&bcsp->rel);
+ 	skb_queue_purge(&bcsp->unrel);
  
--	strncpy(hid->name, req->name, sizeof(hid->name));
-+	strscpy(hid->name, req->name, sizeof(hid->name));
- 
- 	snprintf(hid->phys, sizeof(hid->phys), "%pMR",
- 		 &l2cap_pi(session->ctrl_sock->sk)->chan->src);
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 2151913892ce..03be6a4baef3 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -192,6 +192,7 @@ static int hidp_sock_compat_ioctl(struct socket *sock, unsigned int cmd, unsigne
- 		ca.version = ca32.version;
- 		ca.flags = ca32.flags;
- 		ca.idle_to = ca32.idle_to;
-+		ca32.name[sizeof(ca32.name) - 1] = '\0';
- 		memcpy(ca.name, ca32.name, 128);
- 
- 		csock = sockfd_lookup(ca.ctrl_sock, &err);
++	if (bcsp->rx_skb) {
++		kfree_skb(bcsp->rx_skb);
++		bcsp->rx_skb = NULL;
++	}
++
+ 	kfree(bcsp);
+ 	return 0;
+ }
 -- 
 2.20.1
 
