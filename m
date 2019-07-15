@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF75C76196
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4A9C76191
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:54:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B3662067C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:51:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D303205ED
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:54:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563202279;
-	bh=akGUhKVSHFGT8s4X5fyVfQB6wkOhTdhGrZbORvz2OMo=;
+	s=default; t=1563202471;
+	bh=sAEylipJCq3vwbWa5+xWldqpmR1Owj948qxk23mPNsU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=x66L+8CWqhlF1R9iQfMnd4Z5n/T92M0M4s5E40wbIYDXGSZeibHJVLknROBu03+ou
-	 KjK/9WG5ADgzMvNPP2zkieuMS8p/AsA24XvGeTMXCySrrkfKsBI6EmD5bQ1tHJ+txO
-	 iccdZJUX9KfSBEBeSs7r7H+syyJaqVhCTVmK4H/U=
+	b=HUzStnlr09OIkGzzH6Y2Sj66BYMrSMa01MYgdrk31aXqw8MTBA9LuXPjL/mM7ovs5
+	 f6aVRmRT/ge29PSUbVS5eIw06B3KSt6ntPbBfOUxAKwTaQIXZmNv8oEs2cusqi8vQg
+	 +At5Fr8OxZTFc9J9O8CBPfFN8Bze+D9VhT0qaWmc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404165AbfGOOhB (ORCPT
+        id S2391069AbfGOO1z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:37:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52124 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:27:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37668 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392046AbfGOOeq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:34:46 -0400
+        id S2391052AbfGOO1y (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:27:54 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 576B0206B8;
-        Mon, 15 Jul 2019 14:34:42 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6013D20896;
+        Mon, 15 Jul 2019 14:27:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563201285;
-        bh=akGUhKVSHFGT8s4X5fyVfQB6wkOhTdhGrZbORvz2OMo=;
+        s=default; t=1563200873;
+        bh=sAEylipJCq3vwbWa5+xWldqpmR1Owj948qxk23mPNsU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YKpgrKz3fGRjBkK82R2tUdwqxiHnJi5VWgRyvQpnRzDdZ/0OJUmtS1/6o1S/0BOhE
-         3C3DpNQfNeza3Qy1HNzadp76dE9ihKnmwp5WRSJcYgKH5FV/g7oTPVic3sJtidimUb
-         tAfDvmQuRQ+CCjohvM5m3xxJjDX9qb/qoaOPHGkI=
+        b=e/mc2C0jUXG5ac2Kp7NUTZzGJUOQVo4LaIMNkzbFvRA78aHBB/SKiopwQLrS9NIOb
+         IupaZfighEcNZLkhLKvY5wV6/XWiclylJdTd0wpgL/ckMV+bG457gthF5Smekhv+2V
+         cr+b8D7a3O0t/tvDT8aWDLfGVA907PNDoJ3//cW0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Josua Mayer <josua.mayer@jm0.eu>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Michael Scott <mike@foundries.io>,
+Cc:     Matias Karhumaa <matias.karhumaa@gmail.com>,
+        Matti Kamunen <matti.kamunen@synopsys.com>,
+        Ari Timonen <ari.timonen@synopsys.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 097/105] Bluetooth: 6lowpan: search for destination address in all peers
-Date:   Mon, 15 Jul 2019 10:28:31 -0400
-Message-Id: <20190715142839.9896-97-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 151/158] Bluetooth: Check state in l2cap_disconnect_rsp
+Date:   Mon, 15 Jul 2019 10:18:02 -0400
+Message-Id: <20190715141809.8445-151-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715142839.9896-1-sashal@kernel.org>
-References: <20190715142839.9896-1-sashal@kernel.org>
+In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
+References: <20190715141809.8445-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -62,56 +62,219 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Josua Mayer <josua.mayer@jm0.eu>
+From: Matias Karhumaa <matias.karhumaa@gmail.com>
 
-[ Upstream commit b188b03270b7f8568fc714101ce82fbf5e811c5a ]
+[ Upstream commit 28261da8a26f4915aa257d12d506c6ba179d961f ]
 
-Handle overlooked case where the target address is assigned to a peer
-and neither route nor gateway exist.
+Because of both sides doing L2CAP disconnection at the same time, it
+was possible to receive L2CAP Disconnection Response with CID that was
+already freed. That caused problems if CID was already reused and L2CAP
+Connection Request with same CID was sent out. Before this patch kernel
+deleted channel context regardless of the state of the channel.
 
-For one peer, no checks are performed to see if it is meant to receive
-packets for a given address.
+Example where leftover Disconnection Response (frame #402) causes local
+device to delete L2CAP channel which was not yet connected. This in
+turn confuses remote device's stack because same CID is re-used without
+properly disconnecting.
 
-As soon as there is a second peer however, checks are performed
-to deal with routes and gateways for handling complex setups with
-multiple hops to a target address.
-This logic assumed that no route and no gateway imply that the
-destination address can not be reached, which is false in case of a
-direct peer.
+Btmon capture before patch:
+** snip **
+> ACL Data RX: Handle 43 flags 0x02 dlen 8                #394 [hci1] 10.748949
+      Channel: 65 len 4 [PSM 3 mode 0] {chan 2}
+      RFCOMM: Disconnect (DISC) (0x43)
+         Address: 0x03 cr 1 dlci 0x00
+         Control: 0x53 poll/final 1
+         Length: 0
+         FCS: 0xfd
+< ACL Data TX: Handle 43 flags 0x00 dlen 8                #395 [hci1] 10.749062
+      Channel: 65 len 4 [PSM 3 mode 0] {chan 2}
+      RFCOMM: Unnumbered Ack (UA) (0x63)
+         Address: 0x03 cr 1 dlci 0x00
+         Control: 0x73 poll/final 1
+         Length: 0
+         FCS: 0xd7
+< ACL Data TX: Handle 43 flags 0x00 dlen 12               #396 [hci1] 10.749073
+      L2CAP: Disconnection Request (0x06) ident 17 len 4
+        Destination CID: 65
+        Source CID: 65
+> HCI Event: Number of Completed Packets (0x13) plen 5    #397 [hci1] 10.752391
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> HCI Event: Number of Completed Packets (0x13) plen 5    #398 [hci1] 10.753394
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> ACL Data RX: Handle 43 flags 0x02 dlen 12               #399 [hci1] 10.756499
+      L2CAP: Disconnection Request (0x06) ident 26 len 4
+        Destination CID: 65
+        Source CID: 65
+< ACL Data TX: Handle 43 flags 0x00 dlen 12               #400 [hci1] 10.756548
+      L2CAP: Disconnection Response (0x07) ident 26 len 4
+        Destination CID: 65
+        Source CID: 65
+< ACL Data TX: Handle 43 flags 0x00 dlen 12               #401 [hci1] 10.757459
+      L2CAP: Connection Request (0x02) ident 18 len 4
+        PSM: 1 (0x0001)
+        Source CID: 65
+> ACL Data RX: Handle 43 flags 0x02 dlen 12               #402 [hci1] 10.759148
+      L2CAP: Disconnection Response (0x07) ident 17 len 4
+        Destination CID: 65
+        Source CID: 65
+= bluetoothd: 00:1E:AB:4C:56:54: error updating services: Input/o..   10.759447
+> HCI Event: Number of Completed Packets (0x13) plen 5    #403 [hci1] 10.759386
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> ACL Data RX: Handle 43 flags 0x02 dlen 12               #404 [hci1] 10.760397
+      L2CAP: Connection Request (0x02) ident 27 len 4
+        PSM: 3 (0x0003)
+        Source CID: 65
+< ACL Data TX: Handle 43 flags 0x00 dlen 16               #405 [hci1] 10.760441
+      L2CAP: Connection Response (0x03) ident 27 len 8
+        Destination CID: 65
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+< ACL Data TX: Handle 43 flags 0x00 dlen 27               #406 [hci1] 10.760449
+      L2CAP: Configure Request (0x04) ident 19 len 19
+        Destination CID: 65
+        Flags: 0x0000
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 1013
+        Option: Retransmission and Flow Control (0x04) [mandatory]
+          Mode: Basic (0x00)
+          TX window size: 0
+          Max transmit: 0
+          Retransmission timeout: 0
+          Monitor timeout: 0
+          Maximum PDU size: 0
+> HCI Event: Number of Completed Packets (0x13) plen 5    #407 [hci1] 10.761399
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> ACL Data RX: Handle 43 flags 0x02 dlen 16               #408 [hci1] 10.762942
+      L2CAP: Connection Response (0x03) ident 18 len 8
+        Destination CID: 66
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+*snip*
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Tested-by: Michael Scott <mike@foundries.io>
-Signed-off-by: Josua Mayer <josua.mayer@jm0.eu>
+Similar case after the patch:
+*snip*
+> ACL Data RX: Handle 43 flags 0x02 dlen 8            #22702 [hci0] 1664.411056
+      Channel: 65 len 4 [PSM 3 mode 0] {chan 3}
+      RFCOMM: Disconnect (DISC) (0x43)
+         Address: 0x03 cr 1 dlci 0x00
+         Control: 0x53 poll/final 1
+         Length: 0
+         FCS: 0xfd
+< ACL Data TX: Handle 43 flags 0x00 dlen 8            #22703 [hci0] 1664.411136
+      Channel: 65 len 4 [PSM 3 mode 0] {chan 3}
+      RFCOMM: Unnumbered Ack (UA) (0x63)
+         Address: 0x03 cr 1 dlci 0x00
+         Control: 0x73 poll/final 1
+         Length: 0
+         FCS: 0xd7
+< ACL Data TX: Handle 43 flags 0x00 dlen 12           #22704 [hci0] 1664.411143
+      L2CAP: Disconnection Request (0x06) ident 11 len 4
+        Destination CID: 65
+        Source CID: 65
+> HCI Event: Number of Completed Pac.. (0x13) plen 5  #22705 [hci0] 1664.414009
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> HCI Event: Number of Completed Pac.. (0x13) plen 5  #22706 [hci0] 1664.415007
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> ACL Data RX: Handle 43 flags 0x02 dlen 12           #22707 [hci0] 1664.418674
+      L2CAP: Disconnection Request (0x06) ident 17 len 4
+        Destination CID: 65
+        Source CID: 65
+< ACL Data TX: Handle 43 flags 0x00 dlen 12           #22708 [hci0] 1664.418762
+      L2CAP: Disconnection Response (0x07) ident 17 len 4
+        Destination CID: 65
+        Source CID: 65
+< ACL Data TX: Handle 43 flags 0x00 dlen 12           #22709 [hci0] 1664.421073
+      L2CAP: Connection Request (0x02) ident 12 len 4
+        PSM: 1 (0x0001)
+        Source CID: 65
+> ACL Data RX: Handle 43 flags 0x02 dlen 12           #22710 [hci0] 1664.421371
+      L2CAP: Disconnection Response (0x07) ident 11 len 4
+        Destination CID: 65
+        Source CID: 65
+> HCI Event: Number of Completed Pac.. (0x13) plen 5  #22711 [hci0] 1664.424082
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> HCI Event: Number of Completed Pac.. (0x13) plen 5  #22712 [hci0] 1664.425040
+        Num handles: 1
+        Handle: 43
+        Count: 1
+> ACL Data RX: Handle 43 flags 0x02 dlen 12           #22713 [hci0] 1664.426103
+      L2CAP: Connection Request (0x02) ident 18 len 4
+        PSM: 3 (0x0003)
+        Source CID: 65
+< ACL Data TX: Handle 43 flags 0x00 dlen 16           #22714 [hci0] 1664.426186
+      L2CAP: Connection Response (0x03) ident 18 len 8
+        Destination CID: 66
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+< ACL Data TX: Handle 43 flags 0x00 dlen 27           #22715 [hci0] 1664.426196
+      L2CAP: Configure Request (0x04) ident 13 len 19
+        Destination CID: 65
+        Flags: 0x0000
+        Option: Maximum Transmission Unit (0x01) [mandatory]
+          MTU: 1013
+        Option: Retransmission and Flow Control (0x04) [mandatory]
+          Mode: Basic (0x00)
+          TX window size: 0
+          Max transmit: 0
+          Retransmission timeout: 0
+          Monitor timeout: 0
+          Maximum PDU size: 0
+> ACL Data RX: Handle 43 flags 0x02 dlen 16           #22716 [hci0] 1664.428804
+      L2CAP: Connection Response (0x03) ident 12 len 8
+        Destination CID: 66
+        Source CID: 65
+        Result: Connection successful (0x0000)
+        Status: No further information available (0x0000)
+*snip*
+
+Fix is to check that channel is in state BT_DISCONN before deleting the
+channel.
+
+This bug was found while fuzzing Bluez's OBEX implementation using
+Synopsys Defensics.
+
+Reported-by: Matti Kamunen <matti.kamunen@synopsys.com>
+Reported-by: Ari Timonen <ari.timonen@synopsys.com>
+Signed-off-by: Matias Karhumaa <matias.karhumaa@gmail.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/6lowpan.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 4e2576fc0c59..357475cceec6 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -187,10 +187,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 	}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 879d5432bf77..260ef5426e0c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4384,6 +4384,12 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
  
- 	if (!rt) {
--		nexthop = &lowpan_cb(skb)->gw;
--
--		if (ipv6_addr_any(nexthop))
--			return NULL;
-+		if (ipv6_addr_any(&lowpan_cb(skb)->gw)) {
-+			/* There is neither route nor gateway,
-+			 * probably the destination is a direct peer.
-+			 */
-+			nexthop = daddr;
-+		} else {
-+			/* There is a known gateway
-+			 */
-+			nexthop = &lowpan_cb(skb)->gw;
-+		}
- 	} else {
- 		nexthop = rt6_nexthop(rt, daddr);
+ 	l2cap_chan_lock(chan);
+ 
++	if (chan->state != BT_DISCONN) {
++		l2cap_chan_unlock(chan);
++		mutex_unlock(&conn->chan_lock);
++		return 0;
++	}
++
+ 	l2cap_chan_hold(chan);
+ 	l2cap_chan_del(chan, 0);
  
 -- 
 2.20.1
