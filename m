@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE4BC76191
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC251C7618F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:17:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA9A620868
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A47DF2083D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:17:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563200234;
-	bh=zCNqmRsIrfkKLauR/xi8cjfB1cuIG0NmwcE6Nd8GDmI=;
+	s=default; t=1563200237;
+	bh=b3/08zbf0npl5HNr5gmHxafJHMI5e5HONJlhFc673FA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=zxRWuZdNK5YL70pzI9RGZnUy9BkYTHRhcxeAVsTgxKeUL8XGu229cJB8qNMDGuqpR
-	 +CgSuWc2Ip+M4wWRIhwUwqVtdajP3NV63PzXidn0k+tH9mlJA8A77OWbEbGiQzcM+l
-	 GLU92RzT5CIEgGANnsA5hi57CKg/wDj3T+vhy0dA=
+	b=ZrvJ+3N4ksUpbc2BmJJ3CqnaQ6TbLsBgNNwwSR6n1K0JZS5ThaFP1OQGvmY8cyaV6
+	 MRft7gS/ugXFpajSllEHvSOnUw1lMhZIbRtelAIilHjLZMoid3iNsgZKEywpZKNtOJ
+	 KsSuUitmOMoQpoEw2XpqWDYOnneHLz4vpCSYcc9k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389467AbfGOORI (ORCPT
+        id S2389499AbfGOORQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:17:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35704 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:17:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36284 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731682AbfGOORG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:17:06 -0400
+        id S2389300AbfGOORP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:17:15 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E2B852081C;
-        Mon, 15 Jul 2019 14:17:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 87EDB2081C;
+        Mon, 15 Jul 2019 14:17:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200225;
-        bh=zCNqmRsIrfkKLauR/xi8cjfB1cuIG0NmwcE6Nd8GDmI=;
+        s=default; t=1563200234;
+        bh=b3/08zbf0npl5HNr5gmHxafJHMI5e5HONJlhFc673FA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rc7i6tfelcUBA63sZ7KmOsSzih31JdCtgYcuFTx5D9Ws/1/dkt+p4++8agcwPfiWo
-         gVSz8hNDRtABozVA0Fqtv2OqD0NM5+B5+jDweUk9sRY5cDAVN2ntGsDFVM24TCm89j
-         YpWSyJHyjq+x7Et9F9ciVYAuJ/EErlNKjp/ZX+IM=
+        b=hgbK94GfHnda3rEAZ66OvJzEDk7zS+uddsNLWueour3WJGr3SQHN4coboPdt3vP5U
+         lvyLBrS7nRQ4EGdGG1Fh/lqrqqc1Dd/CC7pbvwols3UM7qDXFVgXDkHNbrR2gFOJnd
+         vBa3nRmEU62jRgyx1y09w0DFw/b98qMk/t8JTo6U=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+Cc:     csonsino <csonsino@gmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.1 211/219] Bluetooth: hidp: NUL terminate a string in the compat ioctl
-Date:   Mon, 15 Jul 2019 10:03:32 -0400
-Message-Id: <20190715140341.6443-211-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.1 213/219] Bluetooth: validate BLE connection interval updates
+Date:   Mon, 15 Jul 2019 10:03:34 -0400
+Message-Id: <20190715140341.6443-213-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715140341.6443-1-sashal@kernel.org>
 References: <20190715140341.6443-1-sashal@kernel.org>
@@ -60,52 +60,92 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dan Carpenter <dan.carpenter@oracle.com>
+From: csonsino <csonsino@gmail.com>
 
-[ Upstream commit dcae9052ebb0c5b2614de620323d615fcbfda7f8 ]
+[ Upstream commit c49a8682fc5d298d44e8d911f4fa14690ea9485e ]
 
-This change is similar to commit a1616a5ac99e ("Bluetooth: hidp: fix
-buffer overflow") but for the compat ioctl.  We take a string from the
-user and forgot to ensure that it's NUL terminated.
+Problem: The Linux Bluetooth stack yields complete control over the BLE
+connection interval to the remote device.
 
-I have also changed the strncpy() in to strscpy() in hidp_setup_hid().
-The difference is the strncpy() doesn't necessarily NUL terminate the
-destination string.  Either change would fix the problem but it's nice
-to take a belt and suspenders approach and do both.
+The Linux Bluetooth stack provides access to the BLE connection interval
+min and max values through /sys/kernel/debug/bluetooth/hci0/
+conn_min_interval and /sys/kernel/debug/bluetooth/hci0/conn_max_interval.
+These values are used for initial BLE connections, but the remote device
+has the ability to request a connection parameter update. In the event
+that the remote side requests to change the connection interval, the Linux
+kernel currently only validates that the desired value is within the
+acceptable range in the Bluetooth specification (6 - 3200, corresponding to
+7.5ms - 4000ms). There is currently no validation that the desired value
+requested by the remote device is within the min/max limits specified in
+the conn_min_interval/conn_max_interval configurations. This essentially
+leads to Linux yielding complete control over the connection interval to
+the remote device.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+The proposed patch adds a verification step to the connection parameter
+update mechanism, ensuring that the desired value is within the min/max
+bounds of the current connection. If the desired value is outside of the
+current connection min/max values, then the connection parameter update
+request is rejected and the negative response is returned to the remote
+device. Recall that the initial connection is established using the local
+conn_min_interval/conn_max_interval values, so this allows the Linux
+administrator to retain control over the BLE connection interval.
+
+The one downside that I see is that the current default Linux values for
+conn_min_interval and conn_max_interval typically correspond to 30ms and
+50ms respectively. If this change were accepted, then it is feasible that
+some devices would no longer be able to negotiate to their desired
+connection interval values. This might be remedied by setting the default
+Linux conn_min_interval and conn_max_interval values to the widest
+supported range (6 - 3200 / 7.5ms - 4000ms). This could lead to the same
+behavior as the current implementation, where the remote device could
+request to change the connection interval value to any value that is
+permitted by the Bluetooth specification, and Linux would accept the
+desired value.
+
+Signed-off-by: Carey Sonsino <csonsino@gmail.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hidp/core.c | 2 +-
- net/bluetooth/hidp/sock.c | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_event.c  | 5 +++++
+ net/bluetooth/l2cap_core.c | 9 ++++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index a442e21f3894..5abd423b55fa 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -775,7 +775,7 @@ static int hidp_setup_hid(struct hidp_session *session,
- 	hid->version = req->version;
- 	hid->country = req->country;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8b893baf9bbe..31eb0449479b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5588,6 +5588,11 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev,
+ 		return send_conn_param_neg_reply(hdev, handle,
+ 						 HCI_ERROR_UNKNOWN_CONN_ID);
  
--	strncpy(hid->name, req->name, sizeof(hid->name));
-+	strscpy(hid->name, req->name, sizeof(hid->name));
++	if (min < hcon->le_conn_min_interval ||
++	    max > hcon->le_conn_max_interval)
++		return send_conn_param_neg_reply(hdev, handle,
++						 HCI_ERROR_INVALID_LL_PARAMS);
++
+ 	if (hci_check_conn_params(min, max, latency, timeout))
+ 		return send_conn_param_neg_reply(hdev, handle,
+ 						 HCI_ERROR_INVALID_LL_PARAMS);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 771e3e17bb6a..32d2be9d6858 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5297,7 +5297,14 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
  
- 	snprintf(hid->phys, sizeof(hid->phys), "%pMR",
- 		 &l2cap_pi(session->ctrl_sock->sk)->chan->src);
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 2151913892ce..03be6a4baef3 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -192,6 +192,7 @@ static int hidp_sock_compat_ioctl(struct socket *sock, unsigned int cmd, unsigne
- 		ca.version = ca32.version;
- 		ca.flags = ca32.flags;
- 		ca.idle_to = ca32.idle_to;
-+		ca32.name[sizeof(ca32.name) - 1] = '\0';
- 		memcpy(ca.name, ca32.name, 128);
+ 	memset(&rsp, 0, sizeof(rsp));
  
- 		csock = sockfd_lookup(ca.ctrl_sock, &err);
+-	err = hci_check_conn_params(min, max, latency, to_multiplier);
++	if (min < hcon->le_conn_min_interval ||
++	    max > hcon->le_conn_max_interval) {
++		BT_DBG("requested connection interval exceeds current bounds.");
++		err = -EINVAL;
++	} else {
++		err = hci_check_conn_params(min, max, latency, to_multiplier);
++	}
++
+ 	if (err)
+ 		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
+ 	else
 -- 
 2.20.1
 
