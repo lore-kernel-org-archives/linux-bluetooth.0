@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA08C7618F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF75C76196
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:51:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B5E22067C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:49:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B3662067C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 14:51:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563202142;
-	bh=OTWwnrkCMDKcr0hVMwbDlU6k6COSOlAGByKRjTcrQw4=;
+	s=default; t=1563202279;
+	bh=akGUhKVSHFGT8s4X5fyVfQB6wkOhTdhGrZbORvz2OMo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=MP8kOujdrIFEQoBqGvbwZMdksAZSMC8lW/3BtZDchL96IGAO9TuR2P7ROfc+iIUmO
-	 nPNcwtkKP10OiGiBu66fQhHvaFeF22wnfOJheJDQoTmX2IFEvv0lghuXZH69aYujkT
-	 NfCiigx+0LbSSrRxq8E5muubPnqBm6Of0IhROFnY=
+	b=x66L+8CWqhlF1R9iQfMnd4Z5n/T92M0M4s5E40wbIYDXGSZeibHJVLknROBu03+ou
+	 KjK/9WG5ADgzMvNPP2zkieuMS8p/AsA24XvGeTMXCySrrkfKsBI6EmD5bQ1tHJ+txO
+	 iccdZJUX9KfSBEBeSs7r7H+syyJaqVhCTVmK4H/U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404456AbfGOOsm (ORCPT
+        id S2404165AbfGOOhB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:48:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46482 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:37:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52124 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732749AbfGOOsl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:48:41 -0400
+        id S2392046AbfGOOeq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:34:46 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C9D242067C;
-        Mon, 15 Jul 2019 14:48:37 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 576B0206B8;
+        Mon, 15 Jul 2019 14:34:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563202120;
-        bh=OTWwnrkCMDKcr0hVMwbDlU6k6COSOlAGByKRjTcrQw4=;
+        s=default; t=1563201285;
+        bh=akGUhKVSHFGT8s4X5fyVfQB6wkOhTdhGrZbORvz2OMo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ow/IARIc389hWKe4+l3XLtv1nmd0pFtMSqTOwlQuOZQ5dLQQVyXzbFTUb/Wi1tmyx
-         tGKhrO95gekjHbblf5hDY4CVa7cv9SF023hgxmiqJIRPWyk9J2xrD1PRTHnZJKE+9o
-         rZqji4w1cuvRjlbNY83ssuy/sMyg+Stp/sIxQ/0E=
+        b=YKpgrKz3fGRjBkK82R2tUdwqxiHnJi5VWgRyvQpnRzDdZ/0OJUmtS1/6o1S/0BOhE
+         3C3DpNQfNeza3Qy1HNzadp76dE9ihKnmwp5WRSJcYgKH5FV/g7oTPVic3sJtidimUb
+         tAfDvmQuRQ+CCjohvM5m3xxJjDX9qb/qoaOPHGkI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Josua Mayer <josua.mayer@jm0.eu>,
@@ -47,12 +47,12 @@ Cc:     Josua Mayer <josua.mayer@jm0.eu>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 51/53] Bluetooth: 6lowpan: search for destination address in all peers
-Date:   Mon, 15 Jul 2019 10:45:33 -0400
-Message-Id: <20190715144535.11636-51-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 097/105] Bluetooth: 6lowpan: search for destination address in all peers
+Date:   Mon, 15 Jul 2019 10:28:31 -0400
+Message-Id: <20190715142839.9896-97-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715144535.11636-1-sashal@kernel.org>
-References: <20190715144535.11636-1-sashal@kernel.org>
+In-Reply-To: <20190715142839.9896-1-sashal@kernel.org>
+References: <20190715142839.9896-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -89,10 +89,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 795ddd8b2f77..4cd6b8d811ff 100644
+index 4e2576fc0c59..357475cceec6 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -184,10 +184,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_dev *dev,
+@@ -187,10 +187,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
  	}
  
  	if (!rt) {
