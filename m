@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C25CBC7618F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 15:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D04E4C7618F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 15:07:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 90EE42054F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 15:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8E8D2067C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Jul 2019 15:07:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563203245;
-	bh=eek9KecmG05ttWvtDl0cOtqaIreulOxait8vngiRMZM=;
+	s=default; t=1563203249;
+	bh=j1lDdqYNqnK+aEApFgVCRclHKlxP7K2HeiG+aldf/nc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=t14FkqfHGFzj3UCyAeQMAzdALW9mCtqM4ItDU6u+44xvSKZlOTgjuSklELIOKzOux
-	 h0d5tkyrrDKLSrvpq0ssJpy3Q0s8/XGQiyAojOxq7U3vjs6GJgIisgH61CbZOmBlH6
-	 3DODhNrrMAPRtLnPLxS+rFlmaQAzZVDKTf5xXDIg=
+	b=BaP5jUKagzY0rqA9FqwFycFO6WKcoYfZ7GRj43fqXax2UpKGwIwwVqet6wSCLkWp6
+	 I7GidfPER2VyYhUu4fYrKSeuua6zByDrnUo8A2EMUCZhS6F+C1Ocexoijc0zYVTvtj
+	 7CG8I+1ftUXjGVzKVadVzcnwZeVTwpF19djA3ICo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387592AbfGOOCQ (ORCPT
+        id S2387576AbfGOOCO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:02:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45498 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:02:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45422 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387586AbfGOOCP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:02:15 -0400
+        id S2387571AbfGOOCN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:02:13 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D27D12083D;
-        Mon, 15 Jul 2019 14:02:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9B21E21530;
+        Mon, 15 Jul 2019 14:02:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563199335;
-        bh=eek9KecmG05ttWvtDl0cOtqaIreulOxait8vngiRMZM=;
+        s=default; t=1563199333;
+        bh=j1lDdqYNqnK+aEApFgVCRclHKlxP7K2HeiG+aldf/nc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fL9a0Lq6/IqaB9Xo2ZuNFiDIXurzEa8aUJkQCTb6cZU9+h2hlysH7B+YRxOKRW7HB
-         sZfV1MxiG2HGM29rVOoHvHXA3KYgN4Bc82C26CGG1wvHafl5v++OkxFyX5SIXc/GgT
-         3toupBw4TZHeSwWHQuZrXAZGU+TKVi2AiAh5qUEY=
+        b=qXEL9S3D7Y2UPT/ILhyilqpQ/Q9+ibtqMjZUPyBBeXNqMbXGeBfjZFPT15gSfSBgH
+         x0I5yOUQKHxuZaabmrf1Z2p/urOYyQ3azUAJLxbtrEIdZKNVpGZy4Qx/sbWwH5nguH
+         ihhAIVIbJMsENIw1sgTSk3uW2+CgyzmTPGHxGjRY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Josua Mayer <josua.mayer@jm0.eu>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Michael Scott <mike@foundries.io>,
+Cc:     =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>,
+        =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessm.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 237/249] Bluetooth: 6lowpan: search for destination address in all peers
-Date:   Mon, 15 Jul 2019 09:46:42 -0400
-Message-Id: <20190715134655.4076-237-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.2 236/249] Bluetooth: Add new 13d3:3501 QCA_ROME device
+Date:   Mon, 15 Jul 2019 09:46:41 -0400
+Message-Id: <20190715134655.4076-236-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
 References: <20190715134655.4076-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -62,57 +62,39 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Josua Mayer <josua.mayer@jm0.eu>
+From: João Paulo Rechi Vita <jprvita@gmail.com>
 
-[ Upstream commit b188b03270b7f8568fc714101ce82fbf5e811c5a ]
+[ Upstream commit 881cec4f6b4da78e54b73c046a60f39315964c7d ]
 
-Handle overlooked case where the target address is assigned to a peer
-and neither route nor gateway exist.
+Without the QCA ROME setup routine this adapter fails to establish a SCO
+connection.
 
-For one peer, no checks are performed to see if it is meant to receive
-packets for a given address.
+T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  2 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3501 Rev=00.01
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#=0x0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#=0x1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-As soon as there is a second peer however, checks are performed
-to deal with routes and gateways for handling complex setups with
-multiple hops to a target address.
-This logic assumed that no route and no gateway imply that the
-destination address can not be reached, which is false in case of a
-direct peer.
-
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Tested-by: Michael Scott <mike@foundries.io>
-Signed-off-by: Josua Mayer <josua.mayer@jm0.eu>
+Signed-off-by: João Paulo Rechi Vita <jprvita@endlessm.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/6lowpan.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 1555b0c6f7ec..9001bf331d56 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -180,10 +180,16 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
- 	}
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 21fa5c889857..6d61f5aafc78 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -266,6 +266,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x04ca, 0x301a), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x13d3, 0x3491), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x13d3, 0x3496), .driver_info = BTUSB_QCA_ROME },
++	{ USB_DEVICE(0x13d3, 0x3501), .driver_info = BTUSB_QCA_ROME },
  
- 	if (!rt) {
--		nexthop = &lowpan_cb(skb)->gw;
--
--		if (ipv6_addr_any(nexthop))
--			return NULL;
-+		if (ipv6_addr_any(&lowpan_cb(skb)->gw)) {
-+			/* There is neither route nor gateway,
-+			 * probably the destination is a direct peer.
-+			 */
-+			nexthop = daddr;
-+		} else {
-+			/* There is a known gateway
-+			 */
-+			nexthop = &lowpan_cb(skb)->gw;
-+		}
- 	} else {
- 		nexthop = rt6_nexthop(rt, daddr);
- 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
 -- 
 2.20.1
 
