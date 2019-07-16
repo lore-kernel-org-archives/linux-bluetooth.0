@@ -2,107 +2,112 @@ Return-Path: <SRS0=iTYz=VN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82948C76188
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jul 2019 03:43:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE442C76188
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jul 2019 06:00:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4CCA92080A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jul 2019 03:43:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68C3F21721
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Jul 2019 06:00:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=HubbellIncorporated.onmicrosoft.com header.i=@HubbellIncorporated.onmicrosoft.com header.b="aINKFa63"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730750AbfGPDn4 convert rfc822-to-8bit (ORCPT
+        id S1733110AbfGPGAB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Jul 2019 23:43:56 -0400
-Received: from mga04.intel.com ([192.55.52.120]:45202 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730311AbfGPDnz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Jul 2019 23:43:55 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 20:43:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,496,1557212400"; 
-   d="scan'208";a="194745143"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by fmsmga002.fm.intel.com with ESMTP; 15 Jul 2019 20:43:55 -0700
-Received: from fmsmsx154.amr.corp.intel.com (10.18.116.70) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 15 Jul 2019 20:43:55 -0700
-Received: from BGSMSX107.gar.corp.intel.com (10.223.4.191) by
- FMSMSX154.amr.corp.intel.com (10.18.116.70) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 15 Jul 2019 20:43:54 -0700
-Received: from bgsmsx101.gar.corp.intel.com ([169.254.1.46]) by
- BGSMSX107.gar.corp.intel.com ([169.254.9.209]) with mapi id 14.03.0439.000;
- Tue, 16 Jul 2019 09:13:48 +0530
-From:   "K, SpoorthiX" <spoorthix.k@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Panda, Bharat B" <bharat.b.panda@intel.com>
-Subject: RE: [PATCH] v3 Fast Advertising Interval
-Thread-Topic: [PATCH] v3 Fast Advertising Interval
-Thread-Index: AQHVOzC21jT/WV5Po0ye7D/nfBvTLabMmohA
-Date:   Tue, 16 Jul 2019 03:43:46 +0000
-Message-ID: <6AFF54953E047B42BC60A96154D42C5CD472A6@BGSMSX101.gar.corp.intel.com>
-References: <1563190522-23651-1-git-send-email-spoorthix.k@intel.com>
- <FBF9BD43-EE1B-4D20-853C-19301B5573A0@holtmann.org>
-In-Reply-To: <FBF9BD43-EE1B-4D20-853C-19301B5573A0@holtmann.org>
+        Tue, 16 Jul 2019 02:00:01 -0400
+Received: from mx0b-00126502.pphosted.com ([148.163.153.66]:54192 "EHLO
+        mx0b-00126502.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733164AbfGPGAB (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Jul 2019 02:00:01 -0400
+X-Greylist: delayed 995 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Jul 2019 02:00:00 EDT
+Received: from pps.filterd (m0100724.ppops.net [127.0.0.1])
+        by mx0a-00126502.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6G5hOdw021416
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2019 01:43:24 -0400
+Received: from nam04-co1-obe.outbound.protection.outlook.com (mail-co1nam04lp2057.outbound.protection.outlook.com [104.47.45.57])
+        by mx0a-00126502.pphosted.com with ESMTP id 2ts7b8g4ad-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2019 01:43:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IO60xXZA+fDGIX4Ey/Iac4h62QTyadGa+ZRo9Klv3QiMxKH6iIr23eST7APq+Gt7N1SNd0IAjvaToB5NMMiqXFlqe5W/tbuqry9IX4rFkK7aGor1Y4ilORP1cPMOofl+UOkXsKQWX0q9PtT1JmwqNkHLvGySpieQYQhUSg6ePHb8QfnKVwH2eRcUNhe2myP/HRdeLEE1PA+38aOKRHO+luAm0sGQHv1oGC/jjQ+Nl/3KsGjNOTHdEP5rOLzICIxP8J+GA0g/kxYoI9UH8hImNUB7kxOPHxAzAyUbjkeq/qYAOH16yn/5UQEhzGvo9BCsgspkfIfUy4NUdmaAl0BhpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7KJp+drO3v97QxNyfmisoPjHMwth3o8TQHtviZyHf8s=;
+ b=WksiABP0HvswNpOnmdtfpeGaPIJU62pecM430F/4LVJkRvfuVOFKtTE18w/deZnh7yXkwNSL9J7c2Gku7onedsLcgMo3dn49/qtCqgJ0TJXdOENXrHNoX5WDi38C5QQHz2wNfOC0op2XqQmQ2pAFcgkcnfuyqL2aNAtJXHPE8/z6Hm7boIYfoGMxb4X3DqZI4a7sMdGhTXNfVWCITfoX0B5qq1gVqjoIWWqhigzytgeD/dP65kQSRCSqmi9KMQsM9/a9fsd3Du+7XaOX4QM4FQ0h8ewZal3tWxUPwlk13eQG9vcjPhhNiC8fHM1Ws3+A88t0F5QaToGeql+4nJ6vBA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=hubbell.com;dmarc=pass action=none
+ header.from=hubbell.com;dkim=pass header.d=hubbell.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=HubbellIncorporated.onmicrosoft.com;
+ s=selector2-HubbellIncorporated-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7KJp+drO3v97QxNyfmisoPjHMwth3o8TQHtviZyHf8s=;
+ b=aINKFa63iIIZrAGrl4rkiswKpiN2DfpCDoyJVQnTBMCvwyEkeZdZCYNC6hz/62MpdAp3krr0vuuSXx97UFV5Rf8XXAfTVnVyKp4nhavHVgduC/7bFvr3v4QBhRXP5Ch8iNRZY/upMBJLto+DN7aQTHcXb1SwqgOdjdpfgf9QXfE=
+Received: from BYAPR18MB2406.namprd18.prod.outlook.com (20.179.91.87) by
+ BYAPR18MB2888.namprd18.prod.outlook.com (20.179.58.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2073.14; Tue, 16 Jul 2019 05:43:20 +0000
+Received: from BYAPR18MB2406.namprd18.prod.outlook.com
+ ([fe80::21a1:ecf9:65e4:3aa0]) by BYAPR18MB2406.namprd18.prod.outlook.com
+ ([fe80::21a1:ecf9:65e4:3aa0%4]) with mapi id 15.20.2073.012; Tue, 16 Jul 2019
+ 05:43:20 +0000
+From:   "V, Arunkumar" <avenkatramani@hubbell.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Advertise flag issue
+Thread-Topic: Advertise flag issue
+Thread-Index: AdU7mWjQq/Ynww6WRaG+PpuTy+lWFQ==
+Date:   Tue, 16 Jul 2019 05:43:20 +0000
+Message-ID: <BYAPR18MB2406CA1EF7CFC4B2A8FE9605B7CE0@BYAPR18MB2406.namprd18.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.223.10.10]
+x-originating-ip: [122.174.131.114]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: cf3e7a0e-ac0e-4c6a-ef0f-08d709b08289
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:BYAPR18MB2888;
+x-ms-traffictypediagnostic: BYAPR18MB2888:
+x-microsoft-antispam-prvs: <BYAPR18MB2888C3FF94168386F93AD5B7B7CE0@BYAPR18MB2888.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5236;
+x-forefront-prvs: 0100732B76
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(199004)(189003)(102836004)(33656002)(5640700003)(7736002)(7696005)(2351001)(9686003)(14454004)(6916009)(53936002)(2501003)(498600001)(6506007)(5660300002)(66946007)(64756008)(66476007)(66446008)(476003)(71190400001)(6116002)(3846002)(81156014)(81166006)(71200400001)(52536014)(7116003)(26005)(8936002)(6436002)(76116006)(186003)(2906002)(558084003)(256004)(8676002)(3480700005)(74316002)(86362001)(99286004)(66066001)(68736007)(55016002)(305945005)(66556008)(486006)(25786009);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR18MB2888;H:BYAPR18MB2406.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: hubbell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AhH21+B+j4lSUhmulGq0uRlfH7KKI07jRE5TEcJ16KuoUzUMm9EWHlllVzNtN6C8IiqFpCFoxm7o60dyDOmfFudfx/WL+rgJvgNmTagTEI9T0pMQQvizdFYlO5UUWEn/mS4gIQzXc8/qYNC9p/WEzGpEV3AmsKehOeUBzPhF5UXTHamXQL2Uiu5rV2eIUXp2No6xBE1ZqX94npqkXEoQRufa69oB5E0cOaIlAShAGtQbjwxKQfI0agg5hJ0f/E5TN/2V/TSmPzAopvDRK9HbA5g9ijvFraL6Y9rcDaECVXhGmFxGTWc6j9Gm6+R3nhG2M3dEfp2qv/KGu5XjMjw3Gjg41cvakycjqtPXc2nJ9LfPD+Cdj+uR24HMwNrYKi8+IPk/DRVqFh64ve9Y+raZxSb9oA3cOJHdn4jga+Wviwk=
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
+X-OriginatorOrg: hubbell.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf3e7a0e-ac0e-4c6a-ef0f-08d709b08289
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jul 2019 05:43:20.3587
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b984e578-dd3f-4fcd-afea-1c381ab634f3
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: avenkatramani@hubbell.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2888
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-16_01:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=507 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907160073
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+HI,
 
-	Thank you for applying the patch.
+I am using BlueZ 5.49. I am trying to run test/example - example-advertisem=
+ent.py with gatt profile.
+How to set the advertising flag which property/data field to set? Any examp=
+le on setting flags as general discovery, with LE only.
 
 Regards,
-Spoorthi
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org] 
-Sent: Monday, July 15, 2019 10:44 PM
-To: K, SpoorthiX <spoorthix.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org; Panda, Bharat B <bharat.b.panda@intel.com>
-Subject: Re: [PATCH] v3 Fast Advertising Interval
-
-Hi Spoorthi,
-
-> Changes made to add support for fast advertising interval as per core 
-> 4.1 specification, section 9.3.11.2.
-> 
-> A peripheral device entering any of the following GAP modes and 
-> sending either non-connectable advertising events or scannable 
-> undirected advertising events should use adv_fast_interval2 (100ms - 
-> 150ms) for adv_fast_period(30s).
-> 
->         - Non-Discoverable Mode
->         - Non-Connectable Mode
->         - Limited Discoverable Mode
->         - General Discoverable Mode
-> 
-> Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |  2 ++
-> net/bluetooth/hci_request.c      | 32 ++++++++++++++++++++++----------
-> 2 files changed, 24 insertions(+), 10 deletions(-)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+Arunkumar.V
