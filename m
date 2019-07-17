@@ -2,287 +2,152 @@ Return-Path: <SRS0=OoMZ=VO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C54C7618F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 20:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1989EC76192
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 21:14:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30FA721851
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 20:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0D6B21783
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 21:14:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727140AbfGQUZS (ORCPT
+        id S1727543AbfGQVO1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jul 2019 16:25:18 -0400
-Received: from mga14.intel.com ([192.55.52.115]:43864 "EHLO mga14.intel.com"
+        Wed, 17 Jul 2019 17:14:27 -0400
+Received: from mga09.intel.com ([134.134.136.24]:34493 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727104AbfGQUZS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jul 2019 16:25:18 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727217AbfGQVO1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 17 Jul 2019 17:14:27 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jul 2019 13:25:17 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jul 2019 14:14:26 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,275,1559545200"; 
-   d="p7s'?scan'208";a="187628495"
-Received: from orsmsx107.amr.corp.intel.com ([10.22.240.5])
-  by fmsmga001.fm.intel.com with ESMTP; 17 Jul 2019 13:25:17 -0700
-Received: from orsmsx126.amr.corp.intel.com (10.22.240.126) by
- ORSMSX107.amr.corp.intel.com (10.22.240.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 17 Jul 2019 13:25:16 -0700
+   d="scan'208";a="187637521"
+Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
+  by fmsmga001.fm.intel.com with ESMTP; 17 Jul 2019 14:14:25 -0700
 Received: from orsmsx103.amr.corp.intel.com ([169.254.5.44]) by
- ORSMSX126.amr.corp.intel.com ([169.254.4.77]) with mapi id 14.03.0439.000;
- Wed, 17 Jul 2019 13:25:16 -0700
-From:   "Stotland, Inga" <inga.stotland@intel.com>
+ ORSMSX105.amr.corp.intel.com ([169.254.2.202]) with mapi id 14.03.0439.000;
+ Wed, 17 Jul 2019 14:14:25 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
 To:     "michal.lowas-rzechonek@silvair.com" 
         <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh: Check address range passed to
- ImportRemoteNode
-Thread-Topic: [PATCH BlueZ] mesh: Check address range passed to
- ImportRemoteNode
-Thread-Index: AQHVPNauHzkyEEMCR0qyfKiG0DErU6bPtyYA
-Date:   Wed, 17 Jul 2019 20:25:15 +0000
-Message-ID: <40457f631498e71c072f3db29faf74fa3cb0b3e0.camel@intel.com>
-References: <20190717193429.14155-1-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190717193429.14155-1-michal.lowas-rzechonek@silvair.com>
+        "Stotland, Inga" <inga.stotland@intel.com>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>
+Subject: RE: [PATCH BlueZ v5 1/4] mesh: Add ImportLocalNode API documentation
+Thread-Topic: [PATCH BlueZ v5 1/4] mesh: Add ImportLocalNode API
+ documentation
+Thread-Index: AQHVPHrRCovprh0e20KaiZ04C5sfCabPqkcAgAAC9gD//48igA==
+Date:   Wed, 17 Jul 2019 21:14:25 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4376CBD3539@ORSMSX103.amr.corp.intel.com>
+References: <20190717083650.26346-1-michal.lowas-rzechonek@silvair.com>
+ <20190717083650.26346-2-michal.lowas-rzechonek@silvair.com>
+ <915ea1c10883aaf1e4d42c5a749bfda964b54b51.camel@intel.com>
+ <20190717194712.i4dtiwhldq2is2z2@kynes>
+In-Reply-To: <20190717194712.i4dtiwhldq2is2z2@kynes>
 Accept-Language: en-US
 Content-Language: en-US
-X-MS-Has-Attach: yes
+X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-originating-ip: [10.251.159.19]
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-/aVzDoA3Kgs0xJZMygpV"
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNWNlMDcwYWUtOGMzZC00NjM2LWJlNjItZjRiNDc1YTM5YmFiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiK0xXUktIUFMzWkxoekNlODVBZVFWVWZLZWlCK25aRFdMSmhkNE1OSXNObG1hU1BIeER1M0dpZmtQQnhWUjZnVCJ9
+x-originating-ip: [10.22.254.138]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-/aVzDoA3Kgs0xJZMygpV
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Michal,
-
-On Wed, 2019-07-17 at 21:34 +0200, Micha=C5=82 Lowas-Rzechonek wrote:
-> This patch disallows importing device key for:
->  - non-unicast addresses
->  - unicast addresses overlapping with local node address range
-> ---
->  doc/mesh-api.txt |  8 ++++++++
->  mesh/keyring.c   | 11 +++++++++++
->  mesh/manager.c   | 12 ++++++++++++
->  3 files changed, 31 insertions(+)
->=20
-> diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-> index 7c2a1fafa..e5d246ae4 100644
-> --- a/doc/mesh-api.txt
-> +++ b/doc/mesh-api.txt
-> @@ -607,9 +607,13 @@ Methods:
-> =20
->  		This call affects the local bluetooth-meshd key
-> database only.
-> =20
-> +		It is an error to call this with address range
-> overlapping
-> +		with local element addresses.
-> +
->  		PossibleErrors:
->  			org.bluez.mesh.Error.Failed
->  			org.bluez.mesh.Error.InvalidArguments
-> +			org.bluez.mesh.Error.NotAuthorized
-> =20
->  	void DeleteRemoteNode(uint16 primary, uint8 count)
-> =20
-> @@ -624,8 +628,12 @@ Methods:
-> =20
->  		This call affects the local bluetooth-meshd key
-> database only.
-> =20
-> +		It is an error to call this with address range
-> overlapping
-> +		with local element addresses.
-> +
->  		PossibleErrors:
->  			org.bluez.mesh.Error.InvalidArguments
-> +			org.bluez.mesh.Error.NotAuthorized
-> =20
->  Properties:
->  	dict Features [read-only]
-> diff --git a/mesh/keyring.c b/mesh/keyring.c
-> index 3ea83194c..0b2474139 100644
-> --- a/mesh/keyring.c
-> +++ b/mesh/keyring.c
-> @@ -128,6 +128,9 @@ bool keyring_put_remote_dev_key(struct mesh_node
-> *node, uint16_t unicast,
->  	bool result =3D true;
->  	int fd, i;
-> =20
-> +	if (!IS_UNICAST(unicast) || !IS_UNICAST(unicast + count - 1))
-> +		return false;
-> +
->  	if (!node)
->  		return false;
-> =20
-> @@ -218,10 +221,14 @@ bool keyring_get_remote_dev_key(struct
-> mesh_node *node, uint16_t unicast,
->  	bool result =3D false;
->  	int fd;
-> =20
-> +	if (!IS_UNICAST(unicast))
-> +		return false;
-> +
->  	if (!node)
->  		return false;
-> =20
->  	node_path =3D node_get_storage_dir(node);
-> +
->  	snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
-> dev_key_dir,
->  								unicast
-> );
-> =20
-> @@ -280,10 +287,14 @@ bool keyring_del_remote_dev_key(struct
-> mesh_node *node, uint16_t unicast,
->  	char key_file[PATH_MAX];
->  	int i;
-> =20
-> +	if (!IS_UNICAST(unicast) || !IS_UNICAST(unicast + count - 1))
-> +		return false;
-> +
-
-I wonder if this deserves its own macro that can be used for validation
-in the number of situations, e.g. node import, config parsing...
-
-
->  	if (!node)
->  		return false;
-> =20
->  	node_path =3D node_get_storage_dir(node);
-> +
->  	for (i =3D 0; i < count; i++) {
->  		snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
->  						dev_key_dir, unicast +
-> i);
-> diff --git a/mesh/manager.c b/mesh/manager.c
-> index 77d7b7516..564a848d1 100644
-> --- a/mesh/manager.c
-> +++ b/mesh/manager.c
-> @@ -282,6 +282,7 @@ static struct l_dbus_message
-> *import_node_call(struct l_dbus *dbus,
->  						void *user_data)
->  {
->  	struct mesh_node *node =3D user_data;
-> +	struct mesh_net *net =3D node_get_net(node);
->  	struct l_dbus_message_iter iter_key;
->  	uint16_t primary;
->  	uint8_t num_ele;
-> @@ -297,6 +298,11 @@ static struct l_dbus_message
-> *import_node_call(struct l_dbus *dbus,
->  		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
->  							"Bad device
-> key");
-> =20
-> +	if (mesh_net_is_local_address(net, primary) ||
-> +			mesh_net_is_local_address(net, primary +
-> num_ele - 1))
-> +		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED,
-> +					"Cannot overwrite local device
-> key");
-> +
->  	if (!keyring_put_remote_dev_key(node, primary, num_ele, key))
->  		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-> =20
-> @@ -308,12 +314,18 @@ static struct l_dbus_message
-> *delete_node_call(struct l_dbus *dbus,
->  						void *user_data)
->  {
->  	struct mesh_node *node =3D user_data;
-> +	struct mesh_net *net =3D node_get_net(node);
->  	uint16_t primary;
->  	uint8_t num_ele;
-> =20
->  	if (!l_dbus_message_get_arguments(msg, "qy", &primary,
-> &num_ele))
->  		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-> =20
-> +	if (mesh_net_is_local_address(net, primary) ||
-> +			mesh_net_is_local_address(net, primary +
-> num_ele - 1))
-> +		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED,
-> +					"Cannot remove local device
-> key");
-> +
->  	keyring_del_remote_dev_key(node, primary, num_ele);
-> =20
->  	return l_dbus_message_new_method_return(msg);
-
---=-/aVzDoA3Kgs0xJZMygpV
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-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
-k3sf6w6ZKbZbz2V54rncMEXM3N/P4C6ZHZR0XYqh5m1vWxZYYVzTuDEH1C8W+b3KzldrAgMBAAGj
-ggIwMIICLDAdBgNVHQ4EFgQUcdzZH9M8OSxLujP+AToiD5oYMRkwHwYDVR0jBBgwFoAU2kEjnFqP
-ca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVw
-b3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIu
-Y3JsMIGeBggrBgEFBQcBAQSBkTCBjjAhBggrBgEFBQcwAYYVaHR0cDovL29jc3AuaW50ZWwuY29t
-MGkGCCsGAQUFBzAChl1odHRwOi8vd3d3LmludGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRl
-cy9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIwQ0ElMjA0Qi5jcnQwCwYDVR0P
-BAQDAgeAMDwGCSsGAQQBgjcVBwQvMC0GJSsGAQQBgjcVCIbDjHWEmeVRg/2BKIWOn1OCkcAJZ4He
-vTmV8EMCAWQCAQkwHwYDVR0lBBgwFgYIKwYBBQUHAwQGCisGAQQBgjcKAwwwKQYJKwYBBAGCNxUK
-BBwwGjAKBggrBgEFBQcDBDAMBgorBgEEAYI3CgMMMEsGA1UdEQREMEKgJwYKKwYBBAGCNxQCA6AZ
-DBdpbmdhLnN0b3RsYW5kQGludGVsLmNvbYEXaW5nYS5zdG90bGFuZEBpbnRlbC5jb20wDQYJKoZI
-hvcNAQEFBQADggEBALnl11xd+3X6fVS0VAKeoF0jCPLFZLCk4jMFifFzY2md3MLjVIB3lE5ffNnS
-mjG9ErOO6as95K6D6hzCJMqNodOyVPRSrMNey0tzFAPLRG3s2bgfmOcvYr4O3WmpDMx8YmH6O2YI
-3Xxjyp11aXl5pk6VjpZV/hjN1jwZ/c/X00KsjoMB8mGSBvbwnV0EFQUJ99xsAlqQ4edj2T9z6pF1
-WX189YL64c/t3a9LWNaT2CWbBZLIFoor9TpZsIj0lGObmGA76JKn5yxN+jzxhWIAzPi5KKYgJ9EU
-FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
-MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
-ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
-ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
-CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwNzE3MjAyNTE0WjAjBgkqhkiG9w0BCQQxFgQU
-y6MHkeONJjOgvCpaMAJ6CAwsIa0wDQYJKoZIhvcNAQEBBQAEggEAmYg462DZv8RmHYuHlfYSHOLI
-Sy3A+APKWGjyBVwIH2i1v1LZWAZVKX8OjIaX5m4rFgOxTbbzIEHojx+CJqTnqgWoghacLFrp3fW+
-+VoswEyuWIN4u+UBUOUIztOMFB06LEQbC72fyEa00W4NFOjluSdmLFGpChYY0bQtTCijF/1CK45s
-aZ1qUSCP3hbcMXaNrweJw7kBvM2UqsMGTjnTW/a9krZ5oYNpStLePg5Wct934HAbjTkiJq7QjACD
-mLyvza6VXyon+fry4yV+Keuci0Tr2Y3yfXDzG5xwijkhe2x4K0n4W2BQh/B6QVo/VESfQyweD65g
-PNOza4fUVPtf1gAAAAAAAA==
-
-
---=-/aVzDoA3Kgs0xJZMygpV--
+SGkgSW5nYSAmIE1pY2hhbCwNCg0KPiBPbiAwNy8xNywgU3RvdGxhbmQsIEluZ2Egd3JvdGU6DQo+
+ID4gSSBmZWVsIGxpa2UgaGF2aW5nICJvYmplY3QgYXBwX3Jvb3QiIGlzIHVubmVjZXNzYXJ5IGFu
+ZCBhbHNvLCBjcmVhdGVzDQo+ID4gc29tZSBnbmFybHkgcGF0aHdheXMgd2l0aGluIHRoZSBjb2Rl
+Lg0KPiA+DQo+ID4gV2hhdCBleGFjdGx5IGlzIHRoZSBwcm9ibGVtIGZvciByZXF1aXJpbmcgdGhl
+IGNvbXBvc2l0aW9uIGRhdGEgdG8gYmUNCj4gPiBwYXJ0IG9mIHRoZSBpbXBvcnRfZGF0YT8gSXQn
+cyBqdXN0IHdlaXJkIHRvIHNheSAib2gsIGl0IG1heSBiZSB0aGVyZQ0KPiA+IG9yIGl0IG1heSBi
+ZSBub3QiLg0KPiANCj4gVGhlIG1haW4gaXNzdWUgbGllcyBvbiB0aGUgYXBwbGljYXRpb24gc2lk
+ZS4gSW4gb3JkZXIgdG8gcHJvcGVybHkgQXR0YWNoKCksIHRoZQ0KPiBhcHBsaWNhdGlvbiBtdXN0
+IGV4cG9zZSBlbGVtZW50IHN0cnVjdHVyZSB2aWEgRC1CdXMuDQoNCkkgdW5kZXJzdGFuZCB0aGlz
+IGNvbmNlcm4sIGJ1dCBJIHRoaW5rIEkgYW0gYWdyZWVpbmcgd2l0aCBJbmdhIG9uIHRoaXMgb25l
+Lg0KDQpBdCB0aGUgdGltZSBvZiBpbmNlcHRpb24sIE5vdCBvbmx5IHRoZSBQcm92IERhdGEgKG5l
+dCBrZXksIG5ldCBpZHgsIGl2IGluZGV4LCBmbGFncywgdW5pY2FzdCwgZGV2IGtleSkgbXVzdCBi
+ZSBwcmVzZW50LCBidXQgYWxzbyBzbyBtdXN0IHRoZSAiQ29tcG9zaXRpb24gRGF0YSIuLi4gIGFs
+bCBvZiB0aGUgZGF0YSB3aGljaCBpcyByZXR1cm5lZCBieSB0aGUgIkdFVCBDT01QT1NJVElPTiBE
+QVRBIiBvcGNvZGUuICBUaGlzIGRhdGEgbmVlZHMgdG8gYmUgcHJlc2VudCBhcyBzb29uIGFzIHRo
+ZSBQcm92aXNpb25lciBzdGFydHMgcXVlcnlpbmcgYW5kIHNldHRpbmcgc3RhdGVzIG9uIHRoZSAo
+bmV3IG9yIG1pZ3JhdGVkKSBmcmVzaCBub2RlLg0KDQpBbiBpbXBvcnRhbnQgcG9pbnQgdG8gcmVt
+ZW1iZXIgaGVyZSBpcyB0aGF0ICp0aGUgYXBwbGljYXRpb24gZG9lcyBub3QgbmVlZCB0byBiZSBh
+dHRhY2hlZCIgd2hpbGUgdGhlIHJlbW90ZSBQcm92aXNpb25lci9Db25maWdDbGllbnQgaXMgaW50
+ZXJhY3Rpbmcgd2l0aCB0aGUgbm9kZXMgQ29uZmlnIFNlcnZlci4gIE9uZSBvZiBvdXIgRGVzaWdu
+IEdvYWxzLCBpbiBmYWN0LCB3YXMgdGhhdCB0aGUgbm9kZSBhbHdheXMgZXhpc3RzIG9uIHRoZSBu
+ZXR3b3JrLCByZWdhcmRsZXNzIG9mIHdoZXRoZXIgdGhlIEFwcCBpcyBhdHRhY2hlZC4uLiAgVGhp
+cyBpcyB3aHkgdGhlIENvbmZpZyBTZXJ2ZXIgbW9kZWwgaXMgcGFydCBvZiB0aGUgZGFlbW9uLi4u
+LiAgIEl0IGlzIGFsd2F5cyAiT25MaW5lIi4NCg0KRm9yIHRoaXMgcmVhc29uLCBJIGFtIHN1cHBv
+cnRpbmcgSW5nYSBoZXJlLCB0aGF0IHRoZSBKU09OIGlucHV0IGZpbGUgc2hvdWxkIGNvbnRhaW4g
+ZXZlcnl0aGluZyBKYWt1YiBoYXMgaW5jbHVkZWQ6DQpEZXYgS2V5DQpOZXQgS2V5DQpOZXQgSW5k
+ZXgNCklWIEluZGV4DQpGbGFncw0KVW5pY2FzdCANCg0KKkFuZCogaXQgc2hvdWxkIGluY2x1ZGUg
+dGhlIHB1cmUgQ29tcG9zaXRpb24gRGF0YSBpbmNsdWRpbmcNCkNJRC9WSUQvUElEICAob3B0aW9u
+YWwgLi4gQ2FuIGJlIHNldCB3aXRoIEJsdWVaIGRlZmF1bHRzKQ0KQ1JQTCAgKG9wdGlvbmFsIC4u
+LiAgQ2FuIGJlIHNldCB3aXRoIGludGVybmFsIGRlZmF1bHRzKQ0KRmVhdHVyZXMgKG9wdGlvbmFs
+IC4uLiAgbWlzc2luZyBhcmUgY3JlYXRlZCBhcyBlaXRoZXIgIlVuc3VwcG9ydGVkIiBvciAiRGlz
+YWJsZWQiKQ0KYXJyYXkgb2YgRWxlbWVudHMsIGNvbnRhaW5pbmcgYXJyYXkgb2YgTW9kZWxzLiAo
+TWFuZGF0b3J5IC4uLiBOZWVkZWQgZm9yIENmZyBTZXJ2ZXIgdG8gZnVuY3Rpb24pDQoNClRoZSBh
+cHBsaWNhdGlvbiBoYXMgbm8gbmVlZCB0byBldmVuIGV4aXN0IGF0IHRoaXMgcG9pbnQsIGFzIGxv
+bmcgYXMgaXQgY2FuIGF0dGFjaCB0byB0aGUgdG9rZW4gYXQgc29tZSBwb2ludCBpbiB0aGUgZnV0
+dXJlLg0KQnV0IHRoaXMgKmRvZXMqIGVuYWJsZSB0aGUgYWJpbGl0eSB0byBoYXZlIGEgKmdlbmVy
+aWMqIGFwcGxpY2F0aW9uIHRoYXQgY2FuIGluamVjdCBub2RlcyAoZnVsbHkgY29uZmlndXJlZCwg
+b3IgIk5ldyIpIGludG8gdGhlIGRhZW1vbi4NCg0KQnV0IHdvcnJpZXMgdGhhdCB0aGUgQXBwIG1p
+Z2h0IG5vdCBpbW1lZGlhdGVseSBiZSBhYmxlIHRvICJBdHRhY2giIGdvIGF3YXkuDQoNCg0KDQo+
+IElmIHdlIHNheSB0aGF0IGl0IG11c3QgYWxzbyBkbyB0aGUgc2FtZSB2aWEgSlNPTiwgdG8gY2Fs
+bCBJbXBvcnRMb2NhbE5vZGUsIGl0DQo+IGxlYWRzIHRvIGNvZGUgZHVwbGljYXRpb24gb24gdGhl
+IGFwcGxpY2F0aW9uIHNpZGUuDQo+IA0KPiBNb3Jlb3ZlciwgdGhlIGFwcCBzdGlsbCBuZWVkcyB0
+byBiZSBxdWVyaWVkIHZpYSBELUJ1cyB0byBjaGVjayB0aGF0IHRoZSBwYXNzZWQNCj4gSlNPTiBt
+YXRjaGVzIHRoZSBELUJ1cyBzdHJ1Y3R1cmUgLSBvdGhlcndpc2UgdGhlIGFwcCB3b3VsZCB0aGVu
+IGZhaWwgdG8NCj4gQXR0YWNoKCkgYW5kIHRoZSB1c2VyIHdvdWxkIGJlIGluIGRlZXAgdHJvdWJs
+ZS4NCg0KVGhlIGNvbXBvc2l0aW9uIGFzIHJlZmxlY3RlZCBieSB0aGUgR2V0TWFuYWdlZE9iamVj
+dHMoKSBjYWxsIGlzICJzYW5pdHkgY2hlY2tlZCIgYWdhaW5zdCB0aGUgaW50ZXJuYWwgc3RvcmFn
+ZSAqZXZlcnkqIHRpbWUgdGhlIEFwcCBhdHRhY2hlcy4uLiAgSSB0aGluayBJbmdhIGlzIGNvbmNl
+cm5lZCB3aXRoIGNvZGUgY29tcGxleGl0eSBhbmQgYmxvYXQgdG8gcmVwZWF0IHRoaXMgZHVyaW5n
+IEltcG9ydExvY2FsTm9kZSgpLCBzaW1wbHkgYXMgYSAic2Vjb25kIHdheSIgYXR0YWluIHRoZSBj
+b21wb3NpdGlvbiBkYXRhLiAgVGhpcyBpcyBkaWZmZXJlbnQgZnJvbSB0aGUgSm9pbigpIGNhc2Us
+IGluIG15IG9waW5pb24sIHdoZXJlIHRoZSBKU09OIChvciBvdGhlciBzdG9yYWdlKSBpcyBiZWlu
+ZyBjcmVhdGVkICp0b3RhbGx5KiBmcm9tIHNjcmF0Y2gsIHZpYSB0aGUgcHJvdmlzaW9uaW5nIGlu
+dGVyYWN0aW9uIHdpdGggdGhlIHJlbW90ZSBQcm92aXNpb25lci4gSW4gdGhhdCBjYXNlLCB5ZXMu
+Li4gdGhlICJvd25pbmcgYXBwbGljYXRpb24iIG5lZWRzIHRvIGJlIHByZXNlbnQgb24gdGhlIEQt
+QnVzLg0KDQogDQo+ID4gR2V0dGluZyByaWQgb2YgdGhlIGFwcF9yb290IGFuZCBtYW5kYXRpbmcg
+dGhlIGNvbXBvc2l0aW9uIHRvIGJlIHBhcnQNCj4gPiBvZiB0aGUgaW1wb3J0X2RhdGEgYWxsb3dz
+Og0KPiA+DQo+ID4gMSkgQXZvaWQgY2hlY2tpbmcgd2hldGhlciB0aGlzIGlzIGEgImZ1bGwiIGNv
+bmZpZ3VyYXRpb24gb3IgdGhlDQo+ID4gIm1pbmltYWwiIG9uZQ0KPiANCj4gSSdtIG5vdCBjb252
+aW5jZWQgdGhhdCB0aGUgImZ1bGwiIGNvbmZpZ3VyYXRpb24gaXMgZXZlbiBuZWVkZWQuIFdlIGNl
+cnRhaW50bHkNCj4gZG9uJ3QgdXNlIGl0IGluIG91ciB1c2UgY2FzZSwgYnV0IGl0IG1pZ2h0IGJl
+IHJlcXVpcmVkIGluIHRoZSBmdXR1cmUuDQoNCldlICpkZWZpbml0ZWx5KiBuZWVkIGFuIG9wdGlv
+biBmb3IgaW1wb3J0aW5nL21pZ3JhdGluZyBhIGZ1bGx5IGNvbmZpZ3VyZWQgbm9kZS4gIFBob25l
+cyBhcmUgcmV0aXJlZCBhbmQgcmVwbGFjZWQuLi4gV29ya3N0YXRpb25zIGFyZSByZXRpcmVkIGFu
+ZCByZXBsYWNlZC4uLiAgU29tZSBub2RlcyBwdWJsaWNhdGlvbnMgd2lsbCBpbmV2aXRhYmx5IG5l
+ZWQgdG8gcGljayB1cCB0aGUgImN1cnJlbnQgY29udmVyc2F0aW9uIiB3aXRoIHRoZSBtaWdyYXRl
+ZCBub2RlLCB3aGVyZSB0aGUgb2xkIGNvbnZlcnNhdGlvbiBsZWZ0IG9mZi4gQW5kIHRoaXMgd2ls
+bCBhbG1vc3QgY2VydGFpbmx5IGJlIGEgcmFyZSAoYnV0IGltcG9ydGFudCkgb3BlcmF0aW9uLCBh
+bmQgYSAiVXRpbGl0eSIgYXBwbGljYXRpb24gdG8gcGVyZm9ybSB0aGUgb3BlcmF0aW9uICh0aGF0
+IGRvZXMgbm90IGl0c2VsZiBuZWVkIHRvIGhhdmUgdGhlIG1vZGVsL2VsZW1lbnQgYXJyYXlzIGlt
+cGxlbWVudGVkKSB3aWxsIGJlIGVhc2llciB0byB3cml0ZSBhbmQgbWFpbnRhaW4uDQoNCg0KPiAN
+Cj4gPiAyKSBFZmZpY2llbnRseSByZS11c2UgdGhlIGV4aXN0aW5nIGNvZGU6DQo+ID4gQWRkaW5n
+IGFuIEFQSSBjYWxsIGxpa2UgdGhpcyBvbmUgbWF5IGJlIHN1ZmZpY2llbnQNCj4gPg0KPiA+IG1l
+c2hfY29uZmlnX2ltcG9ydChjb25zdCBjaGFyICpjZmdfZGlyLA0KPiA+ICAgICAgICAgICAgICAg
+ICAgICBjb25zdCB1aW50OF90IHV1aWRbMTZdLA0KPiA+ICAgICAgICAgICAgICAgICAgICBjb25z
+dCB1aW50OCAqaW1wb3J0X2RhdGEsIDxpbXBvcnRfX2xlbj4/LA0KPiA+ICAgICAgICAgICAgICAg
+ICAgICBtZXNoX2NvbmZpZ19ub2RlX2Z1bmNfdCBjYiwNCj4gPiAgICAgICAgICAgICAgICAgICAg
+dm9pZCAqdXNlcl9kYXRhKQ0KPiA+DQo+ID4gV2UgY2FuIGp1c3QgcmUtZmFjdG9yIHRoZSBjb2Rl
+IHRoYXQgcGFyc2VzIGFuZCBwb3B1bGF0ZXMgYSBzaW5nbGUgbm9kZQ0KPiA+IGZyb20gdGhlIHN0
+b3JlZCBjb25maWd1cmF0aW9uLiB1c2VyX2RhdGEgbWF5IGNvbnRhaW4gd2hhdGV2ZXIgd2UgbmVl
+ZA0KPiA+IHRvIHByZXNlcnZlIGluIG9yZGVyIHRvIHJlc3BvbmQgdG8gZC1idXMgY2FsbC4NCj4g
+DQo+IEFmdGVyIHJlZmFjdG9yaW5nIG5vZGUgdmFsaWRhdGlvbiB0byBieXRlLWNvbXBhcmUgY29t
+cG9zaXRpb24gZGF0YSwgdGhlIGNvZGUNCj4gYWxzbyBiZWNvbWVzIHNpZ25pZmljYW50bHkgc2lt
+cGxlciwgYW5kIGV4ZWN1dGlvbiBwYXRocyBmb3IgSm9pbigpLCBBdHRhY2goKSwNCj4gQ3JlYXRl
+TmV0d29yaygpIGFuZCBJbXBvcnRMb2NhbE5vZGUoKSBjb252ZXJnZS4NCg0KQWdhaW4sIEkgY2Fu
+bm90IHRoaW5rIG9mIGFueSBzaXR1YXRpb25zIHdoZXJlIEpvaW4vQXR0YWNoL0NyZWF0ZSB3b3Vs
+ZCBldmVyIGV4aXN0IGluIHRoZSBhYnNlbmNlIG9mIHRoZSBBcHBsaWNhdGlvbi4NCg0KVGhpcyBp
+cyBhbiBlYXN5IGFuZCBvYnZpb3VzIHVzZSBjYXNlIHdpdGggSW1wb3J0Lg0KDQotLUJyaWFuDQo=
