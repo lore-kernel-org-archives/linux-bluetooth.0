@@ -2,140 +2,98 @@ Return-Path: <SRS0=OoMZ=VO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0192C7618F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 19:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D534C7618F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 19:53:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C390421851
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 19:47:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C4712173E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 19:53:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="YZFpUtbr"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="NbRN3keU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727147AbfGQTrQ (ORCPT
+        id S1727057AbfGQTxg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jul 2019 15:47:16 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:41834 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725873AbfGQTrQ (ORCPT
+        Wed, 17 Jul 2019 15:53:36 -0400
+Received: from mail-lf1-f47.google.com ([209.85.167.47]:39950 "EHLO
+        mail-lf1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726063AbfGQTxg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jul 2019 15:47:16 -0400
-Received: by mail-lj1-f196.google.com with SMTP id d24so24851958ljg.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jul 2019 12:47:15 -0700 (PDT)
+        Wed, 17 Jul 2019 15:53:36 -0400
+Received: by mail-lf1-f47.google.com with SMTP id b17so17419709lff.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jul 2019 12:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=KuS3p44w3UruS4OuPrSqFeaKxSkFSr7gA4eaO2Vuhwk=;
-        b=YZFpUtbrR/mm0I/cu+Fkeq9yufbZYBIgbqBW41WOJj8VkUF9BfagTVrqm/pCiNjsjv
-         f4HP96v1cyJ1oL59RKctub5GD8rBCmjfiS4Jp57rKAtLeWCKaXhhyW8slVlvA23izIhs
-         E41gX+RX9+/w8ZfH1dNE1gdbBtnQiNopRs9V0yrWnHv70IVMoB8bxN8wVsDQrDCrHTNQ
-         /5O3maEx/AZjePFNfd6aqr6lo4IDzcTWVe2zOKewp0DLr7kmB3V+JCdi+N46nWeJ+jj4
-         CvDdtK5maFHIzt5Nozd3sYhSAGfsGTfOYnWh5YHIkq3bYND25uojLsJA58QwzoVM54Fb
-         8ejw==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aBrxeytKOurZQ+nCGd8l34FcDLimTqnxqGL9K+vrwnQ=;
+        b=NbRN3keUi93ecBfT0n444K69uHp+cz7V0/qwgdB3FcNIOBFiRNjA0DtAu5OOhj4kxB
+         +b85YaR/2BlDgXtdi0jl/OSOQcjH9fqYjmhG2KRkmsUNgYq5Mzz5ALkxVENsjsB6tBgW
+         SneXQgHnVgJIlJuH5bis6Ty1J/Fu2TabOtiAzps0vUlE+6hqJZx0vMywichk7diGk0zR
+         dF/ZjFPbFw0f1tbBfuZ8S7UTLsW757HfV7p7f/5TA6MdQ5alEh9OYQtfN5nzt+rJ+gu8
+         5DI2UzSi9UgCbq+9lmHX/LnbF/DSRDPQVhNGPHSutROJwgRwuuJeW+DzboP5nr8VDVT3
+         cKpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=KuS3p44w3UruS4OuPrSqFeaKxSkFSr7gA4eaO2Vuhwk=;
-        b=IbOJy0EQv3C7nNig9wp8OUdGNRkYH4kEKNv44POVT5guCvNzh5Y4dHzxIEteGOVS/G
-         f1bxqJ8bvsExE8RIps7KlIewXuebXiMdKkjhKou3OX055blhqt0YTiWYhhRwJK1uHC2+
-         dTwRyQgJ1Jy85RD5eFq8cxALFIIF8Vaix4+St+/c9F8WXcKvhiviu2v0kpb9yTNY5EGx
-         GS3jfwoS6QJbakGHFtKQ8k8X2la4M68qtKctvB/cLWEGB1EoVfzC+k35KCJpS5TywZlG
-         oAnLlHzI+nj6DBSV3mTjlIXHm4IS3HPEho5c/VE34m2Bw5BKekylkGt8KpQs7TaWzduE
-         ISaw==
-X-Gm-Message-State: APjAAAW57KUBEvl6Jnyb/4NMDx+XGVw6VO0K7c4mkra4A4SneeDO/wn2
-        EBdOl5RkOC0n9SXTWmw1widX1g==
-X-Google-Smtp-Source: APXvYqzrUbWvqA3qKiRRVNMBspOsgFSKlBr3Sg1pV5ytB9PZ5Fqcegj5gkEn6pKmsL3WWzenxkjgJw==
-X-Received: by 2002:a2e:b0c4:: with SMTP id g4mr6519009ljl.155.1563392834378;
-        Wed, 17 Jul 2019 12:47:14 -0700 (PDT)
-Received: from kynes (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
-        by smtp.gmail.com with ESMTPSA id u11sm5074832ljd.90.2019.07.17.12.47.13
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 17 Jul 2019 12:47:13 -0700 (PDT)
-Date:   Wed, 17 Jul 2019 21:47:12 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aBrxeytKOurZQ+nCGd8l34FcDLimTqnxqGL9K+vrwnQ=;
+        b=Je/EYVsW6HkhOC7kWCvxLqZPLskwsdPO/Q3KAGjU6E6q7YA1a+SPkzbH/FbfGOha49
+         Zr095HCRuGx27lira7VXUOZAsY+nagxwe8SMH0mzTkAAvre0EJOUzL/2wAW6fu3tZ1Mm
+         O1lJ1G/a1S/9+dNKDHOWsOYDQoUVgYe0gTFoWY22Ms/noaPMuBe6ZMUUteHH0zAEWtOT
+         2PD6uWCACVl/yStGpJUUuKvhoQMisrwMEhM7Tg26/ERsAjVjz/JBMl4O3A1eom33W5yk
+         g2zb4DkOqHq8ND6UHy+oaNxjVJNNEBFKTxKpBXDXpURytbJeqS05isBTPU8Qr19LD8bc
+         7EJw==
+X-Gm-Message-State: APjAAAW2gOTudl3OO4rnMbs1kObdeVc1RuSYt4S4NM/+OhP/FxNr9/g4
+        RED+4qv333OqBNpl4LJz5FEa7s3lzGk=
+X-Google-Smtp-Source: APXvYqxLTgtk9Paue8tGnDYlclfhR8paSAkbbOA0QAQhhmqWFo74sug+W1krgawuVv/9V6Ee9sVR3w==
+X-Received: by 2002:a19:c1cc:: with SMTP id r195mr18450054lff.95.1563393214329;
+        Wed, 17 Jul 2019 12:53:34 -0700 (PDT)
+Received: from kynes.internet.domowy (apn-77-112-37-101.dynamic.gprs.plus.pl. [77.112.37.101])
+        by smtp.gmail.com with ESMTPSA id 2sm4643181lji.94.2019.07.17.12.53.33
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 17 Jul 2019 12:53:33 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "Gix, Brian" <brian.gix@intel.com>
-Subject: Re: [PATCH BlueZ v5 1/4] mesh: Add ImportLocalNode API documentation
-Message-ID: <20190717194712.i4dtiwhldq2is2z2@kynes>
-Mail-Followup-To: "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "Gix, Brian" <brian.gix@intel.com>
-References: <20190717083650.26346-1-michal.lowas-rzechonek@silvair.com>
- <20190717083650.26346-2-michal.lowas-rzechonek@silvair.com>
- <915ea1c10883aaf1e4d42c5a749bfda964b54b51.camel@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ 0/2] Use composition data to validate app against the node
+Date:   Wed, 17 Jul 2019 21:53:26 +0200
+Message-Id: <20190717195328.16322-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <915ea1c10883aaf1e4d42c5a749bfda964b54b51.camel@intel.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+This patchset streamlines app validation by creating a temporary node
+during Join, CreateNetwork and ImportLocalNode calls and then
+comparing temporary composition data with one generated for already
+existing node.
 
-On 07/17, Stotland, Inga wrote:
-> I feel like having "object app_root" is unnecessary and also, creates
-> some gnarly pathways within the code.
-> 
-> What exactly is the problem for requiring the composition data to be
-> part of the import_data? It's just weird to say "oh, it may be there or
-> it may be not".
+In case of Attach call, the temporary node is simply added to the list.
 
-The main issue lies on the application side. In order to properly
-Attach(), the application must expose element structure via D-Bus.
+TODO: Composition data generation needs to validate node structure,
+checking that:
+ - primary element exists
+ - mandatory models are where they should be
+ - there are no gaps in element indexes
+ - ... possibly a few more things
 
-If we say that it must also do the same via JSON, to call
-ImportLocalNode, it leads to code duplication on the application side.
+Michał Lowas-Rzechonek (2):
+  mesh: Keep model list sorted and unique
+  mesh: Validate application by comparing composition data
 
-Moreover, the app still needs to be queried via D-Bus to check that the
-passed JSON matches the D-Bus structure - otherwise the app would then
-fail to Attach() and the user would be in deep trouble.
+ mesh/cfgmod-server.c |  14 +-
+ mesh/mesh-defs.h     |   2 +
+ mesh/node.c          | 453 ++++++++++++++++++-------------------------
+ 3 files changed, 198 insertions(+), 271 deletions(-)
 
-> Getting rid of the app_root and mandating the composition to be part of
-> the import_data allows:
-> 
-> 1) Avoid checking whether this is a "full" configuration or the
-> "minimal" one
-
-I'm not convinced that the "full" configuration is even needed. We
-certaintly don't use it in our use case, but it might be required in the
-future.
-
-> 2) Efficiently re-use the existing code:
-> Adding an API call like this one may be sufficient
-> 
-> mesh_config_import(const char *cfg_dir,
->                    const uint8_t uuid[16],
->                    const uint8 *import_data, <import__len>?,
->                    mesh_config_node_func_t cb,
->                    void *user_data)
-> 
-> We can just re-factor the code that parses and populates a single node
-> from the stored configuration. user_data may contain whatever we need
-> to preserve in order to respond to d-bus call.
-
-After refactoring node validation to byte-compare composition data, the
-code also becomes significantly simpler, and execution paths for Join(),
-Attach(), CreateNetwork() and ImportLocalNode() converge.
-
-I've implemented this validation method on top of this patch-set. I'll
-send it as RFC shortly.
-
-regards
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+2.22.0
+
