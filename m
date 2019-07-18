@@ -2,174 +2,335 @@ Return-Path: <SRS0=wIos=VP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED78C7618F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 20:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46797C7618F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 21:04:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 957FA208C0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 20:06:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F227F2173B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 21:04:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vIVPxTZF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391130AbfGRUGI convert rfc822-to-8bit (ORCPT
+        id S1727781AbfGRVEX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jul 2019 16:06:08 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:59020 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728025AbfGRUGH (ORCPT
+        Thu, 18 Jul 2019 17:04:23 -0400
+Received: from mail-yb1-f172.google.com ([209.85.219.172]:45627 "EHLO
+        mail-yb1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727685AbfGRVEX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jul 2019 16:06:07 -0400
-Received: from [192.168.23.201] (unknown [157.25.100.178])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 76453CECD9;
-        Thu, 18 Jul 2019 22:14:40 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: HCI Set custom bandwidth for AuriStream SCO codec
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190718100939.bwl26qcfxe6ppcto@pali>
-Date:   Thu, 18 Jul 2019 22:06:03 +0200
-Cc:     Pavel Machek <pavel@ucw.cz>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <814EF218-4123-4C29-BECB-AF1B556C0F67@holtmann.org>
-References: <CABBYNZLJB0bK7o=Tvf9mhb5U41xAin6SdPY9=76AuEvpEiA_8g@mail.gmail.com>
- <20190519082305.q7y4gpmdhvx3vzvo@pali>
- <CABBYNZJKO07p-8ufP7=4WUYS1oLhnsKY_pnP6-0SbVzi=CYZsQ@mail.gmail.com>
- <20190519212157.GB31403@amd> <20190607130245.mv4ch6dxnuptzdki@pali>
- <ED456CCA-CF85-48D9-B7E9-9B0BF02A32FC@holtmann.org>
- <20190708122512.qqfvtm455ltxxg3h@pali>
- <E4A6E61C-DE37-4E5D-9401-71CCE4AE2419@holtmann.org>
- <20190708210616.x2dlnzjhnplu37bz@pali>
- <D0A44CC7-CABC-408A-894E-AAD700FA9B0D@holtmann.org>
- <20190718100939.bwl26qcfxe6ppcto@pali>
-To:     =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Thu, 18 Jul 2019 17:04:23 -0400
+Received: by mail-yb1-f172.google.com with SMTP id s41so9114883ybe.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2019 14:04:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=PmQIRFbOoiqfW6WFCk6HkCrL09SCrEYJXCensd6atjU=;
+        b=vIVPxTZFFUjVZznc+bECAqtyn3kMBXeXg/Qop8ib0c5qeB+Ip7dv+VsBnNGt4Gijxi
+         zvMo28Eatkd+Dw1gwWv5YsnH6ujKWSbLABuGbtOEYGZ68QU7ZqRKqSBm9iZVaJTJAkqs
+         4HXpLsaHJqylaDKE+oVV6psfvy1m6w0ptFnLZ0OR5DgruxfFA8jxK88RSBjGY+5JhbrY
+         psqKuuWwdH7epgpdvlk08aT+ucV/zJ13c0Po6dwEZVX5bifidtouxVVqMxAZBv26AljE
+         9APx9hYxFOyZKEY3/k0pjvADhcKU+YTtotPTisGAtw+9PfvI7itzZCmyJUgi0wfuKevc
+         HK7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=PmQIRFbOoiqfW6WFCk6HkCrL09SCrEYJXCensd6atjU=;
+        b=BVhTRZzNCM7N9Qt7ADXWuz9G2uxxkJuArcrQo40rSoSNhZThoGeIvOm0If7Bm8eSwm
+         kI1UmeCXnJ0QWEyrChWv8G+sVDwfhcnt/5MQLVANhfSezkKdOI+F0lVZKP7QPdmJl/Za
+         OrisL/wlMn90SG44l+54ZZO3HdzzxaJr7YlCoT7fqRxC36pbm0Cj7xnhypYN7wDAD4wR
+         JNN5sMeMGURzbCdAyjMmLR8+YrcZerwSSBF0LZ0rB7HfRYEtJX/kIc4gy5M+lSnQL5lM
+         ZwDwBhReVm3HKz5rtVj3+pekRIgkQ+E9GufPYXk07HVExzkqYbDyTlWo03JVUR83Fcbz
+         H4QA==
+X-Gm-Message-State: APjAAAXMZxGCTC0EasT7yXgyquRufWUK3v+HObdloyC2g6t6ZLBoNtZ7
+        HGGf0SreQhydPYECKmOlP+P7JEIbTB0VRKSMLW50QQ6V
+X-Google-Smtp-Source: APXvYqwVEyl+ft6rICf3ZtoVxZGYmgDno4ICROS7FFs/TjhkDZ2eAEUJnpDeko7Rr8fJLE0Yvz3zJXkG1ldNIFHrMvk=
+X-Received: by 2002:a25:6756:: with SMTP id b83mr29433993ybc.37.1563483861473;
+ Thu, 18 Jul 2019 14:04:21 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAAu3APas5syS3gYXN-BBqB=OcDZJjpPwND6qzOO1wSmbMq2U1Q@mail.gmail.com>
+ <CABBYNZ+W8dG7qgAe-2QYnSkyVG_1eA4KtMKHyXws0LWwB346Ow@mail.gmail.com>
+In-Reply-To: <CABBYNZ+W8dG7qgAe-2QYnSkyVG_1eA4KtMKHyXws0LWwB346Ow@mail.gmail.com>
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Thu, 18 Jul 2019 22:04:06 +0100
+Message-ID: <CAAu3APaPaDXBNsWcCUhNF2_sM_AxiKe5B6U1xtMOU9tYwpFS2g@mail.gmail.com>
+Subject: Re: DBus LEAdvertisement and Python
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pali,
+Hello Luiz,
 
->>>>>>>>>>> to be honest, I would rather see WBS implementation finally
->>>>>>>>>>> reach PA before we start digging into this.
->>>>>>>>>> 
->>>>>>>>>> First I want to finish improving A2DP codec support in pulseaudio. Later
->>>>>>>>>> I can look at HSP/HFP profiles. Ideally it should have modular/plugin
->>>>>>>>>> extensible design. So the aim is that adding new codec would be very
->>>>>>>>>> simple, without need to hack something related to mSBC/WBC, AuriStream
->>>>>>>>>> or any other codec.
->>>>>>>>> 
->>>>>>>>> Well HSP don't have support for codec negotiation, but yes a modular
->>>>>>>>> design is probably recommended.
->>>>>>>>> 
->>>>>>>>>> But for AuriStream I need to set custom SCO parameters as described
->>>>>>>>>> below and currently kernel does not support it. This is why I'm asking
->>>>>>>>>> how kernel can export for userspace configuration of SCO parameters...
->>>>>>>>> 
->>>>>>>>> We can always come up with socket options but we got to see the value
->>>>>>>>> it would bring since AuriStream don't look that popular among
->>>>>>>>> headsets, at least Ive never seem any device advertising it like
->>>>>>>>> apt-X, etc.
->>>>>>>> 
->>>>>>>> Pali clearly has such device and he is willing to work on it. Surely
->>>>>>>> that means it is popular enough to be supported...?
->>>>>>> 
->>>>>>> Just put AT+CSRSF=0,0,0,0,0,7 to google search and you would see that
->>>>>>> not only I have such device...
->>>>>>> 
->>>>>>> So I would really would like to see that kernel finally stops blocking
->>>>>>> usage of this AuriStream codec.
->>>>>> 
->>>>>> we need to figure out on how we do the kernel API to allow you this specific setting.
->>>>> 
->>>>> Hi Marcel! Kernel API for userspace should be simple. Just add two
->>>>> ioctls for retrieving and setting structure with custom parameters:
->>>>> 
->>>>> syncPktTypes = 0x003F
->>>>> bandwidth = 4000
->>>>> max_latency = 16
->>>>> voice_settings = 0x63
->>>>> retx_effort = 2
->>>>> 
->>>>> Or add more ioctls, one ioctl per parameter. There is already only ioctl
->>>>> for voice settings and moreover it is whitelisted only for two values.
->>>> 
->>>> it is not that simple actually. Most profiles define a certain set of parameters and then they try to configure better settings and only fallback to a specification defined default as last resort.
->>> 
->>> Ok. I see that there is another "example" configuration for AuriStream
->>> with just different syncPktTypes = 0x02BF and bandwidth = 3850.
->>> 
->>> So it really is not simple as it can be seen.
->> 
->> currently the stepping for mSBC and CVSD are hard-coded in esco_param_cvsd and esco_param_msbc arrays in hci_conn.c and then selected by the ->setting parameter.
->> 
->> So either we provide an new socket option (for example BT_VOICE_EXT) or we extend BT_VOICE to allow providing the needed information. However this needs to be flexible array size since we should then be able to encode multiple stepping that are tried in order.
->> 
->> My preference is that we extend BT_VOICE and not introduce a new socket option. So feel free to propose how we can load the full tables into the SCO socket. I mean we are not really far off actually. The only difference is that currently the tables are in the hci_conn.c file and selected by the provided voice->setting. However nothing really stops us from providing the full table via user space.
-> 
-> Ok. I will look at it and I will try to propose how to extend current
-> BT_VOICE ioctl API for supporting all those new parameters.
-> 
->>>>>> We have kept is really simple since there was only CVSD and mSBC as of now.
->>>>> 
->>>>> Seems that custom codecs are already widely used, so it would be great
->>>>> it Linux kernel allows to use also other codecs in future without need
->>>>> to explicitly whitelist them.
->>>> 
->>>> This is an overstatement. I see only one custom codec being used. Unless you have heard from others. However as stated above, I think we need to provide an array of settings that are similar defined to what the HFP spec does. Then we just load the whole set into the kernel.
->>> 
->>> CVSD and mSBC are in use. IIRC specification also mandates ulaw a alaw
->>> codecs but I have not seen it used. Has somebody tried to implement it?
->>> I think just replacing voice_settings should be enough as encoding /
->>> decoding should be done in bluetooth firmware / hardware.
->>> 
->>> And then there is AuriStream which based on google results it supported
->>> by lot of headsets.
->>> 
->>> So at least 3 different codecs are widely supported by headset.
->> 
->> The ulaw and alaw air codecs are in theory possible, but nobody in the history of Bluetooth has used them. So just ignore that part of the specification. For air codecs you have either CVSD or transparent. And then with transparent you get mSBC and AuriStream.
-> 
-> More interesting question would be if alaw codec can be used in
-> transparent mode by transmitter and in "normal alaw" mode by receiver.
-> So it is possible to "tell" bluetooth chip "hey, I have already prepared
-> alaw or CVSD packets for you”?
+Thanks for the prompt response. Below are some updates following your input.
 
-actually alaw is an over the air codec. Using it in transparent mode has no profile support. So while possible, it is not interoperable.
+On Thu, 18 Jul 2019 at 09:26, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Barry,
+>
+> On Thu, Jul 18, 2019 at 10:03 AM Barry Byford <31baz66@gmail.com> wrote:
+> >
+> > Hello,
+> >
+> > The Python examples provided in the test directory of the BlueZ
+> > repository use the python-dbus library. Looking at the documentation
+> > of that library it does start by raising concerns and offering
+> > alternatives. I have been looking at some of the alternatives and am
+> > having difficultly getting them to work with BlueZ. I have been
+> > focusing on the org.bluez.LEAdvertisement1 interface.
+> >
+> > Looking at the documentation, it says the service, interface and
+> > object details are:
+> > Service org.bluez
+> > Interface org.bluez.LEAdvertisement1
+> > Object path freely definable
+> >
+> > I am not being successful at publishing to the org.bluez service. It
+> > is also not where the current examples publish to.
+> > Looking at the GattProfile1 documentation, it has service and object
+> > as application dependant.
+> > Service <application dependent>
+> > Interface org.bluez.GattProfile1
+> > Object path <application dependent>
+> > Should the documentation of Service on LEAdvertisement1 be freely
+> > definable also?
+>
+> Yep, the bus name is up to the application which usually don't
+> register a friendly name if you try to register with 'org.bluez' it
+> would probably conflict with the daemon itself so you wouldn't be able
+> to register that name anyway.
+>
+> > I have created the LEAdvertisement1 interface so that it has an
+> > ObjectManager and is introspectable. When I pass the object to
+> > RegisterAdvertisement on the org.bluez.LEAdvertisingManager1 interface
+> > it accepts it (does not give an error) but does not register the data
+> > and I see no advertisement appear. Is there somewhere I can find a
+> > more detailed description of what needs to be on the
+> > org.bluez.LEAdvertisement1 interface that will work with
+> > RegisterAdvertisement?
+>
+> Do you have the bluetoothd output when you register, I get the
+> following when using bluetoothctl:
+>
+> bluetooth]# power on
+> Changing power on succeeded
+> [bluetooth]# advertise on
+> [CHG] Controller B8:8A:60:D8:17:D7 SupportedInstances: 0x04
+> [CHG] Controller B8:8A:60:D8:17:D7 ActiveInstances: 0x01
+> Advertising object registered
+> Tx Power: off
+> Name: off
+> Apperance: off
+> Discoverable: off
+> [bluetooth]#
 
-> In Europe all landline phones (and also their SIP non-compressed
-> equivalents) use alaw codec. So ability to pass SIP alaw samples
-> directly to headset could increase quality of SIP calls. As currently
-> received alaw samples are converted to linear PCM, then send to
-> bluetooth chip which converts it into CVSD codec and finally bluetooth
-> headset converts CVSD to analog.
+Using the new dbus library I get:
+Log from bluetoothctl:
+[CHG] Controller FC:F8:AE:8F:0C:A4 SupportedInstances: 0x04
+[CHG] Controller FC:F8:AE:8F:0C:A4 ActiveInstances: 0x01
 
-Nice idea, but not worth the effort.
+From the bluetoothd log:
+bluetoothd[2856]: src/advertising.c:register_advertisement()
+RegisterAdvertisement
+bluetoothd[2856]: src/advertising.c:client_create() Adding proxy for
+/ukBaz/bluezero/advertisement1
+bluetoothd[2856]: src/advertising.c:register_advertisement()
+Registered advertisement at path /ukBaz/bluezero/advertisement1
+bluetoothd[2856]: src/advertising.c:refresh_adv() Refreshing
+advertisement: /ukBaz/bluezero/advertisement1
+bluetoothd[2856]: src/advertising.c:add_adv_callback() Advertisement
+registered: /ukBaz/bluezero/advertisement1
 
->>>>>> I am also curious on what the assumptions are for the USB driver alternate settings are when using a different codec.
->>>>> 
->>>>> I did all above tests and kernel changes with USB bluetooth chip which
->>>>> is integrated in notebook's combo bt+wifi intel minipci-e card.
->>>> 
->>>> Good to know. Since for mSBC in theory they need a new alternate settings that wasn’t really available.
->>> 
->>> I understood that both mSBC and AuriStream uses "transparent" mode of
->>> transport and bluetooth chip itself does not know if it transmit mSBC or
->>> AuriStream as it does not do any encoding…
->> 
->> That is true, but still for transparent codec they defined a new alternate setting for USB.
-> 
-> So is btintel/btusb already handles it? Or btusb needs to be patches for
-> "proper" support?
 
-It should handle it, but we only know when this is fully tested.
+With the old pyton-dbus library (that is working) I get:
+log from bluetoothctl:
+[CHG] Controller FC:F8:AE:8F:0C:A4 SupportedInstances: 0x04
+[CHG] Controller FC:F8:AE:8F:0C:A4 ActiveInstances: 0x01
 
-Regards
+From the bluetoothd log:
+bluetoothd[2856]: src/advertising.c:register_advertisement()
+RegisterAdvertisement
+bluetoothd[2856]: src/advertising.c:client_create() Adding proxy for
+/ukBaz/bluezero/advertisement0001
+bluetoothd[2856]: src/advertising.c:register_advertisement()
+Registered advertisement at path /ukBaz/bluezero/advertisement0001
+bluetoothd[2856]: src/advertising.c:parse_service_uuids() Adding
+ServiceUUID: FEAA
+bluetoothd[2856]: src/advertising.c:parse_service_data() Adding
+ServiceData for FEAA
+bluetoothd[2856]: src/advertising.c:refresh_adv() Refreshing
+advertisement: /ukBaz/bluezero/advertisement0001
+bluetoothd[2856]: src/advertising.c:add_adv_callback() Advertisement
+registered: /ukBaz/bluezero/advertisement0001
 
-Marcel
 
+>
+> bluetoothd[6103]: src/advertising.c:client_create() Adding proxy for
+> /org/bluez/advertising
+> bluetoothd[6103]: src/advertising.c:register_advertisement()
+> Registered advertisement at path /org/bluez/advertising
+> bluetoothd[6103]: src/advertising.c:refresh_adv() Refreshing
+> advertisement: /org/bluez/advertising
+> bluetoothd[6103]: src/advertising.c:add_adv_callback() Advertisement
+> registered: /org/bluez/advertising
+>
+>
+> > For reference, I have put below what I am currently  putting on the
+> > org.bluez.LEAdvertisement1 interface.
+> >
+> > Thanks,
+> > Barry
+> >
+> >
+> > $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> > org.freedesktop.DBus.ObjectManager GetManagedObjects
+> > a{oa{sa{sv}}} 1 "/ukBaz/bluezero/advertisement1" 5
+> > "org.freedesktop.DBus.Properties" 0
+> > "org.freedesktop.DBus.Introspectable" 0 "org.freedesktop.DBus.Peer" 0
+> > "org.freedesktop.DBus.ObjectManager" 0 "org.bluez.LEAdvertisement1" 6
+> > "Type" s "broadcast" "ServiceUUIDs" as 0 "ManufacturerData" a{sv} 0
+> > "SolicitUUIDs" as 0 "ServiceData" a{sv} 1 "FEAA" ay 18 16 8 3 117 107
+> > 66 97 122 46 103 105 116 104 117 98 46 105 111 "IncludeTxPower" b
+> > false
+>
+> Not sure if that is the problem but usually ObjectManager is suppose
+> to be on the '/' (root) path.
+
+Good point. It is not clear (to me anyway) exactly what the
+requirement is from reading the spec
+https://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager
+I have moved the object manager to the root (/) but this does not seem
+to have changed anything.
+
+$ busctl call ukBaz.bluezero / org.freedesktop.DBus.ObjectManager
+GetManagedObjects
+a{oa{sa{sv}}} 1 "/ukBaz/bluezero/advertisement1" 4
+"org.freedesktop.DBus.Properties" 0
+"org.freedesktop.DBus.Introspectable" 0 "org.freedesktop.DBus.Peer" 0
+"org.bluez.LEAdvertisement1" 6 "Type" s "broadcast" "ServiceUUIDs" as
+0 "ManufacturerData" a{sv} 0 "SolicitUUIDs" as 0 "ServiceData" a{sv} 1
+"FEAA" ay 18 16 8 3 117 107 66 97 122 46 103 105 116 104 117 98 46 105
+111 "IncludeTxPower" b false
+
+
+>
+> > $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> > org.freedesktop.DBus.Properties GetAll s org.bluez.LEAdvertisement1
+> > a{sv} 6 "Type" s "broadcast" "ServiceUUIDs" as 0 "ManufacturerData"
+> > a{sv} 0 "SolicitUUIDs" as 0 "ServiceData" a{sv} 1 "FEAA" ay 18 16 8 3
+> > 117 107 66 97 122 46 103 105 116 104 117 98 46 105 111
+> > "IncludeTxPower" b false
+> >
+
+Using the d-feet application I did a GetAll on the advertisements and
+the data looks identical for both
+Using the new DBus library:
+{'IncludeTxPower': False,
+ 'ManufacturerData': {},
+ 'ServiceData': {'FEAA': [16,
+                          8,
+                          3,
+                          117,
+                          107,
+                          66,
+                          97,
+                          122,
+                          46,
+                          103,
+                          105,
+                          116,
+                          104,
+                          117,
+                          98,
+                          46,
+                          105,
+                          111]},
+ 'ServiceUUIDs': ['FEAA'],
+ 'SolicitUUIDs': [],
+ 'Type': 'broadcast'}
+
+Using the old Python-dbus library:
+{'IncludeTxPower': False,
+ 'ServiceData': {'FEAA': [16,
+                          8,
+                          3,
+                          117,
+                          107,
+                          66,
+                          97,
+                          122,
+                          46,
+                          103,
+                          105,
+                          116,
+                          104,
+                          117,
+                          98,
+                          46,
+                          105,
+                          111]},
+ 'ServiceUUIDs': ['FEAA'],
+ 'Type': 'broadcast'}
+
+> > $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> > org.freedesktop.DBus.Introspectable Introspect
+> > s "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object
+> > Introspection 1.0//EN\"\n
+> > \"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n<!--
+> > GDBus 2.60.4 -->\n<node>\n  <interface
+> > name=\"org.freedesktop.DBus.Properties\">\n    <method name=\"Get\">\n
+> >      <arg type=\"s\" name=\"interface_name\" direction=\"in\"/>\n
+> > <arg type=\"s\" name=\"property_name\" direction=\"in\"/>\n      <arg
+> > type=\"v\" name=\"value\" direction=\"out\"/>\n    </method>\n
+> > <method name=\"GetAll\">\n      <arg type=\"s\"
+> > name=\"interface_name\" direction=\"in\"/>\n      <arg type=\"a{sv}\"
+> > name=\"properties\" direction=\"out\"/>\n    </method>\n    <method
+> > name=\"Set\">\n      <arg type=\"s\" name=\"interface_name\"
+> > direction=\"in\"/>\n      <arg type=\"s\" name=\"property_name\"
+> > direction=\"in\"/>\n      <arg type=\"v\" name=\"value\"
+> > direction=\"in\"/>\n    </method>\n    <signal
+> > name=\"PropertiesChanged\">\n      <arg type=\"s\"
+> > name=\"interface_name\"/>\n      <arg type=\"a{sv}\"
+> > name=\"changed_properties\"/>\n      <arg type=\"as\"
+> > name=\"invalidated_properties\"/>\n    </signal>\n  </interface>\n
+> > <interface name=\"org.freedesktop.DBus.Introspectable\">\n    <method
+> > name=\"Introspect\">\n      <arg type=\"s\" name=\"xml_data\"
+> > direction=\"out\"/>\n    </method>\n  </interface>\n  <interface
+> > name=\"org.freedesktop.DBus.Peer\">\n    <method name=\"Ping\"/>\n
+> > <method name=\"GetMachineId\">\n      <arg type=\"s\"
+> > name=\"machine_uuid\" direction=\"out\"/>\n    </method>\n
+> > </interface>\n  <interface
+> > name=\"org.freedesktop.DBus.ObjectManager\">\n    <method
+> > name=\"GetManagedObjects\">\n      <arg type=\"a{oa{sa{sv}}}\"
+> > name=\"object_paths_interfaces_and_properties\" direction=\"out\">\n
+> >    </arg>\n    </method>\n    <signal name=\"InterfacesAdded\">\n
+> > <arg type=\"o\" name=\"object_path\">\n      </arg>\n      <arg
+> > type=\"a{sa{sv}}\" name=\"interfaces_and_properties\">\n      </arg>\n
+> >    </signal>\n    <signal name=\"InterfacesRemoved\">\n      <arg
+> > type=\"o\" name=\"object_path\">\n      </arg>\n      <arg type=\"as\"
+> > name=\"interfaces\">\n      </arg>\n    </signal>\n  </interface>\n
+> > <interface name=\"org.bluez.LEAdvertisement1\">\n    <annotation
+> > name=\"org.freedesktop.DBus.Properties.PropertiesChanged\"
+> > value=\"const\">\n    </annotation>\n    <method name=\"Release\">\n
+> >    <annotation name=\"org.freedesktop.DBus.Method.NoReply\"
+> > value=\"true\">\n      </annotation>\n    </method>\n    <property
+> > type=\"s\" name=\"Type\" access=\"read\">\n    </property>\n
+> > <property type=\"as\" name=\"ServiceUUIDs\" access=\"read\">\n
+> > </property>\n    <property type=\"a{sv}\" name=\"ManufacturerData\"
+> > access=\"read\">\n    </property>\n    <property type=\"as\"
+> > name=\"SolicitUUIDs\" access=\"read\">\n    </property>\n    <property
+> > type=\"a{sv}\" name=\"ServiceData\" access=\"read\">\n
+> > </property>\n    <property type=\"b\" name=\"IncludeTxPower\"
+> > access=\"read\">\n    </property>\n  </interface>\n</node>\n"
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
