@@ -2,180 +2,219 @@ Return-Path: <SRS0=wIos=VP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52134C76191
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 08:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B15ABC76195
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 08:26:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C29E2173B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 08:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77E1D2173B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 08:26:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="PHei9dex"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDJmPFYG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387777AbfGRIQV (ORCPT
+        id S1726513AbfGRI0N (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jul 2019 04:16:21 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:36692 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726454AbfGRIQV (ORCPT
+        Thu, 18 Jul 2019 04:26:13 -0400
+Received: from mail-ot1-f47.google.com ([209.85.210.47]:46001 "EHLO
+        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726000AbfGRI0M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jul 2019 04:16:21 -0400
-Received: by mail-lf1-f68.google.com with SMTP id q26so18544600lfc.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2019 01:16:19 -0700 (PDT)
+        Thu, 18 Jul 2019 04:26:12 -0400
+Received: by mail-ot1-f47.google.com with SMTP id x21so28071691otq.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2019 01:26:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=ZwvbWBo6ZsnbZt9gGxSBltySN18aXeyFFOZF0q4o6WE=;
-        b=PHei9dexdSYyXzpoinkXaP/lek48C6RFT/vMgd2T5a7xfTitfvo3PVKeD3kafUnPPG
-         psikZs262AFUnPPSTBN5ne/hgJPtj9h6Z5sO9M+ukcutEWtozAHq/1fxaSkpTmSaUqIB
-         bNMxPXBGPE3OlOeR02QTWe2aNcfFQsjy+qC1YRLSeE86R2uR7qLhr5i/q2kvpfSUl0sC
-         tJBvv9GrmUYG0jDsZT7Tu+Vij/DAihEJq6NJkJrwyfCFh6iJEwW8n5+OcfpRCBHOJh4g
-         mVRuXQPVZWiiz+o8U60k+iMmCte7h19pDrzaMlxX1saxRZPOGLj3ye4XBJ4PE2AYXy4V
-         N26w==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GkaprJuHG8aMYxCDCO7BOhlrd3nfkIcptm8XijDLzqo=;
+        b=EDJmPFYG8iFYwHU/i6fpQasB4nt15GxCZy3YwN9/qDNKvrnVLQWzz7JzqTXiH6Ojcl
+         FnZeugC+SUBeOoKfkr1Yf1DyRgwqMoajelXylPpxn3ahP9LpXVqJ/SknILnarkFqqBjg
+         yVvrvdftzPRuzn56fP/m8x6Efa5dieNf032sZfHGFKZ2xF9z5Oo1w+k/TF5eGFFVih3O
+         HUA27juuzCbHbgKJzhrFx3xRBsuxQYOckaXgmm980Cx3czA89FR2FOHq2dBCc4lzLXhR
+         vey7YDMsqByMEaayYpzcSqiefdWn0RHfprFH9qH66YDOzRWNUpgYPRocCMEW43E+wExb
+         m4jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=ZwvbWBo6ZsnbZt9gGxSBltySN18aXeyFFOZF0q4o6WE=;
-        b=R2m2VYM7ZYeqNAc66IQWfKPLA/BCeUWPtuV/d4068poir7NMiced42EiryOnKzAY31
-         bsdlamTCxEsIP6vaZWMIerXCP2H9RxBw0eVxaaQEUWits7mMcayzkyzzAwgmIYwjRaNS
-         m7DwweWJYC14rQ9t+09c0cf20+UxviQU+GD9z2cSTzJY7av+SvvWjTBKIxa46nUyzdf1
-         zIUBz4TuStm649kJs9PmCAT5Ha0Jk6sa/eyKA+zQdyTb0SLI0bpCc1A9sXf3fz9mTOzG
-         imqeGUOdLG4+4S96p6CFkHWotXdWjCOVwGu/Tj9MeCTc/HFe2PgVTyoTzd5VEUTCWn1I
-         jcIg==
-X-Gm-Message-State: APjAAAVbCCag4c1Wiv4EEKSKcBpd7QcYj8LM4HupZZG4zLkDm3gP9sAm
-        pKYU+O51752DMHwyjQ65rIePhw==
-X-Google-Smtp-Source: APXvYqzMLRBQoF4mKJDHz/QVAcDYMTDRsoxha+Vf/WlmnPBCtYH9g3AlyrWvuy2fTK7ppKMpIHF+ow==
-X-Received: by 2002:a19:8093:: with SMTP id b141mr20872029lfd.137.1563437778826;
-        Thu, 18 Jul 2019 01:16:18 -0700 (PDT)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id o8sm4915680ljh.100.2019.07.18.01.16.17
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 18 Jul 2019 01:16:17 -0700 (PDT)
-Date:   Thu, 18 Jul 2019 10:16:16 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>
-Subject: Re: [PATCH BlueZ v5 1/4] mesh: Add ImportLocalNode API documentation
-Message-ID: <20190718081616.ujsbh2ot5hbhmulz@mlowasrzechonek2133>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>
-References: <20190717083650.26346-1-michal.lowas-rzechonek@silvair.com>
- <20190717083650.26346-2-michal.lowas-rzechonek@silvair.com>
- <915ea1c10883aaf1e4d42c5a749bfda964b54b51.camel@intel.com>
- <20190717194712.i4dtiwhldq2is2z2@kynes>
- <DEBB0CAA2616974FAE35E4B560B9A4376CBD3539@ORSMSX103.amr.corp.intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GkaprJuHG8aMYxCDCO7BOhlrd3nfkIcptm8XijDLzqo=;
+        b=HCurFhLFBF0NALLn7OUVHHHEbD0VmjqjqwVc+2z+8OVt9blLMy5cK4BSuDn//TCn1D
+         xxOE9TvpXo3Z6lfkVewVCz3UnA8WfhrcHFc9XHGkm0RzSp/g3CFAUbvfLVZyhgkP76BQ
+         k+WrTA60lM1F6HYzMOEZQeAhhSCa1bim0SWdq+3ZN1z2WA5pNpwE/6tMVog+jqns2bf8
+         qOWILN6mjpH84ydQZqJnzJCPKTVJPJ7RHwNw7rLIgE/GXhO9textrqk0nqbCatSsXLC9
+         o9pJsTFbQDuPtZt1AJDXkRCh0rKnVnw/Q+Ggq1jW8fsPIXTkKwo+9rExcMNnzlvqpMbd
+         aM0A==
+X-Gm-Message-State: APjAAAXiV0R34rwf5kitQAXyQO4C3ZF8/3wl59LZFqwyTHzJJE+nvzFs
+        cQj1FjbfKq323+zP83v/MxAoQVTwoNoxvyIDwlk=
+X-Google-Smtp-Source: APXvYqxhxnfBBW06tDS5sRucKcW8icgmoe7pPeOLzr0+QDM+lmsyIBCrDw2Fv6X8LZKwM2SuhVcZ/CNOVEDG3zpYjTM=
+X-Received: by 2002:a9d:7e88:: with SMTP id m8mr31667038otp.177.1563438371262;
+ Thu, 18 Jul 2019 01:26:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4376CBD3539@ORSMSX103.amr.corp.intel.com>
-User-Agent: NeoMutt/20180716
+References: <CAAu3APas5syS3gYXN-BBqB=OcDZJjpPwND6qzOO1wSmbMq2U1Q@mail.gmail.com>
+In-Reply-To: <CAAu3APas5syS3gYXN-BBqB=OcDZJjpPwND6qzOO1wSmbMq2U1Q@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 18 Jul 2019 11:25:58 +0300
+Message-ID: <CABBYNZ+W8dG7qgAe-2QYnSkyVG_1eA4KtMKHyXws0LWwB346Ow@mail.gmail.com>
+Subject: Re: DBus LEAdvertisement and Python
+To:     Barry Byford <31baz66@gmail.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Brian, Inga,
+Hi Barry,
 
-On 07/17, Gix, Brian wrote:
-> The application has no need to even exist at this point, as long as it 
-> can attach to the token at some point in the future.  But this *does* 
-> enable the ability to have a *generic* application that can inject 
-> nodes (fully configured, or "New") into the daemon.
-
-The same thing can be said about CreateNetwork() call - you don't really 
-*need* to have an attached (of even "attachable") application in order 
-to create a new node.
-
-In fact, CreateNetwork() and ImportLocalNode() calls are very similar in 
-this regard, it's just that CreateNetwork generates keys, addresses and 
-starting sequence number on the daemon side, while ImportLocalNode() 
-allows passing them from the application.
-
-Since CreateNetwork() does query the app via D-Bus, I think it's more 
-consistent to query the app during ImportLocalNode() as well.
-
-That, or replace both calls with a more generic CreateNode() call that 
-would accept create/import data as an agument, and not query the app at 
-all.
-
-> > If we say that it must also do the same via JSON, to call 
-> > ImportLocalNode, it leads to code duplication on the application 
-> > side.
-> >
-> > Moreover, the app still needs to be queried via D-Bus to check that 
-> > the passed JSON matches the D-Bus structure - otherwise the app 
-> > would then fail to Attach() and the user would be in deep trouble.
+On Thu, Jul 18, 2019 at 10:03 AM Barry Byford <31baz66@gmail.com> wrote:
 >
-> The composition as reflected by the GetManagedObjects() call is 
-> "sanity checked" against the internal storage *every* time the App 
-> attaches...  I think Inga is concerned with code complexity and bloat 
-> to repeat this during ImportLocalNode(),
-
-This is covered by the same code path as other calls. I think it's 
-cleaner to always perform GetManagedObjects() dance for all 4 calls.
-
-And, as I mentioned before, this code path becomes even simpler when we 
-refactor "sanity checking" to compare serialized composition data.
-
-> This is different from the Join() case, in my opinion, where the JSON 
-> (or other storage) is being created *totally* from scratch, via the 
-> provisioning interaction with the remote Provisioner. In that case, 
-> yes... the "owning application" needs to be present on the D-Bus.
-
-Not necessarily. The application needs to provide ProvisionAgent 
-interface only, and only in cases where provisioner selects 
-authentication method that requires the app to perform some OOB action.
-
-It is entirely possible for a joining node to say it doesn't support any 
-OOB actions, and the mesh daemon can accept provisioning wihout any 
-interaction with the app.
-
-> > I'm not convinced that the "full" configuration is even needed. We 
-> > certaintly don't use it in our use case, but it might be required in 
-> > the future.
+> Hello,
 >
-> We *definitely* need an option for importing/migrating a fully 
-> configured node.  Phones are retired and replaced... Workstations are 
-> retired and replaced...  Some nodes publications will inevitably need 
-> to pick up the "current conversation" with the migrated node, where 
-> the old conversation left off. And this will almost certainly be a 
-> rare (but important) operation, and a "Utility" application to perform 
-> the operation (that does not itself need to have the model/element 
-> arrays implemented) will be easier to write and maintain.
-(...)
-> Again, I cannot think of any situations where Join/Attach/Create would 
-> ever exist in the absence of the Application.
+> The Python examples provided in the test directory of the BlueZ
+> repository use the python-dbus library. Looking at the documentation
+> of that library it does start by raising concerns and offering
+> alternatives. I have been looking at some of the alternatives and am
+> having difficultly getting them to work with BlueZ. I have been
+> focusing on the org.bluez.LEAdvertisement1 interface.
 >
-> This is an easy and obvious use case with Import.
+> Looking at the documentation, it says the service, interface and
+> object details are:
+> Service org.bluez
+> Interface org.bluez.LEAdvertisement1
+> Object path freely definable
+>
+> I am not being successful at publishing to the org.bluez service. It
+> is also not where the current examples publish to.
+> Looking at the GattProfile1 documentation, it has service and object
+> as application dependant.
+> Service <application dependent>
+> Interface org.bluez.GattProfile1
+> Object path <application dependent>
+> Should the documentation of Service on LEAdvertisement1 be freely
+> definable also?
 
-I don't think it makes sense to have a utility application that would 
-migrate the node without having anything that would Attach() to it.
+Yep, the bus name is up to the application which usually don't
+register a friendly name if you try to register with 'org.bluez' it
+would probably conflict with the daemon itself so you wouldn't be able
+to register that name anyway.
 
-IMO the migration operation should be a part of application logic, 
-because this operation requires talking to external Provisioner, and 
-Provisioner API is vendor specific. So I don't think you can't really 
-create a 'generic migration tool'.
+> I have created the LEAdvertisement1 interface so that it has an
+> ObjectManager and is introspectable. When I pass the object to
+> RegisterAdvertisement on the org.bluez.LEAdvertisingManager1 interface
+> it accepts it (does not give an error) but does not register the data
+> and I see no advertisement appear. Is there somewhere I can find a
+> more detailed description of what needs to be on the
+> org.bluez.LEAdvertisement1 interface that will work with
+> RegisterAdvertisement?
 
-In case of replaced device, the use case I see is re-installing the same 
-application on a new device, and having it re-create the node either 
-from data received from the Provisioner, or exported from the previous 
-instance of the application. I don't see a need to instantiate the node 
-on the replaces device without reinstalling the application - such a 
-node would not be operational anyway.
+Do you have the bluetoothd output when you register, I get the
+following when using bluetoothctl:
+
+bluetooth]# power on
+Changing power on succeeded
+[bluetooth]# advertise on
+[CHG] Controller B8:8A:60:D8:17:D7 SupportedInstances: 0x04
+[CHG] Controller B8:8A:60:D8:17:D7 ActiveInstances: 0x01
+Advertising object registered
+Tx Power: off
+Name: off
+Apperance: off
+Discoverable: off
+[bluetooth]#
+
+bluetoothd[6103]: src/advertising.c:client_create() Adding proxy for
+/org/bluez/advertising
+bluetoothd[6103]: src/advertising.c:register_advertisement()
+Registered advertisement at path /org/bluez/advertising
+bluetoothd[6103]: src/advertising.c:refresh_adv() Refreshing
+advertisement: /org/bluez/advertising
+bluetoothd[6103]: src/advertising.c:add_adv_callback() Advertisement
+registered: /org/bluez/advertising
+
+
+> For reference, I have put below what I am currently  putting on the
+> org.bluez.LEAdvertisement1 interface.
+>
+> Thanks,
+> Barry
+>
+>
+> $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> org.freedesktop.DBus.ObjectManager GetManagedObjects
+> a{oa{sa{sv}}} 1 "/ukBaz/bluezero/advertisement1" 5
+> "org.freedesktop.DBus.Properties" 0
+> "org.freedesktop.DBus.Introspectable" 0 "org.freedesktop.DBus.Peer" 0
+> "org.freedesktop.DBus.ObjectManager" 0 "org.bluez.LEAdvertisement1" 6
+> "Type" s "broadcast" "ServiceUUIDs" as 0 "ManufacturerData" a{sv} 0
+> "SolicitUUIDs" as 0 "ServiceData" a{sv} 1 "FEAA" ay 18 16 8 3 117 107
+> 66 97 122 46 103 105 116 104 117 98 46 105 111 "IncludeTxPower" b
+> false
+
+Not sure if that is the problem but usually ObjectManager is suppose
+to be on the '/' (root) path.
+
+> $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> org.freedesktop.DBus.Properties GetAll s org.bluez.LEAdvertisement1
+> a{sv} 6 "Type" s "broadcast" "ServiceUUIDs" as 0 "ManufacturerData"
+> a{sv} 0 "SolicitUUIDs" as 0 "ServiceData" a{sv} 1 "FEAA" ay 18 16 8 3
+> 117 107 66 97 122 46 103 105 116 104 117 98 46 105 111
+> "IncludeTxPower" b false
+>
+> $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> org.freedesktop.DBus.Introspectable Introspect
+> s "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object
+> Introspection 1.0//EN\"\n
+> \"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n<!--
+> GDBus 2.60.4 -->\n<node>\n  <interface
+> name=\"org.freedesktop.DBus.Properties\">\n    <method name=\"Get\">\n
+>      <arg type=\"s\" name=\"interface_name\" direction=\"in\"/>\n
+> <arg type=\"s\" name=\"property_name\" direction=\"in\"/>\n      <arg
+> type=\"v\" name=\"value\" direction=\"out\"/>\n    </method>\n
+> <method name=\"GetAll\">\n      <arg type=\"s\"
+> name=\"interface_name\" direction=\"in\"/>\n      <arg type=\"a{sv}\"
+> name=\"properties\" direction=\"out\"/>\n    </method>\n    <method
+> name=\"Set\">\n      <arg type=\"s\" name=\"interface_name\"
+> direction=\"in\"/>\n      <arg type=\"s\" name=\"property_name\"
+> direction=\"in\"/>\n      <arg type=\"v\" name=\"value\"
+> direction=\"in\"/>\n    </method>\n    <signal
+> name=\"PropertiesChanged\">\n      <arg type=\"s\"
+> name=\"interface_name\"/>\n      <arg type=\"a{sv}\"
+> name=\"changed_properties\"/>\n      <arg type=\"as\"
+> name=\"invalidated_properties\"/>\n    </signal>\n  </interface>\n
+> <interface name=\"org.freedesktop.DBus.Introspectable\">\n    <method
+> name=\"Introspect\">\n      <arg type=\"s\" name=\"xml_data\"
+> direction=\"out\"/>\n    </method>\n  </interface>\n  <interface
+> name=\"org.freedesktop.DBus.Peer\">\n    <method name=\"Ping\"/>\n
+> <method name=\"GetMachineId\">\n      <arg type=\"s\"
+> name=\"machine_uuid\" direction=\"out\"/>\n    </method>\n
+> </interface>\n  <interface
+> name=\"org.freedesktop.DBus.ObjectManager\">\n    <method
+> name=\"GetManagedObjects\">\n      <arg type=\"a{oa{sa{sv}}}\"
+> name=\"object_paths_interfaces_and_properties\" direction=\"out\">\n
+>    </arg>\n    </method>\n    <signal name=\"InterfacesAdded\">\n
+> <arg type=\"o\" name=\"object_path\">\n      </arg>\n      <arg
+> type=\"a{sa{sv}}\" name=\"interfaces_and_properties\">\n      </arg>\n
+>    </signal>\n    <signal name=\"InterfacesRemoved\">\n      <arg
+> type=\"o\" name=\"object_path\">\n      </arg>\n      <arg type=\"as\"
+> name=\"interfaces\">\n      </arg>\n    </signal>\n  </interface>\n
+> <interface name=\"org.bluez.LEAdvertisement1\">\n    <annotation
+> name=\"org.freedesktop.DBus.Properties.PropertiesChanged\"
+> value=\"const\">\n    </annotation>\n    <method name=\"Release\">\n
+>    <annotation name=\"org.freedesktop.DBus.Method.NoReply\"
+> value=\"true\">\n      </annotation>\n    </method>\n    <property
+> type=\"s\" name=\"Type\" access=\"read\">\n    </property>\n
+> <property type=\"as\" name=\"ServiceUUIDs\" access=\"read\">\n
+> </property>\n    <property type=\"a{sv}\" name=\"ManufacturerData\"
+> access=\"read\">\n    </property>\n    <property type=\"as\"
+> name=\"SolicitUUIDs\" access=\"read\">\n    </property>\n    <property
+> type=\"a{sv}\" name=\"ServiceData\" access=\"read\">\n
+> </property>\n    <property type=\"b\" name=\"IncludeTxPower\"
+> access=\"read\">\n    </property>\n  </interface>\n</node>\n"
+
+
 
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+Luiz Augusto von Dentz
