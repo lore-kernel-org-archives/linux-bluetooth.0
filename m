@@ -2,192 +2,174 @@ Return-Path: <SRS0=wIos=VP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACBCC7618F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 19:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED78C7618F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 20:06:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E91E4208C0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 19:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 957FA208C0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 20:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391043AbfGRTte (ORCPT
+        id S2391130AbfGRUGI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Jul 2019 15:49:34 -0400
-Received: from mga01.intel.com ([192.55.52.88]:43005 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727687AbfGRTte (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Jul 2019 15:49:34 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jul 2019 12:49:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,279,1559545200"; 
-   d="scan'208";a="168365567"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga008.fm.intel.com with ESMTP; 18 Jul 2019 12:49:33 -0700
-Received: from orsmsx156.amr.corp.intel.com (10.22.240.22) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 18 Jul 2019 12:49:33 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.44]) by
- ORSMSX156.amr.corp.intel.com ([169.254.8.199]) with mapi id 14.03.0439.000;
- Thu, 18 Jul 2019 12:49:33 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v2] mesh: Check address range passed to
- ImportRemoteNode
-Thread-Topic: [PATCH BlueZ v2] mesh: Check address range passed to
- ImportRemoteNode
-Thread-Index: AQHVPUZP/ksZ2wbj6ka2u2bAJxhfE6bRPp8A
-Date:   Thu, 18 Jul 2019 19:49:32 +0000
-Message-ID: <1563479370.8708.13.camel@intel.com>
-References: <20190718085327.9598-1-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190718085327.9598-1-michal.lowas-rzechonek@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.251.137.82]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9913AA1BD22D474B81E9B20568537E98@intel.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        Thu, 18 Jul 2019 16:06:08 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:59020 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728025AbfGRUGH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 18 Jul 2019 16:06:07 -0400
+Received: from [192.168.23.201] (unknown [157.25.100.178])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 76453CECD9;
+        Thu, 18 Jul 2019 22:14:40 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: HCI Set custom bandwidth for AuriStream SCO codec
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190718100939.bwl26qcfxe6ppcto@pali>
+Date:   Thu, 18 Jul 2019 22:06:03 +0200
+Cc:     Pavel Machek <pavel@ucw.cz>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <814EF218-4123-4C29-BECB-AF1B556C0F67@holtmann.org>
+References: <CABBYNZLJB0bK7o=Tvf9mhb5U41xAin6SdPY9=76AuEvpEiA_8g@mail.gmail.com>
+ <20190519082305.q7y4gpmdhvx3vzvo@pali>
+ <CABBYNZJKO07p-8ufP7=4WUYS1oLhnsKY_pnP6-0SbVzi=CYZsQ@mail.gmail.com>
+ <20190519212157.GB31403@amd> <20190607130245.mv4ch6dxnuptzdki@pali>
+ <ED456CCA-CF85-48D9-B7E9-9B0BF02A32FC@holtmann.org>
+ <20190708122512.qqfvtm455ltxxg3h@pali>
+ <E4A6E61C-DE37-4E5D-9401-71CCE4AE2419@holtmann.org>
+ <20190708210616.x2dlnzjhnplu37bz@pali>
+ <D0A44CC7-CABC-408A-894E-AAD700FA9B0D@holtmann.org>
+ <20190718100939.bwl26qcfxe6ppcto@pali>
+To:     =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGHFgiwNCg0KT24gVGh1LCAyMDE5LTA3LTE4IGF0IDEwOjUzICswMjAwLCBNaWNoYcWC
-IExvd2FzLVJ6ZWNob25layB3cm90ZToNCj4gK2FkZGVkIG1hY3JvIHRvIGNoZWNrIHVuaWNhc3Qg
-cmFuZ2VzDQo+ICtjaGFuZ2VkIG1lc2hfbmV0X2lzX2xvY2FsX2FkZHJlc3MgdG8gYWNjZXB0IGFk
-ZHJlc3MgcmFuZ2VzDQo+IA0KPiAtLS0NCj4gDQo+IFRoaXMgcGF0Y2ggcHJldmVudHMgdGhlIGFw
-cGxpY2F0b24gZnJvbSBtYW5hZ2luZyBkZXZpY2Uga2V5cyBmb3I6DQo+ICAtIG5vbi11bmljYXN0
-IGFkZHJlc3Nlcw0KPiAgLSB1bmljYXN0IGFkZHJlc3NlcyBvdmVybGFwcGluZyB3aXRoIGxvY2Fs
-IG5vZGUgYWRkcmVzcyByYW5nZQ0KPiAtLS0NCj4gIGRvYy9tZXNoLWFwaS50eHQgfCAgOCArKysr
-KysrKw0KPiAgbWVzaC9rZXlyaW5nLmMgICB8IDExICsrKysrKysrKysrDQo+ICBtZXNoL21hbmFn
-ZXIuYyAgIHwgMTAgKysrKysrKysrKw0KPiAgbWVzaC9tZXNoLWRlZnMuaCB8ICAxICsNCj4gIG1l
-c2gvbW9kZWwuYyAgICAgfCAgMiArLQ0KPiAgbWVzaC9uZXQuYyAgICAgICB8ICA3ICsrKysrLS0N
-Cj4gIG1lc2gvbmV0LmggICAgICAgfCAgMyArKy0NCj4gIDcgZmlsZXMgY2hhbmdlZCwgMzggaW5z
-ZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kb2MvbWVzaC1h
-cGkudHh0IGIvZG9jL21lc2gtYXBpLnR4dA0KPiBpbmRleCA3YzJhMWZhZmEuLmU1ZDI0NmFlNCAx
-MDA2NDQNCj4gLS0tIGEvZG9jL21lc2gtYXBpLnR4dA0KPiArKysgYi9kb2MvbWVzaC1hcGkudHh0
-DQo+IEBAIC02MDcsOSArNjA3LDEzIEBAIE1ldGhvZHM6DQo+ICANCj4gIAkJVGhpcyBjYWxsIGFm
-ZmVjdHMgdGhlIGxvY2FsIGJsdWV0b290aC1tZXNoZCBrZXkgZGF0YWJhc2Ugb25seS4NCj4gIA0K
-PiArCQlJdCBpcyBhbiBlcnJvciB0byBjYWxsIHRoaXMgd2l0aCBhZGRyZXNzIHJhbmdlIG92ZXJs
-YXBwaW5nDQo+ICsJCXdpdGggbG9jYWwgZWxlbWVudCBhZGRyZXNzZXMuDQo+ICsNCj4gIAkJUG9z
-c2libGVFcnJvcnM6DQo+ICAJCQlvcmcuYmx1ZXoubWVzaC5FcnJvci5GYWlsZWQNCj4gIAkJCW9y
-Zy5ibHVlei5tZXNoLkVycm9yLkludmFsaWRBcmd1bWVudHMNCj4gKwkJCW9yZy5ibHVlei5tZXNo
-LkVycm9yLk5vdEF1dGhvcml6ZWQNCj4gIA0KPiAgCXZvaWQgRGVsZXRlUmVtb3RlTm9kZSh1aW50
-MTYgcHJpbWFyeSwgdWludDggY291bnQpDQo+ICANCj4gQEAgLTYyNCw4ICs2MjgsMTIgQEAgTWV0
-aG9kczoNCj4gIA0KPiAgCQlUaGlzIGNhbGwgYWZmZWN0cyB0aGUgbG9jYWwgYmx1ZXRvb3RoLW1l
-c2hkIGtleSBkYXRhYmFzZSBvbmx5Lg0KPiAgDQo+ICsJCUl0IGlzIGFuIGVycm9yIHRvIGNhbGwg
-dGhpcyB3aXRoIGFkZHJlc3MgcmFuZ2Ugb3ZlcmxhcHBpbmcNCj4gKwkJd2l0aCBsb2NhbCBlbGVt
-ZW50IGFkZHJlc3Nlcy4NCj4gKw0KPiAgCQlQb3NzaWJsZUVycm9yczoNCj4gIAkJCW9yZy5ibHVl
-ei5tZXNoLkVycm9yLkludmFsaWRBcmd1bWVudHMNCj4gKwkJCW9yZy5ibHVlei5tZXNoLkVycm9y
-Lk5vdEF1dGhvcml6ZWQNCg0KDQpJIGFncmVlIHdpdGggdGhpcyBwYXRjaCBleGNlcHQgZm9yIHRo
-ZSBlcnJvcihzKSB0aHJvd24gKGhlcmUgYW5kIGFib3ZlKToNCg0KTm90QXV0aG9yaXplZCBtZWFu
-cyB0aGF0IHlvdSBhcmUgbm90IGF1dGhvcml6ZWQgdG8gbWFrZSBjaGFuZ2VzIHRvIHRoZSBrZXkg
-cmluZy4uLiAgSSB0aGluayBpbiB0aGlzDQpjYXNlIHRoaXMgaXMgc2ltcGx5IGFub3RoZXIgdmVy
-c2lvbiBvZiAiSW52YWxpZEFyZ3VtZW50cyIgYWx0aG91Z2ggd2l0aCBhIHN1Yi1tZXNzYWdlIG9m
-ICJPdmVybGFwcGluZw0KYWRkcmVzc2VzIiwgb3IgIlVuaWNhc3Qgb3V0IG9mIHJhbmdlIiBvciBz
-b21ldGhpbmcgbGlrZSB0aGF0Lg0KDQoNCj4gIA0KPiAgUHJvcGVydGllczoNCj4gIAlkaWN0IEZl
-YXR1cmVzIFtyZWFkLW9ubHldDQo+IGRpZmYgLS1naXQgYS9tZXNoL2tleXJpbmcuYyBiL21lc2gv
-a2V5cmluZy5jDQo+IGluZGV4IDNlYTgzMTk0Yy4uNGIzZDhiMjk2IDEwMDY0NA0KPiAtLS0gYS9t
-ZXNoL2tleXJpbmcuYw0KPiArKysgYi9tZXNoL2tleXJpbmcuYw0KPiBAQCAtMTI4LDYgKzEyOCw5
-IEBAIGJvb2wga2V5cmluZ19wdXRfcmVtb3RlX2Rldl9rZXkoc3RydWN0IG1lc2hfbm9kZSAqbm9k
-ZSwgdWludDE2X3QgdW5pY2FzdCwNCj4gIAlib29sIHJlc3VsdCA9IHRydWU7DQo+ICAJaW50IGZk
-LCBpOw0KPiAgDQo+ICsJaWYgKCFJU19VTklDQVNUX1JBTkdFKHVuaWNhc3QsIGNvdW50KSkNCj4g
-KwkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICAJaWYgKCFub2RlKQ0KPiAgCQlyZXR1cm4gZmFsc2U7
-DQo+ICANCj4gQEAgLTIxOCwxMCArMjIxLDE0IEBAIGJvb2wga2V5cmluZ19nZXRfcmVtb3RlX2Rl
-dl9rZXkoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDE2X3QgdW5pY2FzdCwNCj4gIAlib29s
-IHJlc3VsdCA9IGZhbHNlOw0KPiAgCWludCBmZDsNCj4gIA0KPiArCWlmICghSVNfVU5JQ0FTVCh1
-bmljYXN0KSkNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICAJaWYgKCFub2RlKQ0KPiAgCQly
-ZXR1cm4gZmFsc2U7DQo+ICANCj4gIAlub2RlX3BhdGggPSBub2RlX2dldF9zdG9yYWdlX2Rpcihu
-b2RlKTsNCj4gKw0KPiAgCXNucHJpbnRmKGtleV9maWxlLCBQQVRIX01BWCwgIiVzJXMvJTQuNHgi
-LCBub2RlX3BhdGgsIGRldl9rZXlfZGlyLA0KPiAgCQkJCQkJCQl1bmljYXN0KTsNCj4gIA0KPiBA
-QCAtMjgwLDEwICsyODcsMTQgQEAgYm9vbCBrZXlyaW5nX2RlbF9yZW1vdGVfZGV2X2tleShzdHJ1
-Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCB1bmljYXN0LA0KPiAgCWNoYXIga2V5X2ZpbGVb
-UEFUSF9NQVhdOw0KPiAgCWludCBpOw0KPiAgDQo+ICsJaWYgKCFJU19VTklDQVNUX1JBTkdFKHVu
-aWNhc3QsIGNvdW50KSkNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICAJaWYgKCFub2RlKQ0K
-PiAgCQlyZXR1cm4gZmFsc2U7DQo+ICANCj4gIAlub2RlX3BhdGggPSBub2RlX2dldF9zdG9yYWdl
-X2Rpcihub2RlKTsNCj4gKw0KPiAgCWZvciAoaSA9IDA7IGkgPCBjb3VudDsgaSsrKSB7DQo+ICAJ
-CXNucHJpbnRmKGtleV9maWxlLCBQQVRIX01BWCwgIiVzJXMvJTQuNHgiLCBub2RlX3BhdGgsDQo+
-ICAJCQkJCQlkZXZfa2V5X2RpciwgdW5pY2FzdCArIGkpOw0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9t
-YW5hZ2VyLmMgYi9tZXNoL21hbmFnZXIuYw0KPiBpbmRleCA3N2Q3Yjc1MTYuLjQxMGU1ZTFjMSAx
-MDA2NDQNCj4gLS0tIGEvbWVzaC9tYW5hZ2VyLmMNCj4gKysrIGIvbWVzaC9tYW5hZ2VyLmMNCj4g
-QEAgLTI4Miw2ICsyODIsNyBAQCBzdGF0aWMgc3RydWN0IGxfZGJ1c19tZXNzYWdlICppbXBvcnRf
-bm9kZV9jYWxsKHN0cnVjdCBsX2RidXMgKmRidXMsDQo+ICAJCQkJCQl2b2lkICp1c2VyX2RhdGEp
-DQo+ICB7DQo+ICAJc3RydWN0IG1lc2hfbm9kZSAqbm9kZSA9IHVzZXJfZGF0YTsNCj4gKwlzdHJ1
-Y3QgbWVzaF9uZXQgKm5ldCA9IG5vZGVfZ2V0X25ldChub2RlKTsNCj4gIAlzdHJ1Y3QgbF9kYnVz
-X21lc3NhZ2VfaXRlciBpdGVyX2tleTsNCj4gIAl1aW50MTZfdCBwcmltYXJ5Ow0KPiAgCXVpbnQ4
-X3QgbnVtX2VsZTsNCj4gQEAgLTI5Nyw2ICsyOTgsMTAgQEAgc3RhdGljIHN0cnVjdCBsX2RidXNf
-bWVzc2FnZSAqaW1wb3J0X25vZGVfY2FsbChzdHJ1Y3QgbF9kYnVzICpkYnVzLA0KPiAgCQlyZXR1
-cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfSU5WQUxJRF9BUkdTLA0KPiAgCQkJCQkJCSJC
-YWQgZGV2aWNlIGtleSIpOw0KPiAgDQo+ICsJaWYgKG1lc2hfbmV0X2lzX2xvY2FsX2FkZHJlc3Mo
-bmV0LCBwcmltYXJ5LCBudW1fZWxlKSkNCj4gKwkJcmV0dXJuIGRidXNfZXJyb3IobXNnLCBNRVNI
-X0VSUk9SX05PVF9BVVRIT1JJWkVELA0KPiArCQkJCQkiQ2Fubm90IG92ZXJ3cml0ZSBsb2NhbCBk
-ZXZpY2Uga2V5Iik7DQo+ICsNCj4gIAlpZiAoIWtleXJpbmdfcHV0X3JlbW90ZV9kZXZfa2V5KG5v
-ZGUsIHByaW1hcnksIG51bV9lbGUsIGtleSkpDQo+ICAJCXJldHVybiBkYnVzX2Vycm9yKG1zZywg
-TUVTSF9FUlJPUl9GQUlMRUQsIE5VTEwpOw0KPiAgDQo+IEBAIC0zMDgsMTIgKzMxMywxNyBAQCBz
-dGF0aWMgc3RydWN0IGxfZGJ1c19tZXNzYWdlICpkZWxldGVfbm9kZV9jYWxsKHN0cnVjdCBsX2Ri
-dXMgKmRidXMsDQo+ICAJCQkJCQl2b2lkICp1c2VyX2RhdGEpDQo+ICB7DQo+ICAJc3RydWN0IG1l
-c2hfbm9kZSAqbm9kZSA9IHVzZXJfZGF0YTsNCj4gKwlzdHJ1Y3QgbWVzaF9uZXQgKm5ldCA9IG5v
-ZGVfZ2V0X25ldChub2RlKTsNCj4gIAl1aW50MTZfdCBwcmltYXJ5Ow0KPiAgCXVpbnQ4X3QgbnVt
-X2VsZTsNCj4gIA0KPiAgCWlmICghbF9kYnVzX21lc3NhZ2VfZ2V0X2FyZ3VtZW50cyhtc2csICJx
-eSIsICZwcmltYXJ5LCAmbnVtX2VsZSkpDQo+ICAJCXJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVT
-SF9FUlJPUl9JTlZBTElEX0FSR1MsIE5VTEwpOw0KPiAgDQo+ICsJaWYgKG1lc2hfbmV0X2lzX2xv
-Y2FsX2FkZHJlc3MobmV0LCBwcmltYXJ5LCBudW1fZWxlKSkNCj4gKwkJcmV0dXJuIGRidXNfZXJy
-b3IobXNnLCBNRVNIX0VSUk9SX05PVF9BVVRIT1JJWkVELA0KPiArCQkJCQkiQ2Fubm90IHJlbW92
-ZSBsb2NhbCBkZXZpY2Uga2V5Iik7DQo+ICsNCj4gIAlrZXlyaW5nX2RlbF9yZW1vdGVfZGV2X2tl
-eShub2RlLCBwcmltYXJ5LCBudW1fZWxlKTsNCj4gIA0KPiAgCXJldHVybiBsX2RidXNfbWVzc2Fn
-ZV9uZXdfbWV0aG9kX3JldHVybihtc2cpOw0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9tZXNoLWRlZnMu
-aCBiL21lc2gvbWVzaC1kZWZzLmgNCj4gaW5kZXggNzliMzhjNTZjLi41Y2FiZjIyYzEgMTAwNjQ0
-DQo+IC0tLSBhL21lc2gvbWVzaC1kZWZzLmgNCj4gKysrIGIvbWVzaC9tZXNoLWRlZnMuaA0KPiBA
-QCAtODUsNiArODUsNyBAQA0KPiAgI2RlZmluZSBJU19VTkFTU0lHTkVEKHgpCSgoeCkgPT0gVU5B
-U1NJR05FRF9BRERSRVNTKQ0KPiAgI2RlZmluZSBJU19VTklDQVNUKHgpCQkoKCh4KSA+IFVOQVNT
-SUdORURfQUREUkVTUykgJiYgXA0KPiAgCQkJCQkoKHgpIDwgVklSVFVBTF9BRERSRVNTX0xPVykp
-DQo+ICsjZGVmaW5lIElTX1VOSUNBU1RfUkFOR0UoeCwgYykJKElTX1VOSUNBU1QoeCkgJiYgSVNf
-VU5JQ0FTVCh4ICsgYyAtIDEpKQ0KPiAgI2RlZmluZSBJU19WSVJUVUFMKHgpCQkoKCh4KSA+PSBW
-SVJUVUFMX0FERFJFU1NfTE9XKSAmJiBcDQo+ICAJCQkJCSgoeCkgPD0gVklSVFVBTF9BRERSRVNT
-X0hJR0gpKQ0KPiAgI2RlZmluZSBJU19HUk9VUCh4KQkJKCgoKHgpID49IEdST1VQX0FERFJFU1Nf
-TE9XKSAmJiBcDQo+IGRpZmYgLS1naXQgYS9tZXNoL21vZGVsLmMgYi9tZXNoL21vZGVsLmMNCj4g
-aW5kZXggNzg1YmVjYjVmLi41ZGQ0NjllMGQgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbW9kZWwuYw0K
-PiArKysgYi9tZXNoL21vZGVsLmMNCj4gQEAgLTg4Myw3ICs4ODMsNyBAQCBib29sIG1lc2hfbW9k
-ZWxfcngoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgYm9vbCBzem1pY3QsIHVpbnQzMl90IHNlcTAs
-DQo+ICAJCQkJCQlmb3J3YXJkLmRhdGEpOw0KPiAgCQkJZWxzZSBpZiAoZGVjcnlwdF9pZHggPT0g
-QVBQX0lEWF9ERVZfUkVNT1RFIHx8DQo+ICAJCQkJKGRlY3J5cHRfaWR4ID09IEFQUF9JRFhfREVW
-X0xPQ0FMICYmDQo+IC0JCQkJIG1lc2hfbmV0X2lzX2xvY2FsX2FkZHJlc3MobmV0LCBzcmMpKSkN
-Cj4gKwkJCQkgbWVzaF9uZXRfaXNfbG9jYWxfYWRkcmVzcyhuZXQsIHNyYywgMSkpKQ0KPiAgCQkJ
-CXNlbmRfZGV2X2tleV9tc2dfcmN2ZChub2RlLCBpLCBzcmMsIDAsDQo+ICAJCQkJCQlmb3J3YXJk
-LnNpemUsIGZvcndhcmQuZGF0YSk7DQo+ICAJCX0NCj4gZGlmZiAtLWdpdCBhL21lc2gvbmV0LmMg
-Yi9tZXNoL25ldC5jDQo+IGluZGV4IGY3ZjM3Njc1Yi4uYjczZDY2OGE5IDEwMDY0NA0KPiAtLS0g
-YS9tZXNoL25ldC5jDQo+ICsrKyBiL21lc2gvbmV0LmMNCj4gQEAgLTM4ODAsMTIgKzM4ODAsMTUg
-QEAgYm9vbCBtZXNoX25ldF9oYXZlX2tleShzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgdWludDE2X3Qg
-aWR4KQ0KPiAgCQkJCQkJTF9VSU5UX1RPX1BUUihpZHgpKSAhPSBOVUxMKTsNCj4gIH0NCj4gIA0K
-PiAtYm9vbCBtZXNoX25ldF9pc19sb2NhbF9hZGRyZXNzKHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1
-aW50MTZfdCBhZGRyKQ0KPiArYm9vbCBtZXNoX25ldF9pc19sb2NhbF9hZGRyZXNzKHN0cnVjdCBt
-ZXNoX25ldCAqbmV0LCB1aW50MTZfdCBzcmMsDQo+ICsJCQkJCQkJCXVpbnQxNl90IGNvdW50KQ0K
-PiAgew0KPiArCWNvbnN0IHVpbnQxNl90IGxhc3QgPSBzcmMgKyBjb3VudCAtIDE7DQo+ICAJaWYg
-KCFuZXQpDQo+ICAJCXJldHVybiBmYWxzZTsNCj4gIA0KPiAtCXJldHVybiAoYWRkciA+PSBuZXQt
-PnNyY19hZGRyICYmIGFkZHIgPD0gbmV0LT5sYXN0X2FkZHIpOw0KPiArCXJldHVybiAoc3JjID49
-IG5ldC0+c3JjX2FkZHIgJiYgc3JjIDw9IG5ldC0+bGFzdF9hZGRyKSAmJg0KPiArCQkJKGxhc3Qg
-Pj0gbmV0LT5zcmNfYWRkciAmJiBsYXN0IDw9IG5ldC0+bGFzdF9hZGRyKTsNCj4gIH0NCj4gIA0K
-PiAgdm9pZCBtZXNoX25ldF9zZXRfd2luZG93X2FjY3VyYWN5KHN0cnVjdCBtZXNoX25ldCAqbmV0
-LCB1aW50OF90IGFjY3VyYWN5KQ0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9uZXQuaCBiL21lc2gvbmV0
-LmgNCj4gaW5kZXggN2U2YWY4NzE0Li44MGI1NjFkNDIgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbmV0
-LmgNCj4gKysrIGIvbWVzaC9uZXQuaA0KPiBAQCAtMzU4LDcgKzM1OCw4IEBAIHVpbnQzMl90IG1l
-c2hfbmV0X2ZyaWVuZF90aW1lb3V0KHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50MTZfdCBhZGRy
-KTsNCj4gIHN0cnVjdCBtZXNoX2lvICptZXNoX25ldF9nZXRfaW8oc3RydWN0IG1lc2hfbmV0ICpu
-ZXQpOw0KPiAgc3RydWN0IG1lc2hfbm9kZSAqbWVzaF9uZXRfbm9kZV9nZXQoc3RydWN0IG1lc2hf
-bmV0ICpuZXQpOw0KPiAgYm9vbCBtZXNoX25ldF9oYXZlX2tleShzdHJ1Y3QgbWVzaF9uZXQgKm5l
-dCwgdWludDE2X3QgbmV0X2lkeCk7DQo+IC1ib29sIG1lc2hfbmV0X2lzX2xvY2FsX2FkZHJlc3Mo
-c3RydWN0IG1lc2hfbmV0ICpuZXQsIHVpbnQxNl90IGFkZHIpOw0KPiArYm9vbCBtZXNoX25ldF9p
-c19sb2NhbF9hZGRyZXNzKHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50MTZfdCBzcmMsDQo+ICsJ
-CQkJCQkJdWludDE2X3QgY291bnQpOw0KPiAgdm9pZCBtZXNoX25ldF9zZXRfd2luZG93X2FjY3Vy
-YWN5KHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50OF90IGFjY3VyYWN5KTsNCj4gIHZvaWQgbWVz
-aF9uZXRfdHJhbnNtaXRfcGFyYW1zX3NldChzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgdWludDhfdCBj
-b3VudCwNCj4gIAkJCQkJCQl1aW50MTZfdCBpbnRlcnZhbCk7
+Hi Pali,
+
+>>>>>>>>>>> to be honest, I would rather see WBS implementation finally
+>>>>>>>>>>> reach PA before we start digging into this.
+>>>>>>>>>> 
+>>>>>>>>>> First I want to finish improving A2DP codec support in pulseaudio. Later
+>>>>>>>>>> I can look at HSP/HFP profiles. Ideally it should have modular/plugin
+>>>>>>>>>> extensible design. So the aim is that adding new codec would be very
+>>>>>>>>>> simple, without need to hack something related to mSBC/WBC, AuriStream
+>>>>>>>>>> or any other codec.
+>>>>>>>>> 
+>>>>>>>>> Well HSP don't have support for codec negotiation, but yes a modular
+>>>>>>>>> design is probably recommended.
+>>>>>>>>> 
+>>>>>>>>>> But for AuriStream I need to set custom SCO parameters as described
+>>>>>>>>>> below and currently kernel does not support it. This is why I'm asking
+>>>>>>>>>> how kernel can export for userspace configuration of SCO parameters...
+>>>>>>>>> 
+>>>>>>>>> We can always come up with socket options but we got to see the value
+>>>>>>>>> it would bring since AuriStream don't look that popular among
+>>>>>>>>> headsets, at least Ive never seem any device advertising it like
+>>>>>>>>> apt-X, etc.
+>>>>>>>> 
+>>>>>>>> Pali clearly has such device and he is willing to work on it. Surely
+>>>>>>>> that means it is popular enough to be supported...?
+>>>>>>> 
+>>>>>>> Just put AT+CSRSF=0,0,0,0,0,7 to google search and you would see that
+>>>>>>> not only I have such device...
+>>>>>>> 
+>>>>>>> So I would really would like to see that kernel finally stops blocking
+>>>>>>> usage of this AuriStream codec.
+>>>>>> 
+>>>>>> we need to figure out on how we do the kernel API to allow you this specific setting.
+>>>>> 
+>>>>> Hi Marcel! Kernel API for userspace should be simple. Just add two
+>>>>> ioctls for retrieving and setting structure with custom parameters:
+>>>>> 
+>>>>> syncPktTypes = 0x003F
+>>>>> bandwidth = 4000
+>>>>> max_latency = 16
+>>>>> voice_settings = 0x63
+>>>>> retx_effort = 2
+>>>>> 
+>>>>> Or add more ioctls, one ioctl per parameter. There is already only ioctl
+>>>>> for voice settings and moreover it is whitelisted only for two values.
+>>>> 
+>>>> it is not that simple actually. Most profiles define a certain set of parameters and then they try to configure better settings and only fallback to a specification defined default as last resort.
+>>> 
+>>> Ok. I see that there is another "example" configuration for AuriStream
+>>> with just different syncPktTypes = 0x02BF and bandwidth = 3850.
+>>> 
+>>> So it really is not simple as it can be seen.
+>> 
+>> currently the stepping for mSBC and CVSD are hard-coded in esco_param_cvsd and esco_param_msbc arrays in hci_conn.c and then selected by the ->setting parameter.
+>> 
+>> So either we provide an new socket option (for example BT_VOICE_EXT) or we extend BT_VOICE to allow providing the needed information. However this needs to be flexible array size since we should then be able to encode multiple stepping that are tried in order.
+>> 
+>> My preference is that we extend BT_VOICE and not introduce a new socket option. So feel free to propose how we can load the full tables into the SCO socket. I mean we are not really far off actually. The only difference is that currently the tables are in the hci_conn.c file and selected by the provided voice->setting. However nothing really stops us from providing the full table via user space.
+> 
+> Ok. I will look at it and I will try to propose how to extend current
+> BT_VOICE ioctl API for supporting all those new parameters.
+> 
+>>>>>> We have kept is really simple since there was only CVSD and mSBC as of now.
+>>>>> 
+>>>>> Seems that custom codecs are already widely used, so it would be great
+>>>>> it Linux kernel allows to use also other codecs in future without need
+>>>>> to explicitly whitelist them.
+>>>> 
+>>>> This is an overstatement. I see only one custom codec being used. Unless you have heard from others. However as stated above, I think we need to provide an array of settings that are similar defined to what the HFP spec does. Then we just load the whole set into the kernel.
+>>> 
+>>> CVSD and mSBC are in use. IIRC specification also mandates ulaw a alaw
+>>> codecs but I have not seen it used. Has somebody tried to implement it?
+>>> I think just replacing voice_settings should be enough as encoding /
+>>> decoding should be done in bluetooth firmware / hardware.
+>>> 
+>>> And then there is AuriStream which based on google results it supported
+>>> by lot of headsets.
+>>> 
+>>> So at least 3 different codecs are widely supported by headset.
+>> 
+>> The ulaw and alaw air codecs are in theory possible, but nobody in the history of Bluetooth has used them. So just ignore that part of the specification. For air codecs you have either CVSD or transparent. And then with transparent you get mSBC and AuriStream.
+> 
+> More interesting question would be if alaw codec can be used in
+> transparent mode by transmitter and in "normal alaw" mode by receiver.
+> So it is possible to "tell" bluetooth chip "hey, I have already prepared
+> alaw or CVSD packets for you”?
+
+actually alaw is an over the air codec. Using it in transparent mode has no profile support. So while possible, it is not interoperable.
+
+> In Europe all landline phones (and also their SIP non-compressed
+> equivalents) use alaw codec. So ability to pass SIP alaw samples
+> directly to headset could increase quality of SIP calls. As currently
+> received alaw samples are converted to linear PCM, then send to
+> bluetooth chip which converts it into CVSD codec and finally bluetooth
+> headset converts CVSD to analog.
+
+Nice idea, but not worth the effort.
+
+>>>>>> I am also curious on what the assumptions are for the USB driver alternate settings are when using a different codec.
+>>>>> 
+>>>>> I did all above tests and kernel changes with USB bluetooth chip which
+>>>>> is integrated in notebook's combo bt+wifi intel minipci-e card.
+>>>> 
+>>>> Good to know. Since for mSBC in theory they need a new alternate settings that wasn’t really available.
+>>> 
+>>> I understood that both mSBC and AuriStream uses "transparent" mode of
+>>> transport and bluetooth chip itself does not know if it transmit mSBC or
+>>> AuriStream as it does not do any encoding…
+>> 
+>> That is true, but still for transparent codec they defined a new alternate setting for USB.
+> 
+> So is btintel/btusb already handles it? Or btusb needs to be patches for
+> "proper" support?
+
+It should handle it, but we only know when this is fully tested.
+
+Regards
+
+Marcel
+
