@@ -1,153 +1,65 @@
-Return-Path: <SRS0=OoMZ=VO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=wIos=VP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1989EC76192
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 21:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56720C76191
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 03:54:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E0D6B21783
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Jul 2019 21:14:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3530C206DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Jul 2019 03:54:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727543AbfGQVO1 (ORCPT
+        id S1728103AbfGRDyU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Jul 2019 17:14:27 -0400
-Received: from mga09.intel.com ([134.134.136.24]:34493 "EHLO mga09.intel.com"
+        Wed, 17 Jul 2019 23:54:20 -0400
+Received: from mga01.intel.com ([192.55.52.88]:33207 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727217AbfGQVO1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Jul 2019 17:14:27 -0400
+        id S1727544AbfGRDyU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 17 Jul 2019 23:54:20 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jul 2019 14:14:26 -0700
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jul 2019 20:54:20 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,275,1559545200"; 
-   d="scan'208";a="187637521"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga001.fm.intel.com with ESMTP; 17 Jul 2019 14:14:25 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.44]) by
- ORSMSX105.amr.corp.intel.com ([169.254.2.202]) with mapi id 14.03.0439.000;
- Wed, 17 Jul 2019 14:14:25 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>
-Subject: RE: [PATCH BlueZ v5 1/4] mesh: Add ImportLocalNode API documentation
-Thread-Topic: [PATCH BlueZ v5 1/4] mesh: Add ImportLocalNode API
- documentation
-Thread-Index: AQHVPHrRCovprh0e20KaiZ04C5sfCabPqkcAgAAC9gD//48igA==
-Date:   Wed, 17 Jul 2019 21:14:25 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4376CBD3539@ORSMSX103.amr.corp.intel.com>
-References: <20190717083650.26346-1-michal.lowas-rzechonek@silvair.com>
- <20190717083650.26346-2-michal.lowas-rzechonek@silvair.com>
- <915ea1c10883aaf1e4d42c5a749bfda964b54b51.camel@intel.com>
- <20190717194712.i4dtiwhldq2is2z2@kynes>
-In-Reply-To: <20190717194712.i4dtiwhldq2is2z2@kynes>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNWNlMDcwYWUtOGMzZC00NjM2LWJlNjItZjRiNDc1YTM5YmFiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiK0xXUktIUFMzWkxoekNlODVBZVFWVWZLZWlCK25aRFdMSmhkNE1OSXNObG1hU1BIeER1M0dpZmtQQnhWUjZnVCJ9
-x-originating-ip: [10.22.254.138]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+X-IronPort-AV: E=Sophos;i="5.64,276,1559545200"; 
+   d="scan'208";a="168148975"
+Received: from ingas-nuc1.sea.intel.com ([10.251.148.241])
+  by fmsmga008.fm.intel.com with ESMTP; 17 Jul 2019 20:54:20 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Allow sending on org.bluez.mesh.Provisioner1
+Date:   Wed, 17 Jul 2019 20:54:18 -0700
+Message-Id: <20190718035418.4952-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgSW5nYSAmIE1pY2hhbCwNCg0KPiBPbiAwNy8xNywgU3RvdGxhbmQsIEluZ2Egd3JvdGU6DQo+
-ID4gSSBmZWVsIGxpa2UgaGF2aW5nICJvYmplY3QgYXBwX3Jvb3QiIGlzIHVubmVjZXNzYXJ5IGFu
-ZCBhbHNvLCBjcmVhdGVzDQo+ID4gc29tZSBnbmFybHkgcGF0aHdheXMgd2l0aGluIHRoZSBjb2Rl
-Lg0KPiA+DQo+ID4gV2hhdCBleGFjdGx5IGlzIHRoZSBwcm9ibGVtIGZvciByZXF1aXJpbmcgdGhl
-IGNvbXBvc2l0aW9uIGRhdGEgdG8gYmUNCj4gPiBwYXJ0IG9mIHRoZSBpbXBvcnRfZGF0YT8gSXQn
-cyBqdXN0IHdlaXJkIHRvIHNheSAib2gsIGl0IG1heSBiZSB0aGVyZQ0KPiA+IG9yIGl0IG1heSBi
-ZSBub3QiLg0KPiANCj4gVGhlIG1haW4gaXNzdWUgbGllcyBvbiB0aGUgYXBwbGljYXRpb24gc2lk
-ZS4gSW4gb3JkZXIgdG8gcHJvcGVybHkgQXR0YWNoKCksIHRoZQ0KPiBhcHBsaWNhdGlvbiBtdXN0
-IGV4cG9zZSBlbGVtZW50IHN0cnVjdHVyZSB2aWEgRC1CdXMuDQoNCkkgdW5kZXJzdGFuZCB0aGlz
-IGNvbmNlcm4sIGJ1dCBJIHRoaW5rIEkgYW0gYWdyZWVpbmcgd2l0aCBJbmdhIG9uIHRoaXMgb25l
-Lg0KDQpBdCB0aGUgdGltZSBvZiBpbmNlcHRpb24sIE5vdCBvbmx5IHRoZSBQcm92IERhdGEgKG5l
-dCBrZXksIG5ldCBpZHgsIGl2IGluZGV4LCBmbGFncywgdW5pY2FzdCwgZGV2IGtleSkgbXVzdCBi
-ZSBwcmVzZW50LCBidXQgYWxzbyBzbyBtdXN0IHRoZSAiQ29tcG9zaXRpb24gRGF0YSIuLi4gIGFs
-bCBvZiB0aGUgZGF0YSB3aGljaCBpcyByZXR1cm5lZCBieSB0aGUgIkdFVCBDT01QT1NJVElPTiBE
-QVRBIiBvcGNvZGUuICBUaGlzIGRhdGEgbmVlZHMgdG8gYmUgcHJlc2VudCBhcyBzb29uIGFzIHRo
-ZSBQcm92aXNpb25lciBzdGFydHMgcXVlcnlpbmcgYW5kIHNldHRpbmcgc3RhdGVzIG9uIHRoZSAo
-bmV3IG9yIG1pZ3JhdGVkKSBmcmVzaCBub2RlLg0KDQpBbiBpbXBvcnRhbnQgcG9pbnQgdG8gcmVt
-ZW1iZXIgaGVyZSBpcyB0aGF0ICp0aGUgYXBwbGljYXRpb24gZG9lcyBub3QgbmVlZCB0byBiZSBh
-dHRhY2hlZCIgd2hpbGUgdGhlIHJlbW90ZSBQcm92aXNpb25lci9Db25maWdDbGllbnQgaXMgaW50
-ZXJhY3Rpbmcgd2l0aCB0aGUgbm9kZXMgQ29uZmlnIFNlcnZlci4gIE9uZSBvZiBvdXIgRGVzaWdu
-IEdvYWxzLCBpbiBmYWN0LCB3YXMgdGhhdCB0aGUgbm9kZSBhbHdheXMgZXhpc3RzIG9uIHRoZSBu
-ZXR3b3JrLCByZWdhcmRsZXNzIG9mIHdoZXRoZXIgdGhlIEFwcCBpcyBhdHRhY2hlZC4uLiAgVGhp
-cyBpcyB3aHkgdGhlIENvbmZpZyBTZXJ2ZXIgbW9kZWwgaXMgcGFydCBvZiB0aGUgZGFlbW9uLi4u
-LiAgIEl0IGlzIGFsd2F5cyAiT25MaW5lIi4NCg0KRm9yIHRoaXMgcmVhc29uLCBJIGFtIHN1cHBv
-cnRpbmcgSW5nYSBoZXJlLCB0aGF0IHRoZSBKU09OIGlucHV0IGZpbGUgc2hvdWxkIGNvbnRhaW4g
-ZXZlcnl0aGluZyBKYWt1YiBoYXMgaW5jbHVkZWQ6DQpEZXYgS2V5DQpOZXQgS2V5DQpOZXQgSW5k
-ZXgNCklWIEluZGV4DQpGbGFncw0KVW5pY2FzdCANCg0KKkFuZCogaXQgc2hvdWxkIGluY2x1ZGUg
-dGhlIHB1cmUgQ29tcG9zaXRpb24gRGF0YSBpbmNsdWRpbmcNCkNJRC9WSUQvUElEICAob3B0aW9u
-YWwgLi4gQ2FuIGJlIHNldCB3aXRoIEJsdWVaIGRlZmF1bHRzKQ0KQ1JQTCAgKG9wdGlvbmFsIC4u
-LiAgQ2FuIGJlIHNldCB3aXRoIGludGVybmFsIGRlZmF1bHRzKQ0KRmVhdHVyZXMgKG9wdGlvbmFs
-IC4uLiAgbWlzc2luZyBhcmUgY3JlYXRlZCBhcyBlaXRoZXIgIlVuc3VwcG9ydGVkIiBvciAiRGlz
-YWJsZWQiKQ0KYXJyYXkgb2YgRWxlbWVudHMsIGNvbnRhaW5pbmcgYXJyYXkgb2YgTW9kZWxzLiAo
-TWFuZGF0b3J5IC4uLiBOZWVkZWQgZm9yIENmZyBTZXJ2ZXIgdG8gZnVuY3Rpb24pDQoNClRoZSBh
-cHBsaWNhdGlvbiBoYXMgbm8gbmVlZCB0byBldmVuIGV4aXN0IGF0IHRoaXMgcG9pbnQsIGFzIGxv
-bmcgYXMgaXQgY2FuIGF0dGFjaCB0byB0aGUgdG9rZW4gYXQgc29tZSBwb2ludCBpbiB0aGUgZnV0
-dXJlLg0KQnV0IHRoaXMgKmRvZXMqIGVuYWJsZSB0aGUgYWJpbGl0eSB0byBoYXZlIGEgKmdlbmVy
-aWMqIGFwcGxpY2F0aW9uIHRoYXQgY2FuIGluamVjdCBub2RlcyAoZnVsbHkgY29uZmlndXJlZCwg
-b3IgIk5ldyIpIGludG8gdGhlIGRhZW1vbi4NCg0KQnV0IHdvcnJpZXMgdGhhdCB0aGUgQXBwIG1p
-Z2h0IG5vdCBpbW1lZGlhdGVseSBiZSBhYmxlIHRvICJBdHRhY2giIGdvIGF3YXkuDQoNCg0KDQo+
-IElmIHdlIHNheSB0aGF0IGl0IG11c3QgYWxzbyBkbyB0aGUgc2FtZSB2aWEgSlNPTiwgdG8gY2Fs
-bCBJbXBvcnRMb2NhbE5vZGUsIGl0DQo+IGxlYWRzIHRvIGNvZGUgZHVwbGljYXRpb24gb24gdGhl
-IGFwcGxpY2F0aW9uIHNpZGUuDQo+IA0KPiBNb3Jlb3ZlciwgdGhlIGFwcCBzdGlsbCBuZWVkcyB0
-byBiZSBxdWVyaWVkIHZpYSBELUJ1cyB0byBjaGVjayB0aGF0IHRoZSBwYXNzZWQNCj4gSlNPTiBt
-YXRjaGVzIHRoZSBELUJ1cyBzdHJ1Y3R1cmUgLSBvdGhlcndpc2UgdGhlIGFwcCB3b3VsZCB0aGVu
-IGZhaWwgdG8NCj4gQXR0YWNoKCkgYW5kIHRoZSB1c2VyIHdvdWxkIGJlIGluIGRlZXAgdHJvdWJs
-ZS4NCg0KVGhlIGNvbXBvc2l0aW9uIGFzIHJlZmxlY3RlZCBieSB0aGUgR2V0TWFuYWdlZE9iamVj
-dHMoKSBjYWxsIGlzICJzYW5pdHkgY2hlY2tlZCIgYWdhaW5zdCB0aGUgaW50ZXJuYWwgc3RvcmFn
-ZSAqZXZlcnkqIHRpbWUgdGhlIEFwcCBhdHRhY2hlcy4uLiAgSSB0aGluayBJbmdhIGlzIGNvbmNl
-cm5lZCB3aXRoIGNvZGUgY29tcGxleGl0eSBhbmQgYmxvYXQgdG8gcmVwZWF0IHRoaXMgZHVyaW5n
-IEltcG9ydExvY2FsTm9kZSgpLCBzaW1wbHkgYXMgYSAic2Vjb25kIHdheSIgYXR0YWluIHRoZSBj
-b21wb3NpdGlvbiBkYXRhLiAgVGhpcyBpcyBkaWZmZXJlbnQgZnJvbSB0aGUgSm9pbigpIGNhc2Us
-IGluIG15IG9waW5pb24sIHdoZXJlIHRoZSBKU09OIChvciBvdGhlciBzdG9yYWdlKSBpcyBiZWlu
-ZyBjcmVhdGVkICp0b3RhbGx5KiBmcm9tIHNjcmF0Y2gsIHZpYSB0aGUgcHJvdmlzaW9uaW5nIGlu
-dGVyYWN0aW9uIHdpdGggdGhlIHJlbW90ZSBQcm92aXNpb25lci4gSW4gdGhhdCBjYXNlLCB5ZXMu
-Li4gdGhlICJvd25pbmcgYXBwbGljYXRpb24iIG5lZWRzIHRvIGJlIHByZXNlbnQgb24gdGhlIEQt
-QnVzLg0KDQogDQo+ID4gR2V0dGluZyByaWQgb2YgdGhlIGFwcF9yb290IGFuZCBtYW5kYXRpbmcg
-dGhlIGNvbXBvc2l0aW9uIHRvIGJlIHBhcnQNCj4gPiBvZiB0aGUgaW1wb3J0X2RhdGEgYWxsb3dz
-Og0KPiA+DQo+ID4gMSkgQXZvaWQgY2hlY2tpbmcgd2hldGhlciB0aGlzIGlzIGEgImZ1bGwiIGNv
-bmZpZ3VyYXRpb24gb3IgdGhlDQo+ID4gIm1pbmltYWwiIG9uZQ0KPiANCj4gSSdtIG5vdCBjb252
-aW5jZWQgdGhhdCB0aGUgImZ1bGwiIGNvbmZpZ3VyYXRpb24gaXMgZXZlbiBuZWVkZWQuIFdlIGNl
-cnRhaW50bHkNCj4gZG9uJ3QgdXNlIGl0IGluIG91ciB1c2UgY2FzZSwgYnV0IGl0IG1pZ2h0IGJl
-IHJlcXVpcmVkIGluIHRoZSBmdXR1cmUuDQoNCldlICpkZWZpbml0ZWx5KiBuZWVkIGFuIG9wdGlv
-biBmb3IgaW1wb3J0aW5nL21pZ3JhdGluZyBhIGZ1bGx5IGNvbmZpZ3VyZWQgbm9kZS4gIFBob25l
-cyBhcmUgcmV0aXJlZCBhbmQgcmVwbGFjZWQuLi4gV29ya3N0YXRpb25zIGFyZSByZXRpcmVkIGFu
-ZCByZXBsYWNlZC4uLiAgU29tZSBub2RlcyBwdWJsaWNhdGlvbnMgd2lsbCBpbmV2aXRhYmx5IG5l
-ZWQgdG8gcGljayB1cCB0aGUgImN1cnJlbnQgY29udmVyc2F0aW9uIiB3aXRoIHRoZSBtaWdyYXRl
-ZCBub2RlLCB3aGVyZSB0aGUgb2xkIGNvbnZlcnNhdGlvbiBsZWZ0IG9mZi4gQW5kIHRoaXMgd2ls
-bCBhbG1vc3QgY2VydGFpbmx5IGJlIGEgcmFyZSAoYnV0IGltcG9ydGFudCkgb3BlcmF0aW9uLCBh
-bmQgYSAiVXRpbGl0eSIgYXBwbGljYXRpb24gdG8gcGVyZm9ybSB0aGUgb3BlcmF0aW9uICh0aGF0
-IGRvZXMgbm90IGl0c2VsZiBuZWVkIHRvIGhhdmUgdGhlIG1vZGVsL2VsZW1lbnQgYXJyYXlzIGlt
-cGxlbWVudGVkKSB3aWxsIGJlIGVhc2llciB0byB3cml0ZSBhbmQgbWFpbnRhaW4uDQoNCg0KPiAN
-Cj4gPiAyKSBFZmZpY2llbnRseSByZS11c2UgdGhlIGV4aXN0aW5nIGNvZGU6DQo+ID4gQWRkaW5n
-IGFuIEFQSSBjYWxsIGxpa2UgdGhpcyBvbmUgbWF5IGJlIHN1ZmZpY2llbnQNCj4gPg0KPiA+IG1l
-c2hfY29uZmlnX2ltcG9ydChjb25zdCBjaGFyICpjZmdfZGlyLA0KPiA+ICAgICAgICAgICAgICAg
-ICAgICBjb25zdCB1aW50OF90IHV1aWRbMTZdLA0KPiA+ICAgICAgICAgICAgICAgICAgICBjb25z
-dCB1aW50OCAqaW1wb3J0X2RhdGEsIDxpbXBvcnRfX2xlbj4/LA0KPiA+ICAgICAgICAgICAgICAg
-ICAgICBtZXNoX2NvbmZpZ19ub2RlX2Z1bmNfdCBjYiwNCj4gPiAgICAgICAgICAgICAgICAgICAg
-dm9pZCAqdXNlcl9kYXRhKQ0KPiA+DQo+ID4gV2UgY2FuIGp1c3QgcmUtZmFjdG9yIHRoZSBjb2Rl
-IHRoYXQgcGFyc2VzIGFuZCBwb3B1bGF0ZXMgYSBzaW5nbGUgbm9kZQ0KPiA+IGZyb20gdGhlIHN0
-b3JlZCBjb25maWd1cmF0aW9uLiB1c2VyX2RhdGEgbWF5IGNvbnRhaW4gd2hhdGV2ZXIgd2UgbmVl
-ZA0KPiA+IHRvIHByZXNlcnZlIGluIG9yZGVyIHRvIHJlc3BvbmQgdG8gZC1idXMgY2FsbC4NCj4g
-DQo+IEFmdGVyIHJlZmFjdG9yaW5nIG5vZGUgdmFsaWRhdGlvbiB0byBieXRlLWNvbXBhcmUgY29t
-cG9zaXRpb24gZGF0YSwgdGhlIGNvZGUNCj4gYWxzbyBiZWNvbWVzIHNpZ25pZmljYW50bHkgc2lt
-cGxlciwgYW5kIGV4ZWN1dGlvbiBwYXRocyBmb3IgSm9pbigpLCBBdHRhY2goKSwNCj4gQ3JlYXRl
-TmV0d29yaygpIGFuZCBJbXBvcnRMb2NhbE5vZGUoKSBjb252ZXJnZS4NCg0KQWdhaW4sIEkgY2Fu
-bm90IHRoaW5rIG9mIGFueSBzaXR1YXRpb25zIHdoZXJlIEpvaW4vQXR0YWNoL0NyZWF0ZSB3b3Vs
-ZCBldmVyIGV4aXN0IGluIHRoZSBhYnNlbmNlIG9mIHRoZSBBcHBsaWNhdGlvbi4NCg0KVGhpcyBp
-cyBhbiBlYXN5IGFuZCBvYnZpb3VzIHVzZSBjYXNlIHdpdGggSW1wb3J0Lg0KDQotLUJyaWFuDQo=
+This adds a new interface permission to bluetooth-mesh.conf:
+<allow send_interface="org.bluez.mesh.Provisioner1"/>
+---
+ mesh/bluetooth-mesh.conf | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mesh/bluetooth-mesh.conf b/mesh/bluetooth-mesh.conf
+index 28be7c649..7fbbd648e 100644
+--- a/mesh/bluetooth-mesh.conf
++++ b/mesh/bluetooth-mesh.conf
+@@ -13,6 +13,7 @@
+     <allow send_interface="org.bluez.mesh.Application1"/>
+     <allow send_interface="org.bluez.mesh.Element1"/>
+     <allow send_interface="org.bluez.mesh.ProvisionAgent1"/>
++    <allow send_interface="org.bluez.mesh.Provisioner1"/>
+   </policy>
+ 
+   <policy context="default">
+-- 
+2.21.0
+
