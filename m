@@ -2,36 +2,34 @@ Return-Path: <SRS0=sX4l=VT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_CSS,URIBL_CSS_A autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7738C76188
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 13:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0CEC76188
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 14:22:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4ECE21911
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 13:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9AC2217D6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 14:22:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728181AbfGVNgb convert rfc822-to-8bit (ORCPT
+        id S1730568AbfGVOWf convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Jul 2019 09:36:31 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:38228 "EHLO
+        Mon, 22 Jul 2019 10:22:35 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:39650 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727778AbfGVNga (ORCPT
+        by vger.kernel.org with ESMTP id S1730178AbfGVOWf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Jul 2019 09:36:30 -0400
+        Mon, 22 Jul 2019 10:22:35 -0400
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 6F84720501
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2019 13:36:30 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 7568128737
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2019 14:22:34 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 6360821BED; Mon, 22 Jul 2019 13:36:30 +0000 (UTC)
+        id 69EE728711; Mon, 22 Jul 2019 14:22:34 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204275] New: bluetoothd consumes 100% cpu on keyboard
- disconnect
-Date:   Mon, 22 Jul 2019 13:36:29 +0000
+Subject: [Bug 204275] bluetoothd consumes 100% cpu on keyboard disconnect
+Date:   Mon, 22 Jul 2019 14:22:28 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -44,10 +42,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-204275-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-204275-62941-OMnW1cnBXY@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204275-62941@https.bugzilla.kernel.org/>
+References: <bug-204275-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -61,43 +59,9 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=204275
 
-            Bug ID: 204275
-           Summary: bluetoothd consumes 100% cpu on keyboard disconnect
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 3.x +
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: steve@snewbury.org.uk
-        Regression: No
-
-Many bluetooth HID keyboard profile devices disconnect on idle to save power, I
-have two such devices:
-
-Logitech Y-X5A77 keyboard
-
-Sony PS3 bluetooth remote control
-
-When the device disconnects on idle the g_io_channels get disconnected
-
-bluetoothd[3167]: profiles/input/device.c:ctrl_watch_cb() Device
-00:07:61:F6:C9:7D disconnected
-bluetoothd[3167]: profiles/input/device.c:intr_watch_cb() Device
-00:07:61:F6:C9:7D disconnected
-
-But, something isn't closed properly (possibly g_io_add_watch) since bluetoothd
-then spins at 100% CPU in g_main_loop_run() until the device reconnects, at
-which point every works normally again until the device next idles.
-
-This bug has been present for at least 2 years, I'm certain it's much longer:
-
-https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1717796
+--- Comment #1 from Steven Newbury (steve@snewbury.org.uk) ---
+I've tried adding g_source_remove()s for ctrl_watch and intr_watch before
+shutting down the io channels but it doesn't make any difference.
 
 -- 
 You are receiving this mail because:
