@@ -2,33 +2,32 @@ Return-Path: <SRS0=sX4l=VT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_CSS,URIBL_CSS_A autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80BCDC7618F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 19:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 624B7C7618F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 20:54:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5EA0F20644
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 19:36:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B8FA218B8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Jul 2019 20:54:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728694AbfGVTgJ convert rfc822-to-8bit (ORCPT
+        id S1730476AbfGVUyq convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Jul 2019 15:36:09 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:43388 "EHLO
+        Mon, 22 Jul 2019 16:54:46 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:53656 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728176AbfGVTgJ (ORCPT
+        by vger.kernel.org with ESMTP id S1729622AbfGVUyq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Jul 2019 15:36:09 -0400
+        Mon, 22 Jul 2019 16:54:46 -0400
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id A8DCA2837D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2019 19:36:08 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id B2BE028498
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2019 20:54:45 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 9D24128497; Mon, 22 Jul 2019 19:36:08 +0000 (UTC)
+        id A74A1284DB; Mon, 22 Jul 2019 20:54:45 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 204275] bluetoothd consumes 100% cpu on keyboard disconnect
-Date:   Mon, 22 Jul 2019 19:36:06 +0000
+Date:   Mon, 22 Jul 2019 20:54:45 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -44,7 +43,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-204275-62941-B7R13OXBYG@https.bugzilla.kernel.org/>
+Message-ID: <bug-204275-62941-qOQ73orHFj@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-204275-62941@https.bugzilla.kernel.org/>
 References: <bug-204275-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -60,19 +59,21 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=204275
 
---- Comment #2 from Steven Newbury (steve@snewbury.org.uk) ---
-strace results in continuous repeating:
+--- Comment #3 from Steven Newbury (steve@snewbury.org.uk) ---
+Ahhh...
 
-poll([{fd=3, events=POLLIN}, {fd=6, events=POLLIN}, {fd=7, events=POLLIN},
-{fd=8, events=POLLIN}, {fd=10, events=POLLIN}, {fd=11, events=POLLIN}, {fd=12,
-events=POLLIN}, {fd=16, events=POLLIN}, {fd=17, events=POLLIN}, {fd=18,
-events=POLLIN}, {fd=19, events=POLLIN}, {fd=20, events=POLLIN}, {fd=21,
-events=POLLIN}, {fd=22, events=POLLIN}, {fd=23, events=POLLIN}, {fd=42,
-events=POLLIN}, {fd=43, events=POLLIN}, {fd=44, events=POLLIN}, {fd=45,
-events=POLLIN}, {fd=46, events=POLLIN}, {fd=47, events=POLLIN}, {fd=48,
-events=POLLIN}, {fd=49, events=POLLIN}, {fd=50, events=POLLIN}, {fd=51,
-events=POLLIN}, {fd=52, events=POLLIN}, {fd=53, events=POLLIN}, {fd=55,
-events=POLLOUT}], 28, -1) = 1 ([{fd=55, revents=POLLNVAL}])
+I was already aware that on first connect the HID input device wasn't created,
+but I hadn't realised it's part of the same bug.
+
+What's happening is that on initial connect:
+
+ dev->sec_watch = g_io_add_watch(idev->intr_io, G_IO_OUT,
+                                                        encrypt_notify, idev);
+
+creates the notify callback.  But it never triggers.  On second connection the
+callback gets triggered, but the connect code gets run again so another
+refcount is added.  This means the intr channel never gets closed which means
+it's stuck on the last event.
 
 -- 
 You are receiving this mail because:
