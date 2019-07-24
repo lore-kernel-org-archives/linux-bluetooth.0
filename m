@@ -2,126 +2,639 @@ Return-Path: <SRS0=wkNI=VV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD106C76186
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 19:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EE0C76186
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 21:00:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC181218F0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 19:12:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0394721873
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 21:00:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="zjNJzw6K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjKPf5ag"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728895AbfGXTMr (ORCPT
+        id S1727723AbfGXVAC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Jul 2019 15:12:47 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:37114 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726115AbfGXTMq (ORCPT
+        Wed, 24 Jul 2019 17:00:02 -0400
+Received: from mail-yw1-f53.google.com ([209.85.161.53]:40002 "EHLO
+        mail-yw1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726591AbfGXVAC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Jul 2019 15:12:46 -0400
-Received: by mail-lf1-f67.google.com with SMTP id c9so32670767lfh.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2019 12:12:45 -0700 (PDT)
+        Wed, 24 Jul 2019 17:00:02 -0400
+Received: by mail-yw1-f53.google.com with SMTP id b143so18539997ywb.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2019 14:00:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=5YwAIA0kuKzNKxzpxQq64RzoBMp/ErDL78MenJ/PqHw=;
-        b=zjNJzw6K4pNYGlMlKjfinpwXeAn4Ei23SVx4myStGMH14ivsrbn68sWvmw8vGazLh9
-         zeIjc8topHlGnpwA+aDjcA9h5JznuqF6oxlGePtYAnvUSMqWMotV0oBZ4YaSzVxc6wSO
-         RUWThM9NMipcp7yV9yEyEUcVvO5/QdamHgvsKr19FViio4zmTPnrlJkLCylpyqIUrBwR
-         P3v+qpCv1y1wOiSXL+yLLzc2GT9RrLiNcVuCCNCAI3ZxcywRIfnFRyVsCd12rPH2ZzPi
-         cgK2uHeiCmmx07rt3ztNAi3xZf7VaZ/dTa/vdkCKABkP+clM6ayqRrC1anpYBVTHq6dE
-         FA2g==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=9OJ+7aw68Uzti++7pU9UZBmhhdRyOW+x6BXk8LfIZDs=;
+        b=kjKPf5agYTnajemPzkHyb17wBqjHyspdsLwjz4bp6WEl0fhrRkF75wHsIrr4pzW1GR
+         EY8FBsZ+HrOmjRzr1jKRUBLeaa18qalAk0yLWKNUBpmmfzTS2N9y4kFsd4PYT3XBVlyd
+         RRxwtIGB2B7zSVivfyxW1+IoCftQUYgMw84Hj9ctQVcxO6juOqZ2Sth0sTwOawY7wecc
+         CTfoBb8ephmWaQtppzgjgMUTcrO4pCq7B3p+97Bu8Ph8EaIMd686Kzh9nV90wcJ9EXnb
+         A7JI1WRRPLdzX+5LVRZwubhAOvfMMJBSxfA8Nw+cGLCEmOng9KaTa4iV+TU/9PE16IwL
+         83SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=5YwAIA0kuKzNKxzpxQq64RzoBMp/ErDL78MenJ/PqHw=;
-        b=mSAs2rQZ64jNIax2r30dElaucAhhfo2HRdRviURoNcmnN3vx0TipRymsXQAWXs/tpr
-         Sgugk5t/b3xDjzV9haYWs+4ZTLxSmWAoMoLvSxrJLky88akhVyc98Xmk5cOi9Qs9zpRm
-         W8XGf23JZmFInNd5JzxqtHUJq4AwxMUJ8OGyaw6viYx45JSBlDmwD+wc7lqN0HEsDJwf
-         bTGko7O+LPaSqMLXHCBmeWCf08R9L0QK7Ta5Z05DwqJmu+tF9CrGWC0rXWKWcptj2QgN
-         6prp9sLy2CCi1pE+2EYUMnu7gCbz1wQLwgRjWo5+vbT0Tsyfn+eduSXch8hN/ShbT0Xr
-         veYQ==
-X-Gm-Message-State: APjAAAW4Eo6YSCH6UVMkiOkk2M0FfSSdfvwKpWUl/ehQGI/x9hFOT53W
-        dsrgJtk1YCdNuhhMTnE5BQkyDA==
-X-Google-Smtp-Source: APXvYqw9m2gQnhGc4RUVofKdIni1qSjy3pCV9pZdi3/vWDTnBMEnp11QiBj17p4ebnKshdjpCJ4D0g==
-X-Received: by 2002:a19:7616:: with SMTP id c22mr39988182lff.115.1563995564847;
-        Wed, 24 Jul 2019 12:12:44 -0700 (PDT)
-Received: from kynes (apn-95-40-32-72.dynamic.gprs.plus.pl. [95.40.32.72])
-        by smtp.gmail.com with ESMTPSA id m17sm8735037lji.16.2019.07.24.12.12.43
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 24 Jul 2019 12:12:43 -0700 (PDT)
-Date:   Wed, 24 Jul 2019 21:12:41 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v2 2/5] mesh: Validate application by comparing
- composition data
-Message-ID: <20190724191241.ad4vri23hs2zqyce@kynes>
-Mail-Followup-To: "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <20190723100623.6957-1-michal.lowas-rzechonek@silvair.com>
- <20190723100623.6957-3-michal.lowas-rzechonek@silvair.com>
- <164c441cf7b43a1be420444676417f77f88a86c4.camel@intel.com>
- <20190724075511.elmqslt5kb3u3p2m@mlowasrzechonek2133>
- <d880777698581163febad448e8b71c69ab4c0580.camel@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=9OJ+7aw68Uzti++7pU9UZBmhhdRyOW+x6BXk8LfIZDs=;
+        b=uFrH/XYrzE3fOCpwxGsnc+nqOb8lOAOQEHvlZw3eAqdVEMUF6OQ8kwPlL2pc8CdBql
+         BfuVWKC4qyPKpfo8rPHmUg6cQacwTkZxrxS5bmUnEddxsXyxaHo5alfjTIGOuwwNHlg6
+         Ox5nLQSG/93XK/Ok6lVigXhhHRm+0kuiEWc6PIDdXXsXGmsjvtc9cP4AaUSlco5IIfHM
+         jQrDM36FA7xT+3+FS1CH/DrS5lthTZ6uTs8FPPf+x6V4VYpxmT2EqAzqtcXRlVmvKCby
+         XuMTrMAbi2KPhv2/EnWupM7BBOcJy6NF22isDuJ33aQHyiYRXtNkw77597iGwQMv86z2
+         82bQ==
+X-Gm-Message-State: APjAAAVC0DCGbnNvjPl4xYhdr0SkAUCvpbGE+uB/cLHaAY6m33bUN6dQ
+        XtyCWExppP/4BqsCWnXnrLocnaX/+4eIZWCUhfC78Dx1
+X-Google-Smtp-Source: APXvYqw/oHf0zhf+IcOixDpeQvqrPDJMHOIC1LKsYCFKANAmZCsUCXZqlpniWUCBm4Ocyyp/TzTlX4pSB4PqUJ2lNaY=
+X-Received: by 2002:a81:9205:: with SMTP id j5mr48139766ywg.477.1564002000472;
+ Wed, 24 Jul 2019 14:00:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d880777698581163febad448e8b71c69ab4c0580.camel@intel.com>
-User-Agent: NeoMutt/20180716
+References: <CAAu3APas5syS3gYXN-BBqB=OcDZJjpPwND6qzOO1wSmbMq2U1Q@mail.gmail.com>
+ <CABBYNZ+W8dG7qgAe-2QYnSkyVG_1eA4KtMKHyXws0LWwB346Ow@mail.gmail.com>
+ <CAAu3APaPaDXBNsWcCUhNF2_sM_AxiKe5B6U1xtMOU9tYwpFS2g@mail.gmail.com>
+ <CAAu3APZ4n9Cc4RJ40Oca0iKchOSNifd=DbzHG_9XPtv9dr1+BQ@mail.gmail.com>
+ <CAAu3APYuQM84K=pRZc=G0q7kpuRkMBVbFw4pPzfJsVJ4YyrJzA@mail.gmail.com> <CABBYNZL5=f6xSyUL+8_pfdUBe-Y5f-hA_7-iYdL7bAi1_nJvLA@mail.gmail.com>
+In-Reply-To: <CABBYNZL5=f6xSyUL+8_pfdUBe-Y5f-hA_7-iYdL7bAi1_nJvLA@mail.gmail.com>
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Wed, 24 Jul 2019 21:59:49 +0100
+Message-ID: <CAAu3APb5wfo93pbSOedebF40AHPJNcPL0mdSfvsxpRn0Fyhrvg@mail.gmail.com>
+Subject: Re: DBus LEAdvertisement and Python
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+Hello Luiz,
 
-On 07/24, Stotland, Inga wrote:
-> > > So here, prior to removing the temorary node, the element paths
-> > > need to be copied into the "req->attach" version of the node.
-> > > Same goes for node->agent and node->provisioner.	
-> > 
-> > True, thanks! I'll fix this in v3.
-> 
-> Also, could you please add some comment there, like "Deleting the
-> temporary node" just to make the point that tit was temporary? I am
-> afraid that for an outside person this will not be clear why the node
-> is being removed.
+Thank you for your patience! I have something working (details below)
 
-Sure thing.
+On Wed, 24 Jul 2019 at 11:45, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Barry,
+>
+> On Wed, Jul 24, 2019 at 12:41 PM Barry Byford <31baz66@gmail.com> wrote:
+> >
+> > I have exhausted my ideas for debugging this issue. Using d-feet and
+> > various other utilities the creation of the beacon using python-dbus
+> > and pydbus looks identical. However, BlueZ doesn't seem to be able to
+> > parse the properties from LEAdvertisement1 when it is created with
+> > pydbus.
+> >
+> > It would be great if anyone has any ideas for what else to try.
+> > Have people had similar issues using DBus libraries in other languages?
+> >
+> > For reference, I have installed pydbus with "sudo pip3 install pydbus"
+> > I am running with BlueZ 5.50.
+> >
+> > The test code I am using is:
+> >
+> > <python3 code>
+> > import pydbus
+> > from gi.repository import GLib
+> >
+> >
+> > class Advertisement:
+> >     """
+> >     <node>
+> >         <interface name='org.bluez.LEAdvertisement1'>
+> >             <method name='Release'>
+> >                 <annotation name="org.freedesktop.DBus.Method.NoReply"
+> > value="true"/>
+> >             </method>
+> >             <annotation
+> > name="org.freedesktop.DBus.Properties.PropertiesChanged"
+> > value="const"/>
+> >             <property name="Type" type="s" access="read"/>
+> >             <property name="ServiceUUIDs" type="as" access="read"/>
+> >             <property name="ManufacturerData" type="a{sv}" access="read"/>
+>
+> Type here is wrong, it should be a{qv} see:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/advertising.c#n464
+>
+> Im surprised the daemon don't generate report an error? Or it does
+> register but it still doesn't advertise?
+>
+> >             <property name="SolicitUUIDs" type="as" access="read"/>
+> >             <property name="ServiceData" type="a{sv}" access="read"/>
+> >             <property name="IncludeTxPower" type="b" access="read"/>
+> >         </interface>
+> >     </node>
+> >     """
+> >     LE_ADVERTISEMENT_IFACE = 'org.bluez.LEAdvertisement1'
+> >
+> >     def Release(self):
+> >         pass
+> >
+> >     @property
+> >     def Type(self):
+> >         return 'broadcast'
+> >
+> >     @property
+> >     def SolicitUUIDs(self):
+> >         return []
+>
+> Don't include if empty.
+>
+> >     @property
+> >     def ServiceUUIDs(self):
+> >         return ['FEAA']
+> >
+> >     @property
+> >     def ServiceData(self):
+> >         return {'FEAA': GLib.Variant('ay', [0x10, 0x08, 0x03, 0x75,
+> > 0x6B, 0x42, 0x61,
+> >                          0x7A, 0x2e, 0x67, 0x69, 0x74, 0x68, 0x75,
+> >                          0x62, 0x2E, 0x69, 0x6F])}
+> >
+> >     @property
+> >     def IncludeTxPower(self):
+> >         return False
+> >
+> >     @property
+> >     def ManufacturerData(self):
+> >         return []
+>
+> Same here, don't include it empty.
+>
+> >
+> > class LEAdvertisement:
+> >     def __init__(self, service, object_path):
+> >         bus = pydbus.SystemBus()
+> >         bname = bus.request_name(service)
+> >         reg1 = bus.register_object(object_path, Advertisement(), None)
+> >
+> >
+> > class LEAdvertisingManager:
+> >     def __init__(self, object_path):
+> >         lea_iface = 'org.bluez.LEAdvertisingManager1'
+> >         bus = pydbus.SystemBus()
+> >         ad_manager = bus.get('org.bluez', '/org/bluez/hci0')[lea_iface]
+> >         ad_manager.RegisterAdvertisement(object_path, {})
+> >
+> >
+> > if __name__ == '__main__':
+> >     app_name = 'ukBaz.bluezero'
+> >     app_path = '/ukBaz/bluezero/advertisement0099'
+> >     LEAdvertisement(app_name, app_path)
+> >     LEAdvertisingManager(app_path)
+> >
+> >     loop = GLib.MainLoop()
+> >     try:
+> >         loop.run()
+> >     except KeyboardInterrupt:
+> >         print("\nStopping ...")
+> >         loop.quit()
+> >
+> > </python code>
+> >
+> > I have the following config to open the permissions up for this service name:
+> >
+> > $ more /etc/dbus-1/system.d/ukBaz.bluezero.conf
+> > <?xml version="1.0" encoding="UTF-8"?> <!-- -*- XML -*- -->
+> > <!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus
+> > Configuration 1.0//EN"
+> >  "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+> > <busconfig>
+> >
+> >   <!-- ../system.conf have denied everything, so we just punch some
+> > holes -->
+> >
+> >   <policy context="default">
+> >     <allow own="ukBaz.bluezero"/>
+> >     <allow send_destination="ukBaz.bluezero"
+> >            send_interface="org.freedesktop.DBus.Introspectable"/>
+> >     <allow send_type="method_call" log="true"/>
+> >
+> >   </policy>
+> >
+> > </busconfig>
+> >
+> >
+> > Feedback welcome.
+> >
+> > Cheers,
+> > Barry
+> >
+> >
+> > On Sat, 20 Jul 2019 at 17:44, Barry Byford <31baz66@gmail.com> wrote:
+> > >
+> > > Hello,
+> > >
+> > > I have done a little more investigation on this. The difference in
+> > > behaviour between the working library and the failing library comes
+> > > down to this line in the BlueZ source.
+> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/gdbus/client.c#n720
+> > > which is called from:
+> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c#n1020
+> > > It appears g_hash_table_lookup is returning NULL.
+> > > I am not familiar with C and have been doing this investigation with
+> > > fprintf statements. I don't know how to get the values of
+> > > "proxy->prop_list" and "name". Does anyone know how I can print these
+> > > values out?
+> > > Even better would be, if someone could point me at to what this
+> > > relates to in the Python LE Advertisement setup through DBus.
+> > > I've looked up the g_hash_table_lookup command:
+> > > https://developer.gnome.org/glib/stable/glib-Hash-Tables.html#g-hash-table-lookup
+> > > but this hasn't helped me.
+> > >
+> > > Thanks,
+> > > Barry
+> > >
+> > > On Thu, 18 Jul 2019 at 22:04, Barry Byford <31baz66@gmail.com> wrote:
+> > > >
+> > > > Hello Luiz,
+> > > >
+> > > > Thanks for the prompt response. Below are some updates following your input.
+> > > >
+> > > > On Thu, 18 Jul 2019 at 09:26, Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Barry,
+> > > > >
+> > > > > On Thu, Jul 18, 2019 at 10:03 AM Barry Byford <31baz66@gmail.com> wrote:
+> > > > > >
+> > > > > > Hello,
+> > > > > >
+> > > > > > The Python examples provided in the test directory of the BlueZ
+> > > > > > repository use the python-dbus library. Looking at the documentation
+> > > > > > of that library it does start by raising concerns and offering
+> > > > > > alternatives. I have been looking at some of the alternatives and am
+> > > > > > having difficultly getting them to work with BlueZ. I have been
+> > > > > > focusing on the org.bluez.LEAdvertisement1 interface.
+> > > > > >
+> > > > > > Looking at the documentation, it says the service, interface and
+> > > > > > object details are:
+> > > > > > Service org.bluez
+> > > > > > Interface org.bluez.LEAdvertisement1
+> > > > > > Object path freely definable
+> > > > > >
+> > > > > > I am not being successful at publishing to the org.bluez service. It
+> > > > > > is also not where the current examples publish to.
+> > > > > > Looking at the GattProfile1 documentation, it has service and object
+> > > > > > as application dependant.
+> > > > > > Service <application dependent>
+> > > > > > Interface org.bluez.GattProfile1
+> > > > > > Object path <application dependent>
+> > > > > > Should the documentation of Service on LEAdvertisement1 be freely
+> > > > > > definable also?
+> > > > >
+> > > > > Yep, the bus name is up to the application which usually don't
+> > > > > register a friendly name if you try to register with 'org.bluez' it
+> > > > > would probably conflict with the daemon itself so you wouldn't be able
+> > > > > to register that name anyway.
+> > > > >
+> > > > > > I have created the LEAdvertisement1 interface so that it has an
+> > > > > > ObjectManager and is introspectable. When I pass the object to
+> > > > > > RegisterAdvertisement on the org.bluez.LEAdvertisingManager1 interface
+> > > > > > it accepts it (does not give an error) but does not register the data
+> > > > > > and I see no advertisement appear. Is there somewhere I can find a
+> > > > > > more detailed description of what needs to be on the
+> > > > > > org.bluez.LEAdvertisement1 interface that will work with
+> > > > > > RegisterAdvertisement?
+> > > > >
+> > > > > Do you have the bluetoothd output when you register, I get the
+> > > > > following when using bluetoothctl:
+> > > > >
+> > > > > bluetooth]# power on
+> > > > > Changing power on succeeded
+> > > > > [bluetooth]# advertise on
+> > > > > [CHG] Controller B8:8A:60:D8:17:D7 SupportedInstances: 0x04
+> > > > > [CHG] Controller B8:8A:60:D8:17:D7 ActiveInstances: 0x01
+> > > > > Advertising object registered
+> > > > > Tx Power: off
+> > > > > Name: off
+> > > > > Apperance: off
+> > > > > Discoverable: off
+> > > > > [bluetooth]#
+> > > >
+> > > > Using the new dbus library I get:
+> > > > Log from bluetoothctl:
+> > > > [CHG] Controller FC:F8:AE:8F:0C:A4 SupportedInstances: 0x04
+> > > > [CHG] Controller FC:F8:AE:8F:0C:A4 ActiveInstances: 0x01
+> > > >
+> > > > From the bluetoothd log:
+> > > > bluetoothd[2856]: src/advertising.c:register_advertisement()
+> > > > RegisterAdvertisement
+> > > > bluetoothd[2856]: src/advertising.c:client_create() Adding proxy for
+> > > > /ukBaz/bluezero/advertisement1
+> > > > bluetoothd[2856]: src/advertising.c:register_advertisement()
+> > > > Registered advertisement at path /ukBaz/bluezero/advertisement1
+> > > > bluetoothd[2856]: src/advertising.c:refresh_adv() Refreshing
+> > > > advertisement: /ukBaz/bluezero/advertisement1
+> > > > bluetoothd[2856]: src/advertising.c:add_adv_callback() Advertisement
+> > > > registered: /ukBaz/bluezero/advertisement1
+> > > >
+> > > >
+> > > > With the old pyton-dbus library (that is working) I get:
+> > > > log from bluetoothctl:
+> > > > [CHG] Controller FC:F8:AE:8F:0C:A4 SupportedInstances: 0x04
+> > > > [CHG] Controller FC:F8:AE:8F:0C:A4 ActiveInstances: 0x01
+> > > >
+> > > > From the bluetoothd log:
+> > > > bluetoothd[2856]: src/advertising.c:register_advertisement()
+> > > > RegisterAdvertisement
+> > > > bluetoothd[2856]: src/advertising.c:client_create() Adding proxy for
+> > > > /ukBaz/bluezero/advertisement0001
+> > > > bluetoothd[2856]: src/advertising.c:register_advertisement()
+> > > > Registered advertisement at path /ukBaz/bluezero/advertisement0001
+> > > > bluetoothd[2856]: src/advertising.c:parse_service_uuids() Adding
+> > > > ServiceUUID: FEAA
+> > > > bluetoothd[2856]: src/advertising.c:parse_service_data() Adding
+> > > > ServiceData for FEAA
+> > > > bluetoothd[2856]: src/advertising.c:refresh_adv() Refreshing
+> > > > advertisement: /ukBaz/bluezero/advertisement0001
+> > > > bluetoothd[2856]: src/advertising.c:add_adv_callback() Advertisement
+> > > > registered: /ukBaz/bluezero/advertisement0001
+> > > >
+> > > >
+> > > > >
+> > > > > bluetoothd[6103]: src/advertising.c:client_create() Adding proxy for
+> > > > > /org/bluez/advertising
+> > > > > bluetoothd[6103]: src/advertising.c:register_advertisement()
+> > > > > Registered advertisement at path /org/bluez/advertising
+> > > > > bluetoothd[6103]: src/advertising.c:refresh_adv() Refreshing
+> > > > > advertisement: /org/bluez/advertising
+> > > > > bluetoothd[6103]: src/advertising.c:add_adv_callback() Advertisement
+> > > > > registered: /org/bluez/advertising
+> > > > >
+> > > > >
+> > > > > > For reference, I have put below what I am currently  putting on the
+> > > > > > org.bluez.LEAdvertisement1 interface.
+> > > > > >
+> > > > > > Thanks,
+> > > > > > Barry
+> > > > > >
+> > > > > >
+> > > > > > $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> > > > > > org.freedesktop.DBus.ObjectManager GetManagedObjects
+> > > > > > a{oa{sa{sv}}} 1 "/ukBaz/bluezero/advertisement1" 5
+> > > > > > "org.freedesktop.DBus.Properties" 0
+> > > > > > "org.freedesktop.DBus.Introspectable" 0 "org.freedesktop.DBus.Peer" 0
+> > > > > > "org.freedesktop.DBus.ObjectManager" 0 "org.bluez.LEAdvertisement1" 6
+> > > > > > "Type" s "broadcast" "ServiceUUIDs" as 0 "ManufacturerData" a{sv} 0
+> > > > > > "SolicitUUIDs" as 0 "ServiceData" a{sv} 1 "FEAA" ay 18 16 8 3 117 107
+> > > > > > 66 97 122 46 103 105 116 104 117 98 46 105 111 "IncludeTxPower" b
+> > > > > > false
+> > > > >
+> > > > > Not sure if that is the problem but usually ObjectManager is suppose
+> > > > > to be on the '/' (root) path.
+> > > >
+> > > > Good point. It is not clear (to me anyway) exactly what the
+> > > > requirement is from reading the spec
+> > > > https://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager
+> > > > I have moved the object manager to the root (/) but this does not seem
+> > > > to have changed anything.
+> > > >
+> > > > $ busctl call ukBaz.bluezero / org.freedesktop.DBus.ObjectManager
+> > > > GetManagedObjects
+> > > > a{oa{sa{sv}}} 1 "/ukBaz/bluezero/advertisement1" 4
+> > > > "org.freedesktop.DBus.Properties" 0
+> > > > "org.freedesktop.DBus.Introspectable" 0 "org.freedesktop.DBus.Peer" 0
+> > > > "org.bluez.LEAdvertisement1" 6 "Type" s "broadcast" "ServiceUUIDs" as
+> > > > 0 "ManufacturerData" a{sv} 0 "SolicitUUIDs" as 0 "ServiceData" a{sv} 1
+> > > > "FEAA" ay 18 16 8 3 117 107 66 97 122 46 103 105 116 104 117 98 46 105
+> > > > 111 "IncludeTxPower" b false
+> > > >
+> > > >
+> > > > >
+> > > > > > $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> > > > > > org.freedesktop.DBus.Properties GetAll s org.bluez.LEAdvertisement1
+> > > > > > a{sv} 6 "Type" s "broadcast" "ServiceUUIDs" as 0 "ManufacturerData"
+> > > > > > a{sv} 0 "SolicitUUIDs" as 0 "ServiceData" a{sv} 1 "FEAA" ay 18 16 8 3
+> > > > > > 117 107 66 97 122 46 103 105 116 104 117 98 46 105 111
+> > > > > > "IncludeTxPower" b false
+> > > > > >
+> > > >
+> > > > Using the d-feet application I did a GetAll on the advertisements and
+> > > > the data looks identical for both
+> > > > Using the new DBus library:
+> > > > {'IncludeTxPower': False,
+> > > >  'ManufacturerData': {},
+> > > >  'ServiceData': {'FEAA': [16,
+> > > >                           8,
+> > > >                           3,
+> > > >                           117,
+> > > >                           107,
+> > > >                           66,
+> > > >                           97,
+> > > >                           122,
+> > > >                           46,
+> > > >                           103,
+> > > >                           105,
+> > > >                           116,
+> > > >                           104,
+> > > >                           117,
+> > > >                           98,
+> > > >                           46,
+> > > >                           105,
+> > > >                           111]},
+> > > >  'ServiceUUIDs': ['FEAA'],
+> > > >  'SolicitUUIDs': [],
+> > > >  'Type': 'broadcast'}
+> > > >
+> > > > Using the old Python-dbus library:
+> > > > {'IncludeTxPower': False,
+> > > >  'ServiceData': {'FEAA': [16,
+> > > >                           8,
+> > > >                           3,
+> > > >                           117,
+> > > >                           107,
+> > > >                           66,
+> > > >                           97,
+> > > >                           122,
+> > > >                           46,
+> > > >                           103,
+> > > >                           105,
+> > > >                           116,
+> > > >                           104,
+> > > >                           117,
+> > > >                           98,
+> > > >                           46,
+> > > >                           105,
+> > > >                           111]},
+> > > >  'ServiceUUIDs': ['FEAA'],
+> > > >  'Type': 'broadcast'}
+> > > >
+> > > > > > $ busctl call ukBaz.bluezero /ukBaz/bluezero/advertisement1
+> > > > > > org.freedesktop.DBus.Introspectable Introspect
+> > > > > > s "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object
+> > > > > > Introspection 1.0//EN\"\n
+> > > > > > \"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n<!--
+> > > > > > GDBus 2.60.4 -->\n<node>\n  <interface
+> > > > > > name=\"org.freedesktop.DBus.Properties\">\n    <method name=\"Get\">\n
+> > > > > >      <arg type=\"s\" name=\"interface_name\" direction=\"in\"/>\n
+> > > > > > <arg type=\"s\" name=\"property_name\" direction=\"in\"/>\n      <arg
+> > > > > > type=\"v\" name=\"value\" direction=\"out\"/>\n    </method>\n
+> > > > > > <method name=\"GetAll\">\n      <arg type=\"s\"
+> > > > > > name=\"interface_name\" direction=\"in\"/>\n      <arg type=\"a{sv}\"
+> > > > > > name=\"properties\" direction=\"out\"/>\n    </method>\n    <method
+> > > > > > name=\"Set\">\n      <arg type=\"s\" name=\"interface_name\"
+> > > > > > direction=\"in\"/>\n      <arg type=\"s\" name=\"property_name\"
+> > > > > > direction=\"in\"/>\n      <arg type=\"v\" name=\"value\"
+> > > > > > direction=\"in\"/>\n    </method>\n    <signal
+> > > > > > name=\"PropertiesChanged\">\n      <arg type=\"s\"
+> > > > > > name=\"interface_name\"/>\n      <arg type=\"a{sv}\"
+> > > > > > name=\"changed_properties\"/>\n      <arg type=\"as\"
+> > > > > > name=\"invalidated_properties\"/>\n    </signal>\n  </interface>\n
+> > > > > > <interface name=\"org.freedesktop.DBus.Introspectable\">\n    <method
+> > > > > > name=\"Introspect\">\n      <arg type=\"s\" name=\"xml_data\"
+> > > > > > direction=\"out\"/>\n    </method>\n  </interface>\n  <interface
+> > > > > > name=\"org.freedesktop.DBus.Peer\">\n    <method name=\"Ping\"/>\n
+> > > > > > <method name=\"GetMachineId\">\n      <arg type=\"s\"
+> > > > > > name=\"machine_uuid\" direction=\"out\"/>\n    </method>\n
+> > > > > > </interface>\n  <interface
+> > > > > > name=\"org.freedesktop.DBus.ObjectManager\">\n    <method
+> > > > > > name=\"GetManagedObjects\">\n      <arg type=\"a{oa{sa{sv}}}\"
+> > > > > > name=\"object_paths_interfaces_and_properties\" direction=\"out\">\n
+> > > > > >    </arg>\n    </method>\n    <signal name=\"InterfacesAdded\">\n
+> > > > > > <arg type=\"o\" name=\"object_path\">\n      </arg>\n      <arg
+> > > > > > type=\"a{sa{sv}}\" name=\"interfaces_and_properties\">\n      </arg>\n
+> > > > > >    </signal>\n    <signal name=\"InterfacesRemoved\">\n      <arg
+> > > > > > type=\"o\" name=\"object_path\">\n      </arg>\n      <arg type=\"as\"
+> > > > > > name=\"interfaces\">\n      </arg>\n    </signal>\n  </interface>\n
+> > > > > > <interface name=\"org.bluez.LEAdvertisement1\">\n    <annotation
+> > > > > > name=\"org.freedesktop.DBus.Properties.PropertiesChanged\"
+> > > > > > value=\"const\">\n    </annotation>\n    <method name=\"Release\">\n
+> > > > > >    <annotation name=\"org.freedesktop.DBus.Method.NoReply\"
+> > > > > > value=\"true\">\n      </annotation>\n    </method>\n    <property
+> > > > > > type=\"s\" name=\"Type\" access=\"read\">\n    </property>\n
+> > > > > > <property type=\"as\" name=\"ServiceUUIDs\" access=\"read\">\n
+> > > > > > </property>\n    <property type=\"a{sv}\" name=\"ManufacturerData\"
+> > > > > > access=\"read\">\n    </property>\n    <property type=\"as\"
+> > > > > > name=\"SolicitUUIDs\" access=\"read\">\n    </property>\n    <property
+> > > > > > type=\"a{sv}\" name=\"ServiceData\" access=\"read\">\n
+> > > > > > </property>\n    <property type=\"b\" name=\"IncludeTxPower\"
+> > > > > > access=\"read\">\n    </property>\n  </interface>\n</node>\n"
+> > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Luiz Augusto von Dentz
 
-> > > "Location" property is described as optional in mesh-api.txt. It's
-> > > populated with "Default Location", if the property is not present.
-(...)
-> Let's try to keep it as optional then.
+I have had it explained to me that there is a blocking call in the
+pydbus library and there is a need to have two threads running.
+With that addition to the code I am able to create a beacon using the
+pydbus library.
+As this topic has come up before on the mailing list it seems
+appropriate to share the code I used to test this but make no claim
+this is the only or best solution.
 
-Will do.
+Thanks again.
 
-> This will require some *fuzzy* matching of the composition data,
-> something like:
-> add a boolean flag to generate_node_composition() that indicates
-> whether the composition is generated for the verification or as a
-> result of an external request, i.e. for the config server model. Based
-> on the flag, either include location field, or not.
-
-I don't think I follow. If the application doesn't provide the
-"Location" property, everything behaves as if it provided it with value
-"0", no?
-
-Location descriptor is *not* optional in Composition Data (Table 4.4 in
-section 4.2.1.1).
+<python3 code>
+import threading
+import pydbus
+from gi.repository import GLib
 
 
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+class Beacon:
+    """
+    <node>
+        <interface name='org.bluez.LEAdvertisement1'>
+            <method name='Release'>
+                <annotation name="org.freedesktop.DBus.Method.NoReply"
+value="true"/>
+            </method>
+            <annotation
+name="org.freedesktop.DBus.Properties.PropertiesChanged"
+value="const"/>
+            <property name="Type" type="s" access="read"/>
+            <property name="ServiceUUIDs" type="as" access="read"/>
+            <property name="ServiceData" type="a{sv}" access="read"/>
+            <property name="IncludeTxPower" type="b" access="read"/>
+            <property name="ManufacturerData" type="a{qv}" access="read"/>
+            <property name="SolicitUUIDs" type="as" access="read"/>
+        </interface>
+    </node>
+    """
+    LE_ADVERTISEMENT_IFACE = 'org.bluez.LEAdvertisement1'
+
+    def Release(self):
+        pass
+
+    @property
+    def Type(self):
+        return 'broadcast'
+
+    @property
+    def ServiceUUIDs(self):
+        return ['FEAA']
+
+    @property
+    def ServiceData(self):
+        return {'FEAA': pydbus.Variant('ay', [0x10, 0x08, 0x03, 0x75, 0x6B,
+                                              0x42, 0x61, 0x7A, 0x2e, 0x67,
+                                              0x69, 0x74, 0x68, 0x75, 0x62,
+                                              0x2E, 0x69, 0x6F])}
+
+    @property
+    def IncludeTxPower(self):
+        return False
+
+    @property
+    def ManufacturerData(self):
+        return []
+
+    @property
+    def SolicitUUIDs(self):
+        return []
+
+
+class LEAdvertisement:
+    def __init__(self, service, object_path):
+        bus = pydbus.SystemBus()
+        bname = bus.request_name(service)
+        reg1 = bus.register_object(object_path, Beacon(), None)
+
+
+class LEAdvertisingManager:
+    def __init__(self, object_path):
+        lea_iface = 'org.bluez.LEAdvertisingManager1'
+        bus = pydbus.SystemBus()
+        ad_manager = bus.get('org.bluez', '/org/bluez/hci0')[lea_iface]
+        ad_manager.RegisterAdvertisement(object_path, {})
+        print('Registered Ad')
+
+
+def publish_now():
+    print('Publishing Ad')
+    aloop = GLib.MainLoop()
+    aloop.run()
+
+
+def thread_function():
+    print('Starting thread')
+    LEAdvertisement(app_name, app_path)
+    publish_now()
+    print('thread finished')
+
+
+if __name__ == '__main__':
+    app_name = 'ukBaz.bluezero'
+    app_path = '/ukBaz/bluezero/advertisement0099'
+
+    loop = GLib.MainLoop()
+    x = threading.Thread(target=thread_function, daemon=True)
+    x.start()
+    LEAdvertisingManager(app_path)
+
+    try:
+        loop.run()
+    except KeyboardInterrupt:
+        print("\nStopping ...")
+        loop.quit()
+
+
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
