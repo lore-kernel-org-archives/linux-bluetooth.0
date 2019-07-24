@@ -2,81 +2,78 @@ Return-Path: <SRS0=wkNI=VV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC3DC7618B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 15:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1DBC7618B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 16:01:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58D8F20651
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 15:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DB912083B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Jul 2019 16:01:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728475AbfGXPbV convert rfc822-to-8bit (ORCPT
+        id S1727128AbfGXQBB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Jul 2019 11:31:21 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:47332 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727491AbfGXPbV (ORCPT
+        Wed, 24 Jul 2019 12:01:01 -0400
+Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:37423 "EHLO
+        8.mo3.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726308AbfGXQBB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Jul 2019 11:31:21 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 3056A286B8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2019 15:31:21 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 2AFD028908; Wed, 24 Jul 2019 15:31:21 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Wed, 24 Jul 2019 12:01:01 -0400
+X-Greylist: delayed 2314 seconds by postgrey-1.27 at vger.kernel.org; Wed, 24 Jul 2019 12:01:00 EDT
+Received: from player728.ha.ovh.net (unknown [10.109.160.62])
+        by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6AD34220263
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2019 17:22:25 +0200 (CEST)
+Received: from brouillet.org (bed84-1-78-229-93-161.fbx.proxad.net [78.229.93.161])
+        (Authenticated sender: postmaster@brouillet.org)
+        by player728.ha.ovh.net (Postfix) with ESMTPSA id DF02F83196C8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2019 15:22:24 +0000 (UTC)
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204275] bluetoothd consumes 100% cpu on keyboard disconnect
-Date:   Wed, 24 Jul 2019 15:31:20 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: steve@snewbury.org.uk
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-204275-62941-ywPEYHuvdl@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204275-62941@https.bugzilla.kernel.org/>
-References: <bug-204275-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+From:   Marcel Brouillet <marcel@brouillet.org>
+Subject: A2DP sound in ALSA vs PulseAudio
+Message-ID: <3babfac8-767d-5249-f6df-67bf60892d7b@brouillet.org>
+Date:   Wed, 24 Jul 2019 17:22:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: fr-classic
+X-Ovh-Tracer-Id: 8624674762922441804
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrkedtgdekvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecu
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=204275
+Hello,
 
---- Comment #7 from Steven Newbury (steve@snewbury.org.uk) ---
-(In reply to Luiz Von Dentz from comment #6)
-> Ive sent a fix upstream:
-> 
-> https://lore.kernel.org/linux-bluetooth/20190724110151.4258-1-luiz.
-> dentz@gmail.com/T/#u
-> 
-> Let me know if that works.
+I have enabled A2DP sinking on my Ubuntu 18.03 computer, and I am able 
+to stream sound from my phone to my PC. Pavucontrol sees a new device in 
+"Configuration", a new input in the "Input Devices" tab and a new item 
+in the "Playback" tab : "Loopback from xyz".
 
-That will prevent the channel getting left dangling, but it doesn't address the
-issue of the callback not happening on initial connect, which is AFAICT what
-results in that part of the bug for me.
+BUT there are no new devices shown in ALSA (result of aplay -l is 
+unchanged). It seems this is intentional by design, to only register the 
+new devices in Pulse Audio. I use Mixxx which lists ALSA devices.
 
-Is it really supposed to be waiting for G_IO_OUT?  It seems it only gets
-triggered for me when a second connection is attempted on the dangling channel,
-presumably during handshake..?
+Question : What is the best current way to get A2DP sound at ALSA level ?
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+I found relevant discussions :
+
+- https://stackoverflow.com/questions/12338621/a2dp-sink-without-pulseaudio
+
+- 
+https://forum.armbian.com/topic/6480-bluealsa-bluetooth-audio-using-alsa-not-pulseaudio/ 
+referencing a BluezAlsa project.
+
+Has any of the above been integrated in the core bluez (should I 
+recompile bluez with a config parameter) ?
+
+Is there any advocacy against listing the devices in ALSA ? or any 
+incompatibilities ?
+
+Thank you.
+
