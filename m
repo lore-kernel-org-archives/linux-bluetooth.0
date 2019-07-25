@@ -2,111 +2,123 @@ Return-Path: <SRS0=LIv6=VW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9432C7618B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 12:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C823C7618B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:04:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC35921951
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 12:59:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E31A522C7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:04:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729112AbfGYM7q convert rfc822-to-8bit (ORCPT
+        id S1729929AbfGYNEM convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jul 2019 08:59:46 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:50657 "EHLO
+        Thu, 25 Jul 2019 09:04:12 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42108 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbfGYM7q (ORCPT
+        with ESMTP id S1727031AbfGYNEL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jul 2019 08:59:46 -0400
+        Thu, 25 Jul 2019 09:04:11 -0400
 Received: from marcel-macbook.fritz.box (p5B3D2BA7.dip0.t-ipconnect.de [91.61.43.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A8EA1CEC82;
-        Thu, 25 Jul 2019 15:08:20 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 03654CECA3;
+        Thu, 25 Jul 2019 15:12:46 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] Bluetooth: hci_uart: check for missing tty operations in
- protocol handlers
+Subject: Re: KASAN: use-after-free Read in h5_rx_3wire_hdr
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190725120909.31235-1-vdronov@redhat.com>
-Date:   Thu, 25 Jul 2019 14:59:42 +0200
+In-Reply-To: <CACT4Y+bdU4O4zux4NAxqX5kVgcppDuLAiVxHpJ8TzLEXfAFvTQ@mail.gmail.com>
+Date:   Thu, 25 Jul 2019 15:04:09 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Suraj Sumangala <suraj@atheros.com>,
-        Frederic Danis <frederic.danis@linux.intel.com>,
-        Loic Poulain <loic.poulain@intel.com>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        syzkaller@googlegroups.com
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        syzbot <syzbot+0abbda0523882250a97a@syzkaller.appspotmail.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2E234F47-724D-4CFB-93B5-48E5BDA6F230@holtmann.org>
-References: <20190725120909.31235-1-vdronov@redhat.com>
-To:     Vladis Dronov <vdronov@redhat.com>
+Message-Id: <5A513494-AAFC-4AF6-9A0E-9271971A67C2@holtmann.org>
+References: <0000000000003fd4ab058e46951f@google.com>
+ <CACT4Y+YLqSt34ka5kQQNBeo+GvGZ0dzNFL3Rb8_1Cid_C75_2w@mail.gmail.com>
+ <500EB100-0253-4934-80FD-689C32ED310C@holtmann.org>
+ <CACT4Y+aRxn2Wgr7OuZRMb-PbvpJqbeLVUAkygUd_2y6+4u_5Jg@mail.gmail.com>
+ <9F8A3279-E5BE-4852-B099-7CD94A08C1CE@holtmann.org>
+ <CACT4Y+bdU4O4zux4NAxqX5kVgcppDuLAiVxHpJ8TzLEXfAFvTQ@mail.gmail.com>
+To:     Dmitry Vyukov <dvyukov@google.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vladis,
+Hi Dmitry,
 
-> Certain ttys operations (pty_unix98_ops) lack tiocmget() and tiocmset()
-> functions which are called by the certain HCI UART protocols (hci_ath,
-> hci_bcm, hci_intel, hci_mrvl, hci_qca) via hci_uart_set_flow_control()
-> or directly. This leads to an execution at NULL and can be triggered by
-> an unprivileged user. Fix this by adding a check for the missing tty
-> operations to the protocols which use them.
+>>>>>> syzbot found the following crash on:
+>>>>>> 
+>>>>>> HEAD commit:    6d21a41b Add linux-next specific files for 20190718
+>>>>>> git tree:       linux-next
+>>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=1377958fa00000
+>>>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=3430a151e1452331
+>>>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=0abbda0523882250a97a
+>>>>>> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+>>>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=113e2bb7a00000
+>>>>> 
+>>>>> +drivers/bluetooth/hci_h5.c maintainers
+>>>>> 
+>>>>>> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+>>>>>> Reported-by: syzbot+0abbda0523882250a97a@syzkaller.appspotmail.com
+>>>>>> 
+>>>>>> ==================================================================
+>>>>>> BUG: KASAN: use-after-free in h5_rx_3wire_hdr+0x35d/0x3c0
+>>>>>> /drivers/bluetooth/hci_h5.c:438
+>>>>>> Read of size 1 at addr ffff8880a161d1c8 by task syz-executor.4/12040
+>>>>>> 
+>>>>>> CPU: 1 PID: 12040 Comm: syz-executor.4 Not tainted 5.2.0-next-20190718 #41
+>>>>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>>>>>> Google 01/01/2011
+>>>>>> Call Trace:
+>>>>>> __dump_stack /lib/dump_stack.c:77 [inline]
+>>>>>> dump_stack+0x172/0x1f0 /lib/dump_stack.c:113
+>>>>>> print_address_description.cold+0xd4/0x306 /mm/kasan/report.c:351
+>>>>>> __kasan_report.cold+0x1b/0x36 /mm/kasan/report.c:482
+>>>>>> kasan_report+0x12/0x17 /mm/kasan/common.c:612
+>>>>>> __asan_report_load1_noabort+0x14/0x20 /mm/kasan/generic_report.c:129
+>>>>>> h5_rx_3wire_hdr+0x35d/0x3c0 /drivers/bluetooth/hci_h5.c:438
+>>>>>> h5_recv+0x32f/0x500 /drivers/bluetooth/hci_h5.c:563
+>>>>>> hci_uart_tty_receive+0x279/0x790 /drivers/bluetooth/hci_ldisc.c:600
+>>>>>> tiocsti /drivers/tty/tty_io.c:2197 [inline]
+>>>>>> tty_ioctl+0x949/0x14f0 /drivers/tty/tty_io.c:2573
+>>>>>> vfs_ioctl /fs/ioctl.c:46 [inline]
+>>>>>> file_ioctl /fs/ioctl.c:509 [inline]
+>>>>>> do_vfs_ioctl+0xdb6/0x13e0 /fs/ioctl.c:696
+>>>>>> ksys_ioctl+0xab/0xd0 /fs/ioctl.c:713
+>>>>>> __do_sys_ioctl /fs/ioctl.c:720 [inline]
+>>>>>> __se_sys_ioctl /fs/ioctl.c:718 [inline]
+>>>>>> __x64_sys_ioctl+0x73/0xb0 /fs/ioctl.c:718
+>>>>>> do_syscall_64+0xfd/0x6a0 /arch/x86/entry/common.c:296
+>>>>>> entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>>>>>> RIP: 0033:0x459819
+>>>>>> Code: fd b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7
+>>>>>> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
+>>>>>> ff 0f 83 cb b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+>>>>>> RSP: 002b:00007f7a3b459c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+>>>>>> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000459819
+>>>>>> RDX: 0000000020000080 RSI: 0000000000005412 RDI: 0000000000000003
+>>>>>> RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
+>>>>>> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f7a3b45a6d4
+>>>>>> R13: 00000000004c408a R14: 00000000004d7ff0 R15: 00000000ffffffff
+>>>> 
+>>>> Is this happening on specific hardware?
+>>> 
+>>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>> 
+>> funny ;)
+>> 
+>> I meant the Bluetooth chip on this machine.
 > 
-> This fixes CVE-2019-10207.
-> 
-> Link: https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
-> Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
-> Cc: stable@vger.kernel.org # v2.6.36+
-> Fixes: b3190df62861 ("Bluetooth: Support for Atheros AR300x serial chip")
-> Fixes: 118612fb9165 ("Bluetooth: hci_bcm: Add suspend/resume PM functions")
-> Fixes: ff2895592f0f ("Bluetooth: hci_intel: Add Intel baudrate configuration support")
-> Fixes: 162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
-> Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
-> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
-> ---
-> drivers/bluetooth/hci_ath.c   | 3 +++
-> drivers/bluetooth/hci_bcm.c   | 5 +++++
-> drivers/bluetooth/hci_intel.c | 3 +++
-> drivers/bluetooth/hci_mrvl.c  | 3 +++
-> drivers/bluetooth/hci_qca.c   | 4 ++++
-> 5 files changed, 18 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-> index a55be205b91a..99df8a13e47e 100644
-> --- a/drivers/bluetooth/hci_ath.c
-> +++ b/drivers/bluetooth/hci_ath.c
-> @@ -98,6 +98,9 @@ static int ath_open(struct hci_uart *hu)
-> 
-> 	BT_DBG("hu %p", hu);
-> 
-> +	if (!hu->tty->driver->ops->tiocmget || !hu->tty->driver->ops->tiocmset)
-> +		return -ENOTSUPP;
-> +
-> 	ath = kzalloc(sizeof(*ath), GFP_KERNEL);
-> 	if (!ath)
-> 		return -ENOMEM;
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 8905ad2edde7..8c3e09cc341c 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -406,6 +406,11 @@ static int bcm_open(struct hci_uart *hu)
-> 
-> 	bt_dev_dbg(hu->hdev, "hu %p", hu);
-> 
-> +#ifdef CONFIG_PM
-> +	if (!hu->tty->driver->ops->tiocmget || !hu->tty->driver->ops->tiocmset)
-> +		return -ENOTSUPP;
-> +#endif
-> +
+> I don't think there are any Bluetooth chips exposed in GCE VMs. I
+> would expect that this bug does not require any hardware to trigger.
 
-why is this one hidden behind CONFIG_PM? The general baud rate changes are independent of runtime power management support.
-
-And I would introduce a bool hci_uart_has_tiocm_support(struct hci_uart *) helper.
+then this might be also the same bug as the other missing drivers->ops checking. See https://lore.kernel.org/linux-bluetooth/2E234F47-724D-4CFB-93B5-48E5BDA6F230@holtmann.org/ for a proposed patch. However I have the feeling that hci_h5.c needs to be added to this as well.
 
 Regards
 
