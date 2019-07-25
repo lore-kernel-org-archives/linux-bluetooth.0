@@ -2,68 +2,157 @@ Return-Path: <SRS0=LIv6=VW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D75DC7618B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9A0C7618B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 14:26:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7A222238C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:13:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23BD021901
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 14:26:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728233AbfGYNNf convert rfc822-to-8bit (ORCPT
+        id S2388277AbfGYO0b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jul 2019 09:13:35 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41660 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725808AbfGYNNf (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jul 2019 09:13:35 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BC3A12881C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2019 13:13:34 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id B08FB289D1; Thu, 25 Jul 2019 13:13:34 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204275] bluetoothd consumes 100% cpu on keyboard disconnect
-Date:   Thu, 25 Jul 2019 13:13:34 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luiz.dentz@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-204275-62941-VEkpFT0qYt@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204275-62941@https.bugzilla.kernel.org/>
-References: <bug-204275-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 25 Jul 2019 10:26:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38346 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388214AbfGYO0b (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 25 Jul 2019 10:26:31 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 890383083047;
+        Thu, 25 Jul 2019 14:26:30 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FBA91001B09;
+        Thu, 25 Jul 2019 14:26:30 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 3132CE160;
+        Thu, 25 Jul 2019 14:26:30 +0000 (UTC)
+Date:   Thu, 25 Jul 2019 10:26:29 -0400 (EDT)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Suraj Sumangala <suraj@atheros.com>,
+        Frederic Danis <frederic.danis@linux.intel.com>,
+        Loic Poulain <loic.poulain@intel.com>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        syzkaller@googlegroups.com
+Message-ID: <74627941.4546902.1564064789961.JavaMail.zimbra@redhat.com>
+In-Reply-To: <2E234F47-724D-4CFB-93B5-48E5BDA6F230@holtmann.org>
+References: <20190725120909.31235-1-vdronov@redhat.com> <2E234F47-724D-4CFB-93B5-48E5BDA6F230@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: hci_uart: check for missing tty operations
+ in protocol handlers
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.43.2.29, 10.4.195.24]
+Thread-Topic: Bluetooth: hci_uart: check for missing tty operations in protocol handlers
+Thread-Index: gnD96eYXODpIBBKB1hw8FR4695NsjA==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Thu, 25 Jul 2019 14:26:30 +0000 (UTC)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=204275
+Hello, Marcel,
 
---- Comment #9 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
-Im not sure we even need the watch in the first place, the kernel should block
-any in/out until the connection is encrypted (BT_SK_SUSPEND) so it might be
-possible to get rid of sec_watch altogether.
+> why is this one hidden behind CONFIG_PM? The general baud rate changes are
+> independent of runtime power management support.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+hci_bcm calls hci_uart_set_flow_control() only from functions hidden behind
+#ifdef-CONFIG_PM (surely this can change in the future), and so without
+CONFIG_PM set it cannot hit the bug (as of now). So I've hidden the check
+for tiocm[gs]et() behind #ifdef-CONFIG_PM too.
+
+If you tell me it is better to remove this #ifdef, I'll remove it.
+
+> And I would introduce a bool hci_uart_has_tiocm_support(struct hci_uart *)
+> helper.
+
+Great, I will add it to the v2 fix. I guess a good place for it is hci_ldisc.c,
+near hci_uart_set_flow_control(), isn't it?
+
+Best regards,
+Vladis Dronov | Red Hat, Inc. | The Core Kernel | Senior Software Engineer
+
+----- Original Message -----
+> From: "Marcel Holtmann" <marcel@holtmann.org>
+> To: "Vladis Dronov" <vdronov@redhat.com>
+> Cc: "Johan Hedberg" <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, "Suraj
+> Sumangala" <suraj@atheros.com>, "Frederic Danis" <frederic.danis@linux.intel.com>, "Loic Poulain"
+> <loic.poulain@intel.com>, "Balakrishna Godavarthi" <bgodavar@codeaurora.org>, syzkaller@googlegroups.com
+> Sent: Thursday, July 25, 2019 2:59:42 PM
+> Subject: Re: [PATCH] Bluetooth: hci_uart: check for missing tty operations in protocol handlers
+> 
+> Hi Vladis,
+> 
+> > Certain ttys operations (pty_unix98_ops) lack tiocmget() and tiocmset()
+> > functions which are called by the certain HCI UART protocols (hci_ath,
+> > hci_bcm, hci_intel, hci_mrvl, hci_qca) via hci_uart_set_flow_control()
+> > or directly. This leads to an execution at NULL and can be triggered by
+> > an unprivileged user. Fix this by adding a check for the missing tty
+> > operations to the protocols which use them.
+> > 
+> > This fixes CVE-2019-10207.
+> > 
+> > Link:
+> > https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
+> > Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
+> > Cc: stable@vger.kernel.org # v2.6.36+
+> > Fixes: b3190df62861 ("Bluetooth: Support for Atheros AR300x serial chip")
+> > Fixes: 118612fb9165 ("Bluetooth: hci_bcm: Add suspend/resume PM functions")
+> > Fixes: ff2895592f0f ("Bluetooth: hci_intel: Add Intel baudrate
+> > configuration support")
+> > Fixes: 162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
+> > Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm
+> > Bluetooth chip wcn3990")
+> > Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+> > ---
+> > drivers/bluetooth/hci_ath.c   | 3 +++
+> > drivers/bluetooth/hci_bcm.c   | 5 +++++
+> > drivers/bluetooth/hci_intel.c | 3 +++
+> > drivers/bluetooth/hci_mrvl.c  | 3 +++
+> > drivers/bluetooth/hci_qca.c   | 4 ++++
+> > 5 files changed, 18 insertions(+)
+> > 
+> > diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+> > index a55be205b91a..99df8a13e47e 100644
+> > --- a/drivers/bluetooth/hci_ath.c
+> > +++ b/drivers/bluetooth/hci_ath.c
+> > @@ -98,6 +98,9 @@ static int ath_open(struct hci_uart *hu)
+> > 
+> > 	BT_DBG("hu %p", hu);
+> > 
+> > +	if (!hu->tty->driver->ops->tiocmget || !hu->tty->driver->ops->tiocmset)
+> > +		return -ENOTSUPP;
+> > +
+> > 	ath = kzalloc(sizeof(*ath), GFP_KERNEL);
+> > 	if (!ath)
+> > 		return -ENOMEM;
+> > diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> > index 8905ad2edde7..8c3e09cc341c 100644
+> > --- a/drivers/bluetooth/hci_bcm.c
+> > +++ b/drivers/bluetooth/hci_bcm.c
+> > @@ -406,6 +406,11 @@ static int bcm_open(struct hci_uart *hu)
+> > 
+> > 	bt_dev_dbg(hu->hdev, "hu %p", hu);
+> > 
+> > +#ifdef CONFIG_PM
+> > +	if (!hu->tty->driver->ops->tiocmget || !hu->tty->driver->ops->tiocmset)
+> > +		return -ENOTSUPP;
+> > +#endif
+> > +
+> 
+> why is this one hidden behind CONFIG_PM? The general baud rate changes are
+> independent of runtime power management support.
+> 
+> And I would introduce a bool hci_uart_has_tiocm_support(struct hci_uart *)
+> helper.
+> 
+> Regards
+> 
+> Marcel
