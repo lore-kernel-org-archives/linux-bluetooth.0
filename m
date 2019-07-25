@@ -2,115 +2,110 @@ Return-Path: <SRS0=LIv6=VW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EBAC7618B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 09:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C5BC7618B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 09:39:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4040B218EA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 09:23:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvtl5SCD"
+	by mail.kernel.org (Postfix) with ESMTP id 74FDF2190F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 09:39:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390398AbfGYJXF (ORCPT
+        id S2390624AbfGYJjf convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jul 2019 05:23:05 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:44766 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725808AbfGYJXF (ORCPT
+        Thu, 25 Jul 2019 05:39:35 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:34511 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387533AbfGYJjf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jul 2019 05:23:05 -0400
-Received: by mail-pg1-f194.google.com with SMTP id i18so22732308pgl.11;
-        Thu, 25 Jul 2019 02:23:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=6exXecWBG0k9kez9FGk7YSp5KXJbfwmTQdkFhgGKZo0=;
-        b=lvtl5SCD1CEWdcHEeiLXUeefZs2wHJFEVwWdhOuxL6yoQJQ2dVxK94HvSLL10hRLn8
-         CY5/8lhBKIIs8PSSGQVVO19ApVYQmKPJGD6VPxc8G+NGW99WNBTUPw83h9R9U2U/APPD
-         0JLH8d3KWVnIWqNCjOMatP3FH+JoXvcKYgUT1neIRVe0i8txKc8MSb/3YHffdoovlJ3u
-         3U6w4i7ISZzgGIlPO6UcOlMmsjGrIfPMckK2q+iu4zchp1P5u9dWC25Y6vYOBidkN/b4
-         XFDOb8hyvdj/Ok3LIncMurg+dP3AvEaMIZIwNcQZ7a2KQJUrnzOw1zEjoeG512lvwU7L
-         M+Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=6exXecWBG0k9kez9FGk7YSp5KXJbfwmTQdkFhgGKZo0=;
-        b=WIqXrGp3tAlntCjKHTfFhLcXjkfWuaual5eF9ZSJQUo6b63gy8PY4QTPMj/RWp0fH8
-         nOH+ASk8hr0bZoybyth3qPewxu5E/9UuxRBVXDGsRIi6Zv7e7MdPdn2mUJUCXGPfTZnW
-         QeAW67Ue3nd/FrvKaKU4eFJ6P0UMvIOdXjhdbFpRcyc/9ZAOF5OxbRLv9baCK+AYwXGi
-         BcePuyVHMqAl2JbD+7F+WJiJwL1JQt7bECDOR3+iDNKcOLl27OxV+YBnzD6xPx1/pcsU
-         qeqbFHXYd+DLr8thrk2ukDLE+XZi/YTewZXfykYjlBtuUcWZp9DNDEeJdcxaIvljA0S2
-         FHcQ==
-X-Gm-Message-State: APjAAAV1Da4kerPgKcoi4dnsZnF/B2PqXzJoktlhzaoWecJ0ZqUIPz/+
-        PqiK8dkTW2lKEWwk2ylUB+Q=
-X-Google-Smtp-Source: APXvYqwt5S251Ls8+WEXtgiOR2m0ZD3Z56AOdR4AQTJu22b6JGXpQi72qxEU3n7GR7KkY+NPG39i6A==
-X-Received: by 2002:a17:90b:f0e:: with SMTP id br14mr91707102pjb.117.1564046584280;
-        Thu, 25 Jul 2019 02:23:04 -0700 (PDT)
-Received: from oslab.tsinghua.edu.cn ([2402:f000:4:72:808::3ca])
-        by smtp.gmail.com with ESMTPSA id x9sm26549209pgp.75.2019.07.25.02.23.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Jul 2019 02:23:03 -0700 (PDT)
-From:   Jia-Ju Bai <baijiaju1990@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jia-Ju Bai <baijiaju1990@gmail.com>
-Subject: [PATCH] net: bluetooth: hci_sock: Fix a possible null-pointer dereference in hci_mgmt_cmd()
-Date:   Thu, 25 Jul 2019 17:22:53 +0800
-Message-Id: <20190725092253.15912-1-baijiaju1990@gmail.com>
-X-Mailer: git-send-email 2.17.0
+        Thu, 25 Jul 2019 05:39:35 -0400
+Received: from marcel-macbook.fritz.box (p5B3D2BA7.dip0.t-ipconnect.de [91.61.43.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 178D5CED29;
+        Thu, 25 Jul 2019 11:48:10 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH] net: bluetooth: hci_sock: Fix a possible null-pointer
+ dereference in hci_mgmt_cmd()
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190725092253.15912-1-baijiaju1990@gmail.com>
+Date:   Thu, 25 Jul 2019 11:39:32 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <BC138E23-E2FE-450E-B33E-1AD846D14687@holtmann.org>
+References: <20190725092253.15912-1-baijiaju1990@gmail.com>
+To:     Jia-Ju Bai <baijiaju1990@gmail.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In hci_mgmt_cmd(), there is an if statement on line 1570 to check
-whether hdev is NULL:
-    if (hdev && chan->hdev_init)
+Hi Jia-Ju,
 
-When hdev is NULL, it is used on line 1575:
-    err = handler->func(sk, hdev, cp, len);
+> In hci_mgmt_cmd(), there is an if statement on line 1570 to check
+> whether hdev is NULL:
+>    if (hdev && chan->hdev_init)
+> 
+> When hdev is NULL, it is used on line 1575:
+>    err = handler->func(sk, hdev, cp, len);
+> 
+> Some called functions of handler->func use hdev, such as:
+> set_appearance(), add_device() and remove_device() in mgmt.c.
+> 
+> Thus, a possible null-pointer dereference may occur.
+> 
+> To fix this bug, hdev is checked before calling handler->func().
+> 
+> This bug is found by a static analysis tool STCheck written by us.
+> 
+> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+> ---
+> net/bluetooth/hci_sock.c | 11 ++++++-----
+> 1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+> index d32077b28433..18ea1e47ea48 100644
+> --- a/net/bluetooth/hci_sock.c
+> +++ b/net/bluetooth/hci_sock.c
+> @@ -1570,11 +1570,12 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
+> 	if (hdev && chan->hdev_init)
+> 		chan->hdev_init(sk, hdev);
+> 
+> -	cp = buf + sizeof(*hdr);
+> -
+> -	err = handler->func(sk, hdev, cp, len);
+> -	if (err < 0)
+> -		goto done;
+> +	if (hdev) {
+> +		cp = buf + sizeof(*hdr);
+> +		err = handler->func(sk, hdev, cp, len);
+> +		if (err < 0)
+> +			goto done;
+> +	}
+> 
+> 	err = msglen;
 
-Some called functions of handler->func use hdev, such as:
-set_appearance(), add_device() and remove_device() in mgmt.c.
+have you evaluated the statement above:
 
-Thus, a possible null-pointer dereference may occur.
+        no_hdev = (handler->flags & HCI_MGMT_NO_HDEV);                           
+        if (no_hdev != !hdev) {                                                  
+                err = mgmt_cmd_status(sk, index, opcode,                         
+                                      MGMT_STATUS_INVALID_INDEX);                
+                goto done;                                                       
+        }
 
-To fix this bug, hdev is checked before calling handler->func().
+I think that code is just overly complex and can be simplified, but I doubt you get to the situation where hdev is NULL for any function that requires it. Only the handler->func marked with HCI_MGMT_NO_HDEV will get hdev == NULL and these are not using it.
 
-This bug is found by a static analysis tool STCheck written by us.
+So we might can make this easier code to really check the index != MGMT_INDEX_NONE check above to cover all cases to ensure that hdev is either valid or set to NULL before proceeding any further.
 
-Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
----
- net/bluetooth/hci_sock.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+And since we have a full set of unit tests in tools/mgmt-tester, I assume we would have had a chance to catch an issue like this. But we can add a test case to it to explicitly call the functions with either MGMT_INDEX_NONE used or not.
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index d32077b28433..18ea1e47ea48 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1570,11 +1570,12 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
- 	if (hdev && chan->hdev_init)
- 		chan->hdev_init(sk, hdev);
- 
--	cp = buf + sizeof(*hdr);
--
--	err = handler->func(sk, hdev, cp, len);
--	if (err < 0)
--		goto done;
-+	if (hdev) {
-+		cp = buf + sizeof(*hdr);
-+		err = handler->func(sk, hdev, cp, len);
-+		if (err < 0)
-+			goto done;
-+	}
- 
- 	err = msglen;
- 
--- 
-2.17.0
+Regards
+
+Marcel
 
