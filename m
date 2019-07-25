@@ -2,125 +2,68 @@ Return-Path: <SRS0=LIv6=VW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C823C7618B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D75DC7618B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:13:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E31A522C7C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:04:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7A222238C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Jul 2019 13:13:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729929AbfGYNEM convert rfc822-to-8bit (ORCPT
+        id S1728233AbfGYNNf convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Jul 2019 09:04:12 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42108 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727031AbfGYNEL (ORCPT
+        Thu, 25 Jul 2019 09:13:35 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:41660 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725808AbfGYNNf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Jul 2019 09:04:11 -0400
-Received: from marcel-macbook.fritz.box (p5B3D2BA7.dip0.t-ipconnect.de [91.61.43.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 03654CECA3;
-        Thu, 25 Jul 2019 15:12:46 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: KASAN: use-after-free Read in h5_rx_3wire_hdr
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACT4Y+bdU4O4zux4NAxqX5kVgcppDuLAiVxHpJ8TzLEXfAFvTQ@mail.gmail.com>
-Date:   Thu, 25 Jul 2019 15:04:09 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        syzbot <syzbot+0abbda0523882250a97a@syzkaller.appspotmail.com>
+        Thu, 25 Jul 2019 09:13:35 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id BC3A12881C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2019 13:13:34 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id B08FB289D1; Thu, 25 Jul 2019 13:13:34 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 204275] bluetoothd consumes 100% cpu on keyboard disconnect
+Date:   Thu, 25 Jul 2019 13:13:34 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-204275-62941-VEkpFT0qYt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204275-62941@https.bugzilla.kernel.org/>
+References: <bug-204275-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-Message-Id: <5A513494-AAFC-4AF6-9A0E-9271971A67C2@holtmann.org>
-References: <0000000000003fd4ab058e46951f@google.com>
- <CACT4Y+YLqSt34ka5kQQNBeo+GvGZ0dzNFL3Rb8_1Cid_C75_2w@mail.gmail.com>
- <500EB100-0253-4934-80FD-689C32ED310C@holtmann.org>
- <CACT4Y+aRxn2Wgr7OuZRMb-PbvpJqbeLVUAkygUd_2y6+4u_5Jg@mail.gmail.com>
- <9F8A3279-E5BE-4852-B099-7CD94A08C1CE@holtmann.org>
- <CACT4Y+bdU4O4zux4NAxqX5kVgcppDuLAiVxHpJ8TzLEXfAFvTQ@mail.gmail.com>
-To:     Dmitry Vyukov <dvyukov@google.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dmitry,
+https://bugzilla.kernel.org/show_bug.cgi?id=204275
 
->>>>>> syzbot found the following crash on:
->>>>>> 
->>>>>> HEAD commit:    6d21a41b Add linux-next specific files for 20190718
->>>>>> git tree:       linux-next
->>>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=1377958fa00000
->>>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=3430a151e1452331
->>>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=0abbda0523882250a97a
->>>>>> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
->>>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=113e2bb7a00000
->>>>> 
->>>>> +drivers/bluetooth/hci_h5.c maintainers
->>>>> 
->>>>>> IMPORTANT: if you fix the bug, please add the following tag to the commit:
->>>>>> Reported-by: syzbot+0abbda0523882250a97a@syzkaller.appspotmail.com
->>>>>> 
->>>>>> ==================================================================
->>>>>> BUG: KASAN: use-after-free in h5_rx_3wire_hdr+0x35d/0x3c0
->>>>>> /drivers/bluetooth/hci_h5.c:438
->>>>>> Read of size 1 at addr ffff8880a161d1c8 by task syz-executor.4/12040
->>>>>> 
->>>>>> CPU: 1 PID: 12040 Comm: syz-executor.4 Not tainted 5.2.0-next-20190718 #41
->>>>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
->>>>>> Google 01/01/2011
->>>>>> Call Trace:
->>>>>> __dump_stack /lib/dump_stack.c:77 [inline]
->>>>>> dump_stack+0x172/0x1f0 /lib/dump_stack.c:113
->>>>>> print_address_description.cold+0xd4/0x306 /mm/kasan/report.c:351
->>>>>> __kasan_report.cold+0x1b/0x36 /mm/kasan/report.c:482
->>>>>> kasan_report+0x12/0x17 /mm/kasan/common.c:612
->>>>>> __asan_report_load1_noabort+0x14/0x20 /mm/kasan/generic_report.c:129
->>>>>> h5_rx_3wire_hdr+0x35d/0x3c0 /drivers/bluetooth/hci_h5.c:438
->>>>>> h5_recv+0x32f/0x500 /drivers/bluetooth/hci_h5.c:563
->>>>>> hci_uart_tty_receive+0x279/0x790 /drivers/bluetooth/hci_ldisc.c:600
->>>>>> tiocsti /drivers/tty/tty_io.c:2197 [inline]
->>>>>> tty_ioctl+0x949/0x14f0 /drivers/tty/tty_io.c:2573
->>>>>> vfs_ioctl /fs/ioctl.c:46 [inline]
->>>>>> file_ioctl /fs/ioctl.c:509 [inline]
->>>>>> do_vfs_ioctl+0xdb6/0x13e0 /fs/ioctl.c:696
->>>>>> ksys_ioctl+0xab/0xd0 /fs/ioctl.c:713
->>>>>> __do_sys_ioctl /fs/ioctl.c:720 [inline]
->>>>>> __se_sys_ioctl /fs/ioctl.c:718 [inline]
->>>>>> __x64_sys_ioctl+0x73/0xb0 /fs/ioctl.c:718
->>>>>> do_syscall_64+0xfd/0x6a0 /arch/x86/entry/common.c:296
->>>>>> entry_SYSCALL_64_after_hwframe+0x49/0xbe
->>>>>> RIP: 0033:0x459819
->>>>>> Code: fd b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7
->>>>>> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
->>>>>> ff 0f 83 cb b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00
->>>>>> RSP: 002b:00007f7a3b459c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
->>>>>> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000459819
->>>>>> RDX: 0000000020000080 RSI: 0000000000005412 RDI: 0000000000000003
->>>>>> RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
->>>>>> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f7a3b45a6d4
->>>>>> R13: 00000000004c408a R14: 00000000004d7ff0 R15: 00000000ffffffff
->>>> 
->>>> Is this happening on specific hardware?
->>> 
->>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
->> 
->> funny ;)
->> 
->> I meant the Bluetooth chip on this machine.
-> 
-> I don't think there are any Bluetooth chips exposed in GCE VMs. I
-> would expect that this bug does not require any hardware to trigger.
+--- Comment #9 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+Im not sure we even need the watch in the first place, the kernel should block
+any in/out until the connection is encrypted (BT_SK_SUSPEND) so it might be
+possible to get rid of sec_watch altogether.
 
-then this might be also the same bug as the other missing drivers->ops checking. See https://lore.kernel.org/linux-bluetooth/2E234F47-724D-4CFB-93B5-48E5BDA6F230@holtmann.org/ for a proposed patch. However I have the feeling that hci_h5.c needs to be added to this as well.
-
-Regards
-
-Marcel
-
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
