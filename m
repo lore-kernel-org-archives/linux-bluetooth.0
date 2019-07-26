@@ -2,74 +2,111 @@ Return-Path: <SRS0=WgJd=VX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B454C76191
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 16:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2BFC7618F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 21:48:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 355E022CB9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 16:20:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B9782166E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 21:48:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728681AbfGZQUo (ORCPT
+        id S1726690AbfGZVsE convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Jul 2019 12:20:44 -0400
-Received: from mga17.intel.com ([192.55.52.151]:35967 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728611AbfGZQUo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Jul 2019 12:20:44 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jul 2019 09:20:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,311,1559545200"; 
-   d="scan'208";a="369576060"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga005.fm.intel.com with ESMTP; 26 Jul 2019 09:20:43 -0700
-Received: from orsmsx155.amr.corp.intel.com (10.22.240.21) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 26 Jul 2019 09:20:43 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.29]) by
- ORSMSX155.amr.corp.intel.com ([169.254.7.34]) with mapi id 14.03.0439.000;
- Fri, 26 Jul 2019 09:20:42 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ] mesh: Fix storage init of Friend and LPN features
-Thread-Topic: [PATCH BlueZ] mesh: Fix storage init of Friend and LPN features
-Thread-Index: AQHVQxZzbGACAeFtGU+0d+cTWCv6gqbdi06A
-Date:   Fri, 26 Jul 2019 16:20:42 +0000
-Message-ID: <1564158041.16999.3.camel@intel.com>
-References: <20190725182612.23401-1-inga.stotland@intel.com>
-In-Reply-To: <20190725182612.23401-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.105.75]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <43F27FDC9700F040AED2B3FA6F09AEA7@intel.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        Fri, 26 Jul 2019 17:48:04 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:43280 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726640AbfGZVsE (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Jul 2019 17:48:04 -0400
+Received: from marcel-macpro.fritz.box (p5B3D2BA7.dip0.t-ipconnect.de [91.61.43.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0B8A5CECD2;
+        Fri, 26 Jul 2019 23:56:40 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v2] Bluetooth: hci_ldisc: check for missing tty operations
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190726142628.20534-1-vdronov@redhat.com>
+Date:   Fri, 26 Jul 2019 23:48:02 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Suraj Sumangala <suraj@atheros.com>,
+        Frederic Danis <frederic.danis@linux.intel.com>,
+        Loic Poulain <loic.poulain@intel.com>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        syzkaller@googlegroups.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <62A82405-46E2-4921-BA52-D1660FC2DDDB@holtmann.org>
+References: <20190726142628.20534-1-vdronov@redhat.com>
+To:     Vladis Dronov <vdronov@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KDQpPbiBUaHUsIDIwMTktMDctMjUgYXQgMTE6MjYgLTA3MDAsIEluZ2EgU3RvdGxh
-bmQgd3JvdGU6DQo+IFRoaXMgZml4ZXMgYSB0eXBvIGluIG1lc2gtY29uZmlnLWpzb24uYyB3aGVu
-IEZyaWVuZCBmZWF0dXJlDQo+IHdhcyBpbml0aWFsaXplZCB0d2ljZSBhbmQgTFBOIHdhcyBub3Qg
-aW5pdGlhbGl6ZWQgYXQgYWxsLg0KPiAtLS0NCj4gIG1lc2gvbWVzaC1jb25maWctanNvbi5jIHwg
-MiArLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+
-IA0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9tZXNoLWNvbmZpZy1qc29uLmMgYi9tZXNoL21lc2gtY29u
-ZmlnLWpzb24uYw0KPiBpbmRleCA3NTAxNWU2MDcuLmUzYmFmNWRjNiAxMDA2NDQNCj4gLS0tIGEv
-bWVzaC9tZXNoLWNvbmZpZy1qc29uLmMNCj4gKysrIGIvbWVzaC9tZXNoLWNvbmZpZy1qc29uLmMN
-Cj4gQEAgLTExOTEsNyArMTE5MSw3IEBAIHN0YXRpYyB2b2lkIHBhcnNlX2ZlYXR1cmVzKGpzb25f
-b2JqZWN0ICpqY29uZmlnLCBzdHJ1Y3QgbWVzaF9jb25maWdfbm9kZSAqbm9kZSkNCj4gIAlpZiAo
-anNvbl9vYmplY3Rfb2JqZWN0X2dldF9leChqY29uZmlnLCAibG93UG93ZXIiLCAmanZhbHVlKSkg
-ew0KPiAgCQltb2RlID0gZ2V0X21vZGUoanZhbHVlKTsNCj4gIAkJaWYgKG1vZGUgPD0gTUVTSF9N
-T0RFX1VOU1VQUE9SVEVEKQ0KPiAtCQkJbm9kZS0+bW9kZXMuZnJpZW5kID0gbW9kZTsNCj4gKwkJ
-CW5vZGUtPm1vZGVzLmxwbiA9IG1vZGU7DQo+ICAJfQ0KPiAgDQo+ICAJaWYgKGpzb25fb2JqZWN0
-X29iamVjdF9nZXRfZXgoamNvbmZpZywgImJlYWNvbiIsICZqdmFsdWUpKSB7
+Hi Vladis,
+
+> Certain ttys operations (pty_unix98_ops) lack tiocmget() and tiocmset()
+> functions which are called by the certain HCI UART protocols (hci_ath,
+> hci_bcm, hci_intel, hci_mrvl, hci_qca) via hci_uart_set_flow_control()
+> or directly. This leads to an execution at NULL and can be triggered by
+> an unprivileged user. Fix this by adding a check for the missing tty
+> operations the same way it is done for write().
+> 
+> This fixes CVE-2019-10207. The Fixes: lines list commits where calls to
+> tiocm[gs]et() or hci_uart_set_flow_control() were added to the HCI UART
+> protocols.
+> 
+> Link: https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
+> Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
+> Cc: stable@vger.kernel.org # v2.6.36+
+> Fixes: c19483cc5e56 ("bluetooth: Fix missing NULL check")
+> Fixes: b3190df62861 ("Bluetooth: Support for Atheros AR300x serial chip")
+> Fixes: 118612fb9165 ("Bluetooth: hci_bcm: Add suspend/resume PM functions")
+> Fixes: ff2895592f0f ("Bluetooth: hci_intel: Add Intel baudrate configuration support")
+> Fixes: 162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
+> Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
+> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
+> ---
+> 
+> out-of-commit-message-note:
+> 
+> I believe, this is a good location for the check. This way we protect protocols
+> which does not call tiocm[gs]et() or hci_uart_set_flow_control() but may
+> change to call them in the future.
+> 
+> Also we do not need hci_uart_has_tiocm_support() helper now.
+> 
+> drivers/bluetooth/hci_ldisc.c | 7 ++++---
+> 1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index c84f985f348d..4a85c51d0307 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -459,10 +459,11 @@ static int hci_uart_tty_open(struct tty_struct *tty)
+> 
+> 	BT_DBG("tty %p", tty);
+> 
+> -	/* Error if the tty has no write op instead of leaving an exploitable
+> -	 * hole
+> +	/* Error if the tty has no write or tiocm[gs]et ops instead of leaving
+> +	 * an exploitable hole
+> 	 */
+> -	if (tty->ops->write == NULL)
+> +	if (tty->ops->write == NULL || tty->ops->tiocmget == NULL ||
+> +	    tty->ops->tiocmset == NULL)
+> 		return -EOPNOTSUPP;
+
+this means that you can not run hci_h4.c on any TTY anymore. For all the vendor specific ones, I agree, but H:4 is a Bluetooth SIG defined standard one that we might want to allow on any kind of TTY since it doesn’t really mandate anything.
+
+So I would prefer if we go with a hci_uart_has_tiocm_support helper for now. 
+
+Regards
+
+Marcel
+
