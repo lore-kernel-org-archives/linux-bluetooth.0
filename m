@@ -2,104 +2,89 @@ Return-Path: <SRS0=WgJd=VX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B159EC7618B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 14:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B70C7618B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 16:19:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9422E21850
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 14:26:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BACF321901
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 16:19:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727502AbfGZO0d (ORCPT
+        id S1727209AbfGZQTN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Jul 2019 10:26:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56390 "EHLO mx1.redhat.com"
+        Fri, 26 Jul 2019 12:19:13 -0400
+Received: from mga06.intel.com ([134.134.136.31]:7067 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727403AbfGZO0d (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Jul 2019 10:26:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CBABBC06511C;
-        Fri, 26 Jul 2019 14:26:32 +0000 (UTC)
-Received: from rules.brq.redhat.com (unknown [10.43.2.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B3B075FCC8;
-        Fri, 26 Jul 2019 14:26:30 +0000 (UTC)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     vdronov@redhat.com, Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Suraj Sumangala <suraj@atheros.com>,
-        Frederic Danis <frederic.danis@linux.intel.com>,
-        Loic Poulain <loic.poulain@intel.com>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        syzkaller@googlegroups.com
-Subject: [PATCH v2] Bluetooth: hci_ldisc: check for missing tty operations
-Date:   Fri, 26 Jul 2019 16:26:28 +0200
-Message-Id: <20190726142628.20534-1-vdronov@redhat.com>
+        id S1726007AbfGZQTM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Jul 2019 12:19:12 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jul 2019 09:19:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,311,1559545200"; 
+   d="scan'208";a="178446155"
+Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
+  by FMSMGA003.fm.intel.com with ESMTP; 26 Jul 2019 09:19:12 -0700
+Received: from orsmsx163.amr.corp.intel.com (10.22.240.88) by
+ ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 26 Jul 2019 09:19:11 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.29]) by
+ ORSMSX163.amr.corp.intel.com ([169.254.9.86]) with mapi id 14.03.0439.000;
+ Fri, 26 Jul 2019 09:19:11 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ v6 0/5] Use composition data to validate app
+ against the
+Thread-Topic: [PATCH BlueZ v6 0/5] Use composition data to validate app
+ against the
+Thread-Index: AQHVQ3xv74Pd99eOSEqLJUlSbe20V6bdihSA
+Date:   Fri, 26 Jul 2019 16:19:11 +0000
+Message-ID: <1564157949.16999.0.camel@intel.com>
+References: <20190726063606.19359-1-michal.lowas-rzechonek@silvair.com>
+In-Reply-To: <20190726063606.19359-1-michal.lowas-rzechonek@silvair.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.254.105.75]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E5323B9025B39244B6E006931A62B151@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 26 Jul 2019 14:26:33 +0000 (UTC)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Certain ttys operations (pty_unix98_ops) lack tiocmget() and tiocmset()
-functions which are called by the certain HCI UART protocols (hci_ath,
-hci_bcm, hci_intel, hci_mrvl, hci_qca) via hci_uart_set_flow_control()
-or directly. This leads to an execution at NULL and can be triggered by
-an unprivileged user. Fix this by adding a check for the missing tty
-operations the same way it is done for write().
-
-This fixes CVE-2019-10207. The Fixes: lines list commits where calls to
-tiocm[gs]et() or hci_uart_set_flow_control() were added to the HCI UART
-protocols.
-
-Link: https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
-Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
-Cc: stable@vger.kernel.org # v2.6.36+
-Fixes: c19483cc5e56 ("bluetooth: Fix missing NULL check")
-Fixes: b3190df62861 ("Bluetooth: Support for Atheros AR300x serial chip")
-Fixes: 118612fb9165 ("Bluetooth: hci_bcm: Add suspend/resume PM functions")
-Fixes: ff2895592f0f ("Bluetooth: hci_intel: Add Intel baudrate configuration support")
-Fixes: 162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
-Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
-Signed-off-by: Vladis Dronov <vdronov@redhat.com>
----
-
-out-of-commit-message-note:
-
-I believe, this is a good location for the check. This way we protect protocols
-which does not call tiocm[gs]et() or hci_uart_set_flow_control() but may
-change to call them in the future.
-
-Also we do not need hci_uart_has_tiocm_support() helper now.
-
- drivers/bluetooth/hci_ldisc.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index c84f985f348d..4a85c51d0307 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -459,10 +459,11 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 
- 	BT_DBG("tty %p", tty);
- 
--	/* Error if the tty has no write op instead of leaving an exploitable
--	 * hole
-+	/* Error if the tty has no write or tiocm[gs]et ops instead of leaving
-+	 * an exploitable hole
- 	 */
--	if (tty->ops->write == NULL)
-+	if (tty->ops->write == NULL || tty->ops->tiocmget == NULL ||
-+	    tty->ops->tiocmset == NULL)
- 		return -EOPNOTSUPP;
- 
- 	hu = kzalloc(sizeof(struct hci_uart), GFP_KERNEL);
--- 
-2.21.0
+UGF0Y2gtc2V0IGFwcGxpZWQNCg0KT24gRnJpLCAyMDE5LTA3LTI2IGF0IDA4OjM2ICswMjAwLCBN
+aWNoYcWCIExvd2FzLVJ6ZWNob25layB3cm90ZToNCj4gVGhhbmtzIGZvciB5b3VyIHBhdGllbmNl
+IDopDQo+IA0KPiArIEZpeCBicmFjZSBzdHlsZQ0KPiArIEZpeCBjb21tZW50IHN0eWxlDQo+ICsg
+Rml4IHR5cG8gd2hlbiBhc3NpZ25pbmcgZWxlbWVudCBwYXRocyBpbiBhdHRhY2hfcmVxX25vZGUN
+Cj4gKyBGaXggc2V0dGluZyBhcHBfcGF0aCBhbmQgb3duZXIgZHVyaW5nIEF0dGFjaCgpDQo+ICsg
+Rml4IHR5cG8gQ29tcGFueUlEIHByb3BlcnR5IHZhbGlkYXRpb24NCj4gKyBBZGRlZCBjb21tZW50
+cyBhYm91dCB0ZW1wb3Jhcnkgbm9kZSB1c2FnZSBkdXJpbmcgQXR0YWNoKCkNCj4gKyBLZWVwIGVs
+ZW1lbnQncyBMb2NhdGlvbiBwcm9wZXJ0eSBvcHRpb25hbCBhY2NvcmRpbmcgdG8gQVBJDQo+ICAg
+ZG9jdW1lbnRhdGlvbg0KPiANCj4gLS0tDQo+IA0KPiBUaGlzIHBhdGNoc2V0IHN0cmVhbWxpbmVz
+IGFwcCB2YWxpZGF0aW9uIGJ5IGNyZWF0aW5nIGEgdGVtcG9yYXJ5IG5vZGUNCj4gZHVyaW5nIEF0
+dGFjaCwgSm9pbiBhbmQgQ3JlYXRlTmV0d29yayBjYWxscywgdGhlbiB2YWxpZGF0aW5nIGl0cw0K
+PiBjb21wb3NpdGlvbiBkYXRhIHRvOg0KPiAgLSBmaXQgaW4gQ29uZmlnIE1vZGVsIENvbXBvc2l0
+aW9uIERhdGEgR2V0IG1lc3NhZ2UNCj4gIC0gZGVjbGFyZSBtYW5kYXRvcnkgbW9kZWxzIG9uIHBy
+aW1hcnkgZWxlbWVudA0KPiAgLSBkZWNsYXJlIGNvbnNlY3V0aXZlIGVsZW1lbnQgaW5kZXhlcw0K
+PiANCj4gRHVyaW5nIEF0dGFjaCBjYWxsLCB0ZW1wb3JhcnkgY29tcG9zaXRpb24gZGF0YSBpcyBh
+bHNvIGNvbXBhcmVkIHdpdGgNCj4gZGF0YSBnZW5lcmF0ZWQgZm9yIGV4aXN0aW5nIG5vZGUsIGd1
+YXJhbnRlZWluZyBpbW11dGFibGl0eSByZXF1aXJlZCBieQ0KPiB0aGUgc3BlY2lmaWNhdGlvbi4N
+Cj4gDQo+IE1pY2hhxYIgTG93YXMtUnplY2hvbmVrICg1KToNCj4gICBtZXNoOiBDb252ZXJ0IHZv
+aWQgcG9pbnRlcnMgdG8gYW5vbnltb3VzIHVuaW9ucyBpbiBtYW5hZ2VkX29ial9yZXF1ZXN0DQo+
+ICAgbWVzaDogVmFsaWRhdGUgYXBwbGljYXRpb24gYnkgY29tcGFyaW5nIGNvbXBvc2l0aW9uIGRh
+dGENCj4gICBtZXNoOiBLZWVwIGVsZW1lbnQgYW5kIG1vZGVsIGxpc3RzIHNvcnRlZCBhbmQgdW5p
+cXVlDQo+ICAgbWVzaDogQ2hlY2sgdGhhdCBlbGVtZW50IGluZGV4ZXMgYXJlIGNvbnNlY3V0aXZl
+DQo+ICAgbWVzaDogQ2hlY2sgdGhhdCBjb25maWcgc2VydmVyIGlzIHByZXNlbnQgaW4gcHJpbWFy
+eSBlbGVtZW50DQo+IA0KPiAgbWVzaC9tZXNoLWRlZnMuaCB8ICAgMiArDQo+ICBtZXNoL25vZGUu
+YyAgICAgIHwgNTU2ICsrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDI5MCBpbnNlcnRpb25zKCspLCAyNjggZGVsZXRpb25z
+KC0pDQo+IA==
