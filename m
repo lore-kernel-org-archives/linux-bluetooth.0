@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A43A6C7618F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 04:30:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A91B7C76191
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 04:30:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72E4121951
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 04:30:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78C3C21951
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 04:30:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="WpYeg/Hv"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="gn4xs5bj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725836AbfGZEas (ORCPT
+        id S1726120AbfGZEav (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Jul 2019 00:30:48 -0400
-Received: from mail-lf1-f45.google.com ([209.85.167.45]:34562 "EHLO
-        mail-lf1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbfGZEar (ORCPT
+        Fri, 26 Jul 2019 00:30:51 -0400
+Received: from mail-lj1-f173.google.com ([209.85.208.173]:47011 "EHLO
+        mail-lj1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbfGZEau (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Jul 2019 00:30:47 -0400
-Received: by mail-lf1-f45.google.com with SMTP id b29so28861325lfq.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2019 21:30:45 -0700 (PDT)
+        Fri, 26 Jul 2019 00:30:50 -0400
+Received: by mail-lj1-f173.google.com with SMTP id v24so50222273ljg.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2019 21:30:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=h7K9lY2+0igCt03cZCM/gtXA75TBlEFAH6LhnyHb6fM=;
-        b=WpYeg/HvXvLFQzkfpP2N37PkDfMPpBkJyzMcB/qWqZUFgeTCs17F6PHqCha4iZLmz/
-         exUphuSPlbP5bSSDzM41RtcDHPiewZOxEhSBDyzC9YNwPer26g1jsSQjPyLpQYDprhQ1
-         f+AfH2IRiRvD+e3dxHewco1xZTz6aSgqib36oZ4EGUhMCOUI4d49IIyH8B1+rdImttt8
-         oSYwaNYhwPBp+vN6MsDZkjQtQH60bVGECDofJ21XqiKGSo3FrJZNzZFai5N7y/cX96NF
-         chPmHF3nDE3y3JFVNcPp562/ri5DGfcJ1Ke0eNgXCPo/QJYTRFLfNBLeEwPPWTcuu1ak
-         5SLA==
+        bh=QfY9KanHmOr/EyWPjScvuSb3L80EIJ0kfa8lrjkJYME=;
+        b=gn4xs5bjz9htEQSV9aHeORuR60VkJpHYe2EOZbE77oDsnUVkph6sePY3Y4jutNZZrw
+         +xZoMZiDq+fkcu3YFoxj1RDJ82BMfQVwCjkNF2Hi+a8/XJusxm3op5SZ+tY8dDpbQCfD
+         rynu9C9l4jDp746k/XBJfb3bXKZAsACTSK9FSfrH6dPcClUBqKU5/mHwLXA8Dt2nsaxM
+         76jre7Y3KESE88vm66z9dtxrNNJl3TKYGM0MBF3ECsWOmqJ1RJ36dCSoFKkyit6Lyw98
+         geJz4u5luoWvHPdIes7M1o3QKuUJ5lj4aAn2GSggBE7klzmrz9LiUvI46W7X1K1tj7GE
+         yPsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=h7K9lY2+0igCt03cZCM/gtXA75TBlEFAH6LhnyHb6fM=;
-        b=qnWODj5bE1Ysls9ouj6oSTE5Mf63twZI2tQLT8C8GoIA67hA04eO7b9JlYaRpl72Xk
-         1fmEApT0jM9x1wL1DDZrE1g47XG4iZCAta4KNk9TNmW/gt4WkDecniBaVHkZhNmJKkTE
-         cfo25AJ0vCa/NxXlMUsDPgP1GGdY6s677L1GxLSKOzGH1KQ0lcD+vlnDPqcCXISsYFzo
-         Ga16PrSMYMTA0naoDpTpwmCqOR72y3MEcz1FEU4anxKg8aoeO2kdCClAW7nuDVZJMepT
-         aldrJocYSc1/DMj1A2E3HL03vhJCP/oTWnzSoVj0fsMGn//q4raZHE5k2wnEED8sDU4l
-         WA6Q==
-X-Gm-Message-State: APjAAAXdt7YWnCCZrmjD/HQSrYOh9rTqKcBrVtNq9mjgOGBddtu/MYvp
-        Qz7mkZvYXBPJv0EAf7YAXWN9z/H7qeQ=
-X-Google-Smtp-Source: APXvYqxmB50MHZN7bGKmFa+10j0LRxgZQWi5YJVjvC2T1rGh8gyzk/+cTiQgwoddyhJzt1ZijjiATQ==
-X-Received: by 2002:ac2:5337:: with SMTP id f23mr43982995lfh.15.1564115444600;
-        Thu, 25 Jul 2019 21:30:44 -0700 (PDT)
+        bh=QfY9KanHmOr/EyWPjScvuSb3L80EIJ0kfa8lrjkJYME=;
+        b=RfdOHuNeC8hP9G/qfYDtRyyGjLRbk7ObebWlTouvtAS8Wt2O5pwShE2sJKhkwdrhkD
+         Cw/c4ptmldmBa+gGlT9ACnPbji7EKyMycOOFPuYdVI2JZxn/vv+ZE2TuotuyeUCQf/Jq
+         e/3RClRHS2y7G3pTLUztpAl2dkmSrHdCTaX/dzu6beEdHEGkTkv0TOK2lvxRzbKmrUQQ
+         pQm4l5YQE9ZiYV+Hcj7ELpPkMbBCM9t/Fhff1x+y/vQciBG/nJsobGunq7VozJ7DHD7n
+         DONpAxe1N3DjO6aCWpSbC20/Ss71+eLzFUcPL6OxrxVZV71TI5XddNKubH+cCFZe/T7g
+         DVvQ==
+X-Gm-Message-State: APjAAAXNlxWR88VXDqDdOHSP6h3ZFKIuWN1si89FqZinTKYg7pbZHE8m
+        NAWx26yk+ShXST0PlEwDGo4WWKsQ3xI=
+X-Google-Smtp-Source: APXvYqyQL0tyebLAcGDgAlIq4V0RLVNLL3yKQLEjekJlxZgV4JP/mrCvDXArVP7ZEqHJvb2WzZFi8Q==
+X-Received: by 2002:a2e:a311:: with SMTP id l17mr46670491lje.214.1564115447537;
+        Thu, 25 Jul 2019 21:30:47 -0700 (PDT)
 Received: from kynes.internet.domowy (apn-95-40-32-72.dynamic.gprs.plus.pl. [95.40.32.72])
-        by smtp.gmail.com with ESMTPSA id g5sm9792735ljj.69.2019.07.25.21.30.43
+        by smtp.gmail.com with ESMTPSA id g5sm9792735ljj.69.2019.07.25.21.30.46
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Jul 2019 21:30:43 -0700 (PDT)
+        Thu, 25 Jul 2019 21:30:46 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 1/5] mesh: Convert void pointers to anonymous unions in managed_obj_request
-Date:   Fri, 26 Jul 2019 06:30:31 +0200
-Message-Id: <20190726043035.9417-2-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ v5 3/5] mesh: Keep element and model lists sorted and unique
+Date:   Fri, 26 Jul 2019 06:30:33 +0200
+Message-Id: <20190726043035.9417-4-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190726043035.9417-1-michal.lowas-rzechonek@silvair.com>
 References: <20190726043035.9417-1-michal.lowas-rzechonek@silvair.com>
@@ -72,191 +72,175 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This keeps composition data unchanged even if elements or models are
+registered in a different order.
 ---
- mesh/node.c | 75 +++++++++++++++++++++++++----------------------------
- 1 file changed, 35 insertions(+), 40 deletions(-)
+ mesh/node.c | 80 ++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 67 insertions(+), 13 deletions(-)
 
 diff --git a/mesh/node.c b/mesh/node.c
-index ceb46e4df..e51913edf 100644
+index 52ed74ab4..86676bf20 100644
 --- a/mesh/node.c
 +++ b/mesh/node.c
-@@ -58,9 +58,11 @@
- #define DEFAULT_CRPL 10
- #define DEFAULT_SEQUENCE_NUMBER 0
+@@ -160,6 +160,20 @@ static bool match_element_idx(const void *a, const void *b)
+ 	return (element->idx == index);
+ }
  
--#define REQUEST_TYPE_JOIN 0
--#define REQUEST_TYPE_ATTACH 1
--#define REQUEST_TYPE_CREATE 2
-+enum request_type {
-+	REQUEST_TYPE_JOIN,
-+	REQUEST_TYPE_ATTACH,
-+	REQUEST_TYPE_CREATE,
-+};
++static int compare_element_idx(const void *a, const void *b, void *user_data)
++{
++	uint32_t a_idx = ((const struct node_element *)a)->idx;
++	uint32_t b_idx = ((const struct node_element *)b)->idx;
++
++	if (a_idx < b_idx)
++		return -1;
++
++	if (a_idx > b_idx)
++		return 1;
++
++	return 0;
++}
++
+ static bool match_element_path(const void *a, const void *b)
+ {
+ 	const struct node_element *element = a;
+@@ -171,6 +185,29 @@ static bool match_element_path(const void *a, const void *b)
+ 	return (!strcmp(element->path, path));
+ }
  
- struct node_element {
- 	char *path;
-@@ -110,10 +112,16 @@ struct mesh_node {
- };
++static bool match_model_id(const void *a, const void *b)
++{
++	const struct mesh_model *mod = a;
++	uint32_t mod_id = L_PTR_TO_UINT(b);
++
++	return mesh_model_get_model_id(mod) == mod_id;
++}
++
++static int compare_model_id(const void *a, const void *b, void *user_data)
++{
++	uint32_t a_id = mesh_model_get_model_id(a);
++	uint32_t b_id = mesh_model_get_model_id(b);
++
++	if (a_id < b_id)
++		return -1;
++
++	if (a_id > b_id)
++		return 1;
++
++	return 0;
++}
++
++
+ struct mesh_node *node_find_by_addr(uint16_t addr)
+ {
+ 	if (!IS_UNICAST(addr))
+@@ -287,6 +324,17 @@ void node_remove(struct mesh_node *node)
+ 	free_node_resources(node);
+ }
  
- struct managed_obj_request {
--	void *data;
--	void *cb;
--	void *user_data;
--	uint8_t type;
-+	union {
-+		const uint8_t *uuid;
-+		struct mesh_node *node;
-+	};
-+	union {
-+		node_ready_func_t ready_cb;
-+		node_join_ready_func_t join_ready_cb;
-+	};
-+	struct l_dbus_message *pending_msg;
-+	enum request_type type;
- };
++static bool element_add_model(struct node_element *ele, struct mesh_model *mod)
++{
++	uint32_t mod_id = mesh_model_get_model_id(mod);
++
++	if (l_queue_find(ele->models, match_model_id, L_UINT_TO_PTR(mod_id)))
++		return false;
++
++	l_queue_insert(ele->models, mod, compare_model_id, NULL);
++	return true;
++}
++
+ static bool add_models(struct mesh_node *node, struct node_element *ele,
+ 					struct mesh_config_element *db_ele)
+ {
+@@ -305,7 +353,10 @@ static bool add_models(struct mesh_node *node, struct node_element *ele,
+ 		if (!mod)
+ 			return false;
  
- static struct l_queue *nodes;
-@@ -1571,7 +1579,7 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 		node = l_new(struct mesh_node, 1);
- 		node->elements = l_queue_new();
- 	} else {
--		node = req->data;
-+		node = req->node;
+-		l_queue_push_tail(ele->models, mod);
++		if (!element_add_model(ele, mod)) {
++			mesh_model_free(mod);
++			return false;
++		}
  	}
  
- 	num_ele = 0;
-@@ -1642,8 +1650,6 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
+ 	return true;
+@@ -334,7 +385,8 @@ static void add_internal_model(struct mesh_node *node, uint32_t mod_id,
+ 	if (!ele->models)
+ 		ele->models = l_queue_new();
+ 
+-	l_queue_push_tail(ele->models, mod);
++	if (!element_add_model(ele, mod))
++		mesh_model_free(mod);
+ }
+ 
+ static bool add_element(struct mesh_node *node,
+@@ -1026,12 +1078,12 @@ bool node_parse_composition(struct mesh_node *node, uint8_t *data,
+ 		while (len >= 2 && m--) {
+ 			mod_id = l_get_le16(data);
+ 			mod = mesh_model_new(ele->idx, mod_id);
+-			if (!mod) {
++			if (!mod || !element_add_model(ele, mod)) {
++				mesh_model_free(mod);
+ 				element_free(ele);
+ 				goto fail;
+ 			}
+ 
+-			l_queue_push_tail(ele->models, mod);
+ 			data += 2;
+ 			len -= 2;
+ 		}
+@@ -1048,12 +1100,12 @@ bool node_parse_composition(struct mesh_node *node, uint8_t *data,
+ 			mod_id |= (vendor_id << 16);
+ 			mod = mesh_model_vendor_new(ele->idx, vendor_id,
+ 									mod_id);
+-			if (!mod) {
++			if (!mod || !element_add_model(ele, mod)) {
++				mesh_model_free(mod);
+ 				element_free(ele);
+ 				goto fail;
+ 			}
+ 
+-			l_queue_push_tail(ele->models, mod);
+ 			data += 4;
+ 			len -= 4;
+ 		}
+@@ -1151,12 +1203,9 @@ static void get_models_from_properties(struct node_element *ele,
+ 		while (l_dbus_message_iter_next_entry(&ids, &mod_id)) {
+ 			struct mesh_model *mod;
+ 
+-			/* Skip internally implemented models */
+-			if ((VENDOR_ID_MASK | mod_id) == CONFIG_SRV_MODEL)
+-				continue;
+-
+ 			mod = mesh_model_new(ele->idx, mod_id);
+-			l_queue_push_tail(ele->models, mod);
++			if (!element_add_model(ele, mod))
++				mesh_model_free(mod);
+ 		}
+ 		return;
  	}
+@@ -1166,7 +1215,8 @@ static void get_models_from_properties(struct node_element *ele,
+ 		struct mesh_model *mod;
  
- 	if (req->type == REQUEST_TYPE_ATTACH) {
--		node_ready_func_t cb = req->cb;
--
- 		if (num_ele != node->num_ele)
- 			goto fail;
- 
-@@ -1652,7 +1658,7 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 
- 			node->disc_watch = l_dbus_add_disconnect_watch(bus,
- 					node->owner, app_disc_cb, node, NULL);
--			cb(req->user_data, MESH_ERROR_NONE, node);
-+			req->ready_cb(req->pending_msg, MESH_ERROR_NONE, node);
- 		} else
- 			goto fail;
- 
-@@ -1665,8 +1671,6 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 		init_storage_dir(node);
- 
- 	} else if (req->type == REQUEST_TYPE_JOIN) {
--		node_join_ready_func_t cb = req->cb;
--
- 		if (!agent) {
- 			l_error("Interface %s not found",
- 						MESH_PROVISION_AGENT_INTERFACE);
-@@ -1675,22 +1679,20 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 
- 		node->num_ele = num_ele;
- 		set_defaults(node);
--		memcpy(node->uuid, req->data, 16);
-+		memcpy(node->uuid, req->uuid, 16);
- 
- 		if (!create_node_config(node, node->uuid))
- 			goto fail;
- 
--		cb(node, agent);
--
-+		req->join_ready_cb(node, agent);
- 	} else {
- 		/* Callback for create node request */
--		node_ready_func_t cb = req->cb;
- 		struct keyring_net_key net_key;
- 		uint8_t dev_key[16];
- 
- 		node->num_ele = num_ele;
- 		set_defaults(node);
--		memcpy(node->uuid, req->data, 16);
-+		memcpy(node->uuid, req->uuid, 16);
- 
- 		if (!create_node_config(node, node->uuid))
- 			goto fail;
-@@ -1717,7 +1719,7 @@ static void get_managed_objects_cb(struct l_dbus_message *msg, void *user_data)
- 		if (!keyring_put_net_key(node, PRIMARY_NET_IDX, &net_key))
- 			goto fail;
- 
--		cb(req->user_data, MESH_ERROR_NONE, node);
-+		req->ready_cb(req->pending_msg, MESH_ERROR_NONE, node);
- 	}
- 
- 	return;
-@@ -1726,26 +1728,19 @@ fail:
- 		mesh_agent_remove(agent);
- 
- 	if (!is_new) {
--		/* Handle failed Attach request */
--		node_ready_func_t cb = req->cb;
--
- 		free_node_dbus_resources(node);
- 
--		cb(req->user_data, MESH_ERROR_FAILED, node);
-+		req->ready_cb(req->pending_msg, MESH_ERROR_FAILED, node);
- 	} else {
- 		/* Handle failed Join and Create requests */
- 		if (node)
- 			node_remove(node);
- 
--		if (req->type == REQUEST_TYPE_JOIN) {
--			node_join_ready_func_t cb = req->cb;
--
--			cb(NULL, NULL);
--		} else {
--			node_ready_func_t cb = req->cb;
--
--			cb(req->user_data, MESH_ERROR_FAILED, NULL);
--		}
-+		if (req->type == REQUEST_TYPE_JOIN)
-+			req->join_ready_cb(NULL, NULL);
-+		else
-+			req->ready_cb(req->pending_msg, MESH_ERROR_FAILED,
-+									NULL);
+ 		mod = mesh_model_vendor_new(ele->idx, vendor_id, mod_id);
+-		l_queue_push_tail(ele->models, mod);
++		if (!element_add_model(ele, mod))
++			mesh_model_free(mod);
  	}
  }
  
-@@ -1770,9 +1765,9 @@ int node_attach(const char *app_path, const char *sender, uint64_t token,
- 	node->owner = l_strdup(sender);
+@@ -1216,7 +1266,11 @@ static bool get_element_properties(struct mesh_node *node, const char *path,
+ 	if (!idx || !mods || !vendor_mods)
+ 		goto fail;
  
- 	req = l_new(struct managed_obj_request, 1);
--	req->data = node;
--	req->cb = cb;
--	req->user_data = user_data;
-+	req->node = node;
-+	req->ready_cb = cb;
-+	req->pending_msg = user_data;
- 	req->type = REQUEST_TYPE_ATTACH;
+-	l_queue_push_tail(node->elements, ele);
++	if (l_queue_find(node->elements, match_element_idx,
++						L_UINT_TO_PTR(ele->idx)))
++		goto fail;
++
++	l_queue_insert(node->elements, ele, compare_element_idx, NULL);
  
- 	l_dbus_method_call(dbus_get_bus(), sender, app_path,
-@@ -1794,8 +1789,8 @@ void node_join(const char *app_path, const char *sender, const uint8_t *uuid,
- 	l_debug("");
+ 	ele->path = l_strdup(path);
  
- 	req = l_new(struct managed_obj_request, 1);
--	req->data = (void *) uuid;
--	req->cb = cb;
-+	req->uuid = uuid;
-+	req->join_ready_cb = cb;
- 	req->type = REQUEST_TYPE_JOIN;
- 
- 	l_dbus_method_call(dbus_get_bus(), sender, app_path,
-@@ -1813,9 +1808,9 @@ void node_create(const char *app_path, const char *sender, const uint8_t *uuid,
- 	l_debug("");
- 
- 	req = l_new(struct managed_obj_request, 1);
--	req->data = (void *) uuid;
--	req->cb = cb;
--	req->user_data = user_data;
-+	req->uuid = uuid;
-+	req->ready_cb = cb;
-+	req->pending_msg = user_data;
- 	req->type = REQUEST_TYPE_CREATE;
- 
- 	l_dbus_method_call(dbus_get_bus(), sender, app_path,
 -- 
 2.22.0
 
