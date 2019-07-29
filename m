@@ -2,194 +2,93 @@ Return-Path: <SRS0=/vUS=V2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FC7C7618B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 12:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FFBC7618B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 13:40:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFDC2206BA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 12:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35971206DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 13:40:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="nGY4gl4j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387815AbfG2MWm (ORCPT
+        id S1726941AbfG2Nkz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Jul 2019 08:22:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58478 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727942AbfG2MWm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Jul 2019 08:22:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 69DD94E83E;
-        Mon, 29 Jul 2019 12:22:41 +0000 (UTC)
-Received: from rules.brq.redhat.com (unknown [10.43.2.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D39B4600F8;
-        Mon, 29 Jul 2019 12:22:37 +0000 (UTC)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     marcel@holtmann.org
-Cc:     bgodavar@codeaurora.org, frederic.danis@linux.intel.com,
-        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, loic.poulain@intel.com,
-        suraj@atheros.com, syzkaller@googlegroups.com, vdronov@redhat.com
-Subject: [PATCH v3] Bluetooth: hci_uart: check for missing tty operations
-Date:   Mon, 29 Jul 2019 14:22:15 +0200
-Message-Id: <20190729122215.9948-1-vdronov@redhat.com>
-In-Reply-To: <62A82405-46E2-4921-BA52-D1660FC2DDDB@holtmann.org>
-References: <62A82405-46E2-4921-BA52-D1660FC2DDDB@holtmann.org>
+        Mon, 29 Jul 2019 09:40:55 -0400
+Received: from mail-lj1-f170.google.com ([209.85.208.170]:44601 "EHLO
+        mail-lj1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726627AbfG2Nkz (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 29 Jul 2019 09:40:55 -0400
+Received: by mail-lj1-f170.google.com with SMTP id k18so58604827ljc.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2019 06:40:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=L2CQfungpKNvjxTzrQ0gyFVifkmACYxQ+/C8OQL8ClM=;
+        b=nGY4gl4j6JueS0nVUl+7b87IoCIgNr55zaS8hU9KKOyQLOFovYnA1900RFzHt9jnUM
+         la8h+VJc1HwxKDi5ukzLXI7oUVKmU4mTjx+qijwgvO6bb3IJIgzl0gOgaxnr237fzwy+
+         8HH2ODoGi82jNaoGBkkbZ3AZSr9RLS+cQgVfFc3IUJ9JiqnAEaYGFseWZoEW3sLwrCgA
+         c0J3WAC8tVbObIHgWmGtlmSIVxKEPPQSxiKDP23fo2hPRG9kGJyDSEhXFAMCEuniINza
+         VGu/Vlnno5J4mP9o5XIGUxqWu5k8qOLGY92f24K4U+jxeBtjS6rRDKzCCw7wRX0KY/mh
+         ahYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=L2CQfungpKNvjxTzrQ0gyFVifkmACYxQ+/C8OQL8ClM=;
+        b=TtOwoX3vJm4HyvtEuD/ySxkGC8AogiqbybeCS5iLY12CNJ/WOKOIosmnbS4WxjzOdM
+         LP+cbIb7+QEWObOlYJ67OYP5B+oVnLlMkCe37374/bNLpWC3/rUH8VV4nS4RqIHCGoj8
+         FTk6HVO4fo9/sIKTg1rukrTNkhP37I7T2I4rzpDzpuhJnsGvFbGpzSPRGmLiIm5b7UXo
+         kZCQAuQfMwBNDl3JjSRNkuUyRuINrvkexqaznf6L7MhWTjVlcR/Rqkl0+yLYVC7Aw5yM
+         0Vpt2UR5ftJZJOWnw++7FPMaZad7fxCtOv2rhq/X+3Jt5QcJuJ8MJQm4S6hD4+T6kNQ1
+         MTwQ==
+X-Gm-Message-State: APjAAAXK9fIgnX8GOHb9I39sWAYIrZhvPPPV/RfZ9wqTs7ENciJuLX4y
+        99Brfg33K5HPlbeZ+Lx5EHuF3H7dqpY=
+X-Google-Smtp-Source: APXvYqy+26RomZeL9Ta5dOB0ZoXicS0Z5lBDcEuwj7X3oa0BvygnU7IZkdnp9573Yb13CneyahoUiQ==
+X-Received: by 2002:a2e:5dc6:: with SMTP id v67mr58150027lje.240.1564407653643;
+        Mon, 29 Jul 2019 06:40:53 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id h84sm12762220ljf.42.2019.07.29.06.40.52
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 29 Jul 2019 06:40:52 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v6 0/3] Implement org.bluez.mesh.Network1.Import() D-Bus API
+Date:   Mon, 29 Jul 2019 15:40:44 +0200
+Message-Id: <20190729134047.21033-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Mon, 29 Jul 2019 12:22:41 +0000 (UTC)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Certain ttys operations (pty_unix98_ops) lack tiocmget() and tiocmset()
-functions which are called by the certain HCI UART protocols (hci_ath,
-hci_bcm, hci_intel, hci_mrvl, hci_qca) via hci_uart_set_flow_control()
-or directly. This leads to an execution at NULL and can be triggered by
-an unprivileged user. Fix this by adding a helper function and a check
-for the missing tty operations in the protocols code.
++ Reworked the API to new signature
++ Removed dependencies on mesh-config
 
-This fixes CVE-2019-10207. The Fixes: lines list commits where calls to
-tiocm[gs]et() or hci_uart_set_flow_control() were added to the HCI UART
-protocols.
+Jakub Witowski (1):
+  mesh: Extract read_* functions in mesh-config-json
 
-Link: https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
-Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
-Cc: stable@vger.kernel.org # v2.6.36+
-Fixes: b3190df62861 ("Bluetooth: Support for Atheros AR300x serial chip")
-Fixes: 118612fb9165 ("Bluetooth: hci_bcm: Add suspend/resume PM functions")
-Fixes: ff2895592f0f ("Bluetooth: hci_intel: Add Intel baudrate configuration support")
-Fixes: 162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
-Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
-Signed-off-by: Vladis Dronov <vdronov@redhat.com>
----
+Michał Lowas-Rzechonek (2):
+  mesh: Add documentation for Import() D-Bus API
+  mesh: Implement Import() D-Bus API of org.bluez.mesh.Network1
+    interface
 
-out-of-commit-message-note:
+ doc/mesh-api.txt        |  57 ++++++++++++++------
+ mesh/mesh-config-json.c |  68 +++++++++++++++++-------
+ mesh/mesh.c             | 115 +++++++++++++++++++++++++++++++++++++++-
+ mesh/node.c             |  87 +++++++++++++++++++++++++++++-
+ mesh/node.h             |   5 ++
+ 5 files changed, 295 insertions(+), 37 deletions(-)
 
-it is possible that a HCI UART protocol uses serial device's
-operations and not a tty ones. i made hci_uart_has_flow_control() to
-check this also, hence the name. serial device's code checks if
-the needed operations are present itself.
-
-i believe, hci_h5 does not need this check, as it uses serial device
-functions only (as of now):
-
-    serdev_device_set_flow_control(h5->hu->serdev, false);
-    serdev_device_set_baudrate(h5->hu->serdev, 115200);
-
- drivers/bluetooth/hci_ath.c   | 3 +++
- drivers/bluetooth/hci_bcm.c   | 3 +++
- drivers/bluetooth/hci_intel.c | 3 +++
- drivers/bluetooth/hci_ldisc.c | 7 +++++++
- drivers/bluetooth/hci_mrvl.c  | 3 +++
- drivers/bluetooth/hci_qca.c   | 3 +++
- drivers/bluetooth/hci_uart.h  | 1 +
- 7 files changed, 23 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-index a55be205b91a..dbfe34664633 100644
---- a/drivers/bluetooth/hci_ath.c
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -98,6 +98,9 @@ static int ath_open(struct hci_uart *hu)
- 
- 	BT_DBG("hu %p", hu);
- 
-+	if (!hci_uart_has_flow_control(hu))
-+		return -EOPNOTSUPP;
-+
- 	ath = kzalloc(sizeof(*ath), GFP_KERNEL);
- 	if (!ath)
- 		return -ENOMEM;
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 8905ad2edde7..ae2624fce913 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -406,6 +406,9 @@ static int bcm_open(struct hci_uart *hu)
- 
- 	bt_dev_dbg(hu->hdev, "hu %p", hu);
- 
-+	if (!hci_uart_has_flow_control(hu))
-+		return -EOPNOTSUPP;
-+
- 	bcm = kzalloc(sizeof(*bcm), GFP_KERNEL);
- 	if (!bcm)
- 		return -ENOMEM;
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 207bae5e0d46..31f25153087d 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -391,6 +391,9 @@ static int intel_open(struct hci_uart *hu)
- 
- 	BT_DBG("hu %p", hu);
- 
-+	if (!hci_uart_has_flow_control(hu))
-+		return -EOPNOTSUPP;
-+
- 	intel = kzalloc(sizeof(*intel), GFP_KERNEL);
- 	if (!intel)
- 		return -ENOMEM;
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 8950e07889fe..11049e2336f3 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -292,6 +292,13 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
- 
-+/* Check the underlying device or tty has flow control support */
-+bool hci_uart_has_flow_control(struct hci_uart *hu)
-+{
-+	return hu->serdev ||
-+		(hu->tty->driver->ops->tiocmget && hu->tty->driver->ops->tiocmset);
-+}
-+
- /* Flow control or un-flow control the device */
- void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
- {
-diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-index f98e5cc343b2..fbc3f7c3a5c7 100644
---- a/drivers/bluetooth/hci_mrvl.c
-+++ b/drivers/bluetooth/hci_mrvl.c
-@@ -59,6 +59,9 @@ static int mrvl_open(struct hci_uart *hu)
- 
- 	BT_DBG("hu %p", hu);
- 
-+	if (!hci_uart_has_flow_control(hu))
-+		return -EOPNOTSUPP;
-+
- 	mrvl = kzalloc(sizeof(*mrvl), GFP_KERNEL);
- 	if (!mrvl)
- 		return -ENOMEM;
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 9a5c9c1f9484..82a0a3691a63 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -473,6 +473,9 @@ static int qca_open(struct hci_uart *hu)
- 
- 	BT_DBG("hu %p qca_open", hu);
- 
-+	if (!hci_uart_has_flow_control(hu))
-+		return -EOPNOTSUPP;
-+
- 	qca = kzalloc(sizeof(struct qca_data), GFP_KERNEL);
- 	if (!qca)
- 		return -ENOMEM;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index f11af3912ce6..6ab631101019 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -104,6 +104,7 @@ int hci_uart_wait_until_sent(struct hci_uart *hu);
- int hci_uart_init_ready(struct hci_uart *hu);
- void hci_uart_init_work(struct work_struct *work);
- void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
-+bool hci_uart_has_flow_control(struct hci_uart *hu);
- void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
- void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
- 			 unsigned int oper_speed);
 -- 
-2.20.1
+2.19.1
+
