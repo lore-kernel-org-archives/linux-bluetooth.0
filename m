@@ -1,112 +1,93 @@
-Return-Path: <SRS0=WgJd=VX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=/vUS=V2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2BFC7618F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 21:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C09B8C76186
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 03:20:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B9782166E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Jul 2019 21:48:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9860F2075B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 03:20:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7iy0Kcn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726690AbfGZVsE convert rfc822-to-8bit (ORCPT
+        id S1726478AbfG2DUb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Jul 2019 17:48:04 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:43280 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726640AbfGZVsE (ORCPT
+        Sun, 28 Jul 2019 23:20:31 -0400
+Received: from mail-pg1-f169.google.com ([209.85.215.169]:43156 "EHLO
+        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725681AbfG2DUa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Jul 2019 17:48:04 -0400
-Received: from marcel-macpro.fritz.box (p5B3D2BA7.dip0.t-ipconnect.de [91.61.43.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0B8A5CECD2;
-        Fri, 26 Jul 2019 23:56:40 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2] Bluetooth: hci_ldisc: check for missing tty operations
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190726142628.20534-1-vdronov@redhat.com>
-Date:   Fri, 26 Jul 2019 23:48:02 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Suraj Sumangala <suraj@atheros.com>,
-        Frederic Danis <frederic.danis@linux.intel.com>,
-        Loic Poulain <loic.poulain@intel.com>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        syzkaller@googlegroups.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <62A82405-46E2-4921-BA52-D1660FC2DDDB@holtmann.org>
-References: <20190726142628.20534-1-vdronov@redhat.com>
-To:     Vladis Dronov <vdronov@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Sun, 28 Jul 2019 23:20:30 -0400
+Received: by mail-pg1-f169.google.com with SMTP id f25so27457315pgv.10
+        for <linux-bluetooth@vger.kernel.org>; Sun, 28 Jul 2019 20:20:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=Qtlvn5JE6Kj1KVZQxpnADX5oZGSAvHEeulkTS7wVoFE=;
+        b=E7iy0KcnurL4LIOiw3ynujNnR4aqUe6oO4GlIjdDZtiKy58K6Q2/kfNbeYL6c1xrfe
+         9Uuu6aSrzPiT/IIOjSIfsPitK+vypZTOCyVTJkwJP2yKp3UGurO+19yIlnoK0ktF3SGc
+         G0IhOHLOjI+15SRKmlR6OH0nezrpbV+pX6UVdMeFh3qY7oZX5XX/2OihfuZGf0aDhJoN
+         HuBeS0mioUP1+p0FRUfJvSXnI9LrULqPUZUwQg9VjsNc+LdzkzvFhcEuH7ztsPIFoKa2
+         lub3ZM5VMsbASQJqTtcD7BkrBjq3W/cp2x6mtLNXAygJhcqqVN+LpxKIs5+/4gGppiNN
+         XU9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=Qtlvn5JE6Kj1KVZQxpnADX5oZGSAvHEeulkTS7wVoFE=;
+        b=TuWcccWOfbRAY+ng65hkT5d68OgHrH2kQcbZ/L3i4phP2wddjD9YheSjBfJZQTR49U
+         zCss8yfqY12D7vyfdixw/gfOsP3wcUEDWvDexrTDg2OCbVsWg70EConqhi+qczzGudM0
+         Qplmy3c+4q/R0vVNY6qC1C7fZDInZ8D7KgicQJ1iZu3AYI6ztMJFMQatN6o1fZj1M1i1
+         CKsQweb0yser+LrzjkcK5AZ2g7SyfovSRHXSrEBRdrJEdx54NpD+1Ky2qeSGYo/xJlKI
+         w2CZ7jaK23iaYUOh0IL4w8piKkmMIWUV+EkW87xt9qDg9fjECZPXFTt85j51unMdJP+F
+         8N0w==
+X-Gm-Message-State: APjAAAVr9HTrDTvqLjZZZUUOpH557W35tyUxAjZEMiYMQ8PZii8yDjLa
+        +QxKWd7/qjOiy/yZE61qhuGG3yXVXIUmn31CxhecJ3nj
+X-Google-Smtp-Source: APXvYqzLyNnFw2RYxhB1m8yA+iWWY88zKHS7zTZZj9GG30BnDx9O/fi3W5PTWcymt84qtl+Dg2o4BmHRfcjIAmxPsos=
+X-Received: by 2002:a62:cdc3:: with SMTP id o186mr34649147pfg.168.1564370429696;
+ Sun, 28 Jul 2019 20:20:29 -0700 (PDT)
+MIME-Version: 1.0
+From:   Andrey Batyiev <batyiev@gmail.com>
+Date:   Mon, 29 Jul 2019 06:20:18 +0300
+Message-ID: <CAEQQxWySUJZBa9CF7-W_4zXcuitgaNuu2f_pYswLKDUtVwWd1g@mail.gmail.com>
+Subject: Yet another counterfeit CSR device?
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vladis,
+Hello everyone,
 
-> Certain ttys operations (pty_unix98_ops) lack tiocmget() and tiocmset()
-> functions which are called by the certain HCI UART protocols (hci_ath,
-> hci_bcm, hci_intel, hci_mrvl, hci_qca) via hci_uart_set_flow_control()
-> or directly. This leads to an execution at NULL and can be triggered by
-> an unprivileged user. Fix this by adding a check for the missing tty
-> operations the same way it is done for write().
-> 
-> This fixes CVE-2019-10207. The Fixes: lines list commits where calls to
-> tiocm[gs]et() or hci_uart_set_flow_control() were added to the HCI UART
-> protocols.
-> 
-> Link: https://syzkaller.appspot.com/bug?id=1b42faa2848963564a5b1b7f8c837ea7b55ffa50
-> Reported-by: syzbot+79337b501d6aa974d0f6@syzkaller.appspotmail.com
-> Cc: stable@vger.kernel.org # v2.6.36+
-> Fixes: c19483cc5e56 ("bluetooth: Fix missing NULL check")
-> Fixes: b3190df62861 ("Bluetooth: Support for Atheros AR300x serial chip")
-> Fixes: 118612fb9165 ("Bluetooth: hci_bcm: Add suspend/resume PM functions")
-> Fixes: ff2895592f0f ("Bluetooth: hci_intel: Add Intel baudrate configuration support")
-> Fixes: 162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
-> Fixes: fa9ad876b8e0 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990")
-> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
-> ---
-> 
-> out-of-commit-message-note:
-> 
-> I believe, this is a good location for the check. This way we protect protocols
-> which does not call tiocm[gs]et() or hci_uart_set_flow_control() but may
-> change to call them in the future.
-> 
-> Also we do not need hci_uart_has_tiocm_support() helper now.
-> 
-> drivers/bluetooth/hci_ldisc.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index c84f985f348d..4a85c51d0307 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -459,10 +459,11 @@ static int hci_uart_tty_open(struct tty_struct *tty)
-> 
-> 	BT_DBG("tty %p", tty);
-> 
-> -	/* Error if the tty has no write op instead of leaving an exploitable
-> -	 * hole
-> +	/* Error if the tty has no write or tiocm[gs]et ops instead of leaving
-> +	 * an exploitable hole
-> 	 */
-> -	if (tty->ops->write == NULL)
-> +	if (tty->ops->write == NULL || tty->ops->tiocmget == NULL ||
-> +	    tty->ops->tiocmset == NULL)
-> 		return -EOPNOTSUPP;
+I have nontdescript usb bluetooth dongle with "V5.0" marking on it.
+It claims to be CSR (0a12:0001) bluetooth dongle, but it has
+nonfunctional "delete stored link key" command, so I think it is
+counterfeit.
 
-this means that you can not run hci_h4.c on any TTY anymore. For all the vendor specific ones, I agree, but H:4 is a Bluetooth SIG defined standard one that we might want to allow on any kind of TTY since it doesn’t really mandate anything.
+Futhermore, Linux kernel doesn't detect it as counterfeit
+(in`btusb_setup_csr`), because the dongle reports following:
 
-So I would prefer if we go with a hci_uart_has_tiocm_support helper for now. 
+- From USB enumeration:
+bcdDevice = 0x8891
 
-Regards
+- From Read Local Version HCI command:
+Manufacturer = 0x000a (CSR)
+HCI ver. = 4.0
+HCI rev. = 2064
+LMP ver. = 4.0
+LMP subver. = 4114
 
-Marcel
+So, Linux kernel fails to power up this dongle. Ok, so I've hacked
+`btusb_setup_csr` routine to include this device too (it powers up
+now), however GATT communication doesn't work (btmon should nothing =
+no ATT exchanges except MTU setup).
 
+Any ideas on what should I check to make this device work?
+
+Thanks,
+    Andrey
