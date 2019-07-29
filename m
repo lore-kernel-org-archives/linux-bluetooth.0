@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE676C7618E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 13:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93659C7618B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 13:40:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86F1E206DD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 13:40:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68188206DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Jul 2019 13:40:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="dV5/Mg0I"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="vfIrmTbM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727003AbfG2Nk5 (ORCPT
+        id S1727036AbfG2Nk6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Jul 2019 09:40:57 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:42932 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbfG2Nk4 (ORCPT
+        Mon, 29 Jul 2019 09:40:58 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:46744 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726627AbfG2Nk5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Jul 2019 09:40:56 -0400
-Received: by mail-lj1-f193.google.com with SMTP id t28so58627796lje.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2019 06:40:55 -0700 (PDT)
+        Mon, 29 Jul 2019 09:40:57 -0400
+Received: by mail-lj1-f196.google.com with SMTP id v24so58750782ljg.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2019 06:40:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=jLTv3f5KRrQvSUT7EWO8p45jlUUQ/gIaogWpQmPQNSw=;
-        b=dV5/Mg0Ina8wJiwZDNtUHm/9T9I9UzJ8LtHybjh1/oN4MivVoxg6x7cfpZiVgeONxz
-         OYdYpbICqz0c1hLHAt99kwULHHHXoyUKl2C8uUxRCRlym2mNGvxDQcY91tD2QuvQvbJV
-         1NW9zOVE37y+nw2NnQahr3HZB17BXzfSbMkLH0PKGrUGYnCFFeeN/p96Njgk0FPeUB2I
-         uorBC01ODpCR/o6elP+3lJVZL/AfB/m98BMmx0qPiy0dYJjmQvOENC+9Zv/n9GnKTj6+
-         xKmiTm+2fQveKS+29QFfKsTbG5ux500bo3ub7HlQnNtHfeTw0gVPRyr5w0899IoDif79
-         Quyg==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=e30zSybaK0eLO+TfGSnPEXS9ILhDTx4pdKOhP1IwLK8=;
+        b=vfIrmTbMcp354ntRxG5IlYAO0gmudCWO3afH6S/6mHRGcmQLQb+MbliG8njLLSGddD
+         GdccBy+KTzCAXlu+DpmZvT7YvSr3bEZbCGASoVwauwec20pFNX4oPVoPx8xxDdfaKuA0
+         WlV7ZuSKXMf1X4y98j9/iYg0bNiURxiu4pw7p9PPxRf/evLVit+LVhnBDyOYp8fjaUc1
+         YgaSsh3FIO/CWQRoQnb9xPAij8ha2jOGR5q2IlT/Ci0S1Qz6CjlSPg0HYJ6FOvUEuBdS
+         s1w5oJC08LU2ENoMfMB4gxijP6QSMkMBQtINOc+NHJucVhYZc2ppFdNXuAhjN5fNInxD
+         g+8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jLTv3f5KRrQvSUT7EWO8p45jlUUQ/gIaogWpQmPQNSw=;
-        b=PoKxH8wROIqsWMk3yrFeGkE2xSCUpxy/cKDksRkIeXm7pbGJFZgETRq2w0BcT5/9It
-         NWs0O9NPbDTVzXwoNvVC8aArK70mkkVDMyaLsqOkeMN8BdhFvhmHsARTAkM66UGzaorm
-         HY9y1NKIytwm09jkPFowD2fx4njSxDlBZF+h6rwDTs6o94elOidUL0s43tUtXwL5+8dA
-         VjnuV0uqpMBArOY3cCdwiXqDnCtwNtuVrF5eLMomLI8ZJi3K7f9rZ7pAvYbQClu4Ct04
-         0vzBSyDWjRm946hUU2d9JxdY4GjKfb8bKWr/dv9svIFpbksv2RQNpCR7vBC0VCz/Jnyd
-         Lrqg==
-X-Gm-Message-State: APjAAAWhP2PIyqzjz8IDK5MutlgC6ljPIQI37hTV7xjdp7QVGWUaIqq/
-        613IRrACwSc3ocB5xgab9BlSpzoKYsU=
-X-Google-Smtp-Source: APXvYqyJcoFsFzdV51w7g6jzWrZTEMooMBL46iRjL7frk6duHqqY4GM5z/AtXkeHVIekf+TjDgUU/g==
-X-Received: by 2002:a2e:7c15:: with SMTP id x21mr58280967ljc.55.1564407654736;
-        Mon, 29 Jul 2019 06:40:54 -0700 (PDT)
+        bh=e30zSybaK0eLO+TfGSnPEXS9ILhDTx4pdKOhP1IwLK8=;
+        b=goUzYdN+hg4TB8+LyUNWu160ZOe7OI3SB81JgSeLS/Ae3PvsBWQw6EyKiPqP+NbMXJ
+         sNnFzZkHzYTYXgoL8h5w5ul7uKesDu+7lryQm1I76maW8cpmkfbypreAmXOEyh0I93gy
+         QZ8/CUdHC+2CTo+hg7QaSr647arSDTknxJAZtq0+d2ZHZxXW37O3k+kStpDlwqGriOYu
+         pmDVXetXIBymkRntgXaOyzQflTHeAge86LvqaWo6H8HR5DkKBrcvvU3RMTSQXM/uCyIX
+         1KViWJ0lbtghXx+OJ7BXbMyuCUFCT0sQTYkvhRireI1yTUx4jMLdkB0MBjhpeWGNQAFu
+         oGtw==
+X-Gm-Message-State: APjAAAWMrAkOEKYW0/OakNiOzt23af/wfRxtT5Z7LU1mf9OR0mV8Rmzm
+        VUs3Vn+XtTjqtA9wT1MwBxgKq9O6oSI=
+X-Google-Smtp-Source: APXvYqyrk6Dn2K6bY2oAV5B9Gg8LWck+QHqvnjLkfCJcyon/K0fAvLyMSJxj4vTjT/8v4yGcIL4+Sw==
+X-Received: by 2002:a2e:3a01:: with SMTP id h1mr1038221lja.132.1564407655693;
+        Mon, 29 Jul 2019 06:40:55 -0700 (PDT)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id h84sm12762220ljf.42.2019.07.29.06.40.53
+        by smtp.gmail.com with ESMTPSA id h84sm12762220ljf.42.2019.07.29.06.40.54
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 29 Jul 2019 06:40:54 -0700 (PDT)
+        Mon, 29 Jul 2019 06:40:55 -0700 (PDT)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Jakub Witowski <jakub.witowski@silvair.com>
-Subject: [PATCH BlueZ v6 1/3] mesh: Extract read_* functions in mesh-config-json
-Date:   Mon, 29 Jul 2019 15:40:45 +0200
-Message-Id: <20190729134047.21033-2-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ v6 2/3] mesh: Add documentation for Import() D-Bus API
+Date:   Mon, 29 Jul 2019 15:40:46 +0200
+Message-Id: <20190729134047.21033-3-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190729134047.21033-1-michal.lowas-rzechonek@silvair.com>
 References: <20190729134047.21033-1-michal.lowas-rzechonek@silvair.com>
@@ -72,115 +72,96 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Jakub Witowski <jakub.witowski@silvair.com>
-
-This is a small improvement of read_node function readability.
+This replaces previously specified ImportLocalNode() call
 ---
- mesh/mesh-config-json.c | 68 +++++++++++++++++++++++++++++------------
- 1 file changed, 49 insertions(+), 19 deletions(-)
+ doc/mesh-api.txt | 57 +++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 42 insertions(+), 15 deletions(-)
 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index e3baf5dc6..c63883a3d 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -297,6 +297,51 @@ static json_object *jarray_key_del(json_object *jarray, int16_t idx)
- 	return jarray_new;
- }
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index 7b62c0af4..255104ab6 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -151,16 +151,50 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.AlreadyExists,
  
-+static bool read_unicast_address(json_object *jobj,
-+							uint16_t *unicast)
-+{
-+	json_object *jvalue;
-+	char *str;
-+
-+	if (!json_object_object_get_ex(jobj, "unicastAddress", &jvalue))
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", unicast) != 1)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool read_default_ttl(json_object *jobj,
-+								uint8_t *ttl)
-+{
-+	json_object *jvalue;
-+	int val;
-+
-+	if (!json_object_object_get_ex(jobj, "defaultTTL", &jvalue))
-+		return false;
-+
-+	val = json_object_get_int(jvalue);
-+
-+	if (val < 0 || val == 1 || val > DEFAULT_TTL)
-+		return false;
-+	*ttl = (uint8_t) val;
-+
-+	return true;
-+}
-+
-+static bool read_seq_number(json_object *jobj, uint32_t *seq_number)
-+{
-+	json_object *jvalue;
-+
-+	if (!json_object_object_get_ex(jobj, "sequenceNumber", &jvalue))
-+		return false;
-+
-+	*seq_number = json_object_get_int(jvalue);
-+	return true;
-+}
-+
- static bool read_iv_index(json_object *jobj, uint32_t *idx, bool *update)
- {
- 	int tmp;
-@@ -424,7 +469,7 @@ fail:
- 	return false;
- }
+-	 uint64 token ImportLocalNode(string json_data)
++	uint64 token Import(object app_root, array{byte}[16] uuid,
++				array{byte}[16] dev_key,
++				array{byte}[16] net_key, uint16 net_index,
++				dict flags, uint32 iv_index, uint16 unicast)
  
--static bool read_net_keys(json_object *jobj,  struct mesh_config_node *node)
-+static bool read_net_keys(json_object *jobj, struct mesh_config_node *node)
- {
- 	json_object *jarray;
- 	int len;
-@@ -1294,7 +1339,6 @@ static bool read_net_transmit(json_object *jobj, struct mesh_config_node *node)
- static bool read_node(json_object *jnode, struct mesh_config_node *node)
- {
- 	json_object *jvalue;
--	char *str;
+ 		This method creates a local mesh node based on node
+ 		configuration that has been generated outside bluetooth-meshd.
  
- 	if (!read_iv_index(jnode, &node->iv_index, &node->iv_update)) {
- 		l_info("Failed to read IV index");
-@@ -1318,25 +1362,11 @@ static bool read_node(json_object *jnode, struct mesh_config_node *node)
+-		The json_data parameter is a full JSON representation of a node
+-		configuration file. The format must conform to the schema
+-		defined in "Mesh Node Configuration Schema" section. Any
+-		included token will be ignored in favor of a locally generated
+-		token value.
++		The app_root parameter is a D-Bus object root path of the
++		application that implements org.bluez.mesh.Application1
++		interface.
++
++		The uuid parameter is a 16-byte array that contains Device UUID.
++		This UUID must be unique (at least from the daemon perspective),
++		therefore attempting to call this function using already
++		registered UUID results in an error.
++
++		The dev_key parameter is the 16-byte value of the dev key of
++		the imported mesh node.
++
++		Remaining parameters correspond to provisioning data:
++
++		The net_key and net_index parameters describe the network (or a
++		subnet, if net_index is not 0) the imported mesh node belongs
++		to.
++
++		The flags parameter is a dictionary containing provisioning
++		flags. Supported values are:
++
++			boolean IVUpdate
++
++				When true, indicates that the network is in the
++				middle of IV Index Update procedure.
++
++			boolean KeyRefresh
++
++				When true, indicates that the specified net key
++				is in the middle of a key refresh procedure.
++
++		The iv_index parameter is the current IV Index value used by
++		the network. This value is known by the provisioner.
++
++		The unicast parameter is the primary unicast address of the
++		imported node.
  
- 	parse_features(jnode, node);
+ 		The returned token must be preserved by the application in
+ 		order to authenticate itself to the mesh daemon and attach to
+@@ -168,13 +202,10 @@ Methods:
+ 		permanently remove the identity of the mesh node by calling
+ 		Leave() method.
  
--	if (!json_object_object_get_ex(jnode, "unicastAddress", &jvalue)) {
--		l_info("Bad config: Unicast address must be present");
--		return false;
--	}
+-		It is an error to attempt importing a node with already
+-		registered Device UUID.
 -
--	str = (char *)json_object_get_string(jvalue);
--	if (sscanf(str, "%04hx", &node->unicast) != 1)
--		return false;
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments,
+-			org.bluez.mesh.Error.AlreadyExists
+-			org.bluez.mesh.Error.NotFound,
++			org.bluez.mesh.Error.AlreadyExists,
++			org.bluez.mesh.Error.NotSupported,
+ 			org.bluez.mesh.Error.Failed
+ 
+ Mesh Node Hierarchy
+@@ -1069,7 +1100,3 @@ Properties:
+ 
+ 		Uniform Resource Identifier points to out-of-band (OOB)
+ 		information (e.g., a public key)
 -
--	if (json_object_object_get_ex(jnode, "defaultTTL", &jvalue)) {
--		int ttl = json_object_get_int(jvalue);
-+	read_unicast_address(jnode, &node->unicast);
- 
--		if (ttl < 0 || ttl == 1 || ttl > DEFAULT_TTL)
--			return false;
--		node->ttl = (uint8_t) ttl;
--	}
-+	read_default_ttl(jnode, &node->ttl);
- 
--	if (json_object_object_get_ex(jnode, "sequenceNumber", &jvalue))
--		node->seq_number = json_object_get_int(jvalue);
-+	read_seq_number(jnode, &node->seq_number);
- 
- 	/* Check for required "elements" property */
- 	if (!json_object_object_get_ex(jnode, "elements", &jvalue))
+-Mesh Node Configuration Schema
+-==============================
+-<TBD>
 -- 
 2.19.1
 
