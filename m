@@ -2,75 +2,140 @@ Return-Path: <SRS0=cftP=V3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0A6C0650F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 09:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B93C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 20:01:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 797E720679
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 09:40:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4247F20659
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 20:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726330AbfG3JkB convert rfc822-to-8bit (ORCPT
+        id S1727243AbfG3UBI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jul 2019 05:40:01 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48534 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725784AbfG3JkA (ORCPT
+        Tue, 30 Jul 2019 16:01:08 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:45393 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726268AbfG3UBI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jul 2019 05:40:00 -0400
-Received: from marcel-macbook.fritz.box (p5B3D2BA7.dip0.t-ipconnect.de [91.61.43.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C2375CECFE;
-        Tue, 30 Jul 2019 11:48:37 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: Yet another counterfeit CSR device?
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAEQQxWySUJZBa9CF7-W_4zXcuitgaNuu2f_pYswLKDUtVwWd1g@mail.gmail.com>
-Date:   Tue, 30 Jul 2019 11:39:59 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A8776B75-52DF-47E9-9FE8-4C59F10109F5@holtmann.org>
-References: <CAEQQxWySUJZBa9CF7-W_4zXcuitgaNuu2f_pYswLKDUtVwWd1g@mail.gmail.com>
-To:     Andrey Batyiev <batyiev@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Tue, 30 Jul 2019 16:01:08 -0400
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1Mk0e8-1icaLz2Q9Y-00kT86; Tue, 30 Jul 2019 22:00:59 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Alexander Viro <viro@zeniv.linux.org.uk>
+Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v5 18/29] compat_ioctl: move rfcomm handlers into driver
+Date:   Tue, 30 Jul 2019 21:55:34 +0200
+Message-Id: <20190730195819.901457-6-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
+In-Reply-To: <20190730195819.901457-1-arnd@arndb.de>
+References: <20190730192552.4014288-1-arnd@arndb.de>
+ <20190730195819.901457-1-arnd@arndb.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:KNUY+ou8651nO/evqeLR4khDAmABirIr+RCPLbKFzTO6f5smDMh
+ 1tpV8P1jpGNB6ALSmigGLUZLlFHyaaEDufHC/sMHAsJQX00Y4thd3ENOiqljWbJEzD/B0jP
+ 3FZ1Vg0T8Sp9hiGsegZTX8CUT8bO/ryYKyoVmUdgOtjtrOaEj5ukTDZE/2SQcPjIz+yJF4Z
+ cNqFP1tMWqkXErX4a1fsg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+6CEOpAQoyc=:LyOCzZSE4+jayuS467Z4/c
+ 8st+rNurhs1J6i/XBZ+oNNjgNY4fpj2tE22ZLfhBHQ32BjcQW9V/jq1YJHVnAiBSI9+h+nOmV
+ NDfSJ7o3PxNaRCTDKlxhEu8+Gt6T8I0VhW2i7nIhHADGVDjQgfZFhr0GMXtEMywH4CrVC9ryN
+ 0FlHEExe6sXeQrloA038UPeg4eY926SX11JLvMSMIL3wBKbFopNUg9I2BZC9L8itzGJXyE5Az
+ axZfI73Q0ig0PDsLru5Oxso8qza4lo525zyJtq68YgX3c7i0Rq68nsYfR0LlyX+xqG/bCeHPh
+ jf/gj9aYU87g1Kp3zxJD/QaE5CRBbUgHlWtA0fiEBhfMRoGwfI98J4N1bzGcFWRnNcZy/naLy
+ 2qgf3nX9cZWQ3ztX5zm+ub6qfBG/4xjpaDJfx9Q/2tp0MkVfXJ1YbLjjHYTTKch7T8QWOwCDR
+ HCcFUUfen+3iIXFWtxKKs04DiMsnR1LPbf2NjuC0p2ZbzZhHYqwSUC/A9b72DoXyabCctaS+C
+ GnnL3526Z5SEMHHDWT5SxJM4q/rHqwm/rylEBsp6YakLo44c5xbf+1AjFioUVkvqLlQGZ2djo
+ X5uHtMn6/g3qBnxLWcN95L+F6szxHsCa3jWYKdLja7aaj/61jPLNBslLL55QLSQxprFwS54Py
+ 1y9Tdb5ip6RbxKkA1xY3HwjTSAU/glEcypMCehY5sHzVrLYJDzMAUU/3xUk83Ufz1R9GrhJas
+ CGivUsGxb3i8IkbfD9eVTXzNvDmq68u3F8vEsw==
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Andrey,
+All these ioctl commands are compatible, so we can handle
+them with a trivial wrapper in rfcomm/sock.c and remove
+the listing in fs/compat_ioctl.c.
 
-> I have nontdescript usb bluetooth dongle with "V5.0" marking on it.
-> It claims to be CSR (0a12:0001) bluetooth dongle, but it has
-> nonfunctional "delete stored link key" command, so I think it is
-> counterfeit.
-> 
-> Futhermore, Linux kernel doesn't detect it as counterfeit
-> (in`btusb_setup_csr`), because the dongle reports following:
-> 
-> - From USB enumeration:
-> bcdDevice = 0x8891
-> 
-> - From Read Local Version HCI command:
-> Manufacturer = 0x000a (CSR)
-> HCI ver. = 4.0
-> HCI rev. = 2064
-> LMP ver. = 4.0
-> LMP subver. = 4114
-> 
-> So, Linux kernel fails to power up this dongle. Ok, so I've hacked
-> `btusb_setup_csr` routine to include this device too (it powers up
-> now), however GATT communication doesn't work (btmon should nothing =
-> no ATT exchanges except MTU setup).
-> 
-> Any ideas on what should I check to make this device work?
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ fs/compat_ioctl.c           |  6 ------
+ net/bluetooth/rfcomm/sock.c | 14 ++++++++++++--
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-please post a btmon -w trace.log from the init procedure. You might need to blacklist btusb.ko module and then manually load it to capture the whole sequence with btmon.
-
-Regards
-
-Marcel
+diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+index f3b4179d6dff..8dbef92b10fd 100644
+--- a/fs/compat_ioctl.c
++++ b/fs/compat_ioctl.c
+@@ -42,7 +42,6 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_sock.h>
+-#include <net/bluetooth/rfcomm.h>
+ 
+ #ifdef CONFIG_BLOCK
+ #include <linux/cdrom.h>
+@@ -673,11 +672,6 @@ COMPATIBLE_IOCTL(HCIUARTGETPROTO)
+ COMPATIBLE_IOCTL(HCIUARTGETDEVICE)
+ COMPATIBLE_IOCTL(HCIUARTSETFLAGS)
+ COMPATIBLE_IOCTL(HCIUARTGETFLAGS)
+-COMPATIBLE_IOCTL(RFCOMMCREATEDEV)
+-COMPATIBLE_IOCTL(RFCOMMRELEASEDEV)
+-COMPATIBLE_IOCTL(RFCOMMGETDEVLIST)
+-COMPATIBLE_IOCTL(RFCOMMGETDEVINFO)
+-COMPATIBLE_IOCTL(RFCOMMSTEALDLC)
+ /* Misc. */
+ COMPATIBLE_IOCTL(PCIIOC_CONTROLLER)
+ COMPATIBLE_IOCTL(PCIIOC_MMAP_IS_IO)
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 90bb53aa4bee..b4eaf21360ef 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -24,7 +24,7 @@
+ /*
+  * RFCOMM sockets.
+  */
+-
++#include <linux/compat.h>
+ #include <linux/export.h>
+ #include <linux/debugfs.h>
+ #include <linux/sched/signal.h>
+@@ -909,6 +909,13 @@ static int rfcomm_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned lon
+ 	return err;
+ }
+ 
++#ifdef CONFIG_COMPAT
++static int rfcomm_sock_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
++{
++	return rfcomm_sock_ioctl(sock, cmd, (unsigned long)compat_ptr(arg));
++}
++#endif
++
+ static int rfcomm_sock_shutdown(struct socket *sock, int how)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -1042,7 +1049,10 @@ static const struct proto_ops rfcomm_sock_ops = {
+ 	.gettstamp	= sock_gettstamp,
+ 	.poll		= bt_sock_poll,
+ 	.socketpair	= sock_no_socketpair,
+-	.mmap		= sock_no_mmap
++	.mmap		= sock_no_mmap,
++#ifdef CONFIG_COMPAT
++	.compat_ioctl	= rfcomm_sock_compat_ioctl,
++#endif
+ };
+ 
+ static const struct net_proto_family rfcomm_sock_family_ops = {
+-- 
+2.20.0
 
