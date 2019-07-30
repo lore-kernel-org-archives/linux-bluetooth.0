@@ -2,169 +2,274 @@ Return-Path: <SRS0=cftP=V3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D31CC0650F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 20:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA23C32750
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 23:18:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 44A6A2089E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 20:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD0AE206A2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Jul 2019 23:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727345AbfG3UBa (ORCPT
+        id S1727296AbfG3XSJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Jul 2019 16:01:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:44405 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726859AbfG3UB3 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Jul 2019 16:01:29 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MzR0i-1iEV4S49z6-00vL3y; Tue, 30 Jul 2019 22:01:21 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Deepa Dinamani <deepa.kernel@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v5 19/29] compat_ioctl: move hci_sock handlers into driver
-Date:   Tue, 30 Jul 2019 21:55:35 +0200
-Message-Id: <20190730195819.901457-7-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20190730195819.901457-1-arnd@arndb.de>
-References: <20190730192552.4014288-1-arnd@arndb.de>
- <20190730195819.901457-1-arnd@arndb.de>
+        Tue, 30 Jul 2019 19:18:09 -0400
+Received: from mga05.intel.com ([192.55.52.43]:59875 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726145AbfG3XSJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Jul 2019 19:18:09 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Jul 2019 16:18:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,327,1559545200"; 
+   d="p7s'?scan'208";a="191069011"
+Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
+  by fmsmga001.fm.intel.com with ESMTP; 30 Jul 2019 16:18:08 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.29]) by
+ ORSMSX109.amr.corp.intel.com ([169.254.11.170]) with mapi id 14.03.0439.000;
+ Tue, 30 Jul 2019 16:18:07 -0700
+From:   "Stotland, Inga" <inga.stotland@intel.com>
+To:     "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+Subject: Re: [PATCH BlueZ v6 1/3] mesh: Extract read_* functions in
+ mesh-config-json
+Thread-Topic: [PATCH BlueZ v6 1/3] mesh: Extract read_* functions in
+ mesh-config-json
+Thread-Index: AQHVRhNIYJrBBkPOhESzHIm3oi0086bkQ0mA
+Date:   Tue, 30 Jul 2019 23:18:07 +0000
+Message-ID: <5805488b1228a044dd5c9261b7fafd53acdd467b.camel@intel.com>
+References: <20190729134047.21033-1-michal.lowas-rzechonek@silvair.com>
+         <20190729134047.21033-2-michal.lowas-rzechonek@silvair.com>
+In-Reply-To: <20190729134047.21033-2-michal.lowas-rzechonek@silvair.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.255.229.74]
+Content-Type: multipart/signed; micalg=sha-1;
+        protocol="application/x-pkcs7-signature"; boundary="=-6OsKnQ+fCQROjZ9UBo/H"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MRkTCynjx8ZKieEaweTLO5hE+mPqZVxegMLXPvi77ZFI1txQjJ9
- mTrIRI4m4fTqEgGSmmFN3Usqtf2R5hhD0UTDT/QRPC8IcYkJNc9RCybcAKzU9ok26pVCy5x
- ntkofHM1zI0tSnU5pRTvXGNm9jz6ODVkgpTv3FlyEqRYcF0gPPf0Zg4bNFKh5M/3p95jW3c
- NJpqqqWo8sTvCujeLhHJQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:imcKfvdmqYo=:DzN1SJA2kycqmDkWZRU/Nc
- NsiVwWKpUTSbb/mjgweqnGJqA8PbLpXcIVI0DnYKLcstHKQqUM9bO1645MdEsaq35cznVPvnq
- X9McomuGyhOeQ4PuSbktBrAlw0vSZNecfiZbb3tG7c3h22XpzdplbFOuxv3KhygMonfVWHRom
- q/lMAAoIWhR0QRDN3FJ7HuxgNRTr7sSsYzWLch8LnunYDT7RAzT8SXZWWJJLACkpr027DVyBm
- huvqteZ6Pd8c2x4Aggmq/hFTmsM3Zq9uPsl9lo935UhlkRild7uIT9VuPcWYPtlV2L+eoAnCS
- Pnlb4AdR2HlsodyDTCQeCcjUgzEHDub1fnFtoonfOdpw5bf22CbPFFcrFmFO6jrDrYeNuxmva
- ix3kaBzwtWdlwkm57P4mrdU6RkeO/B74i4gO1svQDK7My2+U8l3oD1c/ow7kpQyLk77k0i8PK
- raIm0SZOwvPAT/xC4YctG+JWo6dvw1nCt4x+GcshvZNS0bvVb+U671bBLfumJqbGql+jqSWvQ
- /7zT8QpcC5SMTxfJAGBChF6BIceVc3gKJCROeL+dXVKfyE9cBEhQZzVlSdphRCpuoFKPt8eLv
- Td5m7QCdZ+W8eXpu6wquobqfUhHJ12/2yxsqKSKfFpO3/Ag/TBXOKTuHKnVHNpVkmEiFU+2Mc
- lCLkOH5UiTCy359HjqQDgB2hX4PkesHavNc/hE3CnlZzRMAiUOuQi3br5MXWsqjDFmO5MYGw7
- 47iC//C6Eal1Nx6VmsgdHZTfqrEtec8LChFJ6w==
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-All these ioctl commands are compatible, so we can handle
-them with a trivial wrapper in hci_sock.c and remove
-the listing in fs/compat_ioctl.c.
+--=-6OsKnQ+fCQROjZ9UBo/H
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A few of the commands pass integer arguments instead of
-pointers, so for correctness skip the compat_ptr() conversion
-here.
+Hi Jakub,
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- fs/compat_ioctl.c        | 24 ------------------------
- net/bluetooth/hci_sock.c | 21 ++++++++++++++++++++-
- 2 files changed, 20 insertions(+), 25 deletions(-)
+On Mon, 2019-07-29 at 15:40 +0200, Micha=C5=82 Lowas-Rzechonek wrote:
+> From: Jakub Witowski <jakub.witowski@silvair.com>
+>=20
+> This is a small improvement of read_node function readability.
+> ---
+>  mesh/mesh-config-json.c | 68 +++++++++++++++++++++++++++++--------
+> ----
+>  1 file changed, 49 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+> index e3baf5dc6..c63883a3d 100644
+> --- a/mesh/mesh-config-json.c
+> +++ b/mesh/mesh-config-json.c
+> @@ -297,6 +297,51 @@ static json_object *jarray_key_del(json_object
+> *jarray, int16_t idx)
+>  	return jarray_new;
+>  }
+> =20
+> +static bool read_unicast_address(json_object *jobj,
+> +							uint16_t
+> *unicast)
+> +{
+> +	json_object *jvalue;
+> +	char *str;
+> +
+> +	if (!json_object_object_get_ex(jobj, "unicastAddress",
+> &jvalue))
+> +		return false;
+> +
+> +	str =3D (char *)json_object_get_string(jvalue);
+> +	if (sscanf(str, "%04hx", unicast) !=3D 1)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +static bool read_default_ttl(json_object *jobj,
+> +								uint8_t
+> *ttl)
+> +{
+> +	json_object *jvalue;
+> +	int val;
+> +
+> +	if (!json_object_object_get_ex(jobj, "defaultTTL", &jvalue))
+> +		return false;
+> +
+> +	val =3D json_object_get_int(jvalue);
+> +
+> +	if (val < 0 || val =3D=3D 1 || val > DEFAULT_TTL)
+> +		return false;
 
-diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
-index 8dbef92b10fd..9302157d1471 100644
---- a/fs/compat_ioctl.c
-+++ b/fs/compat_ioctl.c
-@@ -40,9 +40,6 @@
- 
- #include "internal.h"
- 
--#include <net/bluetooth/bluetooth.h>
--#include <net/bluetooth/hci_sock.h>
--
- #ifdef CONFIG_BLOCK
- #include <linux/cdrom.h>
- #include <linux/fd.h>
-@@ -646,27 +643,6 @@ COMPATIBLE_IOCTL(RNDADDENTROPY)
- COMPATIBLE_IOCTL(RNDZAPENTCNT)
- COMPATIBLE_IOCTL(RNDCLEARPOOL)
- /* Bluetooth */
--COMPATIBLE_IOCTL(HCIDEVUP)
--COMPATIBLE_IOCTL(HCIDEVDOWN)
--COMPATIBLE_IOCTL(HCIDEVRESET)
--COMPATIBLE_IOCTL(HCIDEVRESTAT)
--COMPATIBLE_IOCTL(HCIGETDEVLIST)
--COMPATIBLE_IOCTL(HCIGETDEVINFO)
--COMPATIBLE_IOCTL(HCIGETCONNLIST)
--COMPATIBLE_IOCTL(HCIGETCONNINFO)
--COMPATIBLE_IOCTL(HCIGETAUTHINFO)
--COMPATIBLE_IOCTL(HCISETRAW)
--COMPATIBLE_IOCTL(HCISETSCAN)
--COMPATIBLE_IOCTL(HCISETAUTH)
--COMPATIBLE_IOCTL(HCISETENCRYPT)
--COMPATIBLE_IOCTL(HCISETPTYPE)
--COMPATIBLE_IOCTL(HCISETLINKPOL)
--COMPATIBLE_IOCTL(HCISETLINKMODE)
--COMPATIBLE_IOCTL(HCISETACLMTU)
--COMPATIBLE_IOCTL(HCISETSCOMTU)
--COMPATIBLE_IOCTL(HCIBLOCKADDR)
--COMPATIBLE_IOCTL(HCIUNBLOCKADDR)
--COMPATIBLE_IOCTL(HCIINQUIRY)
- COMPATIBLE_IOCTL(HCIUARTSETPROTO)
- COMPATIBLE_IOCTL(HCIUARTGETPROTO)
- COMPATIBLE_IOCTL(HCIUARTGETDEVICE)
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index d32077b28433..5d0ed28c0d3a 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -23,7 +23,7 @@
- */
- 
- /* Bluetooth HCI sockets. */
--
-+#include <linux/compat.h>
- #include <linux/export.h>
- #include <linux/utsname.h>
- #include <linux/sched.h>
-@@ -1054,6 +1054,22 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
- 	return err;
- }
- 
-+#ifdef CONFIG_COMPAT
-+static int hci_sock_compat_ioctl(struct socket *sock, unsigned int cmd,
-+				 unsigned long arg)
-+{
-+	switch (cmd) {
-+	case HCIDEVUP:
-+	case HCIDEVDOWN:
-+	case HCIDEVRESET:
-+	case HCIDEVRESTAT:
-+		return hci_sock_ioctl(sock, cmd, arg);
-+	}
-+
-+	return hci_sock_ioctl(sock, cmd, (unsigned long)compat_ptr(arg));
-+}
-+#endif
-+
- static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 			 int addr_len)
- {
-@@ -1974,6 +1990,9 @@ static const struct proto_ops hci_sock_ops = {
- 	.sendmsg	= hci_sock_sendmsg,
- 	.recvmsg	= hci_sock_recvmsg,
- 	.ioctl		= hci_sock_ioctl,
-+#ifdef CONFIG_COMPAT
-+	.compat_ioctl	= hci_sock_compat_ioctl,
-+#endif
- 	.poll		= datagram_poll,
- 	.listen		= sock_no_listen,
- 	.shutdown	= sock_no_shutdown,
--- 
-2.20.0
+New line here to separate from "if" statement
 
+> +	*ttl =3D (uint8_t) val;
+> +
+> +	return true;
+> +}
+> +
+> +static bool read_seq_number(json_object *jobj, uint32_t *seq_number)
+> +{
+> +	json_object *jvalue;
+> +
+> +	if (!json_object_object_get_ex(jobj, "sequenceNumber",
+> &jvalue))
+> +		return false;
+> +
+> +	*seq_number =3D json_object_get_int(jvalue);
+> +	return true;
+> +}
+> +
+>  static bool read_iv_index(json_object *jobj, uint32_t *idx, bool
+> *update)
+>  {
+>  	int tmp;
+> @@ -424,7 +469,7 @@ fail:
+>  	return false;
+>  }
+> =20
+> -static bool read_net_keys(json_object *jobj,  struct
+> mesh_config_node *node)
+> +static bool read_net_keys(json_object *jobj, struct mesh_config_node
+> *node)
+>  {
+>  	json_object *jarray;
+>  	int len;
+> @@ -1294,7 +1339,6 @@ static bool read_net_transmit(json_object
+> *jobj, struct mesh_config_node *node)
+>  static bool read_node(json_object *jnode, struct mesh_config_node
+> *node)
+>  {
+>  	json_object *jvalue;
+> -	char *str;
+> =20
+>  	if (!read_iv_index(jnode, &node->iv_index, &node->iv_update)) {
+>  		l_info("Failed to read IV index");
+> @@ -1318,25 +1362,11 @@ static bool read_node(json_object *jnode,
+> struct mesh_config_node *node)
+> =20
+>  	parse_features(jnode, node);
+> =20
+> -	if (!json_object_object_get_ex(jnode, "unicastAddress",
+> &jvalue)) {
+> -		l_info("Bad config: Unicast address must be present");
+> -		return false;
+> -	}
+> -
+> -	str =3D (char *)json_object_get_string(jvalue);
+> -	if (sscanf(str, "%04hx", &node->unicast) !=3D 1)
+> -		return false;
+> -
+> -	if (json_object_object_get_ex(jnode, "defaultTTL", &jvalue)) {
+> -		int ttl =3D json_object_get_int(jvalue);
+> +	read_unicast_address(jnode, &node->unicast);
+> =20
+
+The return status needs to be checked: unicast must be present
+
+
+> -		if (ttl < 0 || ttl =3D=3D 1 || ttl > DEFAULT_TTL)
+> -			return false;
+> -		node->ttl =3D (uint8_t) ttl;
+> -	}
+> +	read_default_ttl(jnode, &node->ttl);
+> =20
+I would prefer to keep ttl and sequesnce number parsing as they are
+now:
+they are not mandatory, but we don't want to allow for bad format,
+i.e., we dont want to fail if the fields are absent, but we do want to
+fail if the format is wrong.
+
+> -	if (json_object_object_get_ex(jnode, "sequenceNumber",
+> &jvalue))
+> -		node->seq_number =3D json_object_get_int(jvalue);
+> +	read_seq_number(jnode, &node->seq_number);
+> =20
+>  	/* Check for required "elements" property */
+>  	if (!json_object_object_get_ex(jnode, "elements", &jvalue))
+
+Regards,
+Inga
+
+--=-6OsKnQ+fCQROjZ9UBo/H
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+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
+k3sf6w6ZKbZbz2V54rncMEXM3N/P4C6ZHZR0XYqh5m1vWxZYYVzTuDEH1C8W+b3KzldrAgMBAAGj
+ggIwMIICLDAdBgNVHQ4EFgQUcdzZH9M8OSxLujP+AToiD5oYMRkwHwYDVR0jBBgwFoAU2kEjnFqP
+ca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVw
+b3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIu
+Y3JsMIGeBggrBgEFBQcBAQSBkTCBjjAhBggrBgEFBQcwAYYVaHR0cDovL29jc3AuaW50ZWwuY29t
+MGkGCCsGAQUFBzAChl1odHRwOi8vd3d3LmludGVsLmNvbS9yZXBvc2l0b3J5L2NlcnRpZmljYXRl
+cy9JbnRlbCUyMEV4dGVybmFsJTIwQmFzaWMlMjBJc3N1aW5nJTIwQ0ElMjA0Qi5jcnQwCwYDVR0P
+BAQDAgeAMDwGCSsGAQQBgjcVBwQvMC0GJSsGAQQBgjcVCIbDjHWEmeVRg/2BKIWOn1OCkcAJZ4He
+vTmV8EMCAWQCAQkwHwYDVR0lBBgwFgYIKwYBBQUHAwQGCisGAQQBgjcKAwwwKQYJKwYBBAGCNxUK
+BBwwGjAKBggrBgEFBQcDBDAMBgorBgEEAYI3CgMMMEsGA1UdEQREMEKgJwYKKwYBBAGCNxQCA6AZ
+DBdpbmdhLnN0b3RsYW5kQGludGVsLmNvbYEXaW5nYS5zdG90bGFuZEBpbnRlbC5jb20wDQYJKoZI
+hvcNAQEFBQADggEBALnl11xd+3X6fVS0VAKeoF0jCPLFZLCk4jMFifFzY2md3MLjVIB3lE5ffNnS
+mjG9ErOO6as95K6D6hzCJMqNodOyVPRSrMNey0tzFAPLRG3s2bgfmOcvYr4O3WmpDMx8YmH6O2YI
+3Xxjyp11aXl5pk6VjpZV/hjN1jwZ/c/X00KsjoMB8mGSBvbwnV0EFQUJ99xsAlqQ4edj2T9z6pF1
+WX189YL64c/t3a9LWNaT2CWbBZLIFoor9TpZsIj0lGObmGA76JKn5yxN+jzxhWIAzPi5KKYgJ9EU
+FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
+MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
+ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
+ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwNzMwMjMxODA3WjAjBgkqhkiG9w0BCQQxFgQU
+qk3zBHyex/A3RPG/tgprWkeAYmowDQYJKoZIhvcNAQEBBQAEggEAYroejR2fbuvSZJ9sKyFHQ4TK
+XktvLMfjrUaKvpnVHWjAlHZZuzC/7pzOhybqg5CqWpTrlOGCvlIb2h84fnqpzdaw0C4guxynMuIP
+OCc+c81po1LsBzcB81O58HjCkMzjNJ419sgQ0/YIsmuzEEbKSWq5vIApsOTqDTKv9euKyqc5V6w/
+jMX1Caguk9eFfe5WX1iNVb59zPSgOSKE0cufNNPZNqm81aj+FPd4LhFfUlQxFZEpKIaf55mesCBn
+YBxNbz3FOo/HxgXGYAxT2argeeJ0W89GHmwPm5E7SV9LrEbXP7INd9wLhRbtQnGH+1DGrGoKxEJH
+VLaa8coc/jANjwAAAAAAAA==
+
+
+--=-6OsKnQ+fCQROjZ9UBo/H--
