@@ -1,83 +1,83 @@
-Return-Path: <SRS0=Arr2=V4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Lh13=V5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF57C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Jul 2019 18:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF4CC32751
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 01:56:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58DF9208E4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Jul 2019 18:14:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=orcam.com header.i=@orcam.com header.b="MFmAbxMv"
+	by mail.kernel.org (Postfix) with ESMTP id 40C3320B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 01:56:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728984AbfGaSOw (ORCPT
+        id S1728891AbfHAB4M convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 Jul 2019 14:14:52 -0400
-Received: from mail-io1-f51.google.com ([209.85.166.51]:44555 "EHLO
-        mail-io1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727167AbfGaSOv (ORCPT
+        Wed, 31 Jul 2019 21:56:12 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:59160 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726334AbfHAB4M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 Jul 2019 14:14:51 -0400
-Received: by mail-io1-f51.google.com with SMTP id s7so138191984iob.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2019 11:14:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=orcam.com; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=UJmHMf3k5K8FHY7vHKRUUBymKMESq5q3UwXpDKOzwA0=;
-        b=MFmAbxMv0ZArataLYQDjVDI0CRn5oqFiE2puS73XKHVtXXwe4GI8r5NzTNrMa0GXZy
-         8wjpU/uYx2mpoIY3N1bcE/fltrLtJI/yuP52zPFpEzA4jdjT9tj5eUEgS1j+oTiCCfCM
-         C2IMavuyxkGd19g2Um57DpT8XkSWOLK4v56x8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=UJmHMf3k5K8FHY7vHKRUUBymKMESq5q3UwXpDKOzwA0=;
-        b=Nz8hXzzwTt6R1NU4bj+td+dmDAZZvVI+YUb3TkeO7+J03QdllHLOMWea7aQIgrQAvG
-         gxckLySlrcgBzWMkkVgyu1Hq1J0YBUg/kAl45JmCOqCPeMcs53EA9kRDL0z9ksBu47VQ
-         rIRr3K8VjN9+OCcQ/QvJYGvrCKb8zS+iuhdh85BZuJXlGCsIhsYvV285I6SImLDuHzRV
-         EMEhD5OuSqLl/IruUN89ajJL2hT+lNr4xuNgjy1WOYv2K2+caGJdu4gapcPn0XXbmT9t
-         wlFIphbOdi92EPesHiYoKfy9aMvNFeqyh3tuAoOx+4ZMiF8gV45MDMRhoXuSDrfSv5XP
-         GYcQ==
-X-Gm-Message-State: APjAAAU+q/HRxLrErMGGSCFQo91pw1GMBUz4g/8N4R81iQjJpmOTPdXw
-        Ji285ZWH/RFfpwCE59OzRxWPjs26vbZnevT7EOiSqxKJmn0=
-X-Google-Smtp-Source: APXvYqz6RLUO0BalCGwAHYMUZlhG//W5Z/dYNIEUIrKkLpfjNn+teOeCViiz5Q6PduFewsjX6UMo39Jb/7D5FM8JMjE=
-X-Received: by 2002:a05:6638:52:: with SMTP id a18mr3613412jap.75.1564596890522;
- Wed, 31 Jul 2019 11:14:50 -0700 (PDT)
-MIME-Version: 1.0
-From:   Ordit Gross <ordit.gross@orcam.com>
-Date:   Wed, 31 Jul 2019 21:14:41 +0300
-Message-ID: <CAB+bgRb9YgAd5cbDz_8KVNDuxG6X=iHUmTVfjU07_pUNK24zhg@mail.gmail.com>
-Subject: connectDevice - dbus adapter api
+        Wed, 31 Jul 2019 21:56:12 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 189A32838B
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2019 01:56:12 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 0CDC72838F; Thu,  1 Aug 2019 01:56:12 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Cc:     ordit Binshtok <ordit.b@gmail.com>
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Thu, 01 Aug 2019 01:56:09 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: barfin@protonmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-GVmDAA5HiN@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-hi all,
-I have an application that attempts to connect to a paired speaker every minute.
-in case the remote speaker performs reset, the speaker side keys are gone.
-the local device still attempts to reconnect to that device
-(bluetoothd still have all credentials saved).
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-I would like to have a connect_reply "authentication failed" but am
-only getting org.bluez.Error.Failed
-I want to have that information so I could clear credentials from my
-side (remove device)
-** the failed connect might happen also if the speaker is not in
-reach, so this alone isn't a good indication.
+barfin@protonmail.com changed:
 
-how can I overcome this issue?
-(btmon shows the complete information authentication failed)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |barfin@protonmail.com
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt
+--- Comment #32 from barfin@protonmail.com ---
+(In reply to raestloz from comment #31)
+> After resetting btusb driver with sudo modprobe -r btusb and sudo modprobe
+> btusb, I can confirm that the bluetooth dongle is working
+> 
+> What I had to do was add bcdDevice 0x8891 and lmp_subver 0x0811 to the quirk
+> related functions. Inquiry command 0x1001 still timeouts, which necessitates
+> the forced driver load, but once it loads it works
 
-I appreciate your help!
-thanks in advance
-Ordit
+i have this problem in kernel 5.2.5 :(
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
