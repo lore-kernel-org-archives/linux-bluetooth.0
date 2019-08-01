@@ -2,136 +2,80 @@ Return-Path: <SRS0=Lh13=V5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4A6C19759
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 17:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC45C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 18:03:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D84BC206A2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 17:49:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="TLGPm6Fp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hHM5nPFI"
+	by mail.kernel.org (Postfix) with ESMTP id 2E99B2080C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 18:03:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732480AbfHARs4 (ORCPT
+        id S1731986AbfHASDQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Aug 2019 13:48:56 -0400
-Received: from wout3-smtp.messagingengine.com ([64.147.123.19]:47131 "EHLO
-        wout3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731061AbfHARs4 (ORCPT
+        Thu, 1 Aug 2019 14:03:16 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:51144 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731642AbfHASDQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Aug 2019 13:48:56 -0400
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailout.west.internal (Postfix) with ESMTP id E4FE6396;
-        Thu,  1 Aug 2019 13:48:52 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Thu, 01 Aug 2019 13:48:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm1; bh=bX/6GL3MmE3TsjC8DdRXIIaWGw8
-        ZWwDpfqNZvIz+x50=; b=TLGPm6FpkwCkrXEnN681cRBxD8DR3f5HztHK941Hm3r
-        E9U8tj0cdDagkr5YtVKH6XGnZ2RW/SIyOWA+RwASMrUYKt4OUNuChZLb2xFcrqeI
-        YK/IeRzroBdwoKWgGMrSh72B4yseWbFgaRxscGkilfKeosG14yuLEPMH8DOzk4sX
-        78LHupKp93FaM4g5c6xMUaSF5JCTsU7YEpKLrDxCmMunVEs23QRocSnc+SCg6slC
-        M8+VAPGxPEPUXPzfCuSqIfKW+IvHSr+y9sFSLu6r2LRvByDpPEx2ftLDdf9ZMQEH
-        hlMslx33R7nvkGR5NvtOvSuTJiOMOlTOXQMNrXq75Jg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=bX/6GL
-        3MmE3TsjC8DdRXIIaWGw8ZWwDpfqNZvIz+x50=; b=hHM5nPFIKZmq4qZVxcGfms
-        XPLYsf6+/obWeyhSAvkVBI9727Y6RY0LOQJvdS67/9zMJaRKF3L3FjPv4vDaI26p
-        bEkVCovXdYlgX5MfGx/n85sY6r8A8ELd9NITXRypn7XToC8pne4o4Ya+DuXKKBno
-        nHh8KMnpglXpL2cEo9eKh48EY5N2u8jHi+fZ75OqbWiMWD5JVFd6t76S70yxYcU8
-        7EqbyLm96F85JDZoI7r/9Bqv863YvGDsvVsSDK0fKGp3RaWmygWzc7Ib2Hf0A2FY
-        WdV1VuLnUGmdpG8mUPwNL2xJFySgTi4XE5ufmbaMEtPBw6nKDX4ny5HePv1hu+bg
-        ==
-X-ME-Sender: <xms:AyZDXUQDjzU8sPlkQd-yVXHNJqyvOLmheWCD9bR4TQGyA5qjSuplZA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduvddrleejgdduudehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtuggjfgesthdtredttdervdenucfhrhhomhepifhrvghg
-    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuffhomhgrihhnpehkvghrnhgvlh
-    drohhrghenucfkphepkeefrdekiedrkeelrddutdejnecurfgrrhgrmhepmhgrihhlfhhr
-    ohhmpehgrhgvgheskhhrohgrhhdrtghomhenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:AyZDXVe99Dz8clGzgoNYIUgtdBZBdBq06aW8M_pnVYe1Q2qMdIAsLQ>
-    <xmx:AyZDXboiSB299FPC4RaicydBJnq7m3D2XLTEkKFq2mFd-5zkyvBRyw>
-    <xmx:AyZDXe9UT3p3PDNwM7C3NaJ0qGG_zawz8mYPJe_u90nb675zVtoSaA>
-    <xmx:BCZDXdEP4nZOVGZsRznaGeWIHIpAcgk6bGIwyNbYayLOV8WbPkjW4Q>
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        by mail.messagingengine.com (Postfix) with ESMTPA id E01CB380084;
-        Thu,  1 Aug 2019 13:48:50 -0400 (EDT)
-Date:   Thu, 1 Aug 2019 19:48:49 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Vladis Dronov <vdronov@redhat.com>,
-        torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v5.3-rc2] Bluetooth: hci_uart: check for missing tty
- operations
-Message-ID: <20190801174849.GA5048@kroah.com>
-References: <20190730093345.25573-1-marcel@holtmann.org>
- <20190801133132.6BF30206A3@mail.kernel.org>
- <20190801135044.GB24791@kroah.com>
- <20190801171639.GC17697@sasha-vm>
+        Thu, 1 Aug 2019 14:03:16 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id EACC628724
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2019 18:03:15 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id DF57F28726; Thu,  1 Aug 2019 18:03:15 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 204275] bluetoothd consumes 100% cpu on keyboard disconnect
+Date:   Thu, 01 Aug 2019 18:03:14 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: steve@snewbury.org.uk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-204275-62941-JLpj1vDQDi@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204275-62941@https.bugzilla.kernel.org/>
+References: <bug-204275-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190801171639.GC17697@sasha-vm>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 01:16:39PM -0400, Sasha Levin wrote:
-> On Thu, Aug 01, 2019 at 03:50:44PM +0200, Greg KH wrote:
-> > On Thu, Aug 01, 2019 at 01:31:31PM +0000, Sasha Levin wrote:
-> > > Hi,
-> > > 
-> > > [This is an automated email]
-> > > 
-> > > This commit has been processed because it contains a "Fixes:" tag,
-> > > fixing commit: .
-> > > 
-> > > The bot has tested the following trees: v5.2.4, v5.1.21, v4.19.62, v4.14.134, v4.9.186, v4.4.186.
-> > > 
-> > > v5.2.4: Build OK!
-> > > v5.1.21: Build OK!
-> > > v4.19.62: Build OK!
-> > > v4.14.134: Failed to apply! Possible dependencies:
-> > >     25a13e382de2 ("bluetooth: hci_qca: Replace GFP_ATOMIC with GFP_KERNEL")
-> > > 
-> > > v4.9.186: Failed to apply! Possible dependencies:
-> > >     25a13e382de2 ("bluetooth: hci_qca: Replace GFP_ATOMIC with GFP_KERNEL")
-> > > 
-> > > v4.4.186: Failed to apply! Possible dependencies:
-> > >     162f812f23ba ("Bluetooth: hci_uart: Add Marvell support")
-> > >     25a13e382de2 ("bluetooth: hci_qca: Replace GFP_ATOMIC with GFP_KERNEL")
-> > >     395174bb07c1 ("Bluetooth: hci_uart: Add Intel/AG6xx support")
-> > >     9e69130c4efc ("Bluetooth: hci_uart: Add Nokia Protocol identifier")
-> > > 
-> > > 
-> > > NOTE: The patch will not be queued to stable trees until it is upstream.
-> > > 
-> > > How should we proceed with this patch?
+https://bugzilla.kernel.org/show_bug.cgi?id=204275
+
+--- Comment #12 from Steven Newbury (steve@snewbury.org.uk) ---
+(In reply to Luiz Von Dentz from comment #11)
+> (In reply to Steven Newbury from comment #10)
+> > (In reply to Luiz Von Dentz from comment #9)
+> > > Im not sure we even need the watch in the first place, the kernel should
+> > > block any in/out until the connection is encrypted (BT_SK_SUSPEND) so it
+> > > might be possible to get rid of sec_watch altogether.
 > > 
-> > Already fixed up by hand and queued up, your automated email is a bit
-> > slow :)
+> > Going through the history it originally worked that way, I'm not sure why
+> it
+> > was changed..?
 > 
-> /me scratches head
-> 
-> The patch went out two days ago:
-> https://lore.kernel.org/lkml/20190730093345.25573-1-marcel@holtmann.org/
-> 
-> How did it make it upstream already?
+> Well lets try to remove it then and see if that fix the problem.
 
-It's in Linus's tree as b36a1552d731 ("Bluetooth: hci_uart: check for
-missing tty operations") now.
+That works.  I'll attach a patch on here.
 
-thanks,
-
-greg k-h
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
