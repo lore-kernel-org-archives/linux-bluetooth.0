@@ -2,82 +2,73 @@ Return-Path: <SRS0=Lh13=V5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF4CC32751
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 01:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBB7C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 05:33:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 40C3320B7C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 01:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87604206A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Aug 2019 05:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728891AbfHAB4M convert rfc822-to-8bit (ORCPT
+        id S1726014AbfHAFdc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 Jul 2019 21:56:12 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:59160 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726334AbfHAB4M (ORCPT
+        Thu, 1 Aug 2019 01:33:32 -0400
+Received: from zrw-cggw-01.zabzd.ru ([195.39.228.148]:51716 "EHLO
+        zrw-cggw-01.zabzd.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725768AbfHAFdb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 Jul 2019 21:56:12 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 189A32838B
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2019 01:56:12 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 0CDC72838F; Thu,  1 Aug 2019 01:56:12 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Thu, 1 Aug 2019 01:33:31 -0400
+X-Greylist: delayed 3601 seconds by postgrey-1.27 at vger.kernel.org; Thu, 01 Aug 2019 01:33:31 EDT
+Received: by zrw-cggw-01.zabzd.ru (CommuniGate Pro PIPE 6.1.2)
+  with PIPE id 1256665; Thu, 01 Aug 2019 07:51:07 +0300
+Received: from [10.244.0.131] (HELO zrw.oao.rzd)
+  by zrw-cggw-01.zabzd.ru (CommuniGate Pro SMTP 6.1.2)
+  with ESMTP id 1256664 for linux-bluetooth@vger.kernel.org; Thu, 01 Aug 2019 07:51:00 +0300
+Received: from [10.123.236.115] (HELO [10.123.236.115])
+  by zrw.rzd (CommuniGate Pro SMTP 6.1.2)
+  with ESMTP id 56323822 for linux-bluetooth@vger.kernel.org; Thu, 01 Aug 2019 07:33:21 +0300
+From:   =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
+         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@zabzd.ru>
+Subject: May be 'bluetoothctl devices' not right?
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Thu, 01 Aug 2019 01:56:09 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: barfin@protonmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-GVmDAA5HiN@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+References: <000301d347db$df1dd300$9d597900$@com>
+ <6B2D6FC09217DA4280D35175FA16A620688418CA@msceml521-mbx.china.huawei.com>
+ <457BA4F48509464E9000537839AF501857261694@msceml521-mbx.china.huawei.com>
+ <59E7EBF9.3050705@zabzd.ru>
+ <457BA4F48509464E9000537839AF501857261990@msceml521-mbx.china.huawei.com>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1DDAB@msceml522-mbx.china.huawei.com>
+ <59E946F9.1060501@zabzd.ru>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1E01D@msceml522-mbx.china.huawei.com>
+ <59ED2E3D.7030809@zabzd.ru>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1E6D0@msceml522-mbx.china.huawei.com>
+ <59F92B55.0@zabzd.ru>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F23FDB@msceml522-mbx.china.huawei.com>
+ <480C9E29A742984996B50276401889F36B33E940@msceml521-mbx.china.huawei.com>
+Message-ID: <5D427A18.1080402@zabzd.ru>
+Date:   Thu, 1 Aug 2019 13:35:20 +0800
+User-Agent: Microsoft Outlook Express 6.00.2900.5931
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+In-Reply-To: <480C9E29A742984996B50276401889F36B33E940@msceml521-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+Hi all,
 
-barfin@protonmail.com changed:
+The 'devices' command 'List available devices' should show all founded 
+devices after 'scan on' (all visible paired and unpaired devices?).
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |barfin@protonmail.com
+Now (git version bluetoothctl) 'devices' command show visible devices 
+and all paired devices even if the device is turned off (not available).
 
---- Comment #32 from barfin@protonmail.com ---
-(In reply to raestloz from comment #31)
-> After resetting btusb driver with sudo modprobe -r btusb and sudo modprobe
-> btusb, I can confirm that the bluetooth dongle is working
-> 
-> What I had to do was add bcdDevice 0x8891 and lmp_subver 0x0811 to the quirk
-> related functions. Inquiry command 0x1001 still timeouts, which necessitates
-> the forced driver load, but once it loads it works
+May be exclude the display of paired devices that are turned off (not 
+available)?
 
-i have this problem in kernel 5.2.5 :(
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+--------------
+Best regards,
+Aleksandr Proklov
