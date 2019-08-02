@@ -4,39 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 390DEC433FF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Aug 2019 12:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B467C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Aug 2019 12:10:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1ADC1217D4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Aug 2019 12:02:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF6AF2182B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Aug 2019 12:10:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730547AbfHBMCT (ORCPT
+        id S2387832AbfHBMKX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Aug 2019 08:02:19 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:57016 "EHLO
+        Fri, 2 Aug 2019 08:10:23 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:57160 "EHLO
         rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729065AbfHBMCT (ORCPT
+        with ESMTP id S1729980AbfHBMKX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Aug 2019 08:02:19 -0400
+        Fri, 2 Aug 2019 08:10:23 -0400
 Authenticated-By: 
-X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x72C21Oj020109, This message is accepted by code: ctloc85258
-Received: from RS-CAS02.realsil.com.cn (msx.realsil.com.cn[172.29.17.3](maybeforged))
-        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x72C21Oj020109
+X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x72CACt7020957, This message is accepted by code: ctloc85258
+Received: from RS-CAS02.realsil.com.cn (ms1.realsil.com.cn[172.29.17.3](maybeforged))
+        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x72CACt7020957
         (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Fri, 2 Aug 2019 20:02:01 +0800
+        Fri, 2 Aug 2019 20:10:13 +0800
 Received: from toshiba (172.29.36.108) by RS-CAS02.realsil.com.cn
  (172.29.17.3) with Microsoft SMTP Server (TLS) id 14.3.439.0; Fri, 2 Aug 2019
- 20:02:00 +0800
-Date:   Fri, 2 Aug 2019 20:02:18 +0800
+ 20:10:12 +0800
+Date:   Fri, 2 Aug 2019 20:10:29 +0800
 From:   Alex Lu <alex_lu@realsil.com.cn>
 To:     Marcel Holtmann <marcel@holtmann.org>
 CC:     Johan Hedberg <johan.hedberg@gmail.com>,
         <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Max Chou <max.chou@realtek.com>
-Subject: [PATCH v2] Bluetooth: btusb: Fix suspend issue for Realtek devices
-Message-ID: <20190802120217.GA8712@toshiba>
+Subject: [PATCH] Bluetooth: btrtl: Save firmware and config
+Message-ID: <20190802121029.GA8795@toshiba>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
@@ -49,92 +50,137 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Alex Lu <alex_lu@realsil.com.cn>
 
-From the perspective of controller, global suspend means there is no
-SET_FEATURE (DEVICE_REMOTE_WAKEUP) and controller would drop the
-firmware. It would consume less power. So we should not send this kind
-of SET_FEATURE when host goes to suspend state.
-Otherwise, when making device enter selective suspend, host should send
-SET_FEATURE to make sure the firmware remains.
+usb reset resume will cause downloading firmware again and
+requesting firmware may be failed while host is resuming
 
 Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
 ---
- drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++++++++++----
- 1 file changed, 30 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btrtl.c | 77 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 73 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 50aed5259c2b..1995e26fa4cd 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -426,6 +426,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
- #define BTUSB_DIAG_RUNNING	10
- #define BTUSB_OOB_WAKE_ENABLED	11
- #define BTUSB_HW_RESET_ACTIVE	12
-+#define BTUSB_WAKEUP_DISABLE	13
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 208feef63de4..69f0c2765443 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -56,6 +56,10 @@ struct btrtl_device_info {
+ 	int cfg_len;
+ };
  
- struct btusb_data {
- 	struct hci_dev       *hdev;
-@@ -1165,6 +1166,13 @@ static int btusb_open(struct hci_dev *hdev)
- 	 */
- 	device_wakeup_enable(&data->udev->dev);
- 
-+	/* Disable device remote wakeup when host is suspended
-+	 * For Realtek chips, global suspend without
-+	 * SET_FEATURE (DEVICE_REMOTE_WAKEUP) can save more power in device.
-+	 */
-+	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags))
-+		device_wakeup_disable(&data->udev->dev);
++static struct btrtl_device_info dev_info = {
++	NULL, 0, NULL, 0, NULL, 0
++};
 +
- 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
- 		goto done;
- 
-@@ -1227,6 +1235,11 @@ static int btusb_close(struct hci_dev *hdev)
- 		goto failed;
- 
- 	data->intf->needs_remote_wakeup = 0;
-+
-+	/* Enable remote wake up for auto-suspend */
-+	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags))
-+		data->intf->needs_remote_wakeup = 1;
-+
- 	device_wakeup_disable(&data->udev->dev);
- 	usb_autopm_put_interface(data->intf);
- 
-@@ -3185,11 +3198,11 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info & BTUSB_REALTEK) {
- 		hdev->setup = btrtl_setup_realtek;
- 
--		/* Realtek devices lose their updated firmware over suspend,
--		 * but the USB hub doesn't notice any status change.
--		 * Explicitly request a device reset on resume.
-+		/* Realtek devices lose their updated firmware over global
-+		 * suspend that means host doesn't send SET_FEATURE
-+		 * (DEVICE_REMOTE_WAKEUP)
- 		 */
--		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
-+		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
- 	}
- #endif
- 
-@@ -3363,6 +3376,19 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 		enable_irq(data->oob_wake_irq);
+ static const struct id_table ic_id_table[] = {
+ 	{ IC_MATCH_FL_LMPSUBV, RTL_ROM_LMP_8723A, 0x0,
+ 	  .config_needed = false,
+@@ -553,8 +557,19 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 			goto err_free;
  	}
  
-+	/* For global suspend, Realtek devices lose the loaded fw
-+	 * in them. But for autosuspend, firmware should remain.
-+	 * Actually, it depends on whether the usb host sends
-+	 * set feature (enable wakeup) or not.
-+	 */
-+	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags)) {
-+		if (PMSG_IS_AUTO(message) &&
-+		    device_can_wakeup(&data->udev->dev))
-+			data->udev->do_remote_wakeup = 1;
-+		else if (!PMSG_IS_AUTO(message))
-+			data->udev->reset_resume = 1;
+-	btrtl_dev->fw_len = rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
+-					  &btrtl_dev->fw_data);
++	if (dev_info.ic_info == NULL ||
++	    dev_info.ic_info != btrtl_dev->ic_info) {
++		btrtl_dev->fw_len = rtl_load_file(hdev,
++						  btrtl_dev->ic_info->fw_name,
++						  &btrtl_dev->fw_data);
++	} else {
++		if (dev_info.fw_len)
++			btrtl_dev->fw_data = kmemdup(dev_info.fw_data,
++						     dev_info.fw_len,
++						     GFP_KERNEL);
++		if (btrtl_dev->fw_data)
++			btrtl_dev->fw_len = dev_info.fw_len;
 +	}
-+
- 	return 0;
+ 	if (btrtl_dev->fw_len < 0) {
+ 		rtl_dev_err(hdev, "firmware file %s not found\n",
+ 			    btrtl_dev->ic_info->fw_name);
+@@ -570,8 +585,18 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 			snprintf(cfg_name, sizeof(cfg_name), "%s.bin",
+ 				 btrtl_dev->ic_info->cfg_name);
+ 		}
+-		btrtl_dev->cfg_len = rtl_load_file(hdev, cfg_name,
+-						   &btrtl_dev->cfg_data);
++		if (dev_info.ic_info == NULL ||
++		    dev_info.ic_info != btrtl_dev->ic_info) {
++			btrtl_dev->cfg_len = rtl_load_file(hdev, cfg_name,
++							&btrtl_dev->cfg_data);
++		} else {
++			if (dev_info.cfg_len)
++				btrtl_dev->cfg_data = kmemdup(dev_info.cfg_data,
++							      dev_info.cfg_len,
++							      GFP_KERNEL);
++			if (btrtl_dev->cfg_data)
++				btrtl_dev->cfg_len = dev_info.cfg_len;
++		}
+ 		if (btrtl_dev->ic_info->config_needed &&
+ 		    btrtl_dev->cfg_len <= 0) {
+ 			rtl_dev_err(hdev, "mandatory config file %s not found\n",
+@@ -620,6 +645,29 @@ int btrtl_download_firmware(struct hci_dev *hdev,
  }
+ EXPORT_SYMBOL_GPL(btrtl_download_firmware);
  
++static void dev_fw_free(void)
++{
++	kfree(dev_info.fw_data);
++	kfree(dev_info.cfg_data);
++	memset(&dev_info, 0, sizeof(dev_info));
++}
++
++static void dev_fw_dup(struct btrtl_device_info *btrtl_dev)
++{
++	dev_info.ic_info = btrtl_dev->ic_info;
++	dev_info.rom_version = btrtl_dev->rom_version;
++
++	dev_info.fw_len = btrtl_dev->fw_len;
++	if (dev_info.fw_len)
++		dev_info.fw_data = kmemdup(btrtl_dev->fw_data,
++					   btrtl_dev->fw_len,
++					   GFP_KERNEL);
++	dev_info.cfg_len = btrtl_dev->cfg_len;
++	if (dev_info.cfg_len)
++		dev_info.cfg_data = kmemdup(btrtl_dev->cfg_data,
++					    btrtl_dev->cfg_len, GFP_KERNEL);
++}
++
+ int btrtl_setup_realtek(struct hci_dev *hdev)
+ {
+ 	struct btrtl_device_info *btrtl_dev;
+@@ -630,6 +678,10 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ 		return PTR_ERR(btrtl_dev);
+ 
+ 	ret = btrtl_download_firmware(hdev, btrtl_dev);
++	if (!ret && btrtl_dev->ic_info != dev_info.ic_info) {
++		dev_fw_free();
++		dev_fw_dup(btrtl_dev);
++	}
+ 
+ 	btrtl_free(btrtl_dev);
+ 
+@@ -745,6 +797,23 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+ }
+ EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
+ 
++static int btrtl_module_init(void)
++{
++	BT_INFO("btrtl: init");
++
++	return 0;
++}
++
++static void btrtl_module_exit(void)
++{
++	BT_INFO("btrtl: exit");
++
++	dev_fw_free();
++}
++
++module_init(btrtl_module_init);
++module_exit(btrtl_module_exit)
++
+ MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
+ MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
+ MODULE_VERSION(VERSION);
 -- 
 2.19.2
 
