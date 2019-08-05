@@ -2,87 +2,91 @@ Return-Path: <SRS0=EM7j=WB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C34E7C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Aug 2019 04:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22164C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Aug 2019 07:55:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0FC3217D9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Aug 2019 04:07:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9B2D2067D
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Aug 2019 07:55:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="exLFjaut"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725951AbfHEEHr (ORCPT
+        id S1726877AbfHEHzH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Aug 2019 00:07:47 -0400
-Received: from zrw-cggw-02.zabzd.ru ([195.39.228.149]:50378 "EHLO
-        zrw-cggw-02.zabzd.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725613AbfHEEHq (ORCPT
+        Mon, 5 Aug 2019 03:55:07 -0400
+Received: from mail-lf1-f52.google.com ([209.85.167.52]:36628 "EHLO
+        mail-lf1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726394AbfHEHzH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Aug 2019 00:07:46 -0400
-Received: by zrw-cggw-02.zabzd.ru (CommuniGate Pro PIPE 6.1.2)
-  with PIPE id 893699; Mon, 05 Aug 2019 07:07:43 +0300
-Received: from [10.244.0.130] (HELO zrw.oao.rzd)
-  by zrw-cggw-02.zabzd.ru (CommuniGate Pro SMTP 6.1.2)
-  with ESMTP id 893698 for linux-bluetooth@vger.kernel.org; Mon, 05 Aug 2019 07:07:35 +0300
-X-KLMS-Rule-ID: 1
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiPhishing: not scanned, disabled by settings
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2019/08/04 22:17:00 #13682564
-X-KLMS-AntiVirus-Status: Clean, skipped
-Received: from [10.123.236.115] (HELO [10.123.236.115])
-  by zrw.rzd (CommuniGate Pro SMTP 6.1.2)
-  with ESMTP id 59028239 for linux-bluetooth@vger.kernel.org; Mon, 05 Aug 2019 07:07:35 +0300
-Subject: Re: May be 'bluetoothctl devices' not right?
-References: <000301d347db$df1dd300$9d597900$@com>
- <6B2D6FC09217DA4280D35175FA16A620688418CA@msceml521-mbx.china.huawei.com>
- <457BA4F48509464E9000537839AF501857261694@msceml521-mbx.china.huawei.com>
- <59E7EBF9.3050705@zabzd.ru>
- <457BA4F48509464E9000537839AF501857261990@msceml521-mbx.china.huawei.com>
- <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1DDAB@msceml522-mbx.china.huawei.com>
- <59E946F9.1060501@zabzd.ru>
- <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1E01D@msceml522-mbx.china.huawei.com>
- <59ED2E3D.7030809@zabzd.ru>
- <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1E6D0@msceml522-mbx.china.huawei.com>
- <59F92B55.0@zabzd.ru>
- <7CC793D56C5DD04ABFAFBF59EB0D4A3650F23FDB@msceml522-mbx.china.huawei.com>
- <480C9E29A742984996B50276401889F36B33E940@msceml521-mbx.china.huawei.com>
- <5D427A18.1080402@zabzd.ru>
+        Mon, 5 Aug 2019 03:55:07 -0400
+Received: by mail-lf1-f52.google.com with SMTP id j17so3133806lfp.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Aug 2019 00:55:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5JUiXgTGpVbO60qhcPzO7yJeZwIi/gvrMNbL7/8cKQY=;
+        b=exLFjaut0V+HBOaETOrm9fo52lXdqoMQ3QIrghun7GcttKV+lMXwiE4Sxd8+T2hKP7
+         T5j8f/aIYesZp47b+B118f7hyzjVdEZWpWTbwwe9h4CgpQejV5+/pQpnI31NVlmgP6bw
+         /W4yM9iEt663wc6bFStLNaJklsgME4SXEPlhADZzwfy/XATduX0VTKgbrzk5EgER8zjS
+         0HQET+btxkHpM0tDjpPettErhcieB7vPLv+e7yVM5qPGHfzkvaPQhDyd8d0L+zAyt2iL
+         tZNaBzQzYIMF8J6BLJspkAnB+zR11SjsHA7SNNyc54aAABLK6fjhtVh9WfaldA0jRFhw
+         bAlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5JUiXgTGpVbO60qhcPzO7yJeZwIi/gvrMNbL7/8cKQY=;
+        b=FWjrbbYkoC/eamsiCaPTuEnuQfna1d3z7g/Cytvnq7yOSJlK0XvUwF+KLbIsySH615
+         qbqXU5Y2/PWRItggfcKqEB+4zEmd1s7TjAQV6xBsJFDL9QbbWQQ7q/hERp2JlbaASU3E
+         USX4mNyIezPuo/jo6v1O7VlqxYPPdniePW4vLpFeqfIqIfixlorseehepqWzBTE/z9k1
+         5husm0izEDDmr6/H6YNfuuDQJCl5ndlrqijvbJuuAnGGHRewp4cJZaRQ2LrOatdM3m5l
+         1hgQcONAUylD/Kchqd/sTBDobGo4ubs9AjNBvW5AF/QZxKZ/Wuw+U/MK3yKpabIr/oQP
+         VVpA==
+X-Gm-Message-State: APjAAAWf3wM58eAmRKwMzYgvk6A9YtuNbJAZ4qCm/AqHpV4XItO9OiDj
+        uqw/4xxYAFdpTTfkOoXeEopHdidzm8I=
+X-Google-Smtp-Source: APXvYqyH3cYhSbNUEu7OTRXJxpl11HiE7NhbtVeE96kxebaH2AzQ9OsyoJ3jKfyRL/KEvGLWO/gxWw==
+X-Received: by 2002:a19:4c57:: with SMTP id z84mr2602656lfa.87.1564991704826;
+        Mon, 05 Aug 2019 00:55:04 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id q17sm1661313lfb.26.2019.08.05.00.55.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 05 Aug 2019 00:55:03 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-From:   =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
-         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@zabzd.ru>
-Message-ID: <5D47BA12.1080502@zabzd.ru>
-Date:   Mon, 5 Aug 2019 13:09:38 +0800
-User-Agent: Microsoft Outlook Express 6.00.2900.5931
+Subject: [PATCH BlueZ] mesh: Fix storing network retransmission in config
+Date:   Mon,  5 Aug 2019 09:54:58 +0200
+Message-Id: <20190805075458.15694-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <5D427A18.1080402@zabzd.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Maybe you know the standart method to check availability of the device ?
+---
+ mesh/mesh-config-json.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Now i use l2ping command for this.
-
-
-
-01.08.2019 13:35, Проклов Александр Валерьевич пишет:
-> Hi all,
->
-> The 'devices' command 'List available devices' should show all founded
-> devices after 'scan on' (all visible paired and unpaired devices?).
->
-> Now (git version bluetoothctl) 'devices' command show visible devices
-> and all paired devices even if the device is turned off (not available).
->
-> May be exclude the display of paired devices that are turned off (not
-> available)?
->
-> --------------
-> Best regards,
-> Aleksandr Proklov
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index 177aaac7b..d49f5226a 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -1553,7 +1553,7 @@ bool mesh_config_write_net_transmit(struct mesh_config *cfg, uint8_t cnt,
+ 	jnode = cfg->jnode;
+ 
+ 	jretransmit = json_object_new_object();
+-	if (jretransmit)
++	if (!jretransmit)
+ 		return false;
+ 
+ 	if (!write_int(jretransmit, "count", cnt))
+-- 
+2.19.1
 
