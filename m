@@ -2,149 +2,117 @@ Return-Path: <SRS0=gGyw=WC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E75C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Aug 2019 11:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 103C7C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Aug 2019 13:47:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 47DF620C01
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Aug 2019 11:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3724208C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Aug 2019 13:47:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="LiYPummN";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ESZqsS8V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BBEjc5JG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732696AbfHFLMO (ORCPT
+        id S1726783AbfHFNrZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Aug 2019 07:12:14 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:41756 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731309AbfHFLMO (ORCPT
+        Tue, 6 Aug 2019 09:47:25 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:39560 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726373AbfHFNrZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Aug 2019 07:12:14 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 411E2607DE; Tue,  6 Aug 2019 11:12:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1565089933;
-        bh=PXqe5y9a718vUQSQUOxmfZGDIqCtip464Gcvxtjj4zo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LiYPummNg1KAHClUPC5DEMTpP4DOooxFBDHNhSucbNmUnY1KGXXfEKgVdw4d0O6Fx
-         5TdizQ2A4EnvZ/ca/Gs0Diqe+AgvBBRGRTwGCQ7xBqDdGdz3RsXlaMj4DobPFcPk3B
-         84+t4EnMIfPNzH4rMEcESDA1HZsOat8I4eONCCdI=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 307746053B;
-        Tue,  6 Aug 2019 11:12:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1565089932;
-        bh=PXqe5y9a718vUQSQUOxmfZGDIqCtip464Gcvxtjj4zo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ESZqsS8VblOMAJdQViDaUiA4jfHfE0FXzpZjnWRi9/Fapc2wPyLYgn66ReFe8k7y9
-         Aau3PopZGRte19uvjXU0Mznhk32zMVPlsduCv2NbFBvaK+gp2HwHV+bO+U8bVjaCN+
-         DjeNHnPLCjgKOjOCy3jf0i33qWgCB6j799dxZZa4=
+        Tue, 6 Aug 2019 09:47:25 -0400
+Received: by mail-lf1-f68.google.com with SMTP id x3so7410993lfn.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Aug 2019 06:47:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rvJot3sdFzlXVa95YJ5H7OOgZwYquxrO4qKP13c7uwY=;
+        b=BBEjc5JGpZodXuCK4ydLwMAfFRV0kDM+1QwrUj8hucrDMmHNqgojTX+AM/xRUlQ4zw
+         iLNGuxCIqEtv7Ey+IAYzh3DcpidxweDpHTzLlrZF3j89s+xdlxnzoeXkXHB/Mk5c0lzE
+         t0sIc1kWZkgfNnLZ8nmSx4ip3R0BpbeDBoJG4YRWyJFVgpQa6aGi/65FuWbENmdjwe+C
+         gfV2Xb9hw8DJDfc9H9AEgyjCdMJb46KWYsxE19MoL/CN4whzOInS/AMWwuNtsz5bGBxb
+         QFzkSC0Imb+/7nd7aIiM+7p59t5a2n/RT+OTsvjFAL4U7hRWQMvxnVtp/6dQ9g//uf3Y
+         z1HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rvJot3sdFzlXVa95YJ5H7OOgZwYquxrO4qKP13c7uwY=;
+        b=IzQDTLhGWmZmF/qEUISo74OdIxQ6ZkE6PqlaXojhebPLtmn8a1ZlVPc8zeEIwCbjVC
+         12XgVL6ZnRkoh+M6onh5GxMO2G6hZmsLDqPvof78qRHTfPThUXiDT8c0G3eI1LtgMMhf
+         v2+aGgUAnTqpo74oBUdbqSPpN88bdIId8TkmLHUhNLFxYPJieF6vd0MPmdM5WUFsWl6q
+         47W2YAwKUfA2BWKThOfjKUYTdSFVk2M5FV3E0AjEYsucI3MN84NgdrlxDrm6vw7oy9uf
+         PKpuqSm+CdSXEC1mWHVUkePrWyhP0Eo+pvUyqjaSiFzbOx/tbyZ4VYdvDNY38gJ+Aul1
+         kJ/A==
+X-Gm-Message-State: APjAAAV6VUmjUyZRjVA7G1jB+Hfl/C25pJ98Foqtg37CXUs/+PVaSzaA
+        keJYEOGpudURqGfXPJ4DgPjU3ghv
+X-Google-Smtp-Source: APXvYqxCjc2YN3osb48NgGL+OEc0KKamsz0lm4jEp5BC5/H2zCyshl/tvoWNxczBkSY0CYa9kZjzeg==
+X-Received: by 2002:a19:8c57:: with SMTP id i23mr2464534lfj.192.1565099242721;
+        Tue, 06 Aug 2019 06:47:22 -0700 (PDT)
+Received: from localhost.localdomain (ip-194-187-74-233.konfederacka.maverick.com.pl. [194.187.74.233])
+        by smtp.gmail.com with ESMTPSA id f17sm1694400lfa.67.2019.08.06.06.47.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 06 Aug 2019 06:47:21 -0700 (PDT)
+From:   =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Szymon Janc <szymon.janc@codecoup.pl>,
+        =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
+Subject: [PATCH] advertising: reply in RegisterAdvertisement on success
+Date:   Tue,  6 Aug 2019 15:47:06 +0200
+Message-Id: <20190806134706.21453-1-zajec5@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 06 Aug 2019 16:42:12 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Claire Chang <tientzu@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hemantg@codeaurora.org, rjliao@codeaurora.org
-Subject: Re: [PATCH] Bluetooth: btqca: release_firmware after
- qca_inject_cmd_complete_event
-In-Reply-To: <20190806095629.88769-1-tientzu@chromium.org>
-References: <20190806095629.88769-1-tientzu@chromium.org>
-Message-ID: <e1c1e48cb4c79d958fef7d66539b0a86@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: Rafał Miłecki <rafal@milecki.pl>
+
+RegisterAdvertisement method handler sends a reply message on all kind
+of errors. It makes waiting for a reply and checking it very useful on
+the caller side. There are errors like InvalidArguments, AlreadyExists,
+etc. defined.
+
+A missing reply on RegisterAdvertisement success was causing
+dbus_pending_call_block() to block caller and was resulting in the
+org.freedesktop.DBus.Error.NoReply after a timeout.
+
+Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
+---
 Hi,
 
-On 2019-08-06 15:26, Claire Chang wrote:
-> commit 32646db8cc28 ("Bluetooth: btqca: inject command complete event
-> during fw download") added qca_inject_cmd_complete_event() for certain
-> qualcomm chips. However, qca_download_firmware() will return without
-> calling release_firmware() in this case.
-> 
-> This leads to a memory leak like the following found by kmemleak:
-> 
-> unreferenced object 0xfffffff3868a5880 (size 128):
->   comm "kworker/u17:5", pid 347, jiffies 4294676481 (age 312.157s)
->   hex dump (first 32 bytes):
->     ac fd 00 00 00 00 00 00 00 d0 7e 17 80 ff ff ff  ..........~.....
->     00 00 00 00 00 00 00 00 00 59 8a 86 f3 ff ff ff  .........Y......
->   backtrace:
->     [<00000000978ce31d>] kmem_cache_alloc_trace+0x194/0x298
->     [<000000006ea0398c>] _request_firmware+0x74/0x4e4
->     [<000000004da31ca0>] request_firmware+0x44/0x64
->     [<0000000094572996>] qca_download_firmware+0x74/0x6e4 [btqca]
->     [<00000000b24d615a>] qca_uart_setup+0xc0/0x2b0 [btqca]
->     [<00000000364a6d5a>] qca_setup+0x204/0x570 [hci_uart]
->     [<000000006be1a544>] hci_uart_setup+0xa8/0x148 [hci_uart]
->     [<00000000d64c0f4f>] hci_dev_do_open+0x144/0x530 [bluetooth]
->     [<00000000f69f5110>] hci_power_on+0x84/0x288 [bluetooth]
->     [<00000000d4151583>] process_one_work+0x210/0x420
->     [<000000003cf3dcfb>] worker_thread+0x2c4/0x3e4
->     [<000000007ccaf055>] kthread+0x124/0x134
->     [<00000000bef1f723>] ret_from_fork+0x10/0x18
->     [<00000000c36ee3dd>] 0xffffffffffffffff
-> unreferenced object 0xfffffff37b16de00 (size 128):
->   comm "kworker/u17:5", pid 347, jiffies 4294676873 (age 311.766s)
->   hex dump (first 32 bytes):
->     da 07 00 00 00 00 00 00 00 50 ff 0b 80 ff ff ff  .........P......
->     00 00 00 00 00 00 00 00 00 dd 16 7b f3 ff ff ff  ...........{....
->   backtrace:
->     [<00000000978ce31d>] kmem_cache_alloc_trace+0x194/0x298
->     [<000000006ea0398c>] _request_firmware+0x74/0x4e4
->     [<000000004da31ca0>] request_firmware+0x44/0x64
->     [<0000000094572996>] qca_download_firmware+0x74/0x6e4 [btqca]
->     [<000000000cde20a9>] qca_uart_setup+0x144/0x2b0 [btqca]
->     [<00000000364a6d5a>] qca_setup+0x204/0x570 [hci_uart]
->     [<000000006be1a544>] hci_uart_setup+0xa8/0x148 [hci_uart]
->     [<00000000d64c0f4f>] hci_dev_do_open+0x144/0x530 [bluetooth]
->     [<00000000f69f5110>] hci_power_on+0x84/0x288 [bluetooth]
->     [<00000000d4151583>] process_one_work+0x210/0x420
->     [<000000003cf3dcfb>] worker_thread+0x2c4/0x3e4
->     [<000000007ccaf055>] kthread+0x124/0x134
->     [<00000000bef1f723>] ret_from_fork+0x10/0x18
->     [<00000000c36ee3dd>] 0xffffffffffffffff
-> 
-> Make sure release_firmware() is called aftre
-> qca_inject_cmd_complete_event() to avoid the memory leak.
-> 
-> Fixes: 32646db8cc28 ("Bluetooth: btqca: inject command complete event
-> during fw download")
-> Signed-off-by: Claire Chang <tientzu@chromium.org>
-> ---
->  drivers/bluetooth/btqca.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 2221935fac7e..8f0fec5acade 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -344,7 +344,7 @@ static int qca_download_firmware(struct hci_dev 
-> *hdev,
->  	 */
->  	if (config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
->  	    config->dnld_type == ROME_SKIP_EVT_VSE)
-> -		return qca_inject_cmd_complete_event(hdev);
-> +		ret = qca_inject_cmd_complete_event(hdev);
-> 
->  out:
->  	release_firmware(fw);
+I'm writing my first BlueZ app using C language and I run into this
+timeout + org.freedesktop.DBus.Error.NoReply problem. I found this fix
+and tested it successfully.
 
-Change look fine to me.
+I can see that many methods handler do the same, e.g.:
+UnregisterAdvertisement, RegisterProfile and UnregisterApplication.
 
-Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Let me know if you see any problem with this patch/fix.
+---
+ src/advertising.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/src/advertising.c b/src/advertising.c
+index 3ed13766c..43591ae42 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1190,7 +1190,7 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
+ 
+ 	queue_push_tail(manager->clients, client);
+ 
+-	return NULL;
++	return dbus_message_new_method_return(msg);
+ }
+ 
+ static DBusMessage *unregister_advertisement(DBusConnection *conn,
 -- 
-Regards
-Balakrishna.
+2.21.0
+
