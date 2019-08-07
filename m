@@ -2,403 +2,1455 @@ Return-Path: <SRS0=c51M=WD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 617E5C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Aug 2019 09:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9C8C32751
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Aug 2019 11:19:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1AC1221E6A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Aug 2019 09:58:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85F7721922
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Aug 2019 11:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="cE2xEboD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZTbbUJWu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729292AbfHGJ6l (ORCPT
+        id S2387543AbfHGLTO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Aug 2019 05:58:41 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:33778 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727541AbfHGJ6l (ORCPT
+        Wed, 7 Aug 2019 07:19:14 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:33932 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729348AbfHGLTN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Aug 2019 05:58:41 -0400
-Received: by mail-lj1-f195.google.com with SMTP id h10so13419618ljg.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Aug 2019 02:58:39 -0700 (PDT)
+        Wed, 7 Aug 2019 07:19:13 -0400
+Received: by mail-ot1-f67.google.com with SMTP id n5so102800975otk.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Aug 2019 04:19:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=NXUBeWVSfxqvCGeZIPihMNcHl5jhtnbtgGlCyEVtT1A=;
-        b=cE2xEboD7r1wLyH3ziTb1FAfhtzpjo/d7nTXag1wDYpirKDBSm2daZ0op1aQrkYpc2
-         VxNlhfyQjd+V/aWwTJfZ42AV/uJA52FHaZI4zAPJGez6Pw0Zr3XDxdQnnNlUAY2Ex9Ib
-         NzdMewjTE2UndPs3XAyv55nH5DCCgAgl381V59y8/eBoNyfv/1oalX4TlI/z4PxcNia2
-         nsc21VounHzQcD7TX75mB+yd2dGbMC7HmSDlAzzcIsq0Om2GlODVcchWq0gum0DgmHyG
-         xHAl6mWE8z0DoYN1DxaseTaJhM587JRXNTJvC38rp4wUO7Atkuf72mXKRUm0Y+Bk4PNd
-         drZQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=shs0CzjEWaGe9WlIaZWJ1tAeeGn9L9ux4McjfkHrOFs=;
+        b=ZTbbUJWuBY1L7KUI11Iv9cu/x5q8XAUj23q0fIk4f6EUpF3mbxnGNiu1tQH0HgNX98
+         TAEFSbEYSyQdHgqFlGEHBrcfuMp6xh6UuhEGCpfypSWQ4FKQa6GbNQIKhuS9n8I+YrHQ
+         w8X3ZbQRCxlZ86fbhu29aCrEbyQXe0iZLcpJhYwWgYquC/5DCzUB1HIcDmwWnhGmGzAR
+         cSLJvRGXboRIoj+QANDq1KXU+b+Jf54DNOFDsAJyM7BNv0Bk7zpNxUFHK7LaOpigKJnB
+         b7L9s2hzIJZUKEqF2cuGuxEgQXqTSdZb3nvdhCASswn9bIOnAKa6ohZ/89eycpenNLK6
+         1onA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=NXUBeWVSfxqvCGeZIPihMNcHl5jhtnbtgGlCyEVtT1A=;
-        b=jiKCW6X7/pfYb/l8HWI4CZdbwOWp1surVPIFdWC1HH/uNywUnCYG2YT9eluxM0q4ig
-         ypAiHIf5PKX/Vy0QDqpUWBGieN3HEq47iUPdOd2RV0bIpZD6en+3BLn4zfLAYPi5hPs+
-         NuO2tdSN5FDK+b5GdHm2qKhRxsbzZ7zxXCYpQtuWZ0ZNRVcGwbvo/Hl5QK62tzDDfcWT
-         03ba/jrYhNhL5dFHAxVwIG9dxQZ4mRI89+Vt7uC8wfEoBs37KM498smJBQcNy8hJHi4D
-         0NWp6FPr8iSDQPY6eQ+SQDZXTs5qW8QVJcsu84AeMIrqCKdwh9ok2uRhi/xQCSbvLRii
-         jFVw==
-X-Gm-Message-State: APjAAAX986KlrcZv7EI0fbLf6VfQwFKmm0qpl2OCvhpek9q0HcWmtmxp
-        dRNf5/RF6jHwi7glFOshEXJF4/pVkrQ=
-X-Google-Smtp-Source: APXvYqz/mlCbmHd6NuqiijMIG2L/IltPWJtbtG7aIgfQTDSQ72xq5AiR+wGj8a/4h7sD5dDjJVHALA==
-X-Received: by 2002:a2e:9610:: with SMTP id v16mr4280308ljh.229.1565171918073;
-        Wed, 07 Aug 2019 02:58:38 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id h1sm16247282lfj.21.2019.08.07.02.58.36
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 07 Aug 2019 02:58:37 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Move sequence number overcommit to mesh-config-json
-Date:   Wed,  7 Aug 2019 11:58:31 +0200
-Message-Id: <20190807095831.13229-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.19.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=shs0CzjEWaGe9WlIaZWJ1tAeeGn9L9ux4McjfkHrOFs=;
+        b=jhOWl5yQ+wsPyhP5rLlMpTAtEGJ1IkzMUxzs/dESUlRu6jKFlDtgT4/tgTY5FSYH5p
+         OOGhUzBx9VL8F3xZzQusFF7bwULw/YNHqB14+qt+14TxpNblQVS5qAo0cLf4Z8p6Ctxg
+         K+S5e4vri6fDGgdaj+NtyVV3qpFWXqOb1vpuLwl7L0KQ0a3cfmVLmWQvq+VORXd9du/L
+         1EphFpRnpN1Y0ZDwOp/r7U83/Zf7OvVG++JD57bF+ci+d1m0Zlcv0WdecjhZnbEU+8uS
+         8E53Oxqvc53d7O2ABzLgu53mqhu8mNnzsddp0y1hsgPvJi3Pq8PwjUiG+t1ItjdxbJ+N
+         sqVA==
+X-Gm-Message-State: APjAAAW+Rp6RoJ9eBV6gzvdWaBTty+dVa14w2U40Z5/3e1jxN0PoJiO6
+        3+D1nN4SXd1bRb5H9gGfolFjUJkH5e7KNytb9QE=
+X-Google-Smtp-Source: APXvYqy4WaP1y7TtdxJx97HgfNxwlqXmRxY7WU4KbGyUQBhxg5+V1WGMzNAGP94P2B0lvi8TGZqNFgeSzqxGQE6cco4=
+X-Received: by 2002:aca:bb45:: with SMTP id l66mr5781686oif.108.1565176750500;
+ Wed, 07 Aug 2019 04:19:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190807064747.6725-1-inga.stotland@intel.com> <20190807064747.6725-2-inga.stotland@intel.com>
+In-Reply-To: <20190807064747.6725-2-inga.stotland@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 7 Aug 2019 14:18:57 +0300
+Message-ID: <CABBYNZJcQoowK5KVbwXys0WJf98-6A1WbkDKTXXZcwHkA759WA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/shell: Add ell based shell implementation
+To:     Inga Stotland <inga.stotland@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Gix, Brian" <brian.gix@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This confines sequence overcommit logic in mesh-config-json, as other
-storages might use a different mechanism to ensure reliability.
+Hi Inga,
 
-Also, refactored logic to calculate overcommit value to avoid division
-by zero when messages are sent too fast.
----
- mesh/mesh-config-json.c | 70 +++++++++++++++++++++++++++++++++++++++--
- mesh/mesh-config.h      |  3 +-
- mesh/net.c              | 18 +++--------
- mesh/node.c             | 56 +++------------------------------
- mesh/node.h             |  6 ----
- 5 files changed, 78 insertions(+), 75 deletions(-)
+On Wed, Aug 7, 2019 at 9:47 AM Inga Stotland <inga.stotland@intel.com> wrote:
+>
+> This adds the functionality of bt_shell that uses ell
+> mainloop.
+> ---
+>  Makefile.am            |   13 +-
+>  src/shared/shell-ell.c | 1320 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 1330 insertions(+), 3 deletions(-)
+>  create mode 100644 src/shared/shell-ell.c
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 9d25a815b..0ce3048ad 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -187,9 +187,6 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+>                         src/shared/log.h src/shared/log.c \
+>                         src/shared/tty.h
+>
+> -if READLINE
+> -shared_sources += src/shared/shell.c src/shared/shell.h
+> -endif
+>
+>  src_libshared_glib_la_SOURCES = $(shared_sources) \
+>                                 src/shared/io-glib.c \
+> @@ -205,11 +202,21 @@ src_libshared_mainloop_la_SOURCES = $(shared_sources) \
+>                                 src/shared/mainloop-notify.h \
+>                                 src/shared/mainloop-notify.c
+>
+> +if READLINE
+> +shared_sources += src/shared/shell.h
+> +src_libshared_glib_la_SOURCES += src/shared/shell.c
+> +src_libshared_mainloop_la_SOURCES += src/shared/shell.c
+> +endif
+> +
+>  if LIBSHARED_ELL
+>  noinst_LTLIBRARIES += src/libshared-ell.la
+>
+>  src_libshared_ell_la_SOURCES = $(shared_sources) \
+>                                 src/shared/io-ell.c
+> +
+> +if READLINE
+> +src_libshared_ell_la_SOURCES += src/shared/shell-ell.c
+> +endif
+>  endif
+>
+>  attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
+> diff --git a/src/shared/shell-ell.c b/src/shared/shell-ell.c
+> new file mode 100644
+> index 000000000..1b481e04e
+> --- /dev/null
+> +++ b/src/shared/shell-ell.c
+> @@ -0,0 +1,1320 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2017-2019  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#define _GNU_SOURCE
+> +#include <stdio.h>
+> +#include <errno.h>
+> +#include <syslog.h>
+> +#include <unistd.h>
+> +#include <stdlib.h>
+> +#include <stdarg.h>
+> +#include <stdbool.h>
+> +#include <signal.h>
+> +#include <sys/signalfd.h>
+> +#include <wordexp.h>
+> +#include <getopt.h>
+> +
+> +#include <readline/readline.h>
+> +#include <readline/history.h>
+> +
+> +#include "ell/ell.h"
+> +
+> +#include "src/shared/util.h"
+> +#include "src/shared/log.h"
+> +#include "src/shared/shell.h"
+> +
+> +#define CMD_LENGTH     48
+> +#define print_text(color, fmt, args...) \
+> +               printf(color fmt COLOR_OFF "\n", ## args)
+> +#define print_menu(cmd, args, desc) \
+> +               printf(COLOR_HIGHLIGHT "%s %-*s " COLOR_OFF "%s\n", \
+> +                       cmd, (int)(CMD_LENGTH - strlen(cmd)), args, desc)
+> +#define print_submenu(cmd, desc) \
+> +               printf(COLOR_BLUE "%s %-*s " COLOR_OFF "%s\n", \
+> +                       cmd, (int)(CMD_LENGTH - strlen(cmd)), "", desc)
+> +
+> +struct bt_shell_env {
+> +       char *name;
+> +       void *value;
+> +};
+> +
+> +static char *cmplt = "help";
+> +
+> +struct bt_shell_prompt_input {
+> +       char *str;
+> +       bt_shell_prompt_input_func func;
+> +       void *user_data;
+> +};
+> +
+> +static struct {
+> +       bool init;
+> +       char *name;
+> +       char history[256];
+> +       int argc;
+> +       char **argv;
+> +       bool mode;
+> +       bool monitor;
+> +       int timeout;
+> +       struct l_io *input;
+> +
+> +       bool saved_prompt;
+> +       bt_shell_prompt_input_func saved_func;
+> +       void *saved_user_data;
+> +
+> +       struct l_queue *prompts;
+> +
+> +       const struct bt_shell_menu *menu;
+> +       const struct bt_shell_menu *main;
+> +       struct l_queue *submenus;
+> +       const struct bt_shell_menu_entry *exec;
+> +
+> +       struct l_queue *envs;
+> +} data;
+> +
+> +static void shell_print_menu(void);
+> +
+> +static void cmd_version(int argc, char *argv[])
+> +{
+> +       bt_shell_printf("Version %s\n", VERSION);
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_quit(int argc, char *argv[])
+> +{
+> +       l_main_quit();
+> +}
+> +
+> +static void print_cmds(void)
+> +{
+> +       const struct bt_shell_menu_entry *entry;
+> +       const struct l_queue_entry *submenu;
+> +
+> +       if (!data.menu)
+> +               return;
+> +
+> +       printf("Commands:\n");
+> +
+> +       for (entry = data.menu->entries; entry->cmd; entry++) {
+> +               printf("\t%s%s\t%s\n", entry->cmd,
+> +                       strlen(entry->cmd) < 8 ? "\t" : "", entry->desc);
+> +       }
+> +
+> +       for (submenu = l_queue_get_entries(data.submenus); submenu;
+> +                                       submenu = submenu->next) {
+> +               struct bt_shell_menu *menu = submenu->data;
+> +
+> +               printf("\n\t%s.:\n", menu->name);
+> +
+> +               for (entry = menu->entries; entry->cmd; entry++) {
+> +                       printf("\t\t%s%s\t%s\n", entry->cmd,
+> +                               strlen(entry->cmd) < 8 ? "\t" : "",
+> +                               entry->desc);
+> +               }
+> +       }
+> +}
+> +
+> +static void cmd_help(int argc, char *argv[])
+> +{
+> +       if (argv[0] == cmplt)
+> +               print_cmds();
+> +       else
+> +               shell_print_menu();
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static const struct bt_shell_menu *find_menu(const char *name, size_t len)
+> +{
+> +       const struct l_queue_entry *entry;
+> +
+> +       for (entry = l_queue_get_entries(data.submenus); entry;
+> +                                               entry = entry->next) {
+> +               struct bt_shell_menu *menu = entry->data;
+> +
+> +               if (!strncmp(menu->name, name, len))
+> +                       return menu;
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static char *menu_generator(const char *text, int state)
+> +{
+> +       static unsigned int index, len;
+> +       static struct l_queue_entry *entry;
+> +
+> +       if (!state) {
+> +               index = 0;
+> +               len = strlen(text);
+> +               entry = (void *) l_queue_get_entries(data.submenus);
+> +       }
+> +
+> +       for (; entry; entry = entry->next) {
+> +               struct bt_shell_menu *menu = entry->data;
+> +
+> +               index++;
+> +
+> +               if (!strncmp(menu->name, text, len)) {
+> +                       entry = entry->next;
+> +                       return strdup(menu->name);
+> +               }
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static void cmd_menu(int argc, char *argv[])
+> +{
+> +       const struct bt_shell_menu *menu;
+> +
+> +       if (argc < 2 || !strlen(argv[1])) {
+> +               bt_shell_printf("Missing name argument\n");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       menu = find_menu(argv[1], strlen(argv[1]));
+> +       if (!menu) {
+> +               bt_shell_printf("Unable find menu with name: %s\n", argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bt_shell_set_menu(menu);
+> +
+> +       shell_print_menu();
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static bool cmd_menu_exists(const struct bt_shell_menu *menu)
+> +{
+> +       /* Skip menu command if not on main menu or if there are no
+> +        * submenus.
+> +        */
+> +       if (menu != data.main || l_queue_isempty(data.submenus))
+> +               return false;
+> +
+> +       return true;
+> +}
+> +
+> +static void cmd_back(int argc, char *argv[])
+> +{
+> +       if (data.menu == data.main) {
+> +               bt_shell_printf("Already on main menu\n");
+> +               return;
+> +       }
+> +
+> +       bt_shell_set_menu(data.main);
+> +
+> +       shell_print_menu();
+> +}
+> +
+> +static bool cmd_back_exists(const struct bt_shell_menu *menu)
+> +{
+> +       /* Skip back command if on main menu */
+> +       if (menu == data.main)
+> +               return false;
+> +
+> +       return true;
+> +}
+> +
+> +static void cmd_export(int argc, char *argv[])
+> +{
+> +       const struct l_queue_entry *entry;
+> +
+> +       entry = l_queue_get_entries(data.envs);
+> +
+> +       for (; entry; entry = entry->next) {
+> +               struct bt_shell_env *env = entry->data;
+> +
+> +               print_text(COLOR_HIGHLIGHT, "%s=%p", env->name, env->value);
+> +       }
+> +}
+> +
+> +static const struct bt_shell_menu_entry default_menu[] = {
+> +       { "back",         NULL,       cmd_back, "Return to main menu", NULL,
+> +                                                       NULL, cmd_back_exists },
+> +       { "menu",         "<name>",   cmd_menu, "Select submenu",
+> +                                                       menu_generator, NULL,
+> +                                                       cmd_menu_exists},
+> +       { "version",      NULL,       cmd_version, "Display version" },
+> +       { "quit",         NULL,       cmd_quit, "Quit program" },
+> +       { "exit",         NULL,       cmd_quit, "Quit program" },
+> +       { "help",         NULL,       cmd_help,
+> +                                       "Display help about this program" },
+> +       { "export",       NULL,       cmd_export,
+> +                                               "Print evironment variables" },
+> +       { }
+> +};
+> +
+> +static void shell_print_help(void)
+> +{
+> +       print_text(COLOR_HIGHLIGHT,
+> +               "\n"
+> +               "Use \"help\" for a list of available commands in a menu.\n"
+> +               "Use \"menu <submenu>\" if you want to enter any submenu.\n"
+> +               "Use \"back\" if you want to return to menu main.");
+> +}
+> +
+> +static void shell_print_menu(void)
+> +{
+> +       const struct bt_shell_menu_entry *entry;
+> +       const struct l_queue_entry *submenu;
+> +
+> +       if (!data.menu)
+> +               return;
+> +
+> +       print_text(COLOR_HIGHLIGHT, "Menu %s:", data.menu->name);
+> +       print_text(COLOR_HIGHLIGHT, "Available commands:");
+> +       print_text(COLOR_HIGHLIGHT, "-------------------");
+> +
+> +       if (data.menu == data.main) {
+> +               for (submenu = l_queue_get_entries(data.submenus); submenu;
+> +                                               submenu = submenu->next) {
+> +                       struct bt_shell_menu *menu = submenu->data;
+> +
+> +                       print_submenu(menu->name, menu->desc ? menu->desc :
+> +                                                               "Submenu");
+> +               }
+> +       }
+> +
+> +       for (entry = data.menu->entries; entry->cmd; entry++)
+> +               print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
+> +
+> +       for (entry = default_menu; entry->cmd; entry++) {
+> +               if (entry->exists && !entry->exists(data.menu))
+> +                       continue;
+> +
+> +               print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
+> +       }
+> +}
+> +
+> +static int parse_args(char *arg, wordexp_t *w, char *del, int flags)
+> +{
+> +       char *str;
+> +
+> +       str = strdelimit(arg, del, '"');
+> +
+> +       if (wordexp(str, w, flags)) {
+> +               free(str);
+> +               return -EINVAL;
+> +       }
+> +
+> +       /* If argument ends with ... set we_offs bypass strict checks */
+> +       if (w->we_wordc && !strsuffix(w->we_wordv[w->we_wordc - 1], "..."))
+> +               w->we_offs = 1;
+> +
+> +       free(str);
+> +
+> +       return 0;
+> +}
+> +
+> +static int cmd_exec(const struct bt_shell_menu_entry *entry,
+> +                                       int argc, char *argv[])
+> +{
+> +       wordexp_t w;
+> +       size_t len;
+> +       char *man, *opt;
+> +       int flags = WRDE_NOCMD;
+> +       bool optargs = false;
+> +
+> +       if (!entry->arg || entry->arg[0] == '\0') {
+> +               if (argc > 1) {
+> +                       print_text(COLOR_HIGHLIGHT, "Too many arguments");
+> +                       return -EINVAL;
+> +               }
+> +               goto exec;
+> +       }
+> +
+> +       /* Find last mandatory arguments */
+> +       man = strrchr(entry->arg, '>');
+> +       if (!man) {
+> +               opt = strdup(entry->arg);
+> +               goto optional;
+> +       }
+> +
+> +       len = man - entry->arg;
+> +       if (entry->arg[0] == '<')
+> +               man = strndup(entry->arg, len + 1);
+> +       else {
+> +               /* Find where mandatory arguments start */
+> +               opt = strrchr(entry->arg, '<');
+> +               /* Skip if mandatory arguments are not in the right format */
+> +               if (!opt || opt > man) {
+> +                       opt = strdup(entry->arg);
+> +                       goto optional;
+> +               }
+> +               man = strndup(opt, man - opt + 1);
+> +               optargs = true;
+> +       }
+> +
+> +       if (parse_args(man, &w, "<>", flags) < 0) {
+> +               print_text(COLOR_HIGHLIGHT,
+> +                       "Unable to parse mandatory command arguments: %s", man);
+> +               free(man);
+> +               return -EINVAL;
+> +       }
+> +
+> +       free(man);
+> +
+> +       /* Check if there are enough arguments */
+> +       if ((unsigned int) argc - 1 < w.we_wordc) {
+> +               print_text(COLOR_HIGHLIGHT, "Missing %s argument",
+> +                                               w.we_wordv[argc - 1]);
+> +               goto fail;
+> +       }
+> +
+> +       flags |= WRDE_APPEND;
+> +       opt = strdup(entry->arg + len + 1);
+> +
+> +optional:
+> +       if (parse_args(opt, &w, "[]", flags) < 0) {
+> +               print_text(COLOR_HIGHLIGHT,
+> +                       "Unable to parse optional command arguments: %s", opt);
+> +               free(opt);
+> +               return -EINVAL;
+> +       }
+> +
+> +       free(opt);
+> +
+> +       /* Check if there are too many arguments */
+> +       if (!optargs && ((unsigned int) argc - 1 > w.we_wordc && !w.we_offs)) {
+> +               print_text(COLOR_HIGHLIGHT, "Too many arguments: %d > %zu",
+> +                                       argc - 1, w.we_wordc);
+> +               goto fail;
+> +       }
+> +
+> +       w.we_offs = 0;
+> +       wordfree(&w);
+> +
+> +exec:
+> +       data.exec = entry;
+> +
+> +       if (entry->func)
+> +               entry->func(argc, argv);
+> +
+> +       data.exec = NULL;
+> +
+> +       return 0;
+> +
+> +fail:
+> +       w.we_offs = 0;
+> +       wordfree(&w);
+> +       return -EINVAL;
+> +}
+> +
+> +static int menu_exec(const struct bt_shell_menu_entry *entry,
+> +                                       int argc, char *argv[])
+> +{
+> +       for (; entry->cmd; entry++) {
+> +               if (strcmp(argv[0], entry->cmd))
+> +                       continue;
+> +
+> +               /* Skip menu command if not on main menu */
+> +               if (data.menu != data.main && !strcmp(entry->cmd, "menu"))
+> +                       continue;
+> +
+> +               /* Skip back command if on main menu */
+> +               if (data.menu == data.main && !strcmp(entry->cmd, "back"))
+> +                       continue;
+> +
+> +               return cmd_exec(entry, argc, argv);
+> +       }
+> +
+> +       return -ENOENT;
+> +}
+> +
+> +static int submenu_exec(int argc, char *argv[])
+> +{
+> +       char *name;
+> +       int len, tlen;
+> +       const struct bt_shell_menu *submenu;
+> +
+> +       if (data.menu != data.main)
+> +               return -ENOENT;
+> +
+> +       name = strchr(argv[0], '.');
+> +       if (!name)
+> +               return -ENOENT;
+> +
+> +       tlen = strlen(argv[0]);
+> +       len = name - argv[0];
+> +       name[0] = '\0';
+> +
+> +       submenu = find_menu(argv[0], strlen(argv[0]));
+> +       if (!submenu)
+> +               return -ENOENT;
+> +
+> +       /* Replace submenu.command with command */
+> +       memmove(argv[0], argv[0] + len + 1, tlen - len - 1);
+> +       memset(argv[0] + tlen - len - 1, 0, len + 1);
+> +
+> +       return menu_exec(submenu->entries, argc, argv);
+> +}
+> +
+> +static int shell_exec(int argc, char *argv[])
+> +{
+> +       int err;
+> +
+> +       if (!data.menu || !argv[0])
+> +               return -EINVAL;
+> +
+> +       err  = menu_exec(default_menu, argc, argv);
+> +       if (err == -ENOENT) {
+> +               err  = menu_exec(data.menu->entries, argc, argv);
+> +               if (err == -ENOENT) {
+> +                       err = submenu_exec(argc, argv);
+> +                       if (err == -ENOENT) {
+> +                               print_text(COLOR_HIGHLIGHT,
+> +                                       "Invalid command in menu %s: %s",
+> +                                       data.menu->name, argv[0]);
+> +                               shell_print_help();
+> +                       }
+> +               }
+> +       }
+> +
+> +       return err;
+> +}
+> +
+> +void bt_shell_printf(const char *fmt, ...)
+> +{
+> +       va_list args;
+> +       bool save_input;
+> +       char *saved_line;
+> +       int saved_point;
+> +
+> +       if (!data.input)
+> +               return;
+> +
+> +       if (data.mode) {
+> +               va_start(args, fmt);
+> +               vprintf(fmt, args);
+> +               va_end(args);
+> +               return;
+> +       }
+> +
+> +       save_input = !RL_ISSTATE(RL_STATE_DONE);
+> +
+> +       if (save_input) {
+> +               saved_point = rl_point;
+> +               saved_line = rl_copy_text(0, rl_end);
+> +               if (!data.saved_prompt)
+> +                       rl_save_prompt();
+> +               rl_replace_line("", 0);
+> +               rl_redisplay();
+> +       }
+> +
+> +       va_start(args, fmt);
+> +       vprintf(fmt, args);
+> +       va_end(args);
+> +
+> +       if (data.monitor) {
+> +               va_start(args, fmt);
+> +               bt_log_vprintf(0xffff, data.name, LOG_INFO, fmt, args);
+> +               va_end(args);
+> +       }
+> +
+> +       if (save_input) {
+> +               if (!data.saved_prompt)
+> +                       rl_restore_prompt();
+> +               rl_replace_line(saved_line, 0);
+> +               rl_point = saved_point;
+> +               rl_forced_update_display();
+> +               free(saved_line);
+> +       }
+> +}
+> +
+> +static void print_string(const char *str, void *user_data)
+> +{
+> +       bt_shell_printf("%s\n", str);
+> +}
+> +
+> +void bt_shell_hexdump(const unsigned char *buf, size_t len)
+> +{
+> +       util_hexdump(' ', buf, len, print_string, NULL);
+> +}
+> +
+> +void bt_shell_usage(void)
+> +{
+> +       if (!data.exec)
+> +               return;
+> +
+> +       bt_shell_printf("Usage: %s %s\n", data.exec->cmd,
+> +                                       data.exec->arg ? data.exec->arg : "");
+> +}
+> +
+> +static void prompt_input(const char *str, bt_shell_prompt_input_func func,
+> +                                                       void *user_data)
+> +{
+> +       data.saved_prompt = true;
+> +       data.saved_func = func;
+> +       data.saved_user_data = user_data;
+> +
+> +       rl_save_prompt();
+> +       bt_shell_set_prompt(str);
+> +}
+> +
+> +void bt_shell_prompt_input(const char *label, const char *msg,
+> +                       bt_shell_prompt_input_func func, void *user_data)
+> +{
+> +       char *str;
+> +
+> +       if (!data.init || data.mode)
+> +               return;
+> +
+> +       if (data.saved_prompt) {
+> +               struct bt_shell_prompt_input *prompt;
+> +
+> +               prompt = l_new(struct bt_shell_prompt_input, 1);
+> +
+> +               if (asprintf(&str, COLOR_HIGHLIGHT "[%s] %s " COLOR_OFF, label,
+> +                                                               msg) < 0) {
+> +                       free(prompt);
+> +                       return;
+> +               }
+> +
+> +               prompt->func = func;
+> +               prompt->user_data = user_data;
+> +
+> +               l_queue_push_tail(data.prompts, prompt);
+> +
+> +               return;
+> +       }
+> +
+> +       if (asprintf(&str, COLOR_HIGHLIGHT "[%s] %s " COLOR_OFF, label,
+> +                                                               msg) < 0)
+> +               return;
+> +
+> +       prompt_input(str, func, user_data);
+> +
+> +       free(str);
+> +}
+> +
+> +static void prompt_free(void *data)
+> +{
+> +       struct bt_shell_prompt_input *prompt = data;
+> +
+> +       free(prompt->str);
+> +       free(prompt);
+> +}
+> +
+> +int bt_shell_release_prompt(const char *input)
+> +{
+> +       struct bt_shell_prompt_input *prompt;
+> +       bt_shell_prompt_input_func func;
+> +       void *user_data;
+> +
+> +       if (!data.saved_prompt)
+> +               return -1;
+> +
+> +       data.saved_prompt = false;
+> +
+> +       rl_restore_prompt();
+> +
+> +       func = data.saved_func;
+> +       user_data = data.saved_user_data;
+> +
+> +       prompt = l_queue_pop_head(data.prompts);
+> +       if (prompt)
+> +               data.saved_prompt = true;
+> +
+> +       data.saved_func = NULL;
+> +       data.saved_user_data = NULL;
+> +
+> +       func(input, user_data);
+> +
+> +       if (prompt) {
+> +               prompt_input(prompt->str, prompt->func, prompt->user_data);
+> +               prompt_free(prompt);
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void rl_handler(char *input)
+> +{
+> +       wordexp_t w;
+> +
+> +       if (!input) {
+> +               rl_insert_text("quit");
+> +               rl_redisplay();
+> +               rl_crlf();
+> +               l_main_quit();
+> +               return;
+> +       }
+> +
+> +       if (!strlen(input))
+> +               goto done;
+> +
+> +       if (!bt_shell_release_prompt(input))
+> +               goto done;
+> +
+> +       if (history_search(input, -1))
+> +               add_history(input);
+> +
+> +       if (data.monitor)
+> +               bt_log_printf(0xffff, data.name, LOG_INFO, "%s", input);
+> +
+> +       if (wordexp(input, &w, WRDE_NOCMD))
+> +               goto done;
+> +
+> +       if (w.we_wordc == 0) {
+> +               wordfree(&w);
+> +               goto done;
+> +       }
+> +
+> +       shell_exec(w.we_wordc, w.we_wordv);
+> +       wordfree(&w);
+> +done:
+> +       free(input);
+> +}
+> +
+> +static char *find_cmd(const char *text,
+> +                       const struct bt_shell_menu_entry *entry, int *index)
+> +{
+> +       const struct bt_shell_menu_entry *tmp;
+> +       int len;
+> +
+> +       len = strlen(text);
+> +
+> +       while ((tmp = &entry[*index])) {
+> +               (*index)++;
+> +
+> +               if (!tmp->cmd)
+> +                       break;
+> +
+> +               if (tmp->exists && !tmp->exists(data.menu))
+> +                       continue;
+> +
+> +               if (!strncmp(tmp->cmd, text, len))
+> +                       return strdup(tmp->cmd);
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static char *cmd_generator(const char *text, int state)
+> +{
+> +       static int index;
+> +       static bool default_menu_enabled, submenu_enabled;
+> +       static const struct bt_shell_menu *menu;
+> +       char *cmd;
+> +
+> +       if (!state) {
+> +               index = 0;
+> +               menu = NULL;
+> +               default_menu_enabled = true;
+> +               submenu_enabled = false;
+> +       }
+> +
+> +       if (default_menu_enabled) {
+> +               cmd = find_cmd(text, default_menu, &index);
+> +               if (cmd)
+> +                       return cmd;
+> +
+> +               index = 0;
+> +               menu = data.menu;
+> +               default_menu_enabled = false;
+> +       }
+> +
+> +       if (!submenu_enabled) {
+> +               cmd = find_cmd(text, menu->entries, &index);
+> +               if (cmd || menu != data.main)
+> +                       return cmd;
+> +
+> +               cmd = strrchr(text, '.');
+> +               if (!cmd)
+> +                       return NULL;
+> +
+> +               menu = find_menu(text, cmd - text);
+> +               if (!menu)
+> +                       return NULL;
+> +
+> +               index = 0;
+> +               submenu_enabled = true;
+> +       }
+> +
+> +       cmd = find_cmd(text + strlen(menu->name) + 1, menu->entries, &index);
+> +       if (cmd) {
+> +               int err;
+> +               char *tmp;
+> +
+> +               err = asprintf(&tmp, "%s.%s", menu->name, cmd);
+> +
+> +               free(cmd);
+> +
+> +               if (err < 0)
+> +                       return NULL;
+> +
+> +               cmd = tmp;
+> +       }
+> +
+> +       return cmd;
+> +}
+> +
+> +static wordexp_t args;
+> +
+> +static char *arg_generator(const char *text, int state)
+> +{
+> +       static unsigned int index, len;
+> +       const char *arg;
+> +
+> +       if (!state) {
+> +               index = 0;
+> +               len = strlen(text);
+> +       }
+> +
+> +       while (index < args.we_wordc) {
+> +               arg = args.we_wordv[index];
+> +               index++;
+> +
+> +               if (!strncmp(arg, text, len))
+> +                       return strdup(arg);
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static char **args_completion(const struct bt_shell_menu_entry *entry, int argc,
+> +                                                       const char *text)
+> +{
+> +       char **matches = NULL;
+> +       char *str;
+> +       int index;
+> +
+> +       index = text[0] == '\0' ? argc - 1 : argc - 2;
+> +       if (index < 0)
+> +               return NULL;
+> +
+> +       if (!entry->arg)
+> +               goto end;
+> +
+> +       str = strdup(entry->arg);
+> +
+> +       if (parse_args(str, &args, "<>[]", WRDE_NOCMD))
+> +               goto done;
+> +
+> +       /* Check if argument is valid */
+> +       if ((unsigned int) index > args.we_wordc - 1)
+> +               goto done;
+> +
+> +       /* Check if there are multiple values */
+> +       if (!strrchr(entry->arg, '/'))
+> +               goto done;
+> +
+> +       free(str);
+> +
+> +       /* Split values separated by / */
+> +       str = strdelimit(args.we_wordv[index], "/", ' ');
+> +
+> +       args.we_offs = 0;
+> +       wordfree(&args);
+> +
+> +       if (wordexp(str, &args, WRDE_NOCMD))
+> +               goto done;
+> +
+> +       rl_completion_display_matches_hook = NULL;
+> +       matches = rl_completion_matches(text, arg_generator);
+> +
+> +done:
+> +       free(str);
+> +end:
+> +       if (!matches && text[0] == '\0')
+> +               bt_shell_printf("Usage: %s %s\n", entry->cmd,
+> +                                       entry->arg ? entry->arg : "");
+> +
+> +       args.we_offs = 0;
+> +       wordfree(&args);
+> +       return matches;
+> +}
+> +
+> +static char **menu_completion(const struct bt_shell_menu_entry *entry,
+> +                               const char *text, int argc, char *input_cmd)
+> +{
+> +       char **matches = NULL;
+> +
+> +       for (; entry->cmd; entry++) {
+> +               if (strcmp(entry->cmd, input_cmd))
+> +                       continue;
+> +
+> +               if (!entry->gen) {
+> +                       matches = args_completion(entry, argc, text);
+> +                       break;
+> +               }
+> +
+> +               rl_completion_display_matches_hook = entry->disp;
+> +               matches = rl_completion_matches(text, entry->gen);
+> +               break;
+> +       }
+> +
+> +       return matches;
+> +}
+> +
+> +static char **shell_completion(const char *text, int start, int end)
+> +{
+> +       char **matches = NULL;
+> +
+> +       if (!data.menu)
+> +               return NULL;
+> +
+> +       if (start > 0) {
+> +               wordexp_t w;
+> +
+> +               if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
+> +                       return NULL;
+> +
+> +               matches = menu_completion(default_menu, text, w.we_wordc,
+> +                                                       w.we_wordv[0]);
+> +               if (!matches)
+> +                       matches = menu_completion(data.menu->entries, text,
+> +                                                       w.we_wordc,
+> +                                                       w.we_wordv[0]);
+> +
+> +               wordfree(&w);
+> +       } else {
+> +               rl_completion_display_matches_hook = NULL;
+> +               matches = rl_completion_matches(text, cmd_generator);
+> +       }
+> +
+> +       if (!matches)
+> +               rl_attempted_completion_over = 1;
+> +
+> +       return matches;
+> +}
+> +
+> +static void io_hup(struct l_io *io, void *user_data)
+> +{
+> +       l_main_quit();
+> +}
+> +
+> +static void signal_callback(unsigned int signum, void *user_data)
+> +{
+> +       static bool terminated;
+> +
+> +       switch (signum) {
+> +       case SIGINT:
+> +               if (data.input && !data.mode) {
+> +                       rl_replace_line("", 0);
+> +                       rl_crlf();
+> +                       rl_on_new_line();
+> +                       rl_redisplay();
+> +                       return;
+> +               }
+> +
+> +               /*
+> +                * If input was not yet setup up that means signal was received
+> +                * while daemon was not yet running. Since user is not able
+> +                * to terminate client by CTRL-D or typing exit treat this as
+> +                * exit and fall through.
+> +                */
+> +
+> +               /* fall through */
+> +       case SIGTERM:
+> +               if (!terminated) {
+> +                       if (!data.mode) {
+> +                               rl_replace_line("", 0);
+> +                               rl_crlf();
+> +                       }
+> +                       l_main_quit();
+> +               }
+> +
+> +               terminated = true;
+> +               break;
+> +       }
+> +}
+> +
+> +static void rl_init_history(void)
+> +{
+> +       const char *name;
+> +       char *dir;
+> +
+> +       memset(data.history, 0, sizeof(data.history));
+> +
+> +       name = strrchr(data.name, '/');
+> +       if (!name)
+> +               name = data.name;
+> +       else
+> +               name++;
+> +
+> +       dir = getenv("XDG_CACHE_HOME");
+> +       if (dir) {
+> +               snprintf(data.history, sizeof(data.history), "%s/.%s_history",
+> +                                                       dir, name);
+> +               goto done;
+> +       }
+> +
+> +       dir = getenv("HOME");
+> +       if (dir) {
+> +               snprintf(data.history, sizeof(data.history),
+> +                               "%s/.cache/.%s_history", dir, name);
+> +               goto done;
+> +       }
+> +
+> +       dir = getenv("PWD");
+> +       if (dir) {
+> +               snprintf(data.history, sizeof(data.history), "%s/.%s_history",
+> +                                                       dir, name);
+> +               goto done;
+> +       }
+> +
+> +       return;
+> +
+> +done:
+> +       read_history(data.history);
+> +       using_history();
+> +       bt_shell_set_env("HISTORY", data.history);
+> +}
+> +
+> +static void rl_init(void)
+> +{
+> +       if (data.mode)
+> +               return;
+> +
+> +       /* Allow conditional parsing of the ~/.inputrc file. */
+> +       rl_readline_name = data.name;
+> +
+> +       setlinebuf(stdout);
+> +       rl_attempted_completion_function = shell_completion;
+> +
+> +       rl_erase_empty_line = 1;
+> +       rl_callback_handler_install(NULL, rl_handler);
+> +
+> +       rl_init_history();
+> +}
+> +
+> +static const struct option main_options[] = {
+> +       { "version",    no_argument, 0, 'v' },
+> +       { "help",       no_argument, 0, 'h' },
+> +       { "timeout",    required_argument, 0, 't' },
+> +       { "monitor",    no_argument, 0, 'm' },
+> +};
+> +
+> +static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
+> +{
+> +       unsigned int i;
+> +
+> +       printf("%s ver %s\n", data.name, VERSION);
+> +       printf("Usage:\n"
+> +               "\t%s [--options] [commands]\n", data.name);
+> +
+> +       printf("Options:\n");
+> +
+> +       for (i = 0; opt && opt->options[i].name; i++)
+> +               printf("\t--%s \t%s\n", opt->options[i].name, opt->help[i]);
+> +
+> +       printf("\t--monitor \tEnable monitor output\n"
+> +               "\t--timeout \tTimeout in seconds for non-interactive mode\n"
+> +               "\t--version \tDisplay version\n"
+> +               "\t--help \t\tDisplay help\n");
+> +}
+> +
+> +void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+> +{
+> +       int c, index = -1;
+> +       struct option options[256];
+> +       char optstr[256];
+> +       size_t offset;
+> +
+> +       offset = sizeof(main_options) / sizeof(struct option);
+> +
+> +       memcpy(options, main_options, sizeof(struct option) * offset);
+> +
+> +       if (opt) {
+> +               memcpy(options + offset, opt->options,
+> +                               sizeof(struct option) * opt->optno);
+> +               snprintf(optstr, sizeof(optstr), "+mhvt:%s", opt->optstr);
+> +       } else
+> +               snprintf(optstr, sizeof(optstr), "+mhvt:");
+> +
+> +       data.name = strrchr(argv[0], '/');
+> +       if (!data.name)
+> +               data.name = strdup(argv[0]);
+> +       else
+> +               data.name = strdup(++data.name);
+> +
+> +       while ((c = getopt_long(argc, argv, optstr, options, &index)) != -1) {
+> +               switch (c) {
+> +               case 'v':
+> +                       printf("%s: %s\n", data.name, VERSION);
+> +                       exit(EXIT_SUCCESS);
+> +                       return;
+> +               case 'h':
+> +                       usage(argc, argv, opt);
+> +                       data.argc = 1;
+> +                       data.argv = &cmplt;
+> +                       data.mode = 1;
+> +                       goto done;
+> +               case 't':
+> +                       data.timeout = atoi(optarg);
+> +                       break;
+> +               case 'm':
+> +                       data.monitor = true;
+> +                       if (bt_log_open() < 0) {
+> +                               data.monitor = false;
+> +                               printf("Unable to open logging channel\n");
+> +                       }
+> +                       break;
+> +               default:
+> +                       if (index < 0) {
+> +                               for (index = 0; options[index].val; index++) {
+> +                                       if (c == options[index].val)
+> +                                               break;
+> +                               }
+> +                       }
+> +
+> +                       if (c != opt->options[index - offset].val) {
+> +                               usage(argc, argv, opt);
+> +                               exit(EXIT_SUCCESS);
+> +                               return;
+> +                       }
+> +
+> +                       *opt->optarg[index - offset] = optarg;
+> +               }
+> +
+> +               index = -1;
+> +       }
+> +
+> +       bt_shell_set_env("SHELL", data.name);
+> +
+> +       data.argc = argc - optind;
+> +       data.argv = argv + optind;
+> +       optind = 0;
+> +       data.mode = (data.argc > 0);
+> +
+> +done:
+> +       if (data.mode)
+> +               bt_shell_set_env("NON_INTERACTIVE", &data.mode);
+> +
+> +       l_main_init();
+> +
+> +       rl_init();
+> +
+> +       data.init = true;
+> +       data.prompts = l_queue_new();
+> +}
+> +
+> +static void rl_cleanup(void)
+> +{
+> +       if (data.mode)
+> +               return;
+> +
+> +       if (data.history[0] != '\0')
+> +               write_history(data.history);
+> +
+> +       rl_message("");
+> +       rl_callback_handler_remove();
+> +}
+> +
+> +static void env_destroy(void *data)
+> +{
+> +       struct bt_shell_env *env = data;
+> +
+> +       free(env->name);
+> +       free(env);
+> +}
+> +
+> +int bt_shell_run(void)
+> +{
+> +       int status;
+> +
+> +       status = l_main_run_with_signal(signal_callback, NULL);
+> +
+> +       bt_shell_cleanup();
+> +
+> +       l_main_exit();
+> +
+> +       return status;
+> +}
+> +
+> +void bt_shell_cleanup(void)
+> +{
+> +       bt_shell_release_prompt("");
+> +       bt_shell_detach();
+> +
+> +       if (data.envs) {
+> +               l_queue_destroy(data.envs, env_destroy);
+> +               data.envs = NULL;
+> +       }
+> +
+> +       if (data.monitor)
+> +               bt_log_close();
+> +
+> +       rl_cleanup();
+> +
+> +       l_queue_destroy(data.prompts, prompt_free);
+> +       data.prompts = NULL;
+> +
+> +       data.init = false;
+> +       free(data.name);
+> +}
+> +
+> +void bt_shell_quit(int status)
+> +{
+> +       l_main_quit();
+> +}
+> +
+> +void bt_shell_noninteractive_quit(int status)
+> +{
+> +       if (!data.mode || data.timeout)
+> +               return;
+> +
+> +       bt_shell_quit(status);
+> +}
+> +
+> +bool bt_shell_set_menu(const struct bt_shell_menu *menu)
+> +{
+> +       if (!menu)
+> +               return false;
+> +
+> +       data.menu = menu;
+> +
+> +       if (!data.main)
+> +               data.main = menu;
+> +
+> +       return true;
+> +}
+> +
+> +bool bt_shell_add_submenu(const struct bt_shell_menu *menu)
+> +{
+> +       if (!menu)
+> +               return false;
+> +
+> +       if (!data.submenus)
+> +               data.submenus = l_queue_new();
+> +
+> +       l_queue_push_tail(data.submenus, (void *) menu);
+> +
+> +       return true;
+> +}
+> +
+> +void bt_shell_set_prompt(const char *string)
+> +{
+> +       if (!data.init || data.mode)
+> +               return;
+> +
+> +       rl_set_prompt(string);
+> +       rl_redisplay();
+> +}
+> +
+> +static bool input_read(struct l_io *io, void *user_data)
+> +{
+> +       rl_callback_read_char();
+> +       return true;
+> +}
+> +
+> +static void quit_on_timeout(struct l_timeout *timeout, void *user_data)
+> +{
+> +       l_main_quit();
+> +}
+> +
+> +bool bt_shell_attach(int fd)
+> +{
+> +       struct l_io *io;
+> +
+> +       /* TODO: Allow more than one input? */
+> +       if (data.input)
+> +               return false;
+> +
+> +       io = l_io_new(fd);
+> +
+> +       if (!data.mode)
+> +               l_io_set_read_handler(io, input_read, NULL, NULL);
+> +
+> +       l_io_set_disconnect_handler(io, io_hup, NULL, NULL);
 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index d49f5226a..e3a804d35 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -31,6 +31,8 @@
- #include <string.h>
- #include <unistd.h>
- 
-+#include <sys/time.h>
-+
- #include <ell/ell.h>
- #include <json-c/json.h>
- 
-@@ -38,12 +40,19 @@
- #include "mesh/util.h"
- #include "mesh/mesh-config.h"
- 
-+/* To prevent local node JSON cache thrashing, minimum update times */
-+#define MIN_SEQ_CACHE_TRIGGER	32
-+#define MIN_SEQ_CACHE_VALUE	(2 * 32)
-+#define MIN_SEQ_CACHE_TIME	(5 * 60)
-+
- #define CHECK_KEY_IDX_RANGE(x) (((x) >= 0) && ((x) <= 4095))
- 
- struct mesh_config {
- 	json_object *jnode;
- 	char *node_dir_path;
- 	uint8_t uuid[16];
-+	uint32_t write_seq;
-+	struct timeval write_time;
- };
- 
- struct write_info {
-@@ -1708,6 +1717,8 @@ static struct mesh_config *create_config(const char *cfg_path,
- 	cfg->jnode = jnode;
- 	memcpy(cfg->uuid, uuid, 16);
- 	cfg->node_dir_path = l_strdup(cfg_path);
-+	cfg->write_seq = node->seq_number;
-+	gettimeofday(&cfg->write_time, NULL);
- 
- 	return cfg;
- }
-@@ -2020,12 +2031,59 @@ bool mesh_config_model_sub_del_all(struct mesh_config *cfg, uint16_t addr,
- 	return save_config(cfg->jnode, cfg->node_dir_path);
- }
- 
--bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq)
-+bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq,
-+								bool cache)
- {
--	if (!cfg || !write_int(cfg->jnode, "sequenceNumber", seq))
-+	int value;
-+	uint32_t cached = 0;
-+
-+	if (!cfg)
- 		return false;
- 
--	mesh_config_save(cfg, false, NULL, NULL);
-+	if (!cache) {
-+		if (!write_int(cfg->jnode, "sequenceNumber", seq))
-+		    return false;
-+
-+		return mesh_config_save(cfg, true, NULL, NULL);
-+	}
-+
-+	if (get_int(cfg->jnode, "sequenceNumber", &value))
-+		cached = (uint32_t)value;
-+
-+	/*
-+	 * When sequence number approaches value stored on disk, calculate
-+	 * average time between sequence number updates, then overcommit the
-+	 * sequence number by MIN_SEQ_CACHE_TIME seconds worth of traffic or
-+	 * MIN_SEQ_CACHE_VALUE (whichever is greater) to avoid frequent writes
-+	 * to disk and to protect against crashes.
-+	 *
-+	 * The real value will be saved when daemon shuts down properly.
-+	*/
-+	if (seq + MIN_SEQ_CACHE_TRIGGER >= cached) {
-+		struct timeval now;
-+		struct timeval elapsed;
-+		uint64_t elapsed_ms;
-+
-+		gettimeofday(&now, NULL);
-+		timersub(&now, &cfg->write_time, &elapsed);
-+		elapsed_ms = elapsed.tv_sec * 1000 + elapsed.tv_usec / 1000;
-+
-+		cached = seq + (seq - cfg->write_seq) *
-+					1000 * MIN_SEQ_CACHE_TIME / elapsed_ms;
-+
-+		if (cached < seq + MIN_SEQ_CACHE_VALUE)
-+			cached = seq + MIN_SEQ_CACHE_VALUE;
-+
-+		l_debug("Seq Cache: %d -> %d", seq, cached);
-+
-+		cfg->write_seq = seq;
-+
-+		if (!write_int(cfg->jnode, "sequenceNumber", cached))
-+		    return false;
-+
-+		return mesh_config_save(cfg, false, NULL, NULL);
-+	}
-+
- 	return true;
- }
- 
-@@ -2089,6 +2147,9 @@ static bool load_node(const char *fname, const uint8_t uuid[16],
- 		cfg->jnode = jnode;
- 		memcpy(cfg->uuid, uuid, 16);
- 		cfg->node_dir_path = l_strdup(fname);
-+		cfg->write_seq = node.seq_number;
-+		gettimeofday(&cfg->write_time, NULL);
-+
- 		result = cb(&node, uuid, cfg, user_data);
- 
- 		if (!result) {
-@@ -2147,10 +2208,13 @@ static void idle_save_config(void *user_data)
- 	l_free(fname_tmp);
- 	l_free(fname_bak);
- 
-+	gettimeofday(&info->cfg->write_time, NULL);
-+
- 	if (info->cb)
- 		info->cb(info->user_data, result);
- 
- 	l_free(info);
-+
- }
- 
- bool mesh_config_save(struct mesh_config *cfg, bool no_wait,
-diff --git a/mesh/mesh-config.h b/mesh/mesh-config.h
-index 44e3b3ad6..4172e794b 100644
---- a/mesh/mesh-config.h
-+++ b/mesh/mesh-config.h
-@@ -128,7 +128,8 @@ bool mesh_config_write_network_key(struct mesh_config *cfg, uint16_t idx,
- 				uint8_t *key, uint8_t *new_key, int phase);
- bool mesh_config_write_app_key(struct mesh_config *cfg, uint16_t net_idx,
- 			uint16_t app_idx, uint8_t *key, uint8_t *new_key);
--bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq);
-+bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq,
-+								bool cache);
- bool mesh_config_write_unicast(struct mesh_config *cfg, uint16_t unicast);
- bool mesh_config_write_relay_mode(struct mesh_config *cfg, uint8_t mode,
- 					uint8_t count, uint16_t interval);
-diff --git a/mesh/net.c b/mesh/net.c
-index 7c92cfd5e..7c4049e0e 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -133,7 +133,6 @@ struct mesh_net {
- 	uint32_t instant; /* Controller Instant of recent Rx */
- 	uint32_t iv_index;
- 	uint32_t seq_num;
--	uint32_t cached_seq_num;
- 	uint16_t src_addr;
- 	uint16_t last_addr;
- 	uint16_t friend_addr;
-@@ -503,17 +502,8 @@ void mesh_friend_sub_del(struct mesh_net *net, uint16_t lpn,
- 
- uint32_t mesh_net_next_seq_num(struct mesh_net *net)
- {
--	uint32_t seq = net->seq_num;
--
--	net->seq_num++;
--
--	/* Periodically store advanced sequence number */
--	if (net->seq_num + MIN_SEQ_TRIGGER >= net->cached_seq_num) {
--		net->cached_seq_num = net->seq_num +
--					node_seq_cache(net->node);
--		node_set_sequence_number(net->node, net->cached_seq_num);
--	}
--
-+	uint32_t seq = net->seq_num++;
-+	node_set_sequence_number(net->node, net->seq_num);
- 	return seq;
- }
- 
-@@ -722,12 +712,12 @@ void mesh_net_free(struct mesh_net *net)
- 	l_free(net);
- }
- 
--bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t number)
-+bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t seq)
- {
- 	if (!net)
- 		return false;
- 
--	net->cached_seq_num = net->seq_num = number;
-+	net->seq_num = seq;
- 
- 	return true;
- }
-diff --git a/mesh/node.c b/mesh/node.c
-index bff73cfc7..e7e58d9a7 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -25,8 +25,6 @@
- #include <dirent.h>
- #include <stdio.h>
- 
--#include <sys/time.h>
--
- #include <ell/ell.h>
- 
- #include "mesh/mesh-defs.h"
-@@ -90,9 +88,7 @@ struct mesh_node {
- 	struct mesh_config *cfg;
- 	char *storage_dir;
- 	uint32_t disc_watch;
--	time_t upd_sec;
- 	uint32_t seq_number;
--	uint32_t seq_min_cache;
- 	bool provisioner;
- 	uint16_t primary;
- 	struct node_composition *comp;
-@@ -560,15 +556,11 @@ static void cleanup_node(void *data)
- 	struct mesh_node *node = data;
- 	struct mesh_net *net = node->net;
- 
--	/* Save local node configuration */
--	if (node->cfg) {
--
--		/* Preserve the last sequence number */
-+	/* Preserve the last sequence number */
-+	if (node->cfg)
- 		mesh_config_write_seq_number(node->cfg,
--						mesh_net_get_seq_num(net));
--
--		mesh_config_save(node->cfg, true, NULL, NULL);
--	}
-+						mesh_net_get_seq_num(net),
-+						false);
- 
- 	free_node_resources(node);
- }
-@@ -704,42 +696,12 @@ bool node_default_ttl_set(struct mesh_node *node, uint8_t ttl)
- 
- bool node_set_sequence_number(struct mesh_node *node, uint32_t seq)
- {
--	struct timeval write_time;
--
- 	if (!node)
- 		return false;
- 
- 	node->seq_number = seq;
- 
--	/*
--	 * Holistically determine worst case 5 minute sequence consumption
--	 * so that we typically (once we reach a steady state) rewrite the
--	 * local node file with a new seq cache value no more than once every
--	 * five minutes (or more)
--	 */
--	gettimeofday(&write_time, NULL);
--	if (node->upd_sec) {
--		uint32_t elapsed = write_time.tv_sec - node->upd_sec;
--
--		if (elapsed < MIN_SEQ_CACHE_TIME) {
--			uint32_t ideal = node->seq_min_cache;
--
--			l_debug("Old Seq Cache: %d", node->seq_min_cache);
--
--			ideal *= (MIN_SEQ_CACHE_TIME / elapsed);
--
--			if (ideal > node->seq_min_cache + MIN_SEQ_CACHE)
--				node->seq_min_cache = ideal;
--			else
--				node->seq_min_cache += MIN_SEQ_CACHE;
--
--			l_debug("New Seq Cache: %d", node->seq_min_cache);
--		}
--	}
--
--	node->upd_sec = write_time.tv_sec;
--
--	return mesh_config_write_seq_number(node->cfg, seq);
-+	return mesh_config_write_seq_number(node->cfg, node->seq_number, true);
- }
- 
- uint32_t node_get_sequence_number(struct mesh_node *node)
-@@ -750,14 +712,6 @@ uint32_t node_get_sequence_number(struct mesh_node *node)
- 	return node->seq_number;
- }
- 
--uint32_t node_seq_cache(struct mesh_node *node)
--{
--	if (node->seq_min_cache < MIN_SEQ_CACHE)
--		node->seq_min_cache = MIN_SEQ_CACHE;
--
--	return node->seq_min_cache;
--}
--
- int node_get_element_idx(struct mesh_node *node, uint16_t ele_addr)
- {
- 	uint16_t addr;
-diff --git a/mesh/node.h b/mesh/node.h
-index a4cac028d..be57d5e67 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -24,11 +24,6 @@ struct mesh_agent;
- struct mesh_config;
- struct mesh_config_node;
- 
--/* To prevent local node JSON cache thrashing, minimum update times */
--#define MIN_SEQ_TRIGGER	32
--#define MIN_SEQ_CACHE		(2*MIN_SEQ_TRIGGER)
--#define MIN_SEQ_CACHE_TIME	(5*60)
--
- typedef void (*node_ready_func_t) (void *user_data, int status,
- 							struct mesh_node *node);
- 
-@@ -82,7 +77,6 @@ bool node_beacon_mode_set(struct mesh_node *node, bool enable);
- uint8_t node_beacon_mode_get(struct mesh_node *node);
- bool node_friend_mode_set(struct mesh_node *node, bool enable);
- uint8_t node_friend_mode_get(struct mesh_node *node);
--uint32_t node_seq_cache(struct mesh_node *node);
- const char *node_get_element_path(struct mesh_node *node, uint8_t ele_idx);
- const char *node_get_owner(struct mesh_node *node);
- const char *node_get_app_path(struct mesh_node *node);
+There is an io abstraction to implement this, afaik most of the things
+here are just copy+paste of shell.c just with a different mainloop and
+IO while the io.h and mainloop.h are exactly to abstract these so I
+wonder why you took this alternative.
+
+> +       data.input = io;
+> +
+> +       if (data.mode) {
+> +               if (shell_exec(data.argc, data.argv) < 0) {
+> +                       bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +                       return true;
+> +               }
+> +
+> +
+> +               if (data.timeout)
+> +                       l_timeout_create(data.timeout, quit_on_timeout, NULL,
+> +                                                               NULL);
+> +       }
+> +
+> +       return true;
+> +}
+> +
+> +bool bt_shell_detach(void)
+> +{
+> +       if (!data.input)
+> +               return false;
+> +
+> +       l_io_destroy(data.input);
+> +       data.input = NULL;
+> +
+> +       return true;
+> +}
+> +
+> +static bool match_env(const void *data, const void *user_data)
+> +{
+> +       const struct bt_shell_env *env = data;
+> +       const char *name = user_data;
+> +
+> +       return !strcmp(env->name, name);
+> +}
+> +
+> +void bt_shell_set_env(const char *name, void *value)
+> +{
+> +       struct bt_shell_env *env;
+> +
+> +       if (!data.envs) {
+> +               if (!value)
+> +                       return;
+> +               data.envs = l_queue_new();
+> +               goto done;
+> +       }
+> +
+> +       env = l_queue_remove_if(data.envs, match_env, (void *) name);
+> +       if (env)
+> +               env_destroy(env);
+> +
+> +       /* Don't create an env if value is not set */
+> +       if (!value)
+> +               return;
+> +
+> +done:
+> +       env = l_new(struct bt_shell_env, 1);
+> +       env->name = strdup(name);
+> +       env->value = value;
+> +
+> +       l_queue_push_tail(data.envs, env);
+> +}
+> +
+> +void *bt_shell_get_env(const char *name)
+> +{
+> +       const struct bt_shell_env *env;
+> +
+> +       if (!data.envs)
+> +               return NULL;
+> +
+> +       env = l_queue_find(data.envs, match_env, name);
+> +       if (!env)
+> +               return NULL;
+> +
+> +       return env->value;
+> +}
+> --
+> 2.21.0
+>
+
+
 -- 
-2.19.1
-
+Luiz Augusto von Dentz
