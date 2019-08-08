@@ -2,72 +2,79 @@ Return-Path: <SRS0=RGGC=WE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16081C0650F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 10:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D929C0650F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 14:59:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D85CE2184E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 10:56:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A2FA217D7
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 14:59:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="WhKYtRwp";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="WhKYtRwp"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="k8Oj8SxZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732061AbfHHKz7 (ORCPT
+        id S1732557AbfHHO7N (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Aug 2019 06:55:59 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:43634 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726721AbfHHKz7 (ORCPT
+        Thu, 8 Aug 2019 10:59:13 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:43833 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732403AbfHHO7N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Aug 2019 06:55:59 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id A80BB60398; Thu,  8 Aug 2019 10:55:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1565261758;
-        bh=RyE30W0O6ROzUh+uCUrmfEWFlAw7l82uw+UovVXzR2w=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=WhKYtRwpUVT+oFtBvsqBg2coJ+vg6GMlbCZsoEOEY/D4J5PJxVOWaXLROYeW+khbz
-         pFYRrRaWU0DZi1SkmCSeg/h4niwr//6RtlsoswOeTVUeGORTTPIRY18C0tKcxQMEVo
-         5ROk1VgodxqP0VzKkulN0Q5zxPil4Z5T8F0Lulus=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id F3F306037C;
-        Thu,  8 Aug 2019 10:55:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1565261758;
-        bh=RyE30W0O6ROzUh+uCUrmfEWFlAw7l82uw+UovVXzR2w=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=WhKYtRwpUVT+oFtBvsqBg2coJ+vg6GMlbCZsoEOEY/D4J5PJxVOWaXLROYeW+khbz
-         pFYRrRaWU0DZi1SkmCSeg/h4niwr//6RtlsoswOeTVUeGORTTPIRY18C0tKcxQMEVo
-         5ROk1VgodxqP0VzKkulN0Q5zxPil4Z5T8F0Lulus=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 08 Aug 2019 16:25:57 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+        Thu, 8 Aug 2019 10:59:13 -0400
+Received: by mail-pf1-f195.google.com with SMTP id i189so44260823pfg.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Aug 2019 07:59:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=9+5/LdlgO80ifqp5Q3hDfZTLZi/NJfE6LXgD8QVEE/w=;
+        b=k8Oj8SxZEsMEeHu0tBryjYG26kBKCLyUQPjfsuMKFkmh2q9AmRZebJwGgGQyksprkb
+         ry14QCQKJ60PPHha1SPAM/xmqwrGV2IXMz4AKUcMn34h6MdwTC9RNHaJ9mqBJuw2VC2+
+         LWQJZEiTLbSJB0l1rFABbOurAYvsapfo+I5cw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=9+5/LdlgO80ifqp5Q3hDfZTLZi/NJfE6LXgD8QVEE/w=;
+        b=UIchelSQGrmmaYzgKxvE24N62eI9ltBqPDvP9J9PakzwKItqdYx3JNflssbqp0NrU6
+         rVcx9W/nfDxDN/DGKMVu1sM8tXAPLqDvR/Wye3s9qLEGOJyJ8xN5Xt4JrP95iZM2+t15
+         cDJMGgA+KPKuO+v/zXW1Oj6BukM9FB6j89MPwznYkrQSJpa2Uiaupyy2/bTPATZIujyM
+         3tGvkDKr9qySEZEdr7loQbX2Or9mDeFajlmdWBOX7rk7KQhUFfc9RsELSwgFCjvHteXR
+         BtEKQtz9kK/LBE7c/fn+kMmJxeY45SmELUfW5R+KYDyGwzK3Dcmefje700BbIudQVhZ3
+         1yLw==
+X-Gm-Message-State: APjAAAU1YbHsky+ZZ7+jVM3VRXRqkd6DE9EHy7BOdAAx67mojmKn5EYs
+        6dxtcYGUL3UDVl3Sbv9Fe+xKYg==
+X-Google-Smtp-Source: APXvYqxGAiT4LhfRNYdQR7HAuFp10fpkI7UDH9UfUqZHjejYfguJUGHzkoIsYUFPClYRsEA3ortRKA==
+X-Received: by 2002:aa7:8619:: with SMTP id p25mr15765287pfn.220.1565276353145;
+        Thu, 08 Aug 2019 07:59:13 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id t8sm109639363pfq.31.2019.08.08.07.59.12
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Aug 2019 07:59:12 -0700 (PDT)
+Date:   Thu, 8 Aug 2019 07:59:09 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Harish Bandi <c-hbandi@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        anubhavg@codeaurora.org
+        bgodavar@codeaurora.org, anubhavg@codeaurora.org
 Subject: Re: [PATCH v1] Bluetooth: hci_qca: wait for Pre shutdown to command
  complete event before sending the Power off pulse
-In-Reply-To: <1565256353-4476-1-git-send-email-c-hbandi@codeaurora.org>
+Message-ID: <20190808145909.GP250418@google.com>
 References: <1565256353-4476-1-git-send-email-c-hbandi@codeaurora.org>
-Message-ID: <83f6833dd901e42e2f86d20ff0898526@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1565256353-4476-1-git-send-email-c-hbandi@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Harish,
-
-On 2019-08-08 14:55, Harish Bandi wrote:
+On Thu, Aug 08, 2019 at 02:55:53PM +0530, Harish Bandi wrote:
 > When SoC receives pre shut down command, it share the same
 > with other COEX shared clients. So SoC needs a short
 > time after sending VS pre shutdown command before
@@ -84,18 +91,18 @@ On 2019-08-08 14:55, Harish Bandi wrote:
 > --- a/drivers/bluetooth/btqca.c
 > +++ b/drivers/bluetooth/btqca.c
 > @@ -106,8 +106,9 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
-> 
+>  
 >  	bt_dev_dbg(hdev, "QCA pre shutdown cmd");
-> 
+>  
 > -	skb = __hci_cmd_sync(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
 > -				NULL, HCI_INIT_TIMEOUT);
 > +	skb = __hci_cmd_sync_ev(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
 > +				NULL, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
-
-[Bala]: nit: can you also add reason in commit text for adding 
-HCI_EV_CMD_COMPLETE
-
 > +
+
+The commit message does not mention this change, it only talks about
+adding a delay.
+
 >  	if (IS_ERR(skb)) {
 >  		err = PTR_ERR(skb);
 >  		bt_dev_err(hdev, "QCA preshutdown_cmd failed (%d)", err);
@@ -106,15 +113,9 @@ HCI_EV_CMD_COMPLETE
 > @@ -1386,6 +1386,8 @@ static int qca_power_off(struct hci_dev *hdev)
 >  	/* Perform pre shutdown command */
 >  	qca_send_pre_shutdown_cmd(hdev);
-> 
+>  
 > +	usleep_range(8000, 10000);
 > +
 >  	qca_power_shutdown(hu);
 >  	return 0;
 >  }
-
-Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-
--- 
-Regards
-Balakrishna.
