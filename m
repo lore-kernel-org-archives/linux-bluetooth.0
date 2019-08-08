@@ -2,120 +2,82 @@ Return-Path: <SRS0=RGGC=WE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D929C0650F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 14:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2200C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 18:57:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A2FA217D7
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 14:59:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="k8Oj8SxZ"
+	by mail.kernel.org (Postfix) with ESMTP id 87E872173C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Aug 2019 18:57:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732557AbfHHO7N (ORCPT
+        id S2390201AbfHHS5y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Aug 2019 10:59:13 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43833 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732403AbfHHO7N (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Aug 2019 10:59:13 -0400
-Received: by mail-pf1-f195.google.com with SMTP id i189so44260823pfg.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Aug 2019 07:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=9+5/LdlgO80ifqp5Q3hDfZTLZi/NJfE6LXgD8QVEE/w=;
-        b=k8Oj8SxZEsMEeHu0tBryjYG26kBKCLyUQPjfsuMKFkmh2q9AmRZebJwGgGQyksprkb
-         ry14QCQKJ60PPHha1SPAM/xmqwrGV2IXMz4AKUcMn34h6MdwTC9RNHaJ9mqBJuw2VC2+
-         LWQJZEiTLbSJB0l1rFABbOurAYvsapfo+I5cw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=9+5/LdlgO80ifqp5Q3hDfZTLZi/NJfE6LXgD8QVEE/w=;
-        b=UIchelSQGrmmaYzgKxvE24N62eI9ltBqPDvP9J9PakzwKItqdYx3JNflssbqp0NrU6
-         rVcx9W/nfDxDN/DGKMVu1sM8tXAPLqDvR/Wye3s9qLEGOJyJ8xN5Xt4JrP95iZM2+t15
-         cDJMGgA+KPKuO+v/zXW1Oj6BukM9FB6j89MPwznYkrQSJpa2Uiaupyy2/bTPATZIujyM
-         3tGvkDKr9qySEZEdr7loQbX2Or9mDeFajlmdWBOX7rk7KQhUFfc9RsELSwgFCjvHteXR
-         BtEKQtz9kK/LBE7c/fn+kMmJxeY45SmELUfW5R+KYDyGwzK3Dcmefje700BbIudQVhZ3
-         1yLw==
-X-Gm-Message-State: APjAAAU1YbHsky+ZZ7+jVM3VRXRqkd6DE9EHy7BOdAAx67mojmKn5EYs
-        6dxtcYGUL3UDVl3Sbv9Fe+xKYg==
-X-Google-Smtp-Source: APXvYqxGAiT4LhfRNYdQR7HAuFp10fpkI7UDH9UfUqZHjejYfguJUGHzkoIsYUFPClYRsEA3ortRKA==
-X-Received: by 2002:aa7:8619:: with SMTP id p25mr15765287pfn.220.1565276353145;
-        Thu, 08 Aug 2019 07:59:13 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id t8sm109639363pfq.31.2019.08.08.07.59.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Aug 2019 07:59:12 -0700 (PDT)
-Date:   Thu, 8 Aug 2019 07:59:09 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Harish Bandi <c-hbandi@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, anubhavg@codeaurora.org
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: wait for Pre shutdown to command
- complete event before sending the Power off pulse
-Message-ID: <20190808145909.GP250418@google.com>
-References: <1565256353-4476-1-git-send-email-c-hbandi@codeaurora.org>
+        Thu, 8 Aug 2019 14:57:54 -0400
+Received: from mga03.intel.com ([134.134.136.65]:5508 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728825AbfHHS5x (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 8 Aug 2019 14:57:53 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Aug 2019 11:57:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,362,1559545200"; 
+   d="scan'208";a="182683105"
+Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
+  by FMSMGA003.fm.intel.com with ESMTP; 08 Aug 2019 11:57:53 -0700
+Received: from orsmsx126.amr.corp.intel.com (10.22.240.126) by
+ ORSMSX109.amr.corp.intel.com (10.22.240.7) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 8 Aug 2019 11:57:49 -0700
+Received: from orsmsx101.amr.corp.intel.com ([169.254.8.157]) by
+ ORSMSX126.amr.corp.intel.com ([169.254.4.77]) with mapi id 14.03.0439.000;
+ Thu, 8 Aug 2019 11:57:49 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ] mesh: Fix double free of a pointer in
+ mesh-io-generic
+Thread-Topic: [PATCH BlueZ] mesh: Fix double free of a pointer in
+ mesh-io-generic
+Thread-Index: AQHVTVuoQgddiXFM+kuOEhx5dyyMU6byEPgA
+Date:   Thu, 8 Aug 2019 18:57:48 +0000
+Message-ID: <da2be8478867a386cab75fec400896bb9c006828.camel@intel.com>
+References: <20190807200636.19614-1-inga.stotland@intel.com>
+In-Reply-To: <20190807200636.19614-1-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.251.24.187]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <74A9D384D2CA1640B93BD4CB8A413629@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1565256353-4476-1-git-send-email-c-hbandi@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Aug 08, 2019 at 02:55:53PM +0530, Harish Bandi wrote:
-> When SoC receives pre shut down command, it share the same
-> with other COEX shared clients. So SoC needs a short
-> time after sending VS pre shutdown command before
-> turning off the regulators and sending the power off pulse.
-> 
-> Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
-> ---
->  drivers/bluetooth/btqca.c   | 5 +++--
->  drivers/bluetooth/hci_qca.c | 2 ++
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 2221935..f20991e 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -106,8 +106,9 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->  
->  	bt_dev_dbg(hdev, "QCA pre shutdown cmd");
->  
-> -	skb = __hci_cmd_sync(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
-> -				NULL, HCI_INIT_TIMEOUT);
-> +	skb = __hci_cmd_sync_ev(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
-> +				NULL, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
-> +
-
-The commit message does not mention this change, it only talks about
-adding a delay.
-
->  	if (IS_ERR(skb)) {
->  		err = PTR_ERR(skb);
->  		bt_dev_err(hdev, "QCA preshutdown_cmd failed (%d)", err);
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 16db6c0..566aa28 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1386,6 +1386,8 @@ static int qca_power_off(struct hci_dev *hdev)
->  	/* Perform pre shutdown command */
->  	qca_send_pre_shutdown_cmd(hdev);
->  
-> +	usleep_range(8000, 10000);
-> +
->  	qca_power_shutdown(hu);
->  	return 0;
->  }
+QXBwbGllZA0KDQpPbiBXZWQsIDIwMTktMDgtMDcgYXQgMTM6MDYgLTA3MDAsIEluZ2EgU3RvdGxh
+bmQgd3JvdGU6DQo+IFRoaXMgZml4ZXMgYSBjcmFzaCBpbiBibHVldG9vdGgtbWVzaGQgZHVlIHRv
+IGZyZWVpbmcgdGhlIHNhbWUgcG9pbnRlcg0KPiB0d2ljZS4gVGhlIGZpeCBpcyB0byBpbml0aWFs
+aXplIHRoZSBhZGRyZXNzIG9mIGZyZWVkIFRYIGJ1ZmZlciB0byBOVUxMLg0KPiAtLS0NCj4gIG1l
+c2gvbWVzaC1pby1nZW5lcmljLmMgfCAxMCArKysrKysrKystDQo+ICAxIGZpbGUgY2hhbmdlZCwg
+OSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9t
+ZXNoLWlvLWdlbmVyaWMuYyBiL21lc2gvbWVzaC1pby1nZW5lcmljLmMNCj4gaW5kZXggNTc2YzVk
+ZjFiLi5jYzkxZjQ5NGUgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbWVzaC1pby1nZW5lcmljLmMNCj4g
+KysrIGIvbWVzaC9tZXNoLWlvLWdlbmVyaWMuYw0KPiBAQCAtNjU0LDggKzY1NCwxMiBAQCBzdGF0
+aWMgYm9vbCB0eF9jYW5jZWwoc3RydWN0IG1lc2hfaW8gKmlvLCBjb25zdCB1aW50OF90ICpkYXRh
+LCB1aW50OF90IGxlbikNCj4gIAkJCXR4ID0gbF9xdWV1ZV9yZW1vdmVfaWYocHZ0LT50eF9wa3Rz
+LCBmaW5kX2J5X2FkX3R5cGUsDQo+ICAJCQkJCQkJTF9VSU5UX1RPX1BUUihkYXRhWzBdKSk7DQo+
+ICAJCQlsX2ZyZWUodHgpOw0KPiArDQo+ICsJCQlpZiAodHggPT0gcHZ0LT50eCkNCj4gKwkJCQlw
+dnQtPnR4ID0gTlVMTDsNCj4gKw0KPiAgCQl9IHdoaWxlICh0eCk7DQo+IC0JfSAgZWxzZSB7DQo+
+ICsJfSBlbHNlIHsNCj4gIAkJc3RydWN0IHR4X3BhdHRlcm4gcGF0dGVybiA9IHsNCj4gIAkJCS5k
+YXRhID0gZGF0YSwNCj4gIAkJCS5sZW4gPSBsZW4NCj4gQEAgLTY2NSw2ICs2NjksMTAgQEAgc3Rh
+dGljIGJvb2wgdHhfY2FuY2VsKHN0cnVjdCBtZXNoX2lvICppbywgY29uc3QgdWludDhfdCAqZGF0
+YSwgdWludDhfdCBsZW4pDQo+ICAJCQl0eCA9IGxfcXVldWVfcmVtb3ZlX2lmKHB2dC0+dHhfcGt0
+cywgZmluZF9ieV9wYXR0ZXJuLA0KPiAgCQkJCQkJCQkmcGF0dGVybik7DQo+ICAJCQlsX2ZyZWUo
+dHgpOw0KPiArDQo+ICsJCQlpZiAodHggPT0gcHZ0LT50eCkNCj4gKwkJCQlwdnQtPnR4ID0gTlVM
+TDsNCj4gKw0KPiAgCQl9IHdoaWxlICh0eCk7DQo+ICAJfQ0KPiAgDQo=
