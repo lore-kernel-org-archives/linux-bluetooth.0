@@ -2,154 +2,219 @@ Return-Path: <SRS0=fX1h=WG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD8DC32751
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Aug 2019 06:55:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88316C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Aug 2019 07:00:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89948208C3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Aug 2019 06:55:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A8upRb0h"
+	by mail.kernel.org (Postfix) with ESMTP id 62A45208C3
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Aug 2019 07:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725763AbfHJGzF (ORCPT
+        id S1725773AbfHJHAi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 10 Aug 2019 02:55:05 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:33797 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725554AbfHJGzF (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 10 Aug 2019 02:55:05 -0400
-Received: by mail-ot1-f68.google.com with SMTP id n5so141339268otk.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Aug 2019 23:55:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=dkHzRfkeai+SEc70CMaXC9uHWlnINjH3tuKnKKaSIQ4=;
-        b=A8upRb0hzYbqFPZO2RSHEemwInYZeTlowRMWIATDoEvR8dRVSBoOsVSjFl3UQ0WSlS
-         xlh/6cqKbPAMPv0yrZiOF6+OT24KHJsKLHscgaDJy4ggtijhn7jGZKOLrxWHzpspNrMu
-         2Q5AdxNAYHp7MKPl+HZQec7Hi8ZorEDlXGegGoD2FFlNpppXabvp4HK6bJkPVD/LPp84
-         S4j5LGbP7oN/n9OcQYJN/K2VHRhq8JJVhn9Pv2JFGg8PxMsWVKTz43Hzs/Brw9f64fKn
-         M+A7MtkM2mT9GwtnPGrU9w7oDHb9LkJ9HCy2U/l4E91X9K2gWmyVGuAOpqTHWW9jVJVD
-         mtNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=dkHzRfkeai+SEc70CMaXC9uHWlnINjH3tuKnKKaSIQ4=;
-        b=XjYEkwFvEY8CwT+fso8GNxaIpsBCO3rFHXpVevtQS+HHqwh8BLChb0hif5plZ/cnW/
-         YilVnMRIgZSLG9q35HgHYumKM1lGI6Ij9KvmRVP0d+9hV2se8e4D1pvhBHHrI6v1Zl/O
-         5FCpIQvXuPKCmgwMXb6NRmVOfdT0UIW4n6FporJIIr6ungeo7R5faolFBj3zxQym7JVO
-         mrXD5xeP+By1asRMhH5CVycM5PI8f942DdzaCjCWLeKSeLFrWdaeVsz8xVFxPRGa4UHg
-         +882NpPHupeM82RWvSuOJho/IdrvGzpcg3lknW0SMdOnS+wR0R0+L+qxqgBwGW5Zm3QX
-         Q6nA==
-X-Gm-Message-State: APjAAAVXzYLverUQRE8sbdtjO0FZLARGLnMTW0H8EEp6TYGV2JX+Eu4o
-        /h8Fn3+IdAxnPzLmLwkRgKQ7xT/nqTtr+H5OQYk=
-X-Google-Smtp-Source: APXvYqx2KxjteRVQ18f1ARMu0VmULwcuNjkZSYlV4Cdjxhm3WaXGmcpc/lJ8qGclplhbyorIFjUzK7EmiF8wpuB3oFs=
-X-Received: by 2002:a9d:4817:: with SMTP id c23mr15808838otf.146.1565420104346;
- Fri, 09 Aug 2019 23:55:04 -0700 (PDT)
+        Sat, 10 Aug 2019 03:00:38 -0400
+Received: from mga11.intel.com ([192.55.52.93]:31758 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725468AbfHJHAh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 10 Aug 2019 03:00:37 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Aug 2019 00:00:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,368,1559545200"; 
+   d="scan'208";a="175350723"
+Received: from ingas-nuc1.sea.intel.com ([10.251.24.184])
+  by fmsmga008.fm.intel.com with ESMTP; 10 Aug 2019 00:00:36 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Move commonly used defines into mesh-defs.h
+Date:   Sat, 10 Aug 2019 00:00:28 -0700
+Message-Id: <20190810070028.25703-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20190712151329.11333-1-luiz.dentz@gmail.com> <CABBYNZLDFAJgkfAFWOOAAqqiX8mpi3KgirBkpwpnBFJ3TxPqyg@mail.gmail.com>
- <20190718100024.ii2igadxb2lmmitm@pali> <20190721155522.3vqt7vsprhpxflqf@pali>
-In-Reply-To: <20190721155522.3vqt7vsprhpxflqf@pali>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sat, 10 Aug 2019 09:54:52 +0300
-Message-ID: <CABBYNZK6cuz9n4Hu9uRCbQvn9uFEYkn9=mY8J5Fqu0u-D3B1EA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] doc/media-api: Add RegisterApplication method
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+This consolidates into a single header file for constant values
+based on mesh specification as well as internally defined helper
+constants.
+Also, removes redundant redefinition maximum message length.
+---
+ mesh/mesh-defs.h | 33 ++++++++++++++++++++++++++++++---
+ mesh/model.h     | 21 ---------------------
+ mesh/net.h       |  7 -------
+ mesh/node.c      | 10 ++++------
+ 4 files changed, 34 insertions(+), 37 deletions(-)
 
-On Sun, Jul 21, 2019 at 6:55 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrot=
-e:
->
-> On Thursday 18 July 2019 12:00:24 Pali Roh=C3=A1r wrote:
-> > On Saturday 13 July 2019 17:52:46 Luiz Augusto von Dentz wrote:
-> > > Hi Pali,
-> > >
-> > > On Fri, Jul 12, 2019 at 6:13 PM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > >
-> > > > This uses application ObjectManager to discover the MediaEndpoint a=
-nd
-> > > > MediaPlayer object of an application and deprecates the use of
-> > > > RegisterEndpoint and RegisterPlayer.
-> > > > ---
-> > > >  doc/media-api.txt | 20 ++++++++++++++++++++
-> > > >  1 file changed, 20 insertions(+)
-> > > >
-> > > > diff --git a/doc/media-api.txt b/doc/media-api.txt
-> > > > index bca8c9563..07f7ac3e0 100644
-> > > > --- a/doc/media-api.txt
-> > > > +++ b/doc/media-api.txt
-> > > > @@ -66,7 +66,27 @@ Methods              void RegisterEndpoint(objec=
-t endpoint, dict properties)
-> > > >
-> > > >                         Unregister sender media player.
-> > > >
-> > > > +               void RegisterApplication(object root, dict options)
-> > > >
-> > > > +                       Register endpoints an player objects within=
- root
-> > > > +                       object which must implement ObjectManager.
-> > > > +
-> > > > +                       The application object path together with t=
-he D-Bus
-> > > > +                       system bus connection ID define the identif=
-ication of
-> > > > +                       the application.
-> > > > +
-> > > > +                       Possible errors: org.bluez.Error.InvalidArg=
-uments
-> > > > +                                        org.bluez.Error.AlreadyExi=
-sts
-> > > > +
-> > > > +               void UnregisterApplication(object application)
-> > > > +
-> > > > +                       This unregisters the services that has been
-> > > > +                       previously registered. The object path para=
-meter
-> > > > +                       must match the same value that has been use=
-d
-> > > > +                       on registration.
-> > > > +
-> > > > +                       Possible errors: org.bluez.Error.InvalidArg=
-uments
-> > > > +                                        org.bluez.Error.DoesNotExi=
-st
-> > > >  Media Control hierarchy
-> > > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> > > >
-> > > > --
-> > > > 2.21.0
-> > >
-> > > Can you try this set?
-> >
-> > Hello, I will try it later in next week. To test it would mean to
-> > rewrite pulseaudio bluetooth modules to use this new API, so it would
-> > take me longer time.
->
-> Hi! I looked at it. But I do not know how to implement
-> GetManagedObjects() method via libdbus properly. Any idea?
+diff --git a/mesh/mesh-defs.h b/mesh/mesh-defs.h
+index d14aa5af3..5e253b85c 100644
+--- a/mesh/mesh-defs.h
++++ b/mesh/mesh-defs.h
+@@ -54,6 +54,26 @@
+ #define OOB_OUT_NUMBER	0x0008
+ #define OOB_OUT_ALPHA	0x0010
+ 
++/* Status codes */
++#define MESH_STATUS_SUCCESS		0x00
++#define MESH_STATUS_INVALID_ADDRESS	0x01
++#define MESH_STATUS_INVALID_MODEL	0x02
++#define MESH_STATUS_INVALID_APPKEY	0x03
++#define MESH_STATUS_INVALID_NETKEY	0x04
++#define MESH_STATUS_INSUFF_RESOURCES	0x05
++#define MESH_STATUS_IDX_ALREADY_STORED	0x06
++#define MESH_STATUS_INVALID_PUB_PARAM	0x07
++#define MESH_STATUS_NOT_SUB_MOD		0x08
++#define MESH_STATUS_STORAGE_FAIL	0x09
++#define MESH_STATUS_FEATURE_NO_SUPPORT	0x0a
++#define MESH_STATUS_CANNOT_UPDATE	0x0b
++#define MESH_STATUS_CANNOT_REMOVE	0x0c
++#define MESH_STATUS_CANNOT_BIND		0x0d
++#define MESH_STATUS_UNABLE_CHANGE_STATE	0x0e
++#define MESH_STATUS_CANNOT_SET		0x0f
++#define MESH_STATUS_UNSPECIFIED_ERROR	0x10
++#define MESH_STATUS_INVALID_BINDING	0x11
++
+ #define UNASSIGNED_ADDRESS	0x0000
+ #define PROXIES_ADDRESS	0xfffc
+ #define FRIENDS_ADDRESS	0xfffd
+@@ -72,14 +92,21 @@
+ 
+ #define PRIMARY_ELE_IDX		0x00
+ 
+-#define VENDOR_ID_MASK		0xffff0000
+-
+ #define PRIMARY_NET_IDX		0x0000
+ #define MAX_KEY_IDX		0x0fff
+ #define MAX_MODEL_COUNT		0xff
+ #define MAX_ELE_COUNT		0xff
+ 
+-#define MAX_MSG_LEN 380
++#define MAX_MSG_LEN		380
++
++#define VENDOR_ID_MASK		0xffff0000
++
++#define NET_IDX_INVALID	0xffff
++#define NET_NID_INVALID	0xff
++
++#define APP_IDX_MASK		0x0fff
++#define APP_IDX_DEV_REMOTE	0x6fff
++#define APP_IDX_DEV_LOCAL	0x7fff
+ 
+ #define IS_UNASSIGNED(x)	((x) == UNASSIGNED_ADDRESS)
+ #define IS_UNICAST(x)		(((x) > UNASSIGNED_ADDRESS) && \
+diff --git a/mesh/model.h b/mesh/model.h
+index fa031f598..f30ca2e38 100644
+--- a/mesh/model.h
++++ b/mesh/model.h
+@@ -26,27 +26,6 @@ struct mesh_model;
+ 
+ #define VIRTUAL_BASE			0x10000
+ 
+-#define MESH_MAX_ACCESS_PAYLOAD		380
+-
+-#define MESH_STATUS_SUCCESS		0x00
+-#define MESH_STATUS_INVALID_ADDRESS	0x01
+-#define MESH_STATUS_INVALID_MODEL	0x02
+-#define MESH_STATUS_INVALID_APPKEY	0x03
+-#define MESH_STATUS_INVALID_NETKEY	0x04
+-#define MESH_STATUS_INSUFF_RESOURCES	0x05
+-#define MESH_STATUS_IDX_ALREADY_STORED	0x06
+-#define MESH_STATUS_INVALID_PUB_PARAM	0x07
+-#define MESH_STATUS_NOT_SUB_MOD		0x08
+-#define MESH_STATUS_STORAGE_FAIL	0x09
+-#define MESH_STATUS_FEATURE_NO_SUPPORT	0x0a
+-#define MESH_STATUS_CANNOT_UPDATE	0x0b
+-#define MESH_STATUS_CANNOT_REMOVE	0x0c
+-#define MESH_STATUS_CANNOT_BIND		0x0d
+-#define MESH_STATUS_UNABLE_CHANGE_STATE	0x0e
+-#define MESH_STATUS_CANNOT_SET		0x0f
+-#define MESH_STATUS_UNSPECIFIED_ERROR	0x10
+-#define MESH_STATUS_INVALID_BINDING	0x11
+-
+ #define OP_MODEL_TEST			0x8000fffe
+ #define OP_MODEL_INVALID		0x8000ffff
+ 
+diff --git a/mesh/net.h b/mesh/net.h
+index b7aa37748..c0ace3624 100644
+--- a/mesh/net.h
++++ b/mesh/net.h
+@@ -36,13 +36,6 @@ struct mesh_node;
+ 
+ #define CREDFLAG_MASK	0x1000
+ 
+-#define APP_IDX_MASK		0x0fff
+-#define APP_IDX_DEV_REMOTE	0x6fff
+-#define APP_IDX_DEV_LOCAL	0x7fff
+-
+-#define NET_IDX_INVALID	0xffff
+-#define NET_NID_INVALID	0xff
+-
+ #define KEY_CACHE_SIZE	64
+ #define FRND_CACHE_MAX	32
+ 
+diff --git a/mesh/node.c b/mesh/node.c
+index e7e58d9a7..e0903efb0 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -84,7 +84,6 @@ struct mesh_node {
+ 	char *owner;
+ 	char *obj_path;
+ 	struct mesh_agent *agent;
+-	char *path;
+ 	struct mesh_config *cfg;
+ 	char *storage_dir;
+ 	uint32_t disc_watch;
+@@ -110,7 +109,6 @@ struct mesh_node {
+ 
+ struct node_import {
+ 	uint8_t dev_key[16];
+-
+ 	uint8_t net_key[16];
+ 	uint16_t net_idx;
+ 	struct {
+@@ -1955,7 +1953,7 @@ static struct l_dbus_message *send_call(struct l_dbus *dbus,
+ 	src = node_get_primary(node) + ele->idx;
+ 
+ 	if (!l_dbus_message_iter_get_fixed_array(&iter_data, &data, &len) ||
+-					!len || len > MESH_MAX_ACCESS_PAYLOAD)
++					!len || len > MAX_MSG_LEN)
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 							"Incorrect data");
+ 
+@@ -2001,7 +1999,7 @@ static struct l_dbus_message *dev_key_send_call(struct l_dbus *dbus,
+ 	src = node_get_primary(node) + ele->idx;
+ 
+ 	if (!l_dbus_message_iter_get_fixed_array(&iter_data, &data, &len) ||
+-					!len || len > MESH_MAX_ACCESS_PAYLOAD)
++					!len || len > MAX_MSG_LEN)
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 							"Incorrect data");
+ 
+@@ -2045,7 +2043,7 @@ static struct l_dbus_message *publish_call(struct l_dbus *dbus,
+ 	src = node_get_primary(node) + ele->idx;
+ 
+ 	if (!l_dbus_message_iter_get_fixed_array(&iter_data, &data, &len) ||
+-					!len || len > MESH_MAX_ACCESS_PAYLOAD)
++					!len || len > MAX_MSG_LEN)
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 							"Incorrect data");
+ 
+@@ -2092,7 +2090,7 @@ static struct l_dbus_message *vendor_publish_call(struct l_dbus *dbus,
+ 	src = node_get_primary(node) + ele->idx;
+ 
+ 	if (!l_dbus_message_iter_get_fixed_array(&iter_data, &data, &len) ||
+-					!len || len > MESH_MAX_ACCESS_PAYLOAD)
++					!len || len > MAX_MSG_LEN)
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 							"Incorrect data");
+ 
+-- 
+2.21.0
 
-I went ahead and applied this set, you can find some examples of how
-to implement ObjectManager interface in gdbus but I guess what you
-really need to do is make PA aware of the objects being exposed since
-it does make it simpler to to enumerate objects by the clients.
-
---=20
-Luiz Augusto von Dentz
