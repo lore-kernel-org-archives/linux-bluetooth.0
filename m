@@ -2,56 +2,69 @@ Return-Path: <SRS0=fB+o=WI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C14BC433FF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 13:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE81C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:29:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 13329206A2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 13:36:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9B232075B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:29:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728136AbfHLNgq convert rfc822-to-8bit (ORCPT
+        id S1727019AbfHLQ3e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Aug 2019 09:36:46 -0400
-Received: from p3plsmtpa06-01.prod.phx3.secureserver.net ([173.201.192.102]:36689
-        "EHLO p3plsmtpa06-01.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726502AbfHLNgq (ORCPT
+        Mon, 12 Aug 2019 12:29:34 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:47453 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbfHLQ3e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Aug 2019 09:36:46 -0400
-Received: from JROmen ([199.48.138.4])
-        by :SMTPAUTH: with ESMTPA
-        id xAVBh07bGAihHxAVBhJM7R; Mon, 12 Aug 2019 06:36:46 -0700
-From:   "John Rucker" <John.Rucker@Solar-Current.com>
-To:     <linux-bluetooth@vger.kernel.org>
-References: 
-In-Reply-To: 
-Subject: D-Bus API based peripheral need guidance on setting Advertising_Interval_Min and Advertising_Interval_Max
-Date:   Mon, 12 Aug 2019 08:36:45 -0500
-Message-ID: <004301d55112$fc557da0$f50078e0$@Solar-Current.com>
-MIME-Version: 1.0
+        Mon, 12 Aug 2019 12:29:34 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC580.dip0.t-ipconnect.de [79.239.197.128])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2CE6CCECF4;
+        Mon, 12 Aug 2019 18:38:14 +0200 (CEST)
 Content-Type: text/plain;
-        charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AdVMTTlRUt+lQCh8RqCxvUgdLPGzbwExZoxw
-Content-Language: en-us
-X-CMAE-Envelope: MS4wfIMVEjrJ82xlEtGdv4yPZfwrTxI8mYNN9TA+Oqmbe/OJmreUgL6gSzctwIdJhf9TKdecsRgSCG7wZJgNCaQotkhHpofBW0aQgOCHpzXCszj7vDGuUE9h
- OXgqql9adzi11WGHz4rFvlJoOacfOir2kbDKYkCDxEYe5+dClPjjJngWpepvu7BUdcXoGUwTPQujog==
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH v5 18/29] compat_ioctl: move rfcomm handlers into driver
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190730195819.901457-6-arnd@arndb.de>
+Date:   Mon, 12 Aug 2019 18:29:32 +0200
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <C12653E2-D2EB-423E-82BF-35C05CD1984D@holtmann.org>
+References: <20190730192552.4014288-1-arnd@arndb.de>
+ <20190730195819.901457-1-arnd@arndb.de>
+ <20190730195819.901457-6-arnd@arndb.de>
+To:     Arnd Bergmann <arnd@arndb.de>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I have a BLE peripheral running on top of Raspbian Buster, Kernel version
-4.19 and BlueZ v 5.50.  I need to set the advertising interval from the
-default 1.2 seconds to a much more aggressive setting say 200mS.  Can
-someone please give my guidance on the best way to achieve this.   The only
-way I can find to do this is to completely setup my advertising packet with
-the HCI tool.  I have to be missing something. Is there a way to simply
-change the default advertising interval?  
+Hi Arnd,
 
-Thanks 
-JR
+> All these ioctl commands are compatible, so we can handle
+> them with a trivial wrapper in rfcomm/sock.c and remove
+> the listing in fs/compat_ioctl.c.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> fs/compat_ioctl.c           |  6 ------
+> net/bluetooth/rfcomm/sock.c | 14 ++++++++++++--
+> 2 files changed, 12 insertions(+), 8 deletions(-)
+
+I think it is best if this series is applied as a whole. So whoever takes it
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
 
