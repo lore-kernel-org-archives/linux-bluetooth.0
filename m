@@ -6,67 +6,59 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 963FDC31E40
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 123EDC433FF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:33:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74ECB20679
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:29:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E585B20679
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:33:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726993AbfHLQ3c (ORCPT
+        id S1726479AbfHLQde convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Aug 2019 12:29:32 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:52463 "EHLO
+        Mon, 12 Aug 2019 12:33:34 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:45039 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbfHLQ3c (ORCPT
+        with ESMTP id S1725901AbfHLQde (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Aug 2019 12:29:32 -0400
+        Mon, 12 Aug 2019 12:33:34 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC580.dip0.t-ipconnect.de [79.239.197.128])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 23EACCECF3;
-        Mon, 12 Aug 2019 18:38:12 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 664B7CECF3;
+        Mon, 12 Aug 2019 18:42:13 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v5 19/29] compat_ioctl: move hci_sock handlers into driver
+Subject: Re: [PATCH v2] Bluetooth: btusb: Fix suspend issue for Realtek
+ devices
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190730195819.901457-7-arnd@arndb.de>
-Date:   Mon, 12 Aug 2019 18:29:30 +0200
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Deepa Dinamani <deepa.kernel@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <29753EE8-74C4-4544-801B-3E7F3E4EEA60@holtmann.org>
-References: <20190730192552.4014288-1-arnd@arndb.de>
- <20190730195819.901457-1-arnd@arndb.de>
- <20190730195819.901457-7-arnd@arndb.de>
-To:     Arnd Bergmann <arnd@arndb.de>
+In-Reply-To: <20190802120217.GA8712@toshiba>
+Date:   Mon, 12 Aug 2019 18:33:31 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Max Chou <max.chou@realtek.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A83A0A38-8AC8-4662-BBC1-3B48B707E97B@holtmann.org>
+References: <20190802120217.GA8712@toshiba>
+To:     Alex Lu <alex_lu@realsil.com.cn>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Arnd,
+Hi Alex,
 
-> All these ioctl commands are compatible, so we can handle
-> them with a trivial wrapper in hci_sock.c and remove
-> the listing in fs/compat_ioctl.c.
+> From the perspective of controller, global suspend means there is no
+> SET_FEATURE (DEVICE_REMOTE_WAKEUP) and controller would drop the
+> firmware. It would consume less power. So we should not send this kind
+> of SET_FEATURE when host goes to suspend state.
+> Otherwise, when making device enter selective suspend, host should send
+> SET_FEATURE to make sure the firmware remains.
 > 
-> A few of the commands pass integer arguments instead of
-> pointers, so for correctness skip the compat_ptr() conversion
-> here.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
 > ---
-> fs/compat_ioctl.c        | 24 ------------------------
-> net/bluetooth/hci_sock.c | 21 ++++++++++++++++++++-
-> 2 files changed, 20 insertions(+), 25 deletions(-)
+> drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++++++++++----
+> 1 file changed, 30 insertions(+), 4 deletions(-)
 
-I think it is best if this series is applied as a whole. So whoever takes it
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+this one doesn’t apply cleanly to bluetooth-next. Can you please send a version that does.
 
 Regards
 
