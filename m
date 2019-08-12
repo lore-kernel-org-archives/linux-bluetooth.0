@@ -2,69 +2,109 @@ Return-Path: <SRS0=fB+o=WI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B20C31E40
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F08AC433FF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:37:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F08E20679
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D1B320679
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 16:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbfHLQfW convert rfc822-to-8bit (ORCPT
+        id S1726573AbfHLQhI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Aug 2019 12:35:22 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:57334 "EHLO
+        Mon, 12 Aug 2019 12:37:08 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:46080 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725822AbfHLQfW (ORCPT
+        with ESMTP id S1725843AbfHLQhI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Aug 2019 12:35:22 -0400
+        Mon, 12 Aug 2019 12:37:08 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC580.dip0.t-ipconnect.de [79.239.197.128])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 23B94CECF3;
-        Mon, 12 Aug 2019 18:44:02 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2B53BCECF3;
+        Mon, 12 Aug 2019 18:45:48 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2] Bluetooth: btrtl: Save firmware and config
+Subject: Re: [PATCH] Bluetooth: btqca: release_firmware after
+ qca_inject_cmd_complete_event
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190805030733.GA11069@toshiba>
-Date:   Mon, 12 Aug 2019 18:35:20 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20190806095629.88769-1-tientzu@chromium.org>
+Date:   Mon, 12 Aug 2019 18:37:06 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, johan@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Max Chou <max.chou@realtek.com>
+        bgodavar@codeaurora.org, hemantg@codeaurora.org,
+        rjliao@codeaurora.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <1BB38E27-5FAD-4402-86C1-6AA47E6BA08A@holtmann.org>
-References: <20190805030733.GA11069@toshiba>
-To:     Alex Lu <alex_lu@realsil.com.cn>
+Message-Id: <5AFCA924-5A3E-471D-83A8-5C59B7AD8049@holtmann.org>
+References: <20190806095629.88769-1-tientzu@chromium.org>
+To:     Claire Chang <tientzu@chromium.org>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alex,
+Hi Claire,
 
-> usb reset resume will cause downloading firmware again and
-> requesting firmware may be failed while host is resuming
+> commit 32646db8cc28 ("Bluetooth: btqca: inject command complete event
+> during fw download") added qca_inject_cmd_complete_event() for certain
+> qualcomm chips. However, qca_download_firmware() will return without
+> calling release_firmware() in this case.
 > 
-> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+> This leads to a memory leak like the following found by kmemleak:
+> 
+> unreferenced object 0xfffffff3868a5880 (size 128):
+>  comm "kworker/u17:5", pid 347, jiffies 4294676481 (age 312.157s)
+>  hex dump (first 32 bytes):
+>    ac fd 00 00 00 00 00 00 00 d0 7e 17 80 ff ff ff  ..........~.....
+>    00 00 00 00 00 00 00 00 00 59 8a 86 f3 ff ff ff  .........Y......
+>  backtrace:
+>    [<00000000978ce31d>] kmem_cache_alloc_trace+0x194/0x298
+>    [<000000006ea0398c>] _request_firmware+0x74/0x4e4
+>    [<000000004da31ca0>] request_firmware+0x44/0x64
+>    [<0000000094572996>] qca_download_firmware+0x74/0x6e4 [btqca]
+>    [<00000000b24d615a>] qca_uart_setup+0xc0/0x2b0 [btqca]
+>    [<00000000364a6d5a>] qca_setup+0x204/0x570 [hci_uart]
+>    [<000000006be1a544>] hci_uart_setup+0xa8/0x148 [hci_uart]
+>    [<00000000d64c0f4f>] hci_dev_do_open+0x144/0x530 [bluetooth]
+>    [<00000000f69f5110>] hci_power_on+0x84/0x288 [bluetooth]
+>    [<00000000d4151583>] process_one_work+0x210/0x420
+>    [<000000003cf3dcfb>] worker_thread+0x2c4/0x3e4
+>    [<000000007ccaf055>] kthread+0x124/0x134
+>    [<00000000bef1f723>] ret_from_fork+0x10/0x18
+>    [<00000000c36ee3dd>] 0xffffffffffffffff
+> unreferenced object 0xfffffff37b16de00 (size 128):
+>  comm "kworker/u17:5", pid 347, jiffies 4294676873 (age 311.766s)
+>  hex dump (first 32 bytes):
+>    da 07 00 00 00 00 00 00 00 50 ff 0b 80 ff ff ff  .........P......
+>    00 00 00 00 00 00 00 00 00 dd 16 7b f3 ff ff ff  ...........{....
+>  backtrace:
+>    [<00000000978ce31d>] kmem_cache_alloc_trace+0x194/0x298
+>    [<000000006ea0398c>] _request_firmware+0x74/0x4e4
+>    [<000000004da31ca0>] request_firmware+0x44/0x64
+>    [<0000000094572996>] qca_download_firmware+0x74/0x6e4 [btqca]
+>    [<000000000cde20a9>] qca_uart_setup+0x144/0x2b0 [btqca]
+>    [<00000000364a6d5a>] qca_setup+0x204/0x570 [hci_uart]
+>    [<000000006be1a544>] hci_uart_setup+0xa8/0x148 [hci_uart]
+>    [<00000000d64c0f4f>] hci_dev_do_open+0x144/0x530 [bluetooth]
+>    [<00000000f69f5110>] hci_power_on+0x84/0x288 [bluetooth]
+>    [<00000000d4151583>] process_one_work+0x210/0x420
+>    [<000000003cf3dcfb>] worker_thread+0x2c4/0x3e4
+>    [<000000007ccaf055>] kthread+0x124/0x134
+>    [<00000000bef1f723>] ret_from_fork+0x10/0x18
+>    [<00000000c36ee3dd>] 0xffffffffffffffff
+> 
+> Make sure release_firmware() is called aftre
+> qca_inject_cmd_complete_event() to avoid the memory leak.
+> 
+> Fixes: 32646db8cc28 ("Bluetooth: btqca: inject command complete event during fw download")
+> Signed-off-by: Claire Chang <tientzu@chromium.org>
 > ---
-> drivers/bluetooth/btrtl.c | 101 ++++++++++++++++++++++++++++++++++++--
-> 1 file changed, 97 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 208feef63de4..416a5cb676e3 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -56,6 +56,8 @@ struct btrtl_device_info {
-> 	int cfg_len;
-> };
-> 
-> +static struct btrtl_device_info dev_info;
-> +
+> drivers/bluetooth/btqca.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-No. We are are not using magic global variables. What happens if you attach more than one device? Also I assumed that request_firmware has a caching capability of sorts so that drivers don’t have to re-implement caching of the firmware.
+patch has been applied to bluetooth-stable tree.
 
 Regards
 
