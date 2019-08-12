@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4620EC31E40
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 12:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC97EC31E40
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 12:08:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 13B3420663
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 12:07:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 813F920651
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Aug 2019 12:08:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="KaAMOBXb"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="OiCPXRde"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728253AbfHLMHG (ORCPT
+        id S1728224AbfHLMId (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Aug 2019 08:07:06 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38449 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728239AbfHLMHG (ORCPT
+        Mon, 12 Aug 2019 08:08:33 -0400
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:43589 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726714AbfHLMIc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Aug 2019 08:07:06 -0400
-Received: by mail-wm1-f68.google.com with SMTP id m125so7481517wmm.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2019 05:07:04 -0700 (PDT)
+        Mon, 12 Aug 2019 08:08:32 -0400
+Received: by mail-lj1-f195.google.com with SMTP id h15so4376221ljg.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2019 05:08:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=7gIRMi3bptQpoByiRCRWQUNUOAZQICc2FZLHQ6Aw4Ms=;
-        b=KaAMOBXbzlPupkH9CJbZWG1bTBAAAURBSfZUKzaUYP0qW/S0smwtJK3NS3xZ/ZMPg6
-         Cl6OBXuG8DwAe+Vf3R3pTXoBZaCNcnguBAEUrU02HzRaLPQLv+jcd6Gw+hHIVFvwNi9B
-         ECgAiw36U6PcmXMHtNi41c/gmq2cX3t6WOyzzACBsmQSe8iVh1oSSB5b3irIcNDMB0oH
-         NHZQ0E3Bl4N7C/LqehgQgrzvFI6CfkSXDFwOey//x0WaTmbmEdcepbeSc2gbsxMrKfZJ
-         HwkwupXCnOpk++X4v2Virqg4PtS4RGyPo7GEcUK72lxo9kLoGzB7VtBXPMbbNXOF4hds
-         t8Gg==
+        bh=PrelaoJ6TnJpyofqhLMulqO3h0BlAQ5EW0e+QZj++2g=;
+        b=OiCPXRdeaG94Qr9u9ukwqvx3KBFqWbW4sX74KOqEN0Bf9UJwt+go/99IkXlvRbk4Rk
+         uU6nhgFLqGnAEJBtCleI/rc1b1UL2gk+GZX0K6OSofL+GhLZND86GEIV2yrrfAdLprVy
+         eqRkYe4H3pg7+VaGKkBpleF/az4WPRW7dtyayunBzNcXuuFDPCWLUPP1waf6OiQqUcxA
+         LWnTs/82IN/b8ACPwyUbDffUIy8JuTpd2nEvNKkg76noxflMTp0EXLmoHS0MMGPpONLg
+         OeSRkFmKDxL2Z0oC8nIluv7IJ0K8aroy3N6Jyjnxein3FPjP2ABrvmDN0Xwkhl8oAfP7
+         rLhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=7gIRMi3bptQpoByiRCRWQUNUOAZQICc2FZLHQ6Aw4Ms=;
-        b=rz5XMAzcBSQ76tOu5us87qopjctP3EzlcDM1oyu00CHcHAb5XSf5a+acmbxq5cUcx4
-         0yTj3N0YdiZ5WIJ9O/vWP3L5qY+qYi2tt9TP+/9apu0QQr0Sja2SlHapLFQBdInFg/A5
-         yk9gPBgkpK6mVtdQLZ4YUK05DjHk30Nl/OXhZtSm/zB4MEJRDedD5jIQMBRcvJOaxH+G
-         Tx+jpWamhJIcL3LfU+V/yahJLdz+erigvYyt7u1lHQctYDM17h4g7v2A1OSlEefoxpj3
-         QNpq/Q4Q3pdSava8807xnDPiJLCdCHIjxQVfW9eiVKa+/w37uFDq2NLMRSNLmbUvss2z
-         XfUw==
-X-Gm-Message-State: APjAAAXo68xez+9zXLB3VMrbUueSeQESie2noXvxqnI0bPnzSRo3yhJT
-        1GJLakDZLKnD+5bJ26dcRESXULWqaLTWXw==
-X-Google-Smtp-Source: APXvYqxfvOeT1p3nPgJI9MQnlYIh54bD0WTOUc79iiQXr48Xw3XtOBWYGlAdtDeCrckWYO1pKpGMFg==
-X-Received: by 2002:a7b:c157:: with SMTP id z23mr7637907wmi.104.1565611624080;
-        Mon, 12 Aug 2019 05:07:04 -0700 (PDT)
+        bh=PrelaoJ6TnJpyofqhLMulqO3h0BlAQ5EW0e+QZj++2g=;
+        b=P15MI761TaP885fF6XAF2+V/iDC7uVQ5ETElp3Njo4fJHRVBC4RP9SnNBotfHLk01g
+         XWp1l0D67wrg8VfrBPLK4DGgzut9JhzgEgPWb8OxWF7i4Pf73Rc+851bB5oDnJyJfE4d
+         ziCp6UszeC7cr6RLMIcftfSsMO68csA2vexneigacT/PGYwQ+Ax+qmTaDQlb4lHwmtSF
+         hhSA/MqZQXvKz3xI/E4uYITmL8LjrtfVgCNm5rZ/NBYQf/U42kDRBKLsNMeibiLW8PNH
+         0xqg2Gap5Q1jQJO9Hsnuu7TIs3XGJZNX14FaCPs4bnEApAqU9WkAQpLkuOEz3PsX1XqL
+         fj9w==
+X-Gm-Message-State: APjAAAXAKimqyjfw6hXVW1iOb6bPhFl6+WUIXyiWYW6pDaJMFN/DYxN6
+        WR02RSswTZNhQIxGJ0vf39p863dnof5whQ==
+X-Google-Smtp-Source: APXvYqx/RPddfkkJC/tbg7bfL0+cKD35cFp3QUBYWFcLtZk72VII31p7Cw2wwfhD8n8cnEsRkh4yjg==
+X-Received: by 2002:a2e:9cc6:: with SMTP id g6mr4102305ljj.22.1565611710464;
+        Mon, 12 Aug 2019 05:08:30 -0700 (PDT)
 Received: from localhost.localdomain ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id x20sm231717805wrg.10.2019.08.12.05.07.02
+        by smtp.gmail.com with ESMTPSA id o3sm19019132lfb.40.2019.08.12.05.08.29
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 12 Aug 2019 05:07:03 -0700 (PDT)
+        Mon, 12 Aug 2019 05:08:29 -0700 (PDT)
 From:   =?UTF-8?q?Rafa=C5=82=20Gajda?= <rafal.gajda@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Remove double initialisation and fix typo in log
-Date:   Mon, 12 Aug 2019 14:06:56 +0200
-Message-Id: <20190812120656.29494-1-rafal.gajda@silvair.com>
+Subject: [PATCH BlueZ] mesh: Fix model publication get
+Date:   Mon, 12 Aug 2019 14:08:25 +0200
+Message-Id: <20190812120825.29610-1-rafal.gajda@silvair.com>
 X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -70,29 +70,21 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 ---
- mesh/node.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ mesh/cfgmod-server.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mesh/node.c b/mesh/node.c
-index e7e58d9a7..f8b1099e9 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -475,7 +475,6 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	node->lpn = db_node->modes.lpn;
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index 4447b1cb1..dbed7e03f 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -93,7 +93,7 @@ static bool config_pub_get(struct mesh_node *node, uint16_t net_idx,
+ 	ele_idx = node_get_element_idx(node, ele_addr);
  
- 	node->proxy = db_node->modes.proxy;
--	node->lpn = db_node->modes.lpn;
- 	node->friend = db_node->modes.friend;
- 	node->relay.mode = db_node->modes.relay.state;
- 	node->relay.cnt = db_node->modes.relay.cnt;
-@@ -483,7 +482,7 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	node->beacon = db_node->modes.beacon;
- 
- 	l_debug("relay %2.2x, proxy %2.2x, lpn %2.2x, friend %2.2x",
--			node->relay.mode, node->proxy, node->friend, node->lpn);
-+			node->relay.mode, node->proxy, node->lpn, node->friend);
- 	node->ttl = db_node->ttl;
- 	node->seq_number = db_node->seq_number;
+ 	if (ele_idx >= 0)
+-		pub = mesh_model_pub_get(node, ele_idx, mod_id, &status);
++		pub = mesh_model_pub_get(node, ele_addr, mod_id, &status);
+ 	else
+ 		status = MESH_STATUS_INVALID_ADDRESS;
  
 -- 
 2.22.0
