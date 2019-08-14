@@ -2,91 +2,89 @@ Return-Path: <SRS0=WtLI=WK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B698C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2262C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:55:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C964208C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:23:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8A2F206C1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:55:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728421AbfHNSXA convert rfc822-to-8bit (ORCPT
+        id S1727875AbfHNSz3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Aug 2019 14:23:00 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:44338 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728188AbfHNSXA (ORCPT
+        Wed, 14 Aug 2019 14:55:29 -0400
+Received: from vimdzmsp-mail02.bluewin.ch ([195.186.227.120]:58806 "EHLO
+        vimdzmsp-mail02.bluewin.ch" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727791AbfHNSz2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Aug 2019 14:23:00 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id AAAAB288AA
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Aug 2019 18:22:59 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 9EF4F288A2; Wed, 14 Aug 2019 18:22:59 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Wed, 14 Aug 2019 14:55:28 -0400
+X-Greylist: delayed 360 seconds by postgrey-1.27 at vger.kernel.org; Wed, 14 Aug 2019 14:55:27 EDT
+Received: from vimdzmsp-rich11.bluewin.ch ([195.186.122.144])
+        by vimdzmsp-mail02.bluewin.ch Swisscom AG with SMTP
+        id xyKrhS7C9yiKqxyKrhmVre; Wed, 14 Aug 2019 20:49:25 +0200
+X-Bluewin-Spam-Analysis: v=2.1 cv=TfdbzUkh c=1 sm=1 tr=0
+ a=U7DQdSofu78aJvAWM0d88Q==:117 a=L9H7d07YOLsA:10 a=9cW_t1CCXrUA:10
+ a=s5jvgZ67dGcA:10 a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=IkcTkHD0fZMA:10
+ a=FmdZ9Uzk2mMA:10 a=qhmI3J_UTh88eX6OXJUA:9 a=QEXdDO2ut3YA:10
+X-Bluewin-Spam-Score: 0.00
+Received: from vimdzmsp-rich11.bluewin.ch (localhost.bluewin.ch [127.0.0.1])
+        by vimdzmsp-rich11.bluewin.ch (Postfix) with ESMTP id D975F204F7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Aug 2019 20:49:25 +0200 (CEST)
+Date:   Wed, 14 Aug 2019 20:49:25 +0200 (CEST)
+From:   "hans.w.kramer@bluewin.ch" <hans.w.kramer@bluewin.ch>
+Reply-To: hans.w.kramer@bluewin.ch
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204585] New: Bluetooth Mouse Polling Rate Regressed to 20hz
-Date:   Wed, 14 Aug 2019 18:22:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: worryag@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-204585-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Message-ID: <1665860812.35399.1565808565891@bluewin.ch>
+In-Reply-To: <515577254.15611.1565603370379@bluewin.ch>
+References: <519900441.7067.1565432065454@bluewin.ch> <515577254.15611.1565603370379@bluewin.ch>
+Subject: Bluetooth V. 5.50: "error updating services: Connection refused";,
+ for unknown reason. This worked in v. 5.43
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Importance: 3 (Normal)
+X-Priority: 3 (Normal)
+X-FXIT-IP: IPv4[178.198.170.47] Epoch[1565808565889]
+X-CMAE-Envelope: MS4wfLNVHELj2LjKcc3oPoZYzA+oknFGS10YtHv90p5bkFcsSTiC70u0pp7RkmUC+zfoBoNzwj0+fURo/VvBcsEzTSm/UvsmESIHpRUTnTcKRtZXBGq4p/UP
+ VMCkjKsexIy8ie1/mVsuOhs/0v2l/QloCRwgZb6CsZgGMSCdtgYmaTh39cndmPR4d+VcW2OlN02uMqTkYJs9k2HASrQ5S0kFLYA=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=204585
+Hi, 
 
-            Bug ID: 204585
-           Summary: Bluetooth Mouse Polling Rate Regressed to 20hz
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: Linux arch 5.2.8-arch1-1-ARCH
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: worryag@gmail.com
-        Regression: No
+I have the following problem with a bluetooth audio device (Cambridge Audio One ) in v. 5.50 which i do not have in v. 5.43.
 
-The problem arose with Microsoft BluetoothMouse3600. When you turn on the mouse
-behaves sluggishly. The evhz utility shows a polling rate of 20Hz. The problem
-is solved by changing the max and min values of the connection.
+Attempting to connect to XX:XX:XX:XX:XX:XX
+[CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
+[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 00001108-0000-1000-8000-00805f9b34fb
+[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000110b-0000-1000-8000-00805f9b34fb
+[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000110c-0000-1000-8000-00805f9b34fb
+[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000110e-0000-1000-8000-00805f9b34fb
+[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000111e-0000-1000-8000-00805f9b34fb
+[CHG] Device XX:XX:XX:XX:XX:XX ServicesResolved: yes
+Failed to connect: org.bluez.Error.Failed
+[CHG] Device XX:XX:XX:XX:XX:XX ServicesResolved: no
+[CHG] Device XX:XX:XX:XX:XX:XX Connected: no
 
-/usr/bin/hcitool con | grep " handle " | awk '{print $5}' | xargs -I {}
-/usr/bin/hcitool lecup --handle {}  --min 6 --max 7 --latency 0
+Another bluetooth audio device (JBL GO) works ok in 5.43 and 5.50.
 
-Maybe you should change the default value of conn_min_interval and
-conn_max_interval.
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/net/bluetooth?h=v5.2.8&id=33401f6ba0d9f23ca5877540375b88d7cd5b1f8f
+The following two btmon traces are available upon request:
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+1. V. 5.50, NOK: "cambridge_hcitrace.txt", OS Raspbian Buster Lite, Linux raspberrypi 4.19.57+ #1244 Thu Jul 4 18:42:50 BST 2019 armv6l GNU/Linux (77.7 KB)
+2. V. 5.43, OK:  "stretch_cambridge_hcitrace.txt", OS Raspbian Stretch, Linux raspberrypi 4.14.98+ #1200 Tue Feb 12 20:11:02 GMT 2019 armv6l GNU/Linux (86.8 KB)
+
+Note especially: "cambridge_hcitrace.txt", line 476: "Reason: Remote User Terminated Connection (0x13)".
+There is no obvious reason, why this should occur. Timeout problem in the kernel?
+
+Regards
+
+Hans
+
+PS: Almost the same happens with an up-to-date Fedora 30 (Bluetooth 5.50, Linux 5.2.6-200.fc30.x86_64 #1 SMP Mon Aug 5 13:20:47 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux)
+
+
+
