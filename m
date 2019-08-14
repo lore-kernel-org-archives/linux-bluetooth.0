@@ -2,40 +2,42 @@ Return-Path: <SRS0=WtLI=WK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83866C32750
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 01:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B47C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 01:44:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E85120679
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 01:44:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 543BF20679
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 01:44:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726373AbfHNBoH (ORCPT
+        id S1726515AbfHNBoW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Aug 2019 21:44:07 -0400
-Received: from mga01.intel.com ([192.55.52.88]:58789 "EHLO mga01.intel.com"
+        Tue, 13 Aug 2019 21:44:22 -0400
+Received: from mga09.intel.com ([134.134.136.24]:50863 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726007AbfHNBoH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Aug 2019 21:44:07 -0400
+        id S1726007AbfHNBoV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 13 Aug 2019 21:44:21 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Aug 2019 18:44:07 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Aug 2019 18:44:21 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,382,1559545200"; 
-   d="scan'208";a="176377779"
+   d="scan'208";a="176377819"
 Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.104.160])
-  by fmsmga008.fm.intel.com with ESMTP; 13 Aug 2019 18:44:06 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 13 Aug 2019 18:44:20 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, brian.gix@intel.com,
         inga.stotland@intel.com, michal.lowas-rzechonek@silvair.com
-Subject: [PATCH BlueZ 0/1] mesh: Add D-Bus Security for sensitive data
-Date:   Tue, 13 Aug 2019 18:43:56 -0700
-Message-Id: <20190814014357.32453-1-brian.gix@intel.com>
+Subject: [PATCH BlueZ 1/1] doc: Add Pub/Private ECC shared secret to obscure sensitive data
+Date:   Tue, 13 Aug 2019 18:43:57 -0700
+Message-Id: <20190814014357.32453-2-brian.gix@intel.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190814014357.32453-1-brian.gix@intel.com>
+References: <20190814014357.32453-1-brian.gix@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -43,36 +45,262 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There are various "security sensitive" pieces of data that need to be
-exchanged between Applications and the Bluetooth Mesh daemon.
+Certain pieces of parameter data should be considered as sensitive when
+they are sent over the D-Bus, as they will be vulnerable to D-Bus
+sniffers. These data parameters can reveal which are assumed to be
+secrets shared between the Daemon and the owning applications. The data
+that needs to be secured over D-Bus includes:
+- Tokens
+- Dev Keys
+- Net Keys
+- App Keys
 
-The following items will be encrypted before sending over D-Bus:
-
-token --  This is used by all nodes.
-
-net_keys, app_keys, dev_keys -- These will only typically be needed by
-Provisioner/Config Client nodes to extract the keys for purposes of
-Cponfiguration Database transfer.
-
-Methodology:
-ECC Public/Private pairs, and key exchanges which are set up for each
-Attach() Session, and a counting diversifier to be used as a Nonce.
-
-The App and Daemon will each generate a single session ECC pair, and
-will generate an ECDH Shared Secret, which will be used as the symetric
-encription key, for AES-CCM.
-
-For most nodes, these steps will be required only for Attaching, to
-authenticate the application to the daemon while obscuring the token
-from D-Bus sniffers.  ECC and AES-CCM are both already natively
-supported by Mesh.
-
-Brian Gix (1):
-  doc: Add Pub/Private ECC shared secret to obscure sensitive data
-
+ECC Pubic/Private pairs were selected for security because ECC and
+ECDH shared secret handling is native to Bluetooth Mesh.
+---
  doc/mesh-api.txt | 102 ++++++++++++++++++++++++++++++++++++++++++-----
  1 file changed, 91 insertions(+), 11 deletions(-)
 
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index 255104ab6..b6d40db4f 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -8,7 +8,8 @@ Interface	org.bluez.mesh.Network1
+ Object path	/org/bluez/mesh
+ 
+ Methods:
+-	void Join(object app_defined_root, array{byte}[16] uuid)
++	void Join(object app_defined_root, array{byte}[16] uuid,
++			array{byte}[64] app_pub_key, uint32 diversity)
+ 
+ 		This is the first method that an application has to call to
+ 		become a provisioned node on a mesh network. The call will
+@@ -29,6 +30,15 @@ Methods:
+ 		therefore attempting to call this function using already
+ 		registered UUID results in an error.
+ 
++		The app_pub_key parameter is the public part of an ECC
++		Public/Private key pair that has been generated by the
++		application, which will be used to generate a symetric
++		encryption key to obscure the token.
++
++		The diversity parameter is used as the nonce when encrypting
++		the token. The same app_pub_key + diversity pair should never be
++		used more than once.
++
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.AlreadyExists,
+@@ -39,7 +49,8 @@ Methods:
+ 		method.
+ 
+ 	object node, array{byte, array{(uint16, dict)}} configuration
+-			Attach(object app_defined_root, uint64 token)
++			Attach(object app_defined_root, array{byte}[8] token,
++			array{byte}[64] app_pub_key)
+ 
+ 		This is the first method that an application must call to get
+ 		access to mesh node functionalities.
+@@ -56,7 +67,15 @@ Methods:
+ 		the application when it first got provisioned/joined mesh
+ 		network, i.e. upon receiving JoinComplete() method. The daemon
+ 		uses the token to verify whether the application is authorized
+-		to assume the mesh node identity.
++		to assume the mesh node identity. The token is encrypted with
++		the synchronous key of the ECDH shared secret.
++
++		The app_pub_key parameter is the public part of an ECC
++		Public/Private key pair that has been generated by the
++		application, which will be used to generate a symetric
++		encryption key to obscure the token. A diversity nonce of
++		Zero is used for this call. For each Attach(), the app_pub_key
++		should be newly generated.
+ 
+ 		In case of success, the method call returns mesh node object
+ 		(see Mesh Node Hierarchy section) and current configuration
+@@ -106,16 +125,23 @@ Methods:
+ 			org.bluez.mesh.Error.AlreadyExists,
+ 			org.bluez.mesh.Error.Failed
+ 
+-	void Leave(uint64 token)
++	void Leave(array{byte}[8] token, uint32 diversity)
+ 
+ 		This removes the configuration information about the mesh node
+ 		identified by the 64-bit token parameter. The token parameter
+ 		has been obtained as a result of successful Join() method call.
+ 
++		The diversity parameter is used as the nonce when encrypting
++		the token. The same diversity values should never be used more
++		than once and always increase, until a new App public key has
++		been generated and attached with.
++
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 
+-	uint64 token CreateNetwork(object app_root, array{byte}[16] uuid)
++	array{byte}[8] token CreateNetwork(object app_root,
++				array{byte}[16] uuid,
++				array{byte}[64] app_pub_key, uint32 diversity)
+ 
+ 		This is the first method that an application calls to become
+ 		a Provisioner node, and a Configuration Client on a newly
+@@ -136,6 +162,15 @@ Methods:
+ 		therefore attempting to call this function using already
+ 		registered UUID results in an error.
+ 
++		The app_pub_key parameter is the public part of an ECC
++		Public/Private key pair that has been generated by the
++		application, which will be used to generate a symetric
++		encryption key to obscure the token.
++
++		The diversity parameter is used as the nonce when encrypting
++		the token. The same app_pub_key + diversity pair should never be
++		used more than once.
++
+ 		The returned token must be preserved by the application in
+ 		order to authenticate itself to the mesh daemon and attach to
+ 		the network as a mesh node by calling Attach() method or
+@@ -151,7 +186,8 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.AlreadyExists,
+ 
+-	uint64 token Import(object app_root, array{byte}[16] uuid,
++	array{byte}[8] token Import(object app_root, array{byte}[16] uuid,
++				array{byte}[64] app_pub_key, uint32 diversity,
+ 				array{byte}[16] dev_key,
+ 				array{byte}[16] net_key, uint16 net_index,
+ 				dict flags, uint32 iv_index, uint16 unicast)
+@@ -168,6 +204,15 @@ Methods:
+ 		therefore attempting to call this function using already
+ 		registered UUID results in an error.
+ 
++		The app_pub_key parameter is the public part of an ECC
++		Public/Private key pair that has been generated by the
++		application, which will be used to generate a symetric
++		encryption key to obscure the token.
++
++		The diversity parameter is used as the nonce when encrypting
++		the token. The same app_pub_key + diversity pair should never be
++		used more than once.
++
+ 		The dev_key parameter is the 16-byte value of the dev key of
+ 		the imported mesh node.
+ 
+@@ -208,6 +253,24 @@ Methods:
+ 			org.bluez.mesh.Error.NotSupported,
+ 			org.bluez.mesh.Error.Failed
+ 
++	array{byte}[64] daemon_pub_key GetSessionPubKey()
++
++		This method returns an ECC public key, created fresh each time
++		bluetooth-meshd restarts. The public key is used to secure all
++		privledged information from being sent in the clear over D-Bus.
++
++		The returned daemon_pub_key may be combined with a the private
++		member of a key pair to generate an ECDH Shared Secret, which is
++		used to encrypt and decrypt the following data before sending
++		over D-Bus:
++			Tokens - Private Node identifier owned by the App
++			Device keys
++			Network/Subnet keys
++			Application keys
++
++		PossibleErrors:
++			org.bluez.mesh.Error.Failed
++
+ Mesh Node Hierarchy
+ ===================
+ Service		org.bluez.mesh
+@@ -487,7 +550,8 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.AlreadyExists
+ 
+-	void ImportSubnet(uint16 net_index, array{byte}[16] net_key)
++	void ImportSubnet(uint16 net_index, array{byte}[16] net_key,
++							uint32 diversity)
+ 
+ 		This method is used by the application to add a network subnet
+ 		key, that was originally generated by a remote Config Client.
+@@ -498,6 +562,10 @@ Methods:
+ 		The net_key parameter is the 16-byte value of the net key being
+ 		imported.
+ 
++		The diversity parameter is used as the nonce when encrypting
++		the net_key. The diversity values should increase by at least 1
++		for each call to Import or Export any type of key.
++
+ 		This call affects the local bluetooth-meshd key database only.
+ 
+ 		PossibleErrors:
+@@ -584,7 +652,7 @@ Methods:
+ 			org.bluez.mesh.Error.DoesNotExist
+ 
+ 	void ImportAppKey(uint16 net_index, uint16 app_index,
+-						array{byte}[16] app_key)
++			array{byte}[16] app_key, uint32 diversity)
+ 
+ 		This method is used by the application to add an application
+ 		key, that was originally generated by a remote Config Client.
+@@ -598,6 +666,10 @@ Methods:
+ 		The app_key parameter is the 16-byte value of the key being
+ 		imported.
+ 
++		The diversity parameter is used as the nonce when encrypting
++		the app_key. The diversity values should increase by at least 1
++		for each call to Import or Export any type of key.
++
+ 		This call affects the local bluetooth-meshd key database only.
+ 
+ 		PossibleErrors:
+@@ -626,7 +698,7 @@ Methods:
+ 	void CompleteAppKeyUpdate(uint16 app_index)
+ 
+ 		This method is used by the application at the completion of
+-		a Key Refresh Procedure.  This method should be called for each
++		a Key Refresh Procedure. This method should be called for each
+ 		app key being updated during the procedure, and must be
+ 		performed prior to changing the phase of the bound net key
+ 		to phase 3. (See SetKeyPhase() method).
+@@ -656,7 +728,7 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 
+ 	void ImportRemoteNode(uint16 primary, uint8 count,
+-					array{byte}[16] device_key)
++			array{byte}[16] device_key, uint32 diversity)
+ 
+ 		This method is used by the application to import a remote node
+ 		that has been provisioned by an external process.
+@@ -670,6 +742,10 @@ Methods:
+ 		The device_key parameter is the access layer key that will be
+ 		will used to decrypt privledged messages from this remote node.
+ 
++		The diversity parameter is used as the nonce when encrypting
++		the device_key. The diversity values should increase by at
++		least 1 for each call to Import or Export any type of key.
++
+ 		This call affects the local bluetooth-meshd key database only.
+ 
+ 		It is an error to call this with address range overlapping
+@@ -728,7 +804,7 @@ An example mesh application hierarchy may look like this:
+ 			| |   - org.bluez.mesh.Element1
+ 
+ Methods:
+-	void JoinComplete(uint64 token)
++	void JoinComplete(array{byte}[8] token, uint32 diversity)
+ 
+ 		This method is called when the node provisioning initiated
+ 		by a Join() method call successfully completed.
+@@ -740,6 +816,10 @@ Methods:
+ 		permanently remove the identity of the mesh node by calling
+ 		Leave() method.
+ 
++		The diversity parameter is the nonce, saved from the Join()
++		call, that is used with the ECDH shared secret to encrypt the
++		token.
++
+ 	void JoinFailed(string reason)
+ 
+ 		This method is called when the node provisioning initiated by
 -- 
 2.21.0
 
