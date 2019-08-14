@@ -2,102 +2,91 @@ Return-Path: <SRS0=WtLI=WK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D96C32753
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 16:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B698C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:23:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B22F0208C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 16:41:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C964208C2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:23:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727110AbfHNQlw (ORCPT
+        id S1728421AbfHNSXA convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Aug 2019 12:41:52 -0400
-Received: from mga07.intel.com ([134.134.136.100]:53981 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726704AbfHNQlw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Aug 2019 12:41:52 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Aug 2019 09:41:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,385,1559545200"; 
-   d="scan'208";a="176627061"
-Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Aug 2019 09:41:51 -0700
-Received: from orsmsx126.amr.corp.intel.com (10.22.240.126) by
- ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 14 Aug 2019 09:41:50 -0700
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.157]) by
- ORSMSX126.amr.corp.intel.com ([169.254.4.77]) with mapi id 14.03.0439.000;
- Wed, 14 Aug 2019 09:41:50 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-CC:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "Gix, Brian" <brian.gix@intel.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ 0/1] mesh: Add D-Bus Security for sensitive data
-Thread-Topic: [PATCH BlueZ 0/1] mesh: Add D-Bus Security for sensitive data
-Thread-Index: AQHVUkHFvJ8+Ufu0XkWdTJqFRbJnc6b6uyMAgACUCIA=
-Date:   Wed, 14 Aug 2019 16:41:49 +0000
-Message-ID: <dbffabec9a869204b4de1aab645fd727949e655e.camel@intel.com>
-References: <20190814014357.32453-1-brian.gix@intel.com>
-         <20190814075200.j3jmxpto7kszjjkp@mlowasrzechonek2133>
-In-Reply-To: <20190814075200.j3jmxpto7kszjjkp@mlowasrzechonek2133>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.104.160]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0072223D87980B42923DC98412959F60@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 14 Aug 2019 14:23:00 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:44338 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728188AbfHNSXA (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 14 Aug 2019 14:23:00 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id AAAAB288AA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Aug 2019 18:22:59 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 9EF4F288A2; Wed, 14 Aug 2019 18:22:59 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 204585] New: Bluetooth Mouse Polling Rate Regressed to 20hz
+Date:   Wed, 14 Aug 2019 18:22:59 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: worryag@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-204585-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGHFgiwgDQoNCkkgd291bGQgbGlrZSBNYXJjZWwgdG8gd2VpZ2ggaW4gb24gdGhpcyBz
-aW5jZSB0aGUgc2VjdXJpdHkgb2YgZXhwb3Npbmcga2V5cyB2aWEgRC1CdXMgd2FzIGluaXRpYWxs
-eSBhIGNvbmNlcm4NCnJhaXNlZCBieSBoaW0uDQoNCkFsc28sIHdlIG1heSBiZSBhYmxlIHRvIGxl
-YXZlIGl0IGluIHRoZSBoYW5kcyBvZiB0aGUgQXBwbGljYXRpb24gdGhhdCBvd25zIHRoZSBub2Rl
-LiAgSXQgY291bGQgYmUgYXMgc2ltcGxlIGFzDQp0aGUgQXBwbGljYXRpb24gZGVjaWRlcyB0byBz
-ZWN1cmUgdGhlIEQtQnVzIGNoYW5uZWwgKGZvciBvbmx5IGl0c2VsZikgYnkgcGVyZm9ybWluZyB0
-aGUgUHVibGljIEtleSBFeGNoYW5nZS4NCg0KSWYgdGhlIEFwcGxpY2F0aW9uIGRvZXMgKm5vdCog
-cmVxdWVzdCBhIFB1YmxpYyBLZXkgZnJvbSB0aGUgRGFlbW9uLCBhbmQvb3IgZG9lcyBub3Qgc3Vw
-cGx5IGEgUHVibGljIEtleSBkdXJpbmcNCkF0dGFjaC9Kb2luL0ltcG9ydCwgdGhlbiB0aGUgQVBJ
-cyB3b3JrIHRoZSBzYW1lIGFzIHRoZXkgZG8gdG9kYXkgKGFsYmVpdCB3aXRoIGV4dHJhIGlnbm9y
-ZWQgcGFyYW1ldGVyKHMpKS4NCg0KQW4gYXBwIHRoYXQga25vd3MgaXQgaXMgb3BwZXJhdGluZyBp
-biBhIHNlY3VyZSBlbnZpcm9ubWVudCBjYW4gdGhlbiB0cnVzdCB0aGUgc3lzdGVtIHRvIHByb3Zp
-ZGUgYWxsIG5lZWRlZA0Kc2VjdXJpdHksIGJ1dCBpZiBmb3IgaW5zdGFuY2UsIHNvbWUgc29ydCBv
-ZiBoeWJyaWQgRC1CdXMgdGhhdCBoYXMgYW4gaW5zZWN1cmUgbGluayBpbiB0aGUgY2hhaW4sIHRo
-d2UgQXBwIGNhbg0KYWRkIHRoZSBQdWJsaWMgS2V5IGV4Y2hhbmdlIGFuZCBlbmNyeXB0L2RlY3J5
-cHQgYXMgbmVlZGVkLg0KDQotLUJyaWFuDQoNCk9uIFdlZCwgMjAxOS0wOC0xNCBhdCAwOTo1MiAr
-MDIwMCwgTWljaGHFgiBMb3dhcy1SemVjaG9uZWsgd3JvdGU6DQo+IEhpIEJyaWFuLA0KPiANCj4g
-T24gMDgvMTMsIEJyaWFuIEdpeCB3cm90ZToNCj4gPiBUaGVyZSBhcmUgdmFyaW91cyAic2VjdXJp
-dHkgc2Vuc2l0aXZlIiBwaWVjZXMgb2YgZGF0YSB0aGF0IG5lZWQgdG8gYmUNCj4gPiBleGNoYW5n
-ZWQgYmV0d2VlbiBBcHBsaWNhdGlvbnMgYW5kIHRoZSBCbHVldG9vdGggTWVzaCBkYWVtb24uDQo+
-ID4gDQo+ID4gVGhlIGZvbGxvd2luZyBpdGVtcyB3aWxsIGJlIGVuY3J5cHRlZCBiZWZvcmUgc2Vu
-ZGluZyBvdmVyIEQtQnVzOg0KPiA+IA0KPiA+IHRva2VuIC0tICBUaGlzIGlzIHVzZWQgYnkgYWxs
-IG5vZGVzLg0KPiA+IA0KPiA+IG5ldF9rZXlzLCBhcHBfa2V5cywgZGV2X2tleXMgLS0gVGhlc2Ug
-d2lsbCBvbmx5IHR5cGljYWxseSBiZSBuZWVkZWQgYnkNCj4gPiBQcm92aXNpb25lci9Db25maWcg
-Q2xpZW50IG5vZGVzIHRvIGV4dHJhY3QgdGhlIGtleXMgZm9yIHB1cnBvc2VzIG9mDQo+ID4gQ3Bv
-bmZpZ3VyYXRpb24gRGF0YWJhc2UgdHJhbnNmZXIuDQo+IFBsZWFzZSBkb24ndC4NCj4gDQo+IEkg
-ZG9uJ3Qgc2VlIGFueSBiZW5lZml0IGZyb20gZG9pbmcgc28uIEQtQnVzIHRyYWZmaWMgY2Fubm90
-IGJlIHNuaWZmZWQNCj4gYnkgYW4gdW5wcml2aWxlZ2VkIHVzZXIsIGFuZCBwcml2aWxlZ2VkIHVz
-ZXIgYWxyZWFkeSBoYXMgYWNjZXNzIHRvIHRoZQ0KPiBzdG9yYWdlIGFuZCBjYW4gZXh0cmFjdCBh
-bGwgdGhpcyBpbmZvcm1hdGlvbiBmcm9tIHRoZXJlLg0KPiANCj4gSW4gbXkgb3BpbmlvbiB0aGVy
-ZSBpcyBsaXR0bGUgcG9pbnQgaW4gZW5jcnlwdGluZyBELUJ1cyB0cmFmZmljLiBOb29uZQ0KPiBl
-bHNlIGRvZXMgdGhhdDoNCj4gDQo+ICAtIENvbm5NYW4gc2VuZHMgbG9naW4vcGFzc3dvcmQgcGFp
-cnMgb3ZlciBELUJ1cyBpbg0KPiAgICBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbmV0
-d29yay9jb25ubWFuL2Nvbm5tYW4uZ2l0L3RyZWUvZG9jL3Zwbi1hZ2VudC1hcGkudHh0DQo+ICAt
-IEJsdWVaIHNlbmRzIHBhaXJpbmcgc2VjcmV0cyBpbg0KPiAgICBodHRwczovL2dpdC5rZXJuZWwu
-b3JnL3B1Yi9zY20vYmx1ZXRvb3RoL2JsdWV6LmdpdC90cmVlL2RvYy9hZ2VudC1hcGkudHh0DQo+
-IA0KPiByZWdhcmRzDQo=
+https://bugzilla.kernel.org/show_bug.cgi?id=204585
+
+            Bug ID: 204585
+           Summary: Bluetooth Mouse Polling Rate Regressed to 20hz
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: Linux arch 5.2.8-arch1-1-ARCH
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: worryag@gmail.com
+        Regression: No
+
+The problem arose with Microsoft BluetoothMouse3600. When you turn on the mouse
+behaves sluggishly. The evhz utility shows a polling rate of 20Hz. The problem
+is solved by changing the max and min values of the connection.
+
+/usr/bin/hcitool con | grep " handle " | awk '{print $5}' | xargs -I {}
+/usr/bin/hcitool lecup --handle {}  --min 6 --max 7 --latency 0
+
+Maybe you should change the default value of conn_min_interval and
+conn_max_interval.
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/net/bluetooth?h=v5.2.8&id=33401f6ba0d9f23ca5877540375b88d7cd5b1f8f
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
