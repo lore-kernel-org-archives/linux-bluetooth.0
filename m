@@ -2,89 +2,143 @@ Return-Path: <SRS0=WtLI=WK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2262C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E881FC433FF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 20:53:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8A2F206C1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 18:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B134420651
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 20:53:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="e4qLSlTt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727875AbfHNSz3 (ORCPT
+        id S1728777AbfHNUxC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Aug 2019 14:55:29 -0400
-Received: from vimdzmsp-mail02.bluewin.ch ([195.186.227.120]:58806 "EHLO
-        vimdzmsp-mail02.bluewin.ch" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727791AbfHNSz2 (ORCPT
+        Wed, 14 Aug 2019 16:53:02 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:41129 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726505AbfHNUxC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Aug 2019 14:55:28 -0400
-X-Greylist: delayed 360 seconds by postgrey-1.27 at vger.kernel.org; Wed, 14 Aug 2019 14:55:27 EDT
-Received: from vimdzmsp-rich11.bluewin.ch ([195.186.122.144])
-        by vimdzmsp-mail02.bluewin.ch Swisscom AG with SMTP
-        id xyKrhS7C9yiKqxyKrhmVre; Wed, 14 Aug 2019 20:49:25 +0200
-X-Bluewin-Spam-Analysis: v=2.1 cv=TfdbzUkh c=1 sm=1 tr=0
- a=U7DQdSofu78aJvAWM0d88Q==:117 a=L9H7d07YOLsA:10 a=9cW_t1CCXrUA:10
- a=s5jvgZ67dGcA:10 a=jpOVt7BSZ2e4Z31A5e1TngXxSK0=:19 a=IkcTkHD0fZMA:10
- a=FmdZ9Uzk2mMA:10 a=qhmI3J_UTh88eX6OXJUA:9 a=QEXdDO2ut3YA:10
-X-Bluewin-Spam-Score: 0.00
-Received: from vimdzmsp-rich11.bluewin.ch (localhost.bluewin.ch [127.0.0.1])
-        by vimdzmsp-rich11.bluewin.ch (Postfix) with ESMTP id D975F204F7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Aug 2019 20:49:25 +0200 (CEST)
-Date:   Wed, 14 Aug 2019 20:49:25 +0200 (CEST)
-From:   "hans.w.kramer@bluewin.ch" <hans.w.kramer@bluewin.ch>
-Reply-To: hans.w.kramer@bluewin.ch
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <1665860812.35399.1565808565891@bluewin.ch>
-In-Reply-To: <515577254.15611.1565603370379@bluewin.ch>
-References: <519900441.7067.1565432065454@bluewin.ch> <515577254.15611.1565603370379@bluewin.ch>
-Subject: Bluetooth V. 5.50: "error updating services: Connection refused";,
- for unknown reason. This worked in v. 5.43
+        Wed, 14 Aug 2019 16:53:02 -0400
+Received: by mail-lj1-f194.google.com with SMTP id m24so371620ljg.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Aug 2019 13:53:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=hmW39kI5b1mZgDBY3u9wKUz40mJZSKCnLJXg2WMB/l4=;
+        b=e4qLSlTtRkWDeLIT9lAelQinuDbZKKRsXij1dbjOlcdt5nLFc7c9I5yUrp41HxBusx
+         m7Mi56FlLGrg0z6xgzhM8LsBbYRUzumsmdVkcmcrCHYbVh19c+CMVCFQM/CO7V5drcPF
+         Meq2sq211O9lWd5IRfbgG7oZtm4q6Q4Y1r1A5VhSLnyBeJY6xjEqeGVqZYUVKRk54GVK
+         zKDyxxXTIWMJuR18O5s7eqXKSHfRd+AgMXuhcOltXWVFZWCZ2fgWwplFwGbnJUVtyKDp
+         r/fTlO16vIRr9LufZvTmgxzSVDBBhJSHuL2KDlu62smMeZ+OeC/A1VJdSkyESYzvKQaq
+         1Jog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=hmW39kI5b1mZgDBY3u9wKUz40mJZSKCnLJXg2WMB/l4=;
+        b=Y7UL3iCtncoIOT4omZWuRmpu8eQ/QBhw1shDG8oI9VTLOGtLXNZsLp1KCw1xxBAGrO
+         mihwEkmNrAr2o38OfwUTrfSD2ti7XgDgfYiUjivwTHLpeV7/LdOM9RdYysz03k8JxNsk
+         PMxUTUj01+EmoQlJ2L/gMFdHLluUT9vLVPjxkI6SR4pt7yaoqc2/s+DZqMjEQmbRFNlR
+         TD7uHyuMYUS4eBBaEysojm42rCohC3EdOA9op+NrH6vYwqPRw+CgM2JOxQxXSpaw6AXA
+         LJUNksxz8HSvp3VWInELaVcoaAY19MyLMjeftOxDnaQfNMfQ1rD6OTuoXr7Jjs1aiJs0
+         yjuA==
+X-Gm-Message-State: APjAAAWaozKIzbMZICII4Pt2D870R8ZV+ASw08Hn17q+CnmqHyAjAxG2
+        pdqOvaLV6GbyKLpCDE15cHiSkQ==
+X-Google-Smtp-Source: APXvYqyKMPSfc4TzOcOFGe02uHy5QoAuEkmjMPD8eWHGaV/6gYwSoeUnl9Nr4GzeRNUBTmu/pB3yIQ==
+X-Received: by 2002:a2e:144f:: with SMTP id 15mr827548lju.226.1565815979641;
+        Wed, 14 Aug 2019 13:52:59 -0700 (PDT)
+Received: from kynes (apn-37-249-121-124.dynamic.gprs.plus.pl. [37.249.121.124])
+        by smtp.gmail.com with ESMTPSA id s20sm126416ljg.88.2019.08.14.13.52.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 14 Aug 2019 13:52:58 -0700 (PDT)
+Date:   Wed, 14 Aug 2019 22:52:56 +0200
+From:   "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ 0/1] mesh: Add D-Bus Security for sensitive data
+Message-ID: <20190814205256.xkuqo4zqyl63erhc@kynes>
+Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+References: <20190814014357.32453-1-brian.gix@intel.com>
+ <20190814075200.j3jmxpto7kszjjkp@mlowasrzechonek2133>
+ <dbffabec9a869204b4de1aab645fd727949e655e.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Importance: 3 (Normal)
-X-Priority: 3 (Normal)
-X-FXIT-IP: IPv4[178.198.170.47] Epoch[1565808565889]
-X-CMAE-Envelope: MS4wfLNVHELj2LjKcc3oPoZYzA+oknFGS10YtHv90p5bkFcsSTiC70u0pp7RkmUC+zfoBoNzwj0+fURo/VvBcsEzTSm/UvsmESIHpRUTnTcKRtZXBGq4p/UP
- VMCkjKsexIy8ie1/mVsuOhs/0v2l/QloCRwgZb6CsZgGMSCdtgYmaTh39cndmPR4d+VcW2OlN02uMqTkYJs9k2HASrQ5S0kFLYA=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dbffabec9a869204b4de1aab645fd727949e655e.camel@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, 
+Hi Brian,
 
-I have the following problem with a bluetooth audio device (Cambridge Audio One ) in v. 5.50 which i do not have in v. 5.43.
+On 08/14, Gix, Brian wrote:
+> I would like Marcel to weigh in on this since the security of exposing
+> keys via D-Bus was initially a concern raised by him.
+Ok.
 
-Attempting to connect to XX:XX:XX:XX:XX:XX
-[CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
-[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 00001108-0000-1000-8000-00805f9b34fb
-[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000110b-0000-1000-8000-00805f9b34fb
-[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000110c-0000-1000-8000-00805f9b34fb
-[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000110e-0000-1000-8000-00805f9b34fb
-[CHG] Device XX:XX:XX:XX:XX:XX UUIDs: 0000111e-0000-1000-8000-00805f9b34fb
-[CHG] Device XX:XX:XX:XX:XX:XX ServicesResolved: yes
-Failed to connect: org.bluez.Error.Failed
-[CHG] Device XX:XX:XX:XX:XX:XX ServicesResolved: no
-[CHG] Device XX:XX:XX:XX:XX:XX Connected: no
+> Also, we may be able to leave it in the hands of the Application that
+> owns the node.  It could be as simple as the Application decides to
+> secure the D-Bus channel (for only itself) by performing the Public
+> Key Exchange.
+For the record - I understand the hesitation to "trust" the applications
+to correctly handle security and I don't mean to dispute this. I
+understand that once keys are exfiltrated from a network, all hell
+might break loose.
 
-Another bluetooth audio device (JBL GO) works ok in 5.43 and 5.50.
+Leaking meshd's tokens does not lead to that situation - at worst, one
+could impersonate a single node.
 
-The following two btmon traces are available upon request:
+I also agree that key export is sensitive and accesing these should
+require some kind of authorization scheme.
 
-1. V. 5.50, NOK: "cambridge_hcitrace.txt", OS Raspbian Buster Lite, Linux raspberrypi 4.19.57+ #1244 Thu Jul 4 18:42:50 BST 2019 armv6l GNU/Linux (77.7 KB)
-2. V. 5.43, OK:  "stretch_cambridge_hcitrace.txt", OS Raspbian Stretch, Linux raspberrypi 4.14.98+ #1200 Tue Feb 12 20:11:02 GMT 2019 armv6l GNU/Linux (86.8 KB)
+> If the Application does *not* request a Public Key from the Daemon,
+> and/or does not supply a Public Key during Attach/Join/Import, then
+> the APIs work the same as they do today (albeit with extra ignored
+> parameter(s)).
+This sounds complex.
 
-Note especially: "cambridge_hcitrace.txt", line 476: "Reason: Remote User Terminated Connection (0x13)".
-There is no obvious reason, why this should occur. Timeout problem in the kernel?
+Stefan raised a point about app and net keys being visible in plaintext
+when application attempts to configure a node (both local and remote).
 
-Regards
+This might lead to adding encryption to mesh payloads exchanged between
+the daemon and the application. Such a thing would IMO defeat the whole
+idea of mesh stack implemented as a system service - it would be easier
+to implement this behaviour as a library and do all the crypto on the
+application side.
 
-Hans
+> An app that knows it is opperating in a secure environment can then
+> trust the system to provide all needed security, but if for instance,
+> some sort of hybrid D-Bus that has an insecure link in the chain, thwe
+> App can add the Public Key exchange and encrypt/decrypt as needed.
+As far as I know, there are only a handful of D-Bus daemon
+implementations out there, and I don't think that any of them is
+inherently insecure. Sure, there might be bugs and vulnerabilities, but
+I am not aware of any implementation that includes an "insecure link".
 
-PS: Almost the same happens with an up-to-date Fedora 30 (Bluetooth 5.50, Linux 5.2.6-200.fc30.x86_64 #1 SMP Mon Aug 5 13:20:47 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux)
+Please keep in mind that D-Bus is confined within a single machine -
+yes, there is a TCP transport, but virtually all setups have this turned
+off, and IIRC freedeskop.org explicitly states that this feature should
+not be used in a production environment.
 
-
-
+regards
+-- 
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
