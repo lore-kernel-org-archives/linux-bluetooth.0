@@ -2,90 +2,249 @@ Return-Path: <SRS0=WtLI=WK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1C2C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 08:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE7EC433FF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 08:06:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C45D205C9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 08:04:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 403CB205C9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Aug 2019 08:06:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbfHNIEI (ORCPT
+        id S1726534AbfHNIGw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Aug 2019 04:04:08 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:55153 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725265AbfHNIEI (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Aug 2019 04:04:08 -0400
-Authenticated-By: 
-X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x7E83toI020012, This message is accepted by code: ctaloc0852
-Received: from RS-CAS01.realsil.com.cn (RSFS1.realsil.com.cn[172.29.17.2](maybeforged))
-        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x7E83toI020012
-        (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Wed, 14 Aug 2019 16:03:56 +0800
-Received: from RS-MBS01.realsil.com.cn ([::1]) by RS-CAS01.realsil.com.cn
- ([::1]) with mapi id 14.03.0439.000; Wed, 14 Aug 2019 16:03:55 +0800
-From:   =?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-CC:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        lkml <linux-kernel@vger.kernel.org>,
-        "Max Chou" <max.chou@realtek.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggdjJdIEJsdWV0b290aDogYnR1c2I6IEZpeCBzdXNw?= =?utf-8?Q?end_issue_for_Realtek_devices?=
-Thread-Topic: [PATCH v2] Bluetooth: btusb: Fix suspend issue for Realtek
- devices
-Thread-Index: AQHVSSoXcj83mYj970uYtopmxf680qb3PuqAgABXdACAArxqUA==
-Date:   Wed, 14 Aug 2019 08:03:54 +0000
-Message-ID: <0551C926975A174EA8972327741C7889EE81192D@RS-MBS01.realsil.com.cn>
-References: <20190802120217.GA8712@toshiba>
- <A83A0A38-8AC8-4662-BBC1-3B48B707E97B@holtmann.org>
- <CAKdAkRQP8DBbpdfA6yFZK6THw5eVUbdr+QnVQMkm-mLyEp5brg@mail.gmail.com>
-In-Reply-To: <CAKdAkRQP8DBbpdfA6yFZK6THw5eVUbdr+QnVQMkm-mLyEp5brg@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.29.36.107]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        Wed, 14 Aug 2019 04:06:52 -0400
+Received: from mga01.intel.com ([192.55.52.88]:26875 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725905AbfHNIGw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 14 Aug 2019 04:06:52 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Aug 2019 01:06:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,384,1559545200"; 
+   d="scan'208";a="194448403"
+Received: from spoorthi-h97m-d3h.iind.intel.com ([10.223.96.21])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Aug 2019 01:06:50 -0700
+From:   spoorthix.k@intel.com
+To:     linux-bluetooth@vger.kernel.org
+Cc:     linux-bluetooth-owner@vger.kernel.org, bharat.b.panda@intel.com
+Subject: [PATCH] Add support to use resolving list
+Date:   Wed, 14 Aug 2019 13:48:21 +0530
+Message-Id: <1565770701-7274-1-git-send-email-spoorthix.k@intel.com>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgRG1pdHJ5LA0KSXQncyBvbmx5IGZvciBSZWFsdGVrIGRldmljZXMuDQpJZiBSZWFsdGVrIGRl
-dmljZSBmaXJtd2FyZSByZWNlaXZlcyBTRVRfRkVBVFVSRShkZXZpY2UgcmVtb3RlIHdha2V1cCkg
-dXNiIGNtZCBkdXJpbmcgdXNiIGlzIHN1c3BlbmRpbmcsIGl0IHdpbGwgcmVtYWlucyBpbiBzdXNw
-ZW5kIHN0YXRlLg0KT3RoZXJ3aXNlLCBmaXJtd2FyZSB3aWxsIGRyb3AgaXRzZWxmIGFuZCBkZXZp
-Y2Ugd2lsbCBjb25zdW1lIGxlc3MgcG93ZXIuIEJ1dCB3aGVuIGhvc3QgcmVzdW1lcywgaXQgbmVl
-ZHMgdG8gcmVsb2FkIGZpcm13YXJlLiBJdCBjYW4gYmUgYWNjb21wbGlzaGVkIGJ5IHNldHRpbmcg
-dXNiIHJlc2V0IHJlc3VtZSBmb3IgZGV2aWNlLg0KDQpUaGFua3MsDQpCUnMuDQoNCj4gU3ViamVj
-dDogUmU6IFtQQVRDSCB2Ml0gQmx1ZXRvb3RoOiBidHVzYjogRml4IHN1c3BlbmQgaXNzdWUgZm9y
-IFJlYWx0ZWsgZGV2aWNlcw0KPiANCj4gT24gTW9uLCBBdWcgMTIsIDIwMTkgYXQgOTozNiBBTSBN
-YXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+DQo+IHdyb3RlOg0KPiA+DQo+ID4g
-SGkgQWxleCwNCj4gPg0KPiA+ID4gRnJvbSB0aGUgcGVyc3BlY3RpdmUgb2YgY29udHJvbGxlciwg
-Z2xvYmFsIHN1c3BlbmQgbWVhbnMgdGhlcmUgaXMgbm8NCj4gPiA+IFNFVF9GRUFUVVJFIChERVZJ
-Q0VfUkVNT1RFX1dBS0VVUCkgYW5kIGNvbnRyb2xsZXIgd291bGQgZHJvcA0KPiB0aGUNCj4gPiA+
-IGZpcm13YXJlLiBJdCB3b3VsZCBjb25zdW1lIGxlc3MgcG93ZXIuIFNvIHdlIHNob3VsZCBub3Qg
-c2VuZCB0aGlzIGtpbmQNCj4gPiA+IG9mIFNFVF9GRUFUVVJFIHdoZW4gaG9zdCBnb2VzIHRvIHN1
-c3BlbmQgc3RhdGUuDQo+ID4gPiBPdGhlcndpc2UsIHdoZW4gbWFraW5nIGRldmljZSBlbnRlciBz
-ZWxlY3RpdmUgc3VzcGVuZCwgaG9zdCBzaG91bGQNCj4gc2VuZA0KPiA+ID4gU0VUX0ZFQVRVUkUg
-dG8gbWFrZSBzdXJlIHRoZSBmaXJtd2FyZSByZW1haW5zLg0KPiA+ID4NCj4gPiA+IFNpZ25lZC1v
-ZmYtYnk6IEFsZXggTHUgPGFsZXhfbHVAcmVhbHNpbC5jb20uY24+DQo+ID4gPiAtLS0NCj4gPiA+
-IGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCAzNCArKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKystLS0NCj4gLQ0KPiA+ID4gMSBmaWxlIGNoYW5nZWQsIDMwIGluc2VydGlvbnMoKyksIDQg
-ZGVsZXRpb25zKC0pDQo+ID4NCj4gPiB0aGlzIG9uZSBkb2VzbuKAmXQgYXBwbHkgY2xlYW5seSB0
-byBibHVldG9vdGgtbmV4dC4gQ2FuIHlvdSBwbGVhc2Ugc2VuZCBhDQo+IHZlcnNpb24gdGhhdCBk
-b2VzLg0KPiANCj4gSXMgdGhpcyBhIGNoaXAgaXNzdWUgb3Igc3lzdGVtIGlzc3VlPyBJLmUuIGlm
-IGluIHNvbWUgc3lzdGVtIEJUDQo+IGNvbnRyb2xsZXIgaXMgd2lyZWQgc28gdGhhdCBpdCBsb3Nl
-cyBwb3dlciBvdmVyIHN5c3RlbSBzdXNwZW5kLCB0aGlzDQo+IGlzIHF1aXRlIGRpZmZlcmVudCBm
-b3JtIGNoaXAgaXRzZWxmIGxvc2luZyBmaXJtd2FyZSBpbiBjZXJ0YWluDQo+IHNpdHVhdGlvbnMs
-IGFuZCB0aGlzIHNtZWxscyBsaWtlIGEgc3lzdGVtIGlzc3VlIGFuZCB0aHVzIG5lZWRzIHRvIGJl
-DQo+IGFkZHJlc3NlZCBvbiBzeXN0ZW0gbGV2ZWwuDQo+IA0KPiBUaGFua3MuDQo+IA0KPiAtLQ0K
-PiBEbWl0cnkNCj4gDQo+IC0tLS0tLVBsZWFzZSBjb25zaWRlciB0aGUgZW52aXJvbm1lbnQgYmVm
-b3JlIHByaW50aW5nIHRoaXMgZS1tYWlsLg0K
+From: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+
+As per Core specification 5.0, Vol 2, Part E, Section 7.8.38,
+following code changes implements LE add device to Resolving List.
+
+Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+---
+ include/net/bluetooth/hci.h |   1 +
+ net/bluetooth/hci_request.c | 134 ++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 130 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c36dc1e..99a38cf36 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -420,6 +420,7 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_LL_PRIVACY		0x40
+ #define HCI_LE_PHY_2M			0x01
+ #define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_EXT_ADV			0x10
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index ca73d36..868a592 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -672,7 +672,6 @@ static void add_to_white_list(struct hci_request *req,
+ 
+ 	cp.bdaddr_type = params->addr_type;
+ 	bacpy(&cp.bdaddr, &params->addr);
+-
+ 	hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
+ }
+ 
+@@ -681,7 +680,7 @@ static u8 update_white_list(struct hci_request *req)
+ 	struct hci_dev *hdev = req->hdev;
+ 	struct hci_conn_params *params;
+ 	struct bdaddr_list *b;
+-	uint8_t white_list_entries = 0;
++	u8 white_list_entries = 0;
+ 
+ 	/* Go through the current white list programmed into the
+ 	 * controller one by one and check if that address is still
+@@ -773,6 +772,111 @@ static u8 update_white_list(struct hci_request *req)
+ 	return 0x01;
+ }
+ 
++static void add_to_resolve_list(struct hci_request *req,
++				struct hci_conn_params *params)
++{
++	struct hci_cp_le_add_to_resolv_list cp;
++	struct bdaddr_list_with_irk *entry;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return;
++
++	cp.bdaddr_type = params->addr_type;
++	bacpy(&cp.bdaddr, &params->addr);
++	memcpy(entry->peer_irk, cp.peer_irk, 16);
++	memcpy(entry->local_irk, cp.local_irk, 16);
++	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST, sizeof(cp), &cp);
++}
++
++static u8 update_resolve_list(struct hci_request *req)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_conn_params *params;
++	struct bdaddr_list *b;
++	u8 resolve_list_entries = 0;
++
++	/* Go through the current resolving list programmed into the
++	 * controller one by one and check if that address is still
++	 * in the list of pending connections or list of devices to
++	 * report. If not present in either list, then queue
++	 * command to remove it from the controller.
++	 */
++
++	list_for_each_entry(b, &hdev->le_resolv_list, list) {
++		/* If the device is neither in pend_le_conns nor
++		 * pend_le_reports then remove it from the resolving list.
++		 */
++		if (!hci_pend_le_action_lookup(&hdev->pend_le_conns,
++					       &b->bdaddr, b->bdaddr_type) &&
++		    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
++					       &b->bdaddr, b->bdaddr_type)) {
++			struct hci_cp_le_del_from_resolv_list cp;
++
++			cp.bdaddr_type = b->bdaddr_type;
++			bacpy(&cp.bdaddr, &b->bdaddr);
++			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
++				    sizeof(cp), &cp);
++			continue;
++		}
++		if (hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type))
++			return 0x00;
++
++		resolve_list_entries++;
++	}
++
++	/* Since all no longer valid resolve list entries have been
++	 * removed, walk through the list of pending connections
++	 * and ensure that any new device gets programmed into
++	 * the controller.
++	 *
++	 * If the list of the devices is larger than the list of
++	 * available resolve list entries in the controller, then
++	 * just abort and return filer policy value to not use the
++	 * resolve list.
++	 */
++
++	list_for_each_entry(params, &hdev->pend_le_conns, action) {
++		if (hci_bdaddr_list_lookup(&hdev->le_resolv_list,
++					   &params->addr, params->addr_type))
++			continue;
++
++		if (resolve_list_entries >= hdev->le_resolv_list_size) {
++			/* Select filter policy to accept all advertising */
++			return 0x00;
++		}
++
++		if (hci_find_irk_by_addr(hdev, &params->addr,
++					 params->addr_type)) {
++			return 0x00;
++		}
++		resolve_list_entries++;
++		add_to_resolve_list(req, params);
++	}
++
++	/* After adding all new pending connections, walk through
++	 * the list of pending reports and also add these to the
++	 * resolving list if there is still space.
++	 */
++
++	list_for_each_entry(params, &hdev->pend_le_reports, action) {
++		if (hci_bdaddr_list_lookup(&hdev->le_resolv_list,
++					   &params->addr, params->addr_type))
++			continue;
++
++		if (resolve_list_entries >= hdev->le_resolv_list_size)
++			return 0x00;
++
++		if (hci_find_irk_by_addr(hdev, &params->addr,
++					 params->addr_type)) {
++			return 0x00;
++		}
++		resolve_list_entries++;
++		add_to_resolve_list(req, params);
++	}
++	return 0x02;
++}
++
+ static bool scan_use_rpa(struct hci_dev *hdev)
+ {
+ 	return hci_dev_test_flag(hdev, HCI_PRIVACY);
+@@ -861,6 +965,7 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 own_addr_type;
+ 	u8 filter_policy;
++	u8 ext_filter_policy;
+ 
+ 	/* Set require_privacy to false since no SCAN_REQ are send
+ 	 * during passive scanning. Not using an non-resolvable address
+@@ -878,6 +983,12 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	 */
+ 	filter_policy = update_white_list(req);
+ 
++	/* Adding or removing entries from the resolve list must
++	 * happen before enabling scanning. The controller does
++	 * not allow resolve list modification while scanning.
++	 */
++	ext_filter_policy = update_resolve_list(req);
++
+ 	/* When the controller is using random resolvable addresses and
+ 	 * with that having LE privacy enabled, then controllers with
+ 	 * Extended Scanner Filter Policies support can now enable support
+@@ -888,11 +999,24 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	 * 0x02 (no whitelist) and 0x03 (whitelist enabled).
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_PRIVACY) &&
+-	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
++	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY) &&
++	     (!(hdev->le_features[0] & HCI_LE_LL_PRIVACY)))
+ 		filter_policy |= 0x02;
+ 
+-	hci_req_start_scan(req, LE_SCAN_PASSIVE, hdev->le_scan_interval,
+-			   hdev->le_scan_window, own_addr_type, filter_policy);
++	if (!ext_filter_policy && (hdev->le_features[0] & HCI_LE_LL_PRIVACY)) {
++		/* If resolve list can not be used then check if
++		 * whitelist can be used and set filter policy
++		 * accordingly.
++		 */
++		ext_filter_policy = filter_policy;
++		hci_req_start_scan(req, LE_SCAN_PASSIVE, hdev->le_scan_interval,
++				   hdev->le_scan_window, own_addr_type,
++				   ext_filter_policy);
++	} else {
++		hci_req_start_scan(req, LE_SCAN_PASSIVE, hdev->le_scan_interval,
++				   hdev->le_scan_window, own_addr_type,
++				   filter_policy);
++	}
+ }
+ 
+ static u8 get_adv_instance_scan_rsp_len(struct hci_dev *hdev, u8 instance)
+-- 
+1.9.1
+
