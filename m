@@ -2,102 +2,163 @@ Return-Path: <SRS0=vV7E=WL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A70C433FF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA40EC31E40
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:54:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9740206C2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:53:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fX1/htU1"
+	by mail.kernel.org (Postfix) with ESMTP id A7810206C2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730042AbfHOFxN (ORCPT
+        id S1729988AbfHOFyN convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Aug 2019 01:53:13 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:41022 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729988AbfHOFxN (ORCPT
+        Thu, 15 Aug 2019 01:54:13 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:56752 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729759AbfHOFyN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Aug 2019 01:53:13 -0400
-Received: by mail-pl1-f193.google.com with SMTP id m9so703690pls.8;
-        Wed, 14 Aug 2019 22:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=w0ATp9HjlGiuVTip9k9ZfspyBy/UaIsWwJV5MOixgE8=;
-        b=fX1/htU1s96plQYNCEo4OqSD/SE0mV4DdErSm71213t9UmkDOx5Zz8OrvJy0lQCXNw
-         Lq/kbSknEt97lp5tKdS11C9VlsVCxKoea9MA6Uq6wBy2f9KcBFB8wKF71m7KwQgxcr7m
-         4TNl6cA1K1KdPIk8bhMEAsq8rDd+9MVe6TJg7569LOuSC9yNsltHIeCheYmsI07nDcFT
-         hDe+nHbMwx1lSiH1wa/ngTouF1Oau8501pjU+2D0QrolnMMuM5oDajmaAn04OX/xgGLx
-         5KU950Icz0rC4AetnFhySxU5nssCdye0rd/rggAucQOmBcjW0EYHSyiIDxdfLiu7J1DO
-         ao3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=w0ATp9HjlGiuVTip9k9ZfspyBy/UaIsWwJV5MOixgE8=;
-        b=skaHA/wavy87an3peGo2BpPJ1SsRhCD4XY1PWEHttU34KK8gUmcp/TucezTxDU10iK
-         t61YfooNR7u9WdVS1HMGx6uOKqhNFmDlpjuxh6Xa0Nj5HYBKpjYdUdk0A8DG7YrzJcnb
-         3v77Na4LHMvjt1K7Pa+lPwx6aAUWQbHp6untSZJdonnMhfX3rRLIkYvaS8Kn41QrkUY1
-         exwKs40b6T2vs6a6Ijtzz1uWvyqm1MnrYpRSY4iunAN7vjeEJCAu3AZkIcfBcWIkGLTV
-         6veAPFw4Wpo9P/eJISrQYlpSyaL3c+BUugwQ+cjYAaJSOc4ZTnApDAgzT4VOdsW+P4kN
-         vJRQ==
-X-Gm-Message-State: APjAAAWf24lZHenqsF/aw0DimmcOeqE/TVXLoY4SsGFpkD1nNNqez2S/
-        /EE3zf/Kc5Ar64xo9TosBbI=
-X-Google-Smtp-Source: APXvYqzEcC0Qfmgo4HlDcGAv8vuyzzfy2uV07QqVEUqvGtbsmugCbp2dQUrhlxBgibCRD+8HF2WC2w==
-X-Received: by 2002:a17:902:8ecc:: with SMTP id x12mr536040plo.258.1565848392301;
-        Wed, 14 Aug 2019 22:53:12 -0700 (PDT)
-Received: from localhost.localdomain ([110.225.3.176])
-        by smtp.gmail.com with ESMTPSA id 65sm1841483pff.148.2019.08.14.22.53.09
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 14 Aug 2019 22:53:11 -0700 (PDT)
-From:   Nishka Dasgupta <nishkadg.linux@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        davem@davemloft.net, netdev@vger.kernel.org
-Cc:     Nishka Dasgupta <nishkadg.linux@gmail.com>
-Subject: [PATCH] Bluetooth: 6lowpan: Make variable header_ops constant
-Date:   Thu, 15 Aug 2019 11:22:55 +0530
-Message-Id: <20190815055255.1153-1-nishkadg.linux@gmail.com>
-X-Mailer: git-send-email 2.19.1
+        Thu, 15 Aug 2019 01:54:13 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id D31C1288C6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Aug 2019 05:54:11 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id C261A288BC; Thu, 15 Aug 2019 05:54:11 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Thu, 15 Aug 2019 05:54:09 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: arthur@life.net.br
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-lDQalQ9yv8@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Static variable header_ops, of type header_ops, is used only once, when
-it is assigned to field header_ops of a variable having type net_device.
-This corresponding field is declared as const in the definition of
-net_device. Hence make header_ops constant as well to protect it from
-unnecessary modification.
-Issue found with Coccinelle.
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-Signed-off-by: Nishka Dasgupta <nishkadg.linux@gmail.com>
----
- net/bluetooth/6lowpan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Arthur Fragoso (arthur@life.net.br) changed:
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 9d41de1ec90f..bb55d92691b0 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -583,7 +583,7 @@ static const struct net_device_ops netdev_ops = {
- 	.ndo_start_xmit		= bt_xmit,
- };
- 
--static struct header_ops header_ops = {
-+static const struct header_ops header_ops = {
- 	.create	= header_create,
- };
- 
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |arthur@life.net.br
+
+--- Comment #33 from Arthur Fragoso (arthur@life.net.br) ---
+Same here:
+
+0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode).
+
+But the product name is: JL AC69 A10
+
+I tested in Linux 5.2.8-1-MANJARO, and the 4.19.57-1-MANJARO.
+
+The problems are:
+
+- After booting up the OS with the BT Dongle in, if I try to 'sudo bluetoothctl
+power on', it fails and 'btmon' returns this:
+
+
+@ MGMT Command: Set Powered (0x0005) plen 1                                    
+         {0x0001} [hci0] 34.681295
+        Powered: Enabled (0x01)
+= Open Index: 00:1A:7D:DA:71:10                                                
+                  [hci0] 34.743182
+< HCI Command: Reset (0x03|0x0003) plen 0                                      
+               #2 [hci0] 34.743412
+= Close Index: 00:1A:7D:DA:71:10                                               
+                  [hci0] 44.768939
+@ MGMT Event: Command Status (0x0002) plen 3                                   
+         {0x0001} [hci0] 44.772086
+      Set Powered (0x0005)
+        Status: Failed (0x03)
+= bluetoothd: Failed to set mode: Failed (0x03)                                
+                  [hci0] 44.790305
+
+
+If I unplug and plug it back, the power on command will work fine. If it is set
+to AutoEnable on /etc/bluetooth/main.conf, it will also be powered up after
+plugin it back.
+If I power off, it will only work again if I unplug and plug it back. So it's
+not a big problem.
+
+
+The big deal is that I can't make it to scan:
+
+$ sudo bluetoothctl scan on
+
+bluetoothd[2358]: src/adapter.c:start_discovery() sender :1.268
+bluetoothd[2358]: src/adapter.c:update_discovery_filter() 
+bluetoothd[2358]: src/adapter.c:discovery_filter_to_mgmt_cp() 
+bluetoothd[2358]: src/adapter.c:trigger_start_discovery() 
+bluetoothd[2358]: src/adapter.c:cancel_passive_scanning() 
+bluetoothd[2358]: src/adapter.c:start_discovery_timeout() 
+bluetoothd[2358]: src/adapter.c:start_discovery_timeout()
+adapter->current_discovery_filter == 0
+bluetoothd[2358]: src/adapter.c:start_discovery_complete() status 0x03
+
+
+@ MGMT Command: Start Discovery (0x0023) plen 1           {0x0001} [hci0]
+37.252439
+        Address type: 0x07
+          BR/EDR
+          LE Public
+          LE Random
+< HCI Command: LE Set Random Address (0x08|0x0005) plen 6      #81 [hci0]
+37.252583
+        Address: 06:4D:6A:64:58:36 (Non-Resolvable)
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7     #82 [hci0]
+39.423752
+        Type: Active (0x01)
+        Interval: 22.500 msec (0x0024)
+        Window: 11.250 msec (0x0012)
+        Own address type: Random (0x01)
+        Filter policy: Accept all advertisement (0x00)
+@ MGMT Event: Command Complete (0x0001) plen 4            {0x0001} [hci0]
+39.423747
+      Start Discovery (0x0023) plen 1
+        Status: Failed (0x03)
+        Address type: 0x07
+          BR/EDR
+          LE Public
+          LE Random
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2         #83 [hci0]
+41.557120
+        Scanning: Enabled (0x01)
+        Filter duplicates: Enabled (0x01)
+< HCI Command: Inquiry (0x01|0x0001) plen 5                    #84 [hci0]
+43.690407
+        Access code: 0x9e8b33 (General Inquiry)
+        Length: 10.24s (0x08)
+        Num responses: 0
+
+
+I will try to apply the patch and compile the kernel to see if I can get it to
+work. It's crazy to think this thread started in November 2013, and currently
+there are many of those CSR dongles being sold.
+
 -- 
-2.19.1
-
+You are receiving this mail because:
+You are the assignee for the bug.
