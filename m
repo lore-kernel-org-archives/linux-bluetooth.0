@@ -8,62 +8,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C419EC31E40
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A70C433FF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:53:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 993BC2086C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9740206C2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Aug 2019 05:53:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Roo+3MIe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fX1/htU1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726384AbfHOFwF (ORCPT
+        id S1730042AbfHOFxN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Aug 2019 01:52:05 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:46541 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726027AbfHOFwE (ORCPT
+        Thu, 15 Aug 2019 01:53:13 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:41022 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729988AbfHOFxN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Aug 2019 01:52:04 -0400
-Received: by mail-pl1-f196.google.com with SMTP id c2so692930plz.13;
-        Wed, 14 Aug 2019 22:52:04 -0700 (PDT)
+        Thu, 15 Aug 2019 01:53:13 -0400
+Received: by mail-pl1-f193.google.com with SMTP id m9so703690pls.8;
+        Wed, 14 Aug 2019 22:53:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=m7fRAJxOdOc1GNCOY9NWJKA8JD3G32E5XpmwWmSfP4U=;
-        b=Roo+3MIe+UPeGog0Ys9Q5X+o02oZmXWPWNvA277ShX2Uh/iTpC8J6m8Fywx7+0z3su
-         p9HSPzqYDzhcq38yN3G892zMYWot1hkljWXPTu+wW9A8QRWf3s0Uy1ZZadGGa93jxrSY
-         SX73Ce1mAVnmxGR8LNmwgu/mwjFRKNCJJMDGXSsrQ67lHZL0Qyy7xHpRet4fJl/mRoqF
-         vSKIIh4Vo+KQIykoD/EIhurpZXgrf09HsjEITjHGZRVnZXNcTEKOZqfTn+RjCm3S+lFQ
-         0FpI3MVwZBP7knVoVpGzJM51HaDVzNP85mUvkJ7A1sfAsmtow7/XenhdCVEtrC2kkehC
-         8g2g==
+        bh=w0ATp9HjlGiuVTip9k9ZfspyBy/UaIsWwJV5MOixgE8=;
+        b=fX1/htU1s96plQYNCEo4OqSD/SE0mV4DdErSm71213t9UmkDOx5Zz8OrvJy0lQCXNw
+         Lq/kbSknEt97lp5tKdS11C9VlsVCxKoea9MA6Uq6wBy2f9KcBFB8wKF71m7KwQgxcr7m
+         4TNl6cA1K1KdPIk8bhMEAsq8rDd+9MVe6TJg7569LOuSC9yNsltHIeCheYmsI07nDcFT
+         hDe+nHbMwx1lSiH1wa/ngTouF1Oau8501pjU+2D0QrolnMMuM5oDajmaAn04OX/xgGLx
+         5KU950Icz0rC4AetnFhySxU5nssCdye0rd/rggAucQOmBcjW0EYHSyiIDxdfLiu7J1DO
+         ao3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=m7fRAJxOdOc1GNCOY9NWJKA8JD3G32E5XpmwWmSfP4U=;
-        b=IefLZgYjAJEpNIgqJRUVbn/l9Kyqo8kavXM5MG7MR/5bwsxJpMYuhWcL0thwV3touG
-         BZvP3wJOigiuQz8b34HmBd2EnQi7BBDjXbj6w7ksLI3nnSnsTzUoGJ3mjCSb3WCqZlN4
-         uk7CLz/67CzorMNh6GjVkTcRD/3oshupN7BEl3TdCa2154ESwyYzPYiKhbLyeQ21uc1E
-         MBQyZKYW8RSR5cVH3K6TIaEkOlGQMIrOQqyVhXnbFMWu5HkHsL5F/c+OpsF8D+2RwXe5
-         mUwlyNn5NeCSRnVa0EJxUiLWSB7w3d5maZFKgbRSHzPduXRl05by8mAoFdS5DZvqbBj9
-         Utzw==
-X-Gm-Message-State: APjAAAXfE4T6sEhm2kxYRv+vPuuKxgy4lP8zjB5LbPscUeZPCFUqREW2
-        c5qDmDbIEZNMRjji+EOVjozCymST
-X-Google-Smtp-Source: APXvYqyoQRo8ZdTbK4DaTDT0cIfD6LjGfd+e/+e9szDXSQCjnD3SlKtdkvnk3TDe5L2mcwCfG5JWHw==
-X-Received: by 2002:a17:902:690b:: with SMTP id j11mr2944795plk.35.1565848324382;
-        Wed, 14 Aug 2019 22:52:04 -0700 (PDT)
+        bh=w0ATp9HjlGiuVTip9k9ZfspyBy/UaIsWwJV5MOixgE8=;
+        b=skaHA/wavy87an3peGo2BpPJ1SsRhCD4XY1PWEHttU34KK8gUmcp/TucezTxDU10iK
+         t61YfooNR7u9WdVS1HMGx6uOKqhNFmDlpjuxh6Xa0Nj5HYBKpjYdUdk0A8DG7YrzJcnb
+         3v77Na4LHMvjt1K7Pa+lPwx6aAUWQbHp6untSZJdonnMhfX3rRLIkYvaS8Kn41QrkUY1
+         exwKs40b6T2vs6a6Ijtzz1uWvyqm1MnrYpRSY4iunAN7vjeEJCAu3AZkIcfBcWIkGLTV
+         6veAPFw4Wpo9P/eJISrQYlpSyaL3c+BUugwQ+cjYAaJSOc4ZTnApDAgzT4VOdsW+P4kN
+         vJRQ==
+X-Gm-Message-State: APjAAAWf24lZHenqsF/aw0DimmcOeqE/TVXLoY4SsGFpkD1nNNqez2S/
+        /EE3zf/Kc5Ar64xo9TosBbI=
+X-Google-Smtp-Source: APXvYqzEcC0Qfmgo4HlDcGAv8vuyzzfy2uV07QqVEUqvGtbsmugCbp2dQUrhlxBgibCRD+8HF2WC2w==
+X-Received: by 2002:a17:902:8ecc:: with SMTP id x12mr536040plo.258.1565848392301;
+        Wed, 14 Aug 2019 22:53:12 -0700 (PDT)
 Received: from localhost.localdomain ([110.225.3.176])
-        by smtp.gmail.com with ESMTPSA id e66sm280441pfe.142.2019.08.14.22.52.01
+        by smtp.gmail.com with ESMTPSA id 65sm1841483pff.148.2019.08.14.22.53.09
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 14 Aug 2019 22:52:03 -0700 (PDT)
+        Wed, 14 Aug 2019 22:53:11 -0700 (PDT)
 From:   Nishka Dasgupta <nishkadg.linux@gmail.com>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        davem@davemloft.net, netdev@vger.kernel.org
 Cc:     Nishka Dasgupta <nishkadg.linux@gmail.com>
-Subject: [PATCH] Bluetooth: hci_qca: Make structure qca_proto constant
-Date:   Thu, 15 Aug 2019 11:21:49 +0530
-Message-Id: <20190815055149.1062-1-nishkadg.linux@gmail.com>
+Subject: [PATCH] Bluetooth: 6lowpan: Make variable header_ops constant
+Date:   Thu, 15 Aug 2019 11:22:55 +0530
+Message-Id: <20190815055255.1153-1-nishkadg.linux@gmail.com>
 X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -72,33 +73,31 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Static structure qca_proto, of type hci_uart_proto, is used four times:
-as the last argument in function hci_uart_register_device(), and as the
-only argument to functions hci_uart_register_proto() and
-hci_uart_unregister_proto(). In all three of these functions, the
-parameter corresponding to qca_proto is declared as constant. Therefore,
-make qca_proto itself constant as well in order to protect it from
-unintended modification.
+Static variable header_ops, of type header_ops, is used only once, when
+it is assigned to field header_ops of a variable having type net_device.
+This corresponding field is declared as const in the definition of
+net_device. Hence make header_ops constant as well to protect it from
+unnecessary modification.
 Issue found with Coccinelle.
 
 Signed-off-by: Nishka Dasgupta <nishkadg.linux@gmail.com>
 ---
- drivers/bluetooth/hci_qca.c | 2 +-
+ net/bluetooth/6lowpan.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 82a0a3691a63..80923fc9418f 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1326,7 +1326,7 @@ static int qca_setup(struct hci_uart *hu)
- 	return ret;
- }
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 9d41de1ec90f..bb55d92691b0 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -583,7 +583,7 @@ static const struct net_device_ops netdev_ops = {
+ 	.ndo_start_xmit		= bt_xmit,
+ };
  
--static struct hci_uart_proto qca_proto = {
-+static const struct hci_uart_proto qca_proto = {
- 	.id		= HCI_UART_QCA,
- 	.name		= "QCA",
- 	.manufacturer	= 29,
+-static struct header_ops header_ops = {
++static const struct header_ops header_ops = {
+ 	.create	= header_create,
+ };
+ 
 -- 
 2.19.1
 
