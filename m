@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E05D7C3A5A1
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Aug 2019 06:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2980AC3A5A0
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Aug 2019 06:36:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B668521743
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Aug 2019 06:36:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9E9520880
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Aug 2019 06:36:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="coCdn2Ym"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d882ujB1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726211AbfHQGg1 (ORCPT
+        id S1726220AbfHQGg2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Aug 2019 02:36:27 -0400
-Received: from mail-pl1-f179.google.com ([209.85.214.179]:36513 "EHLO
-        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726128AbfHQGg1 (ORCPT
+        Sat, 17 Aug 2019 02:36:28 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:44034 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726207AbfHQGg2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Aug 2019 02:36:27 -0400
-Received: by mail-pl1-f179.google.com with SMTP id g4so3349602plo.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Aug 2019 23:36:26 -0700 (PDT)
+        Sat, 17 Aug 2019 02:36:28 -0400
+Received: by mail-pg1-f196.google.com with SMTP id i18so3995700pgl.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Aug 2019 23:36:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=h7J78+yYEVX/qg68EjqNRm2MvZOEsuNNwozKTRzm5X8=;
-        b=coCdn2Ymo5DSO2nj1weeHEhO3gbTznKNJ/AuH80+AYXL+gm/dhru5i71Va5Iah6Un/
-         rxswtqWJ7L+aXXkhnnMD3yFXJPGzzav4wrOG9Fm+XwuIaEIvIoMl6Ys2xh0YSCxOg7Rt
-         eYskSn5UXiPkDJM3Ss6axI2GO2n0O58H3j2dVR3L2s/QSCoC+4NS5GzZfhc88hHAARUm
-         ngOttPqkMulXT4wyFmvpVbsdMmku6vnrDMrvoYhPOpZGmxG+f02otLsP2ygv+FbAWSiZ
-         PE4T7zhmsaFUkH1V/UGs0S5U7FiaPER1H0fSLwZE60dNVLCqtql/4Eo1UBXP6OnT9P+f
-         CNiw==
+        bh=V2kBzO6yAeiZ58u3a1dhmifrEqATA5dV//e0NzEMWZc=;
+        b=d882ujB1s6yt2XusrFRusv2LEoGruePTwkDjJxWUobP8tq4AtLU/z9I+Du594ccmIa
+         OeVBi+Ra+ZjDDwuvyDMSTXvOkuuXjW6tgDuABCPqOyQsMFBqfL+tMzIImV60B2w7dRpo
+         k5LaZ4iPOsoDrpTiXZhwJYTd899DClIUpxjAPptR+4ImOM8tIAYXaH93erztLwgLaRzT
+         vY4F951DDptoa5QvAKKjCAJGxACMOYQdYGJU06gO2doR+ItNreCBW9QcLNR+Po/LKLli
+         Rspz0y+pbfxrrqICS2InjBYYR2Je7wqxfp0B6jJn71T2tRmx3QiHFO700StchFc+rBuJ
+         /q3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=h7J78+yYEVX/qg68EjqNRm2MvZOEsuNNwozKTRzm5X8=;
-        b=KzBGgj1h8sKuFsc6r1IxkIfSQQ1P0716+TaDJ6PbKuddssx5XC6YcYiwB1dG6OwNyv
-         JttuY7ss13TkrrdZY5pqlJu2JKyG9RaDp/kELjXJfyR2tCDZ2PWNUTMeAEAIlOpA2ADE
-         R7XGcdGi1DopykAkBrVMN9LhFQEbpFqjaHEpwOPteGYPhvFuoe7FO4zD7T2Br+VzniWQ
-         yBJoNayJ46v7TkCdwHmnjrhVKXmclutL9sQ5DeyO0cvN44U89RDRW27y02yq6ZBLiWr7
-         XAAZTdf2JogkVqCGLodYTyMfvdb/XB8USypXkNwLQq91/rQ2Zy16isbFKxyLwf8XkPNR
-         pKFQ==
-X-Gm-Message-State: APjAAAXsgMj0R/kGi0u77S5YFvCj1Gw9H8BD0ti1oGzKQMHfced04zl1
-        B+Q6nHGwk3oLRutMvnZO0n4D+3g=
-X-Google-Smtp-Source: APXvYqxIiCGAPXy08qNFR+7XlFL2ZEO41KO34rdZrcBekS0S6ISsusKRKJ5MMKvL2KRlVOFcV+pnMQ==
-X-Received: by 2002:a17:902:760e:: with SMTP id k14mr12468091pll.161.1566023786267;
-        Fri, 16 Aug 2019 23:36:26 -0700 (PDT)
+        bh=V2kBzO6yAeiZ58u3a1dhmifrEqATA5dV//e0NzEMWZc=;
+        b=Vule+wfZfe/1Oo+m0HX8kHGyXYskpJYy77MHHjQckmYp+gPPi79wvpg0GpgFXOYpB1
+         kuB8vYonr3pjO5qIFdGSNIIUKv2TXZa0I3qiTSSU0M3un5Z0otm775Xs3z7mXnBN3Xg4
+         bJXKqsDN7vBL711KsVBks1Ugx/AZh2Z79w2IkWDD50VUzTyrbmY86g8l7whAv6Cpy9rS
+         PDeaThbnqKbq+7+mUZ53E6+4c1IvlzOhm3/KhEIYGb+mU624TvjxAy2MAejr7qwzPTK7
+         vsEdArBF1qNwPaw7RR8GaBFzm2daJVGsLMhC7DRarC5q3o2ovpkEqJUBmATpDNRTVOkn
+         dFwQ==
+X-Gm-Message-State: APjAAAUdLeUpb9X1U+tWwE2tXfmvECP3FMHgg57fSQ+z7FBEtKC7abde
+        5/OPJkcI2bVuAD13/KrMLrgrV1I=
+X-Google-Smtp-Source: APXvYqwuK9xAfj5saYzYQu1/x39p4JCJpGiUklnFq0bv8h+F99eRrf22jOWykXFhe+mt8Ry18nckBw==
+X-Received: by 2002:aa7:9e0a:: with SMTP id y10mr14261962pfq.93.1566023787061;
+        Fri, 16 Aug 2019 23:36:27 -0700 (PDT)
 Received: from rxps.home ([2600:8800:1e00:242:3550:edee:2708:4ad0])
-        by smtp.gmail.com with ESMTPSA id y128sm6684095pgy.41.2019.08.16.23.36.25
+        by smtp.gmail.com with ESMTPSA id y128sm6684095pgy.41.2019.08.16.23.36.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2019 23:36:25 -0700 (PDT)
+        Fri, 16 Aug 2019 23:36:26 -0700 (PDT)
 From:   Ronan Pigott <rpigott314@gmail.com>
 X-Google-Original-From: Ronan Pigott
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Ronan Pigott <rpigott@berkeley.edu>
-Subject: [PATCH BlueZ v2 2/4] shared/shell: add --zsh-complete option
-Date:   Fri, 16 Aug 2019 23:34:50 -0700
-Message-Id: <20190817063452.23273-3-rpigott@berkeley.edu>
+Subject: [PATCH BlueZ v2 3/4] completion: add bluetoothctl zsh completions
+Date:   Fri, 16 Aug 2019 23:34:51 -0700
+Message-Id: <20190817063452.23273-4-rpigott@berkeley.edu>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20190817063452.23273-1-rpigott@berkeley.edu>
 References: <20190817063452.23273-1-rpigott@berkeley.edu>
@@ -76,91 +76,131 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Ronan Pigott <rpigott@berkeley.edu>
 
-This adds a new long form option --zsh-complete to provide all available
-commands in an output format suitable for parsing by zsh or other shell
-completion scripts.
+This zsh compdef provides completions for the bluetoothctl command.
 
-Invoke like: `bluetoothctl --zsh-complete help`
+It has been modified from version 1 of this patch to get the command
+names and descriptions from the newly introduced --zsh-complete.
 
-There is no corresponding short form option.
+It utilizes the output of `bluetoothctl devices` or
+`bluetoothctl controllers` to provide a descriptive completion menu
+in those contexts.
+
+e.g.
+
+$ bluetoothctl connect <TAB>
+04:52:C7:0C:D4:A7  -- Bose QuietComfort 35
+40:4E:36:D9:8F:28  -- Pixel 2
+A4:38:CC:20:5D:E0  -- Pro Controller
 
 ---
- src/shared/shell.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ completion/zsh/_bluetoothctl | 98 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
+ create mode 100644 completion/zsh/_bluetoothctl
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index eac654f40..bbf9f9e7a 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -79,6 +79,7 @@ static struct {
- 	int argc;
- 	char **argv;
- 	bool mode;
-+	bool zsh;
- 	bool monitor;
- 	int timeout;
- 	struct io *input;
-@@ -98,6 +99,7 @@ static struct {
- } data;
- 
- static void shell_print_menu(void);
-+static void shell_print_menu_zsh_complete(void);
- 
- static void cmd_version(int argc, char *argv[])
- {
-@@ -288,6 +290,11 @@ static void shell_print_menu(void)
- 	if (!data.menu)
- 		return;
- 
-+	if (data.zsh) {
-+		shell_print_menu_zsh_complete();
-+		return;
-+	}
+diff --git a/completion/zsh/_bluetoothctl b/completion/zsh/_bluetoothctl
+new file mode 100644
+index 000000000..bf35e503e
+--- /dev/null
++++ b/completion/zsh/_bluetoothctl
+@@ -0,0 +1,98 @@
++#compdef bluetoothctl
 +
- 	print_text(COLOR_HIGHLIGHT, "Menu %s:", data.menu->name);
- 	print_text(COLOR_HIGHLIGHT, "Available commands:");
- 	print_text(COLOR_HIGHLIGHT, "-------------------");
-@@ -314,6 +321,22 @@ static void shell_print_menu(void)
- 	}
- }
- 
-+static void shell_print_menu_zsh_complete(void)
-+{
-+	const struct bt_shell_menu_entry *entry;
-+
-+	for (entry = data.menu->entries; entry->cmd; entry++) {
-+		printf("%s:%s\n", entry->cmd, entry->desc ? : "");
-+	}
-+
-+	for (entry = default_menu; entry->cmd; entry++) {
-+		if (entry->exists && !entry->exists(data.menu))
-+			continue;
-+
-+		printf("%s:%s\n", entry->cmd, entry->desc ? : "");
-+	}
++__bluetoothctl() {
++	bluetoothctl "$@" 2>/dev/null
 +}
 +
- static int parse_args(char *arg, wordexp_t *w, char *del, int flags)
- {
- 	char *str;
-@@ -1015,6 +1038,7 @@ static const struct option main_options[] = {
- 	{ "help",	no_argument, 0, 'h' },
- 	{ "timeout",	required_argument, 0, 't' },
- 	{ "monitor",	no_argument, 0, 'm' },
-+	{ "zsh-complete",	no_argument, 0, 'z' },
- };
- 
- static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
-@@ -1075,6 +1099,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 		case 't':
- 			data.timeout = atoi(optarg);
- 			break;
-+		case 'z':
-+			data.zsh = 1;
-+			break;
- 		case 'm':
- 			data.monitor = true;
- 			if (bt_log_open() < 0) {
++_bluezcomp_controller() {
++	local -a controllers
++	bluetoothctl list |
++	while read _ MAC NAME; do
++		controllers+="${MAC//:/\\:}:${NAME//:/\\:}"
++	done
++	_describe -t controllers 'controller' controllers
++}
++
++_bluezcomp_device() {
++	local -a devices
++	bluetoothctl devices |
++	while read _ MAC NAME; do
++		devices+="${MAC//:/\\:}:${NAME//:/\\:}"
++	done
++	_describe -t devices 'device' devices
++}
++
++_bluezcomp_agentcap() {
++	local -a agent_options=(${(f)"$(__bluetoothctl agent help)"})
++	agent_options=( "${(@)agent_options:#(on|off)}" )
++	compadd -a agent_options
++}
++
++_bluetoothctl_agent() {
++	local -a agent_options=(${(f)"$(__bluetoothctl agent help)"})
++	agent_options+=help
++	compadd -a agent_options
++}
++
++_bluetoothctl_advertise() {
++	local -a ad_options=(${(f)"$(__bluetoothctl advertise help)"})
++	ad_options+=help
++	compadd -a ad_options
++}
++
++_bluetoothctl() {
++	local -a toggle_commands=(
++		"discoverable" "pairable" "power" "scan"
++	)
++
++	local -a controller_commands=(
++		"select" "show"
++	)
++
++	local -a device_commands=(
++		"block" "connect" "disconnect" "info"
++		"pair" "remove" "trust" "unblock" "untrust"
++	)
++
++	# Other commands may be handled by _bluetoothctl_$command
++	local -a all_commands=( "${(@f)$(__bluetoothctl --zsh-complete help)}" )
++
++	local curcontext=$curcontext state line ret=1
++	_arguments -C \
++		+ '(info)' \
++		{-h,--help}'[Show help message and exit]' \
++		{-v,--version}'--version[Show version info and exit]' \
++		+ 'mod' \
++		'(info)'{-a+,--agent=}'[Register agent handler]:agent:_bluezcomp_agentcap' \
++		'(info)'{-t,--timeout}'[Timeout in seconds for non-interactive mode]' \
++		'(info)'{-m,--monitor}'[Enable monitor output]' \
++		+ 'command' \
++		'(info):command:->command' \
++		'(info):: :->argument' \
++		': :_message "no more arguments"'
++
++	if [[ $state == "command" ]]; then
++		_describe -t commands 'command' all_commands
++	elif [[ $state == "argument" ]]; then
++		if (( ! ${"${(@)all_commands%%:*}"[(I)${line[1]}]} )); then
++			_message "Unknown bluetoothctl command: $line[1]"
++			return 1;
++		fi
++
++		curcontext="${curcontext%:*:*}:bluetoothctl-$line[1]:"
++		if ! _call_function ret _bluetoothctl_$line[1]; then
++			case $line[1] in
++				(${(~j.|.)toggle_commands})
++					compadd on off
++					;;
++				(${(~j.|.)device_commands})
++					_bluezcomp_device
++					;;
++				(${(~j.|.)controller_commands})
++					_bluezcomp_controller
++					;;
++			esac
++		fi
++		return ret
++	fi
++} && _bluetoothctl
 -- 
 2.22.1
 
