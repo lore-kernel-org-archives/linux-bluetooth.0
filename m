@@ -2,87 +2,95 @@ Return-Path: <SRS0=e9K0=WO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5B5C3A59B
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Aug 2019 00:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D12BC3A59B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Aug 2019 01:45:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06F8821773
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Aug 2019 00:57:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lo9GjyhC"
+	by mail.kernel.org (Postfix) with ESMTP id 274AE21773
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Aug 2019 01:45:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726384AbfHRA5h (ORCPT
+        id S1726384AbfHRBp1 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Aug 2019 20:57:37 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34274 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726366AbfHRA5h (ORCPT
+        Sat, 17 Aug 2019 21:45:27 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:39612 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726351AbfHRBp1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Aug 2019 20:57:37 -0400
-Received: by mail-pg1-f195.google.com with SMTP id n9so4864003pgc.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Aug 2019 17:57:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=content-transfer-encoding:in-reply-to:date:subject:from:to
-         :message-id;
-        bh=vqMlNy0504OWxfFQw0tpGTFGMP3xq9pNZgj0Of4lQkU=;
-        b=lo9GjyhCqHK5I/4av7NMXezZZtL4Q8bwR+/m5X6SYt311IoDvJRN9egtWmbsJAUtdo
-         oqtlwMHLEYtRSWrSMT0U7n2TwunogaVF58/dQYjjFiAFE98NxtsOQqYumsEWH3Bbzsf+
-         Wzv04Yh/A01ibu5wbTkCiJt2mgJshnlUu42zA0XHr+9WuC6Os4RRoSuMQUvB1991tSHo
-         gFLvJwnpBjA1OtN1i8PP8enQNhgYLhD1eup07XvsyQigOQY89wTQapGx+vbFsGcC/oOw
-         iFpHzy0Fr6GN+mUN4IXz9u5wARUKSUDrwtxESuOjxabcONSqyL+9n3zngyRiExh9CdNq
-         FY5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:in-reply-to:date
-         :subject:from:to:message-id;
-        bh=vqMlNy0504OWxfFQw0tpGTFGMP3xq9pNZgj0Of4lQkU=;
-        b=WXPqlFD87pPZmhY65yXTlxTCOoBUx1um1wwvEUy/gcucoCHFOmD+3BuUUo+Dw+QYqV
-         X1IvM2aOb2tZbB+vnrsED7B2TU1rRJ3coy+IdYxLXrB8VLQjsGyxcazjMCyFQypYCUkV
-         4rjAKib1GvHGCdKCgwSdiWOHnwn6pK1d47Q1TX3jRbpzoUWY4924mPtv6c7/DwF182eO
-         x4hacGMWbZ7NOAGBI1LqGjWVWcICiQJGsl4ilLM2nAu0Vdynr+2sDr92EZPpVjJOtpG3
-         rBjxqQ6ft6bY3c8q21OGTaqeu6xh49/sJAolwPzex/DRq2BXuHjyw4q26Hy1bJkyu+dc
-         qS1w==
-X-Gm-Message-State: APjAAAUSyjttMCerkzkpoQ0Z9/OzYSFmybEQfnHF6sxu1CGoP1w3vW9z
-        rRb1FSMY7SbiSWPdCkba4A==
-X-Google-Smtp-Source: APXvYqyfFLd47t/8sj720IoJUaTlJxMAk0pezdnhJklxGWSPNSeOTC2F25DnxRsez0Hg6PZR++5ZXg==
-X-Received: by 2002:a62:6045:: with SMTP id u66mr12708419pfb.261.1566089856534;
-        Sat, 17 Aug 2019 17:57:36 -0700 (PDT)
-Received: from localhost ([2600:8800:1e00:242:d82f:f17f:4a1d:b94b])
-        by smtp.gmail.com with ESMTPSA id z28sm11801998pfj.74.2019.08.17.17.57.35
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 17 Aug 2019 17:57:35 -0700 (PDT)
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-In-Reply-To: <20190817063452.23273-4-rpigott@berkeley.edu>
-Date:   Sat, 17 Aug 2019 17:57:34 -0700
-Subject: Re: [PATCH BlueZ v2 3/4] completion: add bluetoothctl zsh
- completions
-From:   "Ronan Pigott" <rpigott314@gmail.com>
-To:     "Ronan Pigott" <rpigott314@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>
-Message-Id: <BWCCIR3EQSA6.378E7TPHIWLQ0@rxps>
+        Sat, 17 Aug 2019 21:45:27 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 43F6928908
+        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Aug 2019 01:45:26 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 3562D28904; Sun, 18 Aug 2019 01:45:26 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Sun, 18 Aug 2019 01:45:25 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: virtuousfox@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-p6PNNm9nmm@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri Aug 16, 2019 at 11:34 PM Ronan Pigott wrote:
-> +	_arguments -C \
-> +		+ '(info)' \
-> +		{-h,--help}'[Show help message and exit]' \
-> +		{-v,--version}'--version[Show version info and exit]' \
-> +		+ 'mod' \
-> +		'(info)'{-a+,--agent=3D}'[Register agent handler]:agent:_bluezcomp_age=
-ntcap' \
-> +		'(info)'{-t,--timeout}'[Timeout in seconds for non-interactive mode]' =
-\
-> +		'(info)'{-m,--monitor}'[Enable monitor output]' \
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-An error: the -t,--timeout option is missing the required parameter.
-There are no interesting completions to offer here, but it should stop
-completing command words where an argument is required.
+--- Comment #36 from Sergey Kondakov (virtuousfox@gmail.com) ---
+(In reply to Arthur Fragoso from comment #35)
+> The code for these devices are bellow.
+> 
+> You are right, the patch is way too old for this.
+> 
+> I will probably buy a different device while we wait for someone with more
+> knowledge to fix this.
+>...
+>       /* Detect controllers which aren't real CSR ones. */
+>       if (le16_to_cpu(rp->manufacturer) != 10 ||
+>           le16_to_cpu(rp->lmp_subver) == 0x0c5c) {
+>...
+
+Luckily, I still have my old 2.1 dongle.
+
+It seems that this check is too specific, mine has 0x811 subversion but the
+real problem is idiotic notion of holding all BT devices to some imaginary
+standard of compliant vendor-approved behaviour and creating blacklists for
+actual devices only if someone from BT maintainers have heard something about
+some problems from someone. No normal user is going to write them letter with
+complains, let alone patches for hard-coded workarounds to artificial problems.
+They need to redo the whole initialization logic to be more generic or at least
+allow passing quirk-flags at runtime.
+
+There is and will be myriad of devices with random IDs and crappy firmwares,
+sometimes even circuitry, and kernel MUST make all that crap work at least
+partially, not backdown on smallest of mislabelings. It is saddening to see
+only recently created built-in Windows 10 BT stack to behave more sanely than
+bluez.
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
