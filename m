@@ -2,60 +2,130 @@ Return-Path: <SRS0=9IM7=WP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1B0C3A5A0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 16:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D59CC3A5A0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 17:04:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 552282070B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 16:38:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3E0422CEA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 17:04:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b="EbjQsYx5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726905AbfHSQiD (ORCPT
+        id S1727819AbfHSREg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Aug 2019 12:38:03 -0400
-Received: from relay11.mail.gandi.net ([217.70.178.231]:36591 "EHLO
-        relay11.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726168AbfHSQiD (ORCPT
+        Mon, 19 Aug 2019 13:04:36 -0400
+Received: from mx0a-00154904.pphosted.com ([148.163.133.20]:25898 "EHLO
+        mx0a-00154904.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726879AbfHSREf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Aug 2019 12:38:03 -0400
-Received: from classic (mon69-7-83-155-44-161.fbx.proxad.net [83.155.44.161])
-        (Authenticated sender: hadess@hadess.net)
-        by relay11.mail.gandi.net (Postfix) with ESMTPSA id 59224100003;
-        Mon, 19 Aug 2019 16:38:01 +0000 (UTC)
-Message-ID: <5ff510e995cc0e97645c8dc9bb77a64c15886d9d.camel@hadess.net>
-Subject: Re: BT advertising packets and s2idle issue
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Mario.Limonciello@dell.com, ckellner@redhat.com,
-        linux-bluetooth@vger.kernel.org
-Date:   Mon, 19 Aug 2019 18:37:59 +0200
-In-Reply-To: <3d106f2c49514f4db2d418d8b7ad8b3e@AUSX13MPC101.AMER.DELL.COM>
-References: <87sgqoewqv.fsf@kellner.me>
-         <ccb1c793a9094d3d9cac1c63b695d5e5@AUSX13MPC105.AMER.DELL.COM>
-         <3d106f2c49514f4db2d418d8b7ad8b3e@AUSX13MPC101.AMER.DELL.COM>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Mon, 19 Aug 2019 13:04:35 -0400
+Received: from pps.filterd (m0170390.ppops.net [127.0.0.1])
+        by mx0a-00154904.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7JGxaS2003739;
+        Mon, 19 Aug 2019 13:04:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dell.com; h=from : to : cc :
+ subject : date : message-id; s=smtpout1;
+ bh=4TUNstILGMYHtvTWSxWfD1G0ak+h3mI3SMQK5Ban9Ww=;
+ b=EbjQsYx5otpksauPu4rGrqnavBLEoyvwNGYgoyO6lIir9RO6FFjeDNt9Lh+yWLgCa0ax
+ 9hXCY/O2B8jEJ1SkkVZf3LZVgJ4CQZnCm21RZ0s0zCbytGAYSj6onqPc1x7uvADh6enw
+ PjeeV0TNklOXDmFnd7h2Fm1JDWFbLV0AYnEyCSzBV4QGsYtJFfF8BuRbaRyNCOB7nNqp
+ jDbtFw056a5P3iruWJzzugZbZ7flANdBvLjwETBhdbGe8tCczmU1rKbIqa1YmkiZRTls
+ E3UpXBdnQXVYUPCdnjMZTH8sk973qkK+3g7+fWJSmuKzklPMcuV+Mx4wVfjZERRfkaQ8 1A== 
+Received: from mx0a-00154901.pphosted.com (mx0a-00154901.pphosted.com [67.231.149.39])
+        by mx0a-00154904.pphosted.com with ESMTP id 2uecn3ypr5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Aug 2019 13:04:33 -0400
+Received: from pps.filterd (m0142693.ppops.net [127.0.0.1])
+        by mx0a-00154901.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7JGwAu9087772;
+        Mon, 19 Aug 2019 13:04:33 -0400
+Received: from ausxippc101.us.dell.com (ausxippc101.us.dell.com [143.166.85.207])
+        by mx0a-00154901.pphosted.com with ESMTP id 2ufxkfs94c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 19 Aug 2019 13:04:33 -0400
+X-LoopCount0: from 10.173.37.27
+X-PREM-Routing: D-Outbound
+X-IronPort-AV: E=Sophos;i="5.60,346,1549951200"; 
+   d="scan'208";a="1287237318"
+From:   Mario Limonciello <mario.limonciello@dell.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Mario Limonciello <mario.limonciello@dell.com>,
+        Bastien Nocera <hadess@hadess.net>,
+        Christian Kellner <ckellner@redhat.com>,
+        Sukumar Ghorai <sukumar.ghorai@intel.com>
+Subject: [PATCH] Revert "Bluetooth: btusb: driver to enable the usb-wakeup feature"
+Date:   Mon, 19 Aug 2019 12:04:08 -0500
+Message-Id: <1566234248-13799-1-git-send-email-mario.limonciello@dell.com>
+X-Mailer: git-send-email 2.7.4
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-19_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=720 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908190180
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=849 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908190180
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 2019-08-19 at 13:37 +0000, Mario.Limonciello@dell.com wrote:
-> > 
-<snip>
-> Another approach to this may be to submit a revert to the kernel for
-> this commit:
-> https://github.com/torvalds/linux/commit/a0085f2510e8976614ad8f766b209448b385492f
-> until LE privacy support is in place.
-> 
-> This seems a regression to me that the system wakes up from any BLE
-> traffic after that commit.
+This reverts commit a0085f2510e8976614ad8f766b209448b385492f.
 
-You should send a revert and CC: the original author and committer on
-it, otherwise I'm afraid that it might not get traction.
+This commit has caused regressions in notebooks that support suspend
+to idle such as the XPS 9360, XPS 9370 and XPS 9380.
 
-Cheers
+These notebooks will wakeup from suspend to idle from an unsolicited
+advertising packet from an unpaired BLE device.
+
+In a bug report it was sugggested that this is caused by a generic
+lack of LE privacy support.  Revert this commit until that behavior
+can be avoided by the kernel.
+
+Fixes: a0085f2510e8 ("Bluetooth: btusb: driver to enable the usb-wakeup feature")
+BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=200039
+Link: https://marc.info/?l=linux-bluetooth&m=156441081612627&w=2
+Link: https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/750073/
+CC: Bastien Nocera <hadess@hadess.net>
+CC: Christian Kellner <ckellner@redhat.com>
+CC: Sukumar Ghorai <sukumar.ghorai@intel.com>
+Signed-off-by: Mario Limonciello <mario.limonciello@dell.com>
+---
+ drivers/bluetooth/btusb.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3876fee6..33c3873 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1170,10 +1170,6 @@ static int btusb_open(struct hci_dev *hdev)
+ 	}
+ 
+ 	data->intf->needs_remote_wakeup = 1;
+-	/* device specific wakeup source enabled and required for USB
+-	 * remote wakeup while host is suspended
+-	 */
+-	device_wakeup_enable(&data->udev->dev);
+ 
+ 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
+ 		goto done;
+@@ -1238,7 +1234,6 @@ static int btusb_close(struct hci_dev *hdev)
+ 		goto failed;
+ 
+ 	data->intf->needs_remote_wakeup = 0;
+-	device_wakeup_disable(&data->udev->dev);
+ 	usb_autopm_put_interface(data->intf);
+ 
+ failed:
+-- 
+2.7.4
 
