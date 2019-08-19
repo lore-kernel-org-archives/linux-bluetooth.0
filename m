@@ -2,173 +2,201 @@ Return-Path: <SRS0=9IM7=WP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D06C3A5A0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 13:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DB7C3A5A1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 13:58:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A25A20644
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 13:38:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0256B2064A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Aug 2019 13:58:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b="Rdur5d3y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r7U9KaOS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727503AbfHSNiK (ORCPT
+        id S1727769AbfHSN6Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Aug 2019 09:38:10 -0400
-Received: from mx0b-00154904.pphosted.com ([148.163.137.20]:30610 "EHLO
-        mx0b-00154904.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727332AbfHSNiJ (ORCPT
+        Mon, 19 Aug 2019 09:58:24 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:40542 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727368AbfHSN6X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Aug 2019 09:38:09 -0400
-Received: from pps.filterd (m0170397.ppops.net [127.0.0.1])
-        by mx0b-00154904.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7JDYcHZ026238
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Aug 2019 09:38:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dell.com; h=from : to : subject :
- date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=smtpout1;
- bh=mW7tY1YIYGcnxGhEB6HXrcrT8vomw4phmC10tGmZY58=;
- b=Rdur5d3yvwYyDrjhKJyeBbBD9NcbvlMv3mi3Jf4R7sLyTLwx71KksZprmuWLtvEovs8Z
- sp2IZDFpcOIp5YEZ4K2YjaS2reHJHQgUj9UcEDxvqZpsl5wAg/GkEH3orgk0h9/LYsJO
- Ft1Zg1Fw85SNdaXfdfGW5/zmpZw9+grEC3PJxeIdDBGZyIEqa0XTJV/TZ044tsEGpYMe
- eComWDBL1iXTVl4r/YqbJeND+IOPclshLx1TxnkoQgm+9GyDQtSEzZUHZjA2NNdKTLaS
- MEHb3qqAlJIdK7zNybgAG0Ab5taq5ne7H7c/ieTRDutCykYaSbbmbFUAEIzDh+SEI3+S cw== 
-Received: from mx0b-00154901.pphosted.com (mx0a-00154901.pphosted.com [67.231.149.39])
-        by mx0b-00154904.pphosted.com with ESMTP id 2ueanvxyfq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Aug 2019 09:38:08 -0400
-Received: from pps.filterd (m0090350.ppops.net [127.0.0.1])
-        by mx0b-00154901.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7JDbnR3118992
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Aug 2019 09:38:07 -0400
-Received: from ausxipps310.us.dell.com (AUSXIPPS310.us.dell.com [143.166.148.211])
-        by mx0b-00154901.pphosted.com with ESMTP id 2ufufk1cdk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Aug 2019 09:38:06 -0400
-X-LoopCount0: from 10.166.132.127
-X-PREM-Routing: D-Outbound
-X-IronPort-AV: E=Sophos;i="5.60,349,1549951200"; 
-   d="scan'208";a="410156939"
-From:   <Mario.Limonciello@dell.com>
-To:     <ckellner@redhat.com>, <linux-bluetooth@vger.kernel.org>
-Subject: RE: BT advertising packets and s2idle issue
-Thread-Topic: BT advertising packets and s2idle issue
-Thread-Index: AQHVRhqgVGNmeV2XRUeiYVQj/t6U86bwL+ZQgBJp84A=
-Date:   Mon, 19 Aug 2019 13:37:37 +0000
-Message-ID: <3d106f2c49514f4db2d418d8b7ad8b3e@AUSX13MPC101.AMER.DELL.COM>
-References: <87sgqoewqv.fsf@kellner.me>
- <ccb1c793a9094d3d9cac1c63b695d5e5@AUSX13MPC105.AMER.DELL.COM>
-In-Reply-To: <ccb1c793a9094d3d9cac1c63b695d5e5@AUSX13MPC105.AMER.DELL.COM>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_17cb76b2-10b8-4fe1-93d4-2202842406cd_Enabled=True;
- MSIP_Label_17cb76b2-10b8-4fe1-93d4-2202842406cd_SiteId=945c199a-83a2-4e80-9f8c-5a91be5752dd;
- MSIP_Label_17cb76b2-10b8-4fe1-93d4-2202842406cd_Owner=Mario_Limonciello@Dell.com;
- MSIP_Label_17cb76b2-10b8-4fe1-93d4-2202842406cd_SetDate=2019-08-07T20:43:15.5083913Z;
- MSIP_Label_17cb76b2-10b8-4fe1-93d4-2202842406cd_Name=External Public;
- MSIP_Label_17cb76b2-10b8-4fe1-93d4-2202842406cd_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_17cb76b2-10b8-4fe1-93d4-2202842406cd_Extended_MSFT_Method=Manual;
- aiplabel=External Public
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.143.18.86]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 19 Aug 2019 09:58:23 -0400
+Received: by mail-io1-f67.google.com with SMTP id t6so4440667ios.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Aug 2019 06:58:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=reply-to:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=2yK2NEcejpNMZgLFI4b9UPr2wkdggEi8MWE9K/djPC8=;
+        b=r7U9KaOSxN7sjCli/Yi+ax+ayvENKLL1aiXta2mc6kCN0WlvC+gqNhtHMwpKlvKLXi
+         dllckoy8Ek7PHsJ7PwGF6NX8WVMsUlsbJZu/ODxv1fQQlEIsHyHdlIK0Cwcdg8H+A57Q
+         W7ldEE9pbDG3ne3vHRYdNYSmGa9Yk2s7jHSQVy7l9bp/HBO2UVrb0g/b/Iu2jAigRLHy
+         cNqjdZv54tC4PK+n+J0LhSnNqDQefmuhMeAE3U0UooUirGnFX52QPXkSmK+GwgfNoZbR
+         pHQvri9k+lKEYl2SSAGFxGuTlGHrW7EWeKTtlzainGmUVMcfJzvnp+eM0L27Eyf3ipav
+         Id2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=2yK2NEcejpNMZgLFI4b9UPr2wkdggEi8MWE9K/djPC8=;
+        b=SQVOoJ1xdLEM/F0cN0u5MAGLJAnQ/lpFCiErr3oQ3zzFLrARvMbjd+4Ggwt/7E5UNp
+         QkLFSnY9CR65PhPVbMQuY35RO0uOJGyoktbKUG9I7j2h1tftIn9VKdiPlOyEana2+39/
+         reAWEkSVRDFPVkBAqiCqUy/y4iO0lAvu3pmLEbVBa9CD/bDD5T46vDeEXI+EucLW1D8B
+         H9dgAY7226yxpW/mh8HVF8SntMwj176KnIkJgch2GqWZFVBx+YN/leShP8RSJ32v4wYg
+         pWCCQZFIp7CQyZIfgJZYTCHdYIrCniC0m/p6MFdmJxa6kHMjju9jZa5lj64zpu+ZHKT1
+         /BGg==
+X-Gm-Message-State: APjAAAVzkbMoASNtrsVpmuHI/4YieihTUyi0TgaWi+xAUGVQoySUQPfj
+        6P3KGTBgcjRAshig/4+5neI=
+X-Google-Smtp-Source: APXvYqzv45JrZTgVPSWK1uuN1K/OJ+0AzVd5WDsy3QJLdqtYqZP1kx6rhfR35DT/h4FKigw1FBWmJg==
+X-Received: by 2002:a5e:9747:: with SMTP id h7mr10744936ioq.299.1566223101735;
+        Mon, 19 Aug 2019 06:58:21 -0700 (PDT)
+Received: from [10.1.1.187] ([8.39.228.178])
+        by smtp.gmail.com with ESMTPSA id e12sm33079682iob.66.2019.08.19.06.58.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 19 Aug 2019 06:58:20 -0700 (PDT)
+Reply-To: csonsino@gmail.com
+Subject: Re: [PATCH 1/1] bluetooth: validate BLE connection interval updates
+To:     Andreas Kemnade <andreas@kemnade.info>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+References: <f9176553-d4d5-c2e0-ecd7-937cac0d8098@gmail.com>
+ <138296C5-49FA-475D-9618-FC8D241B8823@holtmann.org>
+ <20190815104419.161177fa@kemnade.info>
+From:   Carey Sonsino <csonsino@gmail.com>
+Message-ID: <0cda8242-304e-a073-90d8-63e656e3600c@gmail.com>
+Date:   Mon, 19 Aug 2019 07:58:19 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-19_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908190155
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908190155
+In-Reply-To: <20190815104419.161177fa@kemnade.info>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-> -----Original Message-----
-> From: Limonciello, Mario
-> Sent: Wednesday, August 7, 2019 3:43 PM
-> To: 'Christian Kellner'; linux-bluetooth@vger.kernel.org
-> Subject: RE: BT advertising packets and s2idle issue
->=20
-> > -----Original Message-----
-> > From: Christian Kellner <ckellner@redhat.com>
-> > Sent: Monday, July 29, 2019 9:33 AM
-> > To: linux-bluetooth@vger.kernel.org
-> > Cc: Limonciello, Mario
-> > Subject: BT advertising packets and s2idle issue
-> >
-> >
-> > [EXTERNAL EMAIL]
-> >
-> >
-> > Hi all,
-> >
-> > I have been wondering what to do about the bug that advertising packet
-> > will wake systems from s2idle when a device was previously paired with
-> > the HCI_AUTO_CONN_ALWAYS flag (kernel bug #200039[1]). I was thinking o=
-f
-> > creating a patch for bluez that would create a "delay lock"[2] and
-> > de-register any such device from the kernel before entering s2idle, but
-> > I wanted to check first if that is the best approach.
-> > In comment #27 it is suggested that using a "LE Privacy v1.2" feature
-> > could fix the issue as well. Is there some more information about this
-> > available somewhere?  II can help out with development and testing as I
-> > have an affected system myself.
-> >
-> > Cheers,
-> > CK
-> >
-> > [1] https://bugzilla.kernel.org/show_bug.cgi?id=3D200039
-> > [2] https://www.freedesktop.org/wiki/Software/systemd/inhibit/
-> >
-> > --
-> > Dr. Christian J. Kellner
-> > Desktop Hardware Enablement
-> > Red Hat
->=20
-> If I'm not mistaken, even unpaired LE devices can cause the wakeup.  Any =
-device
-> with an advertisement report will cause the wakeup.  So de-registering al=
-l devices
-> from kernel before entering s2idle wouldn't solve the problem.
->=20
-> My opinion is there should be a dedicated kernel freeze handler that does=
- the
-> following:
-> 1) If LE Privacy 1.2 "in use", handle regular suspend/resume flow
-> 2) If LE Privacy 1.1in use, power off the radio in freeze, power back on =
-in resume.
->=20
-> For now, since LE privacy 1.2 not yet enabled, this would at least help w=
-ith this
-> situation as reported.
->=20
-> Of course this will mean BT devices can't wake the system anymore if s2i,=
- so
-> maybe
-> the behavior  should be put behind a module parameter or sysfs file.
->=20
-> BLE devices are so prevalent though; I find it a hard time imagining anyo=
-ne wants
-> it
-> the way it exists today.
+This seems like the exact "downside" situation that I described in the 
+patch writeup.
 
-Another approach to this may be to submit a revert to the kernel for this c=
-ommit:
-https://github.com/torvalds/linux/commit/a0085f2510e8976614ad8f766b209448b3=
-85492f
-until LE privacy support is in place.
+I would still claim that as a Linux system administrator, I should have 
+control over my system.  If I am operating in a low power environment, I 
+do not want to allow a remote device to apply a setting which causes me 
+to use more power without any say in the matter.
 
-This seems a regression to me that the system wakes up from any BLE traffic=
- after that commit.
+The connection min/max interval settings are configuration options that 
+control how my bluetooth device operates.  Why are these down in debugfs 
+anyway?  I think that a much more appropriate fix would be to migrate 
+some of the BLE configuration options to sysconfdir (some place like 
+/etc/bluetooth/ble.conf).  That would also help in the persistence of 
+these configuration settings, which is kind of a pain with the debugfs 
+mechanism that gets wiped out and recreated on bootup.
+
+A quicker fix would be to simply set the default connection min interval 
+and connection max interval values to the full range (6, 3200).  I 
+*think* that this could be done by simply updating the values in 
+hci_core.c, the hci_alloc_dev() function:
+
+     hdev->le_conn_min_interval = 0x0018;
+     hdev->le_conn_max_interval = 0x0028;
+
+would become:
+
+     hdev->le_conn_min_interval = 0x0006;
+     hdev->le_conn_max_interval = 0x0c80;
+
+This should allow all devices to negotiate whatever connection interval 
+they want by default.  If I'm running on a device with debugfs (which I 
+happen to be most of the time), then I can still override these defaults 
+to control my system.
+
+Please let me know if you would like me to do any further work towards 
+resolving this issue.  I'd be happy to test and submit a patch that 
+changes the default connection min/max interval values- I could probably 
+get that done in the next day or two.  If you would like me to 
+investigate migrating configuration settings to /etc then I'd be happy 
+to do that as well, but it might take a bit more effort and time.
+
+Regards,
+
+Carey
+
+
+On 8/15/19 2:44 AM, Andreas Kemnade wrote:
+> On Sat, 6 Jul 2019 15:34:34 +0200
+> Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+>> Hi Carey,
+>>
+>>> Problem: The Linux bluetooth stack yields complete control over the BLE
+>>> connection interval to the remote device.
+>>>
+>>> The Linux bluetooth stack provides access to the BLE connection interval
+>>> min and max values through /sys/kernel/debug/bluetooth/hci0/
+>>> conn_min_interval and /sys/kernel/debug/bluetooth/hci0/conn_max_interval.
+>>> These values are used for initial BLE connections, but the remote device
+>>> has the ability to request a connection parameter update. In the event
+>>> that the remote side requests to change the connection interval, the Linux
+>>> kernel currently only validates that the desired value is within the
+>>> acceptable range in the bluetooth specification (6 - 3200, corresponding to
+>>> 7.5ms - 4000ms). There is currently no validation that the desired value
+>>> requested by the remote device is within the min/max limits specified in
+>>> the conn_min_interval/conn_max_interval configurations. This essentially
+>>> leads to Linux yielding complete control over the connection interval to
+>>> the remote device.
+>>>
+>>> The proposed patch adds a verification step to the connection parameter
+>>> update mechanism, ensuring that the desired value is within the min/max
+>>> bounds of the current connection. If the desired value is outside of the
+>>> current connection min/max values, then the connection parameter update
+>>> request is rejected and the negative response is returned to the remote
+>>> device. Recall that the initial connection is established using the local
+>>> conn_min_interval/conn_max_interval values, so this allows the Linux
+>>> administrator to retain control over the BLE connection interval.
+>>>
+>>> The one downside that I see is that the current default Linux values for
+>>> conn_min_interval and conn_max_interval typically correspond to 30ms and
+>>> 50ms respectively. If this change were accepted, then it is feasible that
+>>> some devices would no longer be able to negotiate to their desired
+>>> connection interval values. This might be remedied by setting the default
+>>> Linux conn_min_interval and conn_max_interval values to the widest
+>>> supported range (6 - 3200 / 7.5ms - 4000ms). This could lead to the same
+>>> behavior as the current implementation, where the remote device could
+>>> request to change the connection interval value to any value that is
+>>> permitted by the bluetooth specification, and Linux would accept the
+>>> desired value.
+>>>
+>>> Signed-off-by: Carey Sonsino <csonsino@gmail.com>
+>> patch has been applied to bluetooth-next tree.
+>>
+> There are devices which require low connection intervals for usable operation,
+> e.g. BLE smartcard readers. having 30ms instead of 7.5ms means speed four times
+> lower.
+>
+> Other devices might want to set the connection interval  to high values to save
+> power.
+>
+> So if the device is not allowed to set the connection interval to such values,
+> how should the driver sitting on top of the gatt dbus interface of bluetoothd
+> set such things?
+>
+> The debugfs nodes are not necessarily available in distro kernels. Anything
+> sitting on top of gatt dbus interface does not have access to the connection handle
+> and cannot call hci_le_conn_update() to set things to nice values.
+>
+> Using l2cap sockets instead of the dbus gatt interface is also not a viable altenative
+> because it interferes with bluetoothd.
+>
+> So IMHO this patch causes regressions and should be reverted.
+>
+> Sorry for stepping out this late.
+>
+> Regards,
+> Andreas
+
+
