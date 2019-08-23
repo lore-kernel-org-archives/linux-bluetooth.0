@@ -2,31 +2,32 @@ Return-Path: <SRS0=uRBT=WT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48425C3A5A2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Aug 2019 10:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6496C3A5A4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Aug 2019 10:32:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12559206E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Aug 2019 10:32:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A432B233A0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Aug 2019 10:32:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=megous.com header.i=@megous.com header.b="CLBm2jf8"
+	dkim=pass (1024-bit key) header.d=megous.com header.i=@megous.com header.b="L/60kFSD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404975AbfHWKbt (ORCPT
+        id S2405270AbfHWKcS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Aug 2019 06:31:49 -0400
-Received: from vps.xff.cz ([195.181.215.36]:52622 "EHLO vps.xff.cz"
+        Fri, 23 Aug 2019 06:32:18 -0400
+Received: from vps.xff.cz ([195.181.215.36]:52650 "EHLO vps.xff.cz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733308AbfHWKbr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Aug 2019 06:31:47 -0400
+        id S2390768AbfHWKbs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 23 Aug 2019 06:31:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
-        t=1566556306; bh=yUYphsfGd/2aYDGopZa37BQyG22wCozSNaBWz/Gf3VA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=CLBm2jf8h4JtgS5SxCdnyB2k5v8MbkLorcykkkZZPMcfFyOYh8pAvI9yMkkJw4NGU
-         mqsWw8GoynR+GBSYaUVHdBRcRQwBvHHLND7+NgL963Bh7n32Mzfe2iyE4G9Whqdn+/
-         +M3v7tWKaN4Xieu16idwAgjEUyowSPLPrarww1V4=
+        t=1566556306; bh=67uddpb2R7BIS7IqV2fjba5xXtiX29M8NMIbKWrD2kc=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=L/60kFSD7WwXS9H7E3DLRI81r0aV18fY7q8fmCWGjkj3oIRQd/hoiqF95/m22WbX+
+         AZq3WKhSwX1Qk9EDEh/UojmpdEkVAuMPiRsANDRdCw+lqBUoiQT+2BgPxDI3gZy2bp
+         h4w2bCxkYUOfuL6klEKvWsE7u8o6gfzXrQpaCy5A=
 From:   megous@megous.com
 To:     Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
         Rob Herring <robh+dt@kernel.org>,
@@ -37,9 +38,11 @@ Cc:     Mark Rutland <mark.rutland@arm.com>,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>
-Subject: [RESEND PATCH 0/5] Add bluetooth support for Orange Pi 3
-Date:   Fri, 23 Aug 2019 12:31:34 +0200
-Message-Id: <20190823103139.17687-1-megous@megous.com>
+Subject: [RESEND PATCH 2/5] bluetooth: bcm: Add support for loading firmware for BCM4345C5
+Date:   Fri, 23 Aug 2019 12:31:36 +0200
+Message-Id: <20190823103139.17687-3-megous@megous.com>
+In-Reply-To: <20190823103139.17687-1-megous@megous.com>
+References: <20190823103139.17687-1-megous@megous.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -49,38 +52,56 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Ondrej Jirman <megous@megous.com>
 
-(Resend to add missing lists, sorry for the noise.)
+Detect BCM4345C5 and load a corresponding firmware file.
 
-This series implements bluetooth support for Xunlong Orange Pi 3 board.
+Signed-off-by: Ondrej Jirman <megous@megous.com>
+---
+Checkpatch reports a spurious error.
 
-The board uses AP6256 WiFi/BT 5.0 chip.
+ drivers/bluetooth/btbcm.c   | 3 +++
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 2 files changed, 4 insertions(+)
 
-Summary of changes:
-
-- add more delay to let initialize the chip
-- let the kernel detect firmware file path
-- add new compatible and update dt-bindings
-- update Orange Pi 3 / H6 DTS
-
-Please take a look.
-
-thank you and regards,
-  Ondrej Jirman
-
-Ondrej Jirman (5):
-  dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
-  bluetooth: bcm: Add support for loading firmware for BCM4345C5
-  bluetooth: hci_bcm: Give more time to come out of reset
-  arm64: dts: allwinner: h6: Add pin configs for uart1
-  arm64: dts: allwinner: orange-pi-3: Enable UART1 / Bluetooth
-
- .../bindings/net/broadcom-bluetooth.txt       |  1 +
- .../dts/allwinner/sun50i-h6-orangepi-3.dts    | 19 +++++++++++++++++++
- arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 10 ++++++++++
- drivers/bluetooth/btbcm.c                     |  3 +++
- drivers/bluetooth/hci_bcm.c                   |  3 ++-
- 5 files changed, 35 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 124ef0a3e1dd..2d2e6d862068 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -23,6 +23,7 @@
+ #define BDADDR_BCM43430A0 (&(bdaddr_t) {{0xac, 0x1f, 0x12, 0xa0, 0x43, 0x43}})
+ #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
+ #define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
++#define BDADDR_BCM4345C5 (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0xc5, 0x45, 0x43}})
+ #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
+ 
+ int btbcm_check_bdaddr(struct hci_dev *hdev)
+@@ -73,6 +74,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM2076B1) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+ 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+@@ -332,6 +334,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
+ 	{ 0x2122, "BCM4343A0"	},	/* 001.001.034 */
+ 	{ 0x2209, "BCM43430A1"  },	/* 001.002.009 */
+ 	{ 0x6119, "BCM4345C0"	},	/* 003.001.025 */
++	{ 0x6606, "BCM4345C5"	},	/* 003.006.006 */
+ 	{ 0x230f, "BCM4356A2"	},	/* 001.003.015 */
+ 	{ 0x220e, "BCM20702A1"  },	/* 001.002.014 */
+ 	{ 0x4217, "BCM4329B1"   },	/* 002.002.023 */
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 4d9de20bab7b..95c312ae94cf 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1419,6 +1419,7 @@ static void bcm_serdev_remove(struct serdev_device *serdev)
+ #ifdef CONFIG_OF
+ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm20702a1" },
++	{ .compatible = "brcm,bcm4345c5" },
+ 	{ .compatible = "brcm,bcm4330-bt" },
+ 	{ .compatible = "brcm,bcm43438-bt" },
+ 	{ },
 -- 
 2.23.0
 
