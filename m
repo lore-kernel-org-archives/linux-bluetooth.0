@@ -1,169 +1,124 @@
-Return-Path: <SRS0=uRBT=WT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=PESP=WW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E0AC3A5A2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Aug 2019 17:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D14DEC3A5A6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Aug 2019 12:06:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A7C720850
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Aug 2019 17:50:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A563F21881
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Aug 2019 12:06:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mAjryWWp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uYykanSv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404579AbfHWRu2 (ORCPT
+        id S1731060AbfHZMGX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Aug 2019 13:50:28 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:34161 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726779AbfHWRu1 (ORCPT
+        Mon, 26 Aug 2019 08:06:23 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40462 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731208AbfHZMGT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Aug 2019 13:50:27 -0400
-Received: by mail-io1-f68.google.com with SMTP id s21so22061697ioa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Aug 2019 10:50:27 -0700 (PDT)
+        Mon, 26 Aug 2019 08:06:19 -0400
+Received: by mail-wm1-f67.google.com with SMTP id c5so15384391wmb.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2019 05:06:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=reply-to:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=JusjIKfneT/PNqU+0Q/IZqEmKuoVKkvstBuxtJXwDZc=;
-        b=mAjryWWp9gEIxFroP4Uo8OF62F76ngVsgd2wwiwc1Y7eYOLkwv+TVYTLW2uewNZma1
-         aH0wZ7XNjtnRMPpMjIvLYIXI/hyiXN81Cuikz6kGcxZIAMEceKMbp1T77BzXTmcUgxUK
-         GsTwynB8l8KjBufnLv+/UMNU0IkqpAwJ8Hgy7w0pIisPYH4iku6JuUi/WS/5cXi9SzHx
-         vSjng4zuo3nlzaAKh/7pTgMRJx/BADx36oWDsuJW+O8hXNr2ZeR7/e0Bmr7LTm/UpMUL
-         Ln8OdIq2AAYmGskFkK2pveHOJRZcb6G7vu7wMvM4JYFK5sMjcv1vjKd7VXTOhys1Lbdx
-         HrYA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JQcKkNiJdQMqBVQSQobnRS74DuuSkOIfJDwvEN2rbRo=;
+        b=uYykanSvrtJpx8iAJVbFquuxC6ZTS9UDJzXTfVAvGiexVlbcqjeI/e30uZRbMgANIc
+         FrLdCwi8t4fBtzceCQORoRzZMi6FGr3naxcSm0xqkMS2GFKat88hSbIdtppjTeF8kBex
+         W6RaViOGd+NsCfmYFUi0kx4RsYuCdfUDzOev7yVCFKC7ajTpbmjhDL2qHmrvygmd2uDt
+         olFWrasoXwDnWl+6OlmSFnqdwtCfdfOKd30297ylREVkf/QRLvIkn5Rn/LiGyAPTykiO
+         ZOQ8SR42JJclBz4NZt5Vyz4cLrV7gO4HEfwozjEvACs7MSkpmmjrsqipRFvdavdUXQ81
+         8UzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:subject:to:cc:references:from
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-transfer-encoding:content-language;
-        bh=JusjIKfneT/PNqU+0Q/IZqEmKuoVKkvstBuxtJXwDZc=;
-        b=rQpVUmeHwjjHIGsjDkHI8w3jYXY++pi0DVSQ7NyNXQZhwnWtsJcYU3V6/2Pex92tnc
-         prR5UEEP6CZr/BWUYeUlSDWUzXM8oRLD1dYvT7LYQgO1OEzULHhdB/p3a+OPxsJGR9hr
-         n4OdeB3UQoSUQUNEvr2zYTWbcpqWWjLIY8nJ5gmSsal4bx1k5ydp/MLy16YHU7krMXjG
-         +nyz0AT5tuJpkW94b4MrLOJZ9iGWaUjBg4chK8jV5b7jfozJG9fAqcWILPKEQfCADpoe
-         xqjojTHb8FYXWz+onX1mVorodDOv4+OOVJqSzBy0/3lk2M1/NO+eiCMlMlB9ouhFVD5A
-         w1QA==
-X-Gm-Message-State: APjAAAVwDBpHuqnKLp98eOQPRxTGIvB8KzgFWXssdFCBgBN84JRh0xJe
-        h9E1URe4HwY1gk9fz4A/PZBShidV
-X-Google-Smtp-Source: APXvYqxqK46sJ58jD9q29VG1m10o+VgiuPEU9O7ZUTAZcHuCrmyjEuMFqn+3BJG3cNgeXWqbHhb53g==
-X-Received: by 2002:a5e:c311:: with SMTP id a17mr576684iok.140.1566582626631;
-        Fri, 23 Aug 2019 10:50:26 -0700 (PDT)
-Received: from [10.1.1.187] ([8.39.228.178])
-        by smtp.gmail.com with ESMTPSA id y25sm5603438iol.59.2019.08.23.10.50.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Aug 2019 10:50:25 -0700 (PDT)
-Reply-To: Carey Sonsino <csonsino@gmail.com>
-Subject: Re: [PATCH 1/1] bluetooth: update default BLE connection interval
- bounds
-To:     Andreas Kemnade <andreas@kemnade.info>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <1c707bb9-999b-7ca3-3c91-7b183dacfdd5@gmail.com>
- <20190823154559.1f203fac@aktux>
-From:   Carey Sonsino <csonsino@gmail.com>
-Message-ID: <f5976cc8-736f-74d7-a8ec-c5a860e89ae0@gmail.com>
-Date:   Fri, 23 Aug 2019 11:50:24 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JQcKkNiJdQMqBVQSQobnRS74DuuSkOIfJDwvEN2rbRo=;
+        b=Z0na/zSkYuayeLOyWxGtzxL2Jv+U4DtUuimGkaC79ak6Kx+vKSx+BZhmyrhuVycFcD
+         2yfuCuq9KXSq9O1DyZ/j2jhpcNwrJPk6g0XTAZ70VpYHl1W7SRhKal/e2fA+vC1e/x8p
+         Ei8aADxTfwZ3UcX3Bwe5yIiVL2pSwbmx2AzwxlT5LKZx1MxBg1mGGEvm9aP5khOrf30a
+         BHtB2t4hTqgRstA68b7nY6Euk4GPj8DcGTx+E2CWh65VVadgD7L2lOuOdOBAwinDZYzB
+         LpZbkiFHDOVPGkxzrB+YW/9MJ3dkeMYBVb6FTsfRpa1136tme9VuuY547UYRn8C5OznD
+         lGvw==
+X-Gm-Message-State: APjAAAUy/OUeGZWT99aE/MUDW7LJLKRKNfiKjxPaUZs/sNhBHOQbwKYK
+        JTSTWKDQJ+R/EcJEqtvJZ02rvxSo
+X-Google-Smtp-Source: APXvYqyelUlGn+EPI8BroTpJG/a9s1ZcMyNPj2IpxwEe8qpLPKyUagSwq+ZNza9bKBJgVuNsa/B4fQ==
+X-Received: by 2002:a1c:7619:: with SMTP id r25mr21891697wmc.153.1566821176606;
+        Mon, 26 Aug 2019 05:06:16 -0700 (PDT)
+Received: from localhost.localdomain ([192.198.151.62])
+        by smtp.gmail.com with ESMTPSA id l5sm9909055wmj.4.2019.08.26.05.06.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Aug 2019 05:06:15 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/gatt-client: Automatically add CCC when discovering
+Date:   Mon, 26 Aug 2019 15:06:13 +0300
+Message-Id: <20190826120613.23233-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20190823154559.1f203fac@aktux>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Well that is certainly a problem. According to the bluetooth core spec 
-(5.1), section 4.5.2 Supervision timeout:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-     The connSupervisionTimeout shall be a multiple of 10 ms in the 
-range of 100 ms to 32.0 s and it shall be larger than (1 + 
-connSlaveLatency ) * connInterval * 2.
+The spec mandates that a CCC exists if either notify or indicate
+property is marked:
 
-So in theory that value should be able to go up to 3200 (ms * the 10ms 
-multiple = 32000ms).  I see that le_supv_timeout is set to 0x2a (42 
-*10ms = 420ms) so that explains the value in the error you're seeing, 
-but I'm not sure what effect it would have to set the value to 0xc80 
-(3200) -- kind of seems like a bad idea.  I haven't played around with 
-the supervision timeout, and I'm not sure if 
-le_supv_timeout/supervision_timeout specifies the exact value to use or 
-if it's a maximum and the actual value is calculated based upon the 
-negotiated connection interval and slave latency as shown above.
+BLUETOOTH CORE SPECIFICATION Version 5.1 | Vol 3, Part G page 2357
 
-Will have to look into that and the other issues with the patch (commit 
-message length & tabs).
+  "If set, the Client Characteristic Configuration Descriptor shall
+  exist."
+---
+ src/shared/gatt-client.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-Carey
-
-On 8/23/19 7:45 AM, Andreas Kemnade wrote:
-> Hi,
->
-> On Tue, 20 Aug 2019 11:01:41 -0600
-> Carey Sonsino <csonsino@gmail.com> wrote:
->
->> Update the default BLE connection interval min/max bounds to the full
->> range of permitted values (6-3200, corresponding to 7.25-4000ms).
->>
->> Commit c49a8682fc5d298d44e8d911f4fa14690ea9485e introduced a bounds
->> check on connection interval update requests, but the default min/max
->> values were left at 24-40 (30-50ms) which caused problems for devices
->> that want to negotiate connection intervals outside of those bounds.
->>
->> Setting the default min/max connection interval to the full allowable
->> range in the bluetooth specification restores the default Linux behavior
->> of allowing remote devices to negotiate their desired connection
->> interval, while still permitting the system administrator to later
->> narrow the range.
->>
->> Fixes c49a8682fc5d: (validate BLE connection interval updates)
->>
-> Trying pair XX:XX:XX:XX:XX:XX in bluetoothctl
-> leads to create connection commands containing
-> le_conn_max_interval > le_supv_timeout (4000ms > 420ms) which the
-> controller does not like and is imho not allowed.
->
-> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->      bdaddr XX:XX:XX:XX:XX:XX type 0
->      interval 96 window 96 initiator_filter 0
->      own_bdaddr_type 0 min_interval 6 max_interval 3200
->      latency 0 supervision_to 42 min_ce 0 max_ce 0
->> HCI Event: Command Status (0x0f) plen 4
->      LE Create Connection (0x08|0x000d) status 0x12 ncmd 1
->      Error: Invalid HCI Command Parameters
->
->
->> Signed-off-by: Carey Sonsino <csonsino@gmail.com>
->>
->> ---
->>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 04bc79359a17..f4f2f712c527 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -3181,8 +3181,8 @@ struct hci_dev *hci_alloc_dev(void)
->>        hdev->le_adv_max_interval = 0x0800;
->>        hdev->le_scan_interval = 0x0060;
->>        hdev->le_scan_window = 0x0030;
->> -    hdev->le_conn_min_interval = 0x0018;
->> -    hdev->le_conn_max_interval = 0x0028;
->> +    hdev->le_conn_min_interval = 0x0006;
->> +    hdev->le_conn_max_interval = 0x0c80;
->>        hdev->le_conn_latency = 0x0000;
->>        hdev->le_supv_timeout = 0x002a;
->>        hdev->le_def_tx_len = 0x001b;
-> hmm, what happened with the tabs here? I needed to manually apply it.
->
-> Regards,
-> Andreas
->
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 225915d43..38a416ed3 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -659,6 +659,31 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+ 
+ 		desc_start = chrc_data->value_handle + 1;
+ 
++		if (desc_start == chrc_data->end_handle &&
++			(chrc_data->properties & BT_GATT_CHRC_PROP_NOTIFY ||
++			 chrc_data->properties & BT_GATT_CHRC_PROP_INDICATE)) {
++			bt_uuid_t ccc_uuid;
++
++			/* If there is only one descriptor that must be the CCC
++			 * in case either notify or indicate are supported.
++			 */
++			bt_uuid16_create(&ccc_uuid,
++					GATT_CLIENT_CHARAC_CFG_UUID);
++			attr = gatt_db_insert_descriptor(client->db, desc_start,
++							&ccc_uuid, 0, NULL,
++							NULL, NULL);
++			if (attr) {
++				free(chrc_data);
++				continue;
++			}
++		}
++
++		/* Check if the start range is within characteristic range */
++		if (desc_start > chrc_data->end_handle) {
++			free(chrc_data);
++			continue;
++		}
++
+ 		client->discovery_req = bt_gatt_discover_descriptors(
+ 							client->att, desc_start,
+ 							chrc_data->end_handle,
+-- 
+2.21.0
 
