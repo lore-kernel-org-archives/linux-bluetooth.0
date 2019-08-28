@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C66E1C3A5A1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Aug 2019 16:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1015C3A5A4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Aug 2019 17:34:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C8BF208CB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Aug 2019 16:45:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE8D022CF8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Aug 2019 17:34:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726541AbfH1Qpr (ORCPT
+        id S1726711AbfH1Rer (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Aug 2019 12:45:47 -0400
-Received: from mga12.intel.com ([192.55.52.136]:12059 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726513AbfH1Qpr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Aug 2019 12:45:47 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Aug 2019 09:45:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,441,1559545200"; 
-   d="scan'208";a="171602343"
-Received: from orsmsx107.amr.corp.intel.com ([10.22.240.5])
-  by orsmga007.jf.intel.com with ESMTP; 28 Aug 2019 09:45:46 -0700
-Received: from orsmsx123.amr.corp.intel.com (10.22.240.116) by
- ORSMSX107.amr.corp.intel.com (10.22.240.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 28 Aug 2019 09:45:46 -0700
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.221]) by
- ORSMSX123.amr.corp.intel.com ([169.254.1.98]) with mapi id 14.03.0439.000;
- Wed, 28 Aug 2019 09:45:46 -0700
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v2 0/2] mesh: Implement org.bluez.mesh.Node1
- properties
-Thread-Topic: [PATCH BlueZ v2 0/2] mesh: Implement org.bluez.mesh.Node1
- properties
-Thread-Index: AQHVXXWZZGPWv+yQQEG18MUcMA9J+KcROoCA
-Date:   Wed, 28 Aug 2019 16:45:45 +0000
-Message-ID: <a0019b324df26f3083e7f545b1ba32eaee2701d5.camel@intel.com>
-References: <20190828075230.21594-1-michal.lowas-rzechonek@silvair.com>
-In-Reply-To: <20190828075230.21594-1-michal.lowas-rzechonek@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.254.35.27]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8606E1C11C282E4E8D703648C9AC15D3@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 28 Aug 2019 13:34:47 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:51167 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726515AbfH1Rer (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 28 Aug 2019 13:34:47 -0400
+Received: from mail-io1-f70.google.com ([209.85.166.70])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <dan.streetman@canonical.com>)
+        id 1i31qH-0004QI-4s
+        for linux-bluetooth@vger.kernel.org; Wed, 28 Aug 2019 17:34:45 +0000
+Received: by mail-io1-f70.google.com with SMTP id h7so520338ioj.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2019 10:34:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=JDO/ZAWmDwqlIFQKgZ7irqNQBWEkXm9mnlvbokZ/EUI=;
+        b=ifoCjQdx1bK/qwCdPDbxKI+9K19Lr9vQCbUYwtKue5JRasXsiXPSDxa8dnRRzwIEFT
+         OVL6CEEAiX4xUq7Au7x6hdBfVu7a9dHzz+U1p7hTbrvvZ7GcCDDbbN904G+1e9apSyhX
+         uM0alboy0PsOId95RCYwCPEVq9fjDHeEKf/imi+4i1FhZQfwp/tXBoBfy3NsbNrtQQR2
+         xce8/jSYF3lptTkPx7r6JX1ooXgQgFH63N+teTETTNJrIGdXiMD6kWMXHxMcxhzQ0ZDh
+         S3GI+3+lTejp7TwTqqu/3gOnFPn0HeCoK1HbiAu1GcfzkvOg3R7z3EUrLqssBF8Vm0Mo
+         3KbA==
+X-Gm-Message-State: APjAAAW9TzFW5ZMrvYkOWwAqMmTB8e0/4TXnTh1ko3NBChgvQ+1hZGMm
+        ez9v9SmCajf7wzIQVZ6ODYLFepCh+xEtEDY4J7NryqduvzEwqBgkv7oxRx0r3f4NrnfT+o5Rsdo
+        G2u6D3I2wGSjBxbuJVhv6eWJFHLxIF7ZVpme7T9sI/+sTSzVulnUZhNvFugCQVg==
+X-Received: by 2002:a5e:a80f:: with SMTP id c15mr2335633ioa.270.1567013683895;
+        Wed, 28 Aug 2019 10:34:43 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwReRHDJzBqbcjCQ9ykmP4NTlw5EHtIzg+irqu6rpg7RNmmuhDExVR/uYQLTliuqctvbpgIOdsecvTgW7hQ7aY=
+X-Received: by 2002:a5e:a80f:: with SMTP id c15mr2335603ioa.270.1567013683665;
+ Wed, 28 Aug 2019 10:34:43 -0700 (PDT)
 MIME-Version: 1.0
+From:   Dan Streetman <dan.streetman@canonical.com>
+Date:   Wed, 28 Aug 2019 13:34:07 -0400
+Message-ID: <CAOZ2QJOZStRYa=5fyod_AEJcJQw90_yX40dPYY3Dhvfso1e=RA@mail.gmail.com>
+Subject: Follow up on hid2hci: Fix udev rules for linux-4.14+
+To:     linux-bluetooth@vger.kernel.org, ville.syrjala@linux.intel.com
+Cc:     Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Kay Sievers <kay.sievers@vrfy.org>,
+        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KDQpPbiBXZWQsIDIwMTktMDgtMjggYXQgMDk6NTIgKzAyMDAsIE1pY2hhxYIgTG93
-YXMtUnplY2hvbmVrIHdyb3RlOg0KPiBUaGlzIHBhdGNoLXNldCBpbXBsZW1lbnRzIHByZXZpb3Vz
-bHkgZGVmaW5lZCBwcm9wZXJ0aWVzIG9uIE5vZGUxDQo+IGludGVyZmFjZSBhbmQgYWRkcyBhbiBh
-ZGRpdGlvbmFsIHJlYWQtb25seSBwcm9wZXJ0eSB3aXRoIGxpc3Qgb2YgdW5pY2FzdA0KPiBhZGRy
-ZXNzZXMgY2xhaW1lZCBieSB0aGUgbm9kZS4NCj4gDQo+IE1pY2hhxYIgTG93YXMtUnplY2hvbmVr
-ICgyKToNCj4gICBtZXNoOiBJbXBsZW1lbnQgcHJvcGVydGllcyBvbiBvcmcuYmx1ZXoubWVzaC5O
-b2RlMSBpbnRlcmZhY2UNCj4gICBtZXNoOiBBZGQgb3JnLmJsdWV6Lm1lc2guTm9kZTEuQWRkcmVz
-c2VzIHByb3BlcnR5DQo+IA0KPiAgZG9jL21lc2gtYXBpLnR4dCB8ICAgNCArKw0KPiAgbWVzaC9u
-ZXQuYyAgICAgICB8ICAgNCArKw0KPiAgbWVzaC9uZXQuaCAgICAgICB8ICAgMSArDQo+ICBtZXNo
-L25vZGUuYyAgICAgIHwgMTI5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKystDQo+ICA0IGZpbGVzIGNoYW5nZWQsIDEzNyBpbnNlcnRpb25zKCspLCAxIGRlbGV0
-aW9uKC0pDQo+IA0K
+It looks like this patch got lost at some point:
+https://lore.kernel.org/patchwork/patch/902126/#1138115
+
+but it seems to still be a problem and I'd like to pull it into Ubuntu:
+https://bugs.launchpad.net/ubuntu/+source/bluez/+bug/1759836
+
+Ville, did you ever follow up with a v2 for that patch and/or do you
+know if it will be accepted soon?
