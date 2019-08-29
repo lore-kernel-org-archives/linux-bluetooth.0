@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2427EC3A59F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5634C3A5A6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:21:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E51042166E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:19:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91CBC2339E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:21:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567102782;
-	bh=kYBIYi0EgYgnvb+nZ/NT0lsk7oySlc+EQDfS2wuGHoc=;
+	s=default; t=1567102860;
+	bh=JxVNULd1CA1rsypPdOENJE1D+WISPcOAWfG98oKxSiI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pDJRG1Qxw8s1drxK0rCFwW4NfwgapxofbG0A+e5rnNOb0HP9sYtIH2ztsSJ3dtCse
-	 RfeXI9Nynh/yhcn2EXqypiHeTXP5AdhOZjSkqF2ZcIb1BkzSJNaEykYTdqvxpmNiQC
-	 7BK7KkjSOHhoLmHXHPkT6708uKvd5vQoBpAa2CjY=
+	b=l1x3UOGwP8/3XlJVpwE84RAXP4zrf2QZGuLXvQrNWUkovq5RwCKQ7zarbQ3XtkKN+
+	 Q+to2aOcatv9N4j7TKQJFkMmcQrt552v7LZktHsyQA2JEQEfOHrBQT3uAEG3WpgFCr
+	 qd7Y6IhowhGA0mwugJv6SbogwR8XAR/JfWWxcCEU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729535AbfH2STh (ORCPT
+        id S1730158AbfH2SRn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Aug 2019 14:19:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60370 "EHLO mail.kernel.org"
+        Thu, 29 Aug 2019 14:17:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59924 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728752AbfH2SSH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Aug 2019 14:18:07 -0400
+        id S1729311AbfH2SRn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 29 Aug 2019 14:17:43 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B2B20233FF;
-        Thu, 29 Aug 2019 18:18:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C17692189D;
+        Thu, 29 Aug 2019 18:17:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567102686;
-        bh=kYBIYi0EgYgnvb+nZ/NT0lsk7oySlc+EQDfS2wuGHoc=;
+        s=default; t=1567102662;
+        bh=JxVNULd1CA1rsypPdOENJE1D+WISPcOAWfG98oKxSiI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jni8shvrzjenX6CkvvakE7FAg3NKyXzqPcHQRzJQCw57pGhJTh1Blv9DOxl6003/s
-         moowR9KouQZnIUkC2yt99JHPsuOr3ET8yRiFy7ixZtqZKUZK7H2/7WSOOVB2DHISf+
-         +kzMUF4Da4+YtPHY3tNn8MwRcIYCwdYYmjDqYbKM=
+        b=XV5WrA99l3Sb8+QkK2Xpsh5qGf7FAzhW9EOH8zZGowNtOeQW+LDf8/33evY1CxsG/
+         3QG9H3FErYjaix8LKU4fcHd1sYgloex0VPEDP08yc/PnwlM06WqCyrj+j8lORexOxi
+         ZadDlSBIVtMHChchfQmwWvp8sj1pt7J1T1vrTViY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Matthias Kaehlcke <mka@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 03/15] Bluetooth: btqca: Add a short delay before downloading the NVM
-Date:   Thu, 29 Aug 2019 14:17:50 -0400
-Message-Id: <20190829181802.9619-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 03/16] Bluetooth: btqca: Add a short delay before downloading the NVM
+Date:   Thu, 29 Aug 2019 14:17:21 -0400
+Message-Id: <20190829181736.9040-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190829181802.9619-1-sashal@kernel.org>
-References: <20190829181802.9619-1-sashal@kernel.org>
+In-Reply-To: <20190829181736.9040-1-sashal@kernel.org>
+References: <20190829181736.9040-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -83,7 +83,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 4a62081688501..593fc2a5be0f9 100644
+index 28afd5d585f95..b7dfa4afd5169 100644
 --- a/drivers/bluetooth/btqca.c
 +++ b/drivers/bluetooth/btqca.c
 @@ -363,6 +363,9 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
