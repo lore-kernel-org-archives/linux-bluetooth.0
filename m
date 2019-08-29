@@ -2,141 +2,130 @@ Return-Path: <SRS0=q5Cw=WZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA347C3A59F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 09:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED05C3A59F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 13:06:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79DE02339E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 09:59:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="jULKQIJj"
+	by mail.kernel.org (Postfix) with ESMTP id 2DDEB2189D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 13:06:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726081AbfH2J74 (ORCPT
+        id S1727709AbfH2NGR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Aug 2019 05:59:56 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:42922 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbfH2J7z (ORCPT
+        Thu, 29 Aug 2019 09:06:17 -0400
+Received: from emh07.mail.saunalahti.fi ([62.142.5.117]:50002 "EHLO
+        emh07.mail.saunalahti.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726283AbfH2NGP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Aug 2019 05:59:55 -0400
-Received: by mail-lf1-f68.google.com with SMTP id u13so2012667lfm.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2019 02:59:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=1lC+hH9Gwx+bNHkwBGuwqMYJcIp0XDfnrsTRuI7bdjo=;
-        b=jULKQIJjcaORvjGcebXlcKU8ghD3G8S3WiXzUvKbuW8ktGUfL/SItKHqss0QH2Fi27
-         lZ/fWYomnY4NW2U/D6Inc2+3rPU8+4YrOennXq6E6g4iTZ0Ebx7F0qUGpZLoLliYvprL
-         o9nQgky7vSkh92XHMbOrMmFgocUjbyV2ksmM13JFraVeJrx81kkKI9KCIr69iuLJaIMW
-         iZsA2p0Elofmv9d9OriKn4TF976WHI8FHsJzYj/6ovBvPCqNnnzI3wnU35wyv+NZwTFH
-         5Z8GLMMmPBAYCLqFskU1t9w34Ft8LXmv4Op9Jlvp9qU3qHg1fMtrA0TP9v1rUsVKyDOQ
-         7nDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=1lC+hH9Gwx+bNHkwBGuwqMYJcIp0XDfnrsTRuI7bdjo=;
-        b=EBCwRIVRFixXaiMKagm5jQLh7SLBdTFcPaDOI1BMqfm9JaK1T5vBxI3uc3i32cGXbg
-         JLacZuOhYs59HbErXjD3frVfq1y0bYq4DwawpjvmjEc+Ctg480X1NJ6c0bFR0LBoUUo3
-         oW3MrLS5CzSwmTit+/GmwjqCGTCX0pL9loPh7oKBbWW2OXpEHlfWaAvBtOGWghrwAUBz
-         SN2QJKg9koIV5tbMbcvmfAHsBgW0KbWCW0b8D2KAiEXuoTiqQsfx/PeVCru8Z1G6rEl4
-         7bXloZZORMyOr4Xw5lRrHnUduRXm70lNqEkiBAgPQa+GFaKZEj9DDqSVwx8X+hqUri/e
-         9G1A==
-X-Gm-Message-State: APjAAAVFw8tG9z2TIGPOrIvbBQeD6g/7Sje5+7fnhyIJ8RfFYcuTlaHR
-        XT6wuFD3nz5uGuCJvNshrmKxpw==
-X-Google-Smtp-Source: APXvYqwIQcewig2T6+eREfJFW8CrrEJ3QOso9IlAlKZqp1c0bJy1AmI5pzU2DLSCLr6gfq2wYwZhqA==
-X-Received: by 2002:ac2:4901:: with SMTP id n1mr5778781lfi.0.1567072794078;
-        Thu, 29 Aug 2019 02:59:54 -0700 (PDT)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id p9sm276337lji.107.2019.08.29.02.59.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2019 02:59:53 -0700 (PDT)
-Date:   Thu, 29 Aug 2019 11:59:51 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh: Log D-Bus method call errors
-Message-ID: <20190829095951.nzzqqhgvblhogf4e@mlowasrzechonek2133>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
+        Thu, 29 Aug 2019 09:06:15 -0400
+X-Greylist: delayed 516 seconds by postgrey-1.27 at vger.kernel.org; Thu, 29 Aug 2019 09:06:12 EDT
+Received: from ydin.reaktio.net (reaktio.net [85.76.255.15])
+        by emh07.mail.saunalahti.fi (Postfix) with ESMTP id E9045B001C;
+        Thu, 29 Aug 2019 15:57:34 +0300 (EEST)
+Received: by ydin.reaktio.net (Postfix, from userid 1001)
+        id E622D36C0F6; Thu, 29 Aug 2019 15:57:34 +0300 (EEST)
+Date:   Thu, 29 Aug 2019 15:57:34 +0300
+From:   Pasi =?iso-8859-1?Q?K=E4rkk=E4inen?= <pasik@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <20190820075654.2195-1-michal.lowas-rzechonek@silvair.com>
- <685bc703108f5329b861f5c5f87301b44bddd8e0.camel@intel.com>
+Subject: Re: [PATCH BlueZ 1/4] doc/media-api: Add RegisterApplication method
+Message-ID: <20190829125734.GH2840@reaktio.net>
+References: <20190712151329.11333-1-luiz.dentz@gmail.com>
+ <CABBYNZLDFAJgkfAFWOOAAqqiX8mpi3KgirBkpwpnBFJ3TxPqyg@mail.gmail.com>
+ <20190718100024.ii2igadxb2lmmitm@pali>
+ <20190721155522.3vqt7vsprhpxflqf@pali>
+ <CABBYNZK6cuz9n4Hu9uRCbQvn9uFEYkn9=mY8J5Fqu0u-D3B1EA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <685bc703108f5329b861f5c5f87301b44bddd8e0.camel@intel.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <CABBYNZK6cuz9n4Hu9uRCbQvn9uFEYkn9=mY8J5Fqu0u-D3B1EA@mail.gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+Hi,
 
-On 08/28, Gix, Brian wrote:
-> On Tue, 2019-08-20 at 09:56 +0200, Micha≈Ç Lowas-Rzechonek wrote:
-> > If a system is misconfigured, mesh daemon might not have permissions to
-> > call application methods.
+On Sat, Aug 10, 2019 at 09:54:52AM +0300, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Sun, Jul 21, 2019 at 6:55 PM Pali Roh·r <pali.rohar@gmail.com> wrote:
 > >
-> > This patch causes mesh daemon to log such errors, instead of failing
-> > silently.
->
-> Some of these Replies for error checking are warranted, I think...
-> Particularily when there is required information that needs to be sent
-> to the Application during Provisioning, for instance.
->
-> But sometimes we expect the application to be "away" for normal
-> reasons (it is intended as a foreground app, for instance) where I am
-> not sure we want to require the response... For instance the method
-> calls in model.c that occur when a remote node has sent a message.
+> > On Thursday 18 July 2019 12:00:24 Pali Roh·r wrote:
+> > > On Saturday 13 July 2019 17:52:46 Luiz Augusto von Dentz wrote:
+> > > > Hi Pali,
+> > > >
+> > > > On Fri, Jul 12, 2019 at 6:13 PM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > > >
+> > > > > This uses application ObjectManager to discover the MediaEndpoint and
+> > > > > MediaPlayer object of an application and deprecates the use of
+> > > > > RegisterEndpoint and RegisterPlayer.
+> > > > > ---
+> > > > >  doc/media-api.txt | 20 ++++++++++++++++++++
+> > > > >  1 file changed, 20 insertions(+)
+> > > > >
+> > > > > diff --git a/doc/media-api.txt b/doc/media-api.txt
+> > > > > index bca8c9563..07f7ac3e0 100644
+> > > > > --- a/doc/media-api.txt
+> > > > > +++ b/doc/media-api.txt
+> > > > > @@ -66,7 +66,27 @@ Methods              void RegisterEndpoint(object endpoint, dict properties)
+> > > > >
+> > > > >                         Unregister sender media player.
+> > > > >
+> > > > > +               void RegisterApplication(object root, dict options)
+> > > > >
+> > > > > +                       Register endpoints an player objects within root
+> > > > > +                       object which must implement ObjectManager.
+> > > > > +
+> > > > > +                       The application object path together with the D-Bus
+> > > > > +                       system bus connection ID define the identification of
+> > > > > +                       the application.
+> > > > > +
+> > > > > +                       Possible errors: org.bluez.Error.InvalidArguments
+> > > > > +                                        org.bluez.Error.AlreadyExists
+> > > > > +
+> > > > > +               void UnregisterApplication(object application)
+> > > > > +
+> > > > > +                       This unregisters the services that has been
+> > > > > +                       previously registered. The object path parameter
+> > > > > +                       must match the same value that has been used
+> > > > > +                       on registration.
+> > > > > +
+> > > > > +                       Possible errors: org.bluez.Error.InvalidArguments
+> > > > > +                                        org.bluez.Error.DoesNotExist
+> > > > >  Media Control hierarchy
+> > > > >  =======================
+> > > > >
+> > > > > --
+> > > > > 2.21.0
+> > > >
+> > > > Can you try this set?
+> > >
+> > > Hello, I will try it later in next week. To test it would mean to
+> > > rewrite pulseaudio bluetooth modules to use this new API, so it would
+> > > take me longer time.
+> >
+> > Hi! I looked at it. But I do not know how to implement
+> > GetManagedObjects() method via libdbus properly. Any idea?
+> 
+> I went ahead and applied this set, you can find some examples of how
+> to implement ObjectManager interface in gdbus but I guess what you
+> really need to do is make PA aware of the objects being exposed since
+> it does make it simpler to to enumerate objects by the clients.
+> 
 
-Yes, these calls were my primary concern here.
+Pali: How does it look with porting the PA patches to use the new interfaces?
 
-Note that D-Bus calls do *not* happen if the application is not attached
-(node->owner is NULL).
 
-> The Non-Reply version of send (towards the apps) was actually a design
-> decision, since we don't want the *daemon* to exhast d-bus resources,
-> depending on replies from Apps that are ignoring the messages we are
-> sending.
->
-> This could negatively impact the daemon's ability to
-> interact with perhaps better behaved applications.  I think every
-> reply required message persists for up to 30 seconds.
+Thanks,
 
-True.
+-- Pasi
 
-Since most of the application-side methods do not return anything (and
-rightly so, because "Any discrete OTA message might be lost"), the
-application is free to do whatever is pleases with the payload,
-including dropping it.
-
-Still, I think that the none of the call handlers on the application
-side should *ever* return errors/timeouts over D-Bus.
-
-I'm arguing that such an application is misbehaving, so it probably
-should be promptly detached. That would protect the daemon.
-
-> I think our rule of thumb should be requiring a response when the
-> daemon needs to know that the App has successfully handled critical
-> information so for instance YES for:
->
-> AddNodeComplete()
-> JoinComplete()
-> RequestProvData()
-
-Agreed.
-
-regards
--- 
-Micha≈Ç Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnog√≥rska 44, 31-358 Krakow, POLAND
