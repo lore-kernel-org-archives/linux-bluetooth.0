@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6228EC3A59F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2427EC3A59F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:19:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 316EA2341B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:17:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E51042166E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Aug 2019 18:19:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567102628;
-	bh=kGDX4XP3su5dRLtJHSDHm31PWwTm4z04DYHTcLsWqDk=;
+	s=default; t=1567102782;
+	bh=kYBIYi0EgYgnvb+nZ/NT0lsk7oySlc+EQDfS2wuGHoc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ODCewECVqp7tFnH9sYBdH/JLOmPfPYHsTjW5IxqXUTGFsof6J678pw7imQGOWxgFu
-	 dVScXKnm+NzXzcM8WnCmzA9njDFvYZjY7tamJdeCGzZcOPna7XMwC0OqFRVIYkfZLi
-	 HlLIYPcvw19pVMAgK6X5GVF1XO6etaQEegnaYDQU=
+	b=pDJRG1Qxw8s1drxK0rCFwW4NfwgapxofbG0A+e5rnNOb0HP9sYtIH2ztsSJ3dtCse
+	 RfeXI9Nynh/yhcn2EXqypiHeTXP5AdhOZjSkqF2ZcIb1BkzSJNaEykYTdqvxpmNiQC
+	 7BK7KkjSOHhoLmHXHPkT6708uKvd5vQoBpAa2CjY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729962AbfH2SRF (ORCPT
+        id S1729535AbfH2STh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Aug 2019 14:17:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59176 "EHLO mail.kernel.org"
+        Thu, 29 Aug 2019 14:19:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60370 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729945AbfH2SRF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Aug 2019 14:17:05 -0400
+        id S1728752AbfH2SSH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 29 Aug 2019 14:18:07 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8AB102339E;
-        Thu, 29 Aug 2019 18:17:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B2B20233FF;
+        Thu, 29 Aug 2019 18:18:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567102624;
-        bh=kGDX4XP3su5dRLtJHSDHm31PWwTm4z04DYHTcLsWqDk=;
+        s=default; t=1567102686;
+        bh=kYBIYi0EgYgnvb+nZ/NT0lsk7oySlc+EQDfS2wuGHoc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WKZEssMieq3+UIB1G+0iXIWYzNnocGzZFx77CLYGZ5QLzAtIXCBQPzTqidSplZU+B
-         zh338brhZQfxFy8ccmBH0vj1KJ+knvqT3wPebXTFQS6g5fpBqw6wf8UF23DtOHVexe
-         AY13DJkIZO+HMG4xfki/VvbWdP102j+Q3OxEzX6s=
+        b=jni8shvrzjenX6CkvvakE7FAg3NKyXzqPcHQRzJQCw57pGhJTh1Blv9DOxl6003/s
+         moowR9KouQZnIUkC2yt99JHPsuOr3ET8yRiFy7ixZtqZKUZK7H2/7WSOOVB2DHISf+
+         +kzMUF4Da4+YtPHY3tNn8MwRcIYCwdYYmjDqYbKM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Fabian Henneke <fabian.henneke@gmail.com>,
+Cc:     Matthias Kaehlcke <mka@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 05/27] Bluetooth: hidp: Let hidp_send_message return number of queued bytes
-Date:   Thu, 29 Aug 2019 14:16:31 -0400
-Message-Id: <20190829181655.8741-5-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 03/15] Bluetooth: btqca: Add a short delay before downloading the NVM
+Date:   Thu, 29 Aug 2019 14:17:50 -0400
+Message-Id: <20190829181802.9619-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190829181655.8741-1-sashal@kernel.org>
-References: <20190829181655.8741-1-sashal@kernel.org>
+In-Reply-To: <20190829181802.9619-1-sashal@kernel.org>
+References: <20190829181802.9619-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,59 +60,42 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Fabian Henneke <fabian.henneke@gmail.com>
+From: Matthias Kaehlcke <mka@chromium.org>
 
-[ Upstream commit 48d9cc9d85dde37c87abb7ac9bbec6598ba44b56 ]
+[ Upstream commit 8059ba0bd0e4694e51c2ee6438a77b325f06c0d5 ]
 
-Let hidp_send_message return the number of successfully queued bytes
-instead of an unconditional 0.
+On WCN3990 downloading the NVM sometimes fails with a "TLV response
+size mismatch" error:
 
-With the return value fixed to 0, other drivers relying on hidp, such as
-hidraw, can not return meaningful values from their respective
-implementations of write(). In particular, with the current behavior, a
-hidraw device's write() will have different return values depending on
-whether the device is connected via USB or Bluetooth, which makes it
-harder to abstract away the transport layer.
+[  174.949955] Bluetooth: btqca.c:qca_download_firmware() hci0: QCA Downloading qca/crnv21.bin
+[  174.958718] Bluetooth: btqca.c:qca_tlv_send_segment() hci0: QCA TLV response size mismatch
 
-Signed-off-by: Fabian Henneke <fabian.henneke@gmail.com>
+It seems the controller needs a short time after downloading the
+firmware before it is ready for the NVM. A delay as short as 1 ms
+seems sufficient, make it 10 ms just in case. No event is received
+during the delay, hence we don't just silently drop an extra event.
+
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hidp/core.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btqca.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index b21fcc838784d..f6bffb3a95116 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -101,6 +101,7 @@ static int hidp_send_message(struct hidp_session *session, struct socket *sock,
- {
- 	struct sk_buff *skb;
- 	struct sock *sk = sock->sk;
-+	int ret;
- 
- 	BT_DBG("session %p data %p size %d", session, data, size);
- 
-@@ -114,13 +115,17 @@ static int hidp_send_message(struct hidp_session *session, struct socket *sock,
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 4a62081688501..593fc2a5be0f9 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -363,6 +363,9 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ 		return err;
  	}
  
- 	skb_put_u8(skb, hdr);
--	if (data && size > 0)
-+	if (data && size > 0) {
- 		skb_put_data(skb, data, size);
-+		ret = size;
-+	} else {
-+		ret = 0;
-+	}
- 
- 	skb_queue_tail(transmit, skb);
- 	wake_up_interruptible(sk_sleep(sk));
- 
--	return 0;
-+	return ret;
- }
- 
- static int hidp_send_ctrl_message(struct hidp_session *session,
++	/* Give the controller some time to get ready to receive the NVM */
++	msleep(10);
++
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+ 	snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x.bin",
 -- 
 2.20.1
 
