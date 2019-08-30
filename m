@@ -2,67 +2,152 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1C8C3A59B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 18:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7005AC3A59B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 19:15:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 741BA23429
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 18:52:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5060223429
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 19:15:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728221AbfH3Sw3 convert rfc822-to-8bit (ORCPT
+        id S1727963AbfH3TPs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Aug 2019 14:52:29 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34661 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727791AbfH3Sw2 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Aug 2019 14:52:28 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC580.dip0.t-ipconnect.de [79.239.197.128])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 3FA35CECE4;
-        Fri, 30 Aug 2019 21:01:13 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH BlueZ] mesh: test AEAD at startup to check kernel support
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190830182316.fo3nmzfvzk55rhnj@kynes>
-Date:   Fri, 30 Aug 2019 20:52:26 +0200
-Cc:     Brian Gix <brian.gix@intel.com>, linux-bluetooth@vger.kernel.org,
-        inga.stotland@intel.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <3389022D-8306-4276-A715-C2906EB0D91F@holtmann.org>
-References: <20190830173902.19953-1-brian.gix@intel.com>
- <20190830182316.fo3nmzfvzk55rhnj@kynes>
-To:     =?utf-8?Q?Micha=C5=82_Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Fri, 30 Aug 2019 15:15:48 -0400
+Received: from mga11.intel.com ([192.55.52.93]:31344 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727888AbfH3TPs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 30 Aug 2019 15:15:48 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Aug 2019 12:15:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,447,1559545200"; 
+   d="scan'208";a="193426084"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.35.27])
+  by orsmga002.jf.intel.com with ESMTP; 30 Aug 2019 12:15:37 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com, marcel@holtmann.org
+Subject: [PATCH BlueZ v2] mesh: test AEAD at startup to check kernel support
+Date:   Fri, 30 Aug 2019 12:15:27 -0700
+Message-Id: <20190830191527.15962-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michal,
+One time test at startup to ensure either kernel version v4.9 or later,
+*or* that required AES-CCM support has been back-ported. If support not
+there, daemon will run without providing D-Bus service or attaching to
+controllers (prevents systemd thrashing).
+---
+ mesh/crypto.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/crypto.h |  1 +
+ mesh/main.c   |  7 +++++++
+ 3 files changed, 62 insertions(+)
 
->> One time test at startup to ensure either kernel version v4.9 or later,
->> *or* that required AES-CCM support has been back-ported. If support not
->> there, daemon will run without providing D-Bus service or attaching to
->> controllers (prevents systemd thrashing).
-> 
-> By the way - I have a patch that implements all required cryptographic
-> operations using libcrypto, enabled by ./configure --with-openssl
-> (disabled by default).
-> 
-> I know that last time we've talked about this, the consensus was that the
-> vendor should patch meshd to work on older kernels, so we did exactly
-> that - but maybe having this available in the mainline would be
-> interesting?
-
-we are not using anything from OpenSSL. That is a rabbit hole you are not getting back out of.
-
-Regards
-
-Marcel
+diff --git a/mesh/crypto.c b/mesh/crypto.c
+index a6dc7ffe2..cebdffe45 100644
+--- a/mesh/crypto.c
++++ b/mesh/crypto.c
+@@ -1130,3 +1130,57 @@ bool mesh_crypto_check_fcs(const uint8_t *packet, uint8_t packet_len,
+ 
+ 	return fcs == 0xcf;
+ }
++
++/* This function performs a quick-check of ELL and Kernel AEAD encryption.
++ * Some kernel versions before v4.9 have a known AEAD bug. If the system
++ * running this test is using a v4.8 or earlier kernel, a failure here is
++ * likely unless AEAD encryption has been backported.
++ */
++static const uint8_t crypto_test_result[] = {
++	0x75, 0x03, 0x7e, 0xe2, 0x89, 0x81, 0xbe, 0x59,
++	0xbc, 0xe6, 0xdd, 0x23, 0x63, 0x5b, 0x16, 0x61,
++	0xb7, 0x23, 0x92, 0xd4, 0x86, 0xee, 0x84, 0x29,
++	0x9a, 0x2a, 0xbf, 0x96
++};
++
++bool mesh_crypto_check_avail()
++{
++	void *cipher;
++	bool result;
++	uint8_t i;
++	union {
++		struct {
++			uint8_t key[16];
++			uint8_t aad[16];
++			uint8_t nonce[13];
++			uint8_t data[20];
++			uint8_t mic[8];
++		} crypto;
++		uint8_t bytes[0];
++	} u;
++	uint8_t out_msg[sizeof(u.crypto.data) + sizeof(u.crypto.mic)];
++
++	l_debug("Testing Crypto");
++	for (i = 0; i < sizeof(u); i++) {
++		u.bytes[i] = 0x60 + i;
++	}
++
++	cipher = l_aead_cipher_new(L_AEAD_CIPHER_AES_CCM, u.crypto.key,
++				sizeof(u.crypto.key), sizeof(u.crypto.mic));
++
++	if (!cipher)
++		return false;
++
++	result = l_aead_cipher_encrypt(cipher,
++				u.crypto.data, sizeof(u.crypto.data),
++				u.crypto.aad, sizeof(u.crypto.aad),
++				u.crypto.nonce, sizeof(u.crypto.nonce),
++				out_msg, sizeof(out_msg));
++
++	if (result)
++		result = !memcmp(out_msg, crypto_test_result, sizeof(out_msg));
++
++	l_aead_cipher_free(cipher);
++
++	return result;
++}
+diff --git a/mesh/crypto.h b/mesh/crypto.h
+index 1a73bcaa3..e5ce840b4 100644
+--- a/mesh/crypto.h
++++ b/mesh/crypto.h
+@@ -161,3 +161,4 @@ bool mesh_crypto_check_fcs(const uint8_t *packet, uint8_t packet_len,
+ 							uint8_t received_fcs);
+ bool mesh_crypto_aes_cmac(const uint8_t key[16], const uint8_t *msg,
+ 					size_t msg_len, uint8_t res[16]);
++bool mesh_crypto_check_avail(void);
+diff --git a/mesh/main.c b/mesh/main.c
+index 262e3da48..273651f97 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -34,6 +34,7 @@
+ #include "lib/mgmt.h"
+ 
+ #include "mesh/mesh.h"
++#include "mesh/crypto.h"
+ #include "mesh/dbus.h"
+ #include "mesh/mesh-io.h"
+ 
+@@ -121,6 +122,12 @@ int main(int argc, char *argv[])
+ 
+ 	l_log_set_stderr();
+ 
++	if (!mesh_crypto_check_avail()) {
++		l_error("Mesh Crypto functions unavailable");
++		status = l_main_run_with_signal(signal_handler, NULL);
++		goto done;
++	}
++
+ 	for (;;) {
+ 		int opt;
+ 		const char *str;
+-- 
+2.21.0
 
