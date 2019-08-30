@@ -2,130 +2,80 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EED6BC3A5A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 09:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC4DC3A5A4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 09:34:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4AC723426
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 09:21:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567156873;
-	bh=3GufUtVPDW9HriFeClZCJbc5zRagccTM02azG30ED2s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=YtGcO3JumTspPjSTVWQOhcbPLsNPWCkvpUU8ino5OdNRYNdTWSdw5W+kZcmXoC1RY
-	 MkARMiIe+kUwqRh9dkxC+mSp/dQQHPsPZPKwp2Gkbo1l9tC0lyMlNPR66OE4ZtCTWh
-	 KH9sZu8FFZVaGcy5Zk/ysxJXp9MnPA2tZu8W1GUU=
+	by mail.kernel.org (Postfix) with ESMTP id 8AC4A2186A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 09:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727891AbfH3JVJ (ORCPT
+        id S1727386AbfH3Jel (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Aug 2019 05:21:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59974 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727328AbfH3JVI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Aug 2019 05:21:08 -0400
-Received: from localhost (lfbn-1-17395-211.w86-250.abo.wanadoo.fr [86.250.200.211])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 301FB23426;
-        Fri, 30 Aug 2019 09:21:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567156867;
-        bh=3GufUtVPDW9HriFeClZCJbc5zRagccTM02azG30ED2s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bGyZtmRs0b4Fxnur3ZChQTe3ktJskBmByqsK+yxfB7FdIL+Uh06hPDvKO2tBvxUs2
-         vLV9cE1Ubcz2f8fnnb2TSe3PgjfSXD+6sU67fjRkl13gI1sm+JyGlBeKHDPGcq2ROY
-         YXJsOb4xjBWPyFkTwemYMp+Iq9qfKXZ+68kxV7x8=
-Date:   Fri, 30 Aug 2019 11:21:04 +0200
-From:   Maxime Ripard <mripard@kernel.org>
+        Fri, 30 Aug 2019 05:34:41 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46960 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725780AbfH3Jek (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 30 Aug 2019 05:34:40 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 87098AC37;
+        Fri, 30 Aug 2019 09:34:39 +0000 (UTC)
+Date:   Fri, 30 Aug 2019 11:34:37 +0200
+From:   Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     megous@megous.com, Chen-Yu Tsai <wens@csie.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [RESEND PATCH 0/5] Add bluetooth support for Orange Pi 3
-Message-ID: <20190830092104.odipmbflounqpffo@flea>
-References: <20190823103139.17687-1-megous@megous.com>
- <5524D5E9-FA82-4244-A91F-78CF1C3FB3FB@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        oneukum@suse.com, acho@suse.com, tiwai@suse.com, jlee@suse.com
+Subject: Re: [PATCH] Revert "Bluetooth: btusb: driver to enable the
+ usb-wakeup feature"
+Message-ID: <20190830113437.3508bce9@naga>
+In-Reply-To: <C481EEBC-0280-4A20-BEBD-9A888AF5F03F@holtmann.org>
+References: <20190828121349.24966-1-msuchanek@suse.de>
+        <C481EEBC-0280-4A20-BEBD-9A888AF5F03F@holtmann.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="zvsfua4pdi5vswnn"
-Content-Disposition: inline
-In-Reply-To: <5524D5E9-FA82-4244-A91F-78CF1C3FB3FB@holtmann.org>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Fri, 30 Aug 2019 09:49:35 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
---zvsfua4pdi5vswnn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Hi Michal,
+> 
+> > This reverts commit a0085f2510e8976614ad8f766b209448b385492f.
+> > 
+> > After this commit systems wake up at random, most commonly when
+> > 
+> > - put to sleep while bluetooth audio stream is running
+> > - connected bluetooth audio device is powered off while system is
+> > asleep
+> > 
+> > This is broken since the commit was merged up to 5.3-rc6.
+> > 
+> > Signed-off-by: Michal Suchanek <msuchanek@suse.de>
+> > ---
+> > drivers/bluetooth/btusb.c | 5 -----
+> > 1 file changed, 5 deletions(-)  
+> 
+> I think that Mario send in the same patch already.
 
-Hi Marcel,
+Yes, I found it after this copy was threaded with the previous one on
+lore.kernel.org. Anyway, there are multiple reasons why this is broken.
 
-On Fri, Aug 30, 2019 at 09:53:16AM +0200, Marcel Holtmann wrote:
-> > (Resend to add missing lists, sorry for the noise.)
-> >
-> > This series implements bluetooth support for Xunlong Orange Pi 3 board.
-> >
-> > The board uses AP6256 WiFi/BT 5.0 chip.
-> >
-> > Summary of changes:
-> >
-> > - add more delay to let initialize the chip
-> > - let the kernel detect firmware file path
-> > - add new compatible and update dt-bindings
-> > - update Orange Pi 3 / H6 DTS
-> >
-> > Please take a look.
-> >
-> > thank you and regards,
-> >  Ondrej Jirman
-> >
-> > Ondrej Jirman (5):
-> >  dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
-> >  bluetooth: bcm: Add support for loading firmware for BCM4345C5
-> >  bluetooth: hci_bcm: Give more time to come out of reset
-> >  arm64: dts: allwinner: h6: Add pin configs for uart1
-> >  arm64: dts: allwinner: orange-pi-3: Enable UART1 / Bluetooth
-> >
-> > .../bindings/net/broadcom-bluetooth.txt       |  1 +
-> > .../dts/allwinner/sun50i-h6-orangepi-3.dts    | 19 +++++++++++++++++++
-> > arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 10 ++++++++++
-> > drivers/bluetooth/btbcm.c                     |  3 +++
-> > drivers/bluetooth/hci_bcm.c                   |  3 ++-
-> > 5 files changed, 35 insertions(+), 1 deletion(-)
->
-> all 5 patches have been applied to bluetooth-next tree.
+AFAICT the wakeup feature is only workable with OSes that are able to
+wakeup into a small gadget that can check if the packet is interesting
+and put the system back to sleep if not without going through the whole
+online/offline everything sequence.
 
-The DTS patches (last 2) should go through the arm-soc tree, can you
-drop them?
+Thanks
 
-Thanks!
-Maxime
+Michal
 
---
-Maxime Ripard, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
---zvsfua4pdi5vswnn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCXWjqgAAKCRDj7w1vZxhR
-xV8CAP417aV0QNmWtbn2xiBjkD9flY36PSlMOjyVjsX2zxv2GgEAyCygOXXu4S1z
-X+AQg5RIlPCGhi8UpGGBfw2i1qEr5gQ=
-=bUKu
------END PGP SIGNATURE-----
-
---zvsfua4pdi5vswnn--
