@@ -2,105 +2,86 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7090BC3A5A3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E260C3A5A4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 06:43:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 385592186A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:47:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F36AC22CE9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 06:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="wSKgc7E1"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="eVyJLAPP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726405AbfH3Fr4 (ORCPT
+        id S1728062AbfH3Gnp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Aug 2019 01:47:56 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:42175 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726023AbfH3Fr4 (ORCPT
+        Fri, 30 Aug 2019 02:43:45 -0400
+Received: from mail-lj1-f180.google.com ([209.85.208.180]:39487 "EHLO
+        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726090AbfH3Gno (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Aug 2019 01:47:56 -0400
-Received: by mail-lj1-f196.google.com with SMTP id l14so5280486ljj.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2019 22:47:55 -0700 (PDT)
+        Fri, 30 Aug 2019 02:43:44 -0400
+Received: by mail-lj1-f180.google.com with SMTP id x4so5412467ljj.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2019 23:43:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=WhsZ4YABETaZp2LDJIY/+veXTWzZPHgmOSUCIQZtrvc=;
-        b=wSKgc7E11MoImp1ctQxQZ3BzWEzrcbWI8fTD/s+7Dke9GNCAAZ1hBLgg6TFSa7GmyB
-         d81SHe9oFaaK+l2XM+yNtV76rmaHINBxF/5mLRW82W12cxYZqZjBvJAXd1ofpv7hyCky
-         3X9Oi8HHDpslXGHl+2BydF/xnTlyf6aYbBwK1Bi1Q7A/z2lPHnoAvMXlbpGfQVF+gXqC
-         UZNKLxV6zyGU4hhdTHvcb31nAwziPn//KxahfuVA0wt5BPlKAOG8tBRyr951lYgqLEsS
-         rhcg4xFXFTA+FPJfqWG86EzxTpa9wb9ANsd5TCHVSO2fnvEdbhL5vzAR8OqQEaOZIls9
-         qJvw==
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:organization:mime-version
+         :content-transfer-encoding;
+        bh=V6LSW7wyKMLCu+f95GOPU8RY3zXeA5m+JSTwnpkKSQQ=;
+        b=eVyJLAPPYGmn+MLzqLMQgJAHzmCnAoEyP9+apLmu6tmQ0VMFOdvTqr8d+tFTBKAj6t
+         faSxm0NeA8o3vXFHAxFzOrKh4vUhnq5hOGv/kMUkRf1xHpdrAhzh2DzqfLuSjqcfQENK
+         TkaQnSCQAvmwBqAvWDodZ+305/41JXIANLHNyqVOziFhV9oDoNsUBAs8gzCqnzgpbE8n
+         pe9jeZk0jrjk2DCor6ea1EZ/OrUB5IQ0y3aEVr1LSN7P1IclfdwSUNXORv9BoqBdsmeo
+         aVUhRHpmNj9ZLPUgdvJoeT6NZKGJwhDeQi0E/iyE5ErHFsgq5gz7JBApgjqxBCJauFoG
+         p1bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=WhsZ4YABETaZp2LDJIY/+veXTWzZPHgmOSUCIQZtrvc=;
-        b=c5E20mC/yrP8P2BQJfEyna8ij6xx9Md7zrfwwODBZi87BsG7RKyo+9TCvtkmoXhwWR
-         ymH3/cbCV4b8WtKe2FJm8sDFqFOrERhEMtnNamTn6QF3R6qPCp0BZV+b3m3ojIWfDqeu
-         o3x1tj7k6QgvoMY/KUsuC00ZM8ph7FZPWyCl3nXsJxL0G9ePNYSelf/tGCNd0FyZuqun
-         tKmpvhEEdUZKWdJVzIAa9N/8fdhStCvHz6nyQDvLTTTyWz9aLUFonQF5hLfptCNjG8ld
-         tf3ePN6hmxwrvKoJ2SBS4mxSNFf95sMieDIPVxHVPWca/O1yjh33gkURrCWG90YG0pPP
-         UHUg==
-X-Gm-Message-State: APjAAAWmD3rqeK/laix/lPc9ueZbNwOTeGSMuFLYNm8QWg5atI70drMz
-        2ZcSSeqTFDqZibS+uU0QNidsGw==
-X-Google-Smtp-Source: APXvYqyvVriHUQwIOUeiSlK1mLKjXNKFUwVQ2ebCzSB5jv7rjyoAiDnqUkKd+X95pFcXT7hYaWFlVA==
-X-Received: by 2002:a2e:8856:: with SMTP id z22mr7306948ljj.71.1567144074569;
-        Thu, 29 Aug 2019 22:47:54 -0700 (PDT)
-Received: from kynes (apn-95-41-66-58.dynamic.gprs.plus.pl. [95.41.66.58])
-        by smtp.gmail.com with ESMTPSA id i5sm660607lji.74.2019.08.29.22.47.53
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 29 Aug 2019 22:47:53 -0700 (PDT)
-Date:   Fri, 30 Aug 2019 07:47:52 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh: Log D-Bus method call errors
-Message-ID: <20190830054752.o3wrahabdsqmmvrt@kynes>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <20190820075654.2195-1-michal.lowas-rzechonek@silvair.com>
- <685bc703108f5329b861f5c5f87301b44bddd8e0.camel@intel.com>
- <20190829095951.nzzqqhgvblhogf4e@mlowasrzechonek2133>
- <145b9b726c45fd37592b5a7a3504c911cd848409.camel@intel.com>
- <20190829195610.a6dwgxabq3d2g3bp@kynes>
- <38E88E55-4291-47AF-B502-47922E9FBA56@intel.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:organization
+         :mime-version:content-transfer-encoding;
+        bh=V6LSW7wyKMLCu+f95GOPU8RY3zXeA5m+JSTwnpkKSQQ=;
+        b=DBBXAyMwEe84sqSnXhlNhDU31tcI/XM8hpf1rotYrgGsrJtXnCprWibuMFvsO195o5
+         6HUA36uAUfObRkMDYtZzmlYF0r0z4EHExUziCH+YVx0utcvRK3MhHnCR3J77dzm/ETit
+         GctIf7oAKMkJfO6nRhMPl/e+iq4b4FZTdmC7UZdi/ubZDn++NrDKfIZq/dE6KOb2/mn6
+         q+tEXzaoDT/G6t8GV03xozBuJj42RJnc4SBV1mhv1Z7jPmSUv9QpkUxkV4SJYYYpfSSp
+         1NGrrkYrdVmptm6Am+77Jg4jKuJPkwt7/ounOdhUT1NBsAo6ubzPYL0O5I82cOZQY9Ze
+         sQuQ==
+X-Gm-Message-State: APjAAAVzOOc3Sjfn1jyAT56r/wIp348pM3w7cjGke9rZmzRsP8c2QLT+
+        SB0SARy9jwOlHAA3pzpa2EoOnStTdsA=
+X-Google-Smtp-Source: APXvYqxuMwazo2HEJ1Ax4tzgdKvBSJvkVlIrOTTY4NbsG7X0wvyThURziLpSbXqbGgCL7n1eaQPmyQ==
+X-Received: by 2002:a2e:864c:: with SMTP id i12mr7483613ljj.88.1567147422089;
+        Thu, 29 Aug 2019 23:43:42 -0700 (PDT)
+Received: from ix.localnet ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id w1sm754436lfe.67.2019.08.29.23.43.41
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2019 23:43:41 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Subject: removing BlueZ for Android
+Date:   Fri, 30 Aug 2019 08:43:40 +0200
+Message-ID: <26592033.GZZQrohHIk@ix>
+Organization: CODECOUP
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <38E88E55-4291-47AF-B502-47922E9FBA56@intel.com>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Brian,
+Hi,
 
-On 08/29, Gix, Brian wrote:
-> > Anyway, I think a better approach would be to submit patches to ELL
-> > implementing these two features, and then use these additions in meshd.
-> > Does that sound acceptable from your POV?
-> 
-> I still feel though, that you are trying to solve a pre-deployment
-> “debugging” issue by requiring DBus responses for messages that don’t
-> require them.
+This is just to let people know that we plan to remove BlueZ for Android
+( android/ folder in BlueZ code). This code hasn't been updated for few years 
+and last supported version was Android 5.1 (with some initial pieces for 
+Android 6...).
 
-I think you're right.
+If there are no active users who are willing to contribute (eg update code to 
+ELL etc) this will be removed in next few days.
 
-Let's drop this patch, and I'll try to come up with something that would
-cover only "important" methods you mentioned earlier.
-
-regards
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+pozdrawiam
+Szymon Janc
+
+
