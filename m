@@ -2,159 +2,135 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBB4C3A5A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 08:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3402C3A5A4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 08:26:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFB872054F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 08:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E3D1208CB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 08:26:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="b18bVQjK";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Y5BEWXLj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727525AbfH3ICz (ORCPT
+        id S1727294AbfH3I0g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Aug 2019 04:02:55 -0400
-Received: from mga06.intel.com ([134.134.136.31]:50641 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727023AbfH3ICz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Aug 2019 04:02:55 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Aug 2019 01:02:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,446,1559545200"; 
-   d="scan'208";a="186228638"
-Received: from spoorthi-h97m-d3h.iind.intel.com ([10.223.96.21])
-  by orsmga006.jf.intel.com with ESMTP; 30 Aug 2019 01:02:53 -0700
-From:   spoorthix.k@intel.com
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org
-Subject: [PATCH] Add Support to use Resolving list
-Date:   Fri, 30 Aug 2019 13:43:52 +0530
-Message-Id: <1567152832-873-1-git-send-email-spoorthix.k@intel.com>
+        Fri, 30 Aug 2019 04:26:36 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:42954 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726492AbfH3I0g (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 30 Aug 2019 04:26:36 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 686366155C; Fri, 30 Aug 2019 08:26:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1567153594;
+        bh=fe+1CIFsLrsFmj7GnadvoGOHiiGzQrdsXLHYlpV+vnM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=b18bVQjK0tujCHtmNVN7r2uJvzBYrVzIEND/NqFYiponvrWVncdoFvGUewLCFt+hr
+         i5FWd3mfndhPExuUKD+DtyopBFJAqM/xDKSSHRE3RqJ0n/YF0vb1Dj6YD9r2Tl6BNL
+         2MiNFmcExEjQMbDS9yZW7jv6386j9+dVn+MD0/7E=
+Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: c-hbandi@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id DF1876333C;
+        Fri, 30 Aug 2019 08:26:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1567153591;
+        bh=fe+1CIFsLrsFmj7GnadvoGOHiiGzQrdsXLHYlpV+vnM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Y5BEWXLjOCPvhsZGooH78akW+LC0OFO32rHaVS3BdJf4WgOtuUVzL9euDsFqlDTjB
+         ItOz53j7ogyCFylAvNVbSW6wUL2C7jcAIXKK4qaascaLjOrQaKtmmCqi9BoWUg+QaF
+         WUabcHePRtcPdhyiuInrTKHEE6ToJKB2/NG2F8hk=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org DF1876333C
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v2] Bluetooth: hci_qca: wait for Pre shutdown complete event before sending the Power off pulse
+Date:   Fri, 30 Aug 2019 13:56:16 +0530
+Message-Id: <1567153576-16895-1-git-send-email-c-hbandi@codeaurora.org>
 X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+When SoC receives pre shut down command, it share the same
+with other COEX shared clients. So SoC needs a short time
+after sending VS pre shutdown command before turning off
+the regulators and sending the power off pulse. Along with
+short delay, needs to wait for command complete event for
+Pre shutdown VS command
 
-As per Core specification 5.0, Vol 2, Part E, Section 7.8.38,
-following code changes implements LE add device to Resolving List.
-
-Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
+Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_request.c | 74 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 75 insertions(+)
+Changes in V2:
+- Modified commit text.
+---
+ drivers/bluetooth/btqca.c   | 22 ++++++++++++++++++++++
+ drivers/bluetooth/hci_qca.c |  5 +++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c36dc1e..99a38cf36 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -420,6 +420,7 @@ enum {
- #define HCI_LE_SLAVE_FEATURES		0x08
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
-+#define HCI_LE_LL_PRIVACY		0x40
- #define HCI_LE_PHY_2M			0x01
- #define HCI_LE_PHY_CODED		0x08
- #define HCI_LE_EXT_ADV			0x10
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index ca73d36..37ee023 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -665,6 +665,72 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	}
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 8b33128..d48dc9e 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -99,6 +99,28 @@ static int qca_send_reset(struct hci_dev *hdev)
+ 	return 0;
  }
  
-+static void add_to_resolve_list(struct hci_request *req,
-+				struct hci_conn_params *params)
++int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
 +{
-+	struct hci_cp_le_add_to_resolv_list cp;
-+	struct bdaddr_list_with_irk *entry;
-+
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-+	if (!entry)
-+		return;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	cp.bdaddr_type = params->addr_type;
-+	bacpy(&cp.bdaddr, &params->addr);
-+	memcpy(entry->peer_irk, cp.peer_irk, 16);
-+	memcpy(entry->local_irk, cp.local_irk, 16);
-+
-+	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST, sizeof(cp), &cp);
-+}
-+
-+static void update_resolve_list(struct hci_request *req)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct hci_conn_params *params;
++	struct sk_buff *skb;
 +	int err;
-+	u8 resolve_list_entries = 0;
 +
-+	list_for_each_entry(params, &hdev->le_resolv_list, action) {
-+		/* Cannot Remove or add the device to the Resolving list
-+		 * whenever there is an outstanding connection.
-+		 */
-+		if (!hci_pend_le_action_lookup(&hdev->pend_le_conns,
-+					       &params->addr,
-+					       params->addr_type) &&
-+		    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
-+					       &params->addr,
-+					       params->addr_type)) {
-+			struct hci_cp_le_del_from_resolv_list cp;
++	bt_dev_dbg(hdev, "QCA pre shutdown cmd");
 +
-+			cp.bdaddr_type = params->addr_type;
-+			bacpy(&cp.bdaddr, &params->addr);
++	skb = __hci_cmd_sync_ev(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
++				NULL, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
 +
-+			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
-+				    sizeof(cp), &cp);
-+			continue;
-+		}
-+		if (hci_bdaddr_list_lookup(&hdev->le_resolv_list,
-+					   &params->addr, params->addr_type))
-+			continue;
-+
-+		if (hci_find_irk_by_addr(hdev, &params->addr,
-+					 params->addr_type)) {
-+			/* Add device to resolving list */
-+			resolve_list_entries++;
-+			add_to_resolve_list(req, params);
-+		}
-+		if (resolve_list_entries >= hdev->le_resolv_list_size) {
-+			err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
-+			if (err < 0)
-+				BT_ERR("%s failed to generate new RPA",
-+				       hdev->name);
-+		}
-+		resolve_list_entries++;
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "QCA preshutdown_cmd failed (%d)", err);
++		return err;
 +	}
++
++	kfree_skb(skb);
++
++	return 0;
 +}
++EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
 +
- static void add_to_white_list(struct hci_request *req,
- 			      struct hci_conn_params *params)
+ static void qca_tlv_check_data(struct rome_config *config,
+ 				const struct firmware *fw)
  {
-@@ -891,6 +957,14 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
- 	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
- 		filter_policy |= 0x02;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index ab4c18e..43df13c 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1367,6 +1367,11 @@ static int qca_power_off(struct hci_dev *hdev)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
  
-+	/* When filter policy is not 0x00 (no whitelist) and 0x01
-+	 * (whitelist enabled) and if LE Privacy is supported in controller
-+	 * add the device to resolving list.
-+	 */
-+	if ((filter_policy == 0x02 || filter_policy == 0x03) &&
-+	    (hci_dev_test_flag(hdev, HCI_LE_LL_PRIVACY)))
-+		update_resolve_list(req);
++	/* Perform pre shutdown command */
++	qca_send_pre_shutdown_cmd(hdev);
 +
- 	hci_req_start_scan(req, LE_SCAN_PASSIVE, hdev->le_scan_interval,
- 			   hdev->le_scan_window, own_addr_type, filter_policy);
++	usleep_range(8000, 10000);
++
+ 	qca_power_shutdown(hu);
+ 	return 0;
  }
 -- 
-1.9.1
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
