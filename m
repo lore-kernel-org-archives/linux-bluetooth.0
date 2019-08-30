@@ -2,149 +2,135 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13027C3A59F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 03:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4488AC41514
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:02:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD32E21874
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 03:45:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1490321874
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LI2j7Fxi"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="DF35DWi/";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="cq6tFOjr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728007AbfH3Dpq (ORCPT
+        id S1727023AbfH3FCQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Aug 2019 23:45:46 -0400
-Received: from mail-ot1-f53.google.com ([209.85.210.53]:39718 "EHLO
-        mail-ot1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727066AbfH3Dpq (ORCPT
+        Fri, 30 Aug 2019 01:02:16 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:49362 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725902AbfH3FCQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Aug 2019 23:45:46 -0400
-Received: by mail-ot1-f53.google.com with SMTP id b1so5620681otp.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2019 20:45:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=RF/ne96MgoymbOHOluSC7JryFOpqR+LpPNO7XcQ8h/E=;
-        b=LI2j7FxiudzhdL+rO8W3gWbmb2xCVCTEz05+6+8wDJ1s4Sg/+kOQfOQJfQGEKVpctq
-         OKYLAn6JhGRPk5yvL4mDEqcPYMDWeNikUw2HleQvn038RTt0ytrStHkMjQysFSvNcCNb
-         k+evjKOCHf0Q/mNxfyS4eH8d+n5KdfNahPs+cPja0BoOXsfI9v858rs9cuuH5E/oVIdS
-         vLGZ7WTIGFdjsoIAfl5YmItfCq8pjVSPeO8mwOoy4dOilS53Vr8iQpju0tRvx9Zt05sP
-         Ama7Lor/ZU9t4CLTw8TrfHtvzSwq8JmipV3jhnfSlu/FobDoaw6tg7Mym614E1cxkK9Z
-         MTsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=RF/ne96MgoymbOHOluSC7JryFOpqR+LpPNO7XcQ8h/E=;
-        b=FZsTklcTMBnzBK3ajVx8L/d7JR0uA9jIVf1bR+9mobeeRhQq5EHnORBFqViR298YkI
-         iSqAUlEY2/0gZUvD+mJ9fId1aPHFPNlWhm+/mZSWZFO7Y6FWm1tRwt2n7ftx8ccV0ORC
-         MWT2wUm51Hbm3G9Hvj7dBi2TFvG/3aGyZIfYqBtb2hk0nEBmxWaSofpZ13c11AaFFBGL
-         WeN7JPjH3MHxeBh239LBtO7izdda+iDH3wQP9lgVnFt061qkBaNotAqIWDPu+dCO0pWe
-         cmbt61wiegwOTYpgmkQ9llBX09PFH+7J8iZAcRUJ2pP+EoaYWddsC9yz+Ifl8fMIdAZW
-         13BA==
-X-Gm-Message-State: APjAAAWGHSzusKcmSt62twa9bsfjOAr6pajKRG3c7GjmPBxstHlWbpy5
-        x2h1GhyGkp6yStC4aTi6IRp+LAdGe0ed0NHcS7w=
-X-Google-Smtp-Source: APXvYqyYztE0Ccfq/c6xl1zz/C2czX0E38ZC+GExZEq7MpcBBfSS+9jYP65gJ3+4D44/T2JLqGSwFIHOSdddQiTlkBw=
-X-Received: by 2002:a9d:7343:: with SMTP id l3mr10821312otk.268.1567136744976;
- Thu, 29 Aug 2019 20:45:44 -0700 (PDT)
-MIME-Version: 1.0
-From:   =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Date:   Fri, 30 Aug 2019 00:45:08 -0300
-Message-ID: <CA+A7VXUkWFpQvnAbEy_eEJbriUAceHo=EUCthzA8sSW1t0=Oew@mail.gmail.com>
-Subject: Inconsistent SDP database after HSP AG registered
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org,
-        General PulseAudio Discussion 
-        <pulseaudio-discuss@lists.freedesktop.org>,
-        Linux Upstreaming Team <linux@endlessm.com>,
-        =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 30 Aug 2019 01:02:16 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 7AB7961B14; Fri, 30 Aug 2019 05:02:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1567141334;
+        bh=fe+1CIFsLrsFmj7GnadvoGOHiiGzQrdsXLHYlpV+vnM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=DF35DWi/vcIha8ZdCxzYGat7OgmKEDoWJ9P16AGIJunFqUn8gDuZY6RzkK1YBvQXc
+         OyzXUZlhXMt3ZkhRluU+RMIKQvCCnZL3QzcSJHghAiMqdzjXYjAdvWUm4jaKC9hywP
+         oxorZWI2p1t24zo3fb3J5k5M4pIcb3UjLU0ViFPg=
+Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: c-hbandi@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 65CF3602FC;
+        Fri, 30 Aug 2019 05:02:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1567141333;
+        bh=fe+1CIFsLrsFmj7GnadvoGOHiiGzQrdsXLHYlpV+vnM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cq6tFOjrdTDeySUCvbiv+pnJOqt1EA0f/z2kgaQPmN973eij2IW0UMUzos6pQ8aIZ
+         Dyj0sVSZ34RKvan+TEX75lLPeQqCeD70ezOD2PTF1BL6S9FMfmm0jI6fKZdlVzQeAV
+         zuAmz7WnqM0Xb9GteUde4UCbbtVEvZTEGsV+AQoE=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 65CF3602FC
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v2] Bluetooth: hci_qca: wait for Pre shutdown complete event before sending the Power off pulse
+Date:   Fri, 30 Aug 2019 10:31:44 +0530
+Message-Id: <1567141304-24600-1-git-send-email-c-hbandi@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Luiz, Johan, Marcel!
+When SoC receives pre shut down command, it share the same
+with other COEX shared clients. So SoC needs a short time
+after sending VS pre shutdown command before turning off
+the regulators and sending the power off pulse. Along with
+short delay, needs to wait for command complete event for
+Pre shutdown VS command
 
-(cc'ing pulseaudio-discuss for awareness, but I believe nothing is
-wrong on PulseAudio side)
+Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
+Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+---
+Changes in V2:
+- Modified commit text.
+---
+ drivers/bluetooth/btqca.c   | 22 ++++++++++++++++++++++
+ drivers/bluetooth/hci_qca.c |  5 +++++
+ 2 files changed, 27 insertions(+)
 
-I'm investigating a problem on to the interaction of more than one
-PulseAudio instance with bluetoothd, specifically when registering the
-HSP external profiles (oFono is not being used). On my setup, one
-PulseAudio instance is started for GDM, and when the user logs in,
-another instance is started for the user session. A few moments later
-the GDM session finishes and the first PulseAudio instance exits.
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 8b33128..d48dc9e 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -99,6 +99,28 @@ static int qca_send_reset(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	int err;
++
++	bt_dev_dbg(hdev, "QCA pre shutdown cmd");
++
++	skb = __hci_cmd_sync_ev(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
++				NULL, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
++
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "QCA preshutdown_cmd failed (%d)", err);
++		return err;
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
++
+ static void qca_tlv_check_data(struct rome_config *config,
+ 				const struct firmware *fw)
+ {
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index ab4c18e..43df13c 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1367,6 +1367,11 @@ static int qca_power_off(struct hci_dev *hdev)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 
++	/* Perform pre shutdown command */
++	qca_send_pre_shutdown_cmd(hdev);
++
++	usleep_range(8000, 10000);
++
+ 	qca_power_shutdown(hu);
+ 	return 0;
+ }
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
-The first instance is able to register support for HSP AG just fine,
-and a SDP record is added to the server. When the second instance
-starts, while the first one is already active, the RFCOMM server fails
-to bind the socket, but the profile probe does not fail. From
-PulseAudio's perspective everything worked just fine, but a SDP record
-is not added to the server. This does not have any symptoms at this
-point, since the record from the first instance is still active. You
-can find the logs when that happens bellow.
-
-Aug 29 20:03:40 mimieux pulseaudio[3166]: D: [pulseaudio]
-backend-native.c: Bluetooth Headset Backend API support using the
-native backend
-Aug 29 20:03:40 mimieux pulseaudio[3166]: D: [pulseaudio]
-backend-native.c: Registering Profile /Profile/HSPAGProfile
-00001112-0000-1000-8000-00805f9b34fb
-Aug 29 20:03:40 mimieux pulseaudio[3166]: I: [pulseaudio]
-backend-ofono.c: Failed to register as a handsfree audio agent with
-ofono: org.freedesktop.DBus.Error.ServiceUnknown: The name org.ofono
-was not provided by any .service files
-Aug 29 20:03:40 mimieux pulseaudio[3166]: D: [pulseaudio]
-bluez5-util.c: oFono is running: no
-Aug 29 20:03:40 mimieux bluetoothd[796]:
-src/profile.c:register_profile() sender :1.864
-Aug 29 20:03:40 mimieux bluetoothd[796]: src/profile.c:create_ext()
-Created "Headset Voice gateway"
-Aug 29 20:03:40 mimieux bluetoothd[796]:
-src/profile.c:ext_adapter_probe() "Headset Voice gateway" probed
-Aug 29 20:03:40 mimieux bluetoothd[796]: RFCOMM server failed for
-Headset Voice gateway: rfcomm_bind: Address already in use (98)
-Aug 29 20:03:40 mimieux bluetoothd[796]:
-src/profile.c:ext_device_probe() Headset Voice gateway probed with
-UUID 00001108-0000-1000-8000-00805f9b34fb
-Aug 29 20:03:40 mimieux bluetoothd[796]: src/service.c:change_state()
-0x556fa9e9f470: device 00:16:94:0B:1B:8B profile Headset Voice gateway
-state changed: unavailable -> disconnected (0)
-
-The problem happens when the first instance finally exits, and its SDP
-record is removed. At this point there is a valid agent for the
-profile (the second PulseAudio instance), but its UUID is not in list
-of supported UUIDs on the SDP server for that adapter, and not on the
-UUIDs property on the adapter object on D-Bus either.
-
-While pairing and re-connections to headsets seem to be working fine
-even after that failure, this is causing problems with a downstream
-change we carry on PulseAudio at Endless, where we look at the
-supported UUIDs from both the adapter and the device to device whether
-a certain profile is supported, and then only create card profiles for
-supported Bluetooth profiles. So in this case we end up without a card
-profile for HSP even though the profile is actually supported. This
-change is pending upstream review on
-https://gitlab.freedesktop.org/pulseaudio/pulseaudio/merge_requests/50,
-but in any case the SDP database and UUIDs property should be
-consistent with the list of supported profiles.
-
-I'm not familiar with BlueZ' RFCOMM implementation, and haven't really
-touched on BlueZ' code in a while, so I don't know what is the right
-fix for this problem. I can write patches if given a general direction
-of how to approach it, but I'm happy to test someone else's patches as
-well.
-
-Thanks!
-
---
-Jo=C3=A3o Paulo Rechi Vita
