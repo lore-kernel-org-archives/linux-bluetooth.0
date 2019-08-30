@@ -2,103 +2,152 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A616FC3A59B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 19:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A176DC3A59B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 22:14:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 880EB22CE9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 19:40:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C8F82342E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 22:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728241AbfH3TkO (ORCPT
+        id S1728180AbfH3WO1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Aug 2019 15:40:14 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:56352 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727992AbfH3TkI (ORCPT
+        Fri, 30 Aug 2019 18:14:27 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:48559 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728176AbfH3WO1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Aug 2019 15:40:08 -0400
-Received: by mail-io1-f72.google.com with SMTP id i13so9609588iol.23
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Aug 2019 12:40:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=us9ii8ZPiq49/zJdpQsDAPG5tE/hCtulCu7G+qMfvuM=;
-        b=i920AKspnCjKXYRahuP2BiKI2bzagdGuJ6LkHN++4H5Id5cqzQz3M9IQf2TvkkJQ40
-         sS29RLQVIwXljIRk6q4KU+JpwERHGqacYaflUog2y3AmdujUUUPxax6euLv7ra2s/qiL
-         ZpG8JrSLYRZLZz9BaZHI55dINAOfmeZGmRpXNowN3BvH2FnBzofLfDeMM6QDLQFhPH4D
-         G47HDEIbIo5OunbkNro6mmISLh+Cg2gYs2yE32XTIRvlY3IgzDcDdOliRWUc2hlEiA88
-         DjILAiu1fWSgCByNK+mOQCKViDlw0DStXuAjvB38Nq2fa3ekNtL3yhpNK9esnERBujtt
-         6y9A==
-X-Gm-Message-State: APjAAAWsES4UJ2MglQkTfj1zA/0o3Z8F4p+4bbclj+90HHU1V3H8vjRS
-        CgaEDoBfUxyJsITDpnyT4hQg6mspxolk/TPFGU5uc2rTSl3M
-X-Google-Smtp-Source: APXvYqwbAV339fEZpw1x6sMt2R0cuvpx5axDRScvc+Q8sjM2KVT0b/bEevGBGZWlMkTRpgt7RvtHxKimJg7OoiOUXp4akGZoFAep
+        Fri, 30 Aug 2019 18:14:27 -0400
+Authenticated-By: 
+X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x7UMEF4I012637, This message is accepted by code: ctloc85258
+Received: from RS-CAS02.realsil.com.cn (rsn1.realsil.com.cn[172.29.17.3](maybeforged))
+        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x7UMEF4I012637
+        (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
+        Sat, 31 Aug 2019 06:14:16 +0800
+Received: from laptop-alex (59.63.203.251) by RS-CAS02.realsil.com.cn
+ (172.29.17.3) with Microsoft SMTP Server (TLS) id 14.3.439.0; Sat, 31 Aug
+ 2019 06:14:15 +0800
+Date:   Sat, 31 Aug 2019 06:13:56 +0800
+From:   Alex Lu <alex_lu@realsil.com.cn>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     Johan Hedberg <johan.hedberg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Max Chou <max.chou@realtek.com>
+Subject: [PATCH v2 2/2] Bluetooth: btrtl: Add firmware version print
+Message-ID: <20190830221356.GA9697@laptop-alex>
 MIME-Version: 1.0
-X-Received: by 2002:a5e:8344:: with SMTP id y4mr12305637iom.213.1567194007543;
- Fri, 30 Aug 2019 12:40:07 -0700 (PDT)
-Date:   Fri, 30 Aug 2019 12:40:07 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001d284f05915acaa9@google.com>
-Subject: INFO: trying to register non-static key in hci_uart_tty_receive
-From:   syzbot <syzbot+13a3ab5c28d3fb67bacc@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Originating-IP: [59.63.203.251]
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+From: Alex Lu <alex_lu@realsil.com.cn>
 
-syzbot found the following crash on:
+This patch is used to print fw version for debug convenience
 
-HEAD commit:    ed2393ca Add linux-next specific files for 20190827
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16350e7a600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2ef5940a07ed45f4
-dashboard link: https://syzkaller.appspot.com/bug?extid=13a3ab5c28d3fb67bacc
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+13a3ab5c28d3fb67bacc@syzkaller.appspotmail.com
-
-INFO: trying to register non-static key.
-the code is fine but needs lockdep annotation.
-turning off the locking correctness validator.
-CPU: 1 PID: 562 Comm: kworker/u4:3 Not tainted 5.3.0-rc6-next-20190827 #74
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: events_unbound flush_to_ldisc
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  assign_lock_key kernel/locking/lockdep.c:881 [inline]
-  register_lock_class+0x179e/0x1850 kernel/locking/lockdep.c:1190
-  __lock_acquire+0xf4/0x4a00 kernel/locking/lockdep.c:3837
-  lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4487
-  percpu_down_read include/linux/percpu-rwsem.h:40 [inline]
-  hci_uart_tty_receive+0xcf/0x6e0 drivers/bluetooth/hci_ldisc.c:603
-  tty_ldisc_receive_buf+0x15f/0x1c0 drivers/tty/tty_buffer.c:465
-  tty_port_default_receive_buf+0x7d/0xb0 drivers/tty/tty_port.c:38
-  receive_buf drivers/tty/tty_buffer.c:481 [inline]
-  flush_to_ldisc+0x222/0x390 drivers/tty/tty_buffer.c:533
-  process_one_work+0x9af/0x1740 kernel/workqueue.c:2269
-  worker_thread+0x98/0xe40 kernel/workqueue.c:2415
-  kthread+0x361/0x430 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-
+Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v2
+  - Re-order the code so that no forward declaration is needed
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ drivers/bluetooth/btrtl.c | 56 ++++++++++++++++++++++++---------------
+ 1 file changed, 35 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index b7487ab99eed..e32ef7c60a22 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -178,6 +178,27 @@ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
+ 	return &ic_id_table[i];
+ }
+ 
++static struct sk_buff *btrtl_read_local_version(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION failed (%ld)\n",
++			    PTR_ERR(skb));
++		return skb;
++	}
++
++	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
++		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION event length mismatch\n");
++		kfree_skb(skb);
++		return ERR_PTR(-EIO);
++	}
++
++	return skb;
++}
++
+ static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
+ {
+ 	struct rtl_rom_version_evt *rom_version;
+@@ -368,6 +389,8 @@ static int rtl_download_firmware(struct hci_dev *hdev,
+ 	int frag_len = RTL_FRAG_LEN;
+ 	int ret = 0;
+ 	int i;
++	struct sk_buff *skb;
++	struct hci_rp_read_local_version *rp;
+ 
+ 	dl_cmd = kmalloc(sizeof(struct rtl_download_cmd), GFP_KERNEL);
+ 	if (!dl_cmd)
+@@ -406,6 +429,18 @@ static int rtl_download_firmware(struct hci_dev *hdev,
+ 		data += RTL_FRAG_LEN;
+ 	}
+ 
++	skb = btrtl_read_local_version(hdev);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		rtl_dev_err(hdev, "read local version failed");
++		goto out;
++	}
++
++	rp = (struct hci_rp_read_local_version *)skb->data;
++	rtl_dev_info(hdev, "rtl: fw version 0x%04x%04x",
++		     __le16_to_cpu(rp->hci_rev), __le16_to_cpu(rp->lmp_subver));
++	kfree_skb(skb);
++
+ out:
+ 	kfree(dl_cmd);
+ 	return ret;
+@@ -484,27 +519,6 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev,
+ 	return ret;
+ }
+ 
+-static struct sk_buff *btrtl_read_local_version(struct hci_dev *hdev)
+-{
+-	struct sk_buff *skb;
+-
+-	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
+-			     HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION failed (%ld)\n",
+-			    PTR_ERR(skb));
+-		return skb;
+-	}
+-
+-	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
+-		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION event length mismatch\n");
+-		kfree_skb(skb);
+-		return ERR_PTR(-EIO);
+-	}
+-
+-	return skb;
+-}
+-
+ void btrtl_free(struct btrtl_device_info *btrtl_dev)
+ {
+ 	kfree(btrtl_dev->fw_data);
+-- 
+2.21.0
+
