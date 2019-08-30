@@ -2,135 +2,105 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4488AC41514
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7090BC3A5A3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:47:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1490321874
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:02:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 385592186A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 05:47:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="DF35DWi/";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="cq6tFOjr"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="wSKgc7E1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727023AbfH3FCQ (ORCPT
+        id S1726405AbfH3Fr4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Aug 2019 01:02:16 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:49362 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725902AbfH3FCQ (ORCPT
+        Fri, 30 Aug 2019 01:47:56 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:42175 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726023AbfH3Fr4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Aug 2019 01:02:16 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 7AB7961B14; Fri, 30 Aug 2019 05:02:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1567141334;
-        bh=fe+1CIFsLrsFmj7GnadvoGOHiiGzQrdsXLHYlpV+vnM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=DF35DWi/vcIha8ZdCxzYGat7OgmKEDoWJ9P16AGIJunFqUn8gDuZY6RzkK1YBvQXc
-         OyzXUZlhXMt3ZkhRluU+RMIKQvCCnZL3QzcSJHghAiMqdzjXYjAdvWUm4jaKC9hywP
-         oxorZWI2p1t24zo3fb3J5k5M4pIcb3UjLU0ViFPg=
-Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: c-hbandi@codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 65CF3602FC;
-        Fri, 30 Aug 2019 05:02:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1567141333;
-        bh=fe+1CIFsLrsFmj7GnadvoGOHiiGzQrdsXLHYlpV+vnM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=cq6tFOjrdTDeySUCvbiv+pnJOqt1EA0f/z2kgaQPmN973eij2IW0UMUzos6pQ8aIZ
-         Dyj0sVSZ34RKvan+TEX75lLPeQqCeD70ezOD2PTF1BL6S9FMfmm0jI6fKZdlVzQeAV
-         zuAmz7WnqM0Xb9GteUde4UCbbtVEvZTEGsV+AQoE=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 65CF3602FC
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
-From:   Harish Bandi <c-hbandi@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
-Subject: [PATCH v2] Bluetooth: hci_qca: wait for Pre shutdown complete event before sending the Power off pulse
-Date:   Fri, 30 Aug 2019 10:31:44 +0530
-Message-Id: <1567141304-24600-1-git-send-email-c-hbandi@codeaurora.org>
-X-Mailer: git-send-email 1.9.1
+        Fri, 30 Aug 2019 01:47:56 -0400
+Received: by mail-lj1-f196.google.com with SMTP id l14so5280486ljj.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2019 22:47:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=WhsZ4YABETaZp2LDJIY/+veXTWzZPHgmOSUCIQZtrvc=;
+        b=wSKgc7E11MoImp1ctQxQZ3BzWEzrcbWI8fTD/s+7Dke9GNCAAZ1hBLgg6TFSa7GmyB
+         d81SHe9oFaaK+l2XM+yNtV76rmaHINBxF/5mLRW82W12cxYZqZjBvJAXd1ofpv7hyCky
+         3X9Oi8HHDpslXGHl+2BydF/xnTlyf6aYbBwK1Bi1Q7A/z2lPHnoAvMXlbpGfQVF+gXqC
+         UZNKLxV6zyGU4hhdTHvcb31nAwziPn//KxahfuVA0wt5BPlKAOG8tBRyr951lYgqLEsS
+         rhcg4xFXFTA+FPJfqWG86EzxTpa9wb9ANsd5TCHVSO2fnvEdbhL5vzAR8OqQEaOZIls9
+         qJvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=WhsZ4YABETaZp2LDJIY/+veXTWzZPHgmOSUCIQZtrvc=;
+        b=c5E20mC/yrP8P2BQJfEyna8ij6xx9Md7zrfwwODBZi87BsG7RKyo+9TCvtkmoXhwWR
+         ymH3/cbCV4b8WtKe2FJm8sDFqFOrERhEMtnNamTn6QF3R6qPCp0BZV+b3m3ojIWfDqeu
+         o3x1tj7k6QgvoMY/KUsuC00ZM8ph7FZPWyCl3nXsJxL0G9ePNYSelf/tGCNd0FyZuqun
+         tKmpvhEEdUZKWdJVzIAa9N/8fdhStCvHz6nyQDvLTTTyWz9aLUFonQF5hLfptCNjG8ld
+         tf3ePN6hmxwrvKoJ2SBS4mxSNFf95sMieDIPVxHVPWca/O1yjh33gkURrCWG90YG0pPP
+         UHUg==
+X-Gm-Message-State: APjAAAWmD3rqeK/laix/lPc9ueZbNwOTeGSMuFLYNm8QWg5atI70drMz
+        2ZcSSeqTFDqZibS+uU0QNidsGw==
+X-Google-Smtp-Source: APXvYqyvVriHUQwIOUeiSlK1mLKjXNKFUwVQ2ebCzSB5jv7rjyoAiDnqUkKd+X95pFcXT7hYaWFlVA==
+X-Received: by 2002:a2e:8856:: with SMTP id z22mr7306948ljj.71.1567144074569;
+        Thu, 29 Aug 2019 22:47:54 -0700 (PDT)
+Received: from kynes (apn-95-41-66-58.dynamic.gprs.plus.pl. [95.41.66.58])
+        by smtp.gmail.com with ESMTPSA id i5sm660607lji.74.2019.08.29.22.47.53
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 29 Aug 2019 22:47:53 -0700 (PDT)
+Date:   Fri, 30 Aug 2019 07:47:52 +0200
+From:   "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] mesh: Log D-Bus method call errors
+Message-ID: <20190830054752.o3wrahabdsqmmvrt@kynes>
+Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20190820075654.2195-1-michal.lowas-rzechonek@silvair.com>
+ <685bc703108f5329b861f5c5f87301b44bddd8e0.camel@intel.com>
+ <20190829095951.nzzqqhgvblhogf4e@mlowasrzechonek2133>
+ <145b9b726c45fd37592b5a7a3504c911cd848409.camel@intel.com>
+ <20190829195610.a6dwgxabq3d2g3bp@kynes>
+ <38E88E55-4291-47AF-B502-47922E9FBA56@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <38E88E55-4291-47AF-B502-47922E9FBA56@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When SoC receives pre shut down command, it share the same
-with other COEX shared clients. So SoC needs a short time
-after sending VS pre shutdown command before turning off
-the regulators and sending the power off pulse. Along with
-short delay, needs to wait for command complete event for
-Pre shutdown VS command
+Brian,
 
-Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
-Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
-Changes in V2:
-- Modified commit text.
----
- drivers/bluetooth/btqca.c   | 22 ++++++++++++++++++++++
- drivers/bluetooth/hci_qca.c |  5 +++++
- 2 files changed, 27 insertions(+)
+On 08/29, Gix, Brian wrote:
+> > Anyway, I think a better approach would be to submit patches to ELL
+> > implementing these two features, and then use these additions in meshd.
+> > Does that sound acceptable from your POV?
+> 
+> I still feel though, that you are trying to solve a pre-deployment
+> “debugging” issue by requiring DBus responses for messages that don’t
+> require them.
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 8b33128..d48dc9e 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -99,6 +99,28 @@ static int qca_send_reset(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	int err;
-+
-+	bt_dev_dbg(hdev, "QCA pre shutdown cmd");
-+
-+	skb = __hci_cmd_sync_ev(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
-+				NULL, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
-+
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "QCA preshutdown_cmd failed (%d)", err);
-+		return err;
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
-+
- static void qca_tlv_check_data(struct rome_config *config,
- 				const struct firmware *fw)
- {
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index ab4c18e..43df13c 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1367,6 +1367,11 @@ static int qca_power_off(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 
-+	/* Perform pre shutdown command */
-+	qca_send_pre_shutdown_cmd(hdev);
-+
-+	usleep_range(8000, 10000);
-+
- 	qca_power_shutdown(hu);
- 	return 0;
- }
+I think you're right.
+
+Let's drop this patch, and I'll try to come up with something that would
+cover only "important" methods you mentioned earlier.
+
+regards
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
-
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
