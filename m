@@ -2,99 +2,96 @@ Return-Path: <SRS0=Lvhs=W2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7A9C3A5A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 12:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB1FC3A5A6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 12:43:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD90821874
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 12:28:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 549872186A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Aug 2019 12:43:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727812AbfH3M2v (ORCPT
+        id S1728093AbfH3Mnw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Aug 2019 08:28:51 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:49662 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726969AbfH3M2v (ORCPT
+        Fri, 30 Aug 2019 08:43:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:39723 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727417AbfH3Mnw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Aug 2019 08:28:51 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 85B6560208; Fri, 30 Aug 2019 12:28:50 +0000 (UTC)
-Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: c-hbandi@codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id B143B6014B;
-        Fri, 30 Aug 2019 12:28:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org B143B6014B
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=fail (p=none dis=none) header.from=qti.qualcomm.com
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=fail smtp.mailfrom=c_hbandi@qti.qualcomm.com
-From:   Harish Bandi <c_hbandi@qti.qualcomm.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
-Subject: [PATCH v3] Bluetooth: hci_qca: wait for Pre shutdown complete event before sending the Power off pulse
-Date:   Fri, 30 Aug 2019 17:58:36 +0530
-Message-Id: <1567168116-12462-1-git-send-email-c_hbandi@qti.qualcomm.com>
-X-Mailer: git-send-email 1.9.1
+        Fri, 30 Aug 2019 08:43:52 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC580.dip0.t-ipconnect.de [79.239.197.128])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 17EFACECDE;
+        Fri, 30 Aug 2019 14:52:35 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [RESEND PATCH 0/5] Add bluetooth support for Orange Pi 3
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190830092104.odipmbflounqpffo@flea>
+Date:   Fri, 30 Aug 2019 14:43:48 +0200
+Cc:     megous@megous.com, Chen-Yu Tsai <wens@csie.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D02B89FB-F8C0-40AD-A99A-6C1B4FEB72A0@holtmann.org>
+References: <20190823103139.17687-1-megous@megous.com>
+ <5524D5E9-FA82-4244-A91F-78CF1C3FB3FB@holtmann.org>
+ <20190830092104.odipmbflounqpffo@flea>
+To:     Maxime Ripard <mripard@kernel.org>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Harish Bandi <c-hbandi@codeaurora.org>
+Hi Maxime,
 
-When SoC receives pre shut down command, it share the same
-with other COEX shared clients. So SoC needs a short time
-after sending VS pre shutdown command before turning off
-the regulators and sending the power off pulse. Along with
-short delay, needs to wait for command complete event for
-Pre shutdown VS command
+>>> (Resend to add missing lists, sorry for the noise.)
+>>> 
+>>> This series implements bluetooth support for Xunlong Orange Pi 3 board.
+>>> 
+>>> The board uses AP6256 WiFi/BT 5.0 chip.
+>>> 
+>>> Summary of changes:
+>>> 
+>>> - add more delay to let initialize the chip
+>>> - let the kernel detect firmware file path
+>>> - add new compatible and update dt-bindings
+>>> - update Orange Pi 3 / H6 DTS
+>>> 
+>>> Please take a look.
+>>> 
+>>> thank you and regards,
+>>> Ondrej Jirman
+>>> 
+>>> Ondrej Jirman (5):
+>>> dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
+>>> bluetooth: bcm: Add support for loading firmware for BCM4345C5
+>>> bluetooth: hci_bcm: Give more time to come out of reset
+>>> arm64: dts: allwinner: h6: Add pin configs for uart1
+>>> arm64: dts: allwinner: orange-pi-3: Enable UART1 / Bluetooth
+>>> 
+>>> .../bindings/net/broadcom-bluetooth.txt       |  1 +
+>>> .../dts/allwinner/sun50i-h6-orangepi-3.dts    | 19 +++++++++++++++++++
+>>> arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 10 ++++++++++
+>>> drivers/bluetooth/btbcm.c                     |  3 +++
+>>> drivers/bluetooth/hci_bcm.c                   |  3 ++-
+>>> 5 files changed, 35 insertions(+), 1 deletion(-)
+>> 
+>> all 5 patches have been applied to bluetooth-next tree.
+> 
+> The DTS patches (last 2) should go through the arm-soc tree, can you
+> drop them?
 
-Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
-Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
-Changes in V3:
-- updated patch on latest tip.
----
- drivers/bluetooth/btqca.c   | 5 +++--
- drivers/bluetooth/hci_qca.c | 2 ++
- 2 files changed, 5 insertions(+), 2 deletions(-)
+why is that? We have included DTS changes for Bluetooth devices directly all the time. What is different with this hardware?
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 0875470..8cc21ad 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -106,8 +106,9 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
- 
- 	bt_dev_dbg(hdev, "QCA pre shutdown cmd");
- 
--	skb = __hci_cmd_sync(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
--				NULL, HCI_INIT_TIMEOUT);
-+	skb = __hci_cmd_sync_ev(hdev, QCA_PRE_SHUTDOWN_CMD, 0,
-+				NULL, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
-+
- 	if (IS_ERR(skb)) {
- 		err = PTR_ERR(skb);
- 		bt_dev_err(hdev, "QCA preshutdown_cmd failed (%d)", err);
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 15753f6..d33828f 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1375,6 +1375,8 @@ static int qca_power_off(struct hci_dev *hdev)
- 	/* Perform pre shutdown command */
- 	qca_send_pre_shutdown_cmd(hdev);
- 
-+	usleep_range(8000, 10000);
-+
- 	qca_power_shutdown(hu);
- 	return 0;
- }
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Regards
+
+Marcel
 
