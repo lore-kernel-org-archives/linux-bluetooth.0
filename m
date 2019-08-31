@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 245B0C3A59F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Aug 2019 08:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C621AC3A59F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Aug 2019 08:41:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 024F623426
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Aug 2019 08:36:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4C5423711
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 31 Aug 2019 08:41:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbfHaIgg (ORCPT
+        id S1726453AbfHaIlr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 31 Aug 2019 04:36:36 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:33569 "EHLO
+        Sat, 31 Aug 2019 04:41:47 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:33668 "EHLO
         rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726602AbfHaIgg (ORCPT
+        with ESMTP id S1726251AbfHaIlr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 31 Aug 2019 04:36:36 -0400
+        Sat, 31 Aug 2019 04:41:47 -0400
 Authenticated-By: 
-X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x7V8aN5p002730, This message is accepted by code: ctloc85258
-Received: from RS-CAS02.realsil.com.cn (rsn1.realsil.com.cn[172.29.17.3](maybeforged))
-        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x7V8aN5p002730
+X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x7V8fXSa003174, This message is accepted by code: ctloc85258
+Received: from RS-CAS02.realsil.com.cn (doc.realsil.com.cn[172.29.17.3](maybeforged))
+        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x7V8fXSa003174
         (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Sat, 31 Aug 2019 16:36:23 +0800
-Received: from laptop-alex (59.63.203.251) by RS-CAS02.realsil.com.cn
+        Sat, 31 Aug 2019 16:41:34 +0800
+Received: from laptop-alex (116.136.21.149) by RS-CAS02.realsil.com.cn
  (172.29.17.3) with Microsoft SMTP Server (TLS) id 14.3.439.0; Sat, 31 Aug
- 2019 16:36:22 +0800
-Date:   Sat, 31 Aug 2019 16:36:02 +0800
+ 2019 16:41:33 +0800
+Date:   Sat, 31 Aug 2019 16:41:13 +0800
 From:   Alex Lu <alex_lu@realsil.com.cn>
 To:     Marcel Holtmann <marcel@holtmann.org>
 CC:     Johan Hedberg <johan.hedberg@gmail.com>,
         <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Max Chou <max.chou@realtek.com>
-Subject: [PATCH v3 2/2] Bluetooth: btrtl: Add firmware version print
-Message-ID: <20190831083602.GA10103@laptop-alex>
+Subject: [PATCH 1/2] Bluetooth: btrtl: Remove redundant prefix from calls to rtl_dev macros
+Message-ID: <20190831084030.GA10145@laptop-alex>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
 User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Originating-IP: [59.63.203.251]
+X-Originating-IP: [116.136.21.149]
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -50,106 +50,72 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Alex Lu <alex_lu@realsil.com.cn>
 
-This patch is used to print fw version for debug convenience
+the rtl: or RTL: prefix in the string is pointless. The rtl_dev_* macros
+already does that.
 
 Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
 ---
-Changes in v3
-  - Remove the pointless rtl: prefix in the format string
-Changes in v2
-  - Re-order the code so that no forward declaration is needed
-
- drivers/bluetooth/btrtl.c | 56 ++++++++++++++++++++++++---------------
- 1 file changed, 35 insertions(+), 21 deletions(-)
+ drivers/bluetooth/btrtl.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index b7487ab99eed..adb8ba0fcd59 100644
+index adb8ba0fcd59..20aeed3c1ee7 100644
 --- a/drivers/bluetooth/btrtl.c
 +++ b/drivers/bluetooth/btrtl.c
-@@ -178,6 +178,27 @@ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
- 	return &ic_id_table[i];
- }
- 
-+static struct sk_buff *btrtl_read_local_version(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION failed (%ld)",
-+			    PTR_ERR(skb));
-+		return skb;
-+	}
-+
-+	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
-+		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION event length mismatch");
-+		kfree_skb(skb);
-+		return ERR_PTR(-EIO);
-+	}
-+
-+	return skb;
-+}
-+
- static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
- {
- 	struct rtl_rom_version_evt *rom_version;
-@@ -368,6 +389,8 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 	int frag_len = RTL_FRAG_LEN;
- 	int ret = 0;
- 	int i;
-+	struct sk_buff *skb;
-+	struct hci_rp_read_local_version *rp;
- 
- 	dl_cmd = kmalloc(sizeof(struct rtl_download_cmd), GFP_KERNEL);
- 	if (!dl_cmd)
-@@ -406,6 +429,18 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 		data += RTL_FRAG_LEN;
+@@ -213,7 +213,7 @@ static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
  	}
  
-+	skb = btrtl_read_local_version(hdev);
-+	if (IS_ERR(skb)) {
-+		ret = PTR_ERR(skb);
-+		rtl_dev_err(hdev, "read local version failed");
-+		goto out;
-+	}
-+
-+	rp = (struct hci_rp_read_local_version *)skb->data;
-+	rtl_dev_info(hdev, "fw version 0x%04x%04x",
-+		     __le16_to_cpu(rp->hci_rev), __le16_to_cpu(rp->lmp_subver));
-+	kfree_skb(skb);
-+
- out:
- 	kfree(dl_cmd);
- 	return ret;
-@@ -484,27 +519,6 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev,
- 	return ret;
- }
+ 	if (skb->len != sizeof(*rom_version)) {
+-		rtl_dev_err(hdev, "RTL version event length mismatch\n");
++		rtl_dev_err(hdev, "version event length mismatch\n");
+ 		kfree_skb(skb);
+ 		return -EIO;
+ 	}
+@@ -451,7 +451,7 @@ static int rtl_load_file(struct hci_dev *hdev, const char *name, u8 **buff)
+ 	const struct firmware *fw;
+ 	int ret;
  
--static struct sk_buff *btrtl_read_local_version(struct hci_dev *hdev)
--{
--	struct sk_buff *skb;
--
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
--			     HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION failed (%ld)\n",
--			    PTR_ERR(skb));
--		return skb;
--	}
--
--	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
--		rtl_dev_err(hdev, "HCI_OP_READ_LOCAL_VERSION event length mismatch\n");
--		kfree_skb(skb);
--		return ERR_PTR(-EIO);
--	}
--
--	return skb;
--}
--
- void btrtl_free(struct btrtl_device_info *btrtl_dev)
- {
- 	kfree(btrtl_dev->fw_data);
+-	rtl_dev_info(hdev, "rtl: loading %s\n", name);
++	rtl_dev_info(hdev, "loading %s\n", name);
+ 	ret = request_firmware(&fw, name, &hdev->dev);
+ 	if (ret < 0)
+ 		return ret;
+@@ -551,7 +551,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 	}
+ 
+ 	resp = (struct hci_rp_read_local_version *)skb->data;
+-	rtl_dev_info(hdev, "rtl: examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x\n",
++	rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x\n",
+ 		     resp->hci_ver, resp->hci_rev,
+ 		     resp->lmp_ver, resp->lmp_subver);
+ 
+@@ -564,7 +564,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 					    hdev->bus);
+ 
+ 	if (!btrtl_dev->ic_info) {
+-		rtl_dev_info(hdev, "rtl: unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
++		rtl_dev_info(hdev, "unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
+ 			    lmp_subver, hci_rev, hci_ver);
+ 		return btrtl_dev;
+ 	}
+@@ -622,7 +622,7 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+ 	 * to a different value.
+ 	 */
+ 	if (!btrtl_dev->ic_info) {
+-		rtl_dev_info(hdev, "rtl: assuming no firmware upload needed\n");
++		rtl_dev_info(hdev, "assuming no firmware upload needed\n");
+ 		return 0;
+ 	}
+ 
+@@ -636,7 +636,7 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+ 	case RTL_ROM_LMP_8822B:
+ 		return btrtl_setup_rtl8723b(hdev, btrtl_dev);
+ 	default:
+-		rtl_dev_info(hdev, "rtl: assuming no firmware upload needed\n");
++		rtl_dev_info(hdev, "assuming no firmware upload needed\n");
+ 		return 0;
+ 	}
+ }
 -- 
 2.21.0
 
