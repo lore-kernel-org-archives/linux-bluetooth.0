@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F79C3A59E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Sep 2019 11:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F66BC3A59E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Sep 2019 11:49:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6C562173E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Sep 2019 11:44:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F05A2168B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Sep 2019 11:49:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730430AbfIBLoS convert rfc822-to-8bit (ORCPT
+        id S1730611AbfIBLtV convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Sep 2019 07:44:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54258 "EHLO mail.kernel.org"
+        Mon, 2 Sep 2019 07:49:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58340 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730340AbfIBLoS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Sep 2019 07:44:18 -0400
+        id S1729690AbfIBLtV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 2 Sep 2019 07:49:21 -0400
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 203997] [REGRESSION] Unable to connect BT audio device on
  5.1.15
-Date:   Mon, 02 Sep 2019 11:44:17 +0000
+Date:   Mon, 02 Sep 2019 11:49:20 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -38,8 +38,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-203997-62941-RDjihDdifS@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-203997-62941-6gGPSlAedz@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-203997-62941@https.bugzilla.kernel.org/>
 References: <bug-203997-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -54,18 +54,10 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=203997
 
-Pavel (pavel@noa-labs.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |pavel@noa-labs.com
-
---- Comment #16 from Pavel (pavel@noa-labs.com) ---
-Hello,
-
-I'm afraid you are not out of the woods yet. I tried 5.2 and still can't pair a
-lot of BT LE products based on MXCHIP chipset, including my mouse. My fear is
-that they do use a key size of 1 by default 8-[]
+--- Comment #17 from Pavel (pavel@noa-labs.com) ---
+Created attachment 284765
+  --> https://bugzilla.kernel.org/attachment.cgi?id=284765&action=edit
+Traffic capture of a broken pairing
 
 -- 
 You are receiving this mail because:
