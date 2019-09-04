@@ -1,193 +1,134 @@
-Return-Path: <SRS0=zNYh=W6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=/e8j=W7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E341C3A5A2
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Sep 2019 19:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB5D3C3A59E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 04:34:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 548D221897
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Sep 2019 19:04:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8382621883
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 04:34:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="I6pw9B5r";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="I2aSP4zU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726411AbfICTEN (ORCPT
+        id S1727722AbfIDEed (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Sep 2019 15:04:13 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:37001 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725882AbfICTEJ (ORCPT
+        Wed, 4 Sep 2019 00:34:33 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:55088 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725840AbfIDEed (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Sep 2019 15:04:09 -0400
-Received: by mail-io1-f70.google.com with SMTP id f24so15548768ion.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Sep 2019 12:04:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=ggJvVtMwVhNhQHN6gDzzosmGm7u52Y8RU1Pq44M1vzo=;
-        b=ZHyZeHEPclOJxP+2Do1+1MEcKD1IyyjhW8Nf2BjEvVbHpv+4+22LF8ZeeaxvhzrmGE
-         BQ48WIWNRav4k4SF1m6Q+2Rv5dY97zrAvjpl7pzpUCQlGcqLEktSZXBH5mqhF+7h1JTm
-         ztJKrHCgvib/nYC3015Km/SdYicuswlgRRVMiWIkJYMIbZ/9XxJrELHCg1hgWy6GwsZB
-         3vll2nMjIygd2a27e0XC2Tm72xl3f7ZmYSMyszZpLAVQlXANnOAL+UJ1IizOd77M/Tha
-         LPB/D2CPZnsYukOSWl6DdRQ2ADsR7CugbwvF7cF7/eO7QCzOxwj1LmFR8vGabqi0xtE4
-         TDoQ==
-X-Gm-Message-State: APjAAAUehUzSPSgey17T8EWjObErIE0HKPRzcbp3l+vK8bIVjDaI4x2/
-        XtpwId4hu7dSuQII19i8IT+OpEbJ+K/iUG9K0NJN2dRB+b+H
-X-Google-Smtp-Source: APXvYqyAr4lM/K4Q36xxiGHskjtOJEqbMJ9j3gJ54NOxeX+uXRdjwaRPWkvo+iiAXHLNGTu8f+KGdo106jiu2gxQjugcnR1HgHuJ
-MIME-Version: 1.0
-X-Received: by 2002:a5e:d80e:: with SMTP id l14mr1179553iok.217.1567537447635;
- Tue, 03 Sep 2019 12:04:07 -0700 (PDT)
-Date:   Tue, 03 Sep 2019 12:04:07 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bd19720591aac025@google.com>
-Subject: INFO: trying to register non-static key in hci_uart_flush (2)
-From:   syzbot <syzbot+576dfca25381fb6fbc5f@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+        Wed, 4 Sep 2019 00:34:33 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 59917602EF; Wed,  4 Sep 2019 04:34:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1567571672;
+        bh=yD7jddCeDQh/QLkdALenruhc6/Bis0ve+odm+lJNIpc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=I6pw9B5rr26zjf9F8xAcaV9hOA1N438qnSW6RXBSDF2vqmEqZw6tmqy0QALhuYHLj
+         O4sKsaEvGajDPBfDMWc81zdA/1YxO6y9C5kEysZ/G0IzEUwEeKL1n6jdPgeBmX0Aa0
+         32/OFYNYF8FAzDR2ENGUW9Z5zNiiPZEYXTs4f4o4=
+Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: c-hbandi@codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2DFCE607EB;
+        Wed,  4 Sep 2019 04:34:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1567571671;
+        bh=yD7jddCeDQh/QLkdALenruhc6/Bis0ve+odm+lJNIpc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=I2aSP4zUWyN5R+xWOmkIdddBX4q7VtpEp8StdzSVkyn8Yfe5BwBwf5HJVdRvViP94
+         +CnP44E9ZXvhH27gigVLcaGDTUaymlzH7W18sgqlXUtYuBc7hgKOTvFPpKAQtHRYR0
+         AA1zPgMsHJGmJ8rT14/Cy9JLfidd+zH6RuXDb2wA=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 2DFCE607EB
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
+From:   Harish Bandi <c-hbandi@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v1] bluetooth: hci_qca: disable irqs when spinlock is acquired
+Date:   Wed,  4 Sep 2019 10:04:16 +0530
+Message-Id: <1567571656-32403-1-git-send-email-c-hbandi@codeaurora.org>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Looks like Deadlock is observed in hci_qca while performing
+stress and stability tests. Since same lock is getting
+acquired from qca_wq_awake_rx and hci_ibs_tx_idle_timeout
+seeing spinlock recursion, irqs should be disable while
+acquiring the spinlock always.
 
-syzbot found the following crash on:
-
-HEAD commit:    6d028043 Add linux-next specific files for 20190830
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=141d6cae600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=82a6bec43ab0cb69
-dashboard link: https://syzkaller.appspot.com/bug?extid=576dfca25381fb6fbc5f
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+576dfca25381fb6fbc5f@syzkaller.appspotmail.com
-
-INFO: trying to register non-static key.
-the code is fine but needs lockdep annotation.
-turning off the locking correctness validator.
-CPU: 0 PID: 31436 Comm: syz-executor.2 Not tainted 5.3.0-rc6-next-20190830  
-#75
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  assign_lock_key kernel/locking/lockdep.c:881 [inline]
-  register_lock_class+0x179e/0x1850 kernel/locking/lockdep.c:1190
-  __lock_acquire+0xf4/0x4a00 kernel/locking/lockdep.c:3837
-  lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4487
-  percpu_down_read include/linux/percpu-rwsem.h:40 [inline]
-  hci_uart_flush+0x110/0x510 drivers/bluetooth/hci_ldisc.c:241
-  hci_uart_close drivers/bluetooth/hci_ldisc.c:267 [inline]
-  hci_uart_tty_close+0x8e/0x280 drivers/bluetooth/hci_ldisc.c:534
-  tty_ldisc_close.isra.0+0x119/0x1a0 drivers/tty/tty_ldisc.c:494
-  tty_ldisc_kill+0x9c/0x160 drivers/tty/tty_ldisc.c:642
-  tty_ldisc_release+0xe9/0x2b0 drivers/tty/tty_ldisc.c:814
-  tty_release_struct+0x1b/0x50 drivers/tty/tty_io.c:1612
-  tty_release+0xbcb/0xe90 drivers/tty/tty_io.c:1785
-  __fput+0x2ff/0x890 fs/file_table.c:280
-  ____fput+0x16/0x20 fs/file_table.c:313
-  task_work_run+0x145/0x1c0 kernel/task_work.c:113
-  get_signal+0x2078/0x2500 kernel/signal.c:2528
-  do_signal+0x87/0x1700 arch/x86/kernel/signal.c:815
-  exit_to_usermode_loop+0x286/0x380 arch/x86/entry/common.c:159
-  prepare_exit_to_usermode arch/x86/entry/common.c:194 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:274 [inline]
-  do_syscall_64+0x65f/0x760 arch/x86/entry/common.c:300
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x459879
-Code: fd b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 cb b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f5b36328c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000459879
-RDX: 0000000000000002 RSI: 00000000400455c8 RDI: 0000000000000003
-RBP: 000000000075bfc8 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f5b363296d4
-R13: 00000000004c2586 R14: 00000000004d5ae8 R15: 00000000ffffffff
-kasan: CONFIG_KASAN_INLINE enabled
-kasan: GPF could be caused by NULL-ptr deref or user memory access
-general protection fault: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 31436 Comm: syz-executor.2 Not tainted 5.3.0-rc6-next-20190830  
-#75
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-RIP: 0010:__wake_up_common+0xdf/0x610 kernel/sched/wait.c:86
-Code: 05 00 00 4c 8b 43 38 49 83 e8 18 49 8d 78 18 48 39 7d d0 0f 84 64 02  
-00 00 48 b8 00 00 00 00 00 fc ff df 48 89 f9 48 c1 e9 03 <80> 3c 01 00 0f  
-85 0d 05 00 00 49 8b 40 18 89 55 b0 31 db 49 bc 00
-RSP: 0018:ffff8880979bf818 EFLAGS: 00010046
-RAX: dffffc0000000000 RBX: ffff8880a7ff48b8 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: 1ffffffff138b536 RDI: 0000000000000000
-RBP: ffff8880979bf870 R08: ffffffffffffffe8 R09: 0000000000000000
-R10: ffffed1012f37efe R11: 0000000000000003 R12: ffff8880a7ff4900
-R13: ffff8880a7ff48b0 R14: 0000000000000000 R15: ffff8880a7ff48b8
-FS:  00007f5b36329700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffff600400 CR3: 00000000a81a2000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  __wake_up_locked+0x11/0x20 kernel/sched/wait.c:151
-  rcu_sync_func+0x16f/0x200 kernel/rcu/sync.c:87
-  rcu_sync_enter+0x158/0x310 kernel/rcu/sync.c:150
-  percpu_down_write+0x61/0x440 kernel/locking/percpu-rwsem.c:146
-  hci_uart_tty_close+0x154/0x280 drivers/bluetooth/hci_ldisc.c:537
-  tty_ldisc_close.isra.0+0x119/0x1a0 drivers/tty/tty_ldisc.c:494
-  tty_ldisc_kill+0x9c/0x160 drivers/tty/tty_ldisc.c:642
-  tty_ldisc_release+0xe9/0x2b0 drivers/tty/tty_ldisc.c:814
-  tty_release_struct+0x1b/0x50 drivers/tty/tty_io.c:1612
-  tty_release+0xbcb/0xe90 drivers/tty/tty_io.c:1785
-  __fput+0x2ff/0x890 fs/file_table.c:280
-  ____fput+0x16/0x20 fs/file_table.c:313
-  task_work_run+0x145/0x1c0 kernel/task_work.c:113
-  get_signal+0x2078/0x2500 kernel/signal.c:2528
-  do_signal+0x87/0x1700 arch/x86/kernel/signal.c:815
-  exit_to_usermode_loop+0x286/0x380 arch/x86/entry/common.c:159
-  prepare_exit_to_usermode arch/x86/entry/common.c:194 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:274 [inline]
-  do_syscall_64+0x65f/0x760 arch/x86/entry/common.c:300
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x459879
-Code: fd b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 cb b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f5b36328c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000459879
-RDX: 0000000000000002 RSI: 00000000400455c8 RDI: 0000000000000003
-RBP: 000000000075bfc8 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f5b363296d4
-R13: 00000000004c2586 R14: 00000000004d5ae8 R15: 00000000ffffffff
-Modules linked in:
----[ end trace d1da9c36c5e69966 ]---
-RIP: 0010:__wake_up_common+0xdf/0x610 kernel/sched/wait.c:86
-Code: 05 00 00 4c 8b 43 38 49 83 e8 18 49 8d 78 18 48 39 7d d0 0f 84 64 02  
-00 00 48 b8 00 00 00 00 00 fc ff df 48 89 f9 48 c1 e9 03 <80> 3c 01 00 0f  
-85 0d 05 00 00 49 8b 40 18 89 55 b0 31 db 49 bc 00
-RSP: 0018:ffff8880979bf818 EFLAGS: 00010046
-RAX: dffffc0000000000 RBX: ffff8880a7ff48b8 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: 1ffffffff138b536 RDI: 0000000000000000
-RBP: ffff8880979bf870 R08: ffffffffffffffe8 R09: 0000000000000000
-R10: ffffed1012f37efe R11: 0000000000000003 R12: ffff8880a7ff4900
-R13: ffff8880a7ff48b0 R14: 0000000000000000 R15: ffff8880a7ff48b8
-FS:  00007f5b36329700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffff600400 CR3: 00000000a81a2000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
+Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/bluetooth/hci_qca.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index d33828f..e3164c2 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -309,13 +309,14 @@ static void qca_wq_awake_device(struct work_struct *work)
+ 					    ws_awake_device);
+ 	struct hci_uart *hu = qca->hu;
+ 	unsigned long retrans_delay;
++	unsigned long flags;
+ 
+ 	BT_DBG("hu %p wq awake device", hu);
+ 
+ 	/* Vote for serial clock */
+ 	serial_clock_vote(HCI_IBS_TX_VOTE_CLOCK_ON, hu);
+ 
+-	spin_lock(&qca->hci_ibs_lock);
++	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+ 
+ 	/* Send wake indication to device */
+ 	if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0)
+@@ -327,7 +328,7 @@ static void qca_wq_awake_device(struct work_struct *work)
+ 	retrans_delay = msecs_to_jiffies(qca->wake_retrans);
+ 	mod_timer(&qca->wake_retrans_timer, jiffies + retrans_delay);
+ 
+-	spin_unlock(&qca->hci_ibs_lock);
++	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+ 
+ 	/* Actually send the packets */
+ 	hci_uart_tx_wakeup(hu);
+@@ -338,12 +339,13 @@ static void qca_wq_awake_rx(struct work_struct *work)
+ 	struct qca_data *qca = container_of(work, struct qca_data,
+ 					    ws_awake_rx);
+ 	struct hci_uart *hu = qca->hu;
++	unsigned long flags;
+ 
+ 	BT_DBG("hu %p wq awake rx", hu);
+ 
+ 	serial_clock_vote(HCI_IBS_RX_VOTE_CLOCK_ON, hu);
+ 
+-	spin_lock(&qca->hci_ibs_lock);
++	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+ 	qca->rx_ibs_state = HCI_IBS_RX_AWAKE;
+ 
+ 	/* Always acknowledge device wake up,
+@@ -354,7 +356,7 @@ static void qca_wq_awake_rx(struct work_struct *work)
+ 
+ 	qca->ibs_sent_wacks++;
+ 
+-	spin_unlock(&qca->hci_ibs_lock);
++	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+ 
+ 	/* Actually send the packets */
+ 	hci_uart_tx_wakeup(hu);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
