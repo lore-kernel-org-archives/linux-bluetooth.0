@@ -2,109 +2,100 @@ Return-Path: <SRS0=/e8j=W7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB1AC3A5A9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 14:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B434CC3A5A7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 14:23:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F9D222CED
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 14:19:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9546522CED
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 14:23:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730711AbfIDOTk convert rfc822-to-8bit (ORCPT
+        id S1731058AbfIDOXb convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Sep 2019 10:19:40 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:56859 "EHLO
+        Wed, 4 Sep 2019 10:23:31 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52632 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727722AbfIDOTk (ORCPT
+        with ESMTP id S1730880AbfIDOXb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Sep 2019 10:19:40 -0400
+        Wed, 4 Sep 2019 10:23:31 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 15095CECB0;
-        Wed,  4 Sep 2019 16:28:25 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8C9A6CECB0;
+        Wed,  4 Sep 2019 16:32:17 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [RESEND PATCH 0/5] Add bluetooth support for Orange Pi 3
+Subject: Re: [PATCH] Bluetooth: btusb: Use cmd_timeout to reset Realtek device
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190830132034.u65arlv7umh64lx6@flea>
-Date:   Wed, 4 Sep 2019 16:19:37 +0200
-Cc:     megous@megous.com, Chen-Yu Tsai <wens@csie.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org
+In-Reply-To: <20190903094103.GA10714@laptop-alex>
+Date:   Wed, 4 Sep 2019 16:23:29 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Max Chou <max.chou@realtek.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <76FD40C7-10C5-4818-8EF9-60326ECA4243@holtmann.org>
-References: <20190823103139.17687-1-megous@megous.com>
- <5524D5E9-FA82-4244-A91F-78CF1C3FB3FB@holtmann.org>
- <20190830092104.odipmbflounqpffo@flea>
- <D02B89FB-F8C0-40AD-A99A-6C1B4FEB72A0@holtmann.org>
- <20190830132034.u65arlv7umh64lx6@flea>
-To:     Maxime Ripard <mripard@kernel.org>
+Message-Id: <989DBD04-B5DC-4733-8784-93B45BA9FF15@holtmann.org>
+References: <20190903094103.GA10714@laptop-alex>
+To:     Alex Lu <alex_lu@realsil.com.cn>
 X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Maxime,
+Hi Alex,
 
->>>>> (Resend to add missing lists, sorry for the noise.)
->>>>> 
->>>>> This series implements bluetooth support for Xunlong Orange Pi 3 board.
->>>>> 
->>>>> The board uses AP6256 WiFi/BT 5.0 chip.
->>>>> 
->>>>> Summary of changes:
->>>>> 
->>>>> - add more delay to let initialize the chip
->>>>> - let the kernel detect firmware file path
->>>>> - add new compatible and update dt-bindings
->>>>> - update Orange Pi 3 / H6 DTS
->>>>> 
->>>>> Please take a look.
->>>>> 
->>>>> thank you and regards,
->>>>> Ondrej Jirman
->>>>> 
->>>>> Ondrej Jirman (5):
->>>>> dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
->>>>> bluetooth: bcm: Add support for loading firmware for BCM4345C5
->>>>> bluetooth: hci_bcm: Give more time to come out of reset
->>>>> arm64: dts: allwinner: h6: Add pin configs for uart1
->>>>> arm64: dts: allwinner: orange-pi-3: Enable UART1 / Bluetooth
->>>>> 
->>>>> .../bindings/net/broadcom-bluetooth.txt       |  1 +
->>>>> .../dts/allwinner/sun50i-h6-orangepi-3.dts    | 19 +++++++++++++++++++
->>>>> arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 10 ++++++++++
->>>>> drivers/bluetooth/btbcm.c                     |  3 +++
->>>>> drivers/bluetooth/hci_bcm.c                   |  3 ++-
->>>>> 5 files changed, 35 insertions(+), 1 deletion(-)
->>>> 
->>>> all 5 patches have been applied to bluetooth-next tree.
->>> 
->>> The DTS patches (last 2) should go through the arm-soc tree, can you
->>> drop them?
->> 
->> why is that? We have included DTS changes for Bluetooth devices
->> directly all the time. What is different with this hardware?
+> Realtek Bluetooth controller provides a BT_DIS reset pin for hardware
+> reset of it. The cmd_timeout is helpful on Realtek bluetooth controller
+> where the firmware gets stuck.
 > 
-> I guess some maintainers are more relaxed with it than we are then,
-> but for the why, well, it's the usual reasons, the most immediate one
-> being that it reduces to a minimum the conflicts between trees.
+> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+> ---
+> drivers/bluetooth/btusb.c | 29 +++++++++++++++++++++--------
+> 1 file changed, 21 insertions(+), 8 deletions(-)
 > 
-> The other being that it's not really usual to merge patches supposed
-> to be handled by another maintainer without (at least) his
-> consent. I'm pretty sure you would have asked the same request if I
-> would have merged the bluetooth patches through my tree without
-> notice.
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 31d3febed187..a626de3a3f4c 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -489,16 +489,19 @@ struct btusb_data {
+> 	int (*setup_on_usb)(struct hci_dev *hdev);
+> 
+> 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+> -	unsigned cmd_timeout_cnt;
+> +	unsigned int cmd_timeout_cnt;
+> +	unsigned int cmd_timeout_max;
+> +	unsigned int reset_msecs;
+> +	int reset_gpio_value;
+> };
+> 
+> 
+> -static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+> +static void btusb_cmd_timeout(struct hci_dev *hdev)
+> {
+> 	struct btusb_data *data = hci_get_drvdata(hdev);
+> 	struct gpio_desc *reset_gpio = data->reset_gpio;
+> 
+> -	if (++data->cmd_timeout_cnt < 5)
+> +	if (++data->cmd_timeout_cnt < data->cmd_timeout_max)
+> 		return;
+> 
+> 	if (!reset_gpio) {
+> @@ -519,9 +522,9 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+> 	}
+> 
+> 	bt_dev_err(hdev, "Initiating HW reset via gpio");
+> -	gpiod_set_value_cansleep(reset_gpio, 1);
+> -	msleep(100);
+> -	gpiod_set_value_cansleep(reset_gpio, 0);
+> +	gpiod_set_value_cansleep(reset_gpio, data->reset_gpio_value);
+> +	msleep(data->reset_msecs);
+> +	gpiod_set_value_cansleep(reset_gpio, !data->reset_gpio_value);
+> }
 
-I took the two DTS patches out now and let the submitter deal with getting these merged.
+I really prefer that no Realtek specifics end up in a callback that is meant for Intel hardware. So this needs to be split.
+
+So can you just provide a btusb_rtl_cmd_timeout callback and set it in case of Realtek hardware.
 
 Regards
 
