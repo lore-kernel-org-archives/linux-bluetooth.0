@@ -2,120 +2,105 @@ Return-Path: <SRS0=/e8j=W7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD2AC3A5A9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 19:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 131D4C3A5A9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 20:26:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6278C22CF5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 19:48:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="G8bi5DgT"
+	by mail.kernel.org (Postfix) with ESMTP id E2FEC21726
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 20:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727722AbfIDTsO (ORCPT
+        id S1729125AbfIDU0D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Sep 2019 15:48:14 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:46770 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727156AbfIDTsO (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Sep 2019 15:48:14 -0400
-Received: by mail-lj1-f196.google.com with SMTP id e17so9829401ljf.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Sep 2019 12:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=73RAgDI06S2z4waitXKG+YdGLcK+Sgfb8+gbBum1B4c=;
-        b=G8bi5DgTCOW0vc5zG+014H/7z74lebXDvUlyZcxA8TCQ8QinyY/ETAKyzg4qtkW4xh
-         DDVKlQUVM47gYnlOhEn1mnCCku25zeUGCVVyspveb7+M/LJh9o+HZPnCcByFURW5UJ0B
-         vLUaKcDozH3TMqT1Xd6IJu9tYULE/3KMVvfBJYH1xmHrmD2ZlIidymtN0Q/ZLeBYrl5i
-         jtlfrZ6bpwVyvwtRMv8Mr46CWUzgopSy39en58fsZaXjJYrQc6XN9nlPsUK9nmL2b7lp
-         JfK069kZspUvyC8CpubFQL8H4R3tgOaOFI6Td/hGWAKl/ZVZXj7I9cT7TApdiYuOwEPi
-         B0WA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mail-followup-to
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=73RAgDI06S2z4waitXKG+YdGLcK+Sgfb8+gbBum1B4c=;
-        b=qeMWFBL7CD0GKW+5gbZj+Cy3vcnKBLW1/UJ6xVCNjrL4dUm76PlXyH/MlBF7cKkt9a
-         6yM7rvv0co9Ybf4vWnhyJQzHQaFVUZqilug9+OKSC/hjhttAuGfqd4Q+/RuTMDXkFnou
-         8oOcV39EcM800/LncdSl1Yi5pI6ohFCEaeLPjYM9Y9M2eKDwk8YraSm2NFW5xVm3Kq1S
-         Pp2Vor8QVB2n6IKzFeOCXOhMEb7dAn7MPHVZvnS4ILaOaVlayfqSXND6EMl/7p8TTULj
-         E1ZxctZteQ9hp9Cp0QJdN3oes6dE8aARVsdyCcWgu68XwFIstPSQfI1yjp14at8A0mMl
-         1HDw==
-X-Gm-Message-State: APjAAAV8csQTPHMRmOlH8BSHifkoCdXaOB1PKJKKwqy4S3X5G2P9JQAp
-        PDIqliO8yZGXVal5ObCabetuDqV94Zo=
-X-Google-Smtp-Source: APXvYqyVB+dCqfGfK7stfJKB28z78eRpa4Nao4RFN6GzGPSJOFnpsPi2OVsg0KXxUbxvzGAhxC3vNQ==
-X-Received: by 2002:a2e:a303:: with SMTP id l3mr2664274lje.124.1567626491637;
-        Wed, 04 Sep 2019 12:48:11 -0700 (PDT)
-Received: from kynes (apn-95-41-66-58.dynamic.gprs.plus.pl. [95.41.66.58])
-        by smtp.gmail.com with ESMTPSA id b9sm3520991ljd.52.2019.09.04.12.48.09
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 04 Sep 2019 12:48:10 -0700 (PDT)
-Date:   Wed, 4 Sep 2019 21:48:08 +0200
-From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org, Brian Gix <brian.gix@intel.com>,
-        Inga Stotland <inga.stotland@intel.com>,
-        Szymon =?utf-8?Q?S=C5=82upik?= <simon@silvair.com>
+        Wed, 4 Sep 2019 16:26:03 -0400
+Received: from mga12.intel.com ([192.55.52.136]:54637 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726495AbfIDU0D (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 4 Sep 2019 16:26:03 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Sep 2019 13:26:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,468,1559545200"; 
+   d="scan'208";a="194850475"
+Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
+  by orsmga002.jf.intel.com with ESMTP; 04 Sep 2019 13:26:02 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.221]) by
+ ORSMSX104.amr.corp.intel.com ([169.254.4.123]) with mapi id 14.03.0439.000;
+ Wed, 4 Sep 2019 13:26:02 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>,
+        "simon@silvair.com" <simon@silvair.com>
 Subject: Re: mesh: org.bluez.mesh.Element.MessageReceived method does not
  provide destination address
-Message-ID: <20190904194808.nu2cy4vp6uh64m4z@kynes>
-Mail-Followup-To: linux-bluetooth@vger.kernel.org,
-        Brian Gix <brian.gix@intel.com>,
-        Inga Stotland <inga.stotland@intel.com>,
-        Szymon =?utf-8?Q?S=C5=82upik?= <simon@silvair.com>
+Thread-Topic: mesh: org.bluez.mesh.Element.MessageReceived method does not
+ provide destination address
+Thread-Index: AQHVX2LEF/rrCs91wE6OiENpKqkMj6ccY5SAgAAGWACAAAqWgA==
+Date:   Wed, 4 Sep 2019 20:26:02 +0000
+Message-ID: <d79b733068e30cfa1cef106e44b7f9ee7c31526d.camel@intel.com>
 References: <20190830184301.zd3zaqrw7mv6r252@kynes>
- <20190904192525.2dqyihabxmigb54m@kynes>
+         <20190904192525.2dqyihabxmigb54m@kynes>
+         <20190904194808.nu2cy4vp6uh64m4z@kynes>
+In-Reply-To: <20190904194808.nu2cy4vp6uh64m4z@kynes>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.255.229.47]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C5F4B8F8D5ABA44B8ACEBFDF6CCAB966@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190904192525.2dqyihabxmigb54m@kynes>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 09/04, Michał Lowas-Rzechonek wrote:
-> The two examples I provided are *not* violating the spec in any way.
-> For the record:
->  - a combined server/client sitting on element 1 that receives onoff
->    messages and, depending on the destination address, sends a different
->    onoff messages to a "regular" onoff server sitting on element 0,
->    allowing efficient control over switching scenes involving large
->    number of nodes
->  - a model that acts as a IPv6 gateway and directly maps virtual
->    addresses to IPv6 addresses of nodes living on the other side of the
->    gateway
-
-Another one about virtual addresses:
-
-In CANOpen, there is a concept of a "Protocol Data Object" [1].
-Basically, the idea is to pack many pieces of information into a
-preconfigured format (down to single bits, because CAN frames are even
-shorter than mesh ones) - this is known as "PDO Mapping Parameters" -
-then send such payloads to a well-known group address.
-
-In static configurations, this allows to decrease the number (and size)
-of packets sent by sensor nodes.
-
-Since PDO payloads are *not* self-describing (unlike mesh sensor
-messages), the receiving party must be aware of the mapping in order to
-parse the data.
-
-In CANOpen, format is determined by the address - in mesh, it could very
-well be a virtual label.
-
-[1] https://www.can-cia.org/can-knowledge/canopen/pdo-protocol/
-
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+T24gV2VkLCAyMDE5LTA5LTA0IGF0IDIxOjQ4ICswMjAwLCBNaWNoYcWCIExvd2FzLVJ6ZWNob25l
+ayB3cm90ZToNCj4gT24gMDkvMDQsIE1pY2hhxYIgTG93YXMtUnplY2hvbmVrIHdyb3RlOg0KPiA+
+IFRoZSB0d28gZXhhbXBsZXMgSSBwcm92aWRlZCBhcmUgKm5vdCogdmlvbGF0aW5nIHRoZSBzcGVj
+IGluIGFueSB3YXkuDQo+ID4gRm9yIHRoZSByZWNvcmQ6DQo+ID4gIC0gYSBjb21iaW5lZCBzZXJ2
+ZXIvY2xpZW50IHNpdHRpbmcgb24gZWxlbWVudCAxIHRoYXQgcmVjZWl2ZXMgb25vZmYNCj4gPiAg
+ICBtZXNzYWdlcyBhbmQsIGRlcGVuZGluZyBvbiB0aGUgZGVzdGluYXRpb24gYWRkcmVzcywgc2Vu
+ZHMgYSBkaWZmZXJlbnQNCj4gPiAgICBvbm9mZiBtZXNzYWdlcyB0byBhICJyZWd1bGFyIiBvbm9m
+ZiBzZXJ2ZXIgc2l0dGluZyBvbiBlbGVtZW50IDAsDQo+ID4gICAgYWxsb3dpbmcgZWZmaWNpZW50
+IGNvbnRyb2wgb3ZlciBzd2l0Y2hpbmcgc2NlbmVzIGludm9sdmluZyBsYXJnZQ0KPiA+ICAgIG51
+bWJlciBvZiBub2Rlcw0KPiA+ICAtIGEgbW9kZWwgdGhhdCBhY3RzIGFzIGEgSVB2NiBnYXRld2F5
+IGFuZCBkaXJlY3RseSBtYXBzIHZpcnR1YWwNCj4gPiAgICBhZGRyZXNzZXMgdG8gSVB2NiBhZGRy
+ZXNzZXMgb2Ygbm9kZXMgbGl2aW5nIG9uIHRoZSBvdGhlciBzaWRlIG9mIHRoZQ0KPiA+ICAgIGdh
+dGV3YXkNCj4gDQo+IEFub3RoZXIgb25lIGFib3V0IHZpcnR1YWwgYWRkcmVzc2VzOg0KPiANCj4g
+SW4gQ0FOT3BlbiwgdGhlcmUgaXMgYSBjb25jZXB0IG9mIGEgIlByb3RvY29sIERhdGEgT2JqZWN0
+IiBbMV0uDQo+IEJhc2ljYWxseSwgdGhlIGlkZWEgaXMgdG8gcGFjayBtYW55IHBpZWNlcyBvZiBp
+bmZvcm1hdGlvbiBpbnRvIGENCj4gcHJlY29uZmlndXJlZCBmb3JtYXQgKGRvd24gdG8gc2luZ2xl
+IGJpdHMsIGJlY2F1c2UgQ0FOIGZyYW1lcyBhcmUgZXZlbg0KPiBzaG9ydGVyIHRoYW4gbWVzaCBv
+bmVzKSAtIHRoaXMgaXMga25vd24gYXMgIlBETyBNYXBwaW5nIFBhcmFtZXRlcnMiIC0NCj4gdGhl
+biBzZW5kIHN1Y2ggcGF5bG9hZHMgdG8gYSB3ZWxsLWtub3duIGdyb3VwIGFkZHJlc3MuDQo+IA0K
+PiBJbiBzdGF0aWMgY29uZmlndXJhdGlvbnMsIHRoaXMgYWxsb3dzIHRvIGRlY3JlYXNlIHRoZSBu
+dW1iZXIgKGFuZCBzaXplKQ0KPiBvZiBwYWNrZXRzIHNlbnQgYnkgc2Vuc29yIG5vZGVzLg0KPiAN
+Cj4gU2luY2UgUERPIHBheWxvYWRzIGFyZSAqbm90KiBzZWxmLWRlc2NyaWJpbmcgKHVubGlrZSBt
+ZXNoIHNlbnNvcg0KPiBtZXNzYWdlcyksIHRoZSByZWNlaXZpbmcgcGFydHkgbXVzdCBiZSBhd2Fy
+ZSBvZiB0aGUgbWFwcGluZyBpbiBvcmRlciB0bw0KPiBwYXJzZSB0aGUgZGF0YS4NCj4gDQo+IElu
+IENBTk9wZW4sIGZvcm1hdCBpcyBkZXRlcm1pbmVkIGJ5IHRoZSBhZGRyZXNzIC0gaW4gbWVzaCwg
+aXQgY291bGQgdmVyeQ0KPiB3ZWxsIGJlIGEgdmlydHVhbCBsYWJlbC4NCj4gDQo+IFsxXSBodHRw
+czovL3d3dy5jYW4tY2lhLm9yZy9jYW4ta25vd2xlZGdlL2Nhbm9wZW4vcGRvLXByb3RvY29sLw0K
+PiANCg0KSSB0aGluayB0aGF0IHRoaXMgaXMgYW4gaW50ZXJlc3RpbmcgdXNlIG9mIFZpcnR1YWwg
+QWRkcmVzc2VzLCBhbmQgaW4gYWRkaXRpb24gdG8gdGhpcywgTWVzaCBWaXJ0dWFsIEFkZHJlc3Nl
+cw0KaGF2ZSBiZWVuIHN1Z2dlc3RlZCBhcyBhIHdheSBvZiBhZGRyZXNzaW5nIElQdjYgYWRkcmVz
+c2luZyBhcyB3ZWxsLi4uICBIb3dldmVyOg0KDQoxLiBUaGVyZSBpcyBhbHJlYWR5IGEgd2F5IHNv
+bWV0aGluZyBsaWtlIHRoaXMgY291bGQgYmUgdXNlZCBhbHJlYWR5OiAgQSBtb2RlbCBjb3VsZCBi
+ZSBjcmVhdGVkIHRoYXQgZ2V0cw0Kc3Vic2NyaWJlZCB0byB0aGUgVmlydHVhbCBBZGRyZXNzZXMg
+dGhhdCByZXF1aXJlIGhhbmRsaW5nIGJ5IHRoZSBub2RlLg0KDQoyLiBJZiBzdWNoIGEgc3lzdGVt
+IHByb3ZlcyB0byBiZSB3aWRlbHkgcmVxdWVzdGVkLCBkYWVtb24gc3VwcG9ydCBjb3VsZCBiZSBh
+ZGRlZCAocGVyaGFwcyB1bmRlciBhIGRpZmZlcmVudA0KREJ1cyBpbnRlcmZhY2UpIGZvciBlaXRo
+ZXIgb3IgYm90aCBvZiBJUHY2IGFuZCAiQ0FOT3BlbiIuDQoNCkluIGFueSBjYXNlIHRoZSBhYmls
+aXR5IHRvIGNyZWF0ZSBzaW1wbGUgbWVzaCBBcHBzIHdpdGggbWluaW1hbCBjb21wbGV4aXR5IHJl
+bWFpbnMgaW50YWN0LCBhbmQgYXMgYW4gYWRkZWQNCmJvbnVzLCB0aGUgT3BlbiBTb3VyY2UgY29t
+bXVuaXR5IChub3QgdG8gbWVudGlvbiB0aGUgQmx1ZXRvb3RoIE1lc2ggV29ya2luZyBHcm91cCBh
+bmQgbGFyZ2VyIFNJRykgY2FuIHdlaWdoIGluDQpvbiB0aGUgcHJlZmVycmVkIG1ldGhvZG9sb2dp
+ZXMuDQoNCg0KDQoNCg0K
