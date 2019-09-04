@@ -2,133 +2,86 @@ Return-Path: <SRS0=/e8j=W7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB5D3C3A59E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 04:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A47C3A5A7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 11:03:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8382621883
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 04:34:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="I6pw9B5r";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="I2aSP4zU"
+	by mail.kernel.org (Postfix) with ESMTP id 9CD8621670
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Sep 2019 11:03:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567594987;
+	bh=yVM2fK10izAQq2VyphGOPbBfEV5PpavIEDbbL86vyAo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=M/CCpurlosK2Ca5oE1yG6Lkb8tq6MRqvs8VnP/9ImAn+dv8XzslfkQJA2PQfkQzKO
+	 TmAmIkRETrsqRL63g8CEN/oNZ0IySSr+QbkxQr7U4Vky/EgTfYu/jrV1iQSNAlsrOx
+	 RHF//jgPBEnfuSbtxSfCtdPJo9kfLEvJs7pB9Iog=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727722AbfIDEed (ORCPT
+        id S1729335AbfIDLDH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Sep 2019 00:34:33 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:55088 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725840AbfIDEed (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Sep 2019 00:34:33 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 59917602EF; Wed,  4 Sep 2019 04:34:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1567571672;
-        bh=yD7jddCeDQh/QLkdALenruhc6/Bis0ve+odm+lJNIpc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=I6pw9B5rr26zjf9F8xAcaV9hOA1N438qnSW6RXBSDF2vqmEqZw6tmqy0QALhuYHLj
-         O4sKsaEvGajDPBfDMWc81zdA/1YxO6y9C5kEysZ/G0IzEUwEeKL1n6jdPgeBmX0Aa0
-         32/OFYNYF8FAzDR2ENGUW9Z5zNiiPZEYXTs4f4o4=
-Received: from c-hbandi-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        Wed, 4 Sep 2019 07:03:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37244 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727387AbfIDLDG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 4 Sep 2019 07:03:06 -0400
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        (Authenticated sender: c-hbandi@codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2DFCE607EB;
-        Wed,  4 Sep 2019 04:34:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1567571671;
-        bh=yD7jddCeDQh/QLkdALenruhc6/Bis0ve+odm+lJNIpc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=I2aSP4zUWyN5R+xWOmkIdddBX4q7VtpEp8StdzSVkyn8Yfe5BwBwf5HJVdRvViP94
-         +CnP44E9ZXvhH27gigVLcaGDTUaymlzH7W18sgqlXUtYuBc7hgKOTvFPpKAQtHRYR0
-         AA1zPgMsHJGmJ8rT14/Cy9JLfidd+zH6RuXDb2wA=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 2DFCE607EB
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=c-hbandi@codeaurora.org
-From:   Harish Bandi <c-hbandi@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        anubhavg@codeaurora.org, Harish Bandi <c-hbandi@codeaurora.org>
-Subject: [PATCH v1] bluetooth: hci_qca: disable irqs when spinlock is acquired
-Date:   Wed,  4 Sep 2019 10:04:16 +0530
-Message-Id: <1567571656-32403-1-git-send-email-c-hbandi@codeaurora.org>
-X-Mailer: git-send-email 1.9.1
+        by mail.kernel.org (Postfix) with ESMTPSA id CAB202339D
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2019 11:03:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1567594985;
+        bh=yVM2fK10izAQq2VyphGOPbBfEV5PpavIEDbbL86vyAo=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=iKCtBgCKaGRPEPcd3Xp7wXJuq3vQDpNMvigI0zEmMkOyMGt+e4rNZGrWEqpmyiq1v
+         g917ajaGA/NIK9ikDJu5wszxHeJVEkdGfhDdVqlaV8E0anGhcud+hlSrZj5yaMYlHL
+         aICYGPmgmqst97maxHAUoVzGW8oDN9JRTIgN05Mc=
+Received: by mail-qk1-f169.google.com with SMTP id x134so8993929qkb.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Sep 2019 04:03:05 -0700 (PDT)
+X-Gm-Message-State: APjAAAWODFcGR8q2VwfLyzehtpeeZ/mS+3osxP9binmhF9HIdmKL0PJq
+        3kQjgrPsHpxE5ujD+CyQWc6R7ZIHZXstUavrWK4=
+X-Google-Smtp-Source: APXvYqzMlewEVlQuPYdLh4RZzfrrHcTNryNmL9sUGR3d+Zs2Up53bRvj3tODhTseqQLiPrRjzhoPT0jfYohHeRUa2+8=
+X-Received: by 2002:a37:2784:: with SMTP id n126mr24490325qkn.302.1567594984968;
+ Wed, 04 Sep 2019 04:03:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <1566984258-13480-1-git-send-email-amit.k.bag@intel.com>
+In-Reply-To: <1566984258-13480-1-git-send-email-amit.k.bag@intel.com>
+From:   Josh Boyer <jwboyer@kernel.org>
+Date:   Wed, 4 Sep 2019 07:02:52 -0400
+X-Gmail-Original-Message-ID: <CA+5PVA53ikg8AAmz39QTE9zU1FnkwEsqKE8XYto8Rk-UhDqOnw@mail.gmail.com>
+Message-ID: <CA+5PVA53ikg8AAmz39QTE9zU1FnkwEsqKE8XYto8Rk-UhDqOnw@mail.gmail.com>
+Subject: Re: [PATCH] linux-firmware: Add firmware file for Intel Bluetooth AX201
+To:     Amit K Bag <amit.k.bag@intel.com>
+Cc:     Linux Firmware <linux-firmware@kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        chethan.tumkur.narayan@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Looks like Deadlock is observed in hci_qca while performing
-stress and stability tests. Since same lock is getting
-acquired from qca_wq_awake_rx and hci_ibs_tx_idle_timeout
-seeing spinlock recursion, irqs should be disable while
-acquiring the spinlock always.
+On Wed, Aug 28, 2019 at 5:30 AM Amit K Bag <amit.k.bag@intel.com> wrote:
+>
+> This patch adds new firmware file for Intel Bluetooth AX201
+> Also it is known as Intel HarrisonPeak (HrP).
+>
+> FW Build: REL0318
+>
+> Release Version: 21.40.0.1
+>
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> ---
+>  WHENCE                |   4 ++++
+>  intel/ibt-19-32-4.ddc | Bin 0 -> 70 bytes
+>  intel/ibt-19-32-4.sfi | Bin 0 -> 743750 bytes
+>  3 files changed, 4 insertions(+)
+>  create mode 100644 intel/ibt-19-32-4.ddc
+>  create mode 100644 intel/ibt-19-32-4.sfi
 
-Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
----
- drivers/bluetooth/hci_qca.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Applied and pushed out.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index d33828f..e3164c2 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -309,13 +309,14 @@ static void qca_wq_awake_device(struct work_struct *work)
- 					    ws_awake_device);
- 	struct hci_uart *hu = qca->hu;
- 	unsigned long retrans_delay;
-+	unsigned long flags;
- 
- 	BT_DBG("hu %p wq awake device", hu);
- 
- 	/* Vote for serial clock */
- 	serial_clock_vote(HCI_IBS_TX_VOTE_CLOCK_ON, hu);
- 
--	spin_lock(&qca->hci_ibs_lock);
-+	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
- 
- 	/* Send wake indication to device */
- 	if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0)
-@@ -327,7 +328,7 @@ static void qca_wq_awake_device(struct work_struct *work)
- 	retrans_delay = msecs_to_jiffies(qca->wake_retrans);
- 	mod_timer(&qca->wake_retrans_timer, jiffies + retrans_delay);
- 
--	spin_unlock(&qca->hci_ibs_lock);
-+	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
- 
- 	/* Actually send the packets */
- 	hci_uart_tx_wakeup(hu);
-@@ -338,12 +339,13 @@ static void qca_wq_awake_rx(struct work_struct *work)
- 	struct qca_data *qca = container_of(work, struct qca_data,
- 					    ws_awake_rx);
- 	struct hci_uart *hu = qca->hu;
-+	unsigned long flags;
- 
- 	BT_DBG("hu %p wq awake rx", hu);
- 
- 	serial_clock_vote(HCI_IBS_RX_VOTE_CLOCK_ON, hu);
- 
--	spin_lock(&qca->hci_ibs_lock);
-+	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
- 	qca->rx_ibs_state = HCI_IBS_RX_AWAKE;
- 
- 	/* Always acknowledge device wake up,
-@@ -354,7 +356,7 @@ static void qca_wq_awake_rx(struct work_struct *work)
- 
- 	qca->ibs_sent_wacks++;
- 
--	spin_unlock(&qca->hci_ibs_lock);
-+	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
- 
- 	/* Actually send the packets */
- 	hci_uart_tx_wakeup(hu);
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
-
+josh
