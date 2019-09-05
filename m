@@ -2,96 +2,148 @@ Return-Path: <SRS0=Ti+w=XA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A9DC3A5A5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 06:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C17B2C3A5AA
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 06:14:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9CC982173B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 06:04:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96A4D217D7
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 06:14:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DW3orVLa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jnMYGG4i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731417AbfIEGEw (ORCPT
+        id S1730074AbfIEGOw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Sep 2019 02:04:52 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:37022 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731142AbfIEGEw (ORCPT
+        Thu, 5 Sep 2019 02:14:52 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:34851 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725921AbfIEGOw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Sep 2019 02:04:52 -0400
-Received: by mail-pf1-f193.google.com with SMTP id y9so1009268pfl.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Sep 2019 23:04:51 -0700 (PDT)
+        Thu, 5 Sep 2019 02:14:52 -0400
+Received: by mail-pg1-f196.google.com with SMTP id n4so809399pgv.2;
+        Wed, 04 Sep 2019 23:14:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=CAa72BCQwDoIZ0Jk2Bk+th4bdDXZHFU3XLOk43o5i3U=;
-        b=DW3orVLaIX7s9yCgvQGrsfX9Gvqo7CJxoXfJ/SHffeC9XDqcks7sNAf4S0CD+mwXpu
-         wX/3ijoXhq3MSomYIZk/086ApB/OxZ7Oh21j1r97uiml81DYrL53F4owaXkLLDgYfVXn
-         hQbcJ2JXMkUQyfod5LsnGjfgCHcNFd8LNgQMjtownbRneYvNLxz4U+ktH9FjuvE4PIJn
-         fICI0jq/N/mRySigPxvXK9UwXa/yQGuXf6m4nZQOj/MBH9aGRUIkatTacIbThk+oHld1
-         WVZb7A0fBGVvcNbkz9q+Jlz0YVTzUZdG7BuhqwPKfvR1mZqPbnYAgAx28rIKnliUq4e3
-         ou+Q==
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition:user-agent;
+        bh=9MyJls/3pTeaGKyKyHjzn9JlAJCd6lHjYWAtz/m6Flw=;
+        b=jnMYGG4ip7r2EjqeJXdUO1MFOeUjXFq8ce0sSbZR2YKHVQHKmeYPZUVqoddpwDKf0P
+         QgIIh84afLxq0A6z9jLCkf9BVenlrigWoE8hlnuVWiODkGjY1xcq2FioC6PEayai3+iF
+         btIK5lWVyc440yVNOVQuflM7xTWG29/Et/rCbn2oJv4cQjbM3BDMUSbcIuSj5zOstSYs
+         +JaPQMCdjE3RcNDChmPOx+f66sA9OrkezVMC4RSltDxmwEi4j0rkyLyeGgsJQhiHLbyZ
+         rYBAiSKBFBkPivu2ofSThh77zNr3tk1LasbNPzkBdCnO4C+ziGYp2X223G88Q5+VQs+v
+         9nFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=CAa72BCQwDoIZ0Jk2Bk+th4bdDXZHFU3XLOk43o5i3U=;
-        b=Q0x7PJQyDw3g7qhgT7xcWaAqdbydNGDtg1jHLJLtL3tjY7NQfwcuCkxzONWkz3QLp0
-         VG4Y+eOrWW9/48Im6KITJALPDU9Ckj5ooo1uwEuPHWiDV/LYmx5GdkvCjjb9uIE0ZaND
-         YDOi8Xw5nFY6MRWgtdJ3q5LWbydDOkr9AXRQdCy4KfMVH80JRkr9VovqnZLlCylG+v40
-         G5l0EeT3jcgVtM2sxu1GN9Rit6dd+uFfRZptD4ukoS75Zv3C7YiHU1VY2ipvFLDEkLt6
-         A8bCrlKruJ5x2UpiZ3MXbsUFOd0RogM8/yS2A7xI+NRJ3SSI9ZDZV6cu1BNOR7E++VHO
-         jMnw==
-X-Gm-Message-State: APjAAAUg5D8GjWc4CpIrdBvaYVNen/qKc+bDaI/p4vF5DNDdtwEPy5t8
-        dr4ARdM8HzW9omI0zx2Id2xEwfMFUWEfAg==
-X-Google-Smtp-Source: APXvYqyicQIBAxZESX647QAmvZo3Wk7gfeXZuXpioCsoVhar2sf3M05Oy41h8sf6azgxx9CA0SXTPA==
-X-Received: by 2002:a62:583:: with SMTP id 125mr1807583pff.69.1567663490742;
-        Wed, 04 Sep 2019 23:04:50 -0700 (PDT)
+         :mail-followup-to:mime-version:content-disposition:user-agent;
+        bh=9MyJls/3pTeaGKyKyHjzn9JlAJCd6lHjYWAtz/m6Flw=;
+        b=mu/9cetQuUw3vdLAC3v3JrEtg6UtIZbs4eR3hnFVzHtBosLaakmvDGE10tVRX2AxAt
+         aM1T2nxcORg8f5WhLQtLluK5TEg58mNH0sARkznnj28h4Y2NCoxgjJxXNcA1/+vtEXFX
+         Bp+3hZUqFwKYGFxckdwmQzfcpjzCTmUgJni+6mp9qj70ha/2EeFLhuKD5cZkS52A4qKZ
+         Qkbx/X2tFLmFAnqk/kyEr5k8MfMtMbkscruGLA9XcXfi0I5Ef0sU+bcoJ+N4rAMPhtQT
+         efxvYANVNtiE+koJYrc/lpAzJm1xdQj9mpwtZKPdmC014JMPtzPUpy33JSBIfyb838MS
+         ZlkQ==
+X-Gm-Message-State: APjAAAVTvnCCEIyBFgh/zBMEHK+fl6NdoOcaXUrztlpEzv6ZK2Qwlm/d
+        j3rzb5U2Bw72Zc5IwBo9kJeDC83C4MmKXg==
+X-Google-Smtp-Source: APXvYqybNEzEiOFp47YxU9xk8vlpckBv4BbmnghyyTs2egxlOHXMeFb9cFmBA3idHk/m1G/e/UQK9g==
+X-Received: by 2002:a63:5402:: with SMTP id i2mr1648429pgb.414.1567664091625;
+        Wed, 04 Sep 2019 23:14:51 -0700 (PDT)
 Received: from localhost (fmdmzpr04-ext.fm.intel.com. [192.55.54.39])
-        by smtp.gmail.com with ESMTPSA id z4sm920020pgp.80.2019.09.04.23.04.48
+        by smtp.gmail.com with ESMTPSA id b24sm1187360pfi.75.2019.09.04.23.14.49
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Sep 2019 23:04:50 -0700 (PDT)
-Date:   Thu, 5 Sep 2019 09:04:46 +0300
+        Wed, 04 Sep 2019 23:14:50 -0700 (PDT)
+Date:   Thu, 5 Sep 2019 09:14:44 +0300
 From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Revert "Bluetooth: validate BLE connection interval
- updates"
-Message-ID: <20190905060446.GA47246@blobacz-mobl.ger.corp.intel.com>
-Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth 2019-09-05
+Message-ID: <20190905061444.GA47480@blobacz-mobl.ger.corp.intel.com>
+Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
         linux-bluetooth@vger.kernel.org
-References: <20190904181308.14948-1-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
 Content-Disposition: inline
-In-Reply-To: <20190904181308.14948-1-marcel@holtmann.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
 
-On Wed, Sep 04, 2019, Marcel Holtmann wrote:
-> This reverts commit c49a8682fc5d298d44e8d911f4fa14690ea9485e.
-> 
-> There are devices which require low connection intervals for usable operation
-> including keyboards and mice. Forcing a static connection interval for
-> these types of devices has an impact in latency and causes a regression.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_event.c  | 5 -----
->  net/bluetooth/l2cap_core.c | 9 +--------
->  2 files changed, 1 insertion(+), 13 deletions(-)
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Applied to the bluetooth stable tree. Thanks.
+Hi Dave,
+
+Here are a few more Bluetooth fixes for 5.3. I hope they can still make
+it. There's one USB ID addition for btusb, two reverts due to discovered
+regressions, and two other important fixes.
+
+Please let me know if there any issues pulling. Thanks.
 
 Johan
+
+---
+The following changes since commit 8693265329560af4d1190aaa195ad767a05ceeab:
+
+  Merge tag 'mac80211-for-davem-2019-08-29' of git://git.kernel.org/pub/scm/linux/kernel/git/jberg/mac80211 (2019-08-29 16:44:15 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to 68d19d7d995759b96169da5aac313363f92a9075:
+
+  Revert "Bluetooth: validate BLE connection interval updates" (2019-09-05 09:02:59 +0300)
+
+----------------------------------------------------------------
+Harish Bandi (1):
+      Bluetooth: hci_qca: disable irqs when spinlock is acquired
+
+Jian-Hong Pan (1):
+      Bluetooth: btrtl: Additional Realtek 8822CE Bluetooth devices
+
+Marcel Holtmann (1):
+      Revert "Bluetooth: validate BLE connection interval updates"
+
+Mario Limonciello (1):
+      Revert "Bluetooth: btusb: driver to enable the usb-wakeup feature"
+
+Navid Emamdoost (1):
+      Bluetooth: bpa10x: change return value
+
+ drivers/bluetooth/bpa10x.c  |  2 +-
+ drivers/bluetooth/btusb.c   |  8 +++-----
+ drivers/bluetooth/hci_qca.c | 10 ++++++----
+ net/bluetooth/hci_event.c   |  5 -----
+ net/bluetooth/l2cap_core.c  |  9 +--------
+ 5 files changed, 11 insertions(+), 23 deletions(-)
+
+--LQksG6bCIzRHxTLp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl1wp9IACgkQJCP2+/mo
+1BLznw/+LIFw58lLX/bOeG513L1ikqFrc10Udt+PuvPBEi1MDu8TOfRNdd0uKgWJ
+AsoVfoQT3nsxz4g86A6KEbsj3QAwdHXZTxd1YxA4d1H7GdVSy79rCBTUhsoz9Vs9
+EnNp9thWNlR2GUeQHoYsxHGBaglCJpowpxwXof6bKLS3bMfdCTkAv+yYNtRf83Cr
+ADqnTWTElAxKe7RY4NjKXPyzBULKY/s0y/4Iu9Xy1gRZBn8LqBt723K7cPYhteMH
+qgu6brILHvU4RrlE5xXkSi6Qh1GLqDwWRathqsnmAsqHQAFFD3YAO3DBL7nL/GNJ
+OLAw5Doysdfh8mHP+LL2ZFauNHsIp7OpO6AwwoBMPDsGdFVTk6AQ+65t9HVv06AG
+wHvjSuvC4TloD0M3ldhoFyB2aqT8j+abuSEML37LcT7n6hvmgCnBQiztPl8pMX41
+PMmHyCTU62HgVQvmz4nr9GE/5f/HUhCIDeqRYly6yLyqFTxlSf4vkfrV8CWTXEPV
+yElbF4rCvyPyRBi6uvPOT5bFaPg27galY77HZRnXfBKOpkDZzphddOjHosTSwECu
+YtM/66bf+lKUCTpVUeitEo5WA1ipm3zCDL6TqwEM6/qe6ThjPoEOD2rbrsMHV0XT
+GgC9mtTpFlS3XtS/d14shL/lum67qKfQDrAo2eifncqVGMf9ZD0=
+=BCWj
+-----END PGP SIGNATURE-----
+
+--LQksG6bCIzRHxTLp--
