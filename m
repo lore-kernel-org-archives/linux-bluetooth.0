@@ -1,85 +1,62 @@
 Return-Path: <SRS0=Ti+w=XA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=CHARSET_FARAWAY_HEADER,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22AB8C3A5A5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 05:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7F7C3A5A5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 05:26:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01983206DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 05:22:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 400EE206DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 05:26:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730846AbfIEFWO (ORCPT
+        id S1731070AbfIEF0o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Sep 2019 01:22:14 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:33912 "EHLO
+        Thu, 5 Sep 2019 01:26:44 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:34162 "EHLO
         rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbfIEFWO (ORCPT
+        with ESMTP id S1725290AbfIEF0o (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Sep 2019 01:22:14 -0400
+        Thu, 5 Sep 2019 01:26:44 -0400
 Authenticated-By: 
-X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x855M2vq018985, This message is accepted by code: ctloc85258
+X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID x855QZIP019987, This message is accepted by code: ctloc85258
 Received: from mail.realtek.com (RTITCASV01.realtek.com.tw[172.21.6.18])
-        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x855M2vq018985
+        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id x855QZIP019987
         (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Thu, 5 Sep 2019 13:22:02 +0800
-Received: from localhost.localdomain (172.21.83.238) by
- RTITCASV01.realtek.com.tw (172.21.6.18) with Microsoft SMTP Server id
- 14.3.468.0; Thu, 5 Sep 2019 13:22:01 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     <alex_lu@realsil.com.cn>, <max.chou@realtek.com>
-Subject: [PATCH v2] Bluetooth: btrtl: Fix an issue that failing to download the FW which size is over 32K bytes
-Date:   Thu, 5 Sep 2019 13:21:57 +0800
-Message-ID: <20190905052157.2052-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 5 Sep 2019 13:26:35 +0800
+Received: from RTITMBSVM03.realtek.com.tw ([fe80::e1fe:b2c1:57ec:f8e1]) by
+ RTITCASV01.realtek.com.tw ([::1]) with mapi id 14.03.0468.000; Thu, 5 Sep
+ 2019 13:26:34 +0800
+From:   Max Chou <max.chou@realtek.com>
+To:     "marcel@holtmann.org" <marcel@holtmann.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     alex_lu <alex_lu@realsil.com.cn>, Max Chou <max.chou@realtek.com>
+Subject: =?big5?B?pl6mrDogW1BBVENIXSBCbHVldG9vdGg6IGJ0cnRsOiBGaXggYW4gaXNzdWUgdGhh?= =?big5?B?dCBmYWlsaW5nIHRvIGRvd25sb2FkIHRoZSBGVyB3aGljaCBzaXplIGlzIG92ZXIg?= =?big5?Q?32K_bytes?=
+Thread-Topic: [PATCH] Bluetooth: btrtl: Fix an issue that failing to
+ download the FW which size is over 32K bytes
+Thread-Index: AdVjqntCvzeidYOQmk+GP6Vie4JmjA==
+X-CallingTelephoneNumber: IPM.Note
+X-VoiceMessageDuration: 35
+X-FaxNumberOfPages: 0
+Date:   Thu, 5 Sep 2019 05:26:34 +0000
+Message-ID: <805C62CFCC3D8947A436168B9486C77DEE3AAA84@RTITMBSVM03.realtek.com.tw>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.21.83.214]
+Content-Type: text/plain; charset="big5"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.83.238]
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
-
-Fix the issue that when the FW size is 32K+, it will fail for the download
-process because of the incorrect index.
-
-When firmware patch length is over 32K, "dl_cmd->index" may >= 0x80. It
-will be thought as "data end" that download process will not complete.
-However, driver should recount the index from 1.
-
-Signed-off-by: Max Chou <max.chou@realtek.com>
----
-Changes in v2:
-- Added the comment for commit message
-- Remove the extra variable
-
- drivers/bluetooth/btrtl.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 0354e93e7a7c..bf3c02be6930 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -401,7 +401,11 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 
- 		BT_DBG("download fw (%d/%d)", i, frag_num);
- 
--		dl_cmd->index = i;
-+		if (i > 0x7f)
-+			dl_cmd->index = (i & 0x7f) + 1;
-+		else
-+			dl_cmd->index = i;
-+
- 		if (i == (frag_num - 1)) {
- 			dl_cmd->index |= 0x80; /* data end */
- 			frag_len = fw_len % RTL_FRAG_LEN;
--- 
-2.17.1
-
+TWF4IENob3Ugp8ax5qZepqyzb6vKtmyl8yBbW1BBVENIXSBCbHVldG9vdGg6IGJ0cnRsOiBGaXgg
+YW4gaXNzdWUgdGhhdCBmYWlsaW5nIHRvIGRvd25sb2FkIHRoZSBGVyB3aGljaCBzaXplIGlzIG92
+ZXIgMzJLIGJ5dGVzXaFD
