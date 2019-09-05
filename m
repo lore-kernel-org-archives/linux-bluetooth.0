@@ -2,150 +2,111 @@ Return-Path: <SRS0=Ti+w=XA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8A7C3A5A5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 11:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB04C3A5A5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 13:12:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A660422CEC
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 11:57:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567684621;
-	bh=wdTqBGzZQ4leglhr36XMdYedhNTdJDdwpiQCNXzkJDI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=jAN/4A3r7U7UvKBqdSQWrNw4N17dTu8kav7R/Ep/SyO7Fg3RH8hMU8oNwVz23vr8Q
-	 pNM3VZoH6yB1NO9fcedrxVBXzzfjHF0dBSQyRDktV4Iae0KmXq/G/j1suHD50XYLVi
-	 WUaYZJjRSVrrR0M0z2CD6jthLEps1fdXHuVhWE/A=
+	by mail.kernel.org (Postfix) with ESMTP id 221E9206CD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 13:12:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="CIFqZBm7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387662AbfIEL45 (ORCPT
+        id S2387419AbfIENMt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Sep 2019 07:56:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43598 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731817AbfIEL45 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Sep 2019 07:56:57 -0400
-Received: from localhost (unknown [82.195.192.6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8881122CEC;
-        Thu,  5 Sep 2019 11:56:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567684616;
-        bh=wdTqBGzZQ4leglhr36XMdYedhNTdJDdwpiQCNXzkJDI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=H55l7QnkZ69A7MNWrWBau7Dhg05/2syJeQI/Q8uksMOXbsdGsMv680/B9iw6Y61pL
-         bl9m3A5v6iPbOpGjCnNbpcHDuGoGnFd1nE2WyOYvR+bc8WEQcBP3jzSSbL2tfjxCmT
-         RlBxBpvL8l7bA8gBXgxCjgEnixHlMDm/26kIqFzo=
-Date:   Thu, 5 Sep 2019 14:56:53 +0300
-From:   Maxime Ripard <mripard@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     megous@megous.com, Chen-Yu Tsai <wens@csie.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [RESEND PATCH 0/5] Add bluetooth support for Orange Pi 3
-Message-ID: <20190905115653.o2w7eyl4hvqegucv@flea>
-References: <20190823103139.17687-1-megous@megous.com>
- <5524D5E9-FA82-4244-A91F-78CF1C3FB3FB@holtmann.org>
- <20190830092104.odipmbflounqpffo@flea>
- <D02B89FB-F8C0-40AD-A99A-6C1B4FEB72A0@holtmann.org>
- <20190830132034.u65arlv7umh64lx6@flea>
- <76FD40C7-10C5-4818-8EF9-60326ECA4243@holtmann.org>
+        Thu, 5 Sep 2019 09:12:49 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:46953 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731361AbfIENMt (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 5 Sep 2019 09:12:49 -0400
+Received: by mail-lj1-f194.google.com with SMTP id e17so2382083ljf.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Sep 2019 06:12:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qOSrrm6rfp92DGtXFs85xVzRon7AaRe5eJWd22ndJOE=;
+        b=CIFqZBm7xhasAx1ersYYF3axyDO+kiu1nQrunNQ4ea6DVzqYMBhYEqWJnjuL5cV6J8
+         DuMJxESPpdLpOjk+w1WpgRsjty2Fs7ZQHnfU0anrBngtZri+RwyioiyogvKFvMAqheaV
+         OI0SZfOlQXpwT+o04ukm7V4IA51gzsSORprj7YIuI3r/cUFU7l5jM8pQY4OdBHuuqoXg
+         BgOLUh/dm7a5B0iZChTGuLyKsn5lf53cxbZf3ToDHjrRDwX+GFjqBTv8sOu9IURpDDeU
+         TRcTmvP9zgGU+ig2O7i6UcRGvPLjUMkZ/oGigKb/hClkqcPWl7V3n8J3qPYPfs2SB4bf
+         yTmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qOSrrm6rfp92DGtXFs85xVzRon7AaRe5eJWd22ndJOE=;
+        b=nuTWhXncJlcGZ60sU1CU6P2FXhqQSM8rg3DU0uinqv9oCfDN6SUDlltxW8dtYufhPv
+         PkRaFNyvTVqhQgkNOdCUnhvIEk+1MTik+JGx0jFxk9QLhutUC+H9/4RULlRDVou6qcvp
+         HtU3OfZK8HYtep0uHzjZ5SC/6kUG3WxVgbgahUcnAPe4k+P477RgSQJ4EILxHp9x8qNK
+         Y198DpoffKXIE1OcFY5fQgi0CZt9cwcFkwwws9T5ITdJfwXM0BOtDuzvCd21HWnrW9xf
+         5M9SRlzO85pW80BwHhTdUvXFUEb4JI6TzmpVkW3bFHNsMXQvDZch38PznZAoxSkenOlV
+         EZrw==
+X-Gm-Message-State: APjAAAUWr60BdBjRskf40z8BLR5s1fSidTWc78TtQmZXXayt8ofX2vmC
+        HtW0GlDw51FGe+Qhx+VXAs6iwPU36NY=
+X-Google-Smtp-Source: APXvYqwNkvRPhC5AFrA4oASV/2ONeXODt4J2GQuDsWX9jX8idAizGdpY3OrwicJBDVEK+7uf1g0nfA==
+X-Received: by 2002:a2e:990f:: with SMTP id v15mr2096426lji.127.1567689166838;
+        Thu, 05 Sep 2019 06:12:46 -0700 (PDT)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id v10sm429794lfi.26.2019.09.05.06.12.45
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2019 06:12:45 -0700 (PDT)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] mesh: Fix IV Recovery procedure when IV Update is in progress
+Date:   Thu,  5 Sep 2019 15:12:40 +0200
+Message-Id: <20190905131240.24969-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="66mhhep6w5jiiqrl"
-Content-Disposition: inline
-In-Reply-To: <76FD40C7-10C5-4818-8EF9-60326ECA4243@holtmann.org>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This fixes erroneously cleared sequence number when node performs IV
+Recovery procedure on startup in a following scenario:
+     - node has IV Index set to <N>
+     - node starts in IV_UPD_INIT state
+     - node receives a Secure Network Beacon with IV Index <N>+1 and IV
+       Update flag set
 
---66mhhep6w5jiiqrl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Upon reception, the node shall:
+    - increase its IV Index to <N>+1
+    - enter IV_UPD_UPDATING state
 
-On Wed, Sep 04, 2019 at 04:19:37PM +0200, Marcel Holtmann wrote:
-> Hi Maxime,
->
-> >>>>> (Resend to add missing lists, sorry for the noise.)
-> >>>>>
-> >>>>> This series implements bluetooth support for Xunlong Orange Pi 3 board.
-> >>>>>
-> >>>>> The board uses AP6256 WiFi/BT 5.0 chip.
-> >>>>>
-> >>>>> Summary of changes:
-> >>>>>
-> >>>>> - add more delay to let initialize the chip
-> >>>>> - let the kernel detect firmware file path
-> >>>>> - add new compatible and update dt-bindings
-> >>>>> - update Orange Pi 3 / H6 DTS
-> >>>>>
-> >>>>> Please take a look.
-> >>>>>
-> >>>>> thank you and regards,
-> >>>>> Ondrej Jirman
-> >>>>>
-> >>>>> Ondrej Jirman (5):
-> >>>>> dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
-> >>>>> bluetooth: bcm: Add support for loading firmware for BCM4345C5
-> >>>>> bluetooth: hci_bcm: Give more time to come out of reset
-> >>>>> arm64: dts: allwinner: h6: Add pin configs for uart1
-> >>>>> arm64: dts: allwinner: orange-pi-3: Enable UART1 / Bluetooth
-> >>>>>
-> >>>>> .../bindings/net/broadcom-bluetooth.txt       |  1 +
-> >>>>> .../dts/allwinner/sun50i-h6-orangepi-3.dts    | 19 +++++++++++++++++++
-> >>>>> arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 10 ++++++++++
-> >>>>> drivers/bluetooth/btbcm.c                     |  3 +++
-> >>>>> drivers/bluetooth/hci_bcm.c                   |  3 ++-
-> >>>>> 5 files changed, 35 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> all 5 patches have been applied to bluetooth-next tree.
-> >>>
-> >>> The DTS patches (last 2) should go through the arm-soc tree, can you
-> >>> drop them?
-> >>
-> >> why is that? We have included DTS changes for Bluetooth devices
-> >> directly all the time. What is different with this hardware?
-> >
-> > I guess some maintainers are more relaxed with it than we are then,
-> > but for the why, well, it's the usual reasons, the most immediate one
-> > being that it reduces to a minimum the conflicts between trees.
-> >
-> > The other being that it's not really usual to merge patches supposed
-> > to be handled by another maintainer without (at least) his
-> > consent. I'm pretty sure you would have asked the same request if I
-> > would have merged the bluetooth patches through my tree without
-> > notice.
->
-> I took the two DTS patches out now and let the submitter deal with
-> getting these merged.
+This means that the node keeps transmitting messages using IV Index
+equal to <N>, therefore it shall not reset its Sequence Number before IV
+Update procedure completes.
 
-Thanks!
-Maxime
+If, on the other hand, received Secure Network Beacon contains IV Index
+<N>+2 (or more), the node shall:
+    - increase its IV Index to <N>+2 (or more)
+    - enter IV_UPD_UPDATING state
+    - reset the Sequence Number to 0
+---
+ mesh/net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---
-Maxime Ripard, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+diff --git a/mesh/net.c b/mesh/net.c
+index 2785039db..b4b390541 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -2735,7 +2735,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
+ 	}
+ 
+ 	if (net->iv_upd_state == IV_UPD_INIT) {
+-		if (iv_index > net->iv_index)
++		if (iv_index > net->iv_index + 1)
+ 			mesh_net_set_seq_num(net, 0);
+ 		net->iv_index = iv_index;
+ 
+-- 
+2.19.1
 
---66mhhep6w5jiiqrl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCXXD4BQAKCRDj7w1vZxhR
-xRuEAQD4NBPiyuvLlo3LM5wXaUbunkvUUCDpAZ3nIkj1OvPjIgD8Da8U574V2FaU
-aFSxv34yqbNn72v/P/KP/9zxT3Y40g8=
-=SOn6
------END PGP SIGNATURE-----
-
---66mhhep6w5jiiqrl--
