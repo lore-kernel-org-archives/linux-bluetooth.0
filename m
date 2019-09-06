@@ -2,114 +2,99 @@ Return-Path: <SRS0=sa2S=XB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D3BC43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 07:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6BCC43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 08:13:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC12121D7C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 07:07:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D618206A1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 08:13:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Q8Y3BVP4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XH2evxw6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732073AbfIFHHK (ORCPT
+        id S2388889AbfIFIN2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Sep 2019 03:07:10 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:42009 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731717AbfIFHHK (ORCPT
+        Fri, 6 Sep 2019 04:13:28 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:44508 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726263AbfIFIN1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Sep 2019 03:07:10 -0400
-Received: by mail-lf1-f66.google.com with SMTP id u13so4103016lfm.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Sep 2019 00:07:08 -0700 (PDT)
+        Fri, 6 Sep 2019 04:13:27 -0400
+Received: by mail-ot1-f67.google.com with SMTP id 21so4933167otj.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Sep 2019 01:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=05auKXgEciMXleN23OmuPSv2R1TkfhSvfUeH4QQefEI=;
-        b=Q8Y3BVP4QBMLzbiPbD7FMjOVqAs2sX4mJpmnvrpp2X76ZVcR91LpZcuJj+hwDYk7ab
-         P+MPLt+DPHPBYSNXCmyEo715BOzA8V1pMmID6nKY69j0KWV/N3eeMLArj/GUvKVawa5y
-         SvuoIdcOSWwE30GocsE74ZU2pKnMYE8egKnNrZXrerrpAQHP7v3tC9j6atcamBS1oznz
-         j38UgF+eoBlLzlgpJbCxdEZRip2t8P6zdWNWGx+84jmkDFD7Tm2tIJCYaffbjOPnS75n
-         BeTMgs62hp7OJ3LiC+ZPH3x5p7JVK50jq40PeFpygbN/fsPsrDaZs5VGjmyy9Y3PriGK
-         hUSQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FVr0EfphfWPjVA/FX/Uzaty1rCHgw15nNOatw9D6lso=;
+        b=XH2evxw6ROoM0G1/6rM+CGNw0O0SefSX56io8enDL11AelW9aZ78PwOCBEIwNnhUfq
+         XdSOrdwgwhs3p+YzDR7Vme2Gxy74PZdEpZrrZSOb5ZxpaE68NlHoVsv9fuRtI+PjQeFM
+         JfH3KG6Szyr9k76e0Y7bm7F4r6V/ShiLExaxZyACOUQXn4H8xbrDsehHJujzkh9eOktS
+         Tk2uzjl7QdiVy0S14xQZC2RwU8ZaCNtzKCSalVjfOP2S2/mBdJkuJgzAsueGIUlYubzb
+         vovSE7Bx4c2Cs0dyifHwe4+dlBl0gLwkcqTTZ00liHRnKJt1S258H0wEWTXXjN9O6MS0
+         Q/Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=05auKXgEciMXleN23OmuPSv2R1TkfhSvfUeH4QQefEI=;
-        b=f0mtZqscnJq0Uk/hcAX05K33usL20+qevRcd2ET5iGo0KR6BDkBH/QaNu8iWtNULrh
-         rkMZzEZZ41Z/fQNaJwBlEZLNtyIJlTpn/YNJmarY+uIivDkryFfZCix95YieCqaEFNfg
-         tCiRKKlH52P6u4Qu7bDvigWVMWiXtjKd1nEJaTzrFbS4x56yGQ1AVCaMhz5oi6XHH9/W
-         S6xjeNC0G2IHjEvySAq51YnibUuIjQRHhgWuVJkbbr+ju9ePRnBVwpXnj/Ne15844zlk
-         xWwIvQJ/6a9gG6HhN55lIiCjuHXxFC8KSBmKAFLnegNFymXI7Dh96hbPqXveS9sfz/Rx
-         Wmhw==
-X-Gm-Message-State: APjAAAVg2tOeWMLGa8wKsRd3Nu27gRlMVpSbEDPLv08+d76o4e4rNhxG
-        DYs17a+stxcnLR+AmRCeOPYncA==
-X-Google-Smtp-Source: APXvYqykA4BSRIIGctHP/JFbWxKE4YRUcKrY+AmF5rZd68Z2WvGLJ8qBpxMxZCfoqsrB08j0f/XPhQ==
-X-Received: by 2002:a19:c396:: with SMTP id t144mr5332770lff.14.1567753628103;
-        Fri, 06 Sep 2019 00:07:08 -0700 (PDT)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id z21sm767764ljn.100.2019.09.06.00.07.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2019 00:07:07 -0700 (PDT)
-Date:   Fri, 6 Sep 2019 09:07:06 +0200
-From:   "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh: Fix IV Recovery procedure when IV Update is
- in progress
-Message-ID: <20190906070706.xtfu7ihivlsyqvn2@mlowasrzechonek2133>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <20190905131240.24969-1-michal.lowas-rzechonek@silvair.com>
- <3980d0c20d416de8ca17bd406cc830b03a4d9498.camel@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FVr0EfphfWPjVA/FX/Uzaty1rCHgw15nNOatw9D6lso=;
+        b=nH7ACLAIfa7ddmrdxtWm818zlT4vj07zajydf6k5GvhcYpEAu7G/1mbBdM/kysjOrY
+         pUYc5586uifwVC0l7XGe7ovDzeP7IsyZck2FpbNNNrby4PntIGuNv/HaMDIIAOAwyYwL
+         lIaKTcMBV3yL/n9AftOdxYS0ZxwP8hlyGq1Aif90mhc/V+lt5QlQQaa+Z5H6TnAP7UE1
+         N6Ln3csGr/oSTL/aArZc2R8ofQg6Q4kxrz3RgvR64Rmc9Suo84bSIPH1gvSH+8jbV9Jp
+         S+FSJ/9YwYG5acEB/YFILiXwiLzRDLbdDjqOY0PWU//jh5L71OzWUMKvlp5wUUgkZ3zX
+         J/8w==
+X-Gm-Message-State: APjAAAUA87k9NQaNg3ImiCVB8bu2tocxBEUmItBGWH4yiZ5/pzFNyTQI
+        2QwB1NHzAcU9ikN8VQ77HLyWn56pFRsPoe4iNXo=
+X-Google-Smtp-Source: APXvYqyteAcbIiZRSWc8IIB69H7BA2vO+hw8M/CR3A41rqFGJnqetG+Kt0Kx0kT6SLBwEhe1G6yjB+T2JDM0AqVNgPs=
+X-Received: by 2002:a9d:734c:: with SMTP id l12mr584092otk.28.1567757606907;
+ Fri, 06 Sep 2019 01:13:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3980d0c20d416de8ca17bd406cc830b03a4d9498.camel@intel.com>
-User-Agent: NeoMutt/20180716
+References: <20190814230034.15031-1-rpigott@berkeley.edu>
+In-Reply-To: <20190814230034.15031-1-rpigott@berkeley.edu>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 6 Sep 2019 11:13:14 +0300
+Message-ID: <CABBYNZKs+gG6Pa17AySLHv5tp1KRfybEbR2c6kh5NTnjHsQcRA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/shell: fix help message typo
+To:     Ronan Pigott <rpigott314@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Ronan Pigott <rpigott@berkeley.edu>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Brian,
+Hi,
 
-On 09/05, Gix, Brian wrote:
-> >  	if (net->iv_upd_state == IV_UPD_INIT) {
-> > -		if (iv_index > net->iv_index)
-> > +		if (iv_index > net->iv_index + 1)
-> >  			mesh_net_set_seq_num(net, 0);
-> 
-> I think you have found something, but I think we are missing something here...
-> 
-> If iv_index > net->iv_index, and iv_update == false, then we still
-> want to reset to Seq Zero, I think...Even if the increase is just 1.
+On Thu, Aug 15, 2019 at 2:57 AM Ronan Pigott <rpigott314@gmail.com> wrote:
+>
+> From: Ronan Pigott <rpigott@berkeley.edu>
+>
+> ---
+>  src/shared/shell.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index eac654f40..df621295f 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -267,7 +267,7 @@ static const struct bt_shell_menu_entry default_menu[] = {
+>         { "help",         NULL,       cmd_help,
+>                                         "Display help about this program" },
+>         { "export",       NULL,       cmd_export,
+> -                                               "Print evironment variables" },
+> +                                               "Print environment variables" },
+>         { }
+>  };
+>
+> --
+> 2.22.0
 
-Indeed. Let me re-test both scenarios and I'll get back to you with v2.
-
-> So perhaps:
-> 	if (iv_index > net->iv_index && !iv_update)
-> 		mesh_net_set_seq_num(net, 0);
-> 	else if (iv_index > net->iv_index + 2)
-> 		mesh_net_set_seq_num(net, 0);
-> 
-> Or more esoterically (and maybe harder to follow):
-> 	if (iv_index > net->iv_index + iv_update)
-> 		mesh_net_set_seq_num(net, 0);
-> 
-> Or something like that.
-
-Yeah, that looks reasonable.
+Applied, thanks.
 
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+Luiz Augusto von Dentz
