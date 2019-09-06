@@ -2,118 +2,111 @@ Return-Path: <SRS0=sa2S=XB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01D4C43140
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 09:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E29C00307
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 10:14:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7CCFE2081B
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 09:42:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE0172173E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 10:14:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQR0YtcK"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IHImL/hk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390242AbfIFJmb (ORCPT
+        id S2391566AbfIFKON (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Sep 2019 05:42:31 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38704 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726635AbfIFJma (ORCPT
+        Fri, 6 Sep 2019 06:14:13 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:34744 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391487AbfIFKON (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Sep 2019 05:42:30 -0400
-Received: by mail-wr1-f67.google.com with SMTP id l11so5848929wrx.5;
-        Fri, 06 Sep 2019 02:42:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e+p/Fgr/GXLmLHbY0GjO0NrxJFHRdePsa+v/Y507qV0=;
-        b=BQR0YtcKr81f23A2TRofkeO+pilpMRa/WwJo+iMMPEFktSHuU3eZltDR3ZtFAmiEQv
-         aL6InOfGpTaD3qqglpafBNaV3S6RUB5RvIR5NrRV1N3swfF5Bho4LxSPmNYOhIg6N6uf
-         lufqkPDGZN9fbACimgzY2pK4ZiB7+ypfz73iyclMdBL1EsWchWvPetbeI6t4Cxd2kzb1
-         rcqdPb5rVQ7lW7MuI55PxVwUpf2g9GqJrF31ky8Oi5Pvkq0WYd72xAZDoYG42N5VDRHX
-         25hudCi3qjv29TQQ+Neuz8QNO7Q0tSVanIlnJuRseRVZDXWh2WqzZiDNe82qXyxFBc+V
-         52Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e+p/Fgr/GXLmLHbY0GjO0NrxJFHRdePsa+v/Y507qV0=;
-        b=XWkFiDWDdXXFHEuMw62Dt1P3wJAOierbK3xGcpBBffw+qLlliZfILvEuvyRlWxEe94
-         mfYsEkKGIbjCXu19cZZbDM1DADRYmENjVhgJCEHzEtDP6XlmWGQU4h0zDsQrHiQK9M4l
-         Fr6K61zO05gKwPerkdUvghqUO9rKX/SefhJEpDYOFevM4hZI46FkoJRmDImAwcFqvH8n
-         xEt7KFaf9I/EtF64dHdMuagfRDXT2haZ3BVdDb4ciR72YH2QmWoEiX6/5dN2u7qBQO2U
-         i5sL74Joa0iJ94WzkFtNe1xnsLP1yicj6LqEc5PTq4oqxlvHCaZyG+xyouw+OVclLSFE
-         5yPQ==
-X-Gm-Message-State: APjAAAWj6+JprC6RPdvV30JzdBse7OCYWI8vRGP140sQy4b96T4guYd7
-        nomk5DV/mL01+PW7faKwqHWWlyKxE9E=
-X-Google-Smtp-Source: APXvYqzTjRbgJMRGA8JJZnny0Jlqiu+5lr1jbgXZYOMZkq3DLBUhYyRSOJ1o0ZFu+FE9I1VVVZCChg==
-X-Received: by 2002:adf:f44e:: with SMTP id f14mr6041932wrp.290.1567762948379;
-        Fri, 06 Sep 2019 02:42:28 -0700 (PDT)
-Received: from Akatsuki.lan (bzq-109-67-210-71.red.bezeqint.net. [109.67.210.71])
-        by smtp.googlemail.com with ESMTPSA id u68sm7807741wmu.12.2019.09.06.02.42.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2019 02:42:27 -0700 (PDT)
-From:   Dan Elkouby <streetwalkermc@gmail.com>
-Cc:     Dan Elkouby <streetwalkermc@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
+        Fri, 6 Sep 2019 06:14:13 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86ADnO6003918;
+        Fri, 6 Sep 2019 10:13:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=9ZMm+KBPOZqRS75mZ7031RkVZwnvS9z1Wx5ZMZLh53E=;
+ b=IHImL/hkpYOt1DBem1nyKiRma41Tt63AdsBBMTsHoMHCrk4qYIyF8MEAUudo0LBszc00
+ EuEYKFG28HacWSmOii8pkGPNVO5KH4N+ogm3MKctbmUOAe8XSffQPwjpR/djF0MeTS43
+ qu7y5p/eZMCCzVW+Nxo48gHxAPrZTUsg01mGXwRysBu7ECLmGLWehZc36MYaFRjmrRxZ
+ JW0axSSHVkyH6JbOyFgFvTvHmvAOdYybAC1pT3cv218pWD73PQBNAdPm8eHYogsrDIjR
+ qVkeHtFBEToIrfgdFEQjQVSaT5P2qs7nRImhdOdknH7ihjx/pXX5mv3gIGky60w4eZ8Q pQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2uungtg02d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Sep 2019 10:13:59 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86ADoDW032312;
+        Fri, 6 Sep 2019 10:13:58 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2uum4gu7f3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Sep 2019 10:13:58 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x86ADINC020397;
+        Fri, 6 Sep 2019 10:13:18 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 06 Sep 2019 03:13:18 -0700
+Date:   Fri, 6 Sep 2019 13:13:06 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Dan Elkouby <streetwalkermc@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
         Fabian Henneke <fabian.henneke@gmail.com>,
         Brian Norris <computersforpeace@gmail.com>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Andrea Parri <andrea.parri@amarulasolutions.com>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hidp: Fix error checks in hidp_get/set_raw_report
-Date:   Fri,  6 Sep 2019 12:41:57 +0300
-Message-Id: <20190906094158.8854-1-streetwalkermc@gmail.com>
-X-Mailer: git-send-email 2.23.0
+Subject: Re: [PATCH] Bluetooth: hidp: Fix error checks in
+ hidp_get/set_raw_report
+Message-ID: <20190906101306.GA12017@kadam>
+References: <20190906094158.8854-1-streetwalkermc@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190906094158.8854-1-streetwalkermc@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=927
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909060108
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=992 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909060108
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return
-number of queued bytes") changed hidp_send_message to return non-zero
-values on success, which some other bits did not expect. This caused
-spurious errors to be propagated through the stack, breaking some (all?)
-drivers, such as hid-sony for the Dualshock 4 in Bluetooth mode.
+On Fri, Sep 06, 2019 at 12:41:57PM +0300, Dan Elkouby wrote:
+> Commit 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return
+> number of queued bytes") changed hidp_send_message to return non-zero
+> values on success, which some other bits did not expect. This caused
+> spurious errors to be propagated through the stack, breaking some (all?)
+> drivers, such as hid-sony for the Dualshock 4 in Bluetooth mode.
+> 
+> Signed-off-by: Dan Elkouby <streetwalkermc@gmail.com>
 
-Signed-off-by: Dan Elkouby <streetwalkermc@gmail.com>
----
- net/bluetooth/hidp/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I think we also need to update update ms_ff_worker() which assumes that
+hid_hw_output_report() returns zero on success.  Please use the Fixes
+tag for this since a lot of scripts rely on it to decide what to
+backport.
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 8d889969ae7e..bef84b95e2c4 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -267,7 +267,7 @@ static int hidp_get_raw_report(struct hid_device *hid,
- 	set_bit(HIDP_WAITING_FOR_RETURN, &session->flags);
- 	data[0] = report_number;
- 	ret = hidp_send_ctrl_message(session, report_type, data, 1);
--	if (ret)
-+	if (ret < 0)
- 		goto err;
- 
- 	/* Wait for the return of the report. The returned report
-@@ -343,7 +343,7 @@ static int hidp_set_raw_report(struct hid_device *hid, unsigned char reportnum,
- 	data[0] = reportnum;
- 	set_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
- 	ret = hidp_send_ctrl_message(session, report_type, data, count);
--	if (ret)
-+	if (ret < 0)
- 		goto err;
- 
- 	/* Wait for the ACK from the device. */
--- 
-2.23.0
+Fixes: 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return number of queued bytes")
+
+Otherwise, it looks good.  Thanks for catching this.
+
+regards,
+dan carpenter
 
