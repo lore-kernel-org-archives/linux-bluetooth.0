@@ -2,59 +2,64 @@ Return-Path: <SRS0=sa2S=XB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E29C00307
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 10:14:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D463C00307
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 10:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE0172173E
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 10:14:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D65952084F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 10:40:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IHImL/hk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mharq59n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391566AbfIFKON (ORCPT
+        id S1728768AbfIFKk3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Sep 2019 06:14:13 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:34744 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391487AbfIFKON (ORCPT
+        Fri, 6 Sep 2019 06:40:29 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:40182 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728269AbfIFKk3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Sep 2019 06:14:13 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86ADnO6003918;
-        Fri, 6 Sep 2019 10:13:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=9ZMm+KBPOZqRS75mZ7031RkVZwnvS9z1Wx5ZMZLh53E=;
- b=IHImL/hkpYOt1DBem1nyKiRma41Tt63AdsBBMTsHoMHCrk4qYIyF8MEAUudo0LBszc00
- EuEYKFG28HacWSmOii8pkGPNVO5KH4N+ogm3MKctbmUOAe8XSffQPwjpR/djF0MeTS43
- qu7y5p/eZMCCzVW+Nxo48gHxAPrZTUsg01mGXwRysBu7ECLmGLWehZc36MYaFRjmrRxZ
- JW0axSSHVkyH6JbOyFgFvTvHmvAOdYybAC1pT3cv218pWD73PQBNAdPm8eHYogsrDIjR
- qVkeHtFBEToIrfgdFEQjQVSaT5P2qs7nRImhdOdknH7ihjx/pXX5mv3gIGky60w4eZ8Q pQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2uungtg02d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 06 Sep 2019 10:13:59 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86ADoDW032312;
-        Fri, 6 Sep 2019 10:13:58 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2uum4gu7f3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 06 Sep 2019 10:13:58 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x86ADINC020397;
-        Fri, 6 Sep 2019 10:13:18 GMT
-Received: from kadam (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 06 Sep 2019 03:13:18 -0700
-Date:   Fri, 6 Sep 2019 13:13:06 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Dan Elkouby <streetwalkermc@gmail.com>
+        Fri, 6 Sep 2019 06:40:29 -0400
+Received: by mail-lj1-f194.google.com with SMTP id 7so5527339ljw.7;
+        Fri, 06 Sep 2019 03:40:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DnJ87hIg+L1soXqzK+F25qs93DUI2WPEksuGAxLMiCg=;
+        b=mharq59n+r5qjSdEntYwXvnT+ExtPjvbWik0d4+O74MQf1tqAh5eJeAjWA1uEadW0F
+         HdmodOWAFbFf+iwZonCqgrY8IL/8bDX4HFJwwrIGI8n9iQBrBEmfSc07WrFgAPTrFx5P
+         UqJbOXZVrmOjsJ9Bf70sOnFq2U1dBFxDtknIR1tmHddw+AkeYRDXoDgzPGmi81XmZ6Qp
+         u8aO9ADtOB+EbeSx1YErPF6mNU16YZ12CV+cQHmXhd8yVFhSoQglDClbm0hxWEB+1xd9
+         6wjHjq0Lln6XleGgxxqOJ/+ZYJ9YfmwlJTn1ldBEVW1b2irRKAQbYJMw9L/vIMTMragV
+         P0xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DnJ87hIg+L1soXqzK+F25qs93DUI2WPEksuGAxLMiCg=;
+        b=AujuKOLTjVMfrsm/0pezolefAWLstQa9U+0Ha1WD0QpaiiX7Llqea9U2pQDT8O8eEK
+         zViymWElhzZz3lr+kaqqEARAf/VdTkYzLnv1kwioAs58Ja+hzIgFLNxq6wOJ9KtL2Jeb
+         uwkhgA0TRm89HXA3D2oBD0amsiUMmMq8uAJNYr/wZ2QB6+wBbXN9FysmzwfwBepwwECi
+         vlq/QtZdinMe+5+Q5ANKFpCCPKaLoT7EDutEw0Zsd9R+BwVV/CFMbmZwIy08ngFIrbpw
+         FYi9frinr/aMMUKpDxtg2qXaJDlQO5Y0LEOcdHfPXgfmuqkpWFXQVTt8BJWKrcFB3hjZ
+         Lk7g==
+X-Gm-Message-State: APjAAAUnhwfNhNIt7Vk4Z57Lo8eN8OGUhcEmll2RnXNz9eaDgYT0yuTp
+        ZAQS1Kwt9yT2AYqX2gtyN+uWbXFmUwklnnq0WmU=
+X-Google-Smtp-Source: APXvYqxmyBlLRondxqnNbPMJl7+HmdFnfXdetIxT6mvbyOG6g+JATnG+njQGRWZouNhBl1mciLaGDoHDt1xiEhZVZeU=
+X-Received: by 2002:a2e:974c:: with SMTP id f12mr5309332ljj.15.1567766426819;
+ Fri, 06 Sep 2019 03:40:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190906094158.8854-1-streetwalkermc@gmail.com> <20190906101306.GA12017@kadam>
+In-Reply-To: <20190906101306.GA12017@kadam>
+From:   Dan Elkouby <streetwalkermc@gmail.com>
+Date:   Fri, 6 Sep 2019 13:40:15 +0300
+Message-ID: <CANnEQ3HX0SNG+Hzs2b+BzLwuewsC8-3sF2urWV+bqUahXq0hVA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hidp: Fix error checks in hidp_get/set_raw_report
+To:     Dan Carpenter <dan.carpenter@oracle.com>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -64,49 +69,31 @@ Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Andrea Parri <andrea.parri@amarulasolutions.com>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hidp: Fix error checks in
- hidp_get/set_raw_report
-Message-ID: <20190906101306.GA12017@kadam>
-References: <20190906094158.8854-1-streetwalkermc@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190906094158.8854-1-streetwalkermc@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=927
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909060108
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=992 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909060108
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Sep 06, 2019 at 12:41:57PM +0300, Dan Elkouby wrote:
-> Commit 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return
-> number of queued bytes") changed hidp_send_message to return non-zero
-> values on success, which some other bits did not expect. This caused
-> spurious errors to be propagated through the stack, breaking some (all?)
-> drivers, such as hid-sony for the Dualshock 4 in Bluetooth mode.
-> 
-> Signed-off-by: Dan Elkouby <streetwalkermc@gmail.com>
+On Fri, Sep 6, 2019 at 1:14 PM Dan Carpenter wrote:
+> I think we also need to update update ms_ff_worker() which assumes that
+> hid_hw_output_report() returns zero on success.
 
-I think we also need to update update ms_ff_worker() which assumes that
-hid_hw_output_report() returns zero on success.  Please use the Fixes
-tag for this since a lot of scripts rely on it to decide what to
-backport.
+Yes, it looks like that's the case. Should I amend my patch to include
+this fix, or should it be a separate patch? I don't have access to any
+hardware covered by hid-microsoft, so I won't be able to test it.
 
-Fixes: 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return number of queued bytes")
+> Please use the Fixes
+> tag for this since a lot of scripts rely on it to decide what to
+> backport.
+>
+> Fixes: 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return number of queued bytes")
 
-Otherwise, it looks good.  Thanks for catching this.
+Will do.
 
-regards,
-dan carpenter
+> Otherwise, it looks good.  Thanks for catching this.
 
+Thanks for taking a look!
+
+(Sorry for sending this twice, I'm not used to mailing lists and forgot
+to reply to all.)
