@@ -3,77 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BE4C43140
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 14:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 105E1C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 16:24:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE32220842
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 14:12:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5B382082C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 16:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390355AbfIFOMo convert rfc822-to-8bit (ORCPT
+        id S2388021AbfIFQYo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Sep 2019 10:12:44 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:56083 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731109AbfIFOMo (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Sep 2019 10:12:44 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C05D4CECE0;
-        Fri,  6 Sep 2019 16:21:29 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] Bluetooth: hidp: Fix error checks in
- hidp_get/set_raw_report
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190906140744.GC14147@kadam>
-Date:   Fri, 6 Sep 2019 16:12:41 +0200
-Cc:     Dan Elkouby <streetwalkermc@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Fabian Henneke <fabian.henneke@gmail.com>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Andrea Parri <andrea.parri@amarulasolutions.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <48E8A989-AE89-4F59-84F4-075911F4FC75@holtmann.org>
-References: <20190906094158.8854-1-streetwalkermc@gmail.com>
- <440C3662-1870-44D8-B4E3-C290CE154F1E@holtmann.org>
- <20190906140744.GC14147@kadam>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Fri, 6 Sep 2019 12:24:44 -0400
+Received: from mga04.intel.com ([192.55.52.120]:24832 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387834AbfIFQYo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 6 Sep 2019 12:24:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Sep 2019 09:24:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,473,1559545200"; 
+   d="scan'208";a="334937317"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.24.188])
+  by orsmga004.jf.intel.com with ESMTP; 06 Sep 2019 09:24:42 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com
+Subject: [PATCH BlueZ v4 0/2] mesh: Streamline Key Refresh finalization
+Date:   Fri,  6 Sep 2019 09:24:32 -0700
+Message-Id: <20190906162434.7434-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dan,
+All App key refresh finalization will happen when the bound Net Key is
+finalized.
 
->>> Commit 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return
->>> number of queued bytes") changed hidp_send_message to return non-zero
->>> values on success, which some other bits did not expect. This caused
->>> spurious errors to be propagated through the stack, breaking some (all?)
->>> drivers, such as hid-sony for the Dualshock 4 in Bluetooth mode.
->>> 
->>> Signed-off-by: Dan Elkouby <streetwalkermc@gmail.com>
->>> ---
->>> net/bluetooth/hidp/core.c | 4 ++--
->>> 1 file changed, 2 insertions(+), 2 deletions(-)
->> 
->> patch has been applied to bluetooth-next tree.
->> 
-> 
-> The v2 added an additional fix and used the Fixes tag.  Could you apply
-> that instead?
+Version 4: Allow a redundent call to set phase 3 (after transition to
+phase 0 complete) by returning successfully, but doing nothing.
 
-see my reply to Jiri. I replied to the wrong patch, but actually applied to the updated one.
 
-Regards
+Brian Gix (2):
+  doc: Remove uneeded dbus API for App Key Refresh
+  mesh: Automate AppKey update on KR phase 2-->3-->0
 
-Marcel
+ doc/mesh-api.txt | 19 ----------------
+ mesh/keyring.c   | 58 ++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/keyring.h   |  1 +
+ mesh/manager.c   | 53 +++++++++++++++++--------------------------
+ 4 files changed, 79 insertions(+), 52 deletions(-)
+
+-- 
+2.21.0
 
