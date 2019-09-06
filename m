@@ -2,91 +2,113 @@ Return-Path: <SRS0=sa2S=XB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC4CC43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 11:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E767FC43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 11:56:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD21720842
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 11:31:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567769490;
-	bh=iogpGBQG7jXWKjVA6uZiFSlDPTuY7gAzoeRO+2zCtHs=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:List-ID:From;
-	b=ZYBH6IqpXaO4zna08G06UxfAnC7QdLjlDtMeZKv38VQZqGviOIxaIh7+BnBne/xfH
-	 SjK51YUumh+QLjtS8jhVla3rkGWhjhrMhh2XbiKuN9pppIm0i+cc8sYzbacnIFT39K
-	 kTSV7ILJ1m1+CYS4uPKLmqgTtVuaHsqXqxeUAn/E=
+	by mail.kernel.org (Postfix) with ESMTP id BD154214E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 11:56:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="V7YmFi2h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388752AbfIFLb0 (ORCPT
+        id S2404254AbfIFLzy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Sep 2019 07:31:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34946 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732984AbfIFLb0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Sep 2019 07:31:26 -0400
-Received: from pobox.suse.cz (prg-ext-pat.suse.com [213.151.95.130])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B45BF2070C;
-        Fri,  6 Sep 2019 11:31:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567769485;
-        bh=iogpGBQG7jXWKjVA6uZiFSlDPTuY7gAzoeRO+2zCtHs=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=yd935ui4dpymxpEuwbJ9LbamdQt/qCxtr11s6AswOEey2QNt0zao+eKe1PGz31BI9
-         qaxLcPg2RwxbttqksqxBVWxamHtR6qlHLzyA6E84hTviaChQOWijY1jvQWb62xfDQE
-         RXUaBanQkhqp0kgzGLXNcniuXFSNNufTqL3iRwQM=
-Date:   Fri, 6 Sep 2019 13:31:06 +0200 (CEST)
-From:   Jiri Kosina <jikos@kernel.org>
+        Fri, 6 Sep 2019 07:55:54 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52134 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389491AbfIFLzx (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 6 Sep 2019 07:55:53 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86Bs9q1084833;
+        Fri, 6 Sep 2019 11:55:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=UQ7HZzVsUj9ewFhA6fQpQ91lzSpUtdtyloZU6ZAWe04=;
+ b=V7YmFi2h8p3HXetZAeZvjZ1vpqxdwMH+sg5CGT4ej4gyFv9iw6jz/10yTXc3ibXht8Gh
+ veBX1PGMp6vhAoHHcTBWb3ijpPzgCzSZgv9G0fRmFw94qzO/RPWx2OfWsvufET1ESHFs
+ ynKZxtumzwADP/mK1FCFhmWz/dhY+VwOk47YvU+Iu3sMQ7vtFWwRfjBMs5lJ4gDa4u/x
+ J3+azWJJcw0qT2tNhonEcFY7CxvD0QNDkzrDIxs0tRRRYknI0Bs/gUxzK1hEJ3BFm3h1
+ piDPa42KVtxk3y7d+kngg1+Q2x3d8Uq/k9RinMVcwWO2F5DKxm93yx0hLm+6Egzy2j/2 9w== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2uupvpr1k9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Sep 2019 11:55:41 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x86BrvSo047977;
+        Fri, 6 Sep 2019 11:55:40 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2uud7pers0-60
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Sep 2019 11:55:40 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x86AwWeY031955;
+        Fri, 6 Sep 2019 10:58:32 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 06 Sep 2019 03:58:32 -0700
+Date:   Fri, 6 Sep 2019 13:58:24 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
 To:     Dan Elkouby <streetwalkermc@gmail.com>
-cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Brian Norris <computersforpeace@gmail.com>,
         Fabian Henneke <fabian.henneke@gmail.com>,
+        Brian Norris <computersforpeace@gmail.com>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Andrea Parri <andrea.parri@amarulasolutions.com>,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hidp: Fix assumptions on the return value of
- hidp_send_message
-In-Reply-To: <20190906110645.27601-1-streetwalkermc@gmail.com>
-Message-ID: <nycvar.YFH.7.76.1909061330390.31470@cbobk.fhfr.pm>
-References: <20190906101306.GA12017@kadam> <20190906110645.27601-1-streetwalkermc@gmail.com>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hidp: Fix error checks in
+ hidp_get/set_raw_report
+Message-ID: <20190906105824.GA14147@kadam>
+References: <20190906094158.8854-1-streetwalkermc@gmail.com>
+ <20190906101306.GA12017@kadam>
+ <CANnEQ3HX0SNG+Hzs2b+BzLwuewsC8-3sF2urWV+bqUahXq0hVA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANnEQ3HX0SNG+Hzs2b+BzLwuewsC8-3sF2urWV+bqUahXq0hVA@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909060126
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909060126
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, 6 Sep 2019, Dan Elkouby wrote:
-
-> hidp_send_message was changed to return non-zero values on success,
-> which some other bits did not expect. This caused spurious errors to be
-> propagated through the stack, breaking some drivers, such as hid-sony
-> for the Dualshock 4 in Bluetooth mode.
+On Fri, Sep 06, 2019 at 01:40:15PM +0300, Dan Elkouby wrote:
+> On Fri, Sep 6, 2019 at 1:14 PM Dan Carpenter wrote:
+> > I think we also need to update update ms_ff_worker() which assumes that
+> > hid_hw_output_report() returns zero on success.
 > 
-> As pointed out by Dan Carpenter, hid-microsoft directly relied on that
-> assumption as well.
+> Yes, it looks like that's the case. Should I amend my patch to include
+> this fix, or should it be a separate patch? I don't have access to any
+> hardware covered by hid-microsoft, so I won't be able to test it.
 > 
-> Fixes: 48d9cc9d85dd ("Bluetooth: hidp: Let hidp_send_message return number of queued bytes")
-> 
-> Signed-off-by: Dan Elkouby <streetwalkermc@gmail.com>
 
-Reviewed-by: Jiri Kosina <jkosina@suse.cz>
+Yes.  Please amend the patch.  We all understand that you don't have
+the hardware so it's not a problem.  If you want to blame me in the
+commit message that's fine.  "Dan Carpenter pointed out a related issue
+in ms_ff_worker()".  But we're only silencing a warning so it can't
+really break anything.
 
-Marcel, are you taking this through your tree?
+You can add my Reviewed-by tag as well when you resend.
 
-Thanks,
-
--- 
-Jiri Kosina
-SUSE Labs
+regards,
+dan carpenter
 
