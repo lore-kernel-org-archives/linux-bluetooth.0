@@ -1,42 +1,73 @@
-Return-Path: <SRS0=Ti+w=XA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=sa2S=XB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF60C43331
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 22:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 224B2C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 02:36:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1977F20825
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Sep 2019 22:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 234D02070C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 02:36:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KhFHj1wO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390326AbfIEWfa (ORCPT
+        id S2391991AbfIFCgs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Sep 2019 18:35:30 -0400
-Received: from mga04.intel.com ([192.55.52.120]:51621 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729719AbfIEWfa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Sep 2019 18:35:30 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Sep 2019 15:35:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,471,1559545200"; 
-   d="scan'208";a="199376645"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.24.188])
-  by fmsmga001.fm.intel.com with ESMTP; 05 Sep 2019 15:35:29 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ v3 2/2] mesh: Automate AppKey update on KR phase 2-->3-->0
-Date:   Thu,  5 Sep 2019 15:35:18 -0700
-Message-Id: <20190905223518.18073-3-brian.gix@intel.com>
+        Thu, 5 Sep 2019 22:36:48 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34407 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391988AbfIFCgs (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 5 Sep 2019 22:36:48 -0400
+Received: by mail-pg1-f194.google.com with SMTP id n9so2597417pgc.1;
+        Thu, 05 Sep 2019 19:36:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ePXAwP/rNBu3eb2hTDPp8xoweMPxOufZFxZtTEYoIiM=;
+        b=KhFHj1wOs6NfxYaU6KE5WVurkHI8yrh+fF6wgCdTTbo6+qJyCGcFM1Z8rV18BOwJrn
+         Mc3fKxq35i6gEHwZ08mYp9CM9NVWh5iGPe0mFngbJq0+7lSyP73cVsjSmWHKu4yn4FbC
+         +1UXBDj1A5wjmAedQqkWYYQFBBdXDerNTTd6jWjw6zqZGYZxqszRxLLabOMfGgX97lP7
+         1NrKumt6bPoWW8G70PBpw1BGFYRDghfyRHvYjJedm4lF5liKt8p+WmpoDWmWP1W6ApCy
+         0yDqF56tKhkM8uyV29eGuHJ6TiVuhFmrW8AbrNsL6duZjUqxgqZ/fXp78jMSYfKzgd9z
+         TGYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ePXAwP/rNBu3eb2hTDPp8xoweMPxOufZFxZtTEYoIiM=;
+        b=XUPLMdxyQs9/87WKzvlYkFhrioQqmRA8Vk4ZkQmhlQLe2ynKmLcBhPD4diR9EBCl0+
+         EpTc3bHrITHHhjF5eftAIUKxGVnvIlRW9RnYgvtHcMD4Ny/Nbu7NPDtQCGn6N4nveUE0
+         AwHR/9w9d7lULJ8H58ztXQRxJy1Fe+Pr1wqq70seruuXqDulX08QdloeHHIBXjLckwqV
+         vy0wBMshdMTkxJ3faJGFcRMnxOgjkAjd+ktzGRZE6KiCtecVRBOFpIwlLC8eX0ZR86nY
+         wCyHhLEp5J5IAioVuyHFLSbcm+cgRBWR3karuoNmIfDMo5EA4l/6KepnBi+rr7Q5VaX4
+         2imA==
+X-Gm-Message-State: APjAAAXQWjR3JyBEbKTbfVjCvHDhzBdyvLc6fQWpq6oYF6QXIC4XZhwr
+        FahwRdJjnHDkvJ9oCZ/BVRQ=
+X-Google-Smtp-Source: APXvYqxwDwOBTZ0IPGMkUTK6wkUJwtjxOeDa2nQtaWm5wQqr0Uo79ddmcGaajBceJMjFJwy/Ai5W1A==
+X-Received: by 2002:a65:690b:: with SMTP id s11mr5953189pgq.10.1567737407258;
+        Thu, 05 Sep 2019 19:36:47 -0700 (PDT)
+Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
+        by smtp.gmail.com with ESMTPSA id v7sm4035747pff.87.2019.09.05.19.36.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2019 19:36:46 -0700 (PDT)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
+        Florian Dollinger <dollinger.florian@gmx.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH v2] Bluetooth: Retry configure request if result is L2CAP_CONF_UNKNOWN
+Date:   Thu,  5 Sep 2019 19:36:01 -0700
+Message-Id: <20190906023601.4378-1-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190905223518.18073-1-brian.gix@intel.com>
-References: <20190905223518.18073-1-brian.gix@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -44,188 +75,126 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Designed so that if an unexpcted abort() occurs, the bound NetKey remains
-in state 2 or 3.  If successful, the NetKey is set to Phase 0, and all
-bound AppKeys are in their correct state.
----
- mesh/keyring.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/keyring.h |  1 +
- mesh/manager.c | 43 +++++++++++--------------------------
- 3 files changed, 71 insertions(+), 31 deletions(-)
+Due to:
 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index 4b3d8b296..3a7f92f9f 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -23,6 +23,7 @@
+ * Current implementation of l2cap_config_rsp() dropping BT
+   connection if sender of configuration response replied with unknown
+   option failure (Result=0x0003/L2CAP_CONF_UNKNOWN)
+
+ * Current implementation of l2cap_build_conf_req() adding
+   L2CAP_CONF_RFC(0x04) option to initial configure request sent by
+   the Linux host.
+
+devices that do no recongninze L2CAP_CONF_RFC, such as Xbox One S
+controllers, will get stuck in endless connect -> configure ->
+disconnect loop, never connect and be generaly unusable.
+
+To avoid this problem add code to do the following:
+
+ 1. Parse the body of response L2CAP_CONF_UNKNOWN and, in case of
+    unsupported option being RFC, clear L2CAP_FEAT_ERTM and
+    L2CAP_FEAT_STREAMING from connection's feature mask (in order to
+    prevent RFC option from being added going forward)
+
+ 2. Retry configuration step the same way it's done for
+    L2CAP_CONF_UNACCEPT
+
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: Pierre-Loup A. Griffais <pgriffais@valvesoftware.com>
+Cc: Florian Dollinger <dollinger.florian@gmx.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+
+Changes since [v1]:
+
+   - Patch simplified to simply clear L2CAP_FEAT_ERTM |
+     L2CAP_FEAT_STREAMING from feat_mask when device flags RFC options
+     as unknown
+
+[v1] lore.kernel.org/r/20190208025828.30901-1-andrew.smirnov@gmail.com
+
+ net/bluetooth/l2cap_core.c | 58 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index dfc1edb168b7..77b65870b064 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4216,6 +4216,49 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+ 	return err;
+ }
  
- #define _GNU_SOURCE
- #include <fcntl.h>
-+#include <dirent.h>
- #include <stdio.h>
- #include <unistd.h>
- #include <dirent.h>
-@@ -105,6 +106,7 @@ bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 				return false;
- 			}
++static inline int l2cap_config_rsp_unknown(struct l2cap_conn *conn,
++					   struct l2cap_chan *chan,
++					   const u8 *data,
++					   int len)
++{
++	char req[64];
++
++	if (!len || len > sizeof(req) -  sizeof(struct l2cap_conf_req))
++		return -ECONNRESET;
++
++	while (len--) {
++		const u8 option_type = *data++;
++
++		BT_DBG("chan %p, unknown option type: %u", chan,  option_type);
++
++		/* "...Hints shall not be included in the Response and
++		 * shall not be the sole cause for rejecting the
++		 * Request.."
++		 */
++		if (option_type & L2CAP_CONF_HINT)
++			return -ECONNRESET;
++
++		switch (option_type) {
++		case L2CAP_CONF_RFC:
++			/* Clearing the following feature should
++			 * prevent RFC option from being added next
++			 * connection attempt
++			 */
++			conn->feat_mask &= ~(L2CAP_FEAT_ERTM |
++					     L2CAP_FEAT_STREAMING);
++			break;
++		default:
++			return -ECONNRESET;
++		}
++	}
++
++	len = l2cap_build_conf_req(chan, req, sizeof(req));
++	l2cap_send_cmd(conn, l2cap_get_ident(conn), L2CAP_CONF_REQ, len, req);
++	chan->num_conf_req++;
++
++	return 0;
++}
++
+ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 				   struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+ 				   u8 *data)
+@@ -4271,6 +4314,21 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
  		}
-+
- 		lseek(fd, 0, SEEK_SET);
- 	} else
- 		fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC,
-@@ -120,6 +122,62 @@ bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 	return result;
- }
+ 		goto done;
  
-+static void finalize(const char *fpath, uint16_t net_idx)
-+{
-+	struct keyring_app_key key;
-+	int fd;
-+
-+	fd = open(fpath, O_RDWR);
-+
-+	if (fd < 0)
-+		return;
-+
-+	if (read(fd, &key, sizeof(key)) != sizeof(key) ||
-+						key.net_idx != net_idx)
-+		goto done;
-+
-+	l_debug("Finalize %s", fpath);
-+	memcpy(key.old_key, key.new_key, 16);
-+	lseek(fd, 0, SEEK_SET);
-+	write(fd, &key, sizeof(key));
-+
-+done:
-+	close(fd);
-+}
-+
-+bool keyring_finalize_app_keys(struct mesh_node *node, uint16_t net_idx)
-+{
-+	const char *node_path;
-+	char key_dir[PATH_MAX];
-+	DIR *dir;
-+	struct dirent *entry;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = node_get_storage_dir(node);
-+
-+	if (strlen(node_path) + strlen(app_key_dir) + 1 >= PATH_MAX)
-+		return false;
-+
-+	snprintf(key_dir, PATH_MAX, "%s%s", node_path, app_key_dir);
-+	dir = opendir(key_dir);
-+	if (!dir) {
-+		l_error("Failed to App Key storage directory: %s", key_dir);
-+		return false;
-+	}
-+
-+	while ((entry = readdir(dir)) != NULL) {
-+		/* AppKeys are stored in regular files */
-+		if (entry->d_type == DT_REG)
-+			finalize(entry->d_name, net_idx);
-+	}
-+
-+	closedir(dir);
-+
-+	return true;
-+}
-+
- bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 					uint8_t count, uint8_t dev_key[16])
- {
-diff --git a/mesh/keyring.h b/mesh/keyring.h
-index 167191013..2fab6b0dc 100644
---- a/mesh/keyring.h
-+++ b/mesh/keyring.h
-@@ -38,6 +38,7 @@ bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
- bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx);
- bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 				uint16_t net_idx, struct keyring_app_key *key);
-+bool keyring_finalize_app_keys(struct mesh_node *node, uint16_t net_id);
- bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
- 						struct keyring_app_key *key);
- bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx);
-diff --git a/mesh/manager.c b/mesh/manager.c
-index cf4782c45..90093bc2c 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -434,6 +434,7 @@ static struct l_dbus_message *store_new_subnet(struct mesh_node *node,
- 	}
- 
- 	memcpy(key.old_key, new_key, 16);
-+	memcpy(key.new_key, new_key, 16);
- 	key.net_idx = net_idx;
- 	key.phase = KEY_REFRESH_PHASE_NONE;
- 
-@@ -616,34 +617,6 @@ static struct l_dbus_message *update_appkey_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
--static struct l_dbus_message *complete_update_appkey_call(struct l_dbus *dbus,
--						struct l_dbus_message *msg,
--						void *user_data)
--{
--	struct mesh_node *node = user_data;
--	struct keyring_net_key net_key;
--	struct keyring_app_key app_key;
--	uint16_t app_idx;
--
--	if (!l_dbus_message_get_arguments(msg, "q", &app_idx) ||
--			app_idx > MAX_KEY_IDX)
--		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
--
--	if (!keyring_get_app_key(node, app_idx, &app_key) ||
--			!keyring_get_net_key(node, app_key.net_idx, &net_key))
--		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
--
--	if (net_key.phase != KEY_REFRESH_PHASE_TWO)
--		return dbus_error(msg, MESH_ERROR_FAILED, "Invalid phase");
--
--	memcpy(app_key.old_key, app_key.new_key, 16);
--
--	if (!keyring_put_app_key(node, app_idx, app_key.net_idx, &app_key))
--		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
--
--	return l_dbus_message_new_method_return(msg);
--}
--
- static struct l_dbus_message *delete_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
-@@ -698,9 +671,20 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
- 	if (!keyring_get_net_key(node, net_idx, &key))
- 		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
- 
-+	if (phase == KEY_REFRESH_PHASE_NONE &&
-+					key.phase >= KEY_REFRESH_PHASE_TWO)
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
- 	if (phase == KEY_REFRESH_PHASE_THREE &&
- 					key.phase != KEY_REFRESH_PHASE_NONE) {
- 		memcpy(key.old_key, key.new_key, 16);
-+		key.phase = KEY_REFRESH_PHASE_THREE;
-+		if (!keyring_put_net_key(node, net_idx, &key))
-+			return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+		if (!keyring_finalize_app_keys(node, net_idx))
-+			return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
- 		key.phase = KEY_REFRESH_PHASE_NONE;
- 	} else
- 		key.phase = phase;
-@@ -736,9 +720,6 @@ static void setup_management_interface(struct l_dbus_interface *iface)
- 					"", "qq", "", "net_index", "app_index");
- 	l_dbus_interface_method(iface, "UpdateAppKey", 0, update_appkey_call,
- 						"", "q", "", "app_index");
--	l_dbus_interface_method(iface, "CompleteAppKeyUpdate", 0,
--					complete_update_appkey_call, "", "q",
--							"", "app_index");
- 	l_dbus_interface_method(iface, "DeleteAppKey", 0, delete_appkey_call,
- 						"", "q", "", "app_index");
- 	l_dbus_interface_method(iface, "ImportAppKey", 0, import_appkey_call,
++	case L2CAP_CONF_UNKNOWN:
++		if (chan->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
++			if (l2cap_config_rsp_unknown(conn, chan, rsp->data,
++						     len) < 0) {
++				l2cap_send_disconn_req(chan, ECONNRESET);
++				goto done;
++			}
++			break;
++		}
++		/* Once, chan->num_conf_rsp goes above
++		 * L2CAP_CONF_MAX_CONF_RSP we want to go down all the
++		 * way to default label (just like L2CAP_CONF_UNACCEPT
++		 * below)
++		 */
++		/* fall through */
+ 	case L2CAP_CONF_UNACCEPT:
+ 		if (chan->num_conf_rsp <= L2CAP_CONF_MAX_CONF_RSP) {
+ 			char req[64];
 -- 
 2.21.0
 
