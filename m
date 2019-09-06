@@ -2,187 +2,193 @@ Return-Path: <SRS0=sa2S=XB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87260C43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 17:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7959AC00307
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 19:07:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6160220842
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 17:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 534D020838
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 19:07:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTz8xVPH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDLrYv0A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395180AbfIFRXu (ORCPT
+        id S2392825AbfIFTH1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Sep 2019 13:23:50 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39402 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729928AbfIFRXu (ORCPT
+        Fri, 6 Sep 2019 15:07:27 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:43335 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729131AbfIFTH1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Sep 2019 13:23:50 -0400
-Received: by mail-pf1-f193.google.com with SMTP id s12so4936474pfe.6;
-        Fri, 06 Sep 2019 10:23:49 -0700 (PDT)
+        Fri, 6 Sep 2019 15:07:27 -0400
+Received: by mail-pg1-f194.google.com with SMTP id u72so3982103pgb.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Sep 2019 12:07:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition:user-agent;
-        bh=/HzW4Qp75U7WBzQhs2hnRsyzdHsEUO6VvVTbSTDmCv8=;
-        b=JTz8xVPHqk6nKKBd/iZCR8tBpARRzKLZKy64vbGcV08/iVXKQIpxjfcyvTFkg/LgWU
-         5fqzkVuptOTXPbxeNhIMuZv59lqFbhS66rYIFhvGjBxq9UHRFimxw7xfQ/buLSySTr/t
-         iwamPb51jSth2rAAPy30vsubltkDG2v+WH+mZhW26inZBXEan2RCS6PH76GmMSEJH3GM
-         wQ2yt6aw5ojcVUqZXIr6XcZ2Avx8DkmiOzcOASYgeAvDny1qY+PqXeVr0ArXayUxhk0v
-         CbHXJTGlxbOyalwBJ5HMdKbOl0J0mbyAysJjKPMy0zfPr8XICAqpSAoXiHUsImiV0+mM
-         kjKg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=kcAcfV/1aytS8YWfBaGsXQyMFYMczD5w2us5j4aHxG8=;
+        b=rDLrYv0AUkgSY8OCF8xlcDI9BnLCeLvFihsKNiVre7mELqLbZH11jd2HvAiHmfH2FS
+         YoOVa+IF9YuSkiU5nvp0afvK1eAVPrYzrV5jlrKcxBh2QOJr8nyljbUx0PDZ2IPErPvg
+         9Z9L0fqQxuxjrH3ccK+ziL5HH6/3EIXitaxeZrib/6wtTBMqNW82icCDzIc6AhDWMI52
+         AkOxA+ikiCpmPDqxK6uAD5HAIioJ3ZUmr+hnf2an9CLANOOJ+cqSK4UaS5pQ67kjay0M
+         BPEVUBu9H+pZkzh2XlOO6nH6FxldaqDqTlAsQmWyPORcQ6G7Mh7Jze312QZLkZoI9RmE
+         IafA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition:user-agent;
-        bh=/HzW4Qp75U7WBzQhs2hnRsyzdHsEUO6VvVTbSTDmCv8=;
-        b=Wz3Tr2Yjzl5FNPE54rbt5PwG4Syr4HHV4d4gtokjIFOTOVXNHM6gHk1L0LTapLceSP
-         xgk+rPC25sXXQl0eSiPAGZlIvQoNaKfcGu0liexFHjPCglpvueoCkSX6RXWVSn4X0IQ0
-         C17iPVE8w38orCVFSMFVdeUlJXQCZYk36XQY2Wq7GA5ReuP6nmMyPovEf6jW6lKWExva
-         WKJ3jBph4BVTXwlBETsrJrHL36eh41lIsrRf6y76ghF5tYvdVTEXsg89SuxuszkCn9Gd
-         dIKyMA3ykDg4048GVMS8PlZa6JX0xrOS2Zl0H8Nf4MDSeWR9UWxYYlxfBg1DzPQoWE+N
-         bqgw==
-X-Gm-Message-State: APjAAAWvBXtuoV08glbgNVpyXD7MRXs7rEGF3gyDtiJN/ixIxOdrrgNy
-        4vvE2tQORIczZwEPRpiB3NM4Z8Zji+7wDQ==
-X-Google-Smtp-Source: APXvYqx/51Ez1fyokIW49PlSCR6byfpoxr0X9Nt+EpdU300RQvqQWPqIR/zTe7nb/iGywLZ6GkE0QQ==
-X-Received: by 2002:aa7:83c7:: with SMTP id j7mr12049687pfn.167.1567790628834;
-        Fri, 06 Sep 2019 10:23:48 -0700 (PDT)
-Received: from localhost ([134.134.139.77])
-        by smtp.gmail.com with ESMTPSA id p14sm5634366pfn.138.2019.09.06.10.23.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 10:23:43 -0700 (PDT)
-Date:   Fri, 6 Sep 2019 20:23:39 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net
-Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next 2019-09-06
-Message-ID: <20190906172339.GA74057@jmoran1-mobl1.ger.corp.intel.com>
-Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=kcAcfV/1aytS8YWfBaGsXQyMFYMczD5w2us5j4aHxG8=;
+        b=MbYZJQA1RpEFNeb5ZKHnr9GCp1u/OeJICWyCsZ9XHAI8W2mWqpGUhDucvgL8UGqb7I
+         2DFbR/JPVhHYH53uz8Tx9uBbi9CnKdwW0m9x2xyMDwsYa5nOQ9yrtllkOVEQLWkwin3I
+         sU/9d2pzukw1Tdc4oyOfwEZ15qLolT2NuutjKigbseIs8fFpkaS2x3CxRk3QrS3eIEHT
+         DLkzwSJygpnRuSDwEjfP0R2uVkEaindu8NfIQLoNl16m6nKpVppu7f472yAvWsJB4Gvn
+         HdyY7D/or+YpXFIkX0MhjyRgCaKrR7wqC/9nZ3ClcTWgo4jRNRGTsRO2fG8J4dY8m0qn
+         0dOw==
+X-Gm-Message-State: APjAAAVB/MpFU9dI5b0c6SQWtdzDmqi+utNYUwH/kgW9vVN3B0/KJj8/
+        BxTA+2WXesn9cT6KbSXSiAO+eYLAIUU=
+X-Google-Smtp-Source: APXvYqwn4x9JhDnumm6brkZXvhCjKKdSlBGiM4fazdZkQmqmCFmlZKwRuCmgT52yu8k9lEFmoTMzqQ==
+X-Received: by 2002:a17:90a:de11:: with SMTP id m17mr11190896pjv.38.1567796846252;
+        Fri, 06 Sep 2019 12:07:26 -0700 (PDT)
+Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
+        by smtp.gmail.com with ESMTPSA id 14sm7147365pfn.169.2019.09.06.12.07.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2019 12:07:25 -0700 (PDT)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2] monitor: Add unknown options decoding for Configure Response
+Date:   Fri,  6 Sep 2019 12:07:17 -0700
+Message-Id: <20190906190717.1325-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Unknown options respose for Configure Respose packet has a different
+layout that that of unaccepted options, so it needs special code to
+handle it.
 
---M9NhX3UHpAaciwkO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Before:
 
-Hi Dave,
+> ACL Data RX: Handle 12 flags 0x02 dlen 15
+      L2CAP: Configure Response (0x05) ident 2 len 7
+        Source CID: 64
+        Flags: 0x0000
+        Result: Failure - unknown options (0x0003)
+        04
 
-Here's the main bluetooth-next pull request for the 5.4 kernel.
+After:
 
- - Cleanups & fixes to btrtl driver
- - Fixes for Realtek devices in btusb, e.g. for suspend handling
- - Firmware loading support for BCM4345C5
- - hidp_send_message() return value handling fixes
- - Added support for utilizing Fast Advertising Interval
- - Various other minor cleanups & fixes
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+> ACL Data RX: Handle 12 flags 0x02 dlen 15
+      L2CAP: Configure Response (0x05) ident 3 len 7
+        Source CID: 65
+        Flags: 0x0000
+        Result: Failure - unknown options (0x0003)
+        Option: Retransmission and Flow Control (0x04)
 ---
-The following changes since commit 0e5b36bc4c1fccfc18dd851d960781589c16dae8:
 
-  r8152: adjust the settings of ups flags (2019-09-05 12:41:11 +0200)
+Changes since [v1]:
 
-are available in the Git repository at:
+    - Code converted to use l2cap_frame_get_u8() and l2cap_frame_pull()
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
 
-for you to fetch changes up to 8bb3537095f107ed55ad51f6241165b397aaafac:
+[v1] https://lore.kernel.org/linux-bluetooth/20190522013216.22493-1-andrew.smirnov@gmail.com/
 
-  Bluetooth: hidp: Fix assumptions on the return value of hidp_send_message (2019-09-06 15:55:40 +0200)
+ monitor/l2cap.c | 54 +++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 43 insertions(+), 11 deletions(-)
 
-----------------------------------------------------------------
-Alex Lu (6):
-      Bluetooth: btusb: Fix suspend issue for Realtek devices
-      Bluetooth: btrtl: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY
-      Bluetooth: btrtl: Add firmware version print
-      Bluetooth: btrtl: Remove redundant prefix from calls to rtl_dev macros
-      Bluetooth: btrtl: Remove trailing newline from calls to rtl_dev macros
-      Bluetooth: btusb: Use cmd_timeout to reset Realtek device
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index 26719ac5e..41967a731 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -705,6 +705,41 @@ static struct {
+         { }
+ };
+ 
++static void lookup_option_by_type(uint8_t type, const char **str,
++				  uint8_t *expect_len)
++{
++	int i;
++
++	for (i = 0; options_table[i].str; i++) {
++		if (options_table[i].type == type) {
++			*str = options_table[i].str;
++			if (expect_len)
++				*expect_len = options_table[i].len;
++			return;
++		}
++	}
++
++	*str = "Unknown";
++	if (expect_len)
++		*expect_len = 0;
++}
++
++static void print_unknown_options(const struct l2cap_frame *source,
++				  uint8_t offset)
++{
++	struct l2cap_frame frame;
++	uint8_t type;
++
++	l2cap_frame_pull(&frame, source, offset);
++
++	while (l2cap_frame_get_u8(&frame, &type)) {
++		const char *str;
++
++		lookup_option_by_type(type, &str, NULL);
++		print_field("Option: %s (0x%2.2x)", str, type);
++	}
++}
++
+ static void print_config_options(const struct l2cap_frame *frame,
+ 				uint8_t offset, uint16_t cid, bool response)
+ {
+@@ -713,20 +748,13 @@ static void print_config_options(const struct l2cap_frame *frame,
+ 	uint16_t consumed = 0;
+ 
+ 	while (consumed < size - 2) {
+-		const char *str = "Unknown";
++		const char *str;
+ 		uint8_t type = data[consumed] & 0x7f;
+ 		uint8_t hint = data[consumed] & 0x80;
+ 		uint8_t len = data[consumed + 1];
+-		uint8_t expect_len = 0;
+-		int i;
++		uint8_t expect_len;
+ 
+-		for (i = 0; options_table[i].str; i++) {
+-			if (options_table[i].type == type) {
+-				str = options_table[i].str;
+-				expect_len = options_table[i].len;
+-				break;
+-			}
+-		}
++		lookup_option_by_type(type, &str, &expect_len);
+ 
+ 		print_field("Option: %s (0x%2.2x) [%s]", str, type,
+ 						hint ? "hint" : "mandatory");
+@@ -1122,7 +1150,11 @@ static void sig_config_rsp(const struct l2cap_frame *frame)
+ 	print_cid("Source", pdu->scid);
+ 	print_config_flags(pdu->flags);
+ 	print_config_result(pdu->result);
+-	print_config_options(frame, 6, le16_to_cpu(pdu->scid), true);
++	if (pdu->result == 0x0003)
++		print_unknown_options(frame, 6);
++	else
++		print_config_options(frame, 6, le16_to_cpu(pdu->scid), true);
++
+ }
+ 
+ static void sig_disconn_req(const struct l2cap_frame *frame)
+-- 
+2.21.0
 
-Dan Elkouby (1):
-      Bluetooth: hidp: Fix assumptions on the return value of hidp_send_message
-
-Gustavo A. R. Silva (1):
-      Bluetooth: mgmt: Use struct_size() helper
-
-Harish Bandi (1):
-      Bluetooth: hci_qca: wait for Pre shutdown complete event before sending the Power off pulse
-
-Matthias Kaehlcke (1):
-      Bluetooth: hci_qca: Remove redundant initializations to zero
-
-Max Chou (1):
-      Bluetooth: btrtl: Fix an issue that failing to download the FW which size is over 32K bytes
-
-Nishka Dasgupta (2):
-      Bluetooth: 6lowpan: Make variable header_ops constant
-      Bluetooth: hci_qca: Make structure qca_proto constant
-
-Ondrej Jirman (3):
-      dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
-      bluetooth: bcm: Add support for loading firmware for BCM4345C5
-      bluetooth: hci_bcm: Give more time to come out of reset
-
-Rocky Liao (1):
-      Bluetooth: hci_qca: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for QCA UART Radio
-
-Spoorthi Ravishankar Koppad (1):
-      Bluetooth: Add support for utilizing Fast Advertising Interval
-
-YueHaibing (1):
-      Bluetooth: hci_bcm: Fix -Wunused-const-variable warnings
-
- .../devicetree/bindings/net/broadcom-bluetooth.txt |   1 +
- drivers/bluetooth/btbcm.c                          |   3 +
- drivers/bluetooth/btqca.c                          |   5 +-
- drivers/bluetooth/btrtl.c                          | 125 ++++++++++++---------
- drivers/bluetooth/btusb.c                          |  65 ++++++++++-
- drivers/bluetooth/hci_bcm.c                        |  33 +++---
- drivers/bluetooth/hci_qca.c                        |  28 ++---
- drivers/hid/hid-microsoft.c                        |   2 +-
- include/net/bluetooth/hci_core.h                   |   2 +
- net/bluetooth/6lowpan.c                            |   2 +-
- net/bluetooth/hci_request.c                        |  29 +++--
- net/bluetooth/hidp/core.c                          |   4 +-
- net/bluetooth/mgmt.c                               |   8 +-
- 13 files changed, 197 insertions(+), 110 deletions(-)
-
---M9NhX3UHpAaciwkO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl1ylhkACgkQJCP2+/mo
-1BI9lRAArukCpVvMPgzy4e5Y+RaZTCxzMJ/nLd16rBCbpSzjiRoJBYb0030ZRlfY
-K8jN5jXtJ/r8jznY0jH2yRRTrLAZ+GvEE4eikn29rAolFDGXvPLjG7JSGXnM9xlU
-8a7ZkSYVJgI9G5YCVjiHE9y109OyqQuhazwdvH+PFn0xU29nFlRV5jH0FlQsYwj6
-0MQ0c1PTyFoh7dxb0QTesbTiIbJxvWlcLz8JWqzPZpvmJib5Rd3pEllySzBX59+l
-q+DPTYPZVUO/4QmPDqXqms77IHJINaSWO+C9Q2sc8nyM7NzQB0q5JQl9YUHjhwO6
-TmuTZggUHORhUyUEp+eOETP2TcKXZsgzE6rCxVZSLjgckBmKeWMnGB1WrQfxQ6gp
-1JiS2QOS+zbSpktSfpFeQK6NL43sC8f/br2AjPlfQfNiSJmsJVFaBoeW+5b30bfh
-Qj+X7Z+lH+FICDsWe77HbDP62AuBFReWAlb2WdgJFLswr1d6iPBiCut51AUGC6uV
-eOOgLdebw6apSEyXr11OiQ035aX1qN+aC293SmrNp278Vw+OfaefdrQqiNct0Ec/
-kNxEKKILSpk34lM9aXqKTrnyayzbLtbzJDCIIOmpXn2/9iVracx4UdN+bWM2t1AS
-Fep9VKcMgNw1LwBgix9IUHVkXkM3hVqwFWpr2OSSE1cE8gWKmWI=
-=i843
------END PGP SIGNATURE-----
-
---M9NhX3UHpAaciwkO--
