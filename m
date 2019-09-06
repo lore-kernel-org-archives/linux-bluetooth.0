@@ -2,238 +2,187 @@ Return-Path: <SRS0=sa2S=XB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDB7C43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 16:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87260C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 17:23:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1512E206CD
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 16:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6160220842
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Sep 2019 17:23:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTz8xVPH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388260AbfIFQYz (ORCPT
+        id S2395180AbfIFRXu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Sep 2019 12:24:55 -0400
-Received: from mga01.intel.com ([192.55.52.88]:55014 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726012AbfIFQYz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Sep 2019 12:24:55 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Sep 2019 09:24:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,473,1559545200"; 
-   d="scan'208";a="334937441"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.24.188])
-  by orsmga004.jf.intel.com with ESMTP; 06 Sep 2019 09:24:54 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ v4 2/2] mesh: Automate AppKey update on KR phase 2-->3-->0
-Date:   Fri,  6 Sep 2019 09:24:34 -0700
-Message-Id: <20190906162434.7434-3-brian.gix@intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190906162434.7434-1-brian.gix@intel.com>
-References: <20190906162434.7434-1-brian.gix@intel.com>
+        Fri, 6 Sep 2019 13:23:50 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39402 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729928AbfIFRXu (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 6 Sep 2019 13:23:50 -0400
+Received: by mail-pf1-f193.google.com with SMTP id s12so4936474pfe.6;
+        Fri, 06 Sep 2019 10:23:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition:user-agent;
+        bh=/HzW4Qp75U7WBzQhs2hnRsyzdHsEUO6VvVTbSTDmCv8=;
+        b=JTz8xVPHqk6nKKBd/iZCR8tBpARRzKLZKy64vbGcV08/iVXKQIpxjfcyvTFkg/LgWU
+         5fqzkVuptOTXPbxeNhIMuZv59lqFbhS66rYIFhvGjBxq9UHRFimxw7xfQ/buLSySTr/t
+         iwamPb51jSth2rAAPy30vsubltkDG2v+WH+mZhW26inZBXEan2RCS6PH76GmMSEJH3GM
+         wQ2yt6aw5ojcVUqZXIr6XcZ2Avx8DkmiOzcOASYgeAvDny1qY+PqXeVr0ArXayUxhk0v
+         CbHXJTGlxbOyalwBJ5HMdKbOl0J0mbyAysJjKPMy0zfPr8XICAqpSAoXiHUsImiV0+mM
+         kjKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:mime-version:content-disposition:user-agent;
+        bh=/HzW4Qp75U7WBzQhs2hnRsyzdHsEUO6VvVTbSTDmCv8=;
+        b=Wz3Tr2Yjzl5FNPE54rbt5PwG4Syr4HHV4d4gtokjIFOTOVXNHM6gHk1L0LTapLceSP
+         xgk+rPC25sXXQl0eSiPAGZlIvQoNaKfcGu0liexFHjPCglpvueoCkSX6RXWVSn4X0IQ0
+         C17iPVE8w38orCVFSMFVdeUlJXQCZYk36XQY2Wq7GA5ReuP6nmMyPovEf6jW6lKWExva
+         WKJ3jBph4BVTXwlBETsrJrHL36eh41lIsrRf6y76ghF5tYvdVTEXsg89SuxuszkCn9Gd
+         dIKyMA3ykDg4048GVMS8PlZa6JX0xrOS2Zl0H8Nf4MDSeWR9UWxYYlxfBg1DzPQoWE+N
+         bqgw==
+X-Gm-Message-State: APjAAAWvBXtuoV08glbgNVpyXD7MRXs7rEGF3gyDtiJN/ixIxOdrrgNy
+        4vvE2tQORIczZwEPRpiB3NM4Z8Zji+7wDQ==
+X-Google-Smtp-Source: APXvYqx/51Ez1fyokIW49PlSCR6byfpoxr0X9Nt+EpdU300RQvqQWPqIR/zTe7nb/iGywLZ6GkE0QQ==
+X-Received: by 2002:aa7:83c7:: with SMTP id j7mr12049687pfn.167.1567790628834;
+        Fri, 06 Sep 2019 10:23:48 -0700 (PDT)
+Received: from localhost ([134.134.139.77])
+        by smtp.gmail.com with ESMTPSA id p14sm5634366pfn.138.2019.09.06.10.23.42
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Sep 2019 10:23:43 -0700 (PDT)
+Date:   Fri, 6 Sep 2019 20:23:39 +0300
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2019-09-06
+Message-ID: <20190906172339.GA74057@jmoran1-mobl1.ger.corp.intel.com>
+Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Designed so that if an unexpcted abort() occurs, the bound NetKey remains
-in state 2 or 3.  If successful, the NetKey is set to Phase 0, and all
-bound AppKeys are in their correct state.
+
+--M9NhX3UHpAaciwkO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi Dave,
+
+Here's the main bluetooth-next pull request for the 5.4 kernel.
+
+ - Cleanups & fixes to btrtl driver
+ - Fixes for Realtek devices in btusb, e.g. for suspend handling
+ - Firmware loading support for BCM4345C5
+ - hidp_send_message() return value handling fixes
+ - Added support for utilizing Fast Advertising Interval
+ - Various other minor cleanups & fixes
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- mesh/keyring.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/keyring.h |  1 +
- mesh/manager.c | 53 +++++++++++++++++----------------------------
- 3 files changed, 79 insertions(+), 33 deletions(-)
+The following changes since commit 0e5b36bc4c1fccfc18dd851d960781589c16dae8:
 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index 4b3d8b296..3a7f92f9f 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -23,6 +23,7 @@
- 
- #define _GNU_SOURCE
- #include <fcntl.h>
-+#include <dirent.h>
- #include <stdio.h>
- #include <unistd.h>
- #include <dirent.h>
-@@ -105,6 +106,7 @@ bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 				return false;
- 			}
- 		}
-+
- 		lseek(fd, 0, SEEK_SET);
- 	} else
- 		fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC,
-@@ -120,6 +122,62 @@ bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 	return result;
- }
- 
-+static void finalize(const char *fpath, uint16_t net_idx)
-+{
-+	struct keyring_app_key key;
-+	int fd;
-+
-+	fd = open(fpath, O_RDWR);
-+
-+	if (fd < 0)
-+		return;
-+
-+	if (read(fd, &key, sizeof(key)) != sizeof(key) ||
-+						key.net_idx != net_idx)
-+		goto done;
-+
-+	l_debug("Finalize %s", fpath);
-+	memcpy(key.old_key, key.new_key, 16);
-+	lseek(fd, 0, SEEK_SET);
-+	write(fd, &key, sizeof(key));
-+
-+done:
-+	close(fd);
-+}
-+
-+bool keyring_finalize_app_keys(struct mesh_node *node, uint16_t net_idx)
-+{
-+	const char *node_path;
-+	char key_dir[PATH_MAX];
-+	DIR *dir;
-+	struct dirent *entry;
-+
-+	if (!node)
-+		return false;
-+
-+	node_path = node_get_storage_dir(node);
-+
-+	if (strlen(node_path) + strlen(app_key_dir) + 1 >= PATH_MAX)
-+		return false;
-+
-+	snprintf(key_dir, PATH_MAX, "%s%s", node_path, app_key_dir);
-+	dir = opendir(key_dir);
-+	if (!dir) {
-+		l_error("Failed to App Key storage directory: %s", key_dir);
-+		return false;
-+	}
-+
-+	while ((entry = readdir(dir)) != NULL) {
-+		/* AppKeys are stored in regular files */
-+		if (entry->d_type == DT_REG)
-+			finalize(entry->d_name, net_idx);
-+	}
-+
-+	closedir(dir);
-+
-+	return true;
-+}
-+
- bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 					uint8_t count, uint8_t dev_key[16])
- {
-diff --git a/mesh/keyring.h b/mesh/keyring.h
-index 167191013..2fab6b0dc 100644
---- a/mesh/keyring.h
-+++ b/mesh/keyring.h
-@@ -38,6 +38,7 @@ bool keyring_get_net_key(struct mesh_node *node, uint16_t net_idx,
- bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx);
- bool keyring_put_app_key(struct mesh_node *node, uint16_t app_idx,
- 				uint16_t net_idx, struct keyring_app_key *key);
-+bool keyring_finalize_app_keys(struct mesh_node *node, uint16_t net_id);
- bool keyring_get_app_key(struct mesh_node *node, uint16_t app_idx,
- 						struct keyring_app_key *key);
- bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx);
-diff --git a/mesh/manager.c b/mesh/manager.c
-index cf4782c45..501ec10fe 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -434,6 +434,7 @@ static struct l_dbus_message *store_new_subnet(struct mesh_node *node,
- 	}
- 
- 	memcpy(key.old_key, new_key, 16);
-+	memcpy(key.new_key, new_key, 16);
- 	key.net_idx = net_idx;
- 	key.phase = KEY_REFRESH_PHASE_NONE;
- 
-@@ -616,34 +617,6 @@ static struct l_dbus_message *update_appkey_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
--static struct l_dbus_message *complete_update_appkey_call(struct l_dbus *dbus,
--						struct l_dbus_message *msg,
--						void *user_data)
--{
--	struct mesh_node *node = user_data;
--	struct keyring_net_key net_key;
--	struct keyring_app_key app_key;
--	uint16_t app_idx;
--
--	if (!l_dbus_message_get_arguments(msg, "q", &app_idx) ||
--			app_idx > MAX_KEY_IDX)
--		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
--
--	if (!keyring_get_app_key(node, app_idx, &app_key) ||
--			!keyring_get_net_key(node, app_key.net_idx, &net_key))
--		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
--
--	if (net_key.phase != KEY_REFRESH_PHASE_TWO)
--		return dbus_error(msg, MESH_ERROR_FAILED, "Invalid phase");
--
--	memcpy(app_key.old_key, app_key.new_key, 16);
--
--	if (!keyring_put_app_key(node, app_idx, app_key.net_idx, &app_key))
--		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
--
--	return l_dbus_message_new_method_return(msg);
--}
--
- static struct l_dbus_message *delete_appkey_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
-@@ -698,9 +671,26 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
- 	if (!keyring_get_net_key(node, net_idx, &key))
- 		return dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST, NULL);
- 
--	if (phase == KEY_REFRESH_PHASE_THREE &&
--					key.phase != KEY_REFRESH_PHASE_NONE) {
-+	/* Canceling Key Refresh only valid from Phase One */
-+	if (phase == KEY_REFRESH_PHASE_NONE &&
-+					key.phase >= KEY_REFRESH_PHASE_TWO)
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	if (phase == KEY_REFRESH_PHASE_THREE) {
-+
-+		/* If we are already in Phase None, then nothing to do */
-+		if (key.phase == KEY_REFRESH_PHASE_NONE)
-+			return l_dbus_message_new_method_return(msg);
-+
- 		memcpy(key.old_key, key.new_key, 16);
-+		key.phase = KEY_REFRESH_PHASE_THREE;
-+
-+		if (!keyring_put_net_key(node, net_idx, &key))
-+			return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
-+		if (!keyring_finalize_app_keys(node, net_idx))
-+			return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-+
- 		key.phase = KEY_REFRESH_PHASE_NONE;
- 	} else
- 		key.phase = phase;
-@@ -736,9 +726,6 @@ static void setup_management_interface(struct l_dbus_interface *iface)
- 					"", "qq", "", "net_index", "app_index");
- 	l_dbus_interface_method(iface, "UpdateAppKey", 0, update_appkey_call,
- 						"", "q", "", "app_index");
--	l_dbus_interface_method(iface, "CompleteAppKeyUpdate", 0,
--					complete_update_appkey_call, "", "q",
--							"", "app_index");
- 	l_dbus_interface_method(iface, "DeleteAppKey", 0, delete_appkey_call,
- 						"", "q", "", "app_index");
- 	l_dbus_interface_method(iface, "ImportAppKey", 0, import_appkey_call,
--- 
-2.21.0
+  r8152: adjust the settings of ups flags (2019-09-05 12:41:11 +0200)
 
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to 8bb3537095f107ed55ad51f6241165b397aaafac:
+
+  Bluetooth: hidp: Fix assumptions on the return value of hidp_send_message (2019-09-06 15:55:40 +0200)
+
+----------------------------------------------------------------
+Alex Lu (6):
+      Bluetooth: btusb: Fix suspend issue for Realtek devices
+      Bluetooth: btrtl: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY
+      Bluetooth: btrtl: Add firmware version print
+      Bluetooth: btrtl: Remove redundant prefix from calls to rtl_dev macros
+      Bluetooth: btrtl: Remove trailing newline from calls to rtl_dev macros
+      Bluetooth: btusb: Use cmd_timeout to reset Realtek device
+
+Dan Elkouby (1):
+      Bluetooth: hidp: Fix assumptions on the return value of hidp_send_message
+
+Gustavo A. R. Silva (1):
+      Bluetooth: mgmt: Use struct_size() helper
+
+Harish Bandi (1):
+      Bluetooth: hci_qca: wait for Pre shutdown complete event before sending the Power off pulse
+
+Matthias Kaehlcke (1):
+      Bluetooth: hci_qca: Remove redundant initializations to zero
+
+Max Chou (1):
+      Bluetooth: btrtl: Fix an issue that failing to download the FW which size is over 32K bytes
+
+Nishka Dasgupta (2):
+      Bluetooth: 6lowpan: Make variable header_ops constant
+      Bluetooth: hci_qca: Make structure qca_proto constant
+
+Ondrej Jirman (3):
+      dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
+      bluetooth: bcm: Add support for loading firmware for BCM4345C5
+      bluetooth: hci_bcm: Give more time to come out of reset
+
+Rocky Liao (1):
+      Bluetooth: hci_qca: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for QCA UART Radio
+
+Spoorthi Ravishankar Koppad (1):
+      Bluetooth: Add support for utilizing Fast Advertising Interval
+
+YueHaibing (1):
+      Bluetooth: hci_bcm: Fix -Wunused-const-variable warnings
+
+ .../devicetree/bindings/net/broadcom-bluetooth.txt |   1 +
+ drivers/bluetooth/btbcm.c                          |   3 +
+ drivers/bluetooth/btqca.c                          |   5 +-
+ drivers/bluetooth/btrtl.c                          | 125 ++++++++++++---------
+ drivers/bluetooth/btusb.c                          |  65 ++++++++++-
+ drivers/bluetooth/hci_bcm.c                        |  33 +++---
+ drivers/bluetooth/hci_qca.c                        |  28 ++---
+ drivers/hid/hid-microsoft.c                        |   2 +-
+ include/net/bluetooth/hci_core.h                   |   2 +
+ net/bluetooth/6lowpan.c                            |   2 +-
+ net/bluetooth/hci_request.c                        |  29 +++--
+ net/bluetooth/hidp/core.c                          |   4 +-
+ net/bluetooth/mgmt.c                               |   8 +-
+ 13 files changed, 197 insertions(+), 110 deletions(-)
+
+--M9NhX3UHpAaciwkO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl1ylhkACgkQJCP2+/mo
+1BI9lRAArukCpVvMPgzy4e5Y+RaZTCxzMJ/nLd16rBCbpSzjiRoJBYb0030ZRlfY
+K8jN5jXtJ/r8jznY0jH2yRRTrLAZ+GvEE4eikn29rAolFDGXvPLjG7JSGXnM9xlU
+8a7ZkSYVJgI9G5YCVjiHE9y109OyqQuhazwdvH+PFn0xU29nFlRV5jH0FlQsYwj6
+0MQ0c1PTyFoh7dxb0QTesbTiIbJxvWlcLz8JWqzPZpvmJib5Rd3pEllySzBX59+l
+q+DPTYPZVUO/4QmPDqXqms77IHJINaSWO+C9Q2sc8nyM7NzQB0q5JQl9YUHjhwO6
+TmuTZggUHORhUyUEp+eOETP2TcKXZsgzE6rCxVZSLjgckBmKeWMnGB1WrQfxQ6gp
+1JiS2QOS+zbSpktSfpFeQK6NL43sC8f/br2AjPlfQfNiSJmsJVFaBoeW+5b30bfh
+Qj+X7Z+lH+FICDsWe77HbDP62AuBFReWAlb2WdgJFLswr1d6iPBiCut51AUGC6uV
+eOOgLdebw6apSEyXr11OiQ035aX1qN+aC293SmrNp278Vw+OfaefdrQqiNct0Ec/
+kNxEKKILSpk34lM9aXqKTrnyayzbLtbzJDCIIOmpXn2/9iVracx4UdN+bWM2t1AS
+Fep9VKcMgNw1LwBgix9IUHVkXkM3hVqwFWpr2OSSE1cE8gWKmWI=
+=i843
+-----END PGP SIGNATURE-----
+
+--M9NhX3UHpAaciwkO--
