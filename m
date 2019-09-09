@@ -4,79 +4,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E645C00307
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 09:49:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE78C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 10:32:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 304312086D
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 09:49:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D32CC2086D
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 10:32:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z4iNqokb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZfdEVRsy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390030AbfIIJtq (ORCPT
+        id S1730574AbfIIKca (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Sep 2019 05:49:46 -0400
-Received: from mail-vs1-f44.google.com ([209.85.217.44]:39427 "EHLO
-        mail-vs1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390028AbfIIJtq (ORCPT
+        Mon, 9 Sep 2019 06:32:30 -0400
+Received: from mail-vs1-f51.google.com ([209.85.217.51]:36008 "EHLO
+        mail-vs1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730552AbfIIKca (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Sep 2019 05:49:46 -0400
-Received: by mail-vs1-f44.google.com with SMTP id y62so8309846vsb.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2019 02:49:45 -0700 (PDT)
+        Mon, 9 Sep 2019 06:32:30 -0400
+Received: by mail-vs1-f51.google.com with SMTP id v19so3249215vsv.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2019 03:32:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=fE3X+AkZ+kRw+CbTBflxnghoXQ4tgfiTsjBLRDJg41U=;
-        b=Z4iNqokbiZ7uVAmqlbMz3yk99DR2kCxGVdNvsFoTOaP9zPGNEPL/qXD/SYLSX1eBm3
-         3619e7Nf49ZmDnGZ4gwQIMH+atAan5lmkL91PI3rJvTRdIGxatCst1Dgea69/MNbXnVO
-         XGlnImAdgGa3Y7pMnYkEtRclees6Q8MnQZn2FhKjYp1H2zDq6FTc7Mtei+DsZG/beCjR
-         LbdlpX6AHaD9nlKUKbN0ElM7pm1DgDI67lYPm9KMgWGvy1yHY6NNsgsJ/UBgXTl1wosF
-         8TqMRWg4uTjQjvuE0hxNAoOPsskxJ0CVWWcAK1c1FVPqJ0duaHXOCZ5b2jFGIjsZaD5R
-         BgqA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=158c9Ewqi1HxDcDA4IUWZg/zthD4XuhN1FAcK1eUjY4=;
+        b=ZfdEVRsyLKykHvHmgG4QvbdaHY4zhzSvrwVrzVCAS9Q6lfCgasie8Crqg8wCPPXr/9
+         tSiBU6qIO8w6D5M9chx7zLlsIAm/1W2hf3Vpzq82u4HJ2liNGgKjGSYpfN1jXtrALOz+
+         oq1g31MJ864nyvpafvHgPwBtDF7RcnqVaf1v5N4ZOlx2b672rUbbNLlaWU1XO0RKyAyh
+         oWZmVbYLtuYuKlLi0wePRqWwrGtApBfEeR/ZpSLBefXMhebwecbVLciGevg5onz88os0
+         Kon6jQI0cndiglOzzCmKfjTSWq+dUIQxXKBdtXZ9UjIF/1rgZiAn9o8p/dcal4eSCc+V
+         sVcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=fE3X+AkZ+kRw+CbTBflxnghoXQ4tgfiTsjBLRDJg41U=;
-        b=BGS2bQbp8eyM3QsetjJ9SunEXIZ1soDh+ACRBPkxB2SB+mwWrs+4J0ZgUJJsoinIHd
-         9+CETOLBy+yI+waY/PFgbSd2ecgC3j0hawpxkG8nPkI84rONi6vgIVN+UIJNdlGwpD1u
-         B2rJzioIVGQJHYrzJHu6K6GgkUkFxV+TCvdhF8XjOWL9Xvt3C4r6d6c4idJbjl+ljC4N
-         I1BJls90H4jcFGpwhryehZYh0yyKAD2eNOi4bkakWgVGUNniI/JnoH7caiYdISsYP0uM
-         Gh+cAt1/nle9opwLKGTsr/uHm66qE74+X5QC7S4PHv45mUHhiG1omA/+mW6B+Fwh7E4u
-         +PTg==
-X-Gm-Message-State: APjAAAVju3IXCBXVWjD1XjpgGJcNginIhew6VnHejw9jokCm9P+sH+Xn
-        Ah+biJ5Ns5VgRbF5BDmaBPDNKe0oi/Uuf4uO2Avd4TBF+po=
-X-Google-Smtp-Source: APXvYqxOLITnL+XpPRLdRoIHF9y9ISi3QE1sRKSDDw0DWBsBs1Th3gN/CeXd6ZFuy/me42hMSx9ebpjiyUZyIfkQhzQ=
-X-Received: by 2002:a67:dd97:: with SMTP id i23mr11904743vsk.131.1568022585238;
- Mon, 09 Sep 2019 02:49:45 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=158c9Ewqi1HxDcDA4IUWZg/zthD4XuhN1FAcK1eUjY4=;
+        b=gFhh0VoxErV65dRM6eXZjcmLmLbEc2cEYhGWo1O04K4ZZopB6/FwALCgem3gi3elzy
+         xFR1ONDFuYgDnJkA07Rryi7qRJ+L9VTy9DEXozIG0EYr8BT0VfEnLED6ciOQ3KPVHLzR
+         Tlq9myExvl+qwfFgFkD3+0DfbRi6RK3XrXjNaDcFjCwZE/i95GhFwlfoTfCv2m3iid9o
+         g+PBENvvEi7GdrM6lSmxo4j+BoThTOlVj4MWQdMnBEfvQU87wOAJPQ3i5RAjF9I5XuWG
+         w0TnCuc4Fqrp/BSE/N4c7xV40DlRCW6cQlaujrJBQC0a8w0fnyZiYSujZqVP+psRJMUm
+         6kEQ==
+X-Gm-Message-State: APjAAAVfYwLWwu+YYMeUxDkWrxlKCETta56GmoY6Hb96XSk5OHUylsKN
+        +Req+h5Ph+TvL0ZyS1znxG2Ew+HT1GMU/k/Vq9liGGXMTLY=
+X-Google-Smtp-Source: APXvYqw1J1LTWgpdtCN2pnlXHZxj8YJbrDcA7DZe8ghJIpoYiT2GIYJtjkFF68eucVDQ6e2yVcwpBXp+IgNxE07IvXA=
+X-Received: by 2002:a67:2981:: with SMTP id p123mr449985vsp.121.1568025147333;
+ Mon, 09 Sep 2019 03:32:27 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAP1EGUKNdCnaFZLy4rut2zOP0sjmVS+6ZEeQ3vz1M8MQJTDKVQ@mail.gmail.com>
+ <CACXRGxxjN4OwjzFmeV3tRJrFQkGJwj1NDzh7exQjsgZP3gWjuw@mail.gmail.com>
+In-Reply-To: <CACXRGxxjN4OwjzFmeV3tRJrFQkGJwj1NDzh7exQjsgZP3gWjuw@mail.gmail.com>
 From:   anurag biradar <anuragbiradar@gmail.com>
-Date:   Mon, 9 Sep 2019 15:19:32 +0530
-Message-ID: <CAP1EGUKNdCnaFZLy4rut2zOP0sjmVS+6ZEeQ3vz1M8MQJTDKVQ@mail.gmail.com>
-Subject: [Mesh] Query regarding Configuration Client Model
-To:     linux-bluetooth@vger.kernel.org
+Date:   Mon, 9 Sep 2019 16:02:14 +0530
+Message-ID: <CAP1EGU+SSTXrCm64yh8TG9HP13NSFNsLmu_zbKQtGqYjYc-xMQ@mail.gmail.com>
+Subject: Re: [Mesh] Query regarding Configuration Client Model
+To:     =?UTF-8?Q?Micha=C5=82_Lowas=2DRzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello All
+On Mon, Sep 9, 2019 at 3:39 PM Micha=C5=82 Lowas-Rzechonek
+<michal.lowas-rzechonek@silvair.com> wrote:
+>
+>
+> On Mon, 9 Sep 2019, 11:49 anurag biradar, <anuragbiradar@gmail.com> wrote=
+:
+>>
+>> I couldn't see any interface exposed by bluez to do this, is it
+>> something like bluez is expecting application to implement
+>> Configuration Client Model using "DevKeySend" and
+>> "DevKeyMessageReceive" method calls and store all required binding and
+>> appkey details in application
+>
+> Yes.
+>
+> At the momemt we don't plan to implement Config Client Model inside the d=
+aemon, only the Server.
+Thank you for the clarification.
 
-I was browsing through code for PB-ADV bearer based mesh
-implementation in bluez.
-I am trying for Provisioner role, able to provision a node. As of now
-struck with Configuration Client Model.
-I couldn't see any interface exposed by bluez to do this, is it
-something like bluez is expecting application to implement
-Configuration Client Model using "DevKeySend" and
-"DevKeyMessageReceive" method calls and store all required binding and
-appkey details in application or in future bluez will implement
-Configuration Client Model and expose interface to access those
-information.
-
- Any guidance would be very helpful.
-
-Thanks and Regards
-Anurag
+If application stores the required provisioned data. So is it like
+bluez will expose an interface through which application
+can set required model to appkey binding for particular node. Because
+as for my understanding bluez should be knowing which appkey should
+picked when it receives app related data.
