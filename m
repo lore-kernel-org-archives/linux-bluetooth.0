@@ -1,64 +1,60 @@
-Return-Path: <SRS0=4P0p=XD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=76SB=XE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8360C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Sep 2019 16:44:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E645C00307
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 09:49:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72C86216C8
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Sep 2019 16:44:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 304312086D
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 09:49:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=senic-com.20150623.gappssmtp.com header.i=@senic-com.20150623.gappssmtp.com header.b="Ah3i3Swm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z4iNqokb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729898AbfIHQoW (ORCPT
+        id S2390030AbfIIJtq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 Sep 2019 12:44:22 -0400
-Received: from mail-ot1-f49.google.com ([209.85.210.49]:45213 "EHLO
-        mail-ot1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729797AbfIHQoW (ORCPT
+        Mon, 9 Sep 2019 05:49:46 -0400
+Received: from mail-vs1-f44.google.com ([209.85.217.44]:39427 "EHLO
+        mail-vs1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390028AbfIIJtq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 Sep 2019 12:44:22 -0400
-Received: by mail-ot1-f49.google.com with SMTP id 41so6437079oti.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Sep 2019 09:44:20 -0700 (PDT)
+        Mon, 9 Sep 2019 05:49:46 -0400
+Received: by mail-vs1-f44.google.com with SMTP id y62so8309846vsb.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2019 02:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=senic-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=hMAkwyQcTWVTaoTjHYK/sP7PbtlKrZIQtCgXaNISAwE=;
-        b=Ah3i3SwmiecFCJc4r1gZCyEDbcjnZ/YpuiJdaz07V7Fl6JKGlySFbfoYIQZJ9jq5Jr
-         BQGrgzz8HMdjaqkzViysFgzOtFvQ1hsnO5f8ndCzsn8+722ZlniFPjsbI3kkJBzBESMB
-         cTR/3Ev/LiDBeQU4m32k+ll8iLQUaXiQc39Hgj2vvkKTEORTijnS1ytYlt+QQPOeTWGM
-         3wAo8x31Acq7MaGxx4b+hFZtAyWd2FqGei/EhI8pqd+UUmorQyay0ArJdcqOzFO6R6OG
-         +ieq2fD/mAn6CDt0j+58ez+UVGXjFSa0WavSJsh/sY15Mo+XqwBoTNV7JY2TXhR1RHoQ
-         mJew==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=fE3X+AkZ+kRw+CbTBflxnghoXQ4tgfiTsjBLRDJg41U=;
+        b=Z4iNqokbiZ7uVAmqlbMz3yk99DR2kCxGVdNvsFoTOaP9zPGNEPL/qXD/SYLSX1eBm3
+         3619e7Nf49ZmDnGZ4gwQIMH+atAan5lmkL91PI3rJvTRdIGxatCst1Dgea69/MNbXnVO
+         XGlnImAdgGa3Y7pMnYkEtRclees6Q8MnQZn2FhKjYp1H2zDq6FTc7Mtei+DsZG/beCjR
+         LbdlpX6AHaD9nlKUKbN0ElM7pm1DgDI67lYPm9KMgWGvy1yHY6NNsgsJ/UBgXTl1wosF
+         8TqMRWg4uTjQjvuE0hxNAoOPsskxJ0CVWWcAK1c1FVPqJ0duaHXOCZ5b2jFGIjsZaD5R
+         BgqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=hMAkwyQcTWVTaoTjHYK/sP7PbtlKrZIQtCgXaNISAwE=;
-        b=J04leNhDvSgS5VAML07Y0j5xdJbZRAm2j44Rs+0v3pN9P3m5FzCgkBZ504TMsnMwJ2
-         4rnxaTW04c50Ho+j6VIGS3XfEu7lYHYi91SdVzHVIpYFINJb4HZqPGXoruPXwobkY91j
-         3hzys96Q1qHWkQ5Ytqpx8oK25TDlbjWzSx+/E26z0D/yNTX4rKoOyC7zK0SeZSJwVOgK
-         kOwhi9BXbwbTTFBF+KuKMZkaU/WDX/xdLmK9vMKBjmAZuXK4K86QNdlAzuwxASAnnfas
-         Mh/Cpu0mGa4nXNwrMRtdAnsW3q4VF2c+4Y/tt3SjN0zp00QareOcsFtW5ZwoSKle0FRD
-         81Jg==
-X-Gm-Message-State: APjAAAV1iwWq7PawHxAzzIrhgau/ssooP5Cpb4ijNiQAsF7rGlv2a1Rk
-        CEIf9D152FXVzGeExixIaqDD1Fn/ES/SIXNygMhf67QymzM=
-X-Google-Smtp-Source: APXvYqyQxdwPcZq+RyaH6muYjLskpxP+yZcqleE0+7wJnrSrXW4a4CH455NUXTP7XrB8yyj8iJ1GGhOfW1BSjmpiht4=
-X-Received: by 2002:a9d:4103:: with SMTP id o3mr16360524ote.51.1567961059753;
- Sun, 08 Sep 2019 09:44:19 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=fE3X+AkZ+kRw+CbTBflxnghoXQ4tgfiTsjBLRDJg41U=;
+        b=BGS2bQbp8eyM3QsetjJ9SunEXIZ1soDh+ACRBPkxB2SB+mwWrs+4J0ZgUJJsoinIHd
+         9+CETOLBy+yI+waY/PFgbSd2ecgC3j0hawpxkG8nPkI84rONi6vgIVN+UIJNdlGwpD1u
+         B2rJzioIVGQJHYrzJHu6K6GgkUkFxV+TCvdhF8XjOWL9Xvt3C4r6d6c4idJbjl+ljC4N
+         I1BJls90H4jcFGpwhryehZYh0yyKAD2eNOi4bkakWgVGUNniI/JnoH7caiYdISsYP0uM
+         Gh+cAt1/nle9opwLKGTsr/uHm66qE74+X5QC7S4PHv45mUHhiG1omA/+mW6B+Fwh7E4u
+         +PTg==
+X-Gm-Message-State: APjAAAVju3IXCBXVWjD1XjpgGJcNginIhew6VnHejw9jokCm9P+sH+Xn
+        Ah+biJ5Ns5VgRbF5BDmaBPDNKe0oi/Uuf4uO2Avd4TBF+po=
+X-Google-Smtp-Source: APXvYqxOLITnL+XpPRLdRoIHF9y9ISi3QE1sRKSDDw0DWBsBs1Th3gN/CeXd6ZFuy/me42hMSx9ebpjiyUZyIfkQhzQ=
+X-Received: by 2002:a67:dd97:: with SMTP id i23mr11904743vsk.131.1568022585238;
+ Mon, 09 Sep 2019 02:49:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAOT_U5bDZwYLYsny9OpWs3HjQFLqYK2j3o3g2koKX_CwGUtMbw@mail.gmail.com>
- <CAOT_U5a-qBMnS0uaGx=O7Av_a0uVDWUaPxZb5HFbLijd+OQ6pA@mail.gmail.com>
- <CAOT_U5azR21Fu5a9OQ5grRW=ztmT273iba4+nHO03hoZyq-rew@mail.gmail.com> <CAOT_U5bzKdQRZJrRf7MbKMtkas6jfR2UHN0i50unoeUJXs_wWw@mail.gmail.com>
-In-Reply-To: <CAOT_U5bzKdQRZJrRf7MbKMtkas6jfR2UHN0i50unoeUJXs_wWw@mail.gmail.com>
-From:   Alan Martinovic <alan.martinovic@senic.com>
-Date:   Sun, 8 Sep 2019 18:44:08 +0200
-Message-ID: <CAOT_U5aHJxPDZe5Pb6B-YuKV7nrKCWTh8+JZs9hJuDQrsaw=yQ@mail.gmail.com>
-Subject: Re: Locating /org/bluez/example/service from example-gatt-server
+From:   anurag biradar <anuragbiradar@gmail.com>
+Date:   Mon, 9 Sep 2019 15:19:32 +0530
+Message-ID: <CAP1EGUKNdCnaFZLy4rut2zOP0sjmVS+6ZEeQ3vz1M8MQJTDKVQ@mail.gmail.com>
+Subject: [Mesh] Query regarding Configuration Client Model
 To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -66,34 +62,21 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hey,
-looks like no activity here on my question,
-so in case someone is more into StackOverflow,
-I have a bounty on this question
-https://unix.stackexchange.com/questions/538107/locating-the-object-path-for-a-gatt-server-in-bluez
+Hello All
 
-Be Well,
-Alan
+I was browsing through code for PB-ADV bearer based mesh
+implementation in bluez.
+I am trying for Provisioner role, able to provision a node. As of now
+struck with Configuration Client Model.
+I couldn't see any interface exposed by bluez to do this, is it
+something like bluez is expecting application to implement
+Configuration Client Model using "DevKeySend" and
+"DevKeyMessageReceive" method calls and store all required binding and
+appkey details in application or in future bluez will implement
+Configuration Client Model and expose interface to access those
+information.
 
+ Any guidance would be very helpful.
 
-On Thu, Aug 29, 2019 at 6:37 PM Alan Martinovic
-<alan.martinovic@senic.com> wrote:
->
-> Hi,
-> in the example-gatt-server which is provided in the
-> sources there is a reference to the dbus object
-> `/org/bluez/example/service`.
->
-> When that example gets run successfully under what
->  "unique connection name" does that object end up living?
->
-> It doesn't exist under org.bluez
->
-> ~$ busctl --list tree org.bluez
-> /
-> /org
-> /org/bluez
-> /org/bluez/hci0
->
-> Be Well,
-> Alan
+Thanks and Regards
+Anurag
