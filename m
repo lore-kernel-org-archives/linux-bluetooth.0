@@ -1,127 +1,73 @@
-Return-Path: <SRS0=76SB=XE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=SYhR=XF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9293FC4740A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 19:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF456C49ED9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Sep 2019 16:41:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58DB521D6C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Sep 2019 19:25:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="IVNtSueW"
+	by mail.kernel.org (Postfix) with ESMTP id B4D612089F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Sep 2019 16:41:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405488AbfIITZV (ORCPT
+        id S2436814AbfIJQlp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Sep 2019 15:25:21 -0400
-Received: from mail-lf1-f49.google.com ([209.85.167.49]:40823 "EHLO
-        mail-lf1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729060AbfIITZU (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Sep 2019 15:25:20 -0400
-Received: by mail-lf1-f49.google.com with SMTP id u29so11426980lfk.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2019 12:25:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U/wXBGUzX0jqWZ1IaMMUMtkYbR0sC01H/tyQ+UFHiPE=;
-        b=IVNtSueWxObNSt5UDX2kk5i0NMHMfckpOUhzg7pEylWK6mY75HEVBCdbk85Sb+xtcv
-         xvpzHKENqX+c0df3ubzHo76uK+wj1FvtDu1BB0raEIJYPQN0CBYmjqqIGShI34S5BcMi
-         W0M3THUreNyQlk0+fEARGWPhYvTajkKNvAJOfOmb7oKnckaLxOUBH5ZyDYqh61iwTTA7
-         55YmwgitBVET+/8uSyLowMf32T9jkdmMADrLTMIS/1NpctRdNwa2JI6naxatT8CfV+1w
-         E4qgq71spvNRSqxs9Kwf6k3nSIpUyqKUqLVTTu8JNRzQFah+t8U2J51XPKPQ24IlKAJ9
-         mopg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U/wXBGUzX0jqWZ1IaMMUMtkYbR0sC01H/tyQ+UFHiPE=;
-        b=NqqBx3mlILShG5644s2tLLUySNON5WYydDodscNwxyEevN3Oq5SgxTU1QTd73mR2+B
-         ek9Gl3x3lUdJse5HGlUS88omr2D5F8CCPRp46e/ZfQuLE4arsHcELI66if5dDkBOHGgE
-         jdHZN9UF1TVXSspbHZMO0kgg1IF2NGMWumQdbcqd9i5HGo4xMLrtunApd3bqgjaE5HhF
-         UUZ4xlutgTv29hLx6kriz8b0k7jl19+pMaOXNhD3LDIipz8lwGpVid9K3JslR/aODVfR
-         K5Yr5jYBJ+OCm9Wlr3ohM9HZYoBXb9OccYlPA6zE/VbcZRj63u6msDyd76nKqZIiZuX+
-         Lp4A==
-X-Gm-Message-State: APjAAAVdub5CfX3AsCwtkQiF8pppEuFdHQDbMykqNI0n3RZTaI0Sv+nu
-        hvNsVuW9g2nEdqROdZkU9c62j592t8M=
-X-Google-Smtp-Source: APXvYqwSb61VsM7FoS1QGgln6K8jXrGMv3U3fqzXj8YkaldR8GcUPM7UNvob3YAmAMrG+RvmEVRwcg==
-X-Received: by 2002:a19:f11c:: with SMTP id p28mr17292000lfh.44.1568057118374;
-        Mon, 09 Sep 2019 12:25:18 -0700 (PDT)
-Received: from kynes.internet.domowy (apn-37-248-119-32.dynamic.gprs.plus.pl. [37.248.119.32])
-        by smtp.gmail.com with ESMTPSA id c3sm3622904lfi.32.2019.09.09.12.25.16
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Sep 2019 12:25:17 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] mesh: Fix IV Recovery procedure when IV Update is in progress
-Date:   Mon,  9 Sep 2019 21:25:09 +0200
-Message-Id: <20190909192509.15007-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.22.0
+        Tue, 10 Sep 2019 12:41:45 -0400
+Received: from mga06.intel.com ([134.134.136.31]:53374 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2436804AbfIJQlp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Sep 2019 12:41:45 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Sep 2019 09:41:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,490,1559545200"; 
+   d="scan'208";a="200321183"
+Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
+  by fmsmga001.fm.intel.com with ESMTP; 10 Sep 2019 09:41:43 -0700
+Received: from orsmsx111.amr.corp.intel.com (10.22.240.12) by
+ ORSMSX104.amr.corp.intel.com (10.22.225.131) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 10 Sep 2019 09:41:43 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.221]) by
+ ORSMSX111.amr.corp.intel.com ([169.254.12.153]) with mapi id 14.03.0439.000;
+ Tue, 10 Sep 2019 09:41:43 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ v4 0/2] mesh: Streamline Key Refresh finalization
+Thread-Topic: [PATCH BlueZ v4 0/2] mesh: Streamline Key Refresh finalization
+Thread-Index: AQHVZM+bsErCEIN2iEiIv/l6SRYEY6clmPkA
+Date:   Tue, 10 Sep 2019 16:41:43 +0000
+Message-ID: <ed48a0384e0e0d49a2dcd48442d50c0d5ea5f418.camel@intel.com>
+References: <20190906162434.7434-1-brian.gix@intel.com>
+In-Reply-To: <20190906162434.7434-1-brian.gix@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.255.91.200]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <08DA444000D7EA46980595C99A561DA0@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch ensures that Sequence Number is reset only when IV Index used
-for outgoing messages increases.
-
-This fixes erroneously cleared sequence number when node performs IV
-Recovery procedure on startup in a following scenario:
- - node has IV Index set to <N>
- - node starts in IV_UPD_INIT state
- - node receives a Secure Network Beacon with IV Index <N>+1 and IV
-   Update flag set
-
-Upon reception, the node shall:
- - increase its IV Index to <N>+1
- - enter IV_UPD_UPDATING state
-
-This means that the node keeps transmitting messages using IV Index
-equal to <N>, therefore it shall *not* reset its Sequence Number before IV
-Update procedure completes.
-
-If, on the other hand, SNB contains either:
- - IV Index <N>+2 (regardless of IV Update flag)
- - IV Index <N>+1 and IV Update flag *not* set
-the node shall reset the Sequence Number right away.
----
- mesh/net.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/mesh/net.c b/mesh/net.c
-index 7c4049e0e..ba7bb32fd 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -2735,8 +2735,6 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 	}
- 
- 	if (net->iv_upd_state == IV_UPD_INIT) {
--		if (iv_index > net->iv_index)
--			mesh_net_set_seq_num(net, 0);
- 		net->iv_index = iv_index;
- 
- 		if (iv_update) {
-@@ -2757,6 +2755,12 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 		mesh_config_write_iv_index(node_config_get(net->node), iv_index,
- 							net->iv_upd_state);
- 
-+		/* Reset seq num if iv index used for *outgoing* messages has
-+		 * just been increased
-+		 */
-+		if (mesh_net_get_iv_index(net) > local_iv_index)
-+			mesh_net_set_seq_num(net, 0);
-+
- 		/* Figure out the key refresh phase */
- 		if (kr_transition) {
- 			l_debug("Beacon based KR phase change");
--- 
-2.22.0
-
+UGF0Y2hzZXQgQXBwbGllZA0KDQpPbiBGcmksIDIwMTktMDktMDYgYXQgMDk6MjQgLTA3MDAsIEJy
+aWFuIEdpeCB3cm90ZToNCj4gQWxsIEFwcCBrZXkgcmVmcmVzaCBmaW5hbGl6YXRpb24gd2lsbCBo
+YXBwZW4gd2hlbiB0aGUgYm91bmQgTmV0IEtleSBpcw0KPiBmaW5hbGl6ZWQuDQo+IA0KPiBWZXJz
+aW9uIDQ6IEFsbG93IGEgcmVkdW5kZW50IGNhbGwgdG8gc2V0IHBoYXNlIDMgKGFmdGVyIHRyYW5z
+aXRpb24gdG8NCj4gcGhhc2UgMCBjb21wbGV0ZSkgYnkgcmV0dXJuaW5nIHN1Y2Nlc3NmdWxseSwg
+YnV0IGRvaW5nIG5vdGhpbmcuDQo+IA0KPiANCj4gQnJpYW4gR2l4ICgyKToNCj4gICBkb2M6IFJl
+bW92ZSB1bmVlZGVkIGRidXMgQVBJIGZvciBBcHAgS2V5IFJlZnJlc2gNCj4gICBtZXNoOiBBdXRv
+bWF0ZSBBcHBLZXkgdXBkYXRlIG9uIEtSIHBoYXNlIDItLT4zLS0+MA0KPiANCj4gIGRvYy9tZXNo
+LWFwaS50eHQgfCAxOSAtLS0tLS0tLS0tLS0tLS0tDQo+ICBtZXNoL2tleXJpbmcuYyAgIHwgNTgg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICBtZXNo
+L2tleXJpbmcuaCAgIHwgIDEgKw0KPiAgbWVzaC9tYW5hZ2VyLmMgICB8IDUzICsrKysrKysrKysr
+KysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gIDQgZmlsZXMgY2hhbmdlZCwgNzkg
+aW5zZXJ0aW9ucygrKSwgNTIgZGVsZXRpb25zKC0pDQo+IA0K
