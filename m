@@ -2,98 +2,70 @@ Return-Path: <SRS0=he+3=XH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A21DC4CECB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Sep 2019 11:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DE7C47404
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Sep 2019 12:47:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 763EF206CD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Sep 2019 11:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEC4920830
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Sep 2019 12:47:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730923AbfILLWv (ORCPT
+        id S1731714AbfILMrU convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Sep 2019 07:22:51 -0400
-Received: from proxima.lasnet.de ([78.47.171.185]:47600 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730268AbfILLWv (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Sep 2019 07:22:51 -0400
-X-Greylist: delayed 471 seconds by postgrey-1.27 at vger.kernel.org; Thu, 12 Sep 2019 07:22:50 EDT
-Received: from localhost.localdomain (unknown [88.128.80.121])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 74CEFC11ED;
-        Thu, 12 Sep 2019 13:14:57 +0200 (CEST)
-Subject: Re: ANNOUNCE: rpld an another RPL implementation for Linux
-To:     Alexander Aring <alex.aring@gmail.com>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Cc:     Michael Richardson <mcr@sandelman.ca>,
-        Jamal Hadi Salim <jhs@mojatatu.com>,
-        Robert Kaiser <robert.kaiser@hs-rm.de>,
-        Martin Gergeleit <martin.gergeleit@hs-rm.de>,
-        Kai Beckmann <kai.beckmann@hs-rm.de>, koen@bergzand.net,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        reubenhwk@gmail.com,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        sebastian.meiling@haw-hamburg.de,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Werner Almesberger <werner@almesberger.net>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>
-References: <CAB_54W7h9ca0UJAZtk=ApPX-2ZCvzu4774BTFTaB5mtkobWCtw@mail.gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <78e83575-4bae-cb8b-be8c-c108ac488a37@datenfreihafen.org>
-Date:   Thu, 12 Sep 2019 13:14:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 12 Sep 2019 08:47:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40040 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731633AbfILMrU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 12 Sep 2019 08:47:20 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 204585] Bluetooth Mouse Polling Rate Regressed to 20hz
+Date:   Thu, 12 Sep 2019 12:47:19 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: trivial
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pavel@noa-labs.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc attachments.created
+Message-ID: <bug-204585-62941-EcaoivsXw2@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204585-62941@https.bugzilla.kernel.org/>
+References: <bug-204585-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <CAB_54W7h9ca0UJAZtk=ApPX-2ZCvzu4774BTFTaB5mtkobWCtw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Alex.
+https://bugzilla.kernel.org/show_bug.cgi?id=204585
 
-On 29.08.19 23:57, Alexander Aring wrote:
-> Hi,
-> 
-> I had some free time, I wanted to know how RPL [0] works so I did a
-> implementation. It's _very_ basic as it only gives you a "routable"
-> (is that a word?) thing afterwards in a very constrained setup of RPL
-> messages.
-> 
-> Took ~1 month to implement it and I reused some great code from radvd
-> [1]. I released it under the same license (BSD?). Anyway, I know there
-> exists a lot of memory leaks and the parameters are just crazy as not
-> practical in a real environment BUT it works.
-> 
-> I changed a little bit the dependencies from radvd (because fancy new things):
-> 
-> - lua for config handling
-> - libev for event loop handling
-> - libmnl for netlink handling
-> 
-> The code is available at:
-> 
-> https://github.com/linux-wpan/rpld
+Pavel (pavel@noa-labs.com) changed:
 
-I finally had a first look at it and played around a little bit.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |pavel@noa-labs.com
 
-How do you want to review patches for this? Pull requests on the github
-repo or patches send on the linux-wpan list?
+--- Comment #4 from Pavel (pavel@noa-labs.com) ---
+Created attachment 284937
+  --> https://bugzilla.kernel.org/attachment.cgi?id=284937&action=edit
+pairing issue capture
 
-So far just some basic stuff I stumbled over when playing with it. Build
-fixes (SCOPE_ID and different lua pkgconfig namings), leak fixes to
-config.c as well as a travis setup to get building on CI as well as
-submitting to Coverity scan service (the later two are already tested in
-practice with some dev branches I pushed to the github repo, hope you
-don't mind).
+I am experiencing pairing issues after reversal
 
-regards
-Stefan Schmidt
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
