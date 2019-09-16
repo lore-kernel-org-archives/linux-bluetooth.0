@@ -2,103 +2,121 @@ Return-Path: <SRS0=loPc=XL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,LONGWORDS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8055C49ED7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 13:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD9EC49ED7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 16:09:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFD1D20644
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 13:34:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C710020678
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 16:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727995AbfIPNen convert rfc822-to-8bit (ORCPT
+        id S2389582AbfIPQJI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Sep 2019 09:34:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54940 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727826AbfIPNen (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Sep 2019 09:34:43 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204877] [Regression] Linux 5.3 breaks connecting a DualShock 4
- controller via bluetooth
-Date:   Mon, 16 Sep 2019 13:34:42 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: Vash63@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-204877-62941-ITM7lesNWR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204877-62941@https.bugzilla.kernel.org/>
-References: <bug-204877-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 16 Sep 2019 12:09:08 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:41191 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732059AbfIPQJI (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 16 Sep 2019 12:09:08 -0400
+Received: by mail-io1-f72.google.com with SMTP id e6so284657ios.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2019 09:09:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=EC2s8BEqRAx9Dr0E2QNHTzJxeMHG454P6cMAn1PGkeg=;
+        b=mNUTc6bU7vFfBlo6pb0OKANIldpT71OUHb35e+N18A9R16sO5Nm0zqPklN9HQSSVQx
+         sichubTSS/22iJW/SgBz5jnzbTaUHtQlI7XgeT7iOQfw1t8EG2JQ/jlSESudn8OoDhk3
+         MdmxD03Ma2sPqW+egudoTKr/jmZgKqWY4KiGNGR5BUFaiSdlQvQSndNhbo8pje6ETq4K
+         vIso77Qit3bDhPENEFOnDSDJSVJDey8s+WsoWPuam4t42ptuRDZ1jdNxtqYNlwZAYcCL
+         Lcr56358JI1WruxnSY6BTrS4FxNh9/vd9687W01lMlcgtGifoYRkavRL2hx9KbcKO7id
+         u5pA==
+X-Gm-Message-State: APjAAAWr5hnBAfUeeGhR+9S/E0Kk5NIbZOOmLlGz+3zlTGa4RAfoKD/1
+        Jq+mKxUgyi7t4vtMxWwjK2HlN/M0h/YRMQSSK4soib9V28aH
+X-Google-Smtp-Source: APXvYqxgrjyRDgUGY0231kJo3+PNXQQJKev3jLswEnQYXN+zlSCG7YyT3tkMrT/3iiQJJXuxYJgaNcDC3EKtMHA7Zgv2zXaMYWPQ
 MIME-Version: 1.0
+X-Received: by 2002:a6b:2c07:: with SMTP id s7mr716787ios.254.1568650147447;
+ Mon, 16 Sep 2019 09:09:07 -0700 (PDT)
+Date:   Mon, 16 Sep 2019 09:09:07 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d0cc780592add25d@google.com>
+Subject: memory leak in h5_rx_pkt_start
+From:   syzbot <syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=204877
+Hello,
 
-George Gibbs (Vash63@gmail.com) changed:
+syzbot found the following crash on:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |Vash63@gmail.com
+HEAD commit:    1609d760 Merge tag 'for-linus' of git://git.kernel.org/pub..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1494a081600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=90cbcb59581ed842
+dashboard link: https://syzkaller.appspot.com/bug?extid=6ce141c55b2f7aafd1c4
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12185479600000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1238c465600000
 
---- Comment #1 from George Gibbs (Vash63@gmail.com) ---
-I can duplicate this issue on both a DS4 v1 (model CUH-ZTC1U) and a v2 (model
-CUH-ZCT2U), though the crc check numbers are slightly different.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+6ce141c55b2f7aafd1c4@syzkaller.appspotmail.com
 
-CUH-ZTC1U:
-kernel: sony 0005:054C:05C4.0017: unknown main item tag 0x0
-kernel: sony 0005:054C:05C4.0017: DualShock 4 calibration report's CRC check
-failed, received crc 0x1cffff8c != 0xdfe3b226
-kernel: sony 0005:054C:05C4.0017: Retrying DualShock 4 get calibration report
-request
-kernel: sony 0005:054C:05C4.0017: DualShock 4 calibration report's CRC check
-failed, received crc 0x1cffff8c != 0xdfe3b226
-kernel: sony 0005:054C:05C4.0017: Retrying DualShock 4 get calibration report
-request
-kernel: sony 0005:054C:05C4.0017: DualShock 4 calibration report's CRC check
-failed, received crc 0x1cffff8c != 0xdfe3b226
-kernel: sony 0005:054C:05C4.0017: Failed to get calibration data from Dualshock
-4
-kernel: sony 0005:054C:05C4.0017: hidraw18: BLUETOOTH HID v81.00 Gamepad
-[Wireless Controller] on a0:c5:89:b5:44:e1
-kernel: sony 0005:054C:05C4.0017: failed to claim input
+executing program
+executing program
+executing program
+executing program
+executing program
+BUG: memory leak
+unreferenced object 0xffff88811469e100 (size 224):
+   comm "syz-executor068", pid 6860, jiffies 4294949784 (age 13.480s)
+   hex dump (first 32 bytes):
+     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+     00 c0 bf 20 81 88 ff ff 00 00 00 00 00 00 00 00  ... ............
+   backtrace:
+     [<0000000036b71133>] kmemleak_alloc_recursive  
+include/linux/kmemleak.h:43 [inline]
+     [<0000000036b71133>] slab_post_alloc_hook mm/slab.h:522 [inline]
+     [<0000000036b71133>] slab_alloc_node mm/slab.c:3262 [inline]
+     [<0000000036b71133>] kmem_cache_alloc_node+0x163/0x2f0 mm/slab.c:3574
+     [<00000000c50cdaae>] __alloc_skb+0x6e/0x210 net/core/skbuff.c:197
+     [<0000000097f6a43a>] alloc_skb include/linux/skbuff.h:1055 [inline]
+     [<0000000097f6a43a>] bt_skb_alloc include/net/bluetooth/bluetooth.h:339  
+[inline]
+     [<0000000097f6a43a>] h5_rx_pkt_start+0x57/0xd0  
+drivers/bluetooth/hci_h5.c:474
+     [<00000000d2c8fdbf>] h5_recv+0x13f/0x1d0 drivers/bluetooth/hci_h5.c:563
+     [<00000000c4a86230>] hci_uart_tty_receive+0xba/0x200  
+drivers/bluetooth/hci_ldisc.c:613
+     [<0000000039786cc4>] tiocsti drivers/tty/tty_io.c:2197 [inline]
+     [<0000000039786cc4>] tty_ioctl+0x81c/0xa30 drivers/tty/tty_io.c:2573
+     [<00000000ba214ddb>] vfs_ioctl fs/ioctl.c:46 [inline]
+     [<00000000ba214ddb>] file_ioctl fs/ioctl.c:509 [inline]
+     [<00000000ba214ddb>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
+     [<00000000fa2c3356>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
+     [<00000000eab0a027>] __do_sys_ioctl fs/ioctl.c:720 [inline]
+     [<00000000eab0a027>] __se_sys_ioctl fs/ioctl.c:718 [inline]
+     [<00000000eab0a027>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
+     [<00000000db7e89eb>] do_syscall_64+0x76/0x1a0  
+arch/x86/entry/common.c:296
+     [<000000008887ecc0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
-CUH-ZCT2U:
-kernel: sony 0005:054C:09CC.0019: unknown main item tag 0x0
-kernel: sony 0005:054C:09CC.0019: DualShock 4 calibration report's CRC check
-failed, received crc 0x1cffff8c != 0x48b66901
-kernel: sony 0005:054C:09CC.0019: Retrying DualShock 4 get calibration report
-request
-kernel: sony 0005:054C:09CC.0019: DualShock 4 calibration report's CRC check
-failed, received crc 0x1cffff8c != 0x48b66901
-kernel: sony 0005:054C:09CC.0019: Retrying DualShock 4 get calibration report
-request
-kernel: sony 0005:054C:09CC.0019: DualShock 4 calibration report's CRC check
-failed, received crc 0x1cffff8c != 0x48b66901
-kernel: sony 0005:054C:09CC.0019: Failed to get calibration data from Dualshock
-4
-kernel: sony 0005:054C:09CC.0019: hidraw19: BLUETOOTH HID v80.01 Gamepad
-[Wireless Controller] on a0:c5:89:b5:44:e1
-kernel: sony 0005:054C:09CC.0019: failed to claim input
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
