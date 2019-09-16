@@ -2,116 +2,107 @@ Return-Path: <SRS0=loPc=XL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B935CC49ED7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 09:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 242E0C4CECD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 10:55:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E3DC206A4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 09:58:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="yS2QpV94"
+	by mail.kernel.org (Postfix) with ESMTP id 0443F20644
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Sep 2019 10:55:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbfIPJ6u (ORCPT
+        id S1732708AbfIPKz5 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Sep 2019 05:58:50 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35858 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726569AbfIPJ6t (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Sep 2019 05:58:49 -0400
-Received: by mail-wm1-f65.google.com with SMTP id t3so9521476wmj.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2019 02:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=4cSjx5XG6x6AMPYVQpdUv5oPngfbEAO99TqRxKNWknw=;
-        b=yS2QpV94dMlDN98C05w6czON2BkTl8qCFg6c+vWS/xpPWNLLOx7Z/vEo/HpSLdj1XM
-         fUoha1ur9usQVo8uGs6hklOYlFEvhGoKMaVbDqOB7R0gQ/UEqDDoUOScWt6RbJlt4IJY
-         /XwAfaR8P2yMO628VPE0L2TntvWmto5UUE2Su33q6Opi6ze9V8Uf+NDCg/G/cFgtcIg1
-         kjbeuwaM00HmoqYUb6AtELBvXpRPU0B/8YY/5W4q0+c1n9WUH3YKxc2O2GffgthLkSrk
-         TkRijLbeQoECqhBWONBqe2DPstXLMhweF1dsTGnLPqv/gC9mghEvIqsYknp5RP6o5OcX
-         BpFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=4cSjx5XG6x6AMPYVQpdUv5oPngfbEAO99TqRxKNWknw=;
-        b=UTPQhd8i2RdG8E1SMcnOv8aalrWJhgq3ACAywfGZ+CxrvTBU+Jsi+KkbNPC3NXg9cr
-         cHNethHaaHAzjXyLMgoyEd+RxAbdrW7sslpF/t0syw+Q6Ar1V4rTQMQ0C7JmooGfrmQH
-         At22hqN/G6+OB7g4x2/G5OIdGrNKQDXIya/zsQblHsEFP3IT+QLtfnHxVudBY+xDql43
-         L6/4sGY7scilvnavHVRrCu2yNmq2kgwWGCNCh/1MEy4ajt/thf90Jc/SkEqmJf38CCc/
-         jeyD1KseXdGs4/M870SFiyb+6E4WogJgB46BXK9XKpx8fWfI1/cmvxeUqjhTySnlEtIV
-         9VYw==
-X-Gm-Message-State: APjAAAUk8OvVj3L376gpsfFw0Oo6z6woIbH8XDxno2bzK7EA4ThvO/26
-        pvmO9cXq4VtnmNORlosE00eIQonvnLo=
-X-Google-Smtp-Source: APXvYqzRVnyanlNmmdEH51XL3OzJMY7+sGw3nX1VAR+NL8w+NpIX0TousAqRnfqTR972QOGSviPO0Q==
-X-Received: by 2002:a1c:ef14:: with SMTP id n20mr14192477wmh.89.1568627927487;
-        Mon, 16 Sep 2019 02:58:47 -0700 (PDT)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id u11sm8101956wmd.32.2019.09.16.02.58.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2019 02:58:46 -0700 (PDT)
-Date:   Mon, 16 Sep 2019 11:58:45 +0200
-From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
+        Mon, 16 Sep 2019 06:55:57 -0400
+Received: from mga18.intel.com ([134.134.136.126]:27031 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732701AbfIPKz4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 16 Sep 2019 06:55:56 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Sep 2019 03:55:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,492,1559545200"; 
+   d="scan'208";a="177008851"
+Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
+  by orsmga007.jf.intel.com with ESMTP; 16 Sep 2019 03:55:55 -0700
+Received: from orsmsx152.amr.corp.intel.com (10.22.226.39) by
+ ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 16 Sep 2019 03:55:55 -0700
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.221]) by
+ ORSMSX152.amr.corp.intel.com ([169.254.8.93]) with mapi id 14.03.0439.000;
+ Mon, 16 Sep 2019 03:55:55 -0700
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     =?windows-1250?Q?Micha=B3_Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
 Subject: Re: [PATCH BlueZ 1/1] mesh: Add local/remote bools to DevKey
  transactions
-Message-ID: <20190916095845.htvyalekgr4k2ybt@mlowasrzechonek2133>
-Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
-        linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Thread-Topic: [PATCH BlueZ 1/1] mesh: Add local/remote bools to DevKey
+ transactions
+Thread-Index: AQHVa52TiigZ9MdeYUO+JqwhakK/NqcuiMWA//+an5Y=
+Date:   Mon, 16 Sep 2019 10:55:54 +0000
+Message-ID: <8DD9DDA0-1081-479F-B215-2E815B1A8F27@intel.com>
 References: <20190915081408.18116-1-brian.gix@intel.com>
- <20190915081408.18116-2-brian.gix@intel.com>
+ <20190915081408.18116-2-brian.gix@intel.com>,<20190916095845.htvyalekgr4k2ybt@mlowasrzechonek2133>
+In-Reply-To: <20190916095845.htvyalekgr4k2ybt@mlowasrzechonek2133>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="windows-1250"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190915081408.18116-2-brian.gix@intel.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+Hi Micha³, 
 
-On 09/15, Brian Gix wrote:
-> DevKey operations require authorization on the part of the applications
-> making the requests. Messages to state changing Servers should use keys
-> from the local Key Database to demonstrate authority.
+> On Sep 16, 2019, at 11:58 AM, Micha³ Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com> wrote:
+> 
+> Hi Brian,
+> 
+>> On 09/15, Brian Gix wrote:
+>> DevKey operations require authorization on the part of the applications
+>> making the requests. Messages to state changing Servers should use keys
+>> from the local Key Database to demonstrate authority.
+> 
+> Alright, so if I understand this correctly:
+> 
+> 1. If the application would like to change Config Server states on the
+>   local node, it would need to:
+>    - call ImportRemoteNode, passing the address of a *local* node and
+>      the device key obtained from provisioner
+>    - call DevKeySend to a *local* address, with remote flag set to true
+>    - receive responses via DevKeyMessageReceived from *local* node,
+>      with remote flag set to true
+> 
+>   Essentially this means that talking to a local node using device
+>   security behaves in the same manner as if the node was a remote one.
+> 
+> 2. If the application would like to implement an external model that
+>   uses device security, it would:
+>    - receive DevKeyMessageReceived calls from remote nodes, with remote
+>      flag set to false
+>    - send responses by calling DevKeySend to a *remote* address with
+>      remote flag set to false
+> 
+> This means that calling DevKeySend to a *local* address with remote flag
+> false would be forbidden, in order to force the application to use
+> ImportRemoteNode first?
 
-Alright, so if I understand this correctly:
+I think that is all basically correct. I switched the Boolean bit-sense  such that the boolean parameter is “remote” on the send and “local” on the receive.
 
-1. If the application would like to change Config Server states on the
-   local node, it would need to:
-    - call ImportRemoteNode, passing the address of a *local* node and
-      the device key obtained from provisioner
-    - call DevKeySend to a *local* address, with remote flag set to true
-    - receive responses via DevKeyMessageReceived from *local* node,
-      with remote flag set to true
+And most importantly, your last point is an emphatic yes....    you will need to import your own device key to the key ring if you want to talk to your own builtin servers.  The one exception will be nodes that have called “Create()” which are generating brand new mesh networks with themselves as unicast 0001.
 
-   Essentially this means that talking to a local node using device
-   security behaves in the same manner as if the node was a remote one.
 
-2. If the application would like to implement an external model that
-   uses device security, it would:
-    - receive DevKeyMessageReceived calls from remote nodes, with remote
-      flag set to false
-    - send responses by calling DevKeySend to a *remote* address with
-      remote flag set to false
-
-This means that calling DevKeySend to a *local* address with remote flag
-false would be forbidden, in order to force the application to use
-ImportRemoteNode first?
-
--- 
-MichaÅ‚ Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-JasnogÃ³rska 44, 31-358 Krakow, POLAND
+> 
+> -- 
+> Micha³ Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+> Silvair http://silvair.com
+> Jasnogórska 44, 31-358 Krakow, POLAND
