@@ -2,91 +2,114 @@ Return-Path: <SRS0=BfW8=XM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 661B9C4CECD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Sep 2019 06:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D40A4C4CEC9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Sep 2019 21:27:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 369B721670
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Sep 2019 06:55:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A605921897
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Sep 2019 21:27:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="0iBNhtbi"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BCnH8N+v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404396AbfIQGzR (ORCPT
+        id S1727784AbfIQV1J (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Sep 2019 02:55:17 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:36732 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404394AbfIQGzR (ORCPT
+        Tue, 17 Sep 2019 17:27:09 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:35568 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727247AbfIQV1F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Sep 2019 02:55:17 -0400
-Received: by mail-lf1-f66.google.com with SMTP id x80so1954186lff.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2019 23:55:15 -0700 (PDT)
+        Tue, 17 Sep 2019 17:27:05 -0400
+Received: by mail-pf1-f196.google.com with SMTP id 205so2914397pfw.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2019 14:27:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=P0AuMVcmd5E803CCP8Gv40hfCz1Qke42hcV+tzw7VRo=;
-        b=0iBNhtbiKEN3B4+whFyqsoHQ2Ulw7clIInjJtSX7izs21oqctnCDQuort6nZ4TjMW8
-         UwP9nmdl+VPbKvaC3/Z13xYWlqTXhJTWOd1QTYCRwmBXvWBB3MlCKxp8yaeZeiLptr1P
-         iELE8zUz1eN79Mb66Qg3eYDi+RgKMlGNzpDa+O8zO1+zhMlvep8tNCacruE0Ne5KeTF2
-         Q5xR3NbLmjwaQg+OvpqcaoS/OYqJ/66Rixqd+MT6fRuanSpOmt7WBKzvmq08YGtf3uTD
-         C8dh/4U81e6+toihqzcnhr9b3UwsG/N7q6PjBtBIUzRB/Y/d0SIzh5q1uBmdYWJoKyUV
-         oigg==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KQLz48qGupB3U3q6Hm9UR083MeuUpn5l8eEYZ8P5LH4=;
+        b=BCnH8N+v2Ndf8nZ0xfh7LR+M4kkjyoeZ9PT63+Jj6BMVvaEbYgtYK8KXQItxswnrYd
+         5VAsNknB30Szust6QXMPRDzNNgR6pSwWmDW0Cxodb6nQbCR0nWNkMebeWcW6oOxGJaOh
+         Y6tn4n6yykauA7gfG2Q2Cz+h/TV3DMQ0bSVFw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mail-followup-to
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=P0AuMVcmd5E803CCP8Gv40hfCz1Qke42hcV+tzw7VRo=;
-        b=aRJH+S3nzK4+LTJwvq79/WXWEjG23s9DX/is282GI2VZHHnDcsnrC6IBW6CJSgZkba
-         2en3lbP5ng048nGGRPAS2k9JtgYB1kbSAUTCwPpRxd5vw1K4jg9gHejAPQMKk9N1w6h7
-         DgHzX2uRYZOe91kdGjzqIZVnb+4x8r3n9q3ksnvsLl7K1Ckz9fdeuatSk2WebG9FnrRP
-         v9cxqqv2BfVD5KgBzgoXDe4ywe4qKFiYvgp4EzTpvUB9UH5SX6JNuachSji42v1SXO3L
-         uldN15RWZQomGnQmS11vPej1cTVkzVsSY1y2RbXxkzXrUPcfrXHlfUrh9/PazvovCSsI
-         7kJg==
-X-Gm-Message-State: APjAAAWmgmLuXHxL9/10wsGs0aQj7AJm3WDHKNvGdIdtJm20MafLm70x
-        GOVI//uNNw2kbWK2t42o9mLb79K1Y7g=
-X-Google-Smtp-Source: APXvYqxiEFGUkZlSqyl3yn7WYQqSHtMcQnSeXX1jfCYgZrPmnzfEAch11M8Oi/PEnG0sEmhOwKY8Yg==
-X-Received: by 2002:a19:641e:: with SMTP id y30mr1223896lfb.148.1568703314966;
-        Mon, 16 Sep 2019 23:55:14 -0700 (PDT)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id q19sm174890ljj.73.2019.09.16.23.55.13
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KQLz48qGupB3U3q6Hm9UR083MeuUpn5l8eEYZ8P5LH4=;
+        b=l/NPFO9w64ARouavf21L7wQTza20gXYmG3YoG3wx+5Ti/0GmYd+a8KZK1/hPBZLetS
+         AMXPCs7u4YYRHuhfHqcaKjXZ0sM4bBLF/5LagxC4pewd1ziunPAQhN+WRl6igf+sMUv+
+         gfSD0qnzJ4Z7W//I3ugBY4hGFRYS0pZBFShDcxVXj7l3DfhsiwzAQAjAenT9a5FxmgGA
+         pzViAOY95JtSIHFndZwZAODcvs7Bviz8IxzhfmCfusKnnNflj9ZyqwbYQ8qbWKmuQN4W
+         2ev4TaPIFEeGYCwQ1sJA88q4BNzkgRIc0WjnL/lWfjC2CW/JBXUuueVu934gMDsVPK1h
+         nNsg==
+X-Gm-Message-State: APjAAAWSY8/xrGBL/atpc23DxTIFl49V5iiBsGp99TGJy0y67Bwi7Cxb
+        NMY6f2AH3qIxzzg9SWSpGFBVqqRAExs=
+X-Google-Smtp-Source: APXvYqwrNqaZUJYT/gTjZKUsczgj5OqMIQHDe2jbqIfs1EULCI8Vl/6owKyGElJ4hykt9BdVCbqwUA==
+X-Received: by 2002:a63:9245:: with SMTP id s5mr862110pgn.123.1568755624437;
+        Tue, 17 Sep 2019 14:27:04 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
+        by smtp.gmail.com with ESMTPSA id l7sm8489803pga.92.2019.09.17.14.27.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2019 23:55:14 -0700 (PDT)
-Date:   Tue, 17 Sep 2019 08:55:13 +0200
-From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org, Brian Gix <brian.gix@intel.com>
-Subject: Re: [PATCH BlueZ 0/4] mesh: Streamline crypto functions
-Message-ID: <20190917065513.ibenc7hxd7x77geg@mlowasrzechonek2133>
-Mail-Followup-To: linux-bluetooth@vger.kernel.org,
-        Brian Gix <brian.gix@intel.com>
-References: <20190819093324.10566-1-michal.lowas-rzechonek@silvair.com>
+        Tue, 17 Sep 2019 14:27:04 -0700 (PDT)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
+Cc:     dianders@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Hui Peng <benquike@gmail.com>, linux-pm@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Brown <broonie@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Wolfram Sang <wsa@the-dreams.de>, linux-kernel@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Len Brown <len.brown@intel.com>,
+        Mathias Payer <mathias.payer@nebelwelt.net>,
+        Dmitry Torokhov <dtor@chromium.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mans Rullgard <mans@mansr.com>, Pavel Machek <pavel@ucw.cz>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH 0/2] Reset realtek bluetooth devices during user suspend
+Date:   Tue, 17 Sep 2019 14:27:00 -0700
+Message-Id: <20190917212702.35747-1-abhishekpandit@chromium.org>
+X-Mailer: git-send-email 2.23.0.237.gc6a4ce50a0-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190819093324.10566-1-michal.lowas-rzechonek@silvair.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
 
-On 08/19, Michał Lowas-Rzechonek wrote:
-> This patch-set is a cleanup of redundant and/or unused parts of
-> mesh/crypto, making both the usage and the implementation a bit
-> more consistent.
+On a Realtek USB bluetooth device, I wanted a simple and consistent way
+to put the device in reset during suspend (2 reasons: to save power and
+disable BT as a wakeup source). Resetting it in the suspend callback
+causes a detach and the resume callback is not called. Hence the changes
+in this series to do the reset in suspend_noirq.
 
-Ping? :)
+I looked into using PERSIST and reset on resume but those seem mainly
+for misbehaving devices that reset themselves.
+
+This patch series has been tested with Realtek BT hardware as well as
+Intel BT (test procedure = disable as wake source, user suspend and
+observe a detach + reattach on resume).
+
+
+
+Abhishek Pandit-Subedi (2):
+  usb: support suspend_noirq
+  Bluetooth: btusb: Reset realtek devices on user suspend
+
+ drivers/bluetooth/btusb.c | 26 ++++++++++++++++++
+ drivers/usb/core/driver.c | 56 +++++++++++++++++++++++++++++++++++++++
+ drivers/usb/core/usb.c    |  6 +++++
+ include/linux/pm.h        |  8 ++++++
+ include/linux/usb.h       |  3 +++
+ 5 files changed, 99 insertions(+)
 
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+2.23.0.237.gc6a4ce50a0-goog
+
