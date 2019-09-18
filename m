@@ -2,177 +2,99 @@ Return-Path: <SRS0=h2kO=XN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 405B0C4CEC9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 10:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C45C4CEC4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 12:36:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BA4F21906
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 10:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C808D20640
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 12:36:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="q0MAhue/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728630AbfIRKZk (ORCPT
+        id S1730980AbfIRMgT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Sep 2019 06:25:40 -0400
-Received: from mga02.intel.com ([134.134.136.20]:7632 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725298AbfIRKZk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Sep 2019 06:25:40 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Sep 2019 03:25:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,520,1559545200"; 
-   d="scan'208";a="199006309"
-Received: from spoorthi-h97m-d3h.iind.intel.com ([10.223.96.21])
-  by orsmga002.jf.intel.com with ESMTP; 18 Sep 2019 03:25:38 -0700
-From:   spoorthix.k@intel.com
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org
-Subject: [PATCH] Add support to use Resolving list
-Date:   Wed, 18 Sep 2019 16:06:25 +0530
-Message-Id: <1568802985-9990-1-git-send-email-spoorthix.k@intel.com>
-X-Mailer: git-send-email 1.9.1
+        Wed, 18 Sep 2019 08:36:19 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:44101 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725902AbfIRMgT (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Sep 2019 08:36:19 -0400
+Received: by mail-lf1-f67.google.com with SMTP id q11so5543394lfc.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Sep 2019 05:36:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=vB5KbmrOqfeHTzapTIVJBDXUuFlWc0YWmQHR0ZpTcwE=;
+        b=q0MAhue/8lSRh35xTu6+bgL3oAV0xFEbXO5cBkKkX2eqDjGPBJNsyxNKgm4mjf/fQS
+         qnpUjKG6e6spsLHMzoa2IGPUxhH4+Sy6nqu2Xrw86cf4t8xXGd+zCCufbufDG4s7ZUMy
+         hLM0WCKnbun5TgIke96xtIfNHd25WsLLfJSpL8opX23cZYtCMCHb5YTYzkCEvpetURcl
+         OiWeUls4rhqoXd2HbquLnQT7a1OkorMpXW+btyXrt1Cj+0m6GK2EAID1ne7W7CyYz0QU
+         +nJFlPQRYepNEM4axVHH2tJdUdjGA1uQU7vcWInilT/Ow6ZA9hUzhCIamtkcbEWuabFC
+         s8JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:mail-followup-to
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=vB5KbmrOqfeHTzapTIVJBDXUuFlWc0YWmQHR0ZpTcwE=;
+        b=NBo3WwVzApaL5yN60fHLcOwKTe8f82tQOm21cKVKg6lbUXwVhXQWCvtC2hNISnWeUh
+         QQ3ZE+iSjHOULPTNz6s9bKtW+otiPhgCdI80ivRoAi7IuqYoylir7A8vb/b3J7ZK2aHm
+         yRnC8syU/NVivVkymjW/LzBMbaY7Y+WO6zH5yu+iwJBm78uEhGN3/xLqwNv7FP5WTNBf
+         x+GqKYXO5OmC0MK+mE6YVU3pWjL7CwxWRIacjtl8Iblrt/DWQD6bU+6LNJsa105uon5O
+         cI4XfPm7DVTx6zPaHQgaUs4WT0VYumecsyzNgHfp6YF0zatYYzybz08pjYNALUITIhNr
+         BJmA==
+X-Gm-Message-State: APjAAAUYoz6+1tyS8ZxIyTmEdixve2nDfbHcApBT4K+cXmjklVoK0LRl
+        G2YJda3auQ9qg670KWwqzdi2l6OZH2c=
+X-Google-Smtp-Source: APXvYqyRBU9do10TM7MnBHvLAF558pgmj98G7btswbQdIAje42t6F/RTIjARdX4TAiZcYOMlEU82Dw==
+X-Received: by 2002:a05:6512:512:: with SMTP id o18mr2057640lfb.153.1568810175650;
+        Wed, 18 Sep 2019 05:36:15 -0700 (PDT)
+Received: from mlowasrzechonek2133 ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id m8sm994958lfa.67.2019.09.18.05.36.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2019 05:36:15 -0700 (PDT)
+Date:   Wed, 18 Sep 2019 14:36:13 +0200
+From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
+        <michal.lowas-rzechonek@silvair.com>
+To:     Brian Gix <brian.gix@intel.com>,
+        Inga Stotland <inga.stotland@intel.com>,
+        linux-bluetooth@vger.kernel.org,
+        Piotr Winiarczyk <piotr.winiarczyk@silvair.com>,
+        Szymon =?utf-8?Q?S=C5=82upik?= <simon@silvair.com>
+Subject: Re: mesh: org.bluez.mesh.Element.MessageReceived method does not
+ provide destination address
+Message-ID: <20190918123613.xaa37ocslhli6s6o@mlowasrzechonek2133>
+Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
+        Inga Stotland <inga.stotland@intel.com>,
+        linux-bluetooth@vger.kernel.org,
+        Piotr Winiarczyk <piotr.winiarczyk@silvair.com>,
+        Szymon =?utf-8?Q?S=C5=82upik?= <simon@silvair.com>
+References: <20190830184301.zd3zaqrw7mv6r252@kynes>
+ <20190918085239.xhahxoeqjkcrk3bl@mlowasrzechonek2133>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190918085239.xhahxoeqjkcrk3bl@mlowasrzechonek2133>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
+On 09/18, Michał Lowas-Rzechonek wrote:
+> Please see a diagram at http://ujeb.se/BmTIW.
 
-Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
----
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_request.c | 88 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 89 insertions(+)
+If you have trouble accesing the drawing, here are PNGs:
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5bc1e30..1574dc1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -433,6 +433,7 @@ enum {
- #define HCI_LE_SLAVE_FEATURES		0x08
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
-+#define HCI_LE_LL_PRIVACY		0x40
- #define HCI_LE_PHY_2M			0x01
- #define HCI_LE_PHY_CODED		0x08
- #define HCI_LE_EXT_ADV			0x10
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 621f1a9..2c0d7e8 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -670,6 +670,82 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	}
- }
- 
-+static void add_to_resolve_list(struct hci_request *req,
-+				struct hci_conn_params *params)
-+{
-+	struct hci_cp_le_add_to_resolv_list cp;
-+	struct bdaddr_list_with_irk *entry;
-+
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-+	if (!entry)
-+		return;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	cp.bdaddr_type = params->addr_type;
-+	bacpy(&cp.bdaddr, &params->addr);
-+	memcpy(entry->peer_irk, cp.peer_irk, 16);
-+	memcpy(entry->local_irk, cp.local_irk, 16);
-+
-+	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST, sizeof(cp), &cp);
-+}
-+
-+static void update_resolve_list(struct hci_request *req)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct bdaddr_list *b;
-+	struct hci_conn_params *params;
-+	int err;
-+	u8 resolve_list_entries = 0;
-+
-+	list_for_each_entry(b, &hdev->le_resolv_list, list) {
-+	/* Cannot Remove or add the device to the Resolving list
-+	 * whenever there is an outstanding connection.
-+	 */
-+		if (!hci_pend_le_action_lookup(&hdev->pend_le_conns,
-+					       &b->bdaddr,
-+					       b->bdaddr_type) &&
-+		    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
-+					       &b->bdaddr,
-+					       b->bdaddr_type)) {
-+			struct hci_cp_le_del_from_resolv_list cp;
-+
-+			cp.bdaddr_type = b->bdaddr_type;
-+			bacpy(&cp.bdaddr, &b->bdaddr);
-+
-+			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
-+				    sizeof(cp), &cp);
-+		}
-+	}
-+	/* During background scanning/active scanning the
-+	 * device BD address is populated in LE pending
-+	 * connections list. So, track the list and add to Resolving
-+	 * list if found by IRK.
-+	 */
-+	list_for_each_entry(params, &hdev->pend_le_conns, action) {
-+		if (hci_bdaddr_list_lookup(&hdev->le_resolv_list,
-+					   &params->addr, params->addr_type))
-+			resolve_list_entries++;
-+
-+		if (hci_find_irk_by_addr(hdev, &params->addr,
-+					 params->addr_type)) {
-+			/* Add device to resolving list */
-+			resolve_list_entries++;
-+			add_to_resolve_list(req, params);
-+		}
-+	}
-+
-+	/* Device can be resolved in the Host if size of resolving
-+	 * list is greater than defined in the controller.
-+	 */
-+	if (resolve_list_entries >= hdev->le_resolv_list_size) {
-+		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
-+		if (err < 0)
-+			BT_ERR("%s failed to generate new RPA",
-+			       hdev->name);
-+		}
-+}
-+
- static void add_to_white_list(struct hci_request *req,
- 			      struct hci_conn_params *params)
- {
-@@ -896,6 +972,12 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
- 	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
- 		filter_policy |= 0x02;
- 
-+	/* If LE Privacy is supported in controller
-+	 * add the device to resolving list.
-+	 */
-+	if (hci_dev_test_flag(hdev, HCI_LE_LL_PRIVACY))
-+		update_resolve_list(req);
-+
- 	hci_req_start_scan(req, LE_SCAN_PASSIVE, hdev->le_scan_interval,
- 			   hdev->le_scan_window, own_addr_type, filter_policy);
- }
-@@ -2513,6 +2595,12 @@ static int active_scan(struct hci_request *req, unsigned long opt)
- 	if (err < 0)
- 		own_addr_type = ADDR_LE_DEV_PUBLIC;
- 
-+	/* Update resolving list when privacy feature is
-+	 * is enabled in the controller */
-+	if (hci_dev_test_flag(hdev, HCI_LE_LL_PRIVACY)) {
-+		update_resolve_list(req);
-+	}
-+
- 	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval, DISCOV_LE_SCAN_WIN,
- 			   own_addr_type, 0);
- 	return 0;
+https://drive.google.com/file/d/1zZrmFB7NLcbyR-tPE9ljqxolZIonxXbc/view
+https://drive.google.com/file/d/1ntkJGU1SYtgqrmQN9F4PDiWdjYAc0U8o/view
+
 -- 
-1.9.1
-
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
