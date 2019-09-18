@@ -2,34 +2,64 @@ Return-Path: <SRS0=h2kO=XN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B05C4CEC9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 14:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3263BC4CEC4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 17:19:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCCA720665
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 14:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0282D21928
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Sep 2019 17:19:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ARUEYQc2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731374AbfIROle (ORCPT
+        id S1732183AbfIRRTg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Sep 2019 10:41:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:46290 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730029AbfIROle (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Sep 2019 10:41:34 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 98543B76A;
-        Wed, 18 Sep 2019 14:41:30 +0000 (UTC)
-Message-ID: <1568817684.23075.10.camel@suse.com>
+        Wed, 18 Sep 2019 13:19:36 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:33003 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732177AbfIRRTf (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Sep 2019 13:19:35 -0400
+Received: by mail-qk1-f196.google.com with SMTP id x134so286641qkb.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Sep 2019 10:19:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TZ6zNmTN5K3wsuw0UnWMZDNmXyrZg+XulUxUtSzlTDQ=;
+        b=ARUEYQc20VKVq0DC9iR4ZW+0ILmmp38aDfsgHOE6Je7RahPrHGv+1PsoTjZaYCGYHx
+         HuK5+jLbDz/QruHJpkhdLZ2xPx123034b3vz53chKCSsjZKah3Cgo3DJDPz0dRmryALo
+         7webVgnyiqJ1mCH0v1wKqCqToqpzY+EixxruU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TZ6zNmTN5K3wsuw0UnWMZDNmXyrZg+XulUxUtSzlTDQ=;
+        b=Q56v1+gIHMBG1R4azbuqi+Oguv24dGLFCdZpMWN8s4AXjAE1HlMPtQ8J8kf9poy7iA
+         9mwJ0jcxWBHSjN437kv/XTWwjtxDhl9c9IOgUtGMFENHjx1U9dywpF/euFLFKdl3SR2V
+         IRMECSe0Oubk4fSS1bhjY4ulpdLIX1uLET/nElWrtmIakpeWfn/yt4dkjTtLSoik8p9s
+         dVjdwlrjPJt3Sno5/vhwGWGwp4e7iGoDp6H+/c1wpr2Y6J9RMenP1No2iJ0gKoVEc/+c
+         K37EZiLBR6ewBm002Yn8K5H5eYQBgQ+UHQFWwVQPEbaKbz4K7gUYeAzeTZhvfiqVqDAG
+         xz5w==
+X-Gm-Message-State: APjAAAVHx23XiyXABPSqFCGfsNOFIYkQiVnF5IioKHPx8jHKVNeX8C4h
+        QHRn//cVoV9AIl10079VoefaxvxILSVUdLvq0vOq1w==
+X-Google-Smtp-Source: APXvYqySXTHIUcstv5cPNi86ktBT04PmHseptOwBc0q27Fdkd1xYMUXPo9eFDDE5gpLKq/LzteJUa6hnXEf8sBpw5jw=
+X-Received: by 2002:ae9:e817:: with SMTP id a23mr4977536qkg.294.1568827174941;
+ Wed, 18 Sep 2019 10:19:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190917212702.35747-1-abhishekpandit@chromium.org> <Pine.LNX.4.44L0.1909181017300.1507-100000@iolanthe.rowland.org>
+In-Reply-To: <Pine.LNX.4.44L0.1909181017300.1507-100000@iolanthe.rowland.org>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Wed, 18 Sep 2019 10:19:24 -0700
+Message-ID: <CANFp7mX=THOVk-4TgSSscgtm598txqesDZYKE2sFtEVNHjN+-g@mail.gmail.com>
 Subject: Re: [PATCH 0/2] Reset realtek bluetooth devices during user suspend
-From:   Oliver Neukum <oneukum@suse.com>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
-Cc:     dianders@chromium.org, Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
+To:     Alan Stern <stern@rowland.harvard.edu>
+Cc:     linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+        Douglas Anderson <dianders@chromium.org>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
         Hui Peng <benquike@gmail.com>, linux-pm@vger.kernel.org,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -43,41 +73,68 @@ Cc:     dianders@chromium.org, Kai-Heng Feng <kai.heng.feng@canonical.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Mans Rullgard <mans@mansr.com>, Pavel Machek <pavel@ucw.cz>,
         YueHaibing <yuehaibing@huawei.com>
-Date:   Wed, 18 Sep 2019 16:41:24 +0200
-In-Reply-To: <20190917212702.35747-1-abhishekpandit@chromium.org>
-References: <20190917212702.35747-1-abhishekpandit@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Am Dienstag, den 17.09.2019, 14:27 -0700 schrieb Abhishek Pandit-
-Subedi:
-> On a Realtek USB bluetooth device, I wanted a simple and consistent way
-> to put the device in reset during suspend (2 reasons: to save power and
+Sorry, last reply went out with HTML. Re-sending in plain text.
 
-The device really uses less power if you reset it before suspendening
-it?
+On Wed, Sep 18, 2019 at 7:23 AM Alan Stern <stern@rowland.harvard.edu> wrote:
+>
+> On Tue, 17 Sep 2019, Abhishek Pandit-Subedi wrote:
+>
+> > On a Realtek USB bluetooth device, I wanted a simple and consistent way
+> > to put the device in reset during suspend (2 reasons: to save power and
+> > disable BT as a wakeup source). Resetting it in the suspend callback
+> > causes a detach and the resume callback is not called. Hence the changes
+> > in this series to do the reset in suspend_noirq.
+>
+> What about people who _want_ BT to be a wakeup source?
 
-> disable BT as a wakeup source). Resetting it in the suspend callback
+When BT is enabled as a wakeup source, there is no reset.
 
-Then do not enable it. Something is strange.
+> Why does putting the device in reset save power?  That is, a suspended
+> device is very strictly limited in the amount of current it's allowed
+> to draw from the USB bus; why should it draw significantly less when it
+> is reset?
 
-> causes a detach and the resume callback is not called. Hence the changes
-> in this series to do the reset in suspend_noirq.
-> 
-> I looked into using PERSIST and reset on resume but those seem mainly
-> for misbehaving devices that reset themselves.
+I don't know that it's significantly less (only that it's OFF). My
+greater motivation is to make sure the bluetooth chip isn't
+accumulating events while the host is turned off. Sorry, I should have
+made that more clear in the cover letter.
 
-No, not really. It is also for device that need to be reset if you use
-the RESET_RESUME quirk. But that is on resume().
-You could introduce a new flag. But the _noirq method is kind of
-a hack, as USB really cannot operate without interrupts.
+When the host is off, it continues to accumulate events for the host
+to process (packets from connected devices, LE advertisements, etc).
+At some point, the firmware buffers fill up and no more events can be
+stored. When the host is resumed later on, the firmware is in a bad
+state and doesn't respond. I had originally just reset in ->resume but
+then connected wireless devices wouldn't disconnect from the BT either
+and I had trouble getting them to reconnect.
 
-	Regards
-		Oliver
+>
+> > I looked into using PERSIST and reset on resume but those seem mainly
+> > for misbehaving devices that reset themselves.
+>
+> They are, but that doesn't mean you can't use them for other things
+> too.
+>
+> > This patch series has been tested with Realtek BT hardware as well as
+> > Intel BT (test procedure = disable as wake source, user suspend and
+> > observe a detach + reattach on resume).
+>
+> This series really seems like overkill for a single kind of device.
+>
+> Is there any way to turn off the device's BT radio during suspend (if
+> wakeup is disabled) and then turn it back on during resume?  Wouldn't
+> that accomplish what you want just as well?
 
+Probably (but I couldn't find a way to do that). I want to prevent
+bluetooth from waking up the host and to reliably be in a good state
+when the host resumes. The reset logic I implemented causes the hci
+device to disappear and reappear, which userspace seems to handle
+gracefully.
+
+> Alan Stern
+>
