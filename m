@@ -2,105 +2,86 @@ Return-Path: <SRS0=SS8e=XS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A17C04EBF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Sep 2019 13:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A42C11FF4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Sep 2019 20:34:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9F80B20820
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Sep 2019 13:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF1A220673
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Sep 2019 20:34:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKz83jxo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732449AbfIWNsb (ORCPT
+        id S2387422AbfIWUe3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Sep 2019 09:48:31 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2770 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725782AbfIWNsa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Sep 2019 09:48:30 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 0410E57D6B7700CD05A3;
-        Mon, 23 Sep 2019 21:48:29 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 23 Sep 2019 21:48:20 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>
-CC:     YueHaibing <yuehaibing@huawei.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH net] Bluetooth: SMP: remove set but not used variable 'smp'
-Date:   Mon, 23 Sep 2019 14:05:16 +0000
-Message-ID: <20190923140516.166241-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 23 Sep 2019 16:34:29 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:33647 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729065AbfIWUe3 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 23 Sep 2019 16:34:29 -0400
+Received: by mail-pf1-f193.google.com with SMTP id q10so9863516pfl.0;
+        Mon, 23 Sep 2019 13:34:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=EGYPKi+Bj97Txmrg48DsS4RTp4MiyYLZEEl8Gx4dbp8=;
+        b=jKz83jxo6UQCdidNmrf33fmZCqbVFL/nOB6fiSnp2gNv9JmJj7hWP6gvttTTJSt6j0
+         AzRwAdPr3Q1Ev4WZPYct6kzWNZBwOwslDiqquT8VL/ZKKjpiXTZQpneTI/yz2eiuXMVr
+         lxvqmNrR6NQuBrnCeWyzMxyHswtKQBbRPGkqinArLe5zePNdPts+8by7W+6h1pA4tLjf
+         4I6UH6CdbIWL+O8cXm5deqtBJurbgLj3XGS4E45Qi3tluVvtuchQxkOLhAVazH0aTe0N
+         8Kr6y08en2OnR/mIASOeT5gehpa532iH7LzKfLmX/cpjxJamws3moxsebP7JIrdRujZ5
+         xs2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=EGYPKi+Bj97Txmrg48DsS4RTp4MiyYLZEEl8Gx4dbp8=;
+        b=qhzMAWVJl0INbfpwTKTDl1C+pFFRIgmGh7AumfFHODSIxAT27+BtuKIsvXL/cnwuxa
+         zKh2OS4b/fRoHPNEzrIW617KQQVXT4RuSmsJr3gTt2S1Y1WYig8vilJbzb3RXx1VxE9q
+         kgt9qszgaTOu0cU7mA2XV6rNDu2cMzEOAGqJvIXwrDICgVfW/FYaZyJ/DgZFsdFMwpUF
+         KZr64oFVNApUjlBGgqOKLt8lg+GcnlCwS+Fh16RkEEGQ4a2v94CaL343RwvOUbswMyzl
+         lE55n1k5y88IkoXNClkg5rZXPKBf4bBn9EfipQb5Jk5TwuCBjwhxC5LuS9LwPk5PZPDv
+         3Vhg==
+X-Gm-Message-State: APjAAAVZVHUzKUyYNTBWRfbX/7tRt/ipiDNHRZtXUYmKDyl23vVhEZkP
+        0C7uR0DgDroFnwNK9bl914E=
+X-Google-Smtp-Source: APXvYqyNkmREM5d5I86SZMtJX+edL0QFUQzFvJrS6pzQ6ezjgBUHSDocLloyBDJm50K62Mx3Czjxkw==
+X-Received: by 2002:a65:4286:: with SMTP id j6mr1787684pgp.218.1569270868145;
+        Mon, 23 Sep 2019 13:34:28 -0700 (PDT)
+Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
+        by smtp.gmail.com with ESMTPSA id z25sm12391618pfn.7.2019.09.23.13.34.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2019 13:34:26 -0700 (PDT)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
+        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hidp: Fix assumptions on the return value of hidp_send_message
+Date:   Mon, 23 Sep 2019 13:33:57 -0700
+Message-Id: <20190923203357.8355-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <3D70AB75-FEFB-4EB3-9AC8-3BCE90F5458D@holtmann.org>
+References: 
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+> I am taking this through my tree. And yes, I applied the updated patch, but answered the other ;)
+>
+> Regards
+>
+> Marcel
 
-net/bluetooth/smp.c: In function 'smp_irk_matches':
-net/bluetooth/smp.c:505:18: warning:
- variable 'smp' set but not used [-Wunused-but-set-variable]
+Are you also going to mark this patch for inclusion to stable tree? I haven't seen it in any of the stable queues (netdev, Greg's), so just wanted to check.
 
-net/bluetooth/smp.c: In function 'smp_generate_rpa':
-net/bluetooth/smp.c:526:18: warning:
- variable 'smp' set but not used [-Wunused-but-set-variable]
-
-It is not used since commit 28a220aac596 ("bluetooth: switch
-to AES library")
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- net/bluetooth/smp.c | 6 ------
- 1 file changed, 6 deletions(-)
-
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 26e8cfad22b8..6b42be4b5861 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -502,15 +502,12 @@ bool smp_irk_matches(struct hci_dev *hdev, const u8 irk[16],
- 		     const bdaddr_t *bdaddr)
- {
- 	struct l2cap_chan *chan = hdev->smp_data;
--	struct smp_dev *smp;
- 	u8 hash[3];
- 	int err;
- 
- 	if (!chan || !chan->data)
- 		return false;
- 
--	smp = chan->data;
--
- 	BT_DBG("RPA %pMR IRK %*phN", bdaddr, 16, irk);
- 
- 	err = smp_ah(irk, &bdaddr->b[3], hash);
-@@ -523,14 +520,11 @@ bool smp_irk_matches(struct hci_dev *hdev, const u8 irk[16],
- int smp_generate_rpa(struct hci_dev *hdev, const u8 irk[16], bdaddr_t *rpa)
- {
- 	struct l2cap_chan *chan = hdev->smp_data;
--	struct smp_dev *smp;
- 	int err;
- 
- 	if (!chan || !chan->data)
- 		return -EOPNOTSUPP;
- 
--	smp = chan->data;
--
- 	get_random_bytes(&rpa->b[3], 3);
- 
- 	rpa->b[5] &= 0x3f;	/* Clear two most significant bits */
-
-
-
+Thanks,
+Andrey Smirnov
