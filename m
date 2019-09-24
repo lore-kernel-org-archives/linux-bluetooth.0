@@ -1,87 +1,187 @@
-Return-Path: <SRS0=SS8e=XS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=wEtX=XT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A42C11FF4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Sep 2019 20:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3628C432C1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Sep 2019 12:09:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF1A220673
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Sep 2019 20:34:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKz83jxo"
+	by mail.kernel.org (Postfix) with ESMTP id 9882F2168B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Sep 2019 12:09:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387422AbfIWUe3 (ORCPT
+        id S1729505AbfIXMJK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Sep 2019 16:34:29 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33647 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729065AbfIWUe3 (ORCPT
+        Tue, 24 Sep 2019 08:09:10 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:39524 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727879AbfIXMJJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Sep 2019 16:34:29 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q10so9863516pfl.0;
-        Mon, 23 Sep 2019 13:34:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=EGYPKi+Bj97Txmrg48DsS4RTp4MiyYLZEEl8Gx4dbp8=;
-        b=jKz83jxo6UQCdidNmrf33fmZCqbVFL/nOB6fiSnp2gNv9JmJj7hWP6gvttTTJSt6j0
-         AzRwAdPr3Q1Ev4WZPYct6kzWNZBwOwslDiqquT8VL/ZKKjpiXTZQpneTI/yz2eiuXMVr
-         lxvqmNrR6NQuBrnCeWyzMxyHswtKQBbRPGkqinArLe5zePNdPts+8by7W+6h1pA4tLjf
-         4I6UH6CdbIWL+O8cXm5deqtBJurbgLj3XGS4E45Qi3tluVvtuchQxkOLhAVazH0aTe0N
-         8Kr6y08en2OnR/mIASOeT5gehpa532iH7LzKfLmX/cpjxJamws3moxsebP7JIrdRujZ5
-         xs2A==
+        Tue, 24 Sep 2019 08:09:09 -0400
+Received: by mail-io1-f71.google.com with SMTP id f9so2718888ioh.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Sep 2019 05:09:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=EGYPKi+Bj97Txmrg48DsS4RTp4MiyYLZEEl8Gx4dbp8=;
-        b=qhzMAWVJl0INbfpwTKTDl1C+pFFRIgmGh7AumfFHODSIxAT27+BtuKIsvXL/cnwuxa
-         zKh2OS4b/fRoHPNEzrIW617KQQVXT4RuSmsJr3gTt2S1Y1WYig8vilJbzb3RXx1VxE9q
-         kgt9qszgaTOu0cU7mA2XV6rNDu2cMzEOAGqJvIXwrDICgVfW/FYaZyJ/DgZFsdFMwpUF
-         KZr64oFVNApUjlBGgqOKLt8lg+GcnlCwS+Fh16RkEEGQ4a2v94CaL343RwvOUbswMyzl
-         lE55n1k5y88IkoXNClkg5rZXPKBf4bBn9EfipQb5Jk5TwuCBjwhxC5LuS9LwPk5PZPDv
-         3Vhg==
-X-Gm-Message-State: APjAAAVZVHUzKUyYNTBWRfbX/7tRt/ipiDNHRZtXUYmKDyl23vVhEZkP
-        0C7uR0DgDroFnwNK9bl914E=
-X-Google-Smtp-Source: APXvYqyNkmREM5d5I86SZMtJX+edL0QFUQzFvJrS6pzQ6ezjgBUHSDocLloyBDJm50K62Mx3Czjxkw==
-X-Received: by 2002:a65:4286:: with SMTP id j6mr1787684pgp.218.1569270868145;
-        Mon, 23 Sep 2019 13:34:28 -0700 (PDT)
-Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id z25sm12391618pfn.7.2019.09.23.13.34.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2019 13:34:26 -0700 (PDT)
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hidp: Fix assumptions on the return value of hidp_send_message
-Date:   Mon, 23 Sep 2019 13:33:57 -0700
-Message-Id: <20190923203357.8355-1-andrew.smirnov@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <3D70AB75-FEFB-4EB3-9AC8-3BCE90F5458D@holtmann.org>
-References: 
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=VflEvtMKTJZm6UIwz/EKSbfBYk+H3uv1O+TxeI/B3uk=;
+        b=C/q6TzCuG8gzZCaPc5bBguoWenYTkoPSLTxv94afMp+DTq5IODtc5AdbrZ8utZRx9q
+         eUD2rsNMXRKbXgHtgCSBG4SSZ+S/5UR60nKeO5rqmm+mCIe+u2QTmCRQ+e42ualOM1bN
+         NXjOP7270emrFM0LW0reyzV4bu0/F+CVdOqtLGqw9sKmMHAo7Ajy3HOyilwa8PwKPH1c
+         SZez3BgF4SgCFQy697A7zV9gvvwLWDAqtSxBjdIfyb7Ub5E6mnNa46yEIyi5xPqtLpT8
+         /Sg9nbMVyFy/svCMtlOK5QTanf6CtxSRqUsHWP+J0HnM396khLd42ePXFTKXblLGbHzk
+         wPEQ==
+X-Gm-Message-State: APjAAAXlyiHFgzeI5yQIVWZJ0L6kvJVzXZt2P4D61grdOQUykOJAM7Nu
+        0CVjE12JS2PkMweRupLBkvI0ZCxhH9T/VN8ZE0zNJIg/cEja
+X-Google-Smtp-Source: APXvYqzi13VJjfpQWgpOcGuMvwJ4sxVipz+oGIsbv8Bc/wpY9IG/EEWEZk4aWWbywpK02aD05umEVVJgUKJJjwKvH7C3ObVqMDuZ
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a6b:5a1a:: with SMTP id o26mr2992720iob.65.1569326947244;
+ Tue, 24 Sep 2019 05:09:07 -0700 (PDT)
+Date:   Tue, 24 Sep 2019 05:09:07 -0700
+In-Reply-To: <000000000000bd19720591aac025@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003a22d605934b6722@google.com>
+Subject: Re: INFO: trying to register non-static key in hci_uart_flush (2)
+From:   syzbot <syzbot+576dfca25381fb6fbc5f@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-> I am taking this through my tree. And yes, I applied the updated patch, but answered the other ;)
->
-> Regards
->
-> Marcel
+syzbot has found a reproducer for the following crash on:
 
-Are you also going to mark this patch for inclusion to stable tree? I haven't seen it in any of the stable queues (netdev, Greg's), so just wanted to check.
+HEAD commit:    e94f8ccd Merge tag 'smack-for-5.4-rc1' of git://github.com..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16713de9600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=df38eec565aab18d
+dashboard link: https://syzkaller.appspot.com/bug?extid=576dfca25381fb6fbc5f
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12881a9d600000
 
-Thanks,
-Andrey Smirnov
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+576dfca25381fb6fbc5f@syzkaller.appspotmail.com
+
+INFO: trying to register non-static key.
+the code is fine but needs lockdep annotation.
+turning off the locking correctness validator.
+CPU: 0 PID: 9385 Comm: syz-executor.3 Not tainted 5.3.0+ #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+  assign_lock_key kernel/locking/lockdep.c:881 [inline]
+  register_lock_class+0x179e/0x1850 kernel/locking/lockdep.c:1190
+  __lock_acquire+0xf4/0x4e70 kernel/locking/lockdep.c:3837
+  lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4487
+  percpu_down_read include/linux/percpu-rwsem.h:40 [inline]
+  hci_uart_flush+0x110/0x510 drivers/bluetooth/hci_ldisc.c:241
+  hci_uart_close drivers/bluetooth/hci_ldisc.c:267 [inline]
+  hci_uart_tty_close+0x8e/0x280 drivers/bluetooth/hci_ldisc.c:534
+  tty_ldisc_close.isra.0+0x119/0x190 drivers/tty/tty_ldisc.c:494
+  tty_ldisc_kill+0x9c/0x160 drivers/tty/tty_ldisc.c:642
+  tty_ldisc_release+0xe9/0x2b0 drivers/tty/tty_ldisc.c:814
+  tty_release_struct+0x1b/0x50 drivers/tty/tty_io.c:1612
+  tty_release+0xbcb/0xe90 drivers/tty/tty_io.c:1785
+  __fput+0x2ff/0x890 fs/file_table.c:280
+  ____fput+0x16/0x20 fs/file_table.c:313
+  task_work_run+0x145/0x1c0 kernel/task_work.c:113
+  exit_task_work include/linux/task_work.h:22 [inline]
+  do_exit+0x92f/0x2e50 kernel/exit.c:879
+  do_group_exit+0x135/0x360 kernel/exit.c:983
+  get_signal+0x47c/0x2500 kernel/signal.c:2734
+  do_signal+0x87/0x1700 arch/x86/kernel/signal.c:815
+  exit_to_usermode_loop+0x286/0x380 arch/x86/entry/common.c:159
+  prepare_exit_to_usermode arch/x86/entry/common.c:194 [inline]
+  syscall_return_slowpath arch/x86/entry/common.c:274 [inline]
+  do_syscall_64+0x65f/0x760 arch/x86/entry/common.c:300
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x459a09
+Code: Bad RIP value.
+RSP: 002b:00007fe8f55a0c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000459a09
+RDX: 0000000000000002 RSI: 00000000400455c8 RDI: 0000000000000006
+RBP: 000000000075c118 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fe8f55a16d4
+R13: 00000000004c26f7 R14: 00000000004d5df8 R15: 00000000ffffffff
+kasan: CONFIG_KASAN_INLINE enabled
+kasan: GPF could be caused by NULL-ptr deref or user memory access
+general protection fault: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 9385 Comm: syz-executor.3 Not tainted 5.3.0+ #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+RIP: 0010:__wake_up_common+0xdf/0x610 kernel/sched/wait.c:86
+Code: 05 00 00 4c 8b 43 38 49 83 e8 18 49 8d 78 18 48 39 7d d0 0f 84 64 02  
+00 00 48 b8 00 00 00 00 00 fc ff df 48 89 f9 48 c1 e9 03 <80> 3c 01 00 0f  
+85 0b 05 00 00 49 8b 40 18 89 55 b0 31 db 49 bc 00
+RSP: 0018:ffff888097617698 EFLAGS: 00010046
+RAX: dffffc0000000000 RBX: ffff88809612eb38 RCX: 0000000000000000
+RDX: 0000000000000001 RSI: 1ffffffff138dcf6 RDI: 0000000000000000
+RBP: ffff8880976176f0 R08: ffffffffffffffe8 R09: 0000000000000000
+R10: ffffed1012ec2ece R11: 0000000000000003 R12: ffff88809612eb80
+R13: ffff88809612eb30 R14: 0000000000000000 R15: ffff88809612eb38
+FS:  00007fe8f55a1700(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000004599df CR3: 000000008ff2c000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+  __wake_up_locked+0x11/0x20 kernel/sched/wait.c:151
+  rcu_sync_func+0x16f/0x200 kernel/rcu/sync.c:87
+  rcu_sync_enter+0x158/0x310 kernel/rcu/sync.c:150
+  percpu_down_write+0x61/0x437 kernel/locking/percpu-rwsem.c:146
+  hci_uart_tty_close+0x154/0x280 drivers/bluetooth/hci_ldisc.c:537
+  tty_ldisc_close.isra.0+0x119/0x190 drivers/tty/tty_ldisc.c:494
+  tty_ldisc_kill+0x9c/0x160 drivers/tty/tty_ldisc.c:642
+  tty_ldisc_release+0xe9/0x2b0 drivers/tty/tty_ldisc.c:814
+  tty_release_struct+0x1b/0x50 drivers/tty/tty_io.c:1612
+  tty_release+0xbcb/0xe90 drivers/tty/tty_io.c:1785
+  __fput+0x2ff/0x890 fs/file_table.c:280
+  ____fput+0x16/0x20 fs/file_table.c:313
+  task_work_run+0x145/0x1c0 kernel/task_work.c:113
+  exit_task_work include/linux/task_work.h:22 [inline]
+  do_exit+0x92f/0x2e50 kernel/exit.c:879
+  do_group_exit+0x135/0x360 kernel/exit.c:983
+  get_signal+0x47c/0x2500 kernel/signal.c:2734
+  do_signal+0x87/0x1700 arch/x86/kernel/signal.c:815
+  exit_to_usermode_loop+0x286/0x380 arch/x86/entry/common.c:159
+  prepare_exit_to_usermode arch/x86/entry/common.c:194 [inline]
+  syscall_return_slowpath arch/x86/entry/common.c:274 [inline]
+  do_syscall_64+0x65f/0x760 arch/x86/entry/common.c:300
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x459a09
+Code: fd b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 cb b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007fe8f55a0c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000459a09
+RDX: 0000000000000002 RSI: 00000000400455c8 RDI: 0000000000000006
+RBP: 000000000075c118 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fe8f55a16d4
+R13: 00000000004c26f7 R14: 00000000004d5df8 R15: 00000000ffffffff
+Modules linked in:
+---[ end trace cf75381aeb7c112c ]---
+RIP: 0010:__wake_up_common+0xdf/0x610 kernel/sched/wait.c:86
+Code: 05 00 00 4c 8b 43 38 49 83 e8 18 49 8d 78 18 48 39 7d d0 0f 84 64 02  
+00 00 48 b8 00 00 00 00 00 fc ff df 48 89 f9 48 c1 e9 03 <80> 3c 01 00 0f  
+85 0b 05 00 00 49 8b 40 18 89 55 b0 31 db 49 bc 00
+RSP: 0018:ffff888097617698 EFLAGS: 00010046
+RAX: dffffc0000000000 RBX: ffff88809612eb38 RCX: 0000000000000000
+RDX: 0000000000000001 RSI: 1ffffffff138dcf6 RDI: 0000000000000000
+RBP: ffff8880976176f0 R08: ffffffffffffffe8 R09: 0000000000000000
+R10: ffffed1012ec2ece R11: 0000000000000003 R12: ffff88809612eb80
+R13: ffff88809612eb30 R14: 0000000000000000 R15: ffff88809612eb38
+FS:  00007fe8f55a1700(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000004599df CR3: 000000008ff2c000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
