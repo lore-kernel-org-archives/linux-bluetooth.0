@@ -2,103 +2,144 @@ Return-Path: <SRS0=vN2J=XU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCA3C432C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Sep 2019 18:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF66C432C2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Sep 2019 19:02:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7505F207E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Sep 2019 18:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FFFD21D7C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Sep 2019 19:02:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2443164AbfIYSTz (ORCPT
+        id S1731229AbfIYTCV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Sep 2019 14:19:55 -0400
-Received: from mga11.intel.com ([192.55.52.93]:14386 "EHLO mga11.intel.com"
+        Wed, 25 Sep 2019 15:02:21 -0400
+Received: from mga02.intel.com ([134.134.136.20]:8425 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2437692AbfIYSTz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Sep 2019 14:19:55 -0400
+        id S1726741AbfIYTCV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 25 Sep 2019 15:02:21 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 11:19:54 -0700
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 12:02:20 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,549,1559545200"; 
-   d="p7s'?scan'208";a="179892053"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by orsmga007.jf.intel.com with ESMTP; 25 Sep 2019 11:19:53 -0700
+   d="p7s'?scan'208";a="273063285"
+Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
+  by orsmga001.jf.intel.com with ESMTP; 25 Sep 2019 12:02:20 -0700
+Received: from orsmsx153.amr.corp.intel.com (10.22.226.247) by
+ ORSMSX104.amr.corp.intel.com (10.22.225.131) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 25 Sep 2019 12:02:20 -0700
 Received: from orsmsx103.amr.corp.intel.com ([169.254.5.5]) by
- ORSMSX110.amr.corp.intel.com ([169.254.10.139]) with mapi id 14.03.0439.000;
- Wed, 25 Sep 2019 11:19:53 -0700
+ ORSMSX153.amr.corp.intel.com ([169.254.12.237]) with mapi id 14.03.0439.000;
+ Wed, 25 Sep 2019 12:02:19 -0700
 From:   "Stotland, Inga" <inga.stotland@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-Subject: Re: [PATCH BlueZ 0/1 v3] ELL based mainloop
-Thread-Topic: [PATCH BlueZ 0/1 v3] ELL based mainloop
-Thread-Index: AQHVUBKMWsVeokbEp0mGc3wuJuKLyKc9cNkA
-Date:   Wed, 25 Sep 2019 18:19:53 +0000
-Message-ID: <fb9e9c39bf24900c84bd7fe63d91c8443895ee3e.camel@intel.com>
-References: <20190811070045.15406-1-inga.stotland@intel.com>
-In-Reply-To: <20190811070045.15406-1-inga.stotland@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Gix, Brian" <brian.gix@intel.com>,
+        "simon@silvair.com" <simon@silvair.com>,
+        "piotr.winiarczyk@silvair.com" <piotr.winiarczyk@silvair.com>
+Subject: Re: mesh: org.bluez.mesh.Element.MessageReceived method does not
+ provide destination address
+Thread-Topic: mesh: org.bluez.mesh.Element.MessageReceived method does not
+ provide destination address
+Thread-Index: AQHVX2LEtJoH6czNyE6Xu9DaIe4hzqcxs2yAgAuqpwA=
+Date:   Wed, 25 Sep 2019 19:02:19 +0000
+Message-ID: <3c5858c94b3e08a61c5ff8493f9b00f5f77d0aac.camel@intel.com>
+References: <20190830184301.zd3zaqrw7mv6r252@kynes>
+         <20190918085239.xhahxoeqjkcrk3bl@mlowasrzechonek2133>
+In-Reply-To: <20190918085239.xhahxoeqjkcrk3bl@mlowasrzechonek2133>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.254.12.163]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-5LIT3fi4jS4vd0g6W8cz"
+        protocol="application/x-pkcs7-signature"; boundary="=-0tYzmf4BE3oYFUpYV34G"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-5LIT3fi4jS4vd0g6W8cz
+--=-0tYzmf4BE3oYFUpYV34G
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Ping
+Hi Michal,
 
-On Sun, 2019-08-11 at 00:00 -0700, Inga Stotland wrote:
-> + timeout-ell.c
+On Wed, 2019-09-18 at 10:52 +0200, Micha=C5=82 Lowas-Rzechonek wrote:
+> Hi Brian,
 >=20
-> This patch addresses a need to enable using common mainloop for the
-> ell-based apps that desire to use common bluetooth fuctionality
-> (e.g., bt_shell).
+> > Imagine a dot-matrix, where each pixel is a mesh node.
+> >=20
+> > Each of these pixels implements two models:
+> >     on element 0, a GenericOnOffServer controlling the light output
+> >     on element 1, a Blinkenlights Server model
+> >=20
+> > Blinkenlights Server extends GenericOnOff Server and GenericOnOff
+> > Client, and on top of that contains a translation table mapping
+> > group
+> > address to either 'ON' or 'OFF'.
+> >=20
+> > Now, when Blinkenlights Server receives a GenericOnOff Set message,
+> > it
+> > looks up the destination address at the translation table, and
+> > sends a
+> > *different* GenericOnOff Set to *its own* element 0, with target
+> > value
+> > determined by the translation entry.
+> >=20
+> > This allows users to configure each node in such a way, that
+> > sending a
+> > *single* message to a group address causes all pixels to switch to
+> > a
+> > preconfigured pattern *at the same time*.
 >=20
-> Note: A bit awkward callback handling there is due to the discrepancy
-> in the arg type for signo (signal number).
+> Per conversation with Piotr, I'd like to revisit the discussion and
+> provide more details about our use case for models knowing the
+> destination address.
 >=20
-> src/shared/mainloop.h:
-> typedef void (*mainloop_signal_func) (int signum, void *user_data)
+> Please see a diagram at http://ujeb.se/BmTIW.
 >=20
-> and ell/main.h:
+> The main reason we map scenes using destination addresses is that
+> such a
+> setup consumes much less unicast addresses.
 >=20
-> typedef void (*l_main_signal_cb_t) (uint32_t signo, void *user_data)
+> Assuming that:
+>  S - number of switches
+>  B - number of buttons (elements) on a switch
+>  N - nunber of lamps
 >=20
-> My guess is that ell derives the unsigned int type from
-> <sys/signalfd.h>,
-> where ssi_signo is defined as uint32_t. BlueZ is probably following
-> the
-> standard Linux signal handling, where signal is represented as an
-> int.=20
+> With a 'regular' case, number of consumed unicast addresses is
+>     S*B + N*(B+1)
 >=20
-> Inga Stotland (1):
->   shared/mainloop: Add ell-based mainloop implementation
+> With the destination mapping, it becomes
+>     S*B + N*2
 >=20
->  Makefile.am               |  11 +++-
->  src/shared/mainloop-ell.c | 126
-> ++++++++++++++++++++++++++++++++++++++
->  src/shared/timeout-ell.c  |  72 ++++++++++++++++++++++
->  3 files changed, 206 insertions(+), 3 deletions(-)
->  create mode 100644 src/shared/mainloop-ell.c
->  create mode 100644 src/shared/timeout-ell.c
+> Since we typically use 4 button switches (B=3D4), without translation
+> we
+> consume unicast address space at a *much* faster rate.
 >=20
+> reagrds
 
---=-5LIT3fi4jS4vd0g6W8cz
+Okay, this is a good argument for exposing the subscription address in
+MessageReceived().
+It's better to separate the method into two, e.g. MessageReceived() and
+MessageReceivedVirtual().
+
+Then it makes sense to add model subscription array as a dictionary
+entry in the UpdateModelConfiguration() as well as for the node
+configuration returned when calling Attach() method.
+Probably will have to have separate keys: "Groups" and "Virtuals".
+
+Regards,
+Inga
+
+--=-0tYzmf4BE3oYFUpYV34G
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -154,13 +195,13 @@ FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
 MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
 ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
 ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
-CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwOTI1MTgxOTUyWjAjBgkqhkiG9w0BCQQxFgQU
-VoyWM9+2hdRjchS10qCSo28d3yowDQYJKoZIhvcNAQEBBQAEggEAXVEqDI0WI88Uxdh/rL+YfC5F
-zppSLBRm3bhfzJr+WHgowiqFxUA+C7nb1zLNQ9gZwDXAFrDOiVMszhpX7v9DGustDqepFaFKvkmj
-rNX2Wg+p9PWHAt6Fjm3AdoKYBgIkU4x03Jy6q+3BA+yYFgBF7NzfcGWeqfXTJfC7oMz58a7Gl0ey
-qKDV8jyAGApe4tTStowoMleGVaKPDomrijeQezRP8xwSZoyhfW2Rby7K8UJP8BmLpmC17hn/jmgS
-JMTJB5lYTfdIPkQ0OQfT7HusG4PhUPAGz+2MVdJjDqrWFu2I2fsCLrOSC8fWikNYndkNw18eGVb+
-sJXwaUnI0OXcsQAAAAAAAA==
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwOTI1MTkwMjE4WjAjBgkqhkiG9w0BCQQxFgQU
+u+S9emfMPt/2wM6640uHn5KrTd0wDQYJKoZIhvcNAQEBBQAEggEAquhCW+x2ALgXu+8XbMBPAtzB
+mCS5dqXwpuKavfZ7ByzTdi2QhYiJbEFDTfEYT8wbGY35LCHwRf4dMQNJpQYAu6NISywjR0ESWoMf
+qzKXvTunrTX8H560wpqn2D6WgWUcAb4XHyP/84wblE+GQGSIrn2nmYp0mXLpb1aNWu8iPh/iBHUg
+YPRU6QvsrvKvoH3shFyYhc2SCYA+Mzb73pWdPDYcs2a47F04MdsMVe7jkvi7Cwfu4znYsyvXghSI
+6NdPOGyfPzIvI9mm/nHLkSmX1IMdgtet5XkLQjweAjnIlW1kh3BbUu5BB2Qyj0modv4Y8GTZ7d/5
+7Wx/cdWm01sQbAAAAAAAAA==
 
 
---=-5LIT3fi4jS4vd0g6W8cz--
+--=-0tYzmf4BE3oYFUpYV34G--
