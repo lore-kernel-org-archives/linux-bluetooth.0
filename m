@@ -6,235 +6,155 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E32EC4360C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 20:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5ACC4360C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 20:41:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F687222C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 20:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FA2C222C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 20:41:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728777AbfIZUkw (ORCPT
+        id S1728808AbfIZUlD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Sep 2019 16:40:52 -0400
-Received: from mga18.intel.com ([134.134.136.126]:18723 "EHLO mga18.intel.com"
+        Thu, 26 Sep 2019 16:41:03 -0400
+Received: from mga11.intel.com ([192.55.52.93]:58524 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727948AbfIZUkw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Sep 2019 16:40:52 -0400
+        id S1727948AbfIZUlD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 26 Sep 2019 16:41:03 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 13:40:51 -0700
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 13:41:02 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,553,1559545200"; 
-   d="p7s'?scan'208";a="201781252"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by orsmga002.jf.intel.com with ESMTP; 26 Sep 2019 13:40:51 -0700
-Received: from orsmsx160.amr.corp.intel.com (10.22.226.43) by
- ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 26 Sep 2019 13:40:50 -0700
+   d="p7s'?scan'208";a="189237226"
+Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
+  by fmsmga008.fm.intel.com with ESMTP; 26 Sep 2019 13:41:02 -0700
+Received: from orsmsx152.amr.corp.intel.com (10.22.226.39) by
+ ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 26 Sep 2019 13:41:01 -0700
 Received: from orsmsx103.amr.corp.intel.com ([169.254.5.5]) by
- ORSMSX160.amr.corp.intel.com ([169.254.13.218]) with mapi id 14.03.0439.000;
- Thu, 26 Sep 2019 13:40:50 -0700
+ ORSMSX152.amr.corp.intel.com ([169.254.8.93]) with mapi id 14.03.0439.000;
+ Thu, 26 Sep 2019 13:41:00 -0700
 From:   "Stotland, Inga" <inga.stotland@intel.com>
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Gix, Brian" <brian.gix@intel.com>
 CC:     "michal.lowas-rzechonek@silvair.com" 
         <michal.lowas-rzechonek@silvair.com>
-Subject: Re: [PATCH BlueZ v3 2/3] mesh: Explicit Remote/Local Device key
- usage
-Thread-Topic: [PATCH BlueZ v3 2/3] mesh: Explicit Remote/Local Device key
- usage
-Thread-Index: AQHVdJZcl+jjDXdot0aZAbg8fHHFRKc+4YiA
-Date:   Thu, 26 Sep 2019 20:40:50 +0000
-Message-ID: <3750c6bf249398efb5a84c44fdc9c2e6c83b4d8b.camel@intel.com>
+Subject: Re: [PATCH BlueZ v3 3/3] mesh: Fix Key Ring permissions for local
+ nodes
+Thread-Topic: [PATCH BlueZ v3 3/3] mesh: Fix Key Ring permissions for local
+ nodes
+Thread-Index: AQHVdJZoFMOUUqc+tEyrdZ8iI4HYlac+4ZOA
+Date:   Thu, 26 Sep 2019 20:41:00 +0000
+Message-ID: <3c389010afa470574d5a90a4dc31a2bad9c26e84.camel@intel.com>
 References: <20190926181444.4916-1-brian.gix@intel.com>
-         <20190926181444.4916-3-brian.gix@intel.com>
-In-Reply-To: <20190926181444.4916-3-brian.gix@intel.com>
+         <20190926181444.4916-4-brian.gix@intel.com>
+In-Reply-To: <20190926181444.4916-4-brian.gix@intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.251.132.116]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-YJONW2UH7rLC3CWS92YN"
+        protocol="application/x-pkcs7-signature"; boundary="=-AFEzl1ueFepWo0l2YJNC"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-YJONW2UH7rLC3CWS92YN
+--=-AFEzl1ueFepWo0l2YJNC
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Brian,
 
 On Thu, 2019-09-26 at 11:14 -0700, Brian Gix wrote:
-> When sending or receiving Device Key (privileged) mesh messages, the
-> remote vs local device key must be specified. This allows Apps to
-> specify Key Ring stored device keys, and sanity checks that the
-> correct
-> key exists before allowing the transmission. Loopback messages to
-> local
-> servers *must* use keys from the Key Ring to indicate privilege has
-> been
-> granted.
+> We do *not* automatically create populated key rings for imported or
+> joined nodes,=20
+
+Why not for Import()? Since both the DevKey and NetKey are in the
+possesion of the node...
+
+> but we also do not *forbid* any node from adding a key
+> in it's possesion to the local key ring.
 > ---
->  mesh/model.c | 11 +++++++----
->  mesh/node.c  | 25 +++++++++++++++----------
->  2 files changed, 22 insertions(+), 14 deletions(-)
+>  mesh/manager.c |  5 -----
+>  mesh/node.c    | 15 ---------------
+>  2 files changed, 20 deletions(-)
 >=20
-> diff --git a/mesh/model.c b/mesh/model.c
-> index a06b684a5..e9b346102 100644
-> --- a/mesh/model.c
-> +++ b/mesh/model.c
-> @@ -735,14 +735,16 @@ static int add_sub(struct mesh_net *net, struct
-> mesh_model *mod,
->  }
-> =20
->  static void send_dev_key_msg_rcvd(struct mesh_node *node, uint8_t
-> ele_idx,
-> -					uint16_t src, uint16_t net_idx,
-> -					uint16_t size, const uint8_t
-> *data)
-> +					uint16_t src, uint16_t app_idx,
-> +					uint16_t net_idx, uint16_t
-> size,
-> +					const uint8_t *data)
+> diff --git a/mesh/manager.c b/mesh/manager.c
+> index 501ec10fe..633597659 100644
+> --- a/mesh/manager.c
+> +++ b/mesh/manager.c
+> @@ -282,7 +282,6 @@ static struct l_dbus_message
+> *import_node_call(struct l_dbus *dbus,
+>  						void *user_data)
 >  {
->  	struct l_dbus *dbus =3D dbus_get_bus();
->  	struct l_dbus_message *msg;
->  	struct l_dbus_message_builder *builder;
->  	const char *owner;
->  	const char *path;
-> +	bool remote =3D (app_idx !=3D APP_IDX_DEV_LOCAL);
+>  	struct mesh_node *node =3D user_data;
+> -	struct mesh_net *net =3D node_get_net(node);
+>  	struct l_dbus_message_iter iter_key;
+>  	uint16_t primary;
+>  	uint8_t num_ele;
+> @@ -298,10 +297,6 @@ static struct l_dbus_message
+> *import_node_call(struct l_dbus *dbus,
+>  		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+>  							"Bad device
+> key");
 > =20
->  	owner =3D node_get_owner(node);
->  	path =3D node_get_element_path(node, ele_idx);
-> @@ -758,6 +760,7 @@ static void send_dev_key_msg_rcvd(struct
-> mesh_node *node, uint8_t ele_idx,
->  	builder =3D l_dbus_message_builder_new(msg);
+> -	if (mesh_net_is_local_address(net, primary, num_ele))
+> -		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+> -					"Cannot overwrite local device
+> key");
+> -
+>  	if (!keyring_put_remote_dev_key(node, primary, num_ele, key))
+>  		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
 > =20
->  	l_dbus_message_builder_append_basic(builder, 'q', &src);
-> +	l_dbus_message_builder_append_basic(builder, 'b', &remote);
->  	l_dbus_message_builder_append_basic(builder, 'q', &net_idx);
->  	dbus_append_byte_array(builder, data, size);
-> =20
-> @@ -936,8 +939,8 @@ bool mesh_model_rx(struct mesh_node *node, bool
-> szmict, uint32_t seq0,
->  			else if (decrypt_idx =3D=3D APP_IDX_DEV_REMOTE ||
->  				(decrypt_idx =3D=3D APP_IDX_DEV_LOCAL &&
->  				 mesh_net_is_local_address(net, src,
-> 1)))
-> -				send_dev_key_msg_rcvd(node, i, src, 0,
-> -						forward.size,
-> forward.data);
-> +				send_dev_key_msg_rcvd(node, i, src,
-> decrypt_idx,
-> +						0, forward.size,
-> forward.data);
->  		}
-> =20
->  		/*
 > diff --git a/mesh/node.c b/mesh/node.c
-> index b6824f505..833377e99 100644
+> index 833377e99..af45a6130 100644
 > --- a/mesh/node.c
 > +++ b/mesh/node.c
-> @@ -1976,7 +1976,8 @@ static struct l_dbus_message
-> *dev_key_send_call(struct l_dbus *dbus,
->  	const char *sender, *ele_path;
->  	struct l_dbus_message_iter iter_data;
->  	struct node_element *ele;
-> -	uint16_t dst, net_idx, src;
-> +	uint16_t dst, app_idx, net_idx, src;
-> +	bool remote;
->  	uint8_t *data;
->  	uint32_t len;
+> @@ -1681,7 +1681,6 @@ static void get_managed_objects_cb(struct
+> l_dbus_message *msg, void *user_data)
 > =20
-> @@ -1987,8 +1988,12 @@ static struct l_dbus_message
-> *dev_key_send_call(struct l_dbus *dbus,
->  	if (strcmp(sender, node->owner))
->  		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED,
-> NULL);
+>  	} else if (req->type =3D=3D REQUEST_TYPE_IMPORT) {
+>  		struct node_import *import =3D req->import;
+> -		struct keyring_net_key net_key;
 > =20
-> -	if (!l_dbus_message_get_arguments(msg, "oqqay", &ele_path,
-> &dst,
-> -							&net_idx,
-> &iter_data))
-> +	if (!l_dbus_message_get_arguments(msg, "oqbqay", &ele_path,
-> &dst,
-> +						&remote, &net_idx,
-> &iter_data))
-> +		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-> +
-> +	/* Loopbacks to local servers must use *remote* addressing */
-> +	if (!remote && mesh_net_is_local_address(node->net, dst, 1))
->  		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+>  		if (!create_node_config(node, node->uuid))
+>  			goto fail;
+> @@ -1692,23 +1691,9 @@ static void get_managed_objects_cb(struct
+> l_dbus_message *msg, void *user_data)
+>  					import->net_idx, import-
+> >net_key))
+>  			goto fail;
 > =20
->  	ele =3D l_queue_find(node->elements, match_element_path,
-> ele_path);
-> @@ -1999,13 +2004,13 @@ static struct l_dbus_message
-> *dev_key_send_call(struct l_dbus *dbus,
->  	src =3D node_get_primary(node) + ele->idx;
+> -		memcpy(net_key.old_key, import->net_key, 16);
+> -		net_key.net_idx =3D import->net_idx;
+> -		if (import->flags.kr)
+> -			net_key.phase =3D KEY_REFRESH_PHASE_TWO;
+> -		else
+> -			net_key.phase =3D KEY_REFRESH_PHASE_NONE;
+> -
+>  		/* Initialize directory for storing keyring info */
+>  		init_storage_dir(node);
 > =20
->  	if (!l_dbus_message_iter_get_fixed_array(&iter_data, &data,
-> &len) ||
-> -					!len || len > MAX_MSG_LEN)
-> +						!len || len >
-> MAX_MSG_LEN)
->  		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
->  							"Incorrect
-> data");
-> =20
-> -	/* TODO: use net_idx */
-> -	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE,
-> net_idx,
-> -							DEFAULT_TTL,
-> data, len))
-> +	app_idx =3D remote ? APP_IDX_DEV_REMOTE : APP_IDX_DEV_LOCAL;
-> +	if (!mesh_model_send(node, src, dst, app_idx, net_idx,
-> DEFAULT_TTL,
-> +								data,
-> len))
->  		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
+> -		if (!keyring_put_remote_dev_key(node, import->unicast,
+> -						num_ele, import-
+> >dev_key))
+> -			goto fail;
+> -
+> -		if (!keyring_put_net_key(node, import->net_idx,
+> &net_key))
+> -			goto fail;
+> -
+>  	} else {
+>  		/* Callback for create node request */
+>  		struct keyring_net_key net_key;
 
-I think that mesh_model_send() should be modified to return an error
-code (int) instead of boolean. Otherwise, it may fail for a different
-reason than a mismatch in device key and the returned error is
-misleading.
-In fact, the Send() call returns D-Bus "Failed" error upon getting
-"false" from mesh_model_send() and this is not documented in the API
-doc.
 
-This probably should go a separate fix.
 
-> =20
->  	return l_dbus_message_new_method_return(msg);
-> @@ -2226,9 +2231,9 @@ static void setup_node_interface(struct
-> l_dbus_interface *iface)
->  						"element_path",
-> "destination",
->  						"key_index", "data");
->  	l_dbus_interface_method(iface, "DevKeySend", 0,
-> dev_key_send_call,
-> -						"", "oqqay",
-> "element_path",
-> -						"destination",
-> "net_index",
-> -						"data");
-> +						"", "oqbqay",
-> "element_path",
-> +						"destination",
-> "remote",
-> +						"net_index", "data");
->  	l_dbus_interface_method(iface, "Publish", 0, publish_call, "",
-> "oqay",
->  					"element_path", "model_id",
-> "data");
->  	l_dbus_interface_method(iface, "VendorPublish", 0,
-> vendor_publish_call,
-
---=-YJONW2UH7rLC3CWS92YN
+--=-AFEzl1ueFepWo0l2YJNC
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -290,13 +210,13 @@ FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
 MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
 ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
 ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
-CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwOTI2MjA0MDQ5WjAjBgkqhkiG9w0BCQQxFgQU
-sGcbCiDPxMkUjrl1/pRl+rvGxQUwDQYJKoZIhvcNAQEBBQAEggEAgN1aV7Pck8x5J+E5tK5hEava
-G8aXzW1pi88SsGIGzCdGV1h1R1GIda6s2FKH6TZhN+bSB+ZN6rzB+lPTCTNe37g5xMQ/0Wf3GLlK
-xsUDKMW3G6OXkz254KIgjzQQwKIVEBrOGUg+6oFEOxtHnUrCTiM6biIC0Jz2fz+A4jUeX4kYLR7v
-P0RlU/HcqqH5bGy6Y7PWCYmlm0/g5UtKCpZnBH5LaWkfkfWXer7XX0EXdrC5XNEw7Vdai3vwuyeq
-3H6roOpdifW0VPLY6Jho0G2pf0l2tB2w6AJeEaABOMRJMi1cjsgO/Jf3GMMM86pv3z6BJTTwQyI7
-5EqHs9CipYcCBQAAAAAAAA==
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwOTI2MjA0MDU5WjAjBgkqhkiG9w0BCQQxFgQU
+pw5duTrqCM43lxzC/Noa0jHbtvUwDQYJKoZIhvcNAQEBBQAEggEAdyLYALkjT1/xub4qxWUxwtBg
+XK96uZzz8KJaPhFLAaIUYK3sDln1dQkTXtck/TR5vyYlIlbqESc71Tz69wk3wHsaCB1aQqQlWWLT
+VMLCmraLIHnzUwP+xw9vDpYPutFNJ+5lFQuoA0BA/mgXlkIJ7qopuYhVvMa0rsykTVR6rnCcmgoO
+Zb/3UkeoKv1T7jyyetc+thQlKnmZ+h8ZgeVuispbp2y7NyTQaIkGsWLEYihlVLmfG2N7WZ4T9qba
+5AoX6UbED0g2zyGZCLa1hCn1D/Y63w1dOcVWDQ16N+wi9fYXANI0lLCUBfQDbzXcy5es+Gm+Z3+A
+9yjBoVcluzzLoAAAAAAAAA==
 
 
---=-YJONW2UH7rLC3CWS92YN--
+--=-AFEzl1ueFepWo0l2YJNC--
