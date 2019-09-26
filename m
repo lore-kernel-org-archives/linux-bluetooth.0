@@ -2,52 +2,88 @@ Return-Path: <SRS0=vBm7=XV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URI_HEX autolearn=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A05B2ECE589
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 16:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C69FFC4360C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 16:48:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C1B8222C9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 16:40:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72FEF222C7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 16:48:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mnmoran.org header.i=@mnmoran.org header.b="eMNl8mdW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727501AbfIZQkz (ORCPT
+        id S1727464AbfIZQsR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Sep 2019 12:40:55 -0400
-Received: from samaritain1.u-bordeaux2.fr ([193.51.8.10]:37488 "EHLO
-        samaritain1.u-bordeaux2.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727445AbfIZQkz (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Sep 2019 12:40:55 -0400
-X-Greylist: delayed 10778 seconds by postgrey-1.27 at vger.kernel.org; Thu, 26 Sep 2019 12:40:54 EDT
-Received: from samaritain1.u-bordeaux2.fr (samaritain1.u-bordeaux2.fr [127.0.0.1])
-        by samaritain1.u-bordeaux2.fr (8.13.8/8.13.8) with ESMTP id x8QDfBna009996
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Sep 2019 15:41:11 +0200
-Received: (from webvalux@localhost)
-        by samaritain1.u-bordeaux2.fr (8.13.8/8.13.8/Submit) id x8QDfB9H009991;
-        Thu, 26 Sep 2019 15:41:11 +0200
-X-Authentication-Warning: samaritain1.u-bordeaux2.fr: webvalux set sender to emmanuel.baugier@u-bordeaux2.fr using -f
+        Thu, 26 Sep 2019 12:48:17 -0400
+Received: from hoster906.com ([192.252.156.27]:44032 "EHLO hoster906.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726029AbfIZQsR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 26 Sep 2019 12:48:17 -0400
+X-Greylist: delayed 398 seconds by postgrey-1.27 at vger.kernel.org; Thu, 26 Sep 2019 12:48:16 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=to:from
+        :subject:message-id:date:mime-version:content-type; s=dkim; bh=x
+        AYE61VHFn2u0Zg0iFcrXKBzwe0hb2qE41uDqPoW0Zk=; b=eMNl8mdWU3bVqWMbm
+        vAFkt/F3b3l3wUIysvt6By5hsNmpBgbJi/efpFsyX77Mu59CjtJK5F0IZwX+kVuq
+        NOowHhHS3wgL3UXIZj1nUAxF3aZLD5cpN1GpjhuFlOjKPtvwBpY0rj6FrnGLYWWA
+        sntkWM95CiOrepV0gvRiQHHSec=
+Received: (qmail 18598 invoked by uid 503); 26 Sep 2019 16:41:36 -0000
+Received: from unknown (HELO ?192.168.254.100?) (pop-before-smtp@50.96.104.71)
+  by hoster906.com with ESMTPA; 26 Sep 2019 16:41:36 -0000
 To:     linux-bluetooth@vger.kernel.org
-Subject: =?utf-8?B?Q29weSBvZjog546p55qE5piv5ri45oiP77yM5ou855qE5piv5pyq5p2l44CC?=
-Date:   Thu, 26 Sep 2019 15:41:11 +0200
-From:   Valuxtract <emmanuel.baugier@u-bordeaux2.fr>
-Reply-To: =?utf-8?B?6JS66Z6g5rGg?= <linux-bluetooth@vger.kernel.org>
-Message-ID: <2c17c636e0d9ce9bd125bf7244e97fa0@www.valuxtract.univ-bordeauxsegalen.fr>
-X-Priority: 3
-X-Mailer: PHPMailer 5.2.1 (http://code.google.com/a/apache-extras.org/p/phpmailer/)
+From:   "Michael N. Moran" <mike@mnmoran.org>
+Subject: Meshctl GATT MTU Patch
+Message-ID: <44f46ff3-216f-7205-336a-2d0fb150818a@mnmoran.org>
+Date:   Thu, 26 Sep 2019 12:41:30 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/mixed;
+ boundary="------------936B522E3615FCC15D77EC08"
+Content-Language: en-MW
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a copy of the following message you sent to Martine Mietton-Peuchot via Valuxtract
+This is a multi-part message in MIME format.
+--------------936B522E3615FCC15D77EC08
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This is an enquiry email via http://www.valuxtract.univ-bordeauxsegalen.fr/ from:
-蔺鞠池 <linux-bluetooth@vger.kernel.org>
+The attached patch fixes a problem in the meshctl gatt 
+provisioner where the GATT MTU is truncated.
 
-优享好礼註测即送58圜，满188圜即可出窾，www.1643999.com ，天天专享以小博大，最高侟120鎹68，入款即享2.0%优惠，，存取款秒到账 ！！
 
+-- 
+Michael N. Moran           (h) 770 704 9751
+218 Wilshire Terrace       (c) 678 521 5460
+White, GA, USA 30184       http://mnmoran.org
+
+
+--------------936B522E3615FCC15D77EC08
+Content-Type: text/x-patch;
+ name="bluez.mesh.mtu.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="bluez.mesh.mtu.patch"
+
+Fix GATT MTU truncation in the max_len calculation.
+
+diff --git a/tools/mesh/gatt.c b/tools/mesh/gatt.c
+index 0a942d4..c9e789c 100644
+--- a/tools/mesh/gatt.c
++++ b/tools/mesh/gatt.c
+@@ -189,7 +189,7 @@ static bool sock_write(struct io *io, void *user_data)
+ 	struct write_data *data = user_data;
+ 	struct iovec iov[2];
+ 	uint8_t sar;
+-	uint8_t max_len;
++	uint16_t max_len;
+ 
+ 	if (data == NULL)
+ 		return true;
+
+--------------936B522E3615FCC15D77EC08--
