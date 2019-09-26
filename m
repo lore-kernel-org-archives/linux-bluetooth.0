@@ -2,88 +2,73 @@ Return-Path: <SRS0=vBm7=XV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69FFC4360C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 16:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F9CC4360C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 18:14:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72FEF222C7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 16:48:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mnmoran.org header.i=@mnmoran.org header.b="eMNl8mdW"
+	by mail.kernel.org (Postfix) with ESMTP id 6B86421A4A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Sep 2019 18:14:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727464AbfIZQsR (ORCPT
+        id S1727727AbfIZSOz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Sep 2019 12:48:17 -0400
-Received: from hoster906.com ([192.252.156.27]:44032 "EHLO hoster906.com"
+        Thu, 26 Sep 2019 14:14:55 -0400
+Received: from mga03.intel.com ([134.134.136.65]:23148 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726029AbfIZQsR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Sep 2019 12:48:17 -0400
-X-Greylist: delayed 398 seconds by postgrey-1.27 at vger.kernel.org; Thu, 26 Sep 2019 12:48:16 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=to:from
-        :subject:message-id:date:mime-version:content-type; s=dkim; bh=x
-        AYE61VHFn2u0Zg0iFcrXKBzwe0hb2qE41uDqPoW0Zk=; b=eMNl8mdWU3bVqWMbm
-        vAFkt/F3b3l3wUIysvt6By5hsNmpBgbJi/efpFsyX77Mu59CjtJK5F0IZwX+kVuq
-        NOowHhHS3wgL3UXIZj1nUAxF3aZLD5cpN1GpjhuFlOjKPtvwBpY0rj6FrnGLYWWA
-        sntkWM95CiOrepV0gvRiQHHSec=
-Received: (qmail 18598 invoked by uid 503); 26 Sep 2019 16:41:36 -0000
-Received: from unknown (HELO ?192.168.254.100?) (pop-before-smtp@50.96.104.71)
-  by hoster906.com with ESMTPA; 26 Sep 2019 16:41:36 -0000
+        id S1726029AbfIZSOy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 26 Sep 2019 14:14:54 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 11:14:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,552,1559545200"; 
+   d="scan'208";a="196460992"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.251.25.152])
+  by FMSMGA003.fm.intel.com with ESMTP; 26 Sep 2019 11:14:53 -0700
+From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-From:   "Michael N. Moran" <mike@mnmoran.org>
-Subject: Meshctl GATT MTU Patch
-Message-ID: <44f46ff3-216f-7205-336a-2d0fb150818a@mnmoran.org>
-Date:   Thu, 26 Sep 2019 12:41:30 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Cc:     brian.gix@intel.com, inga.stotland@intel.com,
+        michal.lowas-rzechonek@silvair.com
+Subject: [PATCH BlueZ v3 0/3] mesh: Fix Remote/Local dev key usage
+Date:   Thu, 26 Sep 2019 11:14:41 -0700
+Message-Id: <20190926181444.4916-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------936B522E3615FCC15D77EC08"
-Content-Language: en-MW
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------936B522E3615FCC15D77EC08
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+V3:  By popular demand, the name "remote" is now used for both DevKeySend()
+and DevKeyMessageReceived().
 
-The attached patch fixes a problem in the meshctl gatt 
-provisioner where the GATT MTU is truncated.
+In DevKeySend(), setting remote == true means that the Key Ring *must* be
+used to encrypt the outgoing message, and a failure will be returned if
+the requested destination address does not include a device key in the
+local key ring. For remote == false requests, the request will be rejected
+if the destination is an element on the local node.
 
+In DevKeyMessageReceived(), the remote boolean will be set == true if it
+required the key ring to decrypot the message.  If remote == false, this
+means that the local nodes Device Key successfully decrypted the message,
+and the message may be used to change or query privileged states.
+
+
+Brian Gix (3):
+  mesh: Add local/remote bools to DevKey transactions
+  mesh: Use explicit Local vs Remote Device key usage
+  mesh: Fix Key Ring permissions for local nodes
+
+ doc/mesh-api.txt | 17 ++++++++++++++---
+ mesh/manager.c   |  5 -----
+ mesh/model.c     | 11 +++++++----
+ mesh/node.c      | 40 +++++++++++++++-------------------------
+ 4 files changed, 36 insertions(+), 37 deletions(-)
 
 -- 
-Michael N. Moran           (h) 770 704 9751
-218 Wilshire Terrace       (c) 678 521 5460
-White, GA, USA 30184       http://mnmoran.org
+2.21.0
 
-
---------------936B522E3615FCC15D77EC08
-Content-Type: text/x-patch;
- name="bluez.mesh.mtu.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="bluez.mesh.mtu.patch"
-
-Fix GATT MTU truncation in the max_len calculation.
-
-diff --git a/tools/mesh/gatt.c b/tools/mesh/gatt.c
-index 0a942d4..c9e789c 100644
---- a/tools/mesh/gatt.c
-+++ b/tools/mesh/gatt.c
-@@ -189,7 +189,7 @@ static bool sock_write(struct io *io, void *user_data)
- 	struct write_data *data = user_data;
- 	struct iovec iov[2];
- 	uint8_t sar;
--	uint8_t max_len;
-+	uint16_t max_len;
- 
- 	if (data == NULL)
- 		return true;
-
---------------936B522E3615FCC15D77EC08--
