@@ -2,203 +2,290 @@ Return-Path: <SRS0=evP7=XW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42486C4360C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 02:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D22C4360C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 02:54:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1442520872
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 02:50:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 693B020872
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 02:54:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728644AbfI0Cu0 (ORCPT
+        id S1728169AbfI0CyG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Sep 2019 22:50:26 -0400
-Received: from mga11.intel.com ([192.55.52.93]:21067 "EHLO mga11.intel.com"
+        Thu, 26 Sep 2019 22:54:06 -0400
+Received: from mga05.intel.com ([192.55.52.43]:29752 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727796AbfI0Cu0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Sep 2019 22:50:26 -0400
+        id S1728270AbfI0CyF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 26 Sep 2019 22:54:05 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 19:50:26 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2019 19:54:03 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,553,1559545200"; 
-   d="p7s'?scan'208";a="219621729"
-Received: from orsmsx104.amr.corp.intel.com ([10.22.225.131])
-  by fmsmga002.fm.intel.com with ESMTP; 26 Sep 2019 19:50:25 -0700
-Received: from orsmsx153.amr.corp.intel.com (10.22.226.247) by
- ORSMSX104.amr.corp.intel.com (10.22.225.131) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 26 Sep 2019 19:50:25 -0700
+   d="p7s'?scan'208";a="219622477"
+Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
+  by fmsmga002.fm.intel.com with ESMTP; 26 Sep 2019 19:54:03 -0700
 Received: from orsmsx103.amr.corp.intel.com ([169.254.5.5]) by
- ORSMSX153.amr.corp.intel.com ([169.254.12.237]) with mapi id 14.03.0439.000;
- Thu, 26 Sep 2019 19:50:25 -0700
+ ORSMSX110.amr.corp.intel.com ([169.254.10.139]) with mapi id 14.03.0439.000;
+ Thu, 26 Sep 2019 19:54:02 -0700
 From:   "Stotland, Inga" <inga.stotland@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Gix, Brian" <brian.gix@intel.com>
-CC:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-Subject: Re: [PATCH BlueZ v3 3/3] mesh: Fix Key Ring permissions for local
- nodes
-Thread-Topic: [PATCH BlueZ v3 3/3] mesh: Fix Key Ring permissions for local
- nodes
-Thread-Index: AQHVdJZoFMOUUqc+tEyrdZ8iI4HYlac+4ZOAgAAuiwCAADisAA==
-Date:   Fri, 27 Sep 2019 02:50:25 +0000
-Message-ID: <112b44e9e00c909a1d98997df1eeed0c2151eb0b.camel@intel.com>
-References: <20190926181444.4916-1-brian.gix@intel.com>
-         <20190926181444.4916-4-brian.gix@intel.com>
-         <3c389010afa470574d5a90a4dc31a2bad9c26e84.camel@intel.com>
-         <0a384749e155689d7981a443059d6cb5a6522f75.camel@intel.com>
-In-Reply-To: <0a384749e155689d7981a443059d6cb5a6522f75.camel@intel.com>
+Subject: Re: mesh: org.bluez.mesh.Element.MessageReceived method does not
+ provide destination address
+Thread-Topic: mesh: org.bluez.mesh.Element.MessageReceived method does not
+ provide destination address
+Thread-Index: AQHVX2LEtJoH6czNyE6Xu9DaIe4hzqcxs2yAgAuqpwCAAVPggIAAWhSAgAA0QYCAADPtAA==
+Date:   Fri, 27 Sep 2019 02:54:03 +0000
+Message-ID: <4024572b174a47b80647eee79da37c20bac7bc51.camel@intel.com>
+References: <20190830184301.zd3zaqrw7mv6r252@kynes>
+         <20190918085239.xhahxoeqjkcrk3bl@mlowasrzechonek2133>
+         <3c5858c94b3e08a61c5ff8493f9b00f5f77d0aac.camel@intel.com>
+         <4b57242b15ccb44ac123858ce7bdf6e0e526b3e0.camel@intel.com>
+         <a0442c7485fef2bfde9bc52283a5c9dfc0b43515.camel@intel.com>
+         <b7e8c06d747e4625cdeaf59989ba3d8195d430cb.camel@intel.com>
+In-Reply-To: <b7e8c06d747e4625cdeaf59989ba3d8195d430cb.camel@intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.251.130.16]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-+E6D3b31g91Q0upBf1Vb"
+        protocol="application/x-pkcs7-signature"; boundary="=-sQl29ECVOIySZM6pHyH6"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---=-+E6D3b31g91Q0upBf1Vb
+--=-sQl29ECVOIySZM6pHyH6
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Brian,
 
-On Thu, 2019-09-26 at 23:27 +0000, Gix, Brian wrote:
+On Thu, 2019-09-26 at 23:48 +0000, Gix, Brian wrote:
+> Hi Inga,
+>=20
 > On Thu, 2019-09-26 at 20:41 +0000, Stotland, Inga wrote:
-> > Hi Brian,
+> > Hi Brian, Michal,
 > >=20
-> > On Thu, 2019-09-26 at 11:14 -0700, Brian Gix wrote:
-> > > We do *not* automatically create populated key rings for imported
-> > > or
-> > > joined nodes,
+> > Pairing down the cc list since we are down to implementation
+> > details.
 > >=20
-> > Why not for Import()? Since both the DevKey and NetKey are in the
-> > possesion of the node...
+> > On Thu, 2019-09-26 at 15:18 +0000, Gix, Brian wrote:
+> > > Hi Inga, Micha=C5=82,
+> > >=20
+> > > On Wed, 2019-09-25 at 19:02 +0000, Stotland, Inga wrote:
+> > > > Hi Michal,
+> > > >=20
+> > > > On Wed, 2019-09-18 at 10:52 +0200, Micha=C5=82 Lowas-Rzechonek
+> > > > wrote:
+> > > > > Hi Brian,
+> > > > >=20
+> > > > > > Imagine a dot-matrix, where each pixel is a mesh node.
+> > > > > >=20
+> > > > > > Each of these pixels implements two models:
+> > > > > >     on element 0, a GenericOnOffServer controlling the
+> > > > > > light
+> > > > > > output
+> > > > > >     on element 1, a Blinkenlights Server model
+> > > > > >=20
+> > > > > > Blinkenlights Server extends GenericOnOff Server and
+> > > > > > GenericOnOff
+> > > > > > Client, and on top of that contains a translation table
+> > > > > > mapping
+> > > > > > group
+> > > > > > address to either 'ON' or 'OFF'.
+> > > > > >=20
+> > > > > > Now, when Blinkenlights Server receives a GenericOnOff Set
+> > > > > > message,
+> > > > > > it
+> > > > > > looks up the destination address at the translation table,
+> > > > > > and
+> > > > > > sends a
+> > > > > > *different* GenericOnOff Set to *its own* element 0, with
+> > > > > > target
+> > > > > > value
+> > > > > > determined by the translation entry.
+> > > > > >=20
+> > > > > > This allows users to configure each node in such a way,
+> > > > > > that
+> > > > > > sending a
+> > > > > > *single* message to a group address causes all pixels to
+> > > > > > switch
+> > > > > > to
+> > > > > > a
+> > > > > > preconfigured pattern *at the same time*.
+> > > > >=20
+> > > > > Per conversation with Piotr, I'd like to revisit the
+> > > > > discussion
+> > > > > and
+> > > > > provide more details about our use case for models knowing
+> > > > > the
+> > > > > destination address.
+> > > > >=20
+> > > > > Please see a diagram at http://ujeb.se/BmTIW.
+> > > > >=20
+> > > > > The main reason we map scenes using destination addresses is
+> > > > > that
+> > > > > such a
+> > > > > setup consumes much less unicast addresses.
+> > > > >=20
+> > > > > Assuming that:
+> > > > >  S - number of switches
+> > > > >  B - number of buttons (elements) on a switch
+> > > > >  N - nunber of lamps
+> > > > >=20
+> > > > > With a 'regular' case, number of consumed unicast addresses
+> > > > > is
+> > > > >     S*B + N*(B+1)
+> > > > >=20
+> > > > > With the destination mapping, it becomes
+> > > > >     S*B + N*2
+> > > > >=20
+> > > > > Since we typically use 4 button switches (B=3D4), without
+> > > > > translation
+> > > > > we
+> > > > > consume unicast address space at a *much* faster rate.
+> > > > >=20
+> > > > > reagrds
+> > > >=20
+> > > > Okay, this is a good argument for exposing the subscription
+> > > > address
+> > > > in
+> > > > MessageReceived().
+> > > > It's better to separate the method into two, e.g.
+> > > > MessageReceived()
+> > > > and
+> > > > MessageReceivedVirtual().
+> > >=20
+> > > I wonder if we could still do this with a single method.  I can
+> > > think
+> > > of 2 methodologies:
+> > >=20
+> > > 1. A simple way that just uses the U16 DST field instead of
+> > > the "subscription" boolean (not a 100% reliable differentiator
+> > > for Virtuals, but may be sufficient for the use cases given).
+> > >=20
+> > > 2. Replacing the subscription boolean with a u32 "Subscription
+> > > ID".
+> > > A subscription ID value of 0x000000000 would indicate that the
+> > > message was received with the Unicast address, and values from
+> > > 1 - 0xFFFFFFFF mean a Subscription that can be queried for. This
+> > > would be accompanied by a new daemon method which could look up
+> > > the details of the subscription:
+> > >=20
+> > > {dict subcription}  LookupSubscription(u32 Sub_ID)
+> > >=20
+> > > Both of these methodologies would allow an App to be simpler,
+> > > with no added D-Bus Methods required.
+> > >=20
+> > > With the 2nd methodology, the subscription only needs to be
+> > > looked up once (or not at all) to 100% differentiate between
+> > > discrete subscriptions.
+> > >=20
+> > > I *really* do not want an additional mandatory App Method. Most
+> > > Apps will be simpler than that, and truely not care to
+> > > differentiate between subscriptions...   Particularily Client
+> > > based Apps.
+> >=20
+> > While I am still in favor of two distinct methods (given choice,
+> > I'd
+> > always go with self-explanatory API), one method approach would
+> > work as
+> > well if accompanied by detailed and clear description in the mesh-
+> > api.txt doc.
+> >=20
+> > I vote against u16 destination field since there is no reason to
+> > create address space collision even though the chances are small.
+> >=20
+> > A single method "MessageReceived" method can be modified to include
+> > a
+> > subscription parameter as:
+> > 1) a dictionary with keys "Group" and "Label" (self explanatory if
+> > a
+> > bit cumbersome).
 >=20
-> There are two (known) use cases for Import()
+> If this use case is chosen, is it easy enough for an App
+> implementation
+> of this method to *ignore* the dictionary if the subscription
+> information
+> is not important to that model? (Again:  Thinking of simple
+> applications
+> that just want to know whether to respond to the message or not
+> because
+> it was or wasn't sent to the Unicast address)
 >=20
-> 1. Node previously existed on a different physical piece of hardware,
-> and is being migrated to this daemon.
+> > or
+> > 2) a u32 subscription ID that represents a subscription. This
+> > requires the daemon to maintain the relationship between "id" and
+> > the
+> > actual address. I believe the daemon does this anyway for virtual
+> > labels, but from the API design perspective this is not very clean
+> > IMHO, since it has a whiff of implementation details leaking into
+> > user
+> > interface API.
+> >=20
+> > No matter which approach is chosen, the subscriptions must be
+> > included
+> > in the model configuration dictionary for
+> > UpdateModelConfiguration()
+> > and in the corresponding dictionary for node configuration returned
+> > on
+> > successful execution of Attach().
+> >=20
+> > If we go with a single method and a u32 subscription id, the
+> > disctionary representation of the subscriptions should be a pair
+> > {id,
+> > actual subscription address}. This way there is no need for an
+> > additional daemon method.
 >=20
-> 2. Node was newly provisioned Out-Of-Band, and this is the net result
-> of the provisioning.
+> We have avoided dictionaries specifically to avoid mandating that
+> Applications need to have logic to parse them...  And with this,
+> they would have to parse the dictionary on *every message received*.
 >=20
-> In *neither* case is it a given that the Node should be able to
-> provision another node (the effect of adding
-> the Net Key to the key ring). In neither case is it a given that the
-> Node should be able to modify it's own
-> Config Server states (the effect of adding it's Device Key to the key
-> ring).
+> Again, I believe that 99% of applications will *not* be interested
+> in the specifics of the sunscription/group address info except to
+> differentiate between Unicast and non-Unicast addressing.
 >=20
-> However, if it *is* the case that one or more of these operations
-> should be available to the Node, the
-> Application that performed the Import may call the ImportSubnet()
-> and/or the ImportRemoteNode() methods. In
-> actuality, if this was the intent (particularily on a Node being
-> migrated) a key-ring of some sort should have
-> existed on the other physical piece of hardware.
+> That is why I am in favor of *non* complex arguments on the
+> MessageReceived() method.  An additional daemon method that returns
+> a dictionary only when asked (which even with scenes will be rare or
+> only once a session per subscription) will create less overall dbus
+> traffic.
 >=20
->=20
-> The point of this larger patch-set is to no longer assume that every
-> Node has the ability to use it's own
-> network keys to provision other nodes, or use it's own Device Key to
-> change it's own Config Server states.
->=20
-> Yes, that can still happen (as it can with non BlueZ nodes) but it
-> should be by a deliberate mechanism, not as
-> a "time saving default".
->=20
->=20
->=20
+The application is already dealing with dictionaries for the
+configuration update.
+I strongly feel that subscription addresses (since they are being
+exposed in MessageReceived() one way or the other) should be in the
+configuration dictionaries.
 
-Sounds good. Could you please add this description to the commit
-message?
+Also, if an app is not interested in subscripion, it may ignore the
+subscription parameter, doesn't matter what form it takes.
 
-> > > but we also do not *forbid* any node from adding a key
-> > > in it's possesion to the local key ring.
-> > > ---
-> > >  mesh/manager.c |  5 -----
-> > >  mesh/node.c    | 15 ---------------
-> > >  2 files changed, 20 deletions(-)
-> > >=20
-> > > diff --git a/mesh/manager.c b/mesh/manager.c
-> > > index 501ec10fe..633597659 100644
-> > > --- a/mesh/manager.c
-> > > +++ b/mesh/manager.c
-> > > @@ -282,7 +282,6 @@ static struct l_dbus_message
-> > > *import_node_call(struct l_dbus *dbus,
-> > >  void *user_data)
-> > >  {
-> > >  struct mesh_node *node =3D user_data;
-> > > -struct mesh_net *net =3D node_get_net(node);
-> > >  struct l_dbus_message_iter iter_key;
-> > >  uint16_t primary;
-> > >  uint8_t num_ele;
-> > > @@ -298,10 +297,6 @@ static struct l_dbus_message
-> > > *import_node_call(struct l_dbus *dbus,
-> > >  return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
-> > >  "Bad device
-> > > key");
-> > >=20
-> > > -if (mesh_net_is_local_address(net, primary, num_ele))
-> > > -return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
-> > > -"Cannot overwrite local device
-> > > key");
-> > > -
-> > >  if (!keyring_put_remote_dev_key(node, primary, num_ele, key))
-> > >  return dbus_error(msg, MESH_ERROR_FAILED, NULL);
-> > >=20
-> > > diff --git a/mesh/node.c b/mesh/node.c
-> > > index 833377e99..af45a6130 100644
-> > > --- a/mesh/node.c
-> > > +++ b/mesh/node.c
-> > > @@ -1681,7 +1681,6 @@ static void get_managed_objects_cb(struct
-> > > l_dbus_message *msg, void *user_data)
-> > >=20
-> > >  } else if (req->type =3D=3D REQUEST_TYPE_IMPORT) {
-> > >  struct node_import *import =3D req->import;
-> > > -struct keyring_net_key net_key;
-> > >=20
-> > >  if (!create_node_config(node, node->uuid))
-> > >  goto fail;
-> > > @@ -1692,23 +1691,9 @@ static void get_managed_objects_cb(struct
-> > > l_dbus_message *msg, void *user_data)
-> > >  import->net_idx, import-
-> > > > net_key))
-> > >  goto fail;
-> > >=20
-> > > -memcpy(net_key.old_key, import->net_key, 16);
-> > > -net_key.net_idx =3D import->net_idx;
-> > > -if (import->flags.kr)
-> > > -net_key.phase =3D KEY_REFRESH_PHASE_TWO;
-> > > -else
-> > > -net_key.phase =3D KEY_REFRESH_PHASE_NONE;
-> > > -
-> > >  /* Initialize directory for storing keyring info */
-> > >  init_storage_dir(node);
-> > >=20
-> > > -if (!keyring_put_remote_dev_key(node, import->unicast,
-> > > -num_ele, import-
-> > > > dev_key))
-> > > -goto fail;
-> > > -
-> > > -if (!keyring_put_net_key(node, import->net_idx,
-> > > &net_key))
-> > > -goto fail;
-> > > -
-> > >  } else {
-> > >  /* Callback for create node request */
-> > >  struct keyring_net_key net_key;
+> > Michal, any comments?
+> >=20
+> > > > Then it makes sense to add model subscription array as a
+> > > > dictionary
+> > > > entry in the UpdateModelConfiguration() as well as for the node
+> > > > configuration returned when calling Attach() method.
+> > > > Probably will have to have separate keys: "Groups" and
+> > > > "Virtuals".
+> > > >=20
+> >=20
+> > Regards,
+> > Inga
+> >=20
+> >=20
 
---=-+E6D3b31g91Q0upBf1Vb
+--=-sQl29ECVOIySZM6pHyH6
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -254,13 +341,13 @@ FDn6fGbJHisZdWX3bVamfpmPogThm1khlD7R4USu0eyym3JRh0tXJeAxggIXMIICEwIBATCBkDB5
 MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQK
 ExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWlu
 ZyBDQSA0QgITMwAAeRJvGZxlhdnerwAAAAB5EjAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsG
-CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwOTI3MDI1MDI0WjAjBgkqhkiG9w0BCQQxFgQU
-u7bxyzJHXsB8n2GZP+8mzxsWCCAwDQYJKoZIhvcNAQEBBQAEggEAGJXQFHikTXVH4mNGtz5/Lwr5
-FdE5q/SHXMvifFHIg5PoTDx1gjZdRr5/1OgCZLpCb7hnfmuRm2h0umdMNy73N+XY/wpwreKqeYWu
-AuCxhcCCTdg6UymF8jkOOAuXMLEIA24FxGoJOhJVEuc+nwQSSWxnNMfN+iT5Tu/haoCITx4uX6+d
-j4RZzGHKyOay4tLIiN/37u0wpWgyKC9uIUKKpnISSANkyHCwapwRf+fJxbUy06AwHyR37fer4SA8
-4zJDNQWH4inpdfi6cMQqD4b3RLtYc4EGL8Yf9iJq7RSLLTKZwYBxUQbvrupZ2JMMc97wgVpwT6kS
-d/c2L0zn7kx+AAAAAAAAAA==
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTkwOTI3MDI1NDAyWjAjBgkqhkiG9w0BCQQxFgQU
+U07iniwQVqmdt68wOZIdLOz2/VcwDQYJKoZIhvcNAQEBBQAEggEADaYGKMkiT+/8QHMdD0YOTSd8
+d27D8FvKPIqXXML/6kmcltr6QoZk1SqU5dliNdpwF/0HEgcIMAWrVsD0btZN+c7E/R7i94dEsdks
+jshM6oq6Km40Bp4cSjUbYfebhqZBWTPLNOIidITBbAb0qftGlp+uEyqOYfSZbnyYAEF57dLYZnAN
+mYCq8YcxBbff+u2Jf5Wlaz3ytEgGgQFBLvsthkMEmk0zOQmIQS69x/saPOTeVzYccA8GJ4/ZXvd5
+QdvaXVG7EodM//wmx3cFjzFlX7uVsyGN/WoQAHhedYL3/N1azU4N0qBR3a/GfAR3Ph4TV7fMdKCv
+TbHHZlBWnjsSeQAAAAAAAA==
 
 
---=-+E6D3b31g91Q0upBf1Vb--
+--=-sQl29ECVOIySZM6pHyH6--
