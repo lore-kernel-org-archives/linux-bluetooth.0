@@ -3,89 +3,114 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 429F0C4360C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 11:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A422C4360C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 14:39:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DCEE217D9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 11:26:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5924E217D7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 14:39:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="1a9Vlt3k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BsngVRIL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726163AbfI0L0S (ORCPT
+        id S1727427AbfI0OjE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Sep 2019 07:26:18 -0400
-Received: from mail-io1-f48.google.com ([209.85.166.48]:41079 "EHLO
-        mail-io1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726133AbfI0L0S (ORCPT
+        Fri, 27 Sep 2019 10:39:04 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:38703 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726926AbfI0OjD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Sep 2019 07:26:18 -0400
-Received: by mail-io1-f48.google.com with SMTP id r26so15303752ioh.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2019 04:26:17 -0700 (PDT)
+        Fri, 27 Sep 2019 10:39:03 -0400
+Received: by mail-oi1-f196.google.com with SMTP id m16so5397921oic.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2019 07:39:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=cxiZ8mHz0j28rl819694tQyEygOkwVXX3aZ9Pse7uLs=;
-        b=1a9Vlt3kr3NmheuNtoNX67f3qslKORHBNR7q19Sv30lw0wK6qofMEoxa/kK+Ac1vkO
-         s3Ep5FpiUohvIfYo5i3Z18kTGo5ra6jBiZOdgPxnmiKxtXmm8KGSk3rgFdcdgF8gprod
-         oqAu4T67jzfKVInb3zrIGgJUo1/a08wSGjVLOIdMDQmvTStxfp/fRCV1sf9eG6/SLXeS
-         2rx738jR3oWkcdTIuwpMCabO+hfxPKwG2WTn6jrfs5HYUau6i6cFfrcaDfbjdrjTwcGj
-         L5zpFVcHoThtp0Jfqko/RsHwpZkrIJhc911r5TJRQDxDCvxA4tJKHA/jmwj7TewpPajG
-         mvRg==
+         :cc;
+        bh=wWSROEV8RW0ondujQ3rdPkoiWybrO+/xVEfWa704mV8=;
+        b=BsngVRIL7QkbuP6Pun+NoxAzuLOKqv3OAVqenjaNDhxWqyZuzyEKXq5QOwscu6DMqB
+         Cs53kIKEDXpjHhj568Im7hQv7NPDVnKUlx1aeCafQcwauzElL1mSjn0zaCRo9mzfp/Ah
+         dK/KUV5FxpUuUiNB4jFb/FpfCrPmVr2FT+30avZwItV9l5Th9sZqE2ffk3EBFNqNWMa2
+         o1hRTbxa8f3wRfsjeqhcaZVVEK0wuttVp3jeB0M/wgYxy003MvyqsPL0v5lcJgp0ffhu
+         xKkQO3xJ627ulSsWQvp5xvHVs+auoMpd9riOThMa6O5+RGR6pwqEeVyYu8/McuLKB1ZD
+         j9yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=cxiZ8mHz0j28rl819694tQyEygOkwVXX3aZ9Pse7uLs=;
-        b=rgzM22HQM5lxlh0c3UKA1WBs98sVMKWAwdAxHFn8DK6qbRDV/PBQXP9SRhf0LyiMHS
-         48VIVE9I5+kDFqW5HcqaPHOCnyGVeq3EKGSoyCSnBpxBwyoFfUN3W4WrqLDmNNE5KPB2
-         BLEMYslmx4flt57TgqQ12GBt848xwzHt7Beeq9LrXOQCM7DFgSSXoiYOXOVhSFuuEO4b
-         n3gZV4gmAHmIsiVQ4Pg10wjhwglQunTvRsz0EhutP0OaRXd87Q66Yry2b7jNSd3i4RcH
-         LLWWADh7ZDkGNdy9kPdbEk07ttk66GR9tZ0RrdTxrp9LYxG6DD0CKaS/blI4KburWsRD
-         X2zA==
-X-Gm-Message-State: APjAAAVDHZXAJxTms+j+lVH62cAJWTgCIoqxzurmz5T0I5fLw1JllpPo
-        Pc75gIoxuoWzI0LgKiwvztjLYuZBaG30BOl0/ImPG5Iy35U=
-X-Google-Smtp-Source: APXvYqxSsYwATsV23exUR8MTriIajcLCHkqqmlKJ2h+fRUd0Gq55i1W5aNE7Lww1hrfgDfFX4EY+Cxz7EISFbXoMJbc=
-X-Received: by 2002:a92:de41:: with SMTP id e1mr4179079ilr.202.1569583577261;
- Fri, 27 Sep 2019 04:26:17 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=wWSROEV8RW0ondujQ3rdPkoiWybrO+/xVEfWa704mV8=;
+        b=eX4qlW3fp7AnFf0lgFWQB5rPuUwDfjRlqWo365jWW/AF7Gm0UM2o5G37PT7A7oGI36
+         DiCP7jsLs8MInHzAh3uZ/msUOvb5IswMzwja2pTh89e20ew3SJ74hPh0b2cXViXREW0n
+         O4X5qESvuZhqCabNJF39Rwbe14ou8uVsfWQ6hir9PAbIJm3pzY4LCWMnGtzuzxLBmkXX
+         QgYTXclSGE6Bm0kwU9sohi0m6Te7On5piHG0Mc0xeUk0rRe9dzcxrdelOR1G3osZyH4R
+         /c9Hr1p+em29xeLofBOxqkTVDHhgmROQvopHb8DhWxifi6vj1se3jzmlZJJNxkUqqGb2
+         H3Hg==
+X-Gm-Message-State: APjAAAW1BFJTtBI1kYMoeGEYfPVIFk6nJtzr45omI3af+Xe7yp7vGYcl
+        KLOgA+eSqIgh2xUrwpagjdDRZ6DzBCTTHmDg1nB4xYNT
+X-Google-Smtp-Source: APXvYqyJV/+JDrL6eWclRlTsvtvyX7RraNf/xiRx0r9IIY016TMdRosS3IWMuQWchJokGs3vDgFkYf7H1uIjQWaoSh4=
+X-Received: by 2002:a05:6808:ab9:: with SMTP id r25mr6972714oij.8.1569595142800;
+ Fri, 27 Sep 2019 07:39:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <44f46ff3-216f-7205-336a-2d0fb150818a@mnmoran.org>
-In-Reply-To: <44f46ff3-216f-7205-336a-2d0fb150818a@mnmoran.org>
-From:   =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?= 
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Date:   Fri, 27 Sep 2019 13:26:06 +0200
-Message-ID: <CALevQMYsGYyZi-56YQajGCt-Gjojr=w7bnL0aGA=N48Yjg8G4A@mail.gmail.com>
-Subject: Re: Meshctl GATT MTU Patch
-To:     "Michael N. Moran" <mike@mnmoran.org>
-Cc:     linux-bluetooth@vger.kernel.org
+References: <20190811070045.15406-1-inga.stotland@intel.com> <fb9e9c39bf24900c84bd7fe63d91c8443895ee3e.camel@intel.com>
+In-Reply-To: <fb9e9c39bf24900c84bd7fe63d91c8443895ee3e.camel@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 27 Sep 2019 17:38:49 +0300
+Message-ID: <CABBYNZ+Jdh1CSZZXs9asUdF6GUc-18QZzxgt6d74szQ8SvTSpQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/1 v3] ELL based mainloop
+To:     "Stotland, Inga" <inga.stotland@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michael,
+Hi Inga,
 
-Please follow "Submitting patches" guideline from "bluez/HACKING"
-developer readme.
+On Wed, Sep 25, 2019 at 9:19 PM Stotland, Inga <inga.stotland@intel.com> wrote:
+>
+> Ping
+>
+> On Sun, 2019-08-11 at 00:00 -0700, Inga Stotland wrote:
+> > + timeout-ell.c
+> >
+> > This patch addresses a need to enable using common mainloop for the
+> > ell-based apps that desire to use common bluetooth fuctionality
+> > (e.g., bt_shell).
+> >
+> > Note: A bit awkward callback handling there is due to the discrepancy
+> > in the arg type for signo (signal number).
+> >
+> > src/shared/mainloop.h:
+> > typedef void (*mainloop_signal_func) (int signum, void *user_data)
+> >
+> > and ell/main.h:
+> >
+> > typedef void (*l_main_signal_cb_t) (uint32_t signo, void *user_data)
+> >
+> > My guess is that ell derives the unsigned int type from
+> > <sys/signalfd.h>,
+> > where ssi_signo is defined as uint32_t. BlueZ is probably following
+> > the
+> > standard Linux signal handling, where signal is represented as an
+> > int.
+> >
+> > Inga Stotland (1):
+> >   shared/mainloop: Add ell-based mainloop implementation
+> >
+> >  Makefile.am               |  11 +++-
+> >  src/shared/mainloop-ell.c | 126
+> > ++++++++++++++++++++++++++++++++++++++
+> >  src/shared/timeout-ell.c  |  72 ++++++++++++++++++++++
+> >  3 files changed, 206 insertions(+), 3 deletions(-)
+> >  create mode 100644 src/shared/mainloop-ell.c
+> >  create mode 100644 src/shared/timeout-ell.c
+> >
 
-Regards,
-Grzegorz
+Applied, thanks.
 
-
-czw., 26 wrz 2019 o 18:48 Michael N. Moran <mike@mnmoran.org> napisa=C5=82(=
-a):
->
-> The attached patch fixes a problem in the meshctl gatt
-> provisioner where the GATT MTU is truncated.
->
->
-> --
-> Michael N. Moran           (h) 770 704 9751
-> 218 Wilshire Terrace       (c) 678 521 5460
-> White, GA, USA 30184       http://mnmoran.org
->
+-- 
+Luiz Augusto von Dentz
