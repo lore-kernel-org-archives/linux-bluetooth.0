@@ -2,215 +2,241 @@ Return-Path: <SRS0=evP7=XW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965C8C352AB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 07:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 482E3C4360C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 08:43:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CCBE2146E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 07:29:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D201217D9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Sep 2019 08:43:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o7iEtajV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725842AbfI0H3m convert rfc822-to-8bit (ORCPT
+        id S1726080AbfI0Inm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Sep 2019 03:29:42 -0400
-Received: from mga12.intel.com ([192.55.52.136]:60400 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725812AbfI0H3l (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Sep 2019 03:29:41 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Sep 2019 00:29:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,554,1559545200"; 
-   d="scan'208";a="273727566"
-Received: from pgsmsx112.gar.corp.intel.com ([10.108.55.201])
-  by orsmga001.jf.intel.com with ESMTP; 27 Sep 2019 00:29:40 -0700
-Received: from pgsmsx106.gar.corp.intel.com (10.221.44.98) by
- PGSMSX112.gar.corp.intel.com (10.108.55.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 27 Sep 2019 15:27:46 +0800
-Received: from pgsmsx105.gar.corp.intel.com ([169.254.4.30]) by
- PGSMSX106.gar.corp.intel.com ([169.254.9.23]) with mapi id 14.03.0439.000;
- Fri, 27 Sep 2019 15:27:46 +0800
-From:   "Bag, Amit K" <amit.k.bag@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-        "Hegde, Raghuram" <raghuram.hegde@intel.com>
-Subject: RE: [PATCH] Bluetooth: btusb: Trigger Intel FW download error
- recovery
-Thread-Topic: [PATCH] Bluetooth: btusb: Trigger Intel FW download error
- recovery
-Thread-Index: AQHVdDZ8SxjBrsJBVUGWo2sTd/IkjKc+jbWAgACTsUA=
-Date:   Fri, 27 Sep 2019 07:27:45 +0000
-Message-ID: <EFE6F46E14A5F445949D76A8CAC224005844D981@PGSMSX105.gar.corp.intel.com>
-References: <1569480202-10560-1-git-send-email-amit.k.bag@intel.com>
- <BE2BC36F-DD17-4773-B38B-AE4129EB3437@holtmann.org>
-In-Reply-To: <BE2BC36F-DD17-4773-B38B-AE4129EB3437@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTQzODk5ZTgtMTgxNi00NDBhLWE1Y2YtYjZmMTg2NjdhNzYwIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiUEt4ejZGWmxWcXloQzVwa2VScEZCWTVPb1wvR3hFT1VnS2ZTM05zVW9HTzlZQjdYRjN4S0ExUmNGa0N2WFVLZ2MifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [172.30.20.206]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Fri, 27 Sep 2019 04:43:42 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:38441 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725882AbfI0Inm (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 27 Sep 2019 04:43:42 -0400
+Received: by mail-ot1-f67.google.com with SMTP id e11so1586555otl.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2019 01:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=O8KQOHA1DMMmvc0q9c4Va5UTjhKlLyeaO9I6sPpAoIE=;
+        b=o7iEtajVohbpr9lVpZfhZGHi7W9tuRQGgS/gYPuRSkNPGE+gGY2EEwjHmr+xC7sSpy
+         hcYHCu6OE4na0Ujl6zUYcrhNdt7u8scAIJzaoT2BUWt9VVM0QrBBgAfNRBufe2dOEjdK
+         O+5OfZdGIvti/4YdL7AAOIkXOK34sjk5/B5ahogk4Vm/qtnlC48caIohqdieFMvUt8RS
+         L5OE2pYiiM95/UN6yhUlmQ3FgIYDRWDPFS2xX9AOdDGp+9H3mfjsN01JQSM41WEvfYQB
+         mFtjP024QshnHV7VuRqXD8MUrwztQ9N9sS0a7Q/Ye6cynhqBkKMJj0wHg6rRfK0tUklj
+         M/NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=O8KQOHA1DMMmvc0q9c4Va5UTjhKlLyeaO9I6sPpAoIE=;
+        b=LsmFB+aJP01MuddIvsdDnsXfWtZTyptIIbUEh55s4f7KWcA6PnsjIc2VuMOAlT3+MS
+         TYU67/OwQGTPsqGrDoOC/SZqnS6Uv4AQBbasIJDTQdJpCXwxr0u/CSMD4gGMwtov9y2Y
+         BcwMTYsIWtPQMx/7o1U2zrZ1opCsDkSUc9Wb6qfdPA0oL/XU3LXtcvB0M0mQMWPfaDoY
+         SZj1LW9B+qQn2l+oN/295r/SlF8NrDzltTsrks9/yEkIXk380k6vNDx19Jjc9L0ogB5P
+         mRiSYcZN/owGCS6Y/vYQOjfEk+pGImkIRV+7If64ClRDJKaFLtHMi2NhoGwRIWUVy0O9
+         thXA==
+X-Gm-Message-State: APjAAAWLes6B7N8cNWJq6yyRm9PfIUfplY30XMC5LAvfkSEmgjTc6w2l
+        ztCWsXhINdjvMSOCQK8wwyETEV7QG1z5daLa17w=
+X-Google-Smtp-Source: APXvYqzmZRPV4PBJfYv1ZFzJBjMSR3JcuBWU2skNQU4QiMSvTZPlTdDDCdT2wjdc8aGUqj3kaMgaHz5zfo2u9U5g+r4=
+X-Received: by 2002:a9d:39c2:: with SMTP id y60mr2242492otb.11.1569573820621;
+ Fri, 27 Sep 2019 01:43:40 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAHvDJkrdcTCDM9cpeD5ZdMF-whR8jk8ZGdayaeQoU1BO14wwgA@mail.gmail.com>
+ <CABBYNZJ1k7vXEgyTwMPa_M_5Kpc_J9rFkR81JTz07vapf5aefA@mail.gmail.com>
+ <CAHvDJkrCUP2J+znQquCB-XzpPJF3CLKR7j3dApqiS-ynw9LEyg@mail.gmail.com>
+ <CABBYNZ+XhK5gOcYKWmPA0QMyM61u=pp5BNJugdEJyD+XqgbZMA@mail.gmail.com>
+ <CABBYNZJnx7bSyryQy-wXRCQH=56Njk7jb6ofz8AkAXfNCmU4+Q@mail.gmail.com> <CAHvDJkq8Mu1Ymk6_uO6Gx60_He99CC3Hzg=gMJapLS-Jonzg5Q@mail.gmail.com>
+In-Reply-To: <CAHvDJkq8Mu1Ymk6_uO6Gx60_He99CC3Hzg=gMJapLS-Jonzg5Q@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 27 Sep 2019 11:43:26 +0300
+Message-ID: <CABBYNZL7=OgB32MC+UhR93YAfytXJkj2Zqp8jtpk3=GXJRzTmw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Properly set owner of filter data at start
+ of client creation
+To:     Sonny Sasaka <sonnysasaka@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
->Hi Amit,
+Hi Sonny,
+
+On Fri, Sep 20, 2019 at 10:48 PM Sonny Sasaka <sonnysasaka@gmail.com> wrote:
 >
->> Sometimes during FW data download stage, in case of an error is 
->> encountered the controller device could not be recovered. To recover 
->> from such failures send Intel hard Reset to re-trigger FW download in 
->> following error scenarios:
->> 
->> 1. Intel Read version command error
->> 2. Firmware download timeout
->> 3. Failure in Intel Soft Reset for switching to operational FW 4. Boot 
->> timeout for switching to operaional FW
->> 
->> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
->> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
->> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
->> ---
->> drivers/bluetooth/btintel.c | 39 
->> +++++++++++++++++++++++++++++++++++++++
->> drivers/bluetooth/btintel.h |  6 ++++++
->> drivers/bluetooth/btusb.c   | 20 ++++++++++++++++----
->> 3 files changed, 61 insertions(+), 4 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c 
->> index bb99c8653aab..fdec9c53b48d 100644
->> --- a/drivers/bluetooth/btintel.c
->> +++ b/drivers/bluetooth/btintel.c
->> @@ -709,6 +709,45 @@ int btintel_download_firmware(struct hci_dev 
->> *hdev, const struct firmware *fw, } 
->> EXPORT_SYMBOL_GPL(btintel_download_firmware);
->> 
->> +void btintel_retry_fw_download(struct hci_dev *hdev) {
->> +	/* Send Intel Reset command. This will result in
->> +	 * re-enumeration of BT controller.
->> +	 *
->> +	 * Intel Reset parameter description:
->> +	 * reset_param[0] => reset_type : 0x01 (Hard reset),
->> +					  0x00 (Soft reset)
->> +	 * reset_param[1] => patch_enable : 0x01 (Enable),
->> +	 *				    0x00 (Do not enable)
->> +	 * reset_param[2] => ddc_reload : 0x01 (Reload),
->> +	 *				  0x00 (Do not reload)
->> +	 * reset_param[3] => boot_option: 0x00 (Current image),
->> +					  0x01 (Specified boot address)
->> +	 * reset_param[4] to reset_param[7] => Boot address
->> +	 *
->> +	 */
->> +	static const u8 reset_param[] = { 0x01, 0x01, 0x01, 0x00,
->> +					0x00, 0x00, 0x00, 0x00 };
-
-pplease use intel_reset structure and add the comments when assigning the fields.
-
->> +	struct sk_buff *skb;
->> +
->> +	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param),
->> +				reset_param, HCI_INIT_TIMEOUT);
-
-pplease align the second line according to the coding style.
-
->> +	if (IS_ERR(skb)) {
->> +		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
->> +				PTR_ERR(skb));
-
-SSame as above.
-
->> +		return;
->> +	}
->> +	bt_dev_info(hdev, "Intel reset sent to retry FW download");
->> +	kfree_skb(skb);
-
-EExtra empty line here.
-
->> +	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
->> +	 * lines for 2ms when it receives Intel Reset in bootloader mode.
->> +	 * Whereas, the upcoming Intel BT controllers will hold USB reset
->> +	 * for 150ms. To keep the delay generic, 150ms is chosen here.
->> +	 */
->> +	msleep(150);
->> +}
->> +EXPORT_SYMBOL_GPL(btintel_retry_fw_download);
->> +
-
-II do not like the name here. Using btintel_reset_to_bootloader would be better. Since the function itself is not going to do the firmware retry. It will just drop you back into boot loader.
-
-HHowever the more important question is what happens if you send this command. Is the device re-enumerating on USB? Or after the 150ms we just have to redo the firmware download.
-
->> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>"); 
->> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " 
->> VERSION); MODULE_VERSION(VERSION); diff --git 
->> a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h index 
->> 3d846190f2bf..d04d3c7cb513 100644
->> --- a/drivers/bluetooth/btintel.h
->> +++ b/drivers/bluetooth/btintel.h
->> @@ -87,6 +87,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
->> 			     struct intel_boot_params *params); int 
->> btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
->> 			      u32 *boot_param);
->> +void btintel_retry_fw_download(struct hci_dev *hdev);
->> #else
->> 
->> static inline int btintel_check_bdaddr(struct hci_dev *hdev) @@ -181,4 
->> +182,9 @@ static inline int btintel_download_firmware(struct hci_dev 
->> *dev, {
->> 	return -EOPNOTSUPP;
->> }
->> +
->> +static inline void btintel_retry_fw_download(struct hci_dev *hdev) {
->> +	return -EOPNOTSUPP;
->> +}
->> #endif
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
->> index a9c35ebb30f8..7a763bd856ba 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -1846,8 +1846,11 @@ static int btusb_setup_intel(struct hci_dev *hdev)
->> 	 * firmware variant, revision and build number.
->> 	 */
->> 	err = btintel_read_version(hdev, &ver);
->> -	if (err)
->> +	if (err) {
->> +		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
->> +		btintel_retry_fw_download(hdev);
->> 		return err;
->> +	}
->> 
->> 	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
->> 		    ver.hw_platform, ver.hw_variant, ver.hw_revision, @@ -2326,9 
->> +2329,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
->> 
->> 	/* Start firmware downloading and get boot parameter */
->> 	err = btintel_download_firmware(hdev, fw, &boot_param);
->> -	if (err < 0)
->> +	if (err < 0) {
->> +		/* When FW download fails, send Intel Reset to retry
->> +		 * FW download.
->> +		 */
->> +		btintel_retry_fw_download(hdev);
->> 		goto done;
+> Hi Luiz,
 >
->Is this actually going to work? If you jump to done, then you end up sending intel soft reset and then waiting for the device to boot. If you are lucky it times out, if not, then you end up loading DCC now.
+> Sorry for the late reply. Yes I think this should be fixed. My comments below.
 >
->If the device re-enumerates on USB, then we need an extra jump point to just release the firmware memory and then just exit hdev->setup. If are suppose to just retry, then we need to actually start over.
->
->So have you actually tested this by randomly failing each step in the firmware download process.
->
-We send hard reset which will re-emumerates BT USB device and  initialize usb driver. 
-We have tested all the scenario and its working fine.
+> On Thu, Sep 19, 2019 at 12:51 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Sonny,
+> >
+> > On Mon, Sep 16, 2019 at 2:46 PM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Sonny,
+> > >
+> > > On Sun, Sep 15, 2019 at 8:38 PM Sonny Sasaka <sonnysasaka@gmail.com> wrote:
+> > > >
+> > > > Hi Luiz,
+> > > >
+> > > > On Sun, Sep 15, 2019 at 10:14 AM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Sonny,
+> > > > >
+> > > > > On Sat, Sep 14, 2019 at 5:57 PM Sonny Sasaka <sonnysasaka@gmail.com> wrote:
+> > > > > >
+> > > > > > Currently at the start of client creation (g_dbus_client_new), the
+> > > > > > |owner| in |filter_data| is not set until the |name| is resolved. This
+> > > > > > creates a time window where the filter doesn't work properly, i.e. it
+> > > > > > filters in more than it should. To solve this issue, this patch does the
+> > > > > > following:
+> > > > > > 1. At the start of client creation, set the |owner| in |filter_data|
+> > > > > > based on the current resolved |name| if any, or set it explicitly to
+> > > > > > unknown (empty string) as opposed to NULL otherwise. The unknown |owner|
+> > > > > > lets the filter reject any message, unlike NULL |owner| which accepts
+> > > > > > any message.
+> > > > > > 2. Step 1 above reveals another bug: message_filter fails to accept
+> > > > > > messages which have |sender| set directly to D-Bus service name rather
+> > > > > > than D-Bus address. Therefore this patch relaxes the filter requirement
+> > > > > > in message_filter to accept a message if its |sender| is equal directly
+> > > > > > to our filter's |name|.
+> > > > > > 3. After the initial service name resolution (after GetNameOwner)
+> > > > > > returns, immediately update our name cache with the result, otherwise
+> > > > > > the filters' |owner| would be stuck to unknown (empty string) until
+> > > > > > "NameOwnerChanged" signal arrives.
+> > > > > >
+> > > > > > ---
+> > > > > >  gdbus/watch.c | 14 ++++++++++++--
+> > > > > >  1 file changed, 12 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/gdbus/watch.c b/gdbus/watch.c
+> > > > > > index 447e48671..2ae0fd5a7 100644
+> > > > > > --- a/gdbus/watch.c
+> > > > > > +++ b/gdbus/watch.c
+> > > > > > @@ -78,6 +78,8 @@ struct filter_data {
+> > > > > >         gboolean registered;
+> > > > > >  };
+> > > > > >
+> > > > > > +static const char *check_name_cache(const char *name);
+> > > > > > +
+> > > > > >  static struct filter_data *filter_data_find_match(DBusConnection *connection,
+> > > > > >                                                         const char *name,
+> > > > > >                                                         const char *owner,
+> > > > > > @@ -265,7 +267,10 @@ proceed:
+> > > > > >
+> > > > > >         data->connection = dbus_connection_ref(connection);
+> > > > > >         data->name = g_strdup(name);
+> > > > > > -       data->owner = g_strdup(owner);
+> > > > > > +       if (name)
+> > > > > > +               data->owner = g_strdup(check_name_cache(name) ? : "");
+> > > > >
+> > > > > I follow this it would ignore the owner address and use the cache name
+> > > > > or set "" to be resolved shouldn't that use the owner instead? If the
+> > > > > called don't have it resolved then it should optionally set the owner
+> > > > > resolution.
+> > > > if |name| is set, |owner| must be NULL (refer to if block before
+> > > > proceed: label above).
+> > >
+> > > Right so the subsequent change is actually the result of owner being
+> > > set "", not a bug that existed before.
+> > >
+> > > > >
+> > > > > > +       else
+> > > > > > +               data->owner = g_strdup(owner);
+> > > > > >         data->path = g_strdup(path);
+> > > > > >         data->interface = g_strdup(interface);
+> > > > > >         data->member = g_strdup(member);
+> > > > > > @@ -534,8 +539,12 @@ static DBusHandlerResult
+> > > > > > message_filter(DBusConnection *connection,
+> > > > > >                 if (!sender && data->owner)
+> > > > > >                         continue;
+> > > > > >
+> > > > > > -               if (data->owner && g_str_equal(sender, data->owner) == FALSE)
+> > > > > > +               if (data->owner &&
+> > > > > > +                               g_str_equal(sender, data->owner) == FALSE &&
+> > > > > > +                               data->name &&
+> > > > > > +                               g_str_equal(sender, data->name) == FALSE) {
+> > > > >
+> > > > > iirc messages never use the friendly name only the bus connection as
+> > > > > sender so I wonder if this really does make any difference, are there
+> > > > > any example of this not working? Perhaps it would be worth creating a
+> > > > > test case in unit/test-gdbus.c to capture this case.
+> > > > There is a case where the sender is D-Bus daemon itself. For example
+> > > > NameOwnerChanged signal is sent via a message which has
+> > > > sender="org.freedesktop.dbus" instead of a D-Bus address. I am not
+> > > > aware of any other case other than messages sent by D-Bus daemon.
+> > >
+> > > We could perhaps have the check as if(data->owner && data->owner !=
+> > > '\0'... so we skip the check if it was not resolved yet, in that case
+> > > we would accept signals for watches which we do not have resolved
+> > > their bus name resolved yet, which I guess it is the real issue you
+> > > are trying to fix here.
+> It should be the opposite: If name is not yet resolved, we don't want
+> to accept anything because that would be receiving messages from
+> anybody, which is wrong.
+
+Got it, I though the problem was the opposite.
+
+> > >
+> > > > >
+> > > > > >                         continue;
+> > > > > > +               }
+> > > > > >
+> > > > > >                 if (data->path && g_str_equal(path, data->path) == FALSE)
+> > > > > >                         continue;
+> > > > > > @@ -627,6 +636,7 @@ static void service_reply(DBusPendingCall *call,
+> > > > > > void *user_data)
+> > > > > >                                                 DBUS_TYPE_INVALID) == FALSE)
+> > > > > >                 goto fail;
+> > > > > >
+> > >
+> > > This is not needed btw, update_name_cache will just lookup the same
+> > > data and overwrite the owner with the same owner, well except if we do
+> > > have other data pointing to the same name which is normally not the
+> > > case of here, or is it? Also Im not sure how service_reply would be
+> > > triggered since data->owner will always going to be set to either the
+> > > cache or "", so it looks like this would only work because the bus
+> > > name is no longer matched.
+> This is needed because there might be another filter_data which does
+> not have the name resolved, so we should update them all with the
+> resolved name.
+
+Weird, I though we already grouped the filter_data so the had be
+updated altogether or is this really for different path, interface,
+etc?
+
+> > >
+> > > > > > +       update_name_cache(data->name, data->owner);
+> > > > > >         update_service(data);
+> > > > > >
+> > > > > >         goto done;
+> > > > > > --
+> > > > > > 2.21.0
+> >
+> > Are you still planning on working on this, it seems to be valid fix we
+> > just have to work on the details and I hope I didn't demotivate you
+> > with my comments.
+> >
+> > --
+> > Luiz Augusto von Dentz
+
+
+
+-- 
+Luiz Augusto von Dentz
