@@ -2,99 +2,201 @@ Return-Path: <SRS0=G1Nt=XZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6EAC388F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Sep 2019 09:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A424C32792
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Sep 2019 10:41:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2152521721
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Sep 2019 09:22:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Wx/+1/ta"
+	by mail.kernel.org (Postfix) with ESMTP id 3C3CC20679
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Sep 2019 10:41:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727885AbfI3JWl (ORCPT
+        id S1730629AbfI3KlB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Sep 2019 05:22:41 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:33280 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbfI3JWl (ORCPT
+        Mon, 30 Sep 2019 06:41:01 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:54741 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727025AbfI3KlB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Sep 2019 05:22:41 -0400
-Received: by mail-lj1-f194.google.com with SMTP id a22so8677630ljd.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2019 02:22:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QTN1y9TOQH0HRUT0BHv+ByuZ253DbuQM1DJ2JUNJ0cg=;
-        b=Wx/+1/tafkfo1/0+oVHXu94h0i/o9oWCZZXwh+IPFdCIvEgqM7682CQZuRMP4GikmR
-         KvLiF5t4oOA1W1VIRXWBnEdC1jEqtQwpvafZhaa8XXqejFUyo3HPnbmaJfoiHhG6W6e2
-         +GySUpepx0IsUG4c7ukkjH6FVHWbof8GRmLnOTZ4BFIs4qSV8M8cZOyLts3uVCP2AiSW
-         5zPLY5DWdNYP5c8Zgu0Etf/LGR2YYDYCFKT/z/DR8T59QNwIhlOcVck4VoG8oruOEeeM
-         R51VhtrD3G+niqmSzipkhqqY7T0wVWP0wv/6Xg3nbn5QWbuA8qfrXHF9vAxJWH6Qa1+/
-         OrWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QTN1y9TOQH0HRUT0BHv+ByuZ253DbuQM1DJ2JUNJ0cg=;
-        b=my99L8UIX2Nae7GEEZpu6241b/3cmE5ua8pZc8BMt7b0H9Th8IiRHWtU2TnhXa4dlX
-         W/KO6h2tmHN36gGorOT1Bwr6Xm5K28sxk20DXBtHewoIutxAakMRNpMfyLypoQJz4EGM
-         kcBzXm85TVXc8SkMQu+OyGDz6YqvITSGG/SSgI/Rk6o3ophANhumePV/tLOsCatg4hmS
-         2KOncExdPEewYxm9ipR4O4l+ir6nkCezCNedIhkf8+fr6ylobSZRys5BEIA/PgF+YHks
-         2iwJ0Z+6hqbR9uhQp6AYJv6G+kgdWLo+XEoWMdij8rdzyG8mOLQ6Meq9praozkUjwXoS
-         Lzgw==
-X-Gm-Message-State: APjAAAUo1+j4Pj8Gs3NenBaaQrJyKKEBrKymNsN5XjNKe+tsFfLMEugJ
-        fFgopMqBqKpogSlDvxhYKkxVbxcAOTg=
-X-Google-Smtp-Source: APXvYqyP7dMAAAmpqLpwwIvbCeZmA/dGIV8XhacQMI2hBBCHJn5MbQDZC0u+zAQKsAS7lnYaQE6EzQ==
-X-Received: by 2002:a2e:7e05:: with SMTP id z5mr11496451ljc.8.1569835357321;
-        Mon, 30 Sep 2019 02:22:37 -0700 (PDT)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id p22sm3096757ljp.69.2019.09.30.02.22.36
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2019 02:22:36 -0700 (PDT)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Fix ignored return value
-Date:   Mon, 30 Sep 2019 11:22:30 +0200
-Message-Id: <20190930092230.15122-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.19.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Mon, 30 Sep 2019 06:41:01 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
+        by mail.holtmann.org (Postfix) with ESMTPSA id D7327CED24;
+        Mon, 30 Sep 2019 12:49:53 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH] Bluetooth: btusb: Trigger Intel FW download error
+ recovery
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <EFE6F46E14A5F445949D76A8CAC224005844D981@PGSMSX105.gar.corp.intel.com>
+Date:   Mon, 30 Sep 2019 12:40:59 +0200
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "Hegde, Raghuram" <raghuram.hegde@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F15D9D95-0A5F-43E9-AA56-D7FFE0E5EAB9@holtmann.org>
+References: <1569480202-10560-1-git-send-email-amit.k.bag@intel.com>
+ <BE2BC36F-DD17-4773-B38B-AE4129EB3437@holtmann.org>
+ <EFE6F46E14A5F445949D76A8CAC224005844D981@PGSMSX105.gar.corp.intel.com>
+To:     "Bag, Amit K" <amit.k.bag@intel.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the following build error when compiling in maintainer mode:
+Hi Amit,
 
-mesh/keyring.c: In function ‘finalize’:
-mesh/keyring.c:142:8: error: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Werror=unused-result]
-  (void)write(fd, &key, sizeof(key));
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
- mesh/keyring.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+>>> Sometimes during FW data download stage, in case of an error is 
+>>> encountered the controller device could not be recovered. To recover 
+>>> from such failures send Intel hard Reset to re-trigger FW download in 
+>>> following error scenarios:
+>>> 
+>>> 1. Intel Read version command error
+>>> 2. Firmware download timeout
+>>> 3. Failure in Intel Soft Reset for switching to operational FW 4. Boot 
+>>> timeout for switching to operaional FW
+>>> 
+>>> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+>>> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+>>> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+>>> ---
+>>> drivers/bluetooth/btintel.c | 39 
+>>> +++++++++++++++++++++++++++++++++++++++
+>>> drivers/bluetooth/btintel.h |  6 ++++++
+>>> drivers/bluetooth/btusb.c   | 20 ++++++++++++++++----
+>>> 3 files changed, 61 insertions(+), 4 deletions(-)
+>>> 
+>>> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c 
+>>> index bb99c8653aab..fdec9c53b48d 100644
+>>> --- a/drivers/bluetooth/btintel.c
+>>> +++ b/drivers/bluetooth/btintel.c
+>>> @@ -709,6 +709,45 @@ int btintel_download_firmware(struct hci_dev 
+>>> *hdev, const struct firmware *fw, } 
+>>> EXPORT_SYMBOL_GPL(btintel_download_firmware);
+>>> 
+>>> +void btintel_retry_fw_download(struct hci_dev *hdev) {
+>>> +	/* Send Intel Reset command. This will result in
+>>> +	 * re-enumeration of BT controller.
+>>> +	 *
+>>> +	 * Intel Reset parameter description:
+>>> +	 * reset_param[0] => reset_type : 0x01 (Hard reset),
+>>> +					  0x00 (Soft reset)
+>>> +	 * reset_param[1] => patch_enable : 0x01 (Enable),
+>>> +	 *				    0x00 (Do not enable)
+>>> +	 * reset_param[2] => ddc_reload : 0x01 (Reload),
+>>> +	 *				  0x00 (Do not reload)
+>>> +	 * reset_param[3] => boot_option: 0x00 (Current image),
+>>> +					  0x01 (Specified boot address)
+>>> +	 * reset_param[4] to reset_param[7] => Boot address
+>>> +	 *
+>>> +	 */
+>>> +	static const u8 reset_param[] = { 0x01, 0x01, 0x01, 0x00,
+>>> +					0x00, 0x00, 0x00, 0x00 };
+> 
+> pplease use intel_reset structure and add the comments when assigning the fields.
+> 
+>>> +	struct sk_buff *skb;
+>>> +
+>>> +	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param),
+>>> +				reset_param, HCI_INIT_TIMEOUT);
+> 
+> pplease align the second line according to the coding style.
+> 
+>>> +	if (IS_ERR(skb)) {
+>>> +		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
+>>> +				PTR_ERR(skb));
+> 
+> SSame as above.
+> 
+>>> +		return;
+>>> +	}
+>>> +	bt_dev_info(hdev, "Intel reset sent to retry FW download");
+>>> +	kfree_skb(skb);
+> 
+> EExtra empty line here.
+> 
+>>> +	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
+>>> +	 * lines for 2ms when it receives Intel Reset in bootloader mode.
+>>> +	 * Whereas, the upcoming Intel BT controllers will hold USB reset
+>>> +	 * for 150ms. To keep the delay generic, 150ms is chosen here.
+>>> +	 */
+>>> +	msleep(150);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(btintel_retry_fw_download);
+>>> +
+> 
+> II do not like the name here. Using btintel_reset_to_bootloader would be better. Since the function itself is not going to do the firmware retry. It will just drop you back into boot loader.
+> 
+> HHowever the more important question is what happens if you send this command. Is the device re-enumerating on USB? Or after the 150ms we just have to redo the firmware download.
+> 
+>>> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>"); 
+>>> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " 
+>>> VERSION); MODULE_VERSION(VERSION); diff --git 
+>>> a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h index 
+>>> 3d846190f2bf..d04d3c7cb513 100644
+>>> --- a/drivers/bluetooth/btintel.h
+>>> +++ b/drivers/bluetooth/btintel.h
+>>> @@ -87,6 +87,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
+>>> 			     struct intel_boot_params *params); int 
+>>> btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
+>>> 			      u32 *boot_param);
+>>> +void btintel_retry_fw_download(struct hci_dev *hdev);
+>>> #else
+>>> 
+>>> static inline int btintel_check_bdaddr(struct hci_dev *hdev) @@ -181,4 
+>>> +182,9 @@ static inline int btintel_download_firmware(struct hci_dev 
+>>> *dev, {
+>>> 	return -EOPNOTSUPP;
+>>> }
+>>> +
+>>> +static inline void btintel_retry_fw_download(struct hci_dev *hdev) {
+>>> +	return -EOPNOTSUPP;
+>>> +}
+>>> #endif
+>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
+>>> index a9c35ebb30f8..7a763bd856ba 100644
+>>> --- a/drivers/bluetooth/btusb.c
+>>> +++ b/drivers/bluetooth/btusb.c
+>>> @@ -1846,8 +1846,11 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+>>> 	 * firmware variant, revision and build number.
+>>> 	 */
+>>> 	err = btintel_read_version(hdev, &ver);
+>>> -	if (err)
+>>> +	if (err) {
+>>> +		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
+>>> +		btintel_retry_fw_download(hdev);
+>>> 		return err;
+>>> +	}
+>>> 
+>>> 	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
+>>> 		    ver.hw_platform, ver.hw_variant, ver.hw_revision, @@ -2326,9 
+>>> +2329,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>>> 
+>>> 	/* Start firmware downloading and get boot parameter */
+>>> 	err = btintel_download_firmware(hdev, fw, &boot_param);
+>>> -	if (err < 0)
+>>> +	if (err < 0) {
+>>> +		/* When FW download fails, send Intel Reset to retry
+>>> +		 * FW download.
+>>> +		 */
+>>> +		btintel_retry_fw_download(hdev);
+>>> 		goto done;
+>> 
+>> Is this actually going to work? If you jump to done, then you end up sending intel soft reset and then waiting for the device to boot. If you are lucky it times out, if not, then you end up loading DCC now.
+>> 
+>> If the device re-enumerates on USB, then we need an extra jump point to just release the firmware memory and then just exit hdev->setup. If are suppose to just retry, then we need to actually start over.
+>> 
+>> So have you actually tested this by randomly failing each step in the firmware download process.
+>> 
+> We send hard reset which will re-emumerates BT USB device and  initialize usb driver. 
+> We have tested all the scenario and its working fine.
 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index 3a7f92f9f..806ea153c 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -139,7 +139,8 @@ static void finalize(const char *fpath, uint16_t net_idx)
- 	l_debug("Finalize %s", fpath);
- 	memcpy(key.old_key, key.new_key, 16);
- 	lseek(fd, 0, SEEK_SET);
--	write(fd, &key, sizeof(key));
-+	if (write(fd, &key, sizeof(key)) != sizeof(key))
-+		goto done;
- 
- done:
- 	close(fd);
--- 
-2.19.1
+that is fine. However when this happens we should try to exit without sending any further commands. So we will need a separate exit path then.
+
+Regards
+
+Marcel
 
