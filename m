@@ -2,271 +2,263 @@ Return-Path: <SRS0=34D5=X2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4448AC352AA
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E4CC352AA
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:41:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1206620815
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:10:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04CDD21906
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:41:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="sJMb45G3"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="hKqUk9p/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388792AbfJAOKE (ORCPT
+        id S1727051AbfJAOlZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Oct 2019 10:10:04 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:46932 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731280AbfJAOKE (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Oct 2019 10:10:04 -0400
-Received: by mail-lf1-f67.google.com with SMTP id t8so9951799lfc.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Oct 2019 07:10:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=alzF4tpzHmP8qm7bH/g+AGGUXeageptKGk5OT5EgW10=;
-        b=sJMb45G3sVpeHZLiz8soRIjNBJm6IbHBZHEZp4EaDZEyxj1PAUxi/54+EyPSX9KiLn
-         GjR0c/kh5Yaegsn+ohmDQ3FCQs+uIp/GScLlaYsNXmJ73h48dDtPVG8cE9das89jV1iL
-         7Ph3zxw8MHuUoPe62gZKVbYNhwb8IXdFiDV3oYCZdlCqcSWzmoy+H+wYkieQ30MbS5kM
-         l7FFir3CNnE/7A5Lw3LdYNKZP0lpF+byRFQkOks/9WUbnwJbTLm5vpM04rC8sJJpqIeg
-         /NN9kRfAf2eOIJFAqh5QKIEQCJVXs6XCdNHqj8i+8YrkMJHyn+bcdmhor/H4XOIeQxZJ
-         XJXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=alzF4tpzHmP8qm7bH/g+AGGUXeageptKGk5OT5EgW10=;
-        b=HSB2urZRFpUf0tY7KZVjo/SSf3nKJYASwKaXAEQYfyf2zoEMnJOc33bdYJLdLjLr8c
-         b23kELT3DmcrrE9UK/0qQK0igguy6/5/a7DYzFCB5biUQ41XfB2bj56zpN61sg+0ku3D
-         lMnpIXMPlOztzQ+D2DZTSziJmJZ6Uxv5ajun7GAXdr3QnsaJOFr6o62K3aT5i0yzSxin
-         ji+4vleivKtO2uE46ULf1O7yfQQyRPV24pJvy/frTq76AObslg91ywOr3y5+MUifFU+S
-         LpbmNXL0Hkr2HUENxcSn0LCjG3qVVDUt+tPYv7DQGTXXu/iNNyfYBhy2tBYbiiWhYYDL
-         sYtg==
-X-Gm-Message-State: APjAAAXDSFGNUXoyPK5K5tq4zNNcUH79J25zE9ebC6r0kd9MbTOjrXAG
-        u3YEBOoImE/QZnZ+fcdLEBnZO1HiHis=
-X-Google-Smtp-Source: APXvYqzTM67KoIFTAkdp17dnMUP8KE4whzfxaemRkslKua/C19rLaQhR2au80nP+C5Z+WBHtxfNH3A==
-X-Received: by 2002:a19:5515:: with SMTP id n21mr15624628lfe.131.1569939001825;
-        Tue, 01 Oct 2019 07:10:01 -0700 (PDT)
-Received: from ix.int.codecoup.pl ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id k15sm4117794ljg.65.2019.10.01.07.10.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2019 07:10:01 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH V2 3/3] monitor: Add support for reading over J-Link RTT
-Date:   Tue,  1 Oct 2019 16:09:41 +0200
-Message-Id: <20191001140941.8005-3-szymon.janc@codecoup.pl>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191001140941.8005-1-szymon.janc@codecoup.pl>
-References: <20191001140941.8005-1-szymon.janc@codecoup.pl>
+        Tue, 1 Oct 2019 10:41:25 -0400
+Received: from mga18.intel.com ([134.134.136.126]:35915 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727018AbfJAOlZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 1 Oct 2019 10:41:25 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Oct 2019 07:41:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,571,1559545200"; 
+   d="scan'208";a="221021105"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga002.fm.intel.com with ESMTP; 01 Oct 2019 07:41:23 -0700
+Received: from fmsmsx119.amr.corp.intel.com (10.18.124.207) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 1 Oct 2019 07:41:23 -0700
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ FMSMSX119.amr.corp.intel.com (10.18.124.207) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 1 Oct 2019 07:41:22 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.36.58) by
+ edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Tue, 1 Oct 2019 07:41:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nbxSzB0kQ2CzTvpDi1ZjzbKmg/seBKpNCkHqkZftzS5oxpnGBFSXaV1a1OsN1wQ9q9gZCNOtR/d9QfbLGiMQlNa3UNHN6ipnSXclLbezqRDHUGTpRNYaaVbO080N5vkLSBMLN1Dh7q+iN5G1ldzsbMaAcZIXaTE4yauAM+4oT3+Ggo4epUpDQHxTcagGpjWd+RrspmtrYvpE02lJsuwO0i3FuTckjAU9flM/Q0vD7h1DLkbg3cb9pOEpodlE3SciP+e1PODkG/8F994Bo0bp5KpGtHJxJ09TvEVY0qoi4WyLAKWJNlgfkml3jAM3EKFVVrHVn9Ti/9guKw9IMzkK2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MP8cG/MRwYSuiAshLZ3l0yhlCeA8j44gnD5amyVYDG4=;
+ b=P3ewdU7MDZHdunj/icTldw0ztZjBRVRk0MHU4B9Xp9kUAOvjpXSiLy9HLbMNcf+c0IgviJ4yPb/Xkm/ik/+7Z2l+nHa6bIIoegLMuGLzmhZVgoqzWestNOTdwySdrLJu3QmRrAXAW4L6Kjkcy71W/WqCkP+2iUkdp0hk3HIzkj3ewl0XgokRbtibM7Yw0tpIqhbjVmQR4kXEH0tlx8SgwXn39ju1Ut9NNk3CV0jm96bfO5SCG3/D0N4NK7fwl+ikLqqFuoMpJKRktMnIhk13fG5ouGzbZ+Dt151Z8D5w1YHhdalKAge9t8x/0z9nhrl8Li/fzA1qRDxChXtmdEgtBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MP8cG/MRwYSuiAshLZ3l0yhlCeA8j44gnD5amyVYDG4=;
+ b=hKqUk9p/P8Sj76QVNasGQR5RRPnxspnuJlt7nvrrIs0rxNEXxiwdI4W+qtLm3sqJo0/kBTVZlQSTsW3JWTNqzq5PLO5/tpIfb5ow8K6H7N4af1WeLKU1950sbDLUmfUUTi+txKSRvV/+FWHqzu67C5E/EfewrtKIvnkQ8OehLZw=
+Received: from DM6PR11MB4412.namprd11.prod.outlook.com (52.132.248.86) by
+ DM6PR11MB3257.namprd11.prod.outlook.com (20.176.121.21) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Tue, 1 Oct 2019 14:41:21 +0000
+Received: from DM6PR11MB4412.namprd11.prod.outlook.com
+ ([fe80::5d45:636:6a4a:9397]) by DM6PR11MB4412.namprd11.prod.outlook.com
+ ([fe80::5d45:636:6a4a:9397%7]) with mapi id 15.20.2305.022; Tue, 1 Oct 2019
+ 14:41:21 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ] mesh: Make mesh-config API more consistent
+Thread-Topic: [PATCH BlueZ] mesh: Make mesh-config API more consistent
+Thread-Index: AQHVeCK22cngUd6QL0G8621SkwN/rKdF3E4A
+Date:   Tue, 1 Oct 2019 14:41:21 +0000
+Message-ID: <4a94b48b5b1f8793ad31086c0f3b838a14633312.camel@intel.com>
+References: <20191001063708.8279-1-inga.stotland@intel.com>
+In-Reply-To: <20191001063708.8279-1-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [192.55.54.40]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2713e1ef-5acf-46c6-cc28-08d7467d6d58
+x-ms-traffictypediagnostic: DM6PR11MB3257:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR11MB325753A7C2843D9412622D38E19D0@DM6PR11MB3257.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0177904E6B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(396003)(346002)(136003)(366004)(39860400002)(199004)(189003)(316002)(6512007)(229853002)(305945005)(6486002)(7736002)(256004)(14444005)(71190400001)(71200400001)(6246003)(66066001)(6636002)(5660300002)(6436002)(91956017)(110136005)(26005)(8936002)(86362001)(8676002)(186003)(102836004)(14454004)(486006)(25786009)(76116006)(2616005)(76176011)(66476007)(81166006)(81156014)(36756003)(476003)(118296001)(6506007)(64756008)(478600001)(66446008)(2906002)(66556008)(66946007)(99286004)(446003)(11346002)(2501003)(3846002)(6116002);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR11MB3257;H:DM6PR11MB4412.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pQbp5/SUChOtX8Bhlbf906Z2rixBpBeSn0ba8Qp8N8pUhurYKF2K6tsbKfz3dwAQzMhy0fgupZOYwoy7JW3CM2ptyUPT1kA+fdrb57XSYksLR7sNDvX2yvaKJQzZRJLx3xbDfntl0bOqvBn12XZtA8RiaGaivo5FZF1o0wivAmgw3m5rPr/CnE1aUNJGHIwk36B4zGqG41kVuqQu4uswgh2Ao2KAt62eztkcyzMMUd6H8plu7Msz0Y1smvJKp/Mm6xsIsnmrKVWBIZRpIjzTIQOw1YqI5E+JnImWjFBg5AajBxFyUxw/RBCJ3E55ybIF4J+4p9yKZCfdpq41sPAfGWm0bucQUWEoUOLYjXDlJnjWsQbIqTLX3vD9kzmMH2yF3SVwvf/UhdNkfLJg1KkLfFzIEU7qki0bNmOnN9pI3Pw=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DC8BBCE069483648BC93EF4C63D38604@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2713e1ef-5acf-46c6-cc28-08d7467d6d58
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Oct 2019 14:41:21.4277
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XoeqwyzdHhfX9fUvucrMPtL7r+wyQf6nuLUsn7kJ6ZCJdb64UiNU/zrw3Ao+75c75WgnuNkpjI+wbpXXIRn2Xg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB3257
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-
-This patch adds support for reading data over J-Link RTT. It can be
-used as replacement for TTY when reading from embedded devices since
-it's much faster and does block a UART. Data format is the same as
-for TTY. At the moment monitor over RTT is only supported by Apache
-Mynewt project.
-
-Reading data is done by polling RTT every 1 msec since there is no
-blocking API to read something from RTT buffer.
-
-To enable reading from RTT, J-Link configuration needs to be passed via
-command line (all parameters except <device> can be skipped to use
-default value):
-  -J <device>,<interface=swd>,<speed=1000>,<serialno=0>
-  -J nrf52,,683649029
-
-In some cases J-Link cannot locate RTT buffer in RAM. In such case
-RAM area and buffer name should be provided via command line:
-  -R <address=0x0>,<area=0x1000>,<buffer=monitor>
-  -R 0x20000000,0x10000
----
- Makefile.tools    |  3 ++-
- monitor/control.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++
- monitor/control.h |  1 +
- monitor/main.c    | 22 +++++++++++++++++++--
- 4 files changed, 73 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile.tools b/Makefile.tools
-index 81ed2e30d..7ce05b7ef 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -42,9 +42,10 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
- 				monitor/analyze.h monitor/analyze.c \
- 				monitor/intel.h monitor/intel.c \
- 				monitor/broadcom.h monitor/broadcom.c \
-+				monitor/jlink.h monitor/jlink.c \
- 				monitor/tty.h
- monitor_btmon_LDADD = lib/libbluetooth-internal.la \
--				src/libshared-mainloop.la $(UDEV_LIBS)
-+				src/libshared-mainloop.la $(UDEV_LIBS) -ldl
- endif
- 
- if LOGGER
-diff --git a/monitor/control.c b/monitor/control.c
-index 4022e7644..1e9054db3 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -57,6 +57,7 @@
- #include "ellisys.h"
- #include "tty.h"
- #include "control.h"
-+#include "jlink.h"
- 
- static struct btsnoop *btsnoop_file = NULL;
- static bool hcidump_fallback = false;
-@@ -1416,6 +1417,55 @@ int control_tty(const char *path, unsigned int speed)
- 	return 0;
- }
- 
-+static void rtt_callback(int id, void *user_data)
-+{
-+	struct control_data *data = user_data;
-+	ssize_t len;
-+
-+	do {
-+		len = jlink_rtt_read(data->buf + data->offset,
-+					sizeof(data->buf) - data->offset);
-+		data->offset += len;
-+		process_data(data);
-+	} while (len > 0);
-+
-+	if (mainloop_modify_timeout(id, 1) < 0)
-+		mainloop_exit_failure();
-+}
-+
-+int control_rtt(char *jlink, char *rtt)
-+{
-+	struct control_data *data;
-+
-+	if (jlink_init() < 0) {
-+		fprintf(stderr, "Failed to initialize J-Link library\n");
-+		return -EIO;
-+	}
-+
-+	if (jlink_connect(jlink) < 0) {
-+		fprintf(stderr, "Failed to connect to target device\n");
-+		return -ENODEV;
-+	}
-+
-+	if (jlink_start_rtt(rtt) < 0) {
-+		fprintf(stderr, "Failed to initialize RTT\n");
-+		return -ENODEV;
-+	}
-+
-+	printf("--- RTT opened ---\n");
-+
-+	data = new0(struct control_data, 1);
-+	data->channel = HCI_CHANNEL_MONITOR;
-+	data->fd = -1;
-+
-+	if (mainloop_add_timeout(1, rtt_callback, data, free_data) < 0) {
-+		free(data);
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
- bool control_writer(const char *path)
- {
- 	btsnoop_file = btsnoop_create(path, 0, 0, BTSNOOP_FORMAT_MONITOR);
-diff --git a/monitor/control.h b/monitor/control.h
-index a9691e32f..ddf485f1f 100644
---- a/monitor/control.h
-+++ b/monitor/control.h
-@@ -28,6 +28,7 @@ bool control_writer(const char *path);
- void control_reader(const char *path, bool pager);
- void control_server(const char *path);
- int control_tty(const char *path, unsigned int speed);
-+int control_rtt(char *jlink, char *rtt);
- int control_tracing(void);
- void control_disable_decoding(void);
- void control_filter_index(uint16_t index);
-diff --git a/monitor/main.c b/monitor/main.c
-index acd44a098..adb596635 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -75,6 +75,10 @@ static void usage(void)
- 		"\t-A, --a2dp             Dump A2DP stream traffic\n"
- 		"\t-E, --ellisys [ip]     Send Ellisys HCI Injection\n"
- 		"\t-P, --no-pager         Disable pager usage\n"
-+		"\t-J  --jlink <device>,[<interface>],[<speed>],[<serialno>]\n"
-+		"\t                       Read data from RTT\n"
-+		"\t-R  --rtt [<address>],[<area>],[<name>]\n"
-+		"\t                       RTT control block parameters\n"
- 		"\t-h, --help             Show help options\n");
- }
- 
-@@ -94,6 +98,8 @@ static const struct option main_options[] = {
- 	{ "a2dp",      no_argument,       NULL, 'A' },
- 	{ "ellisys",   required_argument, NULL, 'E' },
- 	{ "no-pager",  no_argument,       NULL, 'P' },
-+	{ "jlink",     required_argument, NULL, 'J' },
-+	{ "rtt",       required_argument, NULL, 'R' },
- 	{ "todo",      no_argument,       NULL, '#' },
- 	{ "version",   no_argument,       NULL, 'v' },
- 	{ "help",      no_argument,       NULL, 'h' },
-@@ -112,6 +118,8 @@ int main(int argc, char *argv[])
- 	unsigned int tty_speed = B115200;
- 	unsigned short ellisys_port = 0;
- 	const char *str;
-+	char *jlink = NULL;
-+	char *rtt = NULL;
- 	int exit_status;
- 
- 	mainloop_init();
-@@ -122,7 +130,7 @@ int main(int argc, char *argv[])
- 		int opt;
- 		struct sockaddr_un addr;
- 
--		opt = getopt_long(argc, argv, "r:w:a:s:p:i:d:B:V:tTSAEPvh",
-+		opt = getopt_long(argc, argv, "r:w:a:s:p:i:d:B:V:tTSAE:PJ:R:vh",
- 							main_options, NULL);
- 		if (opt < 0)
- 			break;
-@@ -194,6 +202,12 @@ int main(int argc, char *argv[])
- 		case 'P':
- 			use_pager = false;
- 			break;
-+		case 'J':
-+			jlink = optarg;
-+			break;
-+		case 'R':
-+			rtt = optarg;
-+			break;
- 		case '#':
- 			packet_todo();
- 			lmp_todo();
-@@ -246,11 +260,15 @@ int main(int argc, char *argv[])
- 	if (ellisys_server)
- 		ellisys_enable(ellisys_server, ellisys_port);
- 
--	if (!tty && control_tracing() < 0)
-+	if (tty && jlink)
- 		return EXIT_FAILURE;
- 
- 	if (tty && control_tty(tty, tty_speed) < 0)
- 		return EXIT_FAILURE;
-+	else if (jlink && control_rtt(jlink, rtt) < 0)
-+		return EXIT_FAILURE;
-+	else if (control_tracing() < 0)
-+		return EXIT_FAILURE;
- 
- 	exit_status = mainloop_run_with_signal(signal_callback, NULL);
- 
--- 
-2.21.0
-
+SGkgSW5nYSwNCg0KT24gTW9uLCAyMDE5LTA5LTMwIGF0IDIzOjM3IC0wNzAwLCBJbmdhIFN0b3Rs
+YW5kIHdyb3RlOg0KPiBUaGlzIGNoYW5nZXMgdGhlIHByb3RvdHlwZXMgZm9yIG1lc2hfY29uZmln
+X21vZGVsX2JpbmRpbmdfYWRkKCkgYW5kDQo+IG1lc2hfY29uZmlnX21vZGVsX2JpbmRpbmdfZGVs
+KCkgdG8gdGFrZSB0aGUgZWxlbWVudCdzIGFkZHJlc3MgYXMgaW5wdXQNCj4gcGFyYW1ldGVyIGlu
+c3RlYWQgb2YgdGhlIGVsZW1lbnQncyBpbmRleC4gVGhlIGNoYW5nZSBhbGlnbnMgdGhlIEFQSQ0K
+PiB3aXRoIG90aGVyIGZ1bmN0aW9ucyB0aGF0IGhhbmRsZSBzdG9yYWdlIG9mIG1vZGVsIHN0YXRl
+cy4NCj4gLS0tDQo+ICBtZXNoL21lc2gtY29uZmlnLWpzb24uYyB8IDM0ICsrKysrKysrKysrKysr
+KysrKysrKystLS0tLS0tLS0tLS0NCj4gIG1lc2gvbWVzaC1jb25maWcuaCAgICAgIHwgMTEgKysr
+KysrLS0tLS0NCj4gIG1lc2gvbW9kZWwuYyAgICAgICAgICAgIHwgIDcgKystLS0tLQ0KPiAgMyBm
+aWxlcyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspLCAyMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRp
+ZmYgLS1naXQgYS9tZXNoL21lc2gtY29uZmlnLWpzb24uYyBiL21lc2gvbWVzaC1jb25maWctanNv
+bi5jDQo+IGluZGV4IGNhZmEyZmRkNy4uNGZlMDVhODAyIDEwMDY0NA0KPiAtLS0gYS9tZXNoL21l
+c2gtY29uZmlnLWpzb24uYw0KPiArKysgYi9tZXNoL21lc2gtY29uZmlnLWpzb24uYw0KPiBAQCAt
+ODM1LDExICs4MzUsMTIgQEAgYm9vbCBtZXNoX2NvbmZpZ19hcHBfa2V5X2RlbChzdHJ1Y3QgbWVz
+aF9jb25maWcgKmNmZywgdWludDE2X3QgbmV0X2lkeCwNCj4gIAlyZXR1cm4gc2F2ZV9jb25maWco
+am5vZGUsIGNmZy0+bm9kZV9kaXJfcGF0aCk7DQo+ICB9DQo+ICANCj4gLWJvb2wgbWVzaF9jb25m
+aWdfbW9kZWxfYmluZGluZ19hZGQoc3RydWN0IG1lc2hfY29uZmlnICpjZmcsIHVpbnQ4X3QgZWxl
+X2lkeCwNCj4gLQkJCQkJYm9vbCB2ZW5kb3IsIHVpbnQzMl90IG1vZF9pZCwNCj4gK2Jvb2wgbWVz
+aF9jb25maWdfbW9kZWxfYmluZGluZ19hZGQoc3RydWN0IG1lc2hfY29uZmlnICpjZmcsIHVpbnQx
+Nl90IGVsZV9hZGRyLA0KPiArCQkJCQkJYm9vbCB2ZW5kb3IsIHVpbnQzMl90IG1vZF9pZCwNCj4g
+IAkJCQkJCQl1aW50MTZfdCBhcHBfaWR4KQ0KPiAgew0KPiAgCWpzb25fb2JqZWN0ICpqbm9kZSwg
+Kmptb2RlbCwgKmpzdHJpbmcsICpqYXJyYXkgPSBOVUxMOw0KPiArCWludCBlbGVfaWR4Ow0KPiAg
+CWNoYXIgYnVmWzVdOw0KPiAgDQo+ICAJaWYgKCFjZmcpDQo+IEBAIC04NDcsNiArODQ4LDEwIEBA
+IGJvb2wgbWVzaF9jb25maWdfbW9kZWxfYmluZGluZ19hZGQoc3RydWN0IG1lc2hfY29uZmlnICpj
+ZmcsIHVpbnQ4X3QgZWxlX2lkeCwNCj4gIA0KPiAgCWpub2RlID0gY2ZnLT5qbm9kZTsNCj4gIA0K
+PiArCWVsZV9pZHggPSBnZXRfZWxlbWVudF9pbmRleChqbm9kZSwgZWxlX2FkZHIpOw0KPiArCWlm
+IChlbGVfaWR4IDwgMCkNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICAJam1vZGVsID0gZ2V0
+X2VsZW1lbnRfbW9kZWwoam5vZGUsIGVsZV9pZHgsIG1vZF9pZCwgdmVuZG9yKTsNCj4gIAlpZiAo
+IWptb2RlbCkNCj4gIAkJcmV0dXJuIGZhbHNlOw0KPiBAQCAtODc1LDExICs4ODAsMTIgQEAgYm9v
+bCBtZXNoX2NvbmZpZ19tb2RlbF9iaW5kaW5nX2FkZChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywg
+dWludDhfdCBlbGVfaWR4LA0KPiAgCXJldHVybiBzYXZlX2NvbmZpZyhqbm9kZSwgY2ZnLT5ub2Rl
+X2Rpcl9wYXRoKTsNCj4gIH0NCj4gIA0KPiAtYm9vbCBtZXNoX2NvbmZpZ19tb2RlbF9iaW5kaW5n
+X2RlbChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDhfdCBlbGVfaWR4LA0KPiAtCQkJCQli
+b29sIHZlbmRvciwgdWludDMyX3QgbW9kX2lkLA0KPiArYm9vbCBtZXNoX2NvbmZpZ19tb2RlbF9i
+aW5kaW5nX2RlbChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDhfdCBlbGVfYWRkciwNCg0K
+SSBhbSBndWVzc2luZyB0aGF0IGVsZV9hZGRyIHNob3VsZCBiZSB0aGUgdW5pY2FzdCB1MTYuDQoN
+Cj4gKwkJCQkJCWJvb2wgdmVuZG9yLCB1aW50MzJfdCBtb2RfaWQsDQo+ICAJCQkJCQkJdWludDE2
+X3QgYXBwX2lkeCkNCj4gIHsNCj4gIAlqc29uX29iamVjdCAqam5vZGUsICpqbW9kZWwsICpqYXJy
+YXksICpqYXJyYXlfbmV3Ow0KPiArCWludCBlbGVfaWR4Ow0KPiAgCWNoYXIgYnVmWzVdOw0KPiAg
+DQo+ICAJaWYgKCFjZmcpDQo+IEBAIC04ODcsNiArODkzLDEwIEBAIGJvb2wgbWVzaF9jb25maWdf
+bW9kZWxfYmluZGluZ19kZWwoc3RydWN0IG1lc2hfY29uZmlnICpjZmcsIHVpbnQ4X3QgZWxlX2lk
+eCwNCj4gIA0KPiAgCWpub2RlID0gY2ZnLT5qbm9kZTsNCj4gIA0KPiArCWVsZV9pZHggPSBnZXRf
+ZWxlbWVudF9pbmRleChqbm9kZSwgZWxlX2FkZHIpOw0KPiArCWlmIChlbGVfaWR4IDwgMCkNCj4g
+KwkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICAJam1vZGVsID0gZ2V0X2VsZW1lbnRfbW9kZWwoam5v
+ZGUsIGVsZV9pZHgsIG1vZF9pZCwgdmVuZG9yKTsNCj4gIAlpZiAoIWptb2RlbCkNCj4gIAkJcmV0
+dXJuIGZhbHNlOw0KPiBAQCAtMTgxOCw3ICsxODI4LDcgQEAgYm9vbCBtZXNoX2NvbmZpZ19uZXRf
+a2V5X3NldF9waGFzZShzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDE2X3QgaWR4LA0KPiAg
+CXJldHVybiBzYXZlX2NvbmZpZyhqbm9kZSwgY2ZnLT5ub2RlX2Rpcl9wYXRoKTsNCj4gIH0NCj4g
+IA0KPiAtYm9vbCBtZXNoX2NvbmZpZ19tb2RlbF9wdWJfYWRkKHN0cnVjdCBtZXNoX2NvbmZpZyAq
+Y2ZnLCB1aW50MTZfdCBhZGRyLA0KPiArYm9vbCBtZXNoX2NvbmZpZ19tb2RlbF9wdWJfYWRkKHN0
+cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50MTZfdCBlbGVfYWRkciwNCj4gIAkJCQkJdWludDMy
+X3QgbW9kX2lkLCBib29sIHZlbmRvciwNCj4gIAkJCQkJc3RydWN0IG1lc2hfY29uZmlnX3B1YiAq
+cHViKQ0KPiAgew0KPiBAQCAtMTgzMSw3ICsxODQxLDcgQEAgYm9vbCBtZXNoX2NvbmZpZ19tb2Rl
+bF9wdWJfYWRkKHN0cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50MTZfdCBhZGRyLA0KPiAgDQo+
+ICAJam5vZGUgPSBjZmctPmpub2RlOw0KPiAgDQo+IC0JZWxlX2lkeCA9IGdldF9lbGVtZW50X2lu
+ZGV4KGpub2RlLCBhZGRyKTsNCj4gKwllbGVfaWR4ID0gZ2V0X2VsZW1lbnRfaW5kZXgoam5vZGUs
+IGVsZV9hZGRyKTsNCj4gIAlpZiAoZWxlX2lkeCA8IDApDQo+ICAJCXJldHVybiBmYWxzZTsNCj4g
+IA0KPiBAQCAtMTg4NiwxMyArMTg5NiwxMyBAQCBmYWlsOg0KPiAgCXJldHVybiBmYWxzZTsNCj4g
+IH0NCj4gIA0KPiAtc3RhdGljIGJvb2wgZGVsZXRlX21vZGVsX3Byb3BlcnR5KGpzb25fb2JqZWN0
+ICpqbm9kZSwgdWludDE2X3QgYWRkciwNCj4gK3N0YXRpYyBib29sIGRlbGV0ZV9tb2RlbF9wcm9w
+ZXJ0eShqc29uX29iamVjdCAqam5vZGUsIHVpbnQxNl90IGVsZV9hZGRyLA0KPiAgCQkJdWludDMy
+X3QgbW9kX2lkLCBib29sIHZlbmRvciwgY29uc3QgY2hhciAqa2V5d29yZCkNCj4gIHsNCj4gIAlq
+c29uX29iamVjdCAqam1vZGVsOw0KPiAgCWludCBlbGVfaWR4Ow0KPiAgDQo+IC0JZWxlX2lkeCA9
+IGdldF9lbGVtZW50X2luZGV4KGpub2RlLCBhZGRyKTsNCj4gKwllbGVfaWR4ID0gZ2V0X2VsZW1l
+bnRfaW5kZXgoam5vZGUsIGVsZV9hZGRyKTsNCj4gIAlpZiAoZWxlX2lkeCA8IDApDQo+ICAJCXJl
+dHVybiBmYWxzZTsNCj4gIA0KPiBAQCAtMTkxNSw3ICsxOTI1LDcgQEAgYm9vbCBtZXNoX2NvbmZp
+Z19tb2RlbF9wdWJfZGVsKHN0cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50MTZfdCBhZGRyLA0K
+PiAgCXJldHVybiBzYXZlX2NvbmZpZyhjZmctPmpub2RlLCBjZmctPm5vZGVfZGlyX3BhdGgpOw0K
+PiAgfQ0KPiAgDQo+IC1ib29sIG1lc2hfY29uZmlnX21vZGVsX3N1Yl9hZGQoc3RydWN0IG1lc2hf
+Y29uZmlnICpjZmcsIHVpbnQxNl90IGFkZHIsDQo+ICtib29sIG1lc2hfY29uZmlnX21vZGVsX3N1
+Yl9hZGQoc3RydWN0IG1lc2hfY29uZmlnICpjZmcsIHVpbnQxNl90IGVsZV9hZGRyLA0KPiAgCQkJ
+CQkJdWludDMyX3QgbW9kX2lkLCBib29sIHZlbmRvciwNCj4gIAkJCQkJCXN0cnVjdCBtZXNoX2Nv
+bmZpZ19zdWIgKnN1YikNCj4gIHsNCj4gQEAgLTE5MjgsNyArMTkzOCw3IEBAIGJvb2wgbWVzaF9j
+b25maWdfbW9kZWxfc3ViX2FkZChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDE2X3QgYWRk
+ciwNCj4gIA0KPiAgCWpub2RlID0gY2ZnLT5qbm9kZTsNCj4gIA0KPiAtCWVsZV9pZHggPSBnZXRf
+ZWxlbWVudF9pbmRleChqbm9kZSwgYWRkcik7DQo+ICsJZWxlX2lkeCA9IGdldF9lbGVtZW50X2lu
+ZGV4KGpub2RlLCBlbGVfYWRkcik7DQo+ICAJaWYgKGVsZV9pZHggPCAwKQ0KPiAgCQlyZXR1cm4g
+ZmFsc2U7DQo+ICANCj4gQEAgLTE5NjYsNyArMTk3Niw3IEBAIGJvb2wgbWVzaF9jb25maWdfbW9k
+ZWxfc3ViX2FkZChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDE2X3QgYWRkciwNCj4gIAly
+ZXR1cm4gc2F2ZV9jb25maWcoam5vZGUsIGNmZy0+bm9kZV9kaXJfcGF0aCk7DQo+ICB9DQo+ICAN
+Cj4gLWJvb2wgbWVzaF9jb25maWdfbW9kZWxfc3ViX2RlbChzdHJ1Y3QgbWVzaF9jb25maWcgKmNm
+ZywgdWludDE2X3QgYWRkciwNCj4gK2Jvb2wgbWVzaF9jb25maWdfbW9kZWxfc3ViX2RlbChzdHJ1
+Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDE2X3QgZWxlX2FkZHIsDQo+ICAJCQkJCQl1aW50MzJf
+dCBtb2RfaWQsIGJvb2wgdmVuZG9yLA0KPiAgCQkJCQkJc3RydWN0IG1lc2hfY29uZmlnX3N1YiAq
+c3ViKQ0KPiAgew0KPiBAQCAtMTk3OSw3ICsxOTg5LDcgQEAgYm9vbCBtZXNoX2NvbmZpZ19tb2Rl
+bF9zdWJfZGVsKHN0cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50MTZfdCBhZGRyLA0KPiAgDQo+
+ICAJam5vZGUgPSBjZmctPmpub2RlOw0KPiAgDQo+IC0JZWxlX2lkeCA9IGdldF9lbGVtZW50X2lu
+ZGV4KGpub2RlLCBhZGRyKTsNCj4gKwllbGVfaWR4ID0gZ2V0X2VsZW1lbnRfaW5kZXgoam5vZGUs
+IGVsZV9hZGRyKTsNCj4gIAlpZiAoZWxlX2lkeCA8IDApDQo+ICAJCXJldHVybiBmYWxzZTsNCj4g
+IA0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9tZXNoLWNvbmZpZy5oIGIvbWVzaC9tZXNoLWNvbmZpZy5o
+DQo+IGluZGV4IGNmMWY4YjI5OS4uNTk1ZTUzYjNhIDEwMDY0NA0KPiAtLS0gYS9tZXNoL21lc2gt
+Y29uZmlnLmgNCj4gKysrIGIvbWVzaC9tZXNoLWNvbmZpZy5oDQo+IEBAIC0xMDQsNiArMTA0LDcg
+QEAgc3RydWN0IG1lc2hfY29uZmlnX25vZGUgew0KPiAgCXVpbnQ4X3QgZGV2X2tleVsxNl07DQo+
+ICAJdWludDhfdCB0b2tlbls4XTsNCj4gIH07DQo+ICsNCj4gIHR5cGVkZWYgdm9pZCAoKm1lc2hf
+Y29uZmlnX3N0YXR1c19mdW5jX3QpKHZvaWQgKnVzZXJfZGF0YSwgYm9vbCByZXN1bHQpOw0KPiAg
+dHlwZWRlZiBib29sICgqbWVzaF9jb25maWdfbm9kZV9mdW5jX3QpKHN0cnVjdCBtZXNoX2NvbmZp
+Z19ub2RlICpub2RlLA0KPiAgCQkJCQkJCWNvbnN0IHVpbnQ4X3QgdXVpZFsxNl0sDQo+IEBAIC0x
+MzYsMTAgKzEzNywxMCBAQCBib29sIG1lc2hfY29uZmlnX3dyaXRlX3JlbGF5X21vZGUoc3RydWN0
+IG1lc2hfY29uZmlnICpjZmcsIHVpbnQ4X3QgbW9kZSwNCj4gIGJvb2wgbWVzaF9jb25maWdfd3Jp
+dGVfdHRsKHN0cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50OF90IHR0bCk7DQo+ICBib29sIG1l
+c2hfY29uZmlnX3dyaXRlX21vZGUoc3RydWN0IG1lc2hfY29uZmlnICpjZmcsIGNvbnN0IGNoYXIg
+KmtleXdvcmQsDQo+ICAJCQkJCQkJCWludCB2YWx1ZSk7DQo+IC1ib29sIG1lc2hfY29uZmlnX21v
+ZGVsX2JpbmRpbmdfYWRkKHN0cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50OF90IGVsZV9pZHgs
+DQo+ICtib29sIG1lc2hfY29uZmlnX21vZGVsX2JpbmRpbmdfYWRkKHN0cnVjdCBtZXNoX2NvbmZp
+ZyAqY2ZnLCB1aW50MTZfdCBlbGVfYWRkciwNCj4gIAkJCQkJCWJvb2wgdmVuZG9yLCB1aW50MzJf
+dCBtb2RfaWQsDQo+ICAJCQkJCQkJdWludDE2X3QgYXBwX2lkeCk7DQo+IC1ib29sIG1lc2hfY29u
+ZmlnX21vZGVsX2JpbmRpbmdfZGVsKHN0cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50OF90IGVs
+ZV9pZHgsDQo+ICtib29sIG1lc2hfY29uZmlnX21vZGVsX2JpbmRpbmdfZGVsKHN0cnVjdCBtZXNo
+X2NvbmZpZyAqY2ZnLCB1aW50OF90IGVsZV9hZGRyLA0KDQp1MTYgYWdhaW4NCg0KPiAgCQkJCQkJ
+Ym9vbCB2ZW5kb3IsIHVpbnQzMl90IG1vZF9pZCwNCj4gIAkJCQkJCQl1aW50MTZfdCBhcHBfaWR4
+KTsNCj4gIGJvb2wgbWVzaF9jb25maWdfbW9kZWxfcHViX2FkZChzdHJ1Y3QgbWVzaF9jb25maWcg
+KmNmZywgdWludDE2X3QgZWxlX2FkZHIsDQo+IEBAIC0xNDcsMTMgKzE0OCwxMyBAQCBib29sIG1l
+c2hfY29uZmlnX21vZGVsX3B1Yl9hZGQoc3RydWN0IG1lc2hfY29uZmlnICpjZmcsIHVpbnQxNl90
+IGVsZV9hZGRyLA0KPiAgCQkJCQkJc3RydWN0IG1lc2hfY29uZmlnX3B1YiAqcHViKTsNCj4gIGJv
+b2wgbWVzaF9jb25maWdfbW9kZWxfcHViX2RlbChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWlu
+dDE2X3QgZWxlX2FkZHIsDQo+ICAJCQkJCQl1aW50MzJfdCBtb2RfaWQsIGJvb2wgdmVuZG9yKTsN
+Cj4gLWJvb2wgbWVzaF9jb25maWdfbW9kZWxfc3ViX2FkZChzdHJ1Y3QgbWVzaF9jb25maWcgKmNm
+ZywgdWludDE2X3QgYWRkciwNCj4gK2Jvb2wgbWVzaF9jb25maWdfbW9kZWxfc3ViX2FkZChzdHJ1
+Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDE2X3QgZWxlX2FkZHIsDQo+ICAJCQkJCQl1aW50MzJf
+dCBtb2RfaWQsIGJvb2wgdmVuZG9yLA0KPiAgCQkJCQkJc3RydWN0IG1lc2hfY29uZmlnX3N1YiAq
+c3ViKTsNCj4gLWJvb2wgbWVzaF9jb25maWdfbW9kZWxfc3ViX2RlbChzdHJ1Y3QgbWVzaF9jb25m
+aWcgKmNmZywgdWludDE2X3QgYWRkciwNCj4gK2Jvb2wgbWVzaF9jb25maWdfbW9kZWxfc3ViX2Rl
+bChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDE2X3QgZWxlX2FkZHIsDQo+ICAJCQkJCQl1
+aW50MzJfdCBtb2RfaWQsIGJvb2wgdmVuZG9yLA0KPiAgCQkJCQkJc3RydWN0IG1lc2hfY29uZmln
+X3N1YiAqc3ViKTsNCj4gLWJvb2wgbWVzaF9jb25maWdfbW9kZWxfc3ViX2RlbF9hbGwoc3RydWN0
+IG1lc2hfY29uZmlnICpjZmcsIHVpbnQxNl90IGFkZHIsDQo+ICtib29sIG1lc2hfY29uZmlnX21v
+ZGVsX3N1Yl9kZWxfYWxsKHN0cnVjdCBtZXNoX2NvbmZpZyAqY2ZnLCB1aW50MTZfdCBlbGVfYWRk
+ciwNCj4gIAkJCQkJCXVpbnQzMl90IG1vZF9pZCwgYm9vbCB2ZW5kb3IpOw0KPiAgYm9vbCBtZXNo
+X2NvbmZpZ19hcHBfa2V5X2FkZChzdHJ1Y3QgbWVzaF9jb25maWcgKmNmZywgdWludDE2X3QgbmV0
+X2lkeCwNCj4gIAkJCQl1aW50MTZfdCBhcHBfaWR4LCBjb25zdCB1aW50OF90IGtleVsxNl0pOw0K
+PiBkaWZmIC0tZ2l0IGEvbWVzaC9tb2RlbC5jIGIvbWVzaC9tb2RlbC5jDQo+IGluZGV4IGEwNmI2
+ODRhNS4uZjRiODU2MTA4IDEwMDY0NA0KPiAtLS0gYS9tZXNoL21vZGVsLmMNCj4gKysrIGIvbWVz
+aC9tb2RlbC5jDQo+IEBAIC01NjEsNyArNTYxLDYgQEAgc3RhdGljIGludCB1cGRhdGVfYmluZGlu
+ZyhzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCBhZGRyLCB1aW50MzJfdCBpZCwNCj4g
+IAlpbnQgc3RhdHVzOw0KPiAgCXN0cnVjdCBtZXNoX21vZGVsICptb2Q7DQo+ICAJYm9vbCBpc19w
+cmVzZW50LCBpc192ZW5kb3I7DQo+IC0JdWludDhfdCBlbGVfaWR4Ow0KPiAgDQo+ICAJbW9kID0g
+ZmluZF9tb2RlbChub2RlLCBhZGRyLCBpZCwgJnN0YXR1cyk7DQo+ICAJaWYgKCFtb2QpIHsNCj4g
+QEAgLTU4NiwxMiArNTg1LDEwIEBAIHN0YXRpYyBpbnQgdXBkYXRlX2JpbmRpbmcoc3RydWN0IG1l
+c2hfbm9kZSAqbm9kZSwgdWludDE2X3QgYWRkciwgdWludDMyX3QgaWQsDQo+ICAJaWYgKGlzX3By
+ZXNlbnQgJiYgIXVuYmluZCkNCj4gIAkJcmV0dXJuIE1FU0hfU1RBVFVTX1NVQ0NFU1M7DQo+ICAN
+Cj4gLQllbGVfaWR4ID0gKHVpbnQ4X3QpIG5vZGVfZ2V0X2VsZW1lbnRfaWR4KG5vZGUsIGFkZHIp
+Ow0KPiAtDQo+ICAJaWYgKHVuYmluZCkgew0KPiAgCQltb2RlbF91bmJpbmRfaWR4KG5vZGUsIG1v
+ZCwgYXBwX2lkeCk7DQo+ICAJCWlmICghbWVzaF9jb25maWdfbW9kZWxfYmluZGluZ19kZWwobm9k
+ZV9jb25maWdfZ2V0KG5vZGUpLA0KPiAtCQkJCQllbGVfaWR4LCBpc192ZW5kb3IsIGlkLCBhcHBf
+aWR4KSkNCj4gKwkJCQkJYWRkciwgaXNfdmVuZG9yLCBpZCwgYXBwX2lkeCkpDQo+ICAJCQlyZXR1
+cm4gTUVTSF9TVEFUVVNfU1RPUkFHRV9GQUlMOw0KPiAgDQo+ICAJCXJldHVybiBNRVNIX1NUQVRV
+U19TVUNDRVNTOw0KPiBAQCAtNjAxLDcgKzU5OCw3IEBAIHN0YXRpYyBpbnQgdXBkYXRlX2JpbmRp
+bmcoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDE2X3QgYWRkciwgdWludDMyX3QgaWQsDQo+
+ICAJCXJldHVybiBNRVNIX1NUQVRVU19JTlNVRkZfUkVTT1VSQ0VTOw0KPiAgDQo+ICAJaWYgKCFt
+ZXNoX2NvbmZpZ19tb2RlbF9iaW5kaW5nX2FkZChub2RlX2NvbmZpZ19nZXQobm9kZSksDQo+IC0J
+CQkJCWVsZV9pZHgsIGlzX3ZlbmRvciwgaWQsIGFwcF9pZHgpKQ0KPiArCQkJCQlhZGRyLCBpc192
+ZW5kb3IsIGlkLCBhcHBfaWR4KSkNCj4gIAkJcmV0dXJuIE1FU0hfU1RBVFVTX1NUT1JBR0VfRkFJ
+TDsNCj4gIA0KPiAgCW1vZGVsX2JpbmRfaWR4KG5vZGUsIG1vZCwgYXBwX2lkeCk7DQo=
