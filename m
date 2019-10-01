@@ -1,215 +1,236 @@
-Return-Path: <SRS0=G1Nt=XZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=34D5=X2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E80C32792
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Sep 2019 23:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 822A3C388F3
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 05:05:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52E2A20673
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Sep 2019 23:42:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="beNjvmh0"
+	by mail.kernel.org (Postfix) with ESMTP id 4AB6C20842
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 05:05:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730276AbfI3Xm2 (ORCPT
+        id S1726157AbfJAFF2 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Sep 2019 19:42:28 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38132 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbfI3Xm1 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Sep 2019 19:42:27 -0400
-Received: by mail-io1-f66.google.com with SMTP id u8so43007409iom.5;
-        Mon, 30 Sep 2019 16:42:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=npGWR76W+ANkwMKaV1VzAxIvdcc9xQxvuDfGguyNNeU=;
-        b=beNjvmh0r08vzIhqpr9+2IgXi5VD/ICuDRMVvBX8IfqINKq9Re95ZCqBVTA8Qo68ha
-         ayl5QaDNpTv7GqMYFfLC9wZpqepLVA7gU9f+I1QEpXXY1lKEFZnnoJwMXH0+pIgSSpZB
-         H+s6QLzXMTmloR/DTqlFAIE+3vZEUzT3s8hFT6E1bTJNeKTZISj/KccC3D8HRA1zMH+U
-         +nhuXBx+O1uGCG2ADxNOByiyDU/0O4G4hkhf+quHdy8IaCH6osQYtMzvx57nIjpQt/6l
-         OJvMRMyldSOHlcKuHEiyXQupqsYH0eUnCXwse2M2qRbvuH47jDHU7dkKyT5Kj8m09rvA
-         MLWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=npGWR76W+ANkwMKaV1VzAxIvdcc9xQxvuDfGguyNNeU=;
-        b=JSdNJkb+mx7knshfdeQXgSPf7jZm2fna8Up3JvatAC/Sjzl+RDQgWLPDIaTZMMaMD5
-         L1I3TxVSVhzVINbZuISRdWKehY3vVGAszS6HA5LNWaFg/e4HPc72ISXRI3HeOFlcxxwr
-         TBuCaEkIX096dt9UwFBytilJzT7X9KJwJx14kZrYeV9SuAuEwK+G0LnNNWOOATwzbxfo
-         p2G9+PmLesf61P+XsHD6NgFawj5hc6RmlxtIpdquGingDp8AJMoXVLxFvbEET49jjbR9
-         T/iuLi666rDjw25fOMGtpbZH5tIbeSovGJtbJAv8LfueHHEvxcO5JDtkzF4/7UYnbJeH
-         z/bQ==
-X-Gm-Message-State: APjAAAXujLKPfBxieWekOsQgSutyZiZaOEvyvbFfOznP/7/D0PGa/ZeT
-        i3/NkZrDvKqjKRhhq7j/7Ps0IFr0jIU/+yVaxgk=
-X-Google-Smtp-Source: APXvYqwB9Mc2oDBais5yAXi1w5WCptQ/HNCX0U9RENAVSXuYuqMAytmA4lq5eAxdsIeAyh7Wl+SrehQE0PmdRGBlwY0=
-X-Received: by 2002:a05:6e02:683:: with SMTP id o3mr21443923ils.58.1569886946381;
- Mon, 30 Sep 2019 16:42:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20181221011752.25627-1-sre@kernel.org> <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
- <20190319133154.7tbfafy7pguzw2tk@earth.universe> <CAHCN7xLZFLs=ed539bwuT6s-n6SDof-um7B3AeErQ2ChztC26A@mail.gmail.com>
- <CAHCN7xLQ=h3bfwS=uTfjSpOtv9qWbic0=_51WJz9KmX7v8+vmw@mail.gmail.com>
- <FCCA9B3E-80AD-416E-B6E4-85E90721881E@holtmann.org> <CAHCN7x+2t++EifqQ17kyzW0=NnnQ4A1HeFvE4pEzJ02cXwy+LA@mail.gmail.com>
- <4C83753E-205B-42CE-AF85-74674B311151@holtmann.org>
-In-Reply-To: <4C83753E-205B-42CE-AF85-74674B311151@holtmann.org>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Mon, 30 Sep 2019 18:42:13 -0500
-Message-ID: <CAHCN7xKdACg962p+bEO8+jHGHoVdsRXZKZ5hmE4nTO1_zsDmYw@mail.gmail.com>
-Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
+        Tue, 1 Oct 2019 01:05:28 -0400
+Received: from mga01.intel.com ([192.55.52.88]:21069 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725535AbfJAFF2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 1 Oct 2019 01:05:28 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Sep 2019 22:05:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,569,1559545200"; 
+   d="scan'208";a="392316173"
+Received: from kmsmsx157.gar.corp.intel.com ([172.21.138.134])
+  by fmsmga006.fm.intel.com with ESMTP; 30 Sep 2019 22:05:26 -0700
+Received: from pgsmsx105.gar.corp.intel.com ([169.254.4.30]) by
+ kmsmsx157.gar.corp.intel.com ([169.254.5.132]) with mapi id 14.03.0439.000;
+ Tue, 1 Oct 2019 13:05:25 +0800
+From:   "Bag, Amit K" <amit.k.bag@intel.com>
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Sebastian Reichel <sre@kernel.org>,
-        Hans Verkuil <hverkuil@xs4all.nl>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Tony Lindgren <tony@atomide.com>,
-        Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-media@vger.kernel.org,
-        Linux-OMAP <linux-omap@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "Hegde, Raghuram" <raghuram.hegde@intel.com>
+Subject: RE: [PATCH] Bluetooth: btusb: Trigger Intel FW download error
+ recovery
+Thread-Topic: [PATCH] Bluetooth: btusb: Trigger Intel FW download error
+ recovery
+Thread-Index: AQHVdDZ8SxjBrsJBVUGWo2sTd/IkjKc+jbWAgACTsUCABGcogIAAh00A//+LAICAAafIMA==
+Date:   Tue, 1 Oct 2019 05:05:25 +0000
+Message-ID: <EFE6F46E14A5F445949D76A8CAC224005844E2CF@PGSMSX105.gar.corp.intel.com>
+References: <1569480202-10560-1-git-send-email-amit.k.bag@intel.com>
+ <BE2BC36F-DD17-4773-B38B-AE4129EB3437@holtmann.org>
+ <EFE6F46E14A5F445949D76A8CAC224005844D981@PGSMSX105.gar.corp.intel.com>
+ <F15D9D95-0A5F-43E9-AA56-D7FFE0E5EAB9@holtmann.org>
+ <EFE6F46E14A5F445949D76A8CAC224005844E059@PGSMSX105.gar.corp.intel.com>
+ <C492CC56-8901-44EE-8A84-8DDBCA1655E6@holtmann.org>
+In-Reply-To: <C492CC56-8901-44EE-8A84-8DDBCA1655E6@holtmann.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYmQ3NjU1Y2EtYjBiYi00NjVjLWJjNTUtNWQ1YzE1MjAzMWRlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib1N1emNuVWV5Qmx1bWMrbDNSb2pmbmlOSVJvemVnTE5kdFlqM3NzNk9JS3NnakYrMEhneTdHQ0hpZTU2MzRlYiJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [172.30.20.206]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, May 10, 2019 at 10:38 AM Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
->
-> Hi Adam,
->
-> >>>>>>> This moves all remaining users of the legacy TI_ST driver to hcil=
-l (patches
-> >>>>>>> 1-3). Then patches 4-7 convert wl128x-radio driver to a standard =
-platform
-> >>>>>>> device driver with support for multiple instances. Patch 7 will r=
-esult in
-> >>>>>>> (userless) TI_ST driver no longer supporting radio at runtime. Pa=
-tch 8-11 do
-> >>>>>>> some cleanups in the wl128x-radio driver. Finally patch 12 remove=
-s the TI_ST
-> >>>>>>> specific parts from wl128x-radio and adds the required infrastruc=
-ture to use it
-> >>>>>>> with the serdev hcill driver instead. The remaining patches 13 an=
-d 14 remove
-> >>>>>>> the old TI_ST code.
-> >>>>>>>
-> >>>>>>> The new code has been tested on the Motorola Droid 4. For testing=
- the audio
-> >>>>>>> should be configured to route Ext to Speaker or Headphone. Then y=
-ou need to
-> >>>>>>> plug headphone, since its cable is used as antenna. For testing t=
-here is a
-> >>>>>>> 'radio' utility packages in Debian. When you start the utility yo=
-u need to
-> >>>>>>> specify a frequency, since initial get_frequency returns an error=
-:
-> >>>>>>
-> >>>>>> What is the status of this series?
-> >>>>>>
-> >>>>>> Based on some of the replies (from Adam Ford in particular) it app=
-ears that
-> >>>>>> this isn't ready to be merged, so is a v2 planned?
-> >>>>>
-> >>>>> Yes, a v2 is planned, but I'm super busy at the moment. I don't
-> >>>>> expect to send something for this merge window. Neither LogicPD
-> >>>>> nor IGEP use FM radio, so I can just remove FM support from the
-> >>>>> TI_ST framework. Converting those platforms to hci_ll can be done
-> >>>>> in a different patchset.
-> >>>>>
-> >>>>> If that was the only issue there would be a v2 already. But Marcel
-> >>>>> Holtmann suggested to pass the custom packet data through the BT
-> >>>>> subsystem, which is non-trivial (at least for me) :)
-> >>>>
-> >>>> I am running some tests today on the wl1283-st on the Logic PD Torpe=
-do
-> >>>> board.  Tony had suggested a few options, so I'm going to try those.
-> >>>> Looking at those today.  If/when you have a V2, please CC me on it. =
-If
-> >>>> it's been posted, can you send me a link?  I would really like to se=
-e
-> >>>> the st-kim driver go away so I'd like to resolve the issues with the
-> >>>> torpedo board.
-> >>>
-> >>> I have run a bunch of tests on the 5.1 kernel.  I am able to get the
-> >>> firmware to load now and the hci0 goes up.  I was able to establish a
-> >>> BLE connection to a TI Sensor Tag and read and write data to it with
-> >>> good success on the wl1283.
-> >>>
-> >>> Unfortunately, when I tried to do some more extensive testing over
-> >>> classic Bluetooth, I got an error that repeats itself at seemingly
-> >>> random intervals:
-> >>>     Bluetooth: hci0: Frame reassembly failed (-84)
-> >>>
-> >>> I can still scan and pair, but these Frame reassembly failed errors
-> >>> appear to come and go.
-> >>
-> >> there are only 3 places in h4_recv_buf that return EILSEQ. Just add an=
- extra printk to these to figure out which one it is. Maybe it is just extr=
-a packet types that we need to handle. If it is not the packet type one, pr=
-int what packet we have that is causing this.
-> >>
-> >
-> > I added some code around
-> >
-> > /* Check for invalid packet type */
-> >    if (!skb) {
-> >     printk("Check for invalid packet type %x\n", (unsigned int)
-> > (&pkts[i])->type);
-> >     return ERR_PTR(-EILSEQ);
-> > }
-> >
-> > I don't know if I did it right or I am reading the packet type
-> > correctly, but the frame reassembly errors are being caught here.
-> >
-> > [  408.519165] Check for invalid packet type ff
-> > [  408.523559] Bluetooth: hci0: Frame reassembly failed (-84)
->
-> so now we need to figure our on how to handle HCI_VENDOR_PKT.
->
-> #define LL_RECV_VENDOR \
->         .type =3D HCI_VENDOR_PKT, \
->         .hlen =3D aaa, \
->         .loff =3D bbb, \
->         .lsize =3D ccc, \
->         .maxlen =3D ddd
->
-> static const struct h4_recv_pkt ll_recv_pkts[] =3D {
->         ...
->         { LL_RECV_WAKE_ACK,  .recv =3D ll_recv_frame  },
->         { LL_RECV_VENDOR,    .recv =3D hci_recv_diag  },
-> };
->
-> Can you hexdump the data inside the skb and we can figure out what it use=
-s for the header and size.
->
-> In hci_bcm.c there are a few examples of fixed size packets and bpa10x.c =
-contains one where it follows an actual header definition. Also hci_nokia.c=
- contains a few for their packets.
+Hi Marcel,
 
-I haven't forgotten this, but I was highly distracted.  I wanted to
-test a bunch of stuff on omap3630 and imx6 boards to prep them for the
-upcoming 5.4 LTS kernel.  As of now I 'think' this is the last item on
-my to-do list.
+>>>>>> Sometimes during FW data download stage, in case of an error is 
+>>>>>> encountered the controller device could not be recovered. To 
+>>>>>> recover from such failures send Intel hard Reset to re-trigger FW 
+>>>>>> download in following error scenarios:
+>>>>>> 
+>>>>>> 1. Intel Read version command error 2. Firmware download timeout 
+>>>>>> 3. Failure in Intel Soft Reset for switching to operational FW 4.
+>>>>>> Boot timeout for switching to operaional FW
+>>>>>> 
+>>>>>> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+>>>>>> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+>>>>>> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+>>>>>> ---
+>>>>>> drivers/bluetooth/btintel.c | 39
+>>>>>> +++++++++++++++++++++++++++++++++++++++
+>>>>>> drivers/bluetooth/btintel.h |  6 ++++++
+>>>>>> drivers/bluetooth/btusb.c   | 20 ++++++++++++++++----
+>>>>>> 3 files changed, 61 insertions(+), 4 deletions(-)
+>>>>>> 
+>>>>>> diff --git a/drivers/bluetooth/btintel.c 
+>>>>>> b/drivers/bluetooth/btintel.c index bb99c8653aab..fdec9c53b48d
+>>>>>> 100644
+>>>>>> --- a/drivers/bluetooth/btintel.c
+>>>>>> +++ b/drivers/bluetooth/btintel.c
+>>>>>> @@ -709,6 +709,45 @@ int btintel_download_firmware(struct hci_dev 
+>>>>>> *hdev, const struct firmware *fw, } 
+>>>>>> EXPORT_SYMBOL_GPL(btintel_download_firmware);
+>>>>>> 
+>>>>>> +void btintel_retry_fw_download(struct hci_dev *hdev) {
+>>>>>> +	/* Send Intel Reset command. This will result in
+>>>>>> +	 * re-enumeration of BT controller.
+>>>>>> +	 *
+>>>>>> +	 * Intel Reset parameter description:
+>>>>>> +	 * reset_param[0] => reset_type : 0x01 (Hard reset),
+>>>>>> +					  0x00 (Soft reset)
+>>>>>> +	 * reset_param[1] => patch_enable : 0x01 (Enable),
+>>>>>> +	 *				    0x00 (Do not enable)
+>>>>>> +	 * reset_param[2] => ddc_reload : 0x01 (Reload),
+>>>>>> +	 *				  0x00 (Do not reload)
+>>>>>> +	 * reset_param[3] => boot_option: 0x00 (Current image),
+>>>>>> +					  0x01 (Specified boot address)
+>>>>>> +	 * reset_param[4] to reset_param[7] => Boot address
+>>>>>> +	 *
+>>>>>> +	 */
+>>>>>> +	static const u8 reset_param[] = { 0x01, 0x01, 0x01, 0x00,
+>>>>>> +					0x00, 0x00, 0x00, 0x00 };
+>>>> 
+>>>> pplease use intel_reset structure and add the comments when assigning the fields.
+>>>> 
+>>>>>> +	struct sk_buff *skb;
+>>>>>> +
+>>>>>> +	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param),
+>>>>>> +				reset_param, HCI_INIT_TIMEOUT);
+>>>> 
+>>>> pplease align the second line according to the coding style.
+	 will be done. 
+>>>> 
+>>>>>> +	if (IS_ERR(skb)) {
+>>>>>> +		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
+>>>>>> +				PTR_ERR(skb));
+>>>> 
+>>>> SSame as above.
+	 will be done. 
+>>>> 
+>>>>>> +		return;
+>>>>>> +	}
+>>>>>> +	bt_dev_info(hdev, "Intel reset sent to retry FW download");
+>>>>>> +	kfree_skb(skb);
+>>>> 
+>>>> EExtra empty line here.
+	 will be done.
+>>>> 
+>>>>>> +	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
+>>>>>> +	 * lines for 2ms when it receives Intel Reset in bootloader mode.
+>>>>>> +	 * Whereas, the upcoming Intel BT controllers will hold USB reset
+>>>>>> +	 * for 150ms. To keep the delay generic, 150ms is chosen here.
+>>>>>> +	 */
+>>>>>> +	msleep(150);
+>>>>>> +}
+>>>>>> +EXPORT_SYMBOL_GPL(btintel_retry_fw_download);
+>>>>>> +
+>>>> 
+>>>> II do not like the name here. Using btintel_reset_to_bootloader would be better. Since the function itself is not going to do the firmware retry. It will just drop you back into boot loader.
+	  OK I will rename the fucntion name and share new patch.
+>>>> 
+>>>> HHowever the more important question is what happens if you send this command. Is the device re-enumerating on USB? Or after the 150ms we just have to redo the firmware download.
+	 Yes the device will re-enumerat on USB. 
+>>>> 
+>>>>>> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>"); 
+>>>>>> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver "
+>>>>>> VERSION); MODULE_VERSION(VERSION); diff --git 
+>>>>>> a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h index
+>>>>>> 3d846190f2bf..d04d3c7cb513 100644
+>>>>>> --- a/drivers/bluetooth/btintel.h
+>>>>>> +++ b/drivers/bluetooth/btintel.h
+>>>>>> @@ -87,6 +87,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
+>>>>>> 			     struct intel_boot_params *params); int 
+>>>>>> btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
+>>>>>> 			      u32 *boot_param);
+>>>>>> +void btintel_retry_fw_download(struct hci_dev *hdev);
+>>>>>> #else
+>>>>>> 
+>>>>>> static inline int btintel_check_bdaddr(struct hci_dev *hdev) @@
+>>>>>> -181,4
+>>>>>> +182,9 @@ static inline int btintel_download_firmware(struct 
+>>>>>> +hci_dev
+>>>>>> *dev, {
+>>>>>> 	return -EOPNOTSUPP;
+>>>>>> }
+>>>>>> +
+>>>>>> +static inline void btintel_retry_fw_download(struct hci_dev *hdev) {
+>>>>>> +	return -EOPNOTSUPP;
+>>>>>> +}
+>>>>>> #endif
+>>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
+>>>>>> index a9c35ebb30f8..7a763bd856ba 100644
+>>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>>> @@ -1846,8 +1846,11 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+>>>>>> 	 * firmware variant, revision and build number.
+>>>>>> 	 */
+>>>>>> 	err = btintel_read_version(hdev, &ver);
+>>>>>> -	if (err)
+>>>>>> +	if (err) {
+>>>>>> +		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
+>>>>>> +		btintel_retry_fw_download(hdev);
+>>>>>> 		return err;
+>>>>>> +	}
+>>>>>> 
+>>>>>> 	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
+>>>>>> 		    ver.hw_platform, ver.hw_variant, ver.hw_revision, @@ -2326,9
+>>>>>> +2329,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>>>>>> 
+>>>>>> 	/* Start firmware downloading and get boot parameter */
+>>>>>> 	err = btintel_download_firmware(hdev, fw, &boot_param);
+>>>>>> -	if (err < 0)
+>>>>>> +	if (err < 0) {
+>>>>>> +		/* When FW download fails, send Intel Reset to retry
+>>>>>> +		 * FW download.
+>>>>>> +		 */
+>>>>>> +		btintel_retry_fw_download(hdev);
+>>>>>> 		goto done;
+>>>>> 
+>>>>> Is this actually going to work? If you jump to done, then you end up sending intel soft reset and then waiting for the device to boot. If you are lucky it times out, if not, then you end up loading DCC now.
+>>>>> 
+>>>>> If the device re-enumerates on USB, then we need an extra jump point to just release the firmware memory and then just exit hdev->setup. If are suppose to just retry, then we need to actually start over.
+>>>>> 
+>>>>> So have you actually tested this by randomly failing each step in the firmware download process.
+>>>>> 
+>>>> We send hard reset which will re-emumerates BT USB device and  initialize usb driver. 
+>>>> We have tested all the scenario and its working fine.
+>>> 
+>>> that is fine. However when this happens we should try to exit without sending any further commands. So we will need a separate exit path then.
+>> 
+>> This happens during firmware download when controller is in bootloader mode. When there is error during firmware download BT driver will not send any further command and since driver is not initialized bluez stack also will not send any commands at all. Only way to recover from this error is to power cycle the machine. Instead of complete power cycle we introduce this recovery mechanism by sending hard reset command which will only power cycle the BT chip not the complete machine.
+>
+> are you sure that every goto done is not doing any further commands? When I looked at the code last week I came to a different conclusion.
 
-I'm going to try and throw some debug code into the older st/kim
-driver as well as debug this.  I know some people have stated they
-have wl1283-st working on a dm3730.  dump some logs?  I am curious to
-see if there is anything that can be gained by sharing the info.  I'd
-love to see the older st/kim drivers deprecated.
+Yes in case of error the controller will not reach to goto done and will not send any further commands. 
+I will modify this patch as per comments above and upload new version of this patch. 
 
-adam
->
-> Regards
->
-> Marcel
->
+Thanks & Regards,
+Amit Bag
