@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641C0ECE587
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4448AC352AA
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:10:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C82B20815
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:10:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1206620815
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 14:10:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="icSYiPho"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="sJMb45G3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388790AbfJAOKD (ORCPT
+        id S2388792AbfJAOKE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Oct 2019 10:10:03 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:39403 "EHLO
+        Tue, 1 Oct 2019 10:10:04 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:46932 "EHLO
         mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388223AbfJAOKD (ORCPT
+        with ESMTP id S1731280AbfJAOKE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Oct 2019 10:10:03 -0400
-Received: by mail-lf1-f67.google.com with SMTP id 72so9986231lfh.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Oct 2019 07:10:02 -0700 (PDT)
+        Tue, 1 Oct 2019 10:10:04 -0400
+Received: by mail-lf1-f67.google.com with SMTP id t8so9951799lfc.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Oct 2019 07:10:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=7fbNY59KQ3SFIhICq/UcestqwOZ7NUgD7N5WPbYPWbY=;
-        b=icSYiPhoM6U2dsZZ+OV03RC9O9d/0PWeB0tA+X1MiNDscKAilmP1rOxs5HAJ79e7cl
-         HONGAiAvtpUUO2k8BSVJNz8ZT/ln0Qco7EgnpFbcQJvKYtrB2TtFNyTPUJbuq7rM9hcb
-         aIErqXrT6+PWudKWOqOZ0/bzZwDgK1UJTZXeW7Prn+hRvqMp9k3Zeqg+7/E3o7ANRzIU
-         /cEHXSyrQ/GMXOR6vUuyIfDpGfmMg0ltYQUiUMekOlXnS9/NcHaiT7344tb8cPdPO5BS
-         DYmMTBKG6KmH06OADarLadNEwzHK+H7XllBNG1S7FSymyAVTB0pBeTL1Eyrp8HdUb7WH
-         f0mQ==
+        bh=alzF4tpzHmP8qm7bH/g+AGGUXeageptKGk5OT5EgW10=;
+        b=sJMb45G3sVpeHZLiz8soRIjNBJm6IbHBZHEZp4EaDZEyxj1PAUxi/54+EyPSX9KiLn
+         GjR0c/kh5Yaegsn+ohmDQ3FCQs+uIp/GScLlaYsNXmJ73h48dDtPVG8cE9das89jV1iL
+         7Ph3zxw8MHuUoPe62gZKVbYNhwb8IXdFiDV3oYCZdlCqcSWzmoy+H+wYkieQ30MbS5kM
+         l7FFir3CNnE/7A5Lw3LdYNKZP0lpF+byRFQkOks/9WUbnwJbTLm5vpM04rC8sJJpqIeg
+         /NN9kRfAf2eOIJFAqh5QKIEQCJVXs6XCdNHqj8i+8YrkMJHyn+bcdmhor/H4XOIeQxZJ
+         XJXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=7fbNY59KQ3SFIhICq/UcestqwOZ7NUgD7N5WPbYPWbY=;
-        b=WCMCY+1TWxGQ0K+Lavc2G3xoSexzcoMuY9LzvMrtGyY4jxkYCtmRlfT7QqKx79Pz4O
-         IRT2AEl8lvNiPDJijG5LcACYi5NCNb9p/1s+Zlt8Q5DQlCXkPkyU7FdrIlqbX/3bBLBq
-         IkBXxx0zybA1LRQuajg53yKLGIPu2qIa6aTtqBjJjbps5NTRW1Rt9B4k9sGAvyjZzzNs
-         YP0zeuFqsbRsyZ3NKHwCUoTKmjkz9wKMJkaPvVT7WSJ8f3OivdyT7ZrZem1J6GsJKIPh
-         psC89kvZr5LjAXuzb+C9/hAeeFjbesX//Zf4wbHV0Ka5mVDLq3c9QTVoiFpKxnMZL5/A
-         7zEQ==
-X-Gm-Message-State: APjAAAWzZIADy00zJsd+8MtnQmwKuni5tD7/l+WUXB+IHlBD4/wBkAau
-        ZQtthWisoHj8+rTJTVqmjzIFPQ69Nqc=
-X-Google-Smtp-Source: APXvYqy9LNmwbsH1wkIxQ2tpTOS2RPrkyJJ9MpKOu27xGFnkb5z45vMMNjTxgDecLDejJVw8FPBdLA==
-X-Received: by 2002:ac2:5e9e:: with SMTP id b30mr14991453lfq.5.1569939000900;
-        Tue, 01 Oct 2019 07:10:00 -0700 (PDT)
+        bh=alzF4tpzHmP8qm7bH/g+AGGUXeageptKGk5OT5EgW10=;
+        b=HSB2urZRFpUf0tY7KZVjo/SSf3nKJYASwKaXAEQYfyf2zoEMnJOc33bdYJLdLjLr8c
+         b23kELT3DmcrrE9UK/0qQK0igguy6/5/a7DYzFCB5biUQ41XfB2bj56zpN61sg+0ku3D
+         lMnpIXMPlOztzQ+D2DZTSziJmJZ6Uxv5ajun7GAXdr3QnsaJOFr6o62K3aT5i0yzSxin
+         ji+4vleivKtO2uE46ULf1O7yfQQyRPV24pJvy/frTq76AObslg91ywOr3y5+MUifFU+S
+         LpbmNXL0Hkr2HUENxcSn0LCjG3qVVDUt+tPYv7DQGTXXu/iNNyfYBhy2tBYbiiWhYYDL
+         sYtg==
+X-Gm-Message-State: APjAAAXDSFGNUXoyPK5K5tq4zNNcUH79J25zE9ebC6r0kd9MbTOjrXAG
+        u3YEBOoImE/QZnZ+fcdLEBnZO1HiHis=
+X-Google-Smtp-Source: APXvYqzTM67KoIFTAkdp17dnMUP8KE4whzfxaemRkslKua/C19rLaQhR2au80nP+C5Z+WBHtxfNH3A==
+X-Received: by 2002:a19:5515:: with SMTP id n21mr15624628lfe.131.1569939001825;
+        Tue, 01 Oct 2019 07:10:01 -0700 (PDT)
 Received: from ix.int.codecoup.pl ([95.143.243.62])
         by smtp.gmail.com with ESMTPSA id k15sm4117794ljg.65.2019.10.01.07.10.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2019 07:10:00 -0700 (PDT)
+        Tue, 01 Oct 2019 07:10:01 -0700 (PDT)
 From:   Szymon Janc <szymon.janc@codecoup.pl>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH V2 2/3] monitor: Add interface for J-Link library
-Date:   Tue,  1 Oct 2019 16:09:40 +0200
-Message-Id: <20191001140941.8005-2-szymon.janc@codecoup.pl>
+Subject: [PATCH V2 3/3] monitor: Add support for reading over J-Link RTT
+Date:   Tue,  1 Oct 2019 16:09:41 +0200
+Message-Id: <20191001140941.8005-3-szymon.janc@codecoup.pl>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001140941.8005-1-szymon.janc@codecoup.pl>
 References: <20191001140941.8005-1-szymon.janc@codecoup.pl>
@@ -73,339 +73,200 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 
-This adds simple interface to libjlinkarm.so which will be used to read
-data from RTT buffer. It was mostly made by trial and error since there
-is no public documentation for this library so it may lack something,
-but seems to work fine with few Cortex-M devices I tried.
----
- monitor/jlink.c | 283 ++++++++++++++++++++++++++++++++++++++++++++++++
- monitor/jlink.h |  27 +++++
- 2 files changed, 310 insertions(+)
- create mode 100644 monitor/jlink.c
- create mode 100644 monitor/jlink.h
+This patch adds support for reading data over J-Link RTT. It can be
+used as replacement for TTY when reading from embedded devices since
+it's much faster and does block a UART. Data format is the same as
+for TTY. At the moment monitor over RTT is only supported by Apache
+Mynewt project.
 
-diff --git a/monitor/jlink.c b/monitor/jlink.c
-new file mode 100644
-index 000000000..956a25159
---- /dev/null
-+++ b/monitor/jlink.c
-@@ -0,0 +1,283 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Codecoup
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <dlfcn.h>
-+#include <errno.h>
-+#include <stdio.h>
-+#include <stdint.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+
+Reading data is done by polling RTT every 1 msec since there is no
+blocking API to read something from RTT buffer.
+
+To enable reading from RTT, J-Link configuration needs to be passed via
+command line (all parameters except <device> can be skipped to use
+default value):
+  -J <device>,<interface=swd>,<speed=1000>,<serialno=0>
+  -J nrf52,,683649029
+
+In some cases J-Link cannot locate RTT buffer in RAM. In such case
+RAM area and buffer name should be provided via command line:
+  -R <address=0x0>,<area=0x1000>,<buffer=monitor>
+  -R 0x20000000,0x10000
+---
+ Makefile.tools    |  3 ++-
+ monitor/control.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++
+ monitor/control.h |  1 +
+ monitor/main.c    | 22 +++++++++++++++++++--
+ 4 files changed, 73 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.tools b/Makefile.tools
+index 81ed2e30d..7ce05b7ef 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -42,9 +42,10 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 				monitor/analyze.h monitor/analyze.c \
+ 				monitor/intel.h monitor/intel.c \
+ 				monitor/broadcom.h monitor/broadcom.c \
++				monitor/jlink.h monitor/jlink.c \
+ 				monitor/tty.h
+ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+-				src/libshared-mainloop.la $(UDEV_LIBS)
++				src/libshared-mainloop.la $(UDEV_LIBS) -ldl
+ endif
+ 
+ if LOGGER
+diff --git a/monitor/control.c b/monitor/control.c
+index 4022e7644..1e9054db3 100644
+--- a/monitor/control.c
++++ b/monitor/control.c
+@@ -57,6 +57,7 @@
+ #include "ellisys.h"
+ #include "tty.h"
+ #include "control.h"
 +#include "jlink.h"
-+
-+#define RTT_CONTROL_START		0
-+#define RTT_CONTROL_STOP		1
-+#define RTT_CONTROL_GET_DESC		2
-+#define RTT_CONTROL_GET_NUM_BUF		3
-+#define RTT_CONTROL_GET_STAT		4
-+
-+#define RTT_DIRECTION_UP		0
-+#define RTT_DIRECTION_DOWN		1
-+
-+static const char * const jlink_so_name[] = {
-+	"/usr/lib/libjlinkarm.so",
-+	"/usr/lib/libjlinkarm.so.6",
-+	"/opt/SEGGER/JLink/libjlinkarm.so",
-+	"/opt/SEGGER/JLink/libjlinkarm.so.6",
-+};
-+
-+struct rtt_desc {
-+	uint32_t index;
-+	uint32_t direction;
-+	char name[32];
-+	uint32_t size;
-+	uint32_t flags;
-+};
-+
-+static struct rtt_desc rtt_desc;
-+
-+typedef int (*jlink_emu_selectbyusbsn_func) (unsigned int sn);
-+typedef int (*jlink_open_func) (void);
-+typedef int (*jlink_execcommand_func) (char *in, char *out, int size);
-+typedef int (*jlink_tif_select_func) (int);
-+typedef void (*jlink_setspeed_func) (long int speed);
-+typedef int (*jlink_connect_func) (void);
-+typedef unsigned int (*jlink_getsn_func) (void);
-+typedef void (*jlink_emu_getproductname_func) (char *out, int size);
-+typedef int (*jlink_rtterminal_control_func) (int cmd, void *data);
-+typedef int (*jlink_rtterminal_read_func) (int cmd, char *buf, int size);
-+
-+struct jlink {
-+	jlink_emu_selectbyusbsn_func emu_selectbyusbsn;
-+	jlink_open_func open;
-+	jlink_execcommand_func execcommand;
-+	jlink_tif_select_func tif_select;
-+	jlink_setspeed_func setspeed;
-+	jlink_connect_func connect;
-+	jlink_getsn_func getsn;
-+	jlink_emu_getproductname_func emu_getproductname;
-+	jlink_rtterminal_control_func rtterminal_control;
-+	jlink_rtterminal_read_func rtterminal_read;
-+};
-+
-+static struct jlink jlink;
-+
-+#ifndef NELEM
-+#define NELEM(x) (sizeof(x) / sizeof((x)[0]))
-+#endif
-+
-+int jlink_init(void)
+ 
+ static struct btsnoop *btsnoop_file = NULL;
+ static bool hcidump_fallback = false;
+@@ -1416,6 +1417,55 @@ int control_tty(const char *path, unsigned int speed)
+ 	return 0;
+ }
+ 
++static void rtt_callback(int id, void *user_data)
 +{
-+	void *so;
-+	unsigned int i;
++	struct control_data *data = user_data;
++	ssize_t len;
 +
-+	for (i = 0; i < NELEM(jlink_so_name); i++) {
-+		so = dlopen(jlink_so_name[i], RTLD_LAZY);
-+		if (so)
-+			break;
-+	}
-+
-+	if (!so)
-+		return -EIO;
-+
-+	jlink.emu_selectbyusbsn = dlsym(so, "JLINK_EMU_SelectByUSBSN");
-+	jlink.open = dlsym(so, "JLINK_Open");
-+	jlink.execcommand = dlsym(so, "JLINK_ExecCommand");
-+	jlink.tif_select = dlsym(so, "JLINK_TIF_Select");
-+	jlink.setspeed = dlsym(so, "JLINK_SetSpeed");
-+	jlink.connect = dlsym(so, "JLINK_Connect");
-+	jlink.getsn = dlsym(so, "JLINK_GetSN");
-+	jlink.emu_getproductname = dlsym(so, "JLINK_EMU_GetProductName");
-+	jlink.rtterminal_control = dlsym(so, "JLINK_RTTERMINAL_Control");
-+	jlink.rtterminal_read = dlsym(so, "JLINK_RTTERMINAL_Read");
-+
-+	if (!jlink.emu_selectbyusbsn || !jlink.open || !jlink.execcommand ||
-+			!jlink.tif_select || !jlink.setspeed ||
-+			!jlink.connect || !jlink.getsn ||
-+			!jlink.emu_getproductname ||
-+			!jlink.rtterminal_control || !jlink.rtterminal_read)
-+		return -EIO;
-+
-+	return 0;
-+}
-+
-+int jlink_connect(char *cfg)
-+{
-+	const char *device = NULL;
-+	int tif = 1;
-+	unsigned int speed = 1000;
-+	unsigned int serial_no = 0;
-+	char *tok;
-+	char buf[64];
-+
-+	tok = strtok(cfg, ",");
-+	device = tok;
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto connect;
-+	if (strlen(tok)) {
-+		if (!strcasecmp("swd", tok))
-+			tif = 1;
-+		else
-+			return -EINVAL;
-+	}
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto connect;
-+	if (strlen(tok))
-+		speed = atoi(tok);
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto connect;
-+	if (strlen(tok))
-+		serial_no = atoi(tok);
-+
-+connect:
-+	if (serial_no)
-+		if (jlink.emu_selectbyusbsn(serial_no) < 0) {
-+			fprintf(stderr, "Failed to select emu by SN\n");
-+			return -ENODEV;
-+		}
-+
-+	if (jlink.open() < 0) {
-+		fprintf(stderr, "Failed to open J-Link\n");
-+		return -ENODEV;
-+	}
-+
-+	snprintf(buf, sizeof(buf), "device=%s", device);
-+	if (jlink.execcommand(buf, NULL, 0) < 0) {
-+		fprintf(stderr, "Failed to select target device\n");
-+		return -ENODEV;
-+	}
-+
-+	if (jlink.tif_select(tif) < 0) {
-+		fprintf(stderr, "Failed to select target interface\n");
-+		return -ENODEV;
-+	}
-+
-+	jlink.setspeed(speed);
-+
-+	if (jlink.connect() < 0) {
-+		fprintf(stderr, "Failed to open target\n");
-+		return -EIO;
-+	}
-+
-+	serial_no = jlink.getsn();
-+	jlink.emu_getproductname(buf, sizeof(buf));
-+
-+	printf("Connected to %s (S/N: %u)\n", buf, serial_no);
-+
-+	return 0;
-+}
-+
-+int jlink_start_rtt(char *cfg)
-+{
-+	unsigned int address = 0;
-+	unsigned int area_size = 0;
-+	const char *buffer = "btmonitor";
-+	char *tok;
-+	char cmd[64];
-+	int rtt_dir;
-+	int count;
-+	int i;
-+
-+	if (!cfg)
-+		goto find_rttcb;
-+
-+	tok = strtok(cfg, ",");
-+	if (strlen(tok)) {
-+		address = strtol(tok, NULL, 0);
-+		area_size = 0x1000;
-+	}
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto find_rttcb;
-+	if (strlen(tok))
-+		area_size = strtol(tok, NULL, 0);
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto find_rttcb;
-+	if (strlen(tok))
-+		buffer = tok;
-+
-+find_rttcb:
-+	if (address || area_size) {
-+		if (!area_size)
-+			snprintf(cmd, sizeof(cmd), "SetRTTAddr 0x%x", address);
-+		else
-+			snprintf(cmd, sizeof(cmd),
-+						"SetRTTSearchRanges 0x%x 0x%x",
-+						address, area_size);
-+
-+		if (jlink.execcommand(cmd, NULL, 0) < 0)
-+			return -EIO;
-+	}
-+
-+	if (jlink.rtterminal_control(RTT_CONTROL_START, NULL) < 0) {
-+		fprintf(stderr, "Failed to initialize RTT\n");
-+		return -1;
-+	}
-+
-+	/* RTT may need some time to find control block so we need to wait */
 +	do {
-+		usleep(100);
-+		rtt_dir = RTT_DIRECTION_UP;
-+		count = jlink.rtterminal_control(RTT_CONTROL_GET_NUM_BUF,
-+								&rtt_dir);
-+	} while (count < 0);
++		len = jlink_rtt_read(data->buf + data->offset,
++					sizeof(data->buf) - data->offset);
++		data->offset += len;
++		process_data(data);
++	} while (len > 0);
 +
-+	for (i = 0; i < count; i++) {
-+		memset(&rtt_desc, 0, sizeof(rtt_desc));
-+		rtt_desc.index = i;
-+		rtt_desc.direction = RTT_DIRECTION_UP;
++	if (mainloop_modify_timeout(id, 1) < 0)
++		mainloop_exit_failure();
++}
 +
-+		if (jlink.rtterminal_control(RTT_CONTROL_GET_DESC,
-+								&rtt_desc) < 0)
-+			continue;
++int control_rtt(char *jlink, char *rtt)
++{
++	struct control_data *data;
 +
-+		if (rtt_desc.size > 0 && !strcmp(buffer, rtt_desc.name))
-+			break;
++	if (jlink_init() < 0) {
++		fprintf(stderr, "Failed to initialize J-Link library\n");
++		return -EIO;
 +	}
 +
-+	if (i == count)
++	if (jlink_connect(jlink) < 0) {
++		fprintf(stderr, "Failed to connect to target device\n");
 +		return -ENODEV;
++	}
 +
-+	printf("Using RTT up buffer #%d (size: %d)\n", i, rtt_desc.size);
++	if (jlink_start_rtt(rtt) < 0) {
++		fprintf(stderr, "Failed to initialize RTT\n");
++		return -ENODEV;
++	}
++
++	printf("--- RTT opened ---\n");
++
++	data = new0(struct control_data, 1);
++	data->channel = HCI_CHANNEL_MONITOR;
++	data->fd = -1;
++
++	if (mainloop_add_timeout(1, rtt_callback, data, free_data) < 0) {
++		free(data);
++		return -EIO;
++	}
 +
 +	return 0;
 +}
 +
-+int jlink_rtt_read(void *buf, size_t size)
-+{
-+	return jlink.rtterminal_read(rtt_desc.index, buf, size);
-+}
-diff --git a/monitor/jlink.h b/monitor/jlink.h
-new file mode 100644
-index 000000000..d7c76704c
---- /dev/null
-+++ b/monitor/jlink.h
-@@ -0,0 +1,27 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Codecoup
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int jlink_init(void);
-+int jlink_connect(char *cfg);
-+int jlink_start_rtt(char *cfg);
-+int jlink_rtt_read(void *buf, size_t size);
+ bool control_writer(const char *path)
+ {
+ 	btsnoop_file = btsnoop_create(path, 0, 0, BTSNOOP_FORMAT_MONITOR);
+diff --git a/monitor/control.h b/monitor/control.h
+index a9691e32f..ddf485f1f 100644
+--- a/monitor/control.h
++++ b/monitor/control.h
+@@ -28,6 +28,7 @@ bool control_writer(const char *path);
+ void control_reader(const char *path, bool pager);
+ void control_server(const char *path);
+ int control_tty(const char *path, unsigned int speed);
++int control_rtt(char *jlink, char *rtt);
+ int control_tracing(void);
+ void control_disable_decoding(void);
+ void control_filter_index(uint16_t index);
+diff --git a/monitor/main.c b/monitor/main.c
+index acd44a098..adb596635 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -75,6 +75,10 @@ static void usage(void)
+ 		"\t-A, --a2dp             Dump A2DP stream traffic\n"
+ 		"\t-E, --ellisys [ip]     Send Ellisys HCI Injection\n"
+ 		"\t-P, --no-pager         Disable pager usage\n"
++		"\t-J  --jlink <device>,[<interface>],[<speed>],[<serialno>]\n"
++		"\t                       Read data from RTT\n"
++		"\t-R  --rtt [<address>],[<area>],[<name>]\n"
++		"\t                       RTT control block parameters\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+ 
+@@ -94,6 +98,8 @@ static const struct option main_options[] = {
+ 	{ "a2dp",      no_argument,       NULL, 'A' },
+ 	{ "ellisys",   required_argument, NULL, 'E' },
+ 	{ "no-pager",  no_argument,       NULL, 'P' },
++	{ "jlink",     required_argument, NULL, 'J' },
++	{ "rtt",       required_argument, NULL, 'R' },
+ 	{ "todo",      no_argument,       NULL, '#' },
+ 	{ "version",   no_argument,       NULL, 'v' },
+ 	{ "help",      no_argument,       NULL, 'h' },
+@@ -112,6 +118,8 @@ int main(int argc, char *argv[])
+ 	unsigned int tty_speed = B115200;
+ 	unsigned short ellisys_port = 0;
+ 	const char *str;
++	char *jlink = NULL;
++	char *rtt = NULL;
+ 	int exit_status;
+ 
+ 	mainloop_init();
+@@ -122,7 +130,7 @@ int main(int argc, char *argv[])
+ 		int opt;
+ 		struct sockaddr_un addr;
+ 
+-		opt = getopt_long(argc, argv, "r:w:a:s:p:i:d:B:V:tTSAEPvh",
++		opt = getopt_long(argc, argv, "r:w:a:s:p:i:d:B:V:tTSAE:PJ:R:vh",
+ 							main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -194,6 +202,12 @@ int main(int argc, char *argv[])
+ 		case 'P':
+ 			use_pager = false;
+ 			break;
++		case 'J':
++			jlink = optarg;
++			break;
++		case 'R':
++			rtt = optarg;
++			break;
+ 		case '#':
+ 			packet_todo();
+ 			lmp_todo();
+@@ -246,11 +260,15 @@ int main(int argc, char *argv[])
+ 	if (ellisys_server)
+ 		ellisys_enable(ellisys_server, ellisys_port);
+ 
+-	if (!tty && control_tracing() < 0)
++	if (tty && jlink)
+ 		return EXIT_FAILURE;
+ 
+ 	if (tty && control_tty(tty, tty_speed) < 0)
+ 		return EXIT_FAILURE;
++	else if (jlink && control_rtt(jlink, rtt) < 0)
++		return EXIT_FAILURE;
++	else if (control_tracing() < 0)
++		return EXIT_FAILURE;
+ 
+ 	exit_status = mainloop_run_with_signal(signal_callback, NULL);
+ 
 -- 
 2.21.0
 
