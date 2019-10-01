@@ -2,140 +2,112 @@ Return-Path: <SRS0=34D5=X2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BC2ECE587
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 12:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 110D6ECE587
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 12:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4527321920
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 12:37:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFJhuHSv"
+	by mail.kernel.org (Postfix) with ESMTP id DCC0E2190F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 12:57:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387752AbfJAMhu (ORCPT
+        id S2387624AbfJAM5X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Oct 2019 08:37:50 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:46046 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbfJAMhu (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Oct 2019 08:37:50 -0400
-Received: by mail-io1-f68.google.com with SMTP id c25so47365091iot.12;
-        Tue, 01 Oct 2019 05:37:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FhGjmsDKKPD3QinXgHs/uFmvxQ7KlC4IGlI0yWXxnE0=;
-        b=SFJhuHSvvW8Erq96m6ImL3eOj9JoDGgxYXzBmaiAeyLFuGPT/wzkJf1l7w5eQ+jZHs
-         pHpSDRUEYeKgubAl6P98cKWJIUh4hgv8fL/P3cU0fVvj8EIMqvSVfmDrOg4lj7cz6E5u
-         dj5JAk9Aordu1jw3j09N0Zwwd0+qF5LPwXnOtkuolUx2dcstilmeBCk0C9huvDWh0xDx
-         n68JOqjX3hVXcABMXPV71RCw8nnZjeIjHNbXw3PClR2TFED+9Xc6iZZCYguJHFPKKD+M
-         SlcSv2SQuJHQbYlKeYpvzX+YWhpUoMQ06i35N9jZ1vH534UVPFd/N6JPO2dDh9WznuHA
-         1D7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FhGjmsDKKPD3QinXgHs/uFmvxQ7KlC4IGlI0yWXxnE0=;
-        b=Ghy6G1a9Vai2MrczuSndvKjBjLzTDtAztuwWPv8cTvgI1HFzHSj4x8uHd/ym1Q420p
-         HcsvIoTE2ui4A+XPitQPPo2BzM7rZR+5eeRr7U3dVk5t6LNMhmj5uS0e7gl61lgf/yey
-         oKiZgqGf0M/uzKmAazuSkAsZ+/ZCLDYtIG8VxeUHUgMbuIa+FWq0W8RRNpkoIE3pyWEQ
-         zo/cusNtmkfFiqoumPz0dx5vIKF1KCCGXQhzHryFeCAybJik9psDu5qoWW2KxVPO+k0Z
-         aldY3WLMBFZ3tGVlNOdgdzLM1BVNRAN1CqE4232J38UWempe5C4L5SCWqQiJHrRofRJg
-         Q4Hg==
-X-Gm-Message-State: APjAAAVEs8wLRa78bfdpbRcO0lo2aSP1hmRDCrL9Z88aVxoMW+XadENy
-        CiKaOZy/F4KxhCVt+kYLaLlMyOebinT5ErL+iwg=
-X-Google-Smtp-Source: APXvYqz7VBVXBG+ZMWE3fVk0pO5Y0YXERVtxa+N9juNb16CLwwIaQ6lC3GHyv2uy+2PbeZn7ajoc+Kexz4K/mtji6X8=
-X-Received: by 2002:a92:d84d:: with SMTP id h13mr26003328ilq.205.1569933468111;
- Tue, 01 Oct 2019 05:37:48 -0700 (PDT)
+        Tue, 1 Oct 2019 08:57:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39620 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732435AbfJAM5X (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 1 Oct 2019 08:57:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id E3A6EAC18
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Oct 2019 12:57:21 +0000 (UTC)
+Date:   Tue, 1 Oct 2019 14:57:21 +0200
+From:   Matthias Gerstner <mgerstner@suse.de>
+To:     linux-bluetooth@vger.kernel.org
+Subject: bluez: NULL pointer dereference in bluetooth-meshd
+ org.bluez.mesh.Network1.Join
+Message-ID: <20191001125721.GE9771@f195.suse.de>
 MIME-Version: 1.0
-References: <CAHCN7xLOCC00UC4PB3vHa6Q7yyhXVEaWgx2X9D9L2dDubd_5fA@mail.gmail.com>
- <9525ffc4-3e1f-9941-8f7b-ba74690add77@emlix.com>
-In-Reply-To: <9525ffc4-3e1f-9941-8f7b-ba74690add77@emlix.com>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Tue, 1 Oct 2019 07:37:37 -0500
-Message-ID: <CAHCN7xJ7GsnwT3CM7giK1ydGY_9SFNMbhz6U0k2eYvpz_EK9oQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_ll: set operational frequency earlier
-To:     Philipp Puschmann <philipp.puschmann@emlix.com>
-Cc:     Linux-OMAP <linux-omap@vger.kernel.org>,
-        arm-soc <linux-arm-kernel@lists.infradead.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="XMCwj5IQnwKtuyBG"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Oct 1, 2019 at 2:04 AM Philipp Puschmann
-<philipp.puschmann@emlix.com> wrote:
->
-> A few times i have seen this here too. The wl1837mod should definitely be able to set
-> the operaional frequency before loading the firmware.
-> It takes nearly 5 seconds to upload the firmware with 115kbps while only
-> 0.2s with 3mbps. So i see a high interest to do it the fast way.
-> A problem i have identified may be the power supply. At least on my custom board
-> the power supply is controlled via gpio. But the serial bluetooth device has no
-> support for a regulator. As it is controlled by wifi driver only. I have prepared a patch
-> adding regulator support to hci_ll driver. In a few weeks i may try to get it upstream.
 
-Any change you can share with me what you have?  With 5.4 being the
-next LTS and at least two of us with broken boards, I am concerned
-that a patch in a few weeks may not make the cut for the final release
-of 5.4.
+--XMCwj5IQnwKtuyBG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
-> Another problem may be the timings. The timings the driver uses are according the wl1837mod
-> datasheets but it may that not all devices of that class or the wiring have the same
-> specifications and this causes the trouble.
->
-> For the above mentioned performance gain i would like to see the problem really solved.
+Hi,
 
-I agree it would be nice to have it working fast, but for others of
-us, we just need to work, so unless there is a clear solution to the
-problem, I would advocate reverting the patch until the solution can
-be found that doesn't break other boards.
+in the context of a review of the bluetooth-meshd D-Bus service [1] I
+noticed a segmentation fault due to NULL pointer dereference. It can be
+triggered in bluez version 5.51 via the following D-Bus call:
 
-> It may be enough to add some sleep time or small delay or something of that kind in
-> ll_setup().
->
+$ dbus-send --system --type=3Dmethod_call --print-reply \
+  --dest=3Dorg.bluez.mesh /org/bluez/mesh org.bluez.mesh.Network1.Join \
+  objpath:/org/gnome/DisplayManager \
+  array:byte:1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
 
-I am willing to try something if you want.
+After the D-Bus timeout the bluetooth-meshd will crash with the
+following backtrace:
 
+    node_init_cb (node=3D0x0, agent=3D0x0) at mesh/mesh.c:359
+    359                     reply =3D dbus_error(join_pending->msg, MESH_ER=
+ROR_FAILED,
+    (gdb) bt
+        user_data=3D0x5555555be170) at mesh/node.c:1760
+        dbus=3D<optimized out>) at ell/dbus.c:216
+        user_data=3D0x5555555a6e00) at ell/dbus.c:279
+        user_data=3D0x5555555a7ef0) at ell/io.c:126
+        at ell/main.c:642
+        at mesh/main.c:205
 
-adam
-> Regards,
-> Philipp
->
->
-> Am 30.09.19 um 22:10 schrieb Adam Ford:
-> > Is anyone else having issues with the hci_ll after  a2e02f38eff8
-> > ("Bluetooth: hci_ll: set operational frequency earlier") was applied?
-> >
-> > I have an i.MX6Q with a WL1837MOD attached to UART2.  After this patch
-> > I git a bunch of timeouts when initializing the device using the 5.3
-> > and 5.3.1 kernel.   I know a bunch of omap and imx users have done
-> > some various tests over the years, so I thought I'd ask.
-> >
-> > [  195.911836] Bluetooth: hci0: command 0xff36 tx timeout
-> > [  206.071837] Bluetooth: hci0: command 0x1001 tx timeout
-> > [  214.231862] Bluetooth: hci0: Reading TI version information failed (-110)
-> > [  214.238712] Bluetooth: hci0: download firmware failed, retrying...
-> > [  216.391834] Bluetooth: hci0: command 0xff36 tx timeout
-> > [  226.551843] Bluetooth: hci0: command 0x1001 tx timeout
-> > [  234.711856] Bluetooth: hci0: Reading TI version information failed (-110)
-> > [  234.718705] Bluetooth: hci0: download firmware failed, retrying...
-> > [  236.871832] Bluetooth: hci0: command 0xff36 tx timeout
-> > [  247.031837] Bluetooth: hci0: command 0x1001 tx timeout
-> > [  255.191852] Bluetooth: hci0: Reading TI version information failed (-110)
-> > [  255.198706] Bluetooth: hci0: download firmware failed, retrying...
-> > Can't init device hci0: Connection timed out (110)
-> >
-> > Revering this patch fixes the issue, and subsequent patch proposals
-> > form Philipp haven't seemed to fix the issues for me on 5.3
-> >
-> > adam
-> >
+The reason is probably that the `join_pending` data structure has
+already been freed in a different function.
+
+[1]: https://bugzilla.suse.com/show_bug.cgi?id=3D1151518
+
+Cheers
+
+Matthias
+
+--=20
+Matthias Gerstner <matthias.gerstner@suse.de>
+Dipl.-Wirtsch.-Inf. (FH), Security Engineer
+https://www.suse.com/security
+Phone: +49 911 740 53 290
+GPG Key ID: 0x14C405C971923553
+
+SUSE Software Solutions Germany GmbH
+HRB 247165, AG M=FCnchen
+Gesch=E4ftsf=FChrer: Felix Imend=F6rffer
+
+--XMCwj5IQnwKtuyBG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEE82oG1A8ab1eESZdjFMQFyXGSNVMFAl2TTTEACgkQFMQFyXGS
+NVNciw//VYENl1TYJlpqy8XEydJi4jZEsRXdHHkZm02bLYXzn2RZOzJk1i7mOVpe
+Akr/fnXTIB9oKYmK/zKSR3rAmqu/Dp8d7r5UMFsqfhjJ7We2EBLzojd0Ot/zaee5
+WUylV/IS6A1a/iV1uFJzIQ2j1XZnPIc+xkMmIWrAntCe7zWqdPgAQOXeyCfOb9kz
+MOA8D7v9h3jAg07i116QPal4FBWkvS+591378Y8PiRiy6LQJ1u1tjcBFyyFEVSn1
+nWPFa/p4pIVea2+V0b4Qq4qXHt8on7Uu5cjLlETBVqfwVPGlOTBP1XXHvqgsa6gu
+I+aeVlVcbPlGVQycuaUgqsyeHPoL16o1G9EfLody5mK54H20/NCzouLByX91GBbK
+5CrjgrJHoaWrqCMosRwjcTHh7n5DS0eyw5azx512rohuW09XFVxwP6pSx6u8Ua70
+cnWLgKGu7GG2zorpQ7zMyZr7Ono6wqGfwEcdP2ubhMXunNi6wg4FxjPXYgK/bkIT
+PcSYWP10zFI3rOOO1iw4369e4lZlj2sRQVLyVXT4H7ErTew9IdWOl/JfkFpQPRhM
+ZLu3RgeQjfk3uoIBS9dJMUSQhcX4TD6TbDa0OEYd0h7rdXLjLHjevap1R7CDfRWM
+b2Bwge0mCDWbS3RbHXFTSttRfyd9i0pPMbfe8A6jnUdXEzDOYmw=
+=19K4
+-----END PGP SIGNATURE-----
+
+--XMCwj5IQnwKtuyBG--
