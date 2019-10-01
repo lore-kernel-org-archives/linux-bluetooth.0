@@ -2,200 +2,259 @@ Return-Path: <SRS0=34D5=X2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00C2C388F3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 05:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B683ECDFB6
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 06:37:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7D6F2133F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 05:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D7E82133F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Oct 2019 06:37:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731638AbfJAFy2 (ORCPT
+        id S1730740AbfJAGhM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Oct 2019 01:54:28 -0400
-Received: from mga18.intel.com ([134.134.136.126]:53219 "EHLO mga18.intel.com"
+        Tue, 1 Oct 2019 02:37:12 -0400
+Received: from mga17.intel.com ([192.55.52.151]:4987 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725777AbfJAFy2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Oct 2019 01:54:28 -0400
+        id S1726672AbfJAGhM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 1 Oct 2019 02:37:12 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Sep 2019 22:54:27 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Sep 2019 23:37:10 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,570,1559545200"; 
-   d="scan'208";a="194425186"
-Received: from unknown (HELO ubuntu-16-04.iind.intel.com) ([10.224.186.155])
-  by orsmga003.jf.intel.com with ESMTP; 30 Sep 2019 22:54:25 -0700
-From:   Amit K Bag <amit.k.bag@intel.com>
+   d="scan'208";a="342887857"
+Received: from ingas-nuc1.sea.intel.com ([10.254.103.206])
+  by orsmga004.jf.intel.com with ESMTP; 30 Sep 2019 23:37:09 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-        Amit K Bag <amit.k.bag@intel.com>,
-        Raghuram Hegde <raghuram.hegde@intel.com>
-Subject: [PATCH v2] Bluetooth: btusb: Trigger Intel FW download error recovery
-Date:   Tue,  1 Oct 2019 11:19:07 +0530
-Message-Id: <1569908947-10516-1-git-send-email-amit.k.bag@intel.com>
-X-Mailer: git-send-email 2.7.4
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Make mesh-config API more consistent
+Date:   Mon, 30 Sep 2019 23:37:08 -0700
+Message-Id: <20191001063708.8279-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Sometimes during FW data download stage, in case of an error is
-encountered the controller device could not be recovered. To recover
-from such failures send Intel hard Reset to re-trigger FW download in
-following error scenarios:
-
-1. Intel Read version command error
-2. Firmware download timeout
-3. Failure in Intel Soft Reset for switching to operational FW
-4. Boot timeout for switching to operaional FW
-
-Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+This changes the prototypes for mesh_config_model_binding_add() and
+mesh_config_model_binding_del() to take the element's address as input
+parameter instead of the element's index. The change aligns the API
+with other functions that handle storage of model states.
 ---
- drivers/bluetooth/btintel.c | 39 +++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  6 ++++++
- drivers/bluetooth/btusb.c   | 20 ++++++++++++++++----
- 3 files changed, 61 insertions(+), 4 deletions(-)
+ mesh/mesh-config-json.c | 34 ++++++++++++++++++++++------------
+ mesh/mesh-config.h      | 11 ++++++-----
+ mesh/model.c            |  7 ++-----
+ 3 files changed, 30 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index bb99c8653aab..0154764ebdf8 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -709,6 +709,45 @@ int btintel_download_firmware(struct hci_dev *hdev, const struct firmware *fw,
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index cafa2fdd7..4fe05a802 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -835,11 +835,12 @@ bool mesh_config_app_key_del(struct mesh_config *cfg, uint16_t net_idx,
+ 	return save_config(jnode, cfg->node_dir_path);
  }
- EXPORT_SYMBOL_GPL(btintel_download_firmware);
  
-+void btintel_reset_to_bootloader(struct hci_dev *hdev)
-+{
-+	/* Send Intel Reset command. This will result in
-+	 * re-enumeration of BT controller.
-+	 *
-+	 * Intel Reset parameter description:
-+	 * reset_param[0] => reset_type : 0x01 (Hard reset),
-+					  0x00 (Soft reset)
-+	 * reset_param[1] => patch_enable : 0x01 (Enable),
-+	 *				    0x00 (Do not enable)
-+	 * reset_param[2] => ddc_reload : 0x01 (Reload),
-+	 *				  0x00 (Do not reload)
-+	 * reset_param[3] => boot_option: 0x00 (Current image),
-+					  0x01 (Specified boot address)
-+	 * reset_param[4] to reset_param[7] => Boot address
-+	 *
-+	 */
-+	static const u8 reset_param[] = { 0x01, 0x01, 0x01, 0x00,
-+					0x00, 0x00, 0x00, 0x00 };
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param),
-+			     reset_param, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
-+			   PTR_ERR(skb));
-+		return;
-+	}
-+	bt_dev_info(hdev, "Intel reset sent to retry FW download");
-+	kfree_skb(skb);
-+	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
-+	 * lines for 2ms when it receives Intel Reset in bootloader mode.
-+	 * Whereas, the upcoming Intel BT controllers will hold USB reset
-+	 * for 150ms. To keep the delay generic, 150ms is chosen here.
-+	 */
-+	msleep(150);
-+}
-+EXPORT_SYMBOL_GPL(btintel_reset_to_bootloader);
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 3d846190f2bf..d2311156f778 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -87,6 +87,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
- 			     struct intel_boot_params *params);
- int btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
- 			      u32 *boot_param);
-+void btintel_reset_to_bootloader(struct hci_dev *hdev);
- #else
- 
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -181,4 +182,9 @@ static inline int btintel_download_firmware(struct hci_dev *dev,
+-bool mesh_config_model_binding_add(struct mesh_config *cfg, uint8_t ele_idx,
+-					bool vendor, uint32_t mod_id,
++bool mesh_config_model_binding_add(struct mesh_config *cfg, uint16_t ele_addr,
++						bool vendor, uint32_t mod_id,
+ 							uint16_t app_idx)
  {
- 	return -EOPNOTSUPP;
- }
+ 	json_object *jnode, *jmodel, *jstring, *jarray = NULL;
++	int ele_idx;
+ 	char buf[5];
+ 
+ 	if (!cfg)
+@@ -847,6 +848,10 @@ bool mesh_config_model_binding_add(struct mesh_config *cfg, uint8_t ele_idx,
+ 
+ 	jnode = cfg->jnode;
+ 
++	ele_idx = get_element_index(jnode, ele_addr);
++	if (ele_idx < 0)
++		return false;
 +
-+static inline void btintel_reset_to_bootloader(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
- #endif
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5d7bc3410104..47178af7f7fe 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1846,8 +1846,11 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	 * firmware variant, revision and build number.
- 	 */
- 	err = btintel_read_version(hdev, &ver);
--	if (err)
-+	if (err) {
-+		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
-+		btintel_reset_to_bootloader(hdev);
- 		return err;
-+	}
+ 	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
+ 	if (!jmodel)
+ 		return false;
+@@ -875,11 +880,12 @@ bool mesh_config_model_binding_add(struct mesh_config *cfg, uint8_t ele_idx,
+ 	return save_config(jnode, cfg->node_dir_path);
+ }
  
- 	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
- 		    ver.hw_platform, ver.hw_variant, ver.hw_revision,
-@@ -2326,9 +2329,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+-bool mesh_config_model_binding_del(struct mesh_config *cfg, uint8_t ele_idx,
+-					bool vendor, uint32_t mod_id,
++bool mesh_config_model_binding_del(struct mesh_config *cfg, uint8_t ele_addr,
++						bool vendor, uint32_t mod_id,
+ 							uint16_t app_idx)
+ {
+ 	json_object *jnode, *jmodel, *jarray, *jarray_new;
++	int ele_idx;
+ 	char buf[5];
  
- 	/* Start firmware downloading and get boot parameter */
- 	err = btintel_download_firmware(hdev, fw, &boot_param);
--	if (err < 0)
-+	if (err < 0) {
-+		/* When FW download fails, send Intel Reset to retry
-+		 * FW download.
-+		 */
-+		btintel_reset_to_bootloader(hdev);
- 		goto done;
+ 	if (!cfg)
+@@ -887,6 +893,10 @@ bool mesh_config_model_binding_del(struct mesh_config *cfg, uint8_t ele_idx,
+ 
+ 	jnode = cfg->jnode;
+ 
++	ele_idx = get_element_index(jnode, ele_addr);
++	if (ele_idx < 0)
++		return false;
++
+ 	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
+ 	if (!jmodel)
+ 		return false;
+@@ -1818,7 +1828,7 @@ bool mesh_config_net_key_set_phase(struct mesh_config *cfg, uint16_t idx,
+ 	return save_config(jnode, cfg->node_dir_path);
+ }
+ 
+-bool mesh_config_model_pub_add(struct mesh_config *cfg, uint16_t addr,
++bool mesh_config_model_pub_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 					uint32_t mod_id, bool vendor,
+ 					struct mesh_config_pub *pub)
+ {
+@@ -1831,7 +1841,7 @@ bool mesh_config_model_pub_add(struct mesh_config *cfg, uint16_t addr,
+ 
+ 	jnode = cfg->jnode;
+ 
+-	ele_idx = get_element_index(jnode, addr);
++	ele_idx = get_element_index(jnode, ele_addr);
+ 	if (ele_idx < 0)
+ 		return false;
+ 
+@@ -1886,13 +1896,13 @@ fail:
+ 	return false;
+ }
+ 
+-static bool delete_model_property(json_object *jnode, uint16_t addr,
++static bool delete_model_property(json_object *jnode, uint16_t ele_addr,
+ 			uint32_t mod_id, bool vendor, const char *keyword)
+ {
+ 	json_object *jmodel;
+ 	int ele_idx;
+ 
+-	ele_idx = get_element_index(jnode, addr);
++	ele_idx = get_element_index(jnode, ele_addr);
+ 	if (ele_idx < 0)
+ 		return false;
+ 
+@@ -1915,7 +1925,7 @@ bool mesh_config_model_pub_del(struct mesh_config *cfg, uint16_t addr,
+ 	return save_config(cfg->jnode, cfg->node_dir_path);
+ }
+ 
+-bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t addr,
++bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 						uint32_t mod_id, bool vendor,
+ 						struct mesh_config_sub *sub)
+ {
+@@ -1928,7 +1938,7 @@ bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t addr,
+ 
+ 	jnode = cfg->jnode;
+ 
+-	ele_idx = get_element_index(jnode, addr);
++	ele_idx = get_element_index(jnode, ele_addr);
+ 	if (ele_idx < 0)
+ 		return false;
+ 
+@@ -1966,7 +1976,7 @@ bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t addr,
+ 	return save_config(jnode, cfg->node_dir_path);
+ }
+ 
+-bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t addr,
++bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t ele_addr,
+ 						uint32_t mod_id, bool vendor,
+ 						struct mesh_config_sub *sub)
+ {
+@@ -1979,7 +1989,7 @@ bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t addr,
+ 
+ 	jnode = cfg->jnode;
+ 
+-	ele_idx = get_element_index(jnode, addr);
++	ele_idx = get_element_index(jnode, ele_addr);
+ 	if (ele_idx < 0)
+ 		return false;
+ 
+diff --git a/mesh/mesh-config.h b/mesh/mesh-config.h
+index cf1f8b299..595e53b3a 100644
+--- a/mesh/mesh-config.h
++++ b/mesh/mesh-config.h
+@@ -104,6 +104,7 @@ struct mesh_config_node {
+ 	uint8_t dev_key[16];
+ 	uint8_t token[8];
+ };
++
+ typedef void (*mesh_config_status_func_t)(void *user_data, bool result);
+ typedef bool (*mesh_config_node_func_t)(struct mesh_config_node *node,
+ 							const uint8_t uuid[16],
+@@ -136,10 +137,10 @@ bool mesh_config_write_relay_mode(struct mesh_config *cfg, uint8_t mode,
+ bool mesh_config_write_ttl(struct mesh_config *cfg, uint8_t ttl);
+ bool mesh_config_write_mode(struct mesh_config *cfg, const char *keyword,
+ 								int value);
+-bool mesh_config_model_binding_add(struct mesh_config *cfg, uint8_t ele_idx,
++bool mesh_config_model_binding_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 						bool vendor, uint32_t mod_id,
+ 							uint16_t app_idx);
+-bool mesh_config_model_binding_del(struct mesh_config *cfg, uint8_t ele_idx,
++bool mesh_config_model_binding_del(struct mesh_config *cfg, uint8_t ele_addr,
+ 						bool vendor, uint32_t mod_id,
+ 							uint16_t app_idx);
+ bool mesh_config_model_pub_add(struct mesh_config *cfg, uint16_t ele_addr,
+@@ -147,13 +148,13 @@ bool mesh_config_model_pub_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 						struct mesh_config_pub *pub);
+ bool mesh_config_model_pub_del(struct mesh_config *cfg, uint16_t ele_addr,
+ 						uint32_t mod_id, bool vendor);
+-bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t addr,
++bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 						uint32_t mod_id, bool vendor,
+ 						struct mesh_config_sub *sub);
+-bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t addr,
++bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t ele_addr,
+ 						uint32_t mod_id, bool vendor,
+ 						struct mesh_config_sub *sub);
+-bool mesh_config_model_sub_del_all(struct mesh_config *cfg, uint16_t addr,
++bool mesh_config_model_sub_del_all(struct mesh_config *cfg, uint16_t ele_addr,
+ 						uint32_t mod_id, bool vendor);
+ bool mesh_config_app_key_add(struct mesh_config *cfg, uint16_t net_idx,
+ 				uint16_t app_idx, const uint8_t key[16]);
+diff --git a/mesh/model.c b/mesh/model.c
+index a06b684a5..f4b856108 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -561,7 +561,6 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	int status;
+ 	struct mesh_model *mod;
+ 	bool is_present, is_vendor;
+-	uint8_t ele_idx;
+ 
+ 	mod = find_model(node, addr, id, &status);
+ 	if (!mod) {
+@@ -586,12 +585,10 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	if (is_present && !unbind)
+ 		return MESH_STATUS_SUCCESS;
+ 
+-	ele_idx = (uint8_t) node_get_element_idx(node, addr);
 -
-+	}
- 	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
+ 	if (unbind) {
+ 		model_unbind_idx(node, mod, app_idx);
+ 		if (!mesh_config_model_binding_del(node_config_get(node),
+-					ele_idx, is_vendor, id, app_idx))
++					addr, is_vendor, id, app_idx))
+ 			return MESH_STATUS_STORAGE_FAIL;
  
- 	bt_dev_info(hdev, "Waiting for firmware download to complete");
-@@ -2355,6 +2362,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	if (err) {
- 		bt_dev_err(hdev, "Firmware loading timeout");
- 		err = -ETIMEDOUT;
-+		btintel_reset_to_bootloader(hdev);
- 		goto done;
- 	}
+ 		return MESH_STATUS_SUCCESS;
+@@ -601,7 +598,7 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 		return MESH_STATUS_INSUFF_RESOURCES;
  
-@@ -2381,8 +2389,11 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	set_bit(BTUSB_BOOTING, &data->flags);
+ 	if (!mesh_config_model_binding_add(node_config_get(node),
+-					ele_idx, is_vendor, id, app_idx))
++					addr, is_vendor, id, app_idx))
+ 		return MESH_STATUS_STORAGE_FAIL;
  
- 	err = btintel_send_intel_reset(hdev, boot_param);
--	if (err)
-+	if (err) {
-+		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
-+		btintel_reset_to_bootloader(hdev);
- 		return err;
-+	}
- 
- 	/* The bootloader will not indicate when the device is ready. This
- 	 * is done by the operational firmware sending bootup notification.
-@@ -2404,6 +2415,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 
- 	if (err) {
- 		bt_dev_err(hdev, "Device boot timeout");
-+		btintel_reset_to_bootloader(hdev);
- 		return -ETIMEDOUT;
- 	}
- 
+ 	model_bind_idx(node, mod, app_idx);
 -- 
-2.7.4
+2.21.0
 
