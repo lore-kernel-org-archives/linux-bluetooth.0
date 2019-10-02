@@ -2,133 +2,177 @@ Return-Path: <SRS0=2Aeq=X3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF4CC4360C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 19:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AC0C4360C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 20:31:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF845218DE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 19:04:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kaUlL3j6"
+	by mail.kernel.org (Postfix) with ESMTP id 30C1F21848
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 20:31:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570048317;
+	bh=2WYhvLcVLSMEzXpg5qlewn+Ca793Z6CYPcHmcJoAuKA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=snGqYu6iqmklrlzB5kXzyqMgS8Scc78fcNnuNnbc7XhSvvDAvkoF7mMrelcJ5xEca
+	 wvUCdRX7mJGUBZmLqoWFsa42duvJ2SvqIzrjYaez5kXuJVxPLRDPS5Nvwa/w4bSfnJ
+	 MpImUYDVR+aSAQml5QsY7IVSGU53Qw+fAsJjOZKo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728808AbfJBTEG (ORCPT
+        id S1728159AbfJBUbx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Oct 2019 15:04:06 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:34657 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726076AbfJBTEF (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Oct 2019 15:04:05 -0400
-Received: by mail-io1-f68.google.com with SMTP id q1so59542510ion.1;
-        Wed, 02 Oct 2019 12:04:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=St/5Yx9IAdho5qVopBMcN0+NvHaC/UJiWRlETASobFI=;
-        b=kaUlL3j6+0GmaCUe6vpBY5PoTGdlqVWCuZBArGh4SbLS0unPdcxIETP2WXDtya3J/7
-         Pk9jW8ioH0dWaNgAUdcsqjSe+ptGhqMISbLg5dm+hvb2S+u4qcUVzhr7JGR/hZWaA3Tl
-         aXOf2pISMsJzFG4lPCx/mZi0cditrZ3P6CdICEdcy25sACwFF9VVvPYz+D8H5IZNf+zk
-         wH9Sj8+S7I2eWwhlTFkk9rL3mkHlmq7nkou3hRNkTXV6lADFcrRg59W1EymyGTJkhzZW
-         PHG8mN8uvM3vyGO4Cki8S/OHDQPNUuwvGsQDV+DUOF9zHFcrVJJ6ayS4j3yml5T2RHr/
-         RgtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=St/5Yx9IAdho5qVopBMcN0+NvHaC/UJiWRlETASobFI=;
-        b=LoB6OUaFeI6sDHNdbS0CsMOzJ2agxfMQBPilN3iJ2ruNoVYG18GNajwBkCEswu269W
-         FSC5oeU0lcDTPSXLdseU3xJasMkweWldA5me7XMiX0ZiDxKqcBE8E8rI7xhhK27s8sH6
-         R5Kiu6S/B3wUeeRMvRNWaQV8Tio9zen+1YdPvCjSR2gsqk21uq5z3X0IL2ihZQLaVjum
-         VPliQyMmqf58ru58hzf/u19wOZIlgcteHjFfMEPu99QZAEQ37UPmGW0671/3fOI28W7e
-         kKeFQBAFF/YDbMPtfBTTs4j3jxN08A7tJ8QzJ9N5dF0H5HYJSXXci9RaxmgNJxScgOlE
-         TPZw==
-X-Gm-Message-State: APjAAAWAbaiUygYbsXNDl0CdU/MPe91X2g4OIZe2Rj3uqcZUdqRBLR9y
-        obmDnWTZH8kx3L7X3cQnSGtfO1sPeviGdhTetL4=
-X-Google-Smtp-Source: APXvYqyBDRqzCOURp0bIg87hcNlK+OwvFnOdUWlJtXBAuGTiO64hQFSh/cP5qStkleVFnxHHNCRKAk8bKbmsvDUw5BU=
-X-Received: by 2002:a92:3314:: with SMTP id a20mr5448246ilf.276.1570043044661;
- Wed, 02 Oct 2019 12:04:04 -0700 (PDT)
+        Wed, 2 Oct 2019 16:31:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55168 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727920AbfJBUbx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 2 Oct 2019 16:31:53 -0400
+Received: from earth.universe (unknown [185.62.205.105])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9720B21783;
+        Wed,  2 Oct 2019 20:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570048311;
+        bh=2WYhvLcVLSMEzXpg5qlewn+Ca793Z6CYPcHmcJoAuKA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=o6lmZ1WgebksVHOrIid4jjR2hrh/DJsATwataRLEwP3tQR66WUfsjG66hsuQZh1Sv
+         YFbwIz6byESts5cHB4ZASC+iR57uiiV+t87DgIF/aY4EpCUtLYgIFddeZxT9THgIsR
+         HLFTgRuNhJ3fH6UljH5vn0v7wSoco1kJkuLo1V64=
+Received: by earth.universe (Postfix, from userid 1000)
+        id 11C943C0CA1; Wed,  2 Oct 2019 22:31:49 +0200 (CEST)
+Date:   Wed, 2 Oct 2019 22:31:49 +0200
+From:   Sebastian Reichel <sre@kernel.org>
+To:     Adam Ford <aford173@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
+        adam.ford@logicpd.com
+Subject: Re: [PATCH] Revert "Bluetooth: hci_ll: set operational frequency
+ earlier"
+Message-ID: <20191002203149.g22igmfndbve7m3n@earth.universe>
+References: <20191002114626.12407-1-aford173@gmail.com>
 MIME-Version: 1.0
-References: <20181221011752.25627-1-sre@kernel.org> <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
- <20190319133154.7tbfafy7pguzw2tk@earth.universe>
-In-Reply-To: <20190319133154.7tbfafy7pguzw2tk@earth.universe>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Wed, 2 Oct 2019 14:03:52 -0500
-Message-ID: <CAHCN7xLffcvC0LVnfrhf4cA=y1PRMx+COa3c8rBm1xOj179vEA@mail.gmail.com>
-Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
-To:     Sebastian Reichel <sre@kernel.org>
-Cc:     Hans Verkuil <hverkuil@xs4all.nl>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Tony Lindgren <tony@atomide.com>,
-        Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-media@vger.kernel.org,
-        Linux-OMAP <linux-omap@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="oce6v5i3llqwjvjc"
+Content-Disposition: inline
+In-Reply-To: <20191002114626.12407-1-aford173@gmail.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 19, 2019 at 8:33 AM Sebastian Reichel <sre@kernel.org> wrote:
->
-> Hi Hans,
->
-> On Thu, Mar 14, 2019 at 09:20:10AM +0100, Hans Verkuil wrote:
-> > On 12/21/18 2:17 AM, Sebastian Reichel wrote:
-> > > This moves all remaining users of the legacy TI_ST driver to hcill (patches
-> > > 1-3). Then patches 4-7 convert wl128x-radio driver to a standard platform
-> > > device driver with support for multiple instances. Patch 7 will result in
-> > > (userless) TI_ST driver no longer supporting radio at runtime. Patch 8-11 do
-> > > some cleanups in the wl128x-radio driver. Finally patch 12 removes the TI_ST
-> > > specific parts from wl128x-radio and adds the required infrastructure to use it
-> > > with the serdev hcill driver instead. The remaining patches 13 and 14 remove
-> > > the old TI_ST code.
-> > >
-> > > The new code has been tested on the Motorola Droid 4. For testing the audio
-> > > should be configured to route Ext to Speaker or Headphone. Then you need to
-> > > plug headphone, since its cable is used as antenna. For testing there is a
-> > > 'radio' utility packages in Debian. When you start the utility you need to
-> > > specify a frequency, since initial get_frequency returns an error:
-> >
-> > What is the status of this series?
-> >
-> > Based on some of the replies (from Adam Ford in particular) it appears that
-> > this isn't ready to be merged, so is a v2 planned?
->
-> Yes, a v2 is planned, but I'm super busy at the moment. I don't
-> expect to send something for this merge window. Neither LogicPD
-> nor IGEP use FM radio, so I can just remove FM support from the
-> TI_ST framework. Converting those platforms to hci_ll can be done
-> in a different patchset.
->
 
-Sebastian,
+--oce6v5i3llqwjvjc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-After a bunch of testing, I think the issue I was having was the BTS
-file being pulled in from linux-firmware.  I was able to successfully
-load a BTS file that I have from Logic PD with working BLE and BT
-working together.  I have to run some tests, but if you wouldn't mind
-re-basing your code and pushing it again for review, I can most likely
-add my 'tested-by'
-I am not sure who to discuss my perceived bug in the BTS blob.  I have
-to go find the old BTS editor and see if I can determine the cause,
-but the fact that I can use the BTS file that corresponds to the FCC
-certified file that Logic PD used is more important to me than using
-the generic BTS file provided by TI, however it would be nice for the
-reference BTS file to operate without error.
+Hi,
 
-adam
-> If that was the only issue there would be a v2 already. But Marcel
-> Holtmann suggested to pass the custom packet data through the BT
-> subsystem, which is non-trivial (at least for me) :)
+On Wed, Oct 02, 2019 at 06:46:26AM -0500, Adam Ford wrote:
+> As nice as it would be to update firmware faster, that patch broke
+> at least two different boards, an OMAP4+WL1285 based Motorola Droid
+> 4, as reported by Sebasian Reichel and the Logic PD i.MX6Q +
+> WL1837MOD.
+>=20
+> This reverts commit a2e02f38eff84f199c8e32359eb213f81f270047.
 >
-> -- Sebastian
+> Signed-off-by: Adam Ford <aford173@gmail.com>
+
+Acked-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+
+This should be backported stable
+
+-- Sebastian
+
+> diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+> index 285706618f8a..d9a4c6c691e0 100644
+> --- a/drivers/bluetooth/hci_ll.c
+> +++ b/drivers/bluetooth/hci_ll.c
+> @@ -621,13 +621,6 @@ static int ll_setup(struct hci_uart *hu)
+> =20
+>  	serdev_device_set_flow_control(serdev, true);
+> =20
+> -	if (hu->oper_speed)
+> -		speed =3D hu->oper_speed;
+> -	else if (hu->proto->oper_speed)
+> -		speed =3D hu->proto->oper_speed;
+> -	else
+> -		speed =3D 0;
+> -
+>  	do {
+>  		/* Reset the Bluetooth device */
+>  		gpiod_set_value_cansleep(lldev->enable_gpio, 0);
+> @@ -639,20 +632,6 @@ static int ll_setup(struct hci_uart *hu)
+>  			return err;
+>  		}
+> =20
+> -		if (speed) {
+> -			__le32 speed_le =3D cpu_to_le32(speed);
+> -			struct sk_buff *skb;
+> -
+> -			skb =3D __hci_cmd_sync(hu->hdev,
+> -					     HCI_VS_UPDATE_UART_HCI_BAUDRATE,
+> -					     sizeof(speed_le), &speed_le,
+> -					     HCI_INIT_TIMEOUT);
+> -			if (!IS_ERR(skb)) {
+> -				kfree_skb(skb);
+> -				serdev_device_set_baudrate(serdev, speed);
+> -			}
+> -		}
+> -
+>  		err =3D download_firmware(lldev);
+>  		if (!err)
+>  			break;
+> @@ -677,7 +656,25 @@ static int ll_setup(struct hci_uart *hu)
+>  	}
+> =20
+>  	/* Operational speed if any */
+> +	if (hu->oper_speed)
+> +		speed =3D hu->oper_speed;
+> +	else if (hu->proto->oper_speed)
+> +		speed =3D hu->proto->oper_speed;
+> +	else
+> +		speed =3D 0;
+> +
+> +	if (speed) {
+> +		__le32 speed_le =3D cpu_to_le32(speed);
+> +		struct sk_buff *skb;
+> =20
+> +		skb =3D __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
+> +				     sizeof(speed_le), &speed_le,
+> +				     HCI_INIT_TIMEOUT);
+> +		if (!IS_ERR(skb)) {
+> +			kfree_skb(skb);
+> +			serdev_device_set_baudrate(serdev, speed);
+> +		}
+> +	}
+> =20
+>  	return 0;
+>  }
+> --=20
+> 2.17.1
+>=20
+
+--oce6v5i3llqwjvjc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl2VCSkACgkQ2O7X88g7
++priwg//WmOF0VYpnbAnBIyU0dH6K9I3h+5P5hx3bKGWzJo5y943l8m5CDt0Egq1
+qvsw7K4b9SinxoG7Em1DVbhIEiuExf3bHqeX6tv+VlpFI1tmAPkrkuUPiItV4pRl
+mAk142dQaiLNMlQNevvw9bx0lC0T1P2vWrjELRK9IWZWe4HshRhHc2jULBZNuQrP
+SpZjEgZ6t6jr3U3NrFIgfHef9A6QClzsDsf8ekPBABsVm3FwJpf/UENsANi0oEE9
+QseUbGmu65ROKtP7rRRB3tnlZfklQm71CHVHh6yChqeGLvgLmdvNpzV26v3vb0LH
+vpU4Z4wvHUSlN9as1tJGQffzqyoH0E3E/3OrQjYZWIZbQCvU5+CjHiXsbj/Bw48U
+cgXSWnXAMtE+1g04Tus2lGrNEAJQiOZcyGvpjaGKVaCbWEFjwQ5k4jUXFSIaVbh+
+8rsoeeDkQxDPmWjf5XtVj4mQtDyEZcc4WZ+NoU4gMot4R733Yj29vd/V7AE6YTuT
+qP/a1MygeuJ5YmLSpmPmcJ4dUNbVlCUQjBQUPkWeDPIMUdZsEUZmI5fv+f0ltZmJ
+OsNccPHJLsfFJ2+s2TRk+XO4RnuQtpTNC+mrQkAQE72y4c3za6Jyhl10InmJ2fvM
+Q7iV9O3i5Ovuk77ekTp9c4O6SOARLVEECtJNSglNirRpxhhP69k=
+=gWno
+-----END PGP SIGNATURE-----
+
+--oce6v5i3llqwjvjc--
