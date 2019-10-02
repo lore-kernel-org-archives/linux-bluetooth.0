@@ -2,121 +2,113 @@ Return-Path: <SRS0=2Aeq=X3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF179C352AA
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 12:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A329AC352AA
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 13:31:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FC8E21920
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 12:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 74A9020842
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 13:31:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="lNiYFAcZ"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="U51mhLQZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726481AbfJBMW4 (ORCPT
+        id S1727802AbfJBNb1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Oct 2019 08:22:56 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:34878 "EHLO
+        Wed, 2 Oct 2019 09:31:27 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:33573 "EHLO
         mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbfJBMWz (ORCPT
+        with ESMTP id S1726948AbfJBNb1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Oct 2019 08:22:55 -0400
-Received: by mail-lf1-f68.google.com with SMTP id w6so12581741lfl.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Oct 2019 05:22:54 -0700 (PDT)
+        Wed, 2 Oct 2019 09:31:27 -0400
+Received: by mail-lf1-f68.google.com with SMTP id y127so12771315lfc.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Oct 2019 06:31:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=WSo3iWavk1pRbXCG/cqDdrV1tt/zFbSArjbwwbv/BmU=;
-        b=lNiYFAcZsoN8uZ4+T3aMiO5Q+miuhgHQxY8Qwe2CwS0QdMb1kls9A6nnZ4prhP7qjd
-         Dl4CJ7Tf7Qu+Vx7W7Xmcrk1L0n+QQlHItFwIjIvc/o1rEAc4Yj6rfzoZhCuz5Fmk0Ilv
-         9nC8EcQ+rgYU78encLKY4DJAR4VAwDVWtr8RBsBkn87+7odW5sm1O6zQfLkUgcD9+K17
-         X/GUhJfLSl23scZA9ce904sNXcnlt4W731SGsSnnVLl3aIWv7EWuTFsXCJw46+CeDdhk
-         e58mQPY3DbyTnIoQOMP5JHEuOGzngzYsgdajYd1lw0qVk5VCMiUWhBAcp2EibY/X+y1W
-         xJOw==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=0FtEYUu/cXLCU2Wx/FRgEyJ+h1UqlVRpNKuJsg7dsZM=;
+        b=U51mhLQZDXDq/uBscDo7ainXu45o15EqkJxFOo1pcR+XnS2EuGGCJ1O5wgbjFpkqeS
+         8Cr/hflQZtV5OmTy1ncn3OiqZZBQL4dq52M4cPDICltN0ojM3xXrrQmEqgl7nXVHlK5a
+         ognGSf046RrTibUFGyu00l3s2wR6NMx+h2E6Ca4E83PrzKTNl7lGCaVLeSZcNcWqZ5GU
+         Pirmpq9eG2pICMO+gv9wmSGpG20qIgclfiUAFJbvID3Yvub7yJ1rNhV9tU0s1Y/dmiT9
+         JQj7XSFqEMsfihnrSi+u/Jw426qZF0sF6ktwYUtfFnudE9otAm3cL+neHoUVxGGm8wHa
+         J6lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=WSo3iWavk1pRbXCG/cqDdrV1tt/zFbSArjbwwbv/BmU=;
-        b=Gxbc4S1m7oxT/FB0KeTFoI739L9NpuHYq5gs5Y6aiK+MArhB5HPkaaOjPyjQX1pNkM
-         uh6rZzyH2vlyycaIbBoGoAL27JcbtDwD8EscxauqP9eE5+EDNU+ZI+5m9QbKBwLxmuG0
-         c4o2xsAlbc/Faso7LYQ8+EfFFIJQeoLsiygacHFstLJKROo5Teb5rfQ7lylbeGYsyOJa
-         2oON/mDBW8SXhItaoJw0LbFCyr4/n7eZKe5xm7r3iKCJsUT1zoQWn2kccVVa37CC58jE
-         fmlViXkOAvoJvl91oL0l5hfisE2Eym5e+7iD0Uk3tMkQ500p7CFdAl8ozotfRXCxrDKP
-         FBuA==
-X-Gm-Message-State: APjAAAWZXZ8wDichn1b0iUdSbb5R0rGiKZeFULR8M51l41mgW3Lp2Omn
-        V/olz6rQmr2Kdrb5s7tutPcfTmqGxPM=
-X-Google-Smtp-Source: APXvYqyiEaeQZlLx7NQAG18XA7HjkyOOJbwm9wBxGbem7A1sK9gkFpSBa1WTULcbZEokvuKccJ1nOg==
-X-Received: by 2002:a19:2313:: with SMTP id j19mr2161089lfj.138.1570018973320;
-        Wed, 02 Oct 2019 05:22:53 -0700 (PDT)
-Received: from ix.int.codecoup.pl ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id m17sm6105577lje.0.2019.10.02.05.22.51
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=0FtEYUu/cXLCU2Wx/FRgEyJ+h1UqlVRpNKuJsg7dsZM=;
+        b=S5neAEyLyPEZoeQUDdibhLftDscfA7bc5XYnEy2uQ3ysrfTgcxHTm1kTQ5tJZgkSdv
+         pmm783+JtO10wPYIxOcLNwyzMsKYq8dtP4It01QRlOqK8fJEQAGroKhHV5KV2c6ferkI
+         ud51ryG7XLJv9kfNw9dRPDeQog8Xi5JhwwFc8HDl76Gx+89nuKTSKhTQyRPxV/49Fj0U
+         LHte6xMTwlFnlFcbYMmJkRYOBxaBEl3rx4JUq3hq4EKvSqGZCcoX9lhu8bgBzo1+bxv/
+         gNgo2H3Co0tgf1cW6HA1Vzl/k+ZL2k1lrs4H2GmeDdKIKcJGc3OKBi1/4kqNX+WNb8AS
+         A31w==
+X-Gm-Message-State: APjAAAX2cKm7s+D3vWUUhCPQGB+52ke1/vEOLSJxpoGLpsEdFUeModwl
+        sexIwApZ1eP5Ixm9U9YzfUo30Q==
+X-Google-Smtp-Source: APXvYqwaodZsRA7Shfo3PGyJurQsjLbti6KGkPmbXJ/3+O0wm8qr137trZlNcKYsjGf5YjyiRCFXBA==
+X-Received: by 2002:ac2:5dd6:: with SMTP id x22mr2338967lfq.71.1570023085295;
+        Wed, 02 Oct 2019 06:31:25 -0700 (PDT)
+Received: from mlowasrzechonek2133 ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id m17sm6183743lje.0.2019.10.02.06.31.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2019 05:22:52 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Szymon Janc <szymon.janc@codecoup.pl>,
-        =?UTF-8?q?S=C3=B6ren=20Beye?= <linux@hypfer.de>
-Subject: [PATCH] Bluetooth: Workaround hd directed advertising bug in Broadcom controllers
-Date:   Wed,  2 Oct 2019 14:22:43 +0200
-Message-Id: <20191002122243.31519-1-szymon.janc@codecoup.pl>
-X-Mailer: git-send-email 2.21.0
+        Wed, 02 Oct 2019 06:31:24 -0700 (PDT)
+Date:   Wed, 2 Oct 2019 15:31:22 +0200
+From:   "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ v2] mesh: Fix IV Recovery procedure when IV Update
+ is in progress
+Message-ID: <20191002133122.xha64n3el4klliul@mlowasrzechonek2133>
+Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20190909192509.15007-1-michal.lowas-rzechonek@silvair.com>
+ <547a20d9ff42c6b404bfc646812a243cc2469708.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <547a20d9ff42c6b404bfc646812a243cc2469708.camel@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It appears that some Broadcom controllers (eg BCM20702A0) reject LE Set
-Advertising Parameters command if advertising intervals provided are not
-within range for undirected and low duty directed advertising.
+Hi Brian,
 
-Workaround this bug by populating min and max intervals with 'valid'
-values.
+On 10/01, Gix, Brian wrote:
+> The problem, I think, is using the iv_upd_state (which we need to do 
+> IV Index recovery) as a proxy for the actual state of the IVU bit.
 
-< HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15                                                                                                                                                                                                                                      #75 [hci0] 29.155775
-        Min advertising interval: 0.000 msec (0x0000)
-        Max advertising interval: 0.000 msec (0x0000)
-        Type: Connectable directed - ADV_DIRECT_IND (high duty cycle) (0x01)
-        Own address type: Public (0x00)
-        Direct address type: Random (0x01)
-        Direct address: E2:F0:7B:9F:DC:F4 (Static)
-        Channel map: 37, 38, 39 (0x07)
-        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                                                                                                                                                                                                                                                             #76 [hci0] 29.156745
-      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
-        Status: Invalid HCI Command Parameters (0x12)
+Agreed. The IV Recovery flag should be tracked separately from IV
+Update state.
 
-Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
-Tested-by: Sören Beye <linux@hypfer.de>
----
- net/bluetooth/hci_conn.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+FYI:
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ad5b0ac1f9ce..7ff92dd4c53c 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -934,6 +934,14 @@ static void hci_req_directed_advertising(struct hci_request *req,
- 			return;
- 
- 		memset(&cp, 0, sizeof(cp));
-+
-+		/* Some controllers might reject command if intervals are not
-+		 * within range for undirected advertising.
-+		 * BCM20702A0 is known to be affected by this.
-+		 */
-+		cp.min_interval = cpu_to_le16(0x0020);
-+		cp.max_interval = cpu_to_le16(0x0020);
-+
- 		cp.type = LE_ADV_DIRECT_IND;
- 		cp.own_address_type = own_addr_type;
- 		cp.direct_addr_type = conn->dst_type;
+We ended up implementing two separate state machines to process IV
+Update procedure: one for 'not synced' and one for 'synced' operation.
+
+Node starts in 'not synced' machine and moves to 'synced' when it
+receives its first SNB. The move is one-way, so it's not possible to
+move from 'synced' back to 'not synced' without resetting the node.
+
+Both machines are fairly simple and nearly identical... but moving from
+'not synced' to 'synced' is far from trivial.
+
+In the end, the whole machinery is rather complex. Reflecting this
+approach in BlueZ would require quite an invasive patchset, essentially
+reworking the whole IV Update logic.
+
+I'm going to try to document the whole solution and get back to you.
+
+regards
 -- 
-2.21.0
-
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
