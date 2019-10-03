@@ -2,122 +2,72 @@ Return-Path: <SRS0=QFCk=X4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 593A1ECE58D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 13:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1915C10F14
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 18:18:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3073E20830
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 13:43:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570110193;
-	bh=abRlt0tWQx8wHRdQAm2ffKGRAzb4Fb6wF3dHUvT+a9g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=vHs0drlhhYQz/0NYP3qh9Am6n7i9OsgsONrErQAVL4KQi3PwEDxNpJaOyLpQErIoD
-	 mKEmE9i0+g6AVhq7CpRhNESKYjqRvjMyh4vo+AJG8cMdzhV1NR9rpmuL1OV6SoHxlm
-	 x2w7zuj7tZmq8LWZLZbmTuCos4tP5XHqKxO+HKGM=
+	by mail.kernel.org (Postfix) with ESMTP id 83E122086A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 18:18:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730612AbfJCNnD (ORCPT
+        id S2387768AbfJCSS6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Oct 2019 09:43:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53954 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729655AbfJCNnD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Oct 2019 09:43:03 -0400
-Received: from earth.universe (dyndsl-037-138-174-173.ewe-ip-backbone.de [37.138.174.173])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7DD3520830;
-        Thu,  3 Oct 2019 13:43:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570110181;
-        bh=abRlt0tWQx8wHRdQAm2ffKGRAzb4Fb6wF3dHUvT+a9g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=01ipPJ1T73AEkeXxjuzYiLpHcOBEyTJfYrMMQhaz23nOkeBj8M2bp0l5wNdDlW/pz
-         h6BIJihrVbI5rHohhty4QxkbD+afipPAZJUoAEq3lXB5lo8Yq36///mKoT0ZtgtHfF
-         kA3T1fpfZr1rLEbIb7Wt6Ep6mhD7Vl+3Na3KgkSw=
-Received: by earth.universe (Postfix, from userid 1000)
-        id 71EB23C0CA1; Thu,  3 Oct 2019 15:42:59 +0200 (CEST)
-Date:   Thu, 3 Oct 2019 15:42:59 +0200
-From:   Sebastian Reichel <sre@kernel.org>
-To:     Adam Ford <aford173@gmail.com>
-Cc:     Hans Verkuil <hverkuil@xs4all.nl>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Tony Lindgren <tony@atomide.com>,
-        Rob Herring <robh@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pavel Machek <pavel@ucw.cz>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-media@vger.kernel.org,
-        Linux-OMAP <linux-omap@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
-Message-ID: <20191003134259.bmrhgkvvkyjdvsr3@earth.universe>
-References: <20181221011752.25627-1-sre@kernel.org>
- <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
- <20190319133154.7tbfafy7pguzw2tk@earth.universe>
- <CAHCN7xLffcvC0LVnfrhf4cA=y1PRMx+COa3c8rBm1xOj179vEA@mail.gmail.com>
+        Thu, 3 Oct 2019 14:18:58 -0400
+Received: from emh07.mail.saunalahti.fi ([62.142.5.117]:38594 "EHLO
+        emh07.mail.saunalahti.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731890AbfJCSS5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 3 Oct 2019 14:18:57 -0400
+Received: from ydin.reaktio.net (reaktio.net [85.76.255.15])
+        by emh07.mail.saunalahti.fi (Postfix) with ESMTP id CB455B00CD;
+        Thu,  3 Oct 2019 21:18:55 +0300 (EEST)
+Received: by ydin.reaktio.net (Postfix, from userid 1001)
+        id 81BB736C0F6; Thu,  3 Oct 2019 21:18:55 +0300 (EEST)
+Date:   Thu, 3 Oct 2019 21:18:55 +0300
+From:   Pasi =?iso-8859-1?Q?K=E4rkk=E4inen?= <pasik@iki.fi>
+To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 1/4] doc/media-api: Add RegisterApplication method
+Message-ID: <20191003181855.GF28704@reaktio.net>
+References: <20190712151329.11333-1-luiz.dentz@gmail.com>
+ <CABBYNZLDFAJgkfAFWOOAAqqiX8mpi3KgirBkpwpnBFJ3TxPqyg@mail.gmail.com>
+ <20190718100024.ii2igadxb2lmmitm@pali>
+ <20190721155522.3vqt7vsprhpxflqf@pali>
+ <CABBYNZK6cuz9n4Hu9uRCbQvn9uFEYkn9=mY8J5Fqu0u-D3B1EA@mail.gmail.com>
+ <20190829125734.GH2840@reaktio.net>
+ <20190829200513.6xnta5jx3trbmgxp@pali>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="3hs23bfjj5434d43"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAHCN7xLffcvC0LVnfrhf4cA=y1PRMx+COa3c8rBm1xOj179vEA@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190829200513.6xnta5jx3trbmgxp@pali>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi,
 
---3hs23bfjj5434d43
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Adam,
-
-On Wed, Oct 02, 2019 at 02:03:52PM -0500, Adam Ford wrote:
-> On Tue, Mar 19, 2019 at 8:33 AM Sebastian Reichel <sre@kernel.org> wrote:
-> After a bunch of testing, I think the issue I was having was the BTS
-> file being pulled in from linux-firmware.  I was able to successfully
-> load a BTS file that I have from Logic PD with working BLE and BT
-> working together.  I have to run some tests, but if you wouldn't mind
-> re-basing your code and pushing it again for review, I can most likely
-> add my 'tested-by'.
+On Thu, Aug 29, 2019 at 10:05:13PM +0200, Pali Rohár wrote:
+> On Thursday 29 August 2019 15:57:34 Pasi Kärkkäinen wrote:
+> > Pali: How does it look with porting the PA patches to use the new interfaces?
+> 
+> Hello, I have not had a time yet to play with these pulseaudio patches
+> and porting to the new interface. I guess that I could have more free
+> time in the last week of next month.
 >
-> I am not sure who to discuss my perceived bug in the BTS blob.  I have
-> to go find the old BTS editor and see if I can determine the cause,
-> but the fact that I can use the BTS file that corresponds to the FCC
-> certified file that Logic PD used is more important to me than using
-> the generic BTS file provided by TI, however it would be nice for the
-> reference BTS file to operate without error.
 
-nice :) I just send a rebased partial series. I need some more time
-for the FM radio part (I plan to work on that within the next 3
-weeks).
+It seems BlueZ 5.51 has been released meanwhile (http://www.bluez.org/release-of-bluez-5-51/)
+So now at least the new interfaces are in a released bluez version.
 
--- Sebastian
 
---3hs23bfjj5434d43
-Content-Type: application/pgp-signature; name="signature.asc"
+-- Pasi
 
------BEGIN PGP SIGNATURE-----
+> -- 
+> Pali Rohár
+> pali.rohar@gmail.com
 
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl2V+t4ACgkQ2O7X88g7
-+pqntw//XWtlZbSO/mbBluBjdqneqq8If142mAI8pY6Z1yv9hZV4H4ybUiS4czE8
-5aWvAeye7uUZYbj85bELesffkWiKDShkT2K0mmfnY+apgcRRRsGhNMVN0+lNOHrV
-Ekm2sVokpe+BKHu2hPPiCTsMMSfd4Z6Xga7KeClQJgJFYtmst3e4/k0pTTNNu9tV
-O6J1j+baQzjiJEs7rz24vIrE6PoSvYmh8VRzOv2VwZ3kfcABu2vnz1JPxCSJvDfD
-swO2nW3uZiMdeTDvI027iHCWupdkCc+XReqVHKu7VhiwnEiUg/8YuUxFL43bnFvY
-vVRhJarFYkTvarwA2d1phCPH8DfH+uQ3nvFhpCjHUs+5KEEYWmiZhxkC7urL6xFY
-KvvKQVm0bvNnWtHLOSwrkQD0nRVYEAm3Cjk9DtnwjMemVs7F1vYq9OA6u6GDflty
-FSBlOZMplAA34TzvS3AcFjnKwzfmQqp43britTK1k+FDWcsBM2NWBN6aEOfcxmTs
-hGmFfOOzckx2cf6xPnkkjhzpvMsZHWMcdKp67MWBJxglOBMRpvY+0+JtaXbvDoXQ
-p7GfLTdLP7xkCMcTwXLFD6VvN2lbLioCPBQXCY+HbZ9AseDrHZlSzIM4MXE8nr/v
-qRQ8UFg2GG+KfwxV5uM4IEFOfAdPAtCcWClbYvmcOsJxrbBmqt4=
-=MOKK
------END PGP SIGNATURE-----
-
---3hs23bfjj5434d43--
