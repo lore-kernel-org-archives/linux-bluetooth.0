@@ -2,101 +2,122 @@ Return-Path: <SRS0=QFCk=X4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2C6C32792
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 13:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 593A1ECE58D
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 13:43:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB90520865
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 13:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3073E20830
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 13:43:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570110148;
-	bh=WCUEssIU9+0G8g1dfJGIxcEKX0xGTgolp0w5mbPkFoU=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=fDilw8XZFnBy9BAgKAgnEiHgTFn44m88FkMVY/p+s0IaufzPg1XyIXbuPmnIohBLi
-	 Xpci+UwQIgrFSuoX6KrEsTbYnEBPvdGSC28fx4La/LmdF39rGjTqUyx4TiQNm1x13v
-	 4uOq2Js22Z1flfl61afxUj0qRGmhrzg/i9UvUEAk=
+	s=default; t=1570110193;
+	bh=abRlt0tWQx8wHRdQAm2ffKGRAzb4Fb6wF3dHUvT+a9g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=vHs0drlhhYQz/0NYP3qh9Am6n7i9OsgsONrErQAVL4KQi3PwEDxNpJaOyLpQErIoD
+	 mKEmE9i0+g6AVhq7CpRhNESKYjqRvjMyh4vo+AJG8cMdzhV1NR9rpmuL1OV6SoHxlm
+	 x2w7zuj7tZmq8LWZLZbmTuCos4tP5XHqKxO+HKGM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730516AbfJCNmE (ORCPT
+        id S1730612AbfJCNnD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Oct 2019 09:42:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53342 "EHLO mail.kernel.org"
+        Thu, 3 Oct 2019 09:43:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53954 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730508AbfJCNmE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Oct 2019 09:42:04 -0400
-Received: from jupiter.universe (dyndsl-037-138-174-173.ewe-ip-backbone.de [37.138.174.173])
+        id S1729655AbfJCNnD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 3 Oct 2019 09:43:03 -0400
+Received: from earth.universe (dyndsl-037-138-174-173.ewe-ip-backbone.de [37.138.174.173])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9DD3721783;
-        Thu,  3 Oct 2019 13:42:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7DD3520830;
+        Thu,  3 Oct 2019 13:43:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570110123;
-        bh=WCUEssIU9+0G8g1dfJGIxcEKX0xGTgolp0w5mbPkFoU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=bi9wqLQcIhlqDcoclEDoiLIEYVPEre9nISGzXfUjkF4Eg5vRrvup3aBt46GaOXXYR
-         QGSnAY0mldFrgJ6x2vtbgDPjJxhJx1OkS29zzKxGU8oXWee2zrBodbnHfbQKp7aZgA
-         GvVlY/X2Rc5WMHc10orq73fR8aL9VKjMWRLIiF3c=
-Received: by jupiter.universe (Postfix, from userid 1000)
-        id 8B07D4800C0; Thu,  3 Oct 2019 15:42:01 +0200 (CEST)
+        s=default; t=1570110181;
+        bh=abRlt0tWQx8wHRdQAm2ffKGRAzb4Fb6wF3dHUvT+a9g=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=01ipPJ1T73AEkeXxjuzYiLpHcOBEyTJfYrMMQhaz23nOkeBj8M2bp0l5wNdDlW/pz
+         h6BIJihrVbI5rHohhty4QxkbD+afipPAZJUoAEq3lXB5lo8Yq36///mKoT0ZtgtHfF
+         kA3T1fpfZr1rLEbIb7Wt6Ep6mhD7Vl+3Na3KgkSw=
+Received: by earth.universe (Postfix, from userid 1000)
+        id 71EB23C0CA1; Thu,  3 Oct 2019 15:42:59 +0200 (CEST)
+Date:   Thu, 3 Oct 2019 15:42:59 +0200
 From:   Sebastian Reichel <sre@kernel.org>
-To:     Sebastian Reichel <sre@kernel.org>,
+To:     Adam Ford <aford173@gmail.com>
+Cc:     Hans Verkuil <hverkuil@xs4all.nl>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Tony Lindgren <tony@atomide.com>
-Cc:     Adam Ford <aford173@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel@collabora.com
-Subject: [PATCHv2 0/4] Convert all btwilink users to hci_ll and drop btwilink
-Date:   Thu,  3 Oct 2019 15:41:43 +0200
-Message-Id: <20191003134147.9458-1-sre@kernel.org>
-X-Mailer: git-send-email 2.23.0
+        Tony Lindgren <tony@atomide.com>,
+        Rob Herring <robh@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Pavel Machek <pavel@ucw.cz>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-media@vger.kernel.org,
+        Linux-OMAP <linux-omap@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/14] Add support for FM radio in hcill and kill TI_ST
+Message-ID: <20191003134259.bmrhgkvvkyjdvsr3@earth.universe>
+References: <20181221011752.25627-1-sre@kernel.org>
+ <4f47f7f2-3abb-856c-4db5-675caf8057c7@xs4all.nl>
+ <20190319133154.7tbfafy7pguzw2tk@earth.universe>
+ <CAHCN7xLffcvC0LVnfrhf4cA=y1PRMx+COa3c8rBm1xOj179vEA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="3hs23bfjj5434d43"
+Content-Disposition: inline
+In-Reply-To: <CAHCN7xLffcvC0LVnfrhf4cA=y1PRMx+COa3c8rBm1xOj179vEA@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
 
-This moves the remaining users of btwilink to the "new" serdev based hci_ll
-driver and drops the btwilink driver afterwards. The patches were only compile
-tested by me, but Enric tested the IGEP platform and Adam will test the LogicPD
-platform.
+--3hs23bfjj5434d43
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I kept the TI_ST driver for now, since I plan to send a second patchset for the
-FM radio driver. Once the FM driver has been converted to also use hci_ll, we
-can remove TI_ST completly.
+Hi Adam,
 
-My suggestion is for the patch handling is, that everything simply goes through
-Tony's tree.
+On Wed, Oct 02, 2019 at 02:03:52PM -0500, Adam Ford wrote:
+> On Tue, Mar 19, 2019 at 8:33 AM Sebastian Reichel <sre@kernel.org> wrote:
+> After a bunch of testing, I think the issue I was having was the BTS
+> file being pulled in from linux-firmware.  I was able to successfully
+> load a BTS file that I have from Logic PD with working BLE and BT
+> working together.  I have to run some tests, but if you wouldn't mind
+> re-basing your code and pushing it again for review, I can most likely
+> add my 'tested-by'.
+>
+> I am not sure who to discuss my perceived bug in the BTS blob.  I have
+> to go find the old BTS editor and see if I can determine the cause,
+> but the fact that I can use the BTS file that corresponds to the FCC
+> certified file that Logic PD used is more important to me than using
+> the generic BTS file provided by TI, however it would be nice for the
+> reference BTS file to operate without error.
 
-Changes since PATCHv1 [0]
- * rebase to 5.4-rc1
- * move FM radio patches into separate patchset
-
-[0] https://lore.kernel.org/lkml/20181221011752.25627-1-sre@kernel.org/
+nice :) I just send a rebased partial series. I need some more time
+for the FM radio part (I plan to work on that within the next 3
+weeks).
 
 -- Sebastian
 
-Sebastian Reichel (4):
-  ARM: dts: LogicPD Torpedo: Add WiLink UART node
-  ARM: dts: IGEP: Add WiLink UART node
-  ARM: OMAP2+: pdata-quirks: drop TI_ST/KIM support
-  Bluetooth: btwilink: drop superseded driver
+--3hs23bfjj5434d43
+Content-Type: application/pgp-signature; name="signature.asc"
 
- .../boot/dts/logicpd-torpedo-37xx-devkit.dts  |   8 +
- arch/arm/boot/dts/omap3-igep0020-rev-f.dts    |   8 +
- arch/arm/boot/dts/omap3-igep0030-rev-g.dts    |   8 +
- arch/arm/mach-omap2/pdata-quirks.c            |  52 ---
- drivers/bluetooth/Kconfig                     |  11 -
- drivers/bluetooth/Makefile                    |   1 -
- drivers/bluetooth/btwilink.c                  | 337 ------------------
- 7 files changed, 24 insertions(+), 401 deletions(-)
- delete mode 100644 drivers/bluetooth/btwilink.c
+-----BEGIN PGP SIGNATURE-----
 
--- 
-2.23.0
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl2V+t4ACgkQ2O7X88g7
++pqntw//XWtlZbSO/mbBluBjdqneqq8If142mAI8pY6Z1yv9hZV4H4ybUiS4czE8
+5aWvAeye7uUZYbj85bELesffkWiKDShkT2K0mmfnY+apgcRRRsGhNMVN0+lNOHrV
+Ekm2sVokpe+BKHu2hPPiCTsMMSfd4Z6Xga7KeClQJgJFYtmst3e4/k0pTTNNu9tV
+O6J1j+baQzjiJEs7rz24vIrE6PoSvYmh8VRzOv2VwZ3kfcABu2vnz1JPxCSJvDfD
+swO2nW3uZiMdeTDvI027iHCWupdkCc+XReqVHKu7VhiwnEiUg/8YuUxFL43bnFvY
+vVRhJarFYkTvarwA2d1phCPH8DfH+uQ3nvFhpCjHUs+5KEEYWmiZhxkC7urL6xFY
+KvvKQVm0bvNnWtHLOSwrkQD0nRVYEAm3Cjk9DtnwjMemVs7F1vYq9OA6u6GDflty
+FSBlOZMplAA34TzvS3AcFjnKwzfmQqp43britTK1k+FDWcsBM2NWBN6aEOfcxmTs
+hGmFfOOzckx2cf6xPnkkjhzpvMsZHWMcdKp67MWBJxglOBMRpvY+0+JtaXbvDoXQ
+p7GfLTdLP7xkCMcTwXLFD6VvN2lbLioCPBQXCY+HbZ9AseDrHZlSzIM4MXE8nr/v
+qRQ8UFg2GG+KfwxV5uM4IEFOfAdPAtCcWClbYvmcOsJxrbBmqt4=
+=MOKK
+-----END PGP SIGNATURE-----
 
+--3hs23bfjj5434d43--
