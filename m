@@ -1,178 +1,86 @@
-Return-Path: <SRS0=2Aeq=X3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=QFCk=X4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AC0C4360C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 20:31:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C9C5C10F14
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 08:09:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30C1F21848
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Oct 2019 20:31:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570048317;
-	bh=2WYhvLcVLSMEzXpg5qlewn+Ca793Z6CYPcHmcJoAuKA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=snGqYu6iqmklrlzB5kXzyqMgS8Scc78fcNnuNnbc7XhSvvDAvkoF7mMrelcJ5xEca
-	 wvUCdRX7mJGUBZmLqoWFsa42duvJ2SvqIzrjYaez5kXuJVxPLRDPS5Nvwa/w4bSfnJ
-	 MpImUYDVR+aSAQml5QsY7IVSGU53Qw+fAsJjOZKo=
+	by mail.kernel.org (Postfix) with ESMTP id D2C9621A4C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 08:09:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728159AbfJBUbx (ORCPT
+        id S1726811AbfJCIJA convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Oct 2019 16:31:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55168 "EHLO mail.kernel.org"
+        Thu, 3 Oct 2019 04:09:00 -0400
+Received: from mail.mera.com ([188.40.162.229]:37496 "EHLO mail.mera.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727920AbfJBUbx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Oct 2019 16:31:53 -0400
-Received: from earth.universe (unknown [185.62.205.105])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9720B21783;
-        Wed,  2 Oct 2019 20:31:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570048311;
-        bh=2WYhvLcVLSMEzXpg5qlewn+Ca793Z6CYPcHmcJoAuKA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=o6lmZ1WgebksVHOrIid4jjR2hrh/DJsATwataRLEwP3tQR66WUfsjG66hsuQZh1Sv
-         YFbwIz6byESts5cHB4ZASC+iR57uiiV+t87DgIF/aY4EpCUtLYgIFddeZxT9THgIsR
-         HLFTgRuNhJ3fH6UljH5vn0v7wSoco1kJkuLo1V64=
-Received: by earth.universe (Postfix, from userid 1000)
-        id 11C943C0CA1; Wed,  2 Oct 2019 22:31:49 +0200 (CEST)
-Date:   Wed, 2 Oct 2019 22:31:49 +0200
-From:   Sebastian Reichel <sre@kernel.org>
-To:     Adam Ford <aford173@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
-        adam.ford@logicpd.com
-Subject: Re: [PATCH] Revert "Bluetooth: hci_ll: set operational frequency
- earlier"
-Message-ID: <20191002203149.g22igmfndbve7m3n@earth.universe>
-References: <20191002114626.12407-1-aford173@gmail.com>
+        id S1726039AbfJCIJA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 3 Oct 2019 04:09:00 -0400
+Received: from mera-exch1.mera.com ([188.130.168.211] helo=mera-exch.mera.com)
+        by mail.mera.com with esmtps (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (envelope-from <mikhail.pavlukhin@mera.com>)
+        id 1iFwAT-0002XZ-Ll; Thu, 03 Oct 2019 08:08:57 +0000
+Received: from mera-exch3.mera.com (2001:67c:2344:100::23) by
+ mera-exch1.mera.com (2001:67c:2344:100::21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1591.10; Thu, 3 Oct 2019 11:08:51 +0300
+Received: from mera-exch3.mera.com ([fe80::14f2:6b98:ed28:64d3]) by
+ mera-exch3.mera.com ([fe80::14f2:6b98:ed28:64d3%6]) with mapi id
+ 15.01.1591.017; Thu, 3 Oct 2019 11:08:51 +0300
+From:   Mikhail Pavlukhin <mikhail.pavlukhin@mera.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>
+Subject: RE: Bluetooth / rfcomm  issue with traffic send
+Thread-Topic: Bluetooth / rfcomm  issue with traffic send
+Thread-Index: AdV5waxOsNlW3R6yC0Gfov9roMCrLA==
+Date:   Thu, 3 Oct 2019 08:08:50 +0000
+Message-ID: <916eca5326594ddea3e0fa9fefc1571b@mera.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [192.168.8.16]
+x-inside-org: True
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="oce6v5i3llqwjvjc"
-Content-Disposition: inline
-In-Reply-To: <20191002114626.12407-1-aford173@gmail.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Resending to the mail list in plain text
 
---oce6v5i3llqwjvjc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Mikhail Pavlukhin 
+Sent: Thursday, October 3, 2019 10:45 AM
+To: 'linux-bluetooth@vger.kernel.org' <linux-bluetooth@vger.kernel.org>
+Cc: 'johan.hedberg@gmail.com' <johan.hedberg@gmail.com>; 'marcel@holtmann.org' <marcel@holtmann.org>
+Subject: Bluetooth / rfcomm issue with traffic send
 
-Hi,
+Hello,
 
-On Wed, Oct 02, 2019 at 06:46:26AM -0500, Adam Ford wrote:
-> As nice as it would be to update firmware faster, that patch broke
-> at least two different boards, an OMAP4+WL1285 based Motorola Droid
-> 4, as reported by Sebasian Reichel and the Logic PD i.MX6Q +
-> WL1837MOD.
->=20
-> This reverts commit a2e02f38eff84f199c8e32359eb213f81f270047.
->
-> Signed-off-by: Adam Ford <aford173@gmail.com>
+Would you please assist me with a troubleshooting of the issue with Bluetooth stack? Any advice or recommendation is appreciated.
 
-Acked-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+The system is based on the:
+- Linux kernel 4.14.68 
+- Bluez - 5.48
+- Intel Stick computer with attached Bluetooth USB adapter Broadcom
+- Application written in JavaScript/NodeJS and JavaScript plugin https://github.com/waeco/node-bluez helping with Bluetooth connection management
 
-This should be backported stable
+The aim is to establish connection with external device using Bluetooth SPP profile and send/receive certain amount of traffic to the external device. External device is ALPS Evolution series based (https://www.alps.com/prod/info/E/HTML/Communication/Bluetooth/Bluetooth_list1.html)
 
--- Sebastian
+The observation is the following:
+Bluetooth SPP Connection can be successfully established (after SDP discovery, Pairing procedures) and socket descriptor is returned to the user space application. So it is possible to use it for sending - receiving traffic. It is supposed to send some packets containing ASCII symbols with different intensity (packets per second) and packet length. Traffic sending might continue up to several hours. At some moment (spontaneously) that traffic stops (do not see any packets outgoing from the HCI interface associated with Broadcom adapter) even though peer device is available and working fine. Bluez reports devices as paired and connected. In that moment each call of send function on socket finished with failure and errno 11 reported. Tried to check dmesg and system logs, but there is no indication of the failures or error reports. Tried to compare list of open sockets in bad and good case (for rfcomm and our application/NodeJS) - they are the same. Now trying to use Dynamic Debug featu
+ re in Linux kernel and trace functions in https://github.com/torvalds/linux/blob/63bdf4284c38a48af21745ceb148a087b190cd21/net/bluetooth/rfcomm/sock.c, but there are a lot of printouts so it is hard to follow what is going on.
+It seems the issue with traffic stop reproducible more frequently in case if there is high traffic intensity and small packet length (~64 Kbps).
 
-> diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-> index 285706618f8a..d9a4c6c691e0 100644
-> --- a/drivers/bluetooth/hci_ll.c
-> +++ b/drivers/bluetooth/hci_ll.c
-> @@ -621,13 +621,6 @@ static int ll_setup(struct hci_uart *hu)
-> =20
->  	serdev_device_set_flow_control(serdev, true);
-> =20
-> -	if (hu->oper_speed)
-> -		speed =3D hu->oper_speed;
-> -	else if (hu->proto->oper_speed)
-> -		speed =3D hu->proto->oper_speed;
-> -	else
-> -		speed =3D 0;
-> -
->  	do {
->  		/* Reset the Bluetooth device */
->  		gpiod_set_value_cansleep(lldev->enable_gpio, 0);
-> @@ -639,20 +632,6 @@ static int ll_setup(struct hci_uart *hu)
->  			return err;
->  		}
-> =20
-> -		if (speed) {
-> -			__le32 speed_le =3D cpu_to_le32(speed);
-> -			struct sk_buff *skb;
-> -
-> -			skb =3D __hci_cmd_sync(hu->hdev,
-> -					     HCI_VS_UPDATE_UART_HCI_BAUDRATE,
-> -					     sizeof(speed_le), &speed_le,
-> -					     HCI_INIT_TIMEOUT);
-> -			if (!IS_ERR(skb)) {
-> -				kfree_skb(skb);
-> -				serdev_device_set_baudrate(serdev, speed);
-> -			}
-> -		}
-> -
->  		err =3D download_firmware(lldev);
->  		if (!err)
->  			break;
-> @@ -677,7 +656,25 @@ static int ll_setup(struct hci_uart *hu)
->  	}
-> =20
->  	/* Operational speed if any */
-> +	if (hu->oper_speed)
-> +		speed =3D hu->oper_speed;
-> +	else if (hu->proto->oper_speed)
-> +		speed =3D hu->proto->oper_speed;
-> +	else
-> +		speed =3D 0;
-> +
-> +	if (speed) {
-> +		__le32 speed_le =3D cpu_to_le32(speed);
-> +		struct sk_buff *skb;
-> =20
-> +		skb =3D __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
-> +				     sizeof(speed_le), &speed_le,
-> +				     HCI_INIT_TIMEOUT);
-> +		if (!IS_ERR(skb)) {
-> +			kfree_skb(skb);
-> +			serdev_device_set_baudrate(serdev, speed);
-> +		}
-> +	}
-> =20
->  	return 0;
->  }
-> --=20
-> 2.17.1
->=20
+Could you please advise what modules better to trace with Dynamic Debug feature? Are there any idea why errno 11 can be reported? BTW am I right saying that errno 11 is 
+#define EAGAIN šššššš 11šššš /* Try again */ (taken from https://github.com/torvalds/linux/blob/6f0d349d922ba44e4348a17a78ea51b7135965b1/include/uapi/asm-generic/errno-base.h) ?
+Actually send attempt is retried, but the traffic sending (towards to the external device) is not restarted even after few minutes.
 
---oce6v5i3llqwjvjc
-Content-Type: application/pgp-signature; name="signature.asc"
+Thank you in advance, Mikhail.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl2VCSkACgkQ2O7X88g7
-+priwg//WmOF0VYpnbAnBIyU0dH6K9I3h+5P5hx3bKGWzJo5y943l8m5CDt0Egq1
-qvsw7K4b9SinxoG7Em1DVbhIEiuExf3bHqeX6tv+VlpFI1tmAPkrkuUPiItV4pRl
-mAk142dQaiLNMlQNevvw9bx0lC0T1P2vWrjELRK9IWZWe4HshRhHc2jULBZNuQrP
-SpZjEgZ6t6jr3U3NrFIgfHef9A6QClzsDsf8ekPBABsVm3FwJpf/UENsANi0oEE9
-QseUbGmu65ROKtP7rRRB3tnlZfklQm71CHVHh6yChqeGLvgLmdvNpzV26v3vb0LH
-vpU4Z4wvHUSlN9as1tJGQffzqyoH0E3E/3OrQjYZWIZbQCvU5+CjHiXsbj/Bw48U
-cgXSWnXAMtE+1g04Tus2lGrNEAJQiOZcyGvpjaGKVaCbWEFjwQ5k4jUXFSIaVbh+
-8rsoeeDkQxDPmWjf5XtVj4mQtDyEZcc4WZ+NoU4gMot4R733Yj29vd/V7AE6YTuT
-qP/a1MygeuJ5YmLSpmPmcJ4dUNbVlCUQjBQUPkWeDPIMUdZsEUZmI5fv+f0ltZmJ
-OsNccPHJLsfFJ2+s2TRk+XO4RnuQtpTNC+mrQkAQE72y4c3za6Jyhl10InmJ2fvM
-Q7iV9O3i5Ovuk77ekTp9c4O6SOARLVEECtJNSglNirRpxhhP69k=
-=gWno
------END PGP SIGNATURE-----
-
---oce6v5i3llqwjvjc--
