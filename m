@@ -2,72 +2,66 @@ Return-Path: <SRS0=a/5L=X5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E73C4CED1
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Oct 2019 00:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0106AC4360C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Oct 2019 05:43:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B067F2086A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Oct 2019 00:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C61662133F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Oct 2019 05:43:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="gSADe+cF"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="1qibn2cJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732546AbfJDAJ6 (ORCPT
+        id S1731496AbfJDFno (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Oct 2019 20:09:58 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:40530 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732523AbfJDAJ5 (ORCPT
+        Fri, 4 Oct 2019 01:43:44 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:37487 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730957AbfJDFno (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Oct 2019 20:09:57 -0400
-Received: by mail-pf1-f194.google.com with SMTP id x127so2757489pfb.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Oct 2019 17:09:55 -0700 (PDT)
+        Fri, 4 Oct 2019 01:43:44 -0400
+Received: by mail-lf1-f65.google.com with SMTP id w67so3568558lff.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Oct 2019 22:43:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=aJSnURvrTnKRW7XCAUl3csqPTcgWZWsUjhaWf0zhO5g=;
-        b=gSADe+cFeT+SNla0USBTTbchOiQAsLsRGopRcflGKL9W5IS3MZZoAp5zvVcQxKEobL
-         0+BvUipTyKtCca0sEjQt7eqoBiJ+flXQzgKMFNQ/N3iKesdiWlqD2Pp7jIcOoWLV4+XB
-         FzpHiowmCWE1ZCeO9vMa6CPlQ7XWKtY/kd0+QY+sgpXwGJSt0fLhGaflhT/j+xp8gtd2
-         PHvXETltk4MySeO015s3XAkDt/wi8Oo4/N5lw6i8GNafH91OOVZC+4MRN3iOXqdEr0Kl
-         GUcxgD4g/eSQkLZfUvO/X9RrLxeGOqsErk1D/MlPz/mv+RVoqwl0i6AVUZ2+2u9KKfLB
-         NHBQ==
+        bh=55DCSgxFc7hVW6DQSPmxTSYgVif+Jlg6vTznFg7x+yo=;
+        b=1qibn2cJleXgOV4FSFo5Her+T3of+EySfBy8pbDKRIHi1v++jhM1xu08xH2r3dnACy
+         lyj+sZ2JjUvlrMH+fQWsUcp9xXGcmWrjt0qFRQFhaShK3MS8QAwmGUD/57VC/VL2UM+I
+         j8VkhCuq9x3TRR4gyOOCC1T3NrHrzhqTyJuqbY7L5Tok8aNI/DyHc7eop81/WNagqh0C
+         rib2VsME/zkEA+8D9tPmsTT/YuobJD73blMK1DFtBV3tykEn3yPr4kBrH+gVlQSsmpzr
+         nQ0gYA8hNkZqTebSUQbdF0FPCR1gTD9u36yYbc61kN3opX8y+Uo0m+ajVn+AgNzIJajp
+         TKEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=aJSnURvrTnKRW7XCAUl3csqPTcgWZWsUjhaWf0zhO5g=;
-        b=AkV5ocQ89n2XvSkyIZZqeCOOp8vtpK2HpkjowD2vWxTA/+W+VAt6DH6eV5CNzsMChm
-         fngjjuPqN4R8rVaKHYEpW5ikqt9QOyNFTNqX3MKaZd7bQbnEWu9/NWd2sEivdD0VJhdG
-         VPLg4UHnLRHq4gbCd+sY1hbLivC+yopN3rUslFR9V8GQbz7iSPstvuSgXtqf2OnzZ0aK
-         cJ0UByZwp00f/iq3wOnkvHgyT4yAjf6x+zgnNBac6oRfkJGcVaxC14nHU+NqHxF7T69C
-         ywq2g9HvFDeE6kFmQVu1zPWl/WWDM2MjI+GV+i+zKv8oP/nzg+PP1ujvz6N2PtNvGel8
-         oWVQ==
-X-Gm-Message-State: APjAAAXwjOEds5CYZRVRVcECu0BBKPR1KZuoh/F88xI/M14l8JR/RcnU
-        nAozOUSJl1al15ssNo2nLNTgwGzzNkk=
-X-Google-Smtp-Source: APXvYqxCQMs3UqvPro/uqk4/SIPuDqadTVA4fcofBe/lfbWVzELrP9px1CS+soylpvxJoqmS0m7Zjg==
-X-Received: by 2002:a62:8749:: with SMTP id i70mr13449404pfe.12.1570147795117;
-        Thu, 03 Oct 2019 17:09:55 -0700 (PDT)
-Received: from mkorpershoek-XPS-13-9370.hsd1.ca.comcast.net ([2601:647:5700:f97e:44ec:171c:55e2:48])
-        by smtp.gmail.com with ESMTPSA id g4sm4267913pfo.33.2019.10.03.17.09.54
+        bh=55DCSgxFc7hVW6DQSPmxTSYgVif+Jlg6vTznFg7x+yo=;
+        b=cMeh9GCGIaXAPlWhXvyHiZkPKc82oPichvpTftIO+eZDyhGhAC7sCBsdUus2dMOWcl
+         wXaevCWwIZtKlmehqjNIhBU3wQWZ8moj4uY77ldeXPdPAzElPlhNbD8ArilBuMSF+m0r
+         1RbQLil25j/QnApjniKrL132ksDl//X89d8/ijN4B7JMXHiKe7Axzb/9MaHEqj0AjLI/
+         e/8sV5WdwLPmqo14VeXDRb6UM0zT0zPTSHoGp1KksfV2ZK6856n2PGGDA/lxiJAuUBCn
+         zwQnJDfB9EVho5aT8HYcHhpW1dcfS8rQArMGm+0vRmX+LsVaD/1yraILeBvoKFbmG/s/
+         F9+Q==
+X-Gm-Message-State: APjAAAWvK9SF/lx0UFV09UF3Rof4A5LyRLzvlG7rQy8CPDgn39Bb95RY
+        ja25Rxb4pSeH9IChdhEtUzdrzqF+Wjg=
+X-Google-Smtp-Source: APXvYqxWsLMDaNWGxx56CNINPi09OVGfNf42gSRMhL3OX+8BKppUjj8yM5/Pej4gU+koDIh8csj/bw==
+X-Received: by 2002:a19:711e:: with SMTP id m30mr7932003lfc.63.1570167821726;
+        Thu, 03 Oct 2019 22:43:41 -0700 (PDT)
+Received: from ix.int.codecoup.pl ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id q88sm1024828lje.57.2019.10.03.22.43.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2019 17:09:54 -0700 (PDT)
-From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
+        Thu, 03 Oct 2019 22:43:41 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Sean Wang <sean.wang@mediatek.com>,
-        Mattijs Korpershoek <mkorpershoek@baylibre.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_core: fix init with HCI_QUIRK_NON_PERSISTENT_SETUP
-Date:   Thu,  3 Oct 2019 17:09:32 -0700
-Message-Id: <20191004000933.24575-1-mkorpershoek@baylibre.com>
-X-Mailer: git-send-email 2.20.1
+Cc:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH V3 1/3] monitor: Extract TTY data processing to separate function
+Date:   Fri,  4 Oct 2019 07:43:32 +0200
+Message-Id: <20191004054334.5479-1-szymon.janc@codecoup.pl>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -75,91 +69,68 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some HCI devices which have the HCI_QUIRK_NON_PERSISTENT_SETUP [1]
-require a call to setup() to be ran after every open().
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 
-During the setup() stage, these devices expect the chip to acknowledge
-its setup() completion via vendor specific frames.
-
-If userspace opens() such HCI device in HCI_USER_CHANNEL [2] mode,
-the vendor specific frames are never tranmitted to the driver, as
-they are filtered in hci_rx_work().
-
-Allow HCI devices which have HCI_QUIRK_NON_PERSISTENT_SETUP to process
-frames if the HCI device is is HCI_INIT state.
-
-[1] https://lore.kernel.org/patchwork/patch/965071/
-[2] https://www.spinics.net/lists/linux-bluetooth/msg37345.html
-
-Fixes: 740011cfe948 ("Bluetooth: Add new quirk for non-persistent setup settings")
-Signed-off-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
 ---
-Some more background on the change follows:
+ monitor/control.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
-The Android bluetooth stack (Bluedroid) also has a HAL implementation
-which follows Linux's standard rfkill interface [1].
-
-This implementation relies on the HCI_CHANNEL_USER feature to get
-exclusive access to the underlying bluetooth device.
-
-When testing this along with the btkmtksdio driver, the
-chip appeared unresponsive when calling the following from userspace:
-
-    struct sockaddr_hci addr;
-    int fd;
-
-    fd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-
-    memset(&addr, 0, sizeof(addr));
-    addr.hci_family = AF_BLUETOOTH;
-    addr.hci_dev = 0;
-    addr.hci_channel = HCI_CHANNEL_USER;
-
-    bind(fd, (struct sockaddr *) &addr, sizeof(addr)); # device hangs
-
-In the case of bluetooth drivers exposing QUIRK_NON_PERSISTENT_SETUP
-such as btmtksdio, setup() is called each multiple times.
-In particular, when userspace calls bind(), the setup() is called again
-and vendor specific commands might be send to re-initialize the chip.
-
-Those commands are filtered out by hci_core in HCI_CHANNEL_USER mode,
-preventing setup() from completing successfully.
-
-This has been tested on a 4.19 kernel based on Android Common Kernel.
-It has also been compile tested on bluetooth-next.
-
-[1] https://android.googlesource.com/platform/system/bt/+/refs/heads/master/vendor_libs/linux/interface/
-
- net/bluetooth/hci_core.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 04bc79359a17..5f12e8574d54 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4440,9 +4440,20 @@ static void hci_rx_work(struct work_struct *work)
- 			hci_send_to_sock(hdev, skb);
- 		}
+diff --git a/monitor/control.c b/monitor/control.c
+index 39a413be1..4022e7644 100644
+--- a/monitor/control.c
++++ b/monitor/control.c
+@@ -1300,23 +1300,8 @@ static bool tty_parse_header(uint8_t *hdr, uint8_t len, struct timeval **tv,
+ 	return true;
+ }
  
-+		/* If the device has been opened in HCI_USER_CHANNEL,
-+		 * the userspace has exclusive access to device.
-+		 * When HCI_QUIRK_NON_PERSISTENT_SETUP is set and
-+		 * device is HCI_INIT,  we still need to process
-+		 * the data packets to the driver in order
-+		 * to complete its setup().
-+		 */
- 		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
--			kfree_skb(skb);
--			continue;
-+			if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
-+				      &hdev->quirks) ||
-+			    !test_bit(HCI_INIT, &hdev->flags)) {
-+				kfree_skb(skb);
-+				continue;
-+			}
- 		}
+-static void tty_callback(int fd, uint32_t events, void *user_data)
++static void process_data(struct control_data *data)
+ {
+-	struct control_data *data = user_data;
+-	ssize_t len;
+-
+-	if (events & (EPOLLERR | EPOLLHUP)) {
+-		mainloop_remove_fd(data->fd);
+-		return;
+-	}
+-
+-	len = read(data->fd, data->buf + data->offset,
+-					sizeof(data->buf) - data->offset);
+-	if (len < 0)
+-		return;
+-
+-	data->offset += len;
+-
+ 	while (data->offset >= sizeof(struct tty_hdr)) {
+ 		struct tty_hdr *hdr = (struct tty_hdr *) data->buf;
+ 		uint16_t pktlen, opcode, data_len;
+@@ -1358,6 +1343,26 @@ static void tty_callback(int fd, uint32_t events, void *user_data)
+ 	}
+ }
  
- 		if (test_bit(HCI_INIT, &hdev->flags)) {
++static void tty_callback(int fd, uint32_t events, void *user_data)
++{
++	struct control_data *data = user_data;
++	ssize_t len;
++
++	if (events & (EPOLLERR | EPOLLHUP)) {
++		mainloop_remove_fd(data->fd);
++		return;
++	}
++
++	len = read(data->fd, data->buf + data->offset,
++					sizeof(data->buf) - data->offset);
++	if (len < 0)
++		return;
++
++	data->offset += len;
++
++	process_data(data);
++}
++
+ int control_tty(const char *path, unsigned int speed)
+ {
+ 	struct control_data *data;
 -- 
-2.20.1
+2.21.0
 
