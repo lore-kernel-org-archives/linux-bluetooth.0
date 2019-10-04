@@ -1,125 +1,165 @@
-Return-Path: <SRS0=QFCk=X4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=a/5L=X5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F8FC10F14
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 21:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E73C4CED1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Oct 2019 00:09:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66F4F215EA
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Oct 2019 21:40:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B067F2086A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Oct 2019 00:09:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="choTNLqb"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="gSADe+cF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387926AbfJCVkj (ORCPT
+        id S1732546AbfJDAJ6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Oct 2019 17:40:39 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44933 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387660AbfJCVkj (ORCPT
+        Thu, 3 Oct 2019 20:09:58 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:40530 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732523AbfJDAJ5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Oct 2019 17:40:39 -0400
-Received: by mail-io1-f67.google.com with SMTP id w12so8973496iol.11;
-        Thu, 03 Oct 2019 14:40:38 -0700 (PDT)
+        Thu, 3 Oct 2019 20:09:57 -0400
+Received: by mail-pf1-f194.google.com with SMTP id x127so2757489pfb.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Oct 2019 17:09:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iD1EF6O5uYyPHk2lyyhowDbuFGVloB10aGSek27Khvs=;
-        b=choTNLqb+I3qLscd/IawY0fhTpWqLowAeelSwP4Rv1g6S/K/M5xobirmLd7GvBs63i
-         iuqRncniILwSTQojjX9CyA6LOQyYUl1dAU4LAqvxGrUsld5REzhsNdql4vyPlOALtUkD
-         5cTRIc/HXPi0n3ZJdlmVqTN3NVmEGY1sbhqRR8FurekpH87nqhzH4JUzIb/K3JXVQi6c
-         hR436JlA1x0Yuf/aiHxohOouxN0EXg7k60q9Y5v1WG35lU/wpM1i+ESp3XH3VeBolSFB
-         XIR8wqjpBufBc5gkCWexSFlKJgeUB6FtT3HP3w+6L27rtBUrqwU1Qkr0jaTlUVm+pH5P
-         jhNA==
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aJSnURvrTnKRW7XCAUl3csqPTcgWZWsUjhaWf0zhO5g=;
+        b=gSADe+cFeT+SNla0USBTTbchOiQAsLsRGopRcflGKL9W5IS3MZZoAp5zvVcQxKEobL
+         0+BvUipTyKtCca0sEjQt7eqoBiJ+flXQzgKMFNQ/N3iKesdiWlqD2Pp7jIcOoWLV4+XB
+         FzpHiowmCWE1ZCeO9vMa6CPlQ7XWKtY/kd0+QY+sgpXwGJSt0fLhGaflhT/j+xp8gtd2
+         PHvXETltk4MySeO015s3XAkDt/wi8Oo4/N5lw6i8GNafH91OOVZC+4MRN3iOXqdEr0Kl
+         GUcxgD4g/eSQkLZfUvO/X9RrLxeGOqsErk1D/MlPz/mv+RVoqwl0i6AVUZ2+2u9KKfLB
+         NHBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iD1EF6O5uYyPHk2lyyhowDbuFGVloB10aGSek27Khvs=;
-        b=VGr2dPRx7Uy4E4qarngwbwMcohtYFSfxL/lkB+1xloGr+gDMqYNqqrrr6L3UJGRQy1
-         RmEYIWzQOF7+3Gw7lSvAU3B+MHcEf6drB16fC0O2wQNzbxYQNSX9uGkjkgX5engU0Ce1
-         6afQ+L09cEOykz2wmFbGU9wijMu76C9sBhs+auIIAfYe50YuhjMh3H2nVUrt8X0Lc656
-         2D/pTArVZO1ugPMo6lxiO9FhBoUMK0ZSXP/qGbxsCl/TYQXloJyuI7NN1lwVKdePBUVo
-         htFbouwYe8CaWEhE4sOn2CERHaYUsWaY35mEGBXxTYJOVOMA+F+E6jZBiRZaIlYWjuiX
-         ZjCQ==
-X-Gm-Message-State: APjAAAUIDKXer286MhQGDsE3K1NwaKzbdMNHuVr93T2Z+yLQArG9yn0O
-        5KkryHVKapeKw3I5lgTv+PACETuH2WbI3r/GRtg=
-X-Google-Smtp-Source: APXvYqz/ulXmgBkkmsry2kLhehSjSGtf79MsHLivqOKLdZrTZeZSQy7E58b3R05cg6bkk+txtvjVB/CD70GbVGE+bok=
-X-Received: by 2002:a92:d84d:: with SMTP id h13mr12392064ilq.205.1570138837800;
- Thu, 03 Oct 2019 14:40:37 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aJSnURvrTnKRW7XCAUl3csqPTcgWZWsUjhaWf0zhO5g=;
+        b=AkV5ocQ89n2XvSkyIZZqeCOOp8vtpK2HpkjowD2vWxTA/+W+VAt6DH6eV5CNzsMChm
+         fngjjuPqN4R8rVaKHYEpW5ikqt9QOyNFTNqX3MKaZd7bQbnEWu9/NWd2sEivdD0VJhdG
+         VPLg4UHnLRHq4gbCd+sY1hbLivC+yopN3rUslFR9V8GQbz7iSPstvuSgXtqf2OnzZ0aK
+         cJ0UByZwp00f/iq3wOnkvHgyT4yAjf6x+zgnNBac6oRfkJGcVaxC14nHU+NqHxF7T69C
+         ywq2g9HvFDeE6kFmQVu1zPWl/WWDM2MjI+GV+i+zKv8oP/nzg+PP1ujvz6N2PtNvGel8
+         oWVQ==
+X-Gm-Message-State: APjAAAXwjOEds5CYZRVRVcECu0BBKPR1KZuoh/F88xI/M14l8JR/RcnU
+        nAozOUSJl1al15ssNo2nLNTgwGzzNkk=
+X-Google-Smtp-Source: APXvYqxCQMs3UqvPro/uqk4/SIPuDqadTVA4fcofBe/lfbWVzELrP9px1CS+soylpvxJoqmS0m7Zjg==
+X-Received: by 2002:a62:8749:: with SMTP id i70mr13449404pfe.12.1570147795117;
+        Thu, 03 Oct 2019 17:09:55 -0700 (PDT)
+Received: from mkorpershoek-XPS-13-9370.hsd1.ca.comcast.net ([2601:647:5700:f97e:44ec:171c:55e2:48])
+        by smtp.gmail.com with ESMTPSA id g4sm4267913pfo.33.2019.10.03.17.09.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2019 17:09:54 -0700 (PDT)
+From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sean Wang <sean.wang@mediatek.com>,
+        Mattijs Korpershoek <mkorpershoek@baylibre.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_core: fix init with HCI_QUIRK_NON_PERSISTENT_SETUP
+Date:   Thu,  3 Oct 2019 17:09:32 -0700
+Message-Id: <20191004000933.24575-1-mkorpershoek@baylibre.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20191003134147.9458-1-sre@kernel.org> <20191003134147.9458-2-sre@kernel.org>
-In-Reply-To: <20191003134147.9458-2-sre@kernel.org>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Thu, 3 Oct 2019 16:40:26 -0500
-Message-ID: <CAHCN7xLtHcU6q8_dorZOySPaQATce9qbvzcK1Tn0MoEF+tURHA@mail.gmail.com>
-Subject: Re: [PATCHv2 1/4] ARM: dts: LogicPD Torpedo: Add WiLink UART node
-To:     Sebastian Reichel <sre@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Tony Lindgren <tony@atomide.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Linux-OMAP <linux-omap@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kernel@collabora.com,
-        Sebastian Reichel <sebastian.reichel@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Oct 3, 2019 at 8:42 AM Sebastian Reichel <sre@kernel.org> wrote:
->
-> From: Sebastian Reichel <sebastian.reichel@collabora.com>
->
-> Add a node for the UART part of WiLink chip.
-Thank you.
+Some HCI devices which have the HCI_QUIRK_NON_PERSISTENT_SETUP [1]
+require a call to setup() to be ran after every open().
 
-hci0:   Type: Primary  Bus: UART
-        BD Address: 00:18:30:49:7D:63  ACL MTU: 1021:4  SCO MTU: 180:4
-        UP RUNNING
-        RX bytes:6185 acl:0 sco:0 events:581 errors:0
-        TX bytes:91006 acl:0 sco:0 commands:578 errors:0
+During the setup() stage, these devices expect the chip to acknowledge
+its setup() completion via vendor specific frames.
 
->
-> This is compile tested only!
->
-I am not sure which is more appropriate,
+If userspace opens() such HCI device in HCI_USER_CHANNEL [2] mode,
+the vendor specific frames are never tranmitted to the driver, as
+they are filtered in hci_rx_work().
 
-Acked-by: Adam Ford <aford173@gmail.com>
-Tested-by: Adam Ford <aford173@gmail.com>
+Allow HCI devices which have HCI_QUIRK_NON_PERSISTENT_SETUP to process
+frames if the HCI device is is HCI_INIT state.
 
-> Cc: Adam Ford <aford173@gmail.com>
-> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
-> ---
->  arch/arm/boot/dts/logicpd-torpedo-37xx-devkit.dts | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/arch/arm/boot/dts/logicpd-torpedo-37xx-devkit.dts b/arch/arm/boot/dts/logicpd-torpedo-37xx-devkit.dts
-> index 18c27e85051f..c34ba0ef8b4d 100644
-> --- a/arch/arm/boot/dts/logicpd-torpedo-37xx-devkit.dts
-> +++ b/arch/arm/boot/dts/logicpd-torpedo-37xx-devkit.dts
-> @@ -50,6 +50,14 @@
->         };
->  };
->
-> +&uart2 {
-> +       bluetooth {
-> +               compatible = "ti,wl1283-st";
-> +               enable-gpios = <&gpio6 2 GPIO_ACTIVE_HIGH>; /* gpio 162 */
-> +               max-speed = <3000000>;
-> +       };
-> +};
-> +
->  &omap3_pmx_core {
->         mmc3_pins: pinmux_mm3_pins {
->                 pinctrl-single,pins = <
-> --
-> 2.23.0
->
+[1] https://lore.kernel.org/patchwork/patch/965071/
+[2] https://www.spinics.net/lists/linux-bluetooth/msg37345.html
+
+Fixes: 740011cfe948 ("Bluetooth: Add new quirk for non-persistent setup settings")
+Signed-off-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
+---
+Some more background on the change follows:
+
+The Android bluetooth stack (Bluedroid) also has a HAL implementation
+which follows Linux's standard rfkill interface [1].
+
+This implementation relies on the HCI_CHANNEL_USER feature to get
+exclusive access to the underlying bluetooth device.
+
+When testing this along with the btkmtksdio driver, the
+chip appeared unresponsive when calling the following from userspace:
+
+    struct sockaddr_hci addr;
+    int fd;
+
+    fd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+
+    memset(&addr, 0, sizeof(addr));
+    addr.hci_family = AF_BLUETOOTH;
+    addr.hci_dev = 0;
+    addr.hci_channel = HCI_CHANNEL_USER;
+
+    bind(fd, (struct sockaddr *) &addr, sizeof(addr)); # device hangs
+
+In the case of bluetooth drivers exposing QUIRK_NON_PERSISTENT_SETUP
+such as btmtksdio, setup() is called each multiple times.
+In particular, when userspace calls bind(), the setup() is called again
+and vendor specific commands might be send to re-initialize the chip.
+
+Those commands are filtered out by hci_core in HCI_CHANNEL_USER mode,
+preventing setup() from completing successfully.
+
+This has been tested on a 4.19 kernel based on Android Common Kernel.
+It has also been compile tested on bluetooth-next.
+
+[1] https://android.googlesource.com/platform/system/bt/+/refs/heads/master/vendor_libs/linux/interface/
+
+ net/bluetooth/hci_core.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 04bc79359a17..5f12e8574d54 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4440,9 +4440,20 @@ static void hci_rx_work(struct work_struct *work)
+ 			hci_send_to_sock(hdev, skb);
+ 		}
+ 
++		/* If the device has been opened in HCI_USER_CHANNEL,
++		 * the userspace has exclusive access to device.
++		 * When HCI_QUIRK_NON_PERSISTENT_SETUP is set and
++		 * device is HCI_INIT,  we still need to process
++		 * the data packets to the driver in order
++		 * to complete its setup().
++		 */
+ 		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+-			kfree_skb(skb);
+-			continue;
++			if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
++				      &hdev->quirks) ||
++			    !test_bit(HCI_INIT, &hdev->flags)) {
++				kfree_skb(skb);
++				continue;
++			}
+ 		}
+ 
+ 		if (test_bit(HCI_INIT, &hdev->flags)) {
+-- 
+2.20.1
+
