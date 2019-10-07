@@ -2,112 +2,143 @@ Return-Path: <SRS0=J5Bo=YA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC69ECE58C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Oct 2019 14:12:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 209D2C47404
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Oct 2019 14:33:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 463EC206C2
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Oct 2019 14:12:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E86F72173B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Oct 2019 14:33:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=megous.com header.i=@megous.com header.b="tKFYuF7C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cN0P5+R0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728187AbfJGOL4 (ORCPT
+        id S1728273AbfJGOdL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Oct 2019 10:11:56 -0400
-Received: from vps.xff.cz ([195.181.215.36]:55952 "EHLO vps.xff.cz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727324AbfJGOL4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Oct 2019 10:11:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
-        t=1570457513; bh=vCAFf9C0br5VOI1ZEU2yHBKcKssDrCWtMjeUus4lEvs=;
-        h=Date:From:To:Cc:Subject:References:X-My-GPG-KeyId:From;
-        b=tKFYuF7CIbqBRHvfCbUenSAaxcz2/NEiihFPgquA588JE7l65OI+ZFs3BxqUXBeb3
-         TkIIg1l8zsVvcLmp9N/rKDlseQuzb2rM4cGMspVzIb7OTTU72+40vWEHTpVi6zq6NH
-         qiiN7TechdSJTKlkvQz+q9S8zk3HZuGQXQGL2Ylk=
-Date:   Mon, 7 Oct 2019 16:11:53 +0200
-From:   =?utf-8?Q?Ond=C5=99ej?= Jirman <megous@megous.com>
-To:     Maxime Ripard <mripard@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [RESEND PATCH 0/5] Add bluetooth support for Orange Pi 3
-Message-ID: <20191007141153.7b76t4ntdzdojj5m@core.my.home>
-Mail-Followup-To: Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>, Rob Herring <robh+dt@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org
-References: <20190823103139.17687-1-megous@megous.com>
+        Mon, 7 Oct 2019 10:33:11 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39276 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727324AbfJGOdK (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Oct 2019 10:33:10 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r3so15616170wrj.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Oct 2019 07:33:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=dDIm4ahBv2skerw2lSvf8A55RpMdMMYKPUXMFQ+9MtU=;
+        b=cN0P5+R0URQRG1Yc8JOJq3pS2L16D2sOd09otLQSbWVZLHEZ85puzXzGPFk1vWqIHK
+         8pl+Z4DIfZwYArUwKPEsBtET8MdLaR6A75uymd0t/NPoK66e+ptd0NtR3O4Uf0774Iog
+         1FWKJWqz+hxtn4NXMwT/kw/RSHcyZYGtZaFRJ//qBm5AOLs7Dqs352UsZMdN8wzjy0Lu
+         Q0ZUQYAvhmOGL02Do0ZE+FnHthknURqzPpHEjivBK0C4YIuff7QY12ZaS3CHfEdp6sQw
+         C5ZxS2Fejn31Gfcy/WKOuxxvu8h1LLGKIobrGX0yXopdgGgA7Uy77AKietfSZkL69xAN
+         sBAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=dDIm4ahBv2skerw2lSvf8A55RpMdMMYKPUXMFQ+9MtU=;
+        b=YXsn84XjNPQViqIB7A9ihudu0pW1hzRHYkg+E05wd7MVIJn/ZpGXQyloGjQmtZLG1t
+         ACTtqk4YI363IYhAki1eRpfGatCdLXokT+ZFa9+g2EaihYzQIUcyg9517Dse3EisvopJ
+         uNj1W6ERrwBFSeg7eZqLIH1v7zg9WCPp2tqF7z7ngZYiN9OvQxfJZRcjDI3e0ne4Dam7
+         pm6D1XA9kNRyyGvPPvIw+hhIYl09ryAf7kY6IpRrFTYbsx5dAum4Q+lDMJO/20U7KVqL
+         9wx2/lH8Mf7N50tqiBj5/H77rvUV0XCLhMXBBA4iEEk/hmQMTtY9tUsAElAyTmYnDfF6
+         pB+g==
+X-Gm-Message-State: APjAAAUE0gk3ja4kRFalIE5mCtv7dkuxRBvTtIM+3yxatUw5TRw2DqpA
+        6ynXFRDUj23QxFQpbALUIic=
+X-Google-Smtp-Source: APXvYqw6eAlXUQbxfSnA/e7E4PF1sRLXdGFCCr3wtggmvrFN1o3zbkMqrOyDwzKkXWG0mRCY32Lf6w==
+X-Received: by 2002:adf:f00d:: with SMTP id j13mr11010030wro.140.1570458788698;
+        Mon, 07 Oct 2019 07:33:08 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id u1sm11898698wmc.38.2019.10.07.07.33.07
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 07 Oct 2019 07:33:07 -0700 (PDT)
+Date:   Mon, 7 Oct 2019 16:33:07 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 1/4] doc/media-api: Add RegisterApplication method
+Message-ID: <20191007143307.ez6g466afu3trlxn@pali>
+References: <CABBYNZLDFAJgkfAFWOOAAqqiX8mpi3KgirBkpwpnBFJ3TxPqyg@mail.gmail.com>
+ <20190718100024.ii2igadxb2lmmitm@pali>
+ <20190721155522.3vqt7vsprhpxflqf@pali>
+ <CABBYNZK6cuz9n4Hu9uRCbQvn9uFEYkn9=mY8J5Fqu0u-D3B1EA@mail.gmail.com>
+ <20190829125734.GH2840@reaktio.net>
+ <20190829200513.6xnta5jx3trbmgxp@pali>
+ <20191003181855.GF28704@reaktio.net>
+ <20191006100503.fsbttcschr6wgsdq@pali>
+ <CABBYNZLS4MMxJ=gQED-BVfn81D0bvx8aLw5OO3tNmXAnWeA57Q@mail.gmail.com>
+ <20191006120245.tkrooh45q7irtm6l@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190823103139.17687-1-megous@megous.com>
-X-My-GPG-KeyId: EBFBDDE11FB918D44D1F56C1F9F0A873BE9777ED
- <https://xff.cz/key.txt>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191006120245.tkrooh45q7irtm6l@pali>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Maxime,
+On Sunday 06 October 2019 14:02:45 Pali Rohár wrote:
+> On Sunday 06 October 2019 13:53:37 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> > 
+> > On Sun, Oct 6, 2019 at 1:05 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > >
+> > > On Thursday 03 October 2019 21:18:55 Pasi Kärkkäinen wrote:
+> > > > Hi,
+> > > >
+> > > > On Thu, Aug 29, 2019 at 10:05:13PM +0200, Pali Rohár wrote:
+> > > > > On Thursday 29 August 2019 15:57:34 Pasi Kärkkäinen wrote:
+> > > > > > Pali: How does it look with porting the PA patches to use the new interfaces?
+> > > > >
+> > > > > Hello, I have not had a time yet to play with these pulseaudio patches
+> > > > > and porting to the new interface. I guess that I could have more free
+> > > > > time in the last week of next month.
+> > > > >
+> > > >
+> > > > It seems BlueZ 5.51 has been released meanwhile (http://www.bluez.org/release-of-bluez-5-51/)
+> > > > So now at least the new interfaces are in a released bluez version.
+> > >
+> > > Ok! Today I have looked at this new Bluez API, but seems that there is
+> > > not only missing some examples or usages with libdbus-1, but also
+> > > documentation. I have tried to find something how to register endpoints
+> > > throw GetManagedObjects() via libdbus-1, but seems that there is no
+> > > usage of it and also unusable documentation for it in libdbus-1. So
+> > > currently I'm stuck how to use this exotic API in pulseaudio...
+> > 
+> > It is just another D-Bus method, the only difference is that it
+> > carries the entire object tree, btw I did add an example of how to
+> > register Endpoints in python:
+> > 
+> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-endpoint
+> 
+> This example uses undocumented property "DelayReporting". What it is doing?
 
-On Fri, Aug 23, 2019 at 12:31:34PM +0200, megous hlavni wrote:
-> From: Ondrej Jirman <megous@megous.com>
-> 
-> (Resend to add missing lists, sorry for the noise.)
-> 
-> This series implements bluetooth support for Xunlong Orange Pi 3 board.
-> 
-> The board uses AP6256 WiFi/BT 5.0 chip.
-> 
-> Summary of changes:
-> 
-> - add more delay to let initialize the chip
-> - let the kernel detect firmware file path
-> - add new compatible and update dt-bindings
-> - update Orange Pi 3 / H6 DTS
+Also this new Managed Objects API bring some inconsistency. Codec
+switching API is available only when bluetoothd was started with
+--experimental flag, but this new Object API is available also without
+it. So it just complicated implementation.
 
-Please consider the DTS patches for 5.5.
+How could application (e.g. pulseaudio) check if A2DP codec switching is
+available and based on this decide if via Managed Objects API export
+more codecs or just only default SBC?
 
-Thanks,
-	Ondrej
+> > You can also have a look at how our gdbus internal library (uses
+> > libdbus) utilize it:
+> > 
+> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/gdbus/client.c#n1269
+> > 
+> 
 
-> Please take a look.
-> 
-> thank you and regards,
->   Ondrej Jirman
-> 
-> Ondrej Jirman (5):
->   dt-bindings: net: Add compatible for BCM4345C5 bluetooth device
->   bluetooth: bcm: Add support for loading firmware for BCM4345C5
->   bluetooth: hci_bcm: Give more time to come out of reset
->   arm64: dts: allwinner: h6: Add pin configs for uart1
->   arm64: dts: allwinner: orange-pi-3: Enable UART1 / Bluetooth
-> 
->  .../bindings/net/broadcom-bluetooth.txt       |  1 +
->  .../dts/allwinner/sun50i-h6-orangepi-3.dts    | 19 +++++++++++++++++++
->  arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  | 10 ++++++++++
->  drivers/bluetooth/btbcm.c                     |  3 +++
->  drivers/bluetooth/hci_bcm.c                   |  3 ++-
->  5 files changed, 35 insertions(+), 1 deletion(-)
-> 
-> -- 
-> 2.23.0
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+-- 
+Pali Rohár
+pali.rohar@gmail.com
