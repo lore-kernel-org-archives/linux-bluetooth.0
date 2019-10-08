@@ -2,93 +2,103 @@ Return-Path: <SRS0=DWZO=YB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9028BC4360C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Oct 2019 10:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BE9C10F14
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Oct 2019 10:24:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69C1E2070B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Oct 2019 10:02:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F262206BB
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Oct 2019 10:24:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="QtVQ5kYa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Drg1fMA+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730177AbfJHKCB (ORCPT
+        id S1730415AbfJHKYn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Oct 2019 06:02:01 -0400
-Received: from mail-wr1-f43.google.com ([209.85.221.43]:36337 "EHLO
-        mail-wr1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730180AbfJHKCB (ORCPT
+        Tue, 8 Oct 2019 06:24:43 -0400
+Received: from mail-oi1-f177.google.com ([209.85.167.177]:38166 "EHLO
+        mail-oi1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729958AbfJHKYn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Oct 2019 06:02:01 -0400
-Received: by mail-wr1-f43.google.com with SMTP id y19so18675210wrd.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Oct 2019 03:01:59 -0700 (PDT)
+        Tue, 8 Oct 2019 06:24:43 -0400
+Received: by mail-oi1-f177.google.com with SMTP id m16so14335366oic.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Oct 2019 03:24:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DfabExpNYxiSgZ0gAUihY5IXQSRpa0ndnyt+2X8pJlI=;
-        b=QtVQ5kYaJZhKjB1G/ypllTrJpAQDL6wmYIBQXpkaypIykZTfErX9wnuNK2S17DR/Gd
-         iM0JUpOAqrGAUvbJ6NSk78jkhRXchn9j9ANyNOi+h/AElgzXUmHNgqeoVdw1aQWOwl6e
-         fon4qeuHqVk6KGQ43SMFnQxG1OHaMTqS4oC6V79sh9RNTdOZ2JCGMEgYH4RrgNilbpav
-         OWkbsfdoy+IE7l2dGIrRuNcxmSVrSr4MV2x2bgm+Ootf9djuV1QwqqA6e5OetO/qUkwp
-         Q4Kj5whb9yruxYPIr5T89wFbNwihn1pilGj0ggsnZD1tlz9DGagTPB6OGRKuUTL4E0dZ
-         /wLw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rl7INHwJCNyXE6b5ZEtYM1IZtskUcQIC/BTDcxQDTCQ=;
+        b=Drg1fMA+bME2orN2rQpx+7OMYhQa8InXLIIgUXxOjJHeoD28kYmjPCF5acZfex51dj
+         /acSIP1EtS6j3bfH4a1oQSLCj/sG5QjywMPrubmJ4VRMJ4EyqkR9mCJK2F5bMhrSvWbT
+         upjwlMS0P+jk3Vq0B5WtDd9Xh1PF5UdnSsQKsGrbDR+F4oYOAx0xkRg2BWx4tiCXeKyA
+         g5eNadBvA3LAbk0I9Rdg6E8WTTu2rFnIOlkBImxYOngDNrG+NPfDK41N/mFFWLELy5Fm
+         ZyOcHtL38Htf9ugpBfFcdxxrkDvy9q6c9UGXHHN6u2pLjL0GRHy+YBjJzZwc9A8c8PCV
+         2+kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DfabExpNYxiSgZ0gAUihY5IXQSRpa0ndnyt+2X8pJlI=;
-        b=NQ/jVfh0p5rc4n/eiTNAGfZ5CzyQ2pfYdv+lhYcd9xswfRX0DIDov99IRC21aoh5v/
-         ygOoqQQHAFuYmCuwyN400IDr78hooyxGFT2awSOhqFWHEMERAUidV3QN9SxVyFQmGYuT
-         og8mDDr6qk0h9ZQsuzryow5yi8qohkCmqnB1W7U5kKfmUMk8oPEI1orbzang9wkiQWoR
-         kiazsn0helSc6Csxlbs5gQ+f4+x101JcJM1fN24PwU2RME6vfF9VuQdzOFejhYu/xtMV
-         qlaKk4/SgoBqkYifeLG5eG7KD/J9z7dD5EThEcA+rWw4gM0b+MmcedsVrrTmWoc/UxYJ
-         JJxA==
-X-Gm-Message-State: APjAAAXZcxaplGaN6NXKBRY49Tmv7G+c0t7jQHGx/vrV+Zx5uIgRPBSH
-        5kXONmsjc0Bt/ZxQMXNJceNKrbgzzSM=
-X-Google-Smtp-Source: APXvYqxWtW6j9j5NGV73FKfEjNes1nKnRSPqcBXvz0r9+hFE05cwYk6atGnZjra79z/LgqlIV7fP6A==
-X-Received: by 2002:a5d:4b47:: with SMTP id w7mr19937141wrs.7.1570528918419;
-        Tue, 08 Oct 2019 03:01:58 -0700 (PDT)
-Received: from flashheart.burtonini.com (35.106.2.81.in-addr.arpa. [81.2.106.35])
-        by smtp.gmail.com with ESMTPSA id f3sm20680040wrq.53.2019.10.08.03.01.57
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2019 03:01:57 -0700 (PDT)
-From:   Ross Burton <ross.burton@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] Makefile.am: add missing mkdir in rules generation
-Date:   Tue,  8 Oct 2019 11:01:56 +0100
-Message-Id: <20191008100156.3813-1-ross.burton@intel.com>
-X-Mailer: git-send-email 2.20.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rl7INHwJCNyXE6b5ZEtYM1IZtskUcQIC/BTDcxQDTCQ=;
+        b=kkXR+LRCSMx/jYSa2SxOVZjo9Hq8GFnpn8+hjPNwOtUMKUgD4njQ37rXaslqKpE/Jr
+         mv6ahDzqfr+aVgIu3kiVE24XjkUICxbxfKNU2HN2la6iM1zFFLjYXhdQMJSDj5GcEejA
+         JjcMm4NEfog4kZ4mmoIrRpH5Yku9IYjyP0vHCM11JSlPNnnh7eHUQoG0I/oUKxyh2s61
+         zehznEnA/omf6iJaaT/mNYDr8p76A8yGQd22hsXICp8RexUtAjCms4iSORgwmjpHkUl5
+         XdkdhvOgaku2UwKyHhHgn6QioQcpI2RBYZQl361Xbylx6MSt+OzeOXvl3JGbla40JmwC
+         J4Ww==
+X-Gm-Message-State: APjAAAX8JKc+NjaPZaRrPvVVuZJjPj+D/ZUo3WqC7F1AOYH3dK7Sdsra
+        ya9S0tXn5FefQMMazfjJGfB4GO+HCDet32Q4+VkX/F1e
+X-Google-Smtp-Source: APXvYqzruSHi9KJAgnwYSWogWmh+ZYzwZzclrgL053CCpaCUuBvDQATxvBa3eXmmoTwinhk3i1k7nid14chBaWMjFFY=
+X-Received: by 2002:aca:1c03:: with SMTP id c3mr3081067oic.8.1570530281454;
+ Tue, 08 Oct 2019 03:24:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAJ0=ZJ2rjxM0WmA72J5VCcUZ01q7dH+jxJi7btGzayZWHe7S1Q@mail.gmail.com>
+In-Reply-To: <CAJ0=ZJ2rjxM0WmA72J5VCcUZ01q7dH+jxJi7btGzayZWHe7S1Q@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 8 Oct 2019 13:24:29 +0300
+Message-ID: <CABBYNZ+DYrzhx3Riqt2SFV4ZoL5VHfOnVPH0ScHMRz=+XoBg6Q@mail.gmail.com>
+Subject: Re: Bluez stopped connecting A2DP sink
+To:     yayfortrees <yayfortrees@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In parallel out-of-tree builds it's possible that tools/*.rules are
-generated before the target directory has been implicitly created. Solve this by
-creating the directory before writing into it.
----
- Makefile.am | 1 +
- 1 file changed, 1 insertion(+)
+Hi,
 
-diff --git a/Makefile.am b/Makefile.am
-index 2ac28b23d..e7bcd2366 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -589,6 +589,7 @@ src/builtin.h: src/genbuiltin $(builtin_sources)
- 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
- 
- tools/%.rules:
-+	$(AM_V_at)$(MKDIR_P) tools
- 	$(AM_V_GEN)cp $(srcdir)/$(subst 97-,,$@) $@
- 
- $(lib_libbluetooth_la_OBJECTS): $(local_headers)
+On Mon, Oct 7, 2019 at 10:34 PM yayfortrees <yayfortrees@gmail.com> wrote:
+>
+> Hello,
+>
+> I recently upgraded bluez to 5.51 from 5.50 and my headphones stopped
+> using the A2DP sink during autoconnect. The headphones instead go to
+> HSP/HFP mode and the A2DP sink is disabled in pavucontrol/pactl. The
+> A2DP sink will only work when the device is initially paired.
+>
+> This had worked flawlessly for years. I was able to track down the
+> regression to this patch:
+> https://www.spinics.net/lists/linux-bluetooth/msg76180.html ([PATCH
+> BlueZ] policy: Add logic to connect a Sink). If I apply the patch to
+> 5.50, my headphones no longer connect to the A2DP sink, if I remove it
+> the problem goes away.
+>
+> Not sure what else I should include to help track this down. The
+> headphones I'm using are Beats Wireless (Solo Bluetooth).
+>
+> The only relevant log entry I see with the patch applied is:
+> a2dp-sink profile connect failed for 34:DF:2A:0D:F8:C2: Device or resource busy
+
+Can you collect the HCI traces of the problem using btmon? I didn't
+expect that to cause any problems, it should in theory solve them but
+lets see.
+
+> Let me know if any other information is needed.
+> Thanks.
+
+
+
 -- 
-2.20.1
-
+Luiz Augusto von Dentz
