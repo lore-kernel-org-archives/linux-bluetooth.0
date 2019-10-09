@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8CEC47404
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 08:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C45C47404
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 08:51:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF5B8206C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 08:37:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5ABC8206B6
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 08:51:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="igpSb/8D"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dYt29wLq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729575AbfJIIhP (ORCPT
+        id S1725962AbfJIIvX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Oct 2019 04:37:15 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:41554 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725440AbfJIIhP (ORCPT
+        Wed, 9 Oct 2019 04:51:23 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:33636 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725440AbfJIIvW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Oct 2019 04:37:15 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q7so1148104pfh.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Oct 2019 01:37:13 -0700 (PDT)
+        Wed, 9 Oct 2019 04:51:22 -0400
+Received: by mail-pf1-f193.google.com with SMTP id q10so1198937pfl.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Oct 2019 01:51:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=In7lAtEYz40LWfmW5FUqo3PU26fK6KeFFUXZm6ciSko=;
-        b=igpSb/8DDxaxcOeTDVpkzJYbWOko7TyjaeGMbG50kIJ3hRFccwjw4BLh9h0Zt4JFo0
-         n36v1mZJ31KxwfASSfzbN6fMmDlOcbW1bWKBQTOpXo7xfkMC6ZfNK7WkGWyFS3lrWzRu
-         up8xE5gJfgX5BfTEbUAMY+s8seNetvPivB7Fg=
+        b=dYt29wLqZTFg8WlcHAi/6yG/WQQcQ8I0R93gGpxHkNHDIIqsICqRvc0kAZF94I4kMy
+         fBraO+UARhK7ZoZ6I2WmK2snoiEqgdxt49h8/+ZJTzYGyKWOTPx910pLLY/TMAb4Am3u
+         b20ydM1OvAcs7lv131FiryRJI2gJ3lTeOoSmc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=In7lAtEYz40LWfmW5FUqo3PU26fK6KeFFUXZm6ciSko=;
-        b=V83k/iA+vURR4jKJGiw5e+T3fq/B8KaVeNtPzCD6ZqEOxJ18XWytoMlpS6SMIWYwGH
-         EU9z2NV+cIKcWsl17XAcAiXR7V8XEgkLFu33K06KHXvDjCiTHXIRdfsAeZS+kMv23gfQ
-         g++3N1UlRlbHvqSxUkZd253SuRayfhEKEuIXA/lo9hfXH/I38kVGSvzO91SC+jwPQMtY
-         Yd/ORg13MpNphMK2Zx8wteMoG0T5I8QzVSgEoCY3dkQpn7XIVwmfcVMjKF4E2OVtG3do
-         UfoGFfNBs4cJKGKkuAoD7dSin7y/vrtCjxjfIMpA8y3hIjpFgy3JD4Pwemb4/5epmLAQ
-         sE0A==
-X-Gm-Message-State: APjAAAUMuSvueocD8WQG0t/UJXWnH1DLxV0ho2Zqik1RyEyZbShlwGmj
-        RxYgM69JGfR6xlfxkM8bCF1HUqutxBE=
-X-Google-Smtp-Source: APXvYqyuRb7TMyqADlNNUzJEk9zo38FR5yBxYGgJHb1FFmciLN4vLFfky1rUnhynqgmcYoCqWAmZZw==
-X-Received: by 2002:a63:5918:: with SMTP id n24mr3050345pgb.362.1570610232734;
-        Wed, 09 Oct 2019 01:37:12 -0700 (PDT)
+        b=mk7ZDifBn9aTQ9RWsLIumW3KN4k9TB4ZCbH3TCOJdv1SWeMuFOtBgGwuXlG7g1qKCO
+         wt3va8913eWsPo9T4zz2BL2JeEz7QIBr9JNTDw4LgfVqA4ucXBDc2QnWYjcd0KRphn9d
+         yM61XUg1XO9KVWhfUQLSkjoF3aMyqE+iiZWTVVhtu8bxV0OYtvIW22JtLu2oa0iw0WaB
+         c1uBiJ9weUBdot+Mx8N8vl2mRNixaLNmZAAJSf38ToI2UlsM+ENHSw5DS2P6Utc2ouDq
+         SRfEOVut6fB+ifxSd58AP1ZwyNMuzP+lQAusnz06y2KSPE5SBIxoAOzb/eGrlyjOJnRm
+         kilA==
+X-Gm-Message-State: APjAAAX+nNqaeZ9mGIjq1gI3ATtAEika+/qPJb5yxw2IElgFeskUBnu9
+        /lHxrE3P/kSvWtxj+/e26D5TDA==
+X-Google-Smtp-Source: APXvYqw+p6lVwH/R34JigHtj9JxYN6M1A5y1JJmqaZ+wjVVzbJzlOboDC6D/oNEY9AWUlK9aARTFdQ==
+X-Received: by 2002:aa7:92c9:: with SMTP id k9mr2588834pfa.215.1570611082215;
+        Wed, 09 Oct 2019 01:51:22 -0700 (PDT)
 Received: from localhost ([2401:fa00:1:10:3db2:76bf:938b:be05])
-        by smtp.gmail.com with ESMTPSA id y36sm1478101pgk.66.2019.10.09.01.37.10
+        by smtp.gmail.com with ESMTPSA id g7sm2479081pfm.176.2019.10.09.01.51.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2019 01:37:12 -0700 (PDT)
+        Wed, 09 Oct 2019 01:51:21 -0700 (PDT)
 From:   Claire Chang <tientzu@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        rjliao@qti.qualcomm.com, rongchi@qti.qualcomm.com,
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        rjliao@codeaurora.org, rongchi@codeaurora.org,
         Claire Chang <tientzu@chromium.org>
 Subject: [PATCH] Bluetooth: hci_qca: fix in-band sleep enablement
-Date:   Wed,  9 Oct 2019 16:37:08 +0800
-Message-Id: <20191009083708.194853-1-tientzu@chromium.org>
+Date:   Wed,  9 Oct 2019 16:51:16 +0800
+Message-Id: <20191009085116.199922-1-tientzu@chromium.org>
 X-Mailer: git-send-email 2.23.0.581.g78d2f28ef7-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
