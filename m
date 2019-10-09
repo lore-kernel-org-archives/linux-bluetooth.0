@@ -2,169 +2,197 @@ Return-Path: <SRS0=7chU=YC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 894C4C47404
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 13:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19150ECE58D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 13:16:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A638206B6
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 13:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D86CE206B6
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 13:16:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=einfach.org header.i=@einfach.org header.b="WF6cItkb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FFHpVAdb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731148AbfJINJH (ORCPT
+        id S1731144AbfJINQN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Oct 2019 09:09:07 -0400
-Received: from postler.einfach.org ([5.9.2.179]:44649 "EHLO
-        postler.einfach.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731087AbfJINJH (ORCPT
+        Wed, 9 Oct 2019 09:16:13 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:33325 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730490AbfJINQN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Oct 2019 09:09:07 -0400
-Received: from [192.168.5.9] (unknown [83.55.204.182])
-        by postler.einfach.org (Postfix) with ESMTPSA id 3164C24DA;
-        Wed,  9 Oct 2019 13:09:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=einfach.org; s=mail;
-        t=1570626544; bh=rmSg8CA9vtrr50dL/pRP+U+Z8JSd6rtUkaF0NOB4+tk=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=WF6cItkb7hOLnAQDYo625csp8uwtfi9XUrDmz4fccOp1lbFrHh/dH7uMy1vnJBnyG
-         0qRu7xJr47W0JuHekWAgUuiA/ozNGjCXtGiCU0KahGNk0DANOiSr6mJjVoC3V8lgO1
-         8rBIhm49j2ztqJrQUiIgR5ivDIe17LTtQ6vS3XsI=
-Subject: Re: bluetoothd: Please don't filter UUIDs
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <a04053d3-6165-5dfa-932c-5a93d2bd1358@einfach.org>
- <CABBYNZLK_rzAf5aPzJHShEVvXSvndZFh5TjyjaaFzAPw_sHoTA@mail.gmail.com>
-From:   Bruno Randolf <br1@einfach.org>
-Openpgp: preference=signencrypt
-Autocrypt: addr=br1@einfach.org; prefer-encrypt=mutual; keydata=
- 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
- kcSK3qeB7qKuAXopxt5uEFNOKZeKF/UQlKrr
-Message-ID: <12b16466-3633-75ff-bf84-9cef44a2358c@einfach.org>
-Date:   Wed, 9 Oct 2019 14:09:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Wed, 9 Oct 2019 09:16:13 -0400
+Received: by mail-ot1-f66.google.com with SMTP id 60so1681866otu.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Oct 2019 06:16:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=EYX9wm8aPFnWSQAkZoe6KwkkCZ0jD7bYY5NrvTeYvCs=;
+        b=FFHpVAdbASg0BYZ62wxpB5j3ZZd6XHEpgoOsO0z+M3sf8adQD5/mnoQPQkOTcppzsM
+         8bFrxRw4JydCJTnpQp32KderTuvopDal7Os1mLYPqgfmsAO/96nJDa2vGO8/8bNmDu9M
+         0l/+fnen/OaFwb41cnT5rOpverLO1/33wYDrbtYhp+cOpn2k/6/bWaatacTmAKKz/BYf
+         7Zmt4IbwgO0ConQM1L5PtCL9uIbvmOBlCf4FFaFoLMqVnh74HQK12wtg/AeiGkMPzy6j
+         MU4kKyVE3GyExvgcCmluBAHUCZlhAotXvoGWptY/9z3zaS+fmmcvHW1Y0TEEe875U75U
+         4KRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=EYX9wm8aPFnWSQAkZoe6KwkkCZ0jD7bYY5NrvTeYvCs=;
+        b=XJ+3ig4PlLix72M2dbVitUSepDWd+E2PhqAhqA5h8w0ENKz1n/YmbiLpftpo1Gkb+T
+         BByNoJiaOqBn/qdhsY18r8gTab/o+N8HL//PTGvOogWOvKuXxg3bGu4zKq+oB47tAhwn
+         EiAt6kDjH0SJ6Vk7UOObVgPNej2hgbKynn9lGv/YGGNr+RcYZdyNpVdqp6lrO7+y/eHD
+         3rY2wOcdCHYBrtgBYltdjDNaoimNrS/2oS5/Zk42+7w98zolULC9/ApeaXeF+IjEpM7+
+         yYnqnUExqeIWuJhPTKTpbOlzrteG+8TmBtScIcwbnCd8DHoVDwEy7ebshRkhPX/oBopt
+         lEiA==
+X-Gm-Message-State: APjAAAV0zrX5lS8Awm9QE9AOLMDNwXHlYeE0cZ56UwL+J4I0q6udN8Ju
+        pPNtvKG4GLaOX2B0OoxBuD11CBFLG5cyGOk1CZk=
+X-Google-Smtp-Source: APXvYqzDxyS+TMeuAx2rXrtFiMaLkArgyba6i2+BVwjTbTVkxjz5J7FaR18fZH6rjzjKR+z3c6fuxfPIDvZj3Utl7js=
+X-Received: by 2002:a9d:197:: with SMTP id e23mr2948070ote.28.1570626971756;
+ Wed, 09 Oct 2019 06:16:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLK_rzAf5aPzJHShEVvXSvndZFh5TjyjaaFzAPw_sHoTA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.11 (postler.einfach.org [0.0.0.0]); Wed, 09 Oct 2019 13:09:04 +0000 (UTC)
-X-Virus-Scanned: clamav-milter 0.98.7 at bced1da0f74a
-X-Virus-Status: Clean
+References: <20190721155522.3vqt7vsprhpxflqf@pali> <CABBYNZK6cuz9n4Hu9uRCbQvn9uFEYkn9=mY8J5Fqu0u-D3B1EA@mail.gmail.com>
+ <20190829125734.GH2840@reaktio.net> <20190829200513.6xnta5jx3trbmgxp@pali>
+ <20191003181855.GF28704@reaktio.net> <20191006100503.fsbttcschr6wgsdq@pali>
+ <CABBYNZLS4MMxJ=gQED-BVfn81D0bvx8aLw5OO3tNmXAnWeA57Q@mail.gmail.com>
+ <20191006120245.tkrooh45q7irtm6l@pali> <20191007143307.ez6g466afu3trlxn@pali>
+ <CABBYNZ+2CGn2rONg+Tpdh9vr7E40_SFFT4Mmru2vQw7MKHTFjQ@mail.gmail.com> <20191008103333.rqn2btlkwtcrpouo@pali>
+In-Reply-To: <20191008103333.rqn2btlkwtcrpouo@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 9 Oct 2019 16:15:59 +0300
+Message-ID: <CABBYNZKKUf6-FPBEGjuC5GbsNzNsDLy7LgCHxqiW_g98BaX+QA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] doc/media-api: Add RegisterApplication method
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     =?UTF-8?B?UGFzaSBLw6Rya2vDpGluZW4=?= <pasik@iki.fi>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 03/10/2019 14:04, Luiz Augusto von Dentz wrote:
-> Well I guess you are forgetting that other users of the GATT may
-> interfere with plugin which is why we do the claim APIs in the first
-> place.
+Hi Pali,
 
-Okay, I understand your arguments from your perspective, which seems to
-focus on specific use cases with Desktop Linux.
+On Tue, Oct 8, 2019 at 1:33 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrote=
+:
+>
+> On Tuesday 08 October 2019 13:28:53 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> >
+> > On Mon, Oct 7, 2019 at 5:33 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> w=
+rote:
+> > >
+> > > On Sunday 06 October 2019 14:02:45 Pali Roh=C3=A1r wrote:
+> > > > On Sunday 06 October 2019 13:53:37 Luiz Augusto von Dentz wrote:
+> > > > > Hi Pali,
+> > > > >
+> > > > > On Sun, Oct 6, 2019 at 1:05 PM Pali Roh=C3=A1r <pali.rohar@gmail.=
+com> wrote:
+> > > > > >
+> > > > > > On Thursday 03 October 2019 21:18:55 Pasi K=C3=A4rkk=C3=A4inen =
+wrote:
+> > > > > > > Hi,
+> > > > > > >
+> > > > > > > On Thu, Aug 29, 2019 at 10:05:13PM +0200, Pali Roh=C3=A1r wro=
+te:
+> > > > > > > > On Thursday 29 August 2019 15:57:34 Pasi K=C3=A4rkk=C3=A4in=
+en wrote:
+> > > > > > > > > Pali: How does it look with porting the PA patches to use=
+ the new interfaces?
+> > > > > > > >
+> > > > > > > > Hello, I have not had a time yet to play with these pulseau=
+dio patches
+> > > > > > > > and porting to the new interface. I guess that I could have=
+ more free
+> > > > > > > > time in the last week of next month.
+> > > > > > > >
+> > > > > > >
+> > > > > > > It seems BlueZ 5.51 has been released meanwhile (http://www.b=
+luez.org/release-of-bluez-5-51/)
+> > > > > > > So now at least the new interfaces are in a released bluez ve=
+rsion.
+> > > > > >
+> > > > > > Ok! Today I have looked at this new Bluez API, but seems that t=
+here is
+> > > > > > not only missing some examples or usages with libdbus-1, but al=
+so
+> > > > > > documentation. I have tried to find something how to register e=
+ndpoints
+> > > > > > throw GetManagedObjects() via libdbus-1, but seems that there i=
+s no
+> > > > > > usage of it and also unusable documentation for it in libdbus-1=
+. So
+> > > > > > currently I'm stuck how to use this exotic API in pulseaudio...
+> > > > >
+> > > > > It is just another D-Bus method, the only difference is that it
+> > > > > carries the entire object tree, btw I did add an example of how t=
+o
+> > > > > register Endpoints in python:
+> > > > >
+> > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/exam=
+ple-endpoint
+> > > >
+> > > > This example uses undocumented property "DelayReporting". What it i=
+s doing?
+> > >
+> > > Also this new Managed Objects API bring some inconsistency. Codec
+> > > switching API is available only when bluetoothd was started with
+> > > --experimental flag, but this new Object API is available also withou=
+t
+> > > it. So it just complicated implementation.
+> > >
+> > > How could application (e.g. pulseaudio) check if A2DP codec switching=
+ is
+> > > available and based on this decide if via Managed Objects API export
+> > > more codecs or just only default SBC?
+> >
+> > The idea was that this API would be experimental as well but it seems
+> > it is not,
+>
+> No, it is not experimental. Managed Objects API is available also when
+> bluetoothd is started without --experimental argument.
+>
+> > they should go hand in hand with Endpoint objects to ensure
+> > they will be available as well so we might have to fix this in 5.52,
+> > too bad we didn't see this before 5.51 went out.
+>
+> So... what should applications expects and how they should implement
+> above decision?
 
-But how do you suppose should application programmers or solution
-providers access GATT characteristics under Linux in a predictable way
-then? Not using BlueZ does not seem like a realistic option. Building
-patched versions of bluetoothd isn't practical either.
+Actually the decision should be based on the presence of
+RegisterApplication method, if that exists then endpoint switching
+should be supported as well, so has nothing to do the
+GetManagedObjects API of the bluetoothd. That said RegisterApplication
+was not made experimental which kind makes 5.51 broken because it
+would appear that it endpoint objects would be exposed but when in
+fact there are not, anyway lets finally have the code to use this
+interface and then we can remove the experimental flag from
+MediaEndpoint.
 
-At the very least there should be a build option to deactivate all
-plugins, but I think something more flexible would be better. Could it
-be a user choice? E.g. only claim services which the User has actively
-connected to and activated that service?
+> > > > > You can also have a look at how our gdbus internal library (uses
+> > > > > libdbus) utilize it:
+> > > > >
+> > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/gdbus/cli=
+ent.c#n1269
+> > > > >
+> > > >
+> > >
+> > > --
+> > > Pali Roh=C3=A1r
+> > > pali.rohar@gmail.com
+> >
+> >
+> >
+>
+> --
+> Pali Roh=C3=A1r
+> pali.rohar@gmail.com
 
-In general I don't need to poll the battery status of every device I
-happened to connect to, even though it might export a Battery service...
-so I'd consider it more traffic if BAS is polled even though I didn't
-ask for it. On the other hand on a Bluetooth device I have paired with,
-something like a Headphone or Keyboard it obviously is the right choice.
 
-I hope there is a way to support both use cases.
 
-Regards,
-bruno
-
->> It surely makes sense to provide this more generic API, but I'd argue
->> that all services and characteristics should be available via the normal
->> GATT-based API using org.bluez.GattCharacteristic1 as well.
-> 
-> Not if the service has security implication, for instance we don't
-> want application to be able to access the keys presses coming from a
-> HoG device, or other things like changing the settings bluetoothd has
-> configured.
-> 
->> One of my clients, for example, uses Linux/bluez as an interface for
->> Server-based reading and writing of GATT characteristics of several
->> managed devices. So I can read all those UUIDs, but why not the battery
->> level? What happens when Bluez learns other GATT services, will their
->> characteristics then also disappear? I think there is a strong argument
->> for maintaining a generic API for GATT reading/writing characteristics
->> independently.
-> 
-> But there is even a stronger argument if something breaks because the
-> app access something it shouldn't, even if there are no conflicts
-> between the plugin the very least it would cause is duplicating the
-> traffic.
-> 
->> I made the following change to the bluetoothd code to get access again
->> to all UUIDs, and I would like you to consider to include it upstream to
->> enable us to access all characteristics via the normal GATT API:
->>
->> --- a/src/gatt-client.c
->> +++ b/src/gatt-client.c
->> @@ -2006,9 +2006,6 @@ static void export_service(struct
->> gatt_db_attribute *attr, void *user_data)
->>         struct btd_gatt_client *client = user_data;
->>         struct service *service;
->>
->> -       if (gatt_db_service_get_claimed(attr))
->> -               return;
->> -
->>         service = service_create(attr, client);
->>         if (!service)
->>                 return;
->>
->> Thank you,
->> bruno
->>
->>
->> [1] I published parts of that as an open source library:
->> https://github.com/infsoft-locaware/blzlib
->>
->> [2]
->> https://stackoverflow.com/questions/49078659/check-battery-level-of-connected-bluetooth-device-on-linux
->>
->>
-> 
-> 
+--=20
+Luiz Augusto von Dentz
