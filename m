@@ -2,181 +2,111 @@ Return-Path: <SRS0=7chU=YC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A87C47404
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 13:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77562ECE58D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 14:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A421620B7C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 13:35:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F32B218AC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Oct 2019 14:59:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7nHytH3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAGGoaOP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731145AbfJINfL (ORCPT
+        id S1731534AbfJIO7X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Oct 2019 09:35:11 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:44459 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731005AbfJINfL (ORCPT
+        Wed, 9 Oct 2019 10:59:23 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:34158 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730546AbfJIO7W (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Oct 2019 09:35:11 -0400
-Received: by mail-ot1-f66.google.com with SMTP id 21so1703749otj.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Oct 2019 06:35:10 -0700 (PDT)
+        Wed, 9 Oct 2019 10:59:22 -0400
+Received: by mail-oi1-f193.google.com with SMTP id 83so2026672oii.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Oct 2019 07:59:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=bnxegAEfzr4zIABiKZ2ik9MHE1Cy9dx9lRajU6VfmT4=;
-        b=X7nHytH3Lfq2GjtbIvdPDvwPi1RKlXI2YoLqfprdBzo6I6iCma4iRJYbgaFZJhfRs5
-         FSCECMCZLT1iB0co/fae9/mRjFtyLMZw/nW42XErnKPgO1DCVnflKZIc4578tuQoo2Sr
-         VCVZ0OpygNTKvhAgRTEDPgmJZ4sFUuRL4C1achWztG9b0cQ9QavBpwcyyqIohzaTpKq0
-         6kqigoySl3TcahmQwAXpoZH2yJVrN+Mwq0zXJdpn10p4fsc8ODpjMKfkpXzGGt89Krb8
-         hZ48FehIj1sy1Svjk/8dq6jJSmUPP5/7jo2FCY8h9OwzBFbEyQDyeLPgqs/w+OslU0cG
-         Jp6Q==
+        bh=xLqeYvJdzmh7KNV5+v6muB5CxR1PedcsevU05ZD3D2w=;
+        b=JAGGoaOP9zVCCG5qhMattBbJKx8NfUvSJLMnWjA67f8SPFg+EhmWV2ZpAkaY8GvbKP
+         124uenluPFZ5kaBR2bi1OQQWZBK9nENo7r1/h9Va1dB+LKu2novhg3R6UNkvH1AZdXy5
+         WpEphiFjnnL203oBY4KDLM/B/guWi1CuW1Do3Hi7MvooI61A7nX9tlBIlo9azxQ/Twxh
+         XU8IlehAcQ0XB0Dppii8sVQp6HSAz+cMr3rHxz4be2mjgpCEC3yuZhOeyju1A168Ci7o
+         7zV/IRFssvu0tfnxfmhW3WKhWNU3FAMHh3BDUb+S3xG84v1tfsDnO9FDDsLMgSKv2xyY
+         c9BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=bnxegAEfzr4zIABiKZ2ik9MHE1Cy9dx9lRajU6VfmT4=;
-        b=Tr0XL+dPHUiRoFOmdo24/hcXJT87qn49d0HvZjYL6Dqu6B/CqxNdUId21O1PDHvhxc
-         rctbrzBTNpIF+1RTPC1v9GCB6fUo/dT9DrOW1MFa3MBHMymbHmV3cSe61riFWahmCRd/
-         Szb9tgBXZTaHorx8DUW56nTOkR0Dam3WxKMIpbaiEhcVy0sXccK5wkR0syNh4q7T5+k7
-         mX7JpC3znTv1ljtkDjhPGQ6XkHhoYhbjXb0yo0HEQJ6/YnCY3BEMNdhYFldhwQKTnUne
-         N54dWpIhqn6ee8TzojB+aakbShuWmShQzLzhSRTCkNOmAIg8dyxBJJpNymt41d26DfSB
-         uRiQ==
-X-Gm-Message-State: APjAAAUY8IBAe7WKfbaZcGh5DUzh8wxbETmbNOuw5/t0Y6RaEMnaS/AL
-        7LeWlPkQsjiebQnWOD0eKtONS9NWK9rRxDKNYe6I27fS+8I=
-X-Google-Smtp-Source: APXvYqwipn2DHUUdsHo/Pr1s729I1jj/92rET4LYTTA2InzePp86L3Bj8cmc7wdgQi+T1jNSIJAxBYH7hTTKSIOHG/g=
-X-Received: by 2002:a05:6830:1203:: with SMTP id r3mr2842225otp.11.1570628109640;
- Wed, 09 Oct 2019 06:35:09 -0700 (PDT)
+        bh=xLqeYvJdzmh7KNV5+v6muB5CxR1PedcsevU05ZD3D2w=;
+        b=pmzn6ifpH29B3uKwSCMZFWeyAzAZUq1tgg5NZVqUx0d3CcVBdz+OBtdBU01mZnpRuW
+         8kck/TedWeJFVNxOb5D4LhkaJYJPTrQmPo6gHdkxeO87wo1tzBBuB0OiI1XhVgKuXY3x
+         V2v2tpbQGNLS9myEnFuEuwallqa72cMEMHyPUPCzuKFW9gSnO+v1XpJuMBoWRA4FIhN8
+         qY8U3SvvJH9p2vGUNTPqU3Fbn9hRWqEFVOckBHVECq81CQ9zHaq/Aw4r5C2yQqF+4PN8
+         Rcr/4+mCWRkFhB0T8dL5jfoIf2Wn+UBYoPxiOI4i1iDIujyCudFArFpPzsyqkiO/WOGy
+         sG1A==
+X-Gm-Message-State: APjAAAUaunVJDY1bkSg8ImvHULb7DOy3qxc0E/ycFaPHV5cEeWIzzymw
+        dpFIVCfMOZD0yKW5wJ1EauD8ffsEtD+CGa2cvpg=
+X-Google-Smtp-Source: APXvYqxuT0/jV85rUcgf4mee++8CZraFSZUoZ5GtVsGXtKA6DX/YiTPjlv3jKJTUglpT+VbGdRsaxD3LDUHjWQ8ejpg=
+X-Received: by 2002:aca:3c83:: with SMTP id j125mr2813984oia.108.1570633160090;
+ Wed, 09 Oct 2019 07:59:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <a04053d3-6165-5dfa-932c-5a93d2bd1358@einfach.org>
- <CABBYNZLK_rzAf5aPzJHShEVvXSvndZFh5TjyjaaFzAPw_sHoTA@mail.gmail.com> <12b16466-3633-75ff-bf84-9cef44a2358c@einfach.org>
-In-Reply-To: <12b16466-3633-75ff-bf84-9cef44a2358c@einfach.org>
+References: <20191003204405.27285-1-brian.gix@intel.com> <e9d186c8d89be278252ddfe3982602be984f3c14.camel@intel.com>
+In-Reply-To: <e9d186c8d89be278252ddfe3982602be984f3c14.camel@intel.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 9 Oct 2019 16:34:57 +0300
-Message-ID: <CABBYNZKUmctzTRxix9P-FBK=15v01tkHWMCirFefStpCS2ukBQ@mail.gmail.com>
-Subject: Re: bluetoothd: Please don't filter UUIDs
-To:     Bruno Randolf <br1@einfach.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 9 Oct 2019 17:59:08 +0300
+Message-ID: <CABBYNZJ1L6ZaMe-Vf97jc=NxBEHwAs4gOGMQX_THJ-++w7Rnvg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] unit: Add Mesh Crypto tests from Mesh Profile Spec
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bruno,
+Hi Brian,
 
-On Wed, Oct 9, 2019 at 4:09 PM Bruno Randolf <br1@einfach.org> wrote:
+On Sat, Oct 5, 2019 at 7:17 PM Gix, Brian <brian.gix@intel.com> wrote:
 >
-> On 03/10/2019 14:04, Luiz Augusto von Dentz wrote:
-> > Well I guess you are forgetting that other users of the GATT may
-> > interfere with plugin which is why we do the claim APIs in the first
-> > place.
+> Applied
 >
-> Okay, I understand your arguments from your perspective, which seems to
-> focus on specific use cases with Desktop Linux.
->
-> But how do you suppose should application programmers or solution
-> providers access GATT characteristics under Linux in a predictable way
-> then? Not using BlueZ does not seem like a realistic option. Building
-> patched versions of bluetoothd isn't practical either.
-
-Right, so I assume then every application interested on battery would
-then attempt to subscribe for the battery level on the own instead of
-using org.bluez.Battery1? Either way that would be done via D-Bus but
-dealing with a characteristic seem quite a bit more expensive not to
-mention is another object the daemon has to maintain.
-
-> At the very least there should be a build option to deactivate all
-> plugins, but I think something more flexible would be better. Could it
-> be a user choice? E.g. only claim services which the User has actively
-> connected to and activated that service?
-
-There are runtime switches to disable plugins i.e.: bluetoothd -P
-battery and we can add build time switches as well, btw patches are
-welcome if you want to disable battery plugin.
-
-> In general I don't need to poll the battery status of every device I
-> happened to connect to, even though it might export a Battery service...
-> so I'd consider it more traffic if BAS is polled even though I didn't
-> ask for it. On the other hand on a Bluetooth device I have paired with,
-> something like a Headphone or Keyboard it obviously is the right choice.
-
-If the system don't have any need for battery it can disable it just
-like I said, but depending on the system it is probably better to
-leave the daemon to subscribe since there could be several
-applications interested on the battery status, simply reading
-org.bluez.Battery1 is a _lot_ simpler than enumerating all attributes
-and then subscribing to one characteristic.
-
-> I hope there is a way to support both use cases.
-
-There should be but it up for the system to decide if it wants a
-dedicated plugin to deal with the battery status or not, for the
-desktop usecase it is most likely simpler to support.
-
-> Regards,
-> bruno
->
-> >> It surely makes sense to provide this more generic API, but I'd argue
-> >> that all services and characteristics should be available via the normal
-> >> GATT-based API using org.bluez.GattCharacteristic1 as well.
+> On Thu, 2019-10-03 at 13:44 -0700, Brian Gix wrote:
+> > This unit test will be grown over time to include tests formed from the
+> > sample data in the Bluetooth Mesh Profile specification (Currently at
+> > version v1.0.1).
 > >
-> > Not if the service has security implication, for instance we don't
-> > want application to be able to access the keys presses coming from a
-> > HoG device, or other things like changing the settings bluetoothd has
-> > configured.
-> >
-> >> One of my clients, for example, uses Linux/bluez as an interface for
-> >> Server-based reading and writing of GATT characteristics of several
-> >> managed devices. So I can read all those UUIDs, but why not the battery
-> >> level? What happens when Bluez learns other GATT services, will their
-> >> characteristics then also disappear? I think there is a strong argument
-> >> for maintaining a generic API for GATT reading/writing characteristics
-> >> independently.
-> >
-> > But there is even a stronger argument if something breaks because the
-> > app access something it shouldn't, even if there are no conflicts
-> > between the plugin the very least it would cause is duplicating the
-> > traffic.
-> >
-> >> I made the following change to the bluetoothd code to get access again
-> >> to all UUIDs, and I would like you to consider to include it upstream to
-> >> enable us to access all characteristics via the normal GATT API:
-> >>
-> >> --- a/src/gatt-client.c
-> >> +++ b/src/gatt-client.c
-> >> @@ -2006,9 +2006,6 @@ static void export_service(struct
-> >> gatt_db_attribute *attr, void *user_data)
-> >>         struct btd_gatt_client *client = user_data;
-> >>         struct service *service;
-> >>
-> >> -       if (gatt_db_service_get_claimed(attr))
-> >> -               return;
-> >> -
-> >>         service = service_create(attr, client);
-> >>         if (!service)
-> >>                 return;
-> >>
-> >> Thank you,
-> >> bruno
-> >>
-> >>
-> >> [1] I published parts of that as an open source library:
-> >> https://github.com/infsoft-locaware/blzlib
-> >>
-> >> [2]
-> >> https://stackoverflow.com/questions/49078659/check-battery-level-of-connected-bluetooth-device-on-linux
-> >>
-> >>
-> >
+> > Currently it includes test cases for the following sets of sample data:
+> > Sections 8.1.1-6
+> > Sections 8.2.1-6
+> > Sections 8.3.1-11
+> > Section 8.4.3
+> > Section 8.6.2
+> > ---
+> >  Makefile.am             |   10 +
+> >  unit/test-mesh-crypto.c | 2000 +++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 2010 insertions(+)
+> >  create mode 100644 unit/test-mesh-crypto.c
 > >
 
+make test is failing on this one:
+
+==25559== 8 bytes in 1 blocks are definitely lost in loss record 1 of 4
+==25559==    at 0x483880B: malloc (vg_replace_malloc.c:309)
+==25559==    by 0x11FB25: l_malloc (util.c:62)
+==25559==    by 0x120232: l_util_from_hexstring (util.c:427)
+==25559==    by 0x118069: check_id_beacon (test-mesh-crypto.c:1709)
+==25559==    by 0x118069: main (test-mesh-crypto.c:1997)
+
+Btw usually the test are using the tester framework and it should be
+possible to integrate with that but that probably need some work to
+make you able to run with ell mainloop.
 
 
--- 
+
+
+--
 Luiz Augusto von Dentz
