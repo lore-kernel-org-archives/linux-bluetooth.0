@@ -2,161 +2,143 @@ Return-Path: <SRS0=lLJx=YD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4091C10F14
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 03:44:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE3BC10F14
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 08:10:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7863D208C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 03:44:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9057820B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 08:10:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DQ/ubQqA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732764AbfJJDoY convert rfc822-to-8bit (ORCPT
+        id S1733112AbfJJIKH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Oct 2019 23:44:24 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:51182 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726524AbfJJDoX (ORCPT
+        Thu, 10 Oct 2019 04:10:07 -0400
+Received: from mail-ot1-f41.google.com ([209.85.210.41]:36906 "EHLO
+        mail-ot1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732947AbfJJIKH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Oct 2019 23:44:23 -0400
-Received: from [192.168.1.91] (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
-        by mail.holtmann.org (Postfix) with ESMTPSA id AA05DCECE3;
-        Thu, 10 Oct 2019 05:53:18 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
-Subject: Re: Kernel Bluetooth Protocol Stack Problem
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACokStd_VLLP=dc+v=MZXpYF+Pw57f0Cma3-HSrXz5_PdiyRfw@mail.gmail.com>
-Date:   Thu, 10 Oct 2019 05:43:51 +0200
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D18AA174-F883-481F-B172-EB98B26E925F@holtmann.org>
-References: <CACokStdMboxnDPR6cdQYfpfdNApQCn73pjQZNqQ+ag0QPYZXgw@mail.gmail.com>
- <140A3914-6A0F-4E42-9858-7CDFE348C0CA@holtmann.org>
- <CACokStd_VLLP=dc+v=MZXpYF+Pw57f0Cma3-HSrXz5_PdiyRfw@mail.gmail.com>
-To:     hongyi mao <maohongyicn@gmail.com>
-X-Mailer: Apple Mail (2.3594.4.19)
+        Thu, 10 Oct 2019 04:10:07 -0400
+Received: by mail-ot1-f41.google.com with SMTP id k32so4107487otc.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Oct 2019 01:10:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=61qcfevCTHs8XM2o7bTZAGn624lWyajTVzCkdhDU5LM=;
+        b=DQ/ubQqAY4h4K812zAwMkd0NurtzmhEdQAf0xJqrPWYuLbPqch4nKIo76GkvLTCm/p
+         FTqi8Wc96pfIApmEpJxdAjJhsltiQPxn/8eezMbn+xV4ub5tqbrwQiC7S/ASOUKKzcPd
+         VO00J3QCaTGmgxjhFJqyr+9jGTcaZlzdxFhg5ZvKCXmD9Fep0NoVdVtWNM725LuZYAPr
+         1Ora5bRzAZ4VF78ElCTxAeUglTZ5Ch1dG69RPvRyKahvx8Pyth1EQZqeWv2dLoE7qqu0
+         6EVqDTMDvjCx8yQ4uiNlbbDRhYq2bQeSSVNeqxeUP3TzVTxfjWCkBqsp7f4qWz1mSItf
+         zOWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=61qcfevCTHs8XM2o7bTZAGn624lWyajTVzCkdhDU5LM=;
+        b=fiO7UcFzy/6+yRTKikaTfxj2Maj6gXF+g7vQqCqGzMFEgclODI2jSlOJlWx0xlx+kG
+         DN8yssu2pSlnC7hS4hzRSe4RBR6cx9Z9z3g84rrxxMX2LpFbiCP654P93wvA+kMk1NoT
+         umen7FNiPzjro5p4yFortaj36/q+WgH1FS9uOMjz+MKr6yILQhTfPIacTvwbaqTE0/R9
+         tkaLtxOc4nylQ8UjF31KYGaj14WzXnPMRoMu/HAUZXDLX76919RguhsNGiug7Ldat9oM
+         FI2v6KJyYiyqU1AuDnPA8kZ4V2wwKzarHLG2SshPBFHDOeVLLYz6IohDXoLLRwVzvL81
+         577g==
+X-Gm-Message-State: APjAAAXaBwAe+133GXBFTSTp2TH+Du2EKs5z8Jt7Q7pxNyozMh1aidAC
+        QPTKzhTUbwU3Pk35jI9LV/lWzqZqZxI9Ael0r74=
+X-Google-Smtp-Source: APXvYqypWLi+c4JqjKHx6J6OUyZPX7qy697i7PaPjAUtTBAY1pEzYjqlYInTFSmjFz4WdWGd8mG6Q+v6R7otkS3NBKg=
+X-Received: by 2002:a9d:5c0e:: with SMTP id o14mr7015849otk.79.1570695004359;
+ Thu, 10 Oct 2019 01:10:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAJ0=ZJ2rjxM0WmA72J5VCcUZ01q7dH+jxJi7btGzayZWHe7S1Q@mail.gmail.com>
+ <CABBYNZ+DYrzhx3Riqt2SFV4ZoL5VHfOnVPH0ScHMRz=+XoBg6Q@mail.gmail.com>
+ <CAJ0=ZJ1pD4dHZe98eZnZ6R-ZBazGip_mrPVV_XjFgThXM0Ebmg@mail.gmail.com> <CABBYNZLZFpq_aKpmWFG3mG9oEP7Ly4=5WbJHK3mqGsQgH8Da2g@mail.gmail.com>
+In-Reply-To: <CABBYNZLZFpq_aKpmWFG3mG9oEP7Ly4=5WbJHK3mqGsQgH8Da2g@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 10 Oct 2019 11:09:52 +0300
+Message-ID: <CABBYNZ+GhHtnDi-FCu0N2xoEc_0eTtPMsW+N+GMM6S7buy1-Xw@mail.gmail.com>
+Subject: Re: Bluez stopped connecting A2DP sink
+To:     yayfortrees <yayfortrees@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hongyi,
+Hi,
 
-> My use scenario: the peripheral is a BLE thermometer and
-> hygrometer,and the data of the thermometer and hygrometer is stored in
-> the BLE Advertising packet.
-> the host sends the LE Set Scan Enable Command to the local controller,
-> and then the host receives the le_meta_event and parses the data in
-> the BLE Advertising packet.
-> 
-> The problem occurred: the host side received other events besides
-> le_meta_event, such as HCI_EV_INQUIRY_COMPLETE event,
-> HCI_EV_CONN_REQUEST event, HCI_EV_CHANNEL_SELECTED event..., the
-> reason for receiving these events may be BR/EDR/LE controllers wrong
-> or other, this We are investigating.
-> 
-> However, I think that when the host receives the HCI_EV_CONN_REQUEST
-> event according to the procedure described in kernel,
-> Hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
-> ->hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> ->conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr,HCI_ROLE_SLAVE);
-> ->hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp); or
-> hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ, sizeof(cp),&cp);
-> The host should receive the HCI_EV_CONN_COMPLETE event or the
-> HCI_EV_SYNC_CONN_COMPLETE event,
-> but we did not receive it. Or the host receives the
-> HCI_EV_CONN_COMPLETE event or HCI_EV_SYNC_CONN_COMPLETE, but
-> ev->status != 0;
-> The result is that the data for conn->handle is not updated, conn->handle=0.
-> 
-> Next, the host may receive other events, such as
-> HCI_EV_CHANNEL_SELECTED event, HCI_EV_PHY_LINK_COMPLETE event,
-> HCI_EV_PHY_LINK_COMPLETE event...,
-> but we did not receive an event that can update the struct hci_conn data.
-> For example, the host receives the HCI_EV_CHANNEL_SELECTED event next.
-> Hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
-> ->hci_chan_selected_evt(struct hci_dev *hdev, struct sk_buff
-> *skb);//but ev->phy_handle=0;
-> ->hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);//host will
-> find struct hci_conn because conn->handle=0 ev->phy_handle=0,hcon !=
-> NULL
-> ->amp_read_loc_assoc_final_data(hdev, hcon);
-> ->set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state); //host did not
-> receive any other events to update the data in hcon, mgr = NULL
-> 
-> This situation will lead to kernel oops
-> 
-> This problem can also occur when the host receives other events. As
-> long as the event ev->phy_handle=0, the struct hci_conn is found,
-> and the uninitialized data in the struct hci_conn is manipulated in
-> the event, this problem will occur.
-> 
-> Maybe this problem is a controller error, but I think the kernel stack
-> should take this usage scenario into consideration.
-> The attachment trace.log is the hci log we grab.The trace.log may not
-> have caught this situation, but this situation requires a long test to
-> appear.
+On Wed, Oct 9, 2019 at 10:51 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi,
+>
+> On Wed, Oct 9, 2019 at 1:56 AM yayfortrees <yayfortrees@gmail.com> wrote:
+> >
+> > Hello,
+> >
+> > I've attached btmon traces for 5.50 and 5.51. Thanks for taking a look!
+> >
+> > Let me know if you need anything else.
+>
+> Must likely the following error has something to do with it:
+>
+> = bluetoothd: a2dp-sink profile connect failed for 34:DF:2A:0D:F8:C2:
+> Device or resource busy
+>
+> I will check why this could be happening.
 
-what kind of hardware is this?
+I tried this one and couldn't reproduce with the headsets I have,
+could you please run bluetooth -dn and attach the logs here?
 
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-> HCI Event: Command Complete (0x0e) plen 12
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        Status: Success (0x00)
-        HCI version: Bluetooth 4.1 (0x07) - Revision 0 (0x0000)
-        LMP version: Bluetooth 4.1 (0x07) - Subversion 602 (0x025a)
-        Manufacturer: Qualcomm (29)
-< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
-> HCI Event: Command Complete (0x0e) plen 10
-      Read BD ADDR (0x04|0x0009) ncmd 1
-        Status: Success (0x00)
-        Address: C8:02:8F:04:89:1B (Nova Electronics (Shanghai) Co., Ltd.)
+> > On Tue, Oct 8, 2019 at 4:24 AM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > On Mon, Oct 7, 2019 at 10:34 PM yayfortrees <yayfortrees@gmail.com> wrote:
+> > > >
+> > > > Hello,
+> > > >
+> > > > I recently upgraded bluez to 5.51 from 5.50 and my headphones stopped
+> > > > using the A2DP sink during autoconnect. The headphones instead go to
+> > > > HSP/HFP mode and the A2DP sink is disabled in pavucontrol/pactl. The
+> > > > A2DP sink will only work when the device is initially paired.
+> > > >
+> > > > This had worked flawlessly for years. I was able to track down the
+> > > > regression to this patch:
+> > > > https://www.spinics.net/lists/linux-bluetooth/msg76180.html ([PATCH
+> > > > BlueZ] policy: Add logic to connect a Sink). If I apply the patch to
+> > > > 5.50, my headphones no longer connect to the A2DP sink, if I remove it
+> > > > the problem goes away.
+> > > >
+> > > > Not sure what else I should include to help track this down. The
+> > > > headphones I'm using are Beats Wireless (Solo Bluetooth).
+> > > >
+> > > > The only relevant log entry I see with the patch applied is:
+> > > > a2dp-sink profile connect failed for 34:DF:2A:0D:F8:C2: Device or resource busy
+> > >
+> > > Can you collect the HCI traces of the problem using btmon? I didn't
+> > > expect that to cause any problems, it should in theory solve them but
+> > > lets see.
+> > >
+> > > > Let me know if any other information is needed.
+> > > > Thanks.
+> > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Is this some sort of new USB dongle from Qualcomm?
 
-The problem is not Channel Selected event. That is just a symptom. The problem is that the hardware is sending garbage or you uncovered a bug in the driver or the USB controller.
 
-> HCI Event: Unknown (0xaf) plen 168
-        aa b1 32 13 56 7b dd 4d 68 d2 ec 2b 0e b6 3e 2b  ..2.V{.Mh..+..>+
-        02 01 03 01 b8 63 5a d0 83 0c 1f 1e ff 06 00 01  .....cZ.........
-        09 20 02 3c 26 fe 29 8d b4 89 26 03 37 3d 5c 23  . .<&.)...&.7=\#
-        8e ba 27 b6 41 c3 d2 2d 9b 7f b5 3e 2b 02 01 03  ..'.A..-...>+...
-        01 7a f7 04 dd a4 20 1f 1e ff 06 00 01 09 20 00  .z.... ....... .
-        0e 5f f0 72 0f 3b ea 9b ae ba 77 fa 41 35 4d 7a  ._.r.;....w.A5Mz
-        3f 7b 28 18 9a bb 39 b1 3e 29 02 01 03 01 fb 6e  ?{(...9.>).....n
-        54 04 1f 39 1d 1c ff 06 00 01 09 21 0a 61 76 81  T..9.......!.av.
-        ad 16 28 44 45 53 4b 54 4f 50 2d 4a 4a 38 36 35  ..(DESKTOP-JJ865
-        34 30 c1 3e 2b 02 01 03 01 79 03 3f 35 8e 01 1f  40.>+....y.?5...
-        1e ff 06 00 01 09 20 02                          ...... .        
-> HCI Event: Unknown (0x6b) plen 233
-        87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b dd 4d  ...A......2.V{.M
-        68 d2 ec 2b 0e b5 3e 2b 02 01 03 01 7a f7 04 dd  h..+..>+....z...
-        a4 20 1f 1e ff 06 00 01 09 20 00 0e 5f f0 72 0f  . ....... .._.r.
-        3b ea 9b ae ba 77 fa 41 35 4d 7a 3f 7b 28 18 9a  ;....w.A5Mz?{(..
-        bb 39 b2 3e 29 02 01 03 01 fb 6e 54 04 1f 39 1d  .9.>).....nT..9.
-        1c ff 06 00 01 09 21 0a 61 76 81 ad 16 28 44 45  ......!.av...(DE
-        53 4b 54 4f 50 2d 4a 4a 38 36 35 34 30 c1 3e 2b  SKTOP-JJ86540.>+
-        02 01 03 01 a3 f8 96 8c 85 25 1f 1e ff 06 00 01  .........%......
-        09 20 02 7f 31 9e b5 d1 76 45 f0 77 95 eb e7 5a  . ..1...vE.w...Z
-        93 38 cc 88 20 5c 58 62 d2 af ab 3e 2b 02 01 03  .8.. \Xb...>+...
-        01 79 03 3f 35 8e 01 1f 1e ff 06 00 01 09 20 02  .y.?5......... .
-        6b e9 87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b  k....A......2.V{
-        dd 4d 68 d2 ec 2b 0e b6 3e 2b 02 01 03 01 7a f7  .Mh..+..>+....z.
-        04 dd a4 20 1f 1e ff 06 00 01 09 20 00 0e 5f f0  ... ....... .._.
-        72 0f 3b ea 9b ae ba 77 fa                       r.;....w.       
-> HCI Event: Channel Selected (0x41) plen 53
-        invalid packet size
-        4d 7a 3f 7b 28 18 9a bb 39 b3 3e 2b 02 01 03 01  Mz?{(...9.>+....
-        79 03 3f 35 8e 01 1f 1e ff 06 00 01 09 20 02 6b  y.?5......... .k
-        e9 87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b dd  ....A......2.V{.
-        4d 68 d2 ec 2b                                   Mh..+           
-
-So maybe this is missing a firmware download that has bug fixes. You might need to examine the Windows driver.
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
