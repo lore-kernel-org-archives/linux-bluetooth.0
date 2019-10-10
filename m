@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D94BC4360C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FF8C4360C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:58:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07E4A20B7C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:52:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 814FD20B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:58:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfJJWw7 (ORCPT
+        id S1726559AbfJJW64 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Oct 2019 18:52:59 -0400
-Received: from mga17.intel.com ([192.55.52.151]:38865 "EHLO mga17.intel.com"
+        Thu, 10 Oct 2019 18:58:56 -0400
+Received: from mga05.intel.com ([192.55.52.43]:50592 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726207AbfJJWw7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Oct 2019 18:52:59 -0400
+        id S1726358AbfJJW64 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 10 Oct 2019 18:58:56 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Oct 2019 15:52:57 -0700
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Oct 2019 15:58:55 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,281,1566889200"; 
-   d="scan'208";a="345852574"
+   d="scan'208";a="219201349"
 Received: from bgi1-mobl2.amr.corp.intel.com ([10.255.229.50])
-  by orsmga004.jf.intel.com with ESMTP; 10 Oct 2019 15:52:57 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 10 Oct 2019 15:58:54 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, inga.stotland@intel.com,
         michal.lowas-rzechonek@silvair.com
-Subject: [PATCH BlueZ v3] mesh: Secure Beacon - IV_Index/Key Refresh re-write
-Date:   Thu, 10 Oct 2019 15:52:52 -0700
-Message-Id: <20191010225252.3413-1-brian.gix@intel.com>
+Subject: [PATCH BlueZ v4] mesh: Secure Beacon - IV_Index/Key Refresh re-write
+Date:   Thu, 10 Oct 2019 15:58:52 -0700
+Message-Id: <20191010225852.5793-1-brian.gix@intel.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,8 +64,8 @@ that includes:
   nodes.
 ---
  mesh/mesh-config-json.c |   3 +-
- mesh/net.c              | 353 +++++++++++++++-------------------------
- 2 files changed, 134 insertions(+), 222 deletions(-)
+ mesh/net.c              | 350 +++++++++++++++-------------------------
+ 2 files changed, 131 insertions(+), 222 deletions(-)
 
 diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
 index 198fef518..df58cbd7d 100644
@@ -82,7 +82,7 @@ index 198fef518..df58cbd7d 100644
  
  	/*
 diff --git a/mesh/net.c b/mesh/net.c
-index 2785039db..25a97fc83 100644
+index 2785039db..f07de4d8a 100644
 --- a/mesh/net.c
 +++ b/mesh/net.c
 @@ -41,7 +41,7 @@
@@ -344,16 +344,15 @@ index 2785039db..25a97fc83 100644
 -
 -	if (size != 22 || buf[0] != 0x01)
 -		return;
- 
+-
 -	/* print_packet("Secure Net Beacon RXed", data, size); */
 -	rxed_key_refresh = (buf[1] & 0x01) == 0x01;
 -	rxed_iv_update = iv_update = (buf[1] & 0x02) == 0x02;
 -	iv_index = l_get_be32(buf + 10);
-+	ivi = l_get_be32(buf + 10);
- 
+-
 -	l_debug("KR: %d -- IVU: %d -- IV: %8.8x",
 -				rxed_key_refresh, rxed_iv_update, iv_index);
--
+ 
 -	/* Inhibit recognizing iv_update true-->false
 -	 * if we have outbound SAR messages in flight
 -	 */
@@ -361,7 +360,8 @@ index 2785039db..25a97fc83 100644
 -		if (!iv_update && iv_update != iv_is_updating(net))
 -			iv_update = true;
 -	}
--
++	ivi = l_get_be32(buf + 10);
+ 
 -	key_id = net_key_network_id(buf + 2);
 -	subnet = l_queue_find(net->subnets, match_key_id,
 -						L_UINT_TO_PTR(key_id));
@@ -393,18 +393,18 @@ index 2785039db..25a97fc83 100644
 -	if ((net->iv_index + IV_IDX_DIFF_RANGE < iv_index) ||
 -						(iv_index < net->iv_index)) {
 -		l_info("iv index outside range");
+-		return;
+-	}
+-
+-	/* Don't bother going further if nothing has changed */
+-	if (!memcmp(&subnet->snb.beacon[1], buf, size)) {
+-		subnet->snb.observed++;
 +	/* Ignore Network IDs unknown to this mesh universe */
 +	key_id = net_key_network_id(buf + 2);
 +	if (!key_id)
  		return;
 -	}
  
--	/* Don't bother going further if nothing has changed */
--	if (!memcmp(&subnet->snb.beacon[1], buf, size)) {
--		subnet->snb.observed++;
--		return;
--	}
--
 -	if (!rxed_key_refresh && !subnet->key_refresh && !kr_transition)
 -		key_id = subnet->net_key_cur;
 -	else if (subnet->net_key_upd)
@@ -568,19 +568,16 @@ index 2785039db..25a97fc83 100644
  }
  
  bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable)
-@@ -3044,8 +2951,10 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
+@@ -3044,7 +2951,7 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
  	if (!subnet)
  		return false;
  
 -	if (new_key)
-+	if (new_key && phase) {
++	if (new_key && phase)
  		subnet->net_key_upd = net_key_add(new_key);
-+		l_debug("New Key Added - %d", subnet->net_key_upd);
-+	}
  
  	/* Preserve key refresh state to generate secure beacon flags*/
- 	if (phase == KEY_REFRESH_PHASE_TWO) {
-@@ -3085,7 +2994,7 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+@@ -3085,7 +2992,7 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
  
  		l_info("Register io cb");
  		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
@@ -589,7 +586,7 @@ index 2785039db..25a97fc83 100644
  		mesh_io_register_recv_cb(io, MESH_IO_FILTER_NET,
  							net_msg_recv, NULL);
  		l_queue_foreach(net->subnets, start_network_beacon, net);
-@@ -3128,12 +3037,13 @@ bool mesh_net_iv_index_update(struct mesh_net *net)
+@@ -3128,12 +3035,13 @@ bool mesh_net_iv_index_update(struct mesh_net *net)
  
  	l_info("iv_upd_state = IV_UPD_UPDATING");
  	mesh_net_flush_msg_queues(net);
@@ -606,14 +603,6 @@ index 2785039db..25a97fc83 100644
  	l_queue_foreach(net->subnets, set_network_beacon, net);
  	net->iv_update_timeout = l_timeout_create(
  			IV_IDX_UPD_MIN,
-@@ -3731,6 +3641,7 @@ int mesh_net_update_key(struct mesh_net *net, uint16_t idx,
- 
- 	/* Preserve starting data */
- 	subnet->net_key_upd = net_key_add(value);
-+	l_debug("New Key Added(2) - %d", subnet->net_key_upd);
- 
- 	if (!subnet->net_key_upd) {
- 		l_error("Failed to start key refresh phase one");
 -- 
 2.21.0
 
