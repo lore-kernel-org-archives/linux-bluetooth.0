@@ -2,228 +2,620 @@ Return-Path: <SRS0=lLJx=YD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC37C4360C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 08:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A98EC4360C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:51:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 492FA21920
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 08:27:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhHTPOeF"
+	by mail.kernel.org (Postfix) with ESMTP id 45B0220B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:51:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732228AbfJJI1g (ORCPT
+        id S1726184AbfJJWvh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Oct 2019 04:27:36 -0400
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:32981 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726864AbfJJI1f (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Oct 2019 04:27:35 -0400
-Received: by mail-wr1-f44.google.com with SMTP id b9so6730404wrs.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Oct 2019 01:27:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=wdWtWbz/ORZzjVMGDr8vfSFf6F3enSBbQxtewA9bYjA=;
-        b=IhHTPOeFNhsiR7I35SneIO+EcjzKc4LDmhDPCosKPR4MO4qwtJF4U8dOaOrFtqCtY0
-         6WJ3smt/3yX8DjffWhTuOHP2na4NkTi1dtDI7cRcjSVy0/G4xNGTmow0HUGi7oWTMATa
-         J6OCMT6qzv2AQvaGB7wZCd0bzF9fm2rTbTn22En2bVSztV/pE2j4DtsPvvWDORwlQPLO
-         4UEHOfjBm9a6anzeNDN6nUhMOtTf0CrPwaWdDJZhZbnokUMVeKbdn2FOELntHb3vhMUC
-         jrFrPk7kTQ55Y1ScRcJ45G4ru3IY4BJ7jzHZQeJr+PWc0Tc2QZRlDXSd7h95ySjlNlVv
-         NC+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wdWtWbz/ORZzjVMGDr8vfSFf6F3enSBbQxtewA9bYjA=;
-        b=cK0VoV2wDgyUqQ4AfdiZIDxzqbQfGMtoYrTiab1HyHtAZjuDi+4tH4Z+uFOBlSbY3M
-         T3Xqy8/Q0t1/wEbWjP27r8ob5pCewn7hgAo+zSEsmsLenEmbacO/NrQ7UwzbgHPjlVTJ
-         8SQ7tTYitQ/JQxypzoPBrdMv9QLtjlb29XjVMdap6iBVXxZ5kvpX6KjQ9H9pDa+UIXNe
-         2xOQbSB94lElVEJHaI34eO6xxnTSJW/spY7XpB0rIxt05Akri2tKGyz8xzTzEiwEjPu6
-         xbtDteGAGn6tkwYZ+tX7K3tcsnRGI2XE1XKIAhGRJ02pKFZZTxL1ffizYmolmO6qdk7r
-         B7Dw==
-X-Gm-Message-State: APjAAAW/50cEuuE5PkC+aRvvNybHXL8EpDQE2YmlOFv2uVju2dORhMGQ
-        FyesBI6z4mOWxXQgnnX8dns7IroYktQVskY9oNkbR8Zo
-X-Google-Smtp-Source: APXvYqzpOPkc742JUQBJRfPTw7lHzAaXWWaJejXwY5rrGABnDUYOfS0HOgUHQdHm8J+D3b5ntyZ+534nx03/5y3lCd8=
-X-Received: by 2002:adf:db81:: with SMTP id u1mr7271483wri.347.1570696052520;
- Thu, 10 Oct 2019 01:27:32 -0700 (PDT)
+        Thu, 10 Oct 2019 18:51:37 -0400
+Received: from mga02.intel.com ([134.134.136.20]:48778 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726071AbfJJWvg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 10 Oct 2019 18:51:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Oct 2019 15:51:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,281,1566889200"; 
+   d="scan'208";a="193359241"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.255.229.50])
+  by fmsmga008.fm.intel.com with ESMTP; 10 Oct 2019 15:51:34 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com,
+        michal.lowas-rzechonek@silvair.com
+Subject: [PATCH BlueZ v2] mesh: Secure Beacon - IV_Index/Key Refresh re-write
+Date:   Thu, 10 Oct 2019 15:51:21 -0700
+Message-Id: <20191010225121.2758-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <CACokStdMboxnDPR6cdQYfpfdNApQCn73pjQZNqQ+ag0QPYZXgw@mail.gmail.com>
- <140A3914-6A0F-4E42-9858-7CDFE348C0CA@holtmann.org> <CACokStd_VLLP=dc+v=MZXpYF+Pw57f0Cma3-HSrXz5_PdiyRfw@mail.gmail.com>
- <D18AA174-F883-481F-B172-EB98B26E925F@holtmann.org>
-In-Reply-To: <D18AA174-F883-481F-B172-EB98B26E925F@holtmann.org>
-From:   hongyi mao <maohongyicn@gmail.com>
-Date:   Thu, 10 Oct 2019 16:27:20 +0800
-Message-ID: <CACokStd64AUce4_2swgB06w1BH5DJpB02zwgyxfEMw=nvwJqKQ@mail.gmail.com>
-Subject: Re: Kernel Bluetooth Protocol Stack Problem
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+This is a major rewrite of Secure Network Beacon (SNB) handling
+that includes:
 
-Marcel Holtmann <marcel@holtmann.org> =E4=BA=8E2019=E5=B9=B410=E6=9C=8810=
-=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=8811:44=E5=86=99=E9=81=93=EF=BC=
-=9A
->
-> Hi Hongyi,
->
-> > My use scenario: the peripheral is a BLE thermometer and
-> > hygrometer,and the data of the thermometer and hygrometer is stored in
-> > the BLE Advertising packet.
-> > the host sends the LE Set Scan Enable Command to the local controller,
-> > and then the host receives the le_meta_event and parses the data in
-> > the BLE Advertising packet.
-> >
-> > The problem occurred: the host side received other events besides
-> > le_meta_event, such as HCI_EV_INQUIRY_COMPLETE event,
-> > HCI_EV_CONN_REQUEST event, HCI_EV_CHANNEL_SELECTED event..., the
-> > reason for receiving these events may be BR/EDR/LE controllers wrong
-> > or other, this We are investigating.
-> >
-> > However, I think that when the host receives the HCI_EV_CONN_REQUEST
-> > event according to the procedure described in kernel,
-> > Hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
-> > ->hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> > ->conn =3D hci_conn_add(hdev, ev->link_type, &ev->bdaddr,HCI_ROLE_SLAVE=
-);
-> > ->hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp); or
-> > hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ, sizeof(cp),&cp);
-> > The host should receive the HCI_EV_CONN_COMPLETE event or the
-> > HCI_EV_SYNC_CONN_COMPLETE event,
-> > but we did not receive it. Or the host receives the
-> > HCI_EV_CONN_COMPLETE event or HCI_EV_SYNC_CONN_COMPLETE, but
-> > ev->status !=3D 0;
-> > The result is that the data for conn->handle is not updated, conn->hand=
-le=3D0.
-> >
-> > Next, the host may receive other events, such as
-> > HCI_EV_CHANNEL_SELECTED event, HCI_EV_PHY_LINK_COMPLETE event,
-> > HCI_EV_PHY_LINK_COMPLETE event...,
-> > but we did not receive an event that can update the struct hci_conn dat=
-a.
-> > For example, the host receives the HCI_EV_CHANNEL_SELECTED event next.
-> > Hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
-> > ->hci_chan_selected_evt(struct hci_dev *hdev, struct sk_buff
-> > *skb);//but ev->phy_handle=3D0;
-> > ->hcon =3D hci_conn_hash_lookup_handle(hdev, ev->phy_handle);//host wil=
-l
-> > find struct hci_conn because conn->handle=3D0 ev->phy_handle=3D0,hcon !=
-=3D
-> > NULL
-> > ->amp_read_loc_assoc_final_data(hdev, hcon);
-> > ->set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state); //host did not
-> > receive any other events to update the data in hcon, mgr =3D NULL
-> >
-> > This situation will lead to kernel oops
-> >
-> > This problem can also occur when the host receives other events. As
-> > long as the event ev->phy_handle=3D0, the struct hci_conn is found,
-> > and the uninitialized data in the struct hci_conn is manipulated in
-> > the event, this problem will occur.
-> >
-> > Maybe this problem is a controller error, but I think the kernel stack
-> > should take this usage scenario into consideration.
-> > The attachment trace.log is the hci log we grab.The trace.log may not
-> > have caught this situation, but this situation requires a long test to
-> > appear.
->
-> what kind of hardware is this?
->
-> < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-> > HCI Event: Command Complete (0x0e) plen 12
->       Read Local Version Information (0x04|0x0001) ncmd 1
->         Status: Success (0x00)
->         HCI version: Bluetooth 4.1 (0x07) - Revision 0 (0x0000)
->         LMP version: Bluetooth 4.1 (0x07) - Subversion 602 (0x025a)
->         Manufacturer: Qualcomm (29)
-> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
-> > HCI Event: Command Complete (0x0e) plen 10
->       Read BD ADDR (0x04|0x0009) ncmd 1
->         Status: Success (0x00)
->         Address: C8:02:8F:04:89:1B (Nova Electronics (Shanghai) Co., Ltd.=
-)
->
-> Is this some sort of new USB dongle from Qualcomm?
->
-> The problem is not Channel Selected event. That is just a symptom. The pr=
-oblem is that the hardware is sending garbage or you uncovered a bug in the=
- driver or the USB controller.
->
-> > HCI Event: Unknown (0xaf) plen 168
->         aa b1 32 13 56 7b dd 4d 68 d2 ec 2b 0e b6 3e 2b  ..2.V{.Mh..+..>+
->         02 01 03 01 b8 63 5a d0 83 0c 1f 1e ff 06 00 01  .....cZ.........
->         09 20 02 3c 26 fe 29 8d b4 89 26 03 37 3d 5c 23  . .<&.)...&.7=3D=
-\#
->         8e ba 27 b6 41 c3 d2 2d 9b 7f b5 3e 2b 02 01 03  ..'.A..-...>+...
->         01 7a f7 04 dd a4 20 1f 1e ff 06 00 01 09 20 00  .z.... ....... .
->         0e 5f f0 72 0f 3b ea 9b ae ba 77 fa 41 35 4d 7a  ._.r.;....w.A5Mz
->         3f 7b 28 18 9a bb 39 b1 3e 29 02 01 03 01 fb 6e  ?{(...9.>).....n
->         54 04 1f 39 1d 1c ff 06 00 01 09 21 0a 61 76 81  T..9.......!.av.
->         ad 16 28 44 45 53 4b 54 4f 50 2d 4a 4a 38 36 35  ..(DESKTOP-JJ865
->         34 30 c1 3e 2b 02 01 03 01 79 03 3f 35 8e 01 1f  40.>+....y.?5...
->         1e ff 06 00 01 09 20 02                          ...... .
-> > HCI Event: Unknown (0x6b) plen 233
->         87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b dd 4d  ...A......2.V{.M
->         68 d2 ec 2b 0e b5 3e 2b 02 01 03 01 7a f7 04 dd  h..+..>+....z...
->         a4 20 1f 1e ff 06 00 01 09 20 00 0e 5f f0 72 0f  . ....... .._.r.
->         3b ea 9b ae ba 77 fa 41 35 4d 7a 3f 7b 28 18 9a  ;....w.A5Mz?{(..
->         bb 39 b2 3e 29 02 01 03 01 fb 6e 54 04 1f 39 1d  .9.>).....nT..9.
->         1c ff 06 00 01 09 21 0a 61 76 81 ad 16 28 44 45  ......!.av...(DE
->         53 4b 54 4f 50 2d 4a 4a 38 36 35 34 30 c1 3e 2b  SKTOP-JJ86540.>+
->         02 01 03 01 a3 f8 96 8c 85 25 1f 1e ff 06 00 01  .........%......
->         09 20 02 7f 31 9e b5 d1 76 45 f0 77 95 eb e7 5a  . ..1...vE.w...Z
->         93 38 cc 88 20 5c 58 62 d2 af ab 3e 2b 02 01 03  .8.. \Xb...>+...
->         01 79 03 3f 35 8e 01 1f 1e ff 06 00 01 09 20 02  .y.?5......... .
->         6b e9 87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b  k....A......2.V{
->         dd 4d 68 d2 ec 2b 0e b6 3e 2b 02 01 03 01 7a f7  .Mh..+..>+....z.
->         04 dd a4 20 1f 1e ff 06 00 01 09 20 00 0e 5f f0  ... ....... .._.
->         72 0f 3b ea 9b ae ba 77 fa                       r.;....w.
-> > HCI Event: Channel Selected (0x41) plen 53
->         invalid packet size
->         4d 7a 3f 7b 28 18 9a bb 39 b3 3e 2b 02 01 03 01  Mz?{(...9.>+....
->         79 03 3f 35 8e 01 1f 1e ff 06 00 01 09 20 02 6b  y.?5......... .k
->         e9 87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b dd  ....A......2.V{.
->         4d 68 d2 ec 2b                                   Mh..+
->
-> So maybe this is missing a firmware download that has bug fixes. You migh=
-t need to examine the Windows driver.
->
-> Regards
->
-> Marcel
->
+* Seperating Key Refresh from IV_Index handling
 
-My bluetooth module with IDS is:
-ID 0cf3:e500 Qualcomm Corp.Qualcomm Atheros QCA9377-7
+  This is a clearer handling of the two features. Although both features
+  are represented in SNB's, they run independantly.
 
-Yes, I admit that the problem is that the hardware is sending garbage
-or uncovered a bug in the driver or the USB controller.
-We are solving the problem of the hardware or driver or the USB controller.
+* Creating a Seperate IV_Index initialization and updating state
+  distinct from the current values sent and received in SNBs.
 
-But I think that no matter harware error or a bug in the driver or the
-USB controller, our host receives garbage,
-it should not cause oops in the kernel, should we have a countermeasure?
-When this abnormality occurs, prevent the kernel Oops occurred.
+  If a restart occured during an IV Update procedure (96 hours long)
+  the IVU bit got lost, and Sequence number resetting was not done
+  correctly.
 
-When the host receives the HCI_EV_CONN_REQUEST event, but the connection fa=
-ils,
-conn->handle does not update conn->handle=3D0,struct conn is not free
-and hardware is still sending garbage.
-This situation may lead to kernel oops.
+* Assuring that all Nodes handled by daemon receive each incoming
+  beacon. SNB handling previously stopped after the first node
+  successfuly handled it, although the SNB may be valid for many local
+  nodes.
+---
+ mesh/mesh-config-json.c |   3 +-
+ mesh/net.c              | 355 +++++++++++++++-------------------------
+ 2 files changed, 135 insertions(+), 223 deletions(-)
 
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index 198fef518..df58cbd7d 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -2057,7 +2057,8 @@ bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq,
+ 		return mesh_config_save(cfg, true, NULL, NULL);
+ 	}
+ 
+-	if (get_int(cfg->jnode, "sequenceNumber", &value))
++	/* If resetting seq to Zero, make sure cached value reset as well */
++	if (seq && get_int(cfg->jnode, "sequenceNumber", &value))
+ 		cached = (uint32_t)value;
+ 
+ 	/*
+diff --git a/mesh/net.c b/mesh/net.c
+index 2785039db..77e3e20eb 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -41,8 +41,8 @@
+ 
+ #define IV_IDX_DIFF_RANGE	42
+ 
+-/* #define IV_IDX_UPD_MIN	(60)		1 minute for Testing */
+-#define IV_IDX_UPD_MIN	(60 * 60 * 96)	/* 96 Hours - per Spec */
++#define IV_IDX_UPD_MIN	(5 * 60)	/* 5 minute for Testing */
++//#define IV_IDX_UPD_MIN	(60 * 60 * 96)	/* 96 Hours - per Spec */
+ #define IV_IDX_UPD_HOLD	(IV_IDX_UPD_MIN/2)
+ #define IV_IDX_UPD_MAX	(IV_IDX_UPD_MIN + IV_IDX_UPD_HOLD)
+ 
+@@ -257,6 +257,11 @@ struct net_queue_data {
+ 	uint16_t len;
+ };
+ 
++struct net_beacon_data {
++	const uint8_t *data;
++	uint16_t len;
++};
++
+ #define FAST_CACHE_SIZE 8
+ static struct l_queue *fast_cache;
+ static struct l_queue *nets;
+@@ -503,6 +508,7 @@ void mesh_friend_sub_del(struct mesh_net *net, uint16_t lpn,
+ uint32_t mesh_net_next_seq_num(struct mesh_net *net)
+ {
+ 	uint32_t seq = net->seq_num++;
++
+ 	node_set_sequence_number(net->node, net->seq_num);
+ 	return seq;
+ }
+@@ -568,9 +574,10 @@ static bool create_secure_beacon(struct mesh_net *net,
+ 					struct mesh_subnet *subnet,
+ 					uint8_t *beacon_data)
+ {
++	bool kr = (subnet->kr_phase == KEY_REFRESH_PHASE_TWO);
++
+ 	return net_key_snb_compose(subnet->net_key_tx, net->iv_index,
+-				!!subnet->key_refresh, iv_is_updating(net),
+-								beacon_data);
++					kr, net->iv_update, beacon_data);
+ }
+ 
+ static void send_network_beacon(struct mesh_subnet *subnet,
+@@ -718,6 +725,7 @@ bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t seq)
+ 		return false;
+ 
+ 	net->seq_num = seq;
++	node_set_sequence_number(net->node, net->seq_num);
+ 
+ 	return true;
+ }
+@@ -1034,7 +1042,7 @@ uint32_t mesh_net_get_iv_index(struct mesh_net *net)
+ 	if (!net)
+ 		return 0xffffffff;
+ 
+-	return net->iv_index - (iv_is_updating(net) ? 1 : 0);
++	return net->iv_index - net->iv_update;
+ }
+ 
+ /* TODO: net key index? */
+@@ -2616,10 +2624,15 @@ static void iv_upd_to(struct l_timeout *upd_timeout, void *user_data)
+ 			break;
+ 		}
+ 
+-		l_info("iv_upd_state = IV_UPD_NORMAL_HOLD");
++		l_debug("iv_upd_state = IV_UPD_NORMAL_HOLD");
+ 		net->iv_upd_state = IV_UPD_NORMAL_HOLD;
+ 		l_timeout_modify(net->iv_update_timeout, IV_IDX_UPD_MIN);
+-		mesh_net_set_seq_num(net, 0);
++		if (net->iv_update)
++			mesh_net_set_seq_num(net, 0);
++
++		net->iv_update = false;
++		mesh_config_write_iv_index(node_config_get(net->node),
++							net->iv_index, false);
+ 		l_queue_foreach(net->subnets, set_network_beacon, net);
+ 		mesh_net_flush_msg_queues(net);
+ 		break;
+@@ -2629,8 +2642,12 @@ static void iv_upd_to(struct l_timeout *upd_timeout, void *user_data)
+ 	case IV_UPD_NORMAL:
+ 		l_timeout_remove(upd_timeout);
+ 		net->iv_update_timeout = NULL;
+-		l_info("iv_upd_state = IV_UPD_NORMAL");
++		l_debug("iv_upd_state = IV_UPD_NORMAL");
+ 		net->iv_upd_state = IV_UPD_NORMAL;
++		if (net->iv_update)
++			mesh_net_set_seq_num(net, 0);
++
++		net->iv_update = false;
+ 		if (net->seq_num > IV_UPDATE_SEQ_TRIGGER)
+ 			mesh_net_iv_index_update(net);
+ 		break;
+@@ -2707,39 +2724,41 @@ static int key_refresh_finish(struct mesh_net *net, uint16_t idx)
+ 	return MESH_STATUS_SUCCESS;
+ }
+ 
+-static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
+-				bool iv_update, bool kr_transition,
+-				bool rxed_key_refresh, bool lpn)
++static void update_kr_state(struct mesh_subnet *subnet, bool kr, uint32_t id)
++{
++	/* Figure out the key refresh phase */
++	if (kr) {
++		if (id == subnet->net_key_upd) {
++			l_debug("Beacon based KR phase 2 change");
++			key_refresh_phase_two(subnet->net, subnet->idx);
++		}
++	} else {
++		if (id == subnet->net_key_upd) {
++			l_debug("Beacon based KR phase 3 change");
++			key_refresh_finish(subnet->net, subnet->idx);
++		}
++	}
++}
++
++static void update_iv_ivu_state(struct mesh_net *net, uint32_t iv_index,
++								bool ivu)
+ {
+-	struct mesh_net *net = subnet->net;
+-	uint8_t local_kr;
+ 	uint32_t local_iv_index;
+-	bool local_iv_update;
++	bool local_ivu;
+ 
+-	/* Save original settings to avoid resetting same values,
+-	 * and secure beacon timer
+-	 */
++	/* Save original settings to differentiate what has changed */
+ 	local_iv_index = net->iv_index;
+-	local_kr = subnet->key_refresh;
+-	local_iv_update = iv_is_updating(net);
+-
+-	if (iv_index != local_iv_index || kr_transition)
+-		l_info("SNB-RX: %8.8x - Key Refresh: %d IV Update: %d",
+-					iv_index, rxed_key_refresh, iv_update);
++	local_ivu = net->iv_update;
+ 
+-	if (iv_update && (net->iv_upd_state > IV_UPD_UPDATING)) {
+-		if (iv_index != net->iv_index)
+-			l_error("Update attempted to0 soon (Normal < MIN)");
+-
+-		return;
++	if ((iv_index - ivu) > (local_iv_index - local_ivu)) {
++		/* Don't accept IV_Index changes when performing SAR Out */
++		if (l_queue_length(net->sar_out))
++			return;
+ 	}
+ 
++	/* If first beacon seen, accept without judgement */
+ 	if (net->iv_upd_state == IV_UPD_INIT) {
+-		if (iv_index > net->iv_index)
+-			mesh_net_set_seq_num(net, 0);
+-		net->iv_index = iv_index;
+-
+-		if (iv_update) {
++		if (ivu) {
+ 			/* Other devices will be accepting old or new iv_index,
+ 			 * but we don't know how far through update they are.
+ 			 * Starting permissive state will allow us maximum
+@@ -2753,164 +2772,89 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
+ 			l_info("iv_upd_state = IV_UPD_NORMAL");
+ 			net->iv_upd_state = IV_UPD_NORMAL;
+ 		}
+-
+-		mesh_config_write_iv_index(node_config_get(net->node), iv_index,
+-							net->iv_upd_state);
+-
+-		/* Figure out the key refresh phase */
+-		if (kr_transition) {
+-			l_debug("Beacon based KR phase change");
+-			if (rxed_key_refresh)
+-				key_refresh_phase_two(net, subnet->idx);
+-			else
+-				key_refresh_finish(net, subnet->idx);
++	} else if (ivu) {
++		/* Ignore beacons with IVU if they come too soon */
++		if (!local_ivu && net->iv_upd_state == IV_UPD_NORMAL_HOLD) {
++			l_error("Update attempted too soon");
++			return;
+ 		}
+ 
+-		if (!lpn)
+-			set_network_beacon(subnet, net);
+-
+-		return;
+-	}
+-
+-	if (iv_update && !iv_is_updating(net)) {
+-		l_info("iv_upd_state = IV_UPD_UPDATING");
+-		net->iv_upd_state = IV_UPD_UPDATING;
+-		net->iv_update_timeout = l_timeout_create(IV_IDX_UPD_MIN,
+-							iv_upd_to, net, NULL);
+-		mesh_config_write_iv_index(node_config_get(net->node), iv_index,
+-							net->iv_upd_state);
+-	} else if (iv_update && iv_index != net->iv_index) {
+-		l_error("Update attempted too soon (iv idx already updated)");
++		if (!local_ivu) {
++			l_info("iv_upd_state = IV_UPD_UPDATING");
++			net->iv_upd_state = IV_UPD_UPDATING;
++			net->iv_update_timeout = l_timeout_create(
++					IV_IDX_UPD_MIN, iv_upd_to, net, NULL);
++		}
++	} else if (local_ivu) {
++		l_error("IVU clear attempted too soon");
+ 		return;
+ 	}
+ 
+-	if (iv_index != local_iv_index || kr_transition)
+-		l_info("IVindex 0x%8.8x / Key Refresh update received",
+-								iv_index);
++	if ((iv_index - ivu) > (local_iv_index - local_ivu))
++		mesh_net_set_seq_num(net, 0);
+ 
+-	if (iv_index > net->iv_index) {
+-		l_queue_clear(net->msg_cache, mesh_msg_free);
+-		net->iv_index = iv_index;
+-		mesh_config_write_iv_index(node_config_get(net->node), iv_index,
+-							net->iv_upd_state);
+-	}
++	if (ivu != net->iv_update || local_iv_index != net->iv_index) {
++		struct mesh_config *cfg = node_config_get(net->node);
+ 
+-	/* Figure out the key refresh phase */
+-	if (kr_transition) {
+-		if (rxed_key_refresh)
+-			key_refresh_phase_two(net, subnet->idx);
+-		else
+-			key_refresh_finish(net, subnet->idx);
++		mesh_config_write_iv_index(cfg, iv_index, ivu);
+ 	}
+ 
+-	if (!lpn)
+-		return;
+-
+-	if (local_kr != subnet->key_refresh ||
+-					local_iv_index != net->iv_index ||
+-					local_iv_update != iv_is_updating(net))
+-		set_network_beacon(subnet, net);
++	net->iv_index = iv_index;
++	net->iv_update = ivu;
+ }
+ 
+-static void process_beacon(void *user_data, const void *data,
+-						uint8_t size, int8_t rssi)
++static void process_beacon(void *net_ptr, void *user_data)
+ {
+-	struct mesh_net *net = user_data;
+-	const uint8_t *buf = data;
+-	uint32_t iv_index;
+-	bool iv_update, rxed_iv_update, rxed_key_refresh;
++	struct mesh_net *net = net_ptr;
++	const uint8_t *buf = *(uint8_t **)user_data;
++	uint32_t ivi;
++	bool ivu, kr, local_kr;
+ 	struct mesh_subnet *subnet;
+ 	uint32_t key_id;
+-	bool kr_transition = false;
+-
+-	if (size != 22 || buf[0] != 0x01)
+-		return;
+ 
+-	/* print_packet("Secure Net Beacon RXed", data, size); */
+-	rxed_key_refresh = (buf[1] & 0x01) == 0x01;
+-	rxed_iv_update = iv_update = (buf[1] & 0x02) == 0x02;
+-	iv_index = l_get_be32(buf + 10);
++	ivi = l_get_be32(buf + 10);
+ 
+-	l_debug("KR: %d -- IVU: %d -- IV: %8.8x",
+-				rxed_key_refresh, rxed_iv_update, iv_index);
+-
+-	/* Inhibit recognizing iv_update true-->false
+-	 * if we have outbound SAR messages in flight
+-	 */
+-	if (l_queue_length(net->sar_out)) {
+-		if (!iv_update && iv_update != iv_is_updating(net))
+-			iv_update = true;
+-	}
+-
+-	key_id = net_key_network_id(buf + 2);
+-	subnet = l_queue_find(net->subnets, match_key_id,
+-						L_UINT_TO_PTR(key_id));
+-	if (!subnet || !key_id)
++	/* Ignore out-of-range IV_Index for this network */
++	if ((net->iv_index + IV_IDX_DIFF_RANGE < ivi) || (ivi < net->iv_index))
+ 		return;
+ 
+-	/* Check if Key Refresh flag value is different from
+-	 * the locally stored one
+-	 */
+-	if (rxed_key_refresh != subnet->key_refresh)
+-		kr_transition = true;
+-
+-	/* If the local node is a provisioner or there are no new keys,
+-	 * ignore KR beacon setting
+-	 */
+-	if (net->provisioner)
+-		kr_transition = false;
+-	else if (!subnet->net_key_upd)
+-		kr_transition = false;
+-	/* If beacon's key refresh bit is not set and the beacon is encoded
+-	 * with the "new" network key, this signals transition from
+-	 * key refresh procedure to normal operation
+-	 */
+-	else if (!rxed_key_refresh && subnet->net_key_upd == key_id)
+-		kr_transition = true;
+-
+-	if ((net->iv_index + IV_IDX_DIFF_RANGE < iv_index) ||
+-						(iv_index < net->iv_index)) {
+-		l_info("iv index outside range");
++	/* Ignore Network IDs unknown to this mesh universe */
++	key_id = net_key_network_id(buf + 2);
++	if (!key_id)
+ 		return;
+-	}
+ 
+-	/* Don't bother going further if nothing has changed */
+-	if (!memcmp(&subnet->snb.beacon[1], buf, size)) {
+-		subnet->snb.observed++;
+-		return;
+-	}
+-
+-	if (!rxed_key_refresh && !subnet->key_refresh && !kr_transition)
+-		key_id = subnet->net_key_cur;
+-	else if (subnet->net_key_upd)
+-		key_id = subnet->net_key_upd;
+-	else
++	subnet = l_queue_find(net->subnets, match_key_id,
++							L_UINT_TO_PTR(key_id));
++	if (!subnet)
+ 		return;
+ 
+-	if (!net_key_snb_check(key_id, iv_index, rxed_key_refresh,
+-						rxed_iv_update,
+-						l_get_be64(buf + 14))) {
+-		l_error("mesh_crypto_beacon verify failed");
+-		return;
+-	}
++	/* Get IVU and KR boolean bits from beacon */
++	ivu = !!(buf[1] & 0x02);
++	kr = !!(buf[1] & 0x01);
++	local_kr = !!(subnet->kr_phase != KEY_REFRESH_PHASE_TWO);
+ 
+-	if (iv_index == net->iv_index &&
+-			iv_is_updating(net) == iv_update && !kr_transition) {
+-		l_info("No change: IV index %4.4x, rxed KR = %d ",
+-						iv_index, rxed_key_refresh);
+-		if (net->iv_upd_state == IV_UPD_INIT) {
+-			l_info("iv_upd_state = IV_UPD_NORMAL");
+-			net->iv_upd_state = IV_UPD_NORMAL;
++	if (net->iv_upd_state != IV_UPD_INIT) {
++		/* Ignore beacons that indicate *no change* */
++		if (!memcmp(&subnet->snb.beacon[1], buf, 22)) {
++			subnet->snb.observed++;
++			return;
+ 		}
++	}
+ 
+-		subnet->snb.observed++;
++	/* Validate beacon before accepting */
++	if (!net_key_snb_check(key_id, ivi, kr, ivu, l_get_be64(buf + 14))) {
++		l_error("mesh_crypto_beacon verify failed");
+ 		return;
+ 	}
+ 
++	/* We have officially *seen* this beacon now */
+ 	subnet->snb.observed++;
+ 
+-	update_iv_kr_state(subnet, iv_index, iv_update, kr_transition,
+-						rxed_key_refresh, false);
++	update_iv_ivu_state(net, ivi, ivu);
++	update_kr_state(subnet, kr, key_id);
++
++	if (ivi != net->iv_index || ivu != net->iv_update || kr != local_kr)
++		set_network_beacon(subnet, net);
+ }
+ 
+ static void lpn_process_beacon(void *user_data, const void *data,
+@@ -2918,87 +2862,50 @@ static void lpn_process_beacon(void *user_data, const void *data,
+ {
+ 	struct mesh_net *net = user_data;
+ 	const uint8_t *buf = data;
+-	uint32_t iv_index;
+-	bool iv_update, rxed_key_refresh;
++	uint32_t ivi;
++	bool ivu, kr, local_kr;
+ 	struct mesh_subnet *subnet;
+ 	bool kr_transition = false;
+ 
+ 	/* print_packet("lpn: Secure Net Beacon RXed", data, size); */
+-	rxed_key_refresh = (buf[0] & 0x01) == 0x01;
+-	iv_update = (buf[0] & 0x02) == 0x02;
+-	iv_index = l_get_be32(buf + 1);
++	kr = !!(buf[0] & 0x01);
++	ivu = !!(buf[0] & 0x02);
++	ivi = l_get_be32(buf + 1);
+ 
+-	/* Inhibit recognizing iv_update true-->false if we have outbound
+-	 * SAR messages in flight
+-	 */
+-	if (l_queue_length(net->sar_out)) {
+-		if (!iv_update && iv_update != iv_is_updating(net))
+-			iv_update = true;
+-	}
+-
+-	l_debug("KR: %d -- IVU: %d -- IV: %8.8x",
+-				rxed_key_refresh, iv_update, iv_index);
++	l_debug("KR: %d -- IVU: %d -- IVI: %8.8x", kr, ivu, ivi);
+ 
+ 	/* TODO: figure out actual network index (i.e., friendship subnet) */
+ 	subnet = get_primary_subnet(net);
+ 	if (!subnet)
+ 		return;
+ 
+-	/* Check if Key Refresh flag value is different from
+-	 * the locally stored one
+-	 */
+-	if (rxed_key_refresh != subnet->key_refresh)
+-		kr_transition = true;
+-
+-	/* If the local node is a provisioner or there are no new keys,
+-	 * ignore KR beacon setting
+-	 */
+-	if (!subnet->net_key_upd)
+-		kr_transition = false;
+-
+-	if ((net->iv_index + IV_IDX_DIFF_RANGE < iv_index) ||
+-					(iv_index < net->iv_index)) {
+-		l_info("iv index outside range");
+-		return;
+-	}
++	local_kr = (subnet->kr_phase == KEY_REFRESH_PHASE_TWO);
+ 
+ 	/* Don't bother going further if nothing has changed */
+-	if (!kr_transition && iv_index == net->iv_index &&
+-			iv_update == iv_is_updating(net) &&
+-			net->iv_upd_state != IV_UPD_INIT)
++	if (local_kr == kr && ivi == net->iv_index && ivu == net->iv_update &&
++					net->iv_upd_state != IV_UPD_INIT)
+ 		return;
+ 
+-	if (iv_index == net->iv_index &&
+-			iv_is_updating(net) == iv_update && !kr_transition) {
+-		l_info("No change: IV index %4.4x, rxed KR = %d ",
+-						iv_index, rxed_key_refresh);
+-		if (net->iv_upd_state == IV_UPD_INIT) {
+-			l_info("iv_upd_state = IV_UPD_NORMAL");
+-			net->iv_upd_state = IV_UPD_NORMAL;
+-		}
+-		return;
+-	}
++	update_iv_ivu_state(net, ivi, ivu);
+ 
+-	update_iv_kr_state(subnet, iv_index, iv_update, kr_transition,
+-						rxed_key_refresh, true);
++	if (kr)
++		update_kr_state(subnet, kr_transition, subnet->net_key_upd);
++	else
++		update_kr_state(subnet, kr_transition, subnet->net_key_cur);
+ }
+ 
+ static void beacon_recv(void *user_data, struct mesh_io_recv_info *info,
+ 					const uint8_t *data, uint16_t len)
+ {
+-	struct mesh_net *net = user_data;
+-	int8_t rssi = 0;
++	const uint8_t *ptr = data + 1;
+ 
+-	if (len <= 2 || !net)
++	if (len != 23 || data[1] != 0x01)
+ 		return;
+ 
+-	if (info) {
+-		net->instant = info->instant;
+-		net->chan = info->chan;
+-		rssi = info->rssi;
+-	}
++	l_debug("KR: %d -- IVU: %d -- IV: %8.8x",
++			data[2] & 1, !!(data[2] & 2), l_get_be32(data + 11));
+ 
+-	process_beacon(user_data, data + 1, len - 1, rssi);
++	l_queue_foreach(nets, process_beacon, &ptr);
+ }
+ 
+ bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable)
+@@ -3044,8 +2951,10 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
+ 	if (!subnet)
+ 		return false;
+ 
+-	if (new_key)
++	if (new_key && phase) {
+ 		subnet->net_key_upd = net_key_add(new_key);
++		l_debug("New Key Added - %d", subnet->net_key_upd);
++	}
+ 
+ 	/* Preserve key refresh state to generate secure beacon flags*/
+ 	if (phase == KEY_REFRESH_PHASE_TWO) {
+@@ -3085,7 +2994,7 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 
+ 		l_info("Register io cb");
+ 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
+-							beacon_recv, net);
++							beacon_recv, NULL);
+ 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_NET,
+ 							net_msg_recv, NULL);
+ 		l_queue_foreach(net->subnets, start_network_beacon, net);
+@@ -3128,12 +3037,13 @@ bool mesh_net_iv_index_update(struct mesh_net *net)
+ 
+ 	l_info("iv_upd_state = IV_UPD_UPDATING");
+ 	mesh_net_flush_msg_queues(net);
+-	net->iv_upd_state = IV_UPD_UPDATING;
+-	net->iv_index++;
+ 	if (!mesh_config_write_iv_index(node_config_get(net->node),
+-					net->iv_index, IV_UPD_UPDATING))
++						net->iv_index + 1, true))
+ 		return false;
+ 
++	net->iv_upd_state = IV_UPD_UPDATING;
++	net->iv_index++;
++	net->iv_update = true;
+ 	l_queue_foreach(net->subnets, set_network_beacon, net);
+ 	net->iv_update_timeout = l_timeout_create(
+ 			IV_IDX_UPD_MIN,
+@@ -3731,6 +3641,7 @@ int mesh_net_update_key(struct mesh_net *net, uint16_t idx,
+ 
+ 	/* Preserve starting data */
+ 	subnet->net_key_upd = net_key_add(value);
++	l_debug("New Key Added(2) - %d", subnet->net_key_upd);
+ 
+ 	if (!subnet->net_key_upd) {
+ 		l_error("Failed to start key refresh phase one");
+-- 
+2.21.0
 
-
-Thanks and Best Regards!
-
-Hongyi Mao
