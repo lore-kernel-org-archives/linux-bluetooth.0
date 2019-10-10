@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A98EC4360C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D94BC4360C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45B0220B7C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07E4A20B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Oct 2019 22:52:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726184AbfJJWvh (ORCPT
+        id S1726321AbfJJWw7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Oct 2019 18:51:37 -0400
-Received: from mga02.intel.com ([134.134.136.20]:48778 "EHLO mga02.intel.com"
+        Thu, 10 Oct 2019 18:52:59 -0400
+Received: from mga17.intel.com ([192.55.52.151]:38865 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726071AbfJJWvg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Oct 2019 18:51:36 -0400
+        id S1726207AbfJJWw7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 10 Oct 2019 18:52:59 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Oct 2019 15:51:34 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Oct 2019 15:52:57 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,281,1566889200"; 
-   d="scan'208";a="193359241"
+   d="scan'208";a="345852574"
 Received: from bgi1-mobl2.amr.corp.intel.com ([10.255.229.50])
-  by fmsmga008.fm.intel.com with ESMTP; 10 Oct 2019 15:51:34 -0700
+  by orsmga004.jf.intel.com with ESMTP; 10 Oct 2019 15:52:57 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, inga.stotland@intel.com,
         michal.lowas-rzechonek@silvair.com
-Subject: [PATCH BlueZ v2] mesh: Secure Beacon - IV_Index/Key Refresh re-write
-Date:   Thu, 10 Oct 2019 15:51:21 -0700
-Message-Id: <20191010225121.2758-1-brian.gix@intel.com>
+Subject: [PATCH BlueZ v3] mesh: Secure Beacon - IV_Index/Key Refresh re-write
+Date:   Thu, 10 Oct 2019 15:52:52 -0700
+Message-Id: <20191010225252.3413-1-brian.gix@intel.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,8 +64,8 @@ that includes:
   nodes.
 ---
  mesh/mesh-config-json.c |   3 +-
- mesh/net.c              | 355 +++++++++++++++-------------------------
- 2 files changed, 135 insertions(+), 223 deletions(-)
+ mesh/net.c              | 353 +++++++++++++++-------------------------
+ 2 files changed, 134 insertions(+), 222 deletions(-)
 
 diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
 index 198fef518..df58cbd7d 100644
@@ -82,20 +82,18 @@ index 198fef518..df58cbd7d 100644
  
  	/*
 diff --git a/mesh/net.c b/mesh/net.c
-index 2785039db..77e3e20eb 100644
+index 2785039db..25a97fc83 100644
 --- a/mesh/net.c
 +++ b/mesh/net.c
-@@ -41,8 +41,8 @@
+@@ -41,7 +41,7 @@
  
  #define IV_IDX_DIFF_RANGE	42
  
 -/* #define IV_IDX_UPD_MIN	(60)		1 minute for Testing */
--#define IV_IDX_UPD_MIN	(60 * 60 * 96)	/* 96 Hours - per Spec */
-+#define IV_IDX_UPD_MIN	(5 * 60)	/* 5 minute for Testing */
-+//#define IV_IDX_UPD_MIN	(60 * 60 * 96)	/* 96 Hours - per Spec */
++/*#define IV_IDX_UPD_MIN	(5 * 60)	* 5 minute for Testing */
+ #define IV_IDX_UPD_MIN	(60 * 60 * 96)	/* 96 Hours - per Spec */
  #define IV_IDX_UPD_HOLD	(IV_IDX_UPD_MIN/2)
  #define IV_IDX_UPD_MAX	(IV_IDX_UPD_MIN + IV_IDX_UPD_HOLD)
- 
 @@ -257,6 +257,11 @@ struct net_queue_data {
  	uint16_t len;
  };
