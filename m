@@ -2,123 +2,87 @@ Return-Path: <SRS0=4il6=YE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9CFECE58C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Oct 2019 07:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 939A8ECE58C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Oct 2019 08:27:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5BF721D6C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Oct 2019 07:21:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60A912084C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Oct 2019 08:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="lDvSnwYr";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="dmYotePO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQWOpLHs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727612AbfJKHVn (ORCPT
+        id S1727334AbfJKI1a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Oct 2019 03:21:43 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:59820 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726679AbfJKHVn (ORCPT
+        Fri, 11 Oct 2019 04:27:30 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42278 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726290AbfJKI13 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Oct 2019 03:21:43 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 0AA2060C5F; Fri, 11 Oct 2019 07:21:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1570778502;
-        bh=WkQrvk5nZdbFlR7R6nIX7hBotfoCIQXVHQx/7ibG+Uc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=lDvSnwYrIDpMwOC1dG+D7dKfTFjt4HUFqdy7v0GOjQybddKJrXPkYfcptPJ2F9EGT
-         kousywg6H4M4cSAHsRfQHUhVptCR7D5l3roLnmFOVoccVFHBXjPt6rxEgUNek1dUMu
-         zgLTaO/SbUXLszDRm0Pbh0c7joigBCaM0Xe9A2Lc=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 9EB9560A0A;
-        Fri, 11 Oct 2019 07:21:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1570778500;
-        bh=WkQrvk5nZdbFlR7R6nIX7hBotfoCIQXVHQx/7ibG+Uc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=dmYotePOOzEE6Acy+6MZY5GC2SxDWsJXr7LdEdyJryauUT/oeMqwiddodTivQBFLr
-         E5BUtt3EJxR/jgp2cbbUBcI7e6vWTr68IK35nPuBW5JyBAWX0IjiN12ayUK2SwUp/8
-         ZrJADS6C5m1q7h9YW3UwSM65PmnPxlJOIcElI33w=
+        Fri, 11 Oct 2019 04:27:29 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n14so10820222wrw.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2019 01:27:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:subject:message-id:mime-version:content-disposition
+         :content-transfer-encoding:user-agent;
+        bh=qVoJ4SVUyU+6feycFSsMeunDkYBWEzLCZffZvRl19i4=;
+        b=TQWOpLHsGjyKDbkPNkg3p8u/aA2m8Jk4oFN757R1kEwZqwSqEXcLbv3MQOAdXEDENt
+         tachmmp8fEDl6554Y4YWckTKLY3wGsbc1U3xr2CI33sqh6RmQ4nc5QQVkKFYJzo+cbu9
+         wiFYcoCpOQnCGOWObWs7Gt5F4/U7HG8wkyugL/wI86V/H2VPqy8GWSCjL4FiyhK8FKiL
+         vgB0s5g7ufjLxOtP7IT1IU6GQG/bYLEqyaNsBvFbta+pNqfw1UhB1+jBkLxhnHh01Der
+         W9b1xsHnCAeEdQACfz6krJ3m3MyNToTCcMNKgbLrDqJwKE8pM632gilTIk219bm5f0l0
+         X10Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition:content-transfer-encoding:user-agent;
+        bh=qVoJ4SVUyU+6feycFSsMeunDkYBWEzLCZffZvRl19i4=;
+        b=Vwcs2rQuj/dj57pcUq/zycZPkZIYD1VXSZAheH4+d/iH2YLVZ1ntLOKnD8pQ4OIJcj
+         D66b6VfLwfJDdgOPr86F60erbrx/WaeRyIUHhaFdps3ZJmI34jb11eVsgO9s1uWHZtzd
+         FKagtaBfBnBUK+9jh+YjD5YmAQpu+u/H6gASB/ZmPl/nY2BDimojYRC54NisOGGlE71N
+         fQMzlI0qC+mIuhEPQxBs/r3WaPsMVImOGXSMeFrjfE2lAFp6jg3oLtmz4xfwXxJLBcUI
+         cE2UDy5pmumH9W8sQugCdqbga8wJa2Uw9jpdfoHgGvONJ7U4eVknPjtHTU2nkINapCQ9
+         T2ww==
+X-Gm-Message-State: APjAAAVP4wDL1zP2wrnUfVYY2zr7s1PLm4/T/FgKFScVzxHCXAJfe0g6
+        JVKSqtW3kau91xBD2XMVC59dTkW4
+X-Google-Smtp-Source: APXvYqwGnUvMg9lWGrSkosUUcnRUbMQ4pCJQHUcOgJt7uJvq9dqNFjmj4OgLRQZrkULZaD+ly+w+6g==
+X-Received: by 2002:adf:f0c8:: with SMTP id x8mr12646659wro.206.1570782446090;
+        Fri, 11 Oct 2019 01:27:26 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id z9sm8646256wrp.26.2019.10.11.01.27.24
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 11 Oct 2019 01:27:24 -0700 (PDT)
+Date:   Fri, 11 Oct 2019 10:27:23 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Determinate EDR speed
+Message-ID: <20191011082723.t6w2jcg7v4erlnq6@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 11 Oct 2019 12:51:40 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Harish Bandi <c-hbandi@codeaurora.org>
-Cc:     Claire Chang <tientzu@chromium.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rjliao@codeaurora.org,
-        rongchi@codeaurora.org, linux-bluetooth-owner@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_qca: fix in-band sleep enablement
-In-Reply-To: <238f01ec4b49fee4c0d08a0b8da7e95f@codeaurora.org>
-References: <20191009085116.199922-1-tientzu@chromium.org>
- <238f01ec4b49fee4c0d08a0b8da7e95f@codeaurora.org>
-Message-ID: <74740c0ff64a6a658da2a44a9f9b7ac5@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Claire,
+Hello!
 
-This change will not work  as we need fw files to be loaded tofor IBS to 
-active.
-may i know on which chipset you have this issue of IBS active even with 
-out fw download.
+I would like to ask, how can userspace application which uses bluez DBus
+API determinate EDR speed of remote bluetooth device?
 
-On 2019-10-11 12:31, Harish Bandi wrote:
-> ++ Balakrishna
-> 
-> On 2019-10-09 14:21, Claire Chang wrote:
->> Enabling in-band sleep when there is no patch/nvm-config found and
->> bluetooth is running with the original fw/config.
->> 
->> Fixes: ba8f35979002 ("Bluetooth: hci_qca: Avoid setup failure on
->> missing rampatch")
->> Fixes: 7dc5fe0814c3 ("Bluetooth: hci_qca: Avoid missing rampatch
->> failure with userspace fw loader")
->> Signed-off-by: Claire Chang <tientzu@chromium.org>
->> ---
->>  drivers/bluetooth/hci_qca.c | 11 +++++++----
->>  1 file changed, 7 insertions(+), 4 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index e3164c200eac..367eef893a11 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1291,10 +1291,8 @@ static int qca_setup(struct hci_uart *hu)
->>  	/* Setup patch / NVM configurations */
->>  	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
->>  			firmware_name);
->> -	if (!ret) {
->> -		set_bit(QCA_IBS_ENABLED, &qca->flags);
->> -		qca_debugfs_init(hdev);
->> -	} else if (ret == -ENOENT) {
->> +
->> +	if (ret == -ENOENT) {
->>  		/* No patch/nvm-config found, run with original fw/config */
->>  		ret = 0;
->>  	} else if (ret == -EAGAIN) {
->> @@ -1305,6 +1303,11 @@ static int qca_setup(struct hci_uart *hu)
->>  		ret = 0;
->>  	}
->> 
->> +	if (!ret) {
->> +		set_bit(QCA_IBS_ENABLED, &qca->flags);
->> +		qca_debugfs_init(hdev);
->> +	}
->> +
->>  	/* Setup bdaddr */
->>  	if (qca_is_wcn399x(soc_type))
->>  		hu->hdev->set_bdaddr = qca_set_bdaddr;
+Particularly, I'm interested in detection if bluetooth headset supports
+EDR 2 Mbps or EDR 3 Mbps speed and based on this decide which SBC
+parameters would be used for encoding audio via SBC codec.
+
+Is there any bluez API for it?
 
 -- 
-Regards
-Balakrishna.
+Pali Rohár
+pali.rohar@gmail.com
