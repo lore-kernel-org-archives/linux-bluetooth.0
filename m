@@ -1,89 +1,200 @@
-Return-Path: <SRS0=9HFX=YG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=NoyY=YH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 205A1C4360C
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Oct 2019 17:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F9BC47404
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Oct 2019 05:35:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E31BA206B7
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 13 Oct 2019 17:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B749B20873
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Oct 2019 05:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729295AbfJMRZI convert rfc822-to-8bit (ORCPT
+        id S1726304AbfJNFfH convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 13 Oct 2019 13:25:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35802 "EHLO mail.kernel.org"
+        Mon, 14 Oct 2019 01:35:07 -0400
+Received: from mga04.intel.com ([192.55.52.120]:32904 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728839AbfJMRZI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 13 Oct 2019 13:25:08 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Sun, 13 Oct 2019 17:25:06 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pires.carvalho@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-60824-62941-2ucqJcwTe3@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        id S1725936AbfJNFfH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 14 Oct 2019 01:35:07 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Oct 2019 22:35:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,294,1566889200"; 
+   d="scan'208";a="201379726"
+Received: from pgsmsx111.gar.corp.intel.com ([10.108.55.200])
+  by FMSMGA003.fm.intel.com with ESMTP; 13 Oct 2019 22:35:05 -0700
+Received: from pgsmsx105.gar.corp.intel.com ([169.254.4.226]) by
+ PGSMSX111.gar.corp.intel.com ([169.254.2.128]) with mapi id 14.03.0439.000;
+ Mon, 14 Oct 2019 13:35:04 +0800
+From:   "Bag, Amit K" <amit.k.bag@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "Hegde, Raghuram" <raghuram.hegde@intel.com>
+Subject: RE: [PATCH v2] Bluetooth: btusb: Trigger Intel FW download error
+ recovery
+Thread-Topic: [PATCH v2] Bluetooth: btusb: Trigger Intel FW download error
+ recovery
+Thread-Index: AQHVeByz5G7aeryI2k2IHljkeYMMgqdZqq/w
+Date:   Mon, 14 Oct 2019 05:35:04 +0000
+Message-ID: <EFE6F46E14A5F445949D76A8CAC2240058458264@PGSMSX105.gar.corp.intel.com>
+References: <1569908947-10516-1-git-send-email-amit.k.bag@intel.com>
+In-Reply-To: <1569908947-10516-1-git-send-email-amit.k.bag@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMWY2NDFiZTQtNGNmNy00NjU1LTkzZDItMzRlNGIxZTQ0NmYzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZmpyWkNFaUNEd2JZY2daS0FnT1NNaStLSG4rXC9Va0hqbUdNS2oxOHp2dDVTQ1wvcmZxZmNlalhZVHF1ODZQckJlIn0=
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [172.30.20.205]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=60824
+> Sometimes during FW data download stage, in case of an error is encountered the controller device could not be recovered. To recover from such failures send Intel hard Reset to re-trigger FW download in following error scenarios:
+> 
+> 1. Intel Read version command error
+> 2. Firmware download timeout
+> 3. Failure in Intel Soft Reset for switching to operational FW 4. Boot timeout for switching to operaional FW
+>
+> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> ---
+> drivers/bluetooth/btintel.c | 39 +++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btintel.h |  6 ++++++
+> drivers/bluetooth/btusb.c   | 20 ++++++++++++++++----
+> 3 files changed, 61 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c index bb99c8653aab..0154764ebdf8 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -709,6 +709,45 @@ int btintel_download_firmware(struct hci_dev *hdev, const struct firmware *fw,  }  EXPORT_SYMBOL_GPL(btintel_download_firmware);
+> 
+> +void btintel_reset_to_bootloader(struct hci_dev *hdev) {
+> +	/* Send Intel Reset command. This will result in
+> +	 * re-enumeration of BT controller.
+> +	 *
+> +	 * Intel Reset parameter description:
+> +	 * reset_param[0] => reset_type : 0x01 (Hard reset),
+> +					  0x00 (Soft reset)
+> +	 * reset_param[1] => patch_enable : 0x01 (Enable),
+> +	 *				    0x00 (Do not enable)
+> +	 * reset_param[2] => ddc_reload : 0x01 (Reload),
+> +	 *				  0x00 (Do not reload)
+> +	 * reset_param[3] => boot_option: 0x00 (Current image),
+> +					  0x01 (Specified boot address)
+> +	 * reset_param[4] to reset_param[7] => Boot address
+> +	 *
+> +	 */
+> +	static const u8 reset_param[] = { 0x01, 0x01, 0x01, 0x00,
+> +					0x00, 0x00, 0x00, 0x00 };
+> +	struct sk_buff *skb;
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param),
+> +			     reset_param, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
+> +			   PTR_ERR(skb));
+> +		return;
+> +	}
+> +	bt_dev_info(hdev, "Intel reset sent to retry FW download");
+> +	kfree_skb(skb);
+> +	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
+> +	 * lines for 2ms when it receives Intel Reset in bootloader mode.
+> +	 * Whereas, the upcoming Intel BT controllers will hold USB reset
+> +	 * for 150ms. To keep the delay generic, 150ms is chosen here.
+> +	 */
+> +	msleep(150);
+> +}
+> +EXPORT_SYMBOL_GPL(btintel_reset_to_bootloader);
+> +
+> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");  MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);  MODULE_VERSION(VERSION); diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h index 3d846190f2bf..d2311156f778 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -87,6 +87,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
+> 			     struct intel_boot_params *params);  int btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
+> 			      u32 *boot_param);
+> +void btintel_reset_to_bootloader(struct hci_dev *hdev);
+> #else
+> 
+> static inline int btintel_check_bdaddr(struct hci_dev *hdev) @@ -181,4 +182,9 @@ static inline int btintel_download_firmware(struct hci_dev *dev,  {
+> 	return -EOPNOTSUPP;
+> }
+> +
+> +static inline void btintel_reset_to_bootloader(struct hci_dev *hdev) {
+> +	return -EOPNOTSUPP;
+> +}
+> #endif
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c index 5d7bc3410104..47178af7f7fe 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1846,8 +1846,11 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+> 	 * firmware variant, revision and build number.
+> 	 */
+> 	err = btintel_read_version(hdev, &ver);
+> -	if (err)
+> +	if (err) {
+> +		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
+> +		btintel_reset_to_bootloader(hdev);
+> 		return err;
+> +	}
+> 
+> 	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
+> 		    ver.hw_platform, ver.hw_variant, ver.hw_revision, @@ -2326,9 +2329,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 
+> 	/* Start firmware downloading and get boot parameter */
+> 	err = btintel_download_firmware(hdev, fw, &boot_param);
+> -	if (err < 0)
+> +	if (err < 0) {
+> +		/* When FW download fails, send Intel Reset to retry
+> +		 * FW download.
+> +		 */
+> +		btintel_reset_to_bootloader(hdev);
+> 		goto done;
+> -
+> +	}
+> 	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
+> 
+> 	bt_dev_info(hdev, "Waiting for firmware download to complete"); @@ -2355,6 +2362,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 	if (err) {
+> 		bt_dev_err(hdev, "Firmware loading timeout");
+> 		err = -ETIMEDOUT;
+> +		btintel_reset_to_bootloader(hdev);
+> 		goto done;
+> 	}
+> 
+> @@ -2381,8 +2389,11 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 	set_bit(BTUSB_BOOTING, &data->flags);
+> 
+> 	err = btintel_send_intel_reset(hdev, boot_param);
+> -	if (err)
+> +	if (err) {
+> +		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
+> +		btintel_reset_to_bootloader(hdev);
+> 		return err;
+> +	}
+> 
+> 	/* The bootloader will not indicate when the device is ready. This
+> 	 * is done by the operational firmware sending bootup notification.
+> @@ -2404,6 +2415,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 
+> 	if (err) {
+> 		bt_dev_err(hdev, "Device boot timeout");
+> +		btintel_reset_to_bootloader(hdev);
+> 		return -ETIMEDOUT;
+> 	}
 
---- Comment #41 from Fernando Carvalho (pires.carvalho@gmail.com) ---
-Created attachment 285489
-  --> https://bugzilla.kernel.org/attachment.cgi?id=285489&action=edit
-btusb.c: Module parameter to control multiple fixup
-
-(In reply to Sergey Kondakov from comment #39)
-> ...
-> their own. A more reasonable approach would be passing
-> model=vendorID:productID:<"model"> space-separated (to allow several
-> dongles) override pairs with each having a bunch of quirk-hacks associated
-> (as snd-hda-intel) on it, quirks=vendorID:productID:<comma separated list of
-> all quirks> space-separated pairs (as usbcore/usbhid) or both.
-> ...
-
-Hi,
-
-Yes, the feedback I had from the list was similar (my bad for following after
-the existing code :).
-Your suggestion was the most constructive though, so I implemented it that way.
-I'm uploading the patch that I'm using to play around with the fixups.
-I'm still trying to find out the best combination for my adapter and it may be
-useful to others in the same quest.
-
-PS: The syntax is a bit different from above:
-Syntax:
-fixups=<force_hex>[:<disable_hex>[:<vendor_hex>[:<model_hex>[:<bcdDevice>]]]]"
-PPS: Maybe I'll try a new upstream patch if/when I solve some instability it
-still has.
-
-Thanks.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Anything pending on this patch to be merged. 
