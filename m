@@ -2,147 +2,133 @@ Return-Path: <SRS0=NoyY=YH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 040A5C4CECE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Oct 2019 10:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FAFFC4CECE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Oct 2019 11:07:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCF0F2084B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Oct 2019 10:15:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 038FD20650
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Oct 2019 11:07:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="AY93KN0Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3CI/4Ol"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731268AbfJNKPf (ORCPT
+        id S1731709AbfJNLHI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Oct 2019 06:15:35 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:40020 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730860AbfJNKPf (ORCPT
+        Mon, 14 Oct 2019 07:07:08 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39712 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731503AbfJNLHI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Oct 2019 06:15:35 -0400
-Received: by mail-lj1-f194.google.com with SMTP id 7so16040415ljw.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2019 03:15:33 -0700 (PDT)
+        Mon, 14 Oct 2019 07:07:08 -0400
+Received: by mail-wr1-f65.google.com with SMTP id r3so19213530wrj.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2019 04:07:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:organization:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3INgyaKWPjZBty9lV+1mTdUe1+dH6YK0zgr3wXWgOjE=;
-        b=AY93KN0Zh/Bd7gaMIS0x3ZHvVGRbI5iCC3vF4kN3mXyeKrG/073cuVsDWctonoVPB8
-         W+XLWwCUEmXeHCATARQY5ZSd0v0eO6c2D91bQJMzA92QYQdvv0+UTlT6CQN5+eA6xX0V
-         c8K6m+XRPfysFkBLPb80P62q4V8nkb0a8/IkShc50cDikRiSLSk2FdYFwEzaw7GPXVbU
-         ICp5c6DRU5SgSzYEPAam5/xMn0xCekGJsFqBoy7PjhVBifcZIB83OUe0N9VeDG1BIe9y
-         eEk+xu6k21UCFuSE/HwB8LDbXSVl/HcPeHtLJmF1ryNKK5n0sJlmRH/PfocI2HeMRYAh
-         FzWg==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=tGfbOid9EFvh2WMLq4KJcM6T/F58R9dKwC7u9IWJS4s=;
+        b=l3CI/4Olwdw2C5NUUl6OuFF3A59eij7gDutldu5Z5U2VgeTXryzqzlhUuVceXr4PlV
+         KgqM3lf3N9lzv6z92C5PAVVTwqyULLFFcE2puq7RD44E2R8mzEe3xe+B31HXfDbM+zvw
+         fGVt6JzeEripZqAv4b8M8ijRcXManluPb13PtYM7kOMaY8vh8gFYjTtkuDBDebx3EOln
+         kZVUlUZClQVZ+aNrMY/2SjHvv7OlHDBXPOXbGsps8dPNmO3UnbzN0PlH1OebhhRK8oP2
+         uLti2QkN3kUHe/hlcedIov4DPsQajVuEM3DrgiFozR9uwOAcJOWpaQLDBmGUoUU2LL4J
+         nr3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=3INgyaKWPjZBty9lV+1mTdUe1+dH6YK0zgr3wXWgOjE=;
-        b=RDnHBLy7FQeP/YOCqsmz4Q6ahBAqKAYSGfwDytCXaxjuxG7F57YIlOTcF+g79kvOyE
-         d5Xc8AWFEqSI3hcrAi3/Y6r3hEvv7JU8Vw8cRn/UKeigyjLS9IQnOo5JBimHkb52xETV
-         S9K51/tri2doWdVREbYXf9Uf2MEtY7mL42TfXB9o8Zh9AnIHJYgpdnhvcA8g/63BtZiA
-         V1MHRXk+uDCOOfmKNwDY+2jtO6jahTbIvnrAkCqVQAWJZZAlqmPO4wTZQ9ZaIUCtcwRp
-         MmqqlKaQIlLkZRvqkM5IEfQft4d9t4PLWCSHZYrtQCLzg7D7phsUOCr2ggsix/IKqxWq
-         vgcg==
-X-Gm-Message-State: APjAAAUGagKh5OxB6Y/4ovHusQVk+3P3VUsyqMCSHGyyz5a9FmnaUwXy
-        ZsSSyBPtZf/zwVDmJPUeES5nwMY8Fl8=
-X-Google-Smtp-Source: APXvYqyZSemRr+WPlUjWVviliOgVI9u3gFOytlNWLSExTSem8kCSHKumNvNQ60qfsIBDTTu4QhgG9w==
-X-Received: by 2002:a2e:286:: with SMTP id y6mr18703765lje.184.1571048132746;
-        Mon, 14 Oct 2019 03:15:32 -0700 (PDT)
-Received: from ix.localnet ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id i6sm4082323lfc.37.2019.10.14.03.15.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2019 03:15:32 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: Re: [PATCH V3 1/3] monitor: Extract TTY data processing to separate function
-Date:   Mon, 14 Oct 2019 12:15:30 +0200
-Message-ID: <1584729.7OtKVoQiSF@ix>
-Organization: CODECOUP
-In-Reply-To: <20191004054334.5479-1-szymon.janc@codecoup.pl>
-References: <20191004054334.5479-1-szymon.janc@codecoup.pl>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=tGfbOid9EFvh2WMLq4KJcM6T/F58R9dKwC7u9IWJS4s=;
+        b=ufh4cXno4LEZ76k1IeN5xxpOHX51WEUD0pj2R+I2vrZ5zrTe026WZ+ajgny8N/6Nrm
+         /YfmVFX84/eMt5AelTG2sfppAWhJUWL8TKkNNpKvfA6dxveMory6QopWnqBKuvhgWX24
+         byGDkFvaGYeXsXfE1bYxmikuV2Niz0+O5K1wajRwO8tdgeQbo13nhTpIUTwCF0LLIAMF
+         0XeB6mmNRcdAQnGDB7SYtg6CeLr/VYwWUoCCxMdbK33tlEVOhjg9Yt+vvqo2/yvX5Hc7
+         TDAGsFv3jIhddxj8/ISfLlIn0sGxXisLfJKGbRpd+LK/c7PZzp8VOvlvc8EPAim3MDdJ
+         GMTg==
+X-Gm-Message-State: APjAAAWv3eRhHoOOG3U+s/+ZO9+XCceEu3F1b/iWMHS76wuycnRPcLZn
+        D28BTkyZbE7Rt05LF+2jEX4=
+X-Google-Smtp-Source: APXvYqzoXq357NMdB8C5IuBYyB0q7ogiw6r6EdPJzc4kzzgGV+A79r+ANDjI0nbeg7IoJExebBPZ+A==
+X-Received: by 2002:a05:6000:44:: with SMTP id k4mr26711124wrx.121.1571051226288;
+        Mon, 14 Oct 2019 04:07:06 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id c4sm18975886wru.31.2019.10.14.04.07.05
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 14 Oct 2019 04:07:05 -0700 (PDT)
+Date:   Mon, 14 Oct 2019 13:07:04 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Is BT_VOICE_TRANSPARENT correctly defined?
+Message-ID: <20191014110704.l4xbyxrb2dgnk6jq@pali>
+References: <20190519101854.2ygwxeqbixappks4@pali>
+ <20190607125916.wswblh5nxrx7hapm@pali>
+ <CABBYNZ+JPvvk1eACkp+cM9MtDZq+M78QLAtFcq-qrhR+8DsjnA@mail.gmail.com>
+ <20190607152915.5m2z3gwvlkivr3ms@pali>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190607152915.5m2z3gwvlkivr3ms@pali>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Friday, 4 October 2019 07:43:32 CEST Szymon Janc wrote:
-> From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+On Friday 07 June 2019 17:29:15 Pali Rohár wrote:
+> On Friday 07 June 2019 18:03:50 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> > 
+> > On Fri, Jun 7, 2019 at 4:43 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > >
+> > > On Sunday 19 May 2019 12:18:54 Pali Rohár wrote:
+> > > > Hello!
+> > > >
+> > > > Now I'm looking at BT_VOICE_TRANSPARENT definition which comes from file
+> > > > include/net/bluetooth/bluetooth.h and it has value 0x0003. It is really
+> > > > correct? Because it means following format:
+> > > >
+> > > >   Linear Coding, 8-bit without padding bits, 1's complement
+> > > >
+> > > > I think that usage of 1's complement is not easy as there is no C type
+> > > > which matches it. Should not it be 2's complement or rather Unsigned
+> > > > type?
+> > > >
+> > > > Seems that main usage of BT_VOICE_TRANSPARENT is mSBC codec and I doubt
+> > > > that it uses 1's complement signed format (specially as it should be
+> > > > modification of SBC codec which encode bytes as unsigned type).
+> > > >
+> > > > There is another define BT_VOICE_CVSD_16BIT with value 0x0060 which
+> > > > seems to be correct as it means Linear Coding, 16-bit without padding
+> > > > bits, 2's complement and encoded by CVSD codec.
+> > >
+> > > Hello, can somebody look at this BT_VOICE_TRANSPARENT definition and
+> > > verify that it really should be defined as unsigned or 2's complement?
+> > 
+> > Are you talking about these:
+> > 
+> > https://elixir.bootlin.com/linux/latest/source/include/net/bluetooth/bluetooth.h#L119
 > 
-> ---
->  monitor/control.c | 37 +++++++++++++++++++++----------------
->  1 file changed, 21 insertions(+), 16 deletions(-)
+> Yes, exactly.
 > 
-> diff --git a/monitor/control.c b/monitor/control.c
-> index 39a413be1..4022e7644 100644
-> --- a/monitor/control.c
-> +++ b/monitor/control.c
-> @@ -1300,23 +1300,8 @@ static bool tty_parse_header(uint8_t *hdr, uint8_t
-> len, struct timeval **tv, return true;
->  }
+> > Which is used in ofono:
+> > 
+> > https://github.com/DynamicDevices/ofono/blob/master/src/handsfree-audio.c#L93
+> > 
+> > Afaik these values work as intended with mSBC/WBS.
 > 
-> -static void tty_callback(int fd, uint32_t events, void *user_data)
-> +static void process_data(struct control_data *data)
->  {
-> -	struct control_data *data = user_data;
-> -	ssize_t len;
-> -
-> -	if (events & (EPOLLERR | EPOLLHUP)) {
-> -		mainloop_remove_fd(data->fd);
-> -		return;
-> -	}
-> -
-> -	len = read(data->fd, data->buf + data->offset,
-> -					sizeof(data->buf) - data-
->offset);
-> -	if (len < 0)
-> -		return;
-> -
-> -	data->offset += len;
-> -
->  	while (data->offset >= sizeof(struct tty_hdr)) {
->  		struct tty_hdr *hdr = (struct tty_hdr *) data->buf;
->  		uint16_t pktlen, opcode, data_len;
-> @@ -1358,6 +1343,26 @@ static void tty_callback(int fd, uint32_t events,
-> void *user_data) }
->  }
-> 
-> +static void tty_callback(int fd, uint32_t events, void *user_data)
-> +{
-> +	struct control_data *data = user_data;
-> +	ssize_t len;
-> +
-> +	if (events & (EPOLLERR | EPOLLHUP)) {
-> +		mainloop_remove_fd(data->fd);
-> +		return;
-> +	}
-> +
-> +	len = read(data->fd, data->buf + data->offset,
-> +					sizeof(data->buf) - data-
->offset);
-> +	if (len < 0)
-> +		return;
-> +
-> +	data->offset += len;
-> +
-> +	process_data(data);
-> +}
-> +
->  int control_tty(const char *path, unsigned int speed)
->  {
->  	struct control_data *data;
+> And I suspect that definition is wrong. mSBC does not use 1's complement
+> format.
 
-
-Applied.
+Any comments on this? Could either somebody confirm or not if current
+defined constant BT_VOICE_TRANSPARENT is correct? In previous emails I
+wrote why I think it is defined incorrectly...
 
 -- 
-pozdrawiam
-Szymon Janc
-
-
+Pali Rohár
+pali.rohar@gmail.com
