@@ -2,76 +2,143 @@ Return-Path: <SRS0=8ZYm=YJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E22DDECE599
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73B9FA372B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:27:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C2CD020854
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:17:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCC8B2064B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:27:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390783AbfJPTR5 convert rfc822-to-8bit (ORCPT
+        id S2406555AbfJPT12 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Oct 2019 15:17:57 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41098 "EHLO
+        Wed, 16 Oct 2019 15:27:28 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50892 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726898AbfJPTR5 (ORCPT
+        with ESMTP id S1727282AbfJPT12 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Oct 2019 15:17:57 -0400
-Received: from surfer-172-29-2-69-hotspot.internet-for-guests.com (p2E5701B0.dip0.t-ipconnect.de [46.87.1.176])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E0E71CECDE;
-        Wed, 16 Oct 2019 21:26:53 +0200 (CEST)
+        Wed, 16 Oct 2019 15:27:28 -0400
+Received: from surfer-172-29-2-69-hotspot.internet-for-guests.com (p578ac27a.dip0.t-ipconnect.de [87.138.194.122])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 655A2CECDE;
+        Wed, 16 Oct 2019 21:36:24 +0200 (CEST)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
-Subject: Re: [PATCH] Bluetooth: Workaround hd directed advertising bug in
- Broadcom controllers
+Subject: Re: [PATCH] Bluetooth: hci_core: fix init with
+ HCI_QUIRK_NON_PERSISTENT_SETUP
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191002122243.31519-1-szymon.janc@codecoup.pl>
-Date:   Wed, 16 Oct 2019 21:17:54 +0200
-Cc:     linux-bluetooth@vger.kernel.org,
-        =?utf-8?Q?S=C3=B6ren_Beye?= <linux@hypfer.de>
+In-Reply-To: <20191004000933.24575-1-mkorpershoek@baylibre.com>
+Date:   Wed, 16 Oct 2019 21:27:25 +0200
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <6C0D0A41-21F4-45CF-B21C-ED9A46A989C6@holtmann.org>
-References: <20191002122243.31519-1-szymon.janc@codecoup.pl>
-To:     Szymon Janc <szymon.janc@codecoup.pl>
+Message-Id: <474814D3-A97F-48D1-8268-3D200BE60795@holtmann.org>
+References: <20191004000933.24575-1-mkorpershoek@baylibre.com>
+To:     Mattijs Korpershoek <mkorpershoek@baylibre.com>
 X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Szymon,
+Hi Mattijs,
 
-> It appears that some Broadcom controllers (eg BCM20702A0) reject LE Set
-> Advertising Parameters command if advertising intervals provided are not
-> within range for undirected and low duty directed advertising.
+> Some HCI devices which have the HCI_QUIRK_NON_PERSISTENT_SETUP [1]
+> require a call to setup() to be ran after every open().
 > 
-> Workaround this bug by populating min and max intervals with 'valid'
-> values.
+> During the setup() stage, these devices expect the chip to acknowledge
+> its setup() completion via vendor specific frames.
 > 
-> < HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15                                                                                                                                                                                                                                      #75 [hci0] 29.155775
->        Min advertising interval: 0.000 msec (0x0000)
->        Max advertising interval: 0.000 msec (0x0000)
->        Type: Connectable directed - ADV_DIRECT_IND (high duty cycle) (0x01)
->        Own address type: Public (0x00)
->        Direct address type: Random (0x01)
->        Direct address: E2:F0:7B:9F:DC:F4 (Static)
->        Channel map: 37, 38, 39 (0x07)
->        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                                                                                                                                                                                                                                                             #76 [hci0] 29.156745
->      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
->        Status: Invalid HCI Command Parameters (0x12)
+> If userspace opens() such HCI device in HCI_USER_CHANNEL [2] mode,
+> the vendor specific frames are never tranmitted to the driver, as
+> they are filtered in hci_rx_work().
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
-> Tested-by: Sören Beye <linux@hypfer.de>
+> Allow HCI devices which have HCI_QUIRK_NON_PERSISTENT_SETUP to process
+> frames if the HCI device is is HCI_INIT state.
+> 
+> [1] https://lore.kernel.org/patchwork/patch/965071/
+> [2] https://www.spinics.net/lists/linux-bluetooth/msg37345.html
+> 
+> Fixes: 740011cfe948 ("Bluetooth: Add new quirk for non-persistent setup settings")
+> Signed-off-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
 > ---
-> net/bluetooth/hci_conn.c | 8 ++++++++
-> 1 file changed, 8 insertions(+)
+> Some more background on the change follows:
+> 
+> The Android bluetooth stack (Bluedroid) also has a HAL implementation
+> which follows Linux's standard rfkill interface [1].
+> 
+> This implementation relies on the HCI_CHANNEL_USER feature to get
+> exclusive access to the underlying bluetooth device.
+> 
+> When testing this along with the btkmtksdio driver, the
+> chip appeared unresponsive when calling the following from userspace:
+> 
+>    struct sockaddr_hci addr;
+>    int fd;
+> 
+>    fd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+> 
+>    memset(&addr, 0, sizeof(addr));
+>    addr.hci_family = AF_BLUETOOTH;
+>    addr.hci_dev = 0;
+>    addr.hci_channel = HCI_CHANNEL_USER;
+> 
+>    bind(fd, (struct sockaddr *) &addr, sizeof(addr)); # device hangs
+> 
+> In the case of bluetooth drivers exposing QUIRK_NON_PERSISTENT_SETUP
+> such as btmtksdio, setup() is called each multiple times.
+> In particular, when userspace calls bind(), the setup() is called again
+> and vendor specific commands might be send to re-initialize the chip.
+> 
+> Those commands are filtered out by hci_core in HCI_CHANNEL_USER mode,
+> preventing setup() from completing successfully.
+> 
+> This has been tested on a 4.19 kernel based on Android Common Kernel.
+> It has also been compile tested on bluetooth-next.
+> 
+> [1] https://android.googlesource.com/platform/system/bt/+/refs/heads/master/vendor_libs/linux/interface/
+> 
+> net/bluetooth/hci_core.c | 15 +++++++++++++--
+> 1 file changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 04bc79359a17..5f12e8574d54 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -4440,9 +4440,20 @@ static void hci_rx_work(struct work_struct *work)
+> 			hci_send_to_sock(hdev, skb);
+> 		}
+> 
+> +		/* If the device has been opened in HCI_USER_CHANNEL,
+> +		 * the userspace has exclusive access to device.
+> +		 * When HCI_QUIRK_NON_PERSISTENT_SETUP is set and
+> +		 * device is HCI_INIT,  we still need to process
+> +		 * the data packets to the driver in order
+> +		 * to complete its setup().
+> +		 */
+> 		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> -			kfree_skb(skb);
+> -			continue;
+> +			if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
+> +				      &hdev->quirks) ||
+> +			    !test_bit(HCI_INIT, &hdev->flags)) {
+> +				kfree_skb(skb);
+> +				continue;
+> +			}
+> 		}
 
-patch has been applied to bluetooth-next tree.
+	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+	    !test_bit(HCI_INIT, &hdev->flags)) {
+		kfree_skb(skb);
+		continue;
+	}
+
+Wouldn’t it be enough to just add a check for HCI_INIT to this. I mean it makes no difference if ->setup is repeated on each device open or not. We want to process event during HCI_INIT when in user channel mode.
 
 Regards
 
