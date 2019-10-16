@@ -2,133 +2,168 @@ Return-Path: <SRS0=8ZYm=YJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39CCFA3728
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 12:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D71FA372A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 16:19:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94EE121848
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 12:20:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C501C2168B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 16:19:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="Lryg5TbK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UXaaodg3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405189AbfJPMUb (ORCPT
+        id S2393752AbfJPQTO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Oct 2019 08:20:31 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:41531 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405187AbfJPMU2 (ORCPT
+        Wed, 16 Oct 2019 12:19:14 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:34890 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727154AbfJPQTN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Oct 2019 08:20:28 -0400
-Received: by mail-wr1-f65.google.com with SMTP id p4so11930660wrm.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2019 05:20:27 -0700 (PDT)
+        Wed, 16 Oct 2019 12:19:13 -0400
+Received: by mail-io1-f66.google.com with SMTP id q10so54685545iop.2;
+        Wed, 16 Oct 2019 09:19:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=dmrMhgpUSf60d5nh3MAEGQy/4z6O1wG97cbLuW1Vm/Q=;
-        b=Lryg5TbKNuFD1H9KnYSEFIXh7TPiZG5JT6QcacCuclZQ7ucsqtGD2RjLXMfRQNQn11
-         4H8eWrGeyw6gS2x8zrZV2LRijZHZHDiWAS/WnxWrN5PilX42PAZxtYhpJffHaZ93Q0Xb
-         5yV952iEPXu5/aHNYguUVK3s07QjWaKL860yK9MwH+R94+/TR/9tWxOOY1gav0+m4s/U
-         lvNZoW05LWMCbBwqgknxmY8ZP4NZTlosLfG3f18WVt4LJYwYzJNr0WPoF+YeGPyAH+RQ
-         aNAel85fvckPLTBuXDBW0+kffLA1BAfpPJuw4dw1Cg57p4zBtdSOr4WtIQnK3hTn9zNn
-         y1oA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h32JWLot+gceae0jQn6+dpZ85M9IjTbgfAQ5j4grnTA=;
+        b=UXaaodg3AFzS4aSYdIEd36mhiJEN7vilHRmzWu5tZGMnYleV6eUDOKw4ScHHm1iIo9
+         YhV+fJpyY2lM/ApsjxfbQ41c7Bh9SxHYRzYZybNuFE9tB4D2sCUT+OXc65qbawa6rr/n
+         UV8HHfghrJBRDgHhKSJ3A61llDuxCoCn9IgMl7xXWVb8AolKDi2B4N8vtlQWM6vmdSWO
+         aO7204bSLfoLbtIynHam5CXwCUJyWj0od89S5T3cW5nCJXMS4PrhQWg0FWc4mXmcubY2
+         mjW03XFhU3DSsP1EykwtCvouoektuZJhxOghw3m91RHSQ5XqnKKSGrj9B456LWjHdq5c
+         Zdww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=dmrMhgpUSf60d5nh3MAEGQy/4z6O1wG97cbLuW1Vm/Q=;
-        b=KtUpMvZwJeR31QeNzyZ6Yhp/OnZBHfz8TnLQkBmeYgC8wMNWYdmqYavxchRYfqNXWu
-         MYPnbUr3NRLWgz9qSoZMyyNSp5knKc+sTOsWoGqrFPfQkVM8qnOdrbqpZ1ZFxEfQL3tR
-         5TpPA73ZINtoatQv2gFQTbbKJLyTvfAN6iu36+Zm/tvSO04e+GURxb0EouNcR7rhR40e
-         8gtIB/xzELy+vdTd8B5pYqQgTmM0pTbRiLncy4CzA5rGNUmBj7VfKoH7i/1pIhUGrDnz
-         KpsFCUD3TAw52MEkWx0vRtjnOt0BNka1uxUqcDRTTqKbnYqKZMRHd7yefNqDbZOJCtI5
-         Rbjw==
-X-Gm-Message-State: APjAAAUfOBZw4DBhYh85ScD658CPG9N2syhyPSkc6A7qPhkkocb5LKcb
-        xHv0tmi2noJqn8GGCrLCbbABIg==
-X-Google-Smtp-Source: APXvYqwfPRjX6bZCyWbED2wZKVclukgcm82IW4MA8rMSeU9WhVqp0vA8KEy24wGzUe87U8Bz3v5M6A==
-X-Received: by 2002:adf:e542:: with SMTP id z2mr2327859wrm.338.1571228426355;
-        Wed, 16 Oct 2019 05:20:26 -0700 (PDT)
-Received: from netronome.com (penelope-musen.rivierenbuurt.horms.nl. [2001:470:7eb3:404:c685:8ff:fe7c:9971])
-        by smtp.gmail.com with ESMTPSA id s12sm26946038wra.82.2019.10.16.05.20.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2019 05:20:25 -0700 (PDT)
-Date:   Wed, 16 Oct 2019 14:20:23 +0200
-From:   Simon Horman <simon.horman@netronome.com>
-To:     "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>
-Cc:     linux-kernel@lists.codethink.co.uk,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h32JWLot+gceae0jQn6+dpZ85M9IjTbgfAQ5j4grnTA=;
+        b=ZxZHHMW7OZpKHw4V/0SxIsPRIehy9RkD+jHaYPnYmJuD/PChkj5Fsnk0OnIPP9tRVQ
+         H1o9PtjVVye7Z59Wty+IASEptM0LXbaCIO93PhZrOL4kJ/CEzxKzdWKdsS9aAkm6vowS
+         lI56/WqXuCsO4lKrlG8RcKoOOZVfRO4MrUXI+ru1Dbvdhu7snqBhhsKixQGk51hHlZlI
+         2/sICrAFbqvkWz17wVhO+MnpKKP9zJECUjb3Ew+ukm4yiP5CHuKWsz7aY9APKh4w0BNW
+         fcCEENdVPEdgjihB5mzRPb5UgwIOMoIXIzJCwuXqYhsNG4qllUnqBmZujwAgWHG0GmNc
+         qRxQ==
+X-Gm-Message-State: APjAAAU1mMg0yynMQd9OSz56Q1RhCy1fEQVwjk1sw/nDUekLnXHDhm+E
+        owTWldsdcuL8dlNI1ovYn7svnPf824bj8pOYdwI=
+X-Google-Smtp-Source: APXvYqyhl5iUSYWpUQKJhr3nSoqeJuYCD1HiKNf1oQRQxqz8oX8fx+54lB4kBMH1RO7fz+6Vb8PFFolkd/cH6Qoz2Ps=
+X-Received: by 2002:a05:6638:632:: with SMTP id h18mr31488191jar.55.1571242752159;
+ Wed, 16 Oct 2019 09:19:12 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191002114626.12407-1-aford173@gmail.com> <20191002203149.g22igmfndbve7m3n@earth.universe>
+In-Reply-To: <20191002203149.g22igmfndbve7m3n@earth.universe>
+From:   Adam Ford <aford173@gmail.com>
+Date:   Wed, 16 Oct 2019 11:19:00 -0500
+Message-ID: <CAHCN7xK2MFJbZkjaboDnfHJa4SgGMc7CL3+ZUL4UBCFV00W9+g@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: hci_ll: set operational frequency earlier"
+To:     Sebastian Reichel <sre@kernel.org>
+Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] RFC: Bluetooth: missed cpu_to_le16 conversion in
- hci_init4_req
-Message-ID: <20191016122022.kz4xzx4hzmtuoh5l@netronome.com>
-References: <20191016113943.19256-1-ben.dooks@codethink.co.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191016113943.19256-1-ben.dooks@codethink.co.uk>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Adam Ford <adam.ford@logicpd.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 12:39:43PM +0100, Ben Dooks (Codethink) wrote:
-> It looks like in hci_init4_req() the request is being
-> initialised from cpu-endian data but the packet is specified
-> to be little-endian. This causes an warning from sparse due
-> to __le16 to u16 conversion.
-> 
-> Fix this by using cpu_to_le16() on the two fields in the packet.
-> 
-> net/bluetooth/hci_core.c:845:27: warning: incorrect type in assignment (different base types)
-> net/bluetooth/hci_core.c:845:27:    expected restricted __le16 [usertype] tx_len
-> net/bluetooth/hci_core.c:845:27:    got unsigned short [usertype] le_max_tx_len
-> net/bluetooth/hci_core.c:846:28: warning: incorrect type in assignment (different base types)
-> net/bluetooth/hci_core.c:846:28:    expected restricted __le16 [usertype] tx_time
-> net/bluetooth/hci_core.c:846:28:    got unsigned short [usertype] le_max_tx_time
-> 
-> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
-> ---
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  net/bluetooth/hci_core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 04bc79359a17..b2559d4bed81 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -842,8 +842,8 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
->  	if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) {
->  		struct hci_cp_le_write_def_data_len cp;
->  
-> -		cp.tx_len = hdev->le_max_tx_len;
-> -		cp.tx_time = hdev->le_max_tx_time;
-> +		cp.tx_len = cpu_to_le16(hdev->le_max_tx_len);
-> +		cp.tx_time = cpu_to_le16(hdev->le_max_tx_time);
+On Wed, Oct 2, 2019 at 3:31 PM Sebastian Reichel <sre@kernel.org> wrote:
+>
+> Hi,
+>
+> On Wed, Oct 02, 2019 at 06:46:26AM -0500, Adam Ford wrote:
+> > As nice as it would be to update firmware faster, that patch broke
+> > at least two different boards, an OMAP4+WL1285 based Motorola Droid
+> > 4, as reported by Sebasian Reichel and the Logic PD i.MX6Q +
+> > WL1837MOD.
+> >
+> > This reverts commit a2e02f38eff84f199c8e32359eb213f81f270047.
+> >
+> > Signed-off-by: Adam Ford <aford173@gmail.com>
+>
+> Acked-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+>
+> This should be backported stable
 
-I would suggest that the naming of the le_ fields of struct hci_dev
-implies that the values stored in those fields should be little endian
-(but those that are more than bone byte wide are not).
+Is there any chance of this getting picked up for the 5.4 kernel?
+It's been a couple weeks, and I haven't seen any responses beyond
+Sebastian's Ack and request for backport.
 
-In any case, the question arises as to if this has ever worked on big
-endian machines.
+adam
 
->  		hci_req_add(req, HCI_OP_LE_WRITE_DEF_DATA_LEN, sizeof(cp), &cp);
->  	}
->  
-> -- 
-> 2.23.0
-> 
+>
+> -- Sebastian
+>
+> > diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+> > index 285706618f8a..d9a4c6c691e0 100644
+> > --- a/drivers/bluetooth/hci_ll.c
+> > +++ b/drivers/bluetooth/hci_ll.c
+> > @@ -621,13 +621,6 @@ static int ll_setup(struct hci_uart *hu)
+> >
+> >       serdev_device_set_flow_control(serdev, true);
+> >
+> > -     if (hu->oper_speed)
+> > -             speed = hu->oper_speed;
+> > -     else if (hu->proto->oper_speed)
+> > -             speed = hu->proto->oper_speed;
+> > -     else
+> > -             speed = 0;
+> > -
+> >       do {
+> >               /* Reset the Bluetooth device */
+> >               gpiod_set_value_cansleep(lldev->enable_gpio, 0);
+> > @@ -639,20 +632,6 @@ static int ll_setup(struct hci_uart *hu)
+> >                       return err;
+> >               }
+> >
+> > -             if (speed) {
+> > -                     __le32 speed_le = cpu_to_le32(speed);
+> > -                     struct sk_buff *skb;
+> > -
+> > -                     skb = __hci_cmd_sync(hu->hdev,
+> > -                                          HCI_VS_UPDATE_UART_HCI_BAUDRATE,
+> > -                                          sizeof(speed_le), &speed_le,
+> > -                                          HCI_INIT_TIMEOUT);
+> > -                     if (!IS_ERR(skb)) {
+> > -                             kfree_skb(skb);
+> > -                             serdev_device_set_baudrate(serdev, speed);
+> > -                     }
+> > -             }
+> > -
+> >               err = download_firmware(lldev);
+> >               if (!err)
+> >                       break;
+> > @@ -677,7 +656,25 @@ static int ll_setup(struct hci_uart *hu)
+> >       }
+> >
+> >       /* Operational speed if any */
+> > +     if (hu->oper_speed)
+> > +             speed = hu->oper_speed;
+> > +     else if (hu->proto->oper_speed)
+> > +             speed = hu->proto->oper_speed;
+> > +     else
+> > +             speed = 0;
+> > +
+> > +     if (speed) {
+> > +             __le32 speed_le = cpu_to_le32(speed);
+> > +             struct sk_buff *skb;
+> >
+> > +             skb = __hci_cmd_sync(hu->hdev, HCI_VS_UPDATE_UART_HCI_BAUDRATE,
+> > +                                  sizeof(speed_le), &speed_le,
+> > +                                  HCI_INIT_TIMEOUT);
+> > +             if (!IS_ERR(skb)) {
+> > +                     kfree_skb(skb);
+> > +                     serdev_device_set_baudrate(serdev, speed);
+> > +             }
+> > +     }
+> >
+> >       return 0;
+> >  }
+> > --
+> > 2.17.1
+> >
