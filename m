@@ -2,187 +2,240 @@ Return-Path: <SRS0=8ZYm=YJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E94FA372A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 853D0FA372A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:13:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B574222BE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 538EE20854
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:13:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uwc4jY2c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436683AbfJPTI6 convert rfc822-to-8bit (ORCPT
+        id S2390908AbfJPTNs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Oct 2019 15:08:58 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:35649 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730057AbfJPTI6 (ORCPT
+        Wed, 16 Oct 2019 15:13:48 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40205 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731321AbfJPTNs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Oct 2019 15:08:58 -0400
-Received: from surfer-172-29-2-69-hotspot.internet-for-guests.com (p2E5701B0.dip0.t-ipconnect.de [46.87.1.176])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7AFD9CECDD;
-        Wed, 16 Oct 2019 21:17:54 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
-Subject: Re: Kernel Bluetooth Protocol Stack Problem
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACokStd64AUce4_2swgB06w1BH5DJpB02zwgyxfEMw=nvwJqKQ@mail.gmail.com>
-Date:   Wed, 16 Oct 2019 21:08:55 +0200
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <C8D0046A-3303-4788-B3B4-1C88DFBE6EDB@holtmann.org>
-References: <CACokStdMboxnDPR6cdQYfpfdNApQCn73pjQZNqQ+ag0QPYZXgw@mail.gmail.com>
- <140A3914-6A0F-4E42-9858-7CDFE348C0CA@holtmann.org>
- <CACokStd_VLLP=dc+v=MZXpYF+Pw57f0Cma3-HSrXz5_PdiyRfw@mail.gmail.com>
- <D18AA174-F883-481F-B172-EB98B26E925F@holtmann.org>
- <CACokStd64AUce4_2swgB06w1BH5DJpB02zwgyxfEMw=nvwJqKQ@mail.gmail.com>
-To:     hongyi mao <maohongyicn@gmail.com>
-X-Mailer: Apple Mail (2.3594.4.19)
+        Wed, 16 Oct 2019 15:13:48 -0400
+Received: by mail-wm1-f66.google.com with SMTP id b24so3949003wmj.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2019 12:13:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=VwkACeI83Oz0cwtY9JcF7fy7xApXlsvT5t1ZIq+Bhw8=;
+        b=uwc4jY2cEgUWDbb4UqYPdPu3EpfZ/i89ZG2Ut0pICiJa9vDljpMYHbAsIBWm7ZuVsq
+         D4Ny/c4N79kAMojMijVprw9+TgOF/Uv7dxD9ZhFeArV+qms4AppxvEFRI8MMytLM834A
+         hhTTYBc9K/bD1aPH+GjVdiyYa3CGDF3E+fHOGL6mZPknuNMJch8EECAvtUsKw2I+CAeI
+         pA1/ZQ2z5wyCIw5IcBvaThq5fJsNPk6ev0s/JoZx3ASTjwmlsVtNT8+APwXigPClXHt6
+         HfmTWqJ3HyQ7GnMWzwKe9ShzfzBW7HD5k0UPwRZxITp3DHIcJOcy7PYlCp32+67JpNRf
+         6uzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=VwkACeI83Oz0cwtY9JcF7fy7xApXlsvT5t1ZIq+Bhw8=;
+        b=Bn4Oxf3JHe87GIkUJ31YLxp/hDDKjf/Zj6Jm4fe6wxUH9QntyMbtxA6EiVmeis8x/K
+         eEiVP3uB4zoWycdFyn97oxY7IKwXGhNuY3yXmbwASx6xyAt4eO0V5Evl6hLkWgDX8jGL
+         YtgcyDmtUenCMxRTCcoS3NKZb8OgNmuCVCWN7XWk7OKd6tw1ydqzLJbdwlEamWcJLUu+
+         MkFvmzYZI3SAgVyk5+nBjZVjzNeaQS7pjYUDV71TZQa95frYdlOIVYvYbIbBTUCXTFBK
+         l2oGtl2JldQVLfw39H44iP5pXnpLFUG/SSPNvhoj+jlhtLCLYwM7LqnnFVNWu/7HjW5A
+         3yLA==
+X-Gm-Message-State: APjAAAVJMp7Zn40I0E66pAwlsI9KrcHGeavwnca+jwGe4UD2qHgPk/DX
+        1zCIeN5+hk/M4rmj0A+i2jY=
+X-Google-Smtp-Source: APXvYqxnwU+o1ieiimdBfStApZ11h+OHK1e1C1DGiJJCKQTBsCqFfS2uB3H0yFPyGeAzrRdRKAb0Kg==
+X-Received: by 2002:a1c:990a:: with SMTP id b10mr4673997wme.39.1571253225871;
+        Wed, 16 Oct 2019 12:13:45 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id r140sm3857175wme.47.2019.10.16.12.13.44
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 16 Oct 2019 12:13:44 -0700 (PDT)
+Date:   Wed, 16 Oct 2019 21:13:43 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Brian Gix <brian.gix@intel.com>,
+        "iam@valdikss.org.ru" <iam@valdikss.org.ru>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Determinate EDR speed
+Message-ID: <20191016191343.clby7pmkdq3q2i7s@pali>
+References: <319f751481bbdb5aa012e5fa4daa1d95965b54c3.camel@intel.com>
+ <20191011183502.ao45xlyfabpbadxo@pali>
+ <fea0a8efd80c4c444f56d4f3902aeae4f4f9de32.camel@intel.com>
+ <64060b6a2bc9aee7b7eef0347ee3bafe3fddd18b.camel@intel.com>
+ <20191011200420.hbrutdclfva2uqpv@pali>
+ <CABBYNZL8u2kUnPqiA56DtZyAPZEAUQBaBOC-wuqUQmOW6ZJ=Og@mail.gmail.com>
+ <20191013073603.6jnczqr4fk7lpyxq@pali>
+ <CABBYNZJx6ZKfBftJoZ2b0pdUXyuY23kA1OUAsZTA4KHVLwoF3w@mail.gmail.com>
+ <20191013093947.cbqczgnt3uo3f5wi@pali>
+ <FE2F255A-6762-485B-9166-8348CFB18168@holtmann.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="cwaqzk2yyjodwvxh"
+Content-Disposition: inline
+In-Reply-To: <FE2F255A-6762-485B-9166-8348CFB18168@holtmann.org>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hongyi,
 
->>> My use scenario: the peripheral is a BLE thermometer and
->>> hygrometer,and the data of the thermometer and hygrometer is stored in
->>> the BLE Advertising packet.
->>> the host sends the LE Set Scan Enable Command to the local controller,
->>> and then the host receives the le_meta_event and parses the data in
->>> the BLE Advertising packet.
->>> 
->>> The problem occurred: the host side received other events besides
->>> le_meta_event, such as HCI_EV_INQUIRY_COMPLETE event,
->>> HCI_EV_CONN_REQUEST event, HCI_EV_CHANNEL_SELECTED event..., the
->>> reason for receiving these events may be BR/EDR/LE controllers wrong
->>> or other, this We are investigating.
->>> 
->>> However, I think that when the host receives the HCI_EV_CONN_REQUEST
->>> event according to the procedure described in kernel,
->>> Hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
->>> ->hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->>> ->conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr,HCI_ROLE_SLAVE);
->>> ->hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp); or
->>> hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ, sizeof(cp),&cp);
->>> The host should receive the HCI_EV_CONN_COMPLETE event or the
->>> HCI_EV_SYNC_CONN_COMPLETE event,
->>> but we did not receive it. Or the host receives the
->>> HCI_EV_CONN_COMPLETE event or HCI_EV_SYNC_CONN_COMPLETE, but
->>> ev->status != 0;
->>> The result is that the data for conn->handle is not updated, conn->handle=0.
->>> 
->>> Next, the host may receive other events, such as
->>> HCI_EV_CHANNEL_SELECTED event, HCI_EV_PHY_LINK_COMPLETE event,
->>> HCI_EV_PHY_LINK_COMPLETE event...,
->>> but we did not receive an event that can update the struct hci_conn data.
->>> For example, the host receives the HCI_EV_CHANNEL_SELECTED event next.
->>> Hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
->>> ->hci_chan_selected_evt(struct hci_dev *hdev, struct sk_buff
->>> *skb);//but ev->phy_handle=0;
->>> ->hcon = hci_conn_hash_lookup_handle(hdev, ev->phy_handle);//host will
->>> find struct hci_conn because conn->handle=0 ev->phy_handle=0,hcon !=
->>> NULL
->>> ->amp_read_loc_assoc_final_data(hdev, hcon);
->>> ->set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state); //host did not
->>> receive any other events to update the data in hcon, mgr = NULL
->>> 
->>> This situation will lead to kernel oops
->>> 
->>> This problem can also occur when the host receives other events. As
->>> long as the event ev->phy_handle=0, the struct hci_conn is found,
->>> and the uninitialized data in the struct hci_conn is manipulated in
->>> the event, this problem will occur.
->>> 
->>> Maybe this problem is a controller error, but I think the kernel stack
->>> should take this usage scenario into consideration.
->>> The attachment trace.log is the hci log we grab.The trace.log may not
->>> have caught this situation, but this situation requires a long test to
->>> appear.
->> 
->> what kind of hardware is this?
->> 
->> < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
->>> HCI Event: Command Complete (0x0e) plen 12
->>      Read Local Version Information (0x04|0x0001) ncmd 1
->>        Status: Success (0x00)
->>        HCI version: Bluetooth 4.1 (0x07) - Revision 0 (0x0000)
->>        LMP version: Bluetooth 4.1 (0x07) - Subversion 602 (0x025a)
->>        Manufacturer: Qualcomm (29)
->> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
->>> HCI Event: Command Complete (0x0e) plen 10
->>      Read BD ADDR (0x04|0x0009) ncmd 1
->>        Status: Success (0x00)
->>        Address: C8:02:8F:04:89:1B (Nova Electronics (Shanghai) Co., Ltd.)
->> 
->> Is this some sort of new USB dongle from Qualcomm?
->> 
->> The problem is not Channel Selected event. That is just a symptom. The problem is that the hardware is sending garbage or you uncovered a bug in the driver or the USB controller.
->> 
->>> HCI Event: Unknown (0xaf) plen 168
->>        aa b1 32 13 56 7b dd 4d 68 d2 ec 2b 0e b6 3e 2b  ..2.V{.Mh..+..>+
->>        02 01 03 01 b8 63 5a d0 83 0c 1f 1e ff 06 00 01  .....cZ.........
->>        09 20 02 3c 26 fe 29 8d b4 89 26 03 37 3d 5c 23  . .<&.)...&.7=\#
->>        8e ba 27 b6 41 c3 d2 2d 9b 7f b5 3e 2b 02 01 03  ..'.A..-...>+...
->>        01 7a f7 04 dd a4 20 1f 1e ff 06 00 01 09 20 00  .z.... ....... .
->>        0e 5f f0 72 0f 3b ea 9b ae ba 77 fa 41 35 4d 7a  ._.r.;....w.A5Mz
->>        3f 7b 28 18 9a bb 39 b1 3e 29 02 01 03 01 fb 6e  ?{(...9.>).....n
->>        54 04 1f 39 1d 1c ff 06 00 01 09 21 0a 61 76 81  T..9.......!.av.
->>        ad 16 28 44 45 53 4b 54 4f 50 2d 4a 4a 38 36 35  ..(DESKTOP-JJ865
->>        34 30 c1 3e 2b 02 01 03 01 79 03 3f 35 8e 01 1f  40.>+....y.?5...
->>        1e ff 06 00 01 09 20 02                          ...... .
->>> HCI Event: Unknown (0x6b) plen 233
->>        87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b dd 4d  ...A......2.V{.M
->>        68 d2 ec 2b 0e b5 3e 2b 02 01 03 01 7a f7 04 dd  h..+..>+....z...
->>        a4 20 1f 1e ff 06 00 01 09 20 00 0e 5f f0 72 0f  . ....... .._.r.
->>        3b ea 9b ae ba 77 fa 41 35 4d 7a 3f 7b 28 18 9a  ;....w.A5Mz?{(..
->>        bb 39 b2 3e 29 02 01 03 01 fb 6e 54 04 1f 39 1d  .9.>).....nT..9.
->>        1c ff 06 00 01 09 21 0a 61 76 81 ad 16 28 44 45  ......!.av...(DE
->>        53 4b 54 4f 50 2d 4a 4a 38 36 35 34 30 c1 3e 2b  SKTOP-JJ86540.>+
->>        02 01 03 01 a3 f8 96 8c 85 25 1f 1e ff 06 00 01  .........%......
->>        09 20 02 7f 31 9e b5 d1 76 45 f0 77 95 eb e7 5a  . ..1...vE.w...Z
->>        93 38 cc 88 20 5c 58 62 d2 af ab 3e 2b 02 01 03  .8.. \Xb...>+...
->>        01 79 03 3f 35 8e 01 1f 1e ff 06 00 01 09 20 02  .y.?5......... .
->>        6b e9 87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b  k....A......2.V{
->>        dd 4d 68 d2 ec 2b 0e b6 3e 2b 02 01 03 01 7a f7  .Mh..+..>+....z.
->>        04 dd a4 20 1f 1e ff 06 00 01 09 20 00 0e 5f f0  ... ....... .._.
->>        72 0f 3b ea 9b ae ba 77 fa                       r.;....w.
->>> HCI Event: Channel Selected (0x41) plen 53
->>        invalid packet size
->>        4d 7a 3f 7b 28 18 9a bb 39 b3 3e 2b 02 01 03 01  Mz?{(...9.>+....
->>        79 03 3f 35 8e 01 1f 1e ff 06 00 01 09 20 02 6b  y.?5......... .k
->>        e9 87 d9 8b 41 cf 02 af a8 aa b1 32 13 56 7b dd  ....A......2.V{.
->>        4d 68 d2 ec 2b                                   Mh..+
->> 
->> So maybe this is missing a firmware download that has bug fixes. You might need to examine the Windows driver.
->> 
->> Regards
->> 
->> Marcel
->> 
-> 
-> My bluetooth module with IDS is:
-> ID 0cf3:e500 Qualcomm Corp.Qualcomm Atheros QCA9377-7
-> 
-> Yes, I admit that the problem is that the hardware is sending garbage
-> or uncovered a bug in the driver or the USB controller.
-> We are solving the problem of the hardware or driver or the USB controller.
-> 
-> But I think that no matter harware error or a bug in the driver or the
-> USB controller, our host receives garbage,
-> it should not cause oops in the kernel, should we have a countermeasure?
-> When this abnormality occurs, prevent the kernel Oops occurred.
-> 
-> When the host receives the HCI_EV_CONN_REQUEST event, but the connection fails,
-> conn->handle does not update conn->handle=0,struct conn is not free
-> and hardware is still sending garbage.
-> This situation may lead to kernel oops.
+--cwaqzk2yyjodwvxh
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-you try to fix one symptom and still have to deal with all the other ones. Find a firmware for your hardware in the Windows driver or ask Qualcomm to fix this crappy device. It is plain and simple broken hardware.
+On Wednesday 16 October 2019 21:06:41 Marcel Holtmann wrote:
+> Hi Pali,
+>=20
+> >>>>>>>> Currently bluez API, method Acquire() already inform called appl=
+ication
+> >>>>>>>> what is socket MTU for input and output. So from this informatio=
+n it is
+> >>>>>>>> possible to detect if device supports EDR 3 or not.
+> >>>>>>>>=20
+> >>>>>>>> But it is too late to have this information. I need to send SBC
+> >>>>>>>> parameters to bluez first when doing A2DP negotiation, this is e=
+arly
+> >>>>>>>> steps before Acquire() is called.
+> >>>>>>>=20
+> >>>>>>> This seems to be the kind of information which is fixed, for the =
+life of the pairing.
+> >>>>>>>=20
+> >>>>>>> What if you assumed the lower speed the first time you connected,=
+ determined the
+> >>>>>>> speed during the first streaming, and then either immediately ren=
+egotiate (caching the identifying
+> >>>>>>> information
+> >>>>>>> of the SNK), or just cache the information for future connections.
+> >>>>>>>=20
+> >>>>>>> Or the reverse, and assume fast, but immediately adjust down if y=
+ou aren't getting what you hoped for.
+> >>>>>>>=20
+> >>>>>>> In any case, this would be a "Device Setup" glitch which you coul=
+d note as a routine part of pairing in the
+> >>>>>>> documentation.
+> >>>>>>=20
+> >>>>>> Or, Stream "Silence" the first time you connect, in order to deter=
+mine throughput.  It would add 1-2 seconds to
+> >>>>>> your connection time perhaps, but would be less noticable to the u=
+ser.
+> >>>>>=20
+> >>>>> This increase connection time, increase complexity of implementation
+> >>>>> (lot of things can fail) and just complicate lot of things there. P=
+lus
+> >>>>> adds that glitch which is not user friendly.
+> >>>>>=20
+> >>>>> Also bluetooth devices, like headsets, probably do not expects that
+> >>>>> somebody is going to do such thing and we can hit other implementat=
+ion
+> >>>>> problems...
+> >>>>>=20
+> >>>>> And moreover it is just big hack and workaround for that problem. N=
+ot a
+> >>>>> reasonable solution.
+> >>>>>=20
+> >>>>> In btmon I can see it, so kernel already knows that information. Wh=
+y it
+> >>>>> cannot tell it to userspace and bluetooth daemon to client applicat=
+ion?
+> >>>>>=20
+> >>>>> Client application (e.g. pulseaudio) should really know if is going=
+ to
+> >>>>> talk with bluetooth device with EDR 2 or EDR 3.
+> >>>>>=20
+> >>>>>>>=20
+> >>>>>>>> Therefore I'm asking for some way how to get information if devi=
+ce
+> >>>>>>>> supports EDR 2 or EDR 3. This is basically requirement for proper
+> >>>>>>>> implementation of SBC in high quality mode. So if there are not =
+such API
+> >>>>>>>> yet, could it be exported from kernel to userspace and bluetoothd
+> >>>>>>>> daemon?
+> >>>>>>>>=20
+> >>>>>>>> See these two articles for more details about SBC and its high q=
+uality:
+> >>>>>>>>=20
+> >>>>>>>> https://habr.com/en/post/456182/
+> >>>>>>>> http://soundexpert.org/articles/-/blogs/audio-quality-of-sbc-xq-=
+bluetooth-audio-codec
+> >>>>>>>>=20
+> >>>>>>>>>> Is there any bluez API for it?
+> >>>>>>>>>>=20
+> >>>>=20
+> >>>> There quite a few assumption here that are not really how it is
+> >>>> implemented in BlueZ:
+> >>>>=20
+> >>>> 1. The L2CAP MTU is not based on the ACL link (should be relatively
+> >>>> easy to change)
+> >>>> 2. L2CAP MTU is not required to be symmetric.
+> >>>> 3. Since the ACL link is shared for all channels we shouldn't really
+> >>>> assume all throughput will be available
+> >>>> 4. PA flow control is not just filling up packets and sending them
+> >>>> when they are full to maximize speed, instead it send packets when
+> >>>> necessary to maintain a constant speed so the MTU may not be fully
+> >>>> used, in fact trying to maximize the MTU may result in higher latency
+> >>>> since packets would be sent less frequently.
+> >>>>=20
+> >>>> With this in mind I think the only thing we should look into is to
+> >>>> adjust the default L2CAP MTU to match the underline ACL Link, so it
+> >>>> maximizes throughput, the remote side may choose a different MTU whi=
+ch
+> >>>> will have to follow though.
+> >>>=20
+> >>> Hi Luiz! The main problem is not MTU size, as I wrote I cannot use it
+> >>> normally for distinguish for usage of SBC XQ or not. Instead of MTU I
+> >>> rather need to know if device supports EDR 2 or EDR 3.
+> >>=20
+> >> I was trying to implement this on the kernel to match the MTU size of
+> >> L2CAP with ACL but the packet type current in use by the connection is
+> >> not exposed in the connection complete, or at least I couldn't any
+> >> reference to it, we could possibly expose the packet types via socket
+> >> option as well but changing it at runtime is probably not a good idea.
+> >=20
+> > Hello, when I run btmon, I see following information very early before
+> > creating A2DP connection:
+> >=20
+> > HCI Event: Read Remote Supported Features (0x0b) plen 11
+> >        Status: Success (0x00)
+> >        Handle: 35
+> >        Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x87
+> >          ...
+> >          Enhanced Data Rate ACL 2 Mbps mode
+> >          Enhanced Data Rate ACL 3 Mbps mode
+> >=20
+> > I do not need to change MTU size, I would just like to know EDR features
+> > capabilities. Cannot be those information exported somehow from kernel?
+> > I guess that kernel should have these information if it can send it to
+> > btmon.
+>=20
+> so I have not seen a single device that only supports one of these two mo=
+des. They all support both and if possible you want to use 3 Mpbs anyway si=
+nce that safes power.
 
-Regards
+Hi! But there are devices which support none of the two modes?
 
-Marcel
+Anyway, could be these "features" exported as dbus property from bluez?
 
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--cwaqzk2yyjodwvxh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXadr5QAKCRCL8Mk9A+RD
+UioQAJ9u9sBltnhZu1mSkoV2jRwcPDaWRgCfbbk0YJjPLvD7X3JlpAf0hsOT10g=
+=V8fg
+-----END PGP SIGNATURE-----
+
+--cwaqzk2yyjodwvxh--
