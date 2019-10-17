@@ -2,215 +2,103 @@ Return-Path: <SRS0=wWRn=YK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE542ECE58D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 21:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E77FA372A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 21:30:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C13E121A4C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 21:07:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2F0E21D7A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 21:30:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pek2pn2Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503183AbfJQVHH (ORCPT
+        id S2503649AbfJQVaL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Oct 2019 17:07:07 -0400
-Received: from mga02.intel.com ([134.134.136.20]:39407 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2394814AbfJQVHH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Oct 2019 17:07:07 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 14:07:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,309,1566889200"; 
-   d="scan'208";a="200509257"
-Received: from ingas-nuc1.sea.intel.com ([10.251.143.15])
-  by orsmga006.jf.intel.com with ESMTP; 17 Oct 2019 14:07:06 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2] mesh: Implement AddAppKey and AddNetKey methods
-Date:   Thu, 17 Oct 2019 14:07:05 -0700
-Message-Id: <20191017210705.8829-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 17 Oct 2019 17:30:11 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:38707 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732322AbfJQVaK (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 17 Oct 2019 17:30:10 -0400
+Received: by mail-pg1-f194.google.com with SMTP id w3so2087423pgt.5;
+        Thu, 17 Oct 2019 14:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=h/bBHRGusj98Ie+f89J7SFLKi2fjMoUyMTs7iY5sfPs=;
+        b=pek2pn2QOW42nThx78gpJ5eiILVpMLYfOI2e8D3iR7iPQEXoh5JdfF1Qu0FK+lGCHM
+         rhfvKLT4pa4vyKPCXuC6ecbmlRgJ2DH0ExZpiTPGHFMzCxwIPx8rSFDC6a/nTc8U03EU
+         RSqVFnQjyyHLm8AfXh4B4IWcgdXPwx0CwLwXZ/hksT3qm9lntnIDOo9Ng6cqVcPFJhUw
+         zhZ4K5ms0I/s4cvJNumxUpuDMNz/dO4PSh0qADEHotDYexzHpDuUk+2AwM9S2b4MbP2H
+         xolo2psfzeukidI6shOdZtzIfta+BsGZA8faGmCVcxjXbSVVbFzMpzlWMR4E9holJ3GS
+         2EmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=h/bBHRGusj98Ie+f89J7SFLKi2fjMoUyMTs7iY5sfPs=;
+        b=oKpuBNtIzHQcR+wOMfl67oEDoQl5vFHiI43HzOUW14j8xCqZ2mNETK7b6bOLIQB464
+         HAe8xcV9AmENbIJ1xqD/irj+8v9aH3FIjUiyd6fQy5lw8Qj5womFVCxMxixDMLOthZlJ
+         JK50TLk79jE+tyyI7v/rEgSN0t3c3UX4EEsGiKY6r1y/Lsy/+ct8o4O+HbQ6HVhhUkag
+         TIwUxDilq/RaPKScHSHgp75aOiNRsQedIsrvQm5YGFpZYdAzUyhBaihbiaWLpdzGzr/g
+         YbK/mEzpHezNwfyxsX7I1VruwrYubDj0nlp+30JEP23DaxFWgR8QsnTdO6Z8ZFj0KX+9
+         +MwQ==
+X-Gm-Message-State: APjAAAVffWPSXpeoAsoii0Lc/WBZy7ji5SGclms1OVeMPGFo/wObFo4B
+        NfDCWTKfakYKp16eie8ZWMc=
+X-Google-Smtp-Source: APXvYqwQH11M5d3vGXCkqWTsm7amqBAPjHqccTvWu4XC7F8fg2mPRURwIMBKTQC90afxBF7EvjNckg==
+X-Received: by 2002:a17:90a:1b49:: with SMTP id q67mr7023570pjq.115.1571347809693;
+        Thu, 17 Oct 2019 14:30:09 -0700 (PDT)
+Received: from aw-bldr-10.qualcomm.com (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id w6sm4297898pfw.84.2019.10.17.14.30.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2019 14:30:09 -0700 (PDT)
+From:   Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        c-hbandi@codeaurora.org, bgodavar@codeaurora.org
+Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
+Subject: [PATCH] Bluetooth: hci_qca: Add delay for wcn3990 stability
+Date:   Thu, 17 Oct 2019 14:29:55 -0700
+Message-Id: <20191017212955.6266-1-jeffrey.l.hugo@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds implementation for the following methods on
-org.bluez.mesh.Node1 interface:
-void AddNetKey(object element_path, uint16 destination,
-		uint16 subnet_index, uint16 net_index, boolean update)
-void AddAppKey(object element_path, uint16 destination,
-		uint16 app_index, uint16 net_index, boolean update)
----
- mesh/node.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 125 insertions(+), 2 deletions(-)
+On the msm8998 mtp, the response to the baudrate change command is never
+received.  On the Lenovo Miix 630, the response to the baudrate change
+command is corrupted - "Frame reassembly failed (-84)".
 
-diff --git a/mesh/node.c b/mesh/node.c
-index 74694d520..c47e1961d 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -443,7 +443,7 @@ static void set_net_key(void *a, void *b)
- 								netkey->phase);
- }
+Adding a 50ms delay before re-enabling flow to receive the baudrate change
+command response from the wcn3990 addesses both issues, and allows
+bluetooth to become functional.
+
+Signed-off-by: Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
+---
+ drivers/bluetooth/hci_qca.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index e3164c200eac..265fc60c3850 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1156,8 +1156,10 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		host_set_baudrate(hu, speed);
  
--static void set_app_key(void *a, void *b)
-+static void set_appkey(void *a, void *b)
- {
- 	struct mesh_config_appkey *appkey = a;
- 	struct mesh_node *node = b;
-@@ -512,7 +512,7 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	l_queue_foreach(db_node->netkeys, set_net_key, node);
+ error:
+-		if (qca_is_wcn399x(soc_type))
++		if (qca_is_wcn399x(soc_type)) {
++			msleep(50);
+ 			hci_uart_set_flow_control(hu, false);
++		}
  
- 	if (db_node->appkeys)
--		l_queue_foreach(db_node->appkeys, set_app_key, node);
-+		l_queue_foreach(db_node->appkeys, set_appkey, node);
- 
- 	mesh_net_set_seq_num(node->net, node->seq_number);
- 	mesh_net_set_default_ttl(node->net, node->ttl);
-@@ -2001,6 +2001,123 @@ static struct l_dbus_message *dev_key_send_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
-+static struct l_dbus_message *add_netkey_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	struct mesh_node *node = user_data;
-+	const char *sender, *ele_path;
-+	struct node_element *ele;
-+	uint16_t dst, sub_idx, net_idx, src;
-+	bool update;
-+	struct keyring_net_key key;
-+	uint8_t data[20];
-+
-+	l_debug("AddNetKey");
-+
-+	sender = l_dbus_message_get_sender(msg);
-+
-+	if (strcmp(sender, node->owner))
-+		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
-+
-+	if (!l_dbus_message_get_arguments(msg, "oqqqb", &ele_path, &dst,
-+						&sub_idx, &net_idx, &update))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	ele = l_queue_find(node->elements, match_element_path, ele_path);
-+	if (!ele)
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
-+							"Element not found");
-+
-+	src = node_get_primary(node) + ele->idx;
-+
-+	if (!keyring_get_net_key(node, net_idx, &key))
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
-+							"NetKey not found");
-+
-+	if (!update) {
-+		l_put_be16(OP_NETKEY_ADD, data);
-+		memcpy(data + 4, key.old_key, 16);
-+	} else {
-+		if (key.phase != KEY_REFRESH_PHASE_ONE)
-+			return dbus_error(msg, MESH_ERROR_FAILED,
-+							"Cannot update");
-+		l_put_be16(OP_NETKEY_UPDATE, data);
-+		memcpy(data + 4, key.new_key, 16);
-+	}
-+
-+	l_put_le16(sub_idx, &data[2]);
-+
-+	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
-+							DEFAULT_TTL, data, 20))
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
-+}
-+
-+static struct l_dbus_message *add_appkey_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	struct mesh_node *node = user_data;
-+	const char *sender, *ele_path;
-+	struct node_element *ele;
-+	uint16_t dst, app_idx, net_idx, src;
-+	bool update;
-+	struct keyring_net_key net_key;
-+	struct keyring_app_key app_key;
-+	uint8_t data[20];
-+
-+	l_debug("AddNetKey");
-+
-+	sender = l_dbus_message_get_sender(msg);
-+
-+	if (strcmp(sender, node->owner))
-+		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
-+
-+	if (!l_dbus_message_get_arguments(msg, "oqqqb", &ele_path, &dst,
-+						&app_idx, &net_idx, &update))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	ele = l_queue_find(node->elements, match_element_path, ele_path);
-+	if (!ele)
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
-+							"Element not found");
-+
-+	src = node_get_primary(node) + ele->idx;
-+
-+	if (!keyring_get_app_key(node, app_idx, &app_key))
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
-+							"AppKey not found");
-+
-+	if (!keyring_get_net_key(node, app_key.net_idx, &net_key)) {
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
-+						"Bound NetKey not found");
-+	}
-+
-+	if (!update) {
-+		data[0] = OP_APPKEY_ADD;
-+		memcpy(data + 4, app_key.old_key, 16);
-+	} else {
-+		if (net_key.phase != KEY_REFRESH_PHASE_ONE)
-+			return dbus_error(msg, MESH_ERROR_FAILED,
-+							"Cannot update");
-+		data[0] = OP_APPKEY_UPDATE;
-+		memcpy(data + 4, app_key.new_key, 16);
-+	}
-+
-+	/* Pack bound NetKey and AppKey into 3 octets */
-+	data[1] = app_key.net_idx;
-+	data[2] = ((app_key.net_idx >> 8) & 0xf) | ((app_idx << 4) & 0xf0);
-+	data[3] = app_idx >> 4;
-+
-+	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
-+							DEFAULT_TTL, data, 20))
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
-+
-+	return l_dbus_message_new_method_return(msg);
-+}
-+
- static struct l_dbus_message *publish_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
-@@ -2219,6 +2336,12 @@ static void setup_node_interface(struct l_dbus_interface *iface)
- 						"", "oqbqay", "element_path",
- 						"destination", "remote",
- 						"net_index", "data");
-+	l_dbus_interface_method(iface, "AddNetKey", 0, add_netkey_call, "",
-+					"oqqqb", "element_path", "destination",
-+					"subnet_index", "net_index", "update");
-+	l_dbus_interface_method(iface, "AddAppKey", 0, add_appkey_call, "",
-+					"oqqqb", "element_path", "destination",
-+					"app_index", "net_index", "update");
- 	l_dbus_interface_method(iface, "Publish", 0, publish_call, "", "oqay",
- 					"element_path", "model_id", "data");
- 	l_dbus_interface_method(iface, "VendorPublish", 0, vendor_publish_call,
+ 		if (soc_type == QCA_WCN3990) {
+ 			/* Wait for the controller to send the vendor event
 -- 
-2.21.0
+2.17.1
 
