@@ -1,213 +1,87 @@
-Return-Path: <SRS0=8ZYm=YJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=wWRn=YK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11A9FA3728
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A19EFA3728
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 03:06:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B9C3218DE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Oct 2019 19:53:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="CNtR654p"
+	by mail.kernel.org (Postfix) with ESMTP id 41AA421928
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 03:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394526AbfJPTxY (ORCPT
+        id S2393890AbfJQDGK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Oct 2019 15:53:24 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:47054 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391081AbfJPTxY (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Oct 2019 15:53:24 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q5so26493pfg.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2019 12:53:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=references:user-agent:from:to:cc:subject:in-reply-to:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=A96DxtMYbVnBC5BawUeHIwdFetpJSaKB+Iosg4eUKN4=;
-        b=CNtR654pMu4sToO/k+dQ2GmkEMAIHlmjNOjDYMR8bYdZYKUD21TINej7dKnV7arjeF
-         wax7tzf9aVQjOqlzitRy3XD/6B4bRZCWkMCqdBUKEAe3xF2DpNAuKVbi/+CPdZrxjGhJ
-         bY1YTjq6KqzoGBLT0HadBoOXyrWkA29Cq259Z549J0qsrI2jTwM9wJEuChZ7efLdJwXm
-         GzeAqpn3yAuGBHtGE1L4hcmr/pVbH6vtSkyTVnJRkP+FELWDodoyjBvdeFsDmrWHLOQm
-         3MchZgFBNxAbUoiK5y+MefpsaqXMQgfq6kifT/YXm6IB2uRJHolFT/XwRp4c6t/4ajYq
-         TJzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject
-         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-        bh=A96DxtMYbVnBC5BawUeHIwdFetpJSaKB+Iosg4eUKN4=;
-        b=eXrMmf1N1OH521KH2fmtkzmbwbkw6dii8rMsi1BBulXtaOaOnBh+6FVcoZ4B4dJEKA
-         riVNvTO2yWQXAWGpgx5HNM5sVgdH9dpzYSHCJI1Yvh+sUhZDQhsRQdAXVgAFMIbuocK/
-         0CHHmdrscvJss8O73sdRFXMuVL62N/9nqKJj7lyem2FLp03bkUaampnUk2yURQYAYA2I
-         8rHTF6x5+b00i9puOtec7v3NxLCCJ4Rz5ayGPtdS0mJVu3QILI8oTsqMr5N1K0apBrLU
-         9CwVITdzVYn5Z8I82RUp+gv/BhUP7pMMANT22DFmWDsm8ThugwDLoxWWQvqYr7cBV7Sj
-         AyWg==
-X-Gm-Message-State: APjAAAUP0NT8lte2aiBYp5PWjegRNAMh5zAAX8PZY2SQ2XThHMfZRNFZ
-        80sSCUc2Py5lzBjidfeL6AsQr7FyZ4c=
-X-Google-Smtp-Source: APXvYqy2E0tQRKJEwVptNPiqgFUNSbAOa04lFyLLh0P4iAMAlmi1134MphX5lC2smS2lQZG2rif3Cg==
-X-Received: by 2002:a17:90a:c306:: with SMTP id g6mr7057586pjt.38.1571255603146;
-        Wed, 16 Oct 2019 12:53:23 -0700 (PDT)
-Received: from localhost ([2601:647:5700:f97e:1021:e5a8:28ca:ce5f])
-        by smtp.gmail.com with ESMTPSA id f13sm19053148pgr.6.2019.10.16.12.53.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2019 12:53:22 -0700 (PDT)
-References: <20191004000933.24575-1-mkorpershoek@baylibre.com> <474814D3-A97F-48D1-8268-3D200BE60795@holtmann.org>
-User-agent: mu4e 1.0; emacs 26.1
-From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Sean Wang <sean.wang@mediatek.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_core: fix init with HCI_QUIRK_NON_PERSISTENT_SETUP
-In-reply-to: <474814D3-A97F-48D1-8268-3D200BE60795@holtmann.org>
-Date:   Wed, 16 Oct 2019 12:53:21 -0700
-Message-ID: <87sgnsfowe.fsf@baylibre.com>
+        Wed, 16 Oct 2019 23:06:10 -0400
+Received: from mga09.intel.com ([134.134.136.24]:37056 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2392976AbfJQDGK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 16 Oct 2019 23:06:10 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 20:06:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,306,1566889200"; 
+   d="scan'208";a="200256249"
+Received: from ingas-nuc1.sea.intel.com ([10.255.229.89])
+  by orsmga006.jf.intel.com with ESMTP; 16 Oct 2019 20:06:08 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Fix unpacking NetKey/AppKey 3-octet index combo
+Date:   Wed, 16 Oct 2019 20:06:07 -0700
+Message-Id: <20191017030607.11112-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This fixes how we unpack 3-octet combination of NetKey and AppKey
+indices received in the payload of AppKeyAdd/Update/Delete messages.
 
-Hi Marcel,
+For example, if the config client sends a message to add AppKey with
+index 0x456 bound to NetKey with index 0x123, the received packed
+3-octet will be: 0x56 0x34 0x12
+The fix takes into account the correct byte ordering when unpacking
+indices.
+---
+ mesh/cfgmod-server.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Marcel Holtmann <marcel@holtmann.org> writes:
-
-> Hi Mattijs,
->
->> Some HCI devices which have the HCI_QUIRK_NON_PERSISTENT_SETUP=20
->> [1]
->> require a call to setup() to be ran after every open().
->>=20
->> During the setup() stage, these devices expect the chip to=20
->> acknowledge
->> its setup() completion via vendor specific frames.
->>=20
->> If userspace opens() such HCI device in HCI_USER_CHANNEL [2]=20
->> mode,
->> the vendor specific frames are never tranmitted to the driver,=20
->> as
->> they are filtered in hci_rx_work().
->>=20
->> Allow HCI devices which have HCI_QUIRK_NON_PERSISTENT_SETUP to=20
->> process
->> frames if the HCI device is is HCI_INIT state.
->>=20
->> [1] https://lore.kernel.org/patchwork/patch/965071/
->> [2] https://www.spinics.net/lists/linux-bluetooth/msg37345.html
->>=20
->> Fixes: 740011cfe948 ("Bluetooth: Add new quirk for=20
->> non-persistent setup settings")
->> Signed-off-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
->> ---
->> Some more background on the change follows:
->>=20
->> The Android bluetooth stack (Bluedroid) also has a HAL=20
->> implementation
->> which follows Linux's standard rfkill interface [1].
->>=20
->> This implementation relies on the HCI_CHANNEL_USER feature to=20
->> get
->> exclusive access to the underlying bluetooth device.
->>=20
->> When testing this along with the btkmtksdio driver, the
->> chip appeared unresponsive when calling the following from=20
->> userspace:
->>=20
->>    struct sockaddr_hci addr;
->>    int fd;
->>=20
->>    fd =3D socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
->>=20
->>    memset(&addr, 0, sizeof(addr));
->>    addr.hci_family =3D AF_BLUETOOTH;
->>    addr.hci_dev =3D 0;
->>    addr.hci_channel =3D HCI_CHANNEL_USER;
->>=20
->>    bind(fd, (struct sockaddr *) &addr, sizeof(addr)); # device=20
->>    hangs
->>=20
->> In the case of bluetooth drivers exposing=20
->> QUIRK_NON_PERSISTENT_SETUP
->> such as btmtksdio, setup() is called each multiple times.
->> In particular, when userspace calls bind(), the setup() is=20
->> called again
->> and vendor specific commands might be send to re-initialize the=20
->> chip.
->>=20
->> Those commands are filtered out by hci_core in HCI_CHANNEL_USER=20
->> mode,
->> preventing setup() from completing successfully.
->>=20
->> This has been tested on a 4.19 kernel based on Android Common=20
->> Kernel.
->> It has also been compile tested on bluetooth-next.
->>=20
->> [1]=20
->> https://android.googlesource.com/platform/system/bt/+/refs/heads/master/=
-vendor_libs/linux/interface/
->>=20
->> net/bluetooth/hci_core.c | 15 +++++++++++++--
->> 1 file changed, 13 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/net/bluetooth/hci_core.c=20
->> b/net/bluetooth/hci_core.c
->> index 04bc79359a17..5f12e8574d54 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -4440,9 +4440,20 @@ static void hci_rx_work(struct=20
->> work_struct *work)
->> 			hci_send_to_sock(hdev, skb);
->> 		}
->>=20
->> +		/* If the device has been opened in HCI_USER_CHANNEL,
->> +		 * the userspace has exclusive access to device.
->> +		 * When HCI_QUIRK_NON_PERSISTENT_SETUP is set and
->> +		 * device is HCI_INIT,  we still need to process
->> +		 * the data packets to the driver in order
->> +		 * to complete its setup().
->> +		 */
->> 		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
->> -			kfree_skb(skb);
->> -			continue;
->> +			if (!test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
->> +				      &hdev->quirks) ||
->> +			    !test_bit(HCI_INIT, &hdev->flags)) {
->> +				kfree_skb(skb);
->> +				continue;
->> +			}
->> 		}
->
-> 	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> 	    !test_bit(HCI_INIT, &hdev->flags)) {
-> 		kfree_skb(skb);
-> 		continue;
-> 	}
->
-> Wouldn=E2=80=99t it be enough to just add a check for HCI_INIT to this.=20
-> I mean it makes no difference if ->setup is repeated on each=20
-> device open or not. We want to process event during HCI_INIT=20
-> when in user channel mode.
-Thank you for your review. You are right. We always want to=20
-process
-events during HCI_INIT in user channel mode.
-
-I'll send a v2
-
-Regards,
-Mattijs
-
->
-> Regards
->
-> Marcel
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index 55cc8e9eb..79538037c 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -1022,8 +1022,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst, uint16_t unicast,
+ 		if (size != 19)
+ 			return true;
+ 
+-		n_idx = l_get_le16(pkt) & 0xfff;
+-		a_idx = l_get_le16(pkt + 1) >> 4;
++		n_idx = l_get_le16(pkt + 1) >> 4;
++		a_idx = l_get_le16(pkt) & 0xfff;
+ 
+ 		if (opcode == OP_APPKEY_ADD)
+ 			b_res = appkey_key_add(net, n_idx, a_idx, pkt + 3);
+@@ -1048,9 +1048,10 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst, uint16_t unicast,
+ 		if (size != 3)
+ 			return true;
+ 
+-		n_idx = l_get_le16(pkt) & 0xfff;
+-		a_idx = l_get_le16(pkt + 1) >> 4;
++		n_idx = l_get_le16(pkt + 1) >> 4;
++		a_idx = l_get_le16(pkt) & 0xfff;
+ 		b_res = appkey_key_delete(net, n_idx, a_idx);
++
+ 		l_debug("Delete AppKey %s Net_Idx %3.3x to App_Idx %3.3x",
+ 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
+ 							n_idx, a_idx);
+-- 
+2.21.0
 
