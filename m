@@ -2,95 +2,215 @@ Return-Path: <SRS0=wWRn=YK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 519DEECE58E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 17:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CCDECE58E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 19:52:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C48021925
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 17:57:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BcMp4pfG"
+	by mail.kernel.org (Postfix) with ESMTP id 505A921835
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 19:52:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440827AbfJQR5U (ORCPT
+        id S2391211AbfJQTwI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Oct 2019 13:57:20 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:43558 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733171AbfJQR5U (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Oct 2019 13:57:20 -0400
-Received: by mail-il1-f195.google.com with SMTP id t5so2904819ilh.10;
-        Thu, 17 Oct 2019 10:57:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WcS5hYdP3pCxm/yZLIGrFm7va/wuB5toN9M7cwBJfq4=;
-        b=BcMp4pfGIFOkf4xxZpY2CD5fOpV+6Bj+/idbEiDyJxt8lqnXd3BVwPpM6QI7ja6+aC
-         TwG4M7vMynFU9QefpWHLDy9erHpgm4+zTzlX+6+qXJQjIvo1y3AxxKMIChANbvT58y/D
-         7Vb908VUCtNaCeGApGvG6TAFpgFPwg2GmOdbx37rhNuZ4K0mD3ULJMNZ3/Sbg0M4ks2F
-         5eQsVXgVW1yU/LpdjCGtU/AKeK9aIdyUeVYZCFDh6tPeLMNs1q7HWaz3WrXh2Y3u8cfm
-         UoMsLXLym1pooH607OikvQwcu9wFJWEo3nokTGPMVgy8MzgJIPQ/RBc/szzs7bBNEGWq
-         mTQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WcS5hYdP3pCxm/yZLIGrFm7va/wuB5toN9M7cwBJfq4=;
-        b=StpBZvcdLrnee8TWJmWaDm9B7mntFCFenfaejkF/dVEcV3z9G+B2ANsrqrkni93+8h
-         4dUNqTWMadvk/9fHPpcK7SevEFjBN2vuvFBwdseqHe5TidGx1YiEO4uIucIxaaHIFzb7
-         EtH/umQ+YNtAhKXE1sNahmZAsF3pTbCkovobRUBn/G7ZKl1SEdbvFdfH9oSgYP8rGgS8
-         2bJxf3FcpX/7SzTdhT3rrmPKg6guf1YFVXstDGNwFJ3t3iUhmsrXUc+zHlr62olt3Vzy
-         MprKVD+bWVbp0qmprWLDN1ggNO1SC5MkAJkvEmq7vyiw5qHuUaXv3rYAvmrTPE9y/0ef
-         PMsg==
-X-Gm-Message-State: APjAAAXUjVviVrFmSHtKaGxZuWJdGPD9hMXQtJdiISupSZGl908xB1Jf
-        N4xRfngeGpFaIgZbM8eXSDGNuyYjSpbDFAFjdx4=
-X-Google-Smtp-Source: APXvYqykU6l9b4dn91QLAmg0FiFZO3jTjHvdjb5410032UJVHmHeljk5z6DlHlsHPFhD+w3YNWHsIQg0GHMBWHSh/bM=
-X-Received: by 2002:a92:d652:: with SMTP id x18mr4948635ilp.58.1571335038402;
- Thu, 17 Oct 2019 10:57:18 -0700 (PDT)
+        Thu, 17 Oct 2019 15:52:08 -0400
+Received: from mga18.intel.com ([134.134.136.126]:64435 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387813AbfJQTwI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 17 Oct 2019 15:52:08 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 12:52:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,308,1566889200"; 
+   d="scan'208";a="199472921"
+Received: from ingas-nuc1.sea.intel.com ([10.251.143.15])
+  by orsmga003.jf.intel.com with ESMTP; 17 Oct 2019 12:52:07 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Implement AddAppKey and AddNetKey methods
+Date:   Thu, 17 Oct 2019 12:52:05 -0700
+Message-Id: <20191017195205.7539-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20191002114626.12407-1-aford173@gmail.com> <1550E9D9-43ED-4345-A9AF-6D9F097FC64E@holtmann.org>
-In-Reply-To: <1550E9D9-43ED-4345-A9AF-6D9F097FC64E@holtmann.org>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Thu, 17 Oct 2019 12:57:06 -0500
-Message-ID: <CAHCN7xKA9-K4uYU9oFW+A7ywc8TGixNa-yHJgL7uSTbyXnisTQ@mail.gmail.com>
-Subject: Re: [PATCH] Revert "Bluetooth: hci_ll: set operational frequency earlier"
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Adam Ford <adam.ford@logicpd.com>,
-        Sebastian Reichel <sre@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 1:36 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Adam,
->
-> > As nice as it would be to update firmware faster, that patch broke
-> > at least two different boards, an OMAP4+WL1285 based Motorola Droid
-> > 4, as reported by Sebasian Reichel and the Logic PD i.MX6Q +
-> > WL1837MOD.
-> >
-> > This reverts commit a2e02f38eff84f199c8e32359eb213f81f270047.
-> >
-> > Signed-off-by: Adam Ford <aford173@gmail.com>
->
-> patch has been applied to bluetooth-next tree.
+This adds implementation for the following methods on
+org.bluez.mesh.Node1 interface:
+void AddNetKey(object element_path, uint16 destination,
+		uint16 subnet_index, uint16 net_index, boolean update)
+void AddAppKey(object element_path, uint16 destination,
+		uint16 app_index, uint16 net_index, boolean update)
+---
+ mesh/node.c | 127 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 125 insertions(+), 2 deletions(-)
 
-Any change this can get pushed upstream to stable?  (including 5.4?)
+diff --git a/mesh/node.c b/mesh/node.c
+index 74694d520..c47e1961d 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -443,7 +443,7 @@ static void set_net_key(void *a, void *b)
+ 								netkey->phase);
+ }
+ 
+-static void set_app_key(void *a, void *b)
++static void set_appkey(void *a, void *b)
+ {
+ 	struct mesh_config_appkey *appkey = a;
+ 	struct mesh_node *node = b;
+@@ -512,7 +512,7 @@ static bool init_from_storage(struct mesh_config_node *db_node,
+ 	l_queue_foreach(db_node->netkeys, set_net_key, node);
+ 
+ 	if (db_node->appkeys)
+-		l_queue_foreach(db_node->appkeys, set_app_key, node);
++		l_queue_foreach(db_node->appkeys, set_appkey, node);
+ 
+ 	mesh_net_set_seq_num(node->net, node->seq_number);
+ 	mesh_net_set_default_ttl(node->net, node->ttl);
+@@ -2001,6 +2001,123 @@ static struct l_dbus_message *dev_key_send_call(struct l_dbus *dbus,
+ 	return l_dbus_message_new_method_return(msg);
+ }
+ 
++static struct l_dbus_message *add_netkey_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
++{
++	struct mesh_node *node = user_data;
++	const char *sender, *ele_path;
++	struct node_element *ele;
++	uint16_t dst, sub_idx, net_idx, src;
++	bool update;
++	struct keyring_net_key key;
++	uint8_t data[20];
++
++	l_debug("AddNetKey");
++
++	sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node->owner))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
++
++	if (!l_dbus_message_get_arguments(msg, "oqqqb", &ele_path, &dst,
++						&sub_idx, &net_idx, &update))
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
++
++	ele = l_queue_find(node->elements, match_element_path, ele_path);
++	if (!ele)
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
++							"Element not found");
++
++	src = node_get_primary(node) + ele->idx;
++
++	if (!keyring_get_net_key(node, net_idx, &key))
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
++							"NetKey not found");
++
++	if (!update) {
++		l_put_be16(OP_NETKEY_ADD, data);
++		memcpy(data + 4, key.old_key, 16);
++	} else {
++		if (key.phase != KEY_REFRESH_PHASE_ONE)
++			return dbus_error(msg, MESH_ERROR_FAILED,
++							"Cannot update");
++		l_put_be16(OP_NETKEY_UPDATE, data);
++		memcpy(data + 4, key.new_key, 16);
++	}
++
++	l_put_le16(sub_idx, &data[2]);
++
++	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
++							DEFAULT_TTL, data, 20))
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
++
++	return l_dbus_message_new_method_return(msg);
++}
++
++static struct l_dbus_message *add_appkey_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
++{
++	struct mesh_node *node = user_data;
++	const char *sender, *ele_path;
++	struct node_element *ele;
++	uint16_t dst, app_idx, net_idx, src;
++	bool update;
++	struct keyring_net_key net_key;
++	struct keyring_app_key app_key;
++	uint8_t data[20];
++
++	l_debug("AddNetKey");
++
++	sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node->owner))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
++
++	if (!l_dbus_message_get_arguments(msg, "oqqqb", &ele_path, &dst,
++						&app_idx, &net_idx, &update))
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
++
++	ele = l_queue_find(node->elements, match_element_path, ele_path);
++	if (!ele)
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
++							"Element not found");
++
++	src = node_get_primary(node) + ele->idx;
++
++	if (!keyring_get_app_key(node, app_idx, &app_key))
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
++							"AppKey not found");
++
++	if (!keyring_get_net_key(node, app_key.net_idx, &net_key)) {
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
++						"Bound NetKey not found");
++	}
++
++	if (!update) {
++		data[0] = OP_APPKEY_ADD;
++		memcpy(data + 4, app_key.old_key, 16);
++	} else {
++		if (net_key.phase != KEY_REFRESH_PHASE_ONE)
++			return dbus_error(msg, MESH_ERROR_FAILED,
++							"Cannot update");
++		data[0] = OP_APPKEY_UPDATE;
++		memcpy(data + 4, app_key.new_key, 16);
++	}
++
++	/* Pack bound NetKey and AppKey into 3 octets */
++	data[1] = app_key.net_idx;
++	data[2] = ((app_key.net_idx >> 8) & 0xf) | ((app_idx << 4) & 0xf0);
++	data[3] = app_idx >> 4;
++
++	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
++							DEFAULT_TTL, data, 20))
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
++
++	return l_dbus_message_new_method_return(msg);
++}
++
+ static struct l_dbus_message *publish_call(struct l_dbus *dbus,
+ 						struct l_dbus_message *msg,
+ 						void *user_data)
+@@ -2219,6 +2336,12 @@ static void setup_node_interface(struct l_dbus_interface *iface)
+ 						"", "oqbqay", "element_path",
+ 						"destination", "remote",
+ 						"net_index", "data");
++	l_dbus_interface_method(iface, "AddNetKey", 0, add_netkey_call, "",
++					"oqqqb", "element_path", "destination",
++					"subnet_index", "net_index", "update");
++	l_dbus_interface_method(iface, "AddAppKey", 0, add_appkey_call, "",
++					"oqqqb", "element_path", "destination",
++					"app_index", "net_index", "update");
+ 	l_dbus_interface_method(iface, "Publish", 0, publish_call, "", "oqay",
+ 					"element_path", "model_id", "data");
+ 	l_dbus_interface_method(iface, "VendorPublish", 0, vendor_publish_call,
+-- 
+2.21.0
 
-adam
->
-> Regards
->
-> Marcel
->
