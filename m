@@ -2,244 +2,208 @@ Return-Path: <SRS0=wWRn=YK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B266DFA372A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 08:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24203ECE58E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 10:00:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DCC720869
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 08:36:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCEAB2089C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 10:00:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0o5BmY/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392968AbfJQIge convert rfc822-to-8bit (ORCPT
+        id S2388225AbfJQKAC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Oct 2019 04:36:34 -0400
-Received: from mga01.intel.com ([192.55.52.88]:37727 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388788AbfJQIge (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Oct 2019 04:36:34 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 01:36:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,307,1566889200"; 
-   d="scan'208";a="200323487"
-Received: from pgsmsx104.gar.corp.intel.com ([10.221.44.91])
-  by orsmga006.jf.intel.com with ESMTP; 17 Oct 2019 01:36:31 -0700
-Received: from pgsmsx105.gar.corp.intel.com ([169.254.4.226]) by
- PGSMSX104.gar.corp.intel.com ([169.254.3.188]) with mapi id 14.03.0439.000;
- Thu, 17 Oct 2019 16:36:30 +0800
-From:   "Bag, Amit K" <amit.k.bag@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-        "Hegde, Raghuram" <raghuram.hegde@intel.com>
-Subject: RE: [PATCH v3] Bluetooth: btusb: Trigger Intel FW download error
- recovery
-Thread-Topic: [PATCH v3] Bluetooth: btusb: Trigger Intel FW download error
- recovery
-Thread-Index: AQHVhLJKXxYTQGsv7EuvQlohVPZnv6dd8ToAgACPqxA=
-Date:   Thu, 17 Oct 2019 08:36:30 +0000
-Message-ID: <EFE6F46E14A5F445949D76A8CAC224005845C7BF@PGSMSX105.gar.corp.intel.com>
-References: <1571292602-26274-1-git-send-email-amit.k.bag@intel.com>
- <3FCBAC52-CBED-4E6E-A638-B944975E0600@holtmann.org>
-In-Reply-To: <3FCBAC52-CBED-4E6E-A638-B944975E0600@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOGViOTYxZDktZWRiYS00NmU0LTgxZDUtNWFiNDQ5NWY4NmNlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiME9IcmdEZEtGeGkrUzBjUldudW1ucEdkQ0lSNWtVZkI3OHZLMml6NElkdlBIaFQ5c2t4NVhISnYySkVRdWFPVSJ9
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [172.30.20.205]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Thu, 17 Oct 2019 06:00:02 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34234 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726638AbfJQKAC (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 17 Oct 2019 06:00:02 -0400
+Received: by mail-wr1-f67.google.com with SMTP id j11so1628315wrp.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2019 03:00:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=kbdKXH3wuBvIyxNJP3QHRHENytY3C903+G+jZNVarW0=;
+        b=X0o5BmY/bLkGCahA8Pfs1pw3eLiMMDC5jQIaIFvn1ejqUIzKWp5FAvho2eCHnxFkyV
+         kXFceNz2BY5SVHrvIPBhBmg4obWxVS26WXATWYSo3SrsOvw4e2z0IB+IqogYm3JVNdY+
+         6eEAkmaCAs3kB5DcGARDf1ou0uqkE1/6Wvf6tSfmq5DGLjPBFzY65RG973+qbjc2Y77l
+         pq/MqdxgD4m1bAi7JXGdM/+EV0QIoSPu/gLDe/86D1tfxnBzp87Gn3iRgHGZUR5WAGir
+         p9QNd3WE2i7Kd9RrsaF+HOwiND+xpCXCG5kNUJ06XOq8p/8FOgtCaSoC66bbdMnRBJJ6
+         WDwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=kbdKXH3wuBvIyxNJP3QHRHENytY3C903+G+jZNVarW0=;
+        b=AnG/gJq/ual05nhTfu6s95Ah/052AjoZ7Fn0MOhdqVpGLh4GrqXFjCG1Dx8az4Uzdt
+         gfh7FAokmE9ueMCGPvuGBZdePwuynQ+wMNUxuXi+PsMiIbp0gepSaC219qQknXJ0WcI4
+         gp8WDEOOjzsAofYMWliEj1z+9P0Dcw6CNPKYmEQP2tI8mhnuesRruH68j6vi3XL97CSJ
+         762IXO2ddcdGIz03mrXPFNrBa4jec9aUWYGrdpmhFqN76Igy0PdR/NJNshIH1RN1eeI5
+         NRZN1oMeI0x+SIihZHfEKyu54RpisF0Q0ebxcj22KZQQQH3DRFoz+17U88wtSzlIa0hO
+         WIwQ==
+X-Gm-Message-State: APjAAAXdmDcocq3QWF75gWq8Ti5cwWN6fcmGd2ZWwR/Ll80qx3q7FyJw
+        Zjlet3sdBj/QMiqYCOkqI3I=
+X-Google-Smtp-Source: APXvYqx16JrFZA3HvCQHfupdDeaZOQSph0TIr4veNU+v1kauZifbbuaWCVJP3qlbj5pg4gbGaya9Pg==
+X-Received: by 2002:a05:6000:1051:: with SMTP id c17mr2175019wrx.124.1571306399534;
+        Thu, 17 Oct 2019 02:59:59 -0700 (PDT)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id z13sm1634255wrq.51.2019.10.17.02.59.58
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 17 Oct 2019 02:59:58 -0700 (PDT)
+Date:   Thu, 17 Oct 2019 11:59:57 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 1/4] doc/media-api: Add RegisterApplication method
+Message-ID: <20191017095957.cce7jzejvn76kwkc@pali>
+References: <20190829200513.6xnta5jx3trbmgxp@pali>
+ <20191003181855.GF28704@reaktio.net>
+ <20191006100503.fsbttcschr6wgsdq@pali>
+ <CABBYNZLS4MMxJ=gQED-BVfn81D0bvx8aLw5OO3tNmXAnWeA57Q@mail.gmail.com>
+ <20191006120245.tkrooh45q7irtm6l@pali>
+ <20191007143307.ez6g466afu3trlxn@pali>
+ <CABBYNZ+2CGn2rONg+Tpdh9vr7E40_SFFT4Mmru2vQw7MKHTFjQ@mail.gmail.com>
+ <20191008103333.rqn2btlkwtcrpouo@pali>
+ <CABBYNZKKUf6-FPBEGjuC5GbsNzNsDLy7LgCHxqiW_g98BaX+QA@mail.gmail.com>
+ <20191009131921.ysl3ianpv5e4m677@pali>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191009131921.ysl3ianpv5e4m677@pali>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+On Wednesday 09 October 2019 15:19:21 Pali Rohár wrote:
+> On Wednesday 09 October 2019 16:15:59 Luiz Augusto von Dentz wrote:
+> > Hi Pali,
+> > 
+> > On Tue, Oct 8, 2019 at 1:33 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > >
+> > > On Tuesday 08 October 2019 13:28:53 Luiz Augusto von Dentz wrote:
+> > > > Hi Pali,
+> > > >
+> > > > On Mon, Oct 7, 2019 at 5:33 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > > > >
+> > > > > On Sunday 06 October 2019 14:02:45 Pali Rohár wrote:
+> > > > > > On Sunday 06 October 2019 13:53:37 Luiz Augusto von Dentz wrote:
+> > > > > > > Hi Pali,
+> > > > > > >
+> > > > > > > On Sun, Oct 6, 2019 at 1:05 PM Pali Rohár <pali.rohar@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > On Thursday 03 October 2019 21:18:55 Pasi Kärkkäinen wrote:
+> > > > > > > > > Hi,
+> > > > > > > > >
+> > > > > > > > > On Thu, Aug 29, 2019 at 10:05:13PM +0200, Pali Rohár wrote:
+> > > > > > > > > > On Thursday 29 August 2019 15:57:34 Pasi Kärkkäinen wrote:
+> > > > > > > > > > > Pali: How does it look with porting the PA patches to use the new interfaces?
+> > > > > > > > > >
+> > > > > > > > > > Hello, I have not had a time yet to play with these pulseaudio patches
+> > > > > > > > > > and porting to the new interface. I guess that I could have more free
+> > > > > > > > > > time in the last week of next month.
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > It seems BlueZ 5.51 has been released meanwhile (http://www.bluez.org/release-of-bluez-5-51/)
+> > > > > > > > > So now at least the new interfaces are in a released bluez version.
+> > > > > > > >
+> > > > > > > > Ok! Today I have looked at this new Bluez API, but seems that there is
+> > > > > > > > not only missing some examples or usages with libdbus-1, but also
+> > > > > > > > documentation. I have tried to find something how to register endpoints
+> > > > > > > > throw GetManagedObjects() via libdbus-1, but seems that there is no
+> > > > > > > > usage of it and also unusable documentation for it in libdbus-1. So
+> > > > > > > > currently I'm stuck how to use this exotic API in pulseaudio...
+> > > > > > >
+> > > > > > > It is just another D-Bus method, the only difference is that it
+> > > > > > > carries the entire object tree, btw I did add an example of how to
+> > > > > > > register Endpoints in python:
+> > > > > > >
+> > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-endpoint
+> > > > > >
+> > > > > > This example uses undocumented property "DelayReporting". What it is doing?
+> > > > >
+> > > > > Also this new Managed Objects API bring some inconsistency. Codec
+> > > > > switching API is available only when bluetoothd was started with
+> > > > > --experimental flag, but this new Object API is available also without
+> > > > > it. So it just complicated implementation.
+> > > > >
+> > > > > How could application (e.g. pulseaudio) check if A2DP codec switching is
+> > > > > available and based on this decide if via Managed Objects API export
+> > > > > more codecs or just only default SBC?
+> > > >
+> > > > The idea was that this API would be experimental as well but it seems
+> > > > it is not,
+> > >
+> > > No, it is not experimental. Managed Objects API is available also when
+> > > bluetoothd is started without --experimental argument.
+> > >
+> > > > they should go hand in hand with Endpoint objects to ensure
+> > > > they will be available as well so we might have to fix this in 5.52,
+> > > > too bad we didn't see this before 5.51 went out.
+> > >
+> > > So... what should applications expects and how they should implement
+> > > above decision?
+> > 
+> > Actually the decision should be based on the presence of
+> > RegisterApplication method, if that exists then endpoint switching
+> > should be supported as well, so has nothing to do the
+> > GetManagedObjects API of the bluetoothd. That said RegisterApplication
+> > was not made experimental which kind makes 5.51 broken because it
+> > would appear that it endpoint objects would be exposed but when in
+> > fact there are not, anyway lets finally have the code to use this
+> > interface and then we can remove the experimental flag from
+> > MediaEndpoint.
+> 
+> Ok, so can pulseaudio do following?
+> 
+> Call RegisterApplication. If success then expects that codec switching
+> is possible and via GetManagedObjects exports all available codecs.
+> If RegisterApplication fails then fallback to RegisterEndpoint, expects
+> that codec switching is not possible and so register only one SBC codec.
 
->> Sometimes during FW data download stage, in case of an error is 
->> encountered the controller device could not be recovered. To recover 
->> from such failures send Intel hard Reset to re-trigger FW download in 
->> following error scenarios:
->> 
->> 1. Intel Read version command error
->> 2. Firmware download timeout
->> 3. Failure in Intel Soft Reset for switching to operational FW 4. Boot 
->> timeout for switching to operaional FW
->> 
->> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
->> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
->> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
->> ---
->> drivers/bluetooth/btintel.c | 49 
->> +++++++++++++++++++++++++++++++++++++++++++++
->> drivers/bluetooth/btintel.h |  6 ++++++
->> drivers/bluetooth/btusb.c   | 20 ++++++++++++++----
->> 3 files changed, 71 insertions(+), 4 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c 
->> index bb99c8653aab..a93aec22d3a6 100644
->> --- a/drivers/bluetooth/btintel.c
->> +++ b/drivers/bluetooth/btintel.c
->> @@ -709,6 +709,55 @@ int btintel_download_firmware(struct hci_dev 
->> *hdev, const struct firmware *fw, } 
->> EXPORT_SYMBOL_GPL(btintel_download_firmware);
->> 
->> +void btintel_reset_to_bootloader(struct hci_dev *hdev) {
->> +	const struct intel_reset params;
->> +	struct sk_buff *skb;
->> +	u32 boot_param;
->> +
->> +
->> +	boot_param = 0x00000000;
->> +
->> +	/* Send Intel Reset command. This will result in
->> +	 * re-enumeration of BT controller.
->> +	 *
->> +	 * Intel Reset parameter description:
->> +	 * reset_type :   0x00 (Soft reset),
->> +	 *		  0x01 (Hard reset)
->> +	 * patch_enable : 0x00 (Do not enable),
->> +	 *		  0x01 (Enable)
->> +	 * ddc_reload :   0x00 (Do not reload),
->> +	 *		  0x01 (Reload)
->> +	 * boot_option:   0x00 (Current image),
->> +	 *                0x01 (Specified boot address)
->> +	 * boot_param:    Boot address
->> +	 *
->> +	 */
->> +	params.reset_type = 0x01;
->> +	params.patch_enable = 0x01;
->> +	params.ddc_reload = 0x01;
->> +	params.boot_option = 0x00;
->> +	params.boot_param = cpu_to_le32(boot_param);
->
->params.boot_param = cpu_to_le32(0x00000000);
->
->> +
->> +	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(params),
->> +			     &params, HCI_INIT_TIMEOUT);
->> +	if (IS_ERR(skb)) {
->> +		bt_dev_err(hdev, "FW download error recovery failed (%ld)",
->> +			   PTR_ERR(skb));
->> +		return;
->> +	}
->> +	bt_dev_info(hdev, "Intel reset sent to retry FW download");
->> +	kfree_skb(skb);
->> +
->> +	/* Current Intel BT controllers(ThP/JfP) hold the USB reset
->> +	 * lines for 2ms when it receives Intel Reset in bootloader mode.
->> +	 * Whereas, the upcoming Intel BT controllers will hold USB reset
->> +	 * for 150ms. To keep the delay generic, 150ms is chosen here.
->> +	 */
->> +	msleep(150);
->> +}
->> +EXPORT_SYMBOL_GPL(btintel_reset_to_bootloader);
->> +
->> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>"); 
->> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " 
->> VERSION); MODULE_VERSION(VERSION); diff --git 
->> a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h index 
->> 3d846190f2bf..d2311156f778 100644
->> --- a/drivers/bluetooth/btintel.h
->> +++ b/drivers/bluetooth/btintel.h
->> @@ -87,6 +87,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
->> 			     struct intel_boot_params *params); int 
->> btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
->> 			      u32 *boot_param);
->> +void btintel_reset_to_bootloader(struct hci_dev *hdev);
->> #else
->> 
->> static inline int btintel_check_bdaddr(struct hci_dev *hdev) @@ -181,4 
->> +182,9 @@ static inline int btintel_download_firmware(struct hci_dev 
->> *dev, {
->> 	return -EOPNOTSUPP;
->> }
->> +
->> +static inline void btintel_reset_to_bootloader(struct hci_dev *hdev) 
->> +{
->> +	return -EOPNOTSUPP;
->> +}
->> #endif
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
->> index 5d7bc3410104..47178af7f7fe 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -1846,8 +1846,11 @@ static int btusb_setup_intel(struct hci_dev *hdev)
->> 	 * firmware variant, revision and build number.
->> 	 */
->> 	err = btintel_read_version(hdev, &ver);
->> -	if (err)
->> +	if (err) {
->> +		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
->> +		btintel_reset_to_bootloader(hdev);
->> 		return err;
->> +	}
->> 
->> 	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
->> 		    ver.hw_platform, ver.hw_variant, ver.hw_revision,
->
->I am bit confused on why you modify the read_version in the legacy Intel setup and not in the new one. Can we focus with this patch on setup_intel_new and you add support for legacy setup in a second patch if that is needed as well.
->
->> @@ -2326,9 +2329,13 @@ static int btusb_setup_intel_new(struct hci_dev 
->> *hdev)
->> 
->> 	/* Start firmware downloading and get boot parameter */
->> 	err = btintel_download_firmware(hdev, fw, &boot_param);
->> -	if (err < 0)
->> +	if (err < 0) {
->> +		/* When FW download fails, send Intel Reset to retry
->> +		 * FW download.
->> +		 */
->> +		btintel_reset_to_bootloader(hdev);
->> 		goto done;
->> -
->> +	}
->> 	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
->> 
->> 	bt_dev_info(hdev, "Waiting for firmware download to complete"); @@ 
->> -2355,6 +2362,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
->> 	if (err) {
->> 		bt_dev_err(hdev, "Firmware loading timeout");
->> 		err = -ETIMEDOUT;
->> +		btintel_reset_to_bootloader(hdev);
->> 		goto done;
->> 	}
->> 
->> @@ -2381,8 +2389,11 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
->> 	set_bit(BTUSB_BOOTING, &data->flags);
->> 
->> 	err = btintel_send_intel_reset(hdev, boot_param);
->> -	if (err)
->> +	if (err) {
->> +		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
->> +		btintel_reset_to_bootloader(hdev);
->> 		return err;
->> +	}
->> 
->> 	/* The bootloader will not indicate when the device is ready. This
->> 	 * is done by the operational firmware sending bootup notification.
->> @@ -2404,6 +2415,7 @@ static int btusb_setup_intel_new(struct hci_dev 
->> *hdev)
->> 
->> 	if (err) {
->> 		bt_dev_err(hdev, "Device boot timeout");
->> +		btintel_reset_to_bootloader(hdev);
->> 		return -ETIMEDOUT;
->> 	}
+Also can we solve this problem in bluez ASAP? Last released bluez
+version is due to that non-experimental API broken and once applications
+(e.g. pulseaudio) starts using this new API then A2DP without bluetoothd
+-E would be broken.
 
-Sorry by mistake I modify the read_version in the legacy Intel setup. I corrected it in the patch v6 patch and also removed boot_param variable and directly assign the value as well. 
+I would propose to remove experimental mark for codec switching API and
+release a new bugfix version of bluez, so people would not use released
+5.51 broken version... which could prevent breakage of A2DP in future.
 
-Regards,
-Amit
+> > > > > > > You can also have a look at how our gdbus internal library (uses
+> > > > > > > libdbus) utilize it:
+> > > > > > >
+> > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/gdbus/client.c#n1269
+> > > > > > >
+> > > > > >
+> > > > >
+> > > > > --
+> > > > > Pali Rohár
+> > > > > pali.rohar@gmail.com
+> > > >
+> > > >
+> > > >
+> > >
+> > > --
+> > > Pali Rohár
+> > > pali.rohar@gmail.com
+> > 
+> > 
+> > 
+> 
 
+-- 
+Pali Rohár
+pali.rohar@gmail.com
