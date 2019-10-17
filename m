@@ -2,112 +2,102 @@ Return-Path: <SRS0=wWRn=YK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6EEEECE58E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 11:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A00FA3735
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 11:51:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83B3F20854
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 11:29:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="exlmi1lq"
+	by mail.kernel.org (Postfix) with ESMTP id 6A1952082C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Oct 2019 11:51:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2439698AbfJQL3f (ORCPT
+        id S2502174AbfJQLvs convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Oct 2019 07:29:35 -0400
-Received: from mail-wr1-f54.google.com ([209.85.221.54]:42584 "EHLO
-        mail-wr1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405872AbfJQL3f (ORCPT
+        Thu, 17 Oct 2019 07:51:48 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:58072 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727877AbfJQLvs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Oct 2019 07:29:35 -0400
-Received: by mail-wr1-f54.google.com with SMTP id n14so1915345wrw.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2019 04:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:mime-version:content-disposition
-         :content-transfer-encoding:user-agent;
-        bh=I7csLYiup3xQD57gOwiCpPTw1guySgCP7xZ0hNqoNZA=;
-        b=exlmi1lqnpVKrGyGJq30BVRhuhY1UkL5f4NRsVLSrAxUfCrQr0NCfWN8BzZnGmfdiq
-         4c925Cteob0R5fRIiegMmPZ6dJ84a0ogiP+a2O7kE1jsRB6fPH3ap9BjkXWVodfrYji+
-         cmY+YUtk4BJ3ADbD3Tee5EEoLF6Yx43QH8BZUcJNEfgm+xkXh8d6yGzdAenBui5Drzqq
-         Z4xRcj5pj+5lNbiE1o+WKJyzmrRXk4DyEJgET4Fd1Ri6eCETQMqI1taeci2NoVNaSvsl
-         blc7WOhZ+oLMHiQXxRKm6POjHZb3JoDwVDThNRJRlxo8voKveAkb0SY4aXvRhQKlwNQS
-         Rhww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition:content-transfer-encoding:user-agent;
-        bh=I7csLYiup3xQD57gOwiCpPTw1guySgCP7xZ0hNqoNZA=;
-        b=TbJsreDZOoW2dSiAEnGgEmFX2dFumzWtjqRK9EnzLTEpO4+HT0IzHZk6u1/wlzSxhA
-         qN+hhwyHFZrF3Knshyomj5RvfTVwg/s2qVsyugNHg+HRfckrml7TSBjxOpEyitYqY6+r
-         5XWdM8o0d7Uv8cFLLsHxf/aYP1+I/ypcmODG1aWPsaKZXLmyXlcV2V6Ro6+hJUyJQUaW
-         Gbmh9/Vl6AdDiEscNmAgrFMYs+8gSCk02/XsZTzGcquT0I9eJmakQ1A5ZIN0XmyOU9Xw
-         QhaRpRp62kicW3Ar8oe4wzz//GG4CQqHnEOkolcAhiNZcEUsbbnw1nt86ZU2coIFP6uG
-         GiXQ==
-X-Gm-Message-State: APjAAAUMEHQx4iPvjZVFdxQnjidbJVo7qPBVuttuSR1zbqcEt6eyFUPs
-        zkAJg4cGOWum4I634C87SLw5rcld
-X-Google-Smtp-Source: APXvYqzdumroWEEZw8n6M+VtYt1JjvolDikZKVFSMsQeEh6WnCXbwDjOHa5ga4ObOgBp0goEN2JvlQ==
-X-Received: by 2002:adf:e982:: with SMTP id h2mr447039wrm.53.1571311772528;
-        Thu, 17 Oct 2019 04:29:32 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id k3sm1754008wrn.41.2019.10.17.04.29.31
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 17 Oct 2019 04:29:31 -0700 (PDT)
-Date:   Thu, 17 Oct 2019 13:29:30 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: HSP/HFP profile daemon for bluez
-Message-ID: <20191017112930.baovyz2n2qc2nzgj@pali>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Thu, 17 Oct 2019 07:51:48 -0400
+Received: from surfer-172-29-2-69-hotspot.internet-for-guests.com (p2E5701B0.dip0.t-ipconnect.de [46.87.1.176])
+        by mail.holtmann.org (Postfix) with ESMTPSA id A519ACECE6;
+        Thu, 17 Oct 2019 14:00:45 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
+Subject: Re: [PATCH v6] Bluetooth: btusb: Trigger Intel FW download error
+ recovery
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1571300549-27306-1-git-send-email-amit.k.bag@intel.com>
+Date:   Thu, 17 Oct 2019 13:51:46 +0200
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com,
+        Raghuram Hegde <raghuram.hegde@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <113CA53A-9FB7-4793-B2C4-828B185C4853@holtmann.org>
+References: <1571300549-27306-1-git-send-email-amit.k.bag@intel.com>
+To:     Amit K Bag <amit.k.bag@intel.com>
+X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello!
+Hi Amit,
 
-I would like to open a discussion about problems related to HSP and HFP
-profiles usage via bluez D-Bus API.
+> Sometimes during FW data download stage, in case of an error is
+> encountered the controller device could not be recovered. To recover
+> from such failures send Intel hard Reset to re-trigger FW download in
+> following error scenarios:
+> 
+> 1. Intel Read version command error
+> 2. Firmware download timeout
+> 3. Failure in Intel Soft Reset for switching to operational FW
+> 4. Boot timeout for switching to operaional FW
+> 
+> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> ---
+> drivers/bluetooth/btintel.c | 46 +++++++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btintel.h |  6 ++++++
+> drivers/bluetooth/btusb.c   | 20 ++++++++++++++++----
+> 3 files changed, 68 insertions(+), 4 deletions(-)
 
-Bluez daemon since version 5 does not provide internal AT command parser
-and relay on application's implementation which registers itself to
-bluez via D-Bus API. Application get then via D-Bus bluetooth socket /
-file descriptor and therefore must implement whole HSP and HFP profiles.
+So this patch has a bunch of errors
 
-HSP/HFP profiles today provide lot of different services, including
-custom vendors extensions. E.g. bi-directional audio, controls for GSM
-calls (answer, reject, ring event), push button notification, battery
-status indication, etc...
+Applying: Bluetooth: btusb: Trigger Intel FW download error recovery
+.git/rebase-apply/patch:97: trailing whitespace.
+		btintel_reset_to_bootloader(hdev);	
+warning: 1 line adds whitespace errors.
 
-Basically set of fully different services which are on Linux system
-managed by totally different layers or applications. E.g. audio by
-pulseaudio, modem by ofono, buttons by linux input layer, battery by
-upowerd, ... Some of them are running under ordinary user, some of them
-as root; and at different D-Bus levels (system or different user
-sessions); so synchronization is hard and maybe not possible (in some
-cases).
+  CC      drivers/bluetooth/btintel.o
+drivers/bluetooth/btintel.c: In function ‘btintel_reset_to_bootloader’:
+drivers/bluetooth/btintel.c:733:20: error: assignment of member ‘reset_type’ in read-only object
+  733 |  params.reset_type = 0x01;
+      |                    ^
+drivers/bluetooth/btintel.c:734:22: error: assignment of member ‘patch_enable’ in read-only object
+  734 |  params.patch_enable = 0x01;
+      |                      ^
+drivers/bluetooth/btintel.c:735:20: error: assignment of member ‘ddc_reload’ in read-only object
+  735 |  params.ddc_reload = 0x01;
+      |                    ^
+drivers/bluetooth/btintel.c:736:21: error: assignment of member ‘boot_option’ in read-only object
+  736 |  params.boot_option = 0x00;
+      |                     ^
+drivers/bluetooth/btintel.c:737:20: error: assignment of member ‘boot_param’ in read-only object
+  737 |  params.boot_param = cpu_to_le32(0x00000000);
+      |                    ^
+drivers/bluetooth/btintel.c:716:6: warning: unused variable ‘boot_param’ [-Wunused-variable]
+  716 |  u32 boot_param;
+      |      ^~~~~~~~~~
 
-Plus because different devices use different and custom vendor
-extensions, all these services cannot be implemented by one application
-which receive bluetooth socket from bluez D-Bus API.
+I would really encourage to test the patch with git am and compile test it at least since these are obvious bugs.
 
-To solve this problem, I would propose a solution for this:
+Anyway, I manually fixed this up and applied to patch to bluetooth-next tree.
 
-Implement a new central daemon talking on system D-Bus which would
-register for HSP and HFP profiles to bluez and then would export needed
-information via D-Bus, so other application could implement needed
-services (including those new custom vendor extensions).
+Regards
 
-What do you think about it?
+Marcel
 
--- 
-Pali Rohár
-pali.rohar@gmail.com
