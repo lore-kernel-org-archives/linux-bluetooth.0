@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 976DECA9ED0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 05:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EBCCA9ECF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 05:24:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64657222BD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 05:24:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB655222BD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 05:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nUpMW9IO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pwVGwpyv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2442019AbfJRFYO (ORCPT
+        id S2441999AbfJRFYL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Oct 2019 01:24:14 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:43249 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2442010AbfJRFYN (ORCPT
+        Fri, 18 Oct 2019 01:24:11 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:38874 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2395144AbfJRFYL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Oct 2019 01:24:13 -0400
-Received: by mail-pl1-f193.google.com with SMTP id f21so2266987plj.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2019 22:24:12 -0700 (PDT)
+        Fri, 18 Oct 2019 01:24:11 -0400
+Received: by mail-pg1-f195.google.com with SMTP id w3so2689978pgt.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2019 22:24:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=yvdpNgVZVW1ID8m+eY6Fjz43lKaX01Op/76I7ccP//M=;
-        b=nUpMW9IOCBO3b7o+mUbj+BZ/SJeboSTEvqdXBozkFKDFOiB6KkrRWZGxA+dXTVLvnc
-         NbZ+eEP57xv1HtIhnVhA+gr7WYS3+2M2XwG7OQ55FkY5WCFeNKCoDJxDzm3HFrXL9x7X
-         0LCoL+jG3ra1twhebvIy4bOiBLVhvfDuS7ImW1cMdF53D5ou5RBBAqxI3QyLx2OaYkyH
-         31ODpZTkZdbK8X92s2MC2r62YjEeoycIwMpdt0pbniQ/OHHx2+95DFy+DpugK8oKRmXm
-         mwOO5WDUkdtBOc4qctdK9eDW0n6QxbnbANPl+cGYr0NjzX56aJXnW6ixP+iBRmP/EeGL
-         27Lw==
+        bh=jDq5W42aFu1uYq0Wf8hvxLigwHa6+BiXckCc47UbuNo=;
+        b=pwVGwpyvQv+pshWx85LTbypti0ekQXXbxw/w/zZDphsXBvkSuLrySfri6X+lvRjV7h
+         nClLK/yOUe7XNSihPqlLnE94DyXPhNlUmpufyT5aTtKMpbsDctNH9upkqD0akX9BaghO
+         nva/hRKa/F2qh8c5AHFeNg/SJYT7fStW+H0c7oEZlONcl3bPHhCVVqMS1/MB+OCE2EqJ
+         2SdnSUZcub8AxIvp1baJmgKYKpaJPEjWFFf6oe8QcG/FIzl/Wh/Lb4C0j+B+xYfGsvVJ
+         gY95+KKx0ad0wMuuD/8V2Q8n1uw9BqYeYwehpOXYbWqVzpyGArmAmWC1Pp3tm0VhLdK3
+         lCHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yvdpNgVZVW1ID8m+eY6Fjz43lKaX01Op/76I7ccP//M=;
-        b=oI0btTR3iD2KE4CGjE9vXRP1uKOqdBci7isMvMzdm/KFTcysmVyx9bTljVN40D7WCX
-         Iyd0PcgSlpthXy6V6oS8NgsPkQpIhkFbWQ4iohpA+FBZX47SWALWPbWpxdUu742CZxia
-         sm36bJund6eguNhH9CslsEw4/wY7TznjcJfzeJE5LPIL3Ucb3eV7uPRj7+vTI1ZrqE/S
-         q2feNglicttgWtDCkt1cnqma5lznRltgwcihancAS2vL3yK5/5ci9BrDtMF/zkAq/v4i
-         NYqrYjBG4cmRXOFM/AHM8Qz4FI03I7elXgw2C1X8EW5fHST+7lCwNcGKdhz6sH/BoIsm
-         mt/g==
-X-Gm-Message-State: APjAAAX79wQHUKJ6GB7qWGenT74B8JlcT7xNDmgSMlzlr+9Xn3x18Ww8
-        ZxdOPT82egdwSt1GLFU1JSZSRg==
-X-Google-Smtp-Source: APXvYqwC1onVuDy1d+iHyUXB3LLxKvj824dBaXqO2hYPZD/2/qHNLyvqj3pyRlJuy5HWMKZ2OpfDvw==
-X-Received: by 2002:a17:902:8d89:: with SMTP id v9mr7661064plo.247.1571376252173;
-        Thu, 17 Oct 2019 22:24:12 -0700 (PDT)
+        bh=jDq5W42aFu1uYq0Wf8hvxLigwHa6+BiXckCc47UbuNo=;
+        b=j7K0/KZ6IqGZrShp+BpJA/kLgQUvEp+jxrJvUXGa6PwEX+LRCVizdPDrkGSutyPNE3
+         i96layXuwP6qmknvy6+Xx343BI9EZ5EhcIXH2b8F4ICNPxrisPggepD56DaatKstYO/Y
+         hjmYMiIgG+2sg7lHxWsP8nbgtA57ZFMiGpY72GLp3o29rEGwsCc5Y4dJm3nmCIO/v2Ar
+         qDJ0MlYrvHgsjOsfYy9MbVD22vRcs9vHNRgqoK4fI08/3E9ndEyv9cTZc/3CHSwAfjNV
+         wm29MJaMpVRoWtMWfUfUtDdO493/pCPY3y8Fi0Qqvw3/Nc7ZotGJ3/fQi+pTfe+P6NtC
+         GXbQ==
+X-Gm-Message-State: APjAAAWMVu9P4q7+pvzcwBmwub+Wn77v9UYRPbXCovj765if4DHtT8eu
+        PaWgHx/68Bm+QiJoDQnl/5W0Jrb9544=
+X-Google-Smtp-Source: APXvYqyezGIQ7Ue9t3Jo96VVHFYoqaoyr2+zBXKnyVoWMT90aSE0pee2gnV+wwaa5VzK53ZQsh8lWQ==
+X-Received: by 2002:a62:1a15:: with SMTP id a21mr4491058pfa.5.1571376249793;
+        Thu, 17 Oct 2019 22:24:09 -0700 (PDT)
 Received: from localhost.localdomain (104-188-17-28.lightspeed.sndgca.sbcglobal.net. [104.188.17.28])
-        by smtp.gmail.com with ESMTPSA id u11sm2178760pgc.61.2019.10.17.22.24.11
+        by smtp.gmail.com with ESMTPSA id u11sm2178760pgc.61.2019.10.17.22.24.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Oct 2019 22:24:11 -0700 (PDT)
+        Thu, 17 Oct 2019 22:24:09 -0700 (PDT)
 From:   Bjorn Andersson <bjorn.andersson@linaro.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jeffrey Hugo <jeffrey.l.hugo@gmail.com>,
         linux-arm-msm@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: hci_qca: Use regulator bulk enable/disable
-Date:   Thu, 17 Oct 2019 22:24:03 -0700
-Message-Id: <20191018052405.3693555-4-bjorn.andersson@linaro.org>
+Subject: [PATCH 1/4] Bluetooth: hci_qca: Update regulator_set_load() usage
+Date:   Thu, 17 Oct 2019 22:24:01 -0700
+Message-Id: <20191018052405.3693555-2-bjorn.andersson@linaro.org>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191018052405.3693555-1-bjorn.andersson@linaro.org>
 References: <20191018052405.3693555-1-bjorn.andersson@linaro.org>
@@ -75,124 +75,82 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-With the regulator_set_load() and regulator_set_voltage() out of the
-enable/disable code paths the code can now use the standard
-regulator bulk enable/disable API.
+Since the introduction of '5451781dadf8 ("regulator: core: Only count
+load for enabled consumers")' in v5.0, the requested load of a regulator
+consumer is only accounted for when said consumer is voted enabled.
 
-By cloning num_vregs into struct qca_power there's no need to lug around
-a reference to the struct qca_vreg_data, which further simplifies
-qca_power_setup().
+So there's no need to vote for load ever time the regulator is
+enabled or disabled.
 
 Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
 ---
- drivers/bluetooth/hci_qca.c | 55 +++++++++----------------------------
- 1 file changed, 13 insertions(+), 42 deletions(-)
+ drivers/bluetooth/hci_qca.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 54aafcc69d06..01f941e9adf3 100644
+index e3164c200eac..c07c529b0d81 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -144,8 +144,8 @@ struct qca_vreg_data {
-  */
- struct qca_power {
- 	struct device *dev;
--	const struct qca_vreg_data *vreg_data;
- 	struct regulator_bulk_data *vreg_bulk;
-+	int num_vregs;
- 	bool vregs_on;
- };
+@@ -1393,13 +1393,6 @@ static int qca_enable_regulator(struct qca_vreg vregs,
+ 	if (ret)
+ 		return ret;
  
-@@ -1381,63 +1381,34 @@ static int qca_power_off(struct hci_dev *hdev)
- 	return 0;
+-	if (vregs.load_uA)
+-		ret = regulator_set_load(regulator,
+-					 vregs.load_uA);
+-
+-	if (ret)
+-		return ret;
+-
+ 	return regulator_enable(regulator);
+ 
+ }
+@@ -1409,8 +1402,6 @@ static void qca_disable_regulator(struct qca_vreg vregs,
+ {
+ 	regulator_disable(regulator);
+ 	regulator_set_voltage(regulator, 0, vregs.max_uV);
+-	if (vregs.load_uA)
+-		regulator_set_load(regulator, 0);
+ 
  }
  
--static int qca_enable_regulator(struct qca_vreg vregs,
--				struct regulator *regulator)
--{
--	return regulator_enable(regulator);
--
--}
--
--static void qca_disable_regulator(struct qca_vreg vregs,
--				  struct regulator *regulator)
--{
--	regulator_disable(regulator);
--
--}
--
- static int qca_power_setup(struct hci_uart *hu, bool on)
+@@ -1462,18 +1453,30 @@ static int qca_power_setup(struct hci_uart *hu, bool on)
+ static int qca_init_regulators(struct qca_power *qca,
+ 				const struct qca_vreg *vregs, size_t num_vregs)
  {
--	struct qca_vreg *vregs;
- 	struct regulator_bulk_data *vreg_bulk;
- 	struct qca_serdev *qcadev;
--	int i, num_vregs, ret = 0;
-+	int num_vregs;
-+	int ret = 0;
++	struct regulator_bulk_data *bulk;
++	int ret;
+ 	int i;
  
- 	qcadev = serdev_device_get_drvdata(hu->serdev);
--	if (!qcadev || !qcadev->bt_power || !qcadev->bt_power->vreg_data ||
--	    !qcadev->bt_power->vreg_bulk)
-+	if (!qcadev || !qcadev->bt_power || !qcadev->bt_power->vreg_bulk)
- 		return -EINVAL;
+-	qca->vreg_bulk = devm_kcalloc(qca->dev, num_vregs,
+-				      sizeof(struct regulator_bulk_data),
+-				      GFP_KERNEL);
+-	if (!qca->vreg_bulk)
++	bulk = devm_kcalloc(qca->dev, num_vregs, sizeof(*bulk), GFP_KERNEL);
++	if (!bulk)
+ 		return -ENOMEM;
  
--	vregs = qcadev->bt_power->vreg_data->vregs;
- 	vreg_bulk = qcadev->bt_power->vreg_bulk;
--	num_vregs = qcadev->bt_power->vreg_data->num_vregs;
--	BT_DBG("on: %d", on);
-+	num_vregs = qcadev->bt_power->num_vregs;
-+	BT_DBG("on: %d (%d regulators)", on, num_vregs);
- 	if (on && !qcadev->bt_power->vregs_on) {
--		for (i = 0; i < num_vregs; i++) {
--			ret = qca_enable_regulator(vregs[i],
--						   vreg_bulk[i].consumer);
--			if (ret)
--				break;
--		}
-+		ret = regulator_bulk_enable(num_vregs, vreg_bulk);
+ 	for (i = 0; i < num_vregs; i++)
+-		qca->vreg_bulk[i].supply = vregs[i].name;
++		bulk[i].supply = vregs[i].name;
++
++	ret = devm_regulator_bulk_get(qca->dev, num_vregs, bulk);
++	if (ret < 0)
++		return ret;
+ 
+-	return devm_regulator_bulk_get(qca->dev, num_vregs, qca->vreg_bulk);
++	for (i = 0; i < num_vregs; i++) {
++		ret = regulator_set_load(bulk[i].consumer, vregs[i].load_uA);
 +		if (ret)
 +			return ret;
- 
--		if (ret) {
--			BT_ERR("failed to enable regulator:%s", vregs[i].name);
--			/* turn off regulators which are enabled */
--			for (i = i - 1; i >= 0; i--)
--				qca_disable_regulator(vregs[i],
--						      vreg_bulk[i].consumer);
--		} else {
--			qcadev->bt_power->vregs_on = true;
--		}
-+		qcadev->bt_power->vregs_on = true;
- 	} else if (!on && qcadev->bt_power->vregs_on) {
- 		/* turn off regulator in reverse order */
--		i = qcadev->bt_power->vreg_data->num_vregs - 1;
--		for ( ; i >= 0; i--)
--			qca_disable_regulator(vregs[i], vreg_bulk[i].consumer);
-+		regulator_bulk_disable(num_vregs, vreg_bulk);
- 
- 		qcadev->bt_power->vregs_on = false;
- 	}
- 
--	return ret;
++	}
++
++	qca->vreg_bulk = bulk;
++
 +	return 0;
  }
  
- static int qca_init_regulators(struct qca_power *qca,
-@@ -1465,6 +1436,7 @@ static int qca_init_regulators(struct qca_power *qca,
- 	}
- 
- 	qca->vreg_bulk = bulk;
-+	qca->num_vregs = num_vregs;
- 
- 	return 0;
- }
-@@ -1493,7 +1465,6 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 			return -ENOMEM;
- 
- 		qcadev->bt_power->dev = &serdev->dev;
--		qcadev->bt_power->vreg_data = data;
- 		err = qca_init_regulators(qcadev->bt_power, data->vregs,
- 					  data->num_vregs);
- 		if (err) {
+ static int qca_serdev_probe(struct serdev_device *serdev)
 -- 
 2.23.0
 
