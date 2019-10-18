@@ -2,150 +2,91 @@ Return-Path: <SRS0=NsPc=YL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D184CA9ED1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 04:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71308CA9ECF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 05:24:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6E2A222C5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 04:55:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42696222BD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Oct 2019 05:24:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Qz9YB1cp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x9MS2j9S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2441949AbfJREzH (ORCPT
+        id S2391663AbfJRFYJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Oct 2019 00:55:07 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:35307 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725926AbfJREzF (ORCPT
+        Fri, 18 Oct 2019 01:24:09 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:35517 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388268AbfJRFYJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Oct 2019 00:55:05 -0400
-Received: by mail-qt1-f194.google.com with SMTP id m15so7364871qtq.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2019 21:55:04 -0700 (PDT)
+        Fri, 18 Oct 2019 01:24:09 -0400
+Received: by mail-pl1-f196.google.com with SMTP id c3so2284147plo.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2019 22:24:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8aspMadhLtLdwap/HY8pYXIpI/022GVepCK2sUy5Jo4=;
-        b=Qz9YB1cp2Zg6eSsNCQvAw6Xl7TdE+kvgwqY9mVMHfLFdjXB02ass8EAgL5EVNdqguV
-         oidctHw4mrvIPU8WCuzS+lKh4XCCv8TRwm6eyjKrm8zPZEfkMLCUib6g57hPc6TISL0R
-         RYuybrnZ7s4TaWGAE/9ruSfal9/1BdXMvE0DM=
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3o3EqRq3PgsgiQtn4AY+sfKyKLaEqB9pO5QeXjYW1YY=;
+        b=x9MS2j9SeTU1yjy/80Wvue6xeCHSErdf9EALM3Tjzc+ohSUTFrZ70EJyB/p3y8uCmp
+         E6oisSzZ64R/uT5q9VScB/CUyOZ7ZGyvBjpyp+JPl3pGOKo/IXykFV388A0MvXI77cst
+         pX5J3+EwmNbRsR9dCClbr9xz+PMxp6zkgcXjXyQuncbUYaCKC4ppDkibNqRVoiKxoeeH
+         +oLDcz/9+Kcji/s4z+0T7kT4MnasCEasJtZh74m8B8wBqkjOwDpK8JzeJNlW3UOJuHVG
+         pt2vWbvQc3jWMwz2Ms+vvdBzlZUx/NjpKlQsWPs7KiSDmoqv7lUg/7KxWmUlBYxRTjrF
+         KBsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8aspMadhLtLdwap/HY8pYXIpI/022GVepCK2sUy5Jo4=;
-        b=rMpF1aWCPUkfzapdmsGRpLZpSAKajQV5+Ih/JfLFDF4SLc8nf2PEhvBu8Ud9auTxzm
-         D8hF8OIwcycQXMRd3VltsByWUV72W2AkM2l2jhyCA563pPEPA9Uko4Rogbv9WLLenzc0
-         EKdSAXm2RlSongLEuh4wym8utpDNbZFNp8b//wqmJHJwhATLsKWtk/PL7dq8q4iIz9X+
-         wHiIjLd9TgQ991GdGpRvtGggzcCZk8VmuyzAjcbTKiaOi1ys92+XwTa73xvmeU8ROCzn
-         jzqmY7IBhj8TDTzcAahfmd5aeWujLl4oL6cEeTOocE6Q6qmP8/8yb1iQBqp0eixgXW/V
-         9xjQ==
-X-Gm-Message-State: APjAAAUC67Mi8HqfS0X8k5JE9Y7wSpzM1bswg/NyF/vqSevu/j6p3hX6
-        RJEBHodaf+FxZiPC7IestiH40Cldms8=
-X-Google-Smtp-Source: APXvYqz015B9LFh16sma4gMwU/5pJ0Hg4vHwCLGnWkgVosJiP3LqpWwepKomvWfxkmgFIDGs6qqKBQ==
-X-Received: by 2002:ac8:6c4:: with SMTP id j4mr7571582qth.235.1571367608868;
-        Thu, 17 Oct 2019 20:00:08 -0700 (PDT)
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com. [209.85.222.179])
-        by smtp.gmail.com with ESMTPSA id k199sm211054qke.0.2019.10.17.20.00.07
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2019 20:00:07 -0700 (PDT)
-Received: by mail-qk1-f179.google.com with SMTP id z67so3959749qkb.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2019 20:00:07 -0700 (PDT)
-X-Received: by 2002:ae9:f30c:: with SMTP id p12mr6409294qkg.159.1571367606688;
- Thu, 17 Oct 2019 20:00:06 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3o3EqRq3PgsgiQtn4AY+sfKyKLaEqB9pO5QeXjYW1YY=;
+        b=PsQH+2oxkLrh7qqg2AOBJpVcN7JRQTCUAtPiVDKSLW58qKbbum820Sp+qhp1hiFKY6
+         ZlJ0eOUuNUQS0FxjMSLgpbm08A00Tjxri4O3cckQD4I/HTtGZv/u6Ai0Q3LSe4Di3FCM
+         nu/LmecNPyESK0H66BKeZH2iqrjH+vfpyWB0eC34VumLB61ciDu0at/c8ABg++FjXlM5
+         BMobd7sUlzHDZOsJXTXwMcytHr/52NtP17ZBD29mb9qmg++H6d0YE/VgvC+happffrmP
+         IPQjfdH2A+GHbDCS5woA/zcb9gV/PueS/EI1PoOa68oIzqMjs65jJA8b+AjEMR7XA2bm
+         Rj+g==
+X-Gm-Message-State: APjAAAUW1BJhgdDP09xIsoqGt+d80Wxcbg677wXMaYrezR41LVH403g4
+        6OVtKPj/YzO3PN0GMHuYb3pZwg==
+X-Google-Smtp-Source: APXvYqw19R+uAq8rWGJFrvZRkNKzLLbqBo0up+3BCPqhRIt/ceR4k2HbajPgDlT/k7e+4ftCKy6O+A==
+X-Received: by 2002:a17:902:b70b:: with SMTP id d11mr7650535pls.339.1571376248651;
+        Thu, 17 Oct 2019 22:24:08 -0700 (PDT)
+Received: from localhost.localdomain (104-188-17-28.lightspeed.sndgca.sbcglobal.net. [104.188.17.28])
+        by smtp.gmail.com with ESMTPSA id u11sm2178760pgc.61.2019.10.17.22.24.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2019 22:24:08 -0700 (PDT)
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jeffrey Hugo <jeffrey.l.hugo@gmail.com>,
+        linux-arm-msm@vger.kernel.org
+Subject: [PATCH 0/4] Bluetooth: hci_qca: Regulator usage cleanup
+Date:   Thu, 17 Oct 2019 22:24:00 -0700
+Message-Id: <20191018052405.3693555-1-bjorn.andersson@linaro.org>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-References: <20191009085116.199922-1-tientzu@chromium.org> <238f01ec4b49fee4c0d08a0b8da7e95f@codeaurora.org>
- <74740c0ff64a6a658da2a44a9f9b7ac5@codeaurora.org>
-In-Reply-To: <74740c0ff64a6a658da2a44a9f9b7ac5@codeaurora.org>
-From:   Claire Chang <tientzu@chromium.org>
-Date:   Fri, 18 Oct 2019 10:59:54 +0800
-X-Gmail-Original-Message-ID: <CALiNf2_EcJxxTYd52UVyaJ-Q82YPM5MKTPBmMNUrBZryEShwqw@mail.gmail.com>
-Message-ID: <CALiNf2_EcJxxTYd52UVyaJ-Q82YPM5MKTPBmMNUrBZryEShwqw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_qca: fix in-band sleep enablement
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Harish Bandi <c-hbandi@codeaurora.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        lkml <linux-kernel@vger.kernel.org>,
-        Rocky Liao <rjliao@codeaurora.org>, rongchi@codeaurora.org,
-        linux-bluetooth-owner@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Clean up the regulator usage in hci_qca and in particular don't
+regulator_set_voltage() for fixed voltages. It cleans up the driver, but more
+important it makes bluetooth work on my Lenovo Yoga C630, where the regulator
+for vddch0 is defined with a voltage range that doesn't overlap the values in
+the driver.
 
-Sorry for the late reply. I was on vacation for the past few days.
-The chipset we use is QCA6174A-3 and rjliao has already confirmed that
-IBS won't work without RAM fw downloaded.
-Please ignore this change.
+Bjorn Andersson (4):
+  Bluetooth: hci_qca: Update regulator_set_load() usage
+  Bluetooth: hci_qca: Don't vote for specific voltage
+  Bluetooth: hci_qca: Use regulator bulk enable/disable
+  Bluetooth: hci_qca: Split qca_power_setup()
 
-Thanks,
-Claire
+ drivers/bluetooth/hci_qca.c | 135 +++++++++++++++---------------------
+ 1 file changed, 55 insertions(+), 80 deletions(-)
 
+-- 
+2.23.0
 
-On Fri, Oct 11, 2019 at 3:21 PM Balakrishna Godavarthi
-<bgodavar@codeaurora.org> wrote:
->
-> Hi Claire,
->
-> This change will not work  as we need fw files to be loaded tofor IBS to
-> active.
-> may i know on which chipset you have this issue of IBS active even with
-> out fw download.
->
-> On 2019-10-11 12:31, Harish Bandi wrote:
-> > ++ Balakrishna
-> >
-> > On 2019-10-09 14:21, Claire Chang wrote:
-> >> Enabling in-band sleep when there is no patch/nvm-config found and
-> >> bluetooth is running with the original fw/config.
-> >>
-> >> Fixes: ba8f35979002 ("Bluetooth: hci_qca: Avoid setup failure on
-> >> missing rampatch")
-> >> Fixes: 7dc5fe0814c3 ("Bluetooth: hci_qca: Avoid missing rampatch
-> >> failure with userspace fw loader")
-> >> Signed-off-by: Claire Chang <tientzu@chromium.org>
-> >> ---
-> >>  drivers/bluetooth/hci_qca.c | 11 +++++++----
-> >>  1 file changed, 7 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> >> index e3164c200eac..367eef893a11 100644
-> >> --- a/drivers/bluetooth/hci_qca.c
-> >> +++ b/drivers/bluetooth/hci_qca.c
-> >> @@ -1291,10 +1291,8 @@ static int qca_setup(struct hci_uart *hu)
-> >>      /* Setup patch / NVM configurations */
-> >>      ret = qca_uart_setup(hdev, qca_baudrate, soc_type, soc_ver,
-> >>                      firmware_name);
-> >> -    if (!ret) {
-> >> -            set_bit(QCA_IBS_ENABLED, &qca->flags);
-> >> -            qca_debugfs_init(hdev);
-> >> -    } else if (ret == -ENOENT) {
-> >> +
-> >> +    if (ret == -ENOENT) {
-> >>              /* No patch/nvm-config found, run with original fw/config */
-> >>              ret = 0;
-> >>      } else if (ret == -EAGAIN) {
-> >> @@ -1305,6 +1303,11 @@ static int qca_setup(struct hci_uart *hu)
-> >>              ret = 0;
-> >>      }
-> >>
-> >> +    if (!ret) {
-> >> +            set_bit(QCA_IBS_ENABLED, &qca->flags);
-> >> +            qca_debugfs_init(hdev);
-> >> +    }
-> >> +
-> >>      /* Setup bdaddr */
-> >>      if (qca_is_wcn399x(soc_type))
-> >>              hu->hdev->set_bdaddr = qca_set_bdaddr;
->
-> --
-> Regards
-> Balakrishna.
