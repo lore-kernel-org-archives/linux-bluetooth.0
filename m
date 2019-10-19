@@ -2,238 +2,113 @@ Return-Path: <SRS0=+Vlh=YM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D917FCA9EA0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Oct 2019 01:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ADECCA9EAC
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Oct 2019 06:54:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BF88222C2
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Oct 2019 01:10:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1276222C5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Oct 2019 06:54:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="AcuiVfBB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dSeoTUJX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725937AbfJSBKO (ORCPT
+        id S1727887AbfJSGyB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Oct 2019 21:10:14 -0400
-Received: from mga14.intel.com ([192.55.52.115]:31464 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725911AbfJSBKO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Oct 2019 21:10:14 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Oct 2019 18:10:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,313,1566889200"; 
-   d="scan'208";a="202865846"
-Received: from orsmsx107.amr.corp.intel.com ([10.22.240.5])
-  by FMSMGA003.fm.intel.com with ESMTP; 18 Oct 2019 18:10:13 -0700
-Received: from orsmsx125.amr.corp.intel.com (10.22.240.125) by
- ORSMSX107.amr.corp.intel.com (10.22.240.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 18 Oct 2019 18:10:13 -0700
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- ORSMSX125.amr.corp.intel.com (10.22.240.125) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 18 Oct 2019 18:10:13 -0700
-Received: from NAM01-BY2-obe.outbound.protection.outlook.com (104.47.34.57) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Fri, 18 Oct 2019 18:10:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aDx3+B8336b6opcLt7/hdOdX9OGrnm0Ucnmce5sIXrC/s1CDOJ9hCx+t1fWDCmp5zBYuOgF5bSgjyiPXV1thyNrcLP+ZM4cHaYFMTfBPv2osBxf+tulbRYMoeh1CeHAs1mOg13K5di0XFcr0NkVDFG7N+mquCmHXaH13JBI78PJ1rcwZQtWSt5EZpygZTpd1GhZDHbg97FPqrhcuk2Br2ckprvl4+XIeb385xTWmgo8gnwPIR723v0NJbN3+6c+gctrtm/1ibCcwBN8kAzAEpT/8+tGdsFxCKHz3zHZyyiNIam8RUV8MIphGLaR6BH1nj4VpzUC3YUefG2eA4lYsQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O2QQ0H5T4+u5WdjO6sdauXSnM8vpvekzG14MyJdnDbI=;
- b=ODChkv8fa2JV2lzO+SfRBNN0xxjCDLMqNzViB4Zycg2GLkT/7BIkJZSG+8zUj4VuHm2jgNPBe41HAv6KfhMeRzXcLCd3T0v7B1d7D24b1kNCAGexAiX/YmPmS1/IRN1pCMyG2khrHLWUJJuoqPPZrn3KLOcwA8l3hbt8KXHp6SL6Xgq1+i7bnk48BCLdfY82v/b1a8RDKzAVJk4KTuZJOXxp5/LdEmpm5OWfEt9VVHSXnKv7L+2zmxkWrnv+TUZ8+7V36QCWQM7VMFFo2y2kj7fFwh9e1WYaPXH3l/pVUFeT9CM1+mvAmJ5nPTPmfX0jRjbv8LTRy2jZtVJb9rOu+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O2QQ0H5T4+u5WdjO6sdauXSnM8vpvekzG14MyJdnDbI=;
- b=AcuiVfBBP4aqsQmccnSRMpabPcgAkz/DcKeeWOX+Ye4WZiuNKIvPSqinyNWy6oa7/AkxwchmZ0eeNM2wPYJqzBiAkDo6gq+fI1kxayydEmi+6viJXRYRWl7FUiTSH1DHLHUYHK9PnewfPIUhDqHdh/AygcwKSVh9KJbzDJDwq+0=
-Received: from CY4PR1101MB2262.namprd11.prod.outlook.com (10.172.76.7) by
- CY4PR1101MB2230.namprd11.prod.outlook.com (10.172.78.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Sat, 19 Oct 2019 01:10:11 +0000
-Received: from CY4PR1101MB2262.namprd11.prod.outlook.com
- ([fe80::c6d:ebf:5ae2:7501]) by CY4PR1101MB2262.namprd11.prod.outlook.com
- ([fe80::c6d:ebf:5ae2:7501%10]) with mapi id 15.20.2367.019; Sat, 19 Oct 2019
- 01:10:11 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v2] mesh: Implement AddAppKey and AddNetKey methods
-Thread-Topic: [PATCH BlueZ v2] mesh: Implement AddAppKey and AddNetKey methods
-Thread-Index: AQHVhTWYGxXg31ZFE0aQYNWO0w5pZqdhKXuA
-Date:   Sat, 19 Oct 2019 01:10:10 +0000
-Message-ID: <FFF36443-14C7-417D-8385-B9B4CD7141F9@intel.com>
-References: <20191017215500.9185-1-inga.stotland@intel.com>
-In-Reply-To: <20191017215500.9185-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [97.126.75.253]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b8c7d31a-1c3c-41ad-6116-08d7543116e1
-x-ms-traffictypediagnostic: CY4PR1101MB2230:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR1101MB22308BF3FA10F393A5815AFAE16F0@CY4PR1101MB2230.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 01952C6E96
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(396003)(346002)(136003)(39860400002)(366004)(199004)(189003)(26005)(91956017)(66556008)(25786009)(64756008)(66946007)(102836004)(14444005)(446003)(33656002)(486006)(66476007)(66066001)(256004)(76176011)(186003)(76116006)(476003)(2616005)(11346002)(66446008)(6506007)(53546011)(71190400001)(2906002)(86362001)(7736002)(305945005)(36756003)(6116002)(3846002)(71200400001)(37006003)(316002)(99286004)(5660300002)(6636002)(6512007)(81166006)(478600001)(6486002)(6862004)(6436002)(8676002)(8936002)(4326008)(14454004)(229853002)(6246003)(81156014);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR1101MB2230;H:CY4PR1101MB2262.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: esrPENIlNeLJiGBdZyFaBub9dwyQiMp//3jz1eE68TtAbCG1hzCvGVljdnX3R7Gwa75bCZs7obhVxp30v+qb1X0no+e2edl2YotEgvxzl8IRO9qHo5cOBoZ28uqz/kQd6R0Rsu2Fhw0ffwJFyQbgfMheArlO7JtyEH19LI6nYoJi45VyVrNQ3A03LiBSse1qTYPczett8MjgWqLka/XgfDoouQpSzWb2G3IaFbjVE72I5r0OkgMeDtbVzKJE0eRSRIK8V+WGtERPemsJaym8U6rAoxGKuWGS/H9QDzZutDTePYahSnAG0I25/GY65NWA8qbQutJcye63qKzZHLIiCPT4oblnki5/NJjhqMXJ6DFnCQXsOoeIH60wzVQsxNyRJwHblbMW7RsMWjd4JsFMC4Nf1tNb8sLvpJFKgq5EaJs=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D978AD8C3708E2448B9F1B2E67BC0219@intel.onmicrosoft.com>
-Content-Transfer-Encoding: base64
+        Sat, 19 Oct 2019 02:54:01 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40686 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726939AbfJSGyB (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 19 Oct 2019 02:54:01 -0400
+Received: by mail-pg1-f195.google.com with SMTP id e13so4565240pga.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Oct 2019 23:54:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=j/xrTW3Vtfy8sVm4S9uCW0R8KyIbpsPtDUTj2Kq91s8=;
+        b=dSeoTUJXkJKDcNN2wGAtJilCARbHqPF/azju6wMegCFJwEWLiANMoib9YYdfcHW4sL
+         3FVWKjISNmu+Y1d4mqGsr7yIo3rjkQTbdToAlLkYcFtZK+k/bEDqNRapfZ1lRw4m5H4G
+         pMRmgfm8YBJm50kwH2JPuaJs4Jl3IacOmttWnP/9v6GMbbQ+nfUTvip9d6lp/fm539Q1
+         +8fmqCspu9BXNmJHHdU9YVusbeu5Yh2D+InoHSDDmRmELD8Y5eTw7kErVF2QmJGkkCJg
+         98T2CYcbrcKEnqppzE615/2OKTX8+h6hhi7KsU6ffVKGaiPxmUaF0qrMyVs5etuMGN9H
+         itag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=j/xrTW3Vtfy8sVm4S9uCW0R8KyIbpsPtDUTj2Kq91s8=;
+        b=rKQdQkgI28eqGt5FdOJr92E9aoTkdlSgm+tmnoy930lRQh/um6iGyQfFtEq0ox4vxL
+         OI8sJ7yb6OqiT9ZauaFDuMh+QzAT28TXfLktsfR1nTCpsYZ8f84EOnbYlyMokqaN9zF4
+         TxtWYs+XpVXb6I/5OylrhxQVCMF0MHbHa6lCI28UJ685fi5hkQeKSqU7R/adEp/WGcfo
+         s+R4N+/6TQR70C415dvNvbv6j6nZbdnE6N9h44QHJ9dghkWxoiNX5jTxhPvxdl5Aeazb
+         N3LQ2XqwTplH6LWNSPsF6kyqgupAcqFPjyvLMT9EA7RWH7/oEBq/Uq/ND31eucC2OaNV
+         GA4Q==
+X-Gm-Message-State: APjAAAXj8T5gH8eoZMVtCXWDzC04zJAK6S+6qM4bT68gQUlbS64bQgYx
+        ly710o81lwQjEmsuIepyocup9lN8bRg=
+X-Google-Smtp-Source: APXvYqwASprbQzmk0qrYKaPXnA3ANBnQHtpiHjahQN3elbE+NmAPFOAil8Vw15Bi/ycqC4xt6bmIXQ==
+X-Received: by 2002:a17:90a:cd03:: with SMTP id d3mr15582968pju.137.1571468039786;
+        Fri, 18 Oct 2019 23:53:59 -0700 (PDT)
+Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
+        by smtp.gmail.com with ESMTPSA id x19sm11835494pgc.59.2019.10.18.23.53.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2019 23:53:59 -0700 (PDT)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "Pierre-Loup A . Griffais" <pgriffais@valvesoftware.com>
+Subject: [RFC Bluez] lib/sdb: Don't include NULL terminator in string's unitSize
+Date:   Fri, 18 Oct 2019 23:53:44 -0700
+Message-Id: <20191019065344.26795-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8c7d31a-1c3c-41ad-6116-08d7543116e1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Oct 2019 01:10:10.6016
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RMVuQfDcnC/P5J4zy8YgXoUmimsbVQ11mFHzI4l9Jho2su1GB2TgCzlo7dE5hqVknoNB01NNVAf+7h/58kbmpg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1101MB2230
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZC4NCg0KPiBPbiBPY3QgMTcsIDIwMTksIGF0IDI6NTUgUE0sIFN0b3RsYW5kLCBJbmdh
-IDxpbmdhLnN0b3RsYW5kQGludGVsLmNvbT4gd3JvdGU6DQo+IA0KPiDvu79UaGlzIGFkZHMgaW1w
-bGVtZW50YXRpb24gZm9yIHRoZSBmb2xsb3dpbmcgbWV0aG9kcyBvbg0KPiBvcmcuYmx1ZXoubWVz
-aC5Ob2RlMSBpbnRlcmZhY2U6DQo+IHZvaWQgQWRkTmV0S2V5KG9iamVjdCBlbGVtZW50X3BhdGgs
-IHVpbnQxNiBkZXN0aW5hdGlvbiwNCj4gICAgICAgIHVpbnQxNiBzdWJuZXRfaW5kZXgsIHVpbnQx
-NiBuZXRfaW5kZXgsIGJvb2xlYW4gdXBkYXRlKQ0KPiB2b2lkIEFkZEFwcEtleShvYmplY3QgZWxl
-bWVudF9wYXRoLCB1aW50MTYgZGVzdGluYXRpb24sDQo+ICAgICAgICB1aW50MTYgYXBwX2luZGV4
-LCB1aW50MTYgbmV0X2luZGV4LCBib29sZWFuIHVwZGF0ZSkNCj4gLS0tDQo+IG1lc2gvbm9kZS5j
-IHwgMTM0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0NCj4gMSBmaWxlIGNoYW5nZWQsIDEzMiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0K
-PiANCj4gZGlmZiAtLWdpdCBhL21lc2gvbm9kZS5jIGIvbWVzaC9ub2RlLmMNCj4gaW5kZXggNzQ2
-OTRkNTIwLi5jOTFmYjVkNTMgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbm9kZS5jDQo+ICsrKyBiL21l
-c2gvbm9kZS5jDQo+IEBAIC00NDMsNyArNDQzLDcgQEAgc3RhdGljIHZvaWQgc2V0X25ldF9rZXko
-dm9pZCAqYSwgdm9pZCAqYikNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5ldGtl
-eS0+cGhhc2UpOw0KPiB9DQo+IA0KPiAtc3RhdGljIHZvaWQgc2V0X2FwcF9rZXkodm9pZCAqYSwg
-dm9pZCAqYikNCj4gK3N0YXRpYyB2b2lkIHNldF9hcHBrZXkodm9pZCAqYSwgdm9pZCAqYikNCj4g
-ew0KPiAgICBzdHJ1Y3QgbWVzaF9jb25maWdfYXBwa2V5ICphcHBrZXkgPSBhOw0KPiAgICBzdHJ1
-Y3QgbWVzaF9ub2RlICpub2RlID0gYjsNCj4gQEAgLTUxMiw3ICs1MTIsNyBAQCBzdGF0aWMgYm9v
-bCBpbml0X2Zyb21fc3RvcmFnZShzdHJ1Y3QgbWVzaF9jb25maWdfbm9kZSAqZGJfbm9kZSwNCj4g
-ICAgbF9xdWV1ZV9mb3JlYWNoKGRiX25vZGUtPm5ldGtleXMsIHNldF9uZXRfa2V5LCBub2RlKTsN
-Cj4gDQo+ICAgIGlmIChkYl9ub2RlLT5hcHBrZXlzKQ0KPiAtICAgICAgICBsX3F1ZXVlX2ZvcmVh
-Y2goZGJfbm9kZS0+YXBwa2V5cywgc2V0X2FwcF9rZXksIG5vZGUpOw0KPiArICAgICAgICBsX3F1
-ZXVlX2ZvcmVhY2goZGJfbm9kZS0+YXBwa2V5cywgc2V0X2FwcGtleSwgbm9kZSk7DQo+IA0KPiAg
-ICBtZXNoX25ldF9zZXRfc2VxX251bShub2RlLT5uZXQsIG5vZGUtPnNlcV9udW1iZXIpOw0KPiAg
-ICBtZXNoX25ldF9zZXRfZGVmYXVsdF90dGwobm9kZS0+bmV0LCBub2RlLT50dGwpOw0KPiBAQCAt
-MjAwMSw2ICsyMDAxLDEzMCBAQCBzdGF0aWMgc3RydWN0IGxfZGJ1c19tZXNzYWdlICpkZXZfa2V5
-X3NlbmRfY2FsbChzdHJ1Y3QgbF9kYnVzICpkYnVzLA0KPiAgICByZXR1cm4gbF9kYnVzX21lc3Nh
-Z2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKTsNCj4gfQ0KPiANCj4gK3N0YXRpYyBzdHJ1Y3QgbF9k
-YnVzX21lc3NhZ2UgKmFkZF9uZXRrZXlfY2FsbChzdHJ1Y3QgbF9kYnVzICpkYnVzLA0KPiArICAg
-ICAgICAgICAgICAgICAgICAgICAgc3RydWN0IGxfZGJ1c19tZXNzYWdlICptc2csDQo+ICsgICAg
-ICAgICAgICAgICAgICAgICAgICB2b2lkICp1c2VyX2RhdGEpDQo+ICt7DQo+ICsgICAgc3RydWN0
-IG1lc2hfbm9kZSAqbm9kZSA9IHVzZXJfZGF0YTsNCj4gKyAgICBjb25zdCBjaGFyICpzZW5kZXIs
-ICplbGVfcGF0aDsNCj4gKyAgICBzdHJ1Y3Qgbm9kZV9lbGVtZW50ICplbGU7DQo+ICsgICAgdWlu
-dDE2X3QgZHN0LCBzdWJfaWR4LCBuZXRfaWR4LCBzcmM7DQo+ICsgICAgYm9vbCB1cGRhdGU7DQo+
-ICsgICAgc3RydWN0IGtleXJpbmdfbmV0X2tleSBrZXk7DQo+ICsgICAgdWludDhfdCBkYXRhWzIw
-XTsNCj4gKw0KPiArICAgIGxfZGVidWcoIkFkZE5ldEtleSIpOw0KPiArDQo+ICsgICAgc2VuZGVy
-ID0gbF9kYnVzX21lc3NhZ2VfZ2V0X3NlbmRlcihtc2cpOw0KPiArDQo+ICsgICAgaWYgKHN0cmNt
-cChzZW5kZXIsIG5vZGUtPm93bmVyKSkNCj4gKyAgICAgICAgcmV0dXJuIGRidXNfZXJyb3IobXNn
-LCBNRVNIX0VSUk9SX05PVF9BVVRIT1JJWkVELCBOVUxMKTsNCj4gKw0KPiArICAgIGlmICghbF9k
-YnVzX21lc3NhZ2VfZ2V0X2FyZ3VtZW50cyhtc2csICJvcXFxYiIsICZlbGVfcGF0aCwgJmRzdCwN
-Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICZzdWJfaWR4LCAmbmV0X2lkeCwgJnVwZGF0ZSkp
-DQo+ICsgICAgICAgIHJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJPUl9JTlZBTElEX0FS
-R1MsIE5VTEwpOw0KPiArDQo+ICsgICAgZWxlID0gbF9xdWV1ZV9maW5kKG5vZGUtPmVsZW1lbnRz
-LCBtYXRjaF9lbGVtZW50X3BhdGgsIGVsZV9wYXRoKTsNCj4gKyAgICBpZiAoIWVsZSkNCj4gKyAg
-ICAgICAgcmV0dXJuIGRidXNfZXJyb3IobXNnLCBNRVNIX0VSUk9SX05PVF9GT1VORCwNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAiRWxlbWVudCBub3QgZm91bmQiKTsNCj4gKw0KPiAr
-ICAgIHNyYyA9IG5vZGVfZ2V0X3ByaW1hcnkobm9kZSkgKyBlbGUtPmlkeDsNCj4gKw0KPiArICAg
-IGlmICgha2V5cmluZ19nZXRfbmV0X2tleShub2RlLCBzdWJfaWR4LCAma2V5KSkNCj4gKyAgICAg
-ICAgcmV0dXJuIGRidXNfZXJyb3IobXNnLCBNRVNIX0VSUk9SX05PVF9GT1VORCwNCj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAiTmV0S2V5IG5vdCBmb3VuZCIpOw0KPiArDQo+ICsgICAg
-aWYgKCF1cGRhdGUpIHsNCj4gKyAgICAgICAgbF9wdXRfYmUxNihPUF9ORVRLRVlfQURELCBkYXRh
-KTsNCj4gKw0KPiArICAgICAgICBpZiAoa2V5LnBoYXNlICE9IEtFWV9SRUZSRVNIX1BIQVNFX1RX
-TykNCj4gKyAgICAgICAgICAgIG1lbWNweShkYXRhICsgNCwga2V5Lm9sZF9rZXksIDE2KTsNCj4g
-KyAgICAgICAgZWxzZQ0KPiArICAgICAgICAgICAgbWVtY3B5KGRhdGEgKyA0LCBrZXkubmV3X2tl
-eSwgMTYpOw0KPiArICAgIH0gZWxzZSB7DQo+ICsgICAgICAgIGlmIChrZXkucGhhc2UgIT0gS0VZ
-X1JFRlJFU0hfUEhBU0VfT05FKQ0KPiArICAgICAgICAgICAgcmV0dXJuIGRidXNfZXJyb3IobXNn
-LCBNRVNIX0VSUk9SX0ZBSUxFRCwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAiQ2Fu
-bm90IHVwZGF0ZSIpOw0KPiArICAgICAgICBsX3B1dF9iZTE2KE9QX05FVEtFWV9VUERBVEUsIGRh
-dGEpOw0KPiArICAgICAgICBtZW1jcHkoZGF0YSArIDQsIGtleS5uZXdfa2V5LCAxNik7DQo+ICsg
-ICAgfQ0KPiArDQo+ICsgICAgbF9wdXRfbGUxNihzdWJfaWR4LCAmZGF0YVsyXSk7DQo+ICsNCj4g
-KyAgICBpZiAoIW1lc2hfbW9kZWxfc2VuZChub2RlLCBzcmMsIGRzdCwgQVBQX0lEWF9ERVZfUkVN
-T1RFLCBuZXRfaWR4LA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgIERFRkFVTFRfVFRM
-LCBkYXRhLCAyMCkpDQo+ICsgICAgICAgIHJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJP
-Ul9OT1RfRk9VTkQsIE5VTEwpOw0KPiArDQo+ICsgICAgcmV0dXJuIGxfZGJ1c19tZXNzYWdlX25l
-d19tZXRob2RfcmV0dXJuKG1zZyk7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBzdHJ1Y3QgbF9kYnVz
-X21lc3NhZ2UgKmFkZF9hcHBrZXlfY2FsbChzdHJ1Y3QgbF9kYnVzICpkYnVzLA0KPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgc3RydWN0IGxfZGJ1c19tZXNzYWdlICptc2csDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICB2b2lkICp1c2VyX2RhdGEpDQo+ICt7DQo+ICsgICAgc3RydWN0IG1l
-c2hfbm9kZSAqbm9kZSA9IHVzZXJfZGF0YTsNCj4gKyAgICBjb25zdCBjaGFyICpzZW5kZXIsICpl
-bGVfcGF0aDsNCj4gKyAgICBzdHJ1Y3Qgbm9kZV9lbGVtZW50ICplbGU7DQo+ICsgICAgdWludDE2
-X3QgZHN0LCBhcHBfaWR4LCBuZXRfaWR4LCBzcmM7DQo+ICsgICAgYm9vbCB1cGRhdGU7DQo+ICsg
-ICAgc3RydWN0IGtleXJpbmdfbmV0X2tleSBuZXRfa2V5Ow0KPiArICAgIHN0cnVjdCBrZXlyaW5n
-X2FwcF9rZXkgYXBwX2tleTsNCj4gKyAgICB1aW50OF90IGRhdGFbMjBdOw0KPiArDQo+ICsgICAg
-bF9kZWJ1ZygiQWRkQXBwS2V5Iik7DQo+ICsNCj4gKyAgICBzZW5kZXIgPSBsX2RidXNfbWVzc2Fn
-ZV9nZXRfc2VuZGVyKG1zZyk7DQo+ICsNCj4gKyAgICBpZiAoc3RyY21wKHNlbmRlciwgbm9kZS0+
-b3duZXIpKQ0KPiArICAgICAgICByZXR1cm4gZGJ1c19lcnJvcihtc2csIE1FU0hfRVJST1JfTk9U
-X0FVVEhPUklaRUQsIE5VTEwpOw0KPiArDQo+ICsgICAgaWYgKCFsX2RidXNfbWVzc2FnZV9nZXRf
-YXJndW1lbnRzKG1zZywgIm9xcXFiIiwgJmVsZV9wYXRoLCAmZHN0LA0KPiArICAgICAgICAgICAg
-ICAgICAgICAgICAgJmFwcF9pZHgsICZuZXRfaWR4LCAmdXBkYXRlKSkNCj4gKyAgICAgICAgcmV0
-dXJuIGRidXNfZXJyb3IobXNnLCBNRVNIX0VSUk9SX0lOVkFMSURfQVJHUywgTlVMTCk7DQo+ICsN
-Cj4gKyAgICBlbGUgPSBsX3F1ZXVlX2ZpbmQobm9kZS0+ZWxlbWVudHMsIG1hdGNoX2VsZW1lbnRf
-cGF0aCwgZWxlX3BhdGgpOw0KPiArICAgIGlmICghZWxlKQ0KPiArICAgICAgICByZXR1cm4gZGJ1
-c19lcnJvcihtc2csIE1FU0hfRVJST1JfTk9UX0ZPVU5ELA0KPiArICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICJFbGVtZW50IG5vdCBmb3VuZCIpOw0KPiArDQo+ICsgICAgc3JjID0gbm9kZV9n
-ZXRfcHJpbWFyeShub2RlKSArIGVsZS0+aWR4Ow0KPiArDQo+ICsgICAgaWYgKCFrZXlyaW5nX2dl
-dF9hcHBfa2V5KG5vZGUsIGFwcF9pZHgsICZhcHBfa2V5KSkNCj4gKyAgICAgICAgcmV0dXJuIGRi
-dXNfZXJyb3IobXNnLCBNRVNIX0VSUk9SX05PVF9GT1VORCwNCj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAiQXBwS2V5IG5vdCBmb3VuZCIpOw0KPiArDQo+ICsgICAgaWYgKCFrZXlyaW5n
-X2dldF9uZXRfa2V5KG5vZGUsIGFwcF9rZXkubmV0X2lkeCwgJm5ldF9rZXkpKSB7DQo+ICsgICAg
-ICAgIHJldHVybiBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJPUl9OT1RfRk9VTkQsDQo+ICsgICAg
-ICAgICAgICAgICAgICAgICAgICAiQm91bmQgTmV0S2V5IG5vdCBmb3VuZCIpOw0KPiArICAgIH0N
-Cj4gKw0KPiArICAgIGlmICghdXBkYXRlKSB7DQo+ICsgICAgICAgIGRhdGFbMF0gPSBPUF9BUFBL
-RVlfQUREOw0KPiArICAgICAgICBpZiAobmV0X2tleS5waGFzZSAhPSBLRVlfUkVGUkVTSF9QSEFT
-RV9UV08pDQo+ICsgICAgICAgICAgICBtZW1jcHkoZGF0YSArIDQsIGFwcF9rZXkub2xkX2tleSwg
-MTYpOw0KPiArICAgICAgICBlbHNlDQo+ICsgICAgICAgICAgICBtZW1jcHkoZGF0YSArIDQsIGFw
-cF9rZXkubmV3X2tleSwgMTYpOw0KPiArICAgIH0gZWxzZSB7DQo+ICsgICAgICAgIGlmIChuZXRf
-a2V5LnBoYXNlICE9IEtFWV9SRUZSRVNIX1BIQVNFX09ORSkNCj4gKyAgICAgICAgICAgIHJldHVy
-biBkYnVzX2Vycm9yKG1zZywgTUVTSF9FUlJPUl9GQUlMRUQsDQo+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIkNhbm5vdCB1cGRhdGUiKTsNCj4gKyAgICAgICAgZGF0YVswXSA9IE9QX0FQ
-UEtFWV9VUERBVEU7DQo+ICsgICAgICAgIG1lbWNweShkYXRhICsgNCwgYXBwX2tleS5uZXdfa2V5
-LCAxNik7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAgLyogUGFjayBib3VuZCBOZXRLZXkgYW5kIEFw
-cEtleSBpbnRvIDMgb2N0ZXRzICovDQo+ICsgICAgZGF0YVsxXSA9IGFwcF9rZXkubmV0X2lkeDsN
-Cj4gKyAgICBkYXRhWzJdID0gKChhcHBfa2V5Lm5ldF9pZHggPj4gOCkgJiAweGYpIHwgKChhcHBf
-aWR4IDw8IDQpICYgMHhmMCk7DQo+ICsgICAgZGF0YVszXSA9IGFwcF9pZHggPj4gNDsNCj4gKw0K
-PiArICAgIGlmICghbWVzaF9tb2RlbF9zZW5kKG5vZGUsIHNyYywgZHN0LCBBUFBfSURYX0RFVl9S
-RU1PVEUsIG5ldF9pZHgsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgREVGQVVMVF9U
-VEwsIGRhdGEsIDIwKSkNCj4gKyAgICAgICAgcmV0dXJuIGRidXNfZXJyb3IobXNnLCBNRVNIX0VS
-Uk9SX05PVF9GT1VORCwgTlVMTCk7DQo+ICsNCj4gKyAgICByZXR1cm4gbF9kYnVzX21lc3NhZ2Vf
-bmV3X21ldGhvZF9yZXR1cm4obXNnKTsNCj4gK30NCj4gKw0KPiBzdGF0aWMgc3RydWN0IGxfZGJ1
-c19tZXNzYWdlICpwdWJsaXNoX2NhbGwoc3RydWN0IGxfZGJ1cyAqZGJ1cywNCj4gICAgICAgICAg
-ICAgICAgICAgICAgICBzdHJ1Y3QgbF9kYnVzX21lc3NhZ2UgKm1zZywNCj4gICAgICAgICAgICAg
-ICAgICAgICAgICB2b2lkICp1c2VyX2RhdGEpDQo+IEBAIC0yMjE5LDYgKzIzNDMsMTIgQEAgc3Rh
-dGljIHZvaWQgc2V0dXBfbm9kZV9pbnRlcmZhY2Uoc3RydWN0IGxfZGJ1c19pbnRlcmZhY2UgKmlm
-YWNlKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICIiLCAib3FicWF5IiwgImVsZW1lbnRfcGF0
-aCIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgImRlc3RpbmF0aW9uIiwgInJlbW90ZSIsDQo+
-ICAgICAgICAgICAgICAgICAgICAgICAgIm5ldF9pbmRleCIsICJkYXRhIik7DQo+ICsgICAgbF9k
-YnVzX2ludGVyZmFjZV9tZXRob2QoaWZhY2UsICJBZGROZXRLZXkiLCAwLCBhZGRfbmV0a2V5X2Nh
-bGwsICIiLA0KPiArICAgICAgICAgICAgICAgICAgICAib3FxcWIiLCAiZWxlbWVudF9wYXRoIiwg
-ImRlc3RpbmF0aW9uIiwNCj4gKyAgICAgICAgICAgICAgICAgICAgInN1Ym5ldF9pbmRleCIsICJu
-ZXRfaW5kZXgiLCAidXBkYXRlIik7DQo+ICsgICAgbF9kYnVzX2ludGVyZmFjZV9tZXRob2QoaWZh
-Y2UsICJBZGRBcHBLZXkiLCAwLCBhZGRfYXBwa2V5X2NhbGwsICIiLA0KPiArICAgICAgICAgICAg
-ICAgICAgICAib3FxcWIiLCAiZWxlbWVudF9wYXRoIiwgImRlc3RpbmF0aW9uIiwNCj4gKyAgICAg
-ICAgICAgICAgICAgICAgImFwcF9pbmRleCIsICJuZXRfaW5kZXgiLCAidXBkYXRlIik7DQo+ICAg
-IGxfZGJ1c19pbnRlcmZhY2VfbWV0aG9kKGlmYWNlLCAiUHVibGlzaCIsIDAsIHB1Ymxpc2hfY2Fs
-bCwgIiIsICJvcWF5IiwNCj4gICAgICAgICAgICAgICAgICAgICJlbGVtZW50X3BhdGgiLCAibW9k
-ZWxfaWQiLCAiZGF0YSIpOw0KPiAgICBsX2RidXNfaW50ZXJmYWNlX21ldGhvZChpZmFjZSwgIlZl
-bmRvclB1Ymxpc2giLCAwLCB2ZW5kb3JfcHVibGlzaF9jYWxsLA0KPiAtLSANCj4gMi4yMS4wDQo+
-IA0K
+HID report descriptors are 8-bit unsigned arrays (Data Element Type =
+Text String (4), Data Element Size = array (5, 6, or 7)), so they are
+parsed by extract_str(). Setting unitSize to "n + 1" in that case
+results in NULL terminator of the string being passed as a part of a
+HID report descriptor to the kernel. This causes harmless but
+confusing "unknown main item tag 0x0" warning in dmesg. Change
+unitSize to be "n" to avoid the problem.
+
+The warning has been observed on the following hardware:
+
+   - PowerA Wireless GameCube Style Controller for Nintendo
+
+   - Sony DualShock 4 Controller connected via BT (works fine via USB)
+---
+
+Not sure if this is a right place to fix this or if I missed
+something, hence the RFC tag. Maybe modifying extract_hid_desc_data()
+would be more appropriate? Please let me know.
+
+Thanks,
+Andrey Smirnov
+
+ lib/sdp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 84311eda1..6c0db825e 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -1211,7 +1211,7 @@ static sdp_data_t *extract_str(const void *p, int bufsize, int *len)
+ 	SDPDBG("Str : %s", s);
+ 
+ 	d->val.str = s;
+-	d->unitSize = n + sizeof(uint8_t);
++	d->unitSize = n;
+ 	return d;
+ }
+ 
+-- 
+2.21.0
+
