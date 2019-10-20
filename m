@@ -2,131 +2,129 @@ Return-Path: <SRS0=2Cj2=YN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB85CA9EA0
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 20:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1607CA9EAD
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 21:17:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD7DF21929
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 20:59:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571605148;
-	bh=boQTUh6Tu3qH0IM4MLL8CiD1+e4eE1S96fTvHVhm1ag=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=05F8tX+ekacY+jLEGSPoufn3XOxrfSLj+d3eeb3eUb+IrzC+2CUZTMuLLH01rp9N7
-	 62F0K0xWcnSQhW0tSmGcxXe0n2lEwyTRPolJWBR1mrz4KhQTch09thyr0Yf0lDQph+
-	 Zb9XbJyX/NmdxPINeubIBtQx56pIcn8fL1U07EZw=
+	by mail.kernel.org (Postfix) with ESMTP id C6BCB222C2
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 21:17:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Z1URIBeT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726445AbfJTU7F (ORCPT
+        id S1726445AbfJTVR4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 20 Oct 2019 16:59:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57698 "EHLO mail.kernel.org"
+        Sun, 20 Oct 2019 17:17:56 -0400
+Received: from mout.gmx.net ([212.227.15.18]:57311 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726130AbfJTU7E (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 20 Oct 2019 16:59:04 -0400
-Received: from earth.universe (cust-west-pareq2-46-193-15-226.wb.wifirst.net [46.193.15.226])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4018721897;
-        Sun, 20 Oct 2019 20:59:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571605143;
-        bh=boQTUh6Tu3qH0IM4MLL8CiD1+e4eE1S96fTvHVhm1ag=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NBG1cM5qOQrze7OykO5KU0Se1QvaaBaF8whQY3PDe5eW2IrcDjZETeURTMQdLBMA0
-         G4y8eZW3jdwVGn5KAFEzXj2MrTlnSmyOMqDlaVo+069m6wpn6vRMZOcHJgfO2IZXWs
-         Wu+0LmS5tyC5L0qz7PrqHBKcI17esRVmp6DVQUAI=
-Received: by earth.universe (Postfix, from userid 1000)
-        id 3C7253C0CA0; Sun, 20 Oct 2019 22:59:01 +0200 (CEST)
-Date:   Sun, 20 Oct 2019 22:59:01 +0200
-From:   Sebastian Reichel <sre@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Tony Lindgren <tony@atomide.com>, Adam Ford <aford173@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel@collabora.com
-Subject: Re: [PATCHv2 4/4] Bluetooth: btwilink: drop superseded driver
-Message-ID: <20191020205901.56bafijk7cu3rpaj@earth.universe>
-References: <20191003134147.9458-1-sre@kernel.org>
- <20191003134147.9458-5-sre@kernel.org>
- <BC1F82AC-2988-4BC6-99EA-1C9F9289E582@holtmann.org>
+        id S1726405AbfJTVRz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 20 Oct 2019 17:17:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1571606253;
+        bh=roIbpENmIxP4w7WU842plrcJ0VYVDHDaJFUQvtEjZVw=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=Z1URIBeTCZdah6s4j/sKdRv73XsfdJpSmOnpWS/epQ8RrHI72c1HYDoFE+wvHaE3z
+         CQyow6f1L56niC1fnkb/SyPdL7WT00eZTT+af3mVkhJjMW3xPLI+uP23N9sxpizPxT
+         Q76fGQ2SNYZOah1/Mq72IH1cp0S3g7lXoyGb7dHQ=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.1.162] ([37.4.249.112]) by mail.gmx.com (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MN5eR-1id05A17DB-00J1N0; Sun, 20
+ Oct 2019 23:17:33 +0200
+Subject: Re: [PATCH V4 01/10] bluetooth: hci_bcm: Fix RTS handling during
+ startup
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Eric Anholt <eric@anholt.net>, devicetree@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        linux-bluetooth@vger.kernel.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org
+References: <1570375708-26965-1-git-send-email-wahrenst@gmx.net>
+ <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
+From:   Stefan Wahren <wahrenst@gmx.net>
+Message-ID: <61789264-a4c2-ac85-9d74-d186213ec70a@gmx.net>
+Date:   Sun, 20 Oct 2019 23:17:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="td6khbzgjxudi7vx"
-Content-Disposition: inline
-In-Reply-To: <BC1F82AC-2988-4BC6-99EA-1C9F9289E582@holtmann.org>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Provags-ID: V03:K1:vAXNLeW3B5iKlKv7LnAYxXpah2Ujax35yKaou7peYeveOh8Bfl3
+ GTIPS1NaeC1cJMdYa36LsyR2STBODHsoycgoEwP+G8542RYkQdxAElrhEXuxdsnUAi7liOa
+ wS4SGlI/65Cfkj4tunClj/0XRjXDjXgbch8NLBUgrVl6ju/3d7+odcsqVyjjlzKviPYagej
+ T90QqRJzev5JXtZ2v7BrA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ZvVXQvPtsDM=:Rq5rL0CL03Z2b8FC5Z2jzt
+ IMZD4nGS529l9VjgJSXNIP5SkKDH6OD11sRP78HHHwK9vvT0s0k+iXuaZF3wOwDmOB3w0fPDc
+ 97oyAndzL0qEOIRwqdYSUUvQ29+RmiJJk/Yc9+KdVs7XpNzpeWheOGViq1COuLFWfWK4CbsER
+ QdNjScNeOE/79coAjarQCv0u8EXAYO7Al36INHpHz5nNnDfUlKqvskBsXN21cZR4DEpgfvatS
+ 7uAhiVrshIVVHQ/UG+Y+7nIIvqFssB0HsJHeBQv+6IZ45A32ABK/IewFZ3BZg7ClMIBBv0qeG
+ +n4zricQibxE0O1cOMKWl918w1rg/Rml2NtrgSI6s18Dd783q/01Xud7S/7Z4eyum9WWOfhQp
+ iZjPf5fiPw4eUhbNmUfMT0T0xWttDRGaJIt/A3CYDtkKFvAo/1qP+Mt9BU0QwDqD7iKbN4v0Y
+ TXhq1v5oY9T+tUpoVuv6dZMWGsM6R2Qs3zrX1HEe3c/Diyzk/ltFqNbe+WjjbHk3/VupMXLt6
+ JdQWZgs9Um6ZQW7q+K2o42tgpxCuZ922KzUCnknE0qtVoHjsqtROILyvjBq21SAOt5NIb5A93
+ HWCUEjTqzphXtfoGuiI92F7S+qISKdIRfkeg8L2++MQLSsZ2xxPH3rX4thcGNEQhwYJ9lPOhi
+ uRB5EcaYg6YJhbpj2kfTHZESzX8UK+KA2FEjrVuQOFcaQBkcikEq1FhbfNc3s9lbjQeVAXPRL
+ au8BC4usnvAxnE8N5C+eBiX0VnLw9WiSRHjdS0y7XtHNK/llgI2A6JsyWxoG0bu848q+38Ky0
+ pgwTeWRtj5mxJp9OIKOwSDqh+zMgikMhnpWjzzUVJbYFT0fCsvoS3wwBj2O7E/BXM0SlHY2eB
+ 1TgrXu9i1++fGRhoS1FohhemCDIsQqtp19PszXDIBEUqZi7SWGJhbZnRK5Gs//xZcaBaxLFJO
+ w/UdhsLcyquEgpKcp2YLiuFg73mLHvrmVOs9DqsdoPl/OS3VsmY2lGdN5WDOMaxeaw4yvACpe
+ FPDfotLCr6r7CzxRGsWpqd2jELzKQQa5s8X/qRwPcerlChy1qqVk78ksefjNMr8OJkCBp3YQZ
+ PUda8HS8TXloj9R1yMuq++VyQz9FH9EavSLfof/g1XqeaC6ewoMULPxlXZLfUA9k5IwiWKSzU
+ HF3RYWSLPym91HsCM82SIWOtcaCAJhKcpIIw/A0RoOx4v3zz/jX55LCFwhaE5I2EGMNCFW4Ta
+ AiolJFF63DpRR/O53R4biOThQ9pt/Jbphr1hBIgRtDlLbW2VNWmCXz+eHLsg=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Marcel,
+hi Johan,
 
---td6khbzgjxudi7vx
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Am 06.10.19 um 17:28 schrieb Stefan Wahren:
+> The RPi 4 uses the hardware handshake lines for CYW43455, but the chip
+> doesn't react to HCI requests during DT probe. The reason is the inproper
+> handling of the RTS line during startup. According to the startup
+> signaling sequence in the CYW43455 datasheet, the hosts RTS line must
+> be driven after BT_REG_ON and BT_HOST_WAKE.
+>
+> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+> ---
+>  drivers/bluetooth/hci_bcm.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 7646636..0f73f6a 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -445,9 +445,11 @@ static int bcm_open(struct hci_uart *hu)
+>
+>  out:
+>  	if (bcm->dev) {
+> +		hci_uart_set_flow_control(hu, true);
+>  		hu->init_speed = bcm->dev->init_speed;
+>  		hu->oper_speed = bcm->dev->oper_speed;
+>  		err = bcm_gpio_set_power(bcm->dev, true);
+> +		hci_uart_set_flow_control(hu, false);
+>  		if (err)
+>  			goto err_unset_hu;
+>  	}
+> --
+> 2.7.4
 
-Hi,
+would be nice to get some feedback about this.
 
-On Wed, Oct 16, 2019 at 09:15:03PM +0200, Marcel Holtmann wrote:
-> > All users of this driver have been converted to the serdev based
-> > hci_ll driver. The unused driver can be safely dropped now.
-> >=20
-> > Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
-> > ---
-> > drivers/bluetooth/Kconfig    |  11 --
-> > drivers/bluetooth/Makefile   |   1 -
-> > drivers/bluetooth/btwilink.c | 337 -----------------------------------
-> > 3 files changed, 349 deletions(-)
-> > delete mode 100644 drivers/bluetooth/btwilink.c
->=20
-> patch has been applied to bluetooth-next tree.
->=20
-> However what I really like to see is that you re-introduce a
-> btwilink driver that is purely serdev based and doesn=E2=80=99t rely on
-> any hci_uart/hci_ldisc code. A clean serdev only driver is that
-> best and easier to maintain long term.
+Regards
+Stefan
 
-So basically move the serdev implementation from hci_ll.c into its
-own driver and make hci_ll hci_uart based only? That effectively
-means, that we have two implementations of the protocol. I don't
-think this will improve maintainability, since then bugs needs to
-be fixed in two places? Note, that we have a couple of drivers
-with serdev+hci_uart by now:
-
-for file in $(grep -l serdev drivers/bluetooth/hci_*c) ; grep -l hci_uart_r=
-egister_proto "${file}"
-hci_bcm.c
-hci_h5.c
-hci_ldisc.c
-hci_ll.c
-hci_mrvl.c
-hci_qca.c
-
--- Sebastian
-
---td6khbzgjxudi7vx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl2sypEACgkQ2O7X88g7
-+pp5QQ/9HZr+yWBHDmBiphnMo30Xi90YCZ1Ov6RyGhUJWw2lvBcGkkHGCLuk8M/6
-qvfk4YCI7zdqajXZkVSB7+dRp6QWkt4D5+B8ORjDC1zc103auFsIZmdTBn3c/8/O
-Ed5DR6BKdGgtpdYxnsidYb3GJ5oMCHW9emRVJ603nUrbaipJTlEELjtyC8qemPtK
-px9eTLAAD15WLhImFcq3vs9zP6mZV7EkTIgoIYAoUSJ6MQyapAeQbN19WTn7j+i8
-YF3bB9+NCmM6Y2WJtuzBfq8n4B06OqSB8Yx2oNqRAFNlajIk7AnFwdU9JUj8rdYi
-UrPzL+F0jzitbw0ES05xushHWmMXP+0I4XljEcjiq+UUd3/VkYYYegca+gXmTl+4
-9DSQuITzpuhnKKgV7+VnlxIRg21KFrvC5Xib0BkDCYyTJq085hCq7b97aMlK/YJW
-o04C9zu2vlvtFflQ5ENR5T/t7A6mSpUVcwCOme3o2AhhW7rWWrGZAhFhIq2PFxLp
-9uOTquKl+WbW+rZM+Jx9RhrgGPivmEs+zFzV+bNESuLLcPB3v+b865NvRD+ESzZw
-lFMocVKVE6zgwgy5UiX9/43dcBIdaPeSLdcgz1KoTt91ugDEwzLaaBMkeJjZtsdi
-8qcw1yxVVk+sRBf4PgApEwvvaei+KF4AoNE59m4b5OIkZo4+bPQ=
-=OkWc
------END PGP SIGNATURE-----
-
---td6khbzgjxudi7vx--
