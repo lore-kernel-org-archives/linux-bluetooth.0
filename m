@@ -2,118 +2,112 @@ Return-Path: <SRS0=2Cj2=YN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C95CA9EA9
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 08:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6088CA9EAD
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 10:33:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38989218BA
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 08:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FB48222BD
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Oct 2019 10:33:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCWXZ7gt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GHvxbzJI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726019AbfJTIq2 (ORCPT
+        id S1726115AbfJTKdZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 20 Oct 2019 04:46:28 -0400
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:36394 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbfJTIq2 (ORCPT
+        Sun, 20 Oct 2019 06:33:25 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:46120 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726027AbfJTKdY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 20 Oct 2019 04:46:28 -0400
-Received: by mail-wr1-f44.google.com with SMTP id w18so9924220wrt.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2019 01:46:26 -0700 (PDT)
+        Sun, 20 Oct 2019 06:33:24 -0400
+Received: by mail-lf1-f67.google.com with SMTP id t8so7793618lfc.13
+        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2019 03:33:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:date:user-agent:mime-version;
-        bh=zCdXPudc+OIAu0FoWglaKmBSWDfo7M17biPwlw49Seo=;
-        b=MCWXZ7gtxtLSkMfGCTgGL/0pjG823rk09mf/Aez/NUYtUk+2pQ5HkASgL+70snnd1U
-         w+LYgxlT+Gb12Ie7weD7IaDNPrU9WjJes+6JxYJV2dNNfGmSF0MTCYUTJZ4xqciC/+Fw
-         wZg7jcodU74rGTXV1SUfKh0z0ccN34ofXzok2qzE6tRSJhfxHPAkGBHpT6e1arutZqyS
-         BSztq0xkAAeDpg7jJVqY99s3ZDJOv1Xez1+i8RwElr+NkX0tQB190qlZaUSl9MnsyqMR
-         jv8uHevDRFJrMDXDh1av1KFl6+3ZJxQqstqKFIcho55H/FMyXI0RvZTHo80mR/jRiuyo
-         9ZWg==
+        h=from:content-transfer-encoding:mime-version:subject:message-id:date
+         :cc:to;
+        bh=q+gGUnjyc3UF7fsHxy3ZG3dSjTyarfV4lPAZQeRbcFk=;
+        b=GHvxbzJIWxfBNYFPa/MtY+89iKLT7sKe6FvHL2FsoJ25zvu04PN2PqpqjJJOlXPzpx
+         /q1cuEQ9T4wHw97vs7VEhkWQLa1gRflt59tfG2T5G1IiotBB4ehZv2g+Fy+tdYPWjD0z
+         GutYUbt5mTAzPfMsmiS8hE0Wa5+6940bptc8/lLtYdM5U6AOqXYNEjguPtZw9dsz+yLp
+         xt28PIeuhK/OjQ83BRLF9vPWDRKcefzPWz/0hj9nc19hoA9iPk5a+LX3jqps0FYN4Vo+
+         LiS0+RT3vkba7tSttkfSn0wAdaZUNIZGzjhYs1MCIFocVmnifxfD7sYmuIAnubtNByEA
+         UEQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:date:user-agent
-         :mime-version;
-        bh=zCdXPudc+OIAu0FoWglaKmBSWDfo7M17biPwlw49Seo=;
-        b=IB+9BfCmw1TR/CrJbRS649xyK2US6cziTMihmj/WJbg1i+exyxgnt7MthDhzhfkZjL
-         Wz/IVRTm4CMHMMEKdMW7poYDl4s0nXBh5lvAstGCUr/igKCNUlowqvFv2R/rgBPcXQ0C
-         263FkN3ELTXhzXtH4D9WYpGQ0r4MtBya1XV9qWjrzEegLTlft8pu/81ap87hOaTwjlff
-         EshG3BfiLviHiSLwLDMouP+UebKS7xJ2rJZDh9gTpoN2k2f+UTIEBqTS29VDQYDe+1fX
-         KAbJisPxtjU26r7dv9QoCyRaGHeBn5/a82FbYj2yiMgEChwRaovdltP2cOrcZQANL92Z
-         bp3g==
-X-Gm-Message-State: APjAAAXRkQFba9hTJ+Y19h5HKt0zpChnwgNvPkHr6WZFI1H3IX59WVvV
-        UhZPPGx4ntl3jCMyQAxtPx73Vx3Wog==
-X-Google-Smtp-Source: APXvYqwTTjie6LNThJwRJIf5UgJ59T5AhtShFQ4kQbPKBsFI1WOKxkp7FRqrhdLGevBo1FJMfeCVtQ==
-X-Received: by 2002:a5d:424a:: with SMTP id s10mr9984958wrr.108.1571561185379;
-        Sun, 20 Oct 2019 01:46:25 -0700 (PDT)
-Received: from [10.100.0.6] ([89.131.18.179])
-        by smtp.gmail.com with ESMTPSA id g5sm7968817wmg.12.2019.10.20.01.46.23
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Oct 2019 01:46:24 -0700 (PDT)
-Message-ID: <19fda684fa8b3c604a2c763b7cb890e794c734d4.camel@gmail.com>
-Subject: [PATCH] Missing headers for non GLIBC systems
-From:   Francisco Ramos <pachoramos@gmail.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Sun, 20 Oct 2019 10:46:16 +0200
-Content-Type: multipart/mixed; boundary="=-QmPEVc3zVycUVQl9gwQp"
-User-Agent: Evolution 3.32.4 
-MIME-Version: 1.0
+        h=x-gm-message-state:from:content-transfer-encoding:mime-version
+         :subject:message-id:date:cc:to;
+        bh=q+gGUnjyc3UF7fsHxy3ZG3dSjTyarfV4lPAZQeRbcFk=;
+        b=bIictxoLgrY1CT3KLWTUVBoMzCNGDb142CMYA19NfcFOyC+5XHM6RthbOAl6Dcc4Cu
+         IaB4lAl+er+o9k5q3+nMDqf3PVApWmTYMz5KgDTM0rGNmhxG1ZrIq+vmRikUoXxpERAi
+         GfxP38iT2IHZvQGygT9s7Zw33QCyNyoVKFyWwmWuutf/tm6pao7JI3cjrM/Lzgf096W+
+         WZOZUew3FslwtP1eiH1h3yadEweTagBaUZbSdboytpcNAyhpXJ+a3HdECECQMhej43/r
+         OiPVf7SkqJpPpSXNqnP/U6gqQSlpWS2szq8TvWowAwHWgxUe7DwjFt3PgESb6MZTTfXX
+         /nBA==
+X-Gm-Message-State: APjAAAX5wR8IZUMWfyGgL2KQVqXRx67sQv7RZviSUTLZfCAx24c0UalI
+        Xauwh3bA8kPSs6nO/IYbxxs+40mfwQQ=
+X-Google-Smtp-Source: APXvYqxZBoPtU3HLFku2JhfKd+ztrWn0an4FjypA9iQSWRU3SFeOpTPAJk6HDh0uOzQ61LfnQ3GW6A==
+X-Received: by 2002:a19:148:: with SMTP id 69mr11992688lfb.76.1571567600884;
+        Sun, 20 Oct 2019 03:33:20 -0700 (PDT)
+Received: from [172.16.20.20] ([94.204.252.234])
+        by smtp.gmail.com with ESMTPSA id i6sm5043416lfo.83.2019.10.20.03.33.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 20 Oct 2019 03:33:20 -0700 (PDT)
+From:   Christian Hewitt <christianshewitt@gmail.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Broadcom SDIO module failures since 5.4-rc1
+Message-Id: <225DB466-C6CF-4C47-90EA-70CEB5A1F1DC@gmail.com>
+Date:   Sun, 20 Oct 2019 14:33:17 +0400
+Cc:     Neil Armstrong <narmstrong@baylibre.com>,
+        Kevin Hilman <khilman@baylibre.com>
+To:     linux-bluetooth@vger.kernel.org
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Since bumping from 5.3.x to 5.4-rcX I have seen a bluetooth failure on =
+all Amlogic SoC boards that I test with, using a range of different =
+Ampak (Broadcom) SDIO modules. The following is from a board with =
+BCM4359 wireless/BT (SDIO):
 
---=-QmPEVc3zVycUVQl9gwQp
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+VIM3:~ # dmesg | grep -i Blue
+[    5.594409] Bluetooth: Core ver 2.22
+[    5.594500] Bluetooth: HCI device and connection manager initialized
+[    5.594515] Bluetooth: HCI socket layer initialized
+[    5.594520] Bluetooth: L2CAP socket layer initialized
+[    5.594537] Bluetooth: SCO socket layer initialized
+[    5.625023] Bluetooth: HCI UART driver ver 2.3
+[    5.625031] Bluetooth: HCI UART protocol H4 registered
+[    5.626880] Bluetooth: HCI UART protocol Broadcom registered
+[    5.627042] Bluetooth: HCI UART protocol QCA registered
+[    5.869597] Bluetooth: hci1: Frame reassembly failed (-84)
+[    5.869671] Bluetooth: hci1: Frame reassembly failed (-84)
+[    7.944140] Bluetooth: hci1: command 0xfc18 tx timeout
+[   16.050803] Bluetooth: hci1: BCM: failed to write update baudrate =
+(-110)
+[   16.050808] Bluetooth: hci1: Failed to set baudrate
+[   18.184134] Bluetooth: hci1: command 0x0c03 tx timeout
+[   26.077475] Bluetooth: hci1: BCM: Reset failed (-110)
 
-As can be seen in downstream bug, we need to apply 0001-Include-limits.h-for-
-PATH_MAX.patch to fix building in non-glibc systems
-https://bugs.gentoo.org/695940
+Kernel defconfig: =
+https://github.com/chewitt/LibreELEC.tv/blob/amlogic-master/projects/Amlog=
+ic/linux/linux.aarch64.conf
 
-Thanks
+Kernelci Amlogic images (https://kernelci.org/soc/amlogic/job/amlogic/) =
+are showing the same "Frame reassembly failed (-84)=E2=80=9D error.
 
---=-QmPEVc3zVycUVQl9gwQp
-Content-Disposition: attachment; filename="0001-Include-limits.h-for-PATH_MAX.patch"
-Content-Type: text/x-patch; name="0001-Include-limits.h-for-PATH_MAX.patch";
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+This sounds similar: =
+https://www.spinics.net/lists/linux-bluetooth/msg81600.html but modules =
+will use hci_bcm not hci_qca.
 
-RnJvbSAyMDEyOGM1Yzk1ZmJhZTkzYzlmZDk5NmQ1YWQyNTg0Y2Y2YWQ4MDMyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBKb3J5IFByYXR0IDxhbmFyY2h5QGdlbnRvby5vcmc+CkRhdGU6
-IE1vbiwgMzAgU2VwIDIwMTkgMTg6MzU6NTYgLTA1MDAKU3ViamVjdDogW1BBVENIXSBJbmNsdWRl
-IGxpbWl0cy5oIGZvciBQQVRIX01BWAoKU2lnbmVkLW9mZi1ieTogSm9yeSBQcmF0dCA8YW5hcmNo
-eUBnZW50b28ub3JnPgotLS0KIG1lc2gva2V5cmluZy5jICAgICAgICAgIHwgMSArCiBtZXNoL21l
-c2gtY29uZmlnLWpzb24uYyB8IDEgKwogbWVzaC9ub2RlLmMgICAgICAgICAgICAgfCAxICsKIG1l
-c2gvdXRpbC5jICAgICAgICAgICAgIHwgMSArCiA0IGZpbGVzIGNoYW5nZWQsIDQgaW5zZXJ0aW9u
-cygrKQoKZGlmZiAtLWdpdCBhL21lc2gva2V5cmluZy5jIGIvbWVzaC9rZXlyaW5nLmMKaW5kZXgg
-M2E3ZjkyZi4uOWZhN2Q2YiAxMDA2NDQKLS0tIGEvbWVzaC9rZXlyaW5nLmMKKysrIGIvbWVzaC9r
-ZXlyaW5nLmMKQEAgLTI0LDYgKzI0LDcgQEAKICNkZWZpbmUgX0dOVV9TT1VSQ0UKICNpbmNsdWRl
-IDxmY250bC5oPgogI2luY2x1ZGUgPGRpcmVudC5oPgorI2luY2x1ZGUgPGxpbWl0cy5oPgogI2lu
-Y2x1ZGUgPHN0ZGlvLmg+CiAjaW5jbHVkZSA8dW5pc3RkLmg+CiAjaW5jbHVkZSA8ZGlyZW50Lmg+
-CmRpZmYgLS1naXQgYS9tZXNoL21lc2gtY29uZmlnLWpzb24uYyBiL21lc2gvbWVzaC1jb25maWct
-anNvbi5jCmluZGV4IGNhZmEyZmQuLjc0Y2E0OTUgMTAwNjQ0Ci0tLSBhL21lc2gvbWVzaC1jb25m
-aWctanNvbi5jCisrKyBiL21lc2gvbWVzaC1jb25maWctanNvbi5jCkBAIC0yNyw2ICsyNyw3IEBA
-CiAjaW5jbHVkZSA8ZmNudGwuaD4KICNpbmNsdWRlIDxmdHcuaD4KICNpbmNsdWRlIDxsaWJnZW4u
-aD4KKyNpbmNsdWRlIDxsaW1pdHMuaD4KICNpbmNsdWRlIDxzdGRpby5oPgogI2luY2x1ZGUgPHN0
-cmluZy5oPgogI2luY2x1ZGUgPHVuaXN0ZC5oPgpkaWZmIC0tZ2l0IGEvbWVzaC9ub2RlLmMgYi9t
-ZXNoL25vZGUuYwppbmRleCBiNjgyNGY1Li4xNWRjYjk3IDEwMDY0NAotLS0gYS9tZXNoL25vZGUu
-YworKysgYi9tZXNoL25vZGUuYwpAQCAtMjMsNiArMjMsNyBAQAogCiAjZGVmaW5lIF9HTlVfU09V
-UkNFCiAjaW5jbHVkZSA8ZGlyZW50Lmg+CisjaW5jbHVkZSA8bGltaXRzLmg+CiAjaW5jbHVkZSA8
-c3RkaW8uaD4KICNpbmNsdWRlIDxzeXMvdGltZS5oPgogCmRpZmYgLS1naXQgYS9tZXNoL3V0aWwu
-YyBiL21lc2gvdXRpbC5jCmluZGV4IDE0NTViZGUuLjk4NmJhNGIgMTAwNjQ0Ci0tLSBhL21lc2gv
-dXRpbC5jCisrKyBiL21lc2gvdXRpbC5jCkBAIC0yNSw2ICsyNSw3IEBACiAjaW5jbHVkZSA8ZGly
-ZW50Lmg+CiAjaW5jbHVkZSA8ZnR3Lmg+CiAjaW5jbHVkZSA8c3RkaW8uaD4KKyNpbmNsdWRlIDxs
-aW1pdHMuaD4KICNpbmNsdWRlIDx0aW1lLmg+CiAjaW5jbHVkZSA8c3lzL3RpbWUuaD4KIAotLSAK
-Mi4yMy4wCgo=
+Any ideas?
 
-
---=-QmPEVc3zVycUVQl9gwQp--
-
+Christian=
