@@ -3,62 +3,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E902ACA9EAF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 15:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB02CA9EAF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 15:14:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6E232084B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 15:06:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B21020873
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 15:14:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729392AbfJUPGA (ORCPT
+        id S1728854AbfJUPOT convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Oct 2019 11:06:00 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41712 "EHLO
+        Mon, 21 Oct 2019 11:14:19 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42578 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727040AbfJUPF7 (ORCPT
+        with ESMTP id S1727355AbfJUPOS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Oct 2019 11:05:59 -0400
+        Mon, 21 Oct 2019 11:14:18 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9230CCECB0;
-        Mon, 21 Oct 2019 17:14:57 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1DA90CECC4;
+        Mon, 21 Oct 2019 17:23:16 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
-Subject: Re: [PATCH] Revert "Bluetooth: hci_qca: Add delay for wcn3990
- stability"
+Subject: Re: [PATCHv2 4/4] Bluetooth: btwilink: drop superseded driver
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191021141827.11150-1-jeffrey.l.hugo@gmail.com>
-Date:   Mon, 21 Oct 2019 17:05:57 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, c-hbandi@codeaurora.org,
-        bgodavar@codeaurora.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <41343F73-DBCE-43BB-84AD-4548F8A66D10@holtmann.org>
-References: <20191021141827.11150-1-jeffrey.l.hugo@gmail.com>
-To:     Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
+In-Reply-To: <20191020205901.56bafijk7cu3rpaj@earth.universe>
+Date:   Mon, 21 Oct 2019 17:14:15 +0200
+Cc:     Tony Lindgren <tony@atomide.com>, Adam Ford <aford173@gmail.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@collabora.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <AC376F8D-77F3-4497-94D1-FE25A5ED9337@holtmann.org>
+References: <20191003134147.9458-1-sre@kernel.org>
+ <20191003134147.9458-5-sre@kernel.org>
+ <BC1F82AC-2988-4BC6-99EA-1C9F9289E582@holtmann.org>
+ <20191020205901.56bafijk7cu3rpaj@earth.universe>
+To:     Sebastian Reichel <sre@kernel.org>
 X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jeffrey,
+Hi Sebastian,
 
-> This reverts commit cde9dde6e11a5ab54b6462cd46d82878926783bc.
+>>> All users of this driver have been converted to the serdev based
+>>> hci_ll driver. The unused driver can be safely dropped now.
+>>> 
+>>> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+>>> ---
+>>> drivers/bluetooth/Kconfig    |  11 --
+>>> drivers/bluetooth/Makefile   |   1 -
+>>> drivers/bluetooth/btwilink.c | 337 -----------------------------------
+>>> 3 files changed, 349 deletions(-)
+>>> delete mode 100644 drivers/bluetooth/btwilink.c
+>> 
+>> patch has been applied to bluetooth-next tree.
+>> 
+>> However what I really like to see is that you re-introduce a
+>> btwilink driver that is purely serdev based and doesn’t rely on
+>> any hci_uart/hci_ldisc code. A clean serdev only driver is that
+>> best and easier to maintain long term.
 > 
-> The frame reassembly errors were root caused to a transient gpio issue.
-> The missing response was root caused to an issue with properly managing
-> RFR in the uart driver.  Addressing those root causes occurs outside of
-> hci_qca and eliminates the need for the 50ms delay, so remove it.
+> So basically move the serdev implementation from hci_ll.c into its
+> own driver and make hci_ll hci_uart based only? That effectively
+> means, that we have two implementations of the protocol. I don't
+> think this will improve maintainability, since then bugs needs to
+> be fixed in two places? Note, that we have a couple of drivers
+> with serdev+hci_uart by now:
 > 
-> Signed-off-by: Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
-> ---
-> drivers/bluetooth/hci_qca.c | 4 +---
-> 1 file changed, 1 insertion(+), 3 deletions(-)
+> for file in $(grep -l serdev drivers/bluetooth/hci_*c) ; grep -l hci_uart_register_proto "${file}"
+> hci_bcm.c
+> hci_h5.c
+> hci_ldisc.c
+> hci_ll.c
+> hci_mrvl.c
+> hci_qca.c
 
-patch has been applied to bluetooth-next tree.
+I would like to have something similar to btmtkuart.c which is a pure serdev driver that doesn’t depend on any hci_ldisc.c framework. If we have this, then we would just drop hci_ll.c from the kernel and focus on the serdev only version. As noted, there is no need for any other driver at that point since everything is probed anyway. Users will not even notice the difference.
 
 Regards
 
