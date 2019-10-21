@@ -2,164 +2,102 @@ Return-Path: <SRS0=7NwR=YO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD1E8CA9EB7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 06:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4813BCA9EAF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 14:18:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A23A120B7C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 06:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B9592166E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 14:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="aFJEphDo";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="DYKB6iI3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="INKY8gja"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727129AbfJUGhS (ORCPT
+        id S1729043AbfJUOSc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Oct 2019 02:37:18 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:50228 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726039AbfJUGhS (ORCPT
+        Mon, 21 Oct 2019 10:18:32 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:39538 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727322AbfJUOSc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Oct 2019 02:37:18 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id D048860615; Mon, 21 Oct 2019 06:37:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1571639836;
-        bh=2vIcvW5geZwE7c5DDapmfwvV6vh9/TkLfY1Sx4zMLV8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=aFJEphDoAi0Z+DTztFIGNOiaxbabvkF+YFNlY2PiCCwGPtJCHVb/3xOFBFL17FebK
-         fBLjqFEQJLNYvpF0Dq+yweNTEw024RBis5BWHwUQ8I0E4bUXnjx2k4v4pcbcTUx3sH
-         q+oSNdNI3nd21briSH5qLs1NNAuvTkPq2XER93ug=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 6DD8C60615;
-        Mon, 21 Oct 2019 06:37:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1571639835;
-        bh=2vIcvW5geZwE7c5DDapmfwvV6vh9/TkLfY1Sx4zMLV8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=DYKB6iI3sNz6j7LBcwsaTnf8FCM+oDegeqf5MeFk4qk42fhnKKNS6rKZu9J/eLd5p
-         MopQOPDo1YkdXXejoyy8xDiyFeElpYwIdsEBG0xPvdRhWkLLfKJqFJDjJi6qi99I6/
-         4clfRCxDN2NxegTaAZfVbB8iRz92ldP06d/Kcvjo=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 21 Oct 2019 12:07:15 +0530
-From:   Harish Bandi <c-hbandi@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeffrey Hugo <jeffrey.l.hugo@gmail.com>,
-        linux-arm-msm@vger.kernel.org,
-        linux-bluetooth-owner@vger.kernel.org
-Subject: Re: [PATCH 2/4] Bluetooth: hci_qca: Don't vote for specific voltage
-In-Reply-To: <20191018182205.GA20212@google.com>
-References: <20191018052405.3693555-1-bjorn.andersson@linaro.org>
- <20191018052405.3693555-3-bjorn.andersson@linaro.org>
- <20191018182205.GA20212@google.com>
-Message-ID: <7f9a4de91f364a5f8ce707c8d8a2344d@codeaurora.org>
-X-Sender: c-hbandi@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+        Mon, 21 Oct 2019 10:18:32 -0400
+Received: by mail-pl1-f193.google.com with SMTP id s17so6681679plp.6;
+        Mon, 21 Oct 2019 07:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=Q7pZ33ZbznXPJtvmD19nVQgQlTsXtZXtBOem8I3QUdY=;
+        b=INKY8gjaHhVN5RG3HbT/ZFNUyfWVhQcYZHqWFfbkpK9LZ5p7mYSFYQoPmdkCcrAyK6
+         kG0/4g4Fv+dYnHMWRYWGWq/UVymZSIHmv0zToJC2nblaxfKjngnYumo/4/Xy4eUeh+Lt
+         THexRIY4u2cdv7wff7dhbBkS6nq7YrxjCAZx6Jc15kvBxO11I0rX3PcdGsl4soLCZXnK
+         3vD/GAmPyFuhCMT7+yJ9pPnkIVQIeOHS5xryoXlgLhvczvh0+dnPVlaYa4VECDtY30Gw
+         Hp+gEe03s0MvPXeHo2h9p89q87r7LyGYIYecLH59qdcbWHaAMf8eokSn3rfqbR/BuQJN
+         0jjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Q7pZ33ZbznXPJtvmD19nVQgQlTsXtZXtBOem8I3QUdY=;
+        b=uKHvO5+Vo/kGbPdNYkh7ZtztrnjZ+b5oqXrRRXn1sX8Ft/BuFnM5y1VPTTfalPDHr4
+         ajsK28/W5LXOlt+GIdA4ZdoMuUSTueIB05r6fqoXPj3OJoT0suQ3Lf9+Yq4oE4YMJ6KV
+         v/NCQHKdn7BMIn0gSFQLjZZri+0mOTg0BJCvu8u/IGQnEakIp+lhFJOmKciqaklKXOHA
+         U6fN944JwrE0lQ/684yMlo7OMHA7Lo8JyY/JQBMsNpZLO0isnE8en8/JSQvGlhPqR7rQ
+         P065PnKT0/JTmIoFG8CNDCKGu1v5xwpd47tWPLVp6EzxjpD78fkpVo3PpcDBMHu7VpuZ
+         D08A==
+X-Gm-Message-State: APjAAAWXIXc9lCfrOq+mOKTmranVndRBIgoHijlM3wmeqL7K9p9p/KOX
+        XFHNVYNoA3AgE1I5TJZ/zdk=
+X-Google-Smtp-Source: APXvYqw1mW2AQvjdOIP7c29+EWwxZggL2XmITz2nkKCN5wF79Uum+vQkU9s7tJDd/aN4/aG+i0+d6w==
+X-Received: by 2002:a17:902:fe0d:: with SMTP id g13mr6890785plj.253.1571667511820;
+        Mon, 21 Oct 2019 07:18:31 -0700 (PDT)
+Received: from aw-bldr-10.qualcomm.com (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id p189sm16699509pfp.163.2019.10.21.07.18.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2019 07:18:31 -0700 (PDT)
+From:   Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        c-hbandi@codeaurora.org, bgodavar@codeaurora.org
+Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
+Subject: [PATCH] Revert "Bluetooth: hci_qca: Add delay for wcn3990 stability"
+Date:   Mon, 21 Oct 2019 07:18:27 -0700
+Message-Id: <20191021141827.11150-1-jeffrey.l.hugo@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-+ Bala
+This reverts commit cde9dde6e11a5ab54b6462cd46d82878926783bc.
 
-On 2019-10-18 23:52, Matthias Kaehlcke wrote:
-> On Thu, Oct 17, 2019 at 10:24:02PM -0700, Bjorn Andersson wrote:
->> Devices with specific voltage requirements should not request voltage
->> from the driver, but instead rely on the system configuration to 
->> define
->> appropriate voltages for each rail.
->> 
->> This ensures that PMIC and board variations are accounted for, 
->> something
->> that the 0.1V range in the hci_qca driver currently tries to address.
->> But on the Lenovo Yoga C630 (with wcn3990) vddch0 is 3.1V, which means
->> the driver will fail to set the voltage.
->> 
->> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
->> ---
->>  drivers/bluetooth/hci_qca.c | 26 ++++++++------------------
->>  1 file changed, 8 insertions(+), 18 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index c07c529b0d81..54aafcc69d06 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -130,8 +130,6 @@ enum qca_speed_type {
->>   */
->>  struct qca_vreg {
->>  	const char *name;
->> -	unsigned int min_uV;
->> -	unsigned int max_uV;
->>  	unsigned int load_uA;
->>  };
->> 
->> @@ -1332,10 +1330,10 @@ static const struct hci_uart_proto qca_proto = 
->> {
->>  static const struct qca_vreg_data qca_soc_data_wcn3990 = {
->>  	.soc_type = QCA_WCN3990,
->>  	.vregs = (struct qca_vreg []) {
->> -		{ "vddio",   1800000, 1900000,  15000  },
->> -		{ "vddxo",   1800000, 1900000,  80000  },
->> -		{ "vddrf",   1300000, 1350000,  300000 },
->> -		{ "vddch0",  3300000, 3400000,  450000 },
->> +		{ "vddio", 15000  },
->> +		{ "vddxo", 80000  },
->> +		{ "vddrf", 300000 },
->> +		{ "vddch0", 450000 },
->>  	},
->>  	.num_vregs = 4,
->>  };
->> @@ -1343,10 +1341,10 @@ static const struct qca_vreg_data 
->> qca_soc_data_wcn3990 = {
->>  static const struct qca_vreg_data qca_soc_data_wcn3998 = {
->>  	.soc_type = QCA_WCN3998,
->>  	.vregs = (struct qca_vreg []) {
->> -		{ "vddio",   1800000, 1900000,  10000  },
->> -		{ "vddxo",   1800000, 1900000,  80000  },
->> -		{ "vddrf",   1300000, 1352000,  300000 },
->> -		{ "vddch0",  3300000, 3300000,  450000 },
->> +		{ "vddio", 10000  },
->> +		{ "vddxo", 80000  },
->> +		{ "vddrf", 300000 },
->> +		{ "vddch0", 450000 },
->>  	},
->>  	.num_vregs = 4,
->>  };
->> @@ -1386,13 +1384,6 @@ static int qca_power_off(struct hci_dev *hdev)
->>  static int qca_enable_regulator(struct qca_vreg vregs,
->>  				struct regulator *regulator)
->>  {
->> -	int ret;
->> -
->> -	ret = regulator_set_voltage(regulator, vregs.min_uV,
->> -				    vregs.max_uV);
->> -	if (ret)
->> -		return ret;
->> -
->>  	return regulator_enable(regulator);
->> 
->>  }
->> @@ -1401,7 +1392,6 @@ static void qca_disable_regulator(struct 
->> qca_vreg vregs,
->>  				  struct regulator *regulator)
->>  {
->>  	regulator_disable(regulator);
->> -	regulator_set_voltage(regulator, 0, vregs.max_uV);
->> 
->>  }
-> 
-> This was brought up multiple times during the initial review, but
-> wasn't addressed.
-> 
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+The frame reassembly errors were root caused to a transient gpio issue.
+The missing response was root caused to an issue with properly managing
+RFR in the uart driver.  Addressing those root causes occurs outside of
+hci_qca and eliminates the need for the 50ms delay, so remove it.
+
+Signed-off-by: Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
+---
+ drivers/bluetooth/hci_qca.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 8ae91e0f8102..c591a8ba9d93 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1155,10 +1155,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		host_set_baudrate(hu, speed);
+ 
+ error:
+-		if (qca_is_wcn399x(soc_type)) {
+-			msleep(50);
++		if (qca_is_wcn399x(soc_type))
+ 			hci_uart_set_flow_control(hu, false);
+-		}
+ 
+ 		if (soc_type == QCA_WCN3990) {
+ 			/* Wait for the controller to send the vendor event
+-- 
+2.17.1
+
