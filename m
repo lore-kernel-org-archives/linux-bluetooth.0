@@ -2,102 +2,74 @@ Return-Path: <SRS0=7NwR=YO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4813BCA9EAF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 14:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB6DC47E49
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 15:05:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B9592166E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 14:18:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="INKY8gja"
+	by mail.kernel.org (Postfix) with ESMTP id E2957217D7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Oct 2019 15:05:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729043AbfJUOSc (ORCPT
+        id S1729379AbfJUPFh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Oct 2019 10:18:32 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:39538 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727322AbfJUOSc (ORCPT
+        Mon, 21 Oct 2019 11:05:37 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:46145 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727211AbfJUPFg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Oct 2019 10:18:32 -0400
-Received: by mail-pl1-f193.google.com with SMTP id s17so6681679plp.6;
-        Mon, 21 Oct 2019 07:18:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=Q7pZ33ZbznXPJtvmD19nVQgQlTsXtZXtBOem8I3QUdY=;
-        b=INKY8gjaHhVN5RG3HbT/ZFNUyfWVhQcYZHqWFfbkpK9LZ5p7mYSFYQoPmdkCcrAyK6
-         kG0/4g4Fv+dYnHMWRYWGWq/UVymZSIHmv0zToJC2nblaxfKjngnYumo/4/Xy4eUeh+Lt
-         THexRIY4u2cdv7wff7dhbBkS6nq7YrxjCAZx6Jc15kvBxO11I0rX3PcdGsl4soLCZXnK
-         3vD/GAmPyFuhCMT7+yJ9pPnkIVQIeOHS5xryoXlgLhvczvh0+dnPVlaYa4VECDtY30Gw
-         Hp+gEe03s0MvPXeHo2h9p89q87r7LyGYIYecLH59qdcbWHaAMf8eokSn3rfqbR/BuQJN
-         0jjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Q7pZ33ZbznXPJtvmD19nVQgQlTsXtZXtBOem8I3QUdY=;
-        b=uKHvO5+Vo/kGbPdNYkh7ZtztrnjZ+b5oqXrRRXn1sX8Ft/BuFnM5y1VPTTfalPDHr4
-         ajsK28/W5LXOlt+GIdA4ZdoMuUSTueIB05r6fqoXPj3OJoT0suQ3Lf9+Yq4oE4YMJ6KV
-         v/NCQHKdn7BMIn0gSFQLjZZri+0mOTg0BJCvu8u/IGQnEakIp+lhFJOmKciqaklKXOHA
-         U6fN944JwrE0lQ/684yMlo7OMHA7Lo8JyY/JQBMsNpZLO0isnE8en8/JSQvGlhPqR7rQ
-         P065PnKT0/JTmIoFG8CNDCKGu1v5xwpd47tWPLVp6EzxjpD78fkpVo3PpcDBMHu7VpuZ
-         D08A==
-X-Gm-Message-State: APjAAAWXIXc9lCfrOq+mOKTmranVndRBIgoHijlM3wmeqL7K9p9p/KOX
-        XFHNVYNoA3AgE1I5TJZ/zdk=
-X-Google-Smtp-Source: APXvYqw1mW2AQvjdOIP7c29+EWwxZggL2XmITz2nkKCN5wF79Uum+vQkU9s7tJDd/aN4/aG+i0+d6w==
-X-Received: by 2002:a17:902:fe0d:: with SMTP id g13mr6890785plj.253.1571667511820;
-        Mon, 21 Oct 2019 07:18:31 -0700 (PDT)
-Received: from aw-bldr-10.qualcomm.com (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id p189sm16699509pfp.163.2019.10.21.07.18.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2019 07:18:31 -0700 (PDT)
-From:   Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        c-hbandi@codeaurora.org, bgodavar@codeaurora.org
-Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
-Subject: [PATCH] Revert "Bluetooth: hci_qca: Add delay for wcn3990 stability"
-Date:   Mon, 21 Oct 2019 07:18:27 -0700
-Message-Id: <20191021141827.11150-1-jeffrey.l.hugo@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 21 Oct 2019 11:05:36 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 75FB9CECA3;
+        Mon, 21 Oct 2019 17:14:33 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
+Subject: Re: [PATCH V4 01/10] bluetooth: hci_bcm: Fix RTS handling during
+ startup
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
+Date:   Mon, 21 Oct 2019 17:05:32 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Eric Anholt <eric@anholt.net>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <F722AF4D-B6C8-495E-B4F0-B4DD113C1938@holtmann.org>
+References: <1570375708-26965-1-git-send-email-wahrenst@gmx.net>
+ <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
+To:     Stefan Wahren <wahrenst@gmx.net>
+X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This reverts commit cde9dde6e11a5ab54b6462cd46d82878926783bc.
+Hi Stefan,
 
-The frame reassembly errors were root caused to a transient gpio issue.
-The missing response was root caused to an issue with properly managing
-RFR in the uart driver.  Addressing those root causes occurs outside of
-hci_qca and eliminates the need for the 50ms delay, so remove it.
+> The RPi 4 uses the hardware handshake lines for CYW43455, but the chip
+> doesn't react to HCI requests during DT probe. The reason is the inproper
+> handling of the RTS line during startup. According to the startup
+> signaling sequence in the CYW43455 datasheet, the hosts RTS line must
+> be driven after BT_REG_ON and BT_HOST_WAKE.
+> 
+> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+> ---
+> drivers/bluetooth/hci_bcm.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
-Signed-off-by: Jeffrey Hugo <jeffrey.l.hugo@gmail.com>
----
- drivers/bluetooth/hci_qca.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 8ae91e0f8102..c591a8ba9d93 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1155,10 +1155,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 		host_set_baudrate(hu, speed);
- 
- error:
--		if (qca_is_wcn399x(soc_type)) {
--			msleep(50);
-+		if (qca_is_wcn399x(soc_type))
- 			hci_uart_set_flow_control(hu, false);
--		}
- 
- 		if (soc_type == QCA_WCN3990) {
- 			/* Wait for the controller to send the vendor event
--- 
-2.17.1
+Regards
+
+Marcel
 
