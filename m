@@ -2,213 +2,86 @@ Return-Path: <SRS0=2/I1=YP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F154CA9EB9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Oct 2019 06:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BE7CA9EA0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Oct 2019 16:01:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43ACD21783
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Oct 2019 06:05:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="nfEx9uo1";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="fjydRdeX"
+	by mail.kernel.org (Postfix) with ESMTP id DB4582064B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Oct 2019 16:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730705AbfJVGFp (ORCPT
+        id S2389018AbfJVQBP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Oct 2019 02:05:45 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:42800 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725788AbfJVGFp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Oct 2019 02:05:45 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 42CFB6079C; Tue, 22 Oct 2019 06:05:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1571724344;
-        bh=cY8sxLPZP4vsxpJajBId/YF2IaHEql2Vk2+ldt9E2fU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=nfEx9uo1O1xSaTXuWcoK6t5ju6WT/+pvadG+v2eS/U3MfhLX13srdYUx/1I37J7WK
-         k5VL4kA4kLjXmvb3dvJMEoAtu7z13VHQYfJzGPsv3KtVXqbbt7VK6Zqo5r+wVJqb/b
-         pFulOVd8CwoUJV/4tIRTEqoHjEVeKapn/0dDPHsM=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 2357960614;
-        Tue, 22 Oct 2019 06:05:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1571724343;
-        bh=cY8sxLPZP4vsxpJajBId/YF2IaHEql2Vk2+ldt9E2fU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=fjydRdeXHA1xaIJwtrdGYONDeonhkM77FMoHhORPsVd7Rjra+fBoVB2ieBsewZ5fq
-         z9QJ1V6Nl3lytIgUJJhpQb5W8lzCBNdTOUx+zgdWv/qjmcT5jXZWpwYVdpgTnTlEcq
-         YJxjxuDX40mtlCRkl7T+L3HqCeCkVnBBAhq2+1ig=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 22 Oct 2019 11:35:43 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>
+        Tue, 22 Oct 2019 12:01:15 -0400
+Received: from muru.com ([72.249.23.125]:38950 "EHLO muru.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387746AbfJVQBP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Oct 2019 12:01:15 -0400
+Received: from atomide.com (localhost [127.0.0.1])
+        by muru.com (Postfix) with ESMTPS id 449F980FA;
+        Tue, 22 Oct 2019 16:01:49 +0000 (UTC)
+Date:   Tue, 22 Oct 2019 09:01:11 -0700
+From:   Tony Lindgren <tony@atomide.com>
+To:     Sebastian Reichel <sre@kernel.org>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeffrey Hugo <jeffrey.l.hugo@gmail.com>,
-        linux-arm-msm@vger.kernel.org,
-        linux-bluetooth-owner@vger.kernel.org, hemantg@codeaurora.org,
-        Harish Bandi <c-hbandi@codeaurora.org>
-Subject: Re: [PATCH 2/4] Bluetooth: hci_qca: Don't vote for specific voltage
-In-Reply-To: <7f9a4de91f364a5f8ce707c8d8a2344d@codeaurora.org>
-References: <20191018052405.3693555-1-bjorn.andersson@linaro.org>
- <20191018052405.3693555-3-bjorn.andersson@linaro.org>
- <20191018182205.GA20212@google.com>
- <7f9a4de91f364a5f8ce707c8d8a2344d@codeaurora.org>
-Message-ID: <5bbd8e5bbd832ecdafc7c2d603f10c6c@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+        Adam Ford <aford173@gmail.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@collabora.com
+Subject: Re: [PATCHv2 0/4] Convert all btwilink users to hci_ll and drop
+ btwilink
+Message-ID: <20191022160111.GP5610@atomide.com>
+References: <20191003134147.9458-1-sre@kernel.org>
+ <20191008143116.GF5610@atomide.com>
+ <20191020203352.rh3n6qpagiyift7d@earth.universe>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191020203352.rh3n6qpagiyift7d@earth.universe>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias, Bjorn andresson,
-
-On 2019-10-21 12:07, Harish Bandi wrote:
-> + Bala
+* Sebastian Reichel <sre@kernel.org> [191020 20:34]:
+> Hi Tony,
 > 
-> On 2019-10-18 23:52, Matthias Kaehlcke wrote:
->> On Thu, Oct 17, 2019 at 10:24:02PM -0700, Bjorn Andersson wrote:
->>> Devices with specific voltage requirements should not request voltage
->>> from the driver, but instead rely on the system configuration to 
->>> define
->>> appropriate voltages for each rail.
->>> 
->>> This ensures that PMIC and board variations are accounted for, 
->>> something
->>> that the 0.1V range in the hci_qca driver currently tries to address.
->>> But on the Lenovo Yoga C630 (with wcn3990) vddch0 is 3.1V, which 
->>> means
->>> the driver will fail to set the voltage.
->>> 
->>> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
->>> ---
->>>  drivers/bluetooth/hci_qca.c | 26 ++++++++------------------
->>>  1 file changed, 8 insertions(+), 18 deletions(-)
->>> 
->>> diff --git a/drivers/bluetooth/hci_qca.c 
->>> b/drivers/bluetooth/hci_qca.c
->>> index c07c529b0d81..54aafcc69d06 100644
->>> --- a/drivers/bluetooth/hci_qca.c
->>> +++ b/drivers/bluetooth/hci_qca.c
->>> @@ -130,8 +130,6 @@ enum qca_speed_type {
->>>   */
->>>  struct qca_vreg {
->>>  	const char *name;
->>> -	unsigned int min_uV;
->>> -	unsigned int max_uV;
->>>  	unsigned int load_uA;
->>>  };
->>> 
->>> @@ -1332,10 +1330,10 @@ static const struct hci_uart_proto qca_proto 
->>> = {
->>>  static const struct qca_vreg_data qca_soc_data_wcn3990 = {
->>>  	.soc_type = QCA_WCN3990,
->>>  	.vregs = (struct qca_vreg []) {
->>> -		{ "vddio",   1800000, 1900000,  15000  },
->>> -		{ "vddxo",   1800000, 1900000,  80000  },
->>> -		{ "vddrf",   1300000, 1350000,  300000 },
->>> -		{ "vddch0",  3300000, 3400000,  450000 },
->>> +		{ "vddio", 15000  },
->>> +		{ "vddxo", 80000  },
->>> +		{ "vddrf", 300000 },
->>> +		{ "vddch0", 450000 },
->>>  	},
->>>  	.num_vregs = 4,
->>>  };
->>> @@ -1343,10 +1341,10 @@ static const struct qca_vreg_data 
->>> qca_soc_data_wcn3990 = {
->>>  static const struct qca_vreg_data qca_soc_data_wcn3998 = {
->>>  	.soc_type = QCA_WCN3998,
->>>  	.vregs = (struct qca_vreg []) {
->>> -		{ "vddio",   1800000, 1900000,  10000  },
->>> -		{ "vddxo",   1800000, 1900000,  80000  },
->>> -		{ "vddrf",   1300000, 1352000,  300000 },
->>> -		{ "vddch0",  3300000, 3300000,  450000 },
->>> +		{ "vddio", 10000  },
->>> +		{ "vddxo", 80000  },
->>> +		{ "vddrf", 300000 },
->>> +		{ "vddch0", 450000 },
->>>  	},
->>>  	.num_vregs = 4,
->>>  };
->>> @@ -1386,13 +1384,6 @@ static int qca_power_off(struct hci_dev *hdev)
->>>  static int qca_enable_regulator(struct qca_vreg vregs,
->>>  				struct regulator *regulator)
->>>  {
->>> -	int ret;
->>> -
->>> -	ret = regulator_set_voltage(regulator, vregs.min_uV,
->>> -				    vregs.max_uV);
->>> -	if (ret)
->>> -		return ret;
->>> -
->>>  	return regulator_enable(regulator);
->>> 
->>>  }
->>> @@ -1401,7 +1392,6 @@ static void qca_disable_regulator(struct 
->>> qca_vreg vregs,
->>>  				  struct regulator *regulator)
->>>  {
->>>  	regulator_disable(regulator);
->>> -	regulator_set_voltage(regulator, 0, vregs.max_uV);
->>> 
->>>  }
->> 
->> This was brought up multiple times during the initial review, but
->> wasn't addressed.
->> 
->> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> On Tue, Oct 08, 2019 at 07:31:16AM -0700, Tony Lindgren wrote:
+> > * Sebastian Reichel <sre@kernel.org> [191003 06:42]:
+> > > This moves the remaining users of btwilink to the "new" serdev based hci_ll
+> > > driver and drops the btwilink driver afterwards. The patches were only compile
+> > > tested by me, but Enric tested the IGEP platform and Adam will test the LogicPD
+> > > platform.
+> > > 
+> > > I kept the TI_ST driver for now, since I plan to send a second patchset for the
+> > > FM radio driver. Once the FM driver has been converted to also use hci_ll, we
+> > > can remove TI_ST completly.
+> > > 
+> > > My suggestion is for the patch handling is, that everything simply goes through
+> > > Tony's tree.
+> > 
+> > Sounds good to me, good to see kim gone with patch 3/4 :)
+> > 
+> > Marcel, care to ack the old driver removal patch?
+> 
+> Looks like Marcel missed the extra messages and merged the 4th
+> patch, so I guess you can just merge patches 1-3. Technically that
+> might lead to temporarily missing BT support on those two devices
+> when the BT tree is merged before ARM tree during the merge window.
+> Not a big issue I guess.
+
+Sure no problem. Applying dts changes into omap-for-v5.5/dt
+and the pdata quirk removal to omap-for-v5.5/soc.
+
+I guess ti_wilink_st.h will need some follow-up patch to
+remove unused platform data, but best to wait on that.
+
+Regards,
+
+Tony
 
 
-yes true PMIC dts regulator should do this.
-But we have some real time issues observed.
 
-Issue 1:
-
-In PMIC dts node, ASAIK we have three levels of voltages.
-
-1. Default voltage.
-2. Minimum voltage. (mandatory entry)
-3. Maximum voltage. (mandatory entry)
-
-Let us assume that the if PMIC regulator dts node supports  defaults 
-voltage to 3.2 Volts and Min  as 3.1 V and max as 3.3V
-So default operating voltage is 3.1V  when we turn on BT (but according 
-to spec SoC requires min of 3.3V to operate,
-Might have some functionality failures on end to end testing
-
-Issue 2:
-
-WCN3990 RF is shared with WiFi, so it also try to turn on the 
-regulators. Wifi driver uses the same approach of restricting to min and 
-max voltages in driver.
-Let us assume we turned ON BT and CH0 is set to 3.1v (as in your case), 
-Wifi is tuned on now, as its request the CH0 to operate at 3.3 Volts, 
-regulator will fail to set this voltage as BT is operating
-at CH0 3.1v (assuming max voltage is 3.2v)
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/drivers/net/wireless/ath/ath10k/snoc.c#n39
-
-Issue 3:
-
-By mistake PMIC has low min or default voltage and high max voltages, 
-that is harm for WNC3990.
-
-I would suggest to restrict the min and max voltages in driver, instead 
-of relaying on PMIC to do this.
-BTW pmic will do this and doing it in our driver is safer.
-
-Let me know your views on this.
--- 
-Regards
-Balakrishna.
