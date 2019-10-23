@@ -2,80 +2,183 @@ Return-Path: <SRS0=9nGc=YQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F5BCA9EAE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 05:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A1CCA9EB6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 10:22:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC2312064A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 05:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEF2720650
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 10:22:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="hNt1lFgV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731524AbfJWFlV (ORCPT
+        id S2404209AbfJWKWS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Oct 2019 01:41:21 -0400
-Received: from mga04.intel.com ([192.55.52.120]:29048 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727885AbfJWFlV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Oct 2019 01:41:21 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Oct 2019 22:41:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,219,1569308400"; 
-   d="scan'208";a="203863305"
-Received: from afignato-mobl1.amr.corp.intel.com (HELO ingas-nuc1.sea.intel.com) ([10.252.128.87])
-  by FMSMGA003.fm.intel.com with ESMTP; 22 Oct 2019 22:41:21 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] shared/shell: Add prompt item to bt_shell_menu structure
-Date:   Tue, 22 Oct 2019 22:41:19 -0700
-Message-Id: <20191023054119.7712-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.0
+        Wed, 23 Oct 2019 06:22:18 -0400
+Received: from perceval.ideasonboard.com ([213.167.242.64]:36866 "EHLO
+        perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2403810AbfJWKWR (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 23 Oct 2019 06:22:17 -0400
+Received: from pendragon.ideasonboard.com (143.121.2.93.rev.sfr.net [93.2.121.143])
+        by perceval.ideasonboard.com (Postfix) with ESMTPSA id 613D5814;
+        Wed, 23 Oct 2019 12:22:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+        s=mail; t=1571826133;
+        bh=eGJOH1VGLoVHmq/1QUJrrmrQnHMBekaXv4x5beDzUns=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hNt1lFgV/RYMyeFBPXTgQiKb3GwPw/Wa344JMMSZWnwFmLvL/ZwSc8yFopTSs7O3V
+         3BEcvANOutiE3Uqo9EUjLPvIH0XYH9JeysLU4k3odp1PfhlVV0P9EFVjba6AUVEZTx
+         Bg5kiEXBNGIQl2WjyNDPL8rSeOPgyZ4CMk60KXUs=
+Date:   Wed, 23 Oct 2019 13:22:07 +0300
+From:   Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To:     Mark Salyzyn <salyzyn@android.com>
+Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Harry Wentland <harry.wentland@amd.com>,
+        Leo Li <sunpeng.li@amd.com>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        "David (ChunMing) Zhou" <David1.Zhou@amd.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        VMware Graphics <linux-graphics-maintainer@vmware.com>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Matthew Garrett <matthewgarrett@google.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        hersen wu <hersenxs.wu@amd.com>, Roman Li <Roman.Li@amd.com>,
+        Maxim Martynov <maxim@arista.com>,
+        David Ahern <dsahern@gmail.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Feng Tang <feng.tang@intel.com>,
+        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Rafael Aquini <aquini@redhat.com>, netdev@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-efi@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH] Cleanup: replace prefered with preferred
+Message-ID: <20191023102207.GB4763@pendragon.ideasonboard.com>
+References: <20191022214208.211448-1-salyzyn@android.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191022214208.211448-1-salyzyn@android.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This allows to associate specific prompts with main menu
-and submenus thus providing for better navigation when
-submenus are in use.
----
- src/shared/shell.c | 3 +++
- src/shared/shell.h | 1 +
- 2 files changed, 4 insertions(+)
+Hi Mark,
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index cfdcc76c4..a821c8d0a 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1226,6 +1226,9 @@ bool bt_shell_set_menu(const struct bt_shell_menu *menu)
- 	if (!data.main)
- 		data.main = menu;
- 
-+	if (menu->prompt)
-+		bt_shell_set_prompt(menu->prompt);
-+
- 	return true;
- }
- 
-diff --git a/src/shared/shell.h b/src/shared/shell.h
-index e14d58381..a9eee506f 100644
---- a/src/shared/shell.h
-+++ b/src/shared/shell.h
-@@ -53,6 +53,7 @@ struct bt_shell_menu_entry {
- struct bt_shell_menu {
- 	const char *name;
- 	const char *desc;
-+	const char *prompt;
- 	const struct bt_shell_menu_entry entries[];
- };
- 
+Thank you for the patch.
+
+On Tue, Oct 22, 2019 at 02:41:45PM -0700, Mark Salyzyn wrote:
+> Replace all occurrences of prefered with preferred to make future
+> checkpatch.pl's happy.  A few places the incorrect spelling is
+> matched with the correct spelling to preserve existing user space API.
+> 
+> Signed-off-by: Mark Salyzyn <salyzyn@android.com>
+> ---
+>  Documentation/networking/ip-sysctl.txt        |   2 +-
+>  .../firmware/efi/libstub/efi-stub-helper.c    |   2 +-
+>  .../gpu/drm/amd/display/dc/inc/compressor.h   |   4 +-
+>  drivers/gpu/drm/vmwgfx/vmwgfx_kms.c           |   2 +-
+>  drivers/gpu/drm/vmwgfx/vmwgfx_kms.h           |   2 +-
+>  drivers/media/usb/uvc/uvc_video.c             |   6 +-
+>  fs/nfs/nfs4xdr.c                              |   2 +-
+>  include/linux/ipv6.h                          |   2 +-
+>  include/net/addrconf.h                        |   4 +-
+>  include/net/if_inet6.h                        |   2 +-
+>  include/net/ndisc.h                           |   8 +-
+>  include/uapi/linux/if_addr.h                  |   5 +-
+>  include/uapi/linux/ipv6.h                     |   4 +-
+>  include/uapi/linux/sysctl.h                   |   4 +-
+>  include/uapi/linux/usb/video.h                |   5 +-
+>  kernel/sysctl_binary.c                        |   3 +-
+>  net/6lowpan/ndisc.c                           |   4 +-
+>  net/ipv4/devinet.c                            |  20 ++--
+>  net/ipv6/addrconf.c                           | 113 ++++++++++--------
+>  19 files changed, 112 insertions(+), 82 deletions(-)
+
+[snip]
+
+> diff --git a/drivers/media/usb/uvc/uvc_video.c b/drivers/media/usb/uvc/uvc_video.c
+> index 8fa77a81dd7f..0096e6aacdb4 100644
+> --- a/drivers/media/usb/uvc/uvc_video.c
+> +++ b/drivers/media/usb/uvc/uvc_video.c
+> @@ -276,13 +276,13 @@ static int uvc_get_video_ctrl(struct uvc_streaming *stream,
+>  	if (size >= 34) {
+>  		ctrl->dwClockFrequency = get_unaligned_le32(&data[26]);
+>  		ctrl->bmFramingInfo = data[30];
+> -		ctrl->bPreferedVersion = data[31];
+> +		ctrl->bPreferredVersion = data[31];
+>  		ctrl->bMinVersion = data[32];
+>  		ctrl->bMaxVersion = data[33];
+>  	} else {
+>  		ctrl->dwClockFrequency = stream->dev->clock_frequency;
+>  		ctrl->bmFramingInfo = 0;
+> -		ctrl->bPreferedVersion = 0;
+> +		ctrl->bPreferredVersion = 0;
+>  		ctrl->bMinVersion = 0;
+>  		ctrl->bMaxVersion = 0;
+>  	}
+> @@ -325,7 +325,7 @@ static int uvc_set_video_ctrl(struct uvc_streaming *stream,
+>  	if (size >= 34) {
+>  		put_unaligned_le32(ctrl->dwClockFrequency, &data[26]);
+>  		data[30] = ctrl->bmFramingInfo;
+> -		data[31] = ctrl->bPreferedVersion;
+> +		data[31] = ctrl->bPreferredVersion;
+>  		data[32] = ctrl->bMinVersion;
+>  		data[33] = ctrl->bMaxVersion;
+>  	}
+
+[snip]
+
+> diff --git a/include/uapi/linux/usb/video.h b/include/uapi/linux/usb/video.h
+> index d854cb19c42c..59167f0ed5c1 100644
+> --- a/include/uapi/linux/usb/video.h
+> +++ b/include/uapi/linux/usb/video.h
+> @@ -448,7 +448,10 @@ struct uvc_streaming_control {
+>  	__u32 dwMaxPayloadTransferSize;
+>  	__u32 dwClockFrequency;
+>  	__u8  bmFramingInfo;
+> -	__u8  bPreferedVersion;
+> +	union {
+> +		__u8 bPreferredVersion;
+> +		__u8 bPreferedVersion __attribute__((deprecated)); /* NOTYPO */
+> +	} __attribute__((__packed__));
+
+Quite interestingly this typo is part of the USB device class definition
+for video devices (UVC) specification. I thus think we should keep using
+the field name bPreferedVersion through the code, otherwise it wouldn't
+match the spec.
+
+>  	__u8  bMinVersion;
+>  	__u8  bMaxVersion;
+>  } __attribute__((__packed__));
+
+[snip]
+
 -- 
-2.21.0
+Regards,
 
+Laurent Pinchart
