@@ -2,105 +2,103 @@ Return-Path: <SRS0=9nGc=YQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C75CA9EB6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E79ACCA9EB7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:42:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48FE121920
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:38:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RyFVYm5Q"
+	by mail.kernel.org (Postfix) with ESMTP id C36502173B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:42:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390140AbfJWMi4 (ORCPT
+        id S2391625AbfJWMmq convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Oct 2019 08:38:56 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:45328 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732680AbfJWMiz (ORCPT
+        Wed, 23 Oct 2019 08:42:46 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:47812 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732361AbfJWMmp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Oct 2019 08:38:55 -0400
-Received: by mail-il1-f195.google.com with SMTP id u1so18717581ilq.12;
-        Wed, 23 Oct 2019 05:38:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HjfcC+LWRIyOsNxEHwYIpjkdYtQXmiWTIubUTXxO2eo=;
-        b=RyFVYm5QcD/pDncnlALI3oYymUXhSlp+xSfaaBOUsTaRawqVrzjBGbEt/uSImBrYNQ
-         v3NPD1GAmEm5Z58MfMXl/7vp6RAbNCRKwkcZlNJBrRnwHHhHHSKl++O1Dj/P6WHWXfgI
-         4ChEbP2qVOr/+h+Ti971lfr8GPaUEH/UoWxJsH7nJra3NOJ9RlLi7ONqNmN/8OXytcAY
-         xtaQdAk0fucOMD8gKtq+iVFoIzfVGGkb2yt1K36PwI7xR4dw499OOLKW+2TOpvWwBW/r
-         U14/r2mJ1boN8AwJObH4CF+yuiGpf2ALMPs1jS4RJBBe096rtBlnS5LVeuXPEBGGbNFj
-         vnow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HjfcC+LWRIyOsNxEHwYIpjkdYtQXmiWTIubUTXxO2eo=;
-        b=nekMdu0VZ1CuzMpTmMDfZjtMWd1hQ1ybaFui1doGPxNySAypAD8PIykAxEb7Qm1biJ
-         YvH/35HxBInjjR2gCy72Q7KECdFarBW2fw8TqDXaN5/iWpZ42BThmR9nGpi1SRy0CyTW
-         SN+F9v9P78jJidU6le4Mrvhl0t49U5PV9K3aSFSXYoEpP/6Yb3TRC4QPVKXdaxRMKMGe
-         6V2hwItkGiyNj44VXzzhQe1576zXGq57wlWdfoFRK7EVm6yrN9MYRJOVvXsGGNeV1mwI
-         sTIwfGWfVYXkTiDaHQJK2fRsX8MAwSQ85WzZrKuc0CadTlnurTPOFr3Kd4VW++Pu7RiK
-         q2cg==
-X-Gm-Message-State: APjAAAXJsvFOlmlonFYtqbwojp6K1EvkwAj9+ASdj29HlJgqyPoxXDiA
-        9BdQZZUmRTo9tQ3qST99irTTPdjheM46VxrsSGI=
-X-Google-Smtp-Source: APXvYqxtHmlkACdtW1f6pccY35u7IhqbrLYqUejRnnHxLMYHWGZo78EH3dBev8jkJ6/XmjTx1ZFvlCEPuVe1iPOQ6Vo=
-X-Received: by 2002:a92:5c4f:: with SMTP id q76mr9669699ilb.158.1571834334838;
- Wed, 23 Oct 2019 05:38:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191002114626.12407-1-aford173@gmail.com> <1550E9D9-43ED-4345-A9AF-6D9F097FC64E@holtmann.org>
- <CAHCN7xKA9-K4uYU9oFW+A7ywc8TGixNa-yHJgL7uSTbyXnisTQ@mail.gmail.com>
-In-Reply-To: <CAHCN7xKA9-K4uYU9oFW+A7ywc8TGixNa-yHJgL7uSTbyXnisTQ@mail.gmail.com>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Wed, 23 Oct 2019 07:38:43 -0500
-Message-ID: <CAHCN7xKAkYacV6qWuONVqRyJuODt2mNquTWAgEFb0NcjjqpnsA@mail.gmail.com>
-Subject: Re: [PATCH] Revert "Bluetooth: hci_ll: set operational frequency earlier"
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Adam Ford <adam.ford@logicpd.com>,
-        Sebastian Reichel <sre@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 23 Oct 2019 08:42:45 -0400
+Received: from marcel-macpro.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
+        by mail.holtmann.org (Postfix) with ESMTPSA id E0B6ACECDE;
+        Wed, 23 Oct 2019 14:51:43 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
+Subject: Re: [PATCHv2 4/4] Bluetooth: btwilink: drop superseded driver
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20191023122745.ldh2ghnzazdhaf2x@earth.universe>
+Date:   Wed, 23 Oct 2019 14:42:43 +0200
+Cc:     Tony Lindgren <tony@atomide.com>, Adam Ford <aford173@gmail.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@collabora.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <299B10E1-E7A8-4346-BED9-A48446C4D866@holtmann.org>
+References: <20191003134147.9458-1-sre@kernel.org>
+ <20191003134147.9458-5-sre@kernel.org>
+ <BC1F82AC-2988-4BC6-99EA-1C9F9289E582@holtmann.org>
+ <20191020205901.56bafijk7cu3rpaj@earth.universe>
+ <AC376F8D-77F3-4497-94D1-FE25A5ED9337@holtmann.org>
+ <20191023122745.ldh2ghnzazdhaf2x@earth.universe>
+To:     Sebastian Reichel <sre@kernel.org>
+X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 12:57 PM Adam Ford <aford173@gmail.com> wrote:
->
-> On Wed, Oct 16, 2019 at 1:36 PM Marcel Holtmann <marcel@holtmann.org> wrote:
-> >
-> > Hi Adam,
-> >
-> > > As nice as it would be to update firmware faster, that patch broke
-> > > at least two different boards, an OMAP4+WL1285 based Motorola Droid
-> > > 4, as reported by Sebasian Reichel and the Logic PD i.MX6Q +
-> > > WL1837MOD.
-> > >
-> > > This reverts commit a2e02f38eff84f199c8e32359eb213f81f270047.
-> > >
-> > > Signed-off-by: Adam Ford <aford173@gmail.com>
-> >
-> > patch has been applied to bluetooth-next tree.
->
-> Any change this can get pushed upstream to stable?  (including 5.4?)
->
+Hi Sebastian,
 
-Marcel,  I have confirmed this revert also fixes a regression on my
-omap36xx based device using a wl1283 Bluetooth.  At this point, I
-believe we've identified at least 3 devices with regressions that this
-revert fixes.
+>>>>> All users of this driver have been converted to the serdev based
+>>>>> hci_ll driver. The unused driver can be safely dropped now.
+>>>>> 
+>>>>> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+>>>>> ---
+>>>>> drivers/bluetooth/Kconfig    |  11 --
+>>>>> drivers/bluetooth/Makefile   |   1 -
+>>>>> drivers/bluetooth/btwilink.c | 337 -----------------------------------
+>>>>> 3 files changed, 349 deletions(-)
+>>>>> delete mode 100644 drivers/bluetooth/btwilink.c
+>>>> 
+>>>> patch has been applied to bluetooth-next tree.
+>>>> 
+>>>> However what I really like to see is that you re-introduce a
+>>>> btwilink driver that is purely serdev based and doesn’t rely on
+>>>> any hci_uart/hci_ldisc code. A clean serdev only driver is that
+>>>> best and easier to maintain long term.
+>>> 
+>>> So basically move the serdev implementation from hci_ll.c into its
+>>> own driver and make hci_ll hci_uart based only? That effectively
+>>> means, that we have two implementations of the protocol. I don't
+>>> think this will improve maintainability, since then bugs needs to
+>>> be fixed in two places? Note, that we have a couple of drivers
+>>> with serdev+hci_uart by now:
+>>> 
+>>> for file in $(grep -l serdev drivers/bluetooth/hci_*c) ; grep -l hci_uart_register_proto "${file}"
+>>> hci_bcm.c
+>>> hci_h5.c
+>>> hci_ldisc.c
+>>> hci_ll.c
+>>> hci_mrvl.c
+>>> hci_qca.c
+>> 
+>> I would like to have something similar to btmtkuart.c which is a
+>> pure serdev driver that doesn’t depend on any hci_ldisc.c
+>> framework. If we have this, then we would just drop hci_ll.c from
+>> the kernel and focus on the serdev only version. As noted, there
+>> is no need for any other driver at that point since everything is
+>> probed anyway. Users will not even notice the difference.
+> 
+> This can be achieved by just removing the hci_uart part from
+> hci_ll. But AFAIK there are some non-wilink based TI HCILL
+> devices, which do not require any extra platform data and might
+> still use the hci_uart part.
 
-adam
-> adam
-> >
-> > Regards
-> >
-> > Marcel
-> >
+the hci_ldisc and hci_uart driver abstraction provides enqueue and dequeue handling that just needs to be removed and done natively in the serdev driver. This should be all straight forward and we can keep the current hci_ll.c around for a bit to see what users we have. However I really want to migrate everything over to native serdev drivers that are standalone. The TI HCILL is complex enough to warrant a separate driver.
+
+Regards
+
+Marcel
+
