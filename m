@@ -2,147 +2,105 @@ Return-Path: <SRS0=9nGc=YQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0AB5CA9EB7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C75CA9EB6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:38:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7B3A2086D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:27:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571833673;
-	bh=t8T7r1ufu3VJCAxY8EdZbRggUlqydUzVwu4ytEqymNY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=mKYLNecC8mkBIZXQlVJn8kBMb159DVlJo11OINA6TfVgAWihedAajIEFtW8Yz40Kb
-	 SBoAWbcyKf1b5kDBz9AOTbC5U0s6z+fS8MtGJbvF4j0Byehvn4x7VrV7++TeEmMhyv
-	 4aZIMlRK3bhpVZbPUGks2CYlyh4JPgY9mhok55XM=
+	by mail.kernel.org (Postfix) with ESMTP id 48FE121920
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:38:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RyFVYm5Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731220AbfJWM1t (ORCPT
+        id S2390140AbfJWMi4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Oct 2019 08:27:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59508 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725947AbfJWM1t (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Oct 2019 08:27:49 -0400
-Received: from earth.universe (monacowifi.monaco.mc [82.113.13.92])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8EE942086D;
-        Wed, 23 Oct 2019 12:27:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571833668;
-        bh=t8T7r1ufu3VJCAxY8EdZbRggUlqydUzVwu4ytEqymNY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rEP/KHnEMJt+p5oYo2wj9P7HvDzYxvMMwbEVPFb+ct/AWVpFypiPGZHrOr4EWYoAE
-         jlhMIW2NSPmc6niovedZIbrtq6DoVMMbZ2gRRS9/YcbVTFlwTJQY/yAge1392WcaYi
-         MH10fJB3ITMrv12A5eyEmGMImZ8HqZj4mTiHnPro=
-Received: by earth.universe (Postfix, from userid 1000)
-        id A982F3C09B2; Wed, 23 Oct 2019 14:27:45 +0200 (CEST)
-Date:   Wed, 23 Oct 2019 14:27:45 +0200
-From:   Sebastian Reichel <sre@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Tony Lindgren <tony@atomide.com>, Adam Ford <aford173@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel@collabora.com
-Subject: Re: [PATCHv2 4/4] Bluetooth: btwilink: drop superseded driver
-Message-ID: <20191023122745.ldh2ghnzazdhaf2x@earth.universe>
-References: <20191003134147.9458-1-sre@kernel.org>
- <20191003134147.9458-5-sre@kernel.org>
- <BC1F82AC-2988-4BC6-99EA-1C9F9289E582@holtmann.org>
- <20191020205901.56bafijk7cu3rpaj@earth.universe>
- <AC376F8D-77F3-4497-94D1-FE25A5ED9337@holtmann.org>
+        Wed, 23 Oct 2019 08:38:56 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:45328 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732680AbfJWMiz (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 23 Oct 2019 08:38:55 -0400
+Received: by mail-il1-f195.google.com with SMTP id u1so18717581ilq.12;
+        Wed, 23 Oct 2019 05:38:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HjfcC+LWRIyOsNxEHwYIpjkdYtQXmiWTIubUTXxO2eo=;
+        b=RyFVYm5QcD/pDncnlALI3oYymUXhSlp+xSfaaBOUsTaRawqVrzjBGbEt/uSImBrYNQ
+         v3NPD1GAmEm5Z58MfMXl/7vp6RAbNCRKwkcZlNJBrRnwHHhHHSKl++O1Dj/P6WHWXfgI
+         4ChEbP2qVOr/+h+Ti971lfr8GPaUEH/UoWxJsH7nJra3NOJ9RlLi7ONqNmN/8OXytcAY
+         xtaQdAk0fucOMD8gKtq+iVFoIzfVGGkb2yt1K36PwI7xR4dw499OOLKW+2TOpvWwBW/r
+         U14/r2mJ1boN8AwJObH4CF+yuiGpf2ALMPs1jS4RJBBe096rtBlnS5LVeuXPEBGGbNFj
+         vnow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HjfcC+LWRIyOsNxEHwYIpjkdYtQXmiWTIubUTXxO2eo=;
+        b=nekMdu0VZ1CuzMpTmMDfZjtMWd1hQ1ybaFui1doGPxNySAypAD8PIykAxEb7Qm1biJ
+         YvH/35HxBInjjR2gCy72Q7KECdFarBW2fw8TqDXaN5/iWpZ42BThmR9nGpi1SRy0CyTW
+         SN+F9v9P78jJidU6le4Mrvhl0t49U5PV9K3aSFSXYoEpP/6Yb3TRC4QPVKXdaxRMKMGe
+         6V2hwItkGiyNj44VXzzhQe1576zXGq57wlWdfoFRK7EVm6yrN9MYRJOVvXsGGNeV1mwI
+         sTIwfGWfVYXkTiDaHQJK2fRsX8MAwSQ85WzZrKuc0CadTlnurTPOFr3Kd4VW++Pu7RiK
+         q2cg==
+X-Gm-Message-State: APjAAAXJsvFOlmlonFYtqbwojp6K1EvkwAj9+ASdj29HlJgqyPoxXDiA
+        9BdQZZUmRTo9tQ3qST99irTTPdjheM46VxrsSGI=
+X-Google-Smtp-Source: APXvYqxtHmlkACdtW1f6pccY35u7IhqbrLYqUejRnnHxLMYHWGZo78EH3dBev8jkJ6/XmjTx1ZFvlCEPuVe1iPOQ6Vo=
+X-Received: by 2002:a92:5c4f:: with SMTP id q76mr9669699ilb.158.1571834334838;
+ Wed, 23 Oct 2019 05:38:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="iqu4xmpkphwkun2f"
-Content-Disposition: inline
-In-Reply-To: <AC376F8D-77F3-4497-94D1-FE25A5ED9337@holtmann.org>
-User-Agent: NeoMutt/20180716
+References: <20191002114626.12407-1-aford173@gmail.com> <1550E9D9-43ED-4345-A9AF-6D9F097FC64E@holtmann.org>
+ <CAHCN7xKA9-K4uYU9oFW+A7ywc8TGixNa-yHJgL7uSTbyXnisTQ@mail.gmail.com>
+In-Reply-To: <CAHCN7xKA9-K4uYU9oFW+A7ywc8TGixNa-yHJgL7uSTbyXnisTQ@mail.gmail.com>
+From:   Adam Ford <aford173@gmail.com>
+Date:   Wed, 23 Oct 2019 07:38:43 -0500
+Message-ID: <CAHCN7xKAkYacV6qWuONVqRyJuODt2mNquTWAgEFb0NcjjqpnsA@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: hci_ll: set operational frequency earlier"
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Adam Ford <adam.ford@logicpd.com>,
+        Sebastian Reichel <sre@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Thu, Oct 17, 2019 at 12:57 PM Adam Ford <aford173@gmail.com> wrote:
+>
+> On Wed, Oct 16, 2019 at 1:36 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+> >
+> > Hi Adam,
+> >
+> > > As nice as it would be to update firmware faster, that patch broke
+> > > at least two different boards, an OMAP4+WL1285 based Motorola Droid
+> > > 4, as reported by Sebasian Reichel and the Logic PD i.MX6Q +
+> > > WL1837MOD.
+> > >
+> > > This reverts commit a2e02f38eff84f199c8e32359eb213f81f270047.
+> > >
+> > > Signed-off-by: Adam Ford <aford173@gmail.com>
+> >
+> > patch has been applied to bluetooth-next tree.
+>
+> Any change this can get pushed upstream to stable?  (including 5.4?)
+>
 
---iqu4xmpkphwkun2f
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Marcel,  I have confirmed this revert also fixes a regression on my
+omap36xx based device using a wl1283 Bluetooth.  At this point, I
+believe we've identified at least 3 devices with regressions that this
+revert fixes.
 
-Hi,
-
-On Mon, Oct 21, 2019 at 05:14:15PM +0200, Marcel Holtmann wrote:
-> Hi Sebastian,
->=20
-> >>> All users of this driver have been converted to the serdev based
-> >>> hci_ll driver. The unused driver can be safely dropped now.
-> >>>=20
-> >>> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
-> >>> ---
-> >>> drivers/bluetooth/Kconfig    |  11 --
-> >>> drivers/bluetooth/Makefile   |   1 -
-> >>> drivers/bluetooth/btwilink.c | 337 -----------------------------------
-> >>> 3 files changed, 349 deletions(-)
-> >>> delete mode 100644 drivers/bluetooth/btwilink.c
-> >>=20
-> >> patch has been applied to bluetooth-next tree.
-> >>=20
-> >> However what I really like to see is that you re-introduce a
-> >> btwilink driver that is purely serdev based and doesn=E2=80=99t rely on
-> >> any hci_uart/hci_ldisc code. A clean serdev only driver is that
-> >> best and easier to maintain long term.
-> >=20
-> > So basically move the serdev implementation from hci_ll.c into its
-> > own driver and make hci_ll hci_uart based only? That effectively
-> > means, that we have two implementations of the protocol. I don't
-> > think this will improve maintainability, since then bugs needs to
-> > be fixed in two places? Note, that we have a couple of drivers
-> > with serdev+hci_uart by now:
-> >=20
-> > for file in $(grep -l serdev drivers/bluetooth/hci_*c) ; grep -l hci_ua=
-rt_register_proto "${file}"
-> > hci_bcm.c
-> > hci_h5.c
-> > hci_ldisc.c
-> > hci_ll.c
-> > hci_mrvl.c
-> > hci_qca.c
->=20
-> I would like to have something similar to btmtkuart.c which is a
-> pure serdev driver that doesn=E2=80=99t depend on any hci_ldisc.c
-> framework. If we have this, then we would just drop hci_ll.c from
-> the kernel and focus on the serdev only version. As noted, there
-> is no need for any other driver at that point since everything is
-> probed anyway. Users will not even notice the difference.
-
-This can be achieved by just removing the hci_uart part from
-hci_ll. But AFAIK there are some non-wilink based TI HCILL
-devices, which do not require any extra platform data and might
-still use the hci_uart part.
-
--- Sebastian
-
---iqu4xmpkphwkun2f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl2wRzoACgkQ2O7X88g7
-+pogDw//Xb2ZDLcdKOs0TDYMMcP6rvRkA9S5ou7bDl8c2XgGbqsQSr7a851UVUxK
-S6ya43Jt6jQFTyR1pB55sSvoNu278E/TuBS3dPVwML5LasWRte3eFnITIdI0lHZ4
-ixeJ7JUUsvFLsiZ0GYTFm9ps4lAoh8qvpMFy0zrF4sdNoUq8QEUH4iAePN7Y7C+z
-Tc8RKRND96YNf1oar+mOpwDjqrV9DLahcOncO5VQn5pIO6N65g28K5tBslPIG3ZV
-MDoDmQTpjLnUxLpXs6oWkEbgBmBpI3Hx+ogRZfj1OF0m0qeCEGhvvcBp6STHiEkG
-u0vlQUC4RvnbGVul73MdOTSqfoghGuHiqyxazDWNmHFpo81HdhaHSB6/IxCKl8e4
-XJYYCbDTur4uWIMw9t5NTe7QUHrOezj2QrCNXDyikz1mNN4O4WrahKzkiLA0GSAu
-V2r+gcr6Z7r0QJs5cAimiYF3Hm5xl/sPhnhCqyRfFSBX93SeraGPkqF/PvcPWDRu
-J0H10QcDLI3xo3jnhUQPgcDoMeuNsKhE4w6sQvUPfbsXUme4/6d2+hrLsevQj+HE
-1Ozg/BKkIAlPQ8Pbtz93lZoseLJPCFROArLqLZERiRb++iAfVj/inJZzyhewhZJD
-cYzanohB9A6ZpLXiZLtuRKsQxCEoBYLX314LKlZJ2FaaUeSKIDY=
-=qmL6
------END PGP SIGNATURE-----
-
---iqu4xmpkphwkun2f--
+adam
+> adam
+> >
+> > Regards
+> >
+> > Marcel
+> >
