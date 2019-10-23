@@ -6,97 +6,71 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E79ACCA9EB7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0071CA9EB7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:44:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C36502173B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:42:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94C3F214B2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:44:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391625AbfJWMmq convert rfc822-to-8bit (ORCPT
+        id S2391653AbfJWMoB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Oct 2019 08:42:46 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47812 "EHLO
+        Wed, 23 Oct 2019 08:44:01 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:43425 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732361AbfJWMmp (ORCPT
+        with ESMTP id S2391648AbfJWMoB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Oct 2019 08:42:45 -0400
+        Wed, 23 Oct 2019 08:44:01 -0400
 Received: from marcel-macpro.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E0B6ACECDE;
-        Wed, 23 Oct 2019 14:51:43 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id E87EBCECDF;
+        Wed, 23 Oct 2019 14:52:59 +0200 (CEST)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
-Subject: Re: [PATCHv2 4/4] Bluetooth: btwilink: drop superseded driver
+Subject: Re: [PATCH] Revert "Bluetooth: hci_ll: set operational frequency
+ earlier"
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191023122745.ldh2ghnzazdhaf2x@earth.universe>
-Date:   Wed, 23 Oct 2019 14:42:43 +0200
-Cc:     Tony Lindgren <tony@atomide.com>, Adam Ford <aford173@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel@collabora.com
+In-Reply-To: <CAHCN7xKAkYacV6qWuONVqRyJuODt2mNquTWAgEFb0NcjjqpnsA@mail.gmail.com>
+Date:   Wed, 23 Oct 2019 14:43:59 +0200
+Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Adam Ford <adam.ford@logicpd.com>,
+        Sebastian Reichel <sre@kernel.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <299B10E1-E7A8-4346-BED9-A48446C4D866@holtmann.org>
-References: <20191003134147.9458-1-sre@kernel.org>
- <20191003134147.9458-5-sre@kernel.org>
- <BC1F82AC-2988-4BC6-99EA-1C9F9289E582@holtmann.org>
- <20191020205901.56bafijk7cu3rpaj@earth.universe>
- <AC376F8D-77F3-4497-94D1-FE25A5ED9337@holtmann.org>
- <20191023122745.ldh2ghnzazdhaf2x@earth.universe>
-To:     Sebastian Reichel <sre@kernel.org>
+Message-Id: <D50D569D-E0ED-4682-880F-396590BFE3A6@holtmann.org>
+References: <20191002114626.12407-1-aford173@gmail.com>
+ <1550E9D9-43ED-4345-A9AF-6D9F097FC64E@holtmann.org>
+ <CAHCN7xKA9-K4uYU9oFW+A7ywc8TGixNa-yHJgL7uSTbyXnisTQ@mail.gmail.com>
+ <CAHCN7xKAkYacV6qWuONVqRyJuODt2mNquTWAgEFb0NcjjqpnsA@mail.gmail.com>
+To:     Adam Ford <aford173@gmail.com>
 X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sebastian,
+Hi Adam,
 
->>>>> All users of this driver have been converted to the serdev based
->>>>> hci_ll driver. The unused driver can be safely dropped now.
->>>>> 
->>>>> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
->>>>> ---
->>>>> drivers/bluetooth/Kconfig    |  11 --
->>>>> drivers/bluetooth/Makefile   |   1 -
->>>>> drivers/bluetooth/btwilink.c | 337 -----------------------------------
->>>>> 3 files changed, 349 deletions(-)
->>>>> delete mode 100644 drivers/bluetooth/btwilink.c
+>>>> As nice as it would be to update firmware faster, that patch broke
+>>>> at least two different boards, an OMAP4+WL1285 based Motorola Droid
+>>>> 4, as reported by Sebasian Reichel and the Logic PD i.MX6Q +
+>>>> WL1837MOD.
 >>>> 
->>>> patch has been applied to bluetooth-next tree.
+>>>> This reverts commit a2e02f38eff84f199c8e32359eb213f81f270047.
 >>>> 
->>>> However what I really like to see is that you re-introduce a
->>>> btwilink driver that is purely serdev based and doesn’t rely on
->>>> any hci_uart/hci_ldisc code. A clean serdev only driver is that
->>>> best and easier to maintain long term.
+>>>> Signed-off-by: Adam Ford <aford173@gmail.com>
 >>> 
->>> So basically move the serdev implementation from hci_ll.c into its
->>> own driver and make hci_ll hci_uart based only? That effectively
->>> means, that we have two implementations of the protocol. I don't
->>> think this will improve maintainability, since then bugs needs to
->>> be fixed in two places? Note, that we have a couple of drivers
->>> with serdev+hci_uart by now:
->>> 
->>> for file in $(grep -l serdev drivers/bluetooth/hci_*c) ; grep -l hci_uart_register_proto "${file}"
->>> hci_bcm.c
->>> hci_h5.c
->>> hci_ldisc.c
->>> hci_ll.c
->>> hci_mrvl.c
->>> hci_qca.c
+>>> patch has been applied to bluetooth-next tree.
 >> 
->> I would like to have something similar to btmtkuart.c which is a
->> pure serdev driver that doesn’t depend on any hci_ldisc.c
->> framework. If we have this, then we would just drop hci_ll.c from
->> the kernel and focus on the serdev only version. As noted, there
->> is no need for any other driver at that point since everything is
->> probed anyway. Users will not even notice the difference.
+>> Any change this can get pushed upstream to stable?  (including 5.4?)
+>> 
 > 
-> This can be achieved by just removing the hci_uart part from
-> hci_ll. But AFAIK there are some non-wilink based TI HCILL
-> devices, which do not require any extra platform data and might
-> still use the hci_uart part.
+> Marcel,  I have confirmed this revert also fixes a regression on my
+> omap36xx based device using a wl1283 Bluetooth.  At this point, I
+> believe we've identified at least 3 devices with regressions that this
+> revert fixes.
 
-the hci_ldisc and hci_uart driver abstraction provides enqueue and dequeue handling that just needs to be removed and done natively in the serdev driver. This should be all straight forward and we can keep the current hci_ll.c around for a bit to see what users we have. However I really want to migrate everything over to native serdev drivers that are standalone. The TI HCILL is complex enough to warrant a separate driver.
+as soon as we have done our pull request and this is in Linus’ tree, feel free to suggest it for -stable tree inclusion.
 
 Regards
 
