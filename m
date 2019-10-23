@@ -2,97 +2,142 @@ Return-Path: <SRS0=9nGc=YQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA584CA9EBB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 11:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CDF1CA9EB6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:06:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAD3820663
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 11:57:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1C6521906
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 12:06:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571832391;
+	bh=+a9nfhoSteckAEw+dh3luF4u8UgaH0zuYkDdjBqJdpo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ZkqY7evJHW9wgh7ozKr1pSEl9UiwMTC2TrfAziOE0IXk09U1tq/1glp9eWG7Ru964
+	 nDL73yrrhL6CBCBmJNQcVhr9RBJOEDeJ5IKWRZBWuNL00NH5Lpw22PBZ2UqDIWBqZY
+	 8TQQu8RC7DmD2R68AvKI7LnSyL5W4Uupuq5RRVAY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405150AbfJWL4y (ORCPT
+        id S2391148AbfJWMGb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Oct 2019 07:56:54 -0400
-Received: from mga05.intel.com ([192.55.52.43]:1121 "EHLO mga05.intel.com"
+        Wed, 23 Oct 2019 08:06:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55572 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733169AbfJWL4x (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Oct 2019 07:56:53 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 04:56:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,220,1569308400"; 
-   d="scan'208";a="201968405"
-Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.121])
-  by orsmga006.jf.intel.com with ESMTP; 23 Oct 2019 04:56:37 -0700
-Date:   Wed, 23 Oct 2019 14:56:37 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Mark Salyzyn <salyzyn@android.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Harry Wentland <harry.wentland@amd.com>,
-        Leo Li <sunpeng.li@amd.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        "David (ChunMing) Zhou" <David1.Zhou@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        VMware Graphics <linux-graphics-maintainer@vmware.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Matthew Garrett <matthewgarrett@google.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        hersen wu <hersenxs.wu@amd.com>, Roman Li <Roman.Li@amd.com>,
-        Maxim Martynov <maxim@arista.com>,
-        David Ahern <dsahern@gmail.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Linus =?iso-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Feng Tang <feng.tang@intel.com>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Rafael Aquini <aquini@redhat.com>, netdev@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-efi@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH] Cleanup: replace prefered with preferred
-Message-ID: <20191023115637.GA23733@linux.intel.com>
-References: <20191022214208.211448-1-salyzyn@android.com>
+        id S2388063AbfJWMGb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 23 Oct 2019 08:06:31 -0400
+Received: from earth.universe (monacowifi.monaco.mc [82.113.13.92])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 57DCE20640;
+        Wed, 23 Oct 2019 12:06:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1571832389;
+        bh=+a9nfhoSteckAEw+dh3luF4u8UgaH0zuYkDdjBqJdpo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SYuVD9gOMYo8HSbVPZnjlZwBZbw6N0hnVg90r+ge9zuaQXMSWC2FX7XPBKxJnsKi3
+         hUzAUp4AtvuESpWl5Ug59M/JDWdaa8MdGOQkMoJVaViiZrtlid6iB7//nIuioX/6nF
+         eTZAjQM9Qg5Koh6xS2b7xev0XF2pCb7qtE02QPKU=
+Received: by earth.universe (Postfix, from userid 1000)
+        id 2D7473C09B2; Wed, 23 Oct 2019 14:06:23 +0200 (CEST)
+Date:   Wed, 23 Oct 2019 14:06:23 +0200
+From:   Sebastian Reichel <sre@kernel.org>
+To:     Tony Lindgren <tony@atomide.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Adam Ford <aford173@gmail.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel@collabora.com
+Subject: Re: [PATCHv2 0/4] Convert all btwilink users to hci_ll and drop
+ btwilink
+Message-ID: <20191023120623.gxuxm53tdcvo7biu@earth.universe>
+References: <20191003134147.9458-1-sre@kernel.org>
+ <20191008143116.GF5610@atomide.com>
+ <20191020203352.rh3n6qpagiyift7d@earth.universe>
+ <20191022160111.GP5610@atomide.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="kqi4wz7ug3lodin7"
 Content-Disposition: inline
-In-Reply-To: <20191022214208.211448-1-salyzyn@android.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191022160111.GP5610@atomide.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Oct 22, 2019 at 02:41:45PM -0700, Mark Salyzyn wrote:
-> Replace all occurrences of prefered with preferred to make future
-> checkpatch.pl's happy.  A few places the incorrect spelling is
-> matched with the correct spelling to preserve existing user space API.
-> 
-> Signed-off-by: Mark Salyzyn <salyzyn@android.com>
 
-I'd fix such things when the code is otherwise change and scope this
-patch only to Documentation/. There is no pragmatic benefit of doing
-this for the code.
+--kqi4wz7ug3lodin7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-/Jarkko
+Hi,
+
+On Tue, Oct 22, 2019 at 09:01:11AM -0700, Tony Lindgren wrote:
+> * Sebastian Reichel <sre@kernel.org> [191020 20:34]:
+> > On Tue, Oct 08, 2019 at 07:31:16AM -0700, Tony Lindgren wrote:
+> > > * Sebastian Reichel <sre@kernel.org> [191003 06:42]:
+> > > > This moves the remaining users of btwilink to the "new" serdev base=
+d hci_ll
+> > > > driver and drops the btwilink driver afterwards. The patches were o=
+nly compile
+> > > > tested by me, but Enric tested the IGEP platform and Adam will test=
+ the LogicPD
+> > > > platform.
+> > > >=20
+> > > > I kept the TI_ST driver for now, since I plan to send a second patc=
+hset for the
+> > > > FM radio driver. Once the FM driver has been converted to also use =
+hci_ll, we
+> > > > can remove TI_ST completly.
+> > > >=20
+> > > > My suggestion is for the patch handling is, that everything simply =
+goes through
+> > > > Tony's tree.
+> > >=20
+> > > Sounds good to me, good to see kim gone with patch 3/4 :)
+> > >=20
+> > > Marcel, care to ack the old driver removal patch?
+> >=20
+> > Looks like Marcel missed the extra messages and merged the 4th
+> > patch, so I guess you can just merge patches 1-3. Technically that
+> > might lead to temporarily missing BT support on those two devices
+> > when the BT tree is merged before ARM tree during the merge window.
+> > Not a big issue I guess.
+>=20
+> Sure no problem. Applying dts changes into omap-for-v5.5/dt
+> and the pdata quirk removal to omap-for-v5.5/soc.
+
+Thanks.
+
+> I guess ti_wilink_st.h will need some follow-up patch to
+> remove unused platform data, but best to wait on that.
+
+The header will receive a cleanup in the patchset moving the FM
+driver from TI_ST to serdev based bluetooth driver. After that
+patchset most of the ti_wilink_st.h content can be removed.
+
+-- Sebastian
+
+--kqi4wz7ug3lodin7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl2wQjsACgkQ2O7X88g7
++prBfxAAjpFCamhjBDtV/91EgED/tFuRdEnoinyCfwtkvetGj6ljLv6H0IFFGGbu
+ZSkbuRndI0qzeOXV5MeY2750pIGaL7rNlHXME5oDfPPgg65ucWpBc9CKQjY0n68s
+Rg3SlkNH/24toPFqJ383aeErCa6VjV/KXUfTG4zVzDB7BOaJKy6u146WoscCsZtn
+x84vtolpNSupyuk0TrQnDKTWObhT0/gIXYR4TOQ8W77GST7kUWotluJao3/w/m0I
+j07dObLoZKvdRaWWUO16lSbbmlximfSIuhK0rutZfLU8LS0RIkrO7AytF4+NtlqT
+L18y1eUaIZronA+8gNNTLgHAHIMVhn0AegIwJ4zpudlzLop0KC7DWLs5g7/9FifX
+SQ2KNuZ9IiW2mel1q/Qinh3j0c7eW5faIZB9Zy6xOpwqSwzKLtabh8bIOLdjQBgA
+gC870bXSa3+du/651t662SmRdYsrJRANoTIaTVgpyLpVmuANebHvs910ASvoRX5j
+WBSSne3TPN2yA47m54Lf9swkGG8iP2dy/ytpDqmFTOGrumbBXorYGlj9NzotIUpZ
+UQtgJ9PpQTFP4zkLYO1/MDPmXod2+puyLPjMJDaiUpc9AKgwLwYrDKmLT1TOMIja
+NLZ7ae+8J0Qd3HIqGU/rf9bqrBB/gnxNGOlR1OLWkDy2hTDNG60=
+=AWMy
+-----END PGP SIGNATURE-----
+
+--kqi4wz7ug3lodin7--
