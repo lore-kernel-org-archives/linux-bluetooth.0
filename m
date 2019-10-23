@@ -2,145 +2,197 @@ Return-Path: <SRS0=9nGc=YQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66016CA9EBB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 15:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A3EC47E49
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 16:51:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C5962064A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 15:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DCC021906
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 16:51:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="KBoKx5yO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRmiaPU6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406858AbfJWPlD (ORCPT
+        id S1726519AbfJWQvk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Oct 2019 11:41:03 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:44076 "EHLO
+        Wed, 23 Oct 2019 12:51:40 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:41440 "EHLO
         mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406857AbfJWPlC (ORCPT
+        with ESMTP id S1726316AbfJWQvj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Oct 2019 11:41:02 -0400
-Received: by mail-pg1-f195.google.com with SMTP id e10so12361752pgd.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Oct 2019 08:41:02 -0700 (PDT)
+        Wed, 23 Oct 2019 12:51:39 -0400
+Received: by mail-pg1-f195.google.com with SMTP id t3so12471869pga.8;
+        Wed, 23 Oct 2019 09:51:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=TI9rW32nt+i6GyURUSN10bGjthP0EG+xScjnb+pkqac=;
-        b=KBoKx5yOJdWGZz7I1M810keaJ1ZlEuvnt+HTZJAS0UmK0LTUpPmdFTkklfgcGdi73r
-         feMTzV569J5UceysOEInvWeJdRd/ZzonW6Aa3VYlqczCqXy+PY9ipoJvzLD+NWbnZ5rP
-         mW2vwJLR0Vq7sY9XP/QBVZSb/GxJx9fS5CE5Yo07sdXhMNQdYvScXxROVKhe4Esy5Cvd
-         e50H85g6521yumbQVB+PGX8SW/L7QzMUvgyanXK1Toe52me2wt2CIUN9qyd4f938PFQ7
-         rthEsivMBKI4ftQ33yVLiM1NHSBLjKlHtZVEVP38OG7iyjy4z/skVUexYga7/45kjz+T
-         6+ug==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition:user-agent;
+        bh=gZgN2hGM2j7wSto2q0CnIK8/3sJDOxs1elTGzKeCXvg=;
+        b=CRmiaPU6HwIUxYP+cDnaDpkbskTJPdS3PdxfjxD+SijY3sMTmBKzIBdZomWdmQtyKC
+         hkddKOC6EpSofkYUawLUZGBSEl4r1ZO8Xz2rYlw3F3CVjkZae3vZIJoUvfs7YmnwukaE
+         Y/LPJ0mmdN1zFQDrLK+r5exaczV2nnieGthj9ZPam79Py7YszRFNxo2oMt1enmj08OuV
+         sm8GRRCvnYVVbyb7z/OIqekFjTW7y975q7lF0b8/kXY3NUIlUADJHG2a7z6TAx2SwiJq
+         LZGoVx4EXE3tEnfNt4SQjzHwL4VM/rt9lr2IJZRn4G1hD7HIZ98LLH6PKAV8xgr7DdFI
+         oCoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=TI9rW32nt+i6GyURUSN10bGjthP0EG+xScjnb+pkqac=;
-        b=BIbkGSq7iOYeoaVoEvFTtzs9he5CG0aVGJKTl8Fdlu1QG8lQjwkPN1VJHIbAmbWd+Y
-         GzXg93tClz3adPP2v0Mb4Qu5K39K0bVbd7e9icdy6MhGX2oAIkjkea6k7mK6q7eocfu9
-         s/a3KzGKWpGvyGWjJ0NAjId7GjUV4QDcpxusKt2Q7sbqgMXut25WlUt10UX0KKEH9AmG
-         DK8L09hJfEKZVNsAPq73dbsl/t2lYSkN/xMw6FvS41RSiYPIW0YjhJasArmw/9NzZ0GX
-         aA6BhQJZqmPkrQVT44UIt3vC4WCNFR0V5cYI4+gHdcWW9lABBvjRBxC1eS/u9RL3QHiy
-         AZ+g==
-X-Gm-Message-State: APjAAAXbFWZP0hwsRM3uOMaNJJuFTcJ+JEwImTOC8oppl8Y+K1QNQpFy
-        WqYwS4IjkoOrpakqkKf8SGaZldg6j+wdla3x
-X-Google-Smtp-Source: APXvYqxpUg0BJf6IgZEek+Avbtx6SaPZVRb4CoPCBRhASaoQxSh7v/tZYoAbFxDTBg5wYPAauGUeIw==
-X-Received: by 2002:a17:90a:e987:: with SMTP id v7mr765373pjy.86.1571845261541;
-        Wed, 23 Oct 2019 08:41:01 -0700 (PDT)
-Received: from nebulus.mtv.corp.google.com ([2620:15c:211:200:5404:91ba:59dc:9400])
-        by smtp.googlemail.com with ESMTPSA id r18sm28682272pfc.3.2019.10.23.08.40.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2019 08:41:01 -0700 (PDT)
-Subject: Re: [PATCH] Cleanup: replace prefered with preferred
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Harry Wentland <harry.wentland@amd.com>,
-        Leo Li <sunpeng.li@amd.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        "David (ChunMing) Zhou" <David1.Zhou@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        VMware Graphics <linux-graphics-maintainer@vmware.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Matthew Garrett <matthewgarrett@google.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        hersen wu <hersenxs.wu@amd.com>, Roman Li <Roman.Li@amd.com>,
-        Maxim Martynov <maxim@arista.com>,
-        David Ahern <dsahern@gmail.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        =?UTF-8?Q?Linus_L=c3=bcssing?= <linus.luessing@c0d3.blue>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Feng Tang <feng.tang@intel.com>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Rafael Aquini <aquini@redhat.com>, netdev@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-efi@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-References: <20191022214208.211448-1-salyzyn@android.com>
- <20191023115637.GA23733@linux.intel.com>
-From:   Mark Salyzyn <salyzyn@android.com>
-Message-ID: <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
-Date:   Wed, 23 Oct 2019 08:40:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:mime-version:content-disposition:user-agent;
+        bh=gZgN2hGM2j7wSto2q0CnIK8/3sJDOxs1elTGzKeCXvg=;
+        b=UybGKx7wZkpgIAd8YUsm/+4KBdcUN+Qj6oJE4PrYkDFP7MIBZ3L8poGWWgc01Zcgn7
+         5ITIe1DgUD2pBPRh+gq9mm3hBTK8eKJjPi3m/dwedXVxA0fDHpR3/wyPWQDOeiNWvrUh
+         IcRCtFdqZiWwey43sOF5mafy5zTIq6NJuG0e+CxUXzsXjy8gneodhMUj8HvH+ra/2zUM
+         0HFlD/VINlTkbrK4au7L10cZ2GfFG3frohFE4Je7CwvptlUiWjxdmw51U1zm/t5x+hF4
+         lAWqgj7K1ZP47tXWoHlcEQ+ULoILql1EqBZM/sD5cUFoEHLC30tS9WW9RYYdgLUx2lwf
+         e2eQ==
+X-Gm-Message-State: APjAAAWa//WxHMHMlXgyY0kcqdld9dprXf+bML7NqekPdSMsHq408LhB
+        5bwYRTYdftksLwCTVbyMm50qZIoXpHyHaQ==
+X-Google-Smtp-Source: APXvYqwAl1+FxG99vC8JvUpxrlLUJ0UB2Iwj7qJZy4ixh9Gr5ye8RNTVXXpwlbIFUyPBnWwdUtcZnQ==
+X-Received: by 2002:a17:90a:86c9:: with SMTP id y9mr1131164pjv.67.1571849498554;
+        Wed, 23 Oct 2019 09:51:38 -0700 (PDT)
+Received: from localhost ([192.55.54.44])
+        by smtp.gmail.com with ESMTPSA id i22sm2948542pfa.82.2019.10.23.09.51.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2019 09:51:37 -0700 (PDT)
+Date:   Wed, 23 Oct 2019 19:51:33 +0300
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2019-10-23
+Message-ID: <20191023165133.GA98720@amcewan-mobl1.ger.corp.intel.com>
+Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-In-Reply-To: <20191023115637.GA23733@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
+Content-Disposition: inline
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 10/23/19 4:56 AM, Jarkko Sakkinen wrote:
-> On Tue, Oct 22, 2019 at 02:41:45PM -0700, Mark Salyzyn wrote:
->> Replace all occurrences of prefered with preferred to make future
->> checkpatch.pl's happy.  A few places the incorrect spelling is
->> matched with the correct spelling to preserve existing user space API.
->>
->> Signed-off-by: Mark Salyzyn <salyzyn@android.com>
-> I'd fix such things when the code is otherwise change and scope this
-> patch only to Documentation/. There is no pragmatic benefit of doing
-> this for the code.
->
-> /Jarkko
 
-The pragmatic benefit comes with the use of an ABI/API checker (which is 
-a 'distro' thing, not a top of tree kernel thing) produces its map which 
-is typically required to be co-located in the same tree as the kernel 
-repository. Quite a few ABI/API update checkins result in a 
-checkpatch.pl complaint about the misspelled elements being 
-(re-)recorded due to proximity. We have a separate task to improve how 
-it is tracked in Android to reduce milepost marker changes that result 
-in sweeping changes to the database which would reduce the occurrences.
+--/9DWx/yDrRhgMJTb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I will split this between pure and inert documentation/comments for now, 
-with a followup later for the code portion which understandably is more 
-controversial.
+Hi Dave,
 
-Cleanup is the least appreciated part of kernel maintenance ;-}.
+Here's the main bluetooth-next pull request for the 5.5 kernel:
 
-Sincerely -- Mark Salyzyn
+ - Multiple fixes to hci_qca driver
+ - Fix for HCI_USER_CHANNEL initialization
+ - btwlink: drop superseded driver
+ - Add support for Intel FW download error recovery
+ - Various other smaller fixes & improvements
 
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
+---
+The following changes since commit d9f45ab9e671166004b75427f10389e1f70cfc30:
+
+  net: bcmgenet: Add a shutdown callback (2019-10-15 20:59:28 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to 3347a80965b38f096b1d6f995c00c9c9e53d4b8b:
+
+  Bluetooth: hci_bcm: Fix RTS handling during startup (2019-10-21 17:05:14 +0200)
+
+----------------------------------------------------------------
+Adam Ford (1):
+      Revert "Bluetooth: hci_ll: set operational frequency earlier"
+
+Amit K Bag (2):
+      Bluetooth: btusb: print FW version after FW download
+      Bluetooth: btusb: Trigger Intel FW download error recovery
+
+Arnd Bergmann (1):
+      Bluetooth: btusb: avoid unused function warning
+
+Ben Dooks (Codethink) (1):
+      Bluetooth: missed cpu_to_le16 conversion in hci_init4_req
+
+Bjorn Andersson (4):
+      Bluetooth: hci_qca: Update regulator_set_load() usage
+      Bluetooth: hci_qca: Don't vote for specific voltage
+      Bluetooth: hci_qca: Use regulator bulk enable/disable
+      Bluetooth: hci_qca: Split qca_power_setup()
+
+Christophe JAILLET (1):
+      Bluetooth: hci_nokia: Save a few cycles in 'nokia_enqueue()'
+
+Jeffrey Hugo (2):
+      Bluetooth: hci_qca: Add delay for wcn3990 stability
+      Revert "Bluetooth: hci_qca: Add delay for wcn3990 stability"
+
+Marcel Holtmann (1):
+      Bluetooth: btusb: Use IS_ENABLED instead of #ifdef
+
+Mattijs Korpershoek (1):
+      Bluetooth: hci_core: fix init for HCI_USER_CHANNEL
+
+Max Chou (1):
+      Bluetooth: btrtl: Fix an issue for the incorrect error return code.
+
+Nathan Chancellor (1):
+      Bluetooth: btusb: Remove return statement in btintel_reset_to_bootloader
+
+Sebastian Reichel (1):
+      Bluetooth: btwilink: drop superseded driver
+
+Stefan Wahren (1):
+      Bluetooth: hci_bcm: Fix RTS handling during startup
+
+Szymon Janc (1):
+      Bluetooth: Workaround directed advertising bug in Broadcom controllers
+
+YueHaibing (1):
+      Bluetooth: remove set but not used variable 'smp'
+
+ drivers/bluetooth/Kconfig     |  11 --
+ drivers/bluetooth/Makefile    |   1 -
+ drivers/bluetooth/btintel.c   |  45 ++++++
+ drivers/bluetooth/btintel.h   |   5 +
+ drivers/bluetooth/btrtl.c     |   2 +-
+ drivers/bluetooth/btusb.c     |  54 ++++---
+ drivers/bluetooth/btwilink.c  | 337 ------------------------------------------
+ drivers/bluetooth/hci_bcm.c   |   2 +
+ drivers/bluetooth/hci_ll.c    |  39 +++--
+ drivers/bluetooth/hci_nokia.c |   2 +-
+ drivers/bluetooth/hci_qca.c   | 135 +++++++----------
+ net/bluetooth/hci_conn.c      |   8 +
+ net/bluetooth/hci_core.c      |  13 +-
+ net/bluetooth/smp.c           |   6 -
+ 14 files changed, 177 insertions(+), 483 deletions(-)
+ delete mode 100644 drivers/bluetooth/btwilink.c
+
+--/9DWx/yDrRhgMJTb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl2whRIACgkQJCP2+/mo
+1BILNg//WMbTBzR0Bmb3GQROpIPbRqGZCxQfmCAaA7rgcL46CGEoKIOH+iR3JCLD
+IsnHQc0Tt3GAcOJU7BjDhJiwiH6CBR+EAIOx0hKbTdYr88dOWnd8H8iU4M7fezl6
+RwYi3s/TpdQ7ZSzulrkjfsPxkFGlN/aT6P+GF6m31Rp0CEpUtwXxrjo65nCwy4zW
+ajhgqjHqgBt1+nsFaTFqqKjA+qMTssCrcq2uL6pXmBLY9QVScVLrE4zq+9OC/Pr/
+lN4I8rLcP2Rq7zqHqpJdpa/LRHBt8zTJzk0671OV7eiGZned8oZ5iO8jcSu30CtD
+5pSOzo1wPdWfJjkvDndLWuCUEoV7FPQLjPMFPyFpdcVgODnLUlL6vFuk00KQF/uh
+f1Z+2JVWO1YD7ivhW2DMeH0zP1/jEjprN8djMcj5gK0PhcCxfoM3/Et1kHxMGynY
+FMl10HZsP1TDhN6yxT+EA/TNoWT/g1YhRpAPYwd/o2TS93hMeZdsy50MxhPNWKXc
+ffnuDQjQwwN8UD40Ug+vLBlMvAdylrItQTosbwQY7e12/GY+NhW8I1f6+08HOPXc
+kagq3GLpZzsxOOdL44CI9lkgEKt9wKtx5pBAbQry040kyYJMd5P14dAmW1bJc2XO
+FmCl8Be9djWaCJATnEJ6uzPfzn3aRjoFiMDyfBgoUtzWjxXtQYw=
+=Uc88
+-----END PGP SIGNATURE-----
+
+--/9DWx/yDrRhgMJTb--
