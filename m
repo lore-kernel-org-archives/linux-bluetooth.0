@@ -2,115 +2,133 @@ Return-Path: <SRS0=pV4/=YR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9564FCA9EAF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 13:15:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D03DCA9EBB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C7AF2166E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 13:15:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qdk2Gc9L"
+	by mail.kernel.org (Postfix) with ESMTP id 052FD205C9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502475AbfJXNPv (ORCPT
+        id S2440051AbfJXRbN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Oct 2019 09:15:51 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33269 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2502409AbfJXNPu (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Oct 2019 09:15:50 -0400
-Received: by mail-wr1-f65.google.com with SMTP id s1so17279223wro.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2019 06:15:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=VfO9qD2A3/aBq+u0oWjyv1HV/mx6qQqFV7SC+93mn1I=;
-        b=Qdk2Gc9LSK6/rVpA4CeLW7ROUDtlbNXb+pPP7k6WQPSTNFRoqYV8WQcRWNyIrj5QhN
-         DJdgw2x1FYvDscIilJENS+YqdR/LnRBm08JAIFm5Ohlbx2eH6zRrgqjqLyiKXgQLwsi/
-         lXRjkBjx2hvAh+5sAx8iODFqrZqgGMc93n0P3VwjIPbIMk12f5kbXIDVczLCuZ3PAGZ6
-         V4hHggx6wDPmWb2/4nWqtzCvHxZyqJWnqoxLQj5QIQg26mob5HGAUJWp/J6/75JH+yWx
-         8WHEetzeoocfBkrezn2F+DmlugRxCcU45XQI0qdVA8R0pecaWc+xoRXPvIF/kftl7RDR
-         Riog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=VfO9qD2A3/aBq+u0oWjyv1HV/mx6qQqFV7SC+93mn1I=;
-        b=c64xv6lv8BwCAxR9MeljSZsFs0BK/gNNG7xcljeoYgSGVg2a8kx+iB9AjWrJuZLDdO
-         +dZnskHV/9rPhpXkBQUWPrzWWv3DfAP11IsuAygtW7S3+CFQuowQ2W2L2MqS+k0po8dz
-         j49oMm3ww7jQwNl9qwtGzDfUkfROr4pgb42p97EIBOQsv/Eh0n3n3bsTJfh0xRimGdzc
-         bJOorgV3MeTzbrohhvOd4pEvfZd6JB4uF4MQulzc9tgbNIIIZldr4JgJ/XKy4Ri8uMGX
-         8Zgadv2WHFHmUP5RmTUEGrCi4MDIzme5hW8wODA84PdZNBnG9eYJNVavXx1wol1CFYRj
-         W95w==
-X-Gm-Message-State: APjAAAWiQ0XPeFrMJ1McrznNBhtqOezKFl+7aW7ksX87RecONsulbxoa
-        eXzMaH4RPla7TvuIn/KZdAzw+adk18I=
-X-Google-Smtp-Source: APXvYqxgxdh9MyevugGh6v7PKtQvfII55bHjJkmAbW4w1fumhx7vCNL/96JmDw6o9wHm+UGIY3HxpA==
-X-Received: by 2002:adf:8465:: with SMTP id 92mr3658430wrf.376.1571922947943;
-        Thu, 24 Oct 2019 06:15:47 -0700 (PDT)
-Received: from localhost.localdomain ([192.198.151.61])
-        by smtp.gmail.com with ESMTPSA id d8sm11891334wrr.71.2019.10.24.06.15.46
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2019 06:15:47 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Fix not using LE_ADV_NONCONN_IND for instance 0
-Date:   Thu, 24 Oct 2019 16:15:43 +0300
-Message-Id: <20191024131543.10794-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191024131543.10794-1-luiz.dentz@gmail.com>
-References: <20191024131543.10794-1-luiz.dentz@gmail.com>
+        Thu, 24 Oct 2019 13:31:13 -0400
+Received: from mga12.intel.com ([192.55.52.136]:33122 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729458AbfJXRbM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 24 Oct 2019 13:31:12 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 10:31:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,225,1569308400"; 
+   d="scan'208";a="282008162"
+Received: from nesterov-mobl1.ccr.corp.intel.com (HELO localhost) ([10.252.8.153])
+  by orsmga001.jf.intel.com with ESMTP; 24 Oct 2019 10:30:52 -0700
+Date:   Thu, 24 Oct 2019 20:30:51 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Mark Salyzyn <salyzyn@android.com>
+Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Harry Wentland <harry.wentland@amd.com>,
+        Leo Li <sunpeng.li@amd.com>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        "David (ChunMing) Zhou" <David1.Zhou@amd.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        VMware Graphics <linux-graphics-maintainer@vmware.com>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Matthew Garrett <matthewgarrett@google.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        hersen wu <hersenxs.wu@amd.com>, Roman Li <Roman.Li@amd.com>,
+        Maxim Martynov <maxim@arista.com>,
+        David Ahern <dsahern@gmail.com>,
+        Francesco Ruggeri <fruggeri@arista.com>,
+        Linus =?iso-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Feng Tang <feng.tang@intel.com>,
+        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Rafael Aquini <aquini@redhat.com>, netdev@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-efi@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH] Cleanup: replace prefered with preferred
+Message-ID: <20191024173051.GB7948@linux.intel.com>
+References: <20191022214208.211448-1-salyzyn@android.com>
+ <20191023115637.GA23733@linux.intel.com>
+ <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Oct 23, 2019 at 08:40:59AM -0700, Mark Salyzyn wrote:
+> On 10/23/19 4:56 AM, Jarkko Sakkinen wrote:
+> > On Tue, Oct 22, 2019 at 02:41:45PM -0700, Mark Salyzyn wrote:
+> > > Replace all occurrences of prefered with preferred to make future
+> > > checkpatch.pl's happy.  A few places the incorrect spelling is
+> > > matched with the correct spelling to preserve existing user space API.
+> > > 
+> > > Signed-off-by: Mark Salyzyn <salyzyn@android.com>
+> > I'd fix such things when the code is otherwise change and scope this
+> > patch only to Documentation/. There is no pragmatic benefit of doing
+> > this for the code.
+> > 
+> > /Jarkko
+> 
+> The pragmatic benefit comes with the use of an ABI/API checker (which is a
+> 'distro' thing, not a top of tree kernel thing) produces its map which is
+> typically required to be co-located in the same tree as the kernel
+> repository. Quite a few ABI/API update checkins result in a checkpatch.pl
+> complaint about the misspelled elements being (re-)recorded due to
+> proximity. We have a separate task to improve how it is tracked in Android
+> to reduce milepost marker changes that result in sweeping changes to the
+> database which would reduce the occurrences.
+> 
+> I will split this between pure and inert documentation/comments for now,
+> with a followup later for the code portion which understandably is more
+> controversial.
+> 
+> Cleanup is the least appreciated part of kernel maintenance ;-}.
+> 
+> Sincerely -- Mark Salyzyn
 
-Instance 0 is controlled by stack itself and always set the local name
-in the scan response.
+I'm a strong believer of "evolutionary" approach. Patch sets for the
+most part (everything in the end has to be considered case by case, not
+a strict rule) should have some functional changes involved.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_request.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+What I do require for the parts that I maintain is that any new change
+will result cleaner code base than the one that existed before that
+change was applied. Again, there are some exceptions to this e.g.
+circulating a firmware bug but this is my driving guideline as a
+maintainer.
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 3a2ec34c2999..ba99c292cf04 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -904,9 +904,9 @@ static u8 get_adv_instance_scan_rsp_len(struct hci_dev *hdev, u8 instance)
- {
- 	struct adv_info *adv_instance;
- 
--	/* Ignore instance 0 */
-+	/* Instance 0x00 always set local name */
- 	if (instance == 0x00)
--		return 0;
-+		return 1;
- 
- 	adv_instance = hci_find_adv_instance(hdev, instance);
- 	if (!adv_instance)
-@@ -923,9 +923,9 @@ static u8 get_cur_adv_instance_scan_rsp_len(struct hci_dev *hdev)
- 	u8 instance = hdev->cur_adv_instance;
- 	struct adv_info *adv_instance;
- 
--	/* Ignore instance 0 */
-+	/* Instance 0x00 always set local name */
- 	if (instance == 0x00)
--		return 0;
-+		return 1;
- 
- 	adv_instance = hci_find_adv_instance(hdev, instance);
- 	if (!adv_instance)
--- 
-2.21.0
+Doing cleanups just for cleanups can sometimes add unnecessary merge
+conflicts when backporting patches to stable kernels. Thus, if you are
+doing just a cleanup you should have extremely good reasons to do so.
 
+/Jarkko
