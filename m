@@ -2,96 +2,147 @@ Return-Path: <SRS0=pV4/=YR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29162C47E49
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 12:26:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD7CCC47E49
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 13:01:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09673205F4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 12:26:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A369E21925
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 13:01:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2501899AbfJXM0r (ORCPT
+        id S2502264AbfJXNBR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Oct 2019 08:26:47 -0400
-Received: from mga18.intel.com ([134.134.136.126]:41113 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726360AbfJXM0q (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Oct 2019 08:26:46 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 05:26:45 -0700
-X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; 
-   d="scan'208";a="192171083"
-Received: from jnikula-mobl3.fi.intel.com (HELO localhost) ([10.237.66.161])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 05:26:30 -0700
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Mark Salyzyn <salyzyn@android.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Harry Wentland <harry.wentland@amd.com>,
-        Leo Li <sunpeng.li@amd.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
-        "David \(ChunMing\) Zhou" <David1.Zhou@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        VMware Graphics <linux-graphics-maintainer@vmware.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Matthew Garrett <matthewgarrett@google.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        hersen wu <hersenxs.wu@amd.com>, Roman Li <Roman.Li@amd.com>,
-        Maxim Martynov <maxim@arista.com>,
-        David Ahern <dsahern@gmail.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Feng Tang <feng.tang@intel.com>,
-        "Steven Rostedt \(VMware\)" <rostedt@goodmis.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Rafael Aquini <aquini@redhat.com>, netdev@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-efi@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH] Cleanup: replace prefered with preferred
-In-Reply-To: <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20191022214208.211448-1-salyzyn@android.com> <20191023115637.GA23733@linux.intel.com> <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
-Date:   Thu, 24 Oct 2019 15:26:28 +0300
-Message-ID: <875zkecosr.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Thu, 24 Oct 2019 09:01:17 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:49947 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502258AbfJXNBQ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 24 Oct 2019 09:01:16 -0400
+Received: from marcel-macpro.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 21FE7CECEF;
+        Thu, 24 Oct 2019 15:10:15 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
+Subject: Re: [PATCH] Bluetooth: Always set scannable for Adv instance 0
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1571913139-6477-1-git-send-email-jaganath.kanakkassery@intel.com>
+Date:   Thu, 24 Oct 2019 15:01:13 +0200
+Cc:     linux-bluetooth@vger.kernel.org,
+        Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <585F2A10-B16E-46BD-8EF6-4FD904A485AC@holtmann.org>
+References: <1571913139-6477-1-git-send-email-jaganath.kanakkassery@intel.com>
+To:     Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 23 Oct 2019, Mark Salyzyn <salyzyn@android.com> wrote:
-> I will split this between pure and inert documentation/comments for now, 
-> with a followup later for the code portion which understandably is more 
-> controversial.
+Hi Jaganath,
 
-Please split by driver/subsystem too, and it'll be all around much
-easier for everyone.
+> By default for instance 0, local name will be added for scan rsp
+> data, but currently the property is set as non scannable and hence
+> Set Adv parameter fails with Invalid parameter.
 
-BR,
-Jani.
+can you be a bit more specific why this is the correct behavior. We must have documented in mgmt-api.txt somewhere, right? Or is this something that used to be correct, but we broke it with adding extended advertising?
 
+> < HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+>        Handle: 0x00
+>        Properties: 0x0010
+>          Use legacy advertising PDUs: ADV_NONCONN_IND
+>        Min advertising interval: 1280.000 msec (0x0800)
+>        Max advertising interval: 1280.000 msec (0x0800)
+>        Channel map: 37, 38, 39 (0x07)
+>        Own address type: Random (0x01)
+>        Peer address type: Public (0x00)
+>        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+>        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+>        TX power: 127 dbm (0x7f)
+>        Primary PHY: LE 1M (0x01)
+>        Secondary max skip: 0x00
+>        Secondary PHY: LE 1M (0x01)
+>        SID: 0x00
+>        Scan request notifications: Disabled (0x00)
+>> HCI Event: Command Complete (0x0e) plen 5
+>      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 1
+>        Status: Success (0x00)
+>        TX power (selected): 7 dbm (0x07)
+> 
+> < HCI Command: LE Set Extended Scan Response Data (0x08|0x0038) plen 35
+>        Handle: 0x00
+>        Operation: Complete scan response data (0x03)
+>        Fragment preference: Minimize fragmentation (0x01)
+>        Data length: 0x0d
+>        Name (short): localhost.
+>> HCI Event: Command Complete (0x0e) plen 4
+>      LE Set Extended Scan Response Data (0x08|0x0038) ncmd 1
+>        Status: Invalid HCI Command Parameters (0x12)
+> 
+> This patch makes the instance 0 scannable by default.
+> 
+> < HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+>        Handle: 0x00
+>        Properties: 0x0012
+>          Scannable
+>          Use legacy advertising PDUs: ADV_SCAN_IND
+>        Min advertising interval: 1280.000 msec (0x0800)
+>        Max advertising interval: 1280.000 msec (0x0800)
+>        Channel map: 37, 38, 39 (0x07)
+>        Own address type: Random (0x01)
+>        Peer address type: Public (0x00)
+>        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+>        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+>        TX power: 127 dbm (0x7f)
+>        Primary PHY: LE 1M (0x01)
+>        Secondary max skip: 0x00
+>        Secondary PHY: LE 1M (0x01)
+>        SID: 0x00
+>        Scan request notifications: Disabled (0x00)
+>> HCI Event: Command Complete (0x0e) plen 5
+>      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 1
+>        Status: Success (0x00)
+>        TX power (selected): 7 dbm (0x07)
+> 
+> < HCI Command: LE Set Extended Scan Response Data (0x08|0x0038) plen 35
+>        Handle: 0x00
+>        Operation: Complete scan response data (0x03)
+>        Fragment preference: Minimize fragmentation (0x01)
+>        Data length: 0x0d
+>        Name (short): localhost.
+>> HCI Event: Command Complete (0x0e) plen 4
+>      LE Set Extended Scan Response Data (0x08|0x0038) ncmd 1
+>        Status: Success (0x00)
+> 
+> Signed-off-by: Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
+> ---
+> net/bluetooth/hci_request.c | 7 ++++++-
+> 1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index 7f6a581..362b1ca 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -1601,7 +1601,12 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+> 			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_CONN_IND);
+> 		else
+> 			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
+> -	} else if (get_adv_instance_scan_rsp_len(hdev, instance)) {
+> +	} else if (!instance || get_adv_instance_scan_rsp_len(hdev, instance)) {
+> +		/* Always set scannable for instance 0, as scan rsp data will
+> +		 * be set by default with local name. For other instances set
+> +		 * scannable based on whether scan rsp data is there for the
+> +		 * respective instance
+> +		 */
+> 		if (secondary_adv)
+> 			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_SCAN_IND);
 
--- 
-Jani Nikula, Intel Open Source Graphics Center
+So this comment is at a wrong location. And I am not convinced that we would actually depend on if scan_rsp data is present. We might want to set scannable all the time if that is what we decided for instance 0.
+
+Regards
+
+Marcel
+
