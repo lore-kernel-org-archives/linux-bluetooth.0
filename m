@@ -2,37 +2,48 @@ Return-Path: <SRS0=pV4/=YR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D03DCA9EBB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29890CA9EBC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 18:47:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 052FD205C9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 17:31:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC27321872
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 18:47:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571942864;
+	bh=P2j4bA86XgvOqRFtfCl5MtPYc2xM05N5w3nh3XKCbOU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=VAncKRaaU+hjp5FikXAE47GB4pblzKBxli+yf3od3aMRxVQmoqJVQAo8rIIsNgO3O
+	 lKzQFUK5cPIdXN8EOJmjrPdJP0VgibTn7ZL4cvWSHL96qGUgsD9WRRPumQlq2B0YXm
+	 /aPHOGx7uGH0O9vkNR5o/NkQ9ZOzXEVukq7d9lYM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440051AbfJXRbN (ORCPT
+        id S2440172AbfJXSri (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Oct 2019 13:31:13 -0400
-Received: from mga12.intel.com ([192.55.52.136]:33122 "EHLO mga12.intel.com"
+        Thu, 24 Oct 2019 14:47:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38652 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729458AbfJXRbM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Oct 2019 13:31:12 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 10:31:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,225,1569308400"; 
-   d="scan'208";a="282008162"
-Received: from nesterov-mobl1.ccr.corp.intel.com (HELO localhost) ([10.252.8.153])
-  by orsmga001.jf.intel.com with ESMTP; 24 Oct 2019 10:30:52 -0700
-Date:   Thu, 24 Oct 2019 20:30:51 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+        id S2440168AbfJXSrh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 24 Oct 2019 14:47:37 -0400
+Received: from localhost (unknown [75.104.69.146])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4B01B20659;
+        Thu, 24 Oct 2019 18:47:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1571942856;
+        bh=P2j4bA86XgvOqRFtfCl5MtPYc2xM05N5w3nh3XKCbOU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JXFsM9yewwErnF5S3LK+7K6bicNse77w5ov+K8sMXE1WbXMnNUxJ53lRpClS1Y1CC
+         11fXyyi93K6RL+XYzVbm018cMUVbdftXTSBMyZqzEhGJR0OX5ENyHkk/LV+cr97wvX
+         JQuzhFZ9aaA31ctCt2wdqqskCAv9tdJU2DNgNRus=
+Date:   Thu, 24 Oct 2019 14:47:28 -0400
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     Mark Salyzyn <salyzyn@android.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
+Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        linux-kernel@vger.kernel.org, kernel-team@android.com,
         "David S. Miller" <davem@davemloft.net>,
         Jonathan Corbet <corbet@lwn.net>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -61,7 +72,6 @@ Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
         David Ahern <dsahern@gmail.com>,
         Francesco Ruggeri <fruggeri@arista.com>,
         Linus =?iso-8859-1?Q?L=FCssing?= <linus.luessing@c0d3.blue>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Feng Tang <feng.tang@intel.com>,
         "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -71,7 +81,7 @@ Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
         linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 Subject: Re: [PATCH] Cleanup: replace prefered with preferred
-Message-ID: <20191024173051.GB7948@linux.intel.com>
+Message-ID: <20191024184728.GC260560@kroah.com>
 References: <20191022214208.211448-1-salyzyn@android.com>
  <20191023115637.GA23733@linux.intel.com>
  <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
@@ -79,8 +89,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -108,27 +117,18 @@ On Wed, Oct 23, 2019 at 08:40:59AM -0700, Mark Salyzyn wrote:
 > proximity. We have a separate task to improve how it is tracked in Android
 > to reduce milepost marker changes that result in sweeping changes to the
 > database which would reduce the occurrences.
-> 
+
+Requiring checkpatch spelling warnings to be correct based on function
+names is crazy, you should fix your tools if you are requiring something
+as looney as that :)
+
 > I will split this between pure and inert documentation/comments for now,
 > with a followup later for the code portion which understandably is more
 > controversial.
-> 
-> Cleanup is the least appreciated part of kernel maintenance ;-}.
-> 
-> Sincerely -- Mark Salyzyn
 
-I'm a strong believer of "evolutionary" approach. Patch sets for the
-most part (everything in the end has to be considered case by case, not
-a strict rule) should have some functional changes involved.
+Please break up per subsystem, like all trivial patches, as this
+isn't anything special.
 
-What I do require for the parts that I maintain is that any new change
-will result cleaner code base than the one that existed before that
-change was applied. Again, there are some exceptions to this e.g.
-circulating a firmware bug but this is my driving guideline as a
-maintainer.
+thanks,
 
-Doing cleanups just for cleanups can sometimes add unnecessary merge
-conflicts when backporting patches to stable kernels. Thus, if you are
-doing just a cleanup you should have extremely good reasons to do so.
-
-/Jarkko
+greg k-h
