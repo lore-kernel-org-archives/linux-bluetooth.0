@@ -1,198 +1,167 @@
-Return-Path: <SRS0=9nGc=YQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=pV4/=YR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A3EC47E49
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 16:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23222CA9EAF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 10:35:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DCC021906
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Oct 2019 16:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED12F2084C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Oct 2019 10:35:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRmiaPU6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aDssyzRI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726519AbfJWQvk (ORCPT
+        id S2438876AbfJXKfn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Oct 2019 12:51:40 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:41440 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726316AbfJWQvj (ORCPT
+        Thu, 24 Oct 2019 06:35:43 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:35716 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2438874AbfJXKfn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Oct 2019 12:51:39 -0400
-Received: by mail-pg1-f195.google.com with SMTP id t3so12471869pga.8;
-        Wed, 23 Oct 2019 09:51:39 -0700 (PDT)
+        Thu, 24 Oct 2019 06:35:43 -0400
+Received: by mail-pl1-f193.google.com with SMTP id c3so11665990plo.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2019 03:35:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition:user-agent;
-        bh=gZgN2hGM2j7wSto2q0CnIK8/3sJDOxs1elTGzKeCXvg=;
-        b=CRmiaPU6HwIUxYP+cDnaDpkbskTJPdS3PdxfjxD+SijY3sMTmBKzIBdZomWdmQtyKC
-         hkddKOC6EpSofkYUawLUZGBSEl4r1ZO8Xz2rYlw3F3CVjkZae3vZIJoUvfs7YmnwukaE
-         Y/LPJ0mmdN1zFQDrLK+r5exaczV2nnieGthj9ZPam79Py7YszRFNxo2oMt1enmj08OuV
-         sm8GRRCvnYVVbyb7z/OIqekFjTW7y975q7lF0b8/kXY3NUIlUADJHG2a7z6TAx2SwiJq
-         LZGoVx4EXE3tEnfNt4SQjzHwL4VM/rt9lr2IJZRn4G1hD7HIZ98LLH6PKAV8xgr7DdFI
-         oCoA==
+        h=from:to:cc:subject:date:message-id;
+        bh=+6h95oeKOuPu2vzoPEnhNGHvlYgVDwc1p862g10QGFI=;
+        b=aDssyzRI1O3/WDumH/I/HCjSXWTOfqe01oJBkTTE/wMHgXDw4358dUKlknF1DWPPFR
+         7EeEb3wKNVvZ0rRVrmpUe3NuhVtaSb8AYCU0ezg1ij4vesOeVEUfBperdDFWZ5C3/Wa5
+         noQlwQJGVjrIfJIPHxvdtOuHMtHkTgJWzGc/F1tLQNNg51oNU79FoxxGEDu/hQpYGYrV
+         gyq0yQGckvpK7Aa+GB7CY3Ow0rNryfzyCEhIksqv50GpowkVK9zuE7eHCN/2+GGgv4h4
+         Lt9zZcDAo1aVlryFZ/O7Fe3pfs0zTSwxu7w8o9WAFoxnx1j/v1sh5PcHXGDLEL+bqbJm
+         AwrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition:user-agent;
-        bh=gZgN2hGM2j7wSto2q0CnIK8/3sJDOxs1elTGzKeCXvg=;
-        b=UybGKx7wZkpgIAd8YUsm/+4KBdcUN+Qj6oJE4PrYkDFP7MIBZ3L8poGWWgc01Zcgn7
-         5ITIe1DgUD2pBPRh+gq9mm3hBTK8eKJjPi3m/dwedXVxA0fDHpR3/wyPWQDOeiNWvrUh
-         IcRCtFdqZiWwey43sOF5mafy5zTIq6NJuG0e+CxUXzsXjy8gneodhMUj8HvH+ra/2zUM
-         0HFlD/VINlTkbrK4au7L10cZ2GfFG3frohFE4Je7CwvptlUiWjxdmw51U1zm/t5x+hF4
-         lAWqgj7K1ZP47tXWoHlcEQ+ULoILql1EqBZM/sD5cUFoEHLC30tS9WW9RYYdgLUx2lwf
-         e2eQ==
-X-Gm-Message-State: APjAAAWa//WxHMHMlXgyY0kcqdld9dprXf+bML7NqekPdSMsHq408LhB
-        5bwYRTYdftksLwCTVbyMm50qZIoXpHyHaQ==
-X-Google-Smtp-Source: APXvYqwAl1+FxG99vC8JvUpxrlLUJ0UB2Iwj7qJZy4ixh9Gr5ye8RNTVXXpwlbIFUyPBnWwdUtcZnQ==
-X-Received: by 2002:a17:90a:86c9:: with SMTP id y9mr1131164pjv.67.1571849498554;
-        Wed, 23 Oct 2019 09:51:38 -0700 (PDT)
-Received: from localhost ([192.55.54.44])
-        by smtp.gmail.com with ESMTPSA id i22sm2948542pfa.82.2019.10.23.09.51.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2019 09:51:37 -0700 (PDT)
-Date:   Wed, 23 Oct 2019 19:51:33 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net
-Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next 2019-10-23
-Message-ID: <20191023165133.GA98720@amcewan-mobl1.ger.corp.intel.com>
-Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
-Content-Disposition: inline
-User-Agent: Mutt/1.12.2 (2019-09-21)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=+6h95oeKOuPu2vzoPEnhNGHvlYgVDwc1p862g10QGFI=;
+        b=oVHqdp42QvrOeEkDySKvLm/I3SnrmoZOGI+ylL0Ex5sOj6zrygrWUXJzi97DKjpaTR
+         E4O9RrAt92I9gOtARMytI5LnCZIG8AL8aCVz69K5V5WGpPNJG6OW8xLmpdUrqnBmKWja
+         Me9m6eAcznn8dSoS8iV/kHLNW1/lRTnaZK0bh8nzUcd17KWNP+xqleLuggGoPSFHkIjv
+         q0kjnnB0D0cPdx0g67SjoDtdDGBBvblWpvp3LVOKL+uNXZwNKIS9UhPmk08I15cAqBwS
+         Blmu81svJBAIqVScmIYa/AkFFOF/hbEXd01TMjmFNGXQ9jSccaxm668ihhhWDm17rS9i
+         KCBA==
+X-Gm-Message-State: APjAAAXsVrF1qYRJgiHiFLmtedVKtolRudukh2kKkqH+6QHzCz4OJ5JP
+        ogWRg/T/Uqc0g3ZOHJcFP3kvLVOD3mA=
+X-Google-Smtp-Source: APXvYqwS3bxh0nC+sqNZtrPIRiDWVja5GYb4pA8ITqgXG+SqLwdzMsJMIgAFdhSk/1yprZ8A5PxmLQ==
+X-Received: by 2002:a17:902:b08b:: with SMTP id p11mr15483737plr.57.1571913342259;
+        Thu, 24 Oct 2019 03:35:42 -0700 (PDT)
+Received: from wcs0336-Latitude-E5440.iind.intel.com ([192.55.54.42])
+        by smtp.gmail.com with ESMTPSA id m12sm1672292pjk.13.2019.10.24.03.35.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 24 Oct 2019 03:35:41 -0700 (PDT)
+From:   Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+X-Google-Original-From: Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
+Subject: [PATCH] Bluetooth: Always set scannable for Adv instance 0
+Date:   Thu, 24 Oct 2019 16:02:19 +0530
+Message-Id: <1571913139-6477-1-git-send-email-jaganath.kanakkassery@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+By default for instance 0, local name will be added for scan rsp
+data, but currently the property is set as non scannable and hence
+Set Adv parameter fails with Invalid parameter.
 
---/9DWx/yDrRhgMJTb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+        Handle: 0x00
+        Properties: 0x0010
+          Use legacy advertising PDUs: ADV_NONCONN_IND
+        Min advertising interval: 1280.000 msec (0x0800)
+        Max advertising interval: 1280.000 msec (0x0800)
+        Channel map: 37, 38, 39 (0x07)
+        Own address type: Random (0x01)
+        Peer address type: Public (0x00)
+        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+        TX power: 127 dbm (0x7f)
+        Primary PHY: LE 1M (0x01)
+        Secondary max skip: 0x00
+        Secondary PHY: LE 1M (0x01)
+        SID: 0x00
+        Scan request notifications: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 5
+      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 1
+        Status: Success (0x00)
+        TX power (selected): 7 dbm (0x07)
 
-Hi Dave,
+< HCI Command: LE Set Extended Scan Response Data (0x08|0x0038) plen 35
+        Handle: 0x00
+        Operation: Complete scan response data (0x03)
+        Fragment preference: Minimize fragmentation (0x01)
+        Data length: 0x0d
+        Name (short): localhost.
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Response Data (0x08|0x0038) ncmd 1
+        Status: Invalid HCI Command Parameters (0x12)
 
-Here's the main bluetooth-next pull request for the 5.5 kernel:
+This patch makes the instance 0 scannable by default.
 
- - Multiple fixes to hci_qca driver
- - Fix for HCI_USER_CHANNEL initialization
- - btwlink: drop superseded driver
- - Add support for Intel FW download error recovery
- - Various other smaller fixes & improvements
+< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+        Handle: 0x00
+        Properties: 0x0012
+          Scannable
+          Use legacy advertising PDUs: ADV_SCAN_IND
+        Min advertising interval: 1280.000 msec (0x0800)
+        Max advertising interval: 1280.000 msec (0x0800)
+        Channel map: 37, 38, 39 (0x07)
+        Own address type: Random (0x01)
+        Peer address type: Public (0x00)
+        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+        TX power: 127 dbm (0x7f)
+        Primary PHY: LE 1M (0x01)
+        Secondary max skip: 0x00
+        Secondary PHY: LE 1M (0x01)
+        SID: 0x00
+        Scan request notifications: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 5
+      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 1
+        Status: Success (0x00)
+        TX power (selected): 7 dbm (0x07)
 
-Please let me know if there are any issues pulling. Thanks.
+< HCI Command: LE Set Extended Scan Response Data (0x08|0x0038) plen 35
+        Handle: 0x00
+        Operation: Complete scan response data (0x03)
+        Fragment preference: Minimize fragmentation (0x01)
+        Data length: 0x0d
+        Name (short): localhost.
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Response Data (0x08|0x0038) ncmd 1
+        Status: Success (0x00)
 
-Johan
-
+Signed-off-by: Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
 ---
-The following changes since commit d9f45ab9e671166004b75427f10389e1f70cfc30:
+ net/bluetooth/hci_request.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-  net: bcmgenet: Add a shutdown callback (2019-10-15 20:59:28 -0700)
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 7f6a581..362b1ca 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1601,7 +1601,12 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_CONN_IND);
+ 		else
+ 			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
+-	} else if (get_adv_instance_scan_rsp_len(hdev, instance)) {
++	} else if (!instance || get_adv_instance_scan_rsp_len(hdev, instance)) {
++		/* Always set scannable for instance 0, as scan rsp data will
++		 * be set by default with local name. For other instances set
++		 * scannable based on whether scan rsp data is there for the
++		 * respective instance
++		 */
+ 		if (secondary_adv)
+ 			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_SCAN_IND);
+ 		else
+-- 
+2.7.4
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 3347a80965b38f096b1d6f995c00c9c9e53d4b8b:
-
-  Bluetooth: hci_bcm: Fix RTS handling during startup (2019-10-21 17:05:14 +0200)
-
-----------------------------------------------------------------
-Adam Ford (1):
-      Revert "Bluetooth: hci_ll: set operational frequency earlier"
-
-Amit K Bag (2):
-      Bluetooth: btusb: print FW version after FW download
-      Bluetooth: btusb: Trigger Intel FW download error recovery
-
-Arnd Bergmann (1):
-      Bluetooth: btusb: avoid unused function warning
-
-Ben Dooks (Codethink) (1):
-      Bluetooth: missed cpu_to_le16 conversion in hci_init4_req
-
-Bjorn Andersson (4):
-      Bluetooth: hci_qca: Update regulator_set_load() usage
-      Bluetooth: hci_qca: Don't vote for specific voltage
-      Bluetooth: hci_qca: Use regulator bulk enable/disable
-      Bluetooth: hci_qca: Split qca_power_setup()
-
-Christophe JAILLET (1):
-      Bluetooth: hci_nokia: Save a few cycles in 'nokia_enqueue()'
-
-Jeffrey Hugo (2):
-      Bluetooth: hci_qca: Add delay for wcn3990 stability
-      Revert "Bluetooth: hci_qca: Add delay for wcn3990 stability"
-
-Marcel Holtmann (1):
-      Bluetooth: btusb: Use IS_ENABLED instead of #ifdef
-
-Mattijs Korpershoek (1):
-      Bluetooth: hci_core: fix init for HCI_USER_CHANNEL
-
-Max Chou (1):
-      Bluetooth: btrtl: Fix an issue for the incorrect error return code.
-
-Nathan Chancellor (1):
-      Bluetooth: btusb: Remove return statement in btintel_reset_to_bootloader
-
-Sebastian Reichel (1):
-      Bluetooth: btwilink: drop superseded driver
-
-Stefan Wahren (1):
-      Bluetooth: hci_bcm: Fix RTS handling during startup
-
-Szymon Janc (1):
-      Bluetooth: Workaround directed advertising bug in Broadcom controllers
-
-YueHaibing (1):
-      Bluetooth: remove set but not used variable 'smp'
-
- drivers/bluetooth/Kconfig     |  11 --
- drivers/bluetooth/Makefile    |   1 -
- drivers/bluetooth/btintel.c   |  45 ++++++
- drivers/bluetooth/btintel.h   |   5 +
- drivers/bluetooth/btrtl.c     |   2 +-
- drivers/bluetooth/btusb.c     |  54 ++++---
- drivers/bluetooth/btwilink.c  | 337 ------------------------------------------
- drivers/bluetooth/hci_bcm.c   |   2 +
- drivers/bluetooth/hci_ll.c    |  39 +++--
- drivers/bluetooth/hci_nokia.c |   2 +-
- drivers/bluetooth/hci_qca.c   | 135 +++++++----------
- net/bluetooth/hci_conn.c      |   8 +
- net/bluetooth/hci_core.c      |  13 +-
- net/bluetooth/smp.c           |   6 -
- 14 files changed, 177 insertions(+), 483 deletions(-)
- delete mode 100644 drivers/bluetooth/btwilink.c
-
---/9DWx/yDrRhgMJTb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl2whRIACgkQJCP2+/mo
-1BILNg//WMbTBzR0Bmb3GQROpIPbRqGZCxQfmCAaA7rgcL46CGEoKIOH+iR3JCLD
-IsnHQc0Tt3GAcOJU7BjDhJiwiH6CBR+EAIOx0hKbTdYr88dOWnd8H8iU4M7fezl6
-RwYi3s/TpdQ7ZSzulrkjfsPxkFGlN/aT6P+GF6m31Rp0CEpUtwXxrjo65nCwy4zW
-ajhgqjHqgBt1+nsFaTFqqKjA+qMTssCrcq2uL6pXmBLY9QVScVLrE4zq+9OC/Pr/
-lN4I8rLcP2Rq7zqHqpJdpa/LRHBt8zTJzk0671OV7eiGZned8oZ5iO8jcSu30CtD
-5pSOzo1wPdWfJjkvDndLWuCUEoV7FPQLjPMFPyFpdcVgODnLUlL6vFuk00KQF/uh
-f1Z+2JVWO1YD7ivhW2DMeH0zP1/jEjprN8djMcj5gK0PhcCxfoM3/Et1kHxMGynY
-FMl10HZsP1TDhN6yxT+EA/TNoWT/g1YhRpAPYwd/o2TS93hMeZdsy50MxhPNWKXc
-ffnuDQjQwwN8UD40Ug+vLBlMvAdylrItQTosbwQY7e12/GY+NhW8I1f6+08HOPXc
-kagq3GLpZzsxOOdL44CI9lkgEKt9wKtx5pBAbQry040kyYJMd5P14dAmW1bJc2XO
-FmCl8Be9djWaCJATnEJ6uzPfzn3aRjoFiMDyfBgoUtzWjxXtQYw=
-=Uc88
------END PGP SIGNATURE-----
-
---/9DWx/yDrRhgMJTb--
