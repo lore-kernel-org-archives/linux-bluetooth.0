@@ -2,59 +2,59 @@ Return-Path: <SRS0=Kz1L=YT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7890ECA9EBD
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 03:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06584CA9EB9
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 05:27:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54EDE21D7F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 03:20:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D12F320578
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 05:27:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726168AbfJZDUH (ORCPT
+        id S1726057AbfJZF1F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Oct 2019 23:20:07 -0400
-Received: from shards.monkeyblade.net ([23.128.96.9]:40232 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726010AbfJZDUG (ORCPT
+        Sat, 26 Oct 2019 01:27:05 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:46915 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbfJZF1F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Oct 2019 23:20:06 -0400
-Received: from localhost (unknown [IPv6:2601:601:9f00:1e2::d71])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 45D6B14B7BF9A;
-        Fri, 25 Oct 2019 20:20:06 -0700 (PDT)
-Date:   Fri, 25 Oct 2019 20:20:05 -0700 (PDT)
-Message-Id: <20191025.202005.1641623026019420756.davem@davemloft.net>
-To:     johan.hedberg@gmail.com
-Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2019-10-23
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20191023165133.GA98720@amcewan-mobl1.ger.corp.intel.com>
-References: <20191023165133.GA98720@amcewan-mobl1.ger.corp.intel.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+        Sat, 26 Oct 2019 01:27:05 -0400
+Received: from [172.20.19.11] (unknown [213.61.67.157])
+        by mail.holtmann.org (Postfix) with ESMTPSA id BBE06CED0D;
+        Sat, 26 Oct 2019 07:36:04 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3594.4.19\))
+Subject: Re: [PATCH -next] Bluetooth: btrtl: remove unneeded semicolon
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20191025092653.30428-1-yuehaibing@huawei.com>
+Date:   Sat, 26 Oct 2019 07:27:03 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Fri, 25 Oct 2019 20:20:06 -0700 (PDT)
+Message-Id: <5D6A13BC-0E81-4AA6-B375-B7B762B93BD3@holtmann.org>
+References: <20191025092653.30428-1-yuehaibing@huawei.com>
+To:     YueHaibing <yuehaibing@huawei.com>
+X-Mailer: Apple Mail (2.3594.4.19)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Wed, 23 Oct 2019 19:51:33 +0300
+Hi Yue,
 
-> Here's the main bluetooth-next pull request for the 5.5 kernel:
+> Remove unneeded semicolon.
+> This is detected by coccinelle.
 > 
->  - Multiple fixes to hci_qca driver
->  - Fix for HCI_USER_CHANNEL initialization
->  - btwlink: drop superseded driver
->  - Add support for Intel FW download error recovery
->  - Various other smaller fixes & improvements
-> 
-> Please let me know if there are any issues pulling. Thanks.
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+> drivers/bluetooth/btrtl.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Pulled into net-next, thanks Johan.
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
