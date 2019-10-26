@@ -2,178 +2,102 @@ Return-Path: <SRS0=Kz1L=YT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686ECCA9EB9
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 17:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D712FC47E49
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 20:48:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FD8A21871
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 17:39:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A04AA21655
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Oct 2019 20:48:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lmhZG5Wm"
+	dkim=pass (2048-bit key) header.d=bonstra.fr.eu.org header.i=@bonstra.fr.eu.org header.b="XWt470oI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726276AbfJZRja (ORCPT
+        id S1726614AbfJZUsj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Oct 2019 13:39:30 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:38590 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726210AbfJZRja (ORCPT
+        Sat, 26 Oct 2019 16:48:39 -0400
+Received: from vault.bonstra.fr.eu.org ([51.158.68.104]:39562 "EHLO
+        vault.bonstra.fr.eu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726530AbfJZUsj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Oct 2019 13:39:30 -0400
-Received: by mail-qk1-f193.google.com with SMTP id p4so4770161qkf.5
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Oct 2019 10:39:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WJj+XYLe3cMZIZoQ9vr6L71XNxTz/FYk/4q0duDThfY=;
-        b=lmhZG5WmjZSGyG/n8DvvWPUtaIUQTSAcqfXm1lhQkFBllCnZ0iPY0qO+FfncxWVG1O
-         iGaup108mV3brmcMFcKNNZG1pEu5uY5d31Q7MY//EU1hh+eyZ1YJmsNnwtuZu+TxM3uk
-         uhzDUa/57Q+1Od0c9tEFXNNNfwOEFVHqPLRBg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WJj+XYLe3cMZIZoQ9vr6L71XNxTz/FYk/4q0duDThfY=;
-        b=ILSTi3q1ANDcs7BvLIxYZNxQIV9kdMx8kS5cTmPQs9aODerhOr6tlnRvhjaE88aJm9
-         LGSBeJzSnhZ9S0WCYiJ2kpQ99tMXY5ajZTH1NluBnvk7wmiNgv52U6A5VNPo5YQ5lh6W
-         AFX5tEwaqP9NewMhwWjiK9ejVId3qdkMtpfaAjNsQ18lzXce4/xfoACGhK4qnn1pTYTW
-         FelZ+xY7oiiW90SPu5qiRKaBthFQ6cIB2IrUS/EZ7SfREz9Ywv+ARnC62E/WUXQsuqGy
-         SoscM6ZgVAOyYsYiXKtAMRNpeF1jwT3FTtNxlJ6UOxoReGQFYKsJur6WilaeW4yrXfwO
-         UPQA==
-X-Gm-Message-State: APjAAAUO74syJu6nSHjSyqVNRgjbqc/NcfNAHFIRPLimRPxUJjZg0UXq
-        THgXJxZLTml3JS77xBgDMu6rs/HdZ3omT5OYpH9fwQ==
-X-Google-Smtp-Source: APXvYqxNNWzFrSsnCjh1NbFwr4AgLKBoBn+uLrUEM4+ByNDY81vMaaOzmML5AYyWCxiqf2lVQlNLxbhZNQL2Jn753dk=
-X-Received: by 2002:a37:4dd1:: with SMTP id a200mr8422942qkb.419.1572111568786;
- Sat, 26 Oct 2019 10:39:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191025215428.31607-1-abhishekpandit@chromium.org>
- <20191025215428.31607-4-abhishekpandit@chromium.org> <CAD=FV=Vf64F885me=PUpv34Lb6iZpm1ui30nLHww6T3rmRVJXA@mail.gmail.com>
-In-Reply-To: <CAD=FV=Vf64F885me=PUpv34Lb6iZpm1ui30nLHww6T3rmRVJXA@mail.gmail.com>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Sat, 26 Oct 2019 10:39:18 -0700
-Message-ID: <CANFp7mX7LNxt5=6h-eMC+o1JtoJ1Mvwo2RLBYMhZ3fN5kyqGqQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] ARM: dts: rockchip: Add brcm bluetooth module on uart0
-To:     Doug Anderson <dianders@chromium.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:ARM/Rockchip SoC..." <linux-rockchip@lists.infradead.org>,
+        Sat, 26 Oct 2019 16:48:39 -0400
+Received: from val.bonstra.fr.eu.org (unknown [192.168.128.2])
+        by vault.bonstra.fr.eu.org (Postfix) with ESMTP id 1A923BFE83;
+        Sat, 26 Oct 2019 20:41:48 +0000 (UTC)
+Received: from bonstra.fr.eu.org (vlad.gr1 [IPv6:fd7b:45cc:aa3d::3])
+        by val.bonstra.fr.eu.org (Postfix) with ESMTPSA id 2A6AA60873;
+        Sat, 26 Oct 2019 22:41:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bonstra.fr.eu.org;
+        s=dkim1; t=1572122507; x=1573332107;
+        bh=VhKkxkWcTbCjrWeKegoiffMLEInoYHE0UkHYo8HkL10=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=XWt470oIb0+H5KUndkc4KgevXnc31VGP7RacGTgi4Me6h0cxIdsebstCCEU4tbPRs
+         uirV6/kgxCUItw3V4e2RrOXO3s368QAIlDw+T1TNjM75Fy6h4G82DaByyVunSShyhc
+         w7ljbeEQznjqGZJveqSZiHdfHBv1faGDYFCqLb8vslSUD1i3V7jJDkUtauCc+z4Xcr
+         nwJjiSr7PB9E7T8sn4lgN1ymyfGckhk5gvuzRhK3JIxD9oXZTkdLg47FbexB2xWT2e
+         o0Y6vwNdarMY0jNrcnHVt7Gg90+ZKHqDLPKCVw2i79TzDt4GfktEuHU/Vq829cQp0k
+         FWs67w3PYGdfg==
+From:   Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>
+Cc:     Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>,
+        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] arm64: dts: allwinner: a64: Enable Bluetooth on Teres-I
+Date:   Sat, 26 Oct 2019 22:41:16 +0200
+Message-Id: <20191026204116.95119-4-bonstra@bonstra.fr.eu.org>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191026204116.95119-1-bonstra@bonstra.fr.eu.org>
+References: <20191026204116.95119-1-bonstra@bonstra.fr.eu.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Yes, these shouldn't be for all of Veyron, only Minnie, Mickey and
-Speedy -- my mistake. I'll send an updated patch with your
-suggestions.
+The UART1 on the Teres-A64-I is connected to a rtl8723bs combo
+WLAN/Bluetooth controller, with three GPIOs used for device reset,
+host wake up and device wake up.
 
-Thanks
-Abhishek
+Currently, the host wake up feature is not supported by the HCI H5
+driver.
 
-On Fri, Oct 25, 2019 at 3:50 PM Doug Anderson <dianders@chromium.org> wrote:
->
-> Hi,
->
-> On Fri, Oct 25, 2019 at 2:55 PM Abhishek Pandit-Subedi
-> <abhishekpandit@chromium.org> wrote:
-> >
-> > This enables the Broadcom uart bluetooth driver on uart0 and gives it
-> > ownership of its gpios. In order to use this, you must enable the
-> > following kconfig options:
-> >   - CONFIG_BT_HCIUART_BCM
-> >   - CONFIG_SERIAL_DEV
-> >
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > ---
-> >
-> >  arch/arm/boot/dts/rk3288-veyron.dtsi | 31 +++++++---------------------
-> >  1 file changed, 7 insertions(+), 24 deletions(-)
-> >
-> > diff --git a/arch/arm/boot/dts/rk3288-veyron.dtsi b/arch/arm/boot/dts/rk3288-veyron.dtsi
-> > index 7525e3dd1fc1..8c9f91ba6f57 100644
-> > --- a/arch/arm/boot/dts/rk3288-veyron.dtsi
-> > +++ b/arch/arm/boot/dts/rk3288-veyron.dtsi
->
-> You are changing this for _all_ veryon, not just those veyron devices
-> using Broadcom.  I don't think you want to change the marvell-based
-> boards.
->
-> ...presumably you'll want to make you change only affect minnie,
-> speedy, and mickey.
->
->
-> > @@ -23,30 +23,6 @@
-> >                 reg = <0x0 0x0 0x0 0x80000000>;
-> >         };
-> >
-> > -       bt_activity: bt-activity {
-> > -               compatible = "gpio-keys";
-> > -               pinctrl-names = "default";
-> > -               pinctrl-0 = <&bt_host_wake>;
-> > -
-> > -               /*
-> > -                * HACK: until we have an LPM driver, we'll use an
-> > -                * ugly GPIO key to allow Bluetooth to wake from S3.
-> > -                * This is expected to only be used by BT modules that
-> > -                * use UART for comms.  For BT modules that talk over
-> > -                * SDIO we should use a wakeup mechanism related to SDIO.
-> > -                *
-> > -                * Use KEY_RESERVED here since that will work as a wakeup but
-> > -                * doesn't get reported to higher levels (so doesn't confuse
-> > -                * Chrome).
-> > -                */
-> > -               bt-wake {
-> > -                       label = "BT Wakeup";
-> > -                       gpios = <&gpio4 RK_PD7 GPIO_ACTIVE_HIGH>;
-> > -                       linux,code = <KEY_RESERVED>;
-> > -                       wakeup-source;
-> > -               };
-> > -
-> > -       };
-> >
-> >         power_button: power-button {
-> >                 compatible = "gpio-keys";
-> > @@ -434,6 +410,13 @@
-> >         /* Pins don't include flow control by default; add that in */
-> >         pinctrl-names = "default";
-> >         pinctrl-0 = <&uart0_xfer &uart0_cts &uart0_rts>;
-> > +
-> > +       bluetooth {
-> > +               compatible = "brcm,bcm43540-bt";
->
-> You probably need some pinctrl entries here to make sure that things
-> are properly configured, like:
->
-> pinctrl-names = "default";
-> pinctrl-0 = <&bt_host_wake>, <&bt_dev_wake>, <&bt_enable>;
->
-> This would require defining bt_dev_wake and bt_enable and removing the
-> hacky output-only versions they have now.
->
->
-> > +               host-wakeup-gpios       = <&gpio4 RK_PD7 GPIO_ACTIVE_HIGH>;
-> > +               shutdown-gpios          = <&gpio4 RK_PD5 GPIO_ACTIVE_LOW>;
->
-> Right now gpio4 RK_PD5 is controlled by the "sdio_pwrseq".  Should you
-> remove it from there?  Looks like it was a no-op for marvell which
-> makes it a little easier.
->
->
-> > +               device-wakeup-gpios     = <&gpio4 RK_PD2 GPIO_ACTIVE_HIGH>;
->
-> You probably need to stop driving this in the pinctrl hogs for
-> Broadcom boards...
->
->
-> -Doug
+Signed-off-by: Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
+---
+ .../arm64/boot/dts/allwinner/sun50i-a64-teres-i.dts | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-teres-i.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-teres-i.dts
+index 1069e7012c9c..c7db2f1650d4 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-teres-i.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-teres-i.dts
+@@ -325,6 +325,19 @@
+ 	status = "okay";
+ };
+ 
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++	status = "okay";
++
++	bluetooth {
++		compatible = "realtek,rtl8723bs-bt";
++		enable-gpio = <&r_pio 0 4 GPIO_ACTIVE_HIGH>; /* PL4 */
++		device-wake-gpio = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
++		realtek,config-name = "teres_a64_i";
++	};
++};
++
+ &usbphy {
+ 	usb1_vbus-supply = <&reg_usb1_vbus>;
+ 	status = "okay";
+-- 
+2.23.0
+
