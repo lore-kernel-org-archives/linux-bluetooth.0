@@ -3,37 +3,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4507CA9EAE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 20:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DB0CA9EC3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 20:41:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 73E3D208E3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 20:41:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 940962087F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 20:41:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727778AbfJ2UlC (ORCPT
+        id S1727816AbfJ2UlD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Oct 2019 16:41:02 -0400
-Received: from mga01.intel.com ([192.55.52.88]:15196 "EHLO mga01.intel.com"
+        Tue, 29 Oct 2019 16:41:03 -0400
+Received: from mga01.intel.com ([192.55.52.88]:15200 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727766AbfJ2UlB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Oct 2019 16:41:01 -0400
+        id S1725840AbfJ2UlC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 29 Oct 2019 16:41:02 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 13:41:01 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 13:41:02 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,245,1569308400"; 
-   d="scan'208";a="401277184"
+   d="scan'208";a="401277205"
 Received: from ingas-nuc1.sea.intel.com ([10.255.229.102])
-  by fmsmga006.fm.intel.com with ESMTP; 29 Oct 2019 13:41:00 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 29 Oct 2019 13:41:01 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 04/10] tools/mesh: move remote node processing to a separate file
-Date:   Tue, 29 Oct 2019 13:40:48 -0700
-Message-Id: <20191029204054.30599-5-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 05/10] tools/mesh-cfgclient: Commands for Management iface methods
+Date:   Tue, 29 Oct 2019 13:40:49 -0700
+Message-Id: <20191029204054.30599-6-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191029204054.30599-1-inga.stotland@intel.com>
 References: <20191029204054.30599-1-inga.stotland@intel.com>
@@ -44,359 +44,659 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This confines the functionality related to remote node
-housekeeping into a separate file remote.c
+This adds complete list of commenads that excercise calls to
+org.bluez.mesh.Manager1 methods:
+"appkey-create": CreateAppKey()
+"appkey-import": ImportAppKey()
+"appkey-update": UpdateAppKey()
+"appkey-delete": DeleteAppKey()
+"subnet-create": CreateSubnet()
+"subnet-import": SubnetImport()
+"subnet-update": SubnetUpdate()
+"subnet-delete": SubnetDelete()
+"subnet-set-phase": SetKeyPhase()
+"node-import": ImportRemoteNode()
+"node-delete": DeleteRemoteNode()
 ---
- Makefile.tools         |   2 +
- tools/mesh-cfgclient.c |  76 +++----------------------
- tools/mesh/remote.c    | 124 +++++++++++++++++++++++++++++++++++++++++
- tools/mesh/remote.h    |  31 +++++++++++
- 4 files changed, 165 insertions(+), 68 deletions(-)
- create mode 100644 tools/mesh/remote.c
- create mode 100644 tools/mesh/remote.h
+ tools/mesh-cfgclient.c | 551 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 520 insertions(+), 31 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 12687e495..0b4ddf576 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -332,7 +332,9 @@ tools_mesh_cfgclient_SOURCES = tools/mesh-cfgclient.c \
- 				tools/mesh/cfgcli.h tools/mesh/cfgcli.c \
- 				tools/mesh/keys.h tools/mesh/keys.c \
- 				tools/mesh/util.h tools/mesh/util.c \
-+				tools/mesh/remote.h tools/mesh/remote.c \
- 				tools/mesh/agent.h tools/mesh/agent.c
-+
- tools_mesh_cfgclient_LDADD = lib/libbluetooth-internal.la src/libshared-ell.la \
- 						$(ell_ldadd) -lreadline
- endif
 diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index f225d021f..d21e55fac 100644
+index d21e55fac..5d74be9dd 100644
 --- a/tools/mesh-cfgclient.c
 +++ b/tools/mesh-cfgclient.c
-@@ -39,6 +39,7 @@
- #include "tools/mesh/cfgcli.h"
- #include "tools/mesh/keys.h"
- #include "tools/mesh/model.h"
-+#include "tools/mesh/remote.h"
- 
- #define PROMPT_ON	COLOR_BLUE "[mesh-cfgclient]" COLOR_OFF "# "
- #define PROMPT_OFF	"Waiting to connect to bluetooth-meshd..."
-@@ -84,13 +85,6 @@ struct unprov_device {
+@@ -85,6 +85,15 @@ struct unprov_device {
  	uint8_t uuid[16];
  };
  
--struct remote_node {
--	uint16_t unicast;
--	uint16_t net_idx;
--	uint8_t uuid[16];
--	uint8_t num_ele;
--};
--
++struct generic_request {
++	uint32_t arg1;
++	uint32_t arg2;
++	uint32_t arg3;
++	uint8_t *data1;
++	uint8_t *data2;
++	const char *str;
++};
++
  static struct l_dbus *dbus;
  
  static struct l_queue *node_proxies;
-@@ -99,7 +93,6 @@ static struct meshcfg_node *local;
- static struct model_info *cfgcli;
+@@ -203,6 +212,19 @@ struct key_data {
+ 	bool update;
+ };
  
- static struct l_queue *devices;
--static struct l_queue *nodes;
- 
- static bool prov_in_progress;
- static const char *caps[2] = {"out-numeric", "in-numeric"};
-@@ -192,37 +185,6 @@ static void print_device(void *a, void *b)
- 	l_free(str);
- }
- 
--static bool match_node_addr(const void *a, const void *b)
--{
--	const struct remote_node *rmt = a;
--	uint16_t addr = L_PTR_TO_UINT(b);
++static void append_byte_array(struct l_dbus_message_builder *builder,
++					unsigned char *data, unsigned int len)
++{
++	unsigned int i;
++
++	l_dbus_message_builder_enter_array(builder, "y");
++
++	for (i = 0; i < len; i++)
++		l_dbus_message_builder_append_basic(builder, 'y', &(data[i]));
++
++	l_dbus_message_builder_leave_array(builder);
++}
++
+ static void send_msg_setup(struct l_dbus_message *msg, void *user_data)
+ {
+ 	struct send_data *req = user_data;
+@@ -215,15 +237,7 @@ static void send_msg_setup(struct l_dbus_message *msg, void *user_data)
+ 	if (req->is_dev_key)
+ 		l_dbus_message_builder_append_basic(builder, 'b', &req->rmt);
+ 	l_dbus_message_builder_append_basic(builder, 'q', &req->idx);
+-	l_dbus_message_builder_enter_array(builder, "y");
 -
--	if (addr >= rmt->unicast &&
--				addr <= (rmt->unicast + rmt->num_ele - 1))
--		return true;
--
--	return false;
--}
--
--static uint16_t get_primary_subnet_idx(uint16_t addr)
--{
--	struct remote_node *rmt;
--
--	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
--
--	if (!rmt) {
--		bt_shell_printf("Net key not found: trying %4.4x\n",
--			PRIMARY_NET_IDX);
--		return prov_net_idx;
--		/*
--		 * TODO: When the remote node recovery from storage is
--		 * implemented, return NET_IDX_INVALID" here.
--		 */
+-	while (req->len) {
+-		l_dbus_message_builder_append_basic(builder, 'y', req->data);
+-		req->data++;
+-		req->len--;
 -	}
 -
--	return rmt->net_idx;
--}
--
- struct send_data {
- 	const char *ele_path;
- 	bool rmt;
-@@ -278,7 +240,7 @@ static bool send_msg(void *user_data, uint16_t dst, uint16_t idx,
- 	method_name = is_dev_key ? "DevKeySend" : "Send";
- 
- 	if (is_dev_key) {
--		net_idx_tx = get_primary_subnet_idx(dst);
-+		net_idx_tx = remote_get_subnet_idx(dst);
- 		if (net_idx_tx == NET_IDX_INVALID)
- 			return false;
- 	}
-@@ -319,7 +281,7 @@ static bool send_key(void *user_data, uint16_t dst, uint16_t key_idx,
- 	uint16_t net_idx;
- 	const char *method_name = (!is_appkey) ? "AddNetKey" : "AddAppKey";
- 
--	net_idx = get_primary_subnet_idx(dst);
-+	net_idx = remote_get_subnet_idx(dst);
- 	if (net_idx == NET_IDX_INVALID)
- 		return false;
- 
-@@ -544,6 +506,7 @@ static void create_net_reply(struct l_dbus_proxy *proxy,
- 	bt_shell_printf("Created new node with token %s\n", str);
- 	l_free(str);
- 
-+	remote_add_node(app.uuid, 0x0001, 1, PRIMARY_NET_IDX);
- 	keys_add_net_key(PRIMARY_NET_IDX);
- 
- 	l_dbus_proxy_method_call(net_proxy, "Attach", attach_node_setup,
-@@ -641,26 +604,9 @@ static void cmd_list_unprov(int argc, char *argv[])
- 	l_queue_foreach(devices, print_device, NULL);
+-	l_dbus_message_builder_leave_array(builder);
++	append_byte_array(builder, req->data, req->len);
+ 	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
+ }
+@@ -434,8 +448,7 @@ static void try_set_node_proxy(void *a, void *b)
  }
  
--static void print_node(void *a, void *b)
--{
--	struct remote_node *node = a;
--	char *str;
--
--	bt_shell_printf(COLOR_YELLOW "Mesh node:\n" COLOR_OFF);
--	str = l_util_hexstring_upper(node->uuid, 16);
--	bt_shell_printf("\t" COLOR_GREEN "UUID = %s\n" COLOR_OFF, str);
--	l_free(str);
--	bt_shell_printf("\t" COLOR_GREEN "primary = %4.4x\n" COLOR_OFF,
--								node->unicast);
--	bt_shell_printf("\t" COLOR_GREEN "elements = %u\n" COLOR_OFF,
--								node->num_ele);
--	bt_shell_printf("\t" COLOR_GREEN "net_key_idx = %3.3x\n" COLOR_OFF,
--								node->net_idx);
--}
--
- static void cmd_list_nodes(int argc, char *argv[])
+ static void attach_node_reply(struct l_dbus_proxy *proxy,
+-						struct l_dbus_message *msg,
+-						void *user_data)
++				struct l_dbus_message *msg, void *user_data)
  {
--	l_queue_foreach(nodes, print_node, NULL);
-+	remote_print_all();
+ 	struct meshcfg_node *node = user_data;
+ 	struct l_dbus_message_iter iter_cfg;
+@@ -482,8 +495,7 @@ static void attach_node_setup(struct l_dbus_message *msg, void *user_data)
  }
  
- static void add_node_reply(struct l_dbus_proxy *proxy,
-@@ -972,7 +918,6 @@ static struct l_dbus_message *add_node_cmplt_call(struct l_dbus *dbus,
- 	uint8_t cnt;
- 	uint32_t n;
- 	uint8_t *uuid;
--	struct remote_node *node;
+ static void create_net_reply(struct l_dbus_proxy *proxy,
+-						struct l_dbus_message *msg,
+-						void *user_data)
++				struct l_dbus_message *msg, void *user_data)
+ {
+ 	char *str;
+ 	uint64_t tmp;
+@@ -516,7 +528,6 @@ static void create_net_reply(struct l_dbus_proxy *proxy,
  
- 	if (!prov_in_progress)
- 		return l_dbus_message_new_error(msg, dbus_err_fail, NULL);
-@@ -991,15 +936,11 @@ static struct l_dbus_message *add_node_cmplt_call(struct l_dbus *dbus,
- 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
+ static void create_net_setup(struct l_dbus_message *msg, void *user_data)
+ {
+-	uint i;
+ 	struct l_dbus_message_builder *builder;
+ 
+ 	/* Generate random UUID */
+@@ -525,14 +536,7 @@ static void create_net_setup(struct l_dbus_message *msg, void *user_data)
+ 	builder = l_dbus_message_builder_new(msg);
+ 
+ 	l_dbus_message_builder_append_basic(builder, 'o', app.path);
+-	l_dbus_message_builder_enter_array(builder, "y");
+-
+-	for (i = 0; i < L_ARRAY_SIZE(app.uuid); i++)
+-		l_dbus_message_builder_append_basic(builder, 'y',
+-								&(app.uuid[i]));
+-
+-	l_dbus_message_builder_leave_array(builder);
+-
++	append_byte_array(builder, app.uuid, 16);
+ 	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
+ }
+@@ -609,6 +613,476 @@ static void cmd_list_nodes(int argc, char *argv[])
+ 	remote_print_all();
+ }
+ 
++static void free_generic_request(void *data)
++{
++	struct generic_request *req = data;
++
++	l_free(req->data1);
++	l_free(req->data2);
++	l_free(req);
++}
++
++static void delete_node_setup(struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t primary;
++	uint8_t ele_cnt;
++
++	primary = (uint16_t) req->arg1;
++	ele_cnt = (uint8_t) req->arg2;
++
++	l_dbus_message_set_arguments(msg, "qy", primary, ele_cnt);
++}
++
++static void cmd_delete_node(int argc, char *argv[])
++{
++	struct generic_request *req;
++
++	if (!node || !node->proxy || !node->mgmt_proxy) {
++		bt_shell_printf("Node is not attached\n");
++		return;
++	}
++
++	if (argc < 3) {
++		bt_shell_printf("Unicast and element count are required\n");
++		return;
++	}
++
++	req = l_new(struct generic_request, 1);
++
++	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
++		goto fail;
++
++	if (sscanf(argv[2], "%u", &req->arg2) != 1)
++		goto fail;
++
++	l_dbus_proxy_method_call(node->mgmt_proxy, "DeleteRemoteNode",
++				delete_node_setup, NULL, req, l_free);
++
++	/* TODO:: Delete node from configuration */
++	return;
++
++fail:
++	l_free(req);
++}
++
++static void import_node_reply(struct l_dbus_proxy *proxy,
++				struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t primary, net_idx;
++	uint8_t ele_cnt;
++
++	if (l_dbus_message_is_error(msg)) {
++		const char *name;
++
++		l_dbus_message_get_error(msg, &name, NULL);
++		l_error("Failed to import remote node: %s", name);
++		return;
++	}
++
++	net_idx = (uint16_t) req->arg1;
++	primary = (uint16_t) req->arg2;
++	ele_cnt = (uint8_t) req->arg3;
++
++	remote_add_node(req->data1, primary, ele_cnt, net_idx);
++}
++
++static void import_node_setup(struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t primary;
++	uint8_t ele_cnt;
++	struct l_dbus_message_builder *builder;
++
++	primary = (uint16_t) req->arg2;
++	ele_cnt = (uint8_t) req->arg3;
++
++	builder = l_dbus_message_builder_new(msg);
++	l_dbus_message_builder_append_basic(builder, 'q', &primary);
++	l_dbus_message_builder_append_basic(builder, 'y', &ele_cnt);
++	append_byte_array(builder, req->data2, 16);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++}
++
++static void cmd_import_node(int argc, char *argv[])
++{
++	struct generic_request *req;
++	size_t sz;
++
++	if (!node || !node->proxy || !node->mgmt_proxy) {
++		bt_shell_printf("Node is not attached\n");
++		return;
++	}
++
++	if (argc < 6) {
++		bt_shell_printf("UUID, element count and device key");
++		bt_shell_printf("Unicast, element count and device key");
++		bt_shell_printf("are required\n");
++		return;
++	}
++
++	req = l_new(struct generic_request, 1);
++
++	/* Device UUID */
++	req->data1 = l_util_from_hexstring(argv[1], &sz);
++	if (!req->data1 || sz != 16) {
++		l_error("Failed to generate UUID array from %s", argv[1]);
++		goto fail;
++	}
++
++	/* NetKey Index*/
++	if (sscanf(argv[2], "%04x", &req->arg1) != 1)
++		goto fail;
++
++	/* Unicast of the primary element */
++	if (sscanf(argv[3], "%04x", &req->arg2) != 1)
++		goto fail;
++
++	/* Number of elements */
++	if (sscanf(argv[4], "%u", &req->arg3) != 1)
++		return;
++
++	/* DevKey */
++	req->data2 = l_util_from_hexstring(argv[5], &sz);
++	if (!req->data2 || sz != 16) {
++		l_error("Failed to generate DevKey array from %s", argv[5]);
++		goto fail;
++	}
++
++	l_dbus_proxy_method_call(node->mgmt_proxy, "ImportRemoteNode",
++					import_node_setup, import_node_reply,
++					req, free_generic_request);
++
++	return;
++
++fail:
++	free_generic_request(req);
++}
++
++static void subnet_set_phase_reply(struct l_dbus_proxy *proxy,
++				struct l_dbus_message *msg, void *user_data)
++{
++	if (l_dbus_message_is_error(msg)) {
++		const char *name;
++
++		l_dbus_message_get_error(msg, &name, NULL);
++		l_error("Failed to set subnet phase: %s", name);
++	}
++
++	/* TODO: Set key phase in configuration */
++}
++
++static void subnet_set_phase_setup(struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t net_idx;
++	uint8_t phase;
++
++	net_idx = (uint16_t) req->arg1;
++	phase = (uint8_t) req->arg2;
++
++	l_dbus_message_set_arguments(msg, "qy", net_idx, phase);
++}
++
++static void cmd_subnet_set_phase(int argc, char *argv[])
++{
++	struct generic_request *req;
++
++	if (!node || !node->proxy || !node->mgmt_proxy) {
++		bt_shell_printf("Node is not attached\n");
++		return;
++	}
++
++	if (argc < 3) {
++		bt_shell_printf("NetKey index and phase are required\n");
++		return;
++	}
++
++	req = l_new(struct generic_request, 1);
++
++	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
++		goto fail;
++
++	if (sscanf(argv[2], "%d", &req->arg2) != 1)
++		goto fail;
++
++	l_dbus_proxy_method_call(node->mgmt_proxy, "SetKeyPhase",
++					subnet_set_phase_setup,
++					subnet_set_phase_reply, req, l_free);
++
++	return;
++
++fail:
++	l_free(req);
++}
++
++static void mgr_key_reply(struct l_dbus_proxy *proxy,
++				struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t idx = (uint16_t) req->arg1;
++	const char *method = req->str;
++
++	if (l_dbus_message_is_error(msg)) {
++		const char *name;
++
++		l_dbus_message_get_error(msg, &name, NULL);
++		l_error("Method %s returned error: %s", method, name);
++		return;
++	}
++
++	if (!strcmp("CreateSubnet", method))
++		keys_add_net_key(idx);
++	else if (!strcmp("DeleteSubnet", method))
++		keys_del_net_key(idx);
++	else if (!strcmp("DeleteAppKey", method))
++		keys_del_app_key(idx);
++}
++
++static void mgr_key_setup(struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t idx = (uint16_t) req->arg1;
++
++	l_dbus_message_set_arguments(msg, "q", idx);
++}
++
++static void mgr_key_cmd(int argc, char *argv[], const char *method_name)
++{
++	struct generic_request *req;
++
++	if (!node || !node->proxy || !node->mgmt_proxy) {
++		bt_shell_printf("Node is not attached\n");
++		return;
++	}
++
++	if (argc < 2) {
++		bt_shell_printf("Missing required arguments\n");
++		return;
++	}
++
++	req = l_new(struct generic_request, 1);
++
++	if (sscanf(argv[1], "%04x", &req->arg1) != 1) {
++		l_free(req);
++		return;
++	}
++
++	req->str = method_name;
++
++	l_dbus_proxy_method_call(node->mgmt_proxy, method_name,
++					mgr_key_setup, mgr_key_reply,
++					req, l_free);
++}
++
++static void cmd_delete_appkey(int argc, char *argv[])
++{
++	mgr_key_cmd(argc, argv, "DeleteAppKey");
++}
++
++static void cmd_update_appkey(int argc, char *argv[])
++{
++	mgr_key_cmd(argc, argv, "UpdateAppKey");
++}
++
++static void cmd_delete_subnet(int argc, char *argv[])
++{
++	mgr_key_cmd(argc, argv, "DeleteSubnet");
++}
++
++static void cmd_update_subnet(int argc, char *argv[])
++{
++	mgr_key_cmd(argc, argv, "UpdateSubnet");
++}
++
++static void cmd_create_subnet(int argc, char *argv[])
++{
++	mgr_key_cmd(argc, argv, "CreateSubnet");
++}
++
++static void add_key_reply(struct l_dbus_proxy *proxy,
++				struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t net_idx, app_idx;
++	const char *method = req->str;
++
++	if (l_dbus_message_is_error(msg)) {
++		const char *name;
++
++		l_dbus_message_get_error(msg, &name, NULL);
++		l_error("%s failed: %s", method, name);
++		return;
++	}
++
++	net_idx = (uint16_t) req->arg1;
++
++	if (!strcmp(method, "ImportSubnet")) {
++		keys_add_net_key(net_idx);
++		return;
++	}
++
++	app_idx = (uint16_t) req->arg2;
++	keys_add_app_key(net_idx, app_idx);
++}
++
++static void import_appkey_setup(struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t net_idx, app_idx;
++	struct l_dbus_message_builder *builder;
++
++	net_idx = (uint16_t) req->arg1;
++	app_idx = (uint16_t) req->arg2;
++
++	builder = l_dbus_message_builder_new(msg);
++	l_dbus_message_builder_append_basic(builder, 'q', &net_idx);
++	l_dbus_message_builder_append_basic(builder, 'q', &app_idx);
++	append_byte_array(builder, req->data1, 16);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++}
++
++static void cmd_import_appkey(int argc, char *argv[])
++{
++	struct generic_request *req;
++	size_t sz;
++
++	if (!node || !node->proxy || !node->mgmt_proxy) {
++		bt_shell_printf("Node is not attached\n");
++		return;
++	}
++
++	if (argc < 4) {
++		bt_shell_printf("Netkey and AppKey indices and");
++		bt_shell_printf("key value are required\n");
++		return;
++	}
++
++	req = l_new(struct generic_request, 1);
++
++	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
++		goto fail;
++
++	if (sscanf(argv[2], "%04x", &req->arg2) != 1)
++		goto fail;
++
++	req->data1 = l_util_from_hexstring(argv[3], &sz);
++	if (!req->data1 || sz != 16) {
++		l_error("Failed to generate key array from %s", argv[3]);
++		goto fail;
++	}
++
++	req->str = "ImportAppKey";
++
++	l_dbus_proxy_method_call(node->mgmt_proxy, "ImportAppKey",
++					import_appkey_setup, add_key_reply,
++					req, free_generic_request);
++
++	return;
++
++fail:
++	free_generic_request(req);
++}
++
++static void import_subnet_setup(struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t net_idx;
++	struct l_dbus_message_builder *builder;
++
++	net_idx = (uint16_t) req->arg1;
++
++	builder = l_dbus_message_builder_new(msg);
++	l_dbus_message_builder_append_basic(builder, 'q', &net_idx);
++	append_byte_array(builder, req->data1, 16);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++}
++
++static void cmd_import_subnet(int argc, char *argv[])
++{
++	struct generic_request *req;
++	size_t sz;
++
++	if (!node || !node->proxy || !node->mgmt_proxy) {
++		bt_shell_printf("Node is not attached\n");
++		return;
++	}
++
++	if (argc < 3) {
++		bt_shell_printf("NetKey index and value are required\n");
++		return;
++	}
++
++	req = l_new(struct generic_request, 1);
++
++	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
++		goto fail;
++
++	req->data1 = l_util_from_hexstring(argv[2], &sz);
++	if (!req->data1 || sz != 16) {
++		l_error("Failed to generate key array from %s", argv[2]);
++		goto fail;
++	}
++
++	req->str = "ImportSubnet";
++
++	l_dbus_proxy_method_call(node->mgmt_proxy, "ImportSubnet",
++					import_subnet_setup, add_key_reply,
++					req, free_generic_request);
++	return;
++
++fail:
++	free_generic_request(req);
++}
++
++static void create_appkey_setup(struct l_dbus_message *msg, void *user_data)
++{
++	struct generic_request *req = user_data;
++	uint16_t net_idx, app_idx;
++
++	net_idx = (uint16_t) req->arg1;
++	app_idx = (uint16_t) req->arg2;
++
++	l_dbus_message_set_arguments(msg, "qq", net_idx, app_idx);
++}
++
++static void cmd_create_appkey(int argc, char *argv[])
++{
++	struct generic_request *req;
++
++	if (!node || !node->proxy || !node->mgmt_proxy) {
++		bt_shell_printf("Node is not attached\n");
++		return;
++	}
++
++	if (argc < 3) {
++		bt_shell_printf("AppKey index is required\n");
++		return;
++	}
++
++	req = l_new(struct generic_request, 1);
++
++	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
++		goto fail;
++
++	if (sscanf(argv[2], "%04x", &req->arg2) != 1)
++		goto fail;
++
++	req->str = "CreateAppKey";
++
++	l_dbus_proxy_method_call(node->mgmt_proxy, "CreateAppKey",
++					create_appkey_setup, add_key_reply,
++					req, l_free);
++	return;
++
++fail:
++	l_free(req);
++}
++
+ static void add_node_reply(struct l_dbus_proxy *proxy,
+ 				struct l_dbus_message *msg, void *user_data)
+ {
+@@ -626,7 +1100,6 @@ static void add_node_reply(struct l_dbus_proxy *proxy,
+ 
+ static void add_node_setup(struct l_dbus_message *msg, void *user_data)
+ {
+-	int i;
+ 	char *str = user_data;
+ 	size_t sz;
+ 	unsigned char *uuid;
+@@ -639,14 +1112,7 @@ static void add_node_setup(struct l_dbus_message *msg, void *user_data)
  	}
  
--	node = l_new(struct remote_node, 1);
--	memcpy(node->uuid, uuid, 16);
--	node->unicast = unicast;
--	node->num_ele = cnt;
--	node->net_idx = prov_net_idx;
-+	remote_add_node(uuid, unicast, cnt, prov_net_idx);
+ 	builder = l_dbus_message_builder_new(msg);
+-
+-	l_dbus_message_builder_enter_array(builder, "y");
+-
+-	for (i = 0; i < (int)sz; i++)
+-		l_dbus_message_builder_append_basic(builder, 'y', &(uuid[i]));
+-
+-	l_dbus_message_builder_leave_array(builder);
+-
++	append_byte_array(builder, uuid, 16);
+ 	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
  
- 	bt_shell_printf("Provisioning done:\n");
--	print_node(node, NULL);
--	l_queue_push_tail(nodes, node);
-+	remote_print_node(unicast);
-+
- 	remove_device(uuid);
- 
- 	prov_address = unicast + cnt;
-@@ -1227,7 +1168,6 @@ int main(int argc, char *argv[])
- 
- 	node_proxies = l_queue_new();
- 	devices = l_queue_new();
--	nodes = l_queue_new();
- 
- 	status = bt_shell_run();
- 
-diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
-new file mode 100644
-index 000000000..46839772f
---- /dev/null
-+++ b/tools/mesh/remote.c
-@@ -0,0 +1,124 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <ell/ell.h>
-+
-+#include "src/shared/shell.h"
-+#include "src/shared/util.h"
-+
-+#include "mesh/mesh-defs.h"
-+#include "tools/mesh/remote.h"
-+
-+static struct l_queue *nodes;
-+
-+void remote_add_node(const uint8_t uuid[16], uint16_t unicast,
-+					uint8_t ele_cnt, uint16_t net_idx)
-+{
-+	struct remote_node *rmt = l_new(struct remote_node, 1);
-+
-+	memcpy(rmt->uuid, uuid, 16);
-+	rmt->unicast = unicast;
-+	rmt->num_ele = ele_cnt;
-+	rmt->net_keys = l_queue_new();
-+
-+	l_queue_push_tail(rmt->net_keys, L_UINT_TO_PTR(net_idx));
-+
-+	if (!nodes)
-+		nodes = l_queue_new();
-+
-+	l_queue_push_tail(nodes, rmt);
-+}
-+
-+static bool match_node_addr(const void *a, const void *b)
-+{
-+	const struct remote_node *rmt = a;
-+	uint16_t addr = L_PTR_TO_UINT(b);
-+
-+	if (addr >= rmt->unicast &&
-+				addr <= (rmt->unicast + rmt->num_ele - 1))
-+		return true;
-+
-+	return false;
-+}
-+
-+uint16_t remote_get_subnet_idx(uint16_t addr)
-+{
-+	struct remote_node *rmt;
-+	uint32_t net_idx;
-+
-+	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
-+
-+	if (!rmt || l_queue_isempty(rmt->net_keys))
-+		return NET_IDX_INVALID;
-+
-+	net_idx = L_PTR_TO_UINT(l_queue_peek_head(rmt->net_keys));
-+
-+	return (uint16_t) net_idx;
-+}
-+
-+static void print_subnet(void *net_key, void *user_data)
-+{
-+	uint16_t net_idx = L_PTR_TO_UINT(net_key);
-+
-+	bt_shell_printf("%3.3x ", net_idx);
-+}
-+
-+static void print_node(void *rmt, void *user_data)
-+{
-+	struct remote_node *node = rmt;
-+	char *str;
-+
-+	bt_shell_printf(COLOR_YELLOW "Mesh node:\n" COLOR_OFF);
-+	str = l_util_hexstring_upper(node->uuid, 16);
-+	bt_shell_printf("\t" COLOR_GREEN "UUID = %s\n" COLOR_OFF, str);
-+	l_free(str);
-+	bt_shell_printf("\t" COLOR_GREEN "primary = %4.4x\n" COLOR_OFF,
-+								node->unicast);
-+	bt_shell_printf("\t" COLOR_GREEN "elements = %u\n" COLOR_OFF,
-+								node->num_ele);
-+	bt_shell_printf("\t" COLOR_GREEN "net_keys = ");
-+	l_queue_foreach(node->net_keys, print_subnet, NULL);
-+	bt_shell_printf("\n" COLOR_OFF);
-+}
-+
-+void remote_print_node(uint16_t addr)
-+{
-+	struct remote_node *rmt;
-+
-+	if (!nodes)
-+		return;
-+
-+	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
-+	if (!rmt)
-+		return;
-+
-+	print_node(rmt, NULL);
-+}
-+
-+void remote_print_all(void)
-+{
-+	if (!nodes)
-+		return;
-+
-+	l_queue_foreach(nodes, print_node, NULL);
-+}
-diff --git a/tools/mesh/remote.h b/tools/mesh/remote.h
-new file mode 100644
-index 000000000..dce1619c0
---- /dev/null
-+++ b/tools/mesh/remote.h
-@@ -0,0 +1,31 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+struct remote_node {
-+	uint16_t unicast;
-+	struct l_queue *net_keys;
-+	uint8_t uuid[16];
-+	uint8_t num_ele;
-+};
-+
-+void remote_add_node(const uint8_t uuid[16], uint16_t unicast,
-+					uint8_t ele_cnt, uint16_t net_idx);
-+uint16_t remote_get_subnet_idx(uint16_t addr);
-+void remote_print_node(uint16_t addr);
-+void remote_print_all(void);
+@@ -683,10 +1149,33 @@ static const struct bt_shell_menu main_menu = {
+ 			"Create new mesh network with one initial node" },
+ 	{ "discover-unprovisioned", "<on/off> [seconds]", cmd_scan_unprov,
+ 			"Look for devices to provision" },
++	{ "appkey-create", "<net_idx> <app_idx>", cmd_create_appkey,
++			"Create a new local AppKey" },
++	{ "appkey-import", "<net_idx> <app_idx> <key>", cmd_import_appkey,
++			"Import a new local AppKey" },
++	{ "appkey-update", "<app_idx>", cmd_update_appkey,
++			"Update local AppKey" },
++	{ "appkey-delete", "<app_idx>", cmd_delete_appkey,
++			"Delete local AppKey" },
++	{ "subnet-create", "<net_idx>", cmd_create_subnet,
++			"Create a new local subnet (NetKey)" },
++	{ "subnet-import", "<net_idx> <key>", cmd_import_subnet,
++			"Import a new local subnet (NetKey)" },
++	{ "subnet-update", "<net_idx>", cmd_update_subnet,
++			"Update local subnet (NetKey)" },
++	{ "subnet-delete", "<net_idx>", cmd_delete_subnet,
++			"Delete local subnet (NetKey)" },
++	{ "subnet-set-phase", "<net_idx> <phase>", cmd_subnet_set_phase,
++			"Set subnet (NetKey) phase" },
+ 	{ "list-unprovisioned", NULL, cmd_list_unprov,
+ 			"List unprovisioned devices" },
+ 	{ "provision", "<uuid>", cmd_start_prov,
+ 			"Initiate provisioning"},
++	{ "node-import", "<uuid> <net_idx> <primary> <ele_count> <dev_key>",
++			cmd_import_node,
++			"Import an externally provisioned remote node"},
++	{ "node-delete", "<primary> <ele_count>", cmd_delete_node,
++			"Delete a remote node"},
+ 	{ "list-nodes", NULL, cmd_list_nodes,
+ 			"List remote mesh nodes"},
+ 	{ } },
 -- 
 2.21.0
 
