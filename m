@@ -2,94 +2,124 @@ Return-Path: <SRS0=CsyS=YW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9230C47E49
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 14:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C32CA9EAE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 20:32:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B91572087E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 14:09:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56C972083E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 20:32:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388712AbfJ2OJC (ORCPT
+        id S1726371AbfJ2UcX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Oct 2019 10:09:02 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:34918 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388578AbfJ2OJC (ORCPT
+        Tue, 29 Oct 2019 16:32:23 -0400
+Received: from emh04.mail.saunalahti.fi ([62.142.5.110]:50856 "EHLO
+        emh04.mail.saunalahti.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725840AbfJ2UcW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Oct 2019 10:09:02 -0400
-Received: by mail-io1-f71.google.com with SMTP id g24so10482308ioc.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2019 07:09:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=ZXDP0wwnNkRnGcZ/hxzyUBVhVAKO5MP3N/7b/HrN89M=;
-        b=JqkECE+9SL0E6Fknt3lW4A/n+K3L0SfWTe2PQig8WUtsGaVtTBPO5BJNQHC5UFCZJQ
-         zErHMXiURNqZKer+TFDnqecdXl4Lj7/PFKdiE7wrf0opXjH4CrUil8en0VGFeHFvbXu8
-         gIH1ooDUAgYVao9YNgtlo2gHJSGU54TXrP5M6ArDAdDW8glsptk0aXveLHQY01/SsuAs
-         W+YUf0+hKYi7z/ig9M9lUOHAN3w075yIQDT4AIiLZ4MRTChPrNkfSTmFxMdABBKYQCSZ
-         tEd9wg7RQh/AsBs41Tmk9AdkOeqYFHaWaGudiPJbT/X6LoSzsWidRcBxy4wp4Ml+DkNt
-         ahow==
-X-Gm-Message-State: APjAAAWYTDpbjxyIPBVj3vAFrcS/5vkM+Z1lLSP4Z/qGcP/aQXxkaw+5
-        3yBOrsRTv9+rVdbdUwUDe0o2PyMhiIVgh0slT6wcvUUVMmHh
-X-Google-Smtp-Source: APXvYqyEO6WTdX2TT1MAC5wh+aMxnQAZiQ9NAP9Ue+ASML0EMHR89Lk5xJp5JZTyc5Ij4tXWW9iYcXeag4DdS0UpQCxA/Rt7L8JZ
+        Tue, 29 Oct 2019 16:32:22 -0400
+Received: from ydin.reaktio.net (reaktio.net [85.76.255.15])
+        by emh04.mail.saunalahti.fi (Postfix) with ESMTP id B3FE630088;
+        Tue, 29 Oct 2019 22:32:19 +0200 (EET)
+Received: by ydin.reaktio.net (Postfix, from userid 1001)
+        id 56E7636C0F6; Tue, 29 Oct 2019 22:32:19 +0200 (EET)
+Date:   Tue, 29 Oct 2019 22:32:19 +0200
+From:   Pasi =?iso-8859-1?Q?K=E4rkk=E4inen?= <pasik@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Subject: Re: [PATCH BlueZ] a2dp: Remove experimental flag for remote
+ MediaEndpoint
+Message-ID: <20191029203218.GM28704@reaktio.net>
+References: <20191018105339.1297-1-luiz.dentz@gmail.com>
+ <CABBYNZJc_Z_w2tTOrWj8RhfOgtvx72dFn7hFE=HehcKKUBX-fw@mail.gmail.com>
 MIME-Version: 1.0
-X-Received: by 2002:a92:8394:: with SMTP id p20mr28056667ilk.73.1572358141217;
- Tue, 29 Oct 2019 07:09:01 -0700 (PDT)
-Date:   Tue, 29 Oct 2019 07:09:01 -0700
-In-Reply-To: <0000000000009ea5720595dc03a3@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007792ff05960d289d@google.com>
-Subject: Re: BUG: MAX_LOCKDEP_KEYS too low!
-From:   syzbot <syzbot+692f39f040c1f415567b@syzkaller.appspotmail.com>
-To:     a@unstable.cc, alex.aring@gmail.com, allison@lohutok.net,
-        andrew@lunn.ch, andy@greyhouse.net, ap420073@gmail.com,
-        aroulin@cumulusnetworks.com, ast@domdv.de,
-        b.a.t.m.a.n@lists.open-mesh.org, bridge@lists.linux-foundation.org,
-        cleech@redhat.com, daniel@iogearbox.net, davem@davemloft.net,
-        dcaratti@redhat.com, dsa@cumulusnetworks.com, edumazet@google.com,
-        f.fainelli@gmail.com, fw@strlen.de, gregkh@linuxfoundation.org,
-        gustavo@embeddedor.com, gvaradar@cisco.com, haiyangz@microsoft.com,
-        idosch@mellanox.com, info@metux.net, ivan.khoronzhuk@linaro.org,
-        j.vosburgh@gmail.com, j@w1.fi, jakub.kicinski@netronome.com,
-        jhs@mojatatu.com, jiri@mellanox.com, jiri@resnulli.us,
-        johan.hedberg@gmail.com, johannes.berg@intel.com,
-        john.hurley@netronome.com, jwi@linux.ibm.com,
-        kstewart@linuxfoundation.org, kvalo@codeaurora.org,
-        kys@microsoft.com, lariel@mellanox.com, linmiaohe@huawei.com,
-        linux-bluetooth@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ppp@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-wpan@vger.kernel.org, liuhangbin@gmail.com,
-        marcel@holtmann.org, mareklindner@neomailbox.ch
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABBYNZJc_Z_w2tTOrWj8RhfOgtvx72dFn7hFE=HehcKKUBX-fw@mail.gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this bug to:
+Hi Luiz,
 
-commit ab92d68fc22f9afab480153bd82a20f6e2533769
-Author: Taehee Yoo <ap420073@gmail.com>
-Date:   Mon Oct 21 18:47:51 2019 +0000
+Now that A2DP codec switching related APIs are declared stable in bluez git,
+I'd like to request bluez 5.52 release soon.
 
-     net: core: add generic lockdep keys
+This is because feature freeze for PulseAudio 14.0 is scheduled for 2019-12-13,
+so It'd be nice to have a bluez release before that.. Also to try to avoid 
+distros shipping bluez 5.51, where MediaEndpoint API isn't stable yet..
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12e05224e00000
-start commit:   60c1769a Add linux-next specific files for 20191028
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=11e05224e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16e05224e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cb86688f30db053d
-dashboard link: https://syzkaller.appspot.com/bug?extid=692f39f040c1f415567b
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10be9ed0e00000
 
-Reported-by: syzbot+692f39f040c1f415567b@syzkaller.appspotmail.com
-Fixes: ab92d68fc22f ("net: core: add generic lockdep keys")
+Thanks a lot,
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+-- Pasi
+
+On Sat, Oct 19, 2019 at 03:03:19PM +0300, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Fri, Oct 18, 2019 at 1:53 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This makes the MediaEndpoint and stable API for remote endpoints which
+> > aligns with RegisterApplication API which is already stable.
+> > ---
+> >  profiles/audio/a2dp.c | 17 +++++------------
+> >  1 file changed, 5 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > index f98ec8505..e8262cdfe 100644
+> > --- a/profiles/audio/a2dp.c
+> > +++ b/profiles/audio/a2dp.c
+> > @@ -1761,7 +1761,7 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
+> >  }
+> >
+> >  static const GDBusMethodTable sep_methods[] = {
+> > -       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("SetConfiguration",
+> > +       { GDBUS_ASYNC_METHOD("SetConfiguration",
+> >                                         GDBUS_ARGS({ "endpoint", "o" },
+> >                                                 { "properties", "a{sv}" } ),
+> >                                         NULL, set_configuration) },
+> > @@ -1837,14 +1837,10 @@ static gboolean get_device(const GDBusPropertyTable *property,
+> >  }
+> >
+> >  static const GDBusPropertyTable sep_properties[] = {
+> > -       { "UUID", "s", get_uuid, NULL, NULL,
+> > -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> > -       { "Codec", "y", get_codec, NULL, NULL,
+> > -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> > -       { "Capabilities", "ay", get_capabilities, NULL, NULL,
+> > -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> > -       { "Device", "o", get_device, NULL, NULL,
+> > -                                       G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> > +       { "UUID", "s", get_uuid, NULL, NULL },
+> > +       { "Codec", "y", get_codec, NULL, NULL },
+> > +       { "Capabilities", "ay", get_capabilities, NULL, NULL },
+> > +       { "Device", "o", get_device, NULL, NULL },
+> >         { }
+> >  };
+> >
+> > @@ -1862,9 +1858,6 @@ static void register_remote_sep(void *data, void *user_data)
+> >         sep->chan = chan;
+> >         sep->sep = rsep;
+> >
+> > -       if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
+> > -               goto done;
+> > -
+> >         if (asprintf(&sep->path, "%s/sep%d",
+> >                                 device_get_path(chan->device),
+> >                                 avdtp_get_seid(rsep)) < 0) {
+> > --
+> > 2.21.0
+> >
+> 
+> Pushed.
+> 
+> -- 
+> Luiz Augusto von Dentz
