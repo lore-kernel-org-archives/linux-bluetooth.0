@@ -2,108 +2,94 @@ Return-Path: <SRS0=CsyS=YW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EDCCA9EAE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 13:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9230C47E49
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 14:09:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BD6720578
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 13:23:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DRc92yvo"
+	by mail.kernel.org (Postfix) with ESMTP id B91572087E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Oct 2019 14:09:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388416AbfJ2NXo (ORCPT
+        id S2388712AbfJ2OJC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Oct 2019 09:23:44 -0400
-Received: from mail-oi1-f174.google.com ([209.85.167.174]:42627 "EHLO
-        mail-oi1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388328AbfJ2NXo (ORCPT
+        Tue, 29 Oct 2019 10:09:02 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:34918 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388578AbfJ2OJC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Oct 2019 09:23:44 -0400
-Received: by mail-oi1-f174.google.com with SMTP id i185so8879104oif.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2019 06:23:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+YvoCgsmMDStvkEgYksBPpHKdqHlFbhAPsTW6KZbxXU=;
-        b=DRc92yvoGCdllIJ0JS+46IjIdVD1KAT4uGgkCfASyH08tapI/vgb5Y1xxBo+wCL8Ou
-         9zjzY2quyvyd+/iMLUpdjy08iKFKTU1dzgITFk4vN/90vQZ46yX4GB1ZC0ZWEd3yDOIy
-         84PRWJzJdHwNPkiOQ3LpM7Ev6x/y8WRaMnMaNWO97AUxOPLyCr3BOnxyPqiZ8UEFP64o
-         fUl2rekcntpQF/gLInMG/EPId2J/OZem5LxCqPqhxc8/UuV5nWPK8peOziSZJ4HFd5ar
-         LQQPhcqoXVGvntVQ709yu4msSCmXM+geM2qEQ3mwjwELrNRPIqj+/z0Q8RE1lKfG4L1Z
-         qWLw==
+        Tue, 29 Oct 2019 10:09:02 -0400
+Received: by mail-io1-f71.google.com with SMTP id g24so10482308ioc.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2019 07:09:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+YvoCgsmMDStvkEgYksBPpHKdqHlFbhAPsTW6KZbxXU=;
-        b=IAmnR/icPLYL0ganw4GLiLIlOaWlyUQCDc48RAgqCs267ENgY2doELRajU4um7RnkY
-         LUhPkSepeiTsNT+USqtsj19bOsfgNd9tXGCiBv253iOLtoD+3xLE+vhCTzoQK2rEiH83
-         uKvUomS08V0DriAqMs9jLNH+WGsatM1uJwEGDSdEFUQKLi49GYw0DVdKiQiz+GKEcFlT
-         s5vttXD3Aik98YFzgYwXmr86PTDqKLUxS4Nqqy2Ma2JbHdpOker1eEPaUNxYOJcfvOu+
-         NRNAk32JyO3ArXi3uoih5MoVDGy/S1BoR80mkH6tW+1t81YkNs1F8LAcmcTU1yaXHeNw
-         Se7Q==
-X-Gm-Message-State: APjAAAWJQOUZAAENcBYgU3mwI1OGKtV4TpYcHXWUi0/gVPgJISN5c21t
-        DBAldYKK6q3lwb7/DiPX0svOc9f4kl30vYDZqprGV70CVxo=
-X-Google-Smtp-Source: APXvYqyDqhrcRgfrBxYZ57ffH+J1IDtn9R/tIyZDYvNPsvD73GZDStfHWGorY46d4E18tcaohwmbqYQSFAEbBpeBI9c=
-X-Received: by 2002:aca:281a:: with SMTP id 26mr3935711oix.82.1572355423158;
- Tue, 29 Oct 2019 06:23:43 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=ZXDP0wwnNkRnGcZ/hxzyUBVhVAKO5MP3N/7b/HrN89M=;
+        b=JqkECE+9SL0E6Fknt3lW4A/n+K3L0SfWTe2PQig8WUtsGaVtTBPO5BJNQHC5UFCZJQ
+         zErHMXiURNqZKer+TFDnqecdXl4Lj7/PFKdiE7wrf0opXjH4CrUil8en0VGFeHFvbXu8
+         gIH1ooDUAgYVao9YNgtlo2gHJSGU54TXrP5M6ArDAdDW8glsptk0aXveLHQY01/SsuAs
+         W+YUf0+hKYi7z/ig9M9lUOHAN3w075yIQDT4AIiLZ4MRTChPrNkfSTmFxMdABBKYQCSZ
+         tEd9wg7RQh/AsBs41Tmk9AdkOeqYFHaWaGudiPJbT/X6LoSzsWidRcBxy4wp4Ml+DkNt
+         ahow==
+X-Gm-Message-State: APjAAAWYTDpbjxyIPBVj3vAFrcS/5vkM+Z1lLSP4Z/qGcP/aQXxkaw+5
+        3yBOrsRTv9+rVdbdUwUDe0o2PyMhiIVgh0slT6wcvUUVMmHh
+X-Google-Smtp-Source: APXvYqyEO6WTdX2TT1MAC5wh+aMxnQAZiQ9NAP9Ue+ASML0EMHR89Lk5xJp5JZTyc5Ij4tXWW9iYcXeag4DdS0UpQCxA/Rt7L8JZ
 MIME-Version: 1.0
-References: <37e50a80d823b267508893db9573a1903c87d0c6.camel@rdmp.org>
-In-Reply-To: <37e50a80d823b267508893db9573a1903c87d0c6.camel@rdmp.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 29 Oct 2019 15:23:30 +0200
-Message-ID: <CABBYNZKzscuNsT6SY7KKiHMrJ2+zWCyxuWHk6UrAFDOu2zhpSw@mail.gmail.com>
-Subject: Re: Audio out to phone
-To:     Dale Mellor <bluez-2hxy5d@rdmp.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Received: by 2002:a92:8394:: with SMTP id p20mr28056667ilk.73.1572358141217;
+ Tue, 29 Oct 2019 07:09:01 -0700 (PDT)
+Date:   Tue, 29 Oct 2019 07:09:01 -0700
+In-Reply-To: <0000000000009ea5720595dc03a3@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007792ff05960d289d@google.com>
+Subject: Re: BUG: MAX_LOCKDEP_KEYS too low!
+From:   syzbot <syzbot+692f39f040c1f415567b@syzkaller.appspotmail.com>
+To:     a@unstable.cc, alex.aring@gmail.com, allison@lohutok.net,
+        andrew@lunn.ch, andy@greyhouse.net, ap420073@gmail.com,
+        aroulin@cumulusnetworks.com, ast@domdv.de,
+        b.a.t.m.a.n@lists.open-mesh.org, bridge@lists.linux-foundation.org,
+        cleech@redhat.com, daniel@iogearbox.net, davem@davemloft.net,
+        dcaratti@redhat.com, dsa@cumulusnetworks.com, edumazet@google.com,
+        f.fainelli@gmail.com, fw@strlen.de, gregkh@linuxfoundation.org,
+        gustavo@embeddedor.com, gvaradar@cisco.com, haiyangz@microsoft.com,
+        idosch@mellanox.com, info@metux.net, ivan.khoronzhuk@linaro.org,
+        j.vosburgh@gmail.com, j@w1.fi, jakub.kicinski@netronome.com,
+        jhs@mojatatu.com, jiri@mellanox.com, jiri@resnulli.us,
+        johan.hedberg@gmail.com, johannes.berg@intel.com,
+        john.hurley@netronome.com, jwi@linux.ibm.com,
+        kstewart@linuxfoundation.org, kvalo@codeaurora.org,
+        kys@microsoft.com, lariel@mellanox.com, linmiaohe@huawei.com,
+        linux-bluetooth@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ppp@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-wpan@vger.kernel.org, liuhangbin@gmail.com,
+        marcel@holtmann.org, mareklindner@neomailbox.ch
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dale,
+syzbot has bisected this bug to:
 
-On Sun, Oct 27, 2019 at 11:07 PM Dale Mellor <bluez-2hxy5d@rdmp.org> wrote:
->
-> Does anybody know of any tricks needed to get audio to go out through
-> an ongoing phone call?  Everything in my setup looks good, with all the
-> right devices and settings in bluetoothctl, pavucontrol (including
-> correct headset/handsfree profiles) and I can hear the caller, but they
-> are only getting silence from my end.  I am using the pulseaudio
-> asynchronous API, which works well enough playing through speakers but
-> I can't get sound through the telephone (an Android device, which works
-> perfectly well with my car's headset).
->
-> bluez5: 5.51
-> ofono:  1.30
-> pulseaudio: 13.0
-> debian: 10 (stable)
-> linux: 5.3.0
->
-> I'm quite desperate to get this sorted, so if it is an unsolved problem
-> perhaps some pointers to where the issue might be will help me to help
-> you debug the situation?  As you see from the updatedness of the
-> packages, I have built them all from source and can dig if necessary.
+commit ab92d68fc22f9afab480153bd82a20f6e2533769
+Author: Taehee Yoo <ap420073@gmail.com>
+Date:   Mon Oct 21 18:47:51 2019 +0000
 
-We will need quite a bit more information to help you, like btmon,
-journal of the components involved (bluetoothd, pulseaudio and ofono).
-If I got it right that is the audio path of your mic -> loopback ->
-bluetooth-src -> sco socket -> hci -> usb iso endpoint that is not
-working? There can be quite many things wrong actually, for the mic
-being muted to the usb endpoint not working, the later is not uncommon
-but you did hear the other side of the call so maybe that is not it.
+     net: core: add generic lockdep keys
 
-> Thanks in advance for any help,
-> Dale
->
->
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12e05224e00000
+start commit:   60c1769a Add linux-next specific files for 20191028
+git tree:       linux-next
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=11e05224e00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16e05224e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cb86688f30db053d
+dashboard link: https://syzkaller.appspot.com/bug?extid=692f39f040c1f415567b
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10be9ed0e00000
 
+Reported-by: syzbot+692f39f040c1f415567b@syzkaller.appspotmail.com
+Fixes: ab92d68fc22f ("net: core: add generic lockdep keys")
 
--- 
-Luiz Augusto von Dentz
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
