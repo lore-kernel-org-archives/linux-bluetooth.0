@@ -5,40 +5,40 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2B6CA9ECE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 22:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 830BBCA9ED0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 22:44:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DF5321929
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 22:44:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 560E921A49
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 22:44:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=bonstra.fr.eu.org header.i=@bonstra.fr.eu.org header.b="jsJXY1/j"
+	dkim=pass (2048-bit key) header.d=bonstra.fr.eu.org header.i=@bonstra.fr.eu.org header.b="SaopYqxw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727562AbfJ3Wo0 (ORCPT
+        id S1727572AbfJ3Wo0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 30 Oct 2019 18:44:26 -0400
-Received: from vault.bonstra.fr.eu.org ([51.158.68.104]:39618 "EHLO
+Received: from vault.bonstra.fr.eu.org ([51.158.68.104]:39630 "EHLO
         vault.bonstra.fr.eu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727165AbfJ3WoZ (ORCPT
+        with ESMTP id S1727299AbfJ3Wo0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Oct 2019 18:44:25 -0400
+        Wed, 30 Oct 2019 18:44:26 -0400
 Received: from val.bonstra.fr.eu.org (unknown [192.168.128.2])
-        by vault.bonstra.fr.eu.org (Postfix) with ESMTP id 28C66BFCB4;
+        by vault.bonstra.fr.eu.org (Postfix) with ESMTP id 361D2BFCC6;
         Wed, 30 Oct 2019 22:44:24 +0000 (UTC)
 Received: from bonstra.fr.eu.org (vlad.gr1 [IPv6:fd7b:45cc:aa3d::3])
-        by val.bonstra.fr.eu.org (Postfix) with ESMTPSA id 799DF60919;
+        by val.bonstra.fr.eu.org (Postfix) with ESMTPSA id CB8D96091B;
         Wed, 30 Oct 2019 23:44:22 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bonstra.fr.eu.org;
         s=dkim1; t=1572475462; x=1573685062;
-        bh=WcI1lb2HPbE6I47E0pUdS9lIXhqiufvTf994SqCaSoQ=;
+        bh=KUMEAnZL4N6k6tG30C1RVO+Vdf45cuydb2lqZsclUS4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=jsJXY1/j/UCI2FROIU9mDLmA6WYMaWfy73EICqeoanir22oEHD8AkQzuiKuCYFpwQ
-         LsWrD6za3n/k+snlTZz+2wYpEvAskfY9Y9g4jQss/WeXZkO7/GbgpHf9klZusfGAAB
-         Y5coHDGF0LOrrWGCd6cTGqOt+gbH9dzvVObatkPUgbX4vPfFM6Ot+V1A0I1aHNaD0B
-         3hQRgDsoy9GQuH4uQ+r+GMRTLLT4OEWy4GvYi5RWuPpz8OLnzuf0MuEgwaSj6uFEI2
-         miX0EvjU+a1tOIHUcptLiY8Hm/mh3RHRoL8g1uqg5wlHX0JZTEHL26uHtw+uKPEXRO
-         sKcEgmpPZU60g==
+        b=SaopYqxwNht4EzSr+K9cmlMHFmezLwWrRRj70KExKjcoCARu7GBrZyFVIK+5gY85D
+         CSjFxx0xHxUM5jxGXiuGipGj7uzHpufwwWp+5D900vPdFu/lpjQTrg1gPiofmM9DDz
+         5rMWjh2oxz9/5cQG/xn2OHa2z3ezdam18eiQaZzWp8JSWo6T7SJ8PoD+hsfNd+Ow6W
+         Q/dLTbxcqrvhwwA9mhc+g4TAGJE5uPfNm0EmW0l+Joos7rbGUNl3kNyXctXxPcIyyu
+         PM4K+JZAnPnf9znMHMd9Uf98In/dvWr7xMcmjNHTcOd1ngyBggEx01WCa5CsTpAQ5s
+         mQbc7ilmDRTiQ==
 From:   Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -49,9 +49,9 @@ To:     Marcel Holtmann <marcel@holtmann.org>,
 Cc:     Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>,
         linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] dt-bindings: net: bluetooth: add DT binding for Realtek controllers
-Date:   Wed, 30 Oct 2019 23:43:31 +0100
-Message-Id: <20191030224333.70241-2-bonstra@bonstra.fr.eu.org>
+Subject: [PATCH v2 2/3] Bluetooth: hci_h5: Add DT support for rtl8723bs
+Date:   Wed, 30 Oct 2019 23:43:32 +0100
+Message-Id: <20191030224333.70241-3-bonstra@bonstra.fr.eu.org>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191030224333.70241-1-bonstra@bonstra.fr.eu.org>
 References: <20191030224333.70241-1-bonstra@bonstra.fr.eu.org>
@@ -62,47 +62,114 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The rtl_bt driver already supports some Realtek controllers on ACPI
+The hci_h5 already supports Realtek controllers discovered via ACPI. This
+commit adds support for discovering via device tree for ACPI-less
 platforms.
-This commit adds bindings for DT-only platforms.
 
 Signed-off-by: Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
 ---
- .../bindings/net/realtek-bluetooth.txt        | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+ drivers/bluetooth/Kconfig  |  2 +-
+ drivers/bluetooth/hci_h5.c | 40 +++++++++++++++++++++++++++++++++-----
+ 2 files changed, 36 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
-new file mode 100644
-index 000000000000..01d4ed146705
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
-@@ -0,0 +1,25 @@
-+Realtek Bluetooth controllers
-+=============================
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index aae665a3a254..48c9a004b033 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -211,7 +211,7 @@ config BT_HCIUART_RTL
+ 	depends on BT_HCIUART
+ 	depends on BT_HCIUART_SERDEV
+ 	depends on GPIOLIB
+-	depends on ACPI
++	depends on (ACPI || OF)
+ 	select BT_HCIUART_3WIRE
+ 	select BT_RTL
+ 	help
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index dacf297baf59..d4aceddaaab2 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -11,6 +11,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/kernel.h>
+ #include <linux/mod_devicetable.h>
++#include <linux/of_device.h>
+ #include <linux/serdev.h>
+ #include <linux/skbuff.h>
+ 
+@@ -782,7 +783,6 @@ static const struct hci_uart_proto h5p = {
+ 
+ static int h5_serdev_probe(struct serdev_device *serdev)
+ {
+-	const struct acpi_device_id *match;
+ 	struct device *dev = &serdev->dev;
+ 	struct h5 *h5;
+ 
+@@ -797,16 +797,32 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 	serdev_device_set_drvdata(serdev, h5);
+ 
+ 	if (has_acpi_companion(dev)) {
+-		match = acpi_match_device(dev->driver->acpi_match_table, dev);
+-		if (!match)
++		const struct acpi_device_id *acpi_match;
 +
-+This documents the binding structure and properties for the serial
-+attached Bluetooth controllers from Realtek.
++		acpi_match = acpi_match_device(
++				dev->driver->acpi_match_table, dev);
++		if (!acpi_match)
+ 			return -ENODEV;
+ 
+-		h5->vnd = (const struct h5_vnd *)match->driver_data;
+-		h5->id  = (char *)match->id;
++		h5->vnd = (const struct h5_vnd *)acpi_match->driver_data;
++		h5->id  = (char *)acpi_match->id;
+ 
+ 		if (h5->vnd->acpi_gpio_map)
+ 			devm_acpi_dev_add_driver_gpios(dev,
+ 						       h5->vnd->acpi_gpio_map);
++	} else if (dev->of_node) {
++		const struct of_device_id *of_match;
++		const char *cfgname = NULL;
 +
-+Required properties:
-+- compatible: currently, only "realtek,rt8723bs-bt" is supported
++		of_match = of_match_device(dev->driver->of_match_table, dev);
++		if (!of_match)
++			return -ENODEV;
 +
-+Optional properties:
-+- enable-gpio: gpio line controlling the power down (BT_DIS#) signal
-+- device-wake: gpio line controlling the device wakeup (BT_WAKE) signal
-+- config-name: postfix added to the name of the firmware file
-+  containing the chip configuration
++		of_property_read_string(dev->of_node,
++					"config-name", &cfgname);
 +
-+Example:
-+
-+&uart1 {
-+	bluetooth {
-+		compatible = "realtek,rtl8723bs-bt";
-+		enable-gpio = <&r_pio 0 4 GPIO_ACTIVE_HIGH>; /* PL4 */
-+		device-wake-gpio = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
-+		config-name = "teres_a64_i";
-+	};
++		h5->vnd = (const struct h5_vnd *)of_match->data;
++		h5->id = cfgname;
+ 	}
+ 
+ 	h5->enable_gpio = devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
+@@ -996,6 +1012,19 @@ static const struct acpi_device_id h5_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
+ #endif
+ 
++#ifdef CONFIG_OF
++static const struct of_device_id h5_of_match[] = {
++#ifdef CONFIG_BT_HCIUART_RTL
++	{
++		.compatible = "realtek,rtl8723bs-bt",
++		.data = &rtl_vnd
++	},
++#endif
++	{ },
 +};
++MODULE_DEVICE_TABLE(of, h5_of_match);
++#endif
++
+ static const struct dev_pm_ops h5_serdev_pm_ops = {
+ 	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
+ };
+@@ -1006,6 +1035,7 @@ static struct serdev_device_driver h5_serdev_driver = {
+ 	.driver = {
+ 		.name = "hci_uart_h5",
+ 		.acpi_match_table = ACPI_PTR(h5_acpi_match),
++		.of_match_table = of_match_ptr(h5_of_match),
+ 		.pm = &h5_serdev_pm_ops,
+ 	},
+ };
 -- 
 2.23.0
 
