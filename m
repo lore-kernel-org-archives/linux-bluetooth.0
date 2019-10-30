@@ -2,248 +2,211 @@ Return-Path: <SRS0=evc1=YX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1B6CA9EC5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 06:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D299ECA9EAF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 06:27:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 090372067D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 06:18:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="lcJUypkm";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="YZkm2TLe"
+	by mail.kernel.org (Postfix) with ESMTP id AAF7B20874
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Oct 2019 06:27:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727183AbfJ3GSO (ORCPT
+        id S1727025AbfJ3G1v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Oct 2019 02:18:14 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:51222 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726187AbfJ3GSO (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Oct 2019 02:18:14 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 030A460E75; Wed, 30 Oct 2019 06:18:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1572416293;
-        bh=l+semFXebyaewXhIfR1W+mrDx2SZahl1h5VAmxacW4s=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=lcJUypkmF8a4h7/i+8euAqQ8YkTSzTiUoFg/3gg5t0KnQlled1Aps9WU1qIzU/W5h
-         qnXNV5U60ajAmUhXwU15d7moLDjJN3n/ZSs/yWXBDdJduQa1yFJUcWCxJTcKdxjNYa
-         szt+4peffZt45xmAIdVkH8akmHicu23JEWp1XI80=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id A5C3A60E75;
-        Wed, 30 Oct 2019 06:18:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1572416291;
-        bh=l+semFXebyaewXhIfR1W+mrDx2SZahl1h5VAmxacW4s=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=YZkm2TLeB5x/Q4TSCaZ3smqgjJJdA5i2ZXZW3ISVWegNoxMnCsqoQkso9oWWf8hcp
-         bb8gJ6xbmM5rG1pXGc+cj4cv85P9zb1RdwIvTOIwJ4G5rl/opnmRTY6YPaQzidBVvu
-         krGhWi3KHnTup8Z9IChYKNOGET9+oqg7gnafRsEU=
+        Wed, 30 Oct 2019 02:27:51 -0400
+Received: from mga07.intel.com ([134.134.136.100]:56391 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726108AbfJ3G1v (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 30 Oct 2019 02:27:51 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 23:27:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,246,1569308400"; 
+   d="scan'208";a="283463591"
+Received: from ingas-nuc1.sea.intel.com ([10.255.229.102])
+  by orsmga001.jf.intel.com with ESMTP; 29 Oct 2019 23:27:50 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Add authorization checks for Manager iface methods
+Date:   Tue, 29 Oct 2019 23:27:49 -0700
+Message-Id: <20191030062749.14343-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 30 Oct 2019 11:48:11 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jeffrey Hugo <jeffrey.l.hugo@gmail.com>,
-        linux-arm-msm@vger.kernel.org,
-        linux-bluetooth-owner@vger.kernel.org, hemantg@codeaurora.org,
-        Harish Bandi <c-hbandi@codeaurora.org>,
-        Stephen Boyd <swboyd@chromium.org>
-Subject: Re: [PATCH 2/4] Bluetooth: hci_qca: Don't vote for specific voltage
-In-Reply-To: <20191022171505.GK20212@google.com>
-References: <20191018052405.3693555-1-bjorn.andersson@linaro.org>
- <20191018052405.3693555-3-bjorn.andersson@linaro.org>
- <20191018182205.GA20212@google.com>
- <7f9a4de91f364a5f8ce707c8d8a2344d@codeaurora.org>
- <5bbd8e5bbd832ecdafc7c2d603f10c6c@codeaurora.org>
- <20191022171505.GK20212@google.com>
-Message-ID: <2ab1d48ef09d779c702cf0342c5094ee@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+This adds a check for org.bluez.mesh.Manager1 interface calls to
+validate that a message sender, i.e. thatt the sender is the original
+owner of the node object generated on Attach() method call.
+If the check fails, org.bluez.mesh.Error.NotAuthorized is returned.
+---
+ mesh/manager.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 57 insertions(+), 3 deletions(-)
 
-On 2019-10-22 22:45, Matthias Kaehlcke wrote:
-> On Tue, Oct 22, 2019 at 11:35:43AM +0530, Balakrishna Godavarthi wrote:
->> Hi Matthias, Bjorn andresson,
->> 
->> On 2019-10-21 12:07, Harish Bandi wrote:
->> > + Bala
->> >
->> > On 2019-10-18 23:52, Matthias Kaehlcke wrote:
->> > > On Thu, Oct 17, 2019 at 10:24:02PM -0700, Bjorn Andersson wrote:
->> > > > Devices with specific voltage requirements should not request voltage
->> > > > from the driver, but instead rely on the system configuration to
->> > > > define
->> > > > appropriate voltages for each rail.
->> > > >
->> > > > This ensures that PMIC and board variations are accounted for,
->> > > > something
->> > > > that the 0.1V range in the hci_qca driver currently tries to address.
->> > > > But on the Lenovo Yoga C630 (with wcn3990) vddch0 is 3.1V, which
->> > > > means
->> > > > the driver will fail to set the voltage.
->> > > >
->> > > > Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
->> > > > ---
->> > > >  drivers/bluetooth/hci_qca.c | 26 ++++++++------------------
->> > > >  1 file changed, 8 insertions(+), 18 deletions(-)
->> > > >
->> > > > diff --git a/drivers/bluetooth/hci_qca.c
->> > > > b/drivers/bluetooth/hci_qca.c
->> > > > index c07c529b0d81..54aafcc69d06 100644
->> > > > --- a/drivers/bluetooth/hci_qca.c
->> > > > +++ b/drivers/bluetooth/hci_qca.c
->> > > > @@ -130,8 +130,6 @@ enum qca_speed_type {
->> > > >   */
->> > > >  struct qca_vreg {
->> > > >  	const char *name;
->> > > > -	unsigned int min_uV;
->> > > > -	unsigned int max_uV;
->> > > >  	unsigned int load_uA;
->> > > >  };
->> > > >
->> > > > @@ -1332,10 +1330,10 @@ static const struct hci_uart_proto
->> > > > qca_proto = {
->> > > >  static const struct qca_vreg_data qca_soc_data_wcn3990 = {
->> > > >  	.soc_type = QCA_WCN3990,
->> > > >  	.vregs = (struct qca_vreg []) {
->> > > > -		{ "vddio",   1800000, 1900000,  15000  },
->> > > > -		{ "vddxo",   1800000, 1900000,  80000  },
->> > > > -		{ "vddrf",   1300000, 1350000,  300000 },
->> > > > -		{ "vddch0",  3300000, 3400000,  450000 },
->> > > > +		{ "vddio", 15000  },
->> > > > +		{ "vddxo", 80000  },
->> > > > +		{ "vddrf", 300000 },
->> > > > +		{ "vddch0", 450000 },
->> > > >  	},
->> > > >  	.num_vregs = 4,
->> > > >  };
->> > > > @@ -1343,10 +1341,10 @@ static const struct qca_vreg_data
->> > > > qca_soc_data_wcn3990 = {
->> > > >  static const struct qca_vreg_data qca_soc_data_wcn3998 = {
->> > > >  	.soc_type = QCA_WCN3998,
->> > > >  	.vregs = (struct qca_vreg []) {
->> > > > -		{ "vddio",   1800000, 1900000,  10000  },
->> > > > -		{ "vddxo",   1800000, 1900000,  80000  },
->> > > > -		{ "vddrf",   1300000, 1352000,  300000 },
->> > > > -		{ "vddch0",  3300000, 3300000,  450000 },
->> > > > +		{ "vddio", 10000  },
->> > > > +		{ "vddxo", 80000  },
->> > > > +		{ "vddrf", 300000 },
->> > > > +		{ "vddch0", 450000 },
->> > > >  	},
->> > > >  	.num_vregs = 4,
->> > > >  };
->> > > > @@ -1386,13 +1384,6 @@ static int qca_power_off(struct hci_dev *hdev)
->> > > >  static int qca_enable_regulator(struct qca_vreg vregs,
->> > > >  				struct regulator *regulator)
->> > > >  {
->> > > > -	int ret;
->> > > > -
->> > > > -	ret = regulator_set_voltage(regulator, vregs.min_uV,
->> > > > -				    vregs.max_uV);
->> > > > -	if (ret)
->> > > > -		return ret;
->> > > > -
->> > > >  	return regulator_enable(regulator);
->> > > >
->> > > >  }
->> > > > @@ -1401,7 +1392,6 @@ static void qca_disable_regulator(struct
->> > > > qca_vreg vregs,
->> > > >  				  struct regulator *regulator)
->> > > >  {
->> > > >  	regulator_disable(regulator);
->> > > > -	regulator_set_voltage(regulator, 0, vregs.max_uV);
->> > > >
->> > > >  }
->> > >
->> > > This was brought up multiple times during the initial review, but
->> > > wasn't addressed.
->> > >
->> > > Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
->> 
->> 
->> yes true PMIC dts regulator should do this.
->> But we have some real time issues observed.
->> 
->> Issue 1:
->> 
->> In PMIC dts node, ASAIK we have three levels of voltages.
->> 
->> 1. Default voltage.
->> 2. Minimum voltage. (mandatory entry)
->> 3. Maximum voltage. (mandatory entry)
->> 
->> Let us assume that the if PMIC regulator dts node supports  defaults 
->> voltage
->> to 3.2 Volts and Min  as 3.1 V and max as 3.3V
->> So default operating voltage is 3.1V  when we turn on BT (but 
->> according to
->> spec SoC requires min of 3.3V to operate,
->> Might have some functionality failures on end to end testing
-> 
-> The PMIC regulator shouldn't be configured with the entire range of 
-> voltages
-> it can generate, but with a range of voltages that is suitable for all 
-> its
-> consumers.
-> 
-> In other words if BT requires a minimum voltage of 3.3V the minimum 
-> voltage
-> of the regulator should be at least 3.3V.
-> 
->> Issue 2:
->> 
->> WCN3990 RF is shared with WiFi, so it also try to turn on the 
->> regulators.
->> Wifi driver uses the same approach of restricting to min and max 
->> voltages in
->> driver.
->> Let us assume we turned ON BT and CH0 is set to 3.1v (as in your 
->> case), Wifi
->> is tuned on now, as its request the CH0 to operate at 3.3 Volts, 
->> regulator
->> will fail to set this voltage as BT is operating
->> at CH0 3.1v (assuming max voltage is 3.2v)
->> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/drivers/net/wireless/ath/ath10k/snoc.c#n39
-> 
-> see above
-> 
->> Issue 3:
->> 
->> By mistake PMIC has low min or default voltage and high max voltages, 
->> that
->> is harm for WNC3990.
->> 
->> I would suggest to restrict the min and max voltages in driver, 
->> instead of
->> relaying on PMIC to do this.
->> BTW pmic will do this and doing it in our driver is safer.
-> 
-> What if another device switches the regulator on before BT?
-> 
-> Again, what you describe is a misconfiguration of the regulator and 
-> should
-> be fixed at its root, instead of implementing unreliable 'safeguards' 
-> in each
-> and every driver using regulators.
-
-Thanks for detail analysis :)
+diff --git a/mesh/manager.c b/mesh/manager.c
+index 633597659..b39ea6ed7 100644
+--- a/mesh/manager.c
++++ b/mesh/manager.c
+@@ -287,6 +287,10 @@ static struct l_dbus_message *import_node_call(struct l_dbus *dbus,
+ 	uint8_t num_ele;
+ 	uint8_t *key;
+ 	uint32_t n;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "qyay", &primary, &num_ele,
+ 								&iter_key))
+@@ -311,6 +315,10 @@ static struct l_dbus_message *delete_node_call(struct l_dbus *dbus,
+ 	struct mesh_net *net = node_get_net(node);
+ 	uint16_t primary;
+ 	uint8_t num_ele;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "qy", &primary, &num_ele))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+@@ -368,6 +376,10 @@ static struct l_dbus_message *start_scan_call(struct l_dbus *dbus,
+ 	uint16_t duration;
+ 	struct mesh_io *io;
+ 	struct mesh_net *net;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "q", &duration))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+@@ -402,11 +414,17 @@ static struct l_dbus_message *cancel_scan_call(struct l_dbus *dbus,
+ 						void *user_data)
+ {
+ 	struct mesh_node *node = user_data;
++	const char *sender = l_dbus_message_get_sender(msg);
+ 
+-	if (scan_node != node)
+-		return dbus_error(msg, MESH_ERROR_BUSY, NULL);
++	if (strcmp(sender, node_get_owner(node)) || !node_is_provisioner(node))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+-	scan_cancel(NULL, node);
++	if (scan_node) {
++		if (scan_node != node)
++			return dbus_error(msg, MESH_ERROR_BUSY, NULL);
++
++		scan_cancel(NULL, node);
++	}
+ 
+ 	return l_dbus_message_new_method_return(msg);
+ }
+@@ -446,6 +464,10 @@ static struct l_dbus_message *create_subnet_call(struct l_dbus *dbus,
+ 	struct mesh_node *node = user_data;
+ 	uint8_t key[16];
+ 	uint16_t net_idx;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "q", &net_idx) ||
+ 						net_idx == PRIMARY_NET_IDX)
+@@ -464,6 +486,10 @@ static struct l_dbus_message *update_subnet_call(struct l_dbus *dbus,
+ 	struct mesh_node *node = user_data;
+ 	struct keyring_net_key key;
+ 	uint16_t net_idx;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "q", &net_idx) ||
+ 						net_idx > MAX_KEY_IDX)
+@@ -501,6 +527,10 @@ static struct l_dbus_message *delete_subnet_call(struct l_dbus *dbus,
+ {
+ 	struct mesh_node *node = user_data;
+ 	uint16_t net_idx;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "q", &net_idx) ||
+ 						net_idx > MAX_KEY_IDX)
+@@ -520,6 +550,10 @@ static struct l_dbus_message *import_subnet_call(struct l_dbus *dbus,
+ 	uint16_t net_idx;
+ 	uint8_t *key;
+ 	uint32_t n;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "qay", &net_idx, &iter_key))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+@@ -574,6 +608,10 @@ static struct l_dbus_message *create_appkey_call(struct l_dbus *dbus,
+ 	struct mesh_node *node = user_data;
+ 	uint16_t net_idx, app_idx;
+ 	uint8_t key[16];
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "qq", &net_idx, &app_idx))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+@@ -591,6 +629,10 @@ static struct l_dbus_message *update_appkey_call(struct l_dbus *dbus,
+ 	struct keyring_net_key net_key;
+ 	struct keyring_app_key app_key;
+ 	uint16_t app_idx;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "q", &app_idx) ||
+ 							app_idx > MAX_KEY_IDX)
+@@ -618,6 +660,10 @@ static struct l_dbus_message *delete_appkey_call(struct l_dbus *dbus,
+ {
+ 	struct mesh_node *node = user_data;
+ 	uint16_t app_idx;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "q", &app_idx))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+@@ -636,6 +682,10 @@ static struct l_dbus_message *import_appkey_call(struct l_dbus *dbus,
+ 	uint16_t net_idx, app_idx;
+ 	uint8_t *key;
+ 	uint32_t n;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "qqay", &net_idx, &app_idx,
+ 								&iter_key))
+@@ -657,6 +707,10 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
+ 	struct keyring_net_key key;
+ 	uint16_t net_idx;
+ 	uint8_t phase;
++	const char *sender = l_dbus_message_get_sender(msg);
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "qy", &net_idx, &phase) ||
+ 					phase == KEY_REFRESH_PHASE_ONE ||
 -- 
-Regards
-Balakrishna.
+2.21.0
+
