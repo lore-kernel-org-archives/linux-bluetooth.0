@@ -2,114 +2,127 @@ Return-Path: <SRS0=Dn6D=YZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B54CCA9ECF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 08:27:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3119FCA9ECF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 14:37:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0355B21734
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 08:27:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572596858;
-	bh=UGrR3iRTKwrbEPN+BHW52XhDbxZkXvMXHC6V2nHaiuU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=cgrFue0kHuj2AuXBeur1WnGYIwHYaXiJTmH0nJkuuxPVlFNtjpx5teTZ86Sde4FDY
-	 gjZZWwFq0BrQbtVflitjsNsye+s/Wpx1un2Vsw9Tywj61Gxyky0xHr/m8dgXyBllbm
-	 u+91VIV8WJd3FSQSIfDJr1byzSCZ1qcc9y4Qbsn4=
+	by mail.kernel.org (Postfix) with ESMTP id 05E472085B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 14:37:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jik2qnog"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730261AbfKAI1h (ORCPT
+        id S1727026AbfKAOhA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Nov 2019 04:27:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45468 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729975AbfKAI1h (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Nov 2019 04:27:37 -0400
-Received: from localhost (lfbn-1-10718-76.w90-89.abo.wanadoo.fr [90.89.68.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 93E34208CB;
-        Fri,  1 Nov 2019 08:27:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572596856;
-        bh=UGrR3iRTKwrbEPN+BHW52XhDbxZkXvMXHC6V2nHaiuU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bmNAWnJ4mnMMumb5K9Z5TPfbVMVSG14pUOCb3DPJ2XA3W3x2H1DIt1TB7ofMdQf/9
-         xPDRzfPxGa0pirP3JilU8xsrw6ZA13MRWl7fwDeFP0EsYSKwGnLb8Rpw92376oeBOC
-         5oB8tSHl21zhhbFjvyD42aR6cbPogZi4FsIaQY2k=
-Date:   Fri, 1 Nov 2019 09:02:56 +0100
-From:   Maxime Ripard <mripard@kernel.org>
-To:     Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: add DT binding for
- Realtek controllers
-Message-ID: <20191101080256.gjc4tacltehro3iw@hendrix>
-References: <20191030224333.70241-1-bonstra@bonstra.fr.eu.org>
- <20191030224333.70241-2-bonstra@bonstra.fr.eu.org>
+        Fri, 1 Nov 2019 10:37:00 -0400
+Received: from mail-oi1-f172.google.com ([209.85.167.172]:42128 "EHLO
+        mail-oi1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726965AbfKAOhA (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Nov 2019 10:37:00 -0400
+Received: by mail-oi1-f172.google.com with SMTP id i185so8308610oif.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2019 07:36:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=/z0ql+Z0To/Vmzz8SGsmXnnjrrlEU+EVEPhLRCxTFFQ=;
+        b=Jik2qnogplT41W8MQ1GOE+/uuu/yplspA8/j72SbL+829CAWNTds9PtUPTW8rkHXgk
+         Ch8eNJk8B9f+fnNBprXO8i7/0voP7jcMXDDHIiYiBNqG9Ycv+FKBa6pAkiVcF64nZPNh
+         xayhgFpodg2DMoFLG1S8mBKxG24Y2Gr/uCI9omNzfAqEult6sOpyj70YD6q9auCO1jPP
+         LZcFgzCyYnBs7t+3O0awvcstoGPexM8iJ67Wi5SoD5lhDaRtuRi+PQ+J2cZCkPQ7xVQW
+         XK1BR6nTsI4QHyjYyPWQg4y0ME7kwVC8FUDDyoAjNSBLq3qoIa3Jdo9emB0JZnnk2MFz
+         PzuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=/z0ql+Z0To/Vmzz8SGsmXnnjrrlEU+EVEPhLRCxTFFQ=;
+        b=ACzDXM/6twk2CARBZO9lk53rp1nBY5LBtNi1bee/4/xcrNWllDtsERqFl8icyX0VAh
+         +ZL4Y/WJH1lBdZjWOX3J3lrdlgVudt7W0Ukik9azJPwSx0eb8tq1fIUlRQGhXZQ4Cts1
+         zrPZqtASd5Eaqo+totWx8lqg3bFgvqdGWy6EN2+UckVsw74asCjUnagllsB29y7+RbwB
+         AaQqCtb+cScHVoevMlYYfz7oWKtgEyh8PY1KW+wxtqDLEcTw+ifxses6+LxjoyN4jyAk
+         c5PtM/Sv27eT6/lHtWO6c7uq/1MIHduSODcab2dsGzIbvnQzrTwssldqXADKPrwSrGvy
+         +WmA==
+X-Gm-Message-State: APjAAAVjJszsseR60iFPCfTY5wIAjlFJXiZYhLgzxAwey6x0sVWPArAK
+        rc9u0BrCWlZwwiooPw7uqXEL4KEu2c5/GiZeI+XpKyeUQZU=
+X-Google-Smtp-Source: APXvYqz1k7xwJYL+Vf5gLlIhBQ+RJ9VL7Udx23P0MsIhSQ7xDSHL/hbkl4rM3R8OJd4UDURqubdfsiic874YEmH0Na0=
+X-Received: by 2002:aca:de88:: with SMTP id v130mr2874098oig.108.1572619017377;
+ Fri, 01 Nov 2019 07:36:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191030224333.70241-2-bonstra@bonstra.fr.eu.org>
+References: <PR1PR07MB4858E3C5706803AD2DF72194C7600@PR1PR07MB4858.eurprd07.prod.outlook.com>
+In-Reply-To: <PR1PR07MB4858E3C5706803AD2DF72194C7600@PR1PR07MB4858.eurprd07.prod.outlook.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 1 Nov 2019 16:36:45 +0200
+Message-ID: <CABBYNZJHWr0xdu8TKN7Hhjqt71SeTtEPJ=zr+DgPq+a4cSS3Vg@mail.gmail.com>
+Subject: Re: Bluez 5.50 Qualification tests
+To:     "Sanchez Frias, Cesar (Nokia - ES/Madrid)" 
+        <cesar.sanchez_frias@nokia.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hugo,
+Hi Cesar,
 
-On Wed, Oct 30, 2019 at 11:43:31PM +0100, Hugo Grostabussiat wrote:
-> The rtl_bt driver already supports some Realtek controllers on ACPI
-> platforms.
-> This commit adds bindings for DT-only platforms.
+On Wed, Oct 30, 2019 at 10:17 AM Sanchez Frias, Cesar (Nokia -
+ES/Madrid) <cesar.sanchez_frias@nokia.com> wrote:
 >
-> Signed-off-by: Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
-> ---
->  .../bindings/net/realtek-bluetooth.txt        | 25 +++++++++++++++++++
->  1 file changed, 25 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+> Hi everybody,
+>
+> We are currently passing BlueZ 5.50 (LE Host Subsystem) qualification pro=
+cess.
+>
+> I would like to know if anyone has already passed test cases "L2CAP/LE/CF=
+C/BV-13-C" and "L2CAP/LE/CFC/BV-15-C".
+>
+> Test case "L2CAP/LE/CFC/BV-13-C" seems to require authorization at GATT s=
+ervice level instead of GATT characteristic level. Does it have sense? As f=
+ar as I have seen there is no way in BlueZ tools (bluetoothctl, gatttool) t=
+o add authorization requirement to services, is it?
 
-You should write that binding using a YAML description. Free-form
-device tree bindings are more or less deprecated now.
+The names suggests it is L2CAP testing or is it not? Anyway if that
+requires GATT/ATT error 0x08 (BT_ATT_ERROR_AUTHORIZATION) all you need
+to do is to return the D-Bus error 'org.bluez.Error.NotAuthorized' as
+it will get translated like bellow:
 
-> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
-> new file mode 100644
-> index 000000000000..01d4ed146705
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
-> @@ -0,0 +1,25 @@
-> +Realtek Bluetooth controllers
-> +=============================
-> +
-> +This documents the binding structure and properties for the serial
-> +attached Bluetooth controllers from Realtek.
-> +
-> +Required properties:
-> +- compatible: currently, only "realtek,rt8723bs-bt" is supported
-> +
-> +Optional properties:
-> +- enable-gpio: gpio line controlling the power down (BT_DIS#) signal
-> +- device-wake: gpio line controlling the device wakeup (BT_WAKE) signal
-> +- config-name: postfix added to the name of the firmware file
-> +  containing the chip configuration
-> +
-> +Example:
-> +
-> +&uart1 {
-> +	bluetooth {
-> +		compatible = "realtek,rtl8723bs-bt";
-> +		enable-gpio = <&r_pio 0 4 GPIO_ACTIVE_HIGH>; /* PL4 */
-> +		device-wake-gpio = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
-> +		config-name = "teres_a64_i";
+    if (strcmp(error_name, "org.bluez.Error.NotAuthorized") =3D=3D 0)
+        return BT_ATT_ERROR_AUTHORIZATION;
 
-IIRC, that has been discussed before and the standard "model" property
-was to be preferred.
+> KR,
+> C=C3=A9sar
 
-Maxime
+
+
+--=20
+Luiz Augusto von Dentz
+
+On Wed, Oct 30, 2019 at 10:17 AM Sanchez Frias, Cesar (Nokia -
+ES/Madrid) <cesar.sanchez_frias@nokia.com> wrote:
+>
+> Hi everybody,
+>
+> We are currently passing BlueZ 5.50 (LE Host Subsystem) qualification pro=
+cess.
+>
+> I would like to know if anyone has already passed test cases "L2CAP/LE/CF=
+C/BV-13-C" and "L2CAP/LE/CFC/BV-15-C".
+>
+> Test case "L2CAP/LE/CFC/BV-13-C" seems to require authorization at GATT s=
+ervice level instead of GATT characteristic level. Does it have sense? As f=
+ar as I have seen there is no way in BlueZ tools (bluetoothctl, gatttool) t=
+o add authorization requirement to services, is it?
+>
+> KR,
+> C=C3=A9sar
+
+
+
+--=20
+Luiz Augusto von Dentz
