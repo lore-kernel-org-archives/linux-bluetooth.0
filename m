@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A2DCA9ED0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F0ECA9ED0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 709AF217D9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BD55217D9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727555AbfKAS5d (ORCPT
+        id S1727573AbfKAS5h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Nov 2019 14:57:33 -0400
+        Fri, 1 Nov 2019 14:57:37 -0400
 Received: from mga05.intel.com ([192.55.52.43]:29978 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727372AbfKAS5c (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Nov 2019 14:57:32 -0400
+        id S1727372AbfKAS5h (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Nov 2019 14:57:37 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Nov 2019 11:57:32 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Nov 2019 11:57:36 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,256,1569308400"; 
-   d="scan'208";a="211833713"
+   d="scan'208";a="211833762"
 Received: from ingas-nuc1.sea.intel.com ([10.255.230.110])
-  by fmsmga001.fm.intel.com with ESMTP; 01 Nov 2019 11:57:32 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 01 Nov 2019 11:57:36 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 02/10 v2] tools/mesh: Move meshctl specific files to mesh-gatt
-Date:   Fri,  1 Nov 2019 11:57:21 -0700
-Message-Id: <20191101185729.31661-3-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 04/10 v2] tools/mesh: move remote node processing to a separate file
+Date:   Fri,  1 Nov 2019 11:57:23 -0700
+Message-Id: <20191101185729.31661-5-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191101185729.31661-1-inga.stotland@intel.com>
 References: <20191101185729.31661-1-inga.stotland@intel.com>
@@ -44,466 +44,359 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This confines the functionality related to remote node
+housekeeping into a separate file remote.c
 ---
- Makefile.tools                            | 30 +++++++++++++----------
- tools/{mesh => mesh-gatt}/README          |  0
- tools/{mesh => mesh-gatt}/config-client.c | 14 ++++++-----
- tools/{mesh => mesh-gatt}/config-server.c | 14 +++++------
- tools/{mesh => mesh-gatt}/crypto.c        |  5 ++--
- tools/{mesh => mesh-gatt}/crypto.h        |  0
- tools/{mesh => mesh-gatt}/gatt.c          | 11 +++++----
- tools/{mesh => mesh-gatt}/gatt.h          |  0
- tools/{mesh => mesh-gatt}/keys.h          |  0
- tools/{mesh => mesh-gatt}/local_node.json |  0
- tools/{mesh => mesh-gatt}/mesh-net.h      |  0
- tools/{mesh => mesh-gatt}/net.c           | 16 ++++++------
- tools/{mesh => mesh-gatt}/net.h           |  0
- tools/{mesh => mesh-gatt}/node.c          | 16 ++++++------
- tools/{mesh => mesh-gatt}/node.h          |  0
- tools/{mesh => mesh-gatt}/onoff-model.c   | 15 ++++++------
- tools/{mesh => mesh-gatt}/onoff-model.h   |  0
- tools/{mesh => mesh-gatt}/prov-db.c       | 14 +++++------
- tools/{mesh => mesh-gatt}/prov-db.h       |  0
- tools/{mesh => mesh-gatt}/prov.c          | 16 ++++++------
- tools/{mesh => mesh-gatt}/prov.h          |  0
- tools/{mesh => mesh-gatt}/prov_db.json    |  0
- tools/{mesh => mesh-gatt}/util.c          |  7 +++---
- tools/{mesh => mesh-gatt}/util.h          |  0
- tools/meshctl.c                           | 22 +++++++++--------
- 25 files changed, 98 insertions(+), 82 deletions(-)
- rename tools/{mesh => mesh-gatt}/README (100%)
- rename tools/{mesh => mesh-gatt}/config-client.c (99%)
- rename tools/{mesh => mesh-gatt}/config-server.c (94%)
- rename tools/{mesh => mesh-gatt}/crypto.c (99%)
- rename tools/{mesh => mesh-gatt}/crypto.h (100%)
- rename tools/{mesh => mesh-gatt}/gatt.c (98%)
- rename tools/{mesh => mesh-gatt}/gatt.h (100%)
- rename tools/{mesh => mesh-gatt}/keys.h (100%)
- rename tools/{mesh => mesh-gatt}/local_node.json (100%)
- rename tools/{mesh => mesh-gatt}/mesh-net.h (100%)
- rename tools/{mesh => mesh-gatt}/net.c (99%)
- rename tools/{mesh => mesh-gatt}/net.h (100%)
- rename tools/{mesh => mesh-gatt}/node.c (98%)
- rename tools/{mesh => mesh-gatt}/node.h (100%)
- rename tools/{mesh => mesh-gatt}/onoff-model.c (96%)
- rename tools/{mesh => mesh-gatt}/onoff-model.h (100%)
- rename tools/{mesh => mesh-gatt}/prov-db.c (99%)
- rename tools/{mesh => mesh-gatt}/prov-db.h (100%)
- rename tools/{mesh => mesh-gatt}/prov.c (98%)
- rename tools/{mesh => mesh-gatt}/prov.h (100%)
- rename tools/{mesh => mesh-gatt}/prov_db.json (100%)
- rename tools/{mesh => mesh-gatt}/util.c (98%)
- rename tools/{mesh => mesh-gatt}/util.h (100%)
+ Makefile.tools         |   2 +
+ tools/mesh-cfgclient.c |  76 +++----------------------
+ tools/mesh/remote.c    | 124 +++++++++++++++++++++++++++++++++++++++++
+ tools/mesh/remote.h    |  31 +++++++++++
+ 4 files changed, 165 insertions(+), 68 deletions(-)
+ create mode 100644 tools/mesh/remote.c
+ create mode 100644 tools/mesh/remote.h
 
 diff --git a/Makefile.tools b/Makefile.tools
-index 7ce05b7ef..feb2c8550 100644
+index 12687e495..0b4ddf576 100644
 --- a/Makefile.tools
 +++ b/Makefile.tools
-@@ -304,25 +304,29 @@ if MESH
- bin_PROGRAMS += tools/meshctl
- 
- tools_meshctl_SOURCES = tools/meshctl.c \
--				tools/mesh/mesh-net.h \
--				tools/mesh/node.h tools/mesh/node.c \
--				tools/mesh/gatt.h tools/mesh/gatt.c \
--				tools/mesh/crypto.h tools/mesh/crypto.c \
--				tools/mesh/keys.h \
--				tools/mesh/net.h tools/mesh/net.c \
--				tools/mesh/prov.h tools/mesh/prov.c \
--				tools/mesh/util.h tools/mesh/util.c \
- 				tools/mesh/agent.h tools/mesh/agent.c \
--				tools/mesh/prov-db.h tools/mesh/prov-db.c \
--				tools/mesh/config-model.h tools/mesh/config-client.c \
--				tools/mesh/config-server.c \
--				tools/mesh/onoff-model.h tools/mesh/onoff-model.c
-+				tools/mesh/config-model.h\
-+				tools/mesh-gatt/mesh-net.h \
-+				tools/mesh-gatt/node.h tools/mesh-gatt/node.c \
-+				tools/mesh-gatt/gatt.h tools/mesh-gatt/gatt.c \
-+				tools/mesh-gatt/crypto.h\
-+				tools/mesh-gatt/crypto.c \
-+				tools/mesh-gatt/keys.h \
-+				tools/mesh-gatt/net.h tools/mesh-gatt/net.c \
-+				tools/mesh-gatt/prov.h tools/mesh-gatt/prov.c \
-+				tools/mesh-gatt/util.h tools/mesh-gatt/util.c \
-+				tools/mesh-gatt/prov-db.h \
-+				tools/mesh-gatt/prov-db.c \
-+				tools/mesh-gatt/config-client.c \
-+				tools/mesh-gatt/config-server.c \
-+				tools/mesh-gatt/onoff-model.h \
-+				tools/mesh-gatt/onoff-model.c
- tools_meshctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
- 				lib/libbluetooth-internal.la \
- 				$(GLIB_LIBS) $(DBUS_LIBS) -ljson-c -lreadline
+@@ -332,7 +332,9 @@ tools_mesh_cfgclient_SOURCES = tools/mesh-cfgclient.c \
+ 				tools/mesh/cfgcli.h tools/mesh/cfgcli.c \
+ 				tools/mesh/keys.h tools/mesh/keys.c \
+ 				tools/mesh/util.h tools/mesh/util.c \
++				tools/mesh/remote.h tools/mesh/remote.c \
+ 				tools/mesh/agent.h tools/mesh/agent.c
++
+ tools_mesh_cfgclient_LDADD = lib/libbluetooth-internal.la src/libshared-ell.la \
+ 						$(ell_ldadd) -lreadline
  endif
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index 24e0a910a..c932cc3c5 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -39,6 +39,7 @@
+ #include "tools/mesh/cfgcli.h"
+ #include "tools/mesh/keys.h"
+ #include "tools/mesh/model.h"
++#include "tools/mesh/remote.h"
  
--EXTRA_DIST += tools/mesh/local_node.json tools/mesh/prov_db.json
-+EXTRA_DIST += tools/mesh-gatt/local_node.json tools/mesh-gatt/prov_db.json
+ #define PROMPT_ON	COLOR_BLUE "[mesh-cfgclient]" COLOR_OFF "# "
+ #define PROMPT_OFF	"Waiting to connect to bluetooth-meshd..."
+@@ -84,13 +85,6 @@ struct unprov_device {
+ 	uint8_t uuid[16];
+ };
  
- if DEPRECATED
- bin_PROGRAMS += tools/hciattach tools/hciconfig tools/hcitool tools/hcidump \
-diff --git a/tools/mesh/README b/tools/mesh-gatt/README
-similarity index 100%
-rename from tools/mesh/README
-rename to tools/mesh-gatt/README
-diff --git a/tools/mesh/config-client.c b/tools/mesh-gatt/config-client.c
-similarity index 99%
-rename from tools/mesh/config-client.c
-rename to tools/mesh-gatt/config-client.c
-index df2643622..5e6374f2b 100644
---- a/tools/mesh/config-client.c
-+++ b/tools/mesh-gatt/config-client.c
-@@ -39,14 +39,16 @@
+-struct remote_node {
+-	uint16_t unicast;
+-	uint16_t net_idx;
+-	uint8_t uuid[16];
+-	uint8_t num_ele;
+-};
+-
+ static struct l_dbus *dbus;
  
- #include "src/shared/shell.h"
- #include "src/shared/util.h"
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/keys.h"
--#include "tools/mesh/net.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/prov-db.h"
--#include "tools/mesh/util.h"
-+
- #include "tools/mesh/config-model.h"
+ static struct l_queue *node_proxies;
+@@ -99,7 +93,6 @@ static struct meshcfg_node *local;
+ static struct model_info *cfgcli;
  
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/keys.h"
-+#include "tools/mesh-gatt/net.h"
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/prov-db.h"
-+#include "tools/mesh-gatt/util.h"
-+
- #define MIN_COMPOSITION_LEN 16
+ static struct l_queue *devices;
+-static struct l_queue *nodes;
  
- static uint32_t print_mod_id(uint8_t *data, bool vid)
-diff --git a/tools/mesh/config-server.c b/tools/mesh-gatt/config-server.c
-similarity index 94%
-rename from tools/mesh/config-server.c
-rename to tools/mesh-gatt/config-server.c
-index 55035bacf..8fc6edcc0 100644
---- a/tools/mesh/config-server.c
-+++ b/tools/mesh-gatt/config-server.c
-@@ -36,16 +36,16 @@
- #include <wordexp.h>
+ static bool prov_in_progress;
+ static const char *caps[2] = {"out-numeric", "in-numeric"};
+@@ -192,37 +185,6 @@ static void print_device(void *a, void *b)
+ 	l_free(str);
+ }
  
- #include <glib.h>
-+#include "tools/mesh/config-model.h"
+-static bool match_node_addr(const void *a, const void *b)
+-{
+-	const struct remote_node *rmt = a;
+-	uint16_t addr = L_PTR_TO_UINT(b);
+-
+-	if (addr >= rmt->unicast &&
+-				addr <= (rmt->unicast + rmt->num_ele - 1))
+-		return true;
+-
+-	return false;
+-}
+-
+-static uint16_t get_primary_subnet_idx(uint16_t addr)
+-{
+-	struct remote_node *rmt;
+-
+-	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
+-
+-	if (!rmt) {
+-		bt_shell_printf("Net key not found: trying %4.4x\n",
+-			PRIMARY_NET_IDX);
+-		return prov_net_idx;
+-		/*
+-		 * TODO: When the remote node recovery from storage is
+-		 * implemented, return NET_IDX_INVALID" here.
+-		 */
+-	}
+-
+-	return rmt->net_idx;
+-}
+-
+ struct send_data {
+ 	const char *ele_path;
+ 	bool rmt;
+@@ -278,7 +240,7 @@ static bool send_msg(void *user_data, uint16_t dst, uint16_t idx,
+ 	method_name = is_dev_key ? "DevKeySend" : "Send";
  
- #include "src/shared/util.h"
- #include "src/shared/shell.h"
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/keys.h"
--#include "tools/mesh/net.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/prov-db.h"
--#include "tools/mesh/util.h"
--#include "tools/mesh/config-model.h"
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/keys.h"
-+#include "tools/mesh-gatt/net.h"
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/prov-db.h"
-+#include "tools/mesh-gatt/util.h"
+ 	if (is_dev_key) {
+-		net_idx_tx = get_primary_subnet_idx(dst);
++		net_idx_tx = remote_get_subnet_idx(dst);
+ 		if (net_idx_tx == NET_IDX_INVALID)
+ 			return false;
+ 	}
+@@ -319,7 +281,7 @@ static bool send_key(void *user_data, uint16_t dst, uint16_t key_idx,
+ 	uint16_t net_idx;
+ 	const char *method_name = (!is_appkey) ? "AddNetKey" : "AddAppKey";
  
- static bool server_msg_recvd(uint16_t src, uint8_t *data,
- 				uint16_t len, void *user_data)
-diff --git a/tools/mesh/crypto.c b/tools/mesh-gatt/crypto.c
-similarity index 99%
-rename from tools/mesh/crypto.c
-rename to tools/mesh-gatt/crypto.c
-index 9935612cf..493b502ca 100644
---- a/tools/mesh/crypto.c
-+++ b/tools/mesh-gatt/crypto.c
-@@ -43,8 +43,9 @@
- #endif
+-	net_idx = get_primary_subnet_idx(dst);
++	net_idx = remote_get_subnet_idx(dst);
+ 	if (net_idx == NET_IDX_INVALID)
+ 		return false;
  
- #include "src/shared/util.h"
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/crypto.h"
-+
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/crypto.h"
+@@ -544,6 +506,7 @@ static void create_net_reply(struct l_dbus_proxy *proxy,
+ 	bt_shell_printf("Created new node with token %s\n", str);
+ 	l_free(str);
  
- static int alg_new(int fd, const void *keyval, socklen_t keylen,
- 		size_t mic_size)
-diff --git a/tools/mesh/crypto.h b/tools/mesh-gatt/crypto.h
-similarity index 100%
-rename from tools/mesh/crypto.h
-rename to tools/mesh-gatt/crypto.h
-diff --git a/tools/mesh/gatt.c b/tools/mesh-gatt/gatt.c
-similarity index 98%
-rename from tools/mesh/gatt.c
-rename to tools/mesh-gatt/gatt.c
-index 0a942d4eb..bff594733 100644
---- a/tools/mesh/gatt.c
-+++ b/tools/mesh-gatt/gatt.c
-@@ -40,11 +40,12 @@
- #include "gdbus/gdbus.h"
- #include "lib/bluetooth.h"
- #include "lib/uuid.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/util.h"
--#include "tools/mesh/gatt.h"
--#include "tools/mesh/prov.h"
--#include "tools/mesh/net.h"
-+
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/util.h"
-+#include "tools/mesh-gatt/gatt.h"
-+#include "tools/mesh-gatt/prov.h"
-+#include "tools/mesh-gatt/net.h"
++	remote_add_node(app.uuid, 0x0001, 1, PRIMARY_NET_IDX);
+ 	keys_add_net_key(PRIMARY_NET_IDX);
  
- #define MESH_PROV_DATA_OUT_UUID_STR	"00002adc-0000-1000-8000-00805f9b34fb"
- #define MESH_PROXY_DATA_OUT_UUID_STR	"00002ade-0000-1000-8000-00805f9b34fb"
-diff --git a/tools/mesh/gatt.h b/tools/mesh-gatt/gatt.h
-similarity index 100%
-rename from tools/mesh/gatt.h
-rename to tools/mesh-gatt/gatt.h
-diff --git a/tools/mesh/keys.h b/tools/mesh-gatt/keys.h
-similarity index 100%
-rename from tools/mesh/keys.h
-rename to tools/mesh-gatt/keys.h
-diff --git a/tools/mesh/local_node.json b/tools/mesh-gatt/local_node.json
-similarity index 100%
-rename from tools/mesh/local_node.json
-rename to tools/mesh-gatt/local_node.json
-diff --git a/tools/mesh/mesh-net.h b/tools/mesh-gatt/mesh-net.h
-similarity index 100%
-rename from tools/mesh/mesh-net.h
-rename to tools/mesh-gatt/mesh-net.h
-diff --git a/tools/mesh/net.c b/tools/mesh-gatt/net.c
-similarity index 99%
-rename from tools/mesh/net.c
-rename to tools/mesh-gatt/net.c
-index f1ef23ab8..e8171c677 100644
---- a/tools/mesh/net.c
-+++ b/tools/mesh-gatt/net.c
-@@ -35,14 +35,14 @@
- #include "src/shared/util.h"
- #include "src/shared/shell.h"
+ 	l_dbus_proxy_method_call(net_proxy, "Attach", attach_node_setup,
+@@ -641,26 +604,9 @@ static void cmd_list_unprov(int argc, char *argv[])
+ 	l_queue_foreach(devices, print_device, NULL);
+ }
  
--#include "tools/mesh/crypto.h"
--#include "tools/mesh/gatt.h"
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/util.h"
--#include "tools/mesh/keys.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/prov-db.h"
--#include "tools/mesh/net.h"
-+#include "tools/mesh-gatt/crypto.h"
-+#include "tools/mesh-gatt/gatt.h"
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/util.h"
-+#include "tools/mesh-gatt/keys.h"
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/prov-db.h"
-+#include "tools/mesh-gatt/net.h"
- 
- struct address_range
+-static void print_node(void *a, void *b)
+-{
+-	struct remote_node *node = a;
+-	char *str;
+-
+-	bt_shell_printf(COLOR_YELLOW "Mesh node:\n" COLOR_OFF);
+-	str = l_util_hexstring_upper(node->uuid, 16);
+-	bt_shell_printf("\t" COLOR_GREEN "UUID = %s\n" COLOR_OFF, str);
+-	l_free(str);
+-	bt_shell_printf("\t" COLOR_GREEN "primary = %4.4x\n" COLOR_OFF,
+-								node->unicast);
+-	bt_shell_printf("\t" COLOR_GREEN "elements = %u\n" COLOR_OFF,
+-								node->num_ele);
+-	bt_shell_printf("\t" COLOR_GREEN "net_key_idx = %3.3x\n" COLOR_OFF,
+-								node->net_idx);
+-}
+-
+ static void cmd_list_nodes(int argc, char *argv[])
  {
-diff --git a/tools/mesh/net.h b/tools/mesh-gatt/net.h
-similarity index 100%
-rename from tools/mesh/net.h
-rename to tools/mesh-gatt/net.h
-diff --git a/tools/mesh/node.c b/tools/mesh-gatt/node.c
-similarity index 98%
-rename from tools/mesh/node.c
-rename to tools/mesh-gatt/node.c
-index d23315ce4..6afa6d6ab 100644
---- a/tools/mesh/node.c
-+++ b/tools/mesh-gatt/node.c
-@@ -39,14 +39,16 @@
- #include "src/shared/util.h"
- #include "src/shared/shell.h"
- #include "gdbus/gdbus.h"
--#include "tools/mesh/mesh-net.h"
+-	l_queue_foreach(nodes, print_node, NULL);
++	remote_print_all();
+ }
+ 
+ static void add_node_reply(struct l_dbus_proxy *proxy,
+@@ -972,7 +918,6 @@ static struct l_dbus_message *add_node_cmplt_call(struct l_dbus *dbus,
+ 	uint8_t cnt;
+ 	uint32_t n;
+ 	uint8_t *uuid;
+-	struct remote_node *node;
+ 
+ 	if (!prov_in_progress)
+ 		return l_dbus_message_new_error(msg, dbus_err_fail, NULL);
+@@ -991,15 +936,11 @@ static struct l_dbus_message *add_node_cmplt_call(struct l_dbus *dbus,
+ 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
+ 	}
+ 
+-	node = l_new(struct remote_node, 1);
+-	memcpy(node->uuid, uuid, 16);
+-	node->unicast = unicast;
+-	node->num_ele = cnt;
+-	node->net_idx = prov_net_idx;
++	remote_add_node(uuid, unicast, cnt, prov_net_idx);
+ 
+ 	bt_shell_printf("Provisioning done:\n");
+-	print_node(node, NULL);
+-	l_queue_push_tail(nodes, node);
++	remote_print_node(unicast);
 +
- #include "tools/mesh/config-model.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/keys.h"
--#include "tools/mesh/gatt.h"
--#include "tools/mesh/net.h"
--#include "tools/mesh/prov-db.h"
--#include "tools/mesh/util.h"
+ 	remove_device(uuid);
+ 
+ 	prov_address = unicast + cnt;
+@@ -1227,7 +1168,6 @@ int main(int argc, char *argv[])
+ 
+ 	node_proxies = l_queue_new();
+ 	devices = l_queue_new();
+-	nodes = l_queue_new();
+ 
+ 	status = bt_shell_run();
+ 
+diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
+new file mode 100644
+index 000000000..46839772f
+--- /dev/null
++++ b/tools/mesh/remote.c
+@@ -0,0 +1,124 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/keys.h"
-+#include "tools/mesh-gatt/gatt.h"
-+#include "tools/mesh-gatt/net.h"
-+#include "tools/mesh-gatt/prov-db.h"
-+#include "tools/mesh-gatt/util.h"
- 
- struct mesh_model {
- 	struct mesh_model_ops cbs;
-diff --git a/tools/mesh/node.h b/tools/mesh-gatt/node.h
-similarity index 100%
-rename from tools/mesh/node.h
-rename to tools/mesh-gatt/node.h
-diff --git a/tools/mesh/onoff-model.c b/tools/mesh-gatt/onoff-model.c
-similarity index 96%
-rename from tools/mesh/onoff-model.c
-rename to tools/mesh-gatt/onoff-model.c
-index b52afe2c8..92c9a3105 100644
---- a/tools/mesh/onoff-model.c
-+++ b/tools/mesh-gatt/onoff-model.c
-@@ -40,13 +40,14 @@
- 
- #include "src/shared/shell.h"
- #include "src/shared/util.h"
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/keys.h"
--#include "tools/mesh/net.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/prov-db.h"
--#include "tools/mesh/util.h"
--#include "tools/mesh/onoff-model.h"
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/keys.h"
-+#include "tools/mesh-gatt/net.h"
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/prov-db.h"
-+#include "tools/mesh-gatt/util.h"
-+#include "tools/mesh-gatt/onoff-model.h"
- 
- static uint8_t trans_id;
- static uint16_t onoff_app_idx = APP_IDX_INVALID;
-diff --git a/tools/mesh/onoff-model.h b/tools/mesh-gatt/onoff-model.h
-similarity index 100%
-rename from tools/mesh/onoff-model.h
-rename to tools/mesh-gatt/onoff-model.h
-diff --git a/tools/mesh/prov-db.c b/tools/mesh-gatt/prov-db.c
-similarity index 99%
-rename from tools/mesh/prov-db.c
-rename to tools/mesh-gatt/prov-db.c
-index 05b2547fd..44096e1e1 100644
---- a/tools/mesh/prov-db.c
-+++ b/tools/mesh-gatt/prov-db.c
-@@ -42,13 +42,13 @@
- #include "src/shared/util.h"
- #include "src/shared/shell.h"
- 
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/crypto.h"
--#include "tools/mesh/keys.h"
--#include "tools/mesh/net.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/util.h"
--#include "tools/mesh/prov-db.h"
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/crypto.h"
-+#include "tools/mesh-gatt/keys.h"
-+#include "tools/mesh-gatt/net.h"
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/util.h"
-+#include "tools/mesh-gatt/prov-db.h"
- 
- #define CHECK_KEY_IDX_RANGE(x) (((x) >= 0) && ((x) <= 4095))
- 
-diff --git a/tools/mesh/prov-db.h b/tools/mesh-gatt/prov-db.h
-similarity index 100%
-rename from tools/mesh/prov-db.h
-rename to tools/mesh-gatt/prov-db.h
-diff --git a/tools/mesh/prov.c b/tools/mesh-gatt/prov.c
-similarity index 98%
-rename from tools/mesh/prov.c
-rename to tools/mesh-gatt/prov.c
-index acbc5a1c8..0f9d85d01 100644
---- a/tools/mesh/prov.c
-+++ b/tools/mesh-gatt/prov.c
-@@ -41,14 +41,16 @@
- #include "src/shared/shell.h"
- 
- #include "gdbus/gdbus.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/gatt.h"
--#include "tools/mesh/crypto.h"
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/util.h"
++#include <ell/ell.h>
 +
- #include "tools/mesh/agent.h"
--#include "tools/mesh/prov.h"
--#include "tools/mesh/net.h"
++#include "src/shared/shell.h"
++#include "src/shared/util.h"
 +
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/gatt.h"
-+#include "tools/mesh-gatt/crypto.h"
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/util.h"
-+#include "tools/mesh-gatt/prov.h"
-+#include "tools/mesh-gatt/net.h"
- 
- /* Provisioning Security Levels */
- #define MESH_PROV_SEC_HIGH	2
-diff --git a/tools/mesh/prov.h b/tools/mesh-gatt/prov.h
-similarity index 100%
-rename from tools/mesh/prov.h
-rename to tools/mesh-gatt/prov.h
-diff --git a/tools/mesh/prov_db.json b/tools/mesh-gatt/prov_db.json
-similarity index 100%
-rename from tools/mesh/prov_db.json
-rename to tools/mesh-gatt/prov_db.json
-diff --git a/tools/mesh/util.c b/tools/mesh-gatt/util.c
-similarity index 98%
-rename from tools/mesh/util.c
-rename to tools/mesh-gatt/util.c
-index 47abc0b24..564665e5d 100644
---- a/tools/mesh/util.c
-+++ b/tools/mesh-gatt/util.c
-@@ -33,9 +33,10 @@
- 
- #include "src/shared/shell.h"
- #include "src/shared/util.h"
--#include "tools/mesh/mesh-net.h"
--#include "tools/mesh/node.h"
--#include "tools/mesh/util.h"
++#include "mesh/mesh-defs.h"
++#include "tools/mesh/remote.h"
 +
-+#include "tools/mesh-gatt/mesh-net.h"
-+#include "tools/mesh-gatt/node.h"
-+#include "tools/mesh-gatt/util.h"
- 
- void set_menu_prompt(const char *name, const char *id)
- {
-diff --git a/tools/mesh/util.h b/tools/mesh-gatt/util.h
-similarity index 100%
-rename from tools/mesh/util.h
-rename to tools/mesh-gatt/util.h
-diff --git a/tools/meshctl.c b/tools/meshctl.c
-index 6b6f10882..57998fded 100644
---- a/tools/meshctl.c
-+++ b/tools/meshctl.c
-@@ -47,18 +47,20 @@
- #include "src/shared/shell.h"
- #include "src/shared/util.h"
- #include "gdbus/gdbus.h"
--#include "mesh/mesh-net.h"
--#include "mesh/gatt.h"
--#include "mesh/crypto.h"
--#include "mesh/node.h"
--#include "mesh/net.h"
--#include "mesh/keys.h"
--#include "mesh/prov.h"
--#include "mesh/util.h"
++static struct l_queue *nodes;
 +
- #include "mesh/agent.h"
--#include "mesh/prov-db.h"
- #include "mesh/config-model.h"
--#include "mesh/onoff-model.h"
++void remote_add_node(const uint8_t uuid[16], uint16_t unicast,
++					uint8_t ele_cnt, uint16_t net_idx)
++{
++	struct remote_node *rmt = l_new(struct remote_node, 1);
 +
-+#include "mesh-gatt/mesh-net.h"
-+#include "mesh-gatt/gatt.h"
-+#include "mesh-gatt/crypto.h"
-+#include "mesh-gatt/node.h"
-+#include "mesh-gatt/net.h"
-+#include "mesh-gatt/keys.h"
-+#include "mesh-gatt/prov.h"
-+#include "mesh-gatt/util.h"
-+#include "mesh-gatt/prov-db.h"
-+#include "mesh-gatt/onoff-model.h"
- 
- /* String display constants */
- #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
++	memcpy(rmt->uuid, uuid, 16);
++	rmt->unicast = unicast;
++	rmt->num_ele = ele_cnt;
++	rmt->net_keys = l_queue_new();
++
++	l_queue_push_tail(rmt->net_keys, L_UINT_TO_PTR(net_idx));
++
++	if (!nodes)
++		nodes = l_queue_new();
++
++	l_queue_push_tail(nodes, rmt);
++}
++
++static bool match_node_addr(const void *a, const void *b)
++{
++	const struct remote_node *rmt = a;
++	uint16_t addr = L_PTR_TO_UINT(b);
++
++	if (addr >= rmt->unicast &&
++				addr <= (rmt->unicast + rmt->num_ele - 1))
++		return true;
++
++	return false;
++}
++
++uint16_t remote_get_subnet_idx(uint16_t addr)
++{
++	struct remote_node *rmt;
++	uint32_t net_idx;
++
++	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
++
++	if (!rmt || l_queue_isempty(rmt->net_keys))
++		return NET_IDX_INVALID;
++
++	net_idx = L_PTR_TO_UINT(l_queue_peek_head(rmt->net_keys));
++
++	return (uint16_t) net_idx;
++}
++
++static void print_subnet(void *net_key, void *user_data)
++{
++	uint16_t net_idx = L_PTR_TO_UINT(net_key);
++
++	bt_shell_printf("%3.3x ", net_idx);
++}
++
++static void print_node(void *rmt, void *user_data)
++{
++	struct remote_node *node = rmt;
++	char *str;
++
++	bt_shell_printf(COLOR_YELLOW "Mesh node:\n" COLOR_OFF);
++	str = l_util_hexstring_upper(node->uuid, 16);
++	bt_shell_printf("\t" COLOR_GREEN "UUID = %s\n" COLOR_OFF, str);
++	l_free(str);
++	bt_shell_printf("\t" COLOR_GREEN "primary = %4.4x\n" COLOR_OFF,
++								node->unicast);
++	bt_shell_printf("\t" COLOR_GREEN "elements = %u\n" COLOR_OFF,
++								node->num_ele);
++	bt_shell_printf("\t" COLOR_GREEN "net_keys = ");
++	l_queue_foreach(node->net_keys, print_subnet, NULL);
++	bt_shell_printf("\n" COLOR_OFF);
++}
++
++void remote_print_node(uint16_t addr)
++{
++	struct remote_node *rmt;
++
++	if (!nodes)
++		return;
++
++	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
++	if (!rmt)
++		return;
++
++	print_node(rmt, NULL);
++}
++
++void remote_print_all(void)
++{
++	if (!nodes)
++		return;
++
++	l_queue_foreach(nodes, print_node, NULL);
++}
+diff --git a/tools/mesh/remote.h b/tools/mesh/remote.h
+new file mode 100644
+index 000000000..dce1619c0
+--- /dev/null
++++ b/tools/mesh/remote.h
+@@ -0,0 +1,31 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2019  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++struct remote_node {
++	uint16_t unicast;
++	struct l_queue *net_keys;
++	uint8_t uuid[16];
++	uint8_t num_ele;
++};
++
++void remote_add_node(const uint8_t uuid[16], uint16_t unicast,
++					uint8_t ele_cnt, uint16_t net_idx);
++uint16_t remote_get_subnet_idx(uint16_t addr);
++void remote_print_node(uint16_t addr);
++void remote_print_all(void);
 -- 
 2.21.0
 
