@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED43CA9ED2
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B35CA9ED0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD575217D9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 055E321855
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Nov 2019 18:57:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727575AbfKAS5i (ORCPT
+        id S1727578AbfKAS5j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Nov 2019 14:57:38 -0400
+        Fri, 1 Nov 2019 14:57:39 -0400
 Received: from mga05.intel.com ([192.55.52.43]:29978 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727372AbfKAS5i (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Nov 2019 14:57:38 -0400
+        id S1727576AbfKAS5j (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Nov 2019 14:57:39 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Nov 2019 11:57:37 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Nov 2019 11:57:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,256,1569308400"; 
-   d="scan'208";a="211833770"
+   d="scan'208";a="211833775"
 Received: from ingas-nuc1.sea.intel.com ([10.255.230.110])
-  by fmsmga001.fm.intel.com with ESMTP; 01 Nov 2019 11:57:37 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 01 Nov 2019 11:57:38 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 05/10 v2] tools/mesh-cfgclient: Commands for Management iface methods
-Date:   Fri,  1 Nov 2019 11:57:24 -0700
-Message-Id: <20191101185729.31661-6-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 06/10 v2] tools/mesh-cfgclient: Add config menu key commands
+Date:   Fri,  1 Nov 2019 11:57:25 -0700
+Message-Id: <20191101185729.31661-7-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191101185729.31661-1-inga.stotland@intel.com>
 References: <20191101185729.31661-1-inga.stotland@intel.com>
@@ -44,659 +44,523 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds complete list of commenads that excercise calls to
-org.bluez.mesh.Manager1 methods:
-"appkey-create": CreateAppKey()
-"appkey-import": ImportAppKey()
-"appkey-update": UpdateAppKey()
-"appkey-delete": DeleteAppKey()
-"subnet-create": CreateSubnet()
-"subnet-import": SubnetImport()
-"subnet-update": SubnetUpdate()
-"subnet-delete": SubnetDelete()
-"subnet-set-phase": SetKeyPhase()
-"node-import": ImportRemoteNode()
-"node-delete": DeleteRemoteNode()
+This adds implementation for config client commands to add/update
+NetKeys and AppKeys on a remote node.
 ---
- tools/mesh-cfgclient.c | 551 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 520 insertions(+), 31 deletions(-)
+ tools/mesh/cfgcli.c | 293 +++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 221 insertions(+), 72 deletions(-)
 
-diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index c932cc3c5..d722ea9b7 100644
---- a/tools/mesh-cfgclient.c
-+++ b/tools/mesh-cfgclient.c
-@@ -85,6 +85,15 @@ struct unprov_device {
- 	uint8_t uuid[16];
- };
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index 9e83f7b69..bf85a3097 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -34,10 +34,19 @@
  
-+struct generic_request {
-+	uint32_t arg1;
-+	uint32_t arg2;
-+	uint32_t arg3;
-+	uint8_t *data1;
-+	uint8_t *data2;
-+	const char *str;
+ #include "tools/mesh/util.h"
+ #include "tools/mesh/model.h"
++#include "tools/mesh/keys.h"
++#include "tools/mesh/remote.h"
+ #include "tools/mesh/config-model.h"
+ #include "tools/mesh/cfgcli.h"
+ 
+ #define MIN_COMPOSITION_LEN 16
++#define NO_RESPONSE 0xFFFFFFFF
++
++struct cfg_cmd {
++	uint32_t opcode;
++	uint32_t resp;
++	const char *desc;
++};
+ 
+ static void *send_data;
+ static model_send_msg_func_t send_msg;
+@@ -48,6 +57,113 @@ static key_send_func_t send_key_msg;
+ static uint16_t target = UNASSIGNED_ADDRESS;
+ static uint32_t parms[8];
+ 
++static struct cfg_cmd cmds[] = {
++	{ OP_APPKEY_ADD, OP_APPKEY_STATUS, "AppKeyAdd" },
++	{ OP_APPKEY_DELETE, OP_APPKEY_STATUS, "AppKeyDelete" },
++	{ OP_APPKEY_GET, OP_APPKEY_LIST, "AppKeyGet"},
++	{ OP_APPKEY_LIST, NO_RESPONSE, "AppKeyList"},
++	{ OP_APPKEY_STATUS, NO_RESPONSE, "AppKeyStatus"},
++	{ OP_APPKEY_UPDATE, OP_APPKEY_STATUS, "AppKeyUpdate" },
++	{ OP_DEV_COMP_GET, OP_DEV_COMP_STATUS, "DeviceCompositionGet" },
++	{ OP_DEV_COMP_STATUS, NO_RESPONSE, "DeviceCompositionStatus" },
++	{ OP_CONFIG_BEACON_GET, OP_CONFIG_BEACON_STATUS, "BeaconGet" },
++	{ OP_CONFIG_BEACON_SET, OP_CONFIG_BEACON_STATUS, "BeaconSet" },
++	{ OP_CONFIG_BEACON_STATUS, NO_RESPONSE, "BeaconStatus" },
++	{ OP_CONFIG_DEFAULT_TTL_GET, OP_CONFIG_DEFAULT_TTL_STATUS,
++							"DefaultTTLGet" },
++	{ OP_CONFIG_DEFAULT_TTL_SET, OP_CONFIG_DEFAULT_TTL_STATUS,
++							"DefaultTTLSet" },
++	{ OP_CONFIG_DEFAULT_TTL_STATUS, NO_RESPONSE, "DefaultTTLStatus" },
++	{ OP_CONFIG_FRIEND_GET, OP_CONFIG_FRIEND_STATUS, "FriendGet" },
++	{ OP_CONFIG_FRIEND_SET, OP_CONFIG_FRIEND_STATUS, "FrienSet" },
++	{ OP_CONFIG_FRIEND_STATUS, NO_RESPONSE, "FriendStatus" },
++	{ OP_CONFIG_PROXY_GET, OP_CONFIG_PROXY_STATUS, "ProxyGet" },
++	{ OP_CONFIG_PROXY_SET, OP_CONFIG_PROXY_STATUS, "ProxySet" },
++	{ OP_CONFIG_PROXY_STATUS, NO_RESPONSE, "ProxyStatus" },
++	{ OP_CONFIG_KEY_REFRESH_PHASE_GET, OP_CONFIG_KEY_REFRESH_PHASE_STATUS,
++							"KeyRefreshPhaseGet" },
++	{ OP_CONFIG_KEY_REFRESH_PHASE_SET, OP_CONFIG_KEY_REFRESH_PHASE_STATUS,
++							"KeyRefreshPhaseSet" },
++	{ OP_CONFIG_KEY_REFRESH_PHASE_STATUS, NO_RESPONSE,
++						"KeyRefreshPhaseStatus" },
++	{ OP_CONFIG_MODEL_PUB_GET, OP_CONFIG_MODEL_PUB_STATUS, "ModelPubGet" },
++	{ OP_CONFIG_MODEL_PUB_SET, OP_CONFIG_MODEL_PUB_STATUS, "ModelPubSet" },
++	{ OP_CONFIG_MODEL_PUB_STATUS, NO_RESPONSE, "ModelPubStatus" },
++	{ OP_CONFIG_MODEL_PUB_VIRT_SET, OP_CONFIG_MODEL_PUB_STATUS,
++							"ModelPubVirtualSet" },
++	{ OP_CONFIG_MODEL_SUB_ADD, OP_CONFIG_MODEL_SUB_STATUS, "ModelSubAdd" },
++	{ OP_CONFIG_MODEL_SUB_DELETE, OP_CONFIG_MODEL_SUB_STATUS,
++							"ModelSubDelete" },
++	{ OP_CONFIG_MODEL_SUB_DELETE_ALL, OP_CONFIG_MODEL_SUB_STATUS,
++							"ModelSubDeleteAll" },
++	{ OP_CONFIG_MODEL_SUB_OVERWRITE, OP_CONFIG_MODEL_SUB_STATUS,
++							"ModelSubOverwrite" },
++	{ OP_CONFIG_MODEL_SUB_STATUS, NO_RESPONSE, "ModelSubStatus" },
++	{ OP_CONFIG_MODEL_SUB_VIRT_ADD, OP_CONFIG_MODEL_SUB_STATUS,
++							"ModelSubVirtAdd" },
++	{ OP_CONFIG_MODEL_SUB_VIRT_DELETE, OP_CONFIG_MODEL_SUB_STATUS,
++							"ModelSubVirtDelete" },
++	{ OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE, OP_CONFIG_MODEL_SUB_STATUS,
++						"ModelSubVirtOverwrite" },
++	{ OP_CONFIG_NETWORK_TRANSMIT_GET, OP_CONFIG_NETWORK_TRANSMIT_STATUS,
++							"NetworkTransmitGet" },
++	{ OP_CONFIG_NETWORK_TRANSMIT_SET, OP_CONFIG_NETWORK_TRANSMIT_STATUS,
++							"NetworkTransmitSet" },
++	{ OP_CONFIG_NETWORK_TRANSMIT_STATUS, NO_RESPONSE,
++						"NetworkTransmitStatus" },
++	{ OP_CONFIG_RELAY_GET, OP_CONFIG_RELAY_STATUS, "RelayGet" },
++	{ OP_CONFIG_RELAY_SET, OP_CONFIG_RELAY_STATUS, "RelaySet" },
++	{ OP_CONFIG_RELAY_STATUS, NO_RESPONSE, "RelayStatus" },
++	{ OP_CONFIG_MODEL_SUB_GET, OP_CONFIG_MODEL_SUB_LIST, "ModelSubGet" },
++	{ OP_CONFIG_MODEL_SUB_LIST, NO_RESPONSE, "ModelSubList" },
++	{ OP_CONFIG_VEND_MODEL_SUB_GET, OP_CONFIG_VEND_MODEL_SUB_LIST,
++							"VendorModelSubGet" },
++	{ OP_CONFIG_VEND_MODEL_SUB_LIST, NO_RESPONSE, "VendorModelSubList" },
++	{ OP_CONFIG_POLL_TIMEOUT_LIST, OP_CONFIG_POLL_TIMEOUT_STATUS,
++							"PollTimeoutList" },
++	{ OP_CONFIG_POLL_TIMEOUT_STATUS, NO_RESPONSE, "PollTimeoutStatus" },
++	{ OP_CONFIG_HEARTBEAT_PUB_GET, OP_CONFIG_HEARTBEAT_PUB_STATUS,
++							"HeartbeatPubGet" },
++	{ OP_CONFIG_HEARTBEAT_PUB_SET, OP_CONFIG_HEARTBEAT_PUB_STATUS,
++							"HeartbeatPubSet" },
++	{ OP_CONFIG_HEARTBEAT_PUB_STATUS, NO_RESPONSE, "HeartbeatPubStatus" },
++	{ OP_CONFIG_HEARTBEAT_SUB_GET, OP_CONFIG_HEARTBEAT_SUB_GET,
++							"HeartbeatSubGet" },
++	{ OP_CONFIG_HEARTBEAT_SUB_SET, OP_CONFIG_HEARTBEAT_SUB_GET,
++							"HeartbeatSubSet" },
++	{ OP_CONFIG_HEARTBEAT_SUB_STATUS, NO_RESPONSE, "HeartbeatSubStatus" },
++	{ OP_MODEL_APP_BIND, OP_MODEL_APP_STATUS, "ModelAppBind" },
++	{ OP_MODEL_APP_STATUS, NO_RESPONSE, "ModelAppStatus" },
++	{ OP_MODEL_APP_UNBIND, OP_MODEL_APP_STATUS, "ModelAppUnbind" },
++	{ OP_NETKEY_ADD, OP_NETKEY_STATUS, "NetKeyAdd" },
++	{ OP_NETKEY_DELETE, OP_NETKEY_STATUS, "NetKeyDelete" },
++	{ OP_NETKEY_GET, OP_NETKEY_LIST, "NetKeyGet" },
++	{ OP_NETKEY_LIST, NO_RESPONSE, "NetKeyList" },
++	{ OP_NETKEY_STATUS, NO_RESPONSE, "NetKeyStatus" },
++	{ OP_NETKEY_UPDATE, OP_NETKEY_STATUS, "NetKeyUpdate" },
++	{ OP_NODE_IDENTITY_GET, OP_NODE_IDENTITY_STATUS, "NodeIdentityGet" },
++	{ OP_NODE_IDENTITY_SET, OP_NODE_IDENTITY_STATUS, "NodeIdentitySet" },
++	{ OP_NODE_IDENTITY_STATUS, NO_RESPONSE, "NodeIdentityStatus" },
++	{ OP_NODE_RESET, OP_NODE_RESET_STATUS, "NodeReset" },
++	{ OP_NODE_RESET_STATUS, NO_RESPONSE, "NodeResetStatus" },
++	{ OP_MODEL_APP_GET, OP_MODEL_APP_LIST, "ModelAppGet" },
++	{ OP_MODEL_APP_LIST, NO_RESPONSE, "ModelAppList" },
++	{ OP_VEND_MODEL_APP_GET, OP_VEND_MODEL_APP_LIST, "VendorModelAppGet" },
++	{ OP_VEND_MODEL_APP_LIST, NO_RESPONSE, "VendorModelAppList" }
 +};
 +
- static struct l_dbus *dbus;
- 
- static struct l_queue *node_proxies;
-@@ -203,6 +212,19 @@ struct key_data {
- 	bool update;
- };
- 
-+static void append_byte_array(struct l_dbus_message_builder *builder,
-+					unsigned char *data, unsigned int len)
++static const char *opcode_str(uint32_t opcode)
 +{
-+	unsigned int i;
++	uint32_t n;
 +
-+	l_dbus_message_builder_enter_array(builder, "y");
++	for (n = 0; n < L_ARRAY_SIZE(cmds); n++) {
++		if (opcode == cmds[n].opcode)
++			return cmds[n].desc;
++	}
 +
-+	for (i = 0; i < len; i++)
-+		l_dbus_message_builder_append_basic(builder, 'y', &(data[i]));
-+
-+	l_dbus_message_builder_leave_array(builder);
++	return "Unknown";
 +}
 +
- static void send_msg_setup(struct l_dbus_message *msg, void *user_data)
+ static uint32_t print_mod_id(uint8_t *data, bool vid, const char *offset)
  {
- 	struct send_data *req = user_data;
-@@ -215,15 +237,7 @@ static void send_msg_setup(struct l_dbus_message *msg, void *user_data)
- 	if (req->is_dev_key)
- 		l_dbus_message_builder_append_basic(builder, 'b', &req->rmt);
- 	l_dbus_message_builder_append_basic(builder, 'q', &req->idx);
--	l_dbus_message_builder_enter_array(builder, "y");
--
--	while (req->len) {
--		l_dbus_message_builder_append_basic(builder, 'y', req->data);
--		req->data++;
--		req->len--;
--	}
--
--	l_dbus_message_builder_leave_array(builder);
-+	append_byte_array(builder, req->data, req->len);
- 	l_dbus_message_builder_finalize(builder);
- 	l_dbus_message_builder_destroy(builder);
- }
-@@ -434,8 +448,7 @@ static void try_set_node_proxy(void *a, void *b)
+ 	uint32_t mod_id;
+@@ -162,6 +278,8 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 	} else
+ 		return false;
+ 
++	bt_shell_printf("Received %s\n", opcode_str(opcode));
++
+ 	switch (opcode & ~OP_UNRELIABLE) {
+ 	default:
+ 		return false;
+@@ -437,14 +555,20 @@ static void cmd_dst_set(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  }
  
- static void attach_node_reply(struct l_dbus_proxy *proxy,
--						struct l_dbus_message *msg,
--						void *user_data)
-+				struct l_dbus_message *msg, void *user_data)
+-static bool config_send(uint8_t *buf, uint16_t len)
++static bool config_send(uint8_t *buf, uint16_t len, uint32_t opcode)
  {
- 	struct meshcfg_node *node = user_data;
- 	struct l_dbus_message_iter iter_cfg;
-@@ -482,8 +495,7 @@ static void attach_node_setup(struct l_dbus_message *msg, void *user_data)
- }
- 
- static void create_net_reply(struct l_dbus_proxy *proxy,
--						struct l_dbus_message *msg,
--						void *user_data)
-+				struct l_dbus_message *msg, void *user_data)
- {
- 	char *str;
- 	uint64_t tmp;
-@@ -516,7 +528,6 @@ static void create_net_reply(struct l_dbus_proxy *proxy,
- 
- static void create_net_setup(struct l_dbus_message *msg, void *user_data)
- {
--	uint i;
- 	struct l_dbus_message_builder *builder;
- 
- 	/* Generate random UUID */
-@@ -525,14 +536,7 @@ static void create_net_setup(struct l_dbus_message *msg, void *user_data)
- 	builder = l_dbus_message_builder_new(msg);
- 
- 	l_dbus_message_builder_append_basic(builder, 'o', app.path);
--	l_dbus_message_builder_enter_array(builder, "y");
--
--	for (i = 0; i < L_ARRAY_SIZE(app.uuid); i++)
--		l_dbus_message_builder_append_basic(builder, 'y',
--								&(app.uuid[i]));
--
--	l_dbus_message_builder_leave_array(builder);
--
-+	append_byte_array(builder, app.uuid, 16);
- 	l_dbus_message_builder_finalize(builder);
- 	l_dbus_message_builder_destroy(builder);
- }
-@@ -609,6 +613,476 @@ static void cmd_list_nodes(int argc, char *argv[])
- 	remote_print_all();
- }
- 
-+static void free_generic_request(void *data)
-+{
-+	struct generic_request *req = data;
-+
-+	l_free(req->data1);
-+	l_free(req->data2);
-+	l_free(req);
-+}
-+
-+static void delete_node_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t primary;
-+	uint8_t ele_cnt;
-+
-+	primary = (uint16_t) req->arg1;
-+	ele_cnt = (uint8_t) req->arg2;
-+
-+	l_dbus_message_set_arguments(msg, "qy", primary, ele_cnt);
-+}
-+
-+static void cmd_delete_node(int argc, char *argv[])
-+{
-+	struct generic_request *req;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (argc < 3) {
-+		bt_shell_printf("Unicast and element count are required\n");
-+		return;
-+	}
-+
-+	req = l_new(struct generic_request, 1);
-+
-+	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
-+		goto fail;
-+
-+	if (sscanf(argv[2], "%u", &req->arg2) != 1)
-+		goto fail;
-+
-+	l_dbus_proxy_method_call(local->mgmt_proxy, "DeleteRemoteNode",
-+				delete_node_setup, NULL, req, l_free);
-+
-+	/* TODO:: Delete node from configuration */
-+	return;
-+
-+fail:
-+	l_free(req);
-+}
-+
-+static void import_node_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t primary, net_idx;
-+	uint8_t ele_cnt;
-+
-+	if (l_dbus_message_is_error(msg)) {
-+		const char *name;
-+
-+		l_dbus_message_get_error(msg, &name, NULL);
-+		l_error("Failed to import remote node: %s", name);
-+		return;
-+	}
-+
-+	net_idx = (uint16_t) req->arg1;
-+	primary = (uint16_t) req->arg2;
-+	ele_cnt = (uint8_t) req->arg3;
-+
-+	remote_add_node(req->data1, primary, ele_cnt, net_idx);
-+}
-+
-+static void import_node_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t primary;
-+	uint8_t ele_cnt;
-+	struct l_dbus_message_builder *builder;
-+
-+	primary = (uint16_t) req->arg2;
-+	ele_cnt = (uint8_t) req->arg3;
-+
-+	builder = l_dbus_message_builder_new(msg);
-+	l_dbus_message_builder_append_basic(builder, 'q', &primary);
-+	l_dbus_message_builder_append_basic(builder, 'y', &ele_cnt);
-+	append_byte_array(builder, req->data2, 16);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void cmd_import_node(int argc, char *argv[])
-+{
-+	struct generic_request *req;
-+	size_t sz;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (argc < 6) {
-+		bt_shell_printf("UUID, element count and device key");
-+		bt_shell_printf("Unicast, element count and device key");
-+		bt_shell_printf("are required\n");
-+		return;
-+	}
-+
-+	req = l_new(struct generic_request, 1);
-+
-+	/* Device UUID */
-+	req->data1 = l_util_from_hexstring(argv[1], &sz);
-+	if (!req->data1 || sz != 16) {
-+		l_error("Failed to generate UUID array from %s", argv[1]);
-+		goto fail;
-+	}
-+
-+	/* NetKey Index*/
-+	if (sscanf(argv[2], "%04x", &req->arg1) != 1)
-+		goto fail;
-+
-+	/* Unicast of the primary element */
-+	if (sscanf(argv[3], "%04x", &req->arg2) != 1)
-+		goto fail;
-+
-+	/* Number of elements */
-+	if (sscanf(argv[4], "%u", &req->arg3) != 1)
-+		return;
-+
-+	/* DevKey */
-+	req->data2 = l_util_from_hexstring(argv[5], &sz);
-+	if (!req->data2 || sz != 16) {
-+		l_error("Failed to generate DevKey array from %s", argv[5]);
-+		goto fail;
-+	}
-+
-+	l_dbus_proxy_method_call(local->mgmt_proxy, "ImportRemoteNode",
-+					import_node_setup, import_node_reply,
-+					req, free_generic_request);
-+
-+	return;
-+
-+fail:
-+	free_generic_request(req);
-+}
-+
-+static void subnet_set_phase_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *msg, void *user_data)
-+{
-+	if (l_dbus_message_is_error(msg)) {
-+		const char *name;
-+
-+		l_dbus_message_get_error(msg, &name, NULL);
-+		l_error("Failed to set subnet phase: %s", name);
-+	}
-+
-+	/* TODO: Set key phase in configuration */
-+}
-+
-+static void subnet_set_phase_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t net_idx;
-+	uint8_t phase;
-+
-+	net_idx = (uint16_t) req->arg1;
-+	phase = (uint8_t) req->arg2;
-+
-+	l_dbus_message_set_arguments(msg, "qy", net_idx, phase);
-+}
-+
-+static void cmd_subnet_set_phase(int argc, char *argv[])
-+{
-+	struct generic_request *req;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (argc < 3) {
-+		bt_shell_printf("NetKey index and phase are required\n");
-+		return;
-+	}
-+
-+	req = l_new(struct generic_request, 1);
-+
-+	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
-+		goto fail;
-+
-+	if (sscanf(argv[2], "%d", &req->arg2) != 1)
-+		goto fail;
-+
-+	l_dbus_proxy_method_call(local->mgmt_proxy, "SetKeyPhase",
-+					subnet_set_phase_setup,
-+					subnet_set_phase_reply, req, l_free);
-+
-+	return;
-+
-+fail:
-+	l_free(req);
-+}
-+
-+static void mgr_key_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t idx = (uint16_t) req->arg1;
-+	const char *method = req->str;
-+
-+	if (l_dbus_message_is_error(msg)) {
-+		const char *name;
-+
-+		l_dbus_message_get_error(msg, &name, NULL);
-+		l_error("Method %s returned error: %s", method, name);
-+		return;
-+	}
-+
-+	if (!strcmp("CreateSubnet", method))
-+		keys_add_net_key(idx);
-+	else if (!strcmp("DeleteSubnet", method))
-+		keys_del_net_key(idx);
-+	else if (!strcmp("DeleteAppKey", method))
-+		keys_del_app_key(idx);
-+}
-+
-+static void mgr_key_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t idx = (uint16_t) req->arg1;
-+
-+	l_dbus_message_set_arguments(msg, "q", idx);
-+}
-+
-+static void mgr_key_cmd(int argc, char *argv[], const char *method_name)
-+{
-+	struct generic_request *req;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (argc < 2) {
-+		bt_shell_printf("Missing required arguments\n");
-+		return;
-+	}
-+
-+	req = l_new(struct generic_request, 1);
-+
-+	if (sscanf(argv[1], "%04x", &req->arg1) != 1) {
-+		l_free(req);
-+		return;
-+	}
-+
-+	req->str = method_name;
-+
-+	l_dbus_proxy_method_call(local->mgmt_proxy, method_name,
-+					mgr_key_setup, mgr_key_reply,
-+					req, l_free);
-+}
-+
-+static void cmd_delete_appkey(int argc, char *argv[])
-+{
-+	mgr_key_cmd(argc, argv, "DeleteAppKey");
-+}
-+
-+static void cmd_update_appkey(int argc, char *argv[])
-+{
-+	mgr_key_cmd(argc, argv, "UpdateAppKey");
-+}
-+
-+static void cmd_delete_subnet(int argc, char *argv[])
-+{
-+	mgr_key_cmd(argc, argv, "DeleteSubnet");
-+}
-+
-+static void cmd_update_subnet(int argc, char *argv[])
-+{
-+	mgr_key_cmd(argc, argv, "UpdateSubnet");
-+}
-+
-+static void cmd_create_subnet(int argc, char *argv[])
-+{
-+	mgr_key_cmd(argc, argv, "CreateSubnet");
-+}
-+
-+static void add_key_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t net_idx, app_idx;
-+	const char *method = req->str;
-+
-+	if (l_dbus_message_is_error(msg)) {
-+		const char *name;
-+
-+		l_dbus_message_get_error(msg, &name, NULL);
-+		l_error("%s failed: %s", method, name);
-+		return;
-+	}
-+
-+	net_idx = (uint16_t) req->arg1;
-+
-+	if (!strcmp(method, "ImportSubnet")) {
-+		keys_add_net_key(net_idx);
-+		return;
-+	}
-+
-+	app_idx = (uint16_t) req->arg2;
-+	keys_add_app_key(net_idx, app_idx);
-+}
-+
-+static void import_appkey_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t net_idx, app_idx;
-+	struct l_dbus_message_builder *builder;
-+
-+	net_idx = (uint16_t) req->arg1;
-+	app_idx = (uint16_t) req->arg2;
-+
-+	builder = l_dbus_message_builder_new(msg);
-+	l_dbus_message_builder_append_basic(builder, 'q', &net_idx);
-+	l_dbus_message_builder_append_basic(builder, 'q', &app_idx);
-+	append_byte_array(builder, req->data1, 16);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void cmd_import_appkey(int argc, char *argv[])
-+{
-+	struct generic_request *req;
-+	size_t sz;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (argc < 4) {
-+		bt_shell_printf("Netkey and AppKey indices and");
-+		bt_shell_printf("key value are required\n");
-+		return;
-+	}
-+
-+	req = l_new(struct generic_request, 1);
-+
-+	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
-+		goto fail;
-+
-+	if (sscanf(argv[2], "%04x", &req->arg2) != 1)
-+		goto fail;
-+
-+	req->data1 = l_util_from_hexstring(argv[3], &sz);
-+	if (!req->data1 || sz != 16) {
-+		l_error("Failed to generate key array from %s", argv[3]);
-+		goto fail;
-+	}
-+
-+	req->str = "ImportAppKey";
-+
-+	l_dbus_proxy_method_call(local->mgmt_proxy, "ImportAppKey",
-+					import_appkey_setup, add_key_reply,
-+					req, free_generic_request);
-+
-+	return;
-+
-+fail:
-+	free_generic_request(req);
-+}
-+
-+static void import_subnet_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t net_idx;
-+	struct l_dbus_message_builder *builder;
-+
-+	net_idx = (uint16_t) req->arg1;
-+
-+	builder = l_dbus_message_builder_new(msg);
-+	l_dbus_message_builder_append_basic(builder, 'q', &net_idx);
-+	append_byte_array(builder, req->data1, 16);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void cmd_import_subnet(int argc, char *argv[])
-+{
-+	struct generic_request *req;
-+	size_t sz;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (argc < 3) {
-+		bt_shell_printf("NetKey index and value are required\n");
-+		return;
-+	}
-+
-+	req = l_new(struct generic_request, 1);
-+
-+	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
-+		goto fail;
-+
-+	req->data1 = l_util_from_hexstring(argv[2], &sz);
-+	if (!req->data1 || sz != 16) {
-+		l_error("Failed to generate key array from %s", argv[2]);
-+		goto fail;
-+	}
-+
-+	req->str = "ImportSubnet";
-+
-+	l_dbus_proxy_method_call(local->mgmt_proxy, "ImportSubnet",
-+					import_subnet_setup, add_key_reply,
-+					req, free_generic_request);
-+	return;
-+
-+fail:
-+	free_generic_request(req);
-+}
-+
-+static void create_appkey_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct generic_request *req = user_data;
-+	uint16_t net_idx, app_idx;
-+
-+	net_idx = (uint16_t) req->arg1;
-+	app_idx = (uint16_t) req->arg2;
-+
-+	l_dbus_message_set_arguments(msg, "qq", net_idx, app_idx);
-+}
-+
-+static void cmd_create_appkey(int argc, char *argv[])
-+{
-+	struct generic_request *req;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (argc < 3) {
-+		bt_shell_printf("AppKey index is required\n");
-+		return;
-+	}
-+
-+	req = l_new(struct generic_request, 1);
-+
-+	if (sscanf(argv[1], "%04x", &req->arg1) != 1)
-+		goto fail;
-+
-+	if (sscanf(argv[2], "%04x", &req->arg2) != 1)
-+		goto fail;
-+
-+	req->str = "CreateAppKey";
-+
-+	l_dbus_proxy_method_call(local->mgmt_proxy, "CreateAppKey",
-+					create_appkey_setup, add_key_reply,
-+					req, l_free);
-+	return;
-+
-+fail:
-+	l_free(req);
-+}
-+
- static void add_node_reply(struct l_dbus_proxy *proxy,
- 				struct l_dbus_message *msg, void *user_data)
- {
-@@ -626,7 +1100,6 @@ static void add_node_reply(struct l_dbus_proxy *proxy,
- 
- static void add_node_setup(struct l_dbus_message *msg, void *user_data)
- {
--	int i;
- 	char *str = user_data;
- 	size_t sz;
- 	unsigned char *uuid;
-@@ -639,14 +1112,7 @@ static void add_node_setup(struct l_dbus_message *msg, void *user_data)
++	bool res;
++
+ 	if (IS_UNASSIGNED(target)) {
+ 		bt_shell_printf("Destination not set\n");
+ 		return false;
  	}
  
- 	builder = l_dbus_message_builder_new(msg);
--
--	l_dbus_message_builder_enter_array(builder, "y");
--
--	for (i = 0; i < (int)sz; i++)
--		l_dbus_message_builder_append_basic(builder, 'y', &(uuid[i]));
--
--	l_dbus_message_builder_leave_array(builder);
--
-+	append_byte_array(builder, uuid, 16);
- 	l_dbus_message_builder_finalize(builder);
- 	l_dbus_message_builder_destroy(builder);
+-	return send_msg(send_data, target, APP_IDX_DEV_REMOTE, buf, len);
++	res = send_msg(send_data, target, APP_IDX_DEV_REMOTE, buf, len);
++	if (!res)
++		bt_shell_printf("Failed to send \"%s\"\n", opcode_str(opcode));
++
++	return res;
+ }
  
-@@ -683,10 +1149,33 @@ static const struct bt_shell_menu main_menu = {
- 			"Create new mesh network with one initial node" },
- 	{ "discover-unprovisioned", "<on/off> [seconds]", cmd_scan_unprov,
- 			"Look for devices to provision" },
-+	{ "appkey-create", "<net_idx> <app_idx>", cmd_create_appkey,
-+			"Create a new local AppKey" },
-+	{ "appkey-import", "<net_idx> <app_idx> <key>", cmd_import_appkey,
-+			"Import a new local AppKey" },
-+	{ "appkey-update", "<app_idx>", cmd_update_appkey,
-+			"Update local AppKey" },
-+	{ "appkey-delete", "<app_idx>", cmd_delete_appkey,
-+			"Delete local AppKey" },
-+	{ "subnet-create", "<net_idx>", cmd_create_subnet,
-+			"Create a new local subnet (NetKey)" },
-+	{ "subnet-import", "<net_idx> <key>", cmd_import_subnet,
-+			"Import a new local subnet (NetKey)" },
-+	{ "subnet-update", "<net_idx>", cmd_update_subnet,
-+			"Update local subnet (NetKey)" },
-+	{ "subnet-delete", "<net_idx>", cmd_delete_subnet,
-+			"Delete local subnet (NetKey)" },
-+	{ "subnet-set-phase", "<net_idx> <phase>", cmd_subnet_set_phase,
-+			"Set subnet (NetKey) phase" },
- 	{ "list-unprovisioned", NULL, cmd_list_unprov,
- 			"List unprovisioned devices" },
- 	{ "provision", "<uuid>", cmd_start_prov,
- 			"Initiate provisioning"},
-+	{ "node-import", "<uuid> <net_idx> <primary> <ele_count> <dev_key>",
-+			cmd_import_node,
-+			"Import an externally provisioned remote node"},
-+	{ "node-delete", "<primary> <ele_count>", cmd_delete_node,
-+			"Delete a remote node"},
- 	{ "list-nodes", NULL, cmd_list_nodes,
- 			"List remote mesh nodes"},
- 	{ } },
+ static void cmd_default(uint32_t opcode)
+@@ -454,11 +578,8 @@ static void cmd_default(uint32_t opcode)
+ 
+ 	n = mesh_opcode_set(opcode, msg);
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send command (opcode 0x%x)\n",
+-								opcode);
++	if (!config_send(msg, n, opcode))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -473,10 +594,8 @@ static void cmd_composition_get(int argc, char *argv[])
+ 	/* By default, use page 0 */
+ 	msg[n++] = (read_input_parameters(argc, argv) == 1) ? parms[0] : 0;
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"GET NODE COMPOSITION\"\n");
++	if (!config_send(msg, n, OP_DEV_COMP_GET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -486,6 +605,11 @@ static void cmd_netkey_del(int argc, char *argv[])
+ 	uint16_t n;
+ 	uint8_t msg[32];
+ 
++	if (IS_UNASSIGNED(target)) {
++		bt_shell_printf("Destination not set\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
+ 	n = mesh_opcode_set(OP_NETKEY_DELETE, msg);
+ 
+ 	if (read_input_parameters(argc, argv) != 1) {
+@@ -493,45 +617,98 @@ static void cmd_netkey_del(int argc, char *argv[])
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	put_le16(target + parms[0], msg + n);
++	put_le16(parms[0], msg + n);
+ 	n += 2;
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"DEL_NET KEY\"\n");
++	if (!config_send(msg, n, OP_NETKEY_DELETE))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_appkey_del(int argc, char *argv[])
++{
++	uint16_t n;
++	uint8_t msg[32];
++	uint16_t app_idx, net_idx;
++
++	if (IS_UNASSIGNED(target)) {
++		bt_shell_printf("Destination not set\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	n = mesh_opcode_set(OP_APPKEY_DELETE, msg);
++
++	if (read_input_parameters(argc, argv) != 1) {
++		bt_shell_printf("Bad arguments %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	app_idx = (uint16_t) parms[0];
++	net_idx = keys_get_bound_key(app_idx);
++
++	/* Pack bound NetKey and AppKey into 3 octets */
++	msg[n] = net_idx;
++	msg[n + 1] = ((net_idx >> 8) & 0xf) | ((app_idx << 4) & 0xf0);
++	msg[n + 2] = app_idx >> 4;
++
++	n += 3;
++
++	if (!config_send(msg, n, OP_APPKEY_DELETE))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void cmd_key_add(uint32_t opcode, int argc, char *argv[])
++{
++	uint16_t key_idx;
++	bool is_appkey, update;
++
++	if (IS_UNASSIGNED(target)) {
++		bt_shell_printf("Destination not set\n");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
++	if (!send_key_msg) {
++		bt_shell_printf("Send key callback not set\n");
++		return;
++	}
++
++	if (read_input_parameters(argc, argv) != 1) {
++		bt_shell_printf("Bad arguments %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	key_idx = (uint16_t) parms[0];
++
++	update = (opcode == OP_NETKEY_UPDATE || opcode == OP_APPKEY_UPDATE);
++	is_appkey = (opcode == OP_APPKEY_ADD || opcode == OP_APPKEY_UPDATE);
++
++	if (!send_key_msg(key_data, target, key_idx, is_appkey, update))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+ static void cmd_netkey_add(int argc, char *argv[])
+ {
+-	/*TODO*/
+-	bt_shell_printf("Not implemented\n");
++	cmd_key_add(OP_NETKEY_ADD, argc, argv);
+ }
+ 
+ static void cmd_netkey_update(int argc, char *argv[])
+ {
+-	/*TODO*/
+-	bt_shell_printf("Not implemented\n");
++	cmd_key_add(OP_NETKEY_UPDATE, argc, argv);
+ }
+ 
+ static void cmd_appkey_add(int argc, char *argv[])
+ {
+-	/*TODO*/
+-	bt_shell_printf("Not implemented\n");
++	cmd_key_add(OP_APPKEY_ADD, argc, argv);
+ }
+ 
+ static void cmd_appkey_update(int argc, char *argv[])
+ {
+-	/*TODO*/
+-	bt_shell_printf("Not implemented\n");
+-}
+-
+-static void cmd_appkey_del(int argc, char *argv[])
+-{
+-	/*TODO*/
+-	bt_shell_printf("Not implemented\n");
++	cmd_key_add(OP_APPKEY_UPDATE, argc, argv);
+ }
+ 
+ static void cmd_bind(int argc, char *argv[])
+@@ -548,7 +725,7 @@ static void cmd_bind(int argc, char *argv[])
+ 
+ 	n = mesh_opcode_set(OP_MODEL_APP_BIND, msg);
+ 
+-	put_le16(target + parms[0], msg + n);
++	put_le16(parms[0], msg + n);
+ 	n += 2;
+ 	put_le16(parms[1], msg + n);
+ 	n += 2;
+@@ -562,10 +739,8 @@ static void cmd_bind(int argc, char *argv[])
+ 		n += 2;
+ 	}
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"MODEL APP BIND\"\n");
++	if (!config_send(msg, n, OP_MODEL_APP_BIND))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -586,10 +761,8 @@ static void cmd_beacon_set(int argc, char *argv[])
+ 
+ 	msg[n++] = parms[0];
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET BEACON\"\n");
+-		return;
+-	}
++	if (!config_send(msg, n, OP_CONFIG_BEACON_SET))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -617,10 +790,8 @@ static void cmd_ident_set(int argc, char *argv[])
+ 	n += 2;
+ 	msg[n++] = parms[1];
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET IDENTITY\"\n");
+-		return;
+-	}
++	if (!config_send(msg, n, OP_NODE_IDENTITY_SET))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -642,10 +813,8 @@ static void cmd_ident_get(int argc, char *argv[])
+ 	put_le16(parms[0], msg + n);
+ 	n += 2;
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"GET IDENTITY\"\n");
++	if (!config_send(msg, n, OP_NODE_IDENTITY_GET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -666,10 +835,8 @@ static void cmd_proxy_set(int argc, char *argv[])
+ 
+ 	msg[n++] = parms[0];
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET PROXY\"\n");
++	if (!config_send(msg, n, OP_CONFIG_PROXY_SET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -696,10 +863,8 @@ static void cmd_relay_set(int argc, char *argv[])
+ 	msg[n++] = parms[0];
+ 	msg[n++] = (parms[1] << 5) | parms[2];
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET RELAY\"\n");
++	if (!config_send(msg, n, OP_CONFIG_RELAY_SET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -724,10 +889,8 @@ static void cmd_ttl_set(int argc, char *argv[])
+ 	n = mesh_opcode_set(OP_CONFIG_DEFAULT_TTL_SET, msg);
+ 	msg[n++] = parms[0];
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET_DEFAULT TTL\"\n");
++	if (!config_send(msg, n, OP_CONFIG_DEFAULT_TTL_SET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -771,10 +934,8 @@ static void cmd_pub_set(int argc, char *argv[])
+ 		n += 2;
+ 	}
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET MODEL PUBLICATION\"\n");
++	if (!config_send(msg, n, OP_CONFIG_MODEL_PUB_SET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -807,10 +968,8 @@ static void cmd_pub_get(int argc, char *argv[])
+ 		n += 2;
+ 	}
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"GET MODEL PUBLICATION\"\n");
++	if (!config_send(msg, n, OP_CONFIG_MODEL_PUB_GET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -840,10 +999,8 @@ static void cmd_sub_add(int argc, char *argv[])
+ 	put_le16(parms[2], msg + n);
+ 	n += 2;
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"ADD SUBSCRIPTION\"\n");
++	if (!config_send(msg, n, OP_CONFIG_MODEL_SUB_ADD))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -870,10 +1027,8 @@ static void cmd_sub_get(int argc, char *argv[])
+ 	put_le16(parms[1], msg + n);
+ 	n += 2;
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"GET SUB GET\"\n");
++	if (!config_send(msg, n, OP_CONFIG_MODEL_SUB_GET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -900,10 +1055,8 @@ static void cmd_mod_appidx_get(int argc, char *argv[])
+ 	put_le16(parms[1], msg + n);
+ 	n += 2;
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"GET APP GET\"\n");
++	if (!config_send(msg, n, OP_MODEL_APP_GET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -939,10 +1092,8 @@ static void cmd_hb_pub_set(int argc, char *argv[])
+ 	put_le16(parms[5], msg + n);
+ 	n += 2;
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET HEARTBEAT PUBLISH\"\n");
++	if (!config_send(msg, n, OP_CONFIG_HEARTBEAT_PUB_SET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -976,10 +1127,8 @@ static void cmd_hb_sub_set(int argc, char *argv[])
+ 	/* Period log */
+ 	msg[n++] = parms[2];
+ 
+-	if (!config_send(msg, n)) {
+-		bt_shell_printf("Failed to send \"SET HEARTBEAT SUBSCRIBE\"\n");
++	if (!config_send(msg, n, OP_CONFIG_HEARTBEAT_SUB_SET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -1030,7 +1179,7 @@ static const struct bt_shell_menu cfg_menu = {
+ 				"Add application key"},
+ 	{"appkey-del", "<app_idx>", cmd_appkey_del,
+ 				"Delete application key"},
+-	{"bind", "<ele_idx> <app_idx> <mod_id> [vendor_id]", cmd_bind,
++	{"bind", "<ele_addr> <app_idx> <mod_id> [vendor_id]", cmd_bind,
+ 				"Bind app key to a model"},
+ 	{"mod-appidx-get", "<ele_addr> <model id>", cmd_mod_appidx_get,
+ 				"Get model app_idx"},
 -- 
 2.21.0
 
