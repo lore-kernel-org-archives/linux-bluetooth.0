@@ -2,63 +2,92 @@ Return-Path: <SRS0=jKvG=Y4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D409CA9EA0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Nov 2019 10:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB734CA9EB5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Nov 2019 14:19:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 198BE21D7F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Nov 2019 10:22:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99A45218BA
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Nov 2019 14:19:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728227AbfKDKWj (ORCPT
+        id S1727939AbfKDOTx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Nov 2019 05:22:39 -0500
-Received: from bsmtp2.bon.at ([213.33.87.16]:45168 "EHLO bsmtp2.bon.at"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726441AbfKDKWj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Nov 2019 05:22:39 -0500
-Received: from simon-pc.sueba (81.89.61.168.host.vnet.sk [81.89.61.168])
-        by bsmtp2.bon.at (Postfix) with ESMTPSA id 47684Y6fmkz5tlM;
-        Mon,  4 Nov 2019 11:22:37 +0100 (CET)
-From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 2/2] core/advertising: Fix crash when client is added after unregistration
-Date:   Mon,  4 Nov 2019 11:21:02 +0100
-Message-Id: <1572862862-8536-2-git-send-email-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1572862862-8536-1-git-send-email-simon.mikuda@streamunlimited.com>
-References: <157250771818414>
- <1572862862-8536-1-git-send-email-simon.mikuda@streamunlimited.com>
+        Mon, 4 Nov 2019 09:19:53 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:40716 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727788AbfKDOTw (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 4 Nov 2019 09:19:52 -0500
+Received: from marcel-macbook.fritz.box (p4FEFC197.dip0.t-ipconnect.de [79.239.193.151])
+        by mail.holtmann.org (Postfix) with ESMTPSA id EEC21CECD6;
+        Mon,  4 Nov 2019 15:28:53 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH] Bluetooth: hci_qca: add PM support
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20191031104614.165120-1-tientzu@chromium.org>
+Date:   Mon, 4 Nov 2019 15:19:50 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <A80987FF-C9E1-4790-91F1-F86E405B9691@holtmann.org>
+References: <20191031104614.165120-1-tientzu@chromium.org>
+To:     Claire Chang <tientzu@chromium.org>
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-After "register_advertisement()" callback "client_proxy_added()" was yet
-called but it was actually called after: "unregister_advertisement()" which
-caused segmentation fault because client was removed twice.
+Hi Claire,
 
-Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
----
- src/advertising.c | 2 ++
- 1 file changed, 2 insertions(+)
+> Add PM suspend/resume callbacks for hci_qca driver.
+> 
+> BT host will make sure both Rx and Tx go into sleep state in
+> qca_suspend. Without this, Tx may still remain in awake state, which
+> prevents BTSOC from entering deep sleep. For example, BlueZ will send
+> Set Event Mask to device when suspending and this will wake the device
+> Rx up. However, the Tx idle timeout on the host side is 2000 ms. If the
+> host is suspended before its Tx idle times out, it won't send
+> HCI_IBS_SLEEP_IND to the device and the device Rx will remain awake.
+> 
+> We implement this by canceling relevant work in workqueue, sending
+> HCI_IBS_SLEEP_IND to the device and then waiting HCI_IBS_SLEEP_IND sent
+> by the device.
+> 
+> In order to prevent the device from being awaken again after qca_suspend
+> is called, we introduce QCA_SUSPEND flag. QCA_SUSPEND is set in the
+> beginning of qca_suspend to indicate system is suspending and that we'd
+> like to ignore any further wake events.
+> 
+> With QCA_SUSPEND and spinlock, we can avoid race condition, e.g. if
+> qca_enqueue acquires qca->hci_ibs_lock before qca_suspend calls
+> cancel_work_sync and then qca_enqueue adds a new qca->ws_awake_device
+> work after the previous one is cancelled.
+> 
+> If BTSOC wants to wake the whole system up after qca_suspend is called,
+> it will keep sending HCI_IBS_WAKE_IND and uart driver will take care of
+> waking the system. For example, uart driver will reconfigure its Rx pin
+> to a normal GPIO pin and enable irq wake on that pin when suspending.
+> Once host detects Rx falling, the system will begin resuming. Then, the
+> BT host clears QCA_SUSPEND flag in qca_resume and begins dealing with
+> normal HCI packets. By doing so, only a few HCI_IBS_WAKE_IND packets are
+> lost and there is no data packet loss.
+> 
+> Signed-off-by: Claire Chang <tientzu@chromium.org>
+> ---
+> drivers/bluetooth/hci_qca.c | 127 +++++++++++++++++++++++++++++++++++-
+> 1 file changed, 124 insertions(+), 3 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index f53c14c..45ff19f 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -190,6 +190,8 @@ static void client_remove(void *data)
- 	struct btd_adv_client *client = data;
- 	struct mgmt_cp_remove_advertising cp;
- 
-+	g_dbus_client_set_proxy_handlers(client->client, NULL, NULL, NULL,
-+									client);
- 	g_dbus_client_set_disconnect_watch(client->client, NULL, NULL);
- 
- 	cp.instance = client->instance;
--- 
-2.7.4
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
