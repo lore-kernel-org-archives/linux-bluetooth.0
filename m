@@ -2,376 +2,89 @@ Return-Path: <SRS0=VFYa=Y5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE15C49EAD
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 09:53:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22ECFFC619B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 10:13:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8048A20869
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 09:53:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="BQKdjc90"
+	by mail.kernel.org (Postfix) with ESMTP id E49BA222C5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 10:13:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572948791;
+	bh=EkFkzMw/9Q7TmseCjgj4zggdTDwYFvDKTbwOc9WSrrs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=y303kfKNjqj58rsG47fdqg1ibZjHP8Xivv3ICNILgWrIzQZmWXpjU76G7h2mnegEp
+	 f9fdxSkJVY3ZUTXeAWF39vGmj/mA7Sz79BVdx6MOnvT1bD0K/feF4HQ7w+Rq4aLBYu
+	 /oiEuRbF0u/JAQwcgOPldXkMB3PCjJ+OPD21KOQQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387977AbfKEJxe (ORCPT
+        id S2388175AbfKEKNK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Nov 2019 04:53:34 -0500
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:44404 "EHLO
-        mail-wr1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730571AbfKEJxd (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Nov 2019 04:53:33 -0500
-Received: by mail-wr1-f52.google.com with SMTP id f2so11635812wrs.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Nov 2019 01:53:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=kV7qCR/Y2pv3yHlqY5jXKOlLnNtUlZhctlJqUJO4AWw=;
-        b=BQKdjc90fXG8v4YGyi/38dNoLZtS/Hn6gI6/aWpgblV7xnYAkaMLvl8wPPwKi+rzyO
-         EOSGWDDkPMnQ5xlKVG9SZ76BeVxlI03oBqAmKTGA5VLDCC7abwt5vhrRDU3dO3YNQTMI
-         YBkeMyilavo7ogekER+qGjI1mFWRw0OeSMFJLupupmg94gsa/84d5Ec9zY1w29VPsujC
-         3UpB6yFtxZxOxPX8wI4T5lJlRY0Wn6WDhAlrLPUBeu7N3RaGE0hFzgjsMX2L1azOPGAS
-         3N8RjU/UurXq7tSLJCCZLVKiL+RaKShuTwiwzTgxC6CxwS1XUYHFx3OP5hrP+tNEhJdN
-         tlKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kV7qCR/Y2pv3yHlqY5jXKOlLnNtUlZhctlJqUJO4AWw=;
-        b=rQsIeboUi6et3uhiQgiScoKjVFlknJsw3BrRK4Yk3Nf0RCQlPksSyanYOULyrcRyNd
-         uL50d9IhC96ulxm/vzMa+dZWkZdxpq/+dwXyik//7RvxAAUIFruD/v1/SEuLkUkVs6w6
-         9MTzV3luG9WiNcFgonjnl0xAb25H5D0KxRGJgo//Ml0RAq6wEg6XHL1ojLUzM/fMWECI
-         gogPFh/43cC9yjap91K5xLfzz3FCgD8OZuQFcOyOaTA3+LtLoYEXR7OOUV2+/NgGnFyp
-         5/DI8X8P1XAh5jAXVOgl3TydQRFcbtt7l5lGly3XOHq1+trUnQN6jv7BDGjDunM2T/54
-         zs3w==
-X-Gm-Message-State: APjAAAVx/KYkzazsu4TMYBpF85YJN/Z4FRfjIwhhy45F0E+PoAddEGNo
-        h7O929QO1DOs1xfKqns1wk8=
-X-Google-Smtp-Source: APXvYqzawKRYp/UlO0k4ZYdg2CQ2LnbJq0yVKEb9XNMLNAVi0rebImA0GQWoVP2l1Lhn81HRBASGew==
-X-Received: by 2002:adf:f192:: with SMTP id h18mr28910229wro.148.1572947609083;
-        Tue, 05 Nov 2019 01:53:29 -0800 (PST)
-Received: from [192.168.201.5] (p4FD25546.dip0.t-ipconnect.de. [79.210.85.70])
-        by smtp.googlemail.com with ESMTPSA id d11sm24114298wrf.80.2019.11.05.01.53.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2019 01:53:28 -0800 (PST)
-Subject: Re: test-mesh-crypto segfaults
-To:     "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     "Stotland, Inga" <inga.stotland@intel.com>
-References: <5f75011d-a157-cab2-72df-0209f7a30f21@message-id.googlemail.com>
- <70299d5df034aa0174a9263ea8736b56fd9bbd02.camel@intel.com>
-From:   Stefan Seyfried <stefan.seyfried@googlemail.com>
-Message-ID: <cf7105b3-c623-5583-6cb5-2d04f22c9766@message-id.googlemail.com>
-Date:   Tue, 5 Nov 2019 10:53:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        Tue, 5 Nov 2019 05:13:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40578 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387832AbfKEKNK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 5 Nov 2019 05:13:10 -0500
+Received: from localhost (lfbn-1-10718-76.w90-89.abo.wanadoo.fr [90.89.68.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1961F21929;
+        Tue,  5 Nov 2019 10:13:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572948789;
+        bh=EkFkzMw/9Q7TmseCjgj4zggdTDwYFvDKTbwOc9WSrrs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=huX++/6ld4+kzCEovk5TNI25d6Y7ZwmKcSiqHq0C3aq0lczH3A2WFkTPtIGOPYMHX
+         YUBgihd44UMBnXiRZQslpZ2GYIE3zMWZel0TsiM8XlAcCOz3wgqPDYG7+FyonKaNz4
+         15Md/fEU+jyT4CvadT9+ekOEnTWr+9gdRIbDSX3Y=
+Date:   Tue, 5 Nov 2019 11:13:06 +0100
+From:   Maxime Ripard <mripard@kernel.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: add DT binding for
+ Realtek controllers
+Message-ID: <20191105101306.GA3876@gilmour.lan>
+References: <20191030224333.70241-1-bonstra@bonstra.fr.eu.org>
+ <20191030224333.70241-2-bonstra@bonstra.fr.eu.org>
+ <20191101080256.gjc4tacltehro3iw@hendrix>
+ <6C5CE71F-37F2-4C8A-9D94-1BC75937B478@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <70299d5df034aa0174a9263ea8736b56fd9bbd02.camel@intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <6C5CE71F-37F2-4C8A-9D94-1BC75937B478@holtmann.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+On Mon, Nov 04, 2019 at 03:20:59PM +0100, Marcel Holtmann wrote:
+> >> The rtl_bt driver already supports some Realtek controllers on ACPI
+> >> platforms.
+> >> This commit adds bindings for DT-only platforms.
+> >>
+> >> Signed-off-by: Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
+> >> ---
+> >> .../bindings/net/realtek-bluetooth.txt        | 25 +++++++++++++++++++
+> >> 1 file changed, 25 insertions(+)
+> >> create mode 100644 Documentation/devicetree/bindings/net/realtek-bluet=
+ooth.txt
+> >
+> > You should write that binding using a YAML description. Free-form
+> > device tree bindings are more or less deprecated now.
+>
+> unless we change all the Bluetooth descriptions, I prefer we keep it the =
+=E2=80=9Cold=E2=80=9D way.
 
-One thing I forgot to mention explicitly: this is the recently released bluez-5.52 tarball, not git master(!).
-Also note that openSUSE Factory use LTO by default now.
+FWIW, this is a warning in checkpatch now.
 
-from config.log:
-
-It was created by bluez configure 5.52, which was
-generated by GNU Autoconf 2.69.  Invocation command line was
-  $ ./configure --host=x86_64-suse-linux-gnu --build=x86_64-suse-linux-gnu --program-prefix=
---disable-dependency-tracking --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc
---datadir=/usr/share --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/lib --localstatedir=/var
---sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info --disable-dependency-tracking
---disable-silent-rules --enable-pie --enable-library --enable-tools --enable-cups --enable-mesh --enable-midi
---enable-test --enable-experimental --enable-deprecated --enable-datafiles --enable-sixaxis
---with-systemdsystemunitdir=/usr/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd/user
-
-[...]
-
-ac_cv_env_CFLAGS_value='-O2 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong -funwind-tables
--fasynchronous-unwind-tables -fstack-clash-protection -Werror=return-type -flto=auto -g'
-
-
-Am 04.11.19 um 23:11 schrieb Gix, Brian:
-> Hi Stefan,
-> 
-> On Mon, 2019-11-04 at 22:16 +0100, Stefan Seyfried wrote:
->> Hi,
->>
->> test-mesh-crypto segfaults for me.
->>
->> abuild@strolchi:~/rpmbuild/BUILD/bluez-5.52> gdb unit/test-mesh-crypto
->>
->> [....]
->>
->> [8.6.2 Service Data using Node Identity]
->> ID Resolving Key     = 84396c435ac48560b5965385253e210c
->>                        84396c435ac48560b5965385253e210c => PASS
->> Hash Input           = 00000000000034ae608fbbc1f2c61201
->>                        00000000000034ae608fbbc1f2c61201 => PASS
->> Hash                 = 00861765aefcc57b
->>                        00861765aefcc57b => PASS
->> Mesh ID Beacon       = 0100861765aefcc57b34ae608fbbc1f2c6
->>                        0100861765aefcc57b34ae608fbbc1f2c6 => PASS
->>
-> 
-> This is very strange.  The unit test looks like it has completed successfully (at least from what you copy-
-> pasted).  That test 8.6.2 is the final test, and it looks happy.  Can you verify for me that all the other
-> tests completed successfully?
-
-yes, all previous tests passed successfully.
-
-> There is a *small* chance that you could be running on an old kernel:  Kernels version 4.8 and before had a 
-> bug in the AEAD crypto code that made mesh code (including this unit test) inoperable...  But this should show
-> up *first* in one of the earlier tests within this unit test... so look for any FAIL designations.
-
-This is 5.4.0rc5 right now.
-
-> The other thing about this particular test is that it is the *only* bluez unit test which is based on ELL
-> (Embedded Linux Library) instead of GLIB.
-> 
-> Are you running from an installed ELL when compiling bluez, or do you have ELL in a "peer directory"... For
-> instance:
-> 
-> .../work/ell
-> .../work/bluez 
-
-no, I am using the embedded ell library AFAICT. I had "ell-devel" installed in the build root, but it is not used
-apparently. Nothing changes if I do not install ell-devel. ell-devel and libell0 are old versions (0.23), but again,
-removing them from the buildroot does not change things.
-
-> If you have the ELL source code available, please try running:
-> ell % make check
-> 
-> paying particular attention to the output of:
-> unit/test-cipher
-> 
-> If unit/test-cipher in ELL passes, then unit/test-mesh-crypto in BLUEZ should pass.
-
-I suppose it should work with the ell embedded in bluez-5.52 ;-)
-
->> Program received signal SIGSEGV, Segmentation fault.
->> 0x00007ffff7e874ae in mem2chunk_check () from /lib64/libc.so.6
->> (gdb) bt
->> #0  0x00007ffff7e874ae in mem2chunk_check () from /lib64/libc.so.6
->> #1  0x00007ffff7e8b6af in free_check () from /lib64/libc.so.6
->> #2  0x0000555555557c98 in l_free (ptr=<optimized out>) at ell/util.c:136
->> #3  l_queue_clear (queue=0x55555556d010, destroy=0x555555557c60
->> <l_free>) at ell/queue.c:107
-
-I was intrigued by the lots of 0x55 bytes in these pointers(?) and checked if MALLOC_PERTURB_ and MALLOC_CHECK_ values
-make a difference.
-
-openSUSE Factory by default builds with
-
-abuild@strolchi:~/rpmbuild/BUILD/bluez-5.52> echo $MALLOC_CHECK_
-3
-abuild@strolchi:~/rpmbuild/BUILD/bluez-5.52> echo $MALLOC_PERTURB_
-69
-
-unsetting both leads to an abort() instead of a segfault, but I think that's just a distraction:
-
-~> unit/test-mesh-crypto
-[...]
-[8.6.2 Service Data using Node Identity]
-ID Resolving Key     = 84396c435ac48560b5965385253e210c
-                       84396c435ac48560b5965385253e210c => PASS
-Hash Input           = 00000000000034ae608fbbc1f2c61201
-                       00000000000034ae608fbbc1f2c61201 => PASS
-Hash                 = 00861765aefcc57b
-                       00861765aefcc57b => PASS
-Mesh ID Beacon       = 0100861765aefcc57b34ae608fbbc1f2c6
-                       0100861765aefcc57b34ae608fbbc1f2c6 => PASS
-[8.6.2 Service Data using Node Identity]
-ID Resolving Key     = 84396c435ac48560b5965385253e210c
-                       84396c435ac48560b5965385253e210c => PASS
-Hash Input           = 00000000000034ae608fbbc1f2c61201
-                       00000000000034ae608fbbc1f2c61201 => PASS
-Hash                 = 00861765aefcc57b
-                       00861765aefcc57b => PASS
-Mesh ID Beacon       = 0100861765aefcc57b34ae608fbbc1f2c6
-                       0100861765aefcc57b34ae608fbbc1f2c6 => PASS
-
-free(): invalid size
-Aborted (core dumped)
-
-in gdb:
-Program received signal SIGABRT, Aborted.
-0x00007ffff7e3d0d1 in raise () from /lib64/libc.so.6
-(gdb) bt
-#0  0x00007ffff7e3d0d1 in raise () from /lib64/libc.so.6
-#1  0x00007ffff7e2655d in abort () from /lib64/libc.so.6
-#2  0x00007ffff7e8045f in __libc_message () from /lib64/libc.so.6
-#3  0x00007ffff7e878fc in malloc_printerr () from /lib64/libc.so.6
-#4  0x00007ffff7e892ec in _int_free () from /lib64/libc.so.6
-#5  0x0000555555557ca4 in l_free (ptr=<optimized out>) at ell/util.c:136
-#6  l_queue_clear (queue=0x55555556d2a0, destroy=0x555555557c60 <l_free>) at ell/queue.c:111
-#7  0x0000555555557210 in _sub_D_65535_1.7021 () at ell/cipher.c:319
-#8  0x00007ffff7fe2c13 in _dl_fini () from /lib64/ld-linux-x86-64.so.2
-#9  0x00007ffff7e3f877 in __run_exit_handlers () from /lib64/libc.so.6
-#10 0x00007ffff7e3fa2c in exit () from /lib64/libc.so.6
-#11 0x00007ffff7e27e12 in __libc_start_main () from /lib64/libc.so.6
-#12 0x0000555555557b8a in _start () at ../sysdeps/x86_64/start.S:120
-
-free(): invalid size
-Aborted (core dumped)
-
-
-Valgrind also complains, so I guess something is wrong in libell:
-
-==28744== Invalid read of size 8
-==28744==    at 0x10BC7E: l_queue_clear.constprop.0 (queue.c:101)
-==28744==    by 0x10B20F: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Address 0x4a15040 is 0 bytes inside a block of size 24 free'd
-==28744==    at 0x48389AB: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10B207: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Block was alloc'd at
-==28744==    at 0x483777F: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10C80D: l_malloc (util.c:62)
-==28744==    by 0x10B275: UnknownInlinedFun (queue.c:63)
-==28744==    by 0x10B275: l_debug_add_section.constprop.0 (log.c:376)
-==28744==    by 0x10B308: _sub_I_65535_0.7019 (queue.c:179)
-==28744==    by 0x1119E4: __libc_csu_init (elf-init.c:88)
-==28744==    by 0x4871D99: (below main) (in /lib64/libc-2.30.so)
-==28744==
-==28744== Invalid write of size 8
-==28744==    at 0x10BCA9: l_queue_clear.constprop.0 (queue.c:114)
-==28744==    by 0x10B20F: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Address 0x4a15040 is 0 bytes inside a block of size 24 free'd
-==28744==    at 0x48389AB: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10B207: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Block was alloc'd at
-==28744==    at 0x483777F: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10C80D: l_malloc (util.c:62)
-==28744==    by 0x10B275: UnknownInlinedFun (queue.c:63)
-==28744==    by 0x10B275: l_debug_add_section.constprop.0 (log.c:376)
-==28744==    by 0x10B308: _sub_I_65535_0.7019 (queue.c:179)
-==28744==    by 0x1119E4: __libc_csu_init (elf-init.c:88)
-==28744==    by 0x4871D99: (below main) (in /lib64/libc-2.30.so)
-==28744==
-==28744== Invalid write of size 8
-==28744==    at 0x10BCB1: l_queue_clear.constprop.0 (queue.c:115)
-==28744==    by 0x10B20F: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Address 0x4a15048 is 8 bytes inside a block of size 24 free'd
-==28744==    at 0x48389AB: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10B207: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Block was alloc'd at
-==28744==    at 0x483777F: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10C80D: l_malloc (util.c:62)
-==28744==    by 0x10B275: UnknownInlinedFun (queue.c:63)
-==28744==    by 0x10B275: l_debug_add_section.constprop.0 (log.c:376)
-==28744==    by 0x10B308: _sub_I_65535_0.7019 (queue.c:179)
-==28744==    by 0x1119E4: __libc_csu_init (elf-init.c:88)
-==28744==    by 0x4871D99: (below main) (in /lib64/libc-2.30.so)
-==28744==
-==28744== Invalid write of size 4
-==28744==    at 0x10BCB9: l_queue_clear.constprop.0 (queue.c:116)
-==28744==    by 0x10B20F: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Address 0x4a15050 is 16 bytes inside a block of size 24 free'd
-==28744==    at 0x48389AB: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10B207: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Block was alloc'd at
-==28744==    at 0x483777F: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10C80D: l_malloc (util.c:62)
-==28744==    by 0x10B275: UnknownInlinedFun (queue.c:63)
-==28744==    by 0x10B275: l_debug_add_section.constprop.0 (log.c:376)
-==28744==    by 0x10B308: _sub_I_65535_0.7019 (queue.c:179)
-==28744==    by 0x1119E4: __libc_csu_init (elf-init.c:88)
-==28744==    by 0x4871D99: (below main) (in /lib64/libc-2.30.so)
-==28744==
-==28744== Invalid free() / delete / delete[] / realloc()
-==28744==    at 0x48389AB: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Address 0x4a15040 is 0 bytes inside a block of size 24 free'd
-==28744==    at 0x48389AB: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10B207: _sub_D_65535_1.7021 (in /home/abuild/rpmbuild/BUILD/bluez-5.52/unit/test-mesh-crypto)
-==28744==    by 0x400FC12: _dl_fini (in /lib64/ld-2.30.so)
-==28744==    by 0x4889876: __run_exit_handlers (in /lib64/libc-2.30.so)
-==28744==    by 0x4889A2B: exit (in /lib64/libc-2.30.so)
-==28744==    by 0x4871E11: (below main) (in /lib64/libc-2.30.so)
-==28744==  Block was alloc'd at
-==28744==    at 0x483777F: malloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==28744==    by 0x10C80D: l_malloc (util.c:62)
-==28744==    by 0x10B275: UnknownInlinedFun (queue.c:63)
-==28744==    by 0x10B275: l_debug_add_section.constprop.0 (log.c:376)
-==28744==    by 0x10B308: _sub_I_65535_0.7019 (queue.c:179)
-==28744==    by 0x1119E4: __libc_csu_init (elf-init.c:88)
-==28744==    by 0x4871D99: (below main) (in /lib64/libc-2.30.so)
-==28744==
-==28744==
-==28744== HEAP SUMMARY:
-==28744==     in use at exit: 0 bytes in 0 blocks
-==28744==   total heap usage: 773 allocs, 774 frees, 18,598 bytes allocated
-==28744==
-==28744== All heap blocks were freed -- no leaks are possible
-==28744==
-==28744== For lists of detected and suppressed errors, rerun with: -s
-==28744== ERROR SUMMARY: 5 errors from 5 contexts (suppressed: 0 from 0)
-
-
-Somehow I'm unable to get proper debuginfo and better output from valgrind and gdb, so in a last desparate attempt I
-disabled LTO for my build and now the test does not fail.
-
-I'm going to file a bug for the openSUSE toolchain team for the LTO failure, but it is well possible that they will come
-back and point to issues in ell or bluez, so stay tuned ;-)
-
-the difference  LTO vs non-LTO is:
-
-LTO:
-CFLAGS='-O2 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong -funwind-tables -fasynchronous-unwind-tables
--fstack-clash-protection -Werror=return-type  -g'
-
-Non-LTO:
-CFLAGS='-O2 -Wall -D_FORTIFY_SOURCE=2 -fstack-protector-strong -funwind-tables -fasynchronous-unwind-tables
--fstack-clash-protection -Werror=return-type -flto=auto -g'
-
-Best regards,
--- 
-Stefan Seyfried
-
-"For a successful technology, reality must take precedence over
- public relations, for nature cannot be fooled." -- Richard Feynman
+Maxime
