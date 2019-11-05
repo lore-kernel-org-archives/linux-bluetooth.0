@@ -2,345 +2,96 @@ Return-Path: <SRS0=VFYa=Y5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734B1C17498
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 14:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6E2C5DF60
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 15:24:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3242A21928
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 14:45:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DE3621A4A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 15:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="g0hv0UUr";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="RrXlHKXx"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="mYYiIA3h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389651AbfKEOpc (ORCPT
+        id S2389485AbfKEPY1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Nov 2019 09:45:32 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:45418 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387584AbfKEOpc (ORCPT
+        Tue, 5 Nov 2019 10:24:27 -0500
+Received: from mail-wr1-f53.google.com ([209.85.221.53]:40993 "EHLO
+        mail-wr1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389240AbfKEPY0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Nov 2019 09:45:32 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 1FFFC6162C; Tue,  5 Nov 2019 14:45:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1572965131;
-        bh=f2RpBpxXpUQ0Z5mleXc1WIYnAGw0r+wMHkY1QTysd+M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=g0hv0UUr+Lc1ygMUAXHW0McrBAYBBlIZLwMTjwk8I7bQ0td57SwQzGXTCPrEcuZey
-         vccA2FO7izSfTimzlHMsAaEAiMoQrB6HNlimF+l/fF8udjFCThLYANxQ6O+fpOW3Gd
-         TW6IC2+hO71/HYKgzrOO3G5CZipVuFb36J31A7/0=
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 6E9BB6161C;
-        Tue,  5 Nov 2019 14:45:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1572965128;
-        bh=f2RpBpxXpUQ0Z5mleXc1WIYnAGw0r+wMHkY1QTysd+M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RrXlHKXxn6xt7Vo9HwCQnZgOi9TJyDrnB44Jht6qiZB6k/u/6w7Guhk1XB4cP3z+h
-         wJQvrw6hSXy1LuIjlKTI7+qgwrM/VVk+dk5ivTvs5lN0FoZUloRhDYiRrtVLIkUCVB
-         d9qBvCb0HAQY9VMj/LZlciQ9/TJ6QkPRa6qW+gD0=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 6E9BB6161C
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        tientzu@chromium.org, seanpaul@chromium.org
-Subject: [PATCH v1 2/2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC WCN3991
-Date:   Tue,  5 Nov 2019 20:15:08 +0530
-Message-Id: <20191105144508.22989-3-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20191105144508.22989-1-bgodavar@codeaurora.org>
-References: <20191105144508.22989-1-bgodavar@codeaurora.org>
+        Tue, 5 Nov 2019 10:24:26 -0500
+Received: by mail-wr1-f53.google.com with SMTP id p4so21844813wrm.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Nov 2019 07:24:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20161025;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ZMJ7wtO4WXlhObWuKBQubCP0xVRYpzZmHuADnt8h2zg=;
+        b=mYYiIA3hHedD3psQjc3/4hukHiUdrYHEzjXo0JsPbtz4uJy9ce/gUQIO7t++T2J30L
+         ZXqfPbVjoqEqnQtCJwuOU/Hm62dRr4b4wgyU26zCKF/ioMDLumlJSsxQcVHtql+Babhr
+         tT/p7XnlbFmftqIiUgjPi+OjASSoCLmZA7N9i8XqreEbAusJgTDtLOKSAcuGm1BH1bIT
+         GpYjGWqe276DZPcCBrz3UC3q20XzgjfVubN8m34hGy+w4sm45/rI6tlcP8oF3IFbs0zC
+         m4/8mMIRY+7fSQQ/zX6orY4D7x3ZFVUpDDyrVBkZE1GPY+PGPIMGM+Qi2EFGnKkHV0YA
+         Y1Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZMJ7wtO4WXlhObWuKBQubCP0xVRYpzZmHuADnt8h2zg=;
+        b=gtQNkL/omqiuu+df2te5cUXCFaycW3eQKc65vH2MBl/L8w9N26BvaxBGen5BCxBdk2
+         /u5FKBkWEm6jOoJNiilvLqw3l4W8nXshXnFEJD3R2S0/VTviK37Bc1UFxxBL07Ur7UwN
+         IAGeJH+j3LfOPwdcqEmt3D3bdKbY2Y/TC/UhwOTk298AlWVbgcwPvgpzcsCX1hGwCZrH
+         4W7lRxvyP6RO0DVws8i2XbtK7RCmazwKJyGZ7jgsiitCLT5UXRcDQKaPEJ7Vl3wffjCV
+         Gi+SNpJbvufAhanMxr1LkGrMdyf/LAHnO79LeodpO3Cb8zqa9XSYHrjWVdLBIWtg8sHg
+         gYMg==
+X-Gm-Message-State: APjAAAVpN6GU7pSQJnmkXRRuBaRs5eNsZEqu1DAWSwu5u9NBju/Avyi/
+        DQoD9atJfvnjHIxb3ih3wf9jR9VA
+X-Google-Smtp-Source: APXvYqwJHSDyWtY5T3F1UKQeKVOGoDvt+fUN47mPGavcv2YHoQDF9GTQAmzw+rZ2X3tpGmZYMBZ1TQ==
+X-Received: by 2002:adf:de86:: with SMTP id w6mr28560197wrl.220.1572967464761;
+        Tue, 05 Nov 2019 07:24:24 -0800 (PST)
+Received: from [192.168.201.5] (p4FD25546.dip0.t-ipconnect.de. [79.210.85.70])
+        by smtp.googlemail.com with ESMTPSA id w4sm6838738wmk.29.2019.11.05.07.24.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2019 07:24:23 -0800 (PST)
+Subject: Re: test-mesh-crypto segfaults
+From:   Stefan Seyfried <stefan.seyfried@googlemail.com>
+To:     "Gix, Brian" <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     "Stotland, Inga" <inga.stotland@intel.com>
+References: <5f75011d-a157-cab2-72df-0209f7a30f21@message-id.googlemail.com>
+ <70299d5df034aa0174a9263ea8736b56fd9bbd02.camel@intel.com>
+ <cf7105b3-c623-5583-6cb5-2d04f22c9766@message-id.googlemail.com>
+Message-ID: <c67c9cd7-ecdd-396e-ab7b-bb8716733690@message-id.googlemail.com>
+Date:   Tue, 5 Nov 2019 16:24:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <cf7105b3-c623-5583-6cb5-2d04f22c9766@message-id.googlemail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch add support for WCN3991 i.e. current values and fw download
-support.
+Am 05.11.19 um 10:53 schrieb Stefan Seyfried:
+> Hi Brian,
+> 
+> One thing I forgot to mention explicitly: this is the recently released bluez-5.52 tarball, not git master(!).
+> Also note that openSUSE Factory use LTO by default now.
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
- drivers/bluetooth/btqca.c   | 68 +++++++++++++++++++++++++++++--------
- drivers/bluetooth/btqca.h   | 10 ++++--
- drivers/bluetooth/hci_qca.c | 16 +++++++--
- 3 files changed, 74 insertions(+), 20 deletions(-)
+LTO seems to trigger the problem, see
+https://bugzilla.opensuse.org/show_bug.cgi?id=1155889#c6
+for an explanation of the issue and a suggested patch that will fix / work around the issue.
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 1a0f630515a6..79bca2e2ec13 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -14,19 +14,33 @@
- 
- #define VERSION "0.1"
- 
--int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
-+int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
-+			 enum qca_btsoc_type soc_type)
- {
- 	struct sk_buff *skb;
- 	struct edl_event_hdr *edl;
- 	struct qca_btsoc_version *ver;
- 	char cmd;
- 	int err = 0;
-+	u8 event_type = HCI_EV_VENDOR;
-+	u8 rlen = sizeof(*edl) + sizeof(*ver);
-+	u8 rtype = EDL_APP_VER_RES_EVT;
- 
- 	bt_dev_dbg(hdev, "QCA Version Request");
- 
-+	/* Unlike other SoC's sending version command response as payload to
-+	 * VSE event. WCN3991 sends version command response as a payload to
-+	 * command complete event.
-+	 */
-+	if (soc_type == QCA_WCN3991) {
-+		event_type = 0;
-+		rlen += 1;
-+		rtype = EDL_PATCH_VER_REQ_CMD;
-+	}
-+
- 	cmd = EDL_PATCH_VER_REQ_CMD;
- 	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
--				&cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
-+				&cmd, event_type, HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		err = PTR_ERR(skb);
- 		bt_dev_err(hdev, "Reading QCA version information failed (%d)",
-@@ -34,7 +48,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
- 		return err;
- 	}
- 
--	if (skb->len != sizeof(*edl) + sizeof(*ver)) {
-+	if (skb->len != rlen) {
- 		bt_dev_err(hdev, "QCA Version size mismatch len %d", skb->len);
- 		err = -EILSEQ;
- 		goto out;
-@@ -48,13 +62,16 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
- 	}
- 
- 	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
--	    edl->rtype != EDL_APP_VER_RES_EVT) {
-+	    edl->rtype != rtype) {
- 		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
- 			   edl->rtype);
- 		err = -EIO;
- 		goto out;
- 	}
- 
-+	if (soc_type == QCA_WCN3991)
-+		memcpy(&edl->data, &edl->data[1], sizeof(*ver));
-+
- 	ver = (struct qca_btsoc_version *)(edl->data);
- 
- 	BT_DBG("%s: Product:0x%08x", hdev->name, le32_to_cpu(ver->product_id));
-@@ -223,13 +240,17 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
- }
- 
- static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
--				 const u8 *data, enum qca_tlv_dnld_mode mode)
-+				const u8 *data, enum qca_tlv_dnld_mode mode,
-+				enum qca_btsoc_type soc_type)
- {
- 	struct sk_buff *skb;
- 	struct edl_event_hdr *edl;
- 	struct tlv_seg_resp *tlv_resp;
- 	u8 cmd[MAX_SIZE_PER_TLV_SEGMENT + 2];
- 	int err = 0;
-+	u8 event_type = HCI_EV_VENDOR;
-+	u8 rlen = (sizeof(*edl) + sizeof(*tlv_resp));
-+	u8 rtype = EDL_TVL_DNLD_RES_EVT;
- 
- 	cmd[0] = EDL_PATCH_TLV_REQ_CMD;
- 	cmd[1] = seg_size;
-@@ -239,15 +260,25 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
- 		return __hci_cmd_send(hdev, EDL_PATCH_CMD_OPCODE, seg_size + 2,
- 				      cmd);
- 
-+	/* Unlike other SoC's sending version command response as payload to
-+	 * VSE event. WCN3991 sends version command response as a payload to
-+	 * command complete event.
-+	 */
-+	if (soc_type == QCA_WCN3991) {
-+		event_type = 0;
-+		rlen = sizeof(*edl);
-+		rtype = EDL_PATCH_TLV_REQ_CMD;
-+	}
-+
- 	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, seg_size + 2, cmd,
--				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
-+				event_type, HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		err = PTR_ERR(skb);
- 		bt_dev_err(hdev, "QCA Failed to send TLV segment (%d)", err);
- 		return err;
- 	}
- 
--	if (skb->len != sizeof(*edl) + sizeof(*tlv_resp)) {
-+	if (skb->len != rlen) {
- 		bt_dev_err(hdev, "QCA TLV response size mismatch");
- 		err = -EILSEQ;
- 		goto out;
-@@ -260,13 +291,19 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
- 		goto out;
- 	}
- 
--	tlv_resp = (struct tlv_seg_resp *)(edl->data);
-+	if (edl->cresp != EDL_CMD_REQ_RES_EVT || edl->rtype != rtype) {
-+		bt_dev_err(hdev, "QCA TLV with error stat 0x%x rtype 0x%x",
-+			   edl->cresp, edl->rtype);
-+		err = -EIO;
-+	}
- 
--	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
--	    edl->rtype != EDL_TVL_DNLD_RES_EVT || tlv_resp->result != 0x00) {
-+	if (soc_type == QCA_WCN3991)
-+		goto out;
-+
-+	tlv_resp = (struct tlv_seg_resp *)(edl->data);
-+	if (tlv_resp->result) {
- 		bt_dev_err(hdev, "QCA TLV with error stat 0x%x rtype 0x%x (0x%x)",
- 			   edl->cresp, edl->rtype, tlv_resp->result);
--		err = -EIO;
- 	}
- 
- out:
-@@ -301,7 +338,8 @@ static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
- }
- 
- static int qca_download_firmware(struct hci_dev *hdev,
--				  struct qca_fw_config *config)
-+				 struct qca_fw_config *config,
-+				 enum qca_btsoc_type soc_type)
- {
- 	const struct firmware *fw;
- 	const u8 *segment;
-@@ -331,7 +369,7 @@ static int qca_download_firmware(struct hci_dev *hdev,
- 			config->dnld_mode = QCA_SKIP_EVT_NONE;
- 
- 		ret = qca_tlv_send_segment(hdev, segsize, segment,
--					    config->dnld_mode);
-+					   config->dnld_mode, soc_type);
- 		if (ret)
- 			goto out;
- 
-@@ -405,7 +443,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 			 "qca/rampatch_%08x.bin", soc_ver);
- 	}
- 
--	err = qca_download_firmware(hdev, &config);
-+	err = qca_download_firmware(hdev, &config, soc_type);
- 	if (err < 0) {
- 		bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
- 		return err;
-@@ -426,7 +464,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/nvm_%08x.bin", soc_ver);
- 
--	err = qca_download_firmware(hdev, &config);
-+	err = qca_download_firmware(hdev, &config, soc_type);
- 	if (err < 0) {
- 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
- 		return err;
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index 7f7a2b2c0df6..309a720ff216 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -126,6 +126,7 @@ enum qca_btsoc_type {
- 	QCA_ROME,
- 	QCA_WCN3990,
- 	QCA_WCN3998,
-+	QCA_WCN3991,
- };
- 
- #if IS_ENABLED(CONFIG_BT_QCA)
-@@ -134,12 +135,14 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		   enum qca_btsoc_type soc_type, u32 soc_ver,
- 		   const char *firmware_name);
--int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
-+int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
-+			 enum qca_btsoc_type);
- int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
- static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
- {
--	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3998;
-+	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3998 ||
-+	       soc_type == QCA_WCN3991;
- }
- #else
- 
-@@ -155,7 +158,8 @@ static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	return -EOPNOTSUPP;
- }
- 
--static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
-+static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
-+				       enum qca_btsoc_type)
- {
- 	return -EOPNOTSUPP;
- }
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index c2062087b46b..a655cb714147 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1288,7 +1288,7 @@ static int qca_setup(struct hci_uart *hu)
- 		if (ret)
- 			return ret;
- 
--		ret = qca_read_soc_version(hdev, &soc_ver);
-+		ret = qca_read_soc_version(hdev, &soc_ver, soc_type);
- 		if (ret)
- 			return ret;
- 	} else {
-@@ -1308,7 +1308,7 @@ static int qca_setup(struct hci_uart *hu)
- 
- 	if (!qca_is_wcn399x(soc_type)) {
- 		/* Get QCA version information */
--		ret = qca_read_soc_version(hdev, &soc_ver);
-+		ret = qca_read_soc_version(hdev, &soc_ver, soc_type);
- 		if (ret)
- 			return ret;
- 	}
-@@ -1377,6 +1377,17 @@ static const struct qca_vreg_data qca_soc_data_wcn3998 = {
- 	.num_vregs = 4,
- };
- 
-+static const struct qca_vreg_data qca_soc_data_wcn3991 = {
-+	.soc_type = QCA_WCN3991,
-+	.vregs = (struct qca_vreg []) {
-+		{ "vddio", 15000  },
-+		{ "vddxo", 80000  },
-+		{ "vddrf", 300000 },
-+		{ "vddch0", 450000 },
-+	},
-+	.num_vregs = 4,
-+};
-+
- static void qca_power_shutdown(struct hci_uart *hu)
- {
- 	struct qca_serdev *qcadev;
-@@ -1663,6 +1674,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
- 	{ .compatible = "qcom,qca6174-bt" },
- 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
- 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
-+	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
- 	{ /* sentinel */ }
- };
- MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+Best regards,
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Stefan Seyfried
 
+"For a successful technology, reality must take precedence over
+ public relations, for nature cannot be fooled." -- Richard Feynman
