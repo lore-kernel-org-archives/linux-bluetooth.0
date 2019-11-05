@@ -2,89 +2,86 @@ Return-Path: <SRS0=VFYa=Y5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22ECFFC619B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 10:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28715C1749B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 14:45:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E49BA222C5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 10:13:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572948791;
-	bh=EkFkzMw/9Q7TmseCjgj4zggdTDwYFvDKTbwOc9WSrrs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=y303kfKNjqj58rsG47fdqg1ibZjHP8Xivv3ICNILgWrIzQZmWXpjU76G7h2mnegEp
-	 f9fdxSkJVY3ZUTXeAWF39vGmj/mA7Sz79BVdx6MOnvT1bD0K/feF4HQ7w+Rq4aLBYu
-	 /oiEuRbF0u/JAQwcgOPldXkMB3PCjJ+OPD21KOQQ=
+	by mail.kernel.org (Postfix) with ESMTP id EFEC921928
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Nov 2019 14:45:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="J0w0FIHC";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="KzuZISi6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388175AbfKEKNK (ORCPT
+        id S2389594AbfKEOpV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Nov 2019 05:13:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40578 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387832AbfKEKNK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Nov 2019 05:13:10 -0500
-Received: from localhost (lfbn-1-10718-76.w90-89.abo.wanadoo.fr [90.89.68.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 5 Nov 2019 09:45:21 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:45032 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389096AbfKEOpV (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 5 Nov 2019 09:45:21 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 2C2216160A; Tue,  5 Nov 2019 14:45:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1572965120;
+        bh=cFPlxNSMY1K9+A3LYb2LGLWYFwQfD7aAy8BX2vuRuqM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=J0w0FIHCKDvOgJR9MyLTc2TKcGAanAZaQ8+cGTfGsnX4GgU8e2MlMYsCDmB1JaAL4
+         fGEMJ06oA2h5VtuPNPnHCMAV2X25lE012zg7A+0ejg/4WZEGJKii6HzG8l/zcJhZ99
+         Yv1rqoiR37yzY6kj7FsA/dNZBvV5oTbDVKU4OpCg=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1961F21929;
-        Tue,  5 Nov 2019 10:13:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572948789;
-        bh=EkFkzMw/9Q7TmseCjgj4zggdTDwYFvDKTbwOc9WSrrs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=huX++/6ld4+kzCEovk5TNI25d6Y7ZwmKcSiqHq0C3aq0lczH3A2WFkTPtIGOPYMHX
-         YUBgihd44UMBnXiRZQslpZ2GYIE3zMWZel0TsiM8XlAcCOz3wgqPDYG7+FyonKaNz4
-         15Md/fEU+jyT4CvadT9+ekOEnTWr+9gdRIbDSX3Y=
-Date:   Tue, 5 Nov 2019 11:13:06 +0100
-From:   Maxime Ripard <mripard@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: add DT binding for
- Realtek controllers
-Message-ID: <20191105101306.GA3876@gilmour.lan>
-References: <20191030224333.70241-1-bonstra@bonstra.fr.eu.org>
- <20191030224333.70241-2-bonstra@bonstra.fr.eu.org>
- <20191101080256.gjc4tacltehro3iw@hendrix>
- <6C5CE71F-37F2-4C8A-9D94-1BC75937B478@holtmann.org>
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2864C61603;
+        Tue,  5 Nov 2019 14:45:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1572965119;
+        bh=cFPlxNSMY1K9+A3LYb2LGLWYFwQfD7aAy8BX2vuRuqM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=KzuZISi6AGnf90xULWtm9wSXcy1ZrM1zQrZdivCdSOLeSJXCycGLBGpPb7iX9DbyK
+         9nS8y0EXYQ5ZsVVvJ1X3DFSnuvez/UU+gcdKWQLa9oegLXP4ZE7uJbzEmjNsHaUT+4
+         eJXxnxIVIDjvVyqWG5Dw9DCIdclF3YeAzk8YL6IY=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 2864C61603
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        tientzu@chromium.org, seanpaul@chromium.org
+Subject: [PATCH v1 0/2] Enable Bluetooth functionality for WCN3991
+Date:   Tue,  5 Nov 2019 20:15:06 +0530
+Message-Id: <20191105144508.22989-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <6C5CE71F-37F2-4C8A-9D94-1BC75937B478@holtmann.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 03:20:59PM +0100, Marcel Holtmann wrote:
-> >> The rtl_bt driver already supports some Realtek controllers on ACPI
-> >> platforms.
-> >> This commit adds bindings for DT-only platforms.
-> >>
-> >> Signed-off-by: Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
-> >> ---
-> >> .../bindings/net/realtek-bluetooth.txt        | 25 +++++++++++++++++++
-> >> 1 file changed, 25 insertions(+)
-> >> create mode 100644 Documentation/devicetree/bindings/net/realtek-bluet=
-ooth.txt
-> >
-> > You should write that binding using a YAML description. Free-form
-> > device tree bindings are more or less deprecated now.
->
-> unless we change all the Bluetooth descriptions, I prefer we keep it the =
-=E2=80=9Cold=E2=80=9D way.
+These patches enables Bluetooth functinalties for new Qualcomm
+Bluetooth chip wnc3991. As this is latest chip with new features,
+along with some common features to old chip "qcom,qcawcn3991-bt".
+Major difference between old BT SoC's with WCN3991 is WCN3991 
+will not send any VSE for the VSC instead is sends the data on CC
+packet.
 
-FWIW, this is a warning in checkpatch now.
+Balakrishna Godavarthi (2):
+  Bluetooth: btqca: Rename ROME specific variables to generic variables
+  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC WCN3991
 
-Maxime
+ drivers/bluetooth/btqca.c   | 92 ++++++++++++++++++++++++++-----------
+ drivers/bluetooth/btqca.h   | 32 +++++++------
+ drivers/bluetooth/hci_qca.c | 16 ++++++-
+ 3 files changed, 97 insertions(+), 43 deletions(-)
+
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
