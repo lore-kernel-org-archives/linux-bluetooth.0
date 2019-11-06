@@ -2,77 +2,145 @@ Return-Path: <SRS0=igZI=Y6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 000F5C5DF62
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Nov 2019 06:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2393DC5DF62
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Nov 2019 08:08:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB0832075C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Nov 2019 06:35:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E254A206A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Nov 2019 08:08:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dp92QgAy"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="VMB2FIKp";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Kjd7AuVi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729824AbfKFGfx (ORCPT
+        id S1731143AbfKFIIg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Nov 2019 01:35:53 -0500
-Received: from mail-io1-f42.google.com ([209.85.166.42]:39985 "EHLO
-        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727795AbfKFGfx (ORCPT
+        Wed, 6 Nov 2019 03:08:36 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:32918 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729986AbfKFIIg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Nov 2019 01:35:53 -0500
-Received: by mail-io1-f42.google.com with SMTP id p6so25745244iod.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Nov 2019 22:35:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=inGpfi3QnNPzVhnXRMKpIhHeIyukU0VzmErNS/kFmto=;
-        b=Dp92QgAyS6lQPRaoZ3XnItzPXoLtLy/o3m+G6CZL6lyWrIN+Uw+5TKTjcNsD4VQVG6
-         TadD00PIvGWmL5IRG0dES7APO2oT+L8ZXdDc4ExbibSspYtwMQ5H2Spa9l4wQsRcwSLJ
-         1nybQeD+97OtHqfddpHI0Szc6vz+8RqqGqKIhHJGZv2DcDh0cYmYA+NGIAaWYyHg7gVF
-         mzZpFsxAAM00FyhbrYobuz9qO8C3yFuso/yz2J7qXP6QWQNqACdsVeeLj1G+efuYIwdl
-         8ezpHS5wD6xWMqotWMvVBZjVsyLpS/iSszisumgMH1gK2KP8pV+KgyxjbO4waIzq4c9a
-         TE/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=inGpfi3QnNPzVhnXRMKpIhHeIyukU0VzmErNS/kFmto=;
-        b=Be5oLk4g1MH+A9uYVc3Ls6ZGqKHjnAsWrerPdtbaT0mIk7/tGOblPGIc3a0ASzJGWb
-         PeLXgJEeIoMJq2G3Agsda3Yv/fUmsTrClJjNxrej6z3iempDwdWHNBtf4iMM/aZ6Nu4y
-         uAS52NO3f+MvACpL+LJCUytcLqZkaaQ0fhQoU0MumP28quC9W28l7RRDZCygvHMv+Lg/
-         lhICaU/59oLw1/6NTI9btXOzpOxWAMwScn858d89+RdfNaSVKFvdqJRWwkBNHahdGNQw
-         A70EWKNU7te0x1341xYSPCnT9bRSXAV9p7ScHwuVfovq6+rrmpU7X7tQgm678XvDzR7B
-         PChQ==
-X-Gm-Message-State: APjAAAU0ES4JUdtzYasHpOK/wxkqntPP+TDCmbz7plqAaIVfsFGfNqPl
-        3ExNiPPfRomM03/ZTtBa4EDfIUrdXsDtTMON+Sxt/Jf3Y0c=
-X-Google-Smtp-Source: APXvYqweh5LSHAtfxcl8MySmS+fhU+pBVU1Yh2G0uirIfYQp9AXHEdHwpzAxBysz6RzcCY3Gd9HX9u5PaKEV9hV7g6M=
-X-Received: by 2002:a05:6638:345:: with SMTP id x5mr17774382jap.137.1573022151952;
- Tue, 05 Nov 2019 22:35:51 -0800 (PST)
+        Wed, 6 Nov 2019 03:08:36 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 0A4E7611FA; Wed,  6 Nov 2019 08:08:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1573027715;
+        bh=Yo8SjkHYjtVRfPkp1PCsQaZra8UH8YIzC2IL8wAokAQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VMB2FIKpdyZBdj/Gzgg0EPW60ktlEchBic4EaMJey34K57PbxkBAqpzVCppzsgqed
+         5yj5n03ZLKZRzXEvUyIqAP2W6ElvRfKcluz88VLPT+b5x5njoLRKhuTlpZnw61QVCd
+         W3g/pA8A6ChQYV0Ng/wgNRmFQNLMHT+t5x6y1jaM=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 0F17A611FA;
+        Wed,  6 Nov 2019 08:08:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1573027714;
+        bh=Yo8SjkHYjtVRfPkp1PCsQaZra8UH8YIzC2IL8wAokAQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Kjd7AuVic0Qh7zYpZM8+B10ufNxRXRFu1YkVYV1UH4ckWBzt1b2HedvixzIeG4wIk
+         4gX5fnjwTQ1CKTZZKPs6gaQev5qPNR9TKNqqqiZCLjfz+5s1jKoUk/NIVzuu6byMnk
+         ZcFHv6z/PC7j1xE+547iGggtVbr3c2G/jsQsaGp8=
 MIME-Version: 1.0
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Wed, 6 Nov 2019 12:05:40 +0530
-Message-ID: <CAOVXEJJ=dMe=f8R23JmC_idSV=gy1mmH4NSQTZUpmQPedjgBxw@mail.gmail.com>
-Subject: Bluez Compilation error for l_dbus_object_manager_enable arguments
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 06 Nov 2019 13:38:34 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Bjorn Andersson <bjorn.andersson@linaro.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        tientzu@chromium.org, seanpaul@chromium.org
+Subject: Re: [PATCH v1 2/2] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC WCN3991
+In-Reply-To: <20191105184407.GA1852@minitux>
+References: <20191105144508.22989-1-bgodavar@codeaurora.org>
+ <20191105144508.22989-3-bgodavar@codeaurora.org>
+ <20191105184407.GA1852@minitux>
+Message-ID: <739a8cadc6e01971a523d5a0b6fae057@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Jorn,
 
-I am getting the below error for compiling the latest bluez
+On 2019-11-06 00:14, Bjorn Andersson wrote:
+> On Tue 05 Nov 06:45 PST 2019, Balakrishna Godavarthi wrote:
+> 
+>> This patch add support for WCN3991 i.e. current values and fw download
+>> support.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>>  drivers/bluetooth/btqca.c   | 68 
+>> +++++++++++++++++++++++++++++--------
+>>  drivers/bluetooth/btqca.h   | 10 ++++--
+>>  drivers/bluetooth/hci_qca.c | 16 +++++++--
+>>  3 files changed, 74 insertions(+), 20 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> [..]
+>> @@ -48,13 +62,16 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 
+>> *soc_version)
+>>  	}
+>> 
+>>  	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
+>> -	    edl->rtype != EDL_APP_VER_RES_EVT) {
+>> +	    edl->rtype != rtype) {
+>>  		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
+>>  			   edl->rtype);
+>>  		err = -EIO;
+>>  		goto out;
+>>  	}
+>> 
+>> +	if (soc_type == QCA_WCN3991)
+>> +		memcpy(&edl->data, &edl->data[1], sizeof(*ver));
+> 
+> memcpy() shouldn't be used when the two memory regions are overlapping,
+> use memmove() for this.
+> 
 
-tools/mesh-cfgclient.c:1690:7: error: too many arguments to function
-=E2=80=98l_dbus_object_manager_enable=E2=80=99
- 1690 |  if (!l_dbus_object_manager_enable(dbus, "/"))
+[Bala]: will update
 
+> [..]
+>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> index 7f7a2b2c0df6..309a720ff216 100644
+>> --- a/drivers/bluetooth/btqca.h
+>> +++ b/drivers/bluetooth/btqca.h
+>> @@ -126,6 +126,7 @@ enum qca_btsoc_type {
+>>  	QCA_ROME,
+>>  	QCA_WCN3990,
+>>  	QCA_WCN3998,
+>> +	QCA_WCN3991,
+> 
+> Please maintain sort order.
+> 
 
-Regards,
-Sathish N
+[Bala]: will update
+
+> [..]
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> [..]
+>> @@ -1663,6 +1674,7 @@ static const struct of_device_id 
+>> qca_bluetooth_of_match[] = {
+>>  	{ .compatible = "qcom,qca6174-bt" },
+>>  	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
+>>  	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+>> +	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
+> 
+> Ditto
+> 
+
+[Bala]: will update
+
+> Regards,
+> Bjorn
+
+-- 
+Regards
+Balakrishna.
