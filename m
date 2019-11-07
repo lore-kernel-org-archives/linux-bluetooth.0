@@ -2,113 +2,176 @@ Return-Path: <SRS0=nDLV=Y7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D89FA372C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Nov 2019 00:46:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EEC9C5DF61
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Nov 2019 04:07:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6250320869
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Nov 2019 00:46:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573087568;
-	bh=1KOmyKGo87SrzodW3OLbAx00WBNi0y7bVelDGT8Yc3A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=UKSrf3EZ8Xg/zVmjJXHmp9s3H/ZPDj3gI68BtGVtieTKDjuFU9L7zwEMDPGOFq0Dz
-	 NGgh/19EP7m65KWDVGtuzmxUDyctDvtbQbnbgmHZD/TbPdrTNOCcdaawHAcbFj4hUh
-	 BNzG9IR08HAg4/JU9iY3i59METK5dGlYX/oiVojk=
+	by mail.kernel.org (Postfix) with ESMTP id 270BA2178F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Nov 2019 04:07:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ice9-us.20150623.gappssmtp.com header.i=@ice9-us.20150623.gappssmtp.com header.b="MGEL88Kn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728230AbfKGAqE (ORCPT
+        id S1733117AbfKGEHD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Nov 2019 19:46:04 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:36416 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727328AbfKGAqD (ORCPT
+        Wed, 6 Nov 2019 23:07:03 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:46244 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727279AbfKGEHD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Nov 2019 19:46:03 -0500
-Received: by mail-oi1-f194.google.com with SMTP id j7so453370oib.3;
-        Wed, 06 Nov 2019 16:46:03 -0800 (PST)
+        Wed, 6 Nov 2019 23:07:03 -0500
+Received: by mail-pl1-f193.google.com with SMTP id l4so489778plt.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Nov 2019 20:07:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ice9-us.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=LtTQxTtUpOQDCP0PBJAdks4jWNQ+TOKDlBxapGHb1eI=;
+        b=MGEL88Kn+vJktFuBe5qNvpkBFUnwQeL0j17FXzkIrNy5uD8bkDylTBEeDY32ugekt3
+         EHPAGDanP9jBfh7YLdiTQh+rdO2YIk1WNZa2WeGAiQ6YxRcAOxExvfVuWHoOOyJdvnlQ
+         uFCBLEDBh2obBxU2X2oUA67Co3SuHe9Y/pk5B4ojG5QPoe7LEGT6CRvGf8DazNWjE/uZ
+         IOdidFiKs/+qk5N0wkA9S6GJ+gkaAkyTMflCIcqMDAXjYNKwHWAuqtYTg5xRMEycifIQ
+         cCrV97IQfgzdkOs6fxqdeKWkxjDvVs9eGDLtq9TxX45Grk+fETpZf4E7fCDmkqswmeo4
+         w/Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=+gKYU75NcpNmTXMd0sfcN/iIV3zAqEzJPBb9kI5/Kto=;
-        b=U6KFf38etIn2RzALWalyNC6tsudhVMx8CLAQDsqckEWwMHEpiGOR9MGeemjg0UOZQ1
-         zPwzfh9r8CduhWB9C6RF9jnQHxOV0gTTu1Edzr2Ae7LgpmESXrqPUTm33OPSw68TRWZe
-         3FvQiZfKKhZpzt117mcOJQwyKWel13BDd/Nk2yBUxBP9W1DiNmUI35mo9rWHpnYtG//4
-         bQ20Q4/IHMAGwhpuFdF7N9gY+1exhN6yGc3/c+mMzuyZ60xdmELNyrLOWRBVuY/NjzXS
-         Egsd0f1LFyyuYPViYtBZeUtw5WpZNs0cl7Q0kxk1y3RX1uqdVqLj1Csbwzlr2N8LCIz8
-         BUuA==
-X-Gm-Message-State: APjAAAX5DwXwiqf+1Wm064mpRhnFdA57FlOAtXlFHvzonDxzXonaimqh
-        4VNBVst4PhvyHKbJK1Pf9w==
-X-Google-Smtp-Source: APXvYqyxC5qijCgvXTCtz8C5GVHYmbX7saK5/A84LdWm0eTBTY1n3iy3Ah56R4wGDPUz5rGkF2RNeg==
-X-Received: by 2002:aca:b757:: with SMTP id h84mr750743oif.175.1573087562633;
-        Wed, 06 Nov 2019 16:46:02 -0800 (PST)
-Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id o11sm137500oif.34.2019.11.06.16.46.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2019 16:46:02 -0800 (PST)
-Date:   Wed, 6 Nov 2019 18:46:01 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Chen-Yu Tsai <wens@csie.org>
-Subject: Re: [PATCH 4/4] dt-bindings: net: bluetooth: update
- broadcom-bluetooth
-Message-ID: <20191107004601.GA14629@bogus>
-References: <20191106002923.109344-1-abhishekpandit@chromium.org>
- <20191106002923.109344-5-abhishekpandit@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191106002923.109344-5-abhishekpandit@chromium.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=LtTQxTtUpOQDCP0PBJAdks4jWNQ+TOKDlBxapGHb1eI=;
+        b=aoJDh6G0V+O2pgQY2G0OeeNEb3sOtjqjbqmUnY+R0FTU8a9of3Htny8hVsoJpaEAfI
+         uHU0MTt5tBaZvgsoaWny+kuQGBmP5GKoRtu09Z1/YIQUPbr9NyUKEcW22NntM7fWRsp2
+         ZulC4f8eZifUExfaeLNQHG72lmv+prbUdxScZdFnIonwp/qcpY8uyLEBedV3NYGazvwy
+         0LNHPBB4zWX4sZwVtlgF+3fPpKawEwadwPJWsnbTXX8LM83zk5hQTYRhya8SwcrB4zKo
+         RCaAcJ0UamceHpyM02l4FWAaO/GQd/ofinflYw+MmpCEh8cfx1ijjOJ/XwWDeqotzujL
+         Vv5Q==
+X-Gm-Message-State: APjAAAWTPBpn9NPpMU6qK5Fbwz7y73ReFqS8wCRjxnDoQFsQpKA/V/lY
+        il6VffID/309knhRV7vo1TTwII1eHP8=
+X-Google-Smtp-Source: APXvYqwySDRmGlIDQ8ZPXdirWjD67j9CpxTqXJMbbIEpeHHOLq11iYewyHZ0WVFrekGcsxkvqk+Q5Q==
+X-Received: by 2002:a17:902:7287:: with SMTP id d7mr1426755pll.333.1573099621655;
+        Wed, 06 Nov 2019 20:07:01 -0800 (PST)
+Received: from localhost.localdomain (c-67-188-68-101.hsd1.ca.comcast.net. [67.188.68.101])
+        by smtp.gmail.com with ESMTPSA id s11sm554156pgo.85.2019.11.06.20.07.00
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Nov 2019 20:07:01 -0800 (PST)
+From:   mike@ice9.us
+To:     linux-bluetooth@vger.kernel.org
+Cc:     mike@ice9.us
+Subject: [PATCH] Bluetooth: Expose debugfs entry to allow illegal static address
+Date:   Wed,  6 Nov 2019 20:06:56 -0800
+Message-Id: <20191107040656.29306-1-mike@ice9.us>
+X-Mailer: git-send-email 2.11.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Nov 05, 2019 at 04:29:23PM -0800, Abhishek Pandit-Subedi wrote:
-> Add documentation for pcm-parameters.
-> 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> 
-> ---
-> 
->  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> index c749dc297624..ae60277b5569 100644
-> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> @@ -29,6 +29,9 @@ Optional properties:
->     - "lpo": external low power 32.768 kHz clock
->   - vbat-supply: phandle to regulator supply for VBAT
->   - vddio-supply: phandle to regulator supply for VDDIO
-> + - pcm-parameters: When set, will configure PCM parameters on the device. The
-> +   contents should be a 10-byte array corresponding to the pcm params (see
-> +   btbcm.h for more information).
+From: Mike Ryan <mike@ice9.us>
 
-Needs a vendor prefix.
+The first two bits of valid static addresses must both be 0 because
+other values are reserved for resolvable and non-resolvable private
+addresses (RPA and NRPA). In order to facilitate impersonation attacks
+against devices using RPAs, this debugfs entry allows the user to set
+the static address to an illegal value reserved for RPAs.
 
->  
->  
->  Example:
-> @@ -40,5 +43,6 @@ Example:
->         bluetooth {
->                 compatible = "brcm,bcm43438-bt";
->                 max-speed = <921600>;
-> +               pcm-parameters = [1 2 0 1 1 0 0 0 0 0];
->         };
->  };
-> -- 
-> 2.24.0.rc1.363.gb1bccd3e3d-goog
-> 
+Signed-off-by: Mike Ryan <mike@ice9.us>
+---
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_debugfs.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c        |  4 +++-
+ 3 files changed, 47 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5bc1e30de..d1e477093 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -280,6 +280,7 @@ enum {
+ 	HCI_DUT_MODE,
+ 	HCI_VENDOR_DIAG,
+ 	HCI_FORCE_BREDR_SMP,
++	HCI_ALLOW_ILLEGAL_STATIC_ADDR,
+ 	HCI_FORCE_STATIC_ADDR,
+ 	HCI_LL_RPA_RESOLUTION,
+ 	HCI_CMD_PENDING,
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 402e2cc54..0d3006302 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -667,6 +667,47 @@ static int static_address_show(struct seq_file *f, void *p)
+ 
+ DEFINE_SHOW_ATTRIBUTE(static_address);
+ 
++static ssize_t allow_illegal_static_address_read(struct file *file,
++					 char __user *user_buf,
++					 size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[3];
++
++	buf[0] = hci_dev_test_flag(hdev, HCI_ALLOW_ILLEGAL_STATIC_ADDR) ? 'Y': 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t allow_illegal_static_address_write(struct file *file,
++					  const char __user *user_buf,
++					  size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	bool enable;
++	int err;
++
++	err = kstrtobool_from_user(user_buf, count, &enable);
++	if (err)
++		return err;
++
++	if (enable == hci_dev_test_flag(hdev, HCI_ALLOW_ILLEGAL_STATIC_ADDR))
++		return -EALREADY;
++
++	hci_dev_change_flag(hdev, HCI_ALLOW_ILLEGAL_STATIC_ADDR);
++
++	return count;
++
++}
++
++static const struct file_operations allow_illegal_static_address_fops = {
++	.open		= simple_open,
++	.read		= allow_illegal_static_address_read,
++	.write		= allow_illegal_static_address_write,
++	.llseek		= default_llseek,
++};
++
+ static ssize_t force_static_address_read(struct file *file,
+ 					 char __user *user_buf,
+ 					 size_t count, loff_t *ppos)
+@@ -1016,6 +1057,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+ 			    &random_address_fops);
+ 	debugfs_create_file("static_address", 0444, hdev->debugfs, hdev,
+ 			    &static_address_fops);
++	debugfs_create_file("allow_illegal_static_address", 0644, hdev->debugfs,
++			    hdev, &allow_illegal_static_address_fops);
+ 
+ 	/* For controllers with a public address, provide a debug
+ 	 * option to force the usage of the configured static
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index acb7c6d56..59945b850 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4428,10 +4428,12 @@ static int set_static_address(struct sock *sk, struct hci_dev *hdev,
+ 					       MGMT_STATUS_INVALID_PARAMS);
+ 
+ 		/* Two most significant bits shall be set */
+-		if ((cp->bdaddr.b[5] & 0xc0) != 0xc0)
++		if ((cp->bdaddr.b[5] & 0xc0) != 0xc0 &&
++		    !hci_dev_test_flag(hdev, HCI_ALLOW_ILLEGAL_STATIC_ADDR)) {
+ 			return mgmt_cmd_status(sk, hdev->id,
+ 					       MGMT_OP_SET_STATIC_ADDRESS,
+ 					       MGMT_STATUS_INVALID_PARAMS);
++		}
+ 	}
+ 
+ 	hci_dev_lock(hdev);
+-- 
+2.11.0
+
