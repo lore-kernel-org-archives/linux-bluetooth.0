@@ -1,149 +1,119 @@
-Return-Path: <SRS0=nDLV=Y7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=wWzP=ZA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5240CC5DF60
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Nov 2019 23:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D21C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 02:04:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1A7E2178F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Nov 2019 23:28:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1327E21882
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 02:04:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IiL5AIub"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c+wvsAg5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbfKGX1s (ORCPT
+        id S1728485AbfKHCE2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Nov 2019 18:27:48 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:44418 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727912AbfKGX1s (ORCPT
+        Thu, 7 Nov 2019 21:04:28 -0500
+Received: from mail-qk1-f182.google.com ([209.85.222.182]:40872 "EHLO
+        mail-qk1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725928AbfKHCE2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Nov 2019 18:27:48 -0500
-Received: by mail-pl1-f193.google.com with SMTP id az9so1843374plb.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Nov 2019 15:27:47 -0800 (PST)
+        Thu, 7 Nov 2019 21:04:28 -0500
+Received: by mail-qk1-f182.google.com with SMTP id z16so3925010qkg.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Nov 2019 18:04:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=NUWZMN0GGob52T1jXs/z4kULS3gjYf/I2UiFL9rMkbg=;
-        b=IiL5AIub7qvRwcEMWwV8T/E10byDaXeXyNRPiSewLwoS3vLLD/hjoGvK5d7xoHnhrF
-         bh8nLmxoNOl47LRDoHmuXtPoo0mQzLBBI/SFfnK5/eJ/tWSJtJzwEoQs2RM3U90qWkaO
-         kxT32FnC2xwMsI0iXuYxdBYcynJalis+wRZbM=
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=2gJXdS8n/Z4E33qZju6i0lJ1SLBNFhBSOGRO1i9g/KU=;
+        b=c+wvsAg5bI7hJ2u+3LvTH3zo6rku0GyRI3XuPtzkt/cyOyNBU+uzmbyXM4FkTqaeG1
+         0TeSMmywi6lrUWd3CrOHrpMXJL3XGaEAaDEZo//oEU9tPrdS1k8KVUyLZd5P29clZ9Se
+         3K//CfGEyq856um3ZmsRf3qPficyQe2GHlndo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=NUWZMN0GGob52T1jXs/z4kULS3gjYf/I2UiFL9rMkbg=;
-        b=NB3SfD3Y5KF029b78hUh2RXLjPZd52dZLVdrWAA69pp/aubeOYcrqe5/8850BF6ViC
-         LJm3F7LszozBRYQXXQNYugfhEvglZ2CE84+xI6ib9KpCQMCL7L8qLjzh8yQjfADS4IvO
-         ZlPbFO4tnjKLsYaNNl6wfkJixC94nb4TBkH0yEZcBXb25dgYSU8MMIXi7MeQHkEsATrB
-         f6RgrhqZabczBM0enZhTBq+WjibijM3yUo7ti29AAScWdjazPJAFYST4TQBpYLd3nZ0X
-         U/M/blBpVGL6c/MU7/rpnNw3ZoCgy3yV0sjtC95kzg77swEggORX3jGCnX+j4D4ufqzn
-         oCRQ==
-X-Gm-Message-State: APjAAAVgsaiCRCtHmZdWNOABNDWNeX1f1ETQhgjQgElywIFJhz3swBl4
-        OtY8rdq+gUCY9ANqRQa3a5ok5g==
-X-Google-Smtp-Source: APXvYqzZRuag1cAjOI+5eUD6N6hrGEkeHiHMr+BFM3DE3zFRsUppKe1oXtxtyxpXdxLU/QpcTlyb5g==
-X-Received: by 2002:a17:90a:9604:: with SMTP id v4mr8751603pjo.105.1573169267489;
-        Thu, 07 Nov 2019 15:27:47 -0800 (PST)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id h3sm2857579pji.16.2019.11.07.15.27.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2019 15:27:47 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=2gJXdS8n/Z4E33qZju6i0lJ1SLBNFhBSOGRO1i9g/KU=;
+        b=R1IH1kYkrNZor7NFb2IfTDIooBiL3zii3HcAAv6foisbuLOqrvIsr2ihYKob+JR720
+         yK3mb0E3vhvnTQPmrG6no68nmpEYAWBhCGQRxWMBvuEzZJmulSPOmlLoJ9O8d+/5xJmK
+         iyk5ZaHNnYLNOJ7u4qrSnje2cmEW5qaSUKkqsIMBfC5O3V3lMnQX5Yw7uBkyqRVfWCr9
+         bt1BnRAOGoa67VgjMXT39byeCsQKgi18Sj+vd+bK+eQddXXHDfkO7rvBuCF5utdRPoW/
+         ExmC/d5ZNbRNc0XKSDpJoJnTNRirLyMw7JOK57jDx8Ire8n0oD87NtPvFjxEbH/vr+8G
+         4LLw==
+X-Gm-Message-State: APjAAAX0J23JWNjhDucAI1xGxanZxUfzGVMbUObpEElW/x4r9mU+9/jo
+        /nIn7JEp9LGVymgl8ELmsASqt/ogGw5iRWQyxuRWSQ==
+X-Google-Smtp-Source: APXvYqwAc9bL4cjkHgy48fK84OmvPZAH95bXWdygOImMO0ZJN1zE489UBydJPMduNUuSCERiX4tsqxEV7hf+hjjdlK4=
+X-Received: by 2002:ae9:f003:: with SMTP id l3mr6302911qkg.331.1573178665583;
+ Thu, 07 Nov 2019 18:04:25 -0800 (PST)
+MIME-Version: 1.0
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Thu, 7 Nov 2019 18:04:14 -0800
+Message-ID: <CANFp7mVOh5KPYPPnbGO_YnV-mBGTV3gYgWcPNSMq+=aBzBM00Q@mail.gmail.com>
+Subject: RFC: Managing devices around system suspend in bluez
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>
-Cc:     linux-bluetooth@vger.kernel.org, dianders@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/4] Bluetooth: hci_bcm: Disallow set_baudrate for BCM4354
-Date:   Thu,  7 Nov 2019 15:27:09 -0800
-Message-Id: <20191107232713.48577-2-abhishekpandit@chromium.org>
-X-Mailer: git-send-email 2.24.0.rc1.363.gb1bccd3e3d-goog
-In-Reply-To: <20191107232713.48577-1-abhishekpandit@chromium.org>
-References: <20191107232713.48577-1-abhishekpandit@chromium.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Yoni Shavit <yshavit@chromium.org>, alainmichaud@google.com
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Without updating the patchram, the BCM4354 does not support a higher
-operating speed. The normal bcm_setup follows the correct order
-(init_speed, patchram and then oper_speed) but the serdev driver will
-set the operating speed before calling the hu->setup function. Thus,
-for the BCM4354, disallow setting the operating speed before patchram.
+On ChromeOS, we are currently trying to design how bluez should behave
+during system suspend. This is motivated by the fact that bluetooth
+can be a noisy source of wakeups on a system and historically has been
+noisy on ChromeOS.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
+Here are some problems we've seen:
+- If the system suspends while discovery is active, advertisements
+will continue arriving on the host and will wake the system
+- Pairing a LE keyboard/mouse and disconnecting it (via link loss)
+results in a passive scan of all advertisements (and these will wake
+the host)
 
-Changes in v2: None
+To resolve this, we propose adding a SuspendImminent and SuspendDone
+dbus api to inform bluez that suspend is about to occur and the system
+has resumed.
+(These names are based off the ChromeOS Power Manager's existing
+design: https://chromium.googlesource.com/chromiumos/platform2/+/master/power_manager/docs/suspend_resume.md)
 
- drivers/bluetooth/hci_bcm.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+In the suspend imminent handler, we would do the following in order:
+* Pause any discovery
+* Set an event filter for all paired devices capable of waking the
+system (anything that creates uhid or uinput virtual devices)
+* Disconnect all connected devices (with a soft disconnect)
+* Enable background scan with whitelist of devices that should be able
+to wake the system (** see below for comments about IRK resolution)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 0f851c0dde7f..2114df607cb3 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1167,7 +1167,7 @@ static int bcm_remove(struct platform_device *pdev)
- 	return 0;
- }
- 
--static const struct hci_uart_proto bcm_proto = {
-+static struct hci_uart_proto bcm_proto = {
- 	.id		= HCI_UART_BCM,
- 	.name		= "Broadcom",
- 	.manufacturer	= 15,
-@@ -1371,6 +1371,24 @@ static struct platform_driver bcm_driver = {
- 	},
- };
- 
-+#define BCM_QUIRK_DISALLOW_SET_BAUDRATE (1 << 0)
-+const u32 disallow_set_baudrate = BCM_QUIRK_DISALLOW_SET_BAUDRATE;
-+
-+static int bcm_check_disallow_set_baudrate(struct serdev_device *serdev)
-+{
-+	const u32 *quirks = device_get_match_data(&serdev->dev);
-+
-+	if (quirks) {
-+		/* BCM4354 can't run at full speed before patchram. Disallow
-+		 * externally setting operating speed.
-+		 */
-+		if (*quirks & BCM_QUIRK_DISALLOW_SET_BAUDRATE)
-+			return 1;
-+	}
-+
-+	return 0;
-+}
-+
- static int bcm_serdev_probe(struct serdev_device *serdev)
- {
- 	struct bcm_device *bcmdev;
-@@ -1408,6 +1426,9 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
- 	if (err)
- 		dev_err(&serdev->dev, "Failed to power down\n");
- 
-+	if (bcm_check_disallow_set_baudrate(serdev))
-+		bcm_proto.set_baudrate = NULL;
-+
- 	return hci_uart_register_device(&bcmdev->serdev_hu, &bcm_proto);
- }
- 
-@@ -1424,7 +1445,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
- 	{ .compatible = "brcm,bcm4345c5" },
- 	{ .compatible = "brcm,bcm4330-bt" },
- 	{ .compatible = "brcm,bcm43438-bt" },
--	{ .compatible = "brcm,bcm43540-bt" },
-+	{ .compatible = "brcm,bcm43540-bt", .data = &disallow_set_baudrate },
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
--- 
-2.24.0.rc1.363.gb1bccd3e3d-goog
+In the suspend done handler, we would do the following in order:
+* Clear the event filter
+* Enable background scan with non-suspend logic (** see below for
+comments about IRK resolution)
+* Unpause discovery (if it was running before suspend)
 
+We expect this will result in the following:
+* Classic: A paired device can wake the host if it's in the event filter
+* LE: A paired device can wake the host if it's in the whitelist and
+it sends an advertisement (undirected if in the whitelist, directed if
+targeting our host; i.e. filter_policy = 0x1 or 0x3)
+
+Do you think the actions taken in the suspend handlers are sufficient?
+Any concerns or things to look out for?
+
+Thanks
+Abhishek
+
+IRK Resolution:
+With this design, we have some problems with IRK resolution on BT
+version < 4.2. Devices supporting BT Privacy 1.2 may start using
+resolvable private addresses for both initiator and destination.
+Without address resolution in the controller, we have to set the
+filter policy to 0 (allow all) so that we can do address resolution on
+the host.
+Implementing these privacy features are outside the scope of this RFC
+so we will disallow wake up from suspend for these devices (set filter
+policy to accept only whitelist and directed). Once bluez supports
+Privacy 1.2, wakeup from these devices will work on controllers with
+BT version >= 4.2.
