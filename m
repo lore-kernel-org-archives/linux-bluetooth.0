@@ -2,87 +2,115 @@ Return-Path: <SRS0=wWzP=ZA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBEB1FA372C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 06:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB61CFC6197
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 08:53:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 998BD20865
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 06:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A052521882
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 08:53:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPyGLnm1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729816AbfKHGMH convert rfc822-to-8bit (ORCPT
+        id S1730573AbfKHIxl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Nov 2019 01:12:07 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:43990 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725802AbfKHGMH (ORCPT
+        Fri, 8 Nov 2019 03:53:41 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28790 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727573AbfKHIxl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Nov 2019 01:12:07 -0500
-Received: from marcel-macpro.fritz.box (p5B3D2BA4.dip0.t-ipconnect.de [91.61.43.164])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D24F8CED12;
-        Fri,  8 Nov 2019 07:21:09 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH v2 4/4] dt-bindings: net: broadcom-bluetooth: Add pcm
- config
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191107232713.48577-5-abhishekpandit@chromium.org>
-Date:   Fri, 8 Nov 2019 07:12:05 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
-        devicetree@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Chen-Yu Tsai <wens@csie.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <48D0B4BB-2819-4C4D-B52D-4727FB344C19@holtmann.org>
-References: <20191107232713.48577-1-abhishekpandit@chromium.org>
- <20191107232713.48577-5-abhishekpandit@chromium.org>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-X-Mailer: Apple Mail (2.3601.0.10)
+        Fri, 8 Nov 2019 03:53:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573203219;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H6/rp2sqHx63a+SahoXLpWtKxXlEYGHQF9yA0visXkA=;
+        b=ZPyGLnm1qcNkS1oab+aRmDjQlxx7gMDuHEJvNTC9kKuqYRn3nlc0g79r931pF5M5DSKJt2
+        lXlUtwXgqeJSMMsppbDHzmXqb+cMusmoOVCh9N2ffubSziHM095j6HBXrGGneqGEpfmB06
+        g7+O4AXNoEk8F0H2K7cw3gsPW3ocljc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-6G1-7NXPP82WUfVR0rZY1Q-1; Fri, 08 Nov 2019 03:53:36 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79B79107ACC3;
+        Fri,  8 Nov 2019 08:53:34 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 04FFA60BE1;
+        Fri,  8 Nov 2019 08:53:34 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 668461803C32;
+        Fri,  8 Nov 2019 08:53:33 +0000 (UTC)
+Date:   Fri, 8 Nov 2019 03:53:33 -0500 (EST)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     syzbot <syzbot+8c0dbf8843bb75efaa05@syzkaller.appspotmail.com>
+Cc:     gustavo@padovan.org, johan hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, syzkaller-bugs@googlegroups.com,
+        torvalds@linux-foundation.org, ytkim@qca.qualcomm.com
+Message-ID: <147419886.15836536.1573203213339.JavaMail.zimbra@redhat.com>
+In-Reply-To: <000000000000eac5200596c1d46b@google.com>
+References: <000000000000eac5200596c1d46b@google.com>
+Subject: Re: general protection fault in qca_setup
+MIME-Version: 1.0
+X-Originating-IP: [10.40.205.171, 10.4.195.27]
+Thread-Topic: general protection fault in qca_setup
+Thread-Index: nCtYTpj9im0+XRib/oPMJOIb6++6QQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 6G1-7NXPP82WUfVR0rZY1Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+#syz fix: Bluetooth: hci_uart: check for missing tty operations
 
-> Add documentation for pcm parameters.
-> 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> 
-> ---
-> 
-> Changes in v2:
-> - Use match data to disallow baudrate setting
-> - Parse pcm parameters by name instead of as a byte string
-> - Fix prefix for dt-bindings commit
-> 
-> .../devicetree/bindings/net/broadcom-bluetooth.txt    | 11 +++++++++++
-> 1 file changed, 11 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> index c749dc297624..b5de8a6a3980 100644
-> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> @@ -29,6 +29,11 @@ Optional properties:
->    - "lpo": external low power 32.768 kHz clock
->  - vbat-supply: phandle to regulator supply for VBAT
->  - vddio-supply: phandle to regulator supply for VDDIO
-> + - brcm,sco-routing: 0-3 (PCM, Transport, Codec, I2S)
-> + - brcm,pcm-interface-rate: 0-4 (128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps)
-> + - brcm,pcm-frame-type: 0-1 (short, long)
-> + - brcm,pcm-sync-mode: 0-1 (slave, master)
-> + - brcm,pcm-clock-mode: 0-1 (slave, master)
+Best regards,
+Vladis Dronov | Red Hat, Inc. | The Core Kernel | Senior Software Engineer
 
-should we do brcm,bt-sco-routing etc.
-
-Regards
-
-Marcel
+----- Original Message -----
+> From: "syzbot" <syzbot+8c0dbf8843bb75efaa05@syzkaller.appspotmail.com>
+> To: gustavo@padovan.org, "johan hedberg" <johan.hedberg@gmail.com>, linux=
+-bluetooth@vger.kernel.org,
+> linux-kernel@vger.kernel.org, marcel@holtmann.org, syzkaller-bugs@googleg=
+roups.com, torvalds@linux-foundation.org,
+> vdronov@redhat.com, ytkim@qca.qualcomm.com
+> Sent: Thursday, November 7, 2019 2:42:08 PM
+> Subject: Re: general protection fault in qca_setup
+>=20
+> syzbot suspects this bug was fixed by commit:
+>=20
+> commit b36a1552d7319bbfd5cf7f08726c23c5c66d4f73
+> Author: Vladis Dronov <vdronov@redhat.com>
+> Date:   Tue Jul 30 09:33:45 2019 +0000
+>=20
+>      Bluetooth: hci_uart: check for missing tty operations
+>=20
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1436b32c60=
+0000
+> start commit:   d1393711 Linux 5.0-rc6
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dee434566c893c=
+7b1
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D8c0dbf8843bb75e=
+faa05
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D130894af400=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D10799004c0000=
+0
+>=20
+> If the result looks correct, please mark the bug fixed by replying with:
+>=20
+> #syz fix: Bluetooth: hci_uart: check for missing tty operations
+>=20
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
 
