@@ -2,75 +2,67 @@ Return-Path: <SRS0=54w9=ZB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A2BC17441
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Nov 2019 00:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6FBDC17442
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Nov 2019 00:51:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FA1020869
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Nov 2019 00:07:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC06620869
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Nov 2019 00:51:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726640AbfKIAHD (ORCPT
+        id S1726149AbfKIAvI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Nov 2019 19:07:03 -0500
-Received: from mga05.intel.com ([192.55.52.43]:64720 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726231AbfKIAHD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Nov 2019 19:07:03 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Nov 2019 16:07:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,283,1569308400"; 
-   d="scan'208";a="215104646"
-Received: from ingas-nuc1.sea.intel.com ([10.254.33.193])
-  by orsmga002.jf.intel.com with ESMTP; 08 Nov 2019 16:07:01 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
+        Fri, 8 Nov 2019 19:51:08 -0500
+Received: from mail-out.m-online.net ([212.18.0.9]:33259 "EHLO
+        mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726092AbfKIAvI (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 8 Nov 2019 19:51:08 -0500
+Received: from frontend01.mail.m-online.net (unknown [192.168.8.182])
+        by mail-out.m-online.net (Postfix) with ESMTP id 478z8p16qpz1qqkV
+        for <linux-bluetooth@vger.kernel.org>; Sat,  9 Nov 2019 01:51:06 +0100 (CET)
+Received: from localhost (dynscan1.mnet-online.de [192.168.6.70])
+        by mail.m-online.net (Postfix) with ESMTP id 478z8p11KVz1qqkJ
+        for <linux-bluetooth@vger.kernel.org>; Sat,  9 Nov 2019 01:51:06 +0100 (CET)
+X-Virus-Scanned: amavisd-new at mnet-online.de
+Received: from mail.mnet-online.de ([192.168.8.182])
+        by localhost (dynscan1.mail.m-online.net [192.168.6.70]) (amavisd-new, port 10024)
+        with ESMTP id KUnyWKfVHFC6 for <linux-bluetooth@vger.kernel.org>;
+        Sat,  9 Nov 2019 01:51:05 +0100 (CET)
+X-Auth-Info: sVt2n47QNja/CUE+8dk5oxWjipNjzziHdVYGDGZ8pSOLyUZbnPMFVwUWEQjGeWy2
+Received: from EmacsBook (ppp-93-104-82-64.dynamic.mnet-online.de [93.104.82.64])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.mnet-online.de (Postfix) with ESMTPSA
+        for <linux-bluetooth@vger.kernel.org>; Sat,  9 Nov 2019 01:51:05 +0100 (CET)
+User-agent: mu4e 1.2.0; emacs 26.3
+From:   Raffael Stocker <r.stocker@mnet-mail.de>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Fix clean up after AddNode method
-Date:   Fri,  8 Nov 2019 16:07:00 -0800
-Message-Id: <20191109000700.5428-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.0
+Subject: BlueZ/D-Bus: Interpretation of service classes and UUIDs
+Date:   Sat, 09 Nov 2019 01:50:59 +0100
+Message-ID: <87a795vpn0.fsf@mnet-mail.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the cleanup routine that is called after AddNode method
-on org.bluez.mesh.Manager1 interface is complete: do not remove
-the agent associated with the Provisioner (owner of Manager interface).
----
- mesh/manager.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+I have recently written a bluetooth package for Emacs using the BlueZ
+D-Bus interface.  For the interpretation of device and service classes,
+and other UUIDs, I hand-scraped the bluetooth.com website, although much
+of the information seems to be available somewhere in BlueZ, at least
+on a source code/C library interface level, if not on D-Bus.
 
-diff --git a/mesh/manager.c b/mesh/manager.c
-index b39ea6ed7..0b11b4541 100644
---- a/mesh/manager.c
-+++ b/mesh/manager.c
-@@ -80,8 +80,6 @@ static void free_pending_add_call()
- 		l_dbus_remove_watch(dbus_get_bus(),
- 						add_pending->disc_watch);
- 
--	mesh_agent_remove(add_pending->agent);
--
- 	l_free(add_pending);
- 	add_pending = NULL;
- }
-@@ -246,7 +244,7 @@ static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
- 	add_pending = l_new(struct add_data, 1);
- 	memcpy(add_pending->uuid, uuid, 16);
- 	add_pending->node = node;
--	add_pending->agent = node_get_agent(node);;
-+	add_pending->agent = node_get_agent(node);
- 
- 	if (!node_is_provisioner(node) || (add_pending->agent == NULL)) {
- 		l_info("Provisioner: %d", node_is_provisioner(node));
--- 
-2.21.0
+Have I overlooked any way to query BlueZ for a human-readable
+interpretation of UUIDs etc. over D-Bus?
 
+If not, could such an interface be implemented in BlueZ?  I think it
+would be very useful if applications building on BlueZ could all offer
+the same textual representation of UUIDs without each replicating the
+same data over and over again.
+
+Regards,
+        Raffael
