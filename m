@@ -1,116 +1,76 @@
-Return-Path: <SRS0=wWzP=ZA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=54w9=ZB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB61CFC6197
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 08:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A2BC17441
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Nov 2019 00:07:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A052521882
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Nov 2019 08:53:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPyGLnm1"
+	by mail.kernel.org (Postfix) with ESMTP id 6FA1020869
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Nov 2019 00:07:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730573AbfKHIxl (ORCPT
+        id S1726640AbfKIAHD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Nov 2019 03:53:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28790 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727573AbfKHIxl (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Nov 2019 03:53:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573203219;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H6/rp2sqHx63a+SahoXLpWtKxXlEYGHQF9yA0visXkA=;
-        b=ZPyGLnm1qcNkS1oab+aRmDjQlxx7gMDuHEJvNTC9kKuqYRn3nlc0g79r931pF5M5DSKJt2
-        lXlUtwXgqeJSMMsppbDHzmXqb+cMusmoOVCh9N2ffubSziHM095j6HBXrGGneqGEpfmB06
-        g7+O4AXNoEk8F0H2K7cw3gsPW3ocljc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-6G1-7NXPP82WUfVR0rZY1Q-1; Fri, 08 Nov 2019 03:53:36 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79B79107ACC3;
-        Fri,  8 Nov 2019 08:53:34 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 04FFA60BE1;
-        Fri,  8 Nov 2019 08:53:34 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 668461803C32;
-        Fri,  8 Nov 2019 08:53:33 +0000 (UTC)
-Date:   Fri, 8 Nov 2019 03:53:33 -0500 (EST)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     syzbot <syzbot+8c0dbf8843bb75efaa05@syzkaller.appspotmail.com>
-Cc:     gustavo@padovan.org, johan hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, syzkaller-bugs@googlegroups.com,
-        torvalds@linux-foundation.org, ytkim@qca.qualcomm.com
-Message-ID: <147419886.15836536.1573203213339.JavaMail.zimbra@redhat.com>
-In-Reply-To: <000000000000eac5200596c1d46b@google.com>
-References: <000000000000eac5200596c1d46b@google.com>
-Subject: Re: general protection fault in qca_setup
+        Fri, 8 Nov 2019 19:07:03 -0500
+Received: from mga05.intel.com ([192.55.52.43]:64720 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726231AbfKIAHD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 8 Nov 2019 19:07:03 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Nov 2019 16:07:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,283,1569308400"; 
+   d="scan'208";a="215104646"
+Received: from ingas-nuc1.sea.intel.com ([10.254.33.193])
+  by orsmga002.jf.intel.com with ESMTP; 08 Nov 2019 16:07:01 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Fix clean up after AddNode method
+Date:   Fri,  8 Nov 2019 16:07:00 -0800
+Message-Id: <20191109000700.5428-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-Originating-IP: [10.40.205.171, 10.4.195.27]
-Thread-Topic: general protection fault in qca_setup
-Thread-Index: nCtYTpj9im0+XRib/oPMJOIb6++6QQ==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 6G1-7NXPP82WUfVR0rZY1Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-#syz fix: Bluetooth: hci_uart: check for missing tty operations
+This fixes the cleanup routine that is called after AddNode method
+on org.bluez.mesh.Manager1 interface is complete: do not remove
+the agent associated with the Provisioner (owner of Manager interface).
+---
+ mesh/manager.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Best regards,
-Vladis Dronov | Red Hat, Inc. | The Core Kernel | Senior Software Engineer
-
------ Original Message -----
-> From: "syzbot" <syzbot+8c0dbf8843bb75efaa05@syzkaller.appspotmail.com>
-> To: gustavo@padovan.org, "johan hedberg" <johan.hedberg@gmail.com>, linux=
--bluetooth@vger.kernel.org,
-> linux-kernel@vger.kernel.org, marcel@holtmann.org, syzkaller-bugs@googleg=
-roups.com, torvalds@linux-foundation.org,
-> vdronov@redhat.com, ytkim@qca.qualcomm.com
-> Sent: Thursday, November 7, 2019 2:42:08 PM
-> Subject: Re: general protection fault in qca_setup
->=20
-> syzbot suspects this bug was fixed by commit:
->=20
-> commit b36a1552d7319bbfd5cf7f08726c23c5c66d4f73
-> Author: Vladis Dronov <vdronov@redhat.com>
-> Date:   Tue Jul 30 09:33:45 2019 +0000
->=20
->      Bluetooth: hci_uart: check for missing tty operations
->=20
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1436b32c60=
-0000
-> start commit:   d1393711 Linux 5.0-rc6
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dee434566c893c=
-7b1
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D8c0dbf8843bb75e=
-faa05
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D130894af400=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D10799004c0000=
-0
->=20
-> If the result looks correct, please mark the bug fixed by replying with:
->=20
-> #syz fix: Bluetooth: hci_uart: check for missing tty operations
->=20
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
-ion
+diff --git a/mesh/manager.c b/mesh/manager.c
+index b39ea6ed7..0b11b4541 100644
+--- a/mesh/manager.c
++++ b/mesh/manager.c
+@@ -80,8 +80,6 @@ static void free_pending_add_call()
+ 		l_dbus_remove_watch(dbus_get_bus(),
+ 						add_pending->disc_watch);
+ 
+-	mesh_agent_remove(add_pending->agent);
+-
+ 	l_free(add_pending);
+ 	add_pending = NULL;
+ }
+@@ -246,7 +244,7 @@ static struct l_dbus_message *add_node_call(struct l_dbus *dbus,
+ 	add_pending = l_new(struct add_data, 1);
+ 	memcpy(add_pending->uuid, uuid, 16);
+ 	add_pending->node = node;
+-	add_pending->agent = node_get_agent(node);;
++	add_pending->agent = node_get_agent(node);
+ 
+ 	if (!node_is_provisioner(node) || (add_pending->agent == NULL)) {
+ 		l_info("Provisioner: %d", node_is_provisioner(node));
+-- 
+2.21.0
 
