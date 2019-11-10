@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FE02C43331
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 Nov 2019 02:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C23FAC43331
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 Nov 2019 02:58:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5BBED21019
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 Nov 2019 02:55:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D1FB21019
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 Nov 2019 02:58:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573354547;
-	bh=K4yGkZRbv35RcfeluxzhT6L6sAAB+YWzrmzYRIBSGGs=;
+	s=default; t=1573354690;
+	bh=sL0SKLEML4Y9k9kz/zU2jbjo+8R+OhLdgvLoi8HegYo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ku3MLIagmLvI2q1hDIzOT4aZ0VIupka3XdvRzS0TwEn3cVxWMiZjHX2PU5IJHD9Yb
-	 t3aZxMtgbuBruUW3KmUksetTtGZd+xR2QiTHwc7ydGSd6ryBnDTf29XhhhQQprTv+p
-	 l0UK0zB5zjzAoiZPBmVFjgIXd13Tq6jLiQKVjS50=
+	b=W8HA8g1dz2sUjOUyGrX7PV/i5g8+0Tctvw5K4Y/B0AhbcSQ5YNtNGfDjCEd/6s1Xm
+	 3jPYL+LBsPenogjT2hTQWWJwjWk7OWKqPXUT+ypR4rwuMH6S1hHjxV26YVovEgYXyM
+	 Dm+oruRdbwOLwEeWX0zpdtSroejosZEUVtS06gYo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728037AbfKJCzk (ORCPT
+        id S1729647AbfKJC5o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 9 Nov 2019 21:55:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33178 "EHLO mail.kernel.org"
+        Sat, 9 Nov 2019 21:57:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47202 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727758AbfKJCuN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 9 Nov 2019 21:50:13 -0500
+        id S1729415AbfKJC4s (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 9 Nov 2019 21:56:48 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 74FCD229F2;
-        Sun, 10 Nov 2019 02:50:12 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 095E22249A;
+        Sun, 10 Nov 2019 02:48:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573354213;
-        bh=K4yGkZRbv35RcfeluxzhT6L6sAAB+YWzrmzYRIBSGGs=;
+        s=default; t=1573354087;
+        bh=sL0SKLEML4Y9k9kz/zU2jbjo+8R+OhLdgvLoi8HegYo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pCas/GwH9km4eo5bTV2D7fmY8xRvMWUQG7ZkFKxrbc3F0w/W63C0saXKYprNEYYwi
-         b3/xlLkqkRBAZK2UW1FMrPk9k2F301PB7CN4M25EoLlmHkD7jaMwv9K+rB2zGgpJ0j
-         0CUR9GPdz6l19W8jC//yVeaqkqAgunO3N6cXaovY=
+        b=n0q3KAQVWkrGgyKRZE7mAWbYRcpduLqIZO79Gfxt/t0vf/lcYKVYkK7y2oPHyMaRd
+         Kr7uT0H5yXfPy5e+N7xLi4EPh0FActD5okLflp/IWzSmGb6jiQ5fH8EElRyuHl/cH1
+         SOzilgatMbAQwkleXsBRIC6mifYE//BwHsugd+j8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 52/66] Bluetooth: L2CAP: Detect if remote is not able to use the whole MPS
-Date:   Sat,  9 Nov 2019 21:48:31 -0500
-Message-Id: <20191110024846.32598-52-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 084/109] Bluetooth: L2CAP: Detect if remote is not able to use the whole MPS
+Date:   Sat,  9 Nov 2019 21:45:16 -0500
+Message-Id: <20191110024541.31567-84-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191110024846.32598-1-sashal@kernel.org>
-References: <20191110024846.32598-1-sashal@kernel.org>
+In-Reply-To: <20191110024541.31567-1-sashal@kernel.org>
+References: <20191110024541.31567-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 10 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 48d23abfe7992..1306962a792af 100644
+index 0c2219f483d70..f63d9918b15ad 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -6811,6 +6811,16 @@ static int l2cap_le_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+@@ -6819,6 +6819,16 @@ static int l2cap_le_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
  		chan->sdu_len = sdu_len;
  		chan->sdu_last_frag = skb;
  
