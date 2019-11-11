@@ -2,166 +2,165 @@ Return-Path: <SRS0=pK2I=ZD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3A3C17445
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 19:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DB9C43331
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 19:54:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 115262184C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 19:32:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Drdzwb2n"
+	by mail.kernel.org (Postfix) with ESMTP id 3691E2067B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 19:54:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727223AbfKKTcy (ORCPT
+        id S1726952AbfKKTyJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Nov 2019 14:32:54 -0500
-Received: from mail-pl1-f174.google.com ([209.85.214.174]:38138 "EHLO
-        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726879AbfKKTcy (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Nov 2019 14:32:54 -0500
-Received: by mail-pl1-f174.google.com with SMTP id w8so8214460plq.5;
-        Mon, 11 Nov 2019 11:32:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition:user-agent;
-        bh=MAVRFnvbcrE0oPCckW9ArD+KIh8O0Hu6OBx+zFq+Fg4=;
-        b=Drdzwb2nscVTUsB8sRGh16MAgdw5z+ll+mtgIJ15yQ8p+RYfZGwnrf0XYFbbyQ29jD
-         kWP/2737Z1+FNx9tb6Vk2uX2ED2lJmrXmijq8YIjXuf1Wo7M3qpJrTCn+DnBD8cvRa+G
-         oj3+6YYUOnYE9/hWv/Hfj4BrEDzo98UdhJQRFDpMN628uAcOjERUVL2CUY9MtapPn6Jb
-         TOdhxknDp/7yEPABg0L8eqgB14dCt206lGqwP2DkQ7ne6E/EROL7nMZemwFXuz3soaFF
-         bIMdusLhiEuX1xTIlGsZj3Uca/MJWOIVFd1EXvySSKs+O70vysrviwaMp0saaDheWt37
-         1SNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition:user-agent;
-        bh=MAVRFnvbcrE0oPCckW9ArD+KIh8O0Hu6OBx+zFq+Fg4=;
-        b=GMLDmH5E8ono08C6UNfPyGavnuObNl5NcfTtbiW+7MI4OKpN9UIMN+gio8dLyTEEv6
-         hiQ7GdME8u26gf2yUZ3DCCdhx5gwrMWIud9GiW5O6OVXBAH/8QjH+mByRqSGrBaQGF9z
-         bbU5e/xmi35mrXQqfPQC0yWG3pfMe84KJUF/c9hChmzGr8Z9O8afjeK96T9zdr6Z4QQh
-         3/Jpzo6FQhvmRWYFkaHS3BChkfSK9XlwV9YWob6nOeixjOpS0KmRpHKaaDwwWe78HDyP
-         exjqsBs1wqFd0qnKRP7dMhKsKcnQjbwFQdo9ztXurN9D6YrhxNlHDmd9pJQWFVCKwS6C
-         VaZQ==
-X-Gm-Message-State: APjAAAXoIWMVnixzv7ZQ125JqQfPCvG0jF5Alx+KLalt2s7sKE0SWxhi
-        LIk0tspciDH9+OTWLb8INfRHD36UXx5cww==
-X-Google-Smtp-Source: APXvYqy5EVkN6pTfpTvaMnYBCyp15qKCfbVVPxPn+3WubSycvOehVYMwuXIm2bwlsbkvDTlxra6cuw==
-X-Received: by 2002:a17:902:b20b:: with SMTP id t11mr28026745plr.211.1573500773399;
-        Mon, 11 Nov 2019 11:32:53 -0800 (PST)
-Received: from localhost ([192.55.54.40])
-        by smtp.gmail.com with ESMTPSA id x17sm4463414pfa.119.2019.11.11.11.32.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2019 11:32:52 -0800 (PST)
-Date:   Mon, 11 Nov 2019 21:32:49 +0200
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net
-Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: linux-bluetooth 2019-11-11
-Message-ID: <20191111193249.GA34408@fashcrof-mobl1.ger.corp.intel.com>
-Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
+        Mon, 11 Nov 2019 14:54:09 -0500
+Received: from hall.aurel32.net ([195.154.113.88]:58222 "EHLO hall.aurel32.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726897AbfKKTyJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 11 Nov 2019 14:54:09 -0500
+Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
+        by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1iUFlI-0002rm-Em; Mon, 11 Nov 2019 20:54:08 +0100
+Received: from aurel32 by ohm.rr44.fr with local (Exim 4.92.3)
+        (envelope-from <aurelien@aurel32.net>)
+        id 1iUFlI-0000rw-2r; Mon, 11 Nov 2019 20:54:08 +0100
+From:   Aurelien Jarno <aurelien@aurel32.net>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Aurelien Jarno <aurelien@aurel32.net>
+Subject: [PATCH BlueZ] mesh: fix (re)transmit count & interval steps
+Date:   Mon, 11 Nov 2019 20:54:06 +0100
+Message-Id: <20191111195406.3291-1-aurelien@aurel32.net>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
-Content-Disposition: inline
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+The Foundation Model Layer uses little endian ordering. As a
+consequence the (re)transmit count and interval steps in the Config
+Relay, Config Model Publication and Config Network Transmit messages
+use the lower 3 bits for the (re)transmission count and the higher 5
+bits for the interval steps.
 
---WIyZ46R2i8wDzkSu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The figure 4.5 in section 4.3.2.16 of the Mesh Profile Bluetooth
+Specification provides a good clarification.
 
-Hi Dave,
-
-Here's one more bluetooth-next pull request for the 5.5 kernel release.
-
- - Several fixes for LE advertising
- - Added PM support to hci_qca driver
- - Added support for WCN3991 SoC in hci_qca driver
- - Added DT bindings for BCM43540 module
- - A few other small cleanups/fixes
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+This patch therefore fixes those messages for both the daemon and
+configuration client parts.
 ---
-The following changes since commit 0629d2456ae3bfb374fdc686abb30b73294e4f99:
+ mesh/cfgmod-server.c | 16 ++++++++--------
+ mesh/model.c         |  4 ++--
+ tools/mesh/cfgcli.c  |  8 ++++----
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-  Merge branch 'ionic-updates' (2019-10-25 20:52:36 -0700)
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index 55cc8e9eb..8acde95b9 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -211,8 +211,8 @@ static bool config_pub_set(struct mesh_node *node, uint16_t net_idx,
+ 			.ttl = ttl,
+ 			.credential = cred_flag,
+ 			.period = period,
+-			.count = retransmit >> 5,
+-			.interval = ((0x1f & retransmit) + 1) * 50
++			.count = retransmit & 0x7,
++			.interval = ((retransmit >> 3) + 1) * 50
+ 		};
+ 
+ 		if (b_virt)
+@@ -870,8 +870,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst, uint16_t unicast,
+ 		if (size != 2 || pkt[0] > 0x01)
+ 			return true;
+ 
+-		count = (pkt[1] >> 5) + 1;
+-		interval = ((pkt[1] & 0x1f) + 1) * 10;
++		count = (pkt[1] & 0x7) + 1;
++		interval = ((pkt[1] >> 3) + 1) * 10;
+ 		node_relay_mode_set(node, !!pkt[0], count, interval);
+ 		/* Fall Through */
+ 
+@@ -879,7 +879,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst, uint16_t unicast,
+ 		n = mesh_model_opcode_set(OP_CONFIG_RELAY_STATUS, msg);
+ 
+ 		msg[n++] = node_relay_mode_get(node, &count, &interval);
+-		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
++		msg[n++] = (count - 1) + ((interval/10 - 1) << 3);
+ 
+ 		l_debug("Get/Set Relay Config (%d)", msg[n-1]);
+ 		break;
+@@ -888,8 +888,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst, uint16_t unicast,
+ 		if (size != 1)
+ 			return true;
+ 
+-		count = (pkt[0] >> 5) + 1;
+-		interval = ((pkt[0] & 0x1f) + 1) * 10;
++		count = (pkt[0] & 0x7) + 1;
++		interval = ((pkt[0] >> 3) + 1) * 10;
+ 
+ 		if (mesh_config_write_net_transmit(node_config_get(node), count,
+ 								interval))
+@@ -900,7 +900,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst, uint16_t unicast,
+ 		n = mesh_model_opcode_set(OP_CONFIG_NETWORK_TRANSMIT_STATUS,
+ 									msg);
+ 		mesh_net_transmit_params_get(net, &count, &interval);
+-		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
++		msg[n++] = (count - 1) + ((interval/10 - 1) << 3);
+ 
+ 		l_debug("Get/Set Network Transmit Config");
+ 		break;
+diff --git a/mesh/model.c b/mesh/model.c
+index 84f1dc74c..45cdb93bb 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -1537,8 +1537,8 @@ struct mesh_model *mesh_model_setup(struct mesh_node *node, uint8_t ele_idx,
+ 	if (pub && (pub->virt || !(IS_UNASSIGNED(pub->addr)))) {
+ 		uint8_t mod_addr[2];
+ 		uint8_t *pub_addr;
+-		uint8_t retransmit = (pub->count << 5) +
+-						(pub->interval / 50 - 1);
++		uint8_t retransmit = pub->count +
++					((pub->interval / 50 - 1) << 3);
+ 
+ 		/* Add publication */
+ 		l_put_le16(pub->addr, &mod_addr);
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index 04edc706c..d468fb28c 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -471,7 +471,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 			return true;
+ 
+ 		bt_shell_printf("Node %4.4x: Relay 0x%02x, cnt %d, steps %d\n",
+-				src, data[0], data[1]>>5, data[1] & 0x1f);
++				src, data[0], data[1] & 0x7, data[1] >> 3);
+ 		break;
+ 
+ 	case OP_CONFIG_PROXY_STATUS:
+@@ -527,8 +527,8 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 			break;
+ 		}
+ 
+-		bt_shell_printf("Rexmit count\t%d\n", data[9] >> 5);
+-		bt_shell_printf("Rexmit steps\t%d\n", data[9] & 0x1f);
++		bt_shell_printf("Rexmit count\t%d\n", data[9] & 0x7);
++		bt_shell_printf("Rexmit steps\t%d\n", data[9] >> 3);
+ 
+ 		break;
+ 
+@@ -1056,7 +1056,7 @@ static void cmd_relay_set(int argc, char *argv[])
+ 	}
+ 
+ 	msg[n++] = parms[0];
+-	msg[n++] = (parms[1] << 5) | parms[2];
++	msg[n++] = parms[1] | (parms[2] << 3);
+ 
+ 	if (!config_send(msg, n, OP_CONFIG_RELAY_SET))
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-- 
+2.24.0
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 7d250a062f75e6ee8368b64ac6ff1e09fbb6783d:
-
-  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC WCN3991 (2019-11-09 03:26:47 +0100)
-
-----------------------------------------------------------------
-Abhishek Pandit-Subedi (2):
-      Bluetooth: hci_bcm: Add compatible string for BCM43540
-      dt-bindings: net: broadcom-bluetooth: Add BCM43540 compatible string
-
-Balakrishna Godavarthi (2):
-      Bluetooth: btqca: Rename ROME specific variables to generic variables
-      Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC WCN3991
-
-Bartosz Golaszewski (1):
-      Bluetooth: btmtksdio: add MODULE_DEVICE_TABLE()
-
-Claire Chang (1):
-      Bluetooth: hci_qca: add PM support
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: Fix using advertising instance duration as timeout
-      Bluetooth: Fix not using LE_ADV_NONCONN_IND for instance 0
-      Bluetooth: Fix advertising duplicated flags
-
-Tomas Bortoli (1):
-      Bluetooth: Fix invalid-free in bcsp_close()
-
-YueHaibing (1):
-      Bluetooth: btrtl: remove unneeded semicolon
-
- .../devicetree/bindings/net/broadcom-bluetooth.txt |   1 +
- drivers/bluetooth/btmtksdio.c                      |   1 +
- drivers/bluetooth/btqca.c                          |  92 +++++++++----
- drivers/bluetooth/btqca.h                          |  32 +++--
- drivers/bluetooth/btrtl.c                          |   2 +-
- drivers/bluetooth/hci_bcm.c                        |   1 +
- drivers/bluetooth/hci_bcsp.c                       |   3 +
- drivers/bluetooth/hci_qca.c                        | 143 ++++++++++++++++++++-
- net/bluetooth/hci_request.c                        |  19 ++-
- 9 files changed, 242 insertions(+), 52 deletions(-)
-
---WIyZ46R2i8wDzkSu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl3Jt14ACgkQJCP2+/mo
-1BLO3A/9GmDa28w5jpYzHj5UWboZhtZmoc2v49s03NRf8dtruXY0DeoG1Ha45JVU
-uRsApH0QOlzSZC3Pp7xHj4wnj5Uej0K5f2KqxBf9Ux2d0PVm3AU7eUY04ZCXMPty
-hfkMDlBwzwqqSHnT6hq3VGBhB/j+6OBTTqR8b41IFTxDL82K2IXrgDgGb2XAFA0k
-jehP+AfUUfaKInAc/KOpU3HTpOBZtw8iJTmf7FfpdkcCvP2LNqIrItf+A1HYGL25
-+ZnFdIWUKxUEOGM4QGYiEDcu7MxGheyARjiZNNso8K/DQN7XpeU9QwVZ8F5nr8Cu
-yRTVFqmAVY8l1B3Ra0mo42UC//kokuWNsva8hUSxIN4CYNlB7jGGFh232D0RSfrB
-fnED1JNPb7LUDbIFbOrDk6Nb5sED5l2+1NsNM54p5PeOLdjuyORQKJc7ncawjbnj
-3S7t+s0tiYDkCWR40RNaS/kat3/vSLsczu+odk+uEl3X4RAHU0p/HCMDz+ntBMiZ
-+54Am1dp3N60v3tSdhLWGnPqvhJEuDHpkhi3L/Jei/4K+lSDXr8UORmVT5cnyedf
-TlktSoh6+SO/jJAylQYoMnSGgWjP1SNzRBtmvz7NK9eKLPQ7c8oHKbmMz4Jluu2f
-xaRdWjbvFay5oe+RTq9Tq/cNYEwkOIIUFXJBzXey65lj0bol7vo=
-=B6rj
------END PGP SIGNATURE-----
-
---WIyZ46R2i8wDzkSu--
