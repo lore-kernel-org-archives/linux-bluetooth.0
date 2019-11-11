@@ -2,37 +2,38 @@ Return-Path: <SRS0=pK2I=ZD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBF9C43331
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 12:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58170C43331
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 13:00:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B54F21872
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 12:00:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 342D621872
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 13:00:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726843AbfKKMAM (ORCPT
+        id S1726887AbfKKNAr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Nov 2019 07:00:12 -0500
-Received: from hall.aurel32.net ([195.154.113.88]:54250 "EHLO hall.aurel32.net"
+        Mon, 11 Nov 2019 08:00:47 -0500
+Received: from hall.aurel32.net ([195.154.113.88]:54800 "EHLO hall.aurel32.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726810AbfKKMAL (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Nov 2019 07:00:11 -0500
+        id S1726845AbfKKNAr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 11 Nov 2019 08:00:47 -0500
 Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
         by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <aurelien@aurel32.net>)
-        id 1iU8Mc-0006et-By; Mon, 11 Nov 2019 13:00:10 +0100
+        id 1iU9JG-0000wE-9T; Mon, 11 Nov 2019 14:00:46 +0100
 Received: from aurel32 by ohm.rr44.fr with local (Exim 4.92.3)
         (envelope-from <aurelien@aurel32.net>)
-        id 1iU8Mb-0000vq-D0; Mon, 11 Nov 2019 13:00:09 +0100
+        id 1iU9JE-0001Nv-KH; Mon, 11 Nov 2019 14:00:44 +0100
 From:   Aurelien Jarno <aurelien@aurel32.net>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Aurelien Jarno <aurelien@aurel32.net>
-Subject: [PATCH BlueZ] mesh: fix node default TTL
-Date:   Mon, 11 Nov 2019 13:00:07 +0100
-Message-Id: <20191111120007.3511-1-aurelien@aurel32.net>
+Subject: [PATCH BlueZ] tools/mesh-cfgclient: add network transmit get/set commands
+Date:   Mon, 11 Nov 2019 14:00:43 +0100
+Message-Id: <20191111130043.5247-1-aurelien@aurel32.net>
 X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -41,60 +42,77 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There is a confusion between the node default TTL (section 4.2.7) and
-the publish TTL (section 4.2.2.5):
-
-- The node default TTL can only take values 0x00, and 0x02 to 0x7f. The
-  value 0xff is not prohibited.
-- The publish TTL can take values 0x00 to 0x7f, as well as 0xff which
-  means use the node default TTL.
-
-Currently the default node TTL is set to 0xff (DEFAULT_TTL), and
-read_default_ttl() also allows such a value. This patch fixes that to
-use 0x7f (TTL_MASK) as the default value instead.
-
-Note that the code handling OP_CONFIG_DEFAULT_TTL_SET correctly use 0x7f
-(TTL_MASK) for the upper allowed limit.
+Add network-transmit-get and network-transmit-set commands as per
+Mesh Profile 4.3.2.69, 4.3.2.70 and 4.3.2.71.
 ---
- mesh/mesh-config-json.c | 2 +-
- mesh/node.c             | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ tools/mesh/cfgcli.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index b2cff6824..5ca2961b0 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -358,7 +358,7 @@ static bool read_default_ttl(json_object *jobj, uint8_t *ttl)
- 	if (!val && errno == EINVAL)
- 		return false;
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index a4de42943..adc35f5a7 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -621,6 +621,15 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 				src, mesh_status_str(data[0]));
  
--	if (val < 0 || val == 1 || val > DEFAULT_TTL)
-+	if (val < 0 || val == 1 || val > TTL_MASK)
- 		return false;
+ 		break;
++
++	/* Per Mesh Profile 4.3.2.71 */
++	case OP_CONFIG_NETWORK_TRANSMIT_STATUS:
++		if (len != 1)
++			return true;
++
++		bt_shell_printf("Node %4.4x: Network transmit cnt %d, steps %d\n",
++				src, data[0]>>5, data[0] & 0x1f);
++		break;
+ 	}
  
- 	*ttl = (uint8_t) val;
-diff --git a/mesh/node.c b/mesh/node.c
-index e23f32dd1..5dcffe6f7 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -672,7 +672,7 @@ struct l_queue *node_get_element_models(struct mesh_node *node,
- uint8_t node_default_ttl_get(struct mesh_node *node)
- {
- 	if (!node)
--		return DEFAULT_TTL;
-+		return TTL_MASK;
- 	return node->ttl;
+ 	return true;
+@@ -1334,6 +1343,33 @@ static void cmd_node_reset(int argc, char *argv[])
+ 	cmd_default(OP_NODE_RESET);
  }
  
-@@ -1352,7 +1352,7 @@ static void set_defaults(struct mesh_node *node)
- 	node->friend = MESH_MODE_UNSUPPORTED;
- 	node->beacon = MESH_MODE_DISABLED;
- 	node->relay.mode = MESH_MODE_DISABLED;
--	node->ttl = DEFAULT_TTL;
-+	node->ttl = TTL_MASK;
- 	node->seq_number = DEFAULT_SEQUENCE_NUMBER;
++static void cmd_network_transmit_get(int argc, char *argv[])
++{
++	cmd_default(OP_CONFIG_NETWORK_TRANSMIT_GET);
++}
++
++static void cmd_network_transmit_set(int argc, char *argv[])
++{
++	uint16_t n;
++	uint8_t msg[2 + 1];
++	int parm_cnt;
++
++	n = mesh_opcode_set(OP_CONFIG_NETWORK_TRANSMIT_SET, msg);
++
++	parm_cnt = read_input_parameters(argc, argv);
++	if (parm_cnt != 2) {
++		bt_shell_printf("bad arguments\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	msg[n++] = (parms[0] << 5) | parms[1];
++
++	if (!config_send(msg, n, OP_CONFIG_NETWORK_TRANSMIT_SET))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ static bool tx_setup(model_send_msg_func_t send_func, void *user_data)
+ {
+ 	if (!send_func)
+@@ -1414,6 +1450,10 @@ static const struct bt_shell_menu cfg_menu = {
+ 				"Get subscription"},
+ 	{"node-reset", NULL, cmd_node_reset,
+ 				"Reset a node and remove it from network"},
++	{"network-transmit-get", NULL, cmd_network_transmit_get,
++				"Get network transmit state"},
++	{"network-transmit-set", "<count> <steps>", cmd_network_transmit_set,
++				"Set network transmit state"},
+ 	{} },
+ };
  
- 	/* Add configuration server model on primary element */
 -- 
 2.24.0
 
