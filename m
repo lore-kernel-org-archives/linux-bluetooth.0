@@ -2,287 +2,382 @@ Return-Path: <SRS0=pK2I=ZD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F286C43331
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 05:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA14C43331
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 11:04:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A3F120856
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 05:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16EA021655
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Nov 2019 11:04:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ice9-us.20150623.gappssmtp.com header.i=@ice9-us.20150623.gappssmtp.com header.b="Vl+e4+/0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iP0HFLNR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbfKKFWy (ORCPT
+        id S1726819AbfKKLEZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Nov 2019 00:22:54 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:38596 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725796AbfKKFWy (ORCPT
+        Mon, 11 Nov 2019 06:04:25 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:40213 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726768AbfKKLEZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Nov 2019 00:22:54 -0500
-Received: by mail-pg1-f193.google.com with SMTP id 15so8706653pgh.5
-        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Nov 2019 21:22:53 -0800 (PST)
+        Mon, 11 Nov 2019 06:04:25 -0500
+Received: by mail-il1-f193.google.com with SMTP id d83so11706060ilk.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2019 03:04:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ice9-us.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id;
-        bh=fQ8nY0iOajZyRBJjwagQBzwgBLZiQ4gO/7gFdPx+Mnk=;
-        b=Vl+e4+/0GubjvvmJ1tmU3zTr+v+Djo51JK6URivNHeDlU/pPeHgFXQEpPrhHLyCb/a
-         NJvhZDjEk+QkfHOAflfskkcs/YYIH91YupzoDK1mh06CO15YW5zKRsja8YMeGudTKKtB
-         gzXeM7SHW947sIxdY025XcmFHLrj8jm7oLHp+D7lZbfkSZS84pGceLDUNignh+1+8XKH
-         GajJplxQcfhqg2eJ6TcLd7d6gFhJgclHWfRFDgE/r/esJDkUmgEd0ahzzVfnMccsugY7
-         pVe8bzeDqIvWbuE43UD6zjmz0GRIy70ePLsuWWG4cNPAJB3Ygd8SPD+s/kO1PkBVa1uZ
-         DTxQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bjc2C+j46aN0i2/ydPsGSc5V6ZkrJvYybPvoFON4Pmo=;
+        b=iP0HFLNRObf7RR89wJ2csaAX1zYtCYdtlMN0Wr8c+rBv4PbBCFDPxEoFzISw5WRXbT
+         JnPJZONxYQ4ectooXejLbkcCAxK2GamYHaQZ1mDKca2RV4HofO+4tUBnqUiNa0GZf2aH
+         naB/zbTg6XsQK5YEcG4eztGPCKlGCH9XAgNnWRQgNVjeADCsQN75arVDJ2FpzJPjhJ5Z
+         Xcp474J5ifzPRuMOh4BT5AAMSD05R1lzW1895yVfaQRKqMqhZvIDUiLWgdV7j0alD8RO
+         m+N29zWwtuxu1BBAJf01jPV0Hf2z33M7wp5kM+ZN4w+uBx4bU7lCAAsLC4pwM1Syklen
+         NK/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=fQ8nY0iOajZyRBJjwagQBzwgBLZiQ4gO/7gFdPx+Mnk=;
-        b=SPuFzKvuwjhLF8MSNmS/aRJ9KUzCmHF2gwqKF9ne6TlNOd9FLGDoFeAaKnIfS+HHuP
-         XhRi5PY1qrocofTHzcQDnnkyV4nsnsW96i9f9OMrHCo3fPkNGv0TEO378iMJwR8K/Ujl
-         7llJ3Zd4dgvi1HKRIC8Wi0fB5R/WtcSkvV6vJhBi+/NjsG4veOYeBqB+bSYzglPoFLPc
-         EHWRp5/6MQbo40BBkPIvYOw/KIDlwEJCHjmKLrUEy/rPIujI8EpgnB25Q9V5ClZwNrGL
-         /RmWKzMDQ2SV6U+sIYThSHFRWz6QZhUnZ55a/cSGC/JmmoKE7qZaBLbJ6byJxMHWpvqK
-         jQzQ==
-X-Gm-Message-State: APjAAAXfFH847+jyNeC0sXe7U9MgVPcAy7ua4GF9h5GIlTm0fcxVY6IT
-        ZqWA10N2kshoCBt8ZmV3KPju2u4Wl8Q=
-X-Google-Smtp-Source: APXvYqzniiDmdp41jg/6U5DXqC2ooYE7/YBsNYpExup3ipTXT/oa779Wj1FMfk9I/qHvd8/z6ODcsA==
-X-Received: by 2002:a17:90a:eb0f:: with SMTP id j15mr13814503pjz.97.1573449772960;
-        Sun, 10 Nov 2019 21:22:52 -0800 (PST)
-Received: from localhost.localdomain (c-67-188-68-101.hsd1.ca.comcast.net. [67.188.68.101])
-        by smtp.gmail.com with ESMTPSA id a3sm2834645pfo.71.2019.11.10.21.22.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 10 Nov 2019 21:22:52 -0800 (PST)
-From:   mike@ice9.us
-To:     linux-bluetooth@vger.kernel.org
-Cc:     mike@ice9.us
-Subject: [PATCH] Bluetooth: Expose debugfs entry to force resolvable private address
-Date:   Sun, 10 Nov 2019 21:22:31 -0800
-Message-Id: <20191111052231.31527-1-mike@ice9.us>
-X-Mailer: git-send-email 2.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bjc2C+j46aN0i2/ydPsGSc5V6ZkrJvYybPvoFON4Pmo=;
+        b=Hk4hHzHOXJm+IaloPu8bMbabRErHtuQ76JlwzVdgwyJ/NvojqxVVXv5Kxn9LCQY1mJ
+         DH5bSVUvbSjGLbadBRtF+lgAfPj2dV5in8AbfmQDWnx5uacUjsYJ9G1jHeVUGnNW5g/o
+         ge+HrpgJoTOJ5YyXMgiLWsW+ZHpyZi01oFYrYU1vh7vzkQi2Xxy7ZCa8UdjFqVw0INbZ
+         /V8yrz4aT4KaVnDJr6cX2P7qGjuRfynR42FhAdfsaukjlVSd4oqJhSgCf04Q3hnzNDgg
+         8pONWWTeMbRWauesjPkXlpLiSeEAdeuPXlGHjxA1kfe6vU2/TNJXlu/3VuoIQcEviDCU
+         sn0g==
+X-Gm-Message-State: APjAAAU1ErcIIjpK9r86HLtnQU6b25D6ihXQUcT/+OZ2hFHGeuJFULhs
+        GQgVKDAwtEZK8LvkcnH56DQztWu39LdtsycyU+pJtM2iJC4=
+X-Google-Smtp-Source: APXvYqxF0o9pbRriBipPQdY9MPljbpo7l003q5gB+DRBgbBuNi1udOJp8sCuhrQdkQioS5xEJE3rTzwsVr0jIx/1Bkk=
+X-Received: by 2002:a05:6e02:1014:: with SMTP id n20mr19832012ilj.221.1573470263855;
+ Mon, 11 Nov 2019 03:04:23 -0800 (PST)
+MIME-Version: 1.0
+References: <1569476123-9951-1-git-send-email-amit.k.bag@intel.com> <1DA34553-082C-4C58-ABCC-6CFAA9E3DF3A@holtmann.org>
+In-Reply-To: <1DA34553-082C-4C58-ABCC-6CFAA9E3DF3A@holtmann.org>
+From:   Sathish Narasimman <nsathish41@gmail.com>
+Date:   Mon, 11 Nov 2019 16:34:12 +0530
+Message-ID: <CAOVXEJ+zF4WKA3hjdSJxywMFumY2AT-D8ORMAUy_tX7tRF7PMQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: hci_event: handle msbc audio over USB Endpoints
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Amit K Bag <amit.k.bag@intel.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        Sathish Narasimman <sathish.narasimman@intel.com>,
+        Raghuram Hegde <raghuram.hegde@intel.com>,
+        Hsin-Yu Chao <hychao@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Mike Ryan <mike@ice9.us>
+Hi Marcel,
 
-In order to facilitate impersonation attacks against devices using
-resolvable private addresses (RPAs), this debugfs entry allows the user
-to set a fixed RPA that is used during undirected and directed
-advertising. Writing 00:00:00:00:00:00 disables the forced address and
-will resume generating valid RPAs.
+I will submit the next version of the patch and tried to fix all your comme=
+nts.
+Please check the same.
 
-Signed-off-by: Mike Ryan <mike@ice9.us>
----
- include/net/bluetooth/bluetooth.h |  1 +
- include/net/bluetooth/hci_core.h  |  1 +
- net/bluetooth/hci_debugfs.c       | 53 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.c       | 23 +++++++++++------
- net/bluetooth/lib.c               | 52 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 123 insertions(+), 7 deletions(-)
+On Thu, Sep 26, 2019 at 3:52 PM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Amit,
+>
+> > For msbc encoded audio stream over usb transport, btusb driver
+> > to be set to alternate settings 6 as per BT core spec 5.0. This
+> > done from  hci_sync_conn_complete_evt.  The type of air mode is known
+> > during this event.  For this reason the btusb is to be notifed
+> > about the TRANSPARENT air mode and the ALT setting 6 is selected.
+> > The changes are made considering some discussion over the similar
+> > patch submitted earlier from Kuba Pawlak(link below)
+> > https://www.spinics.net/lists/linux-bluetooth/msg64577.html
+> >
+> > (am from https://www.spinics.net/lists/linux-bluetooth/msg76982.html)
+> >
+> > Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> > Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+> > Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+> > Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
+> > Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> > ---
+> > drivers/bluetooth/btusb.c   | 145 ++++++++++++++++++++++++++++++-------=
+-------
+> > include/net/bluetooth/hci.h |   1 +
+> > net/bluetooth/hci_event.c   |   5 ++
+> > 3 files changed, 106 insertions(+), 45 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index a9c35ebb30f8..368cc93cb17e 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -57,6 +57,9 @@ static struct usb_driver btusb_driver;
+> > #define BTUSB_IFNUM_2         0x80000
+> > #define BTUSB_CW6622          0x100000
+> > #define BTUSB_MEDIATEK                0x200000
+> > +#define BTUSB_ALT6_FLOW_CNTRL        6
+> > +
+> > +static int set_hci_packet_interval_flow =3D BTUSB_ALT6_FLOW_CNTRL;
+>
+> this can never be a global variable. We allow multiple devices be attache=
+d to the same host. You need to move this into btusb_data struct.
+>
+> >
+> > static const struct usb_device_id btusb_table[] =3D {
+> >       /* Generic Bluetooth USB device */
+> > @@ -974,6 +977,38 @@ static void btusb_isoc_complete(struct urb *urb)
+> >       }
+> > }
+> >
+> > +static inline void __fill_isoc_descriptor_msbc(struct urb *urb, int le=
+n,
+> > +                                            int mtu)
+> > +{
+> > +     int i, offset =3D 0;
+> > +
+> > +     /* For msbc ALT 6 setting the host will send the packet at contin=
+uous
+> > +      * flow. As per core spec 5, vol 4, part B, table 2.1. For ALT se=
+tting
+> > +      * 6 the HCI PACKET INTERVAL should be 7.5ms for every usb packet=
+s.
+> > +      * To maintain the rate we send 63bytes of usb packets alternativ=
+ely for
+> > +      * 7ms and 8ms to maintain the rate as 7.5ms.
+> > +      */
+> > +     if (set_hci_packet_interval_flow =3D=3D 6)
+> > +             set_hci_packet_interval_flow =3D 7;
+> > +     else if (set_hci_packet_interval_flow =3D=3D 7)
+> > +             set_hci_packet_interval_flow =3D 6;
+>
+> can=E2=80=99t this just be a bool that you just toggle.
+Done.
+>
+> > +
+> > +     BT_DBG("len %d mtu %d", len, mtu);
+> > +
+> > +     for (i =3D 0; i < set_hci_packet_interval_flow; i++) {
+> > +             urb->iso_frame_desc[i].offset =3D offset;
+> > +             urb->iso_frame_desc[i].length =3D offset;
+> > +     }
+> > +
+> > +     if (len && i < BTUSB_MAX_ISOC_FRAMES) {
+> > +             urb->iso_frame_desc[i].offset =3D offset;
+> > +             urb->iso_frame_desc[i].length =3D len;
+> > +             i++;
+> > +     }
+> > +
+> > +     urb->number_of_packets =3D i;
+> > +}
+> > +
+> > static inline void __fill_isoc_descriptor(struct urb *urb, int len, int=
+ mtu)
+> > {
+> >       int i, offset =3D 0;
+> > @@ -1376,9 +1411,12 @@ static struct urb *alloc_isoc_urb(struct hci_dev=
+ *hdev, struct sk_buff *skb)
+> >
+> >       urb->transfer_flags  =3D URB_ISO_ASAP;
+> >
+> > -     __fill_isoc_descriptor(urb, skb->len,
+> > +     if (data->isoc_altsetting =3D=3D 6)
+> > +             __fill_isoc_descriptor_msbc(urb, skb->len,
+> > +                            le16_to_cpu(data->isoc_tx_ep->wMaxPacketSi=
+ze));
+> > +     else
+> > +             __fill_isoc_descriptor(urb, skb->len,
+> >                              le16_to_cpu(data->isoc_tx_ep->wMaxPacketSi=
+ze));
+> > -
+> >       skb->dev =3D (void *)hdev;
+> >
+> >       return urb;
+> > @@ -1466,18 +1504,6 @@ static int btusb_send_frame(struct hci_dev *hdev=
+, struct sk_buff *skb)
+> >       return -EILSEQ;
+> > }
+> >
+> > -static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+> > -{
+> > -     struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > -
+> > -     BT_DBG("%s evt %d", hdev->name, evt);
+> > -
+> > -     if (hci_conn_num(hdev, SCO_LINK) !=3D data->sco_num) {
+> > -             data->sco_num =3D hci_conn_num(hdev, SCO_LINK);
+> > -             schedule_work(&data->work);
+> > -     }
+> > -}
+> > -
+> > static inline int __set_isoc_interface(struct hci_dev *hdev, int altset=
+ting)
+> > {
+> >       struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > @@ -1521,6 +1547,65 @@ static inline int __set_isoc_interface(struct hc=
+i_dev *hdev, int altsetting)
+> >       return 0;
+> > }
+> >
+> > +static int bt_switch_alt_setting(struct hci_dev *hdev, int new_alts)
+> > +{
+> > +     struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > +     int err;
+> > +
+> > +     if (data->isoc_altsetting !=3D new_alts) {
+> > +             unsigned long flags;
+> > +
+> > +             clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> > +             usb_kill_anchored_urbs(&data->isoc_anchor);
+> > +
+> > +             /* When isochronous alternate setting needs to be
+> > +              * changed, because SCO connection has been added
+> > +              * or removed, a packet fragment may be left in the
+> > +              * reassembling state. This could lead to wrongly
+> > +              * assembled fragments.
+> > +              *
+> > +              * Clear outstanding fragment when selecting a new
+> > +              * alternate setting.
+> > +              */
+> > +             spin_lock_irqsave(&data->rxlock, flags);
+> > +             kfree_skb(data->sco_skb);
+> > +             data->sco_skb =3D NULL;
+> > +             spin_unlock_irqrestore(&data->rxlock, flags);
+> > +
+> > +             err =3D __set_isoc_interface(hdev, new_alts);
+> > +             if (err < 0)
+> > +                     return err;
+> > +     }
+> > +     if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
+> > +             if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
+> > +                     clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> > +             else
+> > +                     btusb_submit_isoc_urb(hdev, GFP_KERNEL);
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+> > +{
+> > +     struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > +
+> > +     BT_DBG("%s evt %d", hdev->name, evt);
+> > +
+> > +     if (hci_conn_num(hdev, SCO_LINK) !=3D data->sco_num) {
+> > +             data->sco_num =3D hci_conn_num(hdev, SCO_LINK);
+> > +             schedule_work(&data->work);
+> > +     }
+>
+> Since the internal processing of packets moved from a tasklet to a workqu=
+eue, I think the extra workqueue inside btusb can be actually removed. So I=
+ would get rid of this also for the non-mSBC case.
+Have left as it is. Expecting you will change this.
+>
+> > +
+> > +     if (evt =3D=3D HCI_NOTIFY_AIR_MODE_TRANSP) {
+> > +             /* Alt setting 6 is used for msbc encoded
+> > +              * audio channel
+> > +              */
+> > +             if (bt_switch_alt_setting(hdev, 6) < 0)
+> > +                     BT_ERR("%s Set USB Alt6 failed", hdev->name);
+> > +     }
+> > +}
+> > +
+>
+> I think this is really a one or the other. If the controller supports alt=
+ernate setting 6 (which you actually have to check first) and it is air mod=
+e transparent then switch to alternate setting 6. Otherwise do what we have=
+ done before.
+Done.
+>
+> > static void btusb_work(struct work_struct *work)
+> > {
+> >       struct btusb_data *data =3D container_of(work, struct btusb_data,=
+ work);
+> > @@ -1547,37 +1632,7 @@ static void btusb_work(struct work_struct *work)
+> >               } else {
+> >                       new_alts =3D data->sco_num;
+> >               }
+> > -
+> > -             if (data->isoc_altsetting !=3D new_alts) {
+> > -                     unsigned long flags;
+> > -
+> > -                     clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> > -                     usb_kill_anchored_urbs(&data->isoc_anchor);
+> > -
+> > -                     /* When isochronous alternate setting needs to be
+> > -                      * changed, because SCO connection has been added
+> > -                      * or removed, a packet fragment may be left in t=
+he
+> > -                      * reassembling state. This could lead to wrongly
+> > -                      * assembled fragments.
+> > -                      *
+> > -                      * Clear outstanding fragment when selecting a ne=
+w
+> > -                      * alternate setting.
+> > -                      */
+> > -                     spin_lock_irqsave(&data->rxlock, flags);
+> > -                     kfree_skb(data->sco_skb);
+> > -                     data->sco_skb =3D NULL;
+> > -                     spin_unlock_irqrestore(&data->rxlock, flags);
+> > -
+> > -                     if (__set_isoc_interface(hdev, new_alts) < 0)
+> > -                             return;
+> > -             }
+> > -
+> > -             if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) =
+{
+> > -                     if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
+> > -                             clear_bit(BTUSB_ISOC_RUNNING, &data->flag=
+s);
+> > -                     else
+> > -                             btusb_submit_isoc_urb(hdev, GFP_KERNEL);
+> > -             }
+> > +             bt_switch_alt_setting(hdev, new_alts);
+> >       } else {
+> >               clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> >               usb_kill_anchored_urbs(&data->isoc_anchor);
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 5bc1e30dedde..89ac29f1dffa 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -52,6 +52,7 @@
+> > #define HCI_NOTIFY_CONN_ADD           1
+> > #define HCI_NOTIFY_CONN_DEL           2
+> > #define HCI_NOTIFY_VOICE_SETTING      3
+> > +#define HCI_NOTIFY_AIR_MODE_TRANSP   4
+> >
+> > /* HCI bus types */
+> > #define HCI_VIRTUAL   0
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index c1d3a303d97f..1c268932422c 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -4231,6 +4231,11 @@ static void hci_sync_conn_complete_evt(struct hc=
+i_dev *hdev,
+> >               break;
+> >       }
+> >
+> > +     if (ev->air_mode =3D=3D SCO_AIRMODE_TRANSP) {
+> > +             if (hdev->notify)
+> > +                     hdev->notify(hdev, HCI_NOTIFY_AIR_MODE_TRANSP);
+> > +     }
+> > +
+>
+> So this might work, but causes the USB subsystem to change the alternate =
+setting twice. Once for CONN_ADD and once for SCO_AIRMODE_TRANSP. I prefer =
+we just change the alternate setting once.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index fabee6db0..c6417d15c 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -237,6 +237,7 @@ static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
- }
- 
- void baswap(bdaddr_t *dst, const bdaddr_t *src);
-+int str2ba(const char *str, bdaddr_t *ba);
- 
- /* Common socket structures and functions */
- 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b689aceb6..a822914d7 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -428,6 +428,7 @@ struct hci_dev {
- 	__u32			rpa_timeout;
- 	struct delayed_work	rpa_expired;
- 	bdaddr_t		rpa;
-+	bdaddr_t		force_rpa;
- 
- #if IS_ENABLED(CONFIG_BT_LEDS)
- 	struct led_trigger	*power_led;
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 402e2cc54..2363ae9bb 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -710,6 +710,57 @@ static const struct file_operations force_static_address_fops = {
- 	.llseek		= default_llseek,
- };
- 
-+static ssize_t force_rpa_read(struct file *file,
-+					 char __user *user_buf,
-+					 size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[19];
-+	bdaddr_t *ba = &hdev->force_rpa;
-+
-+	sprintf(buf, "%pMR\n", ba);
-+
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, strlen(buf));
-+}
-+
-+static ssize_t force_rpa_write(struct file *file, const char __user *user_buf,
-+			       size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[18];
-+	size_t buf_size = min(count, (sizeof(buf)-1));
-+	bdaddr_t rpa;
-+
-+	if (test_bit(HCI_UP, &hdev->flags))
-+		return -EBUSY;
-+
-+	if (copy_from_user(buf, user_buf, buf_size))
-+		return -EFAULT;
-+
-+	buf[buf_size] = '\0';
-+	if (str2ba(buf, &rpa))
-+		return -EINVAL;
-+
-+	// the two most significant bits shall be 01 unless the address is
-+	// 00:00:00:00:00:00
-+	if ((rpa.b[5] & 0xc0) != 0x40 && bacmp(&rpa, BDADDR_ANY))
-+		return -EINVAL;
-+
-+	if (!bacmp(&hdev->force_rpa, &rpa))
-+		return -EALREADY;
-+
-+	bacpy(&hdev->force_rpa, &rpa);
-+
-+	return count;
-+}
-+
-+static const struct file_operations force_rpa_fops = {
-+	.open		= simple_open,
-+	.read		= force_rpa_read,
-+	.write		= force_rpa_write,
-+	.llseek		= default_llseek,
-+};
-+
- static int white_list_show(struct seq_file *f, void *ptr)
- {
- 	struct hci_dev *hdev = f->private;
-@@ -1026,6 +1077,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
- 				    hdev->debugfs, hdev,
- 				    &force_static_address_fops);
- 
-+	debugfs_create_file("force_rpa", 0644, hdev->debugfs, hdev,
-+			    &force_rpa_fops);
- 	debugfs_create_u8("white_list_size", 0444, hdev->debugfs,
- 			  &hdev->le_white_list_size);
- 	debugfs_create_file("white_list", 0444, hdev->debugfs, hdev,
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 2a1b64dbf..8fabb1bb1 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1910,14 +1910,23 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 
- 		*own_addr_type = ADDR_LE_DEV_RANDOM;
- 
--		if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
--		    !bacmp(&hdev->random_addr, &hdev->rpa))
--			return 0;
-+		/* If force_rpa is set to 00:00:00:00:00:00, generate a valid
-+		 * RPA using IRK. Otherwise use the forced value.
-+		 */
-+		if (!bacmp(&hdev->force_rpa, BDADDR_ANY)) {
-+			if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
-+			    !bacmp(&hdev->random_addr, &hdev->rpa))
-+				return 0;
- 
--		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
--		if (err < 0) {
--			bt_dev_err(hdev, "failed to generate new RPA");
--			return err;
-+			err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
-+			if (err < 0) {
-+				bt_dev_err(hdev, "failed to generate new RPA");
-+				return err;
-+			}
-+		} else {
-+			if (!bacmp(&hdev->rpa, &hdev->force_rpa))
-+				return 0;
-+			bacpy(&hdev->rpa, &hdev->force_rpa);
- 		}
- 
- 		set_random_addr(req, &hdev->rpa);
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 63e65d9b4..933d9dd48 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -27,6 +27,7 @@
- #define pr_fmt(fmt) "Bluetooth: " fmt
- 
- #include <linux/export.h>
-+#include <linux/ctype.h>
- 
- #include <net/bluetooth/bluetooth.h>
- 
-@@ -41,6 +42,57 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src)
- }
- EXPORT_SYMBOL(baswap);
- 
-+static int bachk(const char *str)
-+{
-+	if (!str)
-+		return -1;
-+
-+	if (strlen(str) != 17)
-+		return -1;
-+
-+	while (*str) {
-+		if (!isxdigit(*str++))
-+			return -1;
-+
-+		if (!isxdigit(*str++))
-+			return -1;
-+
-+		if (*str == 0)
-+			break;
-+
-+		if (*str++ != ':')
-+			return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+int str2ba(const char *str, bdaddr_t *ba)
-+{
-+	int i;
-+	char digit_str[3];
-+	long digit;
-+
-+	if (bachk(str) < 0) {
-+		memset(ba, 0, sizeof(*ba));
-+		return -1;
-+	}
-+
-+	for (i = 5; i >= 0; i--, str += 3) {
-+		digit_str[0] = str[0];
-+		digit_str[1] = str[1];
-+		digit_str[2] = '\0';
-+		if (kstrtol(digit_str, 16, &digit))
-+			return -1;
-+		if (digit < 0x00 || digit > 0xff)
-+			return -1;
-+		ba->b[i] = digit;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(str2ba);
-+
- /* Bluetooth error codes to Unix errno mapping */
- int bt_to_errno(__u16 code)
- {
--- 
-2.11.0
+> Maybe it is better to change CONN_ADD and CONN_DEL to an explicit ENABLE_=
+SCO_CVSD and ENABLE_SCO_TRANSP and DISABLE_SCO.
 
+Done.
+
+>
+> Regards
+>
+> Marcel
+>
+
+Regards
+Sathish N
