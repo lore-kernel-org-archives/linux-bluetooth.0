@@ -2,66 +2,66 @@ Return-Path: <SRS0=2Kq+=ZE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F71BC43331
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Nov 2019 14:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 305E0C43331
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Nov 2019 15:01:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E572120656
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Nov 2019 14:54:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0483B2067B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Nov 2019 15:01:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="kMttzkOL"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="bOpbHrlk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbfKLOye (ORCPT
+        id S1727063AbfKLPBB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Nov 2019 09:54:34 -0500
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:33465 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726484AbfKLOye (ORCPT
+        Tue, 12 Nov 2019 10:01:01 -0500
+Received: from mail-lj1-f177.google.com ([209.85.208.177]:33997 "EHLO
+        mail-lj1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726957AbfKLPBB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Nov 2019 09:54:34 -0500
-Received: by mail-lf1-f67.google.com with SMTP id d6so12681601lfc.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2019 06:54:33 -0800 (PST)
+        Tue, 12 Nov 2019 10:01:01 -0500
+Received: by mail-lj1-f177.google.com with SMTP id 139so18181254ljf.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2019 07:00:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=s8Qq1ijr+e9R5gPAvVvz71fzXphQW8SpvCMlfr0BT9k=;
-        b=kMttzkOLFOCXo0k+TFdHBpL0FJl4llSIt9Mw0+OrOeEv4FReXcT5jjHvU5pEu1/XzQ
-         FT8BrcMi5MdyY7aWCKE6QoHFjvYx3Z8YtOXGevZVZAn8YzRUpKzd0n5szGX5F+FfPgHu
-         lFuIpAD/nbhdJemLM0VkjXdqSuf4A86Bn01aT6HPlYhwk4y3DISn1d0GG3XuiWulorbU
-         1AtVDgUV+M4u3v1yuDABCeu+cIwLrfzO71r0mf+0u7TUqjFTUDXPNPU+PbZWMPpVyyT1
-         IeTfQOQOQHo40lRlcCRpot7NuigFpnW5cJdfMd91/+toSEA0GyOv8ltJ+hun9C1PxOyg
-         3WCA==
+        bh=SkUwbEEa+Fdg1AndYkreKAEh1zlCI7+zTgcRzFEJqOo=;
+        b=bOpbHrlkSVVugdHhPOvOj1gywlpI4cdPY03BFIzvYtyf2nlBHv+Bn4+0j7jJe0jpjy
+         oYo2N+ZWnwDxQDPwUB62cFkuCuO/dNqadd0nEsMUbWjZl1elJa9L+7C7o5AwBlTj6hlU
+         iKRD9T/PcofcjXoxjwLRPP+TrN9eb34dVmPm6ItWSt8BQTaeJcVtFnHv59F0xREKur7/
+         ibCy+NsYTg2ToYfkkpnjTDP5KXrpI+SRqOKlAZOA5GQ0NQXhf5nWg6ACI3u3QOBbAzL4
+         Nv5I72yh33uQcBI3JjZSD1zjqxONkEJRde6a1LTZ1YyIlDOynhaKa23h6hRvW+tosW9q
+         cnPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=s8Qq1ijr+e9R5gPAvVvz71fzXphQW8SpvCMlfr0BT9k=;
-        b=tbclHd5FbkC3Ky+Ht2JYSM52tP9hHH096moJbDgLM+UwCEzxsXCyx4879nKUpYUZkA
-         Wh8LZI536y92biJDSX0olPhizILRYryVDSc4VNKCqyFuCI6uBue17sJvMdMB88B3d/qy
-         gWxQGcmzMS4YTKRh0j+8mdcc+Hj/upIJrraHlUCSU1Dk3UsIZjwZ8UpmDraCcF9fv8mk
-         WJNou1DmbUGp1assPM2PvvLDaLatWB7u5JD2gtlAubLCoA9ybLXCZODEJJFwU5+J0e4+
-         wvNl3sI5C1OGck8jhoSlY8sI3GL59/3AgIqae2Q3GIjUeJ8PT2uPhQNpc1Y5MAs9HmSA
-         sWdA==
-X-Gm-Message-State: APjAAAUmXcAERZiesLENWKhqOB5s2bXQKcCd6g48zKoUFEz1Kt2Vqm7i
-        Fw+Nq4XDkdFKYsZcIj6sgWBw2nnqybXFKA==
-X-Google-Smtp-Source: APXvYqxOmyzt7CCKPCX/P0ti1eNm4NCC7+hmkzna6SGSYEimqW2cqfZW8LLPvbCsGUmINYgS6Z9ksA==
-X-Received: by 2002:a19:da1a:: with SMTP id r26mr20322883lfg.60.1573570472008;
-        Tue, 12 Nov 2019 06:54:32 -0800 (PST)
+        bh=SkUwbEEa+Fdg1AndYkreKAEh1zlCI7+zTgcRzFEJqOo=;
+        b=BsX34/kO/hkNUZDtfBtZGdyAx0gUaaiY8YpH5lVZGKP11+YgKcXDhYjXjrpSsg4Xjn
+         jcoWd8bhE+8sXuuVOsbBxCdCQuilsbk8c62I8FDEr430p4AIXytsyRaRhWZROPcJc0Wo
+         d1jqRqwnJtiqUUXqjjVNhRniC06yFzQ0M4Q3mY423bJzRUvDpWEMGKEjpwytBou7n5l5
+         n095+1w/xwNQtfev6fbA+NS0qz0To+zhwGErZFB3E2xxSqrrnkKDBdTmRKZrTsU/bq4D
+         UVg9IbTB8ufacKY3nYC2j34tgsuzS5jIAutaAqfj4jEF39gY3nNsg1k9JgvvPlfM0Pb1
+         wP4w==
+X-Gm-Message-State: APjAAAWlGSDvnvkxrQReJo741s5xr2bZAnvKxG0fZu6/0GDrOiTk8ZGa
+        9xeV/n2CFOhDGkaMuIvgiTnKX2z2F/0sew==
+X-Google-Smtp-Source: APXvYqwgLBzbLqmyF8ehs5QWIMWTAhnQfyiYeheumDxyaGmrjnkCVL3lKfP+Eqs8Hqd8PaQnoVWQWw==
+X-Received: by 2002:a2e:547:: with SMTP id 68mr20452922ljf.150.1573570858848;
+        Tue, 12 Nov 2019 07:00:58 -0800 (PST)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id x12sm8398361lfq.52.2019.11.12.06.54.30
+        by smtp.gmail.com with ESMTPSA id 4sm9179536lfa.95.2019.11.12.07.00.57
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2019 06:54:31 -0800 (PST)
+        Tue, 12 Nov 2019 07:00:58 -0800 (PST)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Fix ignored return value
-Date:   Tue, 12 Nov 2019 15:54:25 +0100
-Message-Id: <20191112145425.6318-1-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ v2 0/1] mesh: Streamline crypto functions
+Date:   Tue, 12 Nov 2019 15:58:16 +0100
+Message-Id: <20191112145817.6692-1-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -71,30 +71,20 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the following build error when compiling in maintainer mode:
+This is a followup to commits 79fd24af1 45beec16b and 37bbe30c9,
+continuing a cleanup of mesh/crypto.
 
-mesh/keyring.c: In function ‘finalize’:
-mesh/keyring.c:142:8: error: ignoring return value of ‘write’, declared with attribute warn_unused_result [-Werror=unused-result]
-  (void)write(fd, &key, sizeof(key));
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
- mesh/keyring.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This version works with unit tests added in 06cf0fd1c.
 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index 9fa7d6bd0..fe292b4a7 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -140,7 +140,8 @@ static void finalize(const char *fpath, uint16_t net_idx)
- 	l_debug("Finalize %s", fpath);
- 	memcpy(key.old_key, key.new_key, 16);
- 	lseek(fd, 0, SEEK_SET);
--	write(fd, &key, sizeof(key));
-+	if (write(fd, &key, sizeof(key)) != sizeof(key))
-+		goto done;
- 
- done:
- 	close(fd);
+Michał Lowas-Rzechonek (1):
+  mesh: Remove redundant code from mesh/crypto
+
+ mesh/crypto.c           | 481 ++++++++++++++++------------------------
+ mesh/crypto.h           |  50 +----
+ mesh/net-keys.c         |   2 +-
+ unit/test-mesh-crypto.c | 205 ++++++++---------
+ 4 files changed, 291 insertions(+), 447 deletions(-)
+
 -- 
 2.19.1
 
