@@ -2,194 +2,241 @@ Return-Path: <SRS0=sa5O=ZF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 335C7C43331
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 09:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2455C43331
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 11:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EAAB02067B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 09:23:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAA57222CD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 11:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8kFan9r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uP0aHdfE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727133AbfKMJXB (ORCPT
+        id S1727928AbfKMLrK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Nov 2019 04:23:01 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51839 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727134AbfKMJXB (ORCPT
+        Wed, 13 Nov 2019 06:47:10 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:40037 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726949AbfKMLrK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Nov 2019 04:23:01 -0500
-Received: by mail-wm1-f67.google.com with SMTP id q70so1168715wme.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2019 01:22:59 -0800 (PST)
+        Wed, 13 Nov 2019 06:47:10 -0500
+Received: by mail-oi1-f196.google.com with SMTP id 22so1482408oip.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2019 03:47:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=BSymLBinEM8wqh+8W8GSM8zRxC113Tj7nfQja5hFdjE=;
-        b=V8kFan9rZmIzLJoSq2MoxbacEZk8n9oquBmKX+FAiOFdf2QWR7Xi/t6qAuNCr1V+11
-         PQdsMGKdxjSzNn/EiJzQEGT279aL01A5AowJuBwoS66Q3I9R44mHrm0m7J7TJH+LPS4W
-         yMtDCbI2IN/XznmuvA41oms4SxaQcli1Cw0Z7mRmUg26S1WlIMTC2+zAInB9gKLuaT5J
-         +gucE8iUbDBR7+KlxoezzggEQphpBISQkVIkWILP6YU741kVpLMqhAs8kwc7hWRN7wzH
-         +kOg4Zpyp4Ku3lTlJTsiI64DD5ryHYqLNGejhkVKXVd0piFGVUidD1KBaeOggOEBytZB
-         lS3g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=QFpRVAgu0f6EbmXQj8RhV5UqoMyRBwZ4Ty9fHXr+Nzc=;
+        b=uP0aHdfEjJ02Nv5DZPAWXLjRYy2/MmcTVnFC2BUHpbYgtOQbGiYQKunAKkroUsD9oX
+         AM2jtYe4lgnKVekypuSnjRbovkwZArDC0MuY3Jo57NNPg9+Wti5ACPxu/u2H29TIYj0S
+         xCQ9grZQqm0UNfvFHoROvnpS3TqelV5rcoiy6XN7O+kC/3vPlpCOw13LDLSfkJ8n4F28
+         JQ/KrzPGjd8YjBPwseA6cbxxsGmzBrNnBq1eX6RkFU0U9deNN8XagS7nz24wc/5xRY8I
+         28+6sFGlvq8PROHfZU+4RDhL9Gwqgitvcq0bWHQCZVumCvBhP2QSbVQQ5oFEHksJwa5B
+         2/Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=BSymLBinEM8wqh+8W8GSM8zRxC113Tj7nfQja5hFdjE=;
-        b=K3wzkzEXfPibk2b8gyfP/ny+vJyKLIosMF0QZ7vBq9oQHz3odYPSqWCOpeqjaLF/Zi
-         W5yDpdO8/4S57sd1u4naoJW4yCcbsnAaIoQF09fz/pcFOU3dJP0nkJZpxo1B2jDTJ7kH
-         F0LhUWgolzFp3eK/+akEjh7F0/Y2wMIofSDXNISn5qO1pAaGqhKobCVw+XKwU5jXGQq1
-         mhudgiOI8BFH0nUL0SYDJlEgqvgXaJEe5CZC21tXGfxPa5QWKNM+tp+n4WdCZg2UcIjx
-         MEaNH3LZ3jQzwSCHGT6fvh0qkRf7ovJgfRnusEjdBdLzZoGtNQ9MYUIfvNrZFpRonXeT
-         H5Bg==
-X-Gm-Message-State: APjAAAWfF9Ep1Z1lPPecs+8vTyT/5/+Nlx++ys0tHmaFR4XuUyuZveol
-        Uu7UKcQTpmx42exjFPbRVKf3THim
-X-Google-Smtp-Source: APXvYqwAdxvRroW9A0Wk27z3uj4aQcEARqAekvW769burShSx1LyMUDGMA4FRZJpP8fqFhIfofxBJQ==
-X-Received: by 2002:a1c:7d95:: with SMTP id y143mr1846381wmc.143.1573636978435;
-        Wed, 13 Nov 2019 01:22:58 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id p14sm2123934wrq.72.2019.11.13.01.22.57
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 13 Nov 2019 01:22:57 -0800 (PST)
-Date:   Wed, 13 Nov 2019 10:22:56 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: HCI Set custom bandwidth for AuriStream SCO codec
-Message-ID: <20191113092256.bxc6ixuk7ctrmt57@pali>
-References: <20190519212157.GB31403@amd>
- <20190607130245.mv4ch6dxnuptzdki@pali>
- <ED456CCA-CF85-48D9-B7E9-9B0BF02A32FC@holtmann.org>
- <20190708122512.qqfvtm455ltxxg3h@pali>
- <E4A6E61C-DE37-4E5D-9401-71CCE4AE2419@holtmann.org>
- <20190708210616.x2dlnzjhnplu37bz@pali>
- <D0A44CC7-CABC-408A-894E-AAD700FA9B0D@holtmann.org>
- <20190718100939.bwl26qcfxe6ppcto@pali>
- <20191027220945.wmb3g55wtrmqbnmz@pali>
- <20191112210633.cjhpb7eczzta63mf@ucw.cz>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=QFpRVAgu0f6EbmXQj8RhV5UqoMyRBwZ4Ty9fHXr+Nzc=;
+        b=b38FjdA7zZXHWeOL/LNsHhqyohcnJSaU4efYvUm92t5l6opOkNjd+Z8BQpxl/ZPWQ4
+         F6nA0RyDHlvxF8ZFMvC1JBE8F1AylY9AwyUVe6Lb1YZ0iLqcEdDibsiyxpgKnvhHWjo7
+         S5jAOhEEI7GYn3Nbu5H5OQciroDTEVot2+vHSlQJwXsvSR3TUQ+HDiDcYTl70CkWHHY3
+         zNqgyax8IAmvMcJSblSMkr0hQ580MI/QhyS7lILUw/XgvqYTykd7eFWnfAX4CO3P/zf6
+         Ck/mPqVj2bjQ6/25nNdQmI8ALlVuvqXyc2DmM77PY/OLY3O8PHICr8JuEuccS/GwJphE
+         bgHg==
+X-Gm-Message-State: APjAAAVo1VShLc8Sp9MIQuCOc0kiq2Qx5dXmsNVFmF8L7Ew3JesMxT4d
+        DA3UErZzVvL/7tvqjAyopurgcGizi8iDvir56vqyCZcTxcs=
+X-Google-Smtp-Source: APXvYqycrHJHdWNqQQHzgu81H4ZNEXPiW2XxtoYCUn33PAeGe0cC7Z1Lza5R1O5oNiE7i5SstvAlo/TGVr9zL0e+Wps=
+X-Received: by 2002:aca:da06:: with SMTP id r6mr2626985oig.82.1573645628330;
+ Wed, 13 Nov 2019 03:47:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191112210633.cjhpb7eczzta63mf@ucw.cz>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <1573566995-8482-1-git-send-email-simon.mikuda@streamunlimited.com>
+In-Reply-To: <1573566995-8482-1-git-send-email-simon.mikuda@streamunlimited.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 13 Nov 2019 13:46:54 +0200
+Message-ID: <CABBYNZKh-Mn0o4zi7FprFnb3ykc95-TB6aZu1GkexU1Df7U2jA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] core/advertising: Fix crash when unregistering
+ advertisement too fast
+To:     Simon Mikuda <simon.mikuda@streamunlimited.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tuesday 12 November 2019 22:06:33 Pavel Machek wrote:
-> Hi!
-> 
-> > > > >>>>>>>> But for AuriStream I need to set custom SCO parameters as described
-> > > > >>>>>>>> below and currently kernel does not support it. This is why I'm asking
-> > > > >>>>>>>> how kernel can export for userspace configuration of SCO parameters...
-> > > > >>>>>>> 
-> > > > >>>>>>> We can always come up with socket options but we got to see the value
-> > > > >>>>>>> it would bring since AuriStream don't look that popular among
-> > > > >>>>>>> headsets, at least Ive never seem any device advertising it like
-> > > > >>>>>>> apt-X, etc.
-> > > > >>>>>> 
-> > > > >>>>>> Pali clearly has such device and he is willing to work on it. Surely
-> > > > >>>>>> that means it is popular enough to be supported...?
-> > > > >>>>> 
-> > > > >>>>> Just put AT+CSRSF=0,0,0,0,0,7 to google search and you would see that
-> > > > >>>>> not only I have such device...
-> > > > >>>>> 
-> > > > >>>>> So I would really would like to see that kernel finally stops blocking
-> > > > >>>>> usage of this AuriStream codec.
-> > > > >>>> 
-> > > > >>>> we need to figure out on how we do the kernel API to allow you this specific setting.
-> > > > >>> 
-> > > > >>> Hi Marcel! Kernel API for userspace should be simple. Just add two
-> > > > >>> ioctls for retrieving and setting structure with custom parameters:
-> > > > >>> 
-> > > > >>> syncPktTypes = 0x003F
-> > > > >>> bandwidth = 4000
-> > > > >>> max_latency = 16
-> > > > >>> voice_settings = 0x63
-> > > > >>> retx_effort = 2
-> > > > >>> 
-> > > > >>> Or add more ioctls, one ioctl per parameter. There is already only ioctl
-> > > > >>> for voice settings and moreover it is whitelisted only for two values.
-> > > > >> 
-> > > > >> it is not that simple actually. Most profiles define a certain set of parameters and then they try to configure better settings and only fallback to a specification defined default as last resort.
-> > > > > 
-> > > > > Ok. I see that there is another "example" configuration for AuriStream
-> > > > > with just different syncPktTypes = 0x02BF and bandwidth = 3850.
-> > > > > 
-> > > > > So it really is not simple as it can be seen.
-> > > > 
-> > > > currently the stepping for mSBC and CVSD are hard-coded in esco_param_cvsd and esco_param_msbc arrays in hci_conn.c and then selected by the ->setting parameter.
-> > > > 
-> > > > So either we provide an new socket option (for example BT_VOICE_EXT) or we extend BT_VOICE to allow providing the needed information. However this needs to be flexible array size since we should then be able to encode multiple stepping that are tried in order.
-> > > > 
-> > > > My preference is that we extend BT_VOICE and not introduce a new socket option. So feel free to propose how we can load the full tables into the SCO socket. I mean we are not really far off actually. The only difference is that currently the tables are in the hci_conn.c file and selected by the provided voice->setting. However nothing really stops us from providing the full table via user space.
-> > > 
-> > > Ok. I will look at it and I will try to propose how to extend current
-> > > BT_VOICE ioctl API for supporting all those new parameters.
-> > 
-> > Below is inline MIME part with POC patch which try to implement a new
-> > IOCTL (currently named BT_VOICE_SETUP) for configuring voice sco
-> > settings.
-> > 
-> > It uses flexible array of parameters <tx_bandwidth, rx_bandwidth,
-> > voice_setting, pkt_type, max_latency, retrans_effort>, but with
-> > maximally 10 array members (due to usage of static array storage). cvsd
-> > codec uses 7 different fallback settings (see voice_setup_cvsd), so for
-> > POC 10 should be enough.
-> > 
-> > Because a new IOCL has different members then old BT_VOICE I rather
-> > decided to introduce a new IOCTL and not hacking old IOCTL to accept two
-> > different structures.
-> > 
-> > Please let me know what do you think about this API, if this is a way
-> > how to continue or if something different is needed.
-> 
-> 
-> New ioctl sounds like good idea.
-> 
-> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> > index fabee6db0abb..0e9f4ac07220 100644
-> > --- a/include/net/bluetooth/bluetooth.h
-> > +++ b/include/net/bluetooth/bluetooth.h
-> > @@ -122,6 +122,19 @@ struct bt_voice {
-> >  #define BT_SNDMTU		12
-> >  #define BT_RCVMTU		13
-> >  
-> > +#define BT_VOICE_SETUP		14
-> > +#define BT_VOICE_SETUP_ARRAY_SIZE 10
-> > +struct bt_voice_setup {
-> > +	__u8 sco_capable:1;
-> > +	__u8 esco_capable:1;
-> > +	__u32 tx_bandwidth;
-> > +	__u32 rx_bandwidth;
-> > +	__u16 voice_setting;
-> > +	__u16 pkt_type;
-> > +	__u16 max_latency;
-> > +	__u8 retrans_effort;
-> > +};
-> > +
-> 
-> Is this the new ioctl? I'd assume it should go to include/user/..
-> somewhere to be exported to userspace...?
+Hi,
 
-I put it into same file where is structure for old ioctl BT_VOICE.
+On Tue, Nov 12, 2019 at 3:59 PM Simon Mikuda
+<simon.mikuda@streamunlimited.com> wrote:
+>
+> When advertisement is unregistered during MGMT_OP_ADD_ADVERTISING it will
+> crash in add_adv_callback because struct btd_adv_client no longer exist.
+>
+> This is seen also in debug log from bluetoothd:
+> bluetoothd[29698]: src/advertising.c:register_advertisement() RegisterAdv=
+ertisement
+> bluetoothd[29698]: src/advertising.c:client_create() Adding proxy for /or=
+g/bluez/example/advertisement0
+> bluetoothd[29698]: src/advertising.c:register_advertisement() Registered =
+advertisement at path /org/bluez/example/advertisement0
+> bluetoothd[29698]: src/advertising.c:parse_service_uuids() Adding Service=
+UUID: 180D
+> bluetoothd[29698]: src/advertising.c:parse_service_uuids() Adding Service=
+UUID: 180F
+> bluetoothd[29698]: src/advertising.c:parse_manufacturer_data() Adding Man=
+ufacturerData for ffff
+> bluetoothd[29698]: src/advertising.c:parse_service_data() Adding ServiceD=
+ata for 9999
+> bluetoothd[29698]: src/advertising.c:parse_data() Adding Data for type 0x=
+26 len 3
+> bluetoothd[29698]: src/advertising.c:refresh_adv() Refreshing advertiseme=
+nt: /org/bluez/example/advertisement0
+> bluetoothd[29698]: src/advertising.c:unregister_advertisement() Unregiste=
+rAdvertisement
+> bluetoothd[29698]: src/advertising.c:add_adv_callback() Advertisement reg=
+istered: =EF=BF=BD
+> Segmentation fault (core dumped)
+>
+> Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
+> ---
+>  src/advertising.c | 34 ++++++++++++++++++++++++++--------
+>  1 file changed, 26 insertions(+), 8 deletions(-)
+>
+> diff --git a/src/advertising.c b/src/advertising.c
+> index 3ed1376..f53c14c 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -73,6 +73,7 @@ struct btd_adv_client {
+>         uint16_t discoverable_to;
+>         unsigned int to_id;
+>         unsigned int disc_to_id;
+> +       unsigned int add_adv_id;
+>         GDBusClient *client;
+>         GDBusProxy *proxy;
+>         DBusMessage *reg;
+> @@ -117,6 +118,15 @@ static void client_free(void *data)
+>                 g_dbus_client_unref(client->client);
+>         }
+>
+> +       if (client->reg) {
+> +               g_dbus_send_message(btd_get_dbus_connection(),
+> +                               dbus_message_new_method_return(client->re=
+g));
+> +               dbus_message_unref(client->reg);
+> +       }
+> +
+> +       if (client->add_adv_id)
+> +               mgmt_cancel(client->manager->mgmt, client->add_adv_id);
+> +
+>         if (client->instance)
+>                 util_clear_uid(&client->manager->instance_bitmap,
+>                                                 client->instance);
+> @@ -765,7 +775,8 @@ static uint8_t *generate_scan_rsp(struct btd_adv_clie=
+nt *client,
+>         return bt_ad_generate(client->scan, len);
+>  }
+>
+> -static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_=
+t func)
+> +static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_=
+t func,
+> +                                               unsigned int *mgmt_id)
+>  {
+>         struct mgmt_cp_add_advertising *cp;
+>         uint8_t param_len;
+> @@ -774,6 +785,7 @@ static int refresh_adv(struct btd_adv_client *client,=
+ mgmt_request_func_t func)
+>         uint8_t *scan_rsp;
+>         size_t scan_rsp_len =3D -1;
+>         uint32_t flags =3D 0;
+> +       unsigned int mgmt_ret;
+>
+>         DBG("Refreshing advertisement: %s", client->path);
+>
+> @@ -822,13 +834,17 @@ static int refresh_adv(struct btd_adv_client *clien=
+t, mgmt_request_func_t func)
+>         free(adv_data);
+>         free(scan_rsp);
+>
+> -       if (!mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
+> -                               client->manager->mgmt_index, param_len, c=
+p,
+> -                               func, client, NULL)) {
+> +       mgmt_ret =3D mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTI=
+SING,
+> +                       client->manager->mgmt_index, param_len, cp,
+> +                       func, client, NULL);
+> +
+> +       if (!mgmt_ret) {
+>                 error("Failed to add Advertising Data");
+>                 free(cp);
+>                 return -EINVAL;
+>         }
+> +       if (mgmt_id)
+> +               *mgmt_id =3D mgmt_ret;
+>
+>         free(cp);
+>
+> @@ -845,7 +861,7 @@ static gboolean client_discoverable_timeout(void *use=
+r_data)
+>
+>         bt_ad_clear_flags(client->data);
+>
+> -       refresh_adv(client, NULL);
+> +       refresh_adv(client, NULL, NULL);
+>
+>         return FALSE;
+>  }
+> @@ -948,7 +964,7 @@ static void properties_changed(GDBusProxy *proxy, con=
+st char *name,
+>                         continue;
+>
+>                 if (parser->func(iter, client)) {
+> -                       refresh_adv(client, NULL);
+> +                       refresh_adv(client, NULL, NULL);
+>                         break;
+>                 }
+>         }
+> @@ -980,6 +996,8 @@ static void add_adv_callback(uint8_t status, uint16_t=
+ length,
+>         struct btd_adv_client *client =3D user_data;
+>         const struct mgmt_rp_add_advertising *rp =3D param;
+>
+> +       client->add_adv_id =3D 0;
+> +
+>         if (status)
+>                 goto done;
+>
+> @@ -1059,7 +1077,7 @@ static DBusMessage *parse_advertisement(struct btd_=
+adv_client *client)
+>                 goto fail;
+>         }
+>
+> -       err =3D refresh_adv(client, add_adv_callback);
+> +       err =3D refresh_adv(client, add_adv_callback, &client->add_adv_id=
+);
+>         if (!err)
+>                 return NULL;
+>
+> @@ -1449,7 +1467,7 @@ void btd_adv_manager_destroy(struct btd_adv_manager=
+ *manager)
+>
+>  static void manager_refresh(void *data, void *user_data)
+>  {
+> -       refresh_adv(data, user_data);
+> +       refresh_adv(data, user_data, NULL);
+>  }
+>
+>  void btd_adv_manager_refresh(struct btd_adv_manager *manager)
+> --
+> 2.7.4
 
-> Is it good idea to use __u8 :1 in user<->kernel API?
+Applied, thanks.
 
-I do not know. Should it be rather (C99) bool? Or just one __u8?
-
--- 
-Pali Rohár
-pali.rohar@gmail.com
+--=20
+Luiz Augusto von Dentz
