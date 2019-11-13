@@ -2,241 +2,134 @@ Return-Path: <SRS0=sa5O=ZF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2455C43331
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 11:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF85C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 17:15:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BAA57222CD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 11:47:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8D7A206EE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 17:15:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uP0aHdfE"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="rlxu6Niu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727928AbfKMLrK (ORCPT
+        id S1728394AbfKMRPg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Nov 2019 06:47:10 -0500
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:40037 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726949AbfKMLrK (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Nov 2019 06:47:10 -0500
-Received: by mail-oi1-f196.google.com with SMTP id 22so1482408oip.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2019 03:47:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QFpRVAgu0f6EbmXQj8RhV5UqoMyRBwZ4Ty9fHXr+Nzc=;
-        b=uP0aHdfEjJ02Nv5DZPAWXLjRYy2/MmcTVnFC2BUHpbYgtOQbGiYQKunAKkroUsD9oX
-         AM2jtYe4lgnKVekypuSnjRbovkwZArDC0MuY3Jo57NNPg9+Wti5ACPxu/u2H29TIYj0S
-         xCQ9grZQqm0UNfvFHoROvnpS3TqelV5rcoiy6XN7O+kC/3vPlpCOw13LDLSfkJ8n4F28
-         JQ/KrzPGjd8YjBPwseA6cbxxsGmzBrNnBq1eX6RkFU0U9deNN8XagS7nz24wc/5xRY8I
-         28+6sFGlvq8PROHfZU+4RDhL9Gwqgitvcq0bWHQCZVumCvBhP2QSbVQQ5oFEHksJwa5B
-         2/Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QFpRVAgu0f6EbmXQj8RhV5UqoMyRBwZ4Ty9fHXr+Nzc=;
-        b=b38FjdA7zZXHWeOL/LNsHhqyohcnJSaU4efYvUm92t5l6opOkNjd+Z8BQpxl/ZPWQ4
-         F6nA0RyDHlvxF8ZFMvC1JBE8F1AylY9AwyUVe6Lb1YZ0iLqcEdDibsiyxpgKnvhHWjo7
-         S5jAOhEEI7GYn3Nbu5H5OQciroDTEVot2+vHSlQJwXsvSR3TUQ+HDiDcYTl70CkWHHY3
-         zNqgyax8IAmvMcJSblSMkr0hQ580MI/QhyS7lILUw/XgvqYTykd7eFWnfAX4CO3P/zf6
-         Ck/mPqVj2bjQ6/25nNdQmI8ALlVuvqXyc2DmM77PY/OLY3O8PHICr8JuEuccS/GwJphE
-         bgHg==
-X-Gm-Message-State: APjAAAVo1VShLc8Sp9MIQuCOc0kiq2Qx5dXmsNVFmF8L7Ew3JesMxT4d
-        DA3UErZzVvL/7tvqjAyopurgcGizi8iDvir56vqyCZcTxcs=
-X-Google-Smtp-Source: APXvYqycrHJHdWNqQQHzgu81H4ZNEXPiW2XxtoYCUn33PAeGe0cC7Z1Lza5R1O5oNiE7i5SstvAlo/TGVr9zL0e+Wps=
-X-Received: by 2002:aca:da06:: with SMTP id r6mr2626985oig.82.1573645628330;
- Wed, 13 Nov 2019 03:47:08 -0800 (PST)
+        Wed, 13 Nov 2019 12:15:36 -0500
+Received: from mga02.intel.com ([134.134.136.20]:62357 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728294AbfKMRPf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 13 Nov 2019 12:15:35 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Nov 2019 09:15:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,301,1569308400"; 
+   d="scan'208";a="287940784"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga001.jf.intel.com with ESMTP; 13 Nov 2019 09:15:34 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 13 Nov 2019 09:15:34 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 13 Nov 2019 09:15:33 -0800
+Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 13 Nov 2019 09:15:33 -0800
+Received: from NAM05-DM3-obe.outbound.protection.outlook.com (104.47.49.57) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Wed, 13 Nov 2019 09:15:33 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nyPQ9PzWKsmTUDv3CiVeyPTIzPByHqQs5dMW5o62DXawTU93WMHK3lzURU2mYZR2td12k4dclR7K+5oDZNfIROqM3d7sAkT9MmCP40exh78eVL+IIuBjtH53741m4BrFB63dd2nP88nJIWBQrIUKjpH0GwI2sJY7Txl37QsHR4W0B8BgqVAZZPscR4Fb29xnj/HTqdFroDTPopiWRdTd+wMvyNOGeXM/LytIgNlh4UtYUTijEKJPTbiSng1GQNGrMMW03X9ZGM05QjK/OEICHM+lByghG1ThRJxMXx01rVpW7gdOrvy0WiNY4UaHsfU27CQTeCUUjKaWKM798ps9tg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CDFkDlK/m5ZVcnV3yeKM2kP6jrwFeOGZQFpyYma9YWU=;
+ b=CE8+Lo7dgYiAG0GWN0IwDhL74Zce5bmsyhjc7MOKODnPaX2PWFYdS2O73HSne84avxwgYflZZZO26Zi6yOFlB8zWsUXJMmv8ECmIwYGWZVy0VEN7b09D9zfpKs+swSz8JV0iBVXf2LdD/7OePsFtilHoP/pqE/iVsERdA02X3D3K6a6vD13rninYDlUWVOLGiUWglIq/e91lee+jLI3Fq9LgCbLXUNWBCR5i0QsN7BIG5HH/0dBZ30s8MH3QvsbFufdR8We4YzNSAY8r5ZZp/hOurERwEYp3tJ4tE/Fds7sy1wxEKrzDmbBkInsq69Mbu/yYv1Sxv7XpjH9pIL/IIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CDFkDlK/m5ZVcnV3yeKM2kP6jrwFeOGZQFpyYma9YWU=;
+ b=rlxu6NiuJtXfzkw7ucECdr3a0OzhrKW0chjp37bMSEuw9wbjhHmQ6tXFewHL27qr5gi2KWUK8TwnwXjNVVD3tX53/AsRbuIVfLC1JU/Zf2rxb3v9pEnMWaIWn+JRoCwhWyArrkOiTOKwMwk3KRdKCbhUSzM1v4Tg0Ox7Bcm51aU=
+Received: from CY4PR1101MB2262.namprd11.prod.outlook.com (10.172.76.7) by
+ CY4PR1101MB2296.namprd11.prod.outlook.com (10.172.77.15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.23; Wed, 13 Nov 2019 17:15:32 +0000
+Received: from CY4PR1101MB2262.namprd11.prod.outlook.com
+ ([fe80::44:eac4:f8c8:ad06]) by CY4PR1101MB2262.namprd11.prod.outlook.com
+ ([fe80::44:eac4:f8c8:ad06%11]) with mapi id 15.20.2430.027; Wed, 13 Nov 2019
+ 17:15:32 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] mesh: Fix ignored return value
+Thread-Topic: [PATCH BlueZ] mesh: Fix ignored return value
+Thread-Index: AQHVmWkxFozuuTCX2E6tE58LG7L0VaeJWRMA
+Date:   Wed, 13 Nov 2019 17:15:31 +0000
+Message-ID: <ab35191812d811ebab64fa36e6e2b290a38c5f57.camel@intel.com>
+References: <20191112145425.6318-1-michal.lowas-rzechonek@silvair.com>
+In-Reply-To: <20191112145425.6318-1-michal.lowas-rzechonek@silvair.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [134.134.137.73]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ad9d8b5b-c57f-41a0-a36b-08d7685d16d3
+x-ms-traffictypediagnostic: CY4PR1101MB2296:
+x-microsoft-antispam-prvs: <CY4PR1101MB22969F3A489D7C566F02977CE1760@CY4PR1101MB2296.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 0220D4B98D
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(979002)(376002)(136003)(39860400002)(366004)(396003)(346002)(189003)(199004)(36756003)(6506007)(102836004)(76176011)(486006)(446003)(11346002)(2616005)(476003)(186003)(99286004)(26005)(8676002)(76116006)(305945005)(7736002)(91956017)(4001150100001)(8936002)(256004)(81166006)(81156014)(14444005)(66066001)(118296001)(3846002)(6116002)(14454004)(6246003)(6512007)(2501003)(2906002)(478600001)(25786009)(110136005)(5660300002)(71190400001)(71200400001)(4744005)(229853002)(66556008)(64756008)(66446008)(66476007)(6436002)(66946007)(316002)(86362001)(6486002)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR1101MB2296;H:CY4PR1101MB2262.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: M8YyiNu+usqzEUqJUtvCcCvyMowuWti/+XU+jCxajOj2Ma31a7/0zNwOZ0cS8j90Ig1oMpjm/U8OycovKGrV5p9jMHuELsqVSyDEUOam3ZbRa/hxwr8XW0v9h4xsWicmP5DSoKLCB4IjBNzdoo7d2Yc4lp0Q9fXEqIZiEmbR9EEm9dSuzXXYnHAHNRx7O+xqPp+ErgiHGiD+01gr6PSsXhc5aqZQDMFsXVPiIJInKhh1Antu1hutcSKXsI5/Savq39FPsjV+zORExO65/b4AHeGgzz2bzOUz401HLhA9AcE516EXOWECyxIRH3xzyB+whKRA+hn4M/KzrmIv/Whw8fUZKi5/GsrbTRLIs31zxCNFZ4E1Thywn+nmgVjMiaUDRVNJq3qX28LAL8/eFUsBGSHEoNJm+QjBx8CZgHOX1TFIsRKaok0xXpDpyQAgD7TD
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <829F3AC35E909445AF4F7219406ED5D1@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <1573566995-8482-1-git-send-email-simon.mikuda@streamunlimited.com>
-In-Reply-To: <1573566995-8482-1-git-send-email-simon.mikuda@streamunlimited.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 13 Nov 2019 13:46:54 +0200
-Message-ID: <CABBYNZKh-Mn0o4zi7FprFnb3ykc95-TB6aZu1GkexU1Df7U2jA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] core/advertising: Fix crash when unregistering
- advertisement too fast
-To:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-Network-Message-Id: ad9d8b5b-c57f-41a0-a36b-08d7685d16d3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2019 17:15:31.8236
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: D336mVQlJ3E9k7aQ0M2WT6xER0eVzxkxbwsbNxsK6quk88QINw2jNzr5szBTNszjiJsGMYECmBzw45mjBvRj7Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1101MB2296
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-
-On Tue, Nov 12, 2019 at 3:59 PM Simon Mikuda
-<simon.mikuda@streamunlimited.com> wrote:
->
-> When advertisement is unregistered during MGMT_OP_ADD_ADVERTISING it will
-> crash in add_adv_callback because struct btd_adv_client no longer exist.
->
-> This is seen also in debug log from bluetoothd:
-> bluetoothd[29698]: src/advertising.c:register_advertisement() RegisterAdv=
-ertisement
-> bluetoothd[29698]: src/advertising.c:client_create() Adding proxy for /or=
-g/bluez/example/advertisement0
-> bluetoothd[29698]: src/advertising.c:register_advertisement() Registered =
-advertisement at path /org/bluez/example/advertisement0
-> bluetoothd[29698]: src/advertising.c:parse_service_uuids() Adding Service=
-UUID: 180D
-> bluetoothd[29698]: src/advertising.c:parse_service_uuids() Adding Service=
-UUID: 180F
-> bluetoothd[29698]: src/advertising.c:parse_manufacturer_data() Adding Man=
-ufacturerData for ffff
-> bluetoothd[29698]: src/advertising.c:parse_service_data() Adding ServiceD=
-ata for 9999
-> bluetoothd[29698]: src/advertising.c:parse_data() Adding Data for type 0x=
-26 len 3
-> bluetoothd[29698]: src/advertising.c:refresh_adv() Refreshing advertiseme=
-nt: /org/bluez/example/advertisement0
-> bluetoothd[29698]: src/advertising.c:unregister_advertisement() Unregiste=
-rAdvertisement
-> bluetoothd[29698]: src/advertising.c:add_adv_callback() Advertisement reg=
-istered: =EF=BF=BD
-> Segmentation fault (core dumped)
->
-> Signed-off-by: Simon Mikuda <simon.mikuda@streamunlimited.com>
-> ---
->  src/advertising.c | 34 ++++++++++++++++++++++++++--------
->  1 file changed, 26 insertions(+), 8 deletions(-)
->
-> diff --git a/src/advertising.c b/src/advertising.c
-> index 3ed1376..f53c14c 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -73,6 +73,7 @@ struct btd_adv_client {
->         uint16_t discoverable_to;
->         unsigned int to_id;
->         unsigned int disc_to_id;
-> +       unsigned int add_adv_id;
->         GDBusClient *client;
->         GDBusProxy *proxy;
->         DBusMessage *reg;
-> @@ -117,6 +118,15 @@ static void client_free(void *data)
->                 g_dbus_client_unref(client->client);
->         }
->
-> +       if (client->reg) {
-> +               g_dbus_send_message(btd_get_dbus_connection(),
-> +                               dbus_message_new_method_return(client->re=
-g));
-> +               dbus_message_unref(client->reg);
-> +       }
-> +
-> +       if (client->add_adv_id)
-> +               mgmt_cancel(client->manager->mgmt, client->add_adv_id);
-> +
->         if (client->instance)
->                 util_clear_uid(&client->manager->instance_bitmap,
->                                                 client->instance);
-> @@ -765,7 +775,8 @@ static uint8_t *generate_scan_rsp(struct btd_adv_clie=
-nt *client,
->         return bt_ad_generate(client->scan, len);
->  }
->
-> -static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_=
-t func)
-> +static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_=
-t func,
-> +                                               unsigned int *mgmt_id)
->  {
->         struct mgmt_cp_add_advertising *cp;
->         uint8_t param_len;
-> @@ -774,6 +785,7 @@ static int refresh_adv(struct btd_adv_client *client,=
- mgmt_request_func_t func)
->         uint8_t *scan_rsp;
->         size_t scan_rsp_len =3D -1;
->         uint32_t flags =3D 0;
-> +       unsigned int mgmt_ret;
->
->         DBG("Refreshing advertisement: %s", client->path);
->
-> @@ -822,13 +834,17 @@ static int refresh_adv(struct btd_adv_client *clien=
-t, mgmt_request_func_t func)
->         free(adv_data);
->         free(scan_rsp);
->
-> -       if (!mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
-> -                               client->manager->mgmt_index, param_len, c=
-p,
-> -                               func, client, NULL)) {
-> +       mgmt_ret =3D mgmt_send(client->manager->mgmt, MGMT_OP_ADD_ADVERTI=
-SING,
-> +                       client->manager->mgmt_index, param_len, cp,
-> +                       func, client, NULL);
-> +
-> +       if (!mgmt_ret) {
->                 error("Failed to add Advertising Data");
->                 free(cp);
->                 return -EINVAL;
->         }
-> +       if (mgmt_id)
-> +               *mgmt_id =3D mgmt_ret;
->
->         free(cp);
->
-> @@ -845,7 +861,7 @@ static gboolean client_discoverable_timeout(void *use=
-r_data)
->
->         bt_ad_clear_flags(client->data);
->
-> -       refresh_adv(client, NULL);
-> +       refresh_adv(client, NULL, NULL);
->
->         return FALSE;
->  }
-> @@ -948,7 +964,7 @@ static void properties_changed(GDBusProxy *proxy, con=
-st char *name,
->                         continue;
->
->                 if (parser->func(iter, client)) {
-> -                       refresh_adv(client, NULL);
-> +                       refresh_adv(client, NULL, NULL);
->                         break;
->                 }
->         }
-> @@ -980,6 +996,8 @@ static void add_adv_callback(uint8_t status, uint16_t=
- length,
->         struct btd_adv_client *client =3D user_data;
->         const struct mgmt_rp_add_advertising *rp =3D param;
->
-> +       client->add_adv_id =3D 0;
-> +
->         if (status)
->                 goto done;
->
-> @@ -1059,7 +1077,7 @@ static DBusMessage *parse_advertisement(struct btd_=
-adv_client *client)
->                 goto fail;
->         }
->
-> -       err =3D refresh_adv(client, add_adv_callback);
-> +       err =3D refresh_adv(client, add_adv_callback, &client->add_adv_id=
-);
->         if (!err)
->                 return NULL;
->
-> @@ -1449,7 +1467,7 @@ void btd_adv_manager_destroy(struct btd_adv_manager=
- *manager)
->
->  static void manager_refresh(void *data, void *user_data)
->  {
-> -       refresh_adv(data, user_data);
-> +       refresh_adv(data, user_data, NULL);
->  }
->
->  void btd_adv_manager_refresh(struct btd_adv_manager *manager)
-> --
-> 2.7.4
-
-Applied, thanks.
-
---=20
-Luiz Augusto von Dentz
+QXBwbGllZCB3aXRoIHN0eWxlLWd1aWRlIGNvcnJlY3Rpb25zOg0KQmxhbmsgbGluZSBhaGVhZCBv
+ZiAiaWYiDQoNCk9uIFR1ZSwgMjAxOS0xMS0xMiBhdCAxNTo1NCArMDEwMCwgTWljaGHFgiBMb3dh
+cy1SemVjaG9uZWsgd3JvdGU6DQo+IFRoaXMgZml4ZXMgdGhlIGZvbGxvd2luZyBidWlsZCBlcnJv
+ciB3aGVuIGNvbXBpbGluZyBpbiBtYWludGFpbmVyIG1vZGU6DQo+IA0KPiBtZXNoL2tleXJpbmcu
+YzogSW4gZnVuY3Rpb24g4oCYZmluYWxpemXigJk6DQo+IG1lc2gva2V5cmluZy5jOjE0Mjo4OiBl
+cnJvcjogaWdub3JpbmcgcmV0dXJuIHZhbHVlIG9mIOKAmHdyaXRl4oCZLCBkZWNsYXJlZCB3aXRo
+IGF0dHJpYnV0ZSB3YXJuX3VudXNlZF9yZXN1bHQgWy0NCj4gV2Vycm9yPXVudXNlZC1yZXN1bHRd
+DQo+ICAgKHZvaWQpd3JpdGUoZmQsICZrZXksIHNpemVvZihrZXkpKTsNCj4gICAgICAgICBefn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQo+IC0tLQ0KPiAgbWVzaC9rZXlyaW5nLmMgfCAzICsr
+LQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL21lc2gva2V5cmluZy5jIGIvbWVzaC9rZXlyaW5nLmMNCj4gaW5kZXgg
+OWZhN2Q2YmQwLi5mZTI5MmI0YTcgMTAwNjQ0DQo+IC0tLSBhL21lc2gva2V5cmluZy5jDQo+ICsr
+KyBiL21lc2gva2V5cmluZy5jDQo+IEBAIC0xNDAsNyArMTQwLDggQEAgc3RhdGljIHZvaWQgZmlu
+YWxpemUoY29uc3QgY2hhciAqZnBhdGgsIHVpbnQxNl90IG5ldF9pZHgpDQo+ICAJbF9kZWJ1Zygi
+RmluYWxpemUgJXMiLCBmcGF0aCk7DQo+ICAJbWVtY3B5KGtleS5vbGRfa2V5LCBrZXkubmV3X2tl
+eSwgMTYpOw0KPiAgCWxzZWVrKGZkLCAwLCBTRUVLX1NFVCk7DQo+IC0Jd3JpdGUoZmQsICZrZXks
+IHNpemVvZihrZXkpKTsNCj4gKwlpZiAod3JpdGUoZmQsICZrZXksIHNpemVvZihrZXkpKSAhPSBz
+aXplb2Yoa2V5KSkNCj4gKwkJZ290byBkb25lOw0KPiAgDQo+ICBkb25lOg0KPiAgCWNsb3NlKGZk
+KTsNCg==
