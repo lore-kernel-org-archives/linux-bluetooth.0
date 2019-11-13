@@ -2,81 +2,121 @@ Return-Path: <SRS0=sa5O=ZF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CA3C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 17:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23816C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 17:47:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5954206E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 17:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD1D0206ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 17:47:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BkC55SDN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbfKMRdP (ORCPT
+        id S1726521AbfKMRrC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Nov 2019 12:33:15 -0500
-Received: from mga07.intel.com ([134.134.136.100]:63260 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726115AbfKMRdP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Nov 2019 12:33:15 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Nov 2019 09:33:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,301,1569308400"; 
-   d="scan'208";a="404684560"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga005.fm.intel.com with ESMTP; 13 Nov 2019 09:33:14 -0800
-Received: from orsmsx116.amr.corp.intel.com (10.22.240.14) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 13 Nov 2019 09:33:13 -0800
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.179]) by
- ORSMSX116.amr.corp.intel.com ([169.254.7.11]) with mapi id 14.03.0439.000;
- Wed, 13 Nov 2019 09:33:13 -0800
-From:   "Stotland, Inga" <inga.stotland@intel.com>
-To:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] shared/shell: Add prompt item to bt_shell_menu
- structure
-Thread-Topic: [PATCH BlueZ] shared/shell: Add prompt item to bt_shell_menu
- structure
-Thread-Index: AQHViWSBZsccn0MUSUSJoZ/ZgrGI2qeKBCsA
-Date:   Wed, 13 Nov 2019 17:33:13 +0000
-Message-ID: <35ef6466f21e861809ddd89a04019d98ce869918.camel@intel.com>
-References: <20191023054119.7712-1-inga.stotland@intel.com>
-In-Reply-To: <20191023054119.7712-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.255.228.27]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <72193958246A8748A53E47CBEC0854AE@intel.com>
-Content-Transfer-Encoding: base64
+        Wed, 13 Nov 2019 12:47:02 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:39621 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726105AbfKMRrC (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 13 Nov 2019 12:47:02 -0500
+Received: by mail-oi1-f196.google.com with SMTP id v138so2568059oif.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2019 09:47:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=F2W3S6fSAPS22Y20Zw1Fd1jjLpKo7b1BbZvmEmfJ9/0=;
+        b=BkC55SDNjE8ltR+xlJKO+aB1udeYk1KGsJn5ilQN9mi+UqHLmjQ3LAsfvpuFEJRG96
+         MkAnyIHNAi76nHi2aYM+W/E6yHaOf1r48BAgVe2vrUSL1cQzCgnChOX0dbR5tiZ+jUh6
+         p+npxLRn5z4mI/wCwlzoShjpo8S1KjXod9C0fSAiAMXph73RCKbDv6bKbsyA3u47WTBG
+         xQTC/6bEFmhXAlg2ybEoVP/tAj4DmwYyvsKn2st9BDcDrrqpcXF2H0bLtE89Hjgo9tiy
+         Hc/r2Dk/d5y+hGUTPrysNvUQqfyraZtyd//CVz6mrZghoX0lwtBJl1wzLj3OfU68VVIY
+         4bgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=F2W3S6fSAPS22Y20Zw1Fd1jjLpKo7b1BbZvmEmfJ9/0=;
+        b=MzAHp8FkZEkH3eCtlJdwMjh6ThlWeKJmE5qLNefyo+hODrS2QB0+pK0rGNOciz14bb
+         YDstiEC5P7T7nWlQfWFZg2Vn+thAunLZ0tarj9BVnq+XbJM929J2xbZXYkX0qQ5JKfkG
+         wUhdt7qM9bjSIF3NgOrpgpjdejSvKRPK4Un5TYF0gu7bVPX7g68W0hcP+W7wDEyPVnA5
+         YHm8kcLtl8aQyvPJn1hvbHGIUNJisSFPSXPMfd+Ub7G7MOnZ8iyij589vtgGlBD+iDCw
+         K098DtWbXnzTNWHCavdsMljCTcPV0UvhIrd8GpD0/EwffK06YD6yp9tBzvSDbIhJFKw1
+         iVLw==
+X-Gm-Message-State: APjAAAX6NOfTQpkDRfvpLCJ3zv5g8jppjH7PfsZqBGi5qQlOTB5z/CSZ
+        wGxqXMzr1wqedDpXAAqxSr8j+p7BPE7LN0lN3fQ=
+X-Google-Smtp-Source: APXvYqzsYLdxnZE3YQulsZHQkbnizJugTJk5dlhyAkUytbxwNcVQtk+d/7O/aZCBpwv4pr90EUHSP2rspBVtFco50OM=
+X-Received: by 2002:aca:c756:: with SMTP id x83mr3667168oif.8.1573667221041;
+ Wed, 13 Nov 2019 09:47:01 -0800 (PST)
 MIME-Version: 1.0
+References: <20191023054119.7712-1-inga.stotland@intel.com> <35ef6466f21e861809ddd89a04019d98ce869918.camel@intel.com>
+In-Reply-To: <35ef6466f21e861809ddd89a04019d98ce869918.camel@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 13 Nov 2019 19:46:48 +0200
+Message-ID: <CABBYNZ+UkW6-8tN3iypVhtLA312VV0cBKidv+QFdm8Qy4pu=tQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/shell: Add prompt item to bt_shell_menu structure
+To:     "Stotland, Inga" <inga.stotland@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTHVpeiwNCg0KT24gVHVlLCAyMDE5LTEwLTIyIGF0IDIyOjQxIC0wNzAwLCBJbmdhIFN0b3Rs
-YW5kIHdyb3RlOg0KPiBUaGlzIGFsbG93cyB0byBhc3NvY2lhdGUgc3BlY2lmaWMgcHJvbXB0cyB3
-aXRoIG1haW4gbWVudQ0KPiBhbmQgc3VibWVudXMgdGh1cyBwcm92aWRpbmcgZm9yIGJldHRlciBu
-YXZpZ2F0aW9uIHdoZW4NCj4gc3VibWVudXMgYXJlIGluIHVzZS4NCj4gLS0tDQo+ICBzcmMvc2hh
-cmVkL3NoZWxsLmMgfCAzICsrKw0KPiAgc3JjL3NoYXJlZC9zaGVsbC5oIHwgMSArDQo+ICAyIGZp
-bGVzIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3NyYy9zaGFy
-ZWQvc2hlbGwuYyBiL3NyYy9zaGFyZWQvc2hlbGwuYw0KPiBpbmRleCBjZmRjYzc2YzQuLmE4MjFj
-OGQwYSAxMDA2NDQNCj4gLS0tIGEvc3JjL3NoYXJlZC9zaGVsbC5jDQo+ICsrKyBiL3NyYy9zaGFy
-ZWQvc2hlbGwuYw0KPiBAQCAtMTIyNiw2ICsxMjI2LDkgQEAgYm9vbCBidF9zaGVsbF9zZXRfbWVu
-dShjb25zdCBzdHJ1Y3QgYnRfc2hlbGxfbWVudSAqbWVudSkNCj4gIAlpZiAoIWRhdGEubWFpbikN
-Cj4gIAkJZGF0YS5tYWluID0gbWVudTsNCj4gIA0KPiArCWlmIChtZW51LT5wcm9tcHQpDQo+ICsJ
-CWJ0X3NoZWxsX3NldF9wcm9tcHQobWVudS0+cHJvbXB0KTsNCj4gKw0KPiAgCXJldHVybiB0cnVl
-Ow0KPiAgfQ0KPiAgDQo+IGRpZmYgLS1naXQgYS9zcmMvc2hhcmVkL3NoZWxsLmggYi9zcmMvc2hh
-cmVkL3NoZWxsLmgNCj4gaW5kZXggZTE0ZDU4MzgxLi5hOWVlZTUwNmYgMTAwNjQ0DQo+IC0tLSBh
-L3NyYy9zaGFyZWQvc2hlbGwuaA0KPiArKysgYi9zcmMvc2hhcmVkL3NoZWxsLmgNCj4gQEAgLTUz
-LDYgKzUzLDcgQEAgc3RydWN0IGJ0X3NoZWxsX21lbnVfZW50cnkgew0KPiAgc3RydWN0IGJ0X3No
-ZWxsX21lbnUgew0KPiAgCWNvbnN0IGNoYXIgKm5hbWU7DQo+ICAJY29uc3QgY2hhciAqZGVzYzsN
-Cj4gKwljb25zdCBjaGFyICpwcm9tcHQ7DQo+ICAJY29uc3Qgc3RydWN0IGJ0X3NoZWxsX21lbnVf
-ZW50cnkgZW50cmllc1tdOw0KPiAgfTsNCj4gIA0KDQpEbyB5b3UgaGF2ZSBhbnkgY29tbWVudHMg
-Zm9yIHRoaXMgcGF0Y2g/DQoNCkJlc3QgcmVnYXJkcywNCkluZ2ENCg==
+Hi Inga,
+
+On Wed, Nov 13, 2019 at 7:33 PM Stotland, Inga <inga.stotland@intel.com> wrote:
+>
+> Hi Luiz,
+>
+> On Tue, 2019-10-22 at 22:41 -0700, Inga Stotland wrote:
+> > This allows to associate specific prompts with main menu
+> > and submenus thus providing for better navigation when
+> > submenus are in use.
+> > ---
+> >  src/shared/shell.c | 3 +++
+> >  src/shared/shell.h | 1 +
+> >  2 files changed, 4 insertions(+)
+> >
+> > diff --git a/src/shared/shell.c b/src/shared/shell.c
+> > index cfdcc76c4..a821c8d0a 100644
+> > --- a/src/shared/shell.c
+> > +++ b/src/shared/shell.c
+> > @@ -1226,6 +1226,9 @@ bool bt_shell_set_menu(const struct bt_shell_menu *menu)
+> >       if (!data.main)
+> >               data.main = menu;
+> >
+> > +     if (menu->prompt)
+> > +             bt_shell_set_prompt(menu->prompt);
+> > +
+> >       return true;
+> >  }
+> >
+> > diff --git a/src/shared/shell.h b/src/shared/shell.h
+> > index e14d58381..a9eee506f 100644
+> > --- a/src/shared/shell.h
+> > +++ b/src/shared/shell.h
+> > @@ -53,6 +53,7 @@ struct bt_shell_menu_entry {
+> >  struct bt_shell_menu {
+> >       const char *name;
+> >       const char *desc;
+> > +     const char *prompt;
+> >       const struct bt_shell_menu_entry entries[];
+> >  };
+> >
+>
+> Do you have any comments for this patch?
+
+I recall experimenting with something similar, but the problem is that
+sometimes there is already a prompt set, for instance we set the
+address when connected on bluetoothctl and that should probably stay
+even if you change the menu, perhaps instead overwrite the prompt we
+could have another section so we append the menu name at the end of
+the prompt or something like that.
+
+-- 
+Luiz Augusto von Dentz
