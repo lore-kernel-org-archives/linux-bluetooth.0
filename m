@@ -2,91 +2,170 @@ Return-Path: <SRS0=sa5O=ZF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC29C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 19:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5975BC43141
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 21:22:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45442206ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 19:58:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F6A5206E3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Nov 2019 21:22:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="dFp5Sirs"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RuGtcHgy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbfKMT6a (ORCPT
+        id S1726598AbfKMVWq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Nov 2019 14:58:30 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:41940 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726120AbfKMT6a (ORCPT
+        Wed, 13 Nov 2019 16:22:46 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:35771 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726162AbfKMVWp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Nov 2019 14:58:30 -0500
-Received: by mail-lf1-f68.google.com with SMTP id j14so2969184lfb.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2019 11:58:28 -0800 (PST)
+        Wed, 13 Nov 2019 16:22:45 -0500
+Received: by mail-qk1-f195.google.com with SMTP id i19so3145579qki.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2019 13:22:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=eMqTEUJLMNu+OIkKckHbaR74tuwJgWVmslb/DegCxzc=;
-        b=dFp5SirscTIM2N+Kcvf5ClYH/R7KaScoA6lCKLvXkS3DyyYzEpOGSYwBXmD2ylQF0o
-         Qr2lKGaO2OnIrrtrYWPdz4a9NQxV9JM+qdm6d4TwwDD7isCEt3H9hm0lZCq5zqD0vC3U
-         f8yYYuIPQ6s5GdBoPy0Ku/oEVicwbvYsJ0KlZc0eWyUVle6XvTJ3alsIn7/FtDDiUM+m
-         C38wT5Sx9SqwWX3ojF0CoKvm9twkbL4CScOBf186Lfs00hzppb9GQpLv8MAfdRq/jAbu
-         Ei72EAeClHw4svPUGhjyZHj9WDjFy59WvpWQYzudxEyPSuLYITynxsp2A6XH/0lUSKtW
-         IF2w==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=H5D+0l5YX7kW94tdUvORkwws9N/E0rSMWEMH/aWYGCM=;
+        b=RuGtcHgyES0alZRPSvzuMKMS1akTNwu8rQqiiE0qNV3Qy3YnFzheMDE/xjJqUpG0n9
+         EVGOjLnrQWIDNgAX0oTU7HKxDB6xJU2s7+XLerRGujebZFWK6n24xMEEQRgdD1lViHwG
+         w8kUz0mo1XPBJQgPuFeKE7ef3jqWCBWgufGZE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=eMqTEUJLMNu+OIkKckHbaR74tuwJgWVmslb/DegCxzc=;
-        b=fEPTKjWEAuYC02Q7ctoySSKwkuyODjbdSgzPmICcya6RRZSUjQ1exL76n2dD5FYCpz
-         bzZ/eTMHnnXYzp2fBBjbOyxP7wPb5Aj2XdH5xMIBPUhmVlulXooxVHrFQeXr+g2AUqFe
-         qWAU9BClepKhqHGbvmztI0bO7TuXngrJmUTUIH4/bcQeRhV1XY8bGSm+cwA21ZNCUSzE
-         UFqozKT14EqphuhR5zZoWN3Gsw8vvGakGCN72BCYmaTsklHkVnLkZTKFv6StrN6wM+cS
-         E6zuIilhsMBebdKouwuOBrzQJCTj0h4Rgjs8ACkJ0D5L/7t04qdBphj7AtBEN2qVPgjI
-         J6sQ==
-X-Gm-Message-State: APjAAAVBHTRmATVN208+SWwLAJEAbC2aNokmcETuH8AoXBEsEMfoDHKY
-        Bh7CmO7AC8p6KzfoluQ4wJpBkw==
-X-Google-Smtp-Source: APXvYqx7gfumoApA6RjMAcIEMng5AF6DbkUxcAownxvAXgNcdbuLUprOLWWBMLvI1QPq32oM7AOv0Q==
-X-Received: by 2002:ac2:5b47:: with SMTP id i7mr3919948lfp.82.1573675107958;
-        Wed, 13 Nov 2019 11:58:27 -0800 (PST)
-Received: from kynes (apn-77-112-62-33.dynamic.gprs.plus.pl. [77.112.62.33])
-        by smtp.gmail.com with ESMTPSA id p193sm2019276lfa.18.2019.11.13.11.58.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2019 11:58:27 -0800 (PST)
-Date:   Wed, 13 Nov 2019 20:58:25 +0100
-From:   "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh: Add missing property interface to node
- objects
-Message-ID: <20191113195825.d5d2g4obgij2xzas@kynes>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <20191112104327.13109-1-michal.lowas-rzechonek@silvair.com>
- <7390c6e30fcd8c01205fb29bb3e725b56b5dce4a.camel@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=H5D+0l5YX7kW94tdUvORkwws9N/E0rSMWEMH/aWYGCM=;
+        b=OLew7W04CGLO1WX2uPlwYMEF4RKOy+Lm1gmoIfPEOBhHcWfI97qGdqhVbWHlcMobwf
+         EpheIbTzJLSdKpabK/NqlmiSTFWuLf3YYj/MuRLFvtU/qykaiUxckZEfILj5BoC2oBHG
+         +7h6Y4AkhALw6Tz0EDYDqir+QtHlEx7EnEoH2Ug4CIMmRrjDFnd+HLgEj2FSrTebVm2g
+         TOblXcKGY/OlocjZEy4vkgBb69EIn9pBaymteIiZLtav72tRdl22pFWbG32FSYHsnWEV
+         OFv8CfDbxHeXJq1f9U3hygPm1xKL4hK3wbM93xYt1Ulb0NwYIkj2gCK0vrjjl9dILCu1
+         FsBw==
+X-Gm-Message-State: APjAAAUThmVZDBlc+frekfzRNuKfj70bioz+eW9Z0z8UK4t4dJa/NNZB
+        mrOc2M/DejdxbUnt5VSxiNMJ+OUpO9f40RjdlAmV/g==
+X-Google-Smtp-Source: APXvYqxiGunaKyUs/he4AdfvGfT2knL19MLF8BA0pVlIy1AoRxGy5c5Y/AE0teKVLEm1WL8traRZ3T2koVDdsnAhKoM=
+X-Received: by 2002:a05:620a:1032:: with SMTP id a18mr3070746qkk.305.1573680162664;
+ Wed, 13 Nov 2019 13:22:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7390c6e30fcd8c01205fb29bb3e725b56b5dce4a.camel@intel.com>
-User-Agent: NeoMutt/20180716
+References: <20191112230944.48716-1-abhishekpandit@chromium.org>
+ <20191112230944.48716-4-abhishekpandit@chromium.org> <DCCD0A71-D696-4701-9BBB-ED6D8FECC7FB@holtmann.org>
+In-Reply-To: <DCCD0A71-D696-4701-9BBB-ED6D8FECC7FB@holtmann.org>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Wed, 13 Nov 2019 13:22:31 -0800
+Message-ID: <CANFp7mX0tXmBdJOkBUbar6Niwv9D60Fo9CvAcUkEKZKLnt--hQ@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] Bluetooth: hci_bcm: Support pcm params in dts
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        Douglas Anderson <dianders@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 11/13, Gix, Brian wrote:
-> Applied with style-guide corrections:
-> Reduce max line length to <80 charactors
+Hi Marcel,
 
-Thanks, and sorry about the formatting.
 
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+
+On Tue, Nov 12, 2019 at 4:18 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Abhishek,
+>
+> > BCM chips may require configuration of PCM to operate correctly and
+> > there is a vendor specific HCI command to do this. Add support in the
+> > hci_bcm driver to parse this from devicetree and configure the chip.
+> >
+> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > ---
+> >
+> > Changes in v4: None
+> > Changes in v3: None
+> > Changes in v2: None
+> >
+> > drivers/bluetooth/hci_bcm.c | 32 ++++++++++++++++++++++++++++++++
+> > 1 file changed, 32 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> > index 6134bff58748..4ee0b45be7e2 100644
+> > --- a/drivers/bluetooth/hci_bcm.c
+> > +++ b/drivers/bluetooth/hci_bcm.c
+> > @@ -88,6 +88,8 @@ struct bcm_device_data {
+> >  *    used to disable flow control during runtime suspend and system sleep
+> >  * @is_suspended: whether flow control is currently disabled
+> >  * @disallow_set_baudrate: don't allow set_baudrate
+> > + * @has_pcm_params: whether PCM parameters need to be configured
+> > + * @pcm_params: PCM and routing parameters
+> >  */
+> > struct bcm_device {
+> >       /* Must be the first member, hci_serdev.c expects this. */
+> > @@ -122,6 +124,9 @@ struct bcm_device {
+> >       bool                    is_suspended;
+> > #endif
+> >       bool                    disallow_set_baudrate;
+> > +
+> > +     bool                            has_pcm_params;
+> > +     struct bcm_set_pcm_int_params   pcm_params;
+> > };
+> >
+> > /* generic bcm uart resources */
+> > @@ -596,6 +601,16 @@ static int bcm_setup(struct hci_uart *hu)
+> >                       host_set_baudrate(hu, speed);
+> >       }
+> >
+> > +     /* PCM parameters if any*/
+> > +     if (bcm->dev && bcm->dev->has_pcm_params) {
+> > +             err = btbcm_set_pcm_int_params(hu->hdev, &bcm->dev->pcm_params);
+> > +
+> > +             if (err) {
+> > +                     bt_dev_info(hu->hdev, "BCM: Set pcm params failed (%d)",
+> > +                                 err);
+> > +             }
+> > +     }
+> > +
+> > finalize:
+> >       release_firmware(fw);
+> >
+> > @@ -1132,7 +1147,24 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+> >
+> > static int bcm_of_probe(struct bcm_device *bdev)
+> > {
+> > +     int err;
+> > +
+> >       device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
+> > +
+> > +     err = device_property_read_u8(bdev->dev, "brcm,bt-sco-routing",
+> > +                                   &bdev->pcm_params.routing);
+> > +     if (!err)
+> > +             bdev->has_pcm_params = true;
+>
+> I think in case of HCI as routing path, these should be using the default or zero values as defined by Broadcom.
+
+I'm not sure what these default values should be. Wouldn't it be
+reasonable to expect the user/developer to set the various brcm
+parameters in device tree?
+If unset, it's just 0.
+
+>
+> > +
+> > +     device_property_read_u8(bdev->dev, "brcm,pcm-interface-rate",
+> > +                             &bdev->pcm_params.rate);
+> > +     device_property_read_u8(bdev->dev, "brcm,pcm-frame-type",
+> > +                             &bdev->pcm_params.frame_sync);
+> > +     device_property_read_u8(bdev->dev, "brcm,pcm-sync-mode",
+> > +                             &bdev->pcm_params.sync_mode);
+> > +     device_property_read_u8(bdev->dev, "brcm,pcm-clock-mode",
+> > +                             &bdev->pcm_params.clock_mode);
+> > +
+>
+> I would add some sanity checks here.
+>
+> Regards
+>
+> Marcel
+>
