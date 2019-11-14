@@ -2,144 +2,155 @@ Return-Path: <SRS0=JgXz=ZG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B29C43215
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 17:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A31CC43215
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 19:20:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AA85206DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 17:58:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ECC8206CC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 19:20:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EZv+Wg45"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TLe7YGlj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726865AbfKNR6j (ORCPT
+        id S1726983AbfKNTU0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Nov 2019 12:58:39 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38074 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726098AbfKNR6j (ORCPT
+        Thu, 14 Nov 2019 14:20:26 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:42998 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726289AbfKNTU0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Nov 2019 12:58:39 -0500
-Received: by mail-pl1-f196.google.com with SMTP id w8so2954495plq.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2019 09:58:39 -0800 (PST)
+        Thu, 14 Nov 2019 14:20:26 -0500
+Received: by mail-qt1-f195.google.com with SMTP id t20so8022946qtn.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2019 11:20:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=xtjRZ4N/dj5TnunKPr1ub8m5J6PxcC016TNe/Bh9Z1k=;
-        b=EZv+Wg45gytZ+SSGZ2MxGiIv9faCbFgA5DBq38RREWXPPOYxT+1YkOhGIBThM1zv2s
-         TR/ceK4mmS3CtlaSEFdD51xZIXTwPfo9bq+cgqr+TzMCuaniV2rwiM15zbih8G8djOBO
-         1qkqwFzqGT11ywk/B3nSxFkc47m8FodSOHUBw=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kkwRFJ8JxVgdpo/nC/ABdKBnp89T/DEojTkPf4HtCKM=;
+        b=TLe7YGlj6WJefOzGFhO0G5c7NeQYJ1fI2d+sMS/QqoLjZaFilDPuds3IbV3kE37lVo
+         CO/4LU6qfDO9dK9JYgsyVrB4x0i6I92khIntTjM8VlNQ4HlB9/KNpynBSRuZVvSQYTLh
+         3IliyjzdXxiq9qvK9rdA3UveqIMBO/wqDlrXU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=xtjRZ4N/dj5TnunKPr1ub8m5J6PxcC016TNe/Bh9Z1k=;
-        b=otw7B5zWN17Pt05wiisnZF/8hKYPYPmYsVu4QEdgbqPHZlZBBEQN/f6X/BzqTXHC8C
-         4L9WXTzT0/nFhdqTdMJ3BU+dROjYkdsc7fkW9kmxj2A1+LeSqzvNArq0SRCOgTf4b5DZ
-         nPSqnQFQZJyL/ipXhvtuSxcbyX7ajZUsj9BXjlxkaO1AxuPgaDwPi3Y+cYNsWE4CLteb
-         3eLzBykp0X9P8J/R/EbYW/g2/cF6mctwsat6l1UaVDtWNIGmluSqtG8+A4kZSt8/qtG2
-         /zWj6Ri9gSzuBYDKAqUSOa6vAJrMfRA7S9FD6lOjqiVTXDeafFkQKiJqtVPGgn70Y+iT
-         N4Hw==
-X-Gm-Message-State: APjAAAUD/dIBhXiL+yLC0XfNpmxVMmrapEQ5UNQzOlCycKtH6qZa+5iT
-        rlP+jcZK5ljutKql1dxVguCnhg==
-X-Google-Smtp-Source: APXvYqzLuxA1NXzpc+PtqUC7hvdD8QB6bq/rvafa9MU7QspCSAYdGw0pn8iQHHA0/Bk6SqzTzc8SsQ==
-X-Received: by 2002:a17:902:d917:: with SMTP id c23mr10706341plz.199.1573754318761;
-        Thu, 14 Nov 2019 09:58:38 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id 13sm6901904pgu.53.2019.11.14.09.58.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2019 09:58:37 -0800 (PST)
-Date:   Thu, 14 Nov 2019 09:58:36 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kkwRFJ8JxVgdpo/nC/ABdKBnp89T/DEojTkPf4HtCKM=;
+        b=W7hBFfUEtfsBXcQArvs29waYrXPyBccZL+C4rKBPzLKDV/uFJ3e46p3FT8OA53U5Ia
+         75w/ZGzbDlb0PgSk+2LX1xadAxtr44iuhd3NnQ2bBtzA7cI/2scpz1zPCOA+7W0VThOw
+         ftNG+83PKbhMR6dAHffE3HpAX2+iYnu1rYBAyaQAXtaYFXILZqUY8OcOI6PlszXeiy6M
+         a5d/gaO7J8lWKqRhEC1mAkvRD5Y7T2LzHT869B9IA7D8HuT+pP7NOo/fWfatZxP9jTtI
+         Dz7gHoEO1Z10tLOdQlaBld9Wiqrc1tkig3iyTNai+TXkK17yxPbPxotFIjlNiVIl49nA
+         kigg==
+X-Gm-Message-State: APjAAAV0DayXIFcbmHGra/rIDTbg8CY/Bq3tnRPRqb+hQz0s0oKG1Yrg
+        A+pXuEgyzsai+dwdw3NEBB5QLr4uog8IuPDUA3RJTQ==
+X-Google-Smtp-Source: APXvYqw1+jL9umsKndVRoE+d6jN4cpPkyHVFWUdzXu6CuGu8nopPMMAfao566XJYRUR0bHl2IAsw/1Oxc1hJMtnnnas=
+X-Received: by 2002:ac8:754c:: with SMTP id b12mr9891870qtr.291.1573759225207;
+ Thu, 14 Nov 2019 11:20:25 -0800 (PST)
+MIME-Version: 1.0
+References: <20191112230944.48716-1-abhishekpandit@chromium.org>
+ <20191112230944.48716-5-abhishekpandit@chromium.org> <CAD=FV=UfGDAtePrDmsEsdCNsHQZwDkU8z6E=qzSu=opht7evpQ@mail.gmail.com>
+In-Reply-To: <CAD=FV=UfGDAtePrDmsEsdCNsHQZwDkU8z6E=qzSu=opht7evpQ@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Thu, 14 Nov 2019 11:20:14 -0800
+Message-ID: <CANFp7mWT2GwkSEcE5SkxRnfOebHq2aYLoLh6dmCZ-HktUe+mYQ@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] dt-bindings: net: broadcom-bluetooth: Add pcm config
+To:     Doug Anderson <dianders@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
-        devicetree@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
+        linux-bluetooth@vger.kernel.org,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ondrej Jirman <megous@megous.com>,
         Mark Rutland <mark.rutland@arm.com>,
         Chen-Yu Tsai <wens@csie.org>
-Subject: Re: [PATCH v4 4/4] dt-bindings: net: broadcom-bluetooth: Add pcm
- config
-Message-ID: <20191114175836.GI27773@google.com>
-References: <20191112230944.48716-1-abhishekpandit@chromium.org>
- <20191112230944.48716-5-abhishekpandit@chromium.org>
- <0642BE4E-D3C7-48B3-9893-11828EAFA7EF@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0642BE4E-D3C7-48B3-9893-11828EAFA7EF@holtmann.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 01:21:06AM +0100, Marcel Holtmann wrote:
-> Hi Abhishek,
-> 
+On Thu, Nov 14, 2019 at 9:29 AM Doug Anderson <dianders@chromium.org> wrote:
+>
+> Hi,
+>
+> On Tue, Nov 12, 2019 at 3:10 PM Abhishek Pandit-Subedi
+> <abhishekpandit@chromium.org> wrote:
+> >
 > > Add documentation for pcm parameters.
-> > 
+> >
 > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > 
+> >
 > > ---
-> > 
+> >
 > > Changes in v4:
 > > - Fix incorrect function name in hci_bcm
-> > 
+> >
 > > Changes in v3:
 > > - Change disallow baudrate setting to return -EBUSY if called before
-> >  ready. bcm_proto is no longer modified and is back to being const.
+> >   ready. bcm_proto is no longer modified and is back to being const.
 > > - Changed btbcm_set_pcm_params to btbcm_set_pcm_int_params
 > > - Changed brcm,sco-routing to brcm,bt-sco-routing
-> > 
+> >
 > > Changes in v2:
 > > - Use match data to disallow baudrate setting
 > > - Parse pcm parameters by name instead of as a byte string
 > > - Fix prefix for dt-bindings commit
-> > 
-> > .../devicetree/bindings/net/broadcom-bluetooth.txt    | 11 +++++++++++
-> > 1 file changed, 11 insertions(+)
-> > 
+> >
+> >  .../devicetree/bindings/net/broadcom-bluetooth.txt    | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> >
 > > diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
 > > index c749dc297624..42fb2fa8143d 100644
 > > --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
 > > +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
 > > @@ -29,6 +29,11 @@ Optional properties:
-> >    - "lpo": external low power 32.768 kHz clock
-> >  - vbat-supply: phandle to regulator supply for VBAT
-> >  - vddio-supply: phandle to regulator supply for VDDIO
+> >     - "lpo": external low power 32.768 kHz clock
+> >   - vbat-supply: phandle to regulator supply for VBAT
+> >   - vddio-supply: phandle to regulator supply for VDDIO
 > > + - brcm,bt-sco-routing: 0-3 (PCM, Transport, Codec, I2S)
 > > + - brcm,pcm-interface-rate: 0-4 (128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps)
 > > + - brcm,pcm-frame-type: 0-1 (short, long)
 > > + - brcm,pcm-sync-mode: 0-1 (slave, master)
 > > + - brcm,pcm-clock-mode: 0-1 (slave, master)
-> 
-> I think that all of them need to start with brcm,bt- prefix since it is rather Bluetooth specific.
-> 
-> > 
-> > 
-> > Example:
+>
+> Since these are optional your patch should describe what happens if
+> they are not present.  I think in patch #3 of the series you guys are
+> discussing it, but whatever you end up with should be documented here.
+>
+Yes, I think I will document the default values here as well.
+
+> That actually made me realize that this is patch #4 in the series.  To
+> be pedantic, bindings are supposed to be _earlier_ in the series than
+> the code that implements them.
+>
+>
+> >  Example:
 > > @@ -40,5 +45,11 @@ Example:
-> >        bluetooth {
-> >                compatible = "brcm,bcm43438-bt";
-> >                max-speed = <921600>;
+> >         bluetooth {
+> >                 compatible = "brcm,bcm43438-bt";
+> >                 max-speed = <921600>;
 > > +
 > > +               brcm,bt-sco-routing = [01];
 > > +               brcm,pcm-interface-rate = [02];
 > > +               brcm,pcm-frame-type = [00];
 > > +               brcm,pcm-sync-mode = [01];
 > > +               brcm,pcm-clock-mode = [01];
-> >        };
-> 
-> My personal taste would be to add a comment after each entry that gives the human readable setting.
+>
+> I'm at least marginally curious why your example has a leading 0 for
+> all numbers.  It makes me think you intend them to be represented in
+> octal, though I don't know offhand if dtc uses that format for octal.
+> I guess it doesn't matter since all your numbers are between 0 and 5,
+> but it does seem strange.
 
-I'd suggest to define constants in include/dt-bindings/bluetooth/brcm.h
-and use them instead of literals, with this we wouldn't rely on (optional)
-comments to make the configuration human readable.
+It's a bytestring with a length of 1. See bytestrings under
+https://devicetree-specification.readthedocs.io/en/latest/source-language.html#node-and-property-definitions
+
+>
+> -Doug
