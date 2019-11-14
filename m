@@ -2,94 +2,156 @@ Return-Path: <SRS0=JgXz=ZG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B0AC43141
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 17:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011F4C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 17:29:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2317E20718
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 17:19:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE84D206F4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 17:29:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="heWxqfCm"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iMlPJ+NJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726973AbfKNRTV (ORCPT
+        id S1726969AbfKNR3r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Nov 2019 12:19:21 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:41354 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726410AbfKNRTV (ORCPT
+        Thu, 14 Nov 2019 12:29:47 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:34037 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726901AbfKNR3q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Nov 2019 12:19:21 -0500
-Received: by mail-pl1-f193.google.com with SMTP id d29so2897324plj.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2019 09:19:20 -0800 (PST)
+        Thu, 14 Nov 2019 12:29:46 -0500
+Received: by mail-io1-f66.google.com with SMTP id q83so7760869iod.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2019 09:29:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=message-id:mime-version:content-transfer-encoding:in-reply-to
-         :references:cc:to:from:subject:user-agent:date;
-        bh=VROg+K4TnY3eAbuPo8JrWf/C2byY5+4xNeCDIHGsCeg=;
-        b=heWxqfCmZNzfTeb32+KsxAmK9QmT+BSvtUhbQQds6N/0EWs8x30JKwk7l7OeGKpP+k
-         Rn6qNv/aPihZZWzCsHOPMyQlqKmLOcE78qR9y5B05Zj9xou0l6VhRE3DGx+wxhPPkfd2
-         SpMVcrep/VY8e9SeRZ72CgKFH9R+1+lu4c3z8=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RftPJC/z3aKe9Z2EQoJhnzZgJpMcylstQtfS6pNT5zM=;
+        b=iMlPJ+NJiZRBpDqEg1HSfcU3t5/w56CFqZq6rf17WXZtLre8hZjCjdf2fMoa0PRE9R
+         /RbNAy4ORogOiWqA8tDWCzhZo1WcPdQi5GyBEhjRPBqylco9vrfdCSM0R0mvB4WpUKZQ
+         EK8xlGCBJpsP+VtQqf6/0uzWYpwacWeZji/VM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:mime-version
-         :content-transfer-encoding:in-reply-to:references:cc:to:from:subject
-         :user-agent:date;
-        bh=VROg+K4TnY3eAbuPo8JrWf/C2byY5+4xNeCDIHGsCeg=;
-        b=QZnP9djgYkkGMb8cAwPOgnB1vYqTzXVYaCwAGOOW/JmUf1XIact7ZPCllAwvkPXAOn
-         oUJjDghEzwhxj2UbIs3HdJnG+7Vl57ncdc4i/RsxsHqKbX51fhPwrKxsdCeL/jOu4syy
-         21Pf7H0IVsSnj6Q0+5y5cfjJmPEVpseu6yyikLQefoibmXwraEabwtXCfQvrhN35W5ks
-         ZHT9R+ImNjy0/T2UNRiM4iMmr+vysIdv9QxKCTuxbVeTaRE0Cl4fF3EDP70NBAo5rgNE
-         lWjZEluqEjI6eLic5n+wU+RvogAMmqFjkOh6098KFtH1TG+dKzFlkytMIToIcG3lagS6
-         jOeg==
-X-Gm-Message-State: APjAAAXFydEfdGxXtnSEAzTOc4+DPSowGQur7s9QguPnB3+ZrwKqrT38
-        x4vTeZGKoVz9Y0LA5Y2vly5NhA==
-X-Google-Smtp-Source: APXvYqw7or5Ucfv1vVWnxkJ7A//hqXzGl+dzF4j9Z+0zPBFHLT+WmTtkRBWBQm90pp4DCyaFAV6vIg==
-X-Received: by 2002:a17:902:6508:: with SMTP id b8mr10286509plk.69.1573751960472;
-        Thu, 14 Nov 2019 09:19:20 -0800 (PST)
-Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id n12sm7356081pgb.32.2019.11.14.09.19.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2019 09:19:20 -0800 (PST)
-Message-ID: <5dcd8c98.1c69fb81.4690b.49fe@mx.google.com>
-Content-Type: text/plain; charset="utf-8"
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RftPJC/z3aKe9Z2EQoJhnzZgJpMcylstQtfS6pNT5zM=;
+        b=Lw8+lIE2kp4wzysV/eAK7+lCpYp4T7nD5umBALuBDd6hmiTldL51+ug8dJLcTfVl+D
+         +Jky34KxtIjiGpWNJTAm/o0reO7kWaTyiVGupRnAr1HY1uM1iGukHVQzSqrAmmwk1PHm
+         ijLZilH2sz7gcDqwDaA3z6Pcqo7mAEkE0+3rARjieADF4pFVOzGITwyoqS9pZyblz+c8
+         GzVHDfIMZNBpNqyaQoR9bQ7xbslHTCrY10nIIC6i1nZL4PvTPXuTEo6nF++r+V7lw21a
+         nmCFrRdgJw+HUwu2S5q4AaDpY/Wg2AfuOA1cXfSSvLgVYLbhGEh++K0FqP8tqLvBs3Fm
+         JJTA==
+X-Gm-Message-State: APjAAAVvvGtJx9oADbL2mAC1KmohhjMZCRST02QWwZsP76fety+pjXuz
+        x99GBOEKwlHZgSVA8V9lSHUZo//1PVc=
+X-Google-Smtp-Source: APXvYqzDG2Z2T6KNhcEwDHOceTSSl87v7/XaD3ZCsE1V6Z818B2qCfBFxfieigiGeKBNv3EOddxleA==
+X-Received: by 2002:a6b:f117:: with SMTP id e23mr10379407iog.286.1573752585195;
+        Thu, 14 Nov 2019 09:29:45 -0800 (PST)
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com. [209.85.166.53])
+        by smtp.gmail.com with ESMTPSA id c16sm626293ioh.57.2019.11.14.09.29.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2019 09:29:44 -0800 (PST)
+Received: by mail-io1-f53.google.com with SMTP id j13so7749465ioe.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2019 09:29:44 -0800 (PST)
+X-Received: by 2002:a02:a813:: with SMTP id f19mr8324725jaj.12.1573752583817;
+ Thu, 14 Nov 2019 09:29:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20191114081430.25427-1-bgodavar@codeaurora.org>
-References: <20191114081430.25427-1-bgodavar@codeaurora.org>
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        tientzu@chromium.org, seanpaul@chromium.org
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        johan.hedberg@gmail.com, marcel@holtmann.org
-From:   Stephen Boyd <swboyd@chromium.org>
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Enable clocks required for BT SOC
-User-Agent: alot/0.8.1
-Date:   Thu, 14 Nov 2019 09:19:19 -0800
+References: <20191112230944.48716-1-abhishekpandit@chromium.org> <20191112230944.48716-5-abhishekpandit@chromium.org>
+In-Reply-To: <20191112230944.48716-5-abhishekpandit@chromium.org>
+From:   Doug Anderson <dianders@chromium.org>
+Date:   Thu, 14 Nov 2019 09:29:29 -0800
+X-Gmail-Original-Message-ID: <CAD=FV=UfGDAtePrDmsEsdCNsHQZwDkU8z6E=qzSu=opht7evpQ@mail.gmail.com>
+Message-ID: <CAD=FV=UfGDAtePrDmsEsdCNsHQZwDkU8z6E=qzSu=opht7evpQ@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] dt-bindings: net: broadcom-bluetooth: Add pcm config
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ondrej Jirman <megous@megous.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Quoting Balakrishna Godavarthi (2019-11-14 00:14:30)
-> @@ -1423,6 +1427,20 @@ static int qca_power_off(struct hci_dev *hdev)
->         return 0;
->  }
-> =20
-> +static int qca_power_on(struct qca_serdev *qcadev)
-> +{
-> +       int err;
+Hi,
+
+On Tue, Nov 12, 2019 at 3:10 PM Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
+>
+> Add documentation for pcm parameters.
+>
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>
+> ---
+>
+> Changes in v4:
+> - Fix incorrect function name in hci_bcm
+>
+> Changes in v3:
+> - Change disallow baudrate setting to return -EBUSY if called before
+>   ready. bcm_proto is no longer modified and is back to being const.
+> - Changed btbcm_set_pcm_params to btbcm_set_pcm_int_params
+> - Changed brcm,sco-routing to brcm,bt-sco-routing
+>
+> Changes in v2:
+> - Use match data to disallow baudrate setting
+> - Parse pcm parameters by name instead of as a byte string
+> - Fix prefix for dt-bindings commit
+>
+>  .../devicetree/bindings/net/broadcom-bluetooth.txt    | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> index c749dc297624..42fb2fa8143d 100644
+> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> @@ -29,6 +29,11 @@ Optional properties:
+>     - "lpo": external low power 32.768 kHz clock
+>   - vbat-supply: phandle to regulator supply for VBAT
+>   - vddio-supply: phandle to regulator supply for VDDIO
+> + - brcm,bt-sco-routing: 0-3 (PCM, Transport, Codec, I2S)
+> + - brcm,pcm-interface-rate: 0-4 (128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps)
+> + - brcm,pcm-frame-type: 0-1 (short, long)
+> + - brcm,pcm-sync-mode: 0-1 (slave, master)
+> + - brcm,pcm-clock-mode: 0-1 (slave, master)
+
+Since these are optional your patch should describe what happens if
+they are not present.  I think in patch #3 of the series you guys are
+discussing it, but whatever you end up with should be documented here.
+
+That actually made me realize that this is patch #4 in the series.  To
+be pedantic, bindings are supposed to be _earlier_ in the series than
+the code that implements them.
+
+
+>  Example:
+> @@ -40,5 +45,11 @@ Example:
+>         bluetooth {
+>                 compatible = "brcm,bcm43438-bt";
+>                 max-speed = <921600>;
 > +
-> +       if (qcadev->susclk) {
+> +               brcm,bt-sco-routing = [01];
+> +               brcm,pcm-interface-rate = [02];
+> +               brcm,pcm-frame-type = [00];
+> +               brcm,pcm-sync-mode = [01];
+> +               brcm,pcm-clock-mode = [01];
 
-clk_prepare_enable() shouldn't return anything besides 0 when passed a
-NULL pointer. Please drop this if condition in addition to the one on
-the clk_disable_unprepare().
+I'm at least marginally curious why your example has a leading 0 for
+all numbers.  It makes me think you intend them to be represented in
+octal, though I don't know offhand if dtc uses that format for octal.
+I guess it doesn't matter since all your numbers are between 0 and 5,
+but it does seem strange.
 
-> +               err =3D clk_prepare_enable(qcadev->susclk);
-> +               if (err)
-> +                       return err;
-> +       }
+-Doug
