@@ -2,141 +2,156 @@ Return-Path: <SRS0=JgXz=ZG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4920CC43215
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 06:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD3C9C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 08:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ACF7206DA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 06:09:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D1D4206EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Nov 2019 08:14:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="HKz/vjir";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="LB5755oW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbfKNGJv convert rfc822-to-8bit (ORCPT
+        id S1726534AbfKNIOn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Nov 2019 01:09:51 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:35206 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725914AbfKNGJv (ORCPT
+        Thu, 14 Nov 2019 03:14:43 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:34050 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726330AbfKNIOn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Nov 2019 01:09:51 -0500
-Received: from marcel-macpro.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 33EBDCED06;
-        Thu, 14 Nov 2019 07:18:55 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH v4 3/4] Bluetooth: hci_bcm: Support pcm params in dts
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CANFp7mUxBLGfDd+mR7R1RTK70PRhbHjV8whDJOucpap_qmgN3A@mail.gmail.com>
-Date:   Thu, 14 Nov 2019 07:09:49 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        Douglas Anderson <dianders@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <C6EE827D-4CE7-4A5F-B9FC-C10647B0B8C4@holtmann.org>
-References: <20191112230944.48716-1-abhishekpandit@chromium.org>
- <20191112230944.48716-4-abhishekpandit@chromium.org>
- <DCCD0A71-D696-4701-9BBB-ED6D8FECC7FB@holtmann.org>
- <CANFp7mX0tXmBdJOkBUbar6Niwv9D60Fo9CvAcUkEKZKLnt--hQ@mail.gmail.com>
- <102CFB68-22A0-4DF7-B5CE-F3146AA36746@holtmann.org>
- <CANFp7mUxBLGfDd+mR7R1RTK70PRhbHjV8whDJOucpap_qmgN3A@mail.gmail.com>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-X-Mailer: Apple Mail (2.3601.0.10)
+        Thu, 14 Nov 2019 03:14:43 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 30AC0601E7; Thu, 14 Nov 2019 08:14:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1573719282;
+        bh=UiF0+gnF4eB8dUSiLw/KMBeKnt4Fl+raj9NHWbCWzVA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=HKz/vjirNKzLTHWNR7D4+jmm+6Tsmd65akG1UHLPGyfFnnM+QFufcFJHKolaOyjT1
+         eQ0rz/Gg7nT9D7o+0VdaQlaKSt/OjBY8XgxCmLGOLpTcnpl7XBuymr/WGmpIPktoRc
+         LliRLAfoQYF/+6Z5L9ofplQlzb+YmpapRfr8Hxgo=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 23A9F601E7;
+        Thu, 14 Nov 2019 08:14:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1573719281;
+        bh=UiF0+gnF4eB8dUSiLw/KMBeKnt4Fl+raj9NHWbCWzVA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=LB5755oWBSZO8HhBv1jljCwyGot9VJU6ECZXAnAGlcE5g+6Y9IlwOzsovwzvWwfoa
+         Yk09SpAd8VXUmZ+7AJeTvMJwSKh7Ga3s4k4bQS4Jv538eoLJEkjdtV33hXJHYI6i6X
+         z9Lwoatdix16BKPFInLR1F8pICL90AywX6SXjsPw=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 23A9F601E7
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        tientzu@chromium.org, seanpaul@chromium.org
+Subject: [PATCH v1] Bluetooth: hci_qca: Enable clocks required for BT SOC
+Date:   Thu, 14 Nov 2019 13:44:30 +0530
+Message-Id: <20191114081430.25427-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.22.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Instead of relying on other subsytem to turn ON clocks
+required for BT SoC to operate, voting them from the driver.
 
->>>>> BCM chips may require configuration of PCM to operate correctly and
->>>>> there is a vendor specific HCI command to do this. Add support in the
->>>>> hci_bcm driver to parse this from devicetree and configure the chip.
->>>>> 
->>>>> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->>>>> ---
->>>>> 
->>>>> Changes in v4: None
->>>>> Changes in v3: None
->>>>> Changes in v2: None
->>>>> 
->>>>> drivers/bluetooth/hci_bcm.c | 32 ++++++++++++++++++++++++++++++++
->>>>> 1 file changed, 32 insertions(+)
->>>>> 
->>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->>>>> index 6134bff58748..4ee0b45be7e2 100644
->>>>> --- a/drivers/bluetooth/hci_bcm.c
->>>>> +++ b/drivers/bluetooth/hci_bcm.c
->>>>> @@ -88,6 +88,8 @@ struct bcm_device_data {
->>>>> *    used to disable flow control during runtime suspend and system sleep
->>>>> * @is_suspended: whether flow control is currently disabled
->>>>> * @disallow_set_baudrate: don't allow set_baudrate
->>>>> + * @has_pcm_params: whether PCM parameters need to be configured
->>>>> + * @pcm_params: PCM and routing parameters
->>>>> */
->>>>> struct bcm_device {
->>>>>     /* Must be the first member, hci_serdev.c expects this. */
->>>>> @@ -122,6 +124,9 @@ struct bcm_device {
->>>>>     bool                    is_suspended;
->>>>> #endif
->>>>>     bool                    disallow_set_baudrate;
->>>>> +
->>>>> +     bool                            has_pcm_params;
->>>>> +     struct bcm_set_pcm_int_params   pcm_params;
->>>>> };
->>>>> 
->>>>> /* generic bcm uart resources */
->>>>> @@ -596,6 +601,16 @@ static int bcm_setup(struct hci_uart *hu)
->>>>>                     host_set_baudrate(hu, speed);
->>>>>     }
->>>>> 
->>>>> +     /* PCM parameters if any*/
->>>>> +     if (bcm->dev && bcm->dev->has_pcm_params) {
->>>>> +             err = btbcm_set_pcm_int_params(hu->hdev, &bcm->dev->pcm_params);
->>>>> +
->>>>> +             if (err) {
->>>>> +                     bt_dev_info(hu->hdev, "BCM: Set pcm params failed (%d)",
->>>>> +                                 err);
->>>>> +             }
->>>>> +     }
->>>>> +
->>>>> finalize:
->>>>>     release_firmware(fw);
->>>>> 
->>>>> @@ -1132,7 +1147,24 @@ static int bcm_acpi_probe(struct bcm_device *dev)
->>>>> 
->>>>> static int bcm_of_probe(struct bcm_device *bdev)
->>>>> {
->>>>> +     int err;
->>>>> +
->>>>>     device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
->>>>> +
->>>>> +     err = device_property_read_u8(bdev->dev, "brcm,bt-sco-routing",
->>>>> +                                   &bdev->pcm_params.routing);
->>>>> +     if (!err)
->>>>> +             bdev->has_pcm_params = true;
->>>> 
->>>> I think in case of HCI as routing path, these should be using the default or zero values as defined by Broadcom.
->>> 
->>> I'm not sure what these default values should be. Wouldn't it be
->>> reasonable to expect the user/developer to set the various brcm
->>> parameters in device tree?
->>> If unset, it's just 0.
->> 
->> if that works with the hardware I am fine with that. The other option is to actually first read the current values. And then only change the ones that are supplied by the DT.
-> 
-> I don't know of a read pcm params command (this would be nice to have).
-> 
-> I think it might be prudent to default the frame_mode and clock_mode
-> to master (0x1). I'll test how the hardware responds to 0x0 and update
-> the default to 0x1 if things fail badly.
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
-it is either one opcode down or one opcode up. Look at monitor/broadcom.c since we do actually decode some of these.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index f10bdf8e1fc5..dc95e378574b 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -164,6 +164,7 @@ struct qca_serdev {
+ };
+ 
+ static int qca_regulator_enable(struct qca_serdev *qcadev);
++static int qca_power_on(struct qca_serdev *qcadev);
+ static void qca_regulator_disable(struct qca_serdev *qcadev);
+ static void qca_power_shutdown(struct hci_uart *hu);
+ static int qca_power_off(struct hci_dev *hdev);
+@@ -528,7 +529,7 @@ static int qca_open(struct hci_uart *hu)
+ 		} else {
+ 			hu->init_speed = qcadev->init_speed;
+ 			hu->oper_speed = qcadev->oper_speed;
+-			ret = qca_regulator_enable(qcadev);
++			ret = qca_power_on(qcadev);
+ 			if (ret) {
+ 				destroy_workqueue(qca->workqueue);
+ 				kfree_skb(qca->rx_skb);
+@@ -1214,7 +1215,7 @@ static int qca_wcn3990_init(struct hci_uart *hu)
+ 	qcadev = serdev_device_get_drvdata(hu->serdev);
+ 	if (!qcadev->bt_power->vregs_on) {
+ 		serdev_device_close(hu->serdev);
+-		ret = qca_regulator_enable(qcadev);
++		ret = qca_power_on(qcadev);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -1408,6 +1409,9 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	host_set_baudrate(hu, 2400);
+ 	qca_send_power_pulse(hu, false);
+ 	qca_regulator_disable(qcadev);
++
++	if (qcadev->susclk)
++		clk_disable_unprepare(qcadev->susclk);
+ }
+ 
+ static int qca_power_off(struct hci_dev *hdev)
+@@ -1423,6 +1427,20 @@ static int qca_power_off(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static int qca_power_on(struct qca_serdev *qcadev)
++{
++	int err;
++
++	if (qcadev->susclk) {
++		err = clk_prepare_enable(qcadev->susclk);
++		if (err)
++			return err;
++	}
++
++	qca_regulator_enable(qcadev);
++	return 0;
++}
++
+ static int qca_regulator_enable(struct qca_serdev *qcadev)
+ {
+ 	struct qca_power *power = qcadev->bt_power;
+@@ -1523,6 +1541,15 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 
+ 		qcadev->bt_power->vregs_on = false;
+ 
++		if (qcadev->btsoc_type == QCA_WCN3990 ||
++		    qcadev->btsoc_type == QCA_WCN3991) {
++			qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
++			if (IS_ERR(qcadev->susclk)) {
++				dev_err(&serdev->dev, "failed to acquire clk\n");
++				return PTR_ERR(qcadev->susclk);
++			}
++		}
++
+ 		device_property_read_u32(&serdev->dev, "max-speed",
+ 					 &qcadev->oper_speed);
+ 		if (!qcadev->oper_speed)
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
