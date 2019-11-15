@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB22C43141
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 07:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42BCC43215
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 07:59:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 602882073C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 07:54:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A64A32073B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 07:59:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbfKOHy3 convert rfc822-to-8bit (ORCPT
+        id S1727275AbfKOH7b convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Nov 2019 02:54:29 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:49349 "EHLO
+        Fri, 15 Nov 2019 02:59:31 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:34002 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726323AbfKOHy2 (ORCPT
+        with ESMTP id S1725829AbfKOH7a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Nov 2019 02:54:28 -0500
+        Fri, 15 Nov 2019 02:59:30 -0500
 Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 3E25CCED16;
-        Fri, 15 Nov 2019 09:03:33 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id DF3C9CED16;
+        Fri, 15 Nov 2019 09:08:34 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH v5 2/4] Bluetooth: btbcm: Support pcm configuration
+Subject: Re: [PATCH v5 1/4] Bluetooth: hci_bcm: Disallow set_baudrate for
+ BCM4354
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191114180959.v5.2.I2a9640407d375f20c7c8f4afd1607db143ff0246@changeid>
-Date:   Fri, 15 Nov 2019 08:54:27 +0100
+In-Reply-To: <20191114180959.v5.1.I8ed714e23fdf42fa35588cfee2877b53d781df12@changeid>
+Date:   Fri, 15 Nov 2019 08:59:28 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        dianders@chromium.org, linux-kernel@vger.kernel.org
+        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <32623E12-EAE0-44AD-A6C9-B5183EA2C0B0@holtmann.org>
+Message-Id: <43FDCD41-50CE-4A4B-BC57-6466FE4090F8@holtmann.org>
 References: <20191115021008.32926-1-abhishekpandit@chromium.org>
- <20191114180959.v5.2.I2a9640407d375f20c7c8f4afd1607db143ff0246@changeid>
+ <20191114180959.v5.1.I8ed714e23fdf42fa35588cfee2877b53d781df12@changeid>
 To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -47,27 +48,11 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Abhishek,
 
-> Add BCM vendor specific command to configure PCM parameters. The new
-> vendor opcode allows us to set the sco routing, the pcm interface rate,
-> and a few other pcm specific options (frame sync, sync mode, and clock
-> mode). See broadcom-bluetooth.txt in Documentation for more information
-> about valid values for those settings.
-> 
-> Here is an example trace where this opcode was used to configure
-> a BCM4354:
-> 
->        < HCI Command: Vendor (0x3f|0x001c) plen 5
->                01 02 00 01 01
->> HCI Event: Command Complete (0x0e) plen 4
->        Vendor (0x3f|0x001c) ncmd 1
->                Status: Success (0x00)
-> 
-> We can read back the values as well with ocf 0x001d to confirm the
-> values that were set:
->        $ hcitool cmd 0x3f 0x001d
->        < HCI Command: ogf 0x3f, ocf 0x001d, plen 0
->> HCI Event: 0x0e plen 9
->        01 1D FC 00 01 02 00 01 01
+> Without updating the patchram, the BCM4354 does not support a higher
+> operating speed. The normal bcm_setup follows the correct order
+> (init_speed, patchram and then oper_speed) but the serdev driver will
+> set the operating speed before calling the hu->setup function. Thus,
+> for the BCM4354, don't set the operating speed before patchram.
 > 
 > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
@@ -77,42 +62,104 @@ Hi Abhishek,
 > Changes in v3: None
 > Changes in v2: None
 > 
-> drivers/bluetooth/btbcm.c | 19 +++++++++++++++++++
-> drivers/bluetooth/btbcm.h |  8 ++++++++
-> 2 files changed, 27 insertions(+)
+> drivers/bluetooth/hci_bcm.c | 31 +++++++++++++++++++++++++++++--
+> 1 file changed, 29 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index 2d2e6d862068..53fd66a96e69 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -105,6 +105,25 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 0f851c0dde7f..ee40003008d8 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -47,6 +47,14 @@
+> 
+> #define BCM_NUM_SUPPLIES 2
+> 
+> +/**
+> + * struct bcm_device_data - device specific data
+> + * @no_early_set_baudrate: Disallow set baudrate before driver setup()
+> + */
+> +struct bcm_device_data {
+> +	bool	no_early_set_baudrate;
+> +};
+> +
+> /**
+>  * struct bcm_device - device driver resources
+>  * @serdev_hu: HCI UART controller struct
+> @@ -79,6 +87,7 @@
+>  * @hu: pointer to HCI UART controller struct,
+>  *	used to disable flow control during runtime suspend and system sleep
+>  * @is_suspended: whether flow control is currently disabled
+> + * @no_early_set_baudrate: don't set_baudrate before setup()
+>  */
+> struct bcm_device {
+> 	/* Must be the first member, hci_serdev.c expects this. */
+> @@ -112,6 +121,7 @@ struct bcm_device {
+> 	struct hci_uart		*hu;
+> 	bool			is_suspended;
+> #endif
+> +	bool			no_early_set_baudrate;
+> };
+> 
+> /* generic bcm uart resources */
+> @@ -447,7 +457,13 @@ static int bcm_open(struct hci_uart *hu)
+> 	if (bcm->dev) {
+> 		hci_uart_set_flow_control(hu, true);
+> 		hu->init_speed = bcm->dev->init_speed;
+> -		hu->oper_speed = bcm->dev->oper_speed;
+> +
+> +		/* If oper_speed is set, ldisc/serdev will set the baudrate
+> +		 * before calling setup()
+> +		 */
+> +		if (!bcm->dev->no_early_set_baudrate)
+> +			hu->oper_speed = bcm->dev->oper_speed;
+> +
+> 		err = bcm_gpio_set_power(bcm->dev, true);
+> 		hci_uart_set_flow_control(hu, false);
+> 		if (err)
+> @@ -565,6 +581,8 @@ static int bcm_setup(struct hci_uart *hu)
+> 	/* Operational speed if any */
+> 	if (hu->oper_speed)
+> 		speed = hu->oper_speed;
+> +	else if (bcm->dev && bcm->dev->oper_speed)
+> +		speed = bcm->dev->oper_speed;
+> 	else if (hu->proto->oper_speed)
+> 		speed = hu->proto->oper_speed;
+> 	else
+> @@ -1374,6 +1392,7 @@ static struct platform_driver bcm_driver = {
+> static int bcm_serdev_probe(struct serdev_device *serdev)
+> {
+> 	struct bcm_device *bcmdev;
+> +	const struct bcm_device_data *data;
+> 	int err;
+> 
+> 	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
+> @@ -1408,6 +1427,10 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+> 	if (err)
+> 		dev_err(&serdev->dev, "Failed to power down\n");
+> 
+> +	data = device_get_match_data(bcmdev->dev);
+> +	if (data)
+> +		bcmdev->no_early_set_baudrate = data->no_early_set_baudrate;
+> +
+> 	return hci_uart_register_device(&bcmdev->serdev_hu, &bcm_proto);
 > }
-> EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
 > 
-> +int btbcm_set_pcm_int_params(struct hci_dev *hdev,
-> +			     const struct bcm_set_pcm_int_params *int_params)
-> +{
-> +	struct sk_buff *skb;
-> +	int err;
+> @@ -1419,12 +1442,16 @@ static void bcm_serdev_remove(struct serdev_device *serdev)
+> }
+> 
+> #ifdef CONFIG_OF
+> +struct bcm_device_data bcm4354_device_data = {
+> +	.no_early_set_baudrate = true,
+> +};
 > +
-> +	/* Vendor ocf 0x001c sets the pcm parameters and 0x001d reads it */
+> static const struct of_device_id bcm_bluetooth_of_match[] = {
+> 	{ .compatible = "brcm,bcm20702a1" },
+> 	{ .compatible = "brcm,bcm4345c5" },
+> 	{ .compatible = "brcm,bcm4330-bt" },
+> 	{ .compatible = "brcm,bcm43438-bt" },
+> -	{ .compatible = "brcm,bcm43540-bt" },
+> +	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
 
-drop this comment.
-
-> +	skb = __hci_cmd_sync(hdev, 0xfc1c, 5, int_params, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		err = PTR_ERR(skb);
-> +		bt_dev_err(hdev, "BCM: Set PCM int params failed (%d)", err);
-> +		return err;
-> +	}
-> +	kfree_skb(skb);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btbcm_set_pcm_int_params);
-> +
-
-Lets introduce two function here. btbcm_write_pcm_int_param and btbcm_read_pcm_int_param.
+this looks good to me. Can some users of the other devices test this patch so we ensure that it won’t break other devices.
 
 Regards
 
