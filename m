@@ -6,75 +6,56 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 001CAC33C99
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 08:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A411C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 08:07:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D95392072D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 08:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A8CC2073B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Nov 2019 08:07:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726818AbfKOIEy convert rfc822-to-8bit (ORCPT
+        id S1727064AbfKOIHe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Nov 2019 03:04:54 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:36083 "EHLO
+        Fri, 15 Nov 2019 03:07:34 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:44001 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726365AbfKOIEy (ORCPT
+        with ESMTP id S1726196AbfKOIHe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Nov 2019 03:04:54 -0500
+        Fri, 15 Nov 2019 03:07:34 -0500
 Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 63C8FCED16;
-        Fri, 15 Nov 2019 09:13:58 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3395DCED16;
+        Fri, 15 Nov 2019 09:16:39 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH v5 4/4] Bluetooth: hci_bcm: Support pcm params in dts
+Subject: Re: [PATCH] btusb: fix PM leak in error case of setup
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191114180959.v5.4.I3e900de9478b68e5e4475e747d1c46fdd28313fa@changeid>
-Date:   Fri, 15 Nov 2019 09:04:52 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <139C4D84-3A51-4890-BD2F-995B4A6D57FC@holtmann.org>
-References: <20191115021008.32926-1-abhishekpandit@chromium.org>
- <20191114180959.v5.4.I3e900de9478b68e5e4475e747d1c46fdd28313fa@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+In-Reply-To: <20191114150118.5237-1-oneukum@suse.com>
+Date:   Fri, 15 Nov 2019 09:07:33 +0100
+Cc:     ytkim@qca.qualcomm.com, Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <F5BB5814-4B00-4DD8-BF33-7996CA7E1518@holtmann.org>
+References: <20191114150118.5237-1-oneukum@suse.com>
+To:     Oliver Neukum <oneukum@suse.com>
 X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Oliver,
 
-> BCM chips may require configuration of PCM to operate correctly and
-> there is a vendor specific HCI command to do this. Add support in the
-> hci_bcm driver to parse this from devicetree and configure the chip.
+> If setup() fails a reference for runtime PM has already
+> been taken. Proper use of the error handling in btusb_open()is needed.
+> You cannot just return.
 > 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Fixes: ace31982585a3 ("Bluetooth: btusb: Add setup callback for chip
+> init on USB")
+> Signed-off-by: Oliver Neukum <oneukum@suse.com>
 > ---
-> Looks like hcitool cmd 0x3f 0x001d will read back the PCM parameters so
-> I experimented with different values for sco_routing, interface_rate and
-> other values.
-> 
-> The hardware doesn't care about frame_type, sync_mode or clock_mode (I
-> put them all as 0, all as 1, etc). Only the sco_routing seems to have
-> a discernable effect on the hardware.
-> 
-> To avoid complicating this, I opted not to read PCM settings and then
-> write back to it. Let the user decide what to write themselves. I've
-> opted to add a comment explaining that 0x001d is the read opcode if they
-> want to verify it themselves.
+> drivers/bluetooth/btusb.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-actually I would really do it like this:
-
-	1) read params
-	2) overwrite values from DT
-	2) write params (if transport mode is different)
-
-The advantage with this is that when you have to debug things, then the btmon trace will contain the default values the firmware has. So it is in all trace files all the time. We do that with other parameters as for exactly that reason.
-
-That also means you can drop has_pcm_params variable.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
