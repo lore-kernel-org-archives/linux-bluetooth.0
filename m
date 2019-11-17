@@ -2,75 +2,57 @@ Return-Path: <SRS0=tHDW=ZJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73FA2C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Nov 2019 17:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D0CC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Nov 2019 20:53:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A95B2084C
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Nov 2019 17:56:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F034420730
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Nov 2019 20:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PpFVHO2O"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gerhold.net header.i=@gerhold.net header.b="k96wiDVq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726085AbfKQR43 (ORCPT
+        id S1726150AbfKQUxD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 17 Nov 2019 12:56:29 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45008 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726067AbfKQR42 (ORCPT
+        Sun, 17 Nov 2019 15:53:03 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.21]:23484 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726128AbfKQUxD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 17 Nov 2019 12:56:28 -0500
-Received: by mail-wr1-f65.google.com with SMTP id f2so16769257wrs.11
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Nov 2019 09:56:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=5xrlHyn/zKHye+GAnh7De8qb9y10xddfAIfezFOlqYo=;
-        b=PpFVHO2OzcW+yW+E90oxLBuFpIw+nu3TOOdkf1Xe2dnqWz3iZbrHdLXwphAwrb2ekm
-         5fpyjk81zVFkW/VG5LtZ1e4Io1WjnSN3ibXw15+TVZAIj3c2CrsNf4FFLu0vFzpzC0hs
-         mPagAINrysa7uVt4IbFKUy5/WJ+DSGvfrE4B1h6suSayHS3ekEQFaSS7TaXyDRCDd0+q
-         18RprW5WFCaMoKIl3ovvlgc8TPcFGG6hX0jF9Sr0dGkvqEgx86Y4W1u4jIsZ7Jqp8cxv
-         HwBSYHFckP+fFOuMlBfzVyrwdHk55yDKahXcfEC96x9Cp91j+yPrN+ohYEIOSblrCGPB
-         jE/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5xrlHyn/zKHye+GAnh7De8qb9y10xddfAIfezFOlqYo=;
-        b=HY55fGHk9P4s3SDMr8bejDBwLxXRl628KUeWPrgfZSyhOxafWRDqhkBm+UoVwIjW7d
-         VoNlhzYOIc4/DCdfUmdhNY8MsXggy063DAHdlWRlOjzR/4zIYY4t73n97CIGXm/j7/4G
-         R3H6z+gLl4NMpRR5vuNpCKi1t0CbkCIZxzRAGmrl8fAwLkR21Ss/9vkuIhmfuO36xX/g
-         WkP6kfBKIE7AnoVY/5KEy+jduOXQI07gwSkH1wIyNFWNQAw4HgfeAoZWBCdlpKLun6Ek
-         9WosUaqi6P07ICbdH5iShBOItO/+IY+QxunD+YK4KWoOYaBE4EjmfzaH09B+RvzCDhh6
-         YDBg==
-X-Gm-Message-State: APjAAAVj3Y7u1v5oeQlNi0Rqmld3gB65kq1PYbETmY6lLFIcNE9OzO1L
-        5FbLsLgkdSjI9xdrF+e3uJU=
-X-Google-Smtp-Source: APXvYqx8QHWUHIGY40LTa8n0gtDc2T+YB+/sFkE0wXCESE6N5Descd+yIcErtU/ukNX9O3OGVsOtiA==
-X-Received: by 2002:a5d:4684:: with SMTP id u4mr24866517wrq.352.1574013386499;
-        Sun, 17 Nov 2019 09:56:26 -0800 (PST)
-Received: from localhost ([37.238.189.25])
-        by smtp.gmail.com with ESMTPSA id t185sm19395198wmf.45.2019.11.17.09.56.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Nov 2019 09:56:26 -0800 (PST)
-From:   Mohammad Rasim <mohammad.rasim96@gmail.com>
-To:     linux-amlogic@lists.infradead.org, linux-bluetooth@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     Mohammad Rasim <mohammad.rasim96@gmail.com>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Subject: [RFC PATCH 4/4] Bluetooth: btbcm: Add entry for BCM4335A0 UART bluetooth
-Date:   Sun, 17 Nov 2019 20:56:06 +0300
-Message-Id: <20191117175606.5050-5-mohammad.rasim96@gmail.com>
+        Sun, 17 Nov 2019 15:53:03 -0500
+X-Greylist: delayed 360 seconds by postgrey-1.27 at vger.kernel.org; Sun, 17 Nov 2019 15:53:02 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574023981;
+        s=strato-dkim-0002; d=gerhold.net;
+        h=Message-Id:Date:Subject:Cc:To:From:X-RZG-CLASS-ID:X-RZG-AUTH:From:
+        Subject:Sender;
+        bh=q1SlCqcYNA8v4afPgFyelT/M3Fbh/mLrgWCv7EiA/Sg=;
+        b=k96wiDVqKZ9ZhRpHe1em6K7oNnH7Godwl23YxTzD0DKlzMs7HIzIYr6k04UDODDryt
+        zm+33BzoOWGDyg8rdYUamuByNmXp54ro/o1PjRvtWpqnUxE7CZnK3vQdm0rSRxDTr98c
+        l6G+NQs0TDv/Yv67auDBKN/fT9xXAiJ5gE28lFnsMxwWk1IqCivS+mPRdE8lXEldo3AQ
+        bc0txoJvjdP5djzsd1mTIzAzevjYoKMyEsl8WKbOjLeHDUxp49ry+d+pixWXzXbTPnlU
+        MOD9nB3o8a9lG8a93YEYnDW5QjRP3HM8wNM6MJrrj+QuBEVsiOLYxoxra4YrxCQBdi5s
+        NzVg==
+X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVORvLd4SsytBXQrEOHTIXsMvvtBRRPA=="
+X-RZG-CLASS-ID: mo00
+Received: from localhost.localdomain
+        by smtp.strato.de (RZmta 44.29.0 AUTH)
+        with ESMTPSA id e07688vAHKexb1p
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Sun, 17 Nov 2019 21:40:59 +0100 (CET)
+From:   Stephan Gerhold <stephan@gerhold.net>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stephan Gerhold <stephan@gerhold.net>
+Subject: [PATCH] Bluetooth: btbcm: Add entry for BCM4334B0 UART Bluetooth
+Date:   Sun, 17 Nov 2019 21:39:46 +0100
+Message-Id: <20191117203946.233900-1-stephan@gerhold.net>
 X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20191117175606.5050-1-mohammad.rasim96@gmail.com>
-References: <20191117175606.5050-1-mohammad.rasim96@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -78,58 +60,45 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds the device ID for the BCM4335A0 module (part of the AMPAK AP6335 WIFI/Bluetooth combo)
+Add the device ID for the WiFi/BT/FM combo chip BCM4334 (rev B0).
 
-hciconfig output:
-```
-hci1:   Type: Primary  Bus: UART
-        BD Address: 43:35:B0:07:1F:AC  ACL MTU: 1021:8  SCO MTU: 64:1
-        UP RUNNING
-        RX bytes:5079 acl:0 sco:0 events:567 errors:0
-        TX bytes:69065 acl:0 sco:0 commands:567 errors:0
-        Features: 0xbf 0xfe 0xcf 0xff 0xdf 0xff 0x7b 0x87
-        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-        Link policy: RSWITCH SNIFF
-        Link mode: SLAVE ACCEPT
-        Name: 'alarm'
-        Class: 0x000000
-        Service Classes: Unspecified
-        Device Class: Miscellaneous,
-        HCI Version: 4.0 (0x6)  Revision: 0x161
-        LMP Version: 4.0 (0x6)  Subversion: 0x4106
-        Manufacturer: Broadcom Corporation (15)
-```
+The chip seems to use 43:34:b0:00:00:00 as default address,
+so add it to the list of default addresses and leave it up
+to the user to configure a valid one.
 
-Signed-off-by: Mohammad Rasim <mohammad.rasim96@gmail.com>
+Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
 ---
- drivers/bluetooth/btbcm.c   | 1 +
- drivers/bluetooth/hci_bcm.c | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/bluetooth/btbcm.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 2d2e6d862068..22464bf8cda3 100644
+index 2d2e6d862068..0bb9023ec214 100644
 --- a/drivers/bluetooth/btbcm.c
 +++ b/drivers/bluetooth/btbcm.c
-@@ -339,6 +339,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
- 	{ 0x220e, "BCM20702A1"  },	/* 001.002.014 */
- 	{ 0x4217, "BCM4329B1"   },	/* 002.002.023 */
- 	{ 0x6106, "BCM4359C0"	},	/* 003.001.006 */
-+	{ 0x4106, "BCM4335A0"	},	/* 002.001.006 */
- 	{ }
- };
+@@ -23,6 +23,7 @@
+ #define BDADDR_BCM43430A0 (&(bdaddr_t) {{0xac, 0x1f, 0x12, 0xa0, 0x43, 0x43}})
+ #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
+ #define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
++#define BDADDR_BCM4334B0 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb0, 0x34, 0x43}})
+ #define BDADDR_BCM4345C5 (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0xc5, 0x45, 0x43}})
+ #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
  
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 7646636f2d18..7eba10b0ae6c 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1422,6 +1422,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
- 	{ .compatible = "brcm,bcm4345c5" },
- 	{ .compatible = "brcm,bcm4330-bt" },
- 	{ .compatible = "brcm,bcm43438-bt" },
-+	{ .compatible = "brcm,bcm4335a0" },
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
+@@ -74,6 +75,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM2076B1) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4334B0) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+@@ -326,6 +328,7 @@ struct bcm_subver_table {
+ 
+ static const struct bcm_subver_table bcm_uart_subver_table[] = {
+ 	{ 0x4103, "BCM4330B1"	},	/* 002.001.003 */
++	{ 0x410d, "BCM4334B0"	},	/* 002.001.013 */
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+ 	{ 0x4204, "BCM2076B1"	},	/* 002.002.004 */
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
 -- 
 2.23.0
 
