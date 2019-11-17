@@ -1,88 +1,135 @@
-Return-Path: <SRS0=UnQ+=ZI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=tHDW=ZJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21054C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Nov 2019 12:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73FA2C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Nov 2019 17:56:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00AB720700
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Nov 2019 12:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A95B2084C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Nov 2019 17:56:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PpFVHO2O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727539AbfKPMHv (ORCPT
+        id S1726085AbfKQR43 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 16 Nov 2019 07:07:51 -0500
-Received: from hall.aurel32.net ([195.154.113.88]:52656 "EHLO hall.aurel32.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727474AbfKPMHv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 16 Nov 2019 07:07:51 -0500
-Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
-        by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1iVwrl-00019G-Qj; Sat, 16 Nov 2019 13:07:49 +0100
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.92.3)
-        (envelope-from <aurelien@aurel32.net>)
-        id 1iVwrl-0001MQ-Fe; Sat, 16 Nov 2019 13:07:49 +0100
-Date:   Sat, 16 Nov 2019 13:07:49 +0100
-From:   Aurelien Jarno <aurelien@aurel32.net>
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: Re: [PATCH BlueZ v2 0/2] mesh: Fix inOOB and outOOB issues
-Message-ID: <20191116120749.GC30589@aurel32.net>
-References: <20191115231705.5596-1-brian.gix@intel.com>
+        Sun, 17 Nov 2019 12:56:29 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45008 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726067AbfKQR42 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 17 Nov 2019 12:56:28 -0500
+Received: by mail-wr1-f65.google.com with SMTP id f2so16769257wrs.11
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Nov 2019 09:56:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=5xrlHyn/zKHye+GAnh7De8qb9y10xddfAIfezFOlqYo=;
+        b=PpFVHO2OzcW+yW+E90oxLBuFpIw+nu3TOOdkf1Xe2dnqWz3iZbrHdLXwphAwrb2ekm
+         5fpyjk81zVFkW/VG5LtZ1e4Io1WjnSN3ibXw15+TVZAIj3c2CrsNf4FFLu0vFzpzC0hs
+         mPagAINrysa7uVt4IbFKUy5/WJ+DSGvfrE4B1h6suSayHS3ekEQFaSS7TaXyDRCDd0+q
+         18RprW5WFCaMoKIl3ovvlgc8TPcFGG6hX0jF9Sr0dGkvqEgx86Y4W1u4jIsZ7Jqp8cxv
+         HwBSYHFckP+fFOuMlBfzVyrwdHk55yDKahXcfEC96x9Cp91j+yPrN+ohYEIOSblrCGPB
+         jE/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5xrlHyn/zKHye+GAnh7De8qb9y10xddfAIfezFOlqYo=;
+        b=HY55fGHk9P4s3SDMr8bejDBwLxXRl628KUeWPrgfZSyhOxafWRDqhkBm+UoVwIjW7d
+         VoNlhzYOIc4/DCdfUmdhNY8MsXggy063DAHdlWRlOjzR/4zIYY4t73n97CIGXm/j7/4G
+         R3H6z+gLl4NMpRR5vuNpCKi1t0CbkCIZxzRAGmrl8fAwLkR21Ss/9vkuIhmfuO36xX/g
+         WkP6kfBKIE7AnoVY/5KEy+jduOXQI07gwSkH1wIyNFWNQAw4HgfeAoZWBCdlpKLun6Ek
+         9WosUaqi6P07ICbdH5iShBOItO/+IY+QxunD+YK4KWoOYaBE4EjmfzaH09B+RvzCDhh6
+         YDBg==
+X-Gm-Message-State: APjAAAVj3Y7u1v5oeQlNi0Rqmld3gB65kq1PYbETmY6lLFIcNE9OzO1L
+        5FbLsLgkdSjI9xdrF+e3uJU=
+X-Google-Smtp-Source: APXvYqx8QHWUHIGY40LTa8n0gtDc2T+YB+/sFkE0wXCESE6N5Descd+yIcErtU/ukNX9O3OGVsOtiA==
+X-Received: by 2002:a5d:4684:: with SMTP id u4mr24866517wrq.352.1574013386499;
+        Sun, 17 Nov 2019 09:56:26 -0800 (PST)
+Received: from localhost ([37.238.189.25])
+        by smtp.gmail.com with ESMTPSA id t185sm19395198wmf.45.2019.11.17.09.56.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Nov 2019 09:56:26 -0800 (PST)
+From:   Mohammad Rasim <mohammad.rasim96@gmail.com>
+To:     linux-amlogic@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     Mohammad Rasim <mohammad.rasim96@gmail.com>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Neil Armstrong <narmstrong@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Subject: [RFC PATCH 4/4] Bluetooth: btbcm: Add entry for BCM4335A0 UART bluetooth
+Date:   Sun, 17 Nov 2019 20:56:06 +0300
+Message-Id: <20191117175606.5050-5-mohammad.rasim96@gmail.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191117175606.5050-1-mohammad.rasim96@gmail.com>
+References: <20191117175606.5050-1-mohammad.rasim96@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115231705.5596-1-brian.gix@intel.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2019-11-15 15:17, Brian Gix wrote:
-> This patchset includes modification to both the Daemon and the
-> mesh-cfgclient.  All of the inOOB and outOOB scenarios have been tested,
-> and are working according to the Bluetooth Profile specification, for
-> the Provisioner "Initiator" role.
-> 
-> Brian Gix (1):
->   mesh: Fix inOOB and outOOB agent handling on prov initiate
-> 
-> Inga Stotland (1):
->   tools/mesh-cfgclient: Add full support inOOB and outOOB
-> 
->  mesh/agent.c           |  12 +--
->  mesh/prov-initiator.c  |  69 +++++++++++++---
->  tools/mesh-cfgclient.c | 178 ++++++++++++++++++++++++++++++++++-------
->  tools/mesh-gatt/prov.c |   9 ++-
->  tools/mesh/agent.c     |  21 +++--
->  tools/mesh/agent.h     |   4 +-
->  6 files changed, 233 insertions(+), 60 deletions(-)
+This patch adds the device ID for the BCM4335A0 module (part of the AMPAK AP6335 WIFI/Bluetooth combo)
 
-Thanks for the patches. I have just tried them and I confirm it fixes
-output OOB with number. Output OOB with string still doesn't work. I
-came up with this patch to fix it:
+hciconfig output:
+```
+hci1:   Type: Primary  Bus: UART
+        BD Address: 43:35:B0:07:1F:AC  ACL MTU: 1021:8  SCO MTU: 64:1
+        UP RUNNING
+        RX bytes:5079 acl:0 sco:0 events:567 errors:0
+        TX bytes:69065 acl:0 sco:0 commands:567 errors:0
+        Features: 0xbf 0xfe 0xcf 0xff 0xdf 0xff 0x7b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH SNIFF
+        Link mode: SLAVE ACCEPT
+        Name: 'alarm'
+        Class: 0x000000
+        Service Classes: Unspecified
+        Device Class: Miscellaneous,
+        HCI Version: 4.0 (0x6)  Revision: 0x161
+        LMP Version: 4.0 (0x6)  Subversion: 0x4106
+        Manufacturer: Broadcom Corporation (15)
+```
 
-diff --git a/mesh/agent.c b/mesh/agent.c
-index 623f2faf0..e5545d7f3 100644
---- a/mesh/agent.c
-+++ b/mesh/agent.c
-@@ -604,7 +604,7 @@ int mesh_agent_prompt_number(struct mesh_agent *agent, bool initiator,
- int mesh_agent_prompt_alpha(struct mesh_agent *agent, mesh_agent_key_cb_t cb,
- 								void *user_data)
- {
--	return prompt_input(agent, "in-alpha", MESH_AGENT_REQUEST_IN_ALPHA,
-+	return prompt_input(agent, "out-alpha", MESH_AGENT_REQUEST_OUT_ALPHA,
- 							false, cb, user_data);
- }
+Signed-off-by: Mohammad Rasim <mohammad.rasim96@gmail.com>
+---
+ drivers/bluetooth/btbcm.c   | 1 +
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-Aurelien
-
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 2d2e6d862068..22464bf8cda3 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -339,6 +339,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
+ 	{ 0x220e, "BCM20702A1"  },	/* 001.002.014 */
+ 	{ 0x4217, "BCM4329B1"   },	/* 002.002.023 */
+ 	{ 0x6106, "BCM4359C0"	},	/* 003.001.006 */
++	{ 0x4106, "BCM4335A0"	},	/* 002.001.006 */
+ 	{ }
+ };
+ 
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 7646636f2d18..7eba10b0ae6c 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1422,6 +1422,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm4345c5" },
+ 	{ .compatible = "brcm,bcm4330-bt" },
+ 	{ .compatible = "brcm,bcm43438-bt" },
++	{ .compatible = "brcm,bcm4335a0" },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
 -- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+2.23.0
+
