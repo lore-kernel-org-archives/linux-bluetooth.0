@@ -2,134 +2,105 @@ Return-Path: <SRS0=idF9=ZK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25178C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 19:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EAAEC432C3
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 20:15:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 008F62231D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 19:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA07E222A0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 20:15:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XtQspD0u"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="A4ZDm7gB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726776AbfKRTVe (ORCPT
+        id S1726664AbfKRUPy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Nov 2019 14:21:34 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:44277 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726748AbfKRTVe (ORCPT
+        Mon, 18 Nov 2019 15:15:54 -0500
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:36364 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726250AbfKRUPy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Nov 2019 14:21:34 -0500
-Received: by mail-pg1-f194.google.com with SMTP id e6so2115538pgi.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 11:21:33 -0800 (PST)
+        Mon, 18 Nov 2019 15:15:54 -0500
+Received: by mail-pg1-f171.google.com with SMTP id k13so10161725pgh.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 12:15:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=d5PWZi/zKiryoyNeQKLfBbB+ek5n6FC2NtouBDWVRQs=;
-        b=XtQspD0uMRIVjaZ4j+RdCKdeQxaQCqQPp0dFHeqONKAZ35AY4eVCQPCYYleRmtsva6
-         jiBaP6dXV6CIhPTqL5k3YcxCbhisRrR03J2vLkV72aCm+pVNX6rvuTWONb3vLXyxlYRs
-         v5O5i+t3G1W2pCt3l+6JsFgLJWtzfK3LsM/dQ=
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=vx04uAAhmTJ193O8Kcs44XNMxG/d0kDvX0+WooeKwRI=;
+        b=A4ZDm7gBw3Oq2PHvF7Nu9Q65CzMLkadM55DVviUkin2bnPu8VlV3WUG8mOdt+I1CXH
+         re+rNz0TNEpNOvvGUoPDuPAQlCh98ufSQKCtVHpTeW2UabRADBG0u1ZCjZP3kNXxMC4a
+         LyjmdSOhzUpj4DWw+FQqcXEn/EyzlQjRQgI6A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=d5PWZi/zKiryoyNeQKLfBbB+ek5n6FC2NtouBDWVRQs=;
-        b=Ide7PxkcM8UFGwZflTg31ke0I2SalsANe1Rcj4JGy9E+gGn73BxJVZoBAVxNEAYPuE
-         K3U77P7EBt8z6pYi6qbjWZAcbIExUZMp+1bmFob9GV5LbJCT4Al7LwRweAXvkg+U3azv
-         2ia+Vg9GN3PAer/0qKEACnsluXyV5f5yPBTBGcdN77A7Pv6hqcFpNh2O79AZqB3xHqpt
-         ndfIs9/wHRBWZ07vXI2pFxgTb8CjMIgludX+sctdwJy71s1lQ89pTAmgAvvWVWkONX3c
-         y8wO1DxUs06R3dNi296G6bSvJbec0TlJke6p6J97i+1HCmngPNPmY83vMkqrzXl4NQ9w
-         VpGg==
-X-Gm-Message-State: APjAAAWqghyqH5LPKbirqTjU9KtmxALen0rCHNNU9pdGjb8nrGzp/fv3
-        lANtAeEprPpK4AX9cBT5Y2/ekQ==
-X-Google-Smtp-Source: APXvYqzs+mH7xTW54MFqTm5HE4eK5l6cG37wnugAw2nvX7u/bTQwIc633vnnHFTMf9ZOXDJoQw1YLg==
-X-Received: by 2002:a63:af1a:: with SMTP id w26mr960203pge.251.1574104893199;
-        Mon, 18 Nov 2019 11:21:33 -0800 (PST)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id p123sm22772633pfg.30.2019.11.18.11.21.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2019 11:21:31 -0800 (PST)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>
-Cc:     linux-bluetooth@vger.kernel.org, dianders@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        devicetree@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Chen-Yu Tsai <wens@csie.org>
-Subject: [PATCH v6 0/4] Bluetooth: hci_bcm: Additional changes for BCM4354 support
-Date:   Mon, 18 Nov 2019 11:21:19 -0800
-Message-Id: <20191118192123.82430-1-abhishekpandit@chromium.org>
-X-Mailer: git-send-email 2.24.0.432.g9d3f5f5b63-goog
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=vx04uAAhmTJ193O8Kcs44XNMxG/d0kDvX0+WooeKwRI=;
+        b=hqsIOQOaVPuo2+dzWI5JHjYhCTrbAHIpUUW2CTjha481lCSllFn5HEpKwHa9hTxQjZ
+         PeBYWrfsRvofrSG2WpAUorgIXSFaHFG4L/pqsVStEViiFEz7dKEu+MRkKmEEFgOV60b8
+         9UAN12J1Y7xMjeZMk3dxOpIBwjWxh1UREw7V5EHf6aVDo4k7FCY0QEWuXBXNx/CaenV+
+         8PckVriXHddQZfD3Wct/SQm+ZlvzVCDfXYbvXFF04aJBkNJ5xYKkicdrsUr4JsHwog2Y
+         yc94iHR7T2RnYxpe2lqaEv175we0FSnr0MEPWnb/lF9s4UZwl6njbW1I8bP/nnNylOdW
+         GQLA==
+X-Gm-Message-State: APjAAAUq4aGYuUcPXO14wh8UnQdvxK5XqcNnJOBjMeCnvKxF69aNR9Mq
+        If3XhrXr+wP2S9SrV8TGbOQ8rf4fLEY=
+X-Google-Smtp-Source: APXvYqzAvg4DvjlGJ6Ih/qGGLkG+hk97ybi3O0Pb3mgixYUgPUFExX4fNIP+OGOuXPpGvmzkmHv6nA==
+X-Received: by 2002:a65:41cd:: with SMTP id b13mr1206869pgq.385.1574108153346;
+        Mon, 18 Nov 2019 12:15:53 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
+        by smtp.gmail.com with ESMTPSA id k103sm307468pje.16.2019.11.18.12.15.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Nov 2019 12:15:52 -0800 (PST)
+Date:   Mon, 18 Nov 2019 12:15:51 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Andre Heider <a.heider@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: Re: "local-[bd|mac]-address" inconsistency?
+Message-ID: <20191118201551.GJ27773@google.com>
+References: <57775d51-7de2-a32c-8b23-aba611483f51@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <57775d51-7de2-a32c-8b23-aba611483f51@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Andre,
 
-While adding support for the BCM4354, I discovered a few more things
-that weren't working as they should have.
+On Mon, Nov 18, 2019 at 09:20:35AM +0100, Andre Heider wrote:
+> Hi,
+> 
+> when passing both addresses through device-tree in the same way:
+> $ hexdump /proc/device-tree/soc/ethernet@5020000/local-mac-address
+> 0000000 0702 3d96 53d4
+> 
+> $ hexdump /proc/device-tree/soc/serial@5000400/bluetooth/local-bd-address
+> 0000000 0703 3d96 53d4
+>
+> I get this for eth (which is consistent with u-boot):
+> link/ether 02:07:96:3d:d4:53
+> 
+> But for bt it's in reverse order:
+> Controller 53:D4:3D:96:07:03
+> 
+> Is this intended?
 
-First, we disallow serdev from setting the baudrate on BCM4354. Serdev
-sets the oper_speed first before calling hu->setup() in
-hci_uart_setup(). On the BCM4354, this results in bcm_setup() failing
-when the hci reset times out.
+Kind of.
 
-Next, we add support for setting the PCM parameters, which consists of
-a pair of vendor specific opcodes to set the pcm parameters. The
-documentation for these params are available in the brcm_patchram_plus
-package (i.e. https://github.com/balena-os/brcm_patchram_plus). This is
-necessary for PCM to work properly.
+In both cases the address is specified in the binary format used by BT/NW
+stack.
 
-All changes were tested with rk3288-veyron-minnie.dts.
+When BT addresses are printed they are converted from LSB to MSB.
 
+> Do I really have to pass the bdaddr from u-boot in another way?
 
-Changes in v6:
-- Added btbcm_read_pcm_int_params and change pcm params to first read
-  the pcm params before setting it
-
-Changes in v5:
-- Rename parameters to bt-* and read as integer instead of bytestring
-- Update documentation with defaults and put values in header
-- Changed patch order
-
-Changes in v4:
-- Fix incorrect function name in hci_bcm
-
-Changes in v3:
-- Change disallow baudrate setting to return -EBUSY if called before
-  ready. bcm_proto is no longer modified and is back to being const.
-- Changed btbcm_set_pcm_params to btbcm_set_pcm_int_params
-- Changed brcm,sco-routing to brcm,bt-sco-routing
-
-Changes in v2:
-- Use match data to disallow baudrate setting
-- Parse pcm parameters by name instead of as a byte string
-- Fix prefix for dt-bindings commit
-
-Abhishek Pandit-Subedi (4):
-  Bluetooth: hci_bcm: Disallow set_baudrate for BCM4354
-  Bluetooth: btbcm: Support pcm configuration
-  dt-bindings: net: broadcom-bluetooth: Add pcm config
-  Bluetooth: hci_bcm: Support pcm params in dts
-
- .../bindings/net/broadcom-bluetooth.txt       | 16 ++++
- drivers/bluetooth/btbcm.c                     | 47 ++++++++++
- drivers/bluetooth/btbcm.h                     | 16 ++++
- drivers/bluetooth/hci_bcm.c                   | 88 ++++++++++++++++++-
- include/dt-bindings/bluetooth/brcm.h          | 32 +++++++
- 5 files changed, 197 insertions(+), 2 deletions(-)
- create mode 100644 include/dt-bindings/bluetooth/brcm.h
-
--- 
-2.24.0.432.g9d3f5f5b63-goog
-
+One could make a case that we don't care what the 'internal' format is and
+that the BD_ADDR should be specified in MSB format in the DT, and the kernel
+would be in charge of converting it to LSB. However I fear it is too late to
+consider a change at this point, since the binding has been in the kernel for
+6 months with the current format and existing devices may rely on it.
