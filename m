@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D83C43141
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 13:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1E3C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 13:53:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96A612071C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 13:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C33B2071C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 13:53:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727104AbfKRNxr (ORCPT
+        id S1727105AbfKRNxr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Mon, 18 Nov 2019 08:53:47 -0500
-Received: from mail.borgobrufa.it ([212.104.57.17]:44911 "EHLO mail.tinia.eu"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726909AbfKRNxq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Nov 2019 08:53:46 -0500
+Received: from mail.sorellediluna.it ([212.104.57.17]:44912 "EHLO
+        mail.tinia.eu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727054AbfKRNxr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 18 Nov 2019 08:53:47 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mail.tinia.eu (Postfix) with ESMTP id 5E5FA22293F;
-        Mon, 18 Nov 2019 14:44:19 +0100 (CET)
+        by mail.tinia.eu (Postfix) with ESMTP id 40A3D2229A2;
+        Mon, 18 Nov 2019 14:44:20 +0100 (CET)
 Received: from mail.tinia.eu ([127.0.0.1])
         by localhost (mail.tinia.eu [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id OMk9Tr3MP3PY; Mon, 18 Nov 2019 14:44:18 +0100 (CET)
+        with ESMTP id jEuCSiifNlLg; Mon, 18 Nov 2019 14:44:19 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-        by mail.tinia.eu (Postfix) with ESMTP id E419B220985;
-        Mon, 18 Nov 2019 14:44:18 +0100 (CET)
+        by mail.tinia.eu (Postfix) with ESMTP id 8792A220985;
+        Mon, 18 Nov 2019 14:44:19 +0100 (CET)
 X-Virus-Scanned: amavisd-new at yes
 Received: from mail.tinia.eu ([127.0.0.1])
         by localhost (mail.tinia.eu [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id sobRhVny-Wu4; Mon, 18 Nov 2019 14:44:18 +0100 (CET)
+        with ESMTP id QuWt4MO1278l; Mon, 18 Nov 2019 14:44:19 +0100 (CET)
 Received: from blemesh.cbl.lan (customer-93-189-143-66.com-com.it [93.189.143.66])
-        by mail.tinia.eu (Postfix) with ESMTPA id A915D22270B;
-        Mon, 18 Nov 2019 14:44:18 +0100 (CET)
+        by mail.tinia.eu (Postfix) with ESMTPA id 4F61722270B;
+        Mon, 18 Nov 2019 14:44:19 +0100 (CET)
 From:   Daniele Biagetti <daniele.biagetti@cblelectronics.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Daniele <dbiagio@tiscali.it>
-Subject: [PATCH 3/6] tools/mesh: Fix unwanted return in onoff client model
-Date:   Mon, 18 Nov 2019 14:44:02 +0100
-Message-Id: <20191118134405.20212-4-daniele.biagetti@cblelectronics.com>
+Subject: [PATCH 4/6] tools/mesh: Add subscription delete message to config client model
+Date:   Mon, 18 Nov 2019 14:44:03 +0100
+Message-Id: <20191118134405.20212-5-daniele.biagetti@cblelectronics.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191118134405.20212-1-daniele.biagetti@cblelectronics.com>
 References: <20191118134405.20212-1-daniele.biagetti@cblelectronics.com>
@@ -53,41 +53,69 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Daniele <dbiagio@tiscali.it>
 
-Replaced the return statement with a warning message in case of
-transmission or reception of messages coming from unknown addresses
-(such as group addresses)
 ---
- tools/mesh/onoff-model.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ tools/mesh/config-client.c | 40 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/tools/mesh/onoff-model.c b/tools/mesh/onoff-model.c
-index a6baeb0c5..8199e32bd 100644
---- a/tools/mesh/onoff-model.c
-+++ b/tools/mesh/onoff-model.c
-@@ -225,8 +225,9 @@ static void cmd_get_status(int argc, char *argv[])
+diff --git a/tools/mesh/config-client.c b/tools/mesh/config-client.c
+index df2643622..bff38e7a3 100644
+--- a/tools/mesh/config-client.c
++++ b/tools/mesh/config-client.c
+@@ -1042,6 +1042,44 @@ static void cmd_sub_get(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
 =20
- 	node =3D node_find_by_addr(target);
-=20
--	if (!node)
--		return;
-+	if (!node){
-+		bt_shell_printf("Warning: node %4.4x not found in database\n",target);
-+	}
-=20
- 	n =3D mesh_opcode_set(OP_GENERIC_ONOFF_GET, msg);
-=20
-@@ -253,8 +254,9 @@ static void cmd_set(int argc, char *argv[])
-=20
- 	node =3D node_find_by_addr(target);
-=20
--	if (!node)
--		return;
-+	if (!node){
-+		bt_shell_printf("Warning: node %4.4x not found in database\n",target);
-+	}
-=20
- 	np =3D read_input_parameters(argc, argv);
- 	if ((np !=3D 1) && (np !=3D 2) &&
++static void cmd_sub_del(int argc, char *argv[])
++{
++        uint16_t n;
++        uint8_t msg[32];
++        int parm_cnt;
++
++        if (IS_UNASSIGNED(target)) {
++                bt_shell_printf("Destination not set\n");
++                return bt_shell_noninteractive_quit(EXIT_FAILURE);
++        }
++
++        n =3D mesh_opcode_set(OP_CONFIG_MODEL_SUB_DELETE, msg);
++
++        parm_cnt =3D read_input_parameters(argc, argv);
++        if (parm_cnt !=3D 3) {
++                bt_shell_printf("Bad arguments: %s\n", argv[1]);
++                return bt_shell_noninteractive_quit(EXIT_FAILURE);
++        }
++
++        /* Per Mesh Profile 4.3.2.19 */
++        /* Element Address */
++        put_le16(parms[0], msg + n);
++        n +=3D 2;
++        /* Subscription Address */
++        put_le16(parms[1], msg + n);
++        n +=3D 2;
++        /* SIG Model ID */
++        put_le16(parms[2], msg + n);
++        n +=3D 2;
++
++        if (!config_send(msg, n)) {
++                bt_shell_printf("Failed to send \"ADD SUBSCRIPTION\"\n")=
+;
++                return bt_shell_noninteractive_quit(EXIT_FAILURE);
++        }
++
++        return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ static void cmd_mod_appidx_get(int argc, char *argv[])
+ {
+ 	uint16_t n;
+@@ -1237,6 +1275,8 @@ static const struct bt_shell_menu cfg_menu =3D {
+ 				cmd_sub_add,    "Add subscription"},
+ 	{"sub-get", "<ele_addr> <model id>",
+ 				cmd_sub_get,    "Get subscription"},
++	{"sub-del", "<ele_addr> <sub_addr> <model id>",
++				cmd_sub_del,    "Delete subscription"},
+ 	{"node-reset",		NULL,                    cmd_node_reset,
+ 				"Reset a node and remove it from network"},
+ 	{} },
 --=20
 2.20.1
 
