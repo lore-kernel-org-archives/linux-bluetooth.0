@@ -2,114 +2,191 @@ Return-Path: <SRS0=idF9=ZK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCB3C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 18:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F4BC43215
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 19:21:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 296BF222C2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 18:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D17E20885
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 19:21:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jVDvwbLi"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ausrL/bo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726666AbfKRS14 (ORCPT
+        id S1726435AbfKRTVi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Nov 2019 13:27:56 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:33813 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726336AbfKRS14 (ORCPT
+        Mon, 18 Nov 2019 14:21:38 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:46909 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726894AbfKRTVh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Nov 2019 13:27:56 -0500
-Received: by mail-ot1-f66.google.com with SMTP id 19so5491759otz.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 10:27:56 -0800 (PST)
+        Mon, 18 Nov 2019 14:21:37 -0500
+Received: by mail-pj1-f65.google.com with SMTP id a16so1770324pjs.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 11:21:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9KQjg9dZFnOPjlCsPXH0h3KUnXY8byYuGWlVq4QGXwY=;
-        b=jVDvwbLiN5W+060wQHLYpP9yUzZqGj5ejEIczvuQ1EJ2LRNniDy5pDhVx3+VAAeKch
-         Nj9QrHfvJ3RnjWogKNq86lqXgY0BZlECPT0/hpzmvGwjKGfdlz/qgM1bF1VU3+2LQ9iP
-         M2NZE9rJFKKtEK0/zX8FFhGVXJNtZe+u67s/POH7URblkiSZjnwrmbL9WKljNPW9jX92
-         UPY/Y4ET76UXUlmWbW4nEnD4ztlZbriMbTdNdJtROxNw03Izz7sb0hRc+5IFjV9YH5ae
-         Q7NjkEiGzPifycLkgXR4Oan6bJbl2OPAtNI/e5kRiZTv9q+Qhp1+WfzuV1aSl3+q7xOs
-         /rmA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=DzisFq8fux9k/N21kQN1ZtrgwBNPbrVsn1ch8Jq5ueE=;
+        b=ausrL/boGyOBsVp8bS/Er5jCNIZzOWKh2raHpxUVXOoDbw/TzpEUka9AjChY7JlWZD
+         vaJYqSSWuin+OnLD0jtO+eMtQmtj0eq4m22NZ8bN6ziE8szQ3czZWD8guZvCfJpG0Vpp
+         c1z6UZduWEoSuucp05CcnJVlgDzFlDJmaaOT0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9KQjg9dZFnOPjlCsPXH0h3KUnXY8byYuGWlVq4QGXwY=;
-        b=Btbmh44SFrbwvOKWcbL5QCwS/RbBl9bXrcyPgPlyNog3ytkiCG7ExIm/KnvRGU0Cc1
-         WoWm26MPpd3Ixz7x64WGn469TwNOo4JuDHkz577Fetnqge9+K0Tg3et8ponSsTX396kb
-         9FoPM9rZUhf3r2gomms7hVfV9XITZPSprOMRe6DGIn8zuBHyGRVyZ9gwT/SI2qjiBLZW
-         +ixdIwsb3ZlUJdJjQxegVEuDrP+2lD4oqOBedxzlJJki2uqECh6+yPgmTssDxK1u3uPe
-         yYNoVSCmM8nhyyRmKbFkBZWViggPlq+0NM9FCn7iQTfb53QBJThlJPeir7mqIUc4XMU/
-         2osw==
-X-Gm-Message-State: APjAAAXWpk7ZKo5lPZKgPP2ePeMbZogEbsY6pUwCJkt0EM/oXi4L2TQu
-        MeHiTJew74qk1UePA/ogrqysYabBk2L5mzGqNLrrwTtD
-X-Google-Smtp-Source: APXvYqzpvvn6GOQxwgD5O0sBP9vSQ8wCPFzRJRV1mYJ3scJTu77Imd0phbNVAF6QKmC3hY/RHqvVKThl1zAjK8OZAzs=
-X-Received: by 2002:a9d:5507:: with SMTP id l7mr474316oth.146.1574101675468;
- Mon, 18 Nov 2019 10:27:55 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=DzisFq8fux9k/N21kQN1ZtrgwBNPbrVsn1ch8Jq5ueE=;
+        b=uTon1LuHZtDjM5+dFWPVSrIiMs/XjQLFYPUg4JItl2SgnQ2RntU7DvqY9yKvv88i48
+         oC9cdsoSMwMSViX2kmid3fWQJtSTEIv/SRPC1NnrDR5PXmHRQYLVdpoVQPsL4KY6fYbc
+         ZB/4RuSgiiUuEph8UrgCkaAb7HJduraarzwsg3t4aS/5cBxHcRO099job8Ejw99Tj9OH
+         omHl406vhK0XGr5I57nV+kbMpaT+Moj4suY8syqAOdUWKBoZO6l5JgY0JbjpcglwdxQO
+         583lrzBmKtLW0I9X8+lLgzJ8gU4o5TEFiysPlaFKkx8treYaDkDsPfvaUoADZ7Y3tkAY
+         Y3BA==
+X-Gm-Message-State: APjAAAUkqjHdsoR0Uocj884nZ0GpsDZDtYJkHtB0XheYsxiSCWRwLG4R
+        33gdgmTRhnmHAYVWiI1lbnvxsA==
+X-Google-Smtp-Source: APXvYqzytqoNTQNimKdq9gsy3IPLT3XAenDxgchZm9tK8x/gba4lmVP4pnK6MN6NeaamvxuJ+HKfzQ==
+X-Received: by 2002:a17:90a:33ce:: with SMTP id n72mr747115pjb.17.1574104895674;
+        Mon, 18 Nov 2019 11:21:35 -0800 (PST)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
+        by smtp.gmail.com with ESMTPSA id p123sm22772633pfg.30.2019.11.18.11.21.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2019 11:21:34 -0800 (PST)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>
+Cc:     linux-bluetooth@vger.kernel.org, dianders@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v6 1/4] Bluetooth: hci_bcm: Disallow set_baudrate for BCM4354
+Date:   Mon, 18 Nov 2019 11:21:20 -0800
+Message-Id: <20191118110335.v6.1.I8ed714e23fdf42fa35588cfee2877b53d781df12@changeid>
+X-Mailer: git-send-email 2.24.0.432.g9d3f5f5b63-goog
+In-Reply-To: <20191118192123.82430-1-abhishekpandit@chromium.org>
+References: <20191118192123.82430-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
-References: <CAGssATiS=dpA=WOSfLek385o2g=C5sb0z+z=V7CDswn9_5Eu-g@mail.gmail.com>
-In-Reply-To: <CAGssATiS=dpA=WOSfLek385o2g=C5sb0z+z=V7CDswn9_5Eu-g@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 18 Nov 2019 20:27:42 +0200
-Message-ID: <CABBYNZ+VfyOeWjfdE64bVQM0eAJE789NRBjy+wgKa_Dka2ZZJg@mail.gmail.com>
-Subject: Re: Bluetooth disconnect event / Link layer monitoring
-To:     Guy Morand <g.morand@scewo.ch>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Guy,
+Without updating the patchram, the BCM4354 does not support a higher
+operating speed. The normal bcm_setup follows the correct order
+(init_speed, patchram and then oper_speed) but the serdev driver will
+set the operating speed before calling the hu->setup function. Thus,
+for the BCM4354, don't set the operating speed before patchram.
 
-On Mon, Nov 18, 2019 at 7:19 PM Guy Morand <g.morand@scewo.ch> wrote:
->
-> Hello bluetooth developers,
->
-> We are developing a wheelchair that we can controle with a bluetooth
-> gamepad, the XBOX 360 controller to be more precise. It basically works
-> fine but when I remove the battery, I get the disconnect event in the
-> user space around 10 seconds later. That is not acceptable since the
-> wheelchair will keep rolling to potentially dangerous places!
->
-> I tried to implement a ping mechanism on the bluetooth layer, inspired
-> from bluez sources somewhere:
->   int _socket_fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_L2CAP);
->   // bind on AF_BLUETOOTH
->   // connect with AF_BLUETOOTH
->
->   send_cmd->ident = PING_IDENT;
->   send_cmd->len = htobs(PING_DATA_SIZE);
->   send_cmd->code = L2CAP_ECHO_REQ;
->   if (send(_socket_fd, send_buffer, PING_PACKET_SIZE, 0) <= 0) {
->     // ...
->   }
->
-> It basically works fine except when the signal gets bad. This will get
-> printed by the kernel:
-> [  859.629431] Bluetooth: hci0 link tx timeout
-> [  859.635482] Bluetooth: hci0 killing stalled connection 9c:aa:1b:6b:51:c9
->
-> In that case, I don't get event from the /dev/jsX device but the gamepad
-> seems to still answer to pings??!!
->
-> Since I haven't found any acceptable workaround and always find the same
-> pages again and again, I'm asking here:
-> * Is it possible to achieve what I want?
-> * Does it make sense that the ping work but the HID layer seems dead?
-> * Any recommendation, pointers?
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+---
 
-Id look into adjusting the link supervision timeout instead of
-creating a raw socket, you can use hcitool to do that, neither is
-really great since it require root but at least the supervision
-timeout is something a lot more reliable for this.
+Changes in v6: None
+Changes in v5: None
+Changes in v4: None
+Changes in v3: None
+Changes in v2: None
 
+ drivers/bluetooth/hci_bcm.c | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 0f851c0dde7f..ee40003008d8 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -47,6 +47,14 @@
+ 
+ #define BCM_NUM_SUPPLIES 2
+ 
++/**
++ * struct bcm_device_data - device specific data
++ * @no_early_set_baudrate: Disallow set baudrate before driver setup()
++ */
++struct bcm_device_data {
++	bool	no_early_set_baudrate;
++};
++
+ /**
+  * struct bcm_device - device driver resources
+  * @serdev_hu: HCI UART controller struct
+@@ -79,6 +87,7 @@
+  * @hu: pointer to HCI UART controller struct,
+  *	used to disable flow control during runtime suspend and system sleep
+  * @is_suspended: whether flow control is currently disabled
++ * @no_early_set_baudrate: don't set_baudrate before setup()
+  */
+ struct bcm_device {
+ 	/* Must be the first member, hci_serdev.c expects this. */
+@@ -112,6 +121,7 @@ struct bcm_device {
+ 	struct hci_uart		*hu;
+ 	bool			is_suspended;
+ #endif
++	bool			no_early_set_baudrate;
+ };
+ 
+ /* generic bcm uart resources */
+@@ -447,7 +457,13 @@ static int bcm_open(struct hci_uart *hu)
+ 	if (bcm->dev) {
+ 		hci_uart_set_flow_control(hu, true);
+ 		hu->init_speed = bcm->dev->init_speed;
+-		hu->oper_speed = bcm->dev->oper_speed;
++
++		/* If oper_speed is set, ldisc/serdev will set the baudrate
++		 * before calling setup()
++		 */
++		if (!bcm->dev->no_early_set_baudrate)
++			hu->oper_speed = bcm->dev->oper_speed;
++
+ 		err = bcm_gpio_set_power(bcm->dev, true);
+ 		hci_uart_set_flow_control(hu, false);
+ 		if (err)
+@@ -565,6 +581,8 @@ static int bcm_setup(struct hci_uart *hu)
+ 	/* Operational speed if any */
+ 	if (hu->oper_speed)
+ 		speed = hu->oper_speed;
++	else if (bcm->dev && bcm->dev->oper_speed)
++		speed = bcm->dev->oper_speed;
+ 	else if (hu->proto->oper_speed)
+ 		speed = hu->proto->oper_speed;
+ 	else
+@@ -1374,6 +1392,7 @@ static struct platform_driver bcm_driver = {
+ static int bcm_serdev_probe(struct serdev_device *serdev)
+ {
+ 	struct bcm_device *bcmdev;
++	const struct bcm_device_data *data;
+ 	int err;
+ 
+ 	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
+@@ -1408,6 +1427,10 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+ 	if (err)
+ 		dev_err(&serdev->dev, "Failed to power down\n");
+ 
++	data = device_get_match_data(bcmdev->dev);
++	if (data)
++		bcmdev->no_early_set_baudrate = data->no_early_set_baudrate;
++
+ 	return hci_uart_register_device(&bcmdev->serdev_hu, &bcm_proto);
+ }
+ 
+@@ -1419,12 +1442,16 @@ static void bcm_serdev_remove(struct serdev_device *serdev)
+ }
+ 
+ #ifdef CONFIG_OF
++struct bcm_device_data bcm4354_device_data = {
++	.no_early_set_baudrate = true,
++};
++
+ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm20702a1" },
+ 	{ .compatible = "brcm,bcm4345c5" },
+ 	{ .compatible = "brcm,bcm4330-bt" },
+ 	{ .compatible = "brcm,bcm43438-bt" },
+-	{ .compatible = "brcm,bcm43540-bt" },
++	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
 -- 
-Luiz Augusto von Dentz
+2.24.0.432.g9d3f5f5b63-goog
+
