@@ -2,98 +2,100 @@ Return-Path: <SRS0=idF9=ZK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6B5C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 10:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C20E2C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 12:49:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B06F120726
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 10:51:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9132120722
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Nov 2019 12:49:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="wKtJWqXx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="taZK7smQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbfKRKvi (ORCPT
+        id S1726562AbfKRMtf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Nov 2019 05:51:38 -0500
-Received: from mail-lf1-f50.google.com ([209.85.167.50]:38261 "EHLO
-        mail-lf1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726595AbfKRKvi (ORCPT
+        Mon, 18 Nov 2019 07:49:35 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33755 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726506AbfKRMtf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Nov 2019 05:51:38 -0500
-Received: by mail-lf1-f50.google.com with SMTP id q28so13412859lfa.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 02:51:36 -0800 (PST)
+        Mon, 18 Nov 2019 07:49:35 -0500
+Received: by mail-wr1-f68.google.com with SMTP id w9so19348735wrr.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 04:49:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=ZG9mkhY41A9aJo8uXnA3XR223mAbRrRtP+kn9Z03/Nk=;
-        b=wKtJWqXxluyGtE+zLqa4yY3rcvS7VFF2zpBmBsF0thlG4zHfADRAsx24yYLqPurfh1
-         v01axuqVikXpHaPeuja9oq8g/jA7QAwi3EVmkVV7E+XVXmu3kEoEMhw5y1HyvoHGkV8/
-         ++fIQlKayIZ1YvalPprewYfDfJx4vvMLUH88JQadT80Cfno8glyf1QoKTsHA5l63sTHi
-         SKc5LhzmMOy5db4Nr2AWYbBIg4ItuwzlSD6SOyLl+blUwaxN6nLQsbVv7IiKIUbJgKOZ
-         PaIdE1BDWlQ9ea6dOyOagmTBLkU5fmmV0azGMinV0mKvCgDp+qAaZWAGwZSzz8WvV8Oc
-         2G0w==
+        bh=L7Er13n1f9r1dDvRCAZ2ELhKqMF8fgzn7udaqvsc/4g=;
+        b=taZK7smQ1extpIirFf1VUycjTZ+Wf3rCFCRKN1qRE60IEYsxYVzfE5dKT+5Wq7rqz9
+         7DKBHd9gqmlNnlKnRKlN7Rq3lm7YYgldk/oxmoLvOvygErZJ/9s+45CHovon6wvPrupB
+         Rd+aOF6CC9eg+xQNMXe4gwVmwX1qLZp8T51kW11KvyoFtj452SZMDhLWc4TJVr3ZLxFV
+         6vfCnQAddfIqDrO9GAUQop0mAyUoiR7oOadvUTZROZSptZQ6RbIE+b7t9RCeyhD3Vh4y
+         B966H0ZW9zcf2OYGA1rlqKjeOzcnYRT0ZLq/hQKZRKD/i11aaxy0ZF/RdjuaGN3yOKWu
+         4fjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=ZG9mkhY41A9aJo8uXnA3XR223mAbRrRtP+kn9Z03/Nk=;
-        b=nWQ+lV99lIW15s2VYy7VEXCuxoGvhH1u2AifjnGpoWTufXfP9KVTcF//fQBaKbipJe
-         Evbxa9XD+C9xCO6gUHNWKqK+ZyinAgC26qs7WpPm7eqs/L7RA5FHvJ8HJZZTfeoo3JqO
-         UFcEjIYxdeghdjf3tlIMqBVpYfAP3nLbIn3rFa3N4RgEx5DmZcHEcQUeL2eM58JuanQT
-         9GVCS0R7leoAVZT4bJQm0rP4iZWxpGD33uWntiCeMfWdpfxqhtsB1Oj20JSw7Weahua1
-         ZGLHfgKOK+aBfSf7kgE6gWoOdD+2C6R+++emFhJ8I3JJEC6mOOQzsYebOD43DgEG+8TE
-         Kp6w==
-X-Gm-Message-State: APjAAAUx2v3+qRVHYN3kXALg5vdhibG8Vyl2MstsQhvYZePREj1V2lfY
-        oKRONKh6SM338uYF+KrW6Bj/WLSOcmFTgQ==
-X-Google-Smtp-Source: APXvYqxFPKSluv7VfjIETWZfBPJZB5kVmPK/bW7G6XXCRaKccEutS4dakLns7z+FTsx7p3t10wIe4Q==
-X-Received: by 2002:a19:800a:: with SMTP id b10mr20822316lfd.15.1574074295299;
-        Mon, 18 Nov 2019 02:51:35 -0800 (PST)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id j8sm8075766lja.32.2019.11.18.02.51.33
+        bh=L7Er13n1f9r1dDvRCAZ2ELhKqMF8fgzn7udaqvsc/4g=;
+        b=qhRebtD7QjLLV7ss4k/wQ1/EhWDuljRspMXhuwf360VBRZ8aV8QwMZNFdGZvmzbKcG
+         JbqNO7JqxpTnh1petyi5Oij2roxtW8W/RDpPra0RcHxKPS5qmB90ithg9tM2SLUuHq0h
+         Aia3JDIRpF5KbJf1sFe0g15I5+tDO9i7/O+k7QcWF/DwMb/LeVv8/3CcgBaXms9HFmGD
+         phF+fbyiLD+svkf2JkHBVs9v4qHLhfdOW6qL2KRMBomveO6XeNR8HxU0MRFy6cW6Oazh
+         yUhfTVir72GP6Gtc/F/hu+9X+P4Xmw3kOGx2i8K4jDU+qC5Nhho4Q7NZ3oD849r82c9i
+         HLGg==
+X-Gm-Message-State: APjAAAUAbUADTqNFTMKOubLoZGjpQZ2CrNV/TG29T8MrdCaS8tgKmhUz
+        ZpqbSSJu7iahqdC8qY9a2PA=
+X-Google-Smtp-Source: APXvYqy1VG9RfCQHWb2F6er6G/r9FeY1aG9QWGY2SVhXaef63q/YTO4gnF5wLgD7hMvZoXVlzr3efQ==
+X-Received: by 2002:a5d:55c7:: with SMTP id i7mr31197333wrw.64.1574081371585;
+        Mon, 18 Nov 2019 04:49:31 -0800 (PST)
+Received: from mamamia.internal (a89-183-49-198.net-htp.de. [89.183.49.198])
+        by smtp.gmail.com with ESMTPSA id a11sm20550343wmh.40.2019.11.18.04.49.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2019 02:51:34 -0800 (PST)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     =?UTF-8?q?Rafa=C5=82=20Gajda?= <rafal.gajda@silvair.com>
-Subject: [PATCH BlueZ] mesh: Fix crash after deleting all subscriptions
-Date:   Mon, 18 Nov 2019 11:51:18 +0100
-Message-Id: <20191118105118.28881-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.19.1
+        Mon, 18 Nov 2019 04:49:31 -0800 (PST)
+From:   Andre Heider <a.heider@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
+        Jernej Skrabec <jernej.skrabec@siol.net>
+Subject: [PATCH] bluetooth: bcm: Set HCI_QUIRK_USE_BDADDR_PROPERTY for default addresses
+Date:   Mon, 18 Nov 2019 13:49:30 +0100
+Message-Id: <20191118124930.2138112-1-a.heider@gmail.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Rafał Gajda <rafal.gajda@silvair.com>
+Some devices ship with the controller default address, like the
+Orange Pi 3 (BCM4345C5).
 
+Allow the bootloader to set a valid address through the device tree.
+
+Signed-off-by: Andre Heider <a.heider@gmail.com>
 ---
- mesh/model.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/bluetooth/btbcm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mesh/model.c b/mesh/model.c
-index a06b684a5..40c5e6b18 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -1426,9 +1426,8 @@ int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
- 	for (; entry; entry = entry->next)
- 		mesh_net_dst_unreg(net, (uint16_t) L_PTR_TO_UINT(entry->data));
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 2d2e6d862068..e1471777486e 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -79,7 +79,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+ 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+ 			    &bda->bdaddr);
+-		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 	}
  
--	l_queue_destroy(mod->subs, NULL);
--	l_queue_destroy(mod->virtuals, unref_virt);
--	mod->virtuals = l_queue_new();
-+	l_queue_clear(mod->subs, NULL);
-+	l_queue_clear(mod->virtuals, unref_virt);
- 
- 	return MESH_STATUS_SUCCESS;
- }
+ 	kfree_skb(skb);
 -- 
-2.19.1
+2.24.0
 
