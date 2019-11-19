@@ -6,43 +6,38 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EECE8C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 238B3C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:05:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1C962082F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:03:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 001402082F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:05:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729784AbfKSFjU convert rfc822-to-8bit (ORCPT
+        id S1729860AbfKSFfw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 00:39:20 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:35537 "EHLO
+        Tue, 19 Nov 2019 00:35:52 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:55610 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730261AbfKSFjS (ORCPT
+        with ESMTP id S1728962AbfKSFfv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 00:39:18 -0500
+        Tue, 19 Nov 2019 00:35:51 -0500
 Received: from marcel-macbook.holtmann.net (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 3950ACECED;
-        Tue, 19 Nov 2019 06:48:23 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 33E83CECED;
+        Tue, 19 Nov 2019 06:44:56 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH v6 3/4] dt-bindings: net: broadcom-bluetooth: Add pcm
- config
+Subject: Re: [PATCH v6 2/4] Bluetooth: btbcm: Support pcm configuration
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid>
-Date:   Tue, 19 Nov 2019 06:39:16 +0100
+In-Reply-To: <20191118110335.v6.2.I2a9640407d375f20c7c8f4afd1607db143ff0246@changeid>
+Date:   Tue, 19 Nov 2019 06:35:49 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
         linux-bluetooth@vger.kernel.org, dianders@chromium.org,
-        devicetree@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Chen-Yu Tsai <wens@csie.org>
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <079C85BE-FBC5-4A2B-9EBF-0CEDB6F30C18@holtmann.org>
+Message-Id: <989EE002-F3F4-441B-BD9B-B460D8B09708@holtmann.org>
 References: <20191118192123.82430-1-abhishekpandit@chromium.org>
- <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid>
+ <20191118110335.v6.2.I2a9640407d375f20c7c8f4afd1607db143ff0246@changeid>
 To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -52,7 +47,27 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Abhishek,
 
-> Add documentation for pcm parameters.
+> Add BCM vendor specific command to configure PCM parameters. The new
+> vendor opcode allows us to set the sco routing, the pcm interface rate,
+> and a few other pcm specific options (frame sync, sync mode, and clock
+> mode). See broadcom-bluetooth.txt in Documentation for more information
+> about valid values for those settings.
+> 
+> Here is an example trace where this opcode was used to configure
+> a BCM4354:
+> 
+>        < HCI Command: Vendor (0x3f|0x001c) plen 5
+>                01 02 00 01 01
+>> HCI Event: Command Complete (0x0e) plen 4
+>        Vendor (0x3f|0x001c) ncmd 1
+>                Status: Success (0x00)
+> 
+> We can read back the values as well with ocf 0x001d to confirm the
+> values that were set:
+>        $ hcitool cmd 0x3f 0x001d
+>        < HCI Command: ogf 0x3f, ocf 0x001d, plen 0
+>> HCI Event: 0x0e plen 9
+>        01 1D FC 00 01 02 00 01 01
 > 
 > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
@@ -63,53 +78,89 @@ Hi Abhishek,
 > Changes in v3: None
 > Changes in v2: None
 > 
-> .../bindings/net/broadcom-bluetooth.txt       | 16 ++++++++++
-> include/dt-bindings/bluetooth/brcm.h          | 32 +++++++++++++++++++
-> 2 files changed, 48 insertions(+)
-> create mode 100644 include/dt-bindings/bluetooth/brcm.h
+> drivers/bluetooth/btbcm.c | 47 +++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btbcm.h | 16 +++++++++++++
+> 2 files changed, 63 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> index c749dc297624..8561e4684378 100644
-> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> @@ -29,10 +29,20 @@ Optional properties:
->    - "lpo": external low power 32.768 kHz clock
->  - vbat-supply: phandle to regulator supply for VBAT
->  - vddio-supply: phandle to regulator supply for VDDIO
-> + - brcm,bt-sco-routing: PCM, Transport, Codec, I2S
-> + - brcm,bt-pcm-interface-rate: 128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps
-> + - brcm,bt-pcm-frame-type: short, long
-> + - brcm,bt-pcm-sync-mode: slave, master
-> + - brcm,bt-pcm-clock-mode: slave, master
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index 2d2e6d862068..df90841d29c5 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -105,6 +105,53 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> }
+> EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
 > 
-> +See include/dt-bindings/bluetooth/brcm.h for SCO/PCM parameters. The default
-> +value for all these values are 0 (except for brcm,bt-sco-routing which requires
-> +a value) if you choose to leave it out.
-> 
-> Example:
-> 
-> +#include <dt-bindings/bluetooth/brcm.h>
+> +int btbcm_read_pcm_int_params(struct hci_dev *hdev,
+> +			      struct bcm_set_pcm_int_params *int_params)
+> +{
+
+the name should be _param and not _params since if I remember correctly that is how Broadcom specified it. Also just use param as variable name.
+
+> +	struct sk_buff *skb;
+> +	int err = 0;
 > +
-> &uart2 {
->        pinctrl-names = "default";
->        pinctrl-0 = <&uart2_pins>;
-> @@ -40,5 +50,11 @@ Example:
->        bluetooth {
->                compatible = "brcm,bcm43438-bt";
->                max-speed = <921600>;
+> +	skb = __hci_cmd_sync(hdev, 0xfc1d, 5, int_params, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		err = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "BCM: Read PCM int params failed (%d)", err);
+> +		return err;
+> +	}
 > +
-> +               brcm,bt-sco-routing        = <BRCM_SCO_ROUTING_TRANSPORT>;
+> +	if (!skb->data[0] && skb->len == sizeof(*int_params) + 1) {
+> +		memcpy(int_params, &skb->data[1], sizeof(*int_params));
+> +	} else {
+> +		bt_dev_err(hdev,
+> +			   "BCM: Read PCM int params failed (%d), Length (%d)",
+> +			   skb->data[0], skb->len);
+> +		err = -EINVAL;
+> +	}
+> +
+> +	kfree_skb(skb);
 
-in case you use transport which means HCI, you would not have values below. It is rather PCM here in the example.
+I find these harder to read actually and it can be still fault at data[0] access.
 
-> +               brcm,bt-pcm-interface-rate = <BRCM_PCM_IF_RATE_512KBPS>;
-> +               brcm,bt-pcm-frame-type     = <BRCM_PCM_FRAME_TYPE_SHORT>;
-> +               brcm,bt-pcm-sync-mode      = <BRCM_PCM_SYNC_MODE_MASTER>;
-> +               brcm,bt-pcm-clock-mode     = <BRCM_PCM_CLOCK_MODE_MASTER>;
->        };
-> };
+	if (skb->len != sizeof(*param) || skb->data[0]) {
+		bt_dev_err(hdev, "BCM: Read SCO PCM int parameter failure");    
+		kfree_skb(skb);                                                  
+		return -EIO;
+	}
 
-And I am asking this again. Is this adding any value to use an extra include file? Inside the driver we are not really needing these values since they are handed to the hardware.
+	memcpy(param, skb->data + 1, sizeof(*param));
+	kfree_skb(skb);
+	return 0;
+}
+	
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(btbcm_read_pcm_int_params);
+> +
+> +int btbcm_write_pcm_int_params(struct hci_dev *hdev,
+> +			       const struct bcm_set_pcm_int_params *int_params)
+> +{
+> +	struct sk_buff *skb;
+> +	int err;
+> +
+> +	/* Vendor ocf 0x001c sets the pcm parameters and 0x001d reads it */
+
+Scrap this comment.
+
+> +	skb = __hci_cmd_sync(hdev, 0xfc1c, 5, int_params, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		err = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "BCM: Write PCM int params failed (%d)", err);
+> +		return err;
+> +	}
+> +	kfree_skb(skb);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(btbcm_write_pcm_int_params);
+> +
+> int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+> {
+
+Otherwise this looks good.
 
 Regards
 
