@@ -2,90 +2,77 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD990C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B7BCC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:17:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89A1322318
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D350F2231A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:17:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725787AbfKSFGO convert rfc822-to-8bit (ORCPT
+        id S1726846AbfKSFRf convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 00:06:14 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:55250 "EHLO
+        Tue, 19 Nov 2019 00:17:35 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:33642 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725536AbfKSFGO (ORCPT
+        with ESMTP id S1726836AbfKSFRf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 00:06:14 -0500
+        Tue, 19 Nov 2019 00:17:35 -0500
 Received: from marcel-macbook.holtmann.net (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 31B17CECED;
-        Tue, 19 Nov 2019 06:15:19 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 28E48CECED;
+        Tue, 19 Nov 2019 06:26:40 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: Bluetooth disconnect event / Link layer monitoring
+Subject: Re: [PATCH] bluetooth: bcm: Set HCI_QUIRK_USE_BDADDR_PROPERTY for
+ default addresses
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZ+VfyOeWjfdE64bVQM0eAJE789NRBjy+wgKa_Dka2ZZJg@mail.gmail.com>
-Date:   Tue, 19 Nov 2019 06:06:12 +0100
-Cc:     Guy Morand <g.morand@scewo.ch>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20191118124930.2138112-1-a.heider@gmail.com>
+Date:   Tue, 19 Nov 2019 06:17:33 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
+        Jernej Skrabec <jernej.skrabec@siol.net>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <F827D8AB-4404-4C81-9368-A18AB87D9292@holtmann.org>
-References: <CAGssATiS=dpA=WOSfLek385o2g=C5sb0z+z=V7CDswn9_5Eu-g@mail.gmail.com>
- <CABBYNZ+VfyOeWjfdE64bVQM0eAJE789NRBjy+wgKa_Dka2ZZJg@mail.gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <C93EA7BC-7CCF-48B1-80DA-FD8DF8F5AF53@holtmann.org>
+References: <20191118124930.2138112-1-a.heider@gmail.com>
+To:     Andre Heider <a.heider@gmail.com>
 X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Andre,
 
->> We are developing a wheelchair that we can controle with a bluetooth
->> gamepad, the XBOX 360 controller to be more precise. It basically works
->> fine but when I remove the battery, I get the disconnect event in the
->> user space around 10 seconds later. That is not acceptable since the
->> wheelchair will keep rolling to potentially dangerous places!
->> 
->> I tried to implement a ping mechanism on the bluetooth layer, inspired
->> from bluez sources somewhere:
->>  int _socket_fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_L2CAP);
->>  // bind on AF_BLUETOOTH
->>  // connect with AF_BLUETOOTH
->> 
->>  send_cmd->ident = PING_IDENT;
->>  send_cmd->len = htobs(PING_DATA_SIZE);
->>  send_cmd->code = L2CAP_ECHO_REQ;
->>  if (send(_socket_fd, send_buffer, PING_PACKET_SIZE, 0) <= 0) {
->>    // ...
->>  }
->> 
->> It basically works fine except when the signal gets bad. This will get
->> printed by the kernel:
->> [  859.629431] Bluetooth: hci0 link tx timeout
->> [  859.635482] Bluetooth: hci0 killing stalled connection 9c:aa:1b:6b:51:c9
->> 
->> In that case, I don't get event from the /dev/jsX device but the gamepad
->> seems to still answer to pings??!!
->> 
->> Since I haven't found any acceptable workaround and always find the same
->> pages again and again, I'm asking here:
->> * Is it possible to achieve what I want?
->> * Does it make sense that the ping work but the HID layer seems dead?
->> * Any recommendation, pointers?
+> Some devices ship with the controller default address, like the
+> Orange Pi 3 (BCM4345C5).
 > 
-> Id look into adjusting the link supervision timeout instead of
-> creating a raw socket, you can use hcitool to do that, neither is
-> really great since it require root but at least the supervision
-> timeout is something a lot more reliable for this.
+> Allow the bootloader to set a valid address through the device tree.
+> 
+> Signed-off-by: Andre Heider <a.heider@gmail.com>
+> ---
+> drivers/bluetooth/btbcm.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index 2d2e6d862068..e1471777486e 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -79,7 +79,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+> 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+> 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+> 			    &bda->bdaddr);
+> -		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+> 	}
 
-we can add an option to L2CAP sockets to adjust the link supervision timeout.
+I am not sure the change is this simple. What happens if you run on a boot-loader that doesn’t provide the address and has an invalid address.
 
-Anyway, these days, I would _not_ use Bluetooth BR/EDR for controlling anything. I would find a Gamepad that utilizes Bluetooth LE and focus on that.
+When I allowed HCI_QUIRK_USE_BDADDR_PROPERTY to be added, I stated clearly that the intent was that userspace can handle the address setup and this was pretty much just for the existing hardware where we have some magic boot-loader to do this.
+
+Anyhow, I am fine allowing this here as well. However the HCI_QUIRK_USE_BDADDR_PROPERTY needs to be set unconditionally in the hdev->setup routine. And in case there still is an invalid address we need to stick with invalid address. Right now the code in hci_dev_do_open() operates differently.
 
 Regards
 
