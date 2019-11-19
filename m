@@ -2,200 +2,120 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC32C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC5EC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:55:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B2062071B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:44:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E0FD2084D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:55:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="doa1m6Qa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730651AbfKSFou convert rfc822-to-8bit (ORCPT
+        id S1727723AbfKSFze (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 00:44:50 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:43122 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730881AbfKSFor (ORCPT
+        Tue, 19 Nov 2019 00:55:34 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52420 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731359AbfKSFz2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 00:44:47 -0500
-Received: from marcel-macbook.holtmann.net (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C597FCECEE;
-        Tue, 19 Nov 2019 06:53:52 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH v6 4/4] Bluetooth: hci_bcm: Support pcm params in dts
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191118110335.v6.4.I3e900de9478b68e5e4475e747d1c46fdd28313fa@changeid>
-Date:   Tue, 19 Nov 2019 06:44:45 +0100
+        Tue, 19 Nov 2019 00:55:28 -0500
+Received: by mail-wm1-f66.google.com with SMTP id l1so1755737wme.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 21:55:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=doijmZ707prcu5MSNI7PVZQ+wkSDhjtaYJHKYA5bf6o=;
+        b=doa1m6QaFiYG0OylxzcowX5g60uPHJbLXDlVi0MZ5lP/Ar+wvW0izGEwO1Lq5nqs79
+         uh2iL+zs9OvhdfuBh1qGtKMsXtFG3b5gXANjiZF1IXvS+fyqV3L7fQ00HMCnzwGOLZ6n
+         DItbGHK6yzMUy5OZ5pYOHQIbuDTDFBEAgPHidw1t7RQDBOPMbb582ZKgE/P5fIoDK54I
+         sdg7uSeoeZW0OuybuF0QeGLGy1TtC1VpYIJbSqtETMxmBHQl7NhaqVHOHiW0Lf9bG5JO
+         S0XqP2aBIdMa4EgrXAQo/HbIK4eqjLPGMDG1cUF17y6cT+5ospo0ZY/IUwGXB0Dnof1v
+         ldPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=doijmZ707prcu5MSNI7PVZQ+wkSDhjtaYJHKYA5bf6o=;
+        b=KhQy4+ANr7Nsa6qWm/UvT9GPIFxyg9d4ykVvwkO4wG3eu+ul6V/o4ob1ysz/N8CHYH
+         IadEpLoSesBzQMAWogO0BQHAev3g1Tz5cgxRTBtkGRAZ+9mXrIDqwkrLC3U3/JLgnxKT
+         dPaffPFqxlEhlzRzp/8KwFK0FX5LLTZEXgeh16Cg2zmUJPC+XofIRPZV48WjIMWQVrZ8
+         RrHobXe3EpONJ2Jme5dbxsll/JjvCdaw/NNRV1t85iiZokb1gSNFgqRK+93kd8Kkztvj
+         mtGXFeWgyhiNRcik11gbi5KbvZx+GIKDc1WVSIJkRbdxAOZY4HTq2nj7zglyFJTA486h
+         U0Ow==
+X-Gm-Message-State: APjAAAXRGrZvizL3b8o/uKWwLLxsxJK/GOLyhaOoM+LlCfdo8vbTARkc
+        YnmGI2omNYBJ6zfFA92hg9Us8eYh
+X-Google-Smtp-Source: APXvYqxZHeISDyMwymvRwxfzXzxPNg/juAgSE83rudTJuE3fPQaQdNhVqpnw9JUP4bikRB5Ut69vUg==
+X-Received: by 2002:a1c:dd45:: with SMTP id u66mr3304656wmg.12.1574142926680;
+        Mon, 18 Nov 2019 21:55:26 -0800 (PST)
+Received: from mamamia.internal (a89-183-91-150.net-htp.de. [89.183.91.150])
+        by smtp.gmail.com with ESMTPSA id w19sm1809363wmk.36.2019.11.18.21.55.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Nov 2019 21:55:26 -0800 (PST)
+Subject: Re: [PATCH] bluetooth: bcm: Set HCI_QUIRK_USE_BDADDR_PROPERTY for
+ default addresses
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <963EC7CC-B81D-4667-A681-2CE49D17CB1E@holtmann.org>
-References: <20191118192123.82430-1-abhishekpandit@chromium.org>
- <20191118110335.v6.4.I3e900de9478b68e5e4475e747d1c46fdd28313fa@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-X-Mailer: Apple Mail (2.3601.0.10)
+        linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
+        Jernej Skrabec <jernej.skrabec@siol.net>
+References: <20191118124930.2138112-1-a.heider@gmail.com>
+ <C93EA7BC-7CCF-48B1-80DA-FD8DF8F5AF53@holtmann.org>
+From:   Andre Heider <a.heider@gmail.com>
+Message-ID: <7d81ea5d-2c78-bf6b-e665-17c774785564@gmail.com>
+Date:   Tue, 19 Nov 2019 06:55:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <C93EA7BC-7CCF-48B1-80DA-FD8DF8F5AF53@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Marcel,
 
-> BCM chips may require configuration of PCM to operate correctly and
-> there is a vendor specific HCI command to do this. Add support in the
-> hci_bcm driver to parse this from devicetree and configure the chip.
+On 19/11/2019 06:17, Marcel Holtmann wrote:
+> Hi Andre,
 > 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
+>> Some devices ship with the controller default address, like the
+>> Orange Pi 3 (BCM4345C5).
+>>
+>> Allow the bootloader to set a valid address through the device tree.
+>>
+>> Signed-off-by: Andre Heider <a.heider@gmail.com>
+>> ---
+>> drivers/bluetooth/btbcm.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>> index 2d2e6d862068..e1471777486e 100644
+>> --- a/drivers/bluetooth/btbcm.c
+>> +++ b/drivers/bluetooth/btbcm.c
+>> @@ -79,7 +79,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+>> 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+>> 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+>> 			    &bda->bdaddr);
+>> -		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+>> +		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+>> 	}
 > 
-> Changes in v6:
-> - Added btbcm_read_pcm_int_params and change pcm params to first read
->  the pcm params before setting it
+> I am not sure the change is this simple. What happens if you run on a boot-loader that doesn’t provide the address and has an invalid address.
 > 
-> Changes in v5:
-> - Rename parameters to bt-* and read as integer instead of bytestring
-> - Update documentation with defaults and put values in header
-> - Changed patch order
+> When I allowed HCI_QUIRK_USE_BDADDR_PROPERTY to be added, I stated clearly that the intent was that userspace can handle the address setup and this was pretty much just for the existing hardware where we have some magic boot-loader to do this.
 > 
-> Changes in v4:
-> - Fix incorrect function name in hci_bcm
-> 
-> Changes in v3:
-> - Change disallow baudrate setting to return -EBUSY if called before
->  ready. bcm_proto is no longer modified and is back to being const.
-> - Changed btbcm_set_pcm_params to btbcm_set_pcm_int_params
-> - Changed brcm,sco-routing to brcm,bt-sco-routing
-> 
-> Changes in v2:
-> - Use match data to disallow baudrate setting
-> - Parse pcm parameters by name instead of as a byte string
-> - Fix prefix for dt-bindings commit
-> 
-> drivers/bluetooth/hci_bcm.c | 57 +++++++++++++++++++++++++++++++++++++
-> 1 file changed, 57 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index ee40003008d8..2ce3fac2c5dd 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -25,6 +25,7 @@
-> #include <linux/pm_runtime.h>
-> #include <linux/serdev.h>
-> 
-> +#include <dt-bindings/bluetooth/brcm.h>
-> #include <net/bluetooth/bluetooth.h>
-> #include <net/bluetooth/hci_core.h>
-> 
-> @@ -88,6 +89,7 @@ struct bcm_device_data {
->  *	used to disable flow control during runtime suspend and system sleep
->  * @is_suspended: whether flow control is currently disabled
->  * @no_early_set_baudrate: don't set_baudrate before setup()
-> + * @pcm_params: PCM and routing parameters
->  */
-> struct bcm_device {
-> 	/* Must be the first member, hci_serdev.c expects this. */
-> @@ -122,6 +124,8 @@ struct bcm_device {
-> 	bool			is_suspended;
-> #endif
-> 	bool			no_early_set_baudrate;
-> +
-> +	struct bcm_set_pcm_int_params	pcm_params;
-> };
-> 
-> /* generic bcm uart resources */
-> @@ -541,6 +545,7 @@ static int bcm_flush(struct hci_uart *hu)
-> static int bcm_setup(struct hci_uart *hu)
-> {
-> 	struct bcm_data *bcm = hu->priv;
-> +	struct bcm_set_pcm_int_params p;
-> 	char fw_name[64];
-> 	const struct firmware *fw;
-> 	unsigned int speed;
-> @@ -594,6 +599,31 @@ static int bcm_setup(struct hci_uart *hu)
-> 			host_set_baudrate(hu, speed);
-> 	}
-> 
-> +	/* PCM parameters if any*/
-> +	err = btbcm_read_pcm_int_params(hu->hdev, &p);
-> +	if (!err) {
-> +		if (bcm->dev->pcm_params.routing == 0xff)
-> +			bcm->dev->pcm_params.routing = p.routing;
-> +		if (bcm->dev->pcm_params.rate == 0xff)
-> +			bcm->dev->pcm_params.rate = p.rate;
-> +		if (bcm->dev->pcm_params.frame_sync == 0xff)
-> +			bcm->dev->pcm_params.frame_sync = p.frame_sync;
-> +		if (bcm->dev->pcm_params.sync_mode == 0xff)
-> +			bcm->dev->pcm_params.sync_mode = p.sync_mode;
-> +		if (bcm->dev->pcm_params.clock_mode == 0xff)
-> +			bcm->dev->pcm_params.clock_mode = p.clock_mode;
+> Anyhow, I am fine allowing this here as well. However the HCI_QUIRK_USE_BDADDR_PROPERTY needs to be set unconditionally in the hdev->setup routine. And in case there still is an invalid address we need to stick with invalid address. Right now the code in hci_dev_do_open() operates differently.
 
-Frankly, I wouldn’t bother here. If the read HCI command failed, then we abort bcm_setup and fail the whole procedure. These commands have been around the first Broadcom chips and you can assume they are present. And if at some point they do fail, I want to know about it.
+Okay, will send a v2 with the quirk set in btbcm_finalize() (like 
+HCI_QUIRK_STRICT_DUPLICATE_FILTER).
 
-> +
-> +		/* Write only when there are changes */
-> +		if (memcmp(&p, &bcm->dev->pcm_params, sizeof(p)))
-> +			err = btbcm_write_pcm_int_params(hu->hdev,
-> +							 &bcm->dev->pcm_params);
-> +
-> +		if (err)
-> +			bt_dev_warn(hu->hdev, "BCM: Write pcm params failed (%d)",
-> +				    err);
-> +	} else
-> +		bt_dev_warn(hu->hdev, "BCM: Read pcm params failed (%d)", err);
-> +
-> finalize:
-> 	release_firmware(fw);
-> 
-> @@ -1128,9 +1158,36 @@ static int bcm_acpi_probe(struct bcm_device *dev)
-> }
-> #endif /* CONFIG_ACPI */
-> 
-> +static int property_read_u8(struct device *dev, const char *prop, u8 *value)
-> +{
-> +	int err;
-> +	u32 tmp;
-> +
-> +	err = device_property_read_u32(dev, prop, &tmp);
-> +
-> +	if (!err)
-> +		*value = (u8)tmp;
-> +
-> +	return err;
-> +}
-
-I think this really needs to be done in the generic property code if this is wanted.
-
-> +
-> static int bcm_of_probe(struct bcm_device *bdev)
-> {
-> 	device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
-> +
-> +	memset(&bdev->pcm_params, 0xff, sizeof(bdev->pcm_params));
-
-Scrap this memset. We will read the values first.
-
-> +
-> +	property_read_u8(bdev->dev, "brcm,bt-sco-routing",
-> +			 &bdev->pcm_params.routing);
-> +	property_read_u8(bdev->dev, "brcm,bt-pcm-interface-rate",
-> +			 &bdev->pcm_params.rate);
-> +	property_read_u8(bdev->dev, "brcm,bt-pcm-frame-type",
-> +			 &bdev->pcm_params.frame_sync);
-> +	property_read_u8(bdev->dev, "brcm,bt-pcm-sync-mode",
-> +			 &bdev->pcm_params.sync_mode);
-> +	property_read_u8(bdev->dev, "brcm,bt-pcm-clock-mode",
-> +			 &bdev->pcm_params.clock_mode);
-> +
-> 	return 0;
-> }
-
-Regards
-
-Marcel
-
+Thanks!
+Andre
