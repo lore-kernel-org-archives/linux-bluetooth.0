@@ -2,190 +2,238 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FAFC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 23:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF38C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 23:47:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF2EE222B0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 23:45:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A53B5222B0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 23:47:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727140AbfKSXpq convert rfc822-to-8bit (ORCPT
+        id S1727202AbfKSXr6 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 18:45:46 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:59915 "EHLO
+        Tue, 19 Nov 2019 18:47:58 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:33417 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726874AbfKSXpp (ORCPT
+        with ESMTP id S1726948AbfKSXr6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 18:45:45 -0500
+        Tue, 19 Nov 2019 18:47:58 -0500
 Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 06560CECFA;
-        Wed, 20 Nov 2019 00:54:51 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 10056CECFA;
+        Wed, 20 Nov 2019 00:57:03 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH v6 2/4] Bluetooth: btbcm: Support pcm configuration
+Subject: Re: HCI Set custom bandwidth for AuriStream SCO codec
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CANFp7mWUQFvk=gL5D9N6Fzd8wmfub5O8RF9CcWqwGr03oLJKkw@mail.gmail.com>
-Date:   Wed, 20 Nov 2019 00:45:44 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        Douglas Anderson <dianders@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>
+In-Reply-To: <20191119171342.mwfzszu7xwabi7to@pali>
+Date:   Wed, 20 Nov 2019 00:47:56 +0100
+Cc:     Pavel Machek <pavel@ucw.cz>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2EB9A44E-AF4C-49C9-A98F-35F2BC52B17B@holtmann.org>
-References: <20191118192123.82430-1-abhishekpandit@chromium.org>
- <20191118110335.v6.2.I2a9640407d375f20c7c8f4afd1607db143ff0246@changeid>
- <989EE002-F3F4-441B-BD9B-B460D8B09708@holtmann.org>
- <CANFp7mWUQFvk=gL5D9N6Fzd8wmfub5O8RF9CcWqwGr03oLJKkw@mail.gmail.com>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Message-Id: <392B6AA9-7512-472A-8F22-D86F2A7F1EDC@holtmann.org>
+References: <20190519212157.GB31403@amd>
+ <20190607130245.mv4ch6dxnuptzdki@pali>
+ <ED456CCA-CF85-48D9-B7E9-9B0BF02A32FC@holtmann.org>
+ <20190708122512.qqfvtm455ltxxg3h@pali>
+ <E4A6E61C-DE37-4E5D-9401-71CCE4AE2419@holtmann.org>
+ <20190708210616.x2dlnzjhnplu37bz@pali>
+ <D0A44CC7-CABC-408A-894E-AAD700FA9B0D@holtmann.org>
+ <20190718100939.bwl26qcfxe6ppcto@pali> <20191027220945.wmb3g55wtrmqbnmz@pali>
+ <1CFFA8EF-1B2A-466E-8901-BFB849F20442@holtmann.org>
+ <20191119171342.mwfzszu7xwabi7to@pali>
+To:     =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
 X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Hi Pali,
 
->>> Add BCM vendor specific command to configure PCM parameters. The new
->>> vendor opcode allows us to set the sco routing, the pcm interface rate,
->>> and a few other pcm specific options (frame sync, sync mode, and clock
->>> mode). See broadcom-bluetooth.txt in Documentation for more information
->>> about valid values for those settings.
+>>>>>>>>>>>>>> to be honest, I would rather see WBS implementation finally
+>>>>>>>>>>>>>> reach PA before we start digging into this.
+>>>>>>>>>>>>> 
+>>>>>>>>>>>>> First I want to finish improving A2DP codec support in pulseaudio. Later
+>>>>>>>>>>>>> I can look at HSP/HFP profiles. Ideally it should have modular/plugin
+>>>>>>>>>>>>> extensible design. So the aim is that adding new codec would be very
+>>>>>>>>>>>>> simple, without need to hack something related to mSBC/WBC, AuriStream
+>>>>>>>>>>>>> or any other codec.
+>>>>>>>>>>>> 
+>>>>>>>>>>>> Well HSP don't have support for codec negotiation, but yes a modular
+>>>>>>>>>>>> design is probably recommended.
+>>>>>>>>>>>> 
+>>>>>>>>>>>>> But for AuriStream I need to set custom SCO parameters as described
+>>>>>>>>>>>>> below and currently kernel does not support it. This is why I'm asking
+>>>>>>>>>>>>> how kernel can export for userspace configuration of SCO parameters...
+>>>>>>>>>>>> 
+>>>>>>>>>>>> We can always come up with socket options but we got to see the value
+>>>>>>>>>>>> it would bring since AuriStream don't look that popular among
+>>>>>>>>>>>> headsets, at least Ive never seem any device advertising it like
+>>>>>>>>>>>> apt-X, etc.
+>>>>>>>>>>> 
+>>>>>>>>>>> Pali clearly has such device and he is willing to work on it. Surely
+>>>>>>>>>>> that means it is popular enough to be supported...?
+>>>>>>>>>> 
+>>>>>>>>>> Just put AT+CSRSF=0,0,0,0,0,7 to google search and you would see that
+>>>>>>>>>> not only I have such device...
+>>>>>>>>>> 
+>>>>>>>>>> So I would really would like to see that kernel finally stops blocking
+>>>>>>>>>> usage of this AuriStream codec.
+>>>>>>>>> 
+>>>>>>>>> we need to figure out on how we do the kernel API to allow you this specific setting.
+>>>>>>>> 
+>>>>>>>> Hi Marcel! Kernel API for userspace should be simple. Just add two
+>>>>>>>> ioctls for retrieving and setting structure with custom parameters:
+>>>>>>>> 
+>>>>>>>> syncPktTypes = 0x003F
+>>>>>>>> bandwidth = 4000
+>>>>>>>> max_latency = 16
+>>>>>>>> voice_settings = 0x63
+>>>>>>>> retx_effort = 2
+>>>>>>>> 
+>>>>>>>> Or add more ioctls, one ioctl per parameter. There is already only ioctl
+>>>>>>>> for voice settings and moreover it is whitelisted only for two values.
+>>>>>>> 
+>>>>>>> it is not that simple actually. Most profiles define a certain set of parameters and then they try to configure better settings and only fallback to a specification defined default as last resort.
+>>>>>> 
+>>>>>> Ok. I see that there is another "example" configuration for AuriStream
+>>>>>> with just different syncPktTypes = 0x02BF and bandwidth = 3850.
+>>>>>> 
+>>>>>> So it really is not simple as it can be seen.
+>>>>> 
+>>>>> currently the stepping for mSBC and CVSD are hard-coded in esco_param_cvsd and esco_param_msbc arrays in hci_conn.c and then selected by the ->setting parameter.
+>>>>> 
+>>>>> So either we provide an new socket option (for example BT_VOICE_EXT) or we extend BT_VOICE to allow providing the needed information. However this needs to be flexible array size since we should then be able to encode multiple stepping that are tried in order.
+>>>>> 
+>>>>> My preference is that we extend BT_VOICE and not introduce a new socket option. So feel free to propose how we can load the full tables into the SCO socket. I mean we are not really far off actually. The only difference is that currently the tables are in the hci_conn.c file and selected by the provided voice->setting. However nothing really stops us from providing the full table via user space.
+>>>> 
+>>>> Ok. I will look at it and I will try to propose how to extend current
+>>>> BT_VOICE ioctl API for supporting all those new parameters.
 >>> 
->>> Here is an example trace where this opcode was used to configure
->>> a BCM4354:
+>>> Below is inline MIME part with POC patch which try to implement a new
+>>> IOCTL (currently named BT_VOICE_SETUP) for configuring voice sco
+>>> settings.
 >>> 
->>>       < HCI Command: Vendor (0x3f|0x001c) plen 5
->>>               01 02 00 01 01
->>>> HCI Event: Command Complete (0x0e) plen 4
->>>       Vendor (0x3f|0x001c) ncmd 1
->>>               Status: Success (0x00)
+>>> It uses flexible array of parameters <tx_bandwidth, rx_bandwidth,
+>>> voice_setting, pkt_type, max_latency, retrans_effort>, but with
+>>> maximally 10 array members (due to usage of static array storage). cvsd
+>>> codec uses 7 different fallback settings (see voice_setup_cvsd), so for
+>>> POC 10 should be enough.
 >>> 
->>> We can read back the values as well with ocf 0x001d to confirm the
->>> values that were set:
->>>       $ hcitool cmd 0x3f 0x001d
->>>       < HCI Command: ogf 0x3f, ocf 0x001d, plen 0
->>>> HCI Event: 0x0e plen 9
->>>       01 1D FC 00 01 02 00 01 01
+>>> Because a new IOCL has different members then old BT_VOICE I rather
+>>> decided to introduce a new IOCTL and not hacking old IOCTL to accept two
+>>> different structures.
 >>> 
->>> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->>> ---
+>>> Please let me know what do you think about this API, if this is a way
+>>> how to continue or if something different is needed.
 >>> 
->>> Changes in v6: None
->>> Changes in v5: None
->>> Changes in v4: None
->>> Changes in v3: None
->>> Changes in v2: None
+>>> -- 
+>>> Pali Rohár
+>>> pali.rohar@gmail.com
+>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>> index fabee6db0abb..0e9f4ac07220 100644
+>>> --- a/include/net/bluetooth/bluetooth.h
+>>> +++ b/include/net/bluetooth/bluetooth.h
+>>> @@ -122,6 +122,19 @@ struct bt_voice {
+>>> #define BT_SNDMTU		12
+>>> #define BT_RCVMTU		13
 >>> 
->>> drivers/bluetooth/btbcm.c | 47 +++++++++++++++++++++++++++++++++++++++
->>> drivers/bluetooth/btbcm.h | 16 +++++++++++++
->>> 2 files changed, 63 insertions(+)
->>> 
->>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->>> index 2d2e6d862068..df90841d29c5 100644
->>> --- a/drivers/bluetooth/btbcm.c
->>> +++ b/drivers/bluetooth/btbcm.c
->>> @@ -105,6 +105,53 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>>> +#define BT_VOICE_SETUP		14
+>>> +#define BT_VOICE_SETUP_ARRAY_SIZE 10
+>>> +struct bt_voice_setup {
+>>> +	__u8 sco_capable:1;
+>>> +	__u8 esco_capable:1;
+>>> +	__u32 tx_bandwidth;
+>>> +	__u32 rx_bandwidth;
+>>> +	__u16 voice_setting;
+>>> +	__u16 pkt_type;
+>>> +	__u16 max_latency;
+>>> +	__u8 retrans_effort;
+>>> +};
+>>> +
+>>> __printf(1, 2)
+>>> void bt_info(const char *fmt, ...);
+>>> __printf(1, 2)
+>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>> index 094e61e07030..8f3c161da1c4 100644
+>>> --- a/include/net/bluetooth/hci_core.h
+>>> +++ b/include/net/bluetooth/hci_core.h
+>>> @@ -477,7 +477,7 @@ struct hci_conn {
+>>> 	__u8		passkey_entered;
+>>> 	__u16		disc_timeout;
+>>> 	__u16		conn_timeout;
+>>> -	__u16		setting;
+>>> +	struct bt_voice_setup voice_setup[BT_VOICE_SETUP_ARRAY_SIZE];
+>>> 	__u16		le_conn_min_interval;
+>>> 	__u16		le_conn_max_interval;
+>>> 	__u16		le_conn_interval;
+>>> @@ -897,8 +897,8 @@ static inline struct hci_conn *hci_lookup_le_connect(struct hci_dev *hdev)
 >>> }
->>> EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
 >>> 
->>> +int btbcm_read_pcm_int_params(struct hci_dev *hdev,
->>> +                           struct bcm_set_pcm_int_params *int_params)
->>> +{
+>>> int hci_disconnect(struct hci_conn *conn, __u8 reason);
+>>> -bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
+>>> -void hci_sco_setup(struct hci_conn *conn, __u8 status);
+>>> +int hci_setup_sync(struct hci_conn *conn, __u16 handle);
+>>> +int hci_sco_setup(struct hci_conn *conn, __u8 status);
+>>> 
+>>> struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+>>> 			      u8 role);
+>>> @@ -920,7 +920,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+>>> struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+>>> 				 u8 sec_level, u8 auth_type);
+>>> struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+>>> -				 __u16 setting);
+>>> +				 struct bt_voice_setup *voice_setup);
+>>> int hci_conn_check_link_mode(struct hci_conn *conn);
+>>> int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+>>> int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
+>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>>> index bd4978ce8c45..0aa2ad98eb80 100644
+>>> --- a/net/bluetooth/hci_conn.c
+>>> +++ b/net/bluetooth/hci_conn.c
+>>> @@ -35,30 +35,6 @@
+>>> #include "smp.h"
+>>> #include "a2mp.h"
+>>> 
+>>> -struct sco_param {
+>>> -	u16 pkt_type;
+>>> -	u16 max_latency;
+>>> -	u8  retrans_effort;
+>>> -};
+>>> -
+>>> -static const struct sco_param esco_param_cvsd[] = {
+>>> -	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,	0x01 }, /* S3 */
+>>> -	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,	0x01 }, /* S2 */
+>>> -	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007,	0x01 }, /* S1 */
+>>> -	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0x01 }, /* D1 */
+>>> -	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0x01 }, /* D0 */
+>>> -};
+>>> -
+>>> -static const struct sco_param sco_param_cvsd[] = {
+>>> -	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0xff }, /* D1 */
+>>> -	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0xff }, /* D0 */
+>>> -};
+>>> -
+>>> -static const struct sco_param esco_param_msbc[] = {
+>>> -	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000d,	0x02 }, /* T2 */
+>>> -	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008,	0x02 }, /* T1 */
+>>> -};
+>>> -
 >> 
->> the name should be _param and not _params since if I remember correctly that is how Broadcom specified it. Also just use param as variable name.
+>> can you split this into multiple logical patches. And ensure sending it with git send-email.
 > 
-> Technically, you are configuring multiple PCM params :)
+> I just send it as is to know if such API make sense and should I
+> continue or not. Preparing patches for git send-email takes a lot of
+> time and I wanted to know if such API is OK or should be fully
+> rewritten. So I do not spend on something which does not make sense.
+> Above patch is not mean to be complete not ready for merge.
 
-I know and maybe they renamed the command internally by now. It is just when I read the Broadcom HCI vendor commands, it was named that way. Anyway, I am fine if you want to use _params and params argument variable name. Might make sense since we somehow named the struct that way as well and it is pre-existing.
-
->>> +     struct sk_buff *skb;
->>> +     int err = 0;
->>> +
->>> +     skb = __hci_cmd_sync(hdev, 0xfc1d, 5, int_params, HCI_INIT_TIMEOUT);
->>> +     if (IS_ERR(skb)) {
->>> +             err = PTR_ERR(skb);
->>> +             bt_dev_err(hdev, "BCM: Read PCM int params failed (%d)", err);
->>> +             return err;
->>> +     }
->>> +
->>> +     if (!skb->data[0] && skb->len == sizeof(*int_params) + 1) {
->>> +             memcpy(int_params, &skb->data[1], sizeof(*int_params));
->>> +     } else {
->>> +             bt_dev_err(hdev,
->>> +                        "BCM: Read PCM int params failed (%d), Length (%d)",
->>> +                        skb->data[0], skb->len);
->>> +             err = -EINVAL;
->>> +     }
->>> +
->>> +     kfree_skb(skb);
->> 
->> I find these harder to read actually and it can be still fault at data[0] access.
->> 
->>        if (skb->len != sizeof(*param) || skb->data[0]) {
->>                bt_dev_err(hdev, "BCM: Read SCO PCM int parameter failure");
->>                kfree_skb(skb);
->>                return -EIO;
->>        }
->> 
->>        memcpy(param, skb->data + 1, sizeof(*param));
->>        kfree_skb(skb);
->>        return 0;
->> }
->> 
-> 
-> Sure. skb->len should be sizeof(*param) + 1 because there's an extra
-> byte for the status as well.
-
-Good point. I forgot about the status octet.
-
-> 
->>> +
->>> +     return err;
->>> +}
->>> +EXPORT_SYMBOL_GPL(btbcm_read_pcm_int_params);
->>> +
->>> +int btbcm_write_pcm_int_params(struct hci_dev *hdev,
->>> +                            const struct bcm_set_pcm_int_params *int_params)
->>> +{
->>> +     struct sk_buff *skb;
->>> +     int err;
->>> +
->>> +     /* Vendor ocf 0x001c sets the pcm parameters and 0x001d reads it */
->> 
->> Scrap this comment.
->> 
->>> +     skb = __hci_cmd_sync(hdev, 0xfc1c, 5, int_params, HCI_INIT_TIMEOUT);
->>> +     if (IS_ERR(skb)) {
->>> +             err = PTR_ERR(skb);
->>> +             bt_dev_err(hdev, "BCM: Write PCM int params failed (%d)", err);
->>> +             return err;
->>> +     }
->>> +     kfree_skb(skb);
->>> +
->>> +     return 0;
->>> +}
->>> +EXPORT_SYMBOL_GPL(btbcm_write_pcm_int_params);
->>> +
->>> int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
->>> {
->> 
->> Otherwise this looks good.
->> 
->> Regards
->> 
->> Marcel
->> 
-> 
-> So generally, I've done a whole new patch series with every change.
-> Would you prefer to see singular updates on the same email thread or
-> should I keep doing new patch series?
-
-That is fine by me. I will start applying individual patches if possible and we get the tested-by or ACKs for it where I need them.
+What is wrong with git-format-patch? I don’t need much time to prepare patches. Anyway, I going to have a look what is the best way to load these parameter tables into the kernel.
 
 Regards
 
