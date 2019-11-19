@@ -2,79 +2,198 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97937C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:19:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC32C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:44:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 657B622317
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:19:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B2062071B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726647AbfKSFTa convert rfc822-to-8bit (ORCPT
+        id S1730651AbfKSFou convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 00:19:30 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:53359 "EHLO
+        Tue, 19 Nov 2019 00:44:50 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:43122 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725280AbfKSFT3 (ORCPT
+        with ESMTP id S1730881AbfKSFor (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 00:19:29 -0500
+        Tue, 19 Nov 2019 00:44:47 -0500
 Received: from marcel-macbook.holtmann.net (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 47873CECED;
-        Tue, 19 Nov 2019 06:28:35 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id C597FCECEE;
+        Tue, 19 Nov 2019 06:53:52 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: "local-[bd|mac]-address" inconsistency?
+Subject: Re: [PATCH v6 4/4] Bluetooth: hci_bcm: Support pcm params in dts
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191118201551.GJ27773@google.com>
-Date:   Tue, 19 Nov 2019 06:19:28 +0100
-Cc:     Andre Heider <a.heider@gmail.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20191118110335.v6.4.I3e900de9478b68e5e4475e747d1c46fdd28313fa@changeid>
+Date:   Tue, 19 Nov 2019 06:44:45 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <5F04BF9F-B975-41BE-854B-1B11691A0321@holtmann.org>
-References: <57775d51-7de2-a32c-8b23-aba611483f51@gmail.com>
- <20191118201551.GJ27773@google.com>
-To:     Matthias Kaehlcke <mka@chromium.org>
+Message-Id: <963EC7CC-B81D-4667-A681-2CE49D17CB1E@holtmann.org>
+References: <20191118192123.82430-1-abhishekpandit@chromium.org>
+ <20191118110335.v6.4.I3e900de9478b68e5e4475e747d1c46fdd28313fa@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+Hi Abhishek,
 
->> when passing both addresses through device-tree in the same way:
->> $ hexdump /proc/device-tree/soc/ethernet@5020000/local-mac-address
->> 0000000 0702 3d96 53d4
->> 
->> $ hexdump /proc/device-tree/soc/serial@5000400/bluetooth/local-bd-address
->> 0000000 0703 3d96 53d4
->> 
->> I get this for eth (which is consistent with u-boot):
->> link/ether 02:07:96:3d:d4:53
->> 
->> But for bt it's in reverse order:
->> Controller 53:D4:3D:96:07:03
->> 
->> Is this intended?
+> BCM chips may require configuration of PCM to operate correctly and
+> there is a vendor specific HCI command to do this. Add support in the
+> hci_bcm driver to parse this from devicetree and configure the chip.
 > 
-> Kind of.
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> ---
 > 
-> In both cases the address is specified in the binary format used by BT/NW
-> stack.
+> Changes in v6:
+> - Added btbcm_read_pcm_int_params and change pcm params to first read
+>  the pcm params before setting it
 > 
-> When BT addresses are printed they are converted from LSB to MSB.
+> Changes in v5:
+> - Rename parameters to bt-* and read as integer instead of bytestring
+> - Update documentation with defaults and put values in header
+> - Changed patch order
 > 
->> Do I really have to pass the bdaddr from u-boot in another way?
+> Changes in v4:
+> - Fix incorrect function name in hci_bcm
 > 
-> One could make a case that we don't care what the 'internal' format is and
-> that the BD_ADDR should be specified in MSB format in the DT, and the kernel
-> would be in charge of converting it to LSB. However I fear it is too late to
-> consider a change at this point, since the binding has been in the kernel for
-> 6 months with the current format and existing devices may rely on it.
+> Changes in v3:
+> - Change disallow baudrate setting to return -EBUSY if called before
+>  ready. bcm_proto is no longer modified and is back to being const.
+> - Changed btbcm_set_pcm_params to btbcm_set_pcm_int_params
+> - Changed brcm,sco-routing to brcm,bt-sco-routing
+> 
+> Changes in v2:
+> - Use match data to disallow baudrate setting
+> - Parse pcm parameters by name instead of as a byte string
+> - Fix prefix for dt-bindings commit
+> 
+> drivers/bluetooth/hci_bcm.c | 57 +++++++++++++++++++++++++++++++++++++
+> 1 file changed, 57 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index ee40003008d8..2ce3fac2c5dd 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -25,6 +25,7 @@
+> #include <linux/pm_runtime.h>
+> #include <linux/serdev.h>
+> 
+> +#include <dt-bindings/bluetooth/brcm.h>
+> #include <net/bluetooth/bluetooth.h>
+> #include <net/bluetooth/hci_core.h>
+> 
+> @@ -88,6 +89,7 @@ struct bcm_device_data {
+>  *	used to disable flow control during runtime suspend and system sleep
+>  * @is_suspended: whether flow control is currently disabled
+>  * @no_early_set_baudrate: don't set_baudrate before setup()
+> + * @pcm_params: PCM and routing parameters
+>  */
+> struct bcm_device {
+> 	/* Must be the first member, hci_serdev.c expects this. */
+> @@ -122,6 +124,8 @@ struct bcm_device {
+> 	bool			is_suspended;
+> #endif
+> 	bool			no_early_set_baudrate;
+> +
+> +	struct bcm_set_pcm_int_params	pcm_params;
+> };
+> 
+> /* generic bcm uart resources */
+> @@ -541,6 +545,7 @@ static int bcm_flush(struct hci_uart *hu)
+> static int bcm_setup(struct hci_uart *hu)
+> {
+> 	struct bcm_data *bcm = hu->priv;
+> +	struct bcm_set_pcm_int_params p;
+> 	char fw_name[64];
+> 	const struct firmware *fw;
+> 	unsigned int speed;
+> @@ -594,6 +599,31 @@ static int bcm_setup(struct hci_uart *hu)
+> 			host_set_baudrate(hu, speed);
+> 	}
+> 
+> +	/* PCM parameters if any*/
+> +	err = btbcm_read_pcm_int_params(hu->hdev, &p);
+> +	if (!err) {
+> +		if (bcm->dev->pcm_params.routing == 0xff)
+> +			bcm->dev->pcm_params.routing = p.routing;
+> +		if (bcm->dev->pcm_params.rate == 0xff)
+> +			bcm->dev->pcm_params.rate = p.rate;
+> +		if (bcm->dev->pcm_params.frame_sync == 0xff)
+> +			bcm->dev->pcm_params.frame_sync = p.frame_sync;
+> +		if (bcm->dev->pcm_params.sync_mode == 0xff)
+> +			bcm->dev->pcm_params.sync_mode = p.sync_mode;
+> +		if (bcm->dev->pcm_params.clock_mode == 0xff)
+> +			bcm->dev->pcm_params.clock_mode = p.clock_mode;
 
-we used a different property name for reason. Even while BD_ADDR is allocated from an OUI space, it has nothing in common with a MAC address.
+Frankly, I wouldn’t bother here. If the read HCI command failed, then we abort bcm_setup and fail the whole procedure. These commands have been around the first Broadcom chips and you can assume they are present. And if at some point they do fail, I want to know about it.
+
+> +
+> +		/* Write only when there are changes */
+> +		if (memcmp(&p, &bcm->dev->pcm_params, sizeof(p)))
+> +			err = btbcm_write_pcm_int_params(hu->hdev,
+> +							 &bcm->dev->pcm_params);
+> +
+> +		if (err)
+> +			bt_dev_warn(hu->hdev, "BCM: Write pcm params failed (%d)",
+> +				    err);
+> +	} else
+> +		bt_dev_warn(hu->hdev, "BCM: Read pcm params failed (%d)", err);
+> +
+> finalize:
+> 	release_firmware(fw);
+> 
+> @@ -1128,9 +1158,36 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+> }
+> #endif /* CONFIG_ACPI */
+> 
+> +static int property_read_u8(struct device *dev, const char *prop, u8 *value)
+> +{
+> +	int err;
+> +	u32 tmp;
+> +
+> +	err = device_property_read_u32(dev, prop, &tmp);
+> +
+> +	if (!err)
+> +		*value = (u8)tmp;
+> +
+> +	return err;
+> +}
+
+I think this really needs to be done in the generic property code if this is wanted.
+
+> +
+> static int bcm_of_probe(struct bcm_device *bdev)
+> {
+> 	device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
+> +
+> +	memset(&bdev->pcm_params, 0xff, sizeof(bdev->pcm_params));
+
+Scrap this memset. We will read the values first.
+
+> +
+> +	property_read_u8(bdev->dev, "brcm,bt-sco-routing",
+> +			 &bdev->pcm_params.routing);
+> +	property_read_u8(bdev->dev, "brcm,bt-pcm-interface-rate",
+> +			 &bdev->pcm_params.rate);
+> +	property_read_u8(bdev->dev, "brcm,bt-pcm-frame-type",
+> +			 &bdev->pcm_params.frame_sync);
+> +	property_read_u8(bdev->dev, "brcm,bt-pcm-sync-mode",
+> +			 &bdev->pcm_params.sync_mode);
+> +	property_read_u8(bdev->dev, "brcm,bt-pcm-clock-mode",
+> +			 &bdev->pcm_params.clock_mode);
+> +
+> 	return 0;
+> }
 
 Regards
 
