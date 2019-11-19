@@ -2,168 +2,222 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF3FC432C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 16:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9D7C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 17:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75B07222D1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 16:50:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nDDU/6xB"
+	by mail.kernel.org (Postfix) with ESMTP id 5B3AC2230F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 17:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728566AbfKSQu2 (ORCPT
+        id S1728095AbfKSRB5 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 11:50:28 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:37823 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728560AbfKSQu1 (ORCPT
+        Tue, 19 Nov 2019 12:01:57 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:43846 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728071AbfKSRB4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 11:50:27 -0500
-Received: by mail-io1-f65.google.com with SMTP id 1so23983184iou.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2019 08:50:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gJZxSWnOG8Gs2dy+Q5ughCz+Da0hQ1yJBJ+RDGbHpkw=;
-        b=nDDU/6xBhkkZKiUVL5Ocxj7cHCsYU4c0MefmZkqPYH0eKRB2JYB2UZt217GSyNryga
-         i0HmYl3s5H1A1Q62MU6oqERAk5Fn4PH/oL86+g4t4+AlS+MaRN/h6GJfSTST69GkI0G4
-         W5eu6cHoHNLVEfYFYA4fFqOuBbWxy2p78Vonc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gJZxSWnOG8Gs2dy+Q5ughCz+Da0hQ1yJBJ+RDGbHpkw=;
-        b=X2O8DJ1f3eHZbxdbfIMPvmPD8FBIpy7yNgva3CCEDijY8XEwDk0h8YffJMAZgOm4B7
-         BtNuGTQsZ8Bzng/LS9taT0m/DUVfiOMwbsS8N3EdtxKwjWlYj1l/ZxHe3vGPqk53s9oJ
-         fTVghgfPfoCEKgWeStl9XpTZkBqsWa8zfmC6UY+VH5j0S/TIMpSIV91QfRTkdAujFwrv
-         XibzTJ1xjVKDHqA4lWqGpwoZ2ozP56rjAFFCmM6lsWs6hL3A0tVDYvIGcaNiLnI6ApJy
-         3BFbMUaFlfoeHdQt68xDz3b7ztoMM7JR66iXuX/y70aOlAgQel4928FjE+cwHs18BM0J
-         Hzgw==
-X-Gm-Message-State: APjAAAXD8CkBg2CRjZU9fcZeKTgUCavAKFJt5B4NiqNdIHUXQuWAsT5w
-        CY5qDjpY6aipHRjzUxqrQMMRHVt9AGo=
-X-Google-Smtp-Source: APXvYqzdI0rNbMtMqWdMkOxPLWf1mdHHb+ikzB1Yk2LsEDySUqNJC+IoD6qBHGeFiefnqzDSlwzjVw==
-X-Received: by 2002:a5d:96cf:: with SMTP id r15mr5691457iol.277.1574182226130;
-        Tue, 19 Nov 2019 08:50:26 -0800 (PST)
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com. [209.85.166.179])
-        by smtp.gmail.com with ESMTPSA id l9sm4345546iob.37.2019.11.19.08.50.24
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2019 08:50:25 -0800 (PST)
-Received: by mail-il1-f179.google.com with SMTP id q15so20309697ils.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2019 08:50:24 -0800 (PST)
-X-Received: by 2002:a92:ca8d:: with SMTP id t13mr21900377ilo.58.1574182224501;
- Tue, 19 Nov 2019 08:50:24 -0800 (PST)
-MIME-Version: 1.0
-References: <20191118192123.82430-1-abhishekpandit@chromium.org>
- <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid> <079C85BE-FBC5-4A2B-9EBF-0CEDB6F30C18@holtmann.org>
-In-Reply-To: <079C85BE-FBC5-4A2B-9EBF-0CEDB6F30C18@holtmann.org>
-From:   Doug Anderson <dianders@chromium.org>
-Date:   Tue, 19 Nov 2019 08:50:11 -0800
-X-Gmail-Original-Message-ID: <CAD=FV=U4qOyLWTg3w-AfF3o_0VBTxanpaa6of70viL2v9g3Xgg@mail.gmail.com>
-Message-ID: <CAD=FV=U4qOyLWTg3w-AfF3o_0VBTxanpaa6of70viL2v9g3Xgg@mail.gmail.com>
-Subject: Re: [PATCH v6 3/4] dt-bindings: net: broadcom-bluetooth: Add pcm config
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ondrej Jirman <megous@megous.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Chen-Yu Tsai <wens@csie.org>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 19 Nov 2019 12:01:56 -0500
+Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
+        by mail.holtmann.org (Postfix) with ESMTPSA id A3438CECF6;
+        Tue, 19 Nov 2019 18:11:01 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH] Bluetooth: Expose debugfs entry to force resolvable
+ private address
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20191111052231.31527-1-mike@ice9.us>
+Date:   Tue, 19 Nov 2019 18:01:54 +0100
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <05B1CD3B-543B-4296-A043-335FCE1FD292@holtmann.org>
+References: <20191111052231.31527-1-mike@ice9.us>
+To:     mike@ice9.us
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Mike,
 
-On Mon, Nov 18, 2019 at 9:39 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Abhishek,
->
-> > Add documentation for pcm parameters.
-> >
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > ---
-> >
-> > Changes in v6: None
-> > Changes in v5: None
-> > Changes in v4: None
-> > Changes in v3: None
-> > Changes in v2: None
-> >
-> > .../bindings/net/broadcom-bluetooth.txt       | 16 ++++++++++
-> > include/dt-bindings/bluetooth/brcm.h          | 32 +++++++++++++++++++
-> > 2 files changed, 48 insertions(+)
-> > create mode 100644 include/dt-bindings/bluetooth/brcm.h
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> > index c749dc297624..8561e4684378 100644
-> > --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> > +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> > @@ -29,10 +29,20 @@ Optional properties:
-> >    - "lpo": external low power 32.768 kHz clock
-> >  - vbat-supply: phandle to regulator supply for VBAT
-> >  - vddio-supply: phandle to regulator supply for VDDIO
-> > + - brcm,bt-sco-routing: PCM, Transport, Codec, I2S
-> > + - brcm,bt-pcm-interface-rate: 128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps
-> > + - brcm,bt-pcm-frame-type: short, long
-> > + - brcm,bt-pcm-sync-mode: slave, master
-> > + - brcm,bt-pcm-clock-mode: slave, master
-> >
-> > +See include/dt-bindings/bluetooth/brcm.h for SCO/PCM parameters. The default
-> > +value for all these values are 0 (except for brcm,bt-sco-routing which requires
-> > +a value) if you choose to leave it out.
-> >
-> > Example:
-> >
-> > +#include <dt-bindings/bluetooth/brcm.h>
-> > +
-> > &uart2 {
-> >        pinctrl-names = "default";
-> >        pinctrl-0 = <&uart2_pins>;
-> > @@ -40,5 +50,11 @@ Example:
-> >        bluetooth {
-> >                compatible = "brcm,bcm43438-bt";
-> >                max-speed = <921600>;
-> > +
-> > +               brcm,bt-sco-routing        = <BRCM_SCO_ROUTING_TRANSPORT>;
->
-> in case you use transport which means HCI, you would not have values below. It is rather PCM here in the example.
->
-> > +               brcm,bt-pcm-interface-rate = <BRCM_PCM_IF_RATE_512KBPS>;
-> > +               brcm,bt-pcm-frame-type     = <BRCM_PCM_FRAME_TYPE_SHORT>;
-> > +               brcm,bt-pcm-sync-mode      = <BRCM_PCM_SYNC_MODE_MASTER>;
-> > +               brcm,bt-pcm-clock-mode     = <BRCM_PCM_CLOCK_MODE_MASTER>;
-> >        };
-> > };
->
-> And I am asking this again. Is this adding any value to use an extra include file? Inside the driver we are not really needing these values since they are handed to the hardware.
+> In order to facilitate impersonation attacks against devices using
+> resolvable private addresses (RPAs), this debugfs entry allows the user
+> to set a fixed RPA that is used during undirected and directed
+> advertising. Writing 00:00:00:00:00:00 disables the forced address and
+> will resume generating valid RPAs.
+> 
+> Signed-off-by: Mike Ryan <mike@ice9.us>
+> ---
+> include/net/bluetooth/bluetooth.h |  1 +
+> include/net/bluetooth/hci_core.h  |  1 +
+> net/bluetooth/hci_debugfs.c       | 53 +++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/hci_request.c       | 23 +++++++++++------
+> net/bluetooth/lib.c               | 52 ++++++++++++++++++++++++++++++++++++++
+> 5 files changed, 123 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index fabee6db0..c6417d15c 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -237,6 +237,7 @@ static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
+> }
+> 
+> void baswap(bdaddr_t *dst, const bdaddr_t *src);
+> +int str2ba(const char *str, bdaddr_t *ba);
+> 
+> /* Common socket structures and functions */
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index b689aceb6..a822914d7 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -428,6 +428,7 @@ struct hci_dev {
+> 	__u32			rpa_timeout;
+> 	struct delayed_work	rpa_expired;
+> 	bdaddr_t		rpa;
+> +	bdaddr_t		force_rpa;
+> 
+> #if IS_ENABLED(CONFIG_BT_LEDS)
+> 	struct led_trigger	*power_led;
+> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+> index 402e2cc54..2363ae9bb 100644
+> --- a/net/bluetooth/hci_debugfs.c
+> +++ b/net/bluetooth/hci_debugfs.c
+> @@ -710,6 +710,57 @@ static const struct file_operations force_static_address_fops = {
+> 	.llseek		= default_llseek,
+> };
+> 
+> +static ssize_t force_rpa_read(struct file *file,
+> +					 char __user *user_buf,
+> +					 size_t count, loff_t *ppos)
+> +{
+> +	struct hci_dev *hdev = file->private_data;
+> +	char buf[19];
+> +	bdaddr_t *ba = &hdev->force_rpa;
+> +
+> +	sprintf(buf, "%pMR\n", ba);
+> +
+> +	return simple_read_from_buffer(user_buf, count, ppos, buf, strlen(buf));
+> +}
+> +
+> +static ssize_t force_rpa_write(struct file *file, const char __user *user_buf,
+> +			       size_t count, loff_t *ppos)
+> +{
+> +	struct hci_dev *hdev = file->private_data;
+> +	char buf[18];
+> +	size_t buf_size = min(count, (sizeof(buf)-1));
+> +	bdaddr_t rpa;
+> +
+> +	if (test_bit(HCI_UP, &hdev->flags))
+> +		return -EBUSY;
+> +
+> +	if (copy_from_user(buf, user_buf, buf_size))
+> +		return -EFAULT;
+> +
+> +	buf[buf_size] = '\0';
+> +	if (str2ba(buf, &rpa))
+> +		return -EINVAL;
+> +
+> +	// the two most significant bits shall be 01 unless the address is
+> +	// 00:00:00:00:00:00
 
-Personally I find that they add value in that it makes it easier for
-someone tweaking the device tree to know what the expected valid
-values are and what they mean.  I think Matthias also found value in
-them since he suggested them in:
+comment style is 
 
-https://lore.kernel.org/r/20191114175836.GI27773@google.com
+	/* foo */
 
-There, he said:
+Or 
 
-> I'd suggest to define constants in include/dt-bindings/bluetooth/brcm.h
-> and use them instead of literals, with this we wouldn't rely on (optional)
-> comments to make the configuration human readable.
+	/* foo
+	 * bar */
 
-...which seems to make sense to me.
+> +	if ((rpa.b[5] & 0xc0) != 0x40 && bacmp(&rpa, BDADDR_ANY))
+> +		return -EINVAL;
+> +
+> +	if (!bacmp(&hdev->force_rpa, &rpa))
+> +		return -EALREADY;
+> +
+> +	bacpy(&hdev->force_rpa, &rpa);
+> +
+> +	return count;
+> +}
 
--Doug
+Lets use scanf here instead of truing to copy str2ba from userspace.
+
+> +
+> +static const struct file_operations force_rpa_fops = {
+> +	.open		= simple_open,
+> +	.read		= force_rpa_read,
+> +	.write		= force_rpa_write,
+> +	.llseek		= default_llseek,
+> +};
+> +
+> static int white_list_show(struct seq_file *f, void *ptr)
+> {
+> 	struct hci_dev *hdev = f->private;
+> @@ -1026,6 +1077,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+> 				    hdev->debugfs, hdev,
+> 				    &force_static_address_fops);
+> 
+> +	debugfs_create_file("force_rpa", 0644, hdev->debugfs, hdev,
+> +			    &force_rpa_fops);
+> 	debugfs_create_u8("white_list_size", 0444, hdev->debugfs,
+> 			  &hdev->le_white_list_size);
+> 	debugfs_create_file("white_list", 0444, hdev->debugfs, hdev,
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index 2a1b64dbf..8fabb1bb1 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -1910,14 +1910,23 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+> 
+> 		*own_addr_type = ADDR_LE_DEV_RANDOM;
+> 
+> -		if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
+> -		    !bacmp(&hdev->random_addr, &hdev->rpa))
+> -			return 0;
+> +		/* If force_rpa is set to 00:00:00:00:00:00, generate a valid
+> +		 * RPA using IRK. Otherwise use the forced value.
+> +		 */
+> +		if (!bacmp(&hdev->force_rpa, BDADDR_ANY)) {
+> +			if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
+> +			    !bacmp(&hdev->random_addr, &hdev->rpa))
+> +				return 0;
+> 
+> -		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+> -		if (err < 0) {
+> -			bt_dev_err(hdev, "failed to generate new RPA");
+> -			return err;
+> +			err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+> +			if (err < 0) {
+> +				bt_dev_err(hdev, "failed to generate new RPA");
+> +				return err;
+> +			}
+> +		} else {
+> +			if (!bacmp(&hdev->rpa, &hdev->force_rpa))
+> +				return 0;
+> +			bacpy(&hdev->rpa, &hdev->force_rpa);
+> 		}
+
+Isn’t this going to be enough (minus the required comment).
+
+-               err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+-               if (err < 0) {
+-                       bt_dev_err(hdev, "failed to generate new RPA");
+-                       return err;
++               if (!bacmp(&hdev->force_rpa, BDADDR_ANY)) {
++                       err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
++                       if (err < 0) {
++                               bt_dev_err(hdev, "failed to generate new RPA");
++                               return err;
++                       }
++               } else {
++                       bacpy(&hdev->rpa, &hdev->force_rpa);
+                }
+
+Regards
+
+Marcel
+
