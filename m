@@ -2,174 +2,166 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 698D0C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 09:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80882C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 09:21:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D3DA219F6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 09:10:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52B06222D3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 09:21:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=scewo-ch.20150623.gappssmtp.com header.i=@scewo-ch.20150623.gappssmtp.com header.b="lxcRQjKR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BIolBxGU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727262AbfKSJKT (ORCPT
+        id S1726132AbfKSJVf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 04:10:19 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:36783 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726840AbfKSJKS (ORCPT
+        Tue, 19 Nov 2019 04:21:35 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:56027 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725784AbfKSJVf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 04:10:18 -0500
-Received: by mail-io1-f66.google.com with SMTP id s3so22341515ioe.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2019 01:10:17 -0800 (PST)
+        Tue, 19 Nov 2019 04:21:35 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so2309659wmb.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2019 01:21:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=scewo-ch.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zIDr5J2Yg7tMf+RLWCV3YC/Oi0E4vefOQxXVhy+PepM=;
-        b=lxcRQjKRdKxddw4+eCPV9CM3qltYsJEdgWLwbkgA6f5NKrHi9Z9Sb75jkj6Lel679K
-         peOHspS4ZkayV1c8NBZKPsemqtVSR3Rx2n+0sQNsZD256IvwnECluieziMJPbBV1jmih
-         4OFZULk2+LjtpP4HfZRGWIJyQDyluO6sXIPtmKQ92oOt5cweS8MpMOvJ9v705Ml256Bl
-         VFFke6I9c+Y8rbC4WQ2NsQB9H09Qa0rpSlwOcoXr4g0WqDA5/OPG3U0fgcfSXkbbyWdT
-         L1dGHIXSaAThSycNhMmKlAbfo4YNpE6kYtUEn9hDU3s9jttnOv44wnKL+lYaR4D8nGhI
-         yrjw==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=iWRnqXG9dU1icNm86Zp4oZIPcGtpMH+JgYjZRSXsV5k=;
+        b=BIolBxGU/R9Rmiau8XtohUzeu31mwmBj+FpZ8PqKhdSVlSIpV22RV4qfYi3xNvy6kp
+         I4v6EVwOk6E0PvdEZVGqxPX8K453XDmcEsZ+cxNGGgBqMvi/pRpgdFV5gAHm9pnKOc0F
+         fadtWnW4kR9vrxYzezVbEMKFuxydZTllZHIU7e1IVkZx7B4aYiv4EESqRTMuqY3aVUEB
+         +IQEuRHre9EIpnyyIdlrCR5J2Cjgmcjj5kEHVIJ193FLAlbvNrxQ7r13TFxaL+uzOLrO
+         oSnC0YV7o+WwnLshIuslNaaoug0kHnkygjL/i7f3ZvqGr/Z0evWYjaaDhBBRkUbWm4M2
+         s+Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zIDr5J2Yg7tMf+RLWCV3YC/Oi0E4vefOQxXVhy+PepM=;
-        b=fqWfkEdihFVU1qAChn96DNVvBq+wnKw/CSLnfzcQDauDHRZtyDU7l4rRCTtIE60Ngu
-         hJzk2l8i4pI/WnTros5JNjpf0tgI4Mk5Q6517R3Jt95fL1jpcRrLmNJLnQGCAVQrYhfX
-         c43ORbQjCJSak48xgbKR+UzjaUiRairsoNDBIdTtW+2EFMcVRC3DsMOo2vOuFOlomVbS
-         jNP5ih5zMi2D0efkfJP6jzaZs6MPguFThEJgf3Fqi4foQdYA+m5xN2E5AQlKkChEDEw6
-         BSG52PsazmfWBqnTcB9kmpN2EETSZD8G+lLulbyxAHeHGbPHyBf5kNXsAT1SM/ixZLX3
-         /xUQ==
-X-Gm-Message-State: APjAAAUJMUPMD2amJzxwlFPIbh+TebhrBF+exLJdL3gQG4znqC0UCTta
-        HWqVL920yLW9Ui08PVyyU2/lahuv4u2H2OCqTZSsLg==
-X-Google-Smtp-Source: APXvYqyPM0AujVk1+miC76sR7XKezF5plXWVqkOB1chmL6xqCx1AQZDrvEk/JZBsyh/rqx68cM1CJnWVTbGzFZG7jVc=
-X-Received: by 2002:a02:3f10:: with SMTP id d16mr17367239jaa.139.1574154617401;
- Tue, 19 Nov 2019 01:10:17 -0800 (PST)
-MIME-Version: 1.0
-References: <CAGssATiS=dpA=WOSfLek385o2g=C5sb0z+z=V7CDswn9_5Eu-g@mail.gmail.com>
- <CABBYNZ+VfyOeWjfdE64bVQM0eAJE789NRBjy+wgKa_Dka2ZZJg@mail.gmail.com> <F827D8AB-4404-4C81-9368-A18AB87D9292@holtmann.org>
-In-Reply-To: <F827D8AB-4404-4C81-9368-A18AB87D9292@holtmann.org>
-From:   Guy Morand <g.morand@scewo.ch>
-Date:   Tue, 19 Nov 2019 10:09:58 +0100
-Message-ID: <CAGssATiZsC28X06aVQDTO=8va-0dtoe-1a2Mi6JZv4P9UMdGqg@mail.gmail.com>
-Subject: Re: Bluetooth disconnect event / Link layer monitoring
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iWRnqXG9dU1icNm86Zp4oZIPcGtpMH+JgYjZRSXsV5k=;
+        b=YTvL2vqpyPThbtCRf2rrdpEbecTe+VHv9pnGtLOhLEtZDOH2dH40ms3PBZzC3h0e2V
+         HTOP2vy4APZAmL2a3Q/+I77c5AeL2k+Wl5r+1rc7fXtT+cBZGo+bDnZ33JIYdG5KBk5S
+         D7UlC6nukB25dgKlzrsJ1BEvkg2d3O1L8T4cWgmFrgHetAN0e1cG3k29RG/p4Ar6two5
+         Qbd7oAf6BKs8Em2w7WOcrY+amS7sQt3ud9ohK2u3GXP2vQv7d6kKBvaU4GAA5IBK66ju
+         hunZBlocfH70mDAWN8lZjldICPeL9l0qkXqzyVudeaU2A/Vjp4RbF+tHelhLF6pzuKuD
+         S11g==
+X-Gm-Message-State: APjAAAUNRH1D1TUslkK0pFpNcL8Ge3RMARUP+DkBqrSEuT22aeKYTwWJ
+        J7VGBxl3O2VQ/en+1K0TkhwFaP3D
+X-Google-Smtp-Source: APXvYqzrmFFB9I9zfLKw8kMQcYeTyPOarZ5OOQyeDJ49tv/ybWFsCnAE5bQD5r8qqu4jLzAc/ELYzg==
+X-Received: by 2002:a7b:c747:: with SMTP id w7mr4569484wmk.62.1574155293170;
+        Tue, 19 Nov 2019 01:21:33 -0800 (PST)
+Received: from mamamia.internal (a89-183-91-150.net-htp.de. [89.183.91.150])
+        by smtp.gmail.com with ESMTPSA id a2sm22872362wrt.79.2019.11.19.01.21.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Nov 2019 01:21:32 -0800 (PST)
+Subject: Re: [PATCH v2] bluetooth: bcm: Use HCI_QUIRK_USE_BDADDR_PROPERTY
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
+        Jernej Skrabec <jernej.skrabec@siol.net>
+References: <20191119060221.3297340-1-a.heider@gmail.com>
+ <4DB6C9B7-8454-449C-90B4-4A1B3AD82495@holtmann.org>
+ <e813a126-f0fc-afe8-ad4c-5296f0a2dc06@gmail.com>
+ <F632534C-C9CC-4F4F-AA58-F4FC053D4226@holtmann.org>
+From:   Andre Heider <a.heider@gmail.com>
+Message-ID: <ffa83108-2c0f-26eb-3860-892f65a6e9bd@gmail.com>
+Date:   Tue, 19 Nov 2019 10:21:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <F632534C-C9CC-4F4F-AA58-F4FC053D4226@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks everyone for your quick answers!
+On 19/11/2019 09:16, Marcel Holtmann wrote:
+> Hi Andre,
+> 
+>>>> Some devices ship with the controller default address, like the
+>>>> Orange Pi 3 (BCM4345C5).
+>>>>
+>>>> Allow the bootloader to set a valid address through the device tree.
+>>>>
+>>>> Signed-off-by: Andre Heider <a.heider@gmail.com>
+>>>> ---
+>>>> drivers/bluetooth/btbcm.c | 1 +
+>>>> 1 file changed, 1 insertion(+)
+>>>>
+>>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>>>> index 2d2e6d862068..9d16162d01ea 100644
+>>>> --- a/drivers/bluetooth/btbcm.c
+>>>> +++ b/drivers/bluetooth/btbcm.c
+>>>> @@ -439,6 +439,7 @@ int btbcm_finalize(struct hci_dev *hdev)
+>>>> 	btbcm_check_bdaddr(hdev);
+>>>>
+>>>> 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+>>>> +	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+>>>>
+>>>> 	return 0;
+>>>> }
+>>> have you actually tested this? I might be mistaken, but the code that I read in hci_dev_do_open() would drop this into unconfigured state since HCI_QURIK_INVALID_BDADDR is still set.
+>>
+>> I thought so, but double-checking something obviously failed...
+>>
+>> What would be an acceptable solution to this HCI_QUIRK_USE_BDADDR_PROPERTY|HCI_QUIRK_INVALID_BDADDR situation?
+>>
+>> Getting rid of the quirk in the driver in e.g. set_bdaddr() doesn't sound right.
+>>
+>> How about:
+>>
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 04bc79359a17..7bc384be89f8 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -1470,7 +1470,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+>>          * start up as unconfigured.
+>>          */
+>>         if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
+>> -           test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks))
+>> +           (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
+>> +            !test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)))
+>>             hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
+>>
+>>         /* For an unconfigured controller it is required to
+>>
+>> That works for me (double-checked this time ;)
+> 
+> I am not sure yet. I mean we define what HCI_QUIRK_USE_BDADDR_PROPERTY actually means. Right now it means this:
+> 
+> 1) Run though ->setup
+> 2) If no public BD_ADDR is set, then try to read from DT
+> 3) If found, try to set, if set fails, abort dev_up
+> 
+> Now there is also another problem that no public BD_ADDR means BDADDR_ANY right now. Which means, for Broadcom chips that is never the case. So HCI_QUIRK_USE_BDADDR_PROPERTY doesn’t even work since their invalid addresses are not BDDADDR_ANY.
+> 
+> The first change needs to be something along these lines:
+> 
+>                  if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
+> -                       if (!bacmp(&hdev->public_addr, BDADDR_ANY))
+> +                       if (!bacmp(&hdev->public_addr, BDADDR_ANY) ||
+> +                           test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks))
+>                                  hci_dev_get_bd_addr_from_property(hdev);
+> 
 
-I tried this already but unfortunately, it seems that the gamepad
-doesn't allow that:
-$ hcitool lst ec:83:50:de:02:3c 1
-HCI write_link_supervision_timeout request failed: Input/output error
+Maybe I misunderstood, but just for the record: It works for me even 
+without this hunk (with just my hunk above and the v2 bcm patch). The 
+bdaddr via dt is used and the controller works without any userland 
+interaction.
 
-< HCI Command: Write Link Supervision Timeout (0x03|0x0037) plen 4
-    handle 70 timeout 1
-> HCI Event: Command Complete (0x0e) plen 6
-    Write Link Supervision Timeout (0x03|0x0037) ncmd 1
-    status 0x0c handle 70
-    Error: Command Disallowed
-
-Yes, if it was me, I would never use bluetooth!
-
-I guess the only place where I can do something is in the kernel space.
-I would like to send the error to the user when this happens:
-Bluetooth: hci0 link tx timeout
-
-Do you think that would be possible and make sense?
-
-Best regards,
-
-Guy
-
-On Tue, Nov 19, 2019 at 6:06 AM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
->
-> Hi Luiz,
->
-> >> We are developing a wheelchair that we can controle with a bluetooth
-> >> gamepad, the XBOX 360 controller to be more precise. It basically work=
-s
-> >> fine but when I remove the battery, I get the disconnect event in the
-> >> user space around 10 seconds later. That is not acceptable since the
-> >> wheelchair will keep rolling to potentially dangerous places!
-> >>
-> >> I tried to implement a ping mechanism on the bluetooth layer, inspired
-> >> from bluez sources somewhere:
-> >>  int _socket_fd =3D socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_L2CAP);
-> >>  // bind on AF_BLUETOOTH
-> >>  // connect with AF_BLUETOOTH
-> >>
-> >>  send_cmd->ident =3D PING_IDENT;
-> >>  send_cmd->len =3D htobs(PING_DATA_SIZE);
-> >>  send_cmd->code =3D L2CAP_ECHO_REQ;
-> >>  if (send(_socket_fd, send_buffer, PING_PACKET_SIZE, 0) <=3D 0) {
-> >>    // ...
-> >>  }
-> >>
-> >> It basically works fine except when the signal gets bad. This will get
-> >> printed by the kernel:
-> >> [  859.629431] Bluetooth: hci0 link tx timeout
-> >> [  859.635482] Bluetooth: hci0 killing stalled connection 9c:aa:1b:6b:=
-51:c9
-> >>
-> >> In that case, I don't get event from the /dev/jsX device but the gamep=
-ad
-> >> seems to still answer to pings??!!
-> >>
-> >> Since I haven't found any acceptable workaround and always find the sa=
-me
-> >> pages again and again, I'm asking here:
-> >> * Is it possible to achieve what I want?
-> >> * Does it make sense that the ping work but the HID layer seems dead?
-> >> * Any recommendation, pointers?
-> >
-> > Id look into adjusting the link supervision timeout instead of
-> > creating a raw socket, you can use hcitool to do that, neither is
-> > really great since it require root but at least the supervision
-> > timeout is something a lot more reliable for this.
->
-> we can add an option to L2CAP sockets to adjust the link supervision time=
-out.
->
-> Anyway, these days, I would _not_ use Bluetooth BR/EDR for controlling an=
-ything. I would find a Gamepad that utilizes Bluetooth LE and focus on that=
-.
->
+> But that is not fully correct either. We also have to consider HCI_QUIRK_NON_PERSISTENT_SETUP.
+> 
+> So this is not an easy fix since we need to spell out the semantics of the interactions of these 3 quirks first.
+> 
 > Regards
->
+> 
 > Marcel
->
+> 
 
-
---=20
-
-Guy Morand
-
-Software Engineer
-
-=E2=80=93
-
-Scewo AG, Technoparkstrasse 2, 8406 Winterthur
-
-Office +41 (0)44 500 86 03
-
-
-www.scewo.ch
-
-www.facebook.com/scewo
-
-www.instagram.com/scewo_official
