@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6551C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 20:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC40C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 20:48:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98702206F4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 20:45:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD561206F4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 20:48:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="OG0vgygz"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cv2L1PtA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727399AbfKSUpp (ORCPT
+        id S1727212AbfKSUsw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 15:45:45 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:44854 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726711AbfKSUpo (ORCPT
+        Tue, 19 Nov 2019 15:48:52 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:36192 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726911AbfKSUsw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 15:45:44 -0500
-Received: by mail-qk1-f194.google.com with SMTP id m16so19162452qki.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2019 12:45:44 -0800 (PST)
+        Tue, 19 Nov 2019 15:48:52 -0500
+Received: by mail-qk1-f196.google.com with SMTP id d13so19189524qko.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2019 12:48:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zoHvXClIsnXWrgdxu3K2jU5/KdggH/WhFo/M72uCAgw=;
-        b=OG0vgygz+pz1si6C6obQtYr/Y8ubaS7TSijBKd6HNxscmu96GUD8rfxsHAss8vn9WO
-         +fmU8irYX7vAD7XUouMMfdy+nd5Tu/He7KdY9EpKtMhTlCDm80g+Jbr7KI81alrGW80u
-         zAcB0205ii26BFoenZ6aR8wUEG9+Ft1GxQK8E=
+         :cc;
+        bh=c788r5NW2qmkzzpVNhlK5wHnib53Ht136kdc4fIJn1U=;
+        b=cv2L1PtAFjVVnPC9D4PdLdlDDET6/xRguA93Y3P+533wbzAeR+AMXMUGS8yo5DV0IP
+         ZnVUqAjsrUIx9EBobNeEMRAWcDGV5vIp+1AGc8hkg+zl4CE/AFKOWfPkdnnyb4yJ9R4j
+         aOBPlQFD+5sp80J1gLzm96SrtJKnAAKCiAvyQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zoHvXClIsnXWrgdxu3K2jU5/KdggH/WhFo/M72uCAgw=;
-        b=M7p6IRf1WfVHf++nF21dP1HTaT4OU8WSikj6r5ZGtTAxe2uXzlv7DhVbcEB1iaPHuL
-         HO38TCCRTE5Fg8ophDRtLr4kYXY/ibIIdkS96f5LAU8eiamizd5P9jfiRYrsaR/zJfl1
-         RW1kklXpkJ0S1YY0hP4SpBsMP2s2N9PmfTlUZudJpUDSydNtL4DMkW4fo4z0ywgeOiFZ
-         /U7vXyVA1deGrUGQZTQRBrMN+Flf2CmEhbPbnzurLc/mEvJVqWh2sqw51PI4yjHhqwRg
-         +2u8BuslTk4pHfxr1NBwzL6hqoQLKJ+leoNmgXP3osjH4OqleYToPGVg+GOg1s1hm5mf
-         3stA==
-X-Gm-Message-State: APjAAAX6dZYrOit+mcrWhN82+U++S+6U6rrtRqkDtFbAQO1aQxUkZkkv
-        l23SCFz+c1I2Im1XfhHr2WJOusQJawrFAkKzgLDWTw==
-X-Google-Smtp-Source: APXvYqwkF8zKdheUZutDXGvomMKZgmnKZEPs1I3QnGWgJ9PSOIad16PyVEIIIUTKIpefAzU/9TTaITD1t72IMo2Ae4Y=
-X-Received: by 2002:a37:d91:: with SMTP id 139mr28563973qkn.79.1574196343510;
- Tue, 19 Nov 2019 12:45:43 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=c788r5NW2qmkzzpVNhlK5wHnib53Ht136kdc4fIJn1U=;
+        b=HZDey+W/DEHYueOuk/4uG+Lo1L05LiP8NAE3er+HNApSK5Wa3P3nn9kLC+Aal0uuIA
+         /Xs4G/7P+lvOjTI6T4iaHR5HM6ftISJRPb2y2DlQkUsendDYkUEQ5pMN1k/zBufJ/3mu
+         l98e75iiTz2URZZ0JVlMRE7fOLQw1P/2CfgDkwDJTWVqGZMPbMVrXCbm00SE5kbi60i/
+         q6ZiytFlqo4dJoBNiycN1mPAfVf/FdpSCzg4pJvkrtvGZfc5DB3LBcubrabbQzAfXaQU
+         a+15FHoFiLsNrECjL3JXDuLpzrB30/fHa/PQhvwWUY9yoTfIDQ+Pt0hjiyYTDr3Y2KG5
+         x8QQ==
+X-Gm-Message-State: APjAAAVSZGk+PAZatmQ4WZ//XmGxrW1mj/j8DNq4VCFVmre/4JwGd8jb
+        fP0GP6+phh/CjeNkzTuNrLQdcS4jfNilpSrJikFWJQ==
+X-Google-Smtp-Source: APXvYqx2FAmsLofOin4X6ZxdtxDqBpTxUaLASXaljwcG7oNUFmRwIFPwuYggh3ck8q/SZwFfFoh0kD2NRkYTdCUT2hU=
+X-Received: by 2002:a37:d91:: with SMTP id 139mr28574128qkn.79.1574196530821;
+ Tue, 19 Nov 2019 12:48:50 -0800 (PST)
 MIME-Version: 1.0
 References: <20191118192123.82430-1-abhishekpandit@chromium.org>
- <20191118110335.v6.4.I3e900de9478b68e5e4475e747d1c46fdd28313fa@changeid> <963EC7CC-B81D-4667-A681-2CE49D17CB1E@holtmann.org>
-In-Reply-To: <963EC7CC-B81D-4667-A681-2CE49D17CB1E@holtmann.org>
+ <20191118110335.v6.2.I2a9640407d375f20c7c8f4afd1607db143ff0246@changeid> <989EE002-F3F4-441B-BD9B-B460D8B09708@holtmann.org>
+In-Reply-To: <989EE002-F3F4-441B-BD9B-B460D8B09708@holtmann.org>
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Tue, 19 Nov 2019 12:45:32 -0800
-Message-ID: <CANFp7mX8zsFBjQ4pYyBnG4KbTv-0m004LPmYAtLmGRm3rkfoRA@mail.gmail.com>
-Subject: Re: [PATCH v6 4/4] Bluetooth: hci_bcm: Support pcm params in dts
+Date:   Tue, 19 Nov 2019 12:48:40 -0800
+Message-ID: <CANFp7mWUQFvk=gL5D9N6Fzd8wmfub5O8RF9CcWqwGr03oLJKkw@mail.gmail.com>
+Subject: Re: [PATCH v6 2/4] Bluetooth: btbcm: Support pcm configuration
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
@@ -64,192 +64,142 @@ Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Douglas Anderson <dianders@chromium.org>,
         LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 9:44 PM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+On Mon, Nov 18, 2019 at 9:35 PM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Hi Abhishek,
 >
-> > BCM chips may require configuration of PCM to operate correctly and
-> > there is a vendor specific HCI command to do this. Add support in the
-> > hci_bcm driver to parse this from devicetree and configure the chip.
+> > Add BCM vendor specific command to configure PCM parameters. The new
+> > vendor opcode allows us to set the sco routing, the pcm interface rate,
+> > and a few other pcm specific options (frame sync, sync mode, and clock
+> > mode). See broadcom-bluetooth.txt in Documentation for more information
+> > about valid values for those settings.
+> >
+> > Here is an example trace where this opcode was used to configure
+> > a BCM4354:
+> >
+> >        < HCI Command: Vendor (0x3f|0x001c) plen 5
+> >                01 02 00 01 01
+> >> HCI Event: Command Complete (0x0e) plen 4
+> >        Vendor (0x3f|0x001c) ncmd 1
+> >                Status: Success (0x00)
+> >
+> > We can read back the values as well with ocf 0x001d to confirm the
+> > values that were set:
+> >        $ hcitool cmd 0x3f 0x001d
+> >        < HCI Command: ogf 0x3f, ocf 0x001d, plen 0
+> >> HCI Event: 0x0e plen 9
+> >        01 1D FC 00 01 02 00 01 01
 > >
 > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > > ---
 > >
-> > Changes in v6:
-> > - Added btbcm_read_pcm_int_params and change pcm params to first read
-> >  the pcm params before setting it
+> > Changes in v6: None
+> > Changes in v5: None
+> > Changes in v4: None
+> > Changes in v3: None
+> > Changes in v2: None
 > >
-> > Changes in v5:
-> > - Rename parameters to bt-* and read as integer instead of bytestring
-> > - Update documentation with defaults and put values in header
-> > - Changed patch order
+> > drivers/bluetooth/btbcm.c | 47 +++++++++++++++++++++++++++++++++++++++
+> > drivers/bluetooth/btbcm.h | 16 +++++++++++++
+> > 2 files changed, 63 insertions(+)
 > >
-> > Changes in v4:
-> > - Fix incorrect function name in hci_bcm
+> > diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> > index 2d2e6d862068..df90841d29c5 100644
+> > --- a/drivers/bluetooth/btbcm.c
+> > +++ b/drivers/bluetooth/btbcm.c
+> > @@ -105,6 +105,53 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> > }
+> > EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
 > >
-> > Changes in v3:
-> > - Change disallow baudrate setting to return -EBUSY if called before
-> >  ready. bcm_proto is no longer modified and is back to being const.
-> > - Changed btbcm_set_pcm_params to btbcm_set_pcm_int_params
-> > - Changed brcm,sco-routing to brcm,bt-sco-routing
-> >
-> > Changes in v2:
-> > - Use match data to disallow baudrate setting
-> > - Parse pcm parameters by name instead of as a byte string
-> > - Fix prefix for dt-bindings commit
-> >
-> > drivers/bluetooth/hci_bcm.c | 57 +++++++++++++++++++++++++++++++++++++
-> > 1 file changed, 57 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> > index ee40003008d8..2ce3fac2c5dd 100644
-> > --- a/drivers/bluetooth/hci_bcm.c
-> > +++ b/drivers/bluetooth/hci_bcm.c
-> > @@ -25,6 +25,7 @@
-> > #include <linux/pm_runtime.h>
-> > #include <linux/serdev.h>
-> >
-> > +#include <dt-bindings/bluetooth/brcm.h>
-> > #include <net/bluetooth/bluetooth.h>
-> > #include <net/bluetooth/hci_core.h>
-> >
-> > @@ -88,6 +89,7 @@ struct bcm_device_data {
-> >  *    used to disable flow control during runtime suspend and system sl=
-eep
-> >  * @is_suspended: whether flow control is currently disabled
-> >  * @no_early_set_baudrate: don't set_baudrate before setup()
-> > + * @pcm_params: PCM and routing parameters
-> >  */
-> > struct bcm_device {
-> >       /* Must be the first member, hci_serdev.c expects this. */
-> > @@ -122,6 +124,8 @@ struct bcm_device {
-> >       bool                    is_suspended;
-> > #endif
-> >       bool                    no_early_set_baudrate;
-> > +
-> > +     struct bcm_set_pcm_int_params   pcm_params;
-> > };
-> >
-> > /* generic bcm uart resources */
-> > @@ -541,6 +545,7 @@ static int bcm_flush(struct hci_uart *hu)
-> > static int bcm_setup(struct hci_uart *hu)
-> > {
-> >       struct bcm_data *bcm =3D hu->priv;
-> > +     struct bcm_set_pcm_int_params p;
-> >       char fw_name[64];
-> >       const struct firmware *fw;
-> >       unsigned int speed;
-> > @@ -594,6 +599,31 @@ static int bcm_setup(struct hci_uart *hu)
-> >                       host_set_baudrate(hu, speed);
-> >       }
-> >
-> > +     /* PCM parameters if any*/
-> > +     err =3D btbcm_read_pcm_int_params(hu->hdev, &p);
-> > +     if (!err) {
-> > +             if (bcm->dev->pcm_params.routing =3D=3D 0xff)
-> > +                     bcm->dev->pcm_params.routing =3D p.routing;
-> > +             if (bcm->dev->pcm_params.rate =3D=3D 0xff)
-> > +                     bcm->dev->pcm_params.rate =3D p.rate;
-> > +             if (bcm->dev->pcm_params.frame_sync =3D=3D 0xff)
-> > +                     bcm->dev->pcm_params.frame_sync =3D p.frame_sync;
-> > +             if (bcm->dev->pcm_params.sync_mode =3D=3D 0xff)
-> > +                     bcm->dev->pcm_params.sync_mode =3D p.sync_mode;
-> > +             if (bcm->dev->pcm_params.clock_mode =3D=3D 0xff)
-> > +                     bcm->dev->pcm_params.clock_mode =3D p.clock_mode;
+> > +int btbcm_read_pcm_int_params(struct hci_dev *hdev,
+> > +                           struct bcm_set_pcm_int_params *int_params)
+> > +{
 >
-> Frankly, I wouldn=E2=80=99t bother here. If the read HCI command failed, =
-then we abort bcm_setup and fail the whole procedure. These commands have b=
-een around the first Broadcom chips and you can assume they are present. An=
-d if at some point they do fail, I want to know about it.
-Ok -- will change to return error if it fails.
+> the name should be _param and not _params since if I remember correctly that is how Broadcom specified it. Also just use param as variable name.
+
+Technically, you are configuring multiple PCM params :)
 
 >
+> > +     struct sk_buff *skb;
+> > +     int err = 0;
 > > +
-> > +             /* Write only when there are changes */
-> > +             if (memcmp(&p, &bcm->dev->pcm_params, sizeof(p)))
-> > +                     err =3D btbcm_write_pcm_int_params(hu->hdev,
-> > +                                                      &bcm->dev->pcm_p=
-arams);
+> > +     skb = __hci_cmd_sync(hdev, 0xfc1d, 5, int_params, HCI_INIT_TIMEOUT);
+> > +     if (IS_ERR(skb)) {
+> > +             err = PTR_ERR(skb);
+> > +             bt_dev_err(hdev, "BCM: Read PCM int params failed (%d)", err);
+> > +             return err;
+> > +     }
 > > +
-> > +             if (err)
-> > +                     bt_dev_warn(hu->hdev, "BCM: Write pcm params fail=
-ed (%d)",
-> > +                                 err);
-> > +     } else
-> > +             bt_dev_warn(hu->hdev, "BCM: Read pcm params failed (%d)",=
- err);
+> > +     if (!skb->data[0] && skb->len == sizeof(*int_params) + 1) {
+> > +             memcpy(int_params, &skb->data[1], sizeof(*int_params));
+> > +     } else {
+> > +             bt_dev_err(hdev,
+> > +                        "BCM: Read PCM int params failed (%d), Length (%d)",
+> > +                        skb->data[0], skb->len);
+> > +             err = -EINVAL;
+> > +     }
 > > +
-> > finalize:
-> >       release_firmware(fw);
-> >
-> > @@ -1128,9 +1158,36 @@ static int bcm_acpi_probe(struct bcm_device *dev=
-)
-> > }
-> > #endif /* CONFIG_ACPI */
-> >
-> > +static int property_read_u8(struct device *dev, const char *prop, u8 *=
-value)
-> > +{
-> > +     int err;
-> > +     u32 tmp;
-> > +
-> > +     err =3D device_property_read_u32(dev, prop, &tmp);
-> > +
-> > +     if (!err)
-> > +             *value =3D (u8)tmp;
+> > +     kfree_skb(skb);
+>
+> I find these harder to read actually and it can be still fault at data[0] access.
+>
+>         if (skb->len != sizeof(*param) || skb->data[0]) {
+>                 bt_dev_err(hdev, "BCM: Read SCO PCM int parameter failure");
+>                 kfree_skb(skb);
+>                 return -EIO;
+>         }
+>
+>         memcpy(param, skb->data + 1, sizeof(*param));
+>         kfree_skb(skb);
+>         return 0;
+> }
+>
+
+Sure. skb->len should be sizeof(*param) + 1 because there's an extra
+byte for the status as well.
+
 > > +
 > > +     return err;
 > > +}
->
-> I think this really needs to be done in the generic property code if this=
- is wanted.
-Yes, this should be device_property_read_u8. For some reason, I
-thought that wasn't working before (I'll have to retest it with
-straight integer values).
-
->
+> > +EXPORT_SYMBOL_GPL(btbcm_read_pcm_int_params);
 > > +
-> > static int bcm_of_probe(struct bcm_device *bdev)
+> > +int btbcm_write_pcm_int_params(struct hci_dev *hdev,
+> > +                            const struct bcm_set_pcm_int_params *int_params)
+> > +{
+> > +     struct sk_buff *skb;
+> > +     int err;
+> > +
+> > +     /* Vendor ocf 0x001c sets the pcm parameters and 0x001d reads it */
+>
+> Scrap this comment.
+>
+> > +     skb = __hci_cmd_sync(hdev, 0xfc1c, 5, int_params, HCI_INIT_TIMEOUT);
+> > +     if (IS_ERR(skb)) {
+> > +             err = PTR_ERR(skb);
+> > +             bt_dev_err(hdev, "BCM: Write PCM int params failed (%d)", err);
+> > +             return err;
+> > +     }
+> > +     kfree_skb(skb);
+> > +
+> > +     return 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(btbcm_write_pcm_int_params);
+> > +
+> > int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
 > > {
-> >       device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_spee=
-d);
-> > +
-> > +     memset(&bdev->pcm_params, 0xff, sizeof(bdev->pcm_params));
 >
-> Scrap this memset. We will read the values first.
-
-I added this memset is bcm_of_probe occurs before patchram and without
-setting some magic value in the pcm_params, we don't know which values
-are valid (since 0 has some meaning in the params).
-It doesn't make sense to me to read pcm params outside setup (I want
-patchram to complete first) and it doesn't make sense to do property
-reads inside setup.
-
-
->
-> > +
-> > +     property_read_u8(bdev->dev, "brcm,bt-sco-routing",
-> > +                      &bdev->pcm_params.routing);
-> > +     property_read_u8(bdev->dev, "brcm,bt-pcm-interface-rate",
-> > +                      &bdev->pcm_params.rate);
-> > +     property_read_u8(bdev->dev, "brcm,bt-pcm-frame-type",
-> > +                      &bdev->pcm_params.frame_sync);
-> > +     property_read_u8(bdev->dev, "brcm,bt-pcm-sync-mode",
-> > +                      &bdev->pcm_params.sync_mode);
-> > +     property_read_u8(bdev->dev, "brcm,bt-pcm-clock-mode",
-> > +                      &bdev->pcm_params.clock_mode);
-> > +
-> >       return 0;
-> > }
+> Otherwise this looks good.
 >
 > Regards
 >
 > Marcel
 >
+
+So generally, I've done a whole new patch series with every change.
+Would you prefer to see singular updates on the same email thread or
+should I keep doing new patch series?
