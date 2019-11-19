@@ -2,99 +2,116 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D05CC43215
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EECE8C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:03:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 63EC220872
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:02:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqKi0Iyz"
+	by mail.kernel.org (Postfix) with ESMTP id D1C962082F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 06:03:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729402AbfKSGCZ (ORCPT
+        id S1729784AbfKSFjU convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 01:02:25 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42352 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729126AbfKSGCZ (ORCPT
+        Tue, 19 Nov 2019 00:39:20 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:35537 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730261AbfKSFjS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 01:02:25 -0500
-Received: by mail-wr1-f66.google.com with SMTP id a15so22289964wrf.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2019 22:02:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=P/BlS5+evosPvHmVUYm6S3V3Nm1zq5W5zoFtd5Loxbw=;
-        b=iqKi0Iyze7C5Arl7JoZ403vsIWMOV4I38KahjokaPKFSux6z6d4YAu9KjWjmMNSCKK
-         HI54AsFnjWD5trXH5/zFMSWGXnhY57YOtHrkPrGDB15KNvAFKylVVpIJNSiFhtJvu8Tt
-         yE2B546Vt6D3hkKbtpJtbFiFzXH7c476lYJ9xCqCKS9sJzg4hlnf8UgPbkhqcfAMX9UF
-         MAWfqk3mdtrpb5mogCttH7gmttaSZ0OGurZWObxxw2XJ/hin4/TGLKwUxtAFR+31Ceb1
-         oMEv1QXExiMKWarIgi8s/Sa07FhFmPc3qde59d+5p9xvR2KmiUfCxTUBcv3DFMe54bdh
-         YHEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=P/BlS5+evosPvHmVUYm6S3V3Nm1zq5W5zoFtd5Loxbw=;
-        b=A97yw0cjdu7vbiPuwANKqZvy+6b4Yg4baE6cAMdgDVy1oGEC2mEhgpRtyhrRdlnRPN
-         IxCoTkgh+HbogL47m6DFqcEK9dhyAGz6b+ch00OiPVVbKaGaQvL4DUxhwoT1rFnsNP8f
-         P+3x9nFNf3gFo2ljabh7MNnCu3JF2ZaXHQj/3Eh5wSIK3sTZPEyu/ZoUmc9rYyOETFiu
-         hKr67uN5iEDyRINSIrfN23ifFVq+aa/SAxOylPxOohxLHjTZfIwkEvjlyHd1QLMmf809
-         CKBbl6mKusSJ2qWgEZxMX6upmtaqXWHwpCbUUmbxLlEGzpuvTzXBHw3/nHjCMPsrIli6
-         yiKw==
-X-Gm-Message-State: APjAAAVmbOceEZqTVnb04HyxC2C3YuVAfTA8CgGNwsSAt6z8OPr57iKw
-        IoIze25Ou2mqDjF+0BbmK1Y=
-X-Google-Smtp-Source: APXvYqxcYydXCrYVBqEhFr/ibUYueLvo6f7R+OcQPtZUIs2zXQbwrehFUnLiyVEglTS0ITwZE0n7kQ==
-X-Received: by 2002:adf:9786:: with SMTP id s6mr22769200wrb.188.1574143342972;
-        Mon, 18 Nov 2019 22:02:22 -0800 (PST)
-Received: from mamamia.internal (a89-183-91-150.net-htp.de. [89.183.91.150])
-        by smtp.gmail.com with ESMTPSA id w4sm1791482wmi.39.2019.11.18.22.02.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2019 22:02:22 -0800 (PST)
-From:   Andre Heider <a.heider@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
-        Jernej Skrabec <jernej.skrabec@siol.net>
-Subject: [PATCH v2] bluetooth: bcm: Use HCI_QUIRK_USE_BDADDR_PROPERTY
-Date:   Tue, 19 Nov 2019 07:02:21 +0100
-Message-Id: <20191119060221.3297340-1-a.heider@gmail.com>
-X-Mailer: git-send-email 2.24.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Tue, 19 Nov 2019 00:39:18 -0500
+Received: from marcel-macbook.holtmann.net (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3950ACECED;
+        Tue, 19 Nov 2019 06:48:23 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH v6 3/4] dt-bindings: net: broadcom-bluetooth: Add pcm
+ config
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid>
+Date:   Tue, 19 Nov 2019 06:39:16 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
+        devicetree@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <079C85BE-FBC5-4A2B-9EBF-0CEDB6F30C18@holtmann.org>
+References: <20191118192123.82430-1-abhishekpandit@chromium.org>
+ <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some devices ship with the controller default address, like the
-Orange Pi 3 (BCM4345C5).
+Hi Abhishek,
 
-Allow the bootloader to set a valid address through the device tree.
+> Add documentation for pcm parameters.
+> 
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> ---
+> 
+> Changes in v6: None
+> Changes in v5: None
+> Changes in v4: None
+> Changes in v3: None
+> Changes in v2: None
+> 
+> .../bindings/net/broadcom-bluetooth.txt       | 16 ++++++++++
+> include/dt-bindings/bluetooth/brcm.h          | 32 +++++++++++++++++++
+> 2 files changed, 48 insertions(+)
+> create mode 100644 include/dt-bindings/bluetooth/brcm.h
+> 
+> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> index c749dc297624..8561e4684378 100644
+> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> @@ -29,10 +29,20 @@ Optional properties:
+>    - "lpo": external low power 32.768 kHz clock
+>  - vbat-supply: phandle to regulator supply for VBAT
+>  - vddio-supply: phandle to regulator supply for VDDIO
+> + - brcm,bt-sco-routing: PCM, Transport, Codec, I2S
+> + - brcm,bt-pcm-interface-rate: 128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps
+> + - brcm,bt-pcm-frame-type: short, long
+> + - brcm,bt-pcm-sync-mode: slave, master
+> + - brcm,bt-pcm-clock-mode: slave, master
+> 
+> +See include/dt-bindings/bluetooth/brcm.h for SCO/PCM parameters. The default
+> +value for all these values are 0 (except for brcm,bt-sco-routing which requires
+> +a value) if you choose to leave it out.
+> 
+> Example:
+> 
+> +#include <dt-bindings/bluetooth/brcm.h>
+> +
+> &uart2 {
+>        pinctrl-names = "default";
+>        pinctrl-0 = <&uart2_pins>;
+> @@ -40,5 +50,11 @@ Example:
+>        bluetooth {
+>                compatible = "brcm,bcm43438-bt";
+>                max-speed = <921600>;
+> +
+> +               brcm,bt-sco-routing        = <BRCM_SCO_ROUTING_TRANSPORT>;
 
-Signed-off-by: Andre Heider <a.heider@gmail.com>
----
- drivers/bluetooth/btbcm.c | 1 +
- 1 file changed, 1 insertion(+)
+in case you use transport which means HCI, you would not have values below. It is rather PCM here in the example.
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 2d2e6d862068..9d16162d01ea 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -439,6 +439,7 @@ int btbcm_finalize(struct hci_dev *hdev)
- 	btbcm_check_bdaddr(hdev);
- 
- 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-+	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
- 
- 	return 0;
- }
--- 
-2.24.0
+> +               brcm,bt-pcm-interface-rate = <BRCM_PCM_IF_RATE_512KBPS>;
+> +               brcm,bt-pcm-frame-type     = <BRCM_PCM_FRAME_TYPE_SHORT>;
+> +               brcm,bt-pcm-sync-mode      = <BRCM_PCM_SYNC_MODE_MASTER>;
+> +               brcm,bt-pcm-clock-mode     = <BRCM_PCM_CLOCK_MODE_MASTER>;
+>        };
+> };
+
+And I am asking this again. Is this adding any value to use an extra include file? Inside the driver we are not really needing these values since they are handed to the hardware.
+
+Regards
+
+Marcel
 
