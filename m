@@ -2,77 +2,79 @@ Return-Path: <SRS0=5+i7=ZL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B7BCC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97937C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:19:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D350F2231A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:17:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 657B622317
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Nov 2019 05:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726846AbfKSFRf convert rfc822-to-8bit (ORCPT
+        id S1726647AbfKSFTa convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Nov 2019 00:17:35 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33642 "EHLO
+        Tue, 19 Nov 2019 00:19:30 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:53359 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726836AbfKSFRf (ORCPT
+        with ESMTP id S1725280AbfKSFT3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Nov 2019 00:17:35 -0500
+        Tue, 19 Nov 2019 00:19:29 -0500
 Received: from marcel-macbook.holtmann.net (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 28E48CECED;
-        Tue, 19 Nov 2019 06:26:40 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 47873CECED;
+        Tue, 19 Nov 2019 06:28:35 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH] bluetooth: bcm: Set HCI_QUIRK_USE_BDADDR_PROPERTY for
- default addresses
+Subject: Re: "local-[bd|mac]-address" inconsistency?
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20191118124930.2138112-1-a.heider@gmail.com>
-Date:   Tue, 19 Nov 2019 06:17:33 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
-        Jernej Skrabec <jernej.skrabec@siol.net>
+In-Reply-To: <20191118201551.GJ27773@google.com>
+Date:   Tue, 19 Nov 2019 06:19:28 +0100
+Cc:     Andre Heider <a.heider@gmail.com>, linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C93EA7BC-7CCF-48B1-80DA-FD8DF8F5AF53@holtmann.org>
-References: <20191118124930.2138112-1-a.heider@gmail.com>
-To:     Andre Heider <a.heider@gmail.com>
+Message-Id: <5F04BF9F-B975-41BE-854B-1B11691A0321@holtmann.org>
+References: <57775d51-7de2-a32c-8b23-aba611483f51@gmail.com>
+ <20191118201551.GJ27773@google.com>
+To:     Matthias Kaehlcke <mka@chromium.org>
 X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Andre,
+Hi Matthias,
 
-> Some devices ship with the controller default address, like the
-> Orange Pi 3 (BCM4345C5).
+>> when passing both addresses through device-tree in the same way:
+>> $ hexdump /proc/device-tree/soc/ethernet@5020000/local-mac-address
+>> 0000000 0702 3d96 53d4
+>> 
+>> $ hexdump /proc/device-tree/soc/serial@5000400/bluetooth/local-bd-address
+>> 0000000 0703 3d96 53d4
+>> 
+>> I get this for eth (which is consistent with u-boot):
+>> link/ether 02:07:96:3d:d4:53
+>> 
+>> But for bt it's in reverse order:
+>> Controller 53:D4:3D:96:07:03
+>> 
+>> Is this intended?
 > 
-> Allow the bootloader to set a valid address through the device tree.
+> Kind of.
 > 
-> Signed-off-by: Andre Heider <a.heider@gmail.com>
-> ---
-> drivers/bluetooth/btbcm.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> In both cases the address is specified in the binary format used by BT/NW
+> stack.
 > 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index 2d2e6d862068..e1471777486e 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -79,7 +79,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
-> 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
-> 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
-> 			    &bda->bdaddr);
-> -		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-> +		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-> 	}
+> When BT addresses are printed they are converted from LSB to MSB.
+> 
+>> Do I really have to pass the bdaddr from u-boot in another way?
+> 
+> One could make a case that we don't care what the 'internal' format is and
+> that the BD_ADDR should be specified in MSB format in the DT, and the kernel
+> would be in charge of converting it to LSB. However I fear it is too late to
+> consider a change at this point, since the binding has been in the kernel for
+> 6 months with the current format and existing devices may rely on it.
 
-I am not sure the change is this simple. What happens if you run on a boot-loader that doesn’t provide the address and has an invalid address.
-
-When I allowed HCI_QUIRK_USE_BDADDR_PROPERTY to be added, I stated clearly that the intent was that userspace can handle the address setup and this was pretty much just for the existing hardware where we have some magic boot-loader to do this.
-
-Anyhow, I am fine allowing this here as well. However the HCI_QUIRK_USE_BDADDR_PROPERTY needs to be set unconditionally in the hdev->setup routine. And in case there still is an invalid address we need to stick with invalid address. Right now the code in hci_dev_do_open() operates differently.
+we used a different property name for reason. Even while BD_ADDR is allocated from an OUI space, it has nothing in common with a MAC address.
 
 Regards
 
