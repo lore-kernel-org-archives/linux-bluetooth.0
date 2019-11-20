@@ -2,246 +2,149 @@ Return-Path: <SRS0=VswU=ZM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF9BDC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Nov 2019 10:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63652C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Nov 2019 10:50:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA87F22311
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Nov 2019 10:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EA3B2243F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Nov 2019 10:50:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pBtIVSCs"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Phccrz5b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728410AbfKTKNm (ORCPT
+        id S1728864AbfKTKuG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Nov 2019 05:13:42 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:34871 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728406AbfKTKNm (ORCPT
+        Wed, 20 Nov 2019 05:50:06 -0500
+Received: from mail-lj1-f174.google.com ([209.85.208.174]:39173 "EHLO
+        mail-lj1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728760AbfKTKuG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Nov 2019 05:13:42 -0500
-Received: by mail-wm1-f67.google.com with SMTP id 8so7162622wmo.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2019 02:13:40 -0800 (PST)
+        Wed, 20 Nov 2019 05:50:06 -0500
+Received: by mail-lj1-f174.google.com with SMTP id p18so26983449ljc.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2019 02:50:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PqR1WrZ/2hJ8Wujun3VZMZS2R9VzRc54HDfaX7NEir8=;
-        b=pBtIVSCsMDbTwuvqjRKlM0VfbLkQucnX/8Jkv0dp5HikPjvCszPqIhaZd5exXpCWfm
-         0u6xDz/6E3Lrnt20oYfLB0Gp8hZVfWJsQ75ufvflxq1jxsuZ4bCP4sJZidhVXA8dAlSN
-         dd9M9i++WBl/+PZ+yXmsG2UrLUZ3HPUedSvkNdddLL8vemFXlVKwfSHdp2k8+kZgw0CU
-         bX7ISqyl8vxmaYI/g+fpYehokPu+HoEoWSgV168TMbbaQ2/zEnZBLWS1KBtkhA+ndjdC
-         qL506smOchGE7B6lFV508hl+QVD6flWARCBr85tXiiFQuFJ4umkdFzbJkExa4D4VdUD3
-         Zayw==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lziwnzQ0VV6OaEApFgLdcnyv2faXiVXPEN+aEW8ouIg=;
+        b=Phccrz5bMJ0ooFSTVkqeCY2asqBNJPA5eHoVN3mwS4/vu5AOlxdOkn2g5kDmx2Shwn
+         VBJa9JVxxZ3BsrGzzkGOM8c/GgFtoOCuglXcVO3sNM2SUXnj3k59sM/paK5w1F7JFXWy
+         d39gIvEKGwUQnj0PdkqO4MeMiuMoIKK8Z9kRb4VluI57tnyKlvtZ8MJwlqZ820oznJdk
+         M3gVF4kK5BlhmHwgIySWXtvEaWUxbweY7EXnJdvbaJxvwPipF+rb0M9XMNLyZM9Rs2xh
+         ertn8RVaY2Jxa/ewcab4s2OwA20/PKhhLr+H1LmrB/c+0yTRQCAk/vC+dbAW5baHftRc
+         sK5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=PqR1WrZ/2hJ8Wujun3VZMZS2R9VzRc54HDfaX7NEir8=;
-        b=oczxR3K39vCmrqLE04XNgsydKV9wVqbPmglP1KMwjwqOuMdjMLERuvtZlW3WxbILPB
-         VDm/yDlh8d5DOCsK0Kq5aiE71OdeKYQMi0NNvg4ZzSL2JjQqGj4qT1DzddO0q+wI/tMQ
-         R4xRlzYpEpQRlMwmtZPoR2L4Fzd8lgiikYlQFEcFFlgp9AEe2B72NakuK7hirXl8DZZa
-         DOFO7E7RgR1olSgd4KE4Heue596dw9CaG7xx0cPzz1qHKdgmirkU07+lBWXsNpMzgsmF
-         qzega5s8zIKNUnHcGAfiEchfvtcLBaiTzgjEzfjPsxof8dpDw+/+iToHrZpQWdPLPb2H
-         KQ5A==
-X-Gm-Message-State: APjAAAWu8t0I9wkeJbi5T1syb6Kc9iMQpEw1erop7FOSeBPsuoQ7BMkj
-        d4WnNdXy2KT6fZtyqCp/C9MUoxGL
-X-Google-Smtp-Source: APXvYqw2i7m8DU1Eu0Drskg+/RUqfXr/m0gTRVS77vrn4ARkEEfLmmW/rTrFcuSUN1UQACdCalbjMw==
-X-Received: by 2002:a1c:2bc2:: with SMTP id r185mr2135911wmr.91.1574244819502;
-        Wed, 20 Nov 2019 02:13:39 -0800 (PST)
-Received: from mamamia.internal (a89-183-94-28.net-htp.de. [89.183.94.28])
-        by smtp.gmail.com with ESMTPSA id z9sm30839805wrv.35.2019.11.20.02.13.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Nov 2019 02:13:38 -0800 (PST)
-Subject: Re: [PATCH v2] bluetooth: bcm: Use HCI_QUIRK_USE_BDADDR_PROPERTY
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
-        Jernej Skrabec <jernej.skrabec@siol.net>
-References: <20191119060221.3297340-1-a.heider@gmail.com>
- <4DB6C9B7-8454-449C-90B4-4A1B3AD82495@holtmann.org>
- <e813a126-f0fc-afe8-ad4c-5296f0a2dc06@gmail.com>
- <F632534C-C9CC-4F4F-AA58-F4FC053D4226@holtmann.org>
- <ffa83108-2c0f-26eb-3860-892f65a6e9bd@gmail.com>
- <964E03C9-B14A-4F6A-A6A2-1F52832D4971@holtmann.org>
-From:   Andre Heider <a.heider@gmail.com>
-Message-ID: <416386e4-b9fb-2e6e-05b9-3a3ae8d0a7aa@gmail.com>
-Date:   Wed, 20 Nov 2019 11:13:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        bh=lziwnzQ0VV6OaEApFgLdcnyv2faXiVXPEN+aEW8ouIg=;
+        b=JeSNj81WUzko6QOSlaqRENj8PWP4gY+uzj08EsQX9WLQiWWDvqmUchi8Eo5MnWChJ2
+         MALNduKtKUu+tehM8hY9lpXBjmDTsI4bGSb+rbxTRMAhYN7XIHApjCYPJ6/yC/mO0oQ3
+         dF4UK/Y/tpIJ2xcP0ezd7EygkI7wsyKAVOFl4FZFH8/8GotnYIb6EiOKIztvEzRIqHj0
+         j1uGkpNKdHKHT5Ig69kPHzE8wqWhydhummy37y9AVVyF3vw8cXSClj27nD29Bv8rw9tM
+         Km2GttpaOjhbOjPIv6HHWnD2JbIbUr6hG9RgSl1Eu+VbrhBsOrjPm0iz8USiDM2cq+Bc
+         waCA==
+X-Gm-Message-State: APjAAAUvfnoRTifBzsfUrjNp2tsn6+p1UKovtnnCEALNSRzJx9wi/oju
+        mPExFmFBQ6uBO2v46NW06ArDPvFHmZc=
+X-Google-Smtp-Source: APXvYqy6pPzGQ5revvQgKPnfRJKLK1WEqJL+40z9fZ4xVoXI3/9ClovaJe8WFkEvFbTRDVK+WlWVjA==
+X-Received: by 2002:a2e:9a95:: with SMTP id p21mr2056370lji.175.1574247002402;
+        Wed, 20 Nov 2019 02:50:02 -0800 (PST)
+Received: from localhost.localdomain ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id t13sm11299830ljo.70.2019.11.20.02.50.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Nov 2019 02:50:01 -0800 (PST)
+From:   =?UTF-8?q?Rafa=C5=82=20Gajda?= <rafal.gajda@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?Rafa=C5=82=20Gajda?= <rafal.gajda@silvair.com>
+Subject: [PATCH BlueZ v2] mesh: Fix names of dbus management interface input arguments
+Date:   Wed, 20 Nov 2019 11:49:50 +0100
+Message-Id: <20191120104950.7904-1-rafal.gajda@silvair.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-In-Reply-To: <964E03C9-B14A-4F6A-A6A2-1F52832D4971@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Previously names for method arguments in "org.bluez.mesh.Management1"
+would not register properly, being shifted by one:
+	<method name="ImportRemoteNode">
+		 <arg name="" type="q" direction="in"/>
+		 <arg name="primary" type="y" direction="in"/>
+		 <arg name="count" type="ay" direction="in"/>
+	 </method>
 
-On 19/11/2019 13:30, Marcel Holtmann wrote:
-> Hi Andre,
-> 
->>>>>> Some devices ship with the controller default address, like the
->>>>>> Orange Pi 3 (BCM4345C5).
->>>>>>
->>>>>> Allow the bootloader to set a valid address through the device tree.
->>>>>>
->>>>>> Signed-off-by: Andre Heider <a.heider@gmail.com>
->>>>>> ---
->>>>>> drivers/bluetooth/btbcm.c | 1 +
->>>>>> 1 file changed, 1 insertion(+)
->>>>>>
->>>>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->>>>>> index 2d2e6d862068..9d16162d01ea 100644
->>>>>> --- a/drivers/bluetooth/btbcm.c
->>>>>> +++ b/drivers/bluetooth/btbcm.c
->>>>>> @@ -439,6 +439,7 @@ int btbcm_finalize(struct hci_dev *hdev)
->>>>>> 	btbcm_check_bdaddr(hdev);
->>>>>>
->>>>>> 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
->>>>>> +	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
->>>>>>
->>>>>> 	return 0;
->>>>>> }
->>>>> have you actually tested this? I might be mistaken, but the code that I read in hci_dev_do_open() would drop this into unconfigured state since HCI_QURIK_INVALID_BDADDR is still set.
->>>>
->>>> I thought so, but double-checking something obviously failed...
->>>>
->>>> What would be an acceptable solution to this HCI_QUIRK_USE_BDADDR_PROPERTY|HCI_QUIRK_INVALID_BDADDR situation?
->>>>
->>>> Getting rid of the quirk in the driver in e.g. set_bdaddr() doesn't sound right.
->>>>
->>>> How about:
->>>>
->>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>>> index 04bc79359a17..7bc384be89f8 100644
->>>> --- a/net/bluetooth/hci_core.c
->>>> +++ b/net/bluetooth/hci_core.c
->>>> @@ -1470,7 +1470,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
->>>>          * start up as unconfigured.
->>>>          */
->>>>         if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
->>>> -           test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks))
->>>> +           (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
->>>> +            !test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)))
->>>>             hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
->>>>
->>>>         /* For an unconfigured controller it is required to
->>>>
->>>> That works for me (double-checked this time ;)
->>> I am not sure yet. I mean we define what HCI_QUIRK_USE_BDADDR_PROPERTY actually means. Right now it means this:
->>> 1) Run though ->setup
->>> 2) If no public BD_ADDR is set, then try to read from DT
->>> 3) If found, try to set, if set fails, abort dev_up
->>> Now there is also another problem that no public BD_ADDR means BDADDR_ANY right now. Which means, for Broadcom chips that is never the case. So HCI_QUIRK_USE_BDADDR_PROPERTY doesn’t even work since their invalid addresses are not BDDADDR_ANY.
->>> The first change needs to be something along these lines:
->>>                  if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
->>> -                       if (!bacmp(&hdev->public_addr, BDADDR_ANY))
->>> +                       if (!bacmp(&hdev->public_addr, BDADDR_ANY) ||
->>> +                           test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks))
->>>                                  hci_dev_get_bd_addr_from_property(hdev);
->>
->> Maybe I misunderstood, but just for the record: It works for me even without this hunk (with just my hunk above and the v2 bcm patch). The bdaddr via dt is used and the controller works without any userland interaction.
-> 
-> then please have a btmon trace and check what BD_ADDR is returned from the Read_BD_Addr command. It could be well that hdev->public_addr is not yet populated with the Broadcom specific hdev->setup and thus it does work. However what happens for the hardware that requires to re-run hdev->setup every time. As I said, we need to get the semantics figure out on what we expect things to be when these quirks are provided.
+ This fixes this issue:
+	 <method name="ImportRemoteNode">
+		 <arg name="primary" type="q" direction="in"/>
+		 <arg name="count" type="y" direction="in"/>
+		 <arg name="dev_key" type="ay" direction="in"/>
+	 </method>
+---
 
-Ok, so here's what I did:
-- rmmod bt modules
-- start btmon
-- modprobe 'em again
+v2 - Fixed coding standard
 
-The relevant part looks like:
-< HCI Command: Read BD ADDR (0x04|0x0009) plen 0 
-               #279 [hci0] 95.691010
- > HCI Event: Command Complete (0x0e) plen 10 
-                #280 [hci0] 95.691727
-       Read BD ADDR (0x04|0x0009) ncmd 1
-         Status: Success (0x00)
-         Address: 43:45:C5:00:1F:AC (OUI 43-45-C5)
-...
-< HCI Command: Broadcom Write BD ADDR (0x3f|0x0001) plen 6 
-               #283 [hci0] 95.692816
-         Address: 02:07:96:3D:D4:52 (OUI 02-07-96)
- > HCI Event: Command Complete (0x0e) plen 4 
-                #284 [hci0] 95.693859
-       Broadcom Write BD ADDR (0x3f|0x0001) ncmd 1
-         Status: Success (0x00)
-< HCI Command: Reset (0x03|0x0003) plen 0 
-               #285 [hci0] 95.693946
- > HCI Event: Command Complete (0x0e) plen 4 
-                #286 [hci0] 95.697468
-       Reset (0x03|0x0003) ncmd 1
-         Status: Success (0x00)
-...
-< HCI Command: Read BD ADDR (0x04|0x0009) plen 0 
-               #291 [hci0] 95.698995
- > HCI Event: Command Complete (0x0e) plen 10 
-                #292 [hci0] 95.699851
-       Read BD ADDR (0x04|0x0009) ncmd 1
-         Status: Success (0x00)
-         Address: 02:07:96:3D:D4:52 (OUI 02-07-96)
+ mesh/manager.c | 30 ++++++++++++++----------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
 
-So it seems it gets BDADDR_BCM4345C5 first but a reset after 
-set_bdaddr(what-I-passed-via-devicetree) makes this work?
-
-> What happens on a system that has the patch and doesn’t provide an address via DT?
-
-How about something like (not even compile tested):
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 04bc79359a17..40c6cc6bd35f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1385,6 +1385,7 @@ static void 
-hci_dev_get_bd_addr_from_property(struct hci_dev *hdev)
-  static int hci_dev_do_open(struct hci_dev *hdev)
-  {
-     int ret = 0;
-+   bool valid_bdaddr = false;
-
-     BT_DBG("%s %p", hdev->name, hdev);
-
-@@ -1457,9 +1458,11 @@ static int hci_dev_do_open(struct hci_dev *hdev)
-                 hci_dev_get_bd_addr_from_property(hdev);
-
-             if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
--               hdev->set_bdaddr)
-+               hdev->set_bdaddr) {
-                 ret = hdev->set_bdaddr(hdev,
-                                &hdev->public_addr);
-+               valid_bdaddr = ret == 0;
-+           }
-         }
-
-  setup_failed:
-@@ -1469,8 +1472,11 @@ static int hci_dev_do_open(struct hci_dev *hdev)
-          * In case any of them is set, the controller has to
-          * start up as unconfigured.
-          */
-+       if (!valid_bdaddr)
-+           valid_bdaddr = !test_bit(HCI_QUIRK_INVALID_BDADDR, 
-&hdev->quirks);
-+
-         if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
--           test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks))
-+           !valid_bdaddr)
-             hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
-
-         /* For an unconfigured controller it is required to
-
-> 
-> Just thinking out loud, maybe a hdev->pre_init callback is actually useful. Actually maybe better a hdev->post_setup. Then again, the hdev->post_init seems to have not been used actually.
-> 
-> Regards
-> 
-> Marcel
-> 
+diff --git a/mesh/manager.c b/mesh/manager.c
+index adbb01280..1fb9df5e6 100644
+--- a/mesh/manager.c
++++ b/mesh/manager.c
+@@ -750,36 +750,34 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
+ 
+ static void setup_management_interface(struct l_dbus_interface *iface)
+ {
+-	l_dbus_interface_method(iface, "AddNode", 0, add_node_call, "", "ay",
+-								"uuid");
++	l_dbus_interface_method(iface, "AddNode", 0, add_node_call,
++							"", "ay", "uuid");
+ 	l_dbus_interface_method(iface, "ImportRemoteNode", 0, import_node_call,
+-						"", "qyay", "", "primary",
+-						"count", "dev_key");
++				"", "qyay", "primary", "count", "dev_key");
+ 	l_dbus_interface_method(iface, "DeleteRemoteNode", 0, delete_node_call,
+-					"", "qy", "", "primary", "count");
++						"", "qy", "primary", "count");
+ 	l_dbus_interface_method(iface, "UnprovisionedScan", 0, start_scan_call,
+-							"", "q", "", "seconds");
++							"", "q", "seconds");
+ 	l_dbus_interface_method(iface, "UnprovisionedScanCancel", 0,
+ 						cancel_scan_call, "", "");
+ 	l_dbus_interface_method(iface, "CreateSubnet", 0, create_subnet_call,
+-						"", "q", "", "net_index");
++							"", "q", "net_index");
+ 	l_dbus_interface_method(iface, "UpdateSubnet", 0, update_subnet_call,
+-						"", "q", "", "net_index");
++							"", "q", "net_index");
+ 	l_dbus_interface_method(iface, "DeleteSubnet", 0, delete_subnet_call,
+-						"", "q", "", "net_index");
++							"", "q", "net_index");
+ 	l_dbus_interface_method(iface, "ImportSubnet", 0, import_subnet_call,
+-					"", "qay", "", "net_index", "net_key");
++					"", "qay", "net_index", "net_key");
+ 	l_dbus_interface_method(iface, "CreateAppKey", 0, create_appkey_call,
+-					"", "qq", "", "net_index", "app_index");
++					"", "qq", "net_index", "app_index");
+ 	l_dbus_interface_method(iface, "UpdateAppKey", 0, update_appkey_call,
+-						"", "q", "", "app_index");
++							"", "q", "app_index");
+ 	l_dbus_interface_method(iface, "DeleteAppKey", 0, delete_appkey_call,
+-						"", "q", "", "app_index");
++							"", "q", "app_index");
+ 	l_dbus_interface_method(iface, "ImportAppKey", 0, import_appkey_call,
+-				"", "qqay", "", "net_index", "app_index",
+-								"app_key");
++			"", "qqay", "net_index", "app_index", "app_key");
+ 	l_dbus_interface_method(iface, "SetKeyPhase", 0, set_key_phase_call,
+-					"", "qy", "", "net_index", "phase");
++						"", "qy", "net_index", "phase");
+ }
+ 
+ bool manager_dbus_init(struct l_dbus *bus)
+-- 
+2.22.0
 
