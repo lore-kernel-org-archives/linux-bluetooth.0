@@ -2,94 +2,124 @@ Return-Path: <SRS0=kdk/=ZN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 694C9C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 14:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E4EC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 15:48:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3557A20656
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 14:41:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 798AD206B6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 15:48:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+n8iBTp"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Hl/P40rf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfKUOlo (ORCPT
+        id S1726563AbfKUPss (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Nov 2019 09:41:44 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37530 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726396AbfKUOlo (ORCPT
+        Thu, 21 Nov 2019 10:48:48 -0500
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:43076 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726279AbfKUPsr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Nov 2019 09:41:44 -0500
-Received: by mail-pg1-f193.google.com with SMTP id b10so1704096pgd.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Nov 2019 06:41:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=v3HAeKTDuYmzuUaQeHubT3yslGYo+k+ZzrAxM1aVtS8=;
-        b=i+n8iBTpBDyR7d1J6RtX8F5T4vMMF7N4HmEspmZj3advGjog/V50F9QptSF0+XQKqx
-         08qEAs1AEWkO2pQrNWz1q5FvDK1tBXeU75RwsQkuAKSFLnLVr1M8P7T1Lwn4nMvgWNBc
-         dPzZ2QdqMShypk+VuXSamMvK10C/3Gq9nnsWtmJQ/9OuXEdaJMYVMhaAAGgjtanIAT3y
-         iMlmC/geLgks3LIExOHzkiOP9ficC5yvuN6TVDj7Jk9gxQXW+tR63bqhNrel8+k1BG65
-         HzIU4TX+iP4t8cPyRdW+LnZWlCPSBqcmy1MWsdw4NxkhfMHeYKsGUk5rOfLxpI2SCEXi
-         RRdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=v3HAeKTDuYmzuUaQeHubT3yslGYo+k+ZzrAxM1aVtS8=;
-        b=F3Dn/nrTo7JHJD3Ym2s0WcPAC47zmimDMcqCJdwfsgwZTxOulIiPLlprONPBHRqLul
-         aEwSTIfxLQzwICSquEsnDpbSMHl/9KsFIL+8K7XWy389CfpWcA2xFoBquaN8qmmVWi9P
-         7/tIGCbuxjL3mt0dw0Fj2ZPe7KeTYoS13IM5iUrKODh07/CX+xyhsgwZVK2NhPnKAgf0
-         ZaBmJ26xGN5xp+cV3TIccXRG08SM2GVw5Ae72cSKHiTVGsWNc3Vx9tlwvDTzctmoCAZV
-         gQO52lneu7UUvnY+CBcE/tsglPVkYI47dtdjVgQD9rfcIeqhefsjYoirWTQgOqiaJ7hK
-         EZwA==
-X-Gm-Message-State: APjAAAUw7+pJa6Q8/1chm6xRqrwUFSsw3JNOiOmTFI3EIgDya2WSLKPn
-        d+ERjaroR+H+HZPga5LDmgZ3EjmZE8s=
-X-Google-Smtp-Source: APXvYqxGTOS8Qjz/Ajtx8lq8LeTYK3WaWBc5b4rrVS4gJCPE3fHGDQ5XA4M01XSas29SE+2oNI/ksA==
-X-Received: by 2002:a62:e316:: with SMTP id g22mr11262246pfh.19.1574347303782;
-        Thu, 21 Nov 2019 06:41:43 -0800 (PST)
-Received: from localhost (jfdmzpr04-ext.jf.intel.com. [134.134.137.73])
-        by smtp.gmail.com with ESMTPSA id f19sm4117170pfk.109.2019.11.21.06.41.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2019 06:41:42 -0800 (PST)
-Date:   Thu, 21 Nov 2019 16:41:38 +0200
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Move error check into the right if-clause
-Message-ID: <20191121144138.GA70662@vaespino-mobl1.amr.corp.intel.com>
-Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-References: <20191121075130.92705-1-marcel@holtmann.org>
+        Thu, 21 Nov 2019 10:48:47 -0500
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xALFaKXH007714;
+        Thu, 21 Nov 2019 07:48:43 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0818;
+ bh=o/oIGGHPmwt5MFTKPl2GcISKabBWhPBOdPXPhlV+8H8=;
+ b=Hl/P40rfoZn9RY7pB+WBUA7Q6Dx0P3/ihbAvgGys0xszdawmnmK2yxI9iQLOyjUSrTBd
+ OMhoiIYhV6wl4EXe3bLvuCT18N8Jzuk+F5OOOkCf08799NFQ8Zn8TCuGVKKNsI3HCruH
+ l6wK7pSkUlbiWvZMuwe0F8XzAG9El0B/LeNkRGWg/ATTa0yyjpQC38ctLK3L1z0K0S/6
+ xkPqqMVs9aBa10CFfF90ftdO1iBffnuWhwS2YE3ECPnajpDDaDiZbrse8N0Btxm4rcbd
+ loTpoaCfjA/zbdUeh446u73H7/mNUHkCGUJGSY/rcY3BmzqlQJl7FoCHLVG3t6oN7Bxy gQ== 
+Received: from sc-exch01.marvell.com ([199.233.58.181])
+        by mx0a-0016f401.pphosted.com with ESMTP id 2wc842e6jx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Thu, 21 Nov 2019 07:48:43 -0800
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Thu, 21 Nov
+ 2019 07:48:41 -0800
+Received: from maili.marvell.com (10.93.176.43) by SC-EXCH03.marvell.com
+ (10.93.176.83) with Microsoft SMTP Server id 15.0.1367.3 via Frontend
+ Transport; Thu, 21 Nov 2019 07:48:41 -0800
+Received: from testmailhost.marvell.com (testmailhost.marvell.com [10.31.130.105])
+        by maili.marvell.com (Postfix) with ESMTP id 3F2F33F7041;
+        Thu, 21 Nov 2019 07:48:39 -0800 (PST)
+From:   Ganapathi Bhat <gbhat@marvell.com>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     Cathy Luo <cluo@marvell.com>, Zhiyuan Yang <yangzy@marvell.com>,
+        James Cao <jcao@marvell.com>,
+        Rakesh Parmar <rakeshp@marvell.com>,
+        Brian Norris <briannorris@chromium.org>,
+        Mohammad Tausif Siddiqui <msiddiqu@redhat.com>,
+        huangwen <huangwenabc@gmail.com>,
+        Ganapathi Bhat <gbhat@marvell.com>
+Subject: [PATCH] mwifiex: fix possible heap overflow in mwifiex_process_country_ie()
+Date:   Thu, 21 Nov 2019 21:18:36 +0530
+Message-ID: <1574351316-7533-1-git-send-email-gbhat@marvell.com>
+X-Mailer: git-send-email 1.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191121075130.92705-1-marcel@holtmann.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-21_03:2019-11-21,2019-11-21 signatures=0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+mwifiex_process_country_ie() function parse elements of bss
+descriptor in beacon packet. When processing WLAN_EID_COUNTRY
+element, there is no upper limit check for country_ie_len before
+calling memcpy. The destination buffer domain_info->triplet is an
+array of length MWIFIEX_MAX_TRIPLET_802_11D(83). The remote
+attacker can build a fake AP with the same ssid as real AP, and
+send malicous beacon packet with long WLAN_EID_COUNTRY elemen
+(country_ie_len > 83). Attacker can  force STA connect to fake AP
+on a different channel. When the victim STA connects to fake AP,
+will trigger the heap buffer overflow. Fix this by checking for
+length and if found invalid, don not connect to the AP.
 
-On Thu, Nov 21, 2019, Marcel Holtmann wrote:
-> The if-clause for hdev->setup should also include the error handling
-> since that is where the error really comes from. The code currently
-> works correctly since ret=0 is assigned early on, but it is a lot
-> harder to read and understand.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+This fix addresses CVE-2019-14895.
 
-Both patches in this set have been applied to bluetooth-next. Thanks.
+Reported-by: huangwen <huangwenabc@gmail.com>
+Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+---
+ drivers/net/wireless/marvell/mwifiex/sta_ioctl.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/drivers/net/wireless/marvell/mwifiex/sta_ioctl.c b/drivers/net/wireless/marvell/mwifiex/sta_ioctl.c
+index 74e5056..6dd835f 100644
+--- a/drivers/net/wireless/marvell/mwifiex/sta_ioctl.c
++++ b/drivers/net/wireless/marvell/mwifiex/sta_ioctl.c
+@@ -229,6 +229,14 @@ static int mwifiex_process_country_ie(struct mwifiex_private *priv,
+ 			    "11D: skip setting domain info in FW\n");
+ 		return 0;
+ 	}
++
++	if (country_ie_len >
++	    (IEEE80211_COUNTRY_STRING_LEN + MWIFIEX_MAX_TRIPLET_802_11D)) {
++		mwifiex_dbg(priv->adapter, ERROR,
++			    "11D: country_ie_len overflow!, deauth AP\n");
++		return -EINVAL;
++	}
++
+ 	memcpy(priv->adapter->country_code, &country_ie[2], 2);
+ 
+ 	domain_info->country_code[0] = country_ie[2];
+@@ -272,8 +280,9 @@ int mwifiex_bss_start(struct mwifiex_private *priv, struct cfg80211_bss *bss,
+ 	priv->scan_block = false;
+ 
+ 	if (bss) {
+-		if (adapter->region_code == 0x00)
+-			mwifiex_process_country_ie(priv, bss);
++		if (adapter->region_code == 0x00 &&
++		    mwifiex_process_country_ie(priv, bss))
++			return -EINVAL;
+ 
+ 		/* Allocate and fill new bss descriptor */
+ 		bss_desc = kzalloc(sizeof(struct mwifiex_bssdescriptor),
+-- 
+1.9.1
+
