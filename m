@@ -2,130 +2,121 @@ Return-Path: <SRS0=kdk/=ZN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF3FC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 21:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B57EDC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 21:29:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BDD52067D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 21:14:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="pcYHqTUe"
+	by mail.kernel.org (Postfix) with ESMTP id 8B00F206CB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Nov 2019 21:29:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574371771;
+	bh=U53XELPVQBxyME9omhwr/QuHDvHmFV5UGcb4/wYxHbU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=p7nwKWzRDmrN8i/Ms0UdDNMlaz4WGp7FgTrFs/qYjZWsC4QunivcrODaAUfSSaWm5
+	 RpiT7r46qT8OiA2kYO30s1Tpc7li0By7ylC5y5DcjzEsW41q+ZNdGfuS6gAyzZqTHv
+	 +yCARBSveVDSmJN5P0aVJNPaa6lEuyueIwxd0dRw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfKUVOW (ORCPT
+        id S1726729AbfKUV31 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Nov 2019 16:14:22 -0500
-Received: from mga12.intel.com ([192.55.52.136]:2909 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726293AbfKUVOW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Nov 2019 16:14:22 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Nov 2019 13:14:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,227,1571727600"; 
-   d="scan'208";a="210222921"
-Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
-  by orsmga006.jf.intel.com with ESMTP; 21 Nov 2019 13:14:21 -0800
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 21 Nov 2019 13:14:21 -0800
-Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.51) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Thu, 21 Nov 2019 13:14:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=njZFxZg8qjYphsxXG9fFPq7e/IQKY1SxJwhZof35u3bO5Z6hxXYMOD8NbqbvkZr5F6i+QWN4/soR2e4LSAcVvL3mqzkSfaLXNesml44T68sGwLDrFpOg/t88tPNunic7E+3WNBatd88tRy5cJE+h6hxO73juG6WY9YVZw9LYJByazp1izEDbZL1cG9AtU5lJs1HzapTVEWIIa4xTEeRCY/dt1BQJ6yVwcAm7W34sKtlntVoEqvqj7zq2xfNtb+Ydpk4PmZoA26Ua5upReBIT+DIq8umbyeLiym6f8i90sdzMuY24QnoXuFvb3NuD21CVYuDXY4rH0DEC2LsUqUpG7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MQrN6jEEIUy5pOEw+ghJElcptBny1Whe2WEwKII+S4Y=;
- b=Ekw5JqW/ouUxg1/d8LaWFZPL+eAAQNA7aL+OrRo9Zqp0CuYPgahdOQWmItYMdQY0TiykRlJO/nBhSujNYStV5zMViLGNAexFkG2RtbUlbU4ajKHhkK8PclDiPJwUwEvHzZ255AR7OI205Qt7eJVzkh75VBQcFrfEoegWPqDY5bsvKS7vA7lABK9E3AT5NakgWh+BovTLQleP89icuEZdFeuaJMVXe06M+BOOzJWHrcKf5BAF3H1NboBFHZ8kyWMG0aN3t3MNErXpqvtVpcqWY55WF7fUUOr/xL8Dl+kvTAVMQ7Vs/QfCALv1t2eOaurvVF9wJNPrSyWEjngqS8YcuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MQrN6jEEIUy5pOEw+ghJElcptBny1Whe2WEwKII+S4Y=;
- b=pcYHqTUee/d3dbHrTCazLK+HQSN1cn5e+ozwIryRAPrtzO0QNGyuWkMuMgbjwHCiE3Y10NmTblRgYMXv/JiBkXcQkqMFkwHcAiL8Q5aLWg8sjJRVZvJLt8jOzJ/DuuW9Ihz2CXUrJYtYWifVYgQ7WpYHVm2sQ+2ClQsM6f45VmU=
-Received: from CY4PR1101MB2262.namprd11.prod.outlook.com (10.172.76.7) by
- CY4PR1101MB2184.namprd11.prod.outlook.com (10.174.54.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.28; Thu, 21 Nov 2019 21:14:19 +0000
-Received: from CY4PR1101MB2262.namprd11.prod.outlook.com
- ([fe80::44:eac4:f8c8:ad06]) by CY4PR1101MB2262.namprd11.prod.outlook.com
- ([fe80::44:eac4:f8c8:ad06%11]) with mapi id 15.20.2451.031; Thu, 21 Nov 2019
- 21:14:18 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ 0/2] Include destination address in MessageReceived
- API
-Thread-Topic: [PATCH BlueZ 0/2] Include destination address in MessageReceived
- API
-Thread-Index: AQHVnibLcvuir4OpSkScxr1NbOV+EaeVTF+AgADYlYA=
-Date:   Thu, 21 Nov 2019 21:14:18 +0000
-Message-ID: <41658354b81f6ff078b62f32aa1e21847286f5d2.camel@intel.com>
-References: <20191118154147.3589-1-michal.lowas-rzechonek@silvair.com>
-         <20191121081905.zb4m5gqj5kywjl3v@mlowasrzechonek2133>
-In-Reply-To: <20191121081905.zb4m5gqj5kywjl3v@mlowasrzechonek2133>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [192.55.54.40]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 425f8611-778d-449a-2c71-08d76ec7c59f
-x-ms-traffictypediagnostic: CY4PR1101MB2184:
-x-ms-exchange-purlcount: 1
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR1101MB21841155EE7981B61884F0A3E14E0@CY4PR1101MB2184.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0228DDDDD7
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39850400004)(396003)(346002)(376002)(136003)(366004)(199004)(189003)(81156014)(3846002)(8676002)(6116002)(25786009)(446003)(11346002)(2616005)(4001150100001)(6246003)(5660300002)(107886003)(2906002)(81166006)(8936002)(71190400001)(71200400001)(14454004)(256004)(15650500001)(91956017)(2501003)(76116006)(508600001)(66946007)(66476007)(26005)(6486002)(66446008)(7736002)(6436002)(6512007)(6306002)(99286004)(305945005)(118296001)(4744005)(110136005)(966005)(86362001)(76176011)(66066001)(316002)(4326008)(6506007)(186003)(229853002)(102836004)(36756003)(66556008)(64756008)(6606295002);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR1101MB2184;H:CY4PR1101MB2262.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xWyf0aaHSqEpxWSzS+rao9tUVljaaY2lKOwnQUrldL5duWTE6JDe3d5zMe/MEazzt6IcniobwgX/iFGfEVRQzouW/gg0198ANFIfV0uaN5i1T2btOnuovjWe0gg1UsTztED21LZFqZp9Wf9J3dWHYJveJ75tcoFmWDRcdp6hTFjIrOYfUtIDfUkWuU5ZYC+MCugMCjFwMRbBfUBcg2h/4Rrby42QVl+yY1KVtn1BFP2zWUF5Xsi2QeBKVCu2iw8yBbKxk2ODl1sNAcCekAu7Nwgwyo7gSd7iPF29d103Sxt5LX1zk3feK+JMFTWuB/BqbLxMAtMOzCKFgQltkMOOn+ajzGPF7ojEofDy2GtLWGrfNmYeD+Pc3kJXhHYu29cyJY4gnmYt7pGpPqgktSwom0p029cnBw43SQL4iPjzMj7XElCAOFv4OHjKw/ATy1VSAm27SjJdPpufa886f8E2hHydVCwLgUjHorI+qTFlWzk=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A8FD1DD72A053E4A9911EDDF185AA117@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Thu, 21 Nov 2019 16:29:27 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:34884 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726380AbfKUV30 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 21 Nov 2019 16:29:26 -0500
+Received: by mail-oi1-f196.google.com with SMTP id n16so4629170oig.2;
+        Thu, 21 Nov 2019 13:29:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=eGbzdNGOz3Yt/u7Eg4Uy04gh1oqlzxGRM1Q5IoNwLyo=;
+        b=oq+KBdWNqg48CN7mCNZVLmMylCyaroBTDIEad25MjBX1Nsfxk6oI9UOgM+OK0lMx0p
+         WX6qldlPHvNMCsK4LJ7JoxVdD8P13Lh6Ib/PyNl11JAGqQTPQjtTYgn8Yc9bNusfeUj0
+         nOJHT4lyww1SA8KTP8fFXiPGj8XwecCEXa6dHR3lO5S3gGTktPIEEFDo09simKLYLpHE
+         ST1agA4yZ+kZC/ldtN0ySbFF1HWU8U0IPCZBpFr6N9SJCnWrTVmEsmb4AFYQ0kE19kfv
+         PtRE7ICNjDHHHZT+NlUKEoD7zeov93v10T//Ist0nD8hNmAvB358hTUL/Lc4fAd6+sda
+         znDA==
+X-Gm-Message-State: APjAAAW9hIvuWaOOql1cVmLXAMfM0LBUVgzhSLo0Z/AiwWsAG4b+fRSC
+        PsjQbEal8nNGs6AYvmjzJg==
+X-Google-Smtp-Source: APXvYqzotq60JyOQtDHz/zQ7q1sK4SuGVHd+xXyqMSXmeZsC7zXDHbM2laGjpVcYF8WIemWHY5+y9Q==
+X-Received: by 2002:aca:57d7:: with SMTP id l206mr9713923oib.32.1574371764980;
+        Thu, 21 Nov 2019 13:29:24 -0800 (PST)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id m20sm1408047otr.47.2019.11.21.13.29.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2019 13:29:24 -0800 (PST)
+Date:   Thu, 21 Nov 2019 15:29:23 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, dianders@chromium.org,
+        devicetree@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ondrej Jirman <megous@megous.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>
+Subject: Re: [PATCH v6 3/4] dt-bindings: net: broadcom-bluetooth: Add pcm
+ config
+Message-ID: <20191121212923.GA24437@bogus>
+References: <20191118192123.82430-1-abhishekpandit@chromium.org>
+ <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 425f8611-778d-449a-2c71-08d76ec7c59f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2019 21:14:18.7395
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2rlrXKHWFzHZ6XdxKk8IIcL9/ITrNWPygHjSKZyYvdEZ7E8LszKIN2+9Qe50GPwyhztDYMg+9J9cL7q2W2lQew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1101MB2184
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGHFgiwNCg0KT24gVGh1LCAyMDE5LTExLTIxIGF0IDA5OjE5ICswMTAwLCBNaWNoYcWC
-IExvd2FzLVJ6ZWNob25layB3cm90ZToNCj4gSGkgQnJpYW4NCj4gDQo+IE9uIDExLzE4LCBNaWNo
-YcWCIExvd2FzLVJ6ZWNob25layB3cm90ZToNCj4gPiBUaGlzIHBhdGNoc2V0IGNoYW5nZXMgdGhl
-IE1lc3NhZ2VSZWNlaXZlZCBBUEksIHJlcGxhY2luZyAnc3Vic2NyaXB0aW9uJw0KPiA+IGZsYWcg
-d2l0aCBkZXN0aW5hdGlvbiBhZGRyZXNzIG9mIHJlY2VpdmVkIG1lc3NhZ2VzLg0KPiA+IA0KPiA+
-IFRoZSBhcHBsaWNhdGlvbiByZWNlaXZlcyBkZXN0aW5hdGlvbiBhZGRyZXNzIGFzIGEgRC1CdXMg
-dmFyaWFudCwNCj4gPiBjb250YWluaW5nIGVpdGhlciBhcyBhIHJlZ3VsYXIgMTZiaXQgYWRkcmVz
-cyAodW5pY2FzdC9ncm91cCkgb3IgYQ0KPiA+IDE2LW9jdGV0IHZpcnR1YWwgbGFiZWwuDQo+ID4g
-DQo+ID4gU2VlIHByZXZpb3VzIGRpc2N1c3Npb24gaHR0cHM6Ly9tYXJjLmluZm8vP3Q9MTU2NzE5
-MDY3MzAwMDAxJnI9MSZ3PTIgZm9yDQo+ID4gcmF0aW9uYWxlLg0KPiANCj4gQW55IGNvbW1lbnRz
-IGFib3V0IHRoZSBwYXRjaHNldD8gSWYgdGhlIGNoYW5nZSBpdHNlbGYgbG9va3MgT0ssIEknbQ0K
-PiBoYXBweSB0byBpbXByb3ZlIHRoZSBwYXRjaCBpZiBuZWVkZWQuDQoNCg0KSSB0aGluayB3ZSB3
-b3VsZCBsaWtlIHRoZSBmb2xsb3dpbmc6DQoNCjEuIE1ha2UgQVBJIGNoYW5nZXMgdG8gTWVzc2Fn
-ZVJlY2VpdmVkKCkgaW4gdGVzdC90ZXN0LWpvaW4NCjIuIEFkZCBwcmludGluZyBvdXQgU3Vic2Ny
-aXB0aW9ucyBwcm9wZXJ0eSB0byBib3RoIHRlc3QtbWVzaCBhbmQgdGVzdC1qb2luDQoNClRoZW4s
-IEFzc3VtaW5nIEluZ2EgaGFzIG5vIG90aGVyIGNvbW1lbnRzLCBJIHRoaW5rIHRoaXMgcGF0Y2gt
-c2V0IGlzIHJlYWR5IGZvciBhcHBsaWNhdGlvbi4NCg==
+On Mon, Nov 18, 2019 at 11:21:22AM -0800, Abhishek Pandit-Subedi wrote:
+> Add documentation for pcm parameters.
+> 
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> ---
+> 
+> Changes in v6: None
+> Changes in v5: None
+> Changes in v4: None
+> Changes in v3: None
+> Changes in v2: None
+
+Really? I'm staring at v2 that looks a bit different.
+
+>  .../bindings/net/broadcom-bluetooth.txt       | 16 ++++++++++
+>  include/dt-bindings/bluetooth/brcm.h          | 32 +++++++++++++++++++
+>  2 files changed, 48 insertions(+)
+>  create mode 100644 include/dt-bindings/bluetooth/brcm.h
+> 
+> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> index c749dc297624..8561e4684378 100644
+> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> @@ -29,10 +29,20 @@ Optional properties:
+>     - "lpo": external low power 32.768 kHz clock
+>   - vbat-supply: phandle to regulator supply for VBAT
+>   - vddio-supply: phandle to regulator supply for VDDIO
+> + - brcm,bt-sco-routing: PCM, Transport, Codec, I2S
+> + - brcm,bt-pcm-interface-rate: 128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps
+> + - brcm,bt-pcm-frame-type: short, long
+> + - brcm,bt-pcm-sync-mode: slave, master
+> + - brcm,bt-pcm-clock-mode: slave, master
+
+Little of this seems unique to Broadcom. We already have some standard 
+audio related properties for audio interfaces such as 'format', 
+'frame-master' and 'bitclock-master'. Ultimately, this would be tied 
+into the audio complex of SoCs and need to work with the audio 
+bindings. We also have HDMI audio bindings. 
+
+Maybe sco-routing is unique to BT and still needed in some form though 
+if you describe the connection to the SoC audio complex, then maybe 
+not? I'd assume every BT chip has some audio routing configuration.
+
+Rob
