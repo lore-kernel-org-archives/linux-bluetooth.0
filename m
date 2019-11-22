@@ -2,138 +2,115 @@ Return-Path: <SRS0=qr/Y=ZO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C20C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 06:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D548C43215
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 08:12:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4CAA520409
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 06:25:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574403909;
-	bh=HA1qjHd1T3/y1oTFjb4/iw4zfU/8Qyh1cA8GBBjPN5M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=COfV03LxQwMjX3a1aAd/NtftpI0EZncuuDpfhd4A82KJjXP6EITx6Xhxg6QiXzJOB
-	 ZO3S6QlHpaJ7/3TU9qU4f2gy7kvJ6yxsxjtAMQrpMFPc5+LBUhv2gSoF/PcaPBvLev
-	 Eo4leY7zcbUkTD7gayaG7Pq0TaeDtMKusCoUSRAg=
+	by mail.kernel.org (Postfix) with ESMTP id 35EA82070A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 08:12:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EA+/5w6i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728066AbfKVFvP (ORCPT
+        id S1726722AbfKVIMR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Nov 2019 00:51:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56184 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728059AbfKVFvO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Nov 2019 00:51:14 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2E51120731;
-        Fri, 22 Nov 2019 05:51:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574401873;
-        bh=HA1qjHd1T3/y1oTFjb4/iw4zfU/8Qyh1cA8GBBjPN5M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PLeno+aSvAFYCKNgP2M/0I5mi0poslSvgW1t9S7p4WoYOxhyUnRVClaJCysT1611Y
-         ewauE9MrXQl4/pSY9Kiz/pLDrQSJot+3VwRxGYDfFx2Hra6x49B2W2nOJjpzRYZjJQ
-         sF2mm6owyINWcT5ntM6uAEttR4c80JyH7OaDbG2M=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jonathan Bakker <xc-racer2@live.ca>,
-        =?UTF-8?q?Pawe=C5=82=20Chmiel?= <pawel.mikolaj.chmiel@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 109/219] Bluetooth: hci_bcm: Handle specific unknown packets after firmware loading
-Date:   Fri, 22 Nov 2019 00:47:21 -0500
-Message-Id: <20191122054911.1750-102-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122054911.1750-1-sashal@kernel.org>
-References: <20191122054911.1750-1-sashal@kernel.org>
+        Fri, 22 Nov 2019 03:12:17 -0500
+Received: from mail-qv1-f67.google.com ([209.85.219.67]:36583 "EHLO
+        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726417AbfKVILH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 Nov 2019 03:11:07 -0500
+Received: by mail-qv1-f67.google.com with SMTP id cv8so2536014qvb.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2019 00:11:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bunR22uohvLumSntRQCcWdw1R7jgySamsOIo5iz6NMg=;
+        b=EA+/5w6i1pKnrL2pn3ktDXOh6H+54aNLV2LSClr5L+8ngdUgBsF1wcv5p1Cj4u95cb
+         WIxIp+e45TL/K1UuwGkhJ7ul8TDo9pfGmyYdMe6XbSTo6zT5/DS/KZpHZecgr8pYUvtW
+         oemOTf+WY+3qi8tqN05M/LFN0TT9HkwMpyCtBxAK3gMqrcP/SbwT6QYrUimNd8fyCSE/
+         +74qcLZpLr8DWUIQo6qATXRLOZzzRIIsvFZMrs4e+gdJMVLvGo2zm1pwulbWZnkmKkOn
+         NAz4K1k3iD9e03paQCALC8tYpWLoicbIByko5b1CZ2SRhF4+9YnXjnrJzgIiWHVUOr7D
+         CXaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bunR22uohvLumSntRQCcWdw1R7jgySamsOIo5iz6NMg=;
+        b=tj/Tl+XWhGGQokiDsQikChhf1q2/0Twut+7HnZaLSxjsuKoto+IAWPh530Qibnbyev
+         HK4xfj4JysUkV1uGdjnD9YLVIOaFIyBO9hJR3K5sjq78YzpfF9NWLW+J9+ORr9Q0n6X2
+         wzaeeMYL6f/SGkIwG2NDPj070vZgdOBhDLvzvVWbjnLL26Tt1AbYk1xOYFVtbp6BgrS1
+         XPJUB9z9OWW0bnf0RYRSzGC9AmI/Rat1t5ZfltB9WjnDOqRCaeTgmFIFqUnXmbb3phGP
+         gxy2CMMEHAxOKpxOHj8JZ134I3IVG80VJIjOdVzG6FSDQLSXjvoEdaO4ps1Fhk6rrqbx
+         wJhQ==
+X-Gm-Message-State: APjAAAVR+3GW5L3XzgL30utUpgqoqi10wJSzKj0fEfAAsVJj0IdteCNK
+        1NGoDZ4Pd8aAEM8B6+bWWsf/ifm3q4rVypC9lcLZMQ==
+X-Google-Smtp-Source: APXvYqygFQrkNm6Bt588zmo6tr7srw9mz4qHapNvIHUVmygRLfGyxXTse6VYxx2Cq5vwWS04IxnKEwPg4nNLc1pthaI=
+X-Received: by 2002:a0c:b064:: with SMTP id l33mr12729742qvc.34.1574410265787;
+ Fri, 22 Nov 2019 00:11:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <000000000000bf6bd30575fec528@google.com> <000000000000e2ac670597ad2663@google.com>
+ <CAHk-=wjg0JXgwb6rkFK0q_JvW7YdGpiPtMVWe=YhFK1y_2-F7Q@mail.gmail.com>
+ <14e1a22937ce5a54d94dab04a103e159215fb654.camel@kernel.crashing.org> <CAHk-=wgR=8QX6A6iPAzsD-E38t6Uesa45yWLmeTWZTnK0GbRow@mail.gmail.com>
+In-Reply-To: <CAHk-=wgR=8QX6A6iPAzsD-E38t6Uesa45yWLmeTWZTnK0GbRow@mail.gmail.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Fri, 22 Nov 2019 09:10:54 +0100
+Message-ID: <CACT4Y+ZQ6uB2qNjjbyvqgvywZvDay8Zo9mqUw=FhGUysAf9yiA@mail.gmail.com>
+Subject: Re: general protection fault in kernfs_add_one
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        syzbot <syzbot+db1637662f412ac0d556@syzkaller.appspotmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Rafael Wysocki <rafael@kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Tejun Heo <tj@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Jonathan Bakker <xc-racer2@live.ca>
+On Wed, Nov 20, 2019 at 5:54 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Tue, Nov 19, 2019 at 8:04 PM Benjamin Herrenschmidt
+> <benh@kernel.crashing.org> wrote:
+> >
+> > Could this be what was fixed by:
+> >
+> > ac43432cb1f5c2950408534987e57c2071e24d8f
+> > ("driver core: Fix use-after-free and double free on glue directory")
+> >
+> > Which went into 5.3 afaik ?
+>
+> Hmm. Sounds very possible. It matches the commit syzbot bisected to,
+> and looking at the reports, the I can't find anything that is 5.3 or
+> later.
+>
+> I did find a 5.3.0-rc2+ report, but that's still consistent with that
+> commit: it got merged just before 5.3-rc4.
+>
+> So I think you're right.
+>
+> I forget what the magic email rule was to report that something is
+> fixed to syzbot..
 
-[ Upstream commit 22bba80500fdf624a7cfbb65fdfa97a038ae224d ]
+Hi Linus,
 
-The Broadcom controller on aries S5PV210 boards sends out a couple of
-unknown packets after the firmware is loaded.  This will cause
-logging of errors such as:
-	Bluetooth: hci0: Frame reassembly failed (-84)
+This would be:
 
-This is probably also the case with other boards, as there are related
-Android userspace patches for custom ROMs such as
-https://review.lineageos.org/#/c/LineageOS/android_system_bt/+/142721/
-Since this appears to be intended behaviour, treated them as diagnostic
-packets.
+#syz fix: driver core: Fix use-after-free and double free on glue directory
 
-Note that this is another variant of commit 01d5e44ace8a
-("Bluetooth: hci_bcm: Handle empty packet after firmware loading")
+FTR, the cheat sheet is referenced in every bug report:
 
-Signed-off-by: Jonathan Bakker <xc-racer2@live.ca>
-Signed-off-by: Paweł Chmiel <pawel.mikolaj.chmiel@gmail.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/bluetooth/hci_bcm.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index aa6b7ed9fdf12..59e5fc5eec8f8 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -51,6 +51,12 @@
- #define BCM_LM_DIAG_PKT 0x07
- #define BCM_LM_DIAG_SIZE 63
- 
-+#define BCM_TYPE49_PKT 0x31
-+#define BCM_TYPE49_SIZE 0
-+
-+#define BCM_TYPE52_PKT 0x34
-+#define BCM_TYPE52_SIZE 0
-+
- #define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
- 
- /**
-@@ -564,12 +570,28 @@ static int bcm_setup(struct hci_uart *hu)
- 	.lsize = 0, \
- 	.maxlen = BCM_NULL_SIZE
- 
-+#define BCM_RECV_TYPE49 \
-+	.type = BCM_TYPE49_PKT, \
-+	.hlen = BCM_TYPE49_SIZE, \
-+	.loff = 0, \
-+	.lsize = 0, \
-+	.maxlen = BCM_TYPE49_SIZE
-+
-+#define BCM_RECV_TYPE52 \
-+	.type = BCM_TYPE52_PKT, \
-+	.hlen = BCM_TYPE52_SIZE, \
-+	.loff = 0, \
-+	.lsize = 0, \
-+	.maxlen = BCM_TYPE52_SIZE
-+
- static const struct h4_recv_pkt bcm_recv_pkts[] = {
- 	{ H4_RECV_ACL,      .recv = hci_recv_frame },
- 	{ H4_RECV_SCO,      .recv = hci_recv_frame },
- 	{ H4_RECV_EVENT,    .recv = hci_recv_frame },
- 	{ BCM_RECV_LM_DIAG, .recv = hci_recv_diag  },
- 	{ BCM_RECV_NULL,    .recv = hci_recv_diag  },
-+	{ BCM_RECV_TYPE49,  .recv = hci_recv_diag  },
-+	{ BCM_RECV_TYPE52,  .recv = hci_recv_diag  },
- };
- 
- static int bcm_recv(struct hci_uart *hu, const void *data, int count)
--- 
-2.20.1
-
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with syzbot.
