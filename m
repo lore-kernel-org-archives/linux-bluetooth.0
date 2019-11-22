@@ -2,76 +2,141 @@ Return-Path: <SRS0=qr/Y=ZO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D8A6C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 15:50:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57759C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 15:50:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E19E420714
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 15:50:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 304F02071F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 15:50:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574437850;
+	bh=YyVgvQ275e3tv6kQYPq05Cdmt5/g44Jwrrc70QXxg0Q=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=1ogZDHf22sbcmZQ2UHdlm1EFpNReihr99/WzW9b5qF5ijVSo6aqDUBLpv+D78Y1Oc
+	 xfx4JmWlvVaNRjSEE3TkaoUS8BgEIv0D7cASJKmCikeOk70jKzmwjFaYxFcjWgoJwX
+	 HXc2otEm/+s09Jvt7cTALH1WwMb/rTLoGrMgseQs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbfKVPuE (ORCPT
+        id S1727225AbfKVPuq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Nov 2019 10:50:04 -0500
-Received: from jax4mhob12.myregisteredsite.com ([64.69.218.92]:58782 "EHLO
-        jax4mhob12.myregisteredsite.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726546AbfKVPuE (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Nov 2019 10:50:04 -0500
-Received: from mailpod.hostingplatform.com (atl4qobmail01pod5.registeredsite.com [10.30.71.94])
-        by jax4mhob12.myregisteredsite.com (8.14.4/8.14.4) with ESMTP id xAMFo2Lt027545
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2019 10:50:02 -0500
-Received: (qmail 26583 invoked by uid 0); 22 Nov 2019 15:50:02 -0000
-X-TCPREMOTEIP: 65.41.18.216
-X-Authenticated-UID: sbrown@opensat.com
-Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@65.41.18.216)
-  by 0 with ESMTPA; 22 Nov 2019 15:50:02 -0000
-Received: from localhost (localhost [127.0.0.1])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 2A24F154053A;
-        Fri, 22 Nov 2019 10:50:01 -0500 (EST)
-X-Virus-Scanned: Debian amavisd-new at ewol.com
-Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
-        by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 8m5A20egTLyO; Fri, 22 Nov 2019 10:49:54 -0500 (EST)
-Received: from nm-ws (unknown [192.168.2.3])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTPS id 4AB7C15402C2;
-        Fri, 22 Nov 2019 10:49:54 -0500 (EST)
-Message-ID: <6eadd7b2742ebb018c46d51c8d0588eda9321f47.camel@ewol.com>
-Subject: Re: [PATCH BlueZ] tools/mesh-cfgclient: Fix signatures in agent
- methods
-From:   Steve Brown <sbrown@ewol.com>
-To:     Inga Stotland <inga.stotland@intel.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com
-Date:   Fri, 22 Nov 2019 08:49:52 -0700
-In-Reply-To: <20191122153816.8430-1-inga.stotland@intel.com>
-References: <20191122153816.8430-1-inga.stotland@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.1-2 
+        Fri, 22 Nov 2019 10:50:46 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33778 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727112AbfKVPuq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 Nov 2019 10:50:46 -0500
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B087D20721;
+        Fri, 22 Nov 2019 15:50:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1574437844;
+        bh=YyVgvQ275e3tv6kQYPq05Cdmt5/g44Jwrrc70QXxg0Q=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=lCh/GGuFABRGLpa77QaxVyOzcPZwPwcBWn8bzNYXZuu7I9azFITQRJLxRNAn8NT7C
+         qpns74d3vbTGjo+5q1X6cQ4qmI/n18DAZzXx5IqtC7z1lwfMBN75k0eMBkkwY2PVK5
+         0o5GnnfzVGg58itoNZNcH6zgJykSMZnC+DTa7IuA=
+Received: by mail-qv1-f45.google.com with SMTP id x14so3075721qvu.0;
+        Fri, 22 Nov 2019 07:50:44 -0800 (PST)
+X-Gm-Message-State: APjAAAU+NFInupP4/DZfXasBerLu27ZLeuRQybMEvNOR/eSOr9UB9ioA
+        yVbsvxbubvZAJtwbKDM13/ofxSmSdV0d5Yxe/g==
+X-Google-Smtp-Source: APXvYqwGGJblDyLrod013TGs3RdLWg22H1HuGkGQ1TL0T/oqtvU6mgVVePtuiNDWsbDa/2MkKnaLB0nx29hNdiuDJeE=
+X-Received: by 2002:a0c:aee1:: with SMTP id n33mr5260909qvd.135.1574437843805;
+ Fri, 22 Nov 2019 07:50:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20191118192123.82430-1-abhishekpandit@chromium.org>
+ <20191118110335.v6.3.I18b06235e381accea1c73aa2f9db358645d9f201@changeid>
+ <20191121212923.GA24437@bogus> <06AE1B9D-F048-4AF1-9826-E8CAFA44DD58@holtmann.org>
+In-Reply-To: <06AE1B9D-F048-4AF1-9826-E8CAFA44DD58@holtmann.org>
+From:   Rob Herring <robh@kernel.org>
+Date:   Fri, 22 Nov 2019 09:50:32 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqKso2Us5VW-Qp8mENAkMmoEh7YDT+HfhRMD1BKi7q=qAw@mail.gmail.com>
+Message-ID: <CAL_JsqKso2Us5VW-Qp8mENAkMmoEh7YDT+HfhRMD1BKi7q=qAw@mail.gmail.com>
+Subject: Re: [PATCH v6 3/4] dt-bindings: net: broadcom-bluetooth: Add pcm config
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        netdev <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Ondrej Jirman <megous@megous.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+On Fri, Nov 22, 2019 at 6:34 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Rob,
+>
+> >> Add documentation for pcm parameters.
+> >>
+> >> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> >> ---
+> >>
+> >> Changes in v6: None
+> >> Changes in v5: None
+> >> Changes in v4: None
+> >> Changes in v3: None
+> >> Changes in v2: None
+> >
+> > Really? I'm staring at v2 that looks a bit different.
+> >
+> >> .../bindings/net/broadcom-bluetooth.txt       | 16 ++++++++++
+> >> include/dt-bindings/bluetooth/brcm.h          | 32 +++++++++++++++++++
+> >> 2 files changed, 48 insertions(+)
+> >> create mode 100644 include/dt-bindings/bluetooth/brcm.h
+> >>
+> >> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> >> index c749dc297624..8561e4684378 100644
+> >> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> >> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> >> @@ -29,10 +29,20 @@ Optional properties:
+> >>    - "lpo": external low power 32.768 kHz clock
+> >>  - vbat-supply: phandle to regulator supply for VBAT
+> >>  - vddio-supply: phandle to regulator supply for VDDIO
+> >> + - brcm,bt-sco-routing: PCM, Transport, Codec, I2S
+> >> + - brcm,bt-pcm-interface-rate: 128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps
+> >> + - brcm,bt-pcm-frame-type: short, long
+> >> + - brcm,bt-pcm-sync-mode: slave, master
+> >> + - brcm,bt-pcm-clock-mode: slave, master
+> >
+> > Little of this seems unique to Broadcom. We already have some standard
+> > audio related properties for audio interfaces such as 'format',
+> > 'frame-master' and 'bitclock-master'. Ultimately, this would be tied
+> > into the audio complex of SoCs and need to work with the audio
+> > bindings. We also have HDMI audio bindings.
+> >
+> > Maybe sco-routing is unique to BT and still needed in some form though
+> > if you describe the connection to the SoC audio complex, then maybe
+> > not? I'd assume every BT chip has some audio routing configuration.
+>
+> so we tried to generalize this some time before and failed to get a proper consensus.
+>
+> In general I am with you that we should just expose generic properties from the attached audio codec, but nobody has come up with anything like that. And I think aligning all chip manufacturers will take some time.
+>
 
-On Fri, 2019-11-22 at 07:38 -0800, Inga Stotland wrote:
-> This removes an extra return parameter from PromptNumeric and
-> PromptStatic
-> method signatures. Also, style fixes.
-> ---
->  tools/mesh-cfgclient.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
+That shouldn't be hard. It's a solved problem for codecs and HDMI. I
+don't think BT is any more complicated (ignoring phones). I suspect
+it's not solved simply because no one wants to do the work beyond
+their 1 BT device they care about ATM.
 
-Fixed my SIGSEGV issue.
+> Maybe in the interim we just use brcm,bt-pcm-int-params = [00 00 ..] as initially proposed.
 
-Thanks,
+What's the device using this? Some chromebook I suppose. I think it
+would be better to first see how this fits in with the rest of the
+audio subsystem. Until then, the driver should probably just default
+to "transport" mode which I assume is audio routed over the UART
+interface. That should work on any platform at least, but may not be
+optimal.
 
-Steve
-
+Rob
