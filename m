@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97349C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 06:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C20C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 06:25:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BC102068F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 06:10:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CAA520409
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 06:25:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574403039;
-	bh=WOoMctTv0hgR8uQA1LhoU2CPoGGUIvj+eV1wqxmsOjI=;
+	s=default; t=1574403909;
+	bh=HA1qjHd1T3/y1oTFjb4/iw4zfU/8Qyh1cA8GBBjPN5M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=0qP/4V+l7ZVbZT2IiIxz0GgA+2UPsoW/tuwb6B9gleAdFZQxX2hVxV3Kh6QIqF3ip
-	 2UisIN+8CceQUwQ17I5aW4KsBgz3jt+z10gYBGCD/3qhp9PVPSTa5xyFYkPXzEXJF4
-	 F6TSeFKBB4mFafQPtVZ0/+VhFbQQlKwobfyEgzlo=
+	b=COfV03LxQwMjX3a1aAd/NtftpI0EZncuuDpfhd4A82KJjXP6EITx6Xhxg6QiXzJOB
+	 ZO3S6QlHpaJ7/3TU9qU4f2gy7kvJ6yxsxjtAMQrpMFPc5+LBUhv2gSoF/PcaPBvLev
+	 Eo4leY7zcbUkTD7gayaG7Pq0TaeDtMKusCoUSRAg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729261AbfKVF4s (ORCPT
+        id S1728066AbfKVFvP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Nov 2019 00:56:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34670 "EHLO mail.kernel.org"
+        Fri, 22 Nov 2019 00:51:15 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56184 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729257AbfKVF4s (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Nov 2019 00:56:48 -0500
+        id S1728059AbfKVFvO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 22 Nov 2019 00:51:14 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 04DB720717;
-        Fri, 22 Nov 2019 05:56:46 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2E51120731;
+        Fri, 22 Nov 2019 05:51:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574402207;
-        bh=WOoMctTv0hgR8uQA1LhoU2CPoGGUIvj+eV1wqxmsOjI=;
+        s=default; t=1574401873;
+        bh=HA1qjHd1T3/y1oTFjb4/iw4zfU/8Qyh1cA8GBBjPN5M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1wy98YNuA/Dvr+5jtRufvd3oIAp66CY/WsRnWZdOFsvAQXXJb6vXBX/32R9xd1RC4
-         x0FqllTwI72cAMtE6//CeT9SGkPcHgjwO+M01CIy/uiijEh2bxYAYWvFzF8FQLv4Oi
-         4wml/vhcq3o3PF2Y0GuQi3jgnK71M4PQmnXNL674=
+        b=PLeno+aSvAFYCKNgP2M/0I5mi0poslSvgW1t9S7p4WoYOxhyUnRVClaJCysT1611Y
+         ewauE9MrXQl4/pSY9Kiz/pLDrQSJot+3VwRxGYDfFx2Hra6x49B2W2nOJjpzRYZjJQ
+         sF2mm6owyINWcT5ntM6uAEttR4c80JyH7OaDbG2M=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jonathan Bakker <xc-racer2@live.ca>,
@@ -46,12 +46,12 @@ Cc:     Jonathan Bakker <xc-racer2@live.ca>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 056/127] Bluetooth: hci_bcm: Handle specific unknown packets after firmware loading
-Date:   Fri, 22 Nov 2019 00:54:34 -0500
-Message-Id: <20191122055544.3299-55-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 109/219] Bluetooth: hci_bcm: Handle specific unknown packets after firmware loading
+Date:   Fri, 22 Nov 2019 00:47:21 -0500
+Message-Id: <20191122054911.1750-102-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122055544.3299-1-sashal@kernel.org>
-References: <20191122055544.3299-1-sashal@kernel.org>
+In-Reply-To: <20191122054911.1750-1-sashal@kernel.org>
+References: <20191122054911.1750-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
@@ -89,10 +89,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 22 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 6d41b2023f09d..61971ddbd2313 100644
+index aa6b7ed9fdf12..59e5fc5eec8f8 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -50,6 +50,12 @@
+@@ -51,6 +51,12 @@
  #define BCM_LM_DIAG_PKT 0x07
  #define BCM_LM_DIAG_SIZE 63
  
@@ -104,8 +104,8 @@ index 6d41b2023f09d..61971ddbd2313 100644
 +
  #define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
  
- /* platform device driver resources */
-@@ -483,12 +489,28 @@ static int bcm_setup(struct hci_uart *hu)
+ /**
+@@ -564,12 +570,28 @@ static int bcm_setup(struct hci_uart *hu)
  	.lsize = 0, \
  	.maxlen = BCM_NULL_SIZE
  
