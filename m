@@ -2,91 +2,112 @@ Return-Path: <SRS0=qr/Y=ZO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB65C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 09:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B41DC432C3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 10:04:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7518F20707
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 09:54:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54FF120707
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Nov 2019 10:04:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODHxiLqq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726500AbfKVJyW (ORCPT
+        id S1726574AbfKVKEz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Nov 2019 04:54:22 -0500
-Received: from jax4mhob02.myregisteredsite.com ([64.69.218.82]:60068 "EHLO
-        jax4mhob02.myregisteredsite.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726100AbfKVJyW (ORCPT
+        Fri, 22 Nov 2019 05:04:55 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40394 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726417AbfKVKEy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Nov 2019 04:54:22 -0500
-Received: from mailpod.hostingplatform.com (atl4qobmail02pod5.registeredsite.com [10.30.71.85])
-        by jax4mhob02.myregisteredsite.com (8.14.4/8.14.4) with ESMTP id xAM9sGWG019556
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2019 04:54:18 -0500
-Received: (qmail 170896 invoked by uid 0); 22 Nov 2019 09:54:16 -0000
-X-TCPREMOTEIP: 65.41.18.216
-X-Authenticated-UID: sbrown@opensat.com
-Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@65.41.18.216)
-  by 0 with ESMTPA; 22 Nov 2019 09:54:16 -0000
-Received: from localhost (localhost [127.0.0.1])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 918481540883
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2019 04:54:15 -0500 (EST)
-X-Virus-Scanned: Debian amavisd-new at ewol.com
-Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
-        by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 2YQyzzevAqVx for <linux-bluetooth@vger.kernel.org>;
-        Fri, 22 Nov 2019 04:54:13 -0500 (EST)
-Received: from nm-ws (unknown [192.168.2.3])
-        by 155-15-85-208.altiusbb.net (Postfix) with ESMTPS id 2ABBB154042B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2019 04:54:13 -0500 (EST)
-Message-ID: <9086014f29a8ba454d301e5e77ab7ec597e5617b.camel@ewol.com>
-Subject: BlueZ mesh-cfgclient: throws SIGSEGV after commit 81f7c2e15
-From:   Steve Brown <sbrown@ewol.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Fri, 22 Nov 2019 02:54:11 -0700
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.1-2 
+        Fri, 22 Nov 2019 05:04:54 -0500
+Received: by mail-wm1-f65.google.com with SMTP id y5so6871451wmi.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2019 02:04:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vZt1WPz+SaUcwPa3RcXKfLnJLiyL1oyrxTwENW47IsY=;
+        b=ODHxiLqq//FIvwSCt7ejwT1Ou8V3lfF03vAEQPfWy0mw1W+kfIu2YbvAYumZQ+GBFI
+         /y2HNvXNSf01+xd65txpWTWdboPxkX0ZG7svTxwWCViQz0t9G61BeNLV9NgD8W376HKc
+         LNGVCAt+isqZ6nrMBWdgNG5X4qYlhBCG75IOvkN1GcFxXPMKzyyVsf9lPDiOvF6erPAi
+         zaqSgf/R/xYLYLBOodmuYdHavZID8rW1ZorzQjZXKUelSyj/4UFi6zHvOnQC2ua/eNlK
+         zijCgXTXfbrc4rUyBRxiChs7Uar5oIfREZj1GsGlx7YvfSMnYH7UXl7pKR+5S19BhFI9
+         fwoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vZt1WPz+SaUcwPa3RcXKfLnJLiyL1oyrxTwENW47IsY=;
+        b=TMcsQopjHCXKU23XEjlVvQJGs2/t8Q3I5J4py1DkKkInXb0LBlBlXItzCLhA039SvF
+         hOGGm249A6oaHGbX3l4XOcki7FSEzJzZOmHNxAS9ruPDLeemjWP3Gemnyj84kKUDIDT1
+         vPxy/O2ywgRkv6+x+4mFQPfwjJSiua8Q91nxlJEG4UDUYXOvj5B9RHoJi1haLYYIi5+e
+         QLKfH/TaGgMbe41GR/rJcFxA6SUQF3/AqdbZH9PSAuhWPYmV2caLHQWd4C/taPV/CZ5b
+         nViihbHV/DUTAZ6qWwx6k5YNHxbh1rwzxoDzB/JIg/QS0789lMjS9ApbnhYMiTo/J7Q2
+         mAbQ==
+X-Gm-Message-State: APjAAAVB59jrXHB+l0mneMc6SVnOllkAVa96dip2VPyyM6lqXST1VZ6f
+        vIOrgKoESYX5IOd9IFW+KZw=
+X-Google-Smtp-Source: APXvYqypHeSVOwwoVd8jh4HDUwfh5JIOVmPwpT8ZsFTP93s0KH6ovL6eNhre0Wfe9hZvk3dLIKZilg==
+X-Received: by 2002:a1c:b1c3:: with SMTP id a186mr15800320wmf.10.1574417092462;
+        Fri, 22 Nov 2019 02:04:52 -0800 (PST)
+Received: from mamamia.internal (a89-183-130-53.net-htp.de. [89.183.130.53])
+        by smtp.gmail.com with ESMTPSA id q5sm2846826wmc.27.2019.11.22.02.04.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2019 02:04:51 -0800 (PST)
+From:   Andre Heider <a.heider@gmail.com>
+To:     Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Ondrej Jirman <megous@megous.com>,
+        Jernej Skrabec <jernej.skrabec@siol.net>
+Subject: [PATCH v3] bluetooth: bcm: Use the BDADDR_PROPERTY quirk for Orange Pi 3
+Date:   Fri, 22 Nov 2019 11:04:49 +0100
+Message-Id: <20191122100449.1994340-1-a.heider@gmail.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It appears that the signatures suggest more args than are actually
-passed at tools/mesh-cfgclient.c:548 & 550.
+Some devices ship with the controller default address, like the
+Orange Pi 3 (BCM4345C5).
 
-It only shows up on an rpi3 and ubuntu aarch64.
+Allow the bootloader to set a valid address through the device tree.
 
-Steve
+Signed-off-by: Andre Heider <a.heider@gmail.com>
+---
+ drivers/bluetooth/btbcm.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Program received signal SIGSEGV, Segmentation fault.
-__strlen_generic () at ../sysdeps/aarch64/multiarch/../strlen.S:98
-98	../sysdeps/aarch64/multiarch/../strlen.S: No such file or directory.
-(gdb) bt
-#0  __strlen_generic () at ../sysdeps/aarch64/multiarch/../strlen.S:98
-#1  0x0000aaaaaaad1364 in l_dbus_interface_method (interface=0xaaaaaab42800, name=0xaaaaaaad9c18 "PromptNumeric", flags=0, cb=0xaaaaaaab7388 <prompt_numeric_call>, 
-    return_sig=0xaaaaaaad9c10 "u", param_sig=0xaaaaaaadb148 "s") at ell/dbus-service.c:320
-#2  0x0000aaaaaaab4ddc in setup_agent_iface (iface=0xaaaaaab42800) at tools/mesh-cfgclient.c:548
-#3  0x0000aaaaaaad289c in _dbus_object_tree_register_interface (old_style_properties=<optimized out>, destroy=<optimized out>, setup_func=0xaaaaaaab4d00 <setup_agent_iface>, 
-    interface=<optimized out>, tree=0xaaaaaab3c750) at ell/dbus-service.c:1385
-#4  _dbus_object_tree_register_interface (tree=0xaaaaaab3c750, interface=<optimized out>, setup_func=0xaaaaaaab4d00 <setup_agent_iface>, destroy=<optimized out>, 
-    old_style_properties=<optimized out>) at ell/dbus-service.c:1349
-#5  0x0000aaaaaaab47d0 in register_agent () at tools/mesh-cfgclient.c:1755
-#6  register_app () at tools/mesh-cfgclient.c:1755
-#7  client_ready (client=<optimized out>, user_data=<optimized out>) at tools/mesh-cfgclient.c:1785
-#8  0x0000aaaaaaad3e28 in get_managed_objects_reply (message=<optimized out>, user_data=0xaaaaaab3ecf0) at ell/dbus-client.c:572
-#9  get_managed_objects_reply (message=<optimized out>, user_data=0xaaaaaab3ecf0) at ell/dbus-client.c:536
-#10 0x0000aaaaaaac93dc in handle_method_return (message=0xaaaaaab41450, dbus=<optimized out>) at ell/dbus.c:216
-#11 0x0000aaaaaaaca394 in message_read_handler (io=<optimized out>, user_data=0xaaaaaab395f0) at ell/dbus.c:276
-#12 0x0000aaaaaaac7420 in io_callback (fd=<optimized out>, events=1, user_data=0xaaaaaab1be10) at ell/io.c:126
-#13 0x0000aaaaaaac83d8 in l_main_iterate (timeout=<optimized out>) at ell/main.c:473
-#14 0x0000aaaaaaac84b8 in l_main_run () at ell/main.c:520
-#15 l_main_run () at ell/main.c:502
-#16 0x0000aaaaaaac86d4 in l_main_run_with_signal (callback=callback@entry=0xaaaaaaac3c00 <l_sig_func>, user_data=user_data@entry=0x0) at ell/main.c:642
-#17 0x0000aaaaaaac3cd4 in mainloop_run_with_signal (func=func@entry=0xaaaaaaac2110 <signal_callback>, user_data=user_data@entry=0x0) at src/shared/mainloop-ell.c:87
-#18 0x0000aaaaaaac3374 in bt_shell_run () at src/shared/shell.c:1174
-#19 0x0000aaaaaaab42d8 in main (argc=<optimized out>, argv=<optimized out>) at tools/mesh-cfgclient.c:1969
-
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 2d2e6d862068..e20e7da45377 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -8,6 +8,7 @@
+ 
+ #include <linux/module.h>
+ #include <linux/firmware.h>
++#include <linux/of.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -440,6 +441,12 @@ int btbcm_finalize(struct hci_dev *hdev)
+ 
+ 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 
++	/* Some devices ship with the controller default address.
++	 * Allow the bootloader to set a valid address through the device tree.
++	 */
++	if (of_machine_is_compatible("xunlong,orangepi-3"))
++		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
++
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(btbcm_finalize);
+-- 
+2.24.0
 
