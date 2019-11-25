@@ -2,86 +2,101 @@ Return-Path: <SRS0=LhHL=ZR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED259C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 02:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACA9C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 12:31:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C616020674
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 02:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30A7C20836
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 12:31:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="mLmnZ3Wi"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="AZJdP+xP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727007AbfKYC6s (ORCPT
+        id S1727298AbfKYMbv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 24 Nov 2019 21:58:48 -0500
-Received: from mail-pg1-f180.google.com ([209.85.215.180]:38625 "EHLO
-        mail-pg1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726994AbfKYC6r (ORCPT
+        Mon, 25 Nov 2019 07:31:51 -0500
+Received: from mail-wr1-f51.google.com ([209.85.221.51]:41001 "EHLO
+        mail-wr1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbfKYMbv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 24 Nov 2019 21:58:47 -0500
-Received: by mail-pg1-f180.google.com with SMTP id t3so5997507pgl.5
-        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Nov 2019 18:58:47 -0800 (PST)
+        Mon, 25 Nov 2019 07:31:51 -0500
+Received: by mail-wr1-f51.google.com with SMTP id b18so17793931wrj.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2019 04:31:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=pqb+GA+AV2mbJaXpnj74CQaLRYZl6peQCIBZfhCemGo=;
-        b=mLmnZ3WiWCtynypAoIPkluXf7tpYAXDipRfi9QMgzPS5loYdLlgR80ogXxRBI4sdZp
-         QdFug1yOS5C3WCORNvCY1PSD/oZf4Vacx+LVa+mPzAHgpGJCpfO0gshsH45I8C527/0Q
-         VGNsErGzEetYAVbAjmZK2/cg4OHB19CSyMuE2MlCjStqIkzV2zV0OhCScIukwXiRuBA8
-         PaEVfWinovQcGgHHXKrX6a61sCmDu841PfDGXeMKkzEfJD4Ou5aNJYeoGgH0S8ebdjYe
-         cIIp9TID4w5m+il6G8dh1S5lTh+qIHEZpujjofDxaKBfXaYD8hEvdn0ysnLxwUbjagF/
-         wwfw==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KJCpcSpfPZuvWeVXC8ejepeMr2O+cRN3l77vJHAz7ns=;
+        b=AZJdP+xPvqhvbFJJSRKdRQ+prgRLOzrwOhWkMqoQFgORbmEgcyWgccta0A/0yQbmWh
+         42fxHQkzRzsY1xR4cKSgn+zFg9bcNPE+aUiQoksQgePNNPYpbLTam1C88irFpbVPD/K0
+         qVFanv5oPj5ZsqCYl/+vX9vSpT89hozCcS3fJuaOnK2r9QU00uxy2yU5p0CtWpamoe/r
+         S01bAdkDUmKtjWoJ3jkoyl7CDpWL/ffhWDTWw+0sOA9DmefipjNfjfdgsuu4Jnimvxwa
+         HV2U5xmb7lwu3f0FWlhnSHYML/+L5OgqhSm7kQhTLhdB1oTBm09IIz94lr9j/nmcWscU
+         arQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=pqb+GA+AV2mbJaXpnj74CQaLRYZl6peQCIBZfhCemGo=;
-        b=OCFDjBzUzIYD1F/W+UJAeqohGB1y20m0xmFia42vjGa29e8Z97mJReS8iAD5WK4pL8
-         9A26/AeTGy/6VO2xw+A2LHrFOrWuid0Nb5RM4dpJQ0PFz/Ilh5zJFW/PqwthR2l2Bljt
-         ysYL071Oh5O/jNyLQQCfGozBzZs/w3vn95pXmeCiZAlin2x5RxVGdc5dOAxr/61h6zCf
-         cSBsEOXJOrdVxZ9mDQ/r78TtfganI7l3MR1l14tMgp2hXMPOWpfVTA/+42MUHCz95swG
-         Cq9BeYtmrCjYwztyWbOVd1NHWETRNdqwRF+pcdUbgLMrX8BhxiJacdcZ0vasij2v2/yW
-         4kaQ==
-X-Gm-Message-State: APjAAAX14TGYseFeP0VEqRJkz5cnVaa0ptrgm3sah2Ym3NYYZQ2kM289
-        quPgUqQZMzl3egLktpLYNUSlqg==
-X-Google-Smtp-Source: APXvYqx7pyfcYNt7vKGiYVY/GTidY/pCIxrh1LflI+Aicjzc6KavANnCBrhTuogtg6qKR2TqcqPgsg==
-X-Received: by 2002:a63:e44b:: with SMTP id i11mr29580973pgk.437.1574650727145;
-        Sun, 24 Nov 2019 18:58:47 -0800 (PST)
-Received: from cakuba.netronome.com (c-73-202-202-92.hsd1.ca.comcast.net. [73.202.202.92])
-        by smtp.gmail.com with ESMTPSA id m13sm5835849pga.70.2019.11.24.18.58.46
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KJCpcSpfPZuvWeVXC8ejepeMr2O+cRN3l77vJHAz7ns=;
+        b=mZsuPz2UTfb/Rla/0Wmf+Z7EzXKYR0njMro7S1N9UYpTu08RJmvLexLphOieSvUuK1
+         03r3W+F4dWL9tWkIP3xxEqUGkyVWmBTgOgX39yFhAdCTcMJ6x0exfVllG95OWi1wiVgE
+         +1F8jsocbiodQ60V8EfEdoYrrM6Grf5NXgP7L1nrwnfvskEpOIeEYt6XxCzUPNc+HAth
+         N9xVcmMyl5s/QSFNy8LOLkknON06mNe3JTqJ/iT8riMmUvOkVtonU3Sm3BizB2iG5y7V
+         Rw0z73JFA5ZAW0Hgg168a6sJs+4ri0M2VPGtOFaf74FqCrlmtt4AaCb3dMNV/+7EK64B
+         bFoQ==
+X-Gm-Message-State: APjAAAUtHlSyNrhiFLARlX/2EfPdfSOARRFDRNo1IVsv6PbN6Vyq90LZ
+        kAbuhL2EIZEsRYLEXG8J1KXOTN7VVU5HZQ==
+X-Google-Smtp-Source: APXvYqxM0ozsa4E3Vr2pfnegota0Wraw+AbF188nqh1z+9yPseSRARv2k46tLJQMFiIEhMshm6kPzw==
+X-Received: by 2002:adf:aa92:: with SMTP id h18mr32517662wrc.150.1574685109250;
+        Mon, 25 Nov 2019 04:31:49 -0800 (PST)
+Received: from localhost.localdomain ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id w4sm10257553wrs.1.2019.11.25.04.31.48
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Nov 2019 18:58:47 -0800 (PST)
-Date:   Sun, 24 Nov 2019 18:58:40 -0800
-From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2019-11-24
-Message-ID: <20191124185840.4edc495e@cakuba.netronome.com>
-In-Reply-To: <20191124132645.GA43125@pehoward-mobl1.ger.corp.intel.com>
-References: <20191124132645.GA43125@pehoward-mobl1.ger.corp.intel.com>
-Organization: Netronome Systems, Ltd.
+        Mon, 25 Nov 2019 04:31:48 -0800 (PST)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 0/3] Include destination address in MessageReceived API
+Date:   Mon, 25 Nov 2019 13:31:39 +0100
+Message-Id: <20191125123142.25599-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, 24 Nov 2019 15:26:45 +0200, Johan Hedberg wrote:
-> Hi Dave,
-> 
-> Here's one last bluetooth-next pull request for the 5.5 kernel:
-> 
->  - Fix BDADDR_PROPERTY & INVALID_BDADDR quirk handling
->  - Added support for BCM4334B0 and BCM4335A0 controllers
->  - A few other smaller fixes related to locking and memory leaks
-> 
-> Please let me know if there are any issues pulling. Thanks.
+This patchset changes the MessageReceived API, replacing 'subscription'
+flag with destination address of received messages.
 
-Pulled, thank you!
+The application receives destination address as a D-Bus variant,
+containing either as a regular 16bit address (unicast/group) or a
+16-octet virtual label.
+
+See previous discussion https://marc.info/?t=156719067300001&r=1&w=2 for
+rationale.
+
+v2: Fix test scripts:
+ - fix API in test-join
+ - display model subscriptions in test-join and test-mesh
+
+
+Michał Lowas-Rzechonek (3):
+  mesh: Fix test-join to include mandatory VendorModels property
+  mesh: Provide destination address in MessageReceived API
+  mesh: Inform application about model subscriptions
+
+ doc/mesh-api.txt |  32 +++++++++++---
+ mesh/model.c     | 107 ++++++++++++++++++++++++++++++++++++++++++++---
+ test/test-join   |  37 +++++++++++++---
+ test/test-mesh   |  33 ++++++++-------
+ 4 files changed, 179 insertions(+), 30 deletions(-)
+
+-- 
+2.19.1
+
