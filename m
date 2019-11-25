@@ -3,121 +3,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4024DC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF36C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:58:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23B472071A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:39:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D32E20748
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:58:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727090AbfKYSjD convert rfc822-to-8bit (ORCPT
+        id S1725823AbfKYS6s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Nov 2019 13:39:03 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:48288 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727029AbfKYSjD (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Nov 2019 13:39:03 -0500
-Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 09236CECEF;
-        Mon, 25 Nov 2019 19:48:10 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH 4/4] Bluetooth: hci_bcm: Support pcm params in dts
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CANFp7mXLdmLchTKENP5-jxAWfOWNv6T+L+XR0_ALX+EF3pFB2g@mail.gmail.com>
-Date:   Mon, 25 Nov 2019 19:39:01 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <CBF4676C-215E-4533-B1CA-7194FDD8DC9E@holtmann.org>
-References: <20191123100111.219190-4-marcel@holtmann.org>
- <CANFp7mXLdmLchTKENP5-jxAWfOWNv6T+L+XR0_ALX+EF3pFB2g@mail.gmail.com>
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-X-Mailer: Apple Mail (2.3601.0.10)
+        Mon, 25 Nov 2019 13:58:48 -0500
+Received: from mga03.intel.com ([134.134.136.65]:56117 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725799AbfKYS6s (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 25 Nov 2019 13:58:48 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Nov 2019 10:58:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,242,1571727600"; 
+   d="scan'208";a="216989317"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.251.140.97])
+  by fmsmga001.fm.intel.com with ESMTP; 25 Nov 2019 10:58:46 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com
+Subject: [PATCH BlueZ] mesh: Ignore Composition features during attach
+Date:   Mon, 25 Nov 2019 10:58:42 -0800
+Message-Id: <20191125185842.26399-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Node Features are currently all under the control of the mesh daemon,
+and should be ignored when attaching.  Eventually all Composition
+feature bits will be controlled by a master mesh.conf file, overriding
+any local node specific settings.
+---
+ mesh/node.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
->> BCM chips may require configuration of PCM to operate correctly and
->> there is a vendor specific HCI command to do this. Add support in the
->> hci_bcm driver to parse this from devicetree and configure the chip.
->> 
->> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->> ---
->> drivers/bluetooth/hci_bcm.c | 19 +++++++++++++++++++
->> 1 file changed, 19 insertions(+)
->> 
->> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->> index d48044276895..9cfb202bbeca 100644
->> --- a/drivers/bluetooth/hci_bcm.c
->> +++ b/drivers/bluetooth/hci_bcm.c
->> @@ -122,6 +122,7 @@ struct bcm_device {
->>        bool                    is_suspended;
->> #endif
->>        bool                    no_early_set_baudrate;
->> +       u8                      pcm_int_params[5];
->> };
->> 
->> /* generic bcm uart resources */
->> @@ -594,6 +595,16 @@ static int bcm_setup(struct hci_uart *hu)
->>                        host_set_baudrate(hu, speed);
->>        }
->> 
->> +       /* PCM parameters if provided */
->> +       if (bcm->dev && bcm->dev->pcm_int_params[0] != 0xff) {
->> +               struct bcm_set_pcm_int_params params;
->> +
->> +               btbcm_read_pcm_int_params(hu->hdev, &params);
-> This seems redundant since we just overwrite it anyway.
-
-this is here to have it show up in btmon.
-
-> 
->> +
->> +               memcpy(&params, bcm->dev->pcm_int_params, 5);
->> +               btbcm_write_pcm_int_params(hu->hdev, &params);
->> +       }
->> +
->> finalize:
->>        release_firmware(fw);
->> 
->> @@ -1131,6 +1142,8 @@ static int bcm_acpi_probe(struct bcm_device *dev)
->> static int bcm_of_probe(struct bcm_device *bdev)
->> {
->>        device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
->> +       device_property_read_u8_array(bdev->dev, "brcm,bt-pcm-int-params",
->> +                                     bdev->pcm_int_params, 5);
->>        return 0;
->> }
->> 
->> @@ -1146,6 +1159,9 @@ static int bcm_probe(struct platform_device *pdev)
->>        dev->dev = &pdev->dev;
->>        dev->irq = platform_get_irq(pdev, 0);
->> 
->> +       /* Initialize routing field to an unsued value */
-> unused
->> +       dev->pcm_int_params[0] = 0xff;
->> +
->>        if (has_acpi_companion(&pdev->dev)) {
->>                ret = bcm_acpi_probe(dev);
->>                if (ret)
->> @@ -1406,6 +1422,9 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
->>        bcmdev->serdev_hu.serdev = serdev;
->>        serdev_device_set_drvdata(serdev, bcmdev);
->> 
->> +       /* Initialize routing field to an unsued value */
-> unused
-
-Good catch. I will fix this up.
-
-Regards
-
-Marcel
+diff --git a/mesh/node.c b/mesh/node.c
+index 59936861a..7b4ee0505 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -1526,6 +1526,10 @@ static bool check_req_node(struct managed_obj_request *req)
+ 		uint16_t attach_len = node_generate_comp(req->attach,
+ 					attach_comp, sizeof(attach_comp));
+ 
++		/* Ignore feature bits in Composition Compare */
++		node_comp[8] = 0;
++		attach_comp[8] = 0;
++
+ 		if (node_len != attach_len ||
+ 				memcmp(node_comp, attach_comp, node_len)) {
+ 			l_debug("Failed to verify app's composition data");
+-- 
+2.21.0
 
