@@ -2,144 +2,116 @@ Return-Path: <SRS0=LhHL=ZR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 407BCC432C3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF39BC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11B33207FD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:19:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC5B8207FD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Nov 2019 18:20:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JxDiWV9k"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ERy+HFLC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727269AbfKYSTZ (ORCPT
+        id S1729332AbfKYSUN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Nov 2019 13:19:25 -0500
-Received: from mail-qv1-f67.google.com ([209.85.219.67]:33487 "EHLO
-        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727130AbfKYSTZ (ORCPT
+        Mon, 25 Nov 2019 13:20:13 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:36861 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726990AbfKYSUM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Nov 2019 13:19:25 -0500
-Received: by mail-qv1-f67.google.com with SMTP id x14so6161601qvu.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2019 10:19:23 -0800 (PST)
+        Mon, 25 Nov 2019 13:20:12 -0500
+Received: by mail-qk1-f194.google.com with SMTP id d13so13661697qko.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2019 10:20:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Pkkdhb+/Z2QWGsdN+hFDKjr9JHaHTnQp4dHTiLqkWCs=;
-        b=JxDiWV9kUkV0x0caXAQLBYv8HAHTaDaSDVzUUfjVgLeqzLZVD10aQACqu3SpISL3mv
-         CYJhD8g4TLv5ZsxxPj+DSYQoDovH9LgaPoNYjAkbDG7sEpVkVT2RcZaGGlTd2ecqFvQe
-         UkJ54kb7+LQutUvWFnvV4tErVsSRDS4b5dPsw=
+         :cc:content-transfer-encoding;
+        bh=W09lgIqIKvECTOE849gv8T7YDNLO2Wc4fhvJ0YJldxk=;
+        b=ERy+HFLCmw98rZ+6jHEb6CK3h+hzq2Xd1fFuuD5w5bfjxs7aw6AgNsqMmhI3QlbWoC
+         y0EfJHErAyaz5xlU7Jv89vsAFHpCFp5adnNr6SmEtm7k5JicUESHRlKQftaWhofNPGO/
+         2k6Bym+4k9FYiNEA40m6ydBprmxzen/r0nvrM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Pkkdhb+/Z2QWGsdN+hFDKjr9JHaHTnQp4dHTiLqkWCs=;
-        b=k9v5nwcAp2dt9+jL2GkIWzrxkYJ5S9XlpD0R8beWiZU5lNa+i83FuhUx6+c3sZBJ0e
-         3FLp9n8fSyslFWl6lZwqJLUdkcpjWunpi3yVW82dRuOdnlKpct2tzrtyyMyrEWZAncuQ
-         EwvjLU3xO7R0XlozMarwGppgWsJeXDi1jhJgOSLfgdoSWEsWIzvdDYkqQB3i6IJeYTew
-         Vf+smUuF748wVy9ptnJSTMf5hkrwXHiQzF7CBASgTx0jBUYVIUcuQGFmaVbBaW85J3dX
-         iZkcHUGDVYiiL93PSPE7ZotcvgQLUQDYCbuv5NP+kdkyK8QvhlfOkUTOs+3P0iFjFLKF
-         6pGw==
-X-Gm-Message-State: APjAAAXMfEonkaVbnLAADxkxF0MAYCo6AmN0YYFZQfrDVBB5fmPttabi
-        btaPHTDFrfxFfHxshrJxDFffgqY6ktPy24WRmzY8TtW+
-X-Google-Smtp-Source: APXvYqyW/LED9B1kRHiZadBNTYt2Scjx7rcoJbVPhBzkuAa7aYNJ9N5cLqVPNbTkD+dR1R6kfxaX0ellBQcJpxHoAn8=
-X-Received: by 2002:a05:6214:547:: with SMTP id ci7mr28977858qvb.32.1574705962934;
- Mon, 25 Nov 2019 10:19:22 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=W09lgIqIKvECTOE849gv8T7YDNLO2Wc4fhvJ0YJldxk=;
+        b=JBRlqQS3rnl2e383ppfnZHXFl5/RETGSqBw9kaxxK7XVwSpeGBqbg1dsMABkU/9/LC
+         TCntHhTIZmUeyzam95jwM9sOxmVjs+TgsykwcE3z1rVQJrp1Z6JvcqNcg+pIahxS1qBj
+         dTpruHcrLgcWNxIdV8BXr4JVyF1UEi6NlZjTvThiuZliuO8SigZgmccypuCOdT/XBoVb
+         7MMvAal0GLV9EFf/QCfo8epDnZVO3Xy0kPZqozulyqo3G2+iuTzTFmBIBxvx3VcJOFQk
+         Q3jA7mWIA86B3n2U4oQQWPL8GmRxnh94kKegHS3rPKeUtiob1xaZDe5tnJJSmh7hTF4E
+         ntnA==
+X-Gm-Message-State: APjAAAW/Xoxmb/1bdCqcPeoSruQW82OgIQbER0sp6rY8XxBgDqrFl6Tr
+        xBCf4fxqV95ivGSpl7P7zdZSPdP4vemgqMhDxQHpyQ==
+X-Google-Smtp-Source: APXvYqyViSiFgUBvDzO1mVVyfrDrv1aJlHc6bYxT/J8Hw5dcdeuarzA4nQsAObckQJK0CIoKANHAPwHuY9MKcyA5yUo=
+X-Received: by 2002:a37:5b02:: with SMTP id p2mr27051982qkb.419.1574706011770;
+ Mon, 25 Nov 2019 10:20:11 -0800 (PST)
 MIME-Version: 1.0
-References: <20191123100111.219190-4-marcel@holtmann.org>
-In-Reply-To: <20191123100111.219190-4-marcel@holtmann.org>
+References: <20191118192123.82430-1-abhishekpandit@chromium.org> <1CEDCBDC-221C-4E5F-90E9-898B02304562@holtmann.org>
+In-Reply-To: <1CEDCBDC-221C-4E5F-90E9-898B02304562@holtmann.org>
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 25 Nov 2019 10:19:11 -0800
-Message-ID: <CANFp7mXLdmLchTKENP5-jxAWfOWNv6T+L+XR0_ALX+EF3pFB2g@mail.gmail.com>
-Subject: Re: [PATCH 4/4] Bluetooth: hci_bcm: Support pcm params in dts
+Date:   Mon, 25 Nov 2019 10:20:00 -0800
+Message-ID: <CANFp7mXNPsmfC_dDcxP1N9weiEFdogOvgSjuBLJSd+4-ONsoOQ@mail.gmail.com>
+Subject: Re: [PATCH v6 0/4] Bluetooth: hci_bcm: Additional changes for BCM4354 support
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        Douglas Anderson <dianders@chromium.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ondrej Jirman <megous@megous.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, Nov 23, 2019 at 2:01 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->
-> BCM chips may require configuration of PCM to operate correctly and
-> there is a vendor specific HCI command to do this. Add support in the
-> hci_bcm driver to parse this from devicetree and configure the chip.
->
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/hci_bcm.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index d48044276895..9cfb202bbeca 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -122,6 +122,7 @@ struct bcm_device {
->         bool                    is_suspended;
->  #endif
->         bool                    no_early_set_baudrate;
-> +       u8                      pcm_int_params[5];
->  };
->
->  /* generic bcm uart resources */
-> @@ -594,6 +595,16 @@ static int bcm_setup(struct hci_uart *hu)
->                         host_set_baudrate(hu, speed);
->         }
->
-> +       /* PCM parameters if provided */
-> +       if (bcm->dev && bcm->dev->pcm_int_params[0] != 0xff) {
-> +               struct bcm_set_pcm_int_params params;
-> +
-> +               btbcm_read_pcm_int_params(hu->hdev, &params);
-This seems redundant since we just overwrite it anyway.
+Hey,
 
-> +
-> +               memcpy(&params, bcm->dev->pcm_int_params, 5);
-> +               btbcm_write_pcm_int_params(hu->hdev, &params);
-> +       }
-> +
->  finalize:
->         release_firmware(fw);
+It looks about the same as one of my earlier patch series. Outside a
+few nitpicks, I'm ok with merging this.
+
+Thanks
+Abhishek
+
+On Sat, Nov 23, 2019 at 2:04 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
 >
-> @@ -1131,6 +1142,8 @@ static int bcm_acpi_probe(struct bcm_device *dev)
->  static int bcm_of_probe(struct bcm_device *bdev)
->  {
->         device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
-> +       device_property_read_u8_array(bdev->dev, "brcm,bt-pcm-int-params",
-> +                                     bdev->pcm_int_params, 5);
->         return 0;
->  }
+> Hi Abhishek,
 >
-> @@ -1146,6 +1159,9 @@ static int bcm_probe(struct platform_device *pdev)
->         dev->dev = &pdev->dev;
->         dev->irq = platform_get_irq(pdev, 0);
+> > While adding support for the BCM4354, I discovered a few more things
+> > that weren't working as they should have.
+> >
+> > First, we disallow serdev from setting the baudrate on BCM4354. Serdev
+> > sets the oper_speed first before calling hu->setup() in
+> > hci_uart_setup(). On the BCM4354, this results in bcm_setup() failing
+> > when the hci reset times out.
+> >
+> > Next, we add support for setting the PCM parameters, which consists of
+> > a pair of vendor specific opcodes to set the pcm parameters. The
+> > documentation for these params are available in the brcm_patchram_plus
+> > package (i.e. https://github.com/balena-os/brcm_patchram_plus). This is
+> > necessary for PCM to work properly.
+> >
+> > All changes were tested with rk3288-veyron-minnie.dts.
 >
-> +       /* Initialize routing field to an unsued value */
-unused
-> +       dev->pcm_int_params[0] = 0xff;
-> +
->         if (has_acpi_companion(&pdev->dev)) {
->                 ret = bcm_acpi_probe(dev);
->                 if (ret)
-> @@ -1406,6 +1422,9 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
->         bcmdev->serdev_hu.serdev = serdev;
->         serdev_device_set_drvdata(serdev, bcmdev);
+> so I have re-factored your patch set now to apply to latest bluetooth-nex=
+t tree and posted it to the mailing list. Please have a look at it if this =
+works for you. If it does, then we might just apply it this way and focus o=
+n getting detailed PCM codec configuration for all vendors in once we have =
+a second vendor to unify it.
 >
-> +       /* Initialize routing field to an unsued value */
-unused
-> +       bcmdev->pcm_int_params[0] = 0xff;
-> +
->         if (has_acpi_companion(&serdev->dev))
->                 err = bcm_acpi_probe(bcmdev);
->         else
-> --
-> 2.23.0
+> Regards
+>
+> Marcel
 >
