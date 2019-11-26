@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3587CC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 14:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87014C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 14:54:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D21072068E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 14:54:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 214FB2068E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 14:54:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="POdmPKKq"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="IdrKj3f1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728119AbfKZOyO (ORCPT
+        id S1728198AbfKZOyR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Nov 2019 09:54:14 -0500
-Received: from mail-lf1-f46.google.com ([209.85.167.46]:37572 "EHLO
-        mail-lf1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728040AbfKZOyO (ORCPT
+        Tue, 26 Nov 2019 09:54:17 -0500
+Received: from mail-lf1-f45.google.com ([209.85.167.45]:39605 "EHLO
+        mail-lf1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728138AbfKZOyR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Nov 2019 09:54:14 -0500
-Received: by mail-lf1-f46.google.com with SMTP id b20so14343461lfp.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2019 06:54:12 -0800 (PST)
+        Tue, 26 Nov 2019 09:54:17 -0500
+Received: by mail-lf1-f45.google.com with SMTP id f18so14317666lfj.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2019 06:54:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=yUuLcrq67bnQWX800OWs/DsAGtU1TIJB6gFkhcL1X8k=;
-        b=POdmPKKqeIlT7sfDVgFjk+xvk8vrM4SttXF3DZmL1/GevJc9HxofoNjoh6fSrcWdWc
-         PMbJwIxlogkpuBqxqK+yOZA+mnmRBKrRwanAxA7XVl6hqUh4QYas193/78uL5ttrgpw1
-         Agen/1woiUMGvLxXKgAvmu7IES2tPUgbzKR7W2aPsoURrMlqxkyZYe1swCl+77r+lHvA
-         Z6bcU9LaZLD94mC1VqxqYcHiLuHlBuhfGKMJNamX6z8l8VoOIF2JtUI91fCGzRp0e52H
-         y/KfOOff+SsIliN6w3CJ5GqrtntLaV707EA91p6Qi5obpCUpaWo2Yf7OjXmj77mB8SSQ
-         /FRw==
+        bh=kZFIlMqsNKni5o4rVyOHJFp8JYtLlYP/ROGlBRhyiTU=;
+        b=IdrKj3f1NeUI6afaVcQKyFjAMYvtlHa0e3z3yRPknnFh4tyGxbj0Dle6T/vfJGMTqY
+         rR3vdWjPhA+5XFEjd+WZgb37VBZ5ArzF8QV6P/vE3nO2R03d1B9BiJGwdXQZiPnRrPpm
+         2ZUo+jkPZsV0jwJs+2AcBQCq77AiQC4ZTt/FI9kusxaADfspAsNyfUBWBm/gpllmwpTg
+         TaS94g4g4V0U+8MWRv+fZ6lckomWL7q+GUvbOqDKCmNFUQFUHjoYF1Rb2lvk/OoEv6qT
+         fD+cOB5nkQQTu/I8lkwcz7g0tKbqlqewtxv8FTQ+qUVl/hEQzatGozqt0WkLmIJ+psA4
+         TTfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yUuLcrq67bnQWX800OWs/DsAGtU1TIJB6gFkhcL1X8k=;
-        b=RiB7HijHc2sahw1v9Tl7TF/oPk1Xd9mWVQu7mEuCNxzDSimjFPNbbLW5xR2PWMbP5s
-         8xCpVN4WRVPpklu0H7B8livTmbndJ8ykQEQ3Q5wAAzWKAHC5NDLtNZt88fspO2QRsmMM
-         MuoRj9/Cjlc5frJKeBkWhKQFBaBA657mXS6SyIyfaoaHDc0kYMaSo6n2/KXGf+LO4MC0
-         RcI6szwVQ/Pg9Ufhb5VvSIh0eUdQsmCEzWeRCaXTtLg0PvaSy2lvREXLdaqVsMDZM83r
-         xBby9ryx4Yjhz7roSVJwSTIDlKQV6dlsxQmvJlui1m7fGdpECNFPvI05MC36RyHdI4M4
-         +fTQ==
-X-Gm-Message-State: APjAAAXmKRDFyYDsPgkE8kfd015GVKk2KAwu/cp9sc1LarTHT/qe03xA
-        2bFHwMOcGU5fmMW22ugqjiw/dcK6pzYFow==
-X-Google-Smtp-Source: APXvYqykZiUCgbHHy6XftwA3lU2IgtN6MMnvCbo5iNWluR7u/DHLjcoBx+PBbZ+d7UtKHRJvlyzGoQ==
-X-Received: by 2002:ac2:5323:: with SMTP id f3mr21375763lfh.89.1574780051505;
-        Tue, 26 Nov 2019 06:54:11 -0800 (PST)
+        bh=kZFIlMqsNKni5o4rVyOHJFp8JYtLlYP/ROGlBRhyiTU=;
+        b=r5WFAggpXnrBwHqXFWmrYipgtE578NAc2r28PAhzahSBzSrPXcW/LZNG8xw2acFBmM
+         TJaQmM1vVbkhXsI5XJumn7o7RAfu2/srVl75taPQf1e82uv7It6rOkdVm+ctmBLfqmWQ
+         xk1wMjAy3tk+hxUrHvtMLKsUOi/RHdVdkj2C4fRmR+Hy4ym6xjyOCnhZOc/uERV9P0ON
+         +YqDCwanR44jN/17Yxma5GvRFYVX0NEIc/eLKxxakg5VOLeBtRJ1Kdmylq3vv80VLvKD
+         p0JPd/y7MxwxopiK0A/5Hi4lGvQC7GBfXXETgyoU6a09crli/tRYp3LC7k1llipD6kFC
+         JJRA==
+X-Gm-Message-State: APjAAAVM7UsRaM7eks3SbrMPAe3cn7+pqxGqorBWOjxC3DRZrNVKTFtE
+        69tV5vvPdBnwXOzGqmpDWZOMBnsi7hvBqA==
+X-Google-Smtp-Source: APXvYqyPW06YUorubU7YOyKJIAHtvnSZGVETciiZs9LFVepX8kndT7vHygOvqdrMMAiTTzjXziL7nw==
+X-Received: by 2002:ac2:5388:: with SMTP id g8mr14580639lfh.43.1574780052454;
+        Tue, 26 Nov 2019 06:54:12 -0800 (PST)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id d26sm6607954ljo.54.2019.11.26.06.54.10
+        by smtp.gmail.com with ESMTPSA id d26sm6607954ljo.54.2019.11.26.06.54.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Nov 2019 06:54:10 -0800 (PST)
+        Tue, 26 Nov 2019 06:54:11 -0800 (PST)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/3] mesh: Provide destination address in MessageReceived API
-Date:   Tue, 26 Nov 2019 15:54:00 +0100
-Message-Id: <20191126145401.25129-3-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ v3 3/3] mesh: Inform application about model subscriptions
+Date:   Tue, 26 Nov 2019 15:54:01 +0100
+Message-Id: <20191126145401.25129-4-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20191126145401.25129-1-michal.lowas-rzechonek@silvair.com>
 References: <20191126145401.25129-1-michal.lowas-rzechonek@silvair.com>
@@ -73,130 +73,258 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 ---
- doc/mesh-api.txt | 17 ++++++++++++-----
- mesh/model.c     | 20 ++++++++++++++++----
- test/test-join   |  8 ++++----
- test/test-mesh   |  8 ++++----
- 4 files changed, 36 insertions(+), 17 deletions(-)
+ doc/mesh-api.txt | 15 ++++++++
+ mesh/model.c     | 93 ++++++++++++++++++++++++++++++++++++++++++++++--
+ test/test-join   | 13 +++++++
+ test/test-mesh   | 25 +++++++------
+ 4 files changed, 133 insertions(+), 13 deletions(-)
 
 diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index a589616eb..23a958771 100644
+index 23a958771..30b7452e2 100644
 --- a/doc/mesh-api.txt
 +++ b/doc/mesh-api.txt
-@@ -768,7 +768,7 @@ Object path	<app_defined_element_path>
+@@ -100,6 +100,14 @@ Methods:
+ 					A 16-bit Company ID as defined by the
+ 					Bluetooth SIG
  
- Methods:
- 	void MessageReceived(uint16 source, uint16 key_index,
--					boolean subscription, array{byte} data)
-+					variant destination, array{byte} data)
++				array{variant} Subscriptions
++
++					Addresses the model is subscribed to.
++
++					Each address is provided either as
++					uint16 for group addresses, or
++					as array{byte} for virtual labels.
++
+ 		PossibleErrors:
+ 			org.bluez.mesh.Error.InvalidArguments
+ 			org.bluez.mesh.Error.NotFound,
+@@ -841,6 +849,13 @@ Methods:
+ 			A 16-bit Bluetooth-assigned Company Identifier of the
+ 			vendor as defined by Bluetooth SIG
  
- 		This method is called by bluetooth-meshd daemon when a message
- 		arrives addressed to the application.
-@@ -781,10 +781,17 @@ Methods:
- 		be used by the application when sending a response to this
- 		message (in case a response is expected).
- 
--		The subscription parameter is a boolean that is set to true if
--		the message is received as a part of the subscription (i.e., the
--		destination is either a well known group address or a virtual
--		label.
-+		The destination parameter contains the destination address of
-+		received message. Underlying variant types are:
++		array{variant} Subscriptions
 +
-+		uint16
++			Addresses the model is subscribed to.
 +
-+			Destination is an unicast address, or a well known
-+			group address
++			Each address is provided either as uint16 for group
++			addresses, or as array{byte} for virtual labels.
 +
-+		array{byte}
-+
-+			Destination is a virtual address label
- 
- 		The data parameter is the incoming message.
+ Properties:
+ 	uint8 Index [read-only]
  
 diff --git a/mesh/model.c b/mesh/model.c
-index de271f171..a0c683691 100644
+index a0c683691..57a63c59e 100644
 --- a/mesh/model.c
 +++ b/mesh/model.c
-@@ -823,8 +823,10 @@ static void send_dev_key_msg_rcvd(struct mesh_node *node, uint8_t ele_idx,
+@@ -295,6 +295,70 @@ static void config_update_model_bindings(struct mesh_node *node,
  	l_dbus_send(dbus, msg);
  }
  
--static void send_msg_rcvd(struct mesh_node *node, uint8_t ele_idx, bool is_sub,
--					uint16_t src, uint16_t app_idx,
-+static void send_msg_rcvd(struct mesh_node *node, uint8_t ele_idx,
-+					uint16_t src, uint16_t dst,
-+					const struct mesh_virtual *virt,
-+					uint16_t app_idx,
- 					uint16_t size, const uint8_t *data)
- {
- 	struct l_dbus *dbus = dbus_get_bus();
-@@ -847,7 +849,17 @@ static void send_msg_rcvd(struct mesh_node *node, uint8_t ele_idx, bool is_sub,
- 
- 	l_dbus_message_builder_append_basic(builder, 'q', &src);
- 	l_dbus_message_builder_append_basic(builder, 'q', &app_idx);
--	l_dbus_message_builder_append_basic(builder, 'b', &is_sub);
++static void append_dict_subs_array(struct l_dbus_message_builder *builder,
++						struct l_queue *subs,
++						struct l_queue *virts,
++						const char *key)
++{
++	const struct l_queue_entry *entry;
 +
-+	if (virt) {
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', key);
++	l_dbus_message_builder_enter_variant(builder, "av");
++	l_dbus_message_builder_enter_array(builder, "v");
++
++	if (!subs)
++		goto virts;
++
++	for (entry = l_queue_get_entries(subs); entry; entry = entry->next) {
++		uint16_t grp = L_PTR_TO_UINT(entry->data);
++
++		l_dbus_message_builder_enter_variant(builder, "q");
++		l_dbus_message_builder_append_basic(builder, 'q', &grp);
++		l_dbus_message_builder_leave_variant(builder);
++	}
++
++virts:
++	if (!virts)
++		goto done;
++
++	for (entry = l_queue_get_entries(virts); entry; entry = entry->next) {
++		const struct mesh_virtual *virt = entry->data;
++
 +		l_dbus_message_builder_enter_variant(builder, "ay");
 +		dbus_append_byte_array(builder, virt->label,
 +							sizeof(virt->label));
 +		l_dbus_message_builder_leave_variant(builder);
-+	} else {
-+		l_dbus_message_builder_enter_variant(builder, "q");
-+		l_dbus_message_builder_append_basic(builder, 'q', &dst);
-+		l_dbus_message_builder_leave_variant(builder);
++
 +	}
++
++done:
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++}
++
++static void config_update_model_subscriptions(struct mesh_node *node,
++							struct mesh_model *mod)
++{
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++	struct l_dbus_message_builder *builder;
++
++	msg = create_config_update_msg(node, mod->ele_idx, mod->id,
++								&builder);
++	if (!msg)
++		return;
++
++	append_dict_subs_array(builder, mod->subs, mod->virtuals,
++							"Subscriptions");
++
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++	l_dbus_send(dbus, msg);
++}
++
+ static void forward_model(void *a, void *b)
+ {
+ 	struct mesh_model *mod = a;
+@@ -1381,7 +1445,16 @@ int mesh_model_sub_add(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	if (!mod)
+ 		return status;
  
- 	dbus_append_byte_array(builder, data, size);
+-	return add_sub(node_get_net(node), mod, group, b_virt, dst);
++	status = add_sub(node_get_net(node), mod, group, b_virt, dst);
++
++	if (status != MESH_STATUS_SUCCESS)
++		return status;
++
++	if (!mod->cbs)
++		/* External models */
++		config_update_model_subscriptions(node, mod);
++
++	return MESH_STATUS_SUCCESS;
+ }
  
-@@ -986,7 +998,7 @@ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
- 		 */
- 		if (forward.has_dst && !forward.done) {
- 			if ((decrypt_idx & APP_IDX_MASK) == decrypt_idx)
--				send_msg_rcvd(node, i, is_subscription, src,
-+				send_msg_rcvd(node, i, src, dst, decrypt_virt,
- 						forward.app_idx, forward.size,
- 						forward.data);
- 			else if (decrypt_idx == APP_IDX_DEV_REMOTE ||
+ int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
+@@ -1417,7 +1490,7 @@ int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 		}
+ 	}
+ 
+-	status = mesh_model_sub_add(node, addr, id, group, b_virt, dst);
++	status = add_sub(node_get_net(node), mod, group, b_virt, dst);
+ 
+ 	if (status != MESH_STATUS_SUCCESS) {
+ 		/* Adding new group failed, so revert to old lists */
+@@ -1440,6 +1513,10 @@ int mesh_model_sub_ovr(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 		l_queue_destroy(virtuals, unref_virt);
+ 	}
+ 
++	if (!mod->cbs)
++		/* External models */
++		config_update_model_subscriptions(node, mod);
++
+ 	return status;
+ }
+ 
+@@ -1475,6 +1552,10 @@ int mesh_model_sub_del(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	if (l_queue_remove(mod->subs, L_UINT_TO_PTR(grp)))
+ 		mesh_net_dst_unreg(node_get_net(node), grp);
+ 
++	if (!mod->cbs)
++		/* External models */
++		config_update_model_subscriptions(node, mod);
++
+ 	return MESH_STATUS_SUCCESS;
+ }
+ 
+@@ -1497,6 +1578,10 @@ int mesh_model_sub_del_all(struct mesh_node *node, uint16_t addr, uint32_t id)
+ 	l_queue_clear(mod->subs, NULL);
+ 	l_queue_clear(mod->virtuals, unref_virt);
+ 
++	if (!mod->cbs)
++		/* External models */
++		config_update_model_subscriptions(node, mod);
++
+ 	return MESH_STATUS_SUCCESS;
+ }
+ 
+@@ -1691,6 +1776,10 @@ void model_build_config(void *model, void *msg_builder)
+ 								&period);
+ 	}
+ 
++	if (l_queue_length(mod->subs) || l_queue_length(mod->virtuals))
++		append_dict_subs_array(builder, mod->subs, mod->virtuals,
++							"Subscriptions");
++
+ 	l_dbus_message_builder_leave_array(builder);
+ 	l_dbus_message_builder_leave_struct(builder);
+ }
 diff --git a/test/test-join b/test/test-join
-index 079f71149..fb7b0d640 100644
+index fb7b0d640..6dfb2e8c3 100644
 --- a/test/test-join
 +++ b/test/test-join
-@@ -268,10 +268,10 @@ class Element(dbus.service.Object):
- 			self.UpdateModelConfiguration(mod_id, config[1])
+@@ -327,6 +327,19 @@ class Model():
+ 			print('Model publication period ', end='')
+ 			print(self.pub_period, end='')
+ 			print(' ms')
++		if 'Subscriptions' in config:
++			self.print_subscriptions(config.get('Subscriptions'))
++
++	def print_subscriptions(self, subscriptions):
++		print('Model subscriptions ', end='')
++		for sub in subscriptions:
++			if isinstance(sub, int):
++				print('%04x' % sub, end=' ')
++
++			if isinstance(sub, list):
++				label = uuid.UUID(bytes=b''.join(sub))
++				print(label, end=' ')
++		print()
  
- 	@dbus.service.method(MESH_ELEMENT_IFACE,
--					in_signature="qqbay", out_signature="")
--	def MessageReceived(self, source, key, is_sub, data):
--		print('Message Received on Element ', end='')
--		print(self.index)
-+					in_signature="qqvay", out_signature="")
-+	def MessageReceived(self, source, key, destination, data):
-+		print('Message Received on Element %d, src=%04x, dst=%s' %
-+						self.index, source, destination)
- 		for model in self.models:
- 			model.process_message(source, key, data)
- 
+ class OnOffServer(Model):
+ 	def __init__(self, model_id):
 diff --git a/test/test-mesh b/test/test-mesh
-index 3c5ded7b3..c67bb65fb 100755
+index c67bb65fb..5777fcebc 100755
 --- a/test/test-mesh
 +++ b/test/test-mesh
-@@ -556,10 +556,10 @@ class Element(dbus.service.Object):
- 			self.UpdateModelConfiguration(mod_id, config[1])
+@@ -128,6 +128,7 @@ import dbus.exceptions
  
- 	@dbus.service.method(MESH_ELEMENT_IFACE,
--					in_signature="qqbay", out_signature="")
--	def MessageReceived(self, source, key, is_sub, data):
--		print('Message Received on Element ', end='')
--		print(self.index)
-+					in_signature="qqvay", out_signature="")
-+	def MessageReceived(self, source, key, destination, data):
-+		print('Message Received on Element %d, src=%04x, dst=%s' %
-+						self.index, source, destination)
- 		for model in self.models:
- 			model.process_message(source, key, data)
+ from threading import Timer
+ import time
++import uuid
  
+ try:
+   from gi.repository import GLib
+@@ -628,17 +629,19 @@ class Model():
+ 			print('Model publication period ', end='')
+ 			print(self.pub_period, end='')
+ 			print(' ms')
+-
+-	def print_bindings(self):
+-		print(set_cyan('Model'), set_cyan('%03x' % self.model_id),
+-						set_cyan('is bound to: '))
+-
+-		if len(self.bindings) == 0:
+-			print(set_cyan('** None **'))
+-			return
+-
+-		for b in self.bindings:
+-			print(set_green('%03x' % b) + ' ')
++		if 'Subscriptions' in config:
++			print('Model subscriptions ', end='')
++			self.print_subscriptions(config.get('Subscriptions'))
++			print()
++
++	def print_subscriptions(self, subscriptions):
++		for sub in subscriptions:
++			if isinstance(sub, int):
++				print('%04x' % sub, end=' ')
++
++			if isinstance(sub, list):
++				label = uuid.UUID(bytes=b''.join(sub))
++				print(label, end=' ')
+ 
+ ########################
+ # On Off Server Model
 -- 
 2.19.1
 
