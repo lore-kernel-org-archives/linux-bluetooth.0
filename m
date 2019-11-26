@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D73C43215
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C71EC432C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA10720722
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 460F020748
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727166AbfKZHRj (ORCPT
+        id S1727171AbfKZHRk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Nov 2019 02:17:39 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:43938 "EHLO
+        Tue, 26 Nov 2019 02:17:40 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46072 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726333AbfKZHRi (ORCPT
+        with ESMTP id S1727141AbfKZHRj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Nov 2019 02:17:38 -0500
+        Tue, 26 Nov 2019 02:17:39 -0500
 Received: from localhost.localdomain (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8853CCECF7
+        by mail.holtmann.org (Postfix) with ESMTPSA id C9B57CECF9
         for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2019 08:26:45 +0100 (CET)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/4] Bluetooth: btbcm: Support pcm configuration
-Date:   Tue, 26 Nov 2019 08:17:30 +0100
-Message-Id: <20191126071732.67337-2-marcel@holtmann.org>
+Subject: [PATCH v2 4/4] Bluetooth: hci_bcm: Support pcm params in dts
+Date:   Tue, 26 Nov 2019 08:17:32 +0100
+Message-Id: <20191126071732.67337-4-marcel@holtmann.org>
 X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -38,126 +38,74 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-Add BCM vendor specific command to configure PCM parameters. The new
-vendor opcode allows us to set the sco routing, the pcm interface rate,
-and a few other pcm specific options (frame sync, sync mode, and clock
-mode). See broadcom-bluetooth.txt in Documentation for more information
-about valid values for those settings.
-
-Here is an example trace where this opcode was used to configure
-a BCM4354:
-
-        < HCI Command: Vendor (0x3f|0x001c) plen 5
-                01 02 00 01 01
-        > HCI Event: Command Complete (0x0e) plen 4
-        Vendor (0x3f|0x001c) ncmd 1
-                Status: Success (0x00)
-
-We can read back the values as well with ocf 0x001d to confirm the
-values that were set:
-        $ hcitool cmd 0x3f 0x001d
-        < HCI Command: ogf 0x3f, ocf 0x001d, plen 0
-        > HCI Event: 0x0e plen 9
-        01 1D FC 00 01 02 00 01 01
+BCM chips may require configuration of PCM to operate correctly and
+there is a vendor specific HCI command to do this. Add support in the
+hci_bcm driver to parse this from devicetree and configure the chip.
 
 Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btbcm.c | 46 +++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btbcm.h | 16 ++++++++++++++
- 2 files changed, 62 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 8e05706fe5d9..0795a49edfae 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -107,6 +107,52 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 0200eff12bc9..f8f5c593a05c 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -122,6 +122,7 @@ struct bcm_device {
+ 	bool			is_suspended;
+ #endif
+ 	bool			no_early_set_baudrate;
++	u8			pcm_int_params[5];
+ };
  
-+int btbcm_read_pcm_int_params(struct hci_dev *hdev,
-+			      struct bcm_set_pcm_int_params *params)
-+{
-+	struct sk_buff *skb;
-+	int err = 0;
+ /* generic bcm uart resources */
+@@ -594,6 +595,16 @@ static int bcm_setup(struct hci_uart *hu)
+ 			host_set_baudrate(hu, speed);
+ 	}
+ 
++	/* PCM parameters if provided */
++	if (bcm->dev && bcm->dev->pcm_int_params[0] != 0xff) {
++		struct bcm_set_pcm_int_params params;
 +
-+	skb = __hci_cmd_sync(hdev, 0xfc1d, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "BCM: Read PCM int params failed (%d)", err);
-+		return err;
++		btbcm_read_pcm_int_params(hu->hdev, &params);
++
++		memcpy(&params, bcm->dev->pcm_int_params, 5);
++		btbcm_write_pcm_int_params(hu->hdev, &params);
 +	}
 +
-+	if (skb->len != 6 || skb->data[0]) {
-+		bt_dev_err(hdev, "BCM: Read PCM int params length mismatch");
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	if (params)
-+		memcpy(params, skb->data + 1, 5);
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btbcm_read_pcm_int_params);
-+
-+int btbcm_write_pcm_int_params(struct hci_dev *hdev,
-+			       const struct bcm_set_pcm_int_params *params)
-+{
-+	struct sk_buff *skb;
-+	int err;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc1c, 5, params, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "BCM: Write PCM int params failed (%d)", err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btbcm_write_pcm_int_params);
-+
- int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+ finalize:
+ 	release_firmware(fw);
+ 
+@@ -1131,6 +1142,8 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ static int bcm_of_probe(struct bcm_device *bdev)
  {
- 	const struct hci_command_hdr *cmd;
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index d204be8a84bf..3c7dd0765837 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -54,6 +54,10 @@ struct bcm_set_pcm_format_params {
- int btbcm_check_bdaddr(struct hci_dev *hdev);
- int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw);
-+int btbcm_read_pcm_int_params(struct hci_dev *hdev,
-+			      struct bcm_set_pcm_int_params *params);
-+int btbcm_write_pcm_int_params(struct hci_dev *hdev,
-+			       const struct bcm_set_pcm_int_params *params);
- 
- int btbcm_setup_patchram(struct hci_dev *hdev);
- int btbcm_setup_apple(struct hci_dev *hdev);
-@@ -74,6 +78,18 @@ static inline int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- 	return -EOPNOTSUPP;
+ 	device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
++	device_property_read_u8_array(bdev->dev, "brcm,bt-pcm-int-params",
++				      bdev->pcm_int_params, 5);
+ 	return 0;
  }
  
-+int btbcm_read_pcm_int_params(struct hci_dev *hdev,
-+			      struct bcm_set_pcm_int_params *params)
-+{
-+	return -EOPNOTSUPP;
-+}
+@@ -1146,6 +1159,9 @@ static int bcm_probe(struct platform_device *pdev)
+ 	dev->dev = &pdev->dev;
+ 	dev->irq = platform_get_irq(pdev, 0);
+ 
++	/* Initialize routing field to an unused value */
++	dev->pcm_int_params[0] = 0xff;
 +
-+int btbcm_write_pcm_int_params(struct hci_dev *hdev,
-+			       const struct bcm_set_pcm_int_params *params)
-+{
-+	return -EOPNOTSUPP;
-+}
+ 	if (has_acpi_companion(&pdev->dev)) {
+ 		ret = bcm_acpi_probe(dev);
+ 		if (ret)
+@@ -1406,6 +1422,9 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+ 	bcmdev->serdev_hu.serdev = serdev;
+ 	serdev_device_set_drvdata(serdev, bcmdev);
+ 
++	/* Initialize routing field to an unused value */
++	bcmdev->pcm_int_params[0] = 0xff;
 +
- static inline int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
- {
- 	return -EOPNOTSUPP;
+ 	if (has_acpi_companion(&serdev->dev))
+ 		err = bcm_acpi_probe(bcmdev);
+ 	else
 -- 
 2.23.0
 
