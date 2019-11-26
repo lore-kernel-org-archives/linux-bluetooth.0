@@ -2,75 +2,69 @@ Return-Path: <SRS0=oE9z=ZS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 139DDC43141
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B10C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:19:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D84D520748
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E468F20659
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Nov 2019 07:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727169AbfKZHRj (ORCPT
+        id S1727184AbfKZHTg convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Nov 2019 02:17:39 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:47142 "EHLO
+        Tue, 26 Nov 2019 02:19:36 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:52950 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727138AbfKZHRi (ORCPT
+        with ESMTP id S1726295AbfKZHTg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Nov 2019 02:17:38 -0500
-Received: from localhost.localdomain (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id ABC1CCECF8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2019 08:26:45 +0100 (CET)
+        Tue, 26 Nov 2019 02:19:36 -0500
+Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
+        by mail.holtmann.org (Postfix) with ESMTPSA id EFBD6CECF6;
+        Tue, 26 Nov 2019 08:28:41 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH v6 0/4] Bluetooth: hci_bcm: Additional changes for BCM4354
+ support
 From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/4] dt-bindings: net: bluetooth: update broadcom-bluetooth
-Date:   Tue, 26 Nov 2019 08:17:31 +0100
-Message-Id: <20191126071732.67337-3-marcel@holtmann.org>
-X-Mailer: git-send-email 2.23.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANFp7mXNPsmfC_dDcxP1N9weiEFdogOvgSjuBLJSd+4-ONsoOQ@mail.gmail.com>
+Date:   Tue, 26 Nov 2019 08:19:33 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ondrej Jirman <megous@megous.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1CEB6B69-09AA-47AA-BC43-BD17C00249E7@holtmann.org>
+References: <20191118192123.82430-1-abhishekpandit@chromium.org>
+ <1CEDCBDC-221C-4E5F-90E9-898B02304562@holtmann.org>
+ <CANFp7mXNPsmfC_dDcxP1N9weiEFdogOvgSjuBLJSd+4-ONsoOQ@mail.gmail.com>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Hi Abhishek,
 
-Add documentation for brcm,bt-pcm-int-params vendor specific
-configuration of the SCO PCM settings.
+> It looks about the same as one of my earlier patch series. Outside a
+> few nitpicks, I'm ok with merging this.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- .../devicetree/bindings/net/broadcom-bluetooth.txt         | 7 +++++++
- 1 file changed, 7 insertions(+)
+I fixed the nitpicks up and send a v2.
 
-diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-index f16b99571af1..b02a53275c98 100644
---- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-@@ -30,6 +30,12 @@ Optional properties:
-    - "lpo": external low power 32.768 kHz clock
-  - vbat-supply: phandle to regulator supply for VBAT
-  - vddio-supply: phandle to regulator supply for VDDIO
-+ - brcm,bt-pcm-int-params: configure PCM parameters via a 5-byte array
-+    - sco-routing: 0 = PCM, 1 = Transport, 2 = Codec, 3 = I2S
-+    - pcm-interface-rate: 128KBps, 256KBps, 512KBps, 1024KBps, 2048KBps
-+    - pcm-frame-type: short, long
-+    - pcm-sync-mode: slave, master
-+    - pcm-clock-mode: slave, master
- 
- 
- Example:
-@@ -41,5 +47,6 @@ Example:
-        bluetooth {
-                compatible = "brcm,bcm43438-bt";
-                max-speed = <921600>;
-+               brcm,bt-pcm-int-params = [1 2 0 1 1];
-        };
- };
--- 
-2.23.0
+However we should still work towards a generic description of Bluetooth PCM settings for all vendors. Any ideas are welcome.
+
+Regards
+
+Marcel
 
