@@ -2,80 +2,90 @@ Return-Path: <SRS0=/G8r=ZT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C567C43141
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Nov 2019 03:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 865C8C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Nov 2019 04:16:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E3BD2075C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Nov 2019 03:01:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 556E920835
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Nov 2019 04:16:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=socoptimum-com.20150623.gappssmtp.com header.i=@socoptimum-com.20150623.gappssmtp.com header.b="BU3L5PN0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726822AbfK0DBk (ORCPT
+        id S1726722AbfK0EQX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Nov 2019 22:01:40 -0500
-Received: from rtits2.realtek.com ([211.75.126.72]:50564 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbfK0DBk (ORCPT
+        Tue, 26 Nov 2019 23:16:23 -0500
+Received: from mail-pg1-f181.google.com ([209.85.215.181]:37447 "EHLO
+        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726526AbfK0EQX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Nov 2019 22:01:40 -0500
-Authenticated-By: 
-X-SpamFilter-By: BOX Solutions SpamTrap 5.62 with qID xAR31C2b020528, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (RTITCASV01.realtek.com.tw[172.21.6.18])
-        by rtits2.realtek.com.tw (8.15.2/2.57/5.78) with ESMTPS id xAR31C2b020528
-        (version=TLSv1 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Wed, 27 Nov 2019 11:01:12 +0800
-Received: from localhost.localdomain (172.21.83.238) by
- RTITCASV01.realtek.com.tw (172.21.6.18) with Microsoft SMTP Server id
- 14.3.468.0; Wed, 27 Nov 2019 11:01:11 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <matthias.bgg@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>, <alex_lu@realsil.com.cn>,
-        <max.chou@realtek.com>
-Subject: [PATCH] Bluetooth: btusb: Edit the logical value for Realtek Bluetooth reset
-Date:   Wed, 27 Nov 2019 11:01:07 +0800
-Message-ID: <20191127030107.17604-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.17.1
+        Tue, 26 Nov 2019 23:16:23 -0500
+Received: by mail-pg1-f181.google.com with SMTP id b10so10126336pgd.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2019 20:16:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=socoptimum-com.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-transfer-encoding:content-language;
+        bh=7LE/KmhgWQbDKZiPASD3RWI3bhICe2/ZKa9LlQcl5T4=;
+        b=BU3L5PN0qj0SWkxUKfFd1f0JYJsNtka/dZPmoLXvsSzbfisM+TccMuinD5XBygPe3a
+         Fnb5coB5rkJKbe8vq2ck7KT6Mzb8NOOOHepP9qjSwVC0RVT9ug6hp6LK/o068pmV1t9M
+         ElSZ9M67eepShzNJjlwljJ8c4R1VJVGTo6ekBMZsLpxCrq16BHQL5wLmDv4uPZjC7XES
+         +Mradg0Q9oUxzH5evZ506aTaWLCcgNzJO3OehCiJlqt0qxuGpAvzWKCJpdV+QHTMkFIT
+         8qug/+62WRnN45YaHnp8TXqZr+hiZejtLkwnXQfj1jhsg43gl03CQvFFz6SpabV84ymw
+         G7Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=7LE/KmhgWQbDKZiPASD3RWI3bhICe2/ZKa9LlQcl5T4=;
+        b=awj8hammCCkB5L5pJZfuKSE718nsGmrREAWyu/wkYMMBfZG5PfWkRBea3SahBzekk/
+         DYIy55AyIXBXH3aSvZj3j8NFXBcAkX5HW52m5b3WjLZk53IKjLTprIPIUZLuW8IHltYH
+         51XkZukIbTBaP2J2R/G7MJWzXAFyzRN6uThHI+kZlHyuuPC5lKkB+TvG/T/xyDaheg2X
+         WkcjnPNjzoEXw1GorpqcJze/Q6JDSqtAfVWk3MXddb86AVNT269Bv5ldqBqy5lgTU5va
+         MxCN66jUy4m16Y57edyMgWTRk7vsLP64IIcKe7kEWGEV+wB3n4m00WU9MMdFE5mjJepe
+         Bx0A==
+X-Gm-Message-State: APjAAAVcWNRj+FuWsLAcGQhRO+mcZaL7PReTGG9/RoFMVAhSbDrQ+UAl
+        VuiUDY5EDcYS1/9UED5Y+2lGjBwsCeU=
+X-Google-Smtp-Source: APXvYqzkpe2hCNXYi9q8KVl/4MEUHvtdOWX/Ymih41ogAYLwYn7dvUjCIkC3P/vtlUtISQwxgzDZhQ==
+X-Received: by 2002:a63:f64:: with SMTP id 36mr2469477pgp.16.1574828181193;
+        Tue, 26 Nov 2019 20:16:21 -0800 (PST)
+Received: from [192.168.1.9] ([122.179.42.13])
+        by smtp.gmail.com with ESMTPSA id 136sm14516406pfb.49.2019.11.26.20.16.19
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Nov 2019 20:16:20 -0800 (PST)
+To:     linux-bluetooth@vger.kernel.org
+From:   Venkat Vallapaneni <vallapaneni@socoptimum.com>
+Subject: bluez meshctl error: socket operation on non-socket
+Message-ID: <b260550e-0884-662d-e395-90e7678cb1a7@socoptimum.com>
+Date:   Wed, 27 Nov 2019 09:46:17 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.83.238]
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
+Hi,
 
-It should be pull low and pull high on the physical line for the Realtek
-Bluetooth reset. gpiod_set_value_cansleep() takes ACTIVE_LOW status for
-the logical value settings, so the original commit should be corrected.
+I am trying to use bluez 5.52 for provisioning a bluetooth mesh capable 
+device. When I gave provision <uuid>, I get this below error. Please let 
+me know what I am missing.
 
-Signed-off-by: Max Chou <max.chou@realtek.com>
----
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I am using ell 0.26 on ubuntu 18.04. I am able to provision successfully 
+with bluez 5.50.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 70e385987d41..82fb2e7b2892 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -552,9 +552,9 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
- 	}
- 
- 	bt_dev_err(hdev, "Reset Realtek device via gpio");
--	gpiod_set_value_cansleep(reset_gpio, 0);
--	msleep(200);
- 	gpiod_set_value_cansleep(reset_gpio, 1);
-+	msleep(200);
-+	gpiod_set_value_cansleep(reset_gpio, 0);
- }
- 
- static inline void btusb_free_frags(struct btusb_data *data)
--- 
-2.17.1
+AcquireWrite success: fd 8 MTU 69
+GATT-TX:     03 00 10
+*sendmsg: Socket operation on non-socket*[Zephyr]#
+
+Rgds,
+Venkat.
+
 
