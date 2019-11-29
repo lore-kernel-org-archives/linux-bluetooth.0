@@ -2,73 +2,64 @@ Return-Path: <SRS0=sIa/=ZV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AFD4C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 17:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 262BCC43215
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 19:22:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 579442158A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 17:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04F5E21736
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 19:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727004AbfK2Rgk (ORCPT
+        id S1727022AbfK2TWi convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Nov 2019 12:36:40 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:52102 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726970AbfK2Rgk (ORCPT
+        Fri, 29 Nov 2019 14:22:38 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:59120 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726926AbfK2TWh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Nov 2019 12:36:40 -0500
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1iakC4-0005JJ-20; Fri, 29 Nov 2019 17:36:36 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+        Fri, 29 Nov 2019 14:22:37 -0500
+Received: from [192.168.1.91] (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 923A2CECDE;
+        Fri, 29 Nov 2019 20:31:44 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH] Bluetooth: btusb: fix memory leak on fw
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20191129173635.87479-1-colin.king@canonical.com>
+Date:   Fri, 29 Nov 2019 20:22:05 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Sean Wang <sean.wang@mediatek.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: fix memory leak on fw
-Date:   Fri, 29 Nov 2019 17:36:35 +0000
-Message-Id: <20191129173635.87479-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.24.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F011BBCD-8D95-4934-AB3E-0F264990D4F2@holtmann.org>
+References: <20191129173635.87479-1-colin.king@canonical.com>
+To:     Colin King <colin.king@canonical.com>
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+Hi Colin,
 
-Currently the error return path when the call to btusb_mtk_hci_wmt_sync
-fails does not free fw.  Fix this by returning via the error_release_fw
-label that performs the free'ing.
+> Currently the error return path when the call to btusb_mtk_hci_wmt_sync
+> fails does not free fw.  Fix this by returning via the error_release_fw
+> label that performs the free'ing.
+> 
+> Addresses-Coverity: ("Resource leak")
+> Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+> drivers/bluetooth/btusb.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Addresses-Coverity: ("Resource leak")
-Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/bluetooth/btusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9b587e662b48..d9cd0677d41c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2867,7 +2867,7 @@ static int btusb_mtk_setup_firmware(struct hci_dev *hdev, const char *fwname)
- 	err = btusb_mtk_hci_wmt_sync(hdev, &wmt_params);
- 	if (err < 0) {
- 		bt_dev_err(hdev, "Failed to send wmt rst (%d)", err);
--		return err;
-+		goto err_release_fw;
- 	}
- 
- 	/* Wait a few moments for firmware activation done */
--- 
-2.24.0
+Regards
+
+Marcel
 
