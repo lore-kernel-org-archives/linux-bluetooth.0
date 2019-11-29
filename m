@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F197C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 12:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8ECBC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 13:38:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EBE032086A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 12:15:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61FE7216F4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Nov 2019 13:38:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="op3xsFtq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LtfW9yK6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726684AbfK2MPL (ORCPT
+        id S1726778AbfK2Ni2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Nov 2019 07:15:11 -0500
-Received: from mail-il1-f193.google.com ([209.85.166.193]:35980 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726360AbfK2MPL (ORCPT
+        Fri, 29 Nov 2019 08:38:28 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:33690 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726741AbfK2Ni1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Nov 2019 07:15:11 -0500
-Received: by mail-il1-f193.google.com with SMTP id b15so6688119iln.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Nov 2019 04:15:10 -0800 (PST)
+        Fri, 29 Nov 2019 08:38:27 -0500
+Received: by mail-oi1-f196.google.com with SMTP id x21so19000372oic.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Nov 2019 05:38:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=PYt93vu0PrEFGJ/tpAJlDPbQqWJzwOpZc84agBVFcfE=;
-        b=op3xsFtqd+fnY1HRoDZMGVbXsNwsK3i4xGC55HdplZY2PxFke/V4BqNL5arI/gRoMk
-         hUTo+KZ6DdMaQCzbQqR5SEVBrg/7pgcWRHnLgbzmfDdfSx8EiH9lUoehL1gO2a9rgPDd
-         dCOg4Ngos9vm0aR496Bu2k7gbTBH7QC0IgvUI0M0raKG2N2NgdYU0t2A51spliLnMKjf
-         UPiTFNCpptpGj2SSRqaFG6/6b1eSlVlEjrSau87nRTkA2+S8tKV/d8jUfojGbNEJ+HQU
-         mbaRbBvQPY7B0iOYbGKrLWy3lxtx1abKyuPCWLqLHpO8EaeWdfbt5yxsLVbC4ZyGaGex
-         PUJQ==
+        bh=lqOAp4Acs8n2jW20CoqW6s51k+tgILp27ZnsT/K5EPI=;
+        b=LtfW9yK60KPjbLup6qzpK7mGW+7HXOd+5C1JWytbRPIOSUQ2XrkQSErLBTLoPtHCHA
+         l4oOkQ88R2SiCmrdsmZtdQXB6JSMBUyDdbLG+bovaSswH74QkAQ//BfgO2KlAROgbuvZ
+         ZDIHhv7nvdq/+BY9tDFIyquEZiOlqG9LxOMantZ7hqDjzVahWiNXe1QoNBIMKckoCaGK
+         62oBoZmrenDRYFcR0WbiVe2vp0DDPFYVzQi9rsI1lSfhbRk3nW1jWDt06yMNECOYAQLE
+         gGR9R7Krqq2heuQ/T2BPN3MbiW+2R0fv/uTP+5rk7UB8P7Q4ouZpDGmSJGTTKnODulTY
+         0Ocw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=PYt93vu0PrEFGJ/tpAJlDPbQqWJzwOpZc84agBVFcfE=;
-        b=s3gbc2Wx5VWhKnIMvhcRDnlpNYvnu6c+VWHWBTwJQGuYT/mn/9dEyskS1YvnUHqwBf
-         n7PVAD4DN7QAJrcYRxrBLXf+cYaTQePRMoox5SemO6BZpvX2wy1K26sb/nMWFdGobD8y
-         F1vkhq/2J069PqXt7KZT8p92stpDPWuV7BBLyMRzzSahBzGwW08N6zMhbabNgXtCYNjZ
-         8dr/JAxF+dt8kgF7HJFiEAtldkPq2r2RwvE/wmWSGIA7lt7B3t9+7dwv44om3rQ096Pm
-         6FwNhFTyJaAyTHmiyMKg/jcRFiJk3Tip6CTWJW2rdTWpNGlrXBJd7HwqfAThkBXGI93a
-         M7zQ==
-X-Gm-Message-State: APjAAAUsajfsin/p8euWRIz6WhtXoyHc6+E8z/nnBCpmarMTMAmSmmvT
-        kJXZspFDCn9fMvasPcYpO1gc80zioEP4HkNF1BvhN0hTkJi4A9cN
-X-Google-Smtp-Source: APXvYqy6ZKnWoZwdMSNtzFbUl35trYpLhg0AVrbz/TKKvcitUlpgqJ7CNPVPtuaKDgct/hprux29zep2FFCiFK+ekPY=
-X-Received: by 2002:a92:770d:: with SMTP id s13mr34036803ilc.257.1575029709980;
- Fri, 29 Nov 2019 04:15:09 -0800 (PST)
+        bh=lqOAp4Acs8n2jW20CoqW6s51k+tgILp27ZnsT/K5EPI=;
+        b=uHA7djyDcEablOwgBBUhH9hRubkA4IsHEgwC2DgHXsVsBze84sMbLUNInYdSiRCgpt
+         m3oHZE5oK6uNUyAR+YkvdbvoE0FJLy4Qihj+vJuZGy/4H+HMGrj3IklR279vw2hjRx4j
+         jydmuCdIwJabXHyQdLbJ++C1V1FwEMlzH4LK9p5Bt1QGmKAzczIZ29YMBq7NgPN5ryKQ
+         oa1bSm96TPj+MwefKGqVbudurqFC5kkCpGNgL+PEMY/U0vNN6MWlwnBbIR7GhGh9MDFT
+         0T1E911ronuq6WPZfOSX5QB93QY00722BMLaCHtImbS/RMguvsvtkLAH1pba/NZWFls5
+         wEFA==
+X-Gm-Message-State: APjAAAVi5BvOniAT+AAohG/4C8e5p23Bc72Yvr9FPxuf8xu6irgxdAqO
+        g8q50YHahGjAsX0W3Wd+bCbG3uFPKP/bUFOMsfw=
+X-Google-Smtp-Source: APXvYqybsu5I6rLcDGoHLunP+DuSt+vOdMXHzmpp+SNYU9Kz4yGiZoHfwEkjBMawXjzf4V9LgTDwcsUBHBEr6eLO/Ag=
+X-Received: by 2002:aca:d904:: with SMTP id q4mr12750678oig.21.1575034704861;
+ Fri, 29 Nov 2019 05:38:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20191128091748.24531-1-sathish.narasimman@intel.com> <20191128091748.24531-2-sathish.narasimman@intel.com>
-In-Reply-To: <20191128091748.24531-2-sathish.narasimman@intel.com>
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Fri, 29 Nov 2019 17:44:58 +0530
-Message-ID: <CAOVXEJKJDHopx_vqhEN389xW870HxhYmg56J+Ub9xF3cBsVaTA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] bluetooth:btusb: handle msbc audio over USB Endpoints
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Cc:     Sathish Narasimman <sathish.narasimman@intel.com>,
+References: <20191129121042.3311-1-sathish.narasimman@intel.com> <20191129121042.3311-2-sathish.narasimman@intel.com>
+In-Reply-To: <20191129121042.3311-2-sathish.narasimman@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 29 Nov 2019 15:38:12 +0200
+Message-ID: <CABBYNZLrDOrvJ03FehWv1FRNaNWL6SEecZkhSu_VrHzbHo5PGg@mail.gmail.com>
+Subject: Re: [PATCH v5 2/2] bluetooth:btusb: handle msbc audio over USB Endpoints
+To:     Sathish Narsimman <nsathish41@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Sathish Narasimman <sathish.narasimman@intel.com>,
         Chethan T N <chethan.tumkur.narayan@intel.com>,
         Hsin-Yu Chao <hychao@chromium.org>,
         Amit K Bag <amit.k.bag@intel.com>
@@ -70,9 +71,9 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Sathish,
 
-On Thu, Nov 28, 2019 at 2:47 PM Sathish Narsimman <nsathish41@gmail.com> wrote:
+On Fri, Nov 29, 2019 at 2:16 PM Sathish Narsimman <nsathish41@gmail.com> wrote:
 >
 > From: Sathish Narasimman <sathish.narasimman@intel.com>
 >
@@ -90,11 +91,11 @@ On Thu, Nov 28, 2019 at 2:47 PM Sathish Narsimman <nsathish41@gmail.com> wrote:
 > Signed-off-by: Hsin-Yu Chao <hychao@chromium.org>
 > Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
 > ---
->  drivers/bluetooth/btusb.c | 160 +++++++++++++++++++++++++++++---------
->  1 file changed, 123 insertions(+), 37 deletions(-)
+>  drivers/bluetooth/btusb.c | 157 +++++++++++++++++++++++++++++---------
+>  1 file changed, 121 insertions(+), 36 deletions(-)
 >
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 82fb2e7b2892..dc2af70a3b8d 100644
+> index 9b587e662b48..541048d647d4 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
 > @@ -483,6 +483,8 @@ struct btusb_data {
@@ -112,6 +113,11 @@ On Thu, Nov 28, 2019 at 2:47 PM Sathish Narsimman <nsathish41@gmail.com> wrote:
 >
 > +static inline void __fill_isoc_descriptor_msbc(struct urb *urb, int len,
 > +                                              int mtu, bool packet_flow)
+
+Well I guess is really a role for alt6 since afaik mSBC can be sent in
+other settings as as well, besides we should never assume a specific
+codec is in use since the userspace can use anything with transparent.
+
 > +{
 > +       int i, offset = 0;
 > +       unsigned int interval;
@@ -165,19 +171,15 @@ On Thu, Nov 28, 2019 at 2:47 PM Sathish Narsimman <nsathish41@gmail.com> wrote:
 >         skb->dev = (void *)hdev;
 >
 >         return urb;
-> @@ -1473,8 +1515,10 @@ static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+> @@ -1475,6 +1517,7 @@ static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
 >
->         BT_DBG("%s evt %d", hdev->name, evt);
->
-> -       if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
-> +       if ((evt != HCI_NOTIFY_CONN_ADD)
-> +           && (hci_conn_num(hdev, SCO_LINK) != data->sco_num)) {
+>         if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
 >                 data->sco_num = hci_conn_num(hdev, SCO_LINK);
 > +               data->air_mode = evt;
 >                 schedule_work(&data->work);
 >         }
 >  }
-> @@ -1522,11 +1566,70 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+> @@ -1522,11 +1565,70 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
 >         return 0;
 >  }
 >
@@ -249,7 +251,7 @@ On Thu, Nov 28, 2019 at 2:47 PM Sathish Narsimman <nsathish41@gmail.com> wrote:
 >         int err;
 >
 >         if (data->sco_num > 0) {
-> @@ -1541,44 +1644,27 @@ static void btusb_work(struct work_struct *work)
+> @@ -1541,44 +1643,27 @@ static void btusb_work(struct work_struct *work)
 >                         set_bit(BTUSB_DID_ISO_RESUME, &data->flags);
 >                 }
 >
@@ -313,7 +315,7 @@ On Thu, Nov 28, 2019 at 2:47 PM Sathish Narsimman <nsathish41@gmail.com> wrote:
 > --
 > 2.17.1
 >
-Please ignore this as Patch V5 is updated.
 
-Regards
-Sathish N
+
+-- 
+Luiz Augusto von Dentz
