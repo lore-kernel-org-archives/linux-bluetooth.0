@@ -2,200 +2,193 @@ Return-Path: <SRS0=ukjF=ZX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21126C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Dec 2019 18:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F00C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Dec 2019 21:58:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D38AC20715
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Dec 2019 18:57:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE5DD20865
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Dec 2019 21:58:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EO4pYNi0"
+	dkim=pass (2048-bit key) header.d=ice9-us.20150623.gappssmtp.com header.i=@ice9-us.20150623.gappssmtp.com header.b="UP4+bMER"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727169AbfLAS5p (ORCPT
+        id S1727326AbfLAV6p (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 1 Dec 2019 13:57:45 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:39351 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726702AbfLAS5p (ORCPT
+        Sun, 1 Dec 2019 16:58:45 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35561 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726982AbfLAV6p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 1 Dec 2019 13:57:45 -0500
-Received: by mail-wm1-f68.google.com with SMTP id s14so13854288wmh.4
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Dec 2019 10:57:42 -0800 (PST)
+        Sun, 1 Dec 2019 16:58:45 -0500
+Received: by mail-pf1-f195.google.com with SMTP id b19so641713pfo.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Dec 2019 13:58:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=Xq/RBPSQFJmYhLWpg2XwhynnGZ7roEU4Z9UWkc+CqJM=;
-        b=EO4pYNi0T2YYJN4pwhNnqw3RUJ2SV8fb6k372cxlQgVTvnGwsIZUhYD4dQrMSceBkQ
-         4ghqDUcXfzlKsaEXXZTv1lrh/5ivNUSF9TXJddb4gPDkcgukTz3ueoRdKH8yyl8pus/W
-         MhrTpu7Ep7CooUogomPoQc0ueFKkYdw7lZZbWFB2L1ojYZPGiV1wFOcRPn+cPL4w0Zw4
-         t6zwnjxz2SCyZ54+xjNzyqfaRM1UYG47PJYdgFLjaKbt/1TZ3CDsebn2CxYniJHEJ1zZ
-         Nsn4shUej4p0I8NEaptz3A0DRAR0ajs6kZgECvylbjUui/4TWiggL+ESRTDZzqbDkWM8
-         PUJw==
+        d=ice9-us.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=3CJfkTTxFHlb+JkB8ZdpjP3zB3i9I2B9suW22v+06qQ=;
+        b=UP4+bMERkFdvcxWKWq6sETns6vqy6BUaMJeYzzQnHLG8PwYcj6ZDRzcCY0KQ0jnJ/T
+         wlnSZxcysorkdl1c+crfCDWBcNO1T90CdJtlSHqVPdX+mMKeF+ab0AKnjbKsTzcZ43yN
+         nJT1CyxfLdIjU6QyNR7eBcrkKh9mFNHifA1h2IgdJVNY1xsfLrfBz5nHY2vG6ckEMzxO
+         ABNNTKIU0mZ2qO/z5LCjACnHbCWSnHGdd8IWqopGVrgHJ6arlkA551tT+JcjnLgELcUk
+         JLt6vrzGfHlsyH361Fh08u/wGLe6FBifglGc6JDuKa9YCQJwyAbyr74WY4pavRmZeMRs
+         yNyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=Xq/RBPSQFJmYhLWpg2XwhynnGZ7roEU4Z9UWkc+CqJM=;
-        b=dtxMzyyeY8zN7ghvksdehN+i/mfLGDuIFeqwvuh0JrQU9rvnbQUdnt6jPO2MJubOBp
-         GvGdVhlBCefFvccjay/iBeOCE5h6BB0V/vFWcWh/ZybPgsiEICkXtow9GDlzb7ZloO/f
-         fWpUuL2frHvWTb+RLOiDPBRkJGzx+cMpf2F5zmDKXg1TaRp3C6eGC/nbA36iiujoD3wA
-         yLzk6C0Xkbg4UtN+Ug53ME2QzO0SSIjtt9B7joq+AvmdKHUatb2plqmG4oWBOwaMRboE
-         kmzXwbKu2Jr+foF6r8jXb1wles1OEkXyawexGudE0DadN6fOjWhMJjsG+oVVNekRFg8g
-         UMNA==
-X-Gm-Message-State: APjAAAXcv77SuP3dfZgQcGsi6zHa8YaO6dPUhiCX87Mqf5rsThxARBBj
-        emE2JZXkWKxcutpln07kctfRZw+u
-X-Google-Smtp-Source: APXvYqw+uF4dnINJX8oJwu2GzOcm6uAEavb/AsO43+QBwA48mcTUBQg3+CjTsQkWsbNFPu9eD4ruvQ==
-X-Received: by 2002:a1c:a78f:: with SMTP id q137mr25409349wme.8.1575226661897;
-        Sun, 01 Dec 2019 10:57:41 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id t8sm14007822wrp.69.2019.12.01.10.57.40
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 01 Dec 2019 10:57:40 -0800 (PST)
-Date:   Sun, 1 Dec 2019 19:57:40 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org,
-        General PulseAudio Discussion 
-        <pulseaudio-discuss@lists.freedesktop.org>, ofono@ofono.org,
-        devkit-devel@lists.freedesktop.org,
-        Bastien Nocera <hadess@hadess.net>,
-        Georg Chini <georg@chini.tk>,
-        Russell Treleaven <rtreleaven@bunnykick.ca>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Tanu Kaskinen <tanuk@iki.fi>,
-        Arun Raghavan <arun@arunraghavan.net>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>
-Subject: Proposal for a new API and usage of Bluetooth HSP and HFP profiles
- on Linux
-Message-ID: <20191201185740.uot7zb2s53p5gu7z@pali>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="nxj6qpmarjtupful"
-Content-Disposition: inline
-User-Agent: NeoMutt/20170113 (1.7.2)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=3CJfkTTxFHlb+JkB8ZdpjP3zB3i9I2B9suW22v+06qQ=;
+        b=Q19lBGG/qyV7iFjEkO73WWbuzBby6wZndyAIsfWw0Fld5RmrzYVzjDQ+E76LXn9VOR
+         BiQcTI56CMfB7y5RS30FUp9Pwd6QYkeYIZrmRTsz6dog36id4dqKI0X2OBOZaIaMP23x
+         UQX1Ir4Zw1zuVfn6JSBxlYdU/PTXBX0SWtEDmHfjp9ItAjEsGbqowB1eiVeyNGxMuhpd
+         IHEu2bMYc3kK0DSK4D52xMZJYONhf6P3eH9P/iRUnS5DOCB/i/TIEuALYt8y8ityL0qF
+         ZtovSNZI6GNVk9Y2H8fpY+l7uUMN3BKKYbJuEeMmSWLAuXS4Vzfw7iJpRjhP6hzPcMDQ
+         nF4Q==
+X-Gm-Message-State: APjAAAV/xrccRYyTMISrIw6e6AabycdNKdWS9NuZyNC0rrO8aremaiot
+        5qy4gUAnbhkRtUYVjnneGoMMFcXIEAcLrA==
+X-Google-Smtp-Source: APXvYqx11CIBGgHIOJL93ZavdAp4S8oGzoPExg7oApXpCKJ+hBZKp44tlKkYDPGYU/DVVdFgvQ/9fw==
+X-Received: by 2002:a65:5c48:: with SMTP id v8mr29087671pgr.419.1575237524015;
+        Sun, 01 Dec 2019 13:58:44 -0800 (PST)
+Received: from localhost.localdomain (c-67-188-68-101.hsd1.ca.comcast.net. [67.188.68.101])
+        by smtp.gmail.com with ESMTPSA id v16sm22939813pje.1.2019.12.01.13.58.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 01 Dec 2019 13:58:43 -0800 (PST)
+From:   Mike Ryan <mike@ice9.us>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     mike@ice9.us
+Subject: [PATCH] Bluetooth: Expose debugfs entry to force resolvable private address
+Date:   Sun,  1 Dec 2019 13:57:44 -0800
+Message-Id: <20191201215744.20162-1-mike@ice9.us>
+X-Mailer: git-send-email 2.11.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+In order to facilitate impersonation attacks against devices using
+resolvable private addresses (RPAs), this debugfs entry allows the user
+to set a fixed RPA that is used during undirected and directed
+advertising. Writing 00:00:00:00:00:00 disables the forced address and
+will resume generating valid RPAs.
 
---nxj6qpmarjtupful
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Mike Ryan <mike@ice9.us>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_debugfs.c      | 54 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_request.c      | 15 ++++++++---
+ 3 files changed, 66 insertions(+), 4 deletions(-)
 
-Hello!
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b689aceb6..a822914d7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -428,6 +428,7 @@ struct hci_dev {
+ 	__u32			rpa_timeout;
+ 	struct delayed_work	rpa_expired;
+ 	bdaddr_t		rpa;
++	bdaddr_t		force_rpa;
+ 
+ #if IS_ENABLED(CONFIG_BT_LEDS)
+ 	struct led_trigger	*power_led;
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index 402e2cc54..1efefe82c 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -710,6 +710,58 @@ static const struct file_operations force_static_address_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
++static ssize_t force_rpa_read(struct file *file,
++					 char __user *user_buf,
++					 size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[19];
++	bdaddr_t *ba = &hdev->force_rpa;
++
++	sprintf(buf, "%pMR\n", ba);
++
++	return simple_read_from_buffer(user_buf, count, ppos, buf, strlen(buf));
++}
++
++static ssize_t force_rpa_write(struct file *file, const char __user *user_buf,
++			       size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[18];
++	size_t buf_size = min(count, (sizeof(buf)-1));
++	bdaddr_t rpa;
++
++	if (test_bit(HCI_UP, &hdev->flags))
++		return -EBUSY;
++
++	if (copy_from_user(buf, user_buf, buf_size))
++		return -EFAULT;
++
++	buf[buf_size] = '\0';
++	if (str2ba(buf, &rpa))
++		return -EINVAL;
++
++	/* The two most significant bits shall be 01 unless the address is
++	 * 00:00:00:00:00:00.
++         */
++	if ((rpa.b[5] & 0xc0) != 0x40 && bacmp(&rpa, BDADDR_ANY))
++		return -EINVAL;
++
++	if (!bacmp(&hdev->force_rpa, &rpa))
++		return -EALREADY;
++
++	bacpy(&hdev->force_rpa, &rpa);
++
++	return count;
++}
++
++static const struct file_operations force_rpa_fops = {
++	.open		= simple_open,
++	.read		= force_rpa_read,
++	.write		= force_rpa_write,
++	.llseek		= default_llseek,
++};
++
+ static int white_list_show(struct seq_file *f, void *ptr)
+ {
+ 	struct hci_dev *hdev = f->private;
+@@ -1026,6 +1078,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
+ 				    hdev->debugfs, hdev,
+ 				    &force_static_address_fops);
+ 
++	debugfs_create_file("force_rpa", 0644, hdev->debugfs, hdev,
++			    &force_rpa_fops);
+ 	debugfs_create_u8("white_list_size", 0444, hdev->debugfs,
+ 			  &hdev->le_white_list_size);
+ 	debugfs_create_file("white_list", 0444, hdev->debugfs, hdev,
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 2a1b64dbf..63f4d5c16 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1914,10 +1914,17 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 		    !bacmp(&hdev->random_addr, &hdev->rpa))
+ 			return 0;
+ 
+-		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+-		if (err < 0) {
+-			bt_dev_err(hdev, "failed to generate new RPA");
+-			return err;
++		/* If force_rpa is set to 00:00:00:00:00:00, generate a valid
++		 * RPA using IRK. Otherwise use the forced value.
++		 */
++		if (!bacmp(&hdev->force_rpa, BDADDR_ANY)) {
++			err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
++			if (err < 0) {
++				bt_dev_err(hdev, "failed to generate new RPA");
++				return err;
++			}
++		} else {
++			bacpy(&hdev->rpa, &hdev->force_rpa);
+ 		}
+ 
+ 		set_random_addr(req, &hdev->rpa);
+-- 
+2.11.0
 
-I'm sending this email to relevant mailing lists and other people who
-could be interested in it. (I'm not subscribed to all of ML, so please
-CC me when replying).
-
-
-I would like to open a discussion about a completely new way of handling
-Bluetooth HSP and HFP profiles on Linux. These two profiles are the only
-standard way how to access microphone data from Bluetooth Headsets.
-
-
-Previously in bluez4, HFP profile was implemented by bluez daemon and
-telephony HFP functionality was provided by either dummy modem, ofono
-modem or by Nokia's CSD Maemo modem.
-
-In bluez5 version was modem code together with implementation of HFP
-profile removed. And let implementation of HSP and HFP profiles to
-external application.
-
-Currently HSP profile is implemented in pulseaudio daemon to handle
-microphone and Bluetooth speakers. HFP profile is not implemented yet.
-
-
-HSP and HFP profiles use AT modem commands, so its implementation needs
-to parse and generates AT commands, plus implement needed state machine
-for it.
-
-And now problem is that last version of HFP profile specification is too
-complicated, plus Bluetooth headsets vendors started to inventing and
-using of own custom extensions to HFP profile and AT commands.
-
-Main problem of this "external" implementation outside of bluez is that
-only one application can communicate with remote Bluetooth device. It
-is application which received needed socket from bluez.
-
-So in this design if audio daemon (pulseaudio) implements HFP profile
-for processing audio, and e.g. power supply application wants to
-retrieve battery level from Bluetooth device, it means that audio daemon
-needs to implement also battery related functionality.
-
-It does not make sense to force power supply daemon (upower) to
-implement audio routing/encoding/decoding or audio daemon (power supply)
-to force implementing battery related operations.
-
-
-For handle this problem I would like to propose a new way how to use and
-implement HSP and HFP profiles on Linux.
-
-Implement a new HSP/HFP daemon (I called it hsphfpd) which register HSP
-and HFP profiles in bluez and then exports functionality for all other
-specific applications via DBus API (API for audio, power supply, input
-layer, telephony functions, vendor extensions, etc...). So it would acts
-as proxy daemon between bluez and target applications (pulseaudio,
-upower, ofono, ...)
-
-This would simplify whole HFP usage as applications would not need to
-re-implement parsing and processing of AT commands and it would allow
-more applications to use HFP profile at one time. And also it means that
-audio software does not have to implement telephony stack or power
-supply operations.
-
-
-I wrote a document how such DBus API could look like, see here:
-
-  https://github.com/pali/hsphfpd-prototype/raw/prototype/hsphfpd.txt
-
-
-And also I implemented "prototype" implementation to verify that
-designed API make sense and can be really implemented. Prototype fully
-supports HSP profile in both HS and AG role, plus HFP profile in HF
-role. This prototype implementation is available here:
-
-  https://github.com/pali/hsphfpd-prototype
-
-Some other details are written in README:
-
-  https://github.com/pali/hsphfpd-prototype/raw/prototype/README
-
-
-What do you think about it? Does it make sense to have such design?
-Would you accept usage of such hsphfpd daemon, implemented according to
-specification, on Linux desktop?
-
-I would like to hear your opinion if I should continue with this hsphfpd
-design, or not.
-
-
-With this design and implementation of hsphfpd is possible to easily fix
-pulseaudio issue about power supply properties:
-
-  https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/722
-
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---nxj6qpmarjtupful
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXeQNHwAKCRCL8Mk9A+RD
-Uv8dAJ44NtFBzWdDMuQhQHUa8FkjxL6wFwCgrje2yhXpUyxbGBbOLrUkx/iRams=
-=6fKI
------END PGP SIGNATURE-----
-
---nxj6qpmarjtupful--
