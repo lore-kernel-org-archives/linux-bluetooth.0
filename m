@@ -2,193 +2,197 @@ Return-Path: <SRS0=9PGa=ZY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA90FC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 20:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D4AC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 22:55:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E30B217F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 20:11:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A48812071E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 22:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="zbhrsypa"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DBjGmh5p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727935AbfLBULT (ORCPT
+        id S1726060AbfLBWzJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Dec 2019 15:11:19 -0500
-Received: from mga12.intel.com ([192.55.52.136]:59211 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727586AbfLBULS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Dec 2019 15:11:18 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Dec 2019 12:11:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,270,1571727600"; 
-   d="scan'208";a="222558710"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga002.jf.intel.com with ESMTP; 02 Dec 2019 12:11:17 -0800
-Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 2 Dec 2019 12:11:17 -0800
-Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
- fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 2 Dec 2019 12:11:17 -0800
-Received: from NAM05-CO1-obe.outbound.protection.outlook.com (104.47.48.50) by
- edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Mon, 2 Dec 2019 12:11:17 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jj47KkxN/j6aEPVJkDnq3ZVj32BnZ/6V80qCXRCpslNX7YWnQLXABX82yOKqWeBMOBI9OB4tB47MyjFz1ABYENgBCo4slQgUEH9hXr9F4TeVHkmCbXajRG25HCVjIRTf0TWbV/JbHZaGAgVOvDl5ca6thxhLb1wu21wi1CYhw4kNhZheQ1aYwq7dYXD+SkVV57luOFuWsIlbXsUNJxVziHCBM4nTCUy5FMxyXjCfB5MNGn5eeTBqK1YZZABMtf6Qw4n6FkErHxQYKQNioWCcEh6XE9vDQl6cW/thyjtP45RkVoGVBoQU51KG7l4/xead5bi1SUMkGCzqKRkuCVlmYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=stJERlHEi27TxtR27MsV/adG3T4db0Z6x+Q2RObmi2g=;
- b=UL2xRhqNicGpsyoK+5Fhhpa3mBvlVW6/hjsQJDVsWj7IqYNb/uzEuZZ5yudiRNbt8sgK1+Wd0NNdRyj6SZPiRFAo5q1SLzuijvk7ycai2gSMdJCPXSjv5XLD+gE4Z8dlFidghtQ2eWKCTRD7cGI7kQs5gXCn5V7ImpuP/D7i4tPRQWyw5MEi/6TpIwy2gyQs/trKLMvlUAF7slGmmu2NfyNzUg7eU35kWTs5HEOjryGe4A7ggnjmj79FN7jbIlYqCfbS6TM6debiLHnIDdvfr82kiSF9Gvt7QldnHRL8mtkvSm/t3Kd9i2XHrZTzNCy0r074MCrhn+qrYkdqagdpjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=stJERlHEi27TxtR27MsV/adG3T4db0Z6x+Q2RObmi2g=;
- b=zbhrsypaic/imuFw8bAuJH/jwrNKlMK38ajhkqjFYeUxtyGwRto9CCERydSdHwfTJ72RehSIhycvryF3DslVXYhuFLVUhLyZISto2JRfQTe0RsEjQ1+bUqUUOXt1PqXf1G+rg65JGoIjYI6QbKyJMXbw8s2zBdE+XTyJtyYQ1co=
-Received: from CY4PR11MB1269.namprd11.prod.outlook.com (10.173.16.11) by
- CY4PR11MB1671.namprd11.prod.outlook.com (10.172.68.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.21; Mon, 2 Dec 2019 20:10:57 +0000
-Received: from CY4PR11MB1269.namprd11.prod.outlook.com
- ([fe80::a12f:7254:eec:b905]) by CY4PR11MB1269.namprd11.prod.outlook.com
- ([fe80::a12f:7254:eec:b905%3]) with mapi id 15.20.2495.014; Mon, 2 Dec 2019
- 20:10:57 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "aurelien@aurel32.net" <aurelien@aurel32.net>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] mesh: fix (re)transmit count & interval steps
-Thread-Topic: [PATCH BlueZ] mesh: fix (re)transmit count & interval steps
-Thread-Index: AQHVmMnbRyDJPl5+Z02p6iAJ4vinOKenZ6IA
-Date:   Mon, 2 Dec 2019 20:10:57 +0000
-Message-ID: <d7133754c5fc39059df6136804aecc1ba2bb0966.camel@intel.com>
-References: <20191111195406.3291-1-aurelien@aurel32.net>
-In-Reply-To: <20191111195406.3291-1-aurelien@aurel32.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [192.55.54.40]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a88bbf0a-1636-4f3c-979e-08d77763be71
-x-ms-traffictypediagnostic: CY4PR11MB1671:
-x-microsoft-antispam-prvs: <CY4PR11MB167111A17FBF17FFB049E7E5E1430@CY4PR11MB1671.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:192;
-x-forefront-prvs: 0239D46DB6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(396003)(136003)(376002)(366004)(346002)(199004)(189003)(6512007)(6486002)(25786009)(478600001)(8936002)(81166006)(186003)(71200400001)(2501003)(14454004)(256004)(66946007)(81156014)(3846002)(76176011)(2906002)(66066001)(14444005)(6116002)(102836004)(5660300002)(6506007)(36756003)(91956017)(2616005)(8676002)(26005)(118296001)(71190400001)(99286004)(229853002)(110136005)(316002)(11346002)(66446008)(6246003)(64756008)(66556008)(446003)(305945005)(86362001)(66476007)(4001150100001)(6436002)(76116006)(7736002)(309714004);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR11MB1671;H:CY4PR11MB1269.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QkXNZ3I1aghevhy7Sls+9zSri0KQUrb6181fUVMeiFiL5yhUtw+Du3xnUiPFvhFZn3XGBflBGKhiIa019B8luNVT/AWyjVtM5N4tpp1aKC9lD7JehBdcgb9BKo0r5MlDRgCHLf2fr66ZMQHvnh3Z1f6+/AhTfDFeATnhYnkIMt+VMSWzkpuWxTaqnVgzD6yBGTeUZWB5SF6cNG+joLBWD9Tzv1flHRgS379+A/cogM6JQN89jpWxKNqLBdcpqggCpcz9fr8ijzNusnsmppnv205TFH413aSo7Rs9FdQMI8LD8R7ltv6fzMIgE+5OE+fXuy7iYOjcTFK26sbEv6txu5wxUWGxfFZkZJ3gzIsVNkKnUyeyJOFtJhhgmA8dzj2XXzA12wUdEbtjvwl8IHSN1zKM7KpLImFWZ7DPBi0fyJ1r3AGaXQ5FlHSIMC+y4kce
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5870DEAF56AC7C438F174D1B723168A7@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Mon, 2 Dec 2019 17:55:09 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:40813 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725903AbfLBWzI (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 2 Dec 2019 17:55:08 -0500
+Received: by mail-qt1-f196.google.com with SMTP id z22so1609636qto.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Dec 2019 14:55:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=p04VAJalNVcM1wKI1wNyT7o1NcBjHgxv0Xx73wtI7Uw=;
+        b=DBjGmh5pKmn+iK8CQgTpxCXLqyiQJG9uyAwY9nd08tUBTD7EdZNQdCkUROtRV0IszW
+         Ik9DYNnewG76/TeC83sHVxHYQwrMx3nuthATSCVyb9jMw4daw9ZMFKSqB7oxEtzWTp/0
+         lreu79OC1dYu/O4Np+dsp0oz9IXG8f7xH1uoo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=p04VAJalNVcM1wKI1wNyT7o1NcBjHgxv0Xx73wtI7Uw=;
+        b=WdbqgGcqK7WVCR7bqZREhws9bces54O963ziF0rRXvMWv4DUyQTTfk7mJdWrR2+wVe
+         XWCPGWiEUFv1gjIj06XewFGMU72wbbhOZ7OdNCS+b5/N669vYuN836Yu+dJBQRcBxsjj
+         47IMxrHYZ/0o0+JXkyqF8HV2nna0CFOG73egczIcCDCU4QZRg4BE5juaeH2u40SFEpJU
+         VMnlN+6zOCpz3zwl5IRJ7BgbHMLqPzz5J3BPgGqodD+3AMxmhTE1etb8d5YaVLXyBqPV
+         AF7RaqwxuJjf1nNO4pZkD21YEmo63xYnqWDODFHPSJE/oxCXWvePqEIaGvDJ00ZLTb94
+         8jGQ==
+X-Gm-Message-State: APjAAAVvzntchUDXoxSumAxhlbpmRWvx8n9IaE/LXsZLdQTBd30RYX8l
+        Z2t+IkKyxN0kSJOBYA4spEOVYHOTuahO2FbHoD/a6w==
+X-Google-Smtp-Source: APXvYqx+knpHqLNbP/4kmVwRIQS9IqbMUxOuMcqsz6hyYcabkc8gLoz79VWWwIZmM8CQiV86Xtj8ei8hj4e8cKYZl30=
+X-Received: by 2002:ac8:750b:: with SMTP id u11mr2133080qtq.170.1575327307548;
+ Mon, 02 Dec 2019 14:55:07 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: a88bbf0a-1636-4f3c-979e-08d77763be71
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2019 20:10:57.4588
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qC4vxjdHRdP/+5XXErbXy68w+6Fr4lsZvMVe7MFCSNFnPBQbCRYS0AVB4usqX0Fl+861x+ZEYknbmcbymSrmlA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1671
-X-OriginatorOrg: intel.com
+References: <20191127185139.65048-1-abhishekpandit@chromium.org>
+ <20191201145357.ybq5gfty4ulnfasq@pali> <20191202012305.GQ248138@dtor-ws>
+ <20191202084750.k7lafzzrf3yq2tqs@pali> <20191202175440.GA50317@dtor-ws>
+ <20191202185340.nae4lljten5jqp3y@pali> <20191202193628.GI50317@dtor-ws>
+In-Reply-To: <20191202193628.GI50317@dtor-ws>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Mon, 2 Dec 2019 14:54:56 -0800
+Message-ID: <CANFp7mVr_cb89BH0ApuPWV2wgmBq7MVqeNUWC=OBjO9KTj=qnw@mail.gmail.com>
+Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        linux-input@vger.kernel.org,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Kirill Smelkov <kirr@nexedi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZC4uLiBUaGFuayB5b3UgdmVyeSBtdWNoLg0KDQpPbiBNb24sIDIwMTktMTEtMTEgYXQg
-MjA6NTQgKzAxMDAsIEF1cmVsaWVuIEphcm5vIHdyb3RlOg0KPiBUaGUgRm91bmRhdGlvbiBNb2Rl
-bCBMYXllciB1c2VzIGxpdHRsZSBlbmRpYW4gb3JkZXJpbmcuIEFzIGENCj4gY29uc2VxdWVuY2Ug
-dGhlIChyZSl0cmFuc21pdCBjb3VudCBhbmQgaW50ZXJ2YWwgc3RlcHMgaW4gdGhlIENvbmZpZw0K
-PiBSZWxheSwgQ29uZmlnIE1vZGVsIFB1YmxpY2F0aW9uIGFuZCBDb25maWcgTmV0d29yayBUcmFu
-c21pdCBtZXNzYWdlcw0KPiB1c2UgdGhlIGxvd2VyIDMgYml0cyBmb3IgdGhlIChyZSl0cmFuc21p
-c3Npb24gY291bnQgYW5kIHRoZSBoaWdoZXIgNQ0KPiBiaXRzIGZvciB0aGUgaW50ZXJ2YWwgc3Rl
-cHMuDQo+IA0KPiBUaGUgZmlndXJlIDQuNSBpbiBzZWN0aW9uIDQuMy4yLjE2IG9mIHRoZSBNZXNo
-IFByb2ZpbGUgQmx1ZXRvb3RoDQo+IFNwZWNpZmljYXRpb24gcHJvdmlkZXMgYSBnb29kIGNsYXJp
-ZmljYXRpb24uDQo+IA0KPiBUaGlzIHBhdGNoIHRoZXJlZm9yZSBmaXhlcyB0aG9zZSBtZXNzYWdl
-cyBmb3IgYm90aCB0aGUgZGFlbW9uIGFuZA0KPiBjb25maWd1cmF0aW9uIGNsaWVudCBwYXJ0cy4N
-Cj4gLS0tDQo+ICBtZXNoL2NmZ21vZC1zZXJ2ZXIuYyB8IDE2ICsrKysrKysrLS0tLS0tLS0NCj4g
-IG1lc2gvbW9kZWwuYyAgICAgICAgIHwgIDQgKystLQ0KPiAgdG9vbHMvbWVzaC9jZmdjbGkuYyAg
-fCAgOCArKysrLS0tLQ0KPiAgMyBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCAxNCBk
-ZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9tZXNoL2NmZ21vZC1zZXJ2ZXIuYyBiL21l
-c2gvY2ZnbW9kLXNlcnZlci5jDQo+IGluZGV4IDU1Y2M4ZTllYi4uOGFjZGU5NWI5IDEwMDY0NA0K
-PiAtLS0gYS9tZXNoL2NmZ21vZC1zZXJ2ZXIuYw0KPiArKysgYi9tZXNoL2NmZ21vZC1zZXJ2ZXIu
-Yw0KPiBAQCAtMjExLDggKzIxMSw4IEBAIHN0YXRpYyBib29sIGNvbmZpZ19wdWJfc2V0KHN0cnVj
-dCBtZXNoX25vZGUgKm5vZGUsIHVpbnQxNl90IG5ldF9pZHgsDQo+ICAJCQkudHRsID0gdHRsLA0K
-PiAgCQkJLmNyZWRlbnRpYWwgPSBjcmVkX2ZsYWcsDQo+ICAJCQkucGVyaW9kID0gcGVyaW9kLA0K
-PiAtCQkJLmNvdW50ID0gcmV0cmFuc21pdCA+PiA1LA0KPiAtCQkJLmludGVydmFsID0gKCgweDFm
-ICYgcmV0cmFuc21pdCkgKyAxKSAqIDUwDQo+ICsJCQkuY291bnQgPSByZXRyYW5zbWl0ICYgMHg3
-LA0KPiArCQkJLmludGVydmFsID0gKChyZXRyYW5zbWl0ID4+IDMpICsgMSkgKiA1MA0KPiAgCQl9
-Ow0KPiAgDQo+ICAJCWlmIChiX3ZpcnQpDQo+IEBAIC04NzAsOCArODcwLDggQEAgc3RhdGljIGJv
-b2wgY2ZnX3Nydl9wa3QodWludDE2X3Qgc3JjLCB1aW50MzJfdCBkc3QsIHVpbnQxNl90IHVuaWNh
-c3QsDQo+ICAJCWlmIChzaXplICE9IDIgfHwgcGt0WzBdID4gMHgwMSkNCj4gIAkJCXJldHVybiB0
-cnVlOw0KPiAgDQo+IC0JCWNvdW50ID0gKHBrdFsxXSA+PiA1KSArIDE7DQo+IC0JCWludGVydmFs
-ID0gKChwa3RbMV0gJiAweDFmKSArIDEpICogMTA7DQo+ICsJCWNvdW50ID0gKHBrdFsxXSAmIDB4
-NykgKyAxOw0KPiArCQlpbnRlcnZhbCA9ICgocGt0WzFdID4+IDMpICsgMSkgKiAxMDsNCj4gIAkJ
-bm9kZV9yZWxheV9tb2RlX3NldChub2RlLCAhIXBrdFswXSwgY291bnQsIGludGVydmFsKTsNCj4g
-IAkJLyogRmFsbCBUaHJvdWdoICovDQo+ICANCj4gQEAgLTg3OSw3ICs4NzksNyBAQCBzdGF0aWMg
-Ym9vbCBjZmdfc3J2X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQzMl90IGRzdCwgdWludDE2X3QgdW5p
-Y2FzdCwNCj4gIAkJbiA9IG1lc2hfbW9kZWxfb3Bjb2RlX3NldChPUF9DT05GSUdfUkVMQVlfU1RB
-VFVTLCBtc2cpOw0KPiAgDQo+ICAJCW1zZ1tuKytdID0gbm9kZV9yZWxheV9tb2RlX2dldChub2Rl
-LCAmY291bnQsICZpbnRlcnZhbCk7DQo+IC0JCW1zZ1tuKytdID0gKChjb3VudCAtIDEpIDw8IDUp
-ICsgKChpbnRlcnZhbC8xMCAtIDEpICYgMHgxZik7DQo+ICsJCW1zZ1tuKytdID0gKGNvdW50IC0g
-MSkgKyAoKGludGVydmFsLzEwIC0gMSkgPDwgMyk7DQo+ICANCj4gIAkJbF9kZWJ1ZygiR2V0L1Nl
-dCBSZWxheSBDb25maWcgKCVkKSIsIG1zZ1tuLTFdKTsNCj4gIAkJYnJlYWs7DQo+IEBAIC04ODgs
-OCArODg4LDggQEAgc3RhdGljIGJvb2wgY2ZnX3Nydl9wa3QodWludDE2X3Qgc3JjLCB1aW50MzJf
-dCBkc3QsIHVpbnQxNl90IHVuaWNhc3QsDQo+ICAJCWlmIChzaXplICE9IDEpDQo+ICAJCQlyZXR1
-cm4gdHJ1ZTsNCj4gIA0KPiAtCQljb3VudCA9IChwa3RbMF0gPj4gNSkgKyAxOw0KPiAtCQlpbnRl
-cnZhbCA9ICgocGt0WzBdICYgMHgxZikgKyAxKSAqIDEwOw0KPiArCQljb3VudCA9IChwa3RbMF0g
-JiAweDcpICsgMTsNCj4gKwkJaW50ZXJ2YWwgPSAoKHBrdFswXSA+PiAzKSArIDEpICogMTA7DQo+
-ICANCj4gIAkJaWYgKG1lc2hfY29uZmlnX3dyaXRlX25ldF90cmFuc21pdChub2RlX2NvbmZpZ19n
-ZXQobm9kZSksIGNvdW50LA0KPiAgCQkJCQkJCQlpbnRlcnZhbCkpDQo+IEBAIC05MDAsNyArOTAw
-LDcgQEAgc3RhdGljIGJvb2wgY2ZnX3Nydl9wa3QodWludDE2X3Qgc3JjLCB1aW50MzJfdCBkc3Qs
-IHVpbnQxNl90IHVuaWNhc3QsDQo+ICAJCW4gPSBtZXNoX21vZGVsX29wY29kZV9zZXQoT1BfQ09O
-RklHX05FVFdPUktfVFJBTlNNSVRfU1RBVFVTLA0KPiAgCQkJCQkJCQkJbXNnKTsNCj4gIAkJbWVz
-aF9uZXRfdHJhbnNtaXRfcGFyYW1zX2dldChuZXQsICZjb3VudCwgJmludGVydmFsKTsNCj4gLQkJ
-bXNnW24rK10gPSAoKGNvdW50IC0gMSkgPDwgNSkgKyAoKGludGVydmFsLzEwIC0gMSkgJiAweDFm
-KTsNCj4gKwkJbXNnW24rK10gPSAoY291bnQgLSAxKSArICgoaW50ZXJ2YWwvMTAgLSAxKSA8PCAz
-KTsNCj4gIA0KPiAgCQlsX2RlYnVnKCJHZXQvU2V0IE5ldHdvcmsgVHJhbnNtaXQgQ29uZmlnIik7
-DQo+ICAJCWJyZWFrOw0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9tb2RlbC5jIGIvbWVzaC9tb2RlbC5j
-DQo+IGluZGV4IDg0ZjFkYzc0Yy4uNDVjZGI5M2JiIDEwMDY0NA0KPiAtLS0gYS9tZXNoL21vZGVs
-LmMNCj4gKysrIGIvbWVzaC9tb2RlbC5jDQo+IEBAIC0xNTM3LDggKzE1MzcsOCBAQCBzdHJ1Y3Qg
-bWVzaF9tb2RlbCAqbWVzaF9tb2RlbF9zZXR1cChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50
-OF90IGVsZV9pZHgsDQo+ICAJaWYgKHB1YiAmJiAocHViLT52aXJ0IHx8ICEoSVNfVU5BU1NJR05F
-RChwdWItPmFkZHIpKSkpIHsNCj4gIAkJdWludDhfdCBtb2RfYWRkclsyXTsNCj4gIAkJdWludDhf
-dCAqcHViX2FkZHI7DQo+IC0JCXVpbnQ4X3QgcmV0cmFuc21pdCA9IChwdWItPmNvdW50IDw8IDUp
-ICsNCj4gLQkJCQkJCShwdWItPmludGVydmFsIC8gNTAgLSAxKTsNCj4gKwkJdWludDhfdCByZXRy
-YW5zbWl0ID0gcHViLT5jb3VudCArDQo+ICsJCQkJCSgocHViLT5pbnRlcnZhbCAvIDUwIC0gMSkg
-PDwgMyk7DQo+ICANCj4gIAkJLyogQWRkIHB1YmxpY2F0aW9uICovDQo+ICAJCWxfcHV0X2xlMTYo
-cHViLT5hZGRyLCAmbW9kX2FkZHIpOw0KPiBkaWZmIC0tZ2l0IGEvdG9vbHMvbWVzaC9jZmdjbGku
-YyBiL3Rvb2xzL21lc2gvY2ZnY2xpLmMNCj4gaW5kZXggMDRlZGM3MDZjLi5kNDY4ZmIyOGMgMTAw
-NjQ0DQo+IC0tLSBhL3Rvb2xzL21lc2gvY2ZnY2xpLmMNCj4gKysrIGIvdG9vbHMvbWVzaC9jZmdj
-bGkuYw0KPiBAQCAtNDcxLDcgKzQ3MSw3IEBAIHN0YXRpYyBib29sIG1zZ19yZWN2ZCh1aW50MTZf
-dCBzcmMsIHVpbnQxNl90IGlkeCwgdWludDhfdCAqZGF0YSwNCj4gIAkJCXJldHVybiB0cnVlOw0K
-PiAgDQo+ICAJCWJ0X3NoZWxsX3ByaW50ZigiTm9kZSAlNC40eDogUmVsYXkgMHglMDJ4LCBjbnQg
-JWQsIHN0ZXBzICVkXG4iLA0KPiAtCQkJCXNyYywgZGF0YVswXSwgZGF0YVsxXT4+NSwgZGF0YVsx
-XSAmIDB4MWYpOw0KPiArCQkJCXNyYywgZGF0YVswXSwgZGF0YVsxXSAmIDB4NywgZGF0YVsxXSA+
-PiAzKTsNCj4gIAkJYnJlYWs7DQo+ICANCj4gIAljYXNlIE9QX0NPTkZJR19QUk9YWV9TVEFUVVM6
-DQo+IEBAIC01MjcsOCArNTI3LDggQEAgc3RhdGljIGJvb2wgbXNnX3JlY3ZkKHVpbnQxNl90IHNy
-YywgdWludDE2X3QgaWR4LCB1aW50OF90ICpkYXRhLA0KPiAgCQkJYnJlYWs7DQo+ICAJCX0NCj4g
-IA0KPiAtCQlidF9zaGVsbF9wcmludGYoIlJleG1pdCBjb3VudFx0JWRcbiIsIGRhdGFbOV0gPj4g
-NSk7DQo+IC0JCWJ0X3NoZWxsX3ByaW50ZigiUmV4bWl0IHN0ZXBzXHQlZFxuIiwgZGF0YVs5XSAm
-IDB4MWYpOw0KPiArCQlidF9zaGVsbF9wcmludGYoIlJleG1pdCBjb3VudFx0JWRcbiIsIGRhdGFb
-OV0gJiAweDcpOw0KPiArCQlidF9zaGVsbF9wcmludGYoIlJleG1pdCBzdGVwc1x0JWRcbiIsIGRh
-dGFbOV0gPj4gMyk7DQo+ICANCj4gIAkJYnJlYWs7DQo+ICANCj4gQEAgLTEwNTYsNyArMTA1Niw3
-IEBAIHN0YXRpYyB2b2lkIGNtZF9yZWxheV9zZXQoaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4g
-IAl9DQo+ICANCj4gIAltc2dbbisrXSA9IHBhcm1zWzBdOw0KPiAtCW1zZ1tuKytdID0gKHBhcm1z
-WzFdIDw8IDUpIHwgcGFybXNbMl07DQo+ICsJbXNnW24rK10gPSBwYXJtc1sxXSB8IChwYXJtc1sy
-XSA8PCAzKTsNCj4gIA0KPiAgCWlmICghY29uZmlnX3NlbmQobXNnLCBuLCBPUF9DT05GSUdfUkVM
-QVlfU0VUKSkNCj4gIAkJcmV0dXJuIGJ0X3NoZWxsX25vbmludGVyYWN0aXZlX3F1aXQoRVhJVF9G
-QUlMVVJFKTsNCg==
+On Mon, Dec 2, 2019 at 11:36 AM Dmitry Torokhov
+<dmitry.torokhov@gmail.com> wrote:
+>
+> On Mon, Dec 02, 2019 at 07:53:40PM +0100, Pali Roh=C3=A1r wrote:
+> > On Monday 02 December 2019 09:54:40 Dmitry Torokhov wrote:
+> > > On Mon, Dec 02, 2019 at 09:47:50AM +0100, Pali Roh=C3=A1r wrote:
+> > > > On Sunday 01 December 2019 17:23:05 Dmitry Torokhov wrote:
+> > > > > Hi Pali,
+> > > > >
+> > > > > On Sun, Dec 01, 2019 at 03:53:57PM +0100, Pali Roh=C3=A1r wrote:
+> > > > > > Hello!
+> > > > > >
+> > > > > > On Wednesday 27 November 2019 10:51:39 Abhishek Pandit-Subedi w=
+rote:
+> > > > > > > Support setting the uniq attribute of the input device. The u=
+niq
+> > > > > > > attribute is used as a unique identifier for the connected de=
+vice.
+> > > > > > >
+> > > > > > > For example, uinput devices created by BlueZ will store the a=
+ddress of
+> > > > > > > the connected device as the uniq property.
+> > > > > > >
+> > > > > > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromiu=
+m.org>
+> > > > > >
+> > > > > > ...
+> > > > > >
+> > > > > > > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux=
+/uinput.h
+> > > > > > > index c9e677e3af1d..d5b7767c1b02 100644
+> > > > > > > --- a/include/uapi/linux/uinput.h
+> > > > > > > +++ b/include/uapi/linux/uinput.h
+> > > > > > > @@ -145,6 +145,7 @@ struct uinput_abs_setup {
+> > > > > > >  #define UI_SET_PHYS                _IOW(UINPUT_IOCTL_BASE, 1=
+08, char*)
+> > > > > > >  #define UI_SET_SWBIT               _IOW(UINPUT_IOCTL_BASE, 1=
+09, int)
+> > > > > > >  #define UI_SET_PROPBIT             _IOW(UINPUT_IOCTL_BASE, 1=
+10, int)
+> > > > > > > +#define UI_SET_UNIQ                _IOW(UINPUT_IOCTL_BASE, 1=
+11, char*)
+> > > > > >
+> > > > > > I think that usage of char* as type in _IOW would cause compati=
+bility
+> > > > > > problems like it is for UI_SET_PHYS (there is UI_SET_PHYS_COMPA=
+T). Size
+> > > > > > of char* pointer depends on userspace (32 vs 64bit), so 32bit p=
+rocess on
+> > > > > > 64bit kernel would not be able to call this new UI_SET_UNIQ ioc=
+tl.
+> > > > > >
+> > > > > > I would suggest to define this ioctl as e.g.:
+> > > > > >
+> > > > > >   #define UI_SET_UNIQ         _IOW(_IOC_WRITE, UINPUT_IOCTL_BAS=
+E, 111, 0)
+> > > > > >
+> > > > > > And then in uinput.c code handle it as:
+> > > > > >
+> > > > > >   case UI_SET_UNIQ & ~IOCSIZE_MASK:
+> > > > > >
+> > > > > > as part of section /* Now check variable-length commands */
+> > > > >
+> > > > > If we did not have UI_SET_PHYS in its current form, I'd agree wit=
+h you,
+> > > > > but I think there is benefit in having UI_SET_UNIQ be similar to
+> > > > > UI_SET_PHYS.
+> > > >
+> > > > I thought that ioctl is just number, so we can define it as we want=
+. And
+> > > > because uinput.c has already switch for variable-length commands it
+> > > > would be easy to use it. Final handling can be in separate function=
+ like
+> > > > for UI_SET_PHYS which can look like same.
+> > >
+> > > Yes, we can define ioctl number as whatever we want. What I was tryin=
+g
+> > > to say, right now users do this:
+> > >
+> > >     rc =3D ioctl(fd, UI_SET_PHYS, "whatever");
+> > >     ...
+> > >
+> > > and with UI_SET_UNIQ they expect the following to work:
+> > >
+> > >     rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
+> > >     ...
+> >
+> > And would not following definition
+> >
+> >   #define UI_SET_UNIQ _IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
+> >
+> > allow userspace to call
+> >
+> >   rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
+> >
+> > as you want?
+>
+> OK, so what you are saying is that we can have whatever in the size
+> portion of ioctl number and simply ignore it in the driver (and I do not
+> think we need to do any of "UI_SET_UNIQ & ~IOCSIZE_MASK" really).
+> While this would work, I am not sure it is the best option as I think
+> we'd have to comment extensively why we have arbitrary number in place
+> of the size.
+>
+> And we still do not really save anything, as we still have to go through
+> compat ioctl handler (since we have it already) and it is very simple to
+> add a case for UI_SET_UNIQ there...
+>
+> Thanks.
+>
+> --
+> Dmitry
+
+Since the compat handling already exists for UI_SET_PHYS, I think I
+would prefer to go with the simpler solution of just duplicating that
+for UI_SET_UNIQ. Next patch is coming with that change.
+
+Thanks
+Abhishek
