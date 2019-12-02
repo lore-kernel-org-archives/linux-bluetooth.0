@@ -2,180 +2,120 @@ Return-Path: <SRS0=9PGa=ZY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5073CC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 19:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AA0C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 19:49:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A8DF2071E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 19:36:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/iGU497"
+	by mail.kernel.org (Postfix) with ESMTP id 573242071E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 19:49:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1575316173;
+	bh=mlKueMDRvYcpvxzG02vBGmdoW2OiT03TumQ2uae6pKw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=eTQ3na61QoclKn/xESRuEs1PFl4OYvSCdG4LA7HjoEprIWh+GoJA1SjjnoXa2eKAG
+	 5d/BJA94OOY7ENwbIFy+yihRQhf9nxlkQL5OFyE2bD1Yac2CnNxY0iwixJYvdjk172
+	 LDTEvNESpbXjG8jQslYNStULErJQ4HsgTbxgWxvo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728039AbfLBTge (ORCPT
+        id S1727977AbfLBTtc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Dec 2019 14:36:34 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:33079 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727963AbfLBTgd (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Dec 2019 14:36:33 -0500
-Received: by mail-pl1-f193.google.com with SMTP id ay6so382120plb.0;
-        Mon, 02 Dec 2019 11:36:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=pdfc+rZduUiwSB+hLUklEXg5tzcpX2agFPZ43Mj83Pw=;
-        b=a/iGU497VO3o9GbPQcv1du3WfXjgNF8T/f6C93gPXW+nwOGrUkeHLVnyZGm4MlqgZF
-         3M9OvDX/U0ClT+ktjl/cPEqSKD+ZRey7r27rXnji1Oo+Vx/7iaUp/3c1kwVWnlnfq73R
-         +WZiz+eWzzVvR0c7RMHrJZbu05DZClLWlb3GKI/Js9YG9I0Uvx6rOO64RYc9/6DbY33v
-         +XaqcedJf19w7JE5dfMhbwA+vSf3wHqqT/dJ9LSYBvntG81niygqwvBrO/Ji+Fc8ZU8D
-         GiWjrqvXvUmAx7dZHVmjLwIDTVcaKwQ3VI64XbWbebt9O1z6xLB164ET6AjPwqOhymQn
-         uBCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=pdfc+rZduUiwSB+hLUklEXg5tzcpX2agFPZ43Mj83Pw=;
-        b=o7m9mODSTfvK7C+usZmc6Q5vgSGwhSUbjKnexyeSCRmHB+MF/uwqNuK9QOtHbtrFeW
-         JHG8h2OWug0JxI5A6bnPGiIUCWjDyvq+uLVbDLE4ReyIuHizGVW7ICI68694nZ0a3iim
-         O/DLh0TyMshpgDUYPO8sTq3UGndKcRORGnCWZ0FpbVXcqy7wF3FaFsDUlZQWod9RxQ7l
-         KduGbTfnvw3RaarycvxQ4YEv5gvJX1JDp21vGUhbdQ3qVHAh1PFjb0sFkRvP+BRvjvYb
-         253neVGGHxjJAvlLBLxyllVVNyXTiR8VLCjz1ZYkfGtscPUhF5XXGbCBKbp/5p5SxHeK
-         PVUA==
-X-Gm-Message-State: APjAAAUqUtB40eu1vGkaiD0iyqxxc/6i9rbvjeXdSVWlTU0IfOKixuWW
-        E/9hBWzYeMzr8C3EDW23osko40+R
-X-Google-Smtp-Source: APXvYqz/392QaA/ac+vElrjABvPFdGuEYW5KtuHebo3x1Ih5pWRRgVx4968pH4cf+AsT0ilcrB/H5g==
-X-Received: by 2002:a17:90a:c982:: with SMTP id w2mr776483pjt.125.1575315391887;
-        Mon, 02 Dec 2019 11:36:31 -0800 (PST)
-Received: from dtor-ws ([2620:15c:202:201:3adc:b08c:7acc:b325])
-        by smtp.gmail.com with ESMTPSA id 9sm256525pfx.177.2019.12.02.11.36.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2019 11:36:30 -0800 (PST)
-Date:   Mon, 2 Dec 2019 11:36:28 -0800
-From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mon, 2 Dec 2019 14:49:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37916 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727686AbfLBTtc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 2 Dec 2019 14:49:32 -0500
+Received: from earth.universe (unknown [185.216.33.116])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E018D20715;
+        Mon,  2 Dec 2019 19:49:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1575316172;
+        bh=mlKueMDRvYcpvxzG02vBGmdoW2OiT03TumQ2uae6pKw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nolHYMR44uaUtIaVJ0ckCX+M4YLkvV9KX8v2ja7RAmi5Fm/AJmm5TlG0VPw38T1Lg
+         VJYTH74Pot3OG0hu4kjrBRETrVQFT2h5JhyIDE3XcRXjz4Z7y9sPwAme7SjltMwr1H
+         XoT8GroIwMeZwTr1QbOHcdITJ8wmY6kHxBo0TKyA=
+Received: by earth.universe (Postfix, from userid 1000)
+        id DA0AB3C0C7B; Mon,  2 Dec 2019 20:49:28 +0100 (CET)
+Date:   Mon, 2 Dec 2019 20:49:28 +0100
+From:   Sebastian Reichel <sre@kernel.org>
+To:     Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        General PulseAudio Discussion 
+        <pulseaudio-discuss@lists.freedesktop.org>, ofono@ofono.org,
+        devkit-devel@lists.freedesktop.org,
+        Bastien Nocera <hadess@hadess.net>,
+        Georg Chini <georg@chini.tk>,
+        Russell Treleaven <rtreleaven@bunnykick.ca>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-Message-ID: <20191202193628.GI50317@dtor-ws>
-References: <20191127185139.65048-1-abhishekpandit@chromium.org>
- <20191201145357.ybq5gfty4ulnfasq@pali>
- <20191202012305.GQ248138@dtor-ws>
- <20191202084750.k7lafzzrf3yq2tqs@pali>
- <20191202175440.GA50317@dtor-ws>
- <20191202185340.nae4lljten5jqp3y@pali>
+        Tanu Kaskinen <tanuk@iki.fi>,
+        Arun Raghavan <arun@arunraghavan.net>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Pavel Machek <pavel@ucw.cz>
+Subject: Re: Proposal for a new API and usage of Bluetooth HSP and HFP
+ profiles on Linux
+Message-ID: <20191202194928.nmcucpoabwf2ce3n@earth.universe>
+References: <20191201185740.uot7zb2s53p5gu7z@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="3hixyzurn7x44vjr"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191202185340.nae4lljten5jqp3y@pali>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191201185740.uot7zb2s53p5gu7z@pali>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Dec 02, 2019 at 07:53:40PM +0100, Pali Rohár wrote:
-> On Monday 02 December 2019 09:54:40 Dmitry Torokhov wrote:
-> > On Mon, Dec 02, 2019 at 09:47:50AM +0100, Pali Rohár wrote:
-> > > On Sunday 01 December 2019 17:23:05 Dmitry Torokhov wrote:
-> > > > Hi Pali,
-> > > > 
-> > > > On Sun, Dec 01, 2019 at 03:53:57PM +0100, Pali Rohár wrote:
-> > > > > Hello!
-> > > > > 
-> > > > > On Wednesday 27 November 2019 10:51:39 Abhishek Pandit-Subedi wrote:
-> > > > > > Support setting the uniq attribute of the input device. The uniq
-> > > > > > attribute is used as a unique identifier for the connected device.
-> > > > > > 
-> > > > > > For example, uinput devices created by BlueZ will store the address of
-> > > > > > the connected device as the uniq property.
-> > > > > > 
-> > > > > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > > > > 
-> > > > > ...
-> > > > > 
-> > > > > > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux/uinput.h
-> > > > > > index c9e677e3af1d..d5b7767c1b02 100644
-> > > > > > --- a/include/uapi/linux/uinput.h
-> > > > > > +++ b/include/uapi/linux/uinput.h
-> > > > > > @@ -145,6 +145,7 @@ struct uinput_abs_setup {
-> > > > > >  #define UI_SET_PHYS		_IOW(UINPUT_IOCTL_BASE, 108, char*)
-> > > > > >  #define UI_SET_SWBIT		_IOW(UINPUT_IOCTL_BASE, 109, int)
-> > > > > >  #define UI_SET_PROPBIT		_IOW(UINPUT_IOCTL_BASE, 110, int)
-> > > > > > +#define UI_SET_UNIQ		_IOW(UINPUT_IOCTL_BASE, 111, char*)
-> > > > > 
-> > > > > I think that usage of char* as type in _IOW would cause compatibility
-> > > > > problems like it is for UI_SET_PHYS (there is UI_SET_PHYS_COMPAT). Size
-> > > > > of char* pointer depends on userspace (32 vs 64bit), so 32bit process on
-> > > > > 64bit kernel would not be able to call this new UI_SET_UNIQ ioctl.
-> > > > > 
-> > > > > I would suggest to define this ioctl as e.g.:
-> > > > > 
-> > > > >   #define UI_SET_UNIQ		_IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
-> > > > > 
-> > > > > And then in uinput.c code handle it as:
-> > > > > 
-> > > > >   case UI_SET_UNIQ & ~IOCSIZE_MASK:
-> > > > > 
-> > > > > as part of section /* Now check variable-length commands */
-> > > > 
-> > > > If we did not have UI_SET_PHYS in its current form, I'd agree with you,
-> > > > but I think there is benefit in having UI_SET_UNIQ be similar to
-> > > > UI_SET_PHYS.
-> > > 
-> > > I thought that ioctl is just number, so we can define it as we want. And
-> > > because uinput.c has already switch for variable-length commands it
-> > > would be easy to use it. Final handling can be in separate function like
-> > > for UI_SET_PHYS which can look like same.
-> > 
-> > Yes, we can define ioctl number as whatever we want. What I was trying
-> > to say, right now users do this:
-> > 
-> > 	rc = ioctl(fd, UI_SET_PHYS, "whatever");
-> > 	...
-> > 
-> > and with UI_SET_UNIQ they expect the following to work:
-> > 
-> > 	rc = ioctl(fd, UI_SET_UNIQ, "whatever");
-> > 	...
-> 
-> And would not following definition
-> 
->   #define UI_SET_UNIQ _IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
-> 
-> allow userspace to call
-> 
->   rc = ioctl(fd, UI_SET_UNIQ, "whatever");
-> 
-> as you want?
 
-OK, so what you are saying is that we can have whatever in the size
-portion of ioctl number and simply ignore it in the driver (and I do not
-think we need to do any of "UI_SET_UNIQ & ~IOCSIZE_MASK" really).
-While this would work, I am not sure it is the best option as I think
-we'd have to comment extensively why we have arbitrary number in place
-of the size.
+--3hixyzurn7x44vjr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-And we still do not really save anything, as we still have to go through
-compat ioctl handler (since we have it already) and it is very simple to
-add a case for UI_SET_UNIQ there...
+Hi,
 
-Thanks.
+On Sun, Dec 01, 2019 at 07:57:40PM +0100, Pali Roh=E1r wrote:
+> [...]
+>
+> For handle this problem I would like to propose a new way how to use and
+> implement HSP and HFP profiles on Linux.
+>=20
+> Implement a new HSP/HFP daemon (I called it hsphfpd) which register HSP
+> and HFP profiles in bluez and then exports functionality for all other
+> specific applications via DBus API (API for audio, power supply, input
+> layer, telephony functions, vendor extensions, etc...). So it would acts
+> as proxy daemon between bluez and target applications (pulseaudio,
+> upower, ofono, ...)
+>
+> [...]
 
--- 
-Dmitry
+Makes sense to me. My TODO list for the power-supply subsystem
+contains providing an API similar to uinput, but for batteries/chargers.
+I suppose that would be very useful for the daemon :)
+
+-- Sebastian
+
+--3hixyzurn7x44vjr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAl3lasUACgkQ2O7X88g7
++prEDw//Z6n5Vqe7LPkVNBdWb5RcepC5SXsdMrOWcRZiG2l+ONx3TllLio1oKQzY
+4ySobqzSsYjrMPuutOk5FkevIePy5Bz4CUj7N/GzguMBgBl/AwjM1YD5UvW+B/lU
+AliVp4D7uNE4i4JgvKsVP5oC7BFzY8UPHC1vc6BS5r9HZZ7ftHFaNvVhYZpCEdn/
+TiM3DcyL699MhXPZTXWIWJQNIUFJMNgk46Oqf6MYLfv6uMZy3R84jQ/z+8o81tMZ
+4MtsYqJEGZrcmA8zhJrgHowV6ct7iVrdMKtam8yebFgHBOHLGIgOz3ELVO1V4P6r
+/ysQQq1UwOqp25smRmpiXziQ0vVVj38IKlO+rnNCie+XdcNxR0HwpZsGhepIrR9e
++5HInSMZsfmF2MA97VVfB6JDbkCynk/8HEbddnRPm44suhkEvzMlrZOsnjVLBy2I
+E52luL2LETOYrty9DHdM0SobZ7T4rAMHBuemr7zjYFm2gZ/0oYTdDIMWBDQrk0eS
+BA/e79rgTzH7iMlKhzMCavfOuCRUbWujBayo/d0xyugOC6y8hsGD/PIVu03Bxj/P
+w7oA4PPITTVvxKis4/pvg9QoZhU84b/8T7Ea7i3/LTqIXEhtZrSx8S/wkSRt9Cck
+4qP1pasTIz08mJ+j5GibSI9NecpmP62zWOu+rKfXunzGcgTmzjo=
+=vyz5
+-----END PGP SIGNATURE-----
+
+--3hixyzurn7x44vjr--
