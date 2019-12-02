@@ -2,212 +2,176 @@ Return-Path: <SRS0=9PGa=ZY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE98C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 18:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C503DC43215
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 19:03:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07D4C2070A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 18:53:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99DCC21835
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 19:03:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGwV1mIt"
+	dkim=pass (2048-bit key) header.d=cerno.tech header.i=@cerno.tech header.b="emEElaLY";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QHVRb8Jk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727739AbfLBSxp (ORCPT
+        id S1728101AbfLBTDJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Dec 2019 13:53:45 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46764 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727464AbfLBSxp (ORCPT
+        Mon, 2 Dec 2019 14:03:09 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:39347 "EHLO
+        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727963AbfLBTDI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Dec 2019 13:53:45 -0500
-Received: by mail-wr1-f68.google.com with SMTP id z7so401243wrl.13;
-        Mon, 02 Dec 2019 10:53:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=f1v7Nshk6iUxJP3MddmPzidScvIGdRe5OmcnUCAkON0=;
-        b=XGwV1mItkhgTdZwwbVNEACxRbTs8LSWOx0Y0LkkF9qPUpy5oOusnG5/w5NOdo68xNV
-         NDS2veH+u1ZQ8lFpH05EO2y5DpZs95zH8MSVwAASHh2oNa2wVSSFn8uDfxDlZKYIyHtj
-         jALjaRp6xwWehXwwIS9R9YlvNuMsni7V5mWrfqZkLY3KDXmv7st3sbPjq3MDSdFda+7P
-         SnLWDZ1CGXFyGtNXsql1T5MWBFsQj1788+EM8fB4RViStvE4nB4LHkiDiJVmSW8/HBfZ
-         FbB/WTX/+jyCBXE9KzJKSKiqkyfHszQw29gNiZfzYiw6BLE4KpVN0QWOGW8OHkFqoCv9
-         L4aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=f1v7Nshk6iUxJP3MddmPzidScvIGdRe5OmcnUCAkON0=;
-        b=Fm7+UoCf7RGCYj6W/efhXZZwJXjdshvtTN8F/lgLedyzRpE32BwKKrFAwcrgdzobK8
-         sQ3ceXd40f5pcSgNVBJOihT+rIDEhjNv+/YncwZV9E3T7nOXmxtOaLS3RIM1crRfSyvA
-         gtod7to4wgFDwIzmTL94vziP816qxFTqGQEIHcRQpninpHAONodfpBw8OzXjJKYnq17e
-         2OPV/DXg/hKw0wSGJGeCmaWox6iPjb+XoqUkBnEBfpFbHqnsd2hbqmC1eP3b8xPymzps
-         Zwq14/0/KlfZd7Cxv5IF2yAc/j+woKbabjD+k5CsnIl/EqMzSTVXTDlSfgclHARTYYfK
-         rXMQ==
-X-Gm-Message-State: APjAAAWKbC/eh7bsD9Ka/AZ5shDryLqwm9aYgP1LEkiQlvcPVWQNLKT0
-        tu+cGUiXPleWOKuxMuv8Jz0=
-X-Google-Smtp-Source: APXvYqyT5qIZqkrFXiSHABrKE+fUSySESMth558JCSTXqpdokQG8FYcOIPXEvGBDJOqe6aBeIfztcA==
-X-Received: by 2002:a5d:50d2:: with SMTP id f18mr467853wrt.366.1575312822127;
-        Mon, 02 Dec 2019 10:53:42 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id p5sm309610wrt.79.2019.12.02.10.53.40
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 02 Dec 2019 10:53:41 -0800 (PST)
-Date:   Mon, 2 Dec 2019 19:53:40 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-Message-ID: <20191202185340.nae4lljten5jqp3y@pali>
-References: <20191127185139.65048-1-abhishekpandit@chromium.org>
- <20191201145357.ybq5gfty4ulnfasq@pali>
- <20191202012305.GQ248138@dtor-ws>
- <20191202084750.k7lafzzrf3yq2tqs@pali>
- <20191202175440.GA50317@dtor-ws>
+        Mon, 2 Dec 2019 14:03:08 -0500
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.nyi.internal (Postfix) with ESMTP id 3CEA622091;
+        Mon,  2 Dec 2019 14:03:07 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Mon, 02 Dec 2019 14:03:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cerno.tech; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm1; bh=2vsm1/M5oTih6PJrh0YiOplzSPP
+        8P4CXH6c05UTxHWg=; b=emEElaLYMa7YTVxguo6O1JQpmULBWsQ8tCKQT40jEed
+        DPonOo/EJ6Qo1PQXi5UAxjQskTDGQ5GcZcORZgPSP+HRUODnb8IDqmei41DKQBf6
+        4y/coegy6oy00NC15tf7OlQQ4dII7GMjYHNOAT3GaDLCrJmNTIaFlaO/nVIkzZYM
+        XPAbbTQNDjVMI+ne9NAA0HNSGZkQekZjC2EUIu/Amga3TEWWy3varfZM8SHrNSk+
+        3EKyFIzhH/pMO+TrfLGrAXnOxPRUiDHrzOkkNfFgWpGbFAQibZjwwXuDkVIBRI0Y
+        YVGVZaj/tTTrsHQ+UoSY1IP++1+e3GShPvYgKDpB3Dw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=2vsm1/
+        M5oTih6PJrh0YiOplzSPP8P4CXH6c05UTxHWg=; b=QHVRb8JkbRYNbW6TLzImSt
+        DOQGijgw3aC3Zpy8GqUfo1yKSSw1b+oHfP4gdGqKOTSGaDnTX9x781kaZcJUpQjO
+        C+8g5XaBynieIHbdCYmYnCtYicO1mjiTjSGaMxW+2R7P7T6sJaL7nvCqEpeh3kYZ
+        m7s0/RRU26C4tqUwdrssN4Mu4xBw4KIXlMhkwDY+LzXCqFyQxUGGIRLhjWWKpyUf
+        lpWFBiFhu7K+pTnhb/YFxARY2mH/8LunmoFvrCcPFrIOxpNBxBIsLKfrs3Zqcvuz
+        3y7ITE0e3wx2ng8i1hUu3vgNIkTm/zzVsA4yVXABcEQ7EJoT7IggH5LOV2M03Y8Q
+        ==
+X-ME-Sender: <xms:6F_lXUYkjCDp7aUKrGmmwCMNBFzeAw81dUTdzhzpM-SRt-tsprW0kQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudejhedguddvfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvuffkfhggtggujgesghdtreertddtvdenucfhrhhomhepofgrgihi
+    mhgvucftihhprghrugcuoehmrgigihhmvgestggvrhhnohdrthgvtghhqeenucffohhmrg
+    hinhepuggvvhhitggvthhrvggvrdhorhhgnecukfhppeeltddrkeelrdeikedrjeeinecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpehmrgigihhmvgestggvrhhnohdrthgvtghhnecuve
+    hluhhsthgvrhfuihiivgeptd
+X-ME-Proxy: <xmx:6F_lXTpL74kHEYUIPLaioHXFibx3i96q0k402yCDBXM5ROBaIhsVFw>
+    <xmx:6F_lXZ8QnB85PrZ_qdEYnJiVaVC6UNOeSKfljlDgusDL5BWPmB-Gcg>
+    <xmx:6F_lXS_39O-3u8Iccr2W8i_mdIx6Ewy4ilp_bAldYeS6UUWdPo3c-w>
+    <xmx:61_lXSCv4qsCFuTtwGjN70SkTnAe13F5ACWRy4uqnIVBvvXksPekhg>
+Received: from localhost (lfbn-1-10718-76.w90-89.abo.wanadoo.fr [90.89.68.76])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 2FC1A80064;
+        Mon,  2 Dec 2019 14:03:04 -0500 (EST)
+Date:   Mon, 2 Dec 2019 20:03:02 +0100
+From:   Maxime Ripard <maxime@cerno.tech>
+To:     Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] dt-bindings: net: bluetooth: add DT bindings for
+ Realtek controllers
+Message-ID: <20191202190302.5rtv3p6wkyol4y4b@gilmour.lan>
+References: <20191130202314.142096-1-bonstra@bonstra.fr.eu.org>
+ <20191130202314.142096-2-bonstra@bonstra.fr.eu.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="2etcyssq2xsldc6g"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="qkf2aoim2t2545gg"
 Content-Disposition: inline
-In-Reply-To: <20191202175440.GA50317@dtor-ws>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20191130202314.142096-2-bonstra@bonstra.fr.eu.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 
---2etcyssq2xsldc6g
-Content-Type: text/plain; charset=utf-8
+--qkf2aoim2t2545gg
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Monday 02 December 2019 09:54:40 Dmitry Torokhov wrote:
-> On Mon, Dec 02, 2019 at 09:47:50AM +0100, Pali Roh=C3=A1r wrote:
-> > On Sunday 01 December 2019 17:23:05 Dmitry Torokhov wrote:
-> > > Hi Pali,
-> > >=20
-> > > On Sun, Dec 01, 2019 at 03:53:57PM +0100, Pali Roh=C3=A1r wrote:
-> > > > Hello!
-> > > >=20
-> > > > On Wednesday 27 November 2019 10:51:39 Abhishek Pandit-Subedi wrote:
-> > > > > Support setting the uniq attribute of the input device. The uniq
-> > > > > attribute is used as a unique identifier for the connected device.
-> > > > >=20
-> > > > > For example, uinput devices created by BlueZ will store the addre=
-ss of
-> > > > > the connected device as the uniq property.
-> > > > >=20
-> > > > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.or=
-g>
-> > > >=20
-> > > > ...
-> > > >=20
-> > > > > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux/uin=
-put.h
-> > > > > index c9e677e3af1d..d5b7767c1b02 100644
-> > > > > --- a/include/uapi/linux/uinput.h
-> > > > > +++ b/include/uapi/linux/uinput.h
-> > > > > @@ -145,6 +145,7 @@ struct uinput_abs_setup {
-> > > > >  #define UI_SET_PHYS		_IOW(UINPUT_IOCTL_BASE, 108, char*)
-> > > > >  #define UI_SET_SWBIT		_IOW(UINPUT_IOCTL_BASE, 109, int)
-> > > > >  #define UI_SET_PROPBIT		_IOW(UINPUT_IOCTL_BASE, 110, int)
-> > > > > +#define UI_SET_UNIQ		_IOW(UINPUT_IOCTL_BASE, 111, char*)
-> > > >=20
-> > > > I think that usage of char* as type in _IOW would cause compatibili=
-ty
-> > > > problems like it is for UI_SET_PHYS (there is UI_SET_PHYS_COMPAT). =
-Size
-> > > > of char* pointer depends on userspace (32 vs 64bit), so 32bit proce=
-ss on
-> > > > 64bit kernel would not be able to call this new UI_SET_UNIQ ioctl.
-> > > >=20
-> > > > I would suggest to define this ioctl as e.g.:
-> > > >=20
-> > > >   #define UI_SET_UNIQ		_IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
-> > > >=20
-> > > > And then in uinput.c code handle it as:
-> > > >=20
-> > > >   case UI_SET_UNIQ & ~IOCSIZE_MASK:
-> > > >=20
-> > > > as part of section /* Now check variable-length commands */
-> > >=20
-> > > If we did not have UI_SET_PHYS in its current form, I'd agree with yo=
-u,
-> > > but I think there is benefit in having UI_SET_UNIQ be similar to
-> > > UI_SET_PHYS.
-> >=20
-> > I thought that ioctl is just number, so we can define it as we want. And
-> > because uinput.c has already switch for variable-length commands it
-> > would be easy to use it. Final handling can be in separate function like
-> > for UI_SET_PHYS which can look like same.
->=20
-> Yes, we can define ioctl number as whatever we want. What I was trying
-> to say, right now users do this:
->=20
-> 	rc =3D ioctl(fd, UI_SET_PHYS, "whatever");
-> 	...
->=20
-> and with UI_SET_UNIQ they expect the following to work:
->=20
-> 	rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
-> 	...
+Hi,
 
-And would not following definition
+On Sat, Nov 30, 2019 at 09:23:12PM +0100, Hugo Grostabussiat wrote:
+> The rtl_bt driver already supports some Realtek controllers on ACPI
+> platforms.
+> This commit adds bindings for DT-only platforms.
+>
+> Signed-off-by: Hugo Grostabussiat <bonstra@bonstra.fr.eu.org>
+> ---
+>  .../bindings/net/realtek-bluetooth.yaml       | 52 +++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
+>
+> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
+> new file mode 100644
+> index 000000000000..6b62e5132c90
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
+> @@ -0,0 +1,52 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/realtek-bluetooth.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Realtek Bluetooth controllers device tree bindings
+> +
+> +description: |
+> +  Device tree bindings for serial attached Realtek Bluetooth controllers.
+> +
+> +maintainers:
+> +  - Marcel Holtmann <marcel@holtmann.org>
+> +  - Johan Hedberg <johan.hedberg@gmail.com>
+> +
+> +properties:
+> +  compatible:
+> +    items:
+> +      - const: realtek,rt8723bs-bt
 
-  #define UI_SET_UNIQ _IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
+This can be
+compatible:
+  const: realtek,rt8723bs-bt
 
-allow userspace to call
+> +  powerdown-gpios:
+> +    description: GPIO line controlling the power down (BT_DIS#) signal
+> +    maxItems: 1
+> +
+> +  device-wake-gpios:
+> +    description: GPIO line controlling the device wakeup (BT_WAKE) signal
+> +    maxItems: 1
+> +
+> +  host-wake-gpios:
+> +    description: GPIO line sampling the host wakeup (BT_HOST_WAKE) signal
+> +    maxItems: 1
+> +
+> +  firmware-name:
+> +    description: |
+> +      Name of the configuration file to load in addition to firmware
+> +    $ref: http://devicetree.org/schemas/types.yaml#/definitions/string
+> +
+> +required:
+> +  - compatible
 
-  rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
+Setting additionalProperties to false would be great here too.
 
-as you want?
+Thanks!
+Maxime
 
-> They would not expect a variable length IOCTL here, or expect a
-> fixed-size string, nor do they expect to cast pointer to u64. So keeping
-> the spirit of UI_SET_PHYS, even if it is not great from 64/32 bit point
-> of view is beneficial here.
->=20
-> >=20
-> > > But you are absolutely correct that in current form the patch is
-> > > deficient on 64/32 systems, and the compat handling needs to be added
-> > > before it can be accepted.
-> >=20
-> > Is not better to avoid usage of compat ioctl? Or it is OK to use compat
-> > ioctl also for new features? I do not know if there are some kernel
-> > rules for it or not... But for me it sounds like "compatibility layer
-> > for older code".
->=20
-> Yes, if uinput driver did not have any compat code in it, we would not
-> want to add it. But alas! we already need to handle compat cases for
-> expsting API, so consistency is more important than purity (in my
-> opinion) here.
->=20
-> Thanks.
->=20
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---2etcyssq2xsldc6g
+--qkf2aoim2t2545gg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXeVdsgAKCRCL8Mk9A+RD
-UizOAJ9Q3KfvZg+KBeneTeD4TNT4oX4cRQCgxcA8gx8TdeB2oOo7XPVxPq/88XQ=
-=s/uf
+iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCXeVf5gAKCRDj7w1vZxhR
+xSZyAP9Jq4dzAGIuHEpsruCUumvqfk6iJEGz7e9fEM+G3oj0wwD+LgrZzvPLSgPc
+NVwLv6OPXK2Cqo/tcGM7SAjNGX8VwAc=
+=4oWJ
 -----END PGP SIGNATURE-----
 
---2etcyssq2xsldc6g--
+--qkf2aoim2t2545gg--
