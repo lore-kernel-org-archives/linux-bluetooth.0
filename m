@@ -2,139 +2,94 @@ Return-Path: <SRS0=9PGa=ZY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A75BC432C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 01:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44842C43141
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 04:07:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5164C20881
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 01:23:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JbwPnDI8"
+	by mail.kernel.org (Postfix) with ESMTP id 1BEF12146E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 04:07:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727298AbfLBBXL (ORCPT
+        id S1727398AbfLBEHC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 1 Dec 2019 20:23:11 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:33913 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727266AbfLBBXL (ORCPT
+        Sun, 1 Dec 2019 23:07:02 -0500
+Received: from mail-il1-f198.google.com ([209.85.166.198]:45189 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727385AbfLBEHC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 1 Dec 2019 20:23:11 -0500
-Received: by mail-pg1-f193.google.com with SMTP id r11so528481pgf.1;
-        Sun, 01 Dec 2019 17:23:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=dMdDU7QPfqkfhU93NmKAKuY/iBXJ4ghiOz+NSAn8CiY=;
-        b=JbwPnDI8OxxpXKPY1ygxBWujZyN2RpsTQ4WphYMfy+RsO5+9/B5KEYI7tvMiPmvRoh
-         K8rM/5WWnjy0S9xHOyDt850wsZw4agJ1RSiKyK++A/Fe2X8dazhB32XSD2hZvZNPbsf7
-         tmQNwmYpr9cAECsTS0eYRa0I8edk9D8n9Jas3PVNV8OTGGzy25YtMfKcBrLFUyr5wy0X
-         5YcgUqAWgcXICJ8hfgDnj9FTYud0UYfbx5LGYAAXUfYbiFtE/CLOxlQgxmzVBDm52whl
-         x4auD4RoWMU3c6Bx8QinYLzkP94/kUPuqU7F5hQ23XTOYLPtgbrNSD5qJMXCNPt6es8z
-         AVQA==
+        Sun, 1 Dec 2019 23:07:02 -0500
+Received: by mail-il1-f198.google.com with SMTP id w6so9671059ill.12
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Dec 2019 20:07:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=dMdDU7QPfqkfhU93NmKAKuY/iBXJ4ghiOz+NSAn8CiY=;
-        b=IMML6iTX5BmlS6NAbXrSV1QRu8GaviA1Jwo93zMxx3CT308wFz2E/sx640iSMI594s
-         HCLe1hJINYh78hSXzlRuEILrrODiQ2mFw9vm4hjXngaWAX7JkNPIOYgQC9fAmDH1tZU7
-         Rgb7rLKKLJxeonLH9OthzrQOH7jbWFbzpRIHqKBjeobunm47oSsJr9GNYoCXKzyXujf0
-         re8rEZSX/KAm7OkFdm+Rv/K5En2PnEg65vgiVdZ0PPvIc0303Twg+FuXUXcnLIiFH8I3
-         MuBvpzOr8y0EMX7XmJ6qenI+gi2rnpfQKsidFoMuscLHo/oe0Xge4wcyn2BO0Qr5rBpr
-         5VMA==
-X-Gm-Message-State: APjAAAXZUy6NV9OpX7BVPzr/MGSwaTpwWzM/ZJMiqaanlQbxP7iswwxd
-        ex0xUOAHWbqFSynBt1+LzMk=
-X-Google-Smtp-Source: APXvYqwxTVM2SJdf0fAcJ9eL46EQoaRI/xaWiLcdiJWwmOu/TEFvTCc4nbiWPVWt3IL/a9UwEwuJsQ==
-X-Received: by 2002:a63:1b1b:: with SMTP id b27mr26614665pgb.402.1575249788764;
-        Sun, 01 Dec 2019 17:23:08 -0800 (PST)
-Received: from dtor-ws ([2620:15c:202:201:3adc:b08c:7acc:b325])
-        by smtp.gmail.com with ESMTPSA id y3sm10277577pfe.183.2019.12.01.17.23.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Dec 2019 17:23:08 -0800 (PST)
-Date:   Sun, 1 Dec 2019 17:23:05 -0800
-From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-Message-ID: <20191202012305.GQ248138@dtor-ws>
-References: <20191127185139.65048-1-abhishekpandit@chromium.org>
- <20191201145357.ybq5gfty4ulnfasq@pali>
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=oWsENjm7d/+QABjuPHBYSJPPMCuN6XI9dZYPsoGDEJo=;
+        b=Kg47Ke4PtF5B8KTw90UrUXneqbc5wGx8rFdnqhY2xkc820QhEyDFz3U4VGiHbx5rOj
+         88ZKZX6GmbF7PvNDjN5b0npHpeszpaaR+hKkD3vRaYPF5Ue3EdzvEZL8zVHZ5pXw5nJb
+         VkJae8ciLFGbEDAU9rDaUsihLKIwUUQcwb9YAwWSDe5DRMtIMnUzdelhuRStJ+ii3wqt
+         EwOxRzfNwtr+3LpEpCFki0X8RDtRTqHYQO3eU75CWFC0DpzFXzL8Pjpeb87/3lxMYd+j
+         xzyt0lSOiEm0FC+dF1tpzOeZsW9HQvc7t3fCSQI7mZ6OxeYKFM9qCSV7uszCmoHV0gzV
+         uOHw==
+X-Gm-Message-State: APjAAAUqZUOFS14U41tPDZmdU6zlUykK1WS8UYaEWlCam7kmUWqBSvrs
+        e3j7uN1VqEuO8/FRs86B6k9DOIKoEZy4336Amg1eTeDGi0FE
+X-Google-Smtp-Source: APXvYqwbNau2iLq/cBIAuQInsyrPMPEuwnt2BDzeyB8yqBtnk0ZK4FLDDa7c3GeQTvUxRw7rZ0iE6vluQVplMVvE3Si4+oaVnUb7
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191201145357.ybq5gfty4ulnfasq@pali>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Received: by 2002:a5d:8184:: with SMTP id u4mr50614802ion.155.1575259621372;
+ Sun, 01 Dec 2019 20:07:01 -0800 (PST)
+Date:   Sun, 01 Dec 2019 20:07:01 -0800
+In-Reply-To: <000000000000c280ba05988b6242@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000293e9f0598b0b69d@google.com>
+Subject: Re: BUG: sleeping function called from invalid context in __alloc_pages_nodemask
+From:   syzbot <syzbot+4925d60532bf4c399608@syzkaller.appspotmail.com>
+To:     a@unstable.cc, akpm@linux-foundation.org, alex.aring@gmail.com,
+        allison@lohutok.net, andrew@lunn.ch, andy@greyhouse.net,
+        ap420073@gmail.com, aryabinin@virtuozzo.com, ast@domdv.de,
+        b.a.t.m.a.n@lists.open-mesh.org, bridge@lists.linux-foundation.org,
+        christophe.leroy@c-s.fr, cleech@redhat.com, daniel@iogearbox.net,
+        davem@davemloft.net, dja@axtens.net, dsa@cumulusnetworks.com,
+        dvyukov@google.com, edumazet@google.com, f.fainelli@gmail.com,
+        fw@strlen.de, glider@google.com, gor@linux.ibm.com,
+        gregkh@linuxfoundation.org, gustavo@embeddedor.com,
+        gvaradar@cisco.com, haiyangz@microsoft.com, hdanton@sina.com,
+        idosch@mellanox.com, info@metux.net, j.vosburgh@gmail.com, j@w1.fi,
+        jakub.kicinski@netronome.com, jhs@mojatatu.com, jiri@resnulli.us,
+        johan.hedberg@gmail.com, johannes.berg@intel.com,
+        jwi@linux.ibm.com, kasan-dev@googlegroups.com,
+        kstewart@linuxfoundation.org, kvalo@codeaurora.org,
+        kys@microsoft.com, lariel@mellanox.com, linmiaohe@huawei.com,
+        linux-bluetooth@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-ppp@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pali,
+syzbot has bisected this bug to:
 
-On Sun, Dec 01, 2019 at 03:53:57PM +0100, Pali Rohár wrote:
-> Hello!
-> 
-> On Wednesday 27 November 2019 10:51:39 Abhishek Pandit-Subedi wrote:
-> > Support setting the uniq attribute of the input device. The uniq
-> > attribute is used as a unique identifier for the connected device.
-> > 
-> > For example, uinput devices created by BlueZ will store the address of
-> > the connected device as the uniq property.
-> > 
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> 
-> ...
-> 
-> > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux/uinput.h
-> > index c9e677e3af1d..d5b7767c1b02 100644
-> > --- a/include/uapi/linux/uinput.h
-> > +++ b/include/uapi/linux/uinput.h
-> > @@ -145,6 +145,7 @@ struct uinput_abs_setup {
-> >  #define UI_SET_PHYS		_IOW(UINPUT_IOCTL_BASE, 108, char*)
-> >  #define UI_SET_SWBIT		_IOW(UINPUT_IOCTL_BASE, 109, int)
-> >  #define UI_SET_PROPBIT		_IOW(UINPUT_IOCTL_BASE, 110, int)
-> > +#define UI_SET_UNIQ		_IOW(UINPUT_IOCTL_BASE, 111, char*)
-> 
-> I think that usage of char* as type in _IOW would cause compatibility
-> problems like it is for UI_SET_PHYS (there is UI_SET_PHYS_COMPAT). Size
-> of char* pointer depends on userspace (32 vs 64bit), so 32bit process on
-> 64bit kernel would not be able to call this new UI_SET_UNIQ ioctl.
-> 
-> I would suggest to define this ioctl as e.g.:
-> 
->   #define UI_SET_UNIQ		_IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
-> 
-> And then in uinput.c code handle it as:
-> 
->   case UI_SET_UNIQ & ~IOCSIZE_MASK:
-> 
-> as part of section /* Now check variable-length commands */
+commit ab92d68fc22f9afab480153bd82a20f6e2533769
+Author: Taehee Yoo <ap420073@gmail.com>
+Date:   Mon Oct 21 18:47:51 2019 +0000
 
-If we did not have UI_SET_PHYS in its current form, I'd agree with you,
-but I think there is benefit in having UI_SET_UNIQ be similar to
-UI_SET_PHYS.
+     net: core: add generic lockdep keys
 
-But you are absolutely correct that in current form the patch is
-deficient on 64/32 systems, and the compat handling needs to be added
-before it can be accepted.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15769712e00000
+start commit:   419593da Add linux-next specific files for 20191129
+git tree:       linux-next
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=17769712e00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13769712e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7c04b0959e75c206
+dashboard link: https://syzkaller.appspot.com/bug?extid=4925d60532bf4c399608
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16148e9ce00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a1f786e00000
 
-Thanks.
+Reported-by: syzbot+4925d60532bf4c399608@syzkaller.appspotmail.com
+Fixes: ab92d68fc22f ("net: core: add generic lockdep keys")
 
--- 
-Dmitry
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
