@@ -2,166 +2,201 @@ Return-Path: <SRS0=9PGa=ZY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05122C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 14:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFAEC432C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 17:01:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C702420833
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 14:17:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83B2120848
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 17:01:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=scewo-ch.20150623.gappssmtp.com header.i=@scewo-ch.20150623.gappssmtp.com header.b="xX+4H+sY"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bf/Pik4A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727453AbfLBORl (ORCPT
+        id S1727493AbfLBRBX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Dec 2019 09:17:41 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:36002 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727362AbfLBORl (ORCPT
+        Mon, 2 Dec 2019 12:01:23 -0500
+Received: from new4-smtp.messagingengine.com ([66.111.4.230]:43451 "EHLO
+        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727529AbfLBRBX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Dec 2019 09:17:41 -0500
-Received: by mail-io1-f66.google.com with SMTP id l17so14447271ioj.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Dec 2019 06:17:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=scewo-ch.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:cc
-         :content-transfer-encoding;
-        bh=ttwX5YlkawcLlRdnsDNXMQn/cy+r8metTAs296y6sfs=;
-        b=xX+4H+sYCzEEZ09sxoPLxW0WtjfNcwX0mzMyBrbVXUQgsbC1fczRGdCX0+ynb7f0z/
-         jUTeoFBkVDY4lzTsTCreiQQUVxYP0RgZPM+H3g4ReIaMh8aKMEluAp509G8UOztymP2t
-         Fzahvn80uCSPNoMWdSbN3iT6rr7OEf7sjA9DD2U7+FidEeJNI4I75yFCEchEmkKcUoK9
-         82X/B/O8R+aRoewXkZnVDK1XK34Oz9t96cg+lNdjNd7Nks8bS0gZO3hmssv2qTMqcVxr
-         NRxRTOkKYVLlyL6nhEdhLZwqduKLiWniocMAX5oc70Gj0bHXcnCPlB8TMy70hmpP/5Rl
-         VKDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:cc:content-transfer-encoding;
-        bh=ttwX5YlkawcLlRdnsDNXMQn/cy+r8metTAs296y6sfs=;
-        b=EpEhx/BnuPBUFq9aOUeG8nEIcbJ7CDa8nOn8PTg3X+Scl8tmA/dTsINqH/NYNng6Bp
-         OL4PzpOceEiWXWleUE8qK2ThMIEd6BfbKS87K3IKkjBZmkxpQZk47tC7CRJ1IaSNMNDS
-         /ryinxAHMTHfAfWkXwgc4N701bgbrZv1XcuIoz9Ae/CO/FrP6JncvYfUv3MMTWrXXhpd
-         NJkRq7Rbm3376m2Pnwvj5LYB65PlcY5jXzB0qpvQIq/BENp7IOkEg1w7ciALYpy3H/nk
-         U4VqW1pnqlBzb+n8kYAw+s+MWUtc0q+ppu0b94fSpy0J2m8DTqfoxDTFKBBcJOVlP3sK
-         sIDg==
-X-Gm-Message-State: APjAAAWS1CPp+7PeBHCwQ2B+YAOAmlUc5zGLsBT0xeXsi6c60/mr5yPo
-        5Cw7f4KzrvTK9veHzJEyVW93kl+sJMuycN5vYnwtm0mccV9Eaw==
-X-Google-Smtp-Source: APXvYqwlapBsjg7NuBX/r7J7zQ0cYb8B3fHbpjSPUtKdV4qQjX4DyksEjNq7n5gM3OoiTP7kfjkAuqZX6sEF51nSMp8=
-X-Received: by 2002:a6b:6e18:: with SMTP id d24mr12092971ioh.301.1575296258512;
- Mon, 02 Dec 2019 06:17:38 -0800 (PST)
-MIME-Version: 1.0
-References: <CAGssATiS=dpA=WOSfLek385o2g=C5sb0z+z=V7CDswn9_5Eu-g@mail.gmail.com>
- <CABBYNZ+VfyOeWjfdE64bVQM0eAJE789NRBjy+wgKa_Dka2ZZJg@mail.gmail.com>
- <F827D8AB-4404-4C81-9368-A18AB87D9292@holtmann.org> <CAGssATiZsC28X06aVQDTO=8va-0dtoe-1a2Mi6JZv4P9UMdGqg@mail.gmail.com>
- <CAGssAThL-EYEDLm8+aGqV_+sM0m8Gu7NdZ-jJOCMh3YgxJdq6A@mail.gmail.com>
-In-Reply-To: <CAGssAThL-EYEDLm8+aGqV_+sM0m8Gu7NdZ-jJOCMh3YgxJdq6A@mail.gmail.com>
-From:   Guy Morand <g.morand@scewo.ch>
-Date:   Mon, 2 Dec 2019 15:17:27 +0100
-Message-ID: <CAGssATjZw9x3hro0m+BX_=zRKTuMeBG1WFvFT26j92zpJzcFzg@mail.gmail.com>
-Subject: Re: Bluetooth disconnect event / Link layer monitoring
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        Mon, 2 Dec 2019 12:01:23 -0500
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 55D7574E5;
+        Mon,  2 Dec 2019 12:01:22 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Mon, 02 Dec 2019 12:01:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; bh=xyQy9dAG/Tk48e38Og5fQtPsXOm8/6FxUgZbTP01B
+        Ng=; b=bf/Pik4AdK0i81RPryJxjIgJ7hgyNIDZGbjoN+R4OAjyO0mshRZcfUNm3
+        EaUputDAh8bkMj90N2L4Bzitqkm7bmk35bTwq23U+DExlmaDSQiTC02uvdV3/oDh
+        8LzaOfMSXA33z7ml2MZfIJibzGZvwYO3FuDDEvJnW1bNhiU2HFlucrR3ByyoqhG7
+        pHS04t9exslmjJLqyy7atg6AE5GvFaP2Uqi0l4t0It/r8eQxlLP76Frq+2i+wj2Q
+        yAwlvm46uU+E7M0gjoIG+DzYRtFnzZy9SvIPmw+y6HqbQSv4XFnO2w9RDLcFXLQ3
+        glQzV+UGJ4tx5l15szDDv1UxUWqoQ==
+X-ME-Sender: <xms:YEPlXeDwNs0g1OqHto87mco9gEFY-giThKkRH6TvrFEAdaPvyWYr-A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudejhedgleejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    gorfhhihhshhhinhhgqdfkphfpvghtfihorhhkucdlfedttddmnecujfgurhepkffuhffv
+    ffgjfhgtfggggfesthekredttderjeenucfhrhhomhepvfgrnhhuucfmrghskhhinhgvnh
+    cuoehtrghnuhhksehikhhirdhfiheqnecuffhomhgrihhnpehfrhgvvgguvghskhhtohhp
+    rdhorhhgpdhlihgsvghrrghprgihrdgtohhmpdhgihhthhhusgdrtghomhdpphgrthhrvg
+    honhdrtghomhenucfkphepudeliedrvdeggedrudeluddruddtieenucfrrghrrghmpehm
+    rghilhhfrhhomhepthgrnhhukhesihhkihdrfhhinecuvehluhhsthgvrhfuihiivgeptd
+X-ME-Proxy: <xmx:YEPlXcQ2HDC1UyZfOV2HWwtWuhwVTDzkWHQ52EvnmEWxIFW5_3CpRA>
+    <xmx:YEPlXRVWViSgA4QhWpgBdwvq7A7Jm1-UNX2Ew8OrNG55b7GlW7hpIQ>
+    <xmx:YEPlXcGbgD3AAArjpq19t3Dk5elSPGTOVihDsKUHzu6z43S0iNO0BA>
+    <xmx:YkPlXVyZOVwHg8mwwDmdib3G8v3WvglYBkbH5sbpiBfXUbAs2QlTBb0g5UI>
+Received: from laptop (unknown [196.244.191.106])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 5C055306050C;
+        Mon,  2 Dec 2019 12:01:17 -0500 (EST)
+Message-ID: <508d35f29c2abc26af15e232a38d3ca53eb33706.camel@iki.fi>
+Subject: Re: [pulseaudio-discuss] Proposal for a new API and usage of
+ Bluetooth HSP and HFP profiles on Linux
+From:   Tanu Kaskinen <tanuk@iki.fi>
+To:     General PulseAudio Discussion 
+        <pulseaudio-discuss@lists.freedesktop.org>,
+        linux-bluetooth@vger.kernel.org, ofono@ofono.org,
+        devkit-devel@lists.freedesktop.org,
+        Bastien Nocera <hadess@hadess.net>,
+        Georg Chini <georg@chini.tk>,
+        Russell Treleaven <rtreleaven@bunnykick.ca>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Arun Raghavan <arun@arunraghavan.net>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>
+Cc:     Pali =?ISO-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Date:   Mon, 02 Dec 2019 19:01:11 +0200
+In-Reply-To: <20191201185740.uot7zb2s53p5gu7z@pali>
+References: <20191201185740.uot7zb2s53p5gu7z@pali>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-To:     unlisted-recipients:; (no To-header on input)
+User-Agent: Evolution 3.30.5-1.1 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Bluetooth developers,
+On Sun, 2019-12-01 at 19:57 +0100, Pali Rohár wrote:
+> Hello!
+> 
+> I'm sending this email to relevant mailing lists and other people who
+> could be interested in it. (I'm not subscribed to all of ML, so please
+> CC me when replying).
+> 
+> 
+> I would like to open a discussion about a completely new way of handling
+> Bluetooth HSP and HFP profiles on Linux. These two profiles are the only
+> standard way how to access microphone data from Bluetooth Headsets.
+> 
+> 
+> Previously in bluez4, HFP profile was implemented by bluez daemon and
+> telephony HFP functionality was provided by either dummy modem, ofono
+> modem or by Nokia's CSD Maemo modem.
+> 
+> In bluez5 version was modem code together with implementation of HFP
+> profile removed. And let implementation of HSP and HFP profiles to
+> external application.
+> 
+> Currently HSP profile is implemented in pulseaudio daemon to handle
+> microphone and Bluetooth speakers. HFP profile is not implemented yet.
+> 
+> 
+> HSP and HFP profiles use AT modem commands, so its implementation needs
+> to parse and generates AT commands, plus implement needed state machine
+> for it.
+> 
+> And now problem is that last version of HFP profile specification is too
+> complicated, plus Bluetooth headsets vendors started to inventing and
+> using of own custom extensions to HFP profile and AT commands.
+> 
+> Main problem of this "external" implementation outside of bluez is that
+> only one application can communicate with remote Bluetooth device. It
+> is application which received needed socket from bluez.
+> 
+> So in this design if audio daemon (pulseaudio) implements HFP profile
+> for processing audio, and e.g. power supply application wants to
+> retrieve battery level from Bluetooth device, it means that audio daemon
+> needs to implement also battery related functionality.
+> 
+> It does not make sense to force power supply daemon (upower) to
+> implement audio routing/encoding/decoding or audio daemon (power supply)
+> to force implementing battery related operations.
+> 
+> 
+> For handle this problem I would like to propose a new way how to use and
+> implement HSP and HFP profiles on Linux.
+> 
+> Implement a new HSP/HFP daemon (I called it hsphfpd) which register HSP
+> and HFP profiles in bluez and then exports functionality for all other
+> specific applications via DBus API (API for audio, power supply, input
+> layer, telephony functions, vendor extensions, etc...). So it would acts
+> as proxy daemon between bluez and target applications (pulseaudio,
+> upower, ofono, ...)
+> 
+> This would simplify whole HFP usage as applications would not need to
+> re-implement parsing and processing of AT commands and it would allow
+> more applications to use HFP profile at one time. And also it means that
+> audio software does not have to implement telephony stack or power
+> supply operations.
+> 
+> 
+> I wrote a document how such DBus API could look like, see here:
+> 
+>   https://github.com/pali/hsphfpd-prototype/raw/prototype/hsphfpd.txt
+> 
+> 
+> And also I implemented "prototype" implementation to verify that
+> designed API make sense and can be really implemented. Prototype fully
+> supports HSP profile in both HS and AG role, plus HFP profile in HF
+> role. This prototype implementation is available here:
+> 
+>   https://github.com/pali/hsphfpd-prototype
+> 
+> Some other details are written in README:
+> 
+>   https://github.com/pali/hsphfpd-prototype/raw/prototype/README
+> 
+> 
+> What do you think about it? Does it make sense to have such design?
+> Would you accept usage of such hsphfpd daemon, implemented according to
+> specification, on Linux desktop?
+> 
+> I would like to hear your opinion if I should continue with this hsphfpd
+> design, or not.
+> 
+> 
+> With this design and implementation of hsphfpd is possible to easily fix
+> pulseaudio issue about power supply properties:
+> 
+>   https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/722
 
-To give some feedbacks on my problem and hopefully that could help
-someone else who is also struggling...
+I quite like this proposal. Avoiding the need to implement the button
+press, battery level etc. handling separately in PulseAudio, oFono and
+PipeWire seems like a pretty good justification to me. I assume you're
+volunteering to maintain this new daemon?
 
-I compared the connection with my desktop and my device using btmon and
-noticed that during the connection, my desktop was configured as master
-that is set to slave on my device:
+It's not clear to me how this would affect the PulseAudio <-> oFono
+interaction, if at all. When oFono is used, would PulseAudio get the
+audio socket from oFono or hsphfpd? What about volume commands, would
+they go through oFono or would PulseAudio interact with hsphfpd
+directly?
 
-# On host
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-        Address: EC:83:50:DE:02:3C (Microsoft Corporation)
-        Role: Master (0x00)
+I think hsphfpd should be part of bluetoothd, but if that's not
+possible, then that's not possible.
 
-# On target
-< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
-        Address: EC:83:50:DE:02:3C (OUI EC-83-50)
-        Role: Slave (0x01)
+(I don't want to get into a lengthy discussion about programming
+languages, but I'll just note here that I don't like Perl.)
 
-So I applied this quick and dirty patch and now I can change the link
-supervision timeout without error:
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e17aacbc5630..c83f66066ce0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2286,10 +2286,7 @@ static void hci_conn_request_evt(struct hci_dev
-*hdev, struct sk_buff *skb)
+-- 
+Tanu
 
-                bacpy(&cp.bdaddr, &ev->bdaddr);
+https://www.patreon.com/tanuk
+https://liberapay.com/tanuk
 
--               if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
--                       cp.role =3D 0x00; /* Become master */
--               else
--                       cp.role =3D 0x01; /* Remain slave */
-+               cp.role =3D 0x00; /* Become master */
-
-                hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp)=
-;
-        } else if (!(flags & HCI_PROTO_DEFER)) {
-
-It's weird that in the latest kernel, this part of the file didn't
-change and there is for sure a better fix! bluetooth poeple?
-
-Anyway, if this helps or gives some clue to someone else, I'm always
-glad for a free beer, even virtually :D!
-
-Happy hacking!
-
-Guy
-
-On Thu, Nov 21, 2019 at 6:37 PM Guy Morand <g.morand@scewo.ch> wrote:
->
-> I found out that the hcitool lst command was working perfectly fine on
-> my desktop and is doing what I expect!
->
-> Unfortunately, on my device it only works after pairing, then I always
-> get the "Command Disallowed" error. This is weird as I'm  using the same
-> USB dongle and bluez version (5.50). The only thing that changes is the
-> kernel version that is why I think there is something weird here:
-> * 4.9 (Yocto) -> Doesn't work
-> * 4.14 (Yocto) -> Doesn't work
-> * 4.19 (Debian) -> works!
-> * 5.0.0 (Ubuntu) -> works!
->
-> I know it's  boring but updating the kernel is not straightforward, we
-> use the kernel provided  but our silicium vendor (embedded).
->
-> I was just wondering if one of you remember a similar bug (and fix?) or
-> this was just automagically solved without someone noticing it? Or maybe
-> I'm just missing something else important...
->
-> All the best!
->
-> Guy
-
-
-
---=20
-
-Guy Morand
-
-Software Engineer
-
-=E2=80=93
-
-Scewo AG, Technoparkstrasse 2, 8406 Winterthur
-
-Office +41 (0)44 500 86 03
-
-
-www.scewo.ch
-
-www.facebook.com/scewo
-
-www.instagram.com/scewo_official
