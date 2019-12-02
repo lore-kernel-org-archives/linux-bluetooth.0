@@ -2,150 +2,176 @@ Return-Path: <SRS0=9PGa=ZY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 964AAC432C3
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 08:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB50C432C3
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 12:42:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B50E21774
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 08:47:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pGVkQKfZ"
+	by mail.kernel.org (Postfix) with ESMTP id D651920833
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 12:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726190AbfLBIrz (ORCPT
+        id S1727414AbfLBMmW convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Dec 2019 03:47:55 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51657 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725977AbfLBIrz (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Dec 2019 03:47:55 -0500
-Received: by mail-wm1-f68.google.com with SMTP id g206so20807562wme.1;
-        Mon, 02 Dec 2019 00:47:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=zyOKweXKHOPtqk+48O/QHHMQCCOb/ibIpSzxHuzne4E=;
-        b=pGVkQKfZstToZiwqGP39z4Wy9KIhn5MnEXy6JSxCglui3LGSJZ/unwHs3izmEj0w9u
-         LHVsZCJH9ZQ+CIsdzkZ1m38wwkYKx560rta1CAzquV/qW7IdGvyLG6W9jEABLuF+zpqy
-         3eQ6+hbSW0uLQVb351xC6/IiXlFMFOQW8sMpToM1i7JiN8wpTxabXrr/cFgtQxjjUaz4
-         P0ijV+6XFt3Vy5QFrrXPXLNhO//G1kYDPEP8czX4NmVCBPi61hBeSBQIctjM2TS15fCP
-         k3VPMklRw6PnpedXaiNk/WDHFfG8sWzf3BCdE+M3MIEYlcfVPQATaP0yT31WWwDQVdFz
-         O6Bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=zyOKweXKHOPtqk+48O/QHHMQCCOb/ibIpSzxHuzne4E=;
-        b=kW9dHI+gty4Znzz/HcgYS14ejbStwPal+S8MFbD7NdWB5YzsGYMVCRDzQQGTZMgUks
-         5EhaTPXrDbSuCqCcJdbNz/BkjUFi8GLEusVr+z4lMDuXrNljI7jLei3ACY2NAPd3wrjd
-         yyBFtPIf56GhDC9eoccC3IrSVPbXgT3a97jFoMSut4dGm62W7yA86227ZD/0a+VforQz
-         ZED3JJLyk5faW3yW0j9pBlR/J5kMLKLTgELJHkHarh14aacWdEORXnoxnIVhVn5UGoTD
-         /G4hq+6H3gzRKuukzgjbFXY2LDu3lDfJTKS3afqOBS7WZm9xycX+EgFqg6DivN0kTsN6
-         U+Og==
-X-Gm-Message-State: APjAAAWjB3wISBYomwT+rJfyZsvRrfIRKUgalvF8CpgjgvRFcRkXxpR6
-        GjykQzDeLwE2mDVpaYgPC/o=
-X-Google-Smtp-Source: APXvYqz5uCyAD5CSXVQpElDuIk/VKSs+/hEVEVHXQgAf1sWm3bXsklsVGYc8ngStuhcDka3q39loqQ==
-X-Received: by 2002:a1c:6707:: with SMTP id b7mr23290086wmc.54.1575276473006;
-        Mon, 02 Dec 2019 00:47:53 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id h124sm23837188wme.30.2019.12.02.00.47.51
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 02 Dec 2019 00:47:52 -0800 (PST)
-Date:   Mon, 2 Dec 2019 09:47:50 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-Message-ID: <20191202084750.k7lafzzrf3yq2tqs@pali>
-References: <20191127185139.65048-1-abhishekpandit@chromium.org>
- <20191201145357.ybq5gfty4ulnfasq@pali>
- <20191202012305.GQ248138@dtor-ws>
+        Mon, 2 Dec 2019 07:42:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34720 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727354AbfLBMmW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 2 Dec 2019 07:42:22 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 205735] New: Kernel 4.19.42 and newer have broke my Bluetooth
+ keyboard/mouse support
+Date:   Mon, 02 Dec 2019 12:42:20 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: cijoml@volny.cz
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-205735-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191202012305.GQ248138@dtor-ws>
-User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sunday 01 December 2019 17:23:05 Dmitry Torokhov wrote:
-> Hi Pali,
-> 
-> On Sun, Dec 01, 2019 at 03:53:57PM +0100, Pali Rohár wrote:
-> > Hello!
-> > 
-> > On Wednesday 27 November 2019 10:51:39 Abhishek Pandit-Subedi wrote:
-> > > Support setting the uniq attribute of the input device. The uniq
-> > > attribute is used as a unique identifier for the connected device.
-> > > 
-> > > For example, uinput devices created by BlueZ will store the address of
-> > > the connected device as the uniq property.
-> > > 
-> > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > 
-> > ...
-> > 
-> > > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux/uinput.h
-> > > index c9e677e3af1d..d5b7767c1b02 100644
-> > > --- a/include/uapi/linux/uinput.h
-> > > +++ b/include/uapi/linux/uinput.h
-> > > @@ -145,6 +145,7 @@ struct uinput_abs_setup {
-> > >  #define UI_SET_PHYS		_IOW(UINPUT_IOCTL_BASE, 108, char*)
-> > >  #define UI_SET_SWBIT		_IOW(UINPUT_IOCTL_BASE, 109, int)
-> > >  #define UI_SET_PROPBIT		_IOW(UINPUT_IOCTL_BASE, 110, int)
-> > > +#define UI_SET_UNIQ		_IOW(UINPUT_IOCTL_BASE, 111, char*)
-> > 
-> > I think that usage of char* as type in _IOW would cause compatibility
-> > problems like it is for UI_SET_PHYS (there is UI_SET_PHYS_COMPAT). Size
-> > of char* pointer depends on userspace (32 vs 64bit), so 32bit process on
-> > 64bit kernel would not be able to call this new UI_SET_UNIQ ioctl.
-> > 
-> > I would suggest to define this ioctl as e.g.:
-> > 
-> >   #define UI_SET_UNIQ		_IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
-> > 
-> > And then in uinput.c code handle it as:
-> > 
-> >   case UI_SET_UNIQ & ~IOCSIZE_MASK:
-> > 
-> > as part of section /* Now check variable-length commands */
-> 
-> If we did not have UI_SET_PHYS in its current form, I'd agree with you,
-> but I think there is benefit in having UI_SET_UNIQ be similar to
-> UI_SET_PHYS.
+https://bugzilla.kernel.org/show_bug.cgi?id=205735
 
-I thought that ioctl is just number, so we can define it as we want. And
-because uinput.c has already switch for variable-length commands it
-would be easy to use it. Final handling can be in separate function like
-for UI_SET_PHYS which can look like same.
+            Bug ID: 205735
+           Summary: Kernel 4.19.42 and newer have broke my Bluetooth
+                    keyboard/mouse support
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.19.42 and all newer also 5.4
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: blocking
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: cijoml@volny.cz
+        Regression: No
 
-> But you are absolutely correct that in current form the patch is
-> deficient on 64/32 systems, and the compat handling needs to be added
-> before it can be accepted.
+Hello guys,
 
-Is not better to avoid usage of compat ioctl? Or it is OK to use compat
-ioctl also for new features? I do not know if there are some kernel
-rules for it or not... But for me it sounds like "compatibility layer
-for older code".
+I own a very old Logitech diNovo media set with Keyboard, Mouse MX1000
+for Bluetooth and Mediapad.
+Since 4.19.41 I was able to use it without problem, but kernel 4.19.42
+introduced two patches which one of them problably broke my Bluetooth
+setup support.
+According to the changelog those might be:
+
+commit 38f092c41cebaff589e88cc22686b289a6840559
+Author: Marcel Holtmann <marcel@xxxxxxxxxxxx>
+Date: Wed Apr 24 22:19:17 2019 +0200
+
+Bluetooth: Align minimum encryption key size for LE and BR/EDR connections
+
+commit d5bb334a8e171b262e48f378bd2096c0ea458265 upstream.
+
+The minimum encryption key size for LE connections is 56 bits and to
+align LE with BR/EDR, enforce 56 bits of minimum encryption key size for
+BR/EDR connections as well.
+
+Signed-off-by: Marcel Holtmann <marcel@xxxxxxxxxxxx>
+Signed-off-by: Johan Hedberg <johan.hedberg@xxxxxxxxx>
+Cc: stable@xxxxxxxxxxxxxxx
+Signed-off-by: Greg Kroah-Hartman <gregkh@xxxxxxxxxxxxxxxxxxx>
+
+commit c6d1f9b4b2cb768e29f5d44af143f25ad89062b1
+Author: Young Xiao <YangX92@xxxxxxxxxxx>
+Date: Fri Apr 12 15:24:30 2019 +0800
+
+Bluetooth: hidp: fix buffer overflow
+
+commit a1616a5ac99ede5d605047a9012481ce7ff18b16 upstream.
+
+Struct ca is copied from userspace. It is not checked whether the "name"
+field is NULL terminated, which allows local users to obtain potentially
+sensitive information from kernel stack memory, via a HIDPCONNADD command.
+
+This vulnerability is similar to CVE-2011-1079.
+
+Signed-off-by: Young Xiao <YangX92@xxxxxxxxxxx>
+Signed-off-by: Marcel Holtmann <marcel@xxxxxxxxxxxx>
+Cc: stable@xxxxxxxxxxxxxxx
+Signed-off-by: Greg Kroah-Hartman <gregkh@xxxxxxxxxxxxxxxxxxx>
+
+My current working setup with 4.19.41 is as follows:
+
+root@thinkpad:/home/cijoml# hcitool con
+Connections:
+> ACL 00:07:61:49:2A:6A handle 69 state 1 lm MASTER AUTH ENCRYPT
+> ACL 00:07:61:3E:1C:71 handle 71 state 1 lm MASTER AUTH ENCRYPT
+> ACL 00:07:61:49:E0:3D handle 68 state 1 lm MASTER
+
+root@thinkpad:/home/cijoml# hcitool info 00:07:61:3E:1C:71
+Requesting information ...
+BD Address: 00:07:61:3E:1C:71
+OUI Company: Logitech Europe SA (00-07-61)
+Device Name: Logitech diNovo Keyboard
+LMP Version: 1.2 (0x2) LMP Subversion: 0x545
+Manufacturer: Cambridge Silicon Radio (10)
+Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
+<encryption> <slot offset> <timing accuracy> <role switch>
+<hold mode> <sniff mode> <park state> <RSSI> <channel quality>
+<SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log>
+<CVSD> <paging scheme> <power control> <transparent SCO>
+<AFH cap. slave> <AFH cap. master>
+root@thinkpad:/home/cijoml# hcitool info 00:07:61:49:E0:3D
+Requesting information ...
+BD Address: 00:07:61:49:E0:3D
+OUI Company: Logitech Europe SA (00-07-61)
+Device Name: Logitech MX1000 mouse
+LMP Version: 1.2 (0x2) LMP Subversion: 0x545
+Manufacturer: Cambridge Silicon Radio (10)
+Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
+<encryption> <slot offset> <timing accuracy> <role switch>
+<hold mode> <sniff mode> <park state> <RSSI> <channel quality>
+<SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log>
+<CVSD> <paging scheme> <power control> <transparent SCO>
+<AFH cap. slave> <AFH cap. master>
+root@thinkpad:/home/cijoml# hcitool info 00:07:61:49:2A:6A
+Requesting information ...
+BD Address: 00:07:61:49:2A:6A
+OUI Company: Logitech Europe SA (00-07-61)
+Device Name: Logitech Mediapad
+LMP Version: 1.2 (0x2) LMP Subversion: 0x545
+Manufacturer: Cambridge Silicon Radio (10)
+Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
+<encryption> <slot offset> <timing accuracy> <role switch>
+<hold mode> <sniff mode> <park state> <RSSI> <channel quality>
+<SCO link> <HV2 packets> <HV3 packets> <u-law log> <A-law log>
+<CVSD> <paging scheme> <power control> <transparent SCO>
+<AFH cap. slave> <AFH cap. master>
+
+
+Can anybody please look at this and fix the support for my Bluetooth
+set so I do not need to throw it into dustbin?
+
+Thank you in advance
+
+Michal
 
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+You are receiving this mail because:
+You are the assignee for the bug.
