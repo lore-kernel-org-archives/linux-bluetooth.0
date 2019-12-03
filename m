@@ -7,123 +7,119 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDB5C432C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 09:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED07C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 09:53:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A8D9920661
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 09:48:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D758B206EC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 09:53:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="bENdHiuQ"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="bM5DklZC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725848AbfLCJs5 (ORCPT
+        id S1725907AbfLCJxq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Dec 2019 04:48:57 -0500
-Received: from mailout4.samsung.com ([203.254.224.34]:10974 "EHLO
+        Tue, 3 Dec 2019 04:53:46 -0500
+Received: from mailout4.samsung.com ([203.254.224.34]:13316 "EHLO
         mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbfLCJs5 (ORCPT
+        with ESMTP id S1725773AbfLCJxq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Dec 2019 04:48:57 -0500
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20191203094853epoutp0424f56c38950e3a8221b80e2abc211a08~c04QHUjMB2038920389epoutp040
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:48:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20191203094853epoutp0424f56c38950e3a8221b80e2abc211a08~c04QHUjMB2038920389epoutp040
+        Tue, 3 Dec 2019 04:53:46 -0500
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20191203095343epoutp0420ca0909bc8a74eb8c38d3bcfb63a82e~c08eC1VWU2407624076epoutp04R
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:53:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20191203095343epoutp0420ca0909bc8a74eb8c38d3bcfb63a82e~c08eC1VWU2407624076epoutp04R
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1575366533;
-        bh=FwaqjaxnZ41q7KSt1yI9UikB0Kh1JM6AInZTKp6CZMM=;
+        s=mail20170921; t=1575366823;
+        bh=FNtu+rZmo3beJBFO4K5Dudvw/qZkcxb96EvgpeMiFhI=;
         h=From:To:Subject:Date:References:From;
-        b=bENdHiuQtRPUuHPwzj2itWCoJ5Sm8D7unOp9mC6BIJO3UG/lhDRySH01W0p1fI0vW
-         77XNBKPauglB5l/SxsmJoFAfj4rVfUFBu+jkqosqJ5wQ3pqg6vdf4muSVb2Y6xD1/7
-         fdk1gYbFzKkEJF6wdQWWsAUBvHL7IQ48QG6E52IU=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20191203094853epcas5p35d9cf9af6efb58dd06b91e349d9af8af~c04P7lycl1733717337epcas5p3f
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:48:53 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.40.197]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 47RxyC3P74zMqYkX for
-        <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:48:51 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        8F.EC.19629.18F26ED5; Tue,  3 Dec 2019 18:48:49 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        b=bM5DklZC5215seW9Wa7JZGxU/jgcJAxD142iZmMUtgG98pW6BtZdMIrgR47kS+lW/
+         UNF8lOMvXWzjJMV5DBHIWLgJretqbhFEWHggaGhWUfI/dJQ2S+qLBxdpOY3V6Y3YGG
+         aOMQw+Mcg8/QRU7pRsu4i7C6/XyqNyPVF9LIP0ls=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20191203095342epcas5p197d8426768c5baab29aad51001fcc664~c08dYkWek1446714467epcas5p1l
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:53:42 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.40.194]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 47Ry3n3JJxzMqYlm for
+        <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:53:41 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        EF.DD.19726.0A036ED5; Tue,  3 Dec 2019 18:53:36 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
         epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20191203094848epcas5p296450885dea6e4939072c7b8b50e71fa~c04Lrz91_2569325693epcas5p2I
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:48:48 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20191203094848epsmtrp1ba9e3e978840be11fde5a2c5c637443c~c04Lq8IpR1588015880epsmtrp1F
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:48:48 +0000 (GMT)
-X-AuditID: b6c32a4b-32dff70000014cad-9f-5de62f818f37
+        20191203095335epcas5p2f42315a8d7d9a081afa929f96bb66356~c08WqPus-2116621166epcas5p21
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:53:35 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20191203095335epsmtrp2d863ae45088c04be97fc44bcda8d2a06~c08WpsPnB2909929099epsmtrp2y
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:53:35 +0000 (GMT)
+X-AuditID: b6c32a49-7a9ff70000014d0e-da-5de630a0f53c
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        0D.FB.10238.08F26ED5; Tue,  3 Dec 2019 18:48:48 +0900 (KST)
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        2A.BD.06569.F9036ED5; Tue,  3 Dec 2019 18:53:35 +0900 (KST)
 Received: from SyamLinux.sa.corp.samsungelectronics.net (unknown
         [107.109.107.247]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20191203094848epsmtip1458bff01c3631d5d3bcebdf707d02ef9~c04LVTyau0063900639epsmtip10
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:48:48 +0000 (GMT)
-From:   Syam Sidhardhan <s.syam@samsung.com>
+        20191203095335epsmtip1b13908a499db78436b2d3c777047b809~c08WSMHgG0036000360epsmtip1x
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 09:53:35 +0000 (GMT)
+From:   Nagaraj D R <nagaraj.dr@samsung.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] client: Fix memory leak
-Date:   Tue,  3 Dec 2019 15:18:42 +0530
-Message-Id: <1575366522-7742-1-git-send-email-s.syam@samsung.com>
+Subject: [PATCH 1/1] mesh: Fix invalid netkey index in appkey add/delete
+Date:   Tue,  3 Dec 2019 15:23:27 +0530
+Message-Id: <1575366807-7878-1-git-send-email-nagaraj.dr@samsung.com>
 X-Mailer: git-send-email 2.7.4
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBKsWRmVeSWpSXmKPExsWy7bCmhm6j/rNYg57n5hZzrvUxOzB6fN4k
-        F8AYlWOTkZqYklqkkJqXnJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ibaqvk4hOg65aZAzRU
-        SaEsMacUKBSQWFyspG9nU5RfWpKqkJFfXGKrlFqQklNgaFSgV5yYW1yal66XnJ9rZWhgYGQK
-        VJmQk3F+9S2Wgv0sFZ+bm1kbGM8zdzFyckgImEhMWPqDpYuRi0NIYDejxOSuRlYIZwaTRM+a
-        U1DOHCaJJ3POMsK03D46mx0isZdR4tam41D965gkeg++ZAKpYhPQkth79Tw7iC0ioCzxbN9h
-        sLiwgI5E79W7YHEWAVWJNX8egMV5BRwlbt59zwaxQU7i5rlOqANXsUocnxMCYbtIzLy1nQXC
-        FpZ4dXwLO4QtJfGyvw3sIgmBZkaJznMHGCGcGYwS595OYYWospd4umkuUBUHB7OApsT6Xfog
-        YWYBPone30+YQMISArwSHW1CENUKEqumTmSCsMUk1k3/ArXLQ+LlnSXgkBASiJXY8fsH2wRG
-        6VkIQxcwMq5ilEwtKM5NTy02LTDOSy1HjpFNjOBUoeW9g3HTOZ9DjAIcjEo8vAf+PIkVYk0s
-        K67MPcQowcGsJMK7TeJprBBvSmJlVWpRfnxRaU5q8SFGU2CgTWSWEk3OB6axvJJ4Q1MjMzMD
-        SwNTYwszQyVx3kmsV2OEBNITS1KzU1MLUotg+pg4OKUaGNuM915oc36xxvjQ619zmS/sMZp7
-        Mt73t2PgkbziPXe/J/6R7pSXecIn5ZK7/3s4d3+1g6aKqei3RSnzHr3LPrpBw8nhagbnveYd
-        u652Jxslf5xcqtByLvpuuIPgy8CO5r05urbnazk2bku7F3U+pKg8rtD/buOSuIZMD5Etkraa
-        04I+CaacUGIpzkg01GIuKk4EAKlkKhErAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrHJMWRmVeSWpSXmKPExsWy7bCSnG6D/rNYg+tvTC3mXOtjdmD0+LxJ
-        LoAxissmJTUnsyy1SN8ugSvj/OpbLAX7WSo+NzezNjCeZ+5i5OSQEDCRuH10NnsXIxeHkMBu
-        Rompf3rYIRJiEm9WnICyhSVW/nsOVbSGSeLTopVg3WwCWhJ7r54HKxIRUJZ4tu8wE4gtLKAj
-        0Xv1LlicRUBVYs2fB2BxXgFHiZt337NBDJWTuHmuk3kCI/cCRoZVjJKpBcW56bnFhgWGeanl
-        esWJucWleel6yfm5mxjBvtTS3MF4eUn8IUYBDkYlHt4Df57ECrEmlhVX5h5ilOBgVhLh3Sbx
-        NFaINyWxsiq1KD++qDQntfgQozQHi5I479O8Y5FCAumJJanZqakFqUUwWSYOTqkGRuGXUzM6
-        Ew/niV0utvlroWfOP6V5z4Ydj4MWiC53f/ws2+2U6q8dHdEHnkxYfV76ogvPYrnl3WzReaeZ
-        n/840Gm2ceqlU8oNa3bd/83adsLjyDmDytIHS7dNmrzCbL54hWTayrW7Xn2dwry14WaG5Ud7
-        98fiszZsPKq9i/fXo7dZnR86bWIkM5WVWIozEg21mIuKEwG7vtX34QEAAA==
-X-CMS-MailID: 20191203094848epcas5p296450885dea6e4939072c7b8b50e71fa
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBKsWRmVeSWpSXmKPExsWy7bCmpu4Cg2exBv1nmC3mXOtjdmD0+LxJ
+        LoAxKscmIzUxJbVIITUvOT8lMy/dVsk7ON453tTMwFDX0NLCXEkhLzE31VbJxSdA1y0zB2io
+        kkJZYk4pUCggsbhYSd/Opii/tCRVISO/uMRWKbUgJafA0KhArzgxt7g0L10vOT/XytDAwMgU
+        qDIhJ2PD/TNsBTNZKx7MucDYwDifpYuRk0NCwETi6oX77F2MXBxCArsZJaacuATlzGCSuPrz
+        AyOEM4dJovfcSTaYlnuLXzJBJPYySuxePZMZwlnHJLG7YynYYDYBLYnt13qZQGwRAWWJZ/sO
+        g9nCAh4Sly68YwSxWQRUJWYtXApm8wq4SrTvWcsMsUFO4ua5TrChEgKrWCXurXvACJFwkTiw
+        YhvUGcISr45vYYewpSQ+v9sLFe9mlJjeXwbRPIVRYt6pFiaIhL3E001zgRo4OJgFNCXW79IH
+        CTML8En0/n7CBBKWEOCV6GgTgqhWkFg1dSJUp5jEuulfoFZ5SLS8ncMKYgsJxEq8XjeNdQKj
+        9CyEoQsYGVcxSqYWFOempxabFhjmpZYjx8gmRnCq0PLcwTjrnM8hRgEORiUe3gN/nsQKsSaW
+        FVfmHmKU4GBWEuHdJvE0Vog3JbGyKrUoP76oNCe1+BCjKTDQJjJLiSbnA9NYXkm8oamRmZmB
+        pYGpsYWZoZI47yTWqzFCAumJJanZqakFqUUwfUwcnFINjE2NXvXnJBYUvuZ6vfe2yeFPvx/s
+        U4l1ebx3v+C8ApZVl2Nl8o8VrnygseP+nHXTvaLc56gmhJTNldO+kc9/Mlam8FGpTMfxRr+V
+        G82kNwiu4Oqftv6TiQ5bhJ/RzefPvyjOq5zpsb1G5b0C07E9085abJzH9VTJW537qVPBiwkx
+        mz8GqrXH+CqxFGckGmoxFxUnAgDvKN2NKwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrHJMWRmVeSWpSXmKPExsWy7bCSnO58g2exBi9Wy1vMudbH7MDo8XmT
+        XABjFJdNSmpOZllqkb5dAlfGhvtn2ApmslY8mHOBsYFxPksXIyeHhICJxL3FL5m6GLk4hAR2
+        M0qcv3iTHSIhJvFmxQkoW1hi5b/n7BBFa5gknn14yQiSYBPQkth+rZcJxBYRUJZ4tu8wmC0s
+        4CFx6cI7sBoWAVWJWQuXgtm8Aq4S7XvWMkMMlZO4ea6TeQIj9wJGhlWMkqkFxbnpucWGBUZ5
+        qeV6xYm5xaV56XrJ+bmbGMG+1NLawXjiRPwhRgEORiUe3oxfT2KFWBPLiitzDzFKcDArifBu
+        k3gaK8SbklhZlVqUH19UmpNafIhRmoNFSZxXPv9YpJBAemJJanZqakFqEUyWiYNTqoFRwZe3
+        9Jz2VaVTU/Vfbvy5cu/Cc8prnP7Nfs67NqfXNmBb9oYQdx7Lq66bucWm6DO8mp7QLyP3gO3F
+        lAeTgmaVhaTKFXvZ3Clpz++KtTq6wZRbq2/FgZYjsv4r1f8t95rElW7EwHJze0jZKc0tW6vn
+        5RWf2uoQs22rjNzrwyc2nnnVq1Qia3xEiaU4I9FQi7moOBEAPxT7YeEBAAA=
+X-CMS-MailID: 20191203095335epcas5p2f42315a8d7d9a081afa929f96bb66356
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20191203094848epcas5p296450885dea6e4939072c7b8b50e71fa
-References: <CGME20191203094848epcas5p296450885dea6e4939072c7b8b50e71fa@epcas5p2.samsung.com>
+X-CMS-RootMailID: 20191203095335epcas5p2f42315a8d7d9a081afa929f96bb66356
+References: <CGME20191203095335epcas5p2f42315a8d7d9a081afa929f96bb66356@epcas5p2.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+8 LSbs of netkey index should be packed into the first octet
 ---
- client/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/mesh-gatt/config-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/client/main.c b/client/main.c
-index 68dabda..8bd0bac 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1792,11 +1792,11 @@ static void remove_device(GDBusProxy *proxy)
- {
- 	char *path;
+diff --git a/tools/mesh-gatt/config-client.c b/tools/mesh-gatt/config-client.c
+index 5e6374f..ed31c67 100644
+--- a/tools/mesh-gatt/config-client.c
++++ b/tools/mesh-gatt/config-client.c
+@@ -591,7 +591,7 @@ static void cmd_app_key(int argc, char *argv[], uint32_t opcode)
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
  
--	path = g_strdup(g_dbus_proxy_get_path(proxy));
--
- 	if (!default_ctrl)
- 		return;
- 
-+	path = g_strdup(g_dbus_proxy_get_path(proxy));
-+
- 	if (g_dbus_proxy_method_call(default_ctrl->proxy, "RemoveDevice",
- 						remove_device_setup,
- 						remove_device_reply,
+-	msg[n++] = net_idx & 0xf;
++	msg[n++] = net_idx & 0xff;
+ 	msg[n++] = ((net_idx >> 8) & 0xf) |
+ 		((app_idx << 4) & 0xf0);
+ 	msg[n++] = app_idx >> 4;
 -- 
 2.7.4
 
