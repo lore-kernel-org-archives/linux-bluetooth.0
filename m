@@ -2,74 +2,70 @@ Return-Path: <SRS0=Mp0c=ZZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B344FC432C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 01:05:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00490C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 01:06:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B98220715
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 01:05:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C777C20715
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 01:06:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="M9xaurVU"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="H95yzW87"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726330AbfLCBFi (ORCPT
+        id S1726330AbfLCBG0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Dec 2019 20:05:38 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41578 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725853AbfLCBFh (ORCPT
+        Mon, 2 Dec 2019 20:06:26 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33151 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726066AbfLCBG0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Dec 2019 20:05:37 -0500
-Received: by mail-pg1-f196.google.com with SMTP id x8so725979pgk.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Dec 2019 17:05:37 -0800 (PST)
+        Mon, 2 Dec 2019 20:06:26 -0500
+Received: by mail-pf1-f195.google.com with SMTP id y206so848794pfb.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Dec 2019 17:06:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vQLxprmCC8JfA2uG9NjGBGy94LqJAU7ib6W5ozoiA9A=;
-        b=M9xaurVUD+kIv5wybWVAkUF/iTFeS8zB7Mo6bQy8aUTUSBVZkMwjkUBYeZQcfJXaRb
-         iK0kB/15uQ1OvsRmDOenchn7uq6V0nmG4a0XNj1zFyFG+rzxRKR6eJ268iqo1vc9xWO2
-         IInHkTL/m32zgYTjt9pv5LHRDTIpSd9gT24aI=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=5hpUK9ZBIMphM9rzqP+YZa2i8oL0Tw5HGDAWHY72grw=;
+        b=H95yzW87scREq8cDX6kwC18FNWCp60gg6A2mzkDcS18jzs674sVj+bXd+28dSubpWu
+         9khnwdL/IaR4b4k/Yv7vNbut/w+yvfshoFvfvl4xo5VvklJDfpIPZ2KtrXJGxuiug5eN
+         WB64y3jy2GcsGUYnxwpR4/dyDfjQ6Tv3uGHF8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vQLxprmCC8JfA2uG9NjGBGy94LqJAU7ib6W5ozoiA9A=;
-        b=Fu2y5gZZpojkspzlTn7b31xYz6qdNZ5y+Z2K5qyNnfxIK1GapWwbmnKt28VjJ/EGdR
-         KBsJWyUicLLNRNLV05WItWrekwRSAE5ljrAO0L4x8jfGwBP/IhP4fbLsocjHbVhOgS9M
-         derUoiN8A3FQs8axczqdus4Cg0Q0P3qviaqjcGeS+813RVb2ImWGh9j4LY+HkV9T3d04
-         cXpkUumOW31sVF3meLRuLVjnqPO5bkKgGYrjUYrQl1C+QUAEhK9RhHU3GV8a53yvZznq
-         ZvNkF8lLLNBf+ucGDIoQRtFSi9GLxET9yb7ifZjvsQ+HupoRZa7CgvYIMrytUof/9VBK
-         IMyg==
-X-Gm-Message-State: APjAAAXroFNTrLFZT5B4PLpmjvB+jep8/kycIM8P5F9YR4jZGL8FuWVo
-        KP+k6POXrPHcjjhKlonFSNQ61A==
-X-Google-Smtp-Source: APXvYqxNia/3JTgxap9fHMWDpLMTr4uqu4JKDoTN7qXRJoyVQLz+gHJrRQZHA/ABNQKvLJYuEI2RJw==
-X-Received: by 2002:a62:e411:: with SMTP id r17mr1771126pfh.119.1575335136928;
-        Mon, 02 Dec 2019 17:05:36 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5hpUK9ZBIMphM9rzqP+YZa2i8oL0Tw5HGDAWHY72grw=;
+        b=OssFqqNKX8bMf0QdUTY9PDsnE0ega23hGkn28aNWvHwmZnhtNSXtLE4AZ1J22C96gr
+         akijXMkcfoRccs9H0qn4hZyqWu48IAyYRN0fy9j+17aU1IFz7hWjs4tIE72MHOdgU4TE
+         erBFyyEOxOzARjge/KI/VdAOvJ9FaGt7Z6lbqPRCGfA8wKVkmudCX/k2XRoFhtjDeTr+
+         +lo7d5lBQn7/VVRQpKCxVqkGfjSn5LP2cercfAlCOWQ2/WSljwmScamero6ftgRx9OIO
+         mqTxYclWHOgsJ2Fcs30QwcJhvxZn6skB0RWpVVgJl3Jb+EGOu7iR3WILq+IvrzRwCfE5
+         TlTg==
+X-Gm-Message-State: APjAAAX9o3MkdHsrdaFnqbkBXM4YKdyWBJ1mtJLXHOTNu77tpjdukbne
+        +KwhN15j5jdFSnYrFAhBENZGWg==
+X-Google-Smtp-Source: APXvYqzr4xPCHPcLCI5HtfE9qVaheAeOLlwDIfa28rXytOK3F3tgNBaMaFXEWun0e0i8nJvZb0z+DA==
+X-Received: by 2002:a62:4ec7:: with SMTP id c190mr1822918pfb.68.1575335185441;
+        Mon, 02 Dec 2019 17:06:25 -0800 (PST)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id r7sm759116pfg.34.2019.12.02.17.05.34
+        by smtp.gmail.com with ESMTPSA id 143sm741808pfz.67.2019.12.02.17.05.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2019 17:05:35 -0800 (PST)
+        Mon, 02 Dec 2019 17:05:28 -0800 (PST)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     linux-input@vger.kernel.org
-Cc:     =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
+To:     Marcel Holtmann <marcel@holtmann.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Subject: [PATCH v2] Input: uinput - Add UI_SET_UNIQ ioctl handler
-Date:   Mon,  2 Dec 2019 17:05:21 -0800
-Message-Id: <20191203010521.220577-1-abhishekpandit@chromium.org>
+        linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        alainm@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Subject: [BlueZ PATCH v2 4/4] input: Set uniq attribute
+Date:   Mon,  2 Dec 2019 17:04:00 -0800
+Message-Id: <20191203010400.216538-4-abhishekpandit@chromium.org>
 X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
+In-Reply-To: <20191203010400.216538-1-abhishekpandit@chromium.org>
+References: <20191203010400.216538-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -78,149 +74,73 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Support setting the uniq attribute of the input device. The uniq
-attribute is used as a unique identifier for the connected device.
+Set the uniq attribute of /dev/uinput with the peer device address.
 
-For example, uinput devices created by BlueZ will store the address of
-the connected device as the uniq property.
-
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
-Hi input maintainers,
-
-I added this change to allow BlueZ to display the peer device address in
-udev. BlueZ has been setting ATTR{name} to the peer address since it
-isn't possible to set the uniq attribute currently.
-
-I've tested this on a Chromebook running kernel v4.19 with this patch.
-
-$ uname -r
-4.19.85
-
-$ dmesg | grep "input:" | tail -1
-[   69.604752] input: BeatsStudio Wireless as /devices/virtual/input/input17
+The resulting uinput device will look like this:
 
 $ udevadm info -a -p /sys/devices/virtual/input/input17
-
-Udevadm info starts with the device specified by the devpath and then
-walks up the chain of parent devices. It prints for every device
-found, all possible attributes in the udev rules key format.
-A rule to match, can be composed by the attributes of the device
-and the attributes from one single parent device.
-
+...
   looking at device '/devices/virtual/input/input17':
     KERNEL=="input17"
     SUBSYSTEM=="input"
     DRIVER==""
     ATTR{inhibited}=="0"
-    ATTR{name}=="BeatsStudio Wireless"
+    ATTR{name}=="BeatsStudio Wireless (AVRCP)"
     ATTR{phys}=="00:00:00:6e:d0:74"
     ATTR{properties}=="0"
-    ATTR{uniq}=="00:00:00:cc:1c:f3"
+    ATTR{uniq}=="00:00:00:1a:33:21"
 
-(I zeroed out part of the addresses above. The phys attribute
-corresponds to the address of the Bluetooth controller on the Chromebook
-and the uniq is the address of the headphones)
+---
+
+This change requires an accompanying change in the kernel that adds the
+set uniq ioctl. The change is available here:
+
+https://lore.kernel.org/linux-bluetooth/20191127185139.65048-1-abhishekpandit@chromium.org/T/#u
 
 
 Changes in v2:
-- Added compat handling for UI_SET_UNIQ
+- Split setting uniq to its own commit
 
- drivers/input/misc/uinput.c | 26 +++++++++++++++++++++++++-
- include/uapi/linux/uinput.h |  1 +
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ profiles/audio/avctp.c | 4 +++-
+ src/uinput.h           | 2 ++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/input/misc/uinput.c b/drivers/input/misc/uinput.c
-index 84051f20b18a..a7cbf5726a36 100644
---- a/drivers/input/misc/uinput.c
-+++ b/drivers/input/misc/uinput.c
-@@ -280,7 +280,7 @@ static int uinput_dev_flush(struct input_dev *dev, struct file *file)
- 
- static void uinput_destroy_device(struct uinput_device *udev)
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 5116a5cde..544bc640c 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -1166,7 +1166,7 @@ static int uinput_create(struct btd_device *device, const char *name,
  {
--	const char *name, *phys;
-+	const char *name, *phys, *uniq;
- 	struct input_dev *dev = udev->dev;
- 	enum uinput_state old_state = udev->state;
+ 	struct uinput_dev dev;
+ 	int fd, err, i;
+-	char src[18];
++	char dest[18], src[18];
  
-@@ -289,6 +289,7 @@ static void uinput_destroy_device(struct uinput_device *udev)
- 	if (dev) {
- 		name = dev->name;
- 		phys = dev->phys;
-+		uniq = dev->uniq;
- 		if (old_state == UIST_CREATED) {
- 			uinput_flush_requests(udev);
- 			input_unregister_device(dev);
-@@ -297,6 +298,7 @@ static void uinput_destroy_device(struct uinput_device *udev)
- 		}
- 		kfree(name);
- 		kfree(phys);
-+		kfree(uniq);
- 		udev->dev = NULL;
- 	}
- }
-@@ -840,6 +842,7 @@ static long uinput_ioctl_handler(struct file *file, unsigned int cmd,
- 	struct uinput_ff_erase  ff_erase;
- 	struct uinput_request   *req;
- 	char			*phys;
-+	char			*uniq;
- 	const char		*name;
- 	unsigned int		size;
+ 	fd = open("/dev/uinput", O_RDWR);
+ 	if (fd < 0) {
+@@ -1222,7 +1222,9 @@ static int uinput_create(struct btd_device *device, const char *name,
+ 	ioctl(fd, UI_SET_EVBIT, EV_SYN);
  
-@@ -931,6 +934,22 @@ static long uinput_ioctl_handler(struct file *file, unsigned int cmd,
- 		udev->dev->phys = phys;
- 		goto out;
+ 	ba2strlc(btd_adapter_get_address(device_get_adapter(device)), src);
++	ba2strlc(device_get_address(device), dest);
+ 	ioctl(fd, UI_SET_PHYS, src);
++	ioctl(fd, UI_SET_UNIQ, dest);
  
-+	case UI_SET_UNIQ:
-+		if (udev->state == UIST_CREATED) {
-+			retval = -EINVAL;
-+			goto out;
-+		}
-+
-+		uniq = strndup_user(p, 1024);
-+		if (IS_ERR(uniq)) {
-+			retval = PTR_ERR(uniq);
-+			goto out;
-+		}
-+
-+		kfree(udev->dev->uniq);
-+		udev->dev->uniq = uniq;
-+		goto out;
-+
- 	case UI_BEGIN_FF_UPLOAD:
- 		retval = uinput_ff_upload_from_user(p, &ff_up);
- 		if (retval)
-@@ -1044,6 +1063,8 @@ static long uinput_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
-  */
- #define UI_SET_PHYS_COMPAT		\
- 	_IOW(UINPUT_IOCTL_BASE, 108, compat_uptr_t)
-+#define UI_SET_UNIQ_COMPAT		\
-+	_IOW(UINPUT_IOCTL_BASE, 111, compat_uptr_t)
- #define UI_BEGIN_FF_UPLOAD_COMPAT	\
- 	_IOWR(UINPUT_IOCTL_BASE, 200, struct uinput_ff_upload_compat)
- #define UI_END_FF_UPLOAD_COMPAT		\
-@@ -1056,6 +1077,9 @@ static long uinput_compat_ioctl(struct file *file,
- 	case UI_SET_PHYS_COMPAT:
- 		cmd = UI_SET_PHYS;
- 		break;
-+	case UI_SET_UNIQ_COMPAT:
-+		cmd = UI_SET_UNIQ;
-+		break;
- 	case UI_BEGIN_FF_UPLOAD_COMPAT:
- 		cmd = UI_BEGIN_FF_UPLOAD;
- 		break;
-diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux/uinput.h
-index c9e677e3af1d..d5b7767c1b02 100644
---- a/include/uapi/linux/uinput.h
-+++ b/include/uapi/linux/uinput.h
-@@ -145,6 +145,7 @@ struct uinput_abs_setup {
+ 	for (i = 0; key_map[i].name != NULL; i++)
+ 		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
+diff --git a/src/uinput.h b/src/uinput.h
+index 20e0941d1..589c22528 100644
+--- a/src/uinput.h
++++ b/src/uinput.h
+@@ -686,6 +686,8 @@ extern "C" {
+ #define UI_SET_FFBIT		_IOW(UINPUT_IOCTL_BASE, 107, int)
  #define UI_SET_PHYS		_IOW(UINPUT_IOCTL_BASE, 108, char*)
  #define UI_SET_SWBIT		_IOW(UINPUT_IOCTL_BASE, 109, int)
- #define UI_SET_PROPBIT		_IOW(UINPUT_IOCTL_BASE, 110, int)
++#define UI_SET_PROPBIT		_IOW(UINPUT_IOCTL_BASE, 110, int)
 +#define UI_SET_UNIQ		_IOW(UINPUT_IOCTL_BASE, 111, char*)
  
- #define UI_BEGIN_FF_UPLOAD	_IOWR(UINPUT_IOCTL_BASE, 200, struct uinput_ff_upload)
- #define UI_END_FF_UPLOAD	_IOW(UINPUT_IOCTL_BASE, 201, struct uinput_ff_upload)
+ #ifndef NBITS
+ #define NBITS(x) ((((x) - 1) / (sizeof(long) * 8)) + 1)
 -- 
 2.24.0.393.g34dc348eaf-goog
 
