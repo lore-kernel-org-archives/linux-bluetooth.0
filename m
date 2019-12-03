@@ -2,146 +2,134 @@ Return-Path: <SRS0=Mp0c=ZZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D61C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 10:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B76AFC432C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 17:18:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD20A206EC
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 10:01:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 831AE20637
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 17:18:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="GjHqvu1c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FPNOBsyv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726079AbfLCKBl (ORCPT
+        id S1726492AbfLCRSS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Dec 2019 05:01:41 -0500
-Received: from mailout4.samsung.com ([203.254.224.34]:17377 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726114AbfLCKBl (ORCPT
+        Tue, 3 Dec 2019 12:18:18 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:40055 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726182AbfLCRSS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Dec 2019 05:01:41 -0500
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20191203100139epoutp04e41854b249b77f105f835a8253e38ecf~c1DZOD9YT3236332363epoutp04a
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2019 10:01:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20191203100139epoutp04e41854b249b77f105f835a8253e38ecf~c1DZOD9YT3236332363epoutp04a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1575367299;
-        bh=VpRDOnnyPw8xjH+aWUELDBPfn1y0ORb0TWNExi0efLw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GjHqvu1cseIa9/TarooI/abp17j7uyP8E2/OLM7pvK4Z++nhKaoLgLSl335gNYad7
-         F+UxlfP0wczT5jkYJ8W1E7tpzjnYS8fCvsziZOFrimO3U1tcVQnfGF14kCUQGSp5HK
-         wFG4g71dBkQloJLe1gIH0cZlrLYrG3BAhseTlmng=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20191203100138epcas5p3ac41f57b887cf5dacc3311469b295520~c1DYti9002969329693epcas5p3o;
-        Tue,  3 Dec 2019 10:01:38 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.40.192]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 47RyDx2hJ2zMqYkY; Tue,  3 Dec
-        2019 10:01:37 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        48.FF.19726.E7236ED5; Tue,  3 Dec 2019 19:01:34 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20191203100134epcas5p4855ab386bd90877c85114b970a252223~c1DUoR8Rt1308013080epcas5p41;
-        Tue,  3 Dec 2019 10:01:34 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20191203100134epsmtrp2561c881db438a0cf57e0895e94165b46~c1DUnuVZf0127701277epsmtrp2r;
-        Tue,  3 Dec 2019 10:01:34 +0000 (GMT)
-X-AuditID: b6c32a49-7a9ff70000014d0e-6f-5de6327e307b
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        DE.5E.06569.E7236ED5; Tue,  3 Dec 2019 19:01:34 +0900 (KST)
-Received: from SyamLinux.sa.corp.samsungelectronics.net (unknown
-        [107.109.107.247]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20191203100133epsmtip167b7bf21b5cfed4a1b25ebc244f69a8b~c1DUKIW5K1061410614epsmtip16;
-        Tue,  3 Dec 2019 10:01:33 +0000 (GMT)
-From:   Prathyusha Nelluri <prathyusha.n@samsung.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Prathyusha N <prathyusha.n@samsung.com>
-Subject: [PATCH 1/1] mesh: Fix to send close indication on timeout
-Date:   Tue,  3 Dec 2019 15:31:25 +0530
-Message-Id: <1575367285-8098-3-git-send-email-prathyusha.n@samsung.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1575367285-8098-1-git-send-email-prathyusha.n@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFKsWRmVeSWpSXmKPExsWy7bCmhm6d0bNYg21/DS3mXOtjtvi/9Ba7
-        A5NH35ZVjB6fN8kFMEXl2GSkJqakFimk5iXnp2TmpdsqeQfHO8ebmhkY6hpaWpgrKeQl5qba
-        Krn4BOi6ZeYAjVdSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFBgaFegVJ+YWl+al
-        6yXn51oZGhgYmQJVJuRkfD37hrGgibPiw/LPTA2M29m7GDk5JARMJNp2TWbqYuTiEBLYzShx
-        efEzNgjnE6NE+55ZLBDON0aJGQ/PM8G0zLr1kh0isZdR4uSGiVD9HUwSSx6uZQapYhMwljh/
-        8xVYh4iAssSzfYfBbGYBbYlJb2aC2cICThITdzxgAbFZBFQlpjy6zAZi8wq4Syxf9Y4FYpuc
-        xM1znUAzOTg4BTwkZuxJBtklIfCQVWLzl3fMEDUuEi1zZ0DZwhKvjm+Bek5K4vO7vWwQdjej
-        xO43rhDNUxgl7r04DPWOvcTTTXPZQRYwC2hKrN+lD3Enn0Tv7ydMIGEJAV6JjjYhiGoFiVVT
-        J0J1ikmsm/4FapWHxKYFS6DhMJtRouPkPuYJjLKzEKYuYGRcxSiZWlCcm55abFpgmJdajhxT
-        mxjB6UbLcwfjrHM+hxgFOBiVeHgP/HkSK8SaWFZcmXuIUYKDWUmEd5vE01gh3pTEyqrUovz4
-        otKc1OJDjKbAAJzILCWanA9MhXkl8YamRmZmBpYGpsYWZoZK4ryTWK/GCAmkJ5akZqemFqQW
-        wfQxcXBKNTAusbF2sP/zOcVm/i8J6QQnpvyTD9i2v15+94HKS3f1VPvTqYlrnqqcnrn4zfQt
-        Zz5P0dlkmWfCN2u116kkEQt9Pcntkr67bUOnBWyWtln2VG3/qaqt6wNPbSvbtqD01uSJDyIE
-        WWKaPnNcnnRFXFNSftG7Jz0njrSLmNpecOEysu7sZzCewPVXiaU4I9FQi7moOBEAagVt300D
-        AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNJMWRmVeSWpSXmKPExsWy7bCSnG6d0bNYg5WnxCzmXOtjtvi/9Ba7
-        A5NH35ZVjB6fN8kFMEVx2aSk5mSWpRbp2yVwZXw9+4axoImz4sPyz0wNjNvZuxg5OSQETCRm
-        3XoJZHNxCAnsZpT4svoaVEJM4s2KE1C2sMTKf8+hitqYJKZ+vQ2WYBMwljh/8xUTiC0ioCzx
-        bN9hMJtZQFti0puZYLawgJPExB0PWEBsFgFViSmPLrOB2LwC7hLLV71jgVggJ3HzXCdzFyMH
-        B6eAh8SMPckgYSGgki+PJrNPYORbwMiwilEytaA4Nz232LDAKC+1XK84Mbe4NC9dLzk/dxMj
-        OEi0tHYwnjgRf4hRgINRiYc349eTWCHWxLLiytxDjBIczEoivNsknsYK8aYkVlalFuXHF5Xm
-        pBYfYpTmYFES55XPPxYpJJCeWJKanZpakFoEk2Xi4JRqYKw8ffwy6/9otskOaj+TpnNc/rtQ
-        6WDLRi6vkIlPPlW96fxgdzOwtSmoIeXojObXXKw3gu4ZXHxU13eC8dKzSd/9nXe7hAqqfD12
-        aEITq9CTLs/zlV9fiPr9frTG8vTCPi+teUZT7xQGXWUvs6t1Ocr6gJmVKfDOqxlXXqUbbT09
-        71bVMvt7hmFKLMUZiYZazEXFiQAFH3L+DgIAAA==
-X-CMS-MailID: 20191203100134epcas5p4855ab386bd90877c85114b970a252223
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20191203100134epcas5p4855ab386bd90877c85114b970a252223
-References: <1575367285-8098-1-git-send-email-prathyusha.n@samsung.com>
-        <CGME20191203100134epcas5p4855ab386bd90877c85114b970a252223@epcas5p4.samsung.com>
+        Tue, 3 Dec 2019 12:18:18 -0500
+Received: by mail-oi1-f196.google.com with SMTP id 6so4011178oix.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Dec 2019 09:18:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vGxtGP8voKgU9fYCA479kMrPwTdulBu32ubWXM36jXk=;
+        b=FPNOBsyv0x85z4sHCsXDeFBehPs0lkuQUyweVWDNu9oVwBBG76MPabxjKBmr5diw7f
+         FWjZ/p6j5JLd9gl13eVAcRo/RCHpfTgsMOjE3R4zS5x1rjIerYgBtGKKSMGVawf6u+dk
+         5YP/prOt3Xm89IYRd6sqzOhLNDFBobV/Zi7GNtr3aGcl95tkQnTcL4ctLm0mdwCDcobv
+         5MvW7JrxJJFWWL2WOQIDFaY9qlgtnM21+ketZ3sfXPcSH8vKL3ylbhJWYl9+6J00xibZ
+         qDzox9zyoDJPjJT8xRH1PrMDrP1Pl2h563+APgrLaAyxtAFaZV/MwFezeW6KeZamxu8T
+         NhNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vGxtGP8voKgU9fYCA479kMrPwTdulBu32ubWXM36jXk=;
+        b=cQcpRI2OPUSe1ia6/wYd9qinSjt94hpiSU+jpoXHFUOmacYe/7N2Nkq925UooTKDwj
+         gQm+P0zAyY/G/+sjHedllfsesEC8aMg8mwZB9jKXOrShAOV/1VkKC9tpIBhG/jgF6i/o
+         C1zMbcZUrFi5RCu2mx2FX17Wpo5vphkCMBdoI44zFjj2ECVKFUETNYItsxSm0Ui/vuHU
+         2cwPP+tnTIMpCSkpDnFyyDYnW7scuChHutljAeRXJP47LUc8A9x3pGUKllO/bb6AL5Xi
+         mX8tOxmU8nhPSmTz+MljJLP7AbghdrouM4pUpkb7THINyjIJx424rTQ94WPRYN4zWVcy
+         7w9g==
+X-Gm-Message-State: APjAAAUPXNcJMqRqY4NlombrllF/8/dCZ3EOw1YbjhyTSgqeugO8nUiS
+        Nuwzg6xUt7vv3YJWbskmOWbgCkMAzfmzg4y1loU=
+X-Google-Smtp-Source: APXvYqxiOkM1hP+rao3v+Djki7JTZeEaDN9d6+XssRajPsFpPiLWCH6e2DBTBu4NWoMIUxeyEm18jP/Mtc4/8gih8pQ=
+X-Received: by 2002:aca:d904:: with SMTP id q4mr4612384oig.21.1575393496763;
+ Tue, 03 Dec 2019 09:18:16 -0800 (PST)
+MIME-Version: 1.0
+References: <20191203010400.216538-1-abhishekpandit@chromium.org>
+In-Reply-To: <20191203010400.216538-1-abhishekpandit@chromium.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 3 Dec 2019 19:18:03 +0200
+Message-ID: <CABBYNZLbNrsK3KNyKeCQbLY5q_Bo9smRn0RyYG8iwKD6GGMmiA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v2 1/4] lib: Add ba2strlc to match kernel printk format
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        Alain Michaud <alainm@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Prathyusha N <prathyusha.n@samsung.com>
+Hi Abhishek,
 
-If pb_session is freed in timeout, close indication will not be sent.
-pb_session is freed in pb_adv_unreg() and hence removed from tx_timeout.
-Added acceptor_free() in acp_prov_close() to ensure pb_session is freed.
----
- mesh/pb-adv.c        | 2 --
- mesh/prov-acceptor.c | 1 +
- 2 files changed, 1 insertion(+), 2 deletions(-)
+On Tue, Dec 3, 2019 at 3:04 AM Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
+>
+> When the kernel prints the bluetooth address (via %pMR), it prints the
+> address in lower case. ba2strlc should be used in cases where we should
+> match the kernel casing (i.e. addresses assigned to /dev/uhid and
+> /dev/uinput)
+>
+> ---
+>
+> Changes in v2:
+> - Split into its own commit
+>
+>  lib/bluetooth.c | 7 +++++++
+>  lib/bluetooth.h | 1 +
+>  2 files changed, 8 insertions(+)
+>
+> diff --git a/lib/bluetooth.c b/lib/bluetooth.c
+> index effc7f49d..7cba509d8 100644
+> --- a/lib/bluetooth.c
+> +++ b/lib/bluetooth.c
+> @@ -81,6 +81,13 @@ int ba2str(const bdaddr_t *ba, char *str)
+>                 ba->b[5], ba->b[4], ba->b[3], ba->b[2], ba->b[1], ba->b[0]);
+>  }
+>
+> +/* Match kernel's lowercase printing of mac address (%pMR) */
+> +int ba2strlc(const bdaddr_t *ba, char *str)
+> +{
+> +       return sprintf(str, "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
+> +               ba->b[5], ba->b[4], ba->b[3], ba->b[2], ba->b[1], ba->b[0]);
+> +}
+> +
+>  int str2ba(const char *str, bdaddr_t *ba)
+>  {
+>         int i;
+> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+> index eb279260e..756dce164 100644
+> --- a/lib/bluetooth.h
+> +++ b/lib/bluetooth.h
+> @@ -325,6 +325,7 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src);
+>  bdaddr_t *strtoba(const char *str);
+>  char *batostr(const bdaddr_t *ba);
+>  int ba2str(const bdaddr_t *ba, char *str);
+> +int ba2strlc(const bdaddr_t *ba, char *str);
+>  int str2ba(const char *str, bdaddr_t *ba);
+>  int ba2oui(const bdaddr_t *ba, char *oui);
+>  int bachk(const char *str);
+> --
+> 2.24.0.393.g34dc348eaf-goog
 
-diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
-index 19d1453..586cd7f 100644
---- a/mesh/pb-adv.c
-+++ b/mesh/pb-adv.c
-@@ -175,8 +175,6 @@ static void tx_timeout(struct l_timeout *timeout, void *user_data)
- 	l_info("TX timeout");
- 	cb = pb_session->close_cb;
- 	user_data = pb_session->user_data;
--	l_free(pb_session);
--	pb_session = NULL;
- 	cb(user_data, 1);
- }
- 
-diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-index bca0193..03972c2 100644
---- a/mesh/prov-acceptor.c
-+++ b/mesh/prov-acceptor.c
-@@ -121,6 +121,7 @@ static void acceptor_free(void)
- static void acp_prov_close(void *user_data, uint8_t reason)
- {
- 	/* TODO: Handle Close */
-+	acceptor_free();
- }
- 
- static void prov_to(struct l_timeout *timeout, void *user_data)
+Applied, thanks. Note that I did change a little bit the code in
+uinput_create since strncpy generates some warnings with gcc8 see:
+
+https://developers.redhat.com/blog/2018/05/24/detecting-string-truncation-with-gcc-8/
+
+What I did was to assign '\0' after the use of strncpy otherwise it
+would generate warnings, also replaced the use of strncpy when we know
+it would not need to be truncated.
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
