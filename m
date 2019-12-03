@@ -1,246 +1,120 @@
-Return-Path: <SRS0=9PGa=ZY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Mp0c=ZZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54544C432C3
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 23:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27804C432C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 01:04:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2085A206F0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Dec 2019 23:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E056320717
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Dec 2019 01:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4CKBtxh"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KjObmp2h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726057AbfLBXJx (ORCPT
+        id S1725941AbfLCBEw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Dec 2019 18:09:53 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42866 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725834AbfLBXJx (ORCPT
+        Mon, 2 Dec 2019 20:04:52 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33990 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725853AbfLCBEw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Dec 2019 18:09:53 -0500
-Received: by mail-wr1-f66.google.com with SMTP id a15so1316740wrf.9;
-        Mon, 02 Dec 2019 15:09:50 -0800 (PST)
+        Mon, 2 Dec 2019 20:04:52 -0500
+Received: by mail-pl1-f194.google.com with SMTP id h13so892449plr.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Dec 2019 17:04:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=3SiZHStHdNwKd4k0PA7yaGGj1hYm6GIulwshCwq+z2M=;
-        b=C4CKBtxhr3L5VZCFrol7SGLdY4e1Y+XuL4QvIo52BcPOgN48/0SmduYw14wcJb4aUl
-         6R12GOgzyNzse11S81iOxW+mEONFxqpDRT3ZGELxInoRMzP09YqD1fc3okAt57C1HXtC
-         kBF9ZCROg9Y/NOOKEeRY5uX6jOyHdP/v73oSpApjJOmGurRnwLxT2vWAQNn4qJK8tHpm
-         4khfsj6TA3qUcnb3QCEUCYLFwTu23nbQU2jrpl1VePESHFCGOmn5V5ARWiajT21smdUa
-         GYtluXksMpA1IaxAsW1tvgW4bPqpaYBKAD3F4j+QVrR+HIrA21PnfM/bAJMlPpuzGZpj
-         ByBg==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BXe7pwRrQbnwA35nRKUJbHIgxLQzSL9KPqmYLwImFic=;
+        b=KjObmp2hWin28jpFmOdK/7S8ugklkrYGViJ69cEbsbnfvKzsYlbaOSxTsS2PQ76g7K
+         t1PDDHEQMrh5VsOBePCBeCKz69kHOJPyTPIl3AM6tOwDApFat727wJdn0jFIyK7k+i1+
+         ncP7Ro7VWPIdMeyuCq4+z24G5XdViaJ4CljSc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=3SiZHStHdNwKd4k0PA7yaGGj1hYm6GIulwshCwq+z2M=;
-        b=lFpND21I/qLEdd9lRpxvc2ASmpkzjj7TmLOkMNWBYmcQCMLXU91EysvhRdEtE6bxkT
-         BMdMHAXKepFm9+abfpo2kyAgC4tqsgTg5LIJGLy29yDLi1QUe1c86KR8PEbuHmzkpfaF
-         9XdDWuBhUGcSZ3Pe8Q1qQ0MU6zulETdscxICd6APDnCxAu6P1uD0Mq5037f9QYHAu3IM
-         Zz1fzbkd4+tSIWXOOsmfJhauHWHSTSqw+YI3CmIjHCGyBNsza5+D9vHt/TcrICaLABew
-         /p/7rZqGZHn1wwBX3jAb7AQv6FxoFPt2fYsDVG1TXVyZFC4ik+crdwK4eVD9b/UoEP7t
-         T1xA==
-X-Gm-Message-State: APjAAAW2ImiY9Q1KpBE9sS5Sx2PsCkhh0ub89in2bTsfaIOCPdxeTODb
-        IBlka51aMPi3P/2khtkWosA=
-X-Google-Smtp-Source: APXvYqxPN9gYozPb/44Uug0FGTi6qb6GARk0Vn4Twem59e6nqrP2WkS/Bvj1HMnHip9D/ncf5D4YrA==
-X-Received: by 2002:a5d:6ca1:: with SMTP id a1mr1619121wra.36.1575328189830;
-        Mon, 02 Dec 2019 15:09:49 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id z26sm922313wmk.33.2019.12.02.15.09.48
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 02 Dec 2019 15:09:48 -0800 (PST)
-Date:   Tue, 3 Dec 2019 00:09:47 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-input@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BXe7pwRrQbnwA35nRKUJbHIgxLQzSL9KPqmYLwImFic=;
+        b=ElYyqi0yMPTjhfyHCjks17ffrzwC/iXDA66PstPP86PzlQs2M+4BHnbhMlYw1GLNFw
+         6/hfdpwM5d5B2ymPUoOY0IQw3RkTZsxkLDQTE/nF7fa6+fTKc5XLncEYL6EKo9e5pnSi
+         cfjS1QBy21Tfclg0IN2vBMUvtK7549JMU8FphGLd6RfDDpgj68Chu3Y1o5pRdQ1EQlvY
+         cXFWFh8vv7Un0lGVD15KNUHPEMj1+QTQZQ7Iky/DaBmB7fKO2RiHzT+fcxXvDIEgbZIC
+         177/FarYTaMVig9/dVqwfJ9iFfFE1be+WEtzccsYZzSVrgMg1u8r3oEqjkq+GWirnnV+
+         7BeQ==
+X-Gm-Message-State: APjAAAUyKst7vXoZ81ZOBXAjRn3ASFynF8Zvr2Ek/GpN89qZywGD1jP7
+        RjZKYEuVacPjTy/nbmIt5E8KPw==
+X-Google-Smtp-Source: APXvYqzSkBODkbZ4yAhJkBg0aPk+k8hBA6dpC489e5rQ/ELRxvdYsoaNVGkUzlIU4MiMUPXtchl1zg==
+X-Received: by 2002:a17:902:14f:: with SMTP id 73mr2274536plb.19.1575335091524;
+        Mon, 02 Dec 2019 17:04:51 -0800 (PST)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
+        by smtp.gmail.com with ESMTPSA id 143sm741808pfz.67.2019.12.02.17.04.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Dec 2019 17:04:27 -0800 (PST)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-Message-ID: <20191202230947.ld5ibnczdpkekfcm@pali>
-References: <20191127185139.65048-1-abhishekpandit@chromium.org>
- <20191201145357.ybq5gfty4ulnfasq@pali>
- <20191202012305.GQ248138@dtor-ws>
- <20191202084750.k7lafzzrf3yq2tqs@pali>
- <20191202175440.GA50317@dtor-ws>
- <20191202185340.nae4lljten5jqp3y@pali>
- <20191202193628.GI50317@dtor-ws>
+        linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        alainm@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Subject: [BlueZ PATCH v2 1/4] lib: Add ba2strlc to match kernel printk format
+Date:   Mon,  2 Dec 2019 17:03:57 -0800
+Message-Id: <20191203010400.216538-1-abhishekpandit@chromium.org>
+X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="7npjrcjeypf2arfk"
-Content-Disposition: inline
-In-Reply-To: <20191202193628.GI50317@dtor-ws>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+When the kernel prints the bluetooth address (via %pMR), it prints the
+address in lower case. ba2strlc should be used in cases where we should
+match the kernel casing (i.e. addresses assigned to /dev/uhid and
+/dev/uinput)
 
---7npjrcjeypf2arfk
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+---
 
-On Monday 02 December 2019 11:36:28 Dmitry Torokhov wrote:
-> On Mon, Dec 02, 2019 at 07:53:40PM +0100, Pali Roh=C3=A1r wrote:
-> > On Monday 02 December 2019 09:54:40 Dmitry Torokhov wrote:
-> > > On Mon, Dec 02, 2019 at 09:47:50AM +0100, Pali Roh=C3=A1r wrote:
-> > > > On Sunday 01 December 2019 17:23:05 Dmitry Torokhov wrote:
-> > > > > Hi Pali,
-> > > > >=20
-> > > > > On Sun, Dec 01, 2019 at 03:53:57PM +0100, Pali Roh=C3=A1r wrote:
-> > > > > > Hello!
-> > > > > >=20
-> > > > > > On Wednesday 27 November 2019 10:51:39 Abhishek Pandit-Subedi w=
-rote:
-> > > > > > > Support setting the uniq attribute of the input device. The u=
-niq
-> > > > > > > attribute is used as a unique identifier for the connected de=
-vice.
-> > > > > > >=20
-> > > > > > > For example, uinput devices created by BlueZ will store the a=
-ddress of
-> > > > > > > the connected device as the uniq property.
-> > > > > > >=20
-> > > > > > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromiu=
-m.org>
-> > > > > >=20
-> > > > > > ...
-> > > > > >=20
-> > > > > > > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux=
-/uinput.h
-> > > > > > > index c9e677e3af1d..d5b7767c1b02 100644
-> > > > > > > --- a/include/uapi/linux/uinput.h
-> > > > > > > +++ b/include/uapi/linux/uinput.h
-> > > > > > > @@ -145,6 +145,7 @@ struct uinput_abs_setup {
-> > > > > > >  #define UI_SET_PHYS		_IOW(UINPUT_IOCTL_BASE, 108, char*)
-> > > > > > >  #define UI_SET_SWBIT		_IOW(UINPUT_IOCTL_BASE, 109, int)
-> > > > > > >  #define UI_SET_PROPBIT		_IOW(UINPUT_IOCTL_BASE, 110, int)
-> > > > > > > +#define UI_SET_UNIQ		_IOW(UINPUT_IOCTL_BASE, 111, char*)
-> > > > > >=20
-> > > > > > I think that usage of char* as type in _IOW would cause compati=
-bility
-> > > > > > problems like it is for UI_SET_PHYS (there is UI_SET_PHYS_COMPA=
-T). Size
-> > > > > > of char* pointer depends on userspace (32 vs 64bit), so 32bit p=
-rocess on
-> > > > > > 64bit kernel would not be able to call this new UI_SET_UNIQ ioc=
-tl.
-> > > > > >=20
-> > > > > > I would suggest to define this ioctl as e.g.:
-> > > > > >=20
-> > > > > >   #define UI_SET_UNIQ		_IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111,=
- 0)
-> > > > > >=20
-> > > > > > And then in uinput.c code handle it as:
-> > > > > >=20
-> > > > > >   case UI_SET_UNIQ & ~IOCSIZE_MASK:
-> > > > > >=20
-> > > > > > as part of section /* Now check variable-length commands */
-> > > > >=20
-> > > > > If we did not have UI_SET_PHYS in its current form, I'd agree wit=
-h you,
-> > > > > but I think there is benefit in having UI_SET_UNIQ be similar to
-> > > > > UI_SET_PHYS.
-> > > >=20
-> > > > I thought that ioctl is just number, so we can define it as we want=
-=2E And
-> > > > because uinput.c has already switch for variable-length commands it
-> > > > would be easy to use it. Final handling can be in separate function=
- like
-> > > > for UI_SET_PHYS which can look like same.
-> > >=20
-> > > Yes, we can define ioctl number as whatever we want. What I was trying
-> > > to say, right now users do this:
-> > >=20
-> > > 	rc =3D ioctl(fd, UI_SET_PHYS, "whatever");
-> > > 	...
-> > >=20
-> > > and with UI_SET_UNIQ they expect the following to work:
-> > >=20
-> > > 	rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
-> > > 	...
-> >=20
-> > And would not following definition
-> >=20
-> >   #define UI_SET_UNIQ _IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
-> >=20
-> > allow userspace to call
-> >=20
-> >   rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
-> >=20
-> > as you want?
->=20
-> OK, so what you are saying is that we can have whatever in the size
-> portion of ioctl number and simply ignore it in the driver
+Changes in v2:
+- Split into its own commit
 
-Yes.
+ lib/bluetooth.c | 7 +++++++
+ lib/bluetooth.h | 1 +
+ 2 files changed, 8 insertions(+)
 
-> (and I do not
-> think we need to do any of "UI_SET_UNIQ & ~IOCSIZE_MASK" really).
+diff --git a/lib/bluetooth.c b/lib/bluetooth.c
+index effc7f49d..7cba509d8 100644
+--- a/lib/bluetooth.c
++++ b/lib/bluetooth.c
+@@ -81,6 +81,13 @@ int ba2str(const bdaddr_t *ba, char *str)
+ 		ba->b[5], ba->b[4], ba->b[3], ba->b[2], ba->b[1], ba->b[0]);
+ }
+ 
++/* Match kernel's lowercase printing of mac address (%pMR) */
++int ba2strlc(const bdaddr_t *ba, char *str)
++{
++	return sprintf(str, "%2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x",
++		ba->b[5], ba->b[4], ba->b[3], ba->b[2], ba->b[1], ba->b[0]);
++}
++
+ int str2ba(const char *str, bdaddr_t *ba)
+ {
+ 	int i;
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index eb279260e..756dce164 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -325,6 +325,7 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src);
+ bdaddr_t *strtoba(const char *str);
+ char *batostr(const bdaddr_t *ba);
+ int ba2str(const bdaddr_t *ba, char *str);
++int ba2strlc(const bdaddr_t *ba, char *str);
+ int str2ba(const char *str, bdaddr_t *ba);
+ int ba2oui(const bdaddr_t *ba, char *oui);
+ int bachk(const char *str);
+-- 
+2.24.0.393.g34dc348eaf-goog
 
-You are right, we do not need to clear any IOCSIZE_MASK. As ioctl number
-would be always sam constant number. So it would be really simple. So
-original patch would work if UI_SET_UNIQ define would be changed to
-above with _IOW() macro.
-
-> While this would work, I am not sure it is the best option as I think
-> we'd have to comment extensively why we have arbitrary number in place
-> of the size.
-
-Comment can be added. But this is as ioctl is going to accept variable
-length array (not fixed array), zero value make sense for me (zero as we
-do not know exact size).
-
-> And we still do not really save anything, as we still have to go through
-> compat ioctl handler (since we have it already) and it is very simple to
-> add a case for UI_SET_UNIQ there...
-
-Yes, compat ioctl is still used. But my proposed solution does not
-involve to define a new compact ioctl number just for sizeof(char *).
-
-I'm looking at this particular problem from side, that there is no
-reason to define two new ioctl numbers for UI_SET_UNIQ (one normal
-number and one compat number), when one number is enough. It is one new
-ioctl call, so one ioctl number should be enough.
-
-And also with my proposed solution with ioctl size=3D0 it simplify
-implementation of UI_SET_UNIQ as it is not needed to implement also
-UI_SET_UNIQ_COMPAT ioctl nor touch compat ioct code path. Basically
-original patch (with changed UI_SET_UNIQ macro) is enough.
-
-But of of course, this is my view of this problem and I would not be
-against your decision from maintainer position. Both solutions would
-work correctly and bring same behavior for userspace applications.
-
-> Thanks.
->=20
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---7npjrcjeypf2arfk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXeWZugAKCRCL8Mk9A+RD
-UnTeAKCTUnr6gGjn/3NUTv/7PKhuAkV9mQCfbozrQ4bozHH1N5T69B0hkEw695E=
-=VymX
------END PGP SIGNATURE-----
-
---7npjrcjeypf2arfk--
