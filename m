@@ -2,313 +2,301 @@ Return-Path: <SRS0=DiUs=Z2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF07C2BD09
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 12:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E57D2C43603
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 15:25:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6148D2081B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 12:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C9B82073B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 15:25:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYB+fl6o"
+	dkim=pass (1024-bit key) header.d=arunraghavan.net header.i=@arunraghavan.net header.b="MbyYZBJh";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eq3fDpeK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727811AbfLDMCv (ORCPT
+        id S1728321AbfLDPZ6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Dec 2019 07:02:51 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:46218 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727472AbfLDMCu (ORCPT
+        Wed, 4 Dec 2019 10:25:58 -0500
+Received: from wnew3-smtp.messagingengine.com ([64.147.123.17]:44551 "EHLO
+        wnew3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727828AbfLDPZ5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Dec 2019 07:02:50 -0500
-Received: by mail-oi1-f193.google.com with SMTP id a124so6548618oii.13;
-        Wed, 04 Dec 2019 04:02:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=I/wNnqfcW4ZqavTcDtDeP4DdimYQ/CbMfwcHPxLORcU=;
-        b=IYB+fl6oiS7WVYNm6UizdS/dbsz6W9GVR4XYnydRvQ0ZlHII7Px4LdYgywQOB7vWvr
-         8LgFbx4H2Upl7Cn9wsk0BHhVEh1Q/cgrRij2gzwLTmzkIc9toHHkqw7mgPHAJ5wzwkgy
-         DwsZ+dczIx3jBNYYnN70fdv25xRJxjWdo/qTrfvVGpETJCusxh0mAaLaJBgCs32EAqPk
-         Ubf/BOrPJJ0QAiAGFIQ6NFaM2V+hA8+K/LavEYQ0uW/MguPRaiwWOEjuwvFNuY93nvjx
-         5LYlmty4nWyvV4xnjMg8bikOzKzL3jaBbzmPewXdp7sErAU++naAQ1JZucY/RmrsaZrQ
-         Dtrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=I/wNnqfcW4ZqavTcDtDeP4DdimYQ/CbMfwcHPxLORcU=;
-        b=bQeg+ba/gA6J0nD5BJMJtdftG8JpD5hrvU/oHUIrUIvFlKl8UCksATxomAhhXdWgiD
-         tNurA0bAIhe/PxcQmA8XAi7lY7nhA/SALlqUcSSAplttwMBPDWNiMD7SUTJgE2k0Dtg3
-         G+RGy+XREgSHsRdBZPy3U+F10D20+BNqzi0uu73s9bF3NflEKg2qHoIoAgl/r0mpR5k+
-         of8+SOc87rCdabAAIShHmlxgpXGLDpcqgZa2HAaaxEcXkfvX6lai1/XyWOqrSXEKmeMr
-         xXrp9gPtH9Pxm+2MPUbwrdO+ZdT8BdWN2Y6umZ0WCFS8l3jdi5l2YmwHFy9grcbN6MKq
-         Kv/A==
-X-Gm-Message-State: APjAAAWd5iLE/czO24TW0K/KcfOEW1re0p/QTUEREeRlqaSbRC4utfvx
-        OMYMLUNTzgWe2DWihUuQ9D518L0eUiudwIQs6kM=
-X-Google-Smtp-Source: APXvYqys2hbbLQs/l6VGOlnshpcn40iqrNce0dKse5iFNBHnievNd7zQLIm4YS8hOeNTRMeuOpALpmLfw+cBz1JpNdg=
-X-Received: by 2002:aca:b805:: with SMTP id i5mr2248499oif.110.1575460968940;
- Wed, 04 Dec 2019 04:02:48 -0800 (PST)
-MIME-Version: 1.0
-References: <20191127185139.65048-1-abhishekpandit@chromium.org>
- <20191201145357.ybq5gfty4ulnfasq@pali> <20191202012305.GQ248138@dtor-ws>
- <20191202084750.k7lafzzrf3yq2tqs@pali> <20191202175440.GA50317@dtor-ws>
- <20191202185340.nae4lljten5jqp3y@pali> <20191202193628.GI50317@dtor-ws>
- <20191202230947.ld5ibnczdpkekfcm@pali> <20191203173821.4u6uzxeaqnt3gyz3@pali> <20191203191112.GJ50317@dtor-ws>
-In-Reply-To: <20191203191112.GJ50317@dtor-ws>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 4 Dec 2019 14:02:36 +0200
-Message-ID: <CABBYNZ+D8E1BA--T+dQfWTH31G2zHYvc1mxicm+p7WwA2O-THw@mail.gmail.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-input@vger.kernel.org,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 4 Dec 2019 10:25:57 -0500
+X-Greylist: delayed 609 seconds by postgrey-1.27 at vger.kernel.org; Wed, 04 Dec 2019 10:25:56 EST
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.west.internal (Postfix) with ESMTP id 36A028D3;
+        Wed,  4 Dec 2019 10:15:46 -0500 (EST)
+Received: from imap38 ([10.202.2.88])
+  by compute3.internal (MEProxy); Wed, 04 Dec 2019 10:15:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        arunraghavan.net; h=mime-version:message-id:in-reply-to
+        :references:date:from:to:cc:subject:content-type
+        :content-transfer-encoding; s=mesmtp; bh=zuyMcS61SYpn7Z5DNj9PE0P
+        i+8LaRj+SPIHF+39T1hQ=; b=MbyYZBJh5PHbnWHKR/E9kbAPra6I0Hrl3qlTgN+
+        4A1lsqc2f3Oyi89k7dK3UTwMktxei7cCs5wrLoRaO5JM6wLDqG1AjXIEFQ3fhXLz
+        Mk9ErAerPFdDPpsmHUmGAthCrKN50bObqSKxRGrgO9xnKuONcviRxzG8CAcN5zqe
+        5P4k=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; bh=zuyMcS61SYpn7Z5DNj9PE0Pi+8LaRj+SPIHF+39T1
+        hQ=; b=eq3fDpeKSHU0hIJYm9W1LtH13NcqGjUwdWDCdV8QdGJkNcBvuMMhRZxVJ
+        zohskEhchqn6ZhFR1YncivPq+MbkVYgX4qPqADqqghcwEJlF3By4H6FR1qDTRgge
+        nmGyudxPmB9JlHCGILaaHfYw4qhrTrb23xGohm6VOWtCus9SFKB4QFCHe8Fn0Wwr
+        khfzYDAtlV/INkv138qygXhe+mZHZQ9nqHPGq2EdlQMPGQsKiWSAXttYs9JfViXX
+        fiBeBFOAZN5Bdc9pmWqIdA/Je2lalqP0J5m7QV54gVOpSCGphN15BeljZt9MiLo2
+        fs07XahSH77rZjd72Ewsb2mFqTJsw==
+X-ME-Sender: <xms:n83nXejcqjrF0MJxewEzvFLLXy24pLCf7WpVM_dIaG6aED2o7Mm4cw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudejledgjedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehr
+    uhhnucftrghghhgrvhgrnhdfuceorghruhhnsegrrhhunhhrrghghhgrvhgrnhdrnhgvth
+    eqnecuffhomhgrihhnpehfrhgvvgguvghskhhtohhprdhorhhgpdhgihhthhhusgdrtgho
+    mhenucfrrghrrghmpehmrghilhhfrhhomheprghruhhnsegrrhhunhhrrghghhgrvhgrnh
+    drnhgvthenucevlhhushhtvghrufhiiigvpedt
+X-ME-Proxy: <xmx:n83nXSjX_ps5GYOeAg6sw1CjyEnoNsmo152zDRfZQcxDDz778g1Rtw>
+    <xmx:n83nXY6De5_NWQZQPj8cBnOTZ2TaO_EbVRQpBZy7vrgEXYIYDwjs4A>
+    <xmx:n83nXU27SMXAOVhvTinz-hQwci6hAyvMSVgicTe1iagBFr9Yq-2fVg>
+    <xmx:oc3nXWRsRevuiIIBIT98F9BgDPjaos7XWCMgXkDctAbLZ1s0x-SqSLcIVAU>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 659FC4C000A4; Wed,  4 Dec 2019 10:15:43 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.1.7-612-g13027cc-fmstable-20191203v1
+Mime-Version: 1.0
+Message-Id: <190b130f-bc84-4af1-a807-5b5fbef3f166@www.fastmail.com>
+In-Reply-To: <20191202184512.rx6p63c6axztnwrw@pali>
+References: <20191201185740.uot7zb2s53p5gu7z@pali>
+ <508d35f29c2abc26af15e232a38d3ca53eb33706.camel@iki.fi>
+ <20191202184512.rx6p63c6axztnwrw@pali>
+Date:   Wed, 04 Dec 2019 20:45:23 +0530
+From:   "Arun Raghavan" <arun@arunraghavan.net>
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        "Tanu Kaskinen" <tanuk@iki.fi>
+Cc:     "PulseAudio Discussion" <pulseaudio-discuss@lists.freedesktop.org>,
+        linux-bluetooth@vger.kernel.org, ofono@ofono.org,
+        devkit-devel@lists.freedesktop.org,
+        "Bastien Nocera" <hadess@hadess.net>,
+        "Georg Chini" <georg@chini.tk>,
+        "Russell Treleaven" <rtreleaven@bunnykick.ca>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
+        "Sebastian Reichel" <sre@ring0.de>, "Pavel Machek" <pavel@ucw.cz>,
+        "Wim Taymans" <wim.taymans@gmail.com>,
+        "George Kiagiadakis" <george.kiagiadakis@collabora.com>
+Subject: =?UTF-8?Q?Re:_[pulseaudio-discuss]_Proposal_for_a_new_API_and_usage_of_B?=
+ =?UTF-8?Q?luetooth_HSP_and_HFP_profiles_on_Linux?=
+Content-Type: text/plain;charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dmitry,
++Wim and George from PipeWire
 
-On Tue, Dec 3, 2019 at 9:11 PM Dmitry Torokhov
-<dmitry.torokhov@gmail.com> wrote:
->
-> On Tue, Dec 03, 2019 at 06:38:21PM +0100, Pali Roh=C3=A1r wrote:
-> > On Tuesday 03 December 2019 00:09:47 Pali Roh=C3=A1r wrote:
-> > > On Monday 02 December 2019 11:36:28 Dmitry Torokhov wrote:
-> > > > On Mon, Dec 02, 2019 at 07:53:40PM +0100, Pali Roh=C3=A1r wrote:
-> > > > > On Monday 02 December 2019 09:54:40 Dmitry Torokhov wrote:
-> > > > > > On Mon, Dec 02, 2019 at 09:47:50AM +0100, Pali Roh=C3=A1r wrote=
-:
-> > > > > > > On Sunday 01 December 2019 17:23:05 Dmitry Torokhov wrote:
-> > > > > > > > Hi Pali,
-> > > > > > > >
-> > > > > > > > On Sun, Dec 01, 2019 at 03:53:57PM +0100, Pali Roh=C3=A1r w=
-rote:
-> > > > > > > > > Hello!
-> > > > > > > > >
-> > > > > > > > > On Wednesday 27 November 2019 10:51:39 Abhishek Pandit-Su=
-bedi wrote:
-> > > > > > > > > > Support setting the uniq attribute of the input device.=
- The uniq
-> > > > > > > > > > attribute is used as a unique identifier for the connec=
-ted device.
-> > > > > > > > > >
-> > > > > > > > > > For example, uinput devices created by BlueZ will store=
- the address of
-> > > > > > > > > > the connected device as the uniq property.
-> > > > > > > > > >
-> > > > > > > > > > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@c=
-hromium.org>
-> > > > > > > > >
-> > > > > > > > > ...
-> > > > > > > > >
-> > > > > > > > > > diff --git a/include/uapi/linux/uinput.h b/include/uapi=
-/linux/uinput.h
-> > > > > > > > > > index c9e677e3af1d..d5b7767c1b02 100644
-> > > > > > > > > > --- a/include/uapi/linux/uinput.h
-> > > > > > > > > > +++ b/include/uapi/linux/uinput.h
-> > > > > > > > > > @@ -145,6 +145,7 @@ struct uinput_abs_setup {
-> > > > > > > > > >  #define UI_SET_PHYS          _IOW(UINPUT_IOCTL_BASE, 1=
-08, char*)
-> > > > > > > > > >  #define UI_SET_SWBIT         _IOW(UINPUT_IOCTL_BASE, 1=
-09, int)
-> > > > > > > > > >  #define UI_SET_PROPBIT               _IOW(UINPUT_IOCTL=
-_BASE, 110, int)
-> > > > > > > > > > +#define UI_SET_UNIQ          _IOW(UINPUT_IOCTL_BASE, 1=
-11, char*)
-> > > > > > > > >
-> > > > > > > > > I think that usage of char* as type in _IOW would cause c=
-ompatibility
-> > > > > > > > > problems like it is for UI_SET_PHYS (there is UI_SET_PHYS=
-_COMPAT). Size
-> > > > > > > > > of char* pointer depends on userspace (32 vs 64bit), so 3=
-2bit process on
-> > > > > > > > > 64bit kernel would not be able to call this new UI_SET_UN=
-IQ ioctl.
-> > > > > > > > >
-> > > > > > > > > I would suggest to define this ioctl as e.g.:
-> > > > > > > > >
-> > > > > > > > >   #define UI_SET_UNIQ           _IOW(_IOC_WRITE, UINPUT_I=
-OCTL_BASE, 111, 0)
-> > > > > > > > >
-> > > > > > > > > And then in uinput.c code handle it as:
-> > > > > > > > >
-> > > > > > > > >   case UI_SET_UNIQ & ~IOCSIZE_MASK:
-> > > > > > > > >
-> > > > > > > > > as part of section /* Now check variable-length commands =
-*/
-> > > > > > > >
-> > > > > > > > If we did not have UI_SET_PHYS in its current form, I'd agr=
-ee with you,
-> > > > > > > > but I think there is benefit in having UI_SET_UNIQ be simil=
-ar to
-> > > > > > > > UI_SET_PHYS.
-> > > > > > >
-> > > > > > > I thought that ioctl is just number, so we can define it as w=
-e want. And
-> > > > > > > because uinput.c has already switch for variable-length comma=
-nds it
-> > > > > > > would be easy to use it. Final handling can be in separate fu=
-nction like
-> > > > > > > for UI_SET_PHYS which can look like same.
-> > > > > >
-> > > > > > Yes, we can define ioctl number as whatever we want. What I was=
- trying
-> > > > > > to say, right now users do this:
-> > > > > >
-> > > > > >       rc =3D ioctl(fd, UI_SET_PHYS, "whatever");
-> > > > > >       ...
-> > > > > >
-> > > > > > and with UI_SET_UNIQ they expect the following to work:
-> > > > > >
-> > > > > >       rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
-> > > > > >       ...
-> > > > >
-> > > > > And would not following definition
-> > > > >
-> > > > >   #define UI_SET_UNIQ _IOW(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, 0)
-> > > > >
-> > > > > allow userspace to call
-> > > > >
-> > > > >   rc =3D ioctl(fd, UI_SET_UNIQ, "whatever");
-> > > > >
-> > > > > as you want?
-> > > >
-> > > > OK, so what you are saying is that we can have whatever in the size
-> > > > portion of ioctl number and simply ignore it in the driver
-> > >
-> > > Yes.
-> > >
-> > > > (and I do not
-> > > > think we need to do any of "UI_SET_UNIQ & ~IOCSIZE_MASK" really).
-> > >
-> > > You are right, we do not need to clear any IOCSIZE_MASK. As ioctl num=
-ber
-> > > would be always sam constant number. So it would be really simple. So
-> > > original patch would work if UI_SET_UNIQ define would be changed to
-> > > above with _IOW() macro.
-> > >
-> > > > While this would work, I am not sure it is the best option as I thi=
-nk
-> > > > we'd have to comment extensively why we have arbitrary number in pl=
-ace
-> > > > of the size.
-> > >
-> > > Comment can be added. But this is as ioctl is going to accept variabl=
+On Tue, 3 Dec 2019, at 12:15 AM, Pali Roh=C3=A1r wrote:
+> On Monday 02 December 2019 19:01:11 Tanu Kaskinen wrote:
+> > On Sun, 2019-12-01 at 19:57 +0100, Pali Roh=C3=A1r wrote:
+> > > Hello!
+> > >=20
+> > > I'm sending this email to relevant mailing lists and other people =
+who
+> > > could be interested in it. (I'm not subscribed to all of ML, so pl=
+ease
+> > > CC me when replying).
+> > >=20
+> > >=20
+> > > I would like to open a discussion about a completely new way of ha=
+ndling
+> > > Bluetooth HSP and HFP profiles on Linux. These two profiles are th=
+e only
+> > > standard way how to access microphone data from Bluetooth Headsets=
+.
+> > >=20
+> > >=20
+> > > Previously in bluez4, HFP profile was implemented by bluez daemon =
+and
+> > > telephony HFP functionality was provided by either dummy modem, of=
+ono
+> > > modem or by Nokia's CSD Maemo modem.
+> > >=20
+> > > In bluez5 version was modem code together with implementation of H=
+FP
+> > > profile removed. And let implementation of HSP and HFP profiles to=
+
+> > > external application.
+> > >=20
+> > > Currently HSP profile is implemented in pulseaudio daemon to handl=
 e
-> > > length array (not fixed array), zero value make sense for me (zero as=
- we
-> > > do not know exact size).
-> > >
-> > > > And we still do not really save anything, as we still have to go th=
-rough
-> > > > compat ioctl handler (since we have it already) and it is very simp=
-le to
-> > > > add a case for UI_SET_UNIQ there...
-> > >
-> > > Yes, compat ioctl is still used. But my proposed solution does not
-> > > involve to define a new compact ioctl number just for sizeof(char *).
-> > >
-> > > I'm looking at this particular problem from side, that there is no
-> > > reason to define two new ioctl numbers for UI_SET_UNIQ (one normal
-> > > number and one compat number), when one number is enough. It is one n=
-ew
-> > > ioctl call, so one ioctl number should be enough.
-> > >
-> > > And also with my proposed solution with ioctl size=3D0 it simplify
-> > > implementation of UI_SET_UNIQ as it is not needed to implement also
-> > > UI_SET_UNIQ_COMPAT ioctl nor touch compat ioct code path. Basically
-> > > original patch (with changed UI_SET_UNIQ macro) is enough.
-> > >
-> > > But of of course, this is my view of this problem and I would not be
-> > > against your decision from maintainer position. Both solutions would
-> > > work correctly and bring same behavior for userspace applications.
-> >
-> >
-> > Hi Dmitry!
-> >
-> > I was looking again at those _IOW defines for ioctl calls and I have
-> > another argument why not specify 'char *' in _IOW:
-> >
-> > All ioctls in _IOW() specify as a third macro argument type which is
-> > passed as pointer to the third argument for ioctl() syscall.
-> >
-> > So e.g.:
-> >
-> >   #define EVIOCSCLOCKID _IOW('E', 0xa0, int)
-> >
-> > is called from userspace as:
-> >
-> >   int val;
-> >   ioctl(fd, EVIOCSCLOCKID, &val);
-> >
-> > Or
-> >
-> >   #define EVIOCSMASK _IOW('E', 0x93, struct input_mask)
-> >
-> > is called as:
-> >
-> >   struct input_mask val;
-> >   ioctl(fd, EVIOCSMASK, &val);
-> >
-> > So basically third argument for _IOW specify size of byte buffer passed
-> > as third argument for ioctl(). In _IOW is not specified pointer to
-> > struct input_mask, but struct input_mask itself.
-> >
-> > And in case you define
-> >
-> >   #define MY_NEW_IOCTL _IOW(UINPUT_IOCTL_BASE, 200, char*)
-> >
-> > then you by above usage you should pass data as:
-> >
-> >   char *val =3D "DATA";
-> >   ioctl(fd, MY_NEW_IOCTL, &val);
-> >
-> > Which is not same as just:
-> >
-> >   ioctl(fd, MY_NEW_IOCTL, "DATA");
-> >
-> > As in former case you passed pointer to pointer to data and in later
-> > case you passed only pointer to data.
-> >
-> > It just mean that UI_SET_PHYS is already defined inconsistently which i=
+> > > microphone and Bluetooth speakers. HFP profile is not implemented =
+yet.
+> > >=20
+> > >=20
+> > > HSP and HFP profiles use AT modem commands, so its implementation =
+needs
+> > > to parse and generates AT commands, plus implement needed state ma=
+chine
+> > > for it.
+> > >=20
+> > > And now problem is that last version of HFP profile specification =
+is too
+> > > complicated, plus Bluetooth headsets vendors started to inventing =
+and
+> > > using of own custom extensions to HFP profile and AT commands.
+> > >=20
+> > > Main problem of this "external" implementation outside of bluez is=
+ that
+> > > only one application can communicate with remote Bluetooth device.=
+ It
+> > > is application which received needed socket from bluez.
+> > >=20
+> > > So in this design if audio daemon (pulseaudio) implements HFP prof=
+ile
+> > > for processing audio, and e.g. power supply application wants to
+> > > retrieve battery level from Bluetooth device, it means that audio =
+daemon
+> > > needs to implement also battery related functionality.
+> > >=20
+> > > It does not make sense to force power supply daemon (upower) to
+> > > implement audio routing/encoding/decoding or audio daemon (power s=
+upply)
+> > > to force implementing battery related operations.
+> > >=20
+> > >=20
+> > > For handle this problem I would like to propose a new way how to u=
+se and
+> > > implement HSP and HFP profiles on Linux.
+> > >=20
+> > > Implement a new HSP/HFP daemon (I called it hsphfpd) which registe=
+r HSP
+> > > and HFP profiles in bluez and then exports functionality for all o=
+ther
+> > > specific applications via DBus API (API for audio, power supply, i=
+nput
+> > > layer, telephony functions, vendor extensions, etc...). So it woul=
+d acts
+> > > as proxy daemon between bluez and target applications (pulseaudio,=
+
+> > > upower, ofono, ...)
+> > >=20
+> > > This would simplify whole HFP usage as applications would not need=
+ to
+> > > re-implement parsing and processing of AT commands and it would al=
+low
+> > > more applications to use HFP profile at one time. And also it mean=
+s that
+> > > audio software does not have to implement telephony stack or power=
+
+> > > supply operations.
+> > >=20
+> > >=20
+> > > I wrote a document how such DBus API could look like, see here:
+> > >=20
+> > >   https://github.com/pali/hsphfpd-prototype/raw/prototype/hsphfpd.=
+txt
+> > >=20
+> > >=20
+> > > And also I implemented "prototype" implementation to verify that
+> > > designed API make sense and can be really implemented. Prototype f=
+ully
+> > > supports HSP profile in both HS and AG role, plus HFP profile in H=
+F
+> > > role. This prototype implementation is available here:
+> > >=20
+> > >   https://github.com/pali/hsphfpd-prototype
+> > >=20
+> > > Some other details are written in README:
+> > >=20
+> > >   https://github.com/pali/hsphfpd-prototype/raw/prototype/README
+> > >=20
+> > >=20
+> > > What do you think about it? Does it make sense to have such design=
+?
+> > > Would you accept usage of such hsphfpd daemon, implemented accordi=
+ng to
+> > > specification, on Linux desktop?
+> > >=20
+> > > I would like to hear your opinion if I should continue with this h=
+sphfpd
+> > > design, or not.
+> > >=20
+> > >=20
+> > > With this design and implementation of hsphfpd is possible to easi=
+ly fix
+> > > pulseaudio issue about power supply properties:
+> > >=20
+> > >   https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/722
+> >=20
+> > I quite like this proposal. Avoiding the need to implement the butto=
+n
+> > press, battery level etc. handling separately in PulseAudio, oFono a=
+nd
+> > PipeWire seems like a pretty good justification to me. I assume you'=
+re
+> > volunteering to maintain this new daemon?
+>=20
+> Yes, I can maintain this new daemon.
+>=20
+> > It's not clear to me how this would affect the PulseAudio <-> oFono
+> > interaction, if at all.
+>=20
+> Only one application can register to bluez and "own" bluez socket for
+> communication with bluetooth headset. Currently it can be either
+> pulseaudio (with native backend in pulseaudio for HSP profile) or ofon=
+o
+> (with ofono backend in pulseaudio for HFP profile).
+>=20
+> So if hsphfpd would be in use, then ofono would not be able to get
+> socket from bluez. And it would be needed to add a new "plugin" into
+> ofono to use hsphpfd for telephony operations. See hsphfpd.txt file
+> (there is diagram of usage).
+>=20
+> > When oFono is used, would PulseAudio get the
+> > audio socket from oFono or hsphfpd?
+>=20
+> Always from hsphfpd.
+>=20
+> > What about volume commands, would they go through oFono or would
+> > PulseAudio interact with hsphfpd directly?
+>=20
+> Internally they are handled by hsphpfd directly and appropriate API is=
+
+> exported via DBus for audio application daemon (pulseaudio). For detai=
+ls
+> see hsphfpd.txt file, interface org.hsphfpd.AudioTransport.
+>=20
+> > I think hsphfpd should be part of bluetoothd, but if that's not
+> > possible, then that's not possible.
+>=20
+> I do not know if bluez developers are interested in having this code a=
 s
-> > also reason why compat ioctl for it was introduced.
->
-> Yes, you are right. UI_SET_PHYS is messed up. I guess the question is
-> what to do with all of this...
->
-> Maybe we should define
->
-> #define UI_SET_PHYS_STR(len)    _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE, 111, =
-len)
-> #define UI_SET_UNIQ_STR(len)    _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE, 112, =
-len)
->
-> and mark UI_SET_PHYS as deprecated/wrong? This will allow us to specify
-> exactly how much data kernel is supposed to fetch from userspace instead
-> of trying to rely on a null-terminated string.
->
-> It would also be very helpful if BlueZ did not accept changes that use
-> this brand new ioctl until after we agreed on how it should look like.
-> Luiz, can it be reverted for now please?
+> part of bluez project, specially when in bluez4 HFP profile was there
+> and in bluez5 was HFP code completely removed.
+>=20
+> But it should not matter where hsphpfd is implemented.
+>=20
+> > (I don't want to get into a lengthy discussion about programming
+> > languages, but I'll just note here that I don't like Perl.)
+>=20
+> It is just a prototype. I used Perl just because it is faster for me t=
+o
+> implement parsing of AT commands needed for prototype purposes.
 
-Sure, it has been reverted, I guess we will have to settle on the
-kernel changes first before we do any changes to userspace.
+Broadly, I think this is a good thing to do. My main concern is having t=
+his be adequately maintained over a longer period of time.
 
---=20
-Luiz Augusto von Dentz
+The other thing to note is that in PipeWire, it is possible for external=
+ entities to implement the equivalent of a "sink" or "source" (it's just=
+ a node in PipeWire terminology), so in the long run, it might be good t=
+o have a single BT audio daemon that manages A2DP and HSP/HFP..
+
+This would also have the benefit of moving codec dependencies out of Pul=
+seAudio (which I'll help mitigate in other ways within PulseAudio anyway=
+).
+
+Cheers,
+Arun
