@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 097A2C43603
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 07:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E404C43603
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 07:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C30742068E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 07:14:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3259E20640
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 07:16:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="peIsFVor"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="cveiedzL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727195AbfLDHOP (ORCPT
+        id S1726679AbfLDHQy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Dec 2019 02:14:15 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:41715 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726599AbfLDHOO (ORCPT
+        Wed, 4 Dec 2019 02:16:54 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35347 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725958AbfLDHQy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Dec 2019 02:14:14 -0500
-Received: by mail-wr1-f65.google.com with SMTP id c9so733945wrw.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Dec 2019 23:14:13 -0800 (PST)
+        Wed, 4 Dec 2019 02:16:54 -0500
+Received: by mail-wm1-f67.google.com with SMTP id u8so6630959wmu.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Dec 2019 23:16:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id;
         bh=faPNT/f5uZo8iaeYVLQEwdlcOY2/BBdz04dTFvoUITs=;
-        b=peIsFVorQnWepGPOfBNBZe45ZXcl5mpOqPoMHX8IOEUf1fn4okHL/y7Pa74ipFV7GD
-         cTmSQwqp9fRwL/vTYVqMUTw5C1MQHDslN+//Vi8OSIBreTBfwJ8ljsM4prVjG2rFNCah
-         LeicfS6tlqh06809CAta+BGy33TV1JGJ5O1eB0wBhQI8tn1Bj57BoUE9DS3ZBSVKlvgZ
-         6xh+rDqxqtkL8Tb3RDA+XPbA9GoG3Z3Hon6p1BuYcl7QHh0RaRk9nH2IqDfTqhbozBdK
-         mB9gmxOd4/3OZMQKb2RiP6BxRSdRFIMRBhZI5yosPQeZbErEhSUr9w7t/Sj/QrUIIvy1
-         tpiA==
+        b=cveiedzLTF5mS2Zqe/QUDDb+gQEYISQzEcCxIXxHIgCwuxsCD7IguOlhvwF1mEGg2o
+         yQZ+GKi3S7RZugEX2dkJs+rijyMXZKk0ktN2VTREOuTi+3slnANkRK+oG28LjgVp8dOU
+         aRRNb6+jvjPH6c/s0rsEwy/2dNj0u5hr4PfC8SmRhLoDd+K3kv+3NDa+pL8ohSdCBFqT
+         JOtBJGFlRL9fL3dQwWe/MH2MdP2fds1j9Ia8voFpqlD9rm8OZeuWIUGC74Ifxn1ihlYy
+         ZnrUOB2wEuQgmQSX1hrYqSg4+FQ0wmsYZrefxHyXN5AgX1K1dJlmi0+qwBXLw01dMoo8
+         n5dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
         bh=faPNT/f5uZo8iaeYVLQEwdlcOY2/BBdz04dTFvoUITs=;
-        b=KMfVWNs7rjxI6BxGA9RlpDFShgmwTEiLPwEv4xx8XpdiaRD72t6Qq053UleJKCrVhm
-         x875N0/vu2BYJB5FYiQ+ZraMypYmX3tUcQVp/p0wCg8vsN8kxNz5X0P4ldWq5/FiKNty
-         ZrgydEj41Fm2wa1nxuGDMK16ZgVmbB5jE7N5PK36vmfAVnPVAu16Axr3AoUzYJtg1YDK
-         szFv3BNQRar+XoN+N4RwVbHKEq+v/N/2VpuJhlUoCSxxqm3TMvhViRZpSYmvAZ9cMAXV
-         j4C/KDadItf5izgSOkPLTjTkl+5YygcjISxzrH+Kt1ljXHc+o83ReYSSsyEbnv47QvWN
-         dZGw==
-X-Gm-Message-State: APjAAAXRfc4a9rGXO/IVabff0ty/5fMSzhchy2SiY9pVZD6KeaEX5Rwa
-        tomBzsgn/ctZt27CDHaLVbJXDA==
-X-Google-Smtp-Source: APXvYqzD+bj2dB60P1mwGmgJ0xT8Xw/FI3kBxaFo3ktA55T4hDKZCn/mogaPOBLxwLnhnhi+FcGYpw==
-X-Received: by 2002:a5d:5403:: with SMTP id g3mr2210292wrv.302.1575443652648;
-        Tue, 03 Dec 2019 23:14:12 -0800 (PST)
+        b=js+t/7amcL6xQMrsp5vTO5n+YV5l8Red2iMNo1O42Wl2UGhafE+A2Xm85mN4ar21DJ
+         nZJBd9DGxBuYyTV0v8lDvJRroezik7MaOzmnyd282AlbRgJ6l9sszl3mCqQyIKGwtigw
+         GybIf3r2rYiaw77noKNNgZboIv8bSpI9rdgzqSyrjsqq8S6+efSS3E1w1as25ACqDKNh
+         dfC/ul+GrXEZLDrz9M0SUeIo43Lrd0Y8XbiO6V6+FNvgYiIoyb0dZWJBPS0bsriCLlB3
+         YQt600hg2K3syCdQrARp4Zx5uRelDvUMU2mpYYeQElZBzwDQINHV/EuEhaHOW0TRox3U
+         ItiQ==
+X-Gm-Message-State: APjAAAX8CXksHGJOkho/c707EpKbzfb6iILCoyWD2aUFpVYoCb2xuNZX
+        T77LEeRBnGymykRxkIrajsquvA==
+X-Google-Smtp-Source: APXvYqw1e9Sba16z73Xn9TIg9bIDlbIodXDWx2BbrTyW3EZXd6bcOtv3skaMKAl+1FJ8nPB6WxGrFw==
+X-Received: by 2002:a1c:a70e:: with SMTP id q14mr13797771wme.142.1575443812562;
+        Tue, 03 Dec 2019 23:16:52 -0800 (PST)
 Received: from glaroque-ThinkPad-T480.baylibre.local (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.gmail.com with ESMTPSA id v15sm5417592wmh.24.2019.12.03.23.14.11
+        by smtp.gmail.com with ESMTPSA id m7sm2319337wrr.40.2019.12.03.23.16.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 23:14:12 -0800 (PST)
+        Tue, 03 Dec 2019 23:16:52 -0800 (PST)
 From:   Guillaume La Roque <glaroque@baylibre.com>
-To:     marcel@holtmann.org, ohan.hedberg@gmail.com,
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-bluetooth@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, khilman@baylibre.com
 Subject: [PATCH] bluetooth: hci_bcm: enable IRQ capability from node
-Date:   Wed,  4 Dec 2019 08:14:11 +0100
-Message-Id: <20191204071411.13624-1-glaroque@baylibre.com>
+Date:   Wed,  4 Dec 2019 08:16:51 +0100
+Message-Id: <20191204071651.14977-1-glaroque@baylibre.com>
 X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
