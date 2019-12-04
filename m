@@ -2,156 +2,126 @@ Return-Path: <SRS0=DiUs=Z2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5909EC43603
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 17:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2CAC43603
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 18:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A171205ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 17:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 634D82073B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 18:01:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYrUnVmz"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="j3Xt8oN0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728968AbfLDRF1 (ORCPT
+        id S1729553AbfLDSBV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Dec 2019 12:05:27 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39470 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728784AbfLDRF0 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Dec 2019 12:05:26 -0500
-Received: by mail-wm1-f67.google.com with SMTP id s14so531692wmh.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Dec 2019 09:05:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=GVFHi3MqUrVUXKrFAbPrUxTdeWHEh1Utt1wXYo++VEo=;
-        b=bYrUnVmzd7rkjaRTv/TXdOfXuMSaqkribKfgdr4TMGfl9bGTHS/JZzeMc47N0qNaw2
-         iBhmE3jiJ2H5MZmqm8KDeWgfO4gpo2A4VuvFifh9dExLA4zVaG4JJDa5oooKNlSBMi6n
-         kQvRhU+X68Xyt0os8JbC+JqJDQrqEikOyi0IVhf1VJMD4xqyvf2DDKTvw3yevem7WnEA
-         fsqTe4zDcPHRx4xVbweONYzEV6jPjRfiW9b+w4yRB2CU2ma2mvOpmrXZeaIbrFdp8FYs
-         TYgFvVXGZahMBeiX21E2bVe7c6KcpY8P+4dIxYN1WvTMPyb6eJ0jln7RRU2brxi323P+
-         67qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=GVFHi3MqUrVUXKrFAbPrUxTdeWHEh1Utt1wXYo++VEo=;
-        b=Ifh34pmnX6MaFjWmE668Abix0EctzDHRP7CfROduGA4o8GNFo80Hw8gpYGS/Fep8/m
-         RMPvncfoFzTHBJr83yp7zHhLA9xglJh/Yzl/7rhyWWwzihVnBF12cf8zAn8Yq+OLNCsS
-         bjvhsObIZyWIHe9E6rqbluqwyOxDez8gyKQpFLZ4nIooqsUJSO9P9YsH63pBf6oECjQG
-         oKgy68hIW2NC4ekUTVUUgRFAafsW62XfEuy9eLKfnN41DAa4CBJSON1pFswEHpO9pYfu
-         dADLfYMYKbtwCbBf+JUhp3AfnwOoLK04jT47uNGEBsSMmFJnHFqROVOYOifiNhQofnvy
-         Qs6g==
-X-Gm-Message-State: APjAAAXXTTzQhfSYnWMOMtzz1U3fi9p0babdmIGe8UBdEayIYAbM02oH
-        pZK4kmNLR6hQbE60C+5148U=
-X-Google-Smtp-Source: APXvYqwC0yxAXmIOmrAQZ885IQT16dci3LhqlDTQJtRZI1SSM/Yu3mL5XkGFs2P2gA4Z+S/M8Hefwg==
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr654802wmk.15.1575479124582;
-        Wed, 04 Dec 2019 09:05:24 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id u25sm7105756wmj.0.2019.12.04.09.05.22
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 04 Dec 2019 09:05:23 -0800 (PST)
-Date:   Wed, 4 Dec 2019 18:05:21 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Arun Raghavan <arun@arunraghavan.net>
-Cc:     Tanu Kaskinen <tanuk@iki.fi>,
-        PulseAudio Discussion <pulseaudio-discuss@lists.freedesktop.org>,
-        linux-bluetooth@vger.kernel.org, ofono@ofono.org,
-        devkit-devel@lists.freedesktop.org,
-        Bastien Nocera <hadess@hadess.net>,
-        Georg Chini <georg@chini.tk>,
-        Russell Treleaven <rtreleaven@bunnykick.ca>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>,
-        Wim Taymans <wim.taymans@gmail.com>,
-        George Kiagiadakis <george.kiagiadakis@collabora.com>
-Subject: Re: [pulseaudio-discuss] Proposal for a new API and usage of
- Bluetooth HSP and HFP profiles on Linux
-Message-ID: <20191204170521.mfo5qtoy65raetwc@pali>
-References: <20191201185740.uot7zb2s53p5gu7z@pali>
- <508d35f29c2abc26af15e232a38d3ca53eb33706.camel@iki.fi>
- <20191202184512.rx6p63c6axztnwrw@pali>
- <190b130f-bc84-4af1-a807-5b5fbef3f166@www.fastmail.com>
+        Wed, 4 Dec 2019 13:01:21 -0500
+Received: from mga12.intel.com ([192.55.52.136]:4735 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729165AbfLDSBT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 4 Dec 2019 13:01:19 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Dec 2019 10:01:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,278,1571727600"; 
+   d="scan'208";a="205474824"
+Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
+  by orsmga008.jf.intel.com with ESMTP; 04 Dec 2019 10:01:17 -0800
+Received: from orsmsx163.amr.corp.intel.com (10.22.240.88) by
+ ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 4 Dec 2019 10:01:17 -0800
+Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX163.amr.corp.intel.com (10.22.240.88) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 4 Dec 2019 10:01:17 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 4 Dec 2019 10:01:17 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MiobIn/d1bnMzWHfye7+A7gJ1cYlW/EkCxMLBSI8gfp03lPTOmbjuDtLMgxBOURfdvaPF7VVCYCvRnU7jAkgQLUn30E/Sf3EMCx2pmFuILjVh8B0zgou5iYXmTNTW9BaKkBU7xsveISVfT+rlsjMZEGP//PrgUSqVwjO93+hKlYc9UQJEpX7IKgmhaNC9fCP3z44aQ0Mld+Qf3w1V4S0mso9CmJSwPyZMpfh3wI/REL8X3teClcqzHV8CoU+R1VmoK4V/nO6qKeWoCLzShj85uWAegbZYT+rL49jxdaonrtb5qggP6ANFKCG0zLH3AMIdPitwi/FcVPQw2yrZuwb9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JeFx2r1062oKmFKzB8rXjUm6ry8Ksw3js1IMfF59veM=;
+ b=NJiQvykWI1wMqnZqSWkAyxllayWR4nQUbWvFyX0c22cnTRZgCO9Wnv2gQ+GDOBXJhfxcNIlaYdj2z7y8dc8nLT1caksPX19L5WdeoLaEsTGWD3IpNPZ21ma3tKjixyRbOFa27Cb0CV0DL7uiizc/w44wd1WLpAvW70we9DO583p/rNBd7+d/UtnUMqBqgg+6ESwAp6e2U93ONjipeu5bMR0Hox29j26jgopKBG/gvXu3OmDMY8HXgz2FxoJGfuRM02P2AvQu9zFQ3s3/SqUf2iqjVA1WhPP3QTUtbavtd7V+trEbyBoqpyvPNoAg3sGIZ7xZTjWfZNsNT/ZIsPcQgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JeFx2r1062oKmFKzB8rXjUm6ry8Ksw3js1IMfF59veM=;
+ b=j3Xt8oN0s3NohvTqO9q0f4pRQt6oLVnoR2KM/J5q+B/U3oorzOenJAswTA4fQIJ8IukAjgHZenFtbYTSR3PuotZApCBP8hiv8I+wQCnR5Htek2rcCdD5HioWgIUCfZ0oCoOAHq/igRQcPFRgu8W6OvGNqtHlT3yEE0dXOXZZ+ho=
+Received: from CY4PR11MB1269.namprd11.prod.outlook.com (10.173.16.11) by
+ CY4PR11MB1414.namprd11.prod.outlook.com (10.169.251.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2495.22; Wed, 4 Dec 2019 18:01:13 +0000
+Received: from CY4PR11MB1269.namprd11.prod.outlook.com
+ ([fe80::a12f:7254:eec:b905]) by CY4PR11MB1269.namprd11.prod.outlook.com
+ ([fe80::a12f:7254:eec:b905%3]) with mapi id 15.20.2495.014; Wed, 4 Dec 2019
+ 18:01:12 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "prathyusha.n@samsung.com" <prathyusha.n@samsung.com>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ v2 0/3] mesh: Fix various valgrind identified
+ problems
+Thread-Topic: [PATCH BlueZ v2 0/3] mesh: Fix various valgrind identified
+ problems
+Thread-Index: AQHVqh2j5kauI2xYCEu6e2WcuJzv5KeqRWIA
+Date:   Wed, 4 Dec 2019 18:01:12 +0000
+Message-ID: <814789dacd5a5e71712634e835317ffe923f5a7d.camel@intel.com>
+References: <20191203210410.25548-1-brian.gix@intel.com>
+In-Reply-To: <20191203210410.25548-1-brian.gix@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [192.55.54.38]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1cfd9976-1254-46c2-6d27-08d778e3f311
+x-ms-traffictypediagnostic: CY4PR11MB1414:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CY4PR11MB141473B77EB9374C703A9298E15D0@CY4PR11MB1414.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 0241D5F98C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(396003)(136003)(376002)(346002)(366004)(199004)(189003)(6916009)(5640700003)(229853002)(2501003)(36756003)(86362001)(305945005)(64756008)(66446008)(11346002)(66556008)(66476007)(99286004)(14454004)(14444005)(478600001)(71200400001)(6512007)(26005)(76116006)(54906003)(4744005)(71190400001)(25786009)(76176011)(5660300002)(8936002)(91956017)(4326008)(316002)(66946007)(6436002)(2906002)(186003)(118296001)(81166006)(6116002)(6506007)(7736002)(2351001)(81156014)(102836004)(3846002)(107886003)(8676002)(6246003)(6486002)(2616005);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR11MB1414;H:CY4PR11MB1269.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ymTpCckKvLmOaBL2pL1P3fK/1anXmXiAMZh/sladWHF6NPw0P+KtZbC3SinpG0H3TVViBCtN71qJcEMKrEjLoHzG+4ZMUQ0vKqMvgLS6oYKb/DoIvW6y2Y6dLKoZqMO5NoyPAYwh8gTPyUad1m5+hCFnwG9vkxT1lRAW1lq8qkdLTcjMsu/F3MtXEOCY97pA0PxZPQDge22XWFxmULXfaaGR6Y2wEGMkok/qGl88h7d7v+mKwKMcNSIxaBK8lawjQGkikA1lPn25oqb768yK1P2RYFSTVlgfOX/oa+0gIzoS4n8GVN7syUx9/PorjeSsNokgpMeeAikfP7Ris4jxXghWQ+vDPPpRCDEm+w1f1OvCuK/pgpz74t3w6LE8FZ+r0GnIzc80OweRvebSG9FinFOOdyCB91GC9VO3+MIcr0tSqXO11ahG/JH0Ey9xy1ZG
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3AA592775538B64CA3F7CA175B734011@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="fjnfaeynkyyttc45"
-Content-Disposition: inline
-In-Reply-To: <190b130f-bc84-4af1-a807-5b5fbef3f166@www.fastmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1cfd9976-1254-46c2-6d27-08d778e3f311
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2019 18:01:12.5680
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rGoFKpO+/hm1DMXxCIZkUoKDs+gArF9nfBDJdlei2apw8VdzE2oMSqVkkK57k/UuWFKg7r3NYMbO84qDB+GP0Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB1414
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-
---fjnfaeynkyyttc45
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wednesday 04 December 2019 20:45:23 Arun Raghavan wrote:
-> Broadly, I think this is a good thing to do. My main concern is having th=
-is be adequately maintained over a longer period of time.
-
-I already prepared prototype implementation, so I know how hard is to
-write or maintain this new daemon.
-
-Are there any interested people in either implementing, maintaining or
-in other way helping with this project?
-
-The main problem in maintaining this HSP/HFP codebase I see that I do
-not have enough testing devices. As we know lot of manufactures produce
-devices which are not compliant to standards and this needs to be
-handled in HSP/HFP codebase.
-
-> The other thing to note is that in PipeWire, it is possible for external =
-entities to implement the equivalent of a "sink" or "source" (it's just a n=
-ode in PipeWire terminology), so in the long run, it might be good to have =
-a single BT audio daemon that manages A2DP and HSP/HFP..
-
-PipeWire or any other audio server (jack or bluez-alsa) can benefit from
-this hsphfpd daemon that it does not have to implement (again) parsing
-and interpreting AT commands (as needed for HFP standard).
-
-For PipeWire developers: Do you have any special requirements for this
-hsphfpd daemon which are needed for processing of audio?
-
-See proposed DBus interface, specially "Audio Agent hierarchy":
-https://github.com/pali/hsphfpd-prototype/raw/prototype/hsphfpd.txt
-
-> This would also have the benefit of moving codec dependencies out of Puls=
-eAudio (which I'll help mitigate in other ways within PulseAudio anyway).
-
-hsphfpd just prepares SCO audio socket and then via DBus pass it to
-target application (pulseaudio, pipewire, jacks, ...). And it is up to
-the audio application to do codec processing. hsphfpd is not going to do
-anything with audio samples or codecs. So this does not help directly...
-
-=2E.. But I'm planing to try to separate A2DP code from pulseaudio into
-some external library which would not depend on pulseaudio. So this
-library can help all audio server projects to not re-implement again and
-again A2DP (and HSP/HFP) audio processing. This library should do all
-needed codec stuff (encoding, decoding, setup of A2DP, ...).
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---fjnfaeynkyyttc45
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXefnTwAKCRCL8Mk9A+RD
-UtizAJ4jebcbx+300lfUIYwDo6/CcO8AsQCcCrEwdRrkh+X8gbrX5/qLSQQ3YsQ=
-=uINE
------END PGP SIGNATURE-----
-
---fjnfaeynkyyttc45--
+UGF0Y2hzZXQgQXBwbGllZA0KDQpPbiBUdWUsIDIwMTktMTItMDMgYXQgMTM6MDQgLTA4MDAsIEJy
+aWFuIEdpeCB3cm90ZToNCj4gVGhpcyBwYXRjaHNldCBhZGRyZXNzZXMgYSBmZXcgdmFsZ3JpbmQg
+aWRlbnRpZmllZCBlcnJvcnMsIGluY2x1ZGluZyBzb21lDQo+IGluc3RhbmNlcyB3aGVyZSBtZW1v
+cnkgd2FzIHVzZWQgYWZ0ZXIgZnJlZWluZy4gIEFsbCB0aHJlZSBwYXRjaGVzIHJlbGF0ZQ0KPiB0
+byB0aGUgbWVtb3J5IGFsbG9jYXRlZCBmb3IgUHJvdmlzaW9uaW5nIHB1cnBvc2VzLg0KPiANCj4g
+VGhpcyBpbmNsdWRlcyB0aGUgcGF0Y2ggZnJvbSBQcmF0aHl1c2hhIHRoYXQgZml4ZXMgY2xvc2Ug
+aW5kaWNhdGlvbi4NCj4gDQo+IEJyaWFuIEdpeCAoMik6DQo+ICAgbWVzaDogUmVhcnJhbmdlIFBC
+LUFDSyBmb3IgcG9zc2libGUgc2Vzc2lvbiBjbG9zZQ0KPiAgIG1lc2g6IEZpeCBtZW1vcnkgbGVh
+ayBpbiBKb2luKCkgQVBJIGNhbGwNCj4gDQo+IFByYXRoeXVzaGEgTiAoMSk6DQo+ICAgbWVzaDog
+Rml4IHRvIHNlbmQgY2xvc2UgaW5kaWNhdGlvbiBvbiB0aW1lb3V0DQo+IA0KPiAgbWVzaC9tZXNo
+LmMgICAgICAgICAgfCAgNyArKysrKy0tDQo+ICBtZXNoL25ldC5jICAgICAgICAgICB8ICAxIC0N
+Cj4gIG1lc2gvcGItYWR2LmMgICAgICAgIHwgMTAgKysrKy0tLS0tLQ0KPiAgbWVzaC9wcm92LWFj
+Y2VwdG9yLmMgfCAgMSArDQo+ICA0IGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDkg
+ZGVsZXRpb25zKC0pDQo+IA0K
