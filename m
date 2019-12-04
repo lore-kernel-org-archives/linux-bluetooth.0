@@ -2,102 +2,175 @@ Return-Path: <SRS0=DiUs=Z2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E404C43603
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 07:17:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A23B0C43603
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 10:49:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3259E20640
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 07:16:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="cveiedzL"
+	by mail.kernel.org (Postfix) with ESMTP id 7C272207DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Dec 2019 10:49:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726679AbfLDHQy (ORCPT
+        id S1727552AbfLDKta (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Dec 2019 02:16:54 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35347 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725958AbfLDHQy (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Dec 2019 02:16:54 -0500
-Received: by mail-wm1-f67.google.com with SMTP id u8so6630959wmu.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Dec 2019 23:16:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id;
-        bh=faPNT/f5uZo8iaeYVLQEwdlcOY2/BBdz04dTFvoUITs=;
-        b=cveiedzLTF5mS2Zqe/QUDDb+gQEYISQzEcCxIXxHIgCwuxsCD7IguOlhvwF1mEGg2o
-         yQZ+GKi3S7RZugEX2dkJs+rijyMXZKk0ktN2VTREOuTi+3slnANkRK+oG28LjgVp8dOU
-         aRRNb6+jvjPH6c/s0rsEwy/2dNj0u5hr4PfC8SmRhLoDd+K3kv+3NDa+pL8ohSdCBFqT
-         JOtBJGFlRL9fL3dQwWe/MH2MdP2fds1j9Ia8voFpqlD9rm8OZeuWIUGC74Ifxn1ihlYy
-         ZnrUOB2wEuQgmQSX1hrYqSg4+FQ0wmsYZrefxHyXN5AgX1K1dJlmi0+qwBXLw01dMoo8
-         n5dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=faPNT/f5uZo8iaeYVLQEwdlcOY2/BBdz04dTFvoUITs=;
-        b=js+t/7amcL6xQMrsp5vTO5n+YV5l8Red2iMNo1O42Wl2UGhafE+A2Xm85mN4ar21DJ
-         nZJBd9DGxBuYyTV0v8lDvJRroezik7MaOzmnyd282AlbRgJ6l9sszl3mCqQyIKGwtigw
-         GybIf3r2rYiaw77noKNNgZboIv8bSpI9rdgzqSyrjsqq8S6+efSS3E1w1as25ACqDKNh
-         dfC/ul+GrXEZLDrz9M0SUeIo43Lrd0Y8XbiO6V6+FNvgYiIoyb0dZWJBPS0bsriCLlB3
-         YQt600hg2K3syCdQrARp4Zx5uRelDvUMU2mpYYeQElZBzwDQINHV/EuEhaHOW0TRox3U
-         ItiQ==
-X-Gm-Message-State: APjAAAX8CXksHGJOkho/c707EpKbzfb6iILCoyWD2aUFpVYoCb2xuNZX
-        T77LEeRBnGymykRxkIrajsquvA==
-X-Google-Smtp-Source: APXvYqw1e9Sba16z73Xn9TIg9bIDlbIodXDWx2BbrTyW3EZXd6bcOtv3skaMKAl+1FJ8nPB6WxGrFw==
-X-Received: by 2002:a1c:a70e:: with SMTP id q14mr13797771wme.142.1575443812562;
-        Tue, 03 Dec 2019 23:16:52 -0800 (PST)
-Received: from glaroque-ThinkPad-T480.baylibre.local (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.gmail.com with ESMTPSA id m7sm2319337wrr.40.2019.12.03.23.16.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 23:16:52 -0800 (PST)
-From:   Guillaume La Roque <glaroque@baylibre.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, khilman@baylibre.com
-Subject: [PATCH] bluetooth: hci_bcm: enable IRQ capability from node
-Date:   Wed,  4 Dec 2019 08:16:51 +0100
-Message-Id: <20191204071651.14977-1-glaroque@baylibre.com>
-X-Mailer: git-send-email 2.17.1
+        Wed, 4 Dec 2019 05:49:30 -0500
+Received: from mga07.intel.com ([134.134.136.100]:11533 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727268AbfLDKt3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 4 Dec 2019 05:49:29 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Dec 2019 02:49:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,277,1571727600"; 
+   d="scan'208";a="205350840"
+Received: from unknown (HELO spoorthi-H97M-D3H.iind.intel.com) ([10.223.96.107])
+  by orsmga008.jf.intel.com with ESMTP; 04 Dec 2019 02:49:27 -0800
+From:   spoorthix.k@intel.com
+To:     linux-bluetooth@vger.kernel.org
+Cc:     bharat.b.panda@intel.com
+Subject: [PATCH] Add support to update Resolving list
+Date:   Wed,  4 Dec 2019 16:33:11 +0530
+Message-Id: <1575457391-3974-1-git-send-email-spoorthix.k@intel.com>
+X-Mailer: git-send-email 1.9.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Actually IRQ can be found from GPIO but all platorms don't support
-gpiod_to_irq, it's the case on amlogic chip.
-so to have possibility to use interrupt mode we need to add interrupts
-field in node and support it in driver.
+From: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
 
-Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+Code changes to add or delete the BD address to/from existing
+resolving list referred from  Bluetooth Core Specification
+v5.0 Vol6 Part B Section 6.3, If the link layer privacy feature
+is supported by the controller, Link layer may scan devices
+using RPA during background scan,the host can add newly
+scanned devices to the Resolving list.
+`
+
+Signed-off-by: Spoorthi Ravishankar Koppad <spoorthix.k@intel.com>
 ---
- drivers/bluetooth/hci_bcm.c | 3 +++
- 1 file changed, 3 insertions(+)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_request.c | 85 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 7646636f2d18..9b024e1e36e2 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1372,6 +1372,7 @@ static struct platform_driver bcm_driver = {
- static int bcm_serdev_probe(struct serdev_device *serdev)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5bc1e30..1574dc1 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -433,6 +433,7 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_LL_PRIVACY		0x40
+ #define HCI_LE_PHY_2M			0x01
+ #define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_EXT_ADV			0x10
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 621f1a9..5c59cce 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -670,6 +670,85 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+ 	}
+ }
+ 
++static void add_to_resolve_list(struct hci_request *req,
++				struct hci_conn_params *params,
++				struct list_head *list)
++{
++	struct hci_cp_le_add_to_resolv_list cp;
++	struct bdaddr_list_with_irk *entry;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return;
++
++	memset(&cp, 0, sizeof(cp));
++
++	cp.bdaddr_type = params->addr_type;
++	bacpy(&cp.bdaddr, &params->addr);
++	memcpy(entry->peer_irk, cp.peer_irk, 16);
++	memcpy(entry->local_irk, cp.local_irk, 16);
++
++	list_add(&entry->list, list);
++
++	hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST, sizeof(cp), &cp);
++}
++
++static void update_resolve_list(struct hci_request *req)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct bdaddr_list *b;
++	struct hci_conn_params *params;
++	int err;
++	u8 resolve_list_entries = 0;
++
++	list_for_each_entry(b, &hdev->le_resolv_list, list) {
++	/* Cannot Remove or add the device to the Resolving list
++	 * whenever there is an outstanding connection.
++	 */
++		if (!hci_pend_le_action_lookup(&hdev->pend_le_conns,
++					       &b->bdaddr,
++					       b->bdaddr_type) &&
++		    !hci_pend_le_action_lookup(&hdev->pend_le_reports,
++					       &b->bdaddr,
++					       b->bdaddr_type)) {
++			struct hci_cp_le_del_from_resolv_list cp;
++
++			cp.bdaddr_type = b->bdaddr_type;
++			bacpy(&cp.bdaddr, &b->bdaddr);
++
++			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
++				    sizeof(cp), &cp);
++		}
++	}
++	/* During background scanning/active scanning the
++	 * device BD address is populated in LE pending
++	 * connections list. So, track the list and add to Resolving
++	 * list if found by IRK.
++	 */
++	list_for_each_entry(params, &hdev->pend_le_conns, action) {
++		if (hci_bdaddr_list_lookup(&hdev->le_resolv_list,
++					   &params->addr, params->addr_type))
++			resolve_list_entries++;
++
++		if (hci_find_irk_by_addr(hdev, &params->addr,
++					 params->addr_type)) {
++			/* Add device to resolving list */
++			resolve_list_entries++;
++			add_to_resolve_list(req, params, &hdev->le_resolv_list);
++		}
++	}
++
++	/* Device can be resolved in the Host if size of resolving
++	 * list is greater than defined in the controller.
++	 */
++	if (resolve_list_entries >= hdev->le_resolv_list_size) {
++		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
++		if (err < 0)
++			BT_ERR("%s failed to generate new RPA",
++			       hdev->name);
++		}
++}
++
+ static void add_to_white_list(struct hci_request *req,
+ 			      struct hci_conn_params *params)
  {
- 	struct bcm_device *bcmdev;
-+	struct platform_device *pdev;
- 	int err;
+@@ -896,6 +975,12 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
+ 		filter_policy |= 0x02;
  
- 	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
-@@ -1384,6 +1385,8 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
- #endif
- 	bcmdev->serdev_hu.serdev = serdev;
- 	serdev_device_set_drvdata(serdev, bcmdev);
-+	pdev = to_platform_device(bcmdev->dev);
-+	bcmdev->irq = platform_get_irq(pdev, 0);
- 
- 	if (has_acpi_companion(&serdev->dev))
- 		err = bcm_acpi_probe(bcmdev);
++	/* If LE Privacy is supported in controller
++	 * add the device to resolving list.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_LE_LL_PRIVACY))
++		update_resolve_list(req);
++
+ 	hci_req_start_scan(req, LE_SCAN_PASSIVE, hdev->le_scan_interval,
+ 			   hdev->le_scan_window, own_addr_type, filter_policy);
+ }
 -- 
-2.17.1
+1.9.1
 
