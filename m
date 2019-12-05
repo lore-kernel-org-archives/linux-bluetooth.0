@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8CBC43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59512C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7804A20801
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24154206DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Uyz63hAn"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SeMdfkp+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729894AbfLERIU (ORCPT
+        id S1730220AbfLERvh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Dec 2019 12:08:20 -0500
-Received: from mail-ua1-f67.google.com ([209.85.222.67]:44658 "EHLO
-        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729711AbfLERIU (ORCPT
+        Thu, 5 Dec 2019 12:51:37 -0500
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:46018 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730003AbfLERvh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Dec 2019 12:08:20 -0500
-Received: by mail-ua1-f67.google.com with SMTP id d6so1588831uam.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Dec 2019 09:08:19 -0800 (PST)
+        Thu, 5 Dec 2019 12:51:37 -0500
+Received: by mail-vk1-f195.google.com with SMTP id g7so1390435vkl.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Dec 2019 09:51:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=Rqa3jh+6LIF8YzAGtK9fK9ZOaVj+sTsIrw+GWH4Cjrg=;
-        b=Uyz63hAn345BJ8LJhhZZAoGPJVDMxd0b5PnxrN2YnD4IDq28X3+9E09E39DF1q4+ju
-         q+UyCJ2bo/PF7yemR6x3EYpALQLPxsot3gaq2sud8tYLik9tdF9t2ETd3nj9jPMwEpZ2
-         9FBCp3cFEG/RUTiHRop7+bGuUnEPXS3EZIo/g=
+        b=SeMdfkp+Wi/W5LgJGzFKkrF34IoVAxiin42Q78JEzex1+IjUQ4CWTM3NIOmkUL53rF
+         JEAFveuWtm4vbKheNX7SnrI6YswRuztjzOvvco90NXCek/nimvkRixMcESmzEn9pasYU
+         lQsq4Ohz20QiuIQFTwghwIsUMqod97zYXs8Kc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=Rqa3jh+6LIF8YzAGtK9fK9ZOaVj+sTsIrw+GWH4Cjrg=;
-        b=ahSHl8W/NA6dHRD4wSAxZoFdHCXwaVWsvLhW4+m2j5cNDcQ1C+6DanAVU4DsX8BO8T
-         X5BENCVX6O67qvVkOguUXuYz1fkFASKd2M9Ki2+fs/7BIeEPwabx/lC3DQqdwV5oEtL8
-         raBRVRdeDZd0XscQT5unC16aSzraf+zKVIdr5pTL3xze81xmsubRQDqa4n9Md32EBn1i
-         PRXyyHxdIxDutTNGUrRDjy/IIR31WDqR0Uu39Y9g2Z2ONDPgr/U1e5FakcOk567RUHYg
-         1JZ1SWvWykX0lSQtaMgB5mssqwVofX8+fqpYjsbD7LTxasqbuJ7qIs9gL1a05WvlU1p+
-         8AIA==
-X-Gm-Message-State: APjAAAUYBZ1lNNMrVAaU4+wAXW4eICgy0OCuE06M2E8C61VG8apA8HY0
-        BPSMfWfG3iJ2aM1REqjlsc66Qg6fXRY=
-X-Google-Smtp-Source: APXvYqx36GUcJd/FkO8U6NTPjNsHUi4/WaXyPjtUqeL7TbiapdDPtADh3fQE/1Fio2UcNtH+DHDfFw==
-X-Received: by 2002:ab0:30eb:: with SMTP id d11mr8301445uam.67.1575565698348;
-        Thu, 05 Dec 2019 09:08:18 -0800 (PST)
+        b=LEobAioA8FCsYrLchEH5OWlP+WV/faENpxNenxndE0dhTNqsTr/xi1fZtHH/ZeqRkl
+         mJokUs5TlWrcftfejjh6QdeE4CxBxeZjy94CKVilfD/u8vOawBlJx0xSiVFZYQwedg6U
+         p7uftaqOz/gy8VkdGrMqWb/UGZuo/YUETSq6CqfqYUa+K03yodJHjDPrCZXTAusC0alO
+         8ilfG3DSWOEqA/FSusHs0wwOzOdWWRA/0bSitkUqSinCUDrEk0BZGr1mbgAUSTTjUp0n
+         edlyZuUCEI2hNZ0vePDN2WM+SJe3pMwXDkLUDpb2ej3tjaOFoKXZkebMkQUUia797sPC
+         nNyg==
+X-Gm-Message-State: APjAAAXKjTQdWrSOs1br7hQvfKEJyZvWJ6hrAgxIa2AXhfYinY6YDewp
+        Cd4epTj0rf8sLP2/YKX887JjoAGSskI=
+X-Google-Smtp-Source: APXvYqyMcmhCornn8XBK/9zPIb6HwN0lKh2J4Vv7d2tVxKIfdeGNLbuH+KEaB7PyPTcEJ0tnkrOkIw==
+X-Received: by 2002:a1f:9f01:: with SMTP id i1mr7706193vke.54.1575568295863;
+        Thu, 05 Dec 2019 09:51:35 -0800 (PST)
 Received: from alain.us-east1-b.c.cloudtop-prod.google.com.internal (239.145.196.35.bc.googleusercontent.com. [35.196.145.239])
-        by smtp.gmail.com with ESMTPSA id h2sm4583112vkn.15.2019.12.05.09.07.45
+        by smtp.gmail.com with ESMTPSA id a6sm3949327vsr.9.2019.12.05.09.51.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2019 09:08:03 -0800 (PST)
+        Thu, 05 Dec 2019 09:51:35 -0800 (PST)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [RFC v2] Adding support for blocking keys and mgmt tests.
-Date:   Thu,  5 Dec 2019 17:07:31 +0000
-Message-Id: <20191205170731.118286-1-alainm@chromium.org>
+Subject: [RFC BlueZ v2] Adding support for blocking keys and mgmt tests.
+Date:   Thu,  5 Dec 2019 17:51:32 +0000
+Message-Id: <20191205175132.123632-1-alainm@chromium.org>
 X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
