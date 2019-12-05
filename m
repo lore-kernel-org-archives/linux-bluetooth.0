@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0276EC43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8CBC43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:08:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B747020801
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:07:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7804A20801
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Dec 2019 17:08:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MXIY3zm0"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Uyz63hAn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729685AbfLERHA (ORCPT
+        id S1729894AbfLERIU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Dec 2019 12:07:00 -0500
-Received: from mail-vk1-f193.google.com ([209.85.221.193]:45319 "EHLO
-        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729430AbfLERHA (ORCPT
+        Thu, 5 Dec 2019 12:08:20 -0500
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:44658 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729711AbfLERIU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Dec 2019 12:07:00 -0500
-Received: by mail-vk1-f193.google.com with SMTP id g7so1339526vkl.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Dec 2019 09:06:59 -0800 (PST)
+        Thu, 5 Dec 2019 12:08:20 -0500
+Received: by mail-ua1-f67.google.com with SMTP id d6so1588831uam.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Dec 2019 09:08:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=yD4mG0V3cCGMYMMaEt+q2dp9hTxtTDzg9H8ns6CAN5w=;
-        b=MXIY3zm0O2XGY0al7eWrkUgBQvINbMgMBAG4agLDw7HVE+/G8dnAAge3VZw9vx4ddt
-         wd/oGBaDjHaessldQjJNA7eob1VMnBOkEAtPfUfMnvpdT0pPclCLtHwrX2YuJzEm3gpk
-         0NgO/xUsGEO25Xp4tyeuWEmg7Y7Uy2hlFtAK0=
+        bh=Rqa3jh+6LIF8YzAGtK9fK9ZOaVj+sTsIrw+GWH4Cjrg=;
+        b=Uyz63hAn345BJ8LJhhZZAoGPJVDMxd0b5PnxrN2YnD4IDq28X3+9E09E39DF1q4+ju
+         q+UyCJ2bo/PF7yemR6x3EYpALQLPxsot3gaq2sud8tYLik9tdF9t2ETd3nj9jPMwEpZ2
+         9FBCp3cFEG/RUTiHRop7+bGuUnEPXS3EZIo/g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=yD4mG0V3cCGMYMMaEt+q2dp9hTxtTDzg9H8ns6CAN5w=;
-        b=ik81a+IvXPlEUpVQBmRFuS1xKfpWg+3kUUN1PhULu3RH2/2A2bOpeACcdgJbAI76+y
-         YpqvZKZgjeIBwrhuDlHui6yiLi6TYk6ZzvFxu5/ziepq0/us+h+o3QNit/TZM+s0gPu6
-         u0phuNvI5knvhu3cBknFOe/o5OrkpHARpxo+CiwYDeazCbAy3j01Kcjet9hRtFPkR3Ba
-         L4IKHUSi2MaMHB435mZ4iqY89LitcmHQnKdtGFWMjuAAU7A9PpVtmBSSAB9KHKecB0k/
-         1QmJBuMG8q+/D5pc42k7qDiUxiq+rG7dxh1Kgy711+/qpjN3nOQ8KboEz1NYSqPKTCQg
-         Ri4w==
-X-Gm-Message-State: APjAAAUJM7ExHvbO7ROuYCsWvgTFoLa6LINqTmMfvlOkHGEL6XPWqlTN
-        cCE92FkzCeBNU0VNb8u7w7xaTuds6oA=
-X-Google-Smtp-Source: APXvYqz3RA3gJuauxQZxjE9y+lvp6fySK/RYLTBBSjcF0Y26YpFfCzk3Gh/Z+oh4kArxBiw+Q2usrA==
-X-Received: by 2002:a1f:ec41:: with SMTP id k62mr7751491vkh.87.1575565618330;
-        Thu, 05 Dec 2019 09:06:58 -0800 (PST)
+        bh=Rqa3jh+6LIF8YzAGtK9fK9ZOaVj+sTsIrw+GWH4Cjrg=;
+        b=ahSHl8W/NA6dHRD4wSAxZoFdHCXwaVWsvLhW4+m2j5cNDcQ1C+6DanAVU4DsX8BO8T
+         X5BENCVX6O67qvVkOguUXuYz1fkFASKd2M9Ki2+fs/7BIeEPwabx/lC3DQqdwV5oEtL8
+         raBRVRdeDZd0XscQT5unC16aSzraf+zKVIdr5pTL3xze81xmsubRQDqa4n9Md32EBn1i
+         PRXyyHxdIxDutTNGUrRDjy/IIR31WDqR0Uu39Y9g2Z2ONDPgr/U1e5FakcOk567RUHYg
+         1JZ1SWvWykX0lSQtaMgB5mssqwVofX8+fqpYjsbD7LTxasqbuJ7qIs9gL1a05WvlU1p+
+         8AIA==
+X-Gm-Message-State: APjAAAUYBZ1lNNMrVAaU4+wAXW4eICgy0OCuE06M2E8C61VG8apA8HY0
+        BPSMfWfG3iJ2aM1REqjlsc66Qg6fXRY=
+X-Google-Smtp-Source: APXvYqx36GUcJd/FkO8U6NTPjNsHUi4/WaXyPjtUqeL7TbiapdDPtADh3fQE/1Fio2UcNtH+DHDfFw==
+X-Received: by 2002:ab0:30eb:: with SMTP id d11mr8301445uam.67.1575565698348;
+        Thu, 05 Dec 2019 09:08:18 -0800 (PST)
 Received: from alain.us-east1-b.c.cloudtop-prod.google.com.internal (239.145.196.35.bc.googleusercontent.com. [35.196.145.239])
-        by smtp.gmail.com with ESMTPSA id t8sm1286419vke.23.2019.12.05.09.06.50
+        by smtp.gmail.com with ESMTPSA id h2sm4583112vkn.15.2019.12.05.09.07.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2019 09:06:51 -0800 (PST)
+        Thu, 05 Dec 2019 09:08:03 -0800 (PST)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [RFC v2] Implementation of MGMT_OP_SET_BLOCKED_KEYS.
-Date:   Thu,  5 Dec 2019 17:06:45 +0000
-Message-Id: <20191205170645.117976-1-alainm@chromium.org>
+Subject: [RFC v2] Adding support for blocking keys and mgmt tests.
+Date:   Thu,  5 Dec 2019 17:07:31 +0000
+Message-Id: <20191205170731.118286-1-alainm@chromium.org>
 X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -71,54 +71,18 @@ Here's a newer version with most of your feedback addressed.  Others
 responses sent inline in the v1.
 
 ---
- include/net/bluetooth/hci_core.h |  9 +++++
- include/net/bluetooth/mgmt.h     | 17 ++++++++++
- net/bluetooth/hci_core.c         | 56 ++++++++++++++++++++++++++++++--
- net/bluetooth/mgmt.c             | 51 +++++++++++++++++++++++++++++
- net/bluetooth/smp.c              |  8 +++++
- 5 files changed, 138 insertions(+), 3 deletions(-)
+ lib/mgmt.h       | 17 +++++++++++++
+ src/adapter.c    | 65 +++++++++++++++++++++++++++++++++++++++++++++++-
+ unit/test-mgmt.c | 33 ++++++++++++++++++++++++
+ 3 files changed, 114 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b689aceb636b..e9a789e11493 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -118,6 +118,13 @@ struct bt_uuid {
- 	u8 svc_hint;
- };
- 
-+struct blocked_key {
-+	struct list_head list;
-+	struct rcu_head rcu;
-+	u8 type;
-+	u8 val[16];
-+};
-+
- struct smp_csrk {
- 	bdaddr_t bdaddr;
- 	u8 bdaddr_type;
-@@ -397,6 +404,7 @@ struct hci_dev {
- 	struct list_head	le_conn_params;
- 	struct list_head	pend_le_conns;
- 	struct list_head	pend_le_reports;
-+	struct list_head	blocked_keys;
- 
- 	struct hci_dev_stats	stat;
- 
-@@ -1121,6 +1129,7 @@ struct smp_irk *hci_find_irk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
- struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			    u8 addr_type, u8 val[16], bdaddr_t *rpa);
- void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type);
-+bool hci_is_blocked_key(struct hci_dev *hdev, u8 type, u8 val[16]);
- void hci_smp_irks_clear(struct hci_dev *hdev);
- 
- bool hci_bdaddr_is_paired(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 9cee7ddc6741..c9b1d39d6d6c 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -654,6 +654,23 @@ struct mgmt_cp_set_phy_confguration {
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 570dec997..3e2e26e68 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -583,6 +583,23 @@ struct mgmt_cp_set_phy_confguration {
+ 	uint32_t	selected_phys;
  } __packed;
- #define MGMT_SET_PHY_CONFIGURATION_SIZE	4
  
 +#define MGMT_OP_SET_BLOCKED_KEYS	0x0046
 +
@@ -127,224 +91,173 @@ index 9cee7ddc6741..c9b1d39d6d6c 100644
 +#define HCI_BLOCKED_KEY_TYPE_IRK		0x02
 +
 +struct mgmt_blocked_key_info {
-+	__u8 type;
-+	__u8 val[16];
++	uint8_t type;
++	uint8_t val[16];
 +} __packed;
 +
 +struct mgmt_cp_set_blocked_keys {
-+	__le16 key_count;
++	uint16_t key_count;
 +	struct mgmt_blocked_key_info keys[0];
 +} __packed;
 +#define MGMT_OP_SET_BLOCKED_KEYS_SIZE 0
 +
+ 
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9e19d5a3aac8..52e7bf295a51 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2311,6 +2311,35 @@ void hci_smp_irks_clear(struct hci_dev *hdev)
- 	}
+diff --git a/src/adapter.c b/src/adapter.c
+index cef25616f..f571961bb 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -99,10 +99,25 @@
+ #define DISTANCE_VAL_INVALID	0x7FFF
+ #define PATHLOSS_MAX		137
+ 
++/**
++ * These are known security keys that have been compromised.
++ * If this grows or there are needs to be platform specific, it is
++ * conceivable that these could be read from a config file.
++*/ 
++static const struct mgmt_blocked_key_info blocked_keys [] = {
++	// Google Titan Security Keys
++	{ HCI_BLOCKED_KEY_TYPE_LTK, {0xbf, 0x01, 0xfb, 0x9d, 0x4e, 0xf3, 0xbc, 0x36,
++		 					0xd8, 0x74, 0xf5, 0x39, 0x41, 0x38, 0x68, 0x4c}},
++	{ HCI_BLOCKED_KEY_TYPE_IRK, {0xa5, 0x99, 0xba, 0xe4, 0xe1, 0x7c, 0xa6, 0x18,
++					0x22, 0x8e, 0x07, 0x56, 0xb4, 0xe8, 0x5f, 0x01}},
++};
++
+ static DBusConnection *dbus_conn = NULL;
+ 
+ static bool kernel_conn_control = false;
+ 
++static bool kernel_blocked_keys_supported = false;
++
+ static GList *adapter_list = NULL;
+ static unsigned int adapter_remaining = 0;
+ static bool powering_down = false;
+@@ -8568,6 +8583,40 @@ static bool set_static_addr(struct btd_adapter *adapter)
+ 	return false;
  }
  
-+static void hci_blocked_keys_clear(struct hci_dev *hdev)
++static void set_blocked_keys_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct blocked_key *b;
++	struct btd_adapter *adapter = user_data;
 +
-+	list_for_each_entry_rcu(b, &hdev->blocked_keys, list) {
-+		list_del_rcu(&b->list);
-+		kfree_rcu(b, rcu);
-+	}
-+}
-+
-+bool hci_is_blocked_key(struct hci_dev *hdev, u8 type, u8 val[16])
-+{
-+	bool blocked = false;
-+	struct blocked_key *b;
-+
-+	rcu_read_lock();
-+	list_for_each_entry(b, &hdev->blocked_keys, list) {
-+		if (b->type == type &&
-+				!memcmp(b->val, val, sizeof(b->val))) {
-+			blocked = true;
-+			goto done;
-+		}
++	if (status != MGMT_STATUS_SUCCESS) {
++		btd_error(adapter->dev_id,
++				"Failed to set blocked keys: %s (0x%02x)",
++				mgmt_errstr(status), status);
++		return;
 +	}
 +
-+done:
-+	rcu_read_unlock();
-+	return blocked;
++	DBG("Successfully set blocked keys for index %u", adapter->dev_id);
 +}
 +
- struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
++static bool set_blocked_keys(struct btd_adapter *adapter)
++{
++	uint8_t buffer[sizeof(struct mgmt_cp_set_blocked_keys) +
++					sizeof(blocked_keys)] = { 0 };
++	struct mgmt_cp_set_blocked_keys *cp =
++					(struct mgmt_cp_set_blocked_keys *)buffer;
++	int i;
++
++	cp->key_count = G_N_ELEMENTS(blocked_keys);
++	for (i = 0; i < cp->key_count; ++i) {
++		cp->keys[i].type = blocked_keys[i].type;
++		memcpy(cp->keys[i].val, blocked_keys[i].val, sizeof(cp->keys[i].val));
++	}
++
++	return mgmt_send(mgmt_master, MGMT_OP_SET_BLOCKED_KEYS, adapter->dev_id,
++					sizeof(buffer),	buffer,	set_blocked_keys_complete,
++					adapter, NULL);
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	struct link_key *k;
-@@ -2319,6 +2348,16 @@ struct link_key *hci_find_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	list_for_each_entry_rcu(k, &hdev->link_keys, list) {
- 		if (bacmp(bdaddr, &k->bdaddr) == 0) {
- 			rcu_read_unlock();
+@@ -8795,6 +8844,12 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 
+ 	set_name(adapter, btd_adapter_get_name(adapter));
+ 
++	if (kernel_blocked_keys_supported && !set_blocked_keys(adapter)) {
++		btd_error(adapter->dev_id,
++			"Failed to set blocked keys for index %u", adapter->dev_id);
++		goto failed;
++	}
 +
-+			if (hci_is_blocked_key(hdev, HCI_BLOCKED_KEY_TYPE_LINKKEY,
-+						k->val)) {
-+				WARN_ONCE(1, "Key blocked for %pMR", &k->bdaddr);
-+
-+				/* The device may have refreshed it to a new one which
-+			 	 * would imply a second key is in the list */
-+				continue;
-+			}
-+
- 			return k;
+ 	if (main_opts.pairable &&
+ 			!(adapter->current_settings & MGMT_SETTING_BONDABLE))
+ 		set_mode(adapter, MGMT_OP_SET_BONDABLE, 0x01);
+@@ -8972,9 +9027,17 @@ static void read_commands_complete(uint8_t status, uint16_t length,
+ 	for (i = 0; i < num_commands; i++) {
+ 		uint16_t op = get_le16(rp->opcodes + i);
+ 
+-		if (op == MGMT_OP_ADD_DEVICE) {
++		switch (op){
++		case MGMT_OP_ADD_DEVICE:
+ 			DBG("enabling kernel-side connection control");
+ 			kernel_conn_control = true;
++			break;
++		case MGMT_OP_SET_BLOCKED_KEYS:
++			DBG("kernel supports the set_blocked_keys op");
++			kernel_blocked_keys_supported = true;
++			break;
++		default:
++			break;
  		}
  	}
-@@ -2387,6 +2426,12 @@ struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 
- 		if (smp_ltk_is_sc(k) || ltk_role(k->type) == role) {
- 			rcu_read_unlock();
-+
-+			if (hci_is_blocked_key(hdev, HCI_BLOCKED_KEY_TYPE_LTK, k->val)) {
-+				WARN_ONCE(1, "Key blocked for %pMR", &k->bdaddr);
-+				return NULL;
-+			}
-+
- 			return k;
- 		}
- 	}
-@@ -2548,10 +2593,13 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	if (!key)
- 		return -ENOENT;
- 
--	BT_DBG("%s removing %pMR", hdev->name, bdaddr);
-+	do {
-+		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
- 
--	list_del_rcu(&key->list);
--	kfree_rcu(key, rcu);
-+		list_del_rcu(&key->list);
-+		kfree_rcu(key, rcu);
-+		key = hci_find_link_key(hdev, bdaddr);
-+	} while (key);
- 
- 	return 0;
  }
-@@ -3244,6 +3292,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->pend_le_reports);
- 	INIT_LIST_HEAD(&hdev->conn_hash.list);
- 	INIT_LIST_HEAD(&hdev->adv_instances);
-+	INIT_LIST_HEAD(&hdev->blocked_keys);
- 
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-@@ -3443,6 +3492,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_bdaddr_list_clear(&hdev->le_resolv_list);
- 	hci_conn_params_clear_all(hdev);
- 	hci_discovery_filter_clear(hdev);
-+	hci_blocked_keys_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index acb7c6d5643f..6fb4ce768863 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -106,6 +106,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_START_LIMITED_DISCOVERY,
- 	MGMT_OP_READ_EXT_INFO,
- 	MGMT_OP_SET_APPEARANCE,
-+	MGMT_OP_SET_BLOCKED_KEYS,
+diff --git a/unit/test-mgmt.c b/unit/test-mgmt.c
+index c67678b9a..d73c03f61 100644
+--- a/unit/test-mgmt.c
++++ b/unit/test-mgmt.c
+@@ -256,6 +256,33 @@ static const struct command_test_data command_test_3 = {
+ 	.rsp_status = MGMT_STATUS_INVALID_INDEX,
  };
  
- static const u16 mgmt_events[] = {
-@@ -3531,6 +3532,55 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
++static const unsigned char invalid_key_buffer[] =
++ { 0x01, 0x02 };
++
++static const struct command_test_data command_test_set_blocked_keys1 = {
++ .opcode = MGMT_OP_SET_BLOCKED_KEYS,
++ .index = MGMT_INDEX_NONE,
++ .cmd_data = invalid_key_buffer,
++ .cmd_size = sizeof(invalid_key_buffer),
++ .rsp_data = NULL,
++ .rsp_size = 0,
++ .rsp_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const unsigned char valid_keys_buffer1[] =
++ { 0x01, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
++ 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
++
++static const struct command_test_data command_test_set_blocked_keys2 = {
++ .opcode = MGMT_OP_SET_BLOCKED_KEYS,
++ .index = MGMT_INDEX_NONE,
++ .cmd_data = valid_keys_buffer1,
++ .cmd_size = sizeof(valid_keys_buffer1),
++ .rsp_data = NULL,
++ .rsp_size = 0,
++ .rsp_status = MGMT_STATUS_SUCCESS,
++};
++
+ static const unsigned char event_index_added[] =
+ 				{ 0x04, 0x00, 0x01, 0x00, 0x00, 0x00 };
  
-+static int set_blocked_keys(struct sock *sk, struct hci_dev *hdev, void *data,
-+			  u16 len)
-+{
-+	int err = MGMT_STATUS_SUCCESS;
-+
-+	if (len < sizeof (struct mgmt_cp_set_blocked_keys) ||
-+	    ((len - offsetof(struct mgmt_cp_set_blocked_keys, keys)) %
-+			sizeof(struct mgmt_blocked_key_info))) {
-+		return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_BLOCKED_KEYS,
-+				MGMT_STATUS_INVALID_PARAMS, NULL, 0);
-+	}
-+
-+	hci_dev_lock(hdev);
-+	{
-+		struct mgmt_cp_set_blocked_keys *keys = data;
-+		int i;
-+		for (i = 0; i < keys->key_count; ++i) {
-+			bool already_blocked = false;
-+			struct blocked_key *b;
-+
-+			list_for_each_entry(b, &hdev->blocked_keys, list) {
-+				if (keys->keys[i].type == b->type &&
-+					!memcmp(keys->keys[i].val, b->val,
-+							sizeof(keys->keys[i].val))) {
-+					already_blocked = true;
-+					break;
-+				}
-+			}
-+
-+			if (already_blocked)
-+				continue;
-+
-+			b = kzalloc(sizeof(*b), GFP_KERNEL);
-+			if (!b) {
-+				err = MGMT_STATUS_NO_RESOURCES;
-+				break;
-+			}
-+
-+			b->type = keys->keys[i].type;
-+			memcpy(b->val, keys->keys[i].val, sizeof(b->val));
-+			list_add_rcu(&b->list, &hdev->blocked_keys);
-+		}
-+	}
-+	hci_dev_unlock(hdev);
-+
-+	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_BLOCKED_KEYS,
-+				err, NULL, 0);
-+}
-+
- static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
- 				         u16 opcode, struct sk_buff *skb)
- {
-@@ -6914,6 +6964,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ set_appearance,	   MGMT_SET_APPEARANCE_SIZE },
- 	{ get_phy_configuration,   MGMT_GET_PHY_CONFIGURATION_SIZE },
- 	{ set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
-+	{ set_blocked_keys,	   MGMT_OP_SET_BLOCKED_KEYS_SIZE },
- };
+@@ -441,6 +468,12 @@ int main(int argc, char *argv[])
+ 	g_test_add_data_func("/mgmt/response/2", &command_test_3,
+ 								test_response);
  
- void mgmt_index_added(struct hci_dev *hdev)
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 6b42be4b5861..f61c78d81168 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2453,6 +2453,10 @@ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (skb->len < sizeof(*rp))
- 		return SMP_INVALID_PARAMS;
- 
-+	if (hci_is_blocked_key(conn->hcon->hdev, HCI_BLOCKED_KEY_TYPE_LTK,
-+			rp->ltk))
-+		return SMP_INVALID_PARAMS;
++	g_test_add_data_func("/mgmt/command/set_blocked_keys1",
++						&command_test_set_blocked_keys1, test_command);
 +
- 	SMP_ALLOW_CMD(smp, SMP_CMD_MASTER_IDENT);
- 
- 	skb_pull(skb, sizeof(*rp));
-@@ -2509,6 +2513,10 @@ static int smp_cmd_ident_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (skb->len < sizeof(*info))
- 		return SMP_INVALID_PARAMS;
- 
-+	if (hci_is_blocked_key(conn->hcon->hdev, HCI_BLOCKED_KEY_TYPE_IRK,
-+			info->irk))
-+		return SMP_INVALID_PARAMS;
++	g_test_add_data_func("/mgmt/command/set_blocked_keys2",
++						&command_test_set_blocked_keys2, test_command);
 +
- 	SMP_ALLOW_CMD(smp, SMP_CMD_IDENT_ADDR_INFO);
+ 	g_test_add_data_func("/mgmt/event/1", &event_test_1, test_event);
+ 	g_test_add_data_func("/mgmt/event/2", &event_test_1, test_event2);
  
- 	skb_pull(skb, sizeof(*info));
 -- 
 2.24.0.393.g34dc348eaf-goog
 
