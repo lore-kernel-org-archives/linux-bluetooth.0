@@ -2,120 +2,134 @@ Return-Path: <SRS0=M10/=Z4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7763C43603
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 00:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70836C43603
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 04:09:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C8AB2245C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 00:58:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2154D21823
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 04:09:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="XKCWfMb4"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dGGKbUP6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbfLFA6g (ORCPT
+        id S1726407AbfLFEJG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Dec 2019 19:58:36 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:42498 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726037AbfLFA6f (ORCPT
+        Thu, 5 Dec 2019 23:09:06 -0500
+Received: from mailout1.samsung.com ([203.254.224.24]:30359 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726076AbfLFEJG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Dec 2019 19:58:35 -0500
-Received: by mail-pg1-f194.google.com with SMTP id i5so2395888pgj.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Dec 2019 16:58:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=7Hnuh/lhbaWi78zw47f4T7dSKS95Ee02qVxYEAo3AJs=;
-        b=XKCWfMb4QVNiufc2OLqSEvsCeB+7bLRHN20uFBfrt59dBJT/SgzoA6qehPcrONCMWv
-         qYLqZqHgkEjBtbRaeNMdK0TkNzNNq36de60MThmXWCSLKuBbgMM/ctmNkfWCq1xOMrzw
-         YOP2KjaFZ41eDvZ17cDg27xpENCOq4fg6UJZBpNri7lNrSXYCIJ5ETnSO42yELksrhPD
-         Rex8eS7cHn46wU7whzIAXg2Xj82jorofAiQKypMqsp2/hzBu89J4beD9lmQolbq9K4/2
-         CEYZ1ZlIj+QEgAgiV0sDR/IqfObtRKHLemeMfnBcApAD/N8cgg3ryxIGb1nHxo4SGqGC
-         kwgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=7Hnuh/lhbaWi78zw47f4T7dSKS95Ee02qVxYEAo3AJs=;
-        b=SusvjRPlsVhSgw9tv7rLKPsyzSTNDuuiubbU3uZ4A5OHmND5UO3Q5ecAOE9zPFHgRk
-         fcbBV9WiaHIBjsx7PyPxTffXM2unIJR90qUOWqjHXPpHH816kZm2naNPHo7MKS+HdzB3
-         Hq1hPLmW8BMSgAKklyUFSIRlH+za7zrtL+rprWmm0gjYtut2NoJiKgtEJShccOXkO7a/
-         FSSyF0V0NH/efb2m3fvlbXF81tLCQ+KT33DMURRVEk5b3bx6W5j+zNvKzeWszQUWmQny
-         U+mBFpFbO9SKaq99DbK+iASDkwlT+n4ksnEutgmZGRTfr4Jxr7VxWALXajWllnj7npMf
-         tznw==
-X-Gm-Message-State: APjAAAW/W1q6Yl1dgkbyGgmgFxeM1362ahArnN8q0cQ4/ft4hi1gNjQ6
-        ge+hpsZaFVk8KpUjmZ0JcT9wOA==
-X-Google-Smtp-Source: APXvYqxr+lwRkxpfc0ZURjTqY+KCamdHypKJniTnQq5FbwwNIkUC38xRGVONLHE4KLCVnUBmRLoPlg==
-X-Received: by 2002:a62:87c5:: with SMTP id i188mr11903453pfe.52.1575593915169;
-        Thu, 05 Dec 2019 16:58:35 -0800 (PST)
-Received: from localhost (c-71-197-186-152.hsd1.wa.comcast.net. [71.197.186.152])
-        by smtp.gmail.com with ESMTPSA id d6sm875807pju.8.2019.12.05.16.58.34
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 05 Dec 2019 16:58:34 -0800 (PST)
-From:   Kevin Hilman <khilman@baylibre.com>
-To:     Guillaume La Roque <glaroque@baylibre.com>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] bluetooth: hci_bcm: enable IRQ capability from node
-In-Reply-To: <20191204161239.16653-1-glaroque@baylibre.com>
-References: <20191204161239.16653-1-glaroque@baylibre.com>
-Date:   Thu, 05 Dec 2019 16:58:34 -0800
-Message-ID: <7hv9qu2rt1.fsf@baylibre.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Thu, 5 Dec 2019 23:09:06 -0500
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20191206040903epoutp017599e80cc5e3315c9bc6ae2e6962c55f~drLZGU4Y60452804528epoutp01Q
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2019 04:09:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20191206040903epoutp017599e80cc5e3315c9bc6ae2e6962c55f~drLZGU4Y60452804528epoutp01Q
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1575605343;
+        bh=D8b3fXY9p3ghBt5uxcATFJqG+c+LG92bM8lbhYjFRdE=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=dGGKbUP6UzC9WtHarN9pzGx+4+h73QtMmFkyUSoB5I/WDFyonW0XtRuC9HwJi3aan
+         KmYM4jGjHsziBk8Y2lzLKjwakXAXBtpjwZYqZZkVn6dJy6oavmpGHVHHuWsJwFLOPb
+         BlN5uRBoPnjgkeZ+0WwNVmXGLnFf45hiJBsaigZs=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20191206040902epcas5p4f190fd196aed29756dce780abfe8ac0a~drLYnTRlm2392223922epcas5p44;
+        Fri,  6 Dec 2019 04:09:02 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.40.197]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 47TfGj4grmzMqYkg; Fri,  6 Dec
+        2019 04:09:01 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        70.25.19726.D54D9ED5; Fri,  6 Dec 2019 13:09:01 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20191206040900epcas5p2ccb274134dab1154452d6f8d75dfedac~drLWBlLm73137531375epcas5p2D;
+        Fri,  6 Dec 2019 04:09:00 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20191206040900epsmtrp2033cba9a103d9dd6349aee4ccf6ef66d~drLWBEad01294412944epsmtrp2F;
+        Fri,  6 Dec 2019 04:09:00 +0000 (GMT)
+X-AuditID: b6c32a49-7c1ff70000014d0e-ca-5de9d45d5341
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A4.75.06569.C54D9ED5; Fri,  6 Dec 2019 13:09:00 +0900 (KST)
+Received: from SyamLinux.sa.corp.samsungelectronics.net (unknown
+        [107.109.107.247]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20191206040859epsmtip2f832b1cffd55dee0be839cbcc8820206~drLVmD0Nu1292012920epsmtip24;
+        Fri,  6 Dec 2019 04:08:59 +0000 (GMT)
+From:   Prathyusha Nelluri <prathyusha.n@samsung.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Prathyusha N <prathyusha.n@samsung.com>
+Subject: [PATCH 1/1] mesh: Start link establishment timer of 60 sec
+Date:   Fri,  6 Dec 2019 09:38:39 +0530
+Message-Id: <1575605319-461-1-git-send-email-prathyusha.n@samsung.com>
+X-Mailer: git-send-email 2.7.4
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHKsWRmVeSWpSXmKPExsWy7bCmpm7slZexBmcXKFnMudbHbPF/6S12
+        ByaPvi2rGD0+b5ILYIrKsclITUxJLVJIzUvOT8nMS7dV8g6Od443NTMw1DW0tDBXUshLzE21
+        VXLxCdB1y8wBGq+kUJaYUwoUCkgsLlbSt7Mpyi8tSVXIyC8usVVKLUjJKTA0KtArTswtLs1L
+        10vOz7UyNDAwMgWqTMjJeLjrDGvBR7aKq9vnMjYwXmLtYuTkkBAwkXjTcoGpi5GLQ0hgN6PE
+        xrfvmSGcT4wSPxdvYINwvjFK7LuznhmmZdWXr6wQib2MEsfndrNAOB1MEnOPTmIEqWITMJY4
+        f/MVE4gtIqAs8WzfYTCbWUBbYtKbmWC2sICzxMKnK8CmsgioSqx7vwEszivgJnFuywGobXIS
+        N891gt0kIXCSVeLIzBuMEAkXiRl/XzNB2MISr45vYYewpSQ+v9vLBmF3M0rsfuMK0TyFUeLe
+        i8NQDfYSTzfNBWrgALpIU2L9Ln2I4/gken8/YQIJSwjwSnS0CUFUK0ismjoRqlNMYt30L1Cr
+        PCR+Nm0HB6SQQKzEnG33WCYwysxCGLqAkXEVo2RqQXFuemqxaYFhXmo5cuxsYgSnFS3PHYyz
+        zvkcYhTgYFTi4Z3x+UWsEGtiWXFl7iFGCQ5mJRHedL6XsUK8KYmVValF+fFFpTmpxYcYTYGB
+        NpFZSjQ5H5jy8kriDU2NzMwMLA1MjS3MDJXEeSexXo0REkhPLEnNTk0tSC2C6WPi4JRqYJSX
+        XVrmKDvP74joCxk/7et3dk2r3HXm+b4X8mHzDWQ2+r6sLuVLCpvnOOvHevU2/fX2M64YXGu5
+        w5Djx6L957KA3Rnef7L9RyUF9+ewBTAt3avQZnbHXtAxS8Bshnewyo99tbn7FvlO+3Dt/Fbv
+        VYfaBc69+V7zZ9/89wXJczPqlOSvrZrT76rEUpyRaKjFXFScCADn+RNcQQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCJMWRmVeSWpSXmKPExsWy7bCSvG7MlZexBoffc1nMudbHbPF/6S12
+        ByaPvi2rGD0+b5ILYIrisklJzcksSy3St0vgyni46wxrwUe2iqvb5zI2MF5i7WLk5JAQMJFY
+        9eUrkM3FISSwm1Fi/qddbBAJMYk3K06wQ9jCEiv/PWeHKGpjkvj3dRkjSIJNwFji/M1XTCC2
+        iICyxLN9h8FsZgFtiUlvZoLZwgLOEgufrmAGsVkEVCXWvd8AFucVcJM4t+UAM8QCOYmb5zqZ
+        JzDyLGBkWMUomVpQnJueW2xYYJSXWq5XnJhbXJqXrpecn7uJEex3La0djCdOxB9iFOBgVOLh
+        nfH5RawQa2JZcWXuIUYJDmYlEd50vpexQrwpiZVVqUX58UWlOanFhxilOViUxHnl849FCgmk
+        J5akZqemFqQWwWSZODilGhhLHe+3P4xx+Hi/Xmq+xuX0967nAtovrF+Uy7JgiZPK9aIt5z4e
+        f7Lkq9nSpqWzP0TYrVj/7PXvK9MsV6+8t/r+qbiSN/KSK+Yv3/OsY1/G6nscbwta3u7beyF4
+        gfH0gighhsLsQ8+3yRdzrm2fbrL8ienD++dfB00sbdt0wEpsixF7y+5m5Q18dkosxRmJhlrM
+        RcWJADr/vtP3AQAA
+X-CMS-MailID: 20191206040900epcas5p2ccb274134dab1154452d6f8d75dfedac
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20191206040900epcas5p2ccb274134dab1154452d6f8d75dfedac
+References: <CGME20191206040900epcas5p2ccb274134dab1154452d6f8d75dfedac@epcas5p2.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Guillaume La Roque <glaroque@baylibre.com> writes:
+From: Prathyusha N <prathyusha.n@samsung.com>
 
-> Actually IRQ can be found from GPIO but all platorms don't support
+5.3.2 of Mesh Profile Bluetooth specification:
+To open a link, the provisioner shall start the link establishment
+timer, set to 60 seconds, and then shall start sending Link Open
+messages.
 
-nit: s/platorms/platforms/
+On timeout, close indication will be sent. Provisioner cancels the
+Link Establishment timer, when the link is open i.e. in pb_adv_tx().
+---
+ mesh/pb-adv.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> gpiod_to_irq, it's the case on amlogic chip.
-> so to have possibility to use interrupt mode we need to add interrupts
-> field in node and support it in driver.
->
-> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
-> ---
-> sorry for noise,
->
-> v2 is for rebasing on master branch
->
-> guillaume
->
->  drivers/bluetooth/hci_bcm.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index f8f5c593a05c..9f52d57c56de 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -1409,6 +1409,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
->  {
->  	struct bcm_device *bcmdev;
->  	const struct bcm_device_data *data;
-> +	struct platform_device *pdev;
->  	int err;
->  
->  	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
-> @@ -1421,6 +1422,8 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
->  #endif
->  	bcmdev->serdev_hu.serdev = serdev;
->  	serdev_device_set_drvdata(serdev, bcmdev);
-> +	pdev = to_platform_device(bcmdev->dev);
-> +	bcmdev->irq = platform_get_irq(pdev, 0);
-
-I don't know this driver well enough to be sure, but don't you need some
-error checking here?
-
-If this fails (on platforms with no IRQ defined), is an error code in
-bcmdev->irq going to affect later code that tries to setup IRQs?
-
-Kevin
+diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
+index 27cbc46..c9a2a65 100644
+--- a/mesh/pb-adv.c
++++ b/mesh/pb-adv.c
+@@ -458,6 +458,8 @@ bool pb_adv_reg(bool initiator, mesh_prov_open_func_t open_cb,
+ 
+ 	if (initiator) {
+ 		l_getrandom(&pb_session->link_id, sizeof(pb_session->link_id));
++		pb_session->tx_timeout = l_timeout_create(60, tx_timeout,
++							pb_session, NULL);
+ 		send_open_req(pb_session);
+ 	}
+ 
+-- 
+2.7.4
 
