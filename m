@@ -2,124 +2,137 @@ Return-Path: <SRS0=M10/=Z4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C7DC43603
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 04:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18408C43603
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 09:08:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 696FF21823
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 04:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6F9F24686
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Dec 2019 09:08:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Tztqojv6"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="BE6ht680"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726313AbfLFENo (ORCPT
+        id S1726171AbfLFJIM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Dec 2019 23:13:44 -0500
-Received: from mailout1.samsung.com ([203.254.224.24]:33158 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726287AbfLFENo (ORCPT
+        Fri, 6 Dec 2019 04:08:12 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42449 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726088AbfLFJIM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Dec 2019 23:13:44 -0500
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20191206041342epoutp011d4300293429926a5c42c74626738a14~drPcrrw0w0868608686epoutp01L
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2019 04:13:42 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20191206041342epoutp011d4300293429926a5c42c74626738a14~drPcrrw0w0868608686epoutp01L
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1575605622;
-        bh=C6RbCANrVyu7+PE5XLgUqnxru+qYsykm7/iVeYaD3LA=;
-        h=From:To:Subject:Date:References:From;
-        b=Tztqojv6Dn+qEruRFe/3eJS2yG9QDcsbDkUZUQM4ZfbbApc/jzicRpsg0qjtYXemA
-         gLiMh6xZA+Y+ivYj1HR+G08ne2BKkf7kP7z0Qk7SvfxHXsbo6fk/UFb7v3Q37zIGzH
-         ByHtCOY2IFI3cFFC/Y4f6kffPgBq+Bsuq+A/LEZw=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20191206041341epcas5p4503cf16decf9f96543ea96ddbda62927~drPcFwAgw1160711607epcas5p4v
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2019 04:13:41 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C4.C9.20197.575D9ED5; Fri,  6 Dec 2019 13:13:41 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20191206041341epcas5p4eb1504144abc74f3f25352e63eccf0bd~drPbtGD6o1602916029epcas5p4P
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2019 04:13:41 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20191206041341epsmtrp2a13e0b3871f37304def23cecb7c06f2e~drPbsgmqM1552315523epsmtrp2I
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2019 04:13:41 +0000 (GMT)
-X-AuditID: b6c32a4a-769ff70000014ee5-37-5de9d575ec88
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        82.04.10238.575D9ED5; Fri,  6 Dec 2019 13:13:41 +0900 (KST)
-Received: from SyamLinux.sa.corp.samsungelectronics.net (unknown
-        [107.109.107.247]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20191206041340epsmtip201bedbd10c9e9f918988bd2ccf226e12~drPbVJwVN1240712407epsmtip2d
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2019 04:13:40 +0000 (GMT)
-From:   Anurag Biradar <biradar.a@samsung.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] meshctl: Fix meshctl crash
-Date:   Fri,  6 Dec 2019 09:43:36 +0530
-Message-Id: <1575605616-787-1-git-send-email-biradar.a@samsung.com>
-X-Mailer: git-send-email 2.7.4
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFIsWRmVeSWpSXmKPExsWy7bCmum7p1ZexBnePKFvMudbH7MDo8XmT
-        XABjFJdNSmpOZllqkb5dAlfGz/8L2AvWsVV0fNjG3sC4mrWLkZNDQsBEYuahxSxdjFwcQgK7
-        GSXuvt7FDOHMYJJ4O2MqlDOHSeJy41m4llNdl9ghEnsZJT6f+gtVtY5Jom3/JEaQKjYBHYlf
-        W48yg9giAsoSz/YdZgKxhQX0JaZc6QWyOThYBFQl/r62AAnzCjhLHJy4mh1igZzEzXOdYDMl
-        BFaxSvyduYcNIuEisfbuMhYIW1ji1fEtUA1SEp/f7YWqqZdY9fQTM4TdwSjxtdEXwraXeLpp
-        LjvIXmYBTYn1u/RBwswCfBK9v5+AnSMhwCvR0SYEUa0gsWrqRCYIW0xi3fQvUJs8JDr7D4LZ
-        QgKxEu+7VrBMYJSehTB0ASPjKkbJ1ILi3PTUYtMCo7zUcr3ixNzi0rx0veT83E2M4BjT8trB
-        uOyczyFGAQ5GJR7eGZ9fxAqxJpYVV+YeYpTgYFYS4U3nexkrxJuSWFmVWpQfX1Sak1p8iFGa
-        g0VJnHcS69UYIYH0xJLU7NTUgtQimCwTB6dUA6PymfWXl17+mSV45OxVO7aFOSf0Ne85ux1Y
-        8VFt7tqjSv/Pv4ljkj7GP6csk7G0JlP/5IwHF2JvXvCbsKV7DS+r+x2D3zqTH8/z87jBfPVL
-        bPPK3/mf2r5eqE4Mq+di3fF8gWqNktt7DXk7iXVyu577cFa/9Nfrnr8r48+m6nU7PoiuyV0d
-        a/BNiaU4I9FQi7moOBEALrcLFq0CAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrLJMWRmVeSWpSXmKPExsWy7bCSvG7p1ZexBsfvsFrMudbH7MDo8XmT
-        XABjFJdNSmpOZllqkb5dAlfGz/8L2AvWsVV0fNjG3sC4mrWLkZNDQsBE4lTXJfYuRi4OIYHd
-        jBLXXh1ggUiISbxZcYIdwhaWWPnvOVTRGiaJzV++gnWzCehI/Np6lBnEFhFQlni27zATiC0s
-        oC8x5UovkM3BwSKgKvH3tQVImFfAWeLgxNVQM+Ukbp7rZJ7AyL2AkWEVo2RqQXFuem6xYYFh
-        Xmq5XnFibnFpXrpecn7uJkawJ7U0dzBeXhJ/iFGAg1GJh3fG5xexQqyJZcWVuYcYJTiYlUR4
-        0/lexgrxpiRWVqUW5ccXleakFh9ilOZgURLnfZp3LFJIID2xJDU7NbUgtQgmy8TBKdXAyJQg
-        tjp6ZbjPpn91nbtnfo1wnu36rzmicX7MT6UPeZqrG31uz3PN+/viWqneA8vMn/9Tvxz7dEpK
-        L5R94bWI92Evvidd6utiOV11KaWd58LvNHPt8zp83vmpWsleO0vv97Oozlu/c/OF/XIvdX9x
-        PHroNN3WTENOMGfis99Nfq4zasuWur6+q8RSnJFoqMVcVJwIAGuoDyXgAQAA
-X-CMS-MailID: 20191206041341epcas5p4eb1504144abc74f3f25352e63eccf0bd
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20191206041341epcas5p4eb1504144abc74f3f25352e63eccf0bd
-References: <CGME20191206041341epcas5p4eb1504144abc74f3f25352e63eccf0bd@epcas5p4.samsung.com>
+        Fri, 6 Dec 2019 04:08:12 -0500
+Received: by mail-wr1-f65.google.com with SMTP id a15so6870555wrf.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Dec 2019 01:08:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=IC0nFJQovPdziVzgU2aFSV4eEeO6kPT3TlMkyeyMjTY=;
+        b=BE6ht680FK89WSCevAr+hDyb8eiiRaSME+dcBCpdAfBPuoSvfGpOOy8GTvuMkQot8K
+         qbPX0nc8xReBu8fQo1uAJ01WyJ7Sn+MJ9qlNLfdJe8VJhQmETJmZdvFuzekZk9T7jguD
+         1wtEIImojrv6poPBjtrkJo6rqpqlfzJvFsaSLoa1I1SE7pFzYslfnB3cMJOziys4d7el
+         P4GqzCVIPomt19lNJy0tt9k1AqiKL1RuJDu1Ls0BqcStkQMOoTl1bGN9sPT+wIEfn0iH
+         0Wu7B5mhZZLC913K2lXnVFrcQROMYMdKVoQE0mte0Z2XkYXYPIM+nt/wF8YE/9BR7QC0
+         rSKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=IC0nFJQovPdziVzgU2aFSV4eEeO6kPT3TlMkyeyMjTY=;
+        b=ZbZwTWR4wHEyHqD98TLdxSlWFIoeRTBhsnKVXAezNTbrCE/2u3nPNaRshW4DaCSMze
+         rpKLouOzTq0rq3pGriCXuMa1EyIcfLGuWC8dAsDU8Ebp3l3Y2Ui37AO3pVTL271q0AjS
+         H5/4+HUE74ghi2bSTaVeh0zBzfxwvldH9Rz2p5rkyI4c71HQp7RbjtEXADwghWei5y4p
+         2Y1RD9vbyHsOpErd5iaUY3BOR2ZEalrV2toDqI1eMKW7PiSnnFeKkwiNvcIIjDxJTbT/
+         sciFvaaILtgEvnGnROPF/I3a1pBDP26kVlu1wMeYhr28MNZYt+8+pAiG2sWYZwZnnwsF
+         kKxA==
+X-Gm-Message-State: APjAAAWNSEt7Uj7+mkcCFiwoP650/D+DNyio+fY315um/94L4aVKAJDO
+        BZPUMIpHDevvdJUseVq37eTfZg==
+X-Google-Smtp-Source: APXvYqxAwUOIdiopWUwCUwN0Qp3EG6FDEluwivT/IAoznBn8WYyf9gk/0j9zA4KkkFZDgCe44j+tSw==
+X-Received: by 2002:adf:dd46:: with SMTP id u6mr14998118wrm.13.1575623290069;
+        Fri, 06 Dec 2019 01:08:10 -0800 (PST)
+Received: from [10.1.4.98] (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.gmail.com with ESMTPSA id g25sm4662913wmh.3.2019.12.06.01.08.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Dec 2019 01:08:09 -0800 (PST)
+Subject: Re: [PATCH v2] bluetooth: hci_bcm: enable IRQ capability from node
+To:     Kevin Hilman <khilman@baylibre.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+References: <20191204161239.16653-1-glaroque@baylibre.com>
+ <7hv9qu2rt1.fsf@baylibre.com>
+From:   guillaume La Roque <glaroque@baylibre.com>
+Message-ID: <6f6cbb0d-3265-8e6d-60fb-6df2539d36af@baylibre.com>
+Date:   Fri, 6 Dec 2019 10:08:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
+MIME-Version: 1.0
+In-Reply-To: <7hv9qu2rt1.fsf@baylibre.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-list entry was not updated properly during flushing of packets
+hi Kevin,
 
-<call stack>
-flush_pkt_list (list=0x638b40 <net+64>) at tools/mesh-gatt/net.c:1199
-net_session_close (data_in=<optimized out>) at tools/mesh-gatt/net.c:1979
-disconnect_device (cb=cb@entry=0x0, user_data=user_data@entry=0x0)
-  at tools/meshctl.c:791
-cmd_start_prov (argc=<optimized out>, argv=0x6a9fb0)
-  at tools/meshctl.c:1789
----
- tools/mesh-gatt/net.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/tools/mesh-gatt/net.c b/tools/mesh-gatt/net.c
-index e8171c6..d74e1f5 100644
---- a/tools/mesh-gatt/net.c
-+++ b/tools/mesh-gatt/net.c
-@@ -1197,6 +1197,7 @@ static void flush_pkt_list(GList **list)
- 		pkt = l->data;
- 		*list = g_list_remove(*list, pkt);
- 		g_free(pkt);
-+		l = g_list_first(*list);
- 	}
- }
- 
--- 
-2.7.4
+On 12/6/19 1:58 AM, Kevin Hilman wrote:
+> Guillaume La Roque <glaroque@baylibre.com> writes:
+>
+>> Actually IRQ can be found from GPIO but all platorms don't support
+> nit: s/platorms/platforms/
+will fix in v3
+>> gpiod_to_irq, it's the case on amlogic chip.
+>> so to have possibility to use interrupt mode we need to add interrupts
+>> field in node and support it in driver.
+>>
+>> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+>> ---
+>> sorry for noise,
+>>
+>> v2 is for rebasing on master branch
+>>
+>> guillaume
+>>
+>>  drivers/bluetooth/hci_bcm.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>> index f8f5c593a05c..9f52d57c56de 100644
+>> --- a/drivers/bluetooth/hci_bcm.c
+>> +++ b/drivers/bluetooth/hci_bcm.c
+>> @@ -1409,6 +1409,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+>>  {
+>>  	struct bcm_device *bcmdev;
+>>  	const struct bcm_device_data *data;
+>> +	struct platform_device *pdev;
+>>  	int err;
+>>  
+>>  	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
+>> @@ -1421,6 +1422,8 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+>>  #endif
+>>  	bcmdev->serdev_hu.serdev = serdev;
+>>  	serdev_device_set_drvdata(serdev, bcmdev);
+>> +	pdev = to_platform_device(bcmdev->dev);
+>> +	bcmdev->irq = platform_get_irq(pdev, 0);
+> I don't know this driver well enough to be sure, but don't you need some
+> error checking here?
+>
+> If this fails (on platforms with no IRQ defined), is an error code in
+> bcmdev->irq going to affect later code that tries to setup IRQs?
+
+not needed to do something here because  bcm_get_resources function check irq <=0 if yes it check if host-wakeup gpio was defined in node and try a gpiod_to_irq.
+
+at the end in bcm_request_irq function i check if irq <=0 if yes return EOPNOTSUPP
+
+
+> Kevin
+>
+
+Guillaume
 
