@@ -2,72 +2,80 @@ Return-Path: <SRS0=WaXy=Z7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 698C9C43603
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 00:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CADC2BD09
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 06:20:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3EA5B206E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 00:03:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 050302071E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 06:20:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726918AbfLIADG (ORCPT
+        id S1726960AbfLIGUC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 Dec 2019 19:03:06 -0500
-Received: from gloria.sntech.de ([185.11.138.130]:37214 "EHLO gloria.sntech.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726845AbfLIADG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 Dec 2019 19:03:06 -0500
-Received: from ip5f5a6266.dynamic.kabel-deutschland.de ([95.90.98.102] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <heiko@sntech.de>)
-        id 1ie6Vy-0005fW-Tm; Mon, 09 Dec 2019 01:03:02 +0100
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Douglas Anderson <dianders@chromium.org>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        linux-rockchip@lists.infradead.org,
-        devicetree <devicetree@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/1] ARM: dts: rockchip: Add brcm bluetooth for rk3288-veyron
-Date:   Mon, 09 Dec 2019 01:03:00 +0100
-Message-ID: <1788857.Va9C3Z3akr@diego>
-In-Reply-To: <61639BAF-5AA0-4264-906F-E24E2A30088D@holtmann.org>
-References: <20191127223909.253873-1-abhishekpandit@chromium.org> <20191127223909.253873-2-abhishekpandit@chromium.org> <61639BAF-5AA0-4264-906F-E24E2A30088D@holtmann.org>
+        Mon, 9 Dec 2019 01:20:02 -0500
+Received: from mail-io1-f69.google.com ([209.85.166.69]:46620 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbfLIGUC (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 9 Dec 2019 01:20:02 -0500
+Received: by mail-io1-f69.google.com with SMTP id b186so10032291iof.13
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Dec 2019 22:20:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=ib3fib3sKuBIkbtv5x2t+C/s5FzxvHK11gS8z3pdu9M=;
+        b=Hx3wLD5AzTOdwGqGw6K1c5u2jIB2IatD1WsYQrJympANWQFdsOUtbybSHQPpSWrrfy
+         tAAuqLqzUys4Dm2IACkCdoJZLH9xQ42OjvjFXqghWOREUonPo6ep+BJoQLNZnu0oIJpC
+         5zQAJMh1VDV2czCtVC3HafvQ94qfm6OXOgcQG+pzGpDYji8lJdJaeESfB9WH/FUGU6l8
+         IRGzqEHCIof5k8NentXXuvpfE0nBHPPkaviyC9Aqmrte+9EQ4xM9Moqx0CQLdQYxiPPp
+         GEQQ8fwjzWC1PpCgjGjc4rNiThE69E1HGhmGlrZsKnvH0V/qVRyyxEraAGtioaHVCi3c
+         0rZA==
+X-Gm-Message-State: APjAAAVly67CpEFmz0/1Sp2/H0mXN1RAyOi+MuzVYVm+mi5f0hMER6Wq
+        evFiXYYyBPdvDH2G2iSKrvKjVyFZvk5I9q2o6O/8UIqug0NY
+X-Google-Smtp-Source: APXvYqxt5xSP7tbAVzuFhg+Ac4ya+TgZhTpk2Zr7W851b8K8a2VkPVv4m82Tfhoq72Q7Q0DHIeS8xNIuP9bQPMwA3Lj5vvagzqgz
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-Received: by 2002:a92:3984:: with SMTP id h4mr25241387ilf.36.1575872401339;
+ Sun, 08 Dec 2019 22:20:01 -0800 (PST)
+Date:   Sun, 08 Dec 2019 22:20:01 -0800
+In-Reply-To: <000000000000bcd434057f4eb905@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b17fae05993f628b@google.com>
+Subject: Re: WARNING in tty_set_termios
+From:   syzbot <syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com>
+To:     gregkh@linuxfoundation.org, gustavo@padovan.org,
+        johan.hedberg@gmail.com, jslaby@suse.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        loic.poulain@intel.com, marcel@holtmann.org, mhjungk@gmail.com,
+        syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org,
+        vdronov@redhat.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Am Montag, 9. Dezember 2019, 00:48:31 CET schrieb Marcel Holtmann:
-> > This enables the Broadcom uart bluetooth driver on uart0 and gives it
-> > ownership of its gpios. In order to use this, you must enable the
-> > following kconfig options:
-> > - CONFIG_BT_HCIUART_BCM
-> > - CONFIG_SERIAL_DEV
-> > 
-> > This is applicable to rk3288-veyron series boards that use the bcm43540
-> > wifi+bt chips.
-> > 
-> > As part of this change, also refactor the pinctrl across the various
-> > boards. All the boards using broadcom bluetooth shouldn't touch the
-> > bt_dev_wake pin.
-> 
-> so have these changes being merged?
+syzbot suspects this bug was fixed by commit:
 
-not yet
+commit b36a1552d7319bbfd5cf7f08726c23c5c66d4f73
+Author: Vladis Dronov <vdronov@redhat.com>
+Date:   Tue Jul 30 09:33:45 2019 +0000
 
-Doug wanted to give a Reviewed-by, once the underlying bluetooth
-changes got merged - not sure what the status is though.
+     Bluetooth: hci_uart: check for missing tty operations
 
-Heiko
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10b20aeae00000
+start commit:   66c56cfa Merge tag 'remove-dma_zalloc_coherent-5.0' of git..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b05cfdb4ee8ab9b2
+dashboard link: https://syzkaller.appspot.com/bug?extid=a950165cbb86bdd023a4
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=121cee07400000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16fdaed8c00000
 
+If the result looks correct, please mark the bug fixed by replying with:
 
+#syz fix: Bluetooth: hci_uart: check for missing tty operations
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
