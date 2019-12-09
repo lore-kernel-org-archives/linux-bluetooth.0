@@ -2,247 +2,155 @@ Return-Path: <SRS0=WaXy=Z7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3530C43603
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 11:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F11C04E30
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 12:48:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86F6E2077B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 11:07:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78E4120726
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 12:48:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFYrSTfn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jgPTzQkW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727143AbfLILHL (ORCPT
+        id S1727527AbfLIMsN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Dec 2019 06:07:11 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37237 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726377AbfLILHL (ORCPT
+        Mon, 9 Dec 2019 07:48:13 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:41140 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727200AbfLIMsN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Dec 2019 06:07:11 -0500
-Received: by mail-wm1-f68.google.com with SMTP id f129so14463954wmf.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2019 03:07:08 -0800 (PST)
+        Mon, 9 Dec 2019 07:48:13 -0500
+Received: by mail-pf1-f195.google.com with SMTP id s18so7185630pfd.8;
+        Mon, 09 Dec 2019 04:48:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=oE0rilF40wWs22o3DL+ONvYBO0mzM0rmFHYM05cw310=;
-        b=DFYrSTfnV6lAIb4VXHFg8b0Ryy169Cq7fwxZ/AcyF0nQRsyL6ZQ9zhuJoea14BlYNa
-         PLE+JxkM7Gg/RxEL44Ru5qp8HUvdVecLQrN47kA+GmE4TP9BpYx6ukXpyRGocJsdZz9Z
-         XDzCocS36b6TzbbLJVIZx7i72ijbaqBFYQJhakxsmSy4RBttDbgoU3a8MVMTU8jtYJ/y
-         7lLCEGoBW1ff0JWcjBHnoexJA21Fr3qROcfHHXBC2L1SAf3nc4dAknNn/Y0M3BekAmgZ
-         QZ916+gyq9asvm/rB5dTq3WD3Tg41ZmqTNqUpI+/bzRxfJJu2ZWBshApXPKzTELWTVHX
-         yGgg==
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition:user-agent;
+        bh=NcUkOZc19gbsS2NnimxaYxAkciuFPds/CNa4rJKU++Q=;
+        b=jgPTzQkWr9Z0r9gTe4tdKSppEdIdCA7KTuBX6Y3qMPr5y0EmyWnaQndvNiI43wOjIN
+         7PjO0XaGZTRr8sBljY6ktV9A/1XP/fSR8ua2eHxqulSkhbi7OXgoiyfHDb/3U2s7NuLo
+         Ymyy3uHP7jDziwtbeYncfRjYrjY+mBI51EAJJpNISoKJj403EjZ95Mcom/azvUKFRRgv
+         dhuWIvjSJbtMJy9p1RTsD4XvTXajjItN3xyFoQmcx4GDO+g/1RQRd6KCWPMhloFZAvCv
+         EvpdBb40KS/hjmimp/yjvnNMpz0ySNkyrsubM9QOIu0XR3uwGCOIY36IjkCsjI/WwwIk
+         44vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=oE0rilF40wWs22o3DL+ONvYBO0mzM0rmFHYM05cw310=;
-        b=fyyCIgUPiAZ8i+9yCr5+YWs8Z/3bXmmQoM8dLHsHDFZXx/kRZImurS0zJuKx0+Ucyj
-         rlxEQw8CyLbQSVYfaIChupWcqf/5nEEDe+iF3+djPrfD/JgdXPMaLhVtF3qO85SPwwIx
-         sts2w/qahJQ2qOgBtQbq7vth+FocDKxCb4kboM1fXHGTXsr88OsDH1WfVGdR/+wV5TVZ
-         +wbKeLJhTw8uZReliPh+wUr1FmgEF81rxHGWQC9i+uMrpHcgo6QN0fYVWOBUo8Ktw4Ws
-         a5o4qlFSUEIH41snADp2js8tmuCbiBRpJEO072tDfFYk30tZFrEj9pLufKrpLQ1cfZCw
-         B9fQ==
-X-Gm-Message-State: APjAAAUDhSsY8IKVSyqutZ+30QsGnQu7cxqIUtG8FSCB18djK8NE7/ai
-        tIlvf7r6ddAQpbszmGfc7cg=
-X-Google-Smtp-Source: APXvYqxNOosJLKPnGO0pg/Z1GbKwB/tu72s36Cpue9ORbxGb9h8Jp4kORIpStAecWt48tsJAluX80w==
-X-Received: by 2002:a05:600c:149:: with SMTP id w9mr23241797wmm.132.1575889627967;
-        Mon, 09 Dec 2019 03:07:07 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id t5sm26828245wrr.35.2019.12.09.03.07.06
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 09 Dec 2019 03:07:07 -0800 (PST)
-Date:   Mon, 9 Dec 2019 12:07:06 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     George Kiagiadakis <george.kiagiadakis@collabora.com>
-Cc:     Denis Kenzior <denkenz@gmail.com>, linux-bluetooth@vger.kernel.org,
-        General PulseAudio Discussion 
-        <pulseaudio-discuss@lists.freedesktop.org>, ofono@ofono.org,
-        devkit-devel@lists.freedesktop.org,
-        Bastien Nocera <hadess@hadess.net>,
-        Georg Chini <georg@chini.tk>,
-        Russell Treleaven <rtreleaven@bunnykick.ca>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Tanu Kaskinen <tanuk@iki.fi>,
-        Arun Raghavan <arun@arunraghavan.net>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>,
-        Wim Taymans <wim.taymans@gmail.com>,
-        Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: Re: Proposal for a new API and usage of Bluetooth HSP and HFP
- profiles on Linux
-Message-ID: <20191209110706.4dtehxx67c3lysr7@pali>
-References: <20191201185740.uot7zb2s53p5gu7z@pali>
- <20191207200942.nbao4mxsqw4sp67v@pali>
- <c37951ef-77ff-d5eb-8b35-19bd5725a7c9@collabora.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:mime-version:content-disposition:user-agent;
+        bh=NcUkOZc19gbsS2NnimxaYxAkciuFPds/CNa4rJKU++Q=;
+        b=Q6AVIEuAtX7rl2lobRyaiWAK7TEIclN6i4Vd7yerYPpgjW5Y7ONbQLaQYb/kAYC3Ks
+         KwzceUIQh572X6UyHGJyFT+mme7mt0i+shJggaXsYbr5PP99GJDlG/NliOhRaiXkXZ80
+         llpQFbiVdQWr8R0raTWILBdJquwQQ3+qQwvD99kBxZpEVp8RAxxD2S3CWjm9P+0fSHIJ
+         ztUer5jJaFPUW1JZsUYd1yASVoEYfWiiT9Ou7qpyUsKOKYejkvN3cMiDPI3qdBmVSKFg
+         GamdHHxAk6cfJ3Hfbp3vQV7anNjLc10BTS8flMhZJToLyHCh9/0A7DQWmBtT5T11W6lc
+         Rd8g==
+X-Gm-Message-State: APjAAAUhJ2WlxOJXm+qNOejbdy85AoZcOauIng1cFcDMbPaCclv7fYc2
+        y14nVBA07/qjGiEG3OyyEF7V9M/H+AfRQQ==
+X-Google-Smtp-Source: APXvYqz+BqltE+Woe7RuKwWQyphl33r916ZqyuDENlzsL1Q2GgK1SrPp+/niax9WPMUIm3OXb1jnbw==
+X-Received: by 2002:a62:d449:: with SMTP id u9mr30048066pfl.225.1575895692715;
+        Mon, 09 Dec 2019 04:48:12 -0800 (PST)
+Received: from localhost ([192.55.55.45])
+        by smtp.gmail.com with ESMTPSA id g18sm24821707pfi.80.2019.12.09.04.48.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2019 04:48:11 -0800 (PST)
+Date:   Mon, 9 Dec 2019 14:48:07 +0200
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2019-12-09
+Message-ID: <20191209124807.GA7309@jhedberg-mac01.local>
+Mail-Followup-To: davem@davemloft.net, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="gKMricLos+KVdGMg"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c37951ef-77ff-d5eb-8b35-19bd5725a7c9@collabora.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi George!
 
-On Monday 09 December 2019 11:43:08 George Kiagiadakis wrote:
-> In general, I agree that HFP/HSP AT protocol handling is something that
-> the audio daemons should not have to worry about. However, I am
-> concerned with the level of fragmentation that exists in the bluetooth
-> stack.
-> 
-> At the moment, the best case scenario is that we have 2 processes
-> involved in bluetooth audio (in the case where we route directly to/from
-> the speakers & microphone of the linux host in question):
-> 
->   bluez5 <-> pulseaudio
-> 
-> With pipewire & bluez-alsa, we have 3 processes:
-> 
->   bluez5 <-> pipewire bluetooth session <-> pipewire daemon
-> 
->   bluez5 <-> bluez-alsa <-> alsa application
+--gKMricLos+KVdGMg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Yes, that is truth.
+Hi Dave,
 
-> The 3 process separation here happens so that the bluetooth codecs run
-> in the process that sits in the middle. This avoids having to care about
-> codecs on the right side and also avoids slowing down the pipewire
-> daemon (so that it can still do low-latency audio processing)
-> 
-> When ofono comes into play, we increase this by 1:
-> 
->    bluez5 <-> ofono <-> pulseaudio
-> 
->   bluez5 <-> ofono <-> pipewire bluetooth session <-> pipewire daemon
-> 
->   bluez5 <-> ofono <-> bluez-alsa <-> alsa application
+Here's the first bluetooth-next pull request for 5.6:
 
-Yes.
+ - Devicetree bindings updates for Broadcom controllers
+ - Add support for PCM configuration for Broadcom controllers
+ - btusb: Fixes for Realtek devices
+ - butsb: A few other smaller fixes (mem leak & non-atomic allocation issue)
 
-> With your proposal, we have one more:
-> 
->    bluez5 <-> hfphspd <-> ofono <-> pulseaudio
-> 
->   bluez5 <-> hfphspd <-> ofono <-> pipewire bluetooth session <->
-> pipewire daemon
-> 
->   bluez5 <-> hfphspd <-> ofono <-> bluez-alsa <-> alsa application
+Please let me know if there are any issues pulling. Thanks.
 
-No, this is not how hsphpfd is suppose to work. Look at design & API:
-https://github.com/pali/hsphfpd-prototype/blob/prototype/hsphfpd.txt
+Johan
 
-ofono would be there only in agent role, similar like audio daemon
-(pulseaudio/pipewire/bluez-alsa). So it would look like:
+---
+The following changes since commit be2eca94d144e3ffed565c483a58ecc76a869c98:
 
-              +---- <-> ofono
-              |
-bluez5 <-> hsphfpd
-              |
-              +---- <-> pulseaudio / pipewire / bluez-alsa
+  Merge tag 'for-linus-5.5-1' of git://github.com/cminyard/linux-ipmi (2019-11-25 21:41:48 -0800)
 
-You can connect / disconnect ofono without loosing audio functionality.
-(Or connect / disconnect audio daemon without loosing telephony modem
-functionality.)
+are available in the Git repository at:
 
-hsphfpd is central point for all HSP and HFP related operations and
-applications.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
 
-> And it can become even more crazy when you do ugly hacks like what I
-> have done in Automotive Grade Linux, where I use bluez-alsa for its
-> codec implementation & HFP/HSP handling, and then route the audio using
-> a gstreamer-based helper process to the pipewire daemon process
-> (temporarily, to workaround issues in the pipewire native implementation):
-> 
->   bluez5 <-> hfphspd <-> ofono <-> bluez-alsa <-> gstreamer helper <->
-> pipewire daemon
+for you to fetch changes up to 7ecacafc240638148567742cca41aa7144b4fe1e:
 
-With hsphfpd involved, you would never talk with ofono. Also ofono is
-not required for this setup.
+  Bluetooth: btusb: Disable runtime suspend on Realtek devices (2019-12-05 10:31:29 +0100)
 
-> Instead of all of this crazy context switching, what I would prefer to
-> see is a standalone component library that someone could combine in a
-> single process to get things done. This would:
-> 
-> * avoid re-implementing all kinds of stuff over and over in different
-> audio daemons (we do have 3 implementations atm: pulseaudio, pipewire &
-> bluez-alsa)
+----------------------------------------------------------------
+Abhishek Pandit-Subedi (5):
+      Bluetooth: hci_bcm: Disallow set_baudrate for BCM4354
+      Bluetooth: btbcm: Support pcm configuration
+      dt-bindings: net: bluetooth: update broadcom-bluetooth
+      Bluetooth: hci_bcm: Support pcm params in dts
+      dt-bindings: net: bluetooth: Minor fix in broadcom-bluetooth
 
-HSP/HFP AT commands needed for audio handling are already designed to be
-handled by hsphfpd daemon. Please look at details.
+Colin Ian King (1):
+      Bluetooth: btusb: fix memory leak on fw
 
-> * prevent people like me from doing ugly hacks to get work done
-> * improve collaboration between all the different people that care about
-> the bluetooth stack instead of having them antagonize each other
+Johan Hovold (1):
+      Bluetooth: btusb: fix non-atomic allocation in completion handler
 
-This is reason why I started this discussion :) and proposed my hsphfpd
-daemon.
+Kai-Heng Feng (1):
+      Bluetooth: btusb: Disable runtime suspend on Realtek devices
 
-> * avoid the context switching overkill; we should only have 1 process
-> between bluez and the audio daemon / solution, imho
+Max Chou (1):
+      Bluetooth: btusb: Edit the logical value for Realtek Bluetooth reset
 
-There is no context switching in hsphfpd design once audio connection is
-established. From hsphfpd you get native audio SCO socket, so audio is
-not routed throw hsphfpd nor bluez daemons. Socket directly pass data to
-kernel.
+ .../devicetree/bindings/net/broadcom-bluetooth.txt |  7 +++
+ drivers/bluetooth/btbcm.c                          | 46 ++++++++++++++++++++
+ drivers/bluetooth/btbcm.h                          | 16 +++++++
+ drivers/bluetooth/btusb.c                          | 12 ++++--
+ drivers/bluetooth/hci_bcm.c                        | 50 +++++++++++++++++++++-
+ 5 files changed, 125 insertions(+), 6 deletions(-)
 
-> * potentially allow people to use some components in combination with a
-> proprietary bluetooth stack instead of bluez (a strong requirement in
-> the automotive industry at the moment, at least)
+--gKMricLos+KVdGMg
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The only what is needed is that "other stack" just export DBus interface
-for registering HSP and HFP profiles according to bluez documentation.
-Then hsphfpd would work with that bluetooth "other stack".
+-----BEGIN PGP SIGNATURE-----
 
-> I imagine that this component library would include:
-> 
-> * bluetooth audio codecs
+iQIzBAABCAAdFiEEyxvsVXjY3jV7sQ0/JCP2+/mo1BIFAl3uQoYACgkQJCP2+/mo
+1BKzUg//Qf6RSP/Hr56Hyknpnhy2IM29ilPwzMPGT1p66C2LMhTgwLAMAlwirx5r
+KOtfHFR/CzgSdAcSLEt7Ha6QM6zwsj2Vnld8u+F6pVlsYlA/oC+tmnyEGysNGwfS
+0NT55HW6hG66AfjvK9zWv7dZOkHFrQJK41paqwamhExbJOzEopmftlcBa0fzfpAU
+welc02DlCvigZL279E3PAJKaVL4qS6NjuvLrZQLuUjPpnHWZNrWKENkdHeUgXeLj
+OIFzb87iDOpiyKEjhxREuHsT9tj65wZotf26R3eekh0QvnPa4aoqpArCHaqFH5DA
+rLetS8Ej0IgkpMA/TLWoHxm6Sjh7VnV2S1ZhAu4i/JKt3OGEJEPh5bkN7XR3quvd
+15km/luGU4trXNo8DDWHfnlGVYYRUW2kGCko1mNX/oRkq5m88jiGCaKchMQ3/rM9
+NOjjc+jcmu1V4XTS1LhQ+/5V3Gf5NdJsfu8pk0q4Bx+WMq5eqhNh7bfyhPJJv5Kd
+OX4VtQhkDSctr0GbqKfVUbaK0KoI/f5axdnU91Sf0fv0xiVcyZ0vic+00GaVFyJI
+F+VjDMpa77EDiPQybL063VFqeybmZH2HX6Bg1bTulRcHU/TsbVK0DWGAa6FbuTxc
+J+UA9UKsdZBQbFPMbY9kF1RPYThkmm+J7GJ34WBPFAmvgeoV+aw=
+=2xWZ
+-----END PGP SIGNATURE-----
 
-AT commands are covered by hsphfpd. Encoding / decoding of data is up to
-the application agent. Please look into hsphfpd.txt document.
-
-But creating a library which would do encoding and decoding of audio
-data and acts as a hsphfpd audio application agent is possible. If other
-projects want to use it (e.g. pulseaudio, bluez-alsa, pipewire, jack) we
-can start a separate discussion about API of such library. I guess that
-more audio daemons would be different requirements and to be usable in
-all projects we need to cover all of them.
-
-> * HFP/HSP commands handling
-
-This is already covered by hsphpfd.
-
-> * telephony handling
-
-In hsphfpd this is exported to external telephony agent. Possibly ofono
-or modem manager (whatever project will implement needed API and
-connects to hsphfpd daemon).
-
-> * exposure of common D-Bus APIs for side-channel things like power
-> management or phone dialing
-
-This is part of hsphfpd daemon, please look at hsphfpd.txt if it covers
-your needs. Btw, phone dialing is part of telephony handling.
-
-> ... and then every downstream user (pulse, pipewire, bluez-alsa, ...)
-> could reuse these components and implement the rest of the routing /
-> management logic in their own daemon.
-> 
-> My two cents...
-> 
-> Regards,
-> George
-
--- 
-Pali Rohár
-pali.rohar@gmail.com
+--gKMricLos+KVdGMg--
