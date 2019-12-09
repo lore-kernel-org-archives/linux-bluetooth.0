@@ -2,33 +2,67 @@ Return-Path: <SRS0=WaXy=Z7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D475C43603
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 09:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3530C43603
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 11:07:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4026520726
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 09:43:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86F6E2077B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Dec 2019 11:07:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFYrSTfn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727526AbfLIJnT (ORCPT
+        id S1727143AbfLILHL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Dec 2019 04:43:19 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:40296 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727370AbfLIJnS (ORCPT
+        Mon, 9 Dec 2019 06:07:11 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:37237 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726377AbfLILHL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Dec 2019 04:43:18 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: gkiagia)
-        with ESMTPSA id 51C5328DF20
-Subject: Re: Proposal for a new API and usage of Bluetooth HSP and HFP
- profiles on Linux
-To:     =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>,
-        Denis Kenzior <denkenz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
+        Mon, 9 Dec 2019 06:07:11 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f129so14463954wmf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2019 03:07:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=oE0rilF40wWs22o3DL+ONvYBO0mzM0rmFHYM05cw310=;
+        b=DFYrSTfnV6lAIb4VXHFg8b0Ryy169Cq7fwxZ/AcyF0nQRsyL6ZQ9zhuJoea14BlYNa
+         PLE+JxkM7Gg/RxEL44Ru5qp8HUvdVecLQrN47kA+GmE4TP9BpYx6ukXpyRGocJsdZz9Z
+         XDzCocS36b6TzbbLJVIZx7i72ijbaqBFYQJhakxsmSy4RBttDbgoU3a8MVMTU8jtYJ/y
+         7lLCEGoBW1ff0JWcjBHnoexJA21Fr3qROcfHHXBC2L1SAf3nc4dAknNn/Y0M3BekAmgZ
+         QZ916+gyq9asvm/rB5dTq3WD3Tg41ZmqTNqUpI+/bzRxfJJu2ZWBshApXPKzTELWTVHX
+         yGgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=oE0rilF40wWs22o3DL+ONvYBO0mzM0rmFHYM05cw310=;
+        b=fyyCIgUPiAZ8i+9yCr5+YWs8Z/3bXmmQoM8dLHsHDFZXx/kRZImurS0zJuKx0+Ucyj
+         rlxEQw8CyLbQSVYfaIChupWcqf/5nEEDe+iF3+djPrfD/JgdXPMaLhVtF3qO85SPwwIx
+         sts2w/qahJQ2qOgBtQbq7vth+FocDKxCb4kboM1fXHGTXsr88OsDH1WfVGdR/+wV5TVZ
+         +wbKeLJhTw8uZReliPh+wUr1FmgEF81rxHGWQC9i+uMrpHcgo6QN0fYVWOBUo8Ktw4Ws
+         a5o4qlFSUEIH41snADp2js8tmuCbiBRpJEO072tDfFYk30tZFrEj9pLufKrpLQ1cfZCw
+         B9fQ==
+X-Gm-Message-State: APjAAAUDhSsY8IKVSyqutZ+30QsGnQu7cxqIUtG8FSCB18djK8NE7/ai
+        tIlvf7r6ddAQpbszmGfc7cg=
+X-Google-Smtp-Source: APXvYqxNOosJLKPnGO0pg/Z1GbKwB/tu72s36Cpue9ORbxGb9h8Jp4kORIpStAecWt48tsJAluX80w==
+X-Received: by 2002:a05:600c:149:: with SMTP id w9mr23241797wmm.132.1575889627967;
+        Mon, 09 Dec 2019 03:07:07 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id t5sm26828245wrr.35.2019.12.09.03.07.06
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 09 Dec 2019 03:07:07 -0800 (PST)
+Date:   Mon, 9 Dec 2019 12:07:06 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     George Kiagiadakis <george.kiagiadakis@collabora.com>
+Cc:     Denis Kenzior <denkenz@gmail.com>, linux-bluetooth@vger.kernel.org,
         General PulseAudio Discussion 
         <pulseaudio-discuss@lists.freedesktop.org>, ofono@ofono.org,
         devkit-devel@lists.freedesktop.org,
@@ -42,209 +76,173 @@ To:     =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>,
         Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>,
         Wim Taymans <wim.taymans@gmail.com>,
         Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: Re: Proposal for a new API and usage of Bluetooth HSP and HFP
+ profiles on Linux
+Message-ID: <20191209110706.4dtehxx67c3lysr7@pali>
 References: <20191201185740.uot7zb2s53p5gu7z@pali>
  <20191207200942.nbao4mxsqw4sp67v@pali>
-From:   George Kiagiadakis <george.kiagiadakis@collabora.com>
-Openpgp: preference=signencrypt
-Message-ID: <c37951ef-77ff-d5eb-8b35-19bd5725a7c9@collabora.com>
-Date:   Mon, 9 Dec 2019 11:43:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <c37951ef-77ff-d5eb-8b35-19bd5725a7c9@collabora.com>
 MIME-Version: 1.0
-In-Reply-To: <20191207200942.nbao4mxsqw4sp67v@pali>
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <c37951ef-77ff-d5eb-8b35-19bd5725a7c9@collabora.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-+ the bluez-alsa maintainer
+Hi George!
 
-See my comments below...
+On Monday 09 December 2019 11:43:08 George Kiagiadakis wrote:
+> In general, I agree that HFP/HSP AT protocol handling is something that
+> the audio daemons should not have to worry about. However, I am
+> concerned with the level of fragmentation that exists in the bluetooth
+> stack.
+> 
+> At the moment, the best case scenario is that we have 2 processes
+> involved in bluetooth audio (in the case where we route directly to/from
+> the speakers & microphone of the linux host in question):
+> 
+>   bluez5 <-> pulseaudio
+> 
+> With pipewire & bluez-alsa, we have 3 processes:
+> 
+>   bluez5 <-> pipewire bluetooth session <-> pipewire daemon
+> 
+>   bluez5 <-> bluez-alsa <-> alsa application
 
-On 07/12/2019 22:09, Pali Rohár wrote:
+Yes, that is truth.
 
-> +Denis from ofono
->
-> ofono and pulseaudio are two main users of HFP profile on Linux...
->
-> On Sunday 01 December 2019 19:57:40 Pali Rohár wrote:
->> Hello!
->>
->> I'm sending this email to relevant mailing lists and other people who
->> could be interested in it. (I'm not subscribed to all of ML, so please
->> CC me when replying).
->>
->>
->> I would like to open a discussion about a completely new way of handling
->> Bluetooth HSP and HFP profiles on Linux. These two profiles are the only
->> standard way how to access microphone data from Bluetooth Headsets.
->>
->>
->> Previously in bluez4, HFP profile was implemented by bluez daemon and
->> telephony HFP functionality was provided by either dummy modem, ofono
->> modem or by Nokia's CSD Maemo modem.
->>
->> In bluez5 version was modem code together with implementation of HFP
->> profile removed. And let implementation of HSP and HFP profiles to
->> external application.
->>
->> Currently HSP profile is implemented in pulseaudio daemon to handle
->> microphone and Bluetooth speakers. HFP profile is not implemented yet.
->>
->>
->> HSP and HFP profiles use AT modem commands, so its implementation needs
->> to parse and generates AT commands, plus implement needed state machine
->> for it.
->>
->> And now problem is that last version of HFP profile specification is too
->> complicated, plus Bluetooth headsets vendors started to inventing and
->> using of own custom extensions to HFP profile and AT commands.
->>
->> Main problem of this "external" implementation outside of bluez is that
->> only one application can communicate with remote Bluetooth device. It
->> is application which received needed socket from bluez.
->>
->> So in this design if audio daemon (pulseaudio) implements HFP profile
->> for processing audio, and e.g. power supply application wants to
->> retrieve battery level from Bluetooth device, it means that audio daemon
->> needs to implement also battery related functionality.
->>
->> It does not make sense to force power supply daemon (upower) to
->> implement audio routing/encoding/decoding or audio daemon (power supply)
->> to force implementing battery related operations.
->>
->>
->> For handle this problem I would like to propose a new way how to use and
->> implement HSP and HFP profiles on Linux.
->>
->> Implement a new HSP/HFP daemon (I called it hsphfpd) which register HSP
->> and HFP profiles in bluez and then exports functionality for all other
->> specific applications via DBus API (API for audio, power supply, input
->> layer, telephony functions, vendor extensions, etc...). So it would acts
->> as proxy daemon between bluez and target applications (pulseaudio,
->> upower, ofono, ...)
->>
->> This would simplify whole HFP usage as applications would not need to
->> re-implement parsing and processing of AT commands and it would allow
->> more applications to use HFP profile at one time. And also it means that
->> audio software does not have to implement telephony stack or power
->> supply operations.
->>
->>
->> I wrote a document how such DBus API could look like, see here:
->>
->>   https://github.com/pali/hsphfpd-prototype/raw/prototype/hsphfpd.txt
->>
->>
->> And also I implemented "prototype" implementation to verify that
->> designed API make sense and can be really implemented. Prototype fully
->> supports HSP profile in both HS and AG role, plus HFP profile in HF
->> role. This prototype implementation is available here:
->>
->>   https://github.com/pali/hsphfpd-prototype
->>
->> Some other details are written in README:
->>
->>   https://github.com/pali/hsphfpd-prototype/raw/prototype/README
->>
->>
->> What do you think about it? Does it make sense to have such design?
->> Would you accept usage of such hsphfpd daemon, implemented according to
->> specification, on Linux desktop?
->>
->> I would like to hear your opinion if I should continue with this hsphfpd
->> design, or not.
->>
->>
->> With this design and implementation of hsphfpd is possible to easily fix
->> pulseaudio issue about power supply properties:
->>
->>   https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/722
->>
->>
+> The 3 process separation here happens so that the bluetooth codecs run
+> in the process that sits in the middle. This avoids having to care about
+> codecs on the right side and also avoids slowing down the pipewire
+> daemon (so that it can still do low-latency audio processing)
+> 
+> When ofono comes into play, we increase this by 1:
+> 
+>    bluez5 <-> ofono <-> pulseaudio
+> 
+>   bluez5 <-> ofono <-> pipewire bluetooth session <-> pipewire daemon
+> 
+>   bluez5 <-> ofono <-> bluez-alsa <-> alsa application
 
-In general, I agree that HFP/HSP AT protocol handling is something that
-the audio daemons should not have to worry about. However, I am
-concerned with the level of fragmentation that exists in the bluetooth
-stack.
+Yes.
 
-At the moment, the best case scenario is that we have 2 processes
-involved in bluetooth audio (in the case where we route directly to/from
-the speakers & microphone of the linux host in question):
+> With your proposal, we have one more:
+> 
+>    bluez5 <-> hfphspd <-> ofono <-> pulseaudio
+> 
+>   bluez5 <-> hfphspd <-> ofono <-> pipewire bluetooth session <->
+> pipewire daemon
+> 
+>   bluez5 <-> hfphspd <-> ofono <-> bluez-alsa <-> alsa application
 
-  bluez5 <-> pulseaudio
+No, this is not how hsphpfd is suppose to work. Look at design & API:
+https://github.com/pali/hsphfpd-prototype/blob/prototype/hsphfpd.txt
 
-With pipewire & bluez-alsa, we have 3 processes:
+ofono would be there only in agent role, similar like audio daemon
+(pulseaudio/pipewire/bluez-alsa). So it would look like:
 
-  bluez5 <-> pipewire bluetooth session <-> pipewire daemon
+              +---- <-> ofono
+              |
+bluez5 <-> hsphfpd
+              |
+              +---- <-> pulseaudio / pipewire / bluez-alsa
 
-  bluez5 <-> bluez-alsa <-> alsa application
+You can connect / disconnect ofono without loosing audio functionality.
+(Or connect / disconnect audio daemon without loosing telephony modem
+functionality.)
 
-The 3 process separation here happens so that the bluetooth codecs run
-in the process that sits in the middle. This avoids having to care about
-codecs on the right side and also avoids slowing down the pipewire
-daemon (so that it can still do low-latency audio processing)
+hsphfpd is central point for all HSP and HFP related operations and
+applications.
 
-When ofono comes into play, we increase this by 1:
+> And it can become even more crazy when you do ugly hacks like what I
+> have done in Automotive Grade Linux, where I use bluez-alsa for its
+> codec implementation & HFP/HSP handling, and then route the audio using
+> a gstreamer-based helper process to the pipewire daemon process
+> (temporarily, to workaround issues in the pipewire native implementation):
+> 
+>   bluez5 <-> hfphspd <-> ofono <-> bluez-alsa <-> gstreamer helper <->
+> pipewire daemon
 
-   bluez5 <-> ofono <-> pulseaudio
+With hsphfpd involved, you would never talk with ofono. Also ofono is
+not required for this setup.
 
-  bluez5 <-> ofono <-> pipewire bluetooth session <-> pipewire daemon
+> Instead of all of this crazy context switching, what I would prefer to
+> see is a standalone component library that someone could combine in a
+> single process to get things done. This would:
+> 
+> * avoid re-implementing all kinds of stuff over and over in different
+> audio daemons (we do have 3 implementations atm: pulseaudio, pipewire &
+> bluez-alsa)
 
-  bluez5 <-> ofono <-> bluez-alsa <-> alsa application
+HSP/HFP AT commands needed for audio handling are already designed to be
+handled by hsphfpd daemon. Please look at details.
 
-With your proposal, we have one more:
+> * prevent people like me from doing ugly hacks to get work done
+> * improve collaboration between all the different people that care about
+> the bluetooth stack instead of having them antagonize each other
 
-   bluez5 <-> hfphspd <-> ofono <-> pulseaudio
+This is reason why I started this discussion :) and proposed my hsphfpd
+daemon.
 
-  bluez5 <-> hfphspd <-> ofono <-> pipewire bluetooth session <->
-pipewire daemon
+> * avoid the context switching overkill; we should only have 1 process
+> between bluez and the audio daemon / solution, imho
 
-  bluez5 <-> hfphspd <-> ofono <-> bluez-alsa <-> alsa application
+There is no context switching in hsphfpd design once audio connection is
+established. From hsphfpd you get native audio SCO socket, so audio is
+not routed throw hsphfpd nor bluez daemons. Socket directly pass data to
+kernel.
 
-And it can become even more crazy when you do ugly hacks like what I
-have done in Automotive Grade Linux, where I use bluez-alsa for its
-codec implementation & HFP/HSP handling, and then route the audio using
-a gstreamer-based helper process to the pipewire daemon process
-(temporarily, to workaround issues in the pipewire native implementation):
+> * potentially allow people to use some components in combination with a
+> proprietary bluetooth stack instead of bluez (a strong requirement in
+> the automotive industry at the moment, at least)
 
-  bluez5 <-> hfphspd <-> ofono <-> bluez-alsa <-> gstreamer helper <->
-pipewire daemon
+The only what is needed is that "other stack" just export DBus interface
+for registering HSP and HFP profiles according to bluez documentation.
+Then hsphfpd would work with that bluetooth "other stack".
 
-Instead of all of this crazy context switching, what I would prefer to
-see is a standalone component library that someone could combine in a
-single process to get things done. This would:
+> I imagine that this component library would include:
+> 
+> * bluetooth audio codecs
 
-* avoid re-implementing all kinds of stuff over and over in different
-audio daemons (we do have 3 implementations atm: pulseaudio, pipewire &
-bluez-alsa)
-* prevent people like me from doing ugly hacks to get work done
-* improve collaboration between all the different people that care about
-the bluetooth stack instead of having them antagonize each other
-* avoid the context switching overkill; we should only have 1 process
-between bluez and the audio daemon / solution, imho
-* potentially allow people to use some components in combination with a
-proprietary bluetooth stack instead of bluez (a strong requirement in
-the automotive industry at the moment, at least)
+AT commands are covered by hsphfpd. Encoding / decoding of data is up to
+the application agent. Please look into hsphfpd.txt document.
 
-I imagine that this component library would include:
+But creating a library which would do encoding and decoding of audio
+data and acts as a hsphfpd audio application agent is possible. If other
+projects want to use it (e.g. pulseaudio, bluez-alsa, pipewire, jack) we
+can start a separate discussion about API of such library. I guess that
+more audio daemons would be different requirements and to be usable in
+all projects we need to cover all of them.
 
-* bluetooth audio codecs
-* HFP/HSP commands handling
-* telephony handling
-* exposure of common D-Bus APIs for side-channel things like power
-management or phone dialing
+> * HFP/HSP commands handling
 
-... and then every downstream user (pulse, pipewire, bluez-alsa, ...)
-could reuse these components and implement the rest of the routing /
-management logic in their own daemon.
+This is already covered by hsphpfd.
 
-My two cents...
+> * telephony handling
 
-Regards,
-George
+In hsphfpd this is exported to external telephony agent. Possibly ofono
+or modem manager (whatever project will implement needed API and
+connects to hsphfpd daemon).
 
+> * exposure of common D-Bus APIs for side-channel things like power
+> management or phone dialing
 
+This is part of hsphfpd daemon, please look at hsphfpd.txt if it covers
+your needs. Btw, phone dialing is part of telephony handling.
+
+> ... and then every downstream user (pulse, pipewire, bluez-alsa, ...)
+> could reuse these components and implement the rest of the routing /
+> management logic in their own daemon.
+> 
+> My two cents...
+> 
+> Regards,
+> George
+
+-- 
+Pali Rohár
+pali.rohar@gmail.com
