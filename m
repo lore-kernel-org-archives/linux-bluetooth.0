@@ -2,93 +2,108 @@ Return-Path: <SRS0=8Xmo=2A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47118C00454
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 20:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3F0C00454
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:09:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21AC02073D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 20:59:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07F2824687
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:09:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576012161;
+	bh=3GPtx5pUqQWxEANxlsUwjXgjJlKI6nkAA0UcNLDxKqw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=qjD8Cp6cOfyORq/AN6qckj6i8SO+CcscJFeUpaKFy5RrqR0SGDUihAg28wRztPs8I
+	 +wT0MF4E+OXMSU7By+AmWJwttWDBVWFDWddJjl3H4kcXqPX9Nesedp5qj8yvHKdtAC
+	 qOuxl7/BSsVfM9xAp2xuxbk/ewajcNamcAVPob+I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726769AbfLJU7H (ORCPT
+        id S1728117AbfLJVJU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 15:59:07 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:34107 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725999AbfLJU7H (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 15:59:07 -0500
-Received: from mail-qv1-f45.google.com ([209.85.219.45]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1N6srB-1hfAhC0Qu7-018HpT; Tue, 10 Dec 2019 21:59:05 +0100
-Received: by mail-qv1-f45.google.com with SMTP id b18so4776925qvo.8;
-        Tue, 10 Dec 2019 12:59:04 -0800 (PST)
-X-Gm-Message-State: APjAAAWqwpxGg5heSwzPP9LZKTF2cIC/4vMRdG2wYxS8ALwkky9kijvV
-        I4EnoShgdRPNJ1W66NKACXewhIgTO3RzVseB2Rs=
-X-Google-Smtp-Source: APXvYqxpaP4eHtfb0T1AafOuFFfZMxdK72/d9eCePNosbyemaiai5Ww7g6ZIkMFUlJlmnLpkyxwi/16JxNs8ZYi0oFM=
-X-Received: by 2002:a0c:ead1:: with SMTP id y17mr29359318qvp.210.1576011543816;
- Tue, 10 Dec 2019 12:59:03 -0800 (PST)
-MIME-Version: 1.0
-References: <20191209151114.2410762-1-arnd@arndb.de> <20191210091905.GA3547805@kroah.com>
-In-Reply-To: <20191210091905.GA3547805@kroah.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Tue, 10 Dec 2019 21:58:47 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a21ubUOvKKFYPbC7tqg0wPjBi7iR7ZZP0xTbvvt6=PiEw@mail.gmail.com>
-Message-ID: <CAK8P3a21ubUOvKKFYPbC7tqg0wPjBi7iR7ZZP0xTbvvt6=PiEw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] staging: remove isdn capi drivers
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     driverdevel <devel@driverdev.osuosl.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Networking <netdev@vger.kernel.org>,
+        Tue, 10 Dec 2019 16:09:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57702 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728109AbfLJVJU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:09:20 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 857F824687;
+        Tue, 10 Dec 2019 21:09:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1576012159;
+        bh=3GPtx5pUqQWxEANxlsUwjXgjJlKI6nkAA0UcNLDxKqw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=y3X9VgnGFfvms8rtexKBhMnvCmAEfFpBFX3P8YJf9WNhnvNAcmgKRhVJB6TwvHiR4
+         exozn3Z9Wkzm4dlyXn6hsUC3y9BFTJjSya/CJSqiDxzn8EiIVBkySVgzgifftTswsw
+         rU8kqChtjrvXXuh7c42c5p+WDpdD2hPxRq05+/v4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Mattijs Korpershoek <mkorpershoek@baylibre.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        isdn4linux@listserv.isdn4linux.de,
-        "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:D9pUZUsP3PpPb4Icu3xX3V1NEKv9UKCFsjj64I2c7yx9hi3iJWg
- MNnd7RDoePmusu72ALj1olzxje35GQjW+l0Wcw+7NSmUlDTbezNsOOOSzWixDuFsIVn0yIV
- /PvQkl5OkQJtnWt02e6DAl+SytEzAavirDIZvAMwiCFg7N/JgfaqBD+uFA6/t0q8qk+HDHJ
- K7c+hyyPAPOZeho4hxExg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:B8OsLQgLUjE=:ErhHW6Jfi5MlFJkQjWeUVz
- UnVB6kaxJtyCPRWpKg/vzrUWGuhaaXvpQ6eXNlYosq3NDM4d3Rci0mIw2029YIZQzTXFCF79z
- ZI+2kqjNyBfK+WgM9tuR84s4pAqWlNefSiwQwNmFcnQPEOqO4OE64XbLQNSnta4ttcGTQQPiV
- hqfIgvs5ZitV876n6WrwT4KiONx+7GgSqdkT2WIM4kA/vSIOTZrkkudnrLRhRzpm3/3TPL6M6
- NEitQv59MHLv3DPf/ZMBokfyIly/NeRIhBzqSdpIoyo5XpwWcfunHzmvIfzchJYxFd3oHOJfY
- lCiPGunlQdqCwdJyFNs7y9umExwfyKedZYtYygB1qMwzUXaACONUw2zsagXMj44d0XoMMH2iO
- wBBMajtTH1k3LY7aX9nAVKr68EQMAzhKmdONbgL4L6Ldbz94LADVZbwR1C9H79vkcy5Ut8BgY
- wcUdrvfzjd+Bp81I0yXDXxAaxCWfUr8HtWJD+VInuEpszG2H0YeAq3ycCL62DbDdpQ/rQp0ar
- 5aT5KoRnXDdfkDHw15bFTiRNvwyTgXNlX+0UlcNG6tF8NJSmzMbNd2aMYrtraTwtg8fKDF9uf
- RLjzplQW6Uv0JHnijvIPKVNDGy4AWw3H2blt00zJvE0kNM2f86/Q4TXYNonGf6PjEpRpwn4YH
- J2xu9ZAnKqllwoK/p/zFYFLitpItJxhjODDAchrvNroC5fLtQVo5ZsCGZJLsqwnFDykRqDt7k
- 5zc4rpMPlsFQFecc/Kca841l0irautLryxcDigYFyVziBHwrnSsZfMKBZ+6rh8kfHS0oedM8q
- AB//cdAOqA4mJ9+Qc0zw1hEE1GM4qvO4omrXAArIZJ+GUnQDgy6uVRnoTH9h+/kedDscchMiz
- PspaQJd+nXa7YBHkB1uA==
+        Sasha Levin <sashal@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 121/350] Bluetooth: hci_core: fix init for HCI_USER_CHANNEL
+Date:   Tue, 10 Dec 2019 16:03:46 -0500
+Message-Id: <20191210210735.9077-82-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
+References: <20191210210735.9077-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Dec 10, 2019 at 10:19 AM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Mon, Dec 09, 2019 at 04:11:13PM +0100, Arnd Bergmann wrote:
-> > As described in drivers/staging/isdn/TODO, the drivers are all
-> > assumed to be unmaintained and unused now, with gigaset being the
-> > last one to stop being maintained after Paul Bolle lost access
-> > to an ISDN network.
-> >
-> > The CAPI subsystem remains for now, as it is still required by
-> > bluetooth/cmtp.
-> >
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > ---
-> >  Documentation/ioctl/ioctl-number.rst        |    1 -
->
-> This file is not in 5.5-rc1, what tree did you make this against?
+From: Mattijs Korpershoek <mkorpershoek@baylibre.com>
 
-This was against v5.4, sending a rebased version now.
+[ Upstream commit eb8c101e28496888a0dcfe16ab86a1bee369e820 ]
 
-      Arnd
+During the setup() stage, HCI device drivers expect the chip to
+acknowledge its setup() completion via vendor specific frames.
+
+If userspace opens() such HCI device in HCI_USER_CHANNEL [1] mode,
+the vendor specific frames are never tranmitted to the driver, as
+they are filtered in hci_rx_work().
+
+Allow HCI devices which operate in HCI_USER_CHANNEL mode to receive
+frames if the HCI device is is HCI_INIT state.
+
+[1] https://www.spinics.net/lists/linux-bluetooth/msg37345.html
+
+Fixes: 23500189d7e0 ("Bluetooth: Introduce new HCI socket channel for user operation")
+Signed-off-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/bluetooth/hci_core.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b2559d4bed815..0cc9ce9172229 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4440,7 +4440,14 @@ static void hci_rx_work(struct work_struct *work)
+ 			hci_send_to_sock(hdev, skb);
+ 		}
+ 
+-		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
++		/* If the device has been opened in HCI_USER_CHANNEL,
++		 * the userspace has exclusive access to device.
++		 * When device is HCI_INIT, we still need to process
++		 * the data packets to the driver in order
++		 * to complete its setup().
++		 */
++		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
++		    !test_bit(HCI_INIT, &hdev->flags)) {
+ 			kfree_skb(skb);
+ 			continue;
+ 		}
+-- 
+2.20.1
+
