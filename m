@@ -2,108 +2,106 @@ Return-Path: <SRS0=8Xmo=2A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5B6C00454
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 22:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F743C43603
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 23:06:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A399520836
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 22:42:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576017767;
-	bh=8nkqA5g/vfpGYq285dCubfDGA9q/iGrdrGaEy2NlALA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=PXSyjWTVA+MtSzvNpQHTbYEbAgCyQHysP0Qkfz6n92S+zTlHzyHj2AC8rONvTnz5n
-	 1OIYnRx2T0PZCsbFbIdThyiy/bX+vqvogbkVa66+OS7U8RvOVHggD59vt0DI9FR56z
-	 ZIuRzpauRg298gQx7ovRCvq+o/KhGavKV0IfwDx4=
+	by mail.kernel.org (Postfix) with ESMTP id 5A2BD205C9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 23:06:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728220AbfLJWbU (ORCPT
+        id S1726801AbfLJXGD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 17:31:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51314 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 18:06:03 -0500
+Received: from mga07.intel.com ([134.134.136.100]:13898 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728247AbfLJWbT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 17:31:19 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 21BC92077B;
-        Tue, 10 Dec 2019 22:31:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576017078;
-        bh=8nkqA5g/vfpGYq285dCubfDGA9q/iGrdrGaEy2NlALA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Sfzj90VGF62PjqT9PPpdhpigXiKbwjMaLNUArovGyQJC629KLUecKJ0fGW2GrSmG6
-         anN1X4vsChrQAW9+BmxLmK+oBCxHDoQJF/NTbyeJbc1FvsuQcvnWzPwFSME0lBGOUU
-         3oiLUfcnSxdYjC2r3YZ0dk5sJjDyFqIU7I57PnEg=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Mattijs Korpershoek <mkorpershoek@baylibre.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 36/91] Bluetooth: hci_core: fix init for HCI_USER_CHANNEL
-Date:   Tue, 10 Dec 2019 17:29:40 -0500
-Message-Id: <20191210223035.14270-36-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191210223035.14270-1-sashal@kernel.org>
-References: <20191210223035.14270-1-sashal@kernel.org>
+        id S1726631AbfLJXGD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 18:06:03 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 15:06:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; 
+   d="scan'208";a="264677968"
+Received: from ingas-nuc1.sea.intel.com ([10.254.187.166])
+  by FMSMGA003.fm.intel.com with ESMTP; 10 Dec 2019 15:06:01 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Remove redundant code in mesh IO mgmt
+Date:   Tue, 10 Dec 2019 15:06:00 -0800
+Message-Id: <20191210230600.23035-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Mattijs Korpershoek <mkorpershoek@baylibre.com>
-
-[ Upstream commit eb8c101e28496888a0dcfe16ab86a1bee369e820 ]
-
-During the setup() stage, HCI device drivers expect the chip to
-acknowledge its setup() completion via vendor specific frames.
-
-If userspace opens() such HCI device in HCI_USER_CHANNEL [1] mode,
-the vendor specific frames are never tranmitted to the driver, as
-they are filtered in hci_rx_work().
-
-Allow HCI devices which operate in HCI_USER_CHANNEL mode to receive
-frames if the HCI device is is HCI_INIT state.
-
-[1] https://www.spinics.net/lists/linux-bluetooth/msg37345.html
-
-Fixes: 23500189d7e0 ("Bluetooth: Introduce new HCI socket channel for user operation")
-Signed-off-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+This removes unnecessary housekeeping for hci controllers
 ---
- net/bluetooth/hci_core.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ mesh/mesh-mgmt.c | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4bd72d2fe4150..a70b078ceb3ca 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4180,7 +4180,14 @@ static void hci_rx_work(struct work_struct *work)
- 			hci_send_to_sock(hdev, skb);
- 		}
+diff --git a/mesh/mesh-mgmt.c b/mesh/mesh-mgmt.c
+index 27272d4d2..2cf2ebac2 100644
+--- a/mesh/mesh-mgmt.c
++++ b/mesh/mesh-mgmt.c
+@@ -42,14 +42,8 @@ struct read_info_req {
+ };
  
--		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+		/* If the device has been opened in HCI_USER_CHANNEL,
-+		 * the userspace has exclusive access to device.
-+		 * When device is HCI_INIT, we still need to process
-+		 * the data packets to the driver in order
-+		 * to complete its setup().
-+		 */
-+		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+		    !test_bit(HCI_INIT, &hdev->flags)) {
- 			kfree_skb(skb);
- 			continue;
- 		}
+ static struct mgmt *mgmt_mesh;
+-static struct l_queue *controllers;
+ static struct l_queue *read_info_regs;
+ 
+-static bool simple_match(const void *a, const void *b)
+-{
+-	return a == b;
+-}
+-
+ static void process_read_info_req(void *data, void *user_data)
+ {
+ 	struct read_info_reg *reg = data;
+@@ -101,23 +95,14 @@ static void read_info_cb(uint8_t status, uint16_t length,
+ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+-	if (l_queue_find(controllers, simple_match, L_UINT_TO_PTR(index)))
+-		return;
+-
+-	l_queue_push_tail(controllers, L_UINT_TO_PTR(index));
+-
+-	if (mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
+-			read_info_cb, L_UINT_TO_PTR(index), NULL) != 0)
+-		return;
+-
+-	l_queue_remove(controllers, L_UINT_TO_PTR(index));
++	mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
++				read_info_cb, L_UINT_TO_PTR(index), NULL);
+ }
+ 
+ static void index_removed(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+ 	l_warn("Hci dev %4.4x removed", index);
+-	l_queue_remove(controllers, L_UINT_TO_PTR(index));
+ }
+ 
+ static void read_index_list_cb(uint8_t status, uint16_t length,
+@@ -157,9 +142,6 @@ static void read_index_list_cb(uint8_t status, uint16_t length,
+ 
+ static bool mesh_mgmt_init(void)
+ {
+-	if (!controllers)
+-		controllers = l_queue_new();
+-
+ 	if (!read_info_regs)
+ 		read_info_regs = l_queue_new();
+ 
 -- 
-2.20.1
+2.21.0
 
