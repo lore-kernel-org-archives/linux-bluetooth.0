@@ -2,219 +2,68 @@ Return-Path: <SRS0=8Xmo=2A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7102CC43603
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 02:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DABDDC43603
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 04:54:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4105B20637
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 02:01:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="anFTcJUM"
+	by mail.kernel.org (Postfix) with ESMTP id AE9DE20663
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 04:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726602AbfLJCB2 (ORCPT
+        id S1726835AbfLJEym convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Dec 2019 21:01:28 -0500
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:45963 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726538AbfLJCB2 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Dec 2019 21:01:28 -0500
-Received: by mail-vs1-f67.google.com with SMTP id l24so11902794vsr.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2019 18:01:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=u2lZc1Pfnan5LYYnIWymbrcXMdFa73MVqQki1acJI0o=;
-        b=anFTcJUMapk5Mp3m+hyZBHk/rsT9+fjsxjiBOZf449RKoKLfMuaNQokzeL/vPeDKWl
-         NtHAqGQBW83EFAI3LTIa9hZXgz6y1zGoXZTfze7MPCQG887wKHZfgqhQ6XY8+G/BayeA
-         a/pmMCqgHYe0nXXyKtYsbwPudMPXewuAIs8zE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=u2lZc1Pfnan5LYYnIWymbrcXMdFa73MVqQki1acJI0o=;
-        b=bfR4RLOiPuQBgA+ZpdBTQXSOvhr4mV4dh8vktY5HfHS47GzIaFa0FCGf/fV6w++COn
-         1J8DajqKiilAwl5SoDKyZ9HbVsjbkiqnrszvF8w4RuommC6K5Qa4unGVXqG/MXpY8q97
-         uRL4/ltXIKC3bKPmNhb75vPKDCNY34MkQRAtPX1MoJ6oPouTdUhS8vVKn0mQ6iGGPumm
-         VXwUBIP/75h1zs+Z+s19x5Opzx7Z3GMhyG+BSRsU5DdgiT42XuXRFzEunt3cfvvjzs1H
-         REwqMDLvbtXy6XSR6DzWRc1oZykxWYUl7aGyG4bZlqUUHfxZvtWRRD+2onEpR5M+eCma
-         2J2g==
-X-Gm-Message-State: APjAAAX51jRUaliIHfh4Enmk4y+M/Hn9qbQ+5qwtBsLYpi1bICGOHgqF
-        P7GCs5qRmqnPZxHH6kzc+CXEq/Vfuk0=
-X-Google-Smtp-Source: APXvYqzynRIgzf2N7LE3bssn4OIm8G5TsiFG/1CAj7rYoQclMT7TvrCnHbuIYbm7yOzgX3yuvNX64A==
-X-Received: by 2002:a67:fa16:: with SMTP id i22mr21808130vsq.137.1575943287028;
-        Mon, 09 Dec 2019 18:01:27 -0800 (PST)
-Received: from alain.us-east1-b.c.cloudtop-prod.google.com.internal (239.145.196.35.bc.googleusercontent.com. [35.196.145.239])
-        by smtp.gmail.com with ESMTPSA id x9sm1069587vsf.7.2019.12.09.18.01.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2019 18:01:26 -0800 (PST)
-From:   Alain Michaud <alainm@chromium.org>
-To:     BlueZ <linux-bluetooth@vger.kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Alain Michaud <alainm@chromium.org>
-Subject: [PATCH] Loading keys that should be blocked from bluetoothd.
-Date:   Tue, 10 Dec 2019 02:01:13 +0000
-Message-Id: <20191210020113.163561-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
+        Mon, 9 Dec 2019 23:54:42 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55354 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726824AbfLJEym (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 9 Dec 2019 23:54:42 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Tue, 10 Dec 2019 04:54:40 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: demonik_82@mail.ru
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-zzHckAK2y8@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This changes will send a list of known bad keys that should be blocked
-if supported by the kernel.
+https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-In particular keys from the Google Titan Security key are being blocked.
-For additional information, please see
-https://security.googleblog.com/2019/05/titan-keys-update.html
+Mitai (demonik_82@mail.ru) changed:
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |demonik_82@mail.ru
 
- lib/mgmt.h    | 17 +++++++++++++
- src/adapter.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 83 insertions(+), 1 deletion(-)
+--- Comment #45 from Mitai (demonik_82@mail.ru) ---
+debian 10 (gnome)
+Bus 001 Device 005: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle
+(HCI mode) - not work, how to fix?
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 570dec997..3e2e26e68 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -583,6 +583,23 @@ struct mgmt_cp_set_phy_confguration {
- 	uint32_t	selected_phys;
- } __packed;
- 
-+#define MGMT_OP_SET_BLOCKED_KEYS	0x0046
-+
-+#define HCI_BLOCKED_KEY_TYPE_LINKKEY	0x00
-+#define HCI_BLOCKED_KEY_TYPE_LTK		0x01
-+#define HCI_BLOCKED_KEY_TYPE_IRK		0x02
-+
-+struct mgmt_blocked_key_info {
-+	uint8_t type;
-+	uint8_t val[16];
-+} __packed;
-+
-+struct mgmt_cp_set_blocked_keys {
-+	uint16_t key_count;
-+	struct mgmt_blocked_key_info keys[0];
-+} __packed;
-+#define MGMT_OP_SET_BLOCKED_KEYS_SIZE 0
-+
- 
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
-diff --git a/src/adapter.c b/src/adapter.c
-index cef25616f..83645b2e9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -99,10 +99,27 @@
- #define DISTANCE_VAL_INVALID	0x7FFF
- #define PATHLOSS_MAX		137
- 
-+/**
-+ * These are known security keys that have been compromised.
-+ * If this grows or there are needs to be platform specific, it is
-+ * conceivable that these could be read from a config file.
-+ */
-+static const struct mgmt_blocked_key_info blocked_keys[] = {
-+	/* Google Titan Security Keys */
-+	{ HCI_BLOCKED_KEY_TYPE_LTK,
-+		{0xbf, 0x01, 0xfb, 0x9d, 0x4e, 0xf3, 0xbc, 0x36,
-+		 0xd8, 0x74, 0xf5, 0x39, 0x41, 0x38, 0x68, 0x4c}},
-+	{ HCI_BLOCKED_KEY_TYPE_IRK,
-+		{0xa5, 0x99, 0xba, 0xe4, 0xe1, 0x7c, 0xa6, 0x18,
-+		 0x22, 0x8e, 0x07, 0x56, 0xb4, 0xe8, 0x5f, 0x01}},
-+};
-+
- static DBusConnection *dbus_conn = NULL;
- 
- static bool kernel_conn_control = false;
- 
-+static bool kernel_blocked_keys_supported = false;
-+
- static GList *adapter_list = NULL;
- static unsigned int adapter_remaining = 0;
- static bool powering_down = false;
-@@ -8568,6 +8585,40 @@ static bool set_static_addr(struct btd_adapter *adapter)
- 	return false;
- }
- 
-+static void set_blocked_keys_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		btd_error(adapter->dev_id,
-+				"Failed to set blocked keys: %s (0x%02x)",
-+				mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	DBG("Successfully set blocked keys for index %u", adapter->dev_id);
-+}
-+
-+static bool set_blocked_keys(struct btd_adapter *adapter)
-+{
-+	uint8_t buffer[sizeof(struct mgmt_cp_set_blocked_keys) +
-+					sizeof(blocked_keys)] = { 0 };
-+	struct mgmt_cp_set_blocked_keys *cp =
-+					(struct mgmt_cp_set_blocked_keys *)buffer;
-+	int i;
-+
-+	cp->key_count = G_N_ELEMENTS(blocked_keys);
-+	for (i = 0; i < cp->key_count; ++i) {
-+		cp->keys[i].type = blocked_keys[i].type;
-+		memcpy(cp->keys[i].val, blocked_keys[i].val, sizeof(cp->keys[i].val));
-+	}
-+
-+	return mgmt_send(mgmt_master, MGMT_OP_SET_BLOCKED_KEYS, adapter->dev_id,
-+					sizeof(buffer),	buffer,	set_blocked_keys_complete,
-+					adapter, NULL);
-+}
-+
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -8795,6 +8846,12 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 
- 	set_name(adapter, btd_adapter_get_name(adapter));
- 
-+	if (kernel_blocked_keys_supported && !set_blocked_keys(adapter)) {
-+		btd_error(adapter->dev_id,
-+			"Failed to set blocked keys for index %u", adapter->dev_id);
-+		goto failed;
-+	}
-+
- 	if (main_opts.pairable &&
- 			!(adapter->current_settings & MGMT_SETTING_BONDABLE))
- 		set_mode(adapter, MGMT_OP_SET_BONDABLE, 0x01);
-@@ -8972,9 +9029,17 @@ static void read_commands_complete(uint8_t status, uint16_t length,
- 	for (i = 0; i < num_commands; i++) {
- 		uint16_t op = get_le16(rp->opcodes + i);
- 
--		if (op == MGMT_OP_ADD_DEVICE) {
-+		switch (op) {
-+		case MGMT_OP_ADD_DEVICE:
- 			DBG("enabling kernel-side connection control");
- 			kernel_conn_control = true;
-+			break;
-+		case MGMT_OP_SET_BLOCKED_KEYS:
-+			DBG("kernel supports the set_blocked_keys op");
-+			kernel_blocked_keys_supported = true;
-+			break;
-+		default:
-+			break;
- 		}
- 	}
- }
 -- 
-2.24.0.393.g34dc348eaf-goog
-
+You are receiving this mail because:
+You are the assignee for the bug.
