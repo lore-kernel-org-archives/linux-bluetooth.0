@@ -2,77 +2,56 @@ Return-Path: <SRS0=8Xmo=2A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AAB0C43603
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 16:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF896C43603
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 16:52:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AA80207FF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 16:25:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=metanate.com header.i=@metanate.com header.b="NGJsTWxF"
+	by mail.kernel.org (Postfix) with ESMTP id 8ACDF2073D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 16:52:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727516AbfLJQZ5 (ORCPT
+        id S1727594AbfLJQwr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 11:25:57 -0500
-Received: from dougal.metanate.com ([90.155.101.14]:45524 "EHLO metanate.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727436AbfLJQZ5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 11:25:57 -0500
-X-Greylist: delayed 944 seconds by postgrey-1.27 at vger.kernel.org; Tue, 10 Dec 2019 11:25:57 EST
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=simple/simple; d=metanate.com;
-         s=stronger; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
-        :Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=HlOSO/UsxIjuS4crUqWfNT2KKKKFuiJ3RaYVWIrUG50=; b=NGJsTWxFOYR1PXj9Zjf28RMU40
-        0XwPgNnebnD1pFQT6uzfGbGg0VRKDf600XipJ2PHSgVmd553rkp3jchxqZ3YraCheYP/tg+zAbuEz
-        96g1c5QRNZ4kDBDVZJJ3s2Npk2nVIm0TgM6YICgfZAfqAhZ4N6VgJViEprheITMxUM89i5JI0TWJu
-        OYY+PUnr9/rspXEnRZoZAY8jG6Da7pW1FYwki1c4Z4NlS8Mgs4B9+PkMtAnGTEdpNMgW0s+coxTAC
-        Tu5f3gGGpgU5s+esCrDj90J+DIE9SL5lDI4+BBZKdowY/lV3taNDHAcUYUYXzIJvkBmhv5Bkh627o
-        vQkZKwgw==;
-Received: from johnkeeping.plus.com ([81.174.171.191] helo=donbot.metanate.com)
-        by email.metanate.com with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-        (Exim 4.92.3)
-        (envelope-from <john@metanate.com>)
-        id 1iei5S-0005eE-BG; Tue, 10 Dec 2019 16:10:11 +0000
-From:   John Keeping <john@metanate.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     John Keeping <john@metanate.com>
-Subject: [PATCH sbc] sbc: Fix visibility of sbc_reinit_a2dp()
-Date:   Tue, 10 Dec 2019 16:09:54 +0000
-Message-Id: <20191210160954.2154412-1-john@metanate.com>
-X-Mailer: git-send-email 2.24.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated: YES
+        Tue, 10 Dec 2019 11:52:47 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:52375 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727572AbfLJQwr (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 11:52:47 -0500
+Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 40D98CECC6;
+        Tue, 10 Dec 2019 18:01:56 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH sbc] sbc: Fix visibility of sbc_reinit_a2dp()
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20191210160954.2154412-1-john@metanate.com>
+Date:   Tue, 10 Dec 2019 17:52:45 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <927CEFC4-3DD4-419E-850F-301543EAEC7D@holtmann.org>
+References: <20191210160954.2154412-1-john@metanate.com>
+To:     John Keeping <john@metanate.com>
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-sbc_reinit_a2dp() is missing the SBC_EXPORT attribute so it's not
-visibile to be used by consumers of the shared object.
----
- sbc/sbc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi John,
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 7f1efaa..edbe332 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -1191,7 +1191,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
- 	return 0;
- }
- 
--int sbc_reinit_a2dp(sbc_t *sbc, unsigned long flags,
-+SBC_EXPORT int sbc_reinit_a2dp(sbc_t *sbc, unsigned long flags,
- 					const void *conf, size_t conf_len)
- {
- 	int err;
--- 
-2.24.0
+> sbc_reinit_a2dp() is missing the SBC_EXPORT attribute so it's not
+> visibile to be used by consumers of the shared object.
+> ---
+> sbc/sbc.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+
+patch has been applied.
+
+Regards
+
+Marcel
 
