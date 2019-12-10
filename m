@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52265C43603
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 22:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5B6C00454
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 22:42:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1CE612053B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 22:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A399520836
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 22:42:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576017727;
-	bh=8YhErTKMnJqEhpGGs61SCekY1JkwzBvm7JgJo6zLk4Y=;
+	s=default; t=1576017767;
+	bh=8nkqA5g/vfpGYq285dCubfDGA9q/iGrdrGaEy2NlALA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=g19UDM0iesZaMEC1573vFV6agSTTJ7DQEGMOxcx8x8GiIBBTbYV4DvFvHwwtjF6FX
-	 4Hgpn36r73OXUQYbV48re0iCZxNkyek4bl7xfpc6/vKif4vwMjRyPLbV3MTzH7q+DD
-	 6jPZ2G8dZ+FxXZau/JTaKxf0QcA3ZQZEGcSiHcnE=
+	b=PXSyjWTVA+MtSzvNpQHTbYEbAgCyQHysP0Qkfz6n92S+zTlHzyHj2AC8rONvTnz5n
+	 1OIYnRx2T0PZCsbFbIdThyiy/bX+vqvogbkVa66+OS7U8RvOVHggD59vt0DI9FR56z
+	 ZIuRzpauRg298gQx7ovRCvq+o/KhGavKV0IfwDx4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728613AbfLJWbd (ORCPT
+        id S1728220AbfLJWbU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 17:31:33 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51624 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 17:31:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51314 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728573AbfLJWbd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 17:31:33 -0500
+        id S1728247AbfLJWbT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 17:31:19 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6F4C52073D;
-        Tue, 10 Dec 2019 22:31:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 21BC92077B;
+        Tue, 10 Dec 2019 22:31:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576017092;
-        bh=8YhErTKMnJqEhpGGs61SCekY1JkwzBvm7JgJo6zLk4Y=;
+        s=default; t=1576017078;
+        bh=8nkqA5g/vfpGYq285dCubfDGA9q/iGrdrGaEy2NlALA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XWa4Nnaikrmo8JYeNHviEHV98XBMH+n88GpWkL22XWFvOZIl40QS6vM8d/EDZ+7aj
-         T8oNIwtIv9qCrvI/wVbgjOTVkGAXaraf4AxftZ+IJef7k93i5VKGukRk7BLCf+F36Q
-         xV0l6DgKaVdjC9L8U8pDVJcYvIP/kKBbFG4Bwor0=
+        b=Sfzj90VGF62PjqT9PPpdhpigXiKbwjMaLNUArovGyQJC629KLUecKJ0fGW2GrSmG6
+         anN1X4vsChrQAW9+BmxLmK+oBCxHDoQJF/NTbyeJbc1FvsuQcvnWzPwFSME0lBGOUU
+         3oiLUfcnSxdYjC2r3YZ0dk5sJjDyFqIU7I57PnEg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Johan Hedberg <johan.hedberg@intel.com>,
+Cc:     Mattijs Korpershoek <mkorpershoek@baylibre.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 47/91] Bluetooth: Fix advertising duplicated flags
-Date:   Tue, 10 Dec 2019 17:29:51 -0500
-Message-Id: <20191210223035.14270-47-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 36/91] Bluetooth: hci_core: fix init for HCI_USER_CHANNEL
+Date:   Tue, 10 Dec 2019 17:29:40 -0500
+Message-Id: <20191210223035.14270-36-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191210223035.14270-1-sashal@kernel.org>
 References: <20191210223035.14270-1-sashal@kernel.org>
@@ -60,58 +60,50 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Mattijs Korpershoek <mkorpershoek@baylibre.com>
 
-[ Upstream commit 6012b9346d8959194c239fd60a62dfec98d43048 ]
+[ Upstream commit eb8c101e28496888a0dcfe16ab86a1bee369e820 ]
 
-Instances may have flags set as part of its data in which case the code
-should not attempt to add it again otherwise it can cause duplication:
+During the setup() stage, HCI device drivers expect the chip to
+acknowledge its setup() completion via vendor specific frames.
 
-< HCI Command: LE Set Extended Advertising Data (0x08|0x0037) plen 35
-        Handle: 0x00
-        Operation: Complete extended advertising data (0x03)
-        Fragment preference: Minimize fragmentation (0x01)
-        Data length: 0x06
-        Flags: 0x04
-          BR/EDR Not Supported
-        Flags: 0x06
-          LE General Discoverable Mode
-          BR/EDR Not Supported
+If userspace opens() such HCI device in HCI_USER_CHANNEL [1] mode,
+the vendor specific frames are never tranmitted to the driver, as
+they are filtered in hci_rx_work().
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Allow HCI devices which operate in HCI_USER_CHANNEL mode to receive
+frames if the HCI device is is HCI_INIT state.
+
+[1] https://www.spinics.net/lists/linux-bluetooth/msg37345.html
+
+Fixes: 23500189d7e0 ("Bluetooth: Introduce new HCI socket channel for user operation")
+Signed-off-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_request.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/bluetooth/hci_core.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 1015d9c8d97dd..4a89e121d6627 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1093,6 +1093,14 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
- 
- 	instance_flags = get_adv_instance_flags(hdev, instance);
- 
-+	/* If instance already has the flags set skip adding it once
-+	 * again.
-+	 */
-+	if (adv_instance && eir_get_data(adv_instance->adv_data,
-+					 adv_instance->adv_data_len, EIR_FLAGS,
-+					 NULL))
-+		goto skip_flags;
-+
- 	/* The Add Advertising command allows userspace to set both the general
- 	 * and limited discoverable flags.
- 	 */
-@@ -1125,6 +1133,7 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4bd72d2fe4150..a70b078ceb3ca 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -4180,7 +4180,14 @@ static void hci_rx_work(struct work_struct *work)
+ 			hci_send_to_sock(hdev, skb);
  		}
- 	}
  
-+skip_flags:
- 	if (adv_instance) {
- 		memcpy(ptr, adv_instance->adv_data,
- 		       adv_instance->adv_data_len);
+-		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
++		/* If the device has been opened in HCI_USER_CHANNEL,
++		 * the userspace has exclusive access to device.
++		 * When device is HCI_INIT, we still need to process
++		 * the data packets to the driver in order
++		 * to complete its setup().
++		 */
++		if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
++		    !test_bit(HCI_INIT, &hdev->flags)) {
+ 			kfree_skb(skb);
+ 			continue;
+ 		}
 -- 
 2.20.1
 
