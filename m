@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1229C00454
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9ADC43603
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A64A72073B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 443B42073B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576013534;
-	bh=3VioIPXcwSHgv1LxAJxjtKwmHJCLok8lLIgAF8k9yIk=;
+	s=default; t=1576013542;
+	bh=6qxVuvGp1IqwShizSavmY8GXUi0ZLBs7ZhpmsN4Op/E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=diqXyd3v8PlEYLLLbo/9Wk9dkdrv020kSg6qi69VfW8VUc9lmaD2rt4k9iTxb1RxA
-	 I5qthnIsBzs+RzHWc+7JxNTY6xdG0kakLLbj1nYz5QJNcQLLOlpqPVVr7y9R6PeVlP
-	 4eq2xeoO7PJOzvKGZej9hxUro7wY5065R0D9fHs8=
+	b=v7NKC8hhyZAhPm44dyQX6vD/ZwL49eZj+fu9CsnLHXMHnBA8VoGdPhhqDnIkv1HPA
+	 d49yuvzbX42Xs1x1A9mjOp18Au2EtVpWyRSllIyYiSZbZO5P687EpIti5G074Nud+I
+	 ey5snwQLQ7J9LvpBcKkJwIMhXJPkIeJpzLCgfsrk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728103AbfLJVJS (ORCPT
+        id S1727388AbfLJVcQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:09:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57582 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 16:32:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57562 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728092AbfLJVJR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:09:17 -0500
+        id S1726777AbfLJVJQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:09:16 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3A96924699;
-        Tue, 10 Dec 2019 21:09:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 32A0D2469E;
+        Tue, 10 Dec 2019 21:09:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576012157;
-        bh=3VioIPXcwSHgv1LxAJxjtKwmHJCLok8lLIgAF8k9yIk=;
+        s=default; t=1576012155;
+        bh=6qxVuvGp1IqwShizSavmY8GXUi0ZLBs7ZhpmsN4Op/E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=psdz+E/U3EkQ1FG7Z0Xtmmer1UOyv9OV/9GJmrISqaLChMDDYcta6ncDtCefko2NV
-         zexPf/ULIbMV2rYPWoOlw5zJpsB8eJiGgqNdwMVRWV7EaqnWChy3CTI59ivHTiYMVz
-         zXn1ZvgMbuU7JSCnR0Q7/UvFF3mZI+N0gtcLGZiE=
+        b=qjmrdYNHHzKh4KoKqki04HHqO5X2fqoaC+nJh8CKMtfalfq+y3jWHP7i+tQKTmYug
+         BnCSr5eyJOugbgR/DqMHw6Qtt9/UgA0BJegkjYBwRHgOhCB59b14JVAJDvsOhx5ewy
+         3sdvRGGWQbQIhHurNx5cg8jb4WuiUy6lajSU2G1g=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>,
+Cc:     Arnd Bergmann <arnd@arndb.de>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 119/350] Bluetooth: missed cpu_to_le16 conversion in hci_init4_req
-Date:   Tue, 10 Dec 2019 16:03:44 -0500
-Message-Id: <20191210210735.9077-80-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 118/350] Bluetooth: btusb: avoid unused function warning
+Date:   Tue, 10 Dec 2019 16:03:43 -0500
+Message-Id: <20191210210735.9077-79-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
 References: <20191210210735.9077-1-sashal@kernel.org>
@@ -60,46 +60,50 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit 727ea61a5028f8ac96f75ab34cb1b56e63fd9227 ]
+[ Upstream commit 42d22098127d6384f789107f59caae87d7520fc4 ]
 
-It looks like in hci_init4_req() the request is being
-initialised from cpu-endian data but the packet is specified
-to be little-endian. This causes an warning from sparse due
-to __le16 to u16 conversion.
+The btusb_rtl_cmd_timeout() function is used inside of an
+ifdef, leading to a warning when this part is hidden
+from the compiler:
 
-Fix this by using cpu_to_le16() on the two fields in the packet.
+drivers/bluetooth/btusb.c:530:13: error: unused function 'btusb_rtl_cmd_timeout' [-Werror,-Wunused-function]
 
-net/bluetooth/hci_core.c:845:27: warning: incorrect type in assignment (different base types)
-net/bluetooth/hci_core.c:845:27:    expected restricted __le16 [usertype] tx_len
-net/bluetooth/hci_core.c:845:27:    got unsigned short [usertype] le_max_tx_len
-net/bluetooth/hci_core.c:846:28: warning: incorrect type in assignment (different base types)
-net/bluetooth/hci_core.c:846:28:    expected restricted __le16 [usertype] tx_time
-net/bluetooth/hci_core.c:846:28:    got unsigned short [usertype] le_max_tx_time
+Use an IS_ENABLED() check instead so the compiler can see
+the code and then discard it silently.
 
-Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+Fixes: d7ef0d1e3968 ("Bluetooth: btusb: Use cmd_timeout to reset Realtek device")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btusb.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 04bc79359a173..b2559d4bed815 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -842,8 +842,8 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
- 	if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) {
- 		struct hci_cp_le_write_def_data_len cp;
- 
--		cp.tx_len = hdev->le_max_tx_len;
--		cp.tx_time = hdev->le_max_tx_time;
-+		cp.tx_len = cpu_to_le16(hdev->le_max_tx_len);
-+		cp.tx_time = cpu_to_le16(hdev->le_max_tx_time);
- 		hci_req_add(req, HCI_OP_LE_WRITE_DEF_DATA_LEN, sizeof(cp), &cp);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index a9c35ebb30f86..23e606aaaea49 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3807,8 +3807,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		btusb_check_needs_reset_resume(intf);
  	}
  
+-#ifdef CONFIG_BT_HCIBTUSB_RTL
+-	if (id->driver_info & BTUSB_REALTEK) {
++	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
++	    (id->driver_info & BTUSB_REALTEK)) {
+ 		hdev->setup = btrtl_setup_realtek;
+ 		hdev->shutdown = btrtl_shutdown_realtek;
+ 		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
+@@ -3819,7 +3819,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 		 */
+ 		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
+ 	}
+-#endif
+ 
+ 	if (id->driver_info & BTUSB_AMP) {
+ 		/* AMP controllers do not support SCO packets */
 -- 
 2.20.1
 
