@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C98C3F68F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B430BC2D0BF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:43:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BE6F20828
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:41:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B7BE20637
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:43:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576014078;
-	bh=ykKCGCn8/3t67A1Ya/4CAb5bkolOeo9qOFYnfKkRN8c=;
+	s=default; t=1576014183;
+	bh=M0d+gOqWSOd0I8oIkrNJWdjHyP0Kdwz5xGK+Eo5egks=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Wa5RorFjjaeUFSzv/6k1tafANMKiiTc0V2CPZ3Z/GGCjCd6wXilOVF7KvxCsz/yJR
-	 oc8IELz5Z4IoXJF7GVKdJejlI0+Wr1dELCYQ3/AVDMOQbZOucZQOf2/CrzzaroQOh1
-	 qd/IuwpzOotYyJADkIul3r+Hw2Tspx9XfaPSGjj8=
+	b=kW818shsuH6sZEiLqlbQRoGOC/uyvGL2MdSYkTD8LdWnrmir/MQCt7Pfta8bYp751
+	 5QcTuuvoE+ZsHU4g07c+GkuDbb3/ekYg0aagnwimbXc14KEZK85PT7A7sQaJFftiV7
+	 7b2t0F/BObjBRPjDh756fgcDk/kF8tpPuZvAgW6Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730001AbfLJVeU (ORCPT
+        id S1728845AbfLJVnC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:34:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39352 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 16:43:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38350 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728402AbfLJVeT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:34:19 -0500
+        id S1727310AbfLJVdq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:33:46 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5FA2324654;
-        Tue, 10 Dec 2019 21:34:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7FDCD2465B;
+        Tue, 10 Dec 2019 21:33:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576013659;
-        bh=ykKCGCn8/3t67A1Ya/4CAb5bkolOeo9qOFYnfKkRN8c=;
+        s=default; t=1576013626;
+        bh=M0d+gOqWSOd0I8oIkrNJWdjHyP0Kdwz5xGK+Eo5egks=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mumTng4KbfrCJ5EASheNpQWolfviMdbE1iYef1PHw0eyy9YgpYVC0FuxqYFOquflG
-         6nKEAW15pVjEV3GYiAMLvc/ci302O0hps/SIlR2O4vWTW/QtHsZWQ9qED8CKGIIKtC
-         V6EhKDxXgKpinUNAXhiyrZohduQ6AOfrVMZhibzY=
+        b=tzmL8pSJBLVmR+G1BRIoNDvIZIK/W1fVO0xGwn+Twgs0dRkqV3RM965JEtIZ8lnkH
+         Tb6S6rbpW/gpzxOFvziuO6y+dBvumV6ecCoSHNhqBRIifl+KjFv7b5TDJFNn2KptvN
+         gkt6pTRMThkGF3fb03zVhBY8OUh3nrJQ2wr5rdKM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Johan Hedberg <johan.hedberg@intel.com>,
+Cc:     Stefan Wahren <wahrenst@gmx.net>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 097/177] Bluetooth: Fix advertising duplicated flags
-Date:   Tue, 10 Dec 2019 16:31:01 -0500
-Message-Id: <20191210213221.11921-97-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 068/177] Bluetooth: hci_bcm: Fix RTS handling during startup
+Date:   Tue, 10 Dec 2019 16:30:32 -0500
+Message-Id: <20191210213221.11921-68-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191210213221.11921-1-sashal@kernel.org>
 References: <20191210213221.11921-1-sashal@kernel.org>
@@ -60,58 +60,39 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Stefan Wahren <wahrenst@gmx.net>
 
-[ Upstream commit 6012b9346d8959194c239fd60a62dfec98d43048 ]
+[ Upstream commit 3347a80965b38f096b1d6f995c00c9c9e53d4b8b ]
 
-Instances may have flags set as part of its data in which case the code
-should not attempt to add it again otherwise it can cause duplication:
+The RPi 4 uses the hardware handshake lines for CYW43455, but the chip
+doesn't react to HCI requests during DT probe. The reason is the inproper
+handling of the RTS line during startup. According to the startup
+signaling sequence in the CYW43455 datasheet, the hosts RTS line must
+be driven after BT_REG_ON and BT_HOST_WAKE.
 
-< HCI Command: LE Set Extended Advertising Data (0x08|0x0037) plen 35
-        Handle: 0x00
-        Operation: Complete extended advertising data (0x03)
-        Fragment preference: Minimize fragmentation (0x01)
-        Data length: 0x06
-        Flags: 0x04
-          BR/EDR Not Supported
-        Flags: 0x06
-          LE General Discoverable Mode
-          BR/EDR Not Supported
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_request.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 9448ebd3780a3..a8ddd211e94c2 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1258,6 +1258,14 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 59e5fc5eec8f8..b88cb7bf7f8ab 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -414,9 +414,11 @@ static int bcm_open(struct hci_uart *hu)
  
- 	instance_flags = get_adv_instance_flags(hdev, instance);
- 
-+	/* If instance already has the flags set skip adding it once
-+	 * again.
-+	 */
-+	if (adv_instance && eir_get_data(adv_instance->adv_data,
-+					 adv_instance->adv_data_len, EIR_FLAGS,
-+					 NULL))
-+		goto skip_flags;
-+
- 	/* The Add Advertising command allows userspace to set both the general
- 	 * and limited discoverable flags.
- 	 */
-@@ -1290,6 +1298,7 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
- 		}
+ out:
+ 	if (bcm->dev) {
++		hci_uart_set_flow_control(hu, true);
+ 		hu->init_speed = bcm->dev->init_speed;
+ 		hu->oper_speed = bcm->dev->oper_speed;
+ 		err = bcm_gpio_set_power(bcm->dev, true);
++		hci_uart_set_flow_control(hu, false);
+ 		if (err)
+ 			goto err_unset_hu;
  	}
- 
-+skip_flags:
- 	if (adv_instance) {
- 		memcpy(ptr, adv_instance->adv_data,
- 		       adv_instance->adv_data_len);
 -- 
 2.20.1
 
