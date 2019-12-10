@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9ADC43603
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C98C3F68F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:41:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 443B42073B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BE6F20828
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:41:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576013542;
-	bh=6qxVuvGp1IqwShizSavmY8GXUi0ZLBs7ZhpmsN4Op/E=;
+	s=default; t=1576014078;
+	bh=ykKCGCn8/3t67A1Ya/4CAb5bkolOeo9qOFYnfKkRN8c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=v7NKC8hhyZAhPm44dyQX6vD/ZwL49eZj+fu9CsnLHXMHnBA8VoGdPhhqDnIkv1HPA
-	 d49yuvzbX42Xs1x1A9mjOp18Au2EtVpWyRSllIyYiSZbZO5P687EpIti5G074Nud+I
-	 ey5snwQLQ7J9LvpBcKkJwIMhXJPkIeJpzLCgfsrk=
+	b=Wa5RorFjjaeUFSzv/6k1tafANMKiiTc0V2CPZ3Z/GGCjCd6wXilOVF7KvxCsz/yJR
+	 oc8IELz5Z4IoXJF7GVKdJejlI0+Wr1dELCYQ3/AVDMOQbZOucZQOf2/CrzzaroQOh1
+	 qd/IuwpzOotYyJADkIul3r+Hw2Tspx9XfaPSGjj8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727388AbfLJVcQ (ORCPT
+        id S1730001AbfLJVeU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:32:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57562 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 16:34:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39352 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726777AbfLJVJQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:09:16 -0500
+        id S1728402AbfLJVeT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:34:19 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 32A0D2469E;
-        Tue, 10 Dec 2019 21:09:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5FA2324654;
+        Tue, 10 Dec 2019 21:34:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576012155;
-        bh=6qxVuvGp1IqwShizSavmY8GXUi0ZLBs7ZhpmsN4Op/E=;
+        s=default; t=1576013659;
+        bh=ykKCGCn8/3t67A1Ya/4CAb5bkolOeo9qOFYnfKkRN8c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qjmrdYNHHzKh4KoKqki04HHqO5X2fqoaC+nJh8CKMtfalfq+y3jWHP7i+tQKTmYug
-         BnCSr5eyJOugbgR/DqMHw6Qtt9/UgA0BJegkjYBwRHgOhCB59b14JVAJDvsOhx5ewy
-         3sdvRGGWQbQIhHurNx5cg8jb4WuiUy6lajSU2G1g=
+        b=mumTng4KbfrCJ5EASheNpQWolfviMdbE1iYef1PHw0eyy9YgpYVC0FuxqYFOquflG
+         6nKEAW15pVjEV3GYiAMLvc/ci302O0hps/SIlR2O4vWTW/QtHsZWQ9qED8CKGIIKtC
+         V6EhKDxXgKpinUNAXhiyrZohduQ6AOfrVMZhibzY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Johan Hedberg <johan.hedberg@intel.com>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 118/350] Bluetooth: btusb: avoid unused function warning
-Date:   Tue, 10 Dec 2019 16:03:43 -0500
-Message-Id: <20191210210735.9077-79-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 097/177] Bluetooth: Fix advertising duplicated flags
+Date:   Tue, 10 Dec 2019 16:31:01 -0500
+Message-Id: <20191210213221.11921-97-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
-References: <20191210210735.9077-1-sashal@kernel.org>
+In-Reply-To: <20191210213221.11921-1-sashal@kernel.org>
+References: <20191210213221.11921-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,50 +60,58 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[ Upstream commit 42d22098127d6384f789107f59caae87d7520fc4 ]
+[ Upstream commit 6012b9346d8959194c239fd60a62dfec98d43048 ]
 
-The btusb_rtl_cmd_timeout() function is used inside of an
-ifdef, leading to a warning when this part is hidden
-from the compiler:
+Instances may have flags set as part of its data in which case the code
+should not attempt to add it again otherwise it can cause duplication:
 
-drivers/bluetooth/btusb.c:530:13: error: unused function 'btusb_rtl_cmd_timeout' [-Werror,-Wunused-function]
+< HCI Command: LE Set Extended Advertising Data (0x08|0x0037) plen 35
+        Handle: 0x00
+        Operation: Complete extended advertising data (0x03)
+        Fragment preference: Minimize fragmentation (0x01)
+        Data length: 0x06
+        Flags: 0x04
+          BR/EDR Not Supported
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
 
-Use an IS_ENABLED() check instead so the compiler can see
-the code and then discard it silently.
-
-Fixes: d7ef0d1e3968 ("Bluetooth: btusb: Use cmd_timeout to reset Realtek device")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_request.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a9c35ebb30f86..23e606aaaea49 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3807,8 +3807,8 @@ static int btusb_probe(struct usb_interface *intf,
- 		btusb_check_needs_reset_resume(intf);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 9448ebd3780a3..a8ddd211e94c2 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1258,6 +1258,14 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 
+ 	instance_flags = get_adv_instance_flags(hdev, instance);
+ 
++	/* If instance already has the flags set skip adding it once
++	 * again.
++	 */
++	if (adv_instance && eir_get_data(adv_instance->adv_data,
++					 adv_instance->adv_data_len, EIR_FLAGS,
++					 NULL))
++		goto skip_flags;
++
+ 	/* The Add Advertising command allows userspace to set both the general
+ 	 * and limited discoverable flags.
+ 	 */
+@@ -1290,6 +1298,7 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 		}
  	}
  
--#ifdef CONFIG_BT_HCIBTUSB_RTL
--	if (id->driver_info & BTUSB_REALTEK) {
-+	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
-+	    (id->driver_info & BTUSB_REALTEK)) {
- 		hdev->setup = btrtl_setup_realtek;
- 		hdev->shutdown = btrtl_shutdown_realtek;
- 		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
-@@ -3819,7 +3819,6 @@ static int btusb_probe(struct usb_interface *intf,
- 		 */
- 		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
- 	}
--#endif
- 
- 	if (id->driver_info & BTUSB_AMP) {
- 		/* AMP controllers do not support SCO packets */
++skip_flags:
+ 	if (adv_instance) {
+ 		memcpy(ptr, adv_instance->adv_data,
+ 		       adv_instance->adv_data_len);
 -- 
 2.20.1
 
