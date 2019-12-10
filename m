@@ -7,51 +7,53 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 582CAC2D0BF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 723E7C43603
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E00D207FF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:31:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 454C7205C9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Dec 2019 21:32:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576013477;
-	bh=cwMBLvP+bQjJKU19Fc8UeIkvvtMAGhEI2YS6+LSkA4I=;
+	s=default; t=1576013531;
+	bh=xJ6cWECGTI87+zeHdc7ft6/oh7NfheN/H4B2YxWsVek=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qimkIgP8Q+b5TOs3LChuTI5c9x5BeIwly/HC8d/utbQt9axT0nU8VxGJO1D3K0Ens
-	 AYRLv2ZQu3cPF2YCjlS9M2mEtwazf9w5EJ7HKmtzmHj/DagR4XrF67B5z6GVSZR/Xw
-	 tlI5Mq/7QwSJ/qOfIPN+gi+TBY5GQn7HimNJaFwI=
+	b=ap+U1Nh0A0x6mZxoW26BeGBMrY9q/4kg0QSFqb8sNwzGPrMF2q3TMcpHm8J+lpacp
+	 CvfaPg9Td3SYF7wzaIqw1gdf12R3RUDVn2tqjAqFZdgLN+67OJmLC7ov8Ie9altgkr
+	 Pbmizv2HeB3eJNmKwjwarO4fZDH+bSNZpK8erNEw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727289AbfLJVbM (ORCPT
+        id S1728272AbfLJVb4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:31:12 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58310 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 16:31:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57670 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728219AbfLJVJg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:09:36 -0500
+        id S1728095AbfLJVJS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:09:18 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D725C24696;
-        Tue, 10 Dec 2019 21:09:34 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 584E2246A3;
+        Tue, 10 Dec 2019 21:09:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576012175;
-        bh=cwMBLvP+bQjJKU19Fc8UeIkvvtMAGhEI2YS6+LSkA4I=;
+        s=default; t=1576012158;
+        bh=xJ6cWECGTI87+zeHdc7ft6/oh7NfheN/H4B2YxWsVek=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vx51UUgKJf5tVdz84/5NsIjQko/aEw+SjKkQyre6iDycN7Dh4RgkXIl9Cmt0GSeg1
-         BbVFe0s3r66z8zbMRASO9ACiaSiA2V1L4r4meN/mUNpb7OtIb7vJQG5aWPv+KjjSNQ
-         WwcF1HLdRlnYndsNZi0o/Hfd65EWXHh5Le7Gwt/I=
+        b=jLX/qN5veZDCVw16P/qZkev7aXInRj2LBV+zCBrciFXq1vliKCewh+gWhr5ceSau/
+         3DWItK6ZFVInsaczV8dGebJe+giixihrvirVfkg37DqbjStzOZr8BnQZAcbLD9ZYcT
+         2cMAh6ji3ai6llIQFyHnexbFGpw28SaMWYZ2gslY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Stefan Wahren <wahrenst@gmx.net>,
+Cc:     Szymon Janc <szymon.janc@codecoup.pl>,
+        =?UTF-8?q?S=C3=B6ren=20Beye?= <linux@hypfer.de>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 133/350] Bluetooth: hci_bcm: Fix RTS handling during startup
-Date:   Tue, 10 Dec 2019 16:03:58 -0500
-Message-Id: <20191210210735.9077-94-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 120/350] Bluetooth: Workaround directed advertising bug in Broadcom controllers
+Date:   Tue, 10 Dec 2019 16:03:45 -0500
+Message-Id: <20191210210735.9077-81-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
 References: <20191210210735.9077-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -60,39 +62,57 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Stefan Wahren <wahrenst@gmx.net>
+From: Szymon Janc <szymon.janc@codecoup.pl>
 
-[ Upstream commit 3347a80965b38f096b1d6f995c00c9c9e53d4b8b ]
+[ Upstream commit 4c371bb95cf06ded80df0e6139fdd77cee1d9a94 ]
 
-The RPi 4 uses the hardware handshake lines for CYW43455, but the chip
-doesn't react to HCI requests during DT probe. The reason is the inproper
-handling of the RTS line during startup. According to the startup
-signaling sequence in the CYW43455 datasheet, the hosts RTS line must
-be driven after BT_REG_ON and BT_HOST_WAKE.
+It appears that some Broadcom controllers (eg BCM20702A0) reject LE Set
+Advertising Parameters command if advertising intervals provided are not
+within range for undirected and low duty directed advertising.
 
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+Workaround this bug by populating min and max intervals with 'valid'
+values.
+
+< HCI Command: LE Set Advertising Parameters (0x08|0x0006) plen 15
+        Min advertising interval: 0.000 msec (0x0000)
+        Max advertising interval: 0.000 msec (0x0000)
+        Type: Connectable directed - ADV_DIRECT_IND (high duty cycle) (0x01)
+        Own address type: Public (0x00)
+        Direct address type: Random (0x01)
+        Direct address: E2:F0:7B:9F:DC:F4 (Static)
+        Channel map: 37, 38, 39 (0x07)
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
+        Status: Invalid HCI Command Parameters (0x12)
+
+Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+Tested-by: Sören Beye <linux@hypfer.de>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/hci_bcm.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/hci_conn.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 7646636f2d183..0f73f6a686cb7 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -445,9 +445,11 @@ static int bcm_open(struct hci_uart *hu)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ad5b0ac1f9cef..7ff92dd4c53cd 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -934,6 +934,14 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 			return;
  
- out:
- 	if (bcm->dev) {
-+		hci_uart_set_flow_control(hu, true);
- 		hu->init_speed = bcm->dev->init_speed;
- 		hu->oper_speed = bcm->dev->oper_speed;
- 		err = bcm_gpio_set_power(bcm->dev, true);
-+		hci_uart_set_flow_control(hu, false);
- 		if (err)
- 			goto err_unset_hu;
- 	}
+ 		memset(&cp, 0, sizeof(cp));
++
++		/* Some controllers might reject command if intervals are not
++		 * within range for undirected advertising.
++		 * BCM20702A0 is known to be affected by this.
++		 */
++		cp.min_interval = cpu_to_le16(0x0020);
++		cp.max_interval = cpu_to_le16(0x0020);
++
+ 		cp.type = LE_ADV_DIRECT_IND;
+ 		cp.own_address_type = own_addr_type;
+ 		cp.direct_addr_type = conn->dst_type;
 -- 
 2.20.1
 
