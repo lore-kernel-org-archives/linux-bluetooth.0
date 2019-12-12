@@ -2,75 +2,60 @@ Return-Path: <SRS0=nb/8=2C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8585FC43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 10:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 861F4C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 10:54:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5785F2067C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 10:33:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66B992077B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 10:54:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728795AbfLLKdI convert rfc822-to-8bit (ORCPT
+        id S1728834AbfLLKyu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Dec 2019 05:33:08 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:45993 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728573AbfLLKdI (ORCPT
+        Thu, 12 Dec 2019 05:54:50 -0500
+Received: from relay3.ptmail.sapo.pt ([212.55.154.23]:35171 "EHLO
+        relay3.ptmail.sapo.pt" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728458AbfLLKyt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Dec 2019 05:33:08 -0500
-Received: from marcel-macbook.fritz.box (p4FF9F0D1.dip0.t-ipconnect.de [79.249.240.209])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 25707CECE2;
-        Thu, 12 Dec 2019 11:42:17 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH v1 2/2] dt-bindings: net: bluetooth: Add device tree
- bindings for QCA6390
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <0101016ef8b923bc-5760b40c-1968-4992-9186-8e3965207236-000000@us-west-2.amazonses.com>
-Date:   Thu, 12 Dec 2019 11:33:06 +0100
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <24B540FF-C627-4DF9-9077-247A4A6A3605@holtmann.org>
-References: <0101016ef8b923bc-5760b40c-1968-4992-9186-8e3965207236-000000@us-west-2.amazonses.com>
-To:     Rocky Liao <rjliao@codeaurora.org>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
+        Thu, 12 Dec 2019 05:54:49 -0500
+Received: (qmail 4549 invoked from network); 12 Dec 2019 10:54:47 -0000
+Received: from [::ffff:194.210.216.112] ([::ffff:194.210.216.112]) by
+ mail.sapo.pt (Horde Framework) with HTTPS; Thu, 12 Dec 2019 10:54:47 +0000
+Date:   Thu, 12 Dec 2019 10:54:47 +0000
+Message-ID: <20191212105447.Horde.-DyB7PgBfgAz5YM_p1UkbyO@mail.sapo.pt>
+From:   Nuno Ribeiro <recstar@sapo.pt>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Licence of libbluetooth?
+User-Agent: IMP PTMail 6.1.27
+X-Originating-IP: ::ffff:194.210.216.112
+X-PTMail-Version: PTMail 6.1.27
+X-PTMail-User: eyJpdiI6Im9DR3VZSlRSbnpKVFJ6U3k1bjBDbXc9PSIsImQiOiJva3hnNG92QXl5VG5abFVGODFuTEhzelFhMTRIelI1Y2c0N2hHbUJGdTVRPSJ9
+Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
+MIME-Version: 1.0
+Content-Disposition: inline
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rocky,
+Hi all
+We have been searching for the licence that applies to libbluetooth  
+but without success till now. Hence, we decided to try in this  
+mailling list
 
-> Add compatible string for the Qualcomm QCA6390 Bluetooth controller
-> 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
-> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 1 +
-> 1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> index 68b67d9db63a..87b7f9d22414 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> @@ -10,6 +10,7 @@ device the slave device is attached to.
-> Required properties:
->  - compatible: should contain one of the following:
->    * "qcom,qca6174-bt"
-> +   * "qcom,qca6390-bt"
->    * "qcom,wcn3990-bt"
->    * "qcom,wcn3998-bt"
+We are interested in developing software that deals with bluetooth  
+interface using linux boxes and use the libbluetooth but we are not  
+aware about the licence that our own software must follow because we  
+can not find the libbluetooh and bluetooth.h header licence.
+Please, could you guide us to the address where the licence is stored?
 
-now I am confused. Is this a DT platform or ACPI or both?
+Thank you
+Alex
 
-Regards
 
-Marcel
+
+
+
 
