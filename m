@@ -2,111 +2,172 @@ Return-Path: <SRS0=nb/8=2C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB2BC43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 15:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D18A1C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 17:29:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61DDE205C9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 15:57:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYfqva1B"
+	by mail.kernel.org (Postfix) with ESMTP id A6B9921655
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 17:29:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729618AbfLLP5f (ORCPT
+        id S1730188AbfLLR26 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Dec 2019 10:57:35 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28731 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729731AbfLLP5c (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Dec 2019 10:57:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576166251;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RxNkdTGL+BHDrpQPm/i6A4JCBzTI+wc8n9aRFvVKItM=;
-        b=CYfqva1BnMdTn9G2tv3dAjk5Vn5Y0L2QNwNSSxpKh0DQljPWehISwIgMDxxggFa9KfSnng
-        74LoUznPPgqQscR1RD+CE+k2yXviwkXl7fS85xI4Wozk0BUqqrEYZoeMU/xebEtl8EJWMd
-        5CroIL/sXBuYYB8b0KeW3mnRF0AiK7g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-GV9XHqYCP_G1WJjPtl2YTw-1; Thu, 12 Dec 2019 10:57:28 -0500
-X-MC-Unique: GV9XHqYCP_G1WJjPtl2YTw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 009A7186E8C0;
-        Thu, 12 Dec 2019 15:57:26 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D46C060303;
-        Thu, 12 Dec 2019 15:57:25 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 3554283729;
-        Thu, 12 Dec 2019 15:57:25 +0000 (UTC)
-Date:   Thu, 12 Dec 2019 10:57:25 -0500 (EST)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     syzbot <syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com>
-Cc:     gregkh@linuxfoundation.org, gustavo@padovan.org,
-        johan hedberg <johan.hedberg@gmail.com>, jslaby@suse.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        loic poulain <loic.poulain@intel.com>, marcel@holtmann.org,
-        mhjungk@gmail.com, syzkaller-bugs@googlegroups.com,
-        torvalds@linux-foundation.org
-Message-ID: <678541062.767044.1576166245082.JavaMail.zimbra@redhat.com>
-In-Reply-To: <000000000000b17fae05993f628b@google.com>
-References: <000000000000b17fae05993f628b@google.com>
-Subject: Re: WARNING in tty_set_termios
+        Thu, 12 Dec 2019 12:28:58 -0500
+Received: from mx2.suse.de ([195.135.220.15]:43434 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730114AbfLLR26 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 12 Dec 2019 12:28:58 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 30906B11E;
+        Thu, 12 Dec 2019 17:28:56 +0000 (UTC)
+Message-ID: <cf77eec5df92b1845f0bf7cc8eb53edd4af9e1bf.camel@suse.de>
+Subject: Re: [PATCH v3] bluetooth: hci_bcm: enable IRQ capability from node
+From:   Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+To:     Guillaume La Roque <glaroque@baylibre.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, khilman@baylibre.com,
+        linux-rpi-kernel <linux-rpi-kernel@lists.infradead.org>
+Date:   Thu, 12 Dec 2019 18:28:53 +0100
+In-Reply-To: <20191211094923.20220-1-glaroque@baylibre.com>
+References: <20191211094923.20220-1-glaroque@baylibre.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-Z4kIgFWyImQq74xI5plv"
+User-Agent: Evolution 3.34.2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.2.123, 10.4.195.2]
-Thread-Topic: WARNING in tty_set_termios
-Thread-Index: nfPhKBJJSkrI9vtIk7Do/4ncxH+k5w==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-#syz fix: Bluetooth: hci_uart: check for missing tty operations
 
-Best regards,
-Vladis Dronov
+--=-Z4kIgFWyImQq74xI5plv
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
------ Original Message -----
-> From: "syzbot" <syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com>
-> To: gregkh@linuxfoundation.org, gustavo@padovan.org, "johan hedberg" <johan.hedberg@gmail.com>, jslaby@suse.com,
-> linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, "loic poulain" <loic.poulain@intel.com>,
-> marcel@holtmann.org, mhjungk@gmail.com, syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org,
-> vdronov@redhat.com
-> Sent: Monday, December 9, 2019 7:20:01 AM
-> Subject: Re: WARNING in tty_set_termios
-> 
-> syzbot suspects this bug was fixed by commit:
-> 
-> commit b36a1552d7319bbfd5cf7f08726c23c5c66d4f73
-> Author: Vladis Dronov <vdronov@redhat.com>
-> Date:   Tue Jul 30 09:33:45 2019 +0000
-> 
->      Bluetooth: hci_uart: check for missing tty operations
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10b20aeae00000
-> start commit:   66c56cfa Merge tag 'remove-dma_zalloc_coherent-5.0' of git..
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=b05cfdb4ee8ab9b2
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a950165cbb86bdd023a4
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=121cee07400000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16fdaed8c00000
-> 
-> If the result looks correct, please mark the bug fixed by replying with:
-> 
-> #syz fix: Bluetooth: hci_uart: check for missing tty operations
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> 
-> 
+On Wed, 2019-12-11 at 10:49 +0100, Guillaume La Roque wrote:
+> Actually IRQ can be found from GPIO but all platforms don't support
+> gpiod_to_irq, it's the case on amlogic chip.
+> so to have possibility to use interrupt mode we need to add interrupts
+> field in node and support it in driver.
+>=20
+> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+> ---
+>  drivers/bluetooth/hci_bcm.c | 3 +++
+>  1 file changed, 3 insertions(+)
+
+This triggers the following panic on Raspberry Pi 4:
+
+[    6.634507] Unable to handle kernel NULL pointer dereference at virtual
+address 0000000000000018
+[    6.643486] Mem abort info:
+[    6.646350]   ESR =3D 0x96000004
+[    6.649466]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
+[    6.654873]   SET =3D 0, FnV =3D 0
+[    6.657977]   EA =3D 0, S1PTW =3D 0
+[    6.661201] Data abort info:
+[    6.664135]   ISV =3D 0, ISS =3D 0x00000004
+[    6.668042]   CM =3D 0, WnR =3D 0
+[    6.671061] user pgtable: 4k pages, 48-bit VAs, pgdp=3D00000000f3c83000
+[    6.677627] [0000000000000018] pgd=3D0000000000000000
+[    6.682595] Internal error: Oops: 96000004 [#1] PREEMPT SMP
+[    6.688255] Modules linked in: hci_uart brcmutil btqca btbcm cfg80211
+bluetooth raspberrypi_cpufreq ecdh_generic ecc rfkill clk_raspberrypi
+raspberrypi_hwmon pwm_bcm2835 crct10dif_ce bcm2835_dma i2c_bcm2835 pcie_brc=
+mstb
+ip_tables x_tables ipv6 nf_defrag_ipv6
+[    6.711519] CPU: 3 PID: 39 Comm: kworker/u8:1 Not tainted 5.5.0-rc1-next=
+-
+20191212-00009-geb500fec1e34-dirty #26
+[    6.721771] Hardware name: Raspberry Pi 4 Model B Rev 1.1 (DT)
+[    6.727709] Workqueue: events_unbound async_run_entry_fn
+[    6.733105] pstate: a0000005 (NzCv daif -PAN -UAO)
+[    6.737971] pc : platform_get_irq_optional+0xa4/0x260
+[    6.743099] lr : platform_get_irq_optional+0x6c/0x260
+[    6.748226] sp : ffff8000101b3c20
+[    6.751586] x29: ffff8000101b3c20 x28: ffffd4bd4a957000
+[    6.756980] x27: ffff0000f6c0c070 x26: ffff0000f6c0c020
+[    6.762373] x25: 0000000000000000 x24: 0000000000000000
+[    6.767767] x23: ffff0000f6238c00 x22: ffffd4bd4a241a38
+[    6.773159] x21: ffffd4bd49e95838 x20: ffff0000f6238bf0
+[    6.778552] x19: 0000000000000000 x18: 0000000000000010
+[    6.783944] x17: 0000000000000000 x16: ffffd4bd497117a8
+[    6.789337] x15: ffff0000f6fc0470 x14: 0720072007200720
+[    6.794730] x13: 0720072007200720 x12: 0720072007200720
+[    6.800123] x11: 0720072007200720 x10: 0720072007200720
+[    6.805516] x9 : 0720072007200720 x8 : 0720072007200720
+[    6.810913] x7 : ffffd4bd496ad210 x6 : 000000000000017d
+[    6.810922] x5 : 0000000000000000 x4 : ffff0000fb7fa1b0
+[    6.821713] x3 : 00000000f6238800 x2 : 0000000000000000
+[    6.821716] x1 : 0000000000000000 x0 : 0000000000000000
+[    6.821720] Call trace:
+[    6.821730]  platform_get_irq_optional+0xa4/0x260
+[    6.839768]  platform_get_irq+0x1c/0x58
+[    6.839792]  bcm_serdev_probe+0x40/0x138 [hci_uart]
+[    6.839805]  serdev_drv_probe+0x34/0x70
+[    6.852544]  really_probe+0xd8/0x428
+[    6.852546]  driver_probe_device+0xdc/0x130
+[    6.852549]  __driver_attach_async_helper+0xa8/0xb0
+[    6.852558]  async_run_entry_fn+0x40/0x1a0
+[    6.869534]  process_one_work+0x19c/0x320
+[    6.869537]  worker_thread+0x48/0x420
+[    6.877319]  kthread+0xf0/0x120
+[    6.877324]  ret_from_fork+0x10/0x18
+[    6.877330] Code: 17ffffef f9419293 937a7c02 8b020273 (f9400e62)
+[    6.890329] ---[ end trace 3ebb39e57973e0b7 ]---
+
+>=20
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index f8f5c593a05c..9f52d57c56de 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -1409,6 +1409,7 @@ static int bcm_serdev_probe(struct serdev_device
+> *serdev)
+>  {
+>  	struct bcm_device *bcmdev;
+>  	const struct bcm_device_data *data;
+> +	struct platform_device *pdev;
+>  	int err;
+> =20
+>  	bcmdev =3D devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
+> @@ -1421,6 +1422,8 @@ static int bcm_serdev_probe(struct serdev_device
+> *serdev)
+>  #endif
+>  	bcmdev->serdev_hu.serdev =3D serdev;
+>  	serdev_device_set_drvdata(serdev, bcmdev);
+> +	pdev =3D to_platform_device(bcmdev->dev);
+
+Ultimately bcmdev->dev here comes from a serdev device not a platform devic=
+e,
+right?
+
+> +	bcmdev->irq =3D platform_get_irq(pdev, 0);
+> =20
+>  	/* Initialize routing field to an unused value */
+>  	bcmdev->pcm_int_params[0] =3D 0xff;
+
+Regards,
+Nicolas
+
+
+--=-Z4kIgFWyImQq74xI5plv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEErOkkGDHCg2EbPcGjlfZmHno8x/4FAl3yeNUACgkQlfZmHno8
+x/4v6AgAk3WeE4hzmCOiKm5HgGoC4H9YbcSS6pHN/nIdgPZvgs4lM5Kpk18xnpsl
+GyjXSy19ZWtj9ufT2JG/bSagHzn+ahHjuM2wo71b+4lmDZ+PFlY049LyHw0unmYP
+uSvQaD6SV67vV9hBqFpnJnxpDWJylPwDh0sS2Ch5D2O+THNxlkK9J/8ZYX+bsTjg
+mFXSu1y2h6uPzlcGuRxKmwsgIz03DjS02W7eLqhUC/bALo5s/QMFfO1pc8amjBAX
++V4iQHGtRAr6Sdf+HZibn5UkuQWpQDowTo61VyL51le1LGEMHWlPx7JOwwir6AKl
+oZj0Om024+71HxKW3wxtq3Xk6NJsTg==
+=NemX
+-----END PGP SIGNATURE-----
+
+--=-Z4kIgFWyImQq74xI5plv--
 
