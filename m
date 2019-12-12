@@ -2,60 +2,94 @@ Return-Path: <SRS0=nb/8=2C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 861F4C43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 10:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79072C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 11:35:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66B992077B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 10:54:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55C512464B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 11:35:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728834AbfLLKyu (ORCPT
+        id S1729039AbfLLLfC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Dec 2019 05:54:50 -0500
-Received: from relay3.ptmail.sapo.pt ([212.55.154.23]:35171 "EHLO
-        relay3.ptmail.sapo.pt" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728458AbfLLKyt (ORCPT
+        Thu, 12 Dec 2019 06:35:02 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:51822 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728871AbfLLLfB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Dec 2019 05:54:49 -0500
-Received: (qmail 4549 invoked from network); 12 Dec 2019 10:54:47 -0000
-Received: from [::ffff:194.210.216.112] ([::ffff:194.210.216.112]) by
- mail.sapo.pt (Horde Framework) with HTTPS; Thu, 12 Dec 2019 10:54:47 +0000
-Date:   Thu, 12 Dec 2019 10:54:47 +0000
-Message-ID: <20191212105447.Horde.-DyB7PgBfgAz5YM_p1UkbyO@mail.sapo.pt>
-From:   Nuno Ribeiro <recstar@sapo.pt>
-To:     linux-bluetooth@vger.kernel.org
-Subject: Licence of libbluetooth?
-User-Agent: IMP PTMail 6.1.27
-X-Originating-IP: ::ffff:194.210.216.112
-X-PTMail-Version: PTMail 6.1.27
-X-PTMail-User: eyJpdiI6Im9DR3VZSlRSbnpKVFJ6U3k1bjBDbXc9PSIsImQiOiJva3hnNG92QXl5VG5abFVGODFuTEhzelFhMTRIelI1Y2c0N2hHbUJGdTVRPSJ9
-Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
+        Thu, 12 Dec 2019 06:35:01 -0500
+Received: by mail-io1-f72.google.com with SMTP id t18so1296910iob.18
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2019 03:35:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=zFl6E7DmT67W68XqVzR2aCsqjcFpWexNUq+6/CXmVUk=;
+        b=JCMjJjA/JAumZbRLqva1G3akEutiRJoo8pwrqw1l8Lp5FdQdACQBf1qH2n9s1nmGzi
+         0ttrnnKU+GGrNVUbJUmVmOW6JEuKtYgaSNCpBMc06Bt7Scq2OTiiDKiQaQT+wyfOmrzf
+         Wiel8+6K5J0JnGGDee9LnPTMcKams4KqKDHFv4wN+Xm8wzsck4ZdPQHuYnKEQ3PZxRIy
+         zzkbswFBYUEC082rTfho8nA7ZuJriU0Q/1H/Xz3qCi5Foajl6xxaB33ezKmLzsJY/DZk
+         +Ebz72MIzdxNFbHpvJAcbAxClZLvLytg8p+XSW3MvD47dvl0KhfDiml4SNzqAYpq4xyW
+         si6g==
+X-Gm-Message-State: APjAAAWu+P4AsHRccyOVuElwlNcLHhQ+TYwZ2ROSv9G+G7j0lohN6xsr
+        qjtaj2YXvH+GU5kehPHA+rcbwp6wwIoksYQPARV9mnFi2RE7
+X-Google-Smtp-Source: APXvYqx7tAF42179GqyQGzxmn7mnoZxL7LgtxR3PNlsI/lOpd2FmYULEa+vakNib69tHnoQvSF7+iHISpB+uiby7hAsvBYRTiqDc
 MIME-Version: 1.0
-Content-Disposition: inline
+X-Received: by 2002:a92:3b19:: with SMTP id i25mr7844146ila.85.1576150500982;
+ Thu, 12 Dec 2019 03:35:00 -0800 (PST)
+Date:   Thu, 12 Dec 2019 03:35:00 -0800
+In-Reply-To: <000000000000b6b03205997b71cf@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b949ee0599802274@google.com>
+Subject: Re: BUG: corrupted list in __dentry_kill (2)
+From:   syzbot <syzbot+31043da7725b6ec210f1@syzkaller.appspotmail.com>
+To:     a@unstable.cc, alex.aring@gmail.com, allison@lohutok.net,
+        andrew@lunn.ch, andy@greyhouse.net, ap420073@gmail.com,
+        ast@domdv.de, ast@kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+        bpf@vger.kernel.org, bridge@lists.linux-foundation.org,
+        cleech@redhat.com, daniel@iogearbox.net, davem@davemloft.net,
+        dsa@cumulusnetworks.com, dsahern@gmail.com, dvyukov@google.com,
+        f.fainelli@gmail.com, fw@strlen.de, gregkh@linuxfoundation.org,
+        haiyangz@microsoft.com, hawk@kernel.org, hdanton@sina.com,
+        idosch@mellanox.com, info@metux.net, j.vosburgh@gmail.com, j@w1.fi,
+        jakub.kicinski@netronome.com, jhs@mojatatu.com, jiri@mellanox.com,
+        jiri@resnulli.us, johan.hedberg@gmail.com, johannes.berg@intel.com,
+        john.fastabend@gmail.com, john.hurley@netronome.com,
+        jwi@linux.ibm.com, kafai@fb.com, kstewart@linuxfoundation.org,
+        kvalo@codeaurora.org, kys@microsoft.com,
+        linux-bluetooth@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org,
+        liuhangbin@gmail.com, marcel@holtmann.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi all
-We have been searching for the licence that applies to libbluetooth  
-but without success till now. Hence, we decided to try in this  
-mailling list
+syzbot has bisected this bug to:
 
-We are interested in developing software that deals with bluetooth  
-interface using linux boxes and use the libbluetooth but we are not  
-aware about the licence that our own software must follow because we  
-can not find the libbluetooh and bluetooth.h header licence.
-Please, could you guide us to the address where the licence is stored?
+commit ab92d68fc22f9afab480153bd82a20f6e2533769
+Author: Taehee Yoo <ap420073@gmail.com>
+Date:   Mon Oct 21 18:47:51 2019 +0000
 
-Thank you
-Alex
+     net: core: add generic lockdep keys
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12d37cb6e00000
+start commit:   938f49c8 Add linux-next specific files for 20191211
+git tree:       linux-next
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=11d37cb6e00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16d37cb6e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=96834c884ba7bb81
+dashboard link: https://syzkaller.appspot.com/bug?extid=31043da7725b6ec210f1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12dc83dae00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ac8396e00000
 
+Reported-by: syzbot+31043da7725b6ec210f1@syzkaller.appspotmail.com
+Fixes: ab92d68fc22f ("net: core: add generic lockdep keys")
 
-
-
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
