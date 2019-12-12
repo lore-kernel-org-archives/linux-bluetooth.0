@@ -2,118 +2,168 @@ Return-Path: <SRS0=nb/8=2C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D42AC43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 17:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F33C2D0C9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 17:43:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2557321655
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 17:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80A2A214AF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 17:43:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H79a3F3x"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AnD962j2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730137AbfLLR3s (ORCPT
+        id S1730243AbfLLRnw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Dec 2019 12:29:48 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39525 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730114AbfLLR3s (ORCPT
+        Thu, 12 Dec 2019 12:43:52 -0500
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:38004 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730236AbfLLRnv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Dec 2019 12:29:48 -0500
-Received: by mail-wm1-f66.google.com with SMTP id d5so3461399wmb.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2019 09:29:46 -0800 (PST)
+        Thu, 12 Dec 2019 12:43:51 -0500
+Received: by mail-pj1-f68.google.com with SMTP id l4so1323704pjt.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2019 09:43:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=pycLCjvMMBP695CK9VSeSbANIs2m5SIPyow5sT3t3/0=;
-        b=H79a3F3x8kwdyiD+VMdzp4s/E+V2jq4H8Cbua3dFR7wSiAcesUiOCh70shX9fmXQYs
-         CY37NMuGnd3RICrBa2xSleqUiMu2ljbE174gwa3T6OGIUkiC3K5wVWQakS/E18K76/sQ
-         WE0l9VcM2UA5UodE8ry/c/2fct6a7lL13oDja1Cvi5U2s4LGfWlRU7nnkn3poFJkGTuv
-         qostKEr9cBsb7sIPB+K5BUmg+w4F7VVRKuzF56iPkD6lNFli7Qgw3xqcdKShY7wf5uz4
-         IhGITpZKdQ3Zy+lS8CSDLgwu+a1Z5bvG/8p0RmXBtLxTZifgjByw0478/aHY3aeB1Fl6
-         wAdQ==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=GuBEFzX5L/KmRFYdGw2tsnNnogFgZtYo6kJYMRL2d1I=;
+        b=AnD962j2myid8WfZ47WNy9/d7nvicLmLtLcM+Pb2j1MmswRDY41Z8qerQylGnuKcr5
+         n9tvb681VzrQjbF+0arWfQn+N+O37W/1PXmwDDI8BYmYA9DkSDcRhlrswW3j777R0Efv
+         cooEe887dVu+x52URwUGFbOfmceut8N4hhUiw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=pycLCjvMMBP695CK9VSeSbANIs2m5SIPyow5sT3t3/0=;
-        b=Bjdcc9lq16riasv1Nat1iLge7lgmyDgRk0LOGrPc1r67KeE8b9a1lV32bEvH+wz6hw
-         GuwgOyw7KEV0EtgpUWRF8XRWDsWXynzavH2bMbpkJqDVMTIVtmYkvvwcUduD7EwjhkRB
-         ZYAbYhrBPxdiBQOoUUmUnhejR6788rXZ8dHryUGIeNtrq5itcVceh6sYYAm1Bpcgdr7J
-         9N9BlV7y1q3AexmmCXrnJBv8HzE+tVoDWS1fhacIe4ZupO8gIWVLqPNZAsWUhWKfkNDm
-         7NcOqGreP0qTrPs8W/3Llay0DwTM3D/TZydCzBYltZYJI4fzqvKMHRSu33vnQFqGLn29
-         iFBw==
-X-Gm-Message-State: APjAAAVc6HBXK1WwUYNMn+ka4+H98qcIIb42SoQK8hmYeajw0GJW2+cp
-        cKQf96fJQpONzs1QTnSHUGAqoA7e
-X-Google-Smtp-Source: APXvYqzGAFbRd6E6IRGNTmXvjDpBoXz9CoFfMjjjjMwn2LnDDflO+Y+1mS6kgmqJrwMNMH5EOGyGeA==
-X-Received: by 2002:a05:600c:22d1:: with SMTP id 17mr8263826wmg.23.1576171786024;
-        Thu, 12 Dec 2019 09:29:46 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id x17sm6220038wrt.74.2019.12.12.09.29.44
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 12 Dec 2019 09:29:44 -0800 (PST)
-Date:   Thu, 12 Dec 2019 18:29:44 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: bluez: Export SDP "Remote audio volume control" item for HSP profile
-Message-ID: <20191212172944.hgt6se2qz2hpsbo2@pali>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=GuBEFzX5L/KmRFYdGw2tsnNnogFgZtYo6kJYMRL2d1I=;
+        b=oyhkPgmjkS8SnL4/i9a268sr8REGi0Y0VOXMqWRCl//Obyu6hz7KDgfBoFDk988/gk
+         Cua2nDWA9S99AxbJjTZing2IiteokCCUSc9CCxs6R/ano7naSHxo5+V82MzcJVIMuxK2
+         utjMl+bfVDZGYROTN+JcFqP+zsACYbgoy5Lf9ZgeBgJHF2nn87DBZQyyYkPD5fTwRmMS
+         AKc6uxHcs4NzRn9gfZtyXHhm7vA365yPFnpNUUrpSAB5PTmhAZxXEjFt2BfNM0JLyzLM
+         OlaI2UimFxdlsyIEGuyLiyX9e4JRegu0USwTypQtgaAicXBQjdcE+nXgve3mEL4avuC8
+         SL9g==
+X-Gm-Message-State: APjAAAURdqL48EHhUBn8Yby1SX6hz8JA9M/cPkb/29nBEa0svWj19n3E
+        asmfZWyHUlH0cuLnzv1sc4iyog==
+X-Google-Smtp-Source: APXvYqy85B8z0SRxDxoW/j7/NrrCzAIIIDx2u3ctp9q7gR3aMilopGNx5KCUBaUWfYYHV6RHzgNCmQ==
+X-Received: by 2002:a17:90a:62ca:: with SMTP id k10mr11283072pjs.59.1576172630293;
+        Thu, 12 Dec 2019 09:43:50 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
+        by smtp.gmail.com with ESMTPSA id g18sm7986007pfo.123.2019.12.12.09.43.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2019 09:43:49 -0800 (PST)
+Date:   Thu, 12 Dec 2019 09:43:48 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        tientzu@chromium.org, seanpaul@chromium.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Enable clocks required for BT SOC
+Message-ID: <20191212174348.GS228856@google.com>
+References: <20191114081430.25427-1-bgodavar@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="ys2u4j7ry3hhzv5x"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20191114081430.25427-1-bgodavar@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Thu, Nov 14, 2019 at 01:44:30PM +0530, Balakrishna Godavarthi wrote:
+> Instead of relying on other subsytem to turn ON clocks
+> required for BT SoC to operate, voting them from the driver.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 31 +++++++++++++++++++++++++++++--
+>  1 file changed, 29 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f10bdf8e1fc5..dc95e378574b 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -164,6 +164,7 @@ struct qca_serdev {
+>  };
+>  
+>  static int qca_regulator_enable(struct qca_serdev *qcadev);
+> +static int qca_power_on(struct qca_serdev *qcadev);
+>  static void qca_regulator_disable(struct qca_serdev *qcadev);
+>  static void qca_power_shutdown(struct hci_uart *hu);
+>  static int qca_power_off(struct hci_dev *hdev);
+> @@ -528,7 +529,7 @@ static int qca_open(struct hci_uart *hu)
+>  		} else {
+>  			hu->init_speed = qcadev->init_speed;
+>  			hu->oper_speed = qcadev->oper_speed;
+> -			ret = qca_regulator_enable(qcadev);
+> +			ret = qca_power_on(qcadev);
+>  			if (ret) {
+>  				destroy_workqueue(qca->workqueue);
+>  				kfree_skb(qca->rx_skb);
+> @@ -1214,7 +1215,7 @@ static int qca_wcn3990_init(struct hci_uart *hu)
+>  	qcadev = serdev_device_get_drvdata(hu->serdev);
+>  	if (!qcadev->bt_power->vregs_on) {
+>  		serdev_device_close(hu->serdev);
+> -		ret = qca_regulator_enable(qcadev);
+> +		ret = qca_power_on(qcadev);
+>  		if (ret)
+>  			return ret;
+>  
+> @@ -1408,6 +1409,9 @@ static void qca_power_shutdown(struct hci_uart *hu)
+>  	host_set_baudrate(hu, 2400);
+>  	qca_send_power_pulse(hu, false);
+>  	qca_regulator_disable(qcadev);
+> +
+> +	if (qcadev->susclk)
+> +		clk_disable_unprepare(qcadev->susclk);
+>  }
+>  
+>  static int qca_power_off(struct hci_dev *hdev)
+> @@ -1423,6 +1427,20 @@ static int qca_power_off(struct hci_dev *hdev)
+>  	return 0;
+>  }
+>  
+> +static int qca_power_on(struct qca_serdev *qcadev)
+> +{
+> +	int err;
+> +
+> +	if (qcadev->susclk) {
+> +		err = clk_prepare_enable(qcadev->susclk);
+> +		if (err)
+> +			return err;
+> +	}
+> +
+> +	qca_regulator_enable(qcadev);
+> +	return 0;
+> +}
+> +
+>  static int qca_regulator_enable(struct qca_serdev *qcadev)
+>  {
+>  	struct qca_power *power = qcadev->bt_power;
+> @@ -1523,6 +1541,15 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  
+>  		qcadev->bt_power->vregs_on = false;
+>  
+> +		if (qcadev->btsoc_type == QCA_WCN3990 ||
+> +		    qcadev->btsoc_type == QCA_WCN3991) {
+> +			qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+> +			if (IS_ERR(qcadev->susclk)) {
+> +				dev_err(&serdev->dev, "failed to acquire clk\n");
+> +				return PTR_ERR(qcadev->susclk);
+> +			}
 
---ys2u4j7ry3hhzv5x
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This will break existing users. Use devm_clk_get_optional() and at most
+raise a warning if the clock doesn't exist.
 
-Hello!
+It would also be nice to add the clock to the affected devices in the tree
+if possible:
 
-According to HSP 1.2 specification, section 4.7 Remote Audio Volume
-Control, Support for remote audio volume control is optional, so an
-implementation may support none, either, or both of the controls for
-microphone volume and speaker volume.
-
-According to HSP 1.2 specification, section 5.3 SDP Interoperability
-Requirements, bluetooth device with HSP profile announce via SDP "Remote
-audio volume control" field information if device itself supports volume
-control.
-
-But currently I did not found any way how to access "Remote audio volume
-control" SDP field in (pulseaudio) application as bluez does not export
-it.
-
-Can you please export this field? E.g. for HFP profile all optional
-features from SDP are passed to NewConnection() DBus method via
-fd_properties dictionary under Features key. Could you export that
-"Remote audio volume control" bit for HSP profile in Features key?
-
-And in same way, this needs to be handled also in RegisterProfile() DBus
-method.
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---ys2u4j7ry3hhzv5x
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXfJ5BQAKCRCL8Mk9A+RD
-Uq+1AKC4wILZjNxuosRcTWDKRYFtxojp+QCfWlYCoz6FAZSrT/3N7idLP/oetl4=
-=TgGT
------END PGP SIGNATURE-----
-
---ys2u4j7ry3hhzv5x--
+arch/arm64/boot/dts/qcom/msm8998-clamshell.dtsi:                compatible = "qcom,wcn3990-bt";
+arch/arm64/boot/dts/qcom/msm8998-mtp.dtsi:              compatible = "qcom,wcn3990-bt";
+arch/arm64/boot/dts/qcom/qcs404-evb.dtsi:               compatible = "qcom,wcn3990-bt";
+arch/arm64/boot/dts/qcom/sdm845-cheza.dtsi:             compatible = "qcom,wcn3990-bt";
+arch/arm64/boot/dts/qcom/sdm845-db845c.dts:             compatible = "qcom,wcn3990-bt";
+arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts:           compatible = "qcom,wcn3990-bt";
