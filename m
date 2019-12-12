@@ -2,191 +2,134 @@ Return-Path: <SRS0=nb/8=2C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45CC2C43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 22:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6399C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 23:03:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0ED7A22527
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 22:29:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1C3F214D8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 23:03:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="HQ/cNvPG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hp9x5MAW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731284AbfLLW3m (ORCPT
+        id S1731327AbfLLXDS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Dec 2019 17:29:42 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44731 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730938AbfLLW3j (ORCPT
+        Thu, 12 Dec 2019 18:03:18 -0500
+Received: from mail-wr1-f49.google.com ([209.85.221.49]:37934 "EHLO
+        mail-wr1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730847AbfLLXDS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Dec 2019 17:29:39 -0500
-Received: by mail-wr1-f68.google.com with SMTP id q10so4461494wrm.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2019 14:29:36 -0800 (PST)
+        Thu, 12 Dec 2019 18:03:18 -0500
+Received: by mail-wr1-f49.google.com with SMTP id y17so4567424wrh.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2019 15:03:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=BKntyhBGknYqR6iJsvJMS7cHfVX43Sx45Nvch3UNnOA=;
-        b=HQ/cNvPGNdhjydk4QSD3Kg+XVEeY+qHnpsawRfISHRhABN0sTcIi5OBVnuBmMjfuU7
-         SWhkrHr0zUynJ9Qk+Hc5QwERKI4yEIVscnNfSkeRpCcWVsEtrvY0YLhVXT+BGm2i9/Cn
-         Ztxxdr8jyyz6aw7Pfc1d4+844wxLYpsTEa/ZNI64hkpgzQLqaRNB3axcYo6NhzvjO/GT
-         Pz7iGMyfqrrkWsfjObVciraChCmAvuOYeGYbxEy5z7z6qYGDrJ+DEfZRXP8JNwSpTwyY
-         SzA2o2O/XMqZNsH5Xw2Rzf0+9FVINSDhW7FmPCvJ8sSYbDn13ns7Y9O75WQVlyxI9l3k
-         Ab9A==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=pKMYXHFDinWvkAw3+/awbV6kfj7pvPBocKfaMOS6Sj8=;
+        b=Hp9x5MAWLFfY0XvdkkEHVqexzBbVmuYv7fd34rMXhfxVFcSZJtteDqutdtLFFPlRSL
+         yAnB556jbyPn7d5ZZV6pUGpHko25Sx/OzqxOuY7uom2HyD+gVUKdqN/xH94OyT57c9Lv
+         r2VJxPRI7EQvO6LiOxnzNC0LmOVdzcBsxcxVx89OU3T4DgmqO0Vt3uCr9Qr6NajK0EwH
+         Znq4uuwKTlLtrSKhKBGPYtNmFBNQkQpl/iyRQp752QYJs77T0Jul6CZpxbNqrY5NN/VS
+         05AY4eRSL/9pWGZm8rBUJIMPx/qkR+tUmtIEZkTvpqpan2zoko2YKdXUtvawhVe19mIv
+         A/4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=BKntyhBGknYqR6iJsvJMS7cHfVX43Sx45Nvch3UNnOA=;
-        b=dhEjZvyBiBcKdY7G1Lm/Lqfc+QJKqAINgih24bITErL4ctfr0qlTTq/JEeLY4dGNDf
-         mFL8186TMe/eDPiVe4MbvSHxeGDE9QQVFbQMkULWt43g5ElJxAq+/vqcm3fKLWev26VT
-         LoLeme85lMfBO4Ft8jI1TjBpJNRyucl4dZIhzHZkglEjXJXhSlFXtsCffYLL2y7q6k2m
-         2ix7OApG0UDPoV7cNTdh2Uo/3HGVDwBNVJ68SPwLt+fQXZVLcA9lBuw/6CiPTyd0ydL4
-         st2h8XIS8C+zsmqYNe+4zvxB1o7phCtWNIUg5uD9mQUDRvpioiwbQGdX4sC6X41LmAt2
-         g41g==
-X-Gm-Message-State: APjAAAXdBGUmL3/OjRC1f9AyKRb+L9o3Pg1fHNXGYH5GA1h0B4TKwoqH
-        9B+WP8AHyeW/QzcsSB8DSohUEg==
-X-Google-Smtp-Source: APXvYqzwAGMP57lljUqh+++k6Xlu0zKN7SnAA93D1C2HJd35TxYZoQy7MfzBXqm7zzxXt9j0OBltfQ==
-X-Received: by 2002:a05:6000:cb:: with SMTP id q11mr8564947wrx.14.1576189775899;
-        Thu, 12 Dec 2019 14:29:35 -0800 (PST)
-Received: from ?IPv6:2a01:cb1d:6e7:d500:82a9:347a:43f3:d2ca? ([2a01:cb1d:6e7:d500:82a9:347a:43f3:d2ca])
-        by smtp.gmail.com with ESMTPSA id q3sm7650543wmj.38.2019.12.12.14.29.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2019 14:29:35 -0800 (PST)
-Subject: Re: [PATCH v3] bluetooth: hci_bcm: enable IRQ capability from node
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        lkml <linux-kernel@vger.kernel.org>, khilman@baylibre.com,
-        linux-rpi-kernel <linux-rpi-kernel@lists.infradead.org>
-References: <20191211094923.20220-1-glaroque@baylibre.com>
- <cf77eec5df92b1845f0bf7cc8eb53edd4af9e1bf.camel@suse.de>
- <0CF02341-CF69-4680-B61F-DC5C0702F1A2@holtmann.org>
-From:   guillaume La Roque <glaroque@baylibre.com>
-Message-ID: <3f4aaa42-59fb-b7d2-0e5d-d799d90cab0a@baylibre.com>
-Date:   Thu, 12 Dec 2019 23:29:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=pKMYXHFDinWvkAw3+/awbV6kfj7pvPBocKfaMOS6Sj8=;
+        b=Lki9VktJNIcTZN6LAB72w50Gbopej5+AiK9RxtdbaywMxyn5Os3tT1mII4n8Qgpc12
+         yLSZtShlzYLNfDevD2Glo5a4vT8f7KGOXgQce8EXyBeekckzHficXALqfr4rqRPhStyr
+         edOktqR9BzVW+IqtkToTF+ztsqZctUt5Htnick1BkNYJU6RIwkfZORu+v3OrZRiey9JS
+         nmHsN2+9NSnxIh/oe6mNbOglOoAAWNATs6oYPcnkoLvHSk+2KuHj+uo5K/JfP693kXSC
+         t4J8BvPP9unkZeRB095+Mu0YAbV+a2xNkW1vuBa+QRyo9PYACH8o+5NFUYxjU/lEM2O2
+         gz1A==
+X-Gm-Message-State: APjAAAV0eLzK9RMcEjIaNqRgkMIMWbrA7qAmP0Og3lz/KOV/HSjSJSVv
+        SZQ3M57pXwXZ1uvz9dfHq0M=
+X-Google-Smtp-Source: APXvYqxfDsBvEo/VKZ6ATO4Jy1hT6wo8lH80Vy9lT6klNTaZws/HeBdeWYYN04ilT3dHJeMAQU8jzA==
+X-Received: by 2002:adf:f508:: with SMTP id q8mr9017901wro.334.1576191796044;
+        Thu, 12 Dec 2019 15:03:16 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id c2sm7905354wrp.46.2019.12.12.15.03.14
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 12 Dec 2019 15:03:14 -0800 (PST)
+Date:   Fri, 13 Dec 2019 00:03:14 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez: Export SDP "Remote audio volume control" item for HSP
+ profile
+Message-ID: <20191212230314.g5gt6rxkphzpwucd@pali>
+References: <20191212172944.hgt6se2qz2hpsbo2@pali>
+ <CABBYNZKCovNDcAaMMeYZgKAAq-8oz+pcs6xmS3A_Qt-28aoEbQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <0CF02341-CF69-4680-B61F-DC5C0702F1A2@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="vj3av4dbfywmd6i3"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZKCovNDcAaMMeYZgKAAq-8oz+pcs6xmS3A_Qt-28aoEbQ@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Nicolas and Marcel,
 
-On 12/12/19 9:46 PM, Marcel Holtmann wrote:
-> Hi Nicolas,
->
->>> Actually IRQ can be found from GPIO but all platforms don't support
->>> gpiod_to_irq, it's the case on amlogic chip.
->>> so to have possibility to use interrupt mode we need to add interrupts
->>> field in node and support it in driver.
->>>
->>> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
->>> ---
->>> drivers/bluetooth/hci_bcm.c | 3 +++
->>> 1 file changed, 3 insertions(+)
->> This triggers the following panic on Raspberry Pi 4:
->>
->> [    6.634507] Unable to handle kernel NULL pointer dereference at virtual
->> address 0000000000000018
->> [    6.643486] Mem abort info:
->> [    6.646350]   ESR = 0x96000004
->> [    6.649466]   EC = 0x25: DABT (current EL), IL = 32 bits
->> [    6.654873]   SET = 0, FnV = 0
->> [    6.657977]   EA = 0, S1PTW = 0
->> [    6.661201] Data abort info:
->> [    6.664135]   ISV = 0, ISS = 0x00000004
->> [    6.668042]   CM = 0, WnR = 0
->> [    6.671061] user pgtable: 4k pages, 48-bit VAs, pgdp=00000000f3c83000
->> [    6.677627] [0000000000000018] pgd=0000000000000000
->> [    6.682595] Internal error: Oops: 96000004 [#1] PREEMPT SMP
->> [    6.688255] Modules linked in: hci_uart brcmutil btqca btbcm cfg80211
->> bluetooth raspberrypi_cpufreq ecdh_generic ecc rfkill clk_raspberrypi
->> raspberrypi_hwmon pwm_bcm2835 crct10dif_ce bcm2835_dma i2c_bcm2835 pcie_brcmstb
->> ip_tables x_tables ipv6 nf_defrag_ipv6
->> [    6.711519] CPU: 3 PID: 39 Comm: kworker/u8:1 Not tainted 5.5.0-rc1-next-
->> 20191212-00009-geb500fec1e34-dirty #26
->> [    6.721771] Hardware name: Raspberry Pi 4 Model B Rev 1.1 (DT)
->> [    6.727709] Workqueue: events_unbound async_run_entry_fn
->> [    6.733105] pstate: a0000005 (NzCv daif -PAN -UAO)
->> [    6.737971] pc : platform_get_irq_optional+0xa4/0x260
->> [    6.743099] lr : platform_get_irq_optional+0x6c/0x260
->> [    6.748226] sp : ffff8000101b3c20
->> [    6.751586] x29: ffff8000101b3c20 x28: ffffd4bd4a957000
->> [    6.756980] x27: ffff0000f6c0c070 x26: ffff0000f6c0c020
->> [    6.762373] x25: 0000000000000000 x24: 0000000000000000
->> [    6.767767] x23: ffff0000f6238c00 x22: ffffd4bd4a241a38
->> [    6.773159] x21: ffffd4bd49e95838 x20: ffff0000f6238bf0
->> [    6.778552] x19: 0000000000000000 x18: 0000000000000010
->> [    6.783944] x17: 0000000000000000 x16: ffffd4bd497117a8
->> [    6.789337] x15: ffff0000f6fc0470 x14: 0720072007200720
->> [    6.794730] x13: 0720072007200720 x12: 0720072007200720
->> [    6.800123] x11: 0720072007200720 x10: 0720072007200720
->> [    6.805516] x9 : 0720072007200720 x8 : 0720072007200720
->> [    6.810913] x7 : ffffd4bd496ad210 x6 : 000000000000017d
->> [    6.810922] x5 : 0000000000000000 x4 : ffff0000fb7fa1b0
->> [    6.821713] x3 : 00000000f6238800 x2 : 0000000000000000
->> [    6.821716] x1 : 0000000000000000 x0 : 0000000000000000
->> [    6.821720] Call trace:
->> [    6.821730]  platform_get_irq_optional+0xa4/0x260
->> [    6.839768]  platform_get_irq+0x1c/0x58
->> [    6.839792]  bcm_serdev_probe+0x40/0x138 [hci_uart]
->> [    6.839805]  serdev_drv_probe+0x34/0x70
->> [    6.852544]  really_probe+0xd8/0x428
->> [    6.852546]  driver_probe_device+0xdc/0x130
->> [    6.852549]  __driver_attach_async_helper+0xa8/0xb0
->> [    6.852558]  async_run_entry_fn+0x40/0x1a0
->> [    6.869534]  process_one_work+0x19c/0x320
->> [    6.869537]  worker_thread+0x48/0x420
->> [    6.877319]  kthread+0xf0/0x120
->> [    6.877324]  ret_from_fork+0x10/0x18
->> [    6.877330] Code: 17ffffef f9419293 937a7c02 8b020273 (f9400e62)
->> [    6.890329] ---[ end trace 3ebb39e57973e0b7 ]---
->>
->>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->>> index f8f5c593a05c..9f52d57c56de 100644
->>> --- a/drivers/bluetooth/hci_bcm.c
->>> +++ b/drivers/bluetooth/hci_bcm.c
->>> @@ -1409,6 +1409,7 @@ static int bcm_serdev_probe(struct serdev_device
->>> *serdev)
->>> {
->>> 	struct bcm_device *bcmdev;
->>> 	const struct bcm_device_data *data;
->>> +	struct platform_device *pdev;
->>> 	int err;
->>>
->>> 	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
->>> @@ -1421,6 +1422,8 @@ static int bcm_serdev_probe(struct serdev_device
->>> *serdev)
->>> #endif
->>> 	bcmdev->serdev_hu.serdev = serdev;
->>> 	serdev_device_set_drvdata(serdev, bcmdev);
->>> +	pdev = to_platform_device(bcmdev->dev);
->> Ultimately bcmdev->dev here comes from a serdev device not a platform device,
->> right?
-> I was afraid of this, but then nobody spoke up. Can we fix this or should I just revert the patch?
+--vj3av4dbfywmd6i3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-sorry about that, i will provide a fix as soon as possible but i have no pi4 to validate on it so i will add no in cc nicolas and if you can give me a feedback i will appreciate .
+On Thursday 12 December 2019 21:42:27 Luiz Augusto von Dentz wrote:
+> Hi Pali,
+>=20
+> On Thu, Dec 12, 2019 at 7:31 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wr=
+ote:
+> >
+> > Hello!
+> >
+> > According to HSP 1.2 specification, section 4.7 Remote Audio Volume
+> > Control, Support for remote audio volume control is optional, so an
+> > implementation may support none, either, or both of the controls for
+> > microphone volume and speaker volume.
+> >
+> > According to HSP 1.2 specification, section 5.3 SDP Interoperability
+> > Requirements, bluetooth device with HSP profile announce via SDP "Remote
+> > audio volume control" field information if device itself supports volume
+> > control.
+> >
+> > But currently I did not found any way how to access "Remote audio volume
+> > control" SDP field in (pulseaudio) application as bluez does not export
+> > it.
+> >
+> > Can you please export this field? E.g. for HFP profile all optional
+> > features from SDP are passed to NewConnection() DBus method via
+> > fd_properties dictionary under Features key. Could you export that
+> > "Remote audio volume control" bit for HSP profile in Features key?
+> >
+> > And in same way, this needs to be handled also in RegisterProfile() DBus
+> > method.
+>=20
+> Do you have a use case in mind?
 
+Yes, checking in pulseaudio if remote side announce that supports remote
+volume control or not. And based on this switch to software volume
+level.
 
-Marcel, what is better for you a fix on this patch or a new version of this patch ?
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
 
-> Regards
->
-> Marcel
->
-Regards
+--vj3av4dbfywmd6i3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Guillaume
+-----BEGIN PGP SIGNATURE-----
 
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXfLHMAAKCRCL8Mk9A+RD
+UlKtAJ4wryPSDSLw6lEBAO9H+nQh4bZQzwCfTEqiaXLcALsKsdcplm7U0c2YQCM=
+=kmd+
+-----END PGP SIGNATURE-----
+
+--vj3av4dbfywmd6i3--
