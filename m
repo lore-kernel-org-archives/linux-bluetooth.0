@@ -2,94 +2,111 @@ Return-Path: <SRS0=nb/8=2C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79072C43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 11:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB2BC43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 15:57:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55C512464B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 11:35:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61DDE205C9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Dec 2019 15:57:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYfqva1B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729039AbfLLLfC (ORCPT
+        id S1729618AbfLLP5f (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Dec 2019 06:35:02 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:51822 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728871AbfLLLfB (ORCPT
+        Thu, 12 Dec 2019 10:57:35 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28731 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729731AbfLLP5c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Dec 2019 06:35:01 -0500
-Received: by mail-io1-f72.google.com with SMTP id t18so1296910iob.18
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2019 03:35:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=zFl6E7DmT67W68XqVzR2aCsqjcFpWexNUq+6/CXmVUk=;
-        b=JCMjJjA/JAumZbRLqva1G3akEutiRJoo8pwrqw1l8Lp5FdQdACQBf1qH2n9s1nmGzi
-         0ttrnnKU+GGrNVUbJUmVmOW6JEuKtYgaSNCpBMc06Bt7Scq2OTiiDKiQaQT+wyfOmrzf
-         Wiel8+6K5J0JnGGDee9LnPTMcKams4KqKDHFv4wN+Xm8wzsck4ZdPQHuYnKEQ3PZxRIy
-         zzkbswFBYUEC082rTfho8nA7ZuJriU0Q/1H/Xz3qCi5Foajl6xxaB33ezKmLzsJY/DZk
-         +Ebz72MIzdxNFbHpvJAcbAxClZLvLytg8p+XSW3MvD47dvl0KhfDiml4SNzqAYpq4xyW
-         si6g==
-X-Gm-Message-State: APjAAAWu+P4AsHRccyOVuElwlNcLHhQ+TYwZ2ROSv9G+G7j0lohN6xsr
-        qjtaj2YXvH+GU5kehPHA+rcbwp6wwIoksYQPARV9mnFi2RE7
-X-Google-Smtp-Source: APXvYqx7tAF42179GqyQGzxmn7mnoZxL7LgtxR3PNlsI/lOpd2FmYULEa+vakNib69tHnoQvSF7+iHISpB+uiby7hAsvBYRTiqDc
+        Thu, 12 Dec 2019 10:57:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576166251;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RxNkdTGL+BHDrpQPm/i6A4JCBzTI+wc8n9aRFvVKItM=;
+        b=CYfqva1BnMdTn9G2tv3dAjk5Vn5Y0L2QNwNSSxpKh0DQljPWehISwIgMDxxggFa9KfSnng
+        74LoUznPPgqQscR1RD+CE+k2yXviwkXl7fS85xI4Wozk0BUqqrEYZoeMU/xebEtl8EJWMd
+        5CroIL/sXBuYYB8b0KeW3mnRF0AiK7g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-GV9XHqYCP_G1WJjPtl2YTw-1; Thu, 12 Dec 2019 10:57:28 -0500
+X-MC-Unique: GV9XHqYCP_G1WJjPtl2YTw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 009A7186E8C0;
+        Thu, 12 Dec 2019 15:57:26 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D46C060303;
+        Thu, 12 Dec 2019 15:57:25 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 3554283729;
+        Thu, 12 Dec 2019 15:57:25 +0000 (UTC)
+Date:   Thu, 12 Dec 2019 10:57:25 -0500 (EST)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     syzbot <syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com>
+Cc:     gregkh@linuxfoundation.org, gustavo@padovan.org,
+        johan hedberg <johan.hedberg@gmail.com>, jslaby@suse.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        loic poulain <loic.poulain@intel.com>, marcel@holtmann.org,
+        mhjungk@gmail.com, syzkaller-bugs@googlegroups.com,
+        torvalds@linux-foundation.org
+Message-ID: <678541062.767044.1576166245082.JavaMail.zimbra@redhat.com>
+In-Reply-To: <000000000000b17fae05993f628b@google.com>
+References: <000000000000b17fae05993f628b@google.com>
+Subject: Re: WARNING in tty_set_termios
 MIME-Version: 1.0
-X-Received: by 2002:a92:3b19:: with SMTP id i25mr7844146ila.85.1576150500982;
- Thu, 12 Dec 2019 03:35:00 -0800 (PST)
-Date:   Thu, 12 Dec 2019 03:35:00 -0800
-In-Reply-To: <000000000000b6b03205997b71cf@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b949ee0599802274@google.com>
-Subject: Re: BUG: corrupted list in __dentry_kill (2)
-From:   syzbot <syzbot+31043da7725b6ec210f1@syzkaller.appspotmail.com>
-To:     a@unstable.cc, alex.aring@gmail.com, allison@lohutok.net,
-        andrew@lunn.ch, andy@greyhouse.net, ap420073@gmail.com,
-        ast@domdv.de, ast@kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
-        bpf@vger.kernel.org, bridge@lists.linux-foundation.org,
-        cleech@redhat.com, daniel@iogearbox.net, davem@davemloft.net,
-        dsa@cumulusnetworks.com, dsahern@gmail.com, dvyukov@google.com,
-        f.fainelli@gmail.com, fw@strlen.de, gregkh@linuxfoundation.org,
-        haiyangz@microsoft.com, hawk@kernel.org, hdanton@sina.com,
-        idosch@mellanox.com, info@metux.net, j.vosburgh@gmail.com, j@w1.fi,
-        jakub.kicinski@netronome.com, jhs@mojatatu.com, jiri@mellanox.com,
-        jiri@resnulli.us, johan.hedberg@gmail.com, johannes.berg@intel.com,
-        john.fastabend@gmail.com, john.hurley@netronome.com,
-        jwi@linux.ibm.com, kafai@fb.com, kstewart@linuxfoundation.org,
-        kvalo@codeaurora.org, kys@microsoft.com,
-        linux-bluetooth@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org,
-        liuhangbin@gmail.com, marcel@holtmann.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.43.2.123, 10.4.195.2]
+Thread-Topic: WARNING in tty_set_termios
+Thread-Index: nfPhKBJJSkrI9vtIk7Do/4ncxH+k5w==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this bug to:
+#syz fix: Bluetooth: hci_uart: check for missing tty operations
 
-commit ab92d68fc22f9afab480153bd82a20f6e2533769
-Author: Taehee Yoo <ap420073@gmail.com>
-Date:   Mon Oct 21 18:47:51 2019 +0000
+Best regards,
+Vladis Dronov
 
-     net: core: add generic lockdep keys
+----- Original Message -----
+> From: "syzbot" <syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com>
+> To: gregkh@linuxfoundation.org, gustavo@padovan.org, "johan hedberg" <johan.hedberg@gmail.com>, jslaby@suse.com,
+> linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, "loic poulain" <loic.poulain@intel.com>,
+> marcel@holtmann.org, mhjungk@gmail.com, syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org,
+> vdronov@redhat.com
+> Sent: Monday, December 9, 2019 7:20:01 AM
+> Subject: Re: WARNING in tty_set_termios
+> 
+> syzbot suspects this bug was fixed by commit:
+> 
+> commit b36a1552d7319bbfd5cf7f08726c23c5c66d4f73
+> Author: Vladis Dronov <vdronov@redhat.com>
+> Date:   Tue Jul 30 09:33:45 2019 +0000
+> 
+>      Bluetooth: hci_uart: check for missing tty operations
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10b20aeae00000
+> start commit:   66c56cfa Merge tag 'remove-dma_zalloc_coherent-5.0' of git..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b05cfdb4ee8ab9b2
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a950165cbb86bdd023a4
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=121cee07400000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16fdaed8c00000
+> 
+> If the result looks correct, please mark the bug fixed by replying with:
+> 
+> #syz fix: Bluetooth: hci_uart: check for missing tty operations
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> 
+> 
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12d37cb6e00000
-start commit:   938f49c8 Add linux-next specific files for 20191211
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=11d37cb6e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16d37cb6e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=96834c884ba7bb81
-dashboard link: https://syzkaller.appspot.com/bug?extid=31043da7725b6ec210f1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12dc83dae00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ac8396e00000
-
-Reported-by: syzbot+31043da7725b6ec210f1@syzkaller.appspotmail.com
-Fixes: ab92d68fc22f ("net: core: add generic lockdep keys")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
