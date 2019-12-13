@@ -2,115 +2,95 @@ Return-Path: <SRS0=edj+=2D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA50CC34976
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CE4C79DD6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:39:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0ABBA2473E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:39:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576269552;
-	bh=RBVHAY+CJ2XeDspL1l3fObDb/ux4BAnVyu3PtEsXzhY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZDie/pKG3xO5uMAxOFxrwVssJS9DuYyQD86RQqytNzZx4FiI0KyC4omkztKlXJeQZ
-	 9wK2j2lUSI4y1YwHYfkFkKORSs4NT+ralIMU0ye57frGGvOybmMGttNjdll72VMQkO
-	 qrW6dxV9fcuhUmC4n0lGNmGXG3D7SnDVgIZG29ok=
+	by mail.kernel.org (Postfix) with ESMTP id 82FDC2474A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:39:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="cUYdO6uu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728173AbfLMQTE (ORCPT
+        id S1728462AbfLMRO7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Dec 2019 11:19:04 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:37299 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728133AbfLMQTE (ORCPT
+        Fri, 13 Dec 2019 12:14:59 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:40656 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728437AbfLMRO7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Dec 2019 11:19:04 -0500
-Received: by mail-lf1-f66.google.com with SMTP id b15so2374429lfc.4;
-        Fri, 13 Dec 2019 08:19:02 -0800 (PST)
+        Fri, 13 Dec 2019 12:14:59 -0500
+Received: by mail-pj1-f65.google.com with SMTP id s35so1460435pjb.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Dec 2019 09:14:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version;
+        bh=xGfkgHFOiwzu4bSfkgFVF67O8wpT6Z/ekwvnkfqDuzY=;
+        b=cUYdO6uuG/TiXeqwUvZcAm2hBzDMImTYy4ODdcn/fMcmh9JgLu1CLGGVX+KIvvSvO0
+         o8aWIqxEx/ptb+/MPjY/Yq579KsJr1o9RPqaiCllSSleXUTWrLmcI5RrEd+/Vrfu6Flu
+         CWYAgQa0ZlDt6LHKcaWNRNJjJC1lmY2DyL0S80riSCKaUdLoml+I2lmjv4MSWugYx9o5
+         s6JunedYMjjRe7k0maLrsIspTN1iGgwZbO2xjk7eeLOQ9oZ/D3yt0WyYvo0YErpvSsqV
+         QnY53A7SjfDhKpy53r4//AfCp08E65blD6Nm/gIFCLH23SXnz4k/U4az1r298eO7WUUq
+         FlCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Spg0GfwWFlnRUw0lvoa6ReBLhxIzcCxpK224qhBQrwk=;
-        b=fS2w9fx2/qyRZCSQ7ld1Lck5W9YGKEyko/GaYYX6zDuKFTKxUOCu6aHpYPM6/ts8A1
-         ul7fUEDNoCcdtsiQ973+hkTLseRh5wv2ZkeDw8YIXdSXWuuYuZUSAMJhvzUzuOO/zsLm
-         Akr89PDzpaRXp4ZB1mtf9yAGE6gi4vmouWVNWufSAfxFI0BqZYx7ogKVR85I3YL6MNWQ
-         b35KglaacnJtkFnNl0XKLp6wHNfQ7L51T5Q3TuleAMkidmYaAl+ytGgw/SsI+FUWRcrX
-         he4K41jJPHcdEfOP4sC404HHTi8VyA7hAAqGyxelvVh2yGjivw4B051wGzzM2refoJKd
-         E+RQ==
-X-Gm-Message-State: APjAAAW3GMI8WnEDkOixPA7WoyKNLgiX4I2MXt8cYeJ72Eb69awT/SEL
-        3qZojReauFarRlyqmFXAOn8=
-X-Google-Smtp-Source: APXvYqxnVkGEyfViuTjx4mMxFXlrRlIx6//9d0OuQRcfhBx2KniHpTnXbEebHTcjKF/40vT+3FGIaw==
-X-Received: by 2002:a05:6512:21d:: with SMTP id a29mr9741453lfo.186.1576253941800;
-        Fri, 13 Dec 2019 08:19:01 -0800 (PST)
-Received: from xi.terra (c-14b8e655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.184.20])
-        by smtp.gmail.com with ESMTPSA id x13sm4778590lfe.48.2019.12.13.08.19.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2019 08:19:00 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.92.3)
-        (envelope-from <johan@kernel.org>)
-        id 1ifnef-0000iF-Bd; Fri, 13 Dec 2019 17:19:01 +0100
-Date:   Fri, 13 Dec 2019 17:19:01 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Guillaume La Roque <glaroque@baylibre.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        netdev@vger.kernel.org, nsaenzjulienne@suse.de,
-        linux-kernel@vger.kernel.org, khilman@baylibre.com,
-        Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v5 1/2] dt-bindings: net: bluetooth: add interrupts
- properties
-Message-ID: <20191213161901.GZ10631@localhost>
-References: <20191213150622.14162-1-glaroque@baylibre.com>
- <20191213150622.14162-2-glaroque@baylibre.com>
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=xGfkgHFOiwzu4bSfkgFVF67O8wpT6Z/ekwvnkfqDuzY=;
+        b=OzdF8oSVV9zphBKcAqEsz+mH4V2ROP4KSN5RfybCS2EeC1TmCvdICbw5SAtIAESPiY
+         V7/ztfJKAUd+oz2/JvA/k6Et1eqgMyLRvyu5QvuxMm+Tbqk/L2h5zL+L5/lsnY4HChb2
+         jkN9UsYN2Con30hntijLfdbhBDOBDIST2wwgd74P+HhzMQkMjB9rqt9oEcQtMFKCt2DC
+         Lwu5csD1v7l7yHYBQgFZpDxIs10oN7MtaUUFKWzrv37TUat3H8O0K6buPsl/gYB8oOyA
+         8rTGf6vyGWM1gYgpX+NGdpUAD0zwf50f/KwQwX7YYypmDK7exJxxo6JjsBT++bzkK76C
+         XbDw==
+X-Gm-Message-State: APjAAAWv7EI2oQ4ip+fibu9vTgXSxPJ2k5TpEg3OpGuOr21d+SRc62+P
+        5S+tfT6ybUMK8jY6l8DkWrMddg==
+X-Google-Smtp-Source: APXvYqxNp9JqbsXiF34gHi5lFrYjYb8YF87UwVb6GpItvh6TUJ6QG94Jp9JFz8MrAz7ABEyxzH6tHA==
+X-Received: by 2002:a17:902:758c:: with SMTP id j12mr431734pll.14.1576257298141;
+        Fri, 13 Dec 2019 09:14:58 -0800 (PST)
+Received: from localhost (c-71-197-186-152.hsd1.wa.comcast.net. [71.197.186.152])
+        by smtp.gmail.com with ESMTPSA id n188sm11426933pga.84.2019.12.13.09.14.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 13 Dec 2019 09:14:57 -0800 (PST)
+From:   Kevin Hilman <khilman@baylibre.com>
+To:     Guillaume La Roque <glaroque@baylibre.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        devicetree@vger.kernel.org
+Cc:     netdev@vger.kernel.org, nsaenzjulienne@suse.de,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 2/2] bluetooth: hci_bcm: enable IRQ capability from devicetree
+In-Reply-To: <20191213150622.14162-3-glaroque@baylibre.com>
+References: <20191213150622.14162-1-glaroque@baylibre.com> <20191213150622.14162-3-glaroque@baylibre.com>
+Date:   Fri, 13 Dec 2019 09:14:57 -0800
+Message-ID: <7ho8wc87vy.fsf@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191213150622.14162-2-glaroque@baylibre.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Dec 13, 2019 at 04:06:21PM +0100, Guillaume La Roque wrote:
-> add interrupts and interrupt-names as optional properties
-> to support host-wakeup by interrupt properties instead of
-> host-wakeup-gpios.
-> 
-> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
-> ---
->  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> index b5eadee4a9a7..95912d979239 100644
-> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-> @@ -36,7 +36,9 @@ Optional properties:
->      - pcm-frame-type: short, long
->      - pcm-sync-mode: slave, master
->      - pcm-clock-mode: slave, master
-> -
-> + - interrupts: must be one, used to wakeup the host processor if
-> +   gpiod_to_irq function not supported
+Guillaume La Roque <glaroque@baylibre.com> writes:
 
-This is a Linux implementation detail which therefore doesn't belong in
-the binding.
+> Actually IRQ can be found from GPIO but all platforms don't support
+> gpiod_to_irq, it's the case on amlogic chip.
+> so to have possibility to use interrupt mode we need to add interrupts
+> property in devicetree and support it in driver.
 
-I think the general rule is to prefer interrupts over gpios where we
-have a choice, but here the current binding already has a
-host-wakeup-gpios.
+I would reword this slightly (leaving out the amlogic specifics):
 
-Not sure how best to handle that, maybe Rob knows.
+"""
+Add support for getting IRQ directly from DT instead of relying on
+converting a GPIO to IRQ. This is needed for platforms with GPIO
+controllers that that do not support gpiod_to_irq().
+"""
 
-> + - interrupt-names: must be "host-wakeup"
->  
->  Example:
+Other than that, this looks good to me and now it's clear that it only
+affects the DT path.
 
-Oh, and please keep people commenting on your patches on CC when you
-submit new versions.
+Reviewed-by: Kevin Hilman <khilman@baylibre.com>
 
-Johan
+Kevin
