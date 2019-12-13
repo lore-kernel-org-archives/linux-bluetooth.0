@@ -2,113 +2,81 @@ Return-Path: <SRS0=edj+=2D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F29EC43603
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 07:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E31F7C2D0C9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 08:50:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F6942253D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 07:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAEA72467E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 08:50:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="VbLA9PmA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725828AbfLMH4T (ORCPT
+        id S1726744AbfLMIu5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Dec 2019 02:56:19 -0500
-Received: from mx2.suse.de ([195.135.220.15]:49068 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725468AbfLMH4T (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Dec 2019 02:56:19 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 278DFAC4D;
-        Fri, 13 Dec 2019 07:56:17 +0000 (UTC)
-Message-ID: <8b5f4ed5fd341d279a25e4ad94b751c61cd3a4de.camel@suse.de>
-Subject: Re: [PATCH v3] bluetooth: hci_bcm: enable IRQ capability from node
-From:   Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-To:     guillaume La Roque <glaroque@baylibre.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        lkml <linux-kernel@vger.kernel.org>, khilman@baylibre.com,
-        linux-rpi-kernel <linux-rpi-kernel@lists.infradead.org>
-Date:   Fri, 13 Dec 2019 08:56:16 +0100
-In-Reply-To: <3f4aaa42-59fb-b7d2-0e5d-d799d90cab0a@baylibre.com>
-References: <20191211094923.20220-1-glaroque@baylibre.com>
-         <cf77eec5df92b1845f0bf7cc8eb53edd4af9e1bf.camel@suse.de>
-         <0CF02341-CF69-4680-B61F-DC5C0702F1A2@holtmann.org>
-         <3f4aaa42-59fb-b7d2-0e5d-d799d90cab0a@baylibre.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-2Fr8xhQBje9kaHYBFIhM"
-User-Agent: Evolution 3.34.2 
-MIME-Version: 1.0
+        Fri, 13 Dec 2019 03:50:57 -0500
+Received: from m228-5.mailgun.net ([159.135.228.5]:16953 "EHLO
+        m228-5.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725948AbfLMIu5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 13 Dec 2019 03:50:57 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1576227057; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=XBRwxAmfxra18txp4oAP+b792+6m6ttYJLaEeG2c9+4=; b=VbLA9PmAgWvhfetpSyKV09Lm/zAVFSBuXlMu/26Ytqt3fKo+QEm94YG9RtFaQav5sHi2umPv
+ B25awRTHgb4vn5Y7gQ7NK8ByNUXmDxNOGaJ5/eKJAQku0/Hc8YRCBBUNRG4isxQg6xUjO5Nw
+ BuxP9luayyFpkquMIh3RwRMJjrI=
+X-Mailgun-Sending-Ip: 159.135.228.5
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5df350ee.7f5a9c055d88-smtp-out-n02;
+ Fri, 13 Dec 2019 08:50:54 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id C203AC447B2; Fri, 13 Dec 2019 08:50:53 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 663F8C447AB;
+        Fri, 13 Dec 2019 08:50:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 663F8C447AB
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Replace of_device_get_match_data with device_get_match_data
+Date:   Fri, 13 Dec 2019 16:50:45 +0800
+Message-Id: <20191213085045.24637-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Replace of_device_get_match_data with device_get_match_data to make driver
+work across platforms.
 
---=-2Fr8xhQBje9kaHYBFIhM
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > > > diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bc=
-m.c
-> > > > index f8f5c593a05c..9f52d57c56de 100644
-> > > > --- a/drivers/bluetooth/hci_bcm.c
-> > > > +++ b/drivers/bluetooth/hci_bcm.c
-> > > > @@ -1409,6 +1409,7 @@ static int bcm_serdev_probe(struct serdev_dev=
-ice
-> > > > *serdev)
-> > > > {
-> > > > 	struct bcm_device *bcmdev;
-> > > > 	const struct bcm_device_data *data;
-> > > > +	struct platform_device *pdev;
-> > > > 	int err;
-> > > >=20
-> > > > 	bcmdev =3D devm_kzalloc(&serdev->dev, sizeof(*bcmdev),
-> > > > GFP_KERNEL);
-> > > > @@ -1421,6 +1422,8 @@ static int bcm_serdev_probe(struct serdev_dev=
-ice
-> > > > *serdev)
-> > > > #endif
-> > > > 	bcmdev->serdev_hu.serdev =3D serdev;
-> > > > 	serdev_device_set_drvdata(serdev, bcmdev);
-> > > > +	pdev =3D to_platform_device(bcmdev->dev);
-> > > Ultimately bcmdev->dev here comes from a serdev device not a platform
-> > > device,
-> > > right?
-> > I was afraid of this, but then nobody spoke up. Can we fix this or shou=
-ld I
-> > just revert the patch?
->=20
-> sorry about that, i will provide a fix as soon as possible but i have no =
-pi4
-> to validate on it so i will add no in cc nicolas and if you can give me a
-> feedback i will appreciate .
-
-Thanks, I will :)
-
-Regards,
-Nicolas
-
-
---=-2Fr8xhQBje9kaHYBFIhM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEErOkkGDHCg2EbPcGjlfZmHno8x/4FAl3zRCAACgkQlfZmHno8
-x/4O5wf/S3T5ZtghqcIHN9ZUNBqo4r2BMbKhz5gQKmqgnQYQzvnkZ6j4o267rTD2
-JVT5KeL91NHcqlw/SOFG4x7JbChz8uX6JjDQ1djXG4K4vOi1KssJKMKb8x3RmCWJ
-QUOzLwPSSlT9ZkTRp/b0rOyeLDVrT3ZwCcU4U0QVl9F/M5D53i0oDc9/beEZuNWG
-4yqMsSN5uGkI0rjw/iv/Tg8ZI+kmCNID7cbi0WzkYtjDvQmrNDBnaZqp/e7vKGRn
-lM4PMkzGCEAd8EO9PJ4Ur2NA7unX08m0bFUFhV7/srAQAmf8kzwA5TonU5J+mKMS
-patEbFtwpznGBM8QFnXji1deXIqqtQ==
-=efmf
------END PGP SIGNATURE-----
-
---=-2Fr8xhQBje9kaHYBFIhM--
-
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index f10bdf8e1fc5..b602ed01505b 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1501,7 +1501,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 		return -ENOMEM;
+ 
+ 	qcadev->serdev_hu.serdev = serdev;
+-	data = of_device_get_match_data(&serdev->dev);
++	data = device_get_match_data(&serdev->dev);
+ 	serdev_device_set_drvdata(serdev, qcadev);
+ 	device_property_read_string(&serdev->dev, "firmware-name",
+ 					 &qcadev->firmware_name);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
