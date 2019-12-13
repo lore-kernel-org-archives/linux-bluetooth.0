@@ -2,118 +2,134 @@ Return-Path: <SRS0=edj+=2D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B24BDC34962
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C72C341C6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:36:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E9D36246EB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:36:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576269380;
-	bh=YPaNCsm+FJvIWej38mWbBoe0T6D28xFUIWW4ft16uNY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=2ux+Fc1sQ0HYReZ/UmSgToYHL8KamRmKOM/0KLH85+gwe0VIBZWw7JbvEFAzKR89t
-	 fvwbL0/+Kzd4zmliSQm2z74GQRJDvdhnmek8oy666YBTA4p7hc0E4EmjNhlSDYS2Uo
-	 4oS5a5kVWp2xROISXE23AX6QdE96tordCZtZK5BU=
+	by mail.kernel.org (Postfix) with ESMTP id D3F3E24725
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 20:36:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="Ly/oQT9L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbfLMLRE (ORCPT
+        id S1726912AbfLMMbV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Dec 2019 06:17:04 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:33948 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725937AbfLMLRE (ORCPT
+        Fri, 13 Dec 2019 07:31:21 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35606 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726903AbfLMMbV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Dec 2019 06:17:04 -0500
-Received: by mail-lj1-f196.google.com with SMTP id m6so2146203ljc.1;
-        Fri, 13 Dec 2019 03:17:03 -0800 (PST)
+        Fri, 13 Dec 2019 07:31:21 -0500
+Received: by mail-wm1-f68.google.com with SMTP id p17so6393809wmb.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Dec 2019 04:31:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=z41FKQuYBUSuoSb2FV0vifxkTTBPMXxzD/YOhZ2tMXg=;
+        b=Ly/oQT9L+ts7qFVZIDbECN/aSDdc+QRYixCMzB3z+8bWc36CMUodtwuYDGPaBOM/Ih
+         gLkJq29oULc4rltitaD9MXHtFWZFPgwpOtHwj9ZMOKuo01Yy8jFUyMK5dFhAa75pBX+7
+         CQMwgUHLt9uRCgaYBPs6z9R8fpeYG6seMH6b/CGWq0OB9ozvko1nV46ueLh0yAmeFB7U
+         qot0qE7kJH6deDEOt5ZZTwWT5Keh4ntPraiEvn6E+TFHvEG2QCaC+sCh1TYeqJVDcnAq
+         StldK8xrkuSot7KQ5sgxR+59OsbvQikY9X50zAf2wOgPOzKqLUlm24kNLlQy9Gg5lbuA
+         Vlww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/Ec79d6Yr2kvkN4vFRH9LzqVSAfGcyBhOQq0QTx7vgs=;
-        b=XZgcVO2YgeES1yrMQvmDWD1XbwatbF7kQY8JwWLifjD5ZWO1eOB8Ny6JMJeAgFv2j3
-         2gTcAN4z13IB3xt7QSOVAtLIrfShDLqdumP/WeNW1NxpqTSvQQkkgCGqjkQvCSji7yl/
-         19o5NcEKEcEbZi7zwbR9TVlIjOGo2UIR73LBL5QUlyWHBf/V+P/FT5d3lxgDgU63ipNO
-         UbS0tECU3VwxHU1sNSWstmNpegJBLcj3b/BWl9roZx/t6iNea9FyIbqxLjJ51ns0npy5
-         v5XO46yz2gNkC/bdK63xg75xARvB8FaRUqGzMVTTlB2r+lkfTQOyuJkNThbYGX2LCyfu
-         0OSQ==
-X-Gm-Message-State: APjAAAUnnFrRH7Zn0HomkpP+v6xoXOPA9a830HjMzzkM9teaYlie/aR6
-        FT7so64OhDAgk3l5uAp+Z1ob8+tB
-X-Google-Smtp-Source: APXvYqxtxcxwRs2X5RA/iW/6TivZ5ydkApaGeX1uTLayqUxNdjVNn2zi+i3IJuxiJX5rpfAd5+hF4g==
-X-Received: by 2002:a05:651c:112d:: with SMTP id e13mr8042598ljo.99.1576235822451;
-        Fri, 13 Dec 2019 03:17:02 -0800 (PST)
-Received: from xi.terra (c-14b8e655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.184.20])
-        by smtp.gmail.com with ESMTPSA id t2sm4552700ljj.11.2019.12.13.03.17.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Dec 2019 03:17:01 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.92.3)
-        (envelope-from <johan@kernel.org>)
-        id 1ifiwQ-0004Ws-G0; Fri, 13 Dec 2019 12:17:02 +0100
-Date:   Fri, 13 Dec 2019 12:17:02 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Guillaume La Roque <glaroque@baylibre.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=z41FKQuYBUSuoSb2FV0vifxkTTBPMXxzD/YOhZ2tMXg=;
+        b=Gb8YtDtB7N6h3XxE5zhe45Iqxg4S6oEnJiLppi1UPn46+BxzRmBuLB1plI+OEOHaoP
+         h6WD69TyhfZF5NlBV9FEu8j/FFDILctvxb2tb/eiUqvQ2blM1XNZjg6yDhWzQUUnVzbZ
+         TLOfMYiAA+HJdZlr6idteRj235KHrzuXRPiHGC+XmXDMwGSvdu34FanMFIfqDCS1+OTt
+         HiSQwqp6aiPBpx6K0D8N30/lFP5G5dpwEhN8NKWtfVRAiZ5rbv9UFURS42YnkkYXsxYP
+         k9UykJOl3ya3+mhbGXSp6W7c0Xba7nPky80XL7qRFVAZpf1bIVsoHdSODH527je4W7aT
+         QeGg==
+X-Gm-Message-State: APjAAAW6Dm9wkWQo43P/3Bhhaqss888MAQ3Kz4afK/2SYLWQpzuYdLCC
+        tHjwuSeqeNzy/nAOTLVkozOyuA==
+X-Google-Smtp-Source: APXvYqyI9oCoKlmkTNb1eHINYrX90erhUnwNmt0X9Htia3GuiYl8nmeYuA97/k8Vm2oQdER9i+aAoQ==
+X-Received: by 2002:a1c:3d07:: with SMTP id k7mr5002476wma.79.1576240279760;
+        Fri, 13 Dec 2019 04:31:19 -0800 (PST)
+Received: from ?IPv6:2a01:cb1d:6e7:d500:82a9:347a:43f3:d2ca? ([2a01:cb1d:6e7:d500:82a9:347a:43f3:d2ca])
+        by smtp.gmail.com with ESMTPSA id g7sm9913377wrq.21.2019.12.13.04.31.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Dec 2019 04:31:19 -0800 (PST)
+Subject: Re: [PATCH v4] bluetooth: hci_bcm: enable IRQ capability from node
+To:     Johan Hovold <johan@kernel.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-bluetooth@vger.kernel.org, nsaenzjulienne@suse.de,
         linux-kernel@vger.kernel.org, khilman@baylibre.com
-Subject: Re: [PATCH v4] bluetooth: hci_bcm: enable IRQ capability from node
-Message-ID: <20191213111702.GX10631@localhost>
 References: <20191213105521.4290-1-glaroque@baylibre.com>
+ <20191213111702.GX10631@localhost>
+From:   guillaume La Roque <glaroque@baylibre.com>
+Message-ID: <162e5588-a702-6042-6934-dd41b64fa1dc@baylibre.com>
+Date:   Fri, 13 Dec 2019 13:31:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191213105521.4290-1-glaroque@baylibre.com>
+In-Reply-To: <20191213111702.GX10631@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Dec 13, 2019 at 11:55:21AM +0100, Guillaume La Roque wrote:
-> Actually IRQ can be found from GPIO but all platforms don't support
-> gpiod_to_irq, it's the case on amlogic chip.
-> so to have possibility to use interrupt mode we need to add interrupts
-> field in node and support it in driver.
+Hi Johan,
 
-"node" is a bit vague, please refer to devicetree here and in the patch
-summary.
+On 12/13/19 12:17 PM, Johan Hovold wrote:
+> On Fri, Dec 13, 2019 at 11:55:21AM +0100, Guillaume La Roque wrote:
+>> Actually IRQ can be found from GPIO but all platforms don't support
+>> gpiod_to_irq, it's the case on amlogic chip.
+>> so to have possibility to use interrupt mode we need to add interrupts
+>> field in node and support it in driver.
+> "node" is a bit vague, please refer to devicetree here and in the patch
+> summary.
+>
+ i will
+>> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+>> ---
+>>  drivers/bluetooth/hci_bcm.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>> index f8f5c593a05c..aa194f8d703e 100644
+>> --- a/drivers/bluetooth/hci_bcm.c
+>> +++ b/drivers/bluetooth/hci_bcm.c
+>> @@ -13,6 +13,7 @@
+>>  #include <linux/module.h>
+>>  #include <linux/acpi.h>
+>>  #include <linux/of.h>
+>> +#include <linux/of_irq.h>
+>>  #include <linux/property.h>
+>>  #include <linux/platform_data/x86/apple.h>
+>>  #include <linux/platform_device.h>
+>> @@ -1421,6 +1422,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+>>  #endif
+>>  	bcmdev->serdev_hu.serdev = serdev;
+>>  	serdev_device_set_drvdata(serdev, bcmdev);
+>> +	bcmdev->irq = of_irq_get(bcmdev->dev->of_node, 0);
+> And this clearly makes no sense for acpi, so you'd need to add it to
+> bcm_of_probe().
+>
+> Shouldn't you be used using of_irq_get_byname()?
+i can use it if you prefer but no other interrupt need to be defined
+>
+> And since you're extending the binding, I think you need a preparatory
+> patch documenting this in:
+>
+> 	Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+sorry i forgot this, i will do
+>>  	/* Initialize routing field to an unused value */
+>>  	bcmdev->pcm_int_params[0] = 0xff;
+> Johan
 
-> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
-> ---
->  drivers/bluetooth/hci_bcm.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index f8f5c593a05c..aa194f8d703e 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -13,6 +13,7 @@
->  #include <linux/module.h>
->  #include <linux/acpi.h>
->  #include <linux/of.h>
-> +#include <linux/of_irq.h>
->  #include <linux/property.h>
->  #include <linux/platform_data/x86/apple.h>
->  #include <linux/platform_device.h>
-> @@ -1421,6 +1422,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
->  #endif
->  	bcmdev->serdev_hu.serdev = serdev;
->  	serdev_device_set_drvdata(serdev, bcmdev);
-> +	bcmdev->irq = of_irq_get(bcmdev->dev->of_node, 0);
 
-And this clearly makes no sense for acpi, so you'd need to add it to
-bcm_of_probe().
+thanks
 
-Shouldn't you be used using of_irq_get_byname()?
+Guillaume
 
-And since you're extending the binding, I think you need a preparatory
-patch documenting this in:
-
-	Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-
->  	/* Initialize routing field to an unused value */
->  	bcmdev->pcm_int_params[0] = 0xff;
-
-Johan
