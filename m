@@ -2,81 +2,127 @@ Return-Path: <SRS0=edj+=2D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E31F7C2D0C9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 08:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51894C43603
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 09:18:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BAEA72467E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 08:50:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="VbLA9PmA"
+	by mail.kernel.org (Postfix) with ESMTP id 27D592465E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Dec 2019 09:18:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576228695;
+	bh=YDi2nL2pdMzIcbUQOsNhCRGTKAEMJ8JNqoS0JxCQt50=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=pPpnu4lLFteyUWL2fl/J7/zj+K7V4KWgJNobHcaUvBVXjGRFGwZ0R5vmUFpDG8oQm
+	 IPE45N68TfbsrHtEOZ24G47/pTfUGQyyb3Xa9cd4L5HzN6TbOIDthtQlbrOcAJMhlx
+	 +lwB7sf9Sv5n2LRESsm+uZK4GM6e70kt0w/ibyk0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbfLMIu5 (ORCPT
+        id S1726494AbfLMJSL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Dec 2019 03:50:57 -0500
-Received: from m228-5.mailgun.net ([159.135.228.5]:16953 "EHLO
-        m228-5.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725948AbfLMIu5 (ORCPT
+        Fri, 13 Dec 2019 04:18:11 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:36767 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725882AbfLMJSL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Dec 2019 03:50:57 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1576227057; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=XBRwxAmfxra18txp4oAP+b792+6m6ttYJLaEeG2c9+4=; b=VbLA9PmAgWvhfetpSyKV09Lm/zAVFSBuXlMu/26Ytqt3fKo+QEm94YG9RtFaQav5sHi2umPv
- B25awRTHgb4vn5Y7gQ7NK8ByNUXmDxNOGaJ5/eKJAQku0/Hc8YRCBBUNRG4isxQg6xUjO5Nw
- BuxP9luayyFpkquMIh3RwRMJjrI=
-X-Mailgun-Sending-Ip: 159.135.228.5
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5df350ee.7f5a9c055d88-smtp-out-n02;
- Fri, 13 Dec 2019 08:50:54 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id C203AC447B2; Fri, 13 Dec 2019 08:50:53 +0000 (UTC)
-Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 663F8C447AB;
-        Fri, 13 Dec 2019 08:50:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 663F8C447AB
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Replace of_device_get_match_data with device_get_match_data
-Date:   Fri, 13 Dec 2019 16:50:45 +0800
-Message-Id: <20191213085045.24637-1-rjliao@codeaurora.org>
-X-Mailer: git-send-email 2.17.1
+        Fri, 13 Dec 2019 04:18:11 -0500
+Received: by mail-lj1-f196.google.com with SMTP id r19so1853074ljg.3;
+        Fri, 13 Dec 2019 01:18:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RZ51uRTlJcv6c8enjZTOzifIqw0cVu1vMI6dvmNCekw=;
+        b=B9gNUvtBEcd5FIuqBENpVyMAb01UBNBoM0kwj6htPtJ2jNXH7qwC/qvRs8Kes3/UR8
+         cNnR7lPY0YGmgjC2GjkgrK+ncBrqPDz1uS7IdrNBb20iVTMyJ9ORbRANTGp1LewtsnhB
+         iIOV4NJWzwmIE5qJJmXd0t7m0wC6rAhqpOEgv2N29clLpB78A0g5AWyjInv1cXsM1swB
+         lXYVFUfcerhUHHVhalLYYsfGbJ3WppoW04/MyWQNJWqjkwjoRuShD32bmM+Hb0KreZDw
+         WunR1E3Z514HmiW2dmIHfehb8tJFPNiexO0fWLEBt9XXG/34pbl1c06OGYj70GzwuIYb
+         wMzQ==
+X-Gm-Message-State: APjAAAWtfA1e6ku2DSbwWyQjRw5EW1pW8RGuTsm9yL7dZQugH+xj0Ssj
+        9NLh1ITZ+91Zi1hzBW5p5hI=
+X-Google-Smtp-Source: APXvYqwVxJbJvkmBpoQ44DVZmfkrX2ABY2jSL5V+LsTOqfrT61h5h4UZeIEkOUyzz6Rbwv1HTfRiaA==
+X-Received: by 2002:a2e:850f:: with SMTP id j15mr8768401lji.91.1576228688991;
+        Fri, 13 Dec 2019 01:18:08 -0800 (PST)
+Received: from xi.terra (c-14b8e655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.184.20])
+        by smtp.gmail.com with ESMTPSA id l21sm4223245lfh.74.2019.12.13.01.18.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Dec 2019 01:18:08 -0800 (PST)
+Received: from johan by xi.terra with local (Exim 4.92.3)
+        (envelope-from <johan@kernel.org>)
+        id 1ifh5N-0007ZJ-0d; Fri, 13 Dec 2019 10:18:09 +0100
+Date:   Fri, 13 Dec 2019 10:18:09 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Guillaume La Roque <glaroque@baylibre.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        lkml <linux-kernel@vger.kernel.org>, khilman@baylibre.com,
+        linux-rpi-kernel <linux-rpi-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3] bluetooth: hci_bcm: enable IRQ capability from node
+Message-ID: <20191213091809.GW10631@localhost>
+References: <20191211094923.20220-1-glaroque@baylibre.com>
+ <cf77eec5df92b1845f0bf7cc8eb53edd4af9e1bf.camel@suse.de>
+ <0CF02341-CF69-4680-B61F-DC5C0702F1A2@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0CF02341-CF69-4680-B61F-DC5C0702F1A2@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Replace of_device_get_match_data with device_get_match_data to make driver
-work across platforms.
+On Thu, Dec 12, 2019 at 09:46:32PM +0100, Marcel Holtmann wrote:
+> Hi Nicolas,
+> 
+> >> Actually IRQ can be found from GPIO but all platforms don't support
+> >> gpiod_to_irq, it's the case on amlogic chip.
+> >> so to have possibility to use interrupt mode we need to add interrupts
+> >> field in node and support it in driver.
+> >> 
+> >> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+> >> ---
+> >> drivers/bluetooth/hci_bcm.c | 3 +++
+> >> 1 file changed, 3 insertions(+)
+> > 
+> > This triggers the following panic on Raspberry Pi 4:
+> > 
+> > [    6.634507] Unable to handle kernel NULL pointer dereference at virtual
+> > address 0000000000000018
 
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
----
- drivers/bluetooth/hci_qca.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> >> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> >> index f8f5c593a05c..9f52d57c56de 100644
+> >> --- a/drivers/bluetooth/hci_bcm.c
+> >> +++ b/drivers/bluetooth/hci_bcm.c
+> >> @@ -1409,6 +1409,7 @@ static int bcm_serdev_probe(struct serdev_device
+> >> *serdev)
+> >> {
+> >> 	struct bcm_device *bcmdev;
+> >> 	const struct bcm_device_data *data;
+> >> +	struct platform_device *pdev;
+> >> 	int err;
+> >> 
+> >> 	bcmdev = devm_kzalloc(&serdev->dev, sizeof(*bcmdev), GFP_KERNEL);
+> >> @@ -1421,6 +1422,8 @@ static int bcm_serdev_probe(struct serdev_device
+> >> *serdev)
+> >> #endif
+> >> 	bcmdev->serdev_hu.serdev = serdev;
+> >> 	serdev_device_set_drvdata(serdev, bcmdev);
+> >> +	pdev = to_platform_device(bcmdev->dev);
+> > 
+> > Ultimately bcmdev->dev here comes from a serdev device not a platform device,
+> > right?
+> 
+> I was afraid of this, but then nobody spoke up. Can we fix this or
+> should I just revert the patch?
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f10bdf8e1fc5..b602ed01505b 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1501,7 +1501,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 		return -ENOMEM;
- 
- 	qcadev->serdev_hu.serdev = serdev;
--	data = of_device_get_match_data(&serdev->dev);
-+	data = device_get_match_data(&serdev->dev);
- 	serdev_device_set_drvdata(serdev, qcadev);
- 	device_property_read_string(&serdev->dev, "firmware-name",
- 					 &qcadev->firmware_name);
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+Just revert it, the patch is plain broken and makes no sense.
+
+As Nicolas pointed out, bcmdev->dev is a member of struct serdev_device
+so cannot be cast to a platform device.
+
+Johan
