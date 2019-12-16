@@ -2,149 +2,108 @@ Return-Path: <SRS0=kuCk=2G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E7AC43603
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 18:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7151BC43603
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 19:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE8252082E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 18:46:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E4BC20717
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 19:17:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="JffkAK1t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HwBvDkMC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728224AbfLPSqg (ORCPT
+        id S1726984AbfLPTRb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Dec 2019 13:46:36 -0500
-Received: from mout.gmx.net ([212.227.15.19]:53821 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728175AbfLPR4N (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Dec 2019 12:56:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1576518964;
-        bh=CAK+937vMJ7Ul1L0L0cRsieV0URSjAloZ41FxESMYZg=;
-        h=X-UI-Sender-Class:Subject:To:References:From:Date:In-Reply-To;
-        b=JffkAK1tV2BmEBhNaIPc4vAg6igCT7DVh2lVhf8TVpHgSNU/3O83zV/s7OOF/wA/n
-         d7ey00CzlVsbZRoFDpsN9KLDfOqR15mOfQQa6/wvO+etKanIz3EyZybKUjeoe+onCm
-         9gnq6ewgl1vR0GEARXVdPJ34hWuCcI0lR7nuEsE8=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.1.176] ([37.4.249.154]) by mail.gmx.com (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M6lpM-1id5NS0toc-008KWy; Mon, 16
- Dec 2019 18:56:04 +0100
-Subject: Re: [PATCH AUTOSEL 5.4 133/350] Bluetooth: hci_bcm: Fix RTS handling
- during startup
-To:     Greg KH <greg@kroah.com>, Sasha Levin <sashal@kernel.org>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
+        Mon, 16 Dec 2019 14:17:31 -0500
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:45303 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfLPTRb (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 16 Dec 2019 14:17:31 -0500
+Received: by mail-pj1-f68.google.com with SMTP id r11so3406733pjp.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Dec 2019 11:17:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:date:in-reply-to:references:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=unwqCziusuUsP9xh5yy5iHlg3lJ/dD+s33+iBsCpLJg=;
+        b=HwBvDkMCxjnr4unOFya4kPwgBL9BvCWvb634pMWorlHI/bFSR3JTuwMzi6L91OnNM6
+         AUXjCtvpPL/pHsl2M42GOiFqwVMenQ9rT9NdlTG+p7tqIIOSgqz75YZzqyao5qScmDK6
+         1Zj4J6GXI+zFgh2PKg53fYKrauXsLETtb0oPPjRNwohbiVebhs6//QLeWAqm8N/AxLtH
+         kZ0SAMNxVzDlLgFsMh9pLHGAOCUaCrOw5EPPowMpTN8CpwudefS+OMe1vnwaMDgYenbY
+         pM8kdIGfh1Z/i2wTNak5Rl73y/3luBjaTLEugYg02zsFmccFTKs+VIyZzjIQohiCmClg
+         ZC+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=unwqCziusuUsP9xh5yy5iHlg3lJ/dD+s33+iBsCpLJg=;
+        b=ONx9IPrSX+fViAT0exfvZFtxdp9NwwY+Jr49Ghh8WkJu24hKKf3R/vIrPoeRsvOqp8
+         /5maR+DKirTl2BirbU184SGjH48c043v+vCpnlhiLhg4aoVPr1fkHQdKeT+OKrPvLhvv
+         e46tAukXUKGci0unSigJFifpKENr/gERwvSrcV3kZgRYEhyQAb3wo90BCcqOT12f6qk8
+         ZvDtlILo2GjQYfGDxN6ZoMDtvUtIlhkL3efyCiyWsoLez0x11lUGbGvvngOR2YVotbdT
+         LdahHaX/1AZpUGPA7BaBh2o+GItO/06UsGy008eGrosxSSi8/INkcCkwpS9Z5AcFsHae
+         Z0Iw==
+X-Gm-Message-State: APjAAAWtwMzLbQpUDkF5gIkNVk/Rci7tYrZeirOZP6zZ/11bIGwagDIL
+        TVsCQxmxRa0WT5SSRz+w8PCxx/nm1og=
+X-Google-Smtp-Source: APXvYqyRusv8gW8C8xlijOFaAIQVt7sJLcAP1DqgUY2TaV6KmPbBBxU5W57zeLCbGuFVFAqtm0yZVA==
+X-Received: by 2002:a17:90a:366e:: with SMTP id s101mr921887pjb.18.1576523850831;
+        Mon, 16 Dec 2019 11:17:30 -0800 (PST)
+Received: from vudentzs-t460s ([192.102.209.32])
+        by smtp.gmail.com with ESMTPSA id m101sm259886pje.13.2019.12.16.11.17.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2019 11:17:30 -0800 (PST)
+Message-ID: <8b0d837bcb492dfb86b13e08e11ff3840aae78b5.camel@gmail.com>
+Subject: Re: [PATCH BlueZ] shared/mainloop: Use connect() instead of bind()
+ for sd_notify
+From:   luiz.dentz@gmail.com
+To:     Guillem Jover <guillem@hadrons.org>,
         linux-bluetooth@vger.kernel.org
-References: <20191210210735.9077-1-sashal@kernel.org>
- <20191210210735.9077-94-sashal@kernel.org>
- <20191216131512.c5x5ltndmdambdf4@core.my.home>
- <20191216132750.GA1646935@kroah.com>
-From:   Stefan Wahren <wahrenst@gmx.net>
-Message-ID: <9ea6af63-0133-284c-98a4-57d19c60d497@gmx.net>
-Date:   Mon, 16 Dec 2019 18:56:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+Date:   Mon, 16 Dec 2019 11:17:28 -0800
+In-Reply-To: <20191214094052.GA363763@thunder.hadrons.org>
+References: <20191214094052.GA363763@thunder.hadrons.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
 MIME-Version: 1.0
-In-Reply-To: <20191216132750.GA1646935@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:1NGjEk2kmw7CCqJGd+/tmrSULyEcRMlyxmyL9HTkLzxJ3t5WPre
- h29L1kDiUcoAc5deXTwJbbDpbzsQPQziJ7QNj4jGfnaeGOyK4xzLxQS0A427fUgQqNIDH8w
- qAP3Cw8J8T5ge2H2PDtTALHSY5uvcc6ePf+5gfwGd02xgCd1rDtq0pWE96dhiygulNxnJne
- ssp/U87lfc9blvIt6MBNQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KLJednpRabg=:T5c7YPDR4wYazTXu2MmIJe
- E+SqqfXyXnnDSPNkA/jBrVz/6+pOP+KcGfJdYeVPqa++qTH7k+ZmQtauFTjtT9w6y3jBrrP47
- /+hHD7VfuluBjr7b+87e/E2Q9yGJ5Jdi1xdGyiey46Rcv2GMDOlXHe8p3C+XzYgMZCanN5kXo
- WrYwgrEld69IcwI4cH6MV6R3qxoc40R9Ln39OkKAruN83IR8nPD3qxkgY5Yj2vdavAxwpeLkw
- QVeaZqXGy45BFMuOpdIq9qM3E0VNQtyXPgnNxiDwlRokbsoUxDxSqv6nyFoIbaY9w9SOEnkeG
- ONsxrqDHtoEs99GsE99PAMVAx5BpLwXd7sIVYgcEnM+F7rLDxMFpVdd4HeaPC0NC/0e1P3+or
- 9kh8U5gTXb5LmdO68Df/n56tsYn0p3xc7+prnFmhgrCSJiGqtTcC5xCFfT37x8uwK98Wywx9f
- 73b/wouir1NnWZaGFxzZ4iiVgGr21LJmv03o8l0PIItmiVqdIYLjxX6uGRdKag6ngtqTMK5ZA
- SJOnU62Qj0/dSjF5FJTbiBgiKEZz20+Rv2jgGWv8e2MQ5Z2g9EjAbnUUUnG9eh1DSqeWM81eg
- 0H2qN9KOc9sZ5W1aBOF8yl4U+NGvUnML5M0CYyuKtjU7feU36iv4KpcGabwf08gDX8aYm0yF2
- O0Umcm9UI77hQdMX5sSjDw9scrTiUttl3+sCm3McXQmImJ8k9HVqcqw2yVzkjzoAhJoMIsI1I
- A541DuPLICSFzevgpLHvvYXNbLJHoQdg8JHIrRiF48jTkc9B67J/L8riFGI+3ws6sOXPkBozZ
- CFKighY8lG5zAhqwR/Fi0FpHh82wyucb8n8GmPX/LiBoIZpYvH68rNeDrKIGOfzkNVii0KzFW
- Ibe3wPSVc+My842xtPbxHGuoQlVidb8kB1QV/Rf2L91ida6ML2fLc9Ki/o3BdSTxJL6IpSyT1
- z3NIGVSmWWzmoUlvOQl8+onDyW8ZfM9K0TnvaHcAffIugHIBIxwFvPzvuBj6IAlG/1rU4VyF1
- hUDaaVc/z4Z7WlIjScmpKUDAbqbFuX0wcORDT98xhYGwhRoQxCZ+mCPT9o1lQqSsxO/dMm4uB
- 2Td8XkjsXjT+xASgxnuSaNHSu+Ttw1a5LbPoONwfn6B7jCmWH154P/V+pNDLRDkSHm5xSWEN+
- dZiDgZUD8PMq1ugPPIb1O1S3NrlXZOQ4DTfcE7WgV3XwkLiwL34LFHDaqDkwMXl0ko0tCCqlF
- 0KdG0l9dQUSgpPj0kemw3NcWpYRIUYR88g58tgK7Kaz4YuPFyKczGMUShQ6c=
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Am 16.12.19 um 14:27 schrieb Greg KH:
-> On Mon, Dec 16, 2019 at 02:15:12PM +0100, Ond=C5=99ej Jirman wrote:
->> Hi,
->>
->> On Tue, Dec 10, 2019 at 04:03:58PM -0500, Sasha Levin wrote:
->>> From: Stefan Wahren <wahrenst@gmx.net>
->>>
->>> [ Upstream commit 3347a80965b38f096b1d6f995c00c9c9e53d4b8b ]
->>>
->>> The RPi 4 uses the hardware handshake lines for CYW43455, but the chip
->>> doesn't react to HCI requests during DT probe. The reason is the inpro=
-per
->>> handling of the RTS line during startup. According to the startup
->>> signaling sequence in the CYW43455 datasheet, the hosts RTS line must
->>> be driven after BT_REG_ON and BT_HOST_WAKE.
->>>
->>> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
->>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>> Signed-off-by: Sasha Levin <sashal@kernel.org>
->>> ---
->>>  drivers/bluetooth/hci_bcm.c | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->>> index 7646636f2d183..0f73f6a686cb7 100644
->>> --- a/drivers/bluetooth/hci_bcm.c
->>> +++ b/drivers/bluetooth/hci_bcm.c
->>> @@ -445,9 +445,11 @@ static int bcm_open(struct hci_uart *hu)
->>>
->>>  out:
->>>  	if (bcm->dev) {
->>> +		hci_uart_set_flow_control(hu, true);
->>>  		hu->init_speed =3D bcm->dev->init_speed;
->>>  		hu->oper_speed =3D bcm->dev->oper_speed;
->>>  		err =3D bcm_gpio_set_power(bcm->dev, true);
->>> +		hci_uart_set_flow_control(hu, false);
->>>  		if (err)
->>>  			goto err_unset_hu;
->>>  	}
->> This causes bluetooth breakage (degraded bluetooth performance, due to =
-failure to
->> switch to higher baudrate) for Orange Pi 3 board:
->>
->> [    3.839134] Bluetooth: hci0: command 0xfc18 tx timeout
->> [   11.999136] Bluetooth: hci0: BCM: failed to write update baudrate (-=
-110)
->> [   12.004613] Bluetooth: hci0: Failed to set baudrate
->> [   12.123187] Bluetooth: hci0: BCM: chip id 130
->> [   12.128398] Bluetooth: hci0: BCM: features 0x0f
->> [   12.154686] Bluetooth: hci0: BCM4345C5
->> [   12.157165] Bluetooth: hci0: BCM4345C5 (003.006.006) build 0000
->> [   15.343684] Bluetooth: hci0: BCM4345C5 (003.006.006) build 0038
->>
->> I suggest not pushing this to stable.
-> Is it being fixed in Linus's tree?
+Hi Guillem,
 
-No, because this mail was the first bug report.
+On Sat, 2019-12-14 at 10:40 +0100, Guillem Jover wrote:
+> We are the client, so we should be using connect(2) instead of
+> bind(2),
+> otherwise when using non-abstract Unix sockets we will get an error
+> that
+> the address is already in use.
+> 
+> This breaks the notify support in dpkg's start-stop-daemon.
+> ---
+>  src/shared/mainloop-notify.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/mainloop-notify.c b/src/shared/mainloop-
+> notify.c
+> index 89a880006..1de714a0e 100644
+> --- a/src/shared/mainloop-notify.c
+> +++ b/src/shared/mainloop-notify.c
+> @@ -91,7 +91,7 @@ void mainloop_notify_init(void)
+>  	if (addr.sun_path[0] == '@')
+>  		addr.sun_path[0] = '\0';
+>  
+> -	if (bind(notify_fd, (struct sockaddr *) &addr, sizeof(addr)) <
+> 0) {
+> +	if (connect(notify_fd, (struct sockaddr *) &addr, sizeof(addr))
+> < 0) {
+>  		close(notify_fd);
+>  		notify_fd = -1;
+>  		return;
 
-But i agree with Ond=C5=99ej to not push it into stable.
+Applied, thanks.
 
-Stefan
-
->
-> thanks,
->
-> greg k-h
