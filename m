@@ -2,127 +2,218 @@ Return-Path: <SRS0=kuCk=2G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AF8C43603
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 19:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4251C2D0BF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 21:57:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE0372146E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 19:56:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F65420CC7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 21:57:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="h/o52mFM"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nOaUKB8O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726856AbfLPT4W (ORCPT
+        id S1727529AbfLPV5c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Dec 2019 14:56:22 -0500
-Received: from mout.gmx.net ([212.227.17.20]:60963 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726762AbfLPT4W (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Dec 2019 14:56:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1576526174;
-        bh=CNL4/ITrQyawW6Jwa7ZAkK9ujkdNN6N4djNXPY/LFy8=;
-        h=X-UI-Sender-Class:Subject:To:References:From:Cc:Date:In-Reply-To;
-        b=h/o52mFMz6z4L2EVFIDt/pu0uYfDVMCrkIKvPvLzm0h0VP0vvOyqWLK4KW3o6mEBS
-         ZJf9sGo1WU3uvvIepLMCQIVbdOSi7ReR+1hMXnuoJzJwfQM3QyRFiOGVIiCvLpvZue
-         s1EFwHFD7jvH4Tmk1u8nQFK2l47uOx9e0Ri0syUo=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.1.176] ([37.4.249.154]) by mail.gmx.com (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MQ5rU-1iKtLS0PC4-00M5AL; Mon, 16
- Dec 2019 20:56:14 +0100
-Subject: Re: [PATCH V4 01/10] bluetooth: hci_bcm: Fix RTS handling during
- startup
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        =?UTF-8?Q?Ond=c5=99ej_Jirman?= <megous@megous.com>
-References: <1570375708-26965-1-git-send-email-wahrenst@gmx.net>
- <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
- <61789264-a4c2-ac85-9d74-d186213ec70a@gmx.net>
- <20191216132509.ofqcdpwxsd7324ql@core.my.home>
- <6f05f4d8-fa84-ae81-ac4f-00ab12fabeea@gmx.net>
- <20191216194235.4pq2xpfl7nz3p55w@core.my.home>
-From:   Stefan Wahren <wahrenst@gmx.net>
-Cc:     Florian Fainelli <f.fainelli@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-Message-ID: <ff0206e0-8290-0639-5399-5304b9454110@gmx.net>
-Date:   Mon, 16 Dec 2019 20:56:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Mon, 16 Dec 2019 16:57:32 -0500
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:46388 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727384AbfLPV5c (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 16 Dec 2019 16:57:32 -0500
+Received: by mail-vs1-f65.google.com with SMTP id t12so5127435vso.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Dec 2019 13:57:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=DFPpNng3KoPqtg8NdN2SpyoGmm5E5m0rky9u0AsyxLk=;
+        b=nOaUKB8O/lLoPcm34GbcXeaAetd9TsZSmTrUu2nEBnBwoIurEZRZGA+EjyDHs9ahas
+         mZ72Fu15WqdrDZf5opeovzT/LYUYrT8uK0u70I4hk8q8U26bpxVaTuTHFFRAhs5PaD4v
+         Xx32wem5YmdhKnIA7pj9RACkakMtPlgZ9ce9s=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=DFPpNng3KoPqtg8NdN2SpyoGmm5E5m0rky9u0AsyxLk=;
+        b=nAFFhTfD3JFD4QC9Qymh+EirW/N882PdeRR7GltG6CHOyRBGtCGmW/S4SFpmvZsWmj
+         or8dvCUueTo97O2zIV1FzRzzM6+R7fMSpL/HbRxEARsTMVBG74rxchkWV7mxz0i/87tZ
+         aTxiZImbSlE9MZMnjhId9nxgwTff1dMlp1iAUyTeFHXkE39Azejh6S1ec170EBPR9uSg
+         tycY/UyhsvqgNsyv2OOqHEUIo3NpbGg2pVSiPhzlWRs9PcH5cclWQE//cgNHi9DiM3bj
+         m2lr2hitS3G+XBckTF+MEveLYKX8XemgODqC1SQSw0D595O6/5AZUAzCNXfzVOY4IY8x
+         ZVrQ==
+X-Gm-Message-State: APjAAAUt9FmeeR/E9wSUPkA4d3wwWuNQv0itp1jDHAjkhRewq+LGKERd
+        ZEH96o6mJKbwxRaE0/fMgF6zDiAyXJOLFVuCZmHOTg==
+X-Google-Smtp-Source: APXvYqyK1F6gGCRuxEz8GZK1mdTsTU3OEQl91lSUWV7Cjfrgcb+iTWic/oW/rvOgipPfFAyWFbF1nTFONGWvRzCBwSA=
+X-Received: by 2002:a05:6102:81:: with SMTP id t1mr916905vsp.86.1576533450826;
+ Mon, 16 Dec 2019 13:57:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191216194235.4pq2xpfl7nz3p55w@core.my.home>
-Content-Type: text/plain; charset=utf-8
+References: <20191202084750.k7lafzzrf3yq2tqs@pali> <20191202175440.GA50317@dtor-ws>
+ <20191202185340.nae4lljten5jqp3y@pali> <20191202193628.GI50317@dtor-ws>
+ <20191202230947.ld5ibnczdpkekfcm@pali> <20191203173821.4u6uzxeaqnt3gyz3@pali>
+ <20191203191112.GJ50317@dtor-ws> <20191205105206.slibwytrcteicx6y@pali>
+ <CANFp7mXyaqoMDBs4m_Dfm9+4U88g9WoJVcV1g_4KM4xzFhiGXQ@mail.gmail.com>
+ <20191206091114.kh255jrmerruumnq@pali> <20191206174048.GQ50317@dtor-ws>
+In-Reply-To: <20191206174048.GQ50317@dtor-ws>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Mon, 16 Dec 2019 13:57:19 -0800
+Message-ID: <CANFp7mVStzfjBT6SxQp+BGytat-Pnb8ntzZe8xMgPpB7x59zCg@mail.gmail.com>
+Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        linux-input@vger.kernel.org,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Kirill Smelkov <kirr@nexedi.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:frpVMvHvuwuUjwYqcSegzPvPNdhbH3fki7ucVW2an/S2FhOx+UY
- UcSNCOk4IpNNG4W8cZ7siJs2B/tR7FLt++GI7BAMFyDi6qO7EP3tkHr7FGAW9AtzQmVHta3
- 7h6zwi49JMchT2PpuBILSToHHv09DVPsduHtvCHY9Ewgo5GgBGc33Ge4kd9XG7p4Bc/wHP4
- zgmTQtird6GDCtegho8MQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BNw9DSMBEC4=:bdYEcuDFgaeDTz5P1s3yax
- l13x3/Xtj+VlfUkVJg0oVPAWp2VV1ALfyJ0nzq0DExgodeXMDbpr0LoC4wEKOYc5sLE0zLsVK
- d+WG2PIrojejyuckxioWwqRuVi0fGfUH7IWWyFLCAXgSjtnZN+ff+DD/wputazvQR4kKWlKx2
- sRv2IUrGMtqVaEviTiBwlmsu7O11xRqP1vBEE+z4AwOQaSfQeU64FB4HSJEIIms2SVvMqVgML
- JqBEnINTDTaJjPSFndsLw5kUg017Az8BdPyC0TVSC/HuauLaHhoX0uztgOvUfPKO+bnmUTOTN
- JbpHc7FxR8BR1Xv6WADCs73MNeodh/WSr7RspThKY+kSXiOdLOdN8528VnECeQDLa/UQCn1Q2
- iNaLvWaPYNzoN9EcTaNlfZC/FVJVOxQvPhH02aNGPLVVCSZ7YAqodFFMglT4WhgCUq8ku8wXy
- yjXlBYa3FbuGTF/E5Pzhx1O+hf6hSLJ+0+dSmQLGSoZdTTW/M9H0Bl5fX6rLAxCGlIa2+8Q09
- OrveGtnKfVFQ4LFgaOTj6olCFDklzvyACcxdeYlop8u7PjVni33V5tkVjAzfY3ANKilrb+UVu
- s0NEJJ72nNy+VblxunKioG/yJDk+gBFcLiDYcwcx4sEyixA6y1qmTiK8nu2bCat8BgECUz725
- lgG2wrMJPzGygv2+yUzO/2y3uHklv/wyj6n244nWLcm6n2jDjczwIPeO28WG0Z0CR6GTYZ7ta
- 5H3H25d1w7JGmxtKKlo/dChCGlZevicnSZcDG13nmpThwCc13vGfUn0uQH5rXhz1I8fdOZ940
- I+uJk/D3G5Nn35bAvk1i/6qqC8279TSQtpDhc5cI7Et3WzudQBM+h7neXQ+HuI7cnrnR4FBnM
- Cy93cOJGbGzWpyAoEdFojScHHz0sbL0L5JtVfeHDflsmZ31Q22uC4PT01kkPPiyeC+pW1V6d/
- d6wMkOm/6j6EmNpOpe6asvU8a4mPHBFhQtqV44WoOmfUfSlnHN4rHCu2+Rb70WC5MEfyvVosb
- mJpcjEovzpB/pFF9s/5PLuYX/BfqYhiwC5ZZ4PJOK0kYycQorhzbuLsqdyAt6TVXxjpNg7Et1
- 5a1Tjbq4NIB4c/mVub1ERqIOTmPCDU9N23pUBYlTDKbAE4TbE7GmgQrp/egG4b4+GkAaBC8qm
- MZz/MK8jrNpYhtNoSnZlMlrdwZmGQdoFiHn0UGnVv1nBlpKJ0gfiJXR3oHg9FZtreuZUxLMZo
- 0XmnqZ6dER1TICekvEGpR88GmuzlzFc7aZTY1fUxe2G5Q5w116fjRXxBRI2o=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Ondrej,
+Hi,
 
-Am 16.12.19 um 20:42 schrieb Ond=C5=99ej Jirman:
-> Hello Stefan,
+Since there hasn't been further activity on this thread, I assume that
+we're agreed that requiring the size in the IOCTL is ok (i.e.
+UI_SET_PHYS_STR(18)).
+
+Dmitry, could you please review -- [PATCH v4] Input: uinput - Add
+UI_SET_PHYS_STR and UI_SET_UNIQ_STR -- from December 4 for merge?
+
+Thanks
+Abhishek
+
+On Fri, Dec 6, 2019 at 9:40 AM Dmitry Torokhov
+<dmitry.torokhov@gmail.com> wrote:
 >
-> On Mon, Dec 16, 2019 at 07:28:04PM +0100, Stefan Wahren wrote:
->> Hi Ondrej,
->>
->> sorry, i don't have access to a Orange Pi 3.
->>
->> I looked at a=C2=A0 AP6256 datasheet [1], but i couldn't find any helpf=
-ul
->> information about flow control during power up.
->>
->> Are you able to analyze this issue more further before we revert this p=
-atch?
-> I'd like to, but I'll not be able to attach logic probe to the AP6256
-> module. It's too fine pitch for soldering.
-this the same issue, i had with the Raspberry Pi 4 :-(
-> I may try setting CTS/RTS to gpio/input mode and grab the capture of
-> the GPIO port states in time to see what's happening during probe
-> of bt_bcm module.
+> On Fri, Dec 06, 2019 at 10:11:14AM +0100, Pali Roh=C3=A1r wrote:
+> > On Thursday 05 December 2019 12:03:05 Abhishek Pandit-Subedi wrote:
+> > > On Thu, Dec 5, 2019 at 2:52 AM Pali Roh=C3=A1r <pali.rohar@gmail.com>=
+ wrote:
+> > > >
+> > > > On Tuesday 03 December 2019 11:11:12 Dmitry Torokhov wrote:
+> > > > > On Tue, Dec 03, 2019 at 06:38:21PM +0100, Pali Roh=C3=A1r wrote:
+> > > > > > On Tuesday 03 December 2019 00:09:47 Pali Roh=C3=A1r wrote:
+> > > > > >
+> > > > > > Hi Dmitry!
+> > > > > >
+> > > > > > I was looking again at those _IOW defines for ioctl calls and I=
+ have
+> > > > > > another argument why not specify 'char *' in _IOW:
+> > > > > >
+> > > > > > All ioctls in _IOW() specify as a third macro argument type whi=
+ch is
+> > > > > > passed as pointer to the third argument for ioctl() syscall.
+> > > > > >
+> > > > > > So e.g.:
+> > > > > >
+> > > > > >   #define EVIOCSCLOCKID _IOW('E', 0xa0, int)
+> > > > > >
+> > > > > > is called from userspace as:
+> > > > > >
+> > > > > >   int val;
+> > > > > >   ioctl(fd, EVIOCSCLOCKID, &val);
+> > > > > >
+> > > > > > Or
+> > > > > >
+> > > > > >   #define EVIOCSMASK _IOW('E', 0x93, struct input_mask)
+> > > > > >
+> > > > > > is called as:
+> > > > > >
+> > > > > >   struct input_mask val;
+> > > > > >   ioctl(fd, EVIOCSMASK, &val);
+> > > > > >
+> > > > > > So basically third argument for _IOW specify size of byte buffe=
+r passed
+> > > > > > as third argument for ioctl(). In _IOW is not specified pointer=
+ to
+> > > > > > struct input_mask, but struct input_mask itself.
+> > > > > >
+> > > > > > And in case you define
+> > > > > >
+> > > > > >   #define MY_NEW_IOCTL _IOW(UINPUT_IOCTL_BASE, 200, char*)
+> > > > > >
+> > > > > > then you by above usage you should pass data as:
+> > > > > >
+> > > > > >   char *val =3D "DATA";
+> > > > > >   ioctl(fd, MY_NEW_IOCTL, &val);
+> > > > > >
+> > > > > > Which is not same as just:
+> > > > > >
+> > > > > >   ioctl(fd, MY_NEW_IOCTL, "DATA");
+> > > > > >
+> > > > > > As in former case you passed pointer to pointer to data and in =
+later
+> > > > > > case you passed only pointer to data.
+> > > > > >
+> > > > > > It just mean that UI_SET_PHYS is already defined inconsistently=
+ which is
+> > > > > > also reason why compat ioctl for it was introduced.
+> > > > >
+> > > > > Yes, you are right. UI_SET_PHYS is messed up. I guess the questio=
+n is
+> > > > > what to do with all of this...
+> > > > >
+> > > > > Maybe we should define
+> > > > >
+> > > > > #define UI_SET_PHYS_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE,=
+ 111, len)
+> > > > > #define UI_SET_UNIQ_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE,=
+ 112, len)
+> > > >
+> > > > I'm not sure if this is ideal. Normally in C strings are nul-termin=
+ed,
+> > > > so functions/macros do not take buffer length.
+> > > Except strncpy, strndup, snprintf, etc. all expect a buffer length. A=
+t
+> >
+> > This is something different as for these functions you pass buffer and
+> > length of buffer which is used in write mode -- not for read mode.
+> >
+> > > the user to kernel boundary of ioctl, I think we should require size
+> > > of the user buffer regardless of the data type.
+> > >
+> > > > _STR therefore in names looks inconsistent.
+> > > The _STR suffix is odd (what to name UI_SET_PHYS_STR then??) but
+> > > requiring the length seems to be common across various ioctls.
+> > > * input.h requires a length when requesting the phys and uniq
+> > > (https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/t=
+ree/include/uapi/linux/input.h#n138)
+> > > * Same with HIDRAW when setting and getting features:
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/include/uapi/linux/hidraw.h#n40,
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/samples/hidraw/hid-example.c#n88
+> >
+> > All these ioctls where is passed length are in opposite direction
+> > (_IOC_READ) as our PHYS and UNIQ (_IOC_WRITE).
+> >
+> > I fully agree that when you need to read something from kernel
+> > (_IOC_READ) and then writing it to userspace, you need to specify lengt=
+h
+> > of userspace buffer. Exactly same as with userspace functions like
+> > memcpy, snprintf, etc... as you pointed. Otherwise you get buffer
+> > overflow as callee does not know length of buffer.
+> >
+> > But here we we have there quite different problem, we need to write
+> > something to kernel from userspace (_IOC_WRITE) and we are passing
+> > nul-term string. So in this case specifying size is not required as it
+> > is implicitly specified as part of passed string.
 >
-> I don't really understand what effect your patch is supposed to have
-> on the CTS/RTS lines during power up from the commit description.
-> Can you please explain it more concretely?
-I hope a picture explain more than thousand words. Please look at figure
-7 at page 22 of the datasheet [2]. The patch tries to achieve the proper
-timing of BT_UART_CTS_N.
+> With the new IOCTL definitions it does not need to be a NULL-terminated
+> string. It can be a buffer of characters with given length, and kernel
+> will NULL-terminate as this it what it wants, not what the caller has to
+> give.
 >
-> I'll be able to get to playing with this after the holidays.
-
-Okay
-
-Stefan
-
-[2] -
-https://www.verical.com/datasheet/cypress-semiconductor-combo-wireless-mod=
-ule-cyw43455xkubgt-5770595.pdf
-
+> Thanks.
+>
+> --
+> Dmitry
