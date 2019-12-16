@@ -7,95 +7,113 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DC2C2D0C0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 13:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE652C43603
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 13:27:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF861206CB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 13:25:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9333820725
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 13:27:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=megous.com header.i=@megous.com header.b="tsO1ZGF1"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="g5559xHV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cLhqAmDn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727861AbfLPNZM (ORCPT
+        id S1727916AbfLPN1y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Dec 2019 08:25:12 -0500
-Received: from vps.xff.cz ([195.181.215.36]:45352 "EHLO vps.xff.cz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727758AbfLPNZM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Dec 2019 08:25:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
-        t=1576502709; bh=es+nOMcbHNUvRapBUN4dNUN1UmQSHOWrTb4CbncHywQ=;
-        h=Date:From:To:Cc:Subject:References:X-My-GPG-KeyId:From;
-        b=tsO1ZGF1xfKCIUq16OlM2icXeTDgx8P0RR99yzocXToFCSskUe4dEZqEyANAQwbZh
-         nzkxDr39xTguJz3bbHmXeowcERvh5XnXHD1zwPNH2XirEWE6tkTzeLpa6CRwNHK9OU
-         dzQjLfqVJDbcHudGbMBRHzmlYsObxhMjB4WV0A8Q=
-Date:   Mon, 16 Dec 2019 14:25:09 +0100
-From:   =?utf-8?Q?Ond=C5=99ej?= Jirman <megous@megous.com>
-To:     Stefan Wahren <wahrenst@gmx.net>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Anholt <eric@anholt.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH V4 01/10] bluetooth: hci_bcm: Fix RTS handling during
- startup
-Message-ID: <20191216132509.ofqcdpwxsd7324ql@core.my.home>
-Mail-Followup-To: Stefan Wahren <wahrenst@gmx.net>,
+        Mon, 16 Dec 2019 08:27:54 -0500
+Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:51695 "EHLO
+        wout5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727601AbfLPN1y (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 16 Dec 2019 08:27:54 -0500
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailout.west.internal (Postfix) with ESMTP id B2FC1727;
+        Mon, 16 Dec 2019 08:27:52 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Mon, 16 Dec 2019 08:27:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:subject:message-id:references:mime-version
+        :content-type:content-transfer-encoding:in-reply-to; s=fm2; bh=Y
+        mViL70LTOh/d2HUWHm4SX1kRjzqtzPlz629CD92l7o=; b=g5559xHV/ZCMjWQRL
+        UWI/pqUKEGOqkKg+bsWfTrrpEDpqnV3jhvtF0IUVbhi8Jlzm7+78bXTjiID/tqTt
+        mY1CCAuOauItpHcX7/RUb2bYdoyBbCgLBdtXgUGXnSQ42XVouKfLdhRq5YQbKw9U
+        03E5CNvw9hC5f72JXyjeM5MiCpurESr2T+lrtjinFGsZd/GKb+KJuSeyTC+LeoBE
+        alfTXc/6OXr6p1edPOecWQp2Hz/XoJwQQdla9AR6mXlMI+niKkDf+abWMcN0Jg5L
+        WhxiUrBRdCwCqfQdHzzxFDhGfzWt7nxS4kNmMOvkRcoLaXQd1wOHqa/GfS6BMaof
+        SrTFw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; bh=YmViL70LTOh/d2HUWHm4SX1kRjzqtzPlz629CD92l
+        7o=; b=cLhqAmDna7VjQ9383OzQsmzNRRFn+BLWtqAEe3oHZhAm9L4rIAEN8kAR/
+        V3f2jyIByYkBIOxTQ+7UDKlFnBOrRZIxTWpFUkRtdOirLWraFVsAvdwpbjFKwyG3
+        PB4qJN0Q7xdLVGwD0NLLD7a/eT8UJm6KQjcYyW5kutR1BZ2URimqpCicSiIJ/Fgh
+        QvWUabgX39A3jr81lUc0JYDdg8LHA9RWhVGoyBxV22ah1PCLE9YTkN7NIJ+8CNwL
+        4x5IITF/gmXt73slDHHqmKnBZ0SAdySnq9MUGVV0Kjkw7pdwQGjf/dWYfgjLbmec
+        75XItDwCituwprizpkesg3eOYXnXw==
+X-ME-Sender: <xms:V4b3XZf5TJsqQm6TdDA2OZMRNdtH63WcOi5z3ON7EyiBheZ7fFiNZQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrvddthedgheefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtugfgjgesthekredttddtjeenucfhrhhomhepifhrvghg
+    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecukfhppeekfedrkeeirdekledrud
+    dtjeenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhmnecu
+    vehluhhsthgvrhfuihiivgeptd
+X-ME-Proxy: <xmx:WIb3XaOl1strmbI1xe_6r_gUUNxH1Vy7X7GsRXsF7EoLpm7LU7oFNQ>
+    <xmx:WIb3XeL6fIs7EUe61HNSlxHyMDL1qg-m0lFucPi8_5Yzrbjpi-xJsg>
+    <xmx:WIb3XRppvTTLMJArPhfvq6M9R9whCHoN3hQJZxFvDJCtoS-KHjQB1Q>
+    <xmx:WIb3XSp1VyLOH-z42TfhxpbUlL-3Y-5ZSTjSsGTFvFz6JXnKAVGe8Q>
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        by mail.messagingengine.com (Postfix) with ESMTPA id AFAAF306010D;
+        Mon, 16 Dec 2019 08:27:51 -0500 (EST)
+Date:   Mon, 16 Dec 2019 14:27:50 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Stefan Wahren <wahrenst@gmx.net>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-        Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Anholt <eric@anholt.net>, Rob Herring <robh+dt@kernel.org>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
-References: <1570375708-26965-1-git-send-email-wahrenst@gmx.net>
- <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
- <61789264-a4c2-ac85-9d74-d186213ec70a@gmx.net>
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 5.4 133/350] Bluetooth: hci_bcm: Fix RTS handling
+ during startup
+Message-ID: <20191216132750.GA1646935@kroah.com>
+References: <20191210210735.9077-1-sashal@kernel.org>
+ <20191210210735.9077-94-sashal@kernel.org>
+ <20191216131512.c5x5ltndmdambdf4@core.my.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <61789264-a4c2-ac85-9d74-d186213ec70a@gmx.net>
-X-My-GPG-KeyId: EBFBDDE11FB918D44D1F56C1F9F0A873BE9777ED
- <https://xff.cz/key.txt>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191216131512.c5x5ltndmdambdf4@core.my.home>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
-
-On Sun, Oct 20, 2019 at 11:17:28PM +0200, Stefan Wahren wrote:
-> Hi Marcel,
-> hi Johan,
+On Mon, Dec 16, 2019 at 02:15:12PM +0100, Ondřej Jirman wrote:
+> Hi,
 > 
-> Am 06.10.19 um 17:28 schrieb Stefan Wahren:
+> On Tue, Dec 10, 2019 at 04:03:58PM -0500, Sasha Levin wrote:
+> > From: Stefan Wahren <wahrenst@gmx.net>
+> > 
+> > [ Upstream commit 3347a80965b38f096b1d6f995c00c9c9e53d4b8b ]
+> > 
 > > The RPi 4 uses the hardware handshake lines for CYW43455, but the chip
 > > doesn't react to HCI requests during DT probe. The reason is the inproper
 > > handling of the RTS line during startup. According to the startup
 > > signaling sequence in the CYW43455 datasheet, the hosts RTS line must
 > > be driven after BT_REG_ON and BT_HOST_WAKE.
-> >
+> > 
 > > Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> > Signed-off-by: Sasha Levin <sashal@kernel.org>
 > > ---
 > >  drivers/bluetooth/hci_bcm.c | 2 ++
 > >  1 file changed, 2 insertions(+)
-> >
+> > 
 > > diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> > index 7646636..0f73f6a 100644
+> > index 7646636f2d183..0f73f6a686cb7 100644
 > > --- a/drivers/bluetooth/hci_bcm.c
 > > +++ b/drivers/bluetooth/hci_bcm.c
 > > @@ -445,9 +445,11 @@ static int bcm_open(struct hci_uart *hu)
-> >
+> >  
 > >  out:
 > >  	if (bcm->dev) {
 > > +		hci_uart_set_flow_control(hu, true);
@@ -106,38 +124,23 @@ On Sun, Oct 20, 2019 at 11:17:28PM +0200, Stefan Wahren wrote:
 > >  		if (err)
 > >  			goto err_unset_hu;
 > >  	}
-> > --
-> > 2.7.4
 > 
-> would be nice to get some feedback about this.
-
-I started seeing failures on Orange Pi 3 in 5.5-rc:
-
-[    3.839134] Bluetooth: hci0: command 0xfc18 tx timeout
-[   11.999136] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
-[   12.004613] Bluetooth: hci0: Failed to set baudrate
-[   12.123187] Bluetooth: hci0: BCM: chip id 130
-[   12.128398] Bluetooth: hci0: BCM: features 0x0f
-[   12.154686] Bluetooth: hci0: BCM4345C5
-[   12.157165] Bluetooth: hci0: BCM4345C5 (003.006.006) build 0000
-[   15.343684] Bluetooth: hci0: BCM4345C5 (003.006.006) build 0038
-
-Switch to higher baudrate works again after reverting this patch.
-
-That board also uses RTS/CTS signalling.
-
-I guess the patch needs re-thinking/maybe other chips may not need this?
-
-I don't have access to datasheets.
-
-regards,
-	o.
-
-> Regards
-> Stefan
+> This causes bluetooth breakage (degraded bluetooth performance, due to failure to
+> switch to higher baudrate) for Orange Pi 3 board:
 > 
+> [    3.839134] Bluetooth: hci0: command 0xfc18 tx timeout
+> [   11.999136] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
+> [   12.004613] Bluetooth: hci0: Failed to set baudrate
+> [   12.123187] Bluetooth: hci0: BCM: chip id 130
+> [   12.128398] Bluetooth: hci0: BCM: features 0x0f
+> [   12.154686] Bluetooth: hci0: BCM4345C5
+> [   12.157165] Bluetooth: hci0: BCM4345C5 (003.006.006) build 0000
+> [   15.343684] Bluetooth: hci0: BCM4345C5 (003.006.006) build 0038
 > 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> I suggest not pushing this to stable.
+
+Is it being fixed in Linus's tree?
+
+thanks,
+
+greg k-h
