@@ -2,52 +2,53 @@ Return-Path: <SRS0=kuCk=2G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E1EC2D0CF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 09:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA1D5C43603
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 10:02:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6604120725
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 09:57:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A0FA20725
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 10:02:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727132AbfLPJ5T convert rfc822-to-8bit (ORCPT
+        id S1727166AbfLPKCv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Dec 2019 04:57:19 -0500
-Received: from mga01.intel.com ([192.55.52.88]:3181 "EHLO mga01.intel.com"
+        Mon, 16 Dec 2019 05:02:51 -0500
+Received: from mga02.intel.com ([134.134.136.20]:38676 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727036AbfLPJ5T (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Dec 2019 04:57:19 -0500
+        id S1726992AbfLPKCv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 16 Dec 2019 05:02:51 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 01:57:18 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 02:02:33 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,321,1571727600"; 
-   d="scan'208";a="217118391"
+   d="scan'208";a="217120078"
 Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga006.jf.intel.com with ESMTP; 16 Dec 2019 01:57:18 -0800
-Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+  by orsmga006.jf.intel.com with ESMTP; 16 Dec 2019 02:02:33 -0800
+Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
  FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 16 Dec 2019 01:57:17 -0800
-Received: from bgsmsx106.gar.corp.intel.com (10.223.43.196) by
- fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 16 Dec 2019 01:57:17 -0800
+ id 14.3.439.0; Mon, 16 Dec 2019 02:02:32 -0800
+Received: from bgsmsx151.gar.corp.intel.com (10.224.48.42) by
+ fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 16 Dec 2019 02:02:32 -0800
 Received: from bgsmsx110.gar.corp.intel.com ([169.254.11.108]) by
- BGSMSX106.gar.corp.intel.com ([169.254.1.134]) with mapi id 14.03.0439.000;
- Mon, 16 Dec 2019 15:27:14 +0530
+ BGSMSX151.gar.corp.intel.com ([169.254.3.238]) with mapi id 14.03.0439.000;
+ Mon, 16 Dec 2019 15:32:29 +0530
 From:   "Kishore, Ajay" <ajay.kishore@intel.com>
-To:     Johan Hedberg <johan.hedberg@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 1/5] obexd: Add initial support for MAP conversations
-Thread-Topic: [PATCH 1/5] obexd: Add initial support for MAP conversations
-Thread-Index: AQHVr36tbiXWIyoe+k+Zhj5GqvoZYae8jCrg
-Date:   Mon, 16 Dec 2019 09:57:14 +0000
-Message-ID: <A4827819204CC641A5E2541E6709F15337DAF437@BGSMSX110.gar.corp.intel.com>
+Subject: RE: [PATCH 5/5] obexd: Handle MAP Event Report v1.1 and v1.2
+Thread-Topic: [PATCH 5/5] obexd: Handle MAP Event Report v1.1 and v1.2
+Thread-Index: AQHVr5OcbFbXG5KQ5Eq4jMYY8SU4uKe8j/Ww
+Date:   Mon, 16 Dec 2019 10:02:29 +0000
+Message-ID: <A4827819204CC641A5E2541E6709F15337DAF44C@BGSMSX110.gar.corp.intel.com>
 References: <1575976621-11019-1-git-send-email-ajay.kishore@intel.com>
- <20191210172007.GA50352@meiermar-mobl.ger.corp.intel.com>
-In-Reply-To: <20191210172007.GA50352@meiermar-mobl.ger.corp.intel.com>
+ <1575976621-11019-5-git-send-email-ajay.kishore@intel.com>
+ <CABBYNZLH1qxYELgf4CV0PVb9Lcw1FM5X=TH8ikuMC4FcyJjWzA@mail.gmail.com>
+In-Reply-To: <CABBYNZLH1qxYELgf4CV0PVb9Lcw1FM5X=TH8ikuMC4FcyJjWzA@mail.gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -56,48 +57,77 @@ dlp-product: dlpe-windows
 dlp-version: 11.2.0.6
 dlp-reaction: no-action
 x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzg5OGY4ZmEtN2MwOS00ZjVlLWIyZmUtZjVjNDYzNGQ5MjE4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiMVhCcTZKenNCVWNXNTY5OG8yTlhKNWZSMGtON014eFVSV0ZnekpzSDgyTUZTKzBXcWZyVmhrWVZuYnNXMGVDTCJ9
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDRlMTVhMmUtNjQ0MC00MGJhLWJlMmItYWRhMGIwMmZkZmY5IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidGwxa2NIY1hzZ1RTRjRzQ2FSVjB3OFwvWkdOK05DMzQrMkMyRXJmUXdoOVBOR2JjZGIzRFZsalpcL09LcE9JK0l3In0=
 x-originating-ip: [10.223.10.10]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
-
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org <linux-bluetooth-
-> owner@vger.kernel.org> On Behalf Of Johan Hedberg
-> Sent: Tuesday, December 10, 2019 10:50 PM
-> To: Kishore, Ajay <ajay.kishore@intel.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH 1/5] obexd: Add initial support for MAP conversations
-> 
-> Hi Ajay,
-> 
-> On Tue, Dec 10, 2019, Ajay Kishore wrote:
-> > Changes made to add a new method for MAP conversation listing i.e
-> > "ListConversations" to handle conversation listing object
-> > "x-bt/MAP-convo-listing".
-> >
-> > Co-authored-by: Bharat Bhusan Panda <bharat.b.panda@intel.com>
-> > Signed-off-by: Ajay Kishore <ajay.kishore@intel.com>
-> > ---
-> >  obexd/client/map.c | 68
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 68 insertions(+)
-> 
-> Maybe I missed it, but I didn't see a patch to update doc/obex-api.txt.
-> That's one of the most important changes and what needs to be agreed on
-> first.
-
-Pushed a new patch ([PATCH 6/6] doc/obex-api: Update documentation) with
-Update of documentation file doc/obex-api.txt.
-> 
-> Johan
-
-Thanks.
-Ajay Kishore
+SGkgTHVpeiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMdWl6IEF1
+Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gU2VudDogV2VkbmVzZGF5
+LCBEZWNlbWJlciAxMSwgMjAxOSAxOjI0IEFNDQo+IFRvOiBLaXNob3JlLCBBamF5IDxhamF5Lmtp
+c2hvcmVAaW50ZWwuY29tPg0KPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0K
+PiBTdWJqZWN0OiBSZTogW1BBVENIIDUvNV0gb2JleGQ6IEhhbmRsZSBNQVAgRXZlbnQgUmVwb3J0
+IHYxLjEgYW5kIHYxLjINCj4gDQo+IEhpIEFqYXksDQo+IA0KPiBPbiBUdWUsIERlYyAxMCwgMjAx
+OSBhdCAxOjQyIFBNIEFqYXkgS2lzaG9yZSA8YWpheS5raXNob3JlQGludGVsLmNvbT4NCj4gd3Jv
+dGU6DQo+ID4NCj4gPiBDaGFuZ2VzIG1hZGUgdG8gYWRkIGhhbmRsZXIgZnVuY3Rpb24gZm9yIHRo
+ZSBjb3JyZXNwb25kaW5nIGV2ZW50cw0KPiA+IG1lbnRpb25lZCBpbiBleHRlbmRlZCBldmVudCBy
+ZXBvcnRzIDEuMSBhbmQgMS4yLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQWpheSBLaXNob3Jl
+IDxhamF5Lmtpc2hvcmVAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBvYmV4ZC9jbGllbnQvbWFw
+LWV2ZW50LmggfCAgOCArKysrKysrLQ0KPiA+ICBvYmV4ZC9jbGllbnQvbWFwLmMgICAgICAgfCAy
+NCArKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiAgMiBmaWxlcyBjaGFuZ2VkLCAzMSBpbnNl
+cnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvb2JleGQvY2xp
+ZW50L21hcC1ldmVudC5oIGIvb2JleGQvY2xpZW50L21hcC1ldmVudC5oIGluZGV4DQo+ID4gNTQx
+NGIyNi4uYzQxYmI2NyAxMDA2NDQNCj4gPiAtLS0gYS9vYmV4ZC9jbGllbnQvbWFwLWV2ZW50LmgN
+Cj4gPiArKysgYi9vYmV4ZC9jbGllbnQvbWFwLWV2ZW50LmgNCj4gPiBAQCAtMzIsNyArMzIsMTMg
+QEAgZW51bSBtYXBfZXZlbnRfdHlwZSB7DQo+ID4gICAgICAgICBNQVBfRVRfTUVNT1JZX0ZVTEws
+DQo+ID4gICAgICAgICBNQVBfRVRfTUVNT1JZX0FWQUlMQUJMRSwNCj4gPiAgICAgICAgIE1BUF9F
+VF9NRVNTQUdFX0RFTEVURUQsDQo+ID4gLSAgICAgICBNQVBfRVRfTUVTU0FHRV9TSElGVA0KPiA+
+ICsgICAgICAgTUFQX0VUX01FU1NBR0VfU0hJRlQsDQo+ID4gKyAgICAgICBNQVBfRVRfUkVBRF9T
+VEFUVVNfQ0hBTkdFRCwNCj4gPiArICAgICAgIE1BUF9FVF9NRVNTQUdFX1JFTU9WRUQsDQo+ID4g
+KyAgICAgICBNQVBfRVRfTUVTU0FHRV9FWFRFTkRFRF9EQVRBX0NIQU5HRUQsDQo+ID4gKyAgICAg
+ICBNQVBfRVRfUEFSVElDSVBBTlRfUFJFU0VOQ0VfQ0hBTkdFRCwNCj4gPiArICAgICAgIE1BUF9F
+VF9QQVJUSUNJUEFOVF9DSEFUX1NUQVRFX0NIQU5HRUQsDQo+ID4gKyAgICAgICBNQVBfRVRfQ09O
+VkVSU0FUSU9OX0NIQU5HRUQNCj4gPiAgfTsNCj4gPg0KPiA+ICBzdHJ1Y3QgbWFwX2V2ZW50IHsN
+Cj4gPiBkaWZmIC0tZ2l0IGEvb2JleGQvY2xpZW50L21hcC5jIGIvb2JleGQvY2xpZW50L21hcC5j
+IGluZGV4DQo+ID4gYjY1MTMxYS4uYjFiNGIzOCAxMDA2NDQNCj4gPiAtLS0gYS9vYmV4ZC9jbGll
+bnQvbWFwLmMNCj4gPiArKysgYi9vYmV4ZC9jbGllbnQvbWFwLmMNCj4gPiBAQCAtMjU1MCw2ICsy
+NTUwLDE3IEBAIHN0YXRpYyB2b2lkIG1hcF9oYW5kbGVfZm9sZGVyX2NoYW5nZWQoc3RydWN0DQo+
+IG1hcF9kYXRhICptYXAsDQo+ID4NCj4gPiAiRm9sZGVyIik7ICB9DQo+ID4NCj4gPiArc3RhdGlj
+IHZvaWQgbWFwX2hhbmRsZV9yZW1vdmVfbWVzc2FnZShzdHJ1Y3QgbWFwX2RhdGEgKm1hcCwNCj4g
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qg
+bWFwX2V2ZW50DQo+ID4gKypldmVudCkgew0KPiA+ICsgICAgICAgc3RydWN0IG1hcF9tc2cgKm1z
+ZzsNCj4gPiArDQo+ID4gKyAgICAgICBtc2cgPSBnX2hhc2hfdGFibGVfbG9va3VwKG1hcC0+bWVz
+c2FnZXMsICZldmVudC0+aGFuZGxlKTsNCj4gPiArDQo+ID4gKyAgICAgICBpZiAobXNnKQ0KPiA+
+ICsgICAgICAgICAgICAgICBnX2hhc2hfdGFibGVfcmVtb3ZlKG1hcC0+bWVzc2FnZXMsICZldmVu
+dC0+aGFuZGxlKTsNCj4gDQo+IEkgYmVsaWV2ZSB5b3Ugb25seSBuZWVkIHRoZSBjYWxsIHRvIHJl
+bW92ZSBoZXJlIG90aGVyd2lzZSB3ZSBtaWdodCBqdXN0IGJlDQo+IGRvaW5nIDIgbG9va3VwcyBm
+b3Igbm8gb2J2aW91cyByZWFzb24gc2luY2UgcmVtb3ZlIGFscmVhZHkgZG9lcyB0aGF0Lg0KDQpJ
+IGFkZHJlc3NlZCB5b3VyIGNvbW1lbnQgYW5kIHB1c2hlZCB0aGUgcGF0Y2ggDQooW1BBVENIIHYy
+IDUvNV0gb2JleGQ6IEhhbmRsZSBNQVAgRXZlbnQgUmVwb3J0IHYxLjEgYW5kIHYxLjIpLg0KDQo+
+IA0KPiA+ICt9DQo+ID4gKw0KPiA+ICBzdGF0aWMgdm9pZCBtYXBfaGFuZGxlX25vdGlmaWNhdGlv
+bihzdHJ1Y3QgbWFwX2V2ZW50ICpldmVudCwgdm9pZA0KPiA+ICp1c2VyX2RhdGEpICB7DQo+ID4g
+ICAgICAgICBzdHJ1Y3QgbWFwX2RhdGEgKm1hcCA9IHVzZXJfZGF0YTsgQEAgLTI1ODIsNiArMjU5
+MywxOSBAQA0KPiA+IHN0YXRpYyB2b2lkIG1hcF9oYW5kbGVfbm90aWZpY2F0aW9uKHN0cnVjdCBt
+YXBfZXZlbnQgKmV2ZW50LCB2b2lkDQo+ICp1c2VyX2RhdGEpDQo+ID4gICAgICAgICBjYXNlIE1B
+UF9FVF9NRVNTQUdFX1NISUZUOg0KPiA+ICAgICAgICAgICAgICAgICBtYXBfaGFuZGxlX2ZvbGRl
+cl9jaGFuZ2VkKG1hcCwgZXZlbnQsIGV2ZW50LT5mb2xkZXIpOw0KPiA+ICAgICAgICAgICAgICAg
+ICBicmVhazsNCj4gPiArICAgICAgIGNhc2UgTUFQX0VUX1JFQURfU1RBVFVTX0NIQU5HRUQ6DQo+
+ID4gKyAgICAgICAgICAgICAgIG1hcF9oYW5kbGVfc3RhdHVzX2NoYW5nZWQobWFwLCBldmVudCwg
+InJlYWQiKTsNCj4gPiArICAgICAgICAgICAgICAgYnJlYWs7DQo+ID4gKyAgICAgICBjYXNlIE1B
+UF9FVF9NRVNTQUdFX1JFTU9WRUQ6DQo+ID4gKyAgICAgICAgICAgICAgIG1hcF9oYW5kbGVfcmVt
+b3ZlX21lc3NhZ2UobWFwLCBldmVudCk7DQo+ID4gKyAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+
+ICsgICAgICAgY2FzZSBNQVBfRVRfTUVTU0FHRV9FWFRFTkRFRF9EQVRBX0NIQU5HRUQ6DQo+ID4g
+KyAgICAgICAgICAgICAgIG1hcF9oYW5kbGVfc3RhdHVzX2NoYW5nZWQobWFwLCBldmVudCwNCj4g
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIm1lc3NhZ2UtZXh0ZW5k
+ZWQtZGF0YS1jaGFuZ2VkIik7DQo+ID4gKyAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+ICsgICAg
+ICAgY2FzZSBNQVBfRVRfUEFSVElDSVBBTlRfUFJFU0VOQ0VfQ0hBTkdFRDoNCj4gPiArICAgICAg
+IGNhc2UgTUFQX0VUX1BBUlRJQ0lQQU5UX0NIQVRfU1RBVEVfQ0hBTkdFRDoNCj4gPiArICAgICAg
+IGNhc2UgTUFQX0VUX0NPTlZFUlNBVElPTl9DSEFOR0VEOg0KPiA+ICAgICAgICAgY2FzZSBNQVBf
+RVRfTUVNT1JZX0ZVTEw6DQo+ID4gICAgICAgICBjYXNlIE1BUF9FVF9NRU1PUllfQVZBSUxBQkxF
+Og0KPiA+ICAgICAgICAgZGVmYXVsdDoNCj4gPiAtLQ0KPiA+IDIuNy40DQo+ID4NCj4gDQo+IA0K
+PiAtLQ0KPiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQoNClRoYW5rcy4NCkFqYXkNCg==
