@@ -2,218 +2,148 @@ Return-Path: <SRS0=kuCk=2G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4251C2D0BF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 21:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F03BC43603
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 22:50:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9F65420CC7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 21:57:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 540E62465E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Dec 2019 22:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nOaUKB8O"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="ToYhBpIv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727529AbfLPV5c (ORCPT
+        id S1726663AbfLPWuN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Dec 2019 16:57:32 -0500
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:46388 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727384AbfLPV5c (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Dec 2019 16:57:32 -0500
-Received: by mail-vs1-f65.google.com with SMTP id t12so5127435vso.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Dec 2019 13:57:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=DFPpNng3KoPqtg8NdN2SpyoGmm5E5m0rky9u0AsyxLk=;
-        b=nOaUKB8O/lLoPcm34GbcXeaAetd9TsZSmTrUu2nEBnBwoIurEZRZGA+EjyDHs9ahas
-         mZ72Fu15WqdrDZf5opeovzT/LYUYrT8uK0u70I4hk8q8U26bpxVaTuTHFFRAhs5PaD4v
-         Xx32wem5YmdhKnIA7pj9RACkakMtPlgZ9ce9s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=DFPpNng3KoPqtg8NdN2SpyoGmm5E5m0rky9u0AsyxLk=;
-        b=nAFFhTfD3JFD4QC9Qymh+EirW/N882PdeRR7GltG6CHOyRBGtCGmW/S4SFpmvZsWmj
-         or8dvCUueTo97O2zIV1FzRzzM6+R7fMSpL/HbRxEARsTMVBG74rxchkWV7mxz0i/87tZ
-         aTxiZImbSlE9MZMnjhId9nxgwTff1dMlp1iAUyTeFHXkE39Azejh6S1ec170EBPR9uSg
-         tycY/UyhsvqgNsyv2OOqHEUIo3NpbGg2pVSiPhzlWRs9PcH5cclWQE//cgNHi9DiM3bj
-         m2lr2hitS3G+XBckTF+MEveLYKX8XemgODqC1SQSw0D595O6/5AZUAzCNXfzVOY4IY8x
-         ZVrQ==
-X-Gm-Message-State: APjAAAUt9FmeeR/E9wSUPkA4d3wwWuNQv0itp1jDHAjkhRewq+LGKERd
-        ZEH96o6mJKbwxRaE0/fMgF6zDiAyXJOLFVuCZmHOTg==
-X-Google-Smtp-Source: APXvYqyK1F6gGCRuxEz8GZK1mdTsTU3OEQl91lSUWV7Cjfrgcb+iTWic/oW/rvOgipPfFAyWFbF1nTFONGWvRzCBwSA=
-X-Received: by 2002:a05:6102:81:: with SMTP id t1mr916905vsp.86.1576533450826;
- Mon, 16 Dec 2019 13:57:30 -0800 (PST)
+        Mon, 16 Dec 2019 17:50:13 -0500
+Received: from mga09.intel.com ([134.134.136.24]:42428 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726448AbfLPWuN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 16 Dec 2019 17:50:13 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 14:50:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,323,1571727600"; 
+   d="scan'208";a="205269467"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by orsmga007.jf.intel.com with ESMTP; 16 Dec 2019 14:50:12 -0800
+Received: from orsmsx112.amr.corp.intel.com (10.22.240.13) by
+ ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 16 Dec 2019 14:50:11 -0800
+Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX112.amr.corp.intel.com (10.22.240.13) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 16 Dec 2019 14:50:11 -0800
+Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.51) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Mon, 16 Dec 2019 14:50:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R4OE/pShvWqgLoA/fpTBdds5y+PtebZVxrl6NmJ1bcEdEEVeMfKCWs2unNUcWo/a7MlkZjZDg4ryAUvDWooh2dFs66YrcO2ubTT+p33wzJ0bUnAs4lzykjzIM8UmuleUukD7ziRP8BuAcGxzSAw3I6emMcNVV+pM/sdHJpgW8vDvJNBKAf3gA62939u+FhzBul+BsqPXC7+PHcpGgrsuw9z6EFXDKYWoymUwyKWuUmYLEprbHss8+xBtpfKAOQaBlD48CWUHsDyfgHkA+bT2o9YMKE19/nF/PUs5XjVA+Elm/FBJGsga8t+I6Kij4w9C78GtstzxjBFBl1M8MeKm9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0oWiMiG0RMNgltUGJ+jBt7SVZXlwFYeTpYSipPp+opQ=;
+ b=VN6z4XZ7ipMZnITsEJU9iDtvbd1GjwPY6mU3pC27VkAOl+HcuTA7N4la+TcSyYchlrxiNdaxZEqxm6ap0On1x/XIS8QptUJB7bjLxem3svyHB35yQ+QZfQ0WF/ke1ZRrf58VZtDScZp0e3QVp7gIwutFwkqjFMlfq+s94IWPGyeK6QztIB4Z/vZmmF8fYqE6kKUuTUroiS5wgzR1HNCCXBH0gfz81HQTVniDOtiYW3ZKflkbExQkqdxq1MasFl5JCyJRXNXsamx92lLmRm7N8t1xh7uivrjFIbZaL+B97YFWk6hpRdI77ZC8kKnY4Ocqm+vvsDiY1E7iLDe3Wm7qNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0oWiMiG0RMNgltUGJ+jBt7SVZXlwFYeTpYSipPp+opQ=;
+ b=ToYhBpIvb1opGujfrLLueAX3kxx+kvanKe6wGsXsXsVDQpN6IA+FnVwx6xX4o0oNhwc6l7HjvQ5txzM8Dvs/UR+ZzCcLFqOY4QX5y+AfhuOIeEvCvzHsPIwRT9ErxEjt//d23MJhm0jDw64CbEiWlciQ8pFzrzzd0uciRJy2n0A=
+Received: from CY4PR11MB1269.namprd11.prod.outlook.com (10.173.16.11) by
+ CY4PR11MB0022.namprd11.prod.outlook.com (10.171.254.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2538.20; Mon, 16 Dec 2019 22:50:10 +0000
+Received: from CY4PR11MB1269.namprd11.prod.outlook.com
+ ([fe80::39e0:30e9:a8b0:fe24]) by CY4PR11MB1269.namprd11.prod.outlook.com
+ ([fe80::39e0:30e9:a8b0:fe24%3]) with mapi id 15.20.2538.019; Mon, 16 Dec 2019
+ 22:50:10 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "aurelien@aurel32.net" <aurelien@aurel32.net>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] tools/mesh-cfgclient: add friend get/set commands
+Thread-Topic: [PATCH BlueZ] tools/mesh-cfgclient: add friend get/set commands
+Thread-Index: AQHVr6iAuOBpXOORSUK7yUW6wSGBRKe9ZwMA
+Date:   Mon, 16 Dec 2019 22:50:10 +0000
+Message-ID: <973d8d57b5bbedcd862938e109f0e81db2a1d78f.camel@intel.com>
+References: <20191210222250.759969-1-aurelien@aurel32.net>
+In-Reply-To: <20191210222250.759969-1-aurelien@aurel32.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [192.55.54.38]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d1a230aa-9fa4-4887-2c70-08d7827a4e24
+x-ms-traffictypediagnostic: CY4PR11MB0022:
+x-microsoft-antispam-prvs: <CY4PR11MB00220A53B876DE6B50906BA9E1510@CY4PR11MB0022.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:556;
+x-forefront-prvs: 02530BD3AA
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(39860400002)(136003)(376002)(346002)(189003)(199004)(5660300002)(316002)(478600001)(71200400001)(26005)(81166006)(36756003)(6486002)(186003)(4001150100001)(110136005)(8676002)(86362001)(6512007)(81156014)(91956017)(66946007)(66476007)(76116006)(64756008)(66446008)(66556008)(2616005)(8936002)(6506007)(2906002);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR11MB0022;H:CY4PR11MB1269.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5A9tOQlGpBtkKzwXHk2Bm8Y54hipiBd8PXKAuIYWgL+adHXr8EL05pENpZZJMfUykiDPm5xO44p4j/OSN0cYIvSevPAE/g1RhkUvFiMmLYRZgBoX1GvWu+yOi+D6GpIswONU2aTu7+U/FhMkISgLD6T90gU45kcvhf3GGfk4iXmI4/THcb+gzG/Rg27kW9+VAmvzSZzgD/mslhA6PEi6uOhLc4TF8b0rZf/J5Nwo3tURQgDdC1LGhFeRCYPjx0O5sDZWHHNUaWha1Q8cgUvGY2GmqeHNX/+Dnr8nQbfI7FCZjek8SgkV/O5+dgxOsR4hXm2fhwJhzYH6gPnj1jsmwuy+ht3+5QNb1cWTColW0GhRVzocga1DJ7jihVbbHllEjEEbEneZzGlOx87/hHB62jJ3XN9GG2ugvTiaSyAukn2O7bdJu2lD9Jo+/Qd2vY7p
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6C6ECE912497FD4D90C0CC6C30966AFA@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20191202084750.k7lafzzrf3yq2tqs@pali> <20191202175440.GA50317@dtor-ws>
- <20191202185340.nae4lljten5jqp3y@pali> <20191202193628.GI50317@dtor-ws>
- <20191202230947.ld5ibnczdpkekfcm@pali> <20191203173821.4u6uzxeaqnt3gyz3@pali>
- <20191203191112.GJ50317@dtor-ws> <20191205105206.slibwytrcteicx6y@pali>
- <CANFp7mXyaqoMDBs4m_Dfm9+4U88g9WoJVcV1g_4KM4xzFhiGXQ@mail.gmail.com>
- <20191206091114.kh255jrmerruumnq@pali> <20191206174048.GQ50317@dtor-ws>
-In-Reply-To: <20191206174048.GQ50317@dtor-ws>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 16 Dec 2019 13:57:19 -0800
-Message-ID: <CANFp7mVStzfjBT6SxQp+BGytat-Pnb8ntzZe8xMgPpB7x59zCg@mail.gmail.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
-        linux-input@vger.kernel.org,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1a230aa-9fa4-4887-2c70-08d7827a4e24
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Dec 2019 22:50:10.3629
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3zYJlb42OmS0bcPcIuFcxJtMLYK103fV1HMCVFFIMyVmAE+OeQDZuZTLGnr1xEYjD4/3H7G/9GwiOgo/jeSQAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR11MB0022
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-
-Since there hasn't been further activity on this thread, I assume that
-we're agreed that requiring the size in the IOCTL is ok (i.e.
-UI_SET_PHYS_STR(18)).
-
-Dmitry, could you please review -- [PATCH v4] Input: uinput - Add
-UI_SET_PHYS_STR and UI_SET_UNIQ_STR -- from December 4 for merge?
-
-Thanks
-Abhishek
-
-On Fri, Dec 6, 2019 at 9:40 AM Dmitry Torokhov
-<dmitry.torokhov@gmail.com> wrote:
->
-> On Fri, Dec 06, 2019 at 10:11:14AM +0100, Pali Roh=C3=A1r wrote:
-> > On Thursday 05 December 2019 12:03:05 Abhishek Pandit-Subedi wrote:
-> > > On Thu, Dec 5, 2019 at 2:52 AM Pali Roh=C3=A1r <pali.rohar@gmail.com>=
- wrote:
-> > > >
-> > > > On Tuesday 03 December 2019 11:11:12 Dmitry Torokhov wrote:
-> > > > > On Tue, Dec 03, 2019 at 06:38:21PM +0100, Pali Roh=C3=A1r wrote:
-> > > > > > On Tuesday 03 December 2019 00:09:47 Pali Roh=C3=A1r wrote:
-> > > > > >
-> > > > > > Hi Dmitry!
-> > > > > >
-> > > > > > I was looking again at those _IOW defines for ioctl calls and I=
- have
-> > > > > > another argument why not specify 'char *' in _IOW:
-> > > > > >
-> > > > > > All ioctls in _IOW() specify as a third macro argument type whi=
-ch is
-> > > > > > passed as pointer to the third argument for ioctl() syscall.
-> > > > > >
-> > > > > > So e.g.:
-> > > > > >
-> > > > > >   #define EVIOCSCLOCKID _IOW('E', 0xa0, int)
-> > > > > >
-> > > > > > is called from userspace as:
-> > > > > >
-> > > > > >   int val;
-> > > > > >   ioctl(fd, EVIOCSCLOCKID, &val);
-> > > > > >
-> > > > > > Or
-> > > > > >
-> > > > > >   #define EVIOCSMASK _IOW('E', 0x93, struct input_mask)
-> > > > > >
-> > > > > > is called as:
-> > > > > >
-> > > > > >   struct input_mask val;
-> > > > > >   ioctl(fd, EVIOCSMASK, &val);
-> > > > > >
-> > > > > > So basically third argument for _IOW specify size of byte buffe=
-r passed
-> > > > > > as third argument for ioctl(). In _IOW is not specified pointer=
- to
-> > > > > > struct input_mask, but struct input_mask itself.
-> > > > > >
-> > > > > > And in case you define
-> > > > > >
-> > > > > >   #define MY_NEW_IOCTL _IOW(UINPUT_IOCTL_BASE, 200, char*)
-> > > > > >
-> > > > > > then you by above usage you should pass data as:
-> > > > > >
-> > > > > >   char *val =3D "DATA";
-> > > > > >   ioctl(fd, MY_NEW_IOCTL, &val);
-> > > > > >
-> > > > > > Which is not same as just:
-> > > > > >
-> > > > > >   ioctl(fd, MY_NEW_IOCTL, "DATA");
-> > > > > >
-> > > > > > As in former case you passed pointer to pointer to data and in =
-later
-> > > > > > case you passed only pointer to data.
-> > > > > >
-> > > > > > It just mean that UI_SET_PHYS is already defined inconsistently=
- which is
-> > > > > > also reason why compat ioctl for it was introduced.
-> > > > >
-> > > > > Yes, you are right. UI_SET_PHYS is messed up. I guess the questio=
-n is
-> > > > > what to do with all of this...
-> > > > >
-> > > > > Maybe we should define
-> > > > >
-> > > > > #define UI_SET_PHYS_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE,=
- 111, len)
-> > > > > #define UI_SET_UNIQ_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE,=
- 112, len)
-> > > >
-> > > > I'm not sure if this is ideal. Normally in C strings are nul-termin=
-ed,
-> > > > so functions/macros do not take buffer length.
-> > > Except strncpy, strndup, snprintf, etc. all expect a buffer length. A=
-t
-> >
-> > This is something different as for these functions you pass buffer and
-> > length of buffer which is used in write mode -- not for read mode.
-> >
-> > > the user to kernel boundary of ioctl, I think we should require size
-> > > of the user buffer regardless of the data type.
-> > >
-> > > > _STR therefore in names looks inconsistent.
-> > > The _STR suffix is odd (what to name UI_SET_PHYS_STR then??) but
-> > > requiring the length seems to be common across various ioctls.
-> > > * input.h requires a length when requesting the phys and uniq
-> > > (https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/t=
-ree/include/uapi/linux/input.h#n138)
-> > > * Same with HIDRAW when setting and getting features:
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
-ee/include/uapi/linux/hidraw.h#n40,
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
-ee/samples/hidraw/hid-example.c#n88
-> >
-> > All these ioctls where is passed length are in opposite direction
-> > (_IOC_READ) as our PHYS and UNIQ (_IOC_WRITE).
-> >
-> > I fully agree that when you need to read something from kernel
-> > (_IOC_READ) and then writing it to userspace, you need to specify lengt=
-h
-> > of userspace buffer. Exactly same as with userspace functions like
-> > memcpy, snprintf, etc... as you pointed. Otherwise you get buffer
-> > overflow as callee does not know length of buffer.
-> >
-> > But here we we have there quite different problem, we need to write
-> > something to kernel from userspace (_IOC_WRITE) and we are passing
-> > nul-term string. So in this case specifying size is not required as it
-> > is implicitly specified as part of passed string.
->
-> With the new IOCTL definitions it does not need to be a NULL-terminated
-> string. It can be a buffer of characters with given length, and kernel
-> will NULL-terminate as this it what it wants, not what the caller has to
-> give.
->
-> Thanks.
->
-> --
-> Dmitry
+QXBwbGllZCB3aXRoIG1pbm9yIHJlLWFycmFuZ2UgZm9yIG11bHRpcGxlIGNvbW1hbmQgYWRkcw0K
+VGhhbmtzDQoNCk9uIFR1ZSwgMjAxOS0xMi0xMCBhdCAyMzoyMiArMDEwMCwgQXVyZWxpZW4gSmFy
+bm8gd3JvdGU6DQo+IEFkZCBmcmllbmQtZ2V0IGFuZCBmcmllbmQtc2V0IGNvbW1hbmRzIGFzIHBl
+ciBNZXNoIFByb2ZpbGUgNC4zLjIuNTUsDQo+IDQuMy4yLjU2IGFuZCA0LjMuMi41Ny4NCj4gLS0t
+DQo+ICB0b29scy9tZXNoL2NmZ2NsaS5jIHwgNDAgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKw0KPiAgMSBmaWxlIGNoYW5nZWQsIDQwIGluc2VydGlvbnMoKykNCj4gDQo+
+IGRpZmYgLS1naXQgYS90b29scy9tZXNoL2NmZ2NsaS5jIGIvdG9vbHMvbWVzaC9jZmdjbGkuYw0K
+PiBpbmRleCBlYzlmYWJiM2IuLjkwMjBiYjc1MiAxMDA2NDQNCj4gLS0tIGEvdG9vbHMvbWVzaC9j
+ZmdjbGkuYw0KPiArKysgYi90b29scy9tZXNoL2NmZ2NsaS5jDQo+IEBAIC02MjEsNiArNjIxLDE1
+IEBAIHN0YXRpYyBib29sIG1zZ19yZWN2ZCh1aW50MTZfdCBzcmMsIHVpbnQxNl90IGlkeCwgdWlu
+dDhfdCAqZGF0YSwNCj4gIAkJCQlzcmMsIG1lc2hfc3RhdHVzX3N0cihkYXRhWzBdKSk7DQo+ICAN
+Cj4gIAkJYnJlYWs7DQo+ICsNCj4gKwkvKiBQZXIgTWVzaCBQcm9maWxlIDQuMy4yLjU3ICovDQo+
+ICsJY2FzZSBPUF9DT05GSUdfRlJJRU5EX1NUQVRVUzoNCj4gKwkJaWYgKGxlbiAhPSAxKQ0KPiAr
+CQkJcmV0dXJuIHRydWU7DQo+ICsNCj4gKwkJYnRfc2hlbGxfcHJpbnRmKCJOb2RlICU0LjR4IEZy
+aWVuZCBzdGF0ZSAweCUwMnhcbiIsDQo+ICsJCQkJc3JjLCBkYXRhWzBdKTsNCj4gKwkJYnJlYWs7
+DQo+ICAJfQ0KPiAgDQo+ICAJcmV0dXJuIHRydWU7DQo+IEBAIC0xMzEwLDYgKzEzMTksMzMgQEAg
+c3RhdGljIHZvaWQgY21kX25vZGVfcmVzZXQoaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4gIAlj
+bWRfZGVmYXVsdChPUF9OT0RFX1JFU0VUKTsNCj4gIH0NCj4gIA0KPiArc3RhdGljIHZvaWQgY21k
+X2ZyaWVuZF9zZXQoaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4gK3sNCj4gKwl1aW50MTZfdCBu
+Ow0KPiArCXVpbnQ4X3QgbXNnWzIgKyAxXTsNCj4gKwlpbnQgcGFybV9jbnQ7DQo+ICsNCj4gKwlu
+ID0gbWVzaF9vcGNvZGVfc2V0KE9QX0NPTkZJR19GUklFTkRfU0VULCBtc2cpOw0KPiArDQo+ICsJ
+cGFybV9jbnQgPSByZWFkX2lucHV0X3BhcmFtZXRlcnMoYXJnYywgYXJndik7DQo+ICsJaWYgKHBh
+cm1fY250ICE9IDEpIHsNCj4gKwkJYnRfc2hlbGxfcHJpbnRmKCJiYWQgYXJndW1lbnRzIik7DQo+
+ICsJCXJldHVybiBidF9zaGVsbF9ub25pbnRlcmFjdGl2ZV9xdWl0KEVYSVRfRkFJTFVSRSk7DQo+
+ICsJfQ0KPiArDQo+ICsJbXNnW24rK10gPSBwYXJtc1swXTsNCj4gKw0KPiArCWlmICghY29uZmln
+X3NlbmQobXNnLCBuLCBPUF9DT05GSUdfRlJJRU5EX1NFVCkpDQo+ICsJCXJldHVybiBidF9zaGVs
+bF9ub25pbnRlcmFjdGl2ZV9xdWl0KEVYSVRfRkFJTFVSRSk7DQo+ICsNCj4gKwlyZXR1cm4gYnRf
+c2hlbGxfbm9uaW50ZXJhY3RpdmVfcXVpdChFWElUX1NVQ0NFU1MpOw0KPiArfQ0KPiArDQo+ICtz
+dGF0aWMgdm9pZCBjbWRfZnJpZW5kX2dldChpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KPiArew0K
+PiArCWNtZF9kZWZhdWx0KE9QX0NPTkZJR19GUklFTkRfR0VUKTsNCj4gK30NCj4gKw0KPiAgc3Rh
+dGljIGJvb2wgdHhfc2V0dXAobW9kZWxfc2VuZF9tc2dfZnVuY190IHNlbmRfZnVuYywgdm9pZCAq
+dXNlcl9kYXRhKQ0KPiAgew0KPiAgCWlmICghc2VuZF9mdW5jKQ0KPiBAQCAtMTM5MCw2ICsxNDI2
+LDEwIEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgYnRfc2hlbGxfbWVudSBjZmdfbWVudSA9IHsNCj4g
+IAkJCQkiR2V0IHN1YnNjcmlwdGlvbiJ9LA0KPiAgCXsibm9kZS1yZXNldCIsIE5VTEwsIGNtZF9u
+b2RlX3Jlc2V0LA0KPiAgCQkJCSJSZXNldCBhIG5vZGUgYW5kIHJlbW92ZSBpdCBmcm9tIG5ldHdv
+cmsifSwNCj4gKwl7ImZyaWVuZC1zZXQiLCAiPGZyaWVuZD4iLCBjbWRfZnJpZW5kX3NldCwNCj4g
+KwkJCQkiU2V0IGZyaWVuZCBzdGF0ZSJ9LA0KPiArCXsiZnJpZW5kLWdldCIsIE5VTEwsIGNtZF9m
+cmllbmRfZ2V0LA0KPiArCQkJCSJHZXQgZnJpZW5kIHN0YXRlIn0sDQo+ICAJe30gfSwNCj4gIH07
+DQo+ICANCg==
