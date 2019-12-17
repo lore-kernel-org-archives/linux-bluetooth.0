@@ -2,113 +2,103 @@ Return-Path: <SRS0=Cjqc=2H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7075FC43603
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 12:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A55DC43603
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 13:10:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3374B206A5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 12:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FC71206EC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 13:10:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="krm15xqH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gsj7ZKlt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbfLQM7j (ORCPT
+        id S1727845AbfLQNKe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Dec 2019 07:59:39 -0500
-Received: from mout.gmx.net ([212.227.17.22]:48109 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726141AbfLQM7j (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Dec 2019 07:59:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1576587567;
-        bh=2HkFeiZwUwI8dkycGVvfX0tWo0t5jmvhNrEkAT95D7Y=;
-        h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
-        b=krm15xqHsYEogj2zU9x5pN7IGkkGJbURAuJw0ZIvbB3AwSXilaZqdhuSIUU7GWClA
-         AYD4yfJlYtcE4MSmyY8ju1eQPzmWvHQfVCPTsPjI2HT28NZx7jBLcbDcfMoMQFLVZx
-         UhQwQ8gzsTwTBEqRF7wrXQb7b9lTRUE21eN/of5s=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.1.176] ([37.4.249.154]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1M8hVB-1id3aI2Qa1-004lVV; Tue, 17
- Dec 2019 13:59:27 +0100
-Subject: Re: [PATCH V4 01/10] bluetooth: hci_bcm: Fix RTS handling during
- startup
-From:   Stefan Wahren <wahrenst@gmx.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
+        Tue, 17 Dec 2019 08:10:34 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:35671 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727576AbfLQNKd (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 17 Dec 2019 08:10:33 -0500
+Received: by mail-lf1-f68.google.com with SMTP id 15so6945909lfr.2;
+        Tue, 17 Dec 2019 05:10:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=9jk39L8RgpYiTrld7dSlOIM7xyFzKKS6lSCI/KcHWZk=;
+        b=Gsj7ZKltUMuYF0Ggx/KiJ1fsaIQaYjAxnQgADAj5o13RV0RaBOUb5mOBd6isWfIGEq
+         oHKz5YCSfrd7GIDR/8B8bGv4Gb6Qu1U8BqLG7zhh723dz9A94DSNakk/TfT2mO7wFBoX
+         kDe/afzHPqFNsYpGdfcEM2Aj2zsygDnUo6UjomhX58VDd9/Nabb7cr9NJ7cMNVSp4Cl/
+         veUa5Lxf/UTw8d49VAWnS18pfOyXh2QbTCwU79NywB30U2m0AkZV/h4S+wZPIxAYEqmU
+         ofzoIsSx74pG5d3Fxot++GzF1gDArbVNTVl3hledBXRoWw0R1YXIFdp5cvP9n/04qFCs
+         dydA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9jk39L8RgpYiTrld7dSlOIM7xyFzKKS6lSCI/KcHWZk=;
+        b=OC1aOKFApnoQ63jNUZMkNrss8PuoRgzg0qb3vzSSSOLe4V8H9WCithXMoZPZzTtRBA
+         SVndPlsNt9gihcOah4pJlGgh1EGnFr+yN3ifaZmL99BHIewZpAdwanmaZQaGuv3Rl9aq
+         mv6QdK7sdCkqaQ7IzYrkLKtFQyQzkAP1W7UYqFDgN2vF1hWO+U9hpxPgnmPXXXHViuhW
+         N3jSlzD9Uk/sHj6V3en3YXlKEmN4YTKArZpVOYvHa3GdywSj5+vRj/N8JhAzjDi4A5rx
+         XAMGauyDV/4rVtRruPluEAZohGeUqzU2t4yzDO7AbSTnIdvDEk5qvdyTW1mZfHioZZ1X
+         oH3g==
+X-Gm-Message-State: APjAAAW2XJqWx7nYTu7D2Q8PxDHp/iYdjt9lEEaFoQzrpmUXZYXUft+a
+        EE7MJsvvRiSmiAlRx8UZ/zbZ2Akm
+X-Google-Smtp-Source: APXvYqx0SUti1aF3Yq6Y7m+qSFkDDVrvqKoaKj+P6rWZ8vzlLHdRnKn5vmD5Wa9Ke3xg8KQ5QC53mQ==
+X-Received: by 2002:ac2:455c:: with SMTP id j28mr2806295lfm.184.1576588230944;
+        Tue, 17 Dec 2019 05:10:30 -0800 (PST)
+Received: from [192.168.2.145] (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
+        by smtp.googlemail.com with ESMTPSA id q14sm12539756ljm.68.2019.12.17.05.10.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Dec 2019 05:10:30 -0800 (PST)
+Subject: Re: [PATCH v1 2/2] dt-bindings: net: broadcom-bluetooth: Document
+ BCM4329 support
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        =?UTF-8?Q?Ond=c5=99ej_Jirman?= <megous@megous.com>
-Cc:     Florian Fainelli <f.fainelli@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-References: <1570375708-26965-1-git-send-email-wahrenst@gmx.net>
- <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
- <61789264-a4c2-ac85-9d74-d186213ec70a@gmx.net>
- <20191216132509.ofqcdpwxsd7324ql@core.my.home>
- <6f05f4d8-fa84-ae81-ac4f-00ab12fabeea@gmx.net>
-Message-ID: <5bbda434-d0e4-7162-8634-9900a4fa9148@gmx.net>
-Date:   Tue, 17 Dec 2019 13:59:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-tegra@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20191215185253.14024-1-digetx@gmail.com>
+ <20191215185253.14024-2-digetx@gmail.com>
+ <E971B7A3-B5F2-4F21-B0F4-B7D289080D9A@holtmann.org>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <e59a6d98-eef0-3473-add3-ac6b2fae02a8@gmail.com>
+Date:   Tue, 17 Dec 2019 16:10:29 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <6f05f4d8-fa84-ae81-ac4f-00ab12fabeea@gmx.net>
+In-Reply-To: <E971B7A3-B5F2-4F21-B0F4-B7D289080D9A@holtmann.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-X-Provags-ID: V03:K1:J/+nhngNsiRpXFva8LhRKZOD3EwX4sty6zgKpJk4HznZvWttOsm
- pg38SqOn6JvtHccgD/eEeBbTZpIaPNZP3x87zozi6Z9ONPXxncLRdf9XhnI5pwAUM0Mb0Wc
- z9IFVNHrh5tI4v3dWmQr8AO1q79vn9dtdIfPtRfjniT33D1HCqZ/guQgdTPFnToxvzmNXv7
- WBfGdfYM0rgoeBW+l719A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qKCYXvb1phE=:6j6FxufvYMfhGTAmdw6I4H
- 0KpswJSIboPCVLdJzdz3YKdXLdu1a5diSG0iqFDH8VqmJnAt50BAcFZDtCtk3NMp8u828IZuo
- xqtpeLbTXCnDLCPo1RerRzmV8UxMvdOEl3HiEEu5geuGSzBEMh9wfTihO+5iZOuEu2MpwK8JE
- 1WKTBhQ64wpvoQ8+hwzAvovwnOh8yv2N8X9TO9WP2olCnBw9FC9vL1T+7QYfB2RRjsx/pG8A5
- qtCwgOkiFwkgBQPjFc11nIVK3juEMS/s6N16UlHTQSjlhEVhoGpO+t2emauIDVEEpR8nE1Aoh
- s5Jd1+bd7nsCJacbBpQKyO11rLU9dAwjV2KWkAWiHZoa/fc9T27UQzXyoDLKblV4PYZh62d03
- lyP7ok5Ry6ZMyQYHyVz8JNUDuHGC88vwYrdV57JVLTWlfhviwF2BI6/RQky+CPgiZegRQRTRW
- nVsUKizHSWx0NsiqSdgTg5IilDxMSB6A2fmG/jCLyilAJk1+x4SP52tDmBuD3bSHHq5RldPWj
- Gu2NkKJ6+tmENI3r6WK7jDEjXvIY/tihG3I15XcOzALDQ7RaTwtOk1XXYYn898ltR0fSNhFcT
- 5UyCI4e9ZedcZHv3by2cJR2TIgmNEHFdi/oJAO5l6qQLITYlPbl6/tUwSdTO4XBA50Q571R8x
- dpt0IBldQ0NXF8OzxpBsTPlydNrLJyjBB0xDDg6qkG3pXkLMLpLrOq0hi6dyzuSGbXm4FpCO3
- tEt74TL/3JwWdimfYHmjus/EbAYb0FM/abip0zT4SQh+b3eBFuHPtWc0pKYgOXEa9wp4j5PyF
- 4yqiQ9F/ftzcl0ghzxxaSamYT4+lLr6O4rGqoe5+Q9xePBKGqtdveLeoor1/Xbqjw6MdNy1po
- gvFpb6pr0Nr+cvvK876r/mC26aSIhHpmN8uNSpgJ2Ad8F/wPI1s/jhA68U/Y61xBw3gdvu5G+
- 80PLhnUakDZ9X73QfBuuTjvZQfBgg7Vtpp2VrKWTO2OpZQr8P50OS1f4xdeQm1B4LRPEB21Rw
- jJnA2ivOlrF2B/M28yIRr/8F/PFbuRiaMkyY/ikJs8gLLW7H/ZNHzpJi02HrRbVq3sJW9/obG
- jWq0GSWoRbzJfGvwA75RfDNJEfriBlcViruHqMTBzrYyJUcSc9T7rN4ejSGfbYGqKVILzqUSJ
- Ya6MfWzQ1hcxsKeAvjw6444cljAR1DDF2SipO8qSFSINnPlX5N87uBX8vAJxcakNkncReRXQS
- Ct0ZqFxIjqFXU0ULu9O+VTHZpkNxKW0DJMDUTiSzsYu8HnSBLwVwfT79BYpA=
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ondrej,
-
-Am 16.12.19 um 19:28 schrieb Stefan Wahren:
-> Hi Ondrej,
->
-> Am 16.12.19 um 14:25 schrieb Ond=C5=99ej Jirman:
+17.12.2019 10:40, Marcel Holtmann пишет:
+> Hi Dmitry,
+> 
+>> The BCM4329 is a 802.11 a/b/g/n WiFi + Bluetooth 2.1 chip which is found
+>> in Azurewave AW-NH611 WiFi+BT module.
 >>
->> Meanwhile i will play with modifications of original patch on the
->> Raspberry Pi 4 and come back to you.
+>> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+>> ---
+>> Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 1 +
+>> 1 file changed, 1 insertion(+)
+> 
+> patch has been applied to bluetooth-next tree.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-could you please test this patch [2] on top of current bluetooth-next?
-
-This is the solution in case we don't find the cause of this issue. I
-don't prefer this one, because this is next stuff and we need to revert
-the offending patch for Linux 5.5.
-
-[2] - https://gist.github.com/lategoodbye/3d39e4b07d401f07fa9f9c2f11e1f17d
-
->
-> Thanks
-> Stefan
->
-> [1] -
-> http://www.sparklan.com/p2-products-detail.php?PKey=3D4984FVukjcpylzifQi=
-M-TGFE-IKXD--BCwf4P15KfrU&AP6256
->
+Thank you very much!
