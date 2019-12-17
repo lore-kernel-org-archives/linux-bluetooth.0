@@ -2,103 +2,100 @@ Return-Path: <SRS0=Cjqc=2H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A55DC43603
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 13:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB65C43603
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 13:41:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FC71206EC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 13:10:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3ACC7206B7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Dec 2019 13:41:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gsj7ZKlt"
+	dkim=pass (1024-bit key) header.d=megous.com header.i=@megous.com header.b="FzufCbM2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727845AbfLQNKe (ORCPT
+        id S1728011AbfLQNl4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Dec 2019 08:10:34 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:35671 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727576AbfLQNKd (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Dec 2019 08:10:33 -0500
-Received: by mail-lf1-f68.google.com with SMTP id 15so6945909lfr.2;
-        Tue, 17 Dec 2019 05:10:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9jk39L8RgpYiTrld7dSlOIM7xyFzKKS6lSCI/KcHWZk=;
-        b=Gsj7ZKltUMuYF0Ggx/KiJ1fsaIQaYjAxnQgADAj5o13RV0RaBOUb5mOBd6isWfIGEq
-         oHKz5YCSfrd7GIDR/8B8bGv4Gb6Qu1U8BqLG7zhh723dz9A94DSNakk/TfT2mO7wFBoX
-         kDe/afzHPqFNsYpGdfcEM2Aj2zsygDnUo6UjomhX58VDd9/Nabb7cr9NJ7cMNVSp4Cl/
-         veUa5Lxf/UTw8d49VAWnS18pfOyXh2QbTCwU79NywB30U2m0AkZV/h4S+wZPIxAYEqmU
-         ofzoIsSx74pG5d3Fxot++GzF1gDArbVNTVl3hledBXRoWw0R1YXIFdp5cvP9n/04qFCs
-         dydA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9jk39L8RgpYiTrld7dSlOIM7xyFzKKS6lSCI/KcHWZk=;
-        b=OC1aOKFApnoQ63jNUZMkNrss8PuoRgzg0qb3vzSSSOLe4V8H9WCithXMoZPZzTtRBA
-         SVndPlsNt9gihcOah4pJlGgh1EGnFr+yN3ifaZmL99BHIewZpAdwanmaZQaGuv3Rl9aq
-         mv6QdK7sdCkqaQ7IzYrkLKtFQyQzkAP1W7UYqFDgN2vF1hWO+U9hpxPgnmPXXXHViuhW
-         N3jSlzD9Uk/sHj6V3en3YXlKEmN4YTKArZpVOYvHa3GdywSj5+vRj/N8JhAzjDi4A5rx
-         XAMGauyDV/4rVtRruPluEAZohGeUqzU2t4yzDO7AbSTnIdvDEk5qvdyTW1mZfHioZZ1X
-         oH3g==
-X-Gm-Message-State: APjAAAW2XJqWx7nYTu7D2Q8PxDHp/iYdjt9lEEaFoQzrpmUXZYXUft+a
-        EE7MJsvvRiSmiAlRx8UZ/zbZ2Akm
-X-Google-Smtp-Source: APXvYqx0SUti1aF3Yq6Y7m+qSFkDDVrvqKoaKj+P6rWZ8vzlLHdRnKn5vmD5Wa9Ke3xg8KQ5QC53mQ==
-X-Received: by 2002:ac2:455c:: with SMTP id j28mr2806295lfm.184.1576588230944;
-        Tue, 17 Dec 2019 05:10:30 -0800 (PST)
-Received: from [192.168.2.145] (79-139-233-37.dynamic.spd-mgts.ru. [79.139.233.37])
-        by smtp.googlemail.com with ESMTPSA id q14sm12539756ljm.68.2019.12.17.05.10.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 05:10:30 -0800 (PST)
-Subject: Re: [PATCH v1 2/2] dt-bindings: net: broadcom-bluetooth: Document
- BCM4329 support
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Rob Herring <robh+dt@kernel.org>,
+        Tue, 17 Dec 2019 08:41:56 -0500
+Received: from vps.xff.cz ([195.181.215.36]:41352 "EHLO vps.xff.cz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727962AbfLQNl4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 17 Dec 2019 08:41:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megous.com; s=mail;
+        t=1576590114; bh=6t8Uyc2t+Hfu7WNUKCMbkr4L5H0F8zqAfk4qlpdk8x0=;
+        h=Date:From:To:Cc:Subject:References:X-My-GPG-KeyId:From;
+        b=FzufCbM2RGiDa9KFXYh0vsRZPe9nbbhyIHzSdQd52wvGFJkd5ZK0G66OD7aV8hDXi
+         qIqLxNfM/QYUQ5tEvNr5Pn7IOWSHGm26DeX5swmUsLYsM1orNDDIYQf7QTuNUtp9Rm
+         MjcdSsmiIdOgK8PxdtrqvsdMvmoGQAqwKawP1lo4=
+Date:   Tue, 17 Dec 2019 14:41:54 +0100
+From:   =?utf-8?Q?Ond=C5=99ej?= Jirman <megous@megous.com>
+To:     Stefan Wahren <wahrenst@gmx.net>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-tegra@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20191215185253.14024-1-digetx@gmail.com>
- <20191215185253.14024-2-digetx@gmail.com>
- <E971B7A3-B5F2-4F21-B0F4-B7D289080D9A@holtmann.org>
-From:   Dmitry Osipenko <digetx@gmail.com>
-Message-ID: <e59a6d98-eef0-3473-add3-ac6b2fae02a8@gmail.com>
-Date:   Tue, 17 Dec 2019 16:10:29 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        Florian Fainelli <f.fainelli@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+Subject: Re: [PATCH V4 01/10] bluetooth: hci_bcm: Fix RTS handling during
+ startup
+Message-ID: <20191217134154.zrvukziiqe272pq6@core.my.home>
+Mail-Followup-To: Stefan Wahren <wahrenst@gmx.net>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+References: <1570375708-26965-1-git-send-email-wahrenst@gmx.net>
+ <1570375708-26965-2-git-send-email-wahrenst@gmx.net>
+ <61789264-a4c2-ac85-9d74-d186213ec70a@gmx.net>
+ <20191216132509.ofqcdpwxsd7324ql@core.my.home>
+ <6f05f4d8-fa84-ae81-ac4f-00ab12fabeea@gmx.net>
+ <5bbda434-d0e4-7162-8634-9900a4fa9148@gmx.net>
 MIME-Version: 1.0
-In-Reply-To: <E971B7A3-B5F2-4F21-B0F4-B7D289080D9A@holtmann.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <5bbda434-d0e4-7162-8634-9900a4fa9148@gmx.net>
+X-My-GPG-KeyId: EBFBDDE11FB918D44D1F56C1F9F0A873BE9777ED
+ <https://xff.cz/key.txt>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-17.12.2019 10:40, Marcel Holtmann пишет:
-> Hi Dmitry,
-> 
->> The BCM4329 is a 802.11 a/b/g/n WiFi + Bluetooth 2.1 chip which is found
->> in Azurewave AW-NH611 WiFi+BT module.
->>
->> Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
->> ---
->> Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 1 +
->> 1 file changed, 1 insertion(+)
-> 
-> patch has been applied to bluetooth-next tree.
-> 
-> Regards
-> 
-> Marcel
-> 
+Hi Stefan,
 
-Thank you very much!
+On Tue, Dec 17, 2019 at 01:59:26PM +0100, Stefan Wahren wrote:
+> Hi Ondrej,
+> 
+> Am 16.12.19 um 19:28 schrieb Stefan Wahren:
+> > Hi Ondrej,
+> >
+> > Am 16.12.19 um 14:25 schrieb Ondřej Jirman:
+> >>
+> >> Meanwhile i will play with modifications of original patch on the
+> >> Raspberry Pi 4 and come back to you.
+> 
+> could you please test this patch [2] on top of current bluetooth-next?
+> 
+> This is the solution in case we don't find the cause of this issue. I
+> don't prefer this one, because this is next stuff and we need to revert
+> the offending patch for Linux 5.5.
+> 
+> [2] - https://gist.github.com/lategoodbye/3d39e4b07d401f07fa9f9c2f11e1f17d
+
+That looks equivalent to the revert and it will obviously avoid the issue,
+because Orange Pi 3 has a different bluetooth device compatible.
+
+regards,
+	o.
+
+> >
+> > Thanks
+> > Stefan
+> >
+> > [1] -
+> > http://www.sparklan.com/p2-products-detail.php?PKey=4984FVukjcpylzifQiM-TGFE-IKXD--BCwf4P15KfrU&AP6256
+> >
