@@ -2,127 +2,114 @@ Return-Path: <SRS0=1j7M=2I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A27BEC43603
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 19:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1FDCC2D0CD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 20:38:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7494C2082E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 19:02:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L52GTpe3"
+	by mail.kernel.org (Postfix) with ESMTP id 74EFF24650
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 20:38:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576701512;
+	bh=BxDWvL0wyUI9P6H5mgx31bfKcvWWUxvFPIg7/bc18mw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Wbr4wrybk7Iom7HEhlbbtcG4Z4gQTAH2TuA5OPwgwxBXQZD8O1grw0EDdkIA4DC6a
+	 Nb/yDZ883SBSVLUs9uG4y3NGFAW736MC1CFuY3jlB+IdVaJAYenE0C+DbUWkAMrgmX
+	 WjGfxNhsmMINCErXDRrPBQWQYx2kwY9/LLXqW8YM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727053AbfLRTCo (ORCPT
+        id S1727144AbfLRUiU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Dec 2019 14:02:44 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:44116 "EHLO
+        Wed, 18 Dec 2019 15:38:20 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:33903 "EHLO
         mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727024AbfLRTCo (ORCPT
+        with ESMTP id S1726591AbfLRUiU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Dec 2019 14:02:44 -0500
-Received: by mail-oi1-f194.google.com with SMTP id d62so1638945oia.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2019 11:02:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TNfprp8nc75kh5zAluNCqfSsBco4a1uiDSYyXoDQzSI=;
-        b=L52GTpe34dvN5XUxc9qH29l0XbqRp8ZSS2+CI53HV0YWl5HETHU06rJrfSa+Zaco36
-         RC2FUqDAJySDIrkd7z0dqtJcUTsTcepJxf621ECk8L0N35ulN5uEw0POvA7J8P3oxY1E
-         YL8ctH/Tryr+Y1O15ybFdLL+/yhHKC06oq47gRID3pLiJpGfTORRcTrvRz1HqrvpXHbG
-         TYP67Co9ErwfIAJLLj40f5+viEWVjnGceUJqMHiZsvv0pJYCVo1MMcXcPDb0JE6FaU9e
-         OdJn1+tLP/E3N0+9uNKzQKLn3IlP8RCNqzAljRvt1KvwXuwaRGcDS7kSIXyFY9H0M6EO
-         Te0A==
+        Wed, 18 Dec 2019 15:38:20 -0500
+Received: by mail-oi1-f194.google.com with SMTP id l136so1890924oig.1;
+        Wed, 18 Dec 2019 12:38:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TNfprp8nc75kh5zAluNCqfSsBco4a1uiDSYyXoDQzSI=;
-        b=BJ3oS1Ou1XU3XWKrBOMDrjf377NpcLmMy2ANJ/7phQivlRKsOx9bH+N9Psqf+vjxof
-         v0E3n1WpRHXR3BwiIVqz8wkZ54sLrzTTvxOLHvZAoR8P3YOLzZxH4WxRigdSa7kkozhS
-         3OjdkYY26EF/qy9IzApT9yPC9CMkyZsClpzMLrNSfcIL1r1wIKHqc9BWSoVM1FBoqkdN
-         xn1kutrG4fNaBNsPZPTKKjw2q4Va8QWvCgwlnT8S/OW+fk/0YldKaMInvjECi3ydRpKX
-         88NhFQmmFSPJSoABl4Tl6PDr1H8cjHwXQQZuWbxModYuIjBOc5eBUCB9jTbr6eoloQj2
-         QfDg==
-X-Gm-Message-State: APjAAAVZ0tAFhVzGYabs9+aM00vzcnwSRSWVRkUAIFTFvAHdU5xq4ARh
-        LEeYKGDT8Hy73b2I6PjfzBvWBabhohfC3nGL4jqkKGPFc5Q=
-X-Google-Smtp-Source: APXvYqwqH724arFENC7rR14qxLtcaHTP9gzkb9nzZKFYIrSyJCnFm8rQt+FUdCyF4Zf9S8ign2jkBhrWLZMwC02xXfo=
-X-Received: by 2002:a54:4f8e:: with SMTP id g14mr1163492oiy.8.1576695763613;
- Wed, 18 Dec 2019 11:02:43 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=hZ9E1NuLuIvtf+WPRqjwV9sUZ6orTffbf5yW67pbe2s=;
+        b=E585jzx3Zv6Wlx+jFwqfOn4RW+GD6f6DtZJ2J8WlGjkowZ5UPuIFQVQI1NarROUnaa
+         Gnd2vNMKT2nPo+iSwd7RZYbLOyTLLj86Sak+a6GTFEUqwJ3oKB4QP/vVR5Dsp7QJ1Oz+
+         Av/Jyen7gqMx4BVr2HYtwqN9aR4U1jhudBgeEtzdrBoy9bg9plo11TBa8Axdpcju6GAu
+         elPAq+/tWIAR0PqOMbvvegMWY/WzjrudBITniuWST8f98yF/fWtaAL7KNV5/g9whHqtz
+         /wKBWnwETqehgdh4WGEk6sHoQyvHwSPMDcWKWsMz6MQ0aPXrfo0T7GdKVYMkVSBmDx/5
+         MMsA==
+X-Gm-Message-State: APjAAAWOBVDdpAfI7KMhdtfH7AU5G+Pytyr7wIN4IU+Ox4ogH9i+FXGv
+        PSie/iWYUpKCT/uW1Jb+PQ==
+X-Google-Smtp-Source: APXvYqxAKp78mrKcfBIIJGi+RshJWSvfi1+AG5ZtMHY8fR0aL5vcNcIROydHyMWaiCPZ0EZmvYFcMQ==
+X-Received: by 2002:aca:dd04:: with SMTP id u4mr1348308oig.94.1576701499476;
+        Wed, 18 Dec 2019 12:38:19 -0800 (PST)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id s83sm1185529oif.33.2019.12.18.12.38.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2019 12:38:18 -0800 (PST)
+Date:   Wed, 18 Dec 2019 14:38:18 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Johan Hovold <johan@kernel.org>
+Cc:     Guillaume La Roque <glaroque@baylibre.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        devicetree@vger.kernel.org, netdev@vger.kernel.org,
+        nsaenzjulienne@suse.de, linux-kernel@vger.kernel.org,
+        khilman@baylibre.com
+Subject: Re: [PATCH v5 1/2] dt-bindings: net: bluetooth: add interrupts
+ properties
+Message-ID: <20191218203818.GA8009@bogus>
+References: <20191213150622.14162-1-glaroque@baylibre.com>
+ <20191213150622.14162-2-glaroque@baylibre.com>
+ <20191213161901.GZ10631@localhost>
 MIME-Version: 1.0
-References: <e4a4844024f9c1fd4da044a6d837e2dba17e6ea6.camel@peiker-cee.de>
-In-Reply-To: <e4a4844024f9c1fd4da044a6d837e2dba17e6ea6.camel@peiker-cee.de>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 18 Dec 2019 11:02:31 -0800
-Message-ID: <CABBYNZLpKQ8q7j0VjKKyyf4W8DuOnez2f35RYHj8p3SnmzenXg@mail.gmail.com>
-Subject: Re: GATT server does not forward written attribute to application
-To:     Konstantin Forostyan <konstantin.forostyan@peiker-cee.de>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191213161901.GZ10631@localhost>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Konstantin,
+On Fri, Dec 13, 2019 at 05:19:01PM +0100, Johan Hovold wrote:
+> On Fri, Dec 13, 2019 at 04:06:21PM +0100, Guillaume La Roque wrote:
+> > add interrupts and interrupt-names as optional properties
+> > to support host-wakeup by interrupt properties instead of
+> > host-wakeup-gpios.
+> > 
+> > Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+> > ---
+> >  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > index b5eadee4a9a7..95912d979239 100644
+> > --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > @@ -36,7 +36,9 @@ Optional properties:
+> >      - pcm-frame-type: short, long
+> >      - pcm-sync-mode: slave, master
+> >      - pcm-clock-mode: slave, master
+> > -
+> > + - interrupts: must be one, used to wakeup the host processor if
+> > +   gpiod_to_irq function not supported
+> 
+> This is a Linux implementation detail which therefore doesn't belong in
+> the binding.
+> 
+> I think the general rule is to prefer interrupts over gpios where we
+> have a choice, but here the current binding already has a
+> host-wakeup-gpios.
+> 
+> Not sure how best to handle that, maybe Rob knows.
 
-On Wed, Dec 18, 2019 at 2:36 AM Konstantin Forostyan
-<konstantin.forostyan@peiker-cee.de> wrote:
->
-> Hi,
->
-> During Bluetooth Qualification tests with PTS I found out that if an
-> attribute provided by a GATT server created by BlueZ 5.50 running on my
-> IUT is written by remote, the value of this attribute is not provided
-> by 'bluetoothd' to the upper layer. With a minor modification of
-> 'bluetoothd' I managed to get the tests through, so I'd like to get
-> feedback from the community, whether this modification was necessary or
-> may be there's another way of getting attribute write working.
->
-> For GATT tests I used 'btgatt-server' application provided by BlueZ. In
-> order to test writing characteristic value I made "Device Name"
-> provided by the application writable. It turned out, that the
-> 'gap_device_name_write_cb' function that is called by the daemon upon
-> writing "Device Name" always receives 'value=NULL' and 'len=0'. The
-> reason for this is that in the 'gatt_db_attribute_write' call in
-> 'prep_write_cb' in 'gatt-server.c' file in 'bluetoothd' both 'value'
-> and 'len' are hard-coded to NULL and 0 respectively.
+Use gpiod_to_irqd().
 
-Well not actually a write but a prepare write, so until execute is
-called nothing shall be written, so except if I missing something this
-is the correct behaviour, if you need that for authorizing the prepare
-the you should look into:
+You can also deprecate the gpio prop, but you have to keep driver 
+support for it. And updating dts files would break old kernels with new 
+dtbs.
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n104
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n273
-
-> With the following modification in 'gatt-server.c' the callback in
-> 'btgatt-server' application receives the arguments it expects and the
-> GATT tests can be passed:
->
-> --- a/src/shared/gatt-server.c  2018-06-01 10:37:36.000000000 +0200
-> +++ b/src/shared/gatt-server.c  2019-12-13 12:16:58.000000000 +0100
-> @@ -1291,7 +1291,7 @@
->         pwcd->length = length;
->         pwcd->server = server;
->
-> -       status = gatt_db_attribute_write(attr, offset, NULL, 0,
-> +       status = gatt_db_attribute_write(attr, offset, pwcd->pdu + 4,
-> pwcd->length - 4,
->                                                 BT_ATT_OP_PREP_WRITE_RE
-> Q,
->                                                 server->att,
->                                                 prep_write_complete_cb,
-> pwcd);
->
->
-> Best regards
-> Konstantin
->
-
-
--- 
-Luiz Augusto von Dentz
+Rob
