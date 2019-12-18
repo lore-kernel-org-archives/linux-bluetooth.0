@@ -2,101 +2,281 @@ Return-Path: <SRS0=1j7M=2I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D8FC43603
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 10:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FD9C2D0C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 11:02:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0F44227BF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 10:34:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55D8E2176D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 11:02:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UCaR+Uj2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726725AbfLRKen (ORCPT
+        id S1726725AbfLRLCa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Dec 2019 05:34:43 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:41955 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725785AbfLRKen (ORCPT
+        Wed, 18 Dec 2019 06:02:30 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37912 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726545AbfLRLC3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Dec 2019 05:34:43 -0500
-Received: from Exchange.peiker-cee.de ([82.119.189.133]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N3sZs-1hiAaH0HEu-00zlBA for <linux-bluetooth@vger.kernel.org>; Wed, 18
- Dec 2019 11:34:41 +0100
-Received: from Exchange.peiker-cee.de (10.0.2.22) by Exchange.peiker-cee.de
- (10.0.2.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.1591.10; Wed, 18
- Dec 2019 11:34:34 +0100
-Received: from Exchange.peiker-cee.de ([fe80::743a:4e82:de22:ce17]) by
- Exchange.peiker-cee.de ([fe80::743a:4e82:de22:ce17%13]) with mapi id
- 15.01.1591.012; Wed, 18 Dec 2019 11:34:28 +0100
-From:   Konstantin Forostyan <konstantin.forostyan@peiker-cee.de>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: GATT server does not forward written attribute to application
-Thread-Topic: GATT server does not forward written attribute to application
-Thread-Index: AQHVtY65nC0fDfkvg06V6Un/LPntVg==
-Date:   Wed, 18 Dec 2019 10:34:28 +0000
-Message-ID: <e4a4844024f9c1fd4da044a6d837e2dba17e6ea6.camel@peiker-cee.de>
-Accept-Language: de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [192.168.17.207]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A3EE61482E9FC04895461283F069B2BD@peiker-cee.de>
-Content-Transfer-Encoding: base64
+        Wed, 18 Dec 2019 06:02:29 -0500
+Received: by mail-wr1-f66.google.com with SMTP id y17so1796983wrh.5;
+        Wed, 18 Dec 2019 03:02:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=kWlBV5cUUXjYWUh0dXkQkWK4b1z1l+2C2HXtIRHze6A=;
+        b=UCaR+Uj2u58lujjbQqHjZLVeg3JhQhCNcKozOEi4TC9bzQJ3bOzH30wjm2lMw/cxPK
+         7RKW2+9Uc32cvtdm2llrt36SWOTzVmkvxEWtJdxv1na93yeaeCIeYle3rh2sZpfyyYkY
+         IJF6Ts7lHvcYkhxVdxv7Ga01Ob/2/snOAwwdDR8PDItgpwm71h/kypu2TTb395exo6vI
+         5XLC9msJixhvVAUU9pEL/9WJX4E0TksRVGllrbnNEHtAyJY8M1+t6MoXkiY1a/zViXPe
+         159QAyiLvgNcd6x7nnbpKmyRp8A7OrsI0i+4V6qzARr/dqe4h8zFuRPOVNe6ES/p6iwK
+         29YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=kWlBV5cUUXjYWUh0dXkQkWK4b1z1l+2C2HXtIRHze6A=;
+        b=fpruLPw0Ih+z/MSwKNX1QrPzRvOBsWvu9wuHQI4XD1TsYWXUu6UuS0il7H6grzzqAq
+         mCrmGllgvMypwHvwfknOllI1N3LuNcOB1FlGtLTGA9kJNDg1xrqeoIbnimfMx9o1MjM2
+         CLyufM3WwH7Eo+2/iF9QInH7PBZg1khgoIZEDisnTV8cR6m0tn7QP6iu0XAfiZ3TgYZ0
+         KnDyj86i+8J/cK3DFno5pYompM9kJ4vGcBLG8rpraborS0sQAqF3UfC2LNIFiS5xwH6P
+         m45zFfZD1QdGXNtdF0BZZ6WJuASjLQr6uSsdRwrr0AwEUC9A5HCn7d9KdVEHmNe80qO6
+         zW/w==
+X-Gm-Message-State: APjAAAV1Rxo1qE6ftqjWLlTW4CTxl1EGcMsMcaJBjBnJQ5apROh6mm1l
+        Yist2panUGPxeojKKOoN4G4=
+X-Google-Smtp-Source: APXvYqwwRWSYdUx/joyd3yKjC0OLvkRrvPp/0zbGvUYN6OqE9AKEjGMOBRr29aXXNP947a6wjp2Xww==
+X-Received: by 2002:adf:edd0:: with SMTP id v16mr2143931wro.310.1576666946974;
+        Wed, 18 Dec 2019 03:02:26 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id h2sm2258368wrt.45.2019.12.18.03.02.25
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 18 Dec 2019 03:02:25 -0800 (PST)
+Date:   Wed, 18 Dec 2019 12:02:24 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        linux-input@vger.kernel.org,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Kirill Smelkov <kirr@nexedi.com>
+Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
+Message-ID: <20191218110224.44vcgdxh3j4bn7rw@pali>
+References: <20191202175440.GA50317@dtor-ws>
+ <20191202185340.nae4lljten5jqp3y@pali>
+ <20191202193628.GI50317@dtor-ws>
+ <20191202230947.ld5ibnczdpkekfcm@pali>
+ <20191203173821.4u6uzxeaqnt3gyz3@pali>
+ <20191203191112.GJ50317@dtor-ws>
+ <20191205105206.slibwytrcteicx6y@pali>
+ <CANFp7mXyaqoMDBs4m_Dfm9+4U88g9WoJVcV1g_4KM4xzFhiGXQ@mail.gmail.com>
+ <20191206091114.kh255jrmerruumnq@pali>
+ <20191206174048.GQ50317@dtor-ws>
 MIME-Version: 1.0
-X-Provags-ID: V03:K1:ixgKIImb8rOuYx18yiNnDPfZT22oEBOpvQ9bZehcMX1VeWrYMyL
- G1AQVfnv3l9Jrk0JCMdhfKzCCYjPZTmJBO8MwHNX2MZLrDiipqbbEIrBvqaiCwL2x14Gth8
- Kd78Pn2SKLdiIMZ8mtMFmvwS7owELVe54nFwmeAik16DD4d6bVJVauDAVdoeIei6+INnHXM
- fI2VT2FsiDdBR2ruL/tFg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Tfv1smZ59WI=:d5xI7yLF3UrcO+MIBmoL/r
- 4U0ry3BHC7tvztS8Oj+y5Q/rrCFOyQBPB5ai1MBaGkadlLsVqhaKRVVyVrGJy8lSx0zVyifLk
- TMjr9N3seTTutlTaJcqNgvn5xOr4/C/PamC8+o55C/MZFLr3DlbCA+0jnGBiXsh9Pwh1KIZBK
- txOpPCXxDUxONp8boQnTMZFmdZDcHspieoocICQoV3SOHsxcks/iJREuuR1PdO4wtsu8mj+XV
- HGxmzA9qm4ImY/ERXMj4vAqlDWdzPwUnzLlFTEJ1SwBeLvoU/gF2gk34vUqMbaAwFbSS1mbSf
- H4t6v4jK657cgtx9xJB1CupRZZqXCCXGJJ0dmwZmM2ztBD4+9NGeXXMpfa8v93hzCr0VccHf7
- rUyAw5uQegwqG4LdkkeGzOLew/aoL/a88WWOaMBB6WtZwQJUZvn0IqUEJ4fyDKnz/cclIAIIh
- J/zFtATY7/bsu8SW/daknZHacRSvlLmhXslAmhtEXdYplHBy1ah97eqjGXbUXM/C2nAoL+QFZ
- 4e1g+KcES9eCwBpC7iYsSFiSMFY4DOXOe1zqhyTsVzbbQMVd9ClOV5SD6B5x21+H61SyAq6Hb
- LNKX1mLvIRfoMK/AeSk5wL04sTzp0WlTSTSIIdSaOJXxY3QJ2YT5JsRbwvxPJcuqQ6gkTSyVq
- ri3FmI8tYXWdJ7nggfr9aQm4aFfUyi0OdZnhfg8RnaEcZ9DVYiQQzcHSeVvKNKdUXy15swJvp
- LymNqUZZ0kUNTUnS3vaYIaVutcad0O/rTiCU0sbDeitKRO4cNeE2cSfhrAnjzShQC8WqzJ4Fm
- fSHYsjmIWbu+zoDjc4XV+dVkFKWA7RjoFK56t7QFG2pbpPiQmBxozsqbC7crNYtcLYgh1mKvW
- sZNHSGBW1/apwFptavSfE8J5x6wP2/tClCB1kuVdmfQHscHn33PEGIKECy4K4K
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="qohh5fgjffnqn6l4"
+Content-Disposition: inline
+In-Reply-To: <20191206174048.GQ50317@dtor-ws>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGksDQoNCkR1cmluZyBCbHVldG9vdGggUXVhbGlmaWNhdGlvbiB0ZXN0cyB3aXRoIFBUUyBJIGZv
-dW5kIG91dCB0aGF0IGlmIGFuDQphdHRyaWJ1dGUgcHJvdmlkZWQgYnkgYSBHQVRUIHNlcnZlciBj
-cmVhdGVkIGJ5IEJsdWVaIDUuNTAgcnVubmluZyBvbiBteQ0KSVVUIGlzIHdyaXR0ZW4gYnkgcmVt
-b3RlLCB0aGUgdmFsdWUgb2YgdGhpcyBhdHRyaWJ1dGUgaXMgbm90IHByb3ZpZGVkDQpieSAnYmx1
-ZXRvb3RoZCcgdG8gdGhlIHVwcGVyIGxheWVyLiBXaXRoIGEgbWlub3IgbW9kaWZpY2F0aW9uIG9m
-DQonYmx1ZXRvb3RoZCcgSSBtYW5hZ2VkIHRvIGdldCB0aGUgdGVzdHMgdGhyb3VnaCwgc28gSSdk
-IGxpa2UgdG8gZ2V0DQpmZWVkYmFjayBmcm9tIHRoZSBjb21tdW5pdHksIHdoZXRoZXIgdGhpcyBt
-b2RpZmljYXRpb24gd2FzIG5lY2Vzc2FyeSBvcg0KbWF5IGJlIHRoZXJlJ3MgYW5vdGhlciB3YXkg
-b2YgZ2V0dGluZyBhdHRyaWJ1dGUgd3JpdGUgd29ya2luZy4NCg0KRm9yIEdBVFQgdGVzdHMgSSB1
-c2VkICdidGdhdHQtc2VydmVyJyBhcHBsaWNhdGlvbiBwcm92aWRlZCBieSBCbHVlWi4gSW4NCm9y
-ZGVyIHRvIHRlc3Qgd3JpdGluZyBjaGFyYWN0ZXJpc3RpYyB2YWx1ZSBJIG1hZGUgIkRldmljZSBO
-YW1lIg0KcHJvdmlkZWQgYnkgdGhlIGFwcGxpY2F0aW9uIHdyaXRhYmxlLiBJdCB0dXJuZWQgb3V0
-LCB0aGF0IHRoZQ0KJ2dhcF9kZXZpY2VfbmFtZV93cml0ZV9jYicgZnVuY3Rpb24gdGhhdCBpcyBj
-YWxsZWQgYnkgdGhlIGRhZW1vbiB1cG9uDQp3cml0aW5nICJEZXZpY2UgTmFtZSIgYWx3YXlzIHJl
-Y2VpdmVzICd2YWx1ZT1OVUxMJyBhbmQgJ2xlbj0wJy4gVGhlDQpyZWFzb24gZm9yIHRoaXMgaXMg
-dGhhdCBpbiB0aGUgJ2dhdHRfZGJfYXR0cmlidXRlX3dyaXRlJyBjYWxsIGluDQoncHJlcF93cml0
-ZV9jYicgaW4gJ2dhdHQtc2VydmVyLmMnIGZpbGUgaW4gJ2JsdWV0b290aGQnIGJvdGggJ3ZhbHVl
-Jw0KYW5kICdsZW4nIGFyZSBoYXJkLWNvZGVkIHRvIE5VTEwgYW5kIDAgcmVzcGVjdGl2ZWx5Lg0K
-DQpXaXRoIHRoZSBmb2xsb3dpbmcgbW9kaWZpY2F0aW9uIGluICdnYXR0LXNlcnZlci5jJyB0aGUg
-Y2FsbGJhY2sgaW4NCididGdhdHQtc2VydmVyJyBhcHBsaWNhdGlvbiByZWNlaXZlcyB0aGUgYXJn
-dW1lbnRzIGl0IGV4cGVjdHMgYW5kIHRoZQ0KR0FUVCB0ZXN0cyBjYW4gYmUgcGFzc2VkOg0KDQot
-LS0gYS9zcmMvc2hhcmVkL2dhdHQtc2VydmVyLmMJMjAxOC0wNi0wMSAxMDozNzozNi4wMDAwMDAw
-MDAgKzAyMDANCisrKyBiL3NyYy9zaGFyZWQvZ2F0dC1zZXJ2ZXIuYwkyMDE5LTEyLTEzIDEyOjE2
-OjU4LjAwMDAwMDAwMCArMDEwMA0KQEAgLTEyOTEsNyArMTI5MSw3IEBADQogCXB3Y2QtPmxlbmd0
-aCA9IGxlbmd0aDsNCiAJcHdjZC0+c2VydmVyID0gc2VydmVyOw0KIA0KLQlzdGF0dXMgPSBnYXR0
-X2RiX2F0dHJpYnV0ZV93cml0ZShhdHRyLCBvZmZzZXQsIE5VTEwsIDAsDQorCXN0YXR1cyA9IGdh
-dHRfZGJfYXR0cmlidXRlX3dyaXRlKGF0dHIsIG9mZnNldCwgcHdjZC0+cGR1ICsgNCwNCnB3Y2Qt
-Pmxlbmd0aCAtIDQsDQogCQkJCQkJQlRfQVRUX09QX1BSRVBfV1JJVEVfUkUNClEsDQogCQkJCQkJ
-c2VydmVyLT5hdHQsDQogCQkJCQkJcHJlcF93cml0ZV9jb21wbGV0ZV9jYiwNCnB3Y2QpOw0KDQoN
-CkJlc3QgcmVnYXJkcw0KS29uc3RhbnRpbg0KDQo=
+
+--qohh5fgjffnqn6l4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Friday 06 December 2019 09:40:48 Dmitry Torokhov wrote:
+> On Fri, Dec 06, 2019 at 10:11:14AM +0100, Pali Roh=C3=A1r wrote:
+> > On Thursday 05 December 2019 12:03:05 Abhishek Pandit-Subedi wrote:
+> > > On Thu, Dec 5, 2019 at 2:52 AM Pali Roh=C3=A1r <pali.rohar@gmail.com>=
+ wrote:
+> > > >
+> > > > On Tuesday 03 December 2019 11:11:12 Dmitry Torokhov wrote:
+> > > > > On Tue, Dec 03, 2019 at 06:38:21PM +0100, Pali Roh=C3=A1r wrote:
+> > > > > > On Tuesday 03 December 2019 00:09:47 Pali Roh=C3=A1r wrote:
+> > > > > >
+> > > > > > Hi Dmitry!
+> > > > > >
+> > > > > > I was looking again at those _IOW defines for ioctl calls and I=
+ have
+> > > > > > another argument why not specify 'char *' in _IOW:
+> > > > > >
+> > > > > > All ioctls in _IOW() specify as a third macro argument type whi=
+ch is
+> > > > > > passed as pointer to the third argument for ioctl() syscall.
+> > > > > >
+> > > > > > So e.g.:
+> > > > > >
+> > > > > >   #define EVIOCSCLOCKID _IOW('E', 0xa0, int)
+> > > > > >
+> > > > > > is called from userspace as:
+> > > > > >
+> > > > > >   int val;
+> > > > > >   ioctl(fd, EVIOCSCLOCKID, &val);
+> > > > > >
+> > > > > > Or
+> > > > > >
+> > > > > >   #define EVIOCSMASK _IOW('E', 0x93, struct input_mask)
+> > > > > >
+> > > > > > is called as:
+> > > > > >
+> > > > > >   struct input_mask val;
+> > > > > >   ioctl(fd, EVIOCSMASK, &val);
+> > > > > >
+> > > > > > So basically third argument for _IOW specify size of byte buffe=
+r passed
+> > > > > > as third argument for ioctl(). In _IOW is not specified pointer=
+ to
+> > > > > > struct input_mask, but struct input_mask itself.
+> > > > > >
+> > > > > > And in case you define
+> > > > > >
+> > > > > >   #define MY_NEW_IOCTL _IOW(UINPUT_IOCTL_BASE, 200, char*)
+> > > > > >
+> > > > > > then you by above usage you should pass data as:
+> > > > > >
+> > > > > >   char *val =3D "DATA";
+> > > > > >   ioctl(fd, MY_NEW_IOCTL, &val);
+> > > > > >
+> > > > > > Which is not same as just:
+> > > > > >
+> > > > > >   ioctl(fd, MY_NEW_IOCTL, "DATA");
+> > > > > >
+> > > > > > As in former case you passed pointer to pointer to data and in =
+later
+> > > > > > case you passed only pointer to data.
+> > > > > >
+> > > > > > It just mean that UI_SET_PHYS is already defined inconsistently=
+ which is
+> > > > > > also reason why compat ioctl for it was introduced.
+> > > > >
+> > > > > Yes, you are right. UI_SET_PHYS is messed up. I guess the questio=
+n is
+> > > > > what to do with all of this...
+> > > > >
+> > > > > Maybe we should define
+> > > > >
+> > > > > #define UI_SET_PHYS_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE,=
+ 111, len)
+> > > > > #define UI_SET_UNIQ_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL_BASE,=
+ 112, len)
+> > > >
+> > > > I'm not sure if this is ideal. Normally in C strings are nul-termin=
+ed,
+> > > > so functions/macros do not take buffer length.
+> > > Except strncpy, strndup, snprintf, etc. all expect a buffer length. At
+> >=20
+> > This is something different as for these functions you pass buffer and
+> > length of buffer which is used in write mode -- not for read mode.
+> >=20
+> > > the user to kernel boundary of ioctl, I think we should require size
+> > > of the user buffer regardless of the data type.
+> > >=20
+> > > > _STR therefore in names looks inconsistent.
+> > > The _STR suffix is odd (what to name UI_SET_PHYS_STR then??) but
+> > > requiring the length seems to be common across various ioctls.
+> > > * input.h requires a length when requesting the phys and uniq
+> > > (https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/t=
+ree/include/uapi/linux/input.h#n138)
+> > > * Same with HIDRAW when setting and getting features:
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/include/uapi/linux/hidraw.h#n40,
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/samples/hidraw/hid-example.c#n88
+> >=20
+> > All these ioctls where is passed length are in opposite direction
+> > (_IOC_READ) as our PHYS and UNIQ (_IOC_WRITE).
+> >=20
+> > I fully agree that when you need to read something from kernel
+> > (_IOC_READ) and then writing it to userspace, you need to specify length
+> > of userspace buffer. Exactly same as with userspace functions like
+> > memcpy, snprintf, etc... as you pointed. Otherwise you get buffer
+> > overflow as callee does not know length of buffer.
+> >=20
+> > But here we we have there quite different problem, we need to write
+> > something to kernel from userspace (_IOC_WRITE) and we are passing
+> > nul-term string. So in this case specifying size is not required as it
+> > is implicitly specified as part of passed string.
+>=20
+> With the new IOCTL definitions it does not need to be a NULL-terminated
+> string. It can be a buffer of characters with given length, and kernel
+> will NULL-terminate as this it what it wants, not what the caller has to
+> give.
+
+Hi Dmitry! I was thinking more about this problem and I will propose
+alternative solution, but first with details...
+
+I think that we should use NULL terminated strings. Or better disallow
+NULL byte inside string. Reason: all userspace application expects that
+input device name would be NULL terminated which implies that in the
+middle of name cannot be NULL byte.
+
+So this must apply also for new PHYS / UNIQ ioctl API. If we want in our
+ioctl API to use buffer + size (with upper bound limit for size) instead
+of passing NULL term string (with upper bound limit for string size)
+then kernel have to add a leading NULL byte to string, plus check that
+in the buffer there is no NULL byte. I guess this a very little
+complicate code, but nothing which is problematic.
+
+And on the userspace part. Now when userspace want to pass constant
+string for device name, it just call
+
+  ioctl(fd, UI_SET_PHYS, "my name of device");
+
+After adding a new ioctl with buffer + size API, userspace would have to
+call:
+
+  ioctl(fd, UI_SET_PHYS_STR(strlen("my name of device")), "my name of devic=
+e");
+
+which looks strange, so programmers would had to move device name into
+new variable:
+
+  const char *name =3D "my name of device";
+  ioctl(fd, UI_SET_PHYS_STR(strlen(name)), name);
+
+For me the old ioctl API looks easier to use (no need for strlen() or
+extra variable), but this is just my preference of usage -- as it is
+simpler for me. Maybe you would have different opinion...
+
+And now question: Why we have uinput_compat_ioctl()? It is there only
+because size part of IOCTL number is different on 32bit and 64bit
+systems. As we know size part of UI_SET_PHYS is wrong and does not make
+sense...
+
+Would not it be better to change size of UI_SET_PHYS to just zero and
+then when matching ioctl number just ignore size for this UI_SET_PHYS
+ioctl? Same for UI_BEGIN_FF_UPLOAD_COMPAT and UI_END_FF_UPLOAD_COMPAT
+added in: https://git.kernel.org/tip/tip/c/7c7da40
+
+And we would not have to deal with uinput_compat_ioctl() at all.
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--qohh5fgjffnqn6l4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXfoHPQAKCRCL8Mk9A+RD
+Ui6vAKCQoaVc3rdeWz7eQwciy9rk2PYh5wCgzFl5rIfTL2ILCkXYVnmGETGK6uI=
+=NdRu
+-----END PGP SIGNATURE-----
+
+--qohh5fgjffnqn6l4--
