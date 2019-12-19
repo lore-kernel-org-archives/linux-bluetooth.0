@@ -2,111 +2,83 @@ Return-Path: <SRS0=Qms+=2J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7657EC43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 22:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E225EC2D0C1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 23:07:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46905227BF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 22:12:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q8/VJTqX"
+	by mail.kernel.org (Postfix) with ESMTP id AF72A206EC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 23:07:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576796873;
+	bh=1UwGQnsKsSVL/Sjr7ExtByNFEaes7NdRMbEJNsn3Jok=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=N0WuxL2J3J9mHEn2jhV1OI1lk0Mi+CpygZ6aOaTFJMnwUTXkIaowijijvIJ2Hkf3g
+	 /zD2AZqh/HKB6FyVA1vjG5iTQsV1SnPEXvpurNtsCZ1LhiWP8+MhKHdrrOTbZGicz3
+	 lkHLDfwZ0wtcnQqH9XfFr35nWS96fKnrazofZx8I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbfLSWMt (ORCPT
+        id S1727148AbfLSXHs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Dec 2019 17:12:49 -0500
-Received: from mail-ot1-f50.google.com ([209.85.210.50]:36498 "EHLO
-        mail-ot1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726866AbfLSWMt (ORCPT
+        Thu, 19 Dec 2019 18:07:48 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:35978 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726818AbfLSXHs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Dec 2019 17:12:49 -0500
-Received: by mail-ot1-f50.google.com with SMTP id w1so9104128otg.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2019 14:12:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uYlBA8c06y1TAyvR/8bqnGyH1KBkLIKGqbAByEVlB7w=;
-        b=q8/VJTqXDh7splLFpxnzQd5nzETiLmYcKVMcPzImi3Xzz8/9gCd0usFCi9l1fugIx8
-         F5w77G1sNOKA2QAI/98YEKQ7sxbtXCba1kqpU0UYekTJSgerjyEPBOxyWu4BBYQR2WOA
-         wnygP25zRg4dRIcMynRoG30AeZ6OHhpJGSDO3MYTZ6DJuG323AVrDQaoDNN+Uw3eYUv8
-         w/Dbhdl6YJ0W7SA5uVB52Y6zT1/Yru2I6QPnrCL6F/8LgPH1cYbAl1Xrvfm+hagTtQZe
-         DtS+BmpeAYsSTzYyaCzv7c3jSRvdIM8iRu9pihvDUfmKKHDaAv0EpBmeRV/WpXItyS7m
-         N1xQ==
+        Thu, 19 Dec 2019 18:07:48 -0500
+Received: by mail-ot1-f67.google.com with SMTP id w1so9261060otg.3;
+        Thu, 19 Dec 2019 15:07:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uYlBA8c06y1TAyvR/8bqnGyH1KBkLIKGqbAByEVlB7w=;
-        b=Ng7v6Fetz+Sq+KarsVhuqwbqZIE0J6y9skLS2DkOpR+6E73SO20L4cp8LPKcOGcKah
-         YZsHj0flMSrUendudetymMUKAeTYBmcgkEqrQzg/2V0L/LKMF2gF9cCiPS4PPd3XyMrk
-         F6nYLN4Rk4WxrYVjmMto7hcziaLJ1kjmC9iWBNvmtje9fVoLCvYqbde3RbzLx9lStLjZ
-         hHH/Df+qqIuUFIXZyNNT14JXjlk9QgXVF39wYjDrcnU+JoT0MdbohK0uWePEPLDsWuvA
-         N0SD30nbyNzubWhOJTdlT7dI2YbO/ckqEbhg9bQxSf2DFHbvmTnEL6GFyTa/IrG1UfI7
-         DSxw==
-X-Gm-Message-State: APjAAAVh4u0eOIGobovnId5BjB6/tLeKQNT3m7CF1AlwV98VXZsIsljv
-        9k1mjUonz1O/J4KM3F/wIZgUMeoli7R1jJ0AJ2pZbdmn
-X-Google-Smtp-Source: APXvYqzGKfRELMfyGm981wJoCVWHlMJPeDZKFhv1rgQjvpkv78JDg5lJGvpTK2tULi3/AluSm+P+EfU23+XQU3g0sEo=
-X-Received: by 2002:a05:6830:605:: with SMTP id w5mr7413005oti.79.1576793568584;
- Thu, 19 Dec 2019 14:12:48 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=DgX0NKioz1rOLIBSrzLogpmefAWeE3WIM8ZkXd4rq84=;
+        b=WvTmuBodTGIZtY1oFNFfJL0P6LAVRUMz2RXFVwdEzb3k0zNZprzumrcfEJLVlUj8yp
+         eJhAOgQANtKA3NE6nlsUmEB+npmJFyCodJNpc/aCoHP5CRqSW5jRiy8+GhR33bhqklxi
+         61NCAL6XVIiQqYPKPf2RnEut8DlioGfjSrrmaS+dNLvjjKGlwfz4+gkvhWQ31vlK4y83
+         53cDWoztNiU0D0wxq9unRi9FyVVG2u9EaknyiNb3IPBZQlwy5IxtLtScoijx6bilLBLV
+         6bVQbr2MsZiwDMCVNnXzPHc8RMGyUgzBa/zyCf39b5q5oKuqZYFC51o5UPQdn5kb8B1D
+         ocVQ==
+X-Gm-Message-State: APjAAAUHTprp+HyYz1W3FNwXBIrgXuCSt1GQbApXkedTvuLLYbbuo2Or
+        rJNMMu6QE0gaCLdcBdK7eg==
+X-Google-Smtp-Source: APXvYqwB9T3HzArMlvLUll2SoZeItk08mg/8cUPV/SIjXWZaF7FfZ7O50gyaF8wV0hnYcqYD0TrjJA==
+X-Received: by 2002:a9d:7c97:: with SMTP id q23mr11280615otn.253.1576796867866;
+        Thu, 19 Dec 2019 15:07:47 -0800 (PST)
+Received: from localhost (ip-184-205-174-147.ftwttx.spcsdns.net. [184.205.174.147])
+        by smtp.gmail.com with ESMTPSA id n25sm2528516oic.6.2019.12.19.15.07.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Dec 2019 15:07:47 -0800 (PST)
+Date:   Thu, 19 Dec 2019 17:07:45 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, Rocky Liao <rjliao@codeaurora.org>
+Subject: Re: [PATCH v1 2/2] dt-bindings: net: bluetooth: Add device tree
+ bindings for QCA6390
+Message-ID: <20191219230745.GA9366@bogus>
+References: <0101016ef8b923cf-ef36a521-9c4b-4360-842d-d641e0eaaf0e-000000@us-west-2.amazonses.com>
 MIME-Version: 1.0
-References: <a3757dc933d70f4f23b85d8a152d21dd54f6d2ff.camel@peiker-cee.de>
-In-Reply-To: <a3757dc933d70f4f23b85d8a152d21dd54f6d2ff.camel@peiker-cee.de>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 19 Dec 2019 14:12:36 -0800
-Message-ID: <CABBYNZ+xSJn9ba1w8h_hk+RoHPCb-TWDM7syTpKVUt34Rja3Pw@mail.gmail.com>
-Subject: Re: GATT server does not handle "Invalid Offset" and "Invalid
- Attribute Value Length" errors properly
-To:     Konstantin Forostyan <konstantin.forostyan@peiker-cee.de>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0101016ef8b923cf-ef36a521-9c4b-4360-842d-d641e0eaaf0e-000000@us-west-2.amazonses.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Konstantin,
+On Thu, 12 Dec 2019 06:08:33 +0000, Rocky Liao wrote:
+> Add compatible string for the Qualcomm QCA6390 Bluetooth controller
+> 
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+>  Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt | 1 +
+>  1 file changed, 1 insertion(+)
+> 
 
-On Thu, Dec 19, 2019 at 12:36 AM Konstantin Forostyan
-<konstantin.forostyan@peiker-cee.de> wrote:
->
-> Hi,
->
-> According to Bluetooth specs (BLUETOOTH CORE SPECIFICATION Version 5.1
-> | Vol 3, Part F 3.4.6.1 Prepare Write Request):
->
-> "... The Attribute Value validation is done when an Execute Write
-> Request is received. Hence, any Invalid Offset or Invalid Attribute
-> Value Length errors are generated when an Execute Write Request is
-> received. ..."
->
-> In contrary to the specs, 'bluetoothd' is sending error response during
-> prepare write. The following patch changes this behaviour:
->
->
-> --- a/src/shared/gatt-server.c  2018-06-01 10:37:36.000000000 +0200
-> +++ b/src/shared/gatt-server.c  2019-12-13 12:25:22.000000000 +0100
-> @@ -1223,7 +1223,17 @@
->
->         handle = get_le16(pwcd->pdu);
->
-> -       if (err) {
-> +       if ((0 != err) && (BT_ATT_ERROR_INVALID_OFFSET != err)
-> +               && (BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN != err)) {
->                 bt_att_send_error_rsp(pwcd->server->att,
->                                         BT_ATT_OP_PREP_WRITE_REQ,
-> handle, err);
->                 free(pwcd->pdu);
-
-Yep, I remember this one actually since we did fix something similar
-in Zephyr we would need to move the error checking to execute, btw is
-this with bluetoothd or gatt-server tool, the later is probably not
-recommended for qualification as it is more of a validation tool it
-may not be feature complete.
-
-
--- 
-Luiz Augusto von Dentz
+Acked-by: Rob Herring <robh@kernel.org>
