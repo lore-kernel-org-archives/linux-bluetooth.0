@@ -1,65 +1,65 @@
-Return-Path: <SRS0=1j7M=2I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Qms+=2J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE9CCC43603
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 21:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24103C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 01:07:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D708218AC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Dec 2019 21:33:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E03852176D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 01:07:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FuI9/3kO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ec4VWp2x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726558AbfLRVdy (ORCPT
+        id S1726700AbfLSBHp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Dec 2019 16:33:54 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38284 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726387AbfLRVdy (ORCPT
+        Wed, 18 Dec 2019 20:07:45 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:43999 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726671AbfLSBHp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Dec 2019 16:33:54 -0500
-Received: by mail-wr1-f66.google.com with SMTP id y17so3881727wrh.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2019 13:33:52 -0800 (PST)
+        Wed, 18 Dec 2019 20:07:45 -0500
+Received: by mail-oi1-f194.google.com with SMTP id p125so22104oif.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2019 17:07:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=X+JhUURclvamF9wiwPgZcOg7r7Y6H/UFTWm8wsalVEI=;
-        b=FuI9/3kOVvIWYq9MT98btBbFLuawxx5mBmIWLUootk78xeyGI2if9nPHIxkXLI/S5s
-         Ixm+wF/+UXNFGdMvKB2102xpcOyu5k6zJuEHPJYXJBebjCw9ghy84qhrdIIGcT3ue93b
-         lisNzt/LwB4MY9BVVXLg9cNzZiTzMGRnz4D13kTWoId387j5J0hih0E2OIAAz/+YXglh
-         fb5m7votpsOeAdqhlTt772wd5dJVdds/2rYkn65j7irY7QiLYrdcSlDDC3uKB1vZba49
-         YBEiLIHrqnPjzLgPVmD2PG4PKrfIW1j2TW95NOyjzDZfj998X1TOCpRep7ZIERcWlb78
-         aG2w==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=GaBcnb1+DGe/H6P00Fvikm3cHH0c+ImBAjEWQsi/myo=;
+        b=ec4VWp2xLpv16UsRs4Bh4HRhax72GPvVDcBGQTEjKc86utu29OG4BObpUadBwY2u4B
+         fcX6qYzzrAkXBlNDyE2t0AtJSt38cwoykHCY2OQ+1NAw6FpK/OxMxIOBtrsBv5lnl4NY
+         sGgRlxJDhgQOUN7jIszWgR9eUR0TkLVde1K7OJs4dtYB+gqkrfck+o0iD14qvZC8whn5
+         hCV33OTbh1VNnaC3MrtD1/2y5p+IpFNPwxHdeWRxTkpkMfQVE2jFTppyDNzCvKX6DAVm
+         uInaHSq//BusZGFDMBARQ30jc/ckW285+jcCFD66Iz14R6WWSYvQbmGEVuUPXqCKIn0b
+         Ex+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=X+JhUURclvamF9wiwPgZcOg7r7Y6H/UFTWm8wsalVEI=;
-        b=V71hdXhUD0Ci04/eqmvGoOqkzA0QimTTmtyHCd/uWdSv0AqDjdLq788+o5Va2MVtSL
-         qEQX4ePL/eHHfAqpf1T75NYxZNOzjDNxdbIAuE2nBjYRzFk7odnzcQ26/u5UeFT6cp+4
-         MdaYwRQbM3L8+B0ujI/vqdx9bIpUmuoNcc7ouH4gYcm3GSjx8ODXXG4D3J3XDXh5LiG7
-         sdyrIK1jrFt/IC29e15wGW27qe7Ui+29eGCKedbXT2PXcNV0wvXIk6OnjuVYRHnWrgco
-         Kv2vCpvv9huG6Lm34CS0VLOfaK78++yricG60G6b7KNuJrmwOjFkOAgzYCJtB3vXZ8Zy
-         XCOA==
-X-Gm-Message-State: APjAAAUOYBdrgKa/e3x0A9aAAtH5IRyMHEo6KDhX0NIZOy31y+36qnb+
-        eiPSGGV7NpEz8HJmLHb/1uU=
-X-Google-Smtp-Source: APXvYqyCv1s9ylr1xamXsD1a5IHpT74vOQIzlsKyv5p/E/XlIA6WD1WKVad4vwufIlzpjcq38Ew8RA==
-X-Received: by 2002:adf:cf12:: with SMTP id o18mr5233132wrj.361.1576704831521;
-        Wed, 18 Dec 2019 13:33:51 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id z8sm3980766wrq.22.2019.12.18.13.33.49
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 18 Dec 2019 13:33:50 -0800 (PST)
-Date:   Wed, 18 Dec 2019 22:33:49 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Denis Kenzior <denkenz@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GaBcnb1+DGe/H6P00Fvikm3cHH0c+ImBAjEWQsi/myo=;
+        b=APla6bmkMOJkYXe8Ai7fUXUx7Ju+0dnatGRaIeYh8AVB5/oRMe1oZOf7/6rn3Sp0Ce
+         BnoWjzLA7WvQ0VnzJnAbV//pZNu3vM/CcTaCs0YnoGHKjK3NugwK/l/l4nCi4i+0/er0
+         JCK+mUg/zuALfNp1qbIV55ycPdAwhNx0dqCCD5EQRb2ydZ08WeMxSZHWS9yWDvuyr/Tg
+         TiylLU/pp5r/XIacWmbJJb2xM4Soi6OCJEpN8dLlSIB6kVJ0cGhPIJt7K0m7qTrtzDWC
+         A8mdJrQQdeIa+Qa+xt1unGTnRVJoOM5vm/VjOIP/eWQABqs+KP5FmpTERc1Gvr/nviQ4
+         3NWw==
+X-Gm-Message-State: APjAAAUWmC7HaZywN1KtMn4+zkzYpZlh8TDvCRpG64PKE3qOKQMpi99n
+        VB0kE12FwSSCU6h9CuxcakA=
+X-Google-Smtp-Source: APXvYqyLLFGHH9FQ3sE4hb67IvRD2nX5qF00l1IylJzbBfWGPbJiodzB5195dOSh6pLFhyTk9WZzVA==
+X-Received: by 2002:aca:e084:: with SMTP id x126mr1604271oig.97.1576717664186;
+        Wed, 18 Dec 2019 17:07:44 -0800 (PST)
+Received: from [192.168.1.249] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id m11sm1443320oie.20.2019.12.18.17.07.42
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 18 Dec 2019 17:07:43 -0800 (PST)
+Subject: Re: [pulseaudio-discuss] Proposal for a new API and usage of
+ Bluetooth HSP and HFP profiles on Linux
+To:     =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>
 Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Tanu Kaskinen <tanuk@iki.fi>,
@@ -72,199 +72,123 @@ Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Arun Raghavan <arun@arunraghavan.net>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>
-Subject: Re: [pulseaudio-discuss] Proposal for a new API and usage of
- Bluetooth HSP and HFP profiles on Linux
-Message-ID: <20191218213349.2ksew2wnhgu3peub@pali>
 References: <20191201185740.uot7zb2s53p5gu7z@pali>
  <508d35f29c2abc26af15e232a38d3ca53eb33706.camel@iki.fi>
- <20191202184512.rx6p63c6axztnwrw@pali>
- <20191205093200.x47npi5sxtcphr2o@pali>
+ <20191202184512.rx6p63c6axztnwrw@pali> <20191205093200.x47npi5sxtcphr2o@pali>
  <CABBYNZKi7UUg7kASKadGr7sDJH0-tfuuZr9rd4Xu8ZUA9LqTMA@mail.gmail.com>
  <20191216091521.reh2urr25husschv@pali>
  <3ca53c66-1df0-41bf-710e-dea709906234@gmail.com>
- <20191218172828.vfie4su2whts2fqh@pali>
- <20191218173632.aqdmdhutu3ruezck@pali>
+ <20191218172828.vfie4su2whts2fqh@pali> <20191218173632.aqdmdhutu3ruezck@pali>
  <06eb7e98-1357-afd1-40a5-2ccb139d8dec@gmail.com>
+ <20191218213349.2ksew2wnhgu3peub@pali>
+From:   Denis Kenzior <denkenz@gmail.com>
+Message-ID: <0cfbe253-417c-e7c0-553a-abf360a80c9f@gmail.com>
+Date:   Wed, 18 Dec 2019 19:03:12 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="aq2axre4gjwrgfjj"
-Content-Disposition: inline
-In-Reply-To: <06eb7e98-1357-afd1-40a5-2ccb139d8dec@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20191218213349.2ksew2wnhgu3peub@pali>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Pali,
 
---aq2axre4gjwrgfjj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Yes, I see. Also there are devices without HFP support, only with HSP.
+> pulseaudio support also these devices and pulseaudio is not going to
+> drop support for them. Last time when I looked at ofono, it has no HSP
+> support. Is ofono going to add support for HSP?
+> 
 
-Hello Denis!
+No.
 
-On Wednesday 18 December 2019 14:53:24 Denis Kenzior wrote:
-> Hi Pali,
->=20
-> > > > I'm not sure what logic around HSP you really care about.  It is ju=
-st a
-> > > > single button press in the end.
-> > >=20
-> > > CSR features (battery status level, ...) and CSR codec selection (e.g.
-> > > AuriStream). Also some apple extensions are used in HSP profile.
->=20
-> Since HFP can do everything that HSP can and more, I view HSP as deprecat=
-ed
-> and not to be used.  If these are also available in HFP, then I'd just use
-> HFP instead.  But HSP was never my focus, so if you feel there's a need f=
-or
-> better HSP support, then fair enough.
+<snip>
 
-Yes, I see. Also there are devices without HFP support, only with HSP.
-pulseaudio support also these devices and pulseaudio is not going to
-drop support for them. Last time when I looked at ofono, it has no HSP
-support. Is ofono going to add support for HSP?
+> 
+> But would you accept patches which exports DBus API e.g. for displaying text
+> on HFP headset with embedded display? Or patches which implements 3
+> different way for reporting battery level status of HFP headset? And API
+> for sending "computer battery level" to HFP headset? Or implementing
+> setup of SCO sockets (via RFCOMM layer) for custom codecs? Or exporting
+> uinput linux device for button press events? Because all these
 
-> > >=20
-> > > > For HFP, oFono can already support all sorts of extensions.  See fo=
-r example
-> > > > how we handled Siri for HFP support in oFono here:
-> > > > https://git.kernel.org/pub/scm/network/ofono/ofono.git/tree/doc/sir=
-i-api.txt.
-> >=20
-> > About Siri: In hsphfpd API it is delegated to Telephony Agent. So
-> > hsphfpd is not going to (re)implement it.
-> >=20
-> > > I saw. But it does not support usage of vendor codecs, like CSR
-> > > AuriStream and it does not support CSR extensions, like displaying te=
-xt
-> > > on embedded display.
->=20
-> But that's my point, you can easily accomplish this by creating another
-> oFono API / atom for HFP CSR extensions and expose this information /
-> functionality.  Similar to how Siri was done.  I see no need for a
-> completely new external daemon.
+So which roles are we talking about here?  Your Design document shows 
+hsphfpd registering for both HFP AG and HFP HF roles, but maybe this was 
+not the intent?
 
-Ok. I agree that functionality from my hsphfpd prototype can be "moved"
-to ofono.
+If you're talking about extending oFono APIs when it is acting as the HF 
+connecting to the AG, then codec setup APIs, etc are definitely 
+something that would be welcome.
 
-But would you accept patches which exports DBus API e.g. for displaying text
-on HFP headset with embedded display? Or patches which implements 3
-different way for reporting battery level status of HFP headset? And API
-for sending "computer battery level" to HFP headset? Or implementing
-setup of SCO sockets (via RFCOMM layer) for custom codecs? Or exporting
-uinput linux device for button press events? Because all these
-functionalities looks like not relevant to telephony / modem stack and
-for me it seems that ofono is not target application which should be
-interested in implementing it.
+If you're talking about AG role, then that is different... In general, 
+if the oFono is in an AG role, then there should be nothing to configure 
+and there are no APIs for this role.  Things like reporting AG battery 
+level to HFP headset are done directly using plugins.  See 
+ofono_emulator_set_indicator and how this is done by upower.c for 
+example.  I happily take patches for any additional features (codecs, 
+etc) you want to support here.
 
-> > >=20
-> > > > Many of the extensions you talked about are also relevant for real =
-modems as
-> > > > well (like battery reporting, call volume, etc).  Some of these API=
-s are
-> > > > already defined in fact.
-> > > >=20
-> > > > Given the above, oFono upstream has no interest in adding or mainta=
-ining
-> > > > support this new framework.
-> >=20
-> > Maybe better question: Do you mean that you do not want to maintain
-> > hsphfpd, or that you completely do not want to see that ofono would be
-> > "Telepony Agent" for hsphfpd?
->=20
-> The latter.
+But... oFono upstream has no interest in accepting forwarded AT commands 
+from some external daemon if we're in AG role.  We rejected such a 
+design years ago and nothing has changed.
 
-Ok.
+AG role is already quite tricky to implement without additional 
+complexity introduced by having multiple applications and IPC.  "Its 
+your funeral" as the saying goes if you want to go that route.
 
-> >=20
-> > > Denis, if you are not interested in my proposed hsphfpd daemon, how y=
-ou
-> > > want to solve problem with other extensions and other vendor codecs?
-> > >=20
->=20
-> See above..
->=20
-> > > Also in my proposed solution it is possible to use HFP profile without
-> > > Telephony Agent (ofono). Do you think it is really a good idea to have
-> > > strong dependency on ofono just for bluetooth HFP headset?
-> > >=20
->=20
-> Why not?  The main purpose of HFP is telephony; whether it is classic pho=
-ne
-> calls or skype/facetime.  oFono seems a natural fit.
+<snip>
 
-I disagree here. Primary purpose of HFP for desktop users is ability to
-use bluetooth's microphone. And not telephony stack and its complicated
-features like call hold and others, which are in HFP used and
-implemented probably only in car kits.
+> I disagree here. Primary purpose of HFP for desktop users is ability to
+> use bluetooth's microphone. And not telephony stack and its complicated
+> features like call hold and others, which are in HFP used and
+> implemented probably only in car kits.
 
-> > > Also for using ofono with HFP profile is not possible on desktop
-> > > computer which do not have any modem as it is hooked to some active
-> > > modem.
->=20
-> This statement is not true at all.  You can use oFono without any 'real'
-> modems attached.  It can happily manage only HFP devices (or modems as we
-> call them.)
+So your primary goal here is to have the desktop play the role of the 
+AG, purely so you can forward the audio from a headset out to whatever 
+it is that you want.  And you want oFono (or some other daemon) to 
+(optionally) handle the call related AT commands in the HFP AG role.
 
-Ok, can you please provide exact steps how to do it, including
-activating of bidirectional audio stream?
+Such a design will get a NAK from me on the oFono side.  But don't let 
+that stop you.  You can simply invoke oFono APIs directly from your 
+daemon.  No need for any changes in oFono itself.  As mentioned above, I 
+wouldn't recommend it, but... :)
 
-Because from all information which I got, and also from talk with other
-people, I think it really is not possible.
+> 
+>>>> Also for using ofono with HFP profile is not possible on desktop
+>>>> computer which do not have any modem as it is hooked to some active
+>>>> modem.
+>>
+>> This statement is not true at all.  You can use oFono without any 'real'
+>> modems attached.  It can happily manage only HFP devices (or modems as we
+>> call them.)
+> 
+> Ok, can you please provide exact steps how to do it, including
+> activating of bidirectional audio stream?
 
-Also official pulseaudio documentation mention that you need phone sim
-simulator for this purpose, see:
+So again, which role?  If we're the HF connecting to the AG, then things 
+just work without a modem.  If we're the AG, then yes you need a modem 
+to be driven by the AG connection.
 
-https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/Blu=
-etooth/#index5h2
+>>
+>> You must be thinking of the oFono HFP AG implementation...
+> 
+> Yes! For connecting bluetooth headset you need HFP AG implementation.
+> 
+> And I guess this is the reason why simulator is needed. HFP headset acts
+> as a "client" for modem. Therefore on desktop / laptop you need to
+> implement "modem server" which will be used by HFP headset "client".
+> 
+> And phone simulator is doing exactly this "modem server", it is
+> simulator of modem.
+> 
 
-> > >=20
-> > > There is a way to use ofono sim simulator which provide fake modem, b=
-ut
-> > > its setup is hard on desktop and it not automated.
-> > >=20
->=20
-> You must be thinking of the oFono HFP AG implementation...
+Okay, I see now.  Yes, the above is correct.  My comments about not 
+needing a modem device hold true only if oFono is in HFP HF role 
+connecting to an AG.
 
-Yes! For connecting bluetooth headset you need HFP AG implementation.
-
-And I guess this is the reason why simulator is needed. HFP headset acts
-as a "client" for modem. Therefore on desktop / laptop you need to
-implement "modem server" which will be used by HFP headset "client".
-
-And phone simulator is doing exactly this "modem server", it is
-simulator of modem.
-
-> > > So connecting bluetooth headset in HFP profile with ofono is something
-> > > not so easy and not an obvious way.
-> > >=20
->=20
-> Again, not true.  As I said above, you can use oFono for this use case ju=
-st
-> fine.  Certainly the main driver for the development of oFono was to drive
-> real modem hardware, but it isn't limited to that.  So if you want to use=
- it
-> only for HFP, you can.
-
-If it is really possible (and need for phone simulator as described
-above is not required) then there is completely missing documentation
-how to do it. And how should be audio server (pulseaudio) configured to
-work in this way.
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---aq2axre4gjwrgfjj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXfqbOgAKCRCL8Mk9A+RD
-UqYvAKCE2Hx4+jCk9qkhPTJ7xycOsu7aLQCgj5eBXPUcPJFxiX5HeM+38A4mCsE=
-=0q2g
------END PGP SIGNATURE-----
-
---aq2axre4gjwrgfjj--
+Regards,
+-Denis
