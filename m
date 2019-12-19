@@ -2,94 +2,123 @@ Return-Path: <SRS0=Qms+=2J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0119C43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E37C2D0C1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 06:52:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 95C942082E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:26:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 862DD227BF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 06:52:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huIP5AIq"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="SJ/5cRSd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726813AbfLSE0L (ORCPT
+        id S1726648AbfLSGw1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Dec 2019 23:26:11 -0500
-Received: from mail-lj1-f175.google.com ([209.85.208.175]:46183 "EHLO
-        mail-lj1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726192AbfLSE0K (ORCPT
+        Thu, 19 Dec 2019 01:52:27 -0500
+Received: from mail25.static.mailgun.info ([104.130.122.25]:62794 "EHLO
+        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726173AbfLSGw0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Dec 2019 23:26:10 -0500
-Received: by mail-lj1-f175.google.com with SMTP id m26so2203534ljc.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2019 20:26:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=a4x0+DdHJJaL/vlOuojrdXqU/lC8RD1KG9FEeRdiN5s=;
-        b=huIP5AIqmV4UBq/2nrlQ8tblOu1fjLNX7KZ5oqwC4UGnQZSLvY60gLyOQUHpaoNqtY
-         EZUC7pLi315W09lTvO7qvJqCK+8tmN2+sxIKHOkr1tjLZ2KSAG09TZtIxzBhf4tAk32S
-         KVZqkSw593U5qcTG/BFIUseIfKHWE5HHSOGUt63bAsoRGVwWa1cCuDGE80qk92lGRz83
-         FxLFhp5pwyGq2fNyfhZyHesMvRlAGk5RZZx+DNuk5SYQ7/54Tqv6HCb+aPa6Y/oc3Ty3
-         A48wPym5lRvJFs5NDAajy+dqOM/tzBQ8XY+zMk3jSXpENOOa1hhLVaoxsOJfGDRv5Mkt
-         Fx1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=a4x0+DdHJJaL/vlOuojrdXqU/lC8RD1KG9FEeRdiN5s=;
-        b=DiYRtC15xtCtVIe+8VkGLcHcm6qUf1bvcjv1BeH3fRXlKdUoV3jLAUjoKHzN/D1gxm
-         iLpQtpri7eTkE0LgGYwNDFTjT82yBnwmuOz7FzwfPI4sYo+6T65NsWZ0TwtHEr40xyr1
-         VTKqGCVon8ow98NYA4JcvaJQj4eQo1Cvm1ol3DiWDZTSf/QyKX+7nt00byc0spOav5Yb
-         f2U3pXo6A1dgnuDzbSTsteCwPKzi3IbKnoSQCajQRWI+Zz9ZMCJJZLyBVH9EgRcruhKg
-         U4f6zG69lYTkFoffMmfTeFFEmbrN1P3/mIVva0oRqukmaJd8oeYv1FEIwJ6kjZqqmA83
-         9MlQ==
-X-Gm-Message-State: APjAAAUwNplHY2Yi1aq2nvUogViME4XSsIGa84BgIlul1SejzaFUlvhg
-        1H6f49tyUvQbIUsBjynolcUNM6sFovweUoiGFYC98AY4
-X-Google-Smtp-Source: APXvYqzCUcrTflMj5e4wSWMt1WeVrey4QFR8LZ1oMyPi5nF9chjWXfu8sPx191W15FLQ65P5V8aPoR+/Za00+nmat0I=
-X-Received: by 2002:a2e:8613:: with SMTP id a19mr4355756lji.210.1576729568418;
- Wed, 18 Dec 2019 20:26:08 -0800 (PST)
-MIME-Version: 1.0
-From:   Charles Manning <cdhmanning@gmail.com>
-Date:   Thu, 19 Dec 2019 17:25:57 +1300
-Message-ID: <CAE21AQps-et6iCNh=BH0YXAD8CM=it-Ncw6kbKTEyVpDe1poOg@mail.gmail.com>
-Subject: Preventing connection from initiating a pairing
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 19 Dec 2019 01:52:26 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1576738346; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=R4pG3Dx1SRgEuA1xuLK7CEXE7WH4oBwCAk7ZxvQgeRc=; b=SJ/5cRSd/syBuTtEkpRpLLgZsEMvpq0viJFPA1+/jL7E+jtLl2QnVQ2QmUjCrVtRshqe6ANf
+ RH0h6QM6PCl/GLVC2yjF+slqGV2bbwmc57Dx+/aPBaHWuRk7dwHM7o98gROTVI9Me+Aj7478
+ ih3md5qSNUWi4tp2qjYYGKZINGQ=
+X-Mailgun-Sending-Ip: 104.130.122.25
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5dfb1e28.7f3277fb8d88-smtp-out-n03;
+ Thu, 19 Dec 2019 06:52:24 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 58BC8C55682; Thu, 19 Dec 2019 06:52:23 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 320A5C48B2D;
+        Thu, 19 Dec 2019 06:52:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 320A5C48B2D
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Retry btsoc initialize when it fails
+Date:   Thu, 19 Dec 2019 14:52:17 +0800
+Message-Id: <20191219065217.14122-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi All
+This patch adds the retry of btsoc initialization when it fails. There are
+reports that the btsoc initialization may fail on some platforms but the
+repro ratio is very low. The failure may be caused by UART, platform HW or
+the btsoc itself but it's very difficlut to root cause, given the repro
+ratio is very low. Add a retry for the btsoc initialization will resolve
+most of the failures and make Bluetooth finally works.
 
-I've been getting my head around using BlueZ and libbluetooth and have
-achieved all the behaviour I want except one bit.
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-I have an embedded Linux device that is connecting to a PC using Bluez
-
-They have been paired. Whenever the Linux device turns on, it
-automatically connects to the PC. All fine so far.
-
-If the PC then unpairs while the linux device is off, the PC loses
-it's pairing info but the Linux device retains its now stale pairing
-info.
-
-The Linux device things it is still paired and attempts to connect,
-causing  the PC to pop up a pairing request. I do not want that
-behaviour. I want the Linux device to not try connecting if the PC has
-lost its pairing info.
-
-What I want is either some way to confirm there is a valid pairing
-still in place before connecting or some way of setting the Linux
-device to only connect if the pairing is still valid, or some other
-mechanism by which I can prevent the pairing attempt.
-
-Is there some way to do that?
-
-Thanks for your help.
-
-Thanks
-
-Charles
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1cb706acdef6..af45b31f1b5f 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -53,6 +53,9 @@
+ /* Controller debug log header */
+ #define QCA_DEBUG_HANDLE	0x2EDC
+ 
++/* max retry count when init fails */
++#define QCA_MAX_INIT_RETRY_COUNT 3
++
+ enum qca_flags {
+ 	QCA_IBS_ENABLED,
+ 	QCA_DROP_VENDOR_EVENT,
+@@ -1259,6 +1262,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	struct qca_data *qca = hu->priv;
+ 	struct qca_serdev *qcadev;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
++	unsigned int init_retry_count = 0;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 	const char *firmware_name = qca_get_firmware_name(hu);
+ 	int ret;
+@@ -1276,6 +1280,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	 */
+ 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 
++retry:
+ 	if (qca_is_wcn399x(soc_type)) {
+ 		bt_dev_info(hdev, "setting up wcn3990");
+ 
+@@ -1341,6 +1346,20 @@ static int qca_setup(struct hci_uart *hu)
+ 		 * patch/nvm-config is found, so run with original fw/config.
+ 		 */
+ 		ret = 0;
++	} else {
++		if (init_retry_count < QCA_MAX_INIT_RETRY_COUNT) {
++			qca_power_off(hdev);
++			if (hu->serdev) {
++				serdev_device_close(hu->serdev);
++				ret = serdev_device_open(hu->serdev);
++				if (ret) {
++					bt_dev_err(hu->hdev, "open port fail");
++					return ret;
++				}
++			}
++			init_retry_count++;
++			goto retry;
++		}
+ 	}
+ 
+ 	/* Setup bdaddr */
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
