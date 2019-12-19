@@ -2,133 +2,94 @@ Return-Path: <SRS0=Qms+=2J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3157C43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0119C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:26:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DA4321582
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95C942082E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:26:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="pUvZ6rr4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="huIP5AIq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726813AbfLSEDs (ORCPT
+        id S1726813AbfLSE0L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Dec 2019 23:03:48 -0500
-Received: from mail25.static.mailgun.info ([104.130.122.25]:20563 "EHLO
-        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726762AbfLSEDs (ORCPT
+        Wed, 18 Dec 2019 23:26:11 -0500
+Received: from mail-lj1-f175.google.com ([209.85.208.175]:46183 "EHLO
+        mail-lj1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726192AbfLSE0K (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Dec 2019 23:03:48 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1576728227; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=0fQzSuMhnuj2USzauI4HqHlR+Kp/9qEK+7rRqDzQ/og=; b=pUvZ6rr4H2EPZA+yG3kp60ecJ5VKmmLnu6WOfjtqols7vij6iFcYMgVoFnLRnXVa9Sucdynn
- kEb3aQFJvGItTw+bCEzcudEOKbEOeNYToF0ZVix4ZgX5a9+okhxA4bsdJ1rsc5eil7ENN74f
- mYmj+4DNpHixlPQawafXOzld55w=
-X-Mailgun-Sending-Ip: 104.130.122.25
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5dfaf69d.7f437d6ac928-smtp-out-n01;
- Thu, 19 Dec 2019 04:03:41 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 5F42DC3275A; Thu, 19 Dec 2019 04:03:40 +0000 (UTC)
-Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 74326C2BB50;
-        Thu, 19 Dec 2019 04:03:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 74326C2BB50
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Add poweroff support during hci down for QCA Rome
-Date:   Thu, 19 Dec 2019 12:03:34 +0800
-Message-Id: <20191219040334.15355-1-rjliao@codeaurora.org>
-X-Mailer: git-send-email 2.17.1
+        Wed, 18 Dec 2019 23:26:10 -0500
+Received: by mail-lj1-f175.google.com with SMTP id m26so2203534ljc.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2019 20:26:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=a4x0+DdHJJaL/vlOuojrdXqU/lC8RD1KG9FEeRdiN5s=;
+        b=huIP5AIqmV4UBq/2nrlQ8tblOu1fjLNX7KZ5oqwC4UGnQZSLvY60gLyOQUHpaoNqtY
+         EZUC7pLi315W09lTvO7qvJqCK+8tmN2+sxIKHOkr1tjLZ2KSAG09TZtIxzBhf4tAk32S
+         KVZqkSw593U5qcTG/BFIUseIfKHWE5HHSOGUt63bAsoRGVwWa1cCuDGE80qk92lGRz83
+         FxLFhp5pwyGq2fNyfhZyHesMvRlAGk5RZZx+DNuk5SYQ7/54Tqv6HCb+aPa6Y/oc3Ty3
+         A48wPym5lRvJFs5NDAajy+dqOM/tzBQ8XY+zMk3jSXpENOOa1hhLVaoxsOJfGDRv5Mkt
+         Fx1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=a4x0+DdHJJaL/vlOuojrdXqU/lC8RD1KG9FEeRdiN5s=;
+        b=DiYRtC15xtCtVIe+8VkGLcHcm6qUf1bvcjv1BeH3fRXlKdUoV3jLAUjoKHzN/D1gxm
+         iLpQtpri7eTkE0LgGYwNDFTjT82yBnwmuOz7FzwfPI4sYo+6T65NsWZ0TwtHEr40xyr1
+         VTKqGCVon8ow98NYA4JcvaJQj4eQo1Cvm1ol3DiWDZTSf/QyKX+7nt00byc0spOav5Yb
+         f2U3pXo6A1dgnuDzbSTsteCwPKzi3IbKnoSQCajQRWI+Zz9ZMCJJZLyBVH9EgRcruhKg
+         U4f6zG69lYTkFoffMmfTeFFEmbrN1P3/mIVva0oRqukmaJd8oeYv1FEIwJ6kjZqqmA83
+         9MlQ==
+X-Gm-Message-State: APjAAAUwNplHY2Yi1aq2nvUogViME4XSsIGa84BgIlul1SejzaFUlvhg
+        1H6f49tyUvQbIUsBjynolcUNM6sFovweUoiGFYC98AY4
+X-Google-Smtp-Source: APXvYqzCUcrTflMj5e4wSWMt1WeVrey4QFR8LZ1oMyPi5nF9chjWXfu8sPx191W15FLQ65P5V8aPoR+/Za00+nmat0I=
+X-Received: by 2002:a2e:8613:: with SMTP id a19mr4355756lji.210.1576729568418;
+ Wed, 18 Dec 2019 20:26:08 -0800 (PST)
+MIME-Version: 1.0
+From:   Charles Manning <cdhmanning@gmail.com>
+Date:   Thu, 19 Dec 2019 17:25:57 +1300
+Message-ID: <CAE21AQps-et6iCNh=BH0YXAD8CM=it-Ncw6kbKTEyVpDe1poOg@mail.gmail.com>
+Subject: Preventing connection from initiating a pairing
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch enables power off support for hci down and power on support
-for hci up. As QCA Rome power sources are ignited by bt_en GPIO, we will
-pull it down during hci down, i.e. an complete power off of QCA Rome.
-So while hci up, will pull up the bt_en GPIO again to power on the chip,
-requests BT chip version and download the firmware.
+Hi All
 
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
----
- drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++++++++++++++----
- 1 file changed, 30 insertions(+), 4 deletions(-)
+I've been getting my head around using BlueZ and libbluetooth and have
+achieved all the behaviour I want except one bit.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index b602ed01505b..1cb706acdef6 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1257,6 +1257,7 @@ static int qca_setup(struct hci_uart *hu)
- {
- 	struct hci_dev *hdev = hu->hdev;
- 	struct qca_data *qca = hu->priv;
-+	struct qca_serdev *qcadev;
- 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 	const char *firmware_name = qca_get_firmware_name(hu);
-@@ -1293,6 +1294,17 @@ static int qca_setup(struct hci_uart *hu)
- 			return ret;
- 	} else {
- 		bt_dev_info(hdev, "ROME setup");
-+		if (hu->serdev) {
-+			/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to
-+			 * execute setup for every hci up.
-+			 */
-+			set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
-+			qcadev = serdev_device_get_drvdata(hu->serdev);
-+			hu->hdev->shutdown = qca_power_off;
-+			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-+			/* Controller needs time to bootup. */
-+			msleep(150);
-+		}
- 		qca_set_speed(hu, QCA_INIT_SPEED);
- 	}
- 
-@@ -1413,13 +1425,27 @@ static void qca_power_shutdown(struct hci_uart *hu)
- static int qca_power_off(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct qca_serdev *qcadev;
-+	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 
--	/* Perform pre shutdown command */
--	qca_send_pre_shutdown_cmd(hdev);
-+	if (qca_is_wcn399x(soc_type)) {
-+		/* Perform pre shutdown command */
-+		qca_send_pre_shutdown_cmd(hdev);
- 
--	usleep_range(8000, 10000);
-+		usleep_range(8000, 10000);
-+
-+		qca_power_shutdown(hu);
-+	} else {
-+		if (hu->serdev) {
-+
-+			qcadev = serdev_device_get_drvdata(hu->serdev);
-+
-+			gpiod_set_value_cansleep(qcadev->bt_en, 0);
-+
-+			usleep_range(8000, 10000);
-+		}
-+	}
- 
--	qca_power_shutdown(hu);
- 	return 0;
- }
- 
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+I have an embedded Linux device that is connecting to a PC using Bluez
+
+They have been paired. Whenever the Linux device turns on, it
+automatically connects to the PC. All fine so far.
+
+If the PC then unpairs while the linux device is off, the PC loses
+it's pairing info but the Linux device retains its now stale pairing
+info.
+
+The Linux device things it is still paired and attempts to connect,
+causing  the PC to pop up a pairing request. I do not want that
+behaviour. I want the Linux device to not try connecting if the PC has
+lost its pairing info.
+
+What I want is either some way to confirm there is a valid pairing
+still in place before connecting or some way of setting the Linux
+device to only connect if the pairing is still valid, or some other
+mechanism by which I can prevent the pairing attempt.
+
+Is there some way to do that?
+
+Thanks for your help.
+
+Thanks
+
+Charles
