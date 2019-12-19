@@ -2,193 +2,133 @@ Return-Path: <SRS0=Qms+=2J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24103C43603
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 01:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3157C43603
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:03:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E03852176D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 01:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DA4321582
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Dec 2019 04:03:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ec4VWp2x"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="pUvZ6rr4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726700AbfLSBHp (ORCPT
+        id S1726813AbfLSEDs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Dec 2019 20:07:45 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:43999 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726671AbfLSBHp (ORCPT
+        Wed, 18 Dec 2019 23:03:48 -0500
+Received: from mail25.static.mailgun.info ([104.130.122.25]:20563 "EHLO
+        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726762AbfLSEDs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Dec 2019 20:07:45 -0500
-Received: by mail-oi1-f194.google.com with SMTP id p125so22104oif.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2019 17:07:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GaBcnb1+DGe/H6P00Fvikm3cHH0c+ImBAjEWQsi/myo=;
-        b=ec4VWp2xLpv16UsRs4Bh4HRhax72GPvVDcBGQTEjKc86utu29OG4BObpUadBwY2u4B
-         fcX6qYzzrAkXBlNDyE2t0AtJSt38cwoykHCY2OQ+1NAw6FpK/OxMxIOBtrsBv5lnl4NY
-         sGgRlxJDhgQOUN7jIszWgR9eUR0TkLVde1K7OJs4dtYB+gqkrfck+o0iD14qvZC8whn5
-         hCV33OTbh1VNnaC3MrtD1/2y5p+IpFNPwxHdeWRxTkpkMfQVE2jFTppyDNzCvKX6DAVm
-         uInaHSq//BusZGFDMBARQ30jc/ckW285+jcCFD66Iz14R6WWSYvQbmGEVuUPXqCKIn0b
-         Ex+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GaBcnb1+DGe/H6P00Fvikm3cHH0c+ImBAjEWQsi/myo=;
-        b=APla6bmkMOJkYXe8Ai7fUXUx7Ju+0dnatGRaIeYh8AVB5/oRMe1oZOf7/6rn3Sp0Ce
-         BnoWjzLA7WvQ0VnzJnAbV//pZNu3vM/CcTaCs0YnoGHKjK3NugwK/l/l4nCi4i+0/er0
-         JCK+mUg/zuALfNp1qbIV55ycPdAwhNx0dqCCD5EQRb2ydZ08WeMxSZHWS9yWDvuyr/Tg
-         TiylLU/pp5r/XIacWmbJJb2xM4Soi6OCJEpN8dLlSIB6kVJ0cGhPIJt7K0m7qTrtzDWC
-         A8mdJrQQdeIa+Qa+xt1unGTnRVJoOM5vm/VjOIP/eWQABqs+KP5FmpTERc1Gvr/nviQ4
-         3NWw==
-X-Gm-Message-State: APjAAAUWmC7HaZywN1KtMn4+zkzYpZlh8TDvCRpG64PKE3qOKQMpi99n
-        VB0kE12FwSSCU6h9CuxcakA=
-X-Google-Smtp-Source: APXvYqyLLFGHH9FQ3sE4hb67IvRD2nX5qF00l1IylJzbBfWGPbJiodzB5195dOSh6pLFhyTk9WZzVA==
-X-Received: by 2002:aca:e084:: with SMTP id x126mr1604271oig.97.1576717664186;
-        Wed, 18 Dec 2019 17:07:44 -0800 (PST)
-Received: from [192.168.1.249] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id m11sm1443320oie.20.2019.12.18.17.07.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Dec 2019 17:07:43 -0800 (PST)
-Subject: Re: [pulseaudio-discuss] Proposal for a new API and usage of
- Bluetooth HSP and HFP profiles on Linux
-To:     =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Tanu Kaskinen <tanuk@iki.fi>,
-        General PulseAudio Discussion 
-        <pulseaudio-discuss@lists.freedesktop.org>, ofono@ofono.org,
-        devkit-devel@lists.freedesktop.org,
-        Bastien Nocera <hadess@hadess.net>,
-        Georg Chini <georg@chini.tk>,
-        Russell Treleaven <rtreleaven@bunnykick.ca>,
-        Arun Raghavan <arun@arunraghavan.net>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>
-References: <20191201185740.uot7zb2s53p5gu7z@pali>
- <508d35f29c2abc26af15e232a38d3ca53eb33706.camel@iki.fi>
- <20191202184512.rx6p63c6axztnwrw@pali> <20191205093200.x47npi5sxtcphr2o@pali>
- <CABBYNZKi7UUg7kASKadGr7sDJH0-tfuuZr9rd4Xu8ZUA9LqTMA@mail.gmail.com>
- <20191216091521.reh2urr25husschv@pali>
- <3ca53c66-1df0-41bf-710e-dea709906234@gmail.com>
- <20191218172828.vfie4su2whts2fqh@pali> <20191218173632.aqdmdhutu3ruezck@pali>
- <06eb7e98-1357-afd1-40a5-2ccb139d8dec@gmail.com>
- <20191218213349.2ksew2wnhgu3peub@pali>
-From:   Denis Kenzior <denkenz@gmail.com>
-Message-ID: <0cfbe253-417c-e7c0-553a-abf360a80c9f@gmail.com>
-Date:   Wed, 18 Dec 2019 19:03:12 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191218213349.2ksew2wnhgu3peub@pali>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 18 Dec 2019 23:03:48 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1576728227; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=0fQzSuMhnuj2USzauI4HqHlR+Kp/9qEK+7rRqDzQ/og=; b=pUvZ6rr4H2EPZA+yG3kp60ecJ5VKmmLnu6WOfjtqols7vij6iFcYMgVoFnLRnXVa9Sucdynn
+ kEb3aQFJvGItTw+bCEzcudEOKbEOeNYToF0ZVix4ZgX5a9+okhxA4bsdJ1rsc5eil7ENN74f
+ mYmj+4DNpHixlPQawafXOzld55w=
+X-Mailgun-Sending-Ip: 104.130.122.25
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5dfaf69d.7f437d6ac928-smtp-out-n01;
+ Thu, 19 Dec 2019 04:03:41 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 5F42DC3275A; Thu, 19 Dec 2019 04:03:40 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 74326C2BB50;
+        Thu, 19 Dec 2019 04:03:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 74326C2BB50
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Add poweroff support during hci down for QCA Rome
+Date:   Thu, 19 Dec 2019 12:03:34 +0800
+Message-Id: <20191219040334.15355-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pali,
+This patch enables power off support for hci down and power on support
+for hci up. As QCA Rome power sources are ignited by bt_en GPIO, we will
+pull it down during hci down, i.e. an complete power off of QCA Rome.
+So while hci up, will pull up the bt_en GPIO again to power on the chip,
+requests BT chip version and download the firmware.
 
-> Yes, I see. Also there are devices without HFP support, only with HSP.
-> pulseaudio support also these devices and pulseaudio is not going to
-> drop support for them. Last time when I looked at ofono, it has no HSP
-> support. Is ofono going to add support for HSP?
-> 
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++++++++++++++----
+ 1 file changed, 30 insertions(+), 4 deletions(-)
 
-No.
-
-<snip>
-
-> 
-> But would you accept patches which exports DBus API e.g. for displaying text
-> on HFP headset with embedded display? Or patches which implements 3
-> different way for reporting battery level status of HFP headset? And API
-> for sending "computer battery level" to HFP headset? Or implementing
-> setup of SCO sockets (via RFCOMM layer) for custom codecs? Or exporting
-> uinput linux device for button press events? Because all these
-
-So which roles are we talking about here?  Your Design document shows 
-hsphfpd registering for both HFP AG and HFP HF roles, but maybe this was 
-not the intent?
-
-If you're talking about extending oFono APIs when it is acting as the HF 
-connecting to the AG, then codec setup APIs, etc are definitely 
-something that would be welcome.
-
-If you're talking about AG role, then that is different... In general, 
-if the oFono is in an AG role, then there should be nothing to configure 
-and there are no APIs for this role.  Things like reporting AG battery 
-level to HFP headset are done directly using plugins.  See 
-ofono_emulator_set_indicator and how this is done by upower.c for 
-example.  I happily take patches for any additional features (codecs, 
-etc) you want to support here.
-
-But... oFono upstream has no interest in accepting forwarded AT commands 
-from some external daemon if we're in AG role.  We rejected such a 
-design years ago and nothing has changed.
-
-AG role is already quite tricky to implement without additional 
-complexity introduced by having multiple applications and IPC.  "Its 
-your funeral" as the saying goes if you want to go that route.
-
-<snip>
-
-> I disagree here. Primary purpose of HFP for desktop users is ability to
-> use bluetooth's microphone. And not telephony stack and its complicated
-> features like call hold and others, which are in HFP used and
-> implemented probably only in car kits.
-
-So your primary goal here is to have the desktop play the role of the 
-AG, purely so you can forward the audio from a headset out to whatever 
-it is that you want.  And you want oFono (or some other daemon) to 
-(optionally) handle the call related AT commands in the HFP AG role.
-
-Such a design will get a NAK from me on the oFono side.  But don't let 
-that stop you.  You can simply invoke oFono APIs directly from your 
-daemon.  No need for any changes in oFono itself.  As mentioned above, I 
-wouldn't recommend it, but... :)
-
-> 
->>>> Also for using ofono with HFP profile is not possible on desktop
->>>> computer which do not have any modem as it is hooked to some active
->>>> modem.
->>
->> This statement is not true at all.  You can use oFono without any 'real'
->> modems attached.  It can happily manage only HFP devices (or modems as we
->> call them.)
-> 
-> Ok, can you please provide exact steps how to do it, including
-> activating of bidirectional audio stream?
-
-So again, which role?  If we're the HF connecting to the AG, then things 
-just work without a modem.  If we're the AG, then yes you need a modem 
-to be driven by the AG connection.
-
->>
->> You must be thinking of the oFono HFP AG implementation...
-> 
-> Yes! For connecting bluetooth headset you need HFP AG implementation.
-> 
-> And I guess this is the reason why simulator is needed. HFP headset acts
-> as a "client" for modem. Therefore on desktop / laptop you need to
-> implement "modem server" which will be used by HFP headset "client".
-> 
-> And phone simulator is doing exactly this "modem server", it is
-> simulator of modem.
-> 
-
-Okay, I see now.  Yes, the above is correct.  My comments about not 
-needing a modem device hold true only if oFono is in HFP HF role 
-connecting to an AG.
-
-Regards,
--Denis
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index b602ed01505b..1cb706acdef6 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1257,6 +1257,7 @@ static int qca_setup(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+ 	struct qca_data *qca = hu->priv;
++	struct qca_serdev *qcadev;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 	const char *firmware_name = qca_get_firmware_name(hu);
+@@ -1293,6 +1294,17 @@ static int qca_setup(struct hci_uart *hu)
+ 			return ret;
+ 	} else {
+ 		bt_dev_info(hdev, "ROME setup");
++		if (hu->serdev) {
++			/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to
++			 * execute setup for every hci up.
++			 */
++			set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
++			qcadev = serdev_device_get_drvdata(hu->serdev);
++			hu->hdev->shutdown = qca_power_off;
++			gpiod_set_value_cansleep(qcadev->bt_en, 1);
++			/* Controller needs time to bootup. */
++			msleep(150);
++		}
+ 		qca_set_speed(hu, QCA_INIT_SPEED);
+ 	}
+ 
+@@ -1413,13 +1425,27 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ static int qca_power_off(struct hci_dev *hdev)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct qca_serdev *qcadev;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 
+-	/* Perform pre shutdown command */
+-	qca_send_pre_shutdown_cmd(hdev);
++	if (qca_is_wcn399x(soc_type)) {
++		/* Perform pre shutdown command */
++		qca_send_pre_shutdown_cmd(hdev);
+ 
+-	usleep_range(8000, 10000);
++		usleep_range(8000, 10000);
++
++		qca_power_shutdown(hu);
++	} else {
++		if (hu->serdev) {
++
++			qcadev = serdev_device_get_drvdata(hu->serdev);
++
++			gpiod_set_value_cansleep(qcadev->bt_en, 0);
++
++			usleep_range(8000, 10000);
++		}
++	}
+ 
+-	qca_power_shutdown(hu);
+ 	return 0;
+ }
+ 
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
