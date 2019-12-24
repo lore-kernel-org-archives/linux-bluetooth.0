@@ -2,158 +2,179 @@ Return-Path: <SRS0=L7UJ=2O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7762C2D0CF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Dec 2019 05:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D86C2D0CF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Dec 2019 06:48:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F94420706
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Dec 2019 05:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D197206B7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Dec 2019 06:48:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wrwc3fdk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726037AbfLXFr0 (ORCPT
+        id S1726068AbfLXGsP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Dec 2019 00:47:26 -0500
-Received: from mga14.intel.com ([192.55.52.115]:4020 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725934AbfLXFrZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Dec 2019 00:47:25 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Dec 2019 21:47:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,350,1571727600"; 
-   d="scan'208";a="211772110"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga008.jf.intel.com with ESMTP; 23 Dec 2019 21:47:24 -0800
-Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 23 Dec 2019 21:47:24 -0800
-Received: from bgsmsx102.gar.corp.intel.com (10.223.4.172) by
- FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 23 Dec 2019 21:47:24 -0800
-Received: from bgsmsx110.gar.corp.intel.com ([169.254.11.108]) by
- BGSMSX102.gar.corp.intel.com ([169.254.2.130]) with mapi id 14.03.0439.000;
- Tue, 24 Dec 2019 11:17:21 +0530
-From:   "Kishore, Ajay" <ajay.kishore@intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 6/6] doc/obex-api: Update documentation
-Thread-Topic: [PATCH 6/6] doc/obex-api: Update documentation
-Thread-Index: AQHVtTgTIth0oGQmFkeGeELvL6yqu6fIyyoQ
-Date:   Tue, 24 Dec 2019 05:47:20 +0000
-Message-ID: <A4827819204CC641A5E2541E6709F15337DB052A@BGSMSX110.gar.corp.intel.com>
-References: <1576488509-26331-1-git-send-email-ajay.kishore@intel.com>
- <CABBYNZLVARFpsMJsaA6aXnYZO8BD76C4WWi9zrLu5N3u=euPSg@mail.gmail.com>
-In-Reply-To: <CABBYNZLVARFpsMJsaA6aXnYZO8BD76C4WWi9zrLu5N3u=euPSg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMjJiOWQ2YzEtNWM2Ni00MWZkLTg2YTYtNDdkODIwOTRiZThhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiVWY2WTlhZnhiWUhaXC9UQlFcL2lmZVFhVlVVY0lVRnJaMDFjQXhLcUJ2MUFXQzlSbkFkbFNOY3ZuVGJmTU9RNGJ1In0=
-x-originating-ip: [10.223.10.10]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        Tue, 24 Dec 2019 01:48:15 -0500
+Received: from mail-yw1-f74.google.com ([209.85.161.74]:48555 "EHLO
+        mail-yw1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725993AbfLXGsP (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 24 Dec 2019 01:48:15 -0500
+Received: by mail-yw1-f74.google.com with SMTP id a190so14791802ywe.15
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Dec 2019 22:48:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=afSN7o3UhMcA0gVq30yn427M/iZo9SRaFRuxhiciCtg=;
+        b=Wrwc3fdkTohRw/NO94Zqw5QXA+OiTKmoSy78OpS6aCqYBAIJ7XzWfL6URi2OcMZ2Lc
+         /LOxRZlzqSh2b2yhvuaetVrwKnjrFBKdwGkF8urpwrqKJfR+VNhqVz58zDKaObbMPkaL
+         77jnKV/JHnDY14Bcrc1lrgFfQNGrGPEz7qHcLp0mQsiVNLaEjINiueTkSnnPO6SaPD6z
+         Z9DydPtGvDABZKCfew++swNMr5HmjeHKfWb2fgnUmVvoFc7WscGvnEmnpaeQiQDYF4IT
+         /ycDQeDImZc4A1vVM+rDq3VZivxMzeVBJzZ3vdxhM3mF5YthZi0hbFCeNqVYdekkWWqa
+         0MEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=afSN7o3UhMcA0gVq30yn427M/iZo9SRaFRuxhiciCtg=;
+        b=mn1FcebAdN7lOd8H2ZhGUyVPYlDPbFDsU+ulEmHHPRz7lC8K5PfDMpOcFnpPB43tL8
+         Hmmr1ihpAQ7eEaVPEEvWFCYg1/6xzpcDeh/JW7d1WtYSlDyKGf4muS7XlJAFrulOYJnG
+         RrD+QZ5IdrhIVbUrWRaNU2PUgEFigy22EaS1+IsSOTEF95c0dP9cTN1d35frQtwAhJcy
+         15XgQbDxvH8Zx86EUGnqx2X7UqLLy4eRweYonyNnQ3dxN2ariqwV12qXP5XpBzB6kZS7
+         DpS/Ml/S/4bL20kI1D4/f7ZMbJQFCEwJcatCIZ6mpv5t7Dpy5aB5deYECJms5Oet+0MM
+         qtjg==
+X-Gm-Message-State: APjAAAXrZQoBw/Zaiz4bY/ywDOoPXgwDEBb9gVHgHCMgV5QIuPIYlEMG
+        gWJ1zlS6f52YrDY1TSWuysCSBO+xwaaO1CFirpR3MPzjBMK/7RhwI3a9hS/onp6POigYcDzfl3q
+        O1NGqPv8x/nDgfc/lsu3IHDz+NUIPdoW69OxkZlN69j3+CJsyXS7jRFUaZ9aMAq69uMmDGFz+1p
+        auav6am/9IGE8=
+X-Google-Smtp-Source: APXvYqwUnDMuQSmVr5jpCNjePB3xvGKDiy8d73lfoO+XMLac9HhSr/TsQoXacTv/iCZD2TR6qpWFxj4LZgC3U12xdA==
+X-Received: by 2002:a25:e681:: with SMTP id d123mr10362259ybh.292.1577170093751;
+ Mon, 23 Dec 2019 22:48:13 -0800 (PST)
+Date:   Tue, 24 Dec 2019 14:48:07 +0800
+Message-Id: <20191224144804.Bluez.v1.1.Ie74d7bb468a914ba7386aae02fc63cd4f529b0ef@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
+Subject: [Bluez PATCH v1] CHROMIUM: audio: fix crash during recovering process
+From:   "howardchung@google.com" <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     howardchung <howardchung@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTHVpeiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1i
-bHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIDxsaW51eC1ibHVldG9vdGgtDQo+IG93bmVy
-QHZnZXIua2VybmVsLm9yZz4gT24gQmVoYWxmIE9mIEx1aXogQXVndXN0byB2b24gRGVudHoNCj4g
-U2VudDogV2VkbmVzZGF5LCBEZWNlbWJlciAxOCwgMjAxOSA1OjQ0IEFNDQo+IFRvOiBLaXNob3Jl
-LCBBamF5IDxhamF5Lmtpc2hvcmVAaW50ZWwuY29tPg0KPiBDYzogbGludXgtYmx1ZXRvb3RoQHZn
-ZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDYvNl0gZG9jL29iZXgtYXBpOiBV
-cGRhdGUgZG9jdW1lbnRhdGlvbg0KPiANCj4gSGkgQWpheSwNCj4gDQo+IE9uIE1vbiwgRGVjIDE2
-LCAyMDE5IGF0IDE6NTQgQU0gQWpheSBLaXNob3JlIDxhamF5Lmtpc2hvcmVAaW50ZWwuY29tPg0K
-PiB3cm90ZToNCj4gPg0KPiA+IFRoaXMgYWRkcyBkb2N1bWVudGF0aW9uIHdpdGggdGhlIGNvbnZl
-cnNhdGlvbiBsaXN0aW5nIGZlYXR1cmUNCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEFqYXkgS2lz
-aG9yZSA8YWpheS5raXNob3JlQGludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgZG9jL29iZXgtYXBp
-LnR4dCB8IDY1DQo+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysNCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDY1IGluc2VydGlvbnMoKykNCj4g
-Pg0KPiA+IGRpZmYgLS1naXQgYS9kb2Mvb2JleC1hcGkudHh0IGIvZG9jL29iZXgtYXBpLnR4dCBp
-bmRleA0KPiA+IGYzOTM1NWEuLjlhNzYxNTkgMTAwNjQ0DQo+ID4gLS0tIGEvZG9jL29iZXgtYXBp
-LnR4dA0KPiA+ICsrKyBiL2RvYy9vYmV4LWFwaS50eHQNCj4gPiBAQCAtNzEyLDYgKzcxMiw3MSBA
-QCBNZXRob2RzICAgICAgICAgICAgdm9pZCBTZXRGb2xkZXIoc3RyaW5nIG5hbWUpDQo+ID4gICAg
-ICAgICAgICAgICAgICAgICAgICAgUG9zc2libGUgZXJyb3JzOiBvcmcuYmx1ZXoub2JleC5FcnJv
-ci5JbnZhbGlkQXJndW1lbnRzDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBvcmcuYmx1ZXoub2JleC5FcnJvci5GYWlsZWQNCj4gPg0KPiA+ICsNCj4gPiArDQo+
-ID4gKyAgICAgICAgICAgICAgIGFycmF5e29iamVjdCwgZGljdH0gbGlzdGNvbnZlcnNhdGlvbnMo
-c3RyaW5nIGZvbGRlciwNCj4gPiArIGRpY3QgZmlsdGVyKQ0KPiANCj4gSXQgc2hvdWxkIGhhdmUg
-YmVlbiBMaXN0Q29udmVyc2F0aW9ucyB0byBhZGhlcmUgd2l0aCBvdXIgRC1CdXMgQVBJcywgYnV0
-DQo+IHJlYWQgYmVsbG93Lg0KRml4ZWQgYW5kIHB1c2hlZCBpbiB0aGUgbmV3IHBhdGNoIChbUEFU
-Q0ggdjIgNi82XSBkb2Mvb2JleC1hcGk6IFVwZGF0ZSBkb2N1bWVudGF0aW9uKS4NCj4gDQo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgICAgUmV0dXJucyBhbiBhcnJheSBjb250YWluaW5nIHRoZSBj
-b252ZXJzYXRpb25zIGZvdW5kIGluIHRoZQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGdp
-dmVuIHN1YmZvbGRlciBvZiB0aGUgY3VycmVudCBmb2xkZXIsIG9yIGluIHRoZSBjdXJyZW50DQo+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgZm9sZGVyIGlmIGZvbGRlciBpcyBlbXB0eS4NCj4g
-PiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgUG9zc2libGUgRmlsdGVyczogTGFzdEFj
-dGl2aXR5QmVnaW4sIExhc3RBY3Rpdml0eUVuZCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-ICBSZWFkU3RhdHVzLCBSZWNpcGllbnQNCj4gDQo+IFNvIGhlcmUgaXMgdGhlIGJpZyBkZXNpZ24g
-cXVlc3Rpb24sIHdoeSBoYXNuJ3QgdGhpcyBiZWVuIGRvbmUgYXMgYSBmaWx0ZXIgdG8NCj4gTGlz
-dE1lc3NhZ2VzPyBXZSBjb3VsZCBqdXN0IGhhdmUgYSBjb3VwbGUgb2YgZGlmZmVyZW50IHByb3Bl
-cnRpZXMgdG8gaW5kaWNhdGUNCj4gaXQgaXMgYSBjb252ZXJzYXRpb24gcmF0aGVyIHRoYW4gYSBz
-aW5nbGUgbWVzc2FnZSwgaW4gYW55IGNhc2Ugd2Ugd291bGQgbmVlZA0KPiBzb21ldGhpbmcgbGlr
-ZQ0KPiBvcmcuYmx1ZXoub2JleC5Db252ZXJzYXRpb24xIHRvIGVudW1lcmF0ZSB0aGVzZSBvYmpl
-Y3RzLCBzb21ldGhpbmcgdGhhdCBpcw0KPiBub3QgZG9jdW1lbnRlZCBoZXJlLg0KSSBBZ3JlZSB0
-aGF0IHRoZSBmZXcgcHJvcGVydGllcyBhcmUgc2ltaWxhciBpbiBMaXN0TWVzc2FnZXMgIGFuZCBM
-aXN0Q29udmVyc2F0aW9ucyBmdW5jdGlvbnMgYW5kIGNhbiBiZSBpbXBsZW1lbnRlZCB0byBqdXN0
-IGFkZCBmZXcgbmV3IHByb3BlcnRpZXMuDQpCdXQgd2UgdGhvdWdodCB0byBpbXBsZW1lbnQgYm90
-aCB0aGVzZSBmdW5jdGlvbnMgc2VwYXJhdGVseSBhcyBpbiBNQVAgc3BlY2lmaWNhdGlvbiBhbHNv
-IGl0IGlzIHNlcGFyYXRlZC4NCkFsc28gd2l0aCB0aGlzIGltcGxlbWVudGF0aW9uIGl0IHdpbGwg
-ZWFzaWVyIHRvIGRldmVsb3Agc2VwYXJhdGUgYXBwbGljYXRpb24gZm9yIGJvdGggdGhlIGZlYXR1
-cmUuDQpJbiB0aGUgY3VycmVudCBpbXBsZW1lbnRhdGlvbiB3ZSBhcmUgdXNpbmcgb3JnLmJsdWV6
-Lm9iZXguQ29udmVyc2F0aW9uMSBpbnRlcmZhY2UgdG8gZW51bWVyYXRlIGFuZCBpdCBpcyB1cGRh
-dGVkIGluIHRoZSBuZXcgcGF0Y2ggKFtQQVRDSCB2MiA2LzZdIGRvYy9vYmV4LWFwaTogVXBkYXRl
-IGRvY3VtZW50YXRpb24pLg0KDQo+IA0KPiANCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgUHJvcGVydGllczoNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBzdHJpbmcgaWQ6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBDb252ZXJzYXRpb24gdW5pcXVlDQo+ID4gKyBpZGVudGlmaWNhdGlvbg0KPiA+
-ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmluZyBuYW1lOg0KPiA+
-ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQ29udmVyc2F0
-aW9uIG5hbWUNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJp
-bmcgbGFzdF9hY3Rpdml0eToNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIENvbnZlcnNhdGlvbiB0aW1lc3RhbXAgZm9yIHRoZQ0KPiA+ICsgbGFzdCBh
-Y3Rpdml0eQ0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2xl
-YW4gcmVhZF9zdGF0dXM6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBDb252ZXJzYXRpb24gcmVhZCBmbGFnDQo+ID4gKw0KPiA+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgc3RyaW5nIHZlcnNpb25fY291bnRlcjoNCj4gPiArDQo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIDEyOCBiaXRzIHZlcnNpb24g
-Y291bnRlci4NCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVGhl
-IOKAmENvbnZlcnNhdGlvbi1MaXN0aW5nIFZlcnNpb24gQ291bnRlcuKAmSwNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg4oCYQ29udmVyc2F0aW9uIFZlcnNpb24g
-Q291bnRlcuKAmSwgYW5kIOKAmEZvbGRlcg0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBWZXJzaW9uIENvdW50ZXLigJkgYXJlIHVzZWQgdG8gZGV0ZWN0IGlmIHNv
-bWV0aGluZw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBoYXMg
-Y2hhbmdlZA0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmlu
-ZyBzdW1tYXJ5Og0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgQ29udmVyc2F0aW9uIHN1bW1hcnkNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBzdHJpbmcgZGlzcGxheToNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIENvbnZlcnNhdGlvbiBwYXJ0aWNpcGFudHMgbmFtZQ0K
-PiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmluZyBjaGF0X3N0
-YXRlOg0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-Q29udmVyc2F0aW9uIGN1cnJlbnQgY2hhdA0KPiA+ICsgc3RhdGUgb2YgdGhlIHBhcnRpY2lwYW50
-cw0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cmluZyBwcmVz
-ZW5jZV9hdmFpbGFiaWxpdHk6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBDb252ZXJzYXRpb24gIHBhcnRpY2lwYW50cw0KPiA+ICsgYXZhaWxhYmls
-aXR5DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RyaW5nIHBy
-ZXNlbmNlX3RleHQ6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBVc2VyIGRlZmluZWQgc3RhdHVzIG9mIHRoZQ0KPiA+ICsgY29udmVyc2F0aW9uDQo+
-ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDE2IHByaW9yaXR5
-Og0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQ29u
-dmVyc2F0aW9uIHBhcnRpY2lwYW50DQo+ID4gKyBwcmlvcml0eQ0KPiA+ICsNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgICBQb3NzaWJsZSBlcnJvcnM6IG9yZy5ibHVlei5vYmV4LkVycm9yLklu
-dmFsaWRBcmd1bWVudHMNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIG9yZy5ibHVlei5vYmV4LkVycm9yLkZhaWxlZA0KPiA+ICsNCj4gPiArDQo+ID4gICAgICAg
-ICAgICAgICAgIHZvaWQgVXBkYXRlSW5ib3godm9pZCkNCj4gPg0KPiA+ICAgICAgICAgICAgICAg
-ICAgICAgICAgIFJlcXVlc3QgcmVtb3RlIHRvIHVwZGF0ZSBpdHMgaW5ib3guDQo+ID4gLS0NCj4g
-PiAyLjcuNA0KPiA+DQo+IA0KPiANCj4gLS0NCj4gTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KDQpU
-aGFua3MuDQpBamF5IEtpc2hvcmUNCg==
+From: howardchung <howardchung@google.com>
+
+The crash with stack trace:
+
+(libc-2.27.so -raise.c:51 )      		raise
+(libc-2.27.so -abort.c:79 )      		abort
+(libc-2.27.so -libc_fatal.c:181 )        	__libc_message
+(libc-2.27.so -malloc.c:5350 )   		malloc_printerr
+(libc-2.27.so -malloc.c:4157 )   		_int_free
+(libglib-2.0.so.0.5200.3 -gslist.c:878 )        g_slist_free_full
+(bluetoothd -a2dp.c:165 )       		setup_unref
+(bluetoothd -a2dp.c:2184 )      		a2dp_cancel
+(bluetoothd -sink.c:317 )       		sink_unregister
+(bluetoothd -service.c:176 )    		service_remove
+(bluetoothd -device.c:4678 )    		device_remove
+(bluetoothd -adapter.c:6573 )   		adapter_remove
+(bluetoothd -adapter.c:8832 )   		index_removed
+(bluetoothd -queue.c:220 )      		queue_foreach
+(bluetoothd -mgmt.c:304 )       		can_read_data
+(bluetoothd -io-glib.c:170 )    		watch_callback
+(libglib-2.0.so.0.5200.3 -gmain.c:3234 )        g_main_context_dispatch
+(libglib-2.0.so.0.5200.3 -gmain.c:3972 )        g_main_context_iterate
+(libglib-2.0.so.0.5200.3 -gmain.c:4168 )        g_main_loop_run
+(bluetoothd -main.c:798 )       		main
+(libc-2.27.so -libc-start.c:308 )        	__libc_start_main
+(bluetoothd + 0x0000b089 )      		_start
+(bluetoothd + 0x0000b05f )      		_init
+
+triggered when 'usb disconnect' happened during AVDTP_SET_CONFIGURATION
+request is sent but haven't recevied the responce.
+In this situation, the recovering process goes into sink.c:sink_free and
+then a2dp.c:a2dp_cancel, avdtp.c:cancel_request, avdtp.c:connection_lost,
+avdtp.c:release_stream.
+
+During recovering, the reference count of setup and avdtp decrease more
+than it increase, which ends up causing the crash.
+
+The reference count of setup decreases one more time since
+a2dp.c:setconf_cfm(called by cfm->set_configuration in
+avdtp.c:cancel_request) was called in the 'error mode', which didn't
+reference the setup, but in a2dp.c:abort_cfm(called by cfm->abort in
+avdtp.c:release_stream), the reference count decreased by 1.
+
+In this case, abort_cfm shouldn't be called as we already know
+setconf_cfm didn't send any request. Setting avdtp_sep_state to
+AVDTP_STATE_ABORTING should avoid this issue.
+
+The reference count of avdtp decrease one more time since
+both sink.c:sink_free and sink.c:sink_set_state(called from
+avdtp.c:connection_lost -> avdtp.c:avdtp_set_state) unreference avdtp
+for the session. The changes in sink.c should avoid the issue.
+
+Signed-off-by: howardchung@google.com <howardchung@google.com>
+---
+How to test:
+        The crash can be simulated by the following procedure.
+        1. injecting sleep(10) right before calling a2dp_config in
+           sink.c:select_complete.
+        2. connect with a bluetooth headset
+        3. run 'rmmod btusb' after ~5 seconds(before the connection
+           complete)
+The procedure can reproduce the crash with ~50% probability.
+Even if the bluetoothd didn't crash or it crashed with different
+signature, the reference count can end up with some invalid number.
+
+After the patch applies, there is no crash after running the test above 10
+times in a row.
+
+ profiles/audio/avdtp.c | 3 +++
+ profiles/audio/sink.c  | 4 +++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 91b1e4b96..f42f21bbb 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -3550,6 +3550,7 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
+ {
+ 	struct seid_req req;
+ 	int ret;
++	struct avdtp_local_sep *sep = stream->lsep;
+ 
+ 	if (!stream && session->discover) {
+ 		/* Don't call cb since it being aborted */
+@@ -3564,6 +3565,8 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
+ 	if (stream->lsep->state == AVDTP_STATE_ABORTING)
+ 		return -EINVAL;
+ 
++	avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
++
+ 	if (session->req && stream == session->req->stream)
+ 		return cancel_request(session, ECANCELED);
+ 
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index 966440534..7c5e77577 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -308,8 +308,10 @@ static void sink_free(struct btd_service *service)
+ 		avdtp_stream_remove_cb(sink->session, sink->stream,
+ 					sink->cb_id);
+ 
+-	if (sink->session)
++	if (sink->session) {
+ 		avdtp_unref(sink->session);
++		sink->session = NULL;
++	}
+ 
+ 	if (sink->connect_id > 0) {
+ 		btd_service_connecting_complete(sink->service, -ECANCELED);
+-- 
+2.24.1.735.g03f4e72817-goog
+
