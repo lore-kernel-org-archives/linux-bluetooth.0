@@ -2,91 +2,128 @@ Return-Path: <SRS0=7lkf=2P=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	LOTS_OF_MONEY,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBEBFC2D0DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 07:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01818C2D0DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 13:03:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACBF72071E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 07:40:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C765D2072A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 13:03:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R8gmP8yt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726185AbfLYHkv (ORCPT
+        id S1726461AbfLYNDN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Dec 2019 02:40:51 -0500
-Received: from mail01.vodafone.es ([217.130.24.71]:43462 "EHLO
-        mail01.vodafone.es" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725992AbfLYHkv (ORCPT
+        Wed, 25 Dec 2019 08:03:13 -0500
+Received: from mail-il1-f175.google.com ([209.85.166.175]:46172 "EHLO
+        mail-il1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726388AbfLYNDM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Dec 2019 02:40:51 -0500
-X-Greylist: delayed 302 seconds by postgrey-1.27 at vger.kernel.org; Wed, 25 Dec 2019 02:40:49 EST
-IronPort-SDR: jQw2iwoYROwyOD/OAet41kcjHu8fzEY7DtooW8Aml02CYtlutIkwOrQ0aId6lQb+dfnSapSF/B
- wFs11xsm8zfQ==
-IronPort-PHdr: =?us-ascii?q?9a23=3AqUJUPB3B8z/s2tuVsmDT+DRfVm0co7zxezQtwd?=
- =?us-ascii?q?8ZseIULPad9pjvdHbS+e9qxAeQG9mCsLQe0bGd7fqocFdDyK7JiGoFfp1IWk?=
- =?us-ascii?q?1NouQttCtkPvS4D1bmJuXhdS0wEZcKflZk+3amLRodQ56mNBXdrXKo8DEdBA?=
- =?us-ascii?q?j0OxZrKeTpAI7SiNm82/yv95HJbAhEmTSwbalsIBmoowjducgbjZV/Iast1x?=
- =?us-ascii?q?XFpWdFdf5Lzm1yP1KTmBj85sa0/JF99ilbpuws+c1dX6jkZqo0VbNXAigoPG?=
- =?us-ascii?q?Az/83rqALMTRCT6XsGU2UZiQRHDg7Y5xznRJjxsy/6tu1g2CmGOMD9UL45VS?=
- =?us-ascii?q?i+46ptVRTljjoMOTwk/2HNksF+gqJVoAi/qRJ83oDbb52aOvVlc6PBf94VWX?=
- =?us-ascii?q?ZNUtpNWyBfBI63cosBD/AGPeZdt4TzoUEBpgakCwm2BePvzz5IhmP33a0kye?=
- =?us-ascii?q?sqDAbL3BA9H9IKrHvUrcj6O70JUe2uyanH1zTDb/dM1Tfh9ofIdg4uoemWUr?=
- =?us-ascii?q?1sa8bR0VUvGhrDg16NqoLlJyuY2voQv2WZ9eZsSOyih3I9pw1vrTWj3Mkhh4?=
- =?us-ascii?q?nPi4kI0F7L7z95z5wwJdCgTU57ZsOrH4VIuiGBMot2XtsiQ2Z1uCYm0rEGuY?=
- =?us-ascii?q?C0fCwNyJk/wh7Qcf2Hc4yS4h39UOadPTh1iGh7eLK4mhm960agyur6Vsaqyl?=
- =?us-ascii?q?pFsDFFnsHNtnALyRPT9tCKRuVg8kqjwzqDyg7e5v1eLUwqmqfXMZAsz74omp?=
- =?us-ascii?q?oWq0vDHyv2mEvsjK+Rc0Up4vSo6/njYrr6p5+TKpV7ihrlP6QrgMO/AOA4Ph?=
- =?us-ascii?q?ISX2eF/eSzyqXj8lflT7lQlv02jrHVsIrGKsQDuq65HwhV354n6xa+CTemzd?=
- =?us-ascii?q?sZkWAcI1JBZRKIkZTpO1bJIPDkDfeymEqskDh1yPDcJLHhAYvCLmLFkLj/eb?=
- =?us-ascii?q?Zx8UlcyBA8zYMX25UBDrAHPeK2UEvsucDfCQM5GxK7zvyhC9hn0I4aH2WVDf?=
- =?us-ascii?q?yjPbvWoGOPs8Yma9GWZYoUpDfjIrBx4/f2l348mEMcY6CkxrMFb3C/G/1nJw?=
- =?us-ascii?q?OUfCy/rM0GFDIut0IGVu3viUGDTzcbM2qvW6k96jggIIevDIOFWo2pjaSI12?=
- =?us-ascii?q?GjAssFNSh9FlmQHCKwJM2/UPAWZXfKLw=3D=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-Anti-Spam-Result: =?us-ascii?q?A2GEKgArEANelyMYgtllgkQBGAEBgns?=
- =?us-ascii?q?3GyASk0JUBnUdihKFM4N8FYYaDIFbDQEBAQEBNQIBAYRAgiIkOBMCAw0BAQU?=
- =?us-ascii?q?BAQEBAQUEAQECEAEBAQEBCBYGhXNCAQwBgWsihBeBA4EsgwOCUymtGhoChSO?=
- =?us-ascii?q?Ec4E2AYwYGnmBB4FEgjKFAgESAWyFIQSNRSGIS2GXfoI+BJYwDYIpAYw4A4J?=
- =?us-ascii?q?UiRGnIoI3VYELgQpxTTiBchmBHU8YDY0sji1AgRYQAk+FQIdcgjIBAQ?=
-X-IPAS-Result: =?us-ascii?q?A2GEKgArEANelyMYgtllgkQBGAEBgns3GyASk0JUBnUdi?=
- =?us-ascii?q?hKFM4N8FYYaDIFbDQEBAQEBNQIBAYRAgiIkOBMCAw0BAQUBAQEBAQUEAQECE?=
- =?us-ascii?q?AEBAQEBCBYGhXNCAQwBgWsihBeBA4EsgwOCUymtGhoChSOEc4E2AYwYGnmBB?=
- =?us-ascii?q?4FEgjKFAgESAWyFIQSNRSGIS2GXfoI+BJYwDYIpAYw4A4JUiRGnIoI3VYELg?=
- =?us-ascii?q?QpxTTiBchmBHU8YDY0sji1AgRYQAk+FQIdcgjIBAQ?=
-X-IronPort-AV: E=Sophos;i="5.69,353,1571695200"; 
-   d="scan'208";a="298569150"
-Received: from mailrel04.vodafone.es ([217.130.24.35])
-  by mail01.vodafone.es with ESMTP; 25 Dec 2019 08:35:46 +0100
-Received: (qmail 32118 invoked from network); 25 Dec 2019 04:33:50 -0000
-Received: from unknown (HELO 192.168.1.88) (seigo@[217.217.179.17])
-          (envelope-sender <tulcidas@mail.telepac.pt>)
-          by mailrel04.vodafone.es (qmail-ldap-1.03) with SMTP
-          for <linux-bluetooth@vger.kernel.org>; 25 Dec 2019 04:33:50 -0000
-Date:   Wed, 25 Dec 2019 05:33:41 +0100 (CET)
-From:   La Primitiva <tulcidas@mail.telepac.pt>
-Reply-To: La Primitiva <laprimitivaes@zohomail.eu>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <23632181.259351.1577248422082.JavaMail.javamailuser@localhost>
-Subject: Take home 750,000 Euros this end of year
+        Wed, 25 Dec 2019 08:03:12 -0500
+Received: by mail-il1-f175.google.com with SMTP id t17so18411431ilm.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Dec 2019 05:03:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7b08XDR+AbC+lQYeeWAZ3Z/WeAZB70qkpNf1wpnsJ0Y=;
+        b=R8gmP8ytAPPd7uGgRXX3C8Z7JqkIKnsNqZ9qwqOBawqn0Pt8JexeacwiG07rbtd3Ct
+         ywmW4IU+2VskxkoX+YTeH2rJ2BIZC6g5QGOBwYTAmFd6S8Um91khNKMw3Y03s/0TYjLY
+         8h/Tz4QS/pNsxw5z3yetvanl52wr8AF56FBO1qMFAp3HaoctttIgg2v6v9pY8oicEdSD
+         GZVqHM4xR+YOMGc0V3vnTH7horJ6tmRsCrOz5xs4ip4bRmDN0sx6a9fTtyyuH/ACuTjM
+         LqIOr//K22SWt1Kr2W1/HtzlTofKRA5ePuCTzlial3POEkCn2AT7sdTwsDab7r/9VbtN
+         h5qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7b08XDR+AbC+lQYeeWAZ3Z/WeAZB70qkpNf1wpnsJ0Y=;
+        b=ij9G8R2qQDj6XTffx1wTC7ajR612NOUYFm7dli0Mbl73pcbzuho/HjkTJIIHVScg2A
+         HAygW1Yqov6dtg7YzxIkg+L1IHxYBlWsIP2sMDn7x8ARYjp03abFz+FgxPIMusKpM8gc
+         jV3cizzd+HdBLLVxqHEZxeTkk/Kk91LctCZHDH6TDZFULzs+LLoxYu7ps/VdLnEWenC0
+         9Vy3yyVxf/sS71Mc8VhUK8C0qrh0X55+EM3kcr272h60x/MIrzG9x1TIzqwiWfWbfKVe
+         8g9aeDVi84a3lVObl/yS0wB7+kYEMjKdW9b5qkHEoIlFThj9RIDURNHMLB7zwF62oY3v
+         1ktA==
+X-Gm-Message-State: APjAAAUN0B7bIzdZbx5d5cMuKGC1NNqkxjSexhgRMic4lXAqEvRcfPIo
+        qizhhGZ96AOpfJSyPkjs53iCDP7cQj2slnXG8PPByA==
+X-Google-Smtp-Source: APXvYqwWaEOA+3USiXkdgDCdKsLaLTMuqHt4GY/VRZ5+hfh3jpAlGwUJRSiytpMeJ3UvktUGd22B4AcoBYiaqAUQsmM=
+X-Received: by 2002:a92:8311:: with SMTP id f17mr35924368ild.82.1577278992077;
+ Wed, 25 Dec 2019 05:03:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <CAD-V9V03cvgp_1W_vjV5GeAyXp+KxaG-8so++8bvSf-zyL07bA@mail.gmail.com>
+In-Reply-To: <CAD-V9V03cvgp_1W_vjV5GeAyXp+KxaG-8so++8bvSf-zyL07bA@mail.gmail.com>
+From:   Caio Vinicius Santesso <caiovss@gmail.com>
+Date:   Wed, 25 Dec 2019 13:03:01 +0000
+Message-ID: <CAD-V9V1XFROX-mgh9sPVGUZPArH_D5-b2T=qRXB87UrZnROqkg@mail.gmail.com>
+Subject: Fwd: Bluetooth: btusb: Additional Realtek 8822CE Bluetooth device
+To:     marcel@holtmann.org
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Attn: Email User,
+The ASUS TUF Gaming FX505DV_FX505DV laptop contains a Realtek RTL8822CE device.
 
-You have won, you are to reply back with your name and phone number for
-claim.
+lsusb output with relevant ID.
+Bus 003 Device 002: ID 13d3:3548 IMC Networks Bluetooth Radio
 
-La Primitiva
+The /sys/kernel/debug/usb/devices portion for this device is:
+
+T:  Bus=03 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3548 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+The device was able to scan just some of the Bluetooth devices in
+pairing mode while using Linux kernel 5.4.0-9-generic. Dualshock 4
+wasn't being identified for instance.
+
+So, I've added the following line (#389)  inside the blacklist_table[]
+block to linux-5.4.6/drivers/bluetooth/btusb.c
+{ USB_DEVICE(0x13d3, 0x3548), .driver_info = BTUSB_REALTEK },
+
+built it, and copied to the following directory
+make -C /lib/modules/5.4.0-9-generic/build M=$PWD modules
+sudo cp btusb.ko /lib/modules/5.4.0-9-generic/kernel/drivers/bluetooth/
+
+loaded and reloaded the relevant module.
+sudo modprobe -r btusb
+sudo modprobe btusb
 
 
+Now it is working properly.
+$ bluetoothctl devices
+Device A4:53:85:F5:04:7C Wireless Controller
 
 
-----------------------------------------------------
-This email was sent by the shareware version of Postman Professional.
-
+Caio V. S. Santesso
