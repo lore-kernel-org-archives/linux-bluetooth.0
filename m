@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C752C2D0D2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 06:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA310C2D0D5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 06:03:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 08CD72072A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 06:03:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE1882072A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Dec 2019 06:03:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="jD6Yoz3g"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="NXvzOASD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726371AbfLYGDb (ORCPT
+        id S1726866AbfLYGDe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Dec 2019 01:03:31 -0500
-Received: from mail26.static.mailgun.info ([104.130.122.26]:62154 "EHLO
-        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726388AbfLYGDa (ORCPT
+        Wed, 25 Dec 2019 01:03:34 -0500
+Received: from mail25.static.mailgun.info ([104.130.122.25]:36923 "EHLO
+        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726464AbfLYGDc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Dec 2019 01:03:30 -0500
+        Wed, 25 Dec 2019 01:03:32 -0500
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1577253810; h=References: In-Reply-To: Message-Id: Date:
+ s=smtp; t=1577253811; h=References: In-Reply-To: Message-Id: Date:
  Subject: Cc: To: From: Sender;
- bh=0JaZpRNzIAOhHOHQvAOYMrOTx4xK+wS+FRSzKysbEps=; b=jD6Yoz3gqUKBIkHY1shpY/DG44YRrWjMEJXtcuA3FNij+d7NPaJUp/MDiCehn3NsoeYB08oj
- qZf0Lv9ge8kI1p3g8N87Rfnwfc0ix4Dk5sPGdbNnPaSwnbYA0g0nsdE/pG62T7J4ZXbEsejC
- 80LTDa1inM9QesnWxKw6Ipcbz6o=
-X-Mailgun-Sending-Ip: 104.130.122.26
+ bh=oeRDJ8YBxG1EayBOnnnqVT+S7ve4iE7EuuMGy7WmKCE=; b=NXvzOASD0F8Rmkx1dko19Umv/y7O8ielUlLE81jmVEDUNF8vFopmw3MRvqYeAb7Rux7RbIC2
+ DhoTx2iiPQaDhQzzjLdL+qU+wyog2mKWcZ+ynTyyrWZ12wiKiJHI4/sLAl8BkvqofZzoObNQ
+ PnXIV7oWxcsJSFCK4bp/cwvB4rE=
+X-Mailgun-Sending-Ip: 104.130.122.25
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e02fbae.7fe013371490-smtp-out-n03;
- Wed, 25 Dec 2019 06:03:26 -0000 (UTC)
+ by mxa.mailgun.org with ESMTP id 5e02fbb3.7f9f6a097298-smtp-out-n03;
+ Wed, 25 Dec 2019 06:03:31 -0000 (UTC)
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 65D9DC433A2; Wed, 25 Dec 2019 06:03:25 +0000 (UTC)
+        id 5DB61C433A2; Wed, 25 Dec 2019 06:03:30 +0000 (UTC)
 Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 783BBC43383;
-        Wed, 25 Dec 2019 06:03:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 783BBC43383
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9A9F0C4479D;
+        Wed, 25 Dec 2019 06:03:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 9A9F0C4479D
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
 From:   Rocky Liao <rjliao@codeaurora.org>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com
 Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-arm-msm@vger.kernel.org, Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v1 2/4] Bluetooth: hci_qca: Retry btsoc initialize when it fails
-Date:   Wed, 25 Dec 2019 14:03:15 +0800
-Message-Id: <20191225060317.5258-2-rjliao@codeaurora.org>
+Subject: [PATCH v1 4/4] Bluetooth: hci_qca: Add HCI command timeout handling
+Date:   Wed, 25 Dec 2019 14:03:17 +0800
+Message-Id: <20191225060317.5258-4-rjliao@codeaurora.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191225060317.5258-1-rjliao@codeaurora.org>
 References: <20191225060317.5258-1-rjliao@codeaurora.org>
@@ -60,83 +60,95 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds the retry of btsoc initialization when it fails. There are
-reports that the btsoc initialization may fail on some platforms but the
-repro ratio is very low. The failure may be caused by UART, platform HW or
-the btsoc itself but it's very difficlut to root cause, given the repro
-ratio is very low. Add a retry for the btsoc initialization will resolve
-most of the failures and make Bluetooth finally works.
+This patch adds the HCI command timeout handling, it will trigger btsoc
+to report its memory dump via vendor specific events when hit the defined
+max HCI command timeout count. After all the memory dump VSE are sent, the
+btsoc will also send a HCI_HW_ERROR event to host and this will cause a new
+hci down/up process and the btsoc will be re-initialized.
 
 Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 ---
- drivers/bluetooth/hci_qca.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ drivers/bluetooth/hci_qca.c | 40 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 43fd84028786..45042aa27fa4 100644
+index 7e202041ed77..bc74d69b3d80 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -53,6 +53,9 @@
- /* Controller debug log header */
- #define QCA_DEBUG_HANDLE	0x2EDC
+@@ -47,6 +47,8 @@
+ #define IBS_HOST_TX_IDLE_TIMEOUT_MS	2000
+ #define CMD_TRANS_TIMEOUT_MS		100
  
-+/* max retry count when init fails */
-+#define QCA_MAX_INIT_RETRY_COUNT 3
++#define QCA_BTSOC_DUMP_CMD	0xFB
++
+ /* susclk rate */
+ #define SUSCLK_RATE_32KHZ	32768
+ 
+@@ -56,6 +58,9 @@
+ /* max retry count when init fails */
+ #define QCA_MAX_INIT_RETRY_COUNT 3
+ 
++/* when hit the max cmd time out count, trigger btsoc dump */
++#define QCA_MAX_CMD_TIMEOUT_COUNT 3
 +
  enum qca_flags {
  	QCA_IBS_ENABLED,
  	QCA_DROP_VENDOR_EVENT,
-@@ -1257,7 +1260,9 @@ static int qca_setup(struct hci_uart *hu)
+@@ -170,6 +175,7 @@ static int qca_regulator_enable(struct qca_serdev *qcadev);
+ static void qca_regulator_disable(struct qca_serdev *qcadev);
+ static void qca_power_shutdown(struct hci_uart *hu);
+ static int qca_power_off(struct hci_dev *hdev);
++static void qca_cmd_timeout(struct hci_uart *hu);
+ 
+ static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
  {
- 	struct hci_dev *hdev = hu->hdev;
- 	struct qca_data *qca = hu->priv;
-+	struct qca_serdev *qcadev;
- 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
-+	unsigned int init_retry_count = 0;
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 	const char *firmware_name = qca_get_firmware_name(hu);
- 	int ret;
-@@ -1275,6 +1280,7 @@ static int qca_setup(struct hci_uart *hu)
- 	 */
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 
-+retry:
- 	if (qca_is_wcn399x(soc_type)) {
- 		bt_dev_info(hdev, "setting up wcn3990");
- 
-@@ -1293,6 +1299,12 @@ static int qca_setup(struct hci_uart *hu)
- 			return ret;
- 	} else {
- 		bt_dev_info(hdev, "ROME setup");
-+		if (hu->serdev) {
-+			qcadev = serdev_device_get_drvdata(hu->serdev);
-+			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-+			/* Controller needs time to bootup. */
-+			msleep(150);
-+		}
- 		qca_set_speed(hu, QCA_INIT_SPEED);
- 	}
- 
-@@ -1329,6 +1341,20 @@ static int qca_setup(struct hci_uart *hu)
- 		 * patch/nvm-config is found, so run with original fw/config.
- 		 */
+@@ -1337,6 +1343,8 @@ static int qca_setup(struct hci_uart *hu)
+ 	if (!ret) {
+ 		set_bit(QCA_IBS_ENABLED, &qca->flags);
+ 		qca_debugfs_init(hdev);
++		hdev->cmd_timeout = qca_cmd_timeout;
++		qca->cmd_timeout_cnt = 0;
+ 	} else if (ret == -ENOENT) {
+ 		/* No patch/nvm-config found, run with original fw/config */
  		ret = 0;
-+	} else {
-+		if (init_retry_count < QCA_MAX_INIT_RETRY_COUNT) {
-+			qca_power_off(hdev);
-+			if (hu->serdev) {
-+				serdev_device_close(hu->serdev);
-+				ret = serdev_device_open(hu->serdev);
-+				if (ret) {
-+					bt_dev_err(hu->hdev, "open port fail");
-+					return ret;
-+				}
-+			}
-+			init_retry_count++;
-+			goto retry;
-+		}
- 	}
+@@ -1467,6 +1475,38 @@ static int qca_power_off(struct hci_dev *hdev)
+ 	return 0;
+ }
  
- 	/* Setup bdaddr */
++static int qca_send_btsoc_dump_cmd(struct hci_uart *hu)
++{
++	int err = 0;
++	struct sk_buff *skb = NULL;
++	struct qca_data *qca = hu->priv;
++
++	BT_DBG("hu %p sending btsoc dump command", hu);
++
++	skb = bt_skb_alloc(1, GFP_ATOMIC);
++	if (!skb) {
++		BT_ERR("Failed to allocate memory for qca dump command");
++		return -ENOMEM;
++	}
++
++	skb_put_u8(skb, QCA_BTSOC_DUMP_CMD);
++
++	skb_queue_tail(&qca->txq, skb);
++
++	return err;
++}
++
++
++static void qca_cmd_timeout(struct hci_uart *hu)
++{
++	struct qca_data *qca = hu->priv;
++
++	BT_ERR("hu %p hci cmd timeout count=0x%x", hu, ++qca->cmd_timeout_cnt);
++
++	if (qca->cmd_timeout_cnt >= QCA_MAX_CMD_TIMEOUT_COUNT)
++		qca_send_btsoc_dump_cmd(hu);
++}
++
+ static int qca_regulator_enable(struct qca_serdev *qcadev)
+ {
+ 	struct qca_power *power = qcadev->bt_power;
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
