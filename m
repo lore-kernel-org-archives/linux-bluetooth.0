@@ -1,142 +1,168 @@
-Return-Path: <SRS0=ktGh=2V=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=h36O=2W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C8BC2D0C2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Dec 2019 17:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C37C2D0DC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jan 2020 14:02:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A91C7206DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Dec 2019 17:35:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0C3E206E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jan 2020 14:02:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="W205/VOV"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="A7cCZzyG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727066AbfLaRfm (ORCPT
+        id S1726643AbgAAOCo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Dec 2019 12:35:42 -0500
-Received: from mail-wr1-f53.google.com ([209.85.221.53]:46622 "EHLO
-        mail-wr1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726060AbfLaRfl (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Dec 2019 12:35:41 -0500
-Received: by mail-wr1-f53.google.com with SMTP id z7so35595433wrl.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Dec 2019 09:35:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20161025;
-        h=subject:cc:references:to:from:autocrypt:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=080LC8i60JO9ETHTM8jcnTT8mihpAb1MOPKSH132ZgM=;
-        b=W205/VOVIu8g4cGdZq8T6ruLVWWfIv/bCY2nOzrIAop0+5CPw1LrMlfC9aXHL3to8M
-         9O+2MOK57sL/3rMfU6G9LoJ0V7eNP0AGByz9f0s//iSI0w7ZtLLE21/KDV1PJLvoDH4i
-         oWhuTHLaPFcLuzaA4AsLAt/GgW9bHWgsFebrWj87oLuxdXofe6Fofay9Ta9T9JMHSkHO
-         zxf4f/zYzLegV1Qz+QTuDd8hNs0XYbSaFg2ryS5/zTwHT+I5d+TvuT+YB2zftvMD8mDl
-         jJGlDgDxGV7YA3W3gDDecwt1bidrW6LOYn1R0kkWqrBBPo7w1dPb7NuAKXCLAz+jHhY/
-         Tl1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:cc:references:to:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=080LC8i60JO9ETHTM8jcnTT8mihpAb1MOPKSH132ZgM=;
-        b=TOuFvgmS9hhhdTkNvU7IgornDekTj+bnQN6TVrNI6oQMOtT0evNcDVWXqLaYreDm/H
-         cdEDijgjoY4uTDQq7OV8ZxlSsG+wwn+aLlxhhodieCTbybeZcNnVycbJs10nSMCD67VP
-         09JkVUuYUITbzIZvObzjDBIhSornUavq/Dxxr0afFiDBQP6vJqJF98NAu3ievBlexr1f
-         RdmY+AvV/dmF7JADASywKq9G+IEpxPSR0Yq5+mJQcUF4dZNKODx+QgPOZGreTwNZ/E3E
-         DXE8U0vB6mRFUO12HkMDQNXEA12lXO2loAGvyXT0D9rUmbfzWdWuhVoRiPSQ1HG7/kat
-         /aIg==
-X-Gm-Message-State: APjAAAWoalGx1NgfiKNHjY9O4LNg5gUnioN4bC1mauzfXy4NPyQcwXN+
-        IjZ78IIidihYg16zO16nHsZN9j0X
-X-Google-Smtp-Source: APXvYqxTNAFewcNttH8UQVWIB94rNOxfQ5DcB5TafCbjHjmw5yC5nxfoLuSwUEMijShNiNqfHbrj3A==
-X-Received: by 2002:adf:ee92:: with SMTP id b18mr76526638wro.281.1577813739331;
-        Tue, 31 Dec 2019 09:35:39 -0800 (PST)
-Received: from [192.168.200.12] (p4FD25D76.dip0.t-ipconnect.de. [79.210.93.118])
-        by smtp.gmail.com with ESMTPSA id v14sm49165148wrm.28.2019.12.31.09.35.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Dec 2019 09:35:38 -0800 (PST)
-Subject: Re: deprecated tools: rfcomm, can we un-deprecate it?
-Cc:     Marcel Holtmann <marcel@holtmann.org>
-References: <0aad7250-65f9-3e4c-e5ca-434139a9ae64@message-id.googlemail.com>
- <2203E98B-B581-4C14-94DF-164D7E036234@holtmann.org>
-To:     BlueZ devel list <linux-bluetooth@vger.kernel.org>
-From:   Stefan Seyfried <stefan.seyfried@googlemail.com>
-Autocrypt: addr=stefan.seyfried@googlemail.com; prefer-encrypt=mutual;
- keydata=
- mQGiBDqoB5ARBACZn/K+5V0uoo0Wr9cI9hw5vPioOmIbPv30x47j/w/XNECPSzos078v9Fr2
- Mlz0MG9Gnpl9S1o0OIh//K5xxj2/LRLO2nL9/nqlnwmJ6W5qrjjn6Ch3mxz5mxMeRMRMY1cZ
- EkSj7GH3ZLviZlzrnpuJd12HWsXhAwVxUyQnvsvNzwCgpIO6EfQT33o9illpG/AxIk2Uu0cD
- /A4cgKbm5VZW5DPTlLe8P92eEgj5cN51SUXHXYgWBI0Fx+QwSYm6ON0U03B4oR5zDWMHkJfZ
- WgXROdwY/NqouBoV7lXvHsyInPzExNixe+1vcrhDJ3ow6nlCW77aCFp22iwumC4ouzFtOMXK
- kih0WPrxPKq27Hw9fq9EaR2oV2tUBACN6ZC+G7J21ruG9slJ+bFcY5cW7M5Um6Czk08T+vtd
- 7fAg+fEUcGCtIdVdHrXBut07K9y6iy5IuqwAV5fJsE+JQO+f+X1pymdRgdWHGEoMMdEW4k3W
- IGjrmmMUtpqzr30h4WFgA4+0nR3jpmcGCWBSa4selQecyyOlM7rcmKyQNrQkU3RlZmFuIFNl
- eWZyaWVkIDxzZWlmZUBvcGVuc3VzZS5vcmc+iGAEExECACAFAkx9Sb0CGyMGCwkIBwMCBBUC
- CAMEFgIDAQIeAQIXgAAKCRAx00vNNldAmFZuAJ9xLbFShKeTTDgfwMUmO37qw07npACgmLIK
- fbArokRryKixiliTvxAgFHG5AQ0EOqgHkhAEALGQaS9Hj25lKGsaTOMKMBBvjklv6brH8JdF
- WTA9dr37spc+PFFyc9686bcT+5nkbpjq3ndXUzGdGzfe0YwOlQh4fWXZT/oTXosIBqDWPShE
- ntDU8BX9JVqBBZwJ/ey+QF5tgYrICjCzp8S/mL6sqw8En4/AS84lulAoNJMJsUcDAAMFA/4p
- ik7hBklqJzYC7uNWZDL9dkYwIsUXM64kGenUhpgguLZvhuVeUeHU2iIsdTcNBbeBwvXgLnEu
- vVSdf4wtDwR7SjUYebymbGc/JLkXjqGntaWUr+wfHmAm3oXV2X+WFzZQJ+o8N5dJyBEUbrVX
- YvBD7wErgEuJAL+q/i28U9u7OYhGBBgRAgAGBQI6qAeSAAoJEDHTS802V0CYBL8An1gF2k4s
- UaMjAtoX/ixcOhAv44i4AJ9Yi+OgvhS8CbUp+XkI5Q352XU+BQ==
-Message-ID: <fa70a57e-d5f0-a47d-f987-27b46d8275c4@message-id.googlemail.com>
-Date:   Tue, 31 Dec 2019 18:35:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        Wed, 1 Jan 2020 09:02:44 -0500
+Received: from mout.gmx.net ([212.227.17.20]:47441 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725809AbgAAOCn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 1 Jan 2020 09:02:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1577887359;
+        bh=7kmhkdXPBbL1jj3zc0sr6uH68l4x5u6bSPbY7lCoBww=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=A7cCZzyGsDJswKneoS/KZOFCYPG6K4mjXjjrjgbtEnzSqmm42WhRFJ6FYfoRYsdEC
+         P9MzhVYjaGu7w9s6TBEFCHBWElSlAeueLgY6eMszYXC+PN1COuxuEgBGNccf2a4R2M
+         kNpp0kDwzLrTonFR6nidu4Ag+3mVaOLQmYPRCtf0=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from localhost.localdomain ([37.4.249.154]) by mail.gmx.com
+ (mrgmx105 [212.227.17.168]) with ESMTPSA (Nemesis) id
+ 1MJmGP-1j2PDC1OWn-00K6si; Wed, 01 Jan 2020 15:02:39 +0100
+From:   Stefan Wahren <wahrenst@gmx.net>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?q?Ond=C5=99ej=20Jirman?= <megous@megous.com>,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH] Bluetooth: hci_bcm: Drive RTS only for BCM43438
+Date:   Wed,  1 Jan 2020 15:01:34 +0100
+Message-Id: <1577887294-6089-1-git-send-email-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <2203E98B-B581-4C14-94DF-164D7E036234@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:xJplZGoEroUu1vuigD0tjAl4Wq6KAohLgNWl31Vnp+DQVNJEcCr
+ 948uuc7lO2JhdSbqS6YKnb1ZuFph4Rb65Dq+KbnDq2Yjb89E5HMSvhsg4ks0btvwBWzqFpR
+ rnb/9JBS2kjbHKjY0RoVpw8fYBaboX/YFSAjSFnoN6/TFOkmACbfzBMvLNx9ckVMOepfuhG
+ xv/e3EnT97QEUNV8XrbJw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:mNWhPzDDukc=:PIiLxvNGg5nMACH6n4Ux/0
+ r57jFafuT9qFBrJ5TfaOk5/pLaYpQ4NU3rakKvNjaFEwx2bva3Wm6p4Ei7bFS1Ku+cHPzsOzM
+ 2MXZAaP8Gx4r9+irKQ6hJxUjyJ0RSk6TzEIBOG9dVjx7TwjaI2YWaFBYK5sEk6qw4XVrh/DS5
+ GetEVxYil8b1b4e3Jch+yeayLNlnb10APwpVF9KhWAU97a53GeX2CgUuHBLZHAwwTDglf+fyH
+ O/VpNTfQfTMsCRkBM2GY+PoPRhwQRTLqtI+0m6n6kHpcOCBhVWSPFxQ9YDzpqikWAHvl5LhaE
+ RW5Grs51hRolQrjF0MF4I6Nn60x1esqo4g8N+vcwgjfcuXeFJMJbtr1WoMs1RYi2Bw+zBCZ2Q
+ 5KX/zN+oDk1Cy+WOBwthIEiaF4IZPxErz3/gteHgmbXyw02rNbz3te5Z56ZwzsxYUGI77so+O
+ HgHXCmD95JP+coIhU8gxwCH1HSeXjT7i8OKxPgL0m1bBtR3f9c4fdSMuB4CIY4o+kZ90RzKrd
+ L0kqaMkydPv02o4ILtkB1tmL/13rtwB9jADJHCyrcztawypK1Sy5hRNtd+l+4Y+Os00ASopMk
+ glO1ZrXEa/00ipVnFUQ56QXLQtA/F6QQ1d1BL8FCI4sqknupHffxd6QrQW9ICYR6LWvGO0m2I
+ WnNx2fAf9Wo+LHGfv9avKtub6tiYcFs4/8KNQ+f/Nc534+37kd6nIE5Q9FYoZ3liJrEcZsvEo
+ F7jtu8oN2C+j7jOwaxd+CIH6WkBZlJhBdPPSzWeSrUCTsxF7Jp1wQulS4snH2qLU5c/lDTkTS
+ +YiSmVnMteaAP0GsW98SJdZjnBeZDY/b0XNbky1KDwaSVouffmALLq0urAmbyYPB9T5AIeGDp
+ mlm2DKLbBAF3OlPXlW636oxewJko9SNzzQ26b+Lf682HJV8z3SzcHt0q2Q4O6OQuRg8HqUP4W
+ nPcdv7I1+57wuOoXC/y0jBMBEHkVqdeaVZlNjSOlCn7KgEkNGCAudS6V8c+gbOACv/Si/+cZt
+ H1e6jWA5h/ylGISEnrk1lHRwK6tyCP6Znzxun8AkG4gyDeCOxmpImBbOXXzklktlzhhMVEwg6
+ dqJ2FXaNzMDtqikLXlGixJdmiI57oW+cdENh2BhHFxbxludi5V06GPtFdoh3tR/zdb6Z/DN6/
+ CGpxykKtMCd9Nf5EMOPUHXofGBNkSKMN17RDdfEsgN3B5KQ2hWw0f8E981pVbbLoF0GTSr9pK
+ 3g5dioNizp4zHqG4fTKUbMWvynRrFZ7m1hgyn//Weyzxx0ycMGEl6ZtS3AQI=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+The commit 3347a80965b3 ("Bluetooth: hci_bcm: Fix RTS handling during
+startup") is causing at least a regression for AP6256 on Orange Pi 3.
+So do the RTS line handing during startup only on the necessary platform.
 
-thanks for the response.
+Fixes: 3347a80965b3 ("Bluetooth: hci_bcm: Fix RTS handling during startup"=
+)
+Reported-by: Ond=C5=99ej Jirman <megous@megous.com>
+Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+=2D--
+ drivers/bluetooth/hci_bcm.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-Am 26.12.19 um 21:40 schrieb Marcel Holtmann:
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index bbfaf0c..769bb44 100644
+=2D-- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -53,6 +53,7 @@
+  */
+ struct bcm_device_data {
+ 	bool	no_early_set_baudrate;
++	bool	drive_rts_on_open;
+ };
 
->> So is there a way to set up a rfcomm device via bluetoothctl? I could
->> not find one, but maybe I did not look hard enough?
->>
->> If not, could we please un-deprecate rfcomm, because having everyone out
->> there reinvent the functionality in crazy ways probably is not a good idea.
->>
->> Or should I just continue to build the package with --enable-deprecated?
->> But that will ship tools with known unfixed security issues (hcidump).
-> 
-> have a look at doc/profile-api.txt.
+ /**
+@@ -122,6 +123,7 @@ struct bcm_device {
+ 	bool			is_suspended;
+ #endif
+ 	bool			no_early_set_baudrate;
++	bool			drive_rts_on_open;
+ 	u8			pcm_int_params[5];
+ };
 
-This would be for creating a "rfcomm service" for other devices to
-connect to, right? (The equivalent of "rfcomm listen...")
+@@ -456,7 +458,9 @@ static int bcm_open(struct hci_uart *hu)
 
-But how would I connect e.g. to my serial module (I got this for trying
-it by myself instead of relying on bugreporters results...), so what's
-the dbus equivalent of "rfcomm connect hci0 <bdaddr> <channel>"?
+ out:
+ 	if (bcm->dev) {
+-		hci_uart_set_flow_control(hu, true);
++		if (bcm->dev->drive_rts_on_open)
++			hci_uart_set_flow_control(hu, true);
++
+ 		hu->init_speed =3D bcm->dev->init_speed;
 
-Some small example python script for this in test_scripts would be
-really useful, as the knowledge on how to handle this seems
-non-existent: all the various bluetooth codebases checked (e.g. blueman,
-pybluez) just re-implement the code in tools/rfcomm.c's cmd_connect
-(socket, bind, connect, ioctl RFCOMMCREATEDEV, ...).
+ 		/* If oper_speed is set, ldisc/serdev will set the baudrate
+@@ -466,7 +470,10 @@ static int bcm_open(struct hci_uart *hu)
+ 			hu->oper_speed =3D bcm->dev->oper_speed;
 
-Now from reading the kernel code, RFCOMMCREATEDEV seems to be the way to
-create an rfcomm device.
-The only place in bluez source code that uses RFCOMMCREATEDEV is...
-tools/rfcomm.c.
-So maybe the rfcomm tool is not as deprecated as we all thought? ;-)
+ 		err =3D bcm_gpio_set_power(bcm->dev, true);
+-		hci_uart_set_flow_control(hu, false);
++
++		if (bcm->dev->drive_rts_on_open)
++			hci_uart_set_flow_control(hu, false);
++
+ 		if (err)
+ 			goto err_unset_hu;
+ 	}
+@@ -1447,8 +1454,10 @@ static int bcm_serdev_probe(struct serdev_device *s=
+erdev)
+ 		dev_err(&serdev->dev, "Failed to power down\n");
 
-Best regards,
+ 	data =3D device_get_match_data(bcmdev->dev);
+-	if (data)
++	if (data) {
+ 		bcmdev->no_early_set_baudrate =3D data->no_early_set_baudrate;
++		bcmdev->drive_rts_on_open =3D data->drive_rts_on_open;
++	}
 
-	Stefan
--- 
-Stefan Seyfried
+ 	return hci_uart_register_device(&bcmdev->serdev_hu, &bcm_proto);
+ }
+@@ -1465,12 +1474,16 @@ static struct bcm_device_data bcm4354_device_data =
+=3D {
+ 	.no_early_set_baudrate =3D true,
+ };
 
-"For a successful technology, reality must take precedence over
- public relations, for nature cannot be fooled." -- Richard Feynman
++static struct bcm_device_data bcm43438_device_data =3D {
++	.drive_rts_on_open =3D true,
++};
++
+ static const struct of_device_id bcm_bluetooth_of_match[] =3D {
+ 	{ .compatible =3D "brcm,bcm20702a1" },
+ 	{ .compatible =3D "brcm,bcm4329-bt" },
+ 	{ .compatible =3D "brcm,bcm4345c5" },
+ 	{ .compatible =3D "brcm,bcm4330-bt" },
+-	{ .compatible =3D "brcm,bcm43438-bt" },
++	{ .compatible =3D "brcm,bcm43438-bt", .data =3D &bcm43438_device_data },
+ 	{ .compatible =3D "brcm,bcm43540-bt", .data =3D &bcm4354_device_data },
+ 	{ .compatible =3D "brcm,bcm4335a0" },
+ 	{ },
+=2D-
+2.7.4
+
