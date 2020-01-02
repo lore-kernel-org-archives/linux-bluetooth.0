@@ -2,219 +2,266 @@ Return-Path: <SRS0=Qv9v=2X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9DCDC3276C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 19:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 328EFC3276C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 23:01:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B1DF021835
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 19:07:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC98721D7D
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 23:01:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oVxX1Knt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kvF63mrZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728157AbgABTHa (ORCPT
+        id S1727701AbgABXBE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jan 2020 14:07:30 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:45149 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728074AbgABTHa (ORCPT
+        Thu, 2 Jan 2020 18:01:04 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:56126 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728293AbgABXBC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jan 2020 14:07:30 -0500
-Received: by mail-pg1-f196.google.com with SMTP id b9so22304147pgk.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2020 11:07:30 -0800 (PST)
+        Thu, 2 Jan 2020 18:01:02 -0500
+Received: by mail-pj1-f65.google.com with SMTP id d5so3848920pjz.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2020 15:01:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Ns/i9Oa6qRXMr64PI7szGSN7BWAj/fmeJPxZe1MnizY=;
-        b=oVxX1Knt/R/3nB229kEwTKYVJOHzqxICyECe0tKOS3C9ldeT+jAJTeN3ZMZ/NVjNjo
-         0boUSN6vtNZOtKS1HSFVmLsGiFm2piaawTcuwDNwPT2Er5TQMRZDmCOz7yo5YGsmzi/5
-         HHu4kdc/M7LQoIGa7/ldglhJoXsjqECIycu7c=
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=7tKXYKPkHBK162bq0SRMS9f5TMCqjiPhJER2UPdGUm8=;
+        b=kvF63mrZXMZfwC2bQDCY2rfmWfu9IP3Jl45FtyY+NdCtw9DXSRKYHxOpjGko4Efxlu
+         JUN1GjsD32ZhqjDoZN93MEcY/MP+EY9KSDrxcpNw+Z9r9tHT5IfzhvWo4zvCgdrYqJQ9
+         8duXvLkziDvCD1EfCpMrW022ojRPs3UwRgVgZjlrGYdTl5K4X4Qr/Q3EX83RAltwcarD
+         plGA80yLrufmse5x0tR4xs6VohVx+PuApgvDpsTD5gLWH6A6NsmwKb9StliwHiUKTER7
+         xwcZBO/yU1E6HlpeeRZDrxj7u6Ptbds0tQyfn1V2cNa/lIMv/AiVX+WC/bqyHhWzXY5F
+         ysTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Ns/i9Oa6qRXMr64PI7szGSN7BWAj/fmeJPxZe1MnizY=;
-        b=indmu7pI08EEDnhsK3ACMVfaJaQ+0Wm2Pq3bxUGuhtxZNkS+qvIuPz1ZvZ0BzL8lNk
-         UHsHXE2pPFQL/Jr9//Koq3f6PN7nU6VfFRV4B97vlMUpODnWZaE3BDRxJU9hGmuTXqdg
-         OZ6qLi7q/KXzasqyeki1r6xMKDHUk+b/kf+PlPweavXQ8TJNyL4ZJuYcephWsq9Q8MSK
-         nyQ+IDj6J4g/BxeKlCr9e6RMCeEjvlXSYxzJebdzaDF2inU8bQpNJfKR18twH6G8ikhI
-         mtrFPOCwcNIMKe4nXushjtU7WgLbEhpCn82eIoP/JoyCTGBWTGDe4isjXBGjK1oR6UTr
-         5J9g==
-X-Gm-Message-State: APjAAAWSz28HnriwzvRhyxtjakxMlk+BSLCXTE27hoenDDfKbqLU74eZ
-        8n7uzo8C+N2YqqOqbPsSujc2IA==
-X-Google-Smtp-Source: APXvYqzW/C/2CXlgrd1xB24BgIpm2Szz8CfkC/Ks5s8kCCNGxRt2QDxrQh9ezYm320THOa8knFTpyw==
-X-Received: by 2002:a62:5447:: with SMTP id i68mr81577777pfb.44.1577992049403;
-        Thu, 02 Jan 2020 11:07:29 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id z6sm50037106pfa.155.2020.01.02.11.07.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2020 11:07:28 -0800 (PST)
-Date:   Thu, 2 Jan 2020 11:07:27 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] Bluetooth: hci_qca: Add HCI command timeout
- handling
-Message-ID: <20200102190727.GB89495@google.com>
-References: <20191225060317.5258-1-rjliao@codeaurora.org>
- <20191227072130.29431-1-rjliao@codeaurora.org>
- <20191227072130.29431-4-rjliao@codeaurora.org>
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=7tKXYKPkHBK162bq0SRMS9f5TMCqjiPhJER2UPdGUm8=;
+        b=h/0aFx5HmujhNFNmsorDiPWEEUHcZmc2TTHNgkpv2Cpo2lJtWdKUzFG3LZsxKkm9r/
+         ZzFyvq/zVx8NDfuRNGakPWyPoLYf/nYxOYu2WUUTG6ru/WcA0hzsenjp+aZvbIZMvq1g
+         j6AZXdfAgByLOJD+OcLzsA9KL1JAVcYHW35zYxpyKDQHtgAAm8Mg0C0S2gddIC9jATqh
+         s3+bNK9aIuxbwlnybhdvp8iTr4LIJN69q8FVReh3C1XJ6B4XihythqvHW9pNdg0HH/3c
+         o3HEvMGxzwZCVnRgWvKTUKf5uijwG7sumlziD2JNUBlTHyZDj2YupFiEZ4UShDeizofh
+         4T5Q==
+X-Gm-Message-State: APjAAAUDtWMpy7we45R4bzqlConEdlblpuGVP996sraptAMFakgiWr7k
+        3uhq1NKJu0iz0BWgAXszu539fxp1cro=
+X-Google-Smtp-Source: APXvYqyjUC6KwqoyIHRURymI2tUJNCFFxLzx5cYQRXScSdqjzPeYC1nkGoQuAsLVsBLAsQQ9YhYMRg==
+X-Received: by 2002:a17:902:9a8f:: with SMTP id w15mr87258532plp.149.1578006060619;
+        Thu, 02 Jan 2020 15:01:00 -0800 (PST)
+Received: from vudentzs-t460s.hsd1.or.comcast.net ([2601:1c0:6800:1640::3287])
+        by smtp.gmail.com with ESMTPSA id 83sm61468946pgh.12.2020.01.02.15.00.59
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2020 15:01:00 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC 2/3] Bluetooth: Add BT_PHYS socket option
+Date:   Thu,  2 Jan 2020 15:00:56 -0800
+Message-Id: <20200102230057.31326-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200102230057.31326-1-luiz.dentz@gmail.com>
+References: <20200102230057.31326-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191227072130.29431-4-rjliao@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rocky,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Dec 27, 2019 at 03:21:30PM +0800, Rocky Liao wrote:
-> This patch adds the HCI command timeout handling, it will trigger btsoc
-> to report its memory dump via vendor specific events when hit the defined
-> max HCI command timeout count. After all the memory dump VSE are sent, the
-> btsoc will also send a HCI_HW_ERROR event to host and this will cause a new
-> hci down/up process and the btsoc will be re-initialized.
-> 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
-> 
-> Changes in v2:
-> - Fix build error
-> Changes in v3:
-> - Remove the function declaration 
-> - Move the cmd_timeout() callback register to probe()
-> - Remove the redundant empty line
-> 
->  drivers/bluetooth/hci_qca.c | 45 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index ca0b38f065e5..026e2e2cdd30 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -47,6 +47,8 @@
->  #define IBS_HOST_TX_IDLE_TIMEOUT_MS	2000
->  #define CMD_TRANS_TIMEOUT_MS		100
->  
-> +#define QCA_BTSOC_DUMP_CMD	0xFB
-> +
->  /* susclk rate */
->  #define SUSCLK_RATE_32KHZ	32768
->  
-> @@ -56,6 +58,9 @@
->  /* max retry count when init fails */
->  #define QCA_MAX_INIT_RETRY_COUNT 3
->  
-> +/* when hit the max cmd time out count, trigger btsoc dump */
-> +#define QCA_MAX_CMD_TIMEOUT_COUNT 3
+This adds BT_PHYS socket option which can be used to read the PHYs in
+use by the underline connection.
 
-nit: MAX_CMD_TIMEOUTS?
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/bluetooth.h | 17 ++++++++
+ include/net/bluetooth/hci_core.h  |  2 +
+ net/bluetooth/hci_conn.c          | 64 +++++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_sock.c        | 13 +++++++
+ net/bluetooth/sco.c               | 13 +++++++
+ 5 files changed, 109 insertions(+)
 
-Similar to QCA_MAX_INIT_RETRY_COUNT on which I commented earlier I don't
-think the 'QCA' prefix adds value here. The constant is defined in the driver
-itself and isn't related to hardware.
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index e42bb8e03c09..69c0e7eb26d9 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -121,6 +121,23 @@ struct bt_voice {
+ 
+ #define BT_SNDMTU		12
+ #define BT_RCVMTU		13
++#define BT_PHYS			14
++
++#define BT_PHY_BR_1M_1SLOT	0x00000001
++#define BT_PHY_BR_1M_3SLOT	0x00000002
++#define BT_PHY_BR_1M_5SLOT	0x00000004
++#define BT_PHY_EDR_2M_1SLOT	0x00000008
++#define BT_PHY_EDR_2M_3SLOT	0x00000010
++#define BT_PHY_EDR_2M_5SLOT	0x00000020
++#define BT_PHY_EDR_3M_1SLOT	0x00000040
++#define BT_PHY_EDR_3M_3SLOT	0x00000080
++#define BT_PHY_EDR_3M_5SLOT	0x00000100
++#define BT_PHY_LE_1M_TX		0x00000200
++#define BT_PHY_LE_1M_RX		0x00000400
++#define BT_PHY_LE_2M_TX		0x00000800
++#define BT_PHY_LE_2M_RX		0x00001000
++#define BT_PHY_LE_CODED_TX	0x00002000
++#define BT_PHY_LE_CODED_RX	0x00004000
+ 
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index faebe3859931..03cf3f0f22b9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1467,6 +1467,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			     const void *param, u32 timeout);
+ 
++u32 hci_conn_get_phys(struct hci_conn *conn);
++
+ /* ----- HCI Sockets ----- */
+ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 87691404d0c6..386e6b0bd2ab 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1725,3 +1725,67 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle)
+ 
+ 	return hchan;
+ }
++
++u32 hci_conn_get_phys(struct hci_conn *conn)
++{
++	u32 phys = 0;
++
++	hci_dev_lock(conn->hdev);
++
++	switch (conn->type) {
++	case ACL_LINK:
++	case SCO_LINK:
++		phys |= BT_PHY_BR_1M_1SLOT;
++
++		if (conn->pkt_type & (HCI_DM3 | HCI_DH3))
++			phys |= BT_PHY_BR_1M_3SLOT;
++
++		if (conn->pkt_type & (HCI_DM5 | HCI_DH5))
++			phys |= BT_PHY_BR_1M_5SLOT;
++
++		if (!(conn->pkt_type & HCI_2DH1))
++			phys |= BT_PHY_EDR_2M_1SLOT;
++
++		if (!(conn->pkt_type & HCI_2DH3))
++			phys |= BT_PHY_EDR_2M_3SLOT;
++
++		if (!(conn->pkt_type & HCI_2DH5))
++			phys |= BT_PHY_EDR_2M_5SLOT;
++
++		if (!(conn->pkt_type & HCI_3DH1))
++			phys |= BT_PHY_EDR_3M_1SLOT;
++
++		if (!(conn->pkt_type & HCI_3DH3))
++			phys |= BT_PHY_EDR_3M_3SLOT;
++
++		if (!(conn->pkt_type & HCI_3DH5))
++			phys |= BT_PHY_EDR_3M_5SLOT;
++
++		break;
++
++	case LE_LINK:
++		if (conn->le_tx_phy & HCI_LE_SET_PHY_1M)
++			phys |= BT_PHY_LE_1M_TX;
++
++		if (conn->le_rx_phy & HCI_LE_SET_PHY_1M)
++			phys |= BT_PHY_LE_1M_RX;
++
++		if (conn->le_tx_phy & HCI_LE_SET_PHY_2M)
++			phys |= BT_PHY_LE_2M_TX;
++
++		if (conn->le_rx_phy & HCI_LE_SET_PHY_2M)
++			phys |= BT_PHY_LE_2M_RX;
++
++		if (conn->le_tx_phy & HCI_LE_SET_PHY_CODED)
++			phys |= BT_PHY_LE_CODED_TX;
++
++		if (conn->le_rx_phy & HCI_LE_SET_PHY_CODED)
++			phys |= BT_PHY_LE_CODED_RX;
++
++		break;
++	}
++
++	hci_dev_unlock(conn->hdev);
++
++	return phys;
++}
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a7be8b59b3c2..fb011c6c67be 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -499,6 +499,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+ 	struct bt_security sec;
+ 	struct bt_power pwr;
++	u32 phys;
+ 	int len, err = 0;
+ 
+ 	BT_DBG("sk %p", sk);
+@@ -603,6 +604,18 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			err = -EFAULT;
+ 		break;
+ 
++	case BT_PHYS:
++		if (sk->sk_state == BT_CONNECTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		phys = hci_conn_get_phys(chan->conn->hcon);
++
++		if (put_user(phys, (u32 __user *) optval))
++			err = -EFAULT;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index b91d6b440fdf..dcd297f2acc6 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -922,6 +922,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	int len, err = 0;
+ 	struct bt_voice voice;
++	u32 phys;
+ 
+ 	BT_DBG("sk %p", sk);
+ 
+@@ -956,6 +957,18 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 
+ 		break;
+ 
++	case BT_PHYS:
++		if (sk->sk_state == BT_CONNECTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		phys = hci_conn_get_phys(sco_pi(sk)->conn->hcon);
++
++		if (put_user(phys, (u32 __user *) optval))
++			err = -EFAULT;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+-- 
+2.21.0
 
-> +
->  enum qca_flags {
->  	QCA_IBS_ENABLED,
->  	QCA_DROP_VENDOR_EVENT,
-> @@ -123,6 +128,8 @@ struct qca_data {
->  	u64 rx_votes_off;
->  	u64 votes_on;
->  	u64 votes_off;
-> +
-> +	u32 cmd_timeout_cnt;
-
-nit: cmd_timeouts?
-
->  };
->  
->  enum qca_speed_type {
-> @@ -1332,6 +1339,11 @@ static int qca_setup(struct hci_uart *hu)
->  	if (!ret) {
->  		set_bit(QCA_IBS_ENABLED, &qca->flags);
->  		qca_debugfs_init(hdev);
-> +
-> +		/* clear the command time out count every time after
-> +		 * initializaiton done
-> +		 */
-> +		qca->cmd_timeout_cnt = 0;
->  	} else if (ret == -ENOENT) {
->  		/* No patch/nvm-config found, run with original fw/config */
->  		ret = 0;
-> @@ -1462,6 +1474,38 @@ static int qca_power_off(struct hci_dev *hdev)
->  	return 0;
->  }
->  
-> +static int qca_send_btsoc_dump_cmd(struct hci_uart *hu)
-> +{
-> +	int err = 0;
-
-The variable is pointless, just return 0 at the end of the function.
-
-> +	struct sk_buff *skb = NULL;
-> +	struct qca_data *qca = hu->priv;
-> +
-> +	BT_DBG("hu %p sending btsoc dump command", hu);
-> +
-> +	skb = bt_skb_alloc(1, GFP_ATOMIC);
-> +	if (!skb) {
-> +		BT_ERR("Failed to allocate memory for qca dump command");
-
-"These generic allocation functions all emit a stack dump on failure when used
-without __GFP_NOWARN so there is no use in emitting an additional failure
-message when NULL is returned."
-
-Documentation/process/coding-style.rst
-
-hence the logging is redundant, drop it.
-
-> +		return -ENOMEM;
-> +	}
-> +
-> +	skb_put_u8(skb, QCA_BTSOC_DUMP_CMD);
-> +
-> +	skb_queue_tail(&qca->txq, skb);
-> +
-> +	return err;
-> +}
-> +
-> +static void qca_cmd_timeout(struct hci_dev *hdev)
-> +{
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct qca_data *qca = hu->priv;
-> +
-> +	BT_ERR("hu %p hci cmd timeout count=0x%x", hu, ++qca->cmd_timeout_cnt);
-
-Is there any particular reason to print the counter in hex instead of
-decimal?
-
-Should this use bt_dev_err() since we have a hdev in this context?
-
-> +
-> +	if (qca->cmd_timeout_cnt >= QCA_MAX_CMD_TIMEOUT_COUNT)
-> +		qca_send_btsoc_dump_cmd(hu);
-> +}
-> +
->  static int qca_regulator_enable(struct qca_serdev *qcadev)
->  {
->  	struct qca_power *power = qcadev->bt_power;
-> @@ -1605,6 +1649,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  		hdev = qcadev->serdev_hu.hdev;
->  		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
->  		hdev->shutdown = qca_power_off;
-> +		hdev->cmd_timeout = qca_cmd_timeout;
->  	}
->  
->  out:	return err;
-> -- 
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
