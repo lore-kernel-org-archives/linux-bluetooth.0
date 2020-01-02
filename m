@@ -2,164 +2,274 @@ Return-Path: <SRS0=Qv9v=2X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01577C2D0DC
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 17:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CF9C2D0C2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 17:36:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCB0021734
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 17:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D22C206E6
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 17:36:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aY8/HbOT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXtjKlq1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728079AbgABRYu (ORCPT
+        id S1727761AbgABRgU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jan 2020 12:24:50 -0500
-Received: from mail-pj1-f46.google.com ([209.85.216.46]:36456 "EHLO
-        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728056AbgABRYt (ORCPT
+        Thu, 2 Jan 2020 12:36:20 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:33285 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727706AbgABRgT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jan 2020 12:24:49 -0500
-Received: by mail-pj1-f46.google.com with SMTP id n59so3609860pjb.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2020 09:24:49 -0800 (PST)
+        Thu, 2 Jan 2020 12:36:19 -0500
+Received: by mail-ot1-f66.google.com with SMTP id b18so36098574otp.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2020 09:36:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=r26ZGSJQEt3FmkInwqJEPLO1xlgFwY2lZaHaRg6lYwg=;
-        b=aY8/HbOTKde4UsPJ3UEF8emBVCWj1k4yia5z2ffIv7g9oP3cfQYRo/VTm2lUZpBvFk
-         KvxK7s65/j1QyKcG+eBrkpnjodEfZ84IHgJc8c3k71Tmr5dAeaWcKGhQhIXFvCqy7zU+
-         6Z+JaUXv7e3Mk5UkOgXbK+2zqybRH7yzm6D+ZrT42GJfTvicFtmaFLTd65jl1ceu1o8r
-         on4U0Ew1qK2WR+xRYdkrMSlcSmQwwLvuStW0ON51GYR/sp/d0ip2N+1hu8YM63ptkpLW
-         aZ2talx3IIKSttYARaT8Gjcg0MQG19V6ZtzUEdtQ1go9Bge6IOiLfG8Sw9CVaLquYASD
-         s64w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=n7Suy5vm7eNETKI9A6AINZMUiCvIq8nyXo0HCt+zKP8=;
+        b=HXtjKlq1jsrjoLsiorB8J3pxdvE1zHIta1XdTHa2wyVwinm8p79R27QcACVqS0PbxR
+         WFky8Hx9Bh5bH03BhvBvrEgQr0QblJHN7Kok9ccnfrHf1zGjQx/Mv84EeFD7kLoXB7u2
+         JSwYRzJ5MBuyL162jH8TbKgkAhZuLxEbSgL+9w63l3e4G6854bADn/NE1NfszTrG1jgM
+         HORp6akjkAjCK59GSnL6zr3GHk1ols2bAfBtuK7XscLmwCsrNzZLlAdq5QpBtT6ttF4R
+         63LrsHMTgjOGGW97kYfeZ4MWDH2ql7Wdr+TpXwyvgBsG6FXxI0g5Owjim0Xc6T+6+G3z
+         xkuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=r26ZGSJQEt3FmkInwqJEPLO1xlgFwY2lZaHaRg6lYwg=;
-        b=bPeI2n3PaKOcougWaC7zntEQYuKhquGGMh9D84p7kyUshxUmWw1BTyI2asMcyanzoW
-         Lh+YOsYyAa+12Q8Cjyc/PTv98WyejaSiY7LtlE5P/Wz4Bgfn7kADgaCEK7I834o6FFKj
-         xJPDm8RraIYQqX6KiK4Z/3kXIcemzpVSy6up7tGu5GIOHDcvhmEXStlcaOUkgAaCDFZB
-         XB3m1I0c7nLu8YE26qsOo+ixBREVCt6Fdm/EOxGkyjvPruBj1/omLzYPeco5ry79u7Dy
-         7/eTx2n9GUzVTUY9pW3OkNGsSS4br5Rhu+S4llwfWI3umk6nPOfJKXNpHWGCsgeH5MeW
-         gdQg==
-X-Gm-Message-State: APjAAAV0BkAVi14kQgMK8yUhlW02eY4pqcBYEnIgMQJ10kTKTQ2Hyi7N
-        PEo7pTwc2euW9+ZlfsJNYG8p4FSo1tA=
-X-Google-Smtp-Source: APXvYqz6iugBhDurwn2n4RR1rspsrVfutS5Z69L5vlyBr+QfTTAmyHdlpr8U5sBoRgmyHSZkoTIwPg==
-X-Received: by 2002:a17:902:7004:: with SMTP id y4mr86266450plk.263.1577985888822;
-        Thu, 02 Jan 2020 09:24:48 -0800 (PST)
-Received: from vudentzs-t460s.hsd1.or.comcast.net ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id o6sm59041087pgg.37.2020.01.02.09.24.48
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2020 09:24:48 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/2] Bluetooth: HCI: Add support for LE PHY Update Complete event
-Date:   Thu,  2 Jan 2020 09:24:46 -0800
-Message-Id: <20200102172447.18574-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=n7Suy5vm7eNETKI9A6AINZMUiCvIq8nyXo0HCt+zKP8=;
+        b=CO3EQkLVbkVAkKwBFK9b7K5ACGLTQWd3ZCmZ3jjGBXenS1F+XjnSAoeQVKR8lvtJ6C
+         CzRMZ9KvenDXoCKJwmjEjmC2twGalrPZHs6TRTvM/+vamIE9dEwXglGl6wMabmAgDBsb
+         dfSIxldHOT15zX80SbgxET+t53nawQvKBkT6z0nEmJyh7WTWQeExcAivaaxTkMAFLdjI
+         vO3Y3dUeCqUSCh7KplCX5LIwaUlan7Wm4IkIa0SHhYDZWlCwMQ8kscSUTTwydFp069oq
+         byxTNAL8Xj2aYJbwwSrVzj7NiS08mMZ2uLj4FA7C3uZQ2ZK1X8IA/F/C1ZzpYhLD4Zhp
+         4IwQ==
+X-Gm-Message-State: APjAAAWuPXrXnV/ZJIeD2fiie6ES+McSHmAelIgbyCgs4FLriAGEG1SG
+        +h1nucE0G+neHAAJCnw/mVsJCL1As4+hzmaKtwGt0nJ2
+X-Google-Smtp-Source: APXvYqxWdkGjfCgja2QIX+kDjX5bdjHkoGSR576NeqGZS/y3xo4NBiJi/zFOV2aYFiyjxciVp10ugKOUocCIhJttJZc=
+X-Received: by 2002:a9d:6d10:: with SMTP id o16mr95414476otp.28.1577986578189;
+ Thu, 02 Jan 2020 09:36:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200102172447.18574-1-luiz.dentz@gmail.com> <20200102172447.18574-2-luiz.dentz@gmail.com>
+In-Reply-To: <20200102172447.18574-2-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 2 Jan 2020 09:36:06 -0800
+Message-ID: <CABBYNZJXvmF8j8Fd=zkr0a83RQ52OeEcbTJk-bgk3R9Ofzq8AA@mail.gmail.com>
+Subject: Re: [RFC 2/2] Bluetooth: Add BT_PHYS socket option
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Pali,
 
-This handles LE PHY Update Complete event and store both tx_phy and
-rx_phy into hci_conn.
+On Thu, Jan 2, 2020 at 9:24 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds BT_PHYS socket option which can be used to read the PHYs in
+> use by the underline connection.
+>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  include/net/bluetooth/bluetooth.h | 17 ++++++++
+>  include/net/bluetooth/hci_core.h  |  2 +
+>  net/bluetooth/hci_conn.c          | 64 +++++++++++++++++++++++++++++++
+>  net/bluetooth/l2cap_sock.c        | 13 +++++++
+>  net/bluetooth/sco.c               | 13 +++++++
+>  5 files changed, 109 insertions(+)
+>
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index e42bb8e03c09..69c0e7eb26d9 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -121,6 +121,23 @@ struct bt_voice {
+>
+>  #define BT_SNDMTU              12
+>  #define BT_RCVMTU              13
+> +#define BT_PHYS                        14
+> +
+> +#define BT_PHY_BR_1M_1SLOT     0x00000001
+> +#define BT_PHY_BR_1M_3SLOT     0x00000002
+> +#define BT_PHY_BR_1M_5SLOT     0x00000004
+> +#define BT_PHY_EDR_2M_1SLOT    0x00000008
+> +#define BT_PHY_EDR_2M_3SLOT    0x00000010
+> +#define BT_PHY_EDR_2M_5SLOT    0x00000020
+> +#define BT_PHY_EDR_3M_1SLOT    0x00000040
+> +#define BT_PHY_EDR_3M_3SLOT    0x00000080
+> +#define BT_PHY_EDR_3M_5SLOT    0x00000100
+> +#define BT_PHY_LE_1M_TX                0x00000200
+> +#define BT_PHY_LE_1M_RX                0x00000400
+> +#define BT_PHY_LE_2M_TX                0x00000800
+> +#define BT_PHY_LE_2M_RX                0x00001000
+> +#define BT_PHY_LE_CODED_TX     0x00002000
+> +#define BT_PHY_LE_CODED_RX     0x00004000
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci.h      |  8 ++++++++
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_event.c        | 27 +++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+)
+This might be of your interest since you wanted to know what packet
+size to use, we might use this to adjust the MTU automatically instead
+of always using 672 so we maximize the throughput if the socket owner
+has not set a MTU on its own.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5bc1e30dedde..07b6ecedc6ce 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2186,6 +2186,14 @@ struct hci_ev_le_direct_adv_info {
- 	__s8	 rssi;
- } __packed;
- 
-+#define HCI_EV_LE_PHY_UPDATE_COMPLETE	0x0c
-+struct hci_ev_le_phy_update_complete {
-+	__u8  status;
-+	__u16 handle;
-+	__u8  tx_phy;
-+	__u8  rx_phy;
-+} __packed;
-+
- #define HCI_EV_LE_EXT_ADV_REPORT    0x0d
- struct hci_ev_le_ext_adv_report {
- 	__le16 	 evt_type;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b689aceb636b..faebe3859931 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -493,6 +493,8 @@ struct hci_conn {
- 	__u16		le_supv_timeout;
- 	__u8		le_adv_data[HCI_MAX_AD_LENGTH];
- 	__u8		le_adv_data_len;
-+	__u8		le_tx_phy;
-+	__u8		le_rx_phy;
- 	__s8		rssi;
- 	__s8		tx_power;
- 	__s8		max_tx_power;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1941f120a376..6ddc4a74a5e4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5718,6 +5718,29 @@ static void hci_le_direct_adv_report_evt(struct hci_dev *hdev,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_le_phy_update_evt(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_ev_le_phy_update_complete *ev = (void *) skb->data;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-+
-+	if (!ev->status)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	conn->le_tx_phy = ev->tx_phy;
-+	conn->le_rx_phy = ev->rx_phy;
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
-@@ -5753,6 +5776,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_le_direct_adv_report_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_LE_PHY_UPDATE_COMPLETE:
-+		hci_le_phy_update_evt(hdev, skb);
-+		break;
-+
- 	case HCI_EV_LE_EXT_ADV_REPORT:
- 		hci_le_ext_adv_report_evt(hdev, skb);
- 		break;
+>  __printf(1, 2)
+>  void bt_info(const char *fmt, ...);
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index faebe3859931..03cf3f0f22b9 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1467,6 +1467,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+>  struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+>                              const void *param, u32 timeout);
+>
+> +u32 hci_conn_get_phys(struct hci_conn *conn);
+> +
+>  /* ----- HCI Sockets ----- */
+>  void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+>  void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 87691404d0c6..386e6b0bd2ab 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -1725,3 +1725,67 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle)
+>
+>         return hchan;
+>  }
+> +
+> +u32 hci_conn_get_phys(struct hci_conn *conn)
+> +{
+> +       u32 phys = 0;
+> +
+> +       hci_dev_lock(conn->hdev);
+> +
+> +       switch (conn->type) {
+> +       case ACL_LINK:
+> +       case SCO_LINK:
+> +               phys |= BT_PHY_BR_1M_1SLOT;
+> +
+> +               if (conn->pkt_type & (HCI_DM3 | HCI_DH3))
+> +                       phys |= BT_PHY_BR_1M_3SLOT;
+> +
+> +               if (conn->pkt_type & (HCI_DM5 | HCI_DH5))
+> +                       phys |= BT_PHY_BR_1M_5SLOT;
+> +
+> +               if (!(conn->pkt_type & HCI_2DH1))
+> +                       phys |= BT_PHY_EDR_2M_1SLOT;
+> +
+> +               if (!(conn->pkt_type & HCI_2DH3))
+> +                       phys |= BT_PHY_EDR_2M_3SLOT;
+> +
+> +               if (!(conn->pkt_type & HCI_2DH5))
+> +                       phys |= BT_PHY_EDR_2M_5SLOT;
+> +
+> +               if (!(conn->pkt_type & HCI_3DH1))
+> +                       phys |= BT_PHY_EDR_3M_1SLOT;
+> +
+> +               if (!(conn->pkt_type & HCI_3DH3))
+> +                       phys |= BT_PHY_EDR_3M_3SLOT;
+> +
+> +               if (!(conn->pkt_type & HCI_3DH5))
+> +                       phys |= BT_PHY_EDR_3M_5SLOT;
+> +
+> +               break;
+> +
+> +       case LE_LINK:
+> +               if (conn->le_tx_phy & HCI_LE_SET_PHY_1M)
+> +                       phys |= BT_PHY_LE_1M_TX;
+> +
+> +               if (conn->le_rx_phy & HCI_LE_SET_PHY_1M)
+> +                       phys |= BT_PHY_LE_1M_RX;
+> +
+> +               if (conn->le_tx_phy & HCI_LE_SET_PHY_2M)
+> +                       phys |= BT_PHY_LE_2M_TX;
+> +
+> +               if (conn->le_rx_phy & HCI_LE_SET_PHY_2M)
+> +                       phys |= BT_PHY_LE_2M_RX;
+> +
+> +               if (conn->le_tx_phy & HCI_LE_SET_PHY_CODED)
+> +                       phys |= BT_PHY_LE_CODED_TX;
+> +
+> +               if (conn->le_rx_phy & HCI_LE_SET_PHY_CODED)
+> +                       phys |= BT_PHY_LE_CODED_RX;
+> +
+> +               break;
+> +       }
+> +
+> +       hci_dev_unlock(conn->hdev);
+> +
+> +       return phys;
+> +}
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index a7be8b59b3c2..fb011c6c67be 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -499,6 +499,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+>         struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+>         struct bt_security sec;
+>         struct bt_power pwr;
+> +       u32 phys;
+>         int len, err = 0;
+>
+>         BT_DBG("sk %p", sk);
+> @@ -603,6 +604,18 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+>                         err = -EFAULT;
+>                 break;
+>
+> +       case BT_PHYS:
+> +               if (sk->sk_state == BT_CONNECTED) {
+> +                       err = -EINVAL;
+> +                       break;
+> +               }
+> +
+> +               phys = hci_conn_get_phys(chan->conn->hcon);
+> +
+> +               if (put_user(phys, (u32 __user *) optval))
+> +                       err = -EFAULT;
+> +               break;
+> +
+>         default:
+>                 err = -ENOPROTOOPT;
+>                 break;
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index b91d6b440fdf..dcd297f2acc6 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -922,6 +922,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+>         struct sock *sk = sock->sk;
+>         int len, err = 0;
+>         struct bt_voice voice;
+> +       u32 phys;
+>
+>         BT_DBG("sk %p", sk);
+>
+> @@ -956,6 +957,18 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+>
+>                 break;
+>
+> +       case BT_PHYS:
+> +               if (sk->sk_state == BT_CONNECTED) {
+> +                       err = -EINVAL;
+> +                       break;
+> +               }
+> +
+> +               phys = hci_conn_get_phys(sco_pi(sk)->conn->hcon);
+> +
+> +               if (put_user(phys, (u32 __user *) optval))
+> +                       err = -EFAULT;
+> +               break;
+> +
+>         default:
+>                 err = -ENOPROTOOPT;
+>                 break;
+> --
+> 2.21.0
+>
+
+
 -- 
-2.21.0
-
+Luiz Augusto von Dentz
