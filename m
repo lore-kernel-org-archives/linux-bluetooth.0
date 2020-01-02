@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A370C3276C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 18:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9DCDC3276C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 19:07:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10335217F4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 18:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1DF021835
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jan 2020 19:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EE7NFbPx"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oVxX1Knt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728112AbgABSlT (ORCPT
+        id S1728157AbgABTHa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jan 2020 13:41:19 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:38015 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727951AbgABSlT (ORCPT
+        Thu, 2 Jan 2020 14:07:30 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:45149 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728074AbgABTHa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jan 2020 13:41:19 -0500
-Received: by mail-pj1-f65.google.com with SMTP id l35so3703758pje.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2020 10:41:18 -0800 (PST)
+        Thu, 2 Jan 2020 14:07:30 -0500
+Received: by mail-pg1-f196.google.com with SMTP id b9so22304147pgk.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2020 11:07:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=2P1i80VyW1xqH3NqUoar2oHl+i0gCk3q+IZQrBX1Ayc=;
-        b=EE7NFbPxMgwS+IAAlM3nTY4eDNc+9iyOzif9o6qghjLAOe8EAdCxMP9fyx9mC4y6JY
-         +7a+GihvaTg5XuNxTVC+mIZeGY78rUGUngCaWI3n2aOF5GjC3DFgFBClGu8hUyUaho7q
-         H1t1WoYJ3m8cGNSghV1Tdhy3nn0q4hlrdWj8Q=
+        bh=Ns/i9Oa6qRXMr64PI7szGSN7BWAj/fmeJPxZe1MnizY=;
+        b=oVxX1Knt/R/3nB229kEwTKYVJOHzqxICyECe0tKOS3C9ldeT+jAJTeN3ZMZ/NVjNjo
+         0boUSN6vtNZOtKS1HSFVmLsGiFm2piaawTcuwDNwPT2Er5TQMRZDmCOz7yo5YGsmzi/5
+         HHu4kdc/M7LQoIGa7/ldglhJoXsjqECIycu7c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=2P1i80VyW1xqH3NqUoar2oHl+i0gCk3q+IZQrBX1Ayc=;
-        b=oocaaZD6iHq08esgy/ewaTYOpP433ZLLWoj2bfv9CPdfmfYCpLAXa4J8u5HU4iNTPi
-         +UItaKBTUFNg6WEa6N8veaYg0I/gSOufpiQKIDgV52z1SYe2/zun2UM4I0EqIjkAyDHM
-         53L3n/zT5IEZLiegq5r9fYm8LFkYTQUS45gL82w3HII/TbQaU865MkDD2LoXim4JIzwL
-         /ipafKym47kAXb7M8/JqSimECNgDPHDWJWGub9HfZ+kz9k98xD2JmHLOTQwDlrqMMSIq
-         wMGVDIntKAWU3bZveMU13M5A9lKxOX/ApgFh+wX/tJs+1Kh6vJwV/WegyMIQNdAva6u1
-         IofA==
-X-Gm-Message-State: APjAAAUg/po+KyBk1Z6jqT4qSflD10/vDPlNDt0fdXGIJAtFBxguCDXR
-        5vfCgA/2GNwcith8cjkX43kNuw==
-X-Google-Smtp-Source: APXvYqzobi0Z4e4D0XEc3q+qOlwqMndFh8kYSP6PuxP7Mmeb303hLQ8mU0YDTBBywtGpXI9B52/RWA==
-X-Received: by 2002:a17:90a:b10a:: with SMTP id z10mr21795407pjq.115.1577990478311;
-        Thu, 02 Jan 2020 10:41:18 -0800 (PST)
+        bh=Ns/i9Oa6qRXMr64PI7szGSN7BWAj/fmeJPxZe1MnizY=;
+        b=indmu7pI08EEDnhsK3ACMVfaJaQ+0Wm2Pq3bxUGuhtxZNkS+qvIuPz1ZvZ0BzL8lNk
+         UHsHXE2pPFQL/Jr9//Koq3f6PN7nU6VfFRV4B97vlMUpODnWZaE3BDRxJU9hGmuTXqdg
+         OZ6qLi7q/KXzasqyeki1r6xMKDHUk+b/kf+PlPweavXQ8TJNyL4ZJuYcephWsq9Q8MSK
+         nyQ+IDj6J4g/BxeKlCr9e6RMCeEjvlXSYxzJebdzaDF2inU8bQpNJfKR18twH6G8ikhI
+         mtrFPOCwcNIMKe4nXushjtU7WgLbEhpCn82eIoP/JoyCTGBWTGDe4isjXBGjK1oR6UTr
+         5J9g==
+X-Gm-Message-State: APjAAAWSz28HnriwzvRhyxtjakxMlk+BSLCXTE27hoenDDfKbqLU74eZ
+        8n7uzo8C+N2YqqOqbPsSujc2IA==
+X-Google-Smtp-Source: APXvYqzW/C/2CXlgrd1xB24BgIpm2Szz8CfkC/Ks5s8kCCNGxRt2QDxrQh9ezYm320THOa8knFTpyw==
+X-Received: by 2002:a62:5447:: with SMTP id i68mr81577777pfb.44.1577992049403;
+        Thu, 02 Jan 2020 11:07:29 -0800 (PST)
 Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id k3sm61963109pgc.3.2020.01.02.10.41.17
+        by smtp.gmail.com with ESMTPSA id z6sm50037106pfa.155.2020.01.02.11.07.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jan 2020 10:41:17 -0800 (PST)
-Date:   Thu, 2 Jan 2020 10:41:16 -0800
+        Thu, 02 Jan 2020 11:07:28 -0800 (PST)
+Date:   Thu, 2 Jan 2020 11:07:27 -0800
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Rocky Liao <rjliao@codeaurora.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3 2/4] Bluetooth: hci_qca: Retry btsoc initialize when
- it fails
-Message-ID: <20200102184116.GA89495@google.com>
+Subject: Re: [PATCH v3 4/4] Bluetooth: hci_qca: Add HCI command timeout
+ handling
+Message-ID: <20200102190727.GB89495@google.com>
 References: <20191225060317.5258-1-rjliao@codeaurora.org>
  <20191227072130.29431-1-rjliao@codeaurora.org>
- <20191227072130.29431-2-rjliao@codeaurora.org>
+ <20191227072130.29431-4-rjliao@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191227072130.29431-2-rjliao@codeaurora.org>
+In-Reply-To: <20191227072130.29431-4-rjliao@codeaurora.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -77,101 +77,144 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Rocky,
 
-On Fri, Dec 27, 2019 at 03:21:28PM +0800, Rocky Liao wrote:
-> This patch adds the retry of btsoc initialization when it fails. There are
-> reports that the btsoc initialization may fail on some platforms but the
-> repro ratio is very low. The failure may be caused by UART, platform HW or
-> the btsoc itself but it's very difficlut to root cause, given the repro
-> ratio is very low. Add a retry for the btsoc initialization will resolve
-> most of the failures and make Bluetooth finally works.
-
-Is this problem specific to a certain chipset?
-
-What are the symptoms?
-
+On Fri, Dec 27, 2019 at 03:21:30PM +0800, Rocky Liao wrote:
+> This patch adds the HCI command timeout handling, it will trigger btsoc
+> to report its memory dump via vendor specific events when hit the defined
+> max HCI command timeout count. After all the memory dump VSE are sent, the
+> btsoc will also send a HCI_HW_ERROR event to host and this will cause a new
+> hci down/up process and the btsoc will be re-initialized.
+> 
 > Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 > ---
 > 
-> Changes in v2: None
-> Changes in v3: None
+> Changes in v2:
+> - Fix build error
+> Changes in v3:
+> - Remove the function declaration 
+> - Move the cmd_timeout() callback register to probe()
+> - Remove the redundant empty line
 > 
->  drivers/bluetooth/hci_qca.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
+>  drivers/bluetooth/hci_qca.c | 45 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 45 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 43fd84028786..45042aa27fa4 100644
+> index ca0b38f065e5..026e2e2cdd30 100644
 > --- a/drivers/bluetooth/hci_qca.c
 > +++ b/drivers/bluetooth/hci_qca.c
-> @@ -53,6 +53,9 @@
->  /* Controller debug log header */
->  #define QCA_DEBUG_HANDLE	0x2EDC
+> @@ -47,6 +47,8 @@
+>  #define IBS_HOST_TX_IDLE_TIMEOUT_MS	2000
+>  #define CMD_TRANS_TIMEOUT_MS		100
 >  
-> +/* max retry count when init fails */
-> +#define QCA_MAX_INIT_RETRY_COUNT 3
+> +#define QCA_BTSOC_DUMP_CMD	0xFB
+> +
+>  /* susclk rate */
+>  #define SUSCLK_RATE_32KHZ	32768
+>  
+> @@ -56,6 +58,9 @@
+>  /* max retry count when init fails */
+>  #define QCA_MAX_INIT_RETRY_COUNT 3
+>  
+> +/* when hit the max cmd time out count, trigger btsoc dump */
+> +#define QCA_MAX_CMD_TIMEOUT_COUNT 3
 
-nit: MAX_RETRIES or MAX_INIT_RETRIES?
+nit: MAX_CMD_TIMEOUTS?
 
-The QCA prefix just adds noise here IMO, there's no need to disambiguate
-the constant from other retries since it is defined in hci_qca.c.
+Similar to QCA_MAX_INIT_RETRY_COUNT on which I commented earlier I don't
+think the 'QCA' prefix adds value here. The constant is defined in the driver
+itself and isn't related to hardware.
 
 > +
 >  enum qca_flags {
 >  	QCA_IBS_ENABLED,
 >  	QCA_DROP_VENDOR_EVENT,
-> @@ -1257,7 +1260,9 @@ static int qca_setup(struct hci_uart *hu)
+> @@ -123,6 +128,8 @@ struct qca_data {
+>  	u64 rx_votes_off;
+>  	u64 votes_on;
+>  	u64 votes_off;
+> +
+> +	u32 cmd_timeout_cnt;
+
+nit: cmd_timeouts?
+
+>  };
+>  
+>  enum qca_speed_type {
+> @@ -1332,6 +1339,11 @@ static int qca_setup(struct hci_uart *hu)
+>  	if (!ret) {
+>  		set_bit(QCA_IBS_ENABLED, &qca->flags);
+>  		qca_debugfs_init(hdev);
+> +
+> +		/* clear the command time out count every time after
+> +		 * initializaiton done
+> +		 */
+> +		qca->cmd_timeout_cnt = 0;
+>  	} else if (ret == -ENOENT) {
+>  		/* No patch/nvm-config found, run with original fw/config */
+>  		ret = 0;
+> @@ -1462,6 +1474,38 @@ static int qca_power_off(struct hci_dev *hdev)
+>  	return 0;
+>  }
+>  
+> +static int qca_send_btsoc_dump_cmd(struct hci_uart *hu)
+> +{
+> +	int err = 0;
+
+The variable is pointless, just return 0 at the end of the function.
+
+> +	struct sk_buff *skb = NULL;
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_DBG("hu %p sending btsoc dump command", hu);
+> +
+> +	skb = bt_skb_alloc(1, GFP_ATOMIC);
+> +	if (!skb) {
+> +		BT_ERR("Failed to allocate memory for qca dump command");
+
+"These generic allocation functions all emit a stack dump on failure when used
+without __GFP_NOWARN so there is no use in emitting an additional failure
+message when NULL is returned."
+
+Documentation/process/coding-style.rst
+
+hence the logging is redundant, drop it.
+
+> +		return -ENOMEM;
+> +	}
+> +
+> +	skb_put_u8(skb, QCA_BTSOC_DUMP_CMD);
+> +
+> +	skb_queue_tail(&qca->txq, skb);
+> +
+> +	return err;
+> +}
+> +
+> +static void qca_cmd_timeout(struct hci_dev *hdev)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_ERR("hu %p hci cmd timeout count=0x%x", hu, ++qca->cmd_timeout_cnt);
+
+Is there any particular reason to print the counter in hex instead of
+decimal?
+
+Should this use bt_dev_err() since we have a hdev in this context?
+
+> +
+> +	if (qca->cmd_timeout_cnt >= QCA_MAX_CMD_TIMEOUT_COUNT)
+> +		qca_send_btsoc_dump_cmd(hu);
+> +}
+> +
+>  static int qca_regulator_enable(struct qca_serdev *qcadev)
 >  {
->  	struct hci_dev *hdev = hu->hdev;
->  	struct qca_data *qca = hu->priv;
-> +	struct qca_serdev *qcadev;
->  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
-> +	unsigned int init_retry_count = 0;
-
-nit: the name is a bit clunky, how about 'retries'?
-
->  	enum qca_btsoc_type soc_type = qca_soc_type(hu);
->  	const char *firmware_name = qca_get_firmware_name(hu);
->  	int ret;
-> @@ -1275,6 +1280,7 @@ static int qca_setup(struct hci_uart *hu)
->  	 */
->  	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->  
-> +retry:
->  	if (qca_is_wcn399x(soc_type)) {
->  		bt_dev_info(hdev, "setting up wcn3990");
->  
-> @@ -1293,6 +1299,12 @@ static int qca_setup(struct hci_uart *hu)
->  			return ret;
->  	} else {
->  		bt_dev_info(hdev, "ROME setup");
-> +		if (hu->serdev) {
-> +			qcadev = serdev_device_get_drvdata(hu->serdev);
-> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> +			/* Controller needs time to bootup. */
-> +			msleep(150);
-
-Shouldn't this be in qca_power_on(), analogous to the power off code from
-"[1/4]Bluetooth: hci_qca: Add QCA Rome power off support to the
-qca_power_off()"?
-
-qca_power_on() should then also be called for ROME. If you opt for this it
-should be done in a separate patch, or possibly merged into the one
-mentioned above.
-
-> +		}
->  		qca_set_speed(hu, QCA_INIT_SPEED);
+>  	struct qca_power *power = qcadev->bt_power;
+> @@ -1605,6 +1649,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  		hdev = qcadev->serdev_hu.hdev;
+>  		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+>  		hdev->shutdown = qca_power_off;
+> +		hdev->cmd_timeout = qca_cmd_timeout;
 >  	}
 >  
-> @@ -1329,6 +1341,20 @@ static int qca_setup(struct hci_uart *hu)
->  		 * patch/nvm-config is found, so run with original fw/config.
->  		 */
->  		ret = 0;
-> +	} else {
-> +		if (init_retry_count < QCA_MAX_INIT_RETRY_COUNT) {
-> +			qca_power_off(hdev);
-> +			if (hu->serdev) {
-> +				serdev_device_close(hu->serdev);
-> +				ret = serdev_device_open(hu->serdev);
-> +				if (ret) {
-> +					bt_dev_err(hu->hdev, "open port fail");
-
-nit: "failed to open port"
+>  out:	return err;
+> -- 
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
