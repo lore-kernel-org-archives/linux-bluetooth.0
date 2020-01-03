@@ -2,235 +2,131 @@ Return-Path: <SRS0=BOlL=2Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C0BC32771
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 06:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F765C00523
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 07:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F6322465A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 06:33:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F37E2464E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 07:22:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="NthUW5vi"
+	dkim=pass (1024-bit key) header.d=RFPros.onmicrosoft.com header.i=@RFPros.onmicrosoft.com header.b="hJ2JE/Zm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726739AbgACGdu (ORCPT
+        id S1727315AbgACHWc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Jan 2020 01:33:50 -0500
-Received: from mail25.static.mailgun.info ([104.130.122.25]:34704 "EHLO
-        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725928AbgACGdu (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Jan 2020 01:33:50 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1578033229; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=P4vq32jHwms69hs9KGFtcKj6SJ9aNexS280R3S/lO/w=;
- b=NthUW5vissLVdTYp+bG1s5tyGp95tRI3lEabPilLLajdkpM8/nrERXbQ2e2xRzPRMl1xruCO
- qzB0zO0pdG6a0geHCJm0Auw79wlRO6PQQNGoBW/7dtSft7tKRSi6fUnvMdQ1fu6PFix3xeTO
- CAwXcrkF7bQPq2iC+7+ReFS3RWI=
-X-Mailgun-Sending-Ip: 104.130.122.25
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e0ee04b.7f8aa77a56c0-smtp-out-n01;
- Fri, 03 Jan 2020 06:33:47 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id BD306C4479C; Fri,  3 Jan 2020 06:33:47 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id EE9D4C433CB;
-        Fri,  3 Jan 2020 06:33:46 +0000 (UTC)
+        Fri, 3 Jan 2020 02:22:32 -0500
+Received: from mail-bn8nam11on2062.outbound.protection.outlook.com ([40.107.236.62]:5600
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725890AbgACHWc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 3 Jan 2020 02:22:32 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nll1L3L4w2mNwJX5YTzZ/0YMqTdt9ywqvGJJtSeR1R1Mk549WCesoRS5ICeChiZpXpRFXHpz1FSHOh2k64iTve6vW/yWqImWcXaVHM7Y3mOA/XZscbk1twSSUhpGOxJZ2F2Azyd/JFIv819soF7DBPOjUN3K473XrWEJzNA4+g6HnQL6rBBdKuGQL9fdnqiLEwRpPLRtXzl3r5JtOBkmsJ2H6YqQLZ4NyTezDVwloywdvOQtBIZE+vCH1mZAAzQR9+m7LTJLDZigkHOC3KuGraW+VLSVdUDYjbnC/1cyFsfHFIx7T9all53y7Mn67ZlE3rUDD3ILt9i8FJ9KuCbPlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ym9Y9nKRAGs+oh2hVluEAK+5tq+phxDY1qKoNRafZPI=;
+ b=TwJcANw8IL2z+wZKiBoiyEK3O2PekOK/2iuBuaUxPe15KTjrzstVydwCjSk+hUpQYsT7QMyCOoANTJVBdiNqmOS7r0lGDnmYgPBz8BFGs6KKaFXhhm8OKIba4q0ccXTMbfYjkUk6oGzfYCRKY0Eau4RYdjMSBNM+XyO1sgepUw9a1n1NwnksBpaEHdZBcneNcFT87dBsGMi/+Ld9b9wEMFQ09DoMRymy0ZwVHIr0P7XrUoe/B+96ciTj7b4epFhhL3/u/k7MXNVqbKRr2ED8c7cVDy1Yd9XgIblm5pABibOx9f5/H9LWb0sFmuz1HrIoM7cI2yV53j7FcM0HFwek1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=lairdconnect.com; dmarc=pass action=none
+ header.from=lairdconnect.com; dkim=pass header.d=lairdconnect.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=RFPros.onmicrosoft.com; s=selector1-RFPros-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ym9Y9nKRAGs+oh2hVluEAK+5tq+phxDY1qKoNRafZPI=;
+ b=hJ2JE/ZmupNIeyU0+pPzAQZsh4vnuVH9QdXQR+CeoK+YCjfPszvTdoGaB9dPi6OBMZyz0GIQNwKoN3KAh94mg34lfMx6JlSKgdDJK4Qwz8qxaaEca1ogRUlH/cZ48lNLMgylJYzf82BDD4tpOjytzQm3w5AayAvFhbZocCwTPsw=
+Received: from DM5PR14MB1385.namprd14.prod.outlook.com (10.173.223.13) by
+ DM5PR14MB1468.namprd14.prod.outlook.com (10.173.223.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2581.12; Fri, 3 Jan 2020 07:22:29 +0000
+Received: from DM5PR14MB1385.namprd14.prod.outlook.com
+ ([fe80::95a:5934:c7a4:d915]) by DM5PR14MB1385.namprd14.prod.outlook.com
+ ([fe80::95a:5934:c7a4:d915%6]) with mapi id 15.20.2602.010; Fri, 3 Jan 2020
+ 07:22:29 +0000
+From:   Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [RFC 2/2] Bluetooth: Add BT_PHYS socket option
+Thread-Topic: [RFC 2/2] Bluetooth: Add BT_PHYS socket option
+Thread-Index: AQHVwZGPa63zSU1M/UaBS0dpx7czZ6fYiSdg
+Date:   Fri, 3 Jan 2020 07:22:29 +0000
+Message-ID: <DM5PR14MB1385EC175428FE2F702258FEE6230@DM5PR14MB1385.namprd14.prod.outlook.com>
+References: <20200102172447.18574-1-luiz.dentz@gmail.com>
+ <20200102172447.18574-2-luiz.dentz@gmail.com>
+In-Reply-To: <20200102172447.18574-2-luiz.dentz@gmail.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Jamie.Mccrae@lairdconnect.com; 
+x-originating-ip: [81.148.185.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f9f778e7-369b-412a-761d-08d7901db0ed
+x-ms-traffictypediagnostic: DM5PR14MB1468:
+x-microsoft-antispam-prvs: <DM5PR14MB146830ABCEAFE6B0928B4501E6230@DM5PR14MB1468.namprd14.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0271483E06
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(376002)(396003)(39850400004)(366004)(136003)(189003)(199004)(5660300002)(478600001)(52536014)(9686003)(55016002)(86362001)(71200400001)(2906002)(76116006)(316002)(6506007)(26005)(81166006)(64756008)(66556008)(66946007)(66476007)(66446008)(7696005)(110136005)(33656002)(8676002)(81156014)(8936002)(186003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR14MB1468;H:DM5PR14MB1385.namprd14.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: lairdconnect.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ePPW1fMrwozKZT6o+iaqSTdqUnliTFvGU0v6NGGUsbaeu1eGbNyzkeMuJnrVoKEZ/rgO03w0k80sLuxZVXUSkZvf6rEM9ftuPF17pOTFG5ZvYn5JhlUcfr/fazBEkTUCmlSk1mUpcGfSTwCjJlX6795ENAFUYl7ZQuSRCz5Ujq8cnRRi/+eE7S3uSNYx1pU20RnWmOIdojbKdgzP/JH8x7kZvVrab0pvYk1bsA8fE0pXdyDz9MOex3cTYA3qhI909t0qI3dQim/FqU9IzmviA84vppHd2VfNT/JVz9ylDfVm6x/AIZ9CV5Dz6EiJ4aqJgdIAEbCAaQXnzVVMAsLtot+Hjgon0Vn/WueGfscXsvqggnFbxT0E9d4+qK6irWlz8eR9dUr/B4CrHotGXMi2Vv2ywWuxC6MjCm6dXkxsvwx3/kdkBNuZ+gYKJ/jJxgwR
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Fri, 03 Jan 2020 14:33:46 +0800
-From:   rjliao@codeaurora.org
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] Bluetooth: hci_qca: Add HCI command timeout
- handling
-In-Reply-To: <20200102190727.GB89495@google.com>
-References: <20191225060317.5258-1-rjliao@codeaurora.org>
- <20191227072130.29431-1-rjliao@codeaurora.org>
- <20191227072130.29431-4-rjliao@codeaurora.org>
- <20200102190727.GB89495@google.com>
-Message-ID: <fe752fb28dbefd87f103a4986df55e20@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+X-OriginatorOrg: lairdconnect.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9f778e7-369b-412a-761d-08d7901db0ed
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jan 2020 07:22:29.2128
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a67ad7fe-2b14-4d12-b58f-bb509b58f338
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: udAKqpV57oYRbjrteX2y21JTCkeJi0ox6Jg9K5mYk5ALW64ZXEe77Q01MOKKNweVrbqV/elP474f8eJB4dr+8GT/tXgbk+GM8O8xNk4Oz9A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR14MB1468
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-在 2020-01-03 03:07，Matthias Kaehlcke 写道：
-> Hi Rocky,
-> 
-> On Fri, Dec 27, 2019 at 03:21:30PM +0800, Rocky Liao wrote:
->> This patch adds the HCI command timeout handling, it will trigger 
->> btsoc
->> to report its memory dump via vendor specific events when hit the 
->> defined
->> max HCI command timeout count. After all the memory dump VSE are sent, 
->> the
->> btsoc will also send a HCI_HW_ERROR event to host and this will cause 
->> a new
->> hci down/up process and the btsoc will be re-initialized.
->> 
->> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
->> ---
->> 
->> Changes in v2:
->> - Fix build error
->> Changes in v3:
->> - Remove the function declaration
->> - Move the cmd_timeout() callback register to probe()
->> - Remove the redundant empty line
->> 
->>  drivers/bluetooth/hci_qca.c | 45 
->> +++++++++++++++++++++++++++++++++++++
->>  1 file changed, 45 insertions(+)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index ca0b38f065e5..026e2e2cdd30 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -47,6 +47,8 @@
->>  #define IBS_HOST_TX_IDLE_TIMEOUT_MS	2000
->>  #define CMD_TRANS_TIMEOUT_MS		100
->> 
->> +#define QCA_BTSOC_DUMP_CMD	0xFB
->> +
->>  /* susclk rate */
->>  #define SUSCLK_RATE_32KHZ	32768
->> 
->> @@ -56,6 +58,9 @@
->>  /* max retry count when init fails */
->>  #define QCA_MAX_INIT_RETRY_COUNT 3
->> 
->> +/* when hit the max cmd time out count, trigger btsoc dump */
->> +#define QCA_MAX_CMD_TIMEOUT_COUNT 3
-> 
-> nit: MAX_CMD_TIMEOUTS?
-> 
-> Similar to QCA_MAX_INIT_RETRY_COUNT on which I commented earlier I 
-> don't
-> think the 'QCA' prefix adds value here. The constant is defined in the 
-> driver
-> itself and isn't related to hardware.
-> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index e42bb8e03c09..69c0e7eb26d9 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -121,6 +121,23 @@ struct bt_voice {
+>
+>  #define BT_SNDMTU              12
+>  #define BT_RCVMTU              13
+> +#define BT_PHYS                        14
+> +
+> +#define BT_PHY_BR_1M_1SLOT     0x00000001
+> +#define BT_PHY_BR_1M_3SLOT     0x00000002
+> +#define BT_PHY_BR_1M_5SLOT     0x00000004
+> +#define BT_PHY_EDR_2M_1SLOT    0x00000008
+> +#define BT_PHY_EDR_2M_3SLOT    0x00000010
+> +#define BT_PHY_EDR_2M_5SLOT    0x00000020
+> +#define BT_PHY_EDR_3M_1SLOT    0x00000040
+> +#define BT_PHY_EDR_3M_3SLOT    0x00000080
+> +#define BT_PHY_EDR_3M_5SLOT    0x00000100
+> +#define BT_PHY_LE_1M_TX                0x00000200
+> +#define BT_PHY_LE_1M_RX                0x00000400
+> +#define BT_PHY_LE_2M_TX                0x00000800
+> +#define BT_PHY_LE_2M_RX                0x00001000
+> +#define BT_PHY_LE_CODED_TX     0x00002000
+> +#define BT_PHY_LE_CODED_RX     0x00004000
 
-OK
-
->> +
->>  enum qca_flags {
->>  	QCA_IBS_ENABLED,
->>  	QCA_DROP_VENDOR_EVENT,
->> @@ -123,6 +128,8 @@ struct qca_data {
->>  	u64 rx_votes_off;
->>  	u64 votes_on;
->>  	u64 votes_off;
->> +
->> +	u32 cmd_timeout_cnt;
-> 
-> nit: cmd_timeouts?
-> 
->>  };
->> 
->>  enum qca_speed_type {
->> @@ -1332,6 +1339,11 @@ static int qca_setup(struct hci_uart *hu)
->>  	if (!ret) {
->>  		set_bit(QCA_IBS_ENABLED, &qca->flags);
->>  		qca_debugfs_init(hdev);
->> +
->> +		/* clear the command time out count every time after
->> +		 * initializaiton done
->> +		 */
->> +		qca->cmd_timeout_cnt = 0;
->>  	} else if (ret == -ENOENT) {
->>  		/* No patch/nvm-config found, run with original fw/config */
->>  		ret = 0;
->> @@ -1462,6 +1474,38 @@ static int qca_power_off(struct hci_dev *hdev)
->>  	return 0;
->>  }
->> 
->> +static int qca_send_btsoc_dump_cmd(struct hci_uart *hu)
->> +{
->> +	int err = 0;
-> 
-> The variable is pointless, just return 0 at the end of the function.
-> 
-OK
-
->> +	struct sk_buff *skb = NULL;
->> +	struct qca_data *qca = hu->priv;
->> +
->> +	BT_DBG("hu %p sending btsoc dump command", hu);
->> +
->> +	skb = bt_skb_alloc(1, GFP_ATOMIC);
->> +	if (!skb) {
->> +		BT_ERR("Failed to allocate memory for qca dump command");
-> 
-> "These generic allocation functions all emit a stack dump on failure 
-> when used
-> without __GFP_NOWARN so there is no use in emitting an additional 
-> failure
-> message when NULL is returned."
-> 
-> Documentation/process/coding-style.rst
-> 
-> hence the logging is redundant, drop it.
-> 
-
-OK
-
->> +		return -ENOMEM;
->> +	}
->> +
->> +	skb_put_u8(skb, QCA_BTSOC_DUMP_CMD);
->> +
->> +	skb_queue_tail(&qca->txq, skb);
->> +
->> +	return err;
->> +}
->> +
->> +static void qca_cmd_timeout(struct hci_dev *hdev)
->> +{
->> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->> +	struct qca_data *qca = hu->priv;
->> +
->> +	BT_ERR("hu %p hci cmd timeout count=0x%x", hu, 
->> ++qca->cmd_timeout_cnt);
-> 
-> Is there any particular reason to print the counter in hex instead of
-> decimal?
-> 
-> Should this use bt_dev_err() since we have a hdev in this context?
-> 
-
-OK
-
->> +
->> +	if (qca->cmd_timeout_cnt >= QCA_MAX_CMD_TIMEOUT_COUNT)
->> +		qca_send_btsoc_dump_cmd(hu);
->> +}
->> +
->>  static int qca_regulator_enable(struct qca_serdev *qcadev)
->>  {
->>  	struct qca_power *power = qcadev->bt_power;
->> @@ -1605,6 +1649,7 @@ static int qca_serdev_probe(struct serdev_device 
->> *serdev)
->>  		hdev = qcadev->serdev_hu.hdev;
->>  		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
->>  		hdev->shutdown = qca_power_off;
->> +		hdev->cmd_timeout = qca_cmd_timeout;
->>  	}
->> 
->>  out:	return err;
->> --
->> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
->> Forum, a Linux Foundation Collaborative Project
+My query about this is there is an option for LE Coded, but LE coded can ha=
+ve a data rate of 125Kbps or 500Kbps, is there no need to differentiate bet=
+ween the two rates in applications?
+THIS MESSAGE, ANY ATTACHMENT(S), AND THE INFORMATION CONTAINED HEREIN MAY B=
+E PROPRIETARY TO LAIRD CONNECTIVITY, INC. AND/OR ANOTHER PARTY, AND MAY FUR=
+THER BE INTENDED TO BE KEPT CONFIDENTIAL. IF YOU ARE NOT THE INTENDED RECIP=
+IENT, PLEASE DELETE THE EMAIL AND ANY ATTACHMENTS, AND IMMEDIATELY NOTIFY T=
+HE SENDER BY RETURN EMAIL. THIS MESSAGE AND ITS CONTENTS ARE THE PROPERTY O=
+F LAIRD CONNECTIVITY, INC. AND MAY NOT BE REPRODUCED OR USED WITHOUT THE EX=
+PRESS WRITTEN CONSENT OF LAIRD CONNECTIVITY, INC.
