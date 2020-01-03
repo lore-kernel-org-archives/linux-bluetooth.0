@@ -2,235 +2,195 @@ Return-Path: <SRS0=BOlL=2Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B60EC2D0CE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 04:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF6AC32771
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 06:31:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4555B21D7D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 04:04:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76C4A222C3
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 06:31:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+5xo5uS"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="GaDGzwVN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726292AbgACEEO (ORCPT
+        id S1727278AbgACGbv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jan 2020 23:04:14 -0500
-Received: from mail-io1-f42.google.com ([209.85.166.42]:45509 "EHLO
-        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726112AbgACEEO (ORCPT
+        Fri, 3 Jan 2020 01:31:51 -0500
+Received: from mail26.static.mailgun.info ([104.130.122.26]:61535 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725890AbgACGbu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jan 2020 23:04:14 -0500
-Received: by mail-io1-f42.google.com with SMTP id i11so40200867ioi.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2020 20:04:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kvlf50UMLtm1BlRW8QNyVgsXsu/Xu41SMtf4etJ0vvs=;
-        b=B+5xo5uSrfEy+6NH9S+89FMVUO19G0i8TM/psXIl7E6HQcUBPcvCqfq3FBCgpJaWPF
-         kDnGEYWg/aQ5WOP3gLcTZRj2l8ncA9dfnMcEc767rQZvk7MPVFeXYToGZMQXRcYx//hR
-         77Qo4rxE8V8NBv9OvANIWfwzQaVdVazZPOcRfMeIg4kl3BKTzWHLf4QYBonIu9pa/10p
-         RjYQarFp7TsgNBqNnk5GQhaYgj0j+gNnH/s9loJzPiYmxe4JTJTpPPTmbZeMaka1iQg6
-         1n7mE2wkVoVrzeunthQPw+HQZ6KWEuxW42KjAw0dYRW+IZRsqWRAOSKfM5G0q0vWnc6t
-         e3Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kvlf50UMLtm1BlRW8QNyVgsXsu/Xu41SMtf4etJ0vvs=;
-        b=CbeHNVe87kat/t7MKa8RvnC4bXN/XBuHsKI/PToTz2VJFmg1q6UDgUt+gptnOogC+s
-         Ke/lgdL7IGX/zQ/6zbtnvP07vf5Fk/OxsgW08+EZFiObL+C2HHvyFteQNUHch87ap8JA
-         /iG3F7FYE0LNNHTtdtjsirjwezKUSrwhUJne9P2QVzPnEjQPzMd+luz3NBjJ/TJRiCu9
-         Z9Tk8lTO66adqGG9muHeXutS/5m/1e8qLF7uk8qN8aqxjGMqcNFs3qFlngWP0/q3jZU3
-         a/8MpCcl+1LG5q+2FY8p/nYlFdY6ogqjDyPIHfLS7ns0WBv4Rq5GbLnZehnVCPsFrfB9
-         aDvw==
-X-Gm-Message-State: APjAAAWI8azLVWBILW3RUJzCApXGpuThPZAsWoroQ5TDRBSGY7GyRwci
-        uKu0LBSgSJSMi6VW3lP4C5m9ZfmRMzLKrj2a1VI=
-X-Google-Smtp-Source: APXvYqxpYHsshwoUHeBBRvDqTdzUfrFxD4JWYFVXPBLMyqctaLpPb7ApTOlDKNkq2NAnt7ccMyDIoj4PJg4OO/57nyA=
-X-Received: by 2002:a5e:dd4c:: with SMTP id u12mr34620983iop.144.1578024253597;
- Thu, 02 Jan 2020 20:04:13 -0800 (PST)
+        Fri, 3 Jan 2020 01:31:50 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1578033109; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=AV/d+5XHUKKmFsA8S70fdNu6jhq8PhxMezHm1nRwV+U=;
+ b=GaDGzwVNQSko6eK9SIwEuv/g+VuTWAtlzAx8mYaRBZQc6LwwTEdV8qVt35AVgmAJ3FJjEcZF
+ UeAYtJAcfLqLi+4ui0AMpiFmmJK4IME12/WyijbpN4Dcc9+OD/nCkMh5TxIWbTmXwJE+HwtA
+ T9m62rYWNUQMVndT9QgqkW/zFWg=
+X-Mailgun-Sending-Ip: 104.130.122.26
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e0edfd3.7f6fc4442ca8-smtp-out-n02;
+ Fri, 03 Jan 2020 06:31:47 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id D982BC4479C; Fri,  3 Jan 2020 06:31:46 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 31C9CC43383;
+        Fri,  3 Jan 2020 06:31:46 +0000 (UTC)
 MIME-Version: 1.0
-References: <CAAERL8RHaWGAg5FOwts_pdDmagSdDj-Ui3ittmop+beVj9y6dQ@mail.gmail.com>
- <CABBYNZLe=ZmiPXg8mrU2BxY9H0hv_WvkvigyJBAs_wnq5ct_Cg@mail.gmail.com>
- <CAAERL8SK8rHhhGFN95+gWZF-2K4vozRcmZkA5aU9Fwx3a58+7w@mail.gmail.com>
- <CABBYNZ+UZezf7e4ra7t7sAHhcm8=bNUszMB_4evqtEUG2ktFoQ@mail.gmail.com>
- <CAAERL8TAdaFMMuJ7CgL_MGGw_smcfaSTLg=r+-tBkG2EeOdcJw@mail.gmail.com>
- <CABBYNZ+Xnu_1Xp0g9xx84yOxn3J3+4FRY-GrpPSzwi7TsLfKfA@mail.gmail.com>
- <CAAERL8Tgbh=+SiSQ0=_ejzN9nNA9vc3GqnGnqTmZDDc2fHedYg@mail.gmail.com>
- <CABBYNZKRf2X48fXDGqELp6_KF9rL+syGqZVivzhBLcAL-sKtDw@mail.gmail.com> <CAAERL8RKBUJfyNqkomdme0gwX6wwsegn0vjjzvQntGCbr6xYLw@mail.gmail.com>
-In-Reply-To: <CAAERL8RKBUJfyNqkomdme0gwX6wwsegn0vjjzvQntGCbr6xYLw@mail.gmail.com>
-From:   Peter Belau <pbelau1@gmail.com>
-Date:   Thu, 2 Jan 2020 22:04:02 -0600
-Message-ID: <CAAERL8QqK5EGXusvBcaouKn70V-pKSJA4TFJbxGZG+nZ0Ntbyw@mail.gmail.com>
-Subject: Re: Problems reading characteristics with Bluez 5.52
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Fri, 03 Jan 2020 14:31:46 +0800
+From:   rjliao@codeaurora.org
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v3 2/4] Bluetooth: hci_qca: Retry btsoc initialize when it
+ fails
+In-Reply-To: <20200102184116.GA89495@google.com>
+References: <20191225060317.5258-1-rjliao@codeaurora.org>
+ <20191227072130.29431-1-rjliao@codeaurora.org>
+ <20191227072130.29431-2-rjliao@codeaurora.org>
+ <20200102184116.GA89495@google.com>
+Message-ID: <bfba08a185c81f82d3e05ec03b5ddd65@codeaurora.org>
+X-Sender: rjliao@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I see this rapid connect/disconnect behavior with bluez all the time.
-How would I go about debugging it?
+在 2020-01-03 02:41，Matthias Kaehlcke 写道：
 
-On Thu, Jan 2, 2020 at 8:47 PM Peter Belau <pbelau1@gmail.com> wrote:
->
-> [bluetooth]# connect 5C:D6:1F:0E:0A:7D
-> Attempting to connect to 5C:D6:1F:0E:0A:7D
-> [CHG] Device 5C:D6:1F:0E:0A:7D Connected: yes
-> Connection successful
-> [CHG] Device 5C:D6:1F:0E:0A:7D Connected: no
-> [CHG] Device 5C:D6:1F:0E:0A:7D Paired: yes
-> [bluetooth]# gatt.clone
-> Not connected
->
-> LOL, now I'm having connection problems with this device also it seems.
->
-> On Thu, Jan 2, 2020 at 8:40 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > On Thu, Jan 2, 2020 at 6:29 PM Peter Belau <pbelau1@gmail.com> wrote:
-> > >
-> > > I don't have any trouble getting reads off the device with the
-> > > supplied Android app. As I mentioned these connection troubles seem to
-> > > be ubiquitous with BlueZ. This particular device initiates a read
-> > > through an Android app, so it seems logical that I would need to send
-> > > it something in order to initiate a read, although I'm not entirely
-> > > sure how I would figure out what that something is. I've tried to do
-> > > reads off of push-button devices but those appear to be even more
-> > > reliable (at least this device connects somewhat reliably -- the
-> > > others crap out even earlier).
-> >
-> > The android app might be doing all sorts of things, though you could
-> > try cloning its services and pretend to be the device, that way you
-> > would see exactly what the app is doing, just remember to connect the
-> > app with BlueZ not the real device. For cloning you will need to:
-> >
-> > bluetoothctl> connect <device address>
-> > bluetoothctl> gatt.clone
-> >
-> > Then proceed to connect to BlueZ, it will forward any request for the
-> > services cloned to the real device then just use btmon to investigate
-> > what it is sending to replicate.
-> >
-> > > On Thu, Jan 2, 2020 at 8:20 PM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Peter,
-> > > >
-> > > > On Thu, Jan 2, 2020 at 6:10 PM Peter Belau <pbelau1@gmail.com> wrote:
-> > > > >
-> > > > > hci trace doesn't give me much of anything although I'd be happy to
-> > > > > attach the trace. Which 'spec' should I check here?
-> > > >
-> > > > https://www.bluetooth.org/docman/handlers/DownloadDoc.ashx?doc_id=243126
-> > > >
-> > > > It doesn't look like there is anything required to subscribe but
-> > > > perhaps it is disconnecting because there is no measurement in
-> > > > progress or you have to set the time via CTS.
-> > > >
-> > > > > On Thu, Jan 2, 2020 at 8:04 PM Luiz Augusto von Dentz
-> > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Peter,
-> > > > > >
-> > > > > > On Thu, Jan 2, 2020 at 5:58 PM Peter Belau <pbelau1@gmail.com> wrote:
-> > > > > > >
-> > > > > > > Thank you very much for the response;  I did not realize that
-> > > > > > > 'indicate' was exclusive to doing an attribute read. However, "notify
-> > > > > > > on" doesn't seem to help. The device disconnects after a read and now
-> > > > > > > I can no longer connect to it at all:
-> > > > > > >
-> > > > > > > QardioARM:/service0400/char0410]# notify on
-> > > > > > > Notify started
-> > > > > > > [CHG] Device 5C:D6:1F:0E:0A:7D ServicesResolved: no
-> > > > > > > [CHG] Device 5C:D6:1F:0E:0A:7D Connected: no
-> > > > > > >
-> > > > > > > [bluetooth]#  connect 5C:D6:1F:0E:0A:7D
-> > > > > > >
-> > > > > > >
-> > > > > > > Attempting to connect to 5C:D6:1F:0E:0A:7D
-> > > > > > > Failed to connect: org.bluez.Error.Failed
-> > > > > > >
-> > > > > > >
-> > > > > > > On the bluetoothd side I'm seeing:
-> > > > > > >
-> > > > > > > bluetoothd[20426]: src/agent.c:agent_disconnect() Agent :1.626 disconnected
-> > > > > > > bluetoothd[20426]: src/agent.c:remove_default_agent() Default agent cleared
-> > > > > > > bluetoothd[20426]: src/adapter.c:set_mode() sending set mode command for index 0
-> > > > > > > bluetoothd[20426]: src/agent.c:agent_destroy() agent :1.626
-> > > > > > > bluetoothd[20426]: src/agent.c:agent_unref() 0x55e718787df0: ref=0
-> > > > > > > bluetoothd[20426]: src/adapter.c:new_settings_callback() Settings: 0x00000a01
-> > > > > > > bluetoothd[20426]: src/adapter.c:settings_changed() Changed settings: 0x00000010
-> > > > > > > bluetoothd[20426]: src/adapter.c:settings_changed() Pending settings: 0x00000000
-> > > > > > > bluetoothd[20426]: src/agent.c:add_default_agent() Default agent set
-> > > > > > > to :1.627 /org/bluez/agent
-> > > > > > > bluetoothd[20426]: src/adapter.c:set_mode() sending set mode command for index 0
-> > > > > > > bluetoothd[20426]: src/agent.c:agent_ref() 0x55e7187b7a00: ref=1
-> > > > > > > bluetoothd[20426]: src/agent.c:register_agent() agent :1.627
-> > > > > > > bluetoothd[20426]: src/adapter.c:new_settings_callback() Settings: 0x00000a11
-> > > > > > > bluetoothd[20426]: src/adapter.c:settings_changed() Changed settings: 0x00000010
-> > > > > > > bluetoothd[20426]: src/adapter.c:settings_changed() Pending settings: 0x00000000
-> > > > > > > bluetoothd[20426]: src/device.c:att_connect_cb() connect error:
-> > > > > > > Connection refused (111)
-> > > > > > >
-> > > > > > > I should note that I've tried a number of BTLE blood pressure devices
-> > > > > > > with a variety of BT controllers and Bluez cannot seem to maintain
-> > > > > > > reliable connections with any of the configurations I've tried. Any
-> > > > > > > help would be much appreciated.
-> > > > > >
-> > > > > > HCI trace would probably help here, you can collect it using btmon.
-> > > > > > Have you check the spec if there are other steps before subscribing?
-> > > > > >
-> > > > > > > On Thu, Jan 2, 2020 at 7:30 PM Luiz Augusto von Dentz
-> > > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > Hi Peter,
-> > > > > > > >
-> > > > > > > > On Thu, Jan 2, 2020 at 5:22 PM Peter Belau <pbelau1@gmail.com> wrote:
-> > > > > > > > >
-> > > > > > > > > I'm trying to get a Qardio ARM BP monitor working with Linux/Bluez but
-> > > > > > > > > cannot seem to read any device characteristics with Bluez. My
-> > > > > > > > > interaction through bluetoothctl looks like this:
-> > > > > > > > >
-> > > > > > > > > # menu gatt
-> > > > > > > > > # attribute-info  00002a35-0000-1000-8000-00805f9b34fb
-> > > > > > > > > Characteristic - Blood Pressure Measurement
-> > > > > > > > >     UUID: 00002a35-0000-1000-8000-00805f9b34fb
-> > > > > > > > >     Service: /org/bluez/hci0/dev_B0_49_5F_02_B5_61/service0400
-> > > > > > > > >     Value:
-> > > > > > > > >   16 7f 00 49 00 5b 00 00 00 00 00 00 00 00 35 00  ...I.[........5.
-> > > > > > > > >   00 00                                            ..
-> > > > > > > > >     Notifying: no
-> > > > > > > > >     Flags: indicate
-> > > > > > > > > # select-attribute 00002a35-0000-1000-8000-00805f9b34fb
-> > > > > > > > > # read
-> > > > > > > > > # Attempting to read /org/bluez/hci0/dev_B0_49_5F_02_B5_61/service0400/char0410
-> > > > > > > > > Failed to read: org.bluez.Error.Failed
-> > > > > > > > >
-> > > > > > > > > I have bluetoothd running with debug flags but nothing appears in the
-> > > > > > > > > debug logs. What am I doing wrong?
-> > > > > > > >
-> > > > > > > > Look at the flags, it only has indicate so it doesn't support reading directly.
-> > > > > > > >
-> > > > > > > > --
-> > > > > > > > Luiz Augusto von Dentz
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > --
-> > > > > > Luiz Augusto von Dentz
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Luiz Augusto von Dentz
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+> Hi Rocky,
+> 
+> On Fri, Dec 27, 2019 at 03:21:28PM +0800, Rocky Liao wrote:
+> 
+>> This patch adds the retry of btsoc initialization when it fails. There 
+>> are
+>> reports that the btsoc initialization may fail on some platforms but 
+>> the
+>> repro ratio is very low. The failure may be caused by UART, platform 
+>> HW or
+>> the btsoc itself but it's very difficlut to root cause, given the 
+>> repro
+>> ratio is very low. Add a retry for the btsoc initialization will 
+>> resolve
+>> most of the failures and make Bluetooth finally works.
+> 
+> Is this problem specific to a certain chipset?
+> 
+> What are the symptoms?
+
+It's reported on Rome so far but I think the patch is potentially 
+helpful for
+wcn399x as well.
+
+The symptoms is the firmware downloading failed due to the UART write 
+timed out.
+
+>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+>> ---
+>> 
+>> Changes in v2: None
+>> Changes in v3: None
+>> 
+>> drivers/bluetooth/hci_qca.c | 26 ++++++++++++++++++++++++++
+>> 1 file changed, 26 insertions(+)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 43fd84028786..45042aa27fa4 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -53,6 +53,9 @@
+>> /* Controller debug log header */
+>> #define QCA_DEBUG_HANDLE    0x2EDC
+>> 
+>> +/* max retry count when init fails */
+>> +#define QCA_MAX_INIT_RETRY_COUNT 3
+> 
+> nit: MAX_RETRIES or MAX_INIT_RETRIES?
+> 
+> The QCA prefix just adds noise here IMO, there's no need to 
+> disambiguate
+> the constant from other retries since it is defined in hci_qca.c.
+> 
+>> +
+>> enum qca_flags {
+>> QCA_IBS_ENABLED,
+>> QCA_DROP_VENDOR_EVENT,
+>> @@ -1257,7 +1260,9 @@ static int qca_setup(struct hci_uart *hu)
+>> {
+>> struct hci_dev *hdev = hu->hdev;
+>> struct qca_data *qca = hu->priv;
+>> +    struct qca_serdev *qcadev;
+>> unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+>> +    unsigned int init_retry_count = 0;
+> 
+> nit: the name is a bit clunky, how about 'retries'?
+> 
+>> enum qca_btsoc_type soc_type = qca_soc_type(hu);
+>> const char *firmware_name = qca_get_firmware_name(hu);
+>> int ret;
+>> @@ -1275,6 +1280,7 @@ static int qca_setup(struct hci_uart *hu)
+>> */
+>> set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+>> 
+>> +retry:
+>> if (qca_is_wcn399x(soc_type)) {
+>> bt_dev_info(hdev, "setting up wcn3990");
+>> 
+>> @@ -1293,6 +1299,12 @@ static int qca_setup(struct hci_uart *hu)
+>> return ret;
+>> } else {
+>> bt_dev_info(hdev, "ROME setup");
+>> +        if (hu->serdev) {
+>> +            qcadev = serdev_device_get_drvdata(hu->serdev);
+>> +            gpiod_set_value_cansleep(qcadev->bt_en, 1);
+>> +            /* Controller needs time to bootup. */
+>> +            msleep(150);
+> 
+> Shouldn't this be in qca_power_on(), analogous to the power off code 
+> from
+> "[1/4]Bluetooth: hci_qca: Add QCA Rome power off support to the
+> qca_power_off()"?
+> 
+> qca_power_on() should then also be called for ROME. If you opt for this 
+> it
+> should be done in a separate patch, or possibly merged into the one
+> mentioned above.
+> 
+
+There is no qca_power_on() func and wcn399x is calling 
+qca_wcn3990_init() to
+do power on, I prefer to not do this change this time. If it's needed it 
+should
+be a new patch to add qca_power_on() which supports both Rome and 
+wcn399x.
+
+>> +        }
+>> qca_set_speed(hu, QCA_INIT_SPEED);
+>> }
+>> 
+>> @@ -1329,6 +1341,20 @@ static int qca_setup(struct hci_uart *hu)
+>> * patch/nvm-config is found, so run with original fw/config.
+>> */
+>> ret = 0;
+>> +    } else {
+>> +        if (init_retry_count < QCA_MAX_INIT_RETRY_COUNT) {
+>> +            qca_power_off(hdev);
+>> +            if (hu->serdev) {
+>> +                serdev_device_close(hu->serdev);
+>> +                ret = serdev_device_open(hu->serdev);
+>> +                if (ret) {
+>> +                    bt_dev_err(hu->hdev, "open port fail");
+> 
+> nit: "failed to open port"
