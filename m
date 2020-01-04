@@ -1,112 +1,103 @@
-Return-Path: <SRS0=BOlL=2Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=BHgP=2Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A53BC2D0C2
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 17:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A2DC00523
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Jan 2020 02:53:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 378E2215A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jan 2020 17:45:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B83D721734
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Jan 2020 02:53:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+8ZbV9S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Va3a0IzR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728137AbgACRp3 (ORCPT
+        id S1727260AbgADCxk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Jan 2020 12:45:29 -0500
-Received: from mail-ot1-f54.google.com ([209.85.210.54]:41774 "EHLO
-        mail-ot1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726077AbgACRp3 (ORCPT
+        Fri, 3 Jan 2020 21:53:40 -0500
+Received: from mail-pf1-f172.google.com ([209.85.210.172]:43090 "EHLO
+        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727255AbgADCxk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Jan 2020 12:45:29 -0500
-Received: by mail-ot1-f54.google.com with SMTP id r27so62016560otc.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jan 2020 09:45:28 -0800 (PST)
+        Fri, 3 Jan 2020 21:53:40 -0500
+Received: by mail-pf1-f172.google.com with SMTP id x6so23213232pfo.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jan 2020 18:53:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UHjMmXyc4cvw4XaLUeQiTc8j+wHyKH0uomFcACv8DzI=;
-        b=Y+8ZbV9S9mWaW++a2r/RJN5H7FC/Uq8kbqJFXT511HfDMK2XtYRB4Hw3bcae1OvLLP
-         q7NEaDGsZvd0dSg4AlxFyKaFJaoo61NnOcQGjuHcTJrLZlUvmf6eJV7IpWn+tXCrN4v2
-         S1LeRWLgURMaTu0J57x2q8tAFnxIrWYFyv99ACKJ3djP2/m1cGSwM7dybwNMWYYF1sXu
-         EDnsqh+bD3EdloMIpej5Sk4D5qn2+u7xZ8pmUd2oC40RqwCCgFjn7VfJ9WUE7iVDd1bw
-         uLUSXyliaR4D9JJpOAwXVvQHK8C1WtZRwQ1Uc1rzyC/Yf1MpgfaRYELH3mbulOhYHZ+O
-         JIaQ==
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-transfer-encoding:content-language;
+        bh=V5xys3awqtSGIHbInjB6hk1pCPnn90ilnMiPl+YQvAM=;
+        b=Va3a0IzRQY34jPiO/W2vje78w4u/zrNy+jhvwP2mmQlKPgDheqf1wK2fE5dORtZVRw
+         /Ky1mdqJL2mp3LWA/tZ77U7wsxp44NZBDo06tffiUV3b6aG6trMsxSRf4/IfoiCIH1wK
+         lY88NvuYa6httioHItbK+EAtNA0j3NZPzJzmjGxcWTtNkYptbDDHLxXIMdlJAtvqpLgj
+         4IezvjRWZbUML3wJKtZNcn3f+wDZDU9/4nEzEl9eKiDR7xYuh8gGglsaampT6VUcrUHa
+         /2N5l3CEWzJj+QwIQFBim//N4evdPvdhh3+UsfAgbTjK0chLKWWUzmbFnb1lmir4fDyv
+         UE2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UHjMmXyc4cvw4XaLUeQiTc8j+wHyKH0uomFcACv8DzI=;
-        b=dXg1ceNWxXt28kP9Ok5UWPBv0v7104U0gsu8dKSjq0GozB47D1izxQuz1/3altV5ie
-         zAYMbcfu8gz1FCUZNCbxthngUlah8YeH4DYToCNTlqRfP32QylG5SNt/8hmBhRaBxi32
-         Dt2Ggy/IV5Y4M64yV+vkzCjoojwIzu/1ITN8KFbRZGx7wOHAM1wFfh3IqHGniJQm2AD8
-         n/cEuzAQLXi9Z5OGt+kYnONcJt4Dc8DoqhfaIUx6au7V89XF1lwlav1fckJWwCc1rwma
-         uSjYzDRgYx22w7UPFncFqyhj5AH12J451KOQdzsqgUMdVju6BXo5JddVcJ7urtqLelmB
-         CTMg==
-X-Gm-Message-State: APjAAAXgp+TwDs8aImlfYY2KgyBJ0rI/Zwv5AsN63v0zSNAvbAbGJVUG
-        XhNUx+3rRCgF63HgPMOWqo0oYKh7D4IYkdyZWN+E28SY
-X-Google-Smtp-Source: APXvYqxV0ryec8vti5uouzKyoILWZIc8AwuuVXdlMOQxjbQz06t9T1M5BF56ptZ4lhNYUGBGTPVtLyKf/epJXxBV698=
-X-Received: by 2002:a9d:6d10:: with SMTP id o16mr101988587otp.28.1578073528262;
- Fri, 03 Jan 2020 09:45:28 -0800 (PST)
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=V5xys3awqtSGIHbInjB6hk1pCPnn90ilnMiPl+YQvAM=;
+        b=cps3Pm3E/rusDoYlRZdoPIZkSJqS/QQWH1tF7DVoFTVu5dCUtm93FULH8QFx2ihge3
+         LQkXOl6cwJRpZ5Sktf4jl/h54spKWuz1SCNrtevzn++rdFJ2dBQpSFKyAWADMkvpse6N
+         gHpMpA0Y8nDGOVIbCP7Be5JG+DL6mbW2Pa+VGXotylqFNmzyPjzCuqYiBiQDqSX97QrR
+         EkdOpfa4kGfeumTOt6PO7uV6sfPtMzJz3axKzDG18BZoynPLzmxHa4qw9of0vyRpGnui
+         YyZ2JMHsvoWaTcDpp14RokEbqWZZ4i9tegM0UmM5i4ugyQ8S88im9EM+6yXAvcIYIlUd
+         aUpQ==
+X-Gm-Message-State: APjAAAXD3+3WpKwwST6vXkcNDT/Tc9zMju82sijl78Ub9o4v/YL8Nmd/
+        DGraJB4srf/1ZG+8QnFYB5c60fvL
+X-Google-Smtp-Source: APXvYqwE/Pydi/qNp4FZ0pLhH9/fe6HqEo75zO1rHIPhBcdlQZzP9LJNBjnc1Iimt7NNAd7jGAMTow==
+X-Received: by 2002:aa7:968d:: with SMTP id f13mr95477066pfk.67.1578106419352;
+        Fri, 03 Jan 2020 18:53:39 -0800 (PST)
+Received: from mozzy.local ([2001:8003:2518:fa01:462a:acbd:21ff:a9ff])
+        by smtp.gmail.com with ESMTPSA id r20sm66093327pgu.89.2020.01.03.18.53.38
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Jan 2020 18:53:38 -0800 (PST)
+To:     linux-bluetooth@vger.kernel.org
+From:   John Floyd <johnfloyd0657@gmail.com>
+Subject: Bluetooth Serial Port Disconnect results in high CPU usage.
+Message-ID: <500ecaae-103b-dc09-24e7-ad6f12200199@gmail.com>
+Date:   Sat, 4 Jan 2020 13:53:36 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20200102172447.18574-1-luiz.dentz@gmail.com> <20200102172447.18574-2-luiz.dentz@gmail.com>
- <DM5PR14MB1385EC175428FE2F702258FEE6230@DM5PR14MB1385.namprd14.prod.outlook.com>
-In-Reply-To: <DM5PR14MB1385EC175428FE2F702258FEE6230@DM5PR14MB1385.namprd14.prod.outlook.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 3 Jan 2020 09:45:15 -0800
-Message-ID: <CABBYNZ+3A7qf6X6oLgV3FXOQbDYo5H52V6Ui_0R+WEM0sktGqw@mail.gmail.com>
-Subject: Re: [RFC 2/2] Bluetooth: Add BT_PHYS socket option
-To:     Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jamie,
+Similar to Bug 205579.
 
-On Thu, Jan 2, 2020 at 11:22 PM Jamie Mccrae
-<Jamie.Mccrae@lairdconnect.com> wrote:
->
-> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> > index e42bb8e03c09..69c0e7eb26d9 100644
-> > --- a/include/net/bluetooth/bluetooth.h
-> > +++ b/include/net/bluetooth/bluetooth.h
-> > @@ -121,6 +121,23 @@ struct bt_voice {
-> >
-> >  #define BT_SNDMTU              12
-> >  #define BT_RCVMTU              13
-> > +#define BT_PHYS                        14
-> > +
-> > +#define BT_PHY_BR_1M_1SLOT     0x00000001
-> > +#define BT_PHY_BR_1M_3SLOT     0x00000002
-> > +#define BT_PHY_BR_1M_5SLOT     0x00000004
-> > +#define BT_PHY_EDR_2M_1SLOT    0x00000008
-> > +#define BT_PHY_EDR_2M_3SLOT    0x00000010
-> > +#define BT_PHY_EDR_2M_5SLOT    0x00000020
-> > +#define BT_PHY_EDR_3M_1SLOT    0x00000040
-> > +#define BT_PHY_EDR_3M_3SLOT    0x00000080
-> > +#define BT_PHY_EDR_3M_5SLOT    0x00000100
-> > +#define BT_PHY_LE_1M_TX                0x00000200
-> > +#define BT_PHY_LE_1M_RX                0x00000400
-> > +#define BT_PHY_LE_2M_TX                0x00000800
-> > +#define BT_PHY_LE_2M_RX                0x00001000
-> > +#define BT_PHY_LE_CODED_TX     0x00002000
-> > +#define BT_PHY_LE_CODED_RX     0x00004000
->
-> My query about this is there is an option for LE Coded, but LE coded can have a data rate of 125Kbps or 500Kbps, is there no need to differentiate between the two rates in applications?
+However I am using the dbus interface to create the serial port profile 
+on the server, using similar coding described at
 
-I guess you referring to L=2 and L=8 payloads, those are unfortunately
-not exposed over HCI, they seem to be tied to LL power control and not
-with the PHY selection so Im not sure how we would be able to infer
-what payload is in use. Btw, I've the PHY bit fields to match what we
-use in the management socket,
+https://ukbaz.github.io/howto/AppInventor.html
 
+The connection works well but the disconnect ups the cpu usage (~100%) 
+for the thread running the SPP code.  Subsequent connects, data 
+transfers and disconnects still work over the bluetooth link.  The 
+initial connection before disconnect runs with <  3% cpu usage.
 
--- 
-Luiz Augusto von Dentz
+I tried closing down that SPP thread and restarting it, but the cpu load 
+stays high.  I have also disabled the bluetooth on the client and 
+re-enabled it.  CPU usage stays high.  Only restarting the bluetooth 
+subsystem on the server end, resets the cpu usage.
+
+The test system is bluez 5.52 on fedora desktop.  Client is Bluetooth 
+serial app on android.
+
+Running the server on raspberrypi zero results is similar behaviour.  It 
+running bluez v5.50.
+
+Any suggestions?  Need server operating on raspberrypi for low power use 
+on battery system.  Cannot afford to to restart bluetooth after each 
+disconnect.
+
+Cheers John
