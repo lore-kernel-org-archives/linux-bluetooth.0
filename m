@@ -2,108 +2,155 @@ Return-Path: <SRS0=BHgP=2Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC2BC2D0C2
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Jan 2020 13:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A17DC2D0C2
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Jan 2020 19:52:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D78D2464E
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Jan 2020 13:18:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1gEjlBq"
+	by mail.kernel.org (Postfix) with ESMTP id 5D6B6222C4
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Jan 2020 19:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725884AbgADNSJ (ORCPT
+        id S1726488AbgADTwp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 Jan 2020 08:18:09 -0500
-Received: from mail-pg1-f172.google.com ([209.85.215.172]:35275 "EHLO
-        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbgADNSJ (ORCPT
+        Sat, 4 Jan 2020 14:52:45 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:33733 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726307AbgADTwo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 Jan 2020 08:18:09 -0500
-Received: by mail-pg1-f172.google.com with SMTP id l24so24694488pgk.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 04 Jan 2020 05:18:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=al8pd8ExtQq9t6BystREaSUFF8BJYov7Zjf4FfVocFQ=;
-        b=a1gEjlBqe5gteXR8HA3GxDKP6K7FKbqB8zsBuBp3NKQu8RTrOzn1jVcFANQfi+39qo
-         IdCM4eWJ+PgucD4OKj2dCYxkMOTVDQsJDf6vOLJQw2iHjLV/fdmiIaIOBNw71Y9TR5k5
-         4qI8o+kztTW7Qz7ej8bDtnV9eLYH2xm3urSAJt9Fyef5CRcAS4iAD9aDJV2wbxJyNP/J
-         mli5hqcVPhPEFFKBIjwAACHSgin8/bcTQ1yTIZfCKP7yAeTCnXvEzqQxL2YmXJxOCEEC
-         mBjoGX+RvW0By4Ng5hYpJSxTU6JoneGWBefh/yzZoXGRy271iVKtj6F0DVS/SX8kbGz5
-         Y/pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=al8pd8ExtQq9t6BystREaSUFF8BJYov7Zjf4FfVocFQ=;
-        b=ATETXT3Qh5kESBOll3fnfpPk2I4AIEZ8L/Tm+nEgSOhC2ooPuDdt9RQGqExio09P7t
-         QPVxve8QMTs9TF9lev6hGC3acefhUrJ5BaBxa684o/6vOIKzd7d0NFa3RCaQG4ZB+D7L
-         IOJ0uz9iKCRkMJuhkhlP3Z5jv3JI83c4aAf2c5zAula2JbY1HaK382IcUN1L7j60siNN
-         H57BbMabKRQdWLy1cNxLDpFJRMepX3jU9VCEjJtaIcIS99IOBPD1/y4caEPQXyakwBNN
-         0UpmhJlETlrhZuScLG5qjIWp+DHymHxjQFYgWFCF/K+ow8zaOB17mf4EdrKk4IjCldnT
-         p5Uw==
-X-Gm-Message-State: APjAAAWiQGKdD/UndS1RY/EIzE2N2eGVwQBEPmYXiAeQd9nwGcZ4A/P7
-        diTRF1qRuNYcgknUHyWZhrpcLj4Wa/epdg==
-X-Google-Smtp-Source: APXvYqxkh5tLopD2c5gP+2wn6gXycWDSa3BSEZu7esTqvBnVmuvJgRB9oCthmhMZ/bAIg/3yBwZgYg==
-X-Received: by 2002:a63:5920:: with SMTP id n32mr100005205pgb.443.1578143888653;
-        Sat, 04 Jan 2020 05:18:08 -0800 (PST)
-Received: from djofarre-mobl1.ger.corp.intel.com ([134.134.139.76])
-        by smtp.gmail.com with ESMTPSA id u127sm73211406pfc.95.2020.01.04.05.18.06
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 04 Jan 2020 05:18:07 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: deprecated tools: rfcomm, can we un-deprecate it?
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-In-Reply-To: <cb73add2-cb8c-353a-5d10-134a13553cf4@message-id.googlemail.com>
-Date:   Sat, 4 Jan 2020 14:18:03 +0100
-Cc:     BlueZ devel list <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7192C77E-BFF5-4507-A004-3684EDE489AC@gmail.com>
-References: <0aad7250-65f9-3e4c-e5ca-434139a9ae64@message-id.googlemail.com>
- <2203E98B-B581-4C14-94DF-164D7E036234@holtmann.org>
- <fa70a57e-d5f0-a47d-f987-27b46d8275c4@message-id.googlemail.com>
- <cb73add2-cb8c-353a-5d10-134a13553cf4@message-id.googlemail.com>
-To:     Stefan Seyfried <stefan.seyfried@googlemail.com>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
+        Sat, 4 Jan 2020 14:52:44 -0500
+Received: from orion.localdomain ([95.114.65.70]) by mrelayeu.kundenserver.de
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1Mi2Bb-1jImZZ3gKf-00e89S; Sat, 04 Jan 2020 20:52:13 +0100
+From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     davem@davemloft.net, mareklindner@neomailbox.ch,
+        sw@simonwunderlich.de, a@unstable.cc, sven@narfation.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        roopa@cumulusnetworks.com, nikolay@cumulusnetworks.com,
+        edumazet@google.com, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org,
+        jon.maloy@ericsson.com, ying.xue@windriver.com, kafai@fb.com,
+        songliubraving@fb.com, yhs@fb.com, andriin@fb.com,
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net,
+        linux-hyperv@vger.kernel.org, bpf@vger.kernel.org
+Subject: [PATCH 5/8] net: bluetooth: remove unneeded MODULE_VERSION() usage
+Date:   Sat,  4 Jan 2020 20:51:28 +0100
+Message-Id: <20200104195131.16577-5-info@metux.net>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20200104195131.16577-1-info@metux.net>
+References: <20200104195131.16577-1-info@metux.net>
+X-Provags-ID: V03:K1:rqA9KHBG4cysDCokVxgm9Sj+YPWcsUNju7xr0PpY/iJlLx1AnGC
+ 5RZj76Enp58YNH9g0fqLvKXPzgCpzljXiNYc3I3D44rXQwcjCpwI6G7ZRwzO8DA0IwXF693
+ 97K4gNDoeKoJ9tvibFytZ0/+qxiRt8ncCmlIpyluZ87QlBMz5TImajPVGCSw8uhHfovz65b
+ 699C9ZVmaF1AfBfIqpYLw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Tuf0pe90wXk=:rWkZWxUGjuC0GX/5ngcmin
+ Xj6VzgAh8RrksJIeD2YdxtBpHEJPWVE//m1Vs3X48bw51sGYUBBrn5wlo1tPLXOt40AAU3Ful
+ 5eclNIwRfdlGunG/I7fw4SQpTFDI+0dipUUylX/qcty5kJN0HiQvONr9jysNbICdBmNKz+o5P
+ Fw2bQemWYa3JWU+iBMG/WMbgt1JgJb9Tc3Xk83TB51MV6A9OmupcCY1Eg877/ynGcSzBnL+dL
+ 2bB6471/uKuj8Vv5+gLU/3sv0wky3FzGJnQxkvPebgxvYA4a/uqaL9x7qg/ByBKXCtdjCUJyF
+ 6BJzh8FOzrhyzeTTscVMhouuID/mhmpkAwePcJlk2mObf0RO3b2q7XzxiD8X0sNQ2P6tyFq8X
+ u6bO5U8UdqRAfkmLren4wzXLSobBcpkTwcLSFUExq2WZdkWi4Gw4pU4c3aBk47rTy0BeGhQvL
+ Qn8ekWquBHZYGOUUsuI3dwOV6REobGz6f9fx2VY3XMBg72I5lI0gyGvor5FS1IGXPdYXOdT59
+ sqOZQfDa/mU6XAQ78JWuJF8jDn1E15YnhVNjOkP8EfQtHvK4A3Rd3ZM/6O5NrImoHVTJhThst
+ 9PDJkUsJeJ57hJbSJAWPtsE4jWNqo2pOhwNi+LOYVbbELA7ArXuVnwj3QqpAhtpmOjYxVrtCW
+ dBUv6Dyjsd0ZeO5iUETPVFLSGHmPp2aAflUybgPl3/t00Ow0BP+2Xc4YUNgPWJ1XeZkbQWRrZ
+ NAZIxoQ5GhKlXpuWSe86BOmNADRG2nD6W7o22eYWTp9seqccwz0kbL3KdqYRz6fjxdZN4wi0O
+ TtZzkCLKTWV0z0eVEQpdnOwZCYLJ3mOb9vL1I0sUSoYsQNJrk058bcDnkF3y/K8xREw6XWrG1
+ s1V5QzVKUrXsZyBVu9vQ==
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Stefan,
+Remove MODULE_VERSION(), as it isn't needed at all: the only version
+making sense is the kernel version.
 
-On 4. Jan 2020, at 13.45, Stefan Seyfried =
-<stefan.seyfried@googlemail.com> wrote:
->> This would be for creating a "rfcomm service" for other devices to
->> connect to, right? (The equivalent of "rfcomm listen...")
->>=20
->> But how would I connect e.g. to my serial module (I got this for =
-trying
->> it by myself instead of relying on bugreporters results...), so =
-what's
->> the dbus equivalent of "rfcomm connect hci0 <bdaddr> <channel>"?
->=20
-> OK, now I found https://github.com/tonyespy/bluez5-spp-example which
-> explains how to do this.
->=20
-> I'd still think an example in the bluez documentation would be useful,
-> because=E2=80=A6
+Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
+---
+ net/bluetooth/6lowpan.c      | 3 ---
+ net/bluetooth/af_bluetooth.c | 1 -
+ net/bluetooth/bnep/core.c    | 1 -
+ net/bluetooth/cmtp/core.c    | 1 -
+ net/bluetooth/hidp/core.c    | 1 -
+ net/bluetooth/rfcomm/core.c  | 1 -
+ 6 files changed, 8 deletions(-)
 
-Doesn=E2=80=99t test/test-profile give a pretty good overview of both =
-server- and client-role usage of the Profile D-Bus API? The main =
-difference to the RFCOMM ioctls is that instead of a TTY you get a file =
-descriptor (which I guess you could convert to a TTY using a pty). For =
-client, another difference is that it=E2=80=99s a two-step process, i.e. =
-first you register the client role profile and then you call e.g. =
-ConnectProfile (which test-profile doesn=E2=80=99t cover).
-
-Johan
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4febc82a7c76..76fabc65b8a9 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -21,8 +21,6 @@
+ 
+ #include <net/6lowpan.h> /* for the compression support */
+ 
+-#define VERSION "0.1"
+-
+ static struct dentry *lowpan_enable_debugfs;
+ static struct dentry *lowpan_control_debugfs;
+ 
+@@ -1303,5 +1301,4 @@ module_exit(bt_6lowpan_exit);
+ 
+ MODULE_AUTHOR("Jukka Rissanen <jukka.rissanen@linux.intel.com>");
+ MODULE_DESCRIPTION("Bluetooth 6LoWPAN");
+-MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 3fd124927d4d..1a6972fac1f7 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -798,6 +798,5 @@ module_exit(bt_exit);
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth Core ver " VERSION);
+-MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_NETPROTO(PF_BLUETOOTH);
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 43c284158f63..96f0eb60deb0 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -764,6 +764,5 @@ MODULE_PARM_DESC(compress_dst, "Compress destination headers");
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth BNEP ver " VERSION);
+-MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS("bt-proto-4");
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 07cfa3249f83..9a6306d7f738 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -511,6 +511,5 @@ module_exit(cmtp_exit);
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth CMTP ver " VERSION);
+-MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS("bt-proto-5");
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index bef84b95e2c4..a225ae5f1849 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -1475,6 +1475,5 @@ module_exit(hidp_exit);
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_AUTHOR("David Herrmann <dh.herrmann@gmail.com>");
+ MODULE_DESCRIPTION("Bluetooth HIDP ver " VERSION);
+-MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS("bt-proto-6");
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 3a9e9d9670be..e621fbb451b3 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -2245,6 +2245,5 @@ MODULE_PARM_DESC(l2cap_ertm, "Use L2CAP ERTM mode for connection");
+ 
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth RFCOMM ver " VERSION);
+-MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS("bt-proto-3");
+-- 
+2.11.0
 
