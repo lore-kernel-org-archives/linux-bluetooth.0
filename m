@@ -2,232 +2,91 @@ Return-Path: <SRS0=R8GA=23=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB92C33C8C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jan 2020 11:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D013C33C8C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jan 2020 13:36:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B67EC207FF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jan 2020 11:44:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZQJuHr3"
+	by mail.kernel.org (Postfix) with ESMTP id 2DACC2072E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Jan 2020 13:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726300AbgAFLoV (ORCPT
+        id S1726382AbgAFNgm convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Jan 2020 06:44:21 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:37137 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725787AbgAFLoV (ORCPT
+        Mon, 6 Jan 2020 08:36:42 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:48624 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726292AbgAFNgl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Jan 2020 06:44:21 -0500
-Received: by mail-lf1-f68.google.com with SMTP id b15so36182863lfc.4;
-        Mon, 06 Jan 2020 03:44:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aYrgRkm0PZPCJxxGLNSZWfu1cDxBdCF0aL8SvR3R1J0=;
-        b=gZQJuHr3Wb/5pyS8/zjjdvOL6sft08lp7keJa9ueYLyWUok+4bbFAeXB6itxLhxAKq
-         aC4JPuqiO/d7PQ6EXG2Xzuh+CGGxS84/dnYJadO0xLxWvdKGocv+YM+4p321MCVhp0xC
-         VMlQ3dm4AhLLW+cRn0WcEIzkenUUGRg6g/H8mNnL/Bi5hI8TV4rtH9/+s4w2c0Tkru+r
-         0/tnscwtiIrZoPBUGlEiR8fntLKtYbHN+pn+M0vYlQ5M1/WZyt0dxfuX6M7tE5BKs56s
-         WOD/zqvF0c3LsyhbQg/7tFsSzym5MfrMrxrfAxesefkca/z/ths9Bcyc9irohHWf8q6R
-         WV3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aYrgRkm0PZPCJxxGLNSZWfu1cDxBdCF0aL8SvR3R1J0=;
-        b=ZsH14NlNbEn7F2JeyQQ+FM7RhUgBHh5z1Xdu15I5Wq9aZok5F5+HjK1jNhGzhJzJNP
-         1t/Yp95iaCqyT5x+M6rwZWk9zOeikDFx6gVjVCQfgSm+l4MwngYABI6IpAXefQ8eeeIZ
-         fGPLTXiR77RGRczMnFxIRmmGj/KDKe+xIlJL4XuprPDYbvKz1ksCW/vOB1hzYTDLlds2
-         dwsUDxnPq8mliBnCuyCdSHJPvRHp+BePheYcsF6HXIDnP/GGp8g9BPT9ZdFI5d2Ks+sU
-         YkVujyHRsnMJrRS9m5zTL4Wtv10irp3ztvTVY1A/zvhR9wO+iwtRi0/VVGUfWX0o9zD5
-         Ot/Q==
-X-Gm-Message-State: APjAAAVeagf7DyXYMZ/JIDf2JJKd8tQZJYlpfj34uY9VZymGRYuWwlqd
-        3OVFAnN9K9HMm823TKeBm8qKiKf4xS/estWi8Ri5neQn
-X-Google-Smtp-Source: APXvYqxLq9AYASV1X43me3CXFHTkDnH1Hmd/uYAb4t9tiqLx7UDJD1PmQ27wwsvNBuv1g/6ou69WDH7k2VBZbrIQUMo=
-X-Received: by 2002:ac2:508e:: with SMTP id f14mr52292900lfm.72.1578311057816;
- Mon, 06 Jan 2020 03:44:17 -0800 (PST)
-MIME-Version: 1.0
-References: <20200106181425.Bluez.v1.1.I5ee1ea8e19d41c5bdffb4211aeb9cd9efa5e0a4a@changeid>
- <CAMCGoNzCvOgcg0hAhDO-wcFLgX75JL-G6q1KuGFEjrEz+oPTxA@mail.gmail.com>
-In-Reply-To: <CAMCGoNzCvOgcg0hAhDO-wcFLgX75JL-G6q1KuGFEjrEz+oPTxA@mail.gmail.com>
-From:   Matias Karhumaa <matias.karhumaa@gmail.com>
-Date:   Mon, 6 Jan 2020 13:44:06 +0200
-Message-ID: <CAMCGoNyzN17pK_4t6bWt4OLsWnFUEdn06dJwz=mhzxQLv0BbOA@mail.gmail.com>
-Subject: Fwd: [Bluez PATCH v1] bluetooth: secure bluetooth stack from bluedump attack
-To:     howardchung@google.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 6 Jan 2020 08:36:41 -0500
+Received: from marcel-macbook.fritz.box (p5B22B473.dip0.t-ipconnect.de [91.34.180.115])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 67D39CECD3;
+        Mon,  6 Jan 2020 14:45:56 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for 04ca:3021 QCA_ROME
+ device
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200106060744.5476-1-rjliao@codeaurora.org>
+Date:   Mon, 6 Jan 2020 14:36:39 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <0E6CEC41-1759-4C13-86CF-9067B0F272E4@holtmann.org>
+References: <20191219071857.18532-1-rjliao@codeaurora.org>
+ <20200106060744.5476-1-rjliao@codeaurora.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Rocky,
 
-Re-sending as plain text.
-
-This same attack scenario works also against Ubuntu 18.04 at least.
-
-ma 6. tammik. 2020 klo 12.17 howardchung@google.com
-(howardchung@google.com) kirjoitti:
->
-> From: howardchung <howardchung@google.com>
->
-> Attack scenario:
-> 1. A Chromebook (let's call this device A) is paired to a legitimate
->    Bluetooth classic device (e.g. a speaker) (let's call this device
->    B).
-> 2. A malicious device (let's call this device C) pretends to be the
->    Bluetooth speaker by using the same BT address.
-> 3. If device A is not currently connected to device B, device A will
->    be ready to accept connection from device B in the background
->    (technically, doing Page Scan).
-> 4. Therefore, device C can initiate connection to device A
->    (because device A is doing Page Scan) and device A will accept the
->    connection because device A trusts device C's address which is the
->    same as device B's address.
-> 5. Device C won't be able to communicate at any high level Bluetooth
->    profile with device A because device A enforces that device C is
->    encrypted with their common Link Key, which device C doesn't have.
->    But device C can initiate pairing with device A with just-works
->    model without requiring user interaction (there is only pairing
->    notification). After pairing, device A now trusts device C with a
->    new different link key, common between device A and C.
-> 6. From now on, device A trusts device C, so device C can at anytime
->    connect to device A to do any kind of high-level hijacking, e.g.
->    speaker hijack or mouse/keyboard hijack.
->
-> To fix this, reject the pairing if all the conditions below are met.
-> - the pairing is initialized by peer
-> - the authorization method is just-work
-> - host already had the link key to the peer
->
-> Also create a debugfs option to permit the pairing even the
-> conditions above are met.
->
-> Signed-off-by: howardchung <howardchung@google.com>
+> USB "VendorID:04ca ProductID:3021" is a new QCA ROME USB
+> Bluetooth device, this patch will support firmware downloading for it.
+> 
+> T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=04ca ProdID=3021 Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 > ---
->
->  include/net/bluetooth/hci.h |  1 +
->  net/bluetooth/hci_core.c    | 47 +++++++++++++++++++++++++++++++++++++
->  net/bluetooth/hci_event.c   | 12 ++++++++++
->  3 files changed, 60 insertions(+)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 07b6ecedc6ce..4918b79baa41 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -283,6 +283,7 @@ enum {
->         HCI_FORCE_STATIC_ADDR,
->         HCI_LL_RPA_RESOLUTION,
->         HCI_CMD_PENDING,
-> +       HCI_PERMIT_JUST_WORK_REPAIR,
->
->         __HCI_NUM_FLAGS,
->  };
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 9e19d5a3aac8..9014aa567e7b 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -172,10 +172,57 @@ static const struct file_operations vendor_diag_fops = {
->         .llseek         = default_llseek,
->  };
->
-> +static ssize_t permit_just_work_repair_read(struct file *file,
-> +                                           char __user *user_buf,
-> +                                           size_t count, loff_t *ppos)
-> +{
-> +       struct hci_dev *hdev = file->private_data;
-> +       char buf[3];
-> +
-> +       buf[0] = hci_dev_test_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR) ? 'Y'
-> +                                                                     : 'N';
-> +       buf[1] = '\n';
-> +       buf[2] = '\0';
-> +       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> +}
-> +
-> +static ssize_t permit_just_work_repair_write(struct file *file,
-> +                                            const char __user *user_buf,
-> +                                            size_t count, loff_t *ppos)
-> +{
-> +       struct hci_dev *hdev = file->private_data;
-> +       char buf[32];
-> +       size_t buf_size = min(count, (sizeof(buf) - 1));
-> +       bool enable;
-> +
-> +       if (copy_from_user(buf, user_buf, buf_size))
-> +               return -EFAULT;
-> +
-> +       buf[buf_size] = '\0';
-> +       if (strtobool(buf, &enable))
-> +               return -EINVAL;
-> +
-> +       if (enable)
-> +               hci_dev_set_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR);
-> +       else
-> +               hci_dev_clear_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR);
-> +
-> +       return count;
-> +}
-> +
-> +static const struct file_operations permit_just_work_repair_fops = {
-> +       .open           = simple_open,
-> +       .read           = permit_just_work_repair_read,
-> +       .write          = permit_just_work_repair_write,
-> +       .llseek         = default_llseek,
-> +};
-> +
->  static void hci_debugfs_create_basic(struct hci_dev *hdev)
->  {
->         debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
->                             &dut_mode_fops);
-> +       debugfs_create_file("permit_just_work_repair", 0644, hdev->debugfs,
-> +                           hdev, &permit_just_work_repair_fops);
->
->         if (hdev->set_diag)
->                 debugfs_create_file("vendor_diag", 0644, hdev->debugfs, hdev,
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 6ddc4a74a5e4..898e347e19e0 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4539,6 +4539,18 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
->                 goto unlock;
->         }
->
-> +       /* If there already exists link key in local host, terminate the
-> +        * connection by default since the remote device could be malicious.
-> +        * Permit the connection if permit_just_work_repair is enabled.
-> +        */
-> +       if (!hci_dev_test_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR) &&
-> +           hci_find_link_key(hdev, &ev->bdaddr)) {
-> +               BT_DBG("Rejecting request: local host already have link key");
-> +               hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_NEG_REPLY,
+> 
+> Changes in v2: Added the /sys/kernel/debug/usb/devices output to the commit message
+> 
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-Why wouldn't we just request authorization from userspace in case we
-already have link key? I think that is how it works on other
-platforms.
->
-> +                            sizeof(ev->bdaddr), &ev->bdaddr);
-> +               goto unlock;
-> +       }
-> +
->         /* If no side requires MITM protection; auto-accept */
->         if ((!loc_mitm || conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) &&
->             (!rem_mitm || conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)) {
-> --
-> 2.24.1.735.g03f4e72817-goog
+patch has been applied to bluetooth-next tree.
 
+Regards
 
-Best regard,
-Matias Karhumaa
+Marcel
+
