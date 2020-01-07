@@ -2,121 +2,125 @@ Return-Path: <SRS0=JtZ7=24=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21648C33C9B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 12:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E59CFC33C8C
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 13:49:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC02E2072A
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 12:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B652120656
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 13:49:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="cwJlYynO"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="gq51lt5z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727806AbgAGMdw (ORCPT
+        id S1727858AbgAGNtW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jan 2020 07:33:52 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40541 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726937AbgAGMdw (ORCPT
+        Tue, 7 Jan 2020 08:49:22 -0500
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:56087 "EHLO
+        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727658AbgAGNtW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jan 2020 07:33:52 -0500
-Received: by mail-wr1-f67.google.com with SMTP id c14so53723115wrn.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 04:33:50 -0800 (PST)
+        Tue, 7 Jan 2020 08:49:22 -0500
+Received: by mail-wm1-f53.google.com with SMTP id q9so19021241wmj.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 05:49:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        d=googlemail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=GXTBxUXFf/0lblKnPV2tJJx5huyZR82ySCgLFN7gCSA=;
-        b=cwJlYynOcPBu0xjHXZZtpNCmwXosTzSWCtLwB3W1r1F0BYW1V+9cNdIXBOJ7v5ssmn
-         KxurqCUl8ttNr8KL4synUaSdUyAOcSW+XSv4HHYpnC+E6ctaLjgOPMHNm1kqUEGBTzEF
-         MkwoqzXCAQt2sJ1fAtXtdaHp1UaJ6OXabwQqaIjuQiS5gRHZJiW6HVMJFPHZdneDiwbj
-         LZ8RZRw1vpqaLW8KXieB2i+2arTsB0wBlFWVsIryoPlSJfdh58C8W+d5YHTc8iLfC3vf
-         bZVSd3eU9AzvXiPSUmUUzzwjELxsvKf37egkTVkqPmnkSJo5ucKHDyjDRzqvmB4KHxp6
-         pSSA==
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=sxkg0xlNPC2K/knXuQ++in8aGGMBYeXUp2zUaYdGV40=;
+        b=gq51lt5zzizNxK97PrMkUbgrWPS85X2SkhmV+9ds94Nmo8axxgR01ssozU68d9qMed
+         +UiU5S+y2zjYuBI5SPTQM+X+zUD+QrP/7+ShrVZkLvHA9N5P9OazmJXKAe2BJ0+wLYHj
+         nQfnaJOsm0LYXgx8DEbmnubMj/r7t/QXIWEy2P5RuZOvW97/50Grg9ythOO89R6Dju7y
+         tM7ilLwL5P/flZRkys5tCYIa49QvVBzMpXAV1Yahrc5lpXUVlf6ErD8DKG9uFR05IdOF
+         BHS9VjjwdeQpOebsh3WimltZCD5hwWNS34jxven/ELXtxaUJS07nsBtUpts9tQBLWiMn
+         jwyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=GXTBxUXFf/0lblKnPV2tJJx5huyZR82ySCgLFN7gCSA=;
-        b=BEzguodmG0jTK5ZEwMP1U6xCqnQzPhqxESIg0VQrZlK//KMPrstOLiL/umubhDVEFN
-         RutKpyeEhFBYylW0Fw8JPNc/y0l0PTnyEMjklnOGJXOwkbNwVISOeaxVZ0qK+9CnoEFn
-         5xV/xZtYbxgSyqZNBPIImFbc5xlIsXx4DsNCrgYJBixleDaAWiW0gJLhHRRPnee9Iqiw
-         iKhzCoggXfM05Gl3drGi4UnCwgHlGWoIowLDYsqPxDqYYM9IRNYFFq9zpqLU21gNbLjp
-         qUTOy8S3frRhwl/jJ/puxkQJIyYsdzhSu1FFeht3r6FC5/bzN1zJMFM37F+jMUgoHxQc
-         DaOQ==
-X-Gm-Message-State: APjAAAUf6dJyjRl5nfvtne0WiXVHRqDS3rHdn+3wnnA2PaWczjCJ1yvn
-        O/tjuny8OxV87Cr+pp6+tKwGpQ==
-X-Google-Smtp-Source: APXvYqy74uz9nvj2BIPxpdM20AIWwAe3Di+G7rYdWb/b+n9twWOnu7KnRC6p6sEYexCJAXfIfdL7xA==
-X-Received: by 2002:adf:dd4d:: with SMTP id u13mr110724265wrm.394.1578400430159;
-        Tue, 07 Jan 2020 04:33:50 -0800 (PST)
-Received: from ?IPv6:2a01:cb1d:6e7:d500:82a9:347a:43f3:d2ca? ([2a01:cb1d:6e7:d500:82a9:347a:43f3:d2ca])
-        by smtp.gmail.com with ESMTPSA id f127sm26361528wma.4.2020.01.07.04.33.49
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=sxkg0xlNPC2K/knXuQ++in8aGGMBYeXUp2zUaYdGV40=;
+        b=mv7Y3X6nbsE55VRlibn1/KSUvM5Y0db/rn/VwPH7hnJoJ4D/njrs7oXCWOdfW0Idy7
+         5gDPqJO9Mnv68CNuHn7CngjMaXdN74XeboVJzcHnDnlp/28USrmFHivscmRZaekTkc2t
+         2Hha+GDINtXak484zCB3OiKno5gQd/M//9OpIloDdNxWYBI8c3Wcwuultm0tvcNx/b4U
+         R3IUyjxuFEP4l0qZA04pgC1QDSgz7HxdR38dR0ZKPRaubjVskJB4MG3B+gnslADpUoMO
+         DHKFrW4PfJ+ZQSM7CSKVPOAHh9jRMt9aShKvtOJSDWEooqjORvTCy8r3W5NMXegeGxEx
+         L6jg==
+X-Gm-Message-State: APjAAAVXFdl11pjOg8mt5hIbFjK+ymc6ONYcUmcQV4O+iLKC9rjJtx3J
+        1jZXY2uJ7U7m0YR1eLtCd+l+HIJt
+X-Google-Smtp-Source: APXvYqyVPC4gr6jsnS8rMQyBKCsKXsfs1pNGtOtx6gJ/klVtXtDA8szgVNA/RnURtolwiVakKJUudA==
+X-Received: by 2002:a7b:cc98:: with SMTP id p24mr39021439wma.139.1578404960052;
+        Tue, 07 Jan 2020 05:49:20 -0800 (PST)
+Received: from [192.168.201.5] (p4FD25D76.dip0.t-ipconnect.de. [79.210.93.118])
+        by smtp.googlemail.com with ESMTPSA id t190sm26735803wmt.44.2020.01.07.05.49.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2020 04:33:49 -0800 (PST)
-Subject: Re: [PATCH v4] bluetooth: hci_bcm: enable IRQ capability from node
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hovold <johan@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        BlueZ devel list <linux-bluetooth@vger.kernel.org>,
-        nsaenzjulienne@suse.de, linux-kernel@vger.kernel.org,
-        khilman@baylibre.com
-References: <20191213105521.4290-1-glaroque@baylibre.com>
- <20191213111702.GX10631@localhost>
- <162e5588-a702-6042-6934-dd41b64fa1dc@baylibre.com>
- <20191213134404.GY10631@localhost>
- <08ae6108-0829-3bb4-f398-7e6a58719d29@baylibre.com>
- <8EBBCE1B-688D-4097-A2AF-6E099A0AD68B@holtmann.org>
-From:   guillaume La Roque <glaroque@baylibre.com>
-Message-ID: <11747601-6d29-d2c8-7639-896d654280a4@baylibre.com>
-Date:   Tue, 7 Jan 2020 13:33:48 +0100
+        Tue, 07 Jan 2020 05:49:19 -0800 (PST)
+Subject: Re: deprecated tools: rfcomm, can we un-deprecate it?
+To:     BlueZ devel list <linux-bluetooth@vger.kernel.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+References: <0aad7250-65f9-3e4c-e5ca-434139a9ae64@message-id.googlemail.com>
+ <2203E98B-B581-4C14-94DF-164D7E036234@holtmann.org>
+ <fa70a57e-d5f0-a47d-f987-27b46d8275c4@message-id.googlemail.com>
+ <cb73add2-cb8c-353a-5d10-134a13553cf4@message-id.googlemail.com>
+ <7192C77E-BFF5-4507-A004-3684EDE489AC@gmail.com>
+From:   Stefan Seyfried <stefan.seyfried@googlemail.com>
+Message-ID: <0524896a-fedc-463d-14ac-370de38467de@message-id.googlemail.com>
+Date:   Tue, 7 Jan 2020 14:49:17 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <8EBBCE1B-688D-4097-A2AF-6E099A0AD68B@holtmann.org>
+In-Reply-To: <7192C77E-BFF5-4507-A004-3684EDE489AC@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Johan,
 
-On 1/4/20 10:58 AM, Marcel Holtmann wrote:
-> Hi Guillaume,
->
->>>>>> @@ -1421,6 +1422,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
->>>>>> #endif
->>>>>> 	bcmdev->serdev_hu.serdev = serdev;
->>>>>> 	serdev_device_set_drvdata(serdev, bcmdev);
->>>>>> +	bcmdev->irq = of_irq_get(bcmdev->dev->of_node, 0);
->>>>> Shouldn't you be used using of_irq_get_byname()?
->>>> i can use it if you prefer but no other interrupt need to be defined
->>> Maybe not needed then. Was just thinking it may make it more clear that
->>> you now have two ways to specify the "host-wakeup" interrupt (and in
->>> your proposed implementation the interrupts-property happens to take
->>> priority). Perhaps that can be sorted out when you submit the binding
->>> update for review.
->> no problem i add a "host-wakeup" interrupt-name.
->> you are right it will be more clear with name and we know why this interrupt is needed.
-> have I missed the v5 or are still sending it?
+Am 04.01.20 um 14:18 schrieb Johan Hedberg:
+> Hi Stefan,
+> 
+> On 4. Jan 2020, at 13.45, Stefan Seyfried <stefan.seyfried@googlemail.com> wrote:
+>>> This would be for creating a "rfcomm service" for other devices to
+>>> connect to, right? (The equivalent of "rfcomm listen...")
+>>>
+>>> But how would I connect e.g. to my serial module (I got this for trying
+>>> it by myself instead of relying on bugreporters results...), so what's
+>>> the dbus equivalent of "rfcomm connect hci0 <bdaddr> <channel>"?
+>>
+>> OK, now I found https://github.com/tonyespy/bluez5-spp-example which
+>> explains how to do this.
+>>
+>> I'd still think an example in the bluez documentation would be useful,
+>> because…
+> 
+> Doesn’t test/test-profile give a pretty good overview of both server- and client-role usage of the Profile D-Bus API?
 
-sorry i was in chrismas holidays .
+You are right, now that I know what I am looking for, this is exactly the example code that I need ;-)
 
-v5 was sent before holiday and you comment it [1] ;) , on v5 you ask me to send v6 with tag.
+> The main difference to the RFCOMM ioctls is that instead of a TTY you get a file descriptor (which I guess you could convert to a TTY using a pty). For client, another difference is that it’s a two-step process, i.e. first you register the client role profile and then you call e.g. ConnectProfile (which test-profile doesn’t cover).
 
+I'll try to cook up an example application (if I get some spare time...) for the
+(apparently) #1 wanted application of old rfcomm:
+connecting to a "serial console" via bluetooth and then starting a terminal program on /dev/rfcomm0
 
-Regards
+This should be possible by either providing a local socket that can be connected to or a pty.
 
-Guillaume
+We can then decide if we include this in the bluez examples or if I provide it as a
+separate project.
 
->
-> Regards
->
-> Marcel
->
-[1] : https://www.spinics.net/lists/linux-bluetooth/msg82424.html
+Best regards ans thanks for the info,
+
+	Stefan
+-- 
+Stefan Seyfried
+
+"For a successful technology, reality must take precedence over
+ public relations, for nature cannot be fooled." -- Richard Feynman
