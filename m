@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA96C33C99
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 09:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79993C33C9B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 09:18:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D3C232087F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 09:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E1A32087F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 09:18:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="RjqY1w4R"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="HjCx31Un"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726937AbgAGJS5 (ORCPT
+        id S1727154AbgAGJS7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jan 2020 04:18:57 -0500
-Received: from mail-lj1-f180.google.com ([209.85.208.180]:40552 "EHLO
-        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726327AbgAGJS5 (ORCPT
+        Tue, 7 Jan 2020 04:18:59 -0500
+Received: from mail-lj1-f169.google.com ([209.85.208.169]:44866 "EHLO
+        mail-lj1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726327AbgAGJS6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jan 2020 04:18:57 -0500
-Received: by mail-lj1-f180.google.com with SMTP id u1so53912044ljk.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 01:18:56 -0800 (PST)
+        Tue, 7 Jan 2020 04:18:58 -0500
+Received: by mail-lj1-f169.google.com with SMTP id u71so53908284lje.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 01:18:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=SSvUPMj9oDG8ge9IMvQUvFjkR/T0aekFdLjEpPzlIdY=;
-        b=RjqY1w4RKtqKJ9t2SohNvFguXVyS1vEcvkWl23D/TnlMa35jQ9QI4g74GEZGvHFF0x
-         9pgku1YHxozEjfDvlBHR2r4RQ84xJsLWqNZmJigNaCLG3aAaby9WSbschOQYHN20zm3n
-         BYO+VlmbVhD5Epe/qtApI/MXb8eJOqCfKCmT7toBkzmhiEzJfI1G1NeCblDrAwk9k60F
-         mp7ftlr5yTWdD+YfFBqX0q9mlPPw8hCTqKiNpf+0f+gxtsmJHkJ/oJA2Rwy4dh6dNqh3
-         4g8pI8vpVB/OZPKZfFUItQhqzJafOlyPZ0jQBchblB2nJcIuGjzNu6cPJqNetsOFS9gB
-         dEaA==
+        bh=As14hH5XTd91cqludgJ3ZyIIxEQXQtCoXFONbDuSuOY=;
+        b=HjCx31UnS6dgpILh/wtsLpyp2x2jYTFmMyqj6v+9YJ3Vye88N7FVsI3mFmPOtZT8wM
+         dvL6p8IggFfcos7JDo4XjwAQVXRQyGvf+99qHZyv9MYg+aQs/kg7974eT/srAYjMkdHI
+         pPsmOLxBG9t3fi8INAc8qqAaHgqfD0/ClTVkfcezksTl4+hReQz+8lkChuhqJRKnYazK
+         Q0ZczXa30A//Kahq0W0QJWExua94M3GbJTc8MNekJYsDCSPH3nl8JRm+V059onok6BYC
+         YkP1pR3z2fuZVOMEHnpgk/8qV3bZJ6tQdh08vpFTEbolZ5yCODIrqQGO4QtvVM78ZFTD
+         TCQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SSvUPMj9oDG8ge9IMvQUvFjkR/T0aekFdLjEpPzlIdY=;
-        b=Vw+tRCFDMdUzvqe0qSEQx0ZRujDxrwgR3S3S8UnlJV2MO0r/msd9yIF4rcM2SoVrZq
-         Ook4FFAk+QmlEXVs/k0+ymV9P287p1jQQtRa6rOjfhlRvF/+nJtgPTTNxiI+z4XvWGlh
-         pdcpVx/PBXLPOyMG/Efwaw+dFfZ6XdDG5M2jXOAlSZzQYdX3R18G5iWgcQpmQ6ll+Hts
-         0+FpXZGXIqYrfaxGjmypzYZo0rgKd7f6yqr3e6o6627OaRaN2LGtf6gdtPk7+vm+n+fZ
-         sJdSaRUYuTprl3R9Ct1T3MwPkq8OxxkRsx1kQ53ej/J/750sEOZ+lBO1Is/BYDqKc4HN
-         x5BQ==
-X-Gm-Message-State: APjAAAVHk5Uj/YdNzBljt8ZaqWEzNH8xhnRxvdtISTpkrK1Q9T+JDvbY
-        SYlZw4wAKBZxOP9LpFeMv/NDK7vv0jU=
-X-Google-Smtp-Source: APXvYqz0wTNf06EGNDqoU3K1Cg0bGOm7HgFzTAOW3ZNt/cMhLhf9vHdAA1fTjsCJUhAU4zV6/MrfHg==
-X-Received: by 2002:a2e:9ec3:: with SMTP id h3mr14397518ljk.159.1578388735255;
-        Tue, 07 Jan 2020 01:18:55 -0800 (PST)
+        bh=As14hH5XTd91cqludgJ3ZyIIxEQXQtCoXFONbDuSuOY=;
+        b=fVa4fRlu8lQd9hCFMggBpoOUo+TvCiQPIb0iQfTYfwYHK2RsosWB1bNxEBde9S39ik
+         hJTHYgvHm+bjTBs1LyEXvoH30EAFDHxazmDOvo2vE1uFg5x+v86JUxHn7g0WGlXWmf1o
+         5EOJSfHxZJqNmONzzDOubAvT6DR8nwC3KH7huKviLJOTKrGnu3U0/ZYC+Pe96U87D6zM
+         TLXI6wauc1JKtoGKRPQYwMCCahmtiS7Fgz0WnHxGiClFAiTOi5i/OV1gXtkTlPqdzBIR
+         5rWDXbTPmn/geT82CaS50lWjQI84Mva6d3WmStKZtfXLjmUKWjgO6X7RsZN51CaTb5x/
+         ccVg==
+X-Gm-Message-State: APjAAAXHOM7aQvYWsqAB5khRFAd+jjoyq88uWoPquCFS5haLM8if8+g9
+        esQozVuYox4VpJEqiFsE67kyQUpMi+8=
+X-Google-Smtp-Source: APXvYqzFrdIJ7ZqvdLg0idamrZNMBwgf2+QCIeeEFGsAWMtgLmWSEDUz0tq4aIdMYi76fGK5MvJY0A==
+X-Received: by 2002:a2e:8595:: with SMTP id b21mr43034503lji.219.1578388736729;
+        Tue, 07 Jan 2020 01:18:56 -0800 (PST)
 Received: from tp480.int.codecoup.pl ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id d24sm30345292lfb.94.2020.01.07.01.18.54
+        by smtp.gmail.com with ESMTPSA id d24sm30345292lfb.94.2020.01.07.01.18.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2020 01:18:54 -0800 (PST)
+        Tue, 07 Jan 2020 01:18:56 -0800 (PST)
 From:   Szymon Czapracki <szymon.czapracki@codecoup.pl>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Szymon Czapracki <szymon.czapracki@codecoup.pl>
-Subject: [PATCH 2/8] monitor: Decode LE Periodic Advertising Sync Transfer Received Event
-Date:   Tue,  7 Jan 2020 10:18:27 +0100
-Message-Id: <20200107091833.14921-2-szymon.czapracki@codecoup.pl>
+Subject: [PATCH 3/8] monitor: Decode LE Set Periodic Advertising Receive Enable command
+Date:   Tue,  7 Jan 2020 10:18:28 +0100
+Message-Id: <20200107091833.14921-3-szymon.czapracki@codecoup.pl>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200107091833.14921-1-szymon.czapracki@codecoup.pl>
 References: <20200107091833.14921-1-szymon.czapracki@codecoup.pl>
@@ -71,86 +71,62 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Change-Id: I5a7c2d36ca5aee61441c2aab6adeb16058ab062f
+< HCI Command: LE Periodic Advertising Receive Enable (0x08|0x0059) plen 3
+        Sync handle: 0
+        Reporting: Enabled (0x01)
+> HCI Event: Command Status (0x0f) plen 4
+      LE Periodic Advertising Receive Enable (0x08|0x0059) ncmd 1
+        Status: Unknown HCI Command (0x01)
+
+Change-Id: I19d3bfb7034992a14273b742b38f2c6cc6bd6deb
 ---
- monitor/bt.h     | 14 ++++++++++++++
- monitor/packet.c | 27 +++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+ monitor/bt.h     |  6 ++++++
+ monitor/packet.c | 11 +++++++++++
+ 2 files changed, 17 insertions(+)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index ecf3782c9..e14c1771f 100644
+index e14c1771f..bb373b528 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -3140,6 +3140,20 @@ struct bt_hci_evt_le_chan_select_alg {
- 	uint8_t  algorithm;
+@@ -2461,6 +2461,12 @@ struct bt_hci_cmd_le_tx_test_v3 {
+ 	uint8_t  antenna_ids[0];
  } __attribute__ ((packed));
  
-+#define BT_HCI_EVT_LE_PER_ADV_SYNC_TRANS_REC		0x18
-+struct bt_hci_evt_le_per_adv_sync_trans_rec {
-+	uint8_t  status;
-+	uint16_t handle;
-+	uint16_t service_data;
++#define BT_HCI_CMD_SET_PERIODIC_ADV_REC_ENABLE	0x2059
++struct bt_hci_cmd_set_periodic_adv_rec_enable {
 +	uint16_t sync_handle;
-+	uint8_t  sid;
-+	uint8_t  addr_type;
-+	uint8_t  addr[6];
-+	uint8_t  phy;
-+	uint16_t interval;
-+	uint8_t  clock_accuracy;
++	uint8_t  enable;
 +} __attribute__ ((packed));
 +
- #define BT_HCI_ERR_SUCCESS			0x00
- #define BT_HCI_ERR_UNKNOWN_COMMAND		0x01
- #define BT_HCI_ERR_UNKNOWN_CONN_ID		0x02
+ #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
+ struct bt_hci_evt_inquiry_complete {
+ 	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 64f75cf8e..76bb9f239 100644
+index 76bb9f239..c1e449a68 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -600,6 +600,12 @@ static void print_addr_type(const char *label, uint8_t addr_type)
- 	case 0x01:
- 		str = "Random";
- 		break;
-+	case 0x02:
-+		str = "Public Identity Address";
-+		break;
-+	case 0x03:
-+		str = "Random Identity Address";
-+		break;
- 	default:
- 		str = "Reserved";
- 		break;
-@@ -9788,6 +9794,24 @@ static void le_chan_select_alg_evt(const void *data, uint8_t size)
- 	print_field("Algorithm: %s (0x%2.2x)", str, evt->algorithm);
+@@ -7590,6 +7590,14 @@ static void le_tx_test_cmd_v3(const void *data, uint8_t size)
+ 		print_field("  Antenna ID: %u", cmd->antenna_ids[i]);
  }
  
-+static void le_per_adv_sync_trans_rec_evt(const void *data, uint8_t size)
++static void le_periodic_adv_rec_enable(const void *data, uint8_t size)
 +{
-+	const struct bt_hci_evt_le_per_adv_sync_trans_rec *evt = data;
++	const struct bt_hci_cmd_le_set_periodic_adv_enable *cmd = data;
 +
-+	print_status(evt->status);
-+	print_field("Handle: %d", evt->handle);
-+	print_field("Connection handle: %d", evt->handle);
-+	print_field("Service data: 0x%4.4x", evt->service_data);
-+	print_field("Sync handle: %d", evt->sync_handle);
-+	print_field("SID: 0x%2.2x", evt->sid);
-+	print_addr_type("Address type:", evt->addr_type);
-+	print_addr("Addres:", evt->addr, evt->addr_type);
-+	print_le_phy("PHY:", evt->phy);
-+	print_field("Periodic advertising Interval: %.3f",
-+							1.25 * evt->interval);
-+	print_clock_accuracy(evt->clock_accuracy);
++	print_field("Sync handle: %d", cmd->handle);
++	print_enable("Reporting", cmd->enable);
 +}
 +
- struct subevent_data {
- 	uint8_t subevent;
- 	const char *str;
-@@ -9871,6 +9895,9 @@ static const struct subevent_data le_meta_event_table[] = {
- 				le_scan_req_received_evt, 8, true},
- 	{ 0x14, "LE Channel Selection Algorithm",
- 				le_chan_select_alg_evt, 3, true},
-+	{ 0x18, "LE Periodic Advertising Sync Transfer Received",
-+					le_per_adv_sync_trans_rec_evt, 19,
-+					true},
+ struct opcode_data {
+ 	uint16_t opcode;
+ 	int bit;
+@@ -8383,6 +8391,9 @@ static const struct opcode_data opcode_table[] = {
+ 	{ 0x2050, 316, "LE Transmitter Test command [v3]",
+ 				le_tx_test_cmd_v3, 9, false,
+ 				status_rsp, 1, true },
++	{ 0x2059, 325, "LE Periodic Advertising Receive Enable",
++				le_periodic_adv_rec_enable, 3, true,
++				status_rsp, 1, true },
  	{ }
  };
  
