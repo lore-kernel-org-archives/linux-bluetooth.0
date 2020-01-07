@@ -7,59 +7,61 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D71E3C32771
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 01:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA8AC32771
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 01:29:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA77520715
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 01:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C97CB2073D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 01:29:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AIetSZU2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UsvFKnIa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727420AbgAGB2h (ORCPT
+        id S1727438AbgAGB3n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Jan 2020 20:28:37 -0500
-Received: from mail-vs1-f54.google.com ([209.85.217.54]:40078 "EHLO
-        mail-vs1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727417AbgAGB2g (ORCPT
+        Mon, 6 Jan 2020 20:29:43 -0500
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:44861 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727363AbgAGB3n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Jan 2020 20:28:36 -0500
-Received: by mail-vs1-f54.google.com with SMTP id g23so32901429vsr.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jan 2020 17:28:36 -0800 (PST)
+        Mon, 6 Jan 2020 20:29:43 -0500
+Received: by mail-ua1-f67.google.com with SMTP id c14so16676546uaq.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jan 2020 17:29:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2irKVE9or6kW5TmY2QFUe6XZGKluZ9hMUOOE/em8VvA=;
-        b=AIetSZU2q+oooxsw57vIYYdYWXPM416UVwv0vuvNvWLboBoxTlOybSloqMw50BpUGu
-         HaVef1UycjK9BZSbms1n8ghtCQpIoJ4WzD3uSF2ZKegH43AYTfSk7EJJWpxQTuyjcfMu
-         YNh8cqHW2rghKapOVcNrgcRaTSij35Lm6LLCc=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=fxwCpXshPC80zU3jurlPmcnE1obn0BTvu3Xh4TNXwso=;
+        b=UsvFKnIa9D2YrLu0no2thCY1Wa8jrJyJpojAj4y1+W/hQfJpsV+DTSUfU6GrDETxC6
+         Fc5r8mcAozgaO7SFCnqTNkY09ILPnffOGTgn19WrapYctSP0hLEVziN2HTVm2swe4R45
+         EmDEGzEmTAwWF2+xI8YuiJHX7uXhAUqnYqjiA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2irKVE9or6kW5TmY2QFUe6XZGKluZ9hMUOOE/em8VvA=;
-        b=FSblNDmaSL/d89Xa6dFICfhnjOzZHiq/xZOHy+eINIaP0QVfwoW4sxkdi7YIVv+SJz
-         wcyFDUYcniBr7ELW/q4+864TzK+8/378uMSq0hcBhKKENm+fIVwObL3/JP74iNLkKgmM
-         nNUvyg5QR8wDCRUgGB7VI9MudDtagRzT7/8Sd8ugZRrJLZxE8BOOdYYGegIF93wqJhOQ
-         YCeI3iwlTCF0MTqOI0jLpY0GBtCnukk/ybTQvv0//SIryqulnBlKx661Lf4GzjPxYDkH
-         JgWHNC0TZ+QBWLxkJF55XWVQdoMu3KNKYiiusmsJ1o+rgGDRntv82/STxhIecRgODCyr
-         zATw==
-X-Gm-Message-State: APjAAAW03Zwx5bh4PVGM9L6ROCpS0TZAkYcqR+USH/ysBBq1BrTXOkYn
-        82pzEkvVG4r4RTSRC6B0YO1GZlzC9oY=
-X-Google-Smtp-Source: APXvYqy+MbSW/eYvJ87jugM9SfyZVHq9CUG457x2oCuDVGb9vnP9F5KwZTrr2dh7LDmxCuycjkxGiw==
-X-Received: by 2002:a67:b309:: with SMTP id a9mr48214562vsm.97.1578360515371;
-        Mon, 06 Jan 2020 17:28:35 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=fxwCpXshPC80zU3jurlPmcnE1obn0BTvu3Xh4TNXwso=;
+        b=YW45Gf95RVqlzCayl2nYQXqaccB0zbFQjiczF7j9mzqoUOK69AafeoQwkFIaBPlkX7
+         4ejGZIzntSPPWoGvpxNXhp8izAoTaO+cC93K35Gts1qnKgLnOfRfmOUTnPoScBkO/AT4
+         K2gEuQ6OI/2SoSI49r1xDLrT5F0vQzOkyzliyKKIkdqRG4vtC8fENfIotrXpogAF9hN8
+         FUsXE6YVaYxKodUyokdFZORoyyQX9cb0jsqVnHzk/5nRXpwEpawW4sFltSIzQrd4Oxz9
+         3aXEcvrZEslIyRHzbqWTEUfgBo3vsvVMIUfnds5mitEEGyCE5EYcwz/9TfM6AAPW/d97
+         Fuqw==
+X-Gm-Message-State: APjAAAXYgUreMk4EHERLeJ1gyDD4OxP0YMlAywcqgBXjfyjxEZh2yXmF
+        Tayy3s8H6hLywWrkxd2h4fLV7nu5KaI=
+X-Google-Smtp-Source: APXvYqwcUy8HljJtuHu9qPjRBp8E0d1MCNwNZmKcuMnL72ggMQtycSjQHhs/D1xAd7kAOKZrqppDVQ==
+X-Received: by 2002:ab0:94:: with SMTP id 20mr60199451uaj.71.1578360581873;
+        Mon, 06 Jan 2020 17:29:41 -0800 (PST)
 Received: from alain.c.googlers.com.com (239.145.196.35.bc.googleusercontent.com. [35.196.145.239])
-        by smtp.gmail.com with ESMTPSA id y7sm18784079vkd.38.2020.01.06.17.28.34
+        by smtp.gmail.com with ESMTPSA id y7sm18784079vkd.38.2020.01.06.17.29.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2020 17:28:34 -0800 (PST)
+        Mon, 06 Jan 2020 17:29:41 -0800 (PST)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     marcel@holtmann.org, Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v5 1/3] MGMT_OP_SET_BLOCKED_KEYS Api definitions.
-Date:   Tue,  7 Jan 2020 01:28:18 +0000
-Message-Id: <20200107012820.158721-1-alainm@chromium.org>
+Subject: [PATCH v5 2/3] Adding a shared ARRAY_SIZE macro.
+Date:   Tue,  7 Jan 2020 01:28:20 +0000
+Message-Id: <20200107012820.158721-2-alainm@chromium.org>
 X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
+In-Reply-To: <20200107012820.158721-1-alainm@chromium.org>
+References: <20200107012820.158721-1-alainm@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -67,38 +69,26 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Adding the required definitions for the MGMT_OP_SET_BLOCKED_KEYS Api.
+This will allow other implementations within src/ to use a single
+definition of the ARRAY_SIZE macro.
 ---
 
- lib/mgmt.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ src/shared/util.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 570dec997..276445d0a 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -583,6 +583,21 @@ struct mgmt_cp_set_phy_confguration {
- 	uint32_t	selected_phys;
- } __packed;
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 604dc3be4..9193068d1 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -27,6 +27,8 @@
+ #include <byteswap.h>
+ #include <string.h>
  
-+#define MGMT_OP_SET_BLOCKED_KEYS	0x0046
++#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 +
-+#define HCI_BLOCKED_KEY_TYPE_LINKKEY	0x00
-+#define HCI_BLOCKED_KEY_TYPE_LTK		0x01
-+#define HCI_BLOCKED_KEY_TYPE_IRK		0x02
-+
-+struct mgmt_blocked_key_info {
-+	uint8_t type;
-+	uint8_t val[16];
-+} __packed;
-+
-+struct mgmt_cp_set_blocked_keys {
-+	uint16_t key_count;
-+	struct mgmt_blocked_key_info keys[0];
-+} __packed;
- 
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ #define le16_to_cpu(val) (val)
+ #define le32_to_cpu(val) (val)
 -- 
 2.24.1.735.g03f4e72817-goog
 
