@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E1A5C3F68F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 07:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C1CC33C99
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 07:41:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E40C206DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 07:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F2B0206DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 07:41:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWYziAVU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MvTJYhJP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727211AbgAGHlI (ORCPT
+        id S1727615AbgAGHlJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jan 2020 02:41:08 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:33235 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727607AbgAGHlI (ORCPT
+        Tue, 7 Jan 2020 02:41:09 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44263 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727607AbgAGHlJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jan 2020 02:41:08 -0500
-Received: by mail-pj1-f66.google.com with SMTP id u63so5068121pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jan 2020 23:41:08 -0800 (PST)
+        Tue, 7 Jan 2020 02:41:09 -0500
+Received: by mail-pg1-f194.google.com with SMTP id x7so28089069pgl.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jan 2020 23:41:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=kLolv4TG5ez8jdcGtGB/+5OOu7TJYRnRQOtGX9bYVpg=;
-        b=nWYziAVUD4no6c8qFh5bTsaxVWSDuLiJRpZVIvP7w4VT6bajfFjLpZjF0ES+eQQD+t
-         ocVGTnmjPoZXykOR3oWrKrRgVzDjJbjeCNIekq+mUXcmWJOLiEGP1Mhl6My6Vm7uS0/S
-         C/tvr/vg/Fl/zCjZMhXoCmEMAcAAeoHxXyRRpwtmziRkG2yamLPQSZPR/RyriAkyl34S
-         M1AEGyMPBCuIuTb8DE9RH8vgnf5I/xGrWwRf4O6yTfMfBOYklRaDKJLNZqtBfDcTsFX3
-         SsI0UCof4QQ1EYdAzmVf9QHxQyUdsP7TWdksHUNg7ga2Inv0cak60bHL6kAPZ9QL/HT/
-         xOYQ==
+        bh=583/WEUGQh38LNSV8BmtQVONpnFPOaiN7kX5OAt3Mkw=;
+        b=MvTJYhJP40DUk0d323SgWO8VXGrRBySntaacbwU/HYlk6qiQC+juuDMeUcGEBnvK+8
+         wzrW4k95Bgme8lTsYWkTm0k0wL35zXKhdlaMDq34zpdKqRLg/KJJFKrWszWsnKahMYSy
+         lboiRdN5QVEBQAs6DH6eH36XTgdOUS5ojeHa7fDLRgEqA4aoLtLNnIlx2eHBDoG+4f82
+         f/pMDiX53/RE+ciVKZ5Wg0dqio6A3ZCKx+jT0EjA9sIEFTbQxyHfYMxaU/X+hCwtxpxg
+         PtEqAyfY0pqfm0jcreNpT44mTunFSzq0LML93SMtNRdqla3clMs+ynaUA4auQXiG27kM
+         f9Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kLolv4TG5ez8jdcGtGB/+5OOu7TJYRnRQOtGX9bYVpg=;
-        b=JVprNlrCz8qWElxitXGQxf+SgOFZTrrOxn8x2ggpYw6+82NOR5tkEnWP9PV+DTGI28
-         7yExyl5HClXv1zeuPBSKhb8I7rEHTy0kCae0yqda0iU+THX/rts4A4wZ3xu/AVePwpSi
-         NZ4R070sNDxD8boTwM2gisqdPmSyJtmIPTn2CbHjwnGWoJT2HbMVvGcrQn5efXAqlXOm
-         xn+AbF3LJTp+C+vzegO9g0uP9ouoxtol01aa3LqGxgiwMEBSS0dhtfhzGsyNmUbdLXxG
-         aVZnrUKIIGeiW8gLfUudxV06QOZELG/+4S0Si9mvb9rJf9zcw1iCsKc2s/bOs6OBUpew
-         RlNg==
-X-Gm-Message-State: APjAAAVJT/SR+1WDGHwD63eTWwEto+wtJiP2pjmlzjhLIJgNR8/SCOQw
-        uQYXjaJMBmwa1JH5SEtR0auGYBF/jYg=
-X-Google-Smtp-Source: APXvYqzMfQBvQSac/odTDPEkBeQw3RpgzZQ2XUZOtYzT87FJ3B3c+ngFRHVslRSCODiR7GmyhGQ58g==
-X-Received: by 2002:a17:902:b617:: with SMTP id b23mr102734286pls.285.1578382867545;
-        Mon, 06 Jan 2020 23:41:07 -0800 (PST)
+        bh=583/WEUGQh38LNSV8BmtQVONpnFPOaiN7kX5OAt3Mkw=;
+        b=JT+P+L1dqs1/0+JEJRdy2jlurjhlLlA44Ijed7dZoxYOE8crzKkjWqRnnEFwaOXob2
+         1EYWJ2SmeBZbNBTWKPDXDz0vVI33/yXnM2MFCVFp+vkRxrbTtN2SRRU7tjZdyw+anzNN
+         koRI0z7csC07m1qx8XLNHxwkuHPxnaH95/1rsddi2Y1u2zsVRhepuNP9zbjGaZsI59sN
+         b7BACDoeUf7qRZbzEj8DGP8Xsdi58LGmUBrOr32xqlDEAWSGUd2hVhuiuAkf4qtcQTpJ
+         3QaNAId+W/mHxHBC56oCp4rYw758mEj87ilABMs5ZwePND12kOk9dNuymT5zlnqolmAF
+         m8Qw==
+X-Gm-Message-State: APjAAAUkXrV0WtpvW935W10A2gDUQV0lvmSxPsgZO60PRRvtS1K7CdQ7
+        hkG/Z/cjlkuU9sST7SZYdmaT6Rr/NNo=
+X-Google-Smtp-Source: APXvYqwvKMhYn63ju5da0Rg+rUmIVBUwN5kMmadcoArYkhpScD5KO/2pH1jR4Rkppq1MqF7KtKKMwA==
+X-Received: by 2002:a63:4e06:: with SMTP id c6mr61809945pgb.187.1578382868501;
+        Mon, 06 Jan 2020 23:41:08 -0800 (PST)
 Received: from vudentzs-t460s.hsd1.or.comcast.net ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id k21sm67725388pfa.63.2020.01.06.23.41.06
+        by smtp.gmail.com with ESMTPSA id k21sm67725388pfa.63.2020.01.06.23.41.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jan 2020 23:41:06 -0800 (PST)
+        Mon, 06 Jan 2020 23:41:07 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 09/10] Bluetooth: btusb: Add support for ISO packets
-Date:   Mon,  6 Jan 2020 23:40:55 -0800
-Message-Id: <20200107074056.25453-10-luiz.dentz@gmail.com>
+Subject: [PATCH 10/10] Bluetooth: btusb: Detect if an ACL packet is in fact an ISO packet
+Date:   Mon,  6 Jan 2020 23:40:56 -0800
+Message-Id: <20200107074056.25453-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200107074056.25453-1-luiz.dentz@gmail.com>
 References: <20200107074056.25453-1-luiz.dentz@gmail.com>
@@ -75,45 +75,36 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enabled btusb driver to properly transmit ISO packets.
+Fix up the packet type if ISO packets are sent over the bulk endpoint.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/btusb.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/bluetooth/btusb.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f5924f3e8b8d..ded0ba83bcce 100644
+index ded0ba83bcce..c1e030fc272f 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -1463,6 +1463,13 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -663,11 +663,18 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ 		hci_skb_expect(skb) -= len;
  
- 		hdev->stat.sco_tx++;
- 		return submit_tx_urb(hdev, urb);
-+
-+	case HCI_ISODATA_PKT:
-+		urb = alloc_bulk_urb(hdev, skb);
-+		if (IS_ERR(urb))
-+			return PTR_ERR(urb);
-+
-+		return submit_or_queue_tx_urb(hdev, urb);
- 	}
+ 		if (skb->len == HCI_ACL_HDR_SIZE) {
++			__u16 handle = __le16_to_cpu(hci_acl_hdr(skb)->handle);
+ 			__le16 dlen = hci_acl_hdr(skb)->dlen;
++			__u8 type;
  
- 	return -EILSEQ;
-@@ -2123,6 +2130,13 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 			/* Complete ACL header */
+ 			hci_skb_expect(skb) = __le16_to_cpu(dlen);
  
- 		hdev->stat.sco_tx++;
- 		return submit_tx_urb(hdev, urb);
++			type = hci_conn_lookup_type(data->hdev,
++						    hci_handle(handle));
++			if (type == ISO_LINK)
++				hci_skb_pkt_type(skb) = HCI_ISODATA_PKT;
 +
-+	case HCI_ISODATA_PKT:
-+		urb = alloc_bulk_urb(hdev, skb);
-+		if (IS_ERR(urb))
-+			return PTR_ERR(urb);
-+
-+		return submit_or_queue_tx_urb(hdev, urb);
- 	}
- 
- 	return -EILSEQ;
+ 			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
+ 				kfree_skb(skb);
+ 				skb = NULL;
 -- 
 2.21.0
 
