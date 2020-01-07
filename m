@@ -2,126 +2,203 @@ Return-Path: <SRS0=JtZ7=24=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 802CBC33C8C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 17:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 375BEC33C8C
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 17:35:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58D2D208C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 17:31:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F17B6208C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 17:35:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="L72FmqY7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fwq8zqK7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728458AbgAGRbw (ORCPT
+        id S1728408AbgAGRfv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jan 2020 12:31:52 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33044 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728211AbgAGRbv (ORCPT
+        Tue, 7 Jan 2020 12:35:51 -0500
+Received: from mail-ot1-f45.google.com ([209.85.210.45]:41211 "EHLO
+        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728321AbgAGRfv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jan 2020 12:31:51 -0500
-Received: by mail-pf1-f193.google.com with SMTP id z16so219880pfk.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 09:31:51 -0800 (PST)
+        Tue, 7 Jan 2020 12:35:51 -0500
+Received: by mail-ot1-f45.google.com with SMTP id r27so717422otc.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 09:35:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=6tbx6y0alCppo4JulU8ZX+Wq5gWxVblT3if0J5vpiqg=;
-        b=L72FmqY7y9JcE1Hl8aVOS075lkg2C/pQlQl3XVkV9+o4hG12UWm6Z+RNU4UaowMX7l
-         AzJI7/sOkWRixckpCz3sLqVPZ9Lmn0VMJOukcWmnoz0mlT/zeKG8T+7vtUMCBlLNLNmD
-         C7TYuadNxUKRk5Jyrl5xgt4f5z004pCSe3P5Y=
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0jXl+jsx9LaQYg4ikm51xDrcog0mCBX/+V0TxesH48o=;
+        b=Fwq8zqK7AKQQonr7Eto93CfWpCIEuBWtI3nAm5E9XYha6/tS8j8U2D+4ZwKkrGF09E
+         rzucAM1LBeT6nGub3jmU8Qw22KbfnEqd264oRm+ReKmdzTNNfazrmivaL16ASaZ3AcQt
+         tE2iiJmfEhXFPSQpplEB8EFaw8hnOHh2w4j1ZdB5HqAIwY4l8F+T907TyTNLkNWImZiQ
+         KnBoW/jq/l+L3v/HpwBqpdZWaGX7wgCoWlfIAU/UBiFR8feQzyaGy8HkHX7hi2ZfyErF
+         5mH1T/DB8VkolD+j2AXIrhSsdIoZK3UAR3K3LwROfrU9GJJJziAtaDYzcHyHnOcQUVv3
+         9+mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=6tbx6y0alCppo4JulU8ZX+Wq5gWxVblT3if0J5vpiqg=;
-        b=SWkHzdOLfUYKlAbyhs1DsT9vkWvkCJs/iTjItOOL02ip6GHp2rzgyaRgme+fumFc//
-         UHLk5Smgo/BMu72Zu1m4b36NH+EeErMLVh4iVObG+OIYJNa/UPHQtsoYVTlVsCN7l64z
-         qdiL/CBfKB7sYfbDlkR/wr2pF2Flo1S0nCJQjQV6xzISTgmWgk9onkLp1d6F6rX4CNIl
-         3n/7+jZIApQ8TYx//Lu8ezUVt8+w1JW7AGXedVOwCdPjlnxoqgnZExobUK7ZxeeP3r01
-         2hab+rrrH5LlYhdRxerfHaEYQnSKGdzcTlalwaFxjym7xKHroldgQeM2onnZnMpwRxZu
-         4qBA==
-X-Gm-Message-State: APjAAAWpK56oduHEc5baN+KZXJnpKJVipncPAUjPDOXrk0dog87AzvxC
-        JndH8tKlGW/MWLM3uNKBx8cMIA==
-X-Google-Smtp-Source: APXvYqxuZTRMvr2E0NVTDg27lnwD7H9kx+RE+QwcVmHID/+AUrQOH+CqDmCL6ILFL3+vIgX9QTQ34Q==
-X-Received: by 2002:a63:8041:: with SMTP id j62mr551347pgd.41.1578418311104;
-        Tue, 07 Jan 2020 09:31:51 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id 80sm126769pfw.123.2020.01.07.09.31.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2020 09:31:50 -0800 (PST)
-Date:   Tue, 7 Jan 2020 09:31:49 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Add qca_power_on() API to support
- both wcn399x and Rome power up
-Message-ID: <20200107173149.GD89495@google.com>
-References: <20200107052601.32216-1-rjliao@codeaurora.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0jXl+jsx9LaQYg4ikm51xDrcog0mCBX/+V0TxesH48o=;
+        b=HP6MEkr+1pAaU/6xBhaeeSdCA3yiRi+3WH1fFbm3xG0o2gXpV6sp6TkJjS0bf4Vi/t
+         +dzNV7JAOONHNk+iThJpdrx0gfo9KvLMRbXDNkooajtDcB0nGW4giLdux+1EkuXx7Jxc
+         PJIuGOHA4TttF3S36AcLFUPVZEP7pI7pwHaUWtV3Gqj5hVQxTKdONffCWNOGXWIKwB0x
+         2VJMtbkhL59BG1tuwQFX2EWDSEPJJfOsBVG2z9k11TpX2CYrAsLfY3gcj/EKjj9NODn0
+         h1+5Xf7VVQEKHZnKx+ccwLB/+PEWuenrWSKm8IDEU6xLUid1hcgLgX1vPEScwCadNQvp
+         8yCw==
+X-Gm-Message-State: APjAAAWpcMLr6qyYWyvbcl73WKcvAbfYiLGPUi8R8qRdq4xqVf+lsuEe
+        twu1JCMKqhMx+9s9YS3BpdcHL9Hv
+X-Google-Smtp-Source: APXvYqw07Ji2ltjTUgfUvkVUowCcYziX/5vzPjmxvA6sC5YQjem0iv4TqtEHAfTSBbYgepBiYs//TA==
+X-Received: by 2002:a9d:67d2:: with SMTP id c18mr885714otn.362.1578418550113;
+        Tue, 07 Jan 2020 09:35:50 -0800 (PST)
+Received: from new-host-2.home (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id d131sm151802oia.36.2020.01.07.09.35.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 07 Jan 2020 09:35:49 -0800 (PST)
+Subject: Re: [pulseaudio-discuss] Proposal for a new API and usage of
+ Bluetooth HSP and HFP profiles on Linux
+To:     =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Tanu Kaskinen <tanuk@iki.fi>,
+        General PulseAudio Discussion 
+        <pulseaudio-discuss@lists.freedesktop.org>, ofono@ofono.org,
+        devkit-devel@lists.freedesktop.org,
+        Bastien Nocera <hadess@hadess.net>,
+        Georg Chini <georg@chini.tk>,
+        Russell Treleaven <rtreleaven@bunnykick.ca>,
+        Arun Raghavan <arun@arunraghavan.net>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sebastian Reichel <sre@ring0.de>, Pavel Machek <pavel@ucw.cz>
+References: <3ca53c66-1df0-41bf-710e-dea709906234@gmail.com>
+ <20191218172828.vfie4su2whts2fqh@pali> <20191218173632.aqdmdhutu3ruezck@pali>
+ <06eb7e98-1357-afd1-40a5-2ccb139d8dec@gmail.com>
+ <20191218213349.2ksew2wnhgu3peub@pali>
+ <0cfbe253-417c-e7c0-553a-abf360a80c9f@gmail.com>
+ <20191219095132.blj3oyyrlfowv5ik@pali>
+ <90261b42-1048-370f-7680-acd9f7e754ed@gmail.com>
+ <20191219153344.hxnoa3idqvgdwrp2@pali>
+ <76f1cb25-b608-e4e9-6fd9-8da932c56a15@gmail.com>
+ <20191220224657.n4m6qkxa4sceau3l@pali>
+From:   Denis Kenzior <denkenz@gmail.com>
+Message-ID: <1eeea3f8-d06b-f774-c01d-1c7dbdb71c32@gmail.com>
+Date:   Tue, 7 Jan 2020 11:35:48 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200107052601.32216-1-rjliao@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191220224657.n4m6qkxa4sceau3l@pali>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rocky,
+Hi Pali,
 
-On Tue, Jan 07, 2020 at 01:26:01PM +0800, Rocky Liao wrote:
-> This patch adds a unified API qca_power_on() to support both wcn399x and
-> Rome power on. For wcn399x it calls the qca_wcn3990_init() to init the
-> regulators, and for Rome it pulls up the bt_en GPIO to power up the btsoc.
+<snip>
+
+>> I think you will need to do this regardless.  Otherwise I fail to see how
+>> you prevent one 'agent' from consuming AT commands it shouldn't be. This is
+>> a possibility you need to consider, whether it happens by accident or
+>> maliciously.
 > 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
+> Some subset of AT commands are needed to parse and interpret. But not
+> telephony commands and having up-to-date internal telephony state.
+
+Please think some more about what I said.  You will need to parse every 
+AT command in your daemon, no way around that.  You are right that you 
+do not need to keep track of the telephony state, but that is besides 
+the point.  So if you need an AT parser anyway, the whole reasoning for 
+the proposed architecture starts to look shaky.
+
+<snip>
+
 > 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 9392cc7f9908..f6555bd1adbc 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1532,6 +1532,27 @@ static int qca_wcn3990_init(struct hci_uart *hu)
->  	return 0;
->  }
->  
-> +static int qca_power_on(struct hci_dev *hdev)
-> +{
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	enum qca_btsoc_type soc_type = qca_soc_type(hu);
-> +	struct qca_serdev *qcadev;
-> +	int ret = 0;
+>> - The other example is more practical. HFP Service Level Connection (SLC)
+>> establishment is actually quite tricky.  There are certain limitations on
+>> what can and cannot be done prior to SLC establishment, including how audio
+>> handling is done.
+> 
+> I know :-) I already implemented prototype implementation to check and
+> see how complicated it is and if API make sense and how hard it is for
+> agents (audio - pulseaudio) implement and maintain it.
+> 
+>> Unfortunately, codec negotiation, indicator negotiation,
+>> and feature negotiation are part of the SLC. oFono already solves all of
+>> this and handles all of it nicely.
+> 
+> CSR codecs are not supported nor implemented in ofono. It is more
+> complicated as HFP codecs... and needs a new API for audio application.
+> Another value which brings my hsphfpd is that it handles these CSR
+> codecs and provide API for audio application to use them.
+> 
 
-another option would be to return directly from the if/else branches,
-but either way is fine.
+Again, you're not addressing my main point.  Codec negotiation is part 
+of SLC establishment.  SLC has both telephony and audio aspects. 
+They're inseparable.  Your architecture fails to address this...
 
-> +
-> +	if (qca_is_wcn399x(soc_type)) {
-> +		ret = qca_wcn3990_init(hu);
-> +	} else {
-> +		if (hu->serdev) {
-> +			qcadev = serdev_device_get_drvdata(hu->serdev);
-> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> +			/* Controller needs time to bootup. */
-> +			msleep(150);
-> +		}
-> +	}
-> +
-> +	return ret;
-> +}
-> +
+CSR codecs are not part of SLC and can be bolted on later.  I already 
+told you that oFono can easily be changed to support this.
 
-I expected qca_power_on() would be called from qca_open(), but as is
-this would only work for ROME, and not WCN399x, which only enables
-the regulators in qca_open(), qca_wcn3990_init() is called from
-qca_setup(). Is there a particular reason for this assymmetry between
-the ROME and WCN399x initialization (i.e. one is fully powered up after
-open(), the other not)?
+>> We have passed all relevant
+>> certification testing.  It is very unclear how you plan to handle this (or
+>> whether you realistically even can) in your architecture when the
+>> responsibilities are split between the various daemons.  So again, oFono has
+>> nothing to gain here...
+> 
+> I was not thinking about certification. It is not something which I
+> could do.... And also pulseaudio itself do not have certifications.
+
+So again, no reason for us to get involved :)
+
+Bottom line is there's no value for us in this architecture.  If you 
+want to use the existing oFono APIs, that's fine.  But we're not adding 
+a plugin for taking arbitrary AT commands from some other daemon :)
+
+<snip>
+
+>> Perhaps this can even be solved in oFono itself (since it already does 90%
+>> of what you want) by making the modem requirement optional.  What we could
+>> do for example is to create a dummy modem if an AG connection is requested
+>> and no other suitable modems are detected in the system.  The resultant AG
+>> wouldn't have any call control capability, it could still be used for
+>> transferring audio data, battery, etc.  If you want to pursue this, we can
+>> brainstorm further.
+> 
+> Well, if this would work automatically without any user interaction or
+> without special setup, it seems to be usable.
+> 
+> But what is needed from this implementation in ofono? Basically API for
+> each functionality designed in hsphfod daemon. And one of it is also
+> support for HSP profile (with CSR and Apple extensions).
+
+Start a separate thread on ofono for this.  I already gave you hints on 
+how to solve the 'AG without a real modem' use case.  That would seem to 
+be the biggest 'win' and it should be fairly easy to make this work.
+
+> 
+> I'm not against for it, but I thought that having functionality which is
+> not related to telephony / modem you would not want to see in ofono
+> project (like linux uinput layer for button events or API for displaying
+> raw text on embedded display; or CSR audio codec negotiation).
+> 
+> So how do you see possibility to have also HSP profile in ofono? So have
+> one place which would provide audio API for SCO? Because this is a big
+> requirements from audio software side, to not use 4 different APIs to
+> access SCO sockets (and its rfcomm / SLC configuration) in HSP and HFP
+> profiles.
+> 
+
+HSP is a separate issue.  Maybe we can handle it like the 'dundee' 
+daemon inside oFono (which handles Bluetooth DUN profile).  In other 
+words have a dedicated daemon for hsp support that reuses the relevant 
+bits of oFono and maybe exposes the same APIs (i.e the ones documented 
+in doc/handsfree-audio-api.txt).  That would make life for PulseAudio 
+pretty easy.
+
+Regards,
+-Denis
