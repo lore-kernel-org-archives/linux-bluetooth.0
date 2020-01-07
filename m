@@ -2,125 +2,126 @@ Return-Path: <SRS0=JtZ7=24=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E59CFC33C8C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 13:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 802CBC33C8C
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 17:31:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B652120656
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 13:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58D2D208C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jan 2020 17:31:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="gq51lt5z"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="L72FmqY7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727858AbgAGNtW (ORCPT
+        id S1728458AbgAGRbw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jan 2020 08:49:22 -0500
-Received: from mail-wm1-f53.google.com ([209.85.128.53]:56087 "EHLO
-        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727658AbgAGNtW (ORCPT
+        Tue, 7 Jan 2020 12:31:52 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:33044 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728211AbgAGRbv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jan 2020 08:49:22 -0500
-Received: by mail-wm1-f53.google.com with SMTP id q9so19021241wmj.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 05:49:20 -0800 (PST)
+        Tue, 7 Jan 2020 12:31:51 -0500
+Received: by mail-pf1-f193.google.com with SMTP id z16so219880pfk.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 09:31:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=sxkg0xlNPC2K/knXuQ++in8aGGMBYeXUp2zUaYdGV40=;
-        b=gq51lt5zzizNxK97PrMkUbgrWPS85X2SkhmV+9ds94Nmo8axxgR01ssozU68d9qMed
-         +UiU5S+y2zjYuBI5SPTQM+X+zUD+QrP/7+ShrVZkLvHA9N5P9OazmJXKAe2BJ0+wLYHj
-         nQfnaJOsm0LYXgx8DEbmnubMj/r7t/QXIWEy2P5RuZOvW97/50Grg9ythOO89R6Dju7y
-         tM7ilLwL5P/flZRkys5tCYIa49QvVBzMpXAV1Yahrc5lpXUVlf6ErD8DKG9uFR05IdOF
-         BHS9VjjwdeQpOebsh3WimltZCD5hwWNS34jxven/ELXtxaUJS07nsBtUpts9tQBLWiMn
-         jwyQ==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=6tbx6y0alCppo4JulU8ZX+Wq5gWxVblT3if0J5vpiqg=;
+        b=L72FmqY7y9JcE1Hl8aVOS075lkg2C/pQlQl3XVkV9+o4hG12UWm6Z+RNU4UaowMX7l
+         AzJI7/sOkWRixckpCz3sLqVPZ9Lmn0VMJOukcWmnoz0mlT/zeKG8T+7vtUMCBlLNLNmD
+         C7TYuadNxUKRk5Jyrl5xgt4f5z004pCSe3P5Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sxkg0xlNPC2K/knXuQ++in8aGGMBYeXUp2zUaYdGV40=;
-        b=mv7Y3X6nbsE55VRlibn1/KSUvM5Y0db/rn/VwPH7hnJoJ4D/njrs7oXCWOdfW0Idy7
-         5gDPqJO9Mnv68CNuHn7CngjMaXdN74XeboVJzcHnDnlp/28USrmFHivscmRZaekTkc2t
-         2Hha+GDINtXak484zCB3OiKno5gQd/M//9OpIloDdNxWYBI8c3Wcwuultm0tvcNx/b4U
-         R3IUyjxuFEP4l0qZA04pgC1QDSgz7HxdR38dR0ZKPRaubjVskJB4MG3B+gnslADpUoMO
-         DHKFrW4PfJ+ZQSM7CSKVPOAHh9jRMt9aShKvtOJSDWEooqjORvTCy8r3W5NMXegeGxEx
-         L6jg==
-X-Gm-Message-State: APjAAAVXFdl11pjOg8mt5hIbFjK+ymc6ONYcUmcQV4O+iLKC9rjJtx3J
-        1jZXY2uJ7U7m0YR1eLtCd+l+HIJt
-X-Google-Smtp-Source: APXvYqyVPC4gr6jsnS8rMQyBKCsKXsfs1pNGtOtx6gJ/klVtXtDA8szgVNA/RnURtolwiVakKJUudA==
-X-Received: by 2002:a7b:cc98:: with SMTP id p24mr39021439wma.139.1578404960052;
-        Tue, 07 Jan 2020 05:49:20 -0800 (PST)
-Received: from [192.168.201.5] (p4FD25D76.dip0.t-ipconnect.de. [79.210.93.118])
-        by smtp.googlemail.com with ESMTPSA id t190sm26735803wmt.44.2020.01.07.05.49.18
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=6tbx6y0alCppo4JulU8ZX+Wq5gWxVblT3if0J5vpiqg=;
+        b=SWkHzdOLfUYKlAbyhs1DsT9vkWvkCJs/iTjItOOL02ip6GHp2rzgyaRgme+fumFc//
+         UHLk5Smgo/BMu72Zu1m4b36NH+EeErMLVh4iVObG+OIYJNa/UPHQtsoYVTlVsCN7l64z
+         qdiL/CBfKB7sYfbDlkR/wr2pF2Flo1S0nCJQjQV6xzISTgmWgk9onkLp1d6F6rX4CNIl
+         3n/7+jZIApQ8TYx//Lu8ezUVt8+w1JW7AGXedVOwCdPjlnxoqgnZExobUK7ZxeeP3r01
+         2hab+rrrH5LlYhdRxerfHaEYQnSKGdzcTlalwaFxjym7xKHroldgQeM2onnZnMpwRxZu
+         4qBA==
+X-Gm-Message-State: APjAAAWpK56oduHEc5baN+KZXJnpKJVipncPAUjPDOXrk0dog87AzvxC
+        JndH8tKlGW/MWLM3uNKBx8cMIA==
+X-Google-Smtp-Source: APXvYqxuZTRMvr2E0NVTDg27lnwD7H9kx+RE+QwcVmHID/+AUrQOH+CqDmCL6ILFL3+vIgX9QTQ34Q==
+X-Received: by 2002:a63:8041:: with SMTP id j62mr551347pgd.41.1578418311104;
+        Tue, 07 Jan 2020 09:31:51 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
+        by smtp.gmail.com with ESMTPSA id 80sm126769pfw.123.2020.01.07.09.31.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Jan 2020 05:49:19 -0800 (PST)
-Subject: Re: deprecated tools: rfcomm, can we un-deprecate it?
-To:     BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-References: <0aad7250-65f9-3e4c-e5ca-434139a9ae64@message-id.googlemail.com>
- <2203E98B-B581-4C14-94DF-164D7E036234@holtmann.org>
- <fa70a57e-d5f0-a47d-f987-27b46d8275c4@message-id.googlemail.com>
- <cb73add2-cb8c-353a-5d10-134a13553cf4@message-id.googlemail.com>
- <7192C77E-BFF5-4507-A004-3684EDE489AC@gmail.com>
-From:   Stefan Seyfried <stefan.seyfried@googlemail.com>
-Message-ID: <0524896a-fedc-463d-14ac-370de38467de@message-id.googlemail.com>
-Date:   Tue, 7 Jan 2020 14:49:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        Tue, 07 Jan 2020 09:31:50 -0800 (PST)
+Date:   Tue, 7 Jan 2020 09:31:49 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Add qca_power_on() API to support
+ both wcn399x and Rome power up
+Message-ID: <20200107173149.GD89495@google.com>
+References: <20200107052601.32216-1-rjliao@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <7192C77E-BFF5-4507-A004-3684EDE489AC@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <20200107052601.32216-1-rjliao@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
+Hi Rocky,
 
-Am 04.01.20 um 14:18 schrieb Johan Hedberg:
-> Hi Stefan,
+On Tue, Jan 07, 2020 at 01:26:01PM +0800, Rocky Liao wrote:
+> This patch adds a unified API qca_power_on() to support both wcn399x and
+> Rome power on. For wcn399x it calls the qca_wcn3990_init() to init the
+> regulators, and for Rome it pulls up the bt_en GPIO to power up the btsoc.
 > 
-> On 4. Jan 2020, at 13.45, Stefan Seyfried <stefan.seyfried@googlemail.com> wrote:
->>> This would be for creating a "rfcomm service" for other devices to
->>> connect to, right? (The equivalent of "rfcomm listen...")
->>>
->>> But how would I connect e.g. to my serial module (I got this for trying
->>> it by myself instead of relying on bugreporters results...), so what's
->>> the dbus equivalent of "rfcomm connect hci0 <bdaddr> <channel>"?
->>
->> OK, now I found https://github.com/tonyespy/bluez5-spp-example which
->> explains how to do this.
->>
->> I'd still think an example in the bluez documentation would be useful,
->> because…
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 > 
-> Doesn’t test/test-profile give a pretty good overview of both server- and client-role usage of the Profile D-Bus API?
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 9392cc7f9908..f6555bd1adbc 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1532,6 +1532,27 @@ static int qca_wcn3990_init(struct hci_uart *hu)
+>  	return 0;
+>  }
+>  
+> +static int qca_power_on(struct hci_dev *hdev)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+> +	struct qca_serdev *qcadev;
+> +	int ret = 0;
 
-You are right, now that I know what I am looking for, this is exactly the example code that I need ;-)
+another option would be to return directly from the if/else branches,
+but either way is fine.
 
-> The main difference to the RFCOMM ioctls is that instead of a TTY you get a file descriptor (which I guess you could convert to a TTY using a pty). For client, another difference is that it’s a two-step process, i.e. first you register the client role profile and then you call e.g. ConnectProfile (which test-profile doesn’t cover).
+> +
+> +	if (qca_is_wcn399x(soc_type)) {
+> +		ret = qca_wcn3990_init(hu);
+> +	} else {
+> +		if (hu->serdev) {
+> +			qcadev = serdev_device_get_drvdata(hu->serdev);
+> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+> +			/* Controller needs time to bootup. */
+> +			msleep(150);
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
+> +
 
-I'll try to cook up an example application (if I get some spare time...) for the
-(apparently) #1 wanted application of old rfcomm:
-connecting to a "serial console" via bluetooth and then starting a terminal program on /dev/rfcomm0
-
-This should be possible by either providing a local socket that can be connected to or a pty.
-
-We can then decide if we include this in the bluez examples or if I provide it as a
-separate project.
-
-Best regards ans thanks for the info,
-
-	Stefan
--- 
-Stefan Seyfried
-
-"For a successful technology, reality must take precedence over
- public relations, for nature cannot be fooled." -- Richard Feynman
+I expected qca_power_on() would be called from qca_open(), but as is
+this would only work for ROME, and not WCN399x, which only enables
+the regulators in qca_open(), qca_wcn3990_init() is called from
+qca_setup(). Is there a particular reason for this assymmetry between
+the ROME and WCN399x initialization (i.e. one is fully powered up after
+open(), the other not)?
