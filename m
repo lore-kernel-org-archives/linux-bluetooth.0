@@ -2,89 +2,140 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 078FBC33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 09:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 773F3C33C9E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 09:17:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2F8120705
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 09:08:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E97D2072A
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 09:17:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="J8qOVkb7"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Gegj8Eke"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727538AbgAHJIW (ORCPT
+        id S1727528AbgAHJRC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 04:08:22 -0500
-Received: from mail26.static.mailgun.info ([104.130.122.26]:14921 "EHLO
-        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727529AbgAHJIW (ORCPT
+        Wed, 8 Jan 2020 04:17:02 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40151 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727205AbgAHJRC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 04:08:22 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1578474501; h=References: In-Reply-To: Message-Id: Date:
- Subject: Cc: To: From: Sender;
- bh=6CDsFIM/kWKxfBbG2h1PLawytrueo+E0DdiEb5Ryxt8=; b=J8qOVkb73i/8UhkhT0Ro/6S//suHTWOcV7nLBdBYrDFQiaN7RpCRHu4ItW6y1teTxAkobAbJ
- mNyAaSRrm/acsNsZOpVKlDRQWHoiSbUJPyTVaeI3VF2N7nQGUcYvj/buw2GDklVY8F05LvZP
- XnLkWvczkC322ixVdbetOZm2pos=
-X-Mailgun-Sending-Ip: 104.130.122.26
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e159c02.7f9ba3b37d18-smtp-out-n03;
- Wed, 08 Jan 2020 09:08:18 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id A65EDC4479C; Wed,  8 Jan 2020 09:08:18 +0000 (UTC)
-Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id CBC54C4479F;
-        Wed,  8 Jan 2020 09:08:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org CBC54C4479F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v2 3/3] Bluetooth: hci_qca: Use unified API qca_power_on() to power up wcn399x
-Date:   Wed,  8 Jan 2020 17:08:04 +0800
-Message-Id: <20200108090804.22889-3-rjliao@codeaurora.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200108090804.22889-1-rjliao@codeaurora.org>
-References: <20200107052601.32216-1-rjliao@codeaurora.org>
- <20200108090804.22889-1-rjliao@codeaurora.org>
+        Wed, 8 Jan 2020 04:17:02 -0500
+Received: by mail-wm1-f67.google.com with SMTP id t14so1640623wmi.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 01:17:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=myKdkenQN+/SWYiYcoyHE4AIxh9xihPryU32v+sp1lM=;
+        b=Gegj8EkeimScr7YaxqD/ufCa3qj0JwuFYbm7Y4497gkMv1Dw6q8+WvcSvpTFbO733p
+         EE3BUTrZ9s/qwdgT70dVvBuKYRy3idVUIQItZSZzOmi3eunWxhbc8HRcI22d2m91kc/a
+         U03tu/PWEctANUJaZyANd28wTj14sQtCdn12xDGzTrtH1VzPtnrHMtsX+ndmyz50aFCF
+         MDHv1tBLZsZ8sXF3Uet+tRoKgJL8mkxvfxTZKSIw53asy4wLNTAxhAncRWTmGRAud1+w
+         Hir9MUpCGFZi+ZihN+69rSWWzO/lTvWPLkcf27xCG3HShI4rR+CsMucU/IuxcPvcoN1L
+         q7Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=myKdkenQN+/SWYiYcoyHE4AIxh9xihPryU32v+sp1lM=;
+        b=YK6/aUH5EuWjtp/36NYRD/z1Blxv1N35j4nI8wNfnfcrxpqHlEbOzTvGSSVk5AszKG
+         fZIqcvyJMjuPYPGB32DxaHgzbLz5+HPJzKyezmQKkAcOkybavGGdgeSnVdsXJD4VLA5J
+         h/X6tYt/DxxuYpdOHKvVOsxtfYmMMSjezjy7KoVgySwdY58fkkChgIiCBHikccGev+QT
+         ylh2ydLc5voffIEthI911xdFsXmxuRGAnkvq8/MI0wT9CpptoQIQtbHZp7jt/2dP1z/b
+         QknL9MBZlWUd5bGdFqqW0QU/3MypLd48kW/T9z4jGze4k6xx2LfOM0EM2zTtKKkPGB1p
+         enNA==
+X-Gm-Message-State: APjAAAXfkMN8PqxEi27uyV0S078vVCdOiYLPW6RU3O8lxD3eJ3psA/3Z
+        9o/OkfvR+X4LjKlwp5HH4j+anh58FGs=
+X-Google-Smtp-Source: APXvYqwS1bh172/3GVVtlZ7eI1xetRBJn+6CrwDNnl3zoYviz0910yLzItr9tXodMpjBqB2nTGyBzQ==
+X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr2686453wmm.57.1578475019752;
+        Wed, 08 Jan 2020 01:16:59 -0800 (PST)
+Received: from localhost.localdomain ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id 18sm2848197wmf.1.2020.01.08.01.16.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2020 01:16:59 -0800 (PST)
+From:   =?UTF-8?q?Rafa=C5=82=20Gajda?= <rafal.gajda@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?Rafa=C5=82=20Gajda?= <rafal.gajda@silvair.com>
+Subject: [PATCH BlueZ] mesh: Fix IV recovery                                                        
+Date:   Wed,  8 Jan 2020 10:16:04 +0100
+Message-Id: <20200108091604.15185-1-rafal.gajda@silvair.com>
+X-Mailer: git-send-email 2.22.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch replaces wcn399x power on with unified API qca_power_on(),
-which supports both wcn399x and Rome.
-
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+This patch fixes saving IV received in SNB to storage.                                              
+                                                                                                    
+Previously after creating new node with IV 0 (or loading node with                                  
+IV > 0 but after long inactivity) first received SNB should update IV                               
+(and reset sequence number to 0 if necessary).                                                      
+                                                                                                    
+The bug would prevent new IV being saved in storage                                                 
+which resulted in sequence number being set to 0                                                    
+on first SNB received after every daemon reset                                                      
+but IV never being updated.                
 ---
+ mesh/net.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
 
-Changes in v2: Added this patch
-
- drivers/bluetooth/hci_qca.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 8fc8c9bce9ee..7cc82d048558 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1579,7 +1579,7 @@ static int qca_setup(struct hci_uart *hu)
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
- 		hu->hdev->shutdown = qca_power_off;
--		ret = qca_wcn3990_init(hu);
-+		ret = qca_power_on(hdev);
- 		if (ret)
- 			return ret;
+diff --git a/mesh/net.c b/mesh/net.c
+index 5be95086d..1598933d4 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -2706,14 +2706,7 @@ static void update_kr_state(struct mesh_subnet *subnet, bool kr, uint32_t id)
+ static void update_iv_ivu_state(struct mesh_net *net, uint32_t iv_index,
+ 								bool ivu)
+ {
+-	uint32_t local_iv_index;
+-	bool local_ivu;
+-
+-	/* Save original settings to differentiate what has changed */
+-	local_iv_index = net->iv_index;
+-	local_ivu = net->iv_update;
+-
+-	if ((iv_index - ivu) > (local_iv_index - local_ivu)) {
++	if ((iv_index - ivu) > (net->iv_index - net->iv_update)) {
+ 		/* Don't accept IV_Index changes when performing SAR Out */
+ 		if (l_queue_length(net->sar_out))
+ 			return;
+@@ -2737,26 +2730,27 @@ static void update_iv_ivu_state(struct mesh_net *net, uint32_t iv_index,
+ 		}
+ 	} else if (ivu) {
+ 		/* Ignore beacons with IVU if they come too soon */
+-		if (!local_ivu && net->iv_upd_state == IV_UPD_NORMAL_HOLD) {
++		if (!net->iv_update &&
++				net->iv_upd_state == IV_UPD_NORMAL_HOLD) {
+ 			l_error("Update attempted too soon");
+ 			return;
+ 		}
  
+-		if (!local_ivu) {
++		if (!net->iv_update) {
+ 			l_info("iv_upd_state = IV_UPD_UPDATING");
+ 			net->iv_upd_state = IV_UPD_UPDATING;
+ 			net->iv_update_timeout = l_timeout_create(
+ 					IV_IDX_UPD_MIN, iv_upd_to, net, NULL);
+ 		}
+-	} else if (local_ivu) {
++	} else if (net->iv_update) {
+ 		l_error("IVU clear attempted too soon");
+ 		return;
+ 	}
+ 
+-	if ((iv_index - ivu) > (local_iv_index - local_ivu))
++	if ((iv_index - ivu) > (net->iv_index - net->iv_update))
+ 		mesh_net_set_seq_num(net, 0);
+ 
+-	if (ivu != net->iv_update || local_iv_index != net->iv_index) {
++	if (ivu != net->iv_update || iv_index != net->iv_index) {
+ 		struct mesh_config *cfg = node_config_get(net->node);
+ 
+ 		mesh_config_write_iv_index(cfg, iv_index, ivu);
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.22.0
+
