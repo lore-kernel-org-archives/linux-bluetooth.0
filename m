@@ -2,93 +2,131 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E39C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B46D7C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:57:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C993220692
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:51:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FAB9206DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:57:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="NsxXtAuV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYTyqqwc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727205AbgAHVvX (ORCPT
+        id S1726758AbgAHV5x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 16:51:23 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:39470 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726179AbgAHVvX (ORCPT
+        Wed, 8 Jan 2020 16:57:53 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:34161 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726179AbgAHV5x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 16:51:23 -0500
-Received: by mail-lj1-f193.google.com with SMTP id l2so4935550lja.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 13:51:21 -0800 (PST)
+        Wed, 8 Jan 2020 16:57:53 -0500
+Received: by mail-oi1-f195.google.com with SMTP id l136so4108517oig.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 13:57:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tNNFzFVP8WoF7LYFXiLMzWOGMHkZ6icR0XJY9urVvkA=;
-        b=NsxXtAuVeXzOMR1bF58oVWkbRyvduLtaTExtQlDTqeu6OhqaUuFXtDx623tYg9ZjiM
-         I5/ib+XnWwppD91/c+H61ANddeJKOHjD74aeL//jkDJSv/l7vVx99WdXzeuNnykhFcZw
-         vkbLAyU6nRkiBi7aEbP+k6bSVS78ksqtZtt2oOyFVGXP0Bxzqnh3FXYPWzoyC7IUVMDb
-         SNp87vwTgKVVzdHWAeEkGpVF2mIf/0yW1orcG5EHS0mUVhlU8Q3f4/n/BGgC2yF7JMFB
-         EeBpkyAVYvAv+fYvFoBv4PQJ1tuao+1Kzd9Pf/pFivrJTuhzaHl0tM5Vi5ZNgYes3tV4
-         NGzQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=d6Oa26iDbw8VKzHgATpl1oMrCEN/jmJiXI2BcSQLno8=;
+        b=QYTyqqwcoHHRrLx5SBqykYZYa5f1Tu/qBEe14lu4JqTqB6myFTaeFtxYikD6hxx7kb
+         N9tmQXPQOV/gm8lcemBymG7kaLJR3+txyOZQp0IHpNHtvk9EjM6qOblRrABAOosX9LKv
+         M46W2qbPia+GwWCvC5E7b/k8UqBHtuctVRPm0UdUyUGaSJuAQVJGAAFI58W9IXLRYahd
+         3DCLW7j2p9I+bclXzV4TDjFnVt6sTi7wvzUURfRmAMXC+urHDk9fltBfTz0HpKJjUHsT
+         SdhkPXsUgNEk7j5TrBIS2ll0DOWhqy3+7UouiJ2QVXp2qeKzAS7xQZJsfTHyM2cIEKlg
+         z3Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tNNFzFVP8WoF7LYFXiLMzWOGMHkZ6icR0XJY9urVvkA=;
-        b=MXR3HQ+4mcwMRtbxm8ekAVTlaPH5ahOaiTqp/NO8LPX1nfiotIQoDmN5NF75x74yJl
-         UmsS7WRsXnnf+cA37XrvEaCri4dB1NAkmlsTaK6RtRX6CaIs3+Qij10Pi1tciPFchdfF
-         e5vxmPqNeoGDfBAN29ZpbWYhDvlAl5h5TjdVCFwGTUQfOzpnPgtzTVa3YqHGPAl0YRQJ
-         psPwzo0Dlpq62wT3VUQVSETg+KPkl9LR0Nn2DGvT3jwpdJq6tpcJ3HnLcIUzMTv1RFEC
-         NATnGG6aqNARkS9XhYdCU0ZQzAhA92qVmv1O8HBvdcw7a+YHbAOASV926Kid+sxLpwnU
-         goyQ==
-X-Gm-Message-State: APjAAAWbkarDNbRxuohOel/yv5QZkgiNf+OzhWv03KUdPT4JH0NlOYWu
-        rFEsV7oUrOfkXocJr5izrIItpz7bDNo=
-X-Google-Smtp-Source: APXvYqx9fUMX7qcsHNhYXgR/CHvE1HimdbkTcoUB/5AsIzxsTxDFJDNDw2trAjfLSee7ypaYT3ZWiA==
-X-Received: by 2002:a2e:8646:: with SMTP id i6mr4187483ljj.122.1578520280658;
-        Wed, 08 Jan 2020 13:51:20 -0800 (PST)
-Received: from kynes.internet.domowy (apn-37-7-124-67.dynamic.gprs.plus.pl. [37.7.124.67])
-        by smtp.gmail.com with ESMTPSA id k5sm2001037lfd.86.2020.01.08.13.51.19
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 13:51:19 -0800 (PST)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Fix BeaconFlags property type
-Date:   Wed,  8 Jan 2020 22:51:14 +0100
-Message-Id: <20200108215114.10555-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.23.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=d6Oa26iDbw8VKzHgATpl1oMrCEN/jmJiXI2BcSQLno8=;
+        b=o1TdyvFcSjo4UB2eFsg1bgTfiZ13/xt8oHJ6o6+MMPevqmy7nLywAFMuq1H4vSyp/r
+         dv50+OfNGjO3ZjOlbghjkKU9mAfWr3/QdS34P+qa2Olo8z+24oBfEMb2VQ57FpKY5cdy
+         P3VBcp0a2wZO+4LsfMjw2/WBNBxF+SWvV4cq5YPkqmQ1cEHi4AKH54Fb89BtgkoaFJx+
+         6JRyXoebfonYCYHDtsoJITS65gUjc76hmgeNQK3NH4TMZUDh9RoWRtG1h4c9eq3GoE/N
+         YAZgPy17GD70/egKHaaW0/L780BDSOvz/nL8hWXb89KTko+tBfIHBCSYdLS5Q87d9qIf
+         u8ng==
+X-Gm-Message-State: APjAAAXEGOUnMvuQddJhH2+yMiZM6onK6ZfY34s9WKqAbbiEPnPQptsk
+        mo+YtwtYZvDcs1nVlnNTV2lWq7T71JfTK65pTucHUGFF
+X-Google-Smtp-Source: APXvYqxTsjgxzBVkn6XIctCRNrC7EZSmrc1Xsq3jyGpUEcgdjTGU0qSiaMXD7UtT8//RAlQ5wB6rFJl3buhxSyeiksI=
+X-Received: by 2002:aca:af54:: with SMTP id y81mr631911oie.21.1578520672093;
+ Wed, 08 Jan 2020 13:57:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200107074056.25453-1-luiz.dentz@gmail.com> <20200107074056.25453-10-luiz.dentz@gmail.com>
+ <EA23917D-86E4-4C03-A74B-007E0EC691A4@holtmann.org>
+In-Reply-To: <EA23917D-86E4-4C03-A74B-007E0EC691A4@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 8 Jan 2020 13:57:39 -0800
+Message-ID: <CABBYNZJFXsQb-i15d0LwWWfcwum4rTZqwqyr6yrzcAMdM_99DQ@mail.gmail.com>
+Subject: Re: [PATCH 09/10] Bluetooth: btusb: Add support for ISO packets
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This property is an uint8, not a boolean.
+Hi Marcel,
 
----
- mesh/node.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Jan 8, 2020 at 1:22 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Luiz,
+>
+> > This enabled btusb driver to properly transmit ISO packets.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > drivers/bluetooth/btusb.c | 14 ++++++++++++++
+> > 1 file changed, 14 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index f5924f3e8b8d..ded0ba83bcce 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -1463,6 +1463,13 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> >
+> >               hdev->stat.sco_tx++;
+> >               return submit_tx_urb(hdev, urb);
+> > +
+> > +     case HCI_ISODATA_PKT:
+> > +             urb = alloc_bulk_urb(hdev, skb);
+> > +             if (IS_ERR(urb))
+> > +                     return PTR_ERR(urb);
+> > +
+> > +             return submit_or_queue_tx_urb(hdev, urb);
+> >       }
+> >
+> >       return -EILSEQ;
+> > @@ -2123,6 +2130,13 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> >
+> >               hdev->stat.sco_tx++;
+> >               return submit_tx_urb(hdev, urb);
+> > +
+> > +     case HCI_ISODATA_PKT:
+> > +             urb = alloc_bulk_urb(hdev, skb);
+> > +             if (IS_ERR(urb))
+> > +                     return PTR_ERR(urb);
+> > +
+> > +             return submit_or_queue_tx_urb(hdev, urb);
+> >       }
+>
+> I am failing to see where it says to use bulk endpoints.
 
-diff --git a/mesh/node.c b/mesh/node.c
-index 032216774..13d4d3418 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -2358,7 +2358,7 @@ static void setup_node_interface(struct l_dbus_interface *iface)
- 	l_dbus_interface_property(iface, "Features", 0, "a{sv}", features_getter,
- 									NULL);
- 	l_dbus_interface_property(iface, "Beacon", 0, "b", beacon_getter, NULL);
--	l_dbus_interface_property(iface, "BeaconFlags", 0, "b",
-+	l_dbus_interface_property(iface, "BeaconFlags", 0, "y",
- 						beaconflags_getter, NULL);
- 	l_dbus_interface_property(iface, "IvIndex", 0, "u", ivindex_getter,
- 									NULL);
+It doesn't, in fact USB don't seem to have anything for ISO so this is
+the assumption we made that bulk would cut it, though I would agree an
+ISOC endpoint would actually be better but afaik we would need new
+alternate settings if we intend to use with the new ISO packets, so it
+doesn't look like there is any other option to USB transport to just
+sent packet over the bulk endpoint, or perhaps you want to file an
+issue against the spec to specify this properly?
+
+> Regards
+>
+> Marcel
+>
+
+
 -- 
-2.23.0
-
+Luiz Augusto von Dentz
