@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C4DC33C9B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AC2C33C99
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:34:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BDE8206F0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:34:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BE72206F0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:34:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgR2MRHj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bo88FewY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727149AbgAHAeH (ORCPT
+        id S1727151AbgAHAeI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jan 2020 19:34:07 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43349 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727139AbgAHAeH (ORCPT
+        Tue, 7 Jan 2020 19:34:08 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33144 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727139AbgAHAeI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jan 2020 19:34:07 -0500
-Received: by mail-pg1-f195.google.com with SMTP id k197so660112pga.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 16:34:07 -0800 (PST)
+        Tue, 7 Jan 2020 19:34:08 -0500
+Received: by mail-pl1-f193.google.com with SMTP id ay11so358249plb.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 16:34:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=asgOSiO3en3MKirTF13/FJXqhGCOjS4KYj7aip7vEMk=;
-        b=cgR2MRHjczWnaS1aW48i4voSB3UOGaH+Eav1yu3hM52L1qu9Y5fGt5llo/tq79LuNl
-         HrEkTVikTy/yi8wVmDZfloe0vnCIbCQArUrZK4aFMB/pJGP4cEhzAg/iZAECKpzxAwcu
-         ofwOtKl1Sjhv/qYr0VkzIP3ZxJE6TeiLc0k8ogBKAb9EmXUUM2vOXcr5gpTiwBTMM9Sc
-         8BQW4Ee9xkTar96uyMkRLfiaH1GSGYGGsfUdmaMSerwPoesK4vKP5QTnM7rjbRSUhU2j
-         gQZfMuIqpLv2bIJpuvnfrZurd2JEO80gMH+8N4aXsdrKw3IsRJqhrKzddW8cwZ+rOfQm
-         TEbQ==
+        bh=M2Up/tmikMUiLUcniWn1O0KhIXuMcGa8zC92O3BiMhc=;
+        b=Bo88FewYi7sMMdv/cbTKEYaRk9mSY4NgNKyEz3wG3n/gHQKjay1pa6PN2kPmLj1D77
+         0kdjULkp/0ew1VvjzOSRYzy/cSZvVxGJlHRVxAWtjstmqilfFkQvCB5BddhnIU3rLeZN
+         BISPnEwvryCFFgDy2QYUitSnU7RIlgRqrgb9lK5TwvS9z269rlFpfRz+rjgvCj/mXOJu
+         Ph4KjPMJgp+wJ9Nn4hEDEBTeqM5xfUql3aRu4qd+XFL50xPb57VBFhEkp80A0J4evJMT
+         3A3vQiXl3pgjdKDcaXbwJxh7sRPVVRWugDx4MI27kBOuSejFOE7Ltwo3+Ub2AmoTL7Wh
+         A1NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=asgOSiO3en3MKirTF13/FJXqhGCOjS4KYj7aip7vEMk=;
-        b=WWZzKjczr/ZjnRTHsdzPBbpu5Gv+5ePTcjnqlA7U/sGBvcEW5vI0Yz851kjhA/ot6i
-         Xhr+0JJU1pKyZfrG3/YZoUFjH24gXaWT6eEit1dn+8BSWrKsKPmT2jda5anIFbwWrI+t
-         XYCKXOkTfJYH7SAEsl/iyL0J0XjW81B3eBqFlh2dW82+HpvNwjKzqHGFTekkGredn7Ou
-         euiEDRWpZIZ51z4o2pTS0hv6dod05RiHmvegymFQWt9+EEF0zETj3qM0ZyAKrmPx10Ei
-         OTE4zzSXtu394t0msjuPOVTCy68VMPJSlX9ADrTRYUAO+fv97ULzRT3B5ADDcqpp5ypz
-         T2vA==
-X-Gm-Message-State: APjAAAWTYEMMRsx6jnwWQ0wagIUf03kFCK+Ry7PLzCOPNkS+uHd6mb72
-        mcSHbMdN6tUe+pNq7O4OTYjDsG3srJY=
-X-Google-Smtp-Source: APXvYqxYlFjixI2EP3BpUEnzOSUqX6uTRXNsvgrI3B9plpIEFRs7qlC/95r+2w27WHnZb45Hiz9/Fg==
-X-Received: by 2002:a63:e309:: with SMTP id f9mr2347223pgh.391.1578443646161;
-        Tue, 07 Jan 2020 16:34:06 -0800 (PST)
+        bh=M2Up/tmikMUiLUcniWn1O0KhIXuMcGa8zC92O3BiMhc=;
+        b=D57peuX605vj2Np5v8WrAYVfOyrSygAE1Wn1+WvQTAgiOAXE8fEK+Armx36Tl4IBPz
+         wd+H0F/OrHv0ZF36k3nWeK1fXM8cFlXoHrz644R4OySENBxb3IV50k2vlYHJFgR+qhjW
+         E+4018JV03bTUCHI3s3Zl7fqrKEN97n0mcxuXapfuj0GOPgppmVbjNkf1WP0HJkN88mr
+         NRBrzHwE5FppOSLu/a73b8Je/SN+4ovndySEFWdzxisjvxJ8JCmA7jzJT5KcEanP6yPr
+         6kQGdJHOhd3qJAQ82QfvixSmOu8IfPhQAklAj7eaYmz5eghkgzUqrM9/nCat7zzH9+V4
+         8fMA==
+X-Gm-Message-State: APjAAAVM2/oBOo/5O1vK3D7VoJAf7fEseFBvZwCW/1XoTpex38FGR0k4
+        w/eFUjwzYhY4YIbTSboHWBsWFmKY0q8=
+X-Google-Smtp-Source: APXvYqx4oTMBF+a+idR4EYoRgOxPumfWFmQL5Gl3fdYlOYDUBkHgmT50gXmRZy/LWyFDfKXy+n4eCw==
+X-Received: by 2002:a17:902:ba97:: with SMTP id k23mr2456485pls.343.1578443647377;
+        Tue, 07 Jan 2020 16:34:07 -0800 (PST)
 Received: from localhost.localdomain ([192.102.209.43])
-        by smtp.gmail.com with ESMTPSA id u10sm925805pgg.41.2020.01.07.16.34.05
+        by smtp.gmail.com with ESMTPSA id u10sm925805pgg.41.2020.01.07.16.34.06
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2020 16:34:05 -0800 (PST)
+        Tue, 07 Jan 2020 16:34:06 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 21/22] core: Add support for setting the number of GATT bearers
-Date:   Tue,  7 Jan 2020 16:33:41 -0800
-Message-Id: <20200108003342.15458-22-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 22/22] monitor: Add support for decoding EATT
+Date:   Tue,  7 Jan 2020 16:33:42 -0800
+Message-Id: <20200108003342.15458-23-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200108003342.15458-1-luiz.dentz@gmail.com>
 References: <20200108003342.15458-1-luiz.dentz@gmail.com>
@@ -75,176 +75,75 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds option to set the numbers of GATT Channels/Bearers to be
-connected in main.conf.
+This decodes packets received over EATT PSM.
 ---
- src/device.c        |  5 +++++
- src/gatt-client.c   |  8 +++++---
- src/gatt-database.c | 12 ++++++++++--
- src/hcid.h          |  1 +
- src/main.c          | 14 ++++++++++++++
- src/main.conf       |  5 +++++
- 6 files changed, 40 insertions(+), 5 deletions(-)
+ monitor/l2cap.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index f7f0bc789..828fe9810 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5049,6 +5049,11 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 	}
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index 3b2b25f24..9409604c3 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -2573,6 +2573,36 @@ static void att_handle_value_conf(const struct l2cap_frame *frame)
+ {
+ }
  
- 	if (dev->att) {
-+		if (main_opts.gatt_channels == bt_att_get_channels(dev->att)) {
-+			DBG("EATT channel limit reached");
-+			return false;
++static void att_multiple_vl_rsp(const struct l2cap_frame *frame)
++{
++	struct l2cap_frame *f = (void *) frame;
++
++	while (frame->size) {
++		uint16_t handle;
++		uint16_t len;
++
++		if (!l2cap_frame_get_le16(f, &handle))
++			return;
++
++		print_field("Handle: 0x%4.4x", handle);
++
++		if (!l2cap_frame_get_le16(f, &len))
++			return;
++
++		print_field("Length: 0x%4.4x", len);
++
++		print_hex_field("  Data", f->data,
++				len < f->size ? len : f->size);
++
++		if (len > f->size) {
++			print_text(COLOR_ERROR, "invalid size");
++			return;
 +		}
 +
- 		if (!bt_att_attach_fd(dev->att, g_io_channel_unix_get_fd(io))) {
- 			DBG("EATT channel connected");
- 			g_io_channel_set_close_on_unref(io, FALSE);
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 04a7e5319..203af709b 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -59,8 +59,6 @@
- #define GATT_CHARACTERISTIC_IFACE	"org.bluez.GattCharacteristic1"
- #define GATT_DESCRIPTOR_IFACE		"org.bluez.GattDescriptor1"
- 
--#define EATT_MAX_BEARERS 2
--
- struct btd_gatt_client {
- 	struct btd_device *device;
- 	uint8_t features;
-@@ -2171,6 +2169,7 @@ static void eatt_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 
- static void eatt_connect(struct btd_gatt_client *client)
++		l2cap_frame_pull(f, f, len);
++	}
++}
++
+ static void att_write_command(const struct l2cap_frame *frame)
  {
-+	struct bt_att *att = bt_gatt_client_get_att(client->gatt);
- 	struct btd_device *dev = client->device;
- 	struct btd_adapter *adapter = device_get_adapter(dev);
- 	GIOChannel *io;
-@@ -2178,11 +2177,14 @@ static void eatt_connect(struct btd_gatt_client *client)
- 	char addr[18];
- 	int i;
- 
-+	if (bt_att_get_channels(att) == main_opts.gatt_channels)
-+		return;
-+
- 	ba2str(device_get_address(dev), addr);
- 
- 	DBG("Connection attempt to: %s", addr);
- 
--	for (i = 0; i < EATT_MAX_BEARERS; i++) {
-+	for (i = bt_att_get_channels(att); i < main_opts.gatt_channels; i++) {
- 		io = bt_io_connect(eatt_connect_cb, client, NULL, NULL,
- 				BT_IO_OPT_SOURCE_BDADDR,
- 				btd_adapter_get_address(adapter),
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index d4c892113..455201efd 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1215,10 +1215,13 @@ static void populate_gatt_service(struct btd_gatt_database *database)
- 				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
- 				db_hash_read_cb, NULL, database);
- 
--	bt_uuid16_create(&uuid, GATT_CHARAC_SERVER_FEAT);
--	database->eatt = gatt_db_service_add_characteristic(service,
-+	/* Only enable EATT if there is a socket listening */
-+	if (database->eatt_io) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_SERVER_FEAT);
-+		database->eatt = gatt_db_service_add_characteristic(service,
- 				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
- 				server_feat_read_cb, NULL, database);
-+	}
- 
- 	gatt_db_service_set_active(service, true);
- 
-@@ -3564,6 +3567,10 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
- 		goto fail;
- 	}
- 
-+	/* If just just 1 channel is enabled EATT is not required */
-+	if (main_opts.gatt_channels == 1)
-+		goto bredr;
-+
- 	/* EATT socket */
- 	database->eatt_io = bt_io_listen(connect_cb, NULL, NULL, NULL, NULL,
- 					BT_IO_OPT_SOURCE_BDADDR, addr,
-@@ -3591,6 +3598,7 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
- 		}
- 	}
- 
-+bredr:
- 	/* BR/EDR socket */
- 	database->bredr_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &gerr,
- 					BT_IO_OPT_SOURCE_BDADDR, addr,
-diff --git a/src/hcid.h b/src/hcid.h
-index adea85ce2..083f70c5b 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -56,6 +56,7 @@ struct main_opts {
- 	bt_mode_t	mode;
- 	bt_gatt_cache_t gatt_cache;
- 	uint16_t	gatt_mtu;
-+	uint8_t		gatt_channels;
- 
- 	uint8_t		key_size;
- };
-diff --git a/src/main.c b/src/main.c
-index 1a6ab36a3..701cd279c 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -108,6 +108,7 @@ static const char *gatt_options[] = {
- 	"Cache",
- 	"KeySize",
- 	"ExchangeMTU",
-+	"EATTChannels",
- 	NULL
- };
- 
-@@ -444,6 +445,18 @@ static void parse_config(GKeyFile *config)
- 		DBG("ExchangeMTU=%d", val);
- 		main_opts.gatt_mtu = val;
- 	}
-+
-+	val = g_key_file_get_integer(config, "GATT", "Channels", &err);
-+	if (err) {
-+		DBG("%s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		DBG("Channels=%d", val);
-+		/* Ensure the channels is within a valid range. */
-+		val = MIN(val, 5);
-+		val = MAX(val, 1);
-+		main_opts.gatt_channels = val;
-+	}
- }
- 
- static void init_defaults(void)
-@@ -470,6 +483,7 @@ static void init_defaults(void)
- 
- 	main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
- 	main_opts.gatt_mtu = BT_ATT_MAX_LE_MTU;
-+	main_opts.gatt_channels = 3;
- }
- 
- static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
-diff --git a/src/main.conf b/src/main.conf
-index 40687a755..35e4238f2 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -94,6 +94,11 @@
- # Defaults to 517
- #ExchangeMTU = 517
- 
-+# Number of ATT channels
-+# Possible values: 1-5 (1 disables EATT)
-+# Default to 3
-+#Channels = 3
-+
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
+ 	print_field("Handle: 0x%4.4x", get_le16(frame->data));
+@@ -2645,6 +2675,12 @@ static const struct att_opcode_data att_opcode_table[] = {
+ 			att_handle_value_ind, 2, false },
+ 	{ 0x1e, "Handle Value Confirmation",
+ 			att_handle_value_conf, 0, true },
++	{ 0x20, "Read Multiple Request Variable Length",
++			att_read_multiple_req, 4, false },
++	{ 0x21, "Read Multiple Response Variable Length",
++			att_multiple_vl_rsp, 4, false },
++	{ 0x23, "Handle Multiple Value Notification",
++			att_multiple_vl_rsp, 4, false },
+ 	{ 0x52, "Write Command",
+ 			att_write_command, 2, false },
+ 	{ 0xd2, "Signed Write Command", att_signed_write_command, 14, false },
+@@ -3287,6 +3323,9 @@ void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
+ 		case 0x001f:
+ 			att_packet(index, in, handle, cid, data, size);
+ 			break;
++		case 0x0027:
++			att_packet(index, in, handle, cid, data + 2, size - 2);
++			break;
+ 		case 0x0017:
+ 		case 0x001B:
+ 			avctp_packet(&frame);
 -- 
 2.21.0
 
