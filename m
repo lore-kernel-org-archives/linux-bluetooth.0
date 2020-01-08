@@ -2,126 +2,118 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D769C33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F80C33C9E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:46:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF936206DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:41:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF61A2082E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:46:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tah0V5nL"
+	dkim=pass (1024-bit key) header.d=technicolor.onmicrosoft.com header.i=@technicolor.onmicrosoft.com header.b="OtOtZoeV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbgAHLlD (ORCPT
+        id S1726411AbgAHLqX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 06:41:03 -0500
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:42551 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726098AbgAHLlD (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 06:41:03 -0500
-Received: by mail-wr1-f44.google.com with SMTP id q6so2987173wro.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 03:41:01 -0800 (PST)
+        Wed, 8 Jan 2020 06:46:23 -0500
+Received: from mail-bn8nam11on2108.outbound.protection.outlook.com ([40.107.236.108]:3521
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726290AbgAHLqX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 8 Jan 2020 06:46:23 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QInDIZuxlEHZ7RT98gS/X9GFxlxvk+p5Ks57xEn9iCSz5402HrrKgP4o6m4b03yR97j1IjkhDFND5imNeWkNzLGQJOF7nF98cRlA+NnmBRahNivSOGvcDk0YfXYCTplZW6zifPvVd8qQxQw6I5X1BaEDtB0T8zU08TvMAxvUf5Zgl6uITk6Ru6HsAciDhO4tJf96gu4pkwUPNr3ahfgGA2qqZodAfR2/y39ohpNnx8RukSx8kwCeRiEEseRm8iVNibuRqnqLti139uXKcUaAbX3q1jb+JIipL7brHXFBeDfrQ8cJfa2opd5SSW1g5LQ6/G6Ub59RLPwwb4+nLuGX0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nxCKboUo8TKA2/dF0t51/JK0XDGiT5SsAwXd4ksykkc=;
+ b=ZP2wJ7Nx9pImQnqv3S1UT6YSBkmq1KyjLHQVE0sudi8efQkzqvN+BuJZi7m3PBkutF0MJYA19mjRja4144q4xqvF1g16Lm4dZj4czY3QKrng6pPMFZefsAeeqoaR4NconLQhESQUCNI4VRDsoWZjA/+ZP+Ep7rtCqmn/PcAt+Qb83hAZBfXlA8eMRH8vHs3cZUWi+f6pHQLJ46g3Go73vT/ZTxZdtih+U7mpReWysQe6YhlcjiemaGnF5z/qieneD19GUKfNC1gc2PNbml8izl/TLv6HU+aGkUggp8ScZvElI/UxHzNy9WUaD/6nRqI/sJWuE+3buszhMkb67nPZYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 193.203.95.25) smtp.rcpttodomain=vger.kernel.org
+ smtp.mailfrom=moving-picture.com; dmarc=bestguesspass action=none
+ header.from=moving-picture.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=Be/pnF33rUdHWEv3KFW00cmh9iwQFsZJq3ec00lxSCw=;
-        b=tah0V5nLyQoA8HBXgEFM0RtlEsE3LKDs60gIEl0LvTmpe1DwoF/RHU1NSQlVxgXsu0
-         eaMG+Wt1Jf9AMmdHVhdtHi+fkY8fLfbf9n80TCgsubMfhygJx0wuDi08aHTmaikUhKkR
-         SvUVQJi/8yz42t20JuCSd1Yon/dwygkskcPKtv1YEs9/LeTS4W7BFEfVQz7/jbPtt9Gb
-         AmSIUVTHe4GPo3If7VX5j4GgceS67r2HwAXjN6x6vPjc/I456KrT52ODqwNGwqK6a8uk
-         zjqvDneKrRyMpZcwzZkWix4mDzocpFm3BcR/VkneZu0FoJtVyQblj056wTO+TpNSFY2E
-         8ipw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=Be/pnF33rUdHWEv3KFW00cmh9iwQFsZJq3ec00lxSCw=;
-        b=VmYZsOOAyQFSO8l1obLVfmeWAwW7Ab3XyA7uIBHgTXl5+8NPxRhSNFbbQFdHcrhnzl
-         KLAdVzDX53991sy0l3+gaMObj1J3DRlaoRyoOvVNY2RmEhgBO1RZTIRsqbaaxxdTHqIV
-         oCAJcxAXdXyLzhgzxlV0HEYYiHfclmqycA0kfWUY2mNfNiKAtME8Y8WzBD7Rmc3sUXP9
-         ZcMhMae5yRi1/1t47gluVMNi3CN09zJGK36cI+tv8NeDZXvPgMvrKUWvrMRKTskk2Ua3
-         4ZndBiDeiy8HF8LWckcn0yZyUhpFEpLA1ZNZhijKiuFEf6IVsbAhfiBV5IRSxP+blCTC
-         2iiA==
-X-Gm-Message-State: APjAAAWtTUcmtPLCF6TnyHAvFrWD/+8yq7Ugq2nbRL/+07UASU89dcca
-        8ft8aFY2Ro2HPLq4q063lfFLetqY
-X-Google-Smtp-Source: APXvYqw28te3me6wprEd43CM6MV0GPk5V8ugFOqhuRkWro/nwsaAHRtKJOdd0N0wViQhMoFuyaAWpg==
-X-Received: by 2002:a5d:6441:: with SMTP id d1mr4068049wrw.93.1578483661235;
-        Wed, 08 Jan 2020 03:41:01 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id v8sm3928564wrw.2.2020.01.08.03.41.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 03:41:00 -0800 (PST)
-Date:   Wed, 8 Jan 2020 12:40:59 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     ofono@ofono.org, Denis Kenzior <denkenz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: HSP/HFP ofono bluetooth support for Linux desktop
-Message-ID: <20200108114059.fbypyps6f3nb4ckv@pali>
-References: <20200107192311.efit6zftt27encdc@pali>
+ d=technicolor.onmicrosoft.com; s=selector2-technicolor-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nxCKboUo8TKA2/dF0t51/JK0XDGiT5SsAwXd4ksykkc=;
+ b=OtOtZoeVu48ntjfbuzSby9uRPqOi56Y80HazrMC6V0w2YLAH/nixUjslbasJizA4QnKNK7niT5sjQczTb9YTZ76PFLkSbqCwqcroFCCOVMKtjUQ0hmydCamzMU2k5gAwnb6Kw/gxsHSFB5PiW52sOXp8Rgy++hP/mpAeIfOUGDw=
+Received: from MN2PR02CA0016.namprd02.prod.outlook.com (2603:10b6:208:fc::29)
+ by DM5PR02MB2267.namprd02.prod.outlook.com (2603:10b6:3:5c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.12; Wed, 8 Jan
+ 2020 11:46:20 +0000
+Received: from SN1NAM04FT013.eop-NAM04.prod.protection.outlook.com
+ (2a01:111:f400:7e4c::201) by MN2PR02CA0016.outlook.office365.com
+ (2603:10b6:208:fc::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2623.8 via Frontend
+ Transport; Wed, 8 Jan 2020 11:46:20 +0000
+Authentication-Results: spf=pass (sender IP is 193.203.95.25)
+ smtp.mailfrom=moving-picture.com; vger.kernel.org; dkim=none (message not
+ signed) header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
+ header.from=moving-picture.com;
+Received-SPF: Pass (protection.outlook.com: domain of moving-picture.com
+ designates 193.203.95.25 as permitted sender)
+ receiver=protection.outlook.com; client-ip=193.203.95.25;
+ helo=email.moving-picture.com;
+Received: from email.moving-picture.com (193.203.95.25) by
+ SN1NAM04FT013.mail.protection.outlook.com (10.152.88.111) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.2623.9 via Frontend Transport; Wed, 8 Jan 2020 11:46:19 +0000
+Received: from LNDWSMBX02.ad.mpc.local ([169.254.2.217]) by
+ LNDWSCAS01b.ad.mpc.local ([::1]) with mapi id 14.03.0408.000; Wed, 8 Jan 2020
+ 11:46:18 +0000
+From:   James Pearson <james-p@moving-picture.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Limiting what devices can pair over Bluetooth?
+Thread-Topic: Limiting what devices can pair over Bluetooth?
+Thread-Index: AdXGGLAzLvGXYq9xRBiUKhhPZc5Z4A==
+Date:   Wed, 8 Jan 2020 11:46:16 +0000
+Message-ID: <85C0B54E4752CA4F873E7C78CF0B26F5020662DB2C@LNDWSMBX02.ad.mpc.local>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.63.0.14]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200107192311.efit6zftt27encdc@pali>
-User-Agent: NeoMutt/20180716
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:193.203.95.25;IPV:;CTRY:GB;EFV:NLI;SFV:NSPM;SFS:(10019020)(376002)(346002)(396003)(136003)(39860400002)(189003)(199004)(9686003)(70206006)(186003)(336012)(6916009)(70586007)(316002)(55016002)(7696005)(55846006)(26005)(36906005)(5660300002)(356004)(86362001)(81166006)(81156014)(4744005)(37786003)(33656002)(2906002)(8936002)(478600001)(8676002);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR02MB2267;H:email.moving-picture.com;FPR:;SPF:Pass;LANG:en;PTR:soho95-25.sohonet.co.uk;MX:1;A:1;
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bf77bda0-6b80-42c4-4f7a-08d7943060d3
+X-MS-TrafficTypeDiagnostic: DM5PR02MB2267:
+X-Microsoft-Antispam-PRVS: <DM5PR02MB22677559B1B9A44FCA5020FFCD3E0@DM5PR02MB2267.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 02760F0D1C
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DOvXZ+RyaeWK8QKdg+18HYNbKV9f98GFZM0D7z3MDYsB4PH8Lt8YexI5SKpGQppPc2sZa6Xeeh2LEDEG9dpXA+Szq/KfEEPkPbseAmioGqlZoIDxjPdCvyYdUUc38zhEimnZK85X57MK7oaWv9i+MneuGzLP1KayukmwwmqfYIxcqmd9D47LenTzNJ+w4JWdw9YG/+Tbn2bPGE+M1jORzFMMXfX35iYDG12Mx0riwUc+Z9RNGgGfeVOWFrrznmFu0EKgyyDKT3kephfoxGEt1Wl4bkOTqPcZzQ/aZ/yPIbH9JVPUGZdArNRo+OhRLuDKWw6370iqVapFt+R+ArD4UXfVJAFaxuvfVEEE2tP+EGmqm7Sn4Mj0+etkahw+08/8JC1k4IafQpCgHt1FEmUIo9lRGQ0XjdwUt+WlXG9icArvYJFX7tMXrgnTNPIBuF8Q
+X-OriginatorOrg: moving-picture.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2020 11:46:19.4512
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf77bda0-6b80-42c4-4f7a-08d7943060d3
+X-MS-Exchange-CrossTenant-Id: 036da35c-ba43-4e4a-9bff-72ec0f508621
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=036da35c-ba43-4e4a-9bff-72ec0f508621;Ip=[193.203.95.25];Helo=[email.moving-picture.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR02MB2267
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-CCing also bluez developers as they may be interested in discussion how
-is HSP/HFP going to be implemented and used on Linux desktop.
-
-On Tuesday 07 January 2020 20:23:11 Pali Rohár wrote:
-> Hello!
-> 
-> Denis wanted from me to start a new thread, so I'm doing it.
-> 
-> As I wrote in different thread current state of HSP and HFP bluetooth
-> profiles on Linux desktop is in very bad state, specially usage of SCO
-> audio connection for audio applications (e.g. pulseaudio). See all
-> details in that email. I proposed a solution for it via hsphfpd daemon
-> with its prototype implementation, but Denis wrote that ofono could be a
-> better solution.
-> 
-> Part of HSP and HFP bluetooth profiles is AT socket connection which
-> needs to handle, parse and interpret all needed AT commands.
-> 
-> ofono project seems to be a candidate for handling AT socket on Linux
-> desktop, but in current state it is unusable. For audio application
-> (pulseaudio) there are required following features which ofono currently
-> missing:
-> 
-> * ability to connect HFP profiles in HF role without any modem
->   (desktop computers do not have to have any modem). ofono currently
->   does not support establishing HFP connection in HF role when computer
->   does not have any modem
-> 
-> * support for HSP profiles (in both HS and AG roles). ofono currently
->   does not support HSP profile at all
-> 
-> These two missing features are main blockers why ofono is unusable for
-> desktop/laptop usage as AT parser/handler for bluetooth HSP/HFP
-> profiles.
-> 
-> Denis wrote that fixing first issue would be possible by automatically
-> registering some fake dummy modem (when there is no in system) and
-> connecting it with HFP profile in HF role.
-> 
-> Do you have a reasonable solution also for second issue?
-> 
-> If above two issue could be solved I can write a list of all other
-> issues which are needed to be solved for providing HSP/HFP support on
-> Linux desktops.
-> 
-
--- 
-Pali Rohár
-pali.rohar@gmail.com
+We don't normally enable Bluetooth on Linux (CentOS 7) installs for securit=
+y reasons, but we have a case where we would like to use a Wacom tablet ove=
+r Bluetooth=0A=
+=0A=
+I would like to be able to configure things so Bluetooth can _only_ be used=
+ to pair with Wacom tablets (or just HID devices?)=0A=
+=0A=
+As I never used Bluetooth in anger before, I'm struggling to find out where=
+ to start looking - does anyone know how to do this - or any pointers for w=
+here I should start looking?=0A=
+=0A=
+Thanks=0A=
+=0A=
+James Pearson=
