@@ -6,35 +6,36 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F17B6C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D49C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:25:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C1EDC20705
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A46B206DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:25:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727124AbgAHVX1 convert rfc822-to-8bit (ORCPT
+        id S1727458AbgAHVZS convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 16:23:27 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:56137 "EHLO
+        Wed, 8 Jan 2020 16:25:18 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:55704 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726836AbgAHVX1 (ORCPT
+        with ESMTP id S1726836AbgAHVZR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 16:23:27 -0500
+        Wed, 8 Jan 2020 16:25:17 -0500
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8B246CECFB;
-        Wed,  8 Jan 2020 22:32:42 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id CF0E3CECFB;
+        Wed,  8 Jan 2020 22:34:32 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH 08/10] Bluetooth: hci_h4: Add support for ISO packets
+Subject: Re: [PATCH 10/10] Bluetooth: btusb: Detect if an ACL packet is in
+ fact an ISO packet
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200107074056.25453-9-luiz.dentz@gmail.com>
-Date:   Wed, 8 Jan 2020 22:23:25 +0100
+In-Reply-To: <20200107074056.25453-11-luiz.dentz@gmail.com>
+Date:   Wed, 8 Jan 2020 22:25:16 +0100
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <F1F4DBA5-9A69-4C09-9359-02DAE70C7403@holtmann.org>
+Message-Id: <DD158910-1335-4EAF-BDDD-8C0252C3B564@holtmann.org>
 References: <20200107074056.25453-1-luiz.dentz@gmail.com>
- <20200107074056.25453-9-luiz.dentz@gmail.com>
+ <20200107074056.25453-11-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -44,46 +45,38 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-> This enabled H4 driver to properly handle ISO packets.
+> Fix up the packet type if ISO packets are sent over the bulk endpoint.
 > 
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> drivers/bluetooth/hci_h4.c   | 1 +
-> drivers/bluetooth/hci_uart.h | 7 +++++++
-> 2 files changed, 8 insertions(+)
+> drivers/bluetooth/btusb.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-> index 19ba52005009..6dc1fbeb564b 100644
-> --- a/drivers/bluetooth/hci_h4.c
-> +++ b/drivers/bluetooth/hci_h4.c
-> @@ -103,6 +103,7 @@ static const struct h4_recv_pkt h4_recv_pkts[] = {
-> 	{ H4_RECV_ACL,   .recv = hci_recv_frame },
-> 	{ H4_RECV_SCO,   .recv = hci_recv_frame },
-> 	{ H4_RECV_EVENT, .recv = hci_recv_frame },
-> +	{ H4_RECV_ISO,   .recv = hci_recv_frame },
-> };
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index ded0ba83bcce..c1e030fc272f 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -663,11 +663,18 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+> 		hci_skb_expect(skb) -= len;
 > 
-> /* Recv data */
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index 6ab631101019..4e039d7a16f8 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -143,6 +143,13 @@ struct h4_recv_pkt {
-> 	.lsize = 1, \
-> 	.maxlen = HCI_MAX_EVENT_SIZE
+> 		if (skb->len == HCI_ACL_HDR_SIZE) {
+> +			__u16 handle = __le16_to_cpu(hci_acl_hdr(skb)->handle);
+> 			__le16 dlen = hci_acl_hdr(skb)->dlen;
+> +			__u8 type;
 > 
-> +#define H4_RECV_ISO \
-> +	.type = HCI_ISODATA_PKT, \
-> +	.hlen = HCI_ISO_HDR_SIZE, \
-> +	.loff = 2, \
-> +	.lsize = 2, \
-> +	.maxlen = HCI_MAX_FRAME_SIZE \
+> 			/* Complete ACL header */
+> 			hci_skb_expect(skb) = __le16_to_cpu(dlen);
+> 
+> +			type = hci_conn_lookup_type(data->hdev,
+> +						    hci_handle(handle));
+> +			if (type == ISO_LINK)
+> +				hci_skb_pkt_type(skb) = HCI_ISODATA_PKT;
 > +
-> struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
-> 			    const unsigned char *buffer, int count,
-> 			    const struct h4_recv_pkt *pkts, int pkts_count);
+> 			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
+> 				kfree_skb(skb);
+> 				skb = NULL;
 
-there are a bunch of drivers that should be able to handle packet type 5. We should fix them all.
+is this a local hack for development. We can not just look up the connection type on every packet we receive.
 
 Regards
 
