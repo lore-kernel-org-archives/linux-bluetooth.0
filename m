@@ -2,136 +2,84 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0341CC33CA1
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 20:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA11C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:01:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7B4C20692
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 20:57:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C57FD20692
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:01:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Mlxw6KJP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726721AbgAHU5J convert rfc822-to-8bit (ORCPT
+        id S1726437AbgAHVBO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 15:57:09 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:48276 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726155AbgAHU5J (ORCPT
+        Wed, 8 Jan 2020 16:01:14 -0500
+Received: from mail-lj1-f178.google.com ([209.85.208.178]:40314 "EHLO
+        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbgAHVBO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 15:57:09 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id ADCE2CECFA;
-        Wed,  8 Jan 2020 22:06:24 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH] Bleutooth: Add definitions for LE Read Tx Power
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1578386915-1524-1-git-send-email-ankit.p.navik@intel.com>
-Date:   Wed, 8 Jan 2020 21:57:07 +0100
-Cc:     BlueZ devel list <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <08B392B2-334A-47E3-A60F-AD7E21FAF9B2@holtmann.org>
-References: <1578386915-1524-1-git-send-email-ankit.p.navik@intel.com>
-To:     Ankit Navik <ankit.p.navik@intel.com>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
+        Wed, 8 Jan 2020 16:01:14 -0500
+Received: by mail-lj1-f178.google.com with SMTP id u1so4798411ljk.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 13:01:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hAmjjzdcWLO9QT6nPg8hQ6lAemKdJ+VPhUVLj9Pgpn4=;
+        b=Mlxw6KJPg07HOOO1VUubiiYDp4/FANeVsrslxEwn8AtqvrwKrCeWM9OyAo3vrbkUmj
+         4yauUyXdGL1JGLR3sS76FWvG8xR7ktVKv0uPXZJHHPz+KG1lonqHLPQT04wwPbJaQ3ZT
+         BxfgWwQsAQj4xF8IqLRRTW6ank27tWP7WoUQg4YoirQy41nuntse/OVGKoMRFywP7PzJ
+         LMoDRHHWZs2XKQ6FWV/pmJ5k211ZcgVZkyYNvfBbD8FC/pZ185NtcN82nRoQCuKnMNCC
+         gnFmjNFjhiNBrNv1CbWNmCDHE1MDrf1BfsEozW5YhK+AgupdgQEAGVp33MP6PO3NpEaS
+         cDNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hAmjjzdcWLO9QT6nPg8hQ6lAemKdJ+VPhUVLj9Pgpn4=;
+        b=PzOLZs2KaPhv/sRDvbnNCpHBJbIxyhpoPFlmECvTvZPotKehGLYoNC2Sk5Lt6B+Mch
+         ePHU40hJ0hjLu4UeERhRtpL7Aj+pDf4pegSR8vy34vi1bF6RsNS4AAFrKL9Vb4jL4vgP
+         hqr4h8ehZygd6pxNsk9DdEdD3HuOst1d0kg0SRMxbC8m64tMU4YKjzIHiofPBxFAV30l
+         K49mErznPEOcol9lbw6RdldhE8y3u/ltCngPdE9CsozthbFfkxHWZ7/A8b9vdkgqnOM5
+         szXCXMiKN0qyh4X1Y/1tzo8hHyf+ZmBExzKkJlMN8svrcN+vjivun1INdMeOaULsEenp
+         FEiQ==
+X-Gm-Message-State: APjAAAVWdSFHkTzNALzlCJN+Iy4GqSu2LYYOtl5xKLxv27VYihyUmzF0
+        kl6LT99fwO9RoiI0GG5WdYu7LjlkM+o=
+X-Google-Smtp-Source: APXvYqzEcb1Mgivh71jO4b5KoJ9HMU7JPjU3c7fU2en+tWvd+T4qK3anSjaTNzD7p88Lt+lDytPGdg==
+X-Received: by 2002:a05:651c:30a:: with SMTP id a10mr4155145ljp.101.1578517271828;
+        Wed, 08 Jan 2020 13:01:11 -0800 (PST)
+Received: from kynes.internet.domowy (apn-37-7-124-67.dynamic.gprs.plus.pl. [37.7.124.67])
+        by smtp.gmail.com with ESMTPSA id w19sm1951773lfl.55.2020.01.08.13.01.10
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2020 13:01:11 -0800 (PST)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 0/2] Fix IV recovery procedure
+Date:   Wed,  8 Jan 2020 22:01:01 +0100
+Message-Id: <20200108210103.32220-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ankit,
+v2: Separate actual bugfix from stylistic corrections
 
-> Add the definitions for LE read transmit power HCI commands to
-> read the minimum and maximum Tx power.
-> 
-> Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
-> ---
-> include/net/bluetooth/hci.h      |  7 +++++++
-> include/net/bluetooth/hci_core.h |  3 +++
-> net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
-> 3 files changed, 28 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 07b6ece..6e8805f 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1641,6 +1641,13 @@ struct hci_cp_le_ext_conn_param {
-> 	__le16 max_ce_len;
-> } __packed;
-> 
-> +#define HCI_OP_LE_READ_TX_POWER		0x204b
-> +struct hci_rp_le_read_tx_power {
-> +	__u8 status;
-> +	__s8 min_tx_power;
-> +	__s8 max_tx_power;
-> +} __packed;
-> +
-> #define HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS	0x203b
+Rafał Gajda (2):
+  mesh: Fix IV recovery
+  mesh: Remove local_iv_index and local_ivu aliases
 
-can we please keep this list sorted by opcode.
+ mesh/net.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
 
-> struct hci_rp_le_read_num_supported_adv_sets {
-> 	__u8  status;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index faebe38..88c6e55 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -418,6 +418,9 @@ struct hci_dev {
-> 	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
-> 	__u8			scan_rsp_data_len;
-> 
-> +	__s8			min_tx_power;
-> +	__s8			max_tx_power;
-> +
-
-They are LE specific so lets prefix them as le_ and put them together with other le_ data.
-
-> 	struct list_head	adv_instances;
-> 	unsigned int		adv_instance_cnt;
-> 	__u8			cur_adv_instance;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 6ddc4a7..fc154cf 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -988,6 +988,20 @@ static void hci_cc_le_read_adv_tx_power(struct hci_dev *hdev,
-> 	hdev->adv_tx_power = rp->tx_power;
-> }
-> 
-> +static void hci_cc_le_read_tx_power(struct hci_dev *hdev,
-> +					struct sk_buff *skb)
-
-Please do proper indentation.
-
-> +{
-> +	struct hci_rp_le_read_tx_power *rp = (void *) skb->data;
-> +
-> +	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-> +
-> +	if (rp->status)
-> +		return;
-> +
-> +	hdev->min_tx_power = rp->min_tx_power;
-> +	hdev->max_tx_power = rp->max_tx_power;
-> +}
-> +
-> static void hci_cc_user_confirm_reply(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
-> @@ -3414,6 +3428,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 		hci_cc_le_read_max_data_len(hdev, skb);
-> 		break;
-> 
-> +	case HCI_OP_LE_READ_TX_POWER:
-> +		hci_cc_le_read_tx_power(hdev, skb);
-> +		break;
-> +
-> 	case HCI_OP_WRITE_LE_HOST_SUPPORTED:
-> 		hci_cc_write_le_host_supported(hdev, skb);
-> 		break;
-
-Regards
-
-Marcel
+-- 
+2.23.0
 
