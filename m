@@ -2,132 +2,201 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C75DAC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8FBAC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:02:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99F7F206DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:01:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="IRJHlE2e"
+	by mail.kernel.org (Postfix) with ESMTP id ABD4D20692
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 21:02:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726667AbgAHVBR (ORCPT
+        id S1727256AbgAHVCX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 16:01:17 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:36262 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725446AbgAHVBR (ORCPT
+        Wed, 8 Jan 2020 16:02:23 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:37457 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbgAHVCX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 16:01:17 -0500
-Received: by mail-lj1-f193.google.com with SMTP id r19so4829797ljg.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 13:01:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=y5EtCJNiKvI9R+Z9KSzJ1QI4ki2LmyFbXNK+qFj7+fg=;
-        b=IRJHlE2eIUIQC4et2+pykwZ7CdAPdYGL06aTt0Uwhs3BWdkGZaphYxcO2U4bMbO5iW
-         ES3kdKjDZXZWT7qSev2pjJmFftggOZD3zVnlp0QZLi5jK+puSLywKtw/yIWClIYNilZN
-         zB0YQBZxSjvOmNCGoBZ2Pl6CtHALQCtm4P3jhpGBVHHGI9mmb63S56/VupbCFhCmhrsF
-         v7l1DX6rzYts/cZ8OxB0gr3LHzSlJBFwDCMtTbnZPKuicf2o3PMQ/tM2f5LpFiKQpEbq
-         DgBmBCesHviprL84EoDBEQlT2XQ1rPXx7tgSZdHIVBpgWGRIbrF0T0nkj5HUwGHJYlzq
-         ykBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=y5EtCJNiKvI9R+Z9KSzJ1QI4ki2LmyFbXNK+qFj7+fg=;
-        b=Zo5DbJO8qJmea5/HeVGQ0VefNSfu2bGVUVXChHMzfNjW0ZB6ssXycVLiNfuAhD3ix8
-         QnCCizlPr+VZch3PYW8mwsDlVlczxT7vLur+fO5bMfF4LKi5rekBstHtp4S/h8ChZcVs
-         kNCDvw+RepdcL2QpNAZaaYRK2GFEmd/RWeN7rbNqWzH2XFlNCLzTDN/nPj305Eo6x/IS
-         FNWDsQtWXewmNjWMR/oF6lbPQN0n0He+0ChyrOWycpFUyxq715gJUwnpRgpBLGiklk3U
-         XrDE/vBY+uzsWjqOfTouYHfmuzc9KkiJgbO2T/aJ+FTQEbBSETvJ3ssU8Ad1Xo92DbvM
-         qNSA==
-X-Gm-Message-State: APjAAAUQHFOXwTzi4XleCsgR/dRAUEZgo4oGiMzoF34x9lY6IHZweluu
-        NZBtu+ZQ7gSuw9sef/KyiMsGRm0BAfc=
-X-Google-Smtp-Source: APXvYqz7W6/lkX2E+ktdg0yEhuYBbTC1nZypu6t4eGFjas+Bw7qqPqJIyCeaqIPFS5jSE9L2eVgmyg==
-X-Received: by 2002:a2e:a404:: with SMTP id p4mr3897140ljn.234.1578517274662;
-        Wed, 08 Jan 2020 13:01:14 -0800 (PST)
-Received: from kynes.internet.domowy (apn-37-7-124-67.dynamic.gprs.plus.pl. [37.7.124.67])
-        by smtp.gmail.com with ESMTPSA id w19sm1951773lfl.55.2020.01.08.13.01.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 13:01:14 -0800 (PST)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     =?UTF-8?q?Rafa=C5=82=20Gajda?= <rafal.gajda@silvair.com>
-Subject: [PATCH BlueZ v2 2/2] mesh: Remove local_iv_index and local_ivu aliases
-Date:   Wed,  8 Jan 2020 22:01:03 +0100
-Message-Id: <20200108210103.32220-3-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200108210103.32220-1-michal.lowas-rzechonek@silvair.com>
-References: <20200108210103.32220-1-michal.lowas-rzechonek@silvair.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Wed, 8 Jan 2020 16:02:23 -0500
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 6B43BCECFA;
+        Wed,  8 Jan 2020 22:11:37 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [Bluez PATCH v1] bluetooth: secure bluetooth stack from bluedump
+ attack
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200106181425.Bluez.v1.1.I5ee1ea8e19d41c5bdffb4211aeb9cd9efa5e0a4a@changeid>
+Date:   Wed, 8 Jan 2020 22:02:20 +0100
+Cc:     BlueZ devel list <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <CD07E771-6F40-4158-A0F9-03FC128CDCD3@holtmann.org>
+References: <20200106181425.Bluez.v1.1.I5ee1ea8e19d41c5bdffb4211aeb9cd9efa5e0a4a@changeid>
+To:     howardchung@google.com
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Rafał Gajda <rafal.gajda@silvair.com>
+Hi Howard,
 
----
- mesh/net.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+> Attack scenario:
+> 1. A Chromebook (let's call this device A) is paired to a legitimate
+>   Bluetooth classic device (e.g. a speaker) (let's call this device
+>   B).
+> 2. A malicious device (let's call this device C) pretends to be the
+>   Bluetooth speaker by using the same BT address.
+> 3. If device A is not currently connected to device B, device A will
+>   be ready to accept connection from device B in the background
+>   (technically, doing Page Scan).
+> 4. Therefore, device C can initiate connection to device A
+>   (because device A is doing Page Scan) and device A will accept the
+>   connection because device A trusts device C's address which is the
+>   same as device B's address.
+> 5. Device C won't be able to communicate at any high level Bluetooth
+>   profile with device A because device A enforces that device C is
+>   encrypted with their common Link Key, which device C doesn't have.
+>   But device C can initiate pairing with device A with just-works
+>   model without requiring user interaction (there is only pairing
+>   notification). After pairing, device A now trusts device C with a
+>   new different link key, common between device A and C.
+> 6. From now on, device A trusts device C, so device C can at anytime
+>   connect to device A to do any kind of high-level hijacking, e.g.
+>   speaker hijack or mouse/keyboard hijack.
+> 
+> To fix this, reject the pairing if all the conditions below are met.
+> - the pairing is initialized by peer
+> - the authorization method is just-work
+> - host already had the link key to the peer
+> 
+> Also create a debugfs option to permit the pairing even the
+> conditions above are met.
+> 
+> Signed-off-by: howardchung <howardchung@google.com>
 
-diff --git a/mesh/net.c b/mesh/net.c
-index d7ce5493d..0a4d2e72c 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -2607,14 +2607,7 @@ static void update_kr_state(struct mesh_subnet *subnet, bool kr, uint32_t id)
- static void update_iv_ivu_state(struct mesh_net *net, uint32_t iv_index,
- 								bool ivu)
- {
--	uint32_t local_iv_index;
--	bool local_ivu;
--
--	/* Save original settings to differentiate what has changed */
--	local_iv_index = net->iv_index;
--	local_ivu = net->iv_update;
--
--	if ((iv_index - ivu) > (local_iv_index - local_ivu)) {
-+	if ((iv_index - ivu) > (net->iv_index - net->iv_update)) {
- 		/* Don't accept IV_Index changes when performing SAR Out */
- 		if (l_queue_length(net->sar_out))
- 			return;
-@@ -2638,23 +2631,24 @@ static void update_iv_ivu_state(struct mesh_net *net, uint32_t iv_index,
- 		}
- 	} else if (ivu) {
- 		/* Ignore beacons with IVU if they come too soon */
--		if (!local_ivu && net->iv_upd_state == IV_UPD_NORMAL_HOLD) {
-+		if (!net->iv_update &&
-+				net->iv_upd_state == IV_UPD_NORMAL_HOLD) {
- 			l_error("Update attempted too soon");
- 			return;
- 		}
- 
--		if (!local_ivu) {
-+		if (!net->iv_update) {
- 			l_info("iv_upd_state = IV_UPD_UPDATING");
- 			net->iv_upd_state = IV_UPD_UPDATING;
- 			net->iv_update_timeout = l_timeout_create(
- 					IV_IDX_UPD_MIN, iv_upd_to, net, NULL);
- 		}
--	} else if (local_ivu) {
-+	} else if (net->iv_update) {
- 		l_error("IVU clear attempted too soon");
- 		return;
- 	}
- 
--	if ((iv_index - ivu) > (local_iv_index - local_ivu))
-+	if ((iv_index - ivu) > (net->iv_index - net->iv_update))
- 		mesh_net_set_seq_num(net, 0);
- 
- 	if (ivu != net->iv_update || iv_index != net->iv_index) {
--- 
-2.23.0
+we prefer full name signed-off-by signatures.
+
+> ---
+> 
+> include/net/bluetooth/hci.h |  1 +
+> net/bluetooth/hci_core.c    | 47 +++++++++++++++++++++++++++++++++++++
+> net/bluetooth/hci_event.c   | 12 ++++++++++
+> 3 files changed, 60 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 07b6ecedc6ce..4918b79baa41 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -283,6 +283,7 @@ enum {
+> 	HCI_FORCE_STATIC_ADDR,
+> 	HCI_LL_RPA_RESOLUTION,
+> 	HCI_CMD_PENDING,
+> +	HCI_PERMIT_JUST_WORK_REPAIR,
+> 
+> 	__HCI_NUM_FLAGS,
+> };
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 9e19d5a3aac8..9014aa567e7b 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -172,10 +172,57 @@ static const struct file_operations vendor_diag_fops = {
+> 	.llseek		= default_llseek,
+> };
+> 
+> +static ssize_t permit_just_work_repair_read(struct file *file,
+> +					    char __user *user_buf,
+> +					    size_t count, loff_t *ppos)
+> +{
+> +	struct hci_dev *hdev = file->private_data;
+> +	char buf[3];
+> +
+> +	buf[0] = hci_dev_test_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR) ? 'Y'
+> +								      : 'N';
+> +	buf[1] = '\n';
+> +	buf[2] = '\0';
+> +	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
+> +}
+> +
+> +static ssize_t permit_just_work_repair_write(struct file *file,
+> +					     const char __user *user_buf,
+> +					     size_t count, loff_t *ppos)
+> +{
+> +	struct hci_dev *hdev = file->private_data;
+> +	char buf[32];
+> +	size_t buf_size = min(count, (sizeof(buf) - 1));
+> +	bool enable;
+> +
+> +	if (copy_from_user(buf, user_buf, buf_size))
+> +		return -EFAULT;
+> +
+> +	buf[buf_size] = '\0';
+> +	if (strtobool(buf, &enable))
+> +		return -EINVAL;
+> +
+> +	if (enable)
+> +		hci_dev_set_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR);
+> +	else
+> +		hci_dev_clear_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR);
+> +
+> +	return count;
+> +}
+> +
+> +static const struct file_operations permit_just_work_repair_fops = {
+> +	.open		= simple_open,
+> +	.read		= permit_just_work_repair_read,
+> +	.write		= permit_just_work_repair_write,
+> +	.llseek		= default_llseek,
+> +};
+> +
+> static void hci_debugfs_create_basic(struct hci_dev *hdev)
+> {
+> 	debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
+> 			    &dut_mode_fops);
+> +	debugfs_create_file("permit_just_work_repair", 0644, hdev->debugfs,
+> +			    hdev, &permit_just_work_repair_fops);
+> 
+> 	if (hdev->set_diag)
+> 		debugfs_create_file("vendor_diag", 0644, hdev->debugfs, hdev,
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 6ddc4a74a5e4..898e347e19e0 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4539,6 +4539,18 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+> 		goto unlock;
+> 	}
+> 
+> +	/* If there already exists link key in local host, terminate the
+> +	 * connection by default since the remote device could be malicious.
+> +	 * Permit the connection if permit_just_work_repair is enabled.
+> +	 */
+> +	if (!hci_dev_test_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR) &&
+> +	    hci_find_link_key(hdev, &ev->bdaddr)) {
+> +		BT_DBG("Rejecting request: local host already have link key");
+
+Can we use bt_dev_warn() here.
+
+> +		hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_NEG_REPLY,
+> +			     sizeof(ev->bdaddr), &ev->bdaddr);
+> +		goto unlock;
+> +	}
+> +
+> 	/* If no side requires MITM protection; auto-accept */
+> 	if ((!loc_mitm || conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) &&
+> 	    (!rem_mitm || conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)) {
+
+What about the LE cases?
+
+In addition, I like to get a pair of second eyes from Johan and Luiz on this one.
+
+Regards
+
+Marcel
 
