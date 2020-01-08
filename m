@@ -2,67 +2,69 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF372C33C99
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5F9C33C9E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:33:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F10E206F0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B896206F0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 00:33:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwC02UK9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qow/aPts"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726814AbgAHAdp (ORCPT
+        id S1726837AbgAHAds (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jan 2020 19:33:45 -0500
-Received: from mail-pg1-f178.google.com ([209.85.215.178]:39451 "EHLO
-        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725908AbgAHAdo (ORCPT
+        Tue, 7 Jan 2020 19:33:48 -0500
+Received: from mail-pg1-f176.google.com ([209.85.215.176]:45099 "EHLO
+        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726411AbgAHAdr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jan 2020 19:33:44 -0500
-Received: by mail-pg1-f178.google.com with SMTP id b137so672462pga.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 16:33:44 -0800 (PST)
+        Tue, 7 Jan 2020 19:33:47 -0500
+Received: by mail-pg1-f176.google.com with SMTP id b9so653527pgk.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jan 2020 16:33:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=sX1IhntGLgD4b+CVg8XTNW9d+Ec424eEbQexIym8f0o=;
-        b=mwC02UK9il57gK6VkQszBD+p25K+T2PDsSptVosHEia8Ru2ZmRhg6UzL2JT4aOGLax
-         3zlh8994H0NENQqtiak9G988q1UYO1h4pbdjdgjyj/LqI34cLVXzzx92GV1rxv4J2wpA
-         OLJ1KK9QubgtHHmp2nT1SPBz2xDaDhHX/EHFD5bzD6Vani5PoSNIZgp7vpD6ZlGempdS
-         V5XX+spTMq0LCYIkMGIvfX28B/Vi/5g3kZDom2Jz0Nnhj+/hRuRW98bqJ2c2MXV4Gje3
-         6ErcawpNV56vsnW0iSQCLm1FWLpeccy9WAaf8/S7Igt97BztEphyQZRbp/1kMx3ztfbf
-         xhiA==
+        bh=YQg2WNzj/S4xESCNpW4vqMS7o4sgCnxBsBwcCP7+PJc=;
+        b=qow/aPtsCHtG4R1zoNBGpYxWbK3JZUnApueeLpztBYdx2rKRK02VB9VtACrBq/1CTi
+         qxfjQN5Q7exx57cOA8dkVcqStsIAl9RL8GQdsVdN1SSZ8qP2ET8TJMumRd/GncScINP4
+         bekgKB/n3AU0wfwFc7lBW73hSzeHOs23T14PrJgzN6kSOVeAVzMLiooog/+qWNvqL82u
+         SA1qeBSBABmIMgkUk7Vs38u1PGjZz7ZKMpAybP/+wNdNb0T6Q/jbOTu3zGqA43y3gfEi
+         sS9rMO0KDx9vR34yfyDYmoeJRs/+t7kZKpmkkgDBdnhxMrx3erLawE/S0vItKuexdwzl
+         rc+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sX1IhntGLgD4b+CVg8XTNW9d+Ec424eEbQexIym8f0o=;
-        b=tk1vZkFRe7b0ixbLjMVI2ly/u08ajJQXfIUIsGrfxw6BKuDI3w/MayY6xdDh+pCtSC
-         TR/P9KP5SmcF2FNp+h/35NAvMGTidNxJPB9mfp91EwOxsH7oBOMB2teEqvQogsoEeQx+
-         /S9BKUIDnaLl7DRE3lLFbJ2CXCIPUu+Z7DLWQIeRGYlThWp0DuAT8pjTaldFz4niA9il
-         nj/pJXOBn18C9Md5W0pqyMkaJadw7+Z838ELxcbuSK3LzB3WOJVkaVA0U++EaNJKRcz7
-         al8/GdtJaEpGKB1QJIOZOG9iNRQDlQ/UE0t8mAKb+aHHBcXFMN3ae59IlltimlFLb9Ee
-         oUyw==
-X-Gm-Message-State: APjAAAUC1G+CKt9yCrkDE1FmC7AvPLTQJ9AQMtegtIBwBcUZ6vsXY43k
-        IgBj4Tj4J40MgNYvRJafHXGbTrfgzIM=
-X-Google-Smtp-Source: APXvYqypnA3DotT91kJNeGa1jEPsVQ8HJHIjNkUdYbjuo1EjP84kooQuWkMh1TuQ1wuuQHJISgnV2w==
-X-Received: by 2002:a65:4203:: with SMTP id c3mr2378297pgq.368.1578443623675;
-        Tue, 07 Jan 2020 16:33:43 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=YQg2WNzj/S4xESCNpW4vqMS7o4sgCnxBsBwcCP7+PJc=;
+        b=V8KHIUQY3k4NxjnmD5PWzrSErC+iup4ipbKd/1ud5TEwWZI9VmA6+1UB2K8IbqWt3B
+         sDY4P33/fEFWZ3z2rlKCsLvDZTJ0KNnYAN+0/vZuo9iV2PdrQaFf23vI4xOurlnrM6nE
+         LPURFgxwDgqmh1aHwmI8Dq4Gl3Byw6bZnPkPnkEtFAxDC9wtzZDHhy/GKhqCH0BAZW8W
+         D87c6S+dMb7g3BBYMLI6uBEQrzf8lfgomkdsaKPEhddCupCiGxmIDSarC8vHFSwHNpCX
+         ijE7qxxYndo2HzPC06CMmuSEssI2pRRWMHDzqCib3dFDJDyCkEMtfiKWUFs7ZBtKIvtY
+         R7XA==
+X-Gm-Message-State: APjAAAWx9di5pl4RsQevOtQvYYy1Q+0Pg7ZO8chpwWn29eHcQr2TErN/
+        ZwXKfAHXEayGqrP1DXvk+OrYv93qK/E=
+X-Google-Smtp-Source: APXvYqzJcJIWnvfjGR0MkrgKO7rj2HQzXd7nDzqxy0sQGXg36VOba+mrlfAGgMJQKPQohCLgprFi/w==
+X-Received: by 2002:a63:89c2:: with SMTP id v185mr2320357pgd.135.1578443625828;
+        Tue, 07 Jan 2020 16:33:45 -0800 (PST)
 Received: from localhost.localdomain ([192.102.209.43])
-        by smtp.gmail.com with ESMTPSA id u10sm925805pgg.41.2020.01.07.16.33.42
+        by smtp.gmail.com with ESMTPSA id u10sm925805pgg.41.2020.01.07.16.33.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2020 16:33:43 -0800 (PST)
+        Tue, 07 Jan 2020 16:33:45 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 00/22] Userspace Bluetooth 5.2 initial support
-Date:   Tue,  7 Jan 2020 16:33:20 -0800
-Message-Id: <20200108003342.15458-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 02/22] monitor: Add decoding of ISO related Link Layer PDUs
+Date:   Tue,  7 Jan 2020 16:33:22 -0800
+Message-Id: <20200108003342.15458-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200108003342.15458-1-luiz.dentz@gmail.com>
+References: <20200108003342.15458-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,100 +74,196 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces the initial support for Bluetooth 5.2 features:
+This adds the decoding of ISO related Link Layer PDUs
+---
+ monitor/bt.h |  48 ++++++++++++++++++++++++-
+ monitor/ll.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 147 insertions(+), 1 deletion(-)
 
-* ISO channels:
-	+ tools/isotest command line tool to run validation tests
-
-* L2CAP Enhanced Credit Based Flow Control Mode
-	+ tools/l2test has been update to include the new mode
-
-* Enhanced ATT Bearer:
-	+ Client and Server support
-	+ Include all new procedures
-	+ Automaticlly detects and enables channels
-	+ Number of channels configurable via main.conf
-
-* Monitor:
-	+ HCI/LL Bluetooth 5.2 command/event decoding
-	+ ISO packets decoding
-	+ L2CAP Enhanced Credit Based Flow Control Mode decoding
-	+ Enhanced ATT packets decoding
-
-* Emulator:
-	+ CIS/Unicast emulation support
-	- BIS/Broadcast emulation not yet supported
-
-Kernel changes:
-https://lore.kernel.org/linux-bluetooth/20200107074056.25453-1-luiz.dentz@gmail.com/T/#t
-
-Luiz Augusto von Dentz (22):
-  monitor: Add support for decoding ISO related commands
-  monitor: Add decoding of ISO related Link Layer PDUs
-  lib: Add definitions for ISO socket
-  tools: Add isotest tool
-  emulator: Add initial support for BT 5.2
-  monitor: Add support for ISO packets
-  tools/btproxy: Add support for ISO packets
-  monitor: Fix decoding of CIS estabilished event
-  emulator/btdev: Add parameter to CIS Estabilished
-  lib: Add definitions for Enhanced Credits Based Mode
-  btio: Add mode to for Enhanced Credit Mode
-  monitor: Add decoding for L2CAP Enhanced Credit Based PDUs
-  l2test: Add support for L2CAP_ECRED_MODE
-  share/att: Add EATT support
-  shared/gatt-client: Add support for EATT features
-  gatt: Enable EATT bearer support
-  shared/gatt-server: Add support for Read Multiple Variable Length
-  shared/gatt-client: Add support for Read Multiple Variable Length
-  shared/gatt: Add support for Handle Value Multiple Notifications
-  gatt: Add support for Notify Multiple
-  core: Add support for setting the number of GATT bearers
-  monitor: Add support for decoding EATT
-
- Makefile.tools           |    5 +-
- attrib/gattrib.c         |    5 +-
- btio/btio.c              |    2 +-
- btio/btio.h              |    3 +-
- emulator/btdev.c         |  293 +++++++++--
- emulator/btdev.h         |    1 +
- emulator/hciemu.c        |    3 +
- emulator/hciemu.h        |    1 +
- emulator/vhci.c          |    3 +-
- lib/bluetooth.h          |   14 +
- lib/iso.h                |   45 ++
- lib/l2cap.h              |    1 +
- lib/uuid.h               |    3 +
- monitor/bt.h             |  385 ++++++++++++++
- monitor/l2cap.c          |  192 +++++++
- monitor/ll.c             |  100 ++++
- monitor/packet.c         |  714 ++++++++++++++++++++++++++
- monitor/packet.h         |    2 +
- peripheral/gatt.c        |    2 +-
- src/device.c             |   18 +-
- src/gatt-client.c        |   85 ++++
- src/gatt-database.c      |  125 +++--
- src/hcid.h               |    1 +
- src/main.c               |   14 +
- src/main.conf            |    5 +
- src/shared/att-types.h   |   25 +-
- src/shared/att.c         |  780 +++++++++++++++++++----------
- src/shared/att.h         |   18 +-
- src/shared/btsnoop.h     |    2 +
- src/shared/gatt-client.c |  279 +++++++++--
- src/shared/gatt-client.h |    5 +-
- src/shared/gatt-server.c |  388 ++++++++++-----
- src/shared/gatt-server.h |    2 +-
- tools/btgatt-client.c    |    2 +-
- tools/btgatt-server.c    |    4 +-
- tools/btproxy.c          |   20 +-
- tools/isotest.c          | 1019 ++++++++++++++++++++++++++++++++++++++
- tools/l2test.c           |    5 +-
- unit/test-gatt.c         |    4 +-
- 39 files changed, 4046 insertions(+), 529 deletions(-)
- create mode 100644 lib/iso.h
- create mode 100644 tools/isotest.c
-
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 04ad34ea9..0a88aff97 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -28,7 +28,7 @@
+ #define BT_HCI_BIT_5_2		(8 * 41) + 5
+ #define BT_HCI_SUBEVT_5_2	0x19
+ 
+-#define BT_LL_CMD_MILAN		0x1f
++#define BT_LL_CMD_5_2		0x1f
+ 
+ struct bt_ll_hdr {
+ 	uint8_t  preamble;
+@@ -181,6 +181,52 @@ struct bt_ll_clock_acc {
+ 
+ #define BT_LL_CLOCK_ACCURACY_RSP 0x1e
+ 
++#define BT_LL_CIS_REQ		BT_LL_CMD_5_2
++struct bt_ll_cis_req {
++	uint8_t  cig;
++	uint8_t  cis;
++	uint8_t  m_phy;
++	uint8_t  s_phy;
++	uint16_t m_sdu;
++	uint16_t s_sdu;
++	uint8_t  m_interval[3];
++	uint8_t  s_interval[3];
++	uint8_t  m_pdu;
++	uint8_t  s_pdu;
++	uint8_t  nse;
++	uint8_t  sub_interval[3];
++	uint8_t  bn;
++	uint8_t  m_ft;
++	uint8_t  s_ft;
++	uint16_t iso_interval;
++	uint8_t  offset_min[3];
++	uint8_t  offset_max[3];
++	uint16_t conn_event_count;
++} __attribute__ ((packed));
++
++#define BT_LL_CIS_RSP		BT_LL_CMD_5_2 + 1
++struct bt_ll_cis_rsp {
++	uint8_t  offset_min[3];
++	uint8_t  offset_max[3];
++	uint16_t conn_event_count;
++} __attribute__ ((packed));
++
++#define BT_LL_CIS_IND		BT_LL_CMD_5_2 + 2
++struct bt_ll_cis_ind {
++	uint32_t addr;
++	uint8_t  cis_offset[3];
++	uint8_t  cig_sync_delay[3];
++	uint8_t  cis_sync_delay[3];
++	uint16_t conn_event_count;
++} __attribute__ ((packed));
++
++#define BT_LL_CIS_TERMINATE_IND	BT_LL_CMD_5_2 + 3
++struct bt_ll_cis_term_ind {
++	uint8_t  cig;
++	uint8_t  cis;
++	uint8_t  reason;
++} __attribute__ ((packed));
++
+ #define LMP_ESC4(x) ((127 << 8) | (x))
+ 
+ #define BT_LMP_NAME_REQ			1
+diff --git a/monitor/ll.c b/monitor/ll.c
+index 5141f2be6..4b3f567bd 100644
+--- a/monitor/ll.c
++++ b/monitor/ll.c
+@@ -601,6 +601,97 @@ static void clock_acc_req_rsp(const void *data, uint8_t size)
+ 	print_field("SCA: 0x%2.2x", pdu->sca);
+ }
+ 
++static void cis_req(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_req *cmd = data;
++	uint32_t interval;
++	uint8_t mask;
++
++	print_field("CIG ID: 0x%2.2x", cmd->cig);
++	print_field("CIS ID: 0x%2.2x", cmd->cis);
++	print_field("Master to Slave PHY: 0x%2.2x", cmd->m_phy);
++
++	mask = print_bitfield(2, cmd->m_phy, le_phys);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++
++	print_field("Slave To Master PHY: 0x%2.2x", cmd->s_phy);
++
++	mask = print_bitfield(2, cmd->s_phy, le_phys);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
++
++	print_field("Master to Slave Maximum SDU: %u", cmd->m_sdu);
++	print_field("Slave to Master Maximum SDU: %u", cmd->s_sdu);
++
++	memcpy(&interval, cmd->m_interval, sizeof(cmd->m_interval));
++	print_field("Master to Slave Interval: 0x%6.6x", le32_to_cpu(interval));
++	memcpy(&interval, cmd->s_interval, sizeof(cmd->s_interval));
++	print_field("Slave to Master Interval: 0x%6.6x", le32_to_cpu(interval));
++
++	print_field("Master to Slave Maximum PDU: %u", cmd->m_pdu);
++	print_field("Slave to Master Maximum PDU: %u", cmd->s_pdu);
++
++	print_field("Burst Number: %u us", cmd->bn);
++
++	memcpy(&interval, cmd->sub_interval, sizeof(cmd->sub_interval));
++	print_field("Sub-Interval: 0x%6.6x", le32_to_cpu(interval));
++
++	print_field("Master to Slave Flush Timeout: %u", cmd->m_ft);
++	print_field("Slave to Master Flush Timeout: %u", cmd->s_ft);
++
++	print_field("ISO Interval: 0x%4.4x", le16_to_cpu(cmd->iso_interval));
++
++	memcpy(&interval, cmd->offset_min, sizeof(cmd->offset_min));
++	print_field("CIS Offset Minimum: 0x%6.6x", le32_to_cpu(interval));
++	memcpy(&interval, cmd->offset_max, sizeof(cmd->offset_max));
++	print_field("CIS Offset Maximum: 0x%6.6x", le32_to_cpu(interval));
++
++	print_field("Connection Event Count: %u", cmd->conn_event_count);
++}
++
++static void cis_rsp(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_rsp *rsp = data;
++	uint32_t interval;
++
++	memcpy(&interval, rsp->offset_min, sizeof(rsp->offset_min));
++	print_field("CIS Offset Minimum: 0x%6.6x", le32_to_cpu(interval));
++	memcpy(&interval, rsp->offset_max, sizeof(rsp->offset_max));
++	print_field("CIS Offset Maximum: 0x%6.6x", le32_to_cpu(interval));
++
++	print_field("Connection Event Count: %u", rsp->conn_event_count);
++}
++
++static void cis_ind(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_ind *ind = data;
++	uint32_t interval;
++
++	print_field("CIS Access Address: 0x%4.4x", le32_to_cpu(ind->addr));
++	memcpy(&interval, ind->cis_offset, sizeof(ind->cis_offset));
++	print_field("CIS Offset: 0x%6.6x", le32_to_cpu(interval));
++
++	memcpy(&interval, ind->cig_sync_delay, sizeof(ind->cig_sync_delay));
++	print_field("CIG Synchronization Delay: 0x%6.6x",
++					le32_to_cpu(interval));
++	memcpy(&interval, ind->cis_sync_delay, sizeof(ind->cis_sync_delay));
++	print_field("CIS Synchronization Delay: %u us",
++					le32_to_cpu(interval));
++	print_field("Connection Event Count: %u", ind->conn_event_count);
++}
++
++static void cis_term_ind(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_term_ind *ind = data;
++
++	print_field("CIG ID: 0x%2.2x", ind->cig);
++	print_field("CIS ID: 0x%2.2x", ind->cis);
++	packet_print_error("Reason", ind->reason);
++}
++
+ struct llcp_data {
+ 	uint8_t opcode;
+ 	const char *str;
+@@ -641,6 +732,15 @@ static const struct llcp_data llcp_table[] = {
+ 	{ 0x1c, "LL_PERIODIC_SYNC_IND",     periodic_sync_ind, 34, true },
+ 	{ 0x1d, "LL_CLOCK_ACCURACY_REQ",    clock_acc_req_rsp,  1, true },
+ 	{ 0x1e, "LL_CLOCK_ACCURACY_RSP",    clock_acc_req_rsp,  1, true },
++	{ BT_LL_CIS_REQ, "LL_CIS_REQ",      cis_req,
++					sizeof(struct bt_ll_cis_req), true },
++	{ BT_LL_CIS_RSP, "LL_CIS_RSP",      cis_rsp,
++					sizeof(struct bt_ll_cis_rsp), true },
++	{ BT_LL_CIS_IND, "LL_CIS_IND",      cis_ind,
++					sizeof(struct bt_ll_cis_ind), true },
++	{ BT_LL_CIS_TERMINATE_IND, "LL_CIS_TERMINATE_IND", cis_term_ind,
++					sizeof(struct bt_ll_cis_term_ind),
++					true },
+ 	{ }
+ };
+ 
 -- 
 2.21.0
 
