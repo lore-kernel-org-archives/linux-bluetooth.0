@@ -2,66 +2,65 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18088C33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4DDC33CA2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:48:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD6942077B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:48:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8380B2077B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 11:48:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="YMl0G26/"
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="kH9WlUMF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727444AbgAHLsI (ORCPT
+        id S1727454AbgAHLsK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 06:48:08 -0500
-Received: from mail-lf1-f51.google.com ([209.85.167.51]:33009 "EHLO
-        mail-lf1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727212AbgAHLsI (ORCPT
+        Wed, 8 Jan 2020 06:48:10 -0500
+Received: from mail-lj1-f178.google.com ([209.85.208.178]:39451 "EHLO
+        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727236AbgAHLsJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 06:48:08 -0500
-Received: by mail-lf1-f51.google.com with SMTP id n25so2236237lfl.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 03:48:05 -0800 (PST)
+        Wed, 8 Jan 2020 06:48:09 -0500
+Received: by mail-lj1-f178.google.com with SMTP id l2so2991393lja.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 03:48:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=FLrSyRALA+rrBdzmNTayeiwTN7tLarui48qkxMKE5EE=;
-        b=YMl0G26/8WwZOsKv1hCc7FZeipcAWYMKIiBIStU/wnho8aXwgbpmzF/dYFcrNUKh8J
-         YheU4SAFi2zHi4eD9Me9QCvMxAI98F4vILXcWc4doD2nP1mQ/NM1sjweyuedd1iVRZoF
-         +HIZ4B/ZWHfIgQn8mF65HTQGDstZojWzrVOf/Y1RApqOzCsHo3ofvF+w/m2uG3EypZPp
-         9C0XB7Cor3kMdQDSkWtmd/4kUG/Fu34gYXyFTWJf5RwNOUbL/MILTqO66V6TPvuELP4o
-         hTZrplirhS6zfvqHMeEPqMXlDGn+c6PT/NDWnHUAB6q7ck0qQZU3qc8Y+RNqU+3KFs09
-         j/Hw==
+        bh=NUG4NUiKisBmNULT+8vMhSDE5VM67LNm/WmLM8NesA0=;
+        b=kH9WlUMF+uHoILn6c6AAJuL0Y9GhqyJPXPnAMSB2ljRqt2ru2Z80u2QVt3LfQ0wnV2
+         LzJpuTmtGctzW+o89U622PlkSWFcATiOlZGIscljLHj4zquHKbhGnAM+oSXgQnCjiCyx
+         C5gwZ4YsPaid5zzeefYNc7T+B06VpPGiyVTse0EMPkCEafum9T6jWpEcl/Z46kTKypuH
+         E4+snptiSbEdT9YvLdmYSD5uyX422W+1+SaLX+gbKXLy+NBDt1n5WcgT6abJU25Z1+KY
+         hpVEXLJe6iI5Mx384OHHtUVqE1nYEJCuusvCrkJPRGzObNt39fD7G9vO3YJTxZ3a0ICu
+         HJAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FLrSyRALA+rrBdzmNTayeiwTN7tLarui48qkxMKE5EE=;
-        b=ccZLhWKKW310RjFHSa2hnI4WCYXMrOiINLVvNVuFfHDF+1F36jIiPBK8GpnQt9kTZp
-         2WiHbi6/igvQIDsvUqFppJ5yxXl+jLsp2NwimjW+lkZHHzTWGceOlr9oBIBvH856Lq4g
-         g/AtVb4POxMqw6vvX7Vmk75pCZtLUDTChcGno6EG3vCVgV+7+2odZnRAJHMw8izuaEo/
-         wILxXiHbhpIc+baD1bGcMWcSpghn3UBOE0A/vaSdqLTAuN03s9IctNw8WvaGw8E6fztl
-         BK5XuGykef+m8YxLBzi0Qj4n97iYCN7v6Kp0xDGWhQokTWcOBSYvEB44MWHL4f7TG0SZ
-         y3yg==
-X-Gm-Message-State: APjAAAVm3X73ujSV5yMqXX09xNi+VDlUk9ds2AdUayktimhqNF6GGth4
-        8LwvZu2IutAfbfYTEe2OQu+HypZCH4I=
-X-Google-Smtp-Source: APXvYqzxQDdYpow7XQVkccyuhD9AqzXFHcGt/cO7l8io2z28QdMRdNyE29iF1UIssZ5QGbcYpARr8g==
-X-Received: by 2002:a19:4b55:: with SMTP id y82mr2590196lfa.171.1578484084353;
-        Wed, 08 Jan 2020 03:48:04 -0800 (PST)
+        bh=NUG4NUiKisBmNULT+8vMhSDE5VM67LNm/WmLM8NesA0=;
+        b=bUxgSU8PA2/d6qSDcEYTdb+yxwB1uSWYAMPPwCYzSGfT7pojH5Obh8grKBCRp31pUF
+         nNgig1Am6t8LKgTPg5N7dzmeecZe43oxae0p3fhNhz+2C525djidzgsCoHgq9mlBw1r5
+         oTXsaRf6ZEcBX9/B5TFJlzDjid5ImQ2dvmEj4uQqw9q4HU5Uic9Bs/gGle0E6fAMyHpV
+         jPNh1/3Iy6R/B4Sfgd6RoMVhKpdXY6xqew+jmUisrMzFt25/9AaysOHhdDVDkhT62w7c
+         njFuati22DQidZnqF4xcR6OjIatIs3kz6ltsIJb45Z52eQJ18y2304QT6FU60HvVL8rO
+         caTQ==
+X-Gm-Message-State: APjAAAXf0qyZuV+fk1zL/vubb9g+UQXC8y3EVhmVfW5YcOzbAG0Lfv2K
+        +lzhkt+1jMjqULRFhmr44R846xeWpF4=
+X-Google-Smtp-Source: APXvYqz/QxmVanFVqjLyUm8B3mEV4/jceXi1xLfUZ25saLm+Q5tpZcdwJNfz05vlwV9iFPSGHVtq3A==
+X-Received: by 2002:a2e:580c:: with SMTP id m12mr2702311ljb.252.1578484085781;
+        Wed, 08 Jan 2020 03:48:05 -0800 (PST)
 Received: from tp480.int.codecoup.pl ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id e17sm1130645ljg.101.2020.01.08.03.48.03
+        by smtp.gmail.com with ESMTPSA id e17sm1130645ljg.101.2020.01.08.03.48.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 03:48:03 -0800 (PST)
+        Wed, 08 Jan 2020 03:48:05 -0800 (PST)
 From:   Szymon Czapracki <szymon.czapracki@codecoup.pl>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Szymon Czapracki <szymon.czapracki@codecoup.pl>
-Subject: [PATCH v2 7/8] monitor: Decode LE Set Default Periodic Adv Sync Transfer Params. command
-Date:   Wed,  8 Jan 2020 12:47:51 +0100
-Message-Id: <20200108114752.133076-7-szymon.czapracki@codecoup.pl>
+Subject: [PATCH v2 8/8] monitor: Decode LE CTE Request Failed event
+Date:   Wed,  8 Jan 2020 12:47:52 +0100
+Message-Id: <20200108114752.133076-8-szymon.czapracki@codecoup.pl>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108114752.133076-1-szymon.czapracki@codecoup.pl>
 References: <20200108114752.133076-1-szymon.czapracki@codecoup.pl>
@@ -72,73 +71,56 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-< HCI Command: LE Set Default Periodic Advertisng Sync Transfer Parameters (0x08|0x005d) plen 6
-        Mode: Enabled with report events disabled (0x01)
-        Skip: 0x00
-        Sync timeout: 0 msec (0x0000)
-        Sync CTE type: 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-      LE Set Default Periodic Advertisng Sync Transfer Parameters (0x08|0x005d) ncmd 1
-        Status: Unknown HCI Command (0x01)
 ---
- monitor/bt.h     |  8 ++++++++
- monitor/packet.c | 17 +++++++++++++++++
- 2 files changed, 25 insertions(+)
+ monitor/bt.h     |  6 ++++++
+ monitor/packet.c | 10 ++++++++++
+ 2 files changed, 16 insertions(+)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index 2ec2ea0a7..1859dfb21 100644
+index 1859dfb21..b31e6c5c5 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -2490,6 +2490,14 @@ struct bt_hci_cmd_periodic_adv_sync_trans_params {
- 	uint8_t   cte_type;
+@@ -3177,6 +3177,12 @@ struct bt_hci_evt_le_chan_select_alg {
+ 	uint8_t  algorithm;
  } __attribute__ ((packed));
  
-+#define BT_HCI_CMD_DEFAULT_PERIODIC_ADV_SYNC_TRANS_PARAMS	0x205d
-+struct bt_hci_cmd_default_periodic_adv_sync_trans_params {
-+	uint8_t  mode;
-+	uint16_t skip;
-+	uint16_t sync_timeout;
-+	uint8_t  cte_type;
++#define BT_HCI_EVT_LE_CTE_REQUEST_FAILED	0x17
++struct bt_hci_evt_le_cte_request_failed {
++	uint8_t  status;
++	uint16_t handle;
 +} __attribute__ ((packed));
 +
- #define BT_HCI_EVT_INQUIRY_COMPLETE		0x01
- struct bt_hci_evt_inquiry_complete {
+ #define BT_HCI_EVT_LE_PER_ADV_SYNC_TRANS_REC		0x18
+ struct bt_hci_evt_le_per_adv_sync_trans_rec {
  	uint8_t  status;
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 74c73f145..9d22dfc15 100644
+index 9d22dfc15..415a6abfa 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -7653,6 +7653,19 @@ static void le_periodic_adv_sync_trans_params(const void *data, uint8_t size)
- 	print_create_sync_cte_type(cmd->cte_type);
+@@ -9886,6 +9886,14 @@ static void le_chan_select_alg_evt(const void *data, uint8_t size)
+ 	print_field("Algorithm: %s (0x%2.2x)", str, evt->algorithm);
  }
  
-+static void le_set_default_periodic_adv_sync_trans_params(const void *data,
-+								uint8_t size)
++static void le_cte_request_failed_evt(const void *data, uint8_t size)
 +{
-+	const struct bt_hci_cmd_default_periodic_adv_sync_trans_params *cmd = data;
++	const struct bt_hci_evt_le_cte_request_failed *evt = data;
 +
-+	print_sync_mode(cmd->mode);
-+	print_field("Skip: 0x%2.2x", cmd->skip);
-+	print_field("Sync timeout: %d msec (0x%4.4x)",
-+					le16_to_cpu(cmd->sync_timeout) * 10,
-+					le16_to_cpu(cmd->sync_timeout));
-+	print_create_sync_cte_type(cmd->cte_type);
++	print_status(evt->status);
++	print_field("Connection handle: %d", evt->handle);
 +}
 +
- struct opcode_data {
- 	uint16_t opcode;
- 	int bit;
-@@ -8458,6 +8471,10 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x205c, 328, "LE Periodic Advertising Sync Transfer Parameters",
- 				le_periodic_adv_sync_trans_params, 8, true,
- 				status_handle_rsp, 3, true},
-+	{ 0x205d, 329, "LE Set Default Periodic Advertisng Sync Transfer "
-+				"Parameters",
-+				le_set_default_periodic_adv_sync_trans_params,
-+				6, true, status_rsp, 1, true},
- 	{ }
- };
- 
+ static void le_per_adv_sync_trans_rec_evt(const void *data, uint8_t size)
+ {
+ 	const struct bt_hci_evt_le_per_adv_sync_trans_rec *evt = data;
+@@ -9987,6 +9995,8 @@ static const struct subevent_data le_meta_event_table[] = {
+ 				le_scan_req_received_evt, 8, true},
+ 	{ 0x14, "LE Channel Selection Algorithm",
+ 				le_chan_select_alg_evt, 3, true},
++	{ 0x17, "LE CTE Request Failed",
++				le_cte_request_failed_evt, 3, true},
+ 	{ 0x18, "LE Periodic Advertising Sync Transfer Received",
+ 					le_per_adv_sync_trans_rec_evt, 19,
+ 					true},
 -- 
 2.24.1
 
