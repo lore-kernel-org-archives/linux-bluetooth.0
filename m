@@ -2,103 +2,108 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B20C33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 12:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 757C8C33CA1
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 13:57:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1851A206DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 12:31:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B86520705
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 13:57:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="TcQEnChL"
+	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="m/kaMwLb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727978AbgAHMbQ (ORCPT
+        id S1728539AbgAHN5c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 07:31:16 -0500
-Received: from mail25.static.mailgun.info ([104.130.122.25]:34416 "EHLO
-        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726967AbgAHMbP (ORCPT
+        Wed, 8 Jan 2020 08:57:32 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34462 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726411AbgAHN5b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 07:31:15 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1578486674; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=7BY+YDpvD+FCZPPlZGH7NQ/yH7pyhZGmScGsJHBppFg=;
- b=TcQEnChL54jCmCAtsMk0AUA8U1NM8saoQbTtSMcPDHeJI0IOoio29xbXKNmG9zATI13jDUDG
- vDVtip1rCFJmFLr73xu94ADAYG2zvJBrObOXLr8jmGEe/p7CXqGC5sHunnuytEGqHfemETdk
- tmGb1Wja7aFEYYsbRyB57RQIemg=
-X-Mailgun-Sending-Ip: 104.130.122.25
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e15cb8e.7f5f3e7c85e0-smtp-out-n03;
- Wed, 08 Jan 2020 12:31:10 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 4B977C447A3; Wed,  8 Jan 2020 12:31:10 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 526B1C43383;
-        Wed,  8 Jan 2020 12:31:09 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 08 Jan 2020 18:01:09 +0530
-From:   bgodavar@codeaurora.org
-To:     Wei Yongjun <weiyongjun1@huawei.com>
+        Wed, 8 Jan 2020 08:57:31 -0500
+Received: by mail-wr1-f66.google.com with SMTP id t2so3523434wrr.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 05:57:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=Tjibdcrm0F2gBrVSaGaYRxNAqKq2VCoLQH5KirTsjuc=;
+        b=m/kaMwLbBcSL4lPor8Mo+VgfcRizesHQjejcmUNPWa7XkwV5ZIn7hrCEOLYXHV9/T8
+         AaorCkeLtPS27njH+cQJo1u7AjgxISd32W4iSFFzARbEBSavlQnGrJCL1+RmIuxT1/V9
+         EYPiqhCCxh3giok7xWROLKif3J9WBqOWxHUSYERvNjIB4pLaQOVgoAWB1wgDn7N/cp8Q
+         HrcG/pYdnG8SQgS4r0w4ZaOZ+aZ4otAmnLWRyQCl4LOoZrfCY4PUhSiPeeKtzqoBKh+r
+         dxN7riv+TNU9KNrl55J3szBIMR2vXJqksOoHTGffMk69SAmPkAk7inrwmVnwG/M5ps9W
+         UZLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Tjibdcrm0F2gBrVSaGaYRxNAqKq2VCoLQH5KirTsjuc=;
+        b=mbX9WBGKAmSIx9/jWtRtosVEIeTqgon9vWoTtzjtvNtAG1R1kyMf0Mes5cFtSH4WbV
+         +XuNjSjqyPDmLB42WjNXyXFtgV6eOj0dUpwpKjQ6j232xXmWIbXtSwCxdjaXUkUa8p7a
+         nODrBEiJc60FDA3OOCUMrY0lUdZVol5eVmQffJPlz0G/MilNssaD+4jtmdzKoRMtiqdW
+         WoS5+s71pI2JyoElsGv0t0+sy/puA7WiQZhnRPkRCgAwhh73MaicwsLCBtgPwl/RLi6o
+         VDta6FFim/EIMZ5m7OS+ji/qUI0E8xS54yqyK6ffb7QTo5Y4YTZRMs/lCjtTuQtuPQI7
+         G1vw==
+X-Gm-Message-State: APjAAAWvS+9fph9osZGnI2XjuH0r9g64hBJl1nrv+S4JkHByske1pLTx
+        2Lo75x2q2HLIrubzisjDoDuEFQ==
+X-Google-Smtp-Source: APXvYqx0hay0UMpM7/Vwis+yM8OlqmCCEDSkMJxGOVcZg7bXXpcCn/9V1E3VQGokgXSL6zJJcnAMOA==
+X-Received: by 2002:a5d:404b:: with SMTP id w11mr4973101wrp.171.1578491850026;
+        Wed, 08 Jan 2020 05:57:30 -0800 (PST)
+Received: from netronome.com ([2001:982:756:703:d63d:7eff:fe99:ac9d])
+        by smtp.gmail.com with ESMTPSA id p15sm3678288wma.40.2020.01.08.05.57.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2020 05:57:29 -0800 (PST)
+Date:   Wed, 8 Jan 2020 14:57:28 +0100
+From:   Simon Horman <simon.horman@netronome.com>
+To:     Colin King <colin.king@canonical.com>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        hemantg@codeaurora.org
-Subject: Re: [PATCH -next] Bluetooth: hci_qca: Use vfree() instead of kfree()
-In-Reply-To: <20200108035931.51209-1-weiyongjun1@huawei.com>
-References: <20200108035931.51209-1-weiyongjun1@huawei.com>
-Message-ID: <79e6ab011f21bc6edad81fc8a01aaf9a@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        "David S . Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: remove redundant assignment to variable icid
+Message-ID: <20200108135728.GA19220@netronome.com>
+References: <20200107180013.124501-1-colin.king@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200107180013.124501-1-colin.king@canonical.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2020-01-08 09:29, Wei Yongjun wrote:
-> Use vfree() instead of kfree() to free vmalloc()
-> allocated data.
+On Tue, Jan 07, 2020 at 06:00:13PM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Fixes: d841502c79e3 ("Bluetooth: hci_qca: Collect controller memory
-> dump during SSR")
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> ---
->  drivers/bluetooth/hci_qca.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Variable icid is being rc is assigned with a value that is never
+> read. The assignment is redundant and can be removed.
 > 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 9392cc7f9908..a17260641283 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -529,7 +529,7 @@ static void hci_memdump_timeout(struct timer_list 
-> *t)
->  	bt_dev_err(hu->hdev, "clearing allocated memory due to memdump 
-> timeout");
->  	/* Inject hw error event to reset the device and driver. */
->  	hci_reset_dev(hu->hdev);
-> -	kfree(memdump_buf);
-> +	vfree(memdump_buf);
->  	kfree(qca_memdump);
->  	qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
->  	del_timer(&qca->memdump_timer);
-> @@ -1437,7 +1437,7 @@ static void qca_wait_for_dump_collection(struct
-> hci_dev *hdev)
->  		bt_dev_err(hu->hdev, "Clearing the buffers due to timeout");
->  		if (qca_memdump)
->  			memdump_buf = qca_memdump->memdump_buf_tail;
-> -		kfree(memdump_buf);
-> +		vfree(memdump_buf);
->  		kfree(qca_memdump);
->  		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
->  		del_timer(&qca->memdump_timer);
+> Addresses-Coverity: ("Unused value")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
-Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Simon Horman <simon.horman@netronome.com>
+
+> ---
+>  net/bluetooth/l2cap_core.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 1bca608e0170..195459a1e53e 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -5081,7 +5081,6 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+>  	chan->move_role = L2CAP_MOVE_ROLE_RESPONDER;
+>  	l2cap_move_setup(chan);
+>  	chan->move_id = req->dest_amp_id;
+> -	icid = chan->dcid;
+>  
+>  	if (req->dest_amp_id == AMP_ID_BREDR) {
+>  		/* Moving to BR/EDR */
+> -- 
+> 2.24.0
+> 
