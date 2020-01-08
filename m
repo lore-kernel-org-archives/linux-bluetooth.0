@@ -2,111 +2,213 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 208D9C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFDDC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:22:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA67B20678
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:18:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D55CF20692
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:22:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="iUnBPeAV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n70hVPcF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729011AbgAHSSD (ORCPT
+        id S1729011AbgAHSWb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 13:18:03 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:42664 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727507AbgAHSSD (ORCPT
+        Wed, 8 Jan 2020 13:22:31 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:41461 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727169AbgAHSWb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 13:18:03 -0500
-Received: by mail-lj1-f193.google.com with SMTP id y4so4299592ljj.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 10:18:01 -0800 (PST)
+        Wed, 8 Jan 2020 13:22:31 -0500
+Received: by mail-ot1-f66.google.com with SMTP id r27so4490621otc.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 10:22:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=XIJp8Ev/SWzgxb6l0rKcAVisTQ388xWRnYoEnmIf34I=;
-        b=iUnBPeAVKn4hobAxMqh/OwaVIXpfUnAeyhuMMF/QpCk0AthPuoPRX3w+XNadUiVO1t
-         TAN2G+Mk0fayKVRwLA1iRHWW1lqQah/49SrrDzCxIA+VpfzgPAS3PdEbXh6fhCOHZ9Tp
-         lbbOL+74On2GMp+WxBy1sxhpsVff6vafXw61JSZo4t7deE1TbaNMyybZkfVoCNKFpmoX
-         bupHZgHauWdAXL9M3RzhyoXg9IoDCjUiYyo0kgNB5ufO1kbaw230mYP13g1lBeloSPGk
-         H/XxCAD8kGtIAgLVgs6GM95/UuYQWfoset9nlOqCCGMvR6LcyYRT5stJ3GITDK/RdulZ
-         4syw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Dz8pTDoAK19a20LvhUIc71rgxAGGzMqU+MjUEoV+aoM=;
+        b=n70hVPcFKRMVjy9tuaxWR7lBB/VPSC73rfZcd1phWbTMWyypfSXRzQEXFQ9w3P1UvV
+         /rvi45oCSX+dRkeO6BGagDVfyfpQW4fBnxJzRWjkqD4sxI6Q8oz+tqXA7LiXwlxmt2Vo
+         HeP6pA/bkKuPebciQZuOeEex5ChX02teAjLP+jspGZSF4vWXPFhOJ8GfS533HHDTVF4o
+         kNJArbXd9d7nu873jSdUXNfZi5xAuh3JAZ/USCZUdajb5Cu3v5SvTtC3+utwo/SkpORt
+         eGSe+oxm9x/5hX8+6Dm9hlqG6vLi+knkOFTDyGhUwtQnx+zlf40owxlgm7hHeh6XExyr
+         WeXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=XIJp8Ev/SWzgxb6l0rKcAVisTQ388xWRnYoEnmIf34I=;
-        b=tm9NdeKJfmNz9cjFa2K76B43A71hDAPA8nWFnMjMRlWorK7uOr7nzrJeS3zMppxZ7a
-         6zDh3eFdLhBaScnRE/t7xec5nN5tN88fFMD+7PH/24SX2juG9svaiIm/Y1bFUMazSNNb
-         UsAh3AFZTcS874FR6KQ0OCjr7MQBcGpmvKhjyxXBdYOegjn4nfcldvCxGnN1sW2z0xDq
-         fMDgVbrQNkSeaPO0ssNt4u4bNofflrU2g3UclYM9x/kDUxcI6nhKL0kKqNmlsKLHBajB
-         Tig8wugRqfIzi4US7jyzwiotRkq5KMaH656jVSxPAYDiyQk0RLbEiE4ctzQ9dhMH1/LZ
-         M7Ag==
-X-Gm-Message-State: APjAAAUqqTs2YnMYPQIQvNEkkV4SABDfgY1h8xrb64GtJxJpGImgZLzl
-        M/7auhdR2Z6JJrSTeayfTK7h7Gu1Lpk=
-X-Google-Smtp-Source: APXvYqxxkz5anQl0+hae/8Wk0tRTUINd5UpXYU6dODoQQWe2g/ynC5bV8c3UqeeX+NGejfol3UyDTQ==
-X-Received: by 2002:a2e:8152:: with SMTP id t18mr3668515ljg.255.1578507480975;
-        Wed, 08 Jan 2020 10:18:00 -0800 (PST)
-Received: from kynes (apn-37-7-124-67.dynamic.gprs.plus.pl. [37.7.124.67])
-        by smtp.gmail.com with ESMTPSA id r12sm1644386ljh.105.2020.01.08.10.17.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 10:18:00 -0800 (PST)
-From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
-        <michal.lowas-rzechonek@silvair.com>
-X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
-Date:   Wed, 8 Jan 2020 19:17:58 +0100
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "rafal.gajda@silvair.com" <rafal.gajda@silvair.com>
-Subject: Re: [PATCH BlueZ] mesh: Fix IV recovery
-Message-ID: <20200108181758.kkgjtqkom4kuvzih@kynes>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "rafal.gajda@silvair.com" <rafal.gajda@silvair.com>
-References: <20200108091604.15185-1-rafal.gajda@silvair.com>
- <89614c82891524958af2a7c75c1792b0c9ca4467.camel@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Dz8pTDoAK19a20LvhUIc71rgxAGGzMqU+MjUEoV+aoM=;
+        b=Zhal1GUnD2B2bS4Ait8QLVimy7mi87hYcxS6xsfc5qeW48VcAOKLFx3jVETGwHpNSZ
+         mNrBncG61mLV+v5vzwlumBg7nVQY/Z5Zvb0VVaUoXS6Z/dACiWS7bVA+gEGjhP7ORfOI
+         WtsSo+SNDXK0jUFokg8FBJRqXUIbwx6JrINYuP7J+HaXuNVhpdd1vVdKJZQgw6JgnQE6
+         vtwESxVO3vk+DhE+RLfHNGKHtir3rYsULmQNGedkv7Ok62svTfqwYRV/JjWCvRCGUJ9S
+         y8lUFbhK9IAuOQV7xmriLb8PR6JSbOYk6xy8hn4lQr5RcKG1KAkhbutpcqoaQV05SNWb
+         dUHg==
+X-Gm-Message-State: APjAAAXXZeN8d+MDs55MayTQScSVxDrnsmmJK3W64vHyVAKGXR3a75GU
+        Sz41Y7zZcu3L8QCJHu2VkpLFyFtHDcTIc81SNdagyvN5
+X-Google-Smtp-Source: APXvYqzJkrU/qWa2Q2rk5UtTs5gfK4VqsZFjWgTtZhu0gISGsTC2Ehsj0/zVwUSH1vxSDzV/TkQ9exuSnT5v4pdv2To=
+X-Received: by 2002:a05:6830:1515:: with SMTP id k21mr4852010otp.177.1578507750047;
+ Wed, 08 Jan 2020 10:22:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <89614c82891524958af2a7c75c1792b0c9ca4467.camel@intel.com>
-User-Agent: NeoMutt/20180716
+References: <20200107091833.14921-1-szymon.czapracki@codecoup.pl>
+ <20200107091833.14921-2-szymon.czapracki@codecoup.pl> <CABBYNZLwzscUwUwFgpUu4TjbY7XVCVOCXXccvFFtZiU7yLEjcQ@mail.gmail.com>
+ <1770049.2qRCXdMzth@ix>
+In-Reply-To: <1770049.2qRCXdMzth@ix>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 8 Jan 2020 10:22:16 -0800
+Message-ID: <CABBYNZLL_zB7O+hsvh1Yx1MZ_=H4A7E0wwuk=8RQd4KsrxUneg@mail.gmail.com>
+Subject: Re: [PATCH 2/8] monitor: Decode LE Periodic Advertising Sync Transfer
+ Received Event
+To:     Szymon Janc <szymon.janc@codecoup.pl>
+Cc:     Szymon Czapracki <szymon.czapracki@codecoup.pl>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Brian, Rafał,
+Hi Szymon,
 
-On 01/08, Gix, Brian wrote:
-> > -	if (ivu != net->iv_update || local_iv_index != net->iv_index) {
-> > +	if (ivu != net->iv_update || iv_index != net->iv_index) {
-> 
-> Would it be fair to say that this is the *only* change to the code that fixes the logic that was
-> malfunctioning?
-
-That's correct.
-
-> 
-> If so, I would like to shrink this patch to just:
-> 
-> -	if (ivu != net->iv_update || local_iv_index != net->iv_index) {
-> +	if (ivu != local_ivu || iv_index != local_iv_index) {
+On Wed, Jan 8, 2020 at 1:53 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
 >
-> or, breaking this into a 2-patch patchset, where one of the patches removes the local caching of ivu and ivi,
-> and the second patch fixes the actual bug.
+> Hi,
+>
+> On Wednesday, 8 January 2020 00:43:44 CET Luiz Augusto von Dentz wrote:
+> > Hi Szymon,
+> >
+> > On Tue, Jan 7, 2020 at 1:20 AM Szymon Czapracki
+> >
+> > <szymon.czapracki@codecoup.pl> wrote:
+> > > Change-Id: I5a7c2d36ca5aee61441c2aab6adeb16058ab062f
+> > > ---
+> > >
+> > >  monitor/bt.h     | 14 ++++++++++++++
+> > >  monitor/packet.c | 27 +++++++++++++++++++++++++++
+> > >  2 files changed, 41 insertions(+)
+> > >
+> > > diff --git a/monitor/bt.h b/monitor/bt.h
+> > > index ecf3782c9..e14c1771f 100644
+> > > --- a/monitor/bt.h
+> > > +++ b/monitor/bt.h
+> > > @@ -3140,6 +3140,20 @@ struct bt_hci_evt_le_chan_select_alg {
+> > >
+> > >         uint8_t  algorithm;
+> > >
+> > >  } __attribute__ ((packed));
+> > >
+> > > +#define BT_HCI_EVT_LE_PER_ADV_SYNC_TRANS_REC           0x18
+> > > +struct bt_hci_evt_le_per_adv_sync_trans_rec {
+> > > +       uint8_t  status;
+> > > +       uint16_t handle;
+> > > +       uint16_t service_data;
+> > > +       uint16_t sync_handle;
+> > > +       uint8_t  sid;
+> > > +       uint8_t  addr_type;
+> > > +       uint8_t  addr[6];
+> > > +       uint8_t  phy;
+> > > +       uint16_t interval;
+> > > +       uint8_t  clock_accuracy;
+> > > +} __attribute__ ((packed));
+> > > +
+> > >
+> > >  #define BT_HCI_ERR_SUCCESS                     0x00
+> > >  #define BT_HCI_ERR_UNKNOWN_COMMAND             0x01
+> > >  #define BT_HCI_ERR_UNKNOWN_CONN_ID             0x02
+> > >
+> > > diff --git a/monitor/packet.c b/monitor/packet.c
+> > > index 64f75cf8e..76bb9f239 100644
+> > > --- a/monitor/packet.c
+> > > +++ b/monitor/packet.c
+> > > @@ -600,6 +600,12 @@ static void print_addr_type(const char *label,
+> > > uint8_t addr_type)>
+> > >         case 0x01:
+> > >                 str = "Random";
+> > >                 break;
+> > >
+> > > +       case 0x02:
+> > > +               str = "Public Identity Address";
+> > > +               break;
+> > > +       case 0x03:
+> > > +               str = "Random Identity Address";
+> > > +               break;
+> >
+> > Usually the term Address is already part of the label so we don't need
+> > to repeat here, Random Identity also doesn't sound right, it should
+> > probably be Static Random or perhaps have Resolved Public and Resolved
+> > Static Random to indicate they are actually resolved address from RPA.
+>
+> Those names are from spec actually but I agree that those are somewhat odd.
+> How about just using print_peer_addr_type() to print this?
+> Then we have: public, random, resolved public and resolved Random. This is
+> short and also makes output consistent with other events.
 
-Ok, let's split this into 2 separate patches. I still think this "local
-caching" was the underlying cause of the mistake.
+Yep, lets use that then.
 
-regards
+> >
+> > >         default:
+> > >                 str = "Reserved";
+> > >                 break;
+> > >
+> > > @@ -9788,6 +9794,24 @@ static void le_chan_select_alg_evt(const void
+> > > *data, uint8_t size)>
+> > >         print_field("Algorithm: %s (0x%2.2x)", str, evt->algorithm);
+> > >
+> > >  }
+> > >
+> > > +static void le_per_adv_sync_trans_rec_evt(const void *data, uint8_t size)
+> > > +{
+> > > +       const struct bt_hci_evt_le_per_adv_sync_trans_rec *evt = data;
+> > > +
+> > > +       print_status(evt->status);
+> > > +       print_field("Handle: %d", evt->handle);
+> > > +       print_field("Connection handle: %d", evt->handle);
+> > > +       print_field("Service data: 0x%4.4x", evt->service_data);
+> > > +       print_field("Sync handle: %d", evt->sync_handle);
+> > > +       print_field("SID: 0x%2.2x", evt->sid);
+> > > +       print_addr_type("Address type:", evt->addr_type);
+> > > +       print_addr("Addres:", evt->addr, evt->addr_type);
+> > > +       print_le_phy("PHY:", evt->phy);
+> > > +       print_field("Periodic advertising Interval: %.3f",
+> > > +                                                       1.25 *
+> > > evt->interval); +       print_clock_accuracy(evt->clock_accuracy);
+> > > +}
+> > > +
+> > >
+> > >  struct subevent_data {
+> > >
+> > >         uint8_t subevent;
+> > >         const char *str;
+> > >
+> > > @@ -9871,6 +9895,9 @@ static const struct subevent_data
+> > > le_meta_event_table[] = {>
+> > >                                 le_scan_req_received_evt, 8, true},
+> > >
+> > >         { 0x14, "LE Channel Selection Algorithm",
+> > >
+> > >                                 le_chan_select_alg_evt, 3, true},
+> > >
+> > > +       { 0x18, "LE Periodic Advertising Sync Transfer Received",
+> > > +                                       le_per_adv_sync_trans_rec_evt, 19,
+> > > +                                       true},
+> > >
+> > >         { }
+> > >
+> > >  };
+> > >
+> > > --
+> > > 2.24.1
+>
+>
+> --
+> pozdrawiam
+> Szymon Janc
+>
+>
+
+
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+Luiz Augusto von Dentz
