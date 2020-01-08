@@ -2,213 +2,135 @@ Return-Path: <SRS0=1bSD=25=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFDDC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F237CC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:34:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D55CF20692
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:22:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB4F1206DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jan 2020 18:34:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n70hVPcF"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Rwnwk7EI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729011AbgAHSWb (ORCPT
+        id S1726086AbgAHSea (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 13:22:31 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:41461 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727169AbgAHSWb (ORCPT
+        Wed, 8 Jan 2020 13:34:30 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:34812 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725825AbgAHSea (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 13:22:31 -0500
-Received: by mail-ot1-f66.google.com with SMTP id r27so4490621otc.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 10:22:30 -0800 (PST)
+        Wed, 8 Jan 2020 13:34:30 -0500
+Received: by mail-pl1-f194.google.com with SMTP id x17so1474275pln.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jan 2020 10:34:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Dz8pTDoAK19a20LvhUIc71rgxAGGzMqU+MjUEoV+aoM=;
-        b=n70hVPcFKRMVjy9tuaxWR7lBB/VPSC73rfZcd1phWbTMWyypfSXRzQEXFQ9w3P1UvV
-         /rvi45oCSX+dRkeO6BGagDVfyfpQW4fBnxJzRWjkqD4sxI6Q8oz+tqXA7LiXwlxmt2Vo
-         HeP6pA/bkKuPebciQZuOeEex5ChX02teAjLP+jspGZSF4vWXPFhOJ8GfS533HHDTVF4o
-         kNJArbXd9d7nu873jSdUXNfZi5xAuh3JAZ/USCZUdajb5Cu3v5SvTtC3+utwo/SkpORt
-         eGSe+oxm9x/5hX8+6Dm9hlqG6vLi+knkOFTDyGhUwtQnx+zlf40owxlgm7hHeh6XExyr
-         WeXQ==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ycpN+XpOcmzf5Fswpp+TY6J3qUdx2wbF41rrLN2Bl/k=;
+        b=Rwnwk7EIjhAbXXR5fDaZqGVQXaJkfD91xDJX/5ih7jqvtCxL1tGSobiOPWVMbpXiTk
+         Xzgcesxc9wIeHKM38Q0U5cYDtg+ME3zIni9jOoWk3bywRrigA+qnq5qtO318U/SBD8UH
+         QbKwQtTfbvV7uC4pI+V48jc4LTI9G5eedlt7U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Dz8pTDoAK19a20LvhUIc71rgxAGGzMqU+MjUEoV+aoM=;
-        b=Zhal1GUnD2B2bS4Ait8QLVimy7mi87hYcxS6xsfc5qeW48VcAOKLFx3jVETGwHpNSZ
-         mNrBncG61mLV+v5vzwlumBg7nVQY/Z5Zvb0VVaUoXS6Z/dACiWS7bVA+gEGjhP7ORfOI
-         WtsSo+SNDXK0jUFokg8FBJRqXUIbwx6JrINYuP7J+HaXuNVhpdd1vVdKJZQgw6JgnQE6
-         vtwESxVO3vk+DhE+RLfHNGKHtir3rYsULmQNGedkv7Ok62svTfqwYRV/JjWCvRCGUJ9S
-         y8lUFbhK9IAuOQV7xmriLb8PR6JSbOYk6xy8hn4lQr5RcKG1KAkhbutpcqoaQV05SNWb
-         dUHg==
-X-Gm-Message-State: APjAAAXXZeN8d+MDs55MayTQScSVxDrnsmmJK3W64vHyVAKGXR3a75GU
-        Sz41Y7zZcu3L8QCJHu2VkpLFyFtHDcTIc81SNdagyvN5
-X-Google-Smtp-Source: APXvYqzJkrU/qWa2Q2rk5UtTs5gfK4VqsZFjWgTtZhu0gISGsTC2Ehsj0/zVwUSH1vxSDzV/TkQ9exuSnT5v4pdv2To=
-X-Received: by 2002:a05:6830:1515:: with SMTP id k21mr4852010otp.177.1578507750047;
- Wed, 08 Jan 2020 10:22:30 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ycpN+XpOcmzf5Fswpp+TY6J3qUdx2wbF41rrLN2Bl/k=;
+        b=jKVoL/hcx4vdnlsANSTDBniFjkrrLdtaN3QnpYgW8FVB0rJEZ1lh1BEX2EaiLrhLWI
+         78oFUkf36LHmAFWSfaljDNWVKfV1A+d4uN4EqS02X8qo056qvAsf4Z+rOD+1e4ZmyE9i
+         zlvTs29t6T3olhVUdXI5Qs1diu5dVPbYoV0Ikm2lJPNMiNRhI7yPkNffIlYk8CIZrFrz
+         yihPyzgq66iAbSFtGTFTWg1z0KFiiVkPNMjh5Qd/XxylbZNLapefGPLzqWIY94z29VvZ
+         sEtJXpQ3T0ktpmhSbXMu+RhN4/22QdeX3nBwvNB27KTSVbTbMj5g18p0/QRBhQF+ArYR
+         A8jA==
+X-Gm-Message-State: APjAAAVcJbW/i8gMFeoIiwYl+rwAnBN00H+Jnj1ucaXJLQbb03/c2Mdi
+        stlM5MEpodS/MLqp5JaFFBOvgg==
+X-Google-Smtp-Source: APXvYqwFFiua/Q28cb39Q52i6MM5ymiTmVYVZBEZ/535aaJp/yYe9FvOHXWjDhnkEmklHYuX2LyxhA==
+X-Received: by 2002:a17:90a:cf07:: with SMTP id h7mr5823396pju.66.1578508469499;
+        Wed, 08 Jan 2020 10:34:29 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
+        by smtp.gmail.com with ESMTPSA id t1sm4695406pgq.23.2020.01.08.10.34.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jan 2020 10:34:28 -0800 (PST)
+Date:   Wed, 8 Jan 2020 10:34:27 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] Bluetooth: hci_qca: Add qca_power_on() API to
+ support both wcn399x and Rome power up
+Message-ID: <20200108183427.GE89495@google.com>
+References: <20200107052601.32216-1-rjliao@codeaurora.org>
+ <20200108090804.22889-1-rjliao@codeaurora.org>
 MIME-Version: 1.0
-References: <20200107091833.14921-1-szymon.czapracki@codecoup.pl>
- <20200107091833.14921-2-szymon.czapracki@codecoup.pl> <CABBYNZLwzscUwUwFgpUu4TjbY7XVCVOCXXccvFFtZiU7yLEjcQ@mail.gmail.com>
- <1770049.2qRCXdMzth@ix>
-In-Reply-To: <1770049.2qRCXdMzth@ix>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 8 Jan 2020 10:22:16 -0800
-Message-ID: <CABBYNZLL_zB7O+hsvh1Yx1MZ_=H4A7E0wwuk=8RQd4KsrxUneg@mail.gmail.com>
-Subject: Re: [PATCH 2/8] monitor: Decode LE Periodic Advertising Sync Transfer
- Received Event
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     Szymon Czapracki <szymon.czapracki@codecoup.pl>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200108090804.22889-1-rjliao@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Szymon,
+Hi Rocky,
 
-On Wed, Jan 8, 2020 at 1:53 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
->
-> Hi,
->
-> On Wednesday, 8 January 2020 00:43:44 CET Luiz Augusto von Dentz wrote:
-> > Hi Szymon,
-> >
-> > On Tue, Jan 7, 2020 at 1:20 AM Szymon Czapracki
-> >
-> > <szymon.czapracki@codecoup.pl> wrote:
-> > > Change-Id: I5a7c2d36ca5aee61441c2aab6adeb16058ab062f
-> > > ---
-> > >
-> > >  monitor/bt.h     | 14 ++++++++++++++
-> > >  monitor/packet.c | 27 +++++++++++++++++++++++++++
-> > >  2 files changed, 41 insertions(+)
-> > >
-> > > diff --git a/monitor/bt.h b/monitor/bt.h
-> > > index ecf3782c9..e14c1771f 100644
-> > > --- a/monitor/bt.h
-> > > +++ b/monitor/bt.h
-> > > @@ -3140,6 +3140,20 @@ struct bt_hci_evt_le_chan_select_alg {
-> > >
-> > >         uint8_t  algorithm;
-> > >
-> > >  } __attribute__ ((packed));
-> > >
-> > > +#define BT_HCI_EVT_LE_PER_ADV_SYNC_TRANS_REC           0x18
-> > > +struct bt_hci_evt_le_per_adv_sync_trans_rec {
-> > > +       uint8_t  status;
-> > > +       uint16_t handle;
-> > > +       uint16_t service_data;
-> > > +       uint16_t sync_handle;
-> > > +       uint8_t  sid;
-> > > +       uint8_t  addr_type;
-> > > +       uint8_t  addr[6];
-> > > +       uint8_t  phy;
-> > > +       uint16_t interval;
-> > > +       uint8_t  clock_accuracy;
-> > > +} __attribute__ ((packed));
-> > > +
-> > >
-> > >  #define BT_HCI_ERR_SUCCESS                     0x00
-> > >  #define BT_HCI_ERR_UNKNOWN_COMMAND             0x01
-> > >  #define BT_HCI_ERR_UNKNOWN_CONN_ID             0x02
-> > >
-> > > diff --git a/monitor/packet.c b/monitor/packet.c
-> > > index 64f75cf8e..76bb9f239 100644
-> > > --- a/monitor/packet.c
-> > > +++ b/monitor/packet.c
-> > > @@ -600,6 +600,12 @@ static void print_addr_type(const char *label,
-> > > uint8_t addr_type)>
-> > >         case 0x01:
-> > >                 str = "Random";
-> > >                 break;
-> > >
-> > > +       case 0x02:
-> > > +               str = "Public Identity Address";
-> > > +               break;
-> > > +       case 0x03:
-> > > +               str = "Random Identity Address";
-> > > +               break;
-> >
-> > Usually the term Address is already part of the label so we don't need
-> > to repeat here, Random Identity also doesn't sound right, it should
-> > probably be Static Random or perhaps have Resolved Public and Resolved
-> > Static Random to indicate they are actually resolved address from RPA.
->
-> Those names are from spec actually but I agree that those are somewhat odd.
-> How about just using print_peer_addr_type() to print this?
-> Then we have: public, random, resolved public and resolved Random. This is
-> short and also makes output consistent with other events.
+On Wed, Jan 08, 2020 at 05:08:02PM +0800, Rocky Liao wrote:
+> This patch adds a unified API qca_power_on() to support both wcn399x and
+> Rome power on. For wcn399x it calls the qca_wcn3990_init() to init the
+> regulators, and for Rome it pulls up the bt_en GPIO to power up the btsoc.
+> 
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+> 
+> Changes in v2: None
+> 
+>  drivers/bluetooth/hci_qca.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 9392cc7f9908..f6555bd1adbc 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1532,6 +1532,27 @@ static int qca_wcn3990_init(struct hci_uart *hu)
+>  	return 0;
+>  }
+>  
+> +static int qca_power_on(struct hci_dev *hdev)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+> +	struct qca_serdev *qcadev;
+> +	int ret = 0;
+> +
+> +	if (qca_is_wcn399x(soc_type)) {
 
-Yep, lets use that then.
+Why not include the qca_regulator_enable() call from qca_open() here?
+It is clearly part of power on.
 
-> >
-> > >         default:
-> > >                 str = "Reserved";
-> > >                 break;
-> > >
-> > > @@ -9788,6 +9794,24 @@ static void le_chan_select_alg_evt(const void
-> > > *data, uint8_t size)>
-> > >         print_field("Algorithm: %s (0x%2.2x)", str, evt->algorithm);
-> > >
-> > >  }
-> > >
-> > > +static void le_per_adv_sync_trans_rec_evt(const void *data, uint8_t size)
-> > > +{
-> > > +       const struct bt_hci_evt_le_per_adv_sync_trans_rec *evt = data;
-> > > +
-> > > +       print_status(evt->status);
-> > > +       print_field("Handle: %d", evt->handle);
-> > > +       print_field("Connection handle: %d", evt->handle);
-> > > +       print_field("Service data: 0x%4.4x", evt->service_data);
-> > > +       print_field("Sync handle: %d", evt->sync_handle);
-> > > +       print_field("SID: 0x%2.2x", evt->sid);
-> > > +       print_addr_type("Address type:", evt->addr_type);
-> > > +       print_addr("Addres:", evt->addr, evt->addr_type);
-> > > +       print_le_phy("PHY:", evt->phy);
-> > > +       print_field("Periodic advertising Interval: %.3f",
-> > > +                                                       1.25 *
-> > > evt->interval); +       print_clock_accuracy(evt->clock_accuracy);
-> > > +}
-> > > +
-> > >
-> > >  struct subevent_data {
-> > >
-> > >         uint8_t subevent;
-> > >         const char *str;
-> > >
-> > > @@ -9871,6 +9895,9 @@ static const struct subevent_data
-> > > le_meta_event_table[] = {>
-> > >                                 le_scan_req_received_evt, 8, true},
-> > >
-> > >         { 0x14, "LE Channel Selection Algorithm",
-> > >
-> > >                                 le_chan_select_alg_evt, 3, true},
-> > >
-> > > +       { 0x18, "LE Periodic Advertising Sync Transfer Received",
-> > > +                                       le_per_adv_sync_trans_rec_evt, 19,
-> > > +                                       true},
-> > >
-> > >         { }
-> > >
-> > >  };
-> > >
-> > > --
-> > > 2.24.1
->
->
-> --
-> pozdrawiam
-> Szymon Janc
->
->
+> +		ret = qca_wcn3990_init(hu);
+> +	} else {
+> +		if (hu->serdev) {
 
+nit: you could save a level of indentation (and IMO improve
+readability) by doing:
 
--- 
-Luiz Augusto von Dentz
+     	       if (!hu->serdev)
+	            	return 0;
+
+> +			qcadev = serdev_device_get_drvdata(hu->serdev);
+> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+> +			/* Controller needs time to bootup. */
+> +			msleep(150);
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+
+I think common practice would be to combine the 3 patches of this series
+into one. The new function doesn't really add any new functionality, but
+is a refactoring. This is more evident if you see in a single diff that
+the pieces in qca_power_on() are removed elsewhere.
