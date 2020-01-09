@@ -2,74 +2,121 @@ Return-Path: <SRS0=NtgA=26=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8902BC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 17:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4AAC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 17:49:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67FED20678
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 17:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC88720678
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 17:49:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388250AbgAIRoQ (ORCPT
+        id S2388331AbgAIRtZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jan 2020 12:44:16 -0500
-Received: from mga11.intel.com ([192.55.52.93]:29106 "EHLO mga11.intel.com"
+        Thu, 9 Jan 2020 12:49:25 -0500
+Received: from mga17.intel.com ([192.55.52.151]:61574 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731894AbgAIRoP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jan 2020 12:44:15 -0500
+        id S2388329AbgAIRtZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 9 Jan 2020 12:49:25 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 09:44:15 -0800
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 09:49:24 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,414,1571727600"; 
-   d="scan'208";a="211967107"
-Received: from ingas-nuc1.sea.intel.com ([10.254.104.252])
-  by orsmga007.jf.intel.com with ESMTP; 09 Jan 2020 09:44:15 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
+   d="scan'208";a="396165712"
+Received: from unknown (HELO localhost.localdomain) ([10.223.165.29])
+  by orsmga005.jf.intel.com with ESMTP; 09 Jan 2020 09:49:23 -0800
+From:   Ankit Navik <ankit.p.navik@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] tools/mesh: Fix check condition for model ID
-Date:   Thu,  9 Jan 2020 09:44:09 -0800
-Message-Id: <20200109174409.18135-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     ankit.p.navik@intel.com
+Subject: [PATCH v2] Bleutooth: Add definitions for LE Read Tx Power
+Date:   Thu,  9 Jan 2020 23:19:11 +0530
+Message-Id: <1578592151-9220-1-git-send-email-ankit.p.navik@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use the value of VENDOR_ID_MASK to set/check vendor model
-and SIG model IDs
----
- tools/mesh/cfgcli.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Add the definitions for LE read transmit power HCI commands to
+read the minimum and maximum Tx power.
 
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index 1fcf82035..2403c9293 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -247,7 +247,7 @@ static uint32_t print_mod_id(uint8_t *data, bool vid, const char *offset)
- 	if (!vid) {
- 		mod_id = get_le16(data);
- 		bt_shell_printf("%sModel Id\t%4.4x\n", offset, mod_id);
--		mod_id = 0xffff0000 | mod_id;
-+		mod_id = VENDOR_ID_MASK | mod_id;
- 	} else {
- 		mod_id = get_le16(data + 2);
- 		bt_shell_printf("%sModel Id\t%4.4x %4.4x\n", offset,
-@@ -327,7 +327,7 @@ static void print_pub(uint16_t ele_addr, uint32_t mod_id,
- 	bt_shell_printf("\tElement: %4.4x\n", ele_addr);
- 	bt_shell_printf("\tPub Addr: %4.4x\n", pub->u.addr16);
+Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
+---
+ include/net/bluetooth/hci.h      |  7 +++++++
+ include/net/bluetooth/hci_core.h |  3 +++
+ net/bluetooth/hci_event.c        | 17 +++++++++++++++++
+ 3 files changed, 27 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 07b6ece..eccb6b2 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1718,6 +1718,13 @@ struct hci_cp_le_set_adv_set_rand_addr {
+ 	bdaddr_t  bdaddr;
+ } __packed;
  
--	if (mod_id > 0xffff0000)
-+	if (mod_id < VENDOR_ID_MASK)
- 		bt_shell_printf("\tModel: %8.8x\n", mod_id);
- 	else
- 		bt_shell_printf("\tModel: %4.4x\n",
++#define HCI_OP_LE_READ_TX_POWER		0x204b
++struct hci_rp_le_read_tx_power {
++	__u8 status;
++	__s8 min_tx_power;
++	__s8 max_tx_power;
++} __packed;
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index faebe38..f3d389d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -418,6 +418,9 @@ struct hci_dev {
+ 	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
+ 	__u8			scan_rsp_data_len;
+ 
++	__s8			le_min_tx_power;
++	__s8			le_max_tx_power;
++
+ 	struct list_head	adv_instances;
+ 	unsigned int		adv_instance_cnt;
+ 	__u8			cur_adv_instance;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6ddc4a7..3646f77 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -988,6 +988,19 @@ static void hci_cc_le_read_adv_tx_power(struct hci_dev *hdev,
+ 	hdev->adv_tx_power = rp->tx_power;
+ }
+ 
++static void hci_cc_le_read_tx_power(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_rp_le_read_tx_power *rp = (void *) skb->data;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++
++	if (rp->status)
++		return;
++
++	hdev->le_min_tx_power = rp->min_tx_power;
++	hdev->le_max_tx_power = rp->max_tx_power;
++}
++
+ static void hci_cc_user_confirm_reply(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
+@@ -3414,6 +3427,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_read_max_data_len(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_READ_TX_POWER:
++		hci_cc_le_read_tx_power(hdev, skb);
++		break;
++
+ 	case HCI_OP_WRITE_LE_HOST_SUPPORTED:
+ 		hci_cc_write_le_host_supported(hdev, skb);
+ 		break;
 -- 
-2.21.1
+2.7.4
 
