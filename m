@@ -6,65 +6,63 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99F5C33CA1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 08:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E235C32771
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 10:32:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACD992067D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 08:39:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDB9020678
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 10:32:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="PoF8DYt6"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="WUoAS2hm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728591AbgAIIjE (ORCPT
+        id S1728775AbgAIKcc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jan 2020 03:39:04 -0500
-Received: from mail-lf1-f44.google.com ([209.85.167.44]:37980 "EHLO
-        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728435AbgAIIjE (ORCPT
+        Thu, 9 Jan 2020 05:32:32 -0500
+Received: from mail-wr1-f47.google.com ([209.85.221.47]:37845 "EHLO
+        mail-wr1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728740AbgAIKcc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jan 2020 03:39:04 -0500
-Received: by mail-lf1-f44.google.com with SMTP id r14so4558407lfm.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jan 2020 00:39:03 -0800 (PST)
+        Thu, 9 Jan 2020 05:32:32 -0500
+Received: by mail-wr1-f47.google.com with SMTP id w15so6833096wru.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jan 2020 02:32:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=hGW6uQ6pZvqEoYxkVJEfXUFMgiT2O6k17c3VAbzBRlg=;
-        b=PoF8DYt61U8KN7u1wrLTWRFfgJaA+yyyakQoCqEGAUI+ogmd18ch7frqSXDndVYzwo
-         CiwkBLDOnF37inA19TJ5gIf5aCIXIS+3WpjaPUKODoo8c04A793b99WBLrF5e8kjxYZL
-         EcTfq/rmqsQdlaeDWQVRCsQc8kGqaBwZPS4Ag891gDy6Twqo/tYI1DAzz7YIkScICtAj
-         xiUOru/WpRhMAn9f6fBcwkBHd0nh0UNzp3FdR1UQbEwnTqt/ox3m5HVf71iuhi+4BncZ
-         olqPyOYtTbs035qQlTTgBL/tPZepGqVSr8mV0ea8pQeMKE6OW6PjB+OonMqRKfZwN5h7
-         sNrg==
+        bh=PXb0JEeIh4SpZo6oGWT72Ql3+vCOGA98iBAGPzLxN4I=;
+        b=WUoAS2hmJRITXHeKFuiFXSHCiSEPe3rYzyQ3f5mY4ue6VWR3Jec9rlzPUwgJcrxXjh
+         +rPTN2AWKwvJpiimy+ZAmOXguETSpkLbXgs02YM7lkZ1OtSqfgOquYuJVNGjp/93FxAH
+         RpaM7lR2ESgPsYZ0mdmdvGweyWkTP5XDorJRd3dRIMXkDo9EqhfGSPjCUyNBdf+7qhNb
+         8w3Nd14RTbI3y9UYgq+5memDOQ3Lgk0eT2z2sOnrqh7ssWb+BjjjWEjefWFa/ExXUqMY
+         539/EEfmi2vrjH+lXCwx5pxDn6MMo52b5iSzEMu5mQv8SXOrmoruHHLMH2qfLpys6Hys
+         Daew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=hGW6uQ6pZvqEoYxkVJEfXUFMgiT2O6k17c3VAbzBRlg=;
-        b=oAKUj7boFNC5ZoIEegP5Z6cwwO39AEQMLeOFJJfaZ1BXJ8ZZc4oBB9N092ZhHnWbsX
-         ZGQEntrzWKRfJ81VQp2sasFjspKZFzDAMlMpHX4/09sUjLzATz5jOkK+K8JxjqXZkU9v
-         ssZbFemrghodg/J7M0m3myjkgUX5eozPCujTLNUG5TSqS8K2D4C5p1OXB3gh3k3PW6q7
-         6yIws5SblYTw7Qzzc2ZZbkMBS26Pax3pIOLNnFfKgp2s6b2yvMEyOYi+3n5bNbeyJD4T
-         MQIuk3x9Pfhi1vq6AkrN6m1nOc3Y73D8E3ooV4cAfJyRKVwvVJ6eF9589t6XlN5GdTZ2
-         DOJQ==
-X-Gm-Message-State: APjAAAVThDcxq4iAngrRNHsyPLsZhshNtUbxvCtS+0XNeLhAebTAQ4g4
-        pJ2daJLiPqqC7onvPejOeYWBgdkYelA=
-X-Google-Smtp-Source: APXvYqwmtVnkQ9YCLS9PWNAwvAQPbb125Q3t2kG6pKO6SI8ZVawTRUk4coUtCptqsOqqrx6iGFucwg==
-X-Received: by 2002:a19:7604:: with SMTP id c4mr5660265lff.101.1578559141953;
-        Thu, 09 Jan 2020 00:39:01 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PXb0JEeIh4SpZo6oGWT72Ql3+vCOGA98iBAGPzLxN4I=;
+        b=D/yu/DkX/OYxY1o3xZGZLbweXZETyLiQoCsk/w0zOOYggtBW+AIh601vgYTZ2bzaVZ
+         FwdI0uLiMEZEsuTrt4FuDUaSW5lyteIZnyK/qRW6EO34UVgdk97W8nVx5MCB1fUeQyJW
+         qvuR7ZebadzifIsl25oWe6aK+Q6rWqxD3gN/V1Qf1/Fcgw6ZSlcSGPAXKVtmEfM6e/8n
+         85MAVu999kMMN1ckdZCHV2flgwUS9wfN4vJ2DjOLo8XRHhNiPv0gpEGMAfZZld9kbWjH
+         QATdmCHJXpbrVZfLZx/2TJMukONDKMvd3J6WhrkiKTgoZev5E9P0x/caeN8N4jCxxbij
+         rgMQ==
+X-Gm-Message-State: APjAAAXYcZyXpSd/9Lz+lhu0yH001L9ikKlh5JU0HthHxL+ww4NL7vBw
+        T1DdUEriTXRoCf/zSjGe3OPr2WrQgCg=
+X-Google-Smtp-Source: APXvYqxJ+WNF6cGvocmF+t/cIIvOKeX7oiNTFSXnWNga1PZroltCsOYY6PaWVBiV+Qn9nHBPzSE98A==
+X-Received: by 2002:a5d:5044:: with SMTP id h4mr9861232wrt.4.1578565949813;
+        Thu, 09 Jan 2020 02:32:29 -0800 (PST)
 Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id b22sm2930456lji.99.2020.01.09.00.39.01
+        by smtp.gmail.com with ESMTPSA id d8sm7720607wre.13.2020.01.09.02.32.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2020 00:39:01 -0800 (PST)
+        Thu, 09 Jan 2020 02:32:28 -0800 (PST)
 From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
         <michal.lowas-rzechonek@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 2/2] mesh: Change BeaconFlags property type to a dict
-Date:   Thu,  9 Jan 2020 09:38:55 +0100
-Message-Id: <20200109083855.16000-3-michal.lowas-rzechonek@silvair.com>
+Subject: [PATCH BlueZ] mesh: Allow apps to receive DevKey messages from external nodes
+Date:   Thu,  9 Jan 2020 11:32:22 +0100
+Message-Id: <20200109103222.31139-1-michal.lowas-rzechonek@silvair.com>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20200109083855.16000-1-michal.lowas-rzechonek@silvair.com>
-References: <20200109083855.16000-1-michal.lowas-rzechonek@silvair.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,84 +70,31 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Instead of a binary value, return a dictionary consistent with
-"flags" argument used in Import().
----
- doc/mesh-api.txt | 18 ++++++++++++++----
- mesh/node.c      | 13 +++++++++++--
- 2 files changed, 25 insertions(+), 6 deletions(-)
+After introducing "remote" flag for DevKeyMessageReceived in
+c8cd5b04ccd865deeb90b70ea649c0b6cc0385e6, we can now allow applications
+to received DevKey messages from external addresses as well as from
+local ones.
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index b33c24e12..33077bcfc 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -432,11 +432,21 @@ Properties:
- 		This property indicates whether the periodic beaconing is
- 		enabled (true) or disabled (false).
- 
--	uint8 BeaconFlags [read-only]
-+	dict BeaconFlags [read-only]
- 
--		This property may be read at any time to determine the flag
--		field setting on sent and received beacons of the primary
--		network key.
-+		This property may be read at any time to determine the flags
-+		used in network beacons of the primary network key. Supported
-+		values are:
-+
-+			boolean IvUpdate
-+
-+				When true, indicates that the network is in the
-+				middle of IV Index Update procedure.
-+
-+			boolean KeyRefresh
-+
-+				When true, indicates that the network is in the
-+				middle of a key refresh procedure.
- 
- 	uint32 IvIndex [read-only]
- 
-diff --git a/mesh/node.c b/mesh/node.c
-index 0ad935105..0e28c650b 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -32,6 +32,7 @@
- #include "mesh/mesh-defs.h"
- #include "mesh/mesh.h"
- #include "mesh/net.h"
-+#include "mesh/net-keys.h"
- #include "mesh/appkey.h"
- #include "mesh/mesh-config.h"
- #include "mesh/provision.h"
-@@ -2233,10 +2234,18 @@ static bool beaconflags_getter(struct l_dbus *dbus, struct l_dbus_message *msg,
- 	struct mesh_net *net = node_get_net(node);
- 	uint8_t flags;
- 	uint32_t iv_index;
-+	bool ivu;
-+	bool kr;
- 
- 	mesh_net_get_snb_state(net, &flags, &iv_index);
- 
--	l_dbus_message_builder_append_basic(builder, 'y', &flags);
-+	ivu = flags & IV_INDEX_UPDATE;
-+	kr = flags & KEY_REFRESH;
-+
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+	dbus_append_dict_entry_basic(builder, "IvUpdate", "b", &ivu);
-+	dbus_append_dict_entry_basic(builder, "KeyRefresh", "b", &kr);
-+	l_dbus_message_builder_leave_array(builder);
- 
- 	return true;
- }
-@@ -2337,7 +2346,7 @@ static void setup_node_interface(struct l_dbus_interface *iface)
- 	l_dbus_interface_property(iface, "Features", 0, "a{sv}", features_getter,
- 									NULL);
- 	l_dbus_interface_property(iface, "Beacon", 0, "b", beacon_getter, NULL);
--	l_dbus_interface_property(iface, "BeaconFlags", 0, "b",
-+	l_dbus_interface_property(iface, "BeaconFlags", 0, "a{sv}",
- 						beaconflags_getter, NULL);
- 	l_dbus_interface_property(iface, "IvIndex", 0, "u", ivindex_getter,
- 									NULL);
+This enables applications to properly implement models using DevKey
+security, by accepting only requests with "remote" flag set to false.
+---
+ mesh/model.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/mesh/model.c b/mesh/model.c
+index acdd94f7b..6d7674ee5 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -1066,8 +1066,7 @@ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
+ 						forward.app_idx, forward.size,
+ 						forward.data);
+ 			else if (decrypt_idx == APP_IDX_DEV_REMOTE ||
+-				(decrypt_idx == APP_IDX_DEV_LOCAL &&
+-				 mesh_net_is_local_address(net, src, 1)))
++				 decrypt_idx == APP_IDX_DEV_LOCAL)
+ 				send_dev_key_msg_rcvd(node, i, src, decrypt_idx,
+ 						0, forward.size, forward.data);
+ 		}
 -- 
 2.19.1
 
