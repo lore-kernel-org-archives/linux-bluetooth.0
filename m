@@ -2,110 +2,127 @@ Return-Path: <SRS0=NtgA=26=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A47B9C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 12:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B5DC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 13:13:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 773962075D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 12:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CC1B2072A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 13:13:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="WJOLmYOB"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="BCftgX9E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730154AbgAIM7I (ORCPT
+        id S1730540AbgAINN1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jan 2020 07:59:08 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:37509 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727701AbgAIM7H (ORCPT
+        Thu, 9 Jan 2020 08:13:27 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39987 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728974AbgAINN1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jan 2020 07:59:07 -0500
-Received: by mail-lj1-f196.google.com with SMTP id o13so7130616ljg.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jan 2020 04:59:06 -0800 (PST)
+        Thu, 9 Jan 2020 08:13:27 -0500
+Received: by mail-wr1-f68.google.com with SMTP id c14so7334641wrn.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jan 2020 05:13:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QxE98GUlWxAi1TfQbwxjzpPgJatrskDS49HT8RDKdTU=;
-        b=WJOLmYOBFC4QMBbAJvglCcEiUPzsZ/BD9ObnJWLWsi+Rzqq+Vns0XsyelW6uFpZwQ/
-         ZXALiFmO5md5zmso34HdKiskzEy1lBUmy2P6Ftl1A9yz/PYsqiZW20ThzS6IVzWc8xmu
-         UiGFsEz3ubpaJFg/4uI4Q/6aYgEP1s1hbTAL4Hk8Ad33qVIx6QX2H5Fu0zIQk1+K8T4y
-         JzUv1aaA03UafmCk0bx1lytK4RRWZ9RwAbrw2dKPYwggu+UQzilR0Fg71u+e9VOEcM1l
-         DbMc/0OvQMcWSp9dV5gsQkV0JSdANpQj4YSrAOBDEzwHcNxT/RovG7Pp2+xi9XUoW836
-         bUuw==
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=/rBG0TQpboOYHQ3dtsZ2LO09lSi5DlQHgDK1Z1Ip0gU=;
+        b=BCftgX9EKTr00X5H7I/K7vBUiQorQS3fXvQVNfIZE7Z6WJ3Y+U4C9AA0MFcXkMM7uF
+         qiubw+mjHA/9fB9cHwlCHLc4/svNqgftQC9XbBb/wq7sYV0Hie1T9QHrWQ3vQUNS77bd
+         jDcmLRBkgD6fICBLnJdx1wcr1WE6c/TOY42irLjAZPQoZgm2b8+45ZQMNCJbIORF5fIL
+         cIe4GYsFjeE8JYJxiV+hx9+h72c5ie4YUtOl+U2lku4oUzIJKc9TtZB8S7jQEd4MODSm
+         vYMHyDVaH2DUUyGEgMo/Rfo8Jxdz63REA/ekA+P53DqTz3pYngAXWwyqNaDySvqdDv2V
+         BtnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QxE98GUlWxAi1TfQbwxjzpPgJatrskDS49HT8RDKdTU=;
-        b=gAB8Tn3rvLajJajmxHLyzZQ5GV/BoYm6sV988SEqzwbUaM60Sqlv4JocLOcczeeplj
-         GiOcrKC1XbOUh2z8G28HrOeSCgLjX2pemF2FPBEIZWTcHxbrxhIiVypfLAQv58D0YQRD
-         rjrKOUOi0SGe+xEEo3dq9G938wbsq+U1aDuWQLzRa4A22V53YKXLKyLEPuRtO4yclJIN
-         QFqTZ6clEUAaRJr5oYcPkNJRssHN+CABKYla73vRWo90tM7jz3vT1frqdTk8KxsU+tm2
-         QVyo5wmg1SfoyzTYFkTzvNeFolTUHgUI/jUewKwPi4KZEW1bMe8OEDcxd1GQxf9ud991
-         mBDg==
-X-Gm-Message-State: APjAAAWG45Fz2OKxEyoA5crC6XXCOkB/iepxHi5P5gVZ9MVBfJZIDnju
-        /Edq0aMKcSotg+qUX8tei0sOKSb5e7w=
-X-Google-Smtp-Source: APXvYqwxjVYNmPrGOZ7f1kaB1eqsW3yZ/7cbvDXrQEgigCRuWmTpeQbCDUCpqY5sOQylyW75UjhxtQ==
-X-Received: by 2002:a2e:3005:: with SMTP id w5mr6603207ljw.184.1578574745125;
-        Thu, 09 Jan 2020 04:59:05 -0800 (PST)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id u3sm3033171lfm.37.2020.01.09.04.59.03
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2020 04:59:04 -0800 (PST)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mesh: Fix exiting IV_UPD_STATE when receiving first SNB
-Date:   Thu,  9 Jan 2020 13:58:59 +0100
-Message-Id: <20200109125859.5389-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.19.1
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=/rBG0TQpboOYHQ3dtsZ2LO09lSi5DlQHgDK1Z1Ip0gU=;
+        b=mJorVMNotSJi/FTwoUxioAhBF3Npj/26mQGbStT/h03Gt3v0e+6ypeG6GfTGD7QU1Y
+         v8RHovDot0ds/n7P9OJl9346D70KOQy2/hRCVGO6DhO3Ult/GSDd20WPhmlo4D7sz7Ti
+         5kS/+SuGnCEbwAeX8+c+s2VQzCVnYeUDRpP/KDMgq0d+tRjgJfsBRnm8uF12F2XlKZUT
+         yCWkbRADIGfqsU0Z1eg37H2F+hPhbLDi4S+/6SY9o6r6lQWo6YvPsfORLkhjY+wcFccu
+         Ed/SPymFSmJKCGcw5Z4d+N6jfMaT3yc9vuESx7v31bEZqCynOq3TNcM/NjKlNXbWBjxx
+         RraA==
+X-Gm-Message-State: APjAAAWsuBhlZI5n5A/Vw1rTeupBIcu4pIFJgtUHbf++kb0QCVAcaHzi
+        CfloV8/jm9jkL3VJq6FQIgy+Gg==
+X-Google-Smtp-Source: APXvYqw5xl2LtfiT4yZTxV5PMSEStk6+USro+b+cq5P49/waQtNeQlu36EPIthHWXsqYJeJlJWTwvA==
+X-Received: by 2002:adf:fe86:: with SMTP id l6mr10525600wrr.252.1578575604924;
+        Thu, 09 Jan 2020 05:13:24 -0800 (PST)
+Received: from [10.1.4.98] (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.gmail.com with ESMTPSA id q19sm2726293wmc.12.2020.01.09.05.13.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2020 05:13:24 -0800 (PST)
+Subject: Re: [PATCH v6 1/2] dt-bindings: net: bluetooth: add interrupts
+ properties
+To:     Johan Hovold <johan@kernel.org>, Rob Herring <robh@kernel.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        nsaenzjulienne@suse.de, linux-kernel@vger.kernel.org,
+        khilman@baylibre.com
+References: <20200109104257.6942-1-glaroque@baylibre.com>
+ <20200109104257.6942-2-glaroque@baylibre.com>
+ <20200109105305.GL30908@localhost>
+From:   guillaume La Roque <glaroque@baylibre.com>
+Message-ID: <a33f9c30-03a8-ea12-e9d3-5e050e41318e@baylibre.com>
+Date:   Thu, 9 Jan 2020 14:13:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200109105305.GL30908@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-First valid SNB received from the network should cause the node to
-switch into IV_UPD_NORMAL state.
 
-Otherwise, it will never try to enter IV Update procedure when sequence
-number approaches the IV_UPDATE_SEQ_TRIGGER, because that's only allowed
-in IV_UPD_NORMAL.
----
- mesh/net.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+On 1/9/20 11:53 AM, Johan Hovold wrote:
+> On Thu, Jan 09, 2020 at 11:42:56AM +0100, Guillaume La Roque wrote:
+>> add interrupts and interrupt-names as optional properties
+>> to support host-wakeup by interrupt properties instead of
+>> host-wakeup-gpios.
+>>
+>> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+>> ---
+>>  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>> index c44a30dbe43d..d33bbc998687 100644
+>> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>> @@ -37,7 +37,9 @@ Optional properties:
+>>      - pcm-frame-type: short, long
+>>      - pcm-sync-mode: slave, master
+>>      - pcm-clock-mode: slave, master
+>> -
+>> + - interrupts: must be one, used to wakeup the host processor if
+>> +   gpiod_to_irq function not supported
+>> + - interrupt-names: must be "host-wakeup"
+> Looks like you forgot to address Rob's comment. If I understood him
+> correctly you either need to stick with "host-wakeup-gpios" (and fix
+> your platform) or deprecate it in favour of "interrupts":
+>
+> 	https://lkml.kernel.org/r/20191218203818.GA8009@bogus
 
-diff --git a/mesh/net.c b/mesh/net.c
-index 20e9a1e81..bd8826b58 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -2688,11 +2688,17 @@ static void process_beacon(void *net_ptr, void *user_data)
- 	/* We have officially *seen* this beacon now */
- 	beacon_data->processed = true;
- 
--	if (ivi == net->iv_index && ivu == net->iv_update && kr == local_kr)
--		return;
-+	/*
-+	 * Ignore the beacon if it doesn't change anything, unless we're
-+	 * doing IV Recovery
-+	 */
-+	if (net->iv_upd_state == IV_UPD_INIT ||
-+				ivi != net->iv_index || ivu != net->iv_update)
-+		update_iv_ivu_state(net, ivi, ivu);
-+
-+	if (kr != local_kr)
-+		update_kr_state(subnet, kr, beacon_data->key_id);
- 
--	update_iv_ivu_state(net, ivi, ivu);
--	update_kr_state(subnet, kr, beacon_data->key_id);
- 	net_key_beacon_refresh(beacon_data->key_id, net->iv_index,
- 		!!(subnet->kr_phase == KEY_REFRESH_PHASE_TWO), net->iv_update);
- }
--- 
-2.19.1
+not forgot marcel ask me a v6
+
+for rob comment ok but it's not possible to support gpiod_to_irq on my platform.
+
+if i deprecated it i need to update all DT with good interrupt number right?
+
+
+
+> Johan
+
+Regards
+
+Guillaume
 
