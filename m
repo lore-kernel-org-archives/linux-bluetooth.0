@@ -2,127 +2,122 @@ Return-Path: <SRS0=NtgA=26=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B5DC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 13:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E02C3F68F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 13:29:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9CC1B2072A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 13:13:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="BCftgX9E"
+	by mail.kernel.org (Postfix) with ESMTP id 5FE6F20661
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 13:29:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578576556;
+	bh=iHdDym7OR79CQ1t/GpbEMYCujRuSnN4psVqgGjqi+CI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Mk7W2PnECgVQkOovQICD3UVDwHLj5gZgLviM56rX83AdZKT9MXxuduWIwQ2whbTaE
+	 S9XwxDCI8X1ZXb7ZBU6pjOuhqgX3AgfaX+JCr27qNTXARnDdLE88yuLhzq+jjfPMRK
+	 gZVuMI3HUCFDCWPU+kqXatmWmBeINmUfxtM/xRh0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730540AbgAINN1 (ORCPT
+        id S1731064AbgAIN3K (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jan 2020 08:13:27 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39987 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728974AbgAINN1 (ORCPT
+        Thu, 9 Jan 2020 08:29:10 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:45595 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727861AbgAIN3K (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jan 2020 08:13:27 -0500
-Received: by mail-wr1-f68.google.com with SMTP id c14so7334641wrn.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jan 2020 05:13:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=/rBG0TQpboOYHQ3dtsZ2LO09lSi5DlQHgDK1Z1Ip0gU=;
-        b=BCftgX9EKTr00X5H7I/K7vBUiQorQS3fXvQVNfIZE7Z6WJ3Y+U4C9AA0MFcXkMM7uF
-         qiubw+mjHA/9fB9cHwlCHLc4/svNqgftQC9XbBb/wq7sYV0Hie1T9QHrWQ3vQUNS77bd
-         jDcmLRBkgD6fICBLnJdx1wcr1WE6c/TOY42irLjAZPQoZgm2b8+45ZQMNCJbIORF5fIL
-         cIe4GYsFjeE8JYJxiV+hx9+h72c5ie4YUtOl+U2lku4oUzIJKc9TtZB8S7jQEd4MODSm
-         vYMHyDVaH2DUUyGEgMo/Rfo8Jxdz63REA/ekA+P53DqTz3pYngAXWwyqNaDySvqdDv2V
-         BtnA==
+        Thu, 9 Jan 2020 08:29:10 -0500
+Received: by mail-lj1-f195.google.com with SMTP id j26so7192039ljc.12;
+        Thu, 09 Jan 2020 05:29:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=/rBG0TQpboOYHQ3dtsZ2LO09lSi5DlQHgDK1Z1Ip0gU=;
-        b=mJorVMNotSJi/FTwoUxioAhBF3Npj/26mQGbStT/h03Gt3v0e+6ypeG6GfTGD7QU1Y
-         v8RHovDot0ds/n7P9OJl9346D70KOQy2/hRCVGO6DhO3Ult/GSDd20WPhmlo4D7sz7Ti
-         5kS/+SuGnCEbwAeX8+c+s2VQzCVnYeUDRpP/KDMgq0d+tRjgJfsBRnm8uF12F2XlKZUT
-         yCWkbRADIGfqsU0Z1eg37H2F+hPhbLDi4S+/6SY9o6r6lQWo6YvPsfORLkhjY+wcFccu
-         Ed/SPymFSmJKCGcw5Z4d+N6jfMaT3yc9vuESx7v31bEZqCynOq3TNcM/NjKlNXbWBjxx
-         RraA==
-X-Gm-Message-State: APjAAAWsuBhlZI5n5A/Vw1rTeupBIcu4pIFJgtUHbf++kb0QCVAcaHzi
-        CfloV8/jm9jkL3VJq6FQIgy+Gg==
-X-Google-Smtp-Source: APXvYqw5xl2LtfiT4yZTxV5PMSEStk6+USro+b+cq5P49/waQtNeQlu36EPIthHWXsqYJeJlJWTwvA==
-X-Received: by 2002:adf:fe86:: with SMTP id l6mr10525600wrr.252.1578575604924;
-        Thu, 09 Jan 2020 05:13:24 -0800 (PST)
-Received: from [10.1.4.98] (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.gmail.com with ESMTPSA id q19sm2726293wmc.12.2020.01.09.05.13.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jan 2020 05:13:24 -0800 (PST)
-Subject: Re: [PATCH v6 1/2] dt-bindings: net: bluetooth: add interrupts
- properties
-To:     Johan Hovold <johan@kernel.org>, Rob Herring <robh@kernel.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ErcL1N2fmNI636PPVQLs5GTMAwUgd2f5seuvakUioCs=;
+        b=QcitNdlnK1P8XDsxpOgCJEwk8BBeULze+HvJMfvdQLstUAogkO0HRDXMxt23Xq8ZEq
+         omkD9d+73f49SLK0dpWF2+fyJogSQb2sKjnkQBllazj9K6sfP8TeYqHSq99dZoJRfxeP
+         Tz6FdqVBlVBOSt/NlFQ4up89rRSZDcpstAKFUNs6Y1MbzVpWcxo35CoafZdsFoA1rrYg
+         THdYG47CGQWjWNMDbwQwTjtmQJqV2rYRVIvXvSqMTpkpGebkIaKBhL9jXhOI8VY+6pBg
+         k4sa6qDKRscAFBfZAaYInptVWWKwfQwbgFVEeUd6tjLB5dji3vmnIOLzZJeyXGnUQ8Gn
+         h4dA==
+X-Gm-Message-State: APjAAAX78+2GfWTcxOvQaXm0qmiM0y/RFuy8LSFbHhNHA+chhijaJxmg
+        IH7YTBYrvbYPecAnFjVQoLU=
+X-Google-Smtp-Source: APXvYqw1hcidTUPsXmbfZ5E6ekSaUosd6Z+QbgYKjFwaIPR65Yk0gkHBGblfoIvMFxRv4YpPXS00DQ==
+X-Received: by 2002:a2e:84d0:: with SMTP id q16mr6321120ljh.138.1578576547878;
+        Thu, 09 Jan 2020 05:29:07 -0800 (PST)
+Received: from xi.terra (c-14b8e655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.184.20])
+        by smtp.gmail.com with ESMTPSA id y25sm3094435lfy.59.2020.01.09.05.29.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2020 05:29:07 -0800 (PST)
+Received: from johan by xi.terra with local (Exim 4.92.3)
+        (envelope-from <johan@kernel.org>)
+        id 1ipXsD-0004Te-LT; Thu, 09 Jan 2020 14:29:17 +0100
+Date:   Thu, 9 Jan 2020 14:29:17 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     guillaume La Roque <glaroque@baylibre.com>
+Cc:     Johan Hovold <johan@kernel.org>, Rob Herring <robh@kernel.org>,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
         devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         nsaenzjulienne@suse.de, linux-kernel@vger.kernel.org,
         khilman@baylibre.com
+Subject: Re: [PATCH v6 1/2] dt-bindings: net: bluetooth: add interrupts
+ properties
+Message-ID: <20200109132917.GM30908@localhost>
 References: <20200109104257.6942-1-glaroque@baylibre.com>
  <20200109104257.6942-2-glaroque@baylibre.com>
  <20200109105305.GL30908@localhost>
-From:   guillaume La Roque <glaroque@baylibre.com>
-Message-ID: <a33f9c30-03a8-ea12-e9d3-5e050e41318e@baylibre.com>
-Date:   Thu, 9 Jan 2020 14:13:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ <a33f9c30-03a8-ea12-e9d3-5e050e41318e@baylibre.com>
 MIME-Version: 1.0
-In-Reply-To: <20200109105305.GL30908@localhost>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a33f9c30-03a8-ea12-e9d3-5e050e41318e@baylibre.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Thu, Jan 09, 2020 at 02:13:23PM +0100, guillaume La Roque wrote:
+> 
+> On 1/9/20 11:53 AM, Johan Hovold wrote:
+> > On Thu, Jan 09, 2020 at 11:42:56AM +0100, Guillaume La Roque wrote:
+> >> add interrupts and interrupt-names as optional properties
+> >> to support host-wakeup by interrupt properties instead of
+> >> host-wakeup-gpios.
+> >>
+> >> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+> >> ---
+> >>  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 4 +++-
+> >>  1 file changed, 3 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> >> index c44a30dbe43d..d33bbc998687 100644
+> >> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> >> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> >> @@ -37,7 +37,9 @@ Optional properties:
+> >>      - pcm-frame-type: short, long
+> >>      - pcm-sync-mode: slave, master
+> >>      - pcm-clock-mode: slave, master
+> >> -
+> >> + - interrupts: must be one, used to wakeup the host processor if
+> >> +   gpiod_to_irq function not supported
+> >> + - interrupt-names: must be "host-wakeup"
+> > Looks like you forgot to address Rob's comment. If I understood him
+> > correctly you either need to stick with "host-wakeup-gpios" (and fix
+> > your platform) or deprecate it in favour of "interrupts":
+> >
+> > 	https://lkml.kernel.org/r/20191218203818.GA8009@bogus
+> 
+> not forgot marcel ask me a v6
 
-On 1/9/20 11:53 AM, Johan Hovold wrote:
-> On Thu, Jan 09, 2020 at 11:42:56AM +0100, Guillaume La Roque wrote:
->> add interrupts and interrupt-names as optional properties
->> to support host-wakeup by interrupt properties instead of
->> host-wakeup-gpios.
->>
->> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
->> ---
->>  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
->> index c44a30dbe43d..d33bbc998687 100644
->> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
->> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
->> @@ -37,7 +37,9 @@ Optional properties:
->>      - pcm-frame-type: short, long
->>      - pcm-sync-mode: slave, master
->>      - pcm-clock-mode: slave, master
->> -
->> + - interrupts: must be one, used to wakeup the host processor if
->> +   gpiod_to_irq function not supported
->> + - interrupt-names: must be "host-wakeup"
-> Looks like you forgot to address Rob's comment. If I understood him
-> correctly you either need to stick with "host-wakeup-gpios" (and fix
-> your platform) or deprecate it in favour of "interrupts":
->
-> 	https://lkml.kernel.org/r/20191218203818.GA8009@bogus
+Not much point in sending v6 before addressing feedback on v5.
+Especially as Marcel asked for a v6 with acks. ;)
 
-not forgot marcel ask me a v6
+> for rob comment ok but it's not possible to support gpiod_to_irq on my
+> platform.
+> 
+> if i deprecated it i need to update all DT with good interrupt number
+> right?
 
-for rob comment ok but it's not possible to support gpiod_to_irq on my platform.
+Not sure. Perhaps just updating the binding is enough. Rob?
 
-if i deprecated it i need to update all DT with good interrupt number right?
-
-
-
-> Johan
-
-Regards
-
-Guillaume
-
+Johan
