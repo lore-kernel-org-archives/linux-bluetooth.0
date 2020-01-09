@@ -2,150 +2,102 @@ Return-Path: <SRS0=NtgA=26=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EE9C33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 03:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7824DC32771
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 04:42:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3CA6205F4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 03:37:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43BCD2073A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 04:42:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="Ac4Etxra"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mOAHpvD9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727750AbgAIDh0 (ORCPT
+        id S1727905AbgAIEmh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 22:37:26 -0500
-Received: from mail26.static.mailgun.info ([104.130.122.26]:46057 "EHLO
-        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727642AbgAIDh0 (ORCPT
+        Wed, 8 Jan 2020 23:42:37 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:44896 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726913AbgAIEmh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 22:37:26 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1578541045; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=8NOMDbCsSCIKS4CuNp07DjdS52l2WkgyDWT2pjLqvKM=;
- b=Ac4EtxraYub8QYrtDYNfvdaDAmcnNX9UIbhVzjyLmXD/n1uoWwNO5PSzsnB0LKyQ6+ByKtuU
- oQNXowsebBGRzWuYS3l47h0GVhI6g1DE5PTCBU5A4dojBbIHbMeAkl7cM1AUoCvfyj7Rb66k
- PV6wgA+jzm07EnglE3l0awrV2Hg=
-X-Mailgun-Sending-Ip: 104.130.122.26
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e169fed.7fdadd788f48-smtp-out-n02;
- Thu, 09 Jan 2020 03:37:17 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 65B0FC4479C; Thu,  9 Jan 2020 03:37:16 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id D03C9C43383;
-        Thu,  9 Jan 2020 03:37:15 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Thu, 09 Jan 2020 11:37:15 +0800
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-bluetooth-owner@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] Bluetooth: hci_qca: Add qca_power_on() API to
- support both wcn399x and Rome power up
-In-Reply-To: <671e08d94aa70dc315fbaae0ba3429e4@codeaurora.org>
-References: <20200107052601.32216-1-rjliao@codeaurora.org>
- <20200108090804.22889-1-rjliao@codeaurora.org>
- <20200108183427.GE89495@google.com>
- <671e08d94aa70dc315fbaae0ba3429e4@codeaurora.org>
-Message-ID: <24228a5c46c0fc811735e48b1efdcb4f@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        Wed, 8 Jan 2020 23:42:37 -0500
+Received: by mail-io1-f67.google.com with SMTP id b10so5665155iof.11;
+        Wed, 08 Jan 2020 20:42:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=MYw+qe9+3iQrY99XLJ/14FeCGv5Cf0+Xm8g2s8/ZF24=;
+        b=mOAHpvD92bOlmKmPB69xojfG5yU2MCplQSwKXDmmGYj/y9pwEVqD2pPLJuGatOKefT
+         pCjyHqgt8agznhXv1akuQOcQXpNWt3Oy8UvR7Oi2KfMk9YZHSwlsJiIdaJqaupV/Wfhh
+         a+PSSRhyAnLOTSlUTCL/bzQITNv9EFo2d8Dt/UUme0OTeIXXMSdzaciYBAmTVQj8ojCV
+         VzX4A0CBV2WNYPFJQ4TUkFGOuwGKHeJnDzcHUTTg8HWf0pmafqGIXxBZ96kBTMDkPmYV
+         J/Tz9SWY2IsB7YTfnYL7WxuHygU8fJgOUPynI1LyvRn1uqURFWKGAPU9cQqMsH4XVzxw
+         Y+ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=MYw+qe9+3iQrY99XLJ/14FeCGv5Cf0+Xm8g2s8/ZF24=;
+        b=arAHJGMLEd/9hBBOWUrihjvlAVmbCFcqr4aGSJfojIAOq/VnsldZMXmvSY9jLJEO59
+         Fs8gQAhruMer5jy8PFwmpD5JETBFC2BZCcDU53zv5olOjsuF67dj2VvjtY24rGimdevn
+         3kk+/WkEmnWg0UD8Z+UvODKfTYM1cXanbQ5nyM6DxWqNbJzWql7jl0kn3uwR3PBYY+dU
+         mauoENcd/waHtlh9Vfq0Ayt3aE19F4ToktgFrIdcbPbkQSATPSdRApxe7oDvr2VNGL++
+         Lq7dYOYdpgG8/dxB4Ozk1J3jmS5wD5VotkOaO9XTMqp+TUO/UrDpf1cvKBWsrRIxIj7M
+         Xqpw==
+X-Gm-Message-State: APjAAAUOyM/9tnTnwrXDEf2OrR6X64Z15+/QxniNpatHxM9dW/N5brqK
+        dTqMLnMGZu9IZVHJrTVcF+s=
+X-Google-Smtp-Source: APXvYqxRXXSDl+h+yNJskDo0hvVMLV/KY37ebL8QuwCdA8HaBsSCtn9gguuqDZ3qMe3ToNAWO55EqA==
+X-Received: by 2002:a6b:c9ca:: with SMTP id z193mr6061356iof.276.1578544956991;
+        Wed, 08 Jan 2020 20:42:36 -0800 (PST)
+Received: from localhost.localdomain (24-246-92-100.cable.teksavvy.com. [24.246.92.100])
+        by smtp.googlemail.com with ESMTPSA id i11sm1148602ion.1.2020.01.08.20.42.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 08 Jan 2020 20:42:36 -0800 (PST)
+From:   d.changqi@gmail.com
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Changqi Du <d.changqi@gmail.com>
+Subject: [PATCH] bluetooth: btbcm : Fix warning about missing blank lines after declarations
+Date:   Wed,  8 Jan 2020 23:40:19 -0500
+Message-Id: <20200109044019.53134-1-d.changqi@gmail.com>
+X-Mailer: git-send-email 2.14.3 (Apple Git-98)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-在 2020-01-09 11:22，Rocky Liao 写道：
-> Hi Matt,
-> 
-> 在 2020-01-09 02:34，Matthias Kaehlcke 写道：
->> Hi Rocky,
->> 
->> On Wed, Jan 08, 2020 at 05:08:02PM +0800, Rocky Liao wrote:
->>> This patch adds a unified API qca_power_on() to support both wcn399x 
->>> and
->>> Rome power on. For wcn399x it calls the qca_wcn3990_init() to init 
->>> the
->>> regulators, and for Rome it pulls up the bt_en GPIO to power up the 
->>> btsoc.
->>> 
->>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
->>> ---
->>> 
->>> Changes in v2: None
->>> 
->>>  drivers/bluetooth/hci_qca.c | 21 +++++++++++++++++++++
->>>  1 file changed, 21 insertions(+)
->>> 
->>> diff --git a/drivers/bluetooth/hci_qca.c 
->>> b/drivers/bluetooth/hci_qca.c
->>> index 9392cc7f9908..f6555bd1adbc 100644
->>> --- a/drivers/bluetooth/hci_qca.c
->>> +++ b/drivers/bluetooth/hci_qca.c
->>> @@ -1532,6 +1532,27 @@ static int qca_wcn3990_init(struct hci_uart 
->>> *hu)
->>>  	return 0;
->>>  }
->>> 
->>> +static int qca_power_on(struct hci_dev *hdev)
->>> +{
->>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->>> +	enum qca_btsoc_type soc_type = qca_soc_type(hu);
->>> +	struct qca_serdev *qcadev;
->>> +	int ret = 0;
->>> +
->>> +	if (qca_is_wcn399x(soc_type)) {
->> 
->> Why not include the qca_regulator_enable() call from qca_open() here?
->> It is clearly part of power on.
->> 
-> OK
-> 
-qca_wcn3990_init() already have the qca_regulator_enable() call, so we 
-just
-need to remove it from qca_open().
+From: Changqi Du <d.changqi@gmail.com>
 
->>> +		ret = qca_wcn3990_init(hu);
->>> +	} else {
->>> +		if (hu->serdev) {
->> 
->> nit: you could save a level of indentation (and IMO improve
->> readability) by doing:
->> 
->>      	       if (!hu->serdev)
->> 	            	return 0;
->> 
-> OK
-> 
->>> +			qcadev = serdev_device_get_drvdata(hu->serdev);
->>> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
->>> +			/* Controller needs time to bootup. */
->>> +			msleep(150);
->>> +		}
->>> +	}
->>> +
->>> +	return ret;
->>> +}
->>> +
->> 
->> I think common practice would be to combine the 3 patches of this 
->> series
->> into one. The new function doesn't really add any new functionality, 
->> but
->> is a refactoring. This is more evident if you see in a single diff 
->> that
->> the pieces in qca_power_on() are removed elsewhere.
-> OK
+This patches fixes two warnings of checkpatch.pl, both of the type
+WARNING: Missing a blank line after declarations
+
+Signed-off-by: Changqi Du <d.changqi@gmail.com>
+---
+ drivers/bluetooth/btbcm.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 8e05706fe5d9..1ad98bd65a98 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -36,6 +36,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
++
+ 		bt_dev_err(hdev, "BCM: Reading device address failed (%d)", err);
+ 		return err;
+ 	}
+@@ -177,6 +178,7 @@ static int btbcm_reset(struct hci_dev *hdev)
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
++
+ 		bt_dev_err(hdev, "BCM: Reset failed (%d)", err);
+ 		return err;
+ 	}
+-- 
+2.14.3 (Apple Git-98)
+
