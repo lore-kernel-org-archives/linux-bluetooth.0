@@ -2,102 +2,169 @@ Return-Path: <SRS0=NtgA=26=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7824DC32771
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 04:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A888C33CA2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 05:14:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43BCD2073A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 04:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BCB520678
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jan 2020 05:14:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mOAHpvD9"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="SIqC46ts"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727905AbgAIEmh (ORCPT
+        id S1726557AbgAIFOg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jan 2020 23:42:37 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44896 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726913AbgAIEmh (ORCPT
+        Thu, 9 Jan 2020 00:14:36 -0500
+Received: from mail26.static.mailgun.info ([104.130.122.26]:21911 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725308AbgAIFOg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jan 2020 23:42:37 -0500
-Received: by mail-io1-f67.google.com with SMTP id b10so5665155iof.11;
-        Wed, 08 Jan 2020 20:42:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=MYw+qe9+3iQrY99XLJ/14FeCGv5Cf0+Xm8g2s8/ZF24=;
-        b=mOAHpvD92bOlmKmPB69xojfG5yU2MCplQSwKXDmmGYj/y9pwEVqD2pPLJuGatOKefT
-         pCjyHqgt8agznhXv1akuQOcQXpNWt3Oy8UvR7Oi2KfMk9YZHSwlsJiIdaJqaupV/Wfhh
-         a+PSSRhyAnLOTSlUTCL/bzQITNv9EFo2d8Dt/UUme0OTeIXXMSdzaciYBAmTVQj8ojCV
-         VzX4A0CBV2WNYPFJQ4TUkFGOuwGKHeJnDzcHUTTg8HWf0pmafqGIXxBZ96kBTMDkPmYV
-         J/Tz9SWY2IsB7YTfnYL7WxuHygU8fJgOUPynI1LyvRn1uqURFWKGAPU9cQqMsH4XVzxw
-         Y+ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=MYw+qe9+3iQrY99XLJ/14FeCGv5Cf0+Xm8g2s8/ZF24=;
-        b=arAHJGMLEd/9hBBOWUrihjvlAVmbCFcqr4aGSJfojIAOq/VnsldZMXmvSY9jLJEO59
-         Fs8gQAhruMer5jy8PFwmpD5JETBFC2BZCcDU53zv5olOjsuF67dj2VvjtY24rGimdevn
-         3kk+/WkEmnWg0UD8Z+UvODKfTYM1cXanbQ5nyM6DxWqNbJzWql7jl0kn3uwR3PBYY+dU
-         mauoENcd/waHtlh9Vfq0Ayt3aE19F4ToktgFrIdcbPbkQSATPSdRApxe7oDvr2VNGL++
-         Lq7dYOYdpgG8/dxB4Ozk1J3jmS5wD5VotkOaO9XTMqp+TUO/UrDpf1cvKBWsrRIxIj7M
-         Xqpw==
-X-Gm-Message-State: APjAAAUOyM/9tnTnwrXDEf2OrR6X64Z15+/QxniNpatHxM9dW/N5brqK
-        dTqMLnMGZu9IZVHJrTVcF+s=
-X-Google-Smtp-Source: APXvYqxRXXSDl+h+yNJskDo0hvVMLV/KY37ebL8QuwCdA8HaBsSCtn9gguuqDZ3qMe3ToNAWO55EqA==
-X-Received: by 2002:a6b:c9ca:: with SMTP id z193mr6061356iof.276.1578544956991;
-        Wed, 08 Jan 2020 20:42:36 -0800 (PST)
-Received: from localhost.localdomain (24-246-92-100.cable.teksavvy.com. [24.246.92.100])
-        by smtp.googlemail.com with ESMTPSA id i11sm1148602ion.1.2020.01.08.20.42.36
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 08 Jan 2020 20:42:36 -0800 (PST)
-From:   d.changqi@gmail.com
+        Thu, 9 Jan 2020 00:14:36 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1578546876; h=References: In-Reply-To: Message-Id: Date:
+ Subject: Cc: To: From: Sender;
+ bh=eS9lCZyPtTj+osj5AKiBGLWtwqWO/aNwkaHwJOw+u/8=; b=SIqC46tsLlpMYKFgwnSsJAGdjq2JhAR9UM04SXMpZh0G7I7mw+HoBUPWLQsMajllMA6Wtbdu
+ ye30lWGt3SHF+TR9U3ZQ+rYnF6VtJjFsL7Cnerb3DGWMnv2dq/BAagGFx+ZmazNiHH/NURIz
+ XWyoIdZPmpjGxrdf03y3W3qtlL4=
+X-Mailgun-Sending-Ip: 104.130.122.26
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e16b6b9.7fe87d1325a8-smtp-out-n02;
+ Thu, 09 Jan 2020 05:14:33 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id B1596C433CB; Thu,  9 Jan 2020 05:14:33 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5AAECC43383;
+        Thu,  9 Jan 2020 05:14:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 5AAECC43383
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Changqi Du <d.changqi@gmail.com>
-Subject: [PATCH] bluetooth: btbcm : Fix warning about missing blank lines after declarations
-Date:   Wed,  8 Jan 2020 23:40:19 -0500
-Message-Id: <20200109044019.53134-1-d.changqi@gmail.com>
-X-Mailer: git-send-email 2.14.3 (Apple Git-98)
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v3] Bluetooth: hci_qca: Add qca_power_on() API to support both wcn399x and Rome power up
+Date:   Thu,  9 Jan 2020 13:14:27 +0800
+Message-Id: <20200109051427.16426-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200107052601.32216-1-rjliao@codeaurora.org>
+References: <20200107052601.32216-1-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Changqi Du <d.changqi@gmail.com>
+This patch adds a unified API qca_power_on() to support both wcn399x and
+Rome power on. For wcn399x it calls the qca_wcn3990_init() to init the
+regulators, and for Rome it pulls up the bt_en GPIO to power up the btsoc.
+It also moves all the power up operation from hdev->open() to
+hdev->setup().
 
-This patches fixes two warnings of checkpatch.pl, both of the type
-WARNING: Missing a blank line after declarations
-
-Signed-off-by: Changqi Du <d.changqi@gmail.com>
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 ---
- drivers/bluetooth/btbcm.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 8e05706fe5d9..1ad98bd65a98 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -36,6 +36,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
- 			     HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		int err = PTR_ERR(skb);
-+
- 		bt_dev_err(hdev, "BCM: Reading device address failed (%d)", err);
- 		return err;
+Changes in v2: None
+Changes in v3:
+  -combined the changes of patch 2 and 3 into this patch
+  -updated the commit message
+
+ drivers/bluetooth/hci_qca.c | 46 ++++++++++++++++++++++++-------------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 82e4cd4b6663..427e381a08b4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -541,7 +541,6 @@ static int qca_open(struct hci_uart *hu)
+ {
+ 	struct qca_serdev *qcadev;
+ 	struct qca_data *qca;
+-	int ret;
+ 
+ 	BT_DBG("hu %p qca_open", hu);
+ 
+@@ -582,23 +581,10 @@ static int qca_open(struct hci_uart *hu)
+ 	hu->priv = qca;
+ 
+ 	if (hu->serdev) {
+-
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		if (!qca_is_wcn399x(qcadev->btsoc_type)) {
+-			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+-			/* Controller needs time to bootup. */
+-			msleep(150);
+-		} else {
++		if (qca_is_wcn399x(qcadev->btsoc_type)) {
+ 			hu->init_speed = qcadev->init_speed;
+ 			hu->oper_speed = qcadev->oper_speed;
+-			ret = qca_regulator_enable(qcadev);
+-			if (ret) {
+-				destroy_workqueue(qca->workqueue);
+-				kfree_skb(qca->rx_skb);
+-				hu->priv = NULL;
+-				kfree(qca);
+-				return ret;
+-			}
+ 		}
  	}
-@@ -177,6 +178,7 @@ static int btbcm_reset(struct hci_dev *hdev)
- 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		int err = PTR_ERR(skb);
+ 
+@@ -1531,6 +1517,31 @@ static int qca_wcn3990_init(struct hci_uart *hu)
+ 	return 0;
+ }
+ 
++static int qca_power_on(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	struct qca_serdev *qcadev;
++	int ret = 0;
 +
- 		bt_dev_err(hdev, "BCM: Reset failed (%d)", err);
- 		return err;
++	/* Non-serdev device usually is powered by external power
++	 * and don't need additional action in driver for power on
++	 */
++	if (!hu->serdev)
++		return 0;
++
++	if (qca_is_wcn399x(soc_type)) {
++		ret = qca_wcn3990_init(hu);
++	} else {
++		qcadev = serdev_device_get_drvdata(hu->serdev);
++		gpiod_set_value_cansleep(qcadev->bt_en, 1);
++		/* Controller needs time to bootup. */
++		msleep(150);
++	}
++
++	return ret;
++}
++
+ static int qca_setup(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+@@ -1562,7 +1573,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 		hu->hdev->shutdown = qca_power_off;
+-		ret = qca_wcn3990_init(hu);
++		ret = qca_power_on(hdev);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -1571,6 +1582,9 @@ static int qca_setup(struct hci_uart *hu)
+ 			return ret;
+ 	} else {
+ 		bt_dev_info(hdev, "ROME setup");
++		ret = qca_power_on(hdev);
++		if (ret)
++			return ret;
+ 		qca_set_speed(hu, QCA_INIT_SPEED);
  	}
+ 
 -- 
-2.14.3 (Apple Git-98)
-
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
