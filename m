@@ -2,255 +2,427 @@ Return-Path: <SRS0=nFDS=27=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5BD9C33CA2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 08:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D295C33CA2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 09:54:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 971B52072E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 08:12:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C0B62072E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 09:54:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c0S53NZX"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="QiI9UyBz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726561AbgAJIMe (ORCPT
+        id S1727339AbgAJJyu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jan 2020 03:12:34 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:32830 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726383AbgAJIMe (ORCPT
+        Fri, 10 Jan 2020 04:54:50 -0500
+Received: from mailout2.samsung.com ([203.254.224.25]:57786 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727279AbgAJJyu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jan 2020 03:12:34 -0500
-Received: by mail-pg1-f194.google.com with SMTP id 6so650579pgk.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 00:12:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Stq24dS1Z6xfdk4pDOGb8M2Nd25zUod97TaQOtiZjSk=;
-        b=c0S53NZXfogkt4DUiHhOSzxrf/j3ANtyAQCbETtIQbqnvJ5Rjwl0yiFMHJHhiY16DS
-         K9/+pIG+L5F5M+4HlK0qn0Pzc+GtbvPeg85zAov1yKuiwXJG79AmvEG+Az03edzZIxbq
-         euXl+u17uhkbcMhKScTtn9R9R+G/GiOlCa0xZHHOQfGGIBbC4bBI7amwSV/ANiypEWTS
-         wSHjHhpqsqdguskjUxnOKJ/duIQfPHpsuWB/tFUc8+ho660cbpnn69GEY+STlVFbTcJq
-         dv/poRWX5jzwbJZbgaDmuDB45R4EyVcrbQPgiMgshaeDq1rAYF2mLQxgFnFye5KjdsdZ
-         5g3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Stq24dS1Z6xfdk4pDOGb8M2Nd25zUod97TaQOtiZjSk=;
-        b=h/bMGQ/sa04LS/HK7TMuvcpHjR7HTB2PBkvKl3VeeBzy9YKfucL41zLx5twL6rkhZN
-         YL3gmLk3MRPXgRUwbokOdgzpByztJj4i4UgDSYQ6oSxDAplPqJ2ZLuDvp64nXPjJFvGP
-         kct7gUdo1AmmW8VbjZvrnr0RTuBdG+FQbmarP+b0ewgHEryjpXgFTrzClbtiWKr9u/SF
-         KC7QKS8kYXvTUQC02J/O/jo3MZKas8h0PHhJG3jnNkfVYu6xZA6WU/1e7b53nZWJe2Q7
-         gV7juj+e5IV9mo68eZKqV3AZ5olV9YjMahom19oblO9zwIuFY61+s1skePtTwAdoPV6u
-         lEVQ==
-X-Gm-Message-State: APjAAAUc7/DHm16JT02S2y+CKi3j4UGWtfOwKbUJpzB0Zxa2qQpcoDxq
-        xAM7XHf3gRRvMxZqt6L8wre3qk149CROjStscevbqZRdj5I=
-X-Google-Smtp-Source: APXvYqxWAU0nACWBKzpn0bbNzR0/Rj95YzI4Pcr8zuJ//sZFENxnUEBwkBqowlH9cycG4LvOi6pZOUIlT0YtWdDOKsQ=
-X-Received: by 2002:aa7:9629:: with SMTP id r9mr2667857pfg.51.1578643952452;
- Fri, 10 Jan 2020 00:12:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20200110155716.Bluez.v3.1.Ie74d7bb468a914ba7386aae02fc63cd4f529b0ef@changeid>
- <CAPHZWUd0LQrVrWa5jCG2skA8KOORxpBMRBKtYU+n23kVtx27JA@mail.gmail.com>
-In-Reply-To: <CAPHZWUd0LQrVrWa5jCG2skA8KOORxpBMRBKtYU+n23kVtx27JA@mail.gmail.com>
-From:   Yun-hao Chung <howardchung@google.com>
-Date:   Fri, 10 Jan 2020 16:12:21 +0800
-Message-ID: <CAPHZWUdpxVMvth-cobmWriLsJ9=nVrUVtqr-jtMw3kQqZ36syw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3] audio/a2dp - fix crash during recovering process
-To:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 10 Jan 2020 04:54:50 -0500
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200110095447epoutp02fc3e0902bc4a88788f68c423d1a03e5a~ofePpAvbE0066500665epoutp02o
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 09:54:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200110095447epoutp02fc3e0902bc4a88788f68c423d1a03e5a~ofePpAvbE0066500665epoutp02o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1578650087;
+        bh=qUO9yfRwpmRSEIJUiXTH8DB75pDj7AFZ9QheRP3L0xc=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=QiI9UyBzeGNlV7iXVUlQi7O7KbN8CvAovlV/XYs4vsY2TvE2tb6BoJE42G92ri0y/
+         jejLJiT5CaJlk5ZdfFl7dNyORVhDXm4x9Yr0rKWg4gPTkkdCXxNhrW9GDV2w/ZQ/cr
+         H5XIbVuoKbaOiJGCNvzBfp96u5Wuwx1wG32YPd3Y=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20200110095446epcas5p1dbcaa48459b6828cf413cde2365af114~ofeO96wHY0250002500epcas5p1l;
+        Fri, 10 Jan 2020 09:54:46 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.40.196]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 47vJHS1zNzzMqYkV; Fri, 10 Jan
+        2020 09:54:44 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        54.67.20197.3E9481E5; Fri, 10 Jan 2020 18:54:43 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20200110095441epcas5p4fcf5071a95b6d213419f8abf9dbdb86f~ofeKmFTqi3127231272epcas5p4-;
+        Fri, 10 Jan 2020 09:54:41 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20200110095441epsmtrp1e601cce8232a263c6966cf107ea6d969~ofeKle26J0276702767epsmtrp1s;
+        Fri, 10 Jan 2020 09:54:41 +0000 (GMT)
+X-AuditID: b6c32a4a-769ff70000014ee5-04-5e1849e34162
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        48.A6.10238.1E9481E5; Fri, 10 Jan 2020 18:54:41 +0900 (KST)
+Received: from SyamLinux.sa.corp.samsungelectronics.net (unknown
+        [107.109.107.247]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20200110095441epsmtip27a932d14986be111cc33c6ad73e9bc55~ofeKGb3Mv2908829088epsmtip2v;
+        Fri, 10 Jan 2020 09:54:41 +0000 (GMT)
+From:   Prathyusha Nelluri <prathyusha.n@samsung.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Prathyusha N <prathyusha.n@samsung.com>
+Subject: [PATCH 1/1] mesh: Handle publickey exchange phase for initiator
+Date:   Fri, 10 Jan 2020 15:24:30 +0530
+Message-Id: <1578650070-8530-1-git-send-email-prathyusha.n@samsung.com>
+X-Mailer: git-send-email 2.7.4
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrLKsWRmVeSWpSXmKPExsWy7bCmlu5jT4k4g89/BSzmXOtjtvi/9Ba7
+        A5NH35ZVjB6fN8kFMEXl2GSkJqakFimk5iXnp2TmpdsqeQfHO8ebmhkY6hpaWpgrKeQl5qba
+        Krn4BOi6ZeYAjVdSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFBgaFegVJ+YWl+al
+        6yXn51oZGhgYmQJVJuRkzJ4wnaWg362i+dNd1gbGVRZdjBwcEgImEq33/boYuTiEBHYzSize
+        e4ENwvnEKPHtyHZWCOcbo8SevsvsXYycYB27p3RAVe1llNj16CsjhNPBJLF04nNWkCo2AWOJ
+        8zdfMYHYIgLKEs/2HQazmQW0JSa9mQlmCwt4SJw//Y0ZxGYRUJX4tPMf2AZeAXeJKRu+MEFs
+        k5O4ea6TGWSBhMBJVoktZ/sYIRIuEtd+voCyhSVeHd8CdZ6UxMv+Nii7m1Fi9xtXiOYpjBL3
+        XhyGmmov8XTTXHZQCDALaEqs36UPcRyfRO/vJ0yQgOGV6GgTgqhWkFg1dSJUp5jEuulfoMZ7
+        SJxZMRXsBCGBWImnu9ayT2CUmYUwdAEj4ypGydSC4tz01GLTAqO81HLkyNnECE4qWl47GJed
+        8znEKMDBqMTDmyEsHifEmlhWXJl7iFGCg1lJhPfoDbE4Id6UxMqq1KL8+KLSnNTiQ4ymwECb
+        yCwlmpwPTHh5JfGGpkZmZgaWBqbGFmaGSuK8k1ivxggJpCeWpGanphakFsH0MXFwSjUw5s+u
+        Ltg6u/zYVtXp02yybjRM3G60g48vvU9RiM1UoebC3Ted21P9BTft4d82lfeYdIb0HLY/LdP1
+        CxUPLtzwoeyD74rNj9/XcHkXC0424L6n4Rh0vjl9fuyzuReK07ti2S1XHlg19a//c+5zzcId
+        1Qe/f+SwMPpzNOPt7fnM21e5tk/YW27/U4mlOCPRUIu5qDgRAIZwpmtAAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCJMWRmVeSWpSXmKPExsWy7bCSvO5DT4k4gznvdCzmXOtjtvi/9Ba7
+        A5NH35ZVjB6fN8kFMEVx2aSk5mSWpRbp2yVwZcyeMJ2loN+tovnTXdYGxlUWXYycHBICJhK7
+        p3SwdTFycQgJ7GaUuPr5JitEQkzizYoT7BC2sMTKf8/ZIYramCQWPVvEBpJgEzCWOH/zFROI
+        LSKgLPFs32Ewm1lAW2LSm5lgtrCAh8T509+YQWwWAVWJTzv/gQ3lFXCXmLLhCxPEAjmJm+c6
+        mScw8ixgZFjFKJlaUJybnltsWGCYl1quV5yYW1yal66XnJ+7iRHsdy3NHYyXl8QfYhTgYFTi
+        4c0QFo8TYk0sK67MPcQowcGsJMJ79IZYnBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHep3nHIoUE
+        0hNLUrNTUwtSi2CyTBycUg2Msr0m9xn8T5vefqKZnS/8e4WeyMz9S5akqRi/+7yKabMPv9iB
+        PMHnzz7+CJ+cdTh0Z4tJ31ThHcZ37d5s5zg0K7rlSMw91cYHP4/GufOVOeS3njnvs+bXlYtZ
+        e+7yvHxzO7HJMslxt95Ki/pQNb3C7GkKnb6dGlzHc0ROGkn9yhE/ubw15P10JZbijERDLeai
+        4kQAxa8zkvcBAAA=
+X-CMS-MailID: 20200110095441epcas5p4fcf5071a95b6d213419f8abf9dbdb86f
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20200110095441epcas5p4fcf5071a95b6d213419f8abf9dbdb86f
+References: <CGME20200110095441epcas5p4fcf5071a95b6d213419f8abf9dbdb86f@epcas5p4.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Prathyusha N <prathyusha.n@samsung.com>
 
-Thanks for the comment.
-I did the qualification test with and without the patch on both Chrome
-OS and Linux with bluez-5.52.
-The results are all the same.
-The tests I=E2=80=99ve run are as follows.
+In Public Key OOB case, when provisioner receives public key via
+OOB, provisioner has to send it's public key to remote node and
+and then proceed for authentication.
 
-A2DP/SRC/AS/BV-01-I
-A2DP/SRC/CC/BV-09-I
-A2DP/SRC/CC/BV-10-I
-A2DP/SRC/REL/BV-01-I
-A2DP/SRC/REL/BV-02-I
-A2DP/SRC/SET/BV-01-I
-A2DP/SRC/SET/BV-02-I
-A2DP/SRC/SET/BV-03-I
-A2DP/SRC/SET/BV-04-I
-A2DP/SRC/SET/BV-05-I
-A2DP/SRC/SET/BV-06-I
-IOPT/CL/A2DP-SRC/SFC/BV-01-I
-AVDTP/SRC/ACP/SIG/SMG/BV-06-C
-AVDTP/SRC/ACP/SIG/SMG/BV-08-C
-AVDTP/SRC/ACP/SIG/SMG/BV-10-C
-AVDTP/SRC/ACP/SIG/SMG/BV-16-C
-AVDTP/SRC/ACP/SIG/SMG/BV-18-C
-AVDTP/SRC/ACP/SIG/SMG/BV-20-C
-AVDTP/SRC/ACP/SIG/SMG/BV-24-C
-AVDTP/SRC/ACP/SIG/SMG/BI-05-C
-AVDTP/SRC/ACP/SIG/SMG/BI-08-C
-AVDTP/SRC/ACP/SIG/SMG/BI-17-C
-AVDTP/SRC/ACP/SIG/SMG/BI-20-C
-AVDTP/SRC/ACP/SIG/SMG/BI-23-C
-AVDTP/SRC/ACP/SIG/SMG/BI-28-C*
-AVDTP/SRC/ACP/TRA/BTR/BI-01-C
-AVDTP/SRC/INT/SIG/SMG/BV-05-C
-AVDTP/SRC/INT/SIG/SMG/BV-07-C
-AVDTP/SRC/INT/SIG/SMG/BV-09-C
-AVDTP/SRC/INT/SIG/SMG/BV-15-C
-AVDTP/SRC/INT/SIG/SMG/BV-17-C
-AVDTP/SRC/INT/SIG/SMG/BV-19-C
-AVDTP/SRC/INT/SIG/SMG/BV-23-C
-AVDTP/SRC/INT/SIG/SMG/BV-31-C
-AVDTP/SRC/INT/SIG/SMG/BI-30-C
-AVDTP/SRC/INT/TRA/BTR/BV-01-C
+Handle invalid keys case.
+---
+ mesh/prov-initiator.c | 229 +++++++++++++++++++++++++-----------------
+ 1 file changed, 135 insertions(+), 94 deletions(-)
 
-Except for AVDTP/SRC/ACP/SIG/SMG/BI-28-C, the other tests had been passed.
-Please let me know if I need more verification.
+diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
+index 7efd5b349..cd6be95b0 100644
+--- a/mesh/prov-initiator.c
++++ b/mesh/prov-initiator.c
+@@ -186,7 +186,7 @@ static void int_prov_open(void *user_data, prov_trans_tx_t trans_tx,
+ 	return;
+ }
+ 
+-static void prov_calc_secret(const uint8_t *pub, const uint8_t *priv,
++static bool prov_calc_secret(const uint8_t *pub, const uint8_t *priv,
+ 							uint8_t *secret)
+ {
+ 	uint8_t tmp[64];
+@@ -196,22 +196,27 @@ static void prov_calc_secret(const uint8_t *pub, const uint8_t *priv,
+ 	swap_u256_bytes(tmp);
+ 	swap_u256_bytes(tmp + 32);
+ 
+-	ecdh_shared_secret(tmp, priv, secret);
++	if (!ecdh_shared_secret(tmp, priv, secret))
++		return false;
+ 
+ 	/* Convert to Mesh byte order */
+ 	swap_u256_bytes(secret);
++	return true;
+ }
+ 
+-static void int_credentials(struct mesh_prov_initiator *prov)
++static bool int_credentials(struct mesh_prov_initiator *prov)
+ {
+-	prov_calc_secret(prov->conf_inputs.dev_pub_key,
+-			prov->private_key, prov->secret);
++	if (!prov_calc_secret(prov->conf_inputs.dev_pub_key,
++				prov->private_key, prov->secret))
++		goto failure;
+ 
+-	mesh_crypto_s1(&prov->conf_inputs,
+-			sizeof(prov->conf_inputs), prov->salt);
++	if (!mesh_crypto_s1(&prov->conf_inputs,
++				sizeof(prov->conf_inputs), prov->salt))
++		goto failure;
+ 
+-	mesh_crypto_prov_conf_key(prov->secret, prov->salt,
+-			prov->calc_key);
++	if (!mesh_crypto_prov_conf_key(prov->secret, prov->salt,
++				prov->calc_key))
++		goto failure;
+ 
+ 	l_getrandom(prov->rand_auth_workspace, 16);
+ 
+@@ -224,6 +229,11 @@ static void int_credentials(struct mesh_prov_initiator *prov)
+ 	print_packet("LocalRandom", prov->rand_auth_workspace, 16);
+ 	print_packet("ConfirmationSalt", prov->salt, 16);
+ 	print_packet("ConfirmationKey", prov->calc_key, 16);
++
++	return true;
++
++failure:
++	return false;
+ }
+ 
+ static uint8_t u16_high_bit(uint16_t mask)
+@@ -320,10 +330,21 @@ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ 	send_confirm(prov);
+ }
+ 
++static void send_pub_key(struct mesh_prov_initiator *prov)
++{
++	struct prov_pub_key_msg msg;
++
++	msg.opcode = PROV_PUB_KEY;
++	memcpy(msg.pub_key, prov->conf_inputs.prv_pub_key, 64);
++	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
++	prov->state = INT_PROV_KEY_SENT;
++}
++
+ static void pub_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ {
+ 	struct mesh_prov_initiator *rx_prov = user_data;
+ 	struct prov_fail_msg msg;
++	uint8_t fail_code[2];
+ 
+ 	if (prov != rx_prov)
+ 		return;
+@@ -338,20 +359,16 @@ static void pub_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ 	memcpy(prov->conf_inputs.dev_pub_key, key, 64);
+ 	prov->material |= MAT_REMOTE_PUBLIC;
+ 
+-	if ((prov->material & MAT_SECRET) == MAT_SECRET)
+-		int_credentials(prov);
++	send_pub_key(prov);
+ 
+-	send_confirm(prov);
+-}
+-
+-static void send_pub_key(struct mesh_prov_initiator *prov)
+-{
+-	struct prov_pub_key_msg msg;
+-
+-	msg.opcode = PROV_PUB_KEY;
+-	memcpy(msg.pub_key, prov->conf_inputs.prv_pub_key, 64);
+-	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
+-	prov->state = INT_PROV_KEY_SENT;
++	if ((prov->material & MAT_SECRET) == MAT_SECRET) {
++		if (!int_credentials(prov)) {
++			fail_code[0] = PROV_FAILED;
++			fail_code[1] = PROV_ERR_UNEXPECTED_ERR;
++			prov->trans_tx(prov->trans_data, fail_code, 2);
++			int_prov_close(prov, fail_code[1]);
++		}
++	}
+ }
+ 
+ static void send_random(struct mesh_prov_initiator *prov)
+@@ -482,6 +499,93 @@ static void get_random_key(struct mesh_prov_initiator *prov, uint8_t action,
+ 	l_put_be32(oob_key, prov->rand_auth_workspace + 44);
+ }
+ 
++static void int_prov_auth(void)
++{
++	uint8_t fail_code[2];
++	uint32_t oob_key;
++
++	prov->state = INT_PROV_KEY_ACKED;
++
++	l_debug("auth_method: %d", prov->conf_inputs.start.auth_method);
++	memset(prov->rand_auth_workspace + 16, 0, 32);
++
++	switch (prov->conf_inputs.start.auth_method) {
++	default:
++	case 0:
++		/* Auth Type 3c - No OOB */
++		prov->material |= MAT_RAND_AUTH;
++		break;
++	case 1:
++		/* Auth Type 3c - Static OOB */
++		/* Prompt Agent for Static OOB */
++		fail_code[1] = mesh_agent_request_static(prov->agent,
++				static_cb, prov);
++
++		if (fail_code[1])
++			goto failure;
++
++		break;
++	case 2:
++		/* Auth Type 3a - Output OOB */
++		/* Prompt Agent for Output OOB */
++		if (prov->conf_inputs.start.auth_action ==
++						PROV_ACTION_OUT_ALPHA) {
++			fail_code[1] = mesh_agent_prompt_alpha(
++				prov->agent, true,
++				static_cb, prov);
++		} else {
++			fail_code[1] = mesh_agent_prompt_number(
++				prov->agent, true,
++				prov->conf_inputs.start.auth_action,
++				number_cb, prov);
++		}
++
++		if (fail_code[1])
++			goto failure;
++
++		break;
++
++	case 3:
++		/* Auth Type 3b - input OOB */
++		get_random_key(prov,
++				prov->conf_inputs.start.auth_action,
++				prov->conf_inputs.start.auth_size);
++		oob_key = l_get_be32(prov->rand_auth_workspace + 28);
++
++		/* Ask Agent to Display random key */
++		if (prov->conf_inputs.start.auth_action ==
++						PROV_ACTION_IN_ALPHA) {
++
++			fail_code[1] = mesh_agent_display_string(
++				prov->agent,
++				(char *) prov->rand_auth_workspace + 16,
++				NULL, prov);
++		} else {
++			fail_code[1] = mesh_agent_display_number(
++				prov->agent, true,
++				prov->conf_inputs.start.auth_action,
++				oob_key, NULL, prov);
++		}
++
++		if (fail_code[1])
++			goto failure;
++
++		break;
++
++	}
++
++	if (prov->material & MAT_RAND_AUTH)
++		send_confirm(prov);
++
++	return;
++
++failure:
++	l_debug("Failing... %d", fail_code[1]);
++	fail_code[0] = PROV_FAILED;
++	prov->trans_tx(prov->trans_data, fail_code, 2);
++	int_prov_close(prov, fail_code[1]);
++}
++
+ static void int_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ {
+ 	struct mesh_prov_initiator *rx_prov = user_data;
+@@ -596,79 +700,12 @@ static void int_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 		if ((prov->material & MAT_SECRET) != MAT_SECRET)
+ 			return;
+ 
+-		int_credentials(prov);
+-		prov->state = INT_PROV_KEY_ACKED;
+-
+-		l_debug("auth_method: %d", prov->conf_inputs.start.auth_method);
+-		memset(prov->rand_auth_workspace + 16, 0, 32);
+-		switch (prov->conf_inputs.start.auth_method) {
+-		default:
+-		case 0:
+-			/* Auth Type 3c - No OOB */
+-			prov->material |= MAT_RAND_AUTH;
+-			break;
+-		case 1:
+-			/* Auth Type 3c - Static OOB */
+-			/* Prompt Agent for Static OOB */
+-			fail_code[1] = mesh_agent_request_static(prov->agent,
+-					static_cb, prov);
+-
+-			if (fail_code[1])
+-				goto failure;
+-
+-			break;
+-		case 2:
+-			/* Auth Type 3a - Output OOB */
+-			/* Prompt Agent for Output OOB */
+-			if (prov->conf_inputs.start.auth_action ==
+-							PROV_ACTION_OUT_ALPHA) {
+-				fail_code[1] = mesh_agent_prompt_alpha(
+-					prov->agent, true,
+-					static_cb, prov);
+-			} else {
+-				fail_code[1] = mesh_agent_prompt_number(
+-					prov->agent, true,
+-					prov->conf_inputs.start.auth_action,
+-					number_cb, prov);
+-			}
+-
+-			if (fail_code[1])
+-				goto failure;
+-
+-			break;
+-
+-		case 3:
+-			/* Auth Type 3b - input OOB */
+-			get_random_key(prov,
+-					prov->conf_inputs.start.auth_action,
+-					prov->conf_inputs.start.auth_size);
+-			oob_key = l_get_be32(prov->rand_auth_workspace + 28);
+-
+-			/* Ask Agent to Display random key */
+-			if (prov->conf_inputs.start.auth_action ==
+-							PROV_ACTION_IN_ALPHA) {
+-
+-				fail_code[1] = mesh_agent_display_string(
+-					prov->agent,
+-					(char *) prov->rand_auth_workspace + 16,
+-					NULL, prov);
+-			} else {
+-				fail_code[1] = mesh_agent_display_number(
+-					prov->agent, true,
+-					prov->conf_inputs.start.auth_action,
+-					oob_key, NULL, prov);
+-			}
+-
+-			if (fail_code[1])
+-				goto failure;
+-
+-			break;
+-
++		if (!int_credentials(prov)) {
++			fail_code[1] = PROV_ERR_UNEXPECTED_ERR;
++			goto failure;
+ 		}
+ 
+-		if (prov->material & MAT_RAND_AUTH)
+-			send_confirm(prov);
+-
++		int_prov_auth();
+ 		break;
+ 
+ 	case PROV_INP_CMPLT: /* Provisioning Input Complete */
+@@ -760,11 +797,15 @@ static void int_prov_ack(void *user_data, uint8_t msg_num)
+ 		prov->state = INT_PROV_DATA_ACKED;
+ 		break;
+ 
++	case INT_PROV_KEY_SENT:
++		if (prov->conf_inputs.caps.pub_type == 1)
++			int_prov_auth();
++		break;
++
+ 	case INT_PROV_IDLE:
+ 	case INT_PROV_INVITE_SENT:
+ 	case INT_PROV_INVITE_ACKED:
+ 	case INT_PROV_START_ACKED:
+-	case INT_PROV_KEY_SENT:
+ 	case INT_PROV_KEY_ACKED:
+ 	case INT_PROV_CONF_SENT:
+ 	case INT_PROV_CONF_ACKED:
+-- 
+2.17.1
 
-Thanks,
-Howard
-
-On Fri, Jan 10, 2020 at 4:09 PM Yun-hao Chung <howardchung@google.com> wrot=
-e:
->
-> ---------- Forwarded message ---------
-> From: howardchung@google.com <howardchung@google.com>
-> Date: Fri, Jan 10, 2020 at 3:57 PM
-> Subject: [Bluez PATCH v3] audio/a2dp - fix crash during recovering proces=
-s
-> To: <linux-bluetooth@vger.kernel.org>, <luiz.von.dentz@intel.com>
-> Cc: <chromeos-bluetooth-upstreaming@chromium.org>, howardchung
-> <howardchung@google.com>
->
->
-> From: howardchung <howardchung@google.com>
->
-> The crash with stack trace:
->
-> (libc-2.27.so -raise.c:51 )                     raise
-> (libc-2.27.so -abort.c:79 )                     abort
-> (libc-2.27.so -libc_fatal.c:181 )               __libc_message
-> (libc-2.27.so -malloc.c:5350 )                  malloc_printerr
-> (libc-2.27.so -malloc.c:4157 )                  _int_free
-> (libglib-2.0.so.0.5200.3 -gslist.c:878 )        g_slist_free_full
-> (bluetoothd -a2dp.c:165 )                       setup_unref
-> (bluetoothd -a2dp.c:2184 )                      a2dp_cancel
-> (bluetoothd -sink.c:317 )                       sink_unregister
-> (bluetoothd -service.c:176 )                    service_remove
-> (bluetoothd -device.c:4678 )                    device_remove
-> (bluetoothd -adapter.c:6573 )                   adapter_remove
-> (bluetoothd -adapter.c:8832 )                   index_removed
-> (bluetoothd -queue.c:220 )                      queue_foreach
-> (bluetoothd -mgmt.c:304 )                       can_read_data
-> (bluetoothd -io-glib.c:170 )                    watch_callback
-> (libglib-2.0.so.0.5200.3 -gmain.c:3234 )        g_main_context_dispatch
-> (libglib-2.0.so.0.5200.3 -gmain.c:3972 )        g_main_context_iterate
-> (libglib-2.0.so.0.5200.3 -gmain.c:4168 )        g_main_loop_run
-> (bluetoothd -main.c:798 )                       main
-> (libc-2.27.so -libc-start.c:308 )               __libc_start_main
-> (bluetoothd + 0x0000b089 )                      _start
-> (bluetoothd + 0x0000b05f )                      _init
->
-> triggered when 'usb disconnect' happened during AVDTP_SET_CONFIGURATION
-> request is sent but haven't received the response.
-> In this situation, the recovering process goes into sink.c:sink_free and
-> then a2dp.c:a2dp_cancel, avdtp.c:cancel_request, avdtp.c:connection_lost,
-> avdtp.c:release_stream.
->
-> During recovering, the reference count of setup and avdtp decrease more
-> than it increase, which ends up causing the crash.
->
-> The reference count of setup decreases one more time since
-> a2dp.c:setconf_cfm(called by cfm->set_configuration in
-> avdtp.c:cancel_request) was called in the 'error mode', which didn't
-> reference the setup, but in a2dp.c:abort_cfm(called by cfm->abort in
-> avdtp.c:release_stream), the reference count decreased by 1.
->
-> In this case, abort_cfm shouldn't be called as we already know
-> setconf_cfm didn't send any request. Setting avdtp_sep_state to
-> AVDTP_STATE_ABORTING should avoid this issue.
->
-> The reference count of avdtp decrease one more time since
-> both sink.c:sink_free and sink.c:sink_set_state(called from
-> avdtp.c:connection_lost -> avdtp.c:avdtp_set_state) unreference avdtp
-> for the session. The changes in sink.c should avoid the issue.
->
-> ---
-> How to test:
->         The crash can be simulated by the following procedure.
->         1. injecting sleep(10) right before calling a2dp_config in
->            sink.c:select_complete.
->         2. connect with a bluetooth headset
->         3. run 'rmmod btusb' after ~5 seconds(before the connection
->            complete)
-> The procedure can reproduce the crash with ~50% probability.
-> Even if the bluetoothd didn't crash or it crashed with different
-> signature, the reference count can end up with some invalid number.
->
-> After the patch applies, there is no crash after running the test above 1=
-0
-> times in a row.
->
-> Changes in v3:
-> - Update the title
-> - Remove the signed-off-by section
->
-> Changes in v2:
-> - Fixed typo in commit message
->
->  profiles/audio/avdtp.c | 3 +++
->  profiles/audio/sink.c  | 4 +++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 51ead684a..620a76c90 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -3484,6 +3484,7 @@ int avdtp_abort(struct avdtp *session, struct
-> avdtp_stream *stream)
->  {
->         struct seid_req req;
->         int ret;
-> +       struct avdtp_local_sep *sep =3D stream->lsep;
->
->         if (!stream && session->discover) {
->                 /* Don't call cb since it being aborted */
-> @@ -3498,6 +3499,8 @@ int avdtp_abort(struct avdtp *session, struct
-> avdtp_stream *stream)
->         if (stream->lsep->state =3D=3D AVDTP_STATE_ABORTING)
->                 return -EINVAL;
->
-> +       avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
-> +
->         if (session->req && stream =3D=3D session->req->stream)
->                 return cancel_request(session, ECANCELED);
->
-> diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-> index 7cac21034..726e2f562 100644
-> --- a/profiles/audio/sink.c
-> +++ b/profiles/audio/sink.c
-> @@ -309,8 +309,10 @@ static void sink_free(struct btd_service *service)
->                 avdtp_stream_remove_cb(sink->session, sink->stream,
->                                         sink->cb_id);
->
-> -       if (sink->session)
-> +       if (sink->session) {
->                 avdtp_unref(sink->session);
-> +               sink->session =3D NULL;
-> +       }
->
->         if (sink->connect_id > 0) {
->                 btd_service_connecting_complete(sink->service, -ECANCELED=
-);
-> --
-> 2.25.0.rc1.283.g88dfdc4193-goog
