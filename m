@@ -2,97 +2,195 @@ Return-Path: <SRS0=nFDS=27=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A42AFC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 15:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA93BC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 15:57:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 853DD2077C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 15:45:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CF432080D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 15:57:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuxypsG4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728265AbgAJPo5 convert rfc822-to-8bit (ORCPT
+        id S1728402AbgAJP5a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jan 2020 10:44:57 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:56794 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728245AbgAJPo5 (ORCPT
+        Fri, 10 Jan 2020 10:57:30 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:37347 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728356AbgAJP5a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jan 2020 10:44:57 -0500
-Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 364B6CED16;
-        Fri, 10 Jan 2020 16:54:12 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [RFC] y2038: HCI_TIME_STAMP with time64
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAK8P3a1mOzsaD+ZnN+ZKvmcan=K=KbnTjUOe1y8fS8WOMXT+Dw@mail.gmail.com>
-Date:   Fri, 10 Jan 2020 16:44:54 +0100
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Deepa Dinamani <deepa.kernel@gmail.com>,
-        Rich Felker <dalias@libc.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <5E8DACB3-3B53-4E22-A834-4CEDFC6A1757@holtmann.org>
-References: <CAK8P3a1mOzsaD+ZnN+ZKvmcan=K=KbnTjUOe1y8fS8WOMXT+Dw@mail.gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
+        Fri, 10 Jan 2020 10:57:30 -0500
+Received: by mail-lf1-f68.google.com with SMTP id b15so1847825lfc.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 07:57:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GQrELnWaNkbLnu7iUJ4jRMfQ2doTqb0e3TTzK7hz9X4=;
+        b=KuxypsG4o0WYLvoHQOJip6c+rFCPX4sH8OYCDw3WJw9xXNFtNvz/++UCftS/ouRJhV
+         4izxEUiSMenhA/VWkeNmdv2L9CIsoXT5xuWhpb4pAElQ4zDL4TVhKV4qsMrCNcPg0bMo
+         SBZXk+Gdznqu/gjQlpouDD0VFibQQilhWR+n1FnYmWHffIzaWSvzaZA+gMa0D74BzLU/
+         WEXBw6Y7m/NBwlmMyyM+BEH4fHdNTS+cJNo1BAvtTLNtsPKNAFpIfRvzbu11VeKK19WY
+         ts3Y5qmglNnG0Jv8qEJuLcP7c8OtInooSq+j0mBwIgD10K+wV8+YgpuaYAUTpFwOLyZt
+         TVBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GQrELnWaNkbLnu7iUJ4jRMfQ2doTqb0e3TTzK7hz9X4=;
+        b=kUu1dj4N77j2E5WLJwQzEMYVpf+8n6XtiAk3Le5l43RUCepMjZdHllfIU821xIjdw+
+         x6TE/PcgLCWRk1UphWW2sKqGnwAYiPML5VHvO1W8zg972dh9XFimMhHoYoVTR0GhuKiR
+         rzDMMdo6o83eSi06jOA53nKU3mVNtnaSg47fQ8ja61gqrcabNhpMa5onhGtOo4F6tFtD
+         hoO3VR5dALk64wqDkKMx0JepjzwJx7mwV+PEbSJrT3EXzSWboiTJmiDSibyGIHMwmu9n
+         HrWPImjAW0mf8Q8ALAeiF2fC50p/B7UEmnOY+iyyPgqM1Sd+Ha5bKwfTlcM/Ao+tucHr
+         oAOQ==
+X-Gm-Message-State: APjAAAUDikC2WiAB7P6lGdf7lTia4XM4EJpJDAPj5bwXYv6qMqoUbP6r
+        VOqla3aMZNczZbYNNim3G6MfrgD8fndjbNemUoUddBX+
+X-Google-Smtp-Source: APXvYqx/Ly4JJSZbrhT2boSTdOUr1MtOkdN07Y3TrjYoCniz4L6CVJu1iucsxGA5nwtLIvrBUjOA2lzyE3mxcQcZH40=
+X-Received: by 2002:ac2:5a09:: with SMTP id q9mr2779043lfn.71.1578671847105;
+ Fri, 10 Jan 2020 07:57:27 -0800 (PST)
+MIME-Version: 1.0
+References: <1577163782-28759-1-git-send-email-ajay.kishore@intel.com> <1577163782-28759-2-git-send-email-ajay.kishore@intel.com>
+In-Reply-To: <1577163782-28759-2-git-send-email-ajay.kishore@intel.com>
+From:   Matias Karhumaa <matias.karhumaa@gmail.com>
+Date:   Fri, 10 Jan 2020 17:57:16 +0200
+Message-ID: <CAMCGoNydF4WNNDj6Egoz0MBnXVjr+bFKUY54gLHX+0LErHwOTQ@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] doc/obex-api: Update documentation
+To:     Ajay Kishore <ajay.kishore@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Arnd,
+Hi Ajay,
 
-> I noticed earlier this week that the HCI_CMSG_TSTAMP/HCI_TIME_STAMP
-> interface has no time64 equivalent, as we apparently missed that when
-> converting the normal socket timestamps to support both time32 and time64
-> variants of the sockopt and cmsg data.
-> 
-> The interface was originally added back in 2002 by Maksim Krasnyanskiy
-> when bluetooth support first became non-experimental.
-> 
-> When using HCI_TIME_STAMP on a 32-bit system with a time64
-> libc, users will interpret the { s32 tv_sec; s32 tv_usec } layout of
-> the kernel as { s64 tv_sec; ... }, which puts complete garbage
-> into the timestamp regardless of whether this code runs before or
-> after y2038. From looking at codesearch.debian.org, I found two
-> users of this: libpcap and hcidump. There are probably others that
-> are not part of Debian.
-> 
-> Fixing this the same was as normal socket timestamps is not possible
-> because include/net/bluetooth/hci.h is not an exported UAPI header.
-> This means any changes to it for defining HCI_TIME_STAMP conditionally
-> would be ignored by applications that use a different copy of the
-> header.
-> 
-> I can see three possible ways forward:
-> 
-> 1. move include/net/bluetooth/hci.h to include/uapi/, add a conditional
->   definition of HCI_TIME_STAMP and make the kernel code support
->   both formats. Then change applications to rely on that version of
->   header file to get the correct definition but not change application code.
-> 
-> 2. Leave the kernel completely unchanged and modify only the users
->    to not expect the output to be a 'struct timeval' but interpret as
->    as { uint32_t tv_sec; int32_t tv_usec; } structure on 32-bit architectures,
->    which will work until the unsigned time overflows 86 years from now
->    in 2106 (same as the libpcap on-disk format).
-> 
-> 3. Add support for the normal SO_TIMESTAMPNS_NEW sockopt in
->   HCI, providing timestamps in the unambiguous { long long tv_sec;
->   long long tv_nsec; } format to user space, and change applications
->   to use that if supported by the kernel.
+ti 24. jouluk. 2019 klo 7.29 Ajay Kishore (ajay.kishore@intel.com) kirjoitti:
+>
+> This adds documentation with the conversation listing feature
+>
+> Signed-off-by: Ajay Kishore <ajay.kishore@intel.com>
+Signed-off-by isn't necessary for Bluez patches.
 
-I have added SO_TIMESTAMP* to every Bluetooth socket a while back. And that should be used by the majority of the tools. One exception might by hcidump which has been replaced by btmon already anyway.
+> ---
+>  doc/obex-api.txt | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 94 insertions(+)
+>
+> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+> index f39355a..8f27b40 100644
+> --- a/doc/obex-api.txt
+> +++ b/doc/obex-api.txt
+> @@ -892,3 +892,97 @@ Properties string Folder [readonly]
+>                 boolean Protected [readonly]
+>
+>                         Message protected flag
+> +
+> +Conversation Access hierarchy
+> +==============================
+> +
+> +Service                org.bluez.obex
+> +Interface      org.bluez.obex.Conversation1
+> +Object path    [Session object path]
+> +
+> +Methods                array{object, dict} ListConversations(string folder, dict filter)
+I think this does not quite match the implementation. I think
+ListConversation belongs to MessageAccess1 interface. Conversation1
+interface has similar method than Message1 interface.
 
-So I would not bother with HCI_TIME_STAMP fixing. We can do 2) if someone really still wants to use that socket option. However I am under the impression that 3) should be already possible.
+> +                       Returns an array containing the conversations found in the
+> +                       given subfolder of the current folder, or in the current
+> +                       folder if folder is empty.
+> +
+> +                       Possible Filters: MaxListCount, LastActivityBegin, LastActivityEnd,
+> +                       ReadStatus, Recipient
+> +
+> +               Properties:
+> +                       string id:
+> +
+> +                               Conversation unique identification
+> +
+> +                       string name:
+> +
+> +                               Conversation name
+> +
+> +                       string last_activity:
+> +
+> +                               Conversation timestamp for the last activity
+> +
+> +                       boolean read_status:
+> +
+> +                               Conversation read flag
+> +
+> +                       string version_counter:
+> +
+> +                               128 bits version counter.
+> +                               The 'Conversation-Listing Version Counter',
+> +                               'Conversation Version Counter', and 'Folder
+> +                               Version Counter' are used to detect if something
+> +                               has changed
+> +
+> +                       string summary:
+> +
+> +                               Conversation summary
+> +
+> +                       string display:
+> +
+> +                               Conversation participants name
+> +
+> +                       string chat_state:
+> +
+> +                               Conversation current chat state of the participants
+> +
+> +                       string presence_availability:
+> +
+> +                               Conversation  participants availability
+> +
+> +                       string presence_text:
+> +
+> +                               User defined status of the conversation
+> +
+> +                       uint16 priority:
+> +
+> +                               Conversation participant priority
+> +
+> +               Possible errors: org.bluez.obex.Error.InvalidArguments
+> +                                org.bluez.obex.Error.Failed
+> +
+> +
+> +Filter:                uint16 MaxListCount:
+Shouldn't this be MaxCount?
 
-Regards
+> +
+> +                       Maximum number of items in the conversations.
+> +
+> +               string LastActivityBegin:
+> +
+> +                       Filter conversations by starting period.
+> +
+> +                       Possible values: Date in "YYYYMMDDTHHMMSS" format.
+> +
+> +               string LastActivityEnd:
+> +
+> +                       Filter conversations by ending period.
+> +
+> +                       Possible values: Date in "YYYYMMDDTHHMMSS" format.
+> +
+> +               boolean ReadStatus:
+> +
+> +                       Filter converstions by read flag.
+> +
+> +                       Possible values: True for read or False for unread
+> +
+> +               string Recipient:
+> +
+> +                       Filter conversations by conversation-recipient.
+> --
+> 2.7.4
+>
 
-Marcel
-
+Best regards,
+Matias Karhumaa
