@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 455CDC32771
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 01:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0160C32771
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 03:04:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1190B20678
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 01:53:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79FAA20678
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 03:04:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730601AbgAJBxV (ORCPT
+        id S1730966AbgAJDEm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jan 2020 20:53:21 -0500
-Received: from mga04.intel.com ([192.55.52.120]:13798 "EHLO mga04.intel.com"
+        Thu, 9 Jan 2020 22:04:42 -0500
+Received: from mga05.intel.com ([192.55.52.43]:55361 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730359AbgAJBxV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jan 2020 20:53:21 -0500
+        id S1730952AbgAJDEm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 9 Jan 2020 22:04:42 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 17:53:21 -0800
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 19:04:41 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,414,1571727600"; 
-   d="scan'208";a="229621287"
+X-IronPort-AV: E=Sophos;i="5.69,415,1571727600"; 
+   d="scan'208";a="396293606"
 Received: from ingas-nuc1.sea.intel.com ([10.254.104.252])
-  by fmsmga001.fm.intel.com with ESMTP; 09 Jan 2020 17:53:21 -0800
+  by orsmga005.jf.intel.com with ESMTP; 09 Jan 2020 19:04:41 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] tools/mesh: Remove node's appkeys when deleting a netkey
-Date:   Thu,  9 Jan 2020 17:53:20 -0800
-Message-Id: <20200110015320.2160-1-inga.stotland@intel.com>
+Subject: [PATCH BlueZ] tools/mesh: add commands for AppKey Get and NetKey Get
+Date:   Thu,  9 Jan 2020 19:04:40 -0800
+Message-Id: <20200110030440.5725-1-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -42,20 +42,16 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When a netkey is deleted from a remote node, all the appkeys bound
-to this netkey are expected to be deleted as well.
-This fixes app_key queue manipulation to avoid issues caused by modifying
-the queue while iterating over it: instead of iteration over all the
-entries, find a first bound key, delete it, find next... and so on,
-until there are no bound keys left in the app_keys queue.
+This implements commands to send AppKey Get and NetKey Get messages and
+to process AppKey List and NetKey List reponses
 ---
- tools/mesh/remote.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ tools/mesh/cfgcli.c | 100 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 91 insertions(+), 9 deletions(-)
 
-diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
-index 25e8d23f8..533d59b28 100644
---- a/tools/mesh/remote.c
-+++ b/tools/mesh/remote.c
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index 2403c9293..50d2ce706 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
 @@ -2,7 +2,7 @@
   *
   *  BlueZ - Bluetooth protocol stack for Linux
@@ -65,51 +61,146 @@ index 25e8d23f8..533d59b28 100644
   *
   *
   *  This library is free software; you can redistribute it and/or
-@@ -81,6 +81,14 @@ static bool match_node_addr(const void *a, const void *b)
- 	return false;
+@@ -406,6 +406,33 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 
+ 		break;
+ 
++	case OP_APPKEY_LIST:
++		if (len < 3)
++			break;
++
++		bt_shell_printf("AppKey List (node %4.4x) Status %s\n",
++						src, mesh_status_str(data[0]));
++		bt_shell_printf("NetKey %3.3x\n", l_get_le16(&data[1]));
++		len -= 3;
++
++		if (data[0] != MESH_STATUS_SUCCESS)
++			break;
++
++		bt_shell_printf("AppKeys:\n");
++		data += 3;
++
++		while (len >= 3) {
++			bt_shell_printf("\t%3.3x\n", l_get_le16(data) & 0xfff);
++			bt_shell_printf("\t%3.3x\n", l_get_le16(data + 1) >> 4);
++			len -= 3;
++			data += 3;
++		}
++
++		if (len == 2)
++			bt_shell_printf("\t%3.3x\n", l_get_le16(data));
++
++		break;
++
+ 	case OP_NETKEY_STATUS:
+ 		if (len != 3)
+ 			break;
+@@ -432,6 +459,26 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 
+ 		break;
+ 
++	case OP_NETKEY_LIST:
++		if (len < 2)
++			break;
++
++		bt_shell_printf("NetKey List (node %4.4x):\n", src);
++
++		while (len >= 3) {
++			net_idx = l_get_le16(data) & 0xfff;
++			bt_shell_printf("\t%3.3x\n", net_idx);
++			net_idx = l_get_le16(data + 1) >> 4;
++			bt_shell_printf("\t%3.3x\n", net_idx);
++			data += 3;
++			len -= 3;
++		}
++
++		if (len == 2)
++			bt_shell_printf("\t%3.3x\n", l_get_le16(data) & 0xfff);
++
++		break;
++
+ 	case OP_MODEL_APP_STATUS:
+ 		if (len != 7 && len != 9)
+ 			break;
+@@ -818,6 +865,32 @@ static void cmd_appkey_del(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  }
  
-+static bool match_bound_key(const void *a, const void *b)
++static void cmd_appkey_get(int argc, char *argv[])
 +{
-+	uint16_t app_idx = L_PTR_TO_UINT(a);
-+	uint16_t net_idx = L_PTR_TO_UINT(b);
++	uint16_t n;
++	uint8_t msg[32];
 +
-+	return (net_idx == keys_get_bound_key(app_idx));
++	if (IS_UNASSIGNED(target)) {
++		bt_shell_printf("Destination not set\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	n = mesh_opcode_set(OP_APPKEY_GET, msg);
++
++	if (read_input_parameters(argc, argv) != 1) {
++		bt_shell_printf("Bad arguments %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	put_le16(parms[0], msg + n);
++	n += 2;
++
++	if (!config_send(msg, n, OP_APPKEY_GET))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 +}
 +
- bool remote_add_node(const uint8_t uuid[16], uint16_t unicast,
- 					uint8_t ele_cnt, uint16_t net_idx)
+ static void cmd_key_add(uint32_t opcode, int argc, char *argv[])
  {
-@@ -123,7 +131,7 @@ bool remote_add_net_key(uint16_t addr, uint16_t net_idx)
- bool remote_del_net_key(uint16_t addr, uint16_t net_idx)
+ 	uint16_t key_idx;
+@@ -1382,6 +1455,11 @@ static void cmd_node_reset(int argc, char *argv[])
+ 	cmd_default(OP_NODE_RESET);
+ }
+ 
++static void cmd_netkey_get(int argc, char *argv[])
++{
++	cmd_default(OP_NETKEY_GET);
++}
++
+ static bool tx_setup(model_send_msg_func_t send_func, void *user_data)
  {
- 	struct remote_node *rmt;
--	const struct l_queue_entry *l;
-+	void *data;
- 
- 	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
- 	if (!rmt)
-@@ -132,13 +140,14 @@ bool remote_del_net_key(uint16_t addr, uint16_t net_idx)
- 	if (!l_queue_remove(rmt->net_keys, L_UINT_TO_PTR(net_idx)))
- 		return false;
- 
--	for (l = l_queue_get_entries(rmt->app_keys); l; l = l->next) {
--		uint16_t app_idx = (uint16_t) L_PTR_TO_UINT(l->data);
-+	data = l_queue_remove_if(rmt->app_keys, match_bound_key,
-+						L_UINT_TO_PTR(net_idx));
-+	while (data) {
-+		uint16_t app_idx = (uint16_t) L_PTR_TO_UINT(data);
- 
--		if (net_idx == keys_get_bound_key(app_idx)) {
--			l_queue_remove(rmt->app_keys, L_UINT_TO_PTR(app_idx));
--			mesh_db_node_app_key_del(rmt->unicast, app_idx);
--		}
-+		mesh_db_node_app_key_del(rmt->unicast, app_idx);
-+		data = l_queue_remove_if(rmt->app_keys, match_bound_key,
-+						L_UINT_TO_PTR(net_idx));
- 	}
- 
- 	return true;
+ 	if (!send_func)
+@@ -1404,21 +1482,25 @@ static const struct bt_shell_menu cfg_menu = {
+ 	{"composition-get", "[page_num]", cmd_composition_get,
+ 				"Get composition data"},
+ 	{"netkey-add", "<net_idx>", cmd_netkey_add,
+-				"Add network key"},
++				"Add NetKey"},
+ 	{"netkey-update", "<net_idx>", cmd_netkey_update,
+-				"Update network key"},
++				"Update NetKey"},
+ 	{"netkey-del", "<net_idx>", cmd_netkey_del,
+-				"Delete network key"},
++				"Delete NetKey"},
++	{"netkey-get", NULL, cmd_netkey_get,
++				"List NetKeys known to the node"},
+ 	{"appkey-add", "<app_idx>", cmd_appkey_add,
+-				"Add application key"},
++				"Add AppKey"},
+ 	{"appkey-update", "<app_idx>", cmd_appkey_update,
+-				"Add application key"},
++				"Add AppKey"},
+ 	{"appkey-del", "<app_idx>", cmd_appkey_del,
+-				"Delete application key"},
++				"Delete AppKey"},
++	{"appkey-get", "<net_idx>", cmd_appkey_get,
++				"List AppKeys bound to the NetKey"},
+ 	{"bind", "<ele_addr> <app_idx> <mod_id> [vendor_id]", cmd_add_binding,
+-				"Bind app key to a model"},
++				"Bind AppKey to a model"},
+ 	{"unbind", "<ele_addr> <app_idx> <mod_id> [vendor_id]", cmd_del_binding,
+-				"Remove app key from a model"},
++				"Remove AppKey from a model"},
+ 	{"mod-appidx-get", "<ele_addr> <model id>", cmd_mod_appidx_get,
+ 				"Get model app_idx"},
+ 	{"ttl-set", "<ttl>", cmd_ttl_set,
 -- 
 2.21.1
 
