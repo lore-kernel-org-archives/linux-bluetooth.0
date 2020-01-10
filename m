@@ -2,205 +2,211 @@ Return-Path: <SRS0=nFDS=27=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0160C32771
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 03:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47BADC32771
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 03:07:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79FAA20678
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 03:04:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E08C20673
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 03:07:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="bWOaWpOP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730966AbgAJDEm (ORCPT
+        id S1731010AbgAJDHI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jan 2020 22:04:42 -0500
-Received: from mga05.intel.com ([192.55.52.43]:55361 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730952AbgAJDEm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jan 2020 22:04:42 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 19:04:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,415,1571727600"; 
-   d="scan'208";a="396293606"
-Received: from ingas-nuc1.sea.intel.com ([10.254.104.252])
-  by orsmga005.jf.intel.com with ESMTP; 09 Jan 2020 19:04:41 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] tools/mesh: add commands for AppKey Get and NetKey Get
-Date:   Thu,  9 Jan 2020 19:04:40 -0800
-Message-Id: <20200110030440.5725-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.1
+        Thu, 9 Jan 2020 22:07:08 -0500
+Received: from mail26.static.mailgun.info ([104.130.122.26]:13522 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730965AbgAJDHF (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 9 Jan 2020 22:07:05 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1578625624; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=+QhPmZzsp/IOava1RMgxHzV1gETnluiY676UKvuOYXk=;
+ b=bWOaWpOPOnyr4coY+9qeP9xVtvct/Y/9/ZFRcma2f3bFZ/MTcHx0psIrLdZCTdcraSLM3Gnx
+ aacHD65SQ70xrc92NXCrobQdTk5JvjTEqkw7+bm9iOL+tWmAqsYowGoyjRDkDJdjO/2C26KC
+ G/ZZ7miB1uBQ404H+n4dUZh9s1Q=
+X-Mailgun-Sending-Ip: 104.130.122.26
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e17ea57.7f0ecba01f80-smtp-out-n02;
+ Fri, 10 Jan 2020 03:07:03 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 43C73C4479C; Fri, 10 Jan 2020 03:07:02 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 80AB7C433CB;
+        Fri, 10 Jan 2020 03:07:01 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
+Date:   Fri, 10 Jan 2020 11:07:01 +0800
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v3] Bluetooth: hci_qca: Add qca_power_on() API to support
+ both wcn399x and Rome power up
+In-Reply-To: <20200109190547.GF89495@google.com>
+References: <20200107052601.32216-1-rjliao@codeaurora.org>
+ <20200109051427.16426-1-rjliao@codeaurora.org>
+ <20200109190547.GF89495@google.com>
+Message-ID: <0bb0cf0a61324da281767fe9d01bc5c3@codeaurora.org>
+X-Sender: rjliao@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This implements commands to send AppKey Get and NetKey Get messages and
-to process AppKey List and NetKey List reponses
----
- tools/mesh/cfgcli.c | 100 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 91 insertions(+), 9 deletions(-)
+Hi Matt,
 
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index 2403c9293..50d2ce706 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -2,7 +2,7 @@
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-- *  Copyright (C) 2019  Intel Corporation. All rights reserved.
-+ *  Copyright (C) 2019-2020  Intel Corporation. All rights reserved.
-  *
-  *
-  *  This library is free software; you can redistribute it and/or
-@@ -406,6 +406,33 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 
- 		break;
- 
-+	case OP_APPKEY_LIST:
-+		if (len < 3)
-+			break;
-+
-+		bt_shell_printf("AppKey List (node %4.4x) Status %s\n",
-+						src, mesh_status_str(data[0]));
-+		bt_shell_printf("NetKey %3.3x\n", l_get_le16(&data[1]));
-+		len -= 3;
-+
-+		if (data[0] != MESH_STATUS_SUCCESS)
-+			break;
-+
-+		bt_shell_printf("AppKeys:\n");
-+		data += 3;
-+
-+		while (len >= 3) {
-+			bt_shell_printf("\t%3.3x\n", l_get_le16(data) & 0xfff);
-+			bt_shell_printf("\t%3.3x\n", l_get_le16(data + 1) >> 4);
-+			len -= 3;
-+			data += 3;
-+		}
-+
-+		if (len == 2)
-+			bt_shell_printf("\t%3.3x\n", l_get_le16(data));
-+
-+		break;
-+
- 	case OP_NETKEY_STATUS:
- 		if (len != 3)
- 			break;
-@@ -432,6 +459,26 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 
- 		break;
- 
-+	case OP_NETKEY_LIST:
-+		if (len < 2)
-+			break;
-+
-+		bt_shell_printf("NetKey List (node %4.4x):\n", src);
-+
-+		while (len >= 3) {
-+			net_idx = l_get_le16(data) & 0xfff;
-+			bt_shell_printf("\t%3.3x\n", net_idx);
-+			net_idx = l_get_le16(data + 1) >> 4;
-+			bt_shell_printf("\t%3.3x\n", net_idx);
-+			data += 3;
-+			len -= 3;
-+		}
-+
-+		if (len == 2)
-+			bt_shell_printf("\t%3.3x\n", l_get_le16(data) & 0xfff);
-+
-+		break;
-+
- 	case OP_MODEL_APP_STATUS:
- 		if (len != 7 && len != 9)
- 			break;
-@@ -818,6 +865,32 @@ static void cmd_appkey_del(int argc, char *argv[])
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
-+static void cmd_appkey_get(int argc, char *argv[])
-+{
-+	uint16_t n;
-+	uint8_t msg[32];
-+
-+	if (IS_UNASSIGNED(target)) {
-+		bt_shell_printf("Destination not set\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	n = mesh_opcode_set(OP_APPKEY_GET, msg);
-+
-+	if (read_input_parameters(argc, argv) != 1) {
-+		bt_shell_printf("Bad arguments %s\n", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	put_le16(parms[0], msg + n);
-+	n += 2;
-+
-+	if (!config_send(msg, n, OP_APPKEY_GET))
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
- static void cmd_key_add(uint32_t opcode, int argc, char *argv[])
- {
- 	uint16_t key_idx;
-@@ -1382,6 +1455,11 @@ static void cmd_node_reset(int argc, char *argv[])
- 	cmd_default(OP_NODE_RESET);
- }
- 
-+static void cmd_netkey_get(int argc, char *argv[])
-+{
-+	cmd_default(OP_NETKEY_GET);
-+}
-+
- static bool tx_setup(model_send_msg_func_t send_func, void *user_data)
- {
- 	if (!send_func)
-@@ -1404,21 +1482,25 @@ static const struct bt_shell_menu cfg_menu = {
- 	{"composition-get", "[page_num]", cmd_composition_get,
- 				"Get composition data"},
- 	{"netkey-add", "<net_idx>", cmd_netkey_add,
--				"Add network key"},
-+				"Add NetKey"},
- 	{"netkey-update", "<net_idx>", cmd_netkey_update,
--				"Update network key"},
-+				"Update NetKey"},
- 	{"netkey-del", "<net_idx>", cmd_netkey_del,
--				"Delete network key"},
-+				"Delete NetKey"},
-+	{"netkey-get", NULL, cmd_netkey_get,
-+				"List NetKeys known to the node"},
- 	{"appkey-add", "<app_idx>", cmd_appkey_add,
--				"Add application key"},
-+				"Add AppKey"},
- 	{"appkey-update", "<app_idx>", cmd_appkey_update,
--				"Add application key"},
-+				"Add AppKey"},
- 	{"appkey-del", "<app_idx>", cmd_appkey_del,
--				"Delete application key"},
-+				"Delete AppKey"},
-+	{"appkey-get", "<net_idx>", cmd_appkey_get,
-+				"List AppKeys bound to the NetKey"},
- 	{"bind", "<ele_addr> <app_idx> <mod_id> [vendor_id]", cmd_add_binding,
--				"Bind app key to a model"},
-+				"Bind AppKey to a model"},
- 	{"unbind", "<ele_addr> <app_idx> <mod_id> [vendor_id]", cmd_del_binding,
--				"Remove app key from a model"},
-+				"Remove AppKey from a model"},
- 	{"mod-appidx-get", "<ele_addr> <model id>", cmd_mod_appidx_get,
- 				"Get model app_idx"},
- 	{"ttl-set", "<ttl>", cmd_ttl_set,
--- 
-2.21.1
+在 2020-01-10 03:05，Matthias Kaehlcke 写道：
+> Hi Rocky,
+> 
+> On Thu, Jan 09, 2020 at 01:14:27PM +0800, Rocky Liao wrote:
+>> This patch adds a unified API qca_power_on() to support both wcn399x 
+>> and
+>> Rome power on. For wcn399x it calls the qca_wcn3990_init() to init the
+>> regulators, and for Rome it pulls up the bt_en GPIO to power up the 
+>> btsoc.
+>> It also moves all the power up operation from hdev->open() to
+>> hdev->setup().
+>> 
+>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+>> ---
+>> 
+>> Changes in v2: None
+>> Changes in v3:
+>>   -combined the changes of patch 2 and 3 into this patch
+> 
+> it would be better to actually describe what was done, "patch 2 and 3"
+> doesn't provide much useful information.
+> 
+OK, will update that
 
+>>   -updated the commit message
+>> 
+>>  drivers/bluetooth/hci_qca.c | 46 
+>> ++++++++++++++++++++++++-------------
+>>  1 file changed, 30 insertions(+), 16 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 82e4cd4b6663..427e381a08b4 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -541,7 +541,6 @@ static int qca_open(struct hci_uart *hu)
+>>  {
+>>  	struct qca_serdev *qcadev;
+>>  	struct qca_data *qca;
+>> -	int ret;
+>> 
+>>  	BT_DBG("hu %p qca_open", hu);
+>> 
+>> @@ -582,23 +581,10 @@ static int qca_open(struct hci_uart *hu)
+>>  	hu->priv = qca;
+>> 
+>>  	if (hu->serdev) {
+>> -
+>>  		qcadev = serdev_device_get_drvdata(hu->serdev);
+>> -		if (!qca_is_wcn399x(qcadev->btsoc_type)) {
+>> -			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+>> -			/* Controller needs time to bootup. */
+>> -			msleep(150);
+>> -		} else {
+>> +		if (qca_is_wcn399x(qcadev->btsoc_type)) {
+>>  			hu->init_speed = qcadev->init_speed;
+>>  			hu->oper_speed = qcadev->oper_speed;
+>> -			ret = qca_regulator_enable(qcadev);
+>> -			if (ret) {
+>> -				destroy_workqueue(qca->workqueue);
+>> -				kfree_skb(qca->rx_skb);
+>> -				hu->priv = NULL;
+>> -				kfree(qca);
+>> -				return ret;
+>> -			}
+>>  		}
+>>  	}
+>> 
+>> @@ -1531,6 +1517,31 @@ static int qca_wcn3990_init(struct hci_uart 
+>> *hu)
+>>  	return 0;
+>>  }
+>> 
+>> +static int qca_power_on(struct hci_dev *hdev)
+>> +{
+>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> +	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+>> +	struct qca_serdev *qcadev;
+>> +	int ret = 0;
+>> +
+>> +	/* Non-serdev device usually is powered by external power
+>> +	 * and don't need additional action in driver for power on
+>> +	 */
+>> +	if (!hu->serdev)
+>> +		return 0;
+>> +
+>> +	if (qca_is_wcn399x(soc_type)) {
+>> +		ret = qca_wcn3990_init(hu);
+> 
+> Since there is no real need to add the qca_regulator_enable() call from
+> qca_open() here qca_power_on() is now essentially a fancy wrapper for
+> qca_wcn3990_init(), but I guess that's ok.
+> 
+>> +	} else {
+>> +		qcadev = serdev_device_get_drvdata(hu->serdev);
+>> +		gpiod_set_value_cansleep(qcadev->bt_en, 1);
+>> +		/* Controller needs time to bootup. */
+>> +		msleep(150);
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>>  static int qca_setup(struct hci_uart *hu)
+>>  {
+>>  	struct hci_dev *hdev = hu->hdev;
+>> @@ -1562,7 +1573,7 @@ static int qca_setup(struct hci_uart *hu)
+>>  		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+>>  		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+>>  		hu->hdev->shutdown = qca_power_off;
+>> -		ret = qca_wcn3990_init(hu);
+>> +		ret = qca_power_on(hdev);
+>>  		if (ret)
+>>  			return ret;
+>> 
+>> @@ -1571,6 +1582,9 @@ static int qca_setup(struct hci_uart *hu)
+>>  			return ret;
+>>  	} else {
+>>  		bt_dev_info(hdev, "ROME setup");
+>> +		ret = qca_power_on(hdev);
+>> +		if (ret)
+>> +			return ret;
+>>  		qca_set_speed(hu, QCA_INIT_SPEED);
+>>  	}
+> 
+> It would be nice if we could get away with a single qca_power_on() call
+> for WCN399x and ROME. How about this before 'if 
+> (qca_is_wcn399x(soc_type))':
+> 
+> 	bt_dev_info(hdev, "setting up %s",
+> 		qca_is_wcn399x(soc_type)? "wcn399x" : "ROME");
+> 
+> 	ret = qca_power_on(hdev);
+> 	if (ret)
+> 		return ret;
+> 
+> 
+> In any case:
+> 
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+
+Makes sense will do that
