@@ -2,79 +2,125 @@ Return-Path: <SRS0=nFDS=27=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1D0C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 23:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4438EC282DD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 23:47:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5CDF520721
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 23:43:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F9302072E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 23:47:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="rcmqgfVe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727626AbgAJXm7 convert rfc822-to-8bit (ORCPT
+        id S1727614AbgAJXrO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jan 2020 18:42:59 -0500
-Received: from c.mail.sonic.net ([64.142.111.80]:50374 "EHLO c.mail.sonic.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727608AbgAJXm7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jan 2020 18:42:59 -0500
-Received: from [10.0.2.187] (96-74-112-17-static.hfc.comcastbusiness.net [96.74.112.17] (may be forged))
-        (authenticated bits=0)
-        by c.mail.sonic.net (8.15.1/8.15.1) with ESMTPSA id 00ANWPe0014404
-        (version=TLSv1.2 cipher=DHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Fri, 10 Jan 2020 15:32:25 -0800
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH] hcidump: add support for time64 based libc
-From:   Guy Harris <guy@alum.mit.edu>
-In-Reply-To: <CAK8P3a2VONV2Z6rs=xpntJyzfX4W7YijqCFr-f-PNMm3g4zRyA@mail.gmail.com>
-Date:   Fri, 10 Jan 2020 15:32:24 -0800
-Cc:     Rich Felker <dalias@libc.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Deepa Dinamani <deepa.kernel@gmail.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <0BF859F5-AA95-4941-A80D-7D33F7AC3636@alum.mit.edu>
-References: <20200110204903.3495832-1-arnd@arndb.de>
- <20200110210512.GB30412@brightrain.aerifal.cx>
- <CAK8P3a2VONV2Z6rs=xpntJyzfX4W7YijqCFr-f-PNMm3g4zRyA@mail.gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
-X-Sonic-CAuth: UmFuZG9tSVZfzRQnWvZjU7z+oCr5uoYP1bTOtA3Pmun4SpvjUHajIkrSUR9AvHwPE0H9mnMxZLfsnA5qFsdc26xnraVEakyT
-X-Sonic-ID: C;+BkWdQE06hGJtCGeTRzYKg== M;Yh95dQE06hGJtCGeTRzYKg==
-X-Sonic-Spam-Details: 0.0/5.0 by cerberusd
+        Fri, 10 Jan 2020 18:47:14 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:34527 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727585AbgAJXrO (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 Jan 2020 18:47:14 -0500
+Received: by mail-lj1-f195.google.com with SMTP id z22so3881334ljg.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 15:47:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:date:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=splxgu4LsMaO+TwCG5UFmZ1b08IbiVGGpmLDH8dQIPQ=;
+        b=rcmqgfVeU1jwA3q4Qef2Llsir2MkyVegMqE7bWc6EVYADN13s2wUiU/WyaPwQcC+Mw
+         GNNoVXNA6GyMYkT1JAIulLGFArufbHvyJYQ6ty1P9zR7zrupLyUzxRY8Ccx77X9B0dpK
+         Hh6941nKvjsmY0vJQzVCL1Ld9iiuGJ4VZfLkpMUQQlgfbvjt8SbOmTc1cgJX7bTdBzW0
+         A6fpflspVmZF92zmUwn7Tk3MGb5zviDxr7ayaGdVtnrwZFEdwMgHC5YKR1+K7yw7oPC7
+         B7pMMiPlfoHk8inQ+Tkk5y2yHSqiJ6t3tOatcrSdoiiT/C7q31h3lNGynIi2gADdxt/P
+         GjmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:date:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=splxgu4LsMaO+TwCG5UFmZ1b08IbiVGGpmLDH8dQIPQ=;
+        b=I9ZjJdxLaMdgxy3uvHeQX3nEY+3QCixL0KBuDnvAY2F8NQE5pfErfPob5mz8+ZdAF/
+         QNuOflm2Yj1FBj19BUjTzqfntO6Om+4hOxbeXdbInnICsHxUMkPLOvpl6DQDwLr9gvfY
+         czv2C1WAdMOom3Rp4k9kIvytwC3JX52esBo1RpOChTi7Vsrb4cSz1S+26TS/cNmlPNNm
+         FTjOovTQn+oenWRSSyw5YQrrZhqL7N1aGZRcibV3K19xAJNcQNwK3KO4Ed5CD9CTI5UC
+         ysERPJI6OUqL7c6tzCzWY0dPhhPZGKzRdTBjT7Hu0X8RLkM3mm4xyWPPnHruuNVVRQna
+         Kocg==
+X-Gm-Message-State: APjAAAWQMTuSgZrAIlgtMpP3eB3TNIz1KZxtFsj9NTJxh0raWnO+rrT2
+        ICQSw01F5M7DWkMGNPMXAr78vQ==
+X-Google-Smtp-Source: APXvYqyX+8GDkcnDnUgcydrGncVzRCt1r2Ca8dCjS4bJ8Fts81in4AA/+KS1bdDcjElJP/zTzGuWDg==
+X-Received: by 2002:a2e:b4e7:: with SMTP id s7mr3988277ljm.58.1578700032247;
+        Fri, 10 Jan 2020 15:47:12 -0800 (PST)
+Received: from kynes (apn-37-7-124-67.dynamic.gprs.plus.pl. [37.7.124.67])
+        by smtp.gmail.com with ESMTPSA id w19sm1734702lfl.55.2020.01.10.15.47.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2020 15:47:11 -0800 (PST)
+From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
+        <michal.lowas-rzechonek@silvair.com>
+X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
+Date:   Sat, 11 Jan 2020 00:47:09 +0100
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: Re: [PATCH BlueZ] mesh: Implement provisioning loop-back
+Message-ID: <20200110234709.ihnstfmahenstspp@kynes>
+Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
+        linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+References: <20200110181437.31167-1-brian.gix@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200110181437.31167-1-brian.gix@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Jan 10, 2020, at 1:19 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+Hi Brian,
 
-> On Fri, Jan 10, 2020 at 10:05 PM Rich Felker <dalias@libc.org> wrote:
->> 
->> On Fri, Jan 10, 2020 at 09:49:03PM +0100, Arnd Bergmann wrote:
->>> musl is moving to a default of 64-bit time_t on all architectures,
->>> glibc will follow later. This breaks reading timestamps through cmsg
->>> data with the HCI_TIME_STAMP socket option.
->>> 
->>> Change both copies of hcidump to work on all architectures.  This also
->>> fixes x32, which has never worked, and carefully avoids breaking sparc64,
->>> which is another special case.
->> 
->> Won't it be broken on rv32 though? Based on my (albeit perhaps
->> incomplete) reading of the thread, I think use of HCI_TIME_STAMP
->> should just be dropped entirely in favor of using SO_TIMESTAMPNS -- my
->> understanding was that it works with bluetooth sockets too.
-> 
-> All 32-bit architectures use old_timeval32 timestamps in the kernel
-> here, even rv32 and x32. As a rule, we keep the types bug-for-bug
-> compatible between architectures and fix them all at the same time.
-> 
-> Changing hcidump to SO_TIMESTAMPNS would work as well, but
-> that is a much bigger change and I don't know how to test that.
+On 01/10, Brian Gix wrote:
+> This allows one App using the mesh daemon to provision another.
 
-If so, maybe I'll just do that for libpcap.  Libpcap *does* have an API to request capturing with nanoseconds in tv_usec (and I plan to give it pcapng-flavored APIs to deliver higher-resolution time stamps, as well as metadata such as "incoming" vs. "outgoing", as well).
+This patch contains also some wording cosmetics and other PB-ADV fixes
+that don't seem related to the loopback mechanism.
+
+Could you please split this into a patchset?
+
+> +static void loop_adv(struct pb_adv_session *session, const uint8_t *data,
+> +								uint16_t len)
+> +{
+> +	struct idle_rx *rx = l_new(struct idle_rx, 1);
+> +
+> +	rx->session = session;
+> +	rx->len = len;
+> +	memcpy(rx->data, data, len);
+> +
+> +	l_idle_oneshot(idle_rx_adv, rx, NULL);
+> +}
+(...)
+> +	if (session->loop)
+> +		loop_adv(session->loop, buf, init_size + 10);
+> +	else
+> +		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 200,
+> +							buf, init_size + 10);
+
+This condition check is repeated throughout the code. I think it would
+be clearer to replace mesh_send_pkt usages with something like:
+
+static void pb_adv_send(struct pb_adv_session *session, uint8_t count,
+				uint16_t interval, void *data, uint16_t len)
+{
+	if (session->loop) {
+		struct idle_rx *rx = ...
+	} else {
+		mesh_send_pkt(count, interval, data, len);
+	}
+}
+
+-- 
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
