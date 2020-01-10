@@ -2,371 +2,189 @@ Return-Path: <SRS0=nFDS=27=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB00C282DD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 18:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DFBC33CA3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 20:49:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E69652080D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 18:14:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A646D2082E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 20:49:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728168AbgAJSOt (ORCPT
+        id S1726733AbgAJUtR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jan 2020 13:14:49 -0500
-Received: from mga05.intel.com ([192.55.52.43]:53647 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726789AbgAJSOt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jan 2020 13:14:49 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jan 2020 10:14:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,417,1571727600"; 
-   d="scan'208";a="371676320"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.252.139.61])
-  by orsmga004.jf.intel.com with ESMTP; 10 Jan 2020 10:14:47 -0800
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ] mesh: Implement provisioning loop-back
-Date:   Fri, 10 Jan 2020 10:14:37 -0800
-Message-Id: <20200110181437.31167-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.21.1
+        Fri, 10 Jan 2020 15:49:17 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:42631 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726716AbgAJUtR (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 Jan 2020 15:49:17 -0500
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1MDQNq-1j0R5F1Bvq-00AYsu; Fri, 10 Jan 2020 21:49:11 +0100
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Cc:     y2038 Mailman List <y2038@lists.linaro.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Deepa Dinamani <deepa.kernel@gmail.com>,
+        Rich Felker <dalias@libc.org>, Guy Harris <guy@alum.mit.edu>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] hcidump: add support for time64 based libc
+Date:   Fri, 10 Jan 2020 21:49:03 +0100
+Message-Id: <20200110204903.3495832-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:/h9Dsyrfgqwfb1d0gBYxKrEQQCWg4bujxtrnwT3k69wgG/HcyJx
+ SCNlCHyOmNHVBHKg3xWZ25yYNx47e894CdRU18dUGtPrjXLD4Q15+vteQxInyyvWPyBJgyN
+ aCQ0eJaA+ntnx4e1Fh7xNMXCsW8qaznzZhRo/UXItsEjj6nAxiv9mQlMSb+yFSuLSO+w8Xg
+ TX8IW9yAyj3AYQs0Cv/jQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lO4Yb3kycvY=:4X6ve/YIqvpcDzfPVG9/XO
+ odIxjDHkkryW+alKWrotg7ttLTtLADIupSTIcdzSKnWZsKOxFYPy9g3u26znY8/YsGhuDPxc5
+ Rubfx00oBVuQqsg37S4CnpzjN4ChtJJynBFCJYSm9W5WU0DWLG/Uvj+b5Hzt+LIlBr3FO3ATi
+ Cc1jX81Y5XO2jmCjAyunnQQ+/GlEgSSJEvwvyklwqEuC2FPq9SajuY627V49H3lNO2x5h1+ed
+ A0Lpp7IxH4WpS/x7bikIMDHx02O4HUvKm4IcZqlCjAdwa1slh1heFK6tMEEiqdpBnsHu/fYzU
+ lpdOIUpKelNLszvYsEh0BPfQ4FnPZY2qmgbeUOWHiyJu8qT7ibEYzfdi/ldRVCjYmabACFxkO
+ qS81I0W2cMiLLkCEFaa6+KWCKge9CklEDsqxdsEpXQPLl5gGuT6H6A2uffhqIXM/YyLN6vwcG
+ iMHiVjyefaOycd1QzyIdWpp+fFLohSd1KlyQWr0rIk81A1GVOGYcRYZgAlRfI/DyATZGbLS6w
+ soS/5V7VtOA07bKwpfbTXSuiQxAT+ldprDUcWijMRcfkZJriaxYGUwF2f6MO+LjUcnoDXGjfm
+ FrcRhtpKZ3WEgLQsxeJUf1vSbSAsGSgOyavYo6m69UlNesq5uo0AwWPaAQsJmhIdG/UqZwskn
+ utKPO+TLE/dUuOLvcxT5y5Nah8JNWSK39MObmSO+T+9mkf6/qB9Xo3YuqUYKVBhOHjbAO0XGd
+ 3WyoeftTCtXysaW+UMim6/tZy0v+In+NUp4MrKTVcY9Ll7GtS6aTsNvVVTR5SV7zpJhjdzulF
+ ucDpG4lje9l3vYB6Tgpvh7IZJLrT593zv+Q2Fg0bVwyuccBmV8mBkkHUSb7LJwDloYlPb1TnT
+ 7VwYHlKqKuPlVorb5QyA==
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This allows one App using the mesh daemon to provision another.
----
- mesh/pb-adv.c | 182 ++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 148 insertions(+), 34 deletions(-)
+musl is moving to a default of 64-bit time_t on all architectures,
+glibc will follow later. This breaks reading timestamps through cmsg
+data with the HCI_TIME_STAMP socket option.
 
-diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
-index c9a2a6574..4f32bf013 100644
---- a/mesh/pb-adv.c
-+++ b/mesh/pb-adv.c
-@@ -39,6 +39,7 @@ struct pb_adv_session {
- 	mesh_prov_receive_func_t rx_cb;
- 	mesh_prov_ack_func_t ack_cb;
- 	struct l_timeout *tx_timeout;
-+	struct pb_adv_session *loop;
- 	uint32_t link_id;
- 	uint16_t exp_len;
- 	uint8_t exp_fcs;
-@@ -93,10 +94,38 @@ struct pb_close_ind {
- 	uint8_t reason;
- } __packed;
+Change both copies of hcidump to work on all architectures.  This also
+fixes x32, which has never worked, and carefully avoids breaking sparc64,
+which is another special case.
+
+I have only compiled this on one architecture, please at least test
+it to ensure there are no regressions. The toolchain binaries from
+http://musl.cc/ should allow testing with a 64-bit time_t, but it may
+be hard to build all the dependencies first.
+
+libpcap has the same bug and needs a similar fix to work on future
+32-bit Linux systems. Everything else apparently uses the generic
+SO_TIMESTAMP timestamps, which work correctly when using new enough
+kernels with a time64 libc.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ monitor/hcidump.c | 32 +++++++++++++++++++++++++++++++-
+ tools/hcidump.c   | 33 +++++++++++++++++++++++++++++++--
+ 2 files changed, 62 insertions(+), 3 deletions(-)
+
+diff --git a/monitor/hcidump.c b/monitor/hcidump.c
+index 8b6f846d3..6d2330287 100644
+--- a/monitor/hcidump.c
++++ b/monitor/hcidump.c
+@@ -107,6 +107,36 @@ static int open_hci_dev(uint16_t index)
+ 	return fd;
+ }
  
--static struct pb_adv_session *pb_session = NULL;
-+struct idle_rx {
-+	struct pb_adv_session *session;
-+	uint16_t len;
-+	uint8_t data[PB_ADV_MTU + 6];
-+};
-+
-+static struct l_queue *pb_sessions = NULL;
- 
- static const uint8_t filter[1] = { MESH_AD_TYPE_PROVISION };
- 
-+static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len);
-+
-+static void idle_rx_adv(void *user_data)
++static struct timeval hci_tstamp_read(void *data)
 +{
-+	struct idle_rx *rx = user_data;
++	struct timeval tv;
 +
-+	pb_adv_packet(rx->session, rx->data, rx->len);
-+	l_free(rx);
-+}
-+
-+static void loop_adv(struct pb_adv_session *session, const uint8_t *data,
-+								uint16_t len)
-+{
-+	struct idle_rx *rx = l_new(struct idle_rx, 1);
-+
-+	rx->session = session;
-+	rx->len = len;
-+	memcpy(rx->data, data, len);
-+
-+	l_idle_oneshot(idle_rx_adv, rx, NULL);
-+}
-+
- static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
- 							uint16_t size)
- {
-@@ -135,7 +164,12 @@ static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
- 	l_debug("max_seg: %2.2x", max_seg);
- 	l_debug("size: %2.2x, CRC: %2.2x", size, buf[9]);
- 	/* print_packet("PB-TX", buf + 1, init_size + 9); */
--	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 200, buf, init_size + 10);
-+
-+	if (session->loop)
-+		loop_adv(session->loop, buf, init_size + 10);
-+	else
-+		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 200,
-+							buf, init_size + 10);
- 
- 	consumed = init_size;
- 
-@@ -152,19 +186,42 @@ static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
- 
- 		/* print_packet("PB-TX", buf + 1, seg_size + 6); */
- 
--		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 200,
-+		if (session->loop)
-+			loop_adv(session->loop, buf, seg_size + 7);
-+		else
-+			mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 200,
- 							buf, seg_size + 7);
- 
- 		consumed += seg_size;
- 	}
- }
- 
-+static bool session_match (const void *a, const void *b)
-+{
-+	return a == b;
-+}
-+
-+static bool uuid_match (const void *a, const void *b)
-+{
-+	const struct pb_adv_session *session = a;
-+	const uint8_t *uuid = b;
-+
-+	return !memcmp(session->uuid, uuid, sizeof(session->uuid));
-+}
-+
-+static bool user_match (const void *a, const void *b)
-+{
-+	const struct pb_adv_session *session = a;
-+
-+	return session->user_data == b;
-+}
-+
- static void tx_timeout(struct l_timeout *timeout, void *user_data)
- {
- 	struct pb_adv_session *session = user_data;
- 	mesh_prov_close_func_t cb;
- 
--	if (!session || pb_session != session)
-+	if (!l_queue_find(pb_sessions, session_match, session))
- 		return;
- 
- 	l_timeout_remove(session->tx_timeout);
-@@ -172,9 +229,9 @@ static void tx_timeout(struct l_timeout *timeout, void *user_data)
- 
- 	mesh_send_cancel(filter, sizeof(filter));
- 
--	l_info("TX timeout");
--	cb = pb_session->close_cb;
--	user_data = pb_session->user_data;
-+	l_info("PB-ADV: TX timeout");
-+	cb = session->close_cb;
-+	user_data = session->user_data;
- 	cb(user_data, 1);
- }
- 
-@@ -182,7 +239,7 @@ static void pb_adv_tx(void *user_data, void *data, uint16_t len)
- {
- 	struct pb_adv_session *session = user_data;
- 
--	if (!session || pb_session != session)
-+	if (!l_queue_find(pb_sessions, session_match, session))
- 		return;
- 
- 	l_timeout_remove(session->tx_timeout);
-@@ -201,7 +258,12 @@ static void send_open_req(struct pb_adv_session *session)
- 	memcpy(open_req.uuid, session->uuid, 16);
- 
- 	mesh_send_cancel(filter, sizeof(filter));
--	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_req,
-+
-+	if (session->loop)
-+		loop_adv(session->loop, (uint8_t *) &open_req,
-+							sizeof(open_req));
-+	else
-+		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_req,
- 							sizeof(open_req));
- }
- 
-@@ -214,7 +276,12 @@ static void send_open_cfm(struct pb_adv_session *session)
- 	open_cfm.opcode = PB_ADV_OPEN_CFM;
- 
- 	mesh_send_cancel(filter, sizeof(filter));
--	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_cfm,
-+
-+	if (session->loop)
-+		loop_adv(session->loop, (uint8_t *) &open_cfm,
-+							sizeof(open_cfm));
-+	else
-+		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_cfm,
- 							sizeof(open_cfm));
- }
- 
-@@ -222,18 +289,24 @@ static void send_ack(struct pb_adv_session *session, uint8_t trans_num)
- {
- 	struct pb_ack ack = { MESH_AD_TYPE_PROVISION };
- 
-+	if (!l_queue_find(pb_sessions, session_match, session))
-+		return;
-+
- 	l_put_be32(session->link_id, &ack.link_id);
- 	ack.trans_num = trans_num;
- 	ack.opcode = PB_ADV_ACK;
- 
--	mesh_send_pkt(1, 100, &ack, sizeof(ack));
-+	if (session->loop)
-+		loop_adv(session->loop, (uint8_t *) &ack, sizeof(ack));
-+	else
-+		mesh_send_pkt(1, 100, &ack, sizeof(ack));
- }
- 
- static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
- {
- 	struct pb_close_ind close_ind = { MESH_AD_TYPE_PROVISION };
- 
--	if (!pb_session || pb_session != session)
-+	if (!l_queue_find(pb_sessions, session_match, session))
- 		return;
- 
- 	l_put_be32(session->link_id, &close_ind.link_id);
-@@ -242,7 +315,12 @@ static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
- 	close_ind.reason = reason;
- 
- 	mesh_send_cancel(filter, sizeof(filter));
--	mesh_send_pkt(10, 100, &close_ind, sizeof(close_ind));
-+
-+	if (session->loop)
-+		loop_adv(session->loop, (uint8_t *) &close_ind,
-+							sizeof(close_ind));
-+	else
-+		mesh_send_pkt(10, 100, &close_ind, sizeof(close_ind));
- }
- 
- static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
-@@ -254,7 +332,7 @@ static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
- 	uint8_t type;
- 	bool first;
- 
--	if (!pb_session || pb_session != session)
-+	if (!l_queue_find(pb_sessions, session_match, session))
- 		return;
- 
- 	link_id = l_get_be32(pkt + 1);
-@@ -331,14 +409,15 @@ static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
- 
- 	case PB_ADV_CLOSE:
- 		l_timeout_remove(session->tx_timeout);
-+		session->tx_timeout = NULL;
- 		l_debug("Link closed notification: %2.2x", pkt[0]);
- 		/* Wrap callback for pre-cleaning */
- 		if (true) {
- 			mesh_prov_close_func_t cb = session->close_cb;
- 			void *user_data = session->user_data;
- 
-+			l_queue_remove(pb_sessions, session);
- 			l_free(session);
--			pb_session = NULL;
- 			cb(user_data, pkt[0]);
- 		}
- 		break;
-@@ -442,37 +521,72 @@ bool pb_adv_reg(bool initiator, mesh_prov_open_func_t open_cb,
- 		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
- 		uint8_t uuid[16], void *user_data)
- {
--	if (pb_session)
-+	struct pb_adv_session *session, *old_session;
-+
-+	if (!pb_sessions)
-+		pb_sessions = l_queue_new();
-+
-+	old_session = l_queue_find(pb_sessions, uuid_match, uuid);
-+
-+	/* Reject 2nd session if not looping back */
-+	if (l_queue_length(pb_sessions) && !old_session)
- 		return false;
- 
--	pb_session = l_new(struct pb_adv_session, 1);
--	pb_session->open_cb = open_cb;
--	pb_session->close_cb = close_cb;
--	pb_session->rx_cb = rx_cb;
--	pb_session->ack_cb = ack_cb;
--	pb_session->user_data = user_data;
--	pb_session->initiator = initiator;
--	memcpy(pb_session->uuid, uuid, 16);
-+	/* Reject looping to more than one session or with same role*/
-+	if (old_session && old_session->loop &&
-+					old_session->initiator == initiator)
-+		return false;
-+
-+	session = l_new(struct pb_adv_session, 1);
-+	session->open_cb = open_cb;
-+	session->close_cb = close_cb;
-+	session->rx_cb = rx_cb;
-+	session->ack_cb = ack_cb;
-+	session->user_data = user_data;
-+	session->initiator = initiator;
-+	memcpy(session->uuid, uuid, 16);
- 
--	mesh_reg_prov_rx(pb_adv_packet, pb_session);
-+	l_queue_push_head(pb_sessions, session);
- 
- 	if (initiator) {
--		l_getrandom(&pb_session->link_id, sizeof(pb_session->link_id));
--		pb_session->tx_timeout = l_timeout_create(60, tx_timeout,
--							pb_session, NULL);
--		send_open_req(pb_session);
-+		l_getrandom(&session->link_id, sizeof(session->link_id));
-+		session->tx_timeout = l_timeout_create(60, tx_timeout,
-+							session, NULL);
++	/*
++	 * On 64-bit architectures, the data matches the timeval
++	 * format. Note that on sparc64 this is different from
++	 * all others.
++	 */
++	if (sizeof(long) == 8) {
++		memcpy(&tv, data, sizeof(tv));
 +	}
 +
-+	/* Setup Loop-back if complementary session with same UUID */
-+	if (old_session) {
-+		session->loop = old_session;
-+		old_session->loop = session;
-+		mesh_unreg_prov_rx(pb_adv_packet);
++	/*
++	 * On 32-bit architectures, the timeval definition may
++	 * use 32-bit or 64-bit members depending on the C
++	 * library and architecture.
++	 * The cmsg data however always contains a pair of
++	 * 32-bit values. Interpret as unsigned to make it work
++	 * past y2038.
++	 */
++	if (sizeof(long) == 4) {
++		unsigned int *stamp = data;
++		tv.tv_sec = stamp[0];
++		tv.tv_usec = stamp[1];
++	}
 +
-+		if (initiator)
-+			send_open_req(session);
-+		else
-+			send_open_req(old_session);
++	return tv;
++}
 +
-+		return true;
- 	}
- 
-+	mesh_reg_prov_rx(pb_adv_packet, session);
-+
-+	if (initiator)
-+		send_open_req(session);
-+
- 	return true;
- }
- 
- void pb_adv_unreg(void *user_data)
+ static void device_callback(int fd, uint32_t events, void *user_data)
  {
--	if (!pb_session || pb_session->user_data != user_data)
-+	struct pb_adv_session *session = l_queue_find(pb_sessions,
-+						user_match, user_data);
-+
-+	if (!session)
- 		return;
- 
--	l_timeout_remove(pb_session->tx_timeout);
--	send_close_ind(pb_session, 0);
--	l_free(pb_session);
--	pb_session = NULL;
-+	l_timeout_remove(session->tx_timeout);
-+	session->tx_timeout = NULL;
-+	send_close_ind(session, 0);
-+	l_queue_remove(pb_sessions, session);
-+	l_free(session);
+ 	struct hcidump_data *data = user_data;
+@@ -150,7 +180,7 @@ static void device_callback(int fd, uint32_t events, void *user_data)
+ 				memcpy(&dir, CMSG_DATA(cmsg), sizeof(dir));
+ 				break;
+ 			case HCI_CMSG_TSTAMP:
+-				memcpy(&ctv, CMSG_DATA(cmsg), sizeof(ctv));
++				ctv = hci_tstamp_read(CMSG_DATA(cmsg));
+ 				tv = &ctv;
+ 				break;
+ 			}
+diff --git a/tools/hcidump.c b/tools/hcidump.c
+index 33d429b6c..be14d0930 100644
+--- a/tools/hcidump.c
++++ b/tools/hcidump.c
+@@ -136,6 +136,36 @@ static inline int write_n(int fd, char *buf, int len)
+ 	return t;
  }
+ 
++static struct timeval hci_tstamp_read(void *data)
++{
++	struct timeval tv;
++
++	/*
++	 * On 64-bit architectures, the data matches the timeval
++	 * format. Note that on sparc64 this is different from
++	 * all others.
++	 */
++	if (sizeof(long) == 8) {
++		memcpy(&tv, data, sizeof(tv));
++	}
++
++	/*
++	 * On 32-bit architectures, the timeval definition may
++	 * use 32-bit or 64-bit members depending on the C
++	 * library and architecture.
++	 * The cmsg data however always contains a pair of
++	 * 32-bit values. Interpret as unsigned to make it work
++	 * past y2038.
++	 */
++	if (sizeof(long) == 4) {
++		unsigned int *stamp = data;
++		tv.tv_sec = stamp[0];
++		tv.tv_usec = stamp[1];
++	}
++
++	return tv;
++}
++
+ static int process_frames(int dev, int sock, int fd, unsigned long flags)
+ {
+ 	struct cmsghdr *cmsg;
+@@ -230,8 +260,7 @@ static int process_frames(int dev, int sock, int fd, unsigned long flags)
+ 				frm.in = (uint8_t) dir;
+ 				break;
+ 			case HCI_CMSG_TSTAMP:
+-				memcpy(&frm.ts, CMSG_DATA(cmsg),
+-						sizeof(struct timeval));
++				frm.ts = hci_tstamp_read(CMSG_DATA(cmsg));
+ 				break;
+ 			}
+ 			cmsg = CMSG_NXTHDR(&msg, cmsg);
 -- 
-2.21.1
+2.20.0
 
