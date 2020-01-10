@@ -6,37 +6,35 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E97A1C33CA1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 01:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 455CDC32771
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 01:53:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C09702072E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 01:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1190B20678
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jan 2020 01:53:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730643AbgAJBls (ORCPT
+        id S1730601AbgAJBxV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jan 2020 20:41:48 -0500
-Received: from mga01.intel.com ([192.55.52.88]:58409 "EHLO mga01.intel.com"
+        Thu, 9 Jan 2020 20:53:21 -0500
+Received: from mga04.intel.com ([192.55.52.120]:13798 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730629AbgAJBls (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jan 2020 20:41:48 -0500
+        id S1730359AbgAJBxV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 9 Jan 2020 20:53:21 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 17:41:47 -0800
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jan 2020 17:53:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,414,1571727600"; 
-   d="scan'208";a="236689170"
+   d="scan'208";a="229621287"
 Received: from ingas-nuc1.sea.intel.com ([10.254.104.252])
-  by orsmga002.jf.intel.com with ESMTP; 09 Jan 2020 17:41:47 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 09 Jan 2020 17:53:21 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 2/2] mesh: Fix wholesale deletion of appkeys bound to a netkey
-Date:   Thu,  9 Jan 2020 17:41:45 -0800
-Message-Id: <20200110014145.1785-3-inga.stotland@intel.com>
+Subject: [PATCH BlueZ] tools/mesh: Remove node's appkeys when deleting a netkey
+Date:   Thu,  9 Jan 2020 17:53:20 -0800
+Message-Id: <20200110015320.2160-1-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200110014145.1785-1-inga.stotland@intel.com>
-References: <20200110014145.1785-1-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -44,68 +42,74 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When a netkey is deleted all the appkeys bound to this key has
-to be deleted as well. This fixes app_key queue manipulation to
-avoid issues caused by modifying the queue while iterating over it:
-instead of iteration over all the entries, find a first bound key,
-delete it, find next... and so on, until there are no bound keys
-left in the app_keys queue.
+When a netkey is deleted from a remote node, all the appkeys bound
+to this netkey are expected to be deleted as well.
+This fixes app_key queue manipulation to avoid issues caused by modifying
+the queue while iterating over it: instead of iteration over all the
+entries, find a first bound key, delete it, find next... and so on,
+until there are no bound keys left in the app_keys queue.
 ---
- mesh/appkey.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ tools/mesh/remote.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
-diff --git a/mesh/appkey.c b/mesh/appkey.c
-index 3a1fd8a54..0eb268782 100644
---- a/mesh/appkey.c
-+++ b/mesh/appkey.c
-@@ -58,6 +58,14 @@ static bool match_key_index(const void *a, const void *b)
- 	return key->app_idx == idx;
+diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
+index 25e8d23f8..533d59b28 100644
+--- a/tools/mesh/remote.c
++++ b/tools/mesh/remote.c
+@@ -2,7 +2,7 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+- *  Copyright (C) 2019  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2019-2020  Intel Corporation. All rights reserved.
+  *
+  *
+  *  This library is free software; you can redistribute it and/or
+@@ -81,6 +81,14 @@ static bool match_node_addr(const void *a, const void *b)
+ 	return false;
  }
  
 +static bool match_bound_key(const void *a, const void *b)
 +{
-+	const struct mesh_app_key *key = a;
-+	uint16_t idx = L_PTR_TO_UINT(b);
++	uint16_t app_idx = L_PTR_TO_UINT(a);
++	uint16_t net_idx = L_PTR_TO_UINT(b);
 +
-+	return key->net_idx == idx;
++	return (net_idx == keys_get_bound_key(app_idx));
 +}
 +
- static bool match_replay_cache(const void *a, const void *b)
+ bool remote_add_node(const uint8_t uuid[16], uint16_t unicast,
+ 					uint8_t ele_cnt, uint16_t net_idx)
  {
- 	const struct mesh_msg *msg = a;
-@@ -434,19 +442,27 @@ int appkey_key_delete(struct mesh_net *net, uint16_t net_idx,
- 
- void appkey_delete_bound_keys(struct mesh_net *net, uint16_t net_idx)
+@@ -123,7 +131,7 @@ bool remote_add_net_key(uint16_t addr, uint16_t net_idx)
+ bool remote_del_net_key(uint16_t addr, uint16_t net_idx)
  {
--	const struct l_queue_entry *entry;
- 	struct l_queue *app_keys;
-+	struct mesh_node *node;
-+	struct mesh_app_key *key;
+ 	struct remote_node *rmt;
+-	const struct l_queue_entry *l;
++	void *data;
  
- 	app_keys = mesh_net_get_app_keys(net);
- 	if (!app_keys)
- 		return;
+ 	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(addr));
+ 	if (!rmt)
+@@ -132,13 +140,14 @@ bool remote_del_net_key(uint16_t addr, uint16_t net_idx)
+ 	if (!l_queue_remove(rmt->net_keys, L_UINT_TO_PTR(net_idx)))
+ 		return false;
  
--	entry = l_queue_get_entries(app_keys);
-+	node = mesh_net_node_get(net);
+-	for (l = l_queue_get_entries(rmt->app_keys); l; l = l->next) {
+-		uint16_t app_idx = (uint16_t) L_PTR_TO_UINT(l->data);
++	data = l_queue_remove_if(rmt->app_keys, match_bound_key,
++						L_UINT_TO_PTR(net_idx));
++	while (data) {
++		uint16_t app_idx = (uint16_t) L_PTR_TO_UINT(data);
  
--	for (; entry; entry = entry->next) {
--		struct mesh_app_key *key = entry->data;
-+	key = l_queue_remove_if(app_keys, match_bound_key,
-+					L_UINT_TO_PTR(net_idx));
-+
-+	while (key) {
-+		node_app_key_delete(node, net_idx, key->app_idx);
-+		mesh_config_app_key_del(node_config_get(node), net_idx,
-+								key->app_idx);
-+		appkey_key_free(key);
- 
--		appkey_key_delete(net, net_idx, key->app_idx);
-+		key = l_queue_remove_if(app_keys, match_bound_key,
-+					L_UINT_TO_PTR(net_idx));
+-		if (net_idx == keys_get_bound_key(app_idx)) {
+-			l_queue_remove(rmt->app_keys, L_UINT_TO_PTR(app_idx));
+-			mesh_db_node_app_key_del(rmt->unicast, app_idx);
+-		}
++		mesh_db_node_app_key_del(rmt->unicast, app_idx);
++		data = l_queue_remove_if(rmt->app_keys, match_bound_key,
++						L_UINT_TO_PTR(net_idx));
  	}
- }
  
+ 	return true;
 -- 
 2.21.1
 
