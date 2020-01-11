@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D426FC33CA3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 02:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A19CC33CA4
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 02:22:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ABF442072E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 02:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70A6A2072E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 02:22:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvtWtnpU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3ezFXBH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728109AbgAKCW3 (ORCPT
+        id S1728113AbgAKCWa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jan 2020 21:22:29 -0500
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:35592 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728103AbgAKCW2 (ORCPT
+        Fri, 10 Jan 2020 21:22:30 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33649 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728111AbgAKCW3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jan 2020 21:22:28 -0500
-Received: by mail-pj1-f68.google.com with SMTP id s7so1781092pjc.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 18:22:28 -0800 (PST)
+        Fri, 10 Jan 2020 21:22:29 -0500
+Received: by mail-pl1-f193.google.com with SMTP id ay11so1557780plb.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 18:22:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=YFd0JhZ0fswhsnoF6yQcdQAaq0by6LcXYedQoF+YTDc=;
-        b=lvtWtnpUIrNq0Yk68iLqGyMXTXYovbxw7Hr/x9UeQGRgkk+vTg0BWYd7WeWl0M+ZD/
-         xDW/yHpdQJEFhqYqJg6HZdalbq/4QTDgmDF3ltuGZT6wLAcu+zhkljESQjfVGWcsaV4i
-         smde5WMwURBpgH+XT6KIoPHoM0n4DHmnJcqCpvggh+cRzFLJoD9f646JtL9HI0ye6IuO
-         7f7pg5voYacjw4BNVCZ+bCw1Y2Q8uIhJhAKz5o00wtA5qbIwXTz8wByzI659RpXgT8E0
-         IYtrkNNR1WaX15mAKTWKb6/PkY0woUuC6T+EEraSyIfkebFONX4J+O6fwWqTeexmRXkN
-         9bOA==
+        bh=kLolv4TG5ez8jdcGtGB/+5OOu7TJYRnRQOtGX9bYVpg=;
+        b=S3ezFXBHtQq7NqfO9JD+ujiyRxsjGTwrBRKtM0H/TTy8e/98uYKb6EGAr9NFi4BTyy
+         okJxzJqZNKHQgnpWivsscMzyyAYQtt71KU2I8UbCva/NSqC6NL2mIrzflzb7K2dkrQZt
+         nfAF5hANuRje+D1YIsuFGJ6RQRID00azl5lNPTno7dU/I0TUnJC1vdjq72IlEZuMEAal
+         FMeb4PiBZr981QxO/sOshJJgrayzxaZG9z7Q8cuWt9LrzvuQxPQ4uhcbdo0uyqiFDWxp
+         yMqFnAsKyMY2NUOuDhKDHaCGuIPvU7LhGw8FDjeyj9GXR44/C6f4tOltvsOkQW6vQm28
+         YP8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=YFd0JhZ0fswhsnoF6yQcdQAaq0by6LcXYedQoF+YTDc=;
-        b=fDE7Q8vLsB+743RptAVoDrh3sMp58ixo03VYbKZA1q/PbjEfD3THkrZCSMvRvKgzlg
-         EfRfaFkrrHcSpLHNCGj2Dy749oUSrcyVi1cNk4V7nrlhRhgb4ulrJJDKYG6u9Sg5e/oq
-         W1D/AfvB+C4ZPawahA4ixw6Pt8Jjluo9XpLgJp8A3Q8qB5S95yKNgp6lBjCjSRc0lCcg
-         Dd0hudCOekjtYR7i/72rTFWWD+VIF4JgydVH2I/1rz1vKLvDGJqFivNwA2YaAqyDefBb
-         /jGWja46yUPk1Zrk+ukX4xi88cru8H9+7O/3RpXTicCdEPA7sapvQO8wTAqf5HE+mIvt
-         qYDg==
-X-Gm-Message-State: APjAAAVf7IcmOJlH1IMGLSAUQ90kliXmCOU10tx153iIkzieXIOtwjBq
-        3l++s1xi3d4uRdlSDrwwV71ZFu115Fg=
-X-Google-Smtp-Source: APXvYqz+bHAB6rAE7OGdl7Bpie4NSNgWgJOTrWF176Llc5Yd3iA9q1Z2CBfHYZ6O5riGvtnWUoRllQ==
-X-Received: by 2002:a17:902:b709:: with SMTP id d9mr2019599pls.235.1578709347477;
-        Fri, 10 Jan 2020 18:22:27 -0800 (PST)
+        bh=kLolv4TG5ez8jdcGtGB/+5OOu7TJYRnRQOtGX9bYVpg=;
+        b=aFCNVEDeh+5EdhFnTMtG84hIpxtEeA3phUsxtsTD3JHb2LpyW1OssOWkhf+F22y9pu
+         t44zZisb4R3BHZy+dWK6C/NcPEMpf/x353iU7at9U6edJpkilx5ou6xd+Ps76cr+5zZW
+         M8+/o+QMAmMSKRSll68tCUprlu2IHwxPcAD0B+uSYRAiYzOO0YdPcf42X/5+z1EkYxcb
+         baou+5GGfYGkgYc2YI+o/EU/vesgumuFORrxjQtMcZHXGXk35hmSE/lV7zHgDlyBFUG9
+         oSjHg55AoIkF0+KFCd4RQbp2dltBfbwF6iLzflX3ztoTs5WFKSlATQVnVcFBBt1pBKr6
+         em8A==
+X-Gm-Message-State: APjAAAXIWYyk/O1pd24rCfACEX4XiRVgp0wvn0BUhE5CXstyGvFRF/aG
+        6NC0uqrmjt6F5y5vWhGaiId9xl8tWlE=
+X-Google-Smtp-Source: APXvYqwiWKIjmBDa1dK0aDTsdVysWEFDfqTdpKtX6GQAAWPHO6Du7n60brWbbz/f8wil6h14O8VLXQ==
+X-Received: by 2002:a17:90b:941:: with SMTP id dw1mr8825953pjb.21.1578709348547;
+        Fri, 10 Jan 2020 18:22:28 -0800 (PST)
 Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id g22sm4158906pgk.85.2020.01.10.18.22.26
+        by smtp.gmail.com with ESMTPSA id g22sm4158906pgk.85.2020.01.10.18.22.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2020 18:22:26 -0800 (PST)
+        Fri, 10 Jan 2020 18:22:27 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 08/10] Bluetooth: hci_h4: Add support for ISO packets
-Date:   Fri, 10 Jan 2020 18:22:14 -0800
-Message-Id: <20200111022216.30842-9-luiz.dentz@gmail.com>
+Subject: [PATCH v2 09/10] Bluetooth: btusb: Add support for ISO packets
+Date:   Fri, 10 Jan 2020 18:22:15 -0800
+Message-Id: <20200111022216.30842-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200111022216.30842-1-luiz.dentz@gmail.com>
 References: <20200111022216.30842-1-luiz.dentz@gmail.com>
@@ -75,44 +75,45 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enabled H4 driver to properly handle ISO packets.
+This enabled btusb driver to properly transmit ISO packets.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/hci_h4.c   | 1 +
- drivers/bluetooth/hci_uart.h | 7 +++++++
- 2 files changed, 8 insertions(+)
+ drivers/bluetooth/btusb.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index 19ba52005009..6dc1fbeb564b 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -103,6 +103,7 @@ static const struct h4_recv_pkt h4_recv_pkts[] = {
- 	{ H4_RECV_ACL,   .recv = hci_recv_frame },
- 	{ H4_RECV_SCO,   .recv = hci_recv_frame },
- 	{ H4_RECV_EVENT, .recv = hci_recv_frame },
-+	{ H4_RECV_ISO,   .recv = hci_recv_frame },
- };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f5924f3e8b8d..ded0ba83bcce 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1463,6 +1463,13 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
  
- /* Recv data */
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 6ab631101019..4e039d7a16f8 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -143,6 +143,13 @@ struct h4_recv_pkt {
- 	.lsize = 1, \
- 	.maxlen = HCI_MAX_EVENT_SIZE
- 
-+#define H4_RECV_ISO \
-+	.type = HCI_ISODATA_PKT, \
-+	.hlen = HCI_ISO_HDR_SIZE, \
-+	.loff = 2, \
-+	.lsize = 2, \
-+	.maxlen = HCI_MAX_FRAME_SIZE \
+ 		hdev->stat.sco_tx++;
+ 		return submit_tx_urb(hdev, urb);
 +
- struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
- 			    const unsigned char *buffer, int count,
- 			    const struct h4_recv_pkt *pkts, int pkts_count);
++	case HCI_ISODATA_PKT:
++		urb = alloc_bulk_urb(hdev, skb);
++		if (IS_ERR(urb))
++			return PTR_ERR(urb);
++
++		return submit_or_queue_tx_urb(hdev, urb);
+ 	}
+ 
+ 	return -EILSEQ;
+@@ -2123,6 +2130,13 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 		hdev->stat.sco_tx++;
+ 		return submit_tx_urb(hdev, urb);
++
++	case HCI_ISODATA_PKT:
++		urb = alloc_bulk_urb(hdev, skb);
++		if (IS_ERR(urb))
++			return PTR_ERR(urb);
++
++		return submit_or_queue_tx_urb(hdev, urb);
+ 	}
+ 
+ 	return -EILSEQ;
 -- 
 2.21.0
 
