@@ -2,395 +2,94 @@ Return-Path: <SRS0=d6qz=3A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A6DC33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 06:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0BDAC33C9E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 07:19:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2DBEC206ED
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 06:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4499206DA
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 07:19:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="bjb4ih+U"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="Vf6/1Lgo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728361AbgAKGea (ORCPT
+        id S1728519AbgAKHTV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Jan 2020 01:34:30 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:34514 "EHLO
+        Sat, 11 Jan 2020 02:19:21 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:33245 "EHLO
         mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726262AbgAKGea (ORCPT
+        with ESMTP id S1728507AbgAKHTU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Jan 2020 01:34:30 -0500
-Received: by mail-lf1-f66.google.com with SMTP id l18so3163429lfc.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 22:34:29 -0800 (PST)
+        Sat, 11 Jan 2020 02:19:20 -0500
+Received: by mail-lf1-f66.google.com with SMTP id n25so3209793lfl.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jan 2020 23:19:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+        h=date:from:to:subject:message-id:mail-followup-to:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=DVdPHFnDG09zejtJyU6XFKmlOqodtiXhG8v6cwJVfds=;
-        b=bjb4ih+UbzHgKOhGik3mPH3/O3kz8gya1pVitKuiImAs7DKNqJjqPTDcIJCEvsMrB5
-         Zw1OCK3Gr/6UcnAjSH4ysFH69kqbKXUsGJLMxyfCkfOrCY1HkY6v2TTU/VUp3mXYX/v7
-         DrPLpNhlvxEf2xKTi8XwlV0CP0OKiDJ5okcKYNz1CL0E7u7gilRmdf3I8+A8Uivp09UD
-         uEymfHiQDMP2GOKjhC8pteevNl0wulfkBorBiFEpXhRLYOkDX59/HFTT1HJYrui+xdjp
-         wgLW2yijYiZkcQtgJr/opOdcu/04cShHlZqiU/hfl/5EUqIDcACa1OCa6VUq9J0woRvS
-         /Mug==
+        bh=fa2M5eeaQafc5g38hJFJUuo5DPxJiu2kaUWeTZWQbCc=;
+        b=Vf6/1Lgoswl7L000nIBeKoQhAqTiYuKWIK7I2SUAUpaTaWq8ZNtOOxt9q6Y8mpcGHx
+         N6bgmseB/mpnKwx1yGGVPgogYAN8iEIz97pMhCyjyio6hQaX3PobKPX2YBuq08UqDV7K
+         2IkMRqAg9XDjKqtwr8QPPgK2+u9rY5XLbAIu3DHXATRvbplD8ORm+wQJhRMfdN1rdyDJ
+         34aO23v0HznBjz7eaZClOhzmCSHesEa8E4gspa3RbpMoKUp26Um3uDMq2bPEC2XMnmVi
+         X5X07LYfhMtJzz/lhc9FkyMa9d/3tqV9TFn0UAC835Hz+2xJiscH8d+k+8UCBg+E0qU/
+         8Abg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
+        h=x-gm-message-state:date:from:to:subject:message-id:mail-followup-to
+         :references:mime-version:content-disposition
          :content-transfer-encoding:in-reply-to:user-agent;
-        bh=DVdPHFnDG09zejtJyU6XFKmlOqodtiXhG8v6cwJVfds=;
-        b=C+UPf7i5w+K+i9ySWm0NdrgxcJ0c3vA4fZl0562zx8TTtrbToYAr9BOP2hx5C5AJBs
-         7q2hv9rc6pmr7yvtf+J5hRqoPveExuTwBbKtfOYBXXLpSeoWt3qNXvpvxuZpEEQ+DWWf
-         UXb0DU/c2FqgfmSttmCqs1kpHn9p1FJlovY3jDTmomfyZ59D9DtlrPQqI61VQOHuYNNo
-         thvyhug542Sn4AuPobxqHnt7WzY3ykE50IDsPORlvkkh8I7RMymEb2rCPLTXfyNcurWd
-         ap+G1v95KdsVZrX3la2lBed19T+LdHqExBUA26DqwnrtiGUaFkL+DAMk/jMapWp/TLOl
-         K0Pw==
-X-Gm-Message-State: APjAAAViXPyDgiNPXG5OAdJW3t9BLBqVSrHBMvGPoWowIOb7U3cdz0U0
-        r8yTvaOSRUPrR4NhxO+CbjT1gg==
-X-Google-Smtp-Source: APXvYqyqIbG7am2bTdutcjqaI2ZlHXQvHy4YW/x5XhEdKfi9ntnTLIAfr53g+e416ytA+mXVTWy1yg==
-X-Received: by 2002:a19:4f46:: with SMTP id a6mr4611465lfk.143.1578724468147;
-        Fri, 10 Jan 2020 22:34:28 -0800 (PST)
+        bh=fa2M5eeaQafc5g38hJFJUuo5DPxJiu2kaUWeTZWQbCc=;
+        b=nC0wpZaMYs+xKBehioUhaLlJLg+JvdkU958YaXZYH/r16UgSzmaDERockhyFJodQxw
+         1vLytBFBrQl8qiEJzVOxRFixPaAg6RiUnnXrlmkoOWEcWK9wRFaL/PTvzKRb0JpCaMPm
+         oxoSOEK7sFnsyp0ZdgusQg3Ooo7EZRK6DgqVS0nWDZ2LWhrmU7GlgwdZ0Bcple6MFwTB
+         +bK57OVQkbBJkI9ncLeGQ4eOgq/S8OJXuJJNx+2sM+1ZdSOmlPOH+9TwRZeUqoMTzPEc
+         gpHg87kytlKhhHMi7b32jKNyCn7POE0NLeY6eLDfo4ftVO+JYVUGQhoQJVqqQYS48GX/
+         EkCg==
+X-Gm-Message-State: APjAAAVo1byymr1SrAwLu7Opqomgk7bw8RxIovKDZgIA7i2HLmIga/Z9
+        w7hFM/gRBa4NI+4+Vzf+MHd2RQ==
+X-Google-Smtp-Source: APXvYqy0Ikm4w0qaMVKECzat7OKPLAvA3G3bSiGW8iTl58jgEe4tHuNGTlPPPajac0tURCQYga/IrA==
+X-Received: by 2002:ac2:5147:: with SMTP id q7mr4772040lfd.87.1578727158850;
+        Fri, 10 Jan 2020 23:19:18 -0800 (PST)
 Received: from kynes (apn-37-7-124-67.dynamic.gprs.plus.pl. [37.7.124.67])
-        by smtp.gmail.com with ESMTPSA id z11sm2021225ljc.97.2020.01.10.22.34.26
+        by smtp.gmail.com with ESMTPSA id l28sm2175139lfk.21.2020.01.10.23.19.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2020 22:34:27 -0800 (PST)
-Date:   Sat, 11 Jan 2020 07:34:25 +0100
+        Fri, 10 Jan 2020 23:19:18 -0800 (PST)
+Date:   Sat, 11 Jan 2020 08:19:16 +0100
 From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
         <michal.lowas-rzechonek@silvair.com>
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+To:     Brian Gix <brian.gix@intel.com>, linux-bluetooth@vger.kernel.org,
+        inga.stotland@intel.com
 Subject: Re: [PATCH BlueZ v3 1/1] mesh: Implement provisioning loop-back
-Message-ID: <20200111063425.5sn6mvrlu3rkx3ka@kynes>
+Message-ID: <20200111071916.7skwicdkdwpngfja@kynes>
 Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
         linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
 References: <20200111013856.32675-1-brian.gix@intel.com>
  <20200111013856.32675-2-brian.gix@intel.com>
+ <20200111063425.5sn6mvrlu3rkx3ka@kynes>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200111013856.32675-2-brian.gix@intel.com>
+In-Reply-To: <20200111063425.5sn6mvrlu3rkx3ka@kynes>
 User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
-
-On 01/10, Brian Gix wrote:
-> This allows one App using the mesh daemon to provision another.
-> ---
->  mesh/pb-adv.c | 163 ++++++++++++++++++++++++++++++++++++++++----------
->  1 file changed, 130 insertions(+), 33 deletions(-)
+On 01/11, Michał Lowas-Rzechonek wrote:
+> > @@ -93,10 +94,43 @@ struct pb_close_ind {
+> >  	uint8_t reason;
+> >  } __packed;
 > 
-> diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
-> index c9a2a6574..4767908f3 100644
-> --- a/mesh/pb-adv.c
-> +++ b/mesh/pb-adv.c
-> @@ -39,6 +39,7 @@ struct pb_adv_session {
->  	mesh_prov_receive_func_t rx_cb;
->  	mesh_prov_ack_func_t ack_cb;
->  	struct l_timeout *tx_timeout;
-> +	struct pb_adv_session *loop;
->  	uint32_t link_id;
->  	uint16_t exp_len;
->  	uint8_t exp_fcs;
-> @@ -93,10 +94,43 @@ struct pb_close_ind {
->  	uint8_t reason;
->  } __packed;
+> By the way, why is this struct packed?
 
-By the way, why is this struct packed?
+... because it's a packet.
 
->  
-> -static struct pb_adv_session *pb_session = NULL;
-> +struct idle_rx {
-> +	struct pb_adv_session *session;
-> +	uint16_t len;
-> +	uint8_t data[PB_ADV_MTU + 6];
-> +};
-> +
-> +static struct l_queue *pb_sessions = NULL;
->  
->  static const uint8_t filter[1] = { MESH_AD_TYPE_PROVISION };
->  
-> +static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len);
-> +
-> +static void idle_rx_adv(void *user_data)
-> +{
-> +	struct idle_rx *rx = user_data;
-> +
-> +	pb_adv_packet(rx->session, rx->data, rx->len);
-> +	l_free(rx);
-> +}
-> +
-> +static void pb_adv_send(struct pb_adv_session *session,
-> +					uint8_t count, uint16_t interval,
-> +					void *data, uint16_t len)
-> +{
-> +	struct idle_rx *rx = l_new(struct idle_rx, 1);
-
-This leaks memory.
-
-> +
-> +	if (session->loop) {
-> +		rx = l_new(struct idle_rx, 1);
-> +		rx->session = session->loop;
-> +		rx->len = len;
-> +		memcpy(rx->data, data, len);
-> +
-> +		l_idle_oneshot(idle_rx_adv, rx, NULL);
-> +	} else
-> +		mesh_send_pkt(count, interval, data, len);
-> +}
-> +
->  static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
->  							uint16_t size)
->  {
-> @@ -135,7 +169,9 @@ static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
->  	l_debug("max_seg: %2.2x", max_seg);
->  	l_debug("size: %2.2x, CRC: %2.2x", size, buf[9]);
->  	/* print_packet("PB-TX", buf + 1, init_size + 9); */
-> -	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 200, buf, init_size + 10);
-> +
-> +	pb_adv_send(session, MESH_IO_TX_COUNT_UNLIMITED, 200,
-> +							buf, init_size + 10);
->  
->  	consumed = init_size;
->  
-> @@ -152,19 +188,39 @@ static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
->  
->  		/* print_packet("PB-TX", buf + 1, seg_size + 6); */
->  
-> -		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 200,
-> +		pb_adv_send(session, MESH_IO_TX_COUNT_UNLIMITED, 200,
->  							buf, seg_size + 7);
->  
->  		consumed += seg_size;
->  	}
->  }
->  
-> +static bool session_match (const void *a, const void *b)
-> +{
-> +	return a == b;
-> +}
-> +
-> +static bool uuid_match (const void *a, const void *b)
-> +{
-> +	const struct pb_adv_session *session = a;
-> +	const uint8_t *uuid = b;
-> +
-> +	return !memcmp(session->uuid, uuid, sizeof(session->uuid));
-> +}
-> +
-> +static bool user_match (const void *a, const void *b)
-> +{
-> +	const struct pb_adv_session *session = a;
-> +
-> +	return session->user_data == b;
-> +}
-> +
->  static void tx_timeout(struct l_timeout *timeout, void *user_data)
->  {
->  	struct pb_adv_session *session = user_data;
->  	mesh_prov_close_func_t cb;
->  
-> -	if (!session || pb_session != session)
-> +	if (!l_queue_find(pb_sessions, session_match, session))
->  		return;
->  
->  	l_timeout_remove(session->tx_timeout);
-> @@ -173,8 +229,8 @@ static void tx_timeout(struct l_timeout *timeout, void *user_data)
->  	mesh_send_cancel(filter, sizeof(filter));
->  
->  	l_info("TX timeout");
-> -	cb = pb_session->close_cb;
-> -	user_data = pb_session->user_data;
-> +	cb = session->close_cb;
-> +	user_data = session->user_data;
->  	cb(user_data, 1);
->  }
->  
-> @@ -182,7 +238,7 @@ static void pb_adv_tx(void *user_data, void *data, uint16_t len)
->  {
->  	struct pb_adv_session *session = user_data;
->  
-> -	if (!session || pb_session != session)
-> +	if (!l_queue_find(pb_sessions, session_match, session))
->  		return;
->  
->  	l_timeout_remove(session->tx_timeout);
-> @@ -201,7 +257,8 @@ static void send_open_req(struct pb_adv_session *session)
->  	memcpy(open_req.uuid, session->uuid, 16);
->  
->  	mesh_send_cancel(filter, sizeof(filter));
-> -	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_req,
-> +
-> +	pb_adv_send(session, MESH_IO_TX_COUNT_UNLIMITED, 500, &open_req,
->  							sizeof(open_req));
->  }
->  
-> @@ -214,7 +271,8 @@ static void send_open_cfm(struct pb_adv_session *session)
->  	open_cfm.opcode = PB_ADV_OPEN_CFM;
->  
->  	mesh_send_cancel(filter, sizeof(filter));
-> -	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 500, &open_cfm,
-> +
-> +	pb_adv_send(session, MESH_IO_TX_COUNT_UNLIMITED, 500, &open_cfm,
->  							sizeof(open_cfm));
->  }
->  
-> @@ -222,18 +280,21 @@ static void send_ack(struct pb_adv_session *session, uint8_t trans_num)
->  {
->  	struct pb_ack ack = { MESH_AD_TYPE_PROVISION };
->  
-> +	if (!l_queue_find(pb_sessions, session_match, session))
-> +		return;
-> +
->  	l_put_be32(session->link_id, &ack.link_id);
->  	ack.trans_num = trans_num;
->  	ack.opcode = PB_ADV_ACK;
->  
-> -	mesh_send_pkt(1, 100, &ack, sizeof(ack));
-> +	pb_adv_send(session, 1, 100, &ack, sizeof(ack));
->  }
->  
->  static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
->  {
->  	struct pb_close_ind close_ind = { MESH_AD_TYPE_PROVISION };
->  
-> -	if (!pb_session || pb_session != session)
-> +	if (!l_queue_find(pb_sessions, session_match, session))
->  		return;
->  
->  	l_put_be32(session->link_id, &close_ind.link_id);
-> @@ -242,7 +303,8 @@ static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
->  	close_ind.reason = reason;
->  
->  	mesh_send_cancel(filter, sizeof(filter));
-> -	mesh_send_pkt(10, 100, &close_ind, sizeof(close_ind));
-> +
-> +	pb_adv_send(session, 10, 100, &close_ind, sizeof(close_ind));
->  }
->  
->  static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
-> @@ -254,7 +316,7 @@ static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
->  	uint8_t type;
->  	bool first;
->  
-> -	if (!pb_session || pb_session != session)
-> +	if (!l_queue_find(pb_sessions, session_match, session))
->  		return;
->  
->  	link_id = l_get_be32(pkt + 1);
-> @@ -337,8 +399,8 @@ static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
->  			mesh_prov_close_func_t cb = session->close_cb;
->  			void *user_data = session->user_data;
->  
-> +			l_queue_remove(pb_sessions, session);
->  			l_free(session);
-> -			pb_session = NULL;
->  			cb(user_data, pkt[0]);
->  		}
->  		break;
-> @@ -442,37 +504,72 @@ bool pb_adv_reg(bool initiator, mesh_prov_open_func_t open_cb,
->  		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
->  		uint8_t uuid[16], void *user_data)
->  {
-> -	if (pb_session)
-> +	struct pb_adv_session *session, *old_session;
-> +
-> +	if (!pb_sessions)
-> +		pb_sessions = l_queue_new();
-> +
-> +	old_session = l_queue_find(pb_sessions, uuid_match, uuid);
-> +
-> +	/* Reject 2nd session if not looping back */
-> +	if (l_queue_length(pb_sessions) && !old_session)
-> +		return false;
-> +
-> +	/* Reject looping to more than one session or with same role*/
-> +	if (old_session && (old_session->loop ||
-> +					old_session->initiator == initiator))
->  		return false;
->  
-> -	pb_session = l_new(struct pb_adv_session, 1);
-> -	pb_session->open_cb = open_cb;
-> -	pb_session->close_cb = close_cb;
-> -	pb_session->rx_cb = rx_cb;
-> -	pb_session->ack_cb = ack_cb;
-> -	pb_session->user_data = user_data;
-> -	pb_session->initiator = initiator;
-> -	memcpy(pb_session->uuid, uuid, 16);
-> +	session = l_new(struct pb_adv_session, 1);
-> +	session->open_cb = open_cb;
-> +	session->close_cb = close_cb;
-> +	session->rx_cb = rx_cb;
-> +	session->ack_cb = ack_cb;
-> +	session->user_data = user_data;
-> +	session->initiator = initiator;
-> +	memcpy(session->uuid, uuid, 16);
->  
-> -	mesh_reg_prov_rx(pb_adv_packet, pb_session);
-> +	l_queue_push_head(pb_sessions, session);
->  
->  	if (initiator) {
-> -		l_getrandom(&pb_session->link_id, sizeof(pb_session->link_id));
-> -		pb_session->tx_timeout = l_timeout_create(60, tx_timeout,
-> -							pb_session, NULL);
-> -		send_open_req(pb_session);
-> +		l_getrandom(&session->link_id, sizeof(session->link_id));
-> +		session->tx_timeout = l_timeout_create(60, tx_timeout,
-> +							session, NULL);
-> +	}
-> +
-> +	/* Setup Loop-back if complementary session with same UUID */
-> +	if (old_session) {
-> +		session->loop = old_session;
-> +		old_session->loop = session;
-> +		mesh_unreg_prov_rx(pb_adv_packet);
-> +
-> +		if (initiator)
-> +			send_open_req(session);
-> +		else
-> +			send_open_req(old_session);
-> +
-> +		return true;
->  	}
->  
-> +	mesh_reg_prov_rx(pb_adv_packet, session);
-> +
-> +	if (initiator)
-> +		send_open_req(session);
-> +
->  	return true;
->  }
->  
->  void pb_adv_unreg(void *user_data)
->  {
-> -	if (!pb_session || pb_session->user_data != user_data)
-> +	struct pb_adv_session *session = l_queue_find(pb_sessions,
-> +						user_match, user_data);
-> +
-> +	if (!session)
->  		return;
->  
-> -	l_timeout_remove(pb_session->tx_timeout);
-> -	send_close_ind(pb_session, 0);
-> -	l_free(pb_session);
-> -	pb_session = NULL;
-> +	l_timeout_remove(session->tx_timeout);
-> +	session->tx_timeout = NULL;
-> +	send_close_ind(session, 0);
-> +	l_queue_remove(pb_sessions, session);
-> +	l_free(session);
->  }
-> -- 
-> 2.21.1
-> 
+Seems like lately I need to think before hitting "send"...
 
 -- 
 Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
