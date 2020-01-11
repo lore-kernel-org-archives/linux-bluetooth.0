@@ -2,123 +2,252 @@ Return-Path: <SRS0=d6qz=3A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2CDC282DD
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 16:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3827C33CA7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 21:34:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A764120673
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 16:21:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF6DA2087F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 21:34:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730224AbgAKQVe (ORCPT
+        id S1731469AbgAKVeJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Jan 2020 11:21:34 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:50873 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730168AbgAKQVe (ORCPT
+        Sat, 11 Jan 2020 16:34:09 -0500
+Received: from mail-il1-f199.google.com ([209.85.166.199]:51807 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731449AbgAKVeJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Jan 2020 11:21:34 -0500
-Received: from mail-qk1-f178.google.com ([209.85.222.178]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1MA7Om-1ixR3u1dyE-00BcEp; Sat, 11 Jan 2020 17:21:32 +0100
-Received: by mail-qk1-f178.google.com with SMTP id z76so4845525qka.2;
-        Sat, 11 Jan 2020 08:21:32 -0800 (PST)
-X-Gm-Message-State: APjAAAV+xPOTNIum1DTMGzBc32GfFKrD36xosqYU5whPE6L0ypkGfhN0
-        e/CWuzZwKUbcQ5CNQtd/J+PdGWaImwViev6zB/Y=
-X-Google-Smtp-Source: APXvYqyUQ+1umLAhS3Bm3WiAPaIa5zQhdGd1bt3YDgKZSygcwFwuyAG5XgGigoAyhcs9Z3KHaAN/PlWtbZai2e30oEo=
-X-Received: by 2002:a37:84a:: with SMTP id 71mr8365643qki.138.1578759691126;
- Sat, 11 Jan 2020 08:21:31 -0800 (PST)
+        Sat, 11 Jan 2020 16:34:09 -0500
+Received: by mail-il1-f199.google.com with SMTP id v13so4561082ili.18
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Jan 2020 13:34:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=VqbC1nxtrHJL9YKC9+RGFhtSs2QRUeTPCgImLrmafhI=;
+        b=UJOeZojB8l6EKMXCKq3YA68vDh8LADNpbBS3XaasEYVM9YQqIhabKpj0wVAQ2ixoMG
+         vnaTGUUmp+O0sMX/80biYhdT513Vc2lQWf8Ej5BADb1tW7J+VTTGuVqudi+FqdmGe/Qm
+         kkCFGLP4iZaliO/JotBjibkSJporqQnP6lKziGbdC0RauXP/SWRxowZE7pABY0dyEN7Z
+         BukIQolNVi0qhOKZlfDq9Gpxr1NDeGMU9MTW1ej92z7p23m1FRLHYskLQfDn7pR5D7B+
+         bqyfmdxdV7e2yljgUOwPZtAsg0Sq74xlNWi9C+UamijzgXjnwYbWitbWTfPmaO+NIlth
+         O3wQ==
+X-Gm-Message-State: APjAAAWux+r+HSRwIto80vRJ1WqsBAC6HhyOQqi2i+OKOHk4pcSQXlC9
+        srsvFM4Wv8Gcw3W3r4NojgEzclzYncFjIu5XZTpgqooK7dWz
+X-Google-Smtp-Source: APXvYqwDMniCIY97uKhU+bnTR5FZg7/4cQZUujxBNpKp2M5D7Ocui95o3jXTTcrOoP1fS//zF8w6Rx/O5Xi/fOQoBRBdcWmrFwiI
 MIME-Version: 1.0
-References: <20200110204903.3495832-1-arnd@arndb.de> <20200110210512.GB30412@brightrain.aerifal.cx>
- <CAK8P3a2VONV2Z6rs=xpntJyzfX4W7YijqCFr-f-PNMm3g4zRyA@mail.gmail.com> <0BF859F5-AA95-4941-A80D-7D33F7AC3636@alum.mit.edu>
-In-Reply-To: <0BF859F5-AA95-4941-A80D-7D33F7AC3636@alum.mit.edu>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Sat, 11 Jan 2020 17:21:15 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a109n5JWNJG557i+NtqJuVDU3K0tYcY3DGhjopOHQWp4w@mail.gmail.com>
-Message-ID: <CAK8P3a109n5JWNJG557i+NtqJuVDU3K0tYcY3DGhjopOHQWp4w@mail.gmail.com>
-Subject: Re: [PATCH] hcidump: add support for time64 based libc
-To:     Guy Harris <guy@alum.mit.edu>
-Cc:     Rich Felker <dalias@libc.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Deepa Dinamani <deepa.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:ZHrUmBaNX1d8ZysSWkioreCOyec215J+zph9SYHp039wOh7ZKTy
- nPo0hXRNl5bned2hNeZDNMgZ4yGTUF6x9U9vX2zHk4mxmaqAh8RuK7WOY1JqNjot/LgcNO3
- 6A9pAAcKddt2iEi2kFMksnzQa/k1pBQTC8mJRWb0GAC+Kc7VZ5zMC1xNT7nFX0SS2130Hj6
- cbd3tIpksoLMBDiD9naZA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8qeHBL42Pyw=:YBchiJbJMNRjohDgudsLeC
- eQe6ASoSR5d3ftFDgzuG7CB6HtZZI89pfS1kA5MZj7cDFfauBAC3NvdwhNU2+/TDVZqgXkbpv
- ucNTrqGZaefkX5e3o3wpNYYyjBRaeyTNsCcmTQ9xBXyRxgTO83GXdusT32mZjE3haU44f+6Xq
- m+qHguAQYQH1ng3Ko2XG+dWU5L+Cqxrb4ZT+FTOgSbBHWc9AxpYBDv1W7wp5aW06bOuPO+hy+
- AD1eEhx7uBGxOPuY9H1BUGdDfk3xM4mwNxCsKNVEd+hnxwkJJhy5vK5utADYh0D+nG5QzeR6L
- YGIZs+4a0265r4liIvowdQ8T0uz8maKcn4ZSen148gZl4nI18jfVFV00h8OvRAbs1zBVrkiGC
- 9HHidcd1DMQ1376vdji1iLprF1YRizlNGrlMbvI6Jm07aqlkJyAjpKqcvBKojW2/hFz7DMA91
- S/gIAOKnnfsrgnE3cJbGogo/uVkTScjMyQwSqR9f4pMbgcTwTUFVB/4AGJj+mZzYrorZwZ34k
- CT4OWeshSkio0UaA0+pbaOi1ygq2n6U0GgNmOpEntaLo2TRqgRrggDWIY2TtTPANaOpvlfoM+
- 6fAlyL1upnEE79eaJTvpbZe/NUNwBc2fUILffcnmBZRXHi7OfChK1TbDfFrJTtUDbb/Sddzpr
- nouCajXeYYS3INICEmtTxlHy12vrXoU8FRuw8nbtjLf/oI7jLROXorEnbWPnrj3DFJ6NOwPN6
- A8ZijVwFBT/o/tOeB8deN8DPtaCMTKhc3csKS2pLE6kChUB40wGruugtJJv9QWM6tVJEjjQuB
- JXUuoQAuJOTi9IVsjDveUVHaDg7s/yum7S5rDAsX12BlurpSICCBRp6ahc27pmU4kXFf2duOP
- tIdjp+QlmLCJymaF55UA==
+X-Received: by 2002:a92:c8c4:: with SMTP id c4mr8904769ilq.38.1578778448912;
+ Sat, 11 Jan 2020 13:34:08 -0800 (PST)
+Date:   Sat, 11 Jan 2020 13:34:08 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a06985059be4002e@google.com>
+Subject: WARNING: bad unlock balance in __dev_queue_xmit
+From:   syzbot <syzbot+ad4ea1dd5d26131a58a6@syzkaller.appspotmail.com>
+To:     a@unstable.cc, alex.aring@gmail.com, allison@lohutok.net,
+        andrew@lunn.ch, andy@greyhouse.net, ap420073@gmail.com,
+        ast@domdv.de, b.a.t.m.a.n@lists.open-mesh.org,
+        bridge@lists.linux-foundation.org, cleech@redhat.com,
+        daniel@iogearbox.net, davem@davemloft.net, dsa@cumulusnetworks.com,
+        f.fainelli@gmail.com, fw@strlen.de, gregkh@linuxfoundation.org,
+        gustavo@embeddedor.com, haiyangz@microsoft.com, info@metux.net,
+        j.vosburgh@gmail.com, j@w1.fi, jakub.kicinski@netronome.com,
+        jhs@mojatatu.com, jiri@resnulli.us, johan.hedberg@gmail.com,
+        johannes.berg@intel.com, john.hurley@netronome.com,
+        jwi@linux.ibm.com, kstewart@linuxfoundation.org,
+        kuznet@ms2.inr.ac.ru, kvalo@codeaurora.org, kys@microsoft.com,
+        linmiaohe@huawei.com, linux-bluetooth@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org,
+        liuhangbin@gmail.com, marcel@holtmann.org,
+        mareklindner@neomailbox.ch, mkubecek@suse.cz,
+        mmanning@vyatta.att-mail.com, netdev@vger.kernel.org,
+        nikolay@cumulusnetworks.com, oss-drivers@netronome.com,
+        pabeni@redhat.com, paulus@samba.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
- was On Sat, Jan 11, 2020 at 12:32 AM Guy Harris <guy@alum.mit.edu> wrote:
->
-> On Jan 10, 2020, at 1:19 PM, Arnd Bergmann <arnd@arndb.de> wrote:
->
-> > On Fri, Jan 10, 2020 at 10:05 PM Rich Felker <dalias@libc.org> wrote:
-> >>
-> >> On Fri, Jan 10, 2020 at 09:49:03PM +0100, Arnd Bergmann wrote:
-> >>> musl is moving to a default of 64-bit time_t on all architectures,
-> >>> glibc will follow later. This breaks reading timestamps through cmsg
-> >>> data with the HCI_TIME_STAMP socket option.
-> >>>
-> >>> Change both copies of hcidump to work on all architectures.  This also
-> >>> fixes x32, which has never worked, and carefully avoids breaking sparc64,
-> >>> which is another special case.
-> >>
-> >> Won't it be broken on rv32 though? Based on my (albeit perhaps
-> >> incomplete) reading of the thread, I think use of HCI_TIME_STAMP
-> >> should just be dropped entirely in favor of using SO_TIMESTAMPNS -- my
-> >> understanding was that it works with bluetooth sockets too.
-> >
-> > All 32-bit architectures use old_timeval32 timestamps in the kernel
-> > here, even rv32 and x32. As a rule, we keep the types bug-for-bug
-> > compatible between architectures and fix them all at the same time.
-> >
-> > Changing hcidump to SO_TIMESTAMPNS would work as well, but
-> > that is a much bigger change and I don't know how to test that.
->
-> If so, maybe I'll just do that for libpcap.  Libpcap *does* have an API to request
->capturing with nanoseconds in tv_usec (and I plan to give it pcapng-flavored APIs
-> to deliver higher-resolution time stamps, as well as metadata such as "incoming"
-> vs. "outgoing", as well).
+Hello,
 
-Sounds good to me, just make sure that you no longer reference
-HCI_TIME_STAMP and it should be fine with both old and new libc
-versions.
+syzbot found the following crash on:
 
-SO_TIMESTAMPNS was first added to the kernel in linux-2.6.22, which
-is probably older than anything you care about,  but I'm not sure what you
-need to do to use it on bluetooth. It appears to have first been added along
-with the monitor channel support in linux-3.4.
+HEAD commit:    ae608821 Merge tag 'trace-v5.5-rc5' of git://git.kernel.or..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12abc515e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=18698c0c240ba616
+dashboard link: https://syzkaller.appspot.com/bug?extid=ad4ea1dd5d26131a58a6
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=141051b9e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=125e5876e00000
 
-On a semi-related note, I see that there is a y2038 compatibility in the
-libpcap definition of struct pcap_timeval, which uses a *signed* tv_sec
-field. I assume the sizes of the fields cannot be changed, but it would
-be good to investigate if you can just make it unsigned instead, changing
-the supported time range from 1902...2038 to 1970...2106.
-It probably makes sense to do this together with supporting nanosecond
-timestamps. You could also consider changing the format to use a
-64-bit nanosecond value starting at either 1970 or 1902 to give an
-even larger range.
+The bug was bisected to:
 
-       Arnd
+commit ab92d68fc22f9afab480153bd82a20f6e2533769
+Author: Taehee Yoo <ap420073@gmail.com>
+Date:   Mon Oct 21 18:47:51 2019 +0000
+
+     net: core: add generic lockdep keys
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=107f969ee00000
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=127f969ee00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=147f969ee00000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+ad4ea1dd5d26131a58a6@syzkaller.appspotmail.com
+Fixes: ab92d68fc22f ("net: core: add generic lockdep keys")
+
+=====================================
+WARNING: bad unlock balance detected!
+5.5.0-rc5-syzkaller #0 Not tainted
+-------------------------------------
+swapper/0/0 is trying to release lock (&dev->qdisc_xmit_lock_key) at:
+[<ffffffff8625890d>] spin_unlock include/linux/spinlock.h:378 [inline]
+[<ffffffff8625890d>] __netif_tx_unlock include/linux/netdevice.h:3966  
+[inline]
+[<ffffffff8625890d>] __dev_queue_xmit+0x2bbd/0x35c0 net/core/dev.c:4016
+but there are no more locks to release!
+
+other info that might help us debug this:
+4 locks held by swapper/0/0:
+  #0: ffffc90000007d50 ((&ndev->rs_timer)){+.-.}, at: lockdep_copy_map  
+include/linux/lockdep.h:172 [inline]
+  #0: ffffc90000007d50 ((&ndev->rs_timer)){+.-.}, at:  
+call_timer_fn+0xe0/0x780 kernel/time/timer.c:1394
+  #1: ffffffff899a5340 (rcu_read_lock){....}, at: ip6_nd_hdr  
+net/ipv6/ndisc.c:463 [inline]
+  #1: ffffffff899a5340 (rcu_read_lock){....}, at:  
+ndisc_send_skb+0x7fe/0x1490 net/ipv6/ndisc.c:499
+  #2: ffffffff899a5300 (rcu_read_lock_bh){....}, at: lwtunnel_xmit_redirect  
+include/net/lwtunnel.h:92 [inline]
+  #2: ffffffff899a5300 (rcu_read_lock_bh){....}, at:  
+ip6_finish_output2+0x214/0x25c0 net/ipv6/ip6_output.c:102
+  #3: ffffffff899a5300 (rcu_read_lock_bh){....}, at:  
+__dev_queue_xmit+0x20a/0x35c0 net/core/dev.c:3948
+
+stack backtrace:
+CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.5.0-rc5-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  <IRQ>
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x197/0x210 lib/dump_stack.c:118
+  print_unlock_imbalance_bug kernel/locking/lockdep.c:4008 [inline]
+  print_unlock_imbalance_bug.cold+0x114/0x123 kernel/locking/lockdep.c:3984
+  __lock_release kernel/locking/lockdep.c:4242 [inline]
+  lock_release+0x5f2/0x960 kernel/locking/lockdep.c:4503
+  __raw_spin_unlock include/linux/spinlock_api_smp.h:150 [inline]
+  _raw_spin_unlock+0x16/0x40 kernel/locking/spinlock.c:183
+  spin_unlock include/linux/spinlock.h:378 [inline]
+  __netif_tx_unlock include/linux/netdevice.h:3966 [inline]
+  __dev_queue_xmit+0x2bbd/0x35c0 net/core/dev.c:4016
+  dev_queue_xmit+0x18/0x20 net/core/dev.c:4046
+  neigh_hh_output include/net/neighbour.h:499 [inline]
+  neigh_output include/net/neighbour.h:508 [inline]
+  ip6_finish_output2+0xfbe/0x25c0 net/ipv6/ip6_output.c:116
+  __ip6_finish_output+0x444/0xaa0 net/ipv6/ip6_output.c:142
+  ip6_finish_output+0x38/0x1f0 net/ipv6/ip6_output.c:152
+  NF_HOOK_COND include/linux/netfilter.h:296 [inline]
+  ip6_output+0x25e/0x880 net/ipv6/ip6_output.c:175
+  dst_output include/net/dst.h:436 [inline]
+  NF_HOOK include/linux/netfilter.h:307 [inline]
+  ndisc_send_skb+0xf1f/0x1490 net/ipv6/ndisc.c:505
+  ndisc_send_rs+0x134/0x720 net/ipv6/ndisc.c:699
+  addrconf_rs_timer+0x30f/0x6e0 net/ipv6/addrconf.c:3879
+  call_timer_fn+0x1ac/0x780 kernel/time/timer.c:1404
+  expire_timers kernel/time/timer.c:1449 [inline]
+  __run_timers kernel/time/timer.c:1773 [inline]
+  __run_timers kernel/time/timer.c:1740 [inline]
+  run_timer_softirq+0x6c3/0x1790 kernel/time/timer.c:1786
+  __do_softirq+0x262/0x98c kernel/softirq.c:292
+  invoke_softirq kernel/softirq.c:373 [inline]
+  irq_exit+0x19b/0x1e0 kernel/softirq.c:413
+  exiting_irq arch/x86/include/asm/apic.h:536 [inline]
+  smp_apic_timer_interrupt+0x1a3/0x610 arch/x86/kernel/apic/apic.c:1137
+  apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:829
+  </IRQ>
+RIP: 0010:native_safe_halt+0xe/0x10 arch/x86/include/asm/irqflags.h:61
+Code: 38 be db f9 eb 8a cc cc cc cc cc cc e9 07 00 00 00 0f 00 2d c4 54 51  
+00 f4 c3 66 90 e9 07 00 00 00 0f 00 2d b4 54 51 00 fb f4 <c3> cc 55 48 89  
+e5 41 57 41 56 41 55 41 54 53 e8 5e 92 8b f9 e8 c9
+RSP: 0018:ffffffff89807ce8 EFLAGS: 00000286 ORIG_RAX: ffffffffffffff13
+RAX: 1ffffffff132669e RBX: ffffffff8987a140 RCX: 0000000000000000
+RDX: dffffc0000000000 RSI: 0000000000000006 RDI: ffffffff8987a9d4
+RBP: ffffffff89807d18 R08: ffffffff8987a140 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: dffffc0000000000
+R13: ffffffff8a7b8600 R14: 0000000000000000 R15: 0000000000000000
+  arch_cpu_idle+0xa/0x10 arch/x86/kernel/process.c:690
+  default_idle_call+0x84/0xb0 kernel/sched/idle.c:94
+  cpuidle_idle_call kernel/sched/idle.c:154 [inline]
+  do_idle+0x3c8/0x6e0 kernel/sched/idle.c:269
+  cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:361
+  rest_init+0x23b/0x371 init/main.c:451
+  arch_call_rest_init+0xe/0x1b
+  start_kernel+0x904/0x943 init/main.c:784
+  x86_64_start_reservations+0x29/0x2b arch/x86/kernel/head64.c:490
+  x86_64_start_kernel+0x77/0x7b arch/x86/kernel/head64.c:471
+  secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:242
+kobject: 'brport' (0000000015306f5c): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (0000000015306f5c): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (00000000f618ced7): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (00000000f618ced7): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (0000000090c32451): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (0000000090c32451): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (000000009b39b612): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (000000009b39b612): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (00000000fa23c3a6): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (00000000fa23c3a6): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (0000000059be53cf): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (0000000059be53cf): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (00000000afda9faa): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (00000000afda9faa): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (000000001b8d397b): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (000000001b8d397b): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (00000000c95708c8): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (00000000c95708c8): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (0000000021fa4c47): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (0000000021fa4c47): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (00000000e55a6ea3): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (00000000e55a6ea3): calling ktype release
+kobject: 'brport': free name
+kobject: 'brport' (000000005f707c44): kobject_cleanup, parent  
+00000000835b0c7d
+kobject: 'brport' (000000005f707c44): calling ktype release
+kobject: 'brport': free name
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
