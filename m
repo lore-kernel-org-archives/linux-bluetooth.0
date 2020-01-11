@@ -2,93 +2,82 @@ Return-Path: <SRS0=d6qz=3A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C7BC33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 08:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AD2C282DD
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 14:10:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A61B20848
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 08:02:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51E5020842
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 14:10:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728523AbgAKICX convert rfc822-to-8bit (ORCPT
+        id S1729717AbgAKOJ7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Jan 2020 03:02:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46850 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728517AbgAKICX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Jan 2020 03:02:23 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 99881] 2015 Apple bluetooth keybord and magic mouse support
-Date:   Sat, 11 Jan 2020 08:02:19 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: me@joshgoebel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-99881-62941-Gc5oZ8j4MR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-99881-62941@https.bugzilla.kernel.org/>
-References: <bug-99881-62941@https.bugzilla.kernel.org/>
+        Sat, 11 Jan 2020 09:09:59 -0500
+Received: from jax4mhob12.myregisteredsite.com ([64.69.218.92]:50402 "EHLO
+        jax4mhob12.myregisteredsite.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729630AbgAKOJ7 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 11 Jan 2020 09:09:59 -0500
+Received: from mailpod.hostingplatform.com (atl4qobmail02pod5.registeredsite.com [10.30.71.85])
+        by jax4mhob12.myregisteredsite.com (8.14.4/8.14.4) with ESMTP id 00BE9vEN031333
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Jan 2020 09:09:57 -0500
+Received: (qmail 141434 invoked by uid 0); 11 Jan 2020 14:09:56 -0000
+X-TCPREMOTEIP: 208.85.15.155
+X-Authenticated-UID: sbrown@opensat.com
+Received: from unknown (HELO 155-15-85-208.altiusbb.net) (sbrown@opensat.com@208.85.15.155)
+  by 0 with ESMTPA; 11 Jan 2020 14:09:56 -0000
+Received: from localhost (localhost [127.0.0.1])
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id E2C0F1540254
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Jan 2020 09:09:55 -0500 (EST)
+X-Virus-Scanned: Debian amavisd-new at ewol.com
+Received: from 155-15-85-208.altiusbb.net ([127.0.0.1])
+        by localhost (fl-server.ewol.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id iyEVrzAg4N0g for <linux-bluetooth@vger.kernel.org>;
+        Sat, 11 Jan 2020 09:09:54 -0500 (EST)
+Received: from w7.lan (w7.lan [192.168.1.9])
+        by 155-15-85-208.altiusbb.net (Postfix) with ESMTP id 0AE9715400CE
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Jan 2020 09:09:54 -0500 (EST)
+Message-ID: <988d501619da548fff95f1f1afaa6456e18e6dfe.camel@ewol.com>
+Subject: mesh: scan params specify random address, but no random address set
+From:   Steve Brown <sbrown@ewol.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Sat, 11 Jan 2020 09:09:53 -0500
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+User-Agent: Evolution 3.34.1-2 
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=99881
+I'm using the Zephyr hci implementation on a bt dongle. It complains
+that no random address is set when scan enable is sent.
 
-Josh Goebel (me@joshgoebel.com) changed:
+My RPi doesn't care if a random address is set or not.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |me@joshgoebel.com
+Steve
 
---- Comment #63 from Josh Goebel (me@joshgoebel.com) ---
-I have a version 1.0 identifying Apple Magic Keyboard 2.  From what I can tell
-(at a quick glance) it's descriptor does NOT match what the kernel is
-expecting.
+btmon says:
 
-The kernel is expecting either 0xFF000003 or 0x00FF0003 for Usage HID.  From my
-reading of the description it seems like it would be: 0xFF010003.
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7   #289 [hci0] 409.412208
+        Type: Passive (0x00)
+        Interval: 10.000 msec (0x0010)
+        Window: 10.000 msec (0x0010)
+        Own address type: Random (0x01)
+        Filter policy: Accept all advertisement (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                  #290 [hci0] 409.413191
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2       #291 [hci0] 409.413205
+        Scanning: Enabled (0x01)
+        Filter duplicates: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                  #292 [hci0] 409.429192
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Invalid HCI Command Parameters (0x12)
 
-Seems we need at add another Usage HID variant?
-
-Relevant descriptor dump:
-
-```
-     Report Count (1),
-        Report Size (1),
-        Logical Minimum (0),
-        Logical Maximum (1),
-        Usage Page (Consumer),                      ; Consumer (0Ch)
-        Usage (Eject),                              ; Eject (B8h, one-shot
-control)
-        Input (Variable),
-        Report Count (1),
-        Report Size (1),
-        Usage Page (FF01h),                         ; FF01h, vendor-defined
-        Usage (03h),
-        Input (Variable),
-```
-
-Sorry if this is formatted terribly.  Not matter what I do the Preview looks
-terrible and this is my first time posting here.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
