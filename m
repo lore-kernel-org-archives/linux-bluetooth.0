@@ -1,106 +1,78 @@
-Return-Path: <SRS0=d6qz=3A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Kc/b=3B=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F23C33CA8
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 23:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4FDC33CA7
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 12 Jan 2020 00:47:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67F962087F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Jan 2020 23:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E6D920866
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 12 Jan 2020 00:47:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUzzXi3u"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hexchain.org header.i=@hexchain.org header.b="fPNbIQrJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731715AbgAKXic (ORCPT
+        id S1731813AbgALArl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Jan 2020 18:38:32 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:46380 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731674AbgAKXib (ORCPT
+        Sat, 11 Jan 2020 19:47:41 -0500
+Received: from m228-7.mailgun.net ([159.135.228.7]:45234 "EHLO
+        m228-7.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731805AbgALArl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Jan 2020 18:38:31 -0500
-Received: by mail-oi1-f194.google.com with SMTP id 13so5133123oij.13;
-        Sat, 11 Jan 2020 15:38:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c7HFrOGQ3phE12eoMeyUfOtwv87GN61OlvlGebweSPE=;
-        b=CUzzXi3uv6xXm/4UnggMbWvrrN2Up+aCdXgbjG6cA1RSh2Hsl7MaJGyUzdoMoTmd4R
-         ZrHmzvSIQzS9GFymrJPYSFUJoVbzF0PJ/iecYAh4HGcrfH/zwmd4F6x9nsoOeailYobC
-         MujffRFXqGvkpsurYLOjgR9qmZoZeeEk+kwuIIysdTEHyy0eM0MPpC10Mh0InyVmHn1v
-         5FsP+pOKLqj3MpjEbbWZWOZEilHIuIlxKrmee02exZm69I3xF9XolTxJTNhKMd4CPNUr
-         7TK8yRsQode2rHqJa9VpU78VxSiyf+Oi7TyRFsjn5WlXmrtjazYZe5Wjb+yrJwuo7Mdn
-         THlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c7HFrOGQ3phE12eoMeyUfOtwv87GN61OlvlGebweSPE=;
-        b=bxv7pUmTisUVgD+MUMFJzRwz7jTOyA95aKv2lnmdVyt683eTmk5lOAk+hHrc00fyEm
-         JUWSbjqtcPd5xfgOj9EORmlXwwrxOssY2VVyKUH3msazCFtTjFMiuU30JXwJqadflaph
-         KXec1c4uiPvqEWkdHI/U8P9CzU8yYNnKbvo0bgXQVU6DrrI8C/MmKfPJ3frpcuDB5v9O
-         Ys3q2nykxV1MWh4/XZ0Pjvt5KeWrUxmlmMbN2zUnWDGGY0C2uc3MH/e/QKqjRWgCJCk/
-         GSY5WdUcFAtZMyXyoOPjcfx98yjYQ6IWFabZhUna3F8IvdTTPWcuDTtW6qIpikE+ZtV7
-         cgmg==
-X-Gm-Message-State: APjAAAVyKkpUTAaea+nQZ/TAFNaaBgpNZUiwcxk0mtGSWA5TElDm34Vv
-        0BfM0CJQRD2yQe6Jj0oweVsYgg368fs77blTbaE=
-X-Google-Smtp-Source: APXvYqzdwu5h+fnSlpdGrTkZ59bgP9nPDYS+jBNWRgOtKGV1J84qw+h5nryOcSbFDC8q8K7HsV9LDhKqwf7dQGAQUsU=
-X-Received: by 2002:aca:1e11:: with SMTP id m17mr7953939oic.5.1578785910973;
- Sat, 11 Jan 2020 15:38:30 -0800 (PST)
+        Sat, 11 Jan 2020 19:47:41 -0500
+X-Greylist: delayed 305 seconds by postgrey-1.27 at vger.kernel.org; Sat, 11 Jan 2020 19:47:40 EST
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=hexchain.org; q=dns/txt;
+ s=smtp; t=1578790060; h=Content-Type: MIME-Version: Reply-To:
+ Message-ID: Subject: To: From: Date: Sender;
+ bh=rYCZu6Eok81Ajb6yeUmuuIcg1MqLJjSYtM85jON/MGU=; b=fPNbIQrJlqNOO2J2hmybBUHEZ7i8IHD0Hl8dDtzTskDqP6b3kwz+i9JFGjUUB1k8C8x5duaZ
+ Y7Pef8s+AdjPcMfFDHiEOwQMhqls19E/B9QZxJLFNfrN1E7UGBwRUJswIyho3LFZr093cANS
+ 1tA8+n5gPZGfeQqxccl2nXmnrRG6tVHwc+fHbZWyJBbziakYs+K/Dri5hsw7cUi2AOAcDVq0
+ kGY74BO/IuH5AInbDQw1bJI42KTRSAEHAbjnZm+yNapesyf/SbCtjyvt2RJ1Zxz9M3bOD5T0
+ MfOzaZ+2rUWD6VBmzRfJ306RqUMNzmxswydb3aQXk27FfW96GAaRdQ==
+X-Mailgun-Sending-Ip: 159.135.228.7
+X-Mailgun-Sid: WyJiNzllYSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgIjE5MjUxOCJd
+Received: from localhost (ip-80-113-22-187.ip.prioritytelecom.net [80.113.22.187])
+ by mxa.mailgun.org with ESMTP id 5e1a6b75.7f2add0eade0-smtp-out-n03;
+ Sun, 12 Jan 2020 00:42:29 -0000 (UTC)
+Date:   Sun, 12 Jan 2020 01:42:26 +0100
+From:   Haochen Tong <i@hexchain.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] avctp: Fix EINVAL on uinput creation
+Message-ID: <20200112004226.GA432297@kotori.hexchain.org>
+Reply-To: i@hexchain.org
 MIME-Version: 1.0
-References: <000000000000a06985059be4002e@google.com>
-In-Reply-To: <000000000000a06985059be4002e@google.com>
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-Date:   Sat, 11 Jan 2020 15:38:19 -0800
-Message-ID: <CAM_iQpWN-SKjjrG_7EQ-x+7UMiu6foaNWMJuwQuwN0BGmayB+A@mail.gmail.com>
-Subject: Re: WARNING: bad unlock balance in __dev_queue_xmit
-To:     syzbot <syzbot+ad4ea1dd5d26131a58a6@syzkaller.appspotmail.com>
-Cc:     a@unstable.cc, Alexander Aring <alex.aring@gmail.com>,
-        allison@lohutok.net, andrew@lunn.ch,
-        Andy Gospodarek <andy@greyhouse.net>,
-        Taehee Yoo <ap420073@gmail.com>, ast@domdv.de,
-        b.a.t.m.a.n@lists.open-mesh.org, bridge@lists.linux-foundation.org,
-        cleech@redhat.com, Daniel Borkmann <daniel@iogearbox.net>,
-        David Miller <davem@davemloft.net>,
-        David Ahern <dsa@cumulusnetworks.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg KH <gregkh@linuxfoundation.org>, gustavo@embeddedor.com,
-        haiyangz@microsoft.com, info@metux.net,
-        Jay Vosburgh <j.vosburgh@gmail.com>, j@w1.fi,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        Jamal Hadi Salim <jhs@mojatatu.com>,
-        Jiri Pirko <jiri@resnulli.us>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        John Hurley <john.hurley@netronome.com>, jwi@linux.ibm.com,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Kalle Valo <kvalo@codeaurora.org>, kys@microsoft.com,
-        linmiaohe@huawei.com,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-hams <linux-hams@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-ppp@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        linux-wpan@vger.kernel.org, Hangbin Liu <liuhangbin@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Marek Lindner <mareklindner@neomailbox.ch>,
-        Michal Kubecek <mkubecek@suse.cz>,
-        mmanning@vyatta.att-mail.com,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        Nikolay Aleksandrov <nikolay@cumulusnetworks.com>,
-        oss-drivers@netronome.com, Paolo Abeni <pabeni@redhat.com>,
-        Paul Mackerras <paulus@samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-#syz dup: WARNING: bad unlock balance in sch_direct_xmit
+The struct uinput_dev variable is on stack, so clear its content to
+avoid accidentally writing garbage values to kernel. This fixes "Can't
+create uinput device: Invalid argument (22)" in some cases.
+
+Signed-off-by: Haochen Tong <i@hexchain.org>
+---
+ profiles/audio/avctp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index d3b5dfab9..f7a3de211 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -1182,6 +1182,8 @@ static int uinput_create(struct btd_device *device, const char *name,
+ 		}
+ 	}
+ 
++	memset(&dev, 0, sizeof(struct uinput_dev));
++
+ 	if (name) {
+ 		strncpy(dev.name, name, UINPUT_MAX_NAME_SIZE);
+ 		dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
+
+base-commit: b4270d79e19ee70ccab6c087a7b470dad8a8a8bf
+-- 
+2.24.1
