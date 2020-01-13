@@ -2,112 +2,89 @@ Return-Path: <SRS0=UJar=3C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UPPERCASE_50_75 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE6CC33CAE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 07:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD5AC33CAD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 12:27:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12302207FF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 07:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EE8E2084D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 12:27:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=RFPros.onmicrosoft.com header.i=@RFPros.onmicrosoft.com header.b="1JHqPNCp"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="JyZo17JR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728731AbgAMHah (ORCPT
+        id S1726985AbgAMM1h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jan 2020 02:30:37 -0500
-Received: from mail-dm6nam11on2040.outbound.protection.outlook.com ([40.107.223.40]:7584
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728646AbgAMHah (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jan 2020 02:30:37 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PcVh1DZsg+IKKdQQikotAV2qXkUs8y0UXJ05BzlXbQRGaTRZn82OESTLO0b4QMoEdp45z4OSN+eGHqYy+e4ctUTil/YYwm4yJhglBNOr2KSotQtR0VJdmjOQB0U5QVlTv8RV5UECzHvWLcau3o9THhgiw8z+CnPSXCx4a5wjbpZvLZZBAgxSwUGv8fG/52W5xSdSwXOIE43QFaWoGE1i42Xmg5lRCE9eexmITz3PvZNhqhzd1aK1RieJsoy70U55GHuRH8qlYMQKSIPGs6hhq3UebMqyqC2roZFvCJfFrIaIsulwvBUkYoOvZ3HzIfuwTUT1coUyHhPaPi9Mdg6PBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pZRzac1ck+cTS1P8PRB0yGftanhSik+Lt1zFcQSyMLY=;
- b=gnIDkTN/zd1UfhN8ZcrBqFSxeq7HqK2zKiqAnNYRDwzvfH7hXhrwLlpUgFZSKe+B9JrHcoQgmkZYR9mjNt8TyCkNmIT5FU2HU+KIJaTCL3QU2I1gB17DSzqZS0YCyyqq5iqhZAOum/G+ll9BAKgBFHMM/SHbnifkQwme421BjW963XRdmTQjuCbMv/KQbmZLXVDZemOIhzUWVjnXfAh4o6EDyogqnLf4edLIMU/vOdruuGslGzO6nNaXajZpauLaCZY/GtwbSXRob3B9ElrHBLnLH7X+Sq1JekJJIvOHM16TQgRag5uYpcW7371QfGjYYE4Z1W6+rZ6tWjFvzXaHrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=lairdconnect.com; dmarc=pass action=none
- header.from=lairdconnect.com; dkim=pass header.d=lairdconnect.com; arc=none
+        Mon, 13 Jan 2020 07:27:37 -0500
+Received: from mail-lj1-f179.google.com ([209.85.208.179]:44929 "EHLO
+        mail-lj1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725832AbgAMM1h (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 13 Jan 2020 07:27:37 -0500
+Received: by mail-lj1-f179.google.com with SMTP id u71so9773356lje.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2020 04:27:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=RFPros.onmicrosoft.com; s=selector1-RFPros-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pZRzac1ck+cTS1P8PRB0yGftanhSik+Lt1zFcQSyMLY=;
- b=1JHqPNCpGQGTM72BjrOY6GGTFROwF5B0MAfyGmUx/Ezm1iZfmhZFEtIG4IkRETWW1K0wOC6NGyg3WUyHDv58ZDSAeFEd2RWAvMOAI9SqCq8tnn+aaKAelp3ZBK6R/nVxqPf5oe23w8vEtWYVA8c0q8h46SUk3w3lZKYyUemdxH4=
-Received: from DM5PR14MB1385.namprd14.prod.outlook.com (10.173.223.13) by
- DM5PR14MB1483.namprd14.prod.outlook.com (10.173.221.7) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2623.9; Mon, 13 Jan 2020 07:30:35 +0000
-Received: from DM5PR14MB1385.namprd14.prod.outlook.com
- ([fe80::95a:5934:c7a4:d915]) by DM5PR14MB1385.namprd14.prod.outlook.com
- ([fe80::95a:5934:c7a4:d915%6]) with mapi id 15.20.2623.015; Mon, 13 Jan 2020
- 07:30:35 +0000
-From:   Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>
-To:     Steve Brown <sbrown@ewol.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: mesh: scan params specify random address, but no random address
- set
-Thread-Topic: mesh: scan params specify random address, but no random address
- set
-Thread-Index: AQHVyIjVzdx6hBoAnEeOv2t0j3oKb6foNUog
-Date:   Mon, 13 Jan 2020 07:30:35 +0000
-Message-ID: <DM5PR14MB1385927CD0D2A8B1D0ADBB15E6350@DM5PR14MB1385.namprd14.prod.outlook.com>
-References: <988d501619da548fff95f1f1afaa6456e18e6dfe.camel@ewol.com>
-In-Reply-To: <988d501619da548fff95f1f1afaa6456e18e6dfe.camel@ewol.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Jamie.Mccrae@lairdconnect.com; 
-x-originating-ip: [81.148.167.46]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fb126b4e-d6f9-4d05-711f-08d797fa7af5
-x-ms-traffictypediagnostic: DM5PR14MB1483:
-x-microsoft-antispam-prvs: <DM5PR14MB1483AB8C1BA2E09066F78E4CE6350@DM5PR14MB1483.namprd14.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-forefront-prvs: 028166BF91
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(376002)(366004)(346002)(396003)(39840400004)(189003)(199004)(33656002)(8676002)(316002)(81156014)(110136005)(8936002)(81166006)(52536014)(2906002)(4744005)(71200400001)(86362001)(7696005)(5660300002)(9686003)(66946007)(76116006)(66556008)(66476007)(64756008)(66446008)(478600001)(186003)(55016002)(26005)(6506007);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR14MB1483;H:DM5PR14MB1385.namprd14.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: lairdconnect.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Sdi9ufRRGCPMZsA+7gNRPL4j/rkKjqLitDOK3UedMto2EofXkwWzX43jBtT5YmwX+W4rgu82V/54P1XI+ZtHtNrMuu9JsEA8Q9Srjaw0BwlceQzTge3LjEteQtkfvU29leDxXYaXFj+WDwOMKVU67Oeo4+7ak9unN8mApepgqqaoI+NK8nRxoT8zeUwXRph4PtvOf9BvFCSYlzhSpm/T5YfEfhbAeMxCZRyOFXpAwG1dSTEThwktd2d2If4P0DZRhRGQGC4Mv7UcqJB9lxAuhJWzPeC6P8gpx5GbJfR6dxbLCH90x7foiU+JQgOR3JlHOEXbQLJvEDWUPHwmxjeFbm0wGtLMgXovRAR15xWqWQZhzAwA5d0Ebwe/YocB5yOYp/ewlG0FraaQR7v8Fjr24QSXKWBwbMcb9gRnJ9etGIB54KPLS5fEmhYsghVIOLr+
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=u9QBatFu0uHfdZykzDH8ATKZkl+pbQFxPfrXPrtGbFQ=;
+        b=JyZo17JR8PdmZO40W5PozZWBQ9PvrtMYMqSj7azyK+D8WgXHEZhILaqxF6du33qH4G
+         Njy5Lnto7Wp1o4M4VNFkuv+T9A2UN9iYWREYQNnr9UdDSdbdV8gXr2FDx2hPXCbVthS+
+         Zkew9sbO5cuGParkLBIghqqQDOR63mo933ttgTszWVy8S8X+lBXFhBeB79kvZ99dKCmo
+         PPXI4c7+uX8kTT1wgysJIFQEnEmr1mKjOU/7AndgZACr5B43zh61JUT28sURE2ngbQa+
+         q274ENp6IQkrHELV6yZ2CctkPGbJcPjHHlcX3vXtCv2gsDmciyyBaQXpWhD3U7c4SWFR
+         DKaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=u9QBatFu0uHfdZykzDH8ATKZkl+pbQFxPfrXPrtGbFQ=;
+        b=R9h/MGryUAEvvsbNWDdYkeGwuxZqzipQ+IVOA2kXB6AKHWmyj7LzPD6VvPUMWFjxuL
+         x/zQO64LmNUBdX1nZQngtxfnz90nBxtQzGxKrRzxY0jKlYLI8czd6U7baazZuXryiDyF
+         XM1iesTKERn2ZKcOzvGsbqGNPhyBLHFw0K/hzYXfnSEs66TpbeJCH+xFE2qMC8h/mRUB
+         j5PS8LUGHrN5ElclVDy8mHPXTomlWeGU52z8LlxjD02wHHb4cofusYGRCuT1Y059VeJ/
+         FHguTqaFkXZXxkIGY+rsQch3n+/znJP9ndelXjBTXjl6hCqemQyh1m572bJuVDneP0tP
+         vzoQ==
+X-Gm-Message-State: APjAAAU9tzIoAqVkyOI26E1Ho9i1XY2fhq7LQmgqR0SJFTxHsdYPWr1Z
+        c0roTtQJpEPWTWydUKas90GHi1CMT7Y=
+X-Google-Smtp-Source: APXvYqwE+JFg1q5ZcexGoWzCgM7bVng9LPLdZ1UJHkAN8qnAVD9fLgam6MVQX97pcF9Zc3yQRvziqQ==
+X-Received: by 2002:a2e:b1c3:: with SMTP id e3mr10196981lja.137.1578918454850;
+        Mon, 13 Jan 2020 04:27:34 -0800 (PST)
+Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id l7sm5571758lfc.80.2020.01.13.04.27.33
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2020 04:27:34 -0800 (PST)
+From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
+        <michal.lowas-rzechonek@silvair.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH RESEND BlueZ 0/1] Select mesh-io from command line
+Date:   Mon, 13 Jan 2020 13:27:24 +0100
+Message-Id: <20200113122726.768-1-michal.lowas-rzechonek@silvair.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-OriginatorOrg: lairdconnect.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb126b4e-d6f9-4d05-711f-08d797fa7af5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2020 07:30:35.5378
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a67ad7fe-2b14-4d12-b58f-bb509b58f338
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cp/SHMoHsR0EyBLe6pHvCh1xj4TDUXMrk3FfD6xyhjeeR2McX7Vkc1eH3M9x+phHhGdZ/SOU5Ewf7BpvwxO23fnhgfiUDmb1tPC4YjX1TFk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR14MB1483
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-PiBJJ20gdXNpbmcgdGhlIFplcGh5ciBoY2kgaW1wbGVtZW50YXRpb24gb24gYSBidCBkb25nbGUu
-IEl0IGNvbXBsYWlucw0KPiB0aGF0IG5vIHJhbmRvbSBhZGRyZXNzIGlzIHNldCB3aGVuIHNjYW4g
-ZW5hYmxlIGlzIHNlbnQuDQo+DQo+IE15IFJQaSBkb2Vzbid0IGNhcmUgaWYgYSByYW5kb20gYWRk
-cmVzcyBpcyBzZXQgb3Igbm90Lg0KPg0KPiBTdGV2ZQ0KDQpIaSBTdGV2ZSwNCllvdSBuZWVkIGFu
-IGFkZHJlc3Mgc2V0IGJlY2F1c2Ugb2YgZGlyZWN0ZWQgYWR2ZXJ0aXNpbmcuIFlvdSBuZWVkIHRv
-IHVwZGF0ZSB5b3VyIHplcGh5ciBwcm9qZWN0IHRvIGluY2x1ZGUgYSByYW5kb20sIGFkZHJlc3Ms
-IHRoaXMgaXMgY292ZXJlZCBxdWl0ZSBleHRlbnNpdmVseSBvbiB0aGUgemVwaHlyIGRvY3VtZW50
-YXRpb24gYW5kIGRpc2N1c3Npb25zIGZvciBOb3JkaWMgY2hpcHNldHMuDQpUaGFua3MsDQpKYW1p
-ZQ0KVEhJUyBNRVNTQUdFLCBBTlkgQVRUQUNITUVOVChTKSwgQU5EIFRIRSBJTkZPUk1BVElPTiBD
-T05UQUlORUQgSEVSRUlOIE1BWSBCRSBQUk9QUklFVEFSWSBUTyBMQUlSRCBDT05ORUNUSVZJVFks
-IElOQy4gQU5EL09SIEFOT1RIRVIgUEFSVFksIEFORCBNQVkgRlVSVEhFUiBCRSBJTlRFTkRFRCBU
-TyBCRSBLRVBUIENPTkZJREVOVElBTC4gSUYgWU9VIEFSRSBOT1QgVEhFIElOVEVOREVEIFJFQ0lQ
-SUVOVCwgUExFQVNFIERFTEVURSBUSEUgRU1BSUwgQU5EIEFOWSBBVFRBQ0hNRU5UUywgQU5EIElN
-TUVESUFURUxZIE5PVElGWSBUSEUgU0VOREVSIEJZIFJFVFVSTiBFTUFJTC4gVEhJUyBNRVNTQUdF
-IEFORCBJVFMgQ09OVEVOVFMgQVJFIFRIRSBQUk9QRVJUWSBPRiBMQUlSRCBDT05ORUNUSVZJVFks
-IElOQy4gQU5EIE1BWSBOT1QgQkUgUkVQUk9EVUNFRCBPUiBVU0VEIFdJVEhPVVQgVEhFIEVYUFJF
-U1MgV1JJVFRFTiBDT05TRU5UIE9GIExBSVJEIENPTk5FQ1RJVklUWSwgSU5DLg0K
+Continuing changes started in 12b984d1d4d47a8fd5bc8455d586bb208b804ebf,
+this patch allows us to select mesh-io type using command line
+option.
+
+By default, daemon still uses mesh-io-generic, and currently there are
+no other implementations available, but this patch enables us to
+register more io variants.
+
+Michał Lowas-Rzechonek (1):
+  mesh: Add --io option
+
+ mesh/main.c | 99 +++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 81 insertions(+), 18 deletions(-)
+
+-- 
+2.20.1
+
