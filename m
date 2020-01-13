@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626FBC33CAE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 04:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1479C47409
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 04:31:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35F51214AF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 04:31:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C824221556
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 04:31:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="g0rqCS4f"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="jbUB79KC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387591AbgAMEbO (ORCPT
+        id S2387606AbgAMEbw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 12 Jan 2020 23:31:14 -0500
-Received: from mail26.static.mailgun.info ([104.130.122.26]:18396 "EHLO
+        Sun, 12 Jan 2020 23:31:52 -0500
+Received: from mail26.static.mailgun.info ([104.130.122.26]:50890 "EHLO
         mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387563AbgAMEbN (ORCPT
+        by vger.kernel.org with ESMTP id S2387571AbgAMEbv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 12 Jan 2020 23:31:13 -0500
+        Sun, 12 Jan 2020 23:31:51 -0500
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1578889873; h=Message-ID: References: In-Reply-To: Subject:
+ s=smtp; t=1578889910; h=Message-ID: References: In-Reply-To: Subject:
  Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
  MIME-Version: Sender; bh=kLWHsDu+lXLZgOyBoFDbIPxxLyvvZ/yYAxYjOJEO5nQ=;
- b=g0rqCS4fLjzKcrVadbDqaoKYzRqo7Xf4EK0BXAEP/Q90zqzCu7XISIde+6/GNfJ8KBHmSXdw
- B25pc9Iaq8IZEdnWfhZtvTAFsLc+p/uhv0HsIon8htW+8bbaFYkoYhGl+BhdHWik1Qd9Rz2z
- /S1+//FCkIbJE/i4ghKOzh5D2tY=
+ b=jbUB79KCucy7gydTAAZcbFr5BSlC0g48y9ATvxvPgutwYFG52W0W5Loh6v0mC9Iaiw9n4oio
+ v0YVPqxum8QTV7GfmHyjk5FOU2oXD8ng5fUrIm2G7OQyY3CURRrl8T9Nh+xEbcs9K3SzSB+r
+ 5dWCKXl0ILgY6UAYXW4+PBS50fU=
 X-Mailgun-Sending-Ip: 104.130.122.26
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e1bf28e.7fe114443848-smtp-out-n03;
- Mon, 13 Jan 2020 04:31:10 -0000 (UTC)
+ by mxa.mailgun.org with ESMTP id 5e1bf2b5.7f29f56eb768-smtp-out-n02;
+ Mon, 13 Jan 2020 04:31:49 -0000 (UTC)
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 3E144C43383; Mon, 13 Jan 2020 04:31:10 +0000 (UTC)
+        id 7A4BBC433CB; Mon, 13 Jan 2020 04:31:49 +0000 (UTC)
 Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
         (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
         (No client certificate requested)
         (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9BD4FC433CB;
-        Mon, 13 Jan 2020 04:31:08 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id C1F23C43383;
+        Mon, 13 Jan 2020 04:31:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8;
  format=flowed
 Content-Transfer-Encoding: 8bit
-Date:   Mon, 13 Jan 2020 12:31:08 +0800
+Date:   Mon, 13 Jan 2020 12:31:48 +0800
 From:   Rocky Liao <rjliao@codeaurora.org>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com
 Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-bluetooth-owner@vger.kernel.org
 Subject: Re: [PATCH v4] Bluetooth: hci_qca: Add qca_power_on() API to support
  both wcn399x and Rome power up
 In-Reply-To: <20200113042942.9526-1-rjliao@codeaurora.org>
 References: <20200107052601.32216-1-rjliao@codeaurora.org>
  <20200113042942.9526-1-rjliao@codeaurora.org>
-Message-ID: <5bd30d7a3fabcc73d50e428d4a874755@codeaurora.org>
+Message-ID: <43e209e870c8750f5bd154520cfaccbb@codeaurora.org>
 X-Sender: rjliao@codeaurora.org
 User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
