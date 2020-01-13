@@ -2,178 +2,132 @@ Return-Path: <SRS0=UJar=3C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A50C33CAF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 19:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0FEDC33CAF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 22:37:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CA7E24656
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 19:34:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97118206DA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 22:37:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578955051;
+	bh=+Vwx7gkSAe5ZKuyDwReisBuyr1j6476uD+cB0xRNHyg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=xxtGH0tnILoGK1wNUPgQtNCo/J/r7rNZ5vSmBtS+h9Id8r6D8lMkh458culFWvy1Y
+	 ALG/9dANYtSHt0fyg1TiNapzTm0Y/cR0jdVjQ8gk//epAZR8wtF5MqM8Qu4Dk6QKn7
+	 A5hCyF+wXW4nD8tBtxt0LLXp0ZOQlMDq4wAa28T0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728809AbgAMTeO (ORCPT
+        id S1728838AbgAMWh2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jan 2020 14:34:14 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:50099 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728760AbgAMTeM (ORCPT
+        Mon, 13 Jan 2020 17:37:28 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:39487 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728714AbgAMWh1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jan 2020 14:34:12 -0500
-Received: by mail-il1-f199.google.com with SMTP id j21so8669110ilf.16
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2020 11:34:11 -0800 (PST)
+        Mon, 13 Jan 2020 17:37:27 -0500
+Received: by mail-oi1-f193.google.com with SMTP id a67so9955889oib.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2020 14:37:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=iKgXkUUifDTHe1wYti7XokONx9JjbAC539M6HstQB/k=;
-        b=TCi143ImQakvXTiSPHAs1bubLqCisR5/zORE0HZPYztDI4l3A/aPa4kT7PLwiWdzvf
-         ny8+eYzMQNfrHIzzPFfGBo2wl333fdwNint1c5yKBnPUOxWf0rOSmVW+fDwzEdbZqCI5
-         hKoPtCF3+IYnCLF6wto/Bw6WjX922BirbgDWsLiVxBrrjJyWj1DS37Za4wjd4eYYj26j
-         j+Vb7ixajooPDCO7EOGg2gYTfZp30QzjyGrGVxa3T6aJooqG2rp2tfyb9xRjLvacqNpV
-         0KfW4TiTMQXz/q30+ArIVOg1q5hXm87X5Ya8CIcI0gqWctLUX2VnvMjs4LYrUKM27zn1
-         1G+A==
-X-Gm-Message-State: APjAAAWtSXUxNDuHbEHqpYFxuihQODQlwMyO2eTAAoFf2eg7fGU9kCTg
-        gdCL6c3GHSVWSry3ecFxhAaniWSsL7Oi/Lzx/ZkJDyS0wBbE
-X-Google-Smtp-Source: APXvYqzaNcVpE7dne1l1ihiEgfr6Zy2LxQzVYEVdovLQ5xW8OKaJwY513n5SHhDdl21ILG0FBwo9bbP7vlQ9sXE0LfOo+H5i3o5w
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=zw6iSRepM4LG+d/YXuCQ8oJD6o1KO8WeOLqBNcecU20=;
+        b=jRwIm6YW4h+c2HhPvtFWz1jQyaT0m03tl/KDYKOg9EJtd63gIomedXTJ8y5KIo2aie
+         R33CX6JCZZ6Wu/pM5LFMaRQ2Vv4AhQ2NF/ZjFOurxmpwd8YFmnaWOrq2+RYiaXxIjmyA
+         YqNKBhLw0MhCIGaTSFem5USOHaPzTc0GBxv+19LHdAmMq5HL1GeKS4GaRsmxczhiCNfA
+         cIRMeehJ8fUZRB6NDDdlkHfg3F1ystbDRJ3M6Wvdqp94yX92RPH35OfdY9KURrVyzqLk
+         0qcckm4P2CSjas9/o7FQFt0gCH0J1Soe2FqNwC29ymGXiTYIIVGEBnEEtum44RVAuvMP
+         EPfA==
+X-Gm-Message-State: APjAAAXyY62iAoD37C6pTmOIj3BNi9aO+pUUpTP6Y+fka7rrwGUExFQf
+        u89+6fyvEb6EeWjTsx4hKFOzXDk=
+X-Google-Smtp-Source: APXvYqzrwQfZtJzeCtUZ3aXOrnhdWiDO6GGZbW/oZXMM4fYXRxr6KDHOcw+ZJmaRZt2fyAA9D90osA==
+X-Received: by 2002:aca:b808:: with SMTP id i8mr14039717oif.66.1578955046907;
+        Mon, 13 Jan 2020 14:37:26 -0800 (PST)
+Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id n6sm3333922otl.67.2020.01.13.14.37.25
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2020 14:37:26 -0800 (PST)
+Received: from rob (uid 1000)
+        (envelope-from rob@rob-hp-laptop)
+        id 220b00
+        by rob-hp-laptop (DragonFly Mail Agent v0.11);
+        Mon, 13 Jan 2020 16:37:25 -0600
+Date:   Mon, 13 Jan 2020 16:37:25 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Johan Hovold <johan@kernel.org>
+Cc:     guillaume La Roque <glaroque@baylibre.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, devicetree@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, nsaenzjulienne@suse.de,
+        linux-kernel@vger.kernel.org, khilman@baylibre.com
+Subject: Re: [PATCH v6 1/2] dt-bindings: net: bluetooth: add interrupts
+ properties
+Message-ID: <20200113223725.GA22169@bogus>
+References: <20200109104257.6942-1-glaroque@baylibre.com>
+ <20200109104257.6942-2-glaroque@baylibre.com>
+ <20200109105305.GL30908@localhost>
+ <a33f9c30-03a8-ea12-e9d3-5e050e41318e@baylibre.com>
+ <20200109132917.GM30908@localhost>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:6e06:: with SMTP id d6mr13077449ioh.95.1578944051034;
- Mon, 13 Jan 2020 11:34:11 -0800 (PST)
-Date:   Mon, 13 Jan 2020 11:34:11 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000048427b059c0a8f9d@google.com>
-Subject: WARNING: locking bug in finish_task_switch
-From:   syzbot <syzbot+edec84a8b77e5a0cae31@syzkaller.appspotmail.com>
-To:     coreteam@netfilter.org, davem@davemloft.net,
-        johan.hedberg@gmail.com, kaber@trash.net, kadlec@blackhole.kfki.hu,
-        kernel@stlinux.com, linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-media@vger.kernel.org, marcel@holtmann.org,
-        mchehab@kernel.org, mchehab@s-opensource.com,
-        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        pablo@netfilter.org, patrice.chotard@st.com,
-        peter.griffin@linaro.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200109132917.GM30908@localhost>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Thu, Jan 09, 2020 at 02:29:17PM +0100, Johan Hovold wrote:
+> On Thu, Jan 09, 2020 at 02:13:23PM +0100, guillaume La Roque wrote:
+> > 
+> > On 1/9/20 11:53 AM, Johan Hovold wrote:
+> > > On Thu, Jan 09, 2020 at 11:42:56AM +0100, Guillaume La Roque wrote:
+> > >> add interrupts and interrupt-names as optional properties
+> > >> to support host-wakeup by interrupt properties instead of
+> > >> host-wakeup-gpios.
+> > >>
+> > >> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
+> > >> ---
+> > >>  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 4 +++-
+> > >>  1 file changed, 3 insertions(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > >> index c44a30dbe43d..d33bbc998687 100644
+> > >> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > >> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > >> @@ -37,7 +37,9 @@ Optional properties:
+> > >>      - pcm-frame-type: short, long
+> > >>      - pcm-sync-mode: slave, master
+> > >>      - pcm-clock-mode: slave, master
+> > >> -
+> > >> + - interrupts: must be one, used to wakeup the host processor if
+> > >> +   gpiod_to_irq function not supported
+> > >> + - interrupt-names: must be "host-wakeup"
+> > > Looks like you forgot to address Rob's comment. If I understood him
+> > > correctly you either need to stick with "host-wakeup-gpios" (and fix
+> > > your platform) or deprecate it in favour of "interrupts":
+> > >
+> > > 	https://lkml.kernel.org/r/20191218203818.GA8009@bogus
+> > 
+> > not forgot marcel ask me a v6
+> 
+> Not much point in sending v6 before addressing feedback on v5.
+> Especially as Marcel asked for a v6 with acks. ;)
+> 
+> > for rob comment ok but it's not possible to support gpiod_to_irq on my
+> > platform.
+> > 
+> > if i deprecated it i need to update all DT with good interrupt number
+> > right?
+> 
+> Not sure. Perhaps just updating the binding is enough. Rob?
 
-syzbot found the following crash on:
+Correct. Just need to reflect in the binding which way is preferred. If 
+it's a case of update all the dts files, then we often just don't 
+document the old way.
 
-HEAD commit:    6c09d7db Add linux-next specific files for 20200110
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=150b6a9ee00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7dc7ab9739654fbe
-dashboard link: https://syzkaller.appspot.com/bug?extid=edec84a8b77e5a0cae31
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d005e1e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1527b6aee00000
-
-The bug was bisected to:
-
-commit 7152c88e556bcbee525689063c260cd296f295a8
-Author: Mauro Carvalho Chehab <mchehab@s-opensource.com>
-Date:   Tue Oct 18 19:44:11 2016 +0000
-
-     [media] c8sectpfe: don't break long lines
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10930c21e00000
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=12930c21e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14930c21e00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+edec84a8b77e5a0cae31@syzkaller.appspotmail.com
-Fixes: 7152c88e556b ("[media] c8sectpfe: don't break long lines")
-
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(1)
-WARNING: CPU: 1 PID: 9970 at kernel/locking/lockdep.c:167 hlock_class  
-kernel/locking/lockdep.c:167 [inline]
-WARNING: CPU: 1 PID: 9970 at kernel/locking/lockdep.c:167 hlock_class  
-kernel/locking/lockdep.c:156 [inline]
-WARNING: CPU: 1 PID: 9970 at kernel/locking/lockdep.c:167  
-__lock_acquire+0x21dd/0x4a00 kernel/locking/lockdep.c:3950
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 9970 Comm: syz-executor719 Not tainted  
-5.5.0-rc5-next-20200110-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x197/0x210 lib/dump_stack.c:118
-  panic+0x2e3/0x75c kernel/panic.c:221
-  __warn.cold+0x2f/0x3e kernel/panic.c:582
-  report_bug+0x289/0x300 lib/bug.c:195
-  fixup_bug arch/x86/kernel/traps.c:176 [inline]
-  fixup_bug arch/x86/kernel/traps.c:171 [inline]
-  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:269
-  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:288
-  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
-RIP: 0010:hlock_class kernel/locking/lockdep.c:167 [inline]
-RIP: 0010:hlock_class kernel/locking/lockdep.c:156 [inline]
-RIP: 0010:__lock_acquire+0x21dd/0x4a00 kernel/locking/lockdep.c:3950
-Code: 05 98 39 4a 09 85 c0 75 a0 48 c7 c6 e0 91 4b 88 48 c7 c7 20 92 4b 88  
-4c 89 9d 30 ff ff ff 4c 89 95 70 ff ff ff e8 b2 ff ea ff <0f> 0b 31 db 4c  
-8b 95 70 ff ff ff 4c 8b 9d 30 ff ff ff e9 22 f8 ff
-RSP: 0018:ffffc90002d87738 EFLAGS: 00010086
-RAX: 0000000000000000 RBX: 00000000000005e3 RCX: 0000000000000000
-RDX: 0000000040000000 RSI: ffffffff815e8546 RDI: fffff520005b0ed9
-RBP: ffffc90002d87850 R08: ffff8880903f8380 R09: fffffbfff13748ed
-R10: fffffbfff13748ec R11: ffffffff89ba4763 R12: 000000009ecb23e7
-R13: ffffffff8aa50270 R14: ffff8880903f8c48 R15: 0000000000000000
-  lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4484
-  finish_lock_switch kernel/sched/core.c:3123 [inline]
-  finish_task_switch+0x13f/0x750 kernel/sched/core.c:3224
-  context_switch kernel/sched/core.c:3388 [inline]
-  __schedule+0x93c/0x1f90 kernel/sched/core.c:4081
-  preempt_schedule_irq+0xb5/0x160 kernel/sched/core.c:4338
-  retint_kernel+0x1b/0x2b
-RIP: 0010:arch_local_irq_restore arch/x86/include/asm/paravirt.h:752  
-[inline]
-RIP: 0010:lock_acquire+0x20b/0x410 kernel/locking/lockdep.c:4487
-Code: 9c 08 00 00 00 00 00 00 48 c1 e8 03 80 3c 10 00 0f 85 d3 01 00 00 48  
-83 3d a9 a4 58 08 00 0f 84 53 01 00 00 48 8b 7d c8 57 9d <0f> 1f 44 00 00  
-48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 65 8b
-RSP: 0018:ffffc90002d87ae0 EFLAGS: 00000286 ORIG_RAX: ffffffffffffff13
-RAX: 1ffffffff13675eb RBX: ffff8880903f8380 RCX: ffffffff815ad05a
-RDX: dffffc0000000000 RSI: 0000000000000004 RDI: 0000000000000286
-RBP: ffffc90002d87b28 R08: 0000000000000004 R09: fffffbfff1708c51
-R10: fffffbfff1708c50 R11: ffff8880903f8380 R12: ffff888094a93d28
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-  flush_workqueue+0x126/0x14c0 kernel/workqueue.c:2775
-  hci_dev_open+0xe0/0x280 net/bluetooth/hci_core.c:1626
-  hci_sock_bind+0x4bf/0x12d0 net/bluetooth/hci_sock.c:1189
-  __sys_bind+0x239/0x290 net/socket.c:1662
-  __do_sys_bind net/socket.c:1673 [inline]
-  __se_sys_bind net/socket.c:1671 [inline]
-  __x64_sys_bind+0x73/0xb0 net/socket.c:1671
-  do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x4483b9
-Code: e8 9c e6 ff ff 48 83 c4 18 c3 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 3b 05 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007fb43a523d88 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00000000006e4a18 RCX: 00000000004483b9
-RDX: 0000000000000006 RSI: 00000000200007c0 RDI: 0000000000000004
-RBP: 00000000006e4a10 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000006e4a1c
-R13: 00007ffc78f07a4f R14: 00007fb43a5249c0 R15: 20c49ba5e353f7cf
-Shutting down cpus with NMI
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Rob
