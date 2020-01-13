@@ -2,187 +2,112 @@ Return-Path: <SRS0=UJar=3C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UPPERCASE_50_75 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56390C3F68F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 04:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE6CC33CAE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 07:30:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BC0A22527
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 04:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12302207FF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jan 2020 07:30:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="LbplYLXK"
+	dkim=pass (1024-bit key) header.d=RFPros.onmicrosoft.com header.i=@RFPros.onmicrosoft.com header.b="1JHqPNCp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387610AbgAMEcT (ORCPT
+        id S1728731AbgAMHah (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 12 Jan 2020 23:32:19 -0500
-Received: from mail25.static.mailgun.info ([104.130.122.25]:29588 "EHLO
-        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387571AbgAMEcT (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 12 Jan 2020 23:32:19 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1578889939; h=References: In-Reply-To: Message-Id: Date:
- Subject: Cc: To: From: Sender;
- bh=l7XrpfhhxOyRvikqVWgTDSMGNKmcEQJIF/TbImSjqFM=; b=LbplYLXKsW4bhkzO3PoyBLOIQo5opK0qBj0tu5/Y42YZgikJwxOQbPIIvjimfASPAMOOWzyb
- dXLUdGucnx0MsSvQpSMjCeoxiTqchGe6HjJTNfSBYOwXhCPrtR0JezMGUA6w7z8cK7LKnRK0
- WaYJC/LhzAPiWFkYrLsBQFN6jek=
-X-Mailgun-Sending-Ip: 104.130.122.25
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e1bf2cd.7f61a5cfe378-smtp-out-n02;
- Mon, 13 Jan 2020 04:32:13 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id E28BAC433A2; Mon, 13 Jan 2020 04:32:12 +0000 (UTC)
-Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id D52DAC433CB;
-        Mon, 13 Jan 2020 04:32:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org D52DAC433CB
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
-From:   Rocky Liao <rjliao@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v5] Bluetooth: hci_qca: Add qca_power_on() API to support both wcn399x and Rome power up
-Date:   Mon, 13 Jan 2020 12:30:20 +0800
-Message-Id: <20200113043020.9663-1-rjliao@codeaurora.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200107052601.32216-1-rjliao@codeaurora.org>
-References: <20200107052601.32216-1-rjliao@codeaurora.org>
+        Mon, 13 Jan 2020 02:30:37 -0500
+Received: from mail-dm6nam11on2040.outbound.protection.outlook.com ([40.107.223.40]:7584
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728646AbgAMHah (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 13 Jan 2020 02:30:37 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PcVh1DZsg+IKKdQQikotAV2qXkUs8y0UXJ05BzlXbQRGaTRZn82OESTLO0b4QMoEdp45z4OSN+eGHqYy+e4ctUTil/YYwm4yJhglBNOr2KSotQtR0VJdmjOQB0U5QVlTv8RV5UECzHvWLcau3o9THhgiw8z+CnPSXCx4a5wjbpZvLZZBAgxSwUGv8fG/52W5xSdSwXOIE43QFaWoGE1i42Xmg5lRCE9eexmITz3PvZNhqhzd1aK1RieJsoy70U55GHuRH8qlYMQKSIPGs6hhq3UebMqyqC2roZFvCJfFrIaIsulwvBUkYoOvZ3HzIfuwTUT1coUyHhPaPi9Mdg6PBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pZRzac1ck+cTS1P8PRB0yGftanhSik+Lt1zFcQSyMLY=;
+ b=gnIDkTN/zd1UfhN8ZcrBqFSxeq7HqK2zKiqAnNYRDwzvfH7hXhrwLlpUgFZSKe+B9JrHcoQgmkZYR9mjNt8TyCkNmIT5FU2HU+KIJaTCL3QU2I1gB17DSzqZS0YCyyqq5iqhZAOum/G+ll9BAKgBFHMM/SHbnifkQwme421BjW963XRdmTQjuCbMv/KQbmZLXVDZemOIhzUWVjnXfAh4o6EDyogqnLf4edLIMU/vOdruuGslGzO6nNaXajZpauLaCZY/GtwbSXRob3B9ElrHBLnLH7X+Sq1JekJJIvOHM16TQgRag5uYpcW7371QfGjYYE4Z1W6+rZ6tWjFvzXaHrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=lairdconnect.com; dmarc=pass action=none
+ header.from=lairdconnect.com; dkim=pass header.d=lairdconnect.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=RFPros.onmicrosoft.com; s=selector1-RFPros-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pZRzac1ck+cTS1P8PRB0yGftanhSik+Lt1zFcQSyMLY=;
+ b=1JHqPNCpGQGTM72BjrOY6GGTFROwF5B0MAfyGmUx/Ezm1iZfmhZFEtIG4IkRETWW1K0wOC6NGyg3WUyHDv58ZDSAeFEd2RWAvMOAI9SqCq8tnn+aaKAelp3ZBK6R/nVxqPf5oe23w8vEtWYVA8c0q8h46SUk3w3lZKYyUemdxH4=
+Received: from DM5PR14MB1385.namprd14.prod.outlook.com (10.173.223.13) by
+ DM5PR14MB1483.namprd14.prod.outlook.com (10.173.221.7) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9; Mon, 13 Jan 2020 07:30:35 +0000
+Received: from DM5PR14MB1385.namprd14.prod.outlook.com
+ ([fe80::95a:5934:c7a4:d915]) by DM5PR14MB1385.namprd14.prod.outlook.com
+ ([fe80::95a:5934:c7a4:d915%6]) with mapi id 15.20.2623.015; Mon, 13 Jan 2020
+ 07:30:35 +0000
+From:   Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>
+To:     Steve Brown <sbrown@ewol.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: mesh: scan params specify random address, but no random address
+ set
+Thread-Topic: mesh: scan params specify random address, but no random address
+ set
+Thread-Index: AQHVyIjVzdx6hBoAnEeOv2t0j3oKb6foNUog
+Date:   Mon, 13 Jan 2020 07:30:35 +0000
+Message-ID: <DM5PR14MB1385927CD0D2A8B1D0ADBB15E6350@DM5PR14MB1385.namprd14.prod.outlook.com>
+References: <988d501619da548fff95f1f1afaa6456e18e6dfe.camel@ewol.com>
+In-Reply-To: <988d501619da548fff95f1f1afaa6456e18e6dfe.camel@ewol.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Jamie.Mccrae@lairdconnect.com; 
+x-originating-ip: [81.148.167.46]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fb126b4e-d6f9-4d05-711f-08d797fa7af5
+x-ms-traffictypediagnostic: DM5PR14MB1483:
+x-microsoft-antispam-prvs: <DM5PR14MB1483AB8C1BA2E09066F78E4CE6350@DM5PR14MB1483.namprd14.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 028166BF91
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(376002)(366004)(346002)(396003)(39840400004)(189003)(199004)(33656002)(8676002)(316002)(81156014)(110136005)(8936002)(81166006)(52536014)(2906002)(4744005)(71200400001)(86362001)(7696005)(5660300002)(9686003)(66946007)(76116006)(66556008)(66476007)(64756008)(66446008)(478600001)(186003)(55016002)(26005)(6506007);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR14MB1483;H:DM5PR14MB1385.namprd14.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: lairdconnect.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Sdi9ufRRGCPMZsA+7gNRPL4j/rkKjqLitDOK3UedMto2EofXkwWzX43jBtT5YmwX+W4rgu82V/54P1XI+ZtHtNrMuu9JsEA8Q9Srjaw0BwlceQzTge3LjEteQtkfvU29leDxXYaXFj+WDwOMKVU67Oeo4+7ak9unN8mApepgqqaoI+NK8nRxoT8zeUwXRph4PtvOf9BvFCSYlzhSpm/T5YfEfhbAeMxCZRyOFXpAwG1dSTEThwktd2d2If4P0DZRhRGQGC4Mv7UcqJB9lxAuhJWzPeC6P8gpx5GbJfR6dxbLCH90x7foiU+JQgOR3JlHOEXbQLJvEDWUPHwmxjeFbm0wGtLMgXovRAR15xWqWQZhzAwA5d0Ebwe/YocB5yOYp/ewlG0FraaQR7v8Fjr24QSXKWBwbMcb9gRnJ9etGIB54KPLS5fEmhYsghVIOLr+
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: lairdconnect.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb126b4e-d6f9-4d05-711f-08d797fa7af5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2020 07:30:35.5378
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a67ad7fe-2b14-4d12-b58f-bb509b58f338
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cp/SHMoHsR0EyBLe6pHvCh1xj4TDUXMrk3FfD6xyhjeeR2McX7Vkc1eH3M9x+phHhGdZ/SOU5Ewf7BpvwxO23fnhgfiUDmb1tPC4YjX1TFk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR14MB1483
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds a unified API qca_power_on() to support both wcn399x and
-Rome power on. For wcn399x it calls the qca_wcn3990_init() to init the
-regulators, and for Rome it pulls up the bt_en GPIO to power up the btsoc.
-It also moves all the power up operation from hdev->open() to
-hdev->setup().
-
-Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
----
-
-Changes in v2: None
-Changes in v3:
-  -moved all the power up operation from open() to setup()
-  -updated the commit message
-Changes in v4:
-  -made a single call to qca_power_on() in setup()
-Changes in v5:
-  -modified the debug log location
-
- drivers/bluetooth/hci_qca.c | 54 ++++++++++++++++++++++---------------
- 1 file changed, 33 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 82e4cd4b6663..992622dc1263 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -541,7 +541,6 @@ static int qca_open(struct hci_uart *hu)
- {
- 	struct qca_serdev *qcadev;
- 	struct qca_data *qca;
--	int ret;
- 
- 	BT_DBG("hu %p qca_open", hu);
- 
-@@ -582,23 +581,10 @@ static int qca_open(struct hci_uart *hu)
- 	hu->priv = qca;
- 
- 	if (hu->serdev) {
--
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
--		if (!qca_is_wcn399x(qcadev->btsoc_type)) {
--			gpiod_set_value_cansleep(qcadev->bt_en, 1);
--			/* Controller needs time to bootup. */
--			msleep(150);
--		} else {
-+		if (qca_is_wcn399x(qcadev->btsoc_type)) {
- 			hu->init_speed = qcadev->init_speed;
- 			hu->oper_speed = qcadev->oper_speed;
--			ret = qca_regulator_enable(qcadev);
--			if (ret) {
--				destroy_workqueue(qca->workqueue);
--				kfree_skb(qca->rx_skb);
--				hu->priv = NULL;
--				kfree(qca);
--				return ret;
--			}
- 		}
- 	}
- 
-@@ -1531,6 +1517,31 @@ static int qca_wcn3990_init(struct hci_uart *hu)
- 	return 0;
- }
- 
-+static int qca_power_on(struct hci_dev *hdev)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	enum qca_btsoc_type soc_type = qca_soc_type(hu);
-+	struct qca_serdev *qcadev;
-+	int ret = 0;
-+
-+	/* Non-serdev device usually is powered by external power
-+	 * and don't need additional action in driver for power on
-+	 */
-+	if (!hu->serdev)
-+		return 0;
-+
-+	if (qca_is_wcn399x(soc_type)) {
-+		ret = qca_wcn3990_init(hu);
-+	} else {
-+		qcadev = serdev_device_get_drvdata(hu->serdev);
-+		gpiod_set_value_cansleep(qcadev->bt_en, 1);
-+		/* Controller needs time to bootup. */
-+		msleep(150);
-+	}
-+
-+	return ret;
-+}
-+
- static int qca_setup(struct hci_uart *hu)
- {
- 	struct hci_dev *hdev = hu->hdev;
-@@ -1553,24 +1564,25 @@ static int qca_setup(struct hci_uart *hu)
- 	 */
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 
--	if (qca_is_wcn399x(soc_type)) {
--		bt_dev_info(hdev, "setting up wcn3990");
-+	bt_dev_info(hdev, "setting up %s",
-+		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME");
- 
-+	ret = qca_power_on(hdev);
-+	if (ret)
-+		return ret;
-+
-+	if (qca_is_wcn399x(soc_type)) {
- 		/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to execute
- 		 * setup for every hci up.
- 		 */
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
- 		hu->hdev->shutdown = qca_power_off;
--		ret = qca_wcn3990_init(hu);
--		if (ret)
--			return ret;
- 
- 		ret = qca_read_soc_version(hdev, &soc_ver, soc_type);
- 		if (ret)
- 			return ret;
- 	} else {
--		bt_dev_info(hdev, "ROME setup");
- 		qca_set_speed(hu, QCA_INIT_SPEED);
- 	}
- 
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+PiBJJ20gdXNpbmcgdGhlIFplcGh5ciBoY2kgaW1wbGVtZW50YXRpb24gb24gYSBidCBkb25nbGUu
+IEl0IGNvbXBsYWlucw0KPiB0aGF0IG5vIHJhbmRvbSBhZGRyZXNzIGlzIHNldCB3aGVuIHNjYW4g
+ZW5hYmxlIGlzIHNlbnQuDQo+DQo+IE15IFJQaSBkb2Vzbid0IGNhcmUgaWYgYSByYW5kb20gYWRk
+cmVzcyBpcyBzZXQgb3Igbm90Lg0KPg0KPiBTdGV2ZQ0KDQpIaSBTdGV2ZSwNCllvdSBuZWVkIGFu
+IGFkZHJlc3Mgc2V0IGJlY2F1c2Ugb2YgZGlyZWN0ZWQgYWR2ZXJ0aXNpbmcuIFlvdSBuZWVkIHRv
+IHVwZGF0ZSB5b3VyIHplcGh5ciBwcm9qZWN0IHRvIGluY2x1ZGUgYSByYW5kb20sIGFkZHJlc3Ms
+IHRoaXMgaXMgY292ZXJlZCBxdWl0ZSBleHRlbnNpdmVseSBvbiB0aGUgemVwaHlyIGRvY3VtZW50
+YXRpb24gYW5kIGRpc2N1c3Npb25zIGZvciBOb3JkaWMgY2hpcHNldHMuDQpUaGFua3MsDQpKYW1p
+ZQ0KVEhJUyBNRVNTQUdFLCBBTlkgQVRUQUNITUVOVChTKSwgQU5EIFRIRSBJTkZPUk1BVElPTiBD
+T05UQUlORUQgSEVSRUlOIE1BWSBCRSBQUk9QUklFVEFSWSBUTyBMQUlSRCBDT05ORUNUSVZJVFks
+IElOQy4gQU5EL09SIEFOT1RIRVIgUEFSVFksIEFORCBNQVkgRlVSVEhFUiBCRSBJTlRFTkRFRCBU
+TyBCRSBLRVBUIENPTkZJREVOVElBTC4gSUYgWU9VIEFSRSBOT1QgVEhFIElOVEVOREVEIFJFQ0lQ
+SUVOVCwgUExFQVNFIERFTEVURSBUSEUgRU1BSUwgQU5EIEFOWSBBVFRBQ0hNRU5UUywgQU5EIElN
+TUVESUFURUxZIE5PVElGWSBUSEUgU0VOREVSIEJZIFJFVFVSTiBFTUFJTC4gVEhJUyBNRVNTQUdF
+IEFORCBJVFMgQ09OVEVOVFMgQVJFIFRIRSBQUk9QRVJUWSBPRiBMQUlSRCBDT05ORUNUSVZJVFks
+IElOQy4gQU5EIE1BWSBOT1QgQkUgUkVQUk9EVUNFRCBPUiBVU0VEIFdJVEhPVVQgVEhFIEVYUFJF
+U1MgV1JJVFRFTiBDT05TRU5UIE9GIExBSVJEIENPTk5FQ1RJVklUWSwgSU5DLg0K
