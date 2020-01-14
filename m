@@ -2,216 +2,218 @@ Return-Path: <SRS0=HCMd=3D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2316AC33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 18:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5884C33C9E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 19:39:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0885424658
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 18:43:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6947024655
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 19:39:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="nky5xWIK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727556AbgANSnM convert rfc822-to-8bit (ORCPT
+        id S1728734AbgANTjA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jan 2020 13:43:12 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:55611 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726491AbgANSnM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jan 2020 13:43:12 -0500
-Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 399CCCECE2;
-        Tue, 14 Jan 2020 19:52:28 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH v2] Bluetooth: Store periodic advertiser list size
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1578592599-9605-1-git-send-email-ankit.p.navik@intel.com>
-Date:   Tue, 14 Jan 2020 19:43:10 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <DDF139B1-2CF2-430B-8546-185AF0608DF4@holtmann.org>
-References: <1578592599-9605-1-git-send-email-ankit.p.navik@intel.com>
-To:     Ankit Navik <ankit.p.navik@intel.com>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
+        Tue, 14 Jan 2020 14:39:00 -0500
+Received: from mga09.intel.com ([134.134.136.24]:5608 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726491AbgANTi7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Jan 2020 14:38:59 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jan 2020 11:38:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,320,1574150400"; 
+   d="scan'208";a="242592515"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga002.jf.intel.com with ESMTP; 14 Jan 2020 11:38:59 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 14 Jan 2020 11:38:58 -0800
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 14 Jan 2020 11:38:58 -0800
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 14 Jan 2020 11:38:58 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.104)
+ by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Tue, 14 Jan 2020 11:38:56 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EcfEU5L6eNTE1QbTFiofp7+lr6VAv+Gl42cY7Vc7PBwAcbUr66/62pXnJ8XdLaatwYnGMIGSieCvkciY266NepV5n2XewJ+3eeHRqHMQXrlfTV8T1RyGse7bmPIJ1QNuKJ86VHRF/ZEzbNdWX0w8WluFQLeXvCJQYAXWmwDzVg1d+uHlHtCGS9QW2qx1ncBfVE2ZX/VTOn/wJ6DVyg1jGvlkAess/N3Rp8bsikTmzvLVSQsaOJ42Fq2jv6J9uOHDzPeVm9uXzhgxCnzhCU29mbAJqjDK5j5vuOas5fCb+Fs09C6fGqVxmK1EEDucU01tekrOPCBzAOg3hM/9QkkTmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ud9ZcjhZhmc0c4N4jXgoYCwW/1TBFWBD5KuyiG3BfPk=;
+ b=JFXVnsMwd/5nuv2d0H9YY90FuVjvjlTjgFTW9G+Qhr3nEM+os1n2oWb4jn1mkgqypkWl99vchC2PXAjV6n3+A65CUyQDlkdjXNA8KW2ZjJ1Ytk4GLde8TYraJJhctR8XC/n2QvfHNGp4E2Zst5tjz3K843U8n+EjVjFdrljews9gAxHafNWktcYMXkAt+h9QBWScqtMcrNiQQpo+SthPfbR8VPd063q7OxU6yvUQ0EZgR2LZpZm050AKTOBEYzZoKupgAVOLvtcg9W1HVT6AIOtbZfF+KffkKIt4OOyhYcRiR/YzcersbP9lmJjUiyB7x/vmTHYdM9459crfKwUf4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ud9ZcjhZhmc0c4N4jXgoYCwW/1TBFWBD5KuyiG3BfPk=;
+ b=nky5xWIKgYoMqIqRu8xgtILEfpPz2ZhEL6wSoLW83PEDdCzl/sMNolBP6weiV5JXIblFltZAYudPAcv0orwP8yUOIB7CUmVkGve6VGG+7YbV1QxVnxe2S6elhC0YvPmqkR0qpCt5waNFr6xEMTcXtNiP2ziRcRrDCJda0u+L2IE=
+Received: from SN6PR11MB3520.namprd11.prod.outlook.com (52.135.124.204) by
+ SN6PR11MB2736.namprd11.prod.outlook.com (52.135.92.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9; Tue, 14 Jan 2020 19:38:55 +0000
+Received: from SN6PR11MB3520.namprd11.prod.outlook.com
+ ([fe80::ede7:c158:93c:ca45]) by SN6PR11MB3520.namprd11.prod.outlook.com
+ ([fe80::ede7:c158:93c:ca45%7]) with mapi id 15.20.2623.015; Tue, 14 Jan 2020
+ 19:38:55 +0000
+From:   "Stotland, Inga" <inga.stotland@intel.com>
+To:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH RESEND BlueZ 1/1] mesh: Add --io option
+Thread-Topic: [PATCH RESEND BlueZ 1/1] mesh: Add --io option
+Thread-Index: AQHVygznq9eTqKX+ZE+azCGu4sREHKfqkGMA
+Date:   Tue, 14 Jan 2020 19:38:53 +0000
+Message-ID: <e2a55b9eca724eafb6c019a0e306d33cfb45a617.camel@intel.com>
+References: <20200113122726.768-1-michal.lowas-rzechonek@silvair.com>
+         <20200113122726.768-2-michal.lowas-rzechonek@silvair.com>
+In-Reply-To: <20200113122726.768-2-michal.lowas-rzechonek@silvair.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=inga.stotland@intel.com; 
+x-originating-ip: [192.55.54.40]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6a355620-e913-4ae5-6a6b-08d79929646a
+x-ms-traffictypediagnostic: SN6PR11MB2736:
+x-microsoft-antispam-prvs: <SN6PR11MB273628D5B51A5D707EB06AA5FB340@SN6PR11MB2736.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2399;
+x-forefront-prvs: 028256169F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(376002)(396003)(39860400002)(366004)(199004)(189003)(186003)(6486002)(81166006)(81156014)(8676002)(26005)(2906002)(66946007)(71200400001)(76116006)(91956017)(66476007)(66556008)(110136005)(66446008)(64756008)(316002)(36756003)(2616005)(8936002)(86362001)(5660300002)(6506007)(478600001)(6512007);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR11MB2736;H:SN6PR11MB3520.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1oIBOmSQ5v2A4e6ZcGZPTSX9wb0GnV2g7gz34Vgig8BCTnZhlF7p1Cf/XIAP57JCYLdbS8y4SzRN8wvAVNT1IXjUygYXhJx1KKQ9lRBvn2SOO0PXyDUXYKSDmJRPzxl+G0fUZk9Deh7q0QVFWb/WX5K7+1fuB9SWyRFvXP6zum3aU1P5AI0Gk7in/bvsr0t0PHCspzCr/GyID0VbbHdmuKxDAoFKzqgj5oqkYyTjEiEjf+zBOPdoRTNQkbC+UNcivHPp6fkeA/r63a+uHw216gOgAESUun3RTi2rGStxksLGwrkabw0E8yGiDCXZ4NFSXk+AugzpdD+hGxv1hR1qHzpAjYYkq8xUC4K28UlI6t63nkSF0piKq5z5potcabfPjTf8t5jPKuAFjqZ0pXBjWOW20QsWGal9k3f0Pv95/Q1BDqPBmrOaKP2AU64h+vmZ
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5FBD2C7762481A40B93BA1F0B5DF61B3@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a355620-e913-4ae5-6a6b-08d79929646a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jan 2020 19:38:54.9821
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: U7RMLRvjbbrIv7ZxMP0tjytkMe1m2FtVHETqePgboE1YYV5YZlD2+rurvSBgVZpT8KFlqY4zXcZ+G6HErIjnJA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR11MB2736
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ankit,
-
-> When controller supports the Read LE Periodic Advertiser List Size feature,
-> the total number of list size are read and now stored.
-> 
-> Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
-> ---
-> include/net/bluetooth/hci.h      |  6 ++++++
-> include/net/bluetooth/hci_core.h |  2 ++
-> net/bluetooth/hci_core.c         |  8 ++++++++
-> net/bluetooth/hci_debugfs.c      | 19 +++++++++++++++++++
-> net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
-> 5 files changed, 53 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index eccb6b2..3ef4bae 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1718,6 +1718,12 @@ struct hci_cp_le_set_adv_set_rand_addr {
-> 	bdaddr_t  bdaddr;
-> } __packed;
-> 
-> +#define HCI_OP_LE_READ_PERIODIC_ADV_LIST_SIZE	0x204a
-> +struct hci_rp_le_read_periodic_adv_list_size {
-> +	__u8 status;
-> +	__u8 size;
-> +} __packed;
-> +
-
-if patches depend on each other, please send them in a series. This makes it easier for me to test them.
-
-> #define HCI_OP_LE_READ_TX_POWER		0x204b
-> struct hci_rp_le_read_tx_power {
-> 	__u8 status;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index f3d389d..5e847c6 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -239,6 +239,7 @@ struct hci_dev {
-> 	__u8		le_features[8];
-> 	__u8		le_white_list_size;
-> 	__u8		le_resolv_list_size;
-> +	__u8		le_periodic_adv_list_size;
-> 	__u8		le_num_of_adv_sets;
-> 	__u8		le_states[8];
-> 	__u8		commands[64];
-> @@ -394,6 +395,7 @@ struct hci_dev {
-> 	struct list_head	remote_oob_data;
-> 	struct list_head	le_white_list;
-> 	struct list_head	le_resolv_list;
-> +	struct list_head	le_periodic_adv_list;
-> 	struct list_head	le_conn_params;
-> 	struct list_head	pend_le_conns;
-> 	struct list_head	pend_le_reports;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 9e19d5a..9f9262d 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -757,6 +757,12 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
-> 			hci_req_add(req, HCI_OP_LE_CLEAR_RESOLV_LIST, 0, NULL);
-> 		}
-> 
-> +		if (hdev->commands[44]& 0x40) {
-> +			/* Read LE periodic Advertiser List */
-> +			hci_req_add(req, HCI_OP_LE_READ_PERIODIC_ADV_LIST_SIZE,
-> +				    0, NULL);
-> +		}
-> +
-> 		if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) {
-> 			/* Read LE Maximum Data Length */
-> 			hci_req_add(req, HCI_OP_LE_READ_MAX_DATA_LEN, 0, NULL);
-> @@ -3239,6 +3245,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 	INIT_LIST_HEAD(&hdev->remote_oob_data);
-> 	INIT_LIST_HEAD(&hdev->le_white_list);
-> 	INIT_LIST_HEAD(&hdev->le_resolv_list);
-> +	INIT_LIST_HEAD(&hdev->le_periodic_adv_list);
-> 	INIT_LIST_HEAD(&hdev->le_conn_params);
-> 	INIT_LIST_HEAD(&hdev->pend_le_conns);
-> 	INIT_LIST_HEAD(&hdev->pend_le_reports);
-> @@ -3441,6 +3448,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
-> 	hci_adv_instances_clear(hdev);
-> 	hci_bdaddr_list_clear(&hdev->le_white_list);
-> 	hci_bdaddr_list_clear(&hdev->le_resolv_list);
-> +	hci_bdaddr_list_clear(&hdev->le_periodic_adv_list);
-> 	hci_conn_params_clear_all(hdev);
-> 	hci_discovery_filter_clear(hdev);
-> 	hci_dev_unlock(hdev);
-> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-> index 402e2cc..062fd25 100644
-> --- a/net/bluetooth/hci_debugfs.c
-> +++ b/net/bluetooth/hci_debugfs.c
-> @@ -740,6 +740,21 @@ static int resolv_list_show(struct seq_file *f, void *ptr)
-> 
-> DEFINE_SHOW_ATTRIBUTE(resolv_list);
-> 
-> +static int periodic_adv_list_show(struct seq_file *f, void *ptr)
-> +{
-> +	struct hci_dev *hdev = f->private;
-> +	struct bdaddr_list *b;
-> +
-> +	hci_dev_lock(hdev);
-> +	list_for_each_entry(b, &hdev->le_periodic_adv_list, list)
-> +		seq_printf(f, "%pMR (type %u)\n", &b->bdaddr, b->bdaddr_type);
-> +	hci_dev_unlock(hdev);
-> +
-> +	return 0;
-> +}
-> +
-> +DEFINE_SHOW_ATTRIBUTE(periodic_adv_list);
-> +
-> static int identity_resolving_keys_show(struct seq_file *f, void *ptr)
-> {
-> 	struct hci_dev *hdev = f->private;
-> @@ -1034,6 +1049,10 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
-> 			  &hdev->le_resolv_list_size);
-> 	debugfs_create_file("resolv_list", 0444, hdev->debugfs, hdev,
-> 			    &resolv_list_fops);
-> +	debugfs_create_u8("periodic_adv_list_size", 0444, hdev->debugfs,
-> +			  &hdev->le_periodic_adv_list_size);
-> +	debugfs_create_file("periodic_adv_list", 0444, hdev->debugfs, hdev,
-> +			    &periodic_adv_list_fops);
-> 	debugfs_create_file("identity_resolving_keys", 0400, hdev->debugfs,
-> 			    hdev, &identity_resolving_keys_fops);
-> 	debugfs_create_file("long_term_keys", 0400, hdev->debugfs, hdev,
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 3646f77..082a088 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -222,6 +222,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
-> 
-> 	hci_bdaddr_list_clear(&hdev->le_white_list);
-> 	hci_bdaddr_list_clear(&hdev->le_resolv_list);
-> +	hci_bdaddr_list_clear(&hdev->le_periodic_adv_list);
-> }
-> 
-> static void hci_cc_read_stored_link_key(struct hci_dev *hdev,
-> @@ -1720,6 +1721,19 @@ static void hci_cc_read_rssi(struct hci_dev *hdev, struct sk_buff *skb)
-> 	hci_dev_unlock(hdev);
-> }
-> 
-> +static void hci_cc_le_read_periodic_adv_list_size(struct hci_dev *hdev,
-> +					   struct sk_buff *skb)
-> +{
-> +	struct hci_rp_le_read_periodic_adv_list_size *rp = (void *) skb->data;
-> +
-> +	BT_DBG("%s status 0x%2.2x size %u", hdev->name, rp->status, rp->size);
-> +
-> +	if (rp->status)
-> +		return;
-> +
-> +	hdev->le_periodic_adv_list_size = rp->size;
-> +}
-> +
-> static void hci_cc_read_tx_power(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	struct hci_cp_read_tx_power *sent;
-> @@ -3427,6 +3441,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 		hci_cc_le_read_max_data_len(hdev, skb);
-> 		break;
-> 
-> +	case HCI_OP_LE_READ_PERIODIC_ADV_LIST_SIZE:
-> +		hci_cc_le_read_periodic_adv_list_size(hdev, skb);
-> +		break;
-> +
-> 	case HCI_OP_LE_READ_TX_POWER:
-> 		hci_cc_le_read_tx_power(hdev, skb);
-> 		break;
-
-This patch does two things. Please focus on just doing one at a time or do both things correctly. Right now this patch is not complete.
-
-Regards
-
-Marcel
-
+SGkgTWljaGFsLA0KDQpPbiBNb24sIDIwMjAtMDEtMTMgYXQgMTM6MjcgKzAxMDAsIE1pY2hhxYIg
+TG93YXMtUnplY2hvbmVrIHdyb3RlOg0KPiBUaGlzIGFsbG93cyBzcGVjaWZ5aW5nIGlvIHR5cGUg
+YW5kIG9wdGlvbnMgd2hlbiBpbnZva2luZyB0aGUgZGFlbW9uLg0KPiANCj4gQnkgZGVmYXVsdCwg
+bWVzaGQgcnVucyB3aXRoIE1FU0hfSU9fVFlQRV9HRU5FUklDIGFuZCB0cmllcyB0byBhdHRhY2gg
+dG8NCj4gdGhlIGZpcnN0IGF2YWlsYWJsZSBIQ0kgaW50ZXJmYWNlLg0KPiANCj4gT3B0aW9uICIt
+LWluZGV4PTxuPiIgaXMgbm93IGp1c3QgYSBzaG9ydGN1dCBmb3IgIi0taW89Z2VuZXJpYzo8bj4i
+DQo+IC0tLQ0KPiAgbWVzaC9tYWluLmMgfCA5OSArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDgxIGluc2VydGlv
+bnMoKyksIDE4IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL21lc2gvbWFpbi5jIGIv
+bWVzaC9tYWluLmMNCj4gaW5kZXggMDEwZWRjZjg1Li4yNDNlNzU2ZjkgMTAwNjQ0DQo+IC0tLSBh
+L21lc2gvbWFpbi5jDQo+ICsrKyBiL21lc2gvbWFpbi5jDQo+IEBAIC00MCwxMCArNDAsMTIgQEAN
+Cj4gIA0KPiAgc3RhdGljIGNvbnN0IGNoYXIgKmNvbmZpZ19kaXI7DQo+ICBzdGF0aWMgY29uc3Qg
+Y2hhciAqbWVzaF9jb25mX2ZuYW1lOw0KPiAtc3RhdGljIGludCBjdGxyX2luZGV4ID0gTUdNVF9J
+TkRFWF9OT05FOw0KPiArc3RhdGljIGVudW0gbWVzaF9pb190eXBlIGlvX3R5cGU7DQo+ICtzdGF0
+aWMgdm9pZCAqaW9fb3B0czsNCj4gIA0KPiAgc3RhdGljIGNvbnN0IHN0cnVjdCBvcHRpb24gbWFp
+bl9vcHRpb25zW10gPSB7DQo+ICAJeyAiaW5kZXgiLAlyZXF1aXJlZF9hcmd1bWVudCwJTlVMTCwg
+J2knIH0sDQo+ICsJeyAiaW8iLAkJcmVxdWlyZWRfYXJndW1lbnQsCU5VTEwsICdJJyB9LA0KPiAg
+CXsgImNvbmZpZyIsCW9wdGlvbmFsX2FyZ3VtZW50LAlOVUxMLCAnYycgfSwNCj4gIAl7ICJub2Rl
+dGFjaCIsCW5vX2FyZ3VtZW50LAkJTlVMTCwgJ24nIH0sDQo+ICAJeyAiZGVidWciLAlub19hcmd1
+bWVudCwJCU5VTEwsICdkJyB9LA0KPiBAQCAtNTQsMTYgKzU2LDIzIEBAIHN0YXRpYyBjb25zdCBz
+dHJ1Y3Qgb3B0aW9uIG1haW5fb3B0aW9uc1tdID0gew0KPiAgDQo+ICBzdGF0aWMgdm9pZCB1c2Fn
+ZSh2b2lkKQ0KPiAgew0KPiAtCWxfaW5mbygiIik7DQo+IC0JbF9pbmZvKCJVc2FnZTpcbiINCj4g
+KwlmcHJpbnRmKHN0ZGVyciwNCj4gKwkJIlVzYWdlOlxuIg0KPiAgCSAgICAgICAiXHRibHVldG9v
+dGgtbWVzaGQgW29wdGlvbnNdXG4iKTsNCj4gLQlsX2luZm8oIk9wdGlvbnM6XG4iDQo+IC0JICAg
+ICAgICJcdC0taW5kZXggPGhjaW51bT4gIFVzZSBzcGVjaWZpZWQgY29udHJvbGxlclxuIg0KPiAr
+CWZwcmludGYoc3RkZXJyLA0KPiArCQkiT3B0aW9uczpcbiINCj4gKwkgICAgICAgIlx0LS1pbmRl
+eCA8aGNpbnVtPiAgRXF1aXZhbGVudCBvZiBgLS1pbz1nZW5lcmljOjxoY2ludW0+YFxuIg0KPiAr
+CSAgICAgICAiXHQtLWlvIDxpbz4gICAgICAgICBVc2Ugc3BlY2lmaWVkIGlvIChkZWZhdWx0OiBn
+ZW5lcmljKVxuIg0KPiAgCSAgICAgICAiXHQtLWNvbmZpZyAgICAgICAgICBDb25maWd1cmF0aW9u
+IGRpcmVjdG9yeVxuIg0KPiAgCSAgICAgICAiXHQtLW5vZGV0YWNoICAgICAgICBSdW4gaW4gZm9y
+ZWdyb3VuZFxuIg0KPiAgCSAgICAgICAiXHQtLWRlYnVnICAgICAgICAgICBFbmFibGUgZGVidWcg
+b3V0cHV0XG4iDQo+ICAJICAgICAgICJcdC0tZGJ1cy1kZWJ1ZyAgICAgIEVuYWJsZSBELUJ1cyBk
+ZWJ1Z2dpbmdcbiINCj4gIAkgICAgICAgIlx0LS1oZWxwICAgICAgICAgICAgU2hvdyAlcyBpbmZv
+cm1hdGlvblxuIiwgX19mdW5jX18pOw0KPiArCWZwcmludGYoc3RkZXJyLA0KPiArCSAgICAgICAi
+aW86XG4iDQo+ICsJICAgICAgICJcdGdlbmVyaWNbOjxpbmRleD5dXG4iDQo+ICsJICAgICAgICJc
+dFx0VXNlIGdlbmVyaWMgSENJIGlvIG9uIGludGVyZmFjZSBoY2k8aW5kZXg+LCBvciB0aGUgZmly
+c3RcbiINCj4gKwkgICAgICAgIlx0XHRhdmFpbGFibGUgb25lXG4iKTsNCj4gIH0NCj4gIA0KPiAg
+c3RhdGljIHZvaWQgZG9fZGVidWcoY29uc3QgY2hhciAqc3RyLCB2b2lkICp1c2VyX2RhdGEpDQo+
+IEBAIC0xMDAsOCArMTA5LDggQEAgc3RhdGljIHZvaWQgcmVxdWVzdF9uYW1lX2NhbGxiYWNrKHN0
+cnVjdCBsX2RidXMgKmRidXMsIGJvb2wgc3VjY2VzcywNCj4gIAkJcmV0dXJuOw0KPiAgCX0NCj4g
+IA0KPiAtCWlmICghbWVzaF9pbml0KGNvbmZpZ19kaXIsIG1lc2hfY29uZl9mbmFtZSwgTUVTSF9J
+T19UWVBFX0dFTkVSSUMsDQo+IC0JCQkJJmN0bHJfaW5kZXgsIG1lc2hfcmVhZHlfY2FsbGJhY2ss
+IGRidXMpKSB7DQo+ICsJaWYgKCFtZXNoX2luaXQoY29uZmlnX2RpciwgbWVzaF9jb25mX2ZuYW1l
+LCBpb190eXBlLCBpb19vcHRzLA0KPiArCQkJCQltZXNoX3JlYWR5X2NhbGxiYWNrLCBkYnVzKSkg
+ew0KPiAgCQlsX2Vycm9yKCJGYWlsZWQgdG8gaW5pdGlhbGl6ZSBtZXNoIik7DQo+ICAJCWxfbWFp
+bl9xdWl0KCk7DQo+ICAJfQ0KPiBAQCAtMTMzLDEyICsxNDIsNDQgQEAgc3RhdGljIHZvaWQgc2ln
+bmFsX2hhbmRsZXIodWludDMyX3Qgc2lnbm8sIHZvaWQgKnVzZXJfZGF0YSkNCj4gIAl0ZXJtaW5h
+dGVkID0gdHJ1ZTsNCj4gIH0NCj4gIA0KPiArc3RhdGljIGJvb2wgcGFyc2VfaW8oY29uc3QgY2hh
+ciAqb3B0YXJnLCBlbnVtIG1lc2hfaW9fdHlwZSAqdHlwZSwgdm9pZCAqKm9wdHMpDQo+ICt7DQo+
+ICsJaWYgKHN0cnN0cihvcHRhcmcsICJnZW5lcmljIikgPT0gb3B0YXJnKSB7DQo+ICsJCWludCAq
+aW5kZXggPSBsX25ldyhpbnQsIDEpOw0KPiArDQo+ICsJCSp0eXBlID0gTUVTSF9JT19UWVBFX0dF
+TkVSSUM7DQo+ICsJCSpvcHRzID0gaW5kZXg7DQo+ICsNCj4gKwkJb3B0YXJnICs9IHN0cmxlbigi
+Z2VuZXJpYyIpOw0KPiArCQlpZiAoISpvcHRhcmcpIHsNCj4gKwkJCSppbmRleCA9IE1HTVRfSU5E
+RVhfTk9ORTsNCj4gKwkJCXJldHVybiB0cnVlOw0KPiArCQl9DQo+ICsNCj4gKwkJaWYgKCpvcHRh
+cmcgIT0gJzonKQ0KPiArCQkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICsJCW9wdGFyZysrOw0KPiAr
+DQo+ICsJCWlmIChzc2NhbmYob3B0YXJnLCAiaGNpJWQiLCBpbmRleCkgPT0gMSkNCj4gKwkJCXJl
+dHVybiB0cnVlOw0KPiArDQo+ICsJCWlmIChzc2NhbmYob3B0YXJnLCAiJWQiLCBpbmRleCkgPT0g
+MSkNCj4gKwkJCXJldHVybiB0cnVlOw0KPiArDQo+ICsJCXJldHVybiBmYWxzZTsNCj4gKwl9DQo+
+ICsNCj4gKwlyZXR1cm4gZmFsc2U7DQo+ICt9DQo+ICsNCj4gIGludCBtYWluKGludCBhcmdjLCBj
+aGFyICphcmd2W10pDQo+ICB7DQo+ICAJaW50IHN0YXR1czsNCj4gIAlib29sIGRldGFjaGVkID0g
+dHJ1ZTsNCj4gIAlib29sIGRidXNfZGVidWcgPSBmYWxzZTsNCj4gIAlzdHJ1Y3QgbF9kYnVzICpk
+YnVzID0gTlVMTDsNCj4gKwljaGFyICppbyA9IE5VTEw7DQo+ICANCj4gIAlpZiAoIWxfbWFpbl9p
+bml0KCkpDQo+ICAJCXJldHVybiAtMTsNCj4gQEAgLTE1Myw3ICsxOTQsNiBAQCBpbnQgbWFpbihp
+bnQgYXJnYywgY2hhciAqYXJndltdKQ0KPiAgDQo+ICAJZm9yICg7Oykgew0KPiAgCQlpbnQgb3B0
+Ow0KPiAtCQljb25zdCBjaGFyICpzdHI7DQo+ICANCj4gIAkJb3B0ID0gZ2V0b3B0X2xvbmcoYXJn
+YywgYXJndiwgImk6YzpmOm5kYmgiLCBtYWluX29wdGlvbnMsIE5VTEwpOw0KPiAgCQlpZiAob3B0
+IDwgMCkNCj4gQEAgLTE2MSwxOCArMjAxLDIwIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICph
+cmd2W10pDQo+ICANCj4gIAkJc3dpdGNoIChvcHQpIHsNCj4gIAkJY2FzZSAnaSc6DQo+IC0JCQlp
+ZiAoc3RybGVuKG9wdGFyZykgPiAzICYmICFzdHJuY21wKG9wdGFyZywgImhjaSIsIDMpKQ0KPiAt
+CQkJCXN0ciA9IG9wdGFyZyArIDM7DQo+IC0JCQllbHNlDQo+IC0JCQkJc3RyID0gb3B0YXJnOw0K
+PiAtCQkJaWYgKCFpc2RpZ2l0KCpzdHIpKSB7DQo+IC0JCQkJbF9lcnJvcigiSW52YWxpZCBjb250
+cm9sbGVyIGluZGV4IHZhbHVlIik7DQo+IC0JCQkJc3RhdHVzID0gRVhJVF9GQUlMVVJFOw0KPiAr
+CQkJaWYgKGlvKSB7DQo+ICsJCQkJbF9lcnJvcigiVXNlIGVpdGhlciAtLWluZGV4IG9yIC0taW8s
+IG5vdCBib3RoIik7DQo+ICsJCQkJc3RhdHVzID0gRVhJVF9TVUNDRVNTOw0KPiAgCQkJCWdvdG8g
+ZG9uZTsNCj4gIAkJCX0NCj4gLQ0KPiAtCQkJY3Rscl9pbmRleCA9IGF0b2koc3RyKTsNCj4gLQ0K
+PiArCQkJaW8gPSBsX3N0cmR1cF9wcmludGYoImdlbmVyaWM6JXMiLCBvcHRhcmcpOw0KPiArCQkJ
+YnJlYWs7DQo+ICsJCWNhc2UgJ0knOg0KPiArCQkJaWYgKGlvKSB7DQo+ICsJCQkJbF9lcnJvcigi
+VXNlIGVpdGhlciAtLWluZGV4IG9yIC0taW8sIG5vdCBib3RoIik7DQo+ICsJCQkJc3RhdHVzID0g
+RVhJVF9TVUNDRVNTOw0KPiArCQkJCWdvdG8gZG9uZTsNCj4gKwkJCX0NCj4gKwkJCWlvID0gbF9z
+dHJkdXAob3B0YXJnKTsNCj4gIAkJCWJyZWFrOw0KPiAgCQljYXNlICduJzoNCj4gIAkJCWRldGFj
+aGVkID0gZmFsc2U7DQo+IEBAIC0yMDAsNiArMjQyLDIxIEBAIGludCBtYWluKGludCBhcmdjLCBj
+aGFyICphcmd2W10pDQo+ICAJCX0NCj4gIAl9DQo+ICANCj4gKwlpZiAoIWlvKQ0KPiArCQlpbyA9
+IGxfc3RyZHVwX3ByaW50ZigiZ2VuZXJpYyIpOw0KPiArDQo+ICsJaWYgKCFwYXJzZV9pbyhpbywg
+JmlvX3R5cGUsICZpb19vcHRzKSkgew0KPiArCQlsX2Vycm9yKCJJbnZhbGlkIGlvOiAlcyIsIGlv
+KTsNCj4gKwkJc3RhdHVzID0gRVhJVF9GQUlMVVJFOw0KPiArCQlnb3RvIGRvbmU7DQo+ICsJfQ0K
+PiArDQo+ICsJaWYgKChpb190eXBlID09IE1FU0hfSU9fVFlQRV9OT05FKSAmJiAhaW9fb3B0cykg
+ew0KPiArCQlpbnQgKmluZGV4ID0gbF9uZXcoaW50LCAxKTsNCj4gKwkJKmluZGV4ID0gTUdNVF9J
+TkRFWF9OT05FOw0KPiArCQlpb190eXBlID0gTUVTSF9JT19UWVBFX0dFTkVSSUM7DQo+ICsJCWlv
+X29wdHMgPSBpbmRleDsNCj4gKwl9DQo+ICANCj4gIAlpZiAoIWRldGFjaGVkKQ0KPiAgCQl1bWFz
+aygwMDc3KTsNCj4gQEAgLTIyNSw2ICsyODIsMTIgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIg
+KmFyZ3ZbXSkNCj4gIAlzdGF0dXMgPSBsX21haW5fcnVuX3dpdGhfc2lnbmFsKHNpZ25hbF9oYW5k
+bGVyLCBOVUxMKTsNCj4gIA0KPiAgZG9uZToNCj4gKwlpZiAoaW8pDQo+ICsJCWxfZnJlZShpbyk7
+DQo+ICsNCj4gKwlpZiAoaW9fb3B0cykNCj4gKwkJbF9mcmVlKGlvX29wdHMpOw0KPiArDQo+ICAJ
+bWVzaF9jbGVhbnVwKCk7DQo+ICAJbF9kYnVzX2Rlc3Ryb3koZGJ1cyk7DQo+ICAJbF9tYWluX2V4
+aXQoKTsNCg0KDQpJIHdvbmRlciBpZiBpdCB3b3VsZCBiZSBiZXR0ZXIgdG8gcmUtdXNlICItaSIg
+b3B0aW9uIGJ5IGNoYW5naW5nIGl0J3MNCm1lYW5pbmcgZm9ybSAiaW5kZXgiIHRvICJpL28iLg0K
+DQpTbyB0aGF0ICIgLWkgaGNpPCM+IiB3aWxsIG1hcCB0byBnZW5lcmljIGkvbyBvbiBhIHNwZWNp
+ZmllZCBjb250cm9sbGVyDQphbmQgbm8gIi1pIiBvcHRpb24gbWVhbnMgYW55IGNvbnRyb2xsZXIu
+DQogDQpZZXMsIHdlIHdpbGwgbG9vc2Ugc29tZSB1bmlmb3JtaXR5IGFjcm9zcyBhbGwgb2YgdGhl
+IGJsdWV6IGluIGEgc2Vuc2UNCnRoYXQgIi1pIDwjPiIgd29uJ3Qgd29yaywgYnV0IGltbyBpdCdz
+IHByZWZlcmFibGUgdG8gaGF2aW5nIHR3byBvcHRpb25zDQp3aXRoIGludGVyLWRlcGVuZGVjaWVz
+Lg0KDQpCZXN0IHJlZ2FyZHMsDQoNCkluZ2ENCg0KDQogDQo=
