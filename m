@@ -2,109 +2,179 @@ Return-Path: <SRS0=HCMd=3D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F02C33CA9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 01:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DC2C33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 11:34:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 863982084D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 01:35:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 399892467C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 11:34:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nOt/WGOb"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="TCgn5eQv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728918AbgANBfp (ORCPT
+        id S1729467AbgANLen (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jan 2020 20:35:45 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:40410 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728890AbgANBfp (ORCPT
+        Tue, 14 Jan 2020 06:34:43 -0500
+Received: from mail25.static.mailgun.info ([104.130.122.25]:57169 "EHLO
+        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728826AbgANLel (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jan 2020 20:35:45 -0500
-Received: by mail-oi1-f194.google.com with SMTP id c77so10288809oib.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jan 2020 17:35:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Es2iIa5uM6z+FBYxdNBIIR3L6LPGY9nfZZ3Ee4fEYfs=;
-        b=nOt/WGObnC4Br2dP+J+Se0J9rW2GPMCpwB+WAGjyktEruCZ7WmGMeRoI17agv8KPLp
-         uFl+QMD/9hD6+gDXEgBOI25S4lCx36NyByU+lJ8TUD5lNeQfibE/YJ6yvfZ+FnVJOOPj
-         OKe0lQ7bp4GBUkvY17YVz6aykB8v4S0jeVnbBnwchcZuai/KB8RvBFQ1tMaUMQpb352q
-         mmkK96trS8rH9uBfAcsrmu5W4pDaXn5HXsY9QLJSWSWUs+XEo/JbHsw73tKUCtgxUmuE
-         fxdlbb1J2isnWajQP4EaVuoQzJsX4TfQbvWGQ3jrohZkqazi5y9DQOnyiwIpYy+cLA+P
-         4kog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Es2iIa5uM6z+FBYxdNBIIR3L6LPGY9nfZZ3Ee4fEYfs=;
-        b=XS1Je0iBOeRMgcfARG4yIIAz7lGgdN4acQ0RtkIY/dQxhWzO6QgBzBqqJ3MLxYXDJJ
-         uXh4i4+PsBAx7/sNkeHFiCOT61W5yPmPF2FRXGuAWxTgm28BtHtM/dPRLh9C1meDjcDA
-         yS+8gZaL78xxlvxOEusZscBNOhCMDeCSYMAKgRPZVeQ8GW9vDJI/6bnfPpzBtrNFTgwQ
-         JYmHvrQSQIBn8pCwXvwI7mf6o1tvkt6+Z8hoGAIbVFnZFf7U1Xu2C3kGrMuW4Q5vZZ2Q
-         +a3J9HlV/fLSIiYycGaNS4EvWxMBxNKcewK6rcHDGxpLGyz2g0IL46YAb9AMbqHKWw2U
-         z2Kg==
-X-Gm-Message-State: APjAAAUp2kXDlEFQyyTa5HNcYSMjOR5t4ZDEaWzm2ZbpZuoiOS2QzMNH
-        BpQt1GmsEN+S0RrtlpKlS4cMmOUaQGlL2znsMyugC4x+
-X-Google-Smtp-Source: APXvYqxisBAmsGjHyyQ/pvIfFBCvL4lmLT4nZdPDwT6HSFkZRO06g44KfzkcgMnfSvQEjBbgGlsIBWntQOTkNb4dhtw=
-X-Received: by 2002:aca:481:: with SMTP id 123mr15307992oie.110.1578965744179;
- Mon, 13 Jan 2020 17:35:44 -0800 (PST)
+        Tue, 14 Jan 2020 06:34:41 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1579001680; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=woaMqbbGS/XqLPbmGA4bjzbSXSg0w6f97FTkhMSYq/c=;
+ b=TCgn5eQvvOLtI0UA1HLqo2Zvc15IWJy4ObsSsxFS88MZB84nyqyK+H1vn0fcboXyyjzPsKJz
+ 90CjmaCWYiPgNUyxWgLtfTsY7RQcEikA9Gg73GuuGRm0aAn5wz/dm6R0D2Mu2KqIcUk3uVTu
+ jxzo4X8qiWILCXU5v3Ia1DRkU7M=
+X-Mailgun-Sending-Ip: 104.130.122.25
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e1da74d.7f84b40bf500-smtp-out-n02;
+ Tue, 14 Jan 2020 11:34:37 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 41295C447A1; Tue, 14 Jan 2020 11:34:36 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 822A0C433CB;
+        Tue, 14 Jan 2020 11:34:35 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200112004226.GA432297@kotori.hexchain.org>
-In-Reply-To: <20200112004226.GA432297@kotori.hexchain.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 13 Jan 2020 17:35:32 -0800
-Message-ID: <CABBYNZJRTTXsgrYCnS2rb=e5Ppg+GiCOx1iQ5X08R_sV-Ua4Rg@mail.gmail.com>
-Subject: Re: [PATCH] avctp: Fix EINVAL on uinput creation
-To:     i@hexchain.org
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 14 Jan 2020 17:04:35 +0530
+From:   bgodavar@codeaurora.org
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        tientzu@chromium.org, seanpaul@chromium.org,
+        gubbaven@codeaurora.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Enable clocks required for BT SOC
+In-Reply-To: <20191212174348.GS228856@google.com>
+References: <20191114081430.25427-1-bgodavar@codeaurora.org>
+ <20191212174348.GS228856@google.com>
+Message-ID: <2650b5540448295e767448ddd7662d30@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Matthias,
 
-On Sat, Jan 11, 2020 at 4:49 PM Haochen Tong <i@hexchain.org> wrote:
->
-> The struct uinput_dev variable is on stack, so clear its content to
-> avoid accidentally writing garbage values to kernel. This fixes "Can't
-> create uinput device: Invalid argument (22)" in some cases.
->
-> Signed-off-by: Haochen Tong <i@hexchain.org>
+sorry missed you mail.
+On 2019-12-12 23:13, Matthias Kaehlcke wrote:
+> On Thu, Nov 14, 2019 at 01:44:30PM +0530, Balakrishna Godavarthi wrote:
+>> Instead of relying on other subsytem to turn ON clocks
+>> required for BT SoC to operate, voting them from the driver.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 31 +++++++++++++++++++++++++++++--
+>>  1 file changed, 29 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index f10bdf8e1fc5..dc95e378574b 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -164,6 +164,7 @@ struct qca_serdev {
+>>  };
+>> 
+>>  static int qca_regulator_enable(struct qca_serdev *qcadev);
+>> +static int qca_power_on(struct qca_serdev *qcadev);
+>>  static void qca_regulator_disable(struct qca_serdev *qcadev);
+>>  static void qca_power_shutdown(struct hci_uart *hu);
+>>  static int qca_power_off(struct hci_dev *hdev);
+>> @@ -528,7 +529,7 @@ static int qca_open(struct hci_uart *hu)
+>>  		} else {
+>>  			hu->init_speed = qcadev->init_speed;
+>>  			hu->oper_speed = qcadev->oper_speed;
+>> -			ret = qca_regulator_enable(qcadev);
+>> +			ret = qca_power_on(qcadev);
+>>  			if (ret) {
+>>  				destroy_workqueue(qca->workqueue);
+>>  				kfree_skb(qca->rx_skb);
+>> @@ -1214,7 +1215,7 @@ static int qca_wcn3990_init(struct hci_uart *hu)
+>>  	qcadev = serdev_device_get_drvdata(hu->serdev);
+>>  	if (!qcadev->bt_power->vregs_on) {
+>>  		serdev_device_close(hu->serdev);
+>> -		ret = qca_regulator_enable(qcadev);
+>> +		ret = qca_power_on(qcadev);
+>>  		if (ret)
+>>  			return ret;
+>> 
+>> @@ -1408,6 +1409,9 @@ static void qca_power_shutdown(struct hci_uart 
+>> *hu)
+>>  	host_set_baudrate(hu, 2400);
+>>  	qca_send_power_pulse(hu, false);
+>>  	qca_regulator_disable(qcadev);
+>> +
+>> +	if (qcadev->susclk)
+>> +		clk_disable_unprepare(qcadev->susclk);
+>>  }
+>> 
+>>  static int qca_power_off(struct hci_dev *hdev)
+>> @@ -1423,6 +1427,20 @@ static int qca_power_off(struct hci_dev *hdev)
+>>  	return 0;
+>>  }
+>> 
+>> +static int qca_power_on(struct qca_serdev *qcadev)
+>> +{
+>> +	int err;
+>> +
+>> +	if (qcadev->susclk) {
+>> +		err = clk_prepare_enable(qcadev->susclk);
+>> +		if (err)
+>> +			return err;
+>> +	}
+>> +
+>> +	qca_regulator_enable(qcadev);
+>> +	return 0;
+>> +}
+>> +
+>>  static int qca_regulator_enable(struct qca_serdev *qcadev)
+>>  {
+>>  	struct qca_power *power = qcadev->bt_power;
+>> @@ -1523,6 +1541,15 @@ static int qca_serdev_probe(struct 
+>> serdev_device *serdev)
+>> 
+>>  		qcadev->bt_power->vregs_on = false;
+>> 
+>> +		if (qcadev->btsoc_type == QCA_WCN3990 ||
+>> +		    qcadev->btsoc_type == QCA_WCN3991) {
+>> +			qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+>> +			if (IS_ERR(qcadev->susclk)) {
+>> +				dev_err(&serdev->dev, "failed to acquire clk\n");
+>> +				return PTR_ERR(qcadev->susclk);
+>> +			}
+> 
+> This will break existing users. Use devm_clk_get_optional() and at most
+> raise a warning if the clock doesn't exist.
+> 
+> It would also be nice to add the clock to the affected devices in the 
+> tree
+> if possible:
+> 
+[Bala]: Sure we will use devm_clk_get_optional() in the next patch.
 
-Ive the remove the line above since we don't use it for userspace
-patches, see HACKING.
+We will check the effected areas and update the necessary as i see some 
+projects are not existing.
 
-> ---
->  profiles/audio/avctp.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-> index d3b5dfab9..f7a3de211 100644
-> --- a/profiles/audio/avctp.c
-> +++ b/profiles/audio/avctp.c
-> @@ -1182,6 +1182,8 @@ static int uinput_create(struct btd_device *device, const char *name,
->                 }
->         }
->
-> +       memset(&dev, 0, sizeof(struct uinput_dev));
-
-Ive change the above like to use sizeof(dev)
-
->         if (name) {
->                 strncpy(dev.name, name, UINPUT_MAX_NAME_SIZE);
->                 dev.name[UINPUT_MAX_NAME_SIZE - 1] = '\0';
->
-> base-commit: b4270d79e19ee70ccab6c087a7b470dad8a8a8bf
-> --
-> 2.24.1
-
-Applied, thanks.
-
--- 
-Luiz Augusto von Dentz
+> arch/arm64/boot/dts/qcom/msm8998-clamshell.dtsi:
+> compatible = "qcom,wcn3990-bt";
+> arch/arm64/boot/dts/qcom/msm8998-mtp.dtsi:              compatible =
+> "qcom,wcn3990-bt";
+> arch/arm64/boot/dts/qcom/qcs404-evb.dtsi:               compatible =
+> "qcom,wcn3990-bt";
+> arch/arm64/boot/dts/qcom/sdm845-cheza.dtsi:             compatible =
+> "qcom,wcn3990-bt";
+> arch/arm64/boot/dts/qcom/sdm845-db845c.dts:             compatible =
+> "qcom,wcn3990-bt";
+> arch/arm64/boot/dts/qcom/sdm850-lenovo-yoga-c630.dts:
+> compatible = "qcom,wcn3990-bt";
