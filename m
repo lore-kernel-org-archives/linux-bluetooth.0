@@ -6,36 +6,35 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 808DEC33CB1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 14:15:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E94E2C33CB2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 14:18:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B43724684
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 14:15:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFCA324680
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jan 2020 14:18:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728558AbgANOPW convert rfc822-to-8bit (ORCPT
+        id S1726450AbgANOS3 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jan 2020 09:15:22 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:41722 "EHLO
+        Tue, 14 Jan 2020 09:18:29 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:50070 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbgANOPV (ORCPT
+        with ESMTP id S1725994AbgANOS3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jan 2020 09:15:21 -0500
+        Tue, 14 Jan 2020 09:18:29 -0500
 Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 32E0FCECDE;
-        Tue, 14 Jan 2020 15:24:38 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 6BCF8CECDE;
+        Tue, 14 Jan 2020 15:27:45 +0100 (CET)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH v2 03/10] Bluetooth: L2CAP: Add definitions for Enhanced
- Credit Based Mode
+Subject: Re: [PATCH v2 09/10] Bluetooth: btusb: Add support for ISO packets
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200111022216.30842-4-luiz.dentz@gmail.com>
-Date:   Tue, 14 Jan 2020 15:15:20 +0100
+In-Reply-To: <20200111022216.30842-10-luiz.dentz@gmail.com>
+Date:   Tue, 14 Jan 2020 15:18:27 +0100
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C6B8A073-30E1-4C96-95B2-1C7ED1B136A2@holtmann.org>
+Message-Id: <72D263C0-CFEA-4E0A-B0B0-F409D3606068@holtmann.org>
 References: <20200111022216.30842-1-luiz.dentz@gmail.com>
- <20200111022216.30842-4-luiz.dentz@gmail.com>
+ <20200111022216.30842-10-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -45,105 +44,47 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-> This introduces the definitions for the new L2CAP mode called Enhanced
-> Credit Based Mode.
+> This enabled btusb driver to properly transmit ISO packets.
 > 
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> include/net/bluetooth/l2cap.h | 43 +++++++++++++++++++++++++++++++++++
-> 1 file changed, 43 insertions(+)
+> drivers/bluetooth/btusb.c | 14 ++++++++++++++
+> 1 file changed, 14 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 093aedebdf0c..2a38e1f93c45 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -119,6 +119,11 @@ struct l2cap_conninfo {
-> #define L2CAP_LE_CONN_REQ	0x14
-> #define L2CAP_LE_CONN_RSP	0x15
-> #define L2CAP_LE_CREDITS	0x16
-> +#define L2CAP_ECRED_CONN_REQ	0x17
-> +#define L2CAP_ECRED_CONN_RSP	0x18
-> +#define L2CAP_ECRED_RECONF_REQ	0x19
-> +#define L2CAP_ECRED_RECONF_RSP	0x1a
-> +
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index f5924f3e8b8d..ded0ba83bcce 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1463,6 +1463,13 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
 > 
-> /* L2CAP extended feature mask */
-> #define L2CAP_FEAT_FLOWCTL	0x00000001
-> @@ -360,6 +365,9 @@ struct l2cap_conf_rfc {
->  */
-> #define L2CAP_MODE_LE_FLOWCTL	0x80
+> 		hdev->stat.sco_tx++;
+> 		return submit_tx_urb(hdev, urb);
+> +
+> +	case HCI_ISODATA_PKT:
+> +		urb = alloc_bulk_urb(hdev, skb);
+> +		if (IS_ERR(urb))
+> +			return PTR_ERR(urb);
+> +
+> +		return submit_or_queue_tx_urb(hdev, urb);
+> 	}
 > 
-> +/* This is essentially L2CAP_MODE_LE_FLOWCTL but works with BR/EDR */
-
-Scrap this comment. It doesn’t help at this location.
-
-> +#define L2CAP_MODE_ECRED	0x81
-> +
-
-I am not completely fine with this name. I wonder if we better do L2CAP_MODE_EXT_FLOWCTL.
-
-> struct l2cap_conf_efs {
-> 	__u8	id;
-> 	__u8	stype;
-> @@ -483,6 +491,39 @@ struct l2cap_le_credits {
-> 	__le16     credits;
-> } __packed;
+> 	return -EILSEQ;
+> @@ -2123,6 +2130,13 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
 > 
-> +#define L2CAP_ECRED_MIN_MTU		64
-> +#define L2CAP_ECRED_MIN_MPS		64
+> 		hdev->stat.sco_tx++;
+> 		return submit_tx_urb(hdev, urb);
 > +
-> +struct l2cap_ecred_conn_req {
-> +	__le16 psm;
-> +	__le16 mtu;
-> +	__le16 mps;
-> +	__le16 credits;
-> +	__le16 scid[0];
-> +} __packed;
+> +	case HCI_ISODATA_PKT:
+> +		urb = alloc_bulk_urb(hdev, skb);
+> +		if (IS_ERR(urb))
+> +			return PTR_ERR(urb);
 > +
-> +struct l2cap_ecred_conn_rsp {
-> +	__le16 mtu;
-> +	__le16 mps;
-> +	__le16 credits;
-> +	__le16 result;
-> +	__le16 dcid[0];
-> +};
-> +
-> +struct l2cap_ecred_reconf_req {
-> +	__le16 mtu;
-> +	__le16 mps;
-> +	__le16 scid[0];
-> +} __packed;
-> +
-> +#define L2CAP_RECONF_SUCCESS		0x0000
-> +#define L2CAP_RECONF_INVALID_MTU	0x0001
-> +#define L2CAP_RECONF_INVALID_MPS	0x0002
-> +
-> +struct l2cap_ecred_reconf_rsp {
-> +	__le16 result;
-> +} __packed;
-> +
-> /* ----- L2CAP channels and connections ----- */
-> struct l2cap_seq_list {
-> 	__u16	head;
-> @@ -724,6 +765,7 @@ enum {
-> 	FLAG_EFS_ENABLE,
-> 	FLAG_DEFER_SETUP,
-> 	FLAG_LE_CONN_REQ_SENT,
-> +	FLAG_ECRED_CONN_REQ_SENT,
-> 	FLAG_PENDING_SECURITY,
-> 	FLAG_HOLD_HCI_CONN,
-> };
-> @@ -923,6 +965,7 @@ void l2cap_cleanup_sockets(void);
-> bool l2cap_is_socket(struct socket *sock);
-> 
-> void __l2cap_le_connect_rsp_defer(struct l2cap_chan *chan);
-> +void __l2cap_ecred_conn_rsp_defer(struct l2cap_chan *chan);
+> +		return submit_or_queue_tx_urb(hdev, urb);
+> 	}
 
-This can’t be in this patch.
+please scrap this patch since there is no standard for this.
 
-> void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
-> 
-> int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
+Also we should require a flag from the driver indicating support for ISO packets. If we are running on a system that requires ISO over HCI and we have a transport that doesn’t support it, we should not offer ISO support. We most likely should have been doing the same for SCO/eSCO packets. If the transport is not set correctly for these packets types, just disable the feature.
 
 Regards
 
