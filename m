@@ -2,67 +2,70 @@ Return-Path: <SRS0=uqsz=3E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E5CC33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 01:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51614C33CB3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 01:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61A6B222C3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 01:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C2FA222C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 01:59:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UInPB6GB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qQ1ZxPtp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728911AbgAOB7V (ORCPT
+        id S1728913AbgAOB7W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jan 2020 20:59:21 -0500
-Received: from mail-pf1-f173.google.com ([209.85.210.173]:39651 "EHLO
-        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728880AbgAOB7V (ORCPT
+        Tue, 14 Jan 2020 20:59:22 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40620 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728880AbgAOB7W (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jan 2020 20:59:21 -0500
-Received: by mail-pf1-f173.google.com with SMTP id q10so7621684pfs.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2020 17:59:21 -0800 (PST)
+        Tue, 14 Jan 2020 20:59:22 -0500
+Received: by mail-pg1-f196.google.com with SMTP id k25so7360570pgt.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2020 17:59:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=T67bh54HrODBKW0YAUyFTdqO128dgJCLOMHAidG1lEs=;
-        b=UInPB6GBB8akWOJSaesfeYbpD/VaH8T08fHaEZqnBHB8DGM7IFGLy65Areyqzzrxml
-         6sHQosEtY3Anz9rd62Ep+brm4qd6efkax2MHN3ZB+5h/D5UHDHDcggwpgwAutl+7QGFj
-         LGACzKtXI2/NJdmK4nQgLW61MAiM0sJJetUUC4EFBPQn8XHtYSEzVIAT87m/L6OMWuOK
-         lED1Ou7pAWjbF5TxOzZ0ucwtu6A0qtiXKOhBBaDdourBzqPpvgbj9E7CBaRoB/40UWvb
-         Ulj+njj3ATzYvxk2lM8Vo6OVpucK+nZYKGVBKHLus37Ux1W+L6mbQrUVg0KSRT37nv3j
-         RIsw==
+        bh=vDRM472RxmGtMe+LxMEdcdQNrTeETSbmj9mY914l+Ks=;
+        b=qQ1ZxPtpDZVWJoUc3qwuuuO0rrL4+e/RmkOoqXZBzLVAgz6H7l3NhKdcZlPPcTQL2b
+         m//rJNxMUTIGYiQB3Ci/HZQ8J7nitxPOTaUtWLgI2wuhRvqaagCsqsvkzHx92er7iqfT
+         /27XWQXTFYM8rcjpKyXvK2Lv98nP7BxufreSC6JZ1tlpN1PDe+K7lFlx/Drhj8MCD0QJ
+         P9FbqkRGlq8Di0LqmJPNGdujnpcSdDPpnV2phTtCSIUeTZSES1rcXQX6SpEkF1Yb9MVN
+         MyUQBI/BeMwr8JNsI9SSsNvP3rcDlySa27Yfjy/BilRwwFzrNPVBzwngQBZotwDdNp+C
+         0twA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=T67bh54HrODBKW0YAUyFTdqO128dgJCLOMHAidG1lEs=;
-        b=J0p3ObBO1te/xxB7HaBMFqK+i3Nusc7iddpmZSZ2j+2QOfsUtNYviVyCgYzua+uTsW
-         QUFuDc70CpZuDw63n1JnLdNJpajO0sf06chQcRl0mht/dcwClJCTY2ZC+Mt+NmvZ1t71
-         edvEkwALWPunLrMxEPu0m9Rtxw338WqBRUZjdmNISOFsnMqsqIg/hkH2/6dF0SrCuaim
-         T/sLZRrNWecnkNtVB10taC8IXk/ovNd307DT43bYhLmMpr1YM5tfDzlc+hWubgp3UUaI
-         YgEzSUbI5Nn4/6Qaqaz066nlmKTYsA+jcRkaEGgz/A8N56PxIDaEFVxJmpFe3bVEwAiv
-         BR8w==
-X-Gm-Message-State: APjAAAVmlyixpFPOQ0cT2ENwiIFi2+sthD2TLkQ0mGHqi0sAHLwlGMGC
-        jUEE4EBFBJOfuOse7huB2vvLeU42gDc=
-X-Google-Smtp-Source: APXvYqwXzVNv1Q3jnnhqCu/vNAlCK2mJl+pOHQVTTF32Y+vl1HF31cFNL9tHhLe4ArMmcnZDO+3g9w==
-X-Received: by 2002:a63:de03:: with SMTP id f3mr31052509pgg.141.1579053560404;
-        Tue, 14 Jan 2020 17:59:20 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=vDRM472RxmGtMe+LxMEdcdQNrTeETSbmj9mY914l+Ks=;
+        b=ryq7CxlfPcQnwkM0uij6O7LgFVm20xKyEC99O02TAwLihHgd0CZZwcBoqWrChycHT1
+         hDu7k9Y7QYNyCV9kqg88IWTMwVLQXOM4qr6TrBfCUX0LL662kCGw/U/QlwuH0rG3RgHl
+         iWQ89iz/+Vkdtaxqm/wKXrMBGhevA9fnuKjeorDVD4ZMaKYuj2JOe00OZETRICFIK9sH
+         /sBcL8lP6PTTG4zflvm6fTuby4cf31tDqXCxSXPty7f+59p3O7EaJpSOvyGyl7OLprlE
+         ohH0k/tQxS5RhP9stfkbNAZ05czkHadVmzn3UXxux4yuDuQTRSPBC7PZqsXTBHcaBWUT
+         y+ZA==
+X-Gm-Message-State: APjAAAV1YEXD1CSHvUQCT/L20WoKDFsrgtLjT+mCejxY/45GICh2NRle
+        BDmkm+Y3pJUm4GCwgYTaPpuseelmLSg=
+X-Google-Smtp-Source: APXvYqwg+9W7n4diUq8l3LEZFqro0nNQMV+fTEHQ8sq/o4Aaob4DCYGjs/24pI2G1y2hxuR6dcu5Sg==
+X-Received: by 2002:a63:cb48:: with SMTP id m8mr31369319pgi.128.1579053561267;
+        Tue, 14 Jan 2020 17:59:21 -0800 (PST)
 Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id q10sm20263573pfn.5.2020.01.14.17.59.19
+        by smtp.gmail.com with ESMTPSA id q10sm20263573pfn.5.2020.01.14.17.59.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2020 17:59:19 -0800 (PST)
+        Tue, 14 Jan 2020 17:59:20 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 0/8] Bluetooth 5.2 initial support
-Date:   Tue, 14 Jan 2020 17:59:10 -0800
-Message-Id: <20200115015918.1187-1-luiz.dentz@gmail.com>
+Subject: [PATCH v3 1/8] Bluetooth: Add definitions for CIS connections
+Date:   Tue, 14 Jan 2020 17:59:11 -0800
+Message-Id: <20200115015918.1187-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200115015918.1187-1-luiz.dentz@gmail.com>
+References: <20200115015918.1187-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,74 +75,243 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces the initial support for Bluetooth 5.2 features:
+These adds the HCI definitions for handling CIS connections along with
+ISO data packets.
 
-* ISO channels:
-	+ CIS/Unicast support
-	+ ISO socket family with QoS support
-	- BIS/Broadcast not yet supported
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci.h | 157 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 157 insertions(+)
 
-* L2CAP Enhanced Credit Based Flow Control Mode
-	+ Support all new procedures
-	+ New L2CAP socket mode
-	- Initiating multiple connections at once does not map to any existing
-	  socket APIs
-
-* Monitor:
-	+ ISO packets support
-
-* Drivers:
-	+ H4 ISO packets support
-
-* Emulator:
-	+ CIS/Unicast emulation support
-	- BIS/Broadcast emulation not yet supported
-
-* Userspace support to follow once Kernel changes are merged.
-
-Bluetooth 5.2 spec:
-https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=478726
-
-ChangeLog:
-- v2: Only attempt to fix up packet type when an ISO connection exists, remove
-  L2CAP_ECRED_MASK.
-- v3: Dropped USB changes since that has not clear way to support ISO packets
-  with existing endpoints. Renamed ECRED to EXT_FLOWCTL.
-
-Luiz Augusto von Dentz (8):
-  Bluetooth: Add definitions for CIS connections
-  Bluetooth: Add initial implementation of CIS connections
-  Bluetooth: L2CAP: Add definitions for Enhanced Credit Based Mode
-  Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode
-  Bluetooth: hci_vhci: Add support for ISO packets
-  Bluetooth: monitor: Add support for ISO packets
-  Bluetooth: Make use of __check_timeout on hci_sched_le
-  Bluetooth: hci_h4: Add support for ISO packets
-
- drivers/bluetooth/hci_h4.c        |    1 +
- drivers/bluetooth/hci_uart.h      |    7 +
- drivers/bluetooth/hci_vhci.c      |    1 +
- include/net/bluetooth/bluetooth.h |   35 +
- include/net/bluetooth/hci.h       |  157 ++++
- include/net/bluetooth/hci_core.h  |   68 +-
- include/net/bluetooth/hci_mon.h   |    2 +
- include/net/bluetooth/hci_sock.h  |    2 +
- include/net/bluetooth/iso.h       |   36 +
- include/net/bluetooth/l2cap.h     |   45 +
- net/bluetooth/Kconfig             |    1 +
- net/bluetooth/Makefile            |    1 +
- net/bluetooth/af_bluetooth.c      |   12 +-
- net/bluetooth/hci_conn.c          |  169 ++++
- net/bluetooth/hci_core.c          |  254 ++++--
- net/bluetooth/hci_event.c         |  230 +++++
- net/bluetooth/hci_sock.c          |    6 +
- net/bluetooth/iso.c               | 1393 +++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c        |  510 ++++++++++-
- net/bluetooth/l2cap_sock.c        |   39 +-
- 20 files changed, 2877 insertions(+), 92 deletions(-)
- create mode 100644 include/net/bluetooth/iso.h
- create mode 100644 net/bluetooth/iso.c
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 07b6ecedc6ce..ba603f35c054 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -27,6 +27,7 @@
+ 
+ #define HCI_MAX_ACL_SIZE	1024
+ #define HCI_MAX_SCO_SIZE	255
++#define HCI_MAX_ISO_SIZE	251
+ #define HCI_MAX_EVENT_SIZE	260
+ #define HCI_MAX_FRAME_SIZE	(HCI_MAX_ACL_SIZE + 4)
+ 
+@@ -303,6 +304,7 @@ enum {
+ #define HCI_ACLDATA_PKT		0x02
+ #define HCI_SCODATA_PKT		0x03
+ #define HCI_EVENT_PKT		0x04
++#define HCI_ISODATA_PKT		0x05
+ #define HCI_DIAG_PKT		0xf0
+ #define HCI_VENDOR_PKT		0xff
+ 
+@@ -352,6 +354,15 @@ enum {
+ #define ACL_ACTIVE_BCAST	0x04
+ #define ACL_PICO_BCAST		0x08
+ 
++/* ISO PB flags */
++#define ISO_START		0x00
++#define ISO_CONT		0x01
++#define ISO_SINGLE		0x02
++#define ISO_END			0x03
++
++/* ISO TS flags */
++#define ISO_TS			0x01
++
+ /* Baseband links */
+ #define SCO_LINK	0x00
+ #define ACL_LINK	0x01
+@@ -359,6 +370,7 @@ enum {
+ /* Low Energy links do not have defined link type. Use invented one */
+ #define LE_LINK		0x80
+ #define AMP_LINK	0x81
++#define ISO_LINK	0x82
+ #define INVALID_LINK	0xff
+ 
+ /* LMP features */
+@@ -440,6 +452,8 @@ enum {
+ #define HCI_LE_PHY_2M			0x01
+ #define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_CHAN_SEL_ALG2		0x40
++#define HCI_LE_CIS_MASTER		0x10
++#define HCI_LE_CIS_SLAVE		0x20
+ 
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+@@ -1718,6 +1732,86 @@ struct hci_cp_le_set_adv_set_rand_addr {
+ 	bdaddr_t  bdaddr;
+ } __packed;
+ 
++#define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
++struct hci_rp_le_read_buffer_size_v2 {
++	__u8  status;
++	__u16 acl_mtu;
++	__u8  acl_max_pkt;
++	__u16 iso_mtu;
++	__u8  iso_max_pkt;
++} __attribute__ ((packed));
++
++#define HCI_OP_LE_READ_ISO_TX_SYNC		0x2061
++struct hci_cp_le_read_iso_tx_sync {
++	__u16 handle;
++} __attribute__ ((packed));
++
++struct hci_rp_le_read_iso_tx_sync {
++	__u8  status;
++	__u16 handle;
++	__u16 seq;
++	__u32 timestamp;
++	__u8  offset[3];
++} __attribute__ ((packed));
++
++#define HCI_OP_LE_SET_CIG_PARAMS		0x2062
++struct hci_cis_params {
++	__u8  cis_id;
++	__u16 m_sdu;
++	__u16 s_sdu;
++	__u8  m_phy;
++	__u8  s_phy;
++	__u8  m_rtn;
++	__u8  s_rtn;
++} __packed;
++
++struct hci_cp_le_set_cig_params {
++	__u8  cig_id;
++	__u8  m_interval[3];
++	__u8  s_interval[3];
++	__u8  sca;
++	__u8  packing;
++	__u8  framing;
++	__u16 m_latency;
++	__u16 s_latency;
++	__u8  num_cis;
++	struct hci_cis_params cis[0];
++} __packed;
++
++struct hci_rp_le_set_cig_params {
++	__u8  status;
++	__u8  cig_id;
++	__u8  num_handles;
++	__u16 handle[0];
++} __packed;
++
++#define HCI_OP_LE_CREATE_CIS			0x2064
++struct hci_cis {
++	__u16  cis_handle;
++	__u16  acl_handle;
++} __packed;
++
++struct hci_cp_le_create_cis {
++	__u8  num_cis;
++	struct hci_cis cis[0];
++} __packed;
++
++#define HCI_OP_LE_REMOVE_CIG			0x2065
++struct hci_cp_le_remove_cig {
++	__u8  cig_id;
++} __packed;
++
++#define HCI_OP_LE_ACCEPT_CIS			0x2066
++struct hci_cp_le_accept_cis {
++	__u16 handle;
++} __packed;
++
++#define HCI_OP_LE_REJECT_CIS			0x2067
++struct hci_cp_le_reject_cis {
++	__u16 handle;
++	__u8  reason;
++} __packed;
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+@@ -2234,6 +2328,34 @@ struct hci_evt_le_ext_adv_set_term {
+ 	__u8	num_evts;
+ } __packed;
+ 
++#define HCI_EVT_LE_CIS_ESTABLISHED	0x19
++struct hci_evt_le_cis_established {
++	__u8  status;
++	__u16 handle;
++	__u8  cig_sync_delay[3];
++	__u8  cis_sync_delay[3];
++	__u8  m_latency[3];
++	__u8  s_latency[3];
++	__u8  m_phy;
++	__u8  s_phy;
++	__u8  nse;
++	__u8  m_bn;
++	__u8  s_bn;
++	__u8  m_ft;
++	__u8  s_ft;
++	__u16 m_mtu;
++	__u16 s_mtu;
++	__u16 interval;
++} __packed;
++
++#define HCI_EVT_LE_CIS_REQ		0x1a
++struct hci_evt_le_cis_req {
++	__u16 acl_handle;
++	__u16 cis_handle;
++	__u8  cig_id;
++	__u8  cis_id;
++} __packed;
++
+ #define HCI_EV_VENDOR			0xff
+ 
+ /* Internal events generated by Bluetooth stack */
+@@ -2262,6 +2384,7 @@ struct hci_ev_si_security {
+ #define HCI_EVENT_HDR_SIZE   2
+ #define HCI_ACL_HDR_SIZE     4
+ #define HCI_SCO_HDR_SIZE     3
++#define HCI_ISO_HDR_SIZE     4
+ 
+ struct hci_command_hdr {
+ 	__le16	opcode;		/* OCF & OGF */
+@@ -2283,6 +2406,30 @@ struct hci_sco_hdr {
+ 	__u8	dlen;
+ } __packed;
+ 
++struct hci_iso_hdr {
++	__le16	handle;
++	__le16	dlen;
++	__u8	data[0];
++} __packed;
++
++/* ISO data packet status flags */
++#define HCI_ISO_STATUS_VALID	0x00
++#define HCI_ISO_STATUS_INVALID	0x01
++#define HCI_ISO_STATUS_NOP	0x02
++
++#define HCI_ISO_DATA_HDR_SIZE	4
++struct hci_iso_data_hdr {
++	__le16	sn;
++	__le16	slen;
++};
++
++#define HCI_ISO_TS_DATA_HDR_SIZE 8
++struct hci_iso_ts_data_hdr {
++	__le32	ts;
++	__le16	sn;
++	__le16	slen;
++};
++
+ static inline struct hci_event_hdr *hci_event_hdr(const struct sk_buff *skb)
+ {
+ 	return (struct hci_event_hdr *) skb->data;
+@@ -2308,4 +2455,14 @@ static inline struct hci_sco_hdr *hci_sco_hdr(const struct sk_buff *skb)
+ #define hci_handle(h)		(h & 0x0fff)
+ #define hci_flags(h)		(h >> 12)
+ 
++/* ISO handle and flags pack/unpack */
++#define hci_iso_flags_pb(f)		(f & 0x0003)
++#define hci_iso_flags_ts(f)		((f >> 2) & 0x0001)
++#define hci_iso_flags_pack(pb, ts)	((pb & 0x03) | ((ts & 0x01) << 2))
++
++/* ISO data length and flags pack/unpack */
++#define hci_iso_data_len_pack(h, f)	((__u16) ((h) | ((f) << 14)))
++#define hci_iso_data_len(h)		((h) & 0x3fff)
++#define hci_iso_data_flags(h)		((h) >> 14)
++
+ #endif /* __HCI_H */
 -- 
 2.21.0
 
