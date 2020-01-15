@@ -4,45 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F51EC33CB1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7029CC33CB2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:56:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2EC6E214AF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46191222C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:56:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="dOlwh97b"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="PDi0eR0j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729139AbgAOI4D (ORCPT
+        id S1729213AbgAOI4K (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 03:56:03 -0500
-Received: from mail25.static.mailgun.info ([104.130.122.25]:27710 "EHLO
-        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729077AbgAOI4D (ORCPT
+        Wed, 15 Jan 2020 03:56:10 -0500
+Received: from mail26.static.mailgun.info ([104.130.122.26]:16478 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729205AbgAOI4J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 03:56:03 -0500
+        Wed, 15 Jan 2020 03:56:09 -0500
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1579078563; h=References: In-Reply-To: Message-Id: Date:
+ s=smtp; t=1579078569; h=References: In-Reply-To: Message-Id: Date:
  Subject: Cc: To: From: Sender;
- bh=dw3OGlWe85GTH5+3pzosjlG6zFFR0KXM6IS6Rg1yNew=; b=dOlwh97bLWpvV51sm4Xd0EAQUxtGsqT6Wg//+hZ70+5qYacHNh6jri9lLX7OVvIQ8GjmlWl9
- WM8saYFpEnG32U/THeez/SODHA/sl9JOFw06fPA722rZdKDuOU8dIGpK22xf9gTbH5VOEga+
- 9lTOu9hMYMoyeDGlo+KPDcke9Tc=
-X-Mailgun-Sending-Ip: 104.130.122.25
+ bh=OccWxJb9txWIb6AmPcxbe0MUAwyb7v5wd/Ik42SRC7Q=; b=PDi0eR0jVRY/GVnvbKzyQJvWOn3JCS63Q8qIl8danvoODsx+daL+g9RMv8T238cDenvU1M/4
+ KqVISYDug0uQaPYpRwaNQJIc5gLSELkPYzVttyxkXAJSXtAwtAHcnKZIFNtsZpObZb3ZS9Es
+ D/Jwkqv3yb728wbNpckTofhzVBQ=
+X-Mailgun-Sending-Ip: 104.130.122.26
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e1ed3a0.7f093b78ff48-smtp-out-n01;
- Wed, 15 Jan 2020 08:56:00 -0000 (UTC)
+ by mxa.mailgun.org with ESMTP id 5e1ed3a6.7f2078f6d3b0-smtp-out-n03;
+ Wed, 15 Jan 2020 08:56:06 -0000 (UTC)
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 34BDFC447AA; Wed, 15 Jan 2020 08:55:59 +0000 (UTC)
+        id 422ADC447A6; Wed, 15 Jan 2020 08:56:05 +0000 (UTC)
 Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id BFD40C447A6;
-        Wed, 15 Jan 2020 08:55:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org BFD40C447A6
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 22E3DC447AB;
+        Wed, 15 Jan 2020 08:56:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 22E3DC447AB
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
 From:   Rocky Liao <rjliao@codeaurora.org>
@@ -51,98 +51,78 @@ Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
         bgodavar@codeaurora.org, hemantg@codeaurora.org,
         Rocky Liao <rjliao@codeaurora.org>
-Subject: [PATCH v4 1/3] Bluetooth: hci_qca: Add QCA Rome power off support to the qca_power_shutdown()
-Date:   Wed, 15 Jan 2020 16:55:50 +0800
-Message-Id: <20200115085552.11483-1-rjliao@codeaurora.org>
+Subject: [PATCH v4 3/3] Bluetooth: hci_qca: Enable power off/on support during hci down/up for QCA Rome
+Date:   Wed, 15 Jan 2020 16:55:52 +0800
+Message-Id: <20200115085552.11483-3-rjliao@codeaurora.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191225060317.5258-1-rjliao@codeaurora.org>
+In-Reply-To: <20200115085552.11483-1-rjliao@codeaurora.org>
 References: <20191225060317.5258-1-rjliao@codeaurora.org>
+ <20200115085552.11483-1-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Current qca_power_shutdown() only supports wcn399x, this patch adds Rome
-power off support to it. For Rome it just needs to pull down the bt_en
-GPIO to power off it. This patch also replaces all the power off operation
-in qca_close() with the unified qca_power_shutdown() call.
+This patch registers hdev->shutdown() callback and also sets
+HCI_QUIRK_NON_PERSISTENT_SETUP for QCA Rome. It will power-off the BT chip
+during hci down and power-on/initialize the chip again during hci up. As
+wcn399x already enabled this, this patch also removed the callback register
+and QUIRK setting in qca_setup() for wcn399x and uniformly do this in the
+probe() routine.
 
 Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 ---
 
 Changes in v2: None
-Changes in v3: None
+Changes in v3: 
+  -moved the quirk and callback register to probe()
 Changes in v4:
-  -rebased the patch with latest code base
-  -moved the change from qca_power_off() to qca_power_shutdown()
-  -replaced all the power off operation in qca_close() with
-   qca_power_shutdown()
+  -rebased the patch with latest code
+  -moved the quirk and callback register to probe() for wcn399x
   -updated commit message
 
- drivers/bluetooth/hci_qca.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ drivers/bluetooth/hci_qca.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 992622dc1263..ecb74965be10 100644
+index 1139142e8eed..3c6c6bd20177 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -663,7 +663,6 @@ static int qca_flush(struct hci_uart *hu)
- /* Close protocol */
- static int qca_close(struct hci_uart *hu)
+@@ -1569,12 +1569,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		return ret;
+ 
+ 	if (qca_is_wcn399x(soc_type)) {
+-		/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to execute
+-		 * setup for every hci up.
+-		 */
+-		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+-		hu->hdev->shutdown = qca_power_off;
+ 
+ 		ret = qca_read_soc_version(hdev, &soc_ver, soc_type);
+ 		if (ret)
+@@ -1813,6 +1808,7 @@ static int qca_init_regulators(struct qca_power *qca,
+ static int qca_serdev_probe(struct serdev_device *serdev)
  {
--	struct qca_serdev *qcadev;
- 	struct qca_data *qca = hu->priv;
- 
- 	BT_DBG("hu %p qca close", hu);
-@@ -679,14 +678,7 @@ static int qca_close(struct hci_uart *hu)
- 	destroy_workqueue(qca->workqueue);
- 	qca->hu = NULL;
- 
--	if (hu->serdev) {
--		qcadev = serdev_device_get_drvdata(hu->serdev);
--		if (qca_is_wcn399x(qcadev->btsoc_type))
--			qca_power_shutdown(hu);
--		else
--			gpiod_set_value_cansleep(qcadev->bt_en, 0);
--
--	}
-+	qca_power_shutdown(hu);
- 
- 	kfree_skb(qca->rx_skb);
- 
-@@ -1685,6 +1677,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
  	struct qca_serdev *qcadev;
- 	struct qca_data *qca = hu->priv;
- 	unsigned long flags;
-+	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	struct hci_dev *hdev;
+ 	const struct qca_vreg_data *data;
+ 	int err;
  
- 	qcadev = serdev_device_get_drvdata(hu->serdev);
+@@ -1881,7 +1877,13 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 			clk_disable_unprepare(qcadev->susclk);
+ 	}
  
-@@ -1697,11 +1690,22 @@ static void qca_power_shutdown(struct hci_uart *hu)
- 	qca_flush(hu);
- 	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
- 
--	host_set_baudrate(hu, 2400);
--	qca_send_power_pulse(hu, false);
--	qca_regulator_disable(qcadev);
- 	hu->hdev->hw_error = NULL;
- 	hu->hdev->cmd_timeout = NULL;
-+
-+	/* Non-serdev device usually is powered by external power
-+	 * and don't need additional action in driver for power down
-+	 */
-+	if (!hu->serdev)
-+		return;
-+
-+	if (qca_is_wcn399x(soc_type)) {
-+		host_set_baudrate(hu, 2400);
-+		qca_send_power_pulse(hu, false);
-+		qca_regulator_disable(qcadev);
-+	} else {
-+		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+-out:	return err;
++out:
++	if (!err) {
++		hdev = qcadev->serdev_hu.hdev;
++		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
++		hdev->shutdown = qca_power_off;
 +	}
++	return err;
+ 
  }
  
- static int qca_power_off(struct hci_dev *hdev)
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
