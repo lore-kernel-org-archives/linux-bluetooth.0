@@ -2,253 +2,147 @@ Return-Path: <SRS0=uqsz=3E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43136C33CB1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F51EC33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:56:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11515207E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:49:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EC6E214AF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 08:56:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="lOUQcJQe"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="dOlwh97b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729030AbgAOItD (ORCPT
+        id S1729139AbgAOI4D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 03:49:03 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52807 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726472AbgAOItD (ORCPT
+        Wed, 15 Jan 2020 03:56:03 -0500
+Received: from mail25.static.mailgun.info ([104.130.122.25]:27710 "EHLO
+        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729077AbgAOI4D (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 03:49:03 -0500
-Received: by mail-wm1-f67.google.com with SMTP id p9so16907829wmc.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2020 00:49:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9gQAZen/G0w51BxpOZfJMOciCUwLwrE/yRPpBDPUvwA=;
-        b=lOUQcJQesJueBrLEqI3YNWVYRw+SR0i12yepRBvhJqbjiU4+6SSc1CaMXz9Ie/xfQW
-         RdLXdnQQtnadP0eINyCmDGBrnQ5OYrbrzyPybSpymCLn4oGhl002NtBqexVHOp+v0T3w
-         03DixPAvkMKI2OzVpBfnnmDWIQZx4Yu8/JsfRlFS8DcHj/MwWxje4K3aOVJOn5xdo27w
-         557uLwDeBxA9IeinLJQgYxjugRi9tyPSVmqen/I35U2A6sRuj3tFQABnHKz+fjjaWhR/
-         xTVSqMBiA0C/DTp98KJvfWXzlq0ePszKyC61CexJbi4CIDWUQ5KuAjCF5ZeKcRZPSvb8
-         721Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9gQAZen/G0w51BxpOZfJMOciCUwLwrE/yRPpBDPUvwA=;
-        b=Www8fR8FZ9TVUbLTWHJdMjHdp6HYPgiLaCwiQZSkKw88WkR3jxC1nrOrvC9hfpadeu
-         5dTDP9mHZ9dt3aFKdQ/5D2ZpOD8NO5MnU/8s3r7P1h3rUlQIhpQfktS+6iX00dfc2TTd
-         iKJBxTOjrw/xJ7ke8flxdEGpmia5Jd2MiFJUv47SH45Mvd1Mq74dTJD/MnzVh4ZovxHC
-         T7RIyRJj8ovtdwJ5JSqFf53eG0aHEkworvOJt9NbB4maxaoB7vlPq+IO0l4Cu/oirs/S
-         9Gs3HOtiOhZ3I43IxhTbA8NZ3KM+Irye5axPV4/r7teBmEREyi7vFRwxGd/KMmcgv+6i
-         1ElQ==
-X-Gm-Message-State: APjAAAUXvrbYrEXKMxacSEYtDyW4Sdy3dlYXwwbMva3Fp3Ms0yP1Z+cr
-        I53L91NG8e2rcSxFqzd3YOcOKxdqgaA=
-X-Google-Smtp-Source: APXvYqwBI4WoSxVmAU+YZNFuG4cO4avEoneZbTD+U166IE+59lFNNYEM125BWeiRk3+HKqCZvmJdig==
-X-Received: by 2002:a7b:c847:: with SMTP id c7mr31993544wml.3.1579078140144;
-        Wed, 15 Jan 2020 00:49:00 -0800 (PST)
-Received: from mlowasrzechonek2133.silvair.lan ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id x14sm21845467wmj.42.2020.01.15.00.48.59
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2020 00:48:59 -0800 (PST)
-From:   =?UTF-8?q?Micha=C5=82=20Lowas-Rzechonek?= 
-        <michal.lowas-rzechonek@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] mesh: Rename --index to --io, support additional io types.
-Date:   Wed, 15 Jan 2020 09:48:54 +0100
-Message-Id: <20200115084854.21538-1-michal.lowas-rzechonek@silvair.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 15 Jan 2020 03:56:03 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1579078563; h=References: In-Reply-To: Message-Id: Date:
+ Subject: Cc: To: From: Sender;
+ bh=dw3OGlWe85GTH5+3pzosjlG6zFFR0KXM6IS6Rg1yNew=; b=dOlwh97bLWpvV51sm4Xd0EAQUxtGsqT6Wg//+hZ70+5qYacHNh6jri9lLX7OVvIQ8GjmlWl9
+ WM8saYFpEnG32U/THeez/SODHA/sl9JOFw06fPA722rZdKDuOU8dIGpK22xf9gTbH5VOEga+
+ 9lTOu9hMYMoyeDGlo+KPDcke9Tc=
+X-Mailgun-Sending-Ip: 104.130.122.25
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e1ed3a0.7f093b78ff48-smtp-out-n01;
+ Wed, 15 Jan 2020 08:56:00 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 34BDFC447AA; Wed, 15 Jan 2020 08:55:59 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id BFD40C447A6;
+        Wed, 15 Jan 2020 08:55:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org BFD40C447A6
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, hemantg@codeaurora.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v4 1/3] Bluetooth: hci_qca: Add QCA Rome power off support to the qca_power_shutdown()
+Date:   Wed, 15 Jan 2020 16:55:50 +0800
+Message-Id: <20200115085552.11483-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191225060317.5258-1-rjliao@codeaurora.org>
+References: <20191225060317.5258-1-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This allows specifying io type and options when invoking the daemon.
+Current qca_power_shutdown() only supports wcn399x, this patch adds Rome
+power off support to it. For Rome it just needs to pull down the bt_en
+GPIO to power off it. This patch also replaces all the power off operation
+in qca_close() with the unified qca_power_shutdown() call.
 
-When no "-i" is passed, meshd still runs with MESH_IO_TYPE_GENERIC and
-tries to attach to the first available HCI interface.
-
-Options "-i <n>" and "-i hci<n>" are just shortcuts for
-"--io=generic:<n>" and "--io=generic:hci<n>", respectively.
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 ---
- mesh/main.c | 93 +++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 73 insertions(+), 20 deletions(-)
 
-diff --git a/mesh/main.c b/mesh/main.c
-index 010edcf85..42aa39e4f 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -40,10 +40,11 @@
- 
- static const char *config_dir;
- static const char *mesh_conf_fname;
--static int ctlr_index = MGMT_INDEX_NONE;
-+static enum mesh_io_type io_type;
-+static void *io_opts;
- 
- static const struct option main_options[] = {
--	{ "index",	required_argument,	NULL, 'i' },
-+	{ "io",		required_argument,	NULL, 'i' },
- 	{ "config",	optional_argument,	NULL, 'c' },
- 	{ "nodetach",	no_argument,		NULL, 'n' },
- 	{ "debug",	no_argument,		NULL, 'd' },
-@@ -54,16 +55,22 @@ static const struct option main_options[] = {
- 
- static void usage(void)
+Changes in v2: None
+Changes in v3: None
+Changes in v4:
+  -rebased the patch with latest code base
+  -moved the change from qca_power_off() to qca_power_shutdown()
+  -replaced all the power off operation in qca_close() with
+   qca_power_shutdown()
+  -updated commit message
+
+ drivers/bluetooth/hci_qca.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 992622dc1263..ecb74965be10 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -663,7 +663,6 @@ static int qca_flush(struct hci_uart *hu)
+ /* Close protocol */
+ static int qca_close(struct hci_uart *hu)
  {
--	l_info("");
--	l_info("Usage:\n"
-+	fprintf(stderr,
-+		"Usage:\n"
- 	       "\tbluetooth-meshd [options]\n");
--	l_info("Options:\n"
--	       "\t--index <hcinum>  Use specified controller\n"
-+	fprintf(stderr,
-+		"Options:\n"
-+	       "\t--io <io>         Use specified io (default: generic)\n"
- 	       "\t--config          Configuration directory\n"
- 	       "\t--nodetach        Run in foreground\n"
- 	       "\t--debug           Enable debug output\n"
- 	       "\t--dbus-debug      Enable D-Bus debugging\n"
- 	       "\t--help            Show %s information\n", __func__);
-+	fprintf(stderr,
-+	       "io:\n"
-+	       "\t([hci]<index> | generic[:[hci]<index>])\n"
-+	       "\t\tUse generic HCI io on interface hci<index>, or the first\n"
-+	       "\t\tavailable one\n");
+-	struct qca_serdev *qcadev;
+ 	struct qca_data *qca = hu->priv;
+ 
+ 	BT_DBG("hu %p qca close", hu);
+@@ -679,14 +678,7 @@ static int qca_close(struct hci_uart *hu)
+ 	destroy_workqueue(qca->workqueue);
+ 	qca->hu = NULL;
+ 
+-	if (hu->serdev) {
+-		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		if (qca_is_wcn399x(qcadev->btsoc_type))
+-			qca_power_shutdown(hu);
+-		else
+-			gpiod_set_value_cansleep(qcadev->bt_en, 0);
+-
+-	}
++	qca_power_shutdown(hu);
+ 
+ 	kfree_skb(qca->rx_skb);
+ 
+@@ -1685,6 +1677,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	struct qca_serdev *qcadev;
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned long flags;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 
+ 	qcadev = serdev_device_get_drvdata(hu->serdev);
+ 
+@@ -1697,11 +1690,22 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	qca_flush(hu);
+ 	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+ 
+-	host_set_baudrate(hu, 2400);
+-	qca_send_power_pulse(hu, false);
+-	qca_regulator_disable(qcadev);
+ 	hu->hdev->hw_error = NULL;
+ 	hu->hdev->cmd_timeout = NULL;
++
++	/* Non-serdev device usually is powered by external power
++	 * and don't need additional action in driver for power down
++	 */
++	if (!hu->serdev)
++		return;
++
++	if (qca_is_wcn399x(soc_type)) {
++		host_set_baudrate(hu, 2400);
++		qca_send_power_pulse(hu, false);
++		qca_regulator_disable(qcadev);
++	} else {
++		gpiod_set_value_cansleep(qcadev->bt_en, 0);
++	}
  }
  
- static void do_debug(const char *str, void *user_data)
-@@ -100,8 +107,8 @@ static void request_name_callback(struct l_dbus *dbus, bool success,
- 		return;
- 	}
- 
--	if (!mesh_init(config_dir, mesh_conf_fname, MESH_IO_TYPE_GENERIC,
--				&ctlr_index, mesh_ready_callback, dbus)) {
-+	if (!mesh_init(config_dir, mesh_conf_fname, io_type, io_opts,
-+					mesh_ready_callback, dbus)) {
- 		l_error("Failed to initialize mesh");
- 		l_main_quit();
- 	}
-@@ -133,12 +140,45 @@ static void signal_handler(uint32_t signo, void *user_data)
- 	terminated = true;
- }
- 
-+static bool parse_io(const char *optarg, enum mesh_io_type *type, void **opts)
-+{
-+	if (strstr(optarg, "generic") == optarg) {
-+		int *index = l_new(int, 1);
-+
-+		*type = MESH_IO_TYPE_GENERIC;
-+		*opts = index;
-+
-+		optarg += strlen("generic");
-+		if (!*optarg) {
-+			*index = MGMT_INDEX_NONE;
-+			return true;
-+		}
-+
-+		if (*optarg != ':')
-+			return false;
-+
-+		optarg++;
-+
-+		if (sscanf(optarg, "hci%d", index) == 1)
-+			return true;
-+
-+		if (sscanf(optarg, "%d", index) == 1)
-+			return true;
-+
-+		return false;
-+	}
-+
-+	return false;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	int status;
- 	bool detached = true;
- 	bool dbus_debug = false;
- 	struct l_dbus *dbus = NULL;
-+	char *io = NULL;
-+	int hci_index;
- 
- 	if (!l_main_init())
- 		return -1;
-@@ -153,7 +193,6 @@ int main(int argc, char *argv[])
- 
- 	for (;;) {
- 		int opt;
--		const char *str;
- 
- 		opt = getopt_long(argc, argv, "i:c:f:ndbh", main_options, NULL);
- 		if (opt < 0)
-@@ -161,18 +200,11 @@ int main(int argc, char *argv[])
- 
- 		switch (opt) {
- 		case 'i':
--			if (strlen(optarg) > 3 && !strncmp(optarg, "hci", 3))
--				str = optarg + 3;
-+			if (sscanf(optarg, "hci%d", &hci_index) == 1 ||
-+					sscanf(optarg, "%d", &hci_index) == 1)
-+				io = l_strdup_printf("generic:%s", optarg);
- 			else
--				str = optarg;
--			if (!isdigit(*str)) {
--				l_error("Invalid controller index value");
--				status = EXIT_FAILURE;
--				goto done;
--			}
--
--			ctlr_index = atoi(str);
--
-+				io = l_strdup(optarg);
- 			break;
- 		case 'n':
- 			detached = false;
-@@ -200,6 +232,21 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
-+	if (!io)
-+		io = l_strdup_printf("generic");
-+
-+	if (!parse_io(io, &io_type, &io_opts)) {
-+		l_error("Invalid io: %s", io);
-+		status = EXIT_FAILURE;
-+		goto done;
-+	}
-+
-+	if ((io_type == MESH_IO_TYPE_NONE) && !io_opts) {
-+		int *index = l_new(int, 1);
-+		*index = MGMT_INDEX_NONE;
-+		io_type = MESH_IO_TYPE_GENERIC;
-+		io_opts = index;
-+	}
- 
- 	if (!detached)
- 		umask(0077);
-@@ -225,6 +272,12 @@ int main(int argc, char *argv[])
- 	status = l_main_run_with_signal(signal_handler, NULL);
- 
- done:
-+	if (io)
-+		l_free(io);
-+
-+	if (io_opts)
-+		l_free(io_opts);
-+
- 	mesh_cleanup();
- 	l_dbus_destroy(dbus);
- 	l_main_exit();
+ static int qca_power_off(struct hci_dev *hdev)
 -- 
-2.20.1
-
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
