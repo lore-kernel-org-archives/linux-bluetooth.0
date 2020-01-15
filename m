@@ -6,36 +6,36 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57420C32771
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 21:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D71BCC32771
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 21:20:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 28DA02084D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 21:18:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B356B24679
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 21:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729883AbgAOVSJ convert rfc822-to-8bit (ORCPT
+        id S1729277AbgAOVUC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 16:18:09 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:44353 "EHLO
+        Wed, 15 Jan 2020 16:20:02 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:58884 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726045AbgAOVSJ (ORCPT
+        with ESMTP id S1729180AbgAOVUC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 16:18:09 -0500
+        Wed, 15 Jan 2020 16:20:02 -0500
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D1C62CECF2;
-        Wed, 15 Jan 2020 22:27:25 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id DCB3DCECF2;
+        Wed, 15 Jan 2020 22:29:18 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: [PATCH v5 02/11] Bluetooth: Add initial implementation of CIS
- connections
+Subject: Re: [PATCH v5 03/11] Bluetooth: L2CAP: Add definitions for Enhanced
+ Credit Based Mode
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200115210221.13096-3-luiz.dentz@gmail.com>
-Date:   Wed, 15 Jan 2020 22:18:07 +0100
+In-Reply-To: <20200115210221.13096-4-luiz.dentz@gmail.com>
+Date:   Wed, 15 Jan 2020 22:20:00 +0100
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <3FDBB982-CE2E-431D-8FA1-61C2DA19E153@holtmann.org>
+Message-Id: <42BFE5DB-E1CA-430A-B86A-A37758D999B7@holtmann.org>
 References: <20200115210221.13096-1-luiz.dentz@gmail.com>
- <20200115210221.13096-3-luiz.dentz@gmail.com>
+ <20200115210221.13096-4-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -45,38 +45,92 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-> This adds the initial implementation of CIS connections along with a new
-> socket type BTPROTO_ISO to make use of it.
+> This introduces the definitions for the new L2CAP mode called Enhanced
+> Credit Based Mode.
 > 
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> include/net/bluetooth/bluetooth.h |   35 +
-> include/net/bluetooth/hci_core.h  |   68 +-
-> include/net/bluetooth/hci_sock.h  |    2 +
-> include/net/bluetooth/iso.h       |   36 +
-> net/bluetooth/Kconfig             |    1 +
-> net/bluetooth/Makefile            |    1 +
-> net/bluetooth/af_bluetooth.c      |   12 +-
-> net/bluetooth/hci_conn.c          |  169 ++++
-> net/bluetooth/hci_core.c          |  243 ++++-
-> net/bluetooth/hci_event.c         |  230 +++++
-> net/bluetooth/iso.c               | 1393 +++++++++++++++++++++++++++++
-> 11 files changed, 2138 insertions(+), 52 deletions(-)
-> create mode 100644 include/net/bluetooth/iso.h
-> create mode 100644 net/bluetooth/iso.c
+> include/net/bluetooth/l2cap.h | 41 +++++++++++++++++++++++++++++++++++
+> 1 file changed, 41 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index e42bb8e03c09..af969f250b7d 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -53,6 +53,8 @@
-> #define BTPROTO_CMTP	5
-> #define BTPROTO_HIDP	6
-> #define BTPROTO_AVDTP	7
-> +#define BTPROTO_ISO	8
-> +#define BTPROTO_LAST	BTPROTO_ISO
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 093aedebdf0c..d85fb2c8e6eb 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -119,6 +119,11 @@ struct l2cap_conninfo {
+> #define L2CAP_LE_CONN_REQ	0x14
+> #define L2CAP_LE_CONN_RSP	0x15
+> #define L2CAP_LE_CREDITS	0x16
+> +#define L2CAP_EXT_FLOWCTL_CONN_REQ	0x17
+> +#define L2CAP_EXT_FLOWCTL_CONN_RSP	0x18
+> +#define L2CAP_EXT_FLOWCTL_RECONF_REQ	0x19
+> +#define L2CAP_EXT_FLOWCTL_RECONF_RSP	0x1a
+> +
 
-I prefer to add this patch in a second phase since it is actually userspace API and I want to think this through more carefully. We might need to split this out in the ISO packet processing and ISO sockets.
+the extra empty line here is not needed.
+
+> 
+> /* L2CAP extended feature mask */
+> #define L2CAP_FEAT_FLOWCTL	0x00000001
+> @@ -360,6 +365,8 @@ struct l2cap_conf_rfc {
+>  */
+> #define L2CAP_MODE_LE_FLOWCTL	0x80
+> 
+> +#define L2CAP_MODE_EXT_FLOWCTL	0x81
+> +
+
+So while for the mode, I prefer using EXT_FLOWCTL, but internally I would use ECRED to keep the constants and struct names short.
+
+> struct l2cap_conf_efs {
+> 	__u8	id;
+> 	__u8	stype;
+> @@ -483,6 +490,39 @@ struct l2cap_le_credits {
+> 	__le16     credits;
+> } __packed;
+> 
+> +#define L2CAP_EXT_FLOWCTL_MIN_MTU		64
+> +#define L2CAP_EXT_FLOWCTL_MIN_MPS		64
+> +
+> +struct l2cap_ext_flowctl_conn_req {
+> +	__le16 psm;
+> +	__le16 mtu;
+> +	__le16 mps;
+> +	__le16 credits;
+> +	__le16 scid[0];
+> +} __packed;
+> +
+> +struct l2cap_ext_flowctl_conn_rsp {
+> +	__le16 mtu;
+> +	__le16 mps;
+> +	__le16 credits;
+> +	__le16 result;
+> +	__le16 dcid[0];
+> +};
+> +
+> +struct l2cap_ext_flowctl_reconf_req {
+> +	__le16 mtu;
+> +	__le16 mps;
+> +	__le16 scid[0];
+> +} __packed;
+> +
+> +#define L2CAP_RECONF_SUCCESS		0x0000
+> +#define L2CAP_RECONF_INVALID_MTU	0x0001
+> +#define L2CAP_RECONF_INVALID_MPS	0x0002
+> +
+> +struct l2cap_ext_flowctl_reconf_rsp {
+> +	__le16 result;
+> +} __packed;
+> +
+> /* ----- L2CAP channels and connections ----- */
+> struct l2cap_seq_list {
+> 	__u16	head;
+> @@ -724,6 +764,7 @@ enum {
+> 	FLAG_EFS_ENABLE,
+> 	FLAG_DEFER_SETUP,
+> 	FLAG_LE_CONN_REQ_SENT,
+> +	FLAG_EXT_FLOWCTL_CONN_REQ_SENT,
+
+I know that I said use EXT_FLOWCTL here, but I think internally in the kernel we should use ECRED. Otherwise the code becomes hard to read.
 
 Regards
 
