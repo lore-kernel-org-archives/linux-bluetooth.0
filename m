@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4F2C33CB1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D9EC33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:35:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25F0F2467C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:35:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 684C72467A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:35:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JllLr585"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uQozDKe0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729139AbgAOGfg (ORCPT
+        id S1729140AbgAOGfi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 01:35:36 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:45660 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729106AbgAOGfg (ORCPT
+        Wed, 15 Jan 2020 01:35:38 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:32958 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729106AbgAOGfh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 01:35:36 -0500
-Received: by mail-pg1-f193.google.com with SMTP id b9so7701555pgk.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2020 22:35:36 -0800 (PST)
+        Wed, 15 Jan 2020 01:35:37 -0500
+Received: by mail-pf1-f196.google.com with SMTP id z16so8036119pfk.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2020 22:35:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=/7toxpl5PLp9wQq7+QMjAWMB9Nzp1ZtUr5PVHGbr8I4=;
-        b=JllLr585O8OJB8KqSfHmfqRe3hJcfh9cjZGxM4RxjmqNz7/DgQH78TBDOQybsRAuHY
-         FBDOWddytUXGdHEzYR5LGWGng4f3slAl4j488z0ok9k9BpqteU4+Ke0QCjLDeJdqdUe7
-         +O6ul/n5uxKVDdF/wRYDlhJh/fg8BbBTNNjq4uhjdWSHCvtZ4pKORXjsvIMYBVTZZwPe
-         Fg2q+SQxYD+LstOOSfuKl36AbZY1mjE+SURRVejBoazDPkEegXthHH1qlf4kEVdXVIei
-         vP8YgB1FAjf3bGeyGJUyn1dU8SDpEJS0+h3oyTpMAEfW2SDBve7TYrZrSEMS81xoHDy1
-         IQfg==
+        bh=YFd0JhZ0fswhsnoF6yQcdQAaq0by6LcXYedQoF+YTDc=;
+        b=uQozDKe0TMKljkgjQEH9WsJEwogGjqwkgWCT7oKRYdEZ02ntpi9FA3Eo17gyQFLFqx
+         BuRk+uOJB5AUQnQG1KmSUf9cVH5R0abCV1Dpb5/lME8KVRvyd3FNn+AxGNvrv4mrui/E
+         Ay/QaiCBg0NjCv2eXLfdjO95LWmc8Z+iMbq4p7lhtWs9CL+9114bxQEU2SM4ErR+LJni
+         h1NO34Ae4TmdAwyze18xzxYsuEDa48wIijI3wDvy5sWM3ikaIzb0KpXZZllkBuE6nlLj
+         ASOmJvW7ml/9K5jg+TlwOpStuuNwXfxs2iP2mXYyDnfDTtynCjqHQDQnDG29UIeMUGoC
+         xdKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/7toxpl5PLp9wQq7+QMjAWMB9Nzp1ZtUr5PVHGbr8I4=;
-        b=CWl34NbKHQGaF1+FBT9s5msxysTjeucqgEuvqtws+vuCJJCcoFFo+ZEj6jr44NMc+v
-         k6PehCVhyvcbeLYT4TZ18wN0d32J8nl8AQ03Ax/LmCNenEZP+c9yD2FZDMORhNu/woKr
-         ZLrnmixWyBUVHYd8GIWUdV3sL+JWQm9EmNRD5fPZLkgPpovgmlPdbWeiQulTT4HBOTen
-         Ir801/p//KljHEBiNxvLPxBv4krGjs7dHLxsVAkI2F7WqrR6bBs+aEPuws+sU2zf85nf
-         W3veNH0tXmBakqt3h3eQsogshGQUQUl6KEGlASzNB9m4OU/NmJBcocKFKdZ50J0P9XPT
-         ma7g==
-X-Gm-Message-State: APjAAAV+j/l77FGu1dYYXgts9tER+A7syVLhQo4K8JbAJSBRYmTj6G/d
-        NDZ02VAIWTzTqn2RbtJKqGRfZ/4DrIg=
-X-Google-Smtp-Source: APXvYqx5CnBG1PApT1qd5O+T/EFknbJA9SY6/ZqoKpz3vQC04DefKMkdjUIVk2koXKWt+kj+5otOIA==
-X-Received: by 2002:aa7:82c9:: with SMTP id f9mr29993010pfn.168.1579070135667;
-        Tue, 14 Jan 2020 22:35:35 -0800 (PST)
+        bh=YFd0JhZ0fswhsnoF6yQcdQAaq0by6LcXYedQoF+YTDc=;
+        b=UDU/UmGYh7mKysCQjYMXHrd6FhAXul/5xCmtbtQFi9Zn6nKUXLQUsQIWqHht9gEccp
+         mppG9dTZjlKIjopclAAjWMZrHueKCsnds6VRqqUbYcr6jBnHfL/wcJ5Z++wPv1sypVRI
+         j3uJtPoAcoAUAyZI/XmnGBp6EegYysB1UFU4hp9aKHXTZJn7dx5p0TKRYGP5WJ0+iCQL
+         ucQrG/CmudZ1OtjxYjQRU3+f00EtjySDen3O7AeojnUX3w4CKwK/cG3065gMgKbHBFYo
+         qQ1jFzJ80eGTGzq3FwKrrJKadE8zc2A5eF90TGaOuEvwv2zYomYq1hOUi3WikqKhEH0G
+         598A==
+X-Gm-Message-State: APjAAAW/CoJUFRrsqTHZN3mMBG4e5697pCZaQ7onPV9eqSjLIjIXEPbo
+        fevstkZnyrRlhAPL82A/J34bGZ9ZOvs=
+X-Google-Smtp-Source: APXvYqyzzd5ObRFMQ7pjiM25GIMQP5aoLuHkCqE1UrvFJWWDfGyBTu3MtY4Yz2l7ewmUASW26RHoXA==
+X-Received: by 2002:a63:1502:: with SMTP id v2mr31179264pgl.376.1579070136693;
+        Tue, 14 Jan 2020 22:35:36 -0800 (PST)
 Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id q21sm19637469pff.105.2020.01.14.22.35.34
+        by smtp.gmail.com with ESMTPSA id q21sm19637469pff.105.2020.01.14.22.35.35
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2020 22:35:34 -0800 (PST)
+        Tue, 14 Jan 2020 22:35:35 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 07/11] Bluetooth: monitor: Add support for ISO packets
-Date:   Tue, 14 Jan 2020 22:35:18 -0800
-Message-Id: <20200115063523.32127-11-luiz.dentz@gmail.com>
+Subject: [PATCH v3 8/8] Bluetooth: hci_h4: Add support for ISO packets
+Date:   Tue, 14 Jan 2020 22:35:19 -0800
+Message-Id: <20200115063523.32127-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200115063523.32127-1-luiz.dentz@gmail.com>
 References: <20200115063523.32127-1-luiz.dentz@gmail.com>
@@ -75,44 +75,44 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables passing ISO packets to the monitor socket.
+This enabled H4 driver to properly handle ISO packets.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_mon.h | 2 ++
- net/bluetooth/hci_sock.c        | 6 ++++++
+ drivers/bluetooth/hci_h4.c   | 1 +
+ drivers/bluetooth/hci_uart.h | 7 +++++++
  2 files changed, 8 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
-index 240786b04a46..2d5fcda1bcd0 100644
---- a/include/net/bluetooth/hci_mon.h
-+++ b/include/net/bluetooth/hci_mon.h
-@@ -49,6 +49,8 @@ struct hci_mon_hdr {
- #define HCI_MON_CTRL_CLOSE	15
- #define HCI_MON_CTRL_COMMAND	16
- #define HCI_MON_CTRL_EVENT	17
-+#define HCI_MON_ISO_TX_PKT	18
-+#define HCI_MON_ISO_RX_PKT	19
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 19ba52005009..6dc1fbeb564b 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -103,6 +103,7 @@ static const struct h4_recv_pkt h4_recv_pkts[] = {
+ 	{ H4_RECV_ACL,   .recv = hci_recv_frame },
+ 	{ H4_RECV_SCO,   .recv = hci_recv_frame },
+ 	{ H4_RECV_EVENT, .recv = hci_recv_frame },
++	{ H4_RECV_ISO,   .recv = hci_recv_frame },
+ };
  
- struct hci_mon_new_index {
- 	__u8		type;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 5d0ed28c0d3a..3ae508674ef7 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -324,6 +324,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
- 		else
- 			opcode = cpu_to_le16(HCI_MON_SCO_TX_PKT);
- 		break;
-+	case HCI_ISODATA_PKT:
-+		if (bt_cb(skb)->incoming)
-+			opcode = cpu_to_le16(HCI_MON_ISO_RX_PKT);
-+		else
-+			opcode = cpu_to_le16(HCI_MON_ISO_TX_PKT);
-+		break;
- 	case HCI_DIAG_PKT:
- 		opcode = cpu_to_le16(HCI_MON_VENDOR_DIAG);
- 		break;
+ /* Recv data */
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 6ab631101019..4e039d7a16f8 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -143,6 +143,13 @@ struct h4_recv_pkt {
+ 	.lsize = 1, \
+ 	.maxlen = HCI_MAX_EVENT_SIZE
+ 
++#define H4_RECV_ISO \
++	.type = HCI_ISODATA_PKT, \
++	.hlen = HCI_ISO_HDR_SIZE, \
++	.loff = 2, \
++	.lsize = 2, \
++	.maxlen = HCI_MAX_FRAME_SIZE \
++
+ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 			    const unsigned char *buffer, int count,
+ 			    const struct h4_recv_pkt *pkts, int pkts_count);
 -- 
 2.21.0
 
