@@ -4,153 +4,124 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05B35C32771
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24635C3F68F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:49:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D477E2084D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:33:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F28762077B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:49:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hJrBS8oG"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="inmrpB8t"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728921AbgAORdS (ORCPT
+        id S1729061AbgAORta (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 12:33:18 -0500
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:51836 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728992AbgAORdS (ORCPT
+        Wed, 15 Jan 2020 12:49:30 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:57016 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728896AbgAORta (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 12:33:18 -0500
-Received: by mail-pj1-f68.google.com with SMTP id d15so234764pjw.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2020 09:33:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=wSehoxvwgPJ3qRcy4KOjaQ2g1YFkKXYLIvCDj5Tb0pc=;
-        b=hJrBS8oGKaygMrG8r9UuJikZzYcublFntoivenmN00d1aDSkXeIVb8yvmE2J9kIOdp
-         r6eEUQoeIUJ/9Amzhc3zgwwyx6+n0gGKyxx1rfr16BHudcW9/d3f+ZXApQaArzn8G0SD
-         UpdrZ8d9SefG5vShZAVKNKTNsVVbeFeNpFSG8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=wSehoxvwgPJ3qRcy4KOjaQ2g1YFkKXYLIvCDj5Tb0pc=;
-        b=ZWvFP2ehoy9lb99NB0a2YJxvooRvCMG3x1epo8TCebcGZkeCLhQ0DS3sSFg9SzNnBL
-         FwDbMJO9N9+smCV1c9Xbq5smrgyCHS6GHZezIMAzqJsJzzRns/N4H9BIljL3Oy8XOJcm
-         KtsJs9oxNOS3zcbb9GAt7F95MCwM2ThUpNzG2ytzebZPaGLNKcREqTFvbWwrfw9dPtwD
-         oI+gmSuk6BYCrrEP6U96hS35eqFgYODj5YB/rvnXRr3QxI5X6n2G1M0bUI9MidnnmVIp
-         OHhcwDR35l/XLhcTsmBPoPyqKyisLyYvTM4g+8HxliLcVyiImfq/fBvfWBI59rrR6ul1
-         d2iw==
-X-Gm-Message-State: APjAAAWCUTDOnxyQzwjcl44dHu1xr4Xo77Onm4TVGB0YjyUfwS81ro4V
-        /cQhTN0inA2FSFmnT1ostUQWPE4mhqQ=
-X-Google-Smtp-Source: APXvYqy4QETPwQs32qvwl1MNKys41sAL/ljfhcu4krgU3mBi0kbRvnHa4tPpGG+bkv0uuAdRqV5nZQ==
-X-Received: by 2002:a17:902:ab91:: with SMTP id f17mr33113263plr.172.1579109597426;
-        Wed, 15 Jan 2020 09:33:17 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
-        by smtp.gmail.com with ESMTPSA id f43sm402960pje.23.2020.01.15.09.33.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jan 2020 09:33:16 -0800 (PST)
-Date:   Wed, 15 Jan 2020 09:33:15 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        hemantg@codeaurora.org
-Subject: Re: [PATCH v4 2/3] Bluetooth: hci_qca: Retry btsoc initialize when
- it fails
-Message-ID: <20200115173315.GN89495@google.com>
-References: <20191225060317.5258-1-rjliao@codeaurora.org>
- <20200115085552.11483-1-rjliao@codeaurora.org>
- <20200115085552.11483-2-rjliao@codeaurora.org>
+        Wed, 15 Jan 2020 12:49:30 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00FHm4cu092923;
+        Wed, 15 Jan 2020 17:49:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type : in-reply-to;
+ s=corp-2019-08-05; bh=rWZ81Zyoj/x0/6D5MSomYH/KZvjwYQyAAy0nfURsDk8=;
+ b=inmrpB8tkf9LhwCcsE86Nk/6Vk77iU972dOuwLLy/JQDzF5926+pzpcIyVaAExROH1Pw
+ IH0hTF4D/8Q6tNRnqKwOidS3KNF6kyvW82x8oZ8EF1zHneSpnKcwfiXD5KmmYaekBfZS
+ mHMg3WrEW0H/4k0N9sBd9QN8tjse/mKYUE+hZ0+nplPiTtOPN0qV6LpiobgZVt4E3AgH
+ RC1C9FxGGKXBqDXrNIkmrOocXIiylIDzUpsG/5RPK0I1EYu3wNz38la3cU481NF/kFX8
+ 8BEbAqp0upFij2FHIlovIr/HNIj/OeXcDN12oTsbsJw5BSnh9C2ExLRlCMrk/F3icRvl OQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2xf74sdpmp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Jan 2020 17:49:18 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00FHms0w095414;
+        Wed, 15 Jan 2020 17:49:17 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2xj61k5f87-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Jan 2020 17:49:17 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00FHnEoV028000;
+        Wed, 15 Jan 2020 17:49:14 GMT
+Received: from kili.mountain (/129.205.23.165)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 15 Jan 2020 09:49:13 -0800
+Date:   Wed, 15 Jan 2020 20:49:04 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        syzbot <syzbot+eba992608adf3d796bcc@syzkaller.appspotmail.com>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Subject: [PATCH] Bluetooth: Fix race condition in hci_release_sock()
+Message-ID: <20200115174903.shuanlfvnly3anqk@kili.mountain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200115085552.11483-2-rjliao@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <00000000000012309d059c27b724@google.com>
+X-Mailer: git-send-email haha only kidding
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9501 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001150136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9501 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001150136
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jan 15, 2020 at 04:55:51PM +0800, Rocky Liao wrote:
-> This patch adds the retry of btsoc initialization when it fails. There are
-> reports that the btsoc initialization may fail on some platforms but the
-> repro ratio is very low. The symptoms is the firmware downloading failed
-> due to the UART write timed out. The failure may be caused by UART,
-> platform HW or the btsoc itself but it's very difficlut to root cause,
-> given the repro ratio is very low. Add a retry for the btsoc initialization
-> can work around most of the failures and make Bluetooth finally works.
-> 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
-> 
-> Changes in v2: None
-> Changes in v3: None
-> Changes in v4:
->   -rebased the patch with latet code
->   -refined macro and variable name
->   -updated commit message
-> 
->  drivers/bluetooth/hci_qca.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index ecb74965be10..1139142e8eed 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -55,6 +55,9 @@
->  /* Controller debug log header */
->  #define QCA_DEBUG_HANDLE	0x2EDC
->  
-> +/* max retry count when init fails */
-> +#define MAX_INIT_RETRIES 3
-> +
->  /* Controller dump header */
->  #define QCA_SSR_DUMP_HANDLE		0x0108
->  #define QCA_DUMP_PACKET_SIZE		255
-> @@ -1539,6 +1542,7 @@ static int qca_setup(struct hci_uart *hu)
->  	struct hci_dev *hdev = hu->hdev;
->  	struct qca_data *qca = hu->priv;
->  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
-> +	unsigned int retries = 0;
->  	enum qca_btsoc_type soc_type = qca_soc_type(hu);
->  	const char *firmware_name = qca_get_firmware_name(hu);
->  	int ret;
-> @@ -1559,6 +1563,7 @@ static int qca_setup(struct hci_uart *hu)
->  	bt_dev_info(hdev, "setting up %s",
->  		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME");
->  
-> +retry:
->  	ret = qca_power_on(hdev);
->  	if (ret)
->  		return ret;
-> @@ -1613,6 +1618,20 @@ static int qca_setup(struct hci_uart *hu)
->  		 * patch/nvm-config is found, so run with original fw/config.
->  		 */
->  		ret = 0;
-> +	} else {
-> +		if (retries < MAX_INIT_RETRIES) {
-> +			qca_power_shutdown(hu);
-> +			if (hu->serdev) {
-> +				serdev_device_close(hu->serdev);
-> +				ret = serdev_device_open(hu->serdev);
-> +				if (ret) {
-> +					bt_dev_err(hdev, "failed to open port");
-> +					return ret;
-> +				}
-> +			}
-> +			retries++;
-> +			goto retry;
-> +		}
->  	}
->  
->  	/* Setup bdaddr */
-> -- 
+Syzbot managed to trigger a use after free "KASAN: use-after-free Write
+in hci_sock_bind".  I have reviewed the code manually and one possibly
+cause I have found is that we are not holding lock_sock(sk) when we do
+the hci_dev_put(hdev) in hci_sock_release().  My theory is that the bind
+and the release are racing against each other which results in this use
+after free.
 
-Assuming that this is really a rare condition:
+Reported-by: syzbot+eba992608adf3d796bcc@syzkaller.appspotmail.com
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+Not tested!  Please review very very carefully!
 
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+I feel like maybe someone should audit the (struct proto_ops)->release()
+functions because there may be similar bugs to this in other drivers.
+
+ net/bluetooth/hci_sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 5d0ed28c0d3a..c86598ff4283 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -831,6 +831,8 @@ static int hci_sock_release(struct socket *sock)
+ 	if (!sk)
+ 		return 0;
+ 
++	lock_sock(sk);
++
+ 	switch (hci_pi(sk)->channel) {
+ 	case HCI_CHANNEL_MONITOR:
+ 		atomic_dec(&monitor_promisc);
+@@ -878,6 +880,7 @@ static int hci_sock_release(struct socket *sock)
+ 	skb_queue_purge(&sk->sk_receive_queue);
+ 	skb_queue_purge(&sk->sk_write_queue);
+ 
++	release_sock(sk);
+ 	sock_put(sk);
+ 	return 0;
+ }
+-- 
+2.11.0
+
