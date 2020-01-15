@@ -2,91 +2,127 @@ Return-Path: <SRS0=uqsz=3E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89468C3F68F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 20:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E74C32771
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 20:25:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55C2B2081E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 20:17:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579119424;
-	bh=cRc55CvYpQobK998sX1otex4cVjAmzAwwrwAjicGMNA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZKB66ay/m2mLWKUNKGotf5JKZgm0jxmZn4pP1kZBlwF5Aj70vcNyVWATxztOhYqsw
-	 cOnTATIv0u5tVevWO3zqXsOivxov9KOZn5Cg2vatrGP2QIchEPa8ZqSeY1+LmZ1u62
-	 t99whr0wPrjUchX6ah/9OcP8cxkueJgKXssWvKgo=
+	by mail.kernel.org (Postfix) with ESMTP id 590FF222C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 20:25:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729083AbgAOURD (ORCPT
+        id S1728925AbgAOUZ3 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 15:17:03 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:45161 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729026AbgAOURD (ORCPT
+        Wed, 15 Jan 2020 15:25:29 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:49116 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbgAOUZ2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 15:17:03 -0500
-Received: by mail-oi1-f194.google.com with SMTP id n16so16678424oie.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2020 12:17:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=2myqp2GrpN0pfUan1rnrXmWGh+MWOgXmKRvJ9E5COqI=;
-        b=jNz+e4uFwt2cnbb/h50TwqAFCmA6x3Ha3BXzP/tzSmcpdBj611hQrhWTP4icz2dd40
-         L5SolyJiFEDVsBzNTFgkkM9Lms2zpllJHJDISH5ph9FGIqAC5byHn+MiZ7RQ21DxzSiI
-         OUIaSaWw/6I6u+Z0JkWQKJRB0hWx8ERpihme++v4aLElD7j6VEJbGrpDVNUr6TuUWjii
-         bmtywoKvZhNeb95v7eSvnuEXq5LCTd7xSG8Xcvir/xCqwPfZfr84hogN4ZySOea2/J47
-         cnJbAFyrnavDBCTUaoFRpxjcEERZy3kwuF7HlMYrXvkYfonwl98TJaP3TIj2V64xYaYt
-         ajww==
-X-Gm-Message-State: APjAAAUMGxql4oEWuBK/B+2TcFSOtYQmjwMSPG6X8LCX5Ev+2wvv7D4j
-        pj08+dJxb2WprIQDLKI2rSzmMu4=
-X-Google-Smtp-Source: APXvYqyYTgOKKgfOKXuqR3DKE4/slBum6URubOZr63MHRvziihE3sS9OISH5YHjokv8t77wv6StxYA==
-X-Received: by 2002:aca:d787:: with SMTP id o129mr1325333oig.75.1579119422572;
-        Wed, 15 Jan 2020 12:17:02 -0800 (PST)
-Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id m3sm6896356otf.13.2020.01.15.12.17.00
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2020 12:17:01 -0800 (PST)
-Received: from rob (uid 1000)
-        (envelope-from rob@rob-hp-laptop)
-        id 22062a
-        by rob-hp-laptop (DragonFly Mail Agent v0.11);
-        Wed, 15 Jan 2020 14:17:00 -0600
-Date:   Wed, 15 Jan 2020 14:17:00 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Guillaume La Roque <glaroque@baylibre.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        johan@kernel.org, nsaenzjulienne@suse.de,
-        linux-kernel@vger.kernel.org, khilman@baylibre.com
-Subject: Re: [PATCH v7 1/2] dt-bindings: net: bluetooth: add interrupts
- properties
-Message-ID: <20200115201700.GA26654@bogus>
-References: <20200115101243.17094-1-glaroque@baylibre.com>
- <20200115101243.17094-2-glaroque@baylibre.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200115101243.17094-2-glaroque@baylibre.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Wed, 15 Jan 2020 15:25:28 -0500
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1D624CECF2;
+        Wed, 15 Jan 2020 21:34:45 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [PATCH v4 01/11] Bluetooth: Add definitions for CIS connections
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200115063523.32127-2-luiz.dentz@gmail.com>
+Date:   Wed, 15 Jan 2020 21:25:26 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <B1512A1E-875A-4B2C-94BE-24386C18FB82@holtmann.org>
+References: <20200115063523.32127-1-luiz.dentz@gmail.com>
+ <20200115063523.32127-2-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 15 Jan 2020 11:12:42 +0100, Guillaume La Roque wrote:
-> add interrupts and interrupt-names as optional properties
-> to support host-wakeup by interrupt properties instead of
-> host-wakeup-gpios.
-> 
-> Signed-off-by: Guillaume La Roque <glaroque@baylibre.com>
-> ---
->  .../devicetree/bindings/net/broadcom-bluetooth.txt         | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
+Hi Luiz,
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+> These adds the HCI definitions for handling CIS connections along with
+> ISO data packets.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> include/net/bluetooth/hci.h | 159 +++++++++++++++++++++++++++++++++++-
+> 1 file changed, 158 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 07b6ecedc6ce..bd6ed800de85 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -27,6 +27,7 @@
+> 
+> #define HCI_MAX_ACL_SIZE	1024
+> #define HCI_MAX_SCO_SIZE	255
+> +#define HCI_MAX_ISO_SIZE	251
+> #define HCI_MAX_EVENT_SIZE	260
+> #define HCI_MAX_FRAME_SIZE	(HCI_MAX_ACL_SIZE + 4)
+> 
+> @@ -303,6 +304,7 @@ enum {
+> #define HCI_ACLDATA_PKT		0x02
+> #define HCI_SCODATA_PKT		0x03
+> #define HCI_EVENT_PKT		0x04
+> +#define HCI_ISODATA_PKT		0x05
+> #define HCI_DIAG_PKT		0xf0
+> #define HCI_VENDOR_PKT		0xff
+> 
+> @@ -352,6 +354,15 @@ enum {
+> #define ACL_ACTIVE_BCAST	0x04
+> #define ACL_PICO_BCAST		0x08
+> 
+> +/* ISO PB flags */
+> +#define ISO_START		0x00
+> +#define ISO_CONT		0x01
+> +#define ISO_SINGLE		0x02
+> +#define ISO_END			0x03
+> +
+> +/* ISO TS flags */
+> +#define ISO_TS			0x01
+> +
+> /* Baseband links */
+> #define SCO_LINK	0x00
+> #define ACL_LINK	0x01
+> @@ -359,6 +370,7 @@ enum {
+> /* Low Energy links do not have defined link type. Use invented one */
+> #define LE_LINK		0x80
+> #define AMP_LINK	0x81
+> +#define ISO_LINK	0x82
+> #define INVALID_LINK	0xff
+> 
+> /* LMP features */
+> @@ -440,6 +452,8 @@ enum {
+> #define HCI_LE_PHY_2M			0x01
+> #define HCI_LE_PHY_CODED		0x08
+> #define HCI_LE_CHAN_SEL_ALG2		0x40
+> +#define HCI_LE_CIS_MASTER		0x10
+> +#define HCI_LE_CIS_SLAVE		0x20
+> 
+> /* Connection modes */
+> #define HCI_CM_ACTIVE	0x0000
+> @@ -1718,6 +1732,86 @@ struct hci_cp_le_set_adv_set_rand_addr {
+> 	bdaddr_t  bdaddr;
+> } __packed;
+> 
+> +#define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
+> +struct hci_rp_le_read_buffer_size_v2 {
+> +	__u8  status;
+> +	__le16 acl_mtu;
+> +	__u8  acl_max_pkt;
+> +	__le16 iso_mtu;
+> +	__u8  iso_max_pkt;
+> +} __attribute__ ((packed));
+
+please continue the whitespace spacing between the type and variable name as we do it for all the others.
+
+And actually the kernel used __packed. I missed that the first times around.
+
+Regards
+
+Marcel
+
