@@ -2,193 +2,152 @@ Return-Path: <SRS0=uqsz=3E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC66C33CB2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94556C33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:35:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52A1324679
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:21:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C83A2467C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 06:35:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPwMocuU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726562AbgAOGVO (ORCPT
+        id S1726187AbgAOGf0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 01:21:14 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:36648 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726088AbgAOGVN (ORCPT
+        Wed, 15 Jan 2020 01:35:26 -0500
+Received: from mail-pg1-f178.google.com ([209.85.215.178]:38477 "EHLO
+        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726075AbgAOGfZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 01:21:13 -0500
-Received: by mail-io1-f72.google.com with SMTP id 144so9774370iou.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2020 22:21:13 -0800 (PST)
+        Wed, 15 Jan 2020 01:35:25 -0500
+Received: by mail-pg1-f178.google.com with SMTP id a33so7720743pgm.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jan 2020 22:35:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zuw/g7yooLqFRRvPJ3hVAhhKmFcvSvY92aZ4Scgvaj8=;
+        b=TPwMocuUPRmYjLEx+SOQDvMH1a8Twl61f2dtyupuF3ksO7HnBP2woSPW9pbsOL/T0j
+         Y4Yd5NvMNjWgnFRYr6A6TXbAl2Lah3awlMXstZvppj3pIFyBgQK+qasqGY96dUyGC4Ts
+         i5r494Ej15VDCvgx7c8wW3CdfIvlscznIAa+rQu8YRM51NAtJjDbQuKnwIjKSKzxi9kh
+         wn6yMY33jkilCrhEPALmOajQzepxDTkQLOMc6qz3qUv1PKTEX8YgDsxb3p4UBbRXFvGS
+         E2hrNiUclf5OzNltXK7tTcBUEdqxGw7XZgn4VwomXhkushZs3GyKksJJ6WCDNXTmluad
+         56gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=qrXYY2LE2Rdw3gtOF6VNzDJWkE2RPUWohxrM5XuTNOI=;
-        b=by+VT/b9OmAL9gM1Ge6o9ybzfBgVhPKOxNnMOgSC/YRQIwYavcee1AqDW2OLDkzBr4
-         IwBJ3S8oWyMitq7ctw9xKPl5text8ZgPYpxJzNuMbx5wgk8aliYiqt5xufSY5Ox0ldKY
-         LQ3Ysx80fLZtl2zcQrPvi65MW1Tz+Ym2aNah2TivHEIRPyPTKQJE+9voPutSeyKt4lqJ
-         i+A+CycC9tqEm1joRFsAKxRQ0x9Dr2tVXJZ/t3HMIoyWGykHW/2xSK+oXUvDbloIKyQK
-         lowSvTLn3qB1cSX6p7Pg3necjB9IbyEDsNNuh3WuxxG5gEgCymLhhSqX2tkLQvNjKDbm
-         i0Yg==
-X-Gm-Message-State: APjAAAWf2NMsEdGOLy0zGEfs2HnQ4KRQijHXeUx2n3piP6dOeMlNOV/e
-        n2CSgdykFg9twf3pqmkPvRR+MajvzAox1WNJniFSMREoLeuf
-X-Google-Smtp-Source: APXvYqyzSpBMuZCUa3F2tQNatNZUtWtUtZ+tPB62j/DgeMCkUt58DKMa8GL/FrNRKMWqBnHCrN3zhbUaq8CQPepr5r0rI6IVj1Tu
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zuw/g7yooLqFRRvPJ3hVAhhKmFcvSvY92aZ4Scgvaj8=;
+        b=ryxI2hseWeJVazdoZzTYyQIJ9NzMNTwLa+f/I5WMRqBZ7j9CUyOgonpKPnurcsDDa3
+         xC7Pe6DW5GNwzGnWyU/PNzk893EBgbiVjPmdMq+lXkc5o/eCbrHng85biiqzBT14wnUC
+         UR7744iyqYEDh5JVtsNBxM7M6Iys7FLrh6SATe09L+iQHOw7aBNXwDqGBM5JgdkRs+l0
+         n1QJTXbwfW/n0mHQhU0Cd2RqrC+pai0SlCTbqhtECm/jDmPCFT+Dxi0/Q/wzXNDAcC1Y
+         rmOCnPA7CYOUBM3TLRRmNAAJmKrx8bZtUWwiuUDZ9/tnNPkN50eA2dkm+F2lFTdNKdv3
+         mHdw==
+X-Gm-Message-State: APjAAAXNkFAHfD8MZFK8XX1l7S15/DOr740VaIEehGNXj2cueJX9LFE+
+        meq1EfWFEwSLn8zEWo77DqydlQcMBC0=
+X-Google-Smtp-Source: APXvYqyTuMqwQyqFJtGXVooSZP66zFm6/96Cz0275C6BfW4QaRppeGhlO65kEpT3Ga8CVjG6wFfBIw==
+X-Received: by 2002:a63:483:: with SMTP id 125mr31067898pge.217.1579070124804;
+        Tue, 14 Jan 2020 22:35:24 -0800 (PST)
+Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
+        by smtp.gmail.com with ESMTPSA id q21sm19637469pff.105.2020.01.14.22.35.23
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2020 22:35:24 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 00/11] Bluetooth 5.2 initial support
+Date:   Tue, 14 Jan 2020 22:35:08 -0800
+Message-Id: <20200115063523.32127-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-Received: by 2002:a5e:9507:: with SMTP id r7mr19749309ioj.152.1579069272630;
- Tue, 14 Jan 2020 22:21:12 -0800 (PST)
-Date:   Tue, 14 Jan 2020 22:21:12 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000012309d059c27b724@google.com>
-Subject: KASAN: use-after-free Write in hci_sock_bind
-From:   syzbot <syzbot+eba992608adf3d796bcc@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-syzbot found the following crash on:
+This introduces the initial support for Bluetooth 5.2 features:
 
-HEAD commit:    6c09d7db Add linux-next specific files for 20200110
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=163269e1e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7dc7ab9739654fbe
-dashboard link: https://syzkaller.appspot.com/bug?extid=eba992608adf3d796bcc
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+* ISO channels:
+	+ CIS/Unicast support
+	+ ISO socket family with QoS support
+	- BIS/Broadcast not yet supported
 
-Unfortunately, I don't have any reproducer for this crash yet.
+* L2CAP Enhanced Credit Based Flow Control Mode
+	+ Support all new procedures
+	+ New L2CAP socket mode
+	- Initiating multiple connections at once does not map to any existing
+	  socket APIs
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+eba992608adf3d796bcc@syzkaller.appspotmail.com
+* Monitor:
+	+ ISO packets support
 
-==================================================================
-BUG: KASAN: use-after-free in __atomic_check_write  
-include/asm-generic/atomic-instrumented.h:33 [inline]
-BUG: KASAN: use-after-free in atomic_inc  
-include/asm-generic/atomic-instrumented.h:253 [inline]
-BUG: KASAN: use-after-free in hci_sock_bind+0x642/0x12d0  
-net/bluetooth/hci_sock.c:1239
-Write of size 4 at addr ffff888061255068 by task syz-executor.5/24646
+* Drivers:
+	+ H4,H5,sdio ISO packets support
 
-CPU: 0 PID: 24646 Comm: syz-executor.5 Not tainted  
-5.5.0-rc5-next-20200110-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x197/0x210 lib/dump_stack.c:118
-  print_address_description.constprop.0.cold+0xd4/0x30b mm/kasan/report.c:374
-  __kasan_report.cold+0x1b/0x32 mm/kasan/report.c:506
-  kasan_report+0x12/0x20 mm/kasan/common.c:641
-  check_memory_region_inline mm/kasan/generic.c:185 [inline]
-  check_memory_region+0x134/0x1a0 mm/kasan/generic.c:192
-  __kasan_check_write+0x14/0x20 mm/kasan/common.c:101
-  __atomic_check_write include/asm-generic/atomic-instrumented.h:33 [inline]
-  atomic_inc include/asm-generic/atomic-instrumented.h:253 [inline]
-  hci_sock_bind+0x642/0x12d0 net/bluetooth/hci_sock.c:1239
-  __sys_bind+0x239/0x290 net/socket.c:1662
-  __do_sys_bind net/socket.c:1673 [inline]
-  __se_sys_bind net/socket.c:1671 [inline]
-  __x64_sys_bind+0x73/0xb0 net/socket.c:1671
-  do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x45af49
-Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ff26c106c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00007ff26c106c90 RCX: 000000000045af49
-RDX: 0000000000000006 RSI: 00000000200007c0 RDI: 0000000000000004
-RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ff26c1076d4
-R13: 00000000004c1323 R14: 00000000004d6000 R15: 0000000000000006
+* Emulator:
+	+ CIS/Unicast emulation support
+	- BIS/Broadcast emulation not yet supported
 
-Allocated by task 24646:
-  save_stack+0x23/0x90 mm/kasan/common.c:72
-  set_track mm/kasan/common.c:80 [inline]
-  __kasan_kmalloc mm/kasan/common.c:515 [inline]
-  __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:488
-  kasan_kmalloc+0x9/0x10 mm/kasan/common.c:529
-  kmem_cache_alloc_trace+0x158/0x790 mm/slab.c:3551
-  kmalloc include/linux/slab.h:555 [inline]
-  kzalloc include/linux/slab.h:669 [inline]
-  hci_alloc_dev+0x43/0x1dc0 net/bluetooth/hci_core.c:3182
-  __vhci_create_device+0x101/0x5d0 drivers/bluetooth/hci_vhci.c:99
-  vhci_create_device drivers/bluetooth/hci_vhci.c:148 [inline]
-  vhci_get_user drivers/bluetooth/hci_vhci.c:204 [inline]
-  vhci_write+0x2d0/0x470 drivers/bluetooth/hci_vhci.c:284
-  call_write_iter include/linux/fs.h:1901 [inline]
-  new_sync_write+0x4d3/0x770 fs/read_write.c:483
-  __vfs_write+0xe1/0x110 fs/read_write.c:496
-  vfs_write+0x268/0x5d0 fs/read_write.c:558
-  ksys_write+0x14f/0x290 fs/read_write.c:611
-  __do_sys_write fs/read_write.c:623 [inline]
-  __se_sys_write fs/read_write.c:620 [inline]
-  __x64_sys_write+0x73/0xb0 fs/read_write.c:620
-  do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+* Userspace support to follow once Kernel changes are merged.
 
-Freed by task 24642:
-  save_stack+0x23/0x90 mm/kasan/common.c:72
-  set_track mm/kasan/common.c:80 [inline]
-  kasan_set_free_info mm/kasan/common.c:337 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:476
-  kasan_slab_free+0xe/0x10 mm/kasan/common.c:485
-  __cache_free mm/slab.c:3426 [inline]
-  kfree+0x10a/0x2c0 mm/slab.c:3757
-  bt_host_release+0x19/0x30 net/bluetooth/hci_sysfs.c:86
-  device_release+0x7a/0x210 drivers/base/core.c:1358
-  kobject_cleanup lib/kobject.c:693 [inline]
-  kobject_release lib/kobject.c:722 [inline]
-  kref_put include/linux/kref.h:65 [inline]
-  kobject_put+0x1ff/0x2e0 lib/kobject.c:739
-  put_device+0x20/0x30 drivers/base/core.c:2586
-  hci_free_dev+0x19/0x20 net/bluetooth/hci_core.c:3277
-  vhci_release+0x7e/0xf0 drivers/bluetooth/hci_vhci.c:340
-  __fput+0x2ff/0x890 fs/file_table.c:280
-  ____fput+0x16/0x20 fs/file_table.c:313
-  task_work_run+0x145/0x1c0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:188 [inline]
-  exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:164
-  prepare_exit_to_usermode arch/x86/entry/common.c:195 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:278 [inline]
-  do_syscall_64+0x676/0x790 arch/x86/entry/common.c:304
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+Bluetooth 5.2 spec:
+https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=478726
 
-The buggy address belongs to the object at ffff888061254000
-  which belongs to the cache kmalloc-8k of size 8192
-The buggy address is located 4200 bytes inside of
-  8192-byte region [ffff888061254000, ffff888061256000)
-The buggy address belongs to the page:
-page:ffffea0001849500 refcount:1 mapcount:0 mapping:ffff8880aa4021c0  
-index:0x0 compound_mapcount: 0
-raw: 00fffe0000010200 ffffea0001346b08 ffffea000248f008 ffff8880aa4021c0
-raw: 0000000000000000 ffff888061254000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
+ChangeLog:
+- v2: Only attempt to fix up packet type when an ISO connection exists, remove
+  L2CAP_ECRED_MASK.
+- v3: Dropped USB changes since that has not clear way to support ISO packets
+  with existing endpoints. Renamed ECRED to EXT_FLOWCTL.
+- v4: Fix not using __le16 for HCI PDU definitions, renamed
+  FLAG_LE_CONN_REQ_SENT to FLAG_LE_FLOWCTL_CONN_REQ_SENT.
 
-Memory state around the buggy address:
-  ffff888061254f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff888061254f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ffff888061255000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                           ^
-  ffff888061255080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff888061255100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+Luiz Augusto von Dentz (11):
+  Bluetooth: Add definitions for CIS connections
+  Bluetooth: Add initial implementation of CIS connections
+  Bluetooth: L2CAP: Add definitions for Enhanced Credit Based Mode
+  Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode
+  Bluetooth: L2CAP: Rename FLAG_LE_CONN_REQ_SENT to
+    FLAG_LE_FLOWCTL_CONN_REQ_SENT
+  Bluetooth: hci_vhci: Add support for ISO packets
+  Bluetooth: monitor: Add support for ISO packets
+  Bluetooth: Make use of __check_timeout on hci_sched_le
+  Bluetooth: hci_h4: Add support for ISO packets
+  Bluetooth: hci_h5: Add support for ISO packets
+  Bluetooth: btsdio: Check for valid packet type
 
+ drivers/bluetooth/btsdio.c        |   19 +-
+ drivers/bluetooth/hci_h4.c        |    1 +
+ drivers/bluetooth/hci_h5.c        |    3 +
+ drivers/bluetooth/hci_uart.h      |    7 +
+ drivers/bluetooth/hci_vhci.c      |    1 +
+ include/net/bluetooth/bluetooth.h |   35 +
+ include/net/bluetooth/hci.h       |  159 +++-
+ include/net/bluetooth/hci_core.h  |   68 +-
+ include/net/bluetooth/hci_mon.h   |    2 +
+ include/net/bluetooth/hci_sock.h  |    2 +
+ include/net/bluetooth/iso.h       |   36 +
+ include/net/bluetooth/l2cap.h     |   47 +-
+ net/bluetooth/Kconfig             |    1 +
+ net/bluetooth/Makefile            |    1 +
+ net/bluetooth/af_bluetooth.c      |   12 +-
+ net/bluetooth/hci_conn.c          |  169 ++++
+ net/bluetooth/hci_core.c          |  254 ++++--
+ net/bluetooth/hci_event.c         |  230 +++++
+ net/bluetooth/hci_sock.c          |    6 +
+ net/bluetooth/iso.c               | 1393 +++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c        |  514 ++++++++++-
+ net/bluetooth/l2cap_sock.c        |   39 +-
+ 22 files changed, 2898 insertions(+), 101 deletions(-)
+ create mode 100644 include/net/bluetooth/iso.h
+ create mode 100644 net/bluetooth/iso.c
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+2.21.0
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
