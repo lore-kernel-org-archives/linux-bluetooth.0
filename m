@@ -2,116 +2,163 @@ Return-Path: <SRS0=uqsz=3E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4D1C3F68F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAA6C33CB2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:26:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A38D5214AF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:09:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15F9F2084D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 17:26:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="QnMLkUlW"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SzSDkVJO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728928AbgAORJC (ORCPT
+        id S1728961AbgAOR0h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jan 2020 12:09:02 -0500
-Received: from mail-lj1-f179.google.com ([209.85.208.179]:45357 "EHLO
-        mail-lj1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728911AbgAORJC (ORCPT
+        Wed, 15 Jan 2020 12:26:37 -0500
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:53936 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728912AbgAOR0h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 12:09:02 -0500
-Received: by mail-lj1-f179.google.com with SMTP id j26so19377579ljc.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2020 09:09:01 -0800 (PST)
+        Wed, 15 Jan 2020 12:26:37 -0500
+Received: by mail-pj1-f68.google.com with SMTP id n96so222888pjc.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2020 09:26:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=rXtTljHVFhRNlmRbaj9TvjqLgpgtRjEfGp+77E+05tA=;
-        b=QnMLkUlWTwHrQBxzmwp/qv+9bHSFV3ebVyHt/ODRfnGJ8j9PcpOF0KUpd/ifdz7BE2
-         s47SUB0/phJYYEwFoDW3CGGlVad7BjV6qQakNkpLs8KA8uahHBMIFSd9mKnj7kewHbJO
-         gengVRtv8KW+B0REyFm90LlV3fAfadyDj5NLvGhNODRpx4vr5hycE7pubpSs17IqjS//
-         ZaDMsacqIZ2CZftT9WFPXPBLes17iFYffWhtyo91HELWk5519aplWHd8n9ilSKjhiMYw
-         +RYMb33iixCv9W3urWTXIt4w7d0EvAM1FjZl31PebcnLk6ckMVvwG2lu9GeCNpPHqIvl
-         rDfA==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=yVipBSsh5+WhhTDox0hQWUQ5mqLsA3VpUlWy4/WLk9c=;
+        b=SzSDkVJOwGN5g11CJ0bvDk2k3o9XkbKQC9adW/cKkYW+Caa8MIMyMc90EM3KsGscep
+         nQJ6pR1CzLyFpvt7g0U8waOuNUa6H/CTufY2GYAc21QbdeqJvkwKk7Z88wCRVZVeGJbL
+         0MJ0AUrpzHmJ6VREswpGP4X5i/CwzQZX9hx5E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=rXtTljHVFhRNlmRbaj9TvjqLgpgtRjEfGp+77E+05tA=;
-        b=KRKrS5xNjkWo1k2lL5LmAloB3xYi/mOmFiVU2S6RSCtrcqupOg2acp0fs7QkAKzoAV
-         RHkp61KVm+Y1oTBkIgoqVlYRwodoXvG6HlecjyBQiVu8ryJnK1DkbJuifteoA5/hoz6R
-         fM39roeQjdEj2tl9UAc2cKRf6OQ3XiguNe0IirpmXkdn85KpMqCvNHJSsCXg6xwUl9iF
-         HRIxatB6feGWD4j8qVvJTfvF9uNrNqePmglQDr3VU3Kicw9jYssDmsX6SaPw/JxDRmQE
-         /McEvTyfr8f5oDScKrDyAAUPb8jYdF3qsWvMJnA7V/p5GzvfA6vFU5D8gydr1rzLM9rB
-         4n3g==
-X-Gm-Message-State: APjAAAVSNU2XrASQyCgNuN02KCVMJVUDb49ajwIIXS8/a/Oq3/6umvGt
-        N9gY/ymOLvMZAfeMOnJLfCSJUSv2xYp3hw==
-X-Google-Smtp-Source: APXvYqwP6cru9UMFgG/ibPudjui8u5jdkyO/56aZLjtgEjzIzObsdGhjw32478oyj+DhafRLWZFi8w==
-X-Received: by 2002:a05:651c:111a:: with SMTP id d26mr2482353ljo.153.1579108139999;
-        Wed, 15 Jan 2020 09:08:59 -0800 (PST)
-Received: from localhost.localdomain ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id m15sm9685972ljg.4.2020.01.15.09.08.59
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2020 09:08:59 -0800 (PST)
-From:   Jakub Witowski <jakub.witowski@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] mesh: sequence number out of range fix
-Date:   Wed, 15 Jan 2020 18:08:30 +0100
-Message-Id: <20200115170830.7479-2-jakub.witowski@silvair.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200115170830.7479-1-jakub.witowski@silvair.com>
-References: <20200115170830.7479-1-jakub.witowski@silvair.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=yVipBSsh5+WhhTDox0hQWUQ5mqLsA3VpUlWy4/WLk9c=;
+        b=T81ku4nBG091fl0Vup4iagq+IayxG8IufZMC5HnMYv0TRHjpmwH/6FnEFVAU9FFm0H
+         cPVUftLwvaQd8qfubwWbUU0unFcfZDFCBM72T9s2Bj6YMPNF6Ug5fS+2/VTYFbO5EhkX
+         zdlkydFSY5g5NLi3//ttW9ujb4qnLibTMHTeZUdIAQEarAx96CZXGaawuEyagzN6xbjj
+         0m5XfH0uV3kLPyU4DDWlidjPbSA7D5cm1CRv3KN+sqXarZmNy4x0CuaaBngBgYmSgPow
+         fMEC8K5Hwj6x28wF4jB6EDZWfKEAdKW341aZm+qcwHAwlxBbnysbssdLMQTqwvZdB9AQ
+         xbIA==
+X-Gm-Message-State: APjAAAVDslqsBlP/It8a062bEYE0tFNoS4ovbobFh283aBSdl1GB8aw5
+        S6mGbrQKjsFfi7ZNrgc7JGKq7A==
+X-Google-Smtp-Source: APXvYqy272HK6rPPL3Qfp/pmCyr1lY9GAJPRpsY3XC0oPfve5oiWbCfSwQWAHq4NCihBDd2WXpNsoQ==
+X-Received: by 2002:a17:90a:868b:: with SMTP id p11mr1090472pjn.60.1579109196890;
+        Wed, 15 Jan 2020 09:26:36 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:4fff:7a6b:a335:8fde])
+        by smtp.gmail.com with ESMTPSA id y128sm22005122pfg.17.2020.01.15.09.26.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jan 2020 09:26:35 -0800 (PST)
+Date:   Wed, 15 Jan 2020 09:26:33 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        hemantg@codeaurora.org
+Subject: Re: [PATCH v4 1/3] Bluetooth: hci_qca: Add QCA Rome power off
+ support to the qca_power_shutdown()
+Message-ID: <20200115172633.GM89495@google.com>
+References: <20191225060317.5258-1-rjliao@codeaurora.org>
+ <20200115085552.11483-1-rjliao@codeaurora.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200115085552.11483-1-rjliao@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- mesh/mesh-config-json.c | 4 ++++
- mesh/net.c              | 3 +++
- 2 files changed, 7 insertions(+)
+On Wed, Jan 15, 2020 at 04:55:50PM +0800, Rocky Liao wrote:
+> Current qca_power_shutdown() only supports wcn399x, this patch adds Rome
+> power off support to it. For Rome it just needs to pull down the bt_en
+> GPIO to power off it. This patch also replaces all the power off operation
+> in qca_close() with the unified qca_power_shutdown() call.
+> 
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+> 
+> Changes in v2: None
+> Changes in v3: None
+> Changes in v4:
+>   -rebased the patch with latest code base
+>   -moved the change from qca_power_off() to qca_power_shutdown()
+>   -replaced all the power off operation in qca_close() with
+>    qca_power_shutdown()
+>   -updated commit message
+> 
+>  drivers/bluetooth/hci_qca.c | 28 ++++++++++++++++------------
+>  1 file changed, 16 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 992622dc1263..ecb74965be10 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -663,7 +663,6 @@ static int qca_flush(struct hci_uart *hu)
+>  /* Close protocol */
+>  static int qca_close(struct hci_uart *hu)
+>  {
+> -	struct qca_serdev *qcadev;
+>  	struct qca_data *qca = hu->priv;
+>  
+>  	BT_DBG("hu %p qca close", hu);
+> @@ -679,14 +678,7 @@ static int qca_close(struct hci_uart *hu)
+>  	destroy_workqueue(qca->workqueue);
+>  	qca->hu = NULL;
+>  
+> -	if (hu->serdev) {
+> -		qcadev = serdev_device_get_drvdata(hu->serdev);
+> -		if (qca_is_wcn399x(qcadev->btsoc_type))
+> -			qca_power_shutdown(hu);
+> -		else
+> -			gpiod_set_value_cansleep(qcadev->bt_en, 0);
+> -
+> -	}
+> +	qca_power_shutdown(hu);
+>  
+>  	kfree_skb(qca->rx_skb);
+>  
+> @@ -1685,6 +1677,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
+>  	struct qca_serdev *qcadev;
+>  	struct qca_data *qca = hu->priv;
+>  	unsigned long flags;
+> +	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+>  
+>  	qcadev = serdev_device_get_drvdata(hu->serdev);
+>  
+> @@ -1697,11 +1690,22 @@ static void qca_power_shutdown(struct hci_uart *hu)
+>  	qca_flush(hu);
+>  	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+>  
+> -	host_set_baudrate(hu, 2400);
+> -	qca_send_power_pulse(hu, false);
+> -	qca_regulator_disable(qcadev);
+>  	hu->hdev->hw_error = NULL;
+>  	hu->hdev->cmd_timeout = NULL;
 
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index 755caab0e..3ee3317d9 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -40,6 +40,7 @@
- #include "mesh/mesh-defs.h"
- #include "mesh/util.h"
- #include "mesh/mesh-config.h"
-+#include "mesh/net.h"
- 
- /* To prevent local node JSON cache thrashing, minimum update times */
- #define MIN_SEQ_CACHE_TRIGGER	32
-@@ -2019,6 +2020,9 @@ bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq,
- 		if (cached < seq + MIN_SEQ_CACHE_VALUE)
- 			cached = seq + MIN_SEQ_CACHE_VALUE;
- 
-+		if (cached >= SEQ_MASK)
-+			cached = SEQ_MASK;
-+
- 		l_debug("Seq Cache: %d -> %d", seq, cached);
- 
- 		cfg->write_seq = seq;
-diff --git a/mesh/net.c b/mesh/net.c
-index f0f0dbdbd..10dfd5dd3 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -511,6 +511,9 @@ uint32_t mesh_net_next_seq_num(struct mesh_net *net)
- {
- 	uint32_t seq = net->seq_num++;
- 
-+	if (net->seq_num > SEQ_MASK)
-+		net->seq_num = SEQ_MASK;
-+
- 	node_set_sequence_number(net->node, net->seq_num);
- 	return seq;
- }
--- 
-2.20.1
+This is now done before the power off and not after, I suppose it doesn't
+make a difference.
 
+> +
+> +	/* Non-serdev device usually is powered by external power
+> +	 * and don't need additional action in driver for power down
+> +	 */
+> +	if (!hu->serdev)
+> +		return;
+> +
+> +	if (qca_is_wcn399x(soc_type)) {
+> +		host_set_baudrate(hu, 2400);
+> +		qca_send_power_pulse(hu, false);
+> +		qca_regulator_disable(qcadev);
+> +	} else {
+> +		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+> +	}
+>  }
+
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
