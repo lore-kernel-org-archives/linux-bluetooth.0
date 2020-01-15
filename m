@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BDF2C47409
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21840C33CB2
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 21:02:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43FE3222C3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 21:02:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E82B9222C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jan 2020 21:02:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CV0kxtSG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CW/J7nuq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729747AbgAOVCb (ORCPT
+        id S1729745AbgAOVCb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 15 Jan 2020 16:02:31 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:41079 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729690AbgAOVCb (ORCPT
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:38264 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729710AbgAOVCa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jan 2020 16:02:31 -0500
-Received: by mail-pl1-f195.google.com with SMTP id f14so39903plr.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2020 13:02:30 -0800 (PST)
+        Wed, 15 Jan 2020 16:02:30 -0500
+Received: by mail-pl1-f196.google.com with SMTP id f20so7341642plj.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jan 2020 13:02:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=HGHqSmS/H24jXyYIiH8Dw8BZO8Ld4AD9qcBK9/ryLFo=;
-        b=CV0kxtSGy3Eb8Wz4UjNhb5U+i6t2BisjkITHlE8uMVco4ANVbh2iBuNBuuegwk5vl7
-         /SAeakSbBW1lkrGuA7bLOdWI4XcbWm19CquT2RinW8TjS0fSgY5txagdT1QS5yU6f1Hh
-         vuNXEQd/Die7jIDerUS//lm43OwdfGwbEUQGELF9O342t3P5AN8LQP70dBbA3YjDPUTs
-         VFdS6UuyRhTe+VE9u+Zk7YXw2SHe9OQQyUfps5e1lcsWqXNfioO2TcKycvQJ5cBAE+by
-         oJW5rlC0zgjAKfTuIE6ujuugmue069aAtyFLVd//MBW5ColI9SlJXyIw1VmIqDoWND7J
-         zOnA==
+        bh=TDyk5AyJqA9dAh536qpFA01HVC0HaO+c8TkZOF2IjWQ=;
+        b=CW/J7nuqDvJRM8h989mTeYvvsFEXcNP3++hhXMJmlpCoV1a2OUBBE8l1O+QcUsqp0+
+         BD1f/RvKaU4OfxJrkMGOSJbqS66wB8Kwi+n0YEk/kqfUfjfRmaGGYLAbtvPnmKe4z8s+
+         ZcqHlWeydt+AMQgcmo6lJyzv2Kpq8x0KWAD16nq3g09yLPHj0nMqK1sHQ5DizlCF5F+q
+         Fbsm6ypMO1VoMGJcpkftWmcFxOwSTWBMc9BFzdSui2s4ojE/xFY2Dfq3BfScVPzjNItx
+         uEQrdmylRNOrh+XpD+6XasL9DLvfdB0+hXGzlOVRR44dlslHhm0WTD8huKFULym8kDel
+         C3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=HGHqSmS/H24jXyYIiH8Dw8BZO8Ld4AD9qcBK9/ryLFo=;
-        b=iXaTCMXix9iuFv/p9gkBXTUWdaHXITWYlNfb/BbZSJ4a5SVKnY2Msqrucd0Jv4e9LS
-         7YhqcSjaIpAqAB1GP8/9jd+8zNkq/8KU5ZVWBJizSLZQtfSMToifH5rLtown38Zpp6qa
-         Uedgu+Gb8x5+GfjxlytktazxJsa9P63X1LuUH0boyRLqWPgELVMlnk8bjp/xUspiq43v
-         IzdfohFR5PlOj+XKx3qfd6Djop5UKqtOCPhBZafHaibNTTzC2PPcq92G1OAsgW9EJBel
-         NhJovhDuRdyzT2IBQ+NHXcBh2Ktcz35PNxCbVDq9pbwzSneiWPn95xxbb0UjcdydaN+j
-         Y1kw==
-X-Gm-Message-State: APjAAAV3TA1qQWb8jxC4Ax/qh+F3Bn8NjmtE6o+myphaLIrADA9wdWt0
-        3vd++16w8NhHOTR85Uad8XoG0sxkM3A=
-X-Google-Smtp-Source: APXvYqx3dQFjcEGXjHUjI6Aqh+P5nNm4NaB9HcxKKpL9mcwAmqp0kJchEIWhFJz8G4xFLSg0qygHGw==
-X-Received: by 2002:a17:90b:11d7:: with SMTP id gv23mr2240411pjb.94.1579122150103;
-        Wed, 15 Jan 2020 13:02:30 -0800 (PST)
+        bh=TDyk5AyJqA9dAh536qpFA01HVC0HaO+c8TkZOF2IjWQ=;
+        b=e5CVtufCUv46zP7sD99RTRg6oVgbR1aWkxejZ0hajTp/S6Nz+OX74YS+pKwC5K5ed7
+         fD5m7TQ9nbWtOzUaKBQjs2t2w8lj9I0SbSPCJlDbFoLWFLH+TlSKMGTJneeKlI4xydF+
+         i7g+jwNH3KVWylpvICW5SNXRZqDPj4N5lwtaT+EmmZ5DaQoBaM3xuSidtrCO+OacSotp
+         pGAm+qPOCdCLXkYUGfOKkv93vfk9l89Xz7DDsGSDMHD23BnBQOuRb3Mq/N6VzHDlqGdh
+         YYL4D9lnvoz7TcIEOJL8MH632VkCzeHYH8xpesgP9WseIanrEK5RQnY5HyuqPfibH1a2
+         yz4Q==
+X-Gm-Message-State: APjAAAUUjnYOzLdioKcQgnw0DW5k3+0GEG2xzRgHViCwoDCiDI74LTR5
+        nCcSkloV15HnzUL7nX492SsKDxoARk8=
+X-Google-Smtp-Source: APXvYqynSVwsXLiPt5NZ6ScrN9+bgmi1je3PFQw7XLBh9uSvkx9z1spdlUYX53f8V2+soal+S9teXQ==
+X-Received: by 2002:a17:902:a701:: with SMTP id w1mr26385558plq.165.1579122148995;
+        Wed, 15 Jan 2020 13:02:28 -0800 (PST)
 Received: from localhost.localdomain ([192.102.209.41])
-        by smtp.gmail.com with ESMTPSA id s24sm23290976pfd.161.2020.01.15.13.02.29
+        by smtp.gmail.com with ESMTPSA id s24sm23290976pfd.161.2020.01.15.13.02.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2020 13:02:29 -0800 (PST)
+        Wed, 15 Jan 2020 13:02:28 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 06/11] Bluetooth: hci_vhci: Add support for ISO packets
-Date:   Wed, 15 Jan 2020 13:02:16 -0800
-Message-Id: <20200115210221.13096-7-luiz.dentz@gmail.com>
+Subject: [PATCH v5 05/11] Bluetooth: L2CAP: Rename FLAG_LE_CONN_REQ_SENT to FLAG_LE_FLOWCTL_CONN_REQ_SENT
+Date:   Wed, 15 Jan 2020 13:02:15 -0800
+Message-Id: <20200115210221.13096-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200115210221.13096-1-luiz.dentz@gmail.com>
 References: <20200115210221.13096-1-luiz.dentz@gmail.com>
@@ -75,25 +75,50 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This make virtual controllers to pass ISO packets around.
+This renames FLAG_LE_CONN_REQ_SENT to FLAG_LE_FLOWCTL_CONN_REQ_SENT so
+it is consistent with the naming scheme used for enhanced flow control.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/hci_vhci.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/net/bluetooth/l2cap.h | 2 +-
+ net/bluetooth/l2cap_core.c    | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 65e41c1d760f..8ab26dec5f6e 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -178,6 +178,7 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
- 	case HCI_EVENT_PKT:
- 	case HCI_ACLDATA_PKT:
- 	case HCI_SCODATA_PKT:
-+	case HCI_ISODATA_PKT:
- 		if (!data->hdev) {
- 			kfree_skb(skb);
- 			return -ENODEV;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index d81ed537984f..3b323c54dd0c 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -765,7 +765,7 @@ enum {
+ 	FLAG_EXT_CTRL,
+ 	FLAG_EFS_ENABLE,
+ 	FLAG_DEFER_SETUP,
+-	FLAG_LE_CONN_REQ_SENT,
++	FLAG_LE_FLOWCTL_CONN_REQ_SENT,
+ 	FLAG_EXT_FLOWCTL_CONN_REQ_SENT,
+ 	FLAG_PENDING_SECURITY,
+ 	FLAG_HOLD_HCI_CONN,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e6c8b2ed417f..da927fbb92a7 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1309,7 +1309,7 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_le_conn_req req;
+ 
+-	if (test_and_set_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags))
++	if (test_and_set_bit(FLAG_LE_FLOWCTL_CONN_REQ_SENT, &chan->flags))
+ 		return;
+ 
+ 	if (!chan->imtu)
+@@ -5534,7 +5534,7 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
+ 			chan->sec_level = sec_level;
+ 
+ 		/* We'll need to send a new Connect Request */
+-		clear_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags);
++		clear_bit(FLAG_LE_FLOWCTL_CONN_REQ_SENT, &chan->flags);
+ 
+ 		smp_conn_security(hcon, chan->sec_level);
+ 		break;
 -- 
 2.21.0
 
