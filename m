@@ -2,128 +2,600 @@ Return-Path: <SRS0=0CDr=3F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 999DDC33CAF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jan 2020 20:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CD2C33CAF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jan 2020 21:23:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58BBA206D9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jan 2020 20:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ABC02075B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jan 2020 21:23:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="AkPV7gt7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GjA9Bl2K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388192AbgAPUvb (ORCPT
+        id S1730687AbgAPVXc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jan 2020 15:51:31 -0500
-Received: from mga04.intel.com ([192.55.52.120]:10703 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726994AbgAPUva (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Jan 2020 15:51:30 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jan 2020 12:51:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,327,1574150400"; 
-   d="scan'208";a="248967597"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
-  by fmsmga004.fm.intel.com with ESMTP; 16 Jan 2020 12:51:30 -0800
-Received: from orsmsx605.amr.corp.intel.com (10.22.229.18) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 16 Jan 2020 12:51:29 -0800
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 16 Jan 2020 12:51:29 -0800
-Received: from ORSEDG002.ED.cps.intel.com (10.7.248.5) by
- orsmsx607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 16 Jan 2020 12:51:29 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.173)
- by edgegateway.intel.com (134.134.137.101) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 16 Jan 2020 12:51:28 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bPXDNz11MLfHVvSZrTlJLUCQuDk8JcMNSfGokKQV3UmOPYko3CoQi057fN7ewbCmPYaP72IkmKZ5gMTsSo2MJoA1FrtAu1sHOzAuSxEwimtSYgq8R7o1gAYS8QGESeWosCkse2FTiLDz5mbI17PBV8cnLMcGzmufUloz0cUwHMf2WrPaECE5wVi3KbQp6gAH2XW2+ZUMeuZjxJnUX6XZlYPI+3CRHGomo/phxGO1Oqf/s0Xwg1UYlCet//J0bzUnB99Wyqm73b/WSlg9lKCQtC4tNtQuGabjmwot/aRJCu4bKnMMG3KywTbzSjEO11xTYX+LwOzqu2khW0cpZ+hRwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TtBkkQ0Wt02GfKuEgsko7NQgkQ5KRjqF2dVF2npvuoY=;
- b=mo4fqJsoQneRqtPFOKpT4QV/TrnDJMkofGFsGXDc1r4b/I2gkVxK4os/FdaZykEFMxFFQv5D87oO0N34mkvDIocuygj2J6AazQG4xs+jLT2WND8eryAykTbKOm6OT2tUlrWB5Av+ghZbD3l4b2hTIfxqTG0EVQ00ZfwVe305yrOAryiDm6dwZon6hn6BzB+4SBR+gQrjpljjLxm3h8U2F0UBqb5xRWqG9XeIo+zTgl8Tm2ojOkL2atM60elBOkDi+Cpve0BNsl3WEJHQUellVPvAhTBBLGV1so1wUmy0JPbO4S+iYamrz3O8sTRGv5AkpFnnBBE21uGxkuFPB4orkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TtBkkQ0Wt02GfKuEgsko7NQgkQ5KRjqF2dVF2npvuoY=;
- b=AkPV7gt7mz0CGknKoa+MtNAq5qaGG/G44aRnGWvESDm0/rtbN4bKA2db20qk2TAlAhmP4NOyWoX/5Duy+lbMSLZo67GwHG9dipcfnhitrBO7n9jBOw8X9f2NJuCoz3CFZRlt5GhSR6KQp/TxbsksmHPoMtK/MXnCXRBi62r8lPQ=
-Received: from MWHPR11MB1664.namprd11.prod.outlook.com (10.172.54.13) by
- MWHPR11MB1277.namprd11.prod.outlook.com (10.169.236.150) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2623.9; Thu, 16 Jan 2020 20:51:26 +0000
-Received: from MWHPR11MB1664.namprd11.prod.outlook.com
- ([fe80::e8fb:c0e8:5779:367e]) by MWHPR11MB1664.namprd11.prod.outlook.com
- ([fe80::e8fb:c0e8:5779:367e%6]) with mapi id 15.20.2644.015; Thu, 16 Jan 2020
- 20:51:26 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v3 0/1] mesh: Sequence number related fixes
-Thread-Topic: [PATCH BlueZ v3 0/1] mesh: Sequence number related fixes
-Thread-Index: AQHVzIuTvbE0pqZmLEKtkdPznDXnqqftxFeA
-Date:   Thu, 16 Jan 2020 20:51:26 +0000
-Message-ID: <5ef2ebd2aeb7cb7ce7924c2f7e9338109c976db9.camel@intel.com>
-References: <20200116163908.18041-1-brian.gix@intel.com>
-In-Reply-To: <20200116163908.18041-1-brian.gix@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [192.55.54.38]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0fabdfe2-f0e9-4935-7edd-08d79ac5dacb
-x-ms-traffictypediagnostic: MWHPR11MB1277:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB12774F4F912B8848240CA883E1360@MWHPR11MB1277.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 02843AA9E0
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(346002)(366004)(396003)(376002)(136003)(199004)(189003)(66476007)(86362001)(64756008)(66446008)(66556008)(66946007)(2616005)(71200400001)(2906002)(6512007)(76116006)(6486002)(91956017)(478600001)(8676002)(6506007)(81166006)(54906003)(81156014)(107886003)(316002)(4744005)(186003)(36756003)(4326008)(5660300002)(26005)(8936002)(6916009);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR11MB1277;H:MWHPR11MB1664.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: RK2DDOR2CYQKlIkNVuG2kkLc7RQsxDUTOWGyy8nHtSaQXLOB7hFNQbRUz8fgkH4aYQ8Tr5UNq/TQRKHsrIYkIt1o6CeLwnvVnlZJRKbl0nOE9rpm5JJ9Om6U89lKo1hoqDOfA4KjDhgXB9VPKrvQl/B/8flg0jvZv1XO2pv7zjWWZwSE7li3PBDsdpwZp12FIPLPEjGcCOfWDOg/kLim1qdVoc2NruZn3tJZoLGMri0oo9ipcC7Wi9ipofukXhCt5gMXzneZNl+gpclqxa0Dq2tHavRjigLa/Ohon2qRK+DMYP6figrFj2d9jdiIbGE5j6sTGiiiJQG7R1n3RDSDaPLvlW73M/chp6/6Rn1itMQZI4+oWNAxu2AZ9MyJkn8GetlpII7IyIRMxkOMXH2Vh27nKF0Zr1IBTeqETr5trnKaTDIVzMcwQmW1HDsS/Cwc
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4FF0BC31BEF3B0428B3AD5BBFCB39EE3@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Thu, 16 Jan 2020 16:23:32 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:43769 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729585AbgAPVXb (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 16 Jan 2020 16:23:31 -0500
+Received: by mail-pl1-f195.google.com with SMTP id p27so8877988pli.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jan 2020 13:23:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:message-id:in-reply-to:references
+         :mime-version;
+        bh=eClqInPZv6yZukOE8fnTIIuy7NLi2sSPACWjxuTyk1A=;
+        b=GjA9Bl2K32OiKIvsY9E9n96JUYzIoB/VHuIWPh6sqqGEE8sjOUjnosxtc4x0Jtn/J3
+         zm43Ls7/x8qX2JEI+kfChcqokOYNyDeIOcGnSQTURhgz9fQ0Tk/OGFYlgA3VugTHU07g
+         sOyIG+PF/RTx495N4YLcfidKUN0LCF2DpYQFRbYczwU8LXuYENYYKeX3+1hfIWLQmuya
+         4FEeTxpCb2ZM1GSOCFrwZUZGKuS63Lm4nzctZx1n2KbYYqfPqRjnlqF+08R+6DBFPH9k
+         RivW6mjBf1jD8S/5kbQMScDoJOBr1ywaTlvdEhPdNMMjdMfGf7vk0HUJGmQKxsPGJLll
+         WW3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:message-id:in-reply-to
+         :references:mime-version;
+        bh=eClqInPZv6yZukOE8fnTIIuy7NLi2sSPACWjxuTyk1A=;
+        b=RwhYbhTWL3sUhX5IL2v/TK37AXZodMSt8kAscGFZm7+RdDWzKgO7+bP+KRp8PX8HmG
+         EHj43kImJpJ/mhzQiye5OffoD5fuWYZLvmSy6jfexym2vCtbBDvNFvgzLEN9jBbLc1lI
+         t3LpTGLhRW8vXh/QL7621HMppzWV9MP16GP1B/J7/ePDZx3/6Liqxa5QkJvD1daD/ikz
+         jRRMoV6wOWxgxsQvdsH8ZKF8cuT4YcuF8bhp02yI8GbSk+sOnInd3dMhCwJZLZlbjgKQ
+         zhIoyM3Lghs2/malBRRtR+MSfNBFMJNrDIljlyFAspOACQkAaWLQSxqgMvDWJqUHwsVW
+         ttWA==
+X-Gm-Message-State: APjAAAUU2IOLHWRn65qYTWAsx7DVbnhDZwHfpEjiX2FT5doNKiXLW6cK
+        fmjyqPqDRn7ARc88w2b2w2U=
+X-Google-Smtp-Source: APXvYqyRIUSlsRpp17j+oEcZj1TJ0SIfer3AZixQ1SsguhclKURopWPf/qES38MJsUufJ3B3hya/pw==
+X-Received: by 2002:a17:902:8207:: with SMTP id x7mr33819829pln.286.1579209810607;
+        Thu, 16 Jan 2020 13:23:30 -0800 (PST)
+Received: from [10.175.240.58] ([192.102.209.39])
+        by smtp.gmail.com with ESMTPSA id a9sm26327942pfn.38.2020.01.16.13.23.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2020 13:23:29 -0800 (PST)
+Date:   Thu, 16 Jan 2020 13:23:28 -0800
+From:   Luiz Von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH v5 3/3] Loading keys that should be blocked by the kernel.
+To:     Alain Michaud <alainmichaud@google.com>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>
+Message-Id: <1579209808.12244.3@gmail.com>
+In-Reply-To: <CALWDO_VLnOzmdKUhrM=_MaLfjrgEAMZNCmi-FHu2GaKzimgUsQ@mail.gmail.com>
+References: <20200107012820.158721-1-alainm@chromium.org>
+        <20200107012820.158721-3-alainm@chromium.org>
+        <CABBYNZK8SaQsX70w2FFd12=XRmV09Lk+KqvU+ryc-STfyOzhLg@mail.gmail.com>
+        <CALWDO_UQJcnA0h_Na6AidW9JvWEMWZppZap2-8BO3QrEB1pPmQ@mail.gmail.com>
+        <CABBYNZKrJ5=pLmvdhOH33BxtXc3=om+vdWOVtz44eZ2AR7sHoQ@mail.gmail.com>
+        <CALWDO_VTNag8Fic=JWmiyzRL4mK05GJ0WNAR3GDs-A8AMiE99A@mail.gmail.com>
+        <CABBYNZLst1Lt1orphN0FHB1Wrg-d23UxzSvQcAw32d6Fh-urUA@mail.gmail.com>
+        <CALWDO_VLnOzmdKUhrM=_MaLfjrgEAMZNCmi-FHu2GaKzimgUsQ@mail.gmail.com>
+X-Mailer: geary/3.32.2
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0fabdfe2-f0e9-4935-7edd-08d79ac5dacb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2020 20:51:26.3570
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WKcge47lBL/UN4y4zHR0BEy8KwBLqHkq6HENefIoAkD+Wid9YNNUpPAsW/U+VZK/SHU30vkShdDmC4V3YciLvg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1277
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KT24gVGh1LCAyMDIwLTAxLTE2IGF0IDA4OjM5IC0wODAwLCBCcmlhbiBHaXggd3Jv
-dGU6DQo+IFZlcnNpb24gMyAtDQo+IEFkanVzdGVkIGNvbW1lbnRzIGZvciBjbGFyaXR5LCBhbmQg
-YWRqdXN0ZWQgdGhlIGNhY2hlLXdyaXRlIGNvZGUNCj4gdG8gbm90IHJld3JpdGUgdGhlIE5WTSBz
-dG9yYWdlIGlmIG5vdGhpbmcgaGFzIGNoYW5nZWQsIHRvIHByZXZlbnQNCj4gTlZNIHRocmFzaGlu
-ZyBpZiB3ZSBkbyByZWFjaCB0aGUgb3V0LW9mLXJhbmdlIGJvdW5kYXJ5Lg0KPiANCj4gSSB3b3Vs
-ZCBsaWtlIGJvdGggTWljaGFsIGFuZCBKYWt1YidzIGNvbW1lbnRzIG9uIHRoZXNlIGFkanVzdG1l
-bnRzLg0KPiANCj4gSmFrdWIgV2l0b3dza2kgKDEpOg0KPiAgIG1lc2g6IFNlcXVlbmNlIG51bWJl
-ciByZWxhdGVkIGZpeGVzDQo+IA0KPiAgbWVzaC9jcnlwdG8uYyAgICAgICAgICAgfCAgMyArKysN
-Cj4gIG1lc2gvbWVzaC1jb25maWctanNvbi5jIHwgMTYgKysrKysrKysrKysrKystLQ0KPiAgbWVz
-aC9uZXQuYyAgICAgICAgICAgICAgfCAgOSArKysrKysrKysNCj4gIDMgZmlsZXMgY2hhbmdlZCwg
-MjYgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gDQo=
+Hi Alain,
+
+On Thu, Jan 16, 2020 at 8:18 AM, Alain Michaud 
+<alainmichaud@google.com> wrote:
+> Looks like Marcel committed the kernel changes, are we good to commit 
+> these?
+> 
+> Thanks!
+> Alain
+> 
+> On Fri, Jan 10, 2020 at 4:08 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> 
+>>  Hi Alain, Marcel,
+>> 
+>>  On Wed, Jan 8, 2020 at 12:08 PM Alain Michaud 
+>> <alainmichaud@google.com> wrote:
+>>  >
+>>  > Hi Luiz,
+>>  >
+>>  >
+>>  > On Wed, Jan 8, 2020 at 3:00 PM Luiz Augusto von Dentz
+>>  > <luiz.dentz@gmail.com> wrote:
+>>  > >
+>>  > > Hi Alain,
+>>  > >
+>>  > > On Wed, Jan 8, 2020 at 7:04 AM Alain Michaud 
+>> <alainmichaud@google.com> wrote:
+>>  > > >
+>>  > > > Hi Luiz,
+>>  > > >
+>>  > > >
+>>  > > > On Tue, Jan 7, 2020 at 6:22 PM Luiz Augusto von Dentz
+>>  > > > <luiz.dentz@gmail.com> wrote:
+>>  > > > >
+>>  > > > > Hi Alain,
+>>  > > > >
+>>  > > > > On Mon, Jan 6, 2020 at 5:31 PM Alain Michaud 
+>> <alainm@chromium.org> wrote:
+>>  > > > > >
+>>  > > > > > This change accomplishes 2 things:
+>>  > > > > >  1. Drop device security data from previously paired 
+>> devices
+>>  > > > > >  using blocked keys.
+>>  > > > > >  2. Send the list of known bad keys that should be 
+>> blocked to the kernel
+>>  > > > > >  if supported.
+>>  > > > > >
+>>  > > > > > In particular keys from the Google Titan Security key are 
+>> being
+>>  > > > > > blocked.
+>>  > > > > >
+>>  > > > > > For additional background information, please see
+>>  > > > > > 
+>> https://security.googleblog.com/2019/05/titan-keys-update.html
+>>  > > > > > ---
+>>  > > > > >
+>>  > > > > >  src/adapter.c | 140 
+>> +++++++++++++++++++++++++++++++++++++++++++++++---
+>>  > > > > >  1 file changed, 134 insertions(+), 6 deletions(-)
+>>  > > > > >
+>>  > > > > > diff --git a/src/adapter.c b/src/adapter.c
+>>  > > > > > index cef25616f..9c41ebe86 100644
+>>  > > > > > --- a/src/adapter.c
+>>  > > > > > +++ b/src/adapter.c
+>>  > > > > > @@ -99,10 +99,27 @@
+>>  > > > > >  #define DISTANCE_VAL_INVALID   0x7FFF
+>>  > > > > >  #define PATHLOSS_MAX           137
+>>  > > > > >
+>>  > > > > > +/*
+>>  > > > > > + * These are known security keys that have been 
+>> compromised.
+>>  > > > > > + * If this grows or there are needs to be platform 
+>> specific, it is
+>>  > > > > > + * conceivable that these could be read from a config 
+>> file.
+>>  > > > > > + */
+>>  > > > > > +static const struct mgmt_blocked_key_info blocked_keys[] 
+>> = {
+>>  > > > > > +       /* Google Titan Security Keys */
+>>  > > > > > +       { HCI_BLOCKED_KEY_TYPE_LTK,
+>>  > > > > > +               {0xbf, 0x01, 0xfb, 0x9d, 0x4e, 0xf3, 
+>> 0xbc, 0x36,
+>>  > > > > > +                0xd8, 0x74, 0xf5, 0x39, 0x41, 0x38, 
+>> 0x68, 0x4c}},
+>>  > > > > > +       { HCI_BLOCKED_KEY_TYPE_IRK,
+>>  > > > > > +               {0xa5, 0x99, 0xba, 0xe4, 0xe1, 0x7c, 
+>> 0xa6, 0x18,
+>>  > > > > > +                0x22, 0x8e, 0x07, 0x56, 0xb4, 0xe8, 
+>> 0x5f, 0x01}},
+>>  > > > > > +};
+>>  > > > > > +
+>>  > > > > >  static DBusConnection *dbus_conn = NULL;
+>>  > > > > >
+>>  > > > > >  static bool kernel_conn_control = false;
+>>  > > > > >
+>>  > > > > > +static bool kernel_blocked_keys_supported = false;
+>>  > > > > > +
+>>  > > > > >  static GList *adapter_list = NULL;
+>>  > > > > >  static unsigned int adapter_remaining = 0;
+>>  > > > > >  static bool powering_down = false;
+>>  > > > > > @@ -124,6 +141,7 @@ struct link_key_info {
+>>  > > > > >         unsigned char key[16];
+>>  > > > > >         uint8_t type;
+>>  > > > > >         uint8_t pin_len;
+>>  > > > > > +       bool is_blocked;
+>>  > > > > >  };
+>>  > > > > >
+>>  > > > > >  struct smp_ltk_info {
+>>  > > > > > @@ -135,12 +153,14 @@ struct smp_ltk_info {
+>>  > > > > >         uint16_t ediv;
+>>  > > > > >         uint64_t rand;
+>>  > > > > >         uint8_t val[16];
+>>  > > > > > +       bool is_blocked;
+>>  > > > > >  };
+>>  > > > > >
+>>  > > > > >  struct irk_info {
+>>  > > > > >         bdaddr_t bdaddr;
+>>  > > > > >         uint8_t bdaddr_type;
+>>  > > > > >         uint8_t val[16];
+>>  > > > > > +       bool is_blocked;
+>>  > > > > >  };
+>>  > > > > >
+>>  > > > > >  struct conn_param {
+>>  > > > > > @@ -3439,6 +3459,20 @@ static int str2buf(const char 
+>> *str, uint8_t *buf, size_t blen)
+>>  > > > > >         return 0;
+>>  > > > > >  }
+>>  > > > > >
+>>  > > > > > +static bool is_blocked_key(uint8_t key_type, uint8_t 
+>> *key_value)
+>>  > > > > > +{
+>>  > > > > > +       uint32_t i = 0;
+>>  > > > > > +
+>>  > > > > > +       for (i = 0; i < ARRAY_SIZE(blocked_keys); ++i) {
+>>  > > > > > +               if (key_type == blocked_keys[i].type &&
+>>  > > > > > +                               
+>> !memcmp(blocked_keys[i].val, key_value,
+>>  > > > > > +                                               
+>> sizeof(blocked_keys[i].val)))
+>>  > > > > > +                       return true;
+>>  > > > > > +       }
+>>  > > > > > +
+>>  > > > > > +       return false;
+>>  > > > > > +}
+>>  > > > > > +
+>>  > > > > >  static struct link_key_info *get_key_info(GKeyFile 
+>> *key_file, const char *peer)
+>>  > > > > >  {
+>>  > > > > >         struct link_key_info *info = NULL;
+>>  > > > > > @@ -3461,6 +3495,9 @@ static struct link_key_info 
+>> *get_key_info(GKeyFile *key_file, const char *peer)
+>>  > > > > >         info->pin_len = g_key_file_get_integer(key_file, 
+>> "LinkKey", "PINLength",
+>>  > > > > >                                                 NULL);
+>>  > > > > >
+>>  > > > > > +       info->is_blocked = 
+>> is_blocked_key(HCI_BLOCKED_KEY_TYPE_LINKKEY,
+>>  > > > > > +                                                         
+>>       info->key);
+>>  > > > > > +
+>>  > > > > >  failed:
+>>  > > > > >         g_free(str);
+>>  > > > > >
+>>  > > > > > @@ -3534,6 +3571,9 @@ static struct smp_ltk_info 
+>> *get_ltk(GKeyFile *key_file, const char *peer,
+>>  > > > > >         else
+>>  > > > > >                 ltk->master = master;
+>>  > > > > >
+>>  > > > > > +       ltk->is_blocked = 
+>> is_blocked_key(HCI_BLOCKED_KEY_TYPE_LTK,
+>>  > > > > > +                                                         
+>>       ltk->val);
+>>  > > > > > +
+>>  > > > > >  failed:
+>>  > > > > >         g_free(key);
+>>  > > > > >         g_free(rand);
+>>  > > > > > @@ -3584,6 +3624,9 @@ static struct irk_info 
+>> *get_irk_info(GKeyFile *key_file, const char *peer,
+>>  > > > > >         else
+>>  > > > > >                 str2buf(&str[0], irk->val, 
+>> sizeof(irk->val));
+>>  > > > > >
+>>  > > > > > +       irk->is_blocked = 
+>> is_blocked_key(HCI_BLOCKED_KEY_TYPE_LINKKEY,
+>>  > > > > > +                                                         
+>>       irk->val);
+>>  > > > > > +
+>>  > > > > >  failed:
+>>  > > > > >         g_free(str);
+>>  > > > > >
+>>  > > > > > @@ -4142,21 +4185,55 @@ static void load_devices(struct 
+>> btd_adapter *adapter)
+>>  > > > > >                 g_key_file_load_from_file(key_file, 
+>> filename, 0, NULL);
+>>  > > > > >
+>>  > > > > >                 key_info = get_key_info(key_file, 
+>> entry->d_name);
+>>  > > > > > -               if (key_info)
+>>  > > > > > -                       keys = g_slist_append(keys, 
+>> key_info);
+>>  > > > > >
+>>  > > > > >                 bdaddr_type = get_le_addr_type(key_file);
+>>  > > > > >
+>>  > > > > >                 ltk_info = get_ltk_info(key_file, 
+>> entry->d_name, bdaddr_type);
+>>  > > > > > -               if (ltk_info)
+>>  > > > > > -                       ltks = g_slist_append(ltks, 
+>> ltk_info);
+>>  > > > > >
+>>  > > > > >                 slave_ltk_info = 
+>> get_slave_ltk_info(key_file, entry->d_name,
+>>  > > > > >                                                           
+>>       bdaddr_type);
+>>  > > > > > +
+>>  > > > > > +               irk_info = get_irk_info(key_file, 
+>> entry->d_name, bdaddr_type);
+>>  > > > > > +
+>>  > > > > > +               // If any key for the device is blocked, 
+>> we discard all.
+>>  > > > > > +               if ((key_info && key_info->is_blocked) ||
+>>  > > > > > +                               (ltk_info && 
+>> ltk_info->is_blocked) ||
+>>  > > > > > +                               (slave_ltk_info &&
+>>  > > > > > +                                       
+>> slave_ltk_info->is_blocked) ||
+>>  > > > > > +                               (irk_info && 
+>> irk_info->is_blocked)) {
+>>  > > > >
+>>  > > > > Perhaps it would be more efficient if we don't add 
+>> is_blocked as a
+>>  > > > > member of these keys and instead pass bool variable to 
+>> get_*_info
+>>  > > > > which just set it in case the key is blocked, that way if 
+>> is_blocked
+>>  > > > > is set for get_key_info you don't have to free anything. 
+>> Also it might
+>>  > > > > be a good idea to move the handling of loading the keys to 
+>> another
+>>  > > > > function i.e. load_keys to make it simpler to bail out, 
+>> etc. Have you
+>>  > > > > though about the possibility of just using a the device 
+>> block API when
+>>  > > > > you detect it is using compromised keys? That way the 
+>> application can
+>>  > > > > detect the device is in fact blocked and can either remove 
+>> the device,
+>>  > > > > which would clean up the storage as well (see my comments 
+>> bellow), or
+>>  > > > > unblock it in order to continue using the device.
+>>  > > >
+>>  > > > My thoughts was to keep the contract simple.  if the return 
+>> is not
+>>  > > > null then a key exists, it can be blocked or not blocked.  It 
+>> feels a
+>>  > > > bit weird to have a contract return null but a parameter 
+>> tells you
+>>  > > > that it's been blocked.  The extra allocation/free doesn't 
+>> seem like a
+>>  > > > lot of overhead for what is expected to be a rare case 
+>> (blocked keys).
+>>  > >
+>>  > > Fair enough, I suggested that because the is_block logic seems 
+>> to
+>>  > > apply to all of the keys not just the key that was compromised, 
+>> anyway
+>>  > > Im probably getting a little too paranoid regarding overhead 
+>> but I
+>>  > > don't think we had loose anything by avoiding the extra
+>>  > > allocation/free
+>>  > Correct.  The idea is that if any of the keys from the device is
+>>  > blocked, the device
+>>  > is simply ignored.
+>>  >
+>>  > >
+>>  > > > >
+>>  > > > > > +                       if (key_info) {
+>>  > > > > > +                               g_free(key_info);
+>>  > > > > > +                               key_info = NULL;
+>>  > > > > > +                       }
+>>  > > > > > +
+>>  > > > > > +                       if (ltk_info) {
+>>  > > > > > +                               g_free(ltk_info);
+>>  > > > > > +                               ltk_info = NULL;
+>>  > > > > > +                       }
+>>  > > > > > +
+>>  > > > > > +                       if (slave_ltk_info) {
+>>  > > > > > +                               g_free(slave_ltk_info);
+>>  > > > > > +                               slave_ltk_info = NULL;
+>>  > > > > > +                       }
+>>  > > > > > +
+>>  > > > > > +                       if (irk_info) {
+>>  > > > > > +                               g_free(irk_info);
+>>  > > > > > +                               irk_info = NULL;
+>>  > > > > > +                       }
+>>  > > > > > +
+>>  > > > > > +                       goto free;
+>>  > > > > > +               }
+>>  > > > > > +
+>>  > > > > > +               if (key_info)
+>>  > > > > > +                       keys = g_slist_append(keys, 
+>> key_info);
+>>  > > > > > +
+>>  > > > > > +               if (ltk_info)
+>>  > > > > > +                       ltks = g_slist_append(ltks, 
+>> ltk_info);
+>>  > > > > > +
+>>  > > > >
+>>  > > > > Perhaps I missing something but don't we need to clear 
+>> these keys form
+>>  > > > > the storage once we figure they are blocked or there is any 
+>> reason to
+>>  > > > > leave them in there so we can unblock?
+>>  > > > Since these are expected to be rare cases, I didn't go 
+>> through the
+>>  > > > extent to clear them from storage.  Having them in storage 
+>> also can
+>>  > > > help with diagnosability.
+>>  > >
+>>  > > That is an interesting point, but we don't allow new pairing 
+>> with
+>>  > > compromised keys with these changes or do we? If we want to 
+>> allow
+>>  > > diagnosing in all cases we could actually store the blocked 
+>> flag into
+>>  > > the storage so something like a diagnostic tool can fetch the
+>>  > > information directly.
+>>  > With these changes, the device is simply dropped from the list
+>>  > entirely.  The user is free to attempt to pair it again.  If the
+>>  > device is fixed, pairing will work and the key will be 
+>> overwritten, if
+>>  > the device is still broken, the pairing will fail and the user 
+>> will
+>>  > see the error.  Given that for now, the keys are hardcoded and a
+>>  > relatively small list, it feels like overkill to store an 
+>> additional
+>>  > flag for it.  This may be something we'd want to do if the list of
+>>  > blocked keys grows beyond something that is easily manageable.  If
+>>  > that is the case, I also think we should read the blocked keys 
+>> from a
+>>  > configuration file rather than hardcoded in the code as it 
+>> currently
+>>  > is.
+>> 
+>>  All good, just waiting the kernel changes to be applied then we can 
+>> go
+>>  ahead with these changes as well, @Marcel are you planning to merge
+>>  the kernel changes?
+>> 
+>>  > >
+>>  > > > >
+>>  > > > > >                 if (slave_ltk_info)
+>>  > > > > >                         ltks = g_slist_append(ltks, 
+>> slave_ltk_info);
+>>  > > > > >
+>>  > > > > > -               irk_info = get_irk_info(key_file, 
+>> entry->d_name, bdaddr_type);
+>>  > > > > >                 if (irk_info)
+>>  > > > > >                         irks = g_slist_append(irks, 
+>> irk_info);
+>>  > > > > >
+>>  > > > > > @@ -8568,6 +8645,42 @@ static bool set_static_addr(struct 
+>> btd_adapter *adapter)
+>>  > > > > >         return false;
+>>  > > > > >  }
+>>  > > > > >
+>>  > > > > > +static void set_blocked_keys_complete(uint8_t status, 
+>> uint16_t length,
+>>  > > > > > +                                       const void 
+>> *param, void *user_data)
+>>  > > > > > +{
+>>  > > > > > +       struct btd_adapter *adapter = user_data;
+>>  > > > > > +
+>>  > > > > > +       if (status != MGMT_STATUS_SUCCESS) {
+>>  > > > > > +               btd_error(adapter->dev_id,
+>>  > > > > > +                               "Failed to set blocked 
+>> keys: %s (0x%02x)",
+>>  > > > > > +                               mgmt_errstr(status), 
+>> status);
+>>  > > > > > +               return;
+>>  > > > > > +       }
+>>  > > > > > +
+>>  > > > > > +       DBG("Successfully set blocked keys for index %u", 
+>> adapter->dev_id);
+>>  > > > > > +}
+>>  > > > > > +
+>>  > > > > > +static bool set_blocked_keys(struct btd_adapter *adapter)
+>>  > > > > > +{
+>>  > > > > > +       uint8_t buffer[sizeof(struct 
+>> mgmt_cp_set_blocked_keys) +
+>>  > > > > > +                                       
+>> sizeof(blocked_keys)] = { 0 };
+>>  > > > > > +       struct mgmt_cp_set_blocked_keys *cp =
+>>  > > > > > +                               (struct 
+>> mgmt_cp_set_blocked_keys *)buffer;
+>>  > > > > > +       int i;
+>>  > > > > > +
+>>  > > > > > +       cp->key_count = ARRAY_SIZE(blocked_keys);
+>>  > > > > > +       for (i = 0; i < cp->key_count; ++i) {
+>>  > > > > > +               cp->keys[i].type = blocked_keys[i].type;
+>>  > > > > > +               memcpy(cp->keys[i].val, 
+>> blocked_keys[i].val,
+>>  > > > > > +                                               
+>> sizeof(cp->keys[i].val));
+>>  > > > > > +       }
+>>  > > > > > +
+>>  > > > > > +       return mgmt_send(mgmt_master, 
+>> MGMT_OP_SET_BLOCKED_KEYS, adapter->dev_id,
+>>  > > > > > +                                               
+>> sizeof(buffer), buffer,
+>>  > > > > > +                                               
+>> set_blocked_keys_complete,
+>>  > > > > > +                                               adapter, 
+>> NULL);
+>>  > > > > > +}
+>>  > > > > > +
+>>  > > > > >  static void read_info_complete(uint8_t status, uint16_t 
+>> length,
+>>  > > > > >                                         const void 
+>> *param, void *user_data)
+>>  > > > > >  {
+>>  > > > > > @@ -8795,6 +8908,13 @@ static void 
+>> read_info_complete(uint8_t status, uint16_t length,
+>>  > > > > >
+>>  > > > > >         set_name(adapter, btd_adapter_get_name(adapter));
+>>  > > > > >
+>>  > > > > > +       if (kernel_blocked_keys_supported && 
+>> !set_blocked_keys(adapter)) {
+>>  > > > > > +               btd_error(adapter->dev_id,
+>>  > > > > > +                               "Failed to set blocked 
+>> keys for index %u",
+>>  > > > > > +                               adapter->dev_id);
+>>  > > > > > +               goto failed;
+>>  > > > > > +       }
+>>  > > > > > +
+>>  > > > > >         if (main_opts.pairable &&
+>>  > > > > >                         !(adapter->current_settings & 
+>> MGMT_SETTING_BONDABLE))
+>>  > > > > >                 set_mode(adapter, MGMT_OP_SET_BONDABLE, 
+>> 0x01);
+>>  > > > > > @@ -8972,9 +9092,17 @@ static void 
+>> read_commands_complete(uint8_t status, uint16_t length,
+>>  > > > > >         for (i = 0; i < num_commands; i++) {
+>>  > > > > >                 uint16_t op = get_le16(rp->opcodes + i);
+>>  > > > > >
+>>  > > > > > -               if (op == MGMT_OP_ADD_DEVICE) {
+>>  > > > > > +               switch (op) {
+>>  > > > > > +               case MGMT_OP_ADD_DEVICE:
+>>  > > > > >                         DBG("enabling kernel-side 
+>> connection control");
+>>  > > > > >                         kernel_conn_control = true;
+>>  > > > > > +                       break;
+>>  > > > > > +               case MGMT_OP_SET_BLOCKED_KEYS:
+>>  > > > > > +                       DBG("kernel supports the 
+>> set_blocked_keys op");
+>>  > > > > > +                       kernel_blocked_keys_supported = 
+>> true;
+>>  > > > > > +                       break;
+>>  > > > > > +               default:
+>>  > > > > > +                       break;
+>>  > > > > >                 }
+>>  > > > > >         }
+>>  > > > > >  }
+>>  > > > > > --
+>>  > > > > > 2.24.1.735.g03f4e72817-goog
+>>  > > > > >
+>>  > > > >
+>>  > > > >
+>>  > > > > --
+>>  > > > > Luiz Augusto von Dentz
+>>  > >
+>>  > >
+>>  > >
+>>  > > --
+>>  > > Luiz Augusto von Dentz
+>> 
+>> 
+>> 
+
+Applied, thanks.
+
+Note that I changed a little bit the commit messages since it was 
+causing some warnings with gitlint:
+
+gitlint: checking commit message...
+1: T3 Title has trailing punctuation (.): "MGMT_OP_SET_BLOCKED_KEYS Api 
+definitions."
+-----------------------------------------------
+gitlint: \033[31mYour commit message contains the above 
+violations.\033[0m
+Continue with commit anyways (this keeps the current commit message)? 
+[y(es)/n(no)/e(dit)] y
+Applying: MGMT_OP_SET_BLOCKED_KEYS Api definitions.
+gitlint: checking commit message...
+1: T3 Title has trailing punctuation (.): "Adding a shared ARRAY_SIZE 
+macro."
+-----------------------------------------------
+gitlint: \033[31mYour commit message contains the above 
+violations.\033[0m
+Continue with commit anyways (this keeps the current commit message)? 
+[y(es)/n(no)/e(dit)] y
+Applying: Adding a shared ARRAY_SIZE macro.
+gitlint: checking commit message...
+1: T3 Title has trailing punctuation (.): "Loading keys that should be 
+blocked by the kernel."
+-----------------------------------------------
+gitlint: \033[31mYour commit message contains the above 
+violations.\033[0m
+Continue with commit anyways (this keeps the current commit message)? 
+[y(es)/n(no)/e(dit)] y
+Applying: Loading keys that should be blocked by the kernel.
+
+
+>> 
+>>  --
+>>  Luiz Augusto von Dentz
+
+
