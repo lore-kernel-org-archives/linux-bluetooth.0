@@ -2,119 +2,159 @@ Return-Path: <SRS0=B7Pc=3G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA49C33CB1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 13:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CAF6C33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 13:38:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C79A206B7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 13:34:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="XxHlq2Hr"
+	by mail.kernel.org (Postfix) with ESMTP id E230F20728
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 13:38:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbgAQNeH (ORCPT
+        id S1727123AbgAQNix convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jan 2020 08:34:07 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33482 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726587AbgAQNeG (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jan 2020 08:34:06 -0500
-Received: by mail-wr1-f67.google.com with SMTP id b6so22768785wrq.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2020 05:34:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=BH6w80QxTdIP2HHzWV1JLbsVoRn3u0bYkHkZUerB7q0=;
-        b=XxHlq2HrtXJ4ywwA3gkdqpYxz3x4N0S6FaifZ7fNVZt2X/BHEgCmZyZi5zEYa3D9fs
-         azElc6L3eQKardWGG3krKrZo8GPPNpyALhJfG1rj7ZTgdHktosYlCfEFyKmQ8fCXpGs3
-         603KtF6vFtV5uNp0sprU1HGpwWt4Jnm9tc66p0KQBLYzMp/kc8O/q+HaymaEsfDvU4IV
-         O9ol1rST0UE70CXat+ahghPr6urJ16PxIGfFQf6XEKtWtp+az9DcHnjMVym5gQCB2Vfn
-         y5iMTK6OWcy63hJdFzm2Fv5967eOK/RP5UJq+yuj60MOWrTpmvZ7OfaVKkOz93+6NT7x
-         Xrpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=BH6w80QxTdIP2HHzWV1JLbsVoRn3u0bYkHkZUerB7q0=;
-        b=VsWrwFB+2vCuAxpLtBljlM4cpSJaMuBEj5h0MsTsbjGK1S2unwFaAasKr4eNKj1CW/
-         joucIcob6dnJQiLhQMiffE7V3YdGNN1Ezygl0+s6YT2GSFhF4mBl7SvGsGS7nhbeSsOy
-         njmaNTQlr5i25O44M934n1hCHcdSFjQ1JrLy+3FCsrSaHVQH3bwcU7bnZjYwqOPWLO7U
-         7NkIW46BlUIXfRwrTXwbGEK9CYa95FKAiSdH7z9TdCce4m44Bxid3Z/Kua+mRxKux88D
-         w96SspOW5vMbzBYtxVCk2WGiExp+5ChtcSO/KhvDQtZfJRoXaPmfXKCak5mmoxCtMo8m
-         Dp1g==
-X-Gm-Message-State: APjAAAXItbTmpTExMo2NDy5lsSOvXliWAUGQLGj74cvl4Osm9VmfrfcI
-        81VGLVFpKCDZYM3tl0hmVZbXxg==
-X-Google-Smtp-Source: APXvYqxslLGlE2Z32JrwF68+UT/QTEzc2h4cRU8+oFlfKpGx4lqRoPme+GkRplsBopyQbwZagsOswA==
-X-Received: by 2002:a05:6000:1052:: with SMTP id c18mr3041664wrx.268.1579268044819;
-        Fri, 17 Jan 2020 05:34:04 -0800 (PST)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id c2sm34173581wrp.46.2020.01.17.05.34.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2020 05:34:03 -0800 (PST)
-From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
-        <michal.lowas-rzechonek@silvair.com>
-X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@mlowasrzechonek2133>
-Date:   Fri, 17 Jan 2020 14:34:02 +0100
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: Re: [PATCH BlueZ] mesh: Offload loopback packets to l_idle_onshot()
-Message-ID: <20200117133402.jvnrhoect6olamtk@mlowasrzechonek2133>
-Mail-Followup-To: Brian Gix <brian.gix@intel.com>,
-        linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-References: <20200117071604.20675-1-brian.gix@intel.com>
+        Fri, 17 Jan 2020 08:38:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39114 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726970AbgAQNix (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 17 Jan 2020 08:38:53 -0500
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 206235] New: kernel BUG at mm/slub.c:294
+Date:   Fri, 17 Jan 2020 13:38:51 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: steffen@sdaoden.eu
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-206235-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200117071604.20675-1-brian.gix@intel.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+https://bugzilla.kernel.org/show_bug.cgi?id=206235
 
-On 01/16, Brian Gix wrote:
-> Any packet that may be handled internally by the daemon must be sent in
-> it's own idle_oneshot context, to prevent multiple nodes from handling
-> and responding in the same context, eventually corrupting memory.
->
-> This addresses the following crash:
-> Program terminated with signal SIGSEGV, Segmentation fault.
->  0  tcache_get (tc_idx=0) at malloc.c:2951
->      2951   tcache->entries[tc_idx] = e->next;
-> (gdb) bt
->  0  tcache_get (tc_idx=0) at malloc.c:2951
->  1  __GI___libc_malloc (bytes=bytes@entry=16) at malloc.c:3058
->  2  0x0000564cff9bc1de in l_malloc (size=size@entry=16) at ell/util.c:62
->  3  0x0000564cff9bd46b in l_queue_push_tail (queue=0x564d000c9710, data=data@entry=0x564d000d0d60) at ell/queue.c:136
->  4  0x0000564cff9beabd in idle_add (callback=callback@entry=0x564cff9be4e0 <oneshot_callback>, user_data=user_data@entry=0x564d000d4700,
->     flags=flags@entry=268435456, destroy=destroy@entry=0x564cff9be4c0 <idle_destroy>) at ell/main.c:292
->  5  0x0000564cff9be5f7 in l_idle_oneshot (callback=callback@entry=0x564cff998bc0 <tx_worker>, user_data=user_data@entry=0x564d000d83f0,
->     destroy=destroy@entry=0x0) at ell/idle.c:144
->  6  0x0000564cff998326 in send_tx (io=<optimized out>, info=0x7ffd035503f4, data=<optimized out>, len=<optimized out>)
->     at mesh/mesh-io-generic.c:637
->  7  0x0000564cff99675a in send_network_beacon (key=0x564d000cfee0) at mesh/net-keys.c:355
->  8  snb_timeout (timeout=0x564d000dd730, user_data=0x564d000cfee0) at mesh/net-keys.c:364
->  9  0x0000564cff9bdca2 in timeout_callback (fd=<optimized out>, events=<optimized out>, user_data=0x564d000dd730) at ell/timeout.c:81
->  10 timeout_callback (fd=<optimized out>, events=<optimized out>, user_data=0x564d000dd730) at ell/timeout.c:70
->  11 0x0000564cff9bedcd in l_main_iterate (timeout=<optimized out>) at ell/main.c:473
->  12 0x0000564cff9bee7c in l_main_run () at ell/main.c:520
->  13 l_main_run () at ell/main.c:502
->  14 0x0000564cff9bf08c in l_main_run_with_signal (callback=<optimized out>, user_data=0x0) at ell/main.c:642
->  15 0x0000564cff994b64 in main (argc=<optimized out>, argv=0x7ffd03550668) at mesh/main.c:268
+            Bug ID: 206235
+           Summary: kernel BUG at mm/slub.c:294
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.19.94
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: steffen@sdaoden.eu
+        Regression: No
 
-Hm. I can't seem to wrap my head around this backtrace. Do you maybe
-have a reproduction path?
+during a "sudo rfkill block all" with a bluealsa device still paired (normally
+i unpair first, first time i did not i think) i got this oops:
+
+Jan 17 01:34:05 kent kernel: ------------[ cut here ]------------
+Jan 17 01:34:05 kent kernel: kernel BUG at mm/slub.c:294!
+Jan 17 01:34:05 kent kernel: invalid opcode: 0000 [#1] PREEMPT SMP PTI
+Jan 17 01:34:05 kent kernel: CPU: 0 PID: 16328 Comm: rfkill Tainted: G        
+C        4.19.94-kent #1
+Jan 17 01:34:05 kent kernel: Hardware name: LENOVO 81EU/LNVNB161216, BIOS
+7PCN35WW 09/25/2018
+Jan 17 01:34:05 kent kernel: RIP: 0010:__slab_free.isra.20+0x1b8/0x290
+Jan 17 01:34:05 kent kernel: Code: 75 6a 80 7c 24 4b 00 79 05 40 84 f6 74 1e 48
+8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 80 4c 24 4b 80 4d 89 ef e9 03 ff ff
+ff <0f> 0b 48 8d 65 d8 4c 89 e6 4c 89 f7 ba 01 00 00 00 5b 41 5c 41 5d
+Jan 17 01:34:05 kent kernel: RSP: 0018:ffffa6b840cebcc0 EFLAGS: 00010246
+Jan 17 01:34:05 kent kernel: RAX: ffff95323b657a00 RBX: ffff95323b657a00 RCX:
+ffff95323b657a00
+Jan 17 01:34:05 kent kernel: RDX: 0000000080200005 RSI: ffffdd2dc5ed9580 RDI:
+ffff953324d2b080
+Jan 17 01:34:05 kent kernel: RBP: ffffa6b840cebd50 R08: 0000000000000001 R09:
+ffff95323b657a00
+Jan 17 01:34:05 kent kernel: R10: 00001a05f5d98974 R11: 0000000000001400 R12:
+ffffdd2dc5ed9580
+Jan 17 01:34:05 kent kernel: R13: ffff95323b657a00 R14: ffff953324d2b080 R15:
+0000000000000000
+Jan 17 01:34:05 kent kernel: FS:  00007f21f93c3740(0000)
+GS:ffff953326a00000(0000) knlGS:0000000000000000
+Jan 17 01:34:05 kent kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Jan 17 01:34:05 kent kernel: CR2: 00007ffb6241f9d8 CR3: 000000010dbee002 CR4:
+00000000003606f0
+Jan 17 01:34:05 kent kernel: Call Trace:
+Jan 17 01:34:05 kent kernel:  ? finish_wait+0x2a/0x60
+Jan 17 01:34:05 kent kernel:  ? __hci_cmd_sync_ev+0x20a/0x230
+Jan 17 01:34:05 kent kernel:  kmem_cache_free+0x195/0x1c0
+Jan 17 01:34:05 kent kernel:  btrtl_shutdown_realtek+0x2b/0x50
+Jan 17 01:34:05 kent kernel:  hci_dev_do_close+0x402/0x4c0
+Jan 17 01:34:05 kent kernel:  hci_rfkill_set_block+0x37/0x50
+Jan 17 01:34:05 kent kernel:  rfkill_set_block+0x8f/0x140
+Jan 17 01:34:05 kent kernel:  rfkill_fop_write+0x12a/0x1d0
+Jan 17 01:34:05 kent kernel:  __vfs_write+0x31/0x180
+Jan 17 01:34:05 kent kernel:  vfs_write+0xa4/0x190
+Jan 17 01:34:05 kent kernel:  ksys_write+0x52/0xd0
+Jan 17 01:34:05 kent kernel:  do_syscall_64+0x5a/0x190
+Jan 17 01:34:05 kent kernel:  ? prepare_exit_to_usermode+0x66/0x90
+Jan 17 01:34:05 kent kernel:  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+Jan 17 01:34:05 kent kernel: RIP: 0033:0x7f21f94b0644
+Jan 17 01:34:05 kent kernel: Code: 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b3
+0f 1f 80 00 00 00 00 48 8d 05 b9 50 0d 00 8b 00 85 c0 75 13 b8 01 00 00 00 0f
+05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 41 54 49 89 d4 55 48 89 f5 53
+Jan 17 01:34:05 kent kernel: RSP: 002b:00007ffc78824028 EFLAGS: 00000246
+ORIG_RAX: 0000000000000001
+Jan 17 01:34:05 kent kernel: RAX: ffffffffffffffda RBX: 0000000000000003 RCX:
+00007f21f94b0644
+Jan 17 01:34:05 kent kernel: RDX: 0000000000000008 RSI: 00007ffc78824040 RDI:
+0000000000000003
+Jan 17 01:34:05 kent kernel: RBP: 0000000000000001 R08: 0000000000000003 R09:
+0000000000000000
+Jan 17 01:34:05 kent kernel: R10: fffffffffffff088 R11: 0000000000000246 R12:
+0000000000000000
+Jan 17 01:34:05 kent kernel: R13: 0000000000000000 R14: 0000000000000000 R15:
+0000000000000000
+Jan 17 01:34:05 kent kernel: Modules linked in: r8822be(C)
+Jan 17 01:34:05 kent kernel: ---[ end trace 56293fc55f5cc3e0 ]---
+Jan 17 01:34:05 kent kernel: RIP: 0010:__slab_free.isra.20+0x1b8/0x290
+Jan 17 01:34:05 kent kernel: Code: 75 6a 80 7c 24 4b 00 79 05 40 84 f6 74 1e 48
+8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 80 4c 24 4b 80 4d 89 ef e9 03 ff ff
+ff <0f> 0b 48 8d 65 d8 4c 89 e6 4c 89 f7 ba 01 00 00 00 5b 41 5c 41 5d
+Jan 17 01:34:05 kent kernel: RSP: 0018:ffffa6b840cebcc0 EFLAGS: 00010246
+Jan 17 01:34:05 kent kernel: RAX: ffff95323b657a00 RBX: ffff95323b657a00 RCX:
+ffff95323b657a00
+Jan 17 01:34:05 kent kernel: RDX: 0000000080200005 RSI: ffffdd2dc5ed9580 RDI:
+ffff953324d2b080
+Jan 17 01:34:05 kent kernel: RBP: ffffa6b840cebd50 R08: 0000000000000001 R09:
+ffff95323b657a00
+Jan 17 01:34:05 kent kernel: R10: 00001a05f5d98974 R11: 0000000000001400 R12:
+ffffdd2dc5ed9580
+Jan 17 01:34:05 kent kernel: R13: ffff95323b657a00 R14: ffff953324d2b080 R15:
+0000000000000000
+Jan 17 01:34:05 kent kernel: FS:  00007f21f93c3740(0000)
+GS:ffff953326a00000(0000) knlGS:0000000000000000
+Jan 17 01:34:05 kent kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Jan 17 01:34:05 kent kernel: CR2: 00007ffb6241f9d8 CR3: 000000010dbee002 CR4:
+00000000003606f0
+
+Linux kent 4.19.94-kent #1 SMP PREEMPT Sat Jan 11 22:44:47 CET 2020 x86_64
+Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz GenuineIntel GNU/Linux
 
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+You are receiving this mail because:
+You are the assignee for the bug.
