@@ -2,143 +2,195 @@ Return-Path: <SRS0=B7Pc=3G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B32C8C33CB1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 14:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02836C33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 17:11:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BE032083E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 14:56:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="h7Q1aCW0"
+	by mail.kernel.org (Postfix) with ESMTP id D436920728
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 17:11:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727580AbgAQO4z (ORCPT
+        id S1728057AbgAQRLi convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jan 2020 09:56:55 -0500
-Received: from mga03.intel.com ([134.134.136.65]:31034 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726827AbgAQO4z (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jan 2020 09:56:55 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2020 06:56:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,330,1574150400"; 
-   d="scan'208";a="306255339"
-Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
-  by orsmga001.jf.intel.com with ESMTP; 17 Jan 2020 06:56:39 -0800
-Received: from orsmsx116.amr.corp.intel.com (10.22.240.14) by
- ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 17 Jan 2020 06:56:38 -0800
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- ORSMSX116.amr.corp.intel.com (10.22.240.14) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 17 Jan 2020 06:56:38 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 17 Jan 2020 06:56:38 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZiF7Q/aR/0GdiF955/e0UlI4T/DqxKL595uB+bm+a8q9gZVw0DV+4iQzm65muXOSC/7tTgIkghSv+o43UF57E7c/LgE0XfMt+DHXZrOwgwiXPBRhbD5jLc1EISxBsYOT9OgF2XWRe/BLLxOmBT6K5YfvGWFZjU8wY48YplpbIjyM56Jr6zas+tQ1SFxdzS7tLh4n33hXNNVMP6ZR9BcPLkTUu59QnmE6yB12hKajAmfazUrYQeV3XvvmpNZ6CpL/FFH5DRUZvaHVWImdK0KWEhEoxQz+QORNOzWzjlbKLP4N4TrYiNh6ywNJF6ZO5jLQbTz5RZ0zJcgjhEjOgt50cA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RBu/0lyCuXcJh2Zz63ksEXFqc086710U+YtGGdPGbuU=;
- b=W70nGWtAjZZDDdPw4+198usIjs5VrOGO6yAd7TVmN6YO5LcaEfpCSeoL7FaIy9RQqTOuHyff9pbezduHJf9RmKRTz353n3GH/bZ0cTIghubG3Sffau9dFajgY3GvOVInSrfKi3K4EG7WOoew8b8QGvZGG/uxZA6ERi8a8ZeSnlTACcu4sLz8vQUlUmHdIi0jWQVEYnNkyKJPDBcq4uym5gEyuwCkAR9B9365xgIstMDHyozjl2/TSAekJGy3jv54C3knaGE/le//BNJvvdeb0fVmU8nT4lWc8iJ4Kt5rViVaoa+mF2oEJqqlXibkdPrOQ353aS8J+iMwz6VG8uWBog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RBu/0lyCuXcJh2Zz63ksEXFqc086710U+YtGGdPGbuU=;
- b=h7Q1aCW0R8J0WYB1t2kDPtnKtuBi+37NrBWYz16p0Op8PWfGj2dEHcShs3xPJ2WSKF3/Di7lqp+06WpyvKynJNFme+WDRSR5/vOdT3BxyY2FNjX/VlPvCpi4xIZoR5ag+Ib78wcmepKPeaapBTk/6yn0XwCFMUb2WhdU/50DtAA=
-Received: from MWHPR11MB1664.namprd11.prod.outlook.com (10.172.54.13) by
- MWHPR11MB1792.namprd11.prod.outlook.com (10.175.51.137) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2623.8; Fri, 17 Jan 2020 14:56:36 +0000
-Received: from MWHPR11MB1664.namprd11.prod.outlook.com
- ([fe80::e8fb:c0e8:5779:367e]) by MWHPR11MB1664.namprd11.prod.outlook.com
- ([fe80::e8fb:c0e8:5779:367e%6]) with mapi id 15.20.2644.015; Fri, 17 Jan 2020
- 14:56:36 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     =?utf-8?B?TWljaGHFgiBMb3dhcy1SemVjaG9uZWs=?= 
-        <michal.lowas-rzechonek@silvair.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ] mesh: Offload loopback packets to l_idle_onshot()
-Thread-Topic: [PATCH BlueZ] mesh: Offload loopback packets to l_idle_onshot()
-Thread-Index: AQHVzQYdUfE8nht/UUeExx2EIxj7Fqfu24MAgAALk+iAAAXtAIAABZKr
-Date:   Fri, 17 Jan 2020 14:56:36 +0000
-Message-ID: <7B361DEC-FBE8-4A45-AA51-95D4E5F6E6A7@intel.com>
-References: <20200117071604.20675-1-brian.gix@intel.com>
- <20200117133402.jvnrhoect6olamtk@mlowasrzechonek2133>
- <E1B6E49B-2246-4C1E-9C3C-D15CA1B6DF9C@intel.com>,<20200117143640.7erexoeo6bsevnky@mlowasrzechonek2133>
-In-Reply-To: <20200117143640.7erexoeo6bsevnky@mlowasrzechonek2133>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [2607:fb90:563f:4e18:20d9:7afa:886e:e223]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ee32a609-74d5-4279-33b0-08d79b5d7364
-x-ms-traffictypediagnostic: MWHPR11MB1792:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB17922426BF6E7B4426BA8234E1310@MWHPR11MB1792.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:359;
-x-forefront-prvs: 0285201563
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(376002)(346002)(39860400002)(366004)(199004)(189003)(71200400001)(2906002)(54906003)(6506007)(53546011)(33656002)(66476007)(66946007)(5660300002)(64756008)(66446008)(8676002)(81156014)(91956017)(316002)(76116006)(8936002)(66556008)(81166006)(107886003)(2616005)(6512007)(4326008)(6486002)(86362001)(478600001)(186003)(6916009)(36756003)(31214005);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR11MB1792;H:MWHPR11MB1664.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QROiG0phJsB0Z7iMnAuurDj1PxMROncOQ63JSm9NZbf8CMf15OP80f5wDix+Hw0gn9Dq338P1x5m+ibuw1u7er/q7PamzKS9g1+Xc6C3LqdvY+yRkt8S4EpJG0+eUAStUkTQtkPjyl53GfVh4mOvI4rosTVNKiugJXEiTtUHKVmZ8V4TndEmlHzKbzGCwTfOys8MKVwdNIC+UbMyYKXzdyhMK5YgACMLdds13X0lREVg2JXRMcZE016nZK41l/IrEqr6qKMooC78/fVURZVTGDPa5gx4m1R3j5Ih15JfFiGhWpOZphTlMa3uolsrloPXF2DK5/fUD9idrNeAowe1IBoJeBr0MM/ZgRJQlU9NSHJ14ibl3eWX5OpVH0tEmhQUsfbpL71Hea4+938ie0xvBN1pfUiq+RRQp0biN8cnB0/+bxVP7vQ0U7+mX5bvcrtKl5b9UAF0OnzAdGc0HsojiFTebLjJGVZqFla4F3BFYkXYjsrUcA9+HquS60d3HItZ
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee32a609-74d5-4279-33b0-08d79b5d7364
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2020 14:56:36.5255
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JBPYEFWxmKnRnXmO9o6/Hhs4mybM2YMqlh7oG4SFxSAl8geXrbmAsHANVihKtLavnGLU0Xiwmg3piFjRuu7u9w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1792
-X-OriginatorOrg: intel.com
+        Fri, 17 Jan 2020 12:11:38 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:36244 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726603AbgAQRLi (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 17 Jan 2020 12:11:38 -0500
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id BB273CED0D;
+        Fri, 17 Jan 2020 18:20:54 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [PATCH] bluetooth: Refactoring mgmt cmd op_code structure
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200117034318.51409-1-alainm@chromium.org>
+Date:   Fri, 17 Jan 2020 18:11:36 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <4AC68A7A-5F6F-48D1-8A5D-76718FAA200D@holtmann.org>
+References: <20200117034318.51409-1-alainm@chromium.org>
+To:     Alain Michaud <alainm@chromium.org>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGHFgiwNCg0KPiBPbiBKYW4gMTcsIDIwMjAsIGF0IDY6MzcgQU0sIE1pY2hhxYIgTG93
-YXMtUnplY2hvbmVrIDxtaWNoYWwubG93YXMtcnplY2hvbmVrQHNpbHZhaXIuY29tPiB3cm90ZToN
-Cj4gDQo+IO+7v0hpIEJyaWFuLA0KPiANCj4gT24gMDEvMTcsIEdpeCwgQnJpYW4gd3JvdGU6DQo+
-Pj4gSG0uIEkgY2FuJ3Qgc2VlbSB0byB3cmFwIG15IGhlYWQgYXJvdW5kIHRoaXMgYmFja3RyYWNl
-LiBEbyB5b3UgbWF5YmUNCj4+PiBoYXZlIGEgcmVwcm9kdWN0aW9uIHBhdGg/DQo+PiANCj4+IFRo
-ZSBiYWNrdHJhY2UgZG9lc27igJl0IHJlYWxseSBzaG93IHdoYXQgaGFzIGdvbmUgd3JvbmcgdmVy
-eSB3ZWxsLA0KPj4gYmVjYXVzZSB3aGF0IGhhcyBoYXBwZW5lZCBpcyBhIGhlYXAgY29ycnVwdGlv
-bi4gVGhlIHNlZyBmYXVsdCBvY2N1cnMNCj4+IGR1cmluZyBhIG1lbW9yeSBhbGxvYyBzb21ldGlt
-ZSBsYXRlci4NCj4+IA0KPj4gVGhlIHBoeXNpY3Mgb2YgdGhlIHByb2JsZW0sIGlzIGJlc3Qgc2hv
-d24gYnkgbG9jYWwgY29uZmlnIGNsaWVudA0KPj4gcmVxdWVzdGluZyBzZWdtZW50ZWQgY29tcG9z
-aXRpb24gZGF0YSBmcm9tIGEgbG9jYWwgY29uZmlnIHNlcnZlci4gIFRoZQ0KPj4gb25lIHJlcXVl
-c3QsIGFsbCByZXNwb25zZSBzZWdtZW50cywgdGhlIHJldHVybiBzZWcgQUNLcyBhbGwgaGFwcGVu
-IG9uDQo+PiB0aGUgc2FtZSBDIGNhbGxpbmcgc3RhY2sgd2hpY2ggZ2V0cyAqdmVyeSogZGVlcCwg
-YW5kIHN0ZXBzIG9mZiB0aGUNCj4+IGVuZCwgc2luY2Ugbm90aGluZyBnb2VzIE9UQS4gSXQgZG9l
-cyAqbm90KiBoYXBwZW4gZHVyaW5nIE9UQQ0KPj4gb3BlcmF0aW9ucyBiZWNhdXNlIGVhY2ggZGlz
-Y3JldGUgcGFja2V0IHN0YXJ0cyBmcm9tIGEgZnJlc2ggQyBjYWxsaW5nDQo+PiBzdGFjayBmcm9t
-IG1haW4oKS4NCj4gDQo+IFllYWgsIEkgZ290IHRoYXQgcGFydCAtIGxfaWRsZSB1bndpbmRzIHRo
-ZSBzdGFjayBzbyB0aGF0IGV2ZXJ5dGhpbmcNCj4gc3RhcnRzIGZyb20gdGhlIGJlZ2lubmluZywg
-aXQnYSBwcmV0dHkgc3RhbmRhcmQgdGVjaG5pcXVlIGZvciBtYWluDQo+IGxvb3BzLg0KPiANCj4g
-V2hhdCBJIGNvdWxkbid0IGZpbmQgaXMgdGhlIGV4YWN0IHBsYWNlIHdoZXJlIHNlbmRfbXNnX3Br
-dCByZWN1cnNlcywgYnV0DQo+IEkgdGhpbmsgSSd2ZSBmb3VuZCBpdCBub3csIGUuZy4gaW4gdGhp
-cyBjYWxsIGNoYWluOg0KPiANCj4gICAgc2VuZF9tc2dfcGt0DQo+ICAgIG5ldF9yeA0KPiAgICBw
-YWNrZXRfcmVjZWl2ZWQNCj4gICAgc2VnX3J4ZWQNCj4gICAgc2VuZF9uZXRfYWNrDQo+ICAgIG1l
-c2hfbmV0X3RyYW5zcG9ydF9zZW5kDQo+ICAgIHNlbmRfbXNnX3BrdCA8LSBoZXJlDQo+IA0KPiBJ
-biB0aGUgZW5kOiB0aGUgcGF0Y2ggaXMgZmluZSwgYnV0IG1heWJlIGNoYW5nZSB0aGUgY29tbWl0
-IGxvZyBhbmQvb3IgYQ0KPiBjb21tZW50LCBzaW5jZSwgYXMgeW91IHJlbWFya2VkLCB0aGUgYmFj
-a3RyYWNlIGRvZXNuJ3QgZXhwbGFpbiBtdWNoPw0KDQpUaGUgY29tbWl0IG1lc3NhZ2UgaXMgb3Vy
-IHN0YW5kYXJkIGV4cGxhbmF0aW9uIHdoZW4gYSBidWcgaGFzIGNhdXNlZCBhIGNyYXNoL3NlZyBm
-YXVsdCwgc28gdGhhdCBvdGhlcnMgc3VmZmVyaW5nIHRoZSBzYW1lIGZhdGUgY2FuIG1hdGNoIHRo
-ZSBwcm9ibGVtIHdpdGggdGhlIGZpeC4gSXQgaXNu4oCZdCByZWFsbHkgaW50ZW5kZWQgdG8gYmUg
-YWxsIGluZm8gcmVxdWlyZWQgdG8gZGVidWcgdGhlIHByb2JsZW0geW91cnNlbGYu
+Hi Alain,
+
+> This change refactors the way op-codes are managed in the kernel to
+> facilitate easier cherry-picking  of features on downlevel kernels
+> without incuring significant merge conflicts and op_code collisions.
+> 
+> Signed-off-by: Alain Michaud <alainm@chromium.org>
+> ---
+> 
+> include/net/bluetooth/hci_core.h |   1 +
+> net/bluetooth/hci_sock.c         |  14 +-
+> net/bluetooth/mgmt.c             | 470 +++++++++++++++++++------------
+> 3 files changed, 297 insertions(+), 188 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 89ecf0a80aa1..0cc2f7c11c3a 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1494,6 +1494,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+> #define HCI_MGMT_UNCONFIGURED	BIT(3)
+> 
+> struct hci_mgmt_handler {
+> +	unsigned short op_code;
+> 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+> 		     u16 data_len);
+> 	size_t data_len;
+> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+> index 3ae508674ef7..4e121607d644 100644
+> --- a/net/bluetooth/hci_sock.c
+> +++ b/net/bluetooth/hci_sock.c
+> @@ -1490,9 +1490,9 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
+> 	void *buf;
+> 	u8 *cp;
+> 	struct mgmt_hdr *hdr;
+> -	u16 opcode, index, len;
+> +	u16 opcode, index, len, i;
+> 	struct hci_dev *hdev = NULL;
+> -	const struct hci_mgmt_handler *handler;
+> +	const struct hci_mgmt_handler *handler = NULL;
+> 	bool var_len, no_hdev;
+> 	int err;
+> 
+> @@ -1533,16 +1533,18 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
+> 		}
+> 	}
+> 
+> -	if (opcode >= chan->handler_count ||
+> -	    chan->handlers[opcode].func == NULL) {
+> +	for (i = 0; i < chan->handler_count; ++i) {
+> +		if (opcode == chan->handlers[i].op_code)
+> +			handler = &chan->handlers[i];
+> +	}
+> +
+> +	if (!handler || !handler->func) {
+> 		BT_DBG("Unknown op %u", opcode);
+> 		err = mgmt_cmd_status(sk, index, opcode,
+> 				      MGMT_STATUS_UNKNOWN_COMMAND);
+> 		goto done;
+> 	}
+> 
+> -	handler = &chan->handlers[opcode];
+> -
+> 	if (!hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) &&
+> 	    !(handler->flags & HCI_MGMT_UNTRUSTED)) {
+> 		err = mgmt_cmd_status(sk, index, opcode,
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 0dc610faab70..7baf9a2809a8 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -40,73 +40,271 @@
+> #define MGMT_VERSION	1
+> #define MGMT_REVISION	15
+> 
+> -static const u16 mgmt_commands[] = {
+> -	MGMT_OP_READ_INDEX_LIST,
+> -	MGMT_OP_READ_INFO,
+> -	MGMT_OP_SET_POWERED,
+> -	MGMT_OP_SET_DISCOVERABLE,
+> -	MGMT_OP_SET_CONNECTABLE,
+> -	MGMT_OP_SET_FAST_CONNECTABLE,
+> -	MGMT_OP_SET_BONDABLE,
+> -	MGMT_OP_SET_LINK_SECURITY,
+> -	MGMT_OP_SET_SSP,
+> -	MGMT_OP_SET_HS,
+> -	MGMT_OP_SET_LE,
+> -	MGMT_OP_SET_DEV_CLASS,
+> -	MGMT_OP_SET_LOCAL_NAME,
+> -	MGMT_OP_ADD_UUID,
+> -	MGMT_OP_REMOVE_UUID,
+> -	MGMT_OP_LOAD_LINK_KEYS,
+> -	MGMT_OP_LOAD_LONG_TERM_KEYS,
+> -	MGMT_OP_DISCONNECT,
+> -	MGMT_OP_GET_CONNECTIONS,
+> -	MGMT_OP_PIN_CODE_REPLY,
+> -	MGMT_OP_PIN_CODE_NEG_REPLY,
+> -	MGMT_OP_SET_IO_CAPABILITY,
+> -	MGMT_OP_PAIR_DEVICE,
+> -	MGMT_OP_CANCEL_PAIR_DEVICE,
+> -	MGMT_OP_UNPAIR_DEVICE,
+> -	MGMT_OP_USER_CONFIRM_REPLY,
+> -	MGMT_OP_USER_CONFIRM_NEG_REPLY,
+> -	MGMT_OP_USER_PASSKEY_REPLY,
+> -	MGMT_OP_USER_PASSKEY_NEG_REPLY,
+> -	MGMT_OP_READ_LOCAL_OOB_DATA,
+> -	MGMT_OP_ADD_REMOTE_OOB_DATA,
+> -	MGMT_OP_REMOVE_REMOTE_OOB_DATA,
+> -	MGMT_OP_START_DISCOVERY,
+> -	MGMT_OP_STOP_DISCOVERY,
+> -	MGMT_OP_CONFIRM_NAME,
+> -	MGMT_OP_BLOCK_DEVICE,
+> -	MGMT_OP_UNBLOCK_DEVICE,
+> -	MGMT_OP_SET_DEVICE_ID,
+> -	MGMT_OP_SET_ADVERTISING,
+> -	MGMT_OP_SET_BREDR,
+> -	MGMT_OP_SET_STATIC_ADDRESS,
+> -	MGMT_OP_SET_SCAN_PARAMS,
+> -	MGMT_OP_SET_SECURE_CONN,
+> -	MGMT_OP_SET_DEBUG_KEYS,
+> -	MGMT_OP_SET_PRIVACY,
+> -	MGMT_OP_LOAD_IRKS,
+> -	MGMT_OP_GET_CONN_INFO,
+> -	MGMT_OP_GET_CLOCK_INFO,
+> -	MGMT_OP_ADD_DEVICE,
+> -	MGMT_OP_REMOVE_DEVICE,
+> -	MGMT_OP_LOAD_CONN_PARAM,
+> -	MGMT_OP_READ_UNCONF_INDEX_LIST,
+> -	MGMT_OP_READ_CONFIG_INFO,
+> -	MGMT_OP_SET_EXTERNAL_CONFIG,
+> -	MGMT_OP_SET_PUBLIC_ADDRESS,
+> -	MGMT_OP_START_SERVICE_DISCOVERY,
+> -	MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
+> -	MGMT_OP_READ_EXT_INDEX_LIST,
+> -	MGMT_OP_READ_ADV_FEATURES,
+> -	MGMT_OP_ADD_ADVERTISING,
+> -	MGMT_OP_REMOVE_ADVERTISING,
+> -	MGMT_OP_GET_ADV_SIZE_INFO,
+> -	MGMT_OP_START_LIMITED_DISCOVERY,
+> -	MGMT_OP_READ_EXT_INFO,
+> -	MGMT_OP_SET_APPEARANCE,
+> -	MGMT_OP_SET_BLOCKED_KEYS,
+> +static int read_version(struct sock *sk, struct hci_dev *hdev, void *data,
+> +			u16 data_len);
+> +static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
+> +			 u16 data_len);
+
+<snip>
+
+I do not see this as a good thing. This massive list of forward declarations is not acceptable. That makes the code unmaintainable for upstream.
+
+Regards
+
+Marcel
+
