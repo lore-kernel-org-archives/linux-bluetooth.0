@@ -2,124 +2,143 @@ Return-Path: <SRS0=B7Pc=3G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CCD0C33CB1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 14:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B32C8C33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 14:56:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 000782073A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 14:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BE032083E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jan 2020 14:56:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="oN+JegdN"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="h7Q1aCW0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728780AbgAQOgo (ORCPT
+        id S1727580AbgAQO4z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jan 2020 09:36:44 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37746 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726942AbgAQOgo (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jan 2020 09:36:44 -0500
-Received: by mail-wr1-f67.google.com with SMTP id w15so22991620wru.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2020 06:36:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=lZFcJOkb9xFI3EaRgQob5TrRRWvhpKiRf5M/zbzi3CM=;
-        b=oN+JegdN/E5hIuX55mZMy8h78WkCehD+H7A4FKmvZNeBd9N3fJB4MtJdeaCo0z46I5
-         L9Js+oCIoCWTPgU+EFTmsh99FLYGWoelO4uxccNxGQz/C+uGhER9OcSZ0N5t/ZrVkl+A
-         vLjArY/XmWymid6yGTBEWBQdd3ypkQM7/ULqB+Nu34PamhTs8ZrGbyHOePsVZ59fJ9Nn
-         BFJRxCy7g11ujB0XRnQrZbRNl2BhHEQGPcJmvl9Ob2sh2sX09ZYVpK6kpGqY9GXxYfJ8
-         Piwi7n4LXlMT0rZykWSmQhhX9x4Hb9KH/XtpLi44qPp0AY6V304iBuSqhBHmIjkVmQzm
-         o6bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=lZFcJOkb9xFI3EaRgQob5TrRRWvhpKiRf5M/zbzi3CM=;
-        b=IDoCon+W0QqALkO675YRHjVimGS/Mn6V1Pku1fywfGGKiXM/YSbWLuVVp0B1lX8DPQ
-         nzU93wNmrMOKUYECETp8VvPExD5QeGjkMG49lNVCE2zJGvskrUW61XNkNLJ79DHY+j8a
-         0Da8IX20cQfX5EIVxjFWjXetlZIovGyHtvciSgWOm+7jnqsZr43gX3de8WvxpZ9l6iGp
-         JyjtufzuLzem/3IDaIX6wTWvmPQPkc6GB9b/6B9TRAhbrabhTuA6EUnP7h3PezfOfaTr
-         87cpKu420aDm6qzyeQ3pZA7m1jL8cgtcAM4LSF3873iAHZ1M/U7j7dFsfhexgCcUv+2q
-         vx+Q==
-X-Gm-Message-State: APjAAAU+6KLyeOpDlN73dMZIJiARjQVcLSec1UH+e7hVr/VmLQ07QipC
-        OFcWtubrfO7i/2hhHgVj4EkJDw==
-X-Google-Smtp-Source: APXvYqz2cyBpV3zsEXDKToUBcrhneyCit32llLxG4SO2At8mhhIFC0605i5NVvCNJfOk5J9yOqJA2A==
-X-Received: by 2002:a05:6000:118d:: with SMTP id g13mr3257847wrx.141.1579271802236;
-        Fri, 17 Jan 2020 06:36:42 -0800 (PST)
-Received: from mlowasrzechonek2133 ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id x16sm366671wmk.35.2020.01.17.06.36.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2020 06:36:41 -0800 (PST)
-Date:   Fri, 17 Jan 2020 15:36:40 +0100
-From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
+        Fri, 17 Jan 2020 09:56:55 -0500
+Received: from mga03.intel.com ([134.134.136.65]:31034 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726827AbgAQO4z (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 17 Jan 2020 09:56:55 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2020 06:56:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,330,1574150400"; 
+   d="scan'208";a="306255339"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by orsmga001.jf.intel.com with ESMTP; 17 Jan 2020 06:56:39 -0800
+Received: from orsmsx116.amr.corp.intel.com (10.22.240.14) by
+ ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 17 Jan 2020 06:56:38 -0800
+Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX116.amr.corp.intel.com (10.22.240.14) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 17 Jan 2020 06:56:38 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 17 Jan 2020 06:56:38 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZiF7Q/aR/0GdiF955/e0UlI4T/DqxKL595uB+bm+a8q9gZVw0DV+4iQzm65muXOSC/7tTgIkghSv+o43UF57E7c/LgE0XfMt+DHXZrOwgwiXPBRhbD5jLc1EISxBsYOT9OgF2XWRe/BLLxOmBT6K5YfvGWFZjU8wY48YplpbIjyM56Jr6zas+tQ1SFxdzS7tLh4n33hXNNVMP6ZR9BcPLkTUu59QnmE6yB12hKajAmfazUrYQeV3XvvmpNZ6CpL/FFH5DRUZvaHVWImdK0KWEhEoxQz+QORNOzWzjlbKLP4N4TrYiNh6ywNJF6ZO5jLQbTz5RZ0zJcgjhEjOgt50cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RBu/0lyCuXcJh2Zz63ksEXFqc086710U+YtGGdPGbuU=;
+ b=W70nGWtAjZZDDdPw4+198usIjs5VrOGO6yAd7TVmN6YO5LcaEfpCSeoL7FaIy9RQqTOuHyff9pbezduHJf9RmKRTz353n3GH/bZ0cTIghubG3Sffau9dFajgY3GvOVInSrfKi3K4EG7WOoew8b8QGvZGG/uxZA6ERi8a8ZeSnlTACcu4sLz8vQUlUmHdIi0jWQVEYnNkyKJPDBcq4uym5gEyuwCkAR9B9365xgIstMDHyozjl2/TSAekJGy3jv54C3knaGE/le//BNJvvdeb0fVmU8nT4lWc8iJ4Kt5rViVaoa+mF2oEJqqlXibkdPrOQ353aS8J+iMwz6VG8uWBog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RBu/0lyCuXcJh2Zz63ksEXFqc086710U+YtGGdPGbuU=;
+ b=h7Q1aCW0R8J0WYB1t2kDPtnKtuBi+37NrBWYz16p0Op8PWfGj2dEHcShs3xPJ2WSKF3/Di7lqp+06WpyvKynJNFme+WDRSR5/vOdT3BxyY2FNjX/VlPvCpi4xIZoR5ag+Ib78wcmepKPeaapBTk/6yn0XwCFMUb2WhdU/50DtAA=
+Received: from MWHPR11MB1664.namprd11.prod.outlook.com (10.172.54.13) by
+ MWHPR11MB1792.namprd11.prod.outlook.com (10.175.51.137) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.8; Fri, 17 Jan 2020 14:56:36 +0000
+Received: from MWHPR11MB1664.namprd11.prod.outlook.com
+ ([fe80::e8fb:c0e8:5779:367e]) by MWHPR11MB1664.namprd11.prod.outlook.com
+ ([fe80::e8fb:c0e8:5779:367e%6]) with mapi id 15.20.2644.015; Fri, 17 Jan 2020
+ 14:56:36 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     =?utf-8?B?TWljaGHFgiBMb3dhcy1SemVjaG9uZWs=?= 
         <michal.lowas-rzechonek@silvair.com>
-To:     "Gix, Brian" <brian.gix@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Stotland, Inga" <inga.stotland@intel.com>
 Subject: Re: [PATCH BlueZ] mesh: Offload loopback packets to l_idle_onshot()
-Message-ID: <20200117143640.7erexoeo6bsevnky@mlowasrzechonek2133>
-Mail-Followup-To: "Gix, Brian" <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
+Thread-Topic: [PATCH BlueZ] mesh: Offload loopback packets to l_idle_onshot()
+Thread-Index: AQHVzQYdUfE8nht/UUeExx2EIxj7Fqfu24MAgAALk+iAAAXtAIAABZKr
+Date:   Fri, 17 Jan 2020 14:56:36 +0000
+Message-ID: <7B361DEC-FBE8-4A45-AA51-95D4E5F6E6A7@intel.com>
 References: <20200117071604.20675-1-brian.gix@intel.com>
  <20200117133402.jvnrhoect6olamtk@mlowasrzechonek2133>
- <E1B6E49B-2246-4C1E-9C3C-D15CA1B6DF9C@intel.com>
+ <E1B6E49B-2246-4C1E-9C3C-D15CA1B6DF9C@intel.com>,<20200117143640.7erexoeo6bsevnky@mlowasrzechonek2133>
+In-Reply-To: <20200117143640.7erexoeo6bsevnky@mlowasrzechonek2133>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [2607:fb90:563f:4e18:20d9:7afa:886e:e223]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ee32a609-74d5-4279-33b0-08d79b5d7364
+x-ms-traffictypediagnostic: MWHPR11MB1792:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR11MB17922426BF6E7B4426BA8234E1310@MWHPR11MB1792.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:359;
+x-forefront-prvs: 0285201563
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(376002)(346002)(39860400002)(366004)(199004)(189003)(71200400001)(2906002)(54906003)(6506007)(53546011)(33656002)(66476007)(66946007)(5660300002)(64756008)(66446008)(8676002)(81156014)(91956017)(316002)(76116006)(8936002)(66556008)(81166006)(107886003)(2616005)(6512007)(4326008)(6486002)(86362001)(478600001)(186003)(6916009)(36756003)(31214005);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR11MB1792;H:MWHPR11MB1664.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: QROiG0phJsB0Z7iMnAuurDj1PxMROncOQ63JSm9NZbf8CMf15OP80f5wDix+Hw0gn9Dq338P1x5m+ibuw1u7er/q7PamzKS9g1+Xc6C3LqdvY+yRkt8S4EpJG0+eUAStUkTQtkPjyl53GfVh4mOvI4rosTVNKiugJXEiTtUHKVmZ8V4TndEmlHzKbzGCwTfOys8MKVwdNIC+UbMyYKXzdyhMK5YgACMLdds13X0lREVg2JXRMcZE016nZK41l/IrEqr6qKMooC78/fVURZVTGDPa5gx4m1R3j5Ih15JfFiGhWpOZphTlMa3uolsrloPXF2DK5/fUD9idrNeAowe1IBoJeBr0MM/ZgRJQlU9NSHJ14ibl3eWX5OpVH0tEmhQUsfbpL71Hea4+938ie0xvBN1pfUiq+RRQp0biN8cnB0/+bxVP7vQ0U7+mX5bvcrtKl5b9UAF0OnzAdGc0HsojiFTebLjJGVZqFla4F3BFYkXYjsrUcA9+HquS60d3HItZ
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <E1B6E49B-2246-4C1E-9C3C-D15CA1B6DF9C@intel.com>
-User-Agent: NeoMutt/20180716
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee32a609-74d5-4279-33b0-08d79b5d7364
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2020 14:56:36.5255
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: JBPYEFWxmKnRnXmO9o6/Hhs4mybM2YMqlh7oG4SFxSAl8geXrbmAsHANVihKtLavnGLU0Xiwmg3piFjRuu7u9w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1792
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
-
-On 01/17, Gix, Brian wrote:
-> > Hm. I can't seem to wrap my head around this backtrace. Do you maybe
-> > have a reproduction path?
-> 
-> The backtrace doesn’t really show what has gone wrong very well,
-> because what has happened is a heap corruption. The seg fault occurs
-> during a memory alloc sometime later.
-> 
-> The physics of the problem, is best shown by local config client
-> requesting segmented composition data from a local config server.  The
-> one request, all response segments, the return seg ACKs all happen on
-> the same C calling stack which gets *very* deep, and steps off the
-> end, since nothing goes OTA. It does *not* happen during OTA
-> operations because each discrete packet starts from a fresh C calling
-> stack from main().
-
-Yeah, I got that part - l_idle unwinds the stack so that everything
-starts from the beginning, it'a pretty standard technique for main
-loops.
-
-What I couldn't find is the exact place where send_msg_pkt recurses, but
-I think I've found it now, e.g. in this call chain:
-
-    send_msg_pkt
-    net_rx
-    packet_received
-    seg_rxed
-    send_net_ack
-    mesh_net_transport_send
-    send_msg_pkt <- here
-
-In the end: the patch is fine, but maybe change the commit log and/or a
-comment, since, as you remarked, the backtrace doesn't explain much?
-
-regards
--- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+SGkgTWljaGHFgiwNCg0KPiBPbiBKYW4gMTcsIDIwMjAsIGF0IDY6MzcgQU0sIE1pY2hhxYIgTG93
+YXMtUnplY2hvbmVrIDxtaWNoYWwubG93YXMtcnplY2hvbmVrQHNpbHZhaXIuY29tPiB3cm90ZToN
+Cj4gDQo+IO+7v0hpIEJyaWFuLA0KPiANCj4gT24gMDEvMTcsIEdpeCwgQnJpYW4gd3JvdGU6DQo+
+Pj4gSG0uIEkgY2FuJ3Qgc2VlbSB0byB3cmFwIG15IGhlYWQgYXJvdW5kIHRoaXMgYmFja3RyYWNl
+LiBEbyB5b3UgbWF5YmUNCj4+PiBoYXZlIGEgcmVwcm9kdWN0aW9uIHBhdGg/DQo+PiANCj4+IFRo
+ZSBiYWNrdHJhY2UgZG9lc27igJl0IHJlYWxseSBzaG93IHdoYXQgaGFzIGdvbmUgd3JvbmcgdmVy
+eSB3ZWxsLA0KPj4gYmVjYXVzZSB3aGF0IGhhcyBoYXBwZW5lZCBpcyBhIGhlYXAgY29ycnVwdGlv
+bi4gVGhlIHNlZyBmYXVsdCBvY2N1cnMNCj4+IGR1cmluZyBhIG1lbW9yeSBhbGxvYyBzb21ldGlt
+ZSBsYXRlci4NCj4+IA0KPj4gVGhlIHBoeXNpY3Mgb2YgdGhlIHByb2JsZW0sIGlzIGJlc3Qgc2hv
+d24gYnkgbG9jYWwgY29uZmlnIGNsaWVudA0KPj4gcmVxdWVzdGluZyBzZWdtZW50ZWQgY29tcG9z
+aXRpb24gZGF0YSBmcm9tIGEgbG9jYWwgY29uZmlnIHNlcnZlci4gIFRoZQ0KPj4gb25lIHJlcXVl
+c3QsIGFsbCByZXNwb25zZSBzZWdtZW50cywgdGhlIHJldHVybiBzZWcgQUNLcyBhbGwgaGFwcGVu
+IG9uDQo+PiB0aGUgc2FtZSBDIGNhbGxpbmcgc3RhY2sgd2hpY2ggZ2V0cyAqdmVyeSogZGVlcCwg
+YW5kIHN0ZXBzIG9mZiB0aGUNCj4+IGVuZCwgc2luY2Ugbm90aGluZyBnb2VzIE9UQS4gSXQgZG9l
+cyAqbm90KiBoYXBwZW4gZHVyaW5nIE9UQQ0KPj4gb3BlcmF0aW9ucyBiZWNhdXNlIGVhY2ggZGlz
+Y3JldGUgcGFja2V0IHN0YXJ0cyBmcm9tIGEgZnJlc2ggQyBjYWxsaW5nDQo+PiBzdGFjayBmcm9t
+IG1haW4oKS4NCj4gDQo+IFllYWgsIEkgZ290IHRoYXQgcGFydCAtIGxfaWRsZSB1bndpbmRzIHRo
+ZSBzdGFjayBzbyB0aGF0IGV2ZXJ5dGhpbmcNCj4gc3RhcnRzIGZyb20gdGhlIGJlZ2lubmluZywg
+aXQnYSBwcmV0dHkgc3RhbmRhcmQgdGVjaG5pcXVlIGZvciBtYWluDQo+IGxvb3BzLg0KPiANCj4g
+V2hhdCBJIGNvdWxkbid0IGZpbmQgaXMgdGhlIGV4YWN0IHBsYWNlIHdoZXJlIHNlbmRfbXNnX3Br
+dCByZWN1cnNlcywgYnV0DQo+IEkgdGhpbmsgSSd2ZSBmb3VuZCBpdCBub3csIGUuZy4gaW4gdGhp
+cyBjYWxsIGNoYWluOg0KPiANCj4gICAgc2VuZF9tc2dfcGt0DQo+ICAgIG5ldF9yeA0KPiAgICBw
+YWNrZXRfcmVjZWl2ZWQNCj4gICAgc2VnX3J4ZWQNCj4gICAgc2VuZF9uZXRfYWNrDQo+ICAgIG1l
+c2hfbmV0X3RyYW5zcG9ydF9zZW5kDQo+ICAgIHNlbmRfbXNnX3BrdCA8LSBoZXJlDQo+IA0KPiBJ
+biB0aGUgZW5kOiB0aGUgcGF0Y2ggaXMgZmluZSwgYnV0IG1heWJlIGNoYW5nZSB0aGUgY29tbWl0
+IGxvZyBhbmQvb3IgYQ0KPiBjb21tZW50LCBzaW5jZSwgYXMgeW91IHJlbWFya2VkLCB0aGUgYmFj
+a3RyYWNlIGRvZXNuJ3QgZXhwbGFpbiBtdWNoPw0KDQpUaGUgY29tbWl0IG1lc3NhZ2UgaXMgb3Vy
+IHN0YW5kYXJkIGV4cGxhbmF0aW9uIHdoZW4gYSBidWcgaGFzIGNhdXNlZCBhIGNyYXNoL3NlZyBm
+YXVsdCwgc28gdGhhdCBvdGhlcnMgc3VmZmVyaW5nIHRoZSBzYW1lIGZhdGUgY2FuIG1hdGNoIHRo
+ZSBwcm9ibGVtIHdpdGggdGhlIGZpeC4gSXQgaXNu4oCZdCByZWFsbHkgaW50ZW5kZWQgdG8gYmUg
+YWxsIGluZm8gcmVxdWlyZWQgdG8gZGVidWcgdGhlIHByb2JsZW0geW91cnNlbGYu
