@@ -2,609 +2,204 @@ Return-Path: <SRS0=z6V2=3H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CDCC32771
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Jan 2020 05:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5680CC33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Jan 2020 07:14:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1001224679
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Jan 2020 05:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A15E2468A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Jan 2020 07:14:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RPYzG+CS"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="ETA9OoDN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725497AbgARFEV (ORCPT
+        id S1726046AbgARHO4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 18 Jan 2020 00:04:21 -0500
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:45467 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbgARFEV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 18 Jan 2020 00:04:21 -0500
-Received: by mail-vs1-f67.google.com with SMTP id b4so16127388vsa.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jan 2020 21:04:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=EiyCi8K3kQKf1hOAaemGhAnO0h3FXXVu0X/RsnGp7og=;
-        b=RPYzG+CS60UIwqNVz/l5uu6sbRbt+lPFN1bEPpHvm1DliPdJoRBtrQfAnMoKnghIPf
-         eyzsVcfylEKEnrUvvnTiVws54UC59xlBVF0C9nRNi3aYie6Dn+6lbh4312bZinAwwcw2
-         Xj7L7DJYru6p9fBxXuFjVxaK93lG4In/T6+Gg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=EiyCi8K3kQKf1hOAaemGhAnO0h3FXXVu0X/RsnGp7og=;
-        b=k9eQbvU4ZOQWLxHLPdh0ww41CcDsL3fIKZxg/2Aji2aeqrWjZQNt3C/VTlVcdthMeU
-         KhwQN9DoZdu0NGkz7xrHAa+ep1K2wP8r00srk/PdHhSdzl962M+ImGmqY62WgcyLuXr+
-         /wzEc1usiubhDHIIyyUHayjELTgdEW0TNeMRI+tDREOL/UFW0LM3nv7Xx+QoS4H4MVci
-         erQD7ELFuDbP3uYocTy164bPtYoybMqCRPRU9hpIF4Q+wyMc5s62Meh+Tw5PisFrtGOl
-         YDIKixzWZbJ2UQQ69hrSBqR+FrdpJ+zzbLIjxP1HpN9fyNEMWh7HkSrH24cff14Kqen2
-         uQVA==
-X-Gm-Message-State: APjAAAWRCIRV6gMzqYAzNyzw/Wg9rwwqQ22VXi0OdoUaslubisMteF8V
-        KCU9Gd6erjBLqTduWxMC05wGjMplISM=
-X-Google-Smtp-Source: APXvYqzxqr4U2wb2hZIMEC0uevFY72VwgoFtORAK/87S0P5/tv9pjuC7kf31E7uouJGdHJWNcqrjTg==
-X-Received: by 2002:a67:dc90:: with SMTP id g16mr6775677vsk.110.1579323859486;
-        Fri, 17 Jan 2020 21:04:19 -0800 (PST)
-Received: from alain.c.googlers.com.com (69.104.231.35.bc.googleusercontent.com. [35.231.104.69])
-        by smtp.gmail.com with ESMTPSA id h67sm7952040vka.25.2020.01.17.21.04.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2020 21:04:18 -0800 (PST)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v2] bluetooth: Refactoring mgmt cmd op_code structure
-Date:   Sat, 18 Jan 2020 05:04:10 +0000
-Message-Id: <20200118050410.257697-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+        Sat, 18 Jan 2020 02:14:56 -0500
+Received: from mga07.intel.com ([134.134.136.100]:57703 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725913AbgARHO4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 18 Jan 2020 02:14:56 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2020 23:14:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,333,1574150400"; 
+   d="scan'208";a="219144266"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by orsmga008.jf.intel.com with ESMTP; 17 Jan 2020 23:14:54 -0800
+Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 17 Jan 2020 23:14:53 -0800
+Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
+ FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 17 Jan 2020 23:14:53 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Fri, 17 Jan 2020 23:14:53 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UNIgiQd4aypxSSCLmBfcnHYbgMTSwQrk3aqL4Tjd92D/7QaIPblQOJZC2n4uHrUG1lNTmDHqmhLUuCvbvOiXsYnj8GpkdP1N/ah16gMC0eWzDX4zcGsFyLzCSB+Ut94vcsC53oVFSdi2E04HiYj9PLO8fCdZ0TSTZX+VGGkri8/IMt5E4HGZ0sdAzlF1+awXNUMorx6Mhw2NZ8xB53Zh6ISJPzw1rImk3E8Wzhsm8agZiO9KSYXF4D4JYJl85m82BF38rLzN+bJ1BypdIRJsmdGXyfLz/GB1D2vnWmTsImbovXXrajPexrblCSJEnNLykXqjJ9hMh5Vo8QRkJ+YdIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nhBcNrl0G+HMd0hYjs5tdREg9UjbZHWdnqJGkQ8SonM=;
+ b=k3pKrgfnUO/9632M7O1mK6LInJw590SyMK0iuGKDLmfPdbVZjygjqRAyGQOlXtGyBhGgemT04W880qfFvans71zEjI/0iP3htk3H+7GKeZmqsdQWWnZsmfU/x0Xr805IDa/9yWmpbAQTL3F1T4075rufdUjUQs1KULowpYts9iNVc5YcbYuerRp/bDkoHnU/KIxxeas093eVXVK6ghyWEgvXfLT9ztYrHp9HI/LDxFBB0LgnJYnPxQkKLquvZpY57OMHtoTVOGRcKhNnvgU6apwv2hkbzLUeAP9jO4a3RbSCwwlONjhaEMXsYZyN25tW5odH3Q7joQQV8cp8fXE9eQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nhBcNrl0G+HMd0hYjs5tdREg9UjbZHWdnqJGkQ8SonM=;
+ b=ETA9OoDNvy5lxvVavt6XsGFhnIHMrDpQi61ZYZUCZoKCpL/ax0n+UuViD5OqvhfijfcDo9froehZWA9OxTQzytND72p5Sz89gFby2dtmvRcZhIFHOKcOSwJtDAhsD5KewTk8OV5KBeb/q9jjeox5Zn6XYYz4cm9qhWWvhMJvmL8=
+Received: from MWHPR11MB1664.namprd11.prod.outlook.com (10.172.54.13) by
+ MWHPR11MB1630.namprd11.prod.outlook.com (10.172.55.7) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.21; Sat, 18 Jan 2020 07:14:52 +0000
+Received: from MWHPR11MB1664.namprd11.prod.outlook.com
+ ([fe80::e8fb:c0e8:5779:367e]) by MWHPR11MB1664.namprd11.prod.outlook.com
+ ([fe80::e8fb:c0e8:5779:367e%6]) with mapi id 15.20.2644.015; Sat, 18 Jan 2020
+ 07:14:51 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ] mesh: Offload loopback packets to l_idle_onshot()
+Thread-Topic: [PATCH BlueZ] mesh: Offload loopback packets to l_idle_onshot()
+Thread-Index: AQHVzQYdUfE8nht/UUeExx2EIxj7FqfwA+UA
+Date:   Sat, 18 Jan 2020 07:14:51 +0000
+Message-ID: <cebf36ec9b407070f76d2c37306ef9732c4495e7.camel@intel.com>
+References: <20200117071604.20675-1-brian.gix@intel.com>
+In-Reply-To: <20200117071604.20675-1-brian.gix@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [134.134.139.72]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 00152e08-5970-488b-19d0-08d79be61c84
+x-ms-traffictypediagnostic: MWHPR11MB1630:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR11MB1630F0945858A4229C1538B3E1300@MWHPR11MB1630.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2000;
+x-forefront-prvs: 0286D7B531
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(396003)(136003)(39860400002)(366004)(376002)(199004)(189003)(76116006)(26005)(36756003)(186003)(2616005)(71200400001)(5660300002)(86362001)(6506007)(6916009)(66556008)(66446008)(64756008)(4326008)(66946007)(66476007)(2906002)(6486002)(8936002)(8676002)(81156014)(81166006)(6512007)(478600001)(316002)(107886003);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR11MB1630;H:MWHPR11MB1664.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: wVsiTKmYPWsFY+wmiTCxV7qAnbbVXfhvcZkrgOf2m2mn+E5btcuLS0ggbWh5RFoDBhnz9hoPkhoVsPNfvvR6mfTKk5J2Qgw1UtOYIAUFXzf/jV2XZFO4wroO9o3CUZqrTa89/u7nomP/Kk3wsLHbU36aM+g3BZYRNv0luEFgeCDkgorcfHKAF72abKjHZzwZP7bExUkE50+YD6nnwuik1Kpkdm05gPi0PwDpLmQtRka2RoqEwFTBqFLOReDhYWyo/wSmpAFMlhFTfVkeF3ny/luMfs8HlKdmKU1FsXfXCJxcLLzYNIU+knsq15A4NOf5DzMtzp1HBV8yfwJrP8h0Pf0udwE+2jrYo3pQmYirEleRPtNQd6H3T32K7MsBpWyTvbZ1FR57itSm/qxA/BgLJkFIS9jvf28ncIyKzUNuk8oHtjDUN+WB/xOVXZgt4W9j
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <215AF55A21F4D94480BB5C8E263C0487@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00152e08-5970-488b-19d0-08d79be61c84
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jan 2020 07:14:51.7838
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qmVQnY1EEvFfn1mk0NNqCcqx8mO8iAVsg5PmhBO7tQw7NTnAI3ZoNDaebBlccQpdvRT0OcGtEWvS6PLVZGjhJw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1630
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change refactors the way op-codes are managed in the kernel to
-facilitate easier cherry-picking  of features on downlevel kernels
-without incuring significant merge conflicts and op_code collisions.
-
-Signed-off-by: Alain Michaud <alainm@chromium.org>
----
-Here is a v2 that implements the alternative way that may address your
-forward declaration feedback.  I'm open to any of these or any other
-suggestions you may have to address this.
-
- include/net/bluetooth/hci_core.h |   1 +
- net/bluetooth/hci_sock.c         |  14 +-
- net/bluetooth/mgmt.c             | 426 ++++++++++++++-----------------
- 3 files changed, 206 insertions(+), 235 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 89ecf0a80aa1..0cc2f7c11c3a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1494,6 +1494,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- #define HCI_MGMT_UNCONFIGURED	BIT(3)
- 
- struct hci_mgmt_handler {
-+	unsigned short op_code;
- 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
- 		     u16 data_len);
- 	size_t data_len;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 3ae508674ef7..4e121607d644 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1490,9 +1490,9 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
- 	void *buf;
- 	u8 *cp;
- 	struct mgmt_hdr *hdr;
--	u16 opcode, index, len;
-+	u16 opcode, index, len, i;
- 	struct hci_dev *hdev = NULL;
--	const struct hci_mgmt_handler *handler;
-+	const struct hci_mgmt_handler *handler = NULL;
- 	bool var_len, no_hdev;
- 	int err;
- 
-@@ -1533,16 +1533,18 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
- 		}
- 	}
- 
--	if (opcode >= chan->handler_count ||
--	    chan->handlers[opcode].func == NULL) {
-+	for (i = 0; i < chan->handler_count; ++i) {
-+		if (opcode == chan->handlers[i].op_code)
-+			handler = &chan->handlers[i];
-+	}
-+
-+	if (!handler || !handler->func) {
- 		BT_DBG("Unknown op %u", opcode);
- 		err = mgmt_cmd_status(sk, index, opcode,
- 				      MGMT_STATUS_UNKNOWN_COMMAND);
- 		goto done;
- 	}
- 
--	handler = &chan->handlers[opcode];
--
- 	if (!hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) &&
- 	    !(handler->flags & HCI_MGMT_UNTRUSTED)) {
- 		err = mgmt_cmd_status(sk, index, opcode,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0dc610faab70..b0a24395b4bb 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -40,75 +40,6 @@
- #define MGMT_VERSION	1
- #define MGMT_REVISION	15
- 
--static const u16 mgmt_commands[] = {
--	MGMT_OP_READ_INDEX_LIST,
--	MGMT_OP_READ_INFO,
--	MGMT_OP_SET_POWERED,
--	MGMT_OP_SET_DISCOVERABLE,
--	MGMT_OP_SET_CONNECTABLE,
--	MGMT_OP_SET_FAST_CONNECTABLE,
--	MGMT_OP_SET_BONDABLE,
--	MGMT_OP_SET_LINK_SECURITY,
--	MGMT_OP_SET_SSP,
--	MGMT_OP_SET_HS,
--	MGMT_OP_SET_LE,
--	MGMT_OP_SET_DEV_CLASS,
--	MGMT_OP_SET_LOCAL_NAME,
--	MGMT_OP_ADD_UUID,
--	MGMT_OP_REMOVE_UUID,
--	MGMT_OP_LOAD_LINK_KEYS,
--	MGMT_OP_LOAD_LONG_TERM_KEYS,
--	MGMT_OP_DISCONNECT,
--	MGMT_OP_GET_CONNECTIONS,
--	MGMT_OP_PIN_CODE_REPLY,
--	MGMT_OP_PIN_CODE_NEG_REPLY,
--	MGMT_OP_SET_IO_CAPABILITY,
--	MGMT_OP_PAIR_DEVICE,
--	MGMT_OP_CANCEL_PAIR_DEVICE,
--	MGMT_OP_UNPAIR_DEVICE,
--	MGMT_OP_USER_CONFIRM_REPLY,
--	MGMT_OP_USER_CONFIRM_NEG_REPLY,
--	MGMT_OP_USER_PASSKEY_REPLY,
--	MGMT_OP_USER_PASSKEY_NEG_REPLY,
--	MGMT_OP_READ_LOCAL_OOB_DATA,
--	MGMT_OP_ADD_REMOTE_OOB_DATA,
--	MGMT_OP_REMOVE_REMOTE_OOB_DATA,
--	MGMT_OP_START_DISCOVERY,
--	MGMT_OP_STOP_DISCOVERY,
--	MGMT_OP_CONFIRM_NAME,
--	MGMT_OP_BLOCK_DEVICE,
--	MGMT_OP_UNBLOCK_DEVICE,
--	MGMT_OP_SET_DEVICE_ID,
--	MGMT_OP_SET_ADVERTISING,
--	MGMT_OP_SET_BREDR,
--	MGMT_OP_SET_STATIC_ADDRESS,
--	MGMT_OP_SET_SCAN_PARAMS,
--	MGMT_OP_SET_SECURE_CONN,
--	MGMT_OP_SET_DEBUG_KEYS,
--	MGMT_OP_SET_PRIVACY,
--	MGMT_OP_LOAD_IRKS,
--	MGMT_OP_GET_CONN_INFO,
--	MGMT_OP_GET_CLOCK_INFO,
--	MGMT_OP_ADD_DEVICE,
--	MGMT_OP_REMOVE_DEVICE,
--	MGMT_OP_LOAD_CONN_PARAM,
--	MGMT_OP_READ_UNCONF_INDEX_LIST,
--	MGMT_OP_READ_CONFIG_INFO,
--	MGMT_OP_SET_EXTERNAL_CONFIG,
--	MGMT_OP_SET_PUBLIC_ADDRESS,
--	MGMT_OP_START_SERVICE_DISCOVERY,
--	MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
--	MGMT_OP_READ_EXT_INDEX_LIST,
--	MGMT_OP_READ_ADV_FEATURES,
--	MGMT_OP_ADD_ADVERTISING,
--	MGMT_OP_REMOVE_ADVERTISING,
--	MGMT_OP_GET_ADV_SIZE_INFO,
--	MGMT_OP_START_LIMITED_DISCOVERY,
--	MGMT_OP_READ_EXT_INFO,
--	MGMT_OP_SET_APPEARANCE,
--	MGMT_OP_SET_BLOCKED_KEYS,
--};
--
- static const u16 mgmt_events[] = {
- 	MGMT_EV_CONTROLLER_ERROR,
- 	MGMT_EV_INDEX_ADDED,
-@@ -147,15 +78,6 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_EXT_INFO_CHANGED,
- };
- 
--static const u16 mgmt_untrusted_commands[] = {
--	MGMT_OP_READ_INDEX_LIST,
--	MGMT_OP_READ_INFO,
--	MGMT_OP_READ_UNCONF_INDEX_LIST,
--	MGMT_OP_READ_CONFIG_INFO,
--	MGMT_OP_READ_EXT_INDEX_LIST,
--	MGMT_OP_READ_EXT_INFO,
--};
--
- static const u16 mgmt_untrusted_events[] = {
- 	MGMT_EV_INDEX_ADDED,
- 	MGMT_EV_INDEX_REMOVED,
-@@ -176,7 +98,7 @@ static const u16 mgmt_untrusted_events[] = {
- 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
- 
- /* HCI to MGMT error code conversion table */
--static u8 mgmt_status_table[] = {
-+static const u8 mgmt_status_table[] = {
- 	MGMT_STATUS_SUCCESS,
- 	MGMT_STATUS_UNKNOWN_COMMAND,	/* Unknown Command */
- 	MGMT_STATUS_NOT_CONNECTED,	/* No Connection */
-@@ -298,58 +220,6 @@ static int read_version(struct sock *sk, struct hci_dev *hdev, void *data,
- 				 &rp, sizeof(rp));
- }
- 
--static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
--			 u16 data_len)
--{
--	struct mgmt_rp_read_commands *rp;
--	u16 num_commands, num_events;
--	size_t rp_size;
--	int i, err;
--
--	BT_DBG("sock %p", sk);
--
--	if (hci_sock_test_flag(sk, HCI_SOCK_TRUSTED)) {
--		num_commands = ARRAY_SIZE(mgmt_commands);
--		num_events = ARRAY_SIZE(mgmt_events);
--	} else {
--		num_commands = ARRAY_SIZE(mgmt_untrusted_commands);
--		num_events = ARRAY_SIZE(mgmt_untrusted_events);
--	}
--
--	rp_size = sizeof(*rp) + ((num_commands + num_events) * sizeof(u16));
--
--	rp = kmalloc(rp_size, GFP_KERNEL);
--	if (!rp)
--		return -ENOMEM;
--
--	rp->num_commands = cpu_to_le16(num_commands);
--	rp->num_events = cpu_to_le16(num_events);
--
--	if (hci_sock_test_flag(sk, HCI_SOCK_TRUSTED)) {
--		__le16 *opcode = rp->opcodes;
--
--		for (i = 0; i < num_commands; i++, opcode++)
--			put_unaligned_le16(mgmt_commands[i], opcode);
--
--		for (i = 0; i < num_events; i++, opcode++)
--			put_unaligned_le16(mgmt_events[i], opcode);
--	} else {
--		__le16 *opcode = rp->opcodes;
--
--		for (i = 0; i < num_commands; i++, opcode++)
--			put_unaligned_le16(mgmt_untrusted_commands[i], opcode);
--
--		for (i = 0; i < num_events; i++, opcode++)
--			put_unaligned_le16(mgmt_untrusted_events[i], opcode);
--	}
--
--	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE, MGMT_OP_READ_COMMANDS, 0,
--				rp, rp_size);
--	kfree(rp);
--
--	return err;
--}
--
- static int read_index_list(struct sock *sk, struct hci_dev *hdev, void *data,
- 			   u16 data_len)
- {
-@@ -6894,104 +6764,6 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
- 
--static const struct hci_mgmt_handler mgmt_handlers[] = {
--	{ NULL }, /* 0x0000 (no command) */
--	{ read_version,            MGMT_READ_VERSION_SIZE,
--						HCI_MGMT_NO_HDEV |
--						HCI_MGMT_UNTRUSTED },
--	{ read_commands,           MGMT_READ_COMMANDS_SIZE,
--						HCI_MGMT_NO_HDEV |
--						HCI_MGMT_UNTRUSTED },
--	{ read_index_list,         MGMT_READ_INDEX_LIST_SIZE,
--						HCI_MGMT_NO_HDEV |
--						HCI_MGMT_UNTRUSTED },
--	{ read_controller_info,    MGMT_READ_INFO_SIZE,
--						HCI_MGMT_UNTRUSTED },
--	{ set_powered,             MGMT_SETTING_SIZE },
--	{ set_discoverable,        MGMT_SET_DISCOVERABLE_SIZE },
--	{ set_connectable,         MGMT_SETTING_SIZE },
--	{ set_fast_connectable,    MGMT_SETTING_SIZE },
--	{ set_bondable,            MGMT_SETTING_SIZE },
--	{ set_link_security,       MGMT_SETTING_SIZE },
--	{ set_ssp,                 MGMT_SETTING_SIZE },
--	{ set_hs,                  MGMT_SETTING_SIZE },
--	{ set_le,                  MGMT_SETTING_SIZE },
--	{ set_dev_class,           MGMT_SET_DEV_CLASS_SIZE },
--	{ set_local_name,          MGMT_SET_LOCAL_NAME_SIZE },
--	{ add_uuid,                MGMT_ADD_UUID_SIZE },
--	{ remove_uuid,             MGMT_REMOVE_UUID_SIZE },
--	{ load_link_keys,          MGMT_LOAD_LINK_KEYS_SIZE,
--						HCI_MGMT_VAR_LEN },
--	{ load_long_term_keys,     MGMT_LOAD_LONG_TERM_KEYS_SIZE,
--						HCI_MGMT_VAR_LEN },
--	{ disconnect,              MGMT_DISCONNECT_SIZE },
--	{ get_connections,         MGMT_GET_CONNECTIONS_SIZE },
--	{ pin_code_reply,          MGMT_PIN_CODE_REPLY_SIZE },
--	{ pin_code_neg_reply,      MGMT_PIN_CODE_NEG_REPLY_SIZE },
--	{ set_io_capability,       MGMT_SET_IO_CAPABILITY_SIZE },
--	{ pair_device,             MGMT_PAIR_DEVICE_SIZE },
--	{ cancel_pair_device,      MGMT_CANCEL_PAIR_DEVICE_SIZE },
--	{ unpair_device,           MGMT_UNPAIR_DEVICE_SIZE },
--	{ user_confirm_reply,      MGMT_USER_CONFIRM_REPLY_SIZE },
--	{ user_confirm_neg_reply,  MGMT_USER_CONFIRM_NEG_REPLY_SIZE },
--	{ user_passkey_reply,      MGMT_USER_PASSKEY_REPLY_SIZE },
--	{ user_passkey_neg_reply,  MGMT_USER_PASSKEY_NEG_REPLY_SIZE },
--	{ read_local_oob_data,     MGMT_READ_LOCAL_OOB_DATA_SIZE },
--	{ add_remote_oob_data,     MGMT_ADD_REMOTE_OOB_DATA_SIZE,
--						HCI_MGMT_VAR_LEN },
--	{ remove_remote_oob_data,  MGMT_REMOVE_REMOTE_OOB_DATA_SIZE },
--	{ start_discovery,         MGMT_START_DISCOVERY_SIZE },
--	{ stop_discovery,          MGMT_STOP_DISCOVERY_SIZE },
--	{ confirm_name,            MGMT_CONFIRM_NAME_SIZE },
--	{ block_device,            MGMT_BLOCK_DEVICE_SIZE },
--	{ unblock_device,          MGMT_UNBLOCK_DEVICE_SIZE },
--	{ set_device_id,           MGMT_SET_DEVICE_ID_SIZE },
--	{ set_advertising,         MGMT_SETTING_SIZE },
--	{ set_bredr,               MGMT_SETTING_SIZE },
--	{ set_static_address,      MGMT_SET_STATIC_ADDRESS_SIZE },
--	{ set_scan_params,         MGMT_SET_SCAN_PARAMS_SIZE },
--	{ set_secure_conn,         MGMT_SETTING_SIZE },
--	{ set_debug_keys,          MGMT_SETTING_SIZE },
--	{ set_privacy,             MGMT_SET_PRIVACY_SIZE },
--	{ load_irks,               MGMT_LOAD_IRKS_SIZE,
--						HCI_MGMT_VAR_LEN },
--	{ get_conn_info,           MGMT_GET_CONN_INFO_SIZE },
--	{ get_clock_info,          MGMT_GET_CLOCK_INFO_SIZE },
--	{ add_device,              MGMT_ADD_DEVICE_SIZE },
--	{ remove_device,           MGMT_REMOVE_DEVICE_SIZE },
--	{ load_conn_param,         MGMT_LOAD_CONN_PARAM_SIZE,
--						HCI_MGMT_VAR_LEN },
--	{ read_unconf_index_list,  MGMT_READ_UNCONF_INDEX_LIST_SIZE,
--						HCI_MGMT_NO_HDEV |
--						HCI_MGMT_UNTRUSTED },
--	{ read_config_info,        MGMT_READ_CONFIG_INFO_SIZE,
--						HCI_MGMT_UNCONFIGURED |
--						HCI_MGMT_UNTRUSTED },
--	{ set_external_config,     MGMT_SET_EXTERNAL_CONFIG_SIZE,
--						HCI_MGMT_UNCONFIGURED },
--	{ set_public_address,      MGMT_SET_PUBLIC_ADDRESS_SIZE,
--						HCI_MGMT_UNCONFIGURED },
--	{ start_service_discovery, MGMT_START_SERVICE_DISCOVERY_SIZE,
--						HCI_MGMT_VAR_LEN },
--	{ read_local_oob_ext_data, MGMT_READ_LOCAL_OOB_EXT_DATA_SIZE },
--	{ read_ext_index_list,     MGMT_READ_EXT_INDEX_LIST_SIZE,
--						HCI_MGMT_NO_HDEV |
--						HCI_MGMT_UNTRUSTED },
--	{ read_adv_features,       MGMT_READ_ADV_FEATURES_SIZE },
--	{ add_advertising,	   MGMT_ADD_ADVERTISING_SIZE,
--						HCI_MGMT_VAR_LEN },
--	{ remove_advertising,	   MGMT_REMOVE_ADVERTISING_SIZE },
--	{ get_adv_size_info,       MGMT_GET_ADV_SIZE_INFO_SIZE },
--	{ start_limited_discovery, MGMT_START_DISCOVERY_SIZE },
--	{ read_ext_controller_info,MGMT_READ_EXT_INFO_SIZE,
--						HCI_MGMT_UNTRUSTED },
--	{ set_appearance,	   MGMT_SET_APPEARANCE_SIZE },
--	{ get_phy_configuration,   MGMT_GET_PHY_CONFIGURATION_SIZE },
--	{ set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
--	{ set_blocked_keys,	   MGMT_OP_SET_BLOCKED_KEYS_SIZE,
--						HCI_MGMT_VAR_LEN },
--};
--
- void mgmt_index_added(struct hci_dev *hdev)
- {
- 	struct mgmt_ev_ext_index ev;
-@@ -8012,6 +7784,202 @@ void mgmt_discovering(struct hci_dev *hdev, u8 discovering)
- 	mgmt_event(MGMT_EV_DISCOVERING, hdev, &ev, sizeof(ev), NULL);
- }
- 
-+static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
-+			 u16 data_len);
-+
-+static const struct hci_mgmt_handler mgmt_handlers[] = {
-+	{ 0x0000, NULL },
-+	{ MGMT_OP_READ_VERSION, read_version, MGMT_READ_VERSION_SIZE,
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_READ_COMMANDS, read_commands, MGMT_READ_COMMANDS_SIZE,
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_READ_INDEX_LIST, read_index_list, MGMT_READ_INDEX_LIST_SIZE,
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_READ_INFO, read_controller_info, MGMT_READ_INFO_SIZE,
-+						HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_SET_POWERED, set_powered, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_DISCOVERABLE, set_discoverable,
-+						MGMT_SET_DISCOVERABLE_SIZE },
-+	{ MGMT_OP_SET_CONNECTABLE, set_connectable, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_FAST_CONNECTABLE, set_fast_connectable,
-+							MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_BONDABLE, set_bondable, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_LINK_SECURITY, set_link_security, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_SSP, set_ssp, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_HS, set_hs, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_LE, set_le, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_DEV_CLASS, set_dev_class, MGMT_SET_DEV_CLASS_SIZE },
-+	{ MGMT_OP_SET_LOCAL_NAME, set_local_name, MGMT_SET_LOCAL_NAME_SIZE },
-+	{ MGMT_OP_ADD_UUID, add_uuid, MGMT_ADD_UUID_SIZE },
-+	{ MGMT_OP_REMOVE_UUID, remove_uuid, MGMT_REMOVE_UUID_SIZE },
-+	{ MGMT_OP_LOAD_LINK_KEYS, load_link_keys, MGMT_LOAD_LINK_KEYS_SIZE,
-+							HCI_MGMT_VAR_LEN },
-+	{ MGMT_OP_LOAD_LONG_TERM_KEYS, load_long_term_keys,
-+						MGMT_LOAD_LONG_TERM_KEYS_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ MGMT_OP_DISCONNECT, disconnect, MGMT_DISCONNECT_SIZE },
-+	{ MGMT_OP_GET_CONNECTIONS, get_connections, MGMT_GET_CONNECTIONS_SIZE },
-+	{ MGMT_OP_PIN_CODE_REPLY, pin_code_reply, MGMT_PIN_CODE_REPLY_SIZE },
-+	{ MGMT_OP_PIN_CODE_NEG_REPLY, pin_code_neg_reply,
-+						MGMT_PIN_CODE_NEG_REPLY_SIZE },
-+	{ MGMT_OP_SET_IO_CAPABILITY, set_io_capability,
-+						MGMT_SET_IO_CAPABILITY_SIZE },
-+	{ MGMT_OP_PAIR_DEVICE, pair_device, MGMT_PAIR_DEVICE_SIZE },
-+	{ MGMT_OP_CANCEL_PAIR_DEVICE, cancel_pair_device,
-+						MGMT_CANCEL_PAIR_DEVICE_SIZE },
-+	{ MGMT_OP_UNPAIR_DEVICE, unpair_device, MGMT_UNPAIR_DEVICE_SIZE },
-+	{ MGMT_OP_USER_CONFIRM_REPLY, user_confirm_reply,
-+						MGMT_USER_CONFIRM_REPLY_SIZE },
-+	{ MGMT_OP_USER_CONFIRM_NEG_REPLY, user_confirm_neg_reply,
-+					MGMT_USER_CONFIRM_NEG_REPLY_SIZE },
-+	{ MGMT_OP_USER_PASSKEY_REPLY, user_passkey_reply,
-+						MGMT_USER_PASSKEY_REPLY_SIZE },
-+	{ MGMT_OP_USER_PASSKEY_NEG_REPLY, user_passkey_neg_reply,
-+					MGMT_USER_PASSKEY_NEG_REPLY_SIZE },
-+	{ MGMT_OP_READ_LOCAL_OOB_DATA, read_local_oob_data,
-+						MGMT_READ_LOCAL_OOB_DATA_SIZE },
-+	{ MGMT_OP_ADD_REMOTE_OOB_DATA, add_remote_oob_data,
-+						MGMT_ADD_REMOTE_OOB_DATA_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ MGMT_OP_REMOVE_REMOTE_OOB_DATA, remove_remote_oob_data,
-+					MGMT_REMOVE_REMOTE_OOB_DATA_SIZE },
-+	{ MGMT_OP_START_DISCOVERY, start_discovery, MGMT_START_DISCOVERY_SIZE },
-+	{ MGMT_OP_STOP_DISCOVERY, stop_discovery, MGMT_STOP_DISCOVERY_SIZE },
-+	{ MGMT_OP_CONFIRM_NAME, confirm_name, MGMT_CONFIRM_NAME_SIZE },
-+	{ MGMT_OP_BLOCK_DEVICE, block_device, MGMT_BLOCK_DEVICE_SIZE },
-+	{ MGMT_OP_UNBLOCK_DEVICE, unblock_device, MGMT_UNBLOCK_DEVICE_SIZE },
-+	{ MGMT_OP_SET_DEVICE_ID, set_device_id, MGMT_SET_DEVICE_ID_SIZE },
-+	{ MGMT_OP_SET_ADVERTISING, set_advertising, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_BREDR, set_bredr, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_STATIC_ADDRESS, set_static_address,
-+						MGMT_SET_STATIC_ADDRESS_SIZE },
-+	{ MGMT_OP_SET_SCAN_PARAMS, set_scan_params, MGMT_SET_SCAN_PARAMS_SIZE },
-+	{ MGMT_OP_SET_SECURE_CONN, set_secure_conn, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_DEBUG_KEYS, set_debug_keys, MGMT_SETTING_SIZE },
-+	{ MGMT_OP_SET_PRIVACY, set_privacy, MGMT_SET_PRIVACY_SIZE },
-+	{ MGMT_OP_LOAD_IRKS, load_irks, MGMT_LOAD_IRKS_SIZE, HCI_MGMT_VAR_LEN },
-+	{ MGMT_OP_GET_CONN_INFO, get_conn_info, MGMT_GET_CONN_INFO_SIZE },
-+	{ MGMT_OP_GET_CLOCK_INFO, get_clock_info, MGMT_GET_CLOCK_INFO_SIZE },
-+	{ MGMT_OP_ADD_DEVICE, add_device, MGMT_ADD_DEVICE_SIZE },
-+	{ MGMT_OP_REMOVE_DEVICE, remove_device, MGMT_REMOVE_DEVICE_SIZE },
-+	{ MGMT_OP_LOAD_CONN_PARAM, load_conn_param, MGMT_LOAD_CONN_PARAM_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ MGMT_OP_READ_UNCONF_INDEX_LIST, read_unconf_index_list,
-+					MGMT_READ_UNCONF_INDEX_LIST_SIZE,
-+					HCI_MGMT_NO_HDEV |
-+					HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_READ_CONFIG_INFO, read_config_info,
-+						MGMT_READ_CONFIG_INFO_SIZE,
-+						HCI_MGMT_UNCONFIGURED |
-+						HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_SET_EXTERNAL_CONFIG, set_external_config,
-+						MGMT_SET_EXTERNAL_CONFIG_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ MGMT_OP_SET_PUBLIC_ADDRESS, set_public_address,
-+						MGMT_SET_PUBLIC_ADDRESS_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ MGMT_OP_START_SERVICE_DISCOVERY, start_service_discovery,
-+					MGMT_START_SERVICE_DISCOVERY_SIZE,
-+					HCI_MGMT_VAR_LEN },
-+	{ MGMT_OP_READ_LOCAL_OOB_EXT_DATA, read_local_oob_ext_data,
-+					MGMT_READ_LOCAL_OOB_EXT_DATA_SIZE },
-+	{ MGMT_OP_READ_EXT_INDEX_LIST, read_ext_index_list,
-+						MGMT_READ_EXT_INDEX_LIST_SIZE,
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_READ_ADV_FEATURES, read_adv_features,
-+						MGMT_READ_ADV_FEATURES_SIZE },
-+	{ MGMT_OP_ADD_ADVERTISING, add_advertising, MGMT_ADD_ADVERTISING_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ MGMT_OP_REMOVE_ADVERTISING, remove_advertising,
-+						MGMT_REMOVE_ADVERTISING_SIZE },
-+	{ MGMT_OP_GET_ADV_SIZE_INFO, get_adv_size_info,
-+						MGMT_GET_ADV_SIZE_INFO_SIZE },
-+	{ MGMT_OP_START_LIMITED_DISCOVERY, start_limited_discovery,
-+						MGMT_START_DISCOVERY_SIZE },
-+	{ MGMT_OP_READ_EXT_INFO, read_ext_controller_info,
-+							MGMT_READ_EXT_INFO_SIZE,
-+							HCI_MGMT_UNTRUSTED },
-+	{ MGMT_OP_SET_APPEARANCE, set_appearance, MGMT_SET_APPEARANCE_SIZE },
-+	{ MGMT_OP_GET_PHY_CONFIGURATION, get_phy_configuration,
-+					MGMT_GET_PHY_CONFIGURATION_SIZE },
-+	{ MGMT_OP_SET_PHY_CONFIGURATION, set_phy_configuration,
-+					MGMT_SET_PHY_CONFIGURATION_SIZE },
-+	{ MGMT_OP_SET_BLOCKED_KEYS, set_blocked_keys,
-+					MGMT_OP_SET_BLOCKED_KEYS_SIZE,
-+					HCI_MGMT_VAR_LEN },
-+};
-+
-+static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
-+			 u16 data_len)
-+{
-+	struct mgmt_rp_read_commands *rp;
-+	u16 num_commands = 0, num_events;
-+	size_t rp_size;
-+	int i, err;
-+
-+	BT_DBG("sock %p", sk);
-+
-+	if (hci_sock_test_flag(sk, HCI_SOCK_TRUSTED)) {
-+		for (i = 0; i < ARRAY_SIZE(mgmt_handlers); ++i) {
-+			if ((mgmt_handlers[i].flags &
-+						HCI_MGMT_UNTRUSTED) == 0)
-+				++num_commands;
-+		}
-+
-+		num_events = ARRAY_SIZE(mgmt_events);
-+	} else {
-+		for (i = 0; i < ARRAY_SIZE(mgmt_handlers); ++i) {
-+			if (mgmt_handlers[i].flags & HCI_MGMT_UNTRUSTED)
-+				++num_commands;
-+		}
-+
-+		num_events = ARRAY_SIZE(mgmt_untrusted_events);
-+	}
-+
-+	rp_size = sizeof(*rp) + ((num_commands + num_events) * sizeof(u16));
-+
-+	rp = kmalloc(rp_size, GFP_KERNEL);
-+	if (!rp)
-+		return -ENOMEM;
-+
-+	rp->num_commands = cpu_to_le16(num_commands);
-+	rp->num_events = cpu_to_le16(num_events);
-+
-+	if (hci_sock_test_flag(sk, HCI_SOCK_TRUSTED)) {
-+		__le16 *opcode = rp->opcodes;
-+
-+		for (i = 0; i < ARRAY_SIZE(mgmt_handlers); ++i, ++opcode) {
-+			if ((mgmt_handlers[i].flags & HCI_MGMT_UNTRUSTED) == 0)
-+				put_unaligned_le16(mgmt_handlers[i].op_code,
-+						   opcode);
-+		}
-+
-+		for (i = 0; i < num_events; i++, opcode++)
-+			put_unaligned_le16(mgmt_events[i], opcode);
-+	} else {
-+		__le16 *opcode = rp->opcodes;
-+
-+		for (i = 0; i < ARRAY_SIZE(mgmt_handlers); ++i, ++opcode) {
-+			if (mgmt_handlers[i].flags & HCI_MGMT_UNTRUSTED)
-+				put_unaligned_le16(mgmt_handlers[i].op_code,
-+						   opcode);
-+		}
-+
-+		for (i = 0; i < num_events; i++, opcode++)
-+			put_unaligned_le16(mgmt_untrusted_events[i], opcode);
-+	}
-+
-+	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE, MGMT_OP_READ_COMMANDS, 0,
-+				rp, rp_size);
-+	kfree(rp);
-+
-+	return err;
-+}
-+
- static struct hci_mgmt_chan chan = {
- 	.channel	= HCI_CHANNEL_CONTROL,
- 	.handler_count	= ARRAY_SIZE(mgmt_handlers),
--- 
-2.25.0.341.g760bfbb309-goog
-
+QXBwbGllZA0KT24gVGh1LCAyMDIwLTAxLTE2IGF0IDIzOjE2IC0wODAwLCBCcmlhbiBHaXggd3Jv
+dGU6DQo+IEFueSBwYWNrZXQgdGhhdCBtYXkgYmUgaGFuZGxlZCBpbnRlcm5hbGx5IGJ5IHRoZSBk
+YWVtb24gbXVzdCBiZSBzZW50IGluDQo+IGl0J3Mgb3duIGlkbGVfb25lc2hvdCBjb250ZXh0LCB0
+byBwcmV2ZW50IG11bHRpcGxlIG5vZGVzIGZyb20gaGFuZGxpbmcNCj4gYW5kIHJlc3BvbmRpbmcg
+aW4gdGhlIHNhbWUgY29udGV4dCwgZXZlbnR1YWxseSBjb3JydXB0aW5nIG1lbW9yeS4NCj4gDQo+
+IFRoaXMgYWRkcmVzc2VzIHRoZSBmb2xsb3dpbmcgY3Jhc2g6DQo+IFByb2dyYW0gdGVybWluYXRl
+ZCB3aXRoIHNpZ25hbCBTSUdTRUdWLCBTZWdtZW50YXRpb24gZmF1bHQuDQo+ICAwICB0Y2FjaGVf
+Z2V0ICh0Y19pZHg9MCkgYXQgbWFsbG9jLmM6Mjk1MQ0KPiAgICAgIDI5NTEgICB0Y2FjaGUtPmVu
+dHJpZXNbdGNfaWR4XSA9IGUtPm5leHQ7DQo+IChnZGIpIGJ0DQo+ICAwICB0Y2FjaGVfZ2V0ICh0
+Y19pZHg9MCkgYXQgbWFsbG9jLmM6Mjk1MQ0KPiAgMSAgX19HSV9fX2xpYmNfbWFsbG9jIChieXRl
+cz1ieXRlc0BlbnRyeT0xNikgYXQgbWFsbG9jLmM6MzA1OA0KPiAgMiAgMHgwMDAwNTY0Y2ZmOWJj
+MWRlIGluIGxfbWFsbG9jIChzaXplPXNpemVAZW50cnk9MTYpIGF0IGVsbC91dGlsLmM6NjINCj4g
+IDMgIDB4MDAwMDU2NGNmZjliZDQ2YiBpbiBsX3F1ZXVlX3B1c2hfdGFpbCAocXVldWU9MHg1NjRk
+MDAwYzk3MTAsIGRhdGE9ZGF0YUBlbnRyeT0weDU2NGQwMDBkMGQ2MCkgYXQNCj4gZWxsL3F1ZXVl
+LmM6MTM2DQo+ICA0ICAweDAwMDA1NjRjZmY5YmVhYmQgaW4gaWRsZV9hZGQgKGNhbGxiYWNrPWNh
+bGxiYWNrQGVudHJ5PTB4NTY0Y2ZmOWJlNGUwIDxvbmVzaG90X2NhbGxiYWNrPiwgDQo+IHVzZXJf
+ZGF0YT11c2VyX2RhdGFAZW50cnk9MHg1NjRkMDAwZDQ3MDAsDQo+ICAgICBmbGFncz1mbGFnc0Bl
+bnRyeT0yNjg0MzU0NTYsIGRlc3Ryb3k9ZGVzdHJveUBlbnRyeT0weDU2NGNmZjliZTRjMCA8aWRs
+ZV9kZXN0cm95PikgYXQgZWxsL21haW4uYzoyOTINCj4gIDUgIDB4MDAwMDU2NGNmZjliZTVmNyBp
+biBsX2lkbGVfb25lc2hvdCAoY2FsbGJhY2s9Y2FsbGJhY2tAZW50cnk9MHg1NjRjZmY5OThiYzAg
+PHR4X3dvcmtlcj4sIA0KPiB1c2VyX2RhdGE9dXNlcl9kYXRhQGVudHJ5PTB4NTY0ZDAwMGQ4M2Yw
+LA0KPiAgICAgZGVzdHJveT1kZXN0cm95QGVudHJ5PTB4MCkgYXQgZWxsL2lkbGUuYzoxNDQNCj4g
+IDYgIDB4MDAwMDU2NGNmZjk5ODMyNiBpbiBzZW5kX3R4IChpbz08b3B0aW1pemVkIG91dD4sIGlu
+Zm89MHg3ZmZkMDM1NTAzZjQsIGRhdGE9PG9wdGltaXplZCBvdXQ+LA0KPiBsZW49PG9wdGltaXpl
+ZCBvdXQ+KQ0KPiAgICAgYXQgbWVzaC9tZXNoLWlvLWdlbmVyaWMuYzo2MzcNCj4gIDcgIDB4MDAw
+MDU2NGNmZjk5Njc1YSBpbiBzZW5kX25ldHdvcmtfYmVhY29uIChrZXk9MHg1NjRkMDAwY2ZlZTAp
+IGF0IG1lc2gvbmV0LWtleXMuYzozNTUNCj4gIDggIHNuYl90aW1lb3V0ICh0aW1lb3V0PTB4NTY0
+ZDAwMGRkNzMwLCB1c2VyX2RhdGE9MHg1NjRkMDAwY2ZlZTApIGF0IG1lc2gvbmV0LWtleXMuYzoz
+NjQNCj4gIDkgIDB4MDAwMDU2NGNmZjliZGNhMiBpbiB0aW1lb3V0X2NhbGxiYWNrIChmZD08b3B0
+aW1pemVkIG91dD4sIGV2ZW50cz08b3B0aW1pemVkIG91dD4sDQo+IHVzZXJfZGF0YT0weDU2NGQw
+MDBkZDczMCkgYXQgZWxsL3RpbWVvdXQuYzo4MQ0KPiAgMTAgdGltZW91dF9jYWxsYmFjayAoZmQ9
+PG9wdGltaXplZCBvdXQ+LCBldmVudHM9PG9wdGltaXplZCBvdXQ+LCB1c2VyX2RhdGE9MHg1NjRk
+MDAwZGQ3MzApIGF0DQo+IGVsbC90aW1lb3V0LmM6NzANCj4gIDExIDB4MDAwMDU2NGNmZjliZWRj
+ZCBpbiBsX21haW5faXRlcmF0ZSAodGltZW91dD08b3B0aW1pemVkIG91dD4pIGF0IGVsbC9tYWlu
+LmM6NDczDQo+ICAxMiAweDAwMDA1NjRjZmY5YmVlN2MgaW4gbF9tYWluX3J1biAoKSBhdCBlbGwv
+bWFpbi5jOjUyMA0KPiAgMTMgbF9tYWluX3J1biAoKSBhdCBlbGwvbWFpbi5jOjUwMg0KPiAgMTQg
+MHgwMDAwNTY0Y2ZmOWJmMDhjIGluIGxfbWFpbl9ydW5fd2l0aF9zaWduYWwgKGNhbGxiYWNrPTxv
+cHRpbWl6ZWQgb3V0PiwgdXNlcl9kYXRhPTB4MCkgYXQgZWxsL21haW4uYzo2NDINCj4gIDE1IDB4
+MDAwMDU2NGNmZjk5NGI2NCBpbiBtYWluIChhcmdjPTxvcHRpbWl6ZWQgb3V0PiwgYXJndj0weDdm
+ZmQwMzU1MDY2OCkgYXQgbWVzaC9tYWluLmM6MjY4DQo+IC0tLQ0KPiAgbWVzaC9uZXQuYyB8IDUw
+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tDQo+ICAx
+IGZpbGUgY2hhbmdlZCwgMzcgaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25zKC0pDQo+IA0KPiBk
+aWZmIC0tZ2l0IGEvbWVzaC9uZXQuYyBiL21lc2gvbmV0LmMNCj4gaW5kZXggMzUzODhiZWVjLi4y
+MTkyMTc3OTMgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbmV0LmMNCj4gKysrIGIvbWVzaC9uZXQuYw0K
+PiBAQCAtMjQxLDYgKzI0MSwxMiBAQCBzdHJ1Y3QgbmV0X3F1ZXVlX2RhdGEgew0KPiAgCWJvb2wg
+c2VlbjsNCj4gIH07DQo+ICANCj4gK3N0cnVjdCBvbmVzaG90X3R4IHsNCj4gKwlzdHJ1Y3QgbWVz
+aF9uZXQgKm5ldDsNCj4gKwl1aW50OF90IHNpemU7DQo+ICsJdWludDhfdCBwYWNrZXRbMzBdOw0K
+PiArfTsNCj4gKw0KPiAgc3RydWN0IG5ldF9iZWFjb25fZGF0YSB7DQo+ICAJdWludDMyX3Qga2V5
+X2lkOw0KPiAgCXVpbnQzMl90IGl2aTsNCj4gQEAgLTIyNDcsMjQgKzIyNTMsMzUgQEAgc3RhdGlj
+IHZvaWQgc2VuZF9yZWxheV9wa3Qoc3RydWN0IG1lc2hfbmV0ICpuZXQsIHVpbnQ4X3QgKmRhdGEs
+IHVpbnQ4X3Qgc2l6ZSkNCj4gIAltZXNoX2lvX3NlbmQoaW8sICZpbmZvLCBwYWNrZXQsIHNpemUg
+KyAxKTsNCj4gIH0NCj4gIA0KPiAtc3RhdGljIHZvaWQgc2VuZF9tc2dfcGt0KHN0cnVjdCBtZXNo
+X25ldCAqbmV0LCB1aW50OF90ICpwYWNrZXQsIHVpbnQ4X3Qgc2l6ZSkNCj4gK3N0YXRpYyBib29s
+IHNpbXBsZV9tYXRjaChjb25zdCB2b2lkICphLCBjb25zdCB2b2lkICpiKQ0KPiAgew0KPiAtCXN0
+cnVjdCBtZXNoX2lvICppbyA9IG5ldC0+aW87DQo+ICsJcmV0dXJuIGEgPT0gYjsNCj4gK30NCj4g
+Kw0KPiArc3RhdGljIHZvaWQgc2VuZF9tc2dfcGt0X29uZXNob3Qodm9pZCAqdXNlcl9kYXRhKQ0K
+PiArew0KPiArCXN0cnVjdCBvbmVzaG90X3R4ICp0eCA9IHVzZXJfZGF0YTsNCj4gKwlzdHJ1Y3Qg
+bWVzaF9uZXQgKm5ldDsNCj4gIAlzdHJ1Y3QgbWVzaF9pb19zZW5kX2luZm8gaW5mbzsNCj4gIAlz
+dHJ1Y3QgbmV0X3F1ZXVlX2RhdGEgbmV0X2RhdGEgPSB7DQo+ICAJCS5pbmZvID0gTlVMTCwNCj4g
+LQkJLmRhdGEgPSBwYWNrZXQgKyAxLA0KPiAtCQkubGVuID0gc2l6ZSAtIDEsDQo+ICsJCS5kYXRh
+ID0gdHgtPnBhY2tldCArIDEsDQo+ICsJCS5sZW4gPSB0eC0+c2l6ZSAtIDEsDQo+ICAJCS5yZWxh
+eV9hZHZpY2UgPSBSRUxBWV9OT05FLA0KPiAgCX07DQo+ICANCj4gIAkvKiBTZW5kIHRvIGxvY2Fs
+IG5vZGVzIGZpcnN0ICovDQo+ICAJbF9xdWV1ZV9mb3JlYWNoKG5ldHMsIG5ldF9yeCwgJm5ldF9k
+YXRhKTsNCj4gIA0KPiAtCWlmIChuZXRfZGF0YS5yZWxheV9hZHZpY2UgPT0gUkVMQVlfRElTQUxM
+T1dFRCkNCj4gKwkvKiBNYWtlIHN1cmUgc3BlY2lmaWMgbmV0d29yayBzdGlsbCB2YWxpZCAqLw0K
+PiArCW5ldCA9IGxfcXVldWVfZmluZChuZXRzLCBzaW1wbGVfbWF0Y2gsIHR4LT5uZXQpOw0KPiAr
+DQo+ICsJaWYgKCFuZXQgfHwgbmV0X2RhdGEucmVsYXlfYWR2aWNlID09IFJFTEFZX0RJU0FMTE9X
+RUQpIHsNCj4gKwkJbF9mcmVlKHR4KTsNCj4gIAkJcmV0dXJuOw0KPiArCX0NCj4gIA0KPiAtCXBh
+Y2tldFswXSA9IE1FU0hfQURfVFlQRV9ORVRXT1JLOw0KPiArCXR4LT5wYWNrZXRbMF0gPSBNRVNI
+X0FEX1RZUEVfTkVUV09SSzsNCj4gIAlpbmZvLnR5cGUgPSBNRVNIX0lPX1RJTUlOR19UWVBFX0dF
+TkVSQUw7DQo+ICAJaW5mby51Lmdlbi5pbnRlcnZhbCA9IG5ldC0+dHhfaW50ZXJ2YWw7DQo+ICAJ
+aW5mby51Lmdlbi5jbnQgPSBuZXQtPnR4X2NudDsNCj4gQEAgLTIyNzIsNyArMjI4OSwxOSBAQCBz
+dGF0aWMgdm9pZCBzZW5kX21zZ19wa3Qoc3RydWN0IG1lc2hfbmV0ICpuZXQsIHVpbnQ4X3QgKnBh
+Y2tldCwgdWludDhfdCBzaXplKQ0KPiAgCS8qIE5vIGV4dHJhIHJhbmRvbWl6YXRpb24gd2hlbiBz
+ZW5kaW5nIHJlZ3VsYXIgbWVzaCBtZXNzYWdlcyAqLw0KPiAgCWluZm8udS5nZW4ubWF4X2RlbGF5
+ID0gREVGQVVMVF9NSU5fREVMQVk7DQo+ICANCj4gLQltZXNoX2lvX3NlbmQoaW8sICZpbmZvLCBw
+YWNrZXQsIHNpemUpOw0KPiArCW1lc2hfaW9fc2VuZChuZXQtPmlvLCAmaW5mbywgdHgtPnBhY2tl
+dCwgdHgtPnNpemUpOw0KPiArCWxfZnJlZSh0eCk7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lk
+IHNlbmRfbXNnX3BrdChzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgdWludDhfdCAqcGFja2V0LCB1aW50
+OF90IHNpemUpDQo+ICt7DQo+ICsJc3RydWN0IG9uZXNob3RfdHggKnR4ID0gbF9uZXcoc3RydWN0
+IG9uZXNob3RfdHgsIDEpOw0KPiArDQo+ICsJdHgtPm5ldCA9IG5ldDsNCj4gKwl0eC0+c2l6ZSA9
+IHNpemU7DQo+ICsJbWVtY3B5KHR4LT5wYWNrZXQsIHBhY2tldCwgc2l6ZSk7DQo+ICsNCj4gKwls
+X2lkbGVfb25lc2hvdChzZW5kX21zZ19wa3Rfb25lc2hvdCwgdHgsIE5VTEwpOw0KPiAgfQ0KPiAg
+DQo+ICBzdGF0aWMgZW51bSBfcmVsYXlfYWR2aWNlIHBhY2tldF9yZWNlaXZlZCh2b2lkICp1c2Vy
+X2RhdGEsDQo+IEBAIC0yODQ3LDExICsyODc2LDYgQEAgYm9vbCBtZXNoX25ldF9zZXRfa2V5KHN0
+cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50MTZfdCBpZHgsIGNvbnN0IHVpbnQ4X3QgKmtleSwNCj4g
+IAlyZXR1cm4gdHJ1ZTsNCj4gIH0NCj4gIA0KPiAtc3RhdGljIGJvb2wgaXNfdGhpc19uZXQoY29u
+c3Qgdm9pZCAqYSwgY29uc3Qgdm9pZCAqYikNCj4gLXsNCj4gLQlyZXR1cm4gYSA9PSBiOw0KPiAt
+fQ0KPiAtDQo+ICBib29sIG1lc2hfbmV0X2F0dGFjaChzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgc3Ry
+dWN0IG1lc2hfaW8gKmlvKQ0KPiAgew0KPiAgCWJvb2wgZmlyc3Q7DQo+IEBAIC0yODc0LDcgKzI4
+OTgsNyBAQCBib29sIG1lc2hfbmV0X2F0dGFjaChzdHJ1Y3QgbWVzaF9uZXQgKm5ldCwgc3RydWN0
+IG1lc2hfaW8gKmlvKQ0KPiAgCQkJCQkJCW5ldF9tc2dfcmVjdiwgTlVMTCk7DQo+ICAJfQ0KPiAg
+DQo+IC0JaWYgKGxfcXVldWVfZmluZChuZXRzLCBpc190aGlzX25ldCwgbmV0KSkNCj4gKwlpZiAo
+bF9xdWV1ZV9maW5kKG5ldHMsIHNpbXBsZV9tYXRjaCwgbmV0KSkNCj4gIAkJcmV0dXJuIGZhbHNl
+Ow0KPiAgDQo+ICAJbF9xdWV1ZV9wdXNoX2hlYWQobmV0cywgbmV0KTsNCg==
