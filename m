@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44175C33CAA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 16:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A05C33CB8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 16:11:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A22C217F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 16:11:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 506AF217F4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 16:11:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="V+9WCsDS"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="gyH/kxkn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728712AbgATQLZ (ORCPT
+        id S1729030AbgATQL0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Jan 2020 11:11:25 -0500
-Received: from mail-wm1-f48.google.com ([209.85.128.48]:35715 "EHLO
-        mail-wm1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727048AbgATQLZ (ORCPT
+        Mon, 20 Jan 2020 11:11:26 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36977 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726642AbgATQL0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Jan 2020 11:11:25 -0500
-Received: by mail-wm1-f48.google.com with SMTP id p17so168910wmb.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2020 08:11:23 -0800 (PST)
+        Mon, 20 Jan 2020 11:11:26 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f129so152192wmf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2020 08:11:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=Q+g/aSjL3uLfQBu1JYiGuPibTEA/dL+Z5V+giBpy5ss=;
-        b=V+9WCsDSB7vcl/AAug4BXYoxdeVxG1NnfbvgufCYLzXnA1N2Dt0NOJliF5vPWtzYN5
-         iei7iUEcth0KAdTvPfXnOxflgKlaPiqH9U5sDmFuV8u5g1LDOEO02H+05k5rMI7cazBB
-         lG9qDmu0Z/+810FF77DvjoEnyupdf7RWlhgYdZ6jN9MRsJAuYArKTydux+s0XznThe5A
-         PwokFRv6Fmi/dYb5V8JRK//GcrGzLP6/dqBsD7nn8If+TbgrrO6Bn1BcJ2t4JKhJkvjN
-         ygTFDF4hVpo3oPNCGkwnP9mhz+6OSHnGKDr0A7zLw+Xfz4pS9eM+EALyZjmldqJby7Rz
-         ALNw==
+        bh=KmtQ5vJs04+y7YOuZpyU/tHE9nbTiu1Y147WH5ZpNJg=;
+        b=gyH/kxknCFhLDkLUO8LacMslhsaccB2/ahww5W0R7F0igQuTl4IHmIz9LrOB3FlYum
+         6iMsJQ0hm+u7BjoZYIsrPl+8whc7FcI9tFBVu89QVlwY0yaIQ7kHaSoTMBEl4LVrqAh6
+         gKdKzsG9wYFwweF6o6KNWx+7bKq4KjDzhB8NxXSBn7qTfLuoh805AGYzZviC+YdxoMzR
+         rG3dki+6UBHwzA/X7O5vE8un4xc9Z3SQvkhR/MaDtdMcwXdKexLhUQQsr1qeCYvoLgBu
+         Q8AzH+h8r59RZklhiJ9WF64vrrjZCRLwCFqs4aQLBYoiUIbxH4ESKoZzK1ZRvpTrq14F
+         JMoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Q+g/aSjL3uLfQBu1JYiGuPibTEA/dL+Z5V+giBpy5ss=;
-        b=s4GSbmZtEubaWtfvXpcbivlz5UzztmG4yaXufMXhayF3e5yj4GtB2MbHDzScrE6cfT
-         tobCi4K3goWcCJXMedWU5TXG914ITX9fJtbCf34O+qv6bGQoHazabEH4R6p9D2Q/V75F
-         ds6+h9O+W11991CeoVOSIqqAaTB3ve4t28DStdgj6CCK3FRDi+3F/19M7t7/0gUjwq0B
-         6Tfzak42EamD13/grAzQtBqvVI0xO8lQe5e+lQN4oJu85SYrHQ8zvuQsyDlXyPViJF9J
-         M41fmNA83EWglLBBVukIm5Xz06wgvQMuwsIuZ81acf/1c0oJznhrK5qk1U4AI5cg8Ie2
-         EahQ==
-X-Gm-Message-State: APjAAAWsMXOiZHrXTgk1jvimIL4GInFa/ouTY1S48eENtj86+a2yDUo2
-        Z9QNlgliT8zqLMgALWcLkpy/MjFW6puxvA==
-X-Google-Smtp-Source: APXvYqw8M2c9UmtDzWlLYC8M5VcduROFEBGm3yQhCDVOpcLSSVIX53mzVQhDbcrweAc6ZdbEuZGLJA==
-X-Received: by 2002:a7b:c4cc:: with SMTP id g12mr121091wmk.68.1579536682866;
-        Mon, 20 Jan 2020 08:11:22 -0800 (PST)
+        bh=KmtQ5vJs04+y7YOuZpyU/tHE9nbTiu1Y147WH5ZpNJg=;
+        b=eORt9tPStmSDETiyuojLlfdw8zkpKeyGPqLWodawpNdr7rbje/MU6Ok5tyA6kpOt1D
+         RMPUZW7vEhqlN5ch01c+ainj1XtI1ScIFxA1fbQSVj98SYvVbY2PYIRqVjP0JeBwmgrI
+         TBFKoEZd1SRogt85q6do/U3XAexWzTGBRVW1mBAxKQjuVoHUynM2Q39XxEyJI9Tutk+x
+         IvmBEHpR4o6e8cp0qs4zlCxcVDjYZ9vkU3lJXMmtyJ0P9VAHLg9b9Ulay2zjCIHwzCYd
+         sbdH7iIkWk5JMcwo7lgYRvnaXH0FO08XSZXXxhm4dDLc0I1lpDOGiqPHHISje8nShFyq
+         atlA==
+X-Gm-Message-State: APjAAAWaL4IATub1o3WaWSdsZAEpkJ98UpZWcNwFq2my6Mxh6nJFSwhO
+        Fr4pni0MmnfaFl82f1EoOkCetQCEy3s6JQ==
+X-Google-Smtp-Source: APXvYqztJFGtH1QUgPtlXJEnBArLEXLTNlvHM889F5mN9Z2/XELTvw0ASChNAHyJ6sE8L/89WmeRfQ==
+X-Received: by 2002:a1c:7c11:: with SMTP id x17mr103151wmc.168.1579536684920;
+        Mon, 20 Jan 2020 08:11:24 -0800 (PST)
 Received: from localhost.localdomain ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id 16sm22564602wmi.0.2020.01.20.08.11.21
+        by smtp.gmail.com with ESMTPSA id 16sm22564602wmi.0.2020.01.20.08.11.23
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2020 08:11:22 -0800 (PST)
+        Mon, 20 Jan 2020 08:11:24 -0800 (PST)
 From:   Jakub Witowski <jakub.witowski@silvair.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] mesh: use static node_comp instead of the pointer
-Date:   Mon, 20 Jan 2020 17:11:12 +0100
-Message-Id: <20200120161114.6757-2-jakub.witowski@silvair.com>
+Subject: [PATCH 3/3] mesh: allow to reattach with new composition data
+Date:   Mon, 20 Jan 2020 17:11:14 +0100
+Message-Id: <20200120161114.6757-4-jakub.witowski@silvair.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200120161114.6757-1-jakub.witowski@silvair.com>
 References: <20200120161114.6757-1-jakub.witowski@silvair.com>
@@ -72,155 +72,71 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 ---
- mesh/node.c | 56 +++++++++++++++++++++++------------------------------
- 1 file changed, 24 insertions(+), 32 deletions(-)
+ mesh/node.c | 40 +++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 35 insertions(+), 5 deletions(-)
 
 diff --git a/mesh/node.c b/mesh/node.c
-index de6e74c4f..6fe70742d 100644
+index 6fe70742d..f9a2d5722 100644
 --- a/mesh/node.c
 +++ b/mesh/node.c
-@@ -90,7 +90,7 @@ struct mesh_node {
- 	uint32_t seq_number;
- 	bool provisioner;
- 	uint16_t primary;
--	struct node_composition *comp;
-+	struct node_composition comp;
- 	struct {
- 		uint16_t interval;
- 		uint8_t cnt;
-@@ -336,7 +336,6 @@ static void free_node_resources(void *data)
- 	free_node_dbus_resources(node);
+@@ -47,6 +47,12 @@
  
- 	mesh_net_free(node->net);
--	l_free(node->comp);
- 	l_free(node->storage_dir);
- 	l_free(node);
- }
-@@ -503,11 +502,10 @@ static bool init_from_storage(struct mesh_config_node *db_node,
+ #define MIN_COMP_SIZE 14
  
- 	l_queue_push_tail(nodes, node);
++/* Composition data header size contains the length of belows:
++ * CID, PID, VID, CRPL and Feature bits
++ */
++#define COMP_HDR_SIZE 10
++#define COMP_FEATURE_BITS_SIZE 2
++
+ #define MESH_NODE_PATH_PREFIX "/node"
  
--	node->comp = l_new(struct node_composition, 1);
--	node->comp->cid = db_node->cid;
--	node->comp->pid = db_node->pid;
--	node->comp->vid = db_node->vid;
--	node->comp->crpl = db_node->crpl;
-+	node->comp.cid = db_node->cid;
-+	node->comp.pid = db_node->pid;
-+	node->comp.vid = db_node->vid;
-+	node->comp.crpl = db_node->crpl;
- 	node->lpn = db_node->modes.lpn;
+ /* Default values for a new locally created node */
+@@ -1394,15 +1400,39 @@ static bool check_req_node(struct managed_obj_request *req)
+ 		uint16_t attach_len = node_generate_comp(req->attach,
+ 					attach_comp, sizeof(attach_comp));
  
- 	node->proxy = db_node->modes.proxy;
-@@ -753,7 +751,7 @@ uint16_t node_get_crpl(struct mesh_node *node)
- 	if (!node)
- 		return 0;
- 
--	return node->comp->crpl;
-+	return node->comp.crpl;
- }
- 
- uint8_t node_relay_mode_get(struct mesh_node *node, uint8_t *count,
-@@ -886,18 +884,18 @@ uint16_t node_generate_comp(struct mesh_node *node, uint8_t *buf, uint16_t sz)
- 	uint16_t num_ele = 0;
- 	const struct l_queue_entry *ele_entry;
- 
--	if (!node || !node->comp || sz < MIN_COMP_SIZE)
-+	if (!node || sz < MIN_COMP_SIZE)
- 		return 0;
- 
- 	n = 0;
- 
--	l_put_le16(node->comp->cid, buf + n);
-+	l_put_le16(node->comp.cid, buf + n);
- 	n += 2;
--	l_put_le16(node->comp->pid, buf + n);
-+	l_put_le16(node->comp.pid, buf + n);
- 	n += 2;
--	l_put_le16(node->comp->vid, buf + n);
-+	l_put_le16(node->comp.vid, buf + n);
- 	n += 2;
--	l_put_le16(node->comp->crpl, buf + n);
-+	l_put_le16(node->comp.crpl, buf + n);
- 	n += 2;
- 
- 	features = 0;
-@@ -1198,10 +1196,10 @@ static void convert_node_to_storage(struct mesh_node *node,
- {
- 	const struct l_queue_entry *entry;
- 
--	db_node->cid = node->comp->cid;
--	db_node->pid = node->comp->pid;
--	db_node->vid = node->comp->vid;
--	db_node->crpl = node->comp->crpl;
-+	db_node->cid = node->comp.cid;
-+	db_node->pid = node->comp.pid;
-+	db_node->vid = node->comp.vid;
-+	db_node->crpl = node->comp.crpl;
- 	db_node->modes.lpn = node->lpn;
- 	db_node->modes.proxy = node->proxy;
- 
-@@ -1285,29 +1283,28 @@ static bool get_app_properties(struct mesh_node *node, const char *path,
- 
- 	l_debug("path %s", path);
- 
--	node->comp = l_new(struct node_composition, 1);
--	node->comp->crpl = mesh_get_crpl();
-+	node->comp.crpl = mesh_get_crpl();
- 
- 	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
- 		if (!cid && !strcmp(key, "CompanyID")) {
- 			if (!l_dbus_message_iter_get_variant(&variant, "q",
--							&node->comp->cid))
--				goto fail;
-+							&node->comp.cid))
-+				return false;
- 			cid = true;
- 			continue;
+-		/* Ignore feature bits in Composition Compare */
+-		node_comp[8] = 0;
+-		attach_comp[8] = 0;
+-
++		/* Ignore CID, VID, PID, CRPL and feature bits
++		 * in Composition Compare
++		 */
+ 		if (node_len != attach_len ||
+-				memcmp(node_comp, attach_comp, node_len)) {
++			memcmp(node_comp + COMP_HDR_SIZE,
++						attach_comp + COMP_HDR_SIZE,
++						node_len - COMP_HDR_SIZE)) {
+ 			l_debug("Failed to verify app's composition data");
+ 			return false;
  		}
- 
- 		if (!pid && !strcmp(key, "ProductID")) {
- 			if (!l_dbus_message_iter_get_variant(&variant, "q",
--							&node->comp->pid))
--				goto fail;
-+							&node->comp.pid))
-+				return false;
- 			pid = true;
- 			continue;
- 		}
- 
- 		if (!vid && !strcmp(key, "VersionID")) {
- 			if (!l_dbus_message_iter_get_variant(&variant, "q",
--							&node->comp->vid))
-+							&node->comp.vid))
- 				return false;
- 			vid = true;
- 			continue;
-@@ -1315,21 +1312,16 @@ static bool get_app_properties(struct mesh_node *node, const char *path,
- 
- 		if (!strcmp(key, "CRPL")) {
- 			if (!l_dbus_message_iter_get_variant(&variant, "q",
--							&node->comp->crpl))
--				goto fail;
-+							&node->comp.crpl))
-+				return false;
- 			continue;
- 		}
++
++		/* Compare CID, VID, PID and CRPL */
++		if (!memcmp(node_comp, attach_comp,
++					COMP_HDR_SIZE - COMP_FEATURE_BITS_SIZE))
++			return true;
++
++		l_debug("Composition data update");
++
++		if (!mesh_config_write_comp(req->attach->cfg,
++				req->node->comp.cid, req->node->comp.pid,
++				req->node->comp.vid, req->node->comp.crpl)) {
++
++			l_debug("Failed to update composition data");
++			return false;
++		}
++
++		if (!mesh_config_save(req->attach->cfg, true, NULL, NULL)) {
++			l_debug("Failed to store composition data");
++			return false;
++		}
++
++		memcpy(&req->attach->comp, &req->node->comp,
++					sizeof(struct node_composition));
  	}
  
- 	if (!cid || !pid || !vid)
--		goto fail;
-+		return false;
- 
  	return true;
--fail:
--	l_free(node->comp);
--	node->comp = NULL;
--
--	return false;
- }
- 
- static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
 -- 
 2.20.1
 
