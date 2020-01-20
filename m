@@ -2,118 +2,101 @@ Return-Path: <SRS0=TohX=3J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D76EC32771
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 20:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F08C32771
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 22:32:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0B88217F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 20:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28378217F4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jan 2020 22:32:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AhUwJ6QL"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="m70WP5/0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726903AbgATU1V (ORCPT
+        id S1726816AbgATWcd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Jan 2020 15:27:21 -0500
-Received: from mail-vs1-f53.google.com ([209.85.217.53]:32782 "EHLO
-        mail-vs1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726586AbgATU1V (ORCPT
+        Mon, 20 Jan 2020 17:32:33 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:34222 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726607AbgATWcd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Jan 2020 15:27:21 -0500
-Received: by mail-vs1-f53.google.com with SMTP id n27so385081vsa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2020 12:27:20 -0800 (PST)
+        Mon, 20 Jan 2020 17:32:33 -0500
+Received: by mail-lj1-f195.google.com with SMTP id z22so717569ljg.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jan 2020 14:32:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=o9zdJ1Y4kcP1Ijp/RMF/JHrUzcD2Y95mk1j7rH7aLRw=;
-        b=AhUwJ6QLuWQ2HeQVCgYupY8w+qiCcmmSTpXmduTcV32JS0ldhDRswI2hqRdPTkax69
-         HvnrP0sX+GCrabgUQkb6VFGtGIxMIVccNvk0ySUpLrCRrOP9DF8gtu0TbrxSp4GXUJ6g
-         VB9r4Qn4dv8Eex12zINJR9JGOfeKSiud0WqZw=
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=from:date:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=Qen2oaV6NSJ+DPu/aA+AjsLPX6S4e0YSD1L4RkCs10o=;
+        b=m70WP5/0NaV+TgztVsKDzvPM/e0cAhyjeYS44CPXSBGF4Gbl9bsapo5v6iPZX5akPj
+         EOjgplzLJe/yeq3xOz4IBYDo5D4V9ZnLDN/8c8+LXDZh8O/SQMIxIZA0Py24m7V35oDv
+         wy7y/+qaYhvQhCWa1/ED2LuhLGb3YqIimT/3TmbF0mILh8w8HQUDGtxbKGDrTsRa1NYy
+         Wm7RI/N2V6HyTUfJCitVDKVxdbCTIaQuy6fnoNcfgkgyuzEnhWjaOdqZs0uDW3zfmFdX
+         Np9IcQ9aoHy0ds3+yxNHexkZC1bVYbc/YCkFxWlxGpKN5hLGf70JRx1E8PtzMDU82YA7
+         ZBLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=o9zdJ1Y4kcP1Ijp/RMF/JHrUzcD2Y95mk1j7rH7aLRw=;
-        b=HMIUsKEZDQLgcJ33W2BpL4Bi5I0ErtRbJY4A1OBzYod8GVlH58K5PHg9fO1sqXJjSC
-         2OX5aunMJjofM5i6zw16ax2F0scLUkZh7i8wcWQR2bgjh3yeh47mCxRfnEN+/dc78cPz
-         uG2D98/kVU7UWniR5mImcoeFYsMS880WI+bb5uq3qk+5UdDInrw4fKtNfcSXV39uo8xb
-         0f/6jKtAMG2asIXZ5/gb4p1o/kHDlCm70TUVRFuZkqb33z6Aja20PneRl12ODJn9VSyo
-         7s9S/szX6qs8/HgmIaU3HZ7Bq4E0bor6NXjeRNEkJpx747YmRkXf/wWQiQsCM62SXd73
-         mTxw==
-X-Gm-Message-State: APjAAAVVz8wrTj0hdDldC6VIVwMBcJh0u/Fg1OmoAfvojoRIabWM7fF5
-        3ijOPGOdSqo4ZiCNqR7qC7g7LLs0qwM=
-X-Google-Smtp-Source: APXvYqy6I12z6HxsU3Zqo7NYzy/IefEtRaLqke+vZybAqPBHQtixrLtXLlRPtC56AAU4tEUnM6kyoA==
-X-Received: by 2002:a67:fe50:: with SMTP id m16mr628840vsr.114.1579552039905;
-        Mon, 20 Jan 2020 12:27:19 -0800 (PST)
-Received: from alain.c.googlers.com.com (69.104.231.35.bc.googleusercontent.com. [35.231.104.69])
-        by smtp.gmail.com with ESMTPSA id i20sm10146645vkn.51.2020.01.20.12.27.18
+        h=x-gm-message-state:from:date:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=Qen2oaV6NSJ+DPu/aA+AjsLPX6S4e0YSD1L4RkCs10o=;
+        b=ptm8qCAkGyo9ble6mIet9IMGnAZLblSvz+IyxpIkbpMnbiA7uMHkcP0HbKsbugRrde
+         rNgsxtonY/i5f0KOKHr8M/FNbh2rhfL1pVkRFyG58HWK62pnWAjVycTM7/Uh82r3fRsi
+         AELXAkdKvjvdMeZNMnC3k8VWbVoWGrzGPuFPhjAqgmEkP0/7k8uMWBwV43SGab4Dw2C3
+         K3QCE0EpP+GPn1sqPUHautO6nrPCZSRuKJsZD0p0FKaEVmjg6K82JFr0Uz0aJ+IF8u7u
+         J4uF2znn1E0HNz2a1xb9e4XZJca4x2Zil0oa3uKy7jcsCM7nAmlcOkhhBs0v2hmvDFJ/
+         IiNg==
+X-Gm-Message-State: APjAAAVljp+PeCV14Hi1lroiDt0VRDaphtBsTEEkMU8zh2mr+8WmgHWn
+        M2OPOz02D8BOsQl+0cLgtQYupw==
+X-Google-Smtp-Source: APXvYqyaOGzEEWGqxJXpKHbV3jHTTUTHQhd6USNTkbqHZrO3cU6ta2qXLT1C7Yjm+AO04iGlQQX1Fw==
+X-Received: by 2002:a2e:9687:: with SMTP id q7mr14261049lji.232.1579559551254;
+        Mon, 20 Jan 2020 14:32:31 -0800 (PST)
+Received: from kynes ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id x29sm20466848lfg.45.2020.01.20.14.32.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2020 12:27:19 -0800 (PST)
-From:   Alain Michaud <alainm@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [Bluez PATCH] doc: Add definition for Set Kernel Debug Level
-Date:   Mon, 20 Jan 2020 20:27:08 +0000
-Message-Id: <20200120202708.111383-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+        Mon, 20 Jan 2020 14:32:30 -0800 (PST)
+From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
+        <michal.lowas-rzechonek@silvair.com>
+X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
+Date:   Mon, 20 Jan 2020 23:32:28 +0100
+To:     Marijn Suijten <marijns95@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
+Subject: Re: [BlueZ PATCH] shared: shell: Only omit consecutive duplicate
+ history lines.
+Message-ID: <20200120223228.onfe3orcusf3vhsb@kynes>
+Mail-Followup-To: Marijn Suijten <marijns95@gmail.com>,
+        linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
+References: <20200118204423.494209-1-marijns95@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200118204423.494209-1-marijns95@gmail.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This command is used to by higher level applications to dynamically
-control the debug logging level of the kernel module.  This is
-particularly useful to collect debug information from customers filing
-feedback reports for issues that are difficult to reproduce outside of a
-customer's particular environement.
+On 01/18, Marijn Suijten wrote:
+> Change rl_handler to append duplicate history, as long as it isn't
+> identical to the last line. It prevents consecutive duplicates while
+> still having an accurate overview of the most recent commands used,
+> mimicking most modern shells.
+> 
+> This addresses my only major gripe with bluetoothctl: pressing UP does
+> not retrieve the last typed command when it is a duplicate of something
+> else written (much) earlier in the history. It is especially noticeable
+> when needing the same command repeatedly.
 
----
+Works like a charm, thank you!
 
- doc/mgmt-api.txt | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+I was wondering why btshell utils are so weird and never thought it was
+that obvious...
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 1e59acc54..f2dba64d1 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3047,6 +3047,31 @@ Load Blocked Keys Command
- 	Possible errors:	Invalid Parameters
- 				Invalid Index
- 
-+Set Kernel Debug Logging Level Command
-+=======================
-+
-+	Command Code:		0x0047
-+	Controller Index: <controller id>
-+	Command Parameters : Debug_Logging_Level (1 octet)
-+
-+	This command is used to set the kernel debug logging level. This
-+	can be by higher level applications to facilitate dynamically
-+	controlling	the logging level produced by the Bluez kernel module.
-+
-+	Supported Debug_Logging_Level values:
-+		0 : No Logging
-+		1 : All debug information.
-+		All other values are reserved for future use.
-+
-+	When the kernel receives a value higher than the maximum supported
-+	value, the kernel module shall set it's logging level to the highest
-+	value it supports.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
- 
- Command Complete Event
- ======================
 -- 
-2.25.0.341.g760bfbb309-goog
-
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
