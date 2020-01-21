@@ -6,97 +6,103 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B5DC2D0CE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jan 2020 20:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D966C2D0CE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jan 2020 20:15:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33A3C217F4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jan 2020 20:05:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29122207FF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jan 2020 20:15:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="mYnEf8BA"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="FuRnjyBT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728913AbgAUUF3 (ORCPT
+        id S1727383AbgAUUPG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jan 2020 15:05:29 -0500
-Received: from mail-lf1-f47.google.com ([209.85.167.47]:42155 "EHLO
-        mail-lf1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727813AbgAUUF3 (ORCPT
+        Tue, 21 Jan 2020 15:15:06 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:39199 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726926AbgAUUPG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jan 2020 15:05:29 -0500
-Received: by mail-lf1-f47.google.com with SMTP id y19so3364998lfl.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2020 12:05:28 -0800 (PST)
+        Tue, 21 Jan 2020 15:15:06 -0500
+Received: by mail-lf1-f67.google.com with SMTP id y1so3391477lfb.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2020 12:15:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:mail-followup-to:references
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=UcyqngV//1J9l9nZlZu30kKPNe8LASfRxkjZZbOGhEk=;
-        b=mYnEf8BAUPeiE7+Kpw36XFHtwtJkwoZMA3YIyVix+XmkQwGfUcCZ8BpOwmBFE7tEOV
-         F1Gamd17zpsTA3sHrS8iPBhJdoQv41p7lgletEZuNyveSAyMydcmBQVepBlFmy7HrW9I
-         FhdcSxuhl9N2jgnlwpcymGWADeGLT7n9XMWqVRhabqh98JteEzwKmEIA+xNxNvmaj+Nq
-         Lgb24l9mnEnMvpwwpmrQ6pMhMjSUt4iIa1twRwzd43Zp0uuNIZ03pvUK1Itqqm8NJN/y
-         q6yGkTGMTRY1vALbihkVgGhM+9lN/z7gPoNrwoED3ngumAVgAvk8lMogCHnOX+5f3Mt/
-         9TnQ==
+        bh=HbtJxsHTBL9KqztHKdKNEHpXofiAHjtU2iQrO0XNbKE=;
+        b=FuRnjyBTT1rGpudQhTZV1yx4N46BT/nl+Z1mVD44xw5DwqeiWDIb9AYgNfbDAU7E1s
+         isD9P7MZWJe6tFbgIpE1FrURodlGC8fKHTl0L6VbOv+njH3/+Xk4QlSjpaWqRKUR9Apv
+         XTjHb5L7yTGpuxB8HqCzlKtEY1dCLOTKs0YA6AQgpkPoei9xjS6owIA2Mr/cWhlSsl5Z
+         fD2RuAXn8GqTAK14FdzutBbhYLkntxYC0Z5Ji56o/bv9TnnHw8tplUX32yng8tmLKD7b
+         rfcjGKoPefZaKNlM2JosuusaRdjD+EvcpsDfDObqFwHd9cjI8tg2Tmd5kUGSJPifn1Qc
+         ntjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
          :mail-followup-to:references:mime-version:content-disposition
          :content-transfer-encoding:in-reply-to:user-agent;
-        bh=UcyqngV//1J9l9nZlZu30kKPNe8LASfRxkjZZbOGhEk=;
-        b=HoUKmzt5Z11VWPfgonkDujWwECgJjON1RkCgXik+9XAKFH1/oCZQ2INVukfpc9h7xk
-         Qk4tHyMAM3f2jT9JKW59ojKJbJ0y+4LcSwsB93bYSDtHxzI6pjRy0nRHethKmp4kCgLx
-         fGGonI6k5diKOH62t/PpqCypO0vsQAXItlQJphriTTTAPr4V3VmrszbEj/ZOuSSqCKJt
-         xzNqiGrwsef/VVYQtPKV5wZiGlX/bKoRLF7NwhocrDKxMGccuATpzQ8RPo/EcTTzt7bx
-         YFLxy+dbG3j1UhKyyphF54xP3W9iRP+rM9AjUurIYGyB3LlgEXnTot2w5nUnblsVDoHv
-         3yzA==
-X-Gm-Message-State: APjAAAUpbAiUxoAc22m5lqIHQMLd2VdiOVhn5jxNt+mPuQB6cHi5Nx82
-        WWi0AdZORhTH44gsdzb5yjm7IQ==
-X-Google-Smtp-Source: APXvYqw265jNO7sdl07p9c4SxJKgIkiv/ZxbfS8MOYR2qRpZpgbFRaKNWtT89fuj7F6GtVf/CAG1/w==
-X-Received: by 2002:a19:f00d:: with SMTP id p13mr3572666lfc.37.1579637127413;
-        Tue, 21 Jan 2020 12:05:27 -0800 (PST)
+        bh=HbtJxsHTBL9KqztHKdKNEHpXofiAHjtU2iQrO0XNbKE=;
+        b=c03zAf5US1iUBi7ke1CSt9rDJzE2RSnma/54pC8qyWtmS32VjWH90bgM0b9kYy6nzJ
+         sr9gqHyvELvFycUOAgWnvnmuMm1CCpd3VJtv0vyIqlDPG3kuGuY2qc0j3kzmZpjqd/db
+         gM0OBENNHxjgCG473dp93YZcfZojnhWwjlPsiqXw40DUtENKKtm0ilHG37TtgJYzfYBh
+         2T51SHUko5iKikJaArawF6rCaUjMHjCbmd8jcs/dHsusd3zsa0Osa3UGWHV00Iavty9T
+         8IsF7ISIwMr9kVrM/q7yYnx6VOCzyl42dRaG4EaJg7AP4xu9H/dZAt7mLP2NR0M/R+NE
+         wWEw==
+X-Gm-Message-State: APjAAAW27UR2qArcgn1ZlrPsUIdnG2Uk/5WUafBMvjawQv4i4ZX1jWJz
+        nXw3YKBtk/vRxG14kp0/V9ekIt2tLYsodQ==
+X-Google-Smtp-Source: APXvYqwM4l9nIQ45sx44sljdz2O2LijfgDAQORsxyYxmrnUE9lnroDudaHwTRjKQeDJse2KetpY41w==
+X-Received: by 2002:ac2:4add:: with SMTP id m29mr3623584lfp.190.1579637704254;
+        Tue, 21 Jan 2020 12:15:04 -0800 (PST)
 Received: from kynes ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id h19sm19196230ljl.57.2020.01.21.12.05.25
+        by smtp.gmail.com with ESMTPSA id e17sm19243713ljg.101.2020.01.21.12.15.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2020 12:05:26 -0800 (PST)
-From:   "=?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek" 
+        Tue, 21 Jan 2020 12:15:03 -0800 (PST)
+Date:   Tue, 21 Jan 2020 21:15:01 +0100
+From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
         <michal.lowas-rzechonek@silvair.com>
-X-Google-Original-From: =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek <khorne@kynes>
-Date:   Tue, 21 Jan 2020 21:05:24 +0100
-To:     "Stotland, Inga" <inga.stotland@intel.com>
-Cc:     "Gix, Brian" <brian.gix@intel.com>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 0/3] Allow to reattach with new composition data
-Message-ID: <20200121200524.olwlsw57xcrio5lq@kynes>
-Mail-Followup-To: "Stotland, Inga" <inga.stotland@intel.com>,
-        "Gix, Brian" <brian.gix@intel.com>,
-        "jakub.witowski@silvair.com" <jakub.witowski@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <20200120161114.6757-1-jakub.witowski@silvair.com>
- <56b3aa902dee18a45e91d826344085cf1fb3ecca.camel@intel.com>
- <20200121105927.s2a3avh7tdcnf566@jwitowski2365>
- <2565ef678df9e316ac980937f0f629aad83703b6.camel@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com
+Subject: Re: [RFC BlueZ 0/2] Fix types and names of beacon/import flags.
+Message-ID: <20200121201501.v4ceigg5xngfvjb4@kynes>
+Mail-Followup-To: linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
+        inga.stotland@intel.com
+References: <20200109083855.16000-1-michal.lowas-rzechonek@silvair.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2565ef678df9e316ac980937f0f629aad83703b6.camel@intel.com>
+In-Reply-To: <20200109083855.16000-1-michal.lowas-rzechonek@silvair.com>
 User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+Hi Brian, Inga,
 
-On 01/21, Stotland, Inga wrote:
-> I would strongly prefer not to allow changing CID. Is there a good
-> reason to change CID ever?
+On 01/09, Michał Lowas-Rzechonek wrote:
+> This patchset aims to make the API a bit more consistent.
+> 
+> Side question: at the moment none of the node properties emit
+> PropertiesChanged signal. I think this violates D-Bus spec, since all
+> properties are assumed to emit these signals by default [1] [2].
+> 
+> Unfortunately, at the moment ELL does not support "EmitsChangedSignal"
+> annotation, so I'd like to add this to ELL, annotate node
+> properties with:
+>     - Features: const
+>     - Beacon: true
+>     - BeaconFlags: true
+>     - IvIndex: true
+>     - SecondsSinceLastHeard: false (for performance reasons)
+>     - Addresses: const
+> 
+> And also emit PropertiesChanged where required.
+> 
+> Thoughts?
 
-I don't know, maybe legal, after acquisition, or something?
-
-I don't see any practical difference between these 3 IDs - nothing in
-the spec is tied to them, they are informational only. So maybe keep
-things simple and not add any "special" logic around the CID?
+Any comments about this idea, or should I just go ahead and send a
+patch?
 
 -- 
 Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
