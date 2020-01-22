@@ -2,93 +2,93 @@ Return-Path: <SRS0=lsET=3L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F8A2C2D0DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 15:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6580EC2D0DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 16:09:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F3202071E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 15:29:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28D3F21835
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 16:09:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=robart.cc header.i=@robart.cc header.b="H1BSCkEa"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="an2tVjAb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbgAVP3G (ORCPT
+        id S1729154AbgAVQJV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Jan 2020 10:29:06 -0500
-Received: from srv-mta-01.robart.cc ([80.123.245.229]:13419 "EHLO
-        srv-mta-01.robart.cc" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725836AbgAVP3G (ORCPT
+        Wed, 22 Jan 2020 11:09:21 -0500
+Received: from mail-vk1-f196.google.com ([209.85.221.196]:44839 "EHLO
+        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbgAVQJV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Jan 2020 10:29:06 -0500
-X-Greylist: delayed 572 seconds by postgrey-1.27 at vger.kernel.org; Wed, 22 Jan 2020 10:29:05 EST
-Received: from localhost (localhost [127.0.0.1])
-        by srv-mta-01.robart.cc (Postfix) with ESMTP id AA6C71C0F93;
-        Wed, 22 Jan 2020 16:19:32 +0100 (CET)
-Authentication-Results: srv-mta-01.robart.cc (amavisd-new); dkim=neutral
-        reason="invalid (public key: not available)" header.d=robart.cc
-Received: from srv-mta-01.robart.cc ([127.0.0.1])
-        by localhost (srv-mta-01.robart.cc [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 8H1kKsu6u2K2; Wed, 22 Jan 2020 16:19:32 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by srv-mta-01.robart.cc (Postfix) with ESMTP id 857951C10E2;
-        Wed, 22 Jan 2020 16:19:32 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 srv-mta-01.robart.cc 857951C10E2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=robart.cc;
-        s=B016B336-104E-11EA-8E2D-E36DD02BB770; t=1579706372;
-        bh=7IBnvOhJ+Tvk6BgbwT5JHCfu5tPiFOlxvXbT+GX9EjI=;
-        h=From:To:Date:Message-Id:MIME-Version;
-        b=H1BSCkEaGuaXjeJL+4ydnJBemEPzFwF6uq7vVWEj57J+DAY5sPgN71pNHI1O3beAs
-         uFKX0yRdm5I+jRU90v/12I4f+54qJfOCVo7L9Va0lIZWTwFRgIaFsUieSwssKSsjku
-         eHss9AqXrWrFefiUbgPbFW/ea715NdrDL+T4f8Izo2bLhR84Bo0v4/yppLjAy92771
-         9tYBauoA67ztqkAJZRrDcMchtdhoQ3KgW8MpLsqmg6xJftiwTZrWxMWlij/4AJLFkO
-         t2fDKAUOTUrZBW4VM8xD0YsCpLChiwLseCZUM8QYxcXffMQP6IA72GE+T3zVKgM1v+
-         r3nk2HPckoOBg==
-X-Virus-Scanned: amavisd-new at srv-mta-01.robart.cc
-Received: from srv-mta-01.robart.cc ([127.0.0.1])
-        by localhost (srv-mta-01.robart.cc [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Yvp4pw6RK1be; Wed, 22 Jan 2020 16:19:32 +0100 (CET)
-Received: from workbot3.intern.robart.cc (workbot3.intern.robart.cc [10.0.20.3])
-        by srv-mta-01.robart.cc (Postfix) with ESMTPSA id 6BEFE1C0F93;
-        Wed, 22 Jan 2020 16:19:32 +0100 (CET)
-From:   Roland Ruckerbauer <roland.ruckerbauer@robart.cc>
+        Wed, 22 Jan 2020 11:09:21 -0500
+Received: by mail-vk1-f196.google.com with SMTP id y184so52380vkc.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jan 2020 08:09:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eHF2IKiRh1iKsIm+VtNSl0gaZ27AZU2CCcJv/7yPvbs=;
+        b=an2tVjAbutvzUxefOZCR27RXA18vElgnwg4dh1Nt2Lt0SyevoohnadHImvXEHHNBc9
+         BVcxYEQ9t6Ef4h9A7d8ywoT6MpDVsIE7avWDhWxY1dNM4dgIPTSuseYgwSQccQ4Kd0AO
+         upzif7rQFuvhShzbxoGXy9vdTHUob0JxY/VPw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eHF2IKiRh1iKsIm+VtNSl0gaZ27AZU2CCcJv/7yPvbs=;
+        b=fPsHSN/HayLb0GHqMUXJjUPAQJnCSU8fvG/sKZMS+L1doYaSEqZ8u/VhvxnWfXRVBo
+         eUHSJGz0+buwTSDQyy77TJnuAC7G713OQa6pFLxzBulm8eGvcP2L9MMsUF9wnIpPe8/i
+         VMTPZXymcsU0dfU2z8qPLc9xQcM0ezAYm6rpxNTopPj21vb7GNUqUv6kCBG4GwyWpEMz
+         SjBw3cjqgY72moo5oe2CutdNEGrzBLFs6zqxYzmz3NfkRoun0diVLyMA9gn0YKNf6vAc
+         7UTA7WSwcSuyCqxM7levyIXbufjMVUshHWCeCqQCaSG/8T6kXecccd/RcwFqO4bzW7jU
+         lsIA==
+X-Gm-Message-State: APjAAAXqbpo783IlvPS6bc+3ClaIIWIZAIm8hT2XdXk6k4qvrqNl+PQE
+        bHymmQ0sjxZVM8OcydpgRo0m2kLQneY=
+X-Google-Smtp-Source: APXvYqzIvckql/3Dcv3hkWXeaxf3pWWxfJgP7LjX11iKPfC2Wl8yQ3vvMGGMRANAZce7+KDFtjFLYg==
+X-Received: by 2002:a1f:18cf:: with SMTP id 198mr6590392vky.61.1579709359624;
+        Wed, 22 Jan 2020 08:09:19 -0800 (PST)
+Received: from alain.c.googlers.com.com (69.104.231.35.bc.googleusercontent.com. [35.231.104.69])
+        by smtp.gmail.com with ESMTPSA id p145sm11983228vkp.43.2020.01.22.08.09.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jan 2020 08:09:19 -0800 (PST)
+From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Roland Ruckerbauer <roland.ruckerbauer@robart.cc>
-Subject: [PATCH] Fixed bug in prep_write_cb(): missing arguments
-Date:   Wed, 22 Jan 2020 16:19:24 +0100
-Message-Id: <20200122151924.32697-1-roland.ruckerbauer@robart.cc>
-X-Mailer: git-send-email 2.19.1
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH] bluetooth: adding missing const decoration to mgmt_status_table
+Date:   Wed, 22 Jan 2020 16:09:16 +0000
+Message-Id: <20200122160916.156321-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-prep_write_cb() calls gatt_db_attribure_write(), but does not pass data
-and data length.
+This change simply adds a missing const decoration to the
+mtmt_status_table definition.
 
-Fixed by passing pdu as data, and skipping the first 4 bytes.
+Signed-off-by: Alain Michaud <alainm@chromium.org>
 ---
- src/shared/gatt-server.c | 2 +-
+
+ net/bluetooth/mgmt.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 0d9bb07..a235552 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1312,7 +1312,7 @@ static void prep_write_cb(uint8_t opcode, const voi=
-d *pdu,
- 	pwcd->length =3D length;
- 	pwcd->server =3D server;
-=20
--	status =3D gatt_db_attribute_write(attr, offset, NULL, 0,
-+	status =3D gatt_db_attribute_write(attr, offset, pdu + 4, length - 4,
- 						BT_ATT_OP_PREP_WRITE_REQ,
- 						server->att,
- 						prep_write_complete_cb, pwcd);
---=20
-2.19.1
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0dc610faab70..3c68a366977f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -176,7 +176,7 @@ static const u16 mgmt_untrusted_events[] = {
+ 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
+ 
+ /* HCI to MGMT error code conversion table */
+-static u8 mgmt_status_table[] = {
++static const u8 mgmt_status_table[] = {
+ 	MGMT_STATUS_SUCCESS,
+ 	MGMT_STATUS_UNKNOWN_COMMAND,	/* Unknown Command */
+ 	MGMT_STATUS_NOT_CONNECTED,	/* No Connection */
+-- 
+2.25.0.341.g760bfbb309-goog
 
