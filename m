@@ -2,125 +2,151 @@ Return-Path: <SRS0=lsET=3L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF212C2D0DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 16:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7814C2D0DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 16:54:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A223D24656
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 16:49:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ECC62465A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 16:54:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="Tn8MXkun"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qca.qualcomm.com header.i=@qca.qualcomm.com header.b="ZnJwv6Wa";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="HB9SDx5J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725975AbgAVQtC (ORCPT
+        id S1725989AbgAVQya (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Jan 2020 11:49:02 -0500
-Received: from mga01.intel.com ([192.55.52.88]:29008 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725943AbgAVQtC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Jan 2020 11:49:02 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Jan 2020 08:49:01 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,350,1574150400"; 
-   d="scan'208";a="425912816"
-Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
-  by fmsmga005.fm.intel.com with ESMTP; 22 Jan 2020 08:49:01 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 22 Jan 2020 08:49:00 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 22 Jan 2020 08:49:00 -0800
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 22 Jan 2020 08:49:00 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 22 Jan 2020 08:48:57 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q0815rW1qOI5KBOSVepYz4Xd55AaESJHKxZb8MQljAfvN98gJ8kWIQ0BbJU7HrBS2B/lhtdg8DZ4xEfAk7IvwjhFl1yzokxLqAeQszgpmAMPGGP5Gyjh6FMR/g6A1e9vA8O/ygHB4hQOtMtDYe9wOWGWOnfK6c2a3bMcykAZomxcYuBncqTnzI7zhWlhC9UQja6rSHNo/st+5J3H58ttms+3tsif6GqTeJHDbuAXPtUwotqrybDwOKUn7QkBQag+daZKvReqgkopgLNJzwDoxnP1QYRtmOSEk6JGzbzstystXde0QChzOGcnwGs6gn+Dlqp3WmZbm+zDZ1SjalaHSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8S15yP2QBRV1K9qdAMsJmSAJE/XhB2IqvcQus1dfBpQ=;
- b=RU9VcLGEcNhYAVpzWda+wk5JoWl7ZvgJhByNdI33BZfefv76TbAx9J1JNDOHtfgaiq5AorwSezlwkSTarT27GwZeVDzsiBG3feRcJtLuw2pmC69hCi6QoLr9hizkYm4/VfSjG/AAqYanawJeywnWo4yWxTIUo2wEHwniHBZEJhJ+W5BOKDYS5RUNYjFuE1L8ZeCRu82/ThJtZxHuYrS4WB2fDiLbGVrKdhYQyLDFvVoFBMtYgaR3nGS5gfN72ZACWFjm0s2GcaRKhJTLBPb5G0ZyxS0DFc2wyIJJhRwesRjz8x9yne/vX72KAjzHPYjZIN2UNuBGlO/IMUSVDBcI4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8S15yP2QBRV1K9qdAMsJmSAJE/XhB2IqvcQus1dfBpQ=;
- b=Tn8MXkunqhuMs6knhc1zRGOw0zfrE8xaZjrLSYzAWAYfkg4FQkpGXvR96fhKM/F17O2AfFtbEAWCRW1s0OAAVDKd4klqR2k5FdFZ5CUNx4DcHHsEbgKtKYhLHhkCPOJlrFqGDEnwMT4rpj7MulY5fmTt3PXXRaVp8TZsrA02quk=
-Received: from MWHPR11MB1664.namprd11.prod.outlook.com (10.172.54.13) by
- MWHPR11MB1614.namprd11.prod.outlook.com (10.172.56.140) with Microsoft SMTP
+        Wed, 22 Jan 2020 11:54:30 -0500
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:57324 "EHLO
+        alexa-out-sd-02.qualcomm.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725802AbgAVQy3 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 Jan 2020 11:54:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=qca.qualcomm.com; i=@qca.qualcomm.com; q=dns/txt;
+  s=qcdkim; t=1579712069; x=1611248069;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=kaEbGuT+GWl2/MGW5Ti1JANQBwYuSjM5XrE0fINOxK4=;
+  b=ZnJwv6WalJvnCw+fyrPCQWOetmE4PX9OFt/OFCY1JjS2bsbWsuyzymSx
+   ZjenWMVIq2gcmfv94k8XvlgpkTFcdncs3Bl0x4RHVnoBKnx7QvIRkEZou
+   1LN563vwv9ymFOtANW/3WLDPGkt1jEtEgB9BJj86nisSCwlUaZQj6s1MZ
+   0=;
+Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
+  by alexa-out-sd-02.qualcomm.com with ESMTP; 22 Jan 2020 08:54:29 -0800
+Received: from nasanexm03f.na.qualcomm.com ([10.85.0.47])
+  by ironmsg03-sd.qualcomm.com with ESMTP/TLS/AES256-SHA; 22 Jan 2020 08:54:29 -0800
+Received: from APSANEXR01F.ap.qualcomm.com (10.85.0.39) by
+ nasanexm03f.na.qualcomm.com (10.85.0.47) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Wed, 22 Jan 2020 08:54:28 -0800
+Received: from nasanexm03g.na.qualcomm.com (10.85.0.49) by
+ APSANEXR01F.ap.qualcomm.com (10.85.0.39) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Wed, 22 Jan 2020 08:54:23 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03g.na.qualcomm.com (10.85.0.49) with Microsoft SMTP Server (TLS)
+ id 15.0.1473.3 via Frontend Transport; Wed, 22 Jan 2020 08:54:23 -0800
+Received: from BYAPR02MB6006.namprd02.prod.outlook.com (20.179.63.144) by
+ BYAPR02MB4919.namprd02.prod.outlook.com (52.135.241.212) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20; Wed, 22 Jan 2020 16:48:55 +0000
-Received: from MWHPR11MB1664.namprd11.prod.outlook.com
- ([fe80::e8fb:c0e8:5779:367e]) by MWHPR11MB1664.namprd11.prod.outlook.com
- ([fe80::e8fb:c0e8:5779:367e%6]) with mapi id 15.20.2644.027; Wed, 22 Jan 2020
- 16:48:55 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ 0/4] Add functionality to mesh-cfgclient tool
-Thread-Topic: [PATCH BlueZ 0/4] Add functionality to mesh-cfgclient tool
-Thread-Index: AQHVzbb4Pon5IeusjUW/aqGCFdTldaf27DsA
-Date:   Wed, 22 Jan 2020 16:48:54 +0000
-Message-ID: <a26564cd4be1bc6a7d05c220a4be4267f3033126.camel@intel.com>
-References: <20200118042233.15338-1-inga.stotland@intel.com>
-In-Reply-To: <20200118042233.15338-1-inga.stotland@intel.com>
+ 15.20.2644.18; Wed, 22 Jan 2020 16:54:22 +0000
+Received: from BYAPR02MB6006.namprd02.prod.outlook.com
+ ([fe80::f13a:b064:4db7:b09b]) by BYAPR02MB6006.namprd02.prod.outlook.com
+ ([fe80::f13a:b064:4db7:b09b%3]) with mapi id 15.20.2644.027; Wed, 22 Jan 2020
+ 16:54:22 +0000
+From:   Kalle Valo <kvalo@qca.qualcomm.com>
+To:     "linux-firmware@kernel.org" <linux-firmware@kernel.org>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PULL] btqca firmware 20200122
+Thread-Topic: [PULL] btqca firmware 20200122
+Thread-Index: AQHV0USWwg/r1norU0SRVVboymqSGg==
+Date:   Wed, 22 Jan 2020 16:54:21 +0000
+Message-ID: <BYAPR02MB600646BA6832ADB7C920A45A920C0@BYAPR02MB6006.namprd02.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [192.55.54.38]
+ smtp.mailfrom=kvalo@qca.qualcomm.com; 
+x-originating-ip: [88.114.240.156]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ed3101a5-6d03-4da1-df13-08d79f5af7d6
-x-ms-traffictypediagnostic: MWHPR11MB1614:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB16147B389D8616103D432CB1E10C0@MWHPR11MB1614.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1265;
+x-ms-office365-filtering-correlation-id: f84597ef-aef0-4b4f-a1dc-08d79f5bbac7
+x-ms-traffictypediagnostic: BYAPR02MB4919:
+x-microsoft-antispam-prvs: <BYAPR02MB49197CBAD54FA6B6F15F271F920C0@BYAPR02MB4919.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1247;
 x-forefront-prvs: 029097202E
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(346002)(136003)(39860400002)(366004)(396003)(199004)(189003)(64756008)(66556008)(66476007)(66446008)(110136005)(36756003)(66946007)(2906002)(26005)(71200400001)(76116006)(316002)(6636002)(186003)(91956017)(6512007)(8676002)(6486002)(86362001)(4744005)(81156014)(2616005)(478600001)(6506007)(81166006)(5660300002)(8936002);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR11MB1614;H:MWHPR11MB1664.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(396003)(366004)(376002)(39860400002)(199004)(189003)(71200400001)(478600001)(5660300002)(86362001)(316002)(52536014)(8676002)(81156014)(81166006)(6506007)(8936002)(2906002)(26005)(4326008)(33656002)(7696005)(186003)(6916009)(55016002)(64756008)(66476007)(9686003)(66446008)(66556008)(66946007)(76116006)(91956017);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR02MB4919;H:BYAPR02MB6006.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ra3PnjrNxHKIXkAEXlUkkpZ+40ozz1Xh2uz34x6Y7Jf5eBQic4g/d/eFvhszr4PPtjLB1wqmIR9EkBlT8ITsUWTqZi4C093XxCJK+/1AiQFJ7PxGPwMyFPUXU2hRklp78bMyztNrWsfda5i4GsO5f2XKjLR5aDgBPSzlBda7MuXjfzGyBUUKteiJHpK4GiNuoXBMGA7gVe/YGNjIw4asuBsgUsM25wznDbQt8OouV7Kxv867KK1CK6ZzEDuA76YLlOcNQrM7NUuuzzh3KB2HG7sbMw3pnDSgKbHlRoPzKYb7L20Gi0KKGTvw1XxMP+JaoHkM9N786NQop+x57rlZe/98L08e4fepkeLtoALlHD/VryspsxVFn+reRMYNIGrtyx1rWmOlKeoM8EDNpgq3gRxOV5TVddzTr07zAJD4UkQ814HIFH9FSeobPRsj4ER7
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8BDDD9D12C871841948E1F114347CE92@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+x-microsoft-antispam-message-info: 0lsWwRme3B0pCCkICO+WgzqqaQr0kcrljm3XDWC1I1awOIQrGEq4H8w8AaiQA2w2iCpscHCH14f/SJmG+mF3+fdgH3b9LUzDggj7glDj1DaBDtLsQ32FrNDNi6ePphFf84vB7rfGIeols7uYaSPaEalf/eVt/Ug2TRtS2O3Q4sQBfiogP4nF820wYNT6XIEWurNCQshu9jjSh7ff2XGDUJgkEyT8s9cW5D2Uu/mLrVAV3Y2RKHd5F9RGNg1tElmiFrv3gLwR1oI+jcfXS2jSk6wG3U8kP8PH2ffLRt1g38+dtnjV+kYejywJlXQZJZOJ6Dhtx4kzY8UYH9pPrOGvzV3SsTj+S1Pxqmr//113GHxwjUnx68zN3xhBtuEkVYwVChZv6tayAk9wm1gHxf/T5rjlZhBBgBovwX0Zh/uPHgMPpJaJ99ta0toHT8RplGsv
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NusC7nsrEjN0Qp/8bFjKYqyxtXkBZn7ZdWw5PlzZfSxeWB0X0MwcygQJ2tn5FzikqNxvSDux0k06Xmc4soqaJp6RUX29Gvl9sDpUS4qBTMeqWqAebiNXnJVgDrzDWT96k+LegAFaD9rjfFHRjaocO3Z9Vj0cD4tVB4AEbLKAEUWSUjcjebcjOjiDroIN7MiaKEKGJCLTGUfKZTKps0GwmM9Ceb7yf51T3Pk1kvTpO2QQX5FhS/DwyTC3jmCNKP8MnGZF8DYDJINmjA10e6wUeyP5aH1m8fUDvCIhZPsA9wQzvgdOGNDJY6k6pzuvgKx08cO3YdiX5iBkFvvICYF4XA==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yj4xSg/I12hvlQ0nHW1GVqsSPxVMreTEmambtDZ/wXc=;
+ b=XJbWYL4ZRE/qbHp7lZ6Qy3fgJgAgdCBCm0x9YqG87xNxfYgXjx7eLIj888+wXJcLjhMRjmzZ/0jjLtBq9oWHZU4W5DUwkMuBBxKCkxAUr15K2y5B2izdMhtnpHkEur6mh7V+5vVXU1Z0rw2m+EfWQQ7JxXdxc9cMLbDnA4QUgO74cL3VWjDWQ/YLf4QNR6vFlUgR3EOTqQvdB1peRAHcvkrqFL49ojaXZSpVhupxm4rODKwskWW7Bq8vllUDAm3fdL4XGBgVEEsg+btJmw68QbukGHYg4rnZdzn0xPoWWBvVx6WMpMCrgGr2wwGhXF6KmPK4z/ZMXidYgDvl1lSomA==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=qca.qualcomm.com; dmarc=pass action=none
+ header.from=qca.qualcomm.com; dkim=pass header.d=qca.qualcomm.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yj4xSg/I12hvlQ0nHW1GVqsSPxVMreTEmambtDZ/wXc=;
+ b=HB9SDx5JDNdPKAv7vQPkfmJmxnVIhFsPB2bJ7ocO0snE5L8yOMfOhjJLEXFBOSfuZzGCotw4eJvymL9UYE02LWJ/CATD7FU5osZneGoO3l1lxv1WyhjVdd4acuoxdtlVPvOOrSvM/hGQkmH11C6Jc50354R9+a1DAU/o54cIr+4=
+x-ms-exchange-crosstenant-network-message-id: f84597ef-aef0-4b4f-a1dc-08d79f5bbac7
+x-ms-exchange-crosstenant-originalarrivaltime: 22 Jan 2020 16:54:21.9410 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: 613UY7i/N8XeGW3KQYDBo0Lqi1/Mxa3ei6jh8OD2hvnoo10xjaqPn+a1JGC1pCePwZS+nK5hCcOUcZ9XMq+rig==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4919
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed3101a5-6d03-4da1-df13-08d79f5af7d6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2020 16:48:54.9452
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Uydu+2YE/4GMkitYRXguWjm0q3i0K3AQPncpJmCDboV1/fbcEwmRwR+L6MAO357W6cq0fUjZMABKqk6L+9BZcg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1614
-X-OriginatorOrg: intel.com
+X-OriginatorOrg: qca.qualcomm.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-UGF0Y2hzZXQgQXBwbGllZA0KT24gRnJpLCAyMDIwLTAxLTE3IGF0IDIwOjIyIC0wODAwLCBJbmdh
-IFN0b3RsYW5kIHdyb3RlOg0KPiBUaGlzIHNldCBvZiBwYXRjaGVzIGFkZHMgbW9yZSBmdW5jdGlv
-bmFsaXR5IHRvIG1lc2ggY29uZmlndXJhdGlvb24gdG9vbA0KPiBhcyB3ZWxsIGFzIGEgYml0IG9m
-IGNvZGUgdGlnaHRlbmluZy4NCj4gDQo+IA0KPiBJbmdhIFN0b3RsYW5kICg0KToNCj4gICB0b29s
-cy9tZXNoOiBSZWZhY3RvciBjb2RlIGZvciBnZW5lcmF0aW5nIG1vZGVsIElEDQo+ICAgdG9vbHMv
-bWVzaDogQWRkIGxlbmd0aCBjaGVja3MgZm9yIHJ4ZWQgbWVzc2FnZXMNCj4gICB0b29scy9tZXNo
-OiBBZGQgc3VwcG9ydCBmb3IgVmVuZG9yIE1vZGVsIEFwcCBHZXQvTGlzdA0KPiAgIHRvb2xzL21l
-c2g6IEltcGxlbWVudCBtb2RlbCBncm91cCBzdWJzY3JpcHRpb24gY29tbWFuZHMNCj4gDQo+ICB0
-b29scy9tZXNoL2NmZ2NsaS5jIHwgMjMzICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0t
-LS0tLS0tLS0tLS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgMTU5IGluc2VydGlvbnMoKyksIDc0IGRl
-bGV0aW9ucygtKQ0KPiANCg==
+Hi linux-firmware maintainers,
+
+here's a pull request for btqca bluetooth driver. Please let me know if you=
+ have any problems.
+
+Kalle
+
+The following changes since commit 1eb2408c6feacccd10b02a49214745f15d1c6fb7=
+:
+
+  linux-firmware: Update firmware file for Intel Bluetooth AX200 (2020-01-2=
+2 06:26:14 -0500)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvalo/linux-firmware.git bt=
+-20200122
+
+for you to fetch changes up to 30550605b75c16489ee75fa1cf8be6aea8506068:
+
+  qca: update bluetooth firmware for QCA6174 (2020-01-22 18:27:20 +0200)
+
+----------------------------------------------------------------
+Kalle Valo (1):
+      qca: update bluetooth firmware for QCA6174
+
+ WHENCE                        |   7 ++++++-
+ qca/nvm_00440302_eu.bin       | Bin 0 -> 2041 bytes
+ qca/nvm_00440302_i2s_eu.bin   | Bin 0 -> 2041 bytes
+ qca/nvm_usb_00000302_eu.bin   | Bin 0 -> 1998 bytes
+ qca/rampatch_00440302.tlv     | Bin 0 -> 66332 bytes
+ qca/rampatch_usb_00000302.tlv | Bin 0 -> 66964 bytes
+ 6 files changed, 6 insertions(+), 1 deletion(-)
+ create mode 100644 qca/nvm_00440302_eu.bin
+ create mode 100644 qca/nvm_00440302_i2s_eu.bin
+ create mode 100644 qca/nvm_usb_00000302_eu.bin
+ create mode 100644 qca/rampatch_00440302.tlv
+ create mode 100644 qca/rampatch_usb_00000302.tlv
