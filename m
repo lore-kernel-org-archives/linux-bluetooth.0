@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8823BC2D0CE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 00:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DA1C2D0CE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 00:32:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 529752253D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 00:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52BF024655
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jan 2020 00:32:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sa59Cs6a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FkNqdDl3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728797AbgAVAQo (ORCPT
+        id S1728609AbgAVAcy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jan 2020 19:16:44 -0500
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:40579 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727969AbgAVAQo (ORCPT
+        Tue, 21 Jan 2020 19:32:54 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:43383 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbgAVAcx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jan 2020 19:16:44 -0500
-Received: by mail-oi1-f196.google.com with SMTP id c77so4452193oib.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2020 16:16:43 -0800 (PST)
+        Tue, 21 Jan 2020 19:32:53 -0500
+Received: by mail-oi1-f194.google.com with SMTP id p125so4470062oif.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jan 2020 16:32:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=HNJ2jUDkPY3P07Z3I+xQuaZgP1/KyFIPVqqkQgaS4jo=;
-        b=sa59Cs6alAeYRpQ0eNJifzHJDLE2KghpnrNZshYFHFRnvm/5L/WSO1UO0MdPz3PkkT
-         DQpN5GIjg8z494Hl483XPupQecukl4e61ZkIp2ooOED2ZWgbX2QUsY4m7qh0rYFslqNL
-         OSwTczH+TtQXLOlgHfWwgAeZ2iMlbnSogbYqMtX2INh7Ei7Z2DjKm//ajGI4UK1T3kH+
-         jG11T+ZZ0wbucHpEJsKNtjAUZvqgPSFFqizBpjyC/vgjhxN5Yic5iVyJUbnKmn2FTyaO
-         cll0gFJEQA0f9wjmajoSvPjU31ve3p3m09JbRtKYzxRuGUMExRnhapmI9XkJ7xifsRRd
-         o5sg==
+        bh=DJC/caOwVfR2LAFwhDN8te/tMZBb509QuBHyr248398=;
+        b=FkNqdDl3USNVop1D576/b4snGQe/Srx7+oBfvdIM6doQlpWUh5dZCVyDOSJIl6C1Af
+         3NTd9Y8Fw31y3E3zItRK/Xgyhf7N1L0dz0w+s8T5awevNxhCjlCYuCf1+tvRgSXZMo+O
+         5AeoMAacAXNoiOiuNE4tyk0LDfAmg6dVdYminkmOG8Px2zAxhdJCro3hppREL6Umbstp
+         rylDEk0blCzafy1o+DwQap8zilhuy1y8FoUbobDE9JL0yF0amuY8pXjFI5O7pZLl23TU
+         Z0jfmOarhXP3eSSXWKocxuoC0v0+hXQvsSRHrNtE2t7CjZVQoJugro303sTWOnVFbWFR
+         Ci8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=HNJ2jUDkPY3P07Z3I+xQuaZgP1/KyFIPVqqkQgaS4jo=;
-        b=cXV29TnqTdbKBTEna2U668OylnWs3RMwrXxD4dgzvQ7CECEELO43IG/ZktFMo0yHtS
-         ezRmQmWoxZMmntmxGIj/MJKoAPhYApCDutGOSp23905La4K2HFIYkNe4FQadtraqpiNb
-         G9HTDJbTj8QWpQleuk801yAK9ztq4ezpQFvm3vhqtkajF6coTVWAED+8FZYS/dCOo09m
-         xyspLXoSWHpvBU36WBNI4yYtSggJji6lW95y0drSJO8tx6y2b9vU36nZodx2fNh4ftDr
-         eHKs1hToIb5VOyA5pTdTF5tUBmzvck2frhp+COo3yPqtRZylR7AzT8/oUrVe1SXZiFHF
-         JxVg==
-X-Gm-Message-State: APjAAAXHtmXT4Qk2Se6vEN2HshwsEzx71r3+tXuyNjnWb46iH47Ae5hP
-        I9cwGMH6N444GOoASX9psxiAHV9D7Dav9YpIeqw=
-X-Google-Smtp-Source: APXvYqwZ+kIqISCrdx8k6xacS8ejblWciEXG/1RFV79IDQVnyDp8e3TQaauEiR5HjZNwE41PHahs2PWBDrS+oqRQ8z0=
-X-Received: by 2002:aca:1011:: with SMTP id 17mr5031032oiq.72.1579652203324;
- Tue, 21 Jan 2020 16:16:43 -0800 (PST)
+        bh=DJC/caOwVfR2LAFwhDN8te/tMZBb509QuBHyr248398=;
+        b=TMVXp76GPfE0e1GUpcdz3cc8QKmca4SAGKPNi1bL23z6nFW2EXIHAeRjHAkHn3hl/v
+         G5zV66agcX+ZeEPdvK/fL+ufEaF50A0qOKIwaNrRHX+En25kdd5n++YkKVqr3nW8cFp7
+         GDMRpp1lGqipisGiw/MEV9XnoHIhYP26AMXP9uAMPr0cJGXuRbSsAKfalNC5gXH4h2wb
+         G7pnuWmdXw/Lbt1SHGd99m2cLSZdeUm8WaACeoL80Hve/nwTKjEL36MDjDwTmAQLRoAI
+         OZL/l96f+nR+bkHfqmZ4gwWaxNrkNbC6XESwkBILpMn8VkIjQgHbQ20CiXrFShqIWMw5
+         GGuA==
+X-Gm-Message-State: APjAAAVMMi/PB8ewAaaPrY5yhddmxOkOb2H0CNo+3fCM4yuUTp93IWqi
+        aMHSPEg10axaUQ0SKAczv2Nb8QRn/3vm8xIwqBo=
+X-Google-Smtp-Source: APXvYqyq+CuR21avMVbnxKyCWs8VqoddKgNvoFgxJ9iZMRr+4aBD5Qk1IdNMKx6neChqfzUhadro2zfv6oxgLHmMh2Y=
+X-Received: by 2002:aca:4c15:: with SMTP id z21mr4926521oia.8.1579653172960;
+ Tue, 21 Jan 2020 16:32:52 -0800 (PST)
 MIME-Version: 1.0
-References: <20200118194841.439036-1-marijns95@gmail.com> <CABBYNZ+LW-Lp3q9jOjVwFktuLsKajTrmOpUYmQ5SqCUPrGQ7BA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+LW-Lp3q9jOjVwFktuLsKajTrmOpUYmQ5SqCUPrGQ7BA@mail.gmail.com>
-From:   Marijn <marijns95@gmail.com>
-Date:   Wed, 22 Jan 2020 01:16:32 +0100
-Message-ID: <CANX-K3vEopmiSATkZyDS38CJ0_uTWd0ArKdyJi1UYQRCN2pELQ@mail.gmail.com>
-Subject: Re: [BlueZ PATCH] audio: avrcp: Ignore peer RT supported_events when
- being the RT.
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20200118204423.494209-1-marijns95@gmail.com>
+In-Reply-To: <20200118204423.494209-1-marijns95@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 21 Jan 2020 16:32:41 -0800
+Message-ID: <CABBYNZLmQK6+MXT1AQt_OYYFeXJmE+t+Mkw1hjSC0Gdss=+60g@mail.gmail.com>
+Subject: Re: [BlueZ PATCH] shared: shell: Only omit consecutive duplicate
+ history lines.
+To:     Marijn Suijten <marijns95@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,151 +69,53 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Marijn,
 
-On Tue, 21 Jan 2020 at 23:48, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Sat, Jan 18, 2020 at 12:46 PM Marijn Suijten <marijns95@gmail.com> wrote:
 >
-> Hi Marijn,
+> From: Marijn Suijten <marijns95@gmail.com>
 >
-> On Sat, Jan 18, 2020 at 11:52 AM Marijn Suijten <marijns95@gmail.com> wrote:
-> >
-> > From: Marijn Suijten <marijns95@gmail.com>
-> >
-> > Remove the check of a received event against supported_events in
-> > avrcp_handle_register_notification, which is only called when BlueZ is
-> > the RT even though supported_events is only valid when BlueZ is the TG.
-> >
-> > supported_events is assigned in target_init with events that the
-> > corresponding RT on the other side of the Bluetooth connection supports,
-> > to ensure the local TG will never report anything unexpected in
-> > avrcp_handle_get_capabilities. This value is specific to what the target
-> > should support to be compatible with the peer RT, but a locally running
-> > RT has nothing to do with the external device being the RT.
-> >
-> > This addresses the case where Absolute Volume notification registrations
-> > are rejected when audio is played from an Android device to a computer
-> > running BlueZ. The Android BT stack report an RT of version 1.3 [1]
-> > which does not include Absolute Volume support. The RT on the Android
-> > device is not involved in such a playback session, instead the computer
-> > is the RT and the Android device the TG.
-> >
-> > This has been tested by disabling registration of the RT service in
-> > Android, to make the device a "pure" media player that cannot receive
-> > audio: target_init does not get called and supported_events stays 0
-> > which would have caused any notification registration to be rejected in
-> > the above case.
+> Change rl_handler to append duplicate history, as long as it isn't
+> identical to the last line. It prevents consecutive duplicates while
+> still having an accurate overview of the most recent commands used,
+> mimicking most modern shells.
 >
-> I assume you have a typo on RT instead of CT, is that right? From
-> qualification point of view anything initiated by a device is
-> considered a CT role, much like GATT server and client roles, so we
-> may have instances where both CT and TG are supported simultaneously.
-
-I have indeed missed this distinction entirely. Looking at the AVRCP
-spec (1.6) section 2.2.1 "Roles" the CT/TG naming indeed denotes
-initiator and receiver, respectively. I blindly assumed these matched
-the roles of "target" and "remote"/"controller" following the naming
-of the profiles. Knowing this makes reading section 6.18 much more
-clear; the sink is assumed to be the TG only in the specific case of
-the SetAbsoluteVolume call, for example. I will update the commit to
-mention "target" and "controller" instead (like the rest of the code),
-hopefully finding and clearing up the typo that way.
-
+> This addresses my only major gripe with bluetoothctl: pressing UP does
+> not retrieve the last typed command when it is a duplicate of something
+> else written (much) earlier in the history. It is especially noticeable
+> when needing the same command repeatedly.
+> ---
+>  src/shared/shell.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
-> > [1]: https://android.googlesource.com/platform/system/bt/+/android-10.0.0_r25/bta/av/bta_av_main.cc#712
-> > ---
-> > Hi,
-> >
-> > I have a separate patch lying around that - instead of removing
-> > supported_events - splits it up in two variables; one for the target and
-> > another for the controller. Let me know if this extra safety is desired.
-> >
-> > According to the AVRCP 1.3 specification GetCapabilities is mandatory,
-> > which I have included in that patch. However the documentation also
-> > mentions that this function is only supposed to be called by the CT
-> > meaning that the call in target_init (introduced in 27efc30f0) is not
-> > valid. What is your view on this?
-> > Unfortunately even the small pair of in-ears I have lying around report
-> > AVRCP TG functionality while they are not nearly capable of being a
-> > target/media-source, so I have not been able to confirm how a pure RT
-> > device would respond in such case.
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index cfdcc76c4..2e094b8f1 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -681,6 +681,7 @@ int bt_shell_release_prompt(const char *input)
+>  static void rl_handler(char *input)
+>  {
+>         wordexp_t w;
+> +       HIST_ENTRY *last;
 >
-> As I mentioned above the qualification tests requires both TG and CT
-> for things like absolute volume to work as notifications for volume
-> changes originate from the device rendering the audio/sink not the
-> source, so the typical association of sink/CT, source/TG is no longer
-> true and before you ask, yes we have some code and comments leading to
-> that assumption which we should probably fix at some point so I guess
-> having the supported events in 2 is probably a good idea, though
-> notice that it should probably be local and remote events since event
-> afaik are always originated from the TG role.
-
-If there is any code it must be very minor, as I have based the
-sink/CT, source/TG association solely on the AVRCP documentation. I do
-see it in the creation of of sdp records though, is that what you're
-hinting at?
-According to the documentation it is likely the CT requests a
-notification, and the TG completes it in due time. But because both
-the controller and the target can fulfill the CT and TG role (keeping
-in mind predefined directionality in for example SetAbsoluteVolume), I
-don't think that distinction should make it into my patch. Instead,
-the separation will be solely based on what the local/peer controller
-and target support. The issue still holds that BlueZ in controller
-role incorrectly rejects notification registrations, because
-supported_events is merely based on the peer controller version.
-Splitting supported events seems the way forward: I'll improve the
-patch and resubmit it, then we can decide. Likewise, should
-registered_events be separated across the target and controller role
-too? Or is it unexpected to have a target _and_ controller running on
-both devices, simultaneously (this would imply two transports, in both
-directions, playing back media)?
-
-Locally supported events seem hard to quantify as BlueZ can send out
-events for anything that's physically in the code at any point
-(supposedly anything available according to AVRCP_{CT,TG}_VERSION),
-unless we want to prevent the CT from requesting notifications it
-couldn't realistically support given its profile version.
-
+>         if (!input) {
+>                 rl_insert_text("quit");
+> @@ -696,7 +697,9 @@ static void rl_handler(char *input)
+>         if (!bt_shell_release_prompt(input))
+>                 goto done;
 >
-> >
-> > - Marijn Suijten
-> >
-> >  profiles/audio/avrcp.c | 4 ----
-> >  1 file changed, 4 deletions(-)
-> >
-> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> > index 7fb8af608..820494d2a 100644
-> > --- a/profiles/audio/avrcp.c
-> > +++ b/profiles/audio/avrcp.c
-> > @@ -1529,10 +1529,6 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
-> >         if (len != 5)
-> >                 goto err;
-> >
-> > -       /* Check if event is supported otherwise reject */
-> > -       if (!(session->supported_events & (1 << pdu->params[0])))
-> > -               goto err;
+> -       if (history_search(input, -1))
+> +       last = history_get(history_length + history_base - 1);
+> +       /* append only if input is different from previous command */
+> +       if (!last || strcmp(input, last->line))
+>                 add_history(input);
 >
-> When receiving a request our role is TG so I don't see why we would
-> skip this check, a better way to fix this would be to add the
-> separated supported events like discussed above so we have the roles
-> operating independent as they should be.
-
-I will update this to take into account the target/controller role at
-the time the call is made. Is there any way to figure out what role
-the TG is fulfilling? set_volume in transport.c for example bases that
-on whether the transport has source_watch set, meaning the device is
-the sink playing back audio from a peer device which is the source.
-
->
-> >         switch (pdu->params[0]) {
-> >         case AVRCP_EVENT_STATUS_CHANGED:
-> >                 len = 2;
-> > --
-> > 2.25.0
-> >
->
->
+>         if (data.monitor)
 > --
-> Luiz Augusto von Dentz
+> 2.25.0
 
-- Marijn
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
