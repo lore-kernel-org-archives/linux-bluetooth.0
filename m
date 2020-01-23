@@ -2,75 +2,67 @@ Return-Path: <SRS0=lRrI=3M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FD4C33CAA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jan 2020 23:14:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6E4C35240
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jan 2020 23:30:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A83F20684
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jan 2020 23:14:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 290D2207FF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jan 2020 23:30:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SaVwgSuA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkyACjmL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729559AbgAWXOE (ORCPT
+        id S1729993AbgAWXaB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jan 2020 18:14:04 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:38901 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729546AbgAWXOD (ORCPT
+        Thu, 23 Jan 2020 18:30:01 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:38510 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729934AbgAWXaB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jan 2020 18:14:03 -0500
-Received: by mail-ot1-f66.google.com with SMTP id z9so4513124oth.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2020 15:14:03 -0800 (PST)
+        Thu, 23 Jan 2020 18:30:01 -0500
+Received: by mail-oi1-f193.google.com with SMTP id l9so205121oii.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jan 2020 15:30:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=jfZ6PqzdY3UJ50IFdqGJ0SYi6XBLrvXzq1DVeJ23b24=;
-        b=SaVwgSuAuPTqztpD/q/4goKm5RR45Be96i5EH1LJr+SJe5JgOejN3gye/oR0lT3dna
-         k8WE99Tgy7Ln4SDTUV6j2B1pfCR2Zd4+Ot9s1pnr9cBk+MXX9LtaqZc+a3gkpDKmvZiy
-         vCUkMjYvf1CgT49Z6YBFp50H3y2qVmGSGi/F4Yw3I7QFch8+VcTwJ5ngRYrqK+HOzK04
-         qMYnW4a8gR5/vJezO8SpV6+9TNmCPLJUaCGz58xdln8CzxfWNUT9PlgqKNtCHZvRL0tq
-         oNqgKH48N8JEjss7G1Rz2B+fcqD57N4wH1eF0Mt3+//uJ0oNPojTgbEPeD8soavJFMHU
-         ZZwg==
+        bh=E5QAXWRdWMIAkzcWMbHsfy+72JaiJcc13wSY3fgfJdE=;
+        b=bkyACjmLCXejTuFxiSBmZIlOxv9mFiJSEtxYsD2sltIuCRwbx9KJr4IkS61POCaXxz
+         3V7EiApXtQt2xU2dRdpYePUqyQoWYvrs5HsX/ljAe/VmZ7HwyimdDKUwMCOZkcNh43xl
+         L8tGEimZeOnPqQ9y8j1NYcyUordk2u4iLdQ74z67AvB0u8Lpr9yxN6TWoASzHc63WYnZ
+         6HtEhooLCFRIXwM9vBVANDAOTCSGH/KPgLopahEXilOHDxo3BQHDrVsa3Xx+O4JrGAId
+         pgoB0RZMUT1e9h4MwYZ7HGjVnZcNCI/Qi38jhBVtvEz2eDmeQHEyYh9o0rLo0vejww40
+         h5rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=jfZ6PqzdY3UJ50IFdqGJ0SYi6XBLrvXzq1DVeJ23b24=;
-        b=hVdc1hkrQDKNikgcG8I8T7B1fZyRsGXPOVcX0tKADODen/h//kRarODWrSmEMzYEzS
-         T9fIU0+i+ZSwUgydxRuqkRsdrBJDl3MHDGwO5qRoKhF8ANrnu+4+sSkEYivBBWM2yvG1
-         6CcvPW0feK6Dp1tqqcrQJ5pQ1GFfM/9b/H6L6UNp65+5pTTXvJ55Eqsii2K4L+pYR4GU
-         90jegUrZzkhbOyVWXHfssl92GIy+vZovaO3fwb1G3r2ZAzQzHsuJ1vI0Wqoc6BYlHE1S
-         4iO/J4A7DTWKOm6whTMjv5a4m5kykid+2oNP+urjtafkMHFWTKjSLmhr6yW6jU6orccU
-         UTvQ==
-X-Gm-Message-State: APjAAAXTfAxgqax8bOldi+m5xt8JnO3Hnm96vmhKVp+TToWu5WDmMGf2
-        mKXx1V3NNC0sgslj/CZd3jtbZKkuO75lOShyuMk=
-X-Google-Smtp-Source: APXvYqwA1zkkDvHOFdJ3wqqevzwjgQVd621bM534sBoitVQXxGMsdHdY+PjZRYKhToYTrnLSLLvVzo3pKKSNv5ulRFI=
-X-Received: by 2002:a05:6830:1515:: with SMTP id k21mr561871otp.177.1579821242664;
- Thu, 23 Jan 2020 15:14:02 -0800 (PST)
+        bh=E5QAXWRdWMIAkzcWMbHsfy+72JaiJcc13wSY3fgfJdE=;
+        b=FwzNRG8nnVTd6zdqoPcRpcoV/aWQSBbgxicxFT0dcPUUm7DGuiTAmij+wM6foNVA2H
+         ZlQxJTlvH9JCvIYC8IUnJoWG5g/F+XK7rzwA+XCWsZ26v4MM/J+qwU/prSQFYvohYcY9
+         rhZ6Voushbif2lwPBoro4uYRIhvPJMFmCxh8bjKMpC9kSvgASbsIcS4lu+O52ImqIMwT
+         KAaNkzVjzfJdXZyEIj14fYbrBPlI5IE8KVnrdyODD76oYKLtWdD9olWKGaVjNx5vCHL2
+         9S7jEGmnXv2QRPWW7FGDkKEv/YArawKs8eSgIQU+MDGuaiD+2ICF+YJaYzHBIEyLJf6H
+         SEUw==
+X-Gm-Message-State: APjAAAXMut7k4EUL7shDNEFZEM+cyURTH65bBx0tbmrJ0Zv6WnsR6a38
+        O4a0AW1F+nlb3tgVq47rInfJPQsGuYnq4Pew3j7LzLrr
+X-Google-Smtp-Source: APXvYqxcilYgjqiVNOQ+y/oh8c9hTgXxgGSgzPg1FqcOSB+vLDYG5o+bn7GXJsvdie6+GnknNH76eyGz3g8EulsjMto=
+X-Received: by 2002:aca:b1d5:: with SMTP id a204mr260006oif.82.1579822199471;
+ Thu, 23 Jan 2020 15:29:59 -0800 (PST)
 MIME-Version: 1.0
-References: <20200120202708.111383-1-alainm@chromium.org> <6E55772A-01D5-4616-B3DB-CC22B935C855@holtmann.org>
- <CALWDO_WyZUvkOgXVSd12q7Trg_=LqSb9KQsXH9_C_k8_kD0ddQ@mail.gmail.com>
- <D0C01568-E48B-46ED-A2CC-D19FB2895756@gmail.com> <CALWDO_Wf3c5Vgt1a_p+pt_SpdkGJnLvneiZZ_1spRVuOr+9n0g@mail.gmail.com>
- <CALWDO_VC2z8ZxCQM0EBWvkEWJRQKaVy0butAeRc+uUqhpGcyMw@mail.gmail.com>
- <DFE9B731-5CB8-4FDA-8E89-1D5A51EAFB67@holtmann.org> <CALWDO_V=Q0725MhnA3hMnvL+hDbGVCa-RCT4d4NCysMo0Fvh7g@mail.gmail.com>
- <F6319DB4-FE70-45C8-A61D-D965CB659C9E@holtmann.org> <CALWDO_Vqboxt4JfV9yGVd5Jv5jZ-vwtOghh4tffpQpQzHuq6NQ@mail.gmail.com>
- <D61B5AA9-A509-4253-95D7-F6401C832081@holtmann.org> <CALWDO_Ub-orioZmPkCC4BoVfxHv9onP9QXz_M_T9nmh7_78LLQ@mail.gmail.com>
-In-Reply-To: <CALWDO_Ub-orioZmPkCC4BoVfxHv9onP9QXz_M_T9nmh7_78LLQ@mail.gmail.com>
+References: <20200116212743.21016-1-luiz.dentz@gmail.com> <20200116212743.21016-2-luiz.dentz@gmail.com>
+ <845FE55B-5172-4A4D-8A0F-2C971A084B8A@holtmann.org>
+In-Reply-To: <845FE55B-5172-4A4D-8A0F-2C971A084B8A@holtmann.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 23 Jan 2020 15:13:50 -0800
-Message-ID: <CABBYNZKESdA4V7N8sVc6g31gsfN6G8=NH=-EU3q0phvfg5HGuA@mail.gmail.com>
-Subject: Re: [Bluez PATCH] doc: Add definition for Set Kernel Debug Level
-To:     Alain Michaud <alainmichaud@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Archie Pusaka <apusaka@google.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Alain Michaud <alainm@chromium.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 23 Jan 2020 15:29:47 -0800
+Message-ID: <CABBYNZJEphsTt4U_ruunQS_7hAdLVO2NsZeT8swMRA7127nAGA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: L2CAP: Add initial code for Enhanced
+ Credit Based Mode
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -78,75 +70,925 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain, Marcel,
+Hi Marcel,
 
-On Thu, Jan 23, 2020 at 10:20 AM Alain Michaud <alainmichaud@google.com> wr=
-ote:
+On Thu, Jan 23, 2020 at 10:00 AM Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
 >
-> Hi Marcel,
+> Hi Luiz,
 >
-> That makes sense.  Adding +Archie Pusaka as well who may have input into =
-this.
+> > This adds the initial code for Enhanced Credit Based Mode which
+> > introduces a new socket mode called L2CAP_MODE_EXT_FLOWCTL, which for
+> > the most part work the same as L2CAP_MODE_LE_FLOWCTL but uses different
+> > PDUs to setup the connections and also works over BR/EDR.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > include/net/bluetooth/l2cap.h |   4 +
+> > net/bluetooth/l2cap_core.c    | 510 +++++++++++++++++++++++++++++++++-
+> > net/bluetooth/l2cap_sock.c    |  39 +--
+> > 3 files changed, 521 insertions(+), 32 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2ca=
+p.h
+> > index b9ea88cfd2d2..11ae4c93354b 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -295,6 +295,8 @@ struct l2cap_conn_rsp {
+> > #define L2CAP_CR_LE_ENCRYPTION                0x0008
+> > #define L2CAP_CR_LE_INVALID_SCID      0x0009
+> > #define L2CAP_CR_LE_SCID_IN_USE               0X000A
+> > +#define L2CAP_CR_LE_UNACCEPT_PARAMS  0X000B
+> > +#define L2CAP_CR_LE_INVALID_PARAMS   0X000C
+> >
+> > /* connect/create channel status */
+> > #define L2CAP_CS_NO_INFO      0x0000
+> > @@ -964,6 +966,7 @@ void l2cap_cleanup_sockets(void);
+> > bool l2cap_is_socket(struct socket *sock);
+> >
+> > void __l2cap_le_connect_rsp_defer(struct l2cap_chan *chan);
+> > +void __l2cap_ecred_conn_rsp_defer(struct l2cap_chan *chan);
+> > void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
+> >
+> > int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
+> > @@ -973,6 +976,7 @@ struct l2cap_chan *l2cap_chan_create(void);
+> > void l2cap_chan_close(struct l2cap_chan *chan, int reason);
+> > int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+> >                      bdaddr_t *dst, u8 dst_type);
+> > +int l2cap_chan_reconfigure(struct l2cap_chan *chan, __u16 mtu);
+> > int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t=
+ len);
+> > void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+> > int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 195459a1e53e..a528526cffac 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -532,6 +532,17 @@ static void l2cap_le_flowctl_init(struct l2cap_cha=
+n *chan, u16 tx_credits)
+> >       skb_queue_head_init(&chan->tx_q);
+> > }
+> >
+> > +static void l2cap_ecred_init(struct l2cap_chan *chan, u16 tx_credits)
+> > +{
+> > +     l2cap_le_flowctl_init(chan, tx_credits);
+> > +
+> > +     /* L2CAP implementations shall support a minimum MPS of 64 octets=
+ */
+> > +     if (chan->mps < L2CAP_ECRED_MIN_MPS) {
+> > +             chan->mps =3D L2CAP_ECRED_MIN_MPS;
+> > +             chan->rx_credits =3D (chan->imtu / chan->mps) + 1;
+> > +     }
+> > +}
+> > +
+> > void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+> > {
+> >       BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+> > @@ -638,6 +649,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int er=
+r)
+> >               break;
+> >
+> >       case L2CAP_MODE_LE_FLOWCTL:
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> >               skb_queue_purge(&chan->tx_q);
+> >               break;
+> >
+> > @@ -1260,6 +1272,17 @@ static void l2cap_move_done(struct l2cap_chan *c=
+han)
+> >       }
+> > }
+> >
+> > +static bool l2cap_mode_ready(struct l2cap_chan *chan)
+> > +{
+> > +     switch (chan->mode) {
+> > +     case L2CAP_MODE_LE_FLOWCTL:
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> > +             return chan->tx_credits ? true : false;
+> > +     }
+> > +
+> > +     return true;
+> > +}
+> > +
+> > static void l2cap_chan_ready(struct l2cap_chan *chan)
+> > {
+> >       /* The channel may have already been flagged as connected in
+> > @@ -1273,7 +1296,7 @@ static void l2cap_chan_ready(struct l2cap_chan *c=
+han)
+> >       chan->conf_state =3D 0;
+> >       __clear_chan_timer(chan);
+> >
+> > -     if (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL && !chan->tx_credits)
+> > +     if (!l2cap_mode_ready(chan))
+> >               chan->ops->suspend(chan);
 >
-> Thanks,
-> Alain
+>         switch (chan->mode) {
+>         case ..
+>         case ..
+>                 if (!chan->tx_credits)
+>                         chan->ops->suspend(chan);
+>                 break;
+>         }
 >
-> On Thu, Jan 23, 2020 at 1:16 PM Marcel Holtmann <marcel@holtmann.org> wro=
-te:
 > >
-> > Hi Alain,
+> >       chan->state =3D BT_CONNECTED;
+> > @@ -1306,6 +1329,31 @@ static void l2cap_le_connect(struct l2cap_chan *=
+chan)
+> >                      sizeof(req), &req);
+> > }
 > >
-> > > From a high level, this looks good for me although I agree, this is a=
-n
-> > > order of magnitude bigger in terms of scope.  Can you suggest perhaps
-> > > an interactive way to deliver this over a period of time, perhaps
-> > > prioritizing the BT_DEBUG kernel messages first? :)
+> > +static void l2cap_ecred_connect(struct l2cap_chan *chan)
+> > +{
+> > +     struct l2cap_conn *conn =3D chan->conn;
+> > +     struct {
+> > +             struct l2cap_ecred_conn_req req;
+> > +             __le16 scid;
+> > +     } __packed pdu;
+> > +
+> > +     if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
+> > +             return;
+> > +
+> > +     l2cap_ecred_init(chan, 0);
+> > +
+> > +     pdu.req.psm     =3D chan->psm;
+> > +     pdu.req.mtu     =3D cpu_to_le16(chan->imtu);
+> > +     pdu.req.mps     =3D cpu_to_le16(chan->mps);
+> > +     pdu.req.credits =3D cpu_to_le16(chan->rx_credits);
+> > +     pdu.scid        =3D cpu_to_le16(chan->scid);
+> > +
+> > +     chan->ident =3D l2cap_get_ident(conn);
+> > +
+> > +     l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_CONN_REQ,
+> > +                    sizeof(pdu), &pdu);
+> > +}
+> > +
+> > static void l2cap_le_start(struct l2cap_chan *chan)
+> > {
+> >       struct l2cap_conn *conn =3D chan->conn;
+> > @@ -1318,8 +1366,12 @@ static void l2cap_le_start(struct l2cap_chan *ch=
+an)
+> >               return;
+> >       }
 > >
-> > I am always in favor of increasing the ability to debug things, but we =
-need to do this in a clean fashion and not some short term hacks (since the=
-y will come back and haunt us). I like to get some review on my idea first.
+> > -     if (chan->state =3D=3D BT_CONNECT)
+> > -             l2cap_le_connect(chan);
+> > +     if (chan->state =3D=3D BT_CONNECT) {
+> > +             if (chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL)
+> > +                     l2cap_ecred_connect(chan);
+> > +             else
+> > +                     l2cap_le_connect(chan);
+> > +     }
+> > }
 > >
-> > What we could do is work on the BT_DBG etc infrastructure to allow swit=
-ching when dynamic_debug is not available. Then you would use some debugfs =
-toggle in /sys/kernel/debug/bluetooth since that is no stable API for us (a=
-nd of course the clear understanding that this toggle is temporary).
+> > static void l2cap_start_connection(struct l2cap_chan *chan)
+> > @@ -2505,6 +2557,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, stru=
+ct msghdr *msg, size_t len)
 > >
+> >       switch (chan->mode) {
+> >       case L2CAP_MODE_LE_FLOWCTL:
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> >               /* Check outgoing MTU */
+> >               if (len > chan->omtu)
+> >                       return -EMSGSIZE;
+> > @@ -3773,6 +3826,42 @@ void __l2cap_le_connect_rsp_defer(struct l2cap_c=
+han *chan)
+> >                      &rsp);
+> > }
+> >
+> > +void __l2cap_ecred_conn_rsp_defer(struct l2cap_chan *chan)
+> > +{
+> > +     struct l2cap_ecred_conn_rsp rsp;
+> > +     struct l2cap_conn *conn =3D chan->conn;
+> > +     u16 ident =3D chan->ident;
+> > +     int i =3D 0;
+> > +
+> > +     if (!ident) {
+> > +             return;
+> > +     }
+> > +
+>
+> No { } here.
+>
+> > +     BT_DBG("chan %p ident %d", chan, ident);
+> > +
+> > +     rsp.mtu     =3D cpu_to_le16(chan->imtu);
+> > +     rsp.mps     =3D cpu_to_le16(chan->mps);
+> > +     rsp.credits =3D cpu_to_le16(chan->rx_credits);
+> > +     rsp.result  =3D cpu_to_le16(L2CAP_CR_LE_SUCCESS);
+> > +
+> > +     mutex_lock(&conn->chan_lock);
+> > +
+> > +     list_for_each_entry(chan, &conn->chan_l, list) {
+> > +             if (chan->ident !=3D ident)
+> > +                     continue;
+> > +
+> > +             /* Reset ident so only one response is sent */
+> > +             chan->ident =3D 0;
+> > +
+> > +             /* Include all channels pending with the same ident */
+> > +             rsp.dcid[i++] =3D cpu_to_le16(chan->scid);
+>
+> This doesn=E2=80=99t work. The sizeof(rsp) has no dcid in there. You are =
+overflowing into conn struct here.
+>
+> > +     }
+> > +
+> > +     mutex_unlock(&conn->chan_lock);
+> > +
+> > +     l2cap_send_cmd(conn, ident, L2CAP_ECRED_CONN_RSP, sizeof(rsp), &r=
+sp);
+> > +}
+> > +
+> > void __l2cap_connect_rsp_defer(struct l2cap_chan *chan)
+> > {
+> >       struct l2cap_conn_rsp rsp;
+> > @@ -5714,6 +5803,347 @@ static inline int l2cap_le_credits(struct l2cap=
+_conn *conn,
+> >       return 0;
+> > }
+> >
+> > +static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
+> > +                                    struct l2cap_cmd_hdr *cmd, u16 cmd=
+_len,
+> > +                                    u8 *data)
+> > +{
+> > +     struct l2cap_ecred_conn_req *req =3D (void *) data;
+> > +     struct {
+> > +             struct l2cap_ecred_conn_rsp rsp;
+> > +             __le16 dcid[5];
+> > +     } __packed pdu;
+> > +     struct l2cap_chan *chan, *pchan;
+> > +     u16 credits, mtu, mps;
+> > +     __le16 psm;
+> > +     u8 result, len =3D 0;
+> > +     int i;
+> > +     bool defer =3D false;
+> > +
+> > +     if (cmd_len < sizeof(*req))
+> > +             return -EPROTO;
+> > +
+> > +     mtu  =3D __le16_to_cpu(req->mtu);
+> > +     mps  =3D __le16_to_cpu(req->mps);
+> > +
+> > +     if (mtu < L2CAP_ECRED_MIN_MTU || mps < L2CAP_ECRED_MIN_MPS) {
+> > +             result =3D L2CAP_CR_LE_UNACCEPT_PARAMS;
+> > +             goto response;
+> > +     }
+> > +
+> > +     psm  =3D req->psm;
+> > +     credits =3D 0;
+> > +
+> > +     BT_DBG("psm 0x%2.2x mtu %u mps %u", __le16_to_cpu(psm), mtu, mps)=
+;
+> > +
+> > +     memset(&pdu, 0, sizeof(pdu));
+> > +
+> > +     /* Check if we have socket listening on psm */
+> > +     pchan =3D l2cap_global_chan_by_psm(BT_LISTEN, psm, &conn->hcon->s=
+rc,
+> > +                                      &conn->hcon->dst, LE_LINK);
+> > +     if (!pchan) {
+> > +             result =3D L2CAP_CR_LE_BAD_PSM;
+> > +             goto response;
+> > +     }
+> > +
+> > +     mutex_lock(&conn->chan_lock);
+> > +     l2cap_chan_lock(pchan);
+> > +
+> > +     if (!smp_sufficient_security(conn->hcon, pchan->sec_level,
+> > +                                  SMP_ALLOW_STK)) {
+> > +             result =3D L2CAP_CR_LE_AUTHENTICATION;
+> > +             goto unlock;
+> > +     }
+> > +
+> > +     result =3D L2CAP_CR_LE_SUCCESS;
+> > +
+> > +     for (i =3D 0, cmd_len -=3D sizeof(req); cmd_len >=3D sizeof(u16);
+> > +          i++, cmd_len -=3D sizeof(u16)) {
+>
+> Can we simplify the loop statement or switch to while statement?
+>
+> > +             u16 scid =3D __le16_to_cpu(req->scid[i]);
+> > +
+> > +             BT_DBG("scid[%d] 0x%4.4x", i, scid);
+> > +
+> > +             pdu.dcid[i] =3D 0x0000;
+> > +             len +=3D sizeof(*pdu.dcid);
+> > +
+> > +             /* Check for valid dynamic CID range */
+> > +             if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_LE_DYN=
+_END) {
+> > +                     result =3D L2CAP_CR_LE_INVALID_SCID;
+> > +                     continue;
+> > +             }
+> > +
+> > +             /* Check if we already have channel with that dcid */
+> > +             if (__l2cap_get_chan_by_dcid(conn, scid)) {
+> > +                     result =3D L2CAP_CR_LE_SCID_IN_USE;
+> > +                     continue;
+> > +             }
+> > +
+> > +             chan =3D pchan->ops->new_connection(pchan);
+> > +             if (!chan) {
+> > +                     result =3D L2CAP_CR_LE_NO_MEM;
+> > +                     continue;
+> > +             }
+> > +
+> > +             bacpy(&chan->src, &conn->hcon->src);
+> > +             bacpy(&chan->dst, &conn->hcon->dst);
+> > +             chan->src_type =3D bdaddr_src_type(conn->hcon);
+> > +             chan->dst_type =3D bdaddr_dst_type(conn->hcon);
+> > +             chan->psm  =3D psm;
+> > +             chan->dcid =3D scid;
+> > +             chan->omtu =3D mtu;
+> > +             chan->remote_mps =3D mps;
+> > +
+> > +             __l2cap_chan_add(conn, chan);
+> > +
+> > +             l2cap_ecred_init(chan, __le16_to_cpu(req->credits));
+> > +
+> > +             /* Init response */
+> > +             if (!pdu.rsp.credits) {
+> > +                     pdu.rsp.mtu =3D cpu_to_le16(chan->imtu);
+> > +                     pdu.rsp.mps =3D cpu_to_le16(chan->mps);
+> > +                     pdu.rsp.credits =3D cpu_to_le16(chan->rx_credits)=
+;
+> > +             }
+> > +
+> > +             pdu.dcid[i] =3D cpu_to_le16(chan->scid);
+> > +
+> > +             __set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
+> > +
+> > +             chan->ident =3D cmd->ident;
+> > +
+> > +             if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+> > +                     l2cap_state_change(chan, BT_CONNECT2);
+> > +                     defer =3D true;
+> > +                     chan->ops->defer(chan);
+> > +             } else {
+> > +                     l2cap_chan_ready(chan);
+> > +             }
+> > +     }
+> > +
+> > +unlock:
+> > +     l2cap_chan_unlock(pchan);
+> > +     mutex_unlock(&conn->chan_lock);
+> > +     l2cap_chan_put(pchan);
+> > +
+> > +response:
+> > +     pdu.rsp.result =3D cpu_to_le16(result);
+> > +
+> > +     if (defer)
+> > +             return 0;
+> > +
+> > +     l2cap_send_cmd(conn, cmd->ident, L2CAP_ECRED_CONN_RSP,
+> > +                    sizeof(pdu.rsp) + len, &pdu);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
+> > +                                    struct l2cap_cmd_hdr *cmd, u16 cmd=
+_len,
+> > +                                    u8 *data)
+> > +{
+> > +     struct l2cap_ecred_conn_rsp *rsp =3D (void *) data;
+> > +     struct hci_conn *hcon =3D conn->hcon;
+> > +     u16 mtu, mps, credits, result;
+> > +     struct l2cap_chan *chan;
+> > +     int err =3D 0, sec_level;
+> > +     int i =3D 0;
+> > +
+> > +     if (cmd_len < sizeof(*rsp))
+> > +             return -EPROTO;
+> > +
+> > +     mtu     =3D __le16_to_cpu(rsp->mtu);
+> > +     mps     =3D __le16_to_cpu(rsp->mps);
+> > +     credits =3D __le16_to_cpu(rsp->credits);
+> > +     result  =3D __le16_to_cpu(rsp->result);
+> > +
+> > +     BT_DBG("mtu %u mps %u credits %u result 0x%4.4x", mtu, mps, credi=
+ts,
+> > +            result);
+> > +
+> > +     mutex_lock(&conn->chan_lock);
+> > +
+> > +     cmd_len -=3D sizeof(*rsp);
+> > +
+> > +     list_for_each_entry(chan, &conn->chan_l, list) {
+> > +             u16 dcid;
+> > +
+> > +             if (chan->ident !=3D cmd->ident ||
+> > +                 chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL ||
+> > +                 chan->state =3D=3D BT_CONNECTED)
+> > +                     continue;
+> > +
+> > +             l2cap_chan_lock(chan);
+> > +
+> > +             /* Check that there is a dcid for each pending channel */
+> > +             if (cmd_len < sizeof(dcid)) {
+> > +                     l2cap_chan_del(chan, ECONNREFUSED);
+> > +                     l2cap_chan_unlock(chan);
+> > +                     continue;
+> > +             }
+> > +
+> > +             dcid =3D __le16_to_cpu(rsp->dcid[i++]);
+> > +             cmd_len -=3D sizeof(u16);
+> > +
+> > +             BT_DBG("dcid[%d] 0x%4.4x", i, dcid);
+> > +
+> > +             /* Check if dcid is already in use */
+> > +             if (dcid && __l2cap_get_chan_by_dcid(conn, dcid)) {
+> > +                     /* If a device receives a
+> > +                      * L2CAP_CREDIT_BASED_CONNECTION_RSP packet with =
+an
+> > +                      * already-assigned Destination CID, then both th=
+e
+> > +                      * original channel and the new channel shall be
+> > +                      * immediately discarded and not used.
+> > +                      */
+> > +                     l2cap_chan_del(chan, ECONNREFUSED);
+> > +                     l2cap_chan_unlock(chan);
+> > +                     chan =3D __l2cap_get_chan_by_dcid(conn, dcid);
+> > +                     l2cap_chan_lock(chan);
+> > +                     l2cap_chan_del(chan, ECONNRESET);
+> > +                     l2cap_chan_unlock(chan);
+> > +                     continue;
+> > +             }
+> > +
+> > +             switch (result) {
+> > +             case L2CAP_CR_LE_AUTHENTICATION:
+> > +             case L2CAP_CR_LE_ENCRYPTION:
+> > +                     /* If we already have MITM protection we can't do
+> > +                      * anything.
+> > +                      */
+> > +                     if (hcon->sec_level > BT_SECURITY_MEDIUM) {
+> > +                             l2cap_chan_del(chan, ECONNREFUSED);
+> > +                             break;
+> > +                     }
+> > +
+> > +                     sec_level =3D hcon->sec_level + 1;
+> > +                     if (chan->sec_level < sec_level)
+> > +                             chan->sec_level =3D sec_level;
+> > +
+> > +                     /* We'll need to send a new Connect Request */
+> > +                     clear_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags)=
+;
+> > +
+> > +                     smp_conn_security(hcon, chan->sec_level);
+> > +                     break;
+> > +
+> > +             case L2CAP_CR_LE_BAD_PSM:
+> > +                     l2cap_chan_del(chan, ECONNREFUSED);
+> > +                     break;
+> > +
+> > +             default:
+> > +                     /* If dcid was not set it means channels was refu=
+sed */
+> > +                     if (!dcid) {
+> > +                             l2cap_chan_del(chan, ECONNREFUSED);
+> > +                             break;
+> > +                     }
+> > +
+> > +                     chan->ident =3D 0;
+> > +                     chan->dcid =3D dcid;
+> > +                     chan->omtu =3D mtu;
+> > +                     chan->remote_mps =3D mps;
+> > +                     chan->tx_credits =3D credits;
+> > +                     l2cap_chan_ready(chan);
+> > +                     break;
+> > +             }
+> > +
+> > +             l2cap_chan_unlock(chan);
+> > +     }
+> > +
+> > +     mutex_unlock(&conn->chan_lock);
+> > +
+> > +     return err;
+> > +}
+> > +
+> > +static inline int l2cap_ecred_reconf_req(struct l2cap_conn *conn,
+> > +                                      struct l2cap_cmd_hdr *cmd, u16 c=
+md_len,
+> > +                                      u8 *data)
+> > +{
+> > +     struct l2cap_ecred_reconf_req *req =3D (void *) data;
+> > +     struct l2cap_ecred_reconf_rsp rsp;
+> > +     u16 mtu, mps, result;
+> > +     struct l2cap_chan *chan;
+> > +     int i;
+> > +
+> > +     if (cmd_len < sizeof(*req)) {
+> > +             result =3D L2CAP_CR_LE_INVALID_PARAMS;
+> > +             goto respond;
+> > +     }
+> > +
+> > +     mtu =3D __le16_to_cpu(req->mtu);
+> > +     mps =3D __le16_to_cpu(req->mps);
+> > +
+> > +     BT_DBG("mtu %u mps %u", mtu, mps);
+> > +
+> > +     if (mtu < L2CAP_ECRED_MIN_MTU) {
+> > +             result =3D L2CAP_RECONF_INVALID_MTU;
+> > +             goto respond;
+> > +     }
+> > +
+> > +     if (mps < L2CAP_ECRED_MIN_MPS) {
+> > +             result =3D L2CAP_RECONF_INVALID_MPS;
+> > +             goto respond;
+> > +     }
+> > +
+> > +     result =3D L2CAP_RECONF_SUCCESS;
+> > +
+> > +     for (i =3D 0, cmd_len -=3D sizeof(*req); cmd_len < sizeof(u16);
+> > +          i++, cmd_len -=3D sizeof(u16)) {
+>
+> Same comment as above.
+>
+> > +             u16 scid;
+> > +
+> > +             scid =3D __le16_to_cpu(req->scid[i]);
+> > +             if (!scid)
+> > +                     return -EPROTO;
+> > +
+> > +             chan =3D __l2cap_get_chan_by_dcid(conn, scid);
+> > +             if (!chan)
+> > +                     continue;
+> > +
+> > +             /* If the MTU value is decreased for any of the included
+> > +              * channels, then the receiver shall disconnect all
+> > +              * included channels.
+> > +              */
+> > +             if (chan->omtu > mtu) {
+> > +                     BT_ERR("chan %p decreased MTU %u -> %u", chan,
+> > +                            chan->omtu, mtu);
+> > +                     result =3D L2CAP_RECONF_INVALID_MTU;
+> > +             }
+> > +
+> > +             chan->omtu =3D mtu;
+> > +             chan->remote_mps =3D mps;
+> > +     }
+> > +
+> > +respond:
+> > +     rsp.result =3D cpu_to_le16(result);
+> > +
+> > +     l2cap_send_cmd(conn, cmd->ident, L2CAP_ECRED_RECONF_RSP, sizeof(r=
+sp),
+> > +                    &rsp);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
+> > +                                      struct l2cap_cmd_hdr *cmd, u16 c=
+md_len,
+> > +                                      u8 *data)
+> > +{
+> > +     struct l2cap_chan *chan;
+> > +     struct l2cap_ecred_conn_rsp *rsp =3D (void *) data;
+> > +     u16 result;
+> > +
+> > +     if (cmd_len < sizeof(*rsp))
+> > +             return -EPROTO;
+> > +
+> > +     result =3D __le16_to_cpu(rsp->result);
+> > +
+> > +     BT_DBG("result 0x%4.4x", rsp->result);
+> > +
+> > +     if (!result)
+> > +             return 0;
+> > +
+> > +     list_for_each_entry(chan, &conn->chan_l, list) {
+> > +             if (chan->ident !=3D cmd->ident)
+> > +                     continue;
+> > +
+> > +             l2cap_chan_del(chan, ECONNRESET);
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
+> >                                      struct l2cap_cmd_hdr *cmd, u16 cmd=
+_len,
+> >                                      u8 *data)
+> > @@ -5769,6 +6199,22 @@ static inline int l2cap_le_sig_cmd(struct l2cap_=
+conn *conn,
+> >               err =3D l2cap_le_credits(conn, cmd, cmd_len, data);
+> >               break;
+> >
+> > +     case L2CAP_ECRED_CONN_REQ:
+> > +             err =3D l2cap_ecred_conn_req(conn, cmd, cmd_len, data);
+> > +             break;
+> > +
+> > +     case L2CAP_ECRED_CONN_RSP:
+> > +             err =3D l2cap_ecred_conn_rsp(conn, cmd, cmd_len, data);
+> > +             break;
+> > +
+> > +     case L2CAP_ECRED_RECONF_REQ:
+> > +             err =3D l2cap_ecred_reconf_req(conn, cmd, cmd_len, data);
+> > +             break;
+> > +
+> > +     case L2CAP_ECRED_RECONF_RSP:
+> > +             err =3D l2cap_ecred_reconf_rsp(conn, cmd, cmd_len, data);
+> > +             break;
+> > +
+> >       case L2CAP_DISCONN_REQ:
+> >               err =3D l2cap_disconnect_req(conn, cmd, cmd_len, data);
+> >               break;
+> > @@ -6814,11 +7260,13 @@ static void l2cap_chan_le_send_credits(struct l=
+2cap_chan *chan)
+> >       struct l2cap_le_credits pkt;
+> >       u16 return_credits;
+> >
+> > -     return_credits =3D ((chan->imtu / chan->mps) + 1) - chan->rx_cred=
+its;
+> > +     return_credits =3D (chan->imtu / chan->mps) + 1;
+> >
+> > -     if (!return_credits)
+> > +     if (chan->rx_credits >=3D return_credits)
+> >               return;
+> >
+> > +     return_credits -=3D chan->rx_credits;
+> > +
+> >       BT_DBG("chan %p returning %u credits to sender", chan, return_cre=
+dits);
+> >
+> >       chan->rx_credits +=3D return_credits;
+> > @@ -6831,7 +7279,7 @@ static void l2cap_chan_le_send_credits(struct l2c=
+ap_chan *chan)
+> >       l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CREDITS, sizeof(pkt), =
+&pkt);
+> > }
+> >
+> > -static int l2cap_le_recv(struct l2cap_chan *chan, struct sk_buff *skb)
+> > +static int l2cap_ecred_recv(struct l2cap_chan *chan, struct sk_buff *s=
+kb)
+> > {
+> >       int err;
+> >
+> > @@ -6846,7 +7294,7 @@ static int l2cap_le_recv(struct l2cap_chan *chan,=
+ struct sk_buff *skb)
+> >       return err;
+> > }
+> >
+> > -static int l2cap_le_data_rcv(struct l2cap_chan *chan, struct sk_buff *=
+skb)
+> > +static int l2cap_ecred_data_rcv(struct l2cap_chan *chan, struct sk_buf=
+f *skb)
+> > {
+> >       int err;
+> >
+> > @@ -6894,7 +7342,7 @@ static int l2cap_le_data_rcv(struct l2cap_chan *c=
+han, struct sk_buff *skb)
+> >               }
+> >
+> >               if (skb->len =3D=3D sdu_len)
+> > -                     return l2cap_le_recv(chan, skb);
+> > +                     return l2cap_ecred_recv(chan, skb);
+> >
+> >               chan->sdu =3D skb;
+> >               chan->sdu_len =3D sdu_len;
+> > @@ -6926,7 +7374,7 @@ static int l2cap_le_data_rcv(struct l2cap_chan *c=
+han, struct sk_buff *skb)
+> >       skb =3D NULL;
+> >
+> >       if (chan->sdu->len =3D=3D chan->sdu_len) {
+> > -             err =3D l2cap_le_recv(chan, chan->sdu);
+> > +             err =3D l2cap_ecred_recv(chan, chan->sdu);
+> >               if (!err) {
+> >                       chan->sdu =3D NULL;
+> >                       chan->sdu_last_frag =3D NULL;
+> > @@ -6987,7 +7435,8 @@ static void l2cap_data_channel(struct l2cap_conn =
+*conn, u16 cid,
+> >
+> >       switch (chan->mode) {
+> >       case L2CAP_MODE_LE_FLOWCTL:
+> > -             if (l2cap_le_data_rcv(chan, skb) < 0)
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> > +             if (l2cap_ecred_data_rcv(chan, skb) < 0)
+> >                       goto drop;
+> >
+> >               goto done;
+> > @@ -7214,8 +7663,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, _=
+_le16 psm, u16 cid,
+> >       struct hci_dev *hdev;
+> >       int err;
+> >
+> > -     BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
+> > -            dst_type, __le16_to_cpu(psm));
+> > +     BT_DBG("%pMR -> %pMR (type %u) psm 0x%4.4x mode 0x%2.2x", &chan->=
+src,
+> > +            dst, dst_type, __le16_to_cpu(psm), chan->mode);
+> >
+> >       hdev =3D hci_get_route(dst, &chan->src, chan->src_type);
+> >       if (!hdev)
+> > @@ -7244,6 +7693,8 @@ int l2cap_chan_connect(struct l2cap_chan *chan, _=
+_le16 psm, u16 cid,
+> >               break;
+> >       case L2CAP_MODE_LE_FLOWCTL:
+> >               break;
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> > +             break;
+>
+> No need to do another break. Just put it under LE_FLOWCTL.
+>
+> >       case L2CAP_MODE_ERTM:
+> >       case L2CAP_MODE_STREAMING:
+> >               if (!disable_ertm)
+> > @@ -7368,6 +7819,38 @@ int l2cap_chan_connect(struct l2cap_chan *chan, =
+__le16 psm, u16 cid,
+> > }
+> > EXPORT_SYMBOL_GPL(l2cap_chan_connect);
+> >
+> > +static void l2cap_ecred_reconfigure(struct l2cap_chan *chan)
+> > +{
+> > +     struct l2cap_conn *conn =3D chan->conn;
+> > +     struct {
+> > +             struct l2cap_ecred_reconf_req req;
+> > +             __le16 scid;
+> > +     } pdu;
+> > +
+> > +     pdu.req.mtu =3D cpu_to_le16(chan->imtu);
+> > +     pdu.req.mps =3D cpu_to_le16(chan->mps);
+> > +     pdu.scid    =3D cpu_to_le16(chan->scid);
+> > +
+> > +     chan->ident =3D l2cap_get_ident(conn);
+> > +
+> > +     l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_RECONF_REQ,
+> > +                    sizeof(pdu), &pdu);
+> > +}
+> > +
+> > +int l2cap_chan_reconfigure(struct l2cap_chan *chan, __u16 mtu)
+> > +{
+> > +     if (chan->imtu > mtu)
+> > +             return -EINVAL;
+> > +
+> > +     BT_DBG("chan %p mtu 0x%4.4x", chan, mtu);
+> > +
+> > +     chan->imtu =3D mtu;
+> > +
+> > +     l2cap_ecred_reconfigure(chan);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > /* ---- L2CAP interface with lower layer (HCI) ---- */
+> >
+> > int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+> > @@ -7579,7 +8062,8 @@ static void l2cap_security_cfm(struct hci_conn *h=
+con, u8 status, u8 encrypt)
+> >                       else
+> >                               __set_chan_timer(chan, L2CAP_DISC_TIMEOUT=
+);
+> >               } else if (chan->state =3D=3D BT_CONNECT2 &&
+> > -                        chan->mode !=3D L2CAP_MODE_LE_FLOWCTL) {
+> > +                        !(chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL ||
+> > +                         chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL)) {
+>
+> Please double check that this line is correctly aligned after the (.
+>
+> >                       struct l2cap_conn_rsp rsp;
+> >                       __u16 res, stat;
+> >
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index a7be8b59b3c2..12c557f7f40f 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -232,7 +232,7 @@ static int l2cap_sock_connect(struct socket *sock, =
+struct sockaddr *addr,
+> >                       return -EINVAL;
+> >       }
+> >
+> > -     if (chan->psm && bdaddr_type_is_le(chan->src_type))
+> > +     if (chan->psm && bdaddr_type_is_le(chan->src_type) && !chan->mode=
+)
+> >               chan->mode =3D L2CAP_MODE_LE_FLOWCTL;
+> >
+> >       err =3D l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_c=
+id),
+> > @@ -273,6 +273,7 @@ static int l2cap_sock_listen(struct socket *sock, i=
+nt backlog)
+> >       switch (chan->mode) {
+> >       case L2CAP_MODE_BASIC:
+> >       case L2CAP_MODE_LE_FLOWCTL:
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> >               break;
+> >       case L2CAP_MODE_ERTM:
+> >       case L2CAP_MODE_STREAMING:
+> > @@ -408,16 +409,6 @@ static int l2cap_sock_getsockopt_old(struct socket=
+ *sock, int optname,
+> >
+> >       switch (optname) {
+> >       case L2CAP_OPTIONS:
+> > -             /* LE sockets should use BT_SNDMTU/BT_RCVMTU, but since
+> > -              * legacy ATT code depends on getsockopt for
+> > -              * L2CAP_OPTIONS we need to let this pass.
+> > -              */
+> > -             if (bdaddr_type_is_le(chan->src_type) &&
+> > -                 chan->scid !=3D L2CAP_CID_ATT) {
+> > -                     err =3D -EINVAL;
+> > -                     break;
+> > -             }
+> > -
+>
+> Should this be a separate patch. How do we keep this legacy behavior.
 
-Not sure if I fully understood the problem, so I guess we are looking
-to a solution to replace dynamic_debug since that is not normally
-enabled on production? Not sure if this should be discussed with
-kernel community as whole because it does lead to each subsystem
-reinventing their own mechanism of logging.
+I kind have forgotten to fix this one, I guess we will need a new
+option in order to read the mode without using the old L2CAP_OPTIONS
+then, or do you have anything against introducing yet another option?
 
-Now logging the kernel message into btmon I thing would be very
-useful, regardless on what the mechanism would be used to enable them,
-so perhaps we should start with that. I fill that enabling the exact
-same granularity as the dynamic_debug has would be a bit overkill so
-Id would suggest sticking with the current categories that we have for
-the monitor which are:
+> >               memset(&opts, 0, sizeof(opts));
+> >               opts.imtu     =3D chan->imtu;
+> >               opts.omtu     =3D chan->omtu;
+> > @@ -427,6 +418,8 @@ static int l2cap_sock_getsockopt_old(struct socket =
+*sock, int optname,
+> >               opts.max_tx   =3D chan->max_tx;
+> >               opts.txwin_size =3D chan->tx_win;
+> >
+> > +             BT_DBG("mode 0x%2.2x", chan->mode);
+> > +
+> >               len =3D min_t(unsigned int, len, sizeof(opts));
+> >               if (copy_to_user(optval, (char *) &opts, len))
+> >                       err =3D -EFAULT;
+> > @@ -643,11 +636,6 @@ static int l2cap_sock_setsockopt_old(struct socket=
+ *sock, int optname,
+> >
+> >       switch (optname) {
+> >       case L2CAP_OPTIONS:
+> > -             if (bdaddr_type_is_le(chan->src_type)) {
+> > -                     err =3D -EINVAL;
+> > -                     break;
+> > -             }
+> > -
+> >               if (sk->sk_state =3D=3D BT_CONNECTED) {
+> >                       err =3D -EINVAL;
+> >                       break;
+> > @@ -680,6 +668,7 @@ static int l2cap_sock_setsockopt_old(struct socket =
+*sock, int optname,
+> >               chan->mode =3D opts.mode;
+> >               switch (chan->mode) {
+> >               case L2CAP_MODE_LE_FLOWCTL:
+> > +             case L2CAP_MODE_EXT_FLOWCTL:
+> >                       break;
+> >               case L2CAP_MODE_BASIC:
+> >                       clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
+> > @@ -694,6 +683,8 @@ static int l2cap_sock_setsockopt_old(struct socket =
+*sock, int optname,
+> >                       break;
+> >               }
+> >
+> > +             BT_DBG("mode 0x%2.2x", chan->mode);
+> > +
+> >               chan->imtu =3D opts.imtu;
+> >               chan->omtu =3D opts.omtu;
+> >               chan->fcs  =3D opts.fcs;
+> > @@ -926,7 +917,8 @@ static int l2cap_sock_setsockopt(struct socket *soc=
+k, int level, int optname,
+> >                       break;
+> >               }
+> >
+> > -             if (sk->sk_state =3D=3D BT_CONNECTED) {
+> > +             if (chan->mode =3D=3D L2CAP_MODE_LE_FLOWCTL &&
+> > +                 sk->sk_state =3D=3D BT_CONNECTED) {
+> >                       err =3D -EISCONN;
+> >                       break;
+> >               }
+> > @@ -936,7 +928,12 @@ static int l2cap_sock_setsockopt(struct socket *so=
+ck, int level, int optname,
+> >                       break;
+> >               }
+> >
+> > -             chan->imtu =3D opt;
+> > +             if (chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL &&
+> > +                 sk->sk_state =3D=3D BT_CONNECTED)
+> > +                     err =3D l2cap_chan_reconfigure(chan, opt);
+> > +             else
+> > +                     chan->imtu =3D opt;
+> > +
+> >               break;
+> >
+> >       default:
+> > @@ -991,7 +988,11 @@ static int l2cap_sock_recvmsg(struct socket *sock,=
+ struct msghdr *msg,
+> >
+> >       if (sk->sk_state =3D=3D BT_CONNECT2 && test_bit(BT_SK_DEFER_SETUP=
+,
+> >                                                   &bt_sk(sk)->flags)) {
+> > -             if (bdaddr_type_is_le(pi->chan->src_type)) {
+> > +             if (pi->chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) {
+> > +                     sk->sk_state =3D BT_CONNECTED;
+> > +                     pi->chan->state =3D BT_CONNECTED;
+> > +                     __l2cap_ecred_conn_rsp_defer(pi->chan);
+> > +             } if (bdaddr_type_is_le(pi->chan->src_type)) {
+> >                       sk->sk_state =3D BT_CONNECTED;
+> >                       pi->chan->state =3D BT_CONNECTED;
+> >                       __l2cap_le_connect_rsp_defer(pi->chan);
+>
+> Regards
+>
+> Marcel
+>
 
-#define BTSNOOP_PRIORITY_EMERG        0
-#define BTSNOOP_PRIORITY_ALERT        1
-#define BTSNOOP_PRIORITY_CRIT        2
-#define BTSNOOP_PRIORITY_ERR        3
-#define BTSNOOP_PRIORITY_WARNING    4
-#define BTSNOOP_PRIORITY_NOTICE        5
-#define BTSNOOP_PRIORITY_INFO        6
-#define BTSNOOP_PRIORITY_DEBUG        7
-
-Though I see Marcel's point that if we go this way enabling DEBUG
-level would simple flood the trace, but I believe the problem can be
-solved with a minimal change which is to split data (above
-L2CAP/RFCOMM) and signalling logs, obviously this would require a spit
-on the way BT_DBG works so we can actually say dump the data path or
-just the signalling (this should probably be the default), which I
-think would benefit us even in case of using dynamic_debug because
-depending what files are enabled (hci_core.c, l2cap_core.c, etc) that
-logs way too much and it is not uncommon to lose the logs because the
-terminal buffer is not big enough just because the data is intermixed
-with some signalling, that said I think we would have to prefix data
-and signalling with some string and then use format option to match
-them.
 
 --=20
 Luiz Augusto von Dentz
