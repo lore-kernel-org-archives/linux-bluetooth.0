@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED90C32771
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jan 2020 23:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 563B1C2D0CE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jan 2020 23:52:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 246542071C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jan 2020 23:52:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B8542071C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jan 2020 23:52:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729563AbgAXXwu (ORCPT
+        id S1729602AbgAXXww (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Jan 2020 18:52:50 -0500
+        Fri, 24 Jan 2020 18:52:52 -0500
 Received: from mga11.intel.com ([192.55.52.93]:53121 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729147AbgAXXwu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1729568AbgAXXwu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 24 Jan 2020 18:52:50 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jan 2020 15:52:49 -0800
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jan 2020 15:52:50 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,359,1574150400"; 
-   d="scan'208";a="230511856"
+   d="scan'208";a="230511867"
 Received: from bgi1-mobl2.amr.corp.intel.com ([10.251.17.203])
   by orsmga006.jf.intel.com with ESMTP; 24 Jan 2020 15:52:48 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ 2/5] mesh: Move Replay Protection to mesh/net.c
-Date:   Fri, 24 Jan 2020 15:52:39 -0800
-Message-Id: <20200124235242.21720-3-brian.gix@intel.com>
+Subject: [PATCH BlueZ 5/5] mesh: Add NVM storage of Replay Protection
+Date:   Fri, 24 Jan 2020 15:52:42 -0800
+Message-Id: <20200124235242.21720-6-brian.gix@intel.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200124235242.21720-1-brian.gix@intel.com>
 References: <20200124235242.21720-1-brian.gix@intel.com>
@@ -44,349 +44,421 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The specification calls for a flatter Replay Protection List that
-applies to all processed messages, regardless of which credentials
-were used to secure them. So storage and checking is now centralized
-in mesh/net.c
----
- mesh/appkey.c | 102 -------------------------------------------------
- mesh/appkey.h |   3 --
- mesh/model.c  |   2 +-
- mesh/net.c    | 104 +++++++++++++++++++++++++++++++++++++++++++++-----
- mesh/net.h    |   3 ++
- 5 files changed, 99 insertions(+), 115 deletions(-)
+Mesh specification requires that Replay Protection be preserved
+across node restarts.  This adds that storage in
+<node_uuid>/rpl/<iv_index>/<src>
 
-diff --git a/mesh/appkey.c b/mesh/appkey.c
-index 0eb268782..45d604007 100644
---- a/mesh/appkey.c
-+++ b/mesh/appkey.c
-@@ -35,7 +35,6 @@
- #include "mesh/appkey.h"
+Realtime access remains in an l_queue structure, and stored as
+messages are processed.
+---
+ Makefile.mesh |   1 +
+ mesh/net.c    |  21 ++--
+ mesh/rpl.c    | 271 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/rpl.h    |  30 ++++++
+ 4 files changed, 316 insertions(+), 7 deletions(-)
+ create mode 100644 mesh/rpl.c
+ create mode 100644 mesh/rpl.h
+
+diff --git a/Makefile.mesh b/Makefile.mesh
+index 401122029..10573b304 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -32,6 +32,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
+ 				mesh/manager.h mesh/manager.c \
+ 				mesh/pb-adv.h mesh/pb-adv.c \
+ 				mesh/keyring.h mesh/keyring.c \
++				mesh/rpl.h mesh/rpl.c \
+ 				mesh/mesh-defs.h
+ pkglibexec_PROGRAMS += mesh/bluetooth-meshd
  
- struct mesh_app_key {
--	struct l_queue *replay_cache;
- 	uint16_t net_idx;
- 	uint16_t app_idx;
- 	uint8_t key[16];
-@@ -44,12 +43,6 @@ struct mesh_app_key {
- 	uint8_t new_key_aid;
+diff --git a/mesh/net.c b/mesh/net.c
+index ff43176a3..09a4c6834 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -36,6 +36,7 @@
+ #include "mesh/mesh-config.h"
+ #include "mesh/model.h"
+ #include "mesh/appkey.h"
++#include "mesh/rpl.h"
+ 
+ #define abs_diff(a, b) ((a) > (b) ? (a) - (b) : (b) - (a))
+ 
+@@ -256,12 +257,6 @@ struct net_beacon_data {
+ 	bool processed;
  };
  
--struct mesh_msg {
+-struct mesh_rpl {
 -	uint32_t iv_index;
 -	uint32_t seq;
 -	uint16_t src;
 -};
 -
- static bool match_key_index(const void *a, const void *b)
- {
- 	const struct mesh_app_key *key = a;
-@@ -66,103 +59,11 @@ static bool match_bound_key(const void *a, const void *b)
- 	return key->net_idx == idx;
- }
+ #define FAST_CACHE_SIZE 8
+ static struct l_queue *fast_cache;
+ static struct l_queue *nets;
+@@ -2714,6 +2709,9 @@ static void update_iv_ivu_state(struct mesh_net *net, uint32_t iv_index,
+ 		struct mesh_config *cfg = node_config_get(net->node);
  
--static bool match_replay_cache(const void *a, const void *b)
--{
--	const struct mesh_msg *msg = a;
--	uint16_t src = L_PTR_TO_UINT(b);
--
--	return src == msg->src;
--}
--
--static bool clean_old_iv_index(void *a, void *b)
--{
--	struct mesh_msg *msg = a;
--	uint32_t iv_index = L_PTR_TO_UINT(b);
--
--	if (iv_index < 2)
--		return false;
--
--	if (msg->iv_index < iv_index - 1) {
--		l_free(msg);
--		return true;
--	}
--
--	return false;
--}
--
--bool appkey_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
--				uint16_t src, uint16_t crpl, uint32_t seq,
--				uint32_t iv_index)
--{
--	struct mesh_app_key *key;
--	struct mesh_msg *msg;
--	struct l_queue *app_keys;
--
--	app_keys = mesh_net_get_app_keys(net);
--	if (!app_keys)
--		return false;
--
--	l_debug("Test Replay src: %4.4x seq: %6.6x iv: %8.8x",
--						src, seq, iv_index);
--
--	key = l_queue_find(app_keys, match_key_index, L_UINT_TO_PTR(idx));
--
--	if (!key)
--		return false;
--
--	msg = l_queue_find(key->replay_cache, match_replay_cache,
--						L_UINT_TO_PTR(src));
--
--	if (msg) {
--		if (iv_index > msg->iv_index) {
--			msg->seq = seq;
--			msg->iv_index = iv_index;
--			return false;
--		}
--
--		if (seq < msg->seq) {
--			l_debug("Ignoring packet with lower sequence number");
--			return true;
--		}
--
--		if (seq == msg->seq) {
--			l_debug("Message already processed (duplicate)");
--			return true;
--		}
--
--		msg->seq = seq;
--
--		return false;
--	}
--
--	l_debug("New Entry for %4.4x", src);
--	if (key->replay_cache == NULL)
--		key->replay_cache = l_queue_new();
--
--	/* Replay Cache is fixed sized */
--	if (l_queue_length(key->replay_cache) >= crpl) {
--		int ret = l_queue_foreach_remove(key->replay_cache,
--				clean_old_iv_index, L_UINT_TO_PTR(iv_index));
--
--		if (!ret)
--			return true;
--	}
--
--	msg = l_new(struct mesh_msg, 1);
--	msg->src = src;
--	msg->seq = seq;
--	msg->iv_index = iv_index;
--	l_queue_push_head(key->replay_cache, msg);
--
--	return false;
--}
--
- static struct mesh_app_key *app_key_new(void)
- {
- 	struct mesh_app_key *key = l_new(struct mesh_app_key, 1);
+ 		mesh_config_write_iv_index(cfg, iv_index, ivu);
++
++		/* Cleanup Replay Protection List NVM */
++		rpl_init(net->node, iv_index);
+ 	}
  
- 	key->new_key_aid = 0xFF;
--	key->replay_cache = l_queue_new();
- 	return key;
- }
+ 	net->iv_index = iv_index;
+@@ -3769,8 +3767,11 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
+ 	if (!net || !net->node)
+ 		return true;
  
-@@ -192,7 +93,6 @@ void appkey_key_free(void *data)
- 	if (!key)
- 		return;
+-	if (!net->replay_cache)
++	if (!net->replay_cache) {
+ 		net->replay_cache = l_queue_new();
++		rpl_init(net->node, net->iv_index);
++		rpl_get_list(net->node, net->replay_cache);
++	}
  
--	l_queue_destroy(key->replay_cache, l_free);
- 	l_free(key);
- }
+ 	l_debug("Test Replay src: %4.4x seq: %6.6x iv: %8.8x",
+ 						src, seq, iv_index);
+@@ -3782,6 +3783,7 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
+ 		if (iv_index > rpe->iv_index) {
+ 			rpe->seq = seq;
+ 			rpe->iv_index = iv_index;
++			rpl_put_entry(net->node, src, iv_index, seq);
+ 			return false;
+ 		}
  
-@@ -403,8 +303,6 @@ int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 	key->app_idx = app_idx;
- 	l_queue_push_tail(app_keys, key);
+@@ -3797,6 +3799,8 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
  
--	l_queue_clear(key->replay_cache, l_free);
--
- 	return MESH_STATUS_SUCCESS;
- }
+ 		rpe->seq = seq;
  
-diff --git a/mesh/appkey.h b/mesh/appkey.h
-index b3e548071..23b474a0a 100644
---- a/mesh/appkey.h
-+++ b/mesh/appkey.h
-@@ -25,9 +25,6 @@ struct mesh_app_key;
- bool appkey_key_init(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 				uint8_t *key_value, uint8_t *new_key_value);
- void appkey_key_free(void *data);
--bool appkey_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
--				uint16_t src, uint16_t crpl, uint32_t seq,
--				uint32_t iv_index);
- const uint8_t *appkey_get_key(struct mesh_net *net, uint16_t app_idx,
- 							uint8_t *key_id);
- int appkey_get_key_idx(struct mesh_app_key *app_key,
-diff --git a/mesh/model.c b/mesh/model.c
-index 6d7674ee5..0018c7cff 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -1000,7 +1000,7 @@ bool mesh_model_rx(struct mesh_node *node, bool szmict, uint32_t seq0,
- 	if (key_aid != APP_AID_DEV) {
- 		uint16_t crpl = node_get_crpl(node);
++		rpl_put_entry(net->node, src, iv_index, seq);
++
+ 		return false;
+ 	}
  
--		if (appkey_msg_in_replay_cache(net, (uint16_t) decrypt_idx, src,
-+		if (net_msg_in_replay_cache(net, (uint16_t) decrypt_idx, src,
- 							crpl, seq, iv_index)) {
- 			result = true;
- 			goto done;
-diff --git a/mesh/net.c b/mesh/net.c
-index 219217793..71ff2cea0 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -135,6 +135,7 @@ struct mesh_net {
+@@ -3811,6 +3815,9 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
+ 			return true;
+ 	}
  
- 	struct l_queue *subnets;
- 	struct l_queue *msg_cache;
-+	struct l_queue *replay_cache;
- 	struct l_queue *sar_in;
- 	struct l_queue *sar_out;
- 	struct l_queue *frnd_msgs;
-@@ -255,6 +256,12 @@ struct net_beacon_data {
- 	bool processed;
- };
- 
++	if (!rpl_put_entry(net->node, src, iv_index, seq))
++		return true;
++
+ 	rpe = l_new(struct mesh_rpl, 1);
+ 	rpe->src = src;
+ 	rpe->seq = seq;
+diff --git a/mesh/rpl.c b/mesh/rpl.c
+new file mode 100644
+index 000000000..f180b888a
+--- /dev/null
++++ b/mesh/rpl.c
+@@ -0,0 +1,271 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <fcntl.h>
++#include <limits.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <dirent.h>
++
++#include <sys/stat.h>
++
++#include <ell/ell.h>
++
++#include "mesh/mesh-defs.h"
++
++#include "mesh/node.h"
++#include "mesh/net.h"
++#include "mesh/util.h"
++#include "mesh/rpl.h"
++
++const char *rpl_dir = "/rpl";
++
++bool rpl_put_entry(struct mesh_node *node, uint16_t src, uint32_t iv_index,
++								uint32_t seq)
++{
++	const char *node_path;
++	char src_file[PATH_MAX];
++	char seq_txt[7];
++	bool result = false;
++	int fd;
++
++	if (!node || !IS_UNICAST(src))
++		return false;
++
++	node_path = node_get_storage_dir(node);
++
++	if (strlen(node_path) + strlen(rpl_dir) + 15 >= PATH_MAX)
++		return false;
++
++	snprintf(src_file, PATH_MAX, "%s%s/%8.8x/%4.4x", node_path, rpl_dir,
++								iv_index, src);
++
++	fd = open(src_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
++	if (fd >= 0) {
++		snprintf(seq_txt, 7, "%6.6x", seq);
++		if (write(fd, seq_txt, 6) == 6)
++			result = true;
++
++		close(fd);
++	}
++
++	if (!result)
++		return false;
++
++	/* Delete RPL entry from old iv_index (if it exists) */
++	iv_index--;
++	snprintf(src_file, PATH_MAX, "%s%s/%8.8x/%4.4x", node_path, rpl_dir,
++								iv_index, src);
++	remove(src_file);
++
++
++	return result;
++}
++
++void rpl_del_entry(struct mesh_node *node, uint16_t src)
++{
++	const char *node_path;
++	char rpl_path[PATH_MAX];
++	struct dirent *entry;
++	DIR *dir;
++
++	if (!node || !IS_UNICAST(src))
++		return;
++
++	node_path = node_get_storage_dir(node);
++
++	if (strlen(node_path) + strlen(rpl_dir) + 15 >= PATH_MAX)
++		return;
++
++	snprintf(rpl_path, PATH_MAX, "%s%s", node_path, rpl_dir);
++	dir = opendir(rpl_path);
++
++	if (!dir)
++		return;
++
++	/* Remove all instances of src address */
++	while ((entry = readdir(dir)) != NULL) {
++		if (entry->d_type == DT_DIR) {
++			snprintf(rpl_path, PATH_MAX, "%s/%4.4x",
++							entry->d_name, src);
++			remove(rpl_path);
++		}
++	}
++
++	closedir(dir);
++}
++
++static bool match_src(const void *a, const void *b)
++{
++	const struct mesh_rpl *rpl = a;
++	uint16_t src = L_PTR_TO_UINT(b);
++
++	return rpl->src == src;
++}
++
++static void get_entries(const char *iv_path, struct l_queue *rpl_list)
++{
++	struct mesh_rpl *rpl;
++	struct dirent *entry;
++	DIR *dir;
++	int fd;
++	const char *iv_txt;
++	const char *src_txt;
++	char seq_txt[7];
++	uint32_t iv_index, seq;
++	uint16_t src;
++
++	dir = opendir(iv_path);
++
++	if (!dir)
++		return;
++
++	iv_txt = basename(iv_path);
++	sscanf(iv_txt, "%08x", &iv_index);
++
++	memset(seq_txt, 0, sizeof(seq_txt));
++
++	while ((entry = readdir(dir)) != NULL) {
++		/* RPL sequences are stored in src files under iv_index */
++		if (entry->d_type == DT_REG) {
++			fd = open(entry->d_name, O_RDONLY);
++
++			if (fd < 0)
++				continue;
++
++			src_txt = basename(entry->d_name);
++
++			if(read(fd, seq_txt, 6) == 6) {
++				sscanf(src_txt, "%04hx", &src);
++				sscanf(seq_txt, "%06x", &seq);
++
++				rpl = l_queue_find(rpl_list, match_src,
++							L_UINT_TO_PTR(src));
++
++				if (rpl) {
++					/* Replace older entries */
++					if (rpl->iv_index < iv_index) {
++						rpl->iv_index = iv_index;
++						rpl->seq = seq;
++					}
++				} else if (seq <= SEQ_MASK && IS_UNICAST(src)) {
++					rpl = l_new(struct mesh_rpl, 1);
++					rpl->src = src;
++					rpl->iv_index = iv_index;
++					rpl->seq = seq;
++
++					l_queue_push_head(rpl_list, rpl);
++				}
++			}
++
++			close(fd);
++		}
++	}
++
++	closedir(dir);
++}
++
++bool rpl_get_list(struct mesh_node *node, struct l_queue *rpl_list)
++{
++	const char *node_path;
++	struct dirent *entry;
++	char rpl_path[PATH_MAX];
++	DIR *dir;
++
++	if (!node || !rpl_list)
++		return false;
++
++	node_path = node_get_storage_dir(node);
++
++	if (strlen(node_path) + strlen(rpl_dir) + 15 > PATH_MAX)
++		return false;
++
++	snprintf(rpl_path, PATH_MAX, "%s%s", node_path, rpl_dir);
++
++	dir = opendir(rpl_path);
++
++	if (!dir) {
++		l_error("Failed to read RPL dir: %s%s", node_path, rpl_dir);
++		return false;
++	}
++
++	while ((entry = readdir(dir)) != NULL) {
++		/* RPL sequences are stored in files under iv_indexs */
++		if (entry->d_type == DT_DIR && entry->d_name[0] != '.') {
++			snprintf(rpl_path, PATH_MAX, "%s%s/%s",
++					node_path, rpl_dir, entry->d_name);
++			get_entries(rpl_path, rpl_list);
++		}
++	}
++
++	closedir(dir);
++
++	return true;
++}
++
++void rpl_init(struct mesh_node *node, uint32_t cur)
++{
++	uint32_t old = cur - 1;
++	const char *node_path;
++	struct dirent *entry;
++	char rpl_path[PATH_MAX];
++	DIR *dir;
++
++	if (!node)
++		return;
++
++	node_path = node_get_storage_dir(node);
++
++	if (strlen(node_path) + strlen(rpl_dir) + 10 >= PATH_MAX)
++		return;
++
++	/* Make sure rpl_path exists */
++	snprintf(rpl_path, PATH_MAX, "%s%s", node_path, rpl_dir);
++	mkdir(rpl_path, 0755);
++
++	/* Cleanup any stale trees */
++	dir = opendir(rpl_path);
++	if (!dir)
++		return;
++
++	while ((entry = readdir(dir)) != NULL) {
++		if (entry->d_type == DT_DIR) {
++			const char *iv_txt = basename(entry->d_name);
++			uint32_t iv_index = 0;
++
++			/* Delete all invalid iv_index trees */
++			sscanf(iv_txt, "%08x", &iv_index);
++			if (iv_index != cur && iv_index != old)
++				del_path(entry->d_name);
++		}
++	}
++
++	closedir(dir);
++
++	/* Make sure all currently considered iv_index directories exist */
++	snprintf(rpl_path, PATH_MAX, "%s%s/%8.8x", node_path, rpl_dir, old);
++	mkdir(rpl_path, 0755);
++	snprintf(rpl_path, PATH_MAX, "%s%s/%8.8x", node_path, rpl_dir, cur);
++	mkdir(rpl_path, 0755);
++}
+diff --git a/mesh/rpl.h b/mesh/rpl.h
+new file mode 100644
+index 000000000..17d2e3f05
+--- /dev/null
++++ b/mesh/rpl.h
+@@ -0,0 +1,30 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
 +struct mesh_rpl {
 +	uint32_t iv_index;
 +	uint32_t seq;
 +	uint16_t src;
 +};
 +
- #define FAST_CACHE_SIZE 8
- static struct l_queue *fast_cache;
- static struct l_queue *nets;
-@@ -554,13 +561,6 @@ static void mesh_sar_free(void *data)
- 	l_free(sar);
- }
- 
--static void mesh_msg_free(void *data)
--{
--	struct mesh_msg *msg = data;
--
--	l_free(msg);
--}
--
- static void subnet_free(void *data)
- {
- 	struct mesh_subnet *subnet = data;
-@@ -688,7 +688,8 @@ void mesh_net_free(struct mesh_net *net)
- 		return;
- 
- 	l_queue_destroy(net->subnets, subnet_free);
--	l_queue_destroy(net->msg_cache, mesh_msg_free);
-+	l_queue_destroy(net->msg_cache, l_free);
-+	l_queue_destroy(net->replay_cache, l_free);
- 	l_queue_destroy(net->sar_in, mesh_sar_free);
- 	l_queue_destroy(net->sar_out, mesh_sar_free);
- 	l_queue_destroy(net->frnd_msgs, l_free);
-@@ -1024,7 +1025,7 @@ int mesh_net_add_key(struct mesh_net *net, uint16_t idx, const uint8_t *value)
- 
- void mesh_net_flush_msg_queues(struct mesh_net *net)
- {
--	l_queue_clear(net->msg_cache, mesh_msg_free);
-+	l_queue_clear(net->msg_cache, l_free);
- }
- 
- uint32_t mesh_net_get_iv_index(struct mesh_net *net)
-@@ -3734,3 +3735,88 @@ uint32_t mesh_net_get_instant(struct mesh_net *net)
- 
- 	return net->instant;
- }
-+
-+static bool match_replay_cache(const void *a, const void *b)
-+{
-+	const struct mesh_rpl *rpe = a;
-+	uint16_t src = L_PTR_TO_UINT(b);
-+
-+	return src == rpe->src;
-+}
-+
-+static bool clean_old_iv_index(void *a, void *b)
-+{
-+	struct mesh_rpl *rpe = a;
-+	uint32_t iv_index = L_PTR_TO_UINT(b);
-+
-+	if (iv_index < 2)
-+		return false;
-+
-+	if (rpe->iv_index < iv_index - 1) {
-+		l_free(rpe);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
-+				uint16_t src, uint16_t crpl, uint32_t seq,
-+				uint32_t iv_index)
-+{
-+	struct mesh_rpl *rpe;
-+
-+	/* If anything missing reject this message by returning true */
-+	if (!net || !net->node)
-+		return true;
-+
-+	if (!net->replay_cache)
-+		net->replay_cache = l_queue_new();
-+
-+	l_debug("Test Replay src: %4.4x seq: %6.6x iv: %8.8x",
-+						src, seq, iv_index);
-+
-+	rpe = l_queue_find(net->replay_cache, match_replay_cache,
-+						L_UINT_TO_PTR(src));
-+
-+	if (rpe) {
-+		if (iv_index > rpe->iv_index) {
-+			rpe->seq = seq;
-+			rpe->iv_index = iv_index;
-+			return false;
-+		}
-+
-+		if (seq < rpe->seq) {
-+			l_debug("Ignoring packet with lower sequence number");
-+			return true;
-+		}
-+
-+		if (seq == rpe->seq) {
-+			l_debug("Message already processed (duplicate)");
-+			return true;
-+		}
-+
-+		rpe->seq = seq;
-+
-+		return false;
-+	}
-+
-+	l_debug("New Entry for %4.4x", src);
-+
-+	/* Replay Cache is fixed sized */
-+	if (l_queue_length(net->replay_cache) >= crpl) {
-+		int ret = l_queue_foreach_remove(net->replay_cache,
-+				clean_old_iv_index, L_UINT_TO_PTR(iv_index));
-+
-+		if (!ret)
-+			return true;
-+	}
-+
-+	rpe = l_new(struct mesh_rpl, 1);
-+	rpe->src = src;
-+	rpe->seq = seq;
-+	rpe->iv_index = iv_index;
-+	l_queue_push_head(net->replay_cache, rpe);
-+
-+	return false;
-+}
-diff --git a/mesh/net.h b/mesh/net.h
-index 023b61e71..ff0a9bb2b 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -379,3 +379,6 @@ void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov);
- uint32_t mesh_net_get_instant(struct mesh_net *net);
- struct l_queue *mesh_net_get_friends(struct mesh_net *net);
- struct l_queue *mesh_net_get_negotiations(struct mesh_net *net);
-+bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
-+				uint16_t src, uint16_t crpl, uint32_t seq,
-+				uint32_t iv_index);
++bool rpl_put_entry(struct mesh_node *node, uint16_t src, uint32_t iv_index,
++								uint32_t seq);
++void rpl_del_entry(struct mesh_node *node, uint16_t src);
++bool rpl_get_list(struct mesh_node *node, struct l_queue *rpl_list);
++void rpl_init(struct mesh_node *node, uint32_t iv_index);
 -- 
 2.21.1
 
