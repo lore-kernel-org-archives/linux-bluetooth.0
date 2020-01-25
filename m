@@ -2,116 +2,96 @@ Return-Path: <SRS0=CluT=3O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE257C35241
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Jan 2020 08:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F0FC35243
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Jan 2020 14:35:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 848F72071A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Jan 2020 08:23:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C75EC2071E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Jan 2020 14:35:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rhvrKZmg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727441AbgAYIXw (ORCPT
+        id S1726240AbgAYOfT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Jan 2020 03:23:52 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:44876 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726293AbgAYIXw (ORCPT
+        Sat, 25 Jan 2020 09:35:19 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:39942 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725710AbgAYOfT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Jan 2020 03:23:52 -0500
-Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 37B91CED19
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jan 2020 09:33:11 +0100 (CET)
-From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add missing checks for HCI_ISODATA_PKT packet type
-Date:   Sat, 25 Jan 2020 09:23:47 +0100
-Message-Id: <20200125082347.96440-1-marcel@holtmann.org>
-X-Mailer: git-send-email 2.24.1
+        Sat, 25 Jan 2020 09:35:19 -0500
+Received: by mail-lj1-f196.google.com with SMTP id n18so5813223ljo.7
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Jan 2020 06:35:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=hnOOth4cfOTsK3blqbf64rvHbKbZo2t8cNMCr1uCkdc=;
+        b=rhvrKZmgpI0UG7tHnghsfQfMZ/CDAtqFvaE9K6f1jUh2V61vXu4/tmdS6UBvsyti1k
+         8pK1CUyFZaomWH7BLkA4VLfLAbMGQSEzxmjChEO0/PJn/2e2YTagPF6osIbOsdQrg76K
+         H6pgx7ZQ1f1xXrvABwVVkVC8poqapR8yAmDdJTPWBbn+cB7z9DIbFciBc6pi2wGNyso6
+         d2UJomV6K6+PhoACAbV/d7WSaiFXliWMw/K/G3V6bKfThULcXaB5aVJBS1b0c8urs1q2
+         hZ8yKLyMWFtSN15+w7Lh2asRmjoeOtqT4fznbs0ZgUsPtxq5E9ZPq8w+F4QC5vmkgFaf
+         DwmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to:user-agent;
+        bh=hnOOth4cfOTsK3blqbf64rvHbKbZo2t8cNMCr1uCkdc=;
+        b=q7aXky30lIyTqoxqqyWWOPocpeo1kYVWGwMwcMthDQWy50RjeoWtc8xcCYMFcL2dds
+         hcE0pG+u+CZatv6zKtXBKKuv0myrEDLaUcb8TG6vZyYKh+t2p+4vByzrR0KI1bfusEDY
+         jKjIIvyxrm1QjdnKuSUyF38W6oBaXUplUaNno+J7RtyfG8kuRAPF9YTxaUqnwsAtTEFO
+         kypA/dCsXCbjXShRNLFthCY9QOu9S7zaCkdsYqIN+PhfshG15MjufCP13jq+00G7XNwA
+         nmM1CZ1SKYoDGECwoERY3p9RjKcQkizrfi16uKrtj7Gg33U/W4lL4xWX6XTa52X0lYHC
+         91Bg==
+X-Gm-Message-State: APjAAAUi2KDV6tSCuR+ruC2r/Z850LvnM7Rh//yccgbDD92xsWx3HUg7
+        cP1VKJiA+O0/+mQr39Khbq9xEVGU8HB1ng==
+X-Google-Smtp-Source: APXvYqyhw/cqzHvKhJLEriywFfFhlaELsF2x8ivaN8+6ErAHaZsOx2F2pJ5QMAi2SDgVdJj9FalUjg==
+X-Received: by 2002:a2e:580c:: with SMTP id m12mr5350324ljb.150.1579962916795;
+        Sat, 25 Jan 2020 06:35:16 -0800 (PST)
+Received: from localhost (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
+        by smtp.gmail.com with ESMTPSA id j7sm1069912ljg.25.2020.01.25.06.35.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Jan 2020 06:35:15 -0800 (PST)
+Date:   Sat, 25 Jan 2020 16:35:14 +0200
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Move {min,max}_key_size debugfs into
+ hci_debugfs_create_le
+Message-ID: <20200125143514.GA27634@jhedberg-mac01.home>
+Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org
+References: <20200125081951.96271-1-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200125081951.96271-1-marcel@holtmann.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The checks for HCI_ISODATA_PKT packet type are required in a few
-additional locations to allow sending/receiving of this new packet type.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c |  4 +++-
- net/bluetooth/hci_sock.c | 12 ++++++++----
- 2 files changed, 11 insertions(+), 5 deletions(-)
+On Sat, Jan 25, 2020, Marcel Holtmann wrote:
+> The debugfs entries for {min,max}_key_size are created during SMP
+> registration and thus it might lead to multiple attempts to create the
+> same entries. Avoid this by moving them to the LE controller init
+> section.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_debugfs.c | 61 ++++++++++++++++++++++++
+>  net/bluetooth/smp.c         | 93 -------------------------------------
+>  2 files changed, 61 insertions(+), 93 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1ca7508b6ca7..cbbc34a006d1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3565,7 +3565,8 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT &&
- 	    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
--	    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT) {
-+	    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
-+	    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT) {
- 		kfree_skb(skb);
- 		return -EINVAL;
- 	}
-@@ -4543,6 +4544,7 @@ static void hci_rx_work(struct work_struct *work)
- 			switch (hci_skb_pkt_type(skb)) {
- 			case HCI_ACLDATA_PKT:
- 			case HCI_SCODATA_PKT:
-+			case HCI_ISODATA_PKT:
- 				kfree_skb(skb);
- 				continue;
- 			}
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 3ae508674ef7..5756b124c2cb 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -211,7 +211,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 			if (hci_skb_pkt_type(skb) != HCI_COMMAND_PKT &&
- 			    hci_skb_pkt_type(skb) != HCI_EVENT_PKT &&
- 			    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
--			    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT)
-+			    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
-+			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT)
- 				continue;
- 			if (is_filtered_packet(sk, skb))
- 				continue;
-@@ -220,7 +221,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 				continue;
- 			if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT &&
- 			    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
--			    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT)
-+			    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
-+			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT)
- 				continue;
- 		} else {
- 			/* Don't send frame to other channel types */
-@@ -1768,7 +1770,8 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		 */
- 		if (hci_skb_pkt_type(skb) != HCI_COMMAND_PKT &&
- 		    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
--		    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT) {
-+		    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
-+		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT) {
- 			err = -EINVAL;
- 			goto drop;
- 		}
-@@ -1812,7 +1815,8 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		}
- 
- 		if (hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
--		    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT) {
-+		    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
-+		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT) {
- 			err = -EINVAL;
- 			goto drop;
- 		}
--- 
-2.24.1
+Applied to bluetooth-next. Thanks.
 
+Johan
