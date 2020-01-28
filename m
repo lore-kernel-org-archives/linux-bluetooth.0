@@ -2,136 +2,87 @@ Return-Path: <SRS0=ITs3=3R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1518C2D0DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 20:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49875C2D0DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 21:53:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B7572073A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 20:31:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="au20gHVh"
+	by mail.kernel.org (Postfix) with ESMTP id 2255B207FD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 21:53:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726211AbgA1Ub0 (ORCPT
+        id S1726276AbgA1VxW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jan 2020 15:31:26 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:43318 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726143AbgA1UbZ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jan 2020 15:31:25 -0500
-Received: by mail-ot1-f66.google.com with SMTP id p8so13325290oth.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2020 12:31:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4rzSJ/zEsxngI3ZUM6NCNQhN1RyuO520Wvkse8L9qrE=;
-        b=au20gHVhidJI4KZeMASQYwCQ25MY8z7jAWl2eDhO9yvwfN0Q4iU3X2vTyw9DozLg3S
-         vjrx7z0lsW6adSHzj0HJkOl6uQ6oo9vFlkbB5aK/tm3+NQ9O2yAG+yoMPFlQ6layxpLH
-         NXYVf1QCeFaflqvC0brfWMPS9yEqlFpZnSR5OjceGXbbCbJFhAJ1fUvu7BYqNzz9U5M3
-         sO4OZ2hebiPO5/JKXVCNEW9eWvoh0Si8nwe8lTHxJY6yUezh8t+nv2AILCtYR4hgRtBC
-         7JO47sAih1/QEeBUzxMY5MMxt+0KUJN/L0UL1D8/gGpidHcMZ3e80DmCDq0EXm1nY1Hc
-         cgvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4rzSJ/zEsxngI3ZUM6NCNQhN1RyuO520Wvkse8L9qrE=;
-        b=uD2P9qv35bTWNWxySRJ/ul46X+/630RrobYFYlOA4zz0/382uLucCYKGu8BDV0LOEk
-         97OWesMAg9/Kj1CJBew0BGJ3PwaM7HPszsu0RZEAmadE1lUgTSPNnh2AIUckhqsZVNnN
-         QnjavFVxiROPSAn1lTyZZYM1yXlYiPI4GIqBkbemELoEui1Aapcbt2Spqifqu6CLugcp
-         KQ7jbagLDky5kS3Eha49RPKfwzIqq3hxsSttYsU341UPqasKdUL2A4tovhoEFv7arC+y
-         j/nOn6J/2Rkf2uKNjvvZqohi5oDY3DMP+6L1c8jTR2mMpeTATALm9zX/X0hiEU8uvWOi
-         hZeg==
-X-Gm-Message-State: APjAAAWKApxbCFpsDWO1iyENY/yXkzmnzNsK5+NFjJ8dK1UFnO0570vA
-        4mGyHauT2jdasQaBqH0clG3bbKNKekAEnS+AqME=
-X-Google-Smtp-Source: APXvYqxEWI8Xz612olrLuwE8ui28upYioCKurVrZ613rXrSQ8W+8MHzwh0/VoWylgDEuIG44k0GrA09kYWrRjdj2xOw=
-X-Received: by 2002:a05:6830:1498:: with SMTP id s24mr10474045otq.79.1580243484938;
- Tue, 28 Jan 2020 12:31:24 -0800 (PST)
+        Tue, 28 Jan 2020 16:53:22 -0500
+Received: from mga09.intel.com ([134.134.136.24]:27725 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726211AbgA1VxW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 28 Jan 2020 16:53:22 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Jan 2020 13:53:21 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,375,1574150400"; 
+   d="scan'208";a="246856232"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.255.84.27])
+  by orsmga002.jf.intel.com with ESMTP; 28 Jan 2020 13:53:21 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com,
+        rafal.gajda@silvair.com
+Subject: [PATCH BlueZ v3 0/5] mesh: Add NVM storage of Replay Protection List
+Date:   Tue, 28 Jan 2020 13:53:05 -0800
+Message-Id: <20200128215310.8205-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200128020505.239349-1-abhishekpandit@chromium.org>
-In-Reply-To: <20200128020505.239349-1-abhishekpandit@chromium.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 28 Jan 2020 12:31:12 -0800
-Message-ID: <CABBYNZ+fRVSBxbX-3D-WxK=Z4TxnkHbWMPusv+owrRAsKdEOkw@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v3 0/5] device: Allow devices to be marked as wake capable
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+Version 3: Fix problem found by Rafał relating to the handling of
+sequence numbers of messages being handled internally (loop-backs),
+which were being rejected by the Replay Protection List (please see
+patch 3/5).
 
-On Mon, Jan 27, 2020 at 6:05 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
->
->
-> Hi bluez maintainers,
->
-> This change accompanies changes in the kernel to mark HID devices as
-> wake capable so they can wake the system from suspend. The
-> implementation depends on the Set Wake Capable management operation. It
-> is currently a separate management operation but it may be added as an
-> extension to an exiting operand like add_device (need some feedback
-> regarding this).
->
-> Per request on the last patch, I've moved docs/mgmt-api.txt into its own
-> patch so we can continue discussions on it.
->
-> This change was tested with appropriate kernel changes on v4.19
-> (verified that HID devices were being marked as wake capable in the
-> kernel).
->
-> Thanks
-> Abhishek
->
-> Changes in v3:
-> * Added profile_wake_support and made wake_capable dependent on it
-> * Added documentation for WakeCapable
-> * Mark HID device to support wake from suspend
->
-> Changes in v2:
-> * Separated docs/mgmt-api.txt into its own patch
-> * Added dbus api "WakeCapable" to set value
-> * Update device_set_wake_capable to be called by
->   adapter_set_wake_capable_complete so we can emit property changed
-> * Newly added to show whether device is wake capable
-> * Removed automatically setting wake capable for HID devices
->
-> Abhishek Pandit-Subedi (5):
->   mgmt: Add docs for Set Wake Capable
->   device: Allow device to be marked as wake capable
->   client: Display wake capable property with info
->   doc/device-api: Add WakeCapable
->   input: Make HID devices wake capable
->
->  client/main.c           |   1 +
->  doc/device-api.txt      |   5 ++
->  doc/mgmt-api.txt        |  19 +++++++
->  lib/mgmt.h              |   9 ++++
->  profiles/input/device.c |   1 +
->  profiles/input/hog.c    |   1 +
->  src/adapter.c           |  65 ++++++++++++++++++++++
->  src/adapter.h           |   2 +
->  src/device.c            | 116 ++++++++++++++++++++++++++++++++++++++++
->  src/device.h            |   5 ++
->  10 files changed, 224 insertions(+)
->
-> --
-> 2.25.0.341.g760bfbb309-goog
+Version 2: Fix path construction code when first reading RPL from NVM
 
-Other than the small comments I had this set is quite good, does the
-kernel support has already been merged?
+
+An oversight led to losing our Replay Protection List with every
+re-boot. This patch-set makes a number of Replay Protect List
+modifications that culminate in adding rpl.c/h, which stores the latest
+iv_index/sequence values for each node that handles an incoming packet.
+
+The first 4 patches, does some maintenance required to handle RPL
+according the the Mesh Specification.
+
+
+Brian Gix (5):
+  mesh: Relocate tree deletion to util.c/h
+  mesh: Move Replay Protection to mesh/net.c
+  mesh: Clean-up unneeded Sequence Number increments
+  mesh: Apply Replay Protection to all incoming packets
+  mesh: Add NVM storage of Replay Protection
+
+ Makefile.mesh           |   1 +
+ mesh/appkey.c           | 102 ---------------
+ mesh/appkey.h           |   3 -
+ mesh/mesh-config-json.c |  20 +--
+ mesh/model.c            |  16 +--
+ mesh/net.c              | 128 ++++++++++++++++---
+ mesh/net.h              |   3 +
+ mesh/rpl.c              | 277 ++++++++++++++++++++++++++++++++++++++++
+ mesh/rpl.h              |  30 +++++
+ mesh/util.c             |  25 ++++
+ mesh/util.h             |   1 +
+ 11 files changed, 456 insertions(+), 150 deletions(-)
+ create mode 100644 mesh/rpl.c
+ create mode 100644 mesh/rpl.h
 
 -- 
-Luiz Augusto von Dentz
+2.21.1
+
