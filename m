@@ -1,42 +1,71 @@
-Return-Path: <SRS0=tmcz=3Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=ITs3=3R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F53C2D0DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jan 2020 22:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1249AC32771
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 01:58:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB22D24656
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jan 2020 22:36:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF3E72467B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 01:58:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="luBgcOEn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726360AbgA0WgS (ORCPT
+        id S1726275AbgA1B65 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jan 2020 17:36:18 -0500
-Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:33810 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726181AbgA0WgS (ORCPT
+        Mon, 27 Jan 2020 20:58:57 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35259 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726173AbgA1B65 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jan 2020 17:36:18 -0500
-Received: from localhost.localdomain ([93.22.132.58])
-        by mwinf5d67 with ME
-        id vacD210071Fl4A503acDc3; Mon, 27 Jan 2020 23:36:15 +0100
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 27 Jan 2020 23:36:15 +0100
-X-ME-IP: 93.22.132.58
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, kuba@kernel.org,
-        davem@davemloft.net
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] Bluetooth: SMP: Fix SALT value in some comments
-Date:   Mon, 27 Jan 2020 23:36:09 +0100
-Message-Id: <20200127223609.15066-1-christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.20.1
+        Mon, 27 Jan 2020 20:58:57 -0500
+Received: by mail-pg1-f195.google.com with SMTP id l24so6135703pgk.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2020 17:58:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=R3FwTdU3+YYxJ9SH0Yd6M6zNVwXOrrZbQeuDM/vJ5Fw=;
+        b=luBgcOEnWPjDt+cpT6KoP8uJi/NyTEjILoOu/xFOsfstZZ4hs0ZnNeftmkm1qLl4Zk
+         BoTvNCtfRaBYdsE/zKSlCiM95nPfKXMjRLfqj8uNOZge+T3uJ4bcmK5S5p3ANJPREa8s
+         5HBk3/1H8fscF5HrR7a9CY7l2k2Lg9NZadM1k=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=R3FwTdU3+YYxJ9SH0Yd6M6zNVwXOrrZbQeuDM/vJ5Fw=;
+        b=WTJeqaX88I73xGoJwpi21D0rcVEvctNZHvhCR2ru13KbarZKpidmo8NusJdZqFzH7X
+         5SGqcruyj9Z9hL1wX5CHWqfPu+vBVkNUOswZOj2JFUbstGvjfuAWvglvyETkNl0h0tM6
+         PzvOqltWh+CAL4TsYB7lxzXewYFvDuP3W0Jxu+9vSejjWJn2aeSjHONQBRm8t5J64CCI
+         NUt3q6oTNIUCExicmCEMVQa9g3vgfy/jaTjulLxTmpDGg/Y/YKv2dEDwlpqmYq4aQTLW
+         mJY4LA8J4nhuKIe11Jbt50eWZEgARPjE33qi4JvEEEzXEmNADTO5Zw88lv5r1ZAfeakD
+         sCVw==
+X-Gm-Message-State: APjAAAXBT7jhSlWKD8WW5ctoLqoIDtqa9/J0a4oJtvqEjhpBe8nKyiW6
+        3/cWEuzkAivK1Q9zzBNjrcgnIg==
+X-Google-Smtp-Source: APXvYqxlHkQg/XtYWAHxf1igobzjJd7JwdFaEZsHNaEUCxNG40zoohunADuPkXpcBb/S4ivNa/zShQ==
+X-Received: by 2002:a63:d04c:: with SMTP id s12mr22613870pgi.105.1580176736512;
+        Mon, 27 Jan 2020 17:58:56 -0800 (PST)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
+        by smtp.gmail.com with ESMTPSA id a17sm364153pjv.6.2020.01.27.17.58.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jan 2020 17:58:55 -0800 (PST)
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com, alainm@chromium.org
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [RFC PATCH v2 0/4] Bluetooth: Handle system suspend gracefully
+Date:   Mon, 27 Jan 2020 17:58:44 -0800
+Message-Id: <20200128015848.226966-1-abhishekpandit@chromium.org>
+X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -44,37 +73,61 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Salts are 16 bytes long.
-Remove some extra and erroneous '0' in the human readable format used
-in comments.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- net/bluetooth/smp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi linux-bluetooth,
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 4ece170c518e..a2e9492391fe 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1145,7 +1145,7 @@ static void sc_generate_link_key(struct smp_chan *smp)
- 		return;
- 
- 	if (test_bit(SMP_FLAG_CT2, &smp->flags)) {
--		/* SALT = 0x00000000000000000000000000000000746D7031 */
-+		/* SALT = 0x000000000000000000000000746D7031 */
- 		const u8 salt[16] = { 0x31, 0x70, 0x6d, 0x74 };
- 
- 		if (smp_h7(smp->tfm_cmac, smp->tk, salt, smp->link_key)) {
-@@ -1203,7 +1203,7 @@ static void sc_generate_ltk(struct smp_chan *smp)
- 		set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
- 
- 	if (test_bit(SMP_FLAG_CT2, &smp->flags)) {
--		/* SALT = 0x00000000000000000000000000000000746D7032 */
-+		/* SALT = 0x000000000000000000000000746D7032 */
- 		const u8 salt[16] = { 0x32, 0x70, 0x6d, 0x74 };
- 
- 		if (smp_h7(smp->tfm_cmac, key->val, salt, smp->tk))
+This patch series prepares the Bluetooth controller for system suspend
+by disconnecting all devices and preparing the event filter and LE
+whitelist with devices that can wake the system from suspend.
+
+The main motivation for doing this is so we can enable Bluetooth as
+a wake up source during suspend without it being noisy. Bluetooth should
+wake the system when a HID device receives user input but otherwise not
+send any events to the host.
+
+This patch series was tested on several Chromebooks with both btusb and
+hci_serdev on kernel 4.19. The set of tests was basically the following:
+* Reconnects after suspend succeed
+* HID devices can wake the system from suspend (needs some related bluez
+  changes to call the Set Wake Capable management command)
+* System properly pauses and unpauses discovery + advertising around
+  suspend
+* System does not wake from any events from non wakeable devices
+
+Series 2 has refactored the change into multiple smaller commits as
+requested. I tried to simplify some of the whitelist filtering edge
+cases but unfortunately it remains quite complex.
+
+Please review and provide any feedback.
+
+Thanks
+Abhishek
+
+
+Changes in v2:
+* Moved pm notifier registration into its own patch and moved params out
+  of separate suspend_state
+* Refactored filters and whitelist settings to its own patch
+* Refactored update_white_list to have clearer edge cases
+* Add connected devices to whitelist (previously missing corner case)
+* Refactored pause discovery + advertising into its own patch
+
+Abhishek Pandit-Subedi (4):
+  Bluetooth: Add mgmt op set_wake_capable
+  Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND
+  Bluetooth: Update filters/whitelists for suspend
+  Bluetooth: Pause discovery and advertising during suspend
+
+ include/net/bluetooth/hci.h      |  17 +-
+ include/net/bluetooth/hci_core.h |  38 ++++
+ include/net/bluetooth/mgmt.h     |   7 +
+ net/bluetooth/hci_core.c         |  71 ++++++
+ net/bluetooth/hci_event.c        |  28 ++-
+ net/bluetooth/hci_request.c      | 370 ++++++++++++++++++++++++++-----
+ net/bluetooth/hci_request.h      |   2 +
+ net/bluetooth/mgmt.c             |  89 ++++++++
+ 8 files changed, 554 insertions(+), 68 deletions(-)
+
 -- 
-2.20.1
+2.25.0.341.g760bfbb309-goog
 
