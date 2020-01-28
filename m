@@ -2,272 +2,268 @@ Return-Path: <SRS0=ITs3=3R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB77CC33CB3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F2AC33CB3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 20:13:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C80124683
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 18:54:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 464B020708
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 20:13:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DohQe0ej"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CdgfqeNs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726556AbgA1SyZ (ORCPT
+        id S1726266AbgA1UNj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jan 2020 13:54:25 -0500
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:42845 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726293AbgA1SyZ (ORCPT
+        Tue, 28 Jan 2020 15:13:39 -0500
+Received: from mail-pf1-f169.google.com ([209.85.210.169]:34000 "EHLO
+        mail-pf1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726234AbgA1UNj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jan 2020 13:54:25 -0500
-Received: by mail-pf1-f202.google.com with SMTP id z26so919484pfr.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2020 10:54:24 -0800 (PST)
+        Tue, 28 Jan 2020 15:13:39 -0500
+Received: by mail-pf1-f169.google.com with SMTP id i6so7240059pfc.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2020 12:13:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=LbDTiPWVh2Qq5foi37sJFb+KsRGTnNFnk1CotalxKRA=;
-        b=DohQe0ejifkTBADJN4Db02nIq6lRvM4Xw8JkruUg/Tj+3D5xGSsK6mod4Bi+4BtDSL
-         EWf0oJVtWdlFQ0HhnKjvr2dqNXKyreI4Mc0sBUTawJmL0phIQobqIdHU/XPRJqHF2YP3
-         4eXyvvgIw37R5WtSFYV9/tXX6LbhmeE1Z4i6UcFo3C7DuvURoxo7jLD3ug1xtaFK/03W
-         M3nYESFnsxWbVng/xDoujrQWQwO7qmLWyuVGOfw+8+Ipbyz4Gqt04T09m5TScDSTAgvP
-         vOvSh0HqzbMDSz/Q53Z/okCmOt9FvziDMxBeas6L9XL120tGmSitCzDmRx4QLiFVtd8W
-         8p6g==
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=dWDeFlOYaA4w1s0Cs6qHENIPEa90ixNHdeSZB9/RK5g=;
+        b=CdgfqeNsLbPqZwgZDNK2KwcwZcqxGyAsJ9QevK1IQdKfe7/Q6WH5PUBFGlBuUE76sE
+         2favKRhTScEgdveAVAT+9rz5MOr1fOgJvP3GVrgj38h8GKxJl7i438OUTXAHJhREbclJ
+         4HbH+2hwr1IW11bH5WrJjIv0Z02E7f5LZQNEiY7wdlVoovtIaUAFeLf8/GdCYetl7bAP
+         UWuX1cjPBPr0hZewrmFvVcInTEG+JMCtY/mbi1yawttsnApqYatA0FHO0qXookL2fhGR
+         4s7umaJCq2GTss3vJbVxNIVOJtj40TwCMEcPt1dRj5h6jEyAc8sqkiiZVDifTXMryFhe
+         Z7Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=LbDTiPWVh2Qq5foi37sJFb+KsRGTnNFnk1CotalxKRA=;
-        b=HDfhGOa2WgoRPN0fR3mZsMiCas/ZpnlJHmMUPSlZnMJvry9c67zYSQvaZybqsR3a2u
-         aNu542jsmful57PwVFUkk1UXmEY0qZcPbNs76fynlmbMXao378NTupHqSlN7Hqr1BiY2
-         pQty2U81qHCRHJm6vhVkTqFHiGx2R5JRkEMf8JdhXPjCkEwnQ3Mvi6DJ6NQenGMOR4MV
-         o4HQE//7WvhGrbVpm4Z3ZLuIBAZblp0m8qBkCV6aXhb7Dw3+BeJkCcWAMcXb6Gk33zhu
-         QTObxUmQVaUAQUuYIqyFVbr+V7iAcYD7JXrL1PLdS0KXamqFVuH8erPKsFoBEfzj2l6a
-         oHcg==
-X-Gm-Message-State: APjAAAUiJM+ujiyhVj9DDB/B8NUhaFoukcA9xxlnG16LqccZevDhQ80e
-        a/yQEMRRFyUEtgkKANnuipSoVbNjo8QJpg==
-X-Google-Smtp-Source: APXvYqyK/6wCT/mTPrR4EawFmZoRdscXKvoE+wJYU6Idai+Lw83amCiJ4RuwIEoVmYywqquXhHt8NZy7BkOb3Q==
-X-Received: by 2002:a65:578e:: with SMTP id b14mr26340514pgr.444.1580237664492;
- Tue, 28 Jan 2020 10:54:24 -0800 (PST)
-Date:   Tue, 28 Jan 2020 10:54:14 -0800
-In-Reply-To: <20200128185414.158541-1-mmandlik@google.com>
-Message-Id: <20200128105322.1.If741898c727a5d948cbb10fdf9225b84efd443c8@changeid>
-Mime-Version: 1.0
-References: <20200128185414.158541-1-mmandlik@google.com>
-X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [PATCH 1/1] Bluetooth: Fix refcount use-after-free issue
-From:   Manish Mandlik <mmandlik@google.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Yoni Shavit <yshavit@chromium.org>,
-        linux-bluetooth@vger.kernel.org,
-        Alain Michaud <alainmichaud@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=dWDeFlOYaA4w1s0Cs6qHENIPEa90ixNHdeSZB9/RK5g=;
+        b=kRu9LaTr+qHg/E3EiMrFH2EeALzvrTHIeUapfKVDQ2hQo2egXiWJbmGJQTai/JN2KT
+         JZclgMKXhwOVL7MOAX7EzHrrmK9VMhXi4scC9Ox8TMwSgHNPd8MQ+GYVC+KiwbvcCWFf
+         bqnt5nIOS+jl608yP4jrk1MCpmxWKyhFRUcwkOdHFt7D6guHRowosueSrUnoVq/vdn4y
+         k2GB/Lvue/zg/pk2HXidrKP24G3EhSbDSRNqEIIZYLAzutR4AuDRNrSzLwsI5ra+u+ut
+         YhBNSCzprN/THRDzOprlRKIUwCCtDmAckoqpntltU3HUwNt9USo23DP8Q5Ro070ZF+fD
+         TQMg==
+X-Gm-Message-State: APjAAAWVKJQ1MPhg/4s+E62/IYVPi3atSIrVCNlSYr0+UBoZOwJmpmJp
+        rjnmFvnNaKDOxyhXIVcRsUnB8LaD+y0=
+X-Google-Smtp-Source: APXvYqwjE3eHReMAG2swJF7nUorkSIUN5XOxh1I5gMHesF4EyFkDR1liOTp+tUGy7ndKMrQMzTR3NQ==
+X-Received: by 2002:a62:2ccd:: with SMTP id s196mr5604383pfs.227.1580242418448;
+        Tue, 28 Jan 2020 12:13:38 -0800 (PST)
+Received: from localhost.localdomain ([192.102.209.38])
+        by smtp.gmail.com with ESMTPSA id x8sm3367504pfr.104.2020.01.28.12.13.37
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jan 2020 12:13:37 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/6] monitor: Add decoding of ISO related Link Layer PDUs
+Date:   Tue, 28 Jan 2020 12:13:31 -0800
+Message-Id: <20200128201335.6165-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200128201335.6165-1-luiz.dentz@gmail.com>
+References: <20200128201335.6165-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There is no lock preventing both l2cap_sock_release() and
-chan->ops->close() from running at the same time.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If we consider Thread A running l2cap_chan_timeout() and Thread B running
-l2cap_sock_release(), expected behavior is:
-  A::l2cap_chan_timeout()->l2cap_chan_close()->l2cap_sock_teardown_cb()
-  A::l2cap_chan_timeout()->l2cap_sock_close_cb()->l2cap_sock_kill()
-  B::l2cap_sock_release()->sock_orphan()
-  B::l2cap_sock_release()->l2cap_sock_kill()
-
-where,
-sock_orphan() clears "sk->sk_socket" and l2cap_sock_teardown_cb() marks
-socket as SOCK_ZAPPED.
-
-In l2cap_sock_kill(), there is an "if-statement" that checks if both
-sock_orphan() and sock_teardown() has been run i.e. sk->sk_socket is NULL
-and socket is marked as SOCK_ZAPPED. Socket is killed if the condition is
-satisfied.
-
-In the race condition, following occurs:
-  A::l2cap_chan_timeout()->l2cap_chan_close()->l2cap_sock_teardown_cb()
-  B::l2cap_sock_release()->sock_orphan()
-  B::l2cap_sock_release()->l2cap_sock_kill()
-  A::l2cap_chan_timeout()->l2cap_sock_close_cb()->l2cap_sock_kill()
-
-In this scenario, "if-statement" is true in both B::l2cap_sock_kill() and
-A::l2cap_sock_kill() and we hit "refcount: underflow; use-after-free" bug.
-
-Similar condition occurs at other places where teardown/sock_kill is
-happening:
-  l2cap_disconnect_rsp()->l2cap_chan_del()->l2cap_sock_teardown_cb()
-  l2cap_disconnect_rsp()->l2cap_sock_close_cb()->l2cap_sock_kill()
-
-  l2cap_conn_del()->l2cap_chan_del()->l2cap_sock_teardown_cb()
-  l2cap_conn_del()->l2cap_sock_close_cb()->l2cap_sock_kill()
-
-  l2cap_disconnect_req()->l2cap_chan_del()->l2cap_sock_teardown_cb()
-  l2cap_disconnect_req()->l2cap_sock_close_cb()->l2cap_sock_kill()
-
-  l2cap_sock_cleanup_listen()->l2cap_chan_close()->l2cap_sock_teardown_cb()
-  l2cap_sock_cleanup_listen()->l2cap_sock_kill()
-
-Protect teardown/sock_kill and orphan/sock_kill by adding hold_lock on
-l2cap channel to ensure that the socket is killed only after marked as
-zapped and orphan.
-
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
+This adds the decoding of ISO related Link Layer PDUs
 ---
+ monitor/bt.h |  48 +++++++++++++++++++++++++
+ monitor/ll.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 148 insertions(+)
 
- net/bluetooth/l2cap_core.c | 26 +++++++++++++++-----------
- net/bluetooth/l2cap_sock.c | 16 +++++++++++++---
- 2 files changed, 28 insertions(+), 14 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 195459a1e53e..dd2021270b8a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -419,6 +419,9 @@ static void l2cap_chan_timeout(struct work_struct *work)
- 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 48901d7cd..b1b24afeb 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -28,6 +28,8 @@
+ #define BT_HCI_BIT_5_2		(8 * 41) + 5
+ #define BT_HCI_SUBEVT_5_2	0x19
  
- 	mutex_lock(&conn->chan_lock);
-+	/* __set_chan_timer() calls l2cap_chan_hold(chan) while scheduling
-+	 * this work. No need to call l2cap_chan_hold(chan) here again.
-+	 */
- 	l2cap_chan_lock(chan);
- 
- 	if (chan->state == BT_CONNECTED || chan->state == BT_CONFIG)
-@@ -431,12 +434,12 @@ static void l2cap_chan_timeout(struct work_struct *work)
- 
- 	l2cap_chan_close(chan, reason);
- 
--	l2cap_chan_unlock(chan);
--
- 	chan->ops->close(chan);
--	mutex_unlock(&conn->chan_lock);
- 
-+	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
++#define BT_LL_CMD_5_2		0x1f
 +
-+	mutex_unlock(&conn->chan_lock);
+ struct bt_ll_hdr {
+ 	uint8_t  preamble;
+ 	uint32_t access_addr;
+@@ -179,6 +181,52 @@ struct bt_ll_clock_acc {
+ 
+ #define BT_LL_CLOCK_ACCURACY_RSP 0x1e
+ 
++#define BT_LL_CIS_REQ		BT_LL_CMD_5_2
++struct bt_ll_cis_req {
++	uint8_t  cig;
++	uint8_t  cis;
++	uint8_t  m_phy;
++	uint8_t  s_phy;
++	uint16_t m_sdu;
++	uint16_t s_sdu;
++	uint8_t  m_interval[3];
++	uint8_t  s_interval[3];
++	uint8_t  m_pdu;
++	uint8_t  s_pdu;
++	uint8_t  nse;
++	uint8_t  sub_interval[3];
++	uint8_t  bn;
++	uint8_t  m_ft;
++	uint8_t  s_ft;
++	uint16_t iso_interval;
++	uint8_t  offset_min[3];
++	uint8_t  offset_max[3];
++	uint16_t conn_event_count;
++} __attribute__ ((packed));
++
++#define BT_LL_CIS_RSP		BT_LL_CMD_5_2 + 1
++struct bt_ll_cis_rsp {
++	uint8_t  offset_min[3];
++	uint8_t  offset_max[3];
++	uint16_t conn_event_count;
++} __attribute__ ((packed));
++
++#define BT_LL_CIS_IND		BT_LL_CMD_5_2 + 2
++struct bt_ll_cis_ind {
++	uint32_t addr;
++	uint8_t  cis_offset[3];
++	uint8_t  cig_sync_delay[3];
++	uint8_t  cis_sync_delay[3];
++	uint16_t conn_event_count;
++} __attribute__ ((packed));
++
++#define BT_LL_CIS_TERMINATE_IND	BT_LL_CMD_5_2 + 3
++struct bt_ll_cis_term_ind {
++	uint8_t  cig;
++	uint8_t  cis;
++	uint8_t  reason;
++} __attribute__ ((packed));
++
+ #define LMP_ESC4(x) ((127 << 8) | (x))
+ 
+ #define BT_LMP_NAME_REQ			1
+diff --git a/monitor/ll.c b/monitor/ll.c
+index 5141f2be6..4b3f567bd 100644
+--- a/monitor/ll.c
++++ b/monitor/ll.c
+@@ -601,6 +601,97 @@ static void clock_acc_req_rsp(const void *data, uint8_t size)
+ 	print_field("SCA: 0x%2.2x", pdu->sca);
  }
  
- struct l2cap_chan *l2cap_chan_create(void)
-@@ -1737,9 +1740,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 		l2cap_chan_del(chan, err);
- 
--		l2cap_chan_unlock(chan);
--
- 		chan->ops->close(chan);
++static void cis_req(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_req *cmd = data;
++	uint32_t interval;
++	uint8_t mask;
 +
-+		l2cap_chan_unlock(chan);
- 		l2cap_chan_put(chan);
- 	}
- 
-@@ -4405,6 +4408,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 		return 0;
- 	}
- 
-+	l2cap_chan_hold(chan);
- 	l2cap_chan_lock(chan);
- 
- 	rsp.dcid = cpu_to_le16(chan->scid);
-@@ -4413,12 +4417,11 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 
- 	chan->ops->set_shutdown(chan);
- 
--	l2cap_chan_hold(chan);
- 	l2cap_chan_del(chan, ECONNRESET);
- 
--	l2cap_chan_unlock(chan);
--
- 	chan->ops->close(chan);
++	print_field("CIG ID: 0x%2.2x", cmd->cig);
++	print_field("CIS ID: 0x%2.2x", cmd->cis);
++	print_field("Master to Slave PHY: 0x%2.2x", cmd->m_phy);
 +
-+	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
- 
- 	mutex_unlock(&conn->chan_lock);
-@@ -4450,20 +4453,21 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
- 		return 0;
- 	}
- 
-+	l2cap_chan_hold(chan);
- 	l2cap_chan_lock(chan);
- 
- 	if (chan->state != BT_DISCONN) {
- 		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
- 		mutex_unlock(&conn->chan_lock);
- 		return 0;
- 	}
- 
--	l2cap_chan_hold(chan);
- 	l2cap_chan_del(chan, 0);
- 
--	l2cap_chan_unlock(chan);
--
- 	chan->ops->close(chan);
++	mask = print_bitfield(2, cmd->m_phy, le_phys);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
 +
-+	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
- 
- 	mutex_unlock(&conn->chan_lock);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index a7be8b59b3c2..ab65304f3f63 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1042,7 +1042,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- }
- 
- /* Kill socket (only if zapped and orphan)
-- * Must be called on unlocked socket.
-+ * Must be called on unlocked socket, with l2cap channel lock.
-  */
- static void l2cap_sock_kill(struct sock *sk)
- {
-@@ -1203,8 +1203,15 @@ static int l2cap_sock_release(struct socket *sock)
- 
- 	err = l2cap_sock_shutdown(sock, 2);
- 
-+	l2cap_chan_hold(l2cap_pi(sk)->chan);
-+	l2cap_chan_lock(l2cap_pi(sk)->chan);
++	print_field("Slave To Master PHY: 0x%2.2x", cmd->s_phy);
 +
- 	sock_orphan(sk);
- 	l2cap_sock_kill(sk);
++	mask = print_bitfield(2, cmd->s_phy, le_phys);
++	if (mask)
++		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
++							" (0x%2.2x)", mask);
 +
-+	l2cap_chan_unlock(l2cap_pi(sk)->chan);
-+	l2cap_chan_put(l2cap_pi(sk)->chan);
++	print_field("Master to Slave Maximum SDU: %u", cmd->m_sdu);
++	print_field("Slave to Master Maximum SDU: %u", cmd->s_sdu);
 +
- 	return err;
- }
- 
-@@ -1222,12 +1229,15 @@ static void l2cap_sock_cleanup_listen(struct sock *parent)
- 		BT_DBG("child chan %p state %s", chan,
- 		       state_to_string(chan->state));
- 
-+		l2cap_chan_hold(chan);
- 		l2cap_chan_lock(chan);
++	memcpy(&interval, cmd->m_interval, sizeof(cmd->m_interval));
++	print_field("Master to Slave Interval: 0x%6.6x", le32_to_cpu(interval));
++	memcpy(&interval, cmd->s_interval, sizeof(cmd->s_interval));
++	print_field("Slave to Master Interval: 0x%6.6x", le32_to_cpu(interval));
 +
- 		__clear_chan_timer(chan);
- 		l2cap_chan_close(chan, ECONNRESET);
--		l2cap_chan_unlock(chan);
--
- 		l2cap_sock_kill(sk);
++	print_field("Master to Slave Maximum PDU: %u", cmd->m_pdu);
++	print_field("Slave to Master Maximum PDU: %u", cmd->s_pdu);
 +
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
- 	}
- }
++	print_field("Burst Number: %u us", cmd->bn);
++
++	memcpy(&interval, cmd->sub_interval, sizeof(cmd->sub_interval));
++	print_field("Sub-Interval: 0x%6.6x", le32_to_cpu(interval));
++
++	print_field("Master to Slave Flush Timeout: %u", cmd->m_ft);
++	print_field("Slave to Master Flush Timeout: %u", cmd->s_ft);
++
++	print_field("ISO Interval: 0x%4.4x", le16_to_cpu(cmd->iso_interval));
++
++	memcpy(&interval, cmd->offset_min, sizeof(cmd->offset_min));
++	print_field("CIS Offset Minimum: 0x%6.6x", le32_to_cpu(interval));
++	memcpy(&interval, cmd->offset_max, sizeof(cmd->offset_max));
++	print_field("CIS Offset Maximum: 0x%6.6x", le32_to_cpu(interval));
++
++	print_field("Connection Event Count: %u", cmd->conn_event_count);
++}
++
++static void cis_rsp(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_rsp *rsp = data;
++	uint32_t interval;
++
++	memcpy(&interval, rsp->offset_min, sizeof(rsp->offset_min));
++	print_field("CIS Offset Minimum: 0x%6.6x", le32_to_cpu(interval));
++	memcpy(&interval, rsp->offset_max, sizeof(rsp->offset_max));
++	print_field("CIS Offset Maximum: 0x%6.6x", le32_to_cpu(interval));
++
++	print_field("Connection Event Count: %u", rsp->conn_event_count);
++}
++
++static void cis_ind(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_ind *ind = data;
++	uint32_t interval;
++
++	print_field("CIS Access Address: 0x%4.4x", le32_to_cpu(ind->addr));
++	memcpy(&interval, ind->cis_offset, sizeof(ind->cis_offset));
++	print_field("CIS Offset: 0x%6.6x", le32_to_cpu(interval));
++
++	memcpy(&interval, ind->cig_sync_delay, sizeof(ind->cig_sync_delay));
++	print_field("CIG Synchronization Delay: 0x%6.6x",
++					le32_to_cpu(interval));
++	memcpy(&interval, ind->cis_sync_delay, sizeof(ind->cis_sync_delay));
++	print_field("CIS Synchronization Delay: %u us",
++					le32_to_cpu(interval));
++	print_field("Connection Event Count: %u", ind->conn_event_count);
++}
++
++static void cis_term_ind(const void *data, uint8_t size)
++{
++	const struct bt_ll_cis_term_ind *ind = data;
++
++	print_field("CIG ID: 0x%2.2x", ind->cig);
++	print_field("CIS ID: 0x%2.2x", ind->cis);
++	packet_print_error("Reason", ind->reason);
++}
++
+ struct llcp_data {
+ 	uint8_t opcode;
+ 	const char *str;
+@@ -641,6 +732,15 @@ static const struct llcp_data llcp_table[] = {
+ 	{ 0x1c, "LL_PERIODIC_SYNC_IND",     periodic_sync_ind, 34, true },
+ 	{ 0x1d, "LL_CLOCK_ACCURACY_REQ",    clock_acc_req_rsp,  1, true },
+ 	{ 0x1e, "LL_CLOCK_ACCURACY_RSP",    clock_acc_req_rsp,  1, true },
++	{ BT_LL_CIS_REQ, "LL_CIS_REQ",      cis_req,
++					sizeof(struct bt_ll_cis_req), true },
++	{ BT_LL_CIS_RSP, "LL_CIS_RSP",      cis_rsp,
++					sizeof(struct bt_ll_cis_rsp), true },
++	{ BT_LL_CIS_IND, "LL_CIS_IND",      cis_ind,
++					sizeof(struct bt_ll_cis_ind), true },
++	{ BT_LL_CIS_TERMINATE_IND, "LL_CIS_TERMINATE_IND", cis_term_ind,
++					sizeof(struct bt_ll_cis_term_ind),
++					true },
+ 	{ }
+ };
  
 -- 
-2.25.0.341.g760bfbb309-goog
+2.21.0
 
