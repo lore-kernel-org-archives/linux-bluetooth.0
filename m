@@ -2,66 +2,68 @@ Return-Path: <SRS0=ITs3=3R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA12C32771
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F93C33CB7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 606112467B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B1422467C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="h9pBRg6h"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WkdqcTpY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726173AbgA1CFL (ORCPT
+        id S1726240AbgA1CFM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jan 2020 21:05:11 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38390 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726164AbgA1CFL (ORCPT
+        Mon, 27 Jan 2020 21:05:12 -0500
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:33175 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726164AbgA1CFM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jan 2020 21:05:11 -0500
-Received: by mail-pf1-f194.google.com with SMTP id x185so5818274pfc.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2020 18:05:11 -0800 (PST)
+        Mon, 27 Jan 2020 21:05:12 -0500
+Received: by mail-pj1-f42.google.com with SMTP id m7so246922pjs.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2020 18:05:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=YehW6fGub6Pwi8VfSfLp5w1/7e08XsyNQJVG79iISfM=;
-        b=h9pBRg6hfCmwzQL8O5l6KHlTr4uFn2cFqhGqRLubntUxkRmqEB4ES/BU2VsXOZGEU4
-         RcbTX6ggoUzoeqFn0BuM3U4Wg4hqaAn2ed7cArRtJs6v2dbRXObiV/eUCFUBKMLTRAch
-         jc7kEcQ8YFcBDtNg71MvInaU3mbBJZNl8+PZM=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=oESsgnjn3tlPnw7isobWu7ye1ZgRvVYgV6MEBPxlQMk=;
+        b=WkdqcTpYSKEZ91Ra8Yk2J4AQz5gYroTjm0QQFIBFklYBSZJpEgBIaKoXrPwxZsyNSU
+         kfsGP7Uftxd0x0FCdvsT4A4JQXoF/ub+IiETIsllmfBB389wovkfKZ4u4X8fr97Rkspj
+         h/89JtsdDzrg3YMcZDLtXTq2gl6YmeOmaywLA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=YehW6fGub6Pwi8VfSfLp5w1/7e08XsyNQJVG79iISfM=;
-        b=QbCYVm1/tyyNVOG0McsPzfEVoT235w90ZhaIL+bILG2Mt7P6k8fvvASJJuhwH9Z4Iw
-         SqdVd8sUR3n2LYRfBtWa8o7sR1zFq7TEiRE/ZoQs9qGiV60A+Vj3g6dOAEZ2OEJTbaoH
-         5L+o794jM75haUjQnGc2IIHjCRDaF06oSpbQR17v9+XNP+N3CJU2LLU1uRy7a7r53Ptm
-         inXpYmbCkJnb+v5gT47RpqWOIMOhFA45yZi3vRK0kfg8otCH8YjMyC0fA73qopMmbuGg
-         TRjGtNrUK1kRQnSf5WuEu89dO0Fz8k+riiCJpp2bnvbwCczl+QKeMIdlQXSRF1Uod8xQ
-         bA5A==
-X-Gm-Message-State: APjAAAX8YMdoQysClbucwkBHsmkyDHJ4I7PEprX6zZCQQwO13NPnwcQD
-        GSFx8LCiG1Unr1zrXjB5NYcg/g==
-X-Google-Smtp-Source: APXvYqxRQHFOeSynz3m24br4ZN2VGWjWP0n5YD9aLp8IKwFWfTi+58mEXLBMm5jKAj6Es2dqh/J3wQ==
-X-Received: by 2002:a65:64c6:: with SMTP id t6mr21682053pgv.392.1580177110799;
-        Mon, 27 Jan 2020 18:05:10 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=oESsgnjn3tlPnw7isobWu7ye1ZgRvVYgV6MEBPxlQMk=;
+        b=Gia5CIKY2V714m77WIGijKbohTFWyfRLLPsJH08zfAhAzQhU4rIXHH1+52T2Br8uPA
+         S6u56hXHPYrjRPDt/toLgmsXxK8rfufF3ISzT2msBm8OHj52cBaTOJjAGFp9J0DTykqm
+         1MM5hmsYTYA59XL+fDgtanGkC+zANXuG1CwEUaIYdvMnF+L2Sy69dipgxkm1YHDPIlXB
+         2TgImzWdwFGvPPyqmCOr/R94HWbGk39/2UPsKYuQfnhazsADXbMzMgr7CSa7sP0tNQGC
+         x+GD6R301jzhhqCXScv9FWtct3Lb9E4ViiDOTkuTIKRDTFOM8GIIflCzuF4XPleZxtHz
+         ldpw==
+X-Gm-Message-State: APjAAAUywNx2m+OW5xwpczKmkAThfq5qM35CrIiUxnatUfmafn0MZTUm
+        RCkCU4NpAmOBdR2Kw8NtMiJiWQ==
+X-Google-Smtp-Source: APXvYqxEipU4Zqdk6Ay2JYw1QbiRaFUQ6kzBVZPUq400Ir5nh9isdqrlVaChcvwMWJxpmTqEnzv6gw==
+X-Received: by 2002:a17:902:7c95:: with SMTP id y21mr20356240pll.186.1580177111900;
+        Mon, 27 Jan 2020 18:05:11 -0800 (PST)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
         by smtp.gmail.com with ESMTPSA id z19sm17119015pfn.49.2020.01.27.18.05.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2020 18:05:10 -0800 (PST)
+        Mon, 27 Jan 2020 18:05:11 -0800 (PST)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 To:     luiz.dentz@gmail.com, marcel@holtmann.org, alainm@chromium.org
 Cc:     linux-bluetooth@vger.kernel.org,
         chromeos-bluetooth-upstreaming@chromium.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [BlueZ PATCH v3 0/5] device: Allow devices to be marked as wake capable
-Date:   Mon, 27 Jan 2020 18:05:00 -0800
-Message-Id: <20200128020505.239349-1-abhishekpandit@chromium.org>
+Subject: [BlueZ PATCH v3 1/5] mgmt: Add docs for Set Wake Capable
+Date:   Mon, 27 Jan 2020 18:05:01 -0800
+Message-Id: <20200127180433.BlueZ.v3.1.I999b93b65e613324dbbd16a1cf493be72fa06ad1@changeid>
 X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
+In-Reply-To: <20200128020505.239349-1-abhishekpandit@chromium.org>
+References: <20200128020505.239349-1-abhishekpandit@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -69,58 +71,47 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Add docs for new management operation to mark a device as wake capable.
 
-Hi bluez maintainers,
+---
 
-This change accompanies changes in the kernel to mark HID devices as
-wake capable so they can wake the system from suspend. The
-implementation depends on the Set Wake Capable management operation. It
-is currently a separate management operation but it may be added as an
-extension to an exiting operand like add_device (need some feedback
-regarding this).
-
-Per request on the last patch, I've moved docs/mgmt-api.txt into its own
-patch so we can continue discussions on it.
-
-This change was tested with appropriate kernel changes on v4.19
-(verified that HID devices were being marked as wake capable in the
-kernel).
-
-Thanks
-Abhishek
-
-Changes in v3:
-* Added profile_wake_support and made wake_capable dependent on it
-* Added documentation for WakeCapable
-* Mark HID device to support wake from suspend
-
+Changes in v3: None
 Changes in v2:
 * Separated docs/mgmt-api.txt into its own patch
-* Added dbus api "WakeCapable" to set value
-* Update device_set_wake_capable to be called by
-  adapter_set_wake_capable_complete so we can emit property changed
-* Newly added to show whether device is wake capable
-* Removed automatically setting wake capable for HID devices
 
-Abhishek Pandit-Subedi (5):
-  mgmt: Add docs for Set Wake Capable
-  device: Allow device to be marked as wake capable
-  client: Display wake capable property with info
-  doc/device-api: Add WakeCapable
-  input: Make HID devices wake capable
+ doc/mgmt-api.txt | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
- client/main.c           |   1 +
- doc/device-api.txt      |   5 ++
- doc/mgmt-api.txt        |  19 +++++++
- lib/mgmt.h              |   9 ++++
- profiles/input/device.c |   1 +
- profiles/input/hog.c    |   1 +
- src/adapter.c           |  65 ++++++++++++++++++++++
- src/adapter.h           |   2 +
- src/device.c            | 116 ++++++++++++++++++++++++++++++++++++++++
- src/device.h            |   5 ++
- 10 files changed, 224 insertions(+)
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 1e59acc54..8a73a9bb9 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -3047,6 +3047,25 @@ Load Blocked Keys Command
+ 	Possible errors:	Invalid Parameters
+ 				Invalid Index
+ 
++Set Wake Capable Command
++===========================
++
++	Command Code:		0x0047
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Wake Capable (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Wake Capable (1 Octet)
++
++	This command sets whether a bluetooth device is capable of waking the
++	system from suspend. This property is used to set the event filter and
++	LE whitelist when the system enters suspend.
++
++	Possible errors:	Failed
++				Invalid Parameters
++				Invalid Index
+ 
+ Command Complete Event
+ ======================
 -- 
 2.25.0.341.g760bfbb309-goog
 
