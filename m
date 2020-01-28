@@ -2,106 +2,93 @@ Return-Path: <SRS0=ITs3=3R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912C9C33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 11:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5025BC2D0DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 13:27:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A7B624681
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 11:26:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="2Ql1gmZ8"
+	by mail.kernel.org (Postfix) with ESMTP id 2A35D22522
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 13:27:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725948AbgA1L04 (ORCPT
+        id S1726057AbgA1N1d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jan 2020 06:26:56 -0500
-Received: from mail-vs1-f44.google.com ([209.85.217.44]:44089 "EHLO
-        mail-vs1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbgA1L0z (ORCPT
+        Tue, 28 Jan 2020 08:27:33 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:34409 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725852AbgA1N1d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jan 2020 06:26:55 -0500
-Received: by mail-vs1-f44.google.com with SMTP id p6so7787812vsj.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jan 2020 03:26:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=arNb1j3i4GvNRlcn37kgR9usAhnBUODhruewU4zCDlA=;
-        b=2Ql1gmZ8RviEtZ7yzqWOEntCsZwCoCWzTO0KKvirjPnb9RsrqT7ovAd7tx4XAkJXPg
-         SD/ap43u4ygRJSUQ7xmPaiQifylGMAT5wrFm8qotllkCtWJ1FDEdypM9Dcaop4CJqJpP
-         giqFJPZMoIRZVQGG8MF1SjTTB3GPVDcn8fwmsxCNum9ps4zEaWQiSYY+tToFeXejLh3t
-         mf6X6bclOoEd9AdievmlYPd6nRhfjIk+zOxWtU9WuxuchIQ5WSJWgXkhSkVKR03AY6X5
-         GHu85nYjAE0IoMyUqggo7WfuxQKzGto3WokLg/2h9shmx31fpi3flnr0j6e8yhHDowRn
-         J8TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=arNb1j3i4GvNRlcn37kgR9usAhnBUODhruewU4zCDlA=;
-        b=tbHslvS6z4isGcR2dZ0s2r5/24n4AoftSzTZqfhR+J6L8J1h6bgTl3ERRgAXa0/2VW
-         FRLTkbaf3X3/llVeRjkemND5oQwhd+DItszLgXAWnZwOJxAVjoZ1zpJzw86ZCJd6AhsI
-         xPFZr1Oe0CoKVnLfuHWl0a3Ulivpdl1T0529y79VJ0c0YtWMJbDGKGC3R1P8Bhp0eszt
-         QR1GsgCxq0FOS6Rbs/j6swj7badeQXVC9w8soJeEMtSGdRibLCNFVAM4YYhIW6yQCWvC
-         z+GXhInRAhrYzKypohg4ZBcYWUcBtBRo//zlKKKHOsRaQZ6V6M23p9a4xSFG69mIrNiv
-         eBzQ==
-X-Gm-Message-State: APjAAAW+nvXyYBjFm1zqC4CJZnvNQXwW4jrfObv0KvwAI1IeqMD9DBsd
-        I/bFLXyTzj33LNJJOMD2tQh5hUatAzoME7BpX0hM14nhUEQ=
-X-Google-Smtp-Source: APXvYqzwmtVKYAC3v4nZRicDa6cfEG1E4EAisrOKaEkrWX6ql6CUTWPSF5WzwJFY0yYoOWk0anWkRvbtdNKslpEm0rY=
-X-Received: by 2002:a67:d703:: with SMTP id p3mr15028396vsj.185.1580210814693;
- Tue, 28 Jan 2020 03:26:54 -0800 (PST)
+        Tue, 28 Jan 2020 08:27:33 -0500
+Received: from Exchange.peiker-cee.de ([82.119.189.133]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1N49xZ-1jesSI44av-0107LG for <linux-bluetooth@vger.kernel.org>; Tue, 28
+ Jan 2020 14:27:31 +0100
+Received: from Exchange.peiker-cee.de (10.0.2.22) by Exchange.peiker-cee.de
+ (10.0.2.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.1591.10; Tue, 28
+ Jan 2020 14:27:27 +0100
+Received: from Exchange.peiker-cee.de ([fe80::743a:4e82:de22:ce17]) by
+ Exchange.peiker-cee.de ([fe80::743a:4e82:de22:ce17%13]) with mapi id
+ 15.01.1591.012; Tue, 28 Jan 2020 14:27:21 +0100
+From:   Konstantin Forostyan <konstantin.forostyan@peiker-cee.de>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: bluetooth: If unknown option in L2CAP Configuration Request is a
+ hint, Bluetooth stack responds with "Command Reject" instead of
+ "Configuration Response"
+Thread-Topic: bluetooth: If unknown option in L2CAP Configuration Request is a
+ hint, Bluetooth stack responds with "Command Reject" instead of
+ "Configuration Response"
+Thread-Index: AQHV1d6ryqOWvNk7skOPLPyaAiH6AQ==
+Date:   Tue, 28 Jan 2020 13:27:21 +0000
+Message-ID: <3020b8d0c7d39428aec573153b3c3414213be7ce.camel@peiker-cee.de>
+Accept-Language: de-DE, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [192.168.17.207]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <223C43056D7D5747BF3F4C8D0893F07A@peiker-cee.de>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200125004350.4640-1-brian.gix@intel.com> <CAFcXi1x4skUJuCgQLDswFQm20Hqo8XdAwmGv8qTg+ywKyjPGxg@mail.gmail.com>
-In-Reply-To: <CAFcXi1x4skUJuCgQLDswFQm20Hqo8XdAwmGv8qTg+ywKyjPGxg@mail.gmail.com>
-From:   =?UTF-8?B?UmFmYcWCIEdhamRh?= <rafal.gajda@silvair.com>
-Date:   Tue, 28 Jan 2020 12:26:43 +0100
-Message-ID: <CAFcXi1w3=MgG1e57B_e-yyg6zfHRFL--crCZ-8aGfBvxTNVGfw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/5] mesh: Add NVM storage of Replay Protection List
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1eZbgZLdIgCcie8BfFjsMI82c1q85rEpzU/4riRs06d+GhYWIUv
+ /kpmem9JrtMCs2O64H7ttH7DQSAha4eyG70P1GDywC1kIRJwc59NsQO3licIAChZCwvB7qd
+ oTbxsbWTAn6R84EgdfMg6of1lFBmI/Ooqsobfy6iu+0aW/ta/VICz9osR81QtlFFzBECvOF
+ KTgSBQLtj2ZZZjIylzElA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:wE8aDz9IOX8=:vt45Urv17YTVWopVblaMvg
+ +eQ2RaERbQ3KZMoeUBpt5sjaGbFgYuqnFaoMjSyQdmoiEBCYR/MoeXD+UwWlbDDh4Jhd0jxYe
+ jjxCi9HZ4B1YY3rMEWCrfXJ6rDFtLTJ7cTkL7S2ReyboBK6E3esdjbwnH5schkax50PL5tAch
+ lk2l1tQMTwTj0NrdlrLqICcx+K44yrRLbx6FI8YIF05rvTkl0sFAjX/pPfAPGRTwX8LshFbET
+ LnPrFvAL2sYrSKvpTlTkvbLfxsaK/jSTdmyR10aidkR9jbrp2J0c5dpqPiWWVbN42PoKEsAq0
+ LYctGcvOBKIbaj9y1d5wD1KgnhXovKp6JmIB9tSXv1YPLBJ7mlX+SnEp3xzJ39b2YY3WkHKn9
+ gSzy4SOwIr3Mdkbz+ULOf2hRrAy04XkCerRQs0rmI3QwA2a7L3KkgHTK0n+S/UWNgRzY2XmhU
+ h6zWRmVUfDYAEoy8zPsXplNGs8XpAzrn+Ma/JzOLp89jLu+0GP1PP0j9DryQb0TUh3S4/Owqz
+ 9fcVW5g/4+ZkOR+Mpfy9hKbfw97O8tt0M+x+DZ4YbQvPJmXf0J3SJTP4j2tKRMjy1bigOpZV4
+ riRO3PgFiPjMGBUBw06Fu/RqYjgLiNosFWKrEfFrIsO0t8gezznbfEsGKz1W9J/i+HapeLEch
+ NT/U+JccWZxEVmZbIzvT2qvb24oNjDjzokFRWT67M/j636KbFn2SjWByikkI8dBCmxkxzNSIC
+ eOo64nzAliVUhVjWK+cu0ljYisaGxuT+ja8ZUoXj/Chhn/jsZiuW1K2BlqEOWQWbjylqeWzwp
+ yEb+nqd7qKMFUpy8UqyUFGnLwDeIPa5PM+9WWneeZv2UqYeENWlyeFnvjEkNMPqHAKQ2PtaPU
+ bbIL+vVLtkBQweIW4c9g==
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-
-pon., 27 sty 2020 o 22:27 Rafa=C5=82 Gajda <rafal.gajda@silvair.com> napisa=
-=C5=82(a):
->
-> It looks like sequence number is correctly incremented when calling
-> DevKeySend but it isn't incremented at all when ConfigModel sends the
-> reply back.
-
-I think the culprit is in mesh/net.c in mesh_net_app_send() line 3160:
-
-> /* First enqueue to any Friends and internal models */
->     result =3D msg_rxed(net, false, iv_index, ttl,
->     seq + seg_max,
->     net_idx,
->     src, dst,
->     key_aid,szmic, seq & SEQ_ZERO_MASK,
->     msg, msg_len);
->
-> /* If addressed to a unicast address and successfully enqueued,
-> * or delivered to one of our Unicast addresses we are done
-> */
-> if ((result && IS_UNICAST(dst)) || src =3D=3D dst ||
->     (dst >=3D net->src_addr && dst <=3D net->last_addr)) {
->     /* Adjust our seq_num for "virtual" delivery */
->     net->seq_num +=3D seg_max;
->     return true;
-> }
-
-When sending the message we first deliver it to internal models and
-only after that we increment the msg sequence number.
-If we do "net->seq_num +=3D seg_max" before calling msg_rxed() then
-messages are delivered correctly.
-
---=20
-
-Rafa=C5=82 Gajda
-Silvair Sp. z o.o.
+SGVsbG8gY29tbXVuaXR5LA0KDQpJdCBzZWVtcyB0aGF0IHRoZXJlJ3MgYSBidWcgaW4gQmx1ZXRv
+b3RoIHN0YWNrIG9mIDQuMjAga2VybmVsLiBJDQpkaXNjb3ZlcmVkIGl0IGR1cmluZyBCbHVldG9v
+dGggcXVhbGlmaWNhdGlvbiB0ZXN0cy4gTDJDQVAvQ09TL0NGRC9CVi0NCjEyLUMgW1Vua25vd24g
+T3B0aW9uIFJlc3BvbnNlXSB0ZXN0IGZhaWxzIGJlY2F1c2UgaW5zdGVhZCBvZg0KIkNvbmZpZ3Vy
+YXRpb24gUmVzcG9uc2UiIHdpdGggZXJyb3IgY29kZSAweDAwMDMgInVua25vd24gb3B0aW9uIiB0
+aGUNCkJsdWV0b290aCBzdGFjayBnZW5lcmF0ZXMgIkNvbW1hbmQgUmVqZWN0Ii4NCg0KSSB0aGlu
+aywgdGhpcyBoYXBwZW5zIGJlY2F1c2UgdGhlIHRlc3RlciAoQmx1ZXRvb3RoIFNJRyBQVFMpIHVz
+ZXMgaGludHMNCmFzIHVua25vd24gb3B0aW9ucywgYW5kIHRoZSBCbHVldG9vdGggc3RhY2sgaGFz
+IHNwZWNpYWwgaGFuZGxpbmcgZm9yDQpoaW50cy4gDQoNCkkgbWFkZSBhIHNtYWxsIHBhdGNoIGlu
+IG9yZGVyIHRvIG92ZXJjb21lIHRoaXMgcHJvYmxlbS4gUGxlYXNlIGNvbmZpcm0sDQp0aGF0IHRo
+ZSBwYXRjaCBpcyBmZWFzaWJsZS4gSWYgbm90LCBwbGVhc2Ugc3VnZ2VzdCBob3cgdG8gZml4IHRo
+ZQ0KIkNvbW1hbmQgUmVqZWN0IiBwcm9ibGVtLg0KDQpUaGFuayB5b3UgYW5kIGJlc3QgcmVnYXJk
+cywNCktvbnN0YW50aW4NCg0KLS0tIGEvbmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmMNCisrKyBi
+L25ldC9ibHVldG9vdGgvbDJjYXBfY29yZS5jDQpAQCAtMzM4MSwxMSArMzM4MSwxMSBAQA0KIAkJ
+CWJyZWFrOw0KIA0KIAkJZGVmYXVsdDoNCi0JCQlpZiAoaGludCkNCi0JCQkJYnJlYWs7DQotDQog
+CQkJcmVzdWx0ID0gTDJDQVBfQ09ORl9VTktOT1dOOw0KLQkJCSooKHU4ICopIHB0cisrKSA9IHR5
+cGU7DQorDQorCQkJaWYgKCFoaW50KQ0KKwkJCSAgICAqKCh1OCAqKSBwdHIrKykgPSB0eXBlOw0K
+Kw0KIAkJCWJyZWFrOw0KIAkJfQ0KIAl9DQoNCg0K
