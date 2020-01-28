@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DA6C33CB7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF55C33CB1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E43E02467C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6DBF2467C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jan 2020 02:05:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IXEnWsaj"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Tf5vMLAr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726294AbgA1CFO (ORCPT
+        id S1726323AbgA1CFP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jan 2020 21:05:14 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:36946 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726293AbgA1CFO (ORCPT
+        Mon, 27 Jan 2020 21:05:15 -0500
+Received: from mail-pl1-f175.google.com ([209.85.214.175]:40727 "EHLO
+        mail-pl1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726293AbgA1CFP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jan 2020 21:05:14 -0500
-Received: by mail-pf1-f193.google.com with SMTP id p14so5824144pfn.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2020 18:05:14 -0800 (PST)
+        Mon, 27 Jan 2020 21:05:15 -0500
+Received: by mail-pl1-f175.google.com with SMTP id y1so947650plp.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jan 2020 18:05:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=u1iYWOO81m2b+NFhF6XQobXZiUwHPHVTOJQnybZDmPQ=;
-        b=IXEnWsajud5hk6koP89pU/T81PXmbkMtBjs78rQs0QUOK7l9+Kcxvs8ivyTMWBbqGd
-         ZbbHahtZLOhgRnZvOJTS7//PM/lugRfxYZ9IFIT0axRBU2On4edZYO4enrf4eG5N7OCH
-         PMh2tS1Do4o8jnntL4p5MQi/DwdNp3bNczWV4=
+        bh=S6MZbi0mzpP07Agsgnrrb32qLrG53mkbj8Al32OGINo=;
+        b=Tf5vMLArMDXrKq+rzrIaoAUQ9S33pODR3uJ8Lk4kVvt5QVPPXH5rL6q+tc8pLRYzTU
+         TOgnRqXb7ebm+Vbsg1n1LEEsnXS4yFOT6bc8mbgT5Hgg+9ZTQcA65TPaMc23eD9jm+Ae
+         FcKRUwxxHUjvanNVbLlCrbQwrxWEu3XFUV0BY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=u1iYWOO81m2b+NFhF6XQobXZiUwHPHVTOJQnybZDmPQ=;
-        b=GXtwGuY8ZWgyVtXujNG3IIDIyl23gGpOS4yREOmy4NlOABdWjW11yKEXZFb2AeaOFD
-         csHr/qHHsFm1Kl4++erAi1Yaogj9flyyvd2AleX211i2+RO9Kl0BxxKJPDRmurox27/3
-         cH3AEc1V1IjlzLAfI5M5pPYVI26cY++Cy5Uy6SGXmQ8RXU9xxmP9M841KY8owp7SZwFD
-         a4Sj1zHtYLcUUswms51T0pQ+WA+i6nlJC3Kfh/5/lTnbL2Vx2dBm4PqYzfcNWwK9tYa/
-         O2SoWnXdH5RurBAUre/Upu5aXm51qZryyM1Z0xJ5Tpk+t1riYuNHtOapOO2xjeEJn9Gz
-         /a8g==
-X-Gm-Message-State: APjAAAVjU1Z6y+WjibRKccLaPoz+N8O5DXn2ambbSYvBrl9JghyuUKnF
-        NxOEgOOfVgnKBEFc01+Wbd/Oow==
-X-Google-Smtp-Source: APXvYqzXk/dz0C1A7uC4N7I8WGHz5Kp7x65zaIravhwcyOWuQjYfHGGgquTi9kpnGlTu2djd6QTRzw==
-X-Received: by 2002:a63:358a:: with SMTP id c132mr23193049pga.286.1580177113667;
-        Mon, 27 Jan 2020 18:05:13 -0800 (PST)
+        bh=S6MZbi0mzpP07Agsgnrrb32qLrG53mkbj8Al32OGINo=;
+        b=o8JnEnscJn+VOEH0Zx5RvzrOUVN2IpIlw36Xf+eDrBNyganioOeD61oSn1UgBvRAKN
+         Sq5VYg8LX1pfYAyXqY4zuGYJThwIxx5KIYsPbPUiGbKcdXEhVBWLzHQvrQxIYNpstHv8
+         RZZ5iNqd0lCXmCujv5tp/gFLqlGV1S2ipF+Bj8KMGGMA4HFFxKoeh+Xlsg4yHKuGAFQM
+         c0rAflm41kJ+gf/S16lNZPK1nE0zOVNV/GznS0OuMhVtmbnNL4DwDBfEFJi8HDgoo8BM
+         qqsoWPa0eBGzKRAyWit7ewmVsNsS8f+V/aUzdHpZCy87bMvr3KpTJXW/iHIOLrMnNWgf
+         w2HA==
+X-Gm-Message-State: APjAAAVWsy2so2Ds7NazIh8+/TylTv0qvjvMeEjxzVdLXA6RGQdleuOn
+        Ca6PEf04QVxatxFZ5YTsZ/CrtA==
+X-Google-Smtp-Source: APXvYqyrgcuhfFt/TokltexN0CzeMB2kPlZUldmu5KCsDwi9q/6IZWNlocYiwhYnXLH304yEKyX1fQ==
+X-Received: by 2002:a17:902:7442:: with SMTP id e2mr8339069plt.158.1580177114545;
+        Mon, 27 Jan 2020 18:05:14 -0800 (PST)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id z19sm17119015pfn.49.2020.01.27.18.05.12
+        by smtp.gmail.com with ESMTPSA id z19sm17119015pfn.49.2020.01.27.18.05.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2020 18:05:13 -0800 (PST)
+        Mon, 27 Jan 2020 18:05:14 -0800 (PST)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 To:     luiz.dentz@gmail.com, marcel@holtmann.org, alainm@chromium.org
 Cc:     linux-bluetooth@vger.kernel.org,
         chromeos-bluetooth-upstreaming@chromium.org,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [BlueZ PATCH v3 3/5] client: Display wake capable property with info
-Date:   Mon, 27 Jan 2020 18:05:03 -0800
-Message-Id: <20200127180433.BlueZ.v3.3.I80d0e557c53f464415742324eb3ff2cc4cdcbc2a@changeid>
+Subject: [BlueZ PATCH v3 4/5] doc/device-api: Add WakeCapable
+Date:   Mon, 27 Jan 2020 18:05:04 -0800
+Message-Id: <20200127180433.BlueZ.v3.4.I5b076d560ee47afa4c9a8d5602aebf67ffd3d131@changeid>
 X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
 In-Reply-To: <20200128020505.239349-1-abhishekpandit@chromium.org>
 References: <20200128020505.239349-1-abhishekpandit@chromium.org>
@@ -71,31 +71,35 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Display whether the device is configured as wake capable when queried
-with cmd_info.
+Add documentation for WakeCapable, which allows a device to wake the
+system from suspend.
 
 ---
 
-Changes in v3: None
-Changes in v2:
-* Newly added to show whether device is wake capable
-* Removed automatically setting wake capable for HID devices
+Changes in v3:
+* Added documentation for WakeCapable
 
- client/main.c | 1 +
- 1 file changed, 1 insertion(+)
+Changes in v2: None
 
-diff --git a/client/main.c b/client/main.c
-index 8bd0bac9e..5c53fe08d 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1609,6 +1609,7 @@ static void cmd_info(int argc, char *argv[])
- 	print_property(proxy, "Trusted");
- 	print_property(proxy, "Blocked");
- 	print_property(proxy, "Connected");
-+	print_property(proxy, "WakeCapable");
- 	print_property(proxy, "LegacyPairing");
- 	print_uuids(proxy);
- 	print_property(proxy, "Modalias");
+ doc/device-api.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 65d8fee37..492a7f8c7 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -189,6 +189,11 @@ Properties	string Address [readonly]
+ 			drivers will also be removed and no new ones will
+ 			be probed as long as the device is blocked.
+ 
++		boolean WakeCapable [readwrite]
++
++			If set to true this device will be allowed to wake the
++			host processor from system suspend.
++
+ 		string Alias [readwrite]
+ 
+ 			The name alias for the remote device. The alias can
 -- 
 2.25.0.341.g760bfbb309-goog
 
