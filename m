@@ -2,143 +2,482 @@ Return-Path: <SRS0=JIrD=3S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E067C2D0DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 15:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDEA6C2D0DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 17:07:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C31DD20716
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 15:13:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="Ve2jwiMd"
+	by mail.kernel.org (Postfix) with ESMTP id 8732220720
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 17:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726826AbgA2PNZ (ORCPT
+        id S1727188AbgA2RHo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Jan 2020 10:13:25 -0500
-Received: from mga06.intel.com ([134.134.136.31]:7365 "EHLO mga06.intel.com"
+        Wed, 29 Jan 2020 12:07:44 -0500
+Received: from mga14.intel.com ([192.55.52.115]:33253 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726358AbgA2PNZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Jan 2020 10:13:25 -0500
+        id S1727035AbgA2RHo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 29 Jan 2020 12:07:44 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 07:06:13 -0800
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jan 2020 09:07:43 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,378,1574150400"; 
-   d="scan'208";a="429700826"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by fmsmga006.fm.intel.com with ESMTP; 29 Jan 2020 07:06:12 -0800
-Received: from orsmsx153.amr.corp.intel.com (10.22.226.247) by
- ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 29 Jan 2020 07:06:12 -0800
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- ORSMSX153.amr.corp.intel.com (10.22.226.247) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 29 Jan 2020 07:06:12 -0800
-Received: from NAM04-CO1-obe.outbound.protection.outlook.com (104.47.45.52) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 29 Jan 2020 07:06:12 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WSQ2PAQcRI3sswTayZly/513QpCNrOGsYv39GSvCt+C0Qzj3BJc4gfxD+R+XDSdVna+yt7om46iMrL8Se6K7cLMSEnNI3QQZql5IA/5kwZ5pyNY3nXBgYWxV2NQfDlLbQqEn76XQ18HAhIDEf1Zsijz3+y/vqyGz54W4vGYSWoHq+X7GAqDcPR2o8Ahr3W9WPBZsSoRj+gc7xF0xLShTaegjPnfY04/w/0v/AKUPxtDzMfFkKeH6fQ48dSOAe+ijlZgE2XTA5NNDxMaO+UQx/uks/fD3gORZplqSE+ipMiauF7YvbCYDTwUGZEKqjoijdqlt7jI0X43N56+wSFP0ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6CzkHINgzGfi5BKLUIaA09GLIIkgYZb0dtK9D9s895M=;
- b=edyB0z7CLEh3Nq2BnC9JNhZjWKVZDO1+iv6b1ZR4LP98vW2Zn31/pOUSpCBJFgG7tR4+XQ4IhWxmQXlbsK84a7+lqqNFQPSepNUz/1q7EKjNnOSv8mN9cEiyjvK2h1IGTMnjrmPiVJwydxYK4mKjRi61c7+tsmAA9i+5ZoRQwA7To032qgxy3X8+hvM8RZ5HJerr7/U5Gy/G2+fdfqW0MpFtcup0ngOZAR5FEDIlnO3OAxQTsVfL8ntjk50F5bdEVyksDNNoUFkHrqNf564avAD23WsvI/0ogomRba+Iklfbx1JHoH71U+IKKWTYl8HhWzH0d6t/yDWxRvTzhNi2PQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6CzkHINgzGfi5BKLUIaA09GLIIkgYZb0dtK9D9s895M=;
- b=Ve2jwiMdMjL//7Q3Ncy6Eg6o9rvJZhVb+9dUecstK/MZvXb3D+r7FSTBVzoEAoXwO1f3sjhLhe+3bkd034k/SSjUlyQxq/OuxHga8MvpVG0tDN1QaMl1ExpxgNvJp1FH/JMpR1u+qwHWCoPUR2IxClVI4gbz4sQwtDfeTUZWZeY=
-Received: from BN7PR11MB2580.namprd11.prod.outlook.com (52.135.246.155) by
- BN7PR11MB2738.namprd11.prod.outlook.com (52.135.245.154) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.26; Wed, 29 Jan 2020 15:06:10 +0000
-Received: from BN7PR11MB2580.namprd11.prod.outlook.com
- ([fe80::c8ca:3c11:3fc5:a9d6]) by BN7PR11MB2580.namprd11.prod.outlook.com
- ([fe80::c8ca:3c11:3fc5:a9d6%6]) with mapi id 15.20.2665.027; Wed, 29 Jan 2020
- 15:06:10 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "rafal.gajda@silvair.com" <rafal.gajda@silvair.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v4 5/5] mesh: Add NVM storage of Replay Protection
-Thread-Topic: [PATCH BlueZ v4 5/5] mesh: Add NVM storage of Replay Protection
-Thread-Index: AQHV1kyN/LArUGwVHkm0VPVW+lGhN6gBj54AgAAvDoA=
-Date:   Wed, 29 Jan 2020 15:06:10 +0000
-Message-ID: <a49f5f0c9633bacfcbe6f2125aece235ac34e90f.camel@intel.com>
-References: <20200129023258.10004-1-brian.gix@intel.com>
-         <20200129023258.10004-6-brian.gix@intel.com>
-         <20200129121744.zv3jnf6uejjpetud@rgajda2364>
-In-Reply-To: <20200129121744.zv3jnf6uejjpetud@rgajda2364>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [192.55.54.38]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ee5920a4-5eba-4ce1-97c6-08d7a4ccc6ad
-x-ms-traffictypediagnostic: BN7PR11MB2738:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN7PR11MB2738DC3F8EC90EA5DE400957E1050@BN7PR11MB2738.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 02973C87BC
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(376002)(346002)(366004)(39860400002)(396003)(189003)(199004)(91956017)(6916009)(86362001)(107886003)(26005)(6506007)(478600001)(5660300002)(6486002)(6512007)(2906002)(186003)(8676002)(36756003)(71200400001)(81156014)(316002)(81166006)(8936002)(54906003)(4326008)(66476007)(66946007)(2616005)(66556008)(76116006)(66446008)(64756008);DIR:OUT;SFP:1102;SCL:1;SRVR:BN7PR11MB2738;H:BN7PR11MB2580.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: RpKKQqxGyh5cUczRKTkVtJS7yC/GQOfSOknUshmTN47n6roTrXxk/dHn+Ucim87tbNSr67P5Nd35GncwkaE7JsFfLv1K4lZUZvgecvQ24V2MTNWv0+HrjWYoi2vo36UPYabas8Sz8va1Qn4vaxZ++ILL4osqpqg79bADLMCnNDhFKfFEh7cAaYEbQ6j/IPMqXhtvZCQmKsYUhVQZ+bOOk3i4/4qpxzfPaTrnUk63YyBUke0Ic6FD0ulxWnj1adU2BWq2yUkOYEzzNgtwe6Uytlhd1bJHjlvSangS7+v4b40SQ5ZwEBOvOlQgxUKRWjfEZMpD9JzVgte0BRhhzgTkkIcL13L1xYGnwU112fQLwcnG7C0iPS6vzfakWUuBU2e/fXxUMQz4uAc/fk45mduucF1vvS/fNt19LuKVPQChGZEa4Qi5tvUzZhwGxczxyHWn
-x-ms-exchange-antispam-messagedata: KF1wsp5l8RqHoF5WP3mr0BBnMjuv3HHFNi0M3hBCbHURY5p1jtLr5ZRWucUailkZBajxV/mkZvLmx5lXp+O1EQfdNF1J7+i56ICc3QJ2MIha351+e2FAIqhazKH2wgBdV0lYSpMcG758aHHqq6zhfA==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <272057584E653C4B80F0E1394C7266B0@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+   d="scan'208";a="314877740"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.255.84.27])
+  by fmsmga001.fm.intel.com with ESMTP; 29 Jan 2020 09:07:43 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com,
+        rafal.gajda@silvair.com
+Subject: [PATCH BlueZ v5 5/5] mesh: Add NVM storage of Replay Protection
+Date:   Wed, 29 Jan 2020 09:07:32 -0800
+Message-Id: <20200129170732.1607-6-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200129170732.1607-1-brian.gix@intel.com>
+References: <20200129170732.1607-1-brian.gix@intel.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee5920a4-5eba-4ce1-97c6-08d7a4ccc6ad
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2020 15:06:10.7274
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aRqEpaiteFdpnvTUBHbsw+LKyYN9KsLTrLCKpleSmcZ8Il0irPuF69Sv3nbIR7Aai24K5iEZDAUcSNqFXjMVvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR11MB2738
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgUmFmYcWCLA0KDQpPbiBXZWQsIDIwMjAtMDEtMjkgYXQgMTM6MTcgKzAxMDAsIFJhZmFsIEdh
-amRhIHdyb3RlOg0KPiBIaSBCcmlhbiwNCj4gDQo+IEkgaGF2ZSBhIHF1ZXN0aW9uIGFib3V0IHRo
-ZSB3YXkgUlBMIGlzIHN0b3JlZC4NCj4gDQo+IE9uIFR1ZSwgSmFuIDI4LCAyMDIwIGF0IDA2OjMy
-OjU4UE0gLTA4MDAsIEJyaWFuIEdpeCB3cm90ZTogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICANCj4gPiBNZXNoIHNwZWNpZmljYXRpb24gcmVxdWlyZXMgdGhhdCBSZXBs
-YXkgUHJvdGVjdGlvbiBiZSBwcmVzZXJ2ZWQNCj4gPiBhY3Jvc3Mgbm9kZSByZXN0YXJ0cy4gIFRo
-aXMgYWRkcyB0aGF0IHN0b3JhZ2UgaW4NCj4gPiA8bm9kZV91dWlkPi9ycGwvPGl2X2luZGV4Pi88
-c3JjPg0KPiANCj4gV291bGRuJ3QgaXQgYmUgbW9yZSBjb252aW5pZW50IHRvIGtlZXAgYm90aCBp
-dl9pbmRleCBhbmQgc2VxdWVuY2UgaW4gYSBmaWxlIGxpa2UgdGhpczoNCj4gICA8bm9kZV91dWlk
-Pi9ycGwvPHNyYz4NCj4gPw0KPiANCj4gWW91IGNvdWxkIHN0b3JlIHRoZW0gaW4gYnl0ZXMgaW5z
-dGVhZCBvZiBoZXggc3RyaW5nIA0KPiBhbmQgaXQgd291bGQgZWxpbWluYXRlIHRoZSBuZWVkIGZv
-ciBjbGVhbmluZyBlbnRyaWVzIGZyb20gb2xkIElWX2luZGV4Lg0KDQoNCldlIGNvbnNpZGVyZWQg
-dGhpcyBhbmQgZGVjaWRlZCBhZ2FpbnN0IGl0IGZvciBlYXNlIG9mIHByb2Nlc3NpbmcsIGFzIHRo
-aXMgbWV0aG9kIHJlcXVpcmVzIGZld2VyIGZpbGUNCm9wZXJhdGlvbnMuICBDbGVhbmluZyBvbGQg
-ZW50cmllcyBpcyBzb21ldGhpbmcgdGhhdCB3aWxsIGhhcHBlbiByZWdhcmRsZXNzIG9mIGhvdyB0
-aGUgUlBMIHRyZWUgbG9va3MgaW4gdGhlDQpmaWxlIHN5c3RlbSwgYXMgd2UgZGVsZXRlIGVudHJp
-ZXMgdGhhdCBhcmUgb2xkZXIgdGhhbiAobmV0LT5pdl9pbmRleCAtIDEpIHNpbmNlIHdlIGRvbid0
-IHJlY2VpdmUgbWVzc2FnZXMgb24NCnRoYXQgaXZfaW5kZXgsIHRoZXJlIGlzIG5vIHBvc3NpYmxp
-bGl0eSBvZiBhIFJlcGxheSBhdHRhY2suIEFuZCBkZWxldGluZyBhIGZpbGUgc3lzdGVtIHRyZWUg
-aXMgcHJldHR5IHNpbXBsZS4gDQpBIFNSQyBhZGRyZXNzIGRvZXMgbm90IGdldCB0byBrZWVwIGl0
-J3Mgc3BvdCBpbiB0aGUgUlBMIGluZGVmaW5pdGVseS4uLiAgb25seSBvdmVyIHRoZSBjdXJyZW50
-IG9yIHByaW9yDQppdl9pbmRleC4NCg0KT3VyIG90aGVyIGNvbnNpZGVyYXRpb25zIGluY2x1ZGVk
-IG1haW50YWluaW5nIHRoZSBpbnRlZ3JpdHkgb2YgdGhlIFJQTCBhY3Jvc3MgcG93ZXItbG9zcyBv
-ciBhYm9ydCByZWJvb3RzLg0KDQpIb3dldmVyLCB3ZSBkbyByZWNvZ25pemUgdGhhdCBzb21lIHBs
-YXRmb3JtcyBtYXkgZGlmZmVyZW50IE5WTSBzdG9yYWdlIGF2YWlsYWJsZSB0aGF0IGNhbiBiZSBv
-cHRpbWl6ZWQgaW4NCmRpZmZlcmVudCB3YXlzLCBzbyB3ZSB0cmllZCB0byBrZWVwIHRoZSBOVk0g
-UlBMIGFwaXMgYXMgc2ltcGxlIGFzIHBvc3NpYmxlIHRvIGFsbG93IG90aGVycyB0byBvcHRpbWl6
-ZSB0aGUNCnN0b3JhZ2UgYXMgdGhleSBzZWUgZml0LiAgRm9yIGluc3RhbmNlLCBpZiBzb21lb25l
-IHdhcyB0byBwb3J0IHRoaXMgdG8gYW4gZW1iZWRkZWQgc3lzdGVtIHdpdGhvdXQgYSBzdGFuZGFy
-ZA0KbGludXggZmlsZSBzeXN0ZW0uDQo=
+Mesh specification requires that Replay Protection be preserved
+across node restarts.  This adds that storage in
+<node_uuid>/rpl/<iv_index>/<src>
+
+Realtime access remains in an l_queue structure, and stored as
+messages are processed.
+---
+ Makefile.mesh |   1 +
+ mesh/net.c    |  21 ++--
+ mesh/rpl.c    | 289 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/rpl.h    |  30 ++++++
+ 4 files changed, 334 insertions(+), 7 deletions(-)
+ create mode 100644 mesh/rpl.c
+ create mode 100644 mesh/rpl.h
+
+diff --git a/Makefile.mesh b/Makefile.mesh
+index 401122029..10573b304 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -32,6 +32,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
+ 				mesh/manager.h mesh/manager.c \
+ 				mesh/pb-adv.h mesh/pb-adv.c \
+ 				mesh/keyring.h mesh/keyring.c \
++				mesh/rpl.h mesh/rpl.c \
+ 				mesh/mesh-defs.h
+ pkglibexec_PROGRAMS += mesh/bluetooth-meshd
+ 
+diff --git a/mesh/net.c b/mesh/net.c
+index 9567d947e..19f3b87b7 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -36,6 +36,7 @@
+ #include "mesh/mesh-config.h"
+ #include "mesh/model.h"
+ #include "mesh/appkey.h"
++#include "mesh/rpl.h"
+ 
+ #define abs_diff(a, b) ((a) > (b) ? (a) - (b) : (b) - (a))
+ 
+@@ -256,12 +257,6 @@ struct net_beacon_data {
+ 	bool processed;
+ };
+ 
+-struct mesh_rpl {
+-	uint32_t iv_index;
+-	uint32_t seq;
+-	uint16_t src;
+-};
+-
+ #define FAST_CACHE_SIZE 8
+ static struct l_queue *fast_cache;
+ static struct l_queue *nets;
+@@ -2714,6 +2709,9 @@ static void update_iv_ivu_state(struct mesh_net *net, uint32_t iv_index,
+ 		struct mesh_config *cfg = node_config_get(net->node);
+ 
+ 		mesh_config_write_iv_index(cfg, iv_index, ivu);
++
++		/* Cleanup Replay Protection List NVM */
++		rpl_init(net->node, iv_index);
+ 	}
+ 
+ 	net->iv_index = iv_index;
+@@ -3771,8 +3769,11 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
+ 	if (!net || !net->node)
+ 		return true;
+ 
+-	if (!net->replay_cache)
++	if (!net->replay_cache) {
+ 		net->replay_cache = l_queue_new();
++		rpl_init(net->node, net->iv_index);
++		rpl_get_list(net->node, net->replay_cache);
++	}
+ 
+ 	l_debug("Test Replay src: %4.4x seq: %6.6x iv: %8.8x",
+ 						src, seq, iv_index);
+@@ -3784,6 +3785,7 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
+ 		if (iv_index > rpe->iv_index) {
+ 			rpe->seq = seq;
+ 			rpe->iv_index = iv_index;
++			rpl_put_entry(net->node, src, iv_index, seq);
+ 			return false;
+ 		}
+ 
+@@ -3799,6 +3801,8 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
+ 
+ 		rpe->seq = seq;
+ 
++		rpl_put_entry(net->node, src, iv_index, seq);
++
+ 		return false;
+ 	}
+ 
+@@ -3813,6 +3817,9 @@ bool net_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
+ 			return true;
+ 	}
+ 
++	if (!rpl_put_entry(net->node, src, iv_index, seq))
++		return true;
++
+ 	rpe = l_new(struct mesh_rpl, 1);
+ 	rpe->src = src;
+ 	rpe->seq = seq;
+diff --git a/mesh/rpl.c b/mesh/rpl.c
+new file mode 100644
+index 000000000..ca4ce05ca
+--- /dev/null
++++ b/mesh/rpl.c
+@@ -0,0 +1,289 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <fcntl.h>
++#include <limits.h>
++#include <stdio.h>
++#include <unistd.h>
++#include <dirent.h>
++
++#include <sys/stat.h>
++
++#include <ell/ell.h>
++
++#include "mesh/mesh-defs.h"
++
++#include "mesh/node.h"
++#include "mesh/net.h"
++#include "mesh/util.h"
++#include "mesh/rpl.h"
++
++const char *rpl_dir = "/rpl";
++
++bool rpl_put_entry(struct mesh_node *node, uint16_t src, uint32_t iv_index,
++								uint32_t seq)
++{
++	const char *node_path;
++	char src_file[PATH_MAX];
++	char seq_txt[7];
++	bool result = false;
++	DIR *dir;
++	int fd;
++
++	if (!node || !IS_UNICAST(src))
++		return false;
++
++	node_path = node_get_storage_dir(node);
++
++	if (strlen(node_path) + strlen(rpl_dir) + 15 >= PATH_MAX)
++		return false;
++
++	snprintf(src_file, PATH_MAX, "%s%s/%8.8x", node_path, rpl_dir,
++								iv_index);
++	dir = opendir(src_file);
++
++	if (!dir)
++		mkdir(src_file, 0755);
++	else
++		closedir(dir);
++
++	snprintf(src_file, PATH_MAX, "%s%s/%8.8x/%4.4x", node_path, rpl_dir,
++								iv_index, src);
++
++	fd = open(src_file, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
++	if (fd >= 0) {
++		snprintf(seq_txt, 7, "%6.6x", seq);
++		if (write(fd, seq_txt, 6) == 6)
++			result = true;
++
++		close(fd);
++	}
++
++	if (!result)
++		return false;
++
++	/* Delete RPL entry from old iv_index (if it exists) */
++	iv_index--;
++	snprintf(src_file, PATH_MAX, "%s%s/%8.8x/%4.4x", node_path, rpl_dir,
++								iv_index, src);
++	remove(src_file);
++
++
++	return result;
++}
++
++void rpl_del_entry(struct mesh_node *node, uint16_t src)
++{
++	const char *node_path;
++	char rpl_path[PATH_MAX];
++	struct dirent *entry;
++	DIR *dir;
++
++	if (!node || !IS_UNICAST(src))
++		return;
++
++	node_path = node_get_storage_dir(node);
++
++	if (strlen(node_path) + strlen(rpl_dir) + 15 >= PATH_MAX)
++		return;
++
++	snprintf(rpl_path, PATH_MAX, "%s%s", node_path, rpl_dir);
++	dir = opendir(rpl_path);
++
++	if (!dir)
++		return;
++
++	/* Remove all instances of src address */
++	while ((entry = readdir(dir)) != NULL) {
++		if (entry->d_type == DT_DIR) {
++			snprintf(rpl_path, PATH_MAX, "%s%s/%s/%4.4x",
++					node_path, rpl_dir, entry->d_name, src);
++			remove(rpl_path);
++		}
++	}
++
++	closedir(dir);
++}
++
++static bool match_src(const void *a, const void *b)
++{
++	const struct mesh_rpl *rpl = a;
++	uint16_t src = L_PTR_TO_UINT(b);
++
++	return rpl->src == src;
++}
++
++static void get_entries(const char *iv_path, struct l_queue *rpl_list)
++{
++	struct mesh_rpl *rpl;
++	struct dirent *entry;
++	DIR *dir;
++	int fd;
++	const char *iv_txt;
++	char src_path[PATH_MAX];
++	char seq_txt[7];
++	uint32_t iv_index, seq;
++	uint16_t src;
++
++	dir = opendir(iv_path);
++
++	if (!dir)
++		return;
++
++	iv_txt = basename(iv_path);
++	if (sscanf(iv_txt, "%08x", &iv_index) != 1)
++		return;
++
++	memset(seq_txt, 0, sizeof(seq_txt));
++
++	while ((entry = readdir(dir)) != NULL) {
++		/* RPL sequences are stored in src files under iv_index */
++		if (entry->d_type == DT_REG) {
++			if (sscanf(entry->d_name, "%04hx", &src) != 1)
++				continue;
++
++			snprintf(src_path, PATH_MAX, "%s/%4.4x", iv_path, src);
++			fd = open(src_path, O_RDONLY);
++
++			if (fd < 0)
++				continue;
++
++			if (read(fd, seq_txt, 6) == 6 &&
++					sscanf(seq_txt, "%06x", &seq) == 1) {
++
++				rpl = l_queue_find(rpl_list, match_src,
++						L_UINT_TO_PTR(src));
++
++				if (rpl) {
++					/* Replace older entries */
++					if (rpl->iv_index < iv_index) {
++						rpl->iv_index = iv_index;
++						rpl->seq = seq;
++					}
++				} else if (seq <= SEQ_MASK && IS_UNICAST(src)) {
++					rpl = l_new(struct mesh_rpl, 1);
++					rpl->src = src;
++					rpl->iv_index = iv_index;
++					rpl->seq = seq;
++
++					l_queue_push_head(rpl_list, rpl);
++				}
++			}
++			close(fd);
++		}
++	}
++
++	closedir(dir);
++}
++
++bool rpl_get_list(struct mesh_node *node, struct l_queue *rpl_list)
++{
++	const char *node_path;
++	struct dirent *entry;
++	char *rpl_path;
++	size_t len;
++	DIR *dir;
++
++	if (!node || !rpl_list)
++		return false;
++
++	node_path = node_get_storage_dir(node);
++
++	len = strlen(node_path) + strlen(rpl_dir) + 14;
++
++	if (len > PATH_MAX)
++		return false;
++
++	rpl_path = l_malloc(len);
++	snprintf(rpl_path, len, "%s%s", node_path, rpl_dir);
++
++	dir = opendir(rpl_path);
++
++	if (!dir) {
++		l_error("Failed to read RPL dir: %s", rpl_path);
++		l_free(rpl_path);
++		return false;
++	}
++
++	while ((entry = readdir(dir)) != NULL) {
++		/* RPL sequences are stored in files under iv_indexs */
++		if (entry->d_type == DT_DIR && entry->d_name[0] != '.') {
++			snprintf(rpl_path, len, "%s%s/%s",
++					node_path, rpl_dir, entry->d_name);
++			get_entries(rpl_path, rpl_list);
++		}
++	}
++
++	l_free(rpl_path);
++	closedir(dir);
++
++	return true;
++}
++
++void rpl_init(struct mesh_node *node, uint32_t cur)
++{
++	uint32_t old = cur - 1;
++	const char *node_path;
++	struct dirent *entry;
++	char path[PATH_MAX];
++	DIR *dir;
++
++	if (!node)
++		return;
++
++	node_path = node_get_storage_dir(node);
++
++	if (strlen(node_path) + strlen(rpl_dir) + 10 >= PATH_MAX)
++		return;
++
++	/* Make sure path exists */
++	snprintf(path, PATH_MAX, "%s%s", node_path, rpl_dir);
++	mkdir(path, 0755);
++
++	dir = opendir(path);
++	if (!dir)
++		return;
++
++	/* Cleanup any stale or malformed trees */
++	while ((entry = readdir(dir)) != NULL) {
++		if (entry->d_type == DT_DIR && entry->d_name[0] != '.') {
++			uint32_t val;
++			bool del = false;
++
++			if (strlen(entry->d_name) != 8)
++				del = true;
++			else if (sscanf(entry->d_name, "%08x", &val) != 1)
++				del = true;
++
++			/* Delete all invalid iv_index trees */
++			if (del || (val != cur && val != old)) {
++				snprintf(path, PATH_MAX, "%s%s/%s",
++					node_path, rpl_dir, entry->d_name);
++				del_path(path);
++			}
++		}
++	}
++
++	closedir(dir);
++}
+diff --git a/mesh/rpl.h b/mesh/rpl.h
+new file mode 100644
+index 000000000..17d2e3f05
+--- /dev/null
++++ b/mesh/rpl.h
+@@ -0,0 +1,30 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++struct mesh_rpl {
++	uint32_t iv_index;
++	uint32_t seq;
++	uint16_t src;
++};
++
++bool rpl_put_entry(struct mesh_node *node, uint16_t src, uint32_t iv_index,
++								uint32_t seq);
++void rpl_del_entry(struct mesh_node *node, uint16_t src);
++bool rpl_get_list(struct mesh_node *node, struct l_queue *rpl_list);
++void rpl_init(struct mesh_node *node, uint32_t iv_index);
+-- 
+2.21.1
+
