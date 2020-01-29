@@ -2,101 +2,205 @@ Return-Path: <SRS0=JIrD=3S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B80C33CB2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 08:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21394C33CB2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 09:00:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1481420702
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 08:53:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F008D2070E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jan 2020 09:00:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726091AbgA2Ixo (ORCPT
+        id S1726330AbgA2JA3 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Jan 2020 03:53:44 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:50767 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726068AbgA2Ixo (ORCPT
+        Wed, 29 Jan 2020 04:00:29 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:35164 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726124AbgA2JA3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Jan 2020 03:53:44 -0500
-Received: from Exchange.peiker-cee.de ([82.119.189.133]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MjjSt-1jPlbZ2TcJ-00lFmh; Wed, 29 Jan 2020 09:53:42 +0100
-Received: from Exchange.peiker-cee.de (10.0.2.22) by Exchange.peiker-cee.de
- (10.0.2.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.1591.10; Wed, 29
- Jan 2020 09:53:36 +0100
-Received: from Exchange.peiker-cee.de ([fe80::743a:4e82:de22:ce17]) by
- Exchange.peiker-cee.de ([fe80::743a:4e82:de22:ce17%13]) with mapi id
- 15.01.1591.012; Wed, 29 Jan 2020 09:53:36 +0100
-From:   Konstantin Forostyan <konstantin.forostyan@peiker-cee.de>
-To:     "marcel@holtmann.org" <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluetooth: If unknown option in L2CAP Configuration Request is a
- hint, Bluetooth stack responds with "Command Reject" instead of
- "Configuration Response"
-Thread-Topic: bluetooth: If unknown option in L2CAP Configuration Request is a
- hint, Bluetooth stack responds with "Command Reject" instead of
- "Configuration Response"
-Thread-Index: AQHV1d6ryqOWvNk7skOPLPyaAiH6AagA85sAgABTEwA=
-Date:   Wed, 29 Jan 2020 08:53:36 +0000
-Message-ID: <308de3c58372c552ec9e170e3020f05bbe7f4908.camel@peiker-cee.de>
-References: <3020b8d0c7d39428aec573153b3c3414213be7ce.camel@peiker-cee.de>
-         <89F234DA-089E-4F45-9D32-7A09CC52E8CD@holtmann.org>
-In-Reply-To: <89F234DA-089E-4F45-9D32-7A09CC52E8CD@holtmann.org>
-Accept-Language: de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [192.168.17.207]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <13A5F1E2208F2D4F8740539A68EABFF4@peiker-cee.de>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-Provags-ID: V03:K1:bHlyOsEq4iDRInCpnepIUs29a11vGjZ96CfNpilPx8iOBJUNKZW
- ww+oFQ1aNYtIwiWfA8XUR3zYYvn2NaLlwcgUvi2Bsn6SC+5G7+KaljnYgz/v4AVSKGbKmXa
- Eb/2ruzJr9mN3AtDDyF0Gw9nkpQBi/TGoeEm4UoPEVy1mkTBQOZUouKHlGXmIViVbGtXqIg
- urwHKdHdkOKmzGOSDOhHA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:oNrO+xC5Kp0=:vi8wY8I8rsHSUPRR5vMLox
- TzXWRuW1uXHhFOHHUyl24hc+RpZQzNwgHLlD0qeB4pcfYO59czJsURkdmqmyFV6qCBcXz4JwV
- vG+9v6I0DjAV1TtW7saHLqbtsaZrhw+Sb/cbXwbztYrUIaERN9cIh65FHeDWe3c+IAiVifElk
- 4skpcyE2OIuq1fePcqINW+JNBE23mC2YgckP8A/eKGN4/Am3e9IlmmYU5jowWQJBS4Uyr4gXa
- o9Gs7ISAGWCRWFGqEBWmHr6Pm2BJ0Lkb1j6cmqVKaxnq2ha0aGDekREQ0blRLgaQ8B1rHmSg0
- Ey9BppA0xYUQIkf+yZHTwKs8kpB6JAez14Go9Tu/Nym9fBlZpogUC0g9eJgV0sOVOveIn8UCG
- BVYxSMSdpD3iy0AWSBVhJVhrKjjXFMp7oN9Yi0lk6WoeWCizaCX0kapsHAAUpAixULZBJer5w
- o7qiMzO/ZCCsJXxmZHm+cFz8ZhSc2qkzWWdtvj4a/LTvHJoSx6LNMMSU+lnDawWfYcEHocNFZ
- uaVghyp30NFzGqw1lHlVtOTwoKMBM3Z+Ru742d2G1t7ETJDjfniDRfvJuyjEFnCSN2FhqHpPS
- 2cq9MBlnFnkr0nOL866AmR2d0zEJ8Nc9fR77djSuBbxgJizZmmkDEZF1v5qpk63jCfe1+cw8v
- iL5tLvTQizJcYcHP4vo55Syp9Qs/OkYaldPKPHX9Fa0zttas0TSbFRefZlGe9MW0o274U6LyF
- R5qLiDZMdlBF8guEZHl/m6NAuNWUVJxTg/uuOzgqCpNPYSGRlYoTuDk8LadKc9kCg+1MH0kdU
- FaWj/i5SdV0nzrzyXJwduEw4YCKDDHC5RKgnuVpXMXHArpzxc40sSzvWr+48ZopHkOOI98LE0
- YZ0bGil3K3A72bka1xvQ==
+        Wed, 29 Jan 2020 04:00:29 -0500
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id C984BCECB0;
+        Wed, 29 Jan 2020 10:09:46 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [Bluez PATCH v1] bluetooth: secure bluetooth stack from bluedump
+ attack
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200106181425.Bluez.v1.1.I5ee1ea8e19d41c5bdffb4211aeb9cd9efa5e0a4a@changeid>
+Date:   Wed, 29 Jan 2020 10:00:26 +0100
+Cc:     BlueZ devel list <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <9E07917B-E3B0-4AD9-9771-4CE325F1290F@holtmann.org>
+References: <20200106181425.Bluez.v1.1.I5ee1ea8e19d41c5bdffb4211aeb9cd9efa5e0a4a@changeid>
+To:     Yun-hao Chung <howardchung@google.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWFyY2VsLA0KDQpVbmZvcnR1bmF0ZWx5LCBJIGRvbid0IGhhdmUgYSBwb3NzaWJpbGl0eSB0
-byB0ZXN0IDUuNSBrZXJuZWwuIEFzIGZhciBhcw0KSSBjYW4gc2VlLCB0aGUgbW9zdCByZWNlbnQg
-dmVyc2lvbiBhdmFpbGFibGUgdG8gdGhlIHB1YmxpYyB2aWENCmdpdC5rZXJuZWwub3JnIGlzIDUu
-My1yYzMgYW5kIHRoZSBwcm9ibGVtYXRpYyBwYXJ0IGluDQovbmV0L2JsdWV0b290aC9sMmNhcF9j
-b3JlLmMgZmlsZSBpcyB0aGUgc2FtZSBmb3IgNC4yMCBhbmQgNS4zLXJjMy4NCkhlbmNlIEkgc3Vw
-cG9zZSBpdCB3aWxsIGJlaGF2ZSB0aGUgc2FtZSB3YXkgYXMgNC4yMC4NCg0KQmVzdCByZWdhcmRz
-LA0KS29uc3RhbnRpbg0KDQoNCk9uIFdlZCwgMjAyMC0wMS0yOSBhdCAwNDo1NiArMDEwMCwgTWFy
-Y2VsIEhvbHRtYW5uIHdyb3RlOg0KPiBIaSBLb25zdGFudGluLA0KPiANCj4gPiBJdCBzZWVtcyB0
-aGF0IHRoZXJlJ3MgYSBidWcgaW4gQmx1ZXRvb3RoIHN0YWNrIG9mIDQuMjAga2VybmVsLiBJDQo+
-ID4gZGlzY292ZXJlZCBpdCBkdXJpbmcgQmx1ZXRvb3RoIHF1YWxpZmljYXRpb24gdGVzdHMuDQo+
-ID4gTDJDQVAvQ09TL0NGRC9CVi0NCj4gPiAxMi1DIFtVbmtub3duIE9wdGlvbiBSZXNwb25zZV0g
-dGVzdCBmYWlscyBiZWNhdXNlIGluc3RlYWQgb2YNCj4gPiAiQ29uZmlndXJhdGlvbiBSZXNwb25z
-ZSIgd2l0aCBlcnJvciBjb2RlIDB4MDAwMyAidW5rbm93biBvcHRpb24iDQo+ID4gdGhlDQo+ID4g
-Qmx1ZXRvb3RoIHN0YWNrIGdlbmVyYXRlcyAiQ29tbWFuZCBSZWplY3QiLg0KPiA+IA0KPiA+IEkg
-dGhpbmssIHRoaXMgaGFwcGVucyBiZWNhdXNlIHRoZSB0ZXN0ZXIgKEJsdWV0b290aCBTSUcgUFRT
-KSB1c2VzDQo+ID4gaGludHMNCj4gPiBhcyB1bmtub3duIG9wdGlvbnMsIGFuZCB0aGUgQmx1ZXRv
-b3RoIHN0YWNrIGhhcyBzcGVjaWFsIGhhbmRsaW5nDQo+ID4gZm9yDQo+ID4gaGludHMuIA0KPiA+
-IA0KPiA+IEkgbWFkZSBhIHNtYWxsIHBhdGNoIGluIG9yZGVyIHRvIG92ZXJjb21lIHRoaXMgcHJv
-YmxlbS4gUGxlYXNlDQo+ID4gY29uZmlybSwNCj4gPiB0aGF0IHRoZSBwYXRjaCBpcyBmZWFzaWJs
-ZS4gSWYgbm90LCBwbGVhc2Ugc3VnZ2VzdCBob3cgdG8gZml4IHRoZQ0KPiA+ICJDb21tYW5kIFJl
-amVjdCIgcHJvYmxlbS4NCj4gDQo+IGlzIHRoZSBsaW1pdGVkIHRvIDQuMjAga2VybmVsIG9yIGRv
-ZXMgaXQgYWxzbyBoYXBwZW4gd2l0aCB0aGUgbGF0ZXN0DQo+IDUuNSBrZXJuZWw/DQo+IA0KPiBS
-ZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQo+IA0KPiANCj4gDQo+IA0KDQo=
+Hi Howard,
+
+> Attack scenario:
+> 1. A Chromebook (let's call this device A) is paired to a legitimate
+>   Bluetooth classic device (e.g. a speaker) (let's call this device
+>   B).
+> 2. A malicious device (let's call this device C) pretends to be the
+>   Bluetooth speaker by using the same BT address.
+> 3. If device A is not currently connected to device B, device A will
+>   be ready to accept connection from device B in the background
+>   (technically, doing Page Scan).
+> 4. Therefore, device C can initiate connection to device A
+>   (because device A is doing Page Scan) and device A will accept the
+>   connection because device A trusts device C's address which is the
+>   same as device B's address.
+> 5. Device C won't be able to communicate at any high level Bluetooth
+>   profile with device A because device A enforces that device C is
+>   encrypted with their common Link Key, which device C doesn't have.
+>   But device C can initiate pairing with device A with just-works
+>   model without requiring user interaction (there is only pairing
+>   notification). After pairing, device A now trusts device C with a
+>   new different link key, common between device A and C.
+> 6. From now on, device A trusts device C, so device C can at anytime
+>   connect to device A to do any kind of high-level hijacking, e.g.
+>   speaker hijack or mouse/keyboard hijack.
+> 
+> To fix this, reject the pairing if all the conditions below are met.
+> - the pairing is initialized by peer
+> - the authorization method is just-work
+> - host already had the link key to the peer
+> 
+> Also create a debugfs option to permit the pairing even the
+> conditions above are met.
+> 
+> Signed-off-by: howardchung <howardchung@google.com>
+> ---
+> 
+> include/net/bluetooth/hci.h |  1 +
+> net/bluetooth/hci_core.c    | 47 +++++++++++++++++++++++++++++++++++++
+> net/bluetooth/hci_event.c   | 12 ++++++++++
+> 3 files changed, 60 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 07b6ecedc6ce..4918b79baa41 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -283,6 +283,7 @@ enum {
+> 	HCI_FORCE_STATIC_ADDR,
+> 	HCI_LL_RPA_RESOLUTION,
+> 	HCI_CMD_PENDING,
+> +	HCI_PERMIT_JUST_WORK_REPAIR,
+
+Call this simply JUST_WORKS_REPAIRING.
+
+> 
+> 	__HCI_NUM_FLAGS,
+> };
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 9e19d5a3aac8..9014aa567e7b 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -172,10 +172,57 @@ static const struct file_operations vendor_diag_fops = {
+> 	.llseek		= default_llseek,
+> };
+> 
+> +static ssize_t permit_just_work_repair_read(struct file *file,
+> +					    char __user *user_buf,
+> +					    size_t count, loff_t *ppos)
+> +{
+> +	struct hci_dev *hdev = file->private_data;
+> +	char buf[3];
+> +
+> +	buf[0] = hci_dev_test_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR) ? 'Y'
+> +								      : 'N';
+> +	buf[1] = '\n';
+> +	buf[2] = '\0';
+> +	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
+> +}
+> +
+> +static ssize_t permit_just_work_repair_write(struct file *file,
+> +					     const char __user *user_buf,
+> +					     size_t count, loff_t *ppos)
+> +{
+> +	struct hci_dev *hdev = file->private_data;
+> +	char buf[32];
+> +	size_t buf_size = min(count, (sizeof(buf) - 1));
+> +	bool enable;
+> +
+> +	if (copy_from_user(buf, user_buf, buf_size))
+> +		return -EFAULT;
+> +
+> +	buf[buf_size] = '\0';
+> +	if (strtobool(buf, &enable))
+> +		return -EINVAL;
+> +
+> +	if (enable)
+> +		hci_dev_set_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR);
+> +	else
+> +		hci_dev_clear_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR);
+> +
+> +	return count;
+> +}
+> +
+> +static const struct file_operations permit_just_work_repair_fops = {
+> +	.open		= simple_open,
+> +	.read		= permit_just_work_repair_read,
+> +	.write		= permit_just_work_repair_write,
+> +	.llseek		= default_llseek,
+> +};
+> +
+> static void hci_debugfs_create_basic(struct hci_dev *hdev)
+> {
+> 	debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
+> 			    &dut_mode_fops);
+> +	debugfs_create_file("permit_just_work_repair", 0644, hdev->debugfs,
+> +			    hdev, &permit_just_work_repair_fops);
+
+Call this just_works_repairing.
+
+I have a bad association with “repair” since that means to me that you are trying to repair something that is broken.
+
+> 
+> 	if (hdev->set_diag)
+> 		debugfs_create_file("vendor_diag", 0644, hdev->debugfs, hdev,
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 6ddc4a74a5e4..898e347e19e0 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4539,6 +4539,18 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+> 		goto unlock;
+> 	}
+> 
+> +	/* If there already exists link key in local host, terminate the
+> +	 * connection by default since the remote device could be malicious.
+> +	 * Permit the connection if permit_just_work_repair is enabled.
+> +	 */
+> +	if (!hci_dev_test_flag(hdev, HCI_PERMIT_JUST_WORK_REPAIR) &&
+> +	    hci_find_link_key(hdev, &ev->bdaddr)) {
+> +		BT_DBG("Rejecting request: local host already have link key");
+> +		hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_NEG_REPLY,
+> +			     sizeof(ev->bdaddr), &ev->bdaddr);
+> +		goto unlock;
+> +	}
+> +
+> 	/* If no side requires MITM protection; auto-accept */
+> 	if ((!loc_mitm || conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) &&
+> 	    (!rem_mitm || conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)) {
+
+Looking at this patch as my own second pair of eyes, I am not sure this is the right location to just outright reject the confirmation request.
+
+We need to support upgrading an unauthenticated key into an authenticated key (there is a qualification test case for this). Only when we decided that we are doing just-works auto-accept, then we should reject the pairing if there is an existing link key.
+
+I know that PTS has a test case, but I wonder we actually have a test case in our own test suite. Maybe we don’t and we should really add one to ensure we behave correctly.
+
+Regards
+
+Marcel
+
