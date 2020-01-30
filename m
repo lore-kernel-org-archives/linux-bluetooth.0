@@ -2,225 +2,152 @@ Return-Path: <SRS0=xtvM=3T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF802C2D0DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 19:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB11C2D0DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 19:34:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A78B20708
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 19:12:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 358F620CC7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 19:34:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HY0K9Z/X"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="sL/WONe0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727600AbgA3TMz (ORCPT
+        id S1727499AbgA3TeS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jan 2020 14:12:55 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:45265 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbgA3TMz (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jan 2020 14:12:55 -0500
-Received: by mail-oi1-f194.google.com with SMTP id v19so4698066oic.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2020 11:12:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XOCylnx+cdn4ThF675MPYCr6UKkra/uRDidHN+CNNng=;
-        b=HY0K9Z/XadUDUrz0vQJBaPVug6sxuioNYo/9QKTD8f+6Axhsi7qLHyHPl8i46Qo29q
-         c7n9L9ZH6ANSs2GQOxmFmXbd5n3oKah0pna/TUycjvpyCKDYX/4BAm6W821D29r0s0C6
-         0zSmW1eymYhQGrV2sR3H+5tVgD+rb0BXxMXYzcDC32EnbxxShCUvBy2V888E59ygxXxz
-         aFNuib/trffQJA1kojjAl7agwk+DWj4hklF8reye1ET+QqGKq4hptdYR7GZgfR78C6A8
-         jsCF5wpyOVKJLz6iKjy3HMY4YoRHsxFAQEc0onlLgQQMVvkOy3xObc3YZton4+qrd0bi
-         BNKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XOCylnx+cdn4ThF675MPYCr6UKkra/uRDidHN+CNNng=;
-        b=Ou5gFaA5/LddlaUiaIRTpzgdFxf9fyQj3yxI/VA/zLt1GzTQB+dleddcVVSy2KVvS4
-         utzBXX+UtolPLXu1iOkm8fKK171eo9KWjJCskQHed3Ha+TCZeFYcngZx+UxOebw1F3vj
-         E+bhnCfqil0zQ+0Jbf71ius8L5esLkgTZ2tULBsAgOkfZV2nHXIyengbr0iU1wy0+Q7+
-         FQCiiYzJTj/mToojpGOMLS3AwsZPp0uOzfKZS/EnTZ+2Xxs5VNsfiKyu16xM7eWUN+ri
-         fcL3a6Pk9boVRbKOvMtOKX1+Mi3ZVH2KKHGIkK8pNQJhUQu2IyaUscQVtRahIZ+1Db2u
-         232w==
-X-Gm-Message-State: APjAAAV+grkNMhKYFj+OU7GiwxpfF0oV7/czSsfkZZTb9cHipP2mZxy9
-        EN62aoDAlPjg4f3H3ZbPhO+8lgJs1br6ABqlXzM=
-X-Google-Smtp-Source: APXvYqwq1u8xFtJRno2fuYHCa3NGCNpnccR5xFDmfD0dtR2RHyg8VwwkGlAup1390GgDIliX6JWTBhq/+T97Gma3hU0=
-X-Received: by 2002:aca:ab51:: with SMTP id u78mr3955219oie.21.1580411574098;
- Thu, 30 Jan 2020 11:12:54 -0800 (PST)
+        Thu, 30 Jan 2020 14:34:18 -0500
+Received: from mga04.intel.com ([192.55.52.120]:10664 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727275AbgA3TeS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 30 Jan 2020 14:34:18 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Jan 2020 11:34:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,382,1574150400"; 
+   d="scan'208";a="277884791"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by FMSMGA003.fm.intel.com with ESMTP; 30 Jan 2020 11:34:15 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 30 Jan 2020 11:34:14 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 30 Jan 2020 11:34:14 -0800
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Thu, 30 Jan 2020 11:34:14 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
+ by edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Thu, 30 Jan 2020 11:34:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kX4OTAytNic/sxO+c1kWZ/c4f52psBmxltkfDYSnMnk/RLcSv8XPfeqU7B71TNKyrNYi2B84lLM6c24H+mnKvrDjDjhvO2MvICqNJ8VE2HEMkqeZO9ppRoVpGtaiqcoGn7M2jM7sTD4jyrsYmScOemW2td1kOZhykLAmDvRn8VcOIDAVtcTXw3ePRTdwtCH2RtHHcS5y+Xl7DsrlW4uDMmQcWsRCC+fGLFhj4jtvUZLbqnSLjJ2qTRihk/khi2FGRA9o0THSAoOy+oNQV9wjZe2kLgwJWjEXXHlEDIbqpnj/DoCebghgJIMqLKzMscl64P7wTt7DJOOJnpSra83PiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kcDfyZXHolCaeh2foA3eF5K4fAiOYHuBF24oP5UDs44=;
+ b=JEDfcKQjXFJ22QS6oZiZPCXu5wJQvEnpl+TLvBBQF7B9oUlms+Oc5zzujzE0/LtzF1loqRC5WzvJxuFVcZBAfSqkVOzgT5Jw34/9VNG9vwI/65pAUxC1IV8frGTx4MKvqIrxp9H66DYL8yYPZrMqPSUgXtbUbNUIrr+CAqc7qIs5gtjMMcDsIhmQQGZqNFDfBUeR/+g5MoB9Rn61MT9hRI8inO/+HJbiyQkHq0pCvTe8OIClEOx8/45DvccjFe9SAsTlPSwVj0H4bUsWTKnlm7aDdkR3XiDXPrBU4MHmugqzptlkbfYo10uDtFrcwfSJ4rR9Fm0HQU6qEtpTGHExbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kcDfyZXHolCaeh2foA3eF5K4fAiOYHuBF24oP5UDs44=;
+ b=sL/WONe0iScjSYmUzVTD9X0hVGSNlkFJOean/Wg/rn+0Wp1lGHrcmzSZb87Dtq+0Z/UW8zvp7n5jdDbvy3/M7GBfyo8uuq4U0qGry4BAx9mk8zYCsAAxePivEIOXnCF587UvhnZqVaQjQRvwyjpHv6sFq3Zvaz4aNpkYjydgIvo=
+Received: from BN7PR11MB2580.namprd11.prod.outlook.com (52.135.246.155) by
+ BN7PR11MB2722.namprd11.prod.outlook.com (52.135.242.30) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.24; Thu, 30 Jan 2020 19:34:10 +0000
+Received: from BN7PR11MB2580.namprd11.prod.outlook.com
+ ([fe80::c8ca:3c11:3fc5:a9d6]) by BN7PR11MB2580.namprd11.prod.outlook.com
+ ([fe80::c8ca:3c11:3fc5:a9d6%6]) with mapi id 15.20.2665.027; Thu, 30 Jan 2020
+ 19:34:10 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "Stotland, Inga" <inga.stotland@intel.com>,
+        "rafal.gajda@silvair.com" <rafal.gajda@silvair.com>
+Subject: Re: [PATCH BlueZ v5 0/5] mesh: Add NVM storage of Replay Protection
+ List
+Thread-Topic: [PATCH BlueZ v5 0/5] mesh: Add NVM storage of Replay Protection
+ List
+Thread-Index: AQHV1say8YQMfj5k4EGhcJCjYB7Y26gDmu6A
+Date:   Thu, 30 Jan 2020 19:34:10 +0000
+Message-ID: <73eed33a0d242713baa0fa58920a07ee61df879b.camel@intel.com>
+References: <20200129170732.1607-1-brian.gix@intel.com>
+In-Reply-To: <20200129170732.1607-1-brian.gix@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [192.55.54.38]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a4b03926-54f0-4479-1e2a-08d7a5bb6141
+x-ms-traffictypediagnostic: BN7PR11MB2722:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN7PR11MB2722D2E4DE4C9BC40B7496C6E1040@BN7PR11MB2722.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 02981BE340
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(136003)(366004)(39860400002)(396003)(346002)(189003)(199004)(316002)(64756008)(66476007)(4326008)(66446008)(66556008)(6486002)(478600001)(6512007)(66946007)(186003)(5660300002)(36756003)(26005)(71200400001)(6916009)(81166006)(8936002)(2616005)(81156014)(8676002)(86362001)(2906002)(76116006)(6506007)(91956017)(54906003);DIR:OUT;SFP:1102;SCL:1;SRVR:BN7PR11MB2722;H:BN7PR11MB2580.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: V57fKkuj6pk5sHuOWRC2fSJSGrFo3yymlj5oOlPhoqvjm8KFXp+0ERluTSrz5v1cHnLEaHjQxxDGmr3tqeObWo3hPkPqHowz/CL76/PJzWj0YOY3W9i1kWXhqx8RHFWejJST5jYdXkW/RFz2qOPfl9URGLDJxDCjeIUJW47Wp34NRQitpl3pMhbeX0Vsev8/CwfL+2zr/niSH7IHpbLeiFt4J5RKoBW5/mKDTa5JcFISggkQ8/8sw8bD9ZoRfkSHlFtcVeLFFpxIx7eLeCrp8PRQhOM7zCEMzLMZG+iVrCqeC1UJHIyj7COol3ZibcrysMMdOZ2Kt+vpDQhH0WVuyyz0lQsRc9mN0p8bpHf3xW46wTrhWU2Iy5KkkHmohJE4KiSfLRei7oTuv+lxENe6EJ3U67NM0wXoobc8DS5DxsUgOk/bf89+k/brHPShqs0v
+x-ms-exchange-antispam-messagedata: vtojRBD+cNp64PyXmTpGFs/p5ZDiso2xSbFBmtckbFkRn93t5rbuSuPA1MiVnVVnp2yl9vKOtuary/Mp+FHXVgdHUcDiFJH0kpAqHnn4D38XK4IV2IdVtsqwZQa177dTsDh3V6+5reyZbCO0X3oWKA==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8B3487737CCE85488BCB0A4CFCD7AC86@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <CAMH2TCooGyxiZbhersOCFMHLpjSAqKFq2_XswXx3nt200L-qBQ@mail.gmail.com>
- <CABBYNZLW7qe8ie-FLYaka7wKTeKAmBQYf0DG0ZZqbOu2eEOxPA@mail.gmail.com> <CAOVXEJKb-BNz_Y2xFnEcsiGYgZMaTEYjqrspw1TgCdsFgYNESQ@mail.gmail.com>
-In-Reply-To: <CAOVXEJKb-BNz_Y2xFnEcsiGYgZMaTEYjqrspw1TgCdsFgYNESQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 30 Jan 2020 11:12:40 -0800
-Message-ID: <CABBYNZJGvwZPvhJaeEYoq4Y2dz2pD6vMCyRPqcG0QUSarecifA@mail.gmail.com>
-Subject: Re: L2CAP mtu preference set by user space clarification
-To:     Sathish Narasimman <nsathish41@gmail.com>
-Cc:     chethan tn <chethantn@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Sathish Narasimman <sathish.narasimman@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-Network-Message-Id: a4b03926-54f0-4479-1e2a-08d7a5bb6141
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2020 19:34:10.3860
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dfMlW5x5DWIhsfmeT620oZ0+L4nLiWxmxCoHQIG32IjUglMwZ3h6+eDG5BGgFjfQ9oJ3kEhC5o9K15xiDDubGQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR11MB2722
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
-
-On Mon, Jan 27, 2020 at 11:02 PM Sathish Narasimman
-<nsathish41@gmail.com> wrote:
->
-> Hi Luiz,
->
-> There are some headsets that configure the MTU to 850(3M PHY) and then
-> under some situation(noisy), it switches to 2M PHY packets for A2DP
-> playback.  The reason behind this is their receiver's capability for
-> better demodulation with QDPSK(2M PHY) when compared to 8DPSK(3M PHY).
->
-> From Bluetooth specification, the remote device can request the
-> LMP_preferred_rate with the LMP command to switch to 2M. When Baseband
-> PHY is 2M,  the maximum possible packet type is 2DH5 which can hold
-> 679 bytes ( 672 bytes of L2CAP MTU excluding the baseband headers).
->
-> When L2CAP MTU for an A2DP packet is larger than 672 bytes, it happens
-> to use 2 Baseband packets to deliver the L2CAP packet ie., like 1
-> 2DH5(679 bytes) and 1 2DH3(171 bytes) packet to deliver 850 bytes of
-> AVDTP Media. The is not efficient baseband utilization when the number
-> of baseband ACL buffers used 2 no.s or even less that may lead to the
-> delivery of one L2CAP packet that may take 4 slots more ( 2.5 ms
-> more).
->
-> When the remote device ( headset) has less number of baseband ACL
-> buffers and Host(source) is aggressively delivering the audio data to
-> render, it shall end up in a condition where the remote device does
-> Flow OFF that shall make the Source device to wait until next FLOW ON
-> send from the headset device. This kind of situation shall end up
-> accumulating more buffers and FLOW ON/OFF become cyclic and leads to
-> an audio break.
->
-> Is there a better solution to overcome this issue?
->
-> We considered changing the HOST MTU to 672bytes to overcome this issue
-> that makes the remote headset device to use 2M. And found that the
-> test results are positive.
-
-But we only control the RX/input MTU not the TX/output MTU, so the
-headset is at fault here it should have reconfigured the MTU
-accordingly. For the RX/input there is a patch already adjusting the
-MTU automatically when the socket MTU is set to 0:
-
-commit 4b6e228e297b73451f3a4b12fb7d0b24d9d32e6f
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Thu Jan 2 15:00:57 2020 -0800
-
-    Bluetooth: Auto tune if input MTU is set to 0
-
-    This enables the code to set the input MTU using the underline link
-    packet types when set to 0, previously this would likely be rejected by
-    the remote peer since it would be bellow the minimal of 48 for BR/EDR
-    or 23 for LE, that way it shall be safe to use 0 without causing any
-    side effects.
-
-    This is convenient for the likes of A2DP transport, see:
-
-    https://habr.com/en/post/456182/
-
-Without the remote side updating the MTU the host has no idea of the
-changes to the packet type, also we would have to notify the upper
-layer of the change if that happens mid stream, this relation between
-packet type is not very clear to the L2CAP layer since it doesn't
-distinct what data the upper layer is sending so we cannot just do the
-MTU change locally and limit the output MTU based on the underline
-link, expect perhaps if we would be willing to do that when MTU is set
-to 0 in which we would artificially limit the packet length based on
-the supported packet types, but does the controller notifies this sort
-of change to the host at all?
-
->
-> On Wed, Dec 18, 2019 at 5:49 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Chethan,
-> >
-> > On Mon, Dec 16, 2019 at 10:40 PM chethan tn <chethantn@gmail.com> wrote:
-> > >
-> > > Hi,
-> > >
-> > > I would like to understand why the Source device L2CAP mtu is always
-> > > set to the remote device mtu during L2CAP connection?
-> > >
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3370
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
-> > >
-> > >
-> > >
-> > > I tried to set the specific MTU for specific profile connection( For
-> > > Ex: A2DP connection - PSM  25) patch mentioned below, but the same is
-> > > not reflected because of the below code.
-> > >
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
-> >
-> > The answer is pretty simple, we don't control the remote/output MTU,
-> > so we cannot force the remote to use some arbitrary MTU if it doesn't
-> > agree with.
-> >
-> > > Here the patch to set the MTU from the use space bluez.
-> > >
-> > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> > > index 58e1534a4..7d8a718c0 100644
-> > > --- a/profiles/audio/a2dp.c
-> > > +++ b/profiles/audio/a2dp.c
-> > > @@ -1573,6 +1573,7 @@ static bool a2dp_server_listen(struct a2dp_server *server)
-> > >                                 BT_IO_OPT_SOURCE_BDADDR,
-> > >                                 btd_adapter_get_address(server->adapter),
-> > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
-> > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
-> > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-> > >                                 BT_IO_OPT_MASTER, true,
-> > >                                 BT_IO_OPT_INVALID);
-> > > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> > > index 51ead684a..786702cec 100644
-> > > --- a/profiles/audio/avdtp.c
-> > > +++ b/profiles/audio/avdtp.c
-> > > @@ -2394,6 +2394,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
-> > >                                 BT_IO_OPT_DEST_BDADDR,
-> > >                                 device_get_address(session->device),
-> > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
-> > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
-> > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-> > >                                 BT_IO_OPT_INVALID);
-> > >         if (!io) {
-> > > diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-> > > index 621a6e3cf..372b2579d 100644
-> > > --- a/profiles/audio/avdtp.h
-> > > +++ b/profiles/audio/avdtp.h
-> > >
-> > >
-> > >
-> > > Can you please suggest what is the best way to set the L2CAP mtu as
-> > > user defined.
-> > >
-> > >
-> > > Thanks
-> > >
-> > > Chethan
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Regards
-> Sathish N
-
-
-
--- 
-Luiz Augusto von Dentz
+UGF0Y2hzZXQgQXBwbGllZA0KDQpPbiBXZWQsIDIwMjAtMDEtMjkgYXQgMDk6MDcgLTA4MDAsIEJy
+aWFuIEdpeCB3cm90ZToNCj4gVmVyc2lvbiA1OiBFeHRyYSBjbGVhbi11cCBmaXhlcyBhZGRlZCBm
+b3IgbWFsZm9ybWVkIFJQTCB0cmVlcywgYW5kDQo+IGl2X2luZGV4IGRpcnMgY3JlYXRlZCAiYXMg
+bmVlZGVkIiBpbnN0ZWFkIG9mIGF0IFJQTCBpbml0aWFsaXphdGlvbi4NCj4gKHBhdGNoIDUvNSkN
+Cj4gDQo+IFZlcnNpb24gNDogU3R5bGUgZ3VpZGUgZml4ZXMgZnJvbSBJbmdhIChwYXRjaCA1LzUp
+Lg0KPiANCj4gVmVyc2lvbiAzOiBGaXggcHJvYmxlbSBmb3VuZCBieSBSYWZhxYIgcmVsYXRpbmcg
+dG8gdGhlIGhhbmRsaW5nIG9mDQo+IHNlcXVlbmNlIG51bWJlcnMgb2YgbWVzc2FnZXMgYmVpbmcg
+aGFuZGxlZCBpbnRlcm5hbGx5IChsb29wLWJhY2tzKSwNCj4gd2hpY2ggd2VyZSBiZWluZyByZWpl
+Y3RlZCBieSB0aGUgUmVwbGF5IFByb3RlY3Rpb24gTGlzdCAocGxlYXNlIHNlZQ0KPiBwYXRjaCAz
+LzUpLg0KPiANCj4gVmVyc2lvbiAyOiBGaXggcGF0aCBjb25zdHJ1Y3Rpb24gY29kZSB3aGVuIGZp
+cnN0IHJlYWRpbmcgUlBMIGZyb20gTlZNDQo+IA0KPiANCj4gQW4gb3ZlcnNpZ2h0IGxlZCB0byBs
+b3Npbmcgb3VyIFJlcGxheSBQcm90ZWN0aW9uIExpc3Qgd2l0aCBldmVyeQ0KPiByZS1ib290LiBU
+aGlzIHBhdGNoLXNldCBtYWtlcyBhIG51bWJlciBvZiBSZXBsYXkgUHJvdGVjdCBMaXN0DQo+IG1v
+ZGlmaWNhdGlvbnMgdGhhdCBjdWxtaW5hdGUgaW4gYWRkaW5nIHJwbC5jL2gsIHdoaWNoIHN0b3Jl
+cyB0aGUgbGF0ZXN0DQo+IGl2X2luZGV4L3NlcXVlbmNlIHZhbHVlcyBmb3IgZWFjaCBub2RlIHRo
+YXQgaGFuZGxlcyBhbiBpbmNvbWluZyBwYWNrZXQuDQo+IA0KPiBUaGUgZmlyc3QgNCBwYXRjaGVz
+LCBkb2VzIHNvbWUgbWFpbnRlbmFuY2UgcmVxdWlyZWQgdG8gaGFuZGxlIFJQTA0KPiBhY2NvcmRp
+bmcgdGhlIHRoZSBNZXNoIFNwZWNpZmljYXRpb24uDQo+IA0KPiANCj4gQnJpYW4gR2l4ICg1KToN
+Cj4gICBtZXNoOiBSZWxvY2F0ZSB0cmVlIGRlbGV0aW9uIHRvIHV0aWwuYy9oDQo+ICAgbWVzaDog
+TW92ZSBSZXBsYXkgUHJvdGVjdGlvbiB0byBtZXNoL25ldC5jDQo+ICAgbWVzaDogQ2xlYW4tdXAg
+dW5uZWVkZWQgU2VxdWVuY2UgTnVtYmVyIGluY3JlbWVudHMNCj4gICBtZXNoOiBBcHBseSBSZXBs
+YXkgUHJvdGVjdGlvbiB0byBhbGwgaW5jb21pbmcgcGFja2V0cw0KPiAgIG1lc2g6IEFkZCBOVk0g
+c3RvcmFnZSBvZiBSZXBsYXkgUHJvdGVjdGlvbg0KPiANCj4gIE1ha2VmaWxlLm1lc2ggICAgICAg
+ICAgIHwgICAxICsNCj4gIG1lc2gvYXBwa2V5LmMgICAgICAgICAgIHwgMTAyIC0tLS0tLS0tLS0t
+LS0tDQo+ICBtZXNoL2FwcGtleS5oICAgICAgICAgICB8ICAgMyAtDQo+ICBtZXNoL21lc2gtY29u
+ZmlnLWpzb24uYyB8ICAyMCArLS0NCj4gIG1lc2gvbW9kZWwuYyAgICAgICAgICAgIHwgIDE2ICst
+LQ0KPiAgbWVzaC9uZXQuYyAgICAgICAgICAgICAgfCAxMjggKysrKysrKysrKysrKysrLS0tDQo+
+ICBtZXNoL25ldC5oICAgICAgICAgICAgICB8ICAgMyArDQo+ICBtZXNoL3JwbC5jICAgICAgICAg
+ICAgICB8IDI4OSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICBt
+ZXNoL3JwbC5oICAgICAgICAgICAgICB8ICAzMCArKysrKw0KPiAgbWVzaC91dGlsLmMgICAgICAg
+ICAgICAgfCAgMjUgKysrKw0KPiAgbWVzaC91dGlsLmggICAgICAgICAgICAgfCAgIDEgKw0KPiAg
+MTEgZmlsZXMgY2hhbmdlZCwgNDY4IGluc2VydGlvbnMoKyksIDE1MCBkZWxldGlvbnMoLSkNCj4g
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBtZXNoL3JwbC5jDQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgbWVz
+aC9ycGwuaA0KPiANCg==
