@@ -2,147 +2,225 @@ Return-Path: <SRS0=xtvM=3T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C25C2D0DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 14:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF802C2D0DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 19:12:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66D0820678
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 14:34:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A78B20708
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 19:12:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="OzkWayPv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HY0K9Z/X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727442AbgA3Oej (ORCPT
+        id S1727600AbgA3TMz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jan 2020 09:34:39 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38218 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727440AbgA3Oei (ORCPT
+        Thu, 30 Jan 2020 14:12:55 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:45265 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726267AbgA3TMz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jan 2020 09:34:38 -0500
-Received: by mail-wm1-f66.google.com with SMTP id a9so4478215wmj.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2020 06:34:36 -0800 (PST)
+        Thu, 30 Jan 2020 14:12:55 -0500
+Received: by mail-oi1-f194.google.com with SMTP id v19so4698066oic.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2020 11:12:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=1JONOnTp+j8P+u1SKuer0eDRKjS3RD/D691AgdZxP7A=;
-        b=OzkWayPvGukx0tkOa2yBy8Af90McUfqK85yQHw7ynLFkIB3pejLnZjiyXb/1IaxBcd
-         rcAOlJLPzltovzvlIvalrlL4RF6CRRVAhdq4h+rUk7mRoin/p0NmylLnhrptruzdI3al
-         HlCE3+wnU7U9LfYjfd0/ruFN/cogp+C6g2JqxSZd1rw6eBQg6mF8SBqEUW+X08A765rQ
-         uwJxQ4FmQTRyc7vFvh2Pfo3Lxuz4ker+ySeEIkAMRFgSCFN5SuKIUuJiSH11zDKKxEBC
-         oAtYV6eR6O3IcLJJUMF4QHHkBPCMtKfkv/tVbiK2rhDl6nFnDE8+S4RKIVcmiixJQkMe
-         AJ8Q==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XOCylnx+cdn4ThF675MPYCr6UKkra/uRDidHN+CNNng=;
+        b=HY0K9Z/XadUDUrz0vQJBaPVug6sxuioNYo/9QKTD8f+6Axhsi7qLHyHPl8i46Qo29q
+         c7n9L9ZH6ANSs2GQOxmFmXbd5n3oKah0pna/TUycjvpyCKDYX/4BAm6W821D29r0s0C6
+         0zSmW1eymYhQGrV2sR3H+5tVgD+rb0BXxMXYzcDC32EnbxxShCUvBy2V888E59ygxXxz
+         aFNuib/trffQJA1kojjAl7agwk+DWj4hklF8reye1ET+QqGKq4hptdYR7GZgfR78C6A8
+         jsCF5wpyOVKJLz6iKjy3HMY4YoRHsxFAQEc0onlLgQQMVvkOy3xObc3YZton4+qrd0bi
+         BNKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=1JONOnTp+j8P+u1SKuer0eDRKjS3RD/D691AgdZxP7A=;
-        b=EGOcdPKWdCzUNQ5BCJnzTO3BgzjUYXv0WHWTh/z9rdWl9cPmMyFiTEqGW5iwFLAZzl
-         F/CL5MQtE3Fjlzh4o8NEdS2+BPj3iCyTACr8hqJu2WtrGGw1KtpLVzLNeV0qbhJvKWpQ
-         9E3/5BO46krct8E1XzRalm8AQVkd3gwUvl6Gxtj1nq3U9BHznuD1+YNYFELd/w4ELnx/
-         KkTVAntjf/9wD/3hVqlaqGwudJeA2RqKzq1Y9F4nqJZRMNN8mg6EIlHBADb0IW/DWxyA
-         TdhyXmqVAZUb8xR/tg30dWOcriPsQUAkNMLqaO6TzJTXRRIhe9YPaNZ8r2pxiqJiVmFH
-         4pWQ==
-X-Gm-Message-State: APjAAAXHupXT4LTrsL9u+Q1TFkxH/iJF2IK45ci1xLtLDaPlD6yX9b1o
-        HIF2EaHDXxzFEmck/fKTMaf8OopNl8kk8Q==
-X-Google-Smtp-Source: APXvYqwlAn1zKoNYKIND31ouZKtq39tsv1kPXOCnlRRl0Ug6doYFt/N9JsRKPF1J4k5mrvSiNHtakg==
-X-Received: by 2002:a7b:ce84:: with SMTP id q4mr5812619wmj.57.1580394875776;
-        Thu, 30 Jan 2020 06:34:35 -0800 (PST)
-Received: from localhost.localdomain ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id x10sm7353310wrv.60.2020.01.30.06.34.34
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2020 06:34:35 -0800 (PST)
-From:   Jakub Witowski <jakub.witowski@silvair.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/4] mesh: allow to reattach with new composition data
-Date:   Thu, 30 Jan 2020 15:34:25 +0100
-Message-Id: <20200130143425.5844-5-jakub.witowski@silvair.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200130143425.5844-1-jakub.witowski@silvair.com>
-References: <20200130143425.5844-1-jakub.witowski@silvair.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XOCylnx+cdn4ThF675MPYCr6UKkra/uRDidHN+CNNng=;
+        b=Ou5gFaA5/LddlaUiaIRTpzgdFxf9fyQj3yxI/VA/zLt1GzTQB+dleddcVVSy2KVvS4
+         utzBXX+UtolPLXu1iOkm8fKK171eo9KWjJCskQHed3Ha+TCZeFYcngZx+UxOebw1F3vj
+         E+bhnCfqil0zQ+0Jbf71ius8L5esLkgTZ2tULBsAgOkfZV2nHXIyengbr0iU1wy0+Q7+
+         FQCiiYzJTj/mToojpGOMLS3AwsZPp0uOzfKZS/EnTZ+2Xxs5VNsfiKyu16xM7eWUN+ri
+         fcL3a6Pk9boVRbKOvMtOKX1+Mi3ZVH2KKHGIkK8pNQJhUQu2IyaUscQVtRahIZ+1Db2u
+         232w==
+X-Gm-Message-State: APjAAAV+grkNMhKYFj+OU7GiwxpfF0oV7/czSsfkZZTb9cHipP2mZxy9
+        EN62aoDAlPjg4f3H3ZbPhO+8lgJs1br6ABqlXzM=
+X-Google-Smtp-Source: APXvYqwq1u8xFtJRno2fuYHCa3NGCNpnccR5xFDmfD0dtR2RHyg8VwwkGlAup1390GgDIliX6JWTBhq/+T97Gma3hU0=
+X-Received: by 2002:aca:ab51:: with SMTP id u78mr3955219oie.21.1580411574098;
+ Thu, 30 Jan 2020 11:12:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAMH2TCooGyxiZbhersOCFMHLpjSAqKFq2_XswXx3nt200L-qBQ@mail.gmail.com>
+ <CABBYNZLW7qe8ie-FLYaka7wKTeKAmBQYf0DG0ZZqbOu2eEOxPA@mail.gmail.com> <CAOVXEJKb-BNz_Y2xFnEcsiGYgZMaTEYjqrspw1TgCdsFgYNESQ@mail.gmail.com>
+In-Reply-To: <CAOVXEJKb-BNz_Y2xFnEcsiGYgZMaTEYjqrspw1TgCdsFgYNESQ@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 30 Jan 2020 11:12:40 -0800
+Message-ID: <CABBYNZJGvwZPvhJaeEYoq4Y2dz2pD6vMCyRPqcG0QUSarecifA@mail.gmail.com>
+Subject: Re: L2CAP mtu preference set by user space clarification
+To:     Sathish Narasimman <nsathish41@gmail.com>
+Cc:     chethan tn <chethantn@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Sathish Narasimman <sathish.narasimman@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch allows to change the CIP/PID/VID data when
-reattaching. Additionally the device key is verified
-during those change.
----
- mesh/node.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+Hi Sathish,
 
-diff --git a/mesh/node.c b/mesh/node.c
-index d4be070fa..86102d1da 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -47,6 +47,9 @@
- 
- #define MIN_COMP_SIZE 14
- 
-+/* COMP_ID_SIZE consists of length of the CID, PID and VID */
-+#define COMP_ID_SIZE 6
-+
- #define MESH_NODE_PATH_PREFIX "/node"
- 
- /* Default values for a new locally created node */
-@@ -1389,15 +1392,49 @@ static bool check_req_node(struct managed_obj_request *req)
- 		uint16_t attach_len = node_generate_comp(req->attach,
- 					attach_comp, sizeof(attach_comp));
- 
-+		uint8_t keyring_dev_key[16];
-+
- 		/* Ignore feature bits in Composition Compare */
- 		node_comp[8] = 0;
- 		attach_comp[8] = 0;
- 
-+		/* Ignore CID, PID, VID in Composition Compare */
- 		if (node_len != attach_len ||
--				memcmp(node_comp, attach_comp, node_len)) {
-+					memcmp(node_comp + COMP_ID_SIZE,
-+						attach_comp + COMP_ID_SIZE,
-+						node_len - COMP_ID_SIZE)) {
- 			l_debug("Failed to verify app's composition data");
- 			return false;
- 		}
-+
-+		/* Compare CID, VID and PID */
-+		if (!memcmp(node_comp, attach_comp, COMP_ID_SIZE))
-+			return true;
-+
-+		/* Verify the device key */
-+		keyring_get_remote_dev_key(req->attach, req->attach->primary,
-+							keyring_dev_key);
-+
-+		if (memcmp(keyring_dev_key,
-+					node_get_device_key(req->attach), 16))
-+			return false;
-+
-+		if (!mesh_config_write_comp_id(req->attach->cfg,
-+							req->node->comp.cid,
-+							req->node->comp.pid,
-+							req->node->comp.vid)) {
-+			l_debug("Failed to update comp id data");
-+			return false;
-+		}
-+
-+		if (!mesh_config_save(req->attach->cfg, true, NULL, NULL)) {
-+			l_debug("Failed to store comp id");
-+			return false;
-+		}
-+
-+		memcpy(&req->attach->comp, &req->node->comp,
-+					sizeof(struct node_composition) -
-+						sizeof(req->node->comp.crpl));
- 	}
- 
- 	return true;
+On Mon, Jan 27, 2020 at 11:02 PM Sathish Narasimman
+<nsathish41@gmail.com> wrote:
+>
+> Hi Luiz,
+>
+> There are some headsets that configure the MTU to 850(3M PHY) and then
+> under some situation(noisy), it switches to 2M PHY packets for A2DP
+> playback.  The reason behind this is their receiver's capability for
+> better demodulation with QDPSK(2M PHY) when compared to 8DPSK(3M PHY).
+>
+> From Bluetooth specification, the remote device can request the
+> LMP_preferred_rate with the LMP command to switch to 2M. When Baseband
+> PHY is 2M,  the maximum possible packet type is 2DH5 which can hold
+> 679 bytes ( 672 bytes of L2CAP MTU excluding the baseband headers).
+>
+> When L2CAP MTU for an A2DP packet is larger than 672 bytes, it happens
+> to use 2 Baseband packets to deliver the L2CAP packet ie., like 1
+> 2DH5(679 bytes) and 1 2DH3(171 bytes) packet to deliver 850 bytes of
+> AVDTP Media. The is not efficient baseband utilization when the number
+> of baseband ACL buffers used 2 no.s or even less that may lead to the
+> delivery of one L2CAP packet that may take 4 slots more ( 2.5 ms
+> more).
+>
+> When the remote device ( headset) has less number of baseband ACL
+> buffers and Host(source) is aggressively delivering the audio data to
+> render, it shall end up in a condition where the remote device does
+> Flow OFF that shall make the Source device to wait until next FLOW ON
+> send from the headset device. This kind of situation shall end up
+> accumulating more buffers and FLOW ON/OFF become cyclic and leads to
+> an audio break.
+>
+> Is there a better solution to overcome this issue?
+>
+> We considered changing the HOST MTU to 672bytes to overcome this issue
+> that makes the remote headset device to use 2M. And found that the
+> test results are positive.
+
+But we only control the RX/input MTU not the TX/output MTU, so the
+headset is at fault here it should have reconfigured the MTU
+accordingly. For the RX/input there is a patch already adjusting the
+MTU automatically when the socket MTU is set to 0:
+
+commit 4b6e228e297b73451f3a4b12fb7d0b24d9d32e6f
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Thu Jan 2 15:00:57 2020 -0800
+
+    Bluetooth: Auto tune if input MTU is set to 0
+
+    This enables the code to set the input MTU using the underline link
+    packet types when set to 0, previously this would likely be rejected by
+    the remote peer since it would be bellow the minimal of 48 for BR/EDR
+    or 23 for LE, that way it shall be safe to use 0 without causing any
+    side effects.
+
+    This is convenient for the likes of A2DP transport, see:
+
+    https://habr.com/en/post/456182/
+
+Without the remote side updating the MTU the host has no idea of the
+changes to the packet type, also we would have to notify the upper
+layer of the change if that happens mid stream, this relation between
+packet type is not very clear to the L2CAP layer since it doesn't
+distinct what data the upper layer is sending so we cannot just do the
+MTU change locally and limit the output MTU based on the underline
+link, expect perhaps if we would be willing to do that when MTU is set
+to 0 in which we would artificially limit the packet length based on
+the supported packet types, but does the controller notifies this sort
+of change to the host at all?
+
+>
+> On Wed, Dec 18, 2019 at 5:49 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Chethan,
+> >
+> > On Mon, Dec 16, 2019 at 10:40 PM chethan tn <chethantn@gmail.com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > I would like to understand why the Source device L2CAP mtu is always
+> > > set to the remote device mtu during L2CAP connection?
+> > >
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3370
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
+> > >
+> > >
+> > >
+> > > I tried to set the specific MTU for specific profile connection( For
+> > > Ex: A2DP connection - PSM  25) patch mentioned below, but the same is
+> > > not reflected because of the below code.
+> > >
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
+> >
+> > The answer is pretty simple, we don't control the remote/output MTU,
+> > so we cannot force the remote to use some arbitrary MTU if it doesn't
+> > agree with.
+> >
+> > > Here the patch to set the MTU from the use space bluez.
+> > >
+> > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > > index 58e1534a4..7d8a718c0 100644
+> > > --- a/profiles/audio/a2dp.c
+> > > +++ b/profiles/audio/a2dp.c
+> > > @@ -1573,6 +1573,7 @@ static bool a2dp_server_listen(struct a2dp_server *server)
+> > >                                 BT_IO_OPT_SOURCE_BDADDR,
+> > >                                 btd_adapter_get_address(server->adapter),
+> > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
+> > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
+> > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+> > >                                 BT_IO_OPT_MASTER, true,
+> > >                                 BT_IO_OPT_INVALID);
+> > > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> > > index 51ead684a..786702cec 100644
+> > > --- a/profiles/audio/avdtp.c
+> > > +++ b/profiles/audio/avdtp.c
+> > > @@ -2394,6 +2394,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
+> > >                                 BT_IO_OPT_DEST_BDADDR,
+> > >                                 device_get_address(session->device),
+> > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
+> > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
+> > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+> > >                                 BT_IO_OPT_INVALID);
+> > >         if (!io) {
+> > > diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> > > index 621a6e3cf..372b2579d 100644
+> > > --- a/profiles/audio/avdtp.h
+> > > +++ b/profiles/audio/avdtp.h
+> > >
+> > >
+> > >
+> > > Can you please suggest what is the best way to set the L2CAP mtu as
+> > > user defined.
+> > >
+> > >
+> > > Thanks
+> > >
+> > > Chethan
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+> Regards
+> Sathish N
+
+
+
 -- 
-2.20.1
-
+Luiz Augusto von Dentz
