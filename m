@@ -2,191 +2,120 @@ Return-Path: <SRS0=xtvM=3T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07531C33C9E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 05:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A903C33C9E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 08:55:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA31D2083E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 05:19:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41AE12082E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jan 2020 08:55:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KMf0fe8v"
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="i5u7lKKk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725873AbgA3FTp (ORCPT
+        id S1726922AbgA3Iza (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jan 2020 00:19:45 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:43563 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbgA3FTo (ORCPT
+        Thu, 30 Jan 2020 03:55:30 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35816 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726895AbgA3Iz3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jan 2020 00:19:44 -0500
-Received: by mail-il1-f196.google.com with SMTP id o13so1991509ilg.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jan 2020 21:19:44 -0800 (PST)
+        Thu, 30 Jan 2020 03:55:29 -0500
+Received: by mail-wr1-f68.google.com with SMTP id g17so3052061wro.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2020 00:55:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vCPHJREq4iRGuiNz9Pn0NktTpek3dx8mHhpUo4kMVmk=;
-        b=KMf0fe8v5mPOrgIZFMpumqnHK1hDiNLm7EeMLChuB4NnWkMZ0Inge41LgFBgHbD0Xi
-         G8IlZZ38BVAOmW/awdy097sTmjGIIknI+upJLIMvNMIHcIU4VYevuY+oT6m3HZFSMUFX
-         d26zWXqscokCD48NmMlknJ9LMtCf5SO3oY12u/HQUmxsQnoKXlNHvfzDGf0ymrwuyc5S
-         Bm6ouFl5ECNOfcM2uZbmHfNhGUvAI8KY/1aKQZO86zTib+lxBU53C+gv31aVFtZTy92+
-         0npDghJZ+Ne7VNa3X9yK2GaNuSxlN/cOIZioUiJu5yWK+ryZtwdrR6HWhIsJ8QkrklrN
-         Zkqg==
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=Ltqih8r/YXGD2kJxXajbixBSaqU0NAsgMPa1WlgZDaQ=;
+        b=i5u7lKKk7hA7OeFIOvJ/dBUA3pnmEymApSJEkQ9UeoXpJ7UaxW79bcxlpmorJ9dLNV
+         wHKbtNMp71WOkQwSrauTqjr9WQZR6KLjuLx3OpDH3GMjbrWpexDIyiq9b/Fs4Uu8SD6+
+         a/KmnJZCtpvWOz4ac2Z2Y3DXSNu4qgYlhM5IhqbhWgn+/IYFaU1YVuex/yJc1NYevv9l
+         AwYbf9HVuB4tt5MDVXGrAmkBe/UCi+kiBYjBNxiEsHLA9rhoS1RvV3HyZWGYS91VCTEk
+         3ZFWdEERjmV4IDM5474AIIC3ZZsEslwvPxaMPuYiFxnsF4sFwyNtRI1WL4pOqOyF1D0X
+         GM5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vCPHJREq4iRGuiNz9Pn0NktTpek3dx8mHhpUo4kMVmk=;
-        b=cT75Kb9tSAABPxjJjsJZcH7B8MErVTNAiwzNK3zijhU3skxT0RU72Sd2kf7k07x89V
-         3S6WdQPBB/DyHQULM5J5kkpZUVddaG8BATdDG2sjnPiVGqkN8orFqVEidHzYunpqd8zH
-         D1LxDeAG3+FF1rzMCQNxtKpISPY+4qOeG4LdSLTR3nxqjA4JSxbfQoTWjqfNAEpo13wO
-         UAoxDA/1dE2nLixYEl07XtUghHn3NqtsKaRVDt/21ucHuTMJgiReJcV0PuOAxLKZCEyQ
-         PH+l8xSl8nzKJpEZhLzZo/j48iXCYeem03BuRHfrGZvJ6XrNIqJshVGSeZXl2ZbFN8MD
-         1bAw==
-X-Gm-Message-State: APjAAAWNnJzbkl/p5+C9fPH9cJVqy6Z/W1N8usLlE829UvBk/PicKT1a
-        n9dXK8mmxzSGe93MNzDYSZExV6FMAhKbJfhbMDc=
-X-Google-Smtp-Source: APXvYqwva6jxTWrsbaZTM+0PHLtCRMZYnperZ7dvZWR+J3DtJpfpIXyVZSGrKHdbpXM2udIUmpOGI1m+Yji1NOGBTLQ=
-X-Received: by 2002:a05:6e02:c0c:: with SMTP id d12mr2684667ile.185.1580361583756;
- Wed, 29 Jan 2020 21:19:43 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=Ltqih8r/YXGD2kJxXajbixBSaqU0NAsgMPa1WlgZDaQ=;
+        b=DW7CDGQg9q4ZZo129I/4IWLa3iZ8OFfCSunA2fbWR7cKTZOVZiEUVkAzISqdbxJuU7
+         CgHFQGleOW0SvW9gdr+Ye67Q/tSBehUVfAtyDiiNBy3OhPsKUN6W4gAi6Q3eTZW+Fqoc
+         JXHgSazNfSE1EzWoRFOrjMhl6LrpWjE9WhoZLKf8ZjOIpp3aAb8CVjgEItQc9QOJJuyT
+         LnoPQOejaaoEDFEN8DdWFDQmog+4b3D1p0oekWxq6fk5Cw+f+J80vQrib+Qr+2p/3uAV
+         wTsdSj0JQKdMEs+keH5+9G2ZM7Vl/pLvO1+SUIUT8YbQflECj3ErDlz7fLW1Xnz4cUUY
+         rgPA==
+X-Gm-Message-State: APjAAAVHQJkUjoC74HU0WPbXTiY1ooPz5tnFigvh0AYuKmtCFEc65lxJ
+        q+W6nYqFeIVK//CWBqpDY2xlg5yNwjs=
+X-Google-Smtp-Source: APXvYqyRWY+hIQ2FZwKDKWBEu1ZS0YZGAYQIkt55PvvarOhSlpL957zIlNHoO8Uutq4Mnap+L2g1Eg==
+X-Received: by 2002:a05:6000:1187:: with SMTP id g7mr4151219wrx.109.1580374527486;
+        Thu, 30 Jan 2020 00:55:27 -0800 (PST)
+Received: from rgajda2364 ([217.153.94.18])
+        by smtp.gmail.com with ESMTPSA id q130sm5550413wme.19.2020.01.30.00.55.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jan 2020 00:55:26 -0800 (PST)
+Date:   Thu, 30 Jan 2020 09:55:25 +0100
+From:   Rafal Gajda <rafal.gajda@silvair.com>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ v4 5/5] mesh: Add NVM storage of Replay Protection
+Message-ID: <20200130085525.hmlrfexnwm5dehbb@rgajda2364>
+References: <20200129023258.10004-1-brian.gix@intel.com>
+ <20200129023258.10004-6-brian.gix@intel.com>
+ <20200129121744.zv3jnf6uejjpetud@rgajda2364>
+ <a49f5f0c9633bacfcbe6f2125aece235ac34e90f.camel@intel.com>
 MIME-Version: 1.0
-References: <CAMH2TCooGyxiZbhersOCFMHLpjSAqKFq2_XswXx3nt200L-qBQ@mail.gmail.com>
- <CABBYNZLW7qe8ie-FLYaka7wKTeKAmBQYf0DG0ZZqbOu2eEOxPA@mail.gmail.com> <CAOVXEJKb-BNz_Y2xFnEcsiGYgZMaTEYjqrspw1TgCdsFgYNESQ@mail.gmail.com>
-In-Reply-To: <CAOVXEJKb-BNz_Y2xFnEcsiGYgZMaTEYjqrspw1TgCdsFgYNESQ@mail.gmail.com>
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Thu, 30 Jan 2020 10:49:32 +0530
-Message-ID: <CAOVXEJJR7YE5fFm1b2YrZ53pPz-=0soAHmeiKQBsYnV47orvgg@mail.gmail.com>
-Subject: Re: L2CAP mtu preference set by user space clarification
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     chethan tn <chethantn@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Sathish Narasimman <sathish.narasimman@intel.com>,
-        Sathish N <nsathish41@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a49f5f0c9633bacfcbe6f2125aece235ac34e90f.camel@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+On Wed, Jan 29, 2020 at 03:06:10PM +0000, Gix, Brian wrote:
+> Hi Rafał,
+> 
+> On Wed, 2020-01-29 at 13:17 +0100, Rafal Gajda wrote:
+> > Hi Brian,
+> > 
+> > I have a question about the way RPL is stored.
+> > 
+> > On Tue, Jan 28, 2020 at 06:32:58PM -0800, Brian Gix wrote:                                          
+> > > Mesh specification requires that Replay Protection be preserved
+> > > across node restarts.  This adds that storage in
+> > > <node_uuid>/rpl/<iv_index>/<src>
+> > 
+> > Wouldn't it be more convinient to keep both iv_index and sequence in a file like this:
+> >   <node_uuid>/rpl/<src>
+> > ?
+> > 
+> > You could store them in bytes instead of hex string 
+> > and it would eliminate the need for cleaning entries from old IV_index.
+> 
+> 
+> We considered this and decided against it for ease of processing, as this method requires fewer file
+> operations.  Cleaning old entries is something that will happen regardless of how the RPL tree looks in the
+> file system, as we delete entries that are older than (net->iv_index - 1) since we don't receive messages on
+> that iv_index, there is no possiblility of a Replay attack. And deleting a file system tree is pretty simple. 
+> A SRC address does not get to keep it's spot in the RPL indefinitely...  only over the current or prior
+> iv_index.
+> 
+> Our other considerations included maintaining the integrity of the RPL across power-loss or abort reboots.
+> 
+> However, we do recognize that some platforms may different NVM storage available that can be optimized in
+> different ways, so we tried to keep the NVM RPL apis as simple as possible to allow others to optimize the
+> storage as they see fit.  For instance, if someone was to port this to an embedded system without a standard
+> linux file system.
 
-Requesting your feedback/suggestion to the below case.
+Ok, I understand. Thank you for the explanation.
 
-On Tue, Jan 28, 2020 at 12:31 PM Sathish Narasimman
-<nsathish41@gmail.com> wrote:
->
-> Hi Luiz,
->
-> There are some headsets that configure the MTU to 850(3M PHY) and then
-> under some situation(noisy), it switches to 2M PHY packets for A2DP
-> playback.  The reason behind this is their receiver's capability for
-> better demodulation with QDPSK(2M PHY) when compared to 8DPSK(3M PHY).
->
-> From Bluetooth specification, the remote device can request the
-> LMP_preferred_rate with the LMP command to switch to 2M. When Baseband
-> PHY is 2M,  the maximum possible packet type is 2DH5 which can hold
-> 679 bytes ( 672 bytes of L2CAP MTU excluding the baseband headers).
->
-> When L2CAP MTU for an A2DP packet is larger than 672 bytes, it happens
-> to use 2 Baseband packets to deliver the L2CAP packet ie., like 1
-> 2DH5(679 bytes) and 1 2DH3(171 bytes) packet to deliver 850 bytes of
-> AVDTP Media. The is not efficient baseband utilization when the number
-> of baseband ACL buffers used 2 no.s or even less that may lead to the
-> delivery of one L2CAP packet that may take 4 slots more ( 2.5 ms
-> more).
->
-> When the remote device ( headset) has less number of baseband ACL
-> buffers and Host(source) is aggressively delivering the audio data to
-> render, it shall end up in a condition where the remote device does
-> Flow OFF that shall make the Source device to wait until next FLOW ON
-> send from the headset device. This kind of situation shall end up
-> accumulating more buffers and FLOW ON/OFF become cyclic and leads to
-> an audio break.
->
-> Is there a better solution to overcome this issue?
->
-> We considered changing the HOST MTU to 672bytes to overcome this issue
-> that makes the remote headset device to use 2M. And found that the
-> test results are positive.
->
->
-> On Wed, Dec 18, 2019 at 5:49 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Chethan,
-> >
-> > On Mon, Dec 16, 2019 at 10:40 PM chethan tn <chethantn@gmail.com> wrote:
-> > >
-> > > Hi,
-> > >
-> > > I would like to understand why the Source device L2CAP mtu is always
-> > > set to the remote device mtu during L2CAP connection?
-> > >
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3370
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
-> > >
-> > >
-> > >
-> > > I tried to set the specific MTU for specific profile connection( For
-> > > Ex: A2DP connection - PSM  25) patch mentioned below, but the same is
-> > > not reflected because of the below code.
-> > >
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
-> >
-> > The answer is pretty simple, we don't control the remote/output MTU,
-> > so we cannot force the remote to use some arbitrary MTU if it doesn't
-> > agree with.
-> >
-> > > Here the patch to set the MTU from the use space bluez.
-> > >
-> > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> > > index 58e1534a4..7d8a718c0 100644
-> > > --- a/profiles/audio/a2dp.c
-> > > +++ b/profiles/audio/a2dp.c
-> > > @@ -1573,6 +1573,7 @@ static bool a2dp_server_listen(struct a2dp_server *server)
-> > >                                 BT_IO_OPT_SOURCE_BDADDR,
-> > >                                 btd_adapter_get_address(server->adapter),
-> > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
-> > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
-> > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-> > >                                 BT_IO_OPT_MASTER, true,
-> > >                                 BT_IO_OPT_INVALID);
-> > > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> > > index 51ead684a..786702cec 100644
-> > > --- a/profiles/audio/avdtp.c
-> > > +++ b/profiles/audio/avdtp.c
-> > > @@ -2394,6 +2394,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
-> > >                                 BT_IO_OPT_DEST_BDADDR,
-> > >                                 device_get_address(session->device),
-> > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
-> > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
-> > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-> > >                                 BT_IO_OPT_INVALID);
-> > >         if (!io) {
-> > > diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-> > > index 621a6e3cf..372b2579d 100644
-> > > --- a/profiles/audio/avdtp.h
-> > > +++ b/profiles/audio/avdtp.h
-> > >
-> > >
-> > >
-> > > Can you please suggest what is the best way to set the L2CAP mtu as
-> > > user defined.
-> > >
-> > >
-> > > Thanks
-> > >
-> > > Chethan
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Regards
-> Sathish N
+Rafał Gajda
+Silvair
+
