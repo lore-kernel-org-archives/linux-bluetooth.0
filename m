@@ -2,261 +2,233 @@ Return-Path: <SRS0=covd=3U=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA0AC33CB2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jan 2020 03:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B980C33CB2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jan 2020 05:07:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4398620CC7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jan 2020 03:27:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA2732082E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 31 Jan 2020 05:07:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uTVL0cUA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dpP6bbiF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727862AbgAaD1u (ORCPT
+        id S1726138AbgAaFHl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jan 2020 22:27:50 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54760 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727824AbgAaD1u (ORCPT
+        Fri, 31 Jan 2020 00:07:41 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:46874 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725263AbgAaFHl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jan 2020 22:27:50 -0500
-Received: by mail-wm1-f65.google.com with SMTP id g1so6238931wmh.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2020 19:27:47 -0800 (PST)
+        Fri, 31 Jan 2020 00:07:41 -0500
+Received: by mail-io1-f68.google.com with SMTP id t26so6730672ioi.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jan 2020 21:07:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nSKruqJ/WQ9CFzLw+y2LqH6OAopvrDrbcN3JTRY3iMs=;
-        b=uTVL0cUAvTSods/y86qFItSS2bYJuvaUaYZYjpioMSAg02jWuGPERKTw7e6/Thuvbb
-         xKhxENSY6kN5vGOiqr/seLL3R3XyNGrUHdBqDv/EoDeArzysHred1/xC6DcYxcix3PvA
-         Q0uzF1PIP5KvTAZLBtytv+YgS2HD4GasHuFFNf5yojCe5dEeaYUxgQSkn68VUInYtxwG
-         7ckgLhOuUpyCu2eL2KQIPKCOABwzjs+XK/kZ2ZvQC7OKcgooaTvvJoRKVeS6fuFI282m
-         DMCGmaw1bDrQy/M9gh8IvlrNsaU6Bub1uLOxRdqQNghSZRA4sm5966xj8eP2I9X68y/B
-         bTzA==
+        bh=owFpUSGzMLt+ilIrhwEvul+H64pU1vs/nJcrZ/5Y6oc=;
+        b=dpP6bbiFOmMWOcsM1lWQbPmH8B+/2WDWKxsnvZUwyYBEbVKeom9eT+ZZFUVa4jqzJ6
+         WPKNC5pPBX45so2Qrp7lpbK/dyz5gJ/omjUN8Gi0khpEkoxr3CbZofocoy1UEKF9Hgd+
+         hZOD/AR1m+GTWMPXtRx6MfKIXp3/FaCXFm5q0yyatsej4kTrhJdvL70669N6IWr1RxUz
+         hINHg48XuXbPJxXkBw9EZz51CjAqRTzlBzRW/DR9CnnrJcg0HyRLMNgJfTZVxDA5bQt2
+         0O4yPdyUxrZNtuMJsKpcx84cSV81SfU3b95rXRz5NIsxkv+7scn6ULcPUbYZNoxV1ZW0
+         Ge4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nSKruqJ/WQ9CFzLw+y2LqH6OAopvrDrbcN3JTRY3iMs=;
-        b=mhueBh4bsBDjga6rcGS/yReFm3wtoCagbU9dt46XdvnNQ5/4Gmbvd08YHsJSFZ47RS
-         RaTzYuoObdJkTEyToJKta8aGGhz4leJve3qsNUrpE+PKoZP5bnn5vOn7xSbCCCiwYJ2T
-         MIOCDStrrLH+vFc5qBFuzJbc3OZQX9B+FrNMkolR8P3+PyNeuq2ZmxsJHnCEdx4GqaTM
-         drBGIFyfuc2YjH62mBqbqkgEFvKs+/8vblvrfDJCAJOM10BS0SZJN07S1H51KpVUUOsN
-         nyG+gM5H/VbvhFr8m2sQxUZ2ZQoRH3VaekeNINFQYmIoGgCPfjb0YKk8o0FAEwh1lqqe
-         +LaA==
-X-Gm-Message-State: APjAAAUy6xhaoGB87gBGllDYHx+Dd79kNA6YEANc3Er3PajiDjjU7ic7
-        s6PXfPmijxYfhbZSZuFBx+3GXND7IDEkdvvVox4RrA==
-X-Google-Smtp-Source: APXvYqw7qMagR0Ug7lQAS8FgVAjNzQkmhWHIG93hRg4+MmpgSyMoid3ULiG90N0baL6XWEiJ24EZgj8ZIoJpnJPJPmg=
-X-Received: by 2002:a7b:c3c9:: with SMTP id t9mr8895102wmj.18.1580441265943;
- Thu, 30 Jan 2020 19:27:45 -0800 (PST)
+        bh=owFpUSGzMLt+ilIrhwEvul+H64pU1vs/nJcrZ/5Y6oc=;
+        b=GVt1uU1FXjC6Oxz4hOtQUnG8P3gcDGFk0ihvOAM9zONjKBJy+nFsKTkX4RIQnEsIHH
+         3vG30KPDUUQqm0AwuYyJ8chl6hJQiUpMytGbOw3vWNZBhre8fvZrXLXeV1tysw0OlKX3
+         XDeeLIH/XQBB+9+JjxhPMxe0sTmyduyB/SzZCLTcoUnx9i+jG0H9dZX/6y8qwxm/OIVS
+         4ahfXK2DSmdjbcPUuGx/lozXIav5F8mRnW6TugrJcLIFK7ZiavOk0jA1AyqfTyjG6PdG
+         zjn++XwaVFeFSW7Jv/S66LZxOXc1fF2rlblrP+RWcCOb2pCiWFbbTH6u5ZgXO5nEHxgx
+         z+iw==
+X-Gm-Message-State: APjAAAWgtwFS514xXyaOIePu+rCyWDpxuJUsZagBRWvgoUiCvgdH2oIy
+        +QZaK+2sshkm9xPdP8TcwwJCj9nzDNrItFND799S2Kg9
+X-Google-Smtp-Source: APXvYqw79kISxWP0KwKlqd+Z//DnWDkpBV8sziUwT6fWWcEE6kCaXzQ0wxxJjHTykXujo/sFZVjKUI9nDCqcC5hFmko=
+X-Received: by 2002:a6b:dc09:: with SMTP id s9mr6756238ioc.185.1580447260239;
+ Thu, 30 Jan 2020 21:07:40 -0800 (PST)
 MIME-Version: 1.0
-References: <20200127164943.220776-1-marcel@holtmann.org> <CALWDO_ViEZsqAw-TA5rJ=NfrGpgQJsM2TCoZfoXPOghGi=9Vmg@mail.gmail.com>
-In-Reply-To: <CALWDO_ViEZsqAw-TA5rJ=NfrGpgQJsM2TCoZfoXPOghGi=9Vmg@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 31 Jan 2020 11:27:34 +0800
-Message-ID: <CAJQfnxHXDOhG-a7Q8BcsBZnib4wYY0L0GcJ6HpFOmj2NKZ1X_A@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Add debugfs option to enable runtime debug statements
-To:     Alain Michaud <alainmichaud@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
+References: <CAMH2TCooGyxiZbhersOCFMHLpjSAqKFq2_XswXx3nt200L-qBQ@mail.gmail.com>
+ <CABBYNZLW7qe8ie-FLYaka7wKTeKAmBQYf0DG0ZZqbOu2eEOxPA@mail.gmail.com>
+ <CAOVXEJKb-BNz_Y2xFnEcsiGYgZMaTEYjqrspw1TgCdsFgYNESQ@mail.gmail.com> <CABBYNZJGvwZPvhJaeEYoq4Y2dz2pD6vMCyRPqcG0QUSarecifA@mail.gmail.com>
+In-Reply-To: <CABBYNZJGvwZPvhJaeEYoq4Y2dz2pD6vMCyRPqcG0QUSarecifA@mail.gmail.com>
+From:   Sathish Narasimman <nsathish41@gmail.com>
+Date:   Fri, 31 Jan 2020 10:37:29 +0530
+Message-ID: <CAOVXEJ+Vp=PYaMY+N7cvUuaMAi0SXekwuUpP6GPu1X7CHA=FBA@mail.gmail.com>
+Subject: Re: L2CAP mtu preference set by user space clarification
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     chethan tn <chethantn@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Sathish Narasimman <sathish.narasimman@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Luiz
 
-Thanks for the fantastic patch! My comments inline.
+Thanks for the suggestion.
 
+On Fri, Jan 31, 2020 at 12:42 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/bluetooth.h | 10 ++++-
->  net/bluetooth/Kconfig             |  4 ++
->  net/bluetooth/af_bluetooth.c      |  2 +
->  net/bluetooth/lib.c               | 69 +++++++++++++++++++++++++++++++
->  4 files changed, 84 insertions(+), 1 deletion(-)
+> Hi Sathish,
 >
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index e42bb8e03c09..d32d1f401efb 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -129,6 +129,8 @@ void bt_warn(const char *fmt, ...);
->  __printf(1, 2)
->  void bt_err(const char *fmt, ...);
->  __printf(1, 2)
-> +void bt_dbg(const char *fmt, ...);
-> +__printf(1, 2)
->  void bt_warn_ratelimited(const char *fmt, ...);
->  __printf(1, 2)
->  void bt_err_ratelimited(const char *fmt, ...);
-> @@ -136,7 +138,11 @@ void bt_err_ratelimited(const char *fmt, ...);
->  #define BT_INFO(fmt, ...)      bt_info(fmt "\n", ##__VA_ARGS__)
->  #define BT_WARN(fmt, ...)      bt_warn(fmt "\n", ##__VA_ARGS__)
->  #define BT_ERR(fmt, ...)       bt_err(fmt "\n", ##__VA_ARGS__)
-> -#define BT_DBG(fmt, ...)       pr_debug(fmt "\n", ##__VA_ARGS__)
-> +#if IS_ENABLED(CONFIG_BT_DEBUGFS_OPTION)
-> +#define BT_DBG(fmt, ...)       bt_dbg(fmt "\n", ##__VA_ARGS__)
-> +#else
-> +#define BT_DBG(fmt, ...)       pr_debug(mt "\n", ##__VA_ARGS__)
-
-Should be fmt instead of mt.
-
-> +#endif
+> On Mon, Jan 27, 2020 at 11:02 PM Sathish Narasimman
+> <nsathish41@gmail.com> wrote:
+> >
+> > Hi Luiz,
+> >
+> > There are some headsets that configure the MTU to 850(3M PHY) and then
+> > under some situation(noisy), it switches to 2M PHY packets for A2DP
+> > playback.  The reason behind this is their receiver's capability for
+> > better demodulation with QDPSK(2M PHY) when compared to 8DPSK(3M PHY).
+> >
+> > From Bluetooth specification, the remote device can request the
+> > LMP_preferred_rate with the LMP command to switch to 2M. When Baseband
+> > PHY is 2M,  the maximum possible packet type is 2DH5 which can hold
+> > 679 bytes ( 672 bytes of L2CAP MTU excluding the baseband headers).
+> >
+> > When L2CAP MTU for an A2DP packet is larger than 672 bytes, it happens
+> > to use 2 Baseband packets to deliver the L2CAP packet ie., like 1
+> > 2DH5(679 bytes) and 1 2DH3(171 bytes) packet to deliver 850 bytes of
+> > AVDTP Media. The is not efficient baseband utilization when the number
+> > of baseband ACL buffers used 2 no.s or even less that may lead to the
+> > delivery of one L2CAP packet that may take 4 slots more ( 2.5 ms
+> > more).
+> >
+> > When the remote device ( headset) has less number of baseband ACL
+> > buffers and Host(source) is aggressively delivering the audio data to
+> > render, it shall end up in a condition where the remote device does
+> > Flow OFF that shall make the Source device to wait until next FLOW ON
+> > send from the headset device. This kind of situation shall end up
+> > accumulating more buffers and FLOW ON/OFF become cyclic and leads to
+> > an audio break.
+> >
+> > Is there a better solution to overcome this issue?
+> >
+> > We considered changing the HOST MTU to 672bytes to overcome this issue
+> > that makes the remote headset device to use 2M. And found that the
+> > test results are positive.
 >
->  #define bt_dev_info(hdev, fmt, ...)                            \
->         BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-> @@ -393,6 +399,8 @@ void bt_procfs_cleanup(struct net *net, const char *name);
+> But we only control the RX/input MTU not the TX/output MTU, so the
+> headset is at fault here it should have reconfigured the MTU
+> accordingly. For the RX/input there is a patch already adjusting the
+> MTU automatically when the socket MTU is set to 0:
 >
->  extern struct dentry *bt_debugfs;
+> commit 4b6e228e297b73451f3a4b12fb7d0b24d9d32e6f
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Thu Jan 2 15:00:57 2020 -0800
 >
-> +void bt_lib_debugfs_init(void);
-> +
->  int l2cap_init(void);
->  void l2cap_exit(void);
+>     Bluetooth: Auto tune if input MTU is set to 0
 >
-> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> index 165148c7c4ce..64833640bf3d 100644
-> --- a/net/bluetooth/Kconfig
-> +++ b/net/bluetooth/Kconfig
-> @@ -128,4 +128,8 @@ config BT_DEBUGFS
->           Provide extensive information about internal Bluetooth states
->           in debugfs.
+>     This enables the code to set the input MTU using the underline link
+>     packet types when set to 0, previously this would likely be rejected by
+>     the remote peer since it would be bellow the minimal of 48 for BR/EDR
+>     or 23 for LE, that way it shall be safe to use 0 without causing any
+>     side effects.
 >
-> +config BT_DEBUGFS_OPTION
-> +       bool
-> +       default y if BT_DEBUGFS && !DYNAMIC_DEBUG
-
-If I understand it correctly, setting BT_DEBUGFS_OPTION to true
-will cause all of the BT_DBG logs to be loaded into the resulting
-build. Prior to the introduction of this config setting, the logs by
-default are discarded from the build. Therefore, by introducing this
-option, there will be an increase in the size of the build.
-
-Shouldn't this option defaults to false instead?
-
-> +
->  source "drivers/bluetooth/Kconfig"
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 3fd124927d4d..fa0cd665f32a 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -731,6 +731,8 @@ static int __init bt_init(void)
+>     This is convenient for the likes of A2DP transport, see:
 >
->         bt_debugfs = debugfs_create_dir("bluetooth", NULL);
+>     https://habr.com/en/post/456182/
 >
-> +       bt_lib_debugfs_init();
-> +
->         bt_leds_init();
+> Without the remote side updating the MTU the host has no idea of the
+> changes to the packet type, also we would have to notify the upper
+> layer of the change if that happens mid stream, this relation between
+> packet type is not very clear to the L2CAP layer since it doesn't
+> distinct what data the upper layer is sending so we cannot just do the
+> MTU change locally and limit the output MTU based on the underline
+> link, expect perhaps if we would be willing to do that when MTU is set
+> to 0 in which we would artificially limit the packet length based on
+> the supported packet types, but does the controller notifies this sort
+> of change to the host at all?
 >
->         err = bt_sysfs_init();
-> diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-> index c09e0a3a0ed9..28cfc3fd8fbe 100644
-> --- a/net/bluetooth/lib.c
-> +++ b/net/bluetooth/lib.c
-> @@ -27,6 +27,7 @@
->  #define pr_fmt(fmt) "Bluetooth: " fmt
+> >
+> > On Wed, Dec 18, 2019 at 5:49 AM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Chethan,
+> > >
+> > > On Mon, Dec 16, 2019 at 10:40 PM chethan tn <chethantn@gmail.com> wrote:
+> > > >
+> > > > Hi,
+> > > >
+> > > > I would like to understand why the Source device L2CAP mtu is always
+> > > > set to the remote device mtu during L2CAP connection?
+> > > >
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3370
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
+> > > >
+> > > >
+> > > >
+> > > > I tried to set the specific MTU for specific profile connection( For
+> > > > Ex: A2DP connection - PSM  25) patch mentioned below, but the same is
+> > > > not reflected because of the below code.
+> > > >
+> > > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/tree/net/bluetooth/l2cap_core.c#n3474
+> > >
+> > > The answer is pretty simple, we don't control the remote/output MTU,
+> > > so we cannot force the remote to use some arbitrary MTU if it doesn't
+> > > agree with.
+> > >
+> > > > Here the patch to set the MTU from the use space bluez.
+> > > >
+> > > > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > > > index 58e1534a4..7d8a718c0 100644
+> > > > --- a/profiles/audio/a2dp.c
+> > > > +++ b/profiles/audio/a2dp.c
+> > > > @@ -1573,6 +1573,7 @@ static bool a2dp_server_listen(struct a2dp_server *server)
+> > > >                                 BT_IO_OPT_SOURCE_BDADDR,
+> > > >                                 btd_adapter_get_address(server->adapter),
+> > > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
+> > > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
+> > > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+> > > >                                 BT_IO_OPT_MASTER, true,
+> > > >                                 BT_IO_OPT_INVALID);
+> > > > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> > > > index 51ead684a..786702cec 100644
+> > > > --- a/profiles/audio/avdtp.c
+> > > > +++ b/profiles/audio/avdtp.c
+> > > > @@ -2394,6 +2394,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
+> > > >                                 BT_IO_OPT_DEST_BDADDR,
+> > > >                                 device_get_address(session->device),
+> > > >                                 BT_IO_OPT_PSM, AVDTP_PSM,
+> > > > +                               BT_IO_OPT_OMTU, AVDTP_MTU,
+> > > >                                 BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+> > > >                                 BT_IO_OPT_INVALID);
+> > > >         if (!io) {
+> > > > diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> > > > index 621a6e3cf..372b2579d 100644
+> > > > --- a/profiles/audio/avdtp.h
+> > > > +++ b/profiles/audio/avdtp.h
+> > > >
+> > > >
+> > > >
+> > > > Can you please suggest what is the best way to set the L2CAP mtu as
+> > > > user defined.
+> > > >
+> > > >
+> > > > Thanks
+> > > >
+> > > > Chethan
+> > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+> >
+> > Regards
+> > Sathish N
 >
->  #include <linux/export.h>
-> +#include <linux/debugfs.h>
 >
->  #include <net/bluetooth/bluetooth.h>
 >
-> @@ -135,6 +136,55 @@ int bt_to_errno(__u16 code)
->  }
->  EXPORT_SYMBOL(bt_to_errno);
->
-> +#ifdef CONFIG_BT_DEBUGFS_OPTION
-> +static bool debug_enable;
-> +
-> +static ssize_t debug_enable_read(struct file *file, char __user *user_buf,
-> +                                size_t count, loff_t *ppos)
-> +{
-> +       char buf[3];
-> +
-> +       buf[0] = debug_enable ? 'Y': 'N';
-> +       buf[1] = '\n';
-> +       buf[2] = '\0';
-> +       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> +}
-> +
-> +static ssize_t debug_enable_write(struct file *file,
-> +                                 const char __user *user_buf,
-> +                                 size_t count, loff_t *ppos)
-> +{
-> +       bool enable;
-> +       int err;
-> +
-> +       err = kstrtobool_from_user(user_buf, count, &enable);
-> +       if (err)
-> +               return err;
-> +
-> +       if (enable == debug_enable)
-> +               return -EALREADY;
-> +
-> +       debug_enable = enable;
-> +
-> +       return count;
-> +}
-> +
-> +static const struct file_operations debug_enable_fops = {
-> +       .open           = simple_open,
-> +       .read           = debug_enable_read,
-> +       .write          = debug_enable_write,
-> +       .llseek         = default_llseek,
-> +};
-> +
-> +void bt_lib_debugfs_init(void)
-> +{
-> +       debugfs_create_file("debug_enable", 0644, bt_debugfs, NULL,
-> +                           &debug_enable_fops);
-> +}
-> +#else
-> +void bt_lib_debugfs_init(void);
-
-Should be the empty function
-bt_lib_debugfs_init(void)
-{
-}
-
-> +#endif
-> +
->  void bt_info(const char *format, ...)
->  {
->         struct va_format vaf;
-> @@ -183,6 +233,25 @@ void bt_err(const char *format, ...)
->  }
->  EXPORT_SYMBOL(bt_err);
->
-> +void bt_dbg(const char *format, ...)
-> +{
-> +       struct va_format vaf;
-> +       va_list args;
-> +
-> +       if (likely(!debug_enable))
-> +               return;
-> +
-> +       va_start(args, format);
-> +
-> +       vaf.fmt = format;
-> +       vaf.va = &args;
-> +
-> +       printk(KERN_DEBUG pr_fmt("%pV"), &vaf);
-> +
-> +       va_end(args);
-> +}
-> +EXPORT_SYMBOL(bt_dbg);
-> +
->  void bt_warn_ratelimited(const char *format, ...)
->  {
->         struct va_format vaf;
 > --
-> 2.24.1
->
-
-Thanks,
-Archie
+> Luiz Augusto von Dentz
