@@ -1,246 +1,175 @@
-Return-Path: <SRS0=QFyp=3W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=oUsU=3X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA30C35240
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Feb 2020 10:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D33EFC3524E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Feb 2020 07:27:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31228206E6
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Feb 2020 10:32:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB3222073C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Feb 2020 07:27:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VAF6/ziW"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="KoRfMLUZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725988AbgBBKcD (ORCPT
+        id S1727417AbgBCH1t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Feb 2020 05:32:03 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36803 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725942AbgBBKcD (ORCPT
+        Mon, 3 Feb 2020 02:27:49 -0500
+Received: from mail25.static.mailgun.info ([104.130.122.25]:34296 "EHLO
+        mail25.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727351AbgBCH1t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Feb 2020 05:32:03 -0500
-Received: by mail-wr1-f67.google.com with SMTP id z3so14216534wru.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Feb 2020 02:32:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iw/jlpnFKgvGjPb/LDuHqevkQbtcEh7gdl9bjXy0GUQ=;
-        b=VAF6/ziWcVxi2/k+VYwkLV1UnkRdnDHlJJuL7Lo9hBSC9RHDpNe5LEh9quzWpT6EOD
-         WH0oqO7g9d+8B6Mw6eHvltkMWrEjTwIzl67YJ2xPbJYYLj/dCOA6ejkS2oHD3ohTykuG
-         J0q0t66QKkmk3FiRnkJwLcUjXf4/Ra/aKeM5v46K4EDIMarmzLoYd544kfHIQP1ZLjoW
-         3ICrGkn+kpX44BQBKYNUyuFjyo0QGg+xAY2giMX7CTeXQ8ErXkVpadnQHwqM874ij4k3
-         LJliSrRz7Nn3pqLq8sAweHRJwWz4NsFHaJqQbmj3ReWqaOTZyq2/N8Xz6NO3Ooj6VRxV
-         ql5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iw/jlpnFKgvGjPb/LDuHqevkQbtcEh7gdl9bjXy0GUQ=;
-        b=VnLn/+ups6TwhZg9QlJPZ2Sxw0NPRiFnYPn+nUJZfxvXJ2TUUbDjfK+dfgbG7wRA9G
-         zwogt+OuR5Fjs50PiOpRe408vpLIn06B//i+b4tf8E/u6rLQoeX88JL4681HDkFC/m3B
-         M1CeaQ+iY98ulHwYMQLONhsIGqDENghLEKTL64jW9y6Mn/6gDh7x2GgFuxlyvQVZDCqx
-         qONU9P8692GzK2dAkPe5/utyOJmQB2p9uqb/XVp3N+C0mYlFqAIdFLP+cbQ81PiNqXB2
-         zZyg/1+bdyyoQl72qYwBfLFxLJvSt3iMAI7jqvITtmbS3gOJY390JJASrkH69iY7+2F/
-         HSUg==
-X-Gm-Message-State: APjAAAUmERl4MtDToy3cF6wvbwTD71OhpmE3C1UazQ7D7D4Sin/o8Cv6
-        f/rcfH8KbNrU7qE7KxG4DS+Ap0QyjdDsvn23CxJQJKRU
-X-Google-Smtp-Source: APXvYqylJE0I3A5NQo5+WCSIzhXA8GQQHtgiOEmYxvGToEq2K5v8R2vhY9VVt/WyWWNE83sZ3FyioS+i1b3kk0a+QDE=
-X-Received: by 2002:a5d:484f:: with SMTP id n15mr9627177wrs.365.1580639519796;
- Sun, 02 Feb 2020 02:31:59 -0800 (PST)
+        Mon, 3 Feb 2020 02:27:49 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1580714868; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=iHnr0J8kqrVDVU+/0MUoetOaiS5m6yFUsUBUaVKZVc0=;
+ b=KoRfMLUZM/aqmCrOnRoJR2BzE8tp6tHsELYydkX2PPloNjGWgLbM2ZKx3NdtqTbCgzG0UilR
+ stUtDSVcRnJgsFlg1xEG7X+sbAQP/QmlE1qIFLVusZwKqF9WDh7bG2QiTWhTaqW08rK8l9Cd
+ koiIiIQaWw0is2iKQoqgV+PvVsw=
+X-Mailgun-Sending-Ip: 104.130.122.25
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e37cb71.7f42edba1148-smtp-out-n03;
+ Mon, 03 Feb 2020 07:27:45 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 9C32AC433A2; Mon,  3 Feb 2020 07:27:44 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: gubbaven)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 92ED8C43383;
+        Mon,  3 Feb 2020 07:27:42 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200131220401.27520-1-marcel@holtmann.org>
-In-Reply-To: <20200131220401.27520-1-marcel@holtmann.org>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Sun, 2 Feb 2020 18:31:47 +0800
-Message-ID: <CAJQfnxFssxREB5sOSsW5WM8bqLkrKk=ySZSnbZ7wojfBMFGyKA@mail.gmail.com>
-Subject: Re: [RFC v2] Bluetooth: Add debugfs option to enable runtime debug statements
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Alain Michaud <alainmichaud@google.com>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 03 Feb 2020 12:57:42 +0530
+From:   gubbaven@codeaurora.org
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        robh@kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        tientzu@chromium.org, seanpaul@chromium.org, rjliao@codeaurora.org,
+        yshavit@google.com
+Subject: Re: [PATCH v2 1/2] Bluetooth: hci_qca: Enable clocks required for BT
+ SOC
+In-Reply-To: <543135AD-707A-4945-A67D-8912D1C35EED@holtmann.org>
+References: <1580456335-7317-1-git-send-email-gubbaven@codeaurora.org>
+ <543135AD-707A-4945-A67D-8912D1C35EED@holtmann.org>
+Message-ID: <b38d85546b89df7351abb9a7e25d7475@codeaurora.org>
+X-Sender: gubbaven@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel, Alain,
+Hi Marcel,
 
-Looks wonderful to me.
+On 2020-02-01 01:21, Marcel Holtmann wrote:
+> Hi Venkata,
+> 
+>> Instead of relying on other subsytem to turn ON clocks
+>> required for BT SoC to operate, voting them from the driver.
+>> 
+>> Signed-off-by: Venkata Lakshmi Narayana Gubba 
+>> <gubbaven@codeaurora.org>
+>> ---
+>> v2:
+>>   * addressed forward declarations
+>>   * updated with devm_clk_get_optional()
+>> 
+>> ---
+>> drivers/bluetooth/hci_qca.c | 25 +++++++++++++++++++++++++
+>> 1 file changed, 25 insertions(+)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index d6e0c99..73706f3 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -1738,6 +1738,15 @@ static int qca_power_off(struct hci_dev *hdev)
+>> 	return 0;
+>> }
+>> 
+>> +static int qca_setup_clock(struct clk *clk, bool enable)
+>> +{
+>> +	if (enable)
+>> +		return clk_prepare_enable(clk);
+>> +
+>> +	clk_disable_unprepare(clk);
+>> +	return 0;
+>> +}
+>> +
+> 
+> this function is pointless and it just complicated the code.
 
-On Sat, 1 Feb 2020 at 06:04, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/bluetooth.h |  8 ++++
->  net/bluetooth/Kconfig             |  7 +++
->  net/bluetooth/af_bluetooth.c      |  2 +
->  net/bluetooth/lib.c               | 71 +++++++++++++++++++++++++++++++
->  4 files changed, 88 insertions(+)
->
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index e42bb8e03c09..04f122957314 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -129,6 +129,8 @@ void bt_warn(const char *fmt, ...);
->  __printf(1, 2)
->  void bt_err(const char *fmt, ...);
->  __printf(1, 2)
-> +void bt_dbg(const char *fmt, ...);
-> +__printf(1, 2)
->  void bt_warn_ratelimited(const char *fmt, ...);
->  __printf(1, 2)
->  void bt_err_ratelimited(const char *fmt, ...);
-> @@ -136,7 +138,11 @@ void bt_err_ratelimited(const char *fmt, ...);
->  #define BT_INFO(fmt, ...)      bt_info(fmt "\n", ##__VA_ARGS__)
->  #define BT_WARN(fmt, ...)      bt_warn(fmt "\n", ##__VA_ARGS__)
->  #define BT_ERR(fmt, ...)       bt_err(fmt "\n", ##__VA_ARGS__)
-> +#if IS_ENABLED(CONFIG_BT_DEBUGFS_OPTION)
-> +#define BT_DBG(fmt, ...)       bt_dbg(fmt "\n", ##__VA_ARGS__)
-> +#else
->  #define BT_DBG(fmt, ...)       pr_debug(fmt "\n", ##__VA_ARGS__)
-> +#endif
->
->  #define bt_dev_info(hdev, fmt, ...)                            \
->         BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-> @@ -393,6 +399,8 @@ void bt_procfs_cleanup(struct net *net, const char *name);
->
->  extern struct dentry *bt_debugfs;
->
-> +void bt_lib_debugfs_init(void);
-> +
->  int l2cap_init(void);
->  void l2cap_exit(void);
->
-> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> index 165148c7c4ce..2871d0770c11 100644
-> --- a/net/bluetooth/Kconfig
-> +++ b/net/bluetooth/Kconfig
-> @@ -128,4 +128,11 @@ config BT_DEBUGFS
->           Provide extensive information about internal Bluetooth states
->           in debugfs.
->
-> +         When dynamic debug is not used, then this option also includes
-> +         a switch to enable/disable internal debug statements.
-> +
-> +config BT_DEBUGFS_OPTION
-> +       bool
-> +       default y if BT_DEBUGFS && !DYNAMIC_DEBUG
-> +
->  source "drivers/bluetooth/Kconfig"
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 3fd124927d4d..fa0cd665f32a 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -731,6 +731,8 @@ static int __init bt_init(void)
->
->         bt_debugfs = debugfs_create_dir("bluetooth", NULL);
->
-> +       bt_lib_debugfs_init();
-> +
->         bt_leds_init();
->
->         err = bt_sysfs_init();
-> diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-> index c09e0a3a0ed9..47c7b0244d1d 100644
-> --- a/net/bluetooth/lib.c
-> +++ b/net/bluetooth/lib.c
-> @@ -27,6 +27,7 @@
->  #define pr_fmt(fmt) "Bluetooth: " fmt
->
->  #include <linux/export.h>
-> +#include <linux/debugfs.h>
->
->  #include <net/bluetooth/bluetooth.h>
->
-> @@ -135,6 +136,57 @@ int bt_to_errno(__u16 code)
->  }
->  EXPORT_SYMBOL(bt_to_errno);
->
-> +#ifdef CONFIG_BT_DEBUGFS_OPTION
-> +static bool debug_enable;
-> +
-> +static ssize_t debug_enable_read(struct file *file, char __user *user_buf,
-> +                                size_t count, loff_t *ppos)
-> +{
-> +       char buf[3];
-> +
-> +       buf[0] = debug_enable ? 'Y': 'N';
-> +       buf[1] = '\n';
-> +       buf[2] = '\0';
-> +       return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-> +}
-> +
-> +static ssize_t debug_enable_write(struct file *file,
-> +                                 const char __user *user_buf,
-> +                                 size_t count, loff_t *ppos)
-> +{
-> +       bool enable;
-> +       int err;
-> +
-> +       err = kstrtobool_from_user(user_buf, count, &enable);
-> +       if (err)
-> +               return err;
-> +
-> +       if (enable == debug_enable)
-> +               return -EALREADY;
-> +
-> +       debug_enable = enable;
-> +
-> +       return count;
-> +}
-> +
-> +static const struct file_operations debug_enable_fops = {
-> +       .open           = simple_open,
-> +       .read           = debug_enable_read,
-> +       .write          = debug_enable_write,
-> +       .llseek         = default_llseek,
-> +};
-> +
-> +void bt_lib_debugfs_init(void)
-> +{
-> +       debugfs_create_file("debug_enable", 0644, bt_debugfs, NULL,
-> +                           &debug_enable_fops);
-> +}
-> +#else
-> +void bt_lib_debugfs_init(void)
-> +{
-> +}
-> +#endif
-> +
->  void bt_info(const char *format, ...)
->  {
->         struct va_format vaf;
-> @@ -183,6 +235,25 @@ void bt_err(const char *format, ...)
->  }
->  EXPORT_SYMBOL(bt_err);
->
-> +void bt_dbg(const char *format, ...)
-> +{
-> +       struct va_format vaf;
-> +       va_list args;
-> +
-> +       if (likely(!debug_enable))
-> +               return;
-> +
-> +       va_start(args, format);
-> +
-> +       vaf.fmt = format;
-> +       vaf.va = &args;
-> +
-> +       printk(KERN_DEBUG pr_fmt("%pV"), &vaf);
-> +
-> +       va_end(args);
-> +}
-> +EXPORT_SYMBOL(bt_dbg);
-> +
->  void bt_warn_ratelimited(const char *format, ...)
->  {
->         struct va_format vaf;
-> --
-> 2.24.1
->
+[Venkata] : Sure we will remove the function and will update in next 
+patch set.
+> 
+>> static int qca_regulator_enable(struct qca_serdev *qcadev)
+>> {
+>> 	struct qca_power *power = qcadev->bt_power;
+>> @@ -1755,6 +1764,13 @@ static int qca_regulator_enable(struct 
+>> qca_serdev *qcadev)
+>> 
+>> 	power->vregs_on = true;
+>> 
+>> +	ret = qca_setup_clock(qcadev->susclk, true);
+> 
+> 	ret = clk_prepare_enable(qcadev->susclk);
+
+[Venkata] : Sure.We will update in next patch set.
+
+> 
+>> +	if (ret) {
+>> +		/* Turn off regulators to overcome power leakage */
+>> +		qca_regulator_disable(qcadev);
+>> +		return ret;
+>> +	}
+>> +
+>> 	return 0;
+>> }
+>> 
+>> @@ -1773,6 +1789,9 @@ static void qca_regulator_disable(struct 
+>> qca_serdev *qcadev)
+>> 
+>> 	regulator_bulk_disable(power->num_vregs, power->vreg_bulk);
+>> 	power->vregs_on = false;
+>> +
+>> +	if (qcadev->susclk)
+>> +		qca_setup_clock(qcadev->susclk, false);
+> 
+> 		clk_disable_unprepare(qcadev->susclk);
+
+[Venkata] : Sure.We will update in next patch set.
+> 
+>> }
+>> 
+>> static int qca_init_regulators(struct qca_power *qca,
+>> @@ -1839,6 +1858,12 @@ static int qca_serdev_probe(struct 
+>> serdev_device *serdev)
+>> 
+>> 		qcadev->bt_power->vregs_on = false;
+>> 
+>> +		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
+>> +		if (IS_ERR(qcadev->susclk)) {
+>> +			dev_err(&serdev->dev, "failed to acquire clk\n");
+>> +			return PTR_ERR(qcadev->susclk);
+>> +		}
+>> +
+>> 		device_property_read_u32(&serdev->dev, "max-speed",
+>> 					 &qcadev->oper_speed);
+>> 		if (!qcadev->oper_speed)
+> 
+> Regards
+> 
+> Marcel
+
+Regards,
+Venkata.
