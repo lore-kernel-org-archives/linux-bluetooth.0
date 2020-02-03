@@ -2,187 +2,151 @@ Return-Path: <SRS0=oUsU=3X=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B271BC3F68F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Feb 2020 19:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC60C3524F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Feb 2020 19:56:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8996620CC7
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Feb 2020 19:38:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 435B720CC7
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Feb 2020 19:56:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i8my4THG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727023AbgBCTiO (ORCPT
+        id S1727090AbgBCT4g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Feb 2020 14:38:14 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:49520 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726278AbgBCTiO (ORCPT
+        Mon, 3 Feb 2020 14:56:36 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:40938 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727084AbgBCT4g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Feb 2020 14:38:14 -0500
-Received: by mail-il1-f199.google.com with SMTP id p67so12834640ill.16
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Feb 2020 11:38:12 -0800 (PST)
+        Mon, 3 Feb 2020 14:56:36 -0500
+Received: by mail-pj1-f65.google.com with SMTP id 12so216316pjb.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Feb 2020 11:56:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=I9M9LmaClASV810rGLEc15NYOwGjgzBVPDmw7qIokss=;
+        b=i8my4THGhNGBApfbRpArFdahLO9sBtkHhFpuR70QqVUpG+FWx6DjxhgZFgtqUjPq66
+         0WjH3gKJsCUoMQ7ipT4Q6vIUrwvHLMZegZ57wQNOVbfSJw10ePd/SDUsGr8EfwLgdLes
+         O1I5F4wUR6GK7SPeit5DL2B1y2AggMl1HENdWpde9tuqtecoVfBt8So/j2u0G7u8EZfR
+         WYQYc36PsFqwUCzYk02g3sEuETt3YnBJz//qWShRmOEl+XNkJSTTaMuyvrqaQ9VzdhG4
+         G4T5lN2PKz67M00tNgzdZDVf/jY5dCXi1XUxh9mJ4TXXDeM4IET4KW97tkT7EWyzm5Xj
+         ceqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=OUbMyT2tv3SkHPvgtbUj1+PdN7qNgygE1BDh4gUh5Jg=;
-        b=Sh+mzXyUAYD/Hbxpavzh15whg0fCRYO6ADHnzcd+5hBfW4tmboBoqA78SU9HbH2oZX
-         1GocTwDUGQG42R1kBUb+rZ0e/6Tit5ffLTy2TFKy0u8gORfhDqdSv4C3furfSYrmj9Zo
-         deJpCunlYTiGlid7u1qDCd1iWgugY9cZab4MOj8h0r6xGHpVtQY3Le7I8+CGkacQNhNv
-         khxzuV+O5P15+Nlu0xgZwfCqgcL/rn6uVKlY/UGx68zcxX9NYou254jYGhgH0K/d7lRV
-         jyOtHSYkc4u740hC6njLYfg8+ayDDxQV17mpm78mtrmv4MBd2f3dXZtvZgj+ruvTiSEt
-         0Gkw==
-X-Gm-Message-State: APjAAAVkwlFIETaWGr6MoL0B+c8ZJ0LcgdLRHTB+X7eMNw3cPWUDnouR
-        Q8EtVSCSunt2v4k0vBMf1H+PTSCBDyO2q5DYnHfUy6pvqp35
-X-Google-Smtp-Source: APXvYqylYFhuHM2kQBP7nk7cVkKNgna9n2UqZVDWZ7LpOSGi6IPXsRZPGH4NC5hSeZ9tTO7qWkfrt1jwWqkk1ocHEuWbt1zLaqxz
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=I9M9LmaClASV810rGLEc15NYOwGjgzBVPDmw7qIokss=;
+        b=eCTPmudz2C72Zc4Hxla3TpVcrwS7U0P/RLgmXqmkW0OFB/kl9mLgzGzcQxD0BXOBa0
+         14ZMF56ssRWHDhIOZBnXjwqH7IB2gnWWCv9bI709P7Fk+IKTBDwQD+uPVjrjoeJbZRxl
+         RTRK6rIdcpp3LKoDNePzdD/v4WzleGydw26czO7dBUUeJTNiD/3ritCSYAac/ThR+f4N
+         UpQgmgGSjs9+wMgvJwF1bEItUVYlN+9pc+BK8g8JL8Bp/0X4A8FpHH1Gw685ciW5pPmM
+         8KZ4XX1ou+pWi5zbK0dPUNQgKtKz6rJUrbKjni+wxH4eZTofj8IbRz5QXwfDyYE6W5mu
+         eWQw==
+X-Gm-Message-State: APjAAAUVXYpXcgWDF8BbO2X0f02txsV7rNIoEtfkw8BgG9zTvRiqYmfJ
+        lchZ9yhIMe8hd8JhKzi6fEBCCw==
+X-Google-Smtp-Source: APXvYqz5H17S9JQ02+kNOTj+0Wz6oywPwLIaMN2k+bOpSmvpM87PMUZNYn/QrD1GELPMKLvJrVCm/Q==
+X-Received: by 2002:a17:90b:941:: with SMTP id dw1mr784516pjb.21.1580759795145;
+        Mon, 03 Feb 2020 11:56:35 -0800 (PST)
+Received: from builder (104-188-17-28.lightspeed.sndgca.sbcglobal.net. [104.188.17.28])
+        by smtp.gmail.com with ESMTPSA id o29sm21978029pfp.124.2020.02.03.11.56.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2020 11:56:34 -0800 (PST)
+Date:   Mon, 3 Feb 2020 11:56:32 -0800
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        robh@kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        tientzu@chromium.org, seanpaul@chromium.org, rjliao@codeaurora.org,
+        yshavit@google.com
+Subject: Re: [PATCH v2 1/2] Bluetooth: hci_qca: Enable clocks required for BT
+ SOC
+Message-ID: <20200203195632.GM3948@builder>
+References: <1580456335-7317-1-git-send-email-gubbaven@codeaurora.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:685:: with SMTP id o5mr16097660ils.209.1580758692173;
- Mon, 03 Feb 2020 11:38:12 -0800 (PST)
-Date:   Mon, 03 Feb 2020 11:38:12 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000529cf4059db11032@google.com>
-Subject: linux-next test error: KASAN: use-after-free Read in l2cap_sock_release
-From:   syzbot <syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1580456335-7317-1-git-send-email-gubbaven@codeaurora.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Thu 30 Jan 23:38 PST 2020, Venkata Lakshmi Narayana Gubba wrote:
 
-syzbot found the following crash on:
+> Instead of relying on other subsytem to turn ON clocks
+> required for BT SoC to operate, voting them from the driver.
+> 
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> ---
+> v2:
+>    * addressed forward declarations
+>    * updated with devm_clk_get_optional()
+>  
+> ---
+>  drivers/bluetooth/hci_qca.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index d6e0c99..73706f3 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1738,6 +1738,15 @@ static int qca_power_off(struct hci_dev *hdev)
+>  	return 0;
+>  }
+>  
+> +static int qca_setup_clock(struct clk *clk, bool enable)
+> +{
+> +	if (enable)
+> +		return clk_prepare_enable(clk);
+> +
+> +	clk_disable_unprepare(clk);
+> +	return 0;
+> +}
 
-HEAD commit:    cee5a428 Add linux-next specific files for 20200203
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=167acbf1e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ea1325a05ecd7b98
-dashboard link: https://syzkaller.appspot.com/bug?extid=c3c5bdea7863886115dc
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+As Marcel requested, inline these.
 
-Unfortunately, I don't have any reproducer for this crash yet.
+> +
+>  static int qca_regulator_enable(struct qca_serdev *qcadev)
+>  {
+>  	struct qca_power *power = qcadev->bt_power;
+> @@ -1755,6 +1764,13 @@ static int qca_regulator_enable(struct qca_serdev *qcadev)
+>  
+>  	power->vregs_on = true;
+>  
+> +	ret = qca_setup_clock(qcadev->susclk, true);
+> +	if (ret) {
+> +		/* Turn off regulators to overcome power leakage */
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com
+You can omit this comment as well, as the name of the function you call
+is aptly named.
 
-can: request_module (can-proto-0) failed.
-can: request_module (can-proto-0) failed.
-can: request_module (can-proto-0) failed.
-==================================================================
-BUG: KASAN: use-after-free in l2cap_sock_release+0x24c/0x290 net/bluetooth/l2cap_sock.c:1212
-Read of size 8 at addr ffff8880944904a0 by task syz-fuzzer/9751
+> +		qca_regulator_disable(qcadev);
+> +		return ret;
 
-CPU: 0 PID: 9751 Comm: syz-fuzzer Not tainted 5.5.0-next-20200203-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x197/0x210 lib/dump_stack.c:118
- print_address_description.constprop.0.cold+0xd4/0x30b mm/kasan/report.c:374
- __kasan_report.cold+0x1b/0x32 mm/kasan/report.c:506
- kasan_report+0x12/0x20 mm/kasan/common.c:641
- __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:135
- l2cap_sock_release+0x24c/0x290 net/bluetooth/l2cap_sock.c:1212
- __sock_release+0xce/0x280 net/socket.c:605
- sock_close+0x1e/0x30 net/socket.c:1283
- __fput+0x2ff/0x890 fs/file_table.c:280
- ____fput+0x16/0x20 fs/file_table.c:313
- task_work_run+0x145/0x1c0 kernel/task_work.c:113
- tracehook_notify_resume include/linux/tracehook.h:188 [inline]
- exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:164
- prepare_exit_to_usermode arch/x86/entry/common.c:195 [inline]
- syscall_return_slowpath arch/x86/entry/common.c:278 [inline]
- do_syscall_64+0x676/0x790 arch/x86/entry/common.c:304
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x4afb40
-Code: 8b 7c 24 10 48 8b 74 24 18 48 8b 54 24 20 49 c7 c2 00 00 00 00 49 c7 c0 00 00 00 00 49 c7 c1 00 00 00 00 48 8b 44 24 08 0f 05 <48> 3d 01 f0 ff ff 76 20 48 c7 44 24 28 ff ff ff ff 48 c7 44 24 30
-RSP: 002b:000000c00020b540 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 000000c00002e500 RCX: 00000000004afb40
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 000000c00020b580 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 00000000000000cc
-R13: 00000000000000cb R14: 0000000000000200 R15: 0000000000000200
+Just return ret below instead.
 
-Allocated by task 9751:
- save_stack+0x23/0x90 mm/kasan/common.c:72
- set_track mm/kasan/common.c:80 [inline]
- __kasan_kmalloc mm/kasan/common.c:515 [inline]
- __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:488
- kasan_kmalloc+0x9/0x10 mm/kasan/common.c:529
- __do_kmalloc mm/slab.c:3656 [inline]
- __kmalloc+0x163/0x770 mm/slab.c:3665
- kmalloc include/linux/slab.h:560 [inline]
- sk_prot_alloc+0x23a/0x310 net/core/sock.c:1603
- sk_alloc+0x39/0xfd0 net/core/sock.c:1657
- l2cap_sock_alloc.constprop.0+0x37/0x230 net/bluetooth/l2cap_sock.c:1603
- l2cap_sock_create+0x11e/0x1c0 net/bluetooth/l2cap_sock.c:1649
- bt_sock_create+0x16a/0x2d0 net/bluetooth/af_bluetooth.c:130
- __sock_create+0x3ce/0x730 net/socket.c:1433
- sock_create net/socket.c:1484 [inline]
- __sys_socket+0x103/0x220 net/socket.c:1526
- __do_sys_socket net/socket.c:1535 [inline]
- __se_sys_socket net/socket.c:1533 [inline]
- __x64_sys_socket+0x73/0xb0 net/socket.c:1533
- do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1773,6 +1789,9 @@ static void qca_regulator_disable(struct qca_serdev *qcadev)
+>  
+>  	regulator_bulk_disable(power->num_vregs, power->vreg_bulk);
+>  	power->vregs_on = false;
+> +
+> +	if (qcadev->susclk)
 
-Freed by task 9751:
- save_stack+0x23/0x90 mm/kasan/common.c:72
- set_track mm/kasan/common.c:80 [inline]
- kasan_set_free_info mm/kasan/common.c:337 [inline]
- __kasan_slab_free+0x102/0x150 mm/kasan/common.c:476
- kasan_slab_free+0xe/0x10 mm/kasan/common.c:485
- __cache_free mm/slab.c:3426 [inline]
- kfree+0x10a/0x2c0 mm/slab.c:3757
- sk_prot_free net/core/sock.c:1640 [inline]
- __sk_destruct+0x5d8/0x7f0 net/core/sock.c:1724
- sk_destruct+0xd5/0x110 net/core/sock.c:1739
- __sk_free+0xfb/0x3f0 net/core/sock.c:1750
- sk_free+0x83/0xb0 net/core/sock.c:1761
- sock_put include/net/sock.h:1719 [inline]
- l2cap_sock_kill+0x160/0x190 net/bluetooth/l2cap_sock.c:1058
- l2cap_sock_release+0x1c3/0x290 net/bluetooth/l2cap_sock.c:1210
- __sock_release+0xce/0x280 net/socket.c:605
- sock_close+0x1e/0x30 net/socket.c:1283
- __fput+0x2ff/0x890 fs/file_table.c:280
- ____fput+0x16/0x20 fs/file_table.c:313
- task_work_run+0x145/0x1c0 kernel/task_work.c:113
- tracehook_notify_resume include/linux/tracehook.h:188 [inline]
- exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:164
- prepare_exit_to_usermode arch/x86/entry/common.c:195 [inline]
- syscall_return_slowpath arch/x86/entry/common.c:278 [inline]
- do_syscall_64+0x676/0x790 arch/x86/entry/common.c:304
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
+In the enable path you (correctly) rely on passing NULL to the clock
+code, so do the same here.
 
-The buggy address belongs to the object at ffff888094490000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 1184 bytes inside of
- 2048-byte region [ffff888094490000, ffff888094490800)
-The buggy address belongs to the page:
-page:ffffea0002512400 refcount:1 mapcount:0 mapping:ffff8880aa400e00 index:0x0
-flags: 0xfffe0000000200(slab)
-raw: 00fffe0000000200 ffffea00025123c8 ffffea00021bf608 ffff8880aa400e00
-raw: 0000000000000000 ffff888094490000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff888094490380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888094490400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888094490480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                               ^
- ffff888094490500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888094490580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Regards,
+Bjorn
