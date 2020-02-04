@@ -2,220 +2,290 @@ Return-Path: <SRS0=1xTA=3Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEC8C2D0B1
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 14:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F912C35247
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 16:16:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24D672087E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 14:59:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4628821744
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 16:16:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727363AbgBDO7R convert rfc822-to-8bit (ORCPT
+        id S1727440AbgBDQQD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Feb 2020 09:59:17 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:45212 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727275AbgBDO7Q (ORCPT
+        Tue, 4 Feb 2020 11:16:03 -0500
+Received: from alexa-out-blr-02.qualcomm.com ([103.229.18.198]:25863 "EHLO
+        alexa-out-blr-02.qualcomm.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727433AbgBDQQD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Feb 2020 09:59:16 -0500
-Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C4115CED29;
-        Tue,  4 Feb 2020 16:08:36 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: KASAN: use-after-free Read in l2cap_sock_release
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200204094150.10272-1-hdanton@sina.com>
-Date:   Tue, 4 Feb 2020 15:59:14 +0100
-Cc:     syzbot <syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <8BDF940B-F93A-40FF-AA60-334433D9A6F1@holtmann.org>
-References: <20200204094150.10272-1-hdanton@sina.com>
-To:     Hillf Danton <hdanton@sina.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Tue, 4 Feb 2020 11:16:03 -0500
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by alexa-out-blr-02.qualcomm.com with ESMTP/TLS/AES256-SHA; 04 Feb 2020 21:45:58 +0530
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 04 Feb 2020 21:45:33 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id ED47821447; Tue,  4 Feb 2020 21:45:31 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, robh@kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, tientzu@chromium.org,
+        seanpaul@chromium.org, rjliao@codeaurora.org, yshavit@google.com,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Bug fixes while collecting controller memory dump
+Date:   Tue,  4 Feb 2020 21:45:29 +0530
+Message-Id: <1580832929-2067-1-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hillf,
+This patch will fix the below issues
+   1.Fixed race conditions while accessing memory dump state flags.
+   2.Updated with actual context of timer in hci_memdump_timeout()
+   3.Updated injecting hardware error event if the dumps failed to receive.
+   4.Once timeout is triggered, stopping the memory dump collections.
 
->> syzbot found the following crash on:
->> 
->> HEAD commit:    cee5a428 Add linux-next specific files for 20200203
->> git tree:       linux-next
->> console output: https://syzkaller.appspot.com/x/log.txt?x=167acbf1e00000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=ea1325a05ecd7b98
->> dashboard link: https://syzkaller.appspot.com/bug?extid=c3c5bdea7863886115dc
->> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
->> 
->> Unfortunately, I don't have any reproducer for this crash yet.
->> 
->> IMPORTANT: if you fix the bug, please add the following tag to the commit:
->> Reported-by: syzbot+c3c5bdea7863886115dc@syzkaller.appspotmail.com
->> 
->> can: request_module (can-proto-0) failed.
->> can: request_module (can-proto-0) failed.
->> can: request_module (can-proto-0) failed.
->> ==================================================================
->> BUG: KASAN: use-after-free in l2cap_sock_release+0x24c/0x290 net/bluetooth/l2cap_sock.c:1212
->> Read of size 8 at addr ffff8880944904a0 by task syz-fuzzer/9751
->> 
->> CPU: 0 PID: 9751 Comm: syz-fuzzer Not tainted 5.5.0-next-20200203-syzkaller #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
->> Call Trace:
->> __dump_stack lib/dump_stack.c:77 [inline]
->> dump_stack+0x197/0x210 lib/dump_stack.c:118
->> print_address_description.constprop.0.cold+0xd4/0x30b mm/kasan/report.c:374
->> __kasan_report.cold+0x1b/0x32 mm/kasan/report.c:506
->> kasan_report+0x12/0x20 mm/kasan/common.c:641
->> __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:135
->> l2cap_sock_release+0x24c/0x290 net/bluetooth/l2cap_sock.c:1212
->> __sock_release+0xce/0x280 net/socket.c:605
->> sock_close+0x1e/0x30 net/socket.c:1283
->> __fput+0x2ff/0x890 fs/file_table.c:280
->> ____fput+0x16/0x20 fs/file_table.c:313
->> task_work_run+0x145/0x1c0 kernel/task_work.c:113
->> tracehook_notify_resume include/linux/tracehook.h:188 [inline]
->> exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:164
->> prepare_exit_to_usermode arch/x86/entry/common.c:195 [inline]
->> syscall_return_slowpath arch/x86/entry/common.c:278 [inline]
->> do_syscall_64+0x676/0x790 arch/x86/entry/common.c:304
->> entry_SYSCALL_64_after_hwframe+0x49/0xbe
->> RIP: 0033:0x4afb40
->> Code: 8b 7c 24 10 48 8b 74 24 18 48 8b 54 24 20 49 c7 c2 00 00 00 00 49 c7 c0 00 00 00 00 49 c7 c1 00 00 00 00 48 8b 44 24 08 0f 05 <48> 3d 01 f0 ff ff 76 20 48 c7 44 24 28 ff ff ff ff 48 c7 44 24 30
->> RSP: 002b:000000c00020b540 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
->> RAX: 0000000000000000 RBX: 000000c00002e500 RCX: 00000000004afb40
->> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
->> RBP: 000000c00020b580 R08: 0000000000000000 R09: 0000000000000000
->> R10: 0000000000000000 R11: 0000000000000202 R12: 00000000000000cc
->> R13: 00000000000000cb R14: 0000000000000200 R15: 0000000000000200
->> 
->> Allocated by task 9751:
->> save_stack+0x23/0x90 mm/kasan/common.c:72
->> set_track mm/kasan/common.c:80 [inline]
->> __kasan_kmalloc mm/kasan/common.c:515 [inline]
->> __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:488
->> kasan_kmalloc+0x9/0x10 mm/kasan/common.c:529
->> __do_kmalloc mm/slab.c:3656 [inline]
->> __kmalloc+0x163/0x770 mm/slab.c:3665
->> kmalloc include/linux/slab.h:560 [inline]
->> sk_prot_alloc+0x23a/0x310 net/core/sock.c:1603
->> sk_alloc+0x39/0xfd0 net/core/sock.c:1657
->> l2cap_sock_alloc.constprop.0+0x37/0x230 net/bluetooth/l2cap_sock.c:1603
->> l2cap_sock_create+0x11e/0x1c0 net/bluetooth/l2cap_sock.c:1649
->> bt_sock_create+0x16a/0x2d0 net/bluetooth/af_bluetooth.c:130
->> __sock_create+0x3ce/0x730 net/socket.c:1433
->> sock_create net/socket.c:1484 [inline]
->> __sys_socket+0x103/0x220 net/socket.c:1526
->> __do_sys_socket net/socket.c:1535 [inline]
->> __se_sys_socket net/socket.c:1533 [inline]
->> __x64_sys_socket+0x73/0xb0 net/socket.c:1533
->> do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
->> entry_SYSCALL_64_after_hwframe+0x49/0xbe
->> 
->> Freed by task 9751:
->> save_stack+0x23/0x90 mm/kasan/common.c:72
->> set_track mm/kasan/common.c:80 [inline]
->> kasan_set_free_info mm/kasan/common.c:337 [inline]
->> __kasan_slab_free+0x102/0x150 mm/kasan/common.c:476
->> kasan_slab_free+0xe/0x10 mm/kasan/common.c:485
->> __cache_free mm/slab.c:3426 [inline]
->> kfree+0x10a/0x2c0 mm/slab.c:3757
->> sk_prot_free net/core/sock.c:1640 [inline]
->> __sk_destruct+0x5d8/0x7f0 net/core/sock.c:1724
->> sk_destruct+0xd5/0x110 net/core/sock.c:1739
->> __sk_free+0xfb/0x3f0 net/core/sock.c:1750
->> sk_free+0x83/0xb0 net/core/sock.c:1761
->> sock_put include/net/sock.h:1719 [inline]
->> l2cap_sock_kill+0x160/0x190 net/bluetooth/l2cap_sock.c:1058
->> l2cap_sock_release+0x1c3/0x290 net/bluetooth/l2cap_sock.c:1210
->> __sock_release+0xce/0x280 net/socket.c:605
->> sock_close+0x1e/0x30 net/socket.c:1283
->> __fput+0x2ff/0x890 fs/file_table.c:280
->> ____fput+0x16/0x20 fs/file_table.c:313
->> task_work_run+0x145/0x1c0 kernel/task_work.c:113
->> tracehook_notify_resume include/linux/tracehook.h:188 [inline]
->> exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:164
->> prepare_exit_to_usermode arch/x86/entry/common.c:195 [inline]
->> syscall_return_slowpath arch/x86/entry/common.c:278 [inline]
->> do_syscall_64+0x676/0x790 arch/x86/entry/common.c:304
->> entry_SYSCALL_64_after_hwframe+0x49/0xbe
->> 
->> The buggy address belongs to the object at ffff888094490000
->> which belongs to the cache kmalloc-2k of size 2048
->> The buggy address is located 1184 bytes inside of
->> 2048-byte region [ffff888094490000, ffff888094490800)
->> The buggy address belongs to the page:
->> page:ffffea0002512400 refcount:1 mapcount:0 mapping:ffff8880aa400e00 index:0x0
->> flags: 0xfffe0000000200(slab)
->> raw: 00fffe0000000200 ffffea00025123c8 ffffea00021bf608 ffff8880aa400e00
->> raw: 0000000000000000 ffff888094490000 0000000100000001 0000000000000000
->> page dumped because: kasan: bad access detected
->> 
->> Memory state around the buggy address:
->> ffff888094490380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> ffff888094490400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>> ffff888094490480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>                               ^
->> ffff888094490500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> ffff888094490580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> ==================================================================
->> 
->> 
->> ---
->> This bug is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->> 
->> syzbot will keep track of this bug report. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> 
-> Prefetch channel before killing sock.
-> 
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1193,6 +1193,7 @@ static int l2cap_sock_release(struct soc
-> {
-> 	struct sock *sk = sock->sk;
-> 	int err;
-> +	struct l2cap_chan *chan;
-> 
-> 	BT_DBG("sock %p, sk %p", sock, sk);
-> 
-> @@ -1202,15 +1203,16 @@ static int l2cap_sock_release(struct soc
-> 	bt_sock_unlink(&l2cap_sk_list, sk);
-> 
-> 	err = l2cap_sock_shutdown(sock, 2);
-> +	chan = l2cap_pi(sk)->chan;
-> 
-> -	l2cap_chan_hold(l2cap_pi(sk)->chan);
-> -	l2cap_chan_lock(l2cap_pi(sk)->chan);
-> +	l2cap_chan_hold(chan);
-> +	l2cap_chan_lock(chan);
-> 
-> 	sock_orphan(sk);
-> 	l2cap_sock_kill(sk);
-> 
-> -	l2cap_chan_unlock(l2cap_pi(sk)->chan);
-> -	l2cap_chan_put(l2cap_pi(sk)->chan);
-> +	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
-> 
-> 	return err;
-> }
+Fixes: d841502c79e3 ("Bluetooth: hci_qca: Collect controller memory dump during SSR")
+Reported-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 104 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 90 insertions(+), 14 deletions(-)
 
-please send a proper patch with commit message and everything. That way I can easily apply it.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index eacc65b..ea956c3 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -69,7 +69,8 @@ enum qca_flags {
+ 	QCA_IBS_ENABLED,
+ 	QCA_DROP_VENDOR_EVENT,
+ 	QCA_SUSPENDING,
+-	QCA_MEMDUMP_COLLECTION
++	QCA_MEMDUMP_COLLECTION,
++	QCA_HW_ERROR_EVENT
+ };
+ 
+ 
+@@ -150,6 +151,7 @@ struct qca_data {
+ 	struct completion drop_ev_comp;
+ 	wait_queue_head_t suspend_wait_q;
+ 	enum qca_memdump_states memdump_state;
++	spinlock_t hci_memdump_lock;
+ 
+ 	/* For debugging purpose */
+ 	u64 ibs_sent_wacks;
+@@ -524,19 +526,19 @@ static void hci_ibs_wake_retrans_timeout(struct timer_list *t)
+ 
+ static void hci_memdump_timeout(struct timer_list *t)
+ {
+-	struct qca_data *qca = from_timer(qca, t, tx_idle_timer);
++	struct qca_data *qca = from_timer(qca, t, memdump_timer);
+ 	struct hci_uart *hu = qca->hu;
+-	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
+-	char *memdump_buf = qca_memdump->memdump_buf_tail;
++	unsigned long flags;
+ 
+-	bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
+-	/* Inject hw error event to reset the device and driver. */
+-	hci_reset_dev(hu->hdev);
+-	vfree(memdump_buf);
+-	kfree(qca_memdump);
++	spin_lock_irqsave(&qca->hci_memdump_lock, flags);
+ 	qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
++	if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
++		/* Inject hw error event to reset the device and driver. */
++		hci_reset_dev(hu->hdev);
++	}
++
+ 	del_timer(&qca->memdump_timer);
+-	cancel_work_sync(&qca->ctrl_memdump_evt);
++	spin_unlock_irqrestore(&qca->hci_memdump_lock, flags);
+ }
+ 
+ /* Initialize protocol */
+@@ -558,6 +560,7 @@ static int qca_open(struct hci_uart *hu)
+ 	skb_queue_head_init(&qca->tx_wait_q);
+ 	skb_queue_head_init(&qca->rx_memdump_q);
+ 	spin_lock_init(&qca->hci_ibs_lock);
++	spin_lock_init(&qca->hci_memdump_lock);
+ 	qca->workqueue = alloc_ordered_workqueue("qca_wq", 0);
+ 	if (!qca->workqueue) {
+ 		BT_ERR("QCA Workqueue not initialized properly");
+@@ -960,14 +963,25 @@ static void qca_controller_memdump(struct work_struct *work)
+ 	char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
+ 	u16 seq_no;
+ 	u32 dump_size;
++	unsigned long flags;
+ 
+ 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
+ 
++		spin_lock_irqsave(&qca->hci_memdump_lock, flags);
++		/* Skip processing the received packets if timeout detected. */
++		if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT) {
++			spin_unlock_irqrestore(&qca->hci_memdump_lock, flags);
++			return;
++		}
++
+ 		if (!qca_memdump) {
+ 			qca_memdump = kzalloc(sizeof(struct qca_memdump_data),
+ 					      GFP_ATOMIC);
+-			if (!qca_memdump)
++			if (!qca_memdump) {
++				spin_unlock_irqrestore(&qca->hci_memdump_lock,
++								flags);
+ 				return;
++			}
+ 
+ 			qca->qca_memdump = qca_memdump;
+ 		}
+@@ -992,6 +1006,8 @@ static void qca_controller_memdump(struct work_struct *work)
+ 			if (!(dump_size)) {
+ 				bt_dev_err(hu->hdev, "Rx invalid memdump size");
+ 				kfree_skb(skb);
++				spin_unlock_irqrestore(&qca->hci_memdump_lock,
++							flags);
+ 				return;
+ 			}
+ 
+@@ -1001,7 +1017,24 @@ static void qca_controller_memdump(struct work_struct *work)
+ 				  msecs_to_jiffies(MEMDUMP_TIMEOUT_MS)));
+ 
+ 			skb_pull(skb, sizeof(dump_size));
++
++			/* vmalloc() might go to sleep while trying to allocate
++			 * memory.As calling sleep function under spin lock is
++			 * not allowed so unlocking spin lock and will be locked
++			 * again after vmalloc().
++			 */
++			spin_unlock_irqrestore(&qca->hci_memdump_lock, flags);
+ 			memdump_buf = vmalloc(dump_size);
++			spin_lock_irqsave(&qca->hci_memdump_lock, flags);
++			/* Skip processing the received packets if timeout
++			 * detected.
++			 */
++			if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT) {
++				spin_unlock_irqrestore(&qca->hci_memdump_lock,
++							flags);
++				return;
++			}
++
+ 			qca_memdump->memdump_buf_head = memdump_buf;
+ 			qca_memdump->memdump_buf_tail = memdump_buf;
+ 		}
+@@ -1016,6 +1049,7 @@ static void qca_controller_memdump(struct work_struct *work)
+ 			kfree(qca_memdump);
+ 			kfree_skb(skb);
+ 			qca->qca_memdump = NULL;
++			spin_unlock_irqrestore(&qca->hci_memdump_lock, flags);
+ 			return;
+ 		}
+ 
+@@ -1044,18 +1078,37 @@ static void qca_controller_memdump(struct work_struct *work)
+ 			bt_dev_info(hu->hdev, "QCA writing crash dump of size %d bytes",
+ 				   qca_memdump->received_dump);
+ 			memdump_buf = qca_memdump->memdump_buf_head;
++
++			/* dev_coredumpv() might go to sleep.As calling sleep
++			 * function under spin lock is not allowed so unlocking
++			 * spin lock and will be locked again after
++			 * dev_coredumpv().
++			 */
++			spin_unlock_irqrestore(&qca->hci_memdump_lock,
++						flags);
+ 			dev_coredumpv(&hu->serdev->dev, memdump_buf,
+ 				      qca_memdump->received_dump, GFP_KERNEL);
++			spin_lock_irqsave(&qca->hci_memdump_lock, flags);
++			if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT) {
++				spin_unlock_irqrestore(&qca->hci_memdump_lock,
++							flags);
++				return;
++			}
++
+ 			del_timer(&qca->memdump_timer);
+ 			kfree(qca->qca_memdump);
+ 			qca->qca_memdump = NULL;
+ 			qca->memdump_state = QCA_MEMDUMP_COLLECTED;
++			clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
+ 		}
++
++		spin_unlock_irqrestore(&qca->hci_memdump_lock, flags);
+ 	}
+ 
+ }
+ 
+-int qca_controller_memdump_event(struct hci_dev *hdev, struct sk_buff *skb)
++static int qca_controller_memdump_event(struct hci_dev *hdev,
++					struct sk_buff *skb)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
+@@ -1408,19 +1461,25 @@ static void qca_wait_for_dump_collection(struct hci_dev *hdev)
+ 	struct qca_data *qca = hu->priv;
+ 	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
+ 	char *memdump_buf = NULL;
++	unsigned long flags;
+ 
+ 	wait_on_bit_timeout(&qca->flags, QCA_MEMDUMP_COLLECTION,
+ 			    TASK_UNINTERRUPTIBLE, MEMDUMP_TIMEOUT_MS);
+ 
+ 	clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
+-	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
++	if (qca->memdump_state == QCA_MEMDUMP_IDLE ||
++	    qca->memdump_state == QCA_MEMDUMP_COLLECTING) {
+ 		bt_dev_err(hu->hdev, "Clearing the buffers due to timeout");
++		spin_lock_irqsave(&qca->hci_memdump_lock, flags);
+ 		if (qca_memdump)
+-			memdump_buf = qca_memdump->memdump_buf_tail;
++			memdump_buf = qca_memdump->memdump_buf_head;
+ 		vfree(memdump_buf);
+ 		kfree(qca_memdump);
++		qca->qca_memdump = NULL;
+ 		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
+ 		del_timer(&qca->memdump_timer);
++		skb_queue_purge(&qca->rx_memdump_q);
++		spin_unlock_irqrestore(&qca->hci_memdump_lock, flags);
+ 		cancel_work_sync(&qca->ctrl_memdump_evt);
+ 	}
+ }
+@@ -1429,7 +1488,11 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
++	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
++	char *memdump_buf = NULL;
++	unsigned long flags;
+ 
++	set_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+ 	bt_dev_info(hdev, "mem_dump_status: %d", qca->memdump_state);
+ 
+ 	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
+@@ -1448,7 +1511,20 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
+ 		 */
+ 		bt_dev_info(hdev, "waiting for dump to complete");
+ 		qca_wait_for_dump_collection(hdev);
++	} else if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT) {
++		bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
++		spin_lock_irqsave(&qca->hci_memdump_lock, flags);
++		if (qca_memdump)
++			memdump_buf = qca_memdump->memdump_buf_head;
++		vfree(memdump_buf);
++		kfree(qca_memdump);
++		qca->qca_memdump = NULL;
++		skb_queue_purge(&qca->rx_memdump_q);
++		spin_unlock_irqrestore(&qca->hci_memdump_lock, flags);
++		cancel_work_sync(&qca->ctrl_memdump_evt);
+ 	}
++
++	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
+ }
+ 
+ static void qca_cmd_timeout(struct hci_dev *hdev)
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
