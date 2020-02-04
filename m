@@ -2,125 +2,138 @@ Return-Path: <SRS0=1xTA=3Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57280C2D0B1
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 09:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A903AC2D0B1
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 11:28:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 360862087E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 09:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88A36217BA
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Feb 2020 11:28:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726479AbgBDJEy convert rfc822-to-8bit (ORCPT
+        id S1727072AbgBDL2P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Feb 2020 04:04:54 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33201 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726362AbgBDJEy (ORCPT
+        Tue, 4 Feb 2020 06:28:15 -0500
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:34965 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726983AbgBDL2P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Feb 2020 04:04:54 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 379BFCED24;
-        Tue,  4 Feb 2020 10:14:13 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: hci_qca: Enable clocks required for BT
- SOC
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200203195632.GM3948@builder>
-Date:   Tue, 4 Feb 2020 10:04:51 +0100
-Cc:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        robh@kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        tientzu@chromium.org, seanpaul@chromium.org, rjliao@codeaurora.org,
-        yshavit@google.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <FA054FF0-C1EF-4749-96C3-A86ECD064FE9@holtmann.org>
-References: <1580456335-7317-1-git-send-email-gubbaven@codeaurora.org>
- <20200203195632.GM3948@builder>
-To:     Bjorn Andersson <bjorn.andersson@linaro.org>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Tue, 4 Feb 2020 06:28:15 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R461e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04428;MF=alex.shi@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Tp7pt7A_1580815687;
+Received: from IT-FVFX43SYHV2H.local(mailfrom:alex.shi@linux.alibaba.com fp:SMTPD_---0Tp7pt7A_1580815687)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 04 Feb 2020 19:28:08 +0800
+Subject: Re: [PATCH] net/bluetooth: remove __get_channel/dir
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1579596583-258090-1-git-send-email-alex.shi@linux.alibaba.com>
+ <8CA3EF63-F688-48B2-A21D-16FDBC809EDE@holtmann.org>
+From:   Alex Shi <alex.shi@linux.alibaba.com>
+Message-ID: <09359312-a1c8-c560-85ba-0f94be521b26@linux.alibaba.com>
+Date:   Tue, 4 Feb 2020 19:28:07 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <8CA3EF63-F688-48B2-A21D-16FDBC809EDE@holtmann.org>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bjorn,
 
->> Instead of relying on other subsytem to turn ON clocks
->> required for BT SoC to operate, voting them from the driver.
->> 
->> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+
+ÔÚ 2020/1/22 ÉÏÎç12:19, Marcel Holtmann Ð´µÀ:
+> Hi Alex,
+> 
+>> These 2 macros are never used from first git commit Linux-2.6.12-rc2. So
+>> better to remove them.
+>>
+>> Signed-off-by: Alex Shi <alex.shi@linux.alibaba.com>
+>> Cc: Marcel Holtmann <marcel@holtmann.org> 
+>> Cc: Johan Hedberg <johan.hedberg@gmail.com> 
+>> Cc: "David S. Miller" <davem@davemloft.net> 
+>> Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com> 
+>> Cc: linux-bluetooth@vger.kernel.org 
+>> Cc: netdev@vger.kernel.org 
+>> Cc: linux-kernel@vger.kernel.org 
 >> ---
->> v2:
->>   * addressed forward declarations
->>   * updated with devm_clk_get_optional()
->> 
->> ---
->> drivers/bluetooth/hci_qca.c | 25 +++++++++++++++++++++++++
->> 1 file changed, 25 insertions(+)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index d6e0c99..73706f3 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1738,6 +1738,15 @@ static int qca_power_off(struct hci_dev *hdev)
->> 	return 0;
->> }
->> 
->> +static int qca_setup_clock(struct clk *clk, bool enable)
->> +{
->> +	if (enable)
->> +		return clk_prepare_enable(clk);
->> +
->> +	clk_disable_unprepare(clk);
->> +	return 0;
->> +}
+>> net/bluetooth/rfcomm/core.c | 2 --
+>> 1 file changed, 2 deletions(-)
+>>
+>> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+>> index 3a9e9d9670be..825adff79f13 100644
+>> --- a/net/bluetooth/rfcomm/core.c
+>> +++ b/net/bluetooth/rfcomm/core.c
+>> @@ -73,8 +73,6 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+>>
+>> /* ---- RFCOMM frame parsing macros ---- */
+>> #define __get_dlci(b)     ((b & 0xfc) >> 2)
+>> -#define __get_channel(b)  ((b & 0xf8) >> 3)
+>> -#define __get_dir(b)      ((b & 0x04) >> 2)
+>> #define __get_type(b)     ((b & 0xef))
+>>
+>> #define __test_ea(b)      ((b & 0x01))
 > 
-> As Marcel requested, inline these.
+> it seems we are also not using __dir macro either.
 > 
->> +
->> static int qca_regulator_enable(struct qca_serdev *qcadev)
->> {
->> 	struct qca_power *power = qcadev->bt_power;
->> @@ -1755,6 +1764,13 @@ static int qca_regulator_enable(struct qca_serdev *qcadev)
->> 
->> 	power->vregs_on = true;
->> 
->> +	ret = qca_setup_clock(qcadev->susclk, true);
->> +	if (ret) {
->> +		/* Turn off regulators to overcome power leakage */
-> 
-> You can omit this comment as well, as the name of the function you call
-> is aptly named.
-> 
->> +		qca_regulator_disable(qcadev);
->> +		return ret;
-> 
-> Just return ret below instead.
-> 
->> +	}
->> +
->> 	return 0;
->> }
->> 
->> @@ -1773,6 +1789,9 @@ static void qca_regulator_disable(struct qca_serdev *qcadev)
->> 
->> 	regulator_bulk_disable(power->num_vregs, power->vreg_bulk);
->> 	power->vregs_on = false;
->> +
->> +	if (qcadev->susclk)
-> 
-> In the enable path you (correctly) rely on passing NULL to the clock
-> code, so do the same here.
 
-I already pushed the patch, but I am happy to accept a cleanup patch.
+Hi Marcel,
 
-Regards
+Thanks a lot for reminder. How about the following patch?
 
-Marcel
+Thanks
+Alex
+
+From 41ef02c2f52cee1d69bb0ba0fbd90247d61dc155 Mon Sep 17 00:00:00 2001
+From: Alex Shi <alex.shi@linux.alibaba.com>
+Date: Wed, 15 Jan 2020 17:11:01 +0800
+Subject: [PATCH v2] net/bluetooth: remove __get_channel/dir and __dir
+
+These 3 macros are never used from first git commit Linux-2.6.12-rc2.
+let's remove them.
+
+Suggested-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Alex Shi <alex.shi@linux.alibaba.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ net/bluetooth/rfcomm/core.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 3a9e9d9670be..dcecce087b24 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -73,8 +73,6 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+ 
+ /* ---- RFCOMM frame parsing macros ---- */
+ #define __get_dlci(b)     ((b & 0xfc) >> 2)
+-#define __get_channel(b)  ((b & 0xf8) >> 3)
+-#define __get_dir(b)      ((b & 0x04) >> 2)
+ #define __get_type(b)     ((b & 0xef))
+ 
+ #define __test_ea(b)      ((b & 0x01))
+@@ -87,7 +85,6 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
+ #define __ctrl(type, pf)       (((type & 0xef) | (pf << 4)))
+ #define __dlci(dir, chn)       (((chn & 0x1f) << 1) | dir)
+ #define __srv_channel(dlci)    (dlci >> 1)
+-#define __dir(dlci)            (dlci & 0x01)
+ 
+ #define __len8(len)       (((len) << 1) | 1)
+ #define __len16(len)      ((len) << 1)
+-- 
+1.8.3.1
 
