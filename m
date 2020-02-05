@@ -2,70 +2,84 @@ Return-Path: <SRS0=KupO=3Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3CA9C35254
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 12:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B03C35247
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 18:30:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4B7A2072B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 12:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D767420674
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 18:30:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KWI5B2v6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728168AbgBEMwI convert rfc822-to-8bit (ORCPT
+        id S1727331AbgBESaS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Feb 2020 07:52:08 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:34956 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726386AbgBEMwI (ORCPT
+        Wed, 5 Feb 2020 13:30:18 -0500
+Received: from mail-oi1-f175.google.com ([209.85.167.175]:44652 "EHLO
+        mail-oi1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727083AbgBESaS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Feb 2020 07:52:08 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0C821CECC7;
-        Wed,  5 Feb 2020 14:01:28 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Bug fixes while collecting
- controller memory dump
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <d89347d22c12ffca5ccf4e18e0c716ab@codeaurora.org>
-Date:   Wed, 5 Feb 2020 13:52:05 +0100
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        robh@kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        tientzu@chromium.org, seanpaul@chromium.org, rjliao@codeaurora.org,
-        Yoni Shavit <yshavit@google.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <20C0BA0B-1069-4DCF-A8FA-3B6359621D30@holtmann.org>
-References: <1580832929-2067-1-git-send-email-gubbaven@codeaurora.org>
- <CANFp7mXgvfQGw0bc0dwNXg9KME1XD1zYGtPdEFWbM20NJpKtzQ@mail.gmail.com>
- <d89347d22c12ffca5ccf4e18e0c716ab@codeaurora.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Wed, 5 Feb 2020 13:30:18 -0500
+Received: by mail-oi1-f175.google.com with SMTP id d62so1717676oia.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Feb 2020 10:30:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FAzQeMLR6gNoBDV3AQz8qRzJUhdHOYUBPeR/uOcJaGk=;
+        b=KWI5B2v6olihrnBoN0pTjPPX+l4wVSyQU/TU0rbmtQA+lod5/vDeoXKqncDsECR7h6
+         vEZ090aaMYGUoLHtwwTbaNivaFhQiyN4BIZswLk54zNi18kIaiMeOtAaA0H3PLyvOqeQ
+         8dlf/H7NPrBpQh0lsF6qKouVG7mQs6Wd8X991eLhKHDO/BbsXZEpb/d6pVBpSgWibD3r
+         MvfMV47XYSlkk1BAF4/5wb25CoMm3ou9ssiEeozJE69RWzRDuYLLzCHWIt/dwRPWebqX
+         LrG7857eI1kSWZ6SpB95KRgO4q2g124GNDhiaXgAQrcKgGBLLACOHXn3yzozv8Z5RsJJ
+         ewAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FAzQeMLR6gNoBDV3AQz8qRzJUhdHOYUBPeR/uOcJaGk=;
+        b=jf/bYXQJBP6B5UjEr/JTQG/nyyU6C9sc7MAXMAL/BwTUfdsSRjMZWkyASn0N93YK/u
+         wHb+pV6Bj2hk7MEDsEq2HNYVYcixwj6AfpPeZCuuxQbS7BkdUelu1boqzXk0wy+YoFlF
+         9gRUnBzD8+YFjDvBTedSglwBBuTmSiyXugb2SeQdykQcl1xfqRUd7CHGNBhxY/ubYH29
+         Diw/xL9vDtSiaF6kWcCUkjr879PzfpFK6iwZkKGo0CQXXnq7hGqQNYg6XYILutCCZTah
+         WLPFetzzrIkNSdYIQgOMP0/8gdWC1/1cwO5A032K1D5uG4mqKIAcZK0gucyuMn/rDt2i
+         ifOA==
+X-Gm-Message-State: APjAAAXmrMg9iddgZlr8vN3kVZx4K562IWb9kVMgA2lNlsXnaErRHrgS
+        13IyZEfLRkMaA0zo9Fb+NwJ+4lsaaZ1D2UNG94TYlw==
+X-Google-Smtp-Source: APXvYqz31mXrKVjSQc2T6jzpSs824e1YAGYyJk+z/wvdcFILNfZh0dWp2T0TsKos9R5PIsAnsre/JG70JDJYCCNgFRQ=
+X-Received: by 2002:a05:6808:10b:: with SMTP id b11mr4115812oie.110.1580927415864;
+ Wed, 05 Feb 2020 10:30:15 -0800 (PST)
+MIME-Version: 1.0
+References: <CAOVXEJKBm8VhAC4meAUe+e0ZMED5eJKQ90xLpqxoEp-kFiOwyQ@mail.gmail.com>
+In-Reply-To: <CAOVXEJKBm8VhAC4meAUe+e0ZMED5eJKQ90xLpqxoEp-kFiOwyQ@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 5 Feb 2020 10:30:03 -0800
+Message-ID: <CABBYNZ+g08zmKN2_Cgkj__Qt+Yoy8crY=702Jw4M14VJ8wWaDA@mail.gmail.com>
+Subject: Re: How populate GATT database with bluez
+To:     Sathish Narasimman <nsathish41@gmail.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Venkata,
+Hi Sathish,
 
->> Hi Venkata,
->> Per our earlier review on chromium gerrit:
->> https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1992966
->> I'm not too keen on the change from mutex to spinlock because it's
->> made the code more complex.
-> [Venkata] :
-> 
-> We have moved from mutex to spinlock as timer callback function is getting executed under interrupt context and not under process context.
+On Mon, Feb 3, 2020 at 10:49 PM Sathish Narasimman <nsathish41@gmail.com> wrote:
+>
+> Hi
+>
+> I would like to know is there any tools already available to populate
+> GATT database using bluez.
+> Please advise me to the right direction where I can look
 
-can’t you use a delayed workqueue for this?
+bluetoothctl can register services if that what you meant when saying
+populate, there is also the test/example-gatt-server which registered
+a few services as well.
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
