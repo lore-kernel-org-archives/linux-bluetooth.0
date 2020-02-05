@@ -2,92 +2,136 @@ Return-Path: <SRS0=KupO=3Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD8EC35249
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 03:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34845C35249
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 08:03:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32256214AF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 03:23:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15D092085B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 08:03:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727832AbgBEDXd (ORCPT
+        id S1727003AbgBEIDv convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Feb 2020 22:23:33 -0500
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:52236 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727714AbgBEDXd (ORCPT
+        Wed, 5 Feb 2020 03:03:51 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46938 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725906AbgBEIDv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Feb 2020 22:23:33 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04427;MF=alex.shi@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0TpA7DPY_1580873008;
-Received: from IT-FVFX43SYHV2H.lan(mailfrom:alex.shi@linux.alibaba.com fp:SMTPD_---0TpA7DPY_1580873008)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 05 Feb 2020 11:23:29 +0800
-Subject: [PATCH v2] net/bluetooth: remove __get_channel/dir and __dir
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1579596583-258090-1-git-send-email-alex.shi@linux.alibaba.com>
- <8CA3EF63-F688-48B2-A21D-16FDBC809EDE@holtmann.org>
- <09359312-a1c8-c560-85ba-0f94be521b26@linux.alibaba.com>
- <2287CD53-58F4-40FD-B2F3-81A9F22F4731@holtmann.org>
-From:   Alex Shi <alex.shi@linux.alibaba.com>
-Message-ID: <1e76a7b8-c90a-56fe-96d7-4088dc7f6c38@linux.alibaba.com>
-Date:   Wed, 5 Feb 2020 11:23:27 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <2287CD53-58F4-40FD-B2F3-81A9F22F4731@holtmann.org>
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: 7bit
+        Wed, 5 Feb 2020 03:03:51 -0500
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id AA2E6CECC4;
+        Wed,  5 Feb 2020 09:13:10 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Bug fixes while collecting
+ controller memory dump
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CANFp7mXgvfQGw0bc0dwNXg9KME1XD1zYGtPdEFWbM20NJpKtzQ@mail.gmail.com>
+Date:   Wed, 5 Feb 2020 09:03:48 +0100
+Cc:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        robh@kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        tientzu@chromium.org, seanpaul@chromium.org, rjliao@codeaurora.org,
+        Yoni Shavit <yshavit@google.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <340089F1-166F-4C7C-8CB1-2D37DF11701E@holtmann.org>
+References: <1580832929-2067-1-git-send-email-gubbaven@codeaurora.org>
+ <CANFp7mXgvfQGw0bc0dwNXg9KME1XD1zYGtPdEFWbM20NJpKtzQ@mail.gmail.com>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Abhishek,
 
-These 3 macros are never used from first git commit Linux-2.6.12-rc2.
-let's remove them.
+> Per our earlier review on chromium gerrit:
+> https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1992966
+> 
+> I'm not too keen on the change from mutex to spinlock because it's
+> made the code more complex.
+> 
+> Also, it has been a couple weeks since my last review and I've lost
+> the context of what order of events are supposed to happen (making
+> reviewing the sequencing hard).
+> 
+> Good case:
+> 
+> Memdump event from firmware
+> Some number of memdump events with seq #
+> Hw error event
+> Reset
+> 
+> Timeout case:
+> 
+> Memdump event from firmware
+> Some number of memdump events with seq #
+> Timeout schedules hw_error_event
+> hw_error_event clears the memdump activity
+> reset
+> 
+> Software memdump:
+> 
+> hw_error_event sends memdump command to firmware and waits for completion
+> memdump event with seq#
+> hw error event
+> reset
+> 
+> Does this look right? Could you add this to either the commit message
+> or as a comment in one of the functions so that it's easier to
+> understand what is the expected order of events.
+> 
+> On Tue, Feb 4, 2020 at 8:16 AM Venkata Lakshmi Narayana Gubba
+> <gubbaven@codeaurora.org> wrote:
+>> 
+>> This patch will fix the below issues
+>>   1.Fixed race conditions while accessing memory dump state flags.
+>>   2.Updated with actual context of timer in hci_memdump_timeout()
+>>   3.Updated injecting hardware error event if the dumps failed to receive.
+>>   4.Once timeout is triggered, stopping the memory dump collections.
+>> 
+>> Fixes: d841502c79e3 ("Bluetooth: hci_qca: Collect controller memory dump during SSR")
+>> Reported-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+>> ---
+>> drivers/bluetooth/hci_qca.c | 104 ++++++++++++++++++++++++++++++++++++++------
+>> 1 file changed, 90 insertions(+), 14 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index eacc65b..ea956c3 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -69,7 +69,8 @@ enum qca_flags {
+>>        QCA_IBS_ENABLED,
+>>        QCA_DROP_VENDOR_EVENT,
+>>        QCA_SUSPENDING,
+>> -       QCA_MEMDUMP_COLLECTION
+>> +       QCA_MEMDUMP_COLLECTION,
+>> +       QCA_HW_ERROR_EVENT
+>> };
+>> 
+>> 
+>> @@ -150,6 +151,7 @@ struct qca_data {
+>>        struct completion drop_ev_comp;
+>>        wait_queue_head_t suspend_wait_q;
+>>        enum qca_memdump_states memdump_state;
+>> +       spinlock_t hci_memdump_lock;
+> In an earlier revision of this patch, you had this lock as a mutex.
+> Why change it from mutex to spinlock_t? I think this has made your
+> change more complex since you have to unlock during the middle of an
+> operation more often (i.e. since it can block)
 
-Signed-off-by: Alex Shi <alex.shi@linux.alibaba.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- net/bluetooth/rfcomm/core.c | 3 ---
- 1 file changed, 3 deletions(-)
+I agree that we should try to keep a mutex since all event processing in Bluetooth core happens in a workqueue anyway.
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 3a9e9d9670be..dcecce087b24 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -73,8 +73,6 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
- 
- /* ---- RFCOMM frame parsing macros ---- */
- #define __get_dlci(b)     ((b & 0xfc) >> 2)
--#define __get_channel(b)  ((b & 0xf8) >> 3)
--#define __get_dir(b)      ((b & 0x04) >> 2)
- #define __get_type(b)     ((b & 0xef))
- 
- #define __test_ea(b)      ((b & 0x01))
-@@ -87,7 +85,6 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
- #define __ctrl(type, pf)       (((type & 0xef) | (pf << 4)))
- #define __dlci(dir, chn)       (((chn & 0x1f) << 1) | dir)
- #define __srv_channel(dlci)    (dlci >> 1)
--#define __dir(dlci)            (dlci & 0x01)
- 
- #define __len8(len)       (((len) << 1) | 1)
- #define __len16(len)      ((len) << 1)
--- 
-1.8.3.1
+Regards
 
+Marcel
 
