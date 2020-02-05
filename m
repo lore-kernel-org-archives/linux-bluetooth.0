@@ -2,73 +2,163 @@ Return-Path: <SRS0=KupO=3Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FA6C3524D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 08:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21808C3F68F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 10:38:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9ED6217BA
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 08:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E916B2085B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Feb 2020 10:38:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="nzAXhRYQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728028AbgBEIIR (ORCPT
+        id S1728307AbgBEKiL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Feb 2020 03:08:17 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:44606 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727937AbgBEIIQ (ORCPT
+        Wed, 5 Feb 2020 05:38:11 -0500
+Received: from mail26.static.mailgun.info ([104.130.122.26]:43258 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728282AbgBEKiK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Feb 2020 03:08:16 -0500
-Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1DC94CECC5;
-        Wed,  5 Feb 2020 09:17:37 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v2] net/bluetooth: remove __get_channel/dir and __dir
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1e76a7b8-c90a-56fe-96d7-4088dc7f6c38@linux.alibaba.com>
-Date:   Wed, 5 Feb 2020 09:08:15 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Wed, 5 Feb 2020 05:38:10 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1580899090; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=5ilXVdiiGsHsIhZ8uHUoDTDngAhrh2sBE7trFb5Vk7s=;
+ b=nzAXhRYQMCe2QtQf8quHyHFEpRaQVVwlK04FZl4yId3n8YB0hfbQZSZrKycrZqI8dsCIy7fh
+ cZq8nWuT0EjCUBkRSzvyDHnZkDBez0I3ArLLva5gwF4nBWIY3Dokj7z+4bITMFtXMALZMOx8
+ CUv9XUBjf3zORFSY2GHuAVZZk64=
+X-Mailgun-Sending-Ip: 104.130.122.26
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e3a9b06.7fd1a5f669d0-smtp-out-n01;
+ Wed, 05 Feb 2020 10:37:58 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id B5EC5C447A1; Wed,  5 Feb 2020 10:37:58 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: gubbaven)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 0A903C433CB;
+        Wed,  5 Feb 2020 10:37:58 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <140CEF7E-7BE9-4EC0-8625-292D95C45E7B@holtmann.org>
-References: <1579596583-258090-1-git-send-email-alex.shi@linux.alibaba.com>
- <8CA3EF63-F688-48B2-A21D-16FDBC809EDE@holtmann.org>
- <09359312-a1c8-c560-85ba-0f94be521b26@linux.alibaba.com>
- <2287CD53-58F4-40FD-B2F3-81A9F22F4731@holtmann.org>
- <1e76a7b8-c90a-56fe-96d7-4088dc7f6c38@linux.alibaba.com>
-To:     Alex Shi <alex.shi@linux.alibaba.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+Date:   Wed, 05 Feb 2020 16:07:57 +0530
+From:   gubbaven@codeaurora.org
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        robh@kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        tientzu@chromium.org, seanpaul@chromium.org, rjliao@codeaurora.org,
+        yshavit@google.com
+Subject: Re: [PATCH v2 1/2] Bluetooth: hci_qca: Enable clocks required for BT
+ SOC
+In-Reply-To: <FA054FF0-C1EF-4749-96C3-A86ECD064FE9@holtmann.org>
+References: <1580456335-7317-1-git-send-email-gubbaven@codeaurora.org>
+ <20200203195632.GM3948@builder>
+ <FA054FF0-C1EF-4749-96C3-A86ECD064FE9@holtmann.org>
+Message-ID: <1ff3bfe6793972ab47675bf6b63cc596@codeaurora.org>
+X-Sender: gubbaven@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alex,
+Hi Bjorn,
 
-> These 3 macros are never used from first git commit Linux-2.6.12-rc2.
-> let's remove them.
+On 2020-02-04 14:34, Marcel Holtmann wrote:
+> Hi Bjorn,
 > 
-> Signed-off-by: Alex Shi <alex.shi@linux.alibaba.com>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
-> net/bluetooth/rfcomm/core.c | 3 ---
-> 1 file changed, 3 deletions(-)
+>>> Instead of relying on other subsytem to turn ON clocks
+>>> required for BT SoC to operate, voting them from the driver.
+>>> 
+>>> Signed-off-by: Venkata Lakshmi Narayana Gubba 
+>>> <gubbaven@codeaurora.org>
+>>> ---
+>>> v2:
+>>>   * addressed forward declarations
+>>>   * updated with devm_clk_get_optional()
+>>> 
+>>> ---
+>>> drivers/bluetooth/hci_qca.c | 25 +++++++++++++++++++++++++
+>>> 1 file changed, 25 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/hci_qca.c 
+>>> b/drivers/bluetooth/hci_qca.c
+>>> index d6e0c99..73706f3 100644
+>>> --- a/drivers/bluetooth/hci_qca.c
+>>> +++ b/drivers/bluetooth/hci_qca.c
+>>> @@ -1738,6 +1738,15 @@ static int qca_power_off(struct hci_dev *hdev)
+>>> 	return 0;
+>>> }
+>>> 
+>>> +static int qca_setup_clock(struct clk *clk, bool enable)
+>>> +{
+>>> +	if (enable)
+>>> +		return clk_prepare_enable(clk);
+>>> +
+>>> +	clk_disable_unprepare(clk);
+>>> +	return 0;
+>>> +}
+>> 
+>> As Marcel requested, inline these.
+>> 
+>>> +
+>>> static int qca_regulator_enable(struct qca_serdev *qcadev)
+>>> {
+>>> 	struct qca_power *power = qcadev->bt_power;
+>>> @@ -1755,6 +1764,13 @@ static int qca_regulator_enable(struct 
+>>> qca_serdev *qcadev)
+>>> 
+>>> 	power->vregs_on = true;
+>>> 
+>>> +	ret = qca_setup_clock(qcadev->susclk, true);
+>>> +	if (ret) {
+>>> +		/* Turn off regulators to overcome power leakage */
+>> 
+>> You can omit this comment as well, as the name of the function you 
+>> call
+>> is aptly named.
+[Venkata] :
+We will update in next patch set.
+>> 
+>>> +		qca_regulator_disable(qcadev);
+>>> +		return ret;
+>> 
+>> Just return ret below instead.
+[Venkata] :
+We will update in next patch set
+>> 
+>>> +	}
+>>> +
+>>> 	return 0;
+>>> }
+>>> 
+>>> @@ -1773,6 +1789,9 @@ static void qca_regulator_disable(struct 
+>>> qca_serdev *qcadev)
+>>> 
+>>> 	regulator_bulk_disable(power->num_vregs, power->vreg_bulk);
+>>> 	power->vregs_on = false;
+>>> +
+>>> +	if (qcadev->susclk)
+>> 
+>> In the enable path you (correctly) rely on passing NULL to the clock
+>> code, so do the same here.
+[Venkata] :
+We will update in next patch set.
+> 
+> I already pushed the patch, but I am happy to accept a cleanup patch.
+> 
+> Regards
+> 
+> Marcel
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+Regards,
+Venkata.
