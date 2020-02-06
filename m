@@ -2,167 +2,115 @@ Return-Path: <SRS0=lv0E=32=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D884FC2D0B1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Feb 2020 15:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE6AC352A2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Feb 2020 15:47:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AEE9C21741
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Feb 2020 15:18:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581002321;
-	bh=op7eP86ynCTXd8Ox1Ttv502rN/tOuJ9csm0uPgp2G6Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=LaBOJaCTWLY1jB89389Ww3aohO6XFz+4SVXayO/NRKGdvxAdBORl9T0r/9SBfTG0n
-	 RpjCQWRmaDNeTnmLpM/MmJdCgWZu0XWxvib1ZPUENQoRFfubwBAN0dZTGm5ebx5HDU
-	 OPvm617nvjayIa82eGxNSwIkY7Pq33v5zKgm5vgA=
+	by mail.kernel.org (Postfix) with ESMTP id 883C2214AF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Feb 2020 15:47:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=softwaredesignsolutions.com header.i=@softwaredesignsolutions.com header.b="sE7aE/FI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727606AbgBFPSA (ORCPT
+        id S1727599AbgBFPrk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Feb 2020 10:18:00 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:38090 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727572AbgBFPR7 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Feb 2020 10:17:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=t2yWmhu1E5vZJKxFd22eXuudQGWyjBMcjrUmGzb6AJ8=; b=I7AU+Ful4eBxEXYWh/h3Q/pFNo
-        TPr4sZuabGHRRtrEPnInySpPHKamVwqtrVrRo2J6bFAfh6N2S0BC7BpAzwzKQ7NJqv6mVTYd1hfmi
-        ruwsQTlbuISoBMBKtwIAzSZeOmM0v2oyUIV+OGjXGK0n8o0IJkOcWKcImpVikJzvz16zVTddqRgbS
-        QDIYZC1wDB0EDXyaUvaN1GEaNKF/ldq18y73bb0Mlp5WBzycYpjKvh6MxMM2FT9HDaZ0SdqqdW8gg
-        CL2gCBukzgtRR8cAQRrB7gzCFC8eai6bI8unRgWJJKOktrHQwAPIODp/h2xp4HIlprVI1fZ10I6TW
-        DAPjMWVw==;
-Received: from [179.95.15.160] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iziul-0005jD-Ay; Thu, 06 Feb 2020 15:17:59 +0000
-Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
-        (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iziuc-002oUr-GO; Thu, 06 Feb 2020 16:17:50 +0100
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Linux Media Mailing List <linux-media@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: [PATCH 02/28] docs: networking: convert 6lowpan.txt to ReST
-Date:   Thu,  6 Feb 2020 16:17:22 +0100
-Message-Id: <bfa773f25584a3939e0a3e1fc6bc0e91f415cd91.1581002063.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <cover.1581002062.git.mchehab+huawei@kernel.org>
-References: <cover.1581002062.git.mchehab+huawei@kernel.org>
+        Thu, 6 Feb 2020 10:47:40 -0500
+Received: from mail-bn8nam12on2122.outbound.protection.outlook.com ([40.107.237.122]:51713
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727563AbgBFPrj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 6 Feb 2020 10:47:39 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cwQeLgkSzirz2Upb9RFvdW+718EOX6+XWp1XYoG27kCc6TCpejiQ/jTk9hsNiEHTSsNrb1qb0NacmPS5HRv1ZreIEf+W3PdiemsOdIzpuJR8pcyfngUP9rvna2ZL5hW/ZKJhnDYEgIUiaPfH0tTHmyKN4+6up5el6ih4w/8SCdiKNucrkHBtSVdyO00JRV++7fOVtanUpOoq9+vKwDBxHV5aLQlqhVjw31JDX8sCmqnAEj9sh1BZi8sVwRG/Jjz8o4MuJPRU/aCNCGxwLjsEQ40goeKtfxQ7+AlSLr84WI4RRtwndArS/GL3xgW3ldQetX2Zag9z4jDpUHvMAujDrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aRcsJkvmTy3a4I5rci/G1d47+quwgFOIKIZa+cG2ilE=;
+ b=i1FL2U9psNpq1cBLICp6AemNFnsPimljloQYsXdxzv4PfLGB8VIcMh5oqJLJJCFwNkOOGX6a5yoVhqnrJGSkISqmYEwHZeLU/UI83nQNQHB/q8jrhYlsDbflskVkC6xwKrgriFtKjY/t0NGC9Wcrv+RJKyQju/be+CoDpLeDDohrQ93V8Z3LIzFyWX8d9SdP5+fiygA+kFetSFgYiibXoc1VehpT1J5EXjXYtzDcS+WClCz5ePbvEAW5L53ICElw0Le7TcrljlmLGkymJBxmUt9OcgBc0qh7+lC/nkVOgZ8roOLlodj7oKtOBZtKxZ65krwv/9+BGRtgelWuIZjArw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=softwaredesignsolutions.com; dmarc=pass action=none
+ header.from=softwaredesignsolutions.com; dkim=pass
+ header.d=softwaredesignsolutions.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=softwaredesignsolutions.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aRcsJkvmTy3a4I5rci/G1d47+quwgFOIKIZa+cG2ilE=;
+ b=sE7aE/FIsloOqU+Q789RP48prHSXBysDL2yTW1UQdYT6Nz3H+J9o7gq6/y9KGe9eQ7igTPHVIw9CmPB1yQREuWT51TpgVbcnb+fsTaD7n+hS+VYpY1mhWIUh7ZQgb5tNmT+9I1hCiXdht86oP01uegDcqG2+83K2VacPdoWK0m8=
+Received: from MN2PR14MB4109.namprd14.prod.outlook.com (52.135.51.141) by
+ MN2PR14MB4096.namprd14.prod.outlook.com (10.255.125.84) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Thu, 6 Feb 2020 15:47:36 +0000
+Received: from MN2PR14MB4109.namprd14.prod.outlook.com
+ ([fe80::bd62:d69a:66fb:ae96]) by MN2PR14MB4109.namprd14.prod.outlook.com
+ ([fe80::bd62:d69a:66fb:ae96%5]) with mapi id 15.20.2707.020; Thu, 6 Feb 2020
+ 15:47:36 +0000
+From:   Alex Vallo <avallo@softwaredesignsolutions.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: LE Set Extended Scan Enable command
+Thread-Topic: LE Set Extended Scan Enable command
+Thread-Index: AdXdAw9814We5ayXQ+2XFE9grQIAJQ==
+Date:   Thu, 6 Feb 2020 15:47:35 +0000
+Message-ID: <MN2PR14MB4109F100D9DD9B34D30C3BCBDB1D0@MN2PR14MB4109.namprd14.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=avallo@softwaredesignsolutions.com; 
+x-originating-ip: [72.95.129.74]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bae4c529-bedf-45cb-d2bb-08d7ab1be344
+x-ms-traffictypediagnostic: MN2PR14MB4096:
+x-microsoft-antispam-prvs: <MN2PR14MB40962F1FD5E22A164C793750DB1D0@MN2PR14MB4096.namprd14.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5516;
+x-forefront-prvs: 0305463112
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(396003)(366004)(136003)(39830400003)(376002)(189003)(199004)(5660300002)(52536014)(7696005)(186003)(86362001)(6506007)(71200400001)(6916009)(4744005)(55016002)(26005)(66946007)(76116006)(2906002)(66476007)(81166006)(81156014)(66446008)(64756008)(66556008)(33656002)(9686003)(8936002)(508600001)(8676002)(316002);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR14MB4096;H:MN2PR14MB4109.namprd14.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: softwaredesignsolutions.com does
+ not designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: AMG0M229JtR9fet/dToCXTZ9/HZ/vw1gD9EvhF2KR2QE6L/dNDZixQ4p/F/sr8aEX+YXNChTRWDymN7RYaP8XbXxSDhGm9d6uorNWrxnBX+E9TiurjsI6TEhkmnnF+C65z1VBRyysxbGvE74O+24NW/oxymt0tS1hSqQGsnWJ82liT7feZZAzG6107ti5Rt79ugY/x+2Pqx8XYq3cqEmPgfK4iBUPUYeujepAwLGoD6NgFeP8aVnvhti+X67iWHB1Dr9AQuVgKjES8gHXjrbuOarOx0CI0mWAyX7KuGQxXaC3cdma6lrjwVEQKrSakB0dDPcgBg+uyzvf6qyrtH95C9UCtdS3aEgYKtZK/GqrdFH+PreFNci0Cl1snLaLjXfOE/8lgblRmcQ4iKwin/B2K+FwUr7GsQyxvqhHWcOhG9JIsXTcviZEc1iEdcewOEd
+x-ms-exchange-antispam-messagedata: 9YL5PKUL8eke0m43cVTvnm01uFy6To0jCbkQfW/GFndRjjb9mg3wZPkk6d8OspondzAW46pC1I5dIo+IOKWkq7hDq6xBA3kLzxL90jUuybym7otjI5Y5GsMkF9G+k57hSr3DdfCxreQG8doqm3kjkA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: softwaredesignsolutions.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bae4c529-bedf-45cb-d2bb-08d7ab1be344
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2020 15:47:35.9917
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e4c002f1-a7ff-457a-ae57-9dd3d869a6af
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: myDAJnqb6dYyTiegPuAfgqmIlSWieCprGGQP8F0t5xF5E+a0tJcrVGYOQcbqLpr6nnsSV0EIENoFe2AuvjSLG410eOsB6BZx3hAO7ZqAWtYZ6d5vql4SKK2QxySg45eO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR14MB4096
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-- add SPDX header;
-- use document title markup;
-- mark code blocks and literals as such;
-- adjust identation, whitespaces and blank lines;
-- add to networking/index.rst.
+Hello,
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- .../networking/{6lowpan.txt => 6lowpan.rst}   | 29 ++++++++++---------
- Documentation/networking/index.rst            |  1 +
- 2 files changed, 17 insertions(+), 13 deletions(-)
- rename Documentation/networking/{6lowpan.txt => 6lowpan.rst} (64%)
+Does Bluez have a function hci_le_set_ext_scan_enable() similar to hci_le_s=
+et_scan_enable()?
+If not, is there a particular reason why not?
 
-diff --git a/Documentation/networking/6lowpan.txt b/Documentation/networking/6lowpan.rst
-similarity index 64%
-rename from Documentation/networking/6lowpan.txt
-rename to Documentation/networking/6lowpan.rst
-index 2e5a939d7e6f..e70a6520cc33 100644
---- a/Documentation/networking/6lowpan.txt
-+++ b/Documentation/networking/6lowpan.rst
-@@ -1,37 +1,40 @@
-+.. SPDX-License-Identifier: GPL-2.0
- 
--Netdev private dataroom for 6lowpan interfaces:
-+==============================================
-+Netdev private dataroom for 6lowpan interfaces
-+==============================================
- 
- All 6lowpan able net devices, means all interfaces with ARPHRD_6LOWPAN,
- must have "struct lowpan_priv" placed at beginning of netdev_priv.
- 
--The priv_size of each interface should be calculate by:
-+The priv_size of each interface should be calculate by::
- 
-  dev->priv_size = LOWPAN_PRIV_SIZE(LL_6LOWPAN_PRIV_DATA);
- 
- Where LL_PRIV_6LOWPAN_DATA is sizeof linklayer 6lowpan private data struct.
--To access the LL_PRIV_6LOWPAN_DATA structure you can cast:
-+To access the LL_PRIV_6LOWPAN_DATA structure you can cast::
- 
-  lowpan_priv(dev)-priv;
- 
- to your LL_6LOWPAN_PRIV_DATA structure.
- 
--Before registering the lowpan netdev interface you must run:
-+Before registering the lowpan netdev interface you must run::
- 
-  lowpan_netdev_setup(dev, LOWPAN_LLTYPE_FOOBAR);
- 
- wheres LOWPAN_LLTYPE_FOOBAR is a define for your 6LoWPAN linklayer type of
- enum lowpan_lltypes.
- 
--Example to evaluate the private usually you can do:
-+Example to evaluate the private usually you can do::
- 
--static inline struct lowpan_priv_foobar *
--lowpan_foobar_priv(struct net_device *dev)
--{
-+ static inline struct lowpan_priv_foobar *
-+ lowpan_foobar_priv(struct net_device *dev)
-+ {
- 	return (struct lowpan_priv_foobar *)lowpan_priv(dev)->priv;
--}
-+ }
- 
--switch (dev->type) {
--case ARPHRD_6LOWPAN:
-+ switch (dev->type) {
-+ case ARPHRD_6LOWPAN:
- 	lowpan_priv = lowpan_priv(dev);
- 	/* do great stuff which is ARPHRD_6LOWPAN related */
- 	switch (lowpan_priv->lltype) {
-@@ -42,8 +45,8 @@ case ARPHRD_6LOWPAN:
- 	...
- 	}
- 	break;
--...
--}
-+ ...
-+ }
- 
- In case of generic 6lowpan branch ("net/6lowpan") you can remove the check
- on ARPHRD_6LOWPAN, because you can be sure that these function are called
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 3ccb89bf5585..cc34c06477eb 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -34,6 +34,7 @@ Contents:
-    tls
-    tls-offload
-    nfc
-+   6lowpan
- 
- .. only::  subproject and html
- 
--- 
-2.24.1
+hci_le_set_scan_enable(int dev_id, uint8_t enable, uint8_t filter_dup, int =
+to);
+// LE Set Scan Enable -- Bluetooth Core Spec v5.2, Vol 4, Part E, Section 7=
+.8.11 (page 2496)
+hci_send_cmd(device_handle, 0x08, 0x0C, 0x02, &param)
+hci_send_cmd(device_handle, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, LE_SET_SCAN=
+_ENABLE_CP_SIZE, &param)
 
+
+hci_le_set_ext_scan_enable(...)
+// LE Set Extended Scan Enable -- Bluetooth Core Spec v5.2, Vol 4, Part E, =
+Section 7.8.65 (page 2613)
+hci_send_cmd(device_handle, 0x08, 0x42, 0x06, &param);
+
+
+Thank you,
+Alex Vallo
