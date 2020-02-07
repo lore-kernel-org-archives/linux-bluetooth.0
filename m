@@ -2,157 +2,140 @@ Return-Path: <SRS0=kXS7=33=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED75FC2BA83
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 17:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B85C35250
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 17:22:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA97D214AF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 17:18:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9EC321741
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 17:22:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="A24Awrn2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727234AbgBGRSN (ORCPT
+        id S1727005AbgBGRWY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Feb 2020 12:18:13 -0500
-Received: from mail-io1-f69.google.com ([209.85.166.69]:51421 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgBGRSM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Feb 2020 12:18:12 -0500
-Received: by mail-io1-f69.google.com with SMTP id c7so72911ioq.18
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Feb 2020 09:18:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=0HvboEURlu0M37qfrJEmJ30jzxW8E9Pwkrbv32SONt4=;
-        b=tM7Mvul5XYO1cXiXoYdsasZ+noknT7kX2ZPVK+lW4K07nZF0dcJ5p+/28xJ2SlbbHK
-         jlaRZp3s7C9zGp9f4eAvWkom0EfpJaDZlSitZohoykw6MYF2OJxt1A8u7kNVk/FnOnq+
-         Q+V5lJIbVeloRxmCL2KL2fkFO6/mDls/4Df10yjI6w4OgyUZoNyYSOa0Y5qAxfYo5gzc
-         DHsoviAqH79erQ8lt5QKAr+/U0fMGau5lHs2AeIsJE/xOxHvZiwg6DsJ217Nw/2sy7Xe
-         mS0PkQpUDJ2iF7xIdth5B6iQp7Zci5/r5IGC7f7W8oFxdNu+URnu0E7JUVM7ev32L1n+
-         cDRA==
-X-Gm-Message-State: APjAAAUo6j+YIJjCfK03WFxu/V2UJcKl6H8kNwopVoAmnI9M/7wSOhJS
-        WEjxfD5R6SK8+8wU1DPlgTuHqlB3Pyz7FLePU7GT8BALpble
-X-Google-Smtp-Source: APXvYqwlwmy9FHs5m2Vrv7W1//evSzREdQFs/qWmaq9C71//QUywVp91jetsL4eREcwQE2RfU0SS8eStQcYstC0R83QbbnVUKkGl
+        Fri, 7 Feb 2020 12:22:24 -0500
+Received: from mga07.intel.com ([134.134.136.100]:33933 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726874AbgBGRWY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 7 Feb 2020 12:22:24 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Feb 2020 09:22:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,414,1574150400"; 
+   d="scan'208";a="225602821"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by fmsmga007.fm.intel.com with ESMTP; 07 Feb 2020 09:22:22 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 7 Feb 2020 09:22:22 -0800
+Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 7 Feb 2020 09:22:22 -0800
+Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Fri, 7 Feb 2020 09:22:22 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Fri, 7 Feb 2020 09:22:21 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bq4cZiVzD66vlnOAKs7L09j73wuTNwfEVldf7fsaRJ+dtwBcO+/L3V8BjIASGsd/htuo9JUS78c9QdcAt0lkkaJhxTsT8rV9b5NC4UvqxvWVrwudXxUbfxBuXlTusrE+ag4hf8YwbXHrVy7KmatMYfPUFwCk9YeGifkWR9jC2pTty90NIkV5l8Xc4OcWg7CI2Kaf+KAVNanHLigKA2jd1HztPv4LSGpiN9UfQLbeJkpAbDg+slc6A7qGtUm6IYX2hLLcjS0F/0LGacX9BHiRz55lErubXxyPUZfDfxXvTIFTxK/UTzW1XOukms/b7YJzYZy7zdnYT7QasomUhnVKeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NoJrWqSudindyx02Ih9wEUzqAX5vJPpG0HyD3VScVkQ=;
+ b=no8loAfpjCwAskVba6mX2artxeG8PArkk7sqAdm8QxEL/bXBGuBs3t2B+lWFTkWuwYqJUnsUjYJekhJTqJvYQQWK26PT8/eYI+gQHisP9aEvCw4dxMUAkbA0WuR4J+JmLjEqgpttk05M6p1jNCmT3T35DxoWh8terVfKD+lLzzP4eHkDmkf+SfHHsaDYmSyfDLCBBlHQ6UQwGuSg28QvKgvlnjNhAfuOtwLoKKhCblb/yqDUtv8ladVGB3meUcOmAQj+ICbi58tCdDP9GO2QThuZSZ+ITexyS/8Yge1xeKFThzXPo7rjXKO5v//hxxwX6hO7RbtYgMUQawOocGNvyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NoJrWqSudindyx02Ih9wEUzqAX5vJPpG0HyD3VScVkQ=;
+ b=A24Awrn2s2pK2xyN2UWS7jFdVLVBNyDObiCOBKWJVz8/nB6Ka3CWrffy9we6xHzMb9WSgJth81nyhZ7SE8MCqPxo5se0SGjm2TmCHC/7WUHcZYJxj9wMudTD35XnlfSHiFz+M7fJxLIQ7c8z2Hd1FVK1PVvG/HInUDuEoPbcqPc=
+Received: from BN7PR11MB2580.namprd11.prod.outlook.com (52.135.246.155) by
+ BN7PR11MB2786.namprd11.prod.outlook.com (52.135.245.155) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Fri, 7 Feb 2020 17:22:19 +0000
+Received: from BN7PR11MB2580.namprd11.prod.outlook.com
+ ([fe80::c8ca:3c11:3fc5:a9d6]) by BN7PR11MB2580.namprd11.prod.outlook.com
+ ([fe80::c8ca:3c11:3fc5:a9d6%6]) with mapi id 15.20.2707.024; Fri, 7 Feb 2020
+ 17:22:19 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ] mesh: Allow to finish key refresh when no AppKeys
+ are stored
+Thread-Topic: [PATCH BlueZ] mesh: Allow to finish key refresh when no AppKeys
+ are stored
+Thread-Index: AQHV3HdDEfDnUjNWE0uD/GZlmZ9m0KgP/V0A
+Date:   Fri, 7 Feb 2020 17:22:19 +0000
+Message-ID: <e250cb802a320e0d73fcc6599f4c9c359c54a630.camel@intel.com>
+References: <20200205225343.6271-1-inga.stotland@intel.com>
+In-Reply-To: <20200205225343.6271-1-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [192.55.54.38]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bc7e279d-1575-4757-bcc4-08d7abf2495e
+x-ms-traffictypediagnostic: BN7PR11MB2786:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN7PR11MB27864B9F7FA59278824D4F63E11C0@BN7PR11MB2786.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2331;
+x-forefront-prvs: 0306EE2ED4
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(376002)(346002)(366004)(39860400002)(199004)(189003)(91956017)(76116006)(66946007)(2616005)(478600001)(86362001)(6512007)(8936002)(66556008)(66476007)(66446008)(8676002)(6636002)(5660300002)(64756008)(2906002)(71200400001)(316002)(6486002)(81166006)(186003)(81156014)(110136005)(26005)(36756003)(6506007);DIR:OUT;SFP:1102;SCL:1;SRVR:BN7PR11MB2786;H:BN7PR11MB2580.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 7RgIRxM3WBVnBIpIIEIXZnQb1KQgdKQjgHlrhvFdxVH/knJOtDp9PNQL0mLn2bKzPXgC8nCaUMukvwOHOzDJtDPec29q6/bNyNtkQ5RLKuoVp2NIz/tknS/8fRTkRKSz4NQVaGsOjf95Dw3Tgd8QEJvXfp9j8Y/6zyfTZ9C5uOxVR4HXZfWRS7jxYKh57VQnXZOZr2d90izQnXeUxyL2xrkeT0WdYrGBIC+a73cN5szm6Ulr30OK/QNn0O9+aVO7oDv5rFw6yM8tomv+M2Zdyqrb9k5wT/lMTC1ZrMgiHaysRazUXXFFWRxfbeRHTpwgmv/flC7+ck+Cqu+Ph8b12Yal41exD+y0E3oNYuDWCt6xaOz1QulVBX5XPxbxKH/dgA8gLXYA9N2Tenr/+cORyoGCvGXXk3rp19uURS4D1dlfjJwOsX0lL6zZsYD4XVtT
+x-ms-exchange-antispam-messagedata: qtAlzib6BhdCIjVKFuymo1f09hzaiTa62tWwLi/Kcmx+CcSkS+4DsShXP8vKBwOIWw1gO1b16mjyVyfcMsMINKKHJuVeTtPmJCwAhgWTqSXF84B1/Do5e8rsxFubQPDvfOX3UlEMka7h62wxOrDVEw==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4B1891E3CB282640A4A4081A1759BEC3@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Received: by 2002:a02:5489:: with SMTP id t131mr91096jaa.40.1581095892155;
- Fri, 07 Feb 2020 09:18:12 -0800 (PST)
-Date:   Fri, 07 Feb 2020 09:18:12 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000202d1059dff9341@google.com>
-Subject: KASAN: use-after-free Read in l2cap_chan_close
-From:   syzbot <syzbot+96414aa0033c363d8458@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc7e279d-1575-4757-bcc4-08d7abf2495e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2020 17:22:19.4956
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9a7SqE1a98E18S4ow6zGBeNgOc1hoYSV+j33EssSnGDIGkl0kZxJs03AAOd4tzeRf6KEp9DgIuj5K94XP/hg8g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR11MB2786
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
-
-syzbot found the following crash on:
-
-HEAD commit:    90568ecf Merge tag 'kvm-5.6-2' of git://git.kernel.org/pub..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16fe894ee00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=69fa012479f9a62
-dashboard link: https://syzkaller.appspot.com/bug?extid=96414aa0033c363d8458
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=142dd4e9e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=102c37f1e00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+96414aa0033c363d8458@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: use-after-free in l2cap_chan_close+0x48/0x990 net/bluetooth/l2cap_core.c:730
-Read of size 8 at addr ffff888096950000 by task kworker/1:102/2868
-
-CPU: 1 PID: 2868 Comm: kworker/1:102 Not tainted 5.5.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events do_enable_set
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1fb/0x318 lib/dump_stack.c:118
- print_address_description+0x74/0x5c0 mm/kasan/report.c:374
- __kasan_report+0x149/0x1c0 mm/kasan/report.c:506
- kasan_report+0x26/0x50 mm/kasan/common.c:641
- __asan_report_load8_noabort+0x14/0x20 mm/kasan/generic_report.c:135
- l2cap_chan_close+0x48/0x990 net/bluetooth/l2cap_core.c:730
- do_enable_set+0x660/0x900 net/bluetooth/6lowpan.c:1074
- process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
- worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
- kthread+0x332/0x350 kernel/kthread.c:255
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-Allocated by task 2870:
- save_stack mm/kasan/common.c:72 [inline]
- set_track mm/kasan/common.c:80 [inline]
- __kasan_kmalloc+0x118/0x1c0 mm/kasan/common.c:515
- kasan_kmalloc+0x9/0x10 mm/kasan/common.c:529
- kmem_cache_alloc_trace+0x221/0x2f0 mm/slab.c:3551
- kmalloc include/linux/slab.h:555 [inline]
- kzalloc include/linux/slab.h:669 [inline]
- l2cap_chan_create+0x50/0x320 net/bluetooth/l2cap_core.c:446
- chan_create net/bluetooth/6lowpan.c:640 [inline]
- bt_6lowpan_listen net/bluetooth/6lowpan.c:959 [inline]
- do_enable_set+0x6a4/0x900 net/bluetooth/6lowpan.c:1078
- process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
- worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
- kthread+0x332/0x350 kernel/kthread.c:255
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-Freed by task 2870:
- save_stack mm/kasan/common.c:72 [inline]
- set_track mm/kasan/common.c:80 [inline]
- kasan_set_free_info mm/kasan/common.c:337 [inline]
- __kasan_slab_free+0x12e/0x1e0 mm/kasan/common.c:476
- kasan_slab_free+0xe/0x10 mm/kasan/common.c:485
- __cache_free mm/slab.c:3426 [inline]
- kfree+0x10d/0x220 mm/slab.c:3757
- l2cap_chan_destroy net/bluetooth/l2cap_core.c:484 [inline]
- kref_put include/linux/kref.h:65 [inline]
- l2cap_chan_put+0x170/0x190 net/bluetooth/l2cap_core.c:498
- do_enable_set+0x66c/0x900 net/bluetooth/6lowpan.c:1075
- process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
- worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
- kthread+0x332/0x350 kernel/kthread.c:255
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-The buggy address belongs to the object at ffff888096950000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 0 bytes inside of
- 2048-byte region [ffff888096950000, ffff888096950800)
-The buggy address belongs to the page:
-page:ffffea00025a5400 refcount:1 mapcount:0 mapping:ffff8880aa400e00 index:0x0
-flags: 0xfffe0000000200(slab)
-raw: 00fffe0000000200 ffffea00027d1548 ffffea0002397808 ffff8880aa400e00
-raw: 0000000000000000 ffff888096950000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff88809694ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff88809694ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff888096950000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff888096950080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888096950100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+QXBwbGllZA0KT24gV2VkLCAyMDIwLTAyLTA1IGF0IDE0OjUzIC0wODAwLCBJbmdhIFN0b3RsYW5k
+IHdyb3RlOg0KPiBUaGlzIGhhbmRsZXMgYSBjYXNlIHdoZW4gYSBLZXkgUmVmcmVzaCBwcm9jZWR1
+cmUgaXMgaW4gcGxhY2Ugd2l0aA0KPiBubyBhcHBsaWNhdGlvbiBrZXlzIHN0b3JlZCBpbiB0aGUg
+a2V5cmluZy4gV2hlbiBLUiBwcm9jZWR1cmUgaXMNCj4gZmluYWxpemVkLCB0aGUgY2hlY2sgZm9y
+IHRoZSBwcmVzZW5jZSBvZiBBcHBLZXlzIHN0b3JhZ2UgZGlyZWN0b3J5DQo+IGRvZXMgbm90IHJl
+dHVybiBmYWlsdXJlIGlmIHRoZSBkaXJlY3RvcnkgZG9lcyBub3QgZXhpc3QuDQo+IA0KPiBBbHNv
+LCByZW1vdmUgZHVwbGljYXRlIGluY2x1ZGUuDQo+IC0tLQ0KPiAgbWVzaC9rZXlyaW5nLmMgfCA3
+ICsrKysrLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25z
+KC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbWVzaC9rZXlyaW5nLmMgYi9tZXNoL2tleXJpbmcuYw0K
+PiBpbmRleCA0MWNiMmU5ODAuLjRhNmY5ZjI3ZCAxMDA2NDQNCj4gLS0tIGEvbWVzaC9rZXlyaW5n
+LmMNCj4gKysrIGIvbWVzaC9rZXlyaW5nLmMNCj4gQEAgLTI0LDEwICsyNCwxMCBAQA0KPiAgI2Rl
+ZmluZSBfR05VX1NPVVJDRQ0KPiAgI2luY2x1ZGUgPGZjbnRsLmg+DQo+ICAjaW5jbHVkZSA8ZGly
+ZW50Lmg+DQo+ICsjaW5jbHVkZSA8ZXJybm8uaD4NCj4gICNpbmNsdWRlIDxsaW1pdHMuaD4NCj4g
+ICNpbmNsdWRlIDxzdGRpby5oPg0KPiAgI2luY2x1ZGUgPHVuaXN0ZC5oPg0KPiAtI2luY2x1ZGUg
+PGRpcmVudC5oPg0KPiAgDQo+ICAjaW5jbHVkZSA8c3lzL3N0YXQuaD4NCj4gIA0KPiBAQCAtMTY2
+LDcgKzE2NiwxMCBAQCBib29sIGtleXJpbmdfZmluYWxpemVfYXBwX2tleXMoc3RydWN0IG1lc2hf
+bm9kZSAqbm9kZSwgdWludDE2X3QgbmV0X2lkeCkNCj4gIAlzbnByaW50ZihrZXlfZGlyLCBQQVRI
+X01BWCwgIiVzJXMiLCBub2RlX3BhdGgsIGFwcF9rZXlfZGlyKTsNCj4gIAlkaXIgPSBvcGVuZGly
+KGtleV9kaXIpOw0KPiAgCWlmICghZGlyKSB7DQo+IC0JCWxfZXJyb3IoIkZhaWxlZCB0byBBcHAg
+S2V5IHN0b3JhZ2UgZGlyZWN0b3J5OiAlcyIsIGtleV9kaXIpOw0KPiArCQlpZiAoZXJybm8gPT0g
+RU5PRU5UKQ0KPiArCQkJcmV0dXJuIHRydWU7DQo+ICsNCj4gKwkJbF9lcnJvcigiRmFpbGVkIHRv
+IG9wZW4gQXBwS2V5IHN0b3JhZ2UgZGlyZWN0b3J5OiAlcyIsIGtleV9kaXIpOw0KPiAgCQlyZXR1
+cm4gZmFsc2U7DQo+ICAJfQ0KPiAgDQo=
