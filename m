@@ -5,24 +5,24 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42331C04EB5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 15:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0316C2BA83
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 16:50:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1756F22522
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 15:31:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C58FA222C2
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Feb 2020 16:50:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727011AbgBGPbs convert rfc822-to-8bit (ORCPT
+        id S1726951AbgBGQuY convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Feb 2020 10:31:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49218 "EHLO mail.kernel.org"
+        Fri, 7 Feb 2020 11:50:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49136 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726674AbgBGPbs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Feb 2020 10:31:48 -0500
+        id S1726874AbgBGQuY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 7 Feb 2020 11:50:24 -0500
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Fri, 07 Feb 2020 15:31:47 +0000
+Date:   Fri, 07 Feb 2020 16:50:21 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -31,14 +31,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hernando.cavalcanti@gmail.com
+X-Bugzilla-Who: Abhishekkumartux@gmail.com
 X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-RPJnxVNxef@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-DTPmN3Cmon@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -53,60 +53,69 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=60824
 
-Hernando (hernando.cavalcanti@gmail.com) changed:
+Abhishekkumartux@gmail.com changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-                 CC|                            |hernando.cavalcanti@gmail.c
-                   |                            |om
+                 CC|                            |Abhishekkumartux@gmail.com
 
---- Comment #49 from Hernando (hernando.cavalcanti@gmail.com) ---
-hi guys... i can confirm this with kernel 5.5.2, i applyed every patch attached
-here to kernel 5 and still not working..
+--- Comment #50 from Abhishekkumartux@gmail.com ---
+Hey guys,
+I can also confirm that the adapter is not getting recognized.
 
-uname -r
-5.5.2
+uname -r   
+5.5.2-arch1-1
 
-lsusb -v
-Bus 001 Device 008: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle
-(HCI mode)
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               1.10
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  bMaxPacketSize0        64
-  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
-  idProduct          0x0001 Bluetooth Dongle (HCI mode)
-  bcdDevice           88.91
-  iManufacturer           0 
-  iProduct                2 USB1.1-A
-  iSerial                 0 
-  bNumConfigurations      1
+journalctl -f
+Feb 07 10:46:21 archlinux kernel: usb 1-5.3: new full-speed USB device number 9
+using xhci_hcd
+Feb 07 10:46:21 archlinux kernel: usb 1-5.3: New USB device found,
+idVendor=0a12, idProduct=0001, bcdDevice=88.91
+Feb 07 10:46:21 archlinux kernel: usb 1-5.3: New USB device strings: Mfr=0,
+Product=2, SerialNumber=0
+Feb 07 10:46:21 archlinux kernel: usb 1-5.3: Product: CSR8510 A10
+Feb 07 10:46:21 archlinux krunner[3104]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux kded5[846]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux systemd[794]: Reached target Bluetooth.
+Feb 07 10:46:21 archlinux systemd[1]: Reached target Bluetooth.
+Feb 07 10:46:21 archlinux plasmashell[903]: UdevQt: unhandled device action
+"bind"
+Feb 07 10:46:21 archlinux kmix[990]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux dolphin[971]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux dolphin[978]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux baloo_file[901]: UdevQt: unhandled device action
+"bind"
+Feb 07 10:46:21 archlinux plasmashell[903]: UdevQt: unhandled device action
+"bind"
+Feb 07 10:46:21 archlinux baloo_file[901]: UdevQt: unhandled device action
+"bind"
+Feb 07 10:46:21 archlinux dolphin[971]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux dolphin[978]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux kded5[846]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux kmix[990]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux krunner[3104]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux krunner[3104]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux baloo_file[901]: UdevQt: unhandled device action
+"bind"
+Feb 07 10:46:21 archlinux plasmashell[903]: UdevQt: unhandled device action
+"bind"
+Feb 07 10:46:21 archlinux kded5[846]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux kmix[990]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux dolphin[971]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux dolphin[978]: UdevQt: unhandled device action "bind"
+Feb 07 10:46:21 archlinux bluetooth-meshd[641]: Hci dev 0000 removed
+Feb 07 10:46:21 archlinux bluetooth-meshd[641]: Failed to initialize HCI
+Feb 07 10:46:26 archlinux systemd[1]: systemd-rfkill.service: Succeeded.
 
-hcitool dev
-Devices:
+bluetoothctl  
+Agent registered
+[bluetooth]# devices
+No default controller available
 
-dmesg
-[  231.131312] usb 1-4: reset high-speed USB device number 2 using xhci_hcd
-[  263.037922] usb 1-10: USB disconnect, device number 7
-[  283.813572] usb 1-10: new full-speed USB device number 8 using xhci_hcd
-[  283.962915] usb 1-10: New USB device found, idVendor=0a12, idProduct=0001,
-bcdDevice=88.91
-[  283.962916] usb 1-10: New USB device strings: Mfr=0, Product=2,
-SerialNumber=0
-[  283.962917] usb 1-10: Product: USB1.1-A
-[  283.985700] Bluetooth: hci0: urb 000000004a48b323 failed to resubmit (2)
-[  285.993511] Bluetooth: hci0: command 0x0c14 tx timeout
-[  288.009434] Bluetooth: hci0: command 0x0c25 tx timeout
-[  290.025410] Bluetooth: hci0: command 0x0c38 tx timeout
-[  292.041395] Bluetooth: hci0: command 0x0c39 tx timeout
-[  294.057297] Bluetooth: hci0: command 0x0c05 tx timeout
-[  758.040593] usb 1-4: reset high-speed USB device number 2 using xhci_hcd
-[ 1302.873156] usb 1-4: reset high-speed USB device number 2 using xhci_hcd
-[ 1375.723184] usb 1-4: reset high-speed USB device number 2 using xhci_hcd
+rfkill list   
+2: hci0: Bluetooth
+        Soft blocked: no
+        Hard blocked: no
 
 -- 
 You are receiving this mail because:
