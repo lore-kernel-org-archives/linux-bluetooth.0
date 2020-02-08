@@ -2,263 +2,112 @@ Return-Path: <SRS0=/q0O=34=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C695DC35250
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Feb 2020 08:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA773C35250
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Feb 2020 15:41:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7FC222314
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Feb 2020 08:32:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D51DD2082E
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Feb 2020 15:41:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=prok.pw header.i=@prok.pw header.b="TKpiMODM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726920AbgBHIcp convert rfc822-to-8bit (ORCPT
+        id S1727347AbgBHPlr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 8 Feb 2020 03:32:45 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:39380 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726229AbgBHIcp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 8 Feb 2020 03:32:45 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A4895CECEF;
-        Sat,  8 Feb 2020 09:42:05 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH] Bluetooth: Add BT_PHY socket option
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200207190055.15249-1-luiz.dentz@gmail.com>
-Date:   Sat, 8 Feb 2020 09:32:42 +0100
+        Sat, 8 Feb 2020 10:41:47 -0500
+Received: from smtp37.i.mail.ru ([94.100.177.97]:46462 "EHLO smtp37.i.mail.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727303AbgBHPlr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 8 Feb 2020 10:41:47 -0500
+X-Greylist: delayed 64044 seconds by postgrey-1.27 at vger.kernel.org; Sat, 08 Feb 2020 10:41:46 EST
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=prok.pw; s=mailru;
+        h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date; bh=3AnShhnwiSLwrp3ePp7H+dlYcfMoQrL/a8gs2+Zvkho=;
+        b=TKpiMODMQ0NI/4yqFNk9QZakOTv+mJyMI0eJfJUirlHaHMVeDc1QYrgmmt3rb0CHTPupVDLnJq5zLdcBM0NmYtqGfuOEPBgeQDKuZnqUrDjlayvuD1x9nXn3ncrl0rp7VfOiaPjyJjAUt87vqATsBKRH0zYuv8s1osJVqnv82es=;
+Received: by smtp37.i.mail.ru with esmtpa (envelope-from <me@prok.pw>)
+        id 1j0SEo-0000iD-TA; Sat, 08 Feb 2020 18:41:43 +0300
+Date:   Sat, 8 Feb 2020 23:41:40 +0800
+From:   Sergey Shatunov <me@prok.pw>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <13F78412-516A-4383-AD3F-F15296AA747B@holtmann.org>
-References: <20200207190055.15249-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for 13d3:3548 Realtek
+ 8822CE device
+Message-ID: <20200208154140.mpabdtvbniolxp74@stan>
+References: <1581112454.2855.0@prok.pw>
+ <54525F5A-A461-4E40-ACD5-BF2D2755E5C0@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <54525F5A-A461-4E40-ACD5-BF2D2755E5C0@holtmann.org>
+Authentication-Results: smtp37.i.mail.ru; auth=pass smtp.auth=me@prok.pw smtp.mailfrom=me@prok.pw
+X-7564579A: B8F34718100C35BD
+X-77F55803: 0A44E481635329DB0E1AA8A03B392317179C3E6C7981FFF2772FB3A37D9F3298222FAD4B3F6E813BF688BCB05C26794D2539A9335381B8934287321BB633D101260904A5E548E54D0B173ADDE0E2EE48
+X-7FA49CB5: 0D63561A33F958A549E6A6CAA7235976A8F093779647ABB5D10E9C80DA93212E8941B15DA834481FA18204E546F3947C2FFDA4F57982C5F4F6B57BC7E64490618DEB871D839B7333395957E7521B51C2545D4CF71C94A83E9FA2833FD35BB23D27C277FBC8AE2E8BF1175FABE1C0F9B6A471835C12D1D977C4224003CC8364767815B9869FA544D8D32BA5DBAC0009BE9E8FC8737B5C22493D75B5030B49047576E601842F6C81A12EF20D2F80756B5F012D6517FE479FCD76E601842F6C81A127C277FBC8AE2E8BAE194BC7F2EFB3C23AA81AA40904B5D99449624AB7ADAF3726B9191E2D567F0E725E5C173C3A84C31BC22E60DA9664CB089D37D7C0E48F6C5571747095F342E857739F23D657EF2B6825BDBE14D8E70237733D48D1BA725CBD9CCCA9EDD067B1EDA766A37F9254B7
+X-Mailru-Sender: 8FB30DBD5012A5E0C4BAA8BE6FC1ED46B6B59E4D1B272D0FE0045A6ADFBBE3827962F9E9328436E18BA0E2A9D6159BD266FEC6BF5C9C28D9A91CF0FA91B32267255DC5169939796B8DAAFE1477B51D223453F38A29522196
+X-Mras: OK
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+> this patch doesn’t apply. I think your mailer mangled the whitespaces / tabs.
+Indeed, my mailer corrupt some spaces, resending patch (hopefully correctly).
+---
+The ASUS FX505DV laptop contains RTL8822CE device with an
+associated BT chip using a USB ID of 13d3:3548.
+This patch add fw download support for it.
 
-> This adds BT_PHY socket option (read-only) which can be used to read
-> the PHYs in use by the underline connection.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> include/net/bluetooth/bluetooth.h | 17 ++++++
-> include/net/bluetooth/hci_core.h  |  2 +
-> net/bluetooth/hci_conn.c          | 88 +++++++++++++++++++++++++++++++
-> net/bluetooth/l2cap_sock.c        | 13 +++++
-> net/bluetooth/sco.c               | 13 +++++
-> 5 files changed, 133 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index e42bb8e03c09..1576353a2773 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -121,6 +121,23 @@ struct bt_voice {
-> 
-> #define BT_SNDMTU		12
-> #define BT_RCVMTU		13
-> +#define BT_PHY			14
-> +
-> +#define BT_PHY_BR_1M_1SLOT	0x00000001
-> +#define BT_PHY_BR_1M_3SLOT	0x00000002
-> +#define BT_PHY_BR_1M_5SLOT	0x00000004
-> +#define BT_PHY_EDR_2M_1SLOT	0x00000008
-> +#define BT_PHY_EDR_2M_3SLOT	0x00000010
-> +#define BT_PHY_EDR_2M_5SLOT	0x00000020
-> +#define BT_PHY_EDR_3M_1SLOT	0x00000040
-> +#define BT_PHY_EDR_3M_3SLOT	0x00000080
-> +#define BT_PHY_EDR_3M_5SLOT	0x00000100
-> +#define BT_PHY_LE_1M_TX		0x00000200
-> +#define BT_PHY_LE_1M_RX		0x00000400
-> +#define BT_PHY_LE_2M_TX		0x00000800
-> +#define BT_PHY_LE_2M_RX		0x00001000
-> +#define BT_PHY_LE_CODED_TX	0x00002000
-> +#define BT_PHY_LE_CODED_RX	0x00004000
-> 
-> __printf(1, 2)
-> void bt_info(const char *fmt, ...);
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 89ecf0a80aa1..dcc0dc6e2624 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1477,6 +1477,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
-> struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
-> 			     const void *param, u32 timeout);
-> 
-> +u32 hci_conn_get_phy(struct hci_conn *conn);
-> +
-> /* ----- HCI Sockets ----- */
-> void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
-> void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 87691404d0c6..9ff2611b272f 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -1725,3 +1725,91 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle)
-> 
-> 	return hchan;
-> }
-> +
-> +u32 hci_conn_get_phy(struct hci_conn *conn)
-> +{
-> +	u32 phys = 0;
-> +
-> +	hci_dev_lock(conn->hdev);
-> +
-> +	switch (conn->type) {
-> +	case SCO_LINK:
-> +		phys |= BT_PHY_BR_1M_1SLOT;
-> +
-> +		break;
+T:  Bus=03 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3548 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-something is missing here. The SCO links can also be 3 and 5 slots.
+Signed-off-by: Sergey Shatunov <me@prok.pw>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> +
-> +	case ACL_LINK:
-> +		phys |= BT_PHY_BR_1M_1SLOT;
-> +
-> +		if (conn->pkt_type & (HCI_DM3 | HCI_DH3))
-> +			phys |= BT_PHY_BR_1M_3SLOT;
-> +
-> +		if (conn->pkt_type & (HCI_DM5 | HCI_DH5))
-> +			phys |= BT_PHY_BR_1M_5SLOT;
-> +
-> +		if (!(conn->pkt_type & HCI_2DH1))
-> +			phys |= BT_PHY_EDR_2M_1SLOT;
-> +
-> +		if (!(conn->pkt_type & HCI_2DH3))
-> +			phys |= BT_PHY_EDR_2M_3SLOT;
-> +
-> +		if (!(conn->pkt_type & HCI_2DH5))
-> +			phys |= BT_PHY_EDR_2M_5SLOT;
-> +
-> +		if (!(conn->pkt_type & HCI_3DH1))
-> +			phys |= BT_PHY_EDR_3M_1SLOT;
-> +
-> +		if (!(conn->pkt_type & HCI_3DH3))
-> +			phys |= BT_PHY_EDR_3M_3SLOT;
-> +
-> +		if (!(conn->pkt_type & HCI_3DH5))
-> +			phys |= BT_PHY_EDR_3M_5SLOT;
-> +
-> +		break;
-> +
-> +	case ESCO_LINK:
-> +		phys |= BT_PHY_BR_1M_1SLOT;
-> +
-> +		if (!(conn->pkt_type & (ESCO_EV4 | ESCO_EV5)))
-> +			phys |= BT_PHY_BR_1M_3SLOT;
-> +
-> +		if (!(conn->pkt_type & ESCO_2EV3))
-> +			phys |= BT_PHY_EDR_2M_1SLOT;
-> +
-> +		if (!(conn->pkt_type & ESCO_2EV5))
-> +			phys |= BT_PHY_EDR_2M_3SLOT;
-> +
-> +		if (!(conn->pkt_type & ESCO_3EV3))
-> +			phys |= BT_PHY_EDR_3M_1SLOT;
-> +
-> +		if (!(conn->pkt_type & ESCO_3EV5))
-> +			phys |= BT_PHY_EDR_3M_3SLOT;
-> +
-> +		break;
-> +
-> +	case LE_LINK:
-> +		if (conn->le_tx_phy & HCI_LE_SET_PHY_1M)
-> +			phys |= BT_PHY_LE_1M_TX;
-> +
-> +		if (conn->le_rx_phy & HCI_LE_SET_PHY_1M)
-> +			phys |= BT_PHY_LE_1M_RX;
-> +
-> +		if (conn->le_tx_phy & HCI_LE_SET_PHY_2M)
-> +			phys |= BT_PHY_LE_2M_TX;
-> +
-> +		if (conn->le_rx_phy & HCI_LE_SET_PHY_2M)
-> +			phys |= BT_PHY_LE_2M_RX;
-> +
-> +		if (conn->le_tx_phy & HCI_LE_SET_PHY_CODED)
-> +			phys |= BT_PHY_LE_CODED_TX;
-> +
-> +		if (conn->le_rx_phy & HCI_LE_SET_PHY_CODED)
-> +			phys |= BT_PHY_LE_CODED_RX;
-> +
-> +		break;
-> +	}
-> +
-> +	hci_dev_unlock(conn->hdev);
-> +
-> +	return phys;
-> +}
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 390a9afab647..3df4a7cf85a3 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -499,6 +499,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
-> 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-> 	struct bt_security sec;
-> 	struct bt_power pwr;
-> +	u32 phys;
-> 	int len, err = 0;
-> 
-> 	BT_DBG("sk %p", sk);
-> @@ -603,6 +604,18 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
-> 			err = -EFAULT;
-> 		break;
-> 
-> +	case BT_PHY:
-> +		if (sk->sk_state == BT_CONNECTED) {
-> +			err = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		phys = hci_conn_get_phy(chan->conn->hcon);
-> +
-> +		if (put_user(phys, (u32 __user *) optval))
-> +			err = -EFAULT;
-> +		break;
-> +
-> 	default:
-> 		err = -ENOPROTOOPT;
-> 		break;
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index b91d6b440fdf..95fdfa4b9b62 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -922,6 +922,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
-> 	struct sock *sk = sock->sk;
-> 	int len, err = 0;
-> 	struct bt_voice voice;
-> +	u32 phys;
-> 
-> 	BT_DBG("sk %p", sk);
-> 
-> @@ -956,6 +957,18 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
-> 
-> 		break;
-> 
-> +	case BT_PHY:
-> +		if (sk->sk_state == BT_CONNECTED) {
-> +			err = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		phys = hci_conn_get_phy(sco_pi(sk)->conn->hcon);
-> +
-> +		if (put_user(phys, (u32 __user *) optval))
-> +			err = -EFAULT;
-> +		break;
-> +
-> 	default:
-> 		err = -ENOPROTOOPT;
-> 		break;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f5924f3e8b8d..fa207b715012 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -387,6 +387,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Additional Realtek 8822CE Bluetooth devices */
+ 	{ USB_DEVICE(0x04ca, 0x4005), .driver_info = BTUSB_REALTEK },
++	{ USB_DEVICE(0x13d3, 0x3548), .driver_info = BTUSB_REALTEK },
+ 
+ 	/* Silicon Wave based devices */
+ 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
+-- 
+2.25.0
 
-Regards
-
-Marcel
 
