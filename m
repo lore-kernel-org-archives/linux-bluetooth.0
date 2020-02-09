@@ -8,181 +8,110 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80608C35250
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Feb 2020 13:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A6EC35250
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Feb 2020 13:21:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48223206D6
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Feb 2020 13:15:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64DA020726
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Feb 2020 13:21:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rnmb0l+f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="orlIVuPF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727692AbgBINPs (ORCPT
+        id S1727626AbgBINVl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Feb 2020 08:15:48 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:47080 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727626AbgBINPs (ORCPT
+        Sun, 9 Feb 2020 08:21:41 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40430 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727340AbgBINVl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Feb 2020 08:15:48 -0500
-Received: by mail-wr1-f68.google.com with SMTP id z7so4171004wrl.13
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Feb 2020 05:15:45 -0800 (PST)
+        Sun, 9 Feb 2020 08:21:41 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t3so4225922wru.7
+        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Feb 2020 05:21:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to
          :user-agent;
-        bh=JU90lZjpKZyhwIETwG5n01Ksd90VQegebzUEk5eDE1A=;
-        b=rnmb0l+fTykQDyIpSYEfFsu856cr0spO4CF+kNUJOSOg3qP2GSQOXvGjW7S31zNcZc
-         Gb2q3lBgoa9/sqMrbSE6BA0SivhCNgGvecQCZHHQnPQs0orUU6dn0n8btBsSTy8zMzLJ
-         JzQg/iiUX8bIUAy0wOAj5NqH4CP9Uf2sv9YV4b9R+Q6brFox2mNn4w/xIJINlELEyuOz
-         JIzIHNffwi5oUWbPpStf5XWxqD1WksBnkJb9KsuWtMPEsUO+9EKdwjGJrAwIU8PJ/nHe
-         Ok/PNtAjuVc6MIfVeRAyD1z7Frwgj9q9JAC814cgJXgTmYVeTXMWjJUUY0mPYfg3qiG3
-         Xhvg==
+        bh=viqMTeV8aHU0TNXPkTPu/N167+JygZA4ToYCC2qTqa8=;
+        b=orlIVuPFcwS7WIWf5q7f5VXxCvYM06AoT7mSMgI5UXP9+J38ai10X6Wc2+EXUw+Ynu
+         gFn3+iFXN6iNNf0uXsxpH8QvgvLpzmviHhQVfNgGerDfyJnhKDaCavQQwcp6zLipPoSB
+         uovUiCDvIQtTaA8WYr/UrUvLSQ0C1DSx/NytrASWdFlglJM1Xfldg609y79qB3SIO5px
+         E9MQ7iCfiRj4G33EufGsbanG/FOUei15LPG8LBJtYA1SbWv7L8ks5aeE5tRtQoUKaA36
+         rrXKbwg4t9ezEjkJMTuOpWKumpYHB8pUxqjW+cEccmvwjCqBrPNX/fOREkupXg3UdVR5
+         l9iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=JU90lZjpKZyhwIETwG5n01Ksd90VQegebzUEk5eDE1A=;
-        b=nw2aBBnabTWcWQJ3HhdlFGobnHN1ggXhlwzqw3TwojtCfQH2fNB2o25pQxTvL18m1b
-         opw5mma+TPqHvnoWlc+cnaA0SeXYqszmCzCM6TEebphU4/AKJVpSfmbokyGTo86kvmQo
-         qb3PILfGWkeLhRaTgxwYjn8qGQ6PWiq6w+ITZnsoOMgrlz7vEQApN3daMtl39gwnkoHM
-         qE4DwmoMEnu71xBjyJh+JrdafzzWzJfzhvWY6SfR0s7MiuD2tSioPtpgAsK53WaABHc3
-         ckW4P0i7XoQJMKmSxkxlsAwEQ7e9loCArC+Y1lhDTKErAyVqvzxUvgZMJIRS21G9OGE4
-         VRzQ==
-X-Gm-Message-State: APjAAAVaZ6MHpS+w2vmtCkTodf1XewIDRQSeeFETJ0af7C0H6aCelgRe
-        0W1WrhBVvBWXRL8NBTANH9c=
-X-Google-Smtp-Source: APXvYqwgYaTsfGMTc5oaoeroVPUe5dP20PVNwzzaLJ2gdz+Xao1zWRHVWxGNIfa7B80Vo4OVMnEmNQ==
-X-Received: by 2002:a5d:6191:: with SMTP id j17mr10644768wru.427.1581254145105;
-        Sun, 09 Feb 2020 05:15:45 -0800 (PST)
+        bh=viqMTeV8aHU0TNXPkTPu/N167+JygZA4ToYCC2qTqa8=;
+        b=O+76s3xy5kkKGcztL2M7evDX0iWT2QpGl197knqPgj2+ZDw9y3B3/OhWRnd1ZGxQf2
+         WQNNHky+5MqHk5LHKuuEfUoLF0IsWEMCWdqOPS2vNtLpH8xAPASteqVFI08dPdzzKEMK
+         o9+YoHqAhqpRMpBd3migYt+62+nGDUnsgjAuZ9UwRnqfMiYVDPL+zEtKLmmX3aXvqOyO
+         KcGQ6muDipSj9Aa3HSYStfjA8UtlqCc8PoyWPhmXkNHgz+q2x7rm6+OK7Z3wmHbDb1JX
+         FkTqJdGaeDEQ8xz6/WyI3MTLDjMecrlkyvQA+V5ay+kAwqoOe8XxweusvfWGkKj6edAN
+         lBEw==
+X-Gm-Message-State: APjAAAWGePhJaPshPQE/RlGd05RYtT/RDWKIBAl6U+YG5oBjP0CZp/mC
+        dLVj6bKS5EC4eI7oTOHi6et8kzeD
+X-Google-Smtp-Source: APXvYqwgXPjoVAobePTxwHJk+lTfbm9bdFBhEBuoht/++bAJpvTPVuL25HRSlDeI2qcqvXiauVLDjg==
+X-Received: by 2002:adf:f283:: with SMTP id k3mr9759837wro.69.1581254498559;
+        Sun, 09 Feb 2020 05:21:38 -0800 (PST)
 Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id q130sm12064951wme.19.2020.02.09.05.15.44
+        by smtp.gmail.com with ESMTPSA id x7sm12021680wrq.41.2020.02.09.05.21.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Feb 2020 05:15:44 -0800 (PST)
-Date:   Sun, 9 Feb 2020 14:15:43 +0100
+        Sun, 09 Feb 2020 05:21:38 -0800 (PST)
+Date:   Sun, 9 Feb 2020 14:21:37 +0100
 From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Denis Kenzior <denkenz@gmail.com>
-Cc:     ofono@ofono.org, linux-bluetooth@vger.kernel.org
-Subject: Re: HSP/HFP ofono bluetooth support for Linux desktop
-Message-ID: <20200209131543.e6pjhqpaiunxmpuw@pali>
-References: <20200107192311.efit6zftt27encdc@pali>
- <721332d3-336a-b9d2-f8cd-72da785fb9dc@gmail.com>
- <20200108212537.zs6pesil2vjguvu6@pali>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org, David Heidelberg <david@ixit.cz>
+Subject: Re: OCF_READ_LOCAL_CODECS is permitted only for root user
+Message-ID: <20200209132137.7pi4pgnassosh3ax@pali>
+References: <20191228171212.56anj4d4kvjeqhms@pali>
+ <45BB2908-4E16-4C74-9DB4-8BAD93B42A21@holtmann.org>
+ <20200104102436.bhqagqrfwupj6hkm@pali>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200108212537.zs6pesil2vjguvu6@pali>
+In-Reply-To: <20200104102436.bhqagqrfwupj6hkm@pali>
 User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello! I could you or other ofono developer please look at my comments
-below and say how we can continue with these problems? Now another month
-passed and I really would like to continue in effort to implement
-HSP/HFP profiles with audio support on Linux desktop.
-
-On Wednesday 08 January 2020 22:25:37 Pali Rohár wrote:
-> Hello!
-> 
-> On Wednesday 08 January 2020 14:34:32 Denis Kenzior wrote:
+On Saturday 04 January 2020 11:24:36 Pali Rohár wrote:
+> On Saturday 04 January 2020 10:44:52 Marcel Holtmann wrote:
 > > Hi Pali,
 > > 
-> > > Do you have a reasonable solution also for second issue?
+> > > I wrote a simple script "sco_features.pl" which show all supported
+> > > codecs by local HCI bluetooth adapter. Script is available at:
 > > > 
+> > > https://github.com/pali/hsphfpd-prototype/blob/prototype/sco_features.pl
+> > > 
+> > > And I found out that OCF_READ_LOCAL_CODECS HCI command cannot be send by
+> > > non-root user. Kernel returns "Operation not permitted" error.
+> > > 
+> > > What is reason that kernel blocks OCF_READ_LOCAL_CODECS command for
+> > > non-root users? Without it (audio) application does not know which
+> > > codecs local bluetooth adapter supports.
+> > > 
+> > > E.g. OCF_READ_LOCAL_EXT_FEATURES or OCF_READ_VOICE_SETTING commands can
+> > > be send also by non-root user and kernel does not block them.
 > > 
-> > HSP profile has always been a problem child.  It isn't really all that
-> > useful as a profile, and given how minimal it is, the right place for it
-> > always seemed to be inside Pulse Audio itself.  This is what Marcel & I
-> > agreed upon back about 8-9 years ago anyway.
-> > 
-> > You are advocating that HSP is still useful, particularly with vendor
-> > extensions.  Which is fair enough, but now you have to figure out how and
-> > where to put this support.
-> > 
-> > As mentioned earlier, one idea you can explore is to create a small daemon
-> > (or maybe it can even be part of ofonod itself) that will handle HSP
-> > client/server roles.  See for example the dundee daemon that is part of
-> > ofono.git.  dundee handles Bluetooth DUN profile and might be a good model /
-> > starting point for what you're trying to accomplish.
+> > actually the direct access to HCI commands is being removed. So we have no plans to add new commands into the list since that it what the kernel is suppose to handle. If we wanted to expose this, then it has to be via mgmt.
 > 
-> I looked at dundee, but it does it is separated service, not on org.ofono
-> So it looks like it does not fit into HSP / HFP needs.
-> 
-> Currently you can list all audio cards by DBus call:
-> 
-> "org.ofono", "/", "org.ofono.HandsfreeAudioManager", "GetCards"
-> 
-> and so this (or some new) call should list all HSP and HFP devices/cards
-> for audio application (pulseaudio).
-> 
-> Audio application (e.g. pulseaudio) really do not want to handle two
-> separate services to monitor and process HSP/HFP devices.
-> 
-> For audio application are HSP and HFP devices equivalent, they provide
-> same features: SCO socket, API for controlling microphone and speaker
-> gain; plus optionally specify used codec.
-> 
-> So having two separate services which fully divided for audio
-> application purpose does not make sense.
-> 
-> So it is possible that both HSP and HFP audio cards would be available
-> via one audio API? Because I do not see how it could be done via design
-> like dundee.
-> 
-> > You can then implement the same API interfaces for setting up the HSP audio
-> > stream as oFono does today (i.e. https://git.kernel.org/pub/scm/network/ofono/ofono.git/tree/doc/handsfree-audio-api.txt),
-> 
-> This API is unusable for both HSP and HFP audio streams. In pulseaudio
-> it is somehow used, but it is not suitable.
-> 
-> In part of designing hsphfpd I created a new DBus API for audio
-> application to fit for audio daemons. See org.hsphfpd.AudioAgent:
-> https://github.com/pali/hsphfpd-prototype/blob/prototype/hsphfpd.txt#L600-L663
-> 
-> Main objection for handsfree-audio-api.txt is that it does not provide
-> information about locally used codec and somehow mixes air codec and
-> local codec. In my hsphfpd.txt I used term "AgentCodec" for bluetooth
-> local codec and term "AirCodec" for bluetooth air codec format.
-> 
-> Another objection against handsfree-audio-api.txt API is that it is
-> bound to HF codecs (via number) and does not support for pass e.g. CSR
-> codecs.
-> 
-> What is completely missing in that API is controlling volume level.
-> 
-> And also API does not provide socket MTU information or ability to
-> change/specify which codec would be used.
-> 
-> So something like org.hsphfpd.AudioAgent API in my hsphfpd design would
-> be needed.
-> 
-> > which would make PulseAudio's job much easier, since the audio stream
-> > aspects would be essentially identical to HFP.  If you're part of oFono's
-> > tree, then in theory many implementation aspects could be reused.
-> > 
-> > If you want to provide some higher-level APIs for external applications,
-> > then HSP specific interfaces (APIs) can be added as needed.
-> 
-> Non-audio APIs which are needed to export (for both HSP and HFP profiles):
-> 
-> * battery level (0% - 100%)
-> * power source (external, battery, unknown)
-> * ability to send "our laptop" battery level and power source to remote device
-> * send text message to embedded display
-> * process button press event (exported via linux kernel uinput)
-> 
-> (plus all telephony related operations, but those are already supported
-> and provided by ofono)
-> 
-> > If you decide this is something you want to pursue, then I'm happy to host
-> > this in the oFono tree.
-> > 
-> > Regards,
-> > -Denis
-> 
+> Hi Marcel! Thank you for information. I have not know that this API is
+> "deprecated" and is going to be removed. But userspace audio
+> applications need to know what bluetooth adapter supports, so can you
+> export result of these commands to userspace? My script linked above
+> calls: OCF_READ_VOICE_SETTING, OCF_READ_LOCAL_COMMANDS,
+> OCF_READ_LOCAL_EXT_FEATURES, OCF_READ_LOCAL_CODECS
+
+Hello! Just a gently reminder for this question. How to retrieve
+information about supported codecs from userspace by non-root user?
+Because running all bluetooth audio applications by root is not really a
+solution. Plus if above API for root user is going to be removed, what
+is a replacement?
 
 -- 
 Pali Rohár
