@@ -2,451 +2,295 @@ Return-Path: <SRS0=FZvY=36=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E913EC352A4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Feb 2020 21:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B474DC352A4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Feb 2020 21:14:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF5262072C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Feb 2020 21:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7651E2072C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Feb 2020 21:14:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qrNdy2Oa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FiI5Jbgp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727199AbgBJVH4 (ORCPT
+        id S1727455AbgBJVOD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Feb 2020 16:07:56 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:39522 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727056AbgBJVHz (ORCPT
+        Mon, 10 Feb 2020 16:14:03 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:46509 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727003AbgBJVOC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Feb 2020 16:07:55 -0500
-Received: by mail-oi1-f193.google.com with SMTP id z2so10629934oih.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Feb 2020 13:07:54 -0800 (PST)
+        Mon, 10 Feb 2020 16:14:02 -0500
+Received: by mail-oi1-f196.google.com with SMTP id a22so10603288oid.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Feb 2020 13:14:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=NQFUkkF+hurW4fzFEkfWOspDIcEJZe6/7TervLbbdAQ=;
-        b=qrNdy2OakMisvXY/2yr6LETur3n8r127AbUoMdwN5cfSMX3gBuSwfCH7I/CfJi2fsr
-         YZSdg8+x9lSALZGDuOZ0QeKIlakODzlqLrDR7YN+j5apUE5v8d2ej5e4loSzAYJCy1mD
-         k5DvmyFSh5B3GPalTo4CtaFoQ1TZzd2pTrV7M8ub1sgHHMhk2Sti/0jyaaaq80PEJbYJ
-         sSizFiLyKv9RhftRU3jgvsJKuqrDei4c4OdyqkccBDjfJ0gxhD9wbz0faLaHrcXWMcUP
-         oof6wh+MxzCtzdI/itSrbifEw6hNUKOwcqE0AtMSJQkLLuwlGshyzvLrcgqnA/xh51Dq
-         45iA==
+         :cc;
+        bh=/OJX83D+Or1dYiKaw59kNKInehLXdL0t8F+jfCVvvco=;
+        b=FiI5Jbgp/UV8U6bMSktCUQvrHP95QjgzoxXZgiJvZSOyN8fafP/H1grJedwcJ0+Xc6
+         Ca9ZqqgxEHWcKxqMdIq/orzMLIXQfV+Lf6khuZ8tIeA0Ncn7X9ixO0RJgl4nmH92DpGh
+         oK1qxnzuRvvfuW4MyscZHqwY9G8C+G0E9TzsRJnG95dzB/TCx7SevzcAf1hMW5w56ixL
+         e+iKC9y8VhP8fiUzk6vd6exn+qSli0YQXlEfWGUOi15O6voF3JstA5KNvBAO4waLPvJD
+         xgNLnE9W3wGICM2ZPsOdatUnHmoFhovAE6JpldTvDCnrHOoa059PaZTN5d4m4PziTYSw
+         XhlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=NQFUkkF+hurW4fzFEkfWOspDIcEJZe6/7TervLbbdAQ=;
-        b=WMwhuOkldaDG19kB3D9U7lJoo+ggxUbdOhhYI1K+YqS24FLoAxrAZf3CF/vscEgeZc
-         dMZeHJGfdQDvCsIi8kX7U9dPRR1JxH3XEgqP+jwBeABGl2Ae14C8u//9XZnbC/7zGf8f
-         QJyQDAKIiI+gEh7ZmYpeUdOBv+tYprJD37eDxmRJEci4GOJv76/fkdJBdRoajQTULudz
-         ixbKCi5V1d+HnBxUR/DPlz1Xs9y6FVxejI8OT/NBD3gM9Vcx4xKXMKDWv/+xz8FeM/4X
-         Ezn3GZqnbEbzvFllfUaR64D8YwMn/g/qyNsBffLpOXkqAPY+9GCVJARkI3IoqZuxMTiI
-         wrVg==
-X-Gm-Message-State: APjAAAWaJudAUnmy+tuPLbJJSF6yN1KkEFM485sPgno8xgenv+XWPXWy
-        Di9VzfdOqGBC1Z2KBTGCnOld4KqsVKUo9bC6auY=
-X-Google-Smtp-Source: APXvYqwzrBy0Ui8yWk0Andg4UpBtnkKRZXiNYl9HeHvYwCT7lbIdUG5oifgeK/Cz3c2d0UaqbP94rDH1hx26jMhrPA4=
-X-Received: by 2002:a05:6808:98e:: with SMTP id a14mr678036oic.8.1581368874209;
- Mon, 10 Feb 2020 13:07:54 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=/OJX83D+Or1dYiKaw59kNKInehLXdL0t8F+jfCVvvco=;
+        b=cAPetZelAXbCitpX6JC56XR8aTSIlO+FiC9Sdq+TIQ5Fikjsrd9NAf3XykaZjcOdtm
+         U33DdwucMu0R5+1lVW9ZpEeQwe4DsAukyAQ+JOqblrCsg9mLqXSWdY1sAMffjp1ANzL7
+         G5F1FKWGQ9WjvO3cfNGT2qRIVEYz845ufA2kPM2g/bvds3FKBqaOHCcEiN6jt/Tg8uD5
+         Zv6OTvzM9DpYCSVV4vl/tsSUEGU2MlyB/ECBeoidVgx2LOSkNyGYchwIL1XwMETlzgqI
+         NcAstqED/Og8YEnZR99Z/Ccu19T9beTKbXjjhHwjos3O79cQqfwHrSgOLkEpPBuuUSMG
+         KeEA==
+X-Gm-Message-State: APjAAAUYE3n5knzflHZRbx2vI0PJdsj+K5GkPkCYUKB65M5VV+WauLdi
+        JaZ+d+NJkl7WsiGkXPHQHMhK9+zdVvkKEfvY2S2Z7Q==
+X-Google-Smtp-Source: APXvYqy7MvAYh3QMEAur8nRkG7cnGjWXf7dsXGgLgFyuGIdYBu7B3fjIwhllJJIRjKWWaLRuOmPvz2mjusgyNG3FxMk=
+X-Received: by 2002:a05:6808:98e:: with SMTP id a14mr696036oic.8.1581369241111;
+ Mon, 10 Feb 2020 13:14:01 -0800 (PST)
 MIME-Version: 1.0
-References: <20200207193741.Bluez.v1.1.Ibaab6d18071354eb57b66a22de24d0fa995d86b8@changeid>
- <2E96AC9F-37F7-4951-9033-7E865B44A6B8@holtmann.org>
-In-Reply-To: <2E96AC9F-37F7-4951-9033-7E865B44A6B8@holtmann.org>
+References: <20200207190055.15249-1-luiz.dentz@gmail.com> <13F78412-516A-4383-AD3F-F15296AA747B@holtmann.org>
+In-Reply-To: <13F78412-516A-4383-AD3F-F15296AA747B@holtmann.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 10 Feb 2020 13:07:42 -0800
-Message-ID: <CABBYNZJ4iS9Do+32TQU1pgxom0Wk_Zpf=OmksJquBD5A6Y1=HQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] core: Add new policy for Just-Works repairing
+Date:   Mon, 10 Feb 2020 13:13:49 -0800
+Message-ID: <CABBYNZJZZVzWe3CueUfNYUn8LJVTZinD7oSszPTbNBpTha4L3g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add BT_PHY socket option
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Howard Chung <howardchung@google.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        chromeos-bluetooth-upstreaming@chromium.org
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Marcel,
 
-On Sat, Feb 8, 2020 at 12:27 AM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+On Sat, Feb 8, 2020 at 12:32 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> Hi Howard,
+> Hi Luiz,
 >
-> > When kernel find out that the incoming Just-Works pairing is
-> > initiated by a paired device, it is user space's responsibility to
-> > decide the next action.
+> > This adds BT_PHY socket option (read-only) which can be used to read
+> > the PHYs in use by the underline connection.
 > >
-> > This patch includes the following:
-> > - add JustWorksRepairing policy as an option in main.conf
-> > - handle the confirmation request from kernel
-> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > > ---
-> > The Just-Works repairing policy could be one of the following:
-> > - never: default; reject the repairing immediately.
-> > - confirm: prompt a confirmation dialog to user.
-> > - always: always accept the repairing.
+> > include/net/bluetooth/bluetooth.h | 17 ++++++
+> > include/net/bluetooth/hci_core.h  |  2 +
+> > net/bluetooth/hci_conn.c          | 88 +++++++++++++++++++++++++++++++
+> > net/bluetooth/l2cap_sock.c        | 13 +++++
+> > net/bluetooth/sco.c               | 13 +++++
+> > 5 files changed, 133 insertions(+)
 > >
-> > Note that the confirmation dialog is only available in command
-> > line for now.
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> > index e42bb8e03c09..1576353a2773 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -121,6 +121,23 @@ struct bt_voice {
 > >
-> > client/agent.c | 22 +++++++++++++++++++
-> > src/adapter.c  | 13 +++++++++++
-> > src/agent.c    | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> > src/agent.h    |  4 ++++
-> > src/device.c   | 14 +++++++++---
-> > src/hcid.h     |  8 +++++++
-> > src/main.c     | 27 +++++++++++++++++++++++
-> > src/main.conf  |  5 +++++
-> > 8 files changed, 149 insertions(+), 3 deletions(-)
->
-> you also need to document this in doc/agent-api.txt and we normally split=
- patches into doc/, src/ and client/ changes.
->
+> > #define BT_SNDMTU             12
+> > #define BT_RCVMTU             13
+> > +#define BT_PHY                       14
+> > +
+> > +#define BT_PHY_BR_1M_1SLOT   0x00000001
+> > +#define BT_PHY_BR_1M_3SLOT   0x00000002
+> > +#define BT_PHY_BR_1M_5SLOT   0x00000004
+> > +#define BT_PHY_EDR_2M_1SLOT  0x00000008
+> > +#define BT_PHY_EDR_2M_3SLOT  0x00000010
+> > +#define BT_PHY_EDR_2M_5SLOT  0x00000020
+> > +#define BT_PHY_EDR_3M_1SLOT  0x00000040
+> > +#define BT_PHY_EDR_3M_3SLOT  0x00000080
+> > +#define BT_PHY_EDR_3M_5SLOT  0x00000100
+> > +#define BT_PHY_LE_1M_TX              0x00000200
+> > +#define BT_PHY_LE_1M_RX              0x00000400
+> > +#define BT_PHY_LE_2M_TX              0x00000800
+> > +#define BT_PHY_LE_2M_RX              0x00001000
+> > +#define BT_PHY_LE_CODED_TX   0x00002000
+> > +#define BT_PHY_LE_CODED_RX   0x00004000
 > >
-> > diff --git a/client/agent.c b/client/agent.c
-> > index 4def1b478..544344c46 100644
-> > --- a/client/agent.c
-> > +++ b/client/agent.c
-> > @@ -239,6 +239,25 @@ static DBusMessage *request_authorization(DBusConn=
-ection *conn,
-> >       return NULL;
+> > __printf(1, 2)
+> > void bt_info(const char *fmt, ...);
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index 89ecf0a80aa1..dcc0dc6e2624 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -1477,6 +1477,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+> > struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+> >                            const void *param, u32 timeout);
+> >
+> > +u32 hci_conn_get_phy(struct hci_conn *conn);
+> > +
+> > /* ----- HCI Sockets ----- */
+> > void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+> > void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index 87691404d0c6..9ff2611b272f 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -1725,3 +1725,91 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle)
+> >
+> >       return hchan;
 > > }
-> >
-> > +static DBusMessage *request_drop_old_key(DBusConnection *conn,
-> > +                                     DBusMessage *msg, void *user_data=
-)
+> > +
+> > +u32 hci_conn_get_phy(struct hci_conn *conn)
 > > +{
-> > +     const char *device;
+> > +     u32 phys = 0;
 > > +
-> > +     bt_shell_printf("Request drop old key\n");
+> > +     hci_dev_lock(conn->hdev);
 > > +
-> > +     dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-> > +                                                     DBUS_TYPE_INVALID=
-);
+> > +     switch (conn->type) {
+> > +     case SCO_LINK:
+> > +             phys |= BT_PHY_BR_1M_1SLOT;
 > > +
-> > +     bt_shell_prompt_input("agent",
-> > +                           "Drop the old key and accept pairing (yes/n=
-o):",
-> > +                           confirm_response, conn);
+> > +             break;
+>
+> something is missing here. The SCO links can also be 3 and 5 slots.
+
+I couldn't find any information regarding the slot for HV1, HV2, HV3
+and DV so I assume they were all using 1 slot.
+
 > > +
-> > +     pending_message =3D dbus_message_ref(msg);
+> > +     case ACL_LINK:
+> > +             phys |= BT_PHY_BR_1M_1SLOT;
 > > +
-> > +     return NULL;
+> > +             if (conn->pkt_type & (HCI_DM3 | HCI_DH3))
+> > +                     phys |= BT_PHY_BR_1M_3SLOT;
+> > +
+> > +             if (conn->pkt_type & (HCI_DM5 | HCI_DH5))
+> > +                     phys |= BT_PHY_BR_1M_5SLOT;
+> > +
+> > +             if (!(conn->pkt_type & HCI_2DH1))
+> > +                     phys |= BT_PHY_EDR_2M_1SLOT;
+> > +
+> > +             if (!(conn->pkt_type & HCI_2DH3))
+> > +                     phys |= BT_PHY_EDR_2M_3SLOT;
+> > +
+> > +             if (!(conn->pkt_type & HCI_2DH5))
+> > +                     phys |= BT_PHY_EDR_2M_5SLOT;
+> > +
+> > +             if (!(conn->pkt_type & HCI_3DH1))
+> > +                     phys |= BT_PHY_EDR_3M_1SLOT;
+> > +
+> > +             if (!(conn->pkt_type & HCI_3DH3))
+> > +                     phys |= BT_PHY_EDR_3M_3SLOT;
+> > +
+> > +             if (!(conn->pkt_type & HCI_3DH5))
+> > +                     phys |= BT_PHY_EDR_3M_5SLOT;
+> > +
+> > +             break;
+> > +
+> > +     case ESCO_LINK:
+> > +             phys |= BT_PHY_BR_1M_1SLOT;
+> > +
+> > +             if (!(conn->pkt_type & (ESCO_EV4 | ESCO_EV5)))
+> > +                     phys |= BT_PHY_BR_1M_3SLOT;
+> > +
+> > +             if (!(conn->pkt_type & ESCO_2EV3))
+> > +                     phys |= BT_PHY_EDR_2M_1SLOT;
+> > +
+> > +             if (!(conn->pkt_type & ESCO_2EV5))
+> > +                     phys |= BT_PHY_EDR_2M_3SLOT;
+> > +
+> > +             if (!(conn->pkt_type & ESCO_3EV3))
+> > +                     phys |= BT_PHY_EDR_3M_1SLOT;
+> > +
+> > +             if (!(conn->pkt_type & ESCO_3EV5))
+> > +                     phys |= BT_PHY_EDR_3M_3SLOT;
+> > +
+> > +             break;
+> > +
+> > +     case LE_LINK:
+> > +             if (conn->le_tx_phy & HCI_LE_SET_PHY_1M)
+> > +                     phys |= BT_PHY_LE_1M_TX;
+> > +
+> > +             if (conn->le_rx_phy & HCI_LE_SET_PHY_1M)
+> > +                     phys |= BT_PHY_LE_1M_RX;
+> > +
+> > +             if (conn->le_tx_phy & HCI_LE_SET_PHY_2M)
+> > +                     phys |= BT_PHY_LE_2M_TX;
+> > +
+> > +             if (conn->le_rx_phy & HCI_LE_SET_PHY_2M)
+> > +                     phys |= BT_PHY_LE_2M_RX;
+> > +
+> > +             if (conn->le_tx_phy & HCI_LE_SET_PHY_CODED)
+> > +                     phys |= BT_PHY_LE_CODED_TX;
+> > +
+> > +             if (conn->le_rx_phy & HCI_LE_SET_PHY_CODED)
+> > +                     phys |= BT_PHY_LE_CODED_RX;
+> > +
+> > +             break;
+> > +     }
+> > +
+> > +     hci_dev_unlock(conn->hdev);
+> > +
+> > +     return phys;
 > > +}
-> > +
-> > static DBusMessage *authorize_service(DBusConnection *conn,
-> >                                       DBusMessage *msg, void *user_data=
-)
-> > {
-> > @@ -292,6 +311,9 @@ static const GDBusMethodTable methods[] =3D {
-> >       { GDBUS_ASYNC_METHOD("RequestAuthorization",
-> >                       GDBUS_ARGS({ "device", "o" }),
-> >                       NULL, request_authorization) },
-> > +     { GDBUS_ASYNC_METHOD("RequestDropOldKey",
-> > +                     GDBUS_ARGS({ "device", "o" }),
-> > +                     NULL, request_drop_old_key) },
-> >       { GDBUS_ASYNC_METHOD("AuthorizeService",
-> >                       GDBUS_ARGS({ "device", "o" }, { "uuid", "s" }),
->
-> I am not fully convinced with the name yet. Can we start with a patch tha=
-t just has the policy in main.conf for always and never.
-
-I was thinking we should just use RequestAuthorization which according
-to the documentation was introduced exactly to deal with JustWorks
-pairing, the agent can then check if the device has been already
-paired and reject it if it wants to, that way we don't need a fallback
-mechanism (which most likely would use RequestAuthorization anyway).
-
-> >                       NULL,  authorize_service) },
-> > diff --git a/src/adapter.c b/src/adapter.c
-> > index 329c3ae0b..cecd80ea1 100644
-> > --- a/src/adapter.c
-> > +++ b/src/adapter.c
-> > @@ -6909,6 +6909,19 @@ static void user_confirm_request_callback(uint16=
-_t index, uint16_t length,
-> >               return;
-> >       }
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index 390a9afab647..3df4a7cf85a3 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -499,6 +499,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+> >       struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> >       struct bt_security sec;
+> >       struct bt_power pwr;
+> > +     u32 phys;
+> >       int len, err = 0;
 > >
-> > +     /*Just-Works repairing policy*/
->
-> Please follow our coding style for comments.
->
-> > +     if (ev->confirm_hint =3D=3D 2) {
-> > +             if (main_opts.jw_repairing =3D=3D JW_REPAIRING_NEVER) {
-> > +                     btd_adapter_confirm_reply(adapter, &ev->addr.bdad=
-dr,
-> > +                                                     ev->addr.type, FA=
-LSE);
-> > +                     return;
-> > +             } else if (main_opts.jw_repairing =3D=3D JW_REPAIRING_ALW=
-AYS) {
-> > +                     btd_adapter_confirm_reply(adapter, &ev->addr.bdad=
-dr,
-> > +                                                     ev->addr.type, TR=
-UE);
-> > +                     return;
+> >       BT_DBG("sk %p", sk);
+> > @@ -603,6 +604,18 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+> >                       err = -EFAULT;
+> >               break;
+> >
+> > +     case BT_PHY:
+> > +             if (sk->sk_state == BT_CONNECTED) {
+> > +                     err = -EINVAL;
+> > +                     break;
 > > +             }
-> > +     }
 > > +
-> >       err =3D device_confirm_passkey(device, ev->addr.type, btohl(ev->v=
-alue),
-> >                                                       ev->confirm_hint)=
-;
-> >       if (err < 0) {
-> > diff --git a/src/agent.c b/src/agent.c
-> > index e0ffcd22f..3a75e3b00 100644
-> > --- a/src/agent.c
-> > +++ b/src/agent.c
-> > @@ -60,6 +60,7 @@ typedef enum {
-> >       AGENT_REQUEST_PASSKEY,
-> >       AGENT_REQUEST_CONFIRMATION,
-> >       AGENT_REQUEST_AUTHORIZATION,
-> > +     AGENT_REQUEST_DROP_OLD_KEY,
-> >       AGENT_REQUEST_PINCODE,
-> >       AGENT_REQUEST_AUTHORIZE_SERVICE,
-> >       AGENT_REQUEST_DISPLAY_PINCODE,
-> > @@ -239,6 +240,7 @@ void agent_unref(struct agent *agent)
-> >                       break;
-> >               case AGENT_REQUEST_CONFIRMATION:
-> >               case AGENT_REQUEST_AUTHORIZATION:
-> > +             case AGENT_REQUEST_DROP_OLD_KEY:
-> >               case AGENT_REQUEST_AUTHORIZE_SERVICE:
-> >               case AGENT_REQUEST_DISPLAY_PINCODE:
-> >               default:
-> > @@ -798,6 +800,63 @@ failed:
-> >       return err;
-> > }
-> >
-> > +static int drop_old_key_request_new(struct agent_request *req,
-> > +                                             const char *device_path)
-> > +{
-> > +     struct agent *agent =3D req->agent;
+> > +             phys = hci_conn_get_phy(chan->conn->hcon);
 > > +
-> > +     req->msg =3D dbus_message_new_method_call(agent->owner, agent->pa=
-th,
-> > +                             AGENT_INTERFACE, "RequestDropOldKey");
-> > +     if (req->msg =3D=3D NULL) {
-> > +             error("Couldn't allocate D-Bus message");
-> > +             return -ENOMEM;
-> > +     }
-> > +
-> > +     dbus_message_append_args(req->msg,
-> > +                             DBUS_TYPE_OBJECT_PATH, &device_path,
-> > +                             DBUS_TYPE_INVALID);
-> > +
-> > +     if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req=
-->msg,
-> > +                             &req->call, REQUEST_TIMEOUT) =3D=3D FALSE=
-) {
-> > +             error("D-Bus send failed");
-> > +             return -EIO;
-> > +     }
-> > +
-> > +     dbus_pending_call_set_notify(req->call, simple_agent_reply, req, =
-NULL);
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +int agent_request_drop_old_key(struct agent *agent, struct btd_device =
-*device,
-> > +                                             agent_cb cb, void *user_d=
-ata,
-> > +                                             GDestroyNotify destroy)
-> > +{
-> > +     struct agent_request *req;
-> > +     const char *dev_path =3D device_get_path(device);
-> > +     int err;
-> > +
-> > +     if (agent->request)
-> > +             return -EBUSY;
-> > +
-> > +     DBG("Calling Agent.DropOldKey: name=3D%s, path=3D%s",
-> > +                                             agent->owner, agent->path=
-);
-> > +
-> > +     req =3D agent_request_new(agent, device, AGENT_REQUEST_DROP_OLD_K=
-EY, cb,
-> > +                             user_data, destroy);
-> > +
-> > +     err =3D drop_old_key_request_new(req, dev_path);
-> > +     if (err < 0)
-> > +             goto failed;
-> > +
-> > +     agent->request =3D req;
-> > +
-> > +     return 0;
-> > +
-> > +failed:
-> > +     agent_request_free(req, FALSE);
-> > +     return err;
-> > +}
-> > +
->
-> You need to build in a graceful fallback for agents that are not capable =
-of handling the new agent callbacks.
->
-> > int agent_display_passkey(struct agent *agent, struct btd_device *devic=
-e,
-> >                               uint32_t passkey, uint16_t entered)
-> > {
-> > diff --git a/src/agent.h b/src/agent.h
-> > index 1438b9e6d..ccc651dba 100644
-> > --- a/src/agent.h
-> > +++ b/src/agent.h
-> > @@ -65,6 +65,10 @@ int agent_request_authorization(struct agent *agent,=
- struct btd_device *device,
-> >                                               agent_cb cb, void *user_d=
-ata,
-> >                                               GDestroyNotify destroy);
-> >
-> > +int agent_request_drop_old_key(struct agent *agent, struct btd_device =
-*device,
-> > +                                             agent_cb cb, void *user_d=
-ata,
-> > +                                             GDestroyNotify destroy);
-> > +
-> > int agent_display_passkey(struct agent *agent, struct btd_device *devic=
-e,
-> >                               uint32_t passkey, uint16_t entered);
-> >
-> > diff --git a/src/device.c b/src/device.c
-> > index a4fe10980..e460e034f 100644
-> > --- a/src/device.c
-> > +++ b/src/device.c
-> > @@ -6147,12 +6147,20 @@ int device_confirm_passkey(struct btd_device *d=
-evice, uint8_t type,
-> >
-> >       auth->passkey =3D passkey;
-> >
-> > -     if (confirm_hint)
-> > +     switch (confirm_hint) {
-> > +     case 0:
-> > +             err =3D agent_request_confirmation(auth->agent, device, p=
-asskey,
-> > +                                             confirm_cb, auth, NULL);
+> > +             if (put_user(phys, (u32 __user *) optval))
+> > +                     err = -EFAULT;
 > > +             break;
-> > +     case 1:
-> >               err =3D agent_request_authorization(auth->agent, device,
-> >                                               confirm_cb, auth, NULL);
-> > -     else
-> > -             err =3D agent_request_confirmation(auth->agent, device, p=
-asskey,
+> > +
+> >       default:
+> >               err = -ENOPROTOOPT;
+> >               break;
+> > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> > index b91d6b440fdf..95fdfa4b9b62 100644
+> > --- a/net/bluetooth/sco.c
+> > +++ b/net/bluetooth/sco.c
+> > @@ -922,6 +922,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+> >       struct sock *sk = sock->sk;
+> >       int len, err = 0;
+> >       struct bt_voice voice;
+> > +     u32 phys;
+> >
+> >       BT_DBG("sk %p", sk);
+> >
+> > @@ -956,6 +957,18 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+> >
+> >               break;
+> >
+> > +     case BT_PHY:
+> > +             if (sk->sk_state == BT_CONNECTED) {
+> > +                     err = -EINVAL;
+> > +                     break;
+> > +             }
+> > +
+> > +             phys = hci_conn_get_phy(sco_pi(sk)->conn->hcon);
+> > +
+> > +             if (put_user(phys, (u32 __user *) optval))
+> > +                     err = -EFAULT;
 > > +             break;
-> > +     case 2:
-> > +             err =3D agent_request_drop_old_key(auth->agent, device,
-> >                                               confirm_cb, auth, NULL);
-> > +             break;
-> > +     }
-> >
-> >       if (err < 0) {
-> >               if (err =3D=3D -EINPROGRESS) {
-> > diff --git a/src/hcid.h b/src/hcid.h
-> > index adea85ce2..bcd2b9fa1 100644
-> > --- a/src/hcid.h
-> > +++ b/src/hcid.h
-> > @@ -35,6 +35,12 @@ typedef enum {
-> >       BT_GATT_CACHE_NO,
-> > } bt_gatt_cache_t;
-> >
-> > +enum {
-> > +     JW_REPAIRING_NEVER,
-> > +     JW_REPAIRING_CONFIRM,
-> > +     JW_REPAIRING_ALWAYS,
-> > +} jw_repairing_t;
 > > +
-> > struct main_opts {
-> >       char            *name;
-> >       uint32_t        class;
-> > @@ -58,6 +64,8 @@ struct main_opts {
-> >       uint16_t        gatt_mtu;
-> >
-> >       uint8_t         key_size;
-> > +
-> > +     jw_repairing_t  jw_repairing;
-> > };
-> >
-> > extern struct main_opts main_opts;
-> > diff --git a/src/main.c b/src/main.c
-> > index 1a6ab36a3..d67f469f1 100644
-> > --- a/src/main.c
-> > +++ b/src/main.c
-> > @@ -93,6 +93,7 @@ static const char *supported_options[] =3D {
-> >       "MultiProfile",
-> >       "FastConnectable",
-> >       "Privacy",
-> > +     "JustWorksRepairing",
-> >       NULL
-> > };
-> >
-> > @@ -193,6 +194,20 @@ static bt_gatt_cache_t parse_gatt_cache(const char=
- *cache)
-> >       }
-> > }
-> >
-> > +static jw_repairing_t parse_jw_repairing(const char *jw_repairing)
-> > +{
-> > +     if (!strcmp(jw_repairing, "never")) {
-> > +             return JW_REPAIRING_NEVER;
-> > +     } else if (!strcmp(jw_repairing, "confirm")) {
-> > +             return JW_REPAIRING_CONFIRM;
-> > +     } else if (!strcmp(jw_repairing, "always")) {
-> > +             return JW_REPAIRING_ALWAYS;
-> > +     } else {
-> > +             return JW_REPAIRING_NEVER;
-> > +     }
-> > +}
-> > +
-> > +
-> > static void check_options(GKeyFile *config, const char *group,
-> >                                               const char **options)
-> > {
-> > @@ -331,6 +346,18 @@ static void parse_config(GKeyFile *config)
-> >               g_free(str);
-> >       }
-> >
-> > +     str =3D g_key_file_get_string(config, "General",
-> > +                                             "JustWorksRepairing", &er=
-r);
-> > +     if (err) {
-> > +             DBG("%s", err->message);
-> > +             g_clear_error(&err);
-> > +             main_opts.jw_repairing =3D JW_REPAIRING_NEVER;
-> > +     } else {
-> > +             DBG("just_works_repairing=3D%s", str);
-> > +             main_opts.jw_repairing =3D parse_jw_repairing(str);
-> > +             g_free(str);
-> > +     }
-> > +
-> >       str =3D g_key_file_get_string(config, "General", "Name", &err);
-> >       if (err) {
-> >               DBG("%s", err->message);
-> > diff --git a/src/main.conf b/src/main.conf
-> > index 40687a755..bb5ff5b15 100644
-> > --- a/src/main.conf
-> > +++ b/src/main.conf
-> > @@ -72,6 +72,11 @@
-> > # Defaults to "off"
-> > # Privacy =3D off
-> >
-> > +# Specify the policy to the JUST-WORKS repairing initiated by peer
-> > +# Possible values: "never", "confirm", "always"
-> > +# Defaults to "never"
-> > +#JustWorksRepairing =3D never
-> > +
-> > [GATT]
-> > # GATT attribute cache.
-> > # Possible values:
->
-> The word =E2=80=9Crepairing=E2=80=9D always makes me question if that is =
-the best name. I leave this open for comments from others.
+> >       default:
+> >               err = -ENOPROTOOPT;
+> >               break;
 >
 > Regards
 >
@@ -454,5 +298,5 @@ the best name. I leave this open for comments from others.
 >
 
 
---
+-- 
 Luiz Augusto von Dentz
