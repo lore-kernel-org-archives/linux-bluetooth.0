@@ -1,308 +1,136 @@
-Return-Path: <SRS0=FZvY=36=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Xed5=37=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2CABC352A4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Feb 2020 22:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912E8C352A3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Feb 2020 06:59:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E09C2051A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Feb 2020 22:55:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQSs/GHM"
+	by mail.kernel.org (Postfix) with ESMTP id 6D2DA2082F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Feb 2020 06:59:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727555AbgBJWzy (ORCPT
+        id S1727952AbgBKG7E (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Feb 2020 17:55:54 -0500
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:56140 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727116AbgBJWzy (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Feb 2020 17:55:54 -0500
-Received: by mail-pj1-f68.google.com with SMTP id d5so416506pjz.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Feb 2020 14:55:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CkOPsnM0uzlmHk4C6QGMCr1GZbwo4AwiINMqvselUI8=;
-        b=NQSs/GHMdIE4Ap5hRebfw18J/cVNnEitC80B37jHaRUASOWl6yCZdIzybnB+9P0g0O
-         6CYRkdE/4HYkXCcs8d7sHr1OGb8d3KCzl/fDLXdCduuwut1bBpW8sol7wa+fBBo7h6Rf
-         DJuODwyKjbdeN+CNuV9enMUdBScFOOWw/i7snVvAy+2Zn7SbRUPfR5mQt7viEecxmWpa
-         02y9hVxWYGFrSS4jYhNUTM6ftj3zbz5ebfXnu+A8ZyNua95ZE75tefKlCjd+JTtu4BVs
-         i2bYZDNtZXwo3kpY7bsvA0RDQRwvn5PsES6rH0fmgqR1lWj3yFLYtwom87dYXOcX71V3
-         09Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CkOPsnM0uzlmHk4C6QGMCr1GZbwo4AwiINMqvselUI8=;
-        b=EskZr1kCyJOIseB//Oh9N1ZrKGV7OTuAqJsNSdUBvYo2TO03642b7+Q4fBrMb1GpaM
-         Y7p81j47TdmL/Ir46bf5ajzJFA14Fr5Opw40T5jIEB0T3ot5YSIIMFUXYC24cusLlxVZ
-         MRrmKmhYoVTofbNDKoqT4+BjMclomKcu8z6V40v8agdrZh+9FBCA6JtngBHd7pzTk8pY
-         7QOITUf+GYM8qgc7jBqSUFOB01iI9/zS4NFeID/uzrzCpENMiYo2cYm7eyJvVL7cjR/s
-         juQWGYmseSdfj96vPEBj9xzSKZJ6MQ15Gfp1j0W0Cdgd13BGDu7JMaQnC3Y5FlIJcsHw
-         ZhyQ==
-X-Gm-Message-State: APjAAAUf4WkXyWvyyA7vJl07fKSPWNNyCh1HE9EsmLoz3EAW3PvdLh7d
-        TP5yzz8letqen7XaGQI65IQVftM/
-X-Google-Smtp-Source: APXvYqyrhGIxvCJ98z9HKc1TmrMF5PydkVQQrAQrxGHTcETRsssH/HGB0BzjiF+8Er7o9NF+3L0XpQ==
-X-Received: by 2002:a17:90b:110d:: with SMTP id gi13mr111070pjb.123.1581375352882;
-        Mon, 10 Feb 2020 14:55:52 -0800 (PST)
-Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id z16sm1392901pff.125.2020.02.10.14.55.51
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2020 14:55:52 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Tue, 11 Feb 2020 01:59:04 -0500
+Received: from mga05.intel.com ([192.55.52.43]:10653 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727784AbgBKG7E (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 11 Feb 2020 01:59:04 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Feb 2020 22:59:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,427,1574150400"; 
+   d="scan'208";a="405849840"
+Received: from unknown (HELO ajay-desktop.iind.intel.com) ([10.223.96.133])
+  by orsmga005.jf.intel.com with ESMTP; 10 Feb 2020 22:59:00 -0800
+From:   Ajay Kishore <ajay.kishore@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Add BT_PHY socket option
-Date:   Mon, 10 Feb 2020 14:55:50 -0800
-Message-Id: <20200210225550.4248-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v2 1/6] obexd: Add initial support for MAP conversations
+Date:   Tue, 11 Feb 2020 12:06:05 +0530
+Message-Id: <1581402970-1781-1-git-send-email-ajay.kishore@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This adds BT_PHY socket option (read-only) which can be used to read
-the PHYs in use by the underline connection.
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Changes made to add a new method for MAP conversation listing i.e
+"ListConversations" to handle conversation listing object
+"x-bt/MAP-convo-listing".
 ---
- include/net/bluetooth/bluetooth.h |  17 +++++
- include/net/bluetooth/hci_core.h  |   2 +
- net/bluetooth/hci_conn.c          | 107 ++++++++++++++++++++++++++++++
- net/bluetooth/l2cap_sock.c        |  13 ++++
- net/bluetooth/sco.c               |  13 ++++
- 5 files changed, 152 insertions(+)
+ obexd/client/map.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index e42bb8e03c09..1576353a2773 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -121,6 +121,23 @@ struct bt_voice {
- 
- #define BT_SNDMTU		12
- #define BT_RCVMTU		13
-+#define BT_PHY			14
-+
-+#define BT_PHY_BR_1M_1SLOT	0x00000001
-+#define BT_PHY_BR_1M_3SLOT	0x00000002
-+#define BT_PHY_BR_1M_5SLOT	0x00000004
-+#define BT_PHY_EDR_2M_1SLOT	0x00000008
-+#define BT_PHY_EDR_2M_3SLOT	0x00000010
-+#define BT_PHY_EDR_2M_5SLOT	0x00000020
-+#define BT_PHY_EDR_3M_1SLOT	0x00000040
-+#define BT_PHY_EDR_3M_3SLOT	0x00000080
-+#define BT_PHY_EDR_3M_5SLOT	0x00000100
-+#define BT_PHY_LE_1M_TX		0x00000200
-+#define BT_PHY_LE_1M_RX		0x00000400
-+#define BT_PHY_LE_2M_TX		0x00000800
-+#define BT_PHY_LE_2M_RX		0x00001000
-+#define BT_PHY_LE_CODED_TX	0x00002000
-+#define BT_PHY_LE_CODED_RX	0x00004000
- 
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 89ecf0a80aa1..dcc0dc6e2624 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1477,6 +1477,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
- struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
- 			     const void *param, u32 timeout);
- 
-+u32 hci_conn_get_phy(struct hci_conn *conn);
-+
- /* ----- HCI Sockets ----- */
- void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
- void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 87691404d0c6..65fa44cbe514 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1725,3 +1725,110 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle)
- 
- 	return hchan;
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 550c5af..adf62d9 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1560,6 +1560,69 @@ static DBusMessage *map_list_messages(DBusConnection *connection,
+ 	return get_message_listing(map, message, folder, apparam);
  }
-+
-+u32 hci_conn_get_phy(struct hci_conn *conn)
+ 
++static GObexApparam *parse_conversation_filters(GObexApparam *apparam,
++							DBusMessageIter *iter)
 +{
-+	u32 phys = 0;
++	DBusMessageIter array;
 +
-+	hci_dev_lock(conn->hdev);
-+
-+	/* BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 2, Part B page 471:
-+	 * Table 6.2: Packets defined for synchronous, asynchronous, and
-+	 * CSB logical transport types.
-+	 */
-+	switch (conn->type) {
-+	case SCO_LINK:
-+		/* SCO logical transport (1 Mb/s):
-+		 * HV1, HV2, HV3 and DV.
-+		 */
-+		phys |= BT_PHY_BR_1M_1SLOT;
-+
-+		break;
-+
-+	case ACL_LINK:
-+		/* ACL logical transport (1 Mb/s) ptt=0:
-+		 * DH1, DM3, DH3, DM5 and DH5.
-+		 */
-+		phys |= BT_PHY_BR_1M_1SLOT;
-+
-+		if (conn->pkt_type & (HCI_DM3 | HCI_DH3))
-+			phys |= BT_PHY_BR_1M_3SLOT;
-+
-+		if (conn->pkt_type & (HCI_DM5 | HCI_DH5))
-+			phys |= BT_PHY_BR_1M_5SLOT;
-+
-+		/* ACL logical transport (2 Mb/s) ptt=1:
-+		 * 2-DH1, 2-DH3 and 2-DH5.
-+		 */
-+		if (!(conn->pkt_type & HCI_2DH1))
-+			phys |= BT_PHY_EDR_2M_1SLOT;
-+
-+		if (!(conn->pkt_type & HCI_2DH3))
-+			phys |= BT_PHY_EDR_2M_3SLOT;
-+
-+		if (!(conn->pkt_type & HCI_2DH5))
-+			phys |= BT_PHY_EDR_2M_5SLOT;
-+
-+		/* ACL logical transport (3 Mb/s) ptt=1:
-+		 * 3-DH1, 3-DH3 and 3-DH5.
-+		 */
-+		if (!(conn->pkt_type & HCI_3DH1))
-+			phys |= BT_PHY_EDR_3M_1SLOT;
-+
-+		if (!(conn->pkt_type & HCI_3DH3))
-+			phys |= BT_PHY_EDR_3M_3SLOT;
-+
-+		if (!(conn->pkt_type & HCI_3DH5))
-+			phys |= BT_PHY_EDR_3M_5SLOT;
-+
-+		break;
-+
-+	case ESCO_LINK:
-+		/* eSCO logical transport (1 Mb/s): EV3, EV4 and EV5 */
-+		phys |= BT_PHY_BR_1M_1SLOT;
-+
-+		if (!(conn->pkt_type & (ESCO_EV4 | ESCO_EV5)))
-+			phys |= BT_PHY_BR_1M_3SLOT;
-+
-+		/* eSCO logical transport (2 Mb/s): 2-EV3, 2-EV5 */
-+		if (!(conn->pkt_type & ESCO_2EV3))
-+			phys |= BT_PHY_EDR_2M_1SLOT;
-+
-+		if (!(conn->pkt_type & ESCO_2EV5))
-+			phys |= BT_PHY_EDR_2M_3SLOT;
-+
-+		/* eSCO logical transport (3 Mb/s): 3-EV3, 3-EV5 */
-+		if (!(conn->pkt_type & ESCO_3EV3))
-+			phys |= BT_PHY_EDR_3M_1SLOT;
-+
-+		if (!(conn->pkt_type & ESCO_3EV5))
-+			phys |= BT_PHY_EDR_3M_3SLOT;
-+
-+		break;
-+
-+	case LE_LINK:
-+		if (conn->le_tx_phy & HCI_LE_SET_PHY_1M)
-+			phys |= BT_PHY_LE_1M_TX;
-+
-+		if (conn->le_rx_phy & HCI_LE_SET_PHY_1M)
-+			phys |= BT_PHY_LE_1M_RX;
-+
-+		if (conn->le_tx_phy & HCI_LE_SET_PHY_2M)
-+			phys |= BT_PHY_LE_2M_TX;
-+
-+		if (conn->le_rx_phy & HCI_LE_SET_PHY_2M)
-+			phys |= BT_PHY_LE_2M_RX;
-+
-+		if (conn->le_tx_phy & HCI_LE_SET_PHY_CODED)
-+			phys |= BT_PHY_LE_CODED_TX;
-+
-+		if (conn->le_rx_phy & HCI_LE_SET_PHY_CODED)
-+			phys |= BT_PHY_LE_CODED_RX;
-+
-+		break;
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
++		DBG("Not of type array");
++		return NULL;
 +	}
 +
-+	hci_dev_unlock(conn->hdev);
++	dbus_message_iter_recurse(iter, &array);
 +
-+	return phys;
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++
++		dbus_message_iter_recurse(&array, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		/* TODO: Parse conversation filters */
++
++		dbus_message_iter_next(&array);
++	}
++	return apparam;
 +}
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 390a9afab647..3df4a7cf85a3 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -499,6 +499,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 	struct bt_security sec;
- 	struct bt_power pwr;
-+	u32 phys;
- 	int len, err = 0;
- 
- 	BT_DBG("sk %p", sk);
-@@ -603,6 +604,18 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
- 			err = -EFAULT;
- 		break;
- 
-+	case BT_PHY:
-+		if (sk->sk_state == BT_CONNECTED) {
-+			err = -EINVAL;
-+			break;
-+		}
 +
-+		phys = hci_conn_get_phy(chan->conn->hcon);
++static DBusMessage *map_list_conversations(DBusConnection *connection,
++						DBusMessage *message,
++						void *user_data)
++{
++	struct map_data *map = user_data;
++	const char *folder;
++	GObexApparam *apparam;
++	DBusMessageIter args;
 +
-+		if (put_user(phys, (u32 __user *) optval))
-+			err = -EFAULT;
-+		break;
++	dbus_message_iter_init(message, &args);
 +
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index b91d6b440fdf..95fdfa4b9b62 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -922,6 +922,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 	struct sock *sk = sock->sk;
- 	int len, err = 0;
- 	struct bt_voice voice;
-+	u32 phys;
- 
- 	BT_DBG("sk %p", sk);
- 
-@@ -956,6 +957,18 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 
- 		break;
- 
-+	case BT_PHY:
-+		if (sk->sk_state == BT_CONNECTED) {
-+			err = -EINVAL;
-+			break;
-+		}
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
++		return g_dbus_create_error(message,
++			ERROR_INTERFACE ".InvalidArguments", NULL);
 +
-+		phys = hci_conn_get_phy(sco_pi(sk)->conn->hcon);
++	dbus_message_iter_get_basic(&args, &folder);
 +
-+		if (put_user(phys, (u32 __user *) optval))
-+			err = -EFAULT;
-+		break;
++	apparam = g_obex_apparam_set_uint16(NULL, MAP_AP_MAXLISTCOUNT,
++							DEFAULT_COUNT);
++	apparam = g_obex_apparam_set_uint16(apparam, MAP_AP_STARTOFFSET,
++							DEFAULT_OFFSET);
 +
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
++	dbus_message_iter_next(&args);
++
++	if (parse_conversation_filters(apparam, &args) == NULL) {
++		g_obex_apparam_free(apparam);
++		return g_dbus_create_error(message,
++			ERROR_INTERFACE ".InvalidArguments", NULL);
++	}
++
++	/*TODO: Return conversation listing */
++	return NULL;
++}
++
+ static char **get_filter_strs(uint64_t filter, int *size)
+ {
+ 	char **list, **item;
+@@ -1817,6 +1880,10 @@ static const GDBusMethodTable map_methods[] = {
+ 			GDBUS_ARGS({ "folder", "s" }, { "filter", "a{sv}" }),
+ 			GDBUS_ARGS({ "messages", "a{oa{sv}}" }),
+ 			map_list_messages) },
++	{ GDBUS_ASYNC_METHOD("ListConversations",
++			GDBUS_ARGS({ "folder", "s" }, { "filter", "a{sv}" }),
++			GDBUS_ARGS({ "conversations", "a{oa{sv}}" }),
++			map_list_conversations) },
+ 	{ GDBUS_METHOD("ListFilterFields",
+ 			NULL,
+ 			GDBUS_ARGS({ "fields", "as" }),
 -- 
-2.21.1
+2.7.4
 
