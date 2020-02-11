@@ -2,158 +2,173 @@ Return-Path: <SRS0=Xed5=37=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4379BC352A3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Feb 2020 08:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3067CC35242
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Feb 2020 19:28:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A5BB20675
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Feb 2020 08:14:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09D222086A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Feb 2020 19:28:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixo0D9Xg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727687AbgBKIOQ (ORCPT
+        id S1731661AbgBKT2A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Feb 2020 03:14:16 -0500
-Received: from mga09.intel.com ([134.134.136.24]:30458 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727578AbgBKIOQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Feb 2020 03:14:16 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Feb 2020 00:14:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; 
-   d="scan'208";a="251473988"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by orsmga002.jf.intel.com with ESMTP; 11 Feb 2020 00:14:13 -0800
-Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 11 Feb 2020 00:14:13 -0800
-Received: from bgsmsx101.gar.corp.intel.com (10.223.4.170) by
- fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 11 Feb 2020 00:14:12 -0800
-Received: from bgsmsx110.gar.corp.intel.com ([169.254.11.221]) by
- BGSMSX101.gar.corp.intel.com ([169.254.1.155]) with mapi id 14.03.0439.000;
- Tue, 11 Feb 2020 13:44:09 +0530
-From:   "Kishore, Ajay" <ajay.kishore@intel.com>
-To:     Matias Karhumaa <matias.karhumaa@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v2 6/6] doc/obex-api: Update documentation
-Thread-Topic: [PATCH v2 6/6] doc/obex-api: Update documentation
-Thread-Index: AQHVx86tjOW/V0g/1kmH9YpXBuaIQqgV1Z7Q
-Date:   Tue, 11 Feb 2020 08:14:08 +0000
-Message-ID: <A4827819204CC641A5E2541E6709F15337DCCDE6@BGSMSX110.gar.corp.intel.com>
-References: <1577163782-28759-1-git-send-email-ajay.kishore@intel.com>
- <1577163782-28759-2-git-send-email-ajay.kishore@intel.com>
- <CAMCGoNydF4WNNDj6Egoz0MBnXVjr+bFKUY54gLHX+0LErHwOTQ@mail.gmail.com>
-In-Reply-To: <CAMCGoNydF4WNNDj6Egoz0MBnXVjr+bFKUY54gLHX+0LErHwOTQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYTRhM2U2NzItMDQ1Ni00YTM2LWFjNjYtYjYwNWRmM2IyZDFlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiV0RKNys2WEs5WlBQZ1wvZnRhRFhCQUVXc1wvbXVcL0p4TkRWUFNmZWFTN0FKUDhlbXpMVm84S0VQWURjVnd5V09JQSJ9
-x-originating-ip: [10.223.10.10]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 11 Feb 2020 14:28:00 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:45844 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728202AbgBKT2A (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 11 Feb 2020 14:28:00 -0500
+Received: by mail-oi1-f196.google.com with SMTP id v19so13900836oic.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Feb 2020 11:27:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SYZT81OlGTWcN0jtwAOfQIAD9I9KBu+11E308lphCzs=;
+        b=ixo0D9XgaWnTDk8qIeRPXzE2qDTVTbdWeTw9MbTkIzO/BC62pJ1aXWIfMPHroCLW2m
+         ZLm/BpC1q3eUHsLkNo0qM3JvA2D9tjOFMtAqLd1HA6Q1g2rUU5BjacGmJ3V2vZhJsyKO
+         rOnPxrgjRYYEFEdONkzA2nuYYMnPZwpvMyw4gu9GOq49iHIMll8fdjJmfCwkxWEJwNEt
+         67GD+4uk8OJ6AxO6wsW3wkTcedxBT6cAfThXzqgyJk65hioXSy3doLqviYQSbCGal5AK
+         RC5Riku5sLNRUUxZRyISfoDjyd7jJVjLHBDvb+8BzSKKTFiFEczDUM0YYnNRdgFbY2di
+         Gcow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SYZT81OlGTWcN0jtwAOfQIAD9I9KBu+11E308lphCzs=;
+        b=WItYxLVJywkf26g3QyB8LEsTn8+RmjZrKtYr1u5KSFDizsYoKfkO1M4Q5EIlifoMn4
+         4ZIZZO1J1zdbWukPTjBuSsMTxwglUD/HFedD0zMVEZlEAL1DP4kHty92mffpcOCyrr8k
+         J8qg4LAAaeLAMHibf9WyqQ9+wJT/GjLEe88zR4MIN7uN/N+vJhAEr3TbQWOsCRsgF55h
+         GOdaowXgVuBKB5cAHz5YsSENVznPq+Xb6aissktZgjgEyqrZNexd0AxtjaWitkmk4iiU
+         jHKmIc98Rw72+lZrynIacQ0g6+CRTn8HDy5g3nPSkLMxBg8cKRyWKOjG+seoEgvYZfPc
+         vi1g==
+X-Gm-Message-State: APjAAAUcxz5EihT6vqKG6x/5P3lyXLxy3abcCLTeaACY1I/o/I5NUNhO
+        96wYio1Gvqu1F0je6na/1KndSCkOC5a88r9JBK8=
+X-Google-Smtp-Source: APXvYqwXuqSbj5ohzeukl1xBHuo/YrbZyVjev+GucoEfhjDqyOSr523wsTmXEiyU2wVYlSy/dtYcApSWxjb6W7C4Kyk=
+X-Received: by 2002:aca:b1d5:: with SMTP id a204mr3817251oif.82.1581449279487;
+ Tue, 11 Feb 2020 11:27:59 -0800 (PST)
 MIME-Version: 1.0
+References: <1581402970-1781-1-git-send-email-ajay.kishore@intel.com>
+In-Reply-To: <1581402970-1781-1-git-send-email-ajay.kishore@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 11 Feb 2020 11:27:47 -0800
+Message-ID: <CABBYNZ+Fr629sA17x5wG-C=bGxVGyh=5OMgxp9gjCfkQKPEDqg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] obexd: Add initial support for MAP conversations
+To:     Ajay Kishore <ajay.kishore@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWF0aWFzLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hdGlh
-cyBLYXJodW1hYSA8bWF0aWFzLmthcmh1bWFhQGdtYWlsLmNvbT4NCj4gU2VudDogRnJpZGF5LCBK
-YW51YXJ5IDEwLCAyMDIwIDk6MjcgUE0NCj4gVG86IEtpc2hvcmUsIEFqYXkgPGFqYXkua2lzaG9y
-ZUBpbnRlbC5jb20+DQo+IENjOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1
-YmplY3Q6IFJlOiBbUEFUQ0ggdjIgNi82XSBkb2Mvb2JleC1hcGk6IFVwZGF0ZSBkb2N1bWVudGF0
-aW9uDQo+IA0KPiBIaSBBamF5LA0KPiANCj4gdGkgMjQuIGpvdWx1ay4gMjAxOSBrbG8gNy4yOSBB
-amF5IEtpc2hvcmUgKGFqYXkua2lzaG9yZUBpbnRlbC5jb20pIGtpcmpvaXR0aToNCj4gPg0KPiA+
-IFRoaXMgYWRkcyBkb2N1bWVudGF0aW9uIHdpdGggdGhlIGNvbnZlcnNhdGlvbiBsaXN0aW5nIGZl
-YXR1cmUNCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEFqYXkgS2lzaG9yZSA8YWpheS5raXNob3Jl
-QGludGVsLmNvbT4NCj4gU2lnbmVkLW9mZi1ieSBpc24ndCBuZWNlc3NhcnkgZm9yIEJsdWV6IHBh
-dGNoZXMuDQpSZW1vdmVkIGluIHRoZSBsYXRlc3QgcGF0Y2guDQo+IA0KPiA+IC0tLQ0KPiA+ICBk
-b2Mvb2JleC1hcGkudHh0IHwgOTQNCj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgOTQgaW5zZXJ0
-aW9ucygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RvYy9vYmV4LWFwaS50eHQgYi9kb2Mvb2Jl
-eC1hcGkudHh0IGluZGV4DQo+ID4gZjM5MzU1YS4uOGYyN2I0MCAxMDA2NDQNCj4gPiAtLS0gYS9k
-b2Mvb2JleC1hcGkudHh0DQo+ID4gKysrIGIvZG9jL29iZXgtYXBpLnR4dA0KPiA+IEBAIC04OTIs
-MyArODkyLDk3IEBAIFByb3BlcnRpZXMgc3RyaW5nIEZvbGRlciBbcmVhZG9ubHldDQo+ID4gICAg
-ICAgICAgICAgICAgIGJvb2xlYW4gUHJvdGVjdGVkIFtyZWFkb25seV0NCj4gPg0KPiA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgIE1lc3NhZ2UgcHJvdGVjdGVkIGZsYWcNCj4gPiArDQo+ID4gK0Nv
-bnZlcnNhdGlvbiBBY2Nlc3MgaGllcmFyY2h5DQo+ID4gKz09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PQ0KPiA+ICsNCj4gPiArU2VydmljZSAgICAgICAgICAgICAgICBvcmcuYmx1ZXoub2Jl
-eA0KPiA+ICtJbnRlcmZhY2UgICAgICBvcmcuYmx1ZXoub2JleC5Db252ZXJzYXRpb24xDQo+ID4g
-K09iamVjdCBwYXRoICAgIFtTZXNzaW9uIG9iamVjdCBwYXRoXQ0KPiA+ICsNCj4gPiArTWV0aG9k
-cyAgICAgICAgICAgICAgICBhcnJheXtvYmplY3QsIGRpY3R9IExpc3RDb252ZXJzYXRpb25zKHN0
-cmluZyBmb2xkZXIsIGRpY3QNCj4gZmlsdGVyKQ0KPiBJIHRoaW5rIHRoaXMgZG9lcyBub3QgcXVp
-dGUgbWF0Y2ggdGhlIGltcGxlbWVudGF0aW9uLiBJIHRoaW5rIExpc3RDb252ZXJzYXRpb24NCj4g
-YmVsb25ncyB0byBNZXNzYWdlQWNjZXNzMSBpbnRlcmZhY2UuIENvbnZlcnNhdGlvbjEgaW50ZXJm
-YWNlIGhhcyBzaW1pbGFyDQo+IG1ldGhvZCB0aGFuIE1lc3NhZ2UxIGludGVyZmFjZS4NClRoYW5r
-cyBmb3IgcG9pbnRpbmcgdGhpcyBvdXQuIEkgYWdyZWUgd2l0aCB5b3VyIHBvaW50LiANCkkgaGF2
-ZSBpbmNvcnBvcmF0ZWQgdGhlIGNoYW5nZXMgIGFuZCBwdXNoZWQgdGhlIGxhdGVzdCBwYXRjaC4N
-Cj4gDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgUmV0dXJucyBhbiBhcnJheSBjb250YWlu
-aW5nIHRoZSBjb252ZXJzYXRpb25zIGZvdW5kIGluIHRoZQ0KPiA+ICsgICAgICAgICAgICAgICAg
-ICAgICAgIGdpdmVuIHN1YmZvbGRlciBvZiB0aGUgY3VycmVudCBmb2xkZXIsIG9yIGluIHRoZSBj
-dXJyZW50DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgZm9sZGVyIGlmIGZvbGRlciBpcyBl
-bXB0eS4NCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgUG9zc2libGUgRmlsdGVy
-czogTWF4TGlzdENvdW50LCBMYXN0QWN0aXZpdHlCZWdpbiwNCj4gTGFzdEFjdGl2aXR5RW5kLA0K
-PiA+ICsgICAgICAgICAgICAgICAgICAgICAgIFJlYWRTdGF0dXMsIFJlY2lwaWVudA0KPiA+ICsN
-Cj4gPiArICAgICAgICAgICAgICAgUHJvcGVydGllczoNCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgICBzdHJpbmcgaWQ6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgQ29udmVyc2F0aW9uIHVuaXF1ZSBpZGVudGlmaWNhdGlvbg0KPiA+ICsNCj4gPiArICAgICAg
-ICAgICAgICAgICAgICAgICBzdHJpbmcgbmFtZToNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBDb252ZXJzYXRpb24gbmFtZQ0KPiA+ICsNCj4gPiArICAgICAgICAg
-ICAgICAgICAgICAgICBzdHJpbmcgbGFzdF9hY3Rpdml0eToNCj4gPiArDQo+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBDb252ZXJzYXRpb24gdGltZXN0YW1wIGZvciB0aGUgbGFz
-dA0KPiA+ICsgYWN0aXZpdHkNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgYm9v
-bGVhbiByZWFkX3N0YXR1czoNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBDb252ZXJzYXRpb24gcmVhZCBmbGFnDQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAg
-ICAgICAgIHN0cmluZyB2ZXJzaW9uX2NvdW50ZXI6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgMTI4IGJpdHMgdmVyc2lvbiBjb3VudGVyLg0KPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgVGhlICdDb252ZXJzYXRpb24tTGlzdGluZyBWZXJzaW9u
-IENvdW50ZXInLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJ0NvbnZlcnNh
-dGlvbiBWZXJzaW9uIENvdW50ZXInLCBhbmQgJ0ZvbGRlcg0KPiA+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgVmVyc2lvbiBDb3VudGVyJyBhcmUgdXNlZCB0byBkZXRlY3QgaWYgc29t
-ZXRoaW5nDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBoYXMgY2hhbmdlZA0K
-PiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBzdHJpbmcgc3VtbWFyeToNCj4gPiAr
-DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBDb252ZXJzYXRpb24gc3VtbWFy
-eQ0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBzdHJpbmcgZGlzcGxheToNCj4g
-PiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBDb252ZXJzYXRpb24gcGFy
-dGljaXBhbnRzIG5hbWUNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgc3RyaW5n
-IGNoYXRfc3RhdGU6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-Q29udmVyc2F0aW9uIGN1cnJlbnQgY2hhdCBzdGF0ZSBvZiB0aGUNCj4gPiArIHBhcnRpY2lwYW50
-cw0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBzdHJpbmcgcHJlc2VuY2VfYXZh
-aWxhYmlsaXR5Og0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIENv
-bnZlcnNhdGlvbiAgcGFydGljaXBhbnRzDQo+ID4gKyBhdmFpbGFiaWxpdHkNCj4gPiArDQo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgICAgc3RyaW5nIHByZXNlbmNlX3RleHQ6DQo+ID4gKw0KPiA+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVXNlciBkZWZpbmVkIHN0YXR1cyBvZiB0
-aGUNCj4gPiArIGNvbnZlcnNhdGlvbg0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAg
-ICB1aW50MTYgcHJpb3JpdHk6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgQ29udmVyc2F0aW9uIHBhcnRpY2lwYW50IHByaW9yaXR5DQo+ID4gKw0KPiA+ICsgICAg
-ICAgICAgICAgICBQb3NzaWJsZSBlcnJvcnM6IG9yZy5ibHVlei5vYmV4LkVycm9yLkludmFsaWRB
-cmd1bWVudHMNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBvcmcuYmx1ZXou
-b2JleC5FcnJvci5GYWlsZWQNCj4gPiArDQo+ID4gKw0KPiA+ICtGaWx0ZXI6ICAgICAgICAgICAg
-ICAgIHVpbnQxNiBNYXhMaXN0Q291bnQ6DQo+IFNob3VsZG4ndCB0aGlzIGJlIE1heENvdW50Pw0K
-PiANCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgTWF4aW11bSBudW1iZXIgb2Yg
-aXRlbXMgaW4gdGhlIGNvbnZlcnNhdGlvbnMuDQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICBz
-dHJpbmcgTGFzdEFjdGl2aXR5QmVnaW46DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAg
-ICAgIEZpbHRlciBjb252ZXJzYXRpb25zIGJ5IHN0YXJ0aW5nIHBlcmlvZC4NCj4gPiArDQo+ID4g
-KyAgICAgICAgICAgICAgICAgICAgICAgUG9zc2libGUgdmFsdWVzOiBEYXRlIGluICJZWVlZTU1E
-RFRISE1NU1MiIGZvcm1hdC4NCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgIHN0cmluZyBMYXN0
-QWN0aXZpdHlFbmQ6DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIEZpbHRlciBj
-b252ZXJzYXRpb25zIGJ5IGVuZGluZyBwZXJpb2QuDQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgICAgIFBvc3NpYmxlIHZhbHVlczogRGF0ZSBpbiAiWVlZWU1NRERUSEhNTVNTIiBmb3Jt
-YXQuDQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICBib29sZWFuIFJlYWRTdGF0dXM6DQo+ID4g
-Kw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIEZpbHRlciBjb252ZXJzdGlvbnMgYnkgcmVh
-ZCBmbGFnLg0KPiA+ICsNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICBQb3NzaWJsZSB2YWx1
-ZXM6IFRydWUgZm9yIHJlYWQgb3IgRmFsc2UgZm9yDQo+ID4gKyB1bnJlYWQNCj4gPiArDQo+ID4g
-KyAgICAgICAgICAgICAgIHN0cmluZyBSZWNpcGllbnQ6DQo+ID4gKw0KPiA+ICsgICAgICAgICAg
-ICAgICAgICAgICAgIEZpbHRlciBjb252ZXJzYXRpb25zIGJ5IGNvbnZlcnNhdGlvbi1yZWNpcGll
-bnQuDQo+ID4gLS0NCj4gPiAyLjcuNA0KPiA+DQo+IA0KPiBCZXN0IHJlZ2FyZHMsDQo+IE1hdGlh
-cyBLYXJodW1hYQ0KDQpUaGFua3MuDQpBamF5DQo=
+Hi Ajay,
+
+On Mon, Feb 10, 2020 at 11:32 PM Ajay Kishore <ajay.kishore@intel.com> wrote:
+>
+> Changes made to add a new method for MAP conversation listing i.e
+> "ListConversations" to handle conversation listing object
+> "x-bt/MAP-convo-listing".
+> ---
+>  obexd/client/map.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 67 insertions(+)
+>
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 550c5af..adf62d9 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -1560,6 +1560,69 @@ static DBusMessage *map_list_messages(DBusConnection *connection,
+>         return get_message_listing(map, message, folder, apparam);
+>  }
+>
+> +static GObexApparam *parse_conversation_filters(GObexApparam *apparam,
+> +                                                       DBusMessageIter *iter)
+> +{
+> +       DBusMessageIter array;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
+> +               DBG("Not of type array");
+> +               return NULL;
+> +       }
+> +
+> +       dbus_message_iter_recurse(iter, &array);
+> +
+> +       while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
+> +               const char *key;
+> +               DBusMessageIter value, entry;
+> +
+> +               dbus_message_iter_recurse(&array, &entry);
+> +               dbus_message_iter_get_basic(&entry, &key);
+> +
+> +               dbus_message_iter_next(&entry);
+> +               dbus_message_iter_recurse(&entry, &value);
+> +
+> +               /* TODO: Parse conversation filters */
+> +
+> +               dbus_message_iter_next(&array);
+> +       }
+> +       return apparam;
+> +}
+> +
+> +static DBusMessage *map_list_conversations(DBusConnection *connection,
+> +                                               DBusMessage *message,
+> +                                               void *user_data)
+> +{
+> +       struct map_data *map = user_data;
+> +       const char *folder;
+> +       GObexApparam *apparam;
+> +       DBusMessageIter args;
+> +
+> +       dbus_message_iter_init(message, &args);
+> +
+> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
+> +               return g_dbus_create_error(message,
+> +                       ERROR_INTERFACE ".InvalidArguments", NULL);
+> +
+> +       dbus_message_iter_get_basic(&args, &folder);
+> +
+> +       apparam = g_obex_apparam_set_uint16(NULL, MAP_AP_MAXLISTCOUNT,
+> +                                                       DEFAULT_COUNT);
+> +       apparam = g_obex_apparam_set_uint16(apparam, MAP_AP_STARTOFFSET,
+> +                                                       DEFAULT_OFFSET);
+> +
+> +       dbus_message_iter_next(&args);
+> +
+> +       if (parse_conversation_filters(apparam, &args) == NULL) {
+> +               g_obex_apparam_free(apparam);
+> +               return g_dbus_create_error(message,
+> +                       ERROR_INTERFACE ".InvalidArguments", NULL);
+> +       }
+> +
+> +       /*TODO: Return conversation listing */
+> +       return NULL;
+> +}
+> +
+>  static char **get_filter_strs(uint64_t filter, int *size)
+>  {
+>         char **list, **item;
+> @@ -1817,6 +1880,10 @@ static const GDBusMethodTable map_methods[] = {
+>                         GDBUS_ARGS({ "folder", "s" }, { "filter", "a{sv}" }),
+>                         GDBUS_ARGS({ "messages", "a{oa{sv}}" }),
+>                         map_list_messages) },
+> +       { GDBUS_ASYNC_METHOD("ListConversations",
+> +                       GDBUS_ARGS({ "folder", "s" }, { "filter", "a{sv}" }),
+> +                       GDBUS_ARGS({ "conversations", "a{oa{sv}}" }),
+> +                       map_list_conversations) },
+>         { GDBUS_METHOD("ListFilterFields",
+>                         NULL,
+>                         GDBUS_ARGS({ "fields", "as" }),
+> --
+> 2.7.4
+
+I see some mix of v2 and v3 patches, I recommend updating the whole
+set to v3 to make easier to review.
+
+
+-- 
+Luiz Augusto von Dentz
