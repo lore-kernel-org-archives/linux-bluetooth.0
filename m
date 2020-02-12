@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBBBC352A4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Feb 2020 19:49:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD4FC352A4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Feb 2020 19:50:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6476B2467B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Feb 2020 19:49:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00DA324671
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Feb 2020 19:50:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="djvwU+Rt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="YbFm2LNA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728767AbgBLTtU (ORCPT
+        id S1729051AbgBLTuI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Feb 2020 14:49:20 -0500
-Received: from gateway36.websitewelcome.com ([192.185.188.18]:40248 "EHLO
-        gateway36.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727439AbgBLTtU (ORCPT
+        Wed, 12 Feb 2020 14:50:08 -0500
+Received: from gateway33.websitewelcome.com ([192.185.146.68]:11330 "EHLO
+        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728767AbgBLTuI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Feb 2020 14:49:20 -0500
-X-Greylist: delayed 1233 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Feb 2020 14:49:19 EST
-Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
-        by gateway36.websitewelcome.com (Postfix) with ESMTP id 168F140955E0A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2020 12:42:49 -0600 (CST)
+        Wed, 12 Feb 2020 14:50:08 -0500
+X-Greylist: delayed 1474 seconds by postgrey-1.27 at vger.kernel.org; Wed, 12 Feb 2020 14:50:07 EST
+Received: from cm10.websitewelcome.com (cm10.websitewelcome.com [100.42.49.4])
+        by gateway33.websitewelcome.com (Postfix) with ESMTP id 957D5170F08
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Feb 2020 13:25:33 -0600 (CST)
 Received: from gator4166.hostgator.com ([108.167.133.22])
         by cmsmtp with SMTP
-        id 1xgjj0ha9RP4z1xgjjSKhS; Wed, 12 Feb 2020 13:28:45 -0600
+        id 1xddjW7urEfyq1xddjfpjT; Wed, 12 Feb 2020 13:25:33 -0600
 X-Authority-Reason: nr=8
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
@@ -37,25 +37,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
         :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
         List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=GLQRqO9qBiBgvx5iIVYH7SAy6igUj4/Se4YJcTpd4Uc=; b=djvwU+RtA4hzE8ETixJL+QtaCH
-        DPmZeGdoGlryypEb/bZCGw85EkV5aOI+Up5JbbulEpxubacWLqiFETsw/YNFcVRYLqQbU5IhyHsqo
-        kqNxXDv9fpX9wCISf9bryT4alB2hy2cSFa3wMR71d1NFIxqAhB+J6iriahyU2E78HGQNpY03FbTDY
-        SaR6BOe8aQ4aQcdXNFgGz+L0eRwxTre5U8iPSDK6K4RvPoj5Zczt+XfiKvaXrDxhxJsZ5n0HaX4Nk
-        HgmoAioHcPEO+HJv7rugmZWVCw0D2zgYafZ10TRCRDCEf94Y95j3/1n+T4DopDWUu4dl+2mcxz/zY
-        i+/Sqqkw==;
-Received: from [201.144.174.25] (port=14408 helo=embeddedor)
+        bh=Yw0TNGO/aORoCtmP+MBqxiUhZyXSWK2un4Zm/19bNpU=; b=YbFm2LNA/HB7hYDqEuTGCOkYQC
+        bxST4UXDTm2HiZ4KgZl0BUnokuStDzILXMNwzOR7Ffy1ccPO3Jb8gDtS+FpUBfJecTjO/+MybiDam
+        rjOfb7yjeib2GOEgFRqYBQLtlzl+0R6+yO2eVNwj5mRhUCs3Gey2PDisW6hJWv/+OmBQk1y6q4Xe+
+        EX0F882QfjId4sjDTN8NNHpCd8oDer37TlY+Ot0wtHJXsBcdDw92SzA+BotY8vnGGhVzs2Z2U3NJ+
+        DLyxaqZVFpcaFQAACEul6k6C3M6STZFQmYMo5i/DGsUnT/rk9XOdLtYLsrfk3Jldh5sXmYXediAcB
+        imq9A1Jg==;
+Received: from [201.144.174.25] (port=30860 helo=embeddedor)
         by gator4166.hostgator.com with esmtpa (Exim 4.92)
         (envelope-from <gustavo@embeddedor.com>)
-        id 1j1xgi-0016Mw-Gn; Wed, 12 Feb 2020 13:28:44 -0600
-Date:   Wed, 12 Feb 2020 13:31:19 -0600
+        id 1j1xdb-0014wK-SO; Wed, 12 Feb 2020 13:25:32 -0600
+Date:   Wed, 12 Feb 2020 13:28:07 -0600
 From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] Bluetooth: hci_intel: Replace zero-length array with
+Subject: [PATCH] Bluetooth: btintel: Replace zero-length array with
  flexible-array member
-Message-ID: <20200212193119.GA27048@embeddedor>
+Message-ID: <20200212192807.GA25300@embeddedor>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -68,13 +68,13 @@ X-AntiAbuse: Sender Address Domain - embeddedor.com
 X-BWhitelist: no
 X-Source-IP: 201.144.174.25
 X-Source-L: No
-X-Exim-ID: 1j1xgi-0016Mw-Gn
+X-Exim-ID: 1j1xdb-0014wK-SO
 X-Source: 
 X-Source-Args: 
 X-Source-Dir: 
-X-Source-Sender: (embeddedor) [201.144.174.25]:14408
+X-Source-Sender: (embeddedor) [201.144.174.25]:30860
 X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 15
+X-Email-Count: 7
 X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
 X-Local-Domain: yes
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -112,22 +112,29 @@ This issue was found with the help of Coccinelle.
 
 Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 ---
- drivers/bluetooth/hci_intel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btintel.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 31f25153087d..f1299da6eed8 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -49,7 +49,7 @@
- struct hci_lpm_pkt {
- 	__u8 opcode;
- 	__u8 dlen;
--	__u8 data[0];
-+	__u8 data[];
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 62e781a18bf0..6a0e2c5a8beb 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -376,13 +376,13 @@ struct ibt_cp_reg_access {
+ 	__le32  addr;
+ 	__u8    mode;
+ 	__u8    len;
+-	__u8    data[0];
++	__u8    data[];
  } __packed;
  
- struct intel_device {
+ struct ibt_rp_reg_access {
+ 	__u8    status;
+ 	__le32  addr;
+-	__u8    data[0];
++	__u8    data[];
+ } __packed;
+ 
+ static int regmap_ibt_read(void *context, const void *addr, size_t reg_size,
 -- 
 2.25.0
 
