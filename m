@@ -5,215 +5,149 @@ X-Spam-Level:
 X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D440C2BA83
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 18:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64857C352A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 19:09:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F34B222C2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 18:32:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31D0220656
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 19:09:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fq0tSyNw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N8KqyjG/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728023AbgBMSc5 (ORCPT
+        id S1727076AbgBMTJE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Feb 2020 13:32:57 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35660 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbgBMSc5 (ORCPT
+        Thu, 13 Feb 2020 14:09:04 -0500
+Received: from mail-ot1-f47.google.com ([209.85.210.47]:46629 "EHLO
+        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726282AbgBMTJE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Feb 2020 13:32:57 -0500
-Received: by mail-wr1-f67.google.com with SMTP id w12so7949903wrt.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2020 10:32:55 -0800 (PST)
+        Thu, 13 Feb 2020 14:09:04 -0500
+Received: by mail-ot1-f47.google.com with SMTP id g64so6627148otb.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2020 11:09:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=nQ1O54l/xJoKtZAHjl/ZHrEcTWofgNpjma9R21hQbe4=;
-        b=Fq0tSyNwt4zsLvpuJ38pHkmkFWJBAweoWjmcKy4s6y8cy6xE9B9Ivw9yJ4XTL9zQkj
-         MlQ8NcJbalHXJUEAzFRc43XuR+W++DcQSGOwYZGlK3jY4ClC0CjJPluVgseGDfhm4HzV
-         4HB0Z3oYxuEVIl+/brm0izoHAg9vkPrl8GISm+50RTtRWlYzvg6kIMl3qZvQALb8PKWF
-         n0WSwO/4dyUr0kvOQ1qrgqYLVl2ntNQ9YXNH33VYXVHbxOnfCOnoNegb90Ye2BOjCY3K
-         6in559lrMep2SFeOYPkc/k2eC3v4iSQ6DchLZFvnRU31dRFf64p5dNQvpX44nwHyGDIM
-         v1DQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=VpGQXJ0lqvwrRUjBsBfcl7cSBVI95lG/qE06ZEw0TWs=;
+        b=N8KqyjG/o5gDdunbEZxpwvdQLANR0CAA/8JPl5WmbRuVSceJkY/p9kDvE+HyMHo5ni
+         L0qruZvPcC2ukFW+/Y8RIMLhjD2ZbBNhtrUMBmQdR+w1xj/Ser/0hR0lyEtRoxzPLJFE
+         UVyQ/hk5x7upodJv+SjaEV7BAHkG5PUmxyPFZ4+FjjuzY3MqvPznxhB5iPbcTzA+j7SN
+         z+YuQNfNlqaYNwgaH8uhxTNXLAKu8ioVI8X1Ydvsu0NOQ8BIcC2r9JmyVaQlROPVmr3s
+         HbTpE96GLHS4Vid/xHaKmM9hrf8t//BaXl9geT3/L/jf3BXrDuXYzdUVJTY6SVTQKZfb
+         eK2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=nQ1O54l/xJoKtZAHjl/ZHrEcTWofgNpjma9R21hQbe4=;
-        b=IHbaqX9YI+y8EjamWTi+1g7JXncjdNn4Q7nrqwGL5Zj5QhRAv9wWP68ShVvC0ebIir
-         B8NGxtyWN++TecsG1NmEw+7ddQmLUvAe+0MRDPq3/pDT0Q/82dXWSgSdMeru7U/TQ2LZ
-         4XFu8TSdIq3vq2xGOCUhUdRn5NnwLooxE8Al7uM/c9tBp5HG3bVnAD1WM7BcYyT/51K5
-         vFXuu1unW3WqUjQ1maeQGg5mD9VOt31BdadwcP4mTPfQ0RGrLQIVPSr9EeN9fW7yugxE
-         jSqcI4hyyaiMku8yz88iATBX2yOPhBCB6Msd4Czt4qg5Ge1ltPHHHH+75KRhx+LfQfr6
-         Sy6A==
-X-Gm-Message-State: APjAAAVRlDeBhgJ3kWlFXH3Xw7VQAr5w1PqU6DPmUPaHJJs20ifid5jJ
-        jKRjcaUbw3lFHG0Mca0vrxzXtdqm
-X-Google-Smtp-Source: APXvYqyYVpp14JrlB95imf7znV2ZQlZn89dHM+lhTR8di95r2HIqCXNw78aNiXZueqqQcEnMXJqOtw==
-X-Received: by 2002:adf:afd2:: with SMTP id y18mr856600wrd.90.1581618774660;
-        Thu, 13 Feb 2020 10:32:54 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id 25sm4118723wmi.32.2020.02.13.10.32.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Feb 2020 10:32:54 -0800 (PST)
-Date:   Thu, 13 Feb 2020 19:32:53 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Denis Kenzior <denkenz@gmail.com>
-Cc:     ofono@ofono.org, linux-bluetooth@vger.kernel.org
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VpGQXJ0lqvwrRUjBsBfcl7cSBVI95lG/qE06ZEw0TWs=;
+        b=QfcMHw46kEn038itYDthT6i8nrWB/GT+V8CiG4ppetmAYvly5YQx+plqCwJMvRFfd1
+         NaZzxe/QEaSbklZBmMR2QapCsZbPxqy7ziC6rQoK1Iaozw5GTbvplWsv3w9MWZnRDCuz
+         I+wk9dj0iYA/tGqDwCmWIivVXOX369G0af5QpoMyqUnpYLjyAEvCZk8Qgqae+OKOSDiL
+         LvoLuHYjDLupcDZ7QC6kg35BT2lDJjQVZMqbBGstC+RPtmhMLwz9++CfafXEF18KYfje
+         GWDkVEHa6aO+2r2WuZ0sZ6gfogQvkub8/Ixk9DHafpcbyv9jXNvEgJ6UGAFEKrqank/3
+         smmQ==
+X-Gm-Message-State: APjAAAVmlL7r80s9WsPD4weEHu1RNScR9l5KNHw7l+nC0oCt1dhfPVa7
+        CU1geujwSeZZp1I2ZudwJ3p9KdGG
+X-Google-Smtp-Source: APXvYqy+LkxpeK/KWZHxy8l8M7qySrdf4NVq7hDIDK1MPhhkMAaFmaaQRQTLfCWm1F/RYtZhoN+ecg==
+X-Received: by 2002:a05:6830:1615:: with SMTP id g21mr15112938otr.49.1581620942226;
+        Thu, 13 Feb 2020 11:09:02 -0800 (PST)
+Received: from [192.168.1.249] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id m22sm1088198otj.3.2020.02.13.11.09.00
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 13 Feb 2020 11:09:01 -0800 (PST)
 Subject: Re: HSP/HFP ofono bluetooth support for Linux desktop
-Message-ID: <20200213183253.44vkm6bpddre4dvp@pali>
+To:     =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali.rohar@gmail.com>
+Cc:     ofono@ofono.org, linux-bluetooth@vger.kernel.org
 References: <20200107192311.efit6zftt27encdc@pali>
  <721332d3-336a-b9d2-f8cd-72da785fb9dc@gmail.com>
  <20200108212537.zs6pesil2vjguvu6@pali>
  <57639029-7588-956b-8e3c-a2a6ed11b758@gmail.com>
  <20200213174621.e2q4ryu36p5ericx@pali>
  <6679dd2b-4780-e44f-b86d-28cf65638888@gmail.com>
+ <20200213183253.44vkm6bpddre4dvp@pali>
+From:   Denis Kenzior <denkenz@gmail.com>
+Message-ID: <77397684-1c15-854e-b88b-4adff6f73ada@gmail.com>
+Date:   Thu, 13 Feb 2020 13:08:56 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <20200213183253.44vkm6bpddre4dvp@pali>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6679dd2b-4780-e44f-b86d-28cf65638888@gmail.com>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thursday 13 February 2020 12:14:06 Denis Kenzior wrote:
-> Hi Pali,
+Hi Pali,
+
+On 2/13/20 12:32 PM, Pali Rohár wrote:
+>> At the time this was all done in software.
 > 
-> > Used by who? Gateway role is fully broken and client (hfp) role is used
+> CVSD was never done in software. Always in hardware. As said, even now I
+> was not able to find bluetooth HW which would allow to do CVSD in software.
+>
+
+I don't remember the exact details.  I seem to remember that for mSBC 
+the conversion was being done on the host and no 'on-the-fly' conversion 
+was done in hardware.  Thus this host codec negotiation was not needed / 
+considered.
+
+https://lists.ofono.org/hyperkitty/list/ofono@ofono.org/message/6CUFGDPUJBRIZA4GUVFD2EPOET25XTN3/
+
+>> So how do you negotiate the 'AgentCodec'?  Does BlueZ expose this
+>> information?  If so, how? SCO socket option or ...?
 > 
-> I guess that depends on your perspective.  I've already pointed out that the
-> desktop 'AG' use case was never something we needed to implement. If you
-> want to fix oFono to do that, great.  If you want to write your own daemon
-> to do this, also great.
+> It is done by HCI commands, therefore by kernel. There is discussion for
+> exporting userspace <--> kernel API to allow setting arbitrary
+> configurations for codecs supported by bluetooth HW.
 > 
-> > probably only by some power users. Also there is no support for mSBC in
-> > pusleaudio.
+> Getting list of supported codecs can be done by this script:
+> https://github.com/pali/hsphfpd-prototype/blob/prototype/sco_features.pl
+> (needs to be run as root)
+
+So you might want to get BlueZ guys to expose this info properly first. 
+oFono is not in the business of opening raw hci sockets.
+
+>> Isn't the MTU obtained from the SCO socket itself?  How is oFono at fault
+>> here?
 > 
-> Why is oFono at fault for this?  Genuine question.  What are the roadblocks
-> to mSBC support?
+> Yes, via some ioctl it can be done. But bluez for other bluetooth
+> profiles provides this information via dbus API. As bluez does not
+> support HSP/HFP it expects that software which implement it, provide
+> needed info
 
-Because does not provide needed API.
+Only PA (or whatever implements the audio agent) really cares about this 
+info and it can obtain it via getsockopt.  So I really don't see why the 
+MTU should be exposed via D-Bus.  And this is why it wasn't.  I don't 
+see an issue here...?
 
-> > 
-> > So, no, really it is not used.
-> > 
-> > > > Main objection for handsfree-audio-api.txt is that it does not provide
-> > > > information about locally used codec and somehow mixes air codec and
-> > > > local codec. In my hsphfpd.txt I used term "AgentCodec" for bluetooth
-> > > > local codec and term "AirCodec" for bluetooth air codec format.
-> > > 
-> > > Okay.  But, just FYI, at the time there was no hw that could do such
-> > > on-the-fly conversions, so this use case wasn't considered/implemented.
-> > 
-> > This cannot be truth as probably every bluetooth HW is doing on-the-fly
-> > conversion between CVSD and PCM. I was not able to find HW which allows
-> > me to send raw CVSD samples...
+>>
+>> This seems to be a kernel / device driver / firmware  issue and should be
+>> solved at that level.
 > 
-> At the time this was all done in software.
+> Why??? It is up to the application which owns SLC socket and this
+> application needs to provide API for it. Codecs are negotiated via AT
+> commands, so again only HFP / HSP daemon can do it.
 
-CVSD was never done in software. Always in hardware. As said, even now I
-was not able to find bluetooth HW which would allow to do CVSD in software.
+So in my opinion it is really up to the kernel to tell us whether a 
+given hardware supports wideband speech.  So any quirks need to go into 
+the kernel.  Then userspace can select the best available codec 
+automatically without resorting to having the user twiddle some settings.
 
-> Alternatively, the hardware was
-> directly wired between the sound card / modem and the bluetooth chip.  So
-> just opening the SCO socket was enough.
-> 
-> > > True.  In retrospect we probably should have used strings.  But it was
-> > > assumed that vendor extensions would go via the Bluetooth SIG Assigned
-> > > Numbers facility.  Anyhow, we can always add a 'Register2' method that could
-> > > take codecs as a string array or a combination of strings & ints. And if
-> > > Register2 was used, then use 'NewConnection2' with a signature that supports
-> > > passing in vendor codecs and whatever else that might be needed.
-> > 
-> > This is still not enough. Audio application (e.g. pulseaudio) need to
-> > register AgentCodec, not AirCodec. And current API is somehow mixed.
-> > Audio application needs to know what is the format which bluetooth chip
-> > sends to userspace (PCM? mSBC? CVSD? PCMA? AuriStream?) and which format
-> > bluetooth chip expects. I named this AgentCodec.
-> 
-> So how do you negotiate the 'AgentCodec'?  Does BlueZ expose this
-> information?  If so, how? SCO socket option or ...?
+> So, why should I even consider to use ofono at all? It does not support
+> none of above desktop feature, it does not support extended codecs, it
+> does not support HSP profile and also it does not support HFP profile
+> without physical modem (majority of desktops and laptops).
 
-It is done by HCI commands, therefore by kernel. There is discussion for
-exporting userspace <--> kernel API to allow setting arbitrary
-configurations for codecs supported by bluetooth HW.
+Your initial proposal wanted to use oFono as some sort of helper for 
+your daemon, and that is just not going to be accepted by oFono 
+upstream.  I gave you a few alternatives, including how to extend oFono 
+to do what you want.  If you want to roll your own, go for it.
 
-Getting list of supported codecs can be done by this script:
-https://github.com/pali/hsphfpd-prototype/blob/prototype/sco_features.pl
-(needs to be run as root)
-
-> > > > And also API does not provide socket MTU information or ability to
-> > > > change/specify which codec would be used.
-> > > 
-> > > There was no need, we automatically defaulted to using Wide band if
-> > > available.  Third party codecs are a new use case (for oFono HFP), so would
-> > > require an API extension.
-> > 
-> > MTU is needed also for mSBC codec if encoding is done in software
-> > (pulseaudio). Without it, this wide band support in ofono is unusable
-> > for pulseaudio.
-> 
-> Isn't the MTU obtained from the SCO socket itself?  How is oFono at fault
-> here?
-
-Yes, via some ioctl it can be done. But bluez for other bluetooth
-profiles provides this information via dbus API. As bluez does not
-support HSP/HFP it expects that software which implement it, provide
-needed info.
-
-> > 
-> > And also API extension for choosing codec. Also for choosing if software
-> > of hardware encoding would be used. We know that there are lot of broken
-> > devices in different way and it is really needed for either blacklist
-> > some codec or switch between hw and sw encoding if something strange
-> > happen. Without it pulseaudio is not going to support more codes then
-> > default required (CVSD).
-> 
-> This seems to be a kernel / device driver / firmware  issue and should be
-> solved at that level.
-
-Why??? It is up to the application which owns SLC socket and this
-application needs to provide API for it. Codecs are negotiated via AT
-commands, so again only HFP / HSP daemon can do it.
-
-> > 
-> > > > 
-> > > > Non-audio APIs which are needed to export (for both HSP and HFP profiles):
-> > > > 
-> > > > * battery level (0% - 100%)
-> > > > * power source (external, battery, unknown)
-> > > > * ability to send "our laptop" battery level and power source to remote device
-> > > > * send text message to embedded display
-> > > > * process button press event (exported via linux kernel uinput)
-> > > > 
-> > > 
-> > > I think all of these are feasible to support under the current oFono
-> > > structure, either via plugins or API extensions.
-> > 
-> > Ok. Are you going to implement them?
-> > I think that all of these are missing parts in ofono and something which
-> > is needed to be implemented for desktop/laptop HSP and HFP profile
-> > support.
-> > 
-> 
-> There are no plans to do this at the moment.
-
-So, why should I even consider to use ofono at all? It does not support
-none of above desktop feature, it does not support extended codecs, it
-does not support HSP profile and also it does not support HFP profile
-without physical modem (majority of desktops and laptops).
-
-Please, do not take me wrong but after 2.5 months long discussion I just
-see that ofono does not support needed parts, there are no plans for it
-and everything needed is already designed and implemented in my prototype
-hsphfpd daemon.
-
--- 
-Pali Rohár
-pali.rohar@gmail.com
+Regards,
+-Denis
