@@ -2,153 +2,225 @@ Return-Path: <SRS0=+UdQ=4B=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F8DC3B18D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 21:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE06C352A3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 23:04:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A44424650
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 21:54:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIiVq9sN"
+	by mail.kernel.org (Postfix) with ESMTP id 9B86421734
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Feb 2020 23:04:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbgBMVyy (ORCPT
+        id S1727571AbgBMXEo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Feb 2020 16:54:54 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36926 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727845AbgBMVyy (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Feb 2020 16:54:54 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a6so8481400wme.2;
-        Thu, 13 Feb 2020 13:54:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=cc:references:subject:to:date:mime-version
-         :content-transfer-encoding:from:message-id:in-reply-to:user-agent;
-        bh=/H25Ntzq5GhZEzxDEWAUk2cWpXoHsQi11PWiKlH9h+Q=;
-        b=XIiVq9sNfiYBWhXPTTeOa3mYbejzfH7yYAutDvrsHNEnutkNt7xRJTbj8dw1e54jc+
-         Bu7ps6byEMh/oKpRo7PRH8jaC92i5V3dn+cu8EDfJUXaLK8pAeFZerZULXNQTMgc0cPU
-         SDR6OCQFjdSWNEXqeHbSEU9Oh4ka2EWhB64frK701HPWWfxc5oXi13oZtG0FHMZx91y4
-         mlesPlyk6jxf29dyfo/RrVnt5k2vykmvfZHi4HX3sh+VsxQR46jth8O1aQr1KD/IZOhN
-         8QPx8d47FliACI/KeJcEC43OLzGKBthKQn8tBc/RT30BtbVQv9tO9FqI7T2cMObVz02W
-         Fvjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:cc:references:subject:to:date:mime-version
-         :content-transfer-encoding:from:message-id:in-reply-to:user-agent;
-        bh=/H25Ntzq5GhZEzxDEWAUk2cWpXoHsQi11PWiKlH9h+Q=;
-        b=lZybpdNvnfs5VFJiErWZF/FqXoA71yjAGvPQjSxSk17ZACYzusSrePiiERi08JIqPe
-         FXQp/2pXoayQmThDWHbPYr+XpvtCWXaFykKP8NAj0QJmkEvQuaIBdVErp4pGi6oM4EU4
-         rOuQi6418BXcCUQchKuwZktZOF3nlMw9bsqrRVnWhB2+Pwd2ux65vSG0dCTDjAXfC2Jd
-         2v8fXiCKYzJp39MbYLW155DhWUl++jVYI7lEQF15xTjVq1USNiJRESB55gdXFRDtg/hh
-         l2lcs9FRhb1qoq4ytgnWM94mKx/C4j7oW+57hUUp3RM6ChAUmZ2u+9NaBgZ9GxpsD30r
-         3zLQ==
-X-Gm-Message-State: APjAAAVcacbIcLPGsQa7VmPXa0PLUMy+GdHnM37GGamzhMOz+wP7ouPC
-        0lvZP3NIorQ6mBslEGehXno=
-X-Google-Smtp-Source: APXvYqyVMW6smrU7FD6oXdtce0CP9biKgdLpKNSQz+uQRf7dSWWgjiJm71lhuPW7eYKvWtgD3yw2AQ==
-X-Received: by 2002:a7b:cb97:: with SMTP id m23mr117151wmi.37.1581630892601;
-        Thu, 13 Feb 2020 13:54:52 -0800 (PST)
-Received: from supervisor.net28 ([46.53.250.234])
-        by smtp.gmail.com with ESMTPSA id s139sm4805306wme.35.2020.02.13.13.54.51
-        (version=TLS1 cipher=AES128-SHA bits=128/128);
-        Thu, 13 Feb 2020 13:54:52 -0800 (PST)
-Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
-Cc:     linux-bluetooth@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-wireless@vger.kernel.org
-References: <op.0fudjzcyhxa7s4@supervisor.net28>
- <20200211214705.GD16391@atomide.com> <op.0fuie5cdhxa7s4@supervisor.net28>
- <20200211232425.GE16391@atomide.com> <op.0fu85owhhxa7s4@supervisor.net28>
- <20200212150722.GF16391@atomide.com> <20200212162131.GI16391@atomide.com>
- <op.0fwkyxvihxa7s4@supervisor.net28> <20200213041112.GL16391@atomide.com>
- <op.0fw0oas5hxa7s4@supervisor.net28> <20200213161157.GN16391@atomide.com>
-Subject: Droid 4 WiFi firmware loading error
-To:     sre@kernel.org
-Date:   Fri, 14 Feb 2020 00:54:50 +0300
-MIME-Version: 1.0
+        Thu, 13 Feb 2020 18:04:44 -0500
+Received: from mga18.intel.com ([134.134.136.126]:31346 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726780AbgBMXEn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 13 Feb 2020 18:04:43 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Feb 2020 15:04:42 -0800
+X-IronPort-AV: E=Sophos;i="5.70,438,1574150400"; 
+   d="scan'208";a="347827816"
+Received: from han1-xps-13-9350.jf.intel.com ([10.54.74.61])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Feb 2020 15:04:42 -0800
+Message-ID: <d71649611135c6b7a1ab3a4e59ce3e05265f8470.camel@linux.intel.com>
+Subject: Re: [RFC v3] Bluetooth: Add debugfs option to enable runtime debug
+ statements
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 13 Feb 2020 15:03:31 -0800
+In-Reply-To: <AF6B4197-8AFE-429A-ACFB-14500A7D500F@holtmann.org>
+References: <20200203153603.61931-1-marcel@holtmann.org>
+         <AF6B4197-8AFE-429A-ACFB-14500A7D500F@holtmann.org>
+Organization: Intel Corporation
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-From:   "Arthur D." <spinal.by@gmail.com>
-Message-ID: <op.0fx4hozhhxa7s4@supervisor.net28>
-In-Reply-To: <20200213161157.GN16391@atomide.com>
-User-Agent: Opera Mail/12.16 (Linux)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello.
+Hi Marcel,
 
-Some users have reported that they have issues with WiFi firmware
-loading on Droid 4. The fragment of dmesg for the issue follows
-at the bottom of this mail.
+On Thu, 2020-02-13 at 08:27 +0100, Marcel Holtmann wrote:
+> Hi,
+> 
+> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> > ---
+> > include/net/bluetooth/bluetooth.h | 10 +++++
+> > net/bluetooth/Kconfig             |  7 +++
+> > net/bluetooth/af_bluetooth.c      |  2 +
+> > net/bluetooth/lib.c               | 73 +++++++++++++++++++++++++++++++
+> > 4 files changed, 92 insertions(+)
+> 
+> does anybody have any comments on this. It is not the final solution, but as
+> an interim it might be a good start.
+> 
 
-With the help of Tony Lindgren I have found that the root of the
-issue was Bluetooth firmware loaded before WiFi driver (wlcore).
-
-Now we need to change the kernel to make it load Bluetooth firmware
-only after WiFi firmware is loaded. So the bug will not be triggered.
-
-Any ideas on how it should be done?
-
-P.S. When I do "rmmod hci_uart" on Droid 4 device, I get something
-like endless loop of error reporting from kernel. The fragment of
-dmesg can be downloaded from https://dropmefiles.com/wCPMF
-I'm not sure where to report this one.
-
---
-Best regards, Arthur D.
+I did quick test and it worked fine. Below is the testing output.
+Let me know if need further testing..
 
 
-[   15.951904] ------------[ cut here ]------------
-[   16.028137] WARNING: CPU: 1 PID: 23 at
-drivers/net/wireless/ti/wlcore/sdio.c:78 wl12xx_sdio_raw_read+0xcc/0x15c
-[wlcore_sdio]
-[   16.211669] Modules linked in: omapdrm drm_kms_helper cfbfillrect
-syscopyarea cfbimgblt sysfillrect sysimgblt fb_sys_fops cfbcopyarea
-snd_soc_omap_hdmi wl12xx wlcore mac80211 panel_dsi_cm libarc4
-sha256_generic libsha256 sha256_arm cfg80211 joydev mousedev evdev
-pwm_vibra snd_soc_audio_graph_card ff_memless phy_generic
-snd_soc_simple_card_utils phy_mapphone_mdm6600(+) led_bl cpufreq_dt
-gpio_keys pwm_omap_dmtimer connector_hdmi omapdss omapdss_base
-omap4_keypad drm matrix_keymap drm_panel_orientation_quirks cec
-omap_mailbox omap_sham omap_aes_driver omap2430 ohci_platform ohci_hcd
-ehci_omap ehci_hcd st_accel_spi st_sensors_spi st_accel_i2c st_sensors_i2c
-st_accel st_sensors industrialio_triggered_buffer kfifo_buf omap_des
-libdes crypto_engine omap_crypto wlcore_sdio omap_hdq wire cn
-phy_cpcap_usb musb_hdrc cpcap_adc udc_core cpcap_battery usbcore
-usb_common rtc_cpcap cpcap_pwrbutton cpcap_charger phy_omap_usb2
-industrialio snd_soc_cpcap leds_cpcap atmel_mxt_ts hci_uart btbcm lm75
-[   16.211669]  leds_lm3532
-[   16.226989] systemd-journald[105]: Compressed data object 989 -> 808
-using LZ4
-[   17.050018]  hwmon led_class bluetooth ecdh_generic ecc libaes
-motorola_mdm n_gsm snd_soc_omap_mcbsp snd_soc_ti_sdma snd_soc_core
-snd_pcm_dmaengine snd_pcm snd_timer omap_wdt watchdog snd soundcore autofs4
-[   17.144073] phy-mapphone-mdm6600 usb-phy@1: Waiting for power up
-request to complete..
-[   17.255035] CPU: 1 PID: 23 Comm: kworker/1:1 Tainted: G
-W         5.5.0-00039-gadd2f906e747-dirty #23
-[   17.657806] Hardware name: Generic OMAP4 (Flattened Device Tree)
-[   17.657867] Workqueue: events request_firmware_work_func
-[   17.861297] [<c0112b88>] (unwind_backtrace) from [<c010cafc>]
-(show_stack+0x10/0x14)
-[   17.861297] [<c010cafc>] (show_stack) from [<c090753c>]
-(dump_stack+0xb4/0xd0)
-[   17.861450] [<c090753c>] (dump_stack) from [<c013aaf0>]
-(__warn+0xd0/0xf8)
-[   17.861450] [<c013aaf0>] (__warn) from [<c013abbc>]
-(warn_slowpath_fmt+0xa4/0xb4)
-[   17.861450] [<c013abbc>] (warn_slowpath_fmt) from [<bf1bf418>]
-(wl12xx_sdio_raw_read+0xcc/0x15c [wlcore_sdio])
-[   17.861633] [<bf1bf418>] (wl12xx_sdio_raw_read [wlcore_sdio]) from
-[<bf525074>] (wl12xx_get_mac+0x150/0x324 [wl12xx])
-[   17.861938] [<bf525074>] (wl12xx_get_mac [wl12xx]) from [<bf410380>]
-(wlcore_nvs_cb+0x250/0xad8 [wlcore])
-[   17.862121] [<bf410380>] (wlcore_nvs_cb [wlcore]) from [<eccfdb00>]
-(0xeccfdb00)
-[   17.868988] ---[ end trace b49285f1f3a91e50 ]---
-[   17.868988] wl1271_sdio mmc4:0001:2: sdio read failed (-110)
-[   17.869079] wlcore: ERROR couldn't get hw info
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# dmesg -c
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# cat debug_enable 
+N
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# echo 'Y' > debug_enable 
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# hciconfig -a
+hci0:	Type: Primary  Bus: USB
+	BD Address: 9C:DA:3E:F2:8E:46  ACL MTU: 1021:4  SCO MTU: 96:6
+	UP RUNNING 
+	RX bytes:1367 acl:0 sco:0 events:68 errors:0
+	TX bytes:3729 acl:0 sco:0 commands:68 errors:0
+	Features: 0xbf 0xfe 0x0f 0xfe 0xdb 0xff 0x7b 0x87
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH SNIFF 
+	Link mode: SLAVE ACCEPT 
+	Name: 'tester-VirtualBox'
+	Class: 0x0c0000
+	Service Classes: Rendering, Capturing
+	Device Class: Miscellaneous, 
+	HCI Version: 5.0 (0x9)  Revision: 0x100
+	LMP Version: 5.0 (0x9)  Subversion: 0x100
+	Manufacturer: Intel Corp. (2)
+
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# dmesg
+[  891.432216] Bluetooth: sock 00000000ec80bfe5
+[  891.432448] Bluetooth: cmd 800448d2 arg 565442b6c260
+[  891.432465] Bluetooth: channel 2 len 36
+[  891.432480] Bluetooth: cmd 800448d3 arg 565441d4b860
+[  891.432485] Bluetooth: 0
+[  891.432489] Bluetooth: hci0 orig refcnt 5
+[  891.432493] Bluetooth: hci0 orig refcnt 6
+[  891.434491] Bluetooth: sock 00000000a8d1e746
+[  891.434511] Bluetooth: sock 00000000a8d1e746 sk 00000000ea127ff9
+[  891.434514] Bluetooth: 0
+[  891.434517] Bluetooth: hci0 orig refcnt 5
+[  891.434527] Bluetooth: channel 2 len 36
+[  891.434538] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.434546] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.434558] Bluetooth: sock 00000000a8d1e746 sk 00000000ea127ff9
+[  891.434577] Bluetooth: hci0 cmd_cnt 1 cmd queued 1
+[  891.434584] Bluetooth: hci0 type 1 len 3
+[  891.434588] Bluetooth: hdev 00000000124fe225 len 3
+[  891.434593] Bluetooth: hci0
+[  891.532680] Bluetooth: intf 00000000ed2b072f
+[  891.532682] Bluetooth: intf 00000000600468f3
+[  891.532683] Bluetooth: hci0
+[  891.532696] Bluetooth: hci0
+[  891.532702] Bluetooth: hci0
+[  891.533095] Bluetooth: hci0 urb 0000000015f7b113 status 0 count 3
+[  891.534575] Bluetooth: hci0 urb 00000000f939b99d status 0 count 64
+[  891.535214] Bluetooth: hci0 urb 00000000f939b99d status 0 count 64
+[  891.535885] Bluetooth: hci0 urb 00000000f939b99d status 0 count 64
+[  891.536831] Bluetooth: hci0 urb 00000000f939b99d status 0 count 62
+[  891.536852] Bluetooth: hci0
+[  891.536854] Bluetooth: hdev 00000000124fe225 len 254
+[  891.536860] Bluetooth: hci0 Event packet
+[  891.536862] Bluetooth: hci0 status 0x00
+[  891.536864] Bluetooth: opcode 0x0c14 status 0x00
+[  891.536865] Bluetooth: hci0 opcode 0x0c14
+[  891.536880] Bluetooth: sock 00000000a8d1e746, sk 00000000ea127ff9
+[  891.536885] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.536905] Bluetooth: sock 00000000a8d1e746 sk 00000000ea127ff9
+[  891.536907] Bluetooth: channel 2 len 10
+[  891.536909] Bluetooth: hci0 orig refcnt 6
+[  891.536921] Bluetooth: sock 000000004b3ad07d
+[  891.536927] Bluetooth: sock 000000004b3ad07d sk 00000000ea127ff9
+[  891.536928] Bluetooth: 0
+[  891.536929] Bluetooth: hci0 orig refcnt 5
+[  891.536932] Bluetooth: channel 2 len 36
+[  891.536935] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.536937] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.536941] Bluetooth: sock 000000004b3ad07d sk 00000000ea127ff9
+[  891.536946] Bluetooth: hci0 cmd_cnt 1 cmd queued 1
+[  891.536948] Bluetooth: hci0 type 1 len 3
+[  891.536949] Bluetooth: hdev 00000000124fe225 len 3
+[  891.536950] Bluetooth: hci0
+[  891.537315] Bluetooth: hci0 urb 00000000bf489ae9 status 0 count 3
+[  891.537789] Bluetooth: hci0 urb 00000000f939b99d status 0 count 9
+[  891.537807] Bluetooth: hci0
+[  891.537808] Bluetooth: hdev 00000000124fe225 len 9
+[  891.537812] Bluetooth: hci0 Event packet
+[  891.537813] Bluetooth: hci0 status 0x00
+[  891.537814] Bluetooth: hci0 class 0x0c0000
+[  891.537816] Bluetooth: opcode 0x0c23 status 0x00
+[  891.537817] Bluetooth: hci0 opcode 0x0c23
+[  891.537827] Bluetooth: sock 000000004b3ad07d, sk 00000000ea127ff9
+[  891.537832] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.537853] Bluetooth: sock 000000004b3ad07d sk 00000000ea127ff9
+[  891.537855] Bluetooth: channel 2 len 10
+[  891.537856] Bluetooth: hci0 orig refcnt 6
+[  891.537865] Bluetooth: sock 00000000847c4083
+[  891.537870] Bluetooth: sock 00000000847c4083 sk 00000000ea127ff9
+[  891.537871] Bluetooth: 0
+[  891.537872] Bluetooth: hci0 orig refcnt 5
+[  891.537874] Bluetooth: channel 2 len 36
+[  891.537877] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.537879] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.537882] Bluetooth: sock 00000000847c4083 sk 00000000ea127ff9
+[  891.537886] Bluetooth: hci0 cmd_cnt 1 cmd queued 1
+[  891.537888] Bluetooth: hci0 type 1 len 3
+[  891.537889] Bluetooth: hdev 00000000124fe225 len 3
+[  891.537890] Bluetooth: hci0
+[  891.538149] Bluetooth: hci0 urb 00000000bf489ae9 status 0 count 3
+[  891.538822] Bluetooth: hci0 urb 00000000f939b99d status 0 count 14
+[  891.538854] Bluetooth: hci0
+[  891.538856] Bluetooth: hdev 00000000124fe225 len 14
+[  891.538862] Bluetooth: hci0 Event packet
+[  891.538864] Bluetooth: hci0 status 0x00
+[  891.538866] Bluetooth: opcode 0x1001 status 0x00
+[  891.538868] Bluetooth: hci0 opcode 0x1001
+[  891.538883] Bluetooth: sock 00000000847c4083, sk 00000000ea127ff9
+[  891.538889] Bluetooth: sk 00000000ea127ff9, opt 2
+[  891.538924] Bluetooth: sock 00000000847c4083 sk 00000000ea127ff9
+[  891.538927] Bluetooth: channel 2 len 10
+[  891.538930] Bluetooth: hci0 orig refcnt 6
+[  891.539051] Bluetooth: sock 00000000ec80bfe5 sk 0000000035240669
+[  891.539053] Bluetooth: channel 2 len 10
+[  893.959807] Bluetooth: intf 00000000600468f3
+[  893.961620] Bluetooth: hci0 urb 00000000f939b99d status -2 count 0
+[  893.963498] Bluetooth: hci0 urb 00000000abc1f0d6 status -2 count 0
+[  893.964657] Bluetooth: hci0 urb 000000002a96d38f status -2 count 0
+[  893.964993] Bluetooth: intf 00000000ed2b072f
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# dmesg -c > /dev/null 2>&1
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# echo 'N' > debug_enable 
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# hciconfig -a
+hci0:	Type: Primary  Bus: USB
+	BD Address: 9C:DA:3E:F2:8E:46  ACL MTU: 1021:4  SCO MTU: 96:6
+	UP RUNNING 
+	RX bytes:1644 acl:0 sco:0 events:71 errors:0
+	TX bytes:3738 acl:0 sco:0 commands:71 errors:0
+	Features: 0xbf 0xfe 0x0f 0xfe 0xdb 0xff 0x7b 0x87
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH SNIFF 
+	Link mode: SLAVE ACCEPT 
+	Name: 'tester-VirtualBox'
+	Class: 0x0c0000
+	Service Classes: Rendering, Capturing
+	Device Class: Miscellaneous, 
+	HCI Version: 5.0 (0x9)  Revision: 0x100
+	LMP Version: 5.0 (0x9)  Subversion: 0x100
+	Manufacturer: Intel Corp. (2)
+
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# dmesg
+root@tester-VirtualBox:/sys/kernel/debug/bluetooth# 
+
+
+
+
+> I have not seen any kbuild issues popping up. However I like to get some
+> Tested-By, Reviewed-By lines added to the patch and I can send a patch version
+> with proper commit message if there is interest in getting this upstream.
+> 
+> Regards
+> 
+> Marcel
+> 
+
