@@ -2,357 +2,120 @@ Return-Path: <SRS0=GIG2=4C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF01C3B1A1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 16:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0F2C2BA83
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 17:45:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A06E20656
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 16:57:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="b0kuynEN"
+	by mail.kernel.org (Postfix) with ESMTP id 60FC2206B6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 17:45:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394309AbgBNQ5P (ORCPT
+        id S2389845AbgBNRpx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:57:15 -0500
-Received: from mail26.static.mailgun.info ([104.130.122.26]:22185 "EHLO
-        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2404553AbgBNQRr (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:17:47 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1581697067; h=Content-Transfer-Encoding: MIME-Version:
- Message-Id: Date: Subject: Cc: To: From: Sender;
- bh=BrhdK7FVgZzmzOzx/07qWewoXds4IOKGRXRuVesHqR8=; b=b0kuynEN1rom2aBBqcXXjxAW2Vs3IoUndANncews4ceKarGoPkNeQ3SsdVZWFSnUpBkBl3dZ
- v4PT1BHonfdK1LLfO3Xt6IIy6VO9LFts5kfi0i5/sJwyS9wi/Vgn4CovsuSDtYL+LlazN6Kq
- y3anInSIk1Jubk0PsZuEoINTeog=
-X-Mailgun-Sending-Ip: 104.130.122.26
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e46c81c.7efdac11a3e8-smtp-out-n03;
- Fri, 14 Feb 2020 16:17:32 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 88A7CC447B6; Fri, 14 Feb 2020 16:17:31 +0000 (UTC)
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id B57B6C433A2;
-        Fri, 14 Feb 2020 16:17:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org B57B6C433A2
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        rjliao@codeaurora.org, yshavit@google.com,
-        abhishekpandit@chromium.org,
-        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Subject: [PATCH v4] Bluetooth: hci_qca: Bug fixes while collecting controller memory dump
-Date:   Fri, 14 Feb 2020 21:47:15 +0530
-Message-Id: <20200214161715.2166-1-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.22.0
+        Fri, 14 Feb 2020 12:45:53 -0500
+Received: from muru.com ([72.249.23.125]:55312 "EHLO muru.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389513AbgBNRpw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Feb 2020 12:45:52 -0500
+Received: from atomide.com (localhost [127.0.0.1])
+        by muru.com (Postfix) with ESMTPS id 4AF4780E7;
+        Fri, 14 Feb 2020 17:46:35 +0000 (UTC)
+Date:   Fri, 14 Feb 2020 09:45:48 -0800
+From:   Tony Lindgren <tony@atomide.com>
+To:     Sebastian Reichel <sre@kernel.org>
+Cc:     "Arthur D." <spinal.by@gmail.com>, linux-bluetooth@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: Droid 4 WiFi firmware loading error
+Message-ID: <20200214174548.GC64767@atomide.com>
+References: <20200211232425.GE16391@atomide.com>
+ <op.0fu85owhhxa7s4@supervisor.net28>
+ <20200212150722.GF16391@atomide.com>
+ <20200212162131.GI16391@atomide.com>
+ <op.0fwkyxvihxa7s4@supervisor.net28>
+ <20200213041112.GL16391@atomide.com>
+ <op.0fw0oas5hxa7s4@supervisor.net28>
+ <20200213161157.GN16391@atomide.com>
+ <op.0fx4hozhhxa7s4@supervisor.net28>
+ <20200214161100.b7aqb6wwsrxmx4ab@earth.universe>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200214161100.b7aqb6wwsrxmx4ab@earth.universe>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+* Sebastian Reichel <sre@kernel.org> [200214 17:20]:
+> Hi,
+> 
+> WTF :(
+> 
+> Right now the BT driver and the WiFi driver are no aware of
+> each other. Actually the kernel is not even aware, that both
+> drivers are using the same chip. Unfortunately this will be
+> tricky to solve properly. Since a system may have two WiLink
+> devices, the only solution coming to my mind would be adding
+> a link from the BT device to the WiFi device in device tree.
+> Additionally we would need something in the WiLink driver to
+> check if driver has been initialized properly for a given DT
+> node.
 
-This patch will fix the below issues
- 1. Discarding memory dump events if memdump state is moved to
-    MEMDUMP_TIMEOUT.
- 2. Fixed race conditions between qca_hw_error() and qca_controller_memdump
-    while free memory dump buffers using mutex lock
- 3. Moved timeout timer to delayed work queue
- 4. Injecting HW error event in a case when dumps failed to receive and HW
-    error event is not yet received.
- 5. Clearing hw error and command timeout function callbacks before
-    sending pre shutdown command.
+Yeah exactly.. I think the best way would be to export something
+like wlcore_register_bt/wlcore_unregister_bt.. And then have
+wlcore_register_bt return -EAGAIN until wlcore is up.
 
- Collecting memory dump will follow any of the below sequence.
+> On Fri, Feb 14, 2020 at 12:54:50AM +0300, Arthur D. wrote:
+> > Hello.
+> > 
+> > Some users have reported that they have issues with WiFi firmware
+> > loading on Droid 4. The fragment of dmesg for the issue follows
+> > at the bottom of this mail.
+> > 
+> > With the help of Tony Lindgren I have found that the root of the
+> > issue was Bluetooth firmware loaded before WiFi driver (wlcore).
+> > 
+> > Now we need to change the kernel to make it load Bluetooth firmware
+> > only after WiFi firmware is loaded. So the bug will not be triggered.
+> > 
+> > Any ideas on how it should be done?
+> > 
+> > P.S. When I do "rmmod hci_uart" on Droid 4 device, I get something
+> > like endless loop of error reporting from kernel. The fragment of
+> > dmesg can be downloaded from https://dropmefiles.com/wCPMF
+> > I'm not sure where to report this one.
 
- Sequence 1:
-   Receiving Memory dump events from the controller
-   Received entire dump in stipulated time
-   Received HW error event from the controller
-   Controller Reset from HOST
+Yup I've seen rmmod hci_uart produce kernel oops, but I just tried
+to reproduce it again on v5.5 and it just took a long time to rmmod
+with no oops.
 
- Sequence 2:
-   Receiving Memory dump events from the controller
-   Failed to Receive entire dump in stipulated time
-   A Timeout schedules and if no HW error event received a fake HW
-     error event will be injected.
-   Controller Reset from HOST.
+Regards,
 
- Sequence 3:
-   Received HW error event
-   HOST trigger SSR by sending crash packet to controller.
-   Received entire dump in stipulated time
-   Controller Reset from HOST
+Tony
 
-Fixes: d841502c79e3 ("Bluetooth: hci_qca: Collect controller memory dump during SSR")
-Reported-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
- drivers/bluetooth/hci_qca.c | 101 ++++++++++++++++++++++++------------
- 1 file changed, 67 insertions(+), 34 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 8e95bfe750d4..1e4d6118d9bf 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -29,6 +29,7 @@
- #include <linux/platform_device.h>
- #include <linux/regulator/consumer.h>
- #include <linux/serdev.h>
-+#include <linux/mutex.h>
- #include <asm/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -69,7 +70,8 @@ enum qca_flags {
- 	QCA_IBS_ENABLED,
- 	QCA_DROP_VENDOR_EVENT,
- 	QCA_SUSPENDING,
--	QCA_MEMDUMP_COLLECTION
-+	QCA_MEMDUMP_COLLECTION,
-+	QCA_HW_ERROR_EVENT
- };
- 
- 
-@@ -138,18 +140,19 @@ struct qca_data {
- 	u32 tx_idle_delay;
- 	struct timer_list wake_retrans_timer;
- 	u32 wake_retrans;
--	struct timer_list memdump_timer;
- 	struct workqueue_struct *workqueue;
- 	struct work_struct ws_awake_rx;
- 	struct work_struct ws_awake_device;
- 	struct work_struct ws_rx_vote_off;
- 	struct work_struct ws_tx_vote_off;
- 	struct work_struct ctrl_memdump_evt;
-+	struct delayed_work ctrl_memdump_timeout;
- 	struct qca_memdump_data *qca_memdump;
- 	unsigned long flags;
- 	struct completion drop_ev_comp;
- 	wait_queue_head_t suspend_wait_q;
- 	enum qca_memdump_states memdump_state;
-+	struct mutex hci_memdump_lock;
- 
- 	/* For debugging purpose */
- 	u64 ibs_sent_wacks;
-@@ -522,23 +525,28 @@ static void hci_ibs_wake_retrans_timeout(struct timer_list *t)
- 		hci_uart_tx_wakeup(hu);
- }
- 
--static void hci_memdump_timeout(struct timer_list *t)
-+
-+static void qca_controller_memdump_timeout(struct work_struct *work)
- {
--	struct qca_data *qca = from_timer(qca, t, tx_idle_timer);
-+	struct qca_data *qca = container_of(work, struct qca_data,
-+					ctrl_memdump_timeout.work);
- 	struct hci_uart *hu = qca->hu;
--	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
--	char *memdump_buf = qca_memdump->memdump_buf_tail;
--
--	bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
--	/* Inject hw error event to reset the device and driver. */
--	hci_reset_dev(hu->hdev);
--	vfree(memdump_buf);
--	kfree(qca_memdump);
--	qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
--	del_timer(&qca->memdump_timer);
--	cancel_work_sync(&qca->ctrl_memdump_evt);
-+
-+	mutex_lock(&qca->hci_memdump_lock);
-+	if (test_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)) {
-+		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
-+		if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
-+			/* Inject hw error event to reset the device
-+			 * and driver.
-+			 */
-+			hci_reset_dev(hu->hdev);
-+		}
-+	}
-+
-+	mutex_unlock(&qca->hci_memdump_lock);
- }
- 
-+
- /* Initialize protocol */
- static int qca_open(struct hci_uart *hu)
- {
-@@ -558,6 +566,7 @@ static int qca_open(struct hci_uart *hu)
- 	skb_queue_head_init(&qca->tx_wait_q);
- 	skb_queue_head_init(&qca->rx_memdump_q);
- 	spin_lock_init(&qca->hci_ibs_lock);
-+	mutex_init(&qca->hci_memdump_lock);
- 	qca->workqueue = alloc_ordered_workqueue("qca_wq", 0);
- 	if (!qca->workqueue) {
- 		BT_ERR("QCA Workqueue not initialized properly");
-@@ -570,6 +579,8 @@ static int qca_open(struct hci_uart *hu)
- 	INIT_WORK(&qca->ws_rx_vote_off, qca_wq_serial_rx_clock_vote_off);
- 	INIT_WORK(&qca->ws_tx_vote_off, qca_wq_serial_tx_clock_vote_off);
- 	INIT_WORK(&qca->ctrl_memdump_evt, qca_controller_memdump);
-+	INIT_DELAYED_WORK(&qca->ctrl_memdump_timeout,
-+			  qca_controller_memdump_timeout);
- 	init_waitqueue_head(&qca->suspend_wait_q);
- 
- 	qca->hu = hu;
-@@ -596,7 +607,6 @@ static int qca_open(struct hci_uart *hu)
- 
- 	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
- 	qca->tx_idle_delay = IBS_HOST_TX_IDLE_TIMEOUT_MS;
--	timer_setup(&qca->memdump_timer, hci_memdump_timeout, 0);
- 
- 	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
- 	       qca->tx_idle_delay, qca->wake_retrans);
-@@ -677,7 +687,6 @@ static int qca_close(struct hci_uart *hu)
- 	skb_queue_purge(&qca->rx_memdump_q);
- 	del_timer(&qca->tx_idle_timer);
- 	del_timer(&qca->wake_retrans_timer);
--	del_timer(&qca->memdump_timer);
- 	destroy_workqueue(qca->workqueue);
- 	qca->hu = NULL;
- 
-@@ -963,11 +972,20 @@ static void qca_controller_memdump(struct work_struct *work)
- 
- 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
- 
-+		mutex_lock(&qca->hci_memdump_lock);
-+		/* Skip processing the received packets if timeout detected. */
-+		if (qca->memdump_state == QCA_MEMDUMP_TIMEOUT) {
-+			mutex_unlock(&qca->hci_memdump_lock);
-+			return;
-+		}
-+
- 		if (!qca_memdump) {
- 			qca_memdump = kzalloc(sizeof(struct qca_memdump_data),
- 					      GFP_ATOMIC);
--			if (!qca_memdump)
-+			if (!qca_memdump) {
-+				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
-+			}
- 
- 			qca->qca_memdump = qca_memdump;
- 		}
-@@ -992,13 +1010,15 @@ static void qca_controller_memdump(struct work_struct *work)
- 			if (!(dump_size)) {
- 				bt_dev_err(hu->hdev, "Rx invalid memdump size");
- 				kfree_skb(skb);
-+				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
- 			}
- 
- 			bt_dev_info(hu->hdev, "QCA collecting dump of size:%u",
- 				    dump_size);
--			mod_timer(&qca->memdump_timer, (jiffies +
--				  msecs_to_jiffies(MEMDUMP_TIMEOUT_MS)));
-+			queue_delayed_work(qca->workqueue,
-+					   &qca->ctrl_memdump_timeout,
-+					msecs_to_jiffies(MEMDUMP_TIMEOUT_MS));
- 
- 			skb_pull(skb, sizeof(dump_size));
- 			memdump_buf = vmalloc(dump_size);
-@@ -1016,6 +1036,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 			kfree(qca_memdump);
- 			kfree_skb(skb);
- 			qca->qca_memdump = NULL;
-+			mutex_unlock(&qca->hci_memdump_lock);
- 			return;
- 		}
- 
-@@ -1046,16 +1067,20 @@ static void qca_controller_memdump(struct work_struct *work)
- 			memdump_buf = qca_memdump->memdump_buf_head;
- 			dev_coredumpv(&hu->serdev->dev, memdump_buf,
- 				      qca_memdump->received_dump, GFP_KERNEL);
--			del_timer(&qca->memdump_timer);
-+			cancel_delayed_work(&qca->ctrl_memdump_timeout);
- 			kfree(qca->qca_memdump);
- 			qca->qca_memdump = NULL;
- 			qca->memdump_state = QCA_MEMDUMP_COLLECTED;
-+			clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 		}
-+
-+		mutex_unlock(&qca->hci_memdump_lock);
- 	}
- 
- }
- 
--int qca_controller_memdump_event(struct hci_dev *hdev, struct sk_buff *skb)
-+static int qca_controller_memdump_event(struct hci_dev *hdev,
-+					struct sk_buff *skb)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
-@@ -1406,30 +1431,21 @@ static void qca_wait_for_dump_collection(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
--	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
--	char *memdump_buf = NULL;
- 
- 	wait_on_bit_timeout(&qca->flags, QCA_MEMDUMP_COLLECTION,
- 			    TASK_UNINTERRUPTIBLE, MEMDUMP_TIMEOUT_MS);
- 
- 	clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
--	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
--		bt_dev_err(hu->hdev, "Clearing the buffers due to timeout");
--		if (qca_memdump)
--			memdump_buf = qca_memdump->memdump_buf_tail;
--		vfree(memdump_buf);
--		kfree(qca_memdump);
--		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
--		del_timer(&qca->memdump_timer);
--		cancel_work_sync(&qca->ctrl_memdump_evt);
--	}
- }
- 
- static void qca_hw_error(struct hci_dev *hdev, u8 code)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
-+	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
-+	char *memdump_buf = NULL;
- 
-+	set_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- 	bt_dev_info(hdev, "mem_dump_status: %d", qca->memdump_state);
- 
- 	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
-@@ -1449,6 +1465,23 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 		bt_dev_info(hdev, "waiting for dump to complete");
- 		qca_wait_for_dump_collection(hdev);
- 	}
-+
-+	if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
-+		bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
-+		mutex_lock(&qca->hci_memdump_lock);
-+		if (qca_memdump)
-+			memdump_buf = qca_memdump->memdump_buf_head;
-+		vfree(memdump_buf);
-+		kfree(qca_memdump);
-+		qca->qca_memdump = NULL;
-+		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
-+		cancel_delayed_work(&qca->ctrl_memdump_timeout);
-+		skb_queue_purge(&qca->rx_memdump_q);
-+		mutex_unlock(&qca->hci_memdump_lock);
-+		cancel_work_sync(&qca->ctrl_memdump_evt);
-+	}
-+
-+	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- }
- 
- static void qca_cmd_timeout(struct hci_dev *hdev)
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+8< ---------------
+# dmesg -C; modprobe hci_uart; sleep 5; rmmod hci_uart; dmesg -c
+[  616.926422] Bluetooth: HCI UART driver ver 2.3
+[  616.926422] Bluetooth: HCI UART protocol H4 registered
+[  616.926422] Bluetooth: HCI UART protocol BCSP registered
+[  616.926513] Bluetooth: HCI UART protocol LL registered
+[  616.926635] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[  616.927185] Bluetooth: HCI UART protocol Broadcom registered
+[  616.927764] hci-ti serial1-0: GPIO lookup for consumer enable
+[  616.927764] hci-ti serial1-0: using device tree for GPIO lookup
+[  616.927856] of_get_named_gpiod_flags: parsed 'enable-gpios' property of node '/ocp/interconnect@48000000/segment@0/target-module@6e000/serial@0/bluetooth[0]' - status (0)
+[  616.927886] gpio gpiochip6: Persistence not supported for GPIO 14
+[  624.002838] Bluetooth: hci0: command 0xff05 tx timeout
+[  632.572662] Bluetooth: hci0: send command failed
+[  632.572814] Bluetooth: hci0: download firmware failed, retrying...
+[  634.722991] Bluetooth: hci0: command 0x1001 tx timeout
+[  642.812652] Bluetooth: hci0: Reading TI version information failed (-110)
+[  642.812652] Bluetooth: hci0: download firmware failed, retrying...
+[  644.962707] Bluetooth: hci0: command 0x1001 tx timeout
+[  653.043151] Bluetooth: hci0: Reading TI version information failed (-110)
+[  653.043182] Bluetooth: hci0: download firmware failed, retrying...
+[  655.203582] Bluetooth: hci0: command 0x1001 tx timeout
+[  663.294372] Bluetooth: hci0: Reading TI version information failed (-110)
+[  663.294464] Bluetooth: hci0: download firmware failed, retrying...
