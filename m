@@ -2,145 +2,139 @@ Return-Path: <SRS0=GIG2=4C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA4EC352A3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 02:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4300BC3B194
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 02:22:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDF7E217F4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 02:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19230218AC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 02:22:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eUKWat4V"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="P8vKwe4x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728173AbgBNCVP (ORCPT
+        id S1728141AbgBNCW6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Feb 2020 21:21:15 -0500
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:38987 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728141AbgBNCVP (ORCPT
+        Thu, 13 Feb 2020 21:22:58 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:37310 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728052AbgBNCW6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Feb 2020 21:21:15 -0500
-Received: by mail-vs1-f66.google.com with SMTP id p14so4992914vsq.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2020 18:21:14 -0800 (PST)
+        Thu, 13 Feb 2020 21:22:58 -0500
+Received: by mail-pj1-f66.google.com with SMTP id m13so3280604pjb.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Feb 2020 18:22:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vdZU6oxzz8082H5wxa3sUHsd3r2/KMEe1ZoAk6X+3z4=;
-        b=eUKWat4VTepUvloVJUuVaKHR6JxtasrCqdEXsVVK9T8+FHIRwLNnjTk8221JCte4BT
-         fcWTNUBKuwUnNAt45Iw67/ztMhGgR0l3qDYqT4QjIq5s131aFcoZoC1V25eNrrm9TqG5
-         sOQb8x+lgmp3kAzIZFb5rXWVd5WOOBMSMcvErYxjR8eOGFNchu+Ni9JRdJ1RkiUKd6Qf
-         rPVzHqBtfc32br8iqNVuzhqchskUFxA+0EBz9pWN3DHlbSRafNgEQRWwEeojDXubyWEw
-         O3w6b9BJaC+2EwMMdjjIdVlk9nOTJpeK4PbuuEhvbEY84RKUkeJW0AX31ndy46lCmaYH
-         y0YQ==
+        d=chromium.org; s=google;
+        h=mime-version:content-transfer-encoding:in-reply-to:references
+         :subject:from:cc:to:date:message-id:user-agent;
+        bh=qux6BbvWAe4p4P/wAZ0A+Tgsqzz5Ke6rXhlE3TNAZMo=;
+        b=P8vKwe4xSe7pQWTLvaOXQ2q5lhGX0j40d4RSrt6o9LpHnxqiPRbA/zq73dX2t/4r/l
+         Y+036nBLxx3FvWqRaXbp9aqDhnakRgcd6kkLBqsKEQFRYFD/DH97YduK36SuKZEH9rsm
+         GoTs3CJ2/bT9pltuH6A81V3OT/M77eN42uY34=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vdZU6oxzz8082H5wxa3sUHsd3r2/KMEe1ZoAk6X+3z4=;
-        b=VUMzNJ9OIXYmnFTguJsjU5YEW0En6+PeEoNlfyzdNy+WI6n0u8HKg09rgKp8oZ265z
-         F5Zid5VQ3QOu2GQ9VdNi9Lna0Kr05ZbNomBbOMgeYKo0IDxbMHjxRPUf6uzaxkijq8gP
-         OyvNyf5UF3fs3uqu2G8nlYx/oldarMDJ5ubgj8Pg8hcH6nA9ejgYwIcBdX56KCYybWd0
-         HwXfSOAzXANQBLZT66OBTFdlDql+bA5tsQyVN443ffimC/LUKrKGcSyZgFEc9vclGVgN
-         0cIx7+aTqMtICh//iftX/xWfCKBoyy7db69p2v9/hCJKg5AhA74a6fEcondW7LAz5qEm
-         6ZVQ==
-X-Gm-Message-State: APjAAAWsEXttD7aKuq3m9zpA6qlT72i81hoBXsZSzTu8pbYu3pLMJKR9
-        GEChZam1aSs+A+kQ1HSa07wp9FhzU391wOPIHY/uTdF37mM=
-X-Google-Smtp-Source: APXvYqwIfKA+CfTUrEU4IWI95odBptrxzgwObVTD5cwsuPnhn1hZmU7BTNJwowGPMy4cohr2oVeVuv1srg7ldmkWVFA=
-X-Received: by 2002:a67:f49a:: with SMTP id o26mr225848vsn.124.1581646873860;
- Thu, 13 Feb 2020 18:21:13 -0800 (PST)
+        h=x-gm-message-state:mime-version:content-transfer-encoding
+         :in-reply-to:references:subject:from:cc:to:date:message-id
+         :user-agent;
+        bh=qux6BbvWAe4p4P/wAZ0A+Tgsqzz5Ke6rXhlE3TNAZMo=;
+        b=QkoAcGDNvKe7Xb2n/evWkRO0/OpYJvX5TIudo2EFjnY8YJhjo1NNgcI+0KKxCB+R02
+         Ro1pLtHztK8oXnb/aUZ9BfVgZt4ImZ9of6Olk+tOxbNDy7TI7EFvmXXLxPP0B/e29iAp
+         dDFGcCu9VYxbfO12UzsMe63i3laCiEAeaHm5UwHMqFWc37RuNRh3+NOiZUxABTwz7T+C
+         79rh/eh4PWpojzZDuiH7uyOKpZ3NFEK5LHYN58tX8rXHPjC0IR405w0M/v1+qVYbbfKl
+         QKiuZRcNNBmA9UIYWZCQYuLVqbKXq6izrZ+wH+VE05OvP7qX+ctpekRMASllpgC+LgNQ
+         Dp6A==
+X-Gm-Message-State: APjAAAVnz/iZAOpT9UEDKiLdOSsRQwa2h3UHfGqMCu5DIJLKGyfZmAue
+        ONGtE47OtV8VKiTGAGTDXBnyPg==
+X-Google-Smtp-Source: APXvYqyJ/jvq2tN5ADG2mCUonP7BvFYO8jOQOL4ElMrE52UeGn5nCy1bOAxohojLnenru9dUsef8Qg==
+X-Received: by 2002:a17:902:c693:: with SMTP id r19mr1018218plx.25.1581646977474;
+        Thu, 13 Feb 2020 18:22:57 -0800 (PST)
+Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
+        by smtp.gmail.com with ESMTPSA id cx18sm4052762pjb.26.2020.02.13.18.22.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2020 18:22:56 -0800 (PST)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <CAANRJtzBpw__m0ymcXJu1VhYhGcVT=AkLYpwHaahT=F4xKo+Wg@mail.gmail.com>
- <CABBYNZLngK1F_=fVYhCJNJGnkR+oK93-rN2MTN4z3dMFTP+E3Q@mail.gmail.com>
- <CAANRJtxFLMU6i4maUgpLC1iar1Q9HJv+ELcwpQv=c4bLo-uPAQ@mail.gmail.com> <CABBYNZJccLD-BD1aAB70sX9_FqSwkDc789-WQhi0V4Udbp5wBA@mail.gmail.com>
-In-Reply-To: <CABBYNZJccLD-BD1aAB70sX9_FqSwkDc789-WQhi0V4Udbp5wBA@mail.gmail.com>
-From:   Amit K Bag <amit.k.bag@intel.corp-partner.google.com>
-Date:   Fri, 14 Feb 2020 07:51:04 +0530
-Message-ID: <CAANRJty7xZ+GNyAU82oXAdCuJ07LnaZm_M2yUet3rfgwd6AVMA@mail.gmail.com>
-Subject: Re: OPP throughput is low in ubuntu 18.04
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1581609364-21824-1-git-send-email-gubbaven@codeaurora.org>
+References: <1581609364-21824-1-git-send-email-gubbaven@codeaurora.org>
+Subject: Re: [PATCH v3] Bluetooth: hci_qca: Bug fixes while collecting controller memory dump
+From:   Stephen Boyd <swboyd@chromium.org>
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, robh@kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, tientzu@chromium.org,
+        seanpaul@chromium.org, rjliao@codeaurora.org, yshavit@google.com,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
+        johan.hedberg@gmail.com, marcel@holtmann.org
+Date:   Thu, 13 Feb 2020 18:22:56 -0800
+Message-ID: <158164697600.184098.7937205486686028830@swboyd.mtv.corp.google.com>
+User-Agent: alot/0.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Luiz,
+Quoting Venkata Lakshmi Narayana Gubba (2020-02-13 07:56:04)
+> This patch will fix the below issues
+>    1.Fixed race conditions while accessing memory dump state flags.
 
-I am not sure what changes in kernel causing low throughput. If I get
-any clue I will let you know.
-I wil lalso test your patch with linux - linux and update the result.
+What sort of race condition?
 
-On Fri, Feb 14, 2020 at 6:18 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Amit,
->
-> On Thu, Feb 13, 2020 at 3:32 AM Amit K Bag
-> <amit.k.bag@intel.corp-partner.google.com> wrote:
-> >
-> > Hello Luiz,
-> >
-> > I tested with the patch you have mentioned but not getting any better
-> > throughput.
-> > Please have a look at the log attached.
-> >
-> > We are using below configuration for linux
-> > - Kernel : 4.19.102
-> > - OS : ubuntu 18.04.2 LTS
-> > - Bluez -5.48
-> >
-> > For other machine we are using windows
->
-> I think there is some work to be done to work with RFCOMM since we are
-> only doing this for L2CAP, I will have a look later this week, btw
-> have you look into any difference we may have between these kernels?
-> Or actually in what combination they appear because there could be an
-> isolated problem in either the kernel or the userspace changes.
->
-> > On Mon, Feb 10, 2020 at 11:03 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Amit,
-> > >
-> > > On Mon, Feb 10, 2020 at 3:20 AM Amit K Bag
-> > > <amit.k.bag@intel.corp-partner.google.com> wrote:
-> > > >
-> > > > Hello All,
-> > > >
-> > > > I am tring to test the OPP throughput in linux.
-> > > > I transferred between 2 machines having ubuntu 16.04 with bluez
-> > > > version 5.44 in that I am getting 1.4mbps speed.
-> > > >
-> > > > Kernel : 4.14.13
-> > > > OS : ubuntu 18.04.2 LTS
-> > > > Bluez -5.44
-> > > >
-> > > > I am using a 12 MB of audio file.
-> > > > But the same file when I transferred between  2 machines having ubuntu
-> > > > 18.04 the speed is significantly reduced.
-> > > >
-> > > > Kernel : 4.18.0-15-generic
-> > > > OS : ubuntu 18.04.2 LTS
-> > > > Bluez -5.48
-> > > >
-> > > > Could someone tell me why its reduced in ubuntu 18.04
-> > >
-> > > I don't think we change anything on Obexd related to that so perhaps
-> > > it is something related to the L2CAP MTU? We could try setting the MTU
-> > > to 0 so it automatically picks the matching MTU if you do have the
-> > > following patch applied to your kernel:
-> > >
-> > > Bluetooth: Auto tune if input MTU is set to 0
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+>    2.Updated with actual context of timer in hci_memdump_timeout()
+
+What does this mean?
+
+>    3.Updated injecting hardware error event if the dumps failed to receiv=
+e.
+>    4.Once timeout is triggered, stopping the memory dump collections.
+>=20
+> Possible scenarios while collecting memory dump:
+>=20
+> Scenario 1:
+>=20
+> Memdump event from firmware
+> Some number of memdump events with seq #
+> Hw error event
+> Reset
+>=20
+> Scenario 2:
+>=20
+> Memdump event from firmware
+> Some number of memdump events with seq #
+> Timeout schedules hw_error_event if hw error event is not received already
+> hw_error_event clears the memdump activity
+> reset
+>=20
+> Scenario 3:
+>=20
+> hw_error_event sends memdump command to firmware and waits for completion
+> Some number of memdump events with seq #
+> hw error event
+> reset
+>=20
+> Fixes: d841502c79e3 ("Bluetooth: hci_qca: Collect controller memory dump =
+during SSR")
+> Reported-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> ---
+[...]
+> @@ -1449,6 +1465,23 @@ static void qca_hw_error(struct hci_dev *hdev, u8 =
+code)
+>                 bt_dev_info(hdev, "waiting for dump to complete");
+>                 qca_wait_for_dump_collection(hdev);
+>         }
+> +
+> +       if (qca->memdump_state !=3D QCA_MEMDUMP_COLLECTED) {
+> +               bt_dev_err(hu->hdev, "clearing allocated memory due to me=
+mdump timeout");
+> +               mutex_lock(&qca->hci_memdump_lock);
+
+Why is a mutex needed? Are crashes happening in parallel? It would be
+nice if the commit text mentioned why the mutex is added so that the
+reader doesn't have to figure it out.
+
+> +               if (qca_memdump)
+> +                       memdump_buf =3D qca_memdump->memdump_buf_head;
