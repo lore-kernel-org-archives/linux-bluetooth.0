@@ -6,157 +6,156 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BE7C2BA83
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 07:40:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF284C3B18F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 07:46:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D8FCE22314
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 07:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AED9220873
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 07:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728923AbgBNHj7 convert rfc822-to-8bit (ORCPT
+        id S1728936AbgBNHqC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Feb 2020 02:39:59 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:50319 "EHLO
+        Fri, 14 Feb 2020 02:46:02 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:40094 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728691AbgBNHj7 (ORCPT
+        with ESMTP id S1725897AbgBNHqC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Feb 2020 02:39:59 -0500
+        Fri, 14 Feb 2020 02:46:02 -0500
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C1C4DCECE1;
-        Fri, 14 Feb 2020 08:49:20 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id CDD81CECE1;
+        Fri, 14 Feb 2020 08:55:23 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH] Bluetooth: hci_h5: btrtl: Add support for RTL8822C
+Subject: Re: [Bluez PATCH v4] bluetooth: secure bluetooth stack from bluedump
+ attack
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200213075140.25105-1-max.chou@realtek.com>
-Date:   Fri, 14 Feb 2020 08:39:56 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex_lu@realsil.com.cn, hildawu@realtek.com, kidman@realtek.com
+In-Reply-To: <20200214134922.Bluez.v4.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
+Date:   Fri, 14 Feb 2020 08:45:59 +0100
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <FDDB4E96-85DE-405C-907C-5B15F3218C05@holtmann.org>
-References: <20200213075140.25105-1-max.chou@realtek.com>
-To:     Max Chou <max.chou@realtek.com>
+Message-Id: <54398306-13C8-47C2-A37D-946C757A0C3D@holtmann.org>
+References: <20200214134922.Bluez.v4.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
+To:     Howard Chung <howardchung@google.com>
 X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Max,
+Hi Howard,
 
-> Add new compatible and FW loading support for RTL8822C.
+> Attack scenario:
+> 1. A Chromebook (let's call this device A) is paired to a legitimate
+>   Bluetooth classic device (e.g. a speaker) (let's call this device
+>   B).
+> 2. A malicious device (let's call this device C) pretends to be the
+>   Bluetooth speaker by using the same BT address.
+> 3. If device A is not currently connected to device B, device A will
+>   be ready to accept connection from device B in the background
+>   (technically, doing Page Scan).
+> 4. Therefore, device C can initiate connection to device A
+>   (because device A is doing Page Scan) and device A will accept the
+>   connection because device A trusts device C's address which is the
+>   same as device B's address.
+> 5. Device C won't be able to communicate at any high level Bluetooth
+>   profile with device A because device A enforces that device C is
+>   encrypted with their common Link Key, which device C doesn't have.
+>   But device C can initiate pairing with device A with just-works
+>   model without requiring user interaction (there is only pairing
+>   notification). After pairing, device A now trusts device C with a
+>   new different link key, common between device A and C.
+> 6. From now on, device A trusts device C, so device C can at anytime
+>   connect to device A to do any kind of high-level hijacking, e.g.
+>   speaker hijack or mouse/keyboard hijack.
 > 
-> Signed-off-by: Max Chou <max.chou@realtek.com>
+> Since we don't know whether the repairing is legitimate or not,
+> leave the decision to user space if all the conditions below are met.
+> - the pairing is initialized by peer
+> - the authorization method is just-work
+> - host already had the link key to the peer
+> 
+> Signed-off-by: Howard Chung <howardchung@google.com>
 > ---
-> drivers/bluetooth/Kconfig  |  2 +-
-> drivers/bluetooth/btrtl.c  | 12 ++++++++++++
-> drivers/bluetooth/hci_h5.c | 18 +++++++++++++++++-
-> 3 files changed, 30 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index f7aa2dc1ff85..052020b07e56 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -211,7 +211,7 @@ config BT_HCIUART_RTL
-> 	depends on BT_HCIUART
-> 	depends on BT_HCIUART_SERDEV
-> 	depends on GPIOLIB
-> -	depends on ACPI
-> +	depends on (ACPI || SERIAL_DEV_CTRL_TTYPORT)
-> 	select BT_HCIUART_3WIRE
-> 	select BT_RTL
-> 	help
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 577cfa3329db..67f4bc21e7c5 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -136,6 +136,18 @@ static const struct id_table ic_id_table[] = {
-> 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
-> 	  .cfg_name = "rtl_bt/rtl8761a_config" },
+> Changes in v4:
+> - optimise the check in smp.c.
 > 
-> +	/* 8822C with UART interface */
-> +	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
-> +			 IC_MATCH_FL_HCIBUS,
-> +	  .lmp_subver = RTL_ROM_LMP_8822B,
-> +	  .hci_rev = 0x000c,
-> +	  .hci_ver = 0x0a,
-> +	  .hci_bus = HCI_UART,
-> +	  .config_needed = true,
-> +	  .has_rom_version = true,
-> +	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
-> +	  .cfg_name = "rtl_bt/rtl8822cs_config" },
+> Changes in v3:
+> - Change confirm_hint from 2 to 1
+> - Fix coding style (declaration order)
+> 
+> Changes in v2:
+> - Remove the HCI_PERMIT_JUST_WORK_REPAIR debugfs option
+> - Fix the added code in classic
+> - Add a similar fix for LE
+> 
+> net/bluetooth/hci_event.c | 10 ++++++++++
+> net/bluetooth/smp.c       | 19 +++++++++++++++++++
+> 2 files changed, 29 insertions(+)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 2c833dae9366..e6982f4f51ea 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4571,6 +4571,16 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+> 			goto confirm;
+> 		}
+> 
+> +		/* If there already exists link key in local host, leave the
+> +		 * decision to user space since the remote device could be
+> +		 * legitimate or malicious.
+> +		 */
+> +		if (hci_find_link_key(hdev, &ev->bdaddr)) {
+> +			bt_dev_warn(hdev, "Local host already has link key");
+
+I would turn this into bt_dev_dbg actually.
+
+> +			confirm_hint = 1;
+> +			goto confirm;
+> +		}
 > +
-> 	/* 8822C with USB interface */
-> 	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc),
-> 	  .config_needed = false,
-> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index 0b14547482a7..666b0c009004 100644
-> --- a/drivers/bluetooth/hci_h5.c
-> +++ b/drivers/bluetooth/hci_h5.c
-> @@ -11,6 +11,7 @@
-> #include <linux/gpio/consumer.h>
-> #include <linux/kernel.h>
-> #include <linux/mod_devicetable.h>
-> +#include <linux/of_device.h>
-> #include <linux/serdev.h>
-> #include <linux/skbuff.h>
+> 		BT_DBG("Auto-accept of user confirmation with %ums delay",
+> 		       hdev->auto_accept_delay);
 > 
-> @@ -786,6 +787,7 @@ static const struct hci_uart_proto h5p = {
-> static int h5_serdev_probe(struct serdev_device *serdev)
-> {
-> 	const struct acpi_device_id *match;
-> +	const void *data;
-> 	struct device *dev = &serdev->dev;
-> 	struct h5 *h5;
-> 
-> @@ -799,7 +801,11 @@ static int h5_serdev_probe(struct serdev_device *serdev)
-> 	h5->serdev_hu.serdev = serdev;
-> 	serdev_device_set_drvdata(serdev, h5);
-> 
-> -	if (has_acpi_companion(dev)) {
-> +	data = of_device_get_match_data(dev);
-> +	if (data)
-> +		h5->vnd = (const struct h5_vnd *)data;
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 2cba6e07c02b..bea64071bdd1 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -2192,6 +2192,25 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+> 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
+> 			     smp->prnd);
+> 		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
 > +
-> +	if (!data && has_acpi_companion(dev)) {
-> 		match = acpi_match_device(dev->driver->acpi_match_table, dev);
-> 		if (!match)
-> 			return -ENODEV;
+> +		/* May need further confirmation for Just-Works pairing  */
 
-why is this change done this way?
+This comment is misleading and has two spaces at the end. My proposal would be this:
 
-	if (has_acpi_companion(dev)) {
-		/* do the ACPI stuff */
-	} else {
-		/* do the OF stuff */
-	}
-
-> @@ -1003,6 +1009,15 @@ static const struct dev_pm_ops h5_serdev_pm_ops = {
-> 	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
-> };
-> 
-> +static const struct of_device_id rtl_bluetooth_of_match[] = {
-> +#ifdef CONFIG_BT_HCIUART_RTL
-> +	{ .compatible = "realtek,rtl8822cs-bt",
-> +	  .data = (const void *)&rtl_vnd },
-> +#endif
-> +	{ },
-> +};
-> +MODULE_DEVICE_TABLE(of, rtl_bluetooth_of_match);
+		/* Only Just-Works pairing requires extra checks */
+> +		if (smp->method != JUST_WORKS)
+> +			goto mackey_and_ltk;
 > +
-> static struct serdev_device_driver h5_serdev_driver = {
-> 	.probe = h5_serdev_probe,
-> 	.remove = h5_serdev_remove,
-> @@ -1010,6 +1025,7 @@ static struct serdev_device_driver h5_serdev_driver = {
-> 		.name = "hci_uart_h5",
-> 		.acpi_match_table = ACPI_PTR(h5_acpi_match),
-> 		.pm = &h5_serdev_pm_ops,
-> +		.of_match_table = rtl_bluetooth_of_match,
-> 	},
-> };
 
-And I did post an initial bt3wire.c driver that would be a lot better and cleaner than trying to add everything to hci_h5.c.
+> +		/* If there already exists link key in local host, leave the
+> +		 * decision to user space since the remote device could be
+> +		 * legitimate or malicious.
+> +		 */
+> +		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
+> +				 hcon->role)) {
+> +			err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
+> +							hcon->type,
+> +							hcon->dst_type, passkey,
+> +							1);
+> +			if (err)
+> +				return SMP_UNSPECIFIED;
+> +			set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
+> +		}
+> 	}
+
+Rest looks good. Either you send me a v5 or tell me to fix it up before applying the patch.
 
 Regards
 
