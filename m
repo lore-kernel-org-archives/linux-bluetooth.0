@@ -2,77 +2,101 @@ Return-Path: <SRS0=GIG2=4C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C666DC3B1B9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 18:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 834A8C2BA83
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 18:26:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BF582168B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 18:23:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 528B82086A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Feb 2020 18:26:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVNlNM/H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405297AbgBNSXV convert rfc822-to-8bit (ORCPT
+        id S2388529AbgBNS0l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Feb 2020 13:23:21 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:57282 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390047AbgBNSXP (ORCPT
+        Fri, 14 Feb 2020 13:26:41 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:44966 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387833AbgBNS0l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Feb 2020 13:23:15 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1A29FCECEA;
-        Fri, 14 Feb 2020 19:32:37 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: Droid 4 WiFi firmware loading error
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200214174548.GC64767@atomide.com>
-Date:   Fri, 14 Feb 2020 19:23:12 +0100
-Cc:     Sebastian Reichel <sre@kernel.org>,
-        "Arthur D." <spinal.by@gmail.com>,
+        Fri, 14 Feb 2020 13:26:41 -0500
+Received: by mail-oi1-f193.google.com with SMTP id d62so10272619oia.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Feb 2020 10:26:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=KgVOFyOZ+a9ix5l6En2g5zR0wBoOVgcTRgg+tuBAT5A=;
+        b=CVNlNM/Hv2X27cs1gU11Dw47A4YDwMUj0pJC35tDPMNjxiWaGhIW6LyxlE7//WDSKN
+         EfPt/zUjFoTb+hi4keoVZvka5OLP3xuyYPXUqlPYf/r9jv2guQ8PZvZIoJ/qk75nYfab
+         qVOT64P01GQAiz0qzfC9KI0BZF8PvD25nE4XiwTTXY3npvO2f1jYvBGe9jGk+hwTTXwF
+         9tkQE/6CqVOq6cKravHPhPMMcvUuUMXaM4ROizW0DPsUB5yrLg0MjJHFUM0hmrmT9Yb3
+         ol0/cw61OVxDe8npNZFYWBCraD2VIF6P5lGmnfrteDQkJg40kQDBLgtSOwMNyaErjfjG
+         p8Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=KgVOFyOZ+a9ix5l6En2g5zR0wBoOVgcTRgg+tuBAT5A=;
+        b=mwzX4RdQfvy72LFmtqHVQI0Cslin3pGRwotGg5Z6JSZt5kxfUMkDLHFVWQld3XkJQx
+         bQC64hdeuyrko007qMouGDkCqSEFUuzgE5SER8wddGg+y+FtPLGbkynIo1UtUrJ+PNPj
+         QlwzaJN7F9cQri85dKVR7Q2B/zu3PbmFQuviBkk0rzRqTmAT6q3aanUw5W2WNonuWFYA
+         nnfAhk47mGE3xpx1weHLPFayvCBsZArxQ50WAPMOo5BKs35Ng1TWK2/QL07uImKXetBv
+         FAfT0PWQv0q/X2JuQXlNLsch60D8p7aAxMlhLdjbg2g0bXYXbgMQHyIsGRVN8dze4CwF
+         tILw==
+X-Gm-Message-State: APjAAAU74gfUZUnoNe6+LGPfqcW/f7m8/spYiX86xGlLPv2qv4c3rJBj
+        W3ZGQ8fODXHqudgQafpxWwV8AmPL0+3Nt1y9BvA=
+X-Google-Smtp-Source: APXvYqz+jfhBX8dnN11k/KHaKn+E2HZRqt051GAqW5Hch/48BeA7DEEyJXrowMR/uBgywCdIz8juKRJSIddVwxCILUc=
+X-Received: by 2002:aca:ab51:: with SMTP id u78mr2792877oie.21.1581704800388;
+ Fri, 14 Feb 2020 10:26:40 -0800 (PST)
+MIME-Version: 1.0
+References: <20200214114350.Bluez.v3.1.I333a90ad3c75882c6f008c94a28ca7d3e8f6c76e@changeid>
+ <1BEAEE28-6159-491D-BCCC-4C5298891987@gmail.com>
+In-Reply-To: <1BEAEE28-6159-491D-BCCC-4C5298891987@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 14 Feb 2020 10:26:29 -0800
+Message-ID: <CABBYNZ+x5r_YY7jJ=oDdpcshvvoJWm_eXpj+DbCbFGg79R4j-w@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3] core: Add new policy for Just-Works repairing
+To:     Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Howard Chung <howardchung@google.com>,
         Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-omap@vger.kernel.org, linux-wireless@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <3D50CC42-1201-4067-ACDE-E9B9F0DC5653@holtmann.org>
-References: <20200211232425.GE16391@atomide.com>
- <op.0fu85owhhxa7s4@supervisor.net28> <20200212150722.GF16391@atomide.com>
- <20200212162131.GI16391@atomide.com> <op.0fwkyxvihxa7s4@supervisor.net28>
- <20200213041112.GL16391@atomide.com> <op.0fw0oas5hxa7s4@supervisor.net28>
- <20200213161157.GN16391@atomide.com> <op.0fx4hozhhxa7s4@supervisor.net28>
- <20200214161100.b7aqb6wwsrxmx4ab@earth.universe>
- <20200214174548.GC64767@atomide.com>
-To:     Tony Lindgren <tony@atomide.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Luiz Von Dentz <luiz.von.dentz@intel.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tony,
+Hi Howard,
 
->> WTF :(
->> 
->> Right now the BT driver and the WiFi driver are no aware of
->> each other. Actually the kernel is not even aware, that both
->> drivers are using the same chip. Unfortunately this will be
->> tricky to solve properly. Since a system may have two WiLink
->> devices, the only solution coming to my mind would be adding
->> a link from the BT device to the WiFi device in device tree.
->> Additionally we would need something in the WiLink driver to
->> check if driver has been initialized properly for a given DT
->> node.
-> 
-> Yeah exactly.. I think the best way would be to export something
-> like wlcore_register_bt/wlcore_unregister_bt.. And then have
-> wlcore_register_bt return -EAGAIN until wlcore is up.
+On Thu, Feb 13, 2020 at 11:35 PM Johan Hedberg <johan.hedberg@gmail.com> wr=
+ote:
+>
+> Hi Howard,
+>
+> On 14. Feb 2020, at 5.45, Howard Chung <howardchung@google.com> wrote:
+> > @@ -6141,6 +6141,22 @@ int device_confirm_passkey(struct btd_device *de=
+vice, uint8_t type,
+> >       struct authentication_req *auth;
+> >       int err;
+> >
+> > +     /* Just-Works repairing policy */
+> > +     if (confirm_hint && (device_is_paired(device, BDADDR_BREDR) ||
+> > +                             device_is_paired(device, BDADDR_LE_PUBLIC=
+))) {
+>
+> Wouldn=E2=80=99t a single call to device_is_paired() using =E2=80=9Ctype=
+=E2=80=9D (the address type that=E2=80=99s part of the mgmt event) be the r=
+ight thing to do here?
 
-actually NO.
++1, other than that it looks pretty good now so we should be able to
+merge after this change.
 
-We have rejected this many times for all hardware manufacturers. Please fix the firmware instead.
-
-Regards
-
-Marcel
-
+--=20
+Luiz Augusto von Dentz
