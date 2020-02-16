@@ -2,194 +2,128 @@ Return-Path: <SRS0=yJGP=4E=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 665F7C7619B
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Feb 2020 00:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3525AC7619C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Feb 2020 04:39:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E3B92086A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Feb 2020 00:50:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA24420857
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Feb 2020 04:39:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0WMVYVI"
+	dkim=pass (1024-bit key) header.d=mnmoran.org header.i=@mnmoran.org header.b="RQLEU+Ms"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbgBPAuO (ORCPT
+        id S1726681AbgBPEjR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Feb 2020 19:50:14 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:37067 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726504AbgBPAuN (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Feb 2020 19:50:13 -0500
-Received: by mail-ot1-f67.google.com with SMTP id l2so6598927otp.4;
-        Sat, 15 Feb 2020 16:50:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=uyRNNBKtZ/pBAy6wlcISFvmc40pdoR2VRPKkepKzyLM=;
-        b=Q0WMVYVIM+b2pr/Pn3tUSRAGxAZgv4nYkNxBhG9toP/WvAIaLdYxyP/EisHgN+9XtK
-         cO+219jw4OkNMwxE1dme0AOosSoMn1fSVZZezJDyfLaLCP5mmKJ+B1up/4dGma5d7fcD
-         R35KuDmUMpPqQVeLbfnR2tQqq0819mnmLSfQWwSaE2ZD+kOEk8SvqG0v7mZ1ShkHU/0b
-         ef7TfSzPlXhbF9ibeJZ+jLq434eAPDRc7Tt93/ZyRczazQP6fIrJ7x4LJy6xnAgZXr5v
-         DVfR/DdYNvvpVowKpq+XUhfgOFeD1fDdfo9bv29ZlPLmc7Ez6QBHK9xBsk/lAcmUFOEk
-         ebCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=uyRNNBKtZ/pBAy6wlcISFvmc40pdoR2VRPKkepKzyLM=;
-        b=b+OF5cWF1xEtNNlVKUh6+EI79Jd3sirBzooN/6LZDWMMjI/3qAr9iq0kVBvgUo7xUa
-         AjhcObNZo0dxpXVNbQs6L5gucvT0tGBfMcfX2pDRwIylmI5He5iZzjOW+zOqw5sdeM39
-         vyOt7mE8vd2bOCT29NV/gAjGK3tg8wxYTAPssIZc/2LdOuAgW5PDe/moUyW9ZzHnIfRA
-         zJzKDZ+sm4BIfVCWqV2fe3oCLS5UTVs249trhI81pBqjWf8pErp14m6ih3mEn8zx4G2O
-         YKzHP3ZL8/ROhDLWwJ6Qg0XhDxDutuPXNHN440ghn98kNkBqhYrWByBIFNr5mz4guSXt
-         yyYg==
-X-Gm-Message-State: APjAAAVI9nypy+HvWwLk+wovsqI+9bKhsSwuI0fbY0puO2+wswRzuj5X
-        MK37TY5MJ0Oymf1P7AHLbV9pmIm5
-X-Google-Smtp-Source: APXvYqw24cLn9pSDb30se6fd1ilKzuFGImR7J+NkDrn/Y/GrxMH5sclpTk/kehtaW2O3M77GOCbRMA==
-X-Received: by 2002:a05:6830:138b:: with SMTP id d11mr7101057otq.38.1581814212513;
-        Sat, 15 Feb 2020 16:50:12 -0800 (PST)
-Received: from ubuntu-m2-xlarge-x86 ([2604:1380:4111:8b00::1])
-        by smtp.gmail.com with ESMTPSA id g25sm3678506otr.8.2020.02.15.16.50.11
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 15 Feb 2020 16:50:11 -0800 (PST)
-Date:   Sat, 15 Feb 2020 17:50:10 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Howard Chung <howardchung@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: Re: [Bluez PATCH v5] bluetooth: secure bluetooth stack from bluedump
- attack
-Message-ID: <20200216005010.GA24335@ubuntu-m2-xlarge-x86>
-References: <20200214191609.Bluez.v5.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
+        Sat, 15 Feb 2020 23:39:17 -0500
+Received: from hoster906.com ([192.252.156.27]:36364 "EHLO hoster906.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726651AbgBPEjR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 15 Feb 2020 23:39:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=mnmoran.org; h=subject
+        :to:references:from:message-id:date:mime-version:in-reply-to
+        :content-type:content-transfer-encoding; s=dkim; bh=CqnKB2/YqKrL
+        vCtk8C2pyfTKfpdLAIfGR66nayRwVp0=; b=RQLEU+Ms15yrIYekGLPQK8nJF/oN
+        +by30R6uYnvBDhqsFpzikkOLiYrfHiwBOUZOzjST2JMoPd6i7+mW2ZRGZxFxhRJA
+        TYPXadYYYkiWcfx41BmCnwXI6zNvHeLcAuI8vksbG6Zlyc3XXcYopSPkrnPRbuj8
+        kRJACbmBHcuJLto=
+Received: (qmail 13505 invoked by uid 503); 16 Feb 2020 04:39:16 -0000
+Received: from unknown (HELO ?192.168.254.100?) (pop-before-smtp@162.39.210.60)
+  by hoster906.com with ESMTPA; 16 Feb 2020 04:39:16 -0000
+Subject: Re: mesh: Send mesh model message to group address
+To:     "Gix, Brian" <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <848c1b0b-83c6-41a3-fc66-1359fa9a72bb@mnmoran.org>
+ <e2f322b4ba3abb81b59a51d8bb5c3611b968cd4f.camel@intel.com>
+From:   "Michael N. Moran" <mike@mnmoran.org>
+Message-ID: <410faf08-70e6-ebb2-df7d-79ea1ee0b9f4@mnmoran.org>
+Date:   Sat, 15 Feb 2020 23:39:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200214191609.Bluez.v5.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <e2f322b4ba3abb81b59a51d8bb5c3611b968cd4f.camel@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Brian,
 
-On Fri, Feb 14, 2020 at 07:16:41PM +0800, Howard Chung wrote:
-> Attack scenario:
-> 1. A Chromebook (let's call this device A) is paired to a legitimate
->    Bluetooth classic device (e.g. a speaker) (let's call this device
->    B).
-> 2. A malicious device (let's call this device C) pretends to be the
->    Bluetooth speaker by using the same BT address.
-> 3. If device A is not currently connected to device B, device A will
->    be ready to accept connection from device B in the background
->    (technically, doing Page Scan).
-> 4. Therefore, device C can initiate connection to device A
->    (because device A is doing Page Scan) and device A will accept the
->    connection because device A trusts device C's address which is the
->    same as device B's address.
-> 5. Device C won't be able to communicate at any high level Bluetooth
->    profile with device A because device A enforces that device C is
->    encrypted with their common Link Key, which device C doesn't have.
->    But device C can initiate pairing with device A with just-works
->    model without requiring user interaction (there is only pairing
->    notification). After pairing, device A now trusts device C with a
->    new different link key, common between device A and C.
-> 6. From now on, device A trusts device C, so device C can at anytime
->    connect to device A to do any kind of high-level hijacking, e.g.
->    speaker hijack or mouse/keyboard hijack.
-> 
-> Since we don't know whether the repairing is legitimate or not,
-> leave the decision to user space if all the conditions below are met.
-> - the pairing is initialized by peer
-> - the authorization method is just-work
-> - host already had the link key to the peer
-> 
-> Signed-off-by: Howard Chung <howardchung@google.com>
-> ---
-> 
-> Changes in v5:
-> - Rephrase the comment
-> 
-> Changes in v4:
-> - optimise the check in smp.c.
-> 
-> Changes in v3:
-> - Change confirm_hint from 2 to 1
-> - Fix coding style (declaration order)
-> 
-> Changes in v2:
-> - Remove the HCI_PERMIT_JUST_WORK_REPAIR debugfs option
-> - Fix the added code in classic
-> - Add a similar fix for LE
-> 
->  net/bluetooth/hci_event.c | 10 ++++++++++
->  net/bluetooth/smp.c       | 19 +++++++++++++++++++
->  2 files changed, 29 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 2c833dae9366..e6982f4f51ea 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4571,6 +4571,16 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
->  			goto confirm;
->  		}
->  
-> +		/* If there already exists link key in local host, leave the
-> +		 * decision to user space since the remote device could be
-> +		 * legitimate or malicious.
-> +		 */
-> +		if (hci_find_link_key(hdev, &ev->bdaddr)) {
-> +			bt_dev_warn(hdev, "Local host already has link key");
-> +			confirm_hint = 1;
-> +			goto confirm;
-> +		}
-> +
->  		BT_DBG("Auto-accept of user confirmation with %ums delay",
->  		       hdev->auto_accept_delay);
->  
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 2cba6e07c02b..25dbf77d216b 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -2192,6 +2192,25 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
->  		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
->  			     smp->prnd);
->  		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
-> +
-> +		/* Only Just-Works pairing requires extra checks */
-> +		if (smp->method != JUST_WORKS)
-> +			goto mackey_and_ltk;
-> +
-> +		/* If there already exists link key in local host, leave the
-> +		 * decision to user space since the remote device could be
-> +		 * legitimate or malicious.
-> +		 */
-> +		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
-> +				 hcon->role)) {
-> +			err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
-> +							hcon->type,
-> +							hcon->dst_type, passkey,
+Thanks for the quick reply.
 
-We received a report from the 0day bot when building with clang that
-passkey is uninitialized when used here:
+On 2/15/20 2:50 PM, Gix, Brian wrote:
+> Hi Michael,
+> On Sat, 2020-02-15 at 13:20 -0500, Michael N. Moran wrote:
+>> I've been using meshctl to provision/configure a group of
+>> mesh nodes.
+> 
+> First off, don't use meshctl for work going forward, unless for some reason you *require* GATT support.  Mesh
+> is designed to primarily be an Advertising based system, and so all current work is being done on the
+> bluetooth-meshd daemon, which does not yet have GATT support.
 
-https://groups.google.com/forum/#!topic/clang-built-linux/kyRKCjRsGoU
+I've been working on a mesh stack implementation since June, 
+so I have a pretty good understanding of the protocol.
 
-It appears to be legitimate as if we get to this point, we have not
-touched the value of passkey but I do not know if there is any
-contextual code flow going on where this can never happen but I do not
-see how.
+I started the development using a now defunct Linux meshd 
+project that used PB-ADV for provisioning. It never had much 
+mesh support beyond provisioning.
 
-Would you mind looking into it?
+Later, I moved to meshctl after I implemented Mesh 
+Provisioning and Mesh Proxy over GATT.
 
-Cheers,
-Nathan
+More recently I've been using various silicon vendor Android 
+based mesh apps, which all use GATT exclusively.
+
+At the moment, I'm working on the LPN and Friend support.
+
+> We currently have a pretty robust solution based on:
+> 
+> 1. Run mesh/bluetooth-meshd as root
+>      1.1 You may need to first install, *or* copy
+>          mesh/bluetooth-mesh.conf --> /etc/dbus-1/system.d/bluetooth-mesh.conf
+> 
+>      1.2 Make sure mesh/bluetooth-meshd has a dedicated v4.0 or
+>          better controller. This can be done by stopping bluetoothd,
+>          or by having a 2nd controller in the system and making sure
+>          that in /etc/bluetooth/main.conf, AutoEnable=false
+> 
+>      1.3 reboot
+> 
+> 2. Run tools/mesh-cfgclient
+> 
+
+OK. I'm currently using bluez-5.50 on some rapberry-pi zero 
+w unis with in a Yocto build. I use one pi to run meshctl.
+
+Obviously, bluez has changed since I started. :-)
+
+>> There does not seem to be a mechanism in meshctl to send
+>> model messages to group addresses or virtual addresses.
+>>
+>> As an example, consider the simple OnOff model. I can
+>> configure the subscription for an OnOff model with a group
+>> address. However, the meshctl onoff command will not work
+>> with a group address set for the onoff target.
+>>
+>> I have modified the cmd_set() function in onoff-model.c by
+>> removing the node_find_by_addr(target) check and this works
+>> fine. Obviously, that only works for the OnOff model. I'd
+>> happily submit a patch for that model, but that doesn't seem
+>> to be a very good general solution.
+>>
+>> So is meshctl the right (only) tool to use on Linux?
+>> Is there a newer tool that is planned or under development?
+> 
+> See above, and use the tip of the repository (currently at v5.53)
+
+I cloned the tip and have poked around a bit. However, I 
+don't see any OnOff model work other than the 
+tools/mesh-gatt/onoff-model.c, which does not *appear* to be 
+a part of the mesh-cfgclient build.
+
+I'm probably missing something.
+How is this supported in mesh-cfgclient?
