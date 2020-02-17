@@ -2,179 +2,90 @@ Return-Path: <SRS0=SJVD=4F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B88C7619B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Feb 2020 04:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40D1C2BA83
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Feb 2020 08:02:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 95AB720726
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Feb 2020 04:05:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SJ77Fa0b"
+	by mail.kernel.org (Postfix) with ESMTP id A14042072C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Feb 2020 08:02:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727889AbgBQEFR (ORCPT
+        id S1727354AbgBQICb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Feb 2020 23:05:17 -0500
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:40136 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726498AbgBQEFO (ORCPT
+        Mon, 17 Feb 2020 03:02:31 -0500
+Received: from mail3-bck.iservicesmail.com ([217.130.24.85]:27503 "EHLO
+        mail3-bck.iservicesmail.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727263AbgBQICa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Feb 2020 23:05:14 -0500
-Received: by mail-pg1-f201.google.com with SMTP id n7so10873339pgt.7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Feb 2020 20:05:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=KMuOOh+un+YCPFr8b6yeijMH6rF3UsQjfTXq1dL+TiU=;
-        b=SJ77Fa0bkktg3YOKVByovnXj1UUsGEqdC5K+iVXXrTrxzeIRcidVk/fb4NFEOOfdL9
-         s0Yu+L/nPWd7PXyqy09zpbxxm189pl7CeTweBTyyoz6p4FiNHjBNF49IpkdGiI3xYYwI
-         b+plMsujhnnabbL5x7aybaprN4E2Sc/Z+F5EPRIYi3Gs4s8da0aNsQeL5B/DXstv1jfq
-         hUMPBwt5R9Idh1OSifE2GZJjuozkR0R5obF1KZXr15l7gnJOJ+svm4z2mM9xV5UCCypd
-         OF5WWC8exZ8FxkPaU/qsEXC7fokFwlJ5zInZGF5vWYxkNGPbyLBSrCshThNm89/PAXZZ
-         UgqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=KMuOOh+un+YCPFr8b6yeijMH6rF3UsQjfTXq1dL+TiU=;
-        b=jIa9VPZv656f1YIPUdGhpqwZJJQoGWOacS1ZzmCS5NAxqf94E2408GYYjG/T+JAQjn
-         X5XK9BcNcfWvIy1RDFOVl4UDzhyUPgLTQaKyUgrd42KrgbmsWCMJ0TS3SqpZFudl+QW8
-         5oDS1OVHJF8OnI0SotPlmSsOAjurR/GhdUmuxlco1ii3bAMS+ncVvQv9bZAnT0B2vlG2
-         tyihOoENxBTfUqTTtjKMHA31ixvMv9qe73+5Fxv8zAAZZmiYtp9NCufsSYhEAMKSiklM
-         Vef49H7l2qEG0g/i3S7z+iYFv+eBOJwEOH3jHUrjKlpkOgxHKlGmHyQgI4ho2LMs6tOv
-         r76Q==
-X-Gm-Message-State: APjAAAWcDXpmOtughpoawOObZIaOHKCzkMT93sv9j01R56giDHY/0W+i
-        BgTTb5LTLjOMVt01TpLU84XPObVBAl943U0tENEEhmR/fQJaGeS6gMNOr68Xol0w1/0NQQGGspm
-        nrP2W/o1i6bRQDljAqKJw6y6tqCjDC6RLrakqaCUbVxZyqDkOjTAX99WwrLg4XK5X4T/y2P9ptG
-        C4TMrAZrC7Bqk=
-X-Google-Smtp-Source: APXvYqwzecOqFqAQbDjGxkj8H9g1SfJhMVodrpAyj+HwltbP1RJUNeMBDIJ9Xo+HM4GK8bjoqzV6361fiRur36qs1g==
-X-Received: by 2002:a63:d18:: with SMTP id c24mr15930889pgl.218.1581912312201;
- Sun, 16 Feb 2020 20:05:12 -0800 (PST)
-Date:   Mon, 17 Feb 2020 12:05:03 +0800
-Message-Id: <20200217120454.Bluez.v6.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [Bluez PATCH v6] bluetooth: secure bluetooth stack from bluedump attack
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Howard Chung <howardchung@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 17 Feb 2020 03:02:30 -0500
+IronPort-SDR: JhS6/zAvMlzoyF9fMgLUa3BkTgaxUQdg3z5i8MwjqZTN5P4QLl9GRIRs0sYU0gaa4+h2ndT0sM
+ Z98EGrVABWOA==
+IronPort-PHdr: =?us-ascii?q?9a23=3ATH8iPxXGWsctRPSfBcbqQEw0wDDV8LGtZVwlr6?=
+ =?us-ascii?q?E/grcLSJyIuqrYYx2At8tkgFKBZ4jH8fUM07OQ7/m8HzNdqs/Y6jgrS99laV?=
+ =?us-ascii?q?wssY0uhQsuAcqIWwXQDcXBSGgEJvlET0Jv5HqhMEJYS47UblzWpWCuv3ZJQk?=
+ =?us-ascii?q?2sfQV6Kf7oFYHMks+5y/69+4HJYwVPmTGxfa5+IA+5oAnMucQam4lvJ6Y+xh?=
+ =?us-ascii?q?fUv3dEZfldyH91K16Ugxvz6cC88YJ5/S9Nofwh7clAUav7f6Q8U7NVCSktPn?=
+ =?us-ascii?q?426sP2qxTNVBOD6XQAXGoYlBpIGBXF4wrhXpjtqCv6t/Fy1zecMMbrUL07Qz?=
+ =?us-ascii?q?Wi76NsSB/1lCcKMiMy/W/LhsBsiq9QvRSsrAF9zYHJeoGYLPRwcKPHfd0ERm?=
+ =?us-ascii?q?RPQ8leWDBODI6nc4sCDfYOMfpEo4XhuVcDqwa1Cwm2BOPozz9FnmX40rMm0+?=
+ =?us-ascii?q?s/CwHNwQwvH9UIsHTbsd74M78SUeevzKnU1zrOdO5W2TH86IjTbhAhu+uDUq?=
+ =?us-ascii?q?9qfsbLyEkvCxrIg1ONooLmJzOYzvoBv3WZ4uZ6SO6ihXIrpxtvrjWg3MshhI?=
+ =?us-ascii?q?nEi4QIwV7e7yp52pw6JdigRU5+Zt6rDYVfujmBN4tzXsMiW2ZouDsmyrEeuZ?=
+ =?us-ascii?q?60YiwKyJM/yh7acfOHcoyI4gj9W+aVPTt1i2hpeKy4hxmv60egxOr8Vs+q31?=
+ =?us-ascii?q?pQsCVFicHAtnEL1xPN9siKUuVx8lqj1DqVygze5P1ILVoqmafUMZIszL49mo?=
+ =?us-ascii?q?IWsUvZHy/2nEv2jLWRdkUh4uWo8+PnYq/6ppCGLIJ0lwf+MqU1msyjG+Q3KB?=
+ =?us-ascii?q?UBUHKB9eS9yL3v5Vf5T6lSjv0qjqnZt4jXJcAapq6/Hg9U3Z8v5A27Dze7zt?=
+ =?us-ascii?q?sYgX4HLFVZeBKHlIXpJV7OL+7iDfulgFSjji1rx/bYMb3lGJnNKWLDkLiyNY?=
+ =?us-ascii?q?p6vkpdzhcjiNpb+p9IDbYdINrtVULr8t/VFBk0N0qz2em0Mthl0pIiXje3D7?=
+ =?us-ascii?q?OUKuvttlmHrrY3LvWBfpASvjn9KPg+7fXGgnowmFtbdq6si8g5cne9S8xrP0?=
+ =?us-ascii?q?iDKUXrhNhJRX8NpBY3ZPHsiUaeSzdfbjCzQ/RvtXkAFIu6ANKbFciWi7ub0X?=
+ =?us-ascii?q?LjEw=3D=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-Anti-Spam-Result: =?us-ascii?q?A2G9TQBkR0pelyMYgtllgkOBPgIBgUU?=
+ =?us-ascii?q?QUiASjGOGa1QGcx+DQ4ZShRaBAIMzhgcTDIFbDQEBAQEBNQIEAQGEQIIEJDw?=
+ =?us-ascii?q?CDQIDDQEBBgEBAQEBBQQBAQIQAQEBAQEIFgaFc4I7IoNwIA85SkwBDgGDV4J?=
+ =?us-ascii?q?LAQEKKax2DQ0ChR6CSAQKgQiBGyOBNgMBAYwhGnmBB4EjIYIrCAGCAYJ/ARI?=
+ =?us-ascii?q?BboJIglkEjVISIYlFmDSBaloElmuCOQEPiBaENwOCWg+BC4MdgwmBZ4RSgX+?=
+ =?us-ascii?q?fZoQUV4Egc3EzGggwgW4agSBPGA2ON44rAkCBFxACT4tJgjIBAQ?=
+X-IPAS-Result: =?us-ascii?q?A2G9TQBkR0pelyMYgtllgkOBPgIBgUUQUiASjGOGa1QGc?=
+ =?us-ascii?q?x+DQ4ZShRaBAIMzhgcTDIFbDQEBAQEBNQIEAQGEQIIEJDwCDQIDDQEBBgEBA?=
+ =?us-ascii?q?QEBBQQBAQIQAQEBAQEIFgaFc4I7IoNwIA85SkwBDgGDV4JLAQEKKax2DQ0Ch?=
+ =?us-ascii?q?R6CSAQKgQiBGyOBNgMBAYwhGnmBB4EjIYIrCAGCAYJ/ARIBboJIglkEjVISI?=
+ =?us-ascii?q?YlFmDSBaloElmuCOQEPiBaENwOCWg+BC4MdgwmBZ4RSgX+fZoQUV4Egc3EzG?=
+ =?us-ascii?q?ggwgW4agSBPGA2ON44rAkCBFxACT4tJgjIBAQ?=
+X-IronPort-AV: E=Sophos;i="5.70,451,1574118000"; 
+   d="scan'208";a="338073378"
+Received: from mailrel04.vodafone.es ([217.130.24.35])
+  by mail02.vodafone.es with ESMTP; 17 Feb 2020 09:02:22 +0100
+Received: (qmail 1141 invoked from network); 17 Feb 2020 06:34:31 -0000
+Received: from unknown (HELO 192.168.1.163) (mariapazos@[217.217.179.17])
+          (envelope-sender <porta@unistrada.it>)
+          by mailrel04.vodafone.es (qmail-ldap-1.03) with SMTP
+          for <linux-bluetooth@vger.kernel.org>; 17 Feb 2020 06:34:31 -0000
+Date:   Mon, 17 Feb 2020 07:34:30 +0100 (CET)
+From:   Peter Wong <porta@unistrada.it>
+Reply-To: Peter Wong <peterwonghkhsbc@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <22318792.419763.1581921271245.JavaMail.cash@217.130.24.55>
+Subject: Investment opportunity
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Attack scenario:
-1. A Chromebook (let's call this device A) is paired to a legitimate
-   Bluetooth classic device (e.g. a speaker) (let's call this device
-   B).
-2. A malicious device (let's call this device C) pretends to be the
-   Bluetooth speaker by using the same BT address.
-3. If device A is not currently connected to device B, device A will
-   be ready to accept connection from device B in the background
-   (technically, doing Page Scan).
-4. Therefore, device C can initiate connection to device A
-   (because device A is doing Page Scan) and device A will accept the
-   connection because device A trusts device C's address which is the
-   same as device B's address.
-5. Device C won't be able to communicate at any high level Bluetooth
-   profile with device A because device A enforces that device C is
-   encrypted with their common Link Key, which device C doesn't have.
-   But device C can initiate pairing with device A with just-works
-   model without requiring user interaction (there is only pairing
-   notification). After pairing, device A now trusts device C with a
-   new different link key, common between device A and C.
-6. From now on, device A trusts device C, so device C can at anytime
-   connect to device A to do any kind of high-level hijacking, e.g.
-   speaker hijack or mouse/keyboard hijack.
+Greetings,
+Please check the attached email for a buisness proposal to explore.
+Looking forward to hearing from you for more details.
+Sincerely: Peter Wong
 
-Since we don't know whether the repairing is legitimate or not,
-leave the decision to user space if all the conditions below are met.
-- the pairing is initialized by peer
-- the authorization method is just-work
-- host already had the link key to the peer
 
-Signed-off-by: Howard Chung <howardchung@google.com>
----
 
-Changes in v6:
-- Fix passkey uninitialized issue
 
-Changes in v5:
-- Rephrase the comment
-
-Changes in v4:
-- optimise the check in smp.c.
-
-Changes in v3:
-- Change confirm_hint from 2 to 1
-- Fix coding style (declaration order)
-
-Changes in v2:
-- Remove the HCI_PERMIT_JUST_WORK_REPAIR debugfs option
-- Fix the added code in classic
-- Add a similar fix for LE
-
- net/bluetooth/hci_event.c | 10 ++++++++++
- net/bluetooth/smp.c       | 18 ++++++++++++++++++
- 2 files changed, 28 insertions(+)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2c833dae9366..e6982f4f51ea 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4571,6 +4571,16 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 			goto confirm;
- 		}
- 
-+		/* If there already exists link key in local host, leave the
-+		 * decision to user space since the remote device could be
-+		 * legitimate or malicious.
-+		 */
-+		if (hci_find_link_key(hdev, &ev->bdaddr)) {
-+			bt_dev_warn(hdev, "Local host already has link key");
-+			confirm_hint = 1;
-+			goto confirm;
-+		}
-+
- 		BT_DBG("Auto-accept of user confirmation with %ums delay",
- 		       hdev->auto_accept_delay);
- 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 2cba6e07c02b..2b6fb7454add 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2192,6 +2192,24 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
- 			     smp->prnd);
- 		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
-+
-+		/* Only Just-Works pairing requires extra checks */
-+		if (smp->method != JUST_WORKS)
-+			goto mackey_and_ltk;
-+
-+		/* If there already exists link key in local host, leave the
-+		 * decision to user space since the remote device could be
-+		 * legitimate or malicious.
-+		 */
-+		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
-+				 hcon->role)) {
-+			err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
-+							hcon->type,
-+							hcon->dst_type, 0, 1);
-+			if (err)
-+				return SMP_UNSPECIFIED;
-+			set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
-+		}
- 	}
- 
- mackey_and_ltk:
--- 
-2.25.0.265.gbab2e86ba0-goog
+----------------------------------------------------
+This email was sent by the shareware version of Postman Professional.
 
