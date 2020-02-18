@@ -6,86 +6,54 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189E9C34035
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 08:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34539C34031
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 08:26:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEE9B20722
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 08:18:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1597A206E2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 08:26:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726206AbgBRISP convert rfc822-to-8bit (ORCPT
+        id S1726446AbgBRI0n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Feb 2020 03:18:15 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:37800 "EHLO
+        Tue, 18 Feb 2020 03:26:43 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:39204 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726105AbgBRISP (ORCPT
+        with ESMTP id S1726180AbgBRI0n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Feb 2020 03:18:15 -0500
+        Tue, 18 Feb 2020 03:26:43 -0500
 Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 678BFCED24;
-        Tue, 18 Feb 2020 09:27:37 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 983AACED24;
+        Tue, 18 Feb 2020 09:36:06 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [Bluez PATCH v6] bluetooth: secure bluetooth stack from bluedump
- attack
+Subject: Re: [PATCH] Bluetooth: FIX - Disable EXT Adv if enabled
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200217120454.Bluez.v6.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
-Date:   Tue, 18 Feb 2020 09:18:12 +0100
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <0B84BD16-9C82-4910-8646-B24BCB152AC2@holtmann.org>
-References: <20200217120454.Bluez.v6.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
-To:     Howard Chung <howardchung@google.com>
+In-Reply-To: <20200217090744.909-1-sathish.narasimman@intel.com>
+Date:   Tue, 18 Feb 2020 09:26:41 +0100
+Cc:     linux-bluetooth@vger.kernel.org,
+        Sathish Narsimman <sathish.narasimman@intel.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <18CB6BDB-147A-4D85-9570-8F7FF2DF4E8B@holtmann.org>
+References: <20200217090744.909-1-sathish.narasimman@intel.com>
+To:     Sathish Narsimman <nsathish41@gmail.com>
 X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Sathish,
 
-> Attack scenario:
-> 1. A Chromebook (let's call this device A) is paired to a legitimate
->   Bluetooth classic device (e.g. a speaker) (let's call this device
->   B).
-> 2. A malicious device (let's call this device C) pretends to be the
->   Bluetooth speaker by using the same BT address.
-> 3. If device A is not currently connected to device B, device A will
->   be ready to accept connection from device B in the background
->   (technically, doing Page Scan).
-> 4. Therefore, device C can initiate connection to device A
->   (because device A is doing Page Scan) and device A will accept the
->   connection because device A trusts device C's address which is the
->   same as device B's address.
-> 5. Device C won't be able to communicate at any high level Bluetooth
->   profile with device A because device A enforces that device C is
->   encrypted with their common Link Key, which device C doesn't have.
->   But device C can initiate pairing with device A with just-works
->   model without requiring user interaction (there is only pairing
->   notification). After pairing, device A now trusts device C with a
->   new different link key, common between device A and C.
-> 6. From now on, device A trusts device C, so device C can at anytime
->   connect to device A to do any kind of high-level hijacking, e.g.
->   speaker hijack or mouse/keyboard hijack.
+> Disabling LEGACY_ADV when EXT_ADV is enabled causes
+> 'command disallowed' during DIRECTED_ADV. This Patch fixes this
+> issue.
 > 
-> Since we don't know whether the repairing is legitimate or not,
-> leave the decision to user space if all the conditions below are met.
-> - the pairing is initialized by peer
-> - the authorization method is just-work
-> - host already had the link key to the peer
-> 
-> Signed-off-by: Howard Chung <howardchung@google.com>
+> Signed-off-by: Sathish Narsimman <sathish.narasimman@intel.com>
 > ---
-> 
-> Changes in v6:
-> - Fix passkey uninitialized issue
+> net/bluetooth/hci_conn.c | 7 ++-----
+> 1 file changed, 2 insertions(+), 5 deletions(-)
 
-since I already applied v5, can you send a delta-patch. And please add a comment for using 0 as passkey and why that is correct.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
