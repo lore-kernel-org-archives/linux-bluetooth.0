@@ -2,129 +2,73 @@ Return-Path: <SRS0=m/C2=4G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFC7C34034
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 06:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78862C34031
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 07:52:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3EDCC21D7D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 06:47:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D75F2176D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 07:52:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726422AbgBRGrQ (ORCPT
+        id S1726157AbgBRHwK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Feb 2020 01:47:16 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:43373 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726104AbgBRGrP (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Feb 2020 01:47:15 -0500
-Received: by mail-io1-f72.google.com with SMTP id v15so13260249iol.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Feb 2020 22:47:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=2uIvG8n91WjAK+8Fc4AV0UFGKDnjSDw2pznJjQ1AoWI=;
-        b=sN5kpssFiuDkij86YF9DJbDgzitDOk904pYUbW93nPNaUVoM94ljuKmjZpMFHWSOdt
-         fhuwkEAee1YEfVQBJDHyKmy9WIMyoSgADJIQ9MGDGRxLcouNGB63di7pFvFelHz2UsYL
-         oy0+0K+zNJi5ROg6w2w4n5Rrwf0V8Z4Osc7lgeo6NdJCk5aUrFWAPy3DcE1Uzusva5zC
-         z8V84FTSve1+Bc65M7M9ReRvJVfR/xCP1OuksmU+Sh2eEeWm5RYEAUjkxakVdUfMWwKi
-         VqR9Wwf5Wen49gwX9OPvd9hFlsC/AYjea6UciVlmHoTY4SeFS2dCQTvPqxgNZiuSfYRS
-         RuCw==
-X-Gm-Message-State: APjAAAWv1vAHDr5vlRWIblAYFaMqy8S8W3BTwnNONjmikcnHX2D203LF
-        3t+8PjuWytMi1QLgFe3RPG9RxVSugg95a68SeZhFXd29dTD9
-X-Google-Smtp-Source: APXvYqyl+yC5vY8YiRKB6Nj+2QlehHRz/NDgCroTLCqKaqYUOiL9cwZlR8Nwrb/BTXe5y7Qx+Y6WRTSbs4MQ49+t3mAlTgzvI1NM
+        Tue, 18 Feb 2020 02:52:10 -0500
+Received: from mga04.intel.com ([192.55.52.120]:35670 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726139AbgBRHwK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Feb 2020 02:52:10 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Feb 2020 23:52:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,455,1574150400"; 
+   d="scan'208";a="224063695"
+Received: from ingas-nuc1.sea.intel.com ([10.252.201.157])
+  by orsmga007.jf.intel.com with ESMTP; 17 Feb 2020 23:52:09 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] test/test-mesh: Fix output of MessageReceived method
+Date:   Mon, 17 Feb 2020 23:52:08 -0800
+Message-Id: <20200218075208.17135-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-X-Received: by 2002:a5e:940e:: with SMTP id q14mr13738130ioj.247.1582008433632;
- Mon, 17 Feb 2020 22:47:13 -0800 (PST)
-Date:   Mon, 17 Feb 2020 22:47:13 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b7ee04059ed40af8@google.com>
-Subject: general protection fault in sco_sock_getsockopt
-From:   syzbot <syzbot+4a38d3795200fd59a9eb@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
-
-syzbot found the following crash on:
-
-HEAD commit:    c25a951c Add linux-next specific files for 20200217
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=127e5865e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c727d8fc485ff049
-dashboard link: https://syzkaller.appspot.com/bug?extid=4a38d3795200fd59a9eb
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=158849e9e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e3d711e00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+4a38d3795200fd59a9eb@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 PID: 9807 Comm: syz-executor290 Not tainted 5.6.0-rc2-next-20200217-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:sco_sock_getsockopt+0x33a/0x910 net/bluetooth/sco.c:966
-Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 74 05 00 00 49 8b 9e b8 04 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 45 05 00 00 48 8b 3b e8 44 d1 f3 ff be c8 03 00
-RSP: 0018:ffffc90007a97d40 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87282cb2
-RDX: 0000000000000000 RSI: ffffffff87282cc0 RDI: ffff88808cc7b4b8
-RBP: ffffc90007a97e00 R08: ffff8880a8fc0380 R09: fffffbfff1709225
-R10: fffffbfff1709224 R11: 0000000000000003 R12: 0000000000000000
-R13: 1ffff92000f52fab R14: ffff88808cc7b000 R15: 0000000000000000
-FS:  00000000009c3880(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000080 CR3: 00000000a6d61000 CR4: 00000000001406f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- __sys_getsockopt+0x16d/0x310 net/socket.c:2175
- __do_sys_getsockopt net/socket.c:2190 [inline]
- __se_sys_getsockopt net/socket.c:2187 [inline]
- __x64_sys_getsockopt+0xbe/0x150 net/socket.c:2187
- do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x440199
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffd6ad93468 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440199
-RDX: 000000000000000e RSI: 0000000000000084 RDI: 0000000000000005
-RBP: 00000000006ca018 R08: 0000000020000080 R09: 00000000004002c8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000401a20
-R13: 0000000000401ab0 R14: 0000000000000000 R15: 0000000000000000
-Modules linked in:
----[ end trace 2241e8fa1d14b6d0 ]---
-RIP: 0010:sco_sock_getsockopt+0x33a/0x910 net/bluetooth/sco.c:966
-Code: df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 74 05 00 00 49 8b 9e b8 04 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 45 05 00 00 48 8b 3b e8 44 d1 f3 ff be c8 03 00
-RSP: 0018:ffffc90007a97d40 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87282cb2
-RDX: 0000000000000000 RSI: ffffffff87282cc0 RDI: ffff88808cc7b4b8
-RBP: ffffc90007a97e00 R08: ffff8880a8fc0380 R09: fffffbfff1709225
-R10: fffffbfff1709224 R11: 0000000000000003 R12: 0000000000000000
-R13: 1ffff92000f52fab R14: ffff88808cc7b000 R15: 0000000000000000
-FS:  00000000009c3880(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000080 CR3: 00000000a6d61000 CR4: 00000000001406f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
+This fixes formatted output of recieved message parameters.
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ test/test-mesh | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/test/test-mesh b/test/test-mesh
+index 5777fcebc..929e28fd3 100755
+--- a/test/test-mesh
++++ b/test/test-mesh
+@@ -559,8 +559,15 @@ class Element(dbus.service.Object):
+ 	@dbus.service.method(MESH_ELEMENT_IFACE,
+ 					in_signature="qqvay", out_signature="")
+ 	def MessageReceived(self, source, key, destination, data):
+-		print('Message Received on Element %d, src=%04x, dst=%s' %
+-						self.index, source, destination)
++		print(('Message Received on Element %02x') % self.index, end='')
++		print(', src=', format(source, '04x'), end='')
++
++		if isinstance(destination, int):
++			print(', dst=%04x' % destination)
++		elif isinstance(destination, dbus.Array):
++			dst_str = array_to_string(destination)
++			print(', dst=' + dst_str)
++
+ 		for model in self.models:
+ 			model.process_message(source, key, data)
+ 
+-- 
+2.21.1
+
