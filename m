@@ -1,100 +1,130 @@
-Return-Path: <SRS0=SJVD=4F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=m/C2=4G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A66B5C7619F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Feb 2020 09:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69042C34031
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 04:07:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7907A20718
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Feb 2020 09:06:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nDGNVQw4"
+	by mail.kernel.org (Postfix) with ESMTP id 449A8206D5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 04:07:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728697AbgBQJGK (ORCPT
+        id S1726292AbgBREHN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Feb 2020 04:06:10 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37030 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728388AbgBQJGK (ORCPT
+        Mon, 17 Feb 2020 23:07:13 -0500
+Received: from mail-io1-f69.google.com ([209.85.166.69]:49314 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726266AbgBREHN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Feb 2020 04:06:10 -0500
-Received: by mail-pg1-f193.google.com with SMTP id z12so8735293pgl.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Feb 2020 01:06:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=80rs4W6R0HIIbQ770wNeQg7LbJLKILfAsUBfyaO5AKc=;
-        b=nDGNVQw4/2gUArMIB+co59GbuvYlqkH9na/STD2Q7Jtw8Yld29CSPRMKpB8YRR8sFo
-         5306RmEkQT2yWCT1rTnlJYbcKj5jDQFOoEHrBBPSNKpYQSM0mGHUAHzADu4hwfIi9M2D
-         e9HRCWitZ7jdzGlLqPUSYzVsu++O3wfTrmJF+qg/+pMPlLFgSp317y6zWJRPrnVlVyeD
-         gw+OQ5e4los/kkVAGQkOxL9PhBQSIs91kCFR8z/9/Fxh4RugmAorM0lB1t218lSU4ov3
-         vXakH9TmhSSDpD75kGpAtqeK7awt9lp1iyYDjR1qNc7Db/7tJnD+XznNkbRcbU9gW5Wq
-         6Fbw==
+        Mon, 17 Feb 2020 23:07:13 -0500
+Received: by mail-io1-f69.google.com with SMTP id v11so13069255iop.16
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Feb 2020 20:07:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=80rs4W6R0HIIbQ770wNeQg7LbJLKILfAsUBfyaO5AKc=;
-        b=IzSkKc0yD2rqNzb+nY+07hj8wzf0MQcVIkxIGJlN8DkgMYsvJmlRjpeMRIGfpsrTEK
-         OgjL5Y9AbNcnyY/v7LYlesEmCc/9PTiox/dR/VsdaDJ2DgFKo+hxYGZf9x3RHEUfC9P1
-         NfwOJrzXlBR4cX33Y8nm1/lvy05hnazZSPkJTi4bCbJpAv3NjYpWZiz11PTwSU6Zp8Jr
-         RBJ84rI8oiPBuRpJ0aL19M+jhTz3lrs9N0oR81flfRU7Ql4A/YgxLpvem849RYpT9NJx
-         fu7NbUVorqQSflPZE/R+Pkks6kPucwL55g0HlWeAosgIYwMRfj85eCxhF8/1A1SiVR4B
-         ENvQ==
-X-Gm-Message-State: APjAAAVwQmRyE/L/7+U6W5b3PQxFgkSH0hXDwXIwSmj4ETimXe6aeLUY
-        o3DlLDz3Jm3YMmnEFjvoOl3XooktkIOyow==
-X-Google-Smtp-Source: APXvYqzzumKyoln9iPrikag+NzeYo1qOnRiNQ7aeTQrRixYBj6cEYoBWO4ZrFPyRkQ6jGxAY0sx4lw==
-X-Received: by 2002:a17:90a:e291:: with SMTP id d17mr19430352pjz.116.1581930369169;
-        Mon, 17 Feb 2020 01:06:09 -0800 (PST)
-Received: from nsathish-Latitude-7480.iind.intel.com ([192.55.55.41])
-        by smtp.gmail.com with ESMTPSA id b42sm15900337pjc.27.2020.02.17.01.06.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Feb 2020 01:06:08 -0800 (PST)
-From:   Sathish Narsimman <nsathish41@gmail.com>
-X-Google-Original-From: Sathish Narsimman <sathish.narasimman@intel.com>
-To:     linux-bluetooth@vger.kernel.org, nsathish41@gmail.com
-Cc:     Sathish Narsimman <sathish.narasimman@intel.com>
-Subject: [PATCH] Bluetooth: FIX - Disable EXT Adv if enabled
-Date:   Mon, 17 Feb 2020 14:37:44 +0530
-Message-Id: <20200217090744.909-1-sathish.narasimman@intel.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=uHglhlTsZL9nYXC1SuW5n8zSraL5OSomR7EKPnnITWs=;
+        b=EoRVHPcDXuMGJ0REJ1Zw5Q6zXNO4QxBeAo/0yMjWXOvaJD+xABQRliPBesK7Gaz251
+         91C3ssy/siBCU4lEIIfypWed+JiEnHATHyIxn0SrdFPnd8qaN+1U2Nec7HqLzHReHOFM
+         0A0S9/WeXGx4s5XUixuq6rKGuUpJRcHDocIDrmUTPSogDL/VajToUj/w/jv5b5N8Zgab
+         /UtxAM1kCXFSZYVbalj2hKRrZ/RA4m3n9J54T+RQGK/nS0aLljpABy3TxiVtYZG4gi/O
+         +YTXH42226gzRV2gBh1AGZ7f29pHZnEhQXf5k006s8Ys2BoBv5y23e2Q0Pgz5z0FjUys
+         tHQw==
+X-Gm-Message-State: APjAAAVSE9oTZ7Fe7gxfkhVC679eNFd/Baqb65raSFMWSQZbneakb4/G
+        tlxpQdVAXqu4USS1bFZ+8p1jpo8UYVjB4XEG0sdJ1M8+XOB6
+X-Google-Smtp-Source: APXvYqykvr5lZYYJzLA1G3jokmMLxLQMutu/6LzMIis/OPHm53DIYqPrXMQ1lTAZYZ7MZTpQKx8uB0HWAK4G5RctK5UqXjFwwjDg
+MIME-Version: 1.0
+X-Received: by 2002:a6b:d912:: with SMTP id r18mr13781201ioc.306.1581998832890;
+ Mon, 17 Feb 2020 20:07:12 -0800 (PST)
+Date:   Mon, 17 Feb 2020 20:07:12 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007838f1059ed1cea5@google.com>
+Subject: general protection fault in l2cap_sock_getsockopt
+From:   syzbot <syzbot+6446a589a5ca34dd6e8b@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Disabling LEGACY_ADV when EXT_ADV is enabled causes
-'command disallowed' during DIRECTED_ADV. This Patch fixes this
-issue.
+Hello,
 
-Signed-off-by: Sathish Narsimman <sathish.narasimman@intel.com>
+syzbot found the following crash on:
+
+HEAD commit:    c25a951c Add linux-next specific files for 20200217
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=171b1a29e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c727d8fc485ff049
+dashboard link: https://syzkaller.appspot.com/bug?extid=6446a589a5ca34dd6e8b
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10465579e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16dabb11e00000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+6446a589a5ca34dd6e8b@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 9844 Comm: syz-executor679 Not tainted 5.6.0-rc2-next-20200217-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:l2cap_sock_getsockopt+0x7d3/0x1200 net/bluetooth/l2cap_sock.c:613
+Code: 00 00 00 00 00 fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 a0 09 00 00 48 b8 00 00 00 00 00 fc ff df 49 8b 1f 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 75 09 00 00 48 8b 3b e8 cb be f6 ff be 67 02 00
+RSP: 0018:ffffc900062f7d20 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87253e8c
+RDX: 0000000000000000 RSI: ffffffff87253f44 RDI: 0000000000000001
+RBP: ffffc900062f7e00 R08: ffff88808a5001c0 R09: fffffbfff16a3f80
+R10: fffffbfff16a3f7f R11: ffffffff8b51fbff R12: 0000000000000000
+R13: 1ffff92000c5efa7 R14: ffff8880a9a79000 R15: ffff8880a1d92000
+FS:  0000000001ccd880(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000140 CR3: 0000000097113000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ __sys_getsockopt+0x16d/0x310 net/socket.c:2175
+ __do_sys_getsockopt net/socket.c:2190 [inline]
+ __se_sys_getsockopt net/socket.c:2187 [inline]
+ __x64_sys_getsockopt+0xbe/0x150 net/socket.c:2187
+ do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x440149
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007ffcb256f088 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
+RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440149
+RDX: 000000000000000e RSI: 0000000000000112 RDI: 0000000000000003
+RBP: 00000000006ca018 R08: 0000000020000140 R09: 00000000004002c8
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000004019d0
+R13: 0000000000401a60 R14: 0000000000000000 R15: 0000000000000000
+Modules linked in:
+---[ end trace 63f0b6416dbaab7d ]---
+RIP: 0010:l2cap_sock_getsockopt+0x7d3/0x1200 net/bluetooth/l2cap_sock.c:613
+Code: 00 00 00 00 00 fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 a0 09 00 00 48 b8 00 00 00 00 00 fc ff df 49 8b 1f 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 75 09 00 00 48 8b 3b e8 cb be f6 ff be 67 02 00
+RSP: 0018:ffffc900062f7d20 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff87253e8c
+RDX: 0000000000000000 RSI: ffffffff87253f44 RDI: 0000000000000001
+RBP: ffffc900062f7e00 R08: ffff88808a5001c0 R09: fffffbfff16a3f80
+R10: fffffbfff16a3f7f R11: ffffffff8b51fbff R12: 0000000000000000
+R13: 1ffff92000c5efa7 R14: ffff8880a9a79000 R15: ffff8880a1d92000
+FS:  0000000001ccd880(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000140 CR3: 0000000097113000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
 ---
- net/bluetooth/hci_conn.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 65fa44cbe514..a582c676e584 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1029,11 +1029,8 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	 * anyway have to disable it in order to start directed
- 	 * advertising.
- 	 */
--	if (hci_dev_test_flag(hdev, HCI_LE_ADV)) {
--		u8 enable = 0x00;
--		hci_req_add(&req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
--			    &enable);
--	}
-+	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
-+		 __hci_req_disable_advertising(&req);
- 
- 	/* If requested to connect as slave use directed advertising */
- 	if (conn->role == HCI_ROLE_SLAVE) {
--- 
-2.17.1
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
