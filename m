@@ -2,79 +2,62 @@ Return-Path: <SRS0=m/C2=4G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE2E3C3403B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 13:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7213C34026
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 14:08:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A064B2173E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 13:37:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 973AE20722
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 14:08:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726605AbgBRNhE (ORCPT
+        id S1726605AbgBROIO convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Feb 2020 08:37:04 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:44977 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726340AbgBRNhD (ORCPT
+        Tue, 18 Feb 2020 09:08:14 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:35648 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726556AbgBROIN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Feb 2020 08:37:03 -0500
-Received: by mail-il1-f197.google.com with SMTP id h87so17013783ild.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2020 05:37:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=aHgHZ98+U4qABqernE/QDZiaIAcqsbiecjuclCSQv3M=;
-        b=m5dRbiXvJeW6z6rz4GVs/b6jlAm4v3w5GSQC5D/E/wqTv2RXffqlhDYcIHXvMj0LZ7
-         yVNBeY01tGKESMdTPafB3Be5ji9ayAg7x9eTtNlETK0UYsNGa7PW071LopK8BXm3FdgK
-         VlevxdI8Bip5tGXtMT23udQuqj5mC5MHVZlfvWgL5m+4C3yFFHHlTymYgkrQ/Lw4eiSK
-         2CZaeaVSWHpay5XVv39xEQpqDPjnNG1q9Uzoi1Molmf/zXbJ50JpeBZ0Sn/CoR72tBsm
-         q9JSpIAsf8JMWn5wPxmyR75Qydp5idXxXCLdc9TpS5jeKl6TQgd4KHBpSV9GvGaJARqj
-         Q3rA==
-X-Gm-Message-State: APjAAAUUuVwkPqTrextEwnQy1acinuehcyiWA4/QP5Q3x8ONwCj0mIfQ
-        o6DzaLkcikKbGXN4wGGTEGdE+NvprO95dqwt/86WR+4oGUfQ
-X-Google-Smtp-Source: APXvYqyshNr6yoq5/wyQMhnfun/9MaaVUhImNxSLDXvsUcP+/UH3ULcBhS56N6d3AxYFbB6MIE376Q80hME1hctKKSSfPJJLaJ4T
-MIME-Version: 1.0
-X-Received: by 2002:a92:a1c5:: with SMTP id b66mr18063518ill.190.1582033022916;
- Tue, 18 Feb 2020 05:37:02 -0800 (PST)
-Date:   Tue, 18 Feb 2020 05:37:02 -0800
-In-Reply-To: <000000000000b7ee04059ed40af8@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005a9ed2059ed9c426@google.com>
-Subject: Re: general protection fault in sco_sock_getsockopt
-From:   syzbot <syzbot+4a38d3795200fd59a9eb@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.von.dentz@intel.com, marcel@holtmann.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 18 Feb 2020 09:08:13 -0500
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id B3D71CED28;
+        Tue, 18 Feb 2020 15:17:36 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH] Bluetooth: hci_h5: Move variable into local scope
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200218104533.GA46714@jhedberg-mac01.local>
+Date:   Tue, 18 Feb 2020 15:08:11 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <AE5F5C23-73C1-4348-8711-EC65DBA40591@holtmann.org>
+References: <20200218082858.42994-1-marcel@holtmann.org>
+ <20200218104533.GA46714@jhedberg-mac01.local>
+To:     Johan Hedberg <johan.hedberg@gmail.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this bug to:
+Hi Johan,
 
-commit eab2404ba798a8efda2a970f44071c3406d94e57
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Fri Feb 14 18:08:57 2020 +0000
+>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>> ---
+>> drivers/bluetooth/hci_h5.c | 3 ++-
+>> 1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> Applied to bluetooth-next. I went and added a short body to the commit
+> message as well, since I think we generally require that for kernel
+> commits.
 
-    Bluetooth: Add BT_PHY socket option
+great. Thanks.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=105f1a29e00000
-start commit:   c25a951c Add linux-next specific files for 20200217
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=125f1a29e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=145f1a29e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c727d8fc485ff049
-dashboard link: https://syzkaller.appspot.com/bug?extid=4a38d3795200fd59a9eb
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=158849e9e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10e3d711e00000
+I purposely decided to skip that since it was too obvious what this patch was doing.
 
-Reported-by: syzbot+4a38d3795200fd59a9eb@syzkaller.appspotmail.com
-Fixes: eab2404ba798 ("Bluetooth: Add BT_PHY socket option")
+Regards
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Marcel
+
