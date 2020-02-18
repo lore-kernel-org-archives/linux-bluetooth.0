@@ -2,73 +2,92 @@ Return-Path: <SRS0=m/C2=4G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78862C34031
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 07:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189E9C34035
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 08:18:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D75F2176D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 07:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEE9B20722
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 08:18:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726157AbgBRHwK (ORCPT
+        id S1726206AbgBRISP convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Feb 2020 02:52:10 -0500
-Received: from mga04.intel.com ([192.55.52.120]:35670 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726139AbgBRHwK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Feb 2020 02:52:10 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Feb 2020 23:52:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,455,1574150400"; 
-   d="scan'208";a="224063695"
-Received: from ingas-nuc1.sea.intel.com ([10.252.201.157])
-  by orsmga007.jf.intel.com with ESMTP; 17 Feb 2020 23:52:09 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] test/test-mesh: Fix output of MessageReceived method
-Date:   Mon, 17 Feb 2020 23:52:08 -0800
-Message-Id: <20200218075208.17135-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.21.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Tue, 18 Feb 2020 03:18:15 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:37800 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726105AbgBRISP (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Feb 2020 03:18:15 -0500
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 678BFCED24;
+        Tue, 18 Feb 2020 09:27:37 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [Bluez PATCH v6] bluetooth: secure bluetooth stack from bluedump
+ attack
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200217120454.Bluez.v6.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
+Date:   Tue, 18 Feb 2020 09:18:12 +0100
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <0B84BD16-9C82-4910-8646-B24BCB152AC2@holtmann.org>
+References: <20200217120454.Bluez.v6.1.Ia71869d2f3e19a76a6a352c61088a085a1d41ba6@changeid>
+To:     Howard Chung <howardchung@google.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes formatted output of recieved message parameters.
----
- test/test-mesh | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Hi Howard,
 
-diff --git a/test/test-mesh b/test/test-mesh
-index 5777fcebc..929e28fd3 100755
---- a/test/test-mesh
-+++ b/test/test-mesh
-@@ -559,8 +559,15 @@ class Element(dbus.service.Object):
- 	@dbus.service.method(MESH_ELEMENT_IFACE,
- 					in_signature="qqvay", out_signature="")
- 	def MessageReceived(self, source, key, destination, data):
--		print('Message Received on Element %d, src=%04x, dst=%s' %
--						self.index, source, destination)
-+		print(('Message Received on Element %02x') % self.index, end='')
-+		print(', src=', format(source, '04x'), end='')
-+
-+		if isinstance(destination, int):
-+			print(', dst=%04x' % destination)
-+		elif isinstance(destination, dbus.Array):
-+			dst_str = array_to_string(destination)
-+			print(', dst=' + dst_str)
-+
- 		for model in self.models:
- 			model.process_message(source, key, data)
- 
--- 
-2.21.1
+> Attack scenario:
+> 1. A Chromebook (let's call this device A) is paired to a legitimate
+>   Bluetooth classic device (e.g. a speaker) (let's call this device
+>   B).
+> 2. A malicious device (let's call this device C) pretends to be the
+>   Bluetooth speaker by using the same BT address.
+> 3. If device A is not currently connected to device B, device A will
+>   be ready to accept connection from device B in the background
+>   (technically, doing Page Scan).
+> 4. Therefore, device C can initiate connection to device A
+>   (because device A is doing Page Scan) and device A will accept the
+>   connection because device A trusts device C's address which is the
+>   same as device B's address.
+> 5. Device C won't be able to communicate at any high level Bluetooth
+>   profile with device A because device A enforces that device C is
+>   encrypted with their common Link Key, which device C doesn't have.
+>   But device C can initiate pairing with device A with just-works
+>   model without requiring user interaction (there is only pairing
+>   notification). After pairing, device A now trusts device C with a
+>   new different link key, common between device A and C.
+> 6. From now on, device A trusts device C, so device C can at anytime
+>   connect to device A to do any kind of high-level hijacking, e.g.
+>   speaker hijack or mouse/keyboard hijack.
+> 
+> Since we don't know whether the repairing is legitimate or not,
+> leave the decision to user space if all the conditions below are met.
+> - the pairing is initialized by peer
+> - the authorization method is just-work
+> - host already had the link key to the peer
+> 
+> Signed-off-by: Howard Chung <howardchung@google.com>
+> ---
+> 
+> Changes in v6:
+> - Fix passkey uninitialized issue
+
+since I already applied v5, can you send a delta-patch. And please add a comment for using 0 as passkey and why that is correct.
+
+Regards
+
+Marcel
 
