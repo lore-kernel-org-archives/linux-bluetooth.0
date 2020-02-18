@@ -2,90 +2,106 @@ Return-Path: <SRS0=m/C2=4G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 291B6C34026
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 10:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B121BC34036
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 11:05:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E72F3206E2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 10:45:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A67B24649
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 11:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O75ejVhE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o6TrpqGw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726399AbgBRKpj (ORCPT
+        id S1726594AbgBRLFU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Feb 2020 05:45:39 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46666 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726373AbgBRKpj (ORCPT
+        Tue, 18 Feb 2020 06:05:20 -0500
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:47066 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726556AbgBRLFU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Feb 2020 05:45:39 -0500
-Received: by mail-pf1-f194.google.com with SMTP id k29so10445213pfp.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2020 02:45:39 -0800 (PST)
+        Tue, 18 Feb 2020 06:05:20 -0500
+Received: by mail-pg1-f201.google.com with SMTP id f5so13728909pgn.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2020 03:05:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=F1ItWjQhF+/11m9WN4S4GXuMgCteaBNiTCdfg1bi7K4=;
-        b=O75ejVhEube5w/pSVnZ7qJ1iq/TfjA1xrMP4ijuch2+BUaemE25WWcAyo31RyNW7ug
-         UWaYjegniFFu4e3Cck+rTtEyMrFdmVYDhhbphK4tsy2IEhAE0HB59M5E3tSlZe+5d1fw
-         ZJ3zmflgGq//MZreGZ0b8VM12FwZs5ZSR7a3AYcOAumysG9VhxKNfx8ztl3rrYuf6fxL
-         MIhvjnwdGtQhvDmGF9l50gJ3wjSKtKRu2pvJEpo2eo0gu0/P3zcZvSyDFjV95n4QpFs+
-         pr2oVtf4xjT3RQxtKHDMrfA6s7fS8QGLaejuuy0E5cQaWLTCT7nM4aW02ic5H/dBDSZ5
-         8QCg==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=CAoGK0unI+k/xLNKWQdh/lAz4VEEtKso1RLerS+jz98=;
+        b=o6TrpqGwRyQGGsIaFlxwYKueoWgUAF4oLyN9Z3JTTL7WDa7Y45dVKy3jvooyfmhZal
+         c88Ik7pzARj6rngW3H4f35VaNEbgNOHMBModA1la5bjN7qgpfUN4aYp/5fiY++J8uTX5
+         7NzMK7/5IFSWXrCT2gUamB6pnGF0OVVh997QnEhkaXjCL7th7EHVPp2mhIVZg8rvBFIp
+         cmm8ei+0ULdDQRGUrxXgd158260yWzyXBxa1HHyYWWYh+WOCMsiBseJkaF5qDjVEKTCj
+         7kNb8u00EIQTLAMtbIBMnhnzVvuZ3hT13+X2WYS+FUTAWhj/moREt93bkbfABL/TVgl2
+         XpsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=F1ItWjQhF+/11m9WN4S4GXuMgCteaBNiTCdfg1bi7K4=;
-        b=Yb08muHPsIhMtv/d2Dwe717rBaw++0wgjuvAVh1dpVDAxQ12XpPWs6qx0/P5d1SeZU
-         tMqzjwEcjv5ZySjUEugGx92jqe2cGaMljouKB/CoXFoGQrvvzHDiZVgQXhjUc209ZIAl
-         3doaq7EvdwvaWjn929p+O8ThA5BGF2TnkLLFZkCXiv1wGCSkpicNMzS9xVndosE3T2vf
-         eQX6gl1QC5t27g3uQPYWdzmxEKdT2PUSnMzgju79hOncONYdoA8fqOTHIlIX1p5dXiTa
-         iPtyJLvTsXIGOCSADWH2m7rhfKYGejN4Ie0tYdqxGfEa9Iua0jMdaNXQmjGx/Eh1UBNY
-         0dTw==
-X-Gm-Message-State: APjAAAUorA1JecTiO+L0z+PSoJauVAlzNXm+h6EOIIdy4DjrcVFwsQXY
-        T4py0PnVO1WgdcmzrsaBdphlTTDiuT4=
-X-Google-Smtp-Source: APXvYqwbITMSqLzdG/GnpjOf61NqZboMZ/B22JXdeoOxNbFdloVRTe6StXCN2mhkwaWMoPqzUiicog==
-X-Received: by 2002:a62:be0a:: with SMTP id l10mr21793441pff.110.1582022738628;
-        Tue, 18 Feb 2020 02:45:38 -0800 (PST)
-Received: from localhost ([134.134.139.76])
-        by smtp.gmail.com with ESMTPSA id w25sm3754027pfi.106.2020.02.18.02.45.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Feb 2020 02:45:37 -0800 (PST)
-Date:   Tue, 18 Feb 2020 12:45:33 +0200
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_h5: Move variable into local scope
-Message-ID: <20200218104533.GA46714@jhedberg-mac01.local>
-Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-References: <20200218082858.42994-1-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200218082858.42994-1-marcel@holtmann.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=CAoGK0unI+k/xLNKWQdh/lAz4VEEtKso1RLerS+jz98=;
+        b=qYkcpmYuNb91p3b5HvhKFhOZ7fumEU83GI5ISx3f2mTv27nxl20IS7l2SQOZo4A7qh
+         BqZuLH+og1EeLLEB6Hap99APj47+vSPgmRVcWtUuPHEIXV2WMTicJ75uJpixQs8ht6mh
+         TPzoAAoRiSCdmnq8qryD7iSsyaKwzOf67k5szh/bTiyrI0go2jNlui8YWZk6/0dnAyco
+         R1q/06hf4MiGq1hHp7d0zozoYI8YIVSkETxOjiCDLq56H0pPPHCOku3Wo/Vr1Bk8RXNK
+         EWuHblFVdKWOp99PEcq+nc72NveSYxIWbYvFQPUAZXlEX8hPHQu5HSgRzJG3QXR5z7/a
+         fxUA==
+X-Gm-Message-State: APjAAAWGfWSSTBmWdCrmtbk36jV1B/I3FCY3595o2e/36w4IwUWALhVw
+        63+LtF4SdY2F5M4T4rNux+0ZnziUxUSAxW6ac6cTLvVlr9VR3JTLzuXtggl4W4bEUZEjFDwPYE1
+        scNOGYEGcMG8MzHF6EqDxXwQUSo+Uvit1QZU7rgNuaG7vKcJt7AOUmP9hshqR/idGlsm0LgR7Hd
+        6AuptSc9Az138=
+X-Google-Smtp-Source: APXvYqy8QXu88UfVxv1mCeKTOtVGqBAda09uLXAcnx1IfRX/aGLHvD+3P7BIZvf5E9bFI9KyVQXAtyUv9pxhStFRHg==
+X-Received: by 2002:a63:6383:: with SMTP id x125mr19783198pgb.409.1582023919543;
+ Tue, 18 Feb 2020 03:05:19 -0800 (PST)
+Date:   Tue, 18 Feb 2020 19:05:13 +0800
+Message-Id: <20200218190509.Bluez.v1.1.I04681c6e295c27088c0b4ed7bb9b187d1bb4ed19@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [Bluez PATCH v1] bluetooth: fix passkey uninitialized when used
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        "howardchung@google.com" <howardchung@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        clang-built-linux@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: "howardchung@google.com" <howardchung@google.com>
 
-On Tue, Feb 18, 2020, Marcel Holtmann wrote:
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/hci_h5.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+This issue cause a warning here
+https://groups.google.com/forum/#!topic/clang-built-linux/kyRKCjRsGoU
 
-Applied to bluetooth-next. I went and added a short body to the commit
-message as well, since I think we generally require that for kernel
-commits.
+Signed-off-by: Howard Chung <howardchung@google.com>
+---
 
-Johan
+ net/bluetooth/smp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 50e0ac692ec4..fa40de69e487 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2179,10 +2179,12 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		 */
+ 		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
+ 				 hcon->role)) {
++			/* Set passkey to 0. The value can be any number since
++			 * it'll be ignored anyway.
++			 */
+ 			err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
+ 							hcon->type,
+-							hcon->dst_type,
+-							passkey, 1);
++							hcon->dst_type, 0, 1);
+ 			if (err)
+ 				return SMP_UNSPECIFIED;
+ 			set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
+-- 
+2.25.0.265.gbab2e86ba0-goog
+
