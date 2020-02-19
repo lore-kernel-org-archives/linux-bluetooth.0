@@ -1,199 +1,113 @@
-Return-Path: <SRS0=m/C2=4G=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=cHq6=4H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FEFAC34031
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 21:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20345C34031
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Feb 2020 00:36:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 336AC21D56
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Feb 2020 21:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8FC0208E4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Feb 2020 00:36:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BtMuvT9c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727184AbgBRVUf convert rfc822-to-8bit (ORCPT
+        id S1726768AbgBSAgP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Feb 2020 16:20:35 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:38502 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726595AbgBRVUf (ORCPT
+        Tue, 18 Feb 2020 19:36:15 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:35574 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726488AbgBSAgP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Feb 2020 16:20:35 -0500
-Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9C238CECC6;
-        Tue, 18 Feb 2020 22:29:57 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [Bluez PATCH v1] bluetooth: fix passkey uninitialized when used
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200218190509.Bluez.v1.1.I04681c6e295c27088c0b4ed7bb9b187d1bb4ed19@changeid>
-Date:   Tue, 18 Feb 2020 22:20:32 +0100
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        clang-built-linux@googlegroups.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D9045CD6-997B-4018-8AB0-40F15C71BF5C@holtmann.org>
-References: <20200218190509.Bluez.v1.1.I04681c6e295c27088c0b4ed7bb9b187d1bb4ed19@changeid>
-To:     Howard Chung <howardchung@google.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Tue, 18 Feb 2020 19:36:15 -0500
+Received: by mail-pf1-f193.google.com with SMTP id i19so275466pfa.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Feb 2020 16:36:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qLc+IK/svMCyoYP1PI6eZ6YUgNngu6dPFpoGFYUhDKE=;
+        b=BtMuvT9cmd69kq+Zb7xXgC9oatbRb3D3CubZceYAT+cDnvNy14fMfnAKcjiJLLGY/8
+         yo5ikyqnfRvzkt+qDNiZsL/35umhm50zBiiVCh2Izxnhz1apFD+V7Ftte+uO3IW6Wqf+
+         dYBPGkpfBtJ4UAj23CH0wi/E/pWUOXXU0zkSg3Sm92trJU3RQe/guVYbz44kDCQ42Fwy
+         K2AKjYo+ofJGuCg47KczVf66zW6u8gtvruYApAf9AM1DcvU+EHcp7mb7/HeevTWsI6dp
+         XCmzCNepkGNYKgfvSdLoUFuzHSro0NkxRtZLkgZpUk+nkzJsUI5H+cz+YZPfe0l9k1a9
+         Jotg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qLc+IK/svMCyoYP1PI6eZ6YUgNngu6dPFpoGFYUhDKE=;
+        b=IWcD4PQ+XAnYSZIxabgsq+3kttr8v9FDYm+1oE5zZjzbWJmkolKsRTm/lJZxqMDnkk
+         S5CbTQ99iIcMPfeHiXteHym7oTkG7Ll6tN4NRkH8QV18YK+ac5VAoAVsiWVF0WgFejnS
+         kQbHizEC03+Z0825/3upEG6UGIZknMGVsybDEssf/VQLEI6BXJZd+wyjlgPgAL7GjKbd
+         ADka3TG6SkoxjIweJlEFaEJNG5EyMaZb0LO+1d7VwArA81Qjs+aDTrfCOTkAccPQ/4eD
+         PSxoY1dHfIsJTps4d0IqKNSCFy73USVY4ex158CMALUT05lIw5hUZzhiscVOELDy8jyx
+         eRpA==
+X-Gm-Message-State: APjAAAU40pOVw1OCsYa/T8lHT2LAymtUWgXJyh1HEjIyMFXAtm5N1F7t
+        7yKYu/nx4mBXi59IcSamG/v92IzAcH0=
+X-Google-Smtp-Source: APXvYqziBbTrfcGMpXunx/1LwbCJ+DnJCh8zqsD3nqKsFdcCiylHUR1F0yvUZ+WupBih+oWjgKJNfw==
+X-Received: by 2002:a63:ea4b:: with SMTP id l11mr6743939pgk.93.1582072574325;
+        Tue, 18 Feb 2020 16:36:14 -0800 (PST)
+Received: from localhost.localdomain ([192.102.209.42])
+        by smtp.gmail.com with ESMTPSA id v184sm180569pfc.67.2020.02.18.16.36.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Feb 2020 16:36:13 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/4] lib: Add definition to BT_PHY
+Date:   Tue, 18 Feb 2020 16:36:09 -0800
+Message-Id: <20200219003612.14599-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> From: "howardchung@google.com" <howardchung@google.com>
+This adds the definition to BT_PHY socket options along with the
+possible bitfields for the return value.
+---
+ lib/bluetooth.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-any chance you fix your git setting to provide a From: with full name and email like you have in the signed-off-by line.
-
-> 
-> This issue cause a warning here
-> https://groups.google.com/forum/#!topic/clang-built-linux/kyRKCjRsGoU
-> 
-> Signed-off-by: Howard Chung <howardchung@google.com>
-> ---
-> 
-> net/bluetooth/smp.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 50e0ac692ec4..fa40de69e487 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -2179,10 +2179,12 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
-> 		 */
-> 		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
-> 				 hcon->role)) {
-> +			/* Set passkey to 0. The value can be any number since
-> +			 * it'll be ignored anyway.
-> +			 */
-> 			err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
-> 							hcon->type,
-> -							hcon->dst_type,
-> -							passkey, 1);
-> +							hcon->dst_type, 0, 1);
-> 			if (err)
-> 				return SMP_UNSPECIFIED;
-> 			set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
-
-Since I have to look at this again, I wonder if we do this correctly. Either we have a bug there or not enough comments on why the code is correct.
-
-        if (hcon->out) {
-                u8 cfm[16];
-
-                err = smp_f4(smp->tfm_cmac, smp->remote_pk, smp->local_pk,
-                             smp->rrnd, 0, cfm);
-                if (err)
-                        return SMP_UNSPECIFIED;
-
-                if (crypto_memneq(smp->pcnf, cfm, 16))
-                        return SMP_CONFIRM_FAILED;
-        } else {
-                smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
-                             smp->prnd);
-                SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
-
-                /* Only Just-Works pairing requires extra checks */
-                if (smp->method != JUST_WORKS)
-                        goto mackey_and_ltk;
-
-                /* If there already exists long term key in local host, leave
-                 * the decision to user space since the remote device could
-                 * be legitimate or malicious.
-                 */
-                if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
-                                 hcon->role)) {
-                        err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
-                                                        hcon->type,
-                                                        hcon->dst_type,
-                                                        passkey, 1);
-                        if (err)
-                                return SMP_UNSPECIFIED;
-                        set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
-                }
-        }
-
-mackey_and_ltk:
-        /* Generate MacKey and LTK */
-        err = sc_mackey_and_ltk(smp, smp->mackey, smp->tk);
-        if (err)
-                return SMP_UNSPECIFIED;
-
-        if (smp->method == JUST_WORKS || smp->method == REQ_OOB) {
-                if (hcon->out) {
-                        sc_dhkey_check(smp);
-                        SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
-                }
-                return 0;
-        }
-
-        err = smp_g2(smp->tfm_cmac, pkax, pkbx, na, nb, &passkey);
-        if (err)
-                return SMP_UNSPECIFIED;
-
-        err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst, hcon->type,
-                                        hcon->dst_type, passkey, 0);
-        if (err)
-                return SMP_UNSPECIFIED;
-
-        set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
-
-        return 0;
-}
-
-Since we are already !hcon->out and smp->method == JUST_WORKS, why are we moving into mackey_and_ltk path? If we have already an LTK, then we just should bail out after setting SMP_FLAG_WAIT_USER, right?
-
-@@ -2115,7 +2115,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
-        struct l2cap_chan *chan = conn->smp;
-        struct smp_chan *smp = chan->data;
-        struct hci_conn *hcon = conn->hcon;
--       u8 *pkax, *pkbx, *na, *nb;
-+       u8 *pkax, *pkbx, *na, *nb, confirm_hint;
-        u32 passkey;
-        int err;
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 756dce164..d14217eac 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -123,6 +123,24 @@ struct bt_voice {
+ #define BT_VOICE_TRANSPARENT			0x0003
+ #define BT_VOICE_CVSD_16BIT			0x0060
  
-@@ -2179,13 +2179,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
-                 */
-                if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
-                                 hcon->role)) {
--                       err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
--                                                       hcon->type,
--                                                       hcon->dst_type,
--                                                       passkey, 1);
--                       if (err)
--                               return SMP_UNSPECIFIED;
--                       set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
-+                       passkey = 0;
-+                       confirm_hint = 1;
-+                       goto confirm;
-                }
-        }
- 
-@@ -2207,8 +2203,11 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
-        if (err)
-                return SMP_UNSPECIFIED;
- 
-+       confirm_hint = 0;
++#define BT_PHY			14
 +
-+confirm:
-        err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst, hcon->type,
--                                       hcon->dst_type, passkey, 0);
-+                                       hcon->dst_type, passkey, confirm_hint);
-        if (err)
-                return SMP_UNSPECIFIED;
-
-So isn’t this the better approach and actually cleaner code? And I would still add a comment above setting passkey = 0.
-
-Am I missing anything?
-
-Regards
-
-Marcel
++#define BT_PHY_BR_1M_1SLOT	0x00000001
++#define BT_PHY_BR_1M_3SLOT	0x00000002
++#define BT_PHY_BR_1M_5SLOT	0x00000004
++#define BT_PHY_EDR_2M_1SLOT	0x00000008
++#define BT_PHY_EDR_2M_3SLOT	0x00000010
++#define BT_PHY_EDR_2M_5SLOT	0x00000020
++#define BT_PHY_EDR_3M_1SLOT	0x00000040
++#define BT_PHY_EDR_3M_3SLOT	0x00000080
++#define BT_PHY_EDR_3M_5SLOT	0x00000100
++#define BT_PHY_LE_1M_TX		0x00000200
++#define BT_PHY_LE_1M_RX		0x00000400
++#define BT_PHY_LE_2M_TX		0x00000800
++#define BT_PHY_LE_2M_RX		0x00001000
++#define BT_PHY_LE_CODED_TX	0x00002000
++#define BT_PHY_LE_CODED_RX	0x00004000
++
+ /* Connection and socket states */
+ enum {
+ 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
+-- 
+2.21.1
 
