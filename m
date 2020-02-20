@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DA4C7619D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 00:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 467FFC7619D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 01:03:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB4A524670
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 00:55:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C2E624673
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 01:03:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qigpnAhT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2sede6P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727277AbgBTAzZ (ORCPT
+        id S1727107AbgBTBDb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Feb 2020 19:55:25 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:40078 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726824AbgBTAzY (ORCPT
+        Wed, 19 Feb 2020 20:03:31 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39942 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726962AbgBTBDb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Feb 2020 19:55:24 -0500
-Received: by mail-oi1-f194.google.com with SMTP id a142so25829493oii.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2020 16:55:24 -0800 (PST)
+        Wed, 19 Feb 2020 20:03:31 -0500
+Received: by mail-pf1-f193.google.com with SMTP id b185so1007085pfb.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2020 17:03:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=+5iyro5dL5q833u0D7Sw6LWpoy/E1PZqzaXCOHpKQVQ=;
-        b=qigpnAhTJOkcq1xfHS7s5SvkNY0jlbhvJ50iRgkksQmFAjFCjLnat2yaLdS8HlUEbn
-         61AhaZhgohzRRDf+N/dpyCMtr1lC7Y1sxyGIDq/xiM2jSeeyhGs7MgSqVft18U9o0rwV
-         RAnTLlbEMmkRL1kdC3UnJVsSXon7Vr25SpgnlmU4j9BIvGCj6/OeRGYMnN/62IPqBnYS
-         1hSS8RMorAO9Y/mE40YOOkmPhH6ohy1V3GG8kfut1noe/p+NduO99PS3Nt7w+G9GqYRX
-         +xc0i3z9ThHKfLfNDFKrB2lbbkKOKctj1582iHP1J5VIXpajGGXCA3Guvcj68gtvVF5Q
-         XLoA==
+        b=H2sede6P5YCUH1r9hR+Dg/i+oAEK1VZ2ugOhsMi+wAtKJWx5ed48usKJbz0djGk6gV
+         pWQ9vjWYnF4lmYErodDD/eLylbjYFJ7PSdT3kYQczUceC4uHzs5hQXXLCkhhARjGvOtQ
+         CpI0DBFSkY72/1+hw2Arc6Rw3zZnpZkwHLajVNzj4fY4QLQtwwzqztTmuHh9PXohjoYt
+         om5mJ3tO6r2opvfRAiONorDdU30WDq82Akon6ArF/xs630IAq5zi4edLBHRCYzVHRkXM
+         lLq2VMvlQE4OKZBjKdQMckN2idt7auRIhouGm3AS18tni3MuvMSvn3HN3XzQGYLBxHO+
+         23UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=+5iyro5dL5q833u0D7Sw6LWpoy/E1PZqzaXCOHpKQVQ=;
-        b=MzPACCblvrj38YjhTqTbNTm71jTxLGRkxRwAsc4mnq7jSiZ9K+xXrVz6GNnjDiwnWU
-         UGF0d6o/y9qxlHZ0VZrTBTqEmsQs4mgDjg7jel1DThIzQO0Ytf9MtA6wnFM/qH0vAAwi
-         1VSaCdRGlaLN3xq88j4RWIuV98n/tKsB6mOKOUhT3WziPWfJCf/nJRT5Bbn/l/5wkT3i
-         lSDW7QuKZGQb1SyfmhgR56hx+p3y+pKf05ccOFnAi6dDGRMciqVtOPY/pO8jW9Gsg8/f
-         0b7PaU5E1llVaUCke8BwAO6XRT9UpMeTdJNEy9ne7mXyrGUpbCVRumpGgVSfN5LXUzH6
-         bt4w==
-X-Gm-Message-State: APjAAAVe/riIM1WzMwHx0IsxxcyQd0mJRZFgiO3ZCFrcPUqi1atuYx4T
-        3qvR0GViRCqje0Rp1PKe6bDfW73btDU=
-X-Google-Smtp-Source: APXvYqy0KX9BEPYKEZ0SQaD0+OPVJ0mmMR6x+VQnbTJNctvIDTfAjo2ec/QEaBlOn7i+uixA4lKRIw==
-X-Received: by 2002:a17:90b:11cd:: with SMTP id gv13mr484574pjb.94.1582159682769;
-        Wed, 19 Feb 2020 16:48:02 -0800 (PST)
+        b=QTwARSP9n/K6BUikS1zuLHFCTwS+Ppbgq39uZ7+n7KAXnz73gz7TEg3bDUNFlcYsGW
+         Pa7EBmQu4r8TmrE4zT4V7fP+kSWXUqU8KjHTnso7lSr0thXecjVOLmueHuveee1rLEKd
+         FVJYHQDgTr1zUGImtHbMeWZbL66wB5TYtiwIFRAGc5SGah5K7VrF6FqBE2Yh/D4SVgc/
+         A1Czd/XXrmbqrMG0W6AnTF2wrwSCkNO7HpXHnILbyO8aDh0Vd00oCMcrzlLQpW11r4fF
+         5ZPBrDfIw/a6poi7uwsQq1LWtrnvvHsFysDD5YbQ8QccIBKL3ZPueZvXxcCzQDCGlNK5
+         xpHQ==
+X-Gm-Message-State: APjAAAUcI6g7Oa7n5tQzhZplA0FwMOKgt9xAaTAHzwy//GMn1FDJMCr8
+        BjBrYIyarQidxw9uW2MHBUT1VOOMc7w=
+X-Google-Smtp-Source: APXvYqxkxp1fqW7BjUC9q3+A+w/3v+s8HQ3+O0wEfFjfp9VECD4pUXOWdDeH8769YU11h2kRi4U2ww==
+X-Received: by 2002:a65:4b83:: with SMTP id t3mr29943297pgq.195.1582160610466;
+        Wed, 19 Feb 2020 17:03:30 -0800 (PST)
 Received: from vudentzs-t460s.hsd1.or.comcast.net ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id y15sm855680pgj.78.2020.02.19.16.48.01
+        by smtp.gmail.com with ESMTPSA id g18sm828592pfi.80.2020.02.19.17.03.29
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2020 16:48:01 -0800 (PST)
+        Wed, 19 Feb 2020 17:03:29 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Subject: [PATCH] Bluetooth: Fix crash when using new BT_PHY option
-Date:   Wed, 19 Feb 2020 16:48:01 -0800
-Message-Id: <20200220004801.19944-1-luiz.dentz@gmail.com>
+Date:   Wed, 19 Feb 2020 17:03:28 -0800
+Message-Id: <20200220010328.10132-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
