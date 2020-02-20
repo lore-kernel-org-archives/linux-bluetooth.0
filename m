@@ -2,116 +2,145 @@ Return-Path: <SRS0=cA0y=4I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467FFC7619D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 01:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB86C7619D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 03:17:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C2E624673
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 01:03:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D27F624656
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 03:17:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2sede6P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dlpnFhTJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbgBTBDb (ORCPT
+        id S1727921AbgBTDRl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Feb 2020 20:03:31 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39942 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbgBTBDb (ORCPT
+        Wed, 19 Feb 2020 22:17:41 -0500
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:43699 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727747AbgBTDRl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Feb 2020 20:03:31 -0500
-Received: by mail-pf1-f193.google.com with SMTP id b185so1007085pfb.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2020 17:03:31 -0800 (PST)
+        Wed, 19 Feb 2020 22:17:41 -0500
+Received: by mail-pg1-f202.google.com with SMTP id v14so1416367pgo.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2020 19:17:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+5iyro5dL5q833u0D7Sw6LWpoy/E1PZqzaXCOHpKQVQ=;
-        b=H2sede6P5YCUH1r9hR+Dg/i+oAEK1VZ2ugOhsMi+wAtKJWx5ed48usKJbz0djGk6gV
-         pWQ9vjWYnF4lmYErodDD/eLylbjYFJ7PSdT3kYQczUceC4uHzs5hQXXLCkhhARjGvOtQ
-         CpI0DBFSkY72/1+hw2Arc6Rw3zZnpZkwHLajVNzj4fY4QLQtwwzqztTmuHh9PXohjoYt
-         om5mJ3tO6r2opvfRAiONorDdU30WDq82Akon6ArF/xs630IAq5zi4edLBHRCYzVHRkXM
-         lLq2VMvlQE4OKZBjKdQMckN2idt7auRIhouGm3AS18tni3MuvMSvn3HN3XzQGYLBxHO+
-         23UQ==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=i2O9M22wRHGvAOZAL5G1kwDrP71Yc5DXVKcI6ikT/o0=;
+        b=dlpnFhTJuppuR+7jhHOrc29QhJDsFb/a9lebelLf5+HpvXJAn1SQBioq39Qk8Vm3AQ
+         CaUiiTHkAgza79JX7dXl3SCPyyIwwCB2Zj6DbBTVEGF8c5wauY6xKMi8xxVKZw//JS2H
+         3jDmVyKsKRudtiC4BeHrWuJZBL7iFYElm8LYKpLUaScuxhcalPyXP634Spg/cogqQq8j
+         35xfj0nCeAwlfsWLTdbma6cb6Xzb82XaO/bSzayA2HwEPYyOQefA3WQvS7F/X8tFzwn+
+         PZl1jwhrpg0riUoXF0V61wIeJb0iKteX2/MQYwSMrRU6X8BqMrFqbojtUyrLd10crM2Z
+         1fdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+5iyro5dL5q833u0D7Sw6LWpoy/E1PZqzaXCOHpKQVQ=;
-        b=QTwARSP9n/K6BUikS1zuLHFCTwS+Ppbgq39uZ7+n7KAXnz73gz7TEg3bDUNFlcYsGW
-         Pa7EBmQu4r8TmrE4zT4V7fP+kSWXUqU8KjHTnso7lSr0thXecjVOLmueHuveee1rLEKd
-         FVJYHQDgTr1zUGImtHbMeWZbL66wB5TYtiwIFRAGc5SGah5K7VrF6FqBE2Yh/D4SVgc/
-         A1Czd/XXrmbqrMG0W6AnTF2wrwSCkNO7HpXHnILbyO8aDh0Vd00oCMcrzlLQpW11r4fF
-         5ZPBrDfIw/a6poi7uwsQq1LWtrnvvHsFysDD5YbQ8QccIBKL3ZPueZvXxcCzQDCGlNK5
-         xpHQ==
-X-Gm-Message-State: APjAAAUcI6g7Oa7n5tQzhZplA0FwMOKgt9xAaTAHzwy//GMn1FDJMCr8
-        BjBrYIyarQidxw9uW2MHBUT1VOOMc7w=
-X-Google-Smtp-Source: APXvYqxkxp1fqW7BjUC9q3+A+w/3v+s8HQ3+O0wEfFjfp9VECD4pUXOWdDeH8769YU11h2kRi4U2ww==
-X-Received: by 2002:a65:4b83:: with SMTP id t3mr29943297pgq.195.1582160610466;
-        Wed, 19 Feb 2020 17:03:30 -0800 (PST)
-Received: from vudentzs-t460s.hsd1.or.comcast.net ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id g18sm828592pfi.80.2020.02.19.17.03.29
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2020 17:03:29 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix crash when using new BT_PHY option
-Date:   Wed, 19 Feb 2020 17:03:28 -0800
-Message-Id: <20200220010328.10132-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=i2O9M22wRHGvAOZAL5G1kwDrP71Yc5DXVKcI6ikT/o0=;
+        b=OGZ+FVyHuPjHGD8XYZ8VFAKoqEDWlgdMpQQDU+JrtQHMi3u1bezDZrYLQNeA/qk0Ay
+         bruiWECjx2X4ixAcpDZ5AnBUMtpRg6i+eJVp2ArC5ZZQViRo4NlDWtDQzwYVo4zj+bWc
+         +NfASKWwqL8i4dxM715HMGXI6QUeCb9qtSnGKSlusRIEO8CM7Oa5lMG4dZLP4fCbcJEs
+         ngsbxKT14Xwodtlt+bhpt8fFPicrjRJHZ1WjdJBvfjrxnEnsPF9/njAv0xHU6BDA3zgw
+         X76p1dFze2NUZiG4WOcyihrReRjLkcIvV+EFW0TsLEADLzFy3TU9I75vUWSp8InQ9m8/
+         lSgw==
+X-Gm-Message-State: APjAAAXNLtjaWjmO+cWBDePdx6SoCQaWUcvEk+Om9UQCAWirT6yFUNOP
+        4eZancLnhZ8dKAC/lYy0SCPJKmI+yh8Jh94Rxp2/axDXKpgtt0ezyUdy8dvlbYQMe4PUaI7py16
+        /fl43hw/Zjoh8abf1Lp1UtOQum+JCdXkcnMxs2TRAxxL8EFkJzzCmq9OV824S+/8kGVgFrgcrtA
+        lEYvWpXV17U6U=
+X-Google-Smtp-Source: APXvYqwhfiEKlSr0AAX/yDJjQ+IOrKLdHL+H7bLrG4jZblws54K3aApuo2mh5mWRFYU+RaFoM5HXxjPpmsEXHnHDtw==
+X-Received: by 2002:a63:b250:: with SMTP id t16mr29658302pgo.18.1582168660404;
+ Wed, 19 Feb 2020 19:17:40 -0800 (PST)
+Date:   Thu, 20 Feb 2020 11:17:29 +0800
+Message-Id: <20200220111711.Bluez.v3.1.I145f6c5bbf2437a6f6afc28d3db2b876c034c2d8@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [Bluez PATCH v3] bluetooth: fix passkey uninitialized when used
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Howard Chung <howardchung@google.com>,
+        kbuild test robot <lkp@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        clang-built-linux@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This patch fix the issue: warning:variable 'passkey' is uninitialized
+when used here
 
-This fixes the invalid check for connected socket which causes the
-following trace due to sco_pi(sk)->conn being NULL:
+Link: https://groups.google.com/forum/#!topic/clang-built-linux/kyRKCjRsGoU
 
-RIP: 0010:sco_sock_getsockopt+0x2ff/0x800 net/bluetooth/sco.c:966
+Reported-by: kbuild test robot <lkp@intel.com>
 
-L2CAP has also been fixed since it has the same problem.
+Suggested-by: Marcel Holtmann <marcel@holtmann.org>
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Howard Chung <howardchung@google.com>
+
 ---
- net/bluetooth/l2cap_sock.c | 2 +-
- net/bluetooth/sco.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 9fb47b2b13c9..305710446e66 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -605,7 +605,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
- 		break;
+Changes in v3:
+- rephrase the commit message
+
+Changes in v2:
+- refactor code
+
+ net/bluetooth/smp.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 50e0ac692ec4..929e0bebaf80 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2115,7 +2115,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	struct l2cap_chan *chan = conn->smp;
+ 	struct smp_chan *smp = chan->data;
+ 	struct hci_conn *hcon = conn->hcon;
+-	u8 *pkax, *pkbx, *na, *nb;
++	u8 *pkax, *pkbx, *na, *nb, confirm_hint;
+ 	u32 passkey;
+ 	int err;
  
- 	case BT_PHY:
--		if (sk->sk_state == BT_CONNECTED) {
-+		if (sk->sk_state != BT_CONNECTED) {
- 			err = -ENOTCONN;
- 			break;
+@@ -2179,13 +2179,12 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		 */
+ 		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
+ 				 hcon->role)) {
+-			err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst,
+-							hcon->type,
+-							hcon->dst_type,
+-							passkey, 1);
+-			if (err)
+-				return SMP_UNSPECIFIED;
+-			set_bit(SMP_FLAG_WAIT_USER, &smp->flags);
++			/* Set passkey to 0. The value can be any number since
++			 * it'll be ignored anyway.
++			 */
++			passkey = 0;
++			confirm_hint = 1;
++			goto confirm;
  		}
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 29ab3e12fb46..c8c3d38cdc7b 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -958,7 +958,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 		break;
+ 	}
  
- 	case BT_PHY:
--		if (sk->sk_state == BT_CONNECTED) {
-+		if (sk->sk_state != BT_CONNECTED) {
- 			err = -ENOTCONN;
- 			break;
- 		}
+@@ -2206,9 +2205,11 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	err = smp_g2(smp->tfm_cmac, pkax, pkbx, na, nb, &passkey);
+ 	if (err)
+ 		return SMP_UNSPECIFIED;
++	confirm_hint = 0;
+ 
++confirm:
+ 	err = mgmt_user_confirm_request(hcon->hdev, &hcon->dst, hcon->type,
+-					hcon->dst_type, passkey, 0);
++					hcon->dst_type, passkey, confirm_hint);
+ 	if (err)
+ 		return SMP_UNSPECIFIED;
+ 
 -- 
-2.21.1
+2.25.0.265.gbab2e86ba0-goog
 
