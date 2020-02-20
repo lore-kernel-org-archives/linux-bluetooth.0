@@ -4,239 +4,117 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 346E8C5ACC4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 00:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949C9C11D87
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 00:49:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F31C4207FD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 00:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62B522467E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 00:49:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rBYl1C0q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OEXNy0Hk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727263AbgBTA2j (ORCPT
+        id S1727799AbgBTAtM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Feb 2020 19:28:39 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:35292 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727099AbgBTA2j (ORCPT
+        Wed, 19 Feb 2020 19:49:12 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:33794 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727488AbgBTAtM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Feb 2020 19:28:39 -0500
-Received: by mail-pl1-f196.google.com with SMTP id g6so806697plt.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2020 16:28:38 -0800 (PST)
+        Wed, 19 Feb 2020 19:49:12 -0500
+Received: by mail-ot1-f67.google.com with SMTP id j16so2110552otl.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Feb 2020 16:49:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=Ns4Fu2uAcE2PjfhDsU29BteUAwP8E8zX8ihqevM9inI=;
-        b=rBYl1C0qWV2WlIEltag+TPkDzK4+fw7XqoGtW+y+N51zXkshhAJDVWrQdLm9cB0PbX
-         pSfsR6mFnYyvJH9401NrUgvIMS0gKl7v/00Yj5fVB8QsTDvriTVSnrD+xfPtPnGbDlsB
-         tK7YLh6LeNTRyIKdDagj8YVbmHSaOjBAqUAv4PBF24CFD/y6DI0YkpfhVFzl2H3Extcl
-         b7eKuRS/PZO6qdpa9LeBKapfjDCfjyS9y7Sw7zHKjmuo75kF8hDnta4tDpY9SVQTUWle
-         5FVwHhKSvFbfzDPa7yeylhKjXYbrQIjRwlE6NoHM6ueQEagJwF9CWtwP39CDY5XraZPu
-         OZhQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=R4M8qtpavYeF+iB2J2hl9yrDv2lt6x82ERPBheKd3gs=;
+        b=OEXNy0HkDVhxvkZBATtUzHo9SedXjsoFryJMLDUpe2G1Zw9NAlfLBzMVTtHz/SAG9V
+         06o1BO83sspcT6T63VWYMLTr05c16i3UFNWxQXJd7XVuJl3reiFA4m6OY6eWAWFjMRqR
+         mnbWlnAyUkP0eeb/kX+/dz0AjzmGsy1CJo4VJ2TaLJX2YueZBGxbL9wgpEgHCNCjDlpK
+         0+sZ0O2T7yCyOfQI7imMe4fAw0p89LplVzqE8HZQoTVwbxwB1gmN0fKyHekoq2hARn9K
+         pOyyPYzNV4x6odDnW6WaQqncpbLlcCWFg+oxieTbX7ChCusiV6WFwl/dMQrf2WJB5wgZ
+         ZFjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Ns4Fu2uAcE2PjfhDsU29BteUAwP8E8zX8ihqevM9inI=;
-        b=kzRm3VQncnxmVii9WBl2J/vER4L2FhavJMKQDBf17rJA6JvW1pnl/TR16/cBwR0Ela
-         EvD9cE4GPSnUFmCN9ciVJY94mqbnOVBJFNbht8rLywZvX4yVzIICL/CgUhIvr/6KpsD/
-         TtvgUGeh91zbIqVeYpqV1k7FElixU1ixOZm3t0kS6/JtU9amyzfZ3ZbUx0SNxAYXInMO
-         tVcr4DYd3iztWrQxBFJrM0E8yNxI9um0Jzp6BjrykcwZFslCslSX4UjKbLKBhd0ndSwn
-         hyFI9WhFsyMpyqsH2TfXjTmDi6W1Pm+RzjUKCksu8x2PKhJsnnwzgRavpNUHUvBEYeKj
-         uWAg==
-X-Gm-Message-State: APjAAAXc/dN0epfg1Zk+svfBPBeIE5ySJrYX4y325B8liK0w95xlEp5K
-        3pwq/Wml/+blmeA1W881jRZEwXVVDPs=
-X-Google-Smtp-Source: APXvYqzty42aysvU0hAp7Oyo+7zwEfIDrAb68YuMCxOyGpeAOT+dnwQjdzXhUII22YFiQKvvgHVWcQ==
-X-Received: by 2002:a17:90a:db0f:: with SMTP id g15mr400203pjv.40.1582158517096;
-        Wed, 19 Feb 2020 16:28:37 -0800 (PST)
-Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id c68sm769213pfc.156.2020.02.19.16.28.36
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2020 16:28:36 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] adapter: Implement Pattern filter
-Date:   Wed, 19 Feb 2020 16:28:34 -0800
-Message-Id: <20200220002835.8929-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200220002835.8929-1-luiz.dentz@gmail.com>
-References: <20200220002835.8929-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=R4M8qtpavYeF+iB2J2hl9yrDv2lt6x82ERPBheKd3gs=;
+        b=hn/IHDlCvd0KtAF8vg7pJBSnOmaUqPahPMrOlQDc80F9YaVMytyO5wuzN5u3I8aPc1
+         oiRJbuXzAnS3hZ0qT2D3dCEtwE9hhKOr/d34iyHTt9NBuTCOEpPl+6iPnK4KUvg13Cx8
+         LU9sih10DUqgiF0OV71ZiHHkB+NjOEEsqeMpi1SueYmy2zW0OKHfmus251BRUgRfm47+
+         qRFdb0ILQKJkaa6n0+9ylq5XcUA+QDPIDerAPSqKNfqPB78So61budrkYpGeqZJi7lik
+         n+7DUkIo0Zu4kNorDrESwPBVXQULI6nbeu2sUUNchbfyFi1Be365r7Ork55LKhc+Uq1s
+         vsZQ==
+X-Gm-Message-State: APjAAAVAnYaXK3uyisR9NnLDih7zcgb4r+5jJB36GN71f78nrn+jN+LD
+        cAWwFdxP3DobpEKi/m1mzfi8Yb+/bwuaSmTxvkHzstKW
+X-Google-Smtp-Source: APXvYqw2fhvRYFH26OIlrj+WJwspqg/F7R8zYmRjOYd9SYViJNV3kVBnYL5BnRHQASdwwC8F7qWseHE36pRTMuxM7xU=
+X-Received: by 2002:a9d:3cf:: with SMTP id f73mr21706802otf.11.1582159751134;
+ Wed, 19 Feb 2020 16:49:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200220004801.19944-1-luiz.dentz@gmail.com>
+In-Reply-To: <20200220004801.19944-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 19 Feb 2020 16:48:59 -0800
+Message-ID: <CABBYNZL+TR9-HveCua8dcEjZVQDcxmbeYEUgzPOGQV-RF45LpA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix crash when using new BT_PHY option
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This implements the new Pattern filter as documented in the
-adapter-api.txt.
----
- src/adapter.c | 92 ++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 76 insertions(+), 16 deletions(-)
+On Wed, Feb 19, 2020 at 4:48 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This fixes the invalid check for connected socket which causes the
+> following trace due to sco_pi(sk)->conn being NULL:
+>
+> RIP: 0010:sco_sock_getsockopt+0x2ff/0x800 net/bluetooth/sco.c:966
+>
+> L2CAP has also been fixed since it has the same problem.
+>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/l2cap_sock.c | 2 +-
+>  net/bluetooth/sco.c        | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 9fb47b2b13c9..305710446e66 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -605,7 +605,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+>                 break;
+>
+>         case BT_PHY:
+> -               if (sk->sk_state == BT_CONNECTED) {
+> +               if (sk->sk_state != BT_CONNECTED) {
+>                         err = -ENOTCONN;
+>                         break;
+>                 }
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 29ab3e12fb46..c8c3d38cdc7b 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -958,7 +958,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+>                 break;
+>
+>         case BT_PHY:
+> -               if (sk->sk_state == BT_CONNECTED) {
+> +               if (sk->sk_state != BT_CONNECTED) {
+>                         err = -ENOTCONN;
+>                         break;
+>                 }
+> --
+> 2.21.1
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 329c3ae0b..972d88772 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -174,6 +174,7 @@ struct conn_param {
- 
- struct discovery_filter {
- 	uint8_t type;
-+	char *pattern;
- 	uint16_t pathloss;
- 	int16_t rssi;
- 	GSList *uuids;
-@@ -2423,6 +2424,22 @@ static bool parse_discoverable(DBusMessageIter *value,
- 	return true;
- }
- 
-+static bool parse_pattern(DBusMessageIter *value,
-+					struct discovery_filter *filter)
-+{
-+	const char *pattern;
-+
-+	if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING)
-+		return false;
-+
-+	dbus_message_iter_get_basic(value, &pattern);
-+
-+	free(filter->pattern);
-+	filter->pattern = strdup(pattern);
-+
-+	return true;
-+}
-+
- struct filter_parser {
- 	const char *name;
- 	bool (*func)(DBusMessageIter *iter, struct discovery_filter *filter);
-@@ -2433,6 +2450,7 @@ struct filter_parser {
- 	{ "Transport", parse_transport },
- 	{ "DuplicateData", parse_duplicate_data },
- 	{ "Discoverable", parse_discoverable },
-+	{ "Pattern", parse_pattern },
- 	{ }
- };
- 
-@@ -2473,6 +2491,7 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
- 	(*filter)->type = get_scan_type(adapter);
- 	(*filter)->duplicate = false;
- 	(*filter)->discoverable = false;
-+	(*filter)->pattern = NULL;
- 
- 	dbus_message_iter_init(msg, &iter);
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
-@@ -2518,10 +2537,11 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
- 		goto invalid_args;
- 
- 	DBG("filtered discovery params: transport: %d rssi: %d pathloss: %d "
--		" duplicate data: %s discoverable %s", (*filter)->type,
--		(*filter)->rssi, (*filter)->pathloss,
-+		" duplicate data: %s discoverable %s pattern %s",
-+		(*filter)->type, (*filter)->rssi, (*filter)->pathloss,
- 		(*filter)->duplicate ? "true" : "false",
--		(*filter)->discoverable ? "true" : "false");
-+		(*filter)->discoverable ? "true" : "false",
-+		(*filter)->pattern);
- 
- 	return true;
- 
-@@ -6146,6 +6166,52 @@ static void filter_duplicate_data(void *data, void *user_data)
- 	*duplicate = client->discovery_filter->duplicate;
- }
- 
-+static bool device_is_discoverable(struct btd_adapter *adapter,
-+					struct eir_data *eir, const char *addr,
-+					uint8_t bdaddr_type)
-+{
-+	GSList *l;
-+	bool discoverable;
-+
-+	if (bdaddr_type == BDADDR_BREDR || adapter->filtered_discovery)
-+		discoverable = true;
-+	else
-+		discoverable = eir->flags & (EIR_LIM_DISC | EIR_GEN_DISC);
-+
-+	/*
-+	 * Mark as not discoverable if no client has requested discovery and
-+	 * report has not set any discoverable flags.
-+	 */
-+	if (!adapter->discovery_list && !discoverable)
-+		return false;
-+
-+	/* Do a prefix match for both address and name if pattern is set */
-+	for (l = adapter->discovery_list; l; l = g_slist_next(l)) {
-+		struct watch_client *client = l->data;
-+		struct discovery_filter *filter = client->discovery_filter;
-+		size_t pattern_len;
-+
-+		if (!filter || !filter->pattern)
-+			continue;
-+
-+		/* Reset discoverable if a client has a pattern filter */
-+		discoverable = false;
-+
-+		pattern_len = strlen(filter->pattern);
-+		if (!pattern_len)
-+			return true;
-+
-+		if (!strncmp(filter->pattern, addr, pattern_len))
-+			return true;
-+
-+		if (eir->name && !strncmp(filter->pattern, eir->name,
-+							pattern_len))
-+			return true;
-+	}
-+
-+	return discoverable;
-+}
-+
- static void update_found_devices(struct btd_adapter *adapter,
- 					const bdaddr_t *bdaddr,
- 					uint8_t bdaddr_type, int8_t rssi,
-@@ -6162,21 +6228,14 @@ static void update_found_devices(struct btd_adapter *adapter,
- 	memset(&eir_data, 0, sizeof(eir_data));
- 	eir_parse(&eir_data, data, data_len);
- 
--	if (bdaddr_type == BDADDR_BREDR || adapter->filtered_discovery)
--		discoverable = true;
--	else
--		discoverable = eir_data.flags & (EIR_LIM_DISC | EIR_GEN_DISC);
--
- 	ba2str(bdaddr, addr);
- 
-+	discoverable = device_is_discoverable(adapter, &eir_data, addr,
-+							bdaddr_type);
-+
- 	dev = btd_adapter_find_device(adapter, bdaddr, bdaddr_type);
- 	if (!dev) {
--		/*
--		 * If no client has requested discovery or the device is
--		 * not marked as discoverable, then do not create new
--		 * device objects.
--		 */
--		if (!adapter->discovery_list || !discoverable) {
-+		if (!discoverable) {
- 			eir_data_free(&eir_data);
- 			return;
- 		}
-@@ -6219,8 +6278,9 @@ static void update_found_devices(struct btd_adapter *adapter,
- 		return;
- 	}
- 
--	if (adapter->filtered_discovery &&
--	    !is_filter_match(adapter->discovery_list, &eir_data, rssi)) {
-+	/* Don't continue if not discoverable or if filter don't match */
-+	if (!discoverable || (adapter->filtered_discovery &&
-+	    !is_filter_match(adapter->discovery_list, &eir_data, rssi))) {
- 		eir_data_free(&eir_data);
- 		return;
- 	}
+Please disregard this one, it was sent by mistake.
+
 -- 
-2.21.1
-
+Luiz Augusto von Dentz
