@@ -2,132 +2,95 @@ Return-Path: <SRS0=cA0y=4I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 191BAC11D01
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 07:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1858DC11D01
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 07:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EADD720801
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 07:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 862D3208C4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Feb 2020 07:47:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=temperror (0-bit key) header.d=phytec.in header.i=@phytec.in header.b="KvqLG/vD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726878AbgBTHhW convert rfc822-to-8bit (ORCPT
+        id S1726829AbgBTHrJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Feb 2020 02:37:22 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:41023 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726756AbgBTHhW (ORCPT
+        Thu, 20 Feb 2020 02:47:09 -0500
+Received: from mickerik.phytec.de ([195.145.39.210]:57528 "EHLO
+        mickerik.phytec.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726248AbgBTHrJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Feb 2020 02:37:22 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 00282CECDC;
-        Thu, 20 Feb 2020 08:46:45 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH] Bluetooth: Fix - Remove adv set for directed advertising
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200218144840.2854-1-sathish.narasimman@intel.com>
-Date:   Thu, 20 Feb 2020 08:37:20 +0100
-Cc:     linux-bluetooth@vger.kernel.org,
-        Sathish Narsimman <sathish.narasimman@intel.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <F347B999-AB83-4E11-BAD3-7FC08D40AB9B@holtmann.org>
-References: <20200218144840.2854-1-sathish.narasimman@intel.com>
-To:     Sathish Narsimman <nsathish41@gmail.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Thu, 20 Feb 2020 02:47:09 -0500
+X-Greylist: delayed 900 seconds by postgrey-1.27 at vger.kernel.org; Thu, 20 Feb 2020 02:47:07 EST
+DKIM-Signature: v=1; a=rsa-sha256; d=phytec.in; s=a1; c=relaxed/simple;
+        q=dns/txt; i=@phytec.in; t=1582183926; x=1584775926;
+        h=From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=GarEHcIJxeFfWZFCm6KeEMRfV/XtkQu9YBq/5vYvcr8=;
+        b=KvqLG/vDeA6z1oDjGMHbgMEKVcKKn4tQXJSBauxXxLg/d6L+XbVOUcBaYSm7SkGT
+        fQPxbx4E7e2kJpvdA7VzFFrWu8q05c1NDQifG1hV4IK3hFEm5YCDicjzNsPGGZm/
+        Xg7DTzS0q97+yMr5o28rDMcUDUdZsvkLQdVeytHmMSI=;
+X-AuditID: c39127d2-085ff70000001a8a-3a-5e4e35f6a157
+Received: from tumirnix.phytec.de (tumirnix.phytec.de [172.16.0.38])
+        by mickerik.phytec.de (PHYTEC Mail Gateway) with SMTP id 55.82.06794.6F53E4E5; Thu, 20 Feb 2020 08:32:06 +0100 (CET)
+X-Disclaimed: 1
+MIME-Version: 1.0
+Sensitivity: 
+Importance: Normal
+X-Priority: 3 (Normal)
+In-Reply-To: 
+References: 
+Subject: mesh-cfgclient Node is not attached
+From:   Mahaboob Nazeer SK <nazeer.m@phytec.in>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <OF2849A126.CB6B1F2C-ONC1258514.0028F058-C1258514.0028F05A@phytec.de>
+Date:   Thu, 20 Feb 2020 08:27:09 +0100
+X-Mailer: Lotus Domino Web Server Release 9.0.1FP7 August  17, 2016
+X-MIMETrack: Serialize by http on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 20.02.2020 08:27:09,
+        Serialize complete at 20.02.2020 08:27:09,
+        Serialize by Router on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 20.02.2020 08:27:09
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrLLMWRmVeSWpSXmKPExsWyRoBBTfebqV+cwd17AhZzrvUxOzB6fN4k
+        F8AYxWWTkpqTWZZapG+XwJUx8+ZctoKfLBUHj+1gbGBsYuli5OCQEDCRaPkMZHJxCAnsZpSY
+        8mAjUxcjJ1CcX+LTn1Y2EJtXQFDi5MwnLCC2sACvxKa3sxlBbE4BIYmOq52sEPViEhPW/WIG
+        mckJVDPhnzVIWEiAR+LVhv2MEK06EmtWzQUbzyagK7HywkOwuIiAssSzfYeZIFYFSqy5fQBs
+        LYuAqsSjU60sEOOdJRb/uQB2p4RAA5PErdmzwXYxC6hLrJ8nBFLDLKAtsWzha+YJjEKzkFw9
+        C6FqFpKqBYzMqxiFcjOTs1OLMrP1CjIqS1KT9VJSNzECg/TwRPVLOxj75ngcYmTiYDzEKMHB
+        rCTCq8bjFyfEm5JYWZValB9fVJqTWnyIUZqDRUmcdwNvSZiQQHpiSWp2ampBahFMlomDU6qB
+        sZThwubT7jauR9YViM9kMlMXTo8zmiB9ee0f4Yd7Tbk0VedFqGmxF/1ZfLhb5MnFTexNGdtK
+        Op+2ztKKMtY6Znx28ermJmOHpQy5v+/qzJQ5NbdcotKyo+727dDsa+av3nPK/lG6UR3bFMe+
+        Sn9bmUrug3VGF4+uOdqw7nmaEmv61tScTx/ElViKMxINtZiLihMBM13Ba0ACAAA=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
+Hi,
 
-> Extended advertising Data is set during bluetooth initialization
-> by default which causes InvalidHCICommandParameters when setting
-> Extended advertising parameters.
-> 
-> As per Core Spec 5.2 Vol 2, PART E, Sec 7.8.53, for
-> advertising_event_property LE_LEGACY_ADV_DIRECT_IND does not
-> supports advertising data when the advertising set already
-> contains some, the controller shall return erroc code
-> 'InvalidHCICommandParameters(0x12).
-> 
-> So it is required to remove adv set for handle 0x00. since we use
-> instance 0 for directed adv.
-> 
-> Signed-off-by: Sathish Narsimman <sathish.narasimman@intel.com>
-> ---
-> include/net/bluetooth/hci.h |  2 ++
-> net/bluetooth/hci_conn.c    | 10 ++++++++++
-> net/bluetooth/hci_request.c |  5 +++++
-> net/bluetooth/hci_request.h |  1 +
-> 4 files changed, 18 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 6293bdd7d862..0d7e36c54733 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1724,6 +1724,8 @@ struct hci_cp_le_set_ext_scan_rsp_data {
-> 
-> #define LE_SET_ADV_DATA_NO_FRAG		0x01
-> 
-> +#define HCI_OP_LE_REMOVE_ADV_SET	0x203c
-> +
-> #define HCI_OP_LE_CLEAR_ADV_SETS	0x203d
-> 
-> #define HCI_OP_LE_SET_ADV_SET_RAND_ADDR	0x2035
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 65fa44cbe514..1887da39a93d 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -898,6 +898,16 @@ static void hci_req_directed_advertising(struct hci_request *req,
-> 		cp.peer_addr_type = conn->dst_type;
-> 		bacpy(&cp.peer_addr, &conn->dst);
-> 
-> +		/* As per Core Spec 5.2 Vol 2, PART E, Sec 7.8.53, for
-> +		 * advertising_event_property LE_LEGACY_ADV_DIRECT_IND
-> +		 * does not supports advertising data when the advertising set already
-> +		 * contains some, the controller shall return erroc code 'Invalid
-> +		 * HCI Command Parameters(0x12).
-> +		 * So it is required to remove adv set for handle 0x00. since we use
-> +		 * instance 0 for directed adv.
-> +		 */
-> +		hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, sizeof(cp.handle), &cp.handle);
-> +
-> 		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
-> 
-> 		if (own_addr_type == ADDR_LE_DEV_RANDOM &&
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 2a1b64dbf76e..63da7acbb48c 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -1550,6 +1550,11 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
-> 	return 0;
-> }
-> 
-> +void __hci_req_remove_adv_set(struct hci_request *req, u8 handle)
-> +{
-> +	hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, sizeof(handle), &handle);
-> +}
-> +
-> void __hci_req_clear_ext_adv_sets(struct hci_request *req)
-> {
-> 	hci_req_add(req, HCI_OP_LE_CLEAR_ADV_SETS, 0, NULL);
-> diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-> index a7019fbeadd3..8dd40c6c33c8 100644
-> --- a/net/bluetooth/hci_request.h
-> +++ b/net/bluetooth/hci_request.h
-> @@ -84,6 +84,7 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
-> int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
-> int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
-> int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance);
-> +void __hci_req_remove_adv_set(struct hci_request *req, u8 handle);
+I was trying to provision a node using a mesh-cfgclient.
 
-I don’t get this part of the patch. It is actually not used.
+I have successfully ran create and i was able to get configuration=20
+files in the .config.
 
-Regards
+[mesh-cfgclient]# create=20
+Mesh network configuration exists (/home/nazeer/.config/meshcfg/config=5Fdb=
+.json)
 
-Marcel
+After that i have tried to discover the unprovisioned node but i get=20
+Node is not attached message.
 
+[mesh-cfgclient]# discover-unprovisioned on
+Node is not attached
+[mesh-cfgclient]#
+
+Could you please let me know if weather there are some=20
+more steps involved to discover and provision a node or if am missing somet=
+hings.
+
+Thank you.
