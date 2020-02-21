@@ -3,37 +3,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0B34C11D00
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 02:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679B3C11D24
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 02:18:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A817A206EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 02:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EC05206EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 02:18:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729497AbgBUCSP (ORCPT
+        id S1729529AbgBUCSQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Feb 2020 21:18:15 -0500
+        Thu, 20 Feb 2020 21:18:16 -0500
 Received: from mga04.intel.com ([192.55.52.120]:20563 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728992AbgBUCSP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Feb 2020 21:18:15 -0500
+        id S1728992AbgBUCSQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 20 Feb 2020 21:18:16 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2020 18:18:15 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2020 18:18:16 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.70,466,1574150400"; 
-   d="scan'208";a="230313308"
+   d="scan'208";a="230313320"
 Received: from ingas-nuc1.sea.intel.com ([10.254.187.96])
-  by fmsmga008.fm.intel.com with ESMTP; 20 Feb 2020 18:18:14 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 20 Feb 2020 18:18:15 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 1/4] tools/mesh-cfgclient: Add support for virtual labels
-Date:   Thu, 20 Feb 2020 18:18:08 -0800
-Message-Id: <20200221021811.30408-2-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/4] tools/mesh-cfgclient: Save and restore group addresses
+Date:   Thu, 20 Feb 2020 18:18:09 -0800
+Message-Id: <20200221021811.30408-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200221021811.30408-1-inga.stotland@intel.com>
 References: <20200221021811.30408-1-inga.stotland@intel.com>
@@ -44,71 +44,105 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds commands to generate and use virtual addresses for
-configuring remote node's publication and subscription.
-
-New commands:
-virt-add - generate a new label and calculate virtual address
-group-list - displays group addresses that are in use and available
-             virtual labels with corresponding virtual addresses
+This allows to save created virtual labels and group addresses
+in configuration file. The stored values can be restored upon
+the tool start up.
 ---
- Makefile.tools      |   3 +-
- tools/mesh/cfgcli.c | 203 ++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 188 insertions(+), 18 deletions(-)
+ tools/mesh/cfgcli.c  |  15 +++---
+ tools/mesh/cfgcli.h  |   6 +++
+ tools/mesh/mesh-db.c | 123 +++++++++++++++++++++++++++++++++++++++++++
+ tools/mesh/mesh-db.h |   3 ++
+ 4 files changed, 140 insertions(+), 7 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 006554cf7..f43764adc 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -336,7 +336,8 @@ tools_mesh_cfgclient_SOURCES = tools/mesh-cfgclient.c \
- 				tools/mesh/agent.h tools/mesh/agent.c \
- 				tools/mesh/mesh-db.h tools/mesh/mesh-db.c \
- 				mesh/util.h mesh/util.c \
--				mesh/mesh-config.h mesh/mesh-config-json.c
-+				mesh/mesh-config.h mesh/mesh-config-json.c \
-+				mesh/crypto.h mesh/crypto.c
- 
- tools_mesh_cfgclient_LDADD = lib/libbluetooth-internal.la src/libshared-ell.la \
- 						$(ell_ldadd) -ljson-c -lreadline
 diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index cfa573de3..4930c8b7b 100644
+index 4930c8b7b..60fce17cf 100644
 --- a/tools/mesh/cfgcli.c
 +++ b/tools/mesh/cfgcli.c
-@@ -31,6 +31,8 @@
- #include "src/shared/util.h"
- 
- #include "mesh/mesh-defs.h"
-+#include "mesh/util.h"
-+#include "mesh/crypto.h"
- 
- #include "tools/mesh/util.h"
- #include "tools/mesh/model.h"
-@@ -58,7 +60,13 @@ struct pending_req {
+@@ -60,11 +60,6 @@ struct pending_req {
  	uint16_t addr;
  };
+ 
+-struct mesh_group {
+-	uint16_t addr;
+-	uint8_t label[16];
+-};
+-
+ static struct l_queue *requests;
+ static struct l_queue *groups;
+ 
+@@ -816,6 +811,8 @@ static struct mesh_group *add_group(uint16_t addr)
+ 	grp->addr = addr;
+ 	l_queue_insert(groups, grp, compare_group_addr, NULL);
+ 
++	mesh_db_add_group(grp);
++
+ 	return grp;
+ }
+ 
+@@ -1683,6 +1680,7 @@ retry:
+ 	if (!tmp) {
+ 		l_queue_insert(groups, grp, compare_group_addr, NULL);
+ 		print_group(grp, NULL);
++		mesh_db_add_group(grp);
+ 		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ 	}
+ 
+@@ -1819,6 +1817,11 @@ static struct model_info cli_info = {
+ 	.vendor_id = VENDOR_ID_INVALID
+ };
+ 
++void cfgcli_restore_groups(struct l_queue *saved_groups)
++{
++	groups = saved_groups;
++}
++
+ struct model_info *cfgcli_init(key_send_func_t key_send, void *user_data)
+ {
+ 	if (!key_send)
+@@ -1827,8 +1830,6 @@ struct model_info *cfgcli_init(key_send_func_t key_send, void *user_data)
+ 	send_key_msg = key_send;
+ 	key_data = user_data;
+ 	requests = l_queue_new();
+-	groups = l_queue_new();
+-
+ 	bt_shell_add_submenu(&cfg_menu);
+ 
+ 	return &cli_info;
+diff --git a/tools/mesh/cfgcli.h b/tools/mesh/cfgcli.h
+index 16d2e0a61..c35cb1ca8 100644
+--- a/tools/mesh/cfgcli.h
++++ b/tools/mesh/cfgcli.h
+@@ -18,8 +18,14 @@
+  *
+  */
  
 +struct mesh_group {
 +	uint16_t addr;
 +	uint8_t label[16];
 +};
 +
- static struct l_queue *requests;
-+static struct l_queue *groups;
+ typedef bool (*key_send_func_t) (void *user_data, uint16_t dst,
+ 				 uint16_t idx, bool is_appkey, bool update);
  
- static void *send_data;
- static model_send_msg_func_t send_msg;
-@@ -764,6 +772,53 @@ static uint32_t read_input_parameters(int argc, char *argv[])
- 	return i;
+ struct model_info *cfgcli_init(key_send_func_t key_func, void *user_data);
++void cfgcli_restore_groups(struct l_queue *groups);
+ void cfgcli_cleanup(void);
+diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
+index 5dbb91440..1c8f92e20 100644
+--- a/tools/mesh/mesh-db.c
++++ b/tools/mesh/mesh-db.c
+@@ -41,6 +41,7 @@
+ 
+ #include "tools/mesh/keys.h"
+ #include "tools/mesh/remote.h"
++#include "tools/mesh/cfgcli.h"
+ #include "tools/mesh/mesh-db.h"
+ 
+ #define KEY_IDX_INVALID NET_IDX_INVALID
+@@ -254,6 +255,81 @@ static uint16_t node_parse_key(json_object *jarray, int i)
+ 	return idx;
  }
  
-+static bool match_group_addr(const void *a, const void *b)
-+{
-+	const struct mesh_group *grp = a;
-+	uint16_t addr = L_PTR_TO_UINT(b);
-+
-+	return grp->addr == addr;
-+}
-+
 +static int compare_group_addr(const void *a, const void *b, void *user_data)
 +{
 +	const struct mesh_group *grp0 = a;
@@ -123,267 +157,156 @@ index cfa573de3..4930c8b7b 100644
 +	return 0;
 +}
 +
-+static void print_virtual_not_found(uint16_t addr)
++static void load_groups(json_object *jcfg)
 +{
-+	bt_shell_printf("Virtual group with hash %4.4x not found\n", addr);
-+	bt_shell_printf("To see available, use \"group-list\"\n");
-+	bt_shell_printf("To create new, use \"label-add\"\n");
-+}
++	json_object *jgroups;
++	struct l_queue *groups;
++	int i, sz;
 +
-+static struct mesh_group *add_group(uint16_t addr)
-+{
-+	struct mesh_group *grp;
++	json_object_object_get_ex(jcfg, "groups", &jgroups);
 +
-+	if (!IS_GROUP(addr))
-+		return NULL;
-+
-+	grp = l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(addr));
-+	if (grp)
-+		return grp;
-+
-+	grp = l_new(struct mesh_group, 1);
-+	grp->addr = addr;
-+	l_queue_insert(groups, grp, compare_group_addr, NULL);
-+
-+	return grp;
-+}
-+
- static void cmd_timeout_set(int argc, char *argv[])
- {
- 	if (read_input_parameters(argc, argv) != 1)
-@@ -1196,22 +1251,47 @@ static void cmd_ttl_set(int argc, char *argv[])
- static void cmd_pub_set(int argc, char *argv[])
- {
- 	uint16_t n;
--	uint8_t msg[32];
-+	uint8_t msg[48];
- 	int parm_cnt;
--
--	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_SET, msg);
-+	struct mesh_group *grp;
-+	uint32_t opcode;
-+	uint16_t pub_addr;
- 
- 	parm_cnt = read_input_parameters(argc, argv);
-+
- 	if (parm_cnt != 6 && parm_cnt != 7) {
- 		bt_shell_printf("Bad arguments\n");
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
-+	pub_addr = parms[1];
-+
-+	grp = l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(pub_addr));
-+	if (!grp)
-+		grp = add_group(pub_addr);
-+
-+	if (!grp && IS_VIRTUAL(pub_addr)) {
-+		print_virtual_not_found(pub_addr);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	opcode = (!IS_VIRTUAL(pub_addr)) ? OP_CONFIG_MODEL_PUB_SET :
-+						OP_CONFIG_MODEL_PUB_VIRT_SET;
-+
-+	n = mesh_opcode_set(opcode, msg);
-+
- 	put_le16(parms[0], msg + n);
- 	n += 2;
-+
- 	/* Publish address */
--	put_le16(parms[1], msg + n);
--	n += 2;
-+	if (!IS_VIRTUAL(pub_addr)) {
-+		put_le16(pub_addr, msg + n);
-+		n += 2;
-+	} else {
-+		memcpy(msg + n, grp->label, 16);
-+		n += 16;
-+	}
-+
- 	/* AppKey index + credential (set to 0) */
- 	put_le16(parms[2], msg + n);
- 	n += 2;
-@@ -1225,10 +1305,10 @@ static void cmd_pub_set(int argc, char *argv[])
- 	/* Model Id */
- 	n += put_model_id(msg + n, &parms[5], parm_cnt == 7);
- 
--	if (!config_send(msg, n, OP_CONFIG_MODEL_PUB_SET))
-+	if (!config_send(msg, n, opcode))
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 
--	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
- static void cmd_pub_get(int argc, char *argv[])
-@@ -1263,8 +1343,8 @@ static void subscription_cmd(int argc, char *argv[], uint32_t opcode)
- 	uint16_t n;
- 	uint8_t msg[32];
- 	int parm_cnt;
--
--	n = mesh_opcode_set(opcode, msg);
-+	struct mesh_group *grp;
-+	uint16_t sub_addr;
- 
- 	parm_cnt = read_input_parameters(argc, argv);
- 	if (parm_cnt != 3 && parm_cnt != 4) {
-@@ -1272,12 +1352,42 @@ static void subscription_cmd(int argc, char *argv[], uint32_t opcode)
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
-+	sub_addr = parms[1];
-+
-+	grp = l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(sub_addr));
-+
-+	if (!grp && opcode != OP_CONFIG_MODEL_SUB_DELETE) {
-+		grp = add_group(sub_addr);
-+
-+		if (!grp && IS_VIRTUAL(sub_addr)) {
-+			print_virtual_not_found(sub_addr);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	if (IS_VIRTUAL(sub_addr)) {
-+		if (opcode == OP_CONFIG_MODEL_SUB_ADD)
-+			opcode = OP_CONFIG_MODEL_SUB_VIRT_ADD;
-+		else if (opcode == OP_CONFIG_MODEL_SUB_DELETE)
-+			opcode = OP_CONFIG_MODEL_SUB_VIRT_DELETE;
-+		else if (opcode == OP_CONFIG_MODEL_SUB_OVERWRITE)
-+			opcode = OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE;
-+	}
-+
-+	n = mesh_opcode_set(opcode, msg);
-+
- 	/* Element Address */
- 	put_le16(parms[0], msg + n);
- 	n += 2;
-+
- 	/* Subscription Address */
--	put_le16(parms[1], msg + n);
--	n += 2;
-+	if (!IS_VIRTUAL(sub_addr)) {
-+		put_le16(sub_addr, msg + n);
-+		n += 2;
-+	} else {
-+		memcpy(msg + n, grp->label, 16);
-+		n += 16;
-+	}
- 
- 	/* Model ID */
- 	n += put_model_id(msg + n, &parms[2], parm_cnt == 4);
-@@ -1399,6 +1509,9 @@ static void cmd_hb_pub_set(int argc, char *argv[])
- 
- 	n = mesh_opcode_set(OP_CONFIG_HEARTBEAT_PUB_SET, msg);
- 
-+	if (!l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(parms[1])))
-+		add_group(parms[1]);
-+
- 	parm_cnt = read_input_parameters(argc, argv);
- 	if (parm_cnt != 6) {
- 		bt_shell_printf("Bad arguments: %s\n", argv[1]);
-@@ -1447,6 +1560,9 @@ static void cmd_hb_sub_set(int argc, char *argv[])
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
-+	if (!l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(parms[1])))
-+		add_group(parms[1]);
-+
- 	/* Per Mesh Profile 4.3.2.65 */
- 	/* Source address */
- 	put_le16(parms[0], msg + n);
-@@ -1537,6 +1653,54 @@ static void cmd_netkey_get(int argc, char *argv[])
- 	cmd_default(OP_NETKEY_GET);
- }
- 
-+static void print_group(void *a, void *b)
-+{
-+	struct mesh_group *grp = a;
-+	char buf[33];
-+
-+	if (!IS_VIRTUAL(grp->addr)) {
-+		bt_shell_printf("\tGroup addr: %4.4x\n", grp->addr);
++	if (!jgroups || json_object_get_type(jgroups) != json_type_array)
 +		return;
-+	}
 +
-+	hex2str(grp->label, 16, buf, sizeof(buf));
-+	bt_shell_printf("\tVirtual addr: %4.4x, label: %s\n", grp->addr, buf);
-+}
-+
-+static void cmd_add_virt(int argc, char *argv[])
-+{
-+	struct mesh_group *grp, *tmp;
-+	uint8_t max_tries = 3;
-+
-+	grp = l_new(struct mesh_group, 1);
-+
-+retry:
-+	l_getrandom(grp->label, 16);
-+	mesh_crypto_virtual_addr(grp->label, &grp->addr);
-+
-+	/* For simplicity sake, avoid labels that map to the same hash */
-+	tmp = l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(grp->addr));
-+	if (!tmp) {
-+		l_queue_insert(groups, grp, compare_group_addr, NULL);
-+		print_group(grp, NULL);
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
-+	max_tries--;
-+	if (max_tries)
-+		goto retry;
-+
-+	l_free(grp);
-+	bt_shell_printf("Failed to generate unique label. Try again.");
-+	bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_list_groups(int argc, char *argv[])
-+{
-+	l_queue_foreach(groups, print_group, NULL);
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
- static bool tx_setup(model_send_msg_func_t send_func, void *user_data)
- {
- 	if (!send_func)
-@@ -1625,12 +1789,15 @@ static const struct bt_shell_menu cfg_menu = {
- 				"Set heartbeat subscribe"},
- 	{"hb-sub-get", NULL, cmd_hb_sub_get,
- 				"Get heartbeat subscribe"},
--	{"sub-add", "<ele_addr> <sub_addr> <model_id> [vendor]", cmd_sub_add,
--				"Add subscription"},
--	{"sub-del", "<ele_addr> <sub_addr> <model_id> [vendor]", cmd_sub_del,
--				"Delete subscription"},
--	{"sub-wrt", "<ele_addr> <sub_addr> <model_id> [vendor]", cmd_sub_ovwrt,
--				"Overwrite subscription"},
-+	{"virt-add", NULL, cmd_add_virt, "Generate and add a virtual label"},
-+	{"group-list", NULL, cmd_list_groups,
-+			"Display existing group addresses and virtual labels"},
-+	{"sub-add", "<ele_addr> <sub_addr> <model_id> [vendor]",
-+				cmd_sub_add, "Add subscription"},
-+	{"sub-del", "<ele_addr> <sub_addr> <model_id> [vendor]",
-+				cmd_sub_del, "Delete subscription"},
-+	{"sub-wrt", "<ele_addr> <sub_addr> <model_id> [vendor]",
-+				cmd_sub_ovwrt, "Overwrite subscription"},
- 	{"sub-del-all", "<ele_addr> <model_id> [vendor]", cmd_sub_del_all,
- 				"Delete subscription"},
- 	{"sub-get", "<ele_addr> <model_id> [vendor]", cmd_sub_get,
-@@ -1660,6 +1827,7 @@ struct model_info *cfgcli_init(key_send_func_t key_send, void *user_data)
- 	send_key_msg = key_send;
- 	key_data = user_data;
- 	requests = l_queue_new();
 +	groups = l_queue_new();
- 
- 	bt_shell_add_submenu(&cfg_menu);
- 
-@@ -1669,4 +1837,5 @@ struct model_info *cfgcli_init(key_send_func_t key_send, void *user_data)
- void cfgcli_cleanup(void)
++
++	sz = json_object_array_length(jgroups);
++
++	for (i = 0; i < sz; ++i) {
++		json_object *jgroup, *jval;
++		struct mesh_group *grp;
++		uint16_t addr, addr_len;
++		const char *str;
++
++		jgroup = json_object_array_get_idx(jgroups, i);
++		if (!jgroup)
++			continue;
++
++		if (!json_object_object_get_ex(jgroup, "name", &jval))
++			continue;
++
++		str = json_object_get_string(jval);
++		if (strlen(str) != 10)
++			continue;
++
++		if (sscanf(str + 6, "%04hx", &addr) != 1)
++			continue;
++
++		if (!json_object_object_get_ex(jgroup, "address", &jval))
++			continue;
++
++		str = json_object_get_string(jval);
++		addr_len = strlen(str);
++		if (addr_len != 4 && addr_len != 32)
++			continue;
++
++		if (addr_len == 32 && !IS_VIRTUAL(addr))
++			continue;
++
++		grp = l_new(struct mesh_group, 1);
++
++		if (addr_len == 4)
++			sscanf(str, "%04hx", &grp->addr);
++		else {
++			str2hex(str, 32, grp->label, 16);
++			grp->addr = addr;
++		}
++
++		l_queue_insert(groups, grp, compare_group_addr, NULL);
++	}
++
++	cfgcli_restore_groups(groups);
++}
++
+ static void load_remotes(json_object *jcfg)
  {
- 	l_queue_destroy(requests, free_request);
-+	l_queue_destroy(groups, l_free);
+ 	json_object *jnodes;
+@@ -632,6 +708,45 @@ bool mesh_db_app_key_del(uint16_t app_idx)
+ 	return delete_key(cfg->jcfg, "appKeys", app_idx);
  }
+ 
++bool mesh_db_add_group(struct mesh_group *grp)
++{
++	json_object *jgroup, *jgroups, *jval;
++	char buf[16];
++
++	if (!cfg || !cfg->jcfg)
++		return false;
++
++	if (!json_object_object_get_ex(cfg->jcfg, "groups", &jgroups))
++		return false;
++
++	jgroup = json_object_new_object();
++	if (!jgroup)
++		return false;
++
++	snprintf(buf, 11, "Group_%4.4x", grp->addr);
++	jval = json_object_new_string(buf);
++	json_object_object_add(jgroup, "name", jval);
++
++	if (IS_VIRTUAL(grp->addr)) {
++		if (!add_u8_16(jgroup, grp->label, "address"))
++			goto fail;
++	} else {
++		snprintf(buf, 5, "%4.4x", grp->addr);
++		jval = json_object_new_string(buf);
++		if (!jval)
++			goto fail;
++		json_object_object_add(jgroup, "address", jval);
++	}
++
++	json_object_array_add(jgroups, jgroup);
++
++	return mesh_config_save((struct mesh_config *) cfg, true, NULL, NULL);
++
++fail:
++	json_object_put(jgroup);
++	return false;
++}
++
+ bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
+ 							uint16_t net_idx)
+ {
+@@ -803,6 +918,13 @@ bool mesh_db_create(const char *fname, const uint8_t token[8],
+ 
+ 	json_object_object_add(jcfg, "appKeys", jarray);
+ 
++	jarray = json_object_new_array();
++	if (!jarray)
++		goto fail;
++
++	json_object_object_add(jcfg, "groups", jarray);
++
++
+ 	if (!mesh_config_save((struct mesh_config *) cfg, true, NULL, NULL))
+ 		goto fail;
+ 
+@@ -866,6 +988,7 @@ bool mesh_db_load(const char *fname)
+ 		goto fail;
+ 
+ 	load_remotes(jcfg);
++	load_groups(jcfg);
+ 
+ 	return true;
+ fail:
+diff --git a/tools/mesh/mesh-db.h b/tools/mesh/mesh-db.h
+index 4a7b16ab4..172c2b09b 100644
+--- a/tools/mesh/mesh-db.h
++++ b/tools/mesh/mesh-db.h
+@@ -19,6 +19,8 @@
+ 
+ #include "mesh/mesh-config.h"
+ 
++struct mesh_group;
++
+ bool mesh_db_create(const char *fname, const uint8_t token[8],
+ 							const char *name);
+ bool mesh_db_load(const char *fname);
+@@ -52,3 +54,4 @@ bool mesh_db_node_model_binding_add(uint16_t unicast, uint8_t ele, bool vendor,
+ 					uint32_t mod_id, uint16_t app_idx);
+ bool mesh_db_node_model_binding_del(uint16_t unicast, uint8_t ele, bool vendor,
+ 					uint32_t mod_id, uint16_t app_idx);
++bool mesh_db_add_group(struct mesh_group *grp);
 -- 
 2.21.1
 
