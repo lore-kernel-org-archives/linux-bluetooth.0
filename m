@@ -2,128 +2,148 @@ Return-Path: <SRS0=Dxuj=4J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 191E1C35640
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 08:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCD4C35640
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 09:44:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DDAD82073A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 08:39:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5C2C207FD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Feb 2020 09:44:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nvNcbWKu"
+	dkim=temperror (0-bit key) header.d=phytec.in header.i=@phytec.in header.b="OSYwSUpC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731397AbgBUIjf (ORCPT
+        id S1727952AbgBUJoV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Feb 2020 03:39:35 -0500
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:33253 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731537AbgBUIje (ORCPT
+        Fri, 21 Feb 2020 04:44:21 -0500
+Received: from mickerik.phytec.de ([195.145.39.210]:45852 "EHLO
+        mickerik.phytec.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727867AbgBUJoV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Feb 2020 03:39:34 -0500
-Received: by mail-pl1-f202.google.com with SMTP id bd7so779040plb.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Feb 2020 00:39:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=qabS3Yt4uR7Wnjipl66o4GWZ5y8XuRMfgvjQy7cEXTE=;
-        b=nvNcbWKu8TZNixlQBARlGWvQL9w2bfJZsHHUJB/opCZ64YXTz5gE1urGDpo+gRSCru
-         ODY+TPoZeb0nOaehsVaJEbGtE58GPgpSRYb2shnRFE50uGpj+9B3fAyxnJDFxS+vmCLi
-         o0Pd3d0cGDn3ldlssZpu/bccNKRtyGP1eXHT+JkwshorviJoNEvRzLSDnLN2KuFbDxB8
-         N51pucLgRPl59FtYxPYUWZpD/Qa8Tl82Grx3akhZFbC4eUrbLTonRrd6wINl32sf+9y/
-         gBmkJhjNm50H+TBHEwF65c8TUa0kKvLem17I3/RbtVV0+lPSxRWTV/3EhbR2EoPWLWzk
-         xqFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=qabS3Yt4uR7Wnjipl66o4GWZ5y8XuRMfgvjQy7cEXTE=;
-        b=g+tKT+O+gGDGof3lPiUOwMDLJcd6433vG7GUXGiKfuSDNo5R9+7N73EMp+wL6lFLBx
-         bwYzRtfq394WoFhzQ8OWR8+GMJ6WbxWME/dV7coQvqdiH8r9aIh44jfJCUWC/WqCwDn8
-         nIErWZRF2s/IXULe35q39BSJ8zi+kZo7MthSLqWpl8Eo181ipBKf+9rwEr5HJLxLUnV1
-         8iR+qg1zRF97UF/2ERAJyqtKfE2l+zLV7o8ImIYTispVCQ42KWexJoEJ8PiAMphFNSy9
-         BpGhdtXd6Y6yQIBi8SsjpK3QzsqkotMviN7OnQUgn/SB0YvJjR5FEtYw1jikHsSTdPr4
-         mW6A==
-X-Gm-Message-State: APjAAAU1zWjwDnsy5kR2LCeW5wuEZHs+o8p0lp0ZfX2L8AkCn5WIMvlM
-        ipN+B01FUe+rTBYHUUKK49ZROcEfIhtfnryCm7TmIEhD5Cp9MTT94nyIlyHNNZM3MKvXbZa10DJ
-        9tT3zBzb0pCzGlEMGaKyVLBZB1qtqh3hfGAvonuXPphni4mRMWULWEwsB8RTkK7Cuxm7l6kqnPu
-        hN
-X-Google-Smtp-Source: APXvYqxTNIWUWLbN1wuY/Ql4ptJf/Riaq6Kc3JJwW5j7Xe8DppMGeLf/ob71OgOGZ6oTTKkG/0McgYmK74Z6
-X-Received: by 2002:a63:ad0c:: with SMTP id g12mr36851945pgf.228.1582274373240;
- Fri, 21 Feb 2020 00:39:33 -0800 (PST)
-Date:   Fri, 21 Feb 2020 16:39:23 +0800
-Message-Id: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
-Subject: [Bluez PATCH v1] src/profile: Ensure class UUID matches before
- connecting profile
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc:     Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 21 Feb 2020 04:44:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; d=phytec.in; s=a1; c=relaxed/simple;
+        q=dns/txt; i=@phytec.in; t=1582278260; x=1584870260;
+        h=From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=JPFRN8ed/TOwqYtL3M0bijRVUv6sG3iZse74zf/mTuE=;
+        b=OSYwSUpCohcjw+ai7nzhfeLYuPQQdcGUbH0jWxtJGSIGDeUY1Eu7xasu7jZU1lB6
+        CGbeRjktWVbeMJGpLIJ1tad6xmNe33rYhI3RVU/71nS5Tj1M5uCXALQpmPFmmHl9
+        2X2anafmQSexeaWDYAow8trU8xoCo8lyFxaSTPoFdEs=;
+X-AuditID: c39127d2-06fff70000001a8a-ab-5e4fa673a50a
+Received: from tumirnix.phytec.de (tumirnix.phytec.de [172.16.0.38])
+        by mickerik.phytec.de (PHYTEC Mail Gateway) with SMTP id 37.59.06794.376AF4E5; Fri, 21 Feb 2020 10:44:19 +0100 (CET)
+X-Disclaimed: 1
+MIME-Version: 1.0
+Sensitivity: 
+Importance: Normal
+X-Priority: 3 (Normal)
+In-Reply-To: <e9577a1d890c83da99c8dcc2908fff680c9ecb7e.camel@intel.com>
+References: <e9577a1d890c83da99c8dcc2908fff680c9ecb7e.camel@intel.com>,
+        <OF2849A126.CB6B1F2C-ONC1258514.0028F058-C1258514.0028F05A@phytec.de>
+Subject: Re: mesh-cfgclient Node is not attached
+From:   Mahaboob Nazeer SK <nazeer.m@phytec.in>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-ID: <OFA1C38C14.B5366C1E-ONC1258515.00350A6C-C1258515.00350A6E@phytec.de>
+Date:   Fri, 21 Feb 2020 10:39:20 +0100
+X-Mailer: Lotus Domino Web Server Release 9.0.1FP7 August  17, 2016
+X-MIMETrack: Serialize by http on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 21.02.2020 10:39:20,
+        Serialize complete at 21.02.2020 10:39:20,
+        Serialize by Router on Tumirnix/Phytec(Release 9.0.1FP7|August  17, 2016) at
+ 21.02.2020 10:39:20
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrGLMWRmVeSWpSXmKPExsWyRoBBTbd4mX+cQc9vG4sVM1azWcy51sfs
+        wOSxeM9LJo/Pm+QCmKK4bFJSczLLUov07RK4MqZsOctY8ECgYv2FxcwNjCd4uxg5OSQETCRu
+        b//G2MXIxSEksJtR4v6uv4wQCX6JT39a2UBsXgFBiZMzn7CA2MICvBKb3s4Gq+EUEJLouNrJ
+        ClEvJjFh3S9miLi7xNGHR5khhvYzShxtWskE0WwgsWveMrAiNgFdiZUXHoINEhFQk7h4/QBY
+        nBmoef/8rywQiwMles+dZAexWQRUJbZuvswGscxZYvGfCywgCyQEGpgk5t/9BeRwADWrS6yf
+        JwQxR1ti2cLXzBMYhWch+WEWQtUsJFULGJlXMQrlZiZnpxZlZusVZFSWpCbrpaRuYgSG9eGJ
+        6pd2MPbN8TjEyMTBeIhRgoNZSYRXjccvTog3JbGyKrUoP76oNCe1+BCjNAeLkjjvBt6SMCGB
+        9MSS1OzU1ILUIpgsEwenVAPjbJ5+ttM3fVf/z3ohc/Nu66uV3ho+L3X3+n3W+WsdE1ix4yCH
+        1DUfUdbggxyHT97V4XG3v2gbI3Xo1LFyRSFtobNZ4X63Xvv4XC/5vXJGzJ4LYrE1H3wiNJU/
+        zw22ET34itXs9T73esPu60sF3NjmbWFy8jw/jduQfWLycoGH/hs9orhd0yqVWIozEg21mIuK
+        EwEmKNImWQIAAA==
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+Hi Brian,
 
-According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
-might be multiple service records returned in a SDP Service Search
-Attribute Response. Also, according to 2.5.2, the service pattern
-can match any UUID contained within the service record, it doesn't
-have to match only some specific attributes of the record.
+That was helpful. Its working now,i am able to=20
+discover the unprovisioned nodes.
 
-Therefore, before using the service record to connect to any
-profile, first we must check that the service class ID of the
-service record matches with whatever UUID specified in the service
-pattern we are looking for.
+Thank you.
 
----
 
- src/profile.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+-----linux-bluetooth-owner@vger.kernel.org wrote: -----
+To: "nazeer.m@phytec.in" <nazeer.m@phytec.in>, "linux-bluetooth@vger.kernel=
+.org" <linux-bluetooth@vger.kernel.org>
+From: "Gix, Brian"=20
+Sent by: linux-bluetooth-owner@vger.kernel.org
+Date: 02/21/2020 12:25AM
+Subject: Re: mesh-cfgclient Node is not attached
 
-diff --git a/src/profile.c b/src/profile.c
-index 192fd0245..1b481836e 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1568,8 +1568,34 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
- 
- 	for (r = recs; r != NULL; r = r->next) {
- 		sdp_record_t *rec = r->data;
-+		sdp_list_t *svcclass;
-+		sdp_list_t *svcclass_iter;
- 		sdp_list_t *protos;
- 		int port;
-+		bool matches_class_uuid = false;
-+
-+		if (sdp_get_service_classes(rec, &svcclass) < 0) {
-+			error("Unable to get svc class ID list from %s record",
-+								ext->name);
-+			continue;
-+		}
-+
-+		for (svcclass_iter = svcclass; svcclass_iter != NULL;
-+					svcclass_iter = svcclass_iter->next) {
-+			char *uuid = bt_uuid2string(svcclass_iter->data);
-+			int cmp_result = bt_uuid_strcmp(uuid, ext->uuid);
-+
-+			free(uuid);
-+			if (cmp_result == 0) {
-+				matches_class_uuid = true;
-+				break;
-+			}
-+		}
-+
-+		sdp_list_free(svcclass, free);
-+
-+		if (!matches_class_uuid)
-+			continue;
- 
- 		if (sdp_get_access_protos(rec, &protos) < 0) {
- 			error("Unable to get proto list from %s record",
--- 
-2.25.0.265.gbab2e86ba0-goog
+Hi Mr Nazeer,
+
+On Thu, 2020-02-20 at 08:27 +0100, Mahaboob Nazeer SK wrote:
+> Hi,
+>=20
+> I was trying to provision a node using a mesh-cfgclient.
+>=20
+> I have successfully ran create and i was able to get configuration=20
+> files in the .config.
+>=20
+> [mesh-cfgclient]# create=20
+> Mesh network configuration exists (/home/nazeer/.config/meshcfg/config=5F=
+db.json)
+>=20
+> After that i have tried to discover the unprovisioned node but i get=20
+> Node is not attached message.
+>=20
+> [mesh-cfgclient]# discover-unprovisioned on
+> Node is not attached
+> [mesh-cfgclient]#
+
+The problem you describe is probably due to the daemon not finding an appro=
+priate BT controller to attach to.=20
+This led to the "Attach" failing after the "Create", and then none of the c=
+ommands to the node are able to be
+sent.
+
+
+There are a couple of options here:
+
+1. If you have a single BT Controller (v4 or newer) you will need to disabl=
+e the main bluetooth daemon so that
+the bluetooth-meshd daemon has access to it:
+$ sudo systemctl disable bluetooth
+$ sudo systemctl stop bluetooth
+
+2. If you have *multiple* BT controllers, make sure the bluetooth daemon ha=
+sn't automatically claimed them all:
+In /etc/bluetooth/main.conf, make sure AutoEnable=3Dfalse (reboot may then =
+be required)
+
+
+In the future, we will be doing work to enable co-existance and controller =
+sharing for single controller
+systems. However, this will require some changes in the kernel.
+
+
+>=20
+> Could you please let me know if weather there are some=20
+> more steps involved to discover and provision a node or if am missing som=
+ethings.
+>=20
+> Thank you.
+
+Regards,
+
+--Brian Gix
 
