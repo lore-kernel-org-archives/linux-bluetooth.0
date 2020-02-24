@@ -2,152 +2,613 @@ Return-Path: <SRS0=SAxJ=4M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAD5C38BE0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1086C38BF9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 21:47:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 001E420CC7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:32:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dO861vxh"
+	by mail.kernel.org (Postfix) with ESMTP id 75F8C218AC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 21:47:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727187AbgBXTce (ORCPT
+        id S1728018AbgBXVry (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 14:32:34 -0500
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:35410 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725860AbgBXTce (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 14:32:34 -0500
-Received: by mail-vs1-f67.google.com with SMTP id x123so6452926vsc.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 11:32:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AgL45fhULAGu5G+w7I1P5SZRJSZy9unRzGksGlG5Ac8=;
-        b=dO861vxh0JbDJlF8dML1sOiyH1MDcmL4Zp5QNt6Au8+HWAMJbbaV0ys5arCMrYnV20
-         NhcM3dZjvHefFpOcL62Wa+Y/yM88qqN2gQJpEH1ImycEmUcS3sV8Ex0m1hIFHGhZj5kl
-         i9TCt5a5fmqkuzEuepliXC1g1Tf5c/0pgSzMs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AgL45fhULAGu5G+w7I1P5SZRJSZy9unRzGksGlG5Ac8=;
-        b=W6MC0GSNjUvKrqoaDXcqfI8IooHK5O7r3+0lT6c988T1JsrgWUt7ybGiwE9/9PGISw
-         RC6+pY1Fw3x01CV5zBCs/d3ZPy2JsPH7oISRnPjIpyqeMxm6cHgY8TgNu/FC7WA7BCqC
-         Nb/rNPh1M2Q675OSqOM0SUdNT1/i5v2u725Eu6lIgUeOYnPrcfDECxwQlUwpw9YiZGnl
-         DwpUhQFe4TgC4byt2zHvQCZ8mm+K/hg8eIt/SMpZCPb6A5PIpf4BiTiw0KskAlSWdf1g
-         xcTkmEA0j086ZYfMgy7w/H98OM4Q7aWmxas31QPfs1pI0HD5Usfs2+S0UFX3z0rPtISd
-         cRFQ==
-X-Gm-Message-State: APjAAAVAPsqETrkbrFlR7GSShq/ZGxdAL7wHlxWJVNmg8XxaiqJ4OSn2
-        ekhQsdvgxhdGmuKAnWHhlA3uJ4YUbscGAABz+iZcTw==
-X-Google-Smtp-Source: APXvYqx1q97BlcOmkjgYEGVruOJfe4m4wnPFvEzBNmD79LKbHDZWVUv4ovG9D5w6eIpxyEBGpsJQag8+B15P7pmhy2c=
-X-Received: by 2002:a67:fc8c:: with SMTP id x12mr25076429vsp.96.1582572751694;
- Mon, 24 Feb 2020 11:32:31 -0800 (PST)
+        Mon, 24 Feb 2020 16:47:54 -0500
+Received: from mga01.intel.com ([192.55.52.88]:36514 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726980AbgBXVry (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 Feb 2020 16:47:54 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Feb 2020 13:47:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,481,1574150400"; 
+   d="scan'208";a="316876925"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.255.231.132])
+  by orsmga001.jf.intel.com with ESMTP; 24 Feb 2020 13:47:52 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com
+Subject: [PATCH BlueZ v2] mesh: rework incoming advertisement filtering
+Date:   Mon, 24 Feb 2020 13:47:45 -0800
+Message-Id: <20200224214745.2529-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <0000000000000cce30059f4e27e9@google.com>
-In-Reply-To: <0000000000000cce30059f4e27e9@google.com>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 24 Feb 2020 11:32:20 -0800
-Message-ID: <CANFp7mWobejCpiq5xXouKAcRBSAbVwxKOnFbJ_XfiU6rLsT0Vw@mail.gmail.com>
-Subject: Re: WARNING: refcount bug in l2cap_chan_put
-To:     syzbot <syzbot+198362c76088d1515529@syzkaller.appspotmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        netdev <netdev@vger.kernel.org>, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-(Resent in plain text; sorry for double send)
+Future versions of Mesh will introduce new advertising packets, which
+do not fit in the limited and rigid filtering currently used. This minor
+rewrite allows registering and receiving of *any* AD types, including
+the filtering on multiple octets of the incoming AD parts.
+---
+ mesh/manager.c         |   5 +-
+ mesh/mesh-io-api.h     |  12 ++--
+ mesh/mesh-io-generic.c | 150 ++++++++++++++++++++++++-----------------
+ mesh/mesh-io.c         |  36 ++--------
+ mesh/mesh-io.h         |  25 +++----
+ mesh/mesh.c            |  10 ++-
+ mesh/net.c             |  13 ++--
+ 7 files changed, 128 insertions(+), 123 deletions(-)
 
-I took a brief look at this error and uncovered that 6lowpan uses zero
-locks when using l2cap (should be using the channel lock).
+diff --git a/mesh/manager.c b/mesh/manager.c
+index e4a7deaeb..0909c7e16 100644
+--- a/mesh/manager.c
++++ b/mesh/manager.c
+@@ -52,6 +52,7 @@ static uint8_t scan_uuid[16];
+ static struct mesh_node *scan_node;
+ static struct l_timeout *scan_timeout;
+ static struct add_data *add_pending;
++static const uint8_t prvb[2] = {MESH_AD_TYPE_BEACON, 0x00};
+ 
+ static void scan_cancel(struct l_timeout *timeout, void *user_data)
+ {
+@@ -66,7 +67,7 @@ static void scan_cancel(struct l_timeout *timeout, void *user_data)
+ 
+ 	net = node_get_net(node);
+ 	io = mesh_net_get_io(net);
+-	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_PROV_BEACON);
++	mesh_io_deregister_recv_cb(io, prvb, sizeof(prvb));
+ 	scan_node = NULL;
+ 	scan_timeout = NULL;
+ }
+@@ -397,7 +398,7 @@ static struct l_dbus_message *start_scan_call(struct l_dbus *dbus,
+ 	net = node_get_net(node);
+ 	io = mesh_net_get_io(net);
+ 	scan_node = node;
+-	mesh_io_register_recv_cb(io, MESH_IO_FILTER_PROV_BEACON,
++	mesh_io_register_recv_cb(io, prvb, sizeof(prvb),
+ 						prov_beacon_recv, node);
+ 
+ 	if (duration)
+diff --git a/mesh/mesh-io-api.h b/mesh/mesh-io-api.h
+index 75b881800..7a5b49c60 100644
+--- a/mesh/mesh-io-api.h
++++ b/mesh/mesh-io-api.h
+@@ -26,12 +26,11 @@ typedef bool (*mesh_io_caps_t)(struct mesh_io *io, struct mesh_io_caps *caps);
+ typedef bool (*mesh_io_send_t)(struct mesh_io *io,
+ 					struct mesh_io_send_info *info,
+ 					const uint8_t *data, uint16_t len);
+-typedef bool (*mesh_io_register_t)(struct mesh_io *io, uint8_t filter_id,
+-				mesh_io_recv_func_t cb, void *user_data);
+-typedef bool (*mesh_io_deregister_t)(struct mesh_io *io, uint8_t filter_id);
+-typedef bool (*mesh_io_filter_set_t)(struct mesh_io *io,
+-			uint8_t filter_id, const uint8_t *data, uint8_t len,
+-			mesh_io_status_func_t callback, void *user_data);
++typedef bool (*mesh_io_register_t)(struct mesh_io *io, const uint8_t *filter,
++					uint8_t len, mesh_io_recv_func_t cb,
++					void *user_data);
++typedef bool (*mesh_io_deregister_t)(struct mesh_io *io, const uint8_t *filter,
++								uint8_t len);
+ typedef bool (*mesh_io_tx_cancel_t)(struct mesh_io *io, const uint8_t *pattern,
+ 								uint8_t len);
+ 
+@@ -42,7 +41,6 @@ struct mesh_io_api {
+ 	mesh_io_send_t		send;
+ 	mesh_io_register_t	reg;
+ 	mesh_io_deregister_t	dereg;
+-	mesh_io_filter_set_t	set;
+ 	mesh_io_tx_cancel_t	cancel;
+ };
+ 
+diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
+index b42fb4f1d..2efd32f12 100644
+--- a/mesh/mesh-io-generic.c
++++ b/mesh/mesh-io-generic.c
+@@ -31,6 +31,7 @@
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+ 
++#include "mesh/mesh-defs.h"
+ #include "mesh/mesh-mgmt.h"
+ #include "mesh/mesh-io.h"
+ #include "mesh/mesh-io-api.h"
+@@ -44,16 +45,17 @@ struct mesh_io_private {
+ 	struct l_queue *rx_regs;
+ 	struct l_queue *tx_pkts;
+ 	struct tx_pkt *tx;
+-	uint8_t filters[4];
+-	bool sending;
+ 	uint16_t index;
+ 	uint16_t interval;
++	bool sending;
++	bool active;
+ };
+ 
+ struct pvt_rx_reg {
+-	uint8_t filter_id;
+ 	mesh_io_recv_func_t cb;
+ 	void *user_data;
++	uint8_t len;
++	uint8_t filter[0];
+ };
+ 
+ struct process_data {
+@@ -93,20 +95,17 @@ static uint32_t instant_remaining_ms(uint32_t instant)
+ 	return instant;
+ }
+ 
+-static void process_rx_callbacks(void *v_rx, void *v_reg)
++static void process_rx_callbacks(void *v_reg, void *v_rx)
+ {
+-	struct pvt_rx_reg *rx_reg = v_rx;
+-	struct process_data *rx = v_reg;
+-	uint8_t ad_type;
+-
+-	ad_type = rx->pvt->filters[rx_reg->filter_id - 1];
++	struct pvt_rx_reg *rx_reg = v_reg;
++	struct process_data *rx = v_rx;
+ 
+-	if (rx->data[0] == ad_type && rx_reg->cb)
++	if (!memcmp(rx->data, rx_reg->filter, rx_reg->len))
+ 		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
+ }
+ 
+ static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
+-					uint32_t instant,
++					uint32_t instant, const uint8_t *addr,
+ 					const uint8_t *data, uint8_t len)
+ {
+ 	struct process_data rx = {
+@@ -114,6 +113,7 @@ static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
+ 		.data = data,
+ 		.len = len,
+ 		.info.instant = instant,
++		.info.addr = addr,
+ 		.info.chan = 7,
+ 		.info.rssi = rssi,
+ 	};
+@@ -125,6 +125,7 @@ static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
+ {
+ 	const struct bt_hci_evt_le_adv_report *evt = buf;
+ 	const uint8_t *adv;
++	const uint8_t *addr;
+ 	uint32_t instant;
+ 	uint8_t adv_len;
+ 	uint16_t len = 0;
+@@ -136,6 +137,7 @@ static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
+ 	instant = get_instant();
+ 	adv = evt->data;
+ 	adv_len = evt->data_len;
++	addr = evt->addr;
+ 
+ 	/* rssi is just beyond last byte of data */
+ 	rssi = (int8_t) adv[adv_len];
+@@ -154,7 +156,7 @@ static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
+ 			break;
+ 
+ 		/* TODO: Create an Instant to use */
+-		process_rx(io->pvt, rssi, instant, adv + 1, adv[0]);
++		process_rx(io->pvt, rssi, instant, addr, adv + 1, adv[0]);
+ 
+ 		adv += field_len + 1;
+ 	}
+@@ -371,7 +373,7 @@ static bool dev_caps(struct mesh_io *io, struct mesh_io_caps *caps)
+ 	if (!pvt || !caps)
+ 		return false;
+ 
+-	caps->max_num_filters = sizeof(pvt->filters);
++	caps->max_num_filters = 255;
+ 	caps->window_accuracy = 50;
+ 
+ 	return true;
+@@ -703,12 +705,12 @@ static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
+ 	return true;
+ }
+ 
+-static bool find_by_filter_id(const void *a, const void *b)
++static bool find_by_filter(const void *a, const void *b)
+ {
+ 	const struct pvt_rx_reg *rx_reg = a;
+-	uint8_t filter_id = L_PTR_TO_UINT(b);
++	const uint8_t *filter = b;
+ 
+-	return rx_reg->filter_id == filter_id;
++	return !memcmp(rx_reg->filter, filter, rx_reg->len);
+ }
+ 
+ static void scan_enable_rsp(const void *buf, uint8_t size,
+@@ -732,28 +734,61 @@ static void set_recv_scan_enable(const void *buf, uint8_t size,
+ 			&cmd, sizeof(cmd), scan_enable_rsp, pvt, NULL);
+ }
+ 
+-static bool recv_register(struct mesh_io *io, uint8_t filter_id,
+-				mesh_io_recv_func_t cb, void *user_data)
++static void scan_disable_rsp(const void *buf, uint8_t size,
++							void *user_data)
+ {
+ 	struct bt_hci_cmd_le_set_scan_parameters cmd;
++	struct mesh_io_private *pvt = user_data;
++	uint8_t status = *((uint8_t *) buf);
++
++	if (status)
++		l_error("LE Scan disable failed (0x%02x)", status);
++
++	cmd.type = pvt->active ? 0x01 : 0x00;	/* Passive/Active scanning */
++	cmd.interval = L_CPU_TO_LE16(0x0010);	/* 10 ms */
++	cmd.window = L_CPU_TO_LE16(0x0010);	/* 10 ms */
++	cmd.own_addr_type = 0x01;		/* ADDR_TYPE_RANDOM */
++	cmd.filter_policy = 0x00;		/* Accept all */
++
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
++			&cmd, sizeof(cmd),
++			set_recv_scan_enable, pvt, NULL);
++}
++
++static bool find_active(const void *a, const void *b)
++{
++	const struct pvt_rx_reg *rx_reg = a;
++
++	/* Mesh specific AD types do *not* require active scanning,
++	 * so do not turn on Active Scanning on their account.
++	 */
++	if (rx_reg->filter[0] < MESH_AD_TYPE_PROVISION ||
++			rx_reg->filter[0] > MESH_AD_TYPE_BEACON)
++		return true;
++
++	return false;
++}
++
++static bool recv_register(struct mesh_io *io, const uint8_t *filter,
++			uint8_t len, mesh_io_recv_func_t cb, void *user_data)
++{
++	struct bt_hci_cmd_le_set_scan_enable cmd;
+ 	struct mesh_io_private *pvt = io->pvt;
+ 	struct pvt_rx_reg *rx_reg;
+ 	bool already_scanning;
++	bool active = false;
+ 
+-	l_info("%s %d", __func__, filter_id);
+-	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
++	if (!cb || !filter || !len)
+ 		return false;
+ 
+-	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
+-						L_UINT_TO_PTR(filter_id));
++	l_info("%s %2.2x", __func__, filter[0]);
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
+ 
+-	if (!rx_reg) {
+-		rx_reg = l_new(struct pvt_rx_reg, 1);
+-		if (!rx_reg)
+-			return false;
+-	}
++	l_free(rx_reg);
++	rx_reg = l_malloc(sizeof(*rx_reg) + len);
+ 
+-	rx_reg->filter_id = filter_id;
++	memcpy(rx_reg->filter, filter, len);
++	rx_reg->len = len;
+ 	rx_reg->cb = cb;
+ 	rx_reg->user_data = user_data;
+ 
+@@ -761,62 +796,52 @@ static bool recv_register(struct mesh_io *io, uint8_t filter_id,
+ 
+ 	l_queue_push_head(pvt->rx_regs, rx_reg);
+ 
+-	if (!already_scanning) {
+-		cmd.type = 0x00;			/* Passive scanning */
+-		cmd.interval = L_CPU_TO_LE16(0x0010);	/* 10 ms */
+-		cmd.window = L_CPU_TO_LE16(0x0010);	/* 10 ms */
+-		cmd.own_addr_type = 0x01;		/* ADDR_TYPE_RANDOM */
+-		cmd.filter_policy = 0x00;		/* Accept all */
++	/* Look for any AD types requiring Active Scanning */
++	if (l_queue_find(pvt->rx_regs, find_active, NULL))
++		active = true;
++
++	if (!already_scanning || pvt->active != active) {
++		pvt->active = active;
++		cmd.enable = 0x00;	/* Disable scanning */
++		cmd.filter_dup = 0x00;	/* Report duplicates */
++		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++				&cmd, sizeof(cmd), scan_disable_rsp, pvt, NULL);
+ 
+-		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
+-				&cmd, sizeof(cmd),
+-				set_recv_scan_enable, pvt, NULL);
+ 	}
+ 
+ 	return true;
+ }
+ 
+-static bool recv_deregister(struct mesh_io *io, uint8_t filter_id)
++static bool recv_deregister(struct mesh_io *io, const uint8_t *filter,
++								uint8_t len)
+ {
+-	struct bt_hci_cmd_le_set_scan_enable cmd;
++	struct bt_hci_cmd_le_set_scan_enable cmd = {0, 0};
+ 	struct mesh_io_private *pvt = io->pvt;
+-
+ 	struct pvt_rx_reg *rx_reg;
++	bool active = false;
+ 
+-	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
+-						L_UINT_TO_PTR(filter_id));
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
+ 
+ 	if (rx_reg)
+ 		l_free(rx_reg);
+ 
++	/* Look for any AD types requiring Active Scanning */
++	if (l_queue_find(pvt->rx_regs, find_active, NULL))
++		active = true;
++
+ 	if (l_queue_isempty(pvt->rx_regs)) {
+-		cmd.enable = 0x00;	/* Disable scanning */
+-		cmd.filter_dup = 0x00;	/* Report duplicates */
+ 		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
+-				&cmd, sizeof(cmd), NULL, NULL, NULL);
++					&cmd, sizeof(cmd), NULL, NULL, NULL);
+ 
++	} else if (active != pvt->active) {
++		pvt->active = active;
++		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++				&cmd, sizeof(cmd), scan_disable_rsp, pvt, NULL);
+ 	}
+ 
+ 	return true;
+ }
+ 
+-static bool filter_set(struct mesh_io *io,
+-		uint8_t filter_id, const uint8_t *data, uint8_t len,
+-		mesh_io_status_func_t callback, void *user_data)
+-{
+-	struct mesh_io_private *pvt = io->pvt;
+-
+-	l_info("%s id: %d, --> %2.2x", __func__, filter_id, data[0]);
+-	if (!data || !len || !filter_id || filter_id > sizeof(pvt->filters))
+-		return false;
+-
+-	pvt->filters[filter_id - 1] = data[0];
+-
+-	/* TODO: Delayed Call to successful status */
+-
+-	return true;
+-}
+-
+ const struct mesh_io_api mesh_io_generic = {
+ 	.init = dev_init,
+ 	.destroy = dev_destroy,
+@@ -824,6 +849,5 @@ const struct mesh_io_api mesh_io_generic = {
+ 	.send = send_tx,
+ 	.reg = recv_register,
+ 	.dereg = recv_deregister,
+-	.set = filter_set,
+ 	.cancel = tx_cancel,
+ };
+diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
+index 1ab173d9c..c4eaecefd 100644
+--- a/mesh/mesh-io.c
++++ b/mesh/mesh-io.c
+@@ -85,18 +85,6 @@ struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
+ 	if (!io_list)
+ 		io_list = l_queue_new();
+ 
+-	if (api->set) {
+-		uint8_t pkt = MESH_AD_TYPE_NETWORK;
+-		uint8_t prv = MESH_AD_TYPE_PROVISION;
+-		uint8_t snb[2] = {MESH_AD_TYPE_BEACON, 0x01};
+-		uint8_t prvb[2] = {MESH_AD_TYPE_BEACON, 0x00};
+-
+-		api->set(io, 1, snb, sizeof(snb), NULL, NULL);
+-		api->set(io, 2, &prv, 1, NULL, NULL);
+-		api->set(io, 3, &pkt, 1, NULL, NULL);
+-		api->set(io, 4, prvb, sizeof(prvb), NULL, NULL);
+-	}
+-
+ 	if (l_queue_push_head(io_list, io))
+ 		return io;
+ 
+@@ -133,35 +121,25 @@ bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps)
+ 	return false;
+ }
+ 
+-bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
+-				mesh_io_recv_func_t cb, void *user_data)
++bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
++				uint8_t len, mesh_io_recv_func_t cb,
++				void *user_data)
+ {
+ 	io = l_queue_find(io_list, match_by_io, io);
+ 
+ 	if (io && io->api && io->api->reg)
+-		return io->api->reg(io, filter_id, cb, user_data);
++		return io->api->reg(io, filter, len, cb, user_data);
+ 
+ 	return false;
+ }
+ 
+-bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id)
++bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
++								uint8_t len)
+ {
+ 	io = l_queue_find(io_list, match_by_io, io);
+ 
+ 	if (io && io->api && io->api->dereg)
+-		return io->api->dereg(io, filter_id);
+-
+-	return false;
+-}
+-
+-bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
+-				const uint8_t *data, uint8_t len,
+-				mesh_io_status_func_t cb, void *user_data)
+-{
+-	io = l_queue_find(io_list, match_by_io, io);
+-
+-	if (io && io->api && io->api->set)
+-		return io->api->set(io, filter_id, data, len, cb, user_data);
++		return io->api->dereg(io, filter, len);
+ 
+ 	return false;
+ }
+diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
+index 45ff00a3c..fc0422020 100644
+--- a/mesh/mesh-io.h
++++ b/mesh/mesh-io.h
+@@ -19,11 +19,6 @@
+ 
+ struct mesh_io;
+ 
+-#define MESH_IO_FILTER_BEACON		1
+-#define MESH_IO_FILTER_PROV		2
+-#define MESH_IO_FILTER_NET		3
+-#define MESH_IO_FILTER_PROV_BEACON	4
+-
+ #define MESH_IO_TX_COUNT_UNLIMITED	0
+ 
+ enum mesh_io_type {
+@@ -38,6 +33,7 @@ enum mesh_io_timing_type {
+ };
+ 
+ struct mesh_io_recv_info {
++	const uint8_t *addr;
+ 	uint32_t instant;
+ 	uint8_t chan;
+ 	int8_t rssi;
+@@ -78,26 +74,25 @@ typedef void (*mesh_io_recv_func_t)(void *user_data,
+ 					struct mesh_io_recv_info *info,
+ 					const uint8_t *data, uint16_t len);
+ 
+-typedef void (*mesh_io_status_func_t)(void *user_data, int status,
+-							uint8_t filter_id);
++typedef void (*mesh_io_recv_ext_func_t)(void *user_data,
++					struct mesh_io_recv_info *info,
++					const uint8_t *data, uint16_t len,
++					const uint8_t *addr);
+ 
+ typedef void (*mesh_io_ready_func_t)(void *user_data, bool result);
+ 
+-
+ struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
+ 				mesh_io_ready_func_t cb, void *user_data);
+ void mesh_io_destroy(struct mesh_io *io);
+ 
+ bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps);
+ 
+-bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
+-				mesh_io_recv_func_t cb, void *user_data);
++bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
++					uint8_t len, mesh_io_recv_func_t cb,
++					void *user_data);
+ 
+-bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id);
+-
+-bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
+-				const uint8_t *data, uint8_t len,
+-				mesh_io_status_func_t cb, void *user_data);
++bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
++								uint8_t len);
+ 
+ bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
+ 					const uint8_t *data, uint16_t len);
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index 6d2f86b6d..247c3c9be 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -141,24 +141,28 @@ static void prov_rx(void *user_data, struct mesh_io_recv_info *info,
+ 
+ bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data)
+ {
++	uint8_t prov_filter[] = {MESH_AD_TYPE_PROVISION};
++
+ 	if (mesh.prov_rx && mesh.prov_rx != cb)
+ 		return false;
+ 
+ 	mesh.prov_rx = cb;
+ 	mesh.prov_data = user_data;
+ 
+-	return mesh_io_register_recv_cb(mesh.io, MESH_IO_FILTER_PROV,
+-							prov_rx, &mesh);
++	return mesh_io_register_recv_cb(mesh.io, prov_filter,
++					sizeof(prov_filter), prov_rx, &mesh);
+ }
+ 
+ void mesh_unreg_prov_rx(prov_rx_cb_t cb)
+ {
++	uint8_t prov_filter[] = {MESH_AD_TYPE_PROVISION};
++
+ 	if (mesh.prov_rx != cb)
+ 		return;
+ 
+ 	mesh.prov_rx = NULL;
+ 	mesh.prov_data = NULL;
+-	mesh_io_deregister_recv_cb(mesh.io, MESH_IO_FILTER_PROV);
++	mesh_io_deregister_recv_cb(mesh.io, prov_filter, sizeof(prov_filter));
+ }
+ 
+ static void io_ready_callback(void *user_data, bool result)
+diff --git a/mesh/net.c b/mesh/net.c
+index ec05b6be9..5cf358fbd 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -2884,6 +2884,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 
+ 	first = l_queue_isempty(nets);
+ 	if (first) {
++		uint8_t snb[] = {MESH_AD_TYPE_BEACON, 0x01};
++		uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
++
+ 		if (!nets)
+ 			nets = l_queue_new();
+ 
+@@ -2891,9 +2894,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 			fast_cache = l_queue_new();
+ 
+ 		l_info("Register io cb");
+-		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
++		mesh_io_register_recv_cb(io, snb, sizeof(snb),
+ 							beacon_recv, NULL);
+-		mesh_io_register_recv_cb(io, MESH_IO_FILTER_NET,
++		mesh_io_register_recv_cb(io, pkt, sizeof(pkt),
+ 							net_msg_recv, NULL);
+ 	}
+ 
+@@ -2909,6 +2912,8 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 
+ struct mesh_io *mesh_net_detach(struct mesh_net *net)
+ {
++	uint8_t snb[] = {MESH_AD_TYPE_BEACON, 0x01};
++	uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
+ 	struct mesh_io *io;
+ 	uint8_t type = 0;
+ 
+@@ -2918,8 +2923,8 @@ struct mesh_io *mesh_net_detach(struct mesh_net *net)
+ 	io = net->io;
+ 
+ 	mesh_io_send_cancel(net->io, &type, 1);
+-	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
+-	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_NET);
++	mesh_io_deregister_recv_cb(io, snb, sizeof(snb));
++	mesh_io_deregister_recv_cb(io, pkt, sizeof(pkt));
+ 
+ 	net->io = NULL;
+ 	l_queue_remove(nets, net);
+-- 
+2.21.1
 
-It seems like it would be better just to convert its direct use of
-l2cap channel into using an l2cap socket.
-
-On Mon, Feb 24, 2020 at 12:28 AM syzbot
-<syzbot+198362c76088d1515529@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following crash on:
->
-> HEAD commit:    bee46b30 Add linux-next specific files for 20200221
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1244ea7ee00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=10693880b4976691
-> dashboard link: https://syzkaller.appspot.com/bug?extid=198362c76088d1515529
-> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160a03d9e00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10f8e1dde00000
->
-> Bisection is inconclusive: the bug happens on the oldest tested release.
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13f03a7ee00000
-> final crash:    https://syzkaller.appspot.com/x/report.txt?x=10083a7ee00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=17f03a7ee00000
->
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+198362c76088d1515529@syzkaller.appspotmail.com
->
-> ------------[ cut here ]------------
-> refcount_t: underflow; use-after-free.
-> WARNING: CPU: 1 PID: 2940 at lib/refcount.c:28 refcount_warn_saturate+0x1dc/0x1f0 lib/refcount.c:28
-> Kernel panic - not syncing: panic_on_warn set ...
-> CPU: 1 PID: 2940 Comm: kworker/1:12 Not tainted 5.6.0-rc2-next-20200221-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> Workqueue: events do_enable_set
-> Call Trace:
->  __dump_stack lib/dump_stack.c:77 [inline]
->  dump_stack+0x197/0x210 lib/dump_stack.c:118
->  panic+0x2e3/0x75c kernel/panic.c:221
->  __warn.cold+0x2f/0x3e kernel/panic.c:582
->  report_bug+0x289/0x300 lib/bug.c:195
->  fixup_bug arch/x86/kernel/traps.c:175 [inline]
->  fixup_bug arch/x86/kernel/traps.c:170 [inline]
->  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
->  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
->  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
-> RIP: 0010:refcount_warn_saturate+0x1dc/0x1f0 lib/refcount.c:28
-> Code: e9 d8 fe ff ff 48 89 df e8 81 81 10 fe e9 85 fe ff ff e8 07 54 d1 fd 48 c7 c7 00 c8 91 88 c6 05 6b f6 fc 06 01 e8 23 74 a1 fd <0f> 0b e9 ac fe ff ff 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 55 48
-> RSP: 0018:ffffc9000952fbd8 EFLAGS: 00010286
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: ffffffff815ee766 RDI: fffff520012a5f6d
-> RBP: ffffc9000952fbe8 R08: ffff88809e82e600 R09: ffffed1015d26661
-> R10: ffffed1015d26660 R11: ffff8880ae933307 R12: 0000000000000003
-> R13: ffff888095b3f018 R14: dead000000000122 R15: ffffc9000952fc98
->  refcount_sub_and_test include/linux/refcount.h:261 [inline]
->  refcount_dec_and_test include/linux/refcount.h:281 [inline]
->  kref_put include/linux/kref.h:64 [inline]
->  l2cap_chan_put+0x1d9/0x240 net/bluetooth/l2cap_core.c:501
->  do_enable_set+0x54b/0x960 net/bluetooth/6lowpan.c:1075
->  process_one_work+0xa05/0x17a0 kernel/workqueue.c:2266
->  worker_thread+0x98/0xe40 kernel/workqueue.c:2412
->  kthread+0x361/0x430 kernel/kthread.c:255
->  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-> Kernel Offset: disabled
-> Rebooting in 86400 seconds..
->
->
-> ---
-> This bug is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this bug report. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> syzbot can test patches for this bug, for details see:
-> https://goo.gl/tpsmEJ#testing-patches
