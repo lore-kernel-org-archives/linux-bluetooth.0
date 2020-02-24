@@ -7,115 +7,128 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846BBC38BF9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 21:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4507C38BF9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 22:33:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5470020CC7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 21:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FE162176D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 22:33:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mDBIosUz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LzrrnZSt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727825AbgBXVzo (ORCPT
+        id S1727670AbgBXWdP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 16:55:44 -0500
-Received: from mail-ot1-f49.google.com ([209.85.210.49]:38408 "EHLO
-        mail-ot1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727421AbgBXVzn (ORCPT
+        Mon, 24 Feb 2020 17:33:15 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:36744 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726651AbgBXWdO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 16:55:43 -0500
-Received: by mail-ot1-f49.google.com with SMTP id z9so10173799oth.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 13:55:42 -0800 (PST)
+        Mon, 24 Feb 2020 17:33:14 -0500
+Received: by mail-ot1-f65.google.com with SMTP id j20so10306513otq.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 14:33:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=XvLFP8y+jCq32sXzWEJETvhKdUi7HlmOpGs4d4aKb1Y=;
-        b=mDBIosUzKgxYJ7NoQM+IHg4LCf2opgeS6NdaC063pAfbgYT401sUYpP7/SICPkjx60
-         wxlJ+U1Ku1XFs3eLlX0dDSofxFeSqOfpzXLt/GhleyGXVXdfMvBcgCnVOaon11bxNpSC
-         kMYyFk8eWd1icBnowdzq9cO0cPNaaJYR47GXP/hW5fokwVhDQfnMkAVyebS/ruUZEukQ
-         4W1rWxg9/78zXGdqeLdvJhaDjGHMiyTPwOpQmj+Lz29r33ilGh0p6O0HQL7JljCk7FcW
-         UQ1gbRTYIUXCBvq2G+nd7Gt4LJf6vyfF0I1hdtyDXlf7Fizu18VMe6pEpxSsU9Ir6t10
-         tPaA==
+        bh=7ik8Suev1wn9gM+r6boW5emKP4kGGDxI8AQFnWGxpzs=;
+        b=LzrrnZStsmhe13X2FRsryeRzs0hsO5y2uEEFwDj0YGBPMbUUC3bntxoDfivcdfcrXo
+         1fXVTqogg/F28ex2IpbQJBmxgBePrvMzb80Dm74m5Bx2MRbw/XDKCPwGqpR8PCKUalR6
+         8JqKx90pIpbk6eHKwl+qUTlQ2POboXQmN4Gs9wuvTiScJRbWnZJu4I7rHMxe5xUc8LyN
+         hcuXKRniX+SwRHFAOfv2Q+P0opysuMD2iiwfMHqUG8hWcU4fVRTUqOeBFS6T4ncGHeaT
+         o8mRLZwZImhLONuLtNFhA9oD4xulNmxGSaQF3J8HYsugsaAcsVFhAkgyd89THsPNcu8m
+         x0xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=XvLFP8y+jCq32sXzWEJETvhKdUi7HlmOpGs4d4aKb1Y=;
-        b=em5+oK+aZ+cVMI2LJJNRfKDjuge7SIvah8cFduNAVkPneexFv7WyyDBCkpsaLWFCSB
-         0Pgq7OCRINVFzJUIiHZS2qRS6nDdy91LOnTikZnXgFPmVCYyUdJMMNujzjcgPyI/Mkiv
-         DZ35F+AB5PdtAyAW6VPc+LG82XEf6t+W9Lev5ba1LX7G9VqeXRWGPGOww0tehW98omnR
-         CbGWxboJ8tyt4uJfIXMjL2u13io14ebbPFisuJm7J81zGxL0Mg3Fi/qEutr3YW4qMSEb
-         dcieCWSWSmg9BdYGm774pmPrkqWtCCSCBylQqqDzrzdJoHOOp8Y3drMpMQI/jFQTEi/n
-         cEkQ==
-X-Gm-Message-State: APjAAAXutWBubmoD2dsXauX2YpXRUhmzYHBv9lueGUNb8NLrtY92GkyL
-        JKl/jCZnvfRSr5VNwxjKVHKqU2i2ldbwLu2LCxA=
-X-Google-Smtp-Source: APXvYqx9qAEKLoeFfCskwg1/Hbjd8lpcOv5qc9VovfSbkpdlJR/mTTKtch235uCfd3WISV1hrxRaDagrA6WKagmnwus=
-X-Received: by 2002:a9d:58cb:: with SMTP id s11mr43083839oth.55.1582581342330;
- Mon, 24 Feb 2020 13:55:42 -0800 (PST)
+        bh=7ik8Suev1wn9gM+r6boW5emKP4kGGDxI8AQFnWGxpzs=;
+        b=UgxP6W9s+3b8FzBhriaxhn1wmedajBnZsgQqJxhjeVIi4oCKXTYpvFl5NACYFWJb5e
+         MNmevty7FJrjWZZb+qdUtiSI0oEboQ29uSy2e7CIcSnGewSwm9vvwKi4de/FifR/BjEJ
+         rqAzYqv95PfJ0EfPM33XZIx0d184Rrh6lFUjHuW+qE/zxJcRqbFUpIZpZH1ljqPQKeSy
+         vMMwpXK0f48fpDZKRYalbmfShZ+RPM3OAOpgYy2aGA1Eo/fUobA7gdx8S0tqvMvcS+at
+         I1VTCvL9PzgNH+h6ddjkwxhBNn6qTj2f3cHaTh08kSNx4toRe/HKNFFx/G2PyAHGD8AD
+         JdLg==
+X-Gm-Message-State: APjAAAX5zPahctKXCWhDACPfPNIfxOIfWq5XQkpbe+NO2MVdfh3jGq+b
+        CUZVSj4Na1sYw7k2TqeyoDBN2bIdXHr2zudeX7g=
+X-Google-Smtp-Source: APXvYqyX7MK5E2/Hw9ro/NYVKxDh6GduxfyRDSBs5OoX7M8+PFwuF1IMucqY0S9VME/7IEWN1XuXdC0GE8xr55Ecwrg=
+X-Received: by 2002:a05:6830:88:: with SMTP id a8mr27527566oto.177.1582583593619;
+ Mon, 24 Feb 2020 14:33:13 -0800 (PST)
 MIME-Version: 1.0
-References: <CAD3n0hm61cRPK3=Scf02y3Y3aMJ66eCC5nwFh40Y9kfLBWk-tw@mail.gmail.com>
- <CAAu3APZ4WqFd=61eUfbC8biTbygWW4k2Te3De38B2+maYoBePw@mail.gmail.com>
- <CAD3n0hnJkmXGjiei0-u=GBh0xoGb4N7tkuBh_uSvsuT7bAhXLA@mail.gmail.com> <CAAu3APbWouHkguPG3_FQmxPY=6q6rzmr_CbOqY2_0a0RzC++XQ@mail.gmail.com>
-In-Reply-To: <CAAu3APbWouHkguPG3_FQmxPY=6q6rzmr_CbOqY2_0a0RzC++XQ@mail.gmail.com>
-From:   chris baker <chrisbkr2020@gmail.com>
-Date:   Mon, 24 Feb 2020 13:55:32 -0800
-Message-ID: <CAD3n0hnWk0rULy+RJNTAujqY5vtTR=zvoB8233rtLSGc3R-9Pw@mail.gmail.com>
-Subject: Re: Bluez blotoothctl scan vs hcitool scan
-To:     Barry Byford <31baz66@gmail.com>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+References: <CAJ_gUqbKKxt15OhizRN_x4Dy-RvyuEUH0Bwcah_KEcMsQakQoA@mail.gmail.com>
+ <CABBYNZKG6hFMgy7ifuEW2kxyQYd=Gw0cWefjBy-fdWS00OWL+g@mail.gmail.com> <CAJ_gUqZ5rsV55tO5O07fUYxEoJa=CG0gAz5P3hJ-Lb-kYws2rg@mail.gmail.com>
+In-Reply-To: <CAJ_gUqZ5rsV55tO5O07fUYxEoJa=CG0gAz5P3hJ-Lb-kYws2rg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 24 Feb 2020 14:33:01 -0800
+Message-ID: <CABBYNZJhPqb=H0r93mTnLxBMR-AazXdfopHTT-pw+ZXgj1QzeA@mail.gmail.com>
+Subject: Re: Adding support for DuplicateData into the kernel
+To:     Scott Shawcroft <scott@adafruit.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Feb 24, 2020 at 9:13 AM Barry Byford <31baz66@gmail.com> wrote:
->
-> If the DBus API is not cutting it for you then using the MGMT API
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt
-> is what has been recommended in the past:
-> https://www.spinics.net/lists/linux-bluetooth/msg68959.html
->
-> On Mon, 24 Feb 2020 at 16:37, chris baker <chrisbkr2020@gmail.com> wrote:
-> >
-> > On Mon, Feb 24, 2020 at 6:08 AM Barry Byford <31baz66@gmail.com> wrote:
-> > >
-> > > Hi Chris,
-> > >
-> > > On Mon, 24 Feb 2020 at 10:12, chris baker <chrisbkr2020@gmail.com> wrote:
-> > > >
-> > >
-> > > > So my question is, is there a way to get those missing advertisements
-> > > > through the dbus api, possibly some additional setting somewhere?
-> > >
-> > > Duplicates are disabled by default with the DBus API. This can be
-> > > controlled with the DuplicateData setting:
-> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n107
-> > >
-> > > Regards,
-> > > Barry
-> >
-> >
-> > My apologies, I guess I wasn't clear (long post) but, I turned
-> > duplicate data on when using the bluetoothctl command (via the "scan"
-> > submenu) and also used the flag, "hcitool lescan --duplicates", when
-> > running the hcitool command. So both scans should have included any
-> > duplicates (unless I've misunderstood something). Additionally, none
-> > of the missing packets were duplicates (again, unless I'm
-> > misunderstanding what "duplicates" means). each packet had a unique
-> > sequence numbers as well as the button data field toggling.
+Hi Scott,
 
-Great, thank you. I'll look into the MGMT api in the coming days. That
-said, is it a problem to use both api's (MGMT/DBus) concurrently from
-the same app? My application supports both connected BLE sensors as
-well as BLE beacon type sensors. If possible I can handle them in two
-different threads, but the DBus thread for connected sensors would
-still occasionally need to scan for new sensors (using the DBus
-discovery call) and would still need to get characteristic changed
-callbacks as well.
+On Mon, Feb 24, 2020 at 1:51 PM Scott Shawcroft <scott@adafruit.com> wrote:
+>
+> On Mon, Feb 24, 2020 at 10:57 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Scott,
+> >
+> > On Thu, Feb 20, 2020 at 8:34 PM Scott Shawcroft <scott@adafruit.com> wrote:
+> > >
+> > > Hi!
+> > >
+> > > I'm trying to create a bridge between BLE advertisements and the web
+> > > for sensor data logging. The BLE advertisements use manufacturer data
+> > > to transmit the sensor data. I'm running on a Raspberry Pi 3b.
+> > >
+> > > I've been trying to use the Bluez dbus interface with DuplicateData,
+> > > trying both true and false, and I never seem to get duplicates back. I
+> > > dug into it via hcidump and noticed that the scan enable still has
+> > > filter duplicates set to true regardless. I can only manage to get it
+> > > set to False when using hcitool.
+> > >
+> > > I believe I've tracked the issue down into the kernel here:
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_request.c#n858
+> > > where enabling duplicate filtering is hardcoded. It seems that hcitool
+> > > side steps this by talking directly to the hci device.
+> >
+> > Yep, the kernel code don't actually allow setting the duplicate filter
+> > unfortunately.
+> >
+> > > Could someone confirm I'm on the right track? I'd be willing to plumb
+> > > the DuplicateData value through to the kernel if someone could help me
+> > > find the call path down.
+> >
+> > In the past Marcel was against turning off the duplicate filtering but
+> > since we do have a similar setting over D-Bus, though the later shall
+> > not be confused since tracks duplicates by itself since over D-Bus we
+> > are doing it to prevent duplicate signals, Im with the opinion that
+> > DuplicateData could be used to disable duplicate filtering, default
+> > should be still be enabled though.
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+> Thanks for the reply!
+>
+> I agree the default should be to filter duplicates. I'd love to see
+> the Dbus setting actually used in the kernel. Did I find the correct
+> place to change? I'm not sure how it is called from bluez though.
+> (Maybe through the mgmt API?)
 
-Out of curiosity though, is the behavior I'm seeing normal? Or is the
-sensor doing something improper possibly? Seeing as the packets aren't
-duplicates why would they be filtered (or are they just not being
-received to begin with for some reason)? The 11 second interval seems
-kind of strange. Anyway, thanks again for the help! Chris
+Yes, we would need to add it to Start Service Discover or create a new
+one, while at it we may add support for adding both the interval and
+window to SetDiscoveryFilter, Id actually think we might be better off
+adding a new command e.g. Start Filtered Discover which can then
+accomodate all these details, but it probably won't be very simple to
+do as we learn from the addition of the filters making it work with
+multiple clients complicates it a little bit, anyway I don't think we
+want this to be global but rather per client.
+
+
+-- 
+Luiz Augusto von Dentz
