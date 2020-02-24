@@ -2,105 +2,156 @@ Return-Path: <SRS0=SAxJ=4M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B235DC38BE1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 18:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4981AC38BE2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:30:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8867C21556
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 18:57:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 108E420836
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:30:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rqbB8sdZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrDnw5Ao"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728040AbgBXS5e (ORCPT
+        id S1726452AbgBXTaH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 13:57:34 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:40382 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727730AbgBXS5e (ORCPT
+        Mon, 24 Feb 2020 14:30:07 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:45271 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725860AbgBXTaH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 13:57:34 -0500
-Received: by mail-oi1-f194.google.com with SMTP id a142so9968109oii.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 10:57:32 -0800 (PST)
+        Mon, 24 Feb 2020 14:30:07 -0500
+Received: by mail-ot1-f67.google.com with SMTP id 59so9774763otp.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 11:30:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=hH0Rcw0BsM3EY/d50oiMd/K5+d1atGdLZCMxKEGiRvo=;
-        b=rqbB8sdZCI33D5vtRKcF2G9AL9Mpmm2gwCsUem4ev/1yJ4lTVVz7OTUaW55cF2jWBG
-         nV9tMdFhtHHa01BH/doiPL5VuZxvBZV40TXOqH0cXnA5UIKDGwql7kuaMhdDZrc1TbPl
-         Owvk4cpkW58NuEYBm3pUqST2kQ/cI4JaLzcaWfN41flBPfuxlXx+crxgO1DB24583jtW
-         9YMhLeDlf7Eh2s8KIOPDH792jykZNK+088xrs0Yid1/3+5aHmpW1BcqeiXirHAL479ve
-         ZFV9N8kajwlXafHuia/xpLwKN4KhsIpAZRTDRdjKMqYspWfM7PiVPUUMk4QzuwHHg7Dg
-         MbOA==
+        bh=uxZ6OZgnKFPduV9XuCTwOr328T5ju/6mpIwxHSrioCs=;
+        b=KrDnw5AoLwBxHw+9S3OCdjTobaXQp5EalnxBgamL27zKj8ny+An+XCMZJzNWw1LWgI
+         HkFGAvU1orkcdb4Io/AtfWqcC/eUOb4o939xZDCDkN94mTLDkUJSATY94NWNwp9Tsr+H
+         EmoeIDecSW3vcCPL/QRBqzs+w1SMrvp4kR9kA9Z5N3/kgDM3qy6LdzNvEWRUKgDNqTY1
+         pPOrJjOy2El6Y8Itp5XNceXqVaHt0lsqJSckwyslK3BFHkX/TFgaXWWTy/ANoyk6kMMv
+         7GngHDIwUruyuRE/XnH4yw+xHfTJeYTSGzDuvjOkCkifSrLiiDpCxD5uqXLUFXEozeDt
+         KC8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=hH0Rcw0BsM3EY/d50oiMd/K5+d1atGdLZCMxKEGiRvo=;
-        b=V8Ja/4wPUQWpssM+ymJcmpvblvM4Sfxo5s1o+nBXDsCFu2KDEffKCC1Fwm3DHqp+Es
-         otgiwsqjiFDEQc/jfmYnBfkT10UGaegJPRVa+WRtMrmU1gnW0+B0DcIp37DV6+JKTmZS
-         3q5tr4PIaGV8uCSaW2Wfvi/bIYBzfq6ws9emAxEG9VJPemUXf2O0F6/DMkSc/fYPTpOW
-         NN1m523Wr1ST5bUqc3DpLmEBP6bLpXArkN8eXOrOVk+AAQhVt6yyvTvJ2xuZdJyMyMWx
-         hH9ZtqqNAbNOvquWUgYGKcamHSerBCdsF8jZk3l+ly/fnfP7boWtY9jJ9qzEx+poj/I+
-         Z25w==
-X-Gm-Message-State: APjAAAXIvXK7Hd6cjWiA4faRgYv6BIEtXBxNfbqno+SccJLIH9aH/KEo
-        tRbqK4FzHDDkydxEMYltdZKUiJX88XyzolvE8xU=
-X-Google-Smtp-Source: APXvYqwufs4Z6xqKEzShoxQCjzEUX/Bpt4WYlBlZ1BFAO79nHTZvKw7eKrRxVzn6T07SxstAX2kL3/WKsUU45ULUMQo=
-X-Received: by 2002:a05:6808:10b:: with SMTP id b11mr423137oie.110.1582570651743;
- Mon, 24 Feb 2020 10:57:31 -0800 (PST)
+        bh=uxZ6OZgnKFPduV9XuCTwOr328T5ju/6mpIwxHSrioCs=;
+        b=R/IG/7d3fjxKLFhb2hhZtZIM1RCpikPSx8EFAjf6tw2v+ZPezqFM1TKamgRR7cL57L
+         O/lmh1g5Fo3HfHNw5ama8sQ3rwTjefBitRGtJXJFi4XafBHyz+Xrjp4Qs96pRM5eWRjK
+         as6l3dDV4rp90wU4FOiDzyg0HYGP8GEJbJVC30QF7tuLQsL/PxCc1gtZTau9rW7TRkav
+         e38UMPiViWDHBlNizObiE6OURmhF4lgrllywrxVHN2ynI0LzLjDxAlW0zUOUpihIUOhn
+         be2yPsiA8zIq6bYyJC+j98JYQWJTyHCDl0o1LaZGIKhVqSOnKJnKhdi3WlIMykZBpCYE
+         jECg==
+X-Gm-Message-State: APjAAAV8iY+ruc+qbnaAJb1JsRmmF+BG7wFaSfvCciuVv/YA88JmeMjm
+        zk3W40bb+c6oedrrFeGkyPDItx9PghxT4qLfhhc=
+X-Google-Smtp-Source: APXvYqxAeLLNCsActVBAu6tTM9hBhEuDzuWX1MFCCvmFW/Ttw8fr/CNWuLS3GluB7CRJwlQ9NQUVR57wZ4XHq3GbELU=
+X-Received: by 2002:a9d:3f4b:: with SMTP id m69mr38556212otc.146.1582572604945;
+ Mon, 24 Feb 2020 11:30:04 -0800 (PST)
 MIME-Version: 1.0
-References: <CAJ_gUqbKKxt15OhizRN_x4Dy-RvyuEUH0Bwcah_KEcMsQakQoA@mail.gmail.com>
-In-Reply-To: <CAJ_gUqbKKxt15OhizRN_x4Dy-RvyuEUH0Bwcah_KEcMsQakQoA@mail.gmail.com>
+References: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
+In-Reply-To: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 24 Feb 2020 10:57:20 -0800
-Message-ID: <CABBYNZKG6hFMgy7ifuEW2kxyQYd=Gw0cWefjBy-fdWS00OWL+g@mail.gmail.com>
-Subject: Re: Adding support for DuplicateData into the kernel
-To:     Scott Shawcroft <scott@adafruit.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Mon, 24 Feb 2020 11:29:53 -0800
+Message-ID: <CABBYNZKc6UPfYLbesAk0fUaGWFHP6GNtMQHFAOt+p+Yy0jNkWg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] src/profile: Ensure class UUID matches before
+ connecting profile
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Scott,
+Hi Archie,
 
-On Thu, Feb 20, 2020 at 8:34 PM Scott Shawcroft <scott@adafruit.com> wrote:
+On Fri, Feb 21, 2020 at 12:41 AM Archie Pusaka <apusaka@google.com> wrote:
 >
-> Hi!
+> From: Archie Pusaka <apusaka@chromium.org>
 >
-> I'm trying to create a bridge between BLE advertisements and the web
-> for sensor data logging. The BLE advertisements use manufacturer data
-> to transmit the sensor data. I'm running on a Raspberry Pi 3b.
+> According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
+> might be multiple service records returned in a SDP Service Search
+> Attribute Response. Also, according to 2.5.2, the service pattern
+> can match any UUID contained within the service record, it doesn't
+> have to match only some specific attributes of the record.
 >
-> I've been trying to use the Bluez dbus interface with DuplicateData,
-> trying both true and false, and I never seem to get duplicates back. I
-> dug into it via hcidump and noticed that the scan enable still has
-> filter duplicates set to true regardless. I can only manage to get it
-> set to False when using hcitool.
->
-> I believe I've tracked the issue down into the kernel here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_request.c#n858
-> where enabling duplicate filtering is hardcoded. It seems that hcitool
-> side steps this by talking directly to the hci device.
+> Therefore, before using the service record to connect to any
+> profile, first we must check that the service class ID of the
+> service record matches with whatever UUID specified in the service
+> pattern we are looking for.
 
-Yep, the kernel code don't actually allow setting the duplicate filter
-unfortunately.
+Im surprised we were not doing this currently, Im fairly sure we do
+that for the services/plugin though since there are only probed if the
+service UUID matches
 
-> Could someone confirm I'm on the right track? I'd be willing to plumb
-> the DuplicateData value through to the kernel if someone could help me
-> find the call path down.
+> ---
+>
+>  src/profile.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index 192fd0245..1b481836e 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -1568,8 +1568,34 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
+>
+>         for (r = recs; r != NULL; r = r->next) {
+>                 sdp_record_t *rec = r->data;
+> +               sdp_list_t *svcclass;
+> +               sdp_list_t *svcclass_iter;
+>                 sdp_list_t *protos;
+>                 int port;
+> +               bool matches_class_uuid = false;
+> +
+> +               if (sdp_get_service_classes(rec, &svcclass) < 0) {
+> +                       error("Unable to get svc class ID list from %s record",
+> +                                                               ext->name);
+> +                       continue;
+> +               }
+> +
+> +               for (svcclass_iter = svcclass; svcclass_iter != NULL;
+> +                                       svcclass_iter = svcclass_iter->next) {
+> +                       char *uuid = bt_uuid2string(svcclass_iter->data);
+> +                       int cmp_result = bt_uuid_strcmp(uuid, ext->uuid);
 
-In the past Marcel was against turning off the duplicate filtering but
-since we do have a similar setting over D-Bus, though the later shall
-not be confused since tracks duplicates by itself since over D-Bus we
-are doing it to prevent duplicate signals, Im with the opinion that
-DuplicateData could be used to disable duplicate filtering, default
-should be still be enabled though.
+I think it would be probably more efficient to convert to data to
+binary format (bt_uuid_t) and then do the comparision with
+bt_uuid_cmp, also there might not be needed to iterate at all see
+device.c:update_bredr_service which has the logic for updating
+records:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4602
+
+Btw, we should probably have bt_search_service doing the matching if
+the uuid is set instead of returning all records like it seems to be
+doing that way we don't have to maintain duplicate logic in both
+device.c and profile.c
+
+> +                       free(uuid);
+> +                       if (cmp_result == 0) {
+> +                               matches_class_uuid = true;
+> +                               break;
+> +                       }
+> +               }
+> +
+> +               sdp_list_free(svcclass, free);
+> +
+> +               if (!matches_class_uuid)
+> +                       continue;
+>
+>                 if (sdp_get_access_protos(rec, &protos) < 0) {
+>                         error("Unable to get proto list from %s record",
+> --
+> 2.25.0.265.gbab2e86ba0-goog
+>
+
 
 -- 
 Luiz Augusto von Dentz
