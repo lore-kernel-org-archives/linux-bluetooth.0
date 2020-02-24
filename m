@@ -2,156 +2,152 @@ Return-Path: <SRS0=SAxJ=4M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4981AC38BE2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAD5C38BE0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:32:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 108E420836
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:30:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 001E420CC7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Feb 2020 19:32:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrDnw5Ao"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dO861vxh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726452AbgBXTaH (ORCPT
+        id S1727187AbgBXTce (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 14:30:07 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:45271 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725860AbgBXTaH (ORCPT
+        Mon, 24 Feb 2020 14:32:34 -0500
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:35410 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725860AbgBXTce (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 14:30:07 -0500
-Received: by mail-ot1-f67.google.com with SMTP id 59so9774763otp.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 11:30:05 -0800 (PST)
+        Mon, 24 Feb 2020 14:32:34 -0500
+Received: by mail-vs1-f67.google.com with SMTP id x123so6452926vsc.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 11:32:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=uxZ6OZgnKFPduV9XuCTwOr328T5ju/6mpIwxHSrioCs=;
-        b=KrDnw5AoLwBxHw+9S3OCdjTobaXQp5EalnxBgamL27zKj8ny+An+XCMZJzNWw1LWgI
-         HkFGAvU1orkcdb4Io/AtfWqcC/eUOb4o939xZDCDkN94mTLDkUJSATY94NWNwp9Tsr+H
-         EmoeIDecSW3vcCPL/QRBqzs+w1SMrvp4kR9kA9Z5N3/kgDM3qy6LdzNvEWRUKgDNqTY1
-         pPOrJjOy2El6Y8Itp5XNceXqVaHt0lsqJSckwyslK3BFHkX/TFgaXWWTy/ANoyk6kMMv
-         7GngHDIwUruyuRE/XnH4yw+xHfTJeYTSGzDuvjOkCkifSrLiiDpCxD5uqXLUFXEozeDt
-         KC8A==
+        bh=AgL45fhULAGu5G+w7I1P5SZRJSZy9unRzGksGlG5Ac8=;
+        b=dO861vxh0JbDJlF8dML1sOiyH1MDcmL4Zp5QNt6Au8+HWAMJbbaV0ys5arCMrYnV20
+         NhcM3dZjvHefFpOcL62Wa+Y/yM88qqN2gQJpEH1ImycEmUcS3sV8Ex0m1hIFHGhZj5kl
+         i9TCt5a5fmqkuzEuepliXC1g1Tf5c/0pgSzMs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=uxZ6OZgnKFPduV9XuCTwOr328T5ju/6mpIwxHSrioCs=;
-        b=R/IG/7d3fjxKLFhb2hhZtZIM1RCpikPSx8EFAjf6tw2v+ZPezqFM1TKamgRR7cL57L
-         O/lmh1g5Fo3HfHNw5ama8sQ3rwTjefBitRGtJXJFi4XafBHyz+Xrjp4Qs96pRM5eWRjK
-         as6l3dDV4rp90wU4FOiDzyg0HYGP8GEJbJVC30QF7tuLQsL/PxCc1gtZTau9rW7TRkav
-         e38UMPiViWDHBlNizObiE6OURmhF4lgrllywrxVHN2ynI0LzLjDxAlW0zUOUpihIUOhn
-         be2yPsiA8zIq6bYyJC+j98JYQWJTyHCDl0o1LaZGIKhVqSOnKJnKhdi3WlIMykZBpCYE
-         jECg==
-X-Gm-Message-State: APjAAAV8iY+ruc+qbnaAJb1JsRmmF+BG7wFaSfvCciuVv/YA88JmeMjm
-        zk3W40bb+c6oedrrFeGkyPDItx9PghxT4qLfhhc=
-X-Google-Smtp-Source: APXvYqxAeLLNCsActVBAu6tTM9hBhEuDzuWX1MFCCvmFW/Ttw8fr/CNWuLS3GluB7CRJwlQ9NQUVR57wZ4XHq3GbELU=
-X-Received: by 2002:a9d:3f4b:: with SMTP id m69mr38556212otc.146.1582572604945;
- Mon, 24 Feb 2020 11:30:04 -0800 (PST)
+        bh=AgL45fhULAGu5G+w7I1P5SZRJSZy9unRzGksGlG5Ac8=;
+        b=W6MC0GSNjUvKrqoaDXcqfI8IooHK5O7r3+0lT6c988T1JsrgWUt7ybGiwE9/9PGISw
+         RC6+pY1Fw3x01CV5zBCs/d3ZPy2JsPH7oISRnPjIpyqeMxm6cHgY8TgNu/FC7WA7BCqC
+         Nb/rNPh1M2Q675OSqOM0SUdNT1/i5v2u725Eu6lIgUeOYnPrcfDECxwQlUwpw9YiZGnl
+         DwpUhQFe4TgC4byt2zHvQCZ8mm+K/hg8eIt/SMpZCPb6A5PIpf4BiTiw0KskAlSWdf1g
+         xcTkmEA0j086ZYfMgy7w/H98OM4Q7aWmxas31QPfs1pI0HD5Usfs2+S0UFX3z0rPtISd
+         cRFQ==
+X-Gm-Message-State: APjAAAVAPsqETrkbrFlR7GSShq/ZGxdAL7wHlxWJVNmg8XxaiqJ4OSn2
+        ekhQsdvgxhdGmuKAnWHhlA3uJ4YUbscGAABz+iZcTw==
+X-Google-Smtp-Source: APXvYqx1q97BlcOmkjgYEGVruOJfe4m4wnPFvEzBNmD79LKbHDZWVUv4ovG9D5w6eIpxyEBGpsJQag8+B15P7pmhy2c=
+X-Received: by 2002:a67:fc8c:: with SMTP id x12mr25076429vsp.96.1582572751694;
+ Mon, 24 Feb 2020 11:32:31 -0800 (PST)
 MIME-Version: 1.0
-References: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
-In-Reply-To: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 24 Feb 2020 11:29:53 -0800
-Message-ID: <CABBYNZKc6UPfYLbesAk0fUaGWFHP6GNtMQHFAOt+p+Yy0jNkWg@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] src/profile: Ensure class UUID matches before
- connecting profile
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>
+References: <0000000000000cce30059f4e27e9@google.com>
+In-Reply-To: <0000000000000cce30059f4e27e9@google.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Mon, 24 Feb 2020 11:32:20 -0800
+Message-ID: <CANFp7mWobejCpiq5xXouKAcRBSAbVwxKOnFbJ_XfiU6rLsT0Vw@mail.gmail.com>
+Subject: Re: WARNING: refcount bug in l2cap_chan_put
+To:     syzbot <syzbot+198362c76088d1515529@syzkaller.appspotmail.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        netdev <netdev@vger.kernel.org>, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+(Resent in plain text; sorry for double send)
 
-On Fri, Feb 21, 2020 at 12:41 AM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
-> might be multiple service records returned in a SDP Service Search
-> Attribute Response. Also, according to 2.5.2, the service pattern
-> can match any UUID contained within the service record, it doesn't
-> have to match only some specific attributes of the record.
->
-> Therefore, before using the service record to connect to any
-> profile, first we must check that the service class ID of the
-> service record matches with whatever UUID specified in the service
-> pattern we are looking for.
+I took a brief look at this error and uncovered that 6lowpan uses zero
+locks when using l2cap (should be using the channel lock).
 
-Im surprised we were not doing this currently, Im fairly sure we do
-that for the services/plugin though since there are only probed if the
-service UUID matches
+It seems like it would be better just to convert its direct use of
+l2cap channel into using an l2cap socket.
 
+On Mon, Feb 24, 2020 at 12:28 AM syzbot
+<syzbot+198362c76088d1515529@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following crash on:
+>
+> HEAD commit:    bee46b30 Add linux-next specific files for 20200221
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1244ea7ee00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=10693880b4976691
+> dashboard link: https://syzkaller.appspot.com/bug?extid=198362c76088d1515529
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160a03d9e00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10f8e1dde00000
+>
+> Bisection is inconclusive: the bug happens on the oldest tested release.
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13f03a7ee00000
+> final crash:    https://syzkaller.appspot.com/x/report.txt?x=10083a7ee00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17f03a7ee00000
+>
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+198362c76088d1515529@syzkaller.appspotmail.com
+>
+> ------------[ cut here ]------------
+> refcount_t: underflow; use-after-free.
+> WARNING: CPU: 1 PID: 2940 at lib/refcount.c:28 refcount_warn_saturate+0x1dc/0x1f0 lib/refcount.c:28
+> Kernel panic - not syncing: panic_on_warn set ...
+> CPU: 1 PID: 2940 Comm: kworker/1:12 Not tainted 5.6.0-rc2-next-20200221-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> Workqueue: events do_enable_set
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0x197/0x210 lib/dump_stack.c:118
+>  panic+0x2e3/0x75c kernel/panic.c:221
+>  __warn.cold+0x2f/0x3e kernel/panic.c:582
+>  report_bug+0x289/0x300 lib/bug.c:195
+>  fixup_bug arch/x86/kernel/traps.c:175 [inline]
+>  fixup_bug arch/x86/kernel/traps.c:170 [inline]
+>  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
+>  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
+>  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
+> RIP: 0010:refcount_warn_saturate+0x1dc/0x1f0 lib/refcount.c:28
+> Code: e9 d8 fe ff ff 48 89 df e8 81 81 10 fe e9 85 fe ff ff e8 07 54 d1 fd 48 c7 c7 00 c8 91 88 c6 05 6b f6 fc 06 01 e8 23 74 a1 fd <0f> 0b e9 ac fe ff ff 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 55 48
+> RSP: 0018:ffffc9000952fbd8 EFLAGS: 00010286
+> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: ffffffff815ee766 RDI: fffff520012a5f6d
+> RBP: ffffc9000952fbe8 R08: ffff88809e82e600 R09: ffffed1015d26661
+> R10: ffffed1015d26660 R11: ffff8880ae933307 R12: 0000000000000003
+> R13: ffff888095b3f018 R14: dead000000000122 R15: ffffc9000952fc98
+>  refcount_sub_and_test include/linux/refcount.h:261 [inline]
+>  refcount_dec_and_test include/linux/refcount.h:281 [inline]
+>  kref_put include/linux/kref.h:64 [inline]
+>  l2cap_chan_put+0x1d9/0x240 net/bluetooth/l2cap_core.c:501
+>  do_enable_set+0x54b/0x960 net/bluetooth/6lowpan.c:1075
+>  process_one_work+0xa05/0x17a0 kernel/workqueue.c:2266
+>  worker_thread+0x98/0xe40 kernel/workqueue.c:2412
+>  kthread+0x361/0x430 kernel/kthread.c:255
+>  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+> Kernel Offset: disabled
+> Rebooting in 86400 seconds..
+>
+>
 > ---
+> This bug is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
 >
->  src/profile.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
->
-> diff --git a/src/profile.c b/src/profile.c
-> index 192fd0245..1b481836e 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -1568,8 +1568,34 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
->
->         for (r = recs; r != NULL; r = r->next) {
->                 sdp_record_t *rec = r->data;
-> +               sdp_list_t *svcclass;
-> +               sdp_list_t *svcclass_iter;
->                 sdp_list_t *protos;
->                 int port;
-> +               bool matches_class_uuid = false;
-> +
-> +               if (sdp_get_service_classes(rec, &svcclass) < 0) {
-> +                       error("Unable to get svc class ID list from %s record",
-> +                                                               ext->name);
-> +                       continue;
-> +               }
-> +
-> +               for (svcclass_iter = svcclass; svcclass_iter != NULL;
-> +                                       svcclass_iter = svcclass_iter->next) {
-> +                       char *uuid = bt_uuid2string(svcclass_iter->data);
-> +                       int cmp_result = bt_uuid_strcmp(uuid, ext->uuid);
-
-I think it would be probably more efficient to convert to data to
-binary format (bt_uuid_t) and then do the comparision with
-bt_uuid_cmp, also there might not be needed to iterate at all see
-device.c:update_bredr_service which has the logic for updating
-records:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4602
-
-Btw, we should probably have bt_search_service doing the matching if
-the uuid is set instead of returning all records like it seems to be
-doing that way we don't have to maintain duplicate logic in both
-device.c and profile.c
-
-> +                       free(uuid);
-> +                       if (cmp_result == 0) {
-> +                               matches_class_uuid = true;
-> +                               break;
-> +                       }
-> +               }
-> +
-> +               sdp_list_free(svcclass, free);
-> +
-> +               if (!matches_class_uuid)
-> +                       continue;
->
->                 if (sdp_get_access_protos(rec, &protos) < 0) {
->                         error("Unable to get proto list from %s record",
-> --
-> 2.25.0.265.gbab2e86ba0-goog
->
-
-
--- 
-Luiz Augusto von Dentz
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> syzbot can test patches for this bug, for details see:
+> https://goo.gl/tpsmEJ#testing-patches
