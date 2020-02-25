@@ -2,218 +2,159 @@ Return-Path: <SRS0=zBEa=4N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D02C35DF5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 08:04:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EE7C35DF5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 13:07:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E63D922464
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 08:04:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2719D20CC7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 13:07:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXwPT+Nq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/aX2xkl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729593AbgBYIEx (ORCPT
+        id S1730111AbgBYNHX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Feb 2020 03:04:53 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:40876 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729443AbgBYIEx (ORCPT
+        Tue, 25 Feb 2020 08:07:23 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:40277 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729193AbgBYNHW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Feb 2020 03:04:53 -0500
-Received: by mail-ot1-f67.google.com with SMTP id i6so11268119otr.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2020 00:04:51 -0800 (PST)
+        Tue, 25 Feb 2020 08:07:22 -0500
+Received: by mail-pl1-f196.google.com with SMTP id y1so5473088plp.7;
+        Tue, 25 Feb 2020 05:07:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OAPj1XBZLNFAf4SineVPDvFpHYh1qFQIuQAZtHLdUtc=;
-        b=lXwPT+Nq93BPpcUK+ygkKpiqn2heGVdf9eFTnq0l7k6/xDENj4479/5RYmP7NE0oUy
-         Dshf65ACoUiaZQsm/ePnf7/bW7KS+h72QutFuXX+WBKufZDjdUBy/4gSK3E9uIDA3RF1
-         T1lOOk07CYTa7IErSk16DdikvJc4/pKmUti5b0fWBsLzlP2w/2cC7VbZ5vs6olOX4S/K
-         TpMV6F3rXtS1SMWdd3KNrizHX6MkLDdgHmVLUycnVLxesE/5TCIhppe9tf/vSOnyQ5g+
-         cAEw/6UzwOYBZ3TYRxiPx8KvJoJNc4uxe151f3iiMbBEPWZvUKlPIbQSm4Pfx1nvDO8P
-         nHuw==
+        h=from:to:cc:subject:date:message-id;
+        bh=1bjATN5yUQRktfOaoPKCC0Tyl9TIao9QDPF9Tp8wgtM=;
+        b=c/aX2xklwzN+KnL1Z0gS/vWAo34D7B+EVCyRXa1sgSGIxkEwXGMtnLjDb06SaW6TV4
+         poMEIqGLmg1KJrMLIUiVgZS0KWPG8ctxN7CBg9Ly/OimQ1ZgN6Y6NgVj7AgdClRM+jb5
+         EW0Xut8jNmTiVhGfgelmisiwJiDIwm7tuzzx2el4955WR6jKsFGeUJMrgOzeOLIvdzSJ
+         itgDnFljBrFvVl9FVXN63kKDys0rdJtm/Xwkv9kEVztRae2l2+34UPgc5tjPIK3swwx4
+         jnMp7VuSAmIfweh50M43NWjfak/4QtyjVk28klahBW9drhnBIsR1Ud1/0RionuTuDYhv
+         yLeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OAPj1XBZLNFAf4SineVPDvFpHYh1qFQIuQAZtHLdUtc=;
-        b=iCoeK2Il66bsNAJjGAbC7hv1S2X8k2a4V37/rigXsqD5jQUNKLCRxQga50VlIsjjcw
-         JGnNbXg+uRYWXoqqnxITnQKhpaZ7uhbPmxUZwoN5Jzect0ABVsqjHcdMHKVaO2MNYnlv
-         EYs6qXJHKJFSCHN70nfKvydQMkSwAsLIemD2x+gfVo0p/CoSU2lwWnYjdG2JJ1IWFXMz
-         7BfTT/I6axh+6sJh6qPl4Th1lVcIZ7MMM1vEY8IAGWGv+KefkF7SEdMYxKruriGNHgzG
-         fGpYcEfBFs4blJ7Mlko2GgHuyEWD3d0ed70zFamrvosYKSaeJNrNO+l5Xe2CAuUjFowq
-         kgRQ==
-X-Gm-Message-State: APjAAAVaNmpmYdcGW9ZWUC7Db616BHFJ0v4Vi4GrWyPXKduCQlSMujom
-        +JkWn3vlgDffeeslfrtp9aEes+v4vhWXyVHHF6U=
-X-Google-Smtp-Source: APXvYqwN4YIQYVLshYqI4/hI6S2RPwcowXMq5a0nZ8g3JILQHNWRotH8xNlwjN5iYlI5nmeBhkNs4G8I3/UlZfZuYCo=
-X-Received: by 2002:a9d:6d10:: with SMTP id o16mr45080894otp.28.1582617890863;
- Tue, 25 Feb 2020 00:04:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
- <CABBYNZKc6UPfYLbesAk0fUaGWFHP6GNtMQHFAOt+p+Yy0jNkWg@mail.gmail.com>
- <CAJQfnxGoRhuw9_+v=TUXTa1j_rO7qZEVS=UnzS6TwNHt1FudRg@mail.gmail.com> <CAJQfnxEce-dH5Qrf538hiKZUvGmWox_Dx-RU6zS3n4Fd4X-F+Q@mail.gmail.com>
-In-Reply-To: <CAJQfnxEce-dH5Qrf538hiKZUvGmWox_Dx-RU6zS3n4Fd4X-F+Q@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 25 Feb 2020 00:04:38 -0800
-Message-ID: <CABBYNZJ2c_HSGku_5gtMQ=HrO96vL5hRN+4ZAWyYbxcCQJz4wA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] src/profile: Ensure class UUID matches before
- connecting profile
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=1bjATN5yUQRktfOaoPKCC0Tyl9TIao9QDPF9Tp8wgtM=;
+        b=SCdv8jUd1wzquk2X3S06G19VJX0SoDB4tkC0RlhWDvVDAnQocZ4G46AG58r6OvnElP
+         4Iy3bjTC9fSdcMuWxPgciaXgnE/FnPhrsXOzJqg+dSI34n2JXg8IXtKrNNMshi9vM6MC
+         DHmcGfNhlaIf6tv6BMvFCfszGXNvsvHuH1w00N/C1b4aZvVOoA6bSxJBu2UCddmTzo+/
+         0HKMyTL3zS/lVHJh+2py0hyzMCDk3AxGt03yq56CmfsCOlpnj8b1K40WmPLJe1V/BxPg
+         iYBzyHHiNZ8ho5D/tgfK40iaoFXFEJuWrpj1+/YviR0hXPZyJb21mGzyRYGW2vMUvul2
+         Hbzg==
+X-Gm-Message-State: APjAAAWS1yhv/ko78ryHM6cRYNmI0DGxPjRNbzGGTgEjECqAtZTWmXUL
+        1n4a2dx7OD3o0YNqiZaOSvBcmR8=
+X-Google-Smtp-Source: APXvYqx9u7699mSLH5QM5nQvKggMKDwMmVA1TGSCMDygfPwY1tQRBvHxTUNFIRyMh+PucBct8heGZA==
+X-Received: by 2002:a17:902:223:: with SMTP id 32mr55786706plc.167.1582636041493;
+        Tue, 25 Feb 2020 05:07:21 -0800 (PST)
+Received: from madhuparna-HP-Notebook.nitk.ac.in ([112.79.48.254])
+        by smtp.gmail.com with ESMTPSA id e2sm3156979pjs.25.2020.02.25.05.07.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2020 05:07:20 -0800 (PST)
+From:   madhuparnabhowmik10@gmail.com
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.or, joel@joelfernandes.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        frextrite@gmail.com, paulmck@kernel.org,
+        Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+Subject: [PATCH] net: bluetooth: hci_core: Fix Suspicious RCU usage warnings
+Date:   Tue, 25 Feb 2020 18:36:38 +0530
+Message-Id: <20200225130638.32394-1-madhuparnabhowmik10@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 
-On Mon, Feb 24, 2020 at 10:59 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> Hi Luiz,
->
-> After looking at the code for device.c you pointed out,
-> apparently the function update_bredr_services() is called two times
-> upon connecting to a device, the first one for UUID 0x0100 (L2CAP),
-> then the second one for UUID 0x1200 (PNP).
->
-> I am not clear as to why BlueZ needs to search for those two records,
-> but this might impacted the decision to move the service class ID
-> filtering to sdp-client.c, because the service class ID of the records
-> will never match 0x0100, so it will all be filtered out.
+The following functions in hci_core are always called with
+hdev->lock held. No need to use list_for_each_entry_rcu(), therefore
+change the usage of list_for_each_entry_rcu() in these functions
+to list_for_each_entry().
 
-Right that is looking for all records basically, since L2CAP is
-included everytime, so we need to keep that working, so perhaps a
-better alternative would be to have a second helper function that does
-the filtering or extend bt_search_service with another parameter, but
-I guess doing the former is cleaner, though I rename bt_search_service
-to just bt_search and the later since that doesn't do any filtering
-and leave bt_search_service to actually filter out base on service
-class.
+hci_link_keys_clear()
+hci_smp_ltks_clear()
+hci_smp_irks_clear()
+hci_blocked_keys_clear()
 
-> Could you confirm that it is okay to filter all records based on the
-> service class ID, especially considering all records related to L2CAP
-> query will not execute this part of the code?
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4630
->
-> Thanks,
-> Archie
->
-> On Tue, 25 Feb 2020 at 13:58, Archie Pusaka <apusaka@google.com> wrote:
-> >
-> > Hi Luiz,
-> >
-> > On Tue, 25 Feb 2020 at 03:30, Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Archie,
-> > >
-> > > On Fri, Feb 21, 2020 at 12:41 AM Archie Pusaka <apusaka@google.com> wrote:
-> > > >
-> > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > >
-> > > > According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
-> > > > might be multiple service records returned in a SDP Service Search
-> > > > Attribute Response. Also, according to 2.5.2, the service pattern
-> > > > can match any UUID contained within the service record, it doesn't
-> > > > have to match only some specific attributes of the record.
-> > > >
-> > > > Therefore, before using the service record to connect to any
-> > > > profile, first we must check that the service class ID of the
-> > > > service record matches with whatever UUID specified in the service
-> > > > pattern we are looking for.
-> > >
-> > > Im surprised we were not doing this currently, Im fairly sure we do
-> > > that for the services/plugin though since there are only probed if the
-> > > service UUID matches
-> > >
-> > > > ---
-> > > >
-> > > >  src/profile.c | 26 ++++++++++++++++++++++++++
-> > > >  1 file changed, 26 insertions(+)
-> > > >
-> > > > diff --git a/src/profile.c b/src/profile.c
-> > > > index 192fd0245..1b481836e 100644
-> > > > --- a/src/profile.c
-> > > > +++ b/src/profile.c
-> > > > @@ -1568,8 +1568,34 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
-> > > >
-> > > >         for (r = recs; r != NULL; r = r->next) {
-> > > >                 sdp_record_t *rec = r->data;
-> > > > +               sdp_list_t *svcclass;
-> > > > +               sdp_list_t *svcclass_iter;
-> > > >                 sdp_list_t *protos;
-> > > >                 int port;
-> > > > +               bool matches_class_uuid = false;
-> > > > +
-> > > > +               if (sdp_get_service_classes(rec, &svcclass) < 0) {
-> > > > +                       error("Unable to get svc class ID list from %s record",
-> > > > +                                                               ext->name);
-> > > > +                       continue;
-> > > > +               }
-> > > > +
-> > > > +               for (svcclass_iter = svcclass; svcclass_iter != NULL;
-> > > > +                                       svcclass_iter = svcclass_iter->next) {
-> > > > +                       char *uuid = bt_uuid2string(svcclass_iter->data);
-> > > > +                       int cmp_result = bt_uuid_strcmp(uuid, ext->uuid);
-> > >
-> > > I think it would be probably more efficient to convert to data to
-> > > binary format (bt_uuid_t) and then do the comparision with
-> > > bt_uuid_cmp, also there might not be needed to iterate at all see
-> > > device.c:update_bredr_service which has the logic for updating
-> > > records:
-> > >
-> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4602
-> >
-> > I was uncertain whether we need to iterate or not, so I went for the safer side.
-> > However if there is no need to do that then this shall be updated.
-> > I also agree that comparison in binary should be faster.
-> >
-> > >
-> > > Btw, we should probably have bt_search_service doing the matching if
-> > > the uuid is set instead of returning all records like it seems to be
-> > > doing that way we don't have to maintain duplicate logic in both
-> > > device.c and profile.c
-> >
-> > Got it. somewhere in sdp-client.c is a good idea.
-> > Aside from device.c and profile.c, is this also used somewhere else
-> > though? We might also want to take them out if we are to implement
-> > the check in sdp-client.c.
-> >
-> > >
-> > >
-> > > > +                       free(uuid);
-> > > > +                       if (cmp_result == 0) {
-> > > > +                               matches_class_uuid = true;
-> > > > +                               break;
-> > > > +                       }
-> > > > +               }
-> > > > +
-> > > > +               sdp_list_free(svcclass, free);
-> > > > +
-> > > > +               if (!matches_class_uuid)
-> > > > +                       continue;
-> > > >
-> > > >                 if (sdp_get_access_protos(rec, &protos) < 0) {
-> > > >                         error("Unable to get proto list from %s record",
-> > > > --
-> > > > 2.25.0.265.gbab2e86ba0-goog
-> > > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-> >
-> >
-> > Thanks,
-> > Archie
+Warning encountered with CONFIG_PROVE_RCU_LIST:
 
+[   72.213184] =============================
+[   72.213188] WARNING: suspicious RCU usage
+[   72.213192] 5.6.0-rc1+ #5 Not tainted
+[   72.213195] -----------------------------
+[   72.213198] net/bluetooth/hci_core.c:2288 RCU-list traversed in non-reader section!!
 
+[   72.213676] =============================
+[   72.213679] WARNING: suspicious RCU usage
+[   72.213683] 5.6.0-rc1+ #5 Not tainted
+[   72.213685] -----------------------------
+[   72.213689] net/bluetooth/hci_core.c:2298 RCU-list traversed in non-reader section!!
 
+[   72.214195] =============================
+[   72.214198] WARNING: suspicious RCU usage
+[   72.214201] 5.6.0-rc1+ #5 Not tainted
+[   72.214204] -----------------------------
+[   72.214208] net/bluetooth/hci_core.c:2308 RCU-list traversed in non-reader section!!
+
+[  333.456972] =============================
+[  333.456979] WARNING: suspicious RCU usage
+[  333.457001] 5.6.0-rc1+ #5 Not tainted
+[  333.457007] -----------------------------
+[  333.457014] net/bluetooth/hci_core.c:2318 RCU-list traversed in non-reader section!!
+
+Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+---
+ net/bluetooth/hci_core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cbbc34a006d1..8ddd1bea02be 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2285,7 +2285,7 @@ void hci_link_keys_clear(struct hci_dev *hdev)
+ {
+ 	struct link_key *key;
+ 
+-	list_for_each_entry_rcu(key, &hdev->link_keys, list) {
++	list_for_each_entry(key, &hdev->link_keys, list) {
+ 		list_del_rcu(&key->list);
+ 		kfree_rcu(key, rcu);
+ 	}
+@@ -2295,7 +2295,7 @@ void hci_smp_ltks_clear(struct hci_dev *hdev)
+ {
+ 	struct smp_ltk *k;
+ 
+-	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
++	list_for_each_entry(k, &hdev->long_term_keys, list) {
+ 		list_del_rcu(&k->list);
+ 		kfree_rcu(k, rcu);
+ 	}
+@@ -2305,7 +2305,7 @@ void hci_smp_irks_clear(struct hci_dev *hdev)
+ {
+ 	struct smp_irk *k;
+ 
+-	list_for_each_entry_rcu(k, &hdev->identity_resolving_keys, list) {
++	list_for_each_entry(k, &hdev->identity_resolving_keys, list) {
+ 		list_del_rcu(&k->list);
+ 		kfree_rcu(k, rcu);
+ 	}
+@@ -2315,7 +2315,7 @@ void hci_blocked_keys_clear(struct hci_dev *hdev)
+ {
+ 	struct blocked_key *b;
+ 
+-	list_for_each_entry_rcu(b, &hdev->blocked_keys, list) {
++	list_for_each_entry(b, &hdev->blocked_keys, list) {
+ 		list_del_rcu(&b->list);
+ 		kfree_rcu(b, rcu);
+ 	}
 -- 
-Luiz Augusto von Dentz
+2.17.1
+
