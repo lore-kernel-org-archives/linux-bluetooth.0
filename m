@@ -2,172 +2,237 @@ Return-Path: <SRS0=zBEa=4N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7754C35DEA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96612C35DF0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86106218AC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DEC321D7E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QEID+QJ9"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d3qBxLkk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728646AbgBYBTJ (ORCPT
+        id S1728690AbgBYBfC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 20:19:09 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:37600 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728529AbgBYBTI (ORCPT
+        Mon, 24 Feb 2020 20:35:02 -0500
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:36361 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728682AbgBYBfB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 20:19:08 -0500
-Received: by mail-ot1-f67.google.com with SMTP id b3so10602093otp.4;
-        Mon, 24 Feb 2020 17:19:08 -0800 (PST)
+        Mon, 24 Feb 2020 20:35:01 -0500
+Received: by mail-vs1-f67.google.com with SMTP id a2so7002477vso.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 17:34:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=aE1i9Rz4lLQhWMcE4DMh4CNy5Gg6MzzIMCjBhBBi/rs=;
-        b=QEID+QJ9xZeQ58mEs3KxCOZ+xtPBop2qKOjgokoNp+jbmAzHNMB1AKFkurgmOEXf37
-         lIIuxK86GUjW7jKPOorKXNbUoydEqeXYjZ0l6iGIn7uFf5xAChd3wjJOvCTqIh0RUXW/
-         a5QdJsLwG1xhDpEHZimA1ZBLddylZbvm4qsFU4L85h6NFa3nYOpGf/MJ75DeCQmM68Ia
-         2/xAsZ2qOsbzc7d45L1KEcF2Pw6jHYzeEyoWNQCk12m3t/fjKwsCTD70acaTl0jpUH16
-         dJ3P8CDhws9W44d7xJdWbmJ1jvLN0nMiLwXHDbLDnyyQFlX2VgAwNvj7+M9kwF8fIw/L
-         gdnQ==
+        bh=XvbopwCF9mmo8OGNCSjhGDMkBahDz5BZ+asKUlhTYZA=;
+        b=d3qBxLkkQKBffrrYpQqjOfPul0BCOX5LkqmU+vnztHjTT4FVLQEwOcfsr4+UiX9vVJ
+         BUl9qJLVhATZ5cGirePb6WkDrQVdREkv4EMomOLXaCRGfBTA6kw+HiIIzNhWxlNVrPKU
+         m/gvyTIjy/BWsc6wB4n9sQwmOTGAgEDsskmv8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=aE1i9Rz4lLQhWMcE4DMh4CNy5Gg6MzzIMCjBhBBi/rs=;
-        b=D3TV4mQmEeTW2sH23AMOo1P3o1+og/DUWbMmGz4bfYn8hpG1orYJ2UHKGK5lvvJJHL
-         zxJTXLZ60Uukmup4Y9Cr6UKcT0BUecVfN6dQ2bItxGDzB+88ot4PikrWzgANqHtk5xz5
-         OFGrF9wixFwlplWa1vHbxz0jUigv5SPrlUJU1p36Dj1GAb1/SwRTXsCZwp5EXrlYyyuN
-         oZ7AnlHn9o7U+GlwIIHYl7eRSvDCtYCFDTqTQKEM2+gmM6DKCKFheRzm2tb7AhQaDZfk
-         aa9W9LXZdgrDM3iPCma1CGBcD/iuBrwNLABtGU02m0C7JbiiaPJQyxXPrcPzg/cEh2N1
-         ON8w==
-X-Gm-Message-State: APjAAAVd/nGpMxQS7yzxoYXIJiIpDy9Jrp4UmDzQ/cdU/Xfb9g+g8ljz
-        FFbenN5aJRkXyqU08wV1DQh15CpmPCi8zLPzqxg=
-X-Google-Smtp-Source: APXvYqwWq03HyoRhkh6X6v2oIwvKH4wC2OZrfsZMOdlFU0MD49+Kv33pqgqy6FT9XQnTLJOe0EG1UxES727L18YBHsQ=
-X-Received: by 2002:a9d:6d10:: with SMTP id o16mr43983492otp.28.1582593547644;
- Mon, 24 Feb 2020 17:19:07 -0800 (PST)
+        bh=XvbopwCF9mmo8OGNCSjhGDMkBahDz5BZ+asKUlhTYZA=;
+        b=VrFdKBzEHnbomFcXEz4Q1bUp4gw6QmWsiXVcmmaEv3u/V1AviOOwMEbKjQKSacJIf7
+         E2p2LPbHJIG1qvefGc7p++KMSc8GVwwiEnvOtLT3VQGlt2C4EOzH4x8GdY0xp0dWBHVY
+         9fWsnJ+UeF8+G1Q9mFcnCOBmlyKyKycTm9W4GDQBc9cG2WDSn9qVE9nhtgrj/r701Nac
+         dsGxdoVl/As/Icf+85ZuPXCt96nXtJkRPnHeZmha2djT3Z9EcMgYnILHoZhxKLqzQDr2
+         jNFwub1KduZqOP2UEwLSvt67wruPXFSEIt86O6o49x5s6QYtKaokqRMITgaLKSLJBBLG
+         hjnA==
+X-Gm-Message-State: APjAAAUnp487jgv3NJrpPS6OocNMd7mO04SlCoeWEERVRRkMVJ9X+Mnq
+        vdgSIvwxY2QBLCiTjEB/63cfcAwga+VACDcfz1EH1A==
+X-Google-Smtp-Source: APXvYqwj++UMCeh3XQCSqWC6OoNtBiIOWXW/gh6glTMjVsSGcrp1jrbKj/II7rje4gpIBvRg97EAG9UqmCB23TF5yLI=
+X-Received: by 2002:a67:2dd6:: with SMTP id t205mr30321975vst.71.1582594498280;
+ Mon, 24 Feb 2020 17:34:58 -0800 (PST)
 MIME-Version: 1.0
-References: <0000000000000cce30059f4e27e9@google.com> <CANFp7mWobejCpiq5xXouKAcRBSAbVwxKOnFbJ_XfiU6rLsT0Vw@mail.gmail.com>
-In-Reply-To: <CANFp7mWobejCpiq5xXouKAcRBSAbVwxKOnFbJ_XfiU6rLsT0Vw@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 24 Feb 2020 17:18:56 -0800
-Message-ID: <CABBYNZJzxO=aTnYOL7UpDzK+PDNcAa-DuH_5N+FZV6OZp52uFA@mail.gmail.com>
-Subject: Re: WARNING: refcount bug in l2cap_chan_put
-To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Cc:     syzbot <syzbot+198362c76088d1515529@syzkaller.appspotmail.com>,
+References: <20200225000036.156250-1-abhishekpandit@chromium.org> <20200224160019.RFC.v3.1.I797e2f4cb824299043e771f3ab9cef86ee09f4db@changeid>
+In-Reply-To: <20200224160019.RFC.v3.1.I797e2f4cb824299043e771f3ab9cef86ee09f4db@changeid>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Mon, 24 Feb 2020 17:34:47 -0800
+Message-ID: <CANFp7mUehaCSR2W3mXpq2s80YLJVfO2U8D_N+sRzJ2pMZQw1UA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 1/5] Bluetooth: Add mgmt op set_wake_capable
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Alain Michaud <alainm@chromium.org>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        netdev <netdev@vger.kernel.org>, syzkaller-bugs@googlegroups.com
+        Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+I seem to have forgotten to update the series changes here. In series
+3, I added a wakeable property to le_conn_param so that the wakeable
+list is only used for BR/EDR as requested in the previous revision.
 
-On Mon, Feb 24, 2020 at 11:33 AM Abhishek Pandit-Subedi
+On Mon, Feb 24, 2020 at 4:00 PM Abhishek Pandit-Subedi
 <abhishekpandit@chromium.org> wrote:
 >
-> (Resent in plain text; sorry for double send)
+> When the system is suspended, only some connected Bluetooth devices
+> cause user input that should wake the system (mostly HID devices). Add
+> a list to keep track of devices that can wake the system and add
+> a management API to let userspace tell the kernel whether a device is
+> wake capable or not. For LE devices, the wakeable property is added to
+> the connection parameter and can only be modified after calling
+> add_device.
 >
-> I took a brief look at this error and uncovered that 6lowpan uses zero
-> locks when using l2cap (should be using the channel lock).
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> ---
 >
-> It seems like it would be better just to convert its direct use of
-> l2cap channel into using an l2cap socket.
-
-I recall having some thought on that, I think having a socket like
-RFCOMM does would be better but I don't remember why I haven't
-follow-up on that, well we wanted to discontinue the bt specific
-6lowpan on the kernel side though.
-
-> On Mon, Feb 24, 2020 at 12:28 AM syzbot
-> <syzbot+198362c76088d1515529@syzkaller.appspotmail.com> wrote:
-> >
-> > Hello,
-> >
-> > syzbot found the following crash on:
-> >
-> > HEAD commit:    bee46b30 Add linux-next specific files for 20200221
-> > git tree:       linux-next
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=1244ea7ee00000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=10693880b4976691
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=198362c76088d1515529
-> > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160a03d9e00000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10f8e1dde00000
-> >
-> > Bisection is inconclusive: the bug happens on the oldest tested release.
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13f03a7ee00000
-> > final crash:    https://syzkaller.appspot.com/x/report.txt?x=10083a7ee00000
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=17f03a7ee00000
-> >
-> > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > Reported-by: syzbot+198362c76088d1515529@syzkaller.appspotmail.com
-> >
-> > ------------[ cut here ]------------
-> > refcount_t: underflow; use-after-free.
-> > WARNING: CPU: 1 PID: 2940 at lib/refcount.c:28 refcount_warn_saturate+0x1dc/0x1f0 lib/refcount.c:28
-> > Kernel panic - not syncing: panic_on_warn set ...
-> > CPU: 1 PID: 2940 Comm: kworker/1:12 Not tainted 5.6.0-rc2-next-20200221-syzkaller #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> > Workqueue: events do_enable_set
-> > Call Trace:
-> >  __dump_stack lib/dump_stack.c:77 [inline]
-> >  dump_stack+0x197/0x210 lib/dump_stack.c:118
-> >  panic+0x2e3/0x75c kernel/panic.c:221
-> >  __warn.cold+0x2f/0x3e kernel/panic.c:582
-> >  report_bug+0x289/0x300 lib/bug.c:195
-> >  fixup_bug arch/x86/kernel/traps.c:175 [inline]
-> >  fixup_bug arch/x86/kernel/traps.c:170 [inline]
-> >  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:267
-> >  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:286
-> >  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
-> > RIP: 0010:refcount_warn_saturate+0x1dc/0x1f0 lib/refcount.c:28
-> > Code: e9 d8 fe ff ff 48 89 df e8 81 81 10 fe e9 85 fe ff ff e8 07 54 d1 fd 48 c7 c7 00 c8 91 88 c6 05 6b f6 fc 06 01 e8 23 74 a1 fd <0f> 0b e9 ac fe ff ff 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 55 48
-> > RSP: 0018:ffffc9000952fbd8 EFLAGS: 00010286
-> > RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-> > RDX: 0000000000000000 RSI: ffffffff815ee766 RDI: fffff520012a5f6d
-> > RBP: ffffc9000952fbe8 R08: ffff88809e82e600 R09: ffffed1015d26661
-> > R10: ffffed1015d26660 R11: ffff8880ae933307 R12: 0000000000000003
-> > R13: ffff888095b3f018 R14: dead000000000122 R15: ffffc9000952fc98
-> >  refcount_sub_and_test include/linux/refcount.h:261 [inline]
-> >  refcount_dec_and_test include/linux/refcount.h:281 [inline]
-> >  kref_put include/linux/kref.h:64 [inline]
-> >  l2cap_chan_put+0x1d9/0x240 net/bluetooth/l2cap_core.c:501
-> >  do_enable_set+0x54b/0x960 net/bluetooth/6lowpan.c:1075
-> >  process_one_work+0xa05/0x17a0 kernel/workqueue.c:2266
-> >  worker_thread+0x98/0xe40 kernel/workqueue.c:2412
-> >  kthread+0x361/0x430 kernel/kthread.c:255
-> >  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-> > Kernel Offset: disabled
-> > Rebooting in 86400 seconds..
-> >
-> >
-> > ---
-> > This bug is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this bug report. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> > syzbot can test patches for this bug, for details see:
-> > https://goo.gl/tpsmEJ#testing-patches
-
-
-
--- 
-Luiz Augusto von Dentz
+> Changes in v3: None
+> Changes in v2: None
+>
+>  include/net/bluetooth/hci_core.h |  2 ++
+>  include/net/bluetooth/mgmt.h     |  7 +++++
+>  net/bluetooth/hci_core.c         |  1 +
+>  net/bluetooth/mgmt.c             | 51 ++++++++++++++++++++++++++++++++
+>  4 files changed, 61 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index dcc0dc6e2624..9d9ada5bc9d4 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -394,6 +394,7 @@ struct hci_dev {
+>         struct list_head        mgmt_pending;
+>         struct list_head        blacklist;
+>         struct list_head        whitelist;
+> +       struct list_head        wakeable;
+>         struct list_head        uuids;
+>         struct list_head        link_keys;
+>         struct list_head        long_term_keys;
+> @@ -575,6 +576,7 @@ struct hci_conn_params {
+>
+>         struct hci_conn *conn;
+>         bool explicit_connect;
+> +       bool wakeable;
+>  };
+>
+>  extern struct list_head hci_dev_list;
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index a90666af05bd..283ba5320bdb 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -671,6 +671,13 @@ struct mgmt_cp_set_blocked_keys {
+>  } __packed;
+>  #define MGMT_OP_SET_BLOCKED_KEYS_SIZE 2
+>
+> +#define MGMT_OP_SET_WAKE_CAPABLE       0x0047
+> +#define MGMT_SET_WAKE_CAPABLE_SIZE     8
+> +struct mgmt_cp_set_wake_capable {
+> +       struct mgmt_addr_info addr;
+> +       u8 wake_capable;
+> +} __packed;
+> +
+>  #define MGMT_EV_CMD_COMPLETE           0x0001
+>  struct mgmt_ev_cmd_complete {
+>         __le16  opcode;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index cbbc34a006d1..2fceaf76644a 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3299,6 +3299,7 @@ struct hci_dev *hci_alloc_dev(void)
+>         INIT_LIST_HEAD(&hdev->mgmt_pending);
+>         INIT_LIST_HEAD(&hdev->blacklist);
+>         INIT_LIST_HEAD(&hdev->whitelist);
+> +       INIT_LIST_HEAD(&hdev->wakeable);
+>         INIT_LIST_HEAD(&hdev->uuids);
+>         INIT_LIST_HEAD(&hdev->link_keys);
+>         INIT_LIST_HEAD(&hdev->long_term_keys);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 3074363c68df..9a873097000b 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -107,6 +107,7 @@ static const u16 mgmt_commands[] = {
+>         MGMT_OP_READ_EXT_INFO,
+>         MGMT_OP_SET_APPEARANCE,
+>         MGMT_OP_SET_BLOCKED_KEYS,
+> +       MGMT_OP_SET_WAKE_CAPABLE,
+>  };
+>
+>  static const u16 mgmt_events[] = {
+> @@ -4663,6 +4664,48 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+>         return err;
+>  }
+>
+> +static int set_wake_capable(struct sock *sk, struct hci_dev *hdev, void *data,
+> +                           u16 len)
+> +{
+> +       struct mgmt_cp_set_wake_capable *cp = data;
+> +       struct hci_conn_params *params;
+> +       int err;
+> +       u8 status = MGMT_STATUS_FAILED;
+> +       u8 addr_type = cp->addr.type == BDADDR_BREDR ?
+> +                              cp->addr.type :
+> +                              le_addr_type(cp->addr.type);
+> +
+> +       BT_DBG("Set wake capable %pMR (type 0x%x) = 0x%x\n", &cp->addr.bdaddr,
+> +              addr_type, cp->wake_capable);
+> +
+> +       if (cp->addr.type == BDADDR_BREDR) {
+> +               if (cp->wake_capable)
+> +                       err = hci_bdaddr_list_add(&hdev->wakeable,
+> +                                                 &cp->addr.bdaddr, addr_type);
+> +               else
+> +                       err = hci_bdaddr_list_del(&hdev->wakeable,
+> +                                                 &cp->addr.bdaddr, addr_type);
+> +
+> +               if (!err || err == -EEXIST || err == -ENOENT)
+> +                       status = MGMT_STATUS_SUCCESS;
+> +
+> +               goto done;
+> +       }
+> +
+> +       /* Add wakeable param to le connection parameters */
+> +       params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr, addr_type);
+> +       if (params) {
+> +               params->wakeable = cp->wake_capable;
+> +               status = MGMT_STATUS_SUCCESS;
+> +       }
+> +
+> +done:
+> +       err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_WAKE_CAPABLE, status,
+> +                               cp, sizeof(*cp));
+> +
+> +       return err;
+> +}
+> +
+>  static void set_bredr_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+>  {
+>         struct mgmt_pending_cmd *cmd;
+> @@ -5791,6 +5834,13 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+>                         err = hci_bdaddr_list_del(&hdev->whitelist,
+>                                                   &cp->addr.bdaddr,
+>                                                   cp->addr.type);
+> +
+> +                       /* Don't check result since it either succeeds or device
+> +                        * wasn't there (not wakeable or invalid params as
+> +                        * covered by deleting from whitelist).
+> +                        */
+> +                       hci_bdaddr_list_del(&hdev->wakeable, &cp->addr.bdaddr,
+> +                                           cp->addr.type);
+>                         if (err) {
+>                                 err = mgmt_cmd_complete(sk, hdev->id,
+>                                                         MGMT_OP_REMOVE_DEVICE,
+> @@ -6990,6 +7040,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+>         { set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
+>         { set_blocked_keys,        MGMT_OP_SET_BLOCKED_KEYS_SIZE,
+>                                                 HCI_MGMT_VAR_LEN },
+> +       { set_wake_capable,        MGMT_SET_WAKE_CAPABLE_SIZE },
+>  };
+>
+>  void mgmt_index_added(struct hci_dev *hdev)
+> --
+> 2.25.0.265.gbab2e86ba0-goog
+>
