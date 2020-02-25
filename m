@@ -2,237 +2,163 @@ Return-Path: <SRS0=zBEa=4N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96612C35DF0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E234C35DEA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:36:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DEC321D7E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27205222C2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 01:36:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="d3qBxLkk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZX0XaM0O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728690AbgBYBfC (ORCPT
+        id S1728529AbgBYBgS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 20:35:02 -0500
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:36361 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728682AbgBYBfB (ORCPT
+        Mon, 24 Feb 2020 20:36:18 -0500
+Received: from mail-ot1-f42.google.com ([209.85.210.42]:39665 "EHLO
+        mail-ot1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728011AbgBYBgS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 20:35:01 -0500
-Received: by mail-vs1-f67.google.com with SMTP id a2so7002477vso.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 17:34:58 -0800 (PST)
+        Mon, 24 Feb 2020 20:36:18 -0500
+Received: by mail-ot1-f42.google.com with SMTP id 77so10637373oty.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 17:36:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=XvbopwCF9mmo8OGNCSjhGDMkBahDz5BZ+asKUlhTYZA=;
-        b=d3qBxLkkQKBffrrYpQqjOfPul0BCOX5LkqmU+vnztHjTT4FVLQEwOcfsr4+UiX9vVJ
-         BUl9qJLVhATZ5cGirePb6WkDrQVdREkv4EMomOLXaCRGfBTA6kw+HiIIzNhWxlNVrPKU
-         m/gvyTIjy/BWsc6wB4n9sQwmOTGAgEDsskmv8=
+        bh=hoUWZFubdZALCd9e8O268DXImCxJAVzZhN7QYxJJNnM=;
+        b=ZX0XaM0O2DAGMldSKJ9LhXcEH4yaffI4UVFkzQldJ9BTzyJs6m2yTK5TJ9h/4HQm7D
+         bjuYxwyJ75NiuJB4DMYTuUwz70xzgqn07gdbe6Qk9kgRSyRE3HJh6IF8gkLVQTYv+eJH
+         4EaCSFzBu30USnVjhokf+Vlyj4KxrvzvyHiySDAeVHtSfChKsoy8uSThe0lkjqoY83SB
+         eyJE2vm723BABLZ4hW27O9Nd45XGOXHEOd2yoOH+QXn5k2ZRAP5XkW0nbLs4/6HOkocq
+         qgzKSG8f3r1DWzqfVnnIm/EJX3cYe9WgKd1F1haImEi81iY1xMGa8/Edxg1FgnaU5qNi
+         Q9UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=XvbopwCF9mmo8OGNCSjhGDMkBahDz5BZ+asKUlhTYZA=;
-        b=VrFdKBzEHnbomFcXEz4Q1bUp4gw6QmWsiXVcmmaEv3u/V1AviOOwMEbKjQKSacJIf7
-         E2p2LPbHJIG1qvefGc7p++KMSc8GVwwiEnvOtLT3VQGlt2C4EOzH4x8GdY0xp0dWBHVY
-         9fWsnJ+UeF8+G1Q9mFcnCOBmlyKyKycTm9W4GDQBc9cG2WDSn9qVE9nhtgrj/r701Nac
-         dsGxdoVl/As/Icf+85ZuPXCt96nXtJkRPnHeZmha2djT3Z9EcMgYnILHoZhxKLqzQDr2
-         jNFwub1KduZqOP2UEwLSvt67wruPXFSEIt86O6o49x5s6QYtKaokqRMITgaLKSLJBBLG
-         hjnA==
-X-Gm-Message-State: APjAAAUnp487jgv3NJrpPS6OocNMd7mO04SlCoeWEERVRRkMVJ9X+Mnq
-        vdgSIvwxY2QBLCiTjEB/63cfcAwga+VACDcfz1EH1A==
-X-Google-Smtp-Source: APXvYqwj++UMCeh3XQCSqWC6OoNtBiIOWXW/gh6glTMjVsSGcrp1jrbKj/II7rje4gpIBvRg97EAG9UqmCB23TF5yLI=
-X-Received: by 2002:a67:2dd6:: with SMTP id t205mr30321975vst.71.1582594498280;
- Mon, 24 Feb 2020 17:34:58 -0800 (PST)
+        bh=hoUWZFubdZALCd9e8O268DXImCxJAVzZhN7QYxJJNnM=;
+        b=R3M8G9G0IkNScN1DHHzC1EYtRf85scO5esrvxFGaoH6u4eu60yQW5oXovqCAzmw2p/
+         /DnJiqUN1+9CN/7tl1JcwFMO/1VeFw909I/ZpzK7KsSs1saR8eyCQcYhn3Rb6YDn+Uw7
+         5V1IAYnQzzqVV/aiCqWWXZY7jaequY9H4o07wUnC+T2L4m1YOzb8BPgnJ95E81GoBtRy
+         w8+ALjTA1FvcEz71YOzsCVih3SeFaNEIiP/XDIx3UCi2h6ZLkAeKLRKc/h9Vrj3jI3kH
+         ez2Of0dm1L/g8/hT72aELv7ke0nAugbRNcyISXRItJmEWeHC0kmjjOp/lCn6rxFTc7xi
+         2Ifg==
+X-Gm-Message-State: APjAAAVa4QAs9rmqUbhDfU2w9FN3WzCNTzdA1ihVtOHu0WRgipd0FKDk
+        cE4UuCFSjkbqyPMOCZ47qXjqY89J1/0cibvXqck=
+X-Google-Smtp-Source: APXvYqx5UtHf1ca0eOcm4/+pj1xniOa2rCOqb9xUoBSvVo+7j2RgSEm7GbfUFcupbN8IP7PM7E1ELCwdoQU20M4kgyY=
+X-Received: by 2002:a9d:58cb:: with SMTP id s11mr43758217oth.55.1582594577205;
+ Mon, 24 Feb 2020 17:36:17 -0800 (PST)
 MIME-Version: 1.0
-References: <20200225000036.156250-1-abhishekpandit@chromium.org> <20200224160019.RFC.v3.1.I797e2f4cb824299043e771f3ab9cef86ee09f4db@changeid>
-In-Reply-To: <20200224160019.RFC.v3.1.I797e2f4cb824299043e771f3ab9cef86ee09f4db@changeid>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 24 Feb 2020 17:34:47 -0800
-Message-ID: <CANFp7mUehaCSR2W3mXpq2s80YLJVfO2U8D_N+sRzJ2pMZQw1UA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 1/5] Bluetooth: Add mgmt op set_wake_capable
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Alain Michaud <alainm@chromium.org>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>
+References: <CAD3n0hm61cRPK3=Scf02y3Y3aMJ66eCC5nwFh40Y9kfLBWk-tw@mail.gmail.com>
+ <CAAu3APZ4WqFd=61eUfbC8biTbygWW4k2Te3De38B2+maYoBePw@mail.gmail.com>
+ <CAD3n0hnJkmXGjiei0-u=GBh0xoGb4N7tkuBh_uSvsuT7bAhXLA@mail.gmail.com>
+ <CAAu3APbWouHkguPG3_FQmxPY=6q6rzmr_CbOqY2_0a0RzC++XQ@mail.gmail.com>
+ <CAD3n0hnWk0rULy+RJNTAujqY5vtTR=zvoB8233rtLSGc3R-9Pw@mail.gmail.com> <CABBYNZJn3-xBUQ8h_akoKAzm4AT1COjAFLhMhg6V=VnjOZVTvQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJn3-xBUQ8h_akoKAzm4AT1COjAFLhMhg6V=VnjOZVTvQ@mail.gmail.com>
+From:   chris baker <chrisbkr2020@gmail.com>
+Date:   Mon, 24 Feb 2020 17:36:07 -0800
+Message-ID: <CAD3n0h=A9UhCd+Aux=GLdQKWPJUma4=eYfV7xUb0tJHgnxUA0A@mail.gmail.com>
+Subject: Re: Bluez blotoothctl scan vs hcitool scan
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I seem to have forgotten to update the series changes here. In series
-3, I added a wakeable property to le_conn_param so that the wakeable
-list is only used for BR/EDR as requested in the previous revision.
-
-On Mon, Feb 24, 2020 at 4:00 PM Abhishek Pandit-Subedi
-<abhishekpandit@chromium.org> wrote:
+On Mon, Feb 24, 2020 at 4:33 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> When the system is suspended, only some connected Bluetooth devices
-> cause user input that should wake the system (mostly HID devices). Add
-> a list to keep track of devices that can wake the system and add
-> a management API to let userspace tell the kernel whether a device is
-> wake capable or not. For LE devices, the wakeable property is added to
-> the connection parameter and can only be modified after calling
-> add_device.
+> Hi Chris,
 >
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
+> On Mon, Feb 24, 2020 at 1:56 PM chris baker <chrisbkr2020@gmail.com> wrote:
+> >
+> > On Mon, Feb 24, 2020 at 9:13 AM Barry Byford <31baz66@gmail.com> wrote:
+> > >
+> > > If the DBus API is not cutting it for you then using the MGMT API
+> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt
+> > > is what has been recommended in the past:
+> > > https://www.spinics.net/lists/linux-bluetooth/msg68959.html
+> > >
+> > > On Mon, 24 Feb 2020 at 16:37, chris baker <chrisbkr2020@gmail.com> wrote:
+> > > >
+> > > > On Mon, Feb 24, 2020 at 6:08 AM Barry Byford <31baz66@gmail.com> wrote:
+> > > > >
+> > > > > Hi Chris,
+> > > > >
+> > > > > On Mon, 24 Feb 2020 at 10:12, chris baker <chrisbkr2020@gmail.com> wrote:
+> > > > > >
+> > > > >
+> > > > > > So my question is, is there a way to get those missing advertisements
+> > > > > > through the dbus api, possibly some additional setting somewhere?
+> > > > >
+> > > > > Duplicates are disabled by default with the DBus API. This can be
+> > > > > controlled with the DuplicateData setting:
+> > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n107
+> > > > >
+> > > > > Regards,
+> > > > > Barry
+> > > >
+> > > >
+> > > > My apologies, I guess I wasn't clear (long post) but, I turned
+> > > > duplicate data on when using the bluetoothctl command (via the "scan"
+> > > > submenu) and also used the flag, "hcitool lescan --duplicates", when
+> > > > running the hcitool command. So both scans should have included any
+> > > > duplicates (unless I've misunderstood something). Additionally, none
+> > > > of the missing packets were duplicates (again, unless I'm
+> > > > misunderstanding what "duplicates" means). each packet had a unique
+> > > > sequence numbers as well as the button data field toggling.
+> >
+> > Great, thank you. I'll look into the MGMT api in the coming days. That
+> > said, is it a problem to use both api's (MGMT/DBus) concurrently from
+> > the same app? My application supports both connected BLE sensors as
+> > well as BLE beacon type sensors. If possible I can handle them in two
+> > different threads, but the DBus thread for connected sensors would
+> > still occasionally need to scan for new sensors (using the DBus
+> > discovery call) and would still need to get characteristic changed
+> > callbacks as well.
 >
-> Changes in v3: None
-> Changes in v2: None
+> Have a look at the other thread subject: Adding support for
+> DuplicateData into the kernel
 >
->  include/net/bluetooth/hci_core.h |  2 ++
->  include/net/bluetooth/mgmt.h     |  7 +++++
->  net/bluetooth/hci_core.c         |  1 +
->  net/bluetooth/mgmt.c             | 51 ++++++++++++++++++++++++++++++++
->  4 files changed, 61 insertions(+)
+> We are discussing adding support to disable duplicate via MGMT since
+> DuplicateData does not currently remove it but we might want to change
+> that, or at least have some alternative API to do that. We could for
+> example have a socket that enables a more direct access to the
+> advertisments, that way protocol that work over advertisement would
+> have a way to do this, in fact this might be better for things like
+> mesh so it can coexist with bluetoothd.
 >
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index dcc0dc6e2624..9d9ada5bc9d4 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -394,6 +394,7 @@ struct hci_dev {
->         struct list_head        mgmt_pending;
->         struct list_head        blacklist;
->         struct list_head        whitelist;
-> +       struct list_head        wakeable;
->         struct list_head        uuids;
->         struct list_head        link_keys;
->         struct list_head        long_term_keys;
-> @@ -575,6 +576,7 @@ struct hci_conn_params {
+> > Out of curiosity though, is the behavior I'm seeing normal? Or is the
+> > sensor doing something improper possibly? Seeing as the packets aren't
+> > duplicates why would they be filtered (or are they just not being
+> > received to begin with for some reason)? The 11 second interval seems
+> > kind of strange. Anyway, thanks again for the help! Chris
 >
->         struct hci_conn *conn;
->         bool explicit_connect;
-> +       bool wakeable;
->  };
 >
->  extern struct list_head hci_dev_list;
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index a90666af05bd..283ba5320bdb 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -671,6 +671,13 @@ struct mgmt_cp_set_blocked_keys {
->  } __packed;
->  #define MGMT_OP_SET_BLOCKED_KEYS_SIZE 2
 >
-> +#define MGMT_OP_SET_WAKE_CAPABLE       0x0047
-> +#define MGMT_SET_WAKE_CAPABLE_SIZE     8
-> +struct mgmt_cp_set_wake_capable {
-> +       struct mgmt_addr_info addr;
-> +       u8 wake_capable;
-> +} __packed;
-> +
->  #define MGMT_EV_CMD_COMPLETE           0x0001
->  struct mgmt_ev_cmd_complete {
->         __le16  opcode;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index cbbc34a006d1..2fceaf76644a 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3299,6 +3299,7 @@ struct hci_dev *hci_alloc_dev(void)
->         INIT_LIST_HEAD(&hdev->mgmt_pending);
->         INIT_LIST_HEAD(&hdev->blacklist);
->         INIT_LIST_HEAD(&hdev->whitelist);
-> +       INIT_LIST_HEAD(&hdev->wakeable);
->         INIT_LIST_HEAD(&hdev->uuids);
->         INIT_LIST_HEAD(&hdev->link_keys);
->         INIT_LIST_HEAD(&hdev->long_term_keys);
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 3074363c68df..9a873097000b 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -107,6 +107,7 @@ static const u16 mgmt_commands[] = {
->         MGMT_OP_READ_EXT_INFO,
->         MGMT_OP_SET_APPEARANCE,
->         MGMT_OP_SET_BLOCKED_KEYS,
-> +       MGMT_OP_SET_WAKE_CAPABLE,
->  };
->
->  static const u16 mgmt_events[] = {
-> @@ -4663,6 +4664,48 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
->         return err;
->  }
->
-> +static int set_wake_capable(struct sock *sk, struct hci_dev *hdev, void *data,
-> +                           u16 len)
-> +{
-> +       struct mgmt_cp_set_wake_capable *cp = data;
-> +       struct hci_conn_params *params;
-> +       int err;
-> +       u8 status = MGMT_STATUS_FAILED;
-> +       u8 addr_type = cp->addr.type == BDADDR_BREDR ?
-> +                              cp->addr.type :
-> +                              le_addr_type(cp->addr.type);
-> +
-> +       BT_DBG("Set wake capable %pMR (type 0x%x) = 0x%x\n", &cp->addr.bdaddr,
-> +              addr_type, cp->wake_capable);
-> +
-> +       if (cp->addr.type == BDADDR_BREDR) {
-> +               if (cp->wake_capable)
-> +                       err = hci_bdaddr_list_add(&hdev->wakeable,
-> +                                                 &cp->addr.bdaddr, addr_type);
-> +               else
-> +                       err = hci_bdaddr_list_del(&hdev->wakeable,
-> +                                                 &cp->addr.bdaddr, addr_type);
-> +
-> +               if (!err || err == -EEXIST || err == -ENOENT)
-> +                       status = MGMT_STATUS_SUCCESS;
-> +
-> +               goto done;
-> +       }
-> +
-> +       /* Add wakeable param to le connection parameters */
-> +       params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr, addr_type);
-> +       if (params) {
-> +               params->wakeable = cp->wake_capable;
-> +               status = MGMT_STATUS_SUCCESS;
-> +       }
-> +
-> +done:
-> +       err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_WAKE_CAPABLE, status,
-> +                               cp, sizeof(*cp));
-> +
-> +       return err;
-> +}
-> +
->  static void set_bredr_complete(struct hci_dev *hdev, u8 status, u16 opcode)
->  {
->         struct mgmt_pending_cmd *cmd;
-> @@ -5791,6 +5834,13 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
->                         err = hci_bdaddr_list_del(&hdev->whitelist,
->                                                   &cp->addr.bdaddr,
->                                                   cp->addr.type);
-> +
-> +                       /* Don't check result since it either succeeds or device
-> +                        * wasn't there (not wakeable or invalid params as
-> +                        * covered by deleting from whitelist).
-> +                        */
-> +                       hci_bdaddr_list_del(&hdev->wakeable, &cp->addr.bdaddr,
-> +                                           cp->addr.type);
->                         if (err) {
->                                 err = mgmt_cmd_complete(sk, hdev->id,
->                                                         MGMT_OP_REMOVE_DEVICE,
-> @@ -6990,6 +7040,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
->         { set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
->         { set_blocked_keys,        MGMT_OP_SET_BLOCKED_KEYS_SIZE,
->                                                 HCI_MGMT_VAR_LEN },
-> +       { set_wake_capable,        MGMT_SET_WAKE_CAPABLE_SIZE },
->  };
->
->  void mgmt_index_added(struct hci_dev *hdev)
 > --
-> 2.25.0.265.gbab2e86ba0-goog
->
+> Luiz Augusto von Dentz
+
+
+Thanks Luiz, I don't want to sound dense, and I really appreciate you
+and Barry's help, but these aren't duplicate packets (unless, again,
+I'm misunderstanding the term). Each packet payload is completely
+unique. I'll have a look at the other thread for sure, but I'm really
+just trying to understand if the missing packets I identified in the
+trace should be there (in the DBus/bluetoothctl trace) or if there's a
+reason they were excluded. Again, they weren't duplicates and I'm
+reasonably sure I had the duplicate data flags set correctly each
+time. Also, whatever is going on is not transient, I can duplicate it
+with the senor I'm testing every time (both in my app or via
+bluetoothctl). More important for sure is to find a work-around
+(hopefully the MGMT api Barry pointed me to) but still just curious
+why these packets are getting dropped/filtered... Anyway, thanks again
+to you both!
