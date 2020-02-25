@@ -2,194 +2,176 @@ Return-Path: <SRS0=zBEa=4N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70750C35DEE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 02:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BE9C35DF5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 05:58:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35C3E21927
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 02:18:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC0CE24653
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 05:58:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IVVRUBjn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X1P2gW18"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728541AbgBYCS2 (ORCPT
+        id S1726956AbgBYF6X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 21:18:28 -0500
-Received: from mail-oi1-f177.google.com ([209.85.167.177]:43396 "EHLO
-        mail-oi1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbgBYCS2 (ORCPT
+        Tue, 25 Feb 2020 00:58:23 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34775 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725783AbgBYF6X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 21:18:28 -0500
-Received: by mail-oi1-f177.google.com with SMTP id p125so11066080oif.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 18:18:27 -0800 (PST)
+        Tue, 25 Feb 2020 00:58:23 -0500
+Received: by mail-wr1-f68.google.com with SMTP id z15so4828425wrl.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 21:58:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=BorgV2hcURsdYjdaOVBs24kkWkYUQfMMu/bryAnlmWY=;
-        b=IVVRUBjnkNSNLF/x8GsNiDEXRNR82TU+8iu2EG+T/w1qI9nB2NKCXohgoad29aigN6
-         SRaFjD7AvpTl/ONKCDwwfxDIM8zqMELTwzRClQuuU9u5hZfuyfVnKZL5yuxvGCe2kQFk
-         Ky7ngU1ibdyMlyVaHb/tW9FN2olHlA4v6qEfrESzCib3s+XTOth0a33TTNswNlu1jTr8
-         lcjh8Sy1FYuSY5QlMIG/RArq3mUQyzWui3NIFidHI55gRC8PE9MjZTuRuzTWPA5jJ/cL
-         pzhrJ3Vpb6d9Djs+qrSGq8TrSKjra6nrGXHT3yRQgAxPsYMmgrCfECPdyYixFndAlyKw
-         EQhA==
+        bh=DgDOWnoRdqXdI9bQwdE/XHj+LImCcei1vyd6/cTCvYY=;
+        b=X1P2gW18zPONQLT2CVyqYKfojnKX+WtP4eVw6WDL3JivATN57e/PsM9/Q+m0YJ1TbZ
+         No6fEr4VokzYCf5Zu7jUIiTX72irgpUN2dhbyW+PmyF18pj6K0pLvMMoYh8GQxAjvOPi
+         Xm7LBo259ctyXASJYdKo+fV+9mkXNIJwr3R0sBl6pfNap9fcwu32LeGaKVKfhRpA6RC8
+         sSUqOatOEeAwgpxmiRuLG0hEdZFHoeQmYPFVRfRpEbEeLt+GTqGZY/9pvPS0ClA5cnNg
+         HgnOmQ5FeF1lgXfYpOW3Hqr3iQ6caykqRkQqykI7Y4LlqBPgijraZg7wYnpBUngPIqL6
+         S9Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=BorgV2hcURsdYjdaOVBs24kkWkYUQfMMu/bryAnlmWY=;
-        b=Es/KW8p1E572ipb/KrElr2SMeFCg/u0vmqDny/LXeSdMvgJ7rdjPWHq2iIO/Bl3kJR
-         nZWm41m144xZR462BxwPUJ9gltzK0GzNkJeHQGzaytlHb9ZH+xcl5uvrOZKoLOhAKlwe
-         tpCTOags/9gg7WxsRrzqjyysoGlPgLxw9ANrt8QxgY6AayCHXkRwcYuvqFiOmDgvR1Lt
-         LoCP6Fb0YXOaiNpl0TQBl0+B2fqFzDRUhIoMN+jbscwavBvDK3NXnS3T1yLnohNxhX7W
-         EEz61zPWmhcOVZo9FvDRUfOBH1TJt5jAMNVH+sJyJU6n+tllOVHddI+C+TjWbfaYB6d1
-         aW1g==
-X-Gm-Message-State: APjAAAVZ5PVfDzLGMYm6jsMdsOxs9UMJ1WUWnfFCk7rNr64y+2bBxGO3
-        1dQ8bSP8f5fGN5GSP79Q48FQ+OSp9dPUYyuEwR15Cg==
-X-Google-Smtp-Source: APXvYqyBSK9mcm//hjhkVyW+wdbw5hGMj3EGGY3992uvAGiPMVojFYyyMR9VvEknYdThTNRfkqhDqm+EEbLVU5lOO3E=
-X-Received: by 2002:a05:6808:643:: with SMTP id z3mr1656698oih.19.1582597107461;
- Mon, 24 Feb 2020 18:18:27 -0800 (PST)
+        bh=DgDOWnoRdqXdI9bQwdE/XHj+LImCcei1vyd6/cTCvYY=;
+        b=aEpBSoas0+B+D1gW+dkH+FZbKVGvqAt0b/EIInurYEZX5rfne5Geb7nQYoEkcisecg
+         Xb+8ktTdxSOF5e2WK1fRlmP5zAHx2URVnguWcA/QFBfVOfKmsSUjwdXLmmOKG4wBYfXC
+         yCg7PE0LDh5StYk9TY2W0/vVXPHfrnlPGVHZ08D2qIOjy+1iyEwLURDAORq5bYVGkWd2
+         jYMIaH3vwWVNWj6eYAyMe5/PDwysxUFFgDSk+pv7FZ4OIJNUFrls1pAL2jgiqYpZc0bH
+         HrkRlmi1VpQCI1hbY14NOBUX3sjCGvzLsoBp+mkNDbEimN3qY/kC0I2XV5f1du7QnkaX
+         LE7A==
+X-Gm-Message-State: APjAAAWzN5dNDB5U6yKHVxFw9WdyrM024EQg879Cit88mFEWsya+i/3Q
+        HicQ3Js5HU5aka4jo7H7lSlTu10aZ9CdPoUPY4Ms2A==
+X-Google-Smtp-Source: APXvYqyj/uoEbCb+Cvjl4/eVoMe3rWWvrLHsl/AE4XtmpVOMDqZLP6H595QsENKP9jVbZga0eDXYTU4zSwKi4WfMUGs=
+X-Received: by 2002:a5d:484f:: with SMTP id n15mr70798068wrs.365.1582610300938;
+ Mon, 24 Feb 2020 21:58:20 -0800 (PST)
 MIME-Version: 1.0
-References: <CAD3n0hm61cRPK3=Scf02y3Y3aMJ66eCC5nwFh40Y9kfLBWk-tw@mail.gmail.com>
- <CAAu3APZ4WqFd=61eUfbC8biTbygWW4k2Te3De38B2+maYoBePw@mail.gmail.com>
- <CAD3n0hnJkmXGjiei0-u=GBh0xoGb4N7tkuBh_uSvsuT7bAhXLA@mail.gmail.com>
- <CAAu3APbWouHkguPG3_FQmxPY=6q6rzmr_CbOqY2_0a0RzC++XQ@mail.gmail.com>
- <CAD3n0hnWk0rULy+RJNTAujqY5vtTR=zvoB8233rtLSGc3R-9Pw@mail.gmail.com>
- <CABBYNZJn3-xBUQ8h_akoKAzm4AT1COjAFLhMhg6V=VnjOZVTvQ@mail.gmail.com>
- <CAD3n0h=A9UhCd+Aux=GLdQKWPJUma4=eYfV7xUb0tJHgnxUA0A@mail.gmail.com> <CABBYNZJC3xwQ0jx7k6_t0uhzpJyOsdO1n3LYqW1gC_TSnU-SHg@mail.gmail.com>
-In-Reply-To: <CABBYNZJC3xwQ0jx7k6_t0uhzpJyOsdO1n3LYqW1gC_TSnU-SHg@mail.gmail.com>
-From:   chris baker <chrisbkr2020@gmail.com>
-Date:   Mon, 24 Feb 2020 18:18:18 -0800
-Message-ID: <CAD3n0hnsVu_AvFA=3gYdqAZT5tS_B-=wnB0tgro+nZKHiG7wfA@mail.gmail.com>
-Subject: Re: Bluez blotoothctl scan vs hcitool scan
+References: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
+ <CABBYNZKc6UPfYLbesAk0fUaGWFHP6GNtMQHFAOt+p+Yy0jNkWg@mail.gmail.com>
+In-Reply-To: <CABBYNZKc6UPfYLbesAk0fUaGWFHP6GNtMQHFAOt+p+Yy0jNkWg@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Tue, 25 Feb 2020 13:58:09 +0800
+Message-ID: <CAJQfnxGoRhuw9_+v=TUXTa1j_rO7qZEVS=UnzS6TwNHt1FudRg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] src/profile: Ensure class UUID matches before
+ connecting profile
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Barry Byford <31baz66@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks Luiz, that makes sense and would explain why it ignores the
-sensor's advertisements at pretty regular 11 second intervals. And
-again, I don't want to keep bugging you guys but my last question is,
-is there any issue using the MGMT api in conjunction with the normal
-DBus BLE api's? For that matter if I end up having to go to the hci
-level can that be mixed as well or will they step on each other
-somehow? I'm envisioning putting the normal, "connected" sensors using
-the DBus api calls (for scanning, connecting, receiving characteristic
-data) in one thread and the beacon devices in a completely separate
-thread, both running independently and using different api's (though
-possibly sharing some data). If that's just not going to work it'll
-help to know up front and I can look at alternatives. Thanks again,
-chris
+Hi Luiz,
 
-On Mon, Feb 24, 2020 at 5:52 PM Luiz Augusto von Dentz
+On Tue, 25 Feb 2020 at 03:30, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
-> Hi Chris,
+> Hi Archie,
 >
-> On Mon, Feb 24, 2020 at 5:36 PM chris baker <chrisbkr2020@gmail.com> wrote:
+> On Fri, Feb 21, 2020 at 12:41 AM Archie Pusaka <apusaka@google.com> wrote:
 > >
-> > On Mon, Feb 24, 2020 at 4:33 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Chris,
-> > >
-> > > On Mon, Feb 24, 2020 at 1:56 PM chris baker <chrisbkr2020@gmail.com> wrote:
-> > > >
-> > > > On Mon, Feb 24, 2020 at 9:13 AM Barry Byford <31baz66@gmail.com> wrote:
-> > > > >
-> > > > > If the DBus API is not cutting it for you then using the MGMT API
-> > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt
-> > > > > is what has been recommended in the past:
-> > > > > https://www.spinics.net/lists/linux-bluetooth/msg68959.html
-> > > > >
-> > > > > On Mon, 24 Feb 2020 at 16:37, chris baker <chrisbkr2020@gmail.com> wrote:
-> > > > > >
-> > > > > > On Mon, Feb 24, 2020 at 6:08 AM Barry Byford <31baz66@gmail.com> wrote:
-> > > > > > >
-> > > > > > > Hi Chris,
-> > > > > > >
-> > > > > > > On Mon, 24 Feb 2020 at 10:12, chris baker <chrisbkr2020@gmail.com> wrote:
-> > > > > > > >
-> > > > > > >
-> > > > > > > > So my question is, is there a way to get those missing advertisements
-> > > > > > > > through the dbus api, possibly some additional setting somewhere?
-> > > > > > >
-> > > > > > > Duplicates are disabled by default with the DBus API. This can be
-> > > > > > > controlled with the DuplicateData setting:
-> > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n107
-> > > > > > >
-> > > > > > > Regards,
-> > > > > > > Barry
-> > > > > >
-> > > > > >
-> > > > > > My apologies, I guess I wasn't clear (long post) but, I turned
-> > > > > > duplicate data on when using the bluetoothctl command (via the "scan"
-> > > > > > submenu) and also used the flag, "hcitool lescan --duplicates", when
-> > > > > > running the hcitool command. So both scans should have included any
-> > > > > > duplicates (unless I've misunderstood something). Additionally, none
-> > > > > > of the missing packets were duplicates (again, unless I'm
-> > > > > > misunderstanding what "duplicates" means). each packet had a unique
-> > > > > > sequence numbers as well as the button data field toggling.
-> > > >
-> > > > Great, thank you. I'll look into the MGMT api in the coming days. That
-> > > > said, is it a problem to use both api's (MGMT/DBus) concurrently from
-> > > > the same app? My application supports both connected BLE sensors as
-> > > > well as BLE beacon type sensors. If possible I can handle them in two
-> > > > different threads, but the DBus thread for connected sensors would
-> > > > still occasionally need to scan for new sensors (using the DBus
-> > > > discovery call) and would still need to get characteristic changed
-> > > > callbacks as well.
-> > >
-> > > Have a look at the other thread subject: Adding support for
-> > > DuplicateData into the kernel
-> > >
-> > > We are discussing adding support to disable duplicate via MGMT since
-> > > DuplicateData does not currently remove it but we might want to change
-> > > that, or at least have some alternative API to do that. We could for
-> > > example have a socket that enables a more direct access to the
-> > > advertisments, that way protocol that work over advertisement would
-> > > have a way to do this, in fact this might be better for things like
-> > > mesh so it can coexist with bluetoothd.
-> > >
-> > > > Out of curiosity though, is the behavior I'm seeing normal? Or is the
-> > > > sensor doing something improper possibly? Seeing as the packets aren't
-> > > > duplicates why would they be filtered (or are they just not being
-> > > > received to begin with for some reason)? The 11 second interval seems
-> > > > kind of strange. Anyway, thanks again for the help! Chris
-> > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
+> > From: Archie Pusaka <apusaka@chromium.org>
 > >
+> > According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
+> > might be multiple service records returned in a SDP Service Search
+> > Attribute Response. Also, according to 2.5.2, the service pattern
+> > can match any UUID contained within the service record, it doesn't
+> > have to match only some specific attributes of the record.
 > >
-> > Thanks Luiz, I don't want to sound dense, and I really appreciate you
-> > and Barry's help, but these aren't duplicate packets (unless, again,
-> > I'm misunderstanding the term). Each packet payload is completely
-> > unique. I'll have a look at the other thread for sure, but I'm really
-> > just trying to understand if the missing packets I identified in the
-> > trace should be there (in the DBus/bluetoothctl trace) or if there's a
-> > reason they were excluded. Again, they weren't duplicates and I'm
-> > reasonably sure I had the duplicate data flags set correctly each
-> > time. Also, whatever is going on is not transient, I can duplicate it
-> > with the senor I'm testing every time (both in my app or via
-> > bluetoothctl). More important for sure is to find a work-around
-> > (hopefully the MGMT api Barry pointed me to) but still just curious
-> > why these packets are getting dropped/filtered... Anyway, thanks again
-> > to you both!
+> > Therefore, before using the service record to connect to any
+> > profile, first we must check that the service class ID of the
+> > service record matches with whatever UUID specified in the service
+> > pattern we are looking for.
 >
-> Afaik the HCI duplicate filter flag is not very granular, so the
-> controller may be dropping any reports found during a sort period
-> since it might not have enough memory to store everything, include
-> actual data in the advertisement, to compare with.
+> Im surprised we were not doing this currently, Im fairly sure we do
+> that for the services/plugin though since there are only probed if the
+> service UUID matches
+>
+> > ---
+> >
+> >  src/profile.c | 26 ++++++++++++++++++++++++++
+> >  1 file changed, 26 insertions(+)
+> >
+> > diff --git a/src/profile.c b/src/profile.c
+> > index 192fd0245..1b481836e 100644
+> > --- a/src/profile.c
+> > +++ b/src/profile.c
+> > @@ -1568,8 +1568,34 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
+> >
+> >         for (r = recs; r != NULL; r = r->next) {
+> >                 sdp_record_t *rec = r->data;
+> > +               sdp_list_t *svcclass;
+> > +               sdp_list_t *svcclass_iter;
+> >                 sdp_list_t *protos;
+> >                 int port;
+> > +               bool matches_class_uuid = false;
+> > +
+> > +               if (sdp_get_service_classes(rec, &svcclass) < 0) {
+> > +                       error("Unable to get svc class ID list from %s record",
+> > +                                                               ext->name);
+> > +                       continue;
+> > +               }
+> > +
+> > +               for (svcclass_iter = svcclass; svcclass_iter != NULL;
+> > +                                       svcclass_iter = svcclass_iter->next) {
+> > +                       char *uuid = bt_uuid2string(svcclass_iter->data);
+> > +                       int cmp_result = bt_uuid_strcmp(uuid, ext->uuid);
+>
+> I think it would be probably more efficient to convert to data to
+> binary format (bt_uuid_t) and then do the comparision with
+> bt_uuid_cmp, also there might not be needed to iterate at all see
+> device.c:update_bredr_service which has the logic for updating
+> records:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4602
+
+I was uncertain whether we need to iterate or not, so I went for the safer side.
+However if there is no need to do that then this shall be updated.
+I also agree that comparison in binary should be faster.
+
+>
+> Btw, we should probably have bt_search_service doing the matching if
+> the uuid is set instead of returning all records like it seems to be
+> doing that way we don't have to maintain duplicate logic in both
+> device.c and profile.c
+
+Got it. somewhere in sdp-client.c is a good idea.
+Aside from device.c and profile.c, is this also used somewhere else
+though? We might also want to take them out if we are to implement
+the check in sdp-client.c.
+
+>
+>
+> > +                       free(uuid);
+> > +                       if (cmp_result == 0) {
+> > +                               matches_class_uuid = true;
+> > +                               break;
+> > +                       }
+> > +               }
+> > +
+> > +               sdp_list_free(svcclass, free);
+> > +
+> > +               if (!matches_class_uuid)
+> > +                       continue;
+> >
+> >                 if (sdp_get_access_protos(rec, &protos) < 0) {
+> >                         error("Unable to get proto list from %s record",
+> > --
+> > 2.25.0.265.gbab2e86ba0-goog
+> >
+>
 >
 > --
 > Luiz Augusto von Dentz
+
+
+Thanks,
+Archie
