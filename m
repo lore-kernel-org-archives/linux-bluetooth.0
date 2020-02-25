@@ -2,140 +2,143 @@ Return-Path: <SRS0=zBEa=4N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 558B2C35DF1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 00:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B12C2C35DEE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 00:33:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AEBF21D7E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 00:01:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 876A121927
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 00:33:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jc5CHOxA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="beIUoD1i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728524AbgBYAAt (ORCPT
+        id S1728445AbgBYAdL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Feb 2020 19:00:49 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:55650 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728501AbgBYAAs (ORCPT
+        Mon, 24 Feb 2020 19:33:11 -0500
+Received: from mail-oi1-f176.google.com ([209.85.167.176]:35859 "EHLO
+        mail-oi1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727976AbgBYAdK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Feb 2020 19:00:48 -0500
-Received: by mail-pj1-f66.google.com with SMTP id d5so454189pjz.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 16:00:48 -0800 (PST)
+        Mon, 24 Feb 2020 19:33:10 -0500
+Received: by mail-oi1-f176.google.com with SMTP id c16so10872254oic.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 16:33:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5+8ngQIB3GNYZhQp96LbiuLKzGQX6teIB6tS+tcQAEI=;
-        b=jc5CHOxAioIkjj1QZAS40yykoz02ZFZzTowxaz1evbUBDn+APB+dg5yi/CqMRUHBPO
-         CaS+PgoTg7kAlqDJ6pxDt/OaBB5uOGPxArVMkdbJ3VqoIWjg1xF8GVZLATzkElJ/Loww
-         bUDs0l+DbGjuRVS0AnyNkLI+IfFwSvxJeLnB0=
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Res0HXUOda8HRoAlvYopl15Xx32Uf448+bwwDxLqWJ8=;
+        b=beIUoD1iaf4uNmi+ZdQqTXFtTGOHXajE/zKFI0MK7t8kOx+NoUMQjzIiHlQTaft8Av
+         Q/hmoPN0dwZpeRk2RtBIlF9/IOp1ZxGQlDr7CtTzIJ/y4iNE7gFlII0kRxWJgUcY186f
+         dgXzhiao1tECQDXqnZJymxi3ZRymJOPSRrwIyxoqnfsJjviMSWvEwqWS413D6Rovgggh
+         TqfExlaFvLit39+zOqKegQEXXQ5KAiWCc6MefIQLJ+OF1c5TxOrkzHdKAcS4H/S0jfPR
+         xteehljDmgd4Gw5bxQbCnNYIxpsmOJVI4xjwdOrYtJeF7v8/eGgJAIj8wcX6d8fAdvXd
+         UQeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5+8ngQIB3GNYZhQp96LbiuLKzGQX6teIB6tS+tcQAEI=;
-        b=HPenMyB9My7ak7QWC8h6WPLEnw5IzaN0IAhuNTErM27dSjDKgKSSPS40M89x5rZLhB
-         552pv6btZXzyFTGJLcmTRk/arY0Kcc2/hZQCKhH0xzGnpkNo9D9mBvU9NvUKbcQEHe8f
-         Bo1obeoC+6dZWHi79KoXbc8bOOErdxTTDPdpd0X/tUdQRV87QafwOXcxpHiaEgoqz65V
-         5cxZIVmdnjdNN33idl0x6FGh2zJOIceQJfsqnhTpDEhxlVh9buToddzG9HixDAaMOCZw
-         96CwAgaA+LCR+hcPQvy2sRY6aVJv+lQnfu5StVYJxU2MtbdVeB5p78RMM6I2MgXHcSBJ
-         ItPQ==
-X-Gm-Message-State: APjAAAVu4gMTWpdOJVq18aYcL9qHA0S/FkV/120OW2gweiDjpaTQX2pF
-        Co6aglR/D6uz/3A6GbmzsClwFg==
-X-Google-Smtp-Source: APXvYqzj/EmbtyPe0tewAX+jrs6CxwD84WnIm3mzFDz0oyXPS0y+ZDGcKiyEel+jbzhFqho5VvozQw==
-X-Received: by 2002:a17:90a:330c:: with SMTP id m12mr1868860pjb.18.1582588847029;
-        Mon, 24 Feb 2020 16:00:47 -0800 (PST)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id c188sm14477657pfb.151.2020.02.24.16.00.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2020 16:00:46 -0800 (PST)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com, alainm@chromium.org
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC PATCH v3 0/5] Bluetooth: Handle system suspend gracefully
-Date:   Mon, 24 Feb 2020 16:00:31 -0800
-Message-Id: <20200225000036.156250-1-abhishekpandit@chromium.org>
-X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Res0HXUOda8HRoAlvYopl15Xx32Uf448+bwwDxLqWJ8=;
+        b=NbxcEkAc1tBc6vL5nTQ1MjVY8gODUcxtORztGTr6pkLh73KK1s9OT7Z7rQzJbEIGoH
+         xZiWU//dQTWY7tUbei9uzrz8SfHcjDjTDSSaDqz9Wk+z0RcKwdekXJJtQ9VB2WdCr272
+         fRf4ZZIyc7jUk4+5Q/nCfJRlqXfBVIvIYcdJNcO5h+H4HehvlV7ZTHNcXkSrPHduN9NJ
+         pvx4hoCc6+TdKQ2MSzotnDNmfBdBV2FtrDClXfOV4fv8JX1WQhtQLp/BKkeX1WQFim1j
+         vY381CLjWDbiN6Mk+26bTqp/Te9rofHF9IsByt1xMGagijfsqLjHxiT6tgcB7hgMzJ5m
+         57SQ==
+X-Gm-Message-State: APjAAAWoFz5ELqmCheXqzRBPPNtdJWjfoQkS/Hcm2CafLr4iB5uLmExH
+        6p3Gp/AnZIM73GwlteJVUKYTdVBr49h7yrrJoq0=
+X-Google-Smtp-Source: APXvYqzcznhh1uJ/NVSm7VZ5dLzVAWCvzkfM6JTah9ZFUf6ZCS/IATgbcRNX+ulohZqsvjVWqHgU4XAodjtEbFoeFIk=
+X-Received: by 2002:a05:6808:98e:: with SMTP id a14mr1344924oic.8.1582590789846;
+ Mon, 24 Feb 2020 16:33:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAD3n0hm61cRPK3=Scf02y3Y3aMJ66eCC5nwFh40Y9kfLBWk-tw@mail.gmail.com>
+ <CAAu3APZ4WqFd=61eUfbC8biTbygWW4k2Te3De38B2+maYoBePw@mail.gmail.com>
+ <CAD3n0hnJkmXGjiei0-u=GBh0xoGb4N7tkuBh_uSvsuT7bAhXLA@mail.gmail.com>
+ <CAAu3APbWouHkguPG3_FQmxPY=6q6rzmr_CbOqY2_0a0RzC++XQ@mail.gmail.com> <CAD3n0hnWk0rULy+RJNTAujqY5vtTR=zvoB8233rtLSGc3R-9Pw@mail.gmail.com>
+In-Reply-To: <CAD3n0hnWk0rULy+RJNTAujqY5vtTR=zvoB8233rtLSGc3R-9Pw@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 24 Feb 2020 16:32:58 -0800
+Message-ID: <CABBYNZJn3-xBUQ8h_akoKAzm4AT1COjAFLhMhg6V=VnjOZVTvQ@mail.gmail.com>
+Subject: Re: Bluez blotoothctl scan vs hcitool scan
+To:     chris baker <chrisbkr2020@gmail.com>
+Cc:     Barry Byford <31baz66@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Chris,
 
-Hi linux-bluetooth,
+On Mon, Feb 24, 2020 at 1:56 PM chris baker <chrisbkr2020@gmail.com> wrote:
+>
+> On Mon, Feb 24, 2020 at 9:13 AM Barry Byford <31baz66@gmail.com> wrote:
+> >
+> > If the DBus API is not cutting it for you then using the MGMT API
+> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt
+> > is what has been recommended in the past:
+> > https://www.spinics.net/lists/linux-bluetooth/msg68959.html
+> >
+> > On Mon, 24 Feb 2020 at 16:37, chris baker <chrisbkr2020@gmail.com> wrote:
+> > >
+> > > On Mon, Feb 24, 2020 at 6:08 AM Barry Byford <31baz66@gmail.com> wrote:
+> > > >
+> > > > Hi Chris,
+> > > >
+> > > > On Mon, 24 Feb 2020 at 10:12, chris baker <chrisbkr2020@gmail.com> wrote:
+> > > > >
+> > > >
+> > > > > So my question is, is there a way to get those missing advertisements
+> > > > > through the dbus api, possibly some additional setting somewhere?
+> > > >
+> > > > Duplicates are disabled by default with the DBus API. This can be
+> > > > controlled with the DuplicateData setting:
+> > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n107
+> > > >
+> > > > Regards,
+> > > > Barry
+> > >
+> > >
+> > > My apologies, I guess I wasn't clear (long post) but, I turned
+> > > duplicate data on when using the bluetoothctl command (via the "scan"
+> > > submenu) and also used the flag, "hcitool lescan --duplicates", when
+> > > running the hcitool command. So both scans should have included any
+> > > duplicates (unless I've misunderstood something). Additionally, none
+> > > of the missing packets were duplicates (again, unless I'm
+> > > misunderstanding what "duplicates" means). each packet had a unique
+> > > sequence numbers as well as the button data field toggling.
+>
+> Great, thank you. I'll look into the MGMT api in the coming days. That
+> said, is it a problem to use both api's (MGMT/DBus) concurrently from
+> the same app? My application supports both connected BLE sensors as
+> well as BLE beacon type sensors. If possible I can handle them in two
+> different threads, but the DBus thread for connected sensors would
+> still occasionally need to scan for new sensors (using the DBus
+> discovery call) and would still need to get characteristic changed
+> callbacks as well.
 
-This patch series prepares the Bluetooth controller for system suspend
-by disconnecting all devices and preparing the event filter and LE
-whitelist with devices that can wake the system from suspend.
+Have a look at the other thread subject: Adding support for
+DuplicateData into the kernel
 
-The main motivation for doing this is so we can enable Bluetooth as
-a wake up source during suspend without it being noisy. Bluetooth should
-wake the system when a HID device receives user input but otherwise not
-send any events to the host.
+We are discussing adding support to disable duplicate via MGMT since
+DuplicateData does not currently remove it but we might want to change
+that, or at least have some alternative API to do that. We could for
+example have a socket that enables a more direct access to the
+advertisments, that way protocol that work over advertisement would
+have a way to do this, in fact this might be better for things like
+mesh so it can coexist with bluetoothd.
 
-This patch series was tested on several Chromebooks with both btusb and
-hci_serdev on kernel 4.19. The set of tests was basically the following:
-* Reconnects after suspend succeed
-* HID devices can wake the system from suspend (needs some related bluez
-  changes to call the Set Wake Capable management command)
-* System properly pauses and unpauses discovery + advertising around
-  suspend
-* System does not wake from any events from non wakeable devices
-
-Series 2 has refactored the change into multiple smaller commits as
-requested. I tried to simplify some of the whitelist filtering edge
-cases but unfortunately it remains quite complex.
-
-Series 3 has refactored it further and should have resolved the
-whitelisting complexity in series 2.
-
-Please review and provide any feedback.
-
-Thanks
-Abhishek
+> Out of curiosity though, is the behavior I'm seeing normal? Or is the
+> sensor doing something improper possibly? Seeing as the packets aren't
+> duplicates why would they be filtered (or are they just not being
+> received to begin with for some reason)? The 11 second interval seems
+> kind of strange. Anyway, thanks again for the help! Chris
 
 
-Changes in v3:
-* Refactored to only handle BR/EDR devices
-* Split LE changes into its own commit
 
-Changes in v2:
-* Moved pm notifier registration into its own patch and moved params out
-  of separate suspend_state
-* Refactored filters and whitelist settings to its own patch
-* Refactored update_white_list to have clearer edge cases
-* Add connected devices to whitelist (previously missing corner case)
-* Refactored pause discovery + advertising into its own patch
-
-Abhishek Pandit-Subedi (5):
-  Bluetooth: Add mgmt op set_wake_capable
-  Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND
-  Bluetooth: Handle BR/EDR devices during suspend
-  Bluetooth: Handle LE devices during suspend
-  Bluetooth: Pause discovery and advertising during suspend
-
- include/net/bluetooth/hci.h      |  17 +-
- include/net/bluetooth/hci_core.h |  41 ++++
- include/net/bluetooth/mgmt.h     |   7 +
- net/bluetooth/hci_core.c         |  86 ++++++++
- net/bluetooth/hci_event.c        |  24 +++
- net/bluetooth/hci_request.c      | 327 ++++++++++++++++++++++++++-----
- net/bluetooth/hci_request.h      |   2 +
- net/bluetooth/mgmt.c             |  92 +++++++++
- 8 files changed, 536 insertions(+), 60 deletions(-)
-
--- 
-2.25.0.265.gbab2e86ba0-goog
-
+--
+Luiz Augusto von Dentz
