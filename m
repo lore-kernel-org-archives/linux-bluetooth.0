@@ -2,198 +2,196 @@ Return-Path: <SRS0=zBEa=4N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C4DC35DF8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 06:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A45CC35DF8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 07:34:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DCB7218AC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 06:59:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF86424650
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 07:34:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lMNll2uB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHsXkF8M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728955AbgBYG7g (ORCPT
+        id S1726019AbgBYHek (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Feb 2020 01:59:36 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36234 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725788AbgBYG7g (ORCPT
+        Tue, 25 Feb 2020 02:34:40 -0500
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:38383 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbgBYHek (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Feb 2020 01:59:36 -0500
-Received: by mail-wr1-f68.google.com with SMTP id z3so13327628wru.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 22:59:34 -0800 (PST)
+        Tue, 25 Feb 2020 02:34:40 -0500
+Received: by mail-pj1-f65.google.com with SMTP id j17so895938pjz.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 23:34:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Aka4v4J6eN44pOf1Tlt4VSvLy5q1UFQKce/CVZypNEw=;
-        b=lMNll2uB8w6Ybo6kpupHwJevTjQJF7cjcpL80WVtobk6jLowz2t7CK4uafv4sny0xo
-         s9B3pMwlaRFvccyeSzulh3ZQLLdlh9xF1HcHcfuqQTMcEOliHlrfKhH+VL13B7qyjuNl
-         ghE+b3djlrH0qcqdaOJrJVoradLdQRlqrt/kd+t2bRl1rFZxWumBNqja0HsFKdhAyaKw
-         7MVx1QY6UaBSrkTit6CCtFw0vnlTAO50qla6R+WJGzpazRmRhbCxoeaaTGM4TX11SXGG
-         JQvapjBFBZN5OMpT5eH0KU/ZEcEqu+n4sbAP2eEGi8oNQ1qZGiMMc3hiZOSLhfYxdFBc
-         1Y9Q==
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IK76F8Hano/AjV4cpJJAOJ2mTmDW0uldHdnyQdU/cHE=;
+        b=eHsXkF8MTtR593zoJQvUTu6ShHXcVqx2kUNAyy7Z8eamUgKHO0Ei38IqTmWrX+WOwn
+         lItXUIStJdnAkx3g3i8poiEiP+YnfW0655kw5Vm/6PUMLmh1RDkW2ID6tju60z9LrGGI
+         StlrYc4wMB1fIvG97TKcwkVT4X9XU35ieu1pHOrwu0ZDMxXh3iMzWLN39yckAbyMOA01
+         WZNxWQ21asgKkq4z410fUgcUxibNq+BRaKNKcS6VB/yk22uZ1j+u5MPUBNYlupXx51tZ
+         gAICapFLEtL49EHvYcUL/6qRvJZcAxJCfxSMA9UGjeiOAW0NbeOuzqvef8VrPbm/1RZq
+         6T5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Aka4v4J6eN44pOf1Tlt4VSvLy5q1UFQKce/CVZypNEw=;
-        b=h0XT8wkvNfLKNSZC9nCNataq7gnD+gDdm0J5Be4SdJ3g4uH0kFdt6wMQ10UvsymvGl
-         I5bQGCcso7aVSMUUi+/ZwMBclm2nf4M0eOV88LorkFjy+g9MWsxbAKcu3jFkB/2qdhil
-         C07e7OjAv9X+sVH/VZ8hpYGNdPCouRbZAPkWCD0K1JL9CTTPN5AZfNb8/2hppmHHx08W
-         3kjoXNk8RhdNHEJtP60HEDG4G02oL6u9vMSldS3sdzc+q6MU/N23/DByMGPXyakcE8ER
-         rEtIO8Q7p1tdrIcmIxqVNLu2WcytJjo3bOzP8W0I3Pwe+q9IjL6CHqUUdpYei+o0FVWS
-         z1tQ==
-X-Gm-Message-State: APjAAAUvuBLEhsMnqzejO/QbXOuAeHnKhpNI5wfnjBgDGByah09rWN+G
-        PS6l9f3a8D+3s9Bfejptp75VCkmARdvVQus8DXWPLQ==
-X-Google-Smtp-Source: APXvYqyD+RsQp/VJysfXhinZp+vmG/2N5yxVTFBn12GKQ41ADuv+3/4WYif5/EPX7EjHoTOMd3Gn0b0O4Dy7+1RPJUI=
-X-Received: by 2002:adf:e742:: with SMTP id c2mr6926586wrn.262.1582613972896;
- Mon, 24 Feb 2020 22:59:32 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IK76F8Hano/AjV4cpJJAOJ2mTmDW0uldHdnyQdU/cHE=;
+        b=EywIXVKYmNzKdfNmC8652to4r8b7T7D/jvwsNjXWuBXtsLaIUBUnLsQHrojx4UzRg5
+         GvqwjURIIp3f8UGds+Tb2AJpC1DNSzj1AkGu21BIyREUVKYmltXhVXrJu5Q42Ewy2+lq
+         kObReNvh+/2Z64EGPeay9I574lvVpfz3yCtUA8BYko7NBiz/fS8kYFjTQrNDIGly1jbY
+         dQtOtHwbBdtlDKwrw6ykfAuILqFfajr44HEn22Q1VgSoneDQhXUjKwEdzhpuohIGJJn+
+         5WtqYWUyYnU3+zN2CopGvCduWTL1vghBRUlk6qKi4OXoHY0dBljkN1t14v7ppgbqdkPA
+         TZtQ==
+X-Gm-Message-State: APjAAAXKEPXYzMCpwN58TmvkaTpgfEGIiwFZJFKCO9Ow/7Xa9wvtpO8d
+        5usQf2K+YpbnGzgkZ5Qe/jhqdTM+lws=
+X-Google-Smtp-Source: APXvYqzLSlhL4GhOvl4MxhdxldTzPtSTEdIA0t8ftce4gJtZ91z5AjEphaFVJT2kZGMn6HoYPAOK3g==
+X-Received: by 2002:a17:902:9349:: with SMTP id g9mr53551718plp.110.1582616078673;
+        Mon, 24 Feb 2020 23:34:38 -0800 (PST)
+Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
+        by smtp.gmail.com with ESMTPSA id j125sm15642787pfg.160.2020.02.24.23.34.37
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Feb 2020 23:34:37 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC 1/5] Bluetooth: Add BT_MODE socket option
+Date:   Mon, 24 Feb 2020 23:34:33 -0800
+Message-Id: <20200225073437.11212-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
- <CABBYNZKc6UPfYLbesAk0fUaGWFHP6GNtMQHFAOt+p+Yy0jNkWg@mail.gmail.com> <CAJQfnxGoRhuw9_+v=TUXTa1j_rO7qZEVS=UnzS6TwNHt1FudRg@mail.gmail.com>
-In-Reply-To: <CAJQfnxGoRhuw9_+v=TUXTa1j_rO7qZEVS=UnzS6TwNHt1FudRg@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Tue, 25 Feb 2020 14:59:21 +0800
-Message-ID: <CAJQfnxEce-dH5Qrf538hiKZUvGmWox_Dx-RU6zS3n4Fd4X-F+Q@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] src/profile: Ensure class UUID matches before
- connecting profile
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-After looking at the code for device.c you pointed out,
-apparently the function update_bredr_services() is called two times
-upon connecting to a device, the first one for UUID 0x0100 (L2CAP),
-then the second one for UUID 0x1200 (PNP).
+This adds BT_MODE socket option which can be used to set L2CAP modes,
+including modes only supported over LE which were not supported using
+the L2CAP_OPTIONS.
 
-I am not clear as to why BlueZ needs to search for those two records,
-but this might impacted the decision to move the service class ID
-filtering to sdp-client.c, because the service class ID of the records
-will never match 0x0100, so it will all be filtered out.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/bluetooth.h |  2 +
+ net/bluetooth/l2cap_sock.c        | 64 ++++++++++++++++++++++++-------
+ 2 files changed, 53 insertions(+), 13 deletions(-)
 
-Could you confirm that it is okay to filter all records based on the
-service class ID, especially considering all records related to L2CAP
-query will not execute this part of the code?
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4630
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 1576353a2773..c361ec7b06aa 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -139,6 +139,8 @@ struct bt_voice {
+ #define BT_PHY_LE_CODED_TX	0x00002000
+ #define BT_PHY_LE_CODED_RX	0x00004000
+ 
++#define BT_MODE			15
++
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 305710446e66..640cb461af9d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -616,6 +616,16 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			err = -EFAULT;
+ 		break;
+ 
++	case BT_MODE:
++		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (put_user(chan->mode, (u8 __user *) optval))
++			err = -EFAULT;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -641,6 +651,28 @@ static bool l2cap_valid_mtu(struct l2cap_chan *chan, u16 mtu)
+ 	return true;
+ }
+ 
++static int l2cap_set_mode(struct l2cap_chan *chan, u8 mode)
++{
++	switch (chan->mode) {
++	case L2CAP_MODE_LE_FLOWCTL:
++		break;
++	case L2CAP_MODE_BASIC:
++		clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
++		break;
++	case L2CAP_MODE_ERTM:
++	case L2CAP_MODE_STREAMING:
++		if (!disable_ertm)
++			break;
++		/* fall through */
++	default:
++		return -EINVAL;
++	}
++
++	chan->mode = mode;
++
++	return 0;
++}
++
+ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 				     char __user *optval, unsigned int optlen)
+ {
+@@ -690,19 +722,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 			break;
+ 		}
+ 
+-		chan->mode = opts.mode;
+-		switch (chan->mode) {
+-		case L2CAP_MODE_LE_FLOWCTL:
+-			break;
+-		case L2CAP_MODE_BASIC:
+-			clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
+-			break;
+-		case L2CAP_MODE_ERTM:
+-		case L2CAP_MODE_STREAMING:
+-			if (!disable_ertm)
+-				break;
+-			/* fall through */
+-		default:
++		if (l2cap_set_mode(chan, opts.mode)) {
+ 			err = -EINVAL;
+ 			break;
+ 		}
+@@ -952,6 +972,24 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 		chan->imtu = opt;
+ 		break;
+ 
++	case BT_MODE:
++		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (get_user(opt, (u8 __user *) optval)) {
++			err = -EFAULT;
++			break;
++		}
++
++		if (l2cap_set_mode(chan, opt)) {
++			err = -EINVAL;
++			break;
++		}
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+-- 
+2.21.1
 
-Thanks,
-Archie
-
-On Tue, 25 Feb 2020 at 13:58, Archie Pusaka <apusaka@google.com> wrote:
->
-> Hi Luiz,
->
-> On Tue, 25 Feb 2020 at 03:30, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Fri, Feb 21, 2020 at 12:41 AM Archie Pusaka <apusaka@google.com> wrote:
-> > >
-> > > From: Archie Pusaka <apusaka@chromium.org>
-> > >
-> > > According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
-> > > might be multiple service records returned in a SDP Service Search
-> > > Attribute Response. Also, according to 2.5.2, the service pattern
-> > > can match any UUID contained within the service record, it doesn't
-> > > have to match only some specific attributes of the record.
-> > >
-> > > Therefore, before using the service record to connect to any
-> > > profile, first we must check that the service class ID of the
-> > > service record matches with whatever UUID specified in the service
-> > > pattern we are looking for.
-> >
-> > Im surprised we were not doing this currently, Im fairly sure we do
-> > that for the services/plugin though since there are only probed if the
-> > service UUID matches
-> >
-> > > ---
-> > >
-> > >  src/profile.c | 26 ++++++++++++++++++++++++++
-> > >  1 file changed, 26 insertions(+)
-> > >
-> > > diff --git a/src/profile.c b/src/profile.c
-> > > index 192fd0245..1b481836e 100644
-> > > --- a/src/profile.c
-> > > +++ b/src/profile.c
-> > > @@ -1568,8 +1568,34 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
-> > >
-> > >         for (r = recs; r != NULL; r = r->next) {
-> > >                 sdp_record_t *rec = r->data;
-> > > +               sdp_list_t *svcclass;
-> > > +               sdp_list_t *svcclass_iter;
-> > >                 sdp_list_t *protos;
-> > >                 int port;
-> > > +               bool matches_class_uuid = false;
-> > > +
-> > > +               if (sdp_get_service_classes(rec, &svcclass) < 0) {
-> > > +                       error("Unable to get svc class ID list from %s record",
-> > > +                                                               ext->name);
-> > > +                       continue;
-> > > +               }
-> > > +
-> > > +               for (svcclass_iter = svcclass; svcclass_iter != NULL;
-> > > +                                       svcclass_iter = svcclass_iter->next) {
-> > > +                       char *uuid = bt_uuid2string(svcclass_iter->data);
-> > > +                       int cmp_result = bt_uuid_strcmp(uuid, ext->uuid);
-> >
-> > I think it would be probably more efficient to convert to data to
-> > binary format (bt_uuid_t) and then do the comparision with
-> > bt_uuid_cmp, also there might not be needed to iterate at all see
-> > device.c:update_bredr_service which has the logic for updating
-> > records:
-> >
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4602
->
-> I was uncertain whether we need to iterate or not, so I went for the safer side.
-> However if there is no need to do that then this shall be updated.
-> I also agree that comparison in binary should be faster.
->
-> >
-> > Btw, we should probably have bt_search_service doing the matching if
-> > the uuid is set instead of returning all records like it seems to be
-> > doing that way we don't have to maintain duplicate logic in both
-> > device.c and profile.c
->
-> Got it. somewhere in sdp-client.c is a good idea.
-> Aside from device.c and profile.c, is this also used somewhere else
-> though? We might also want to take them out if we are to implement
-> the check in sdp-client.c.
->
-> >
-> >
-> > > +                       free(uuid);
-> > > +                       if (cmp_result == 0) {
-> > > +                               matches_class_uuid = true;
-> > > +                               break;
-> > > +                       }
-> > > +               }
-> > > +
-> > > +               sdp_list_free(svcclass, free);
-> > > +
-> > > +               if (!matches_class_uuid)
-> > > +                       continue;
-> > >
-> > >                 if (sdp_get_access_protos(rec, &protos) < 0) {
-> > >                         error("Unable to get proto list from %s record",
-> > > --
-> > > 2.25.0.265.gbab2e86ba0-goog
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
->
-> Thanks,
-> Archie
