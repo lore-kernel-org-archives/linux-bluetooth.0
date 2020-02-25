@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EE7C35DF5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 13:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE38C35E01
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 13:08:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2719D20CC7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 13:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF3FF20CC7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 13:08:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/aX2xkl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uvN6kIxK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730111AbgBYNHX (ORCPT
+        id S1730222AbgBYNIV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Feb 2020 08:07:23 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:40277 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729193AbgBYNHW (ORCPT
+        Tue, 25 Feb 2020 08:08:21 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:37929 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729564AbgBYNIV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Feb 2020 08:07:22 -0500
-Received: by mail-pl1-f196.google.com with SMTP id y1so5473088plp.7;
-        Tue, 25 Feb 2020 05:07:22 -0800 (PST)
+        Tue, 25 Feb 2020 08:08:21 -0500
+Received: by mail-pf1-f195.google.com with SMTP id x185so7166950pfc.5;
+        Tue, 25 Feb 2020 05:08:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
         bh=1bjATN5yUQRktfOaoPKCC0Tyl9TIao9QDPF9Tp8wgtM=;
-        b=c/aX2xklwzN+KnL1Z0gS/vWAo34D7B+EVCyRXa1sgSGIxkEwXGMtnLjDb06SaW6TV4
-         poMEIqGLmg1KJrMLIUiVgZS0KWPG8ctxN7CBg9Ly/OimQ1ZgN6Y6NgVj7AgdClRM+jb5
-         EW0Xut8jNmTiVhGfgelmisiwJiDIwm7tuzzx2el4955WR6jKsFGeUJMrgOzeOLIvdzSJ
-         itgDnFljBrFvVl9FVXN63kKDys0rdJtm/Xwkv9kEVztRae2l2+34UPgc5tjPIK3swwx4
-         jnMp7VuSAmIfweh50M43NWjfak/4QtyjVk28klahBW9drhnBIsR1Ud1/0RionuTuDYhv
-         yLeg==
+        b=uvN6kIxK9vk6GbegcH4Kbd7p2T9YC5SqOl4mUP7VZYonTQTCsZzdM5Wb/iD3AGteau
+         sUjlLSX5mg48I8NaR6m8Ls4t45N+CXdESz1LJ8pYWP9VIVGHPbEjt7vKINgMQoHR8k/N
+         S4c5mu7Boh49/asjAfxDsrczi3xkcjA5TmYu7C3zhAZTjnOfimGQXGlJKHIIo6vHMNfY
+         5HWx5XVpCFys9o4JmQk0u0V9zsev1jLeTU3aTJu0DIA6z3e66IwQ0y7+T4ta0v/RQVYE
+         HFYzLyR4QjxCcPPaH3z6pVIjTRcZPXr0tyojGCk5PZkeDuTnnU61zGtj1aX9wuHta89S
+         hTNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
         bh=1bjATN5yUQRktfOaoPKCC0Tyl9TIao9QDPF9Tp8wgtM=;
-        b=SCdv8jUd1wzquk2X3S06G19VJX0SoDB4tkC0RlhWDvVDAnQocZ4G46AG58r6OvnElP
-         4Iy3bjTC9fSdcMuWxPgciaXgnE/FnPhrsXOzJqg+dSI34n2JXg8IXtKrNNMshi9vM6MC
-         DHmcGfNhlaIf6tv6BMvFCfszGXNvsvHuH1w00N/C1b4aZvVOoA6bSxJBu2UCddmTzo+/
-         0HKMyTL3zS/lVHJh+2py0hyzMCDk3AxGt03yq56CmfsCOlpnj8b1K40WmPLJe1V/BxPg
-         iYBzyHHiNZ8ho5D/tgfK40iaoFXFEJuWrpj1+/YviR0hXPZyJb21mGzyRYGW2vMUvul2
-         Hbzg==
-X-Gm-Message-State: APjAAAWS1yhv/ko78ryHM6cRYNmI0DGxPjRNbzGGTgEjECqAtZTWmXUL
-        1n4a2dx7OD3o0YNqiZaOSvBcmR8=
-X-Google-Smtp-Source: APXvYqx9u7699mSLH5QM5nQvKggMKDwMmVA1TGSCMDygfPwY1tQRBvHxTUNFIRyMh+PucBct8heGZA==
-X-Received: by 2002:a17:902:223:: with SMTP id 32mr55786706plc.167.1582636041493;
-        Tue, 25 Feb 2020 05:07:21 -0800 (PST)
-Received: from madhuparna-HP-Notebook.nitk.ac.in ([112.79.48.254])
-        by smtp.gmail.com with ESMTPSA id e2sm3156979pjs.25.2020.02.25.05.07.16
+        b=LxnLw241wodknEsEzoqiqtoDjr6NWY/DdOGZuZ8a2UbU1LfbucZ7gOtnVkoalC0cqy
+         7uhCWaLnJZTX92/WdWUbmOVCbnhiS992X4qVvdaGTKosHSSiVqExBZVrFc0acTuAOh4y
+         koNOVcMyFdj5ut//ajFy4ifXYJr2n0sBioyakPTy43pTOFAedgBcJx+/UWEJ0jcBfnN4
+         wbt/3lXuZv/J0wXnAfQI7XeQKYdj9vEm/kg3HTLlVwSdi18l3QMiA9Po7udgIf3HS8n0
+         hPYgw738m+YJgZEzFeNoatLmIkfV6vheZBTj4tmyusfEVfmo3vWDVw4HZtHnn2sZl4S+
+         67yg==
+X-Gm-Message-State: APjAAAXwFf/NF3o0JukuLbJTFYiqhhafImNuIUbRGj4DLgsguZfusmGJ
+        sZaArdWt/v1yG/AG9zlUXQ==
+X-Google-Smtp-Source: APXvYqwaimesWPD/s9AtUlqC9UWr76llfcjVPJ/inH6Pf263cKIywJYT06l587vdDDb+Q4G/RHQ4Uw==
+X-Received: by 2002:a63:cf4f:: with SMTP id b15mr34802096pgj.287.1582636099106;
+        Tue, 25 Feb 2020 05:08:19 -0800 (PST)
+Received: from madhuparna-HP-Notebook.nitk.ac.in ([2402:3a80:1ee1:f355:dcbb:6353:6580:5d41])
+        by smtp.gmail.com with ESMTPSA id 5sm17241541pfx.163.2020.02.25.05.08.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2020 05:07:20 -0800 (PST)
+        Tue, 25 Feb 2020 05:08:18 -0800 (PST)
 From:   madhuparnabhowmik10@gmail.com
 To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
         kuba@kernel.org
 Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.or, joel@joelfernandes.org,
+        linux-kernel@vger.kernel.org, joel@joelfernandes.org,
         linux-kernel-mentees@lists.linuxfoundation.org,
         frextrite@gmail.com, paulmck@kernel.org,
         Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 Subject: [PATCH] net: bluetooth: hci_core: Fix Suspicious RCU usage warnings
-Date:   Tue, 25 Feb 2020 18:36:38 +0530
-Message-Id: <20200225130638.32394-1-madhuparnabhowmik10@gmail.com>
+Date:   Tue, 25 Feb 2020 18:38:09 +0530
+Message-Id: <20200225130809.32750-1-madhuparnabhowmik10@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
