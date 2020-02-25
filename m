@@ -2,319 +2,218 @@ Return-Path: <SRS0=zBEa=4N=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD336C35DFA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 07:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D02C35DF5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 08:04:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A949F21556
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 07:34:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E63D922464
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Feb 2020 08:04:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qAH3mcUm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXwPT+Nq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729139AbgBYHep (ORCPT
+        id S1729593AbgBYIEx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Feb 2020 02:34:45 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:44987 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728978AbgBYHeo (ORCPT
+        Tue, 25 Feb 2020 03:04:53 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:40876 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729443AbgBYIEx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Feb 2020 02:34:44 -0500
-Received: by mail-pl1-f195.google.com with SMTP id d9so5122392plo.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Feb 2020 23:34:44 -0800 (PST)
+        Tue, 25 Feb 2020 03:04:53 -0500
+Received: by mail-ot1-f67.google.com with SMTP id i6so11268119otr.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Feb 2020 00:04:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=Hp+0qwGkrzfKZN0Z2QFev4gemFzE4pAmbHXzWgyKMT4=;
-        b=qAH3mcUmDKDgq4w2u/xwFT2K+jSn4o4rz6L6ma1DUEYZUo6pQSz3IUM2XzQkYbHv4x
-         JZu6vKMWi5x6afB18iCxbvjhokiDiwtn2IhG6q12G0BwV42olPBiu2VwDyENLq9T+129
-         2QU6iptbikf7mNyRM5+eW1Vi/tpycs6MvkoPcWmpElNBWskUzVgnQ03tQ2NnzMC6VrA7
-         PdBJg2XMcl0f+QnLm6D4LKmUlMPgQIpJGlzIHS+ZjbtcUNUgphJAq011KU5b/LuK8mPm
-         GKnFPtVcGd6tQ07WLskSXh41h4Va2I/ze2hTUaS8FrnjuNGo9lsJma+yLDFvwg8khEpN
-         JZLQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OAPj1XBZLNFAf4SineVPDvFpHYh1qFQIuQAZtHLdUtc=;
+        b=lXwPT+Nq93BPpcUK+ygkKpiqn2heGVdf9eFTnq0l7k6/xDENj4479/5RYmP7NE0oUy
+         Dshf65ACoUiaZQsm/ePnf7/bW7KS+h72QutFuXX+WBKufZDjdUBy/4gSK3E9uIDA3RF1
+         T1lOOk07CYTa7IErSk16DdikvJc4/pKmUti5b0fWBsLzlP2w/2cC7VbZ5vs6olOX4S/K
+         TpMV6F3rXtS1SMWdd3KNrizHX6MkLDdgHmVLUycnVLxesE/5TCIhppe9tf/vSOnyQ5g+
+         cAEw/6UzwOYBZ3TYRxiPx8KvJoJNc4uxe151f3iiMbBEPWZvUKlPIbQSm4Pfx1nvDO8P
+         nHuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Hp+0qwGkrzfKZN0Z2QFev4gemFzE4pAmbHXzWgyKMT4=;
-        b=bKu7QuFoNDBv2+ayWgZfg9CcwyT8oxtlM/jDaVcCXeuRQaFakUk5Vha5IE+egMbdDw
-         qtHjdGwfvR2sVmZxh3lV+tLkspI0PuKlvrnx8+lP25ej5QgK7SGHc3XR5yEgCPuyzo2c
-         F9JqjPK7xSXPRIlYhw7gIcfUxmPKYF7kU+Uo6IwWtDgs/reAUXFgbURCr2umbzBCj2HK
-         SI8W0Dh9ON7RQQi/4JmVuuZkGmYte707X916HpDww08rQiORi2mzrLBefFVRwiKWgdb0
-         xdegO7skJ/MaGOuLUeCNYc4SNpAdsTgOR/3VHAO0QUpwZTUxVNKu1RxYrMy3Yr6k0mXW
-         3OUw==
-X-Gm-Message-State: APjAAAX9X2vXtylJfkxb7VByuzsM2pI5LnhARDYmYmK/qNGtTPk5Rw6L
-        v/N8mKTYHxn7tU1FRTdXGtKysp0b8pI=
-X-Google-Smtp-Source: APXvYqxBcFUWOVSOcQ6/sg2U9cot8m+II+o/M1wB8Wm5EXPwPP2r6hME+jNW1X68M6kTDJB515LMHQ==
-X-Received: by 2002:a17:90a:a385:: with SMTP id x5mr3721623pjp.102.1582616083681;
-        Mon, 24 Feb 2020 23:34:43 -0800 (PST)
-Received: from vudentzs-t460s.amr.corp.intel.com ([2601:1c0:6800:1640::3287])
-        by smtp.gmail.com with ESMTPSA id j125sm15642787pfg.160.2020.02.24.23.34.42
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2020 23:34:42 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/5] Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections
-Date:   Mon, 24 Feb 2020 23:34:37 -0800
-Message-Id: <20200225073437.11212-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200225073437.11212-1-luiz.dentz@gmail.com>
-References: <20200225073437.11212-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OAPj1XBZLNFAf4SineVPDvFpHYh1qFQIuQAZtHLdUtc=;
+        b=iCoeK2Il66bsNAJjGAbC7hv1S2X8k2a4V37/rigXsqD5jQUNKLCRxQga50VlIsjjcw
+         JGnNbXg+uRYWXoqqnxITnQKhpaZ7uhbPmxUZwoN5Jzect0ABVsqjHcdMHKVaO2MNYnlv
+         EYs6qXJHKJFSCHN70nfKvydQMkSwAsLIemD2x+gfVo0p/CoSU2lwWnYjdG2JJ1IWFXMz
+         7BfTT/I6axh+6sJh6qPl4Th1lVcIZ7MMM1vEY8IAGWGv+KefkF7SEdMYxKruriGNHgzG
+         fGpYcEfBFs4blJ7Mlko2GgHuyEWD3d0ed70zFamrvosYKSaeJNrNO+l5Xe2CAuUjFowq
+         kgRQ==
+X-Gm-Message-State: APjAAAVaNmpmYdcGW9ZWUC7Db616BHFJ0v4Vi4GrWyPXKduCQlSMujom
+        +JkWn3vlgDffeeslfrtp9aEes+v4vhWXyVHHF6U=
+X-Google-Smtp-Source: APXvYqwN4YIQYVLshYqI4/hI6S2RPwcowXMq5a0nZ8g3JILQHNWRotH8xNlwjN5iYlI5nmeBhkNs4G8I3/UlZfZuYCo=
+X-Received: by 2002:a9d:6d10:: with SMTP id o16mr45080894otp.28.1582617890863;
+ Tue, 25 Feb 2020 00:04:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200221163911.Bluez.v1.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
+ <CABBYNZKc6UPfYLbesAk0fUaGWFHP6GNtMQHFAOt+p+Yy0jNkWg@mail.gmail.com>
+ <CAJQfnxGoRhuw9_+v=TUXTa1j_rO7qZEVS=UnzS6TwNHt1FudRg@mail.gmail.com> <CAJQfnxEce-dH5Qrf538hiKZUvGmWox_Dx-RU6zS3n4Fd4X-F+Q@mail.gmail.com>
+In-Reply-To: <CAJQfnxEce-dH5Qrf538hiKZUvGmWox_Dx-RU6zS3n4Fd4X-F+Q@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 25 Feb 2020 00:04:38 -0800
+Message-ID: <CABBYNZJ2c_HSGku_5gtMQ=HrO96vL5hRN+4ZAWyYbxcCQJz4wA@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] src/profile: Ensure class UUID matches before
+ connecting profile
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Archie,
 
-This uses the DEFER_SETUP flag to group channels with
-L2CAP_CREDIT_BASED_CONNECTION_REQ.
+On Mon, Feb 24, 2020 at 10:59 PM Archie Pusaka <apusaka@google.com> wrote:
+>
+> Hi Luiz,
+>
+> After looking at the code for device.c you pointed out,
+> apparently the function update_bredr_services() is called two times
+> upon connecting to a device, the first one for UUID 0x0100 (L2CAP),
+> then the second one for UUID 0x1200 (PNP).
+>
+> I am not clear as to why BlueZ needs to search for those two records,
+> but this might impacted the decision to move the service class ID
+> filtering to sdp-client.c, because the service class ID of the records
+> will never match 0x0100, so it will all be filtered out.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/l2cap.h |  5 +++
- net/bluetooth/l2cap_core.c    | 81 ++++++++++++++++++++++++++++++-----
- net/bluetooth/l2cap_sock.c    | 49 ++++++++++++++++++---
- 3 files changed, 120 insertions(+), 15 deletions(-)
+Right that is looking for all records basically, since L2CAP is
+included everytime, so we need to keep that working, so perhaps a
+better alternative would be to have a second helper function that does
+the filtering or extend bt_search_service with another parameter, but
+I guess doing the former is cleaner, though I rename bt_search_service
+to just bt_search and the later since that doesn't do any filtering
+and leave bt_search_service to actually filter out base on service
+class.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 1644c9651a35..1b7be429f63c 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -47,6 +47,7 @@
- #define L2CAP_DEFAULT_ACC_LAT		0xFFFFFFFF
- #define L2CAP_BREDR_MAX_PAYLOAD		1019    /* 3-DH5 packet */
- #define L2CAP_LE_MIN_MTU		23
-+#define L2CAP_ECRED_CONN_SCID_MAX	5
- 
- #define L2CAP_DISC_TIMEOUT		msecs_to_jiffies(100)
- #define L2CAP_DISC_REJ_TIMEOUT		msecs_to_jiffies(5000)
-@@ -660,6 +661,7 @@ struct l2cap_ops {
- 	void			(*suspend) (struct l2cap_chan *chan);
- 	void			(*set_shutdown) (struct l2cap_chan *chan);
- 	long			(*get_sndtimeo) (struct l2cap_chan *chan);
-+	struct pid		*(*get_peer_pid) (struct l2cap_chan *chan);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long hdr_len,
- 					       unsigned long len, int nb);
-@@ -983,6 +985,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-+void l2cap_chan_list(struct l2cap_conn *conn,
-+		     void (*func)(struct l2cap_chan *chan, void *data),
-+		     void *data);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
- void l2cap_send_conn_req(struct l2cap_chan *chan);
- void l2cap_move_start(struct l2cap_chan *chan);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index badfbbcc0de4..8eb483948565 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -678,6 +678,23 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- }
- EXPORT_SYMBOL_GPL(l2cap_chan_del);
- 
-+void l2cap_chan_list(struct l2cap_conn *conn,
-+		     void (*func)(struct l2cap_chan *chan, void *data),
-+		     void *data)
-+{
-+	struct l2cap_chan *chan;
-+
-+	mutex_lock(&conn->chan_lock);
-+
-+	list_for_each_entry(chan, &conn->chan_l, list) {
-+		func(chan, data);
-+	}
-+
-+	mutex_unlock(&conn->chan_lock);
-+}
-+
-+EXPORT_SYMBOL_GPL(l2cap_chan_list);
-+
- static void l2cap_conn_update_id_addr(struct work_struct *work)
- {
- 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
-@@ -1356,29 +1373,73 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
- 		       sizeof(req), &req);
- }
- 
--static void l2cap_ecred_connect(struct l2cap_chan *chan)
--{
--	struct l2cap_conn *conn = chan->conn;
-+struct l2cap_ecred_conn_data {
- 	struct {
- 		struct l2cap_ecred_conn_req req;
--		__le16 scid;
-+		__le16 scid[5];
- 	} __packed pdu;
-+	struct l2cap_chan *chan;
-+	struct pid *pid;
-+	int count;
-+};
-+
-+static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
-+{
-+	struct l2cap_ecred_conn_data *conn = data;
-+
-+	if (chan == conn->chan)
-+		return;
-+
-+	/* Only add deferred channels with the same PID/PSM */
-+	if (conn->pid != chan->ops->get_peer_pid(chan) ||
-+	    chan->psm != conn->chan->psm || chan->ident ||
-+	    chan->mode != L2CAP_MODE_EXT_FLOWCTL ||
-+	    chan->state != BT_CONNECT)
-+		return;
-+
-+	if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
-+		return;
-+
-+	/* Set the same ident so we can match on the rsp */
-+	chan->ident = conn->chan->ident;
-+
-+	/* Include all channels deferred */
-+	conn->pdu.scid[conn->count] = cpu_to_le16(chan->scid);
-+
-+	conn->count++;
-+}
-+
-+static void l2cap_ecred_connect(struct l2cap_chan *chan)
-+{
-+	struct l2cap_conn *conn = chan->conn;
-+	struct l2cap_ecred_conn_data data;
-+
-+	if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
-+		return;
- 
- 	if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
- 		return;
- 
- 	l2cap_ecred_init(chan, 0);
- 
--	pdu.req.psm     = chan->psm;
--	pdu.req.mtu     = cpu_to_le16(chan->imtu);
--	pdu.req.mps     = cpu_to_le16(chan->mps);
--	pdu.req.credits = cpu_to_le16(chan->rx_credits);
--	pdu.scid        = cpu_to_le16(chan->scid);
-+	data.pdu.req.psm     = chan->psm;
-+	data.pdu.req.mtu     = cpu_to_le16(chan->imtu);
-+	data.pdu.req.mps     = cpu_to_le16(chan->mps);
-+	data.pdu.req.credits = cpu_to_le16(chan->rx_credits);
-+	data.pdu.scid[0]   = cpu_to_le16(chan->scid);
- 
- 	chan->ident = l2cap_get_ident(conn);
-+	data.pid = chan->ops->get_peer_pid(chan);
-+
-+	data.count = 1;
-+	data.chan = chan;
-+	data.pid = chan->ops->get_peer_pid(chan);
-+
-+	l2cap_chan_list(chan->conn, l2cap_ecred_defer_connect, &data);
- 
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_CONN_REQ,
--		       sizeof(pdu), &pdu);
-+		       sizeof(data.pdu.req) + data.count * sizeof(__le16),
-+		       &data.pdu);
- }
- 
- static void l2cap_le_start(struct l2cap_chan *chan)
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 7ed0b79dd832..67a52fc2273e 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -172,6 +172,29 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	return err;
- }
- 
-+struct l2cap_chan_data {
-+	struct l2cap_chan *chan;
-+	struct pid *pid;
-+	int count;
-+};
-+
-+static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
-+{
-+	struct l2cap_chan_data *d = data;
-+
-+	if (chan == d->chan)
-+		return;
-+
-+	/* Only count deferred channels with the same PID/PSM */
-+	if (d->pid != chan->ops->get_peer_pid(chan) ||
-+	    !test_bit(FLAG_DEFER_SETUP, &chan->flags) ||
-+	    chan->psm != d->chan->psm || chan->ident ||
-+	    chan->state != BT_CONNECT)
-+		return;
-+
-+	d->count++;
-+}
-+
- static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 			      int alen, int flags)
- {
-@@ -235,6 +258,19 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	if (chan->psm && bdaddr_type_is_le(chan->src_type) && !chan->mode)
- 		chan->mode = L2CAP_MODE_LE_FLOWCTL;
- 
-+	if (chan->mode == L2CAP_MODE_EXT_FLOWCTL) {
-+		struct l2cap_chan_data data;
-+
-+		data.chan = chan;
-+		data.pid = chan->ops->get_peer_pid(chan);
-+		data.count = 0;
-+
-+		l2cap_chan_list(chan->conn, l2cap_chan_by_pid, &data);
-+		/* Check if there isn't too many channels being connected */
-+		if (!(data.count < L2CAP_ECRED_CONN_SCID_MAX - 1))
-+			return -EINVAL;
-+	}
-+
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
-@@ -549,11 +585,6 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
- 		break;
- 
- 	case BT_DEFER_SETUP:
--		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
--			err = -EINVAL;
--			break;
--		}
--
- 		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
- 			     (u32 __user *) optval))
- 			err = -EFAULT;
-@@ -1546,6 +1577,13 @@ static long l2cap_sock_get_sndtimeo_cb(struct l2cap_chan *chan)
- 	return sk->sk_sndtimeo;
- }
- 
-+static struct pid *l2cap_sock_get_peer_pid_cb(struct l2cap_chan *chan)
-+{
-+	struct sock *sk = chan->data;
-+
-+	return sk->sk_peer_pid;
-+}
-+
- static void l2cap_sock_suspend_cb(struct l2cap_chan *chan)
- {
- 	struct sock *sk = chan->data;
-@@ -1567,6 +1605,7 @@ static const struct l2cap_ops l2cap_chan_ops = {
- 	.suspend		= l2cap_sock_suspend_cb,
- 	.set_shutdown		= l2cap_sock_set_shutdown_cb,
- 	.get_sndtimeo		= l2cap_sock_get_sndtimeo_cb,
-+	.get_peer_pid		= l2cap_sock_get_peer_pid_cb,
- 	.alloc_skb		= l2cap_sock_alloc_skb_cb,
- };
- 
+> Could you confirm that it is okay to filter all records based on the
+> service class ID, especially considering all records related to L2CAP
+> query will not execute this part of the code?
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4630
+>
+> Thanks,
+> Archie
+>
+> On Tue, 25 Feb 2020 at 13:58, Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > Hi Luiz,
+> >
+> > On Tue, 25 Feb 2020 at 03:30, Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Archie,
+> > >
+> > > On Fri, Feb 21, 2020 at 12:41 AM Archie Pusaka <apusaka@google.com> wrote:
+> > > >
+> > > > From: Archie Pusaka <apusaka@chromium.org>
+> > > >
+> > > > According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
+> > > > might be multiple service records returned in a SDP Service Search
+> > > > Attribute Response. Also, according to 2.5.2, the service pattern
+> > > > can match any UUID contained within the service record, it doesn't
+> > > > have to match only some specific attributes of the record.
+> > > >
+> > > > Therefore, before using the service record to connect to any
+> > > > profile, first we must check that the service class ID of the
+> > > > service record matches with whatever UUID specified in the service
+> > > > pattern we are looking for.
+> > >
+> > > Im surprised we were not doing this currently, Im fairly sure we do
+> > > that for the services/plugin though since there are only probed if the
+> > > service UUID matches
+> > >
+> > > > ---
+> > > >
+> > > >  src/profile.c | 26 ++++++++++++++++++++++++++
+> > > >  1 file changed, 26 insertions(+)
+> > > >
+> > > > diff --git a/src/profile.c b/src/profile.c
+> > > > index 192fd0245..1b481836e 100644
+> > > > --- a/src/profile.c
+> > > > +++ b/src/profile.c
+> > > > @@ -1568,8 +1568,34 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
+> > > >
+> > > >         for (r = recs; r != NULL; r = r->next) {
+> > > >                 sdp_record_t *rec = r->data;
+> > > > +               sdp_list_t *svcclass;
+> > > > +               sdp_list_t *svcclass_iter;
+> > > >                 sdp_list_t *protos;
+> > > >                 int port;
+> > > > +               bool matches_class_uuid = false;
+> > > > +
+> > > > +               if (sdp_get_service_classes(rec, &svcclass) < 0) {
+> > > > +                       error("Unable to get svc class ID list from %s record",
+> > > > +                                                               ext->name);
+> > > > +                       continue;
+> > > > +               }
+> > > > +
+> > > > +               for (svcclass_iter = svcclass; svcclass_iter != NULL;
+> > > > +                                       svcclass_iter = svcclass_iter->next) {
+> > > > +                       char *uuid = bt_uuid2string(svcclass_iter->data);
+> > > > +                       int cmp_result = bt_uuid_strcmp(uuid, ext->uuid);
+> > >
+> > > I think it would be probably more efficient to convert to data to
+> > > binary format (bt_uuid_t) and then do the comparision with
+> > > bt_uuid_cmp, also there might not be needed to iterate at all see
+> > > device.c:update_bredr_service which has the logic for updating
+> > > records:
+> > >
+> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c#n4602
+> >
+> > I was uncertain whether we need to iterate or not, so I went for the safer side.
+> > However if there is no need to do that then this shall be updated.
+> > I also agree that comparison in binary should be faster.
+> >
+> > >
+> > > Btw, we should probably have bt_search_service doing the matching if
+> > > the uuid is set instead of returning all records like it seems to be
+> > > doing that way we don't have to maintain duplicate logic in both
+> > > device.c and profile.c
+> >
+> > Got it. somewhere in sdp-client.c is a good idea.
+> > Aside from device.c and profile.c, is this also used somewhere else
+> > though? We might also want to take them out if we are to implement
+> > the check in sdp-client.c.
+> >
+> > >
+> > >
+> > > > +                       free(uuid);
+> > > > +                       if (cmp_result == 0) {
+> > > > +                               matches_class_uuid = true;
+> > > > +                               break;
+> > > > +                       }
+> > > > +               }
+> > > > +
+> > > > +               sdp_list_free(svcclass, free);
+> > > > +
+> > > > +               if (!matches_class_uuid)
+> > > > +                       continue;
+> > > >
+> > > >                 if (sdp_get_access_protos(rec, &protos) < 0) {
+> > > >                         error("Unable to get proto list from %s record",
+> > > > --
+> > > > 2.25.0.265.gbab2e86ba0-goog
+> > > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+> >
+> >
+> > Thanks,
+> > Archie
+
+
+
 -- 
-2.21.1
-
+Luiz Augusto von Dentz
