@@ -2,272 +2,149 @@ Return-Path: <SRS0=9bU/=4O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66235C4BA1E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Feb 2020 17:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6B9C4BA21
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Feb 2020 19:23:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 298D8206E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Feb 2020 17:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16C6120732
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Feb 2020 19:23:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFQM6xFD"
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="zV1KWTrk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgBZRy7 (ORCPT
+        id S1727174AbgBZTXR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Feb 2020 12:54:59 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:40672 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726917AbgBZRy7 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Feb 2020 12:54:59 -0500
-Received: by mail-oi1-f194.google.com with SMTP id a142so377676oii.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2020 09:54:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=estgmIbjcZDTvCbjUaIPeX0dZo67rE0n+PpIAnMK5Hc=;
-        b=jFQM6xFD1c1IPx4g9xfssH5ZauO2pJLvr789qjGrr/0vZ1rRZSU6Ma3w394t0lFj77
-         2q60BcMI/VWHmlIlWeH0pmgJLCpmMQSZIcjfMcvnlY8oBrTDbOkfHbGC0OYSRjDOK72H
-         BpCaSDYE7q61tG+Nx8FyvMgvyEBYaUyP7a3mMVyOKwPpEoVPuJ8TSyqkdueGn12H8ULQ
-         maBziS82skRBbQds8Q7fMUPRsSFa9NyyLNGmoL4kZtazNhQ0TKn4NmBCab74iX2RBTai
-         8ZqzvF+T0FdXvu6CXl1IKL+UG1805Eh4hGhD0cgXyR0HUZPw2VHHCluywIDz+SnEb5PY
-         521w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=estgmIbjcZDTvCbjUaIPeX0dZo67rE0n+PpIAnMK5Hc=;
-        b=og2UC218sfya1Yt2VRu7+edsodh1X2fqBwBOQt7Bs29Eauw3NaOvm/DDj0pl+kfl1f
-         7bdm8bC4y652mIY3HNyXUcJ+W1lgZV6j1KQW84P84fRW+HjCvmgDqlY9aPorxFmvEFJd
-         p/E6yHj44i7ZqLeDmRdVI2AWw/GOJz4kxhXSmk2o0xn1/emZiU0Ji510JyJD8TK2le1A
-         /oye833I8t77coYUw3ZwdLOCnwHVzNG83GMhfLaBlyDbU3btVaTC495tafzsFLr1E7Ag
-         7iyhOnktz2pIG7g96H6xMe8dW9dKatBJquvMkZqURGR1woXlJXJcC/8LhLgW8+u2ugmr
-         uhXw==
-X-Gm-Message-State: APjAAAWG0gfddslT3bbaNbo8XoxaoN0F9C69L1c6J8VRpJ6H9IKZA4Hs
-        qd3W8tgH7B5jofUdHMbApZrIX5DdcECtB8ilIgc=
-X-Google-Smtp-Source: APXvYqwO902TJyHrNWF8i7hfu8kGSAYUwhK8Z1cLHckLv6MM9z7S3F+RdrxCu2KXy6fMsb/d79fzW4P+uHmUE/tecu8=
-X-Received: by 2002:a05:6808:10b:: with SMTP id b11mr160503oie.110.1582739698481;
- Wed, 26 Feb 2020 09:54:58 -0800 (PST)
+        Wed, 26 Feb 2020 14:23:17 -0500
+Received: from mga06.intel.com ([134.134.136.31]:64851 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727035AbgBZTXR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 26 Feb 2020 14:23:17 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Feb 2020 11:23:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,489,1574150400"; 
+   d="scan'208";a="241779088"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by orsmga006.jf.intel.com with ESMTP; 26 Feb 2020 11:23:16 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 26 Feb 2020 11:23:16 -0800
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 26 Feb 2020 11:23:15 -0800
+Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 26 Feb 2020 11:23:15 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.176)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Wed, 26 Feb 2020 11:23:15 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eIN5zpir4ZDPRarTceIU+jAwdtvTyWKsoIGsSGwgtCyA0TXJYODvtX15DUVGTUPm1t/Z0/vakLTWK0TIXqXAXDYue68VbRkSIDoiskwpP3KUYOosR11p6R0/z3mIizhq+3B4s8k0R4aUL46I0ZhHyBMtrGh0CMDlLxoIVXGH16JTvbmJtFHUZ2WHEVPr1pu+4fnrhtXz8G/G/ZLYcWep6QOvZozSXCaJac6CBP87535yWIffn85eXFN3nTAUU3D+3JSZPZNJdGQSYMIS14K1NCDieZ190N4l0n5RNG6rs8AxEo+jHFYIiLjt29i9WcgQzI44bsa9y/PuTf00z4nN7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hFxRj0gX0xffdCs8sSDe61j0XcMNaaS6REoLKvfEXuk=;
+ b=HU1Ii9FvqH1TiOvK0U47SdkZV7r+PupFYw+siSFnFN25ab+8UnpbiqrOVYQO3m3AWFylpad/127HuAonfyZZVU858MSoxl0k+mLc698mlZviKqHAWA0qljzHlx2KNUTef6w6sI8RDKkTdNrKCNbamFdUuX4mNbkVODq8USKuBqIP2+xWLWQ0YXn5w+w5PjYU3LKtRvuZs1txKrSaJ76zbSp3VW2vWLBtMXvlOoAPrZD9v0YxfIHH+dEStPLVclzJ2uBFEZyNFvqS5TcqdSc7n/nArWX7fcH52YforkyfHKdoeM66CalEFwcx9lqA//w1uvJDSPQ6qvGCUblKzxcQvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hFxRj0gX0xffdCs8sSDe61j0XcMNaaS6REoLKvfEXuk=;
+ b=zV1KWTrkXA2l/MLVV1fGnB46LNuVFX8quM4BbcCcNEJh+h7ayh9Mi+djF5pyQEFyQnViCQtN7ExC96HIjf2ejsHveNlp1JgQY3HoOhRGH1fIlREchar6tgFvqlnGTVYxu9W6+8kTkOPmQ4/9AcFvcPq2uodlXAo11uAMvC0CjLc=
+Received: from BN7PR11MB2580.namprd11.prod.outlook.com (2603:10b6:406:b5::27)
+ by BN7PR11MB2708.namprd11.prod.outlook.com (2603:10b6:406:a9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.22; Wed, 26 Feb
+ 2020 19:23:14 +0000
+Received: from BN7PR11MB2580.namprd11.prod.outlook.com
+ ([fe80::c8ca:3c11:3fc5:a9d6]) by BN7PR11MB2580.namprd11.prod.outlook.com
+ ([fe80::c8ca:3c11:3fc5:a9d6%6]) with mapi id 15.20.2750.021; Wed, 26 Feb 2020
+ 19:23:14 +0000
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ v3 0/6] Support for virtual labels
+Thread-Topic: [PATCH BlueZ v3 0/6] Support for virtual labels
+Thread-Index: AQHV7Au4/gP00pQgLEC//vTaMK0wxqgt3EiA
+Date:   Wed, 26 Feb 2020 19:23:14 +0000
+Message-ID: <30afc21c1d9789992ad8f929d103d1019ac7fe92.camel@intel.com>
+References: <20200225184418.12660-1-inga.stotland@intel.com>
+In-Reply-To: <20200225184418.12660-1-inga.stotland@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brian.gix@intel.com; 
+x-originating-ip: [192.55.54.38]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d8b4ae38-8943-4049-8905-08d7baf1539c
+x-ms-traffictypediagnostic: BN7PR11MB2708:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN7PR11MB2708B69D3BA5238847B0AB39E1EA0@BN7PR11MB2708.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4502;
+x-forefront-prvs: 0325F6C77B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(396003)(366004)(376002)(39860400002)(346002)(189003)(199004)(66946007)(81156014)(8676002)(64756008)(66476007)(66446008)(66556008)(81166006)(36756003)(8936002)(6486002)(91956017)(76116006)(316002)(6636002)(86362001)(110136005)(5660300002)(478600001)(2906002)(6506007)(71200400001)(2616005)(6512007)(186003)(26005);DIR:OUT;SFP:1102;SCL:1;SRVR:BN7PR11MB2708;H:BN7PR11MB2580.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yKhfNalYRcCf4HMpBgzSj7szhI9YZc6hSlSjYpRqz8dEGshHFDfTjbb3qLaJQTYK+kobqOCzTkYlTPDtU0sdWk8RfWk4VEmfbD9lF2D7t/jyoUbeXmOG0zuENKcIf7kUpTXszhBpJatD1KLlKM7yyMxFwEMJLyzQmrnaF1lI1wA9IzhWWLpwyqxemzrlYAfaJA03bhqZ9kxeDLQE6SoI2q6L+/7zjp1SWR/E5ZhkAysbg3rAWiHdTGhJpxdsPYQilTwWkZhRa6BjYlkk2dxUfZyG3DBGEAuOMcqG9kEFxkBKR6szgjqtonBiHUitDK7JsgR3RY7bhRmJaGfYWR6vZCi0cSBRyfIlsdprDg3pW1oCz4BL58tiHGL1h6wgTDU3/3lojobsZj6QrA6LVkOJBTSq/Rlg4746L/IC+buSkEp7grqVTVXS4FVRMqkVOBpG
+x-ms-exchange-antispam-messagedata: 5bA8vH6QoD6h13C0U0MT4015YKVhbi6Xyh7VlAoJkvo4h3vd9xetvY1uQeGiNmJNHpINhq7PLDAfqIVizZLdeHTHa4qWpXQ7udUyHI7pdxmRtvtMw2AXWcYnmvLy/7m1UgNxe0p7oYICLsXm1t6tiw==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3C824916461E0A4C9E7C3ABB91E34246@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200226161257.Bluez.v2.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
-In-Reply-To: <20200226161257.Bluez.v2.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 26 Feb 2020 09:54:47 -0800
-Message-ID: <CABBYNZLK3Ct9kyikQiC4-QPC+xmg8cN30wN=fK8tm6STpmvDGA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2] src/profile: Ensure class UUID matches before
- connecting profile
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8b4ae38-8943-4049-8905-08d7baf1539c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2020 19:23:14.7127
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yjyEzOH8OBYSiulQeKHTp3tXwx+dpi+oNOTkFvEkpLWqXnm84WQVj3RDhOxfRwnV+/wLxLzPQ1MVc1TUoMm4FQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR11MB2708
+X-OriginatorOrg: intel.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
-
-On Wed, Feb 26, 2020 at 12:14 AM Archie Pusaka <apusaka@google.com> wrote:
->
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
-> might be multiple service records returned in a SDP Service Search
-> Attribute Response. Also, according to 2.5.2, the service pattern
-> can match any UUID contained within the service record, it doesn't
-> have to match only some specific attributes of the record.
->
-> Therefore, before using the service record to connect to any
-> profile, first we must check that the service class ID of the
-> service record matches with whatever UUID specified in the service
-> pattern we are looking for.
->
-> This patch checks the service class ID of the records against the
-> requested UUID whenever bt_search_service() is called and filter
-> out the ones that don't match. For the alternative where filtering
-> is not applied, use the method bt_search().
-> ---
->
-> Changes in v2:
-> - Move service class matching from profile.c to sdp_client.c
-> - Create function bt_search for searching without matching uuid
-> - Update device.c to use bt_search for L2CAP
->
->  src/device.c     | 17 ++++---------
->  src/sdp-client.c | 62 ++++++++++++++++++++++++++++++++++++++++++++----
->  src/sdp-client.h |  3 +++
->  3 files changed, 64 insertions(+), 18 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index a8f4c22f3..5ff381959 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -4590,17 +4590,8 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
->                 if (!rec)
->                         break;
->
-> -               if (sdp_get_service_classes(rec, &svcclass) < 0)
-> -                       continue;
-> -
-> -               /* Check for empty service classes list */
-> -               if (svcclass == NULL) {
-> -                       DBG("Skipping record with no service classes");
-> -                       continue;
-> -               }
-
-This actually still need to be checked since there could be malformed
-records which don't set a service class, that said perhaps we could
-deal with that in sdp-client.c but it doesn't seem you have added
-these checks there.
-
-> +               profile_uuid = bt_uuid2string(&rec->svclass);
->
-> -               /* Extract the first element and skip the remainning */
-> -               profile_uuid = bt_uuid2string(svcclass->data);
->                 if (!profile_uuid) {
->                         sdp_list_free(svcclass, free);
->                         continue;
-> @@ -5352,9 +5343,9 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
->
->         req->sdp_flags = get_sdp_flags(device);
->
-> -       err = bt_search_service(btd_adapter_get_address(adapter),
-> -                               &device->bdaddr, &uuid, browse_cb, req, NULL,
-> -                               req->sdp_flags);
-> +       err = bt_search(btd_adapter_get_address(adapter),
-> +                       &device->bdaddr, &uuid, browse_cb, req, NULL,
-> +                       req->sdp_flags);
->         if (err < 0) {
->                 browse_request_free(req);
->                 return err;
-> diff --git a/src/sdp-client.c b/src/sdp-client.c
-> index 413cf30ec..fc8e9ec10 100644
-> --- a/src/sdp-client.c
-> +++ b/src/sdp-client.c
-> @@ -143,6 +143,7 @@ struct search_context {
->         gpointer                user_data;
->         uuid_t                  uuid;
->         guint                   io_id;
-> +       gboolean                filter_svc_class;
->  };
->
->  static GSList *context_list = NULL;
-> @@ -157,6 +158,11 @@ static void search_context_cleanup(struct search_context *ctxt)
->         g_free(ctxt);
->  }
->
-> +static gboolean check_record_uuid(sdp_record_t *rec, uuid_t *uuid)
-> +{
-> +       return sdp_uuid_cmp(uuid, &rec->svclass) == 0;
-> +}
-
-I wouldn't bother adding this function, instead just use sdp_uuid_cmp directly.
-
->  static void search_completed_cb(uint8_t type, uint16_t status,
->                         uint8_t *rsp, size_t size, void *user_data)
->  {
-> @@ -195,6 +201,12 @@ static void search_completed_cb(uint8_t type, uint16_t status,
->                 rsp += recsize;
->                 bytesleft -= recsize;
->
-> +               if (ctxt->filter_svc_class &&
-> +                                       !check_record_uuid(rec, &ctxt->uuid)) {
-> +                       sdp_record_free(rec);
-> +                       continue;
-> +               }
-> +
->                 recs = sdp_list_append(recs, rec);
->         } while (scanned < (ssize_t) size && bytesleft > 0);
->
-> @@ -338,7 +350,28 @@ static int create_search_context(struct search_context **ctxt,
->         return 0;
->  }
->
-> -int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
-> +static int create_search_context_full(struct search_context **ctxt,
-> +                                       const bdaddr_t *src,
-> +                                       const bdaddr_t *dst,
-> +                                       uuid_t *uuid, uint16_t flags,
-> +                                       void *user_data, bt_callback_t cb,
-> +                                       bt_destroy_t destroy,
-> +                                       gboolean filter_svc_class)
-> +{
-> +       int err = create_search_context(ctxt, src, dst, uuid, flags);
-> +
-> +       if (err < 0)
-> +               return err;
-> +
-> +       (*ctxt)->cb = cb;
-> +       (*ctxt)->destroy = destroy;
-> +       (*ctxt)->user_data = user_data;
-> +       (*ctxt)->filter_svc_class = filter_svc_class;
-> +
-> +       return 0;
-> +}
-> +
-> +int bt_search(const bdaddr_t *src, const bdaddr_t *dst,
->                         uuid_t *uuid, bt_callback_t cb, void *user_data,
->                         bt_destroy_t destroy, uint16_t flags)
->  {
-> @@ -348,13 +381,32 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
->         if (!cb)
->                 return -EINVAL;
->
-> -       err = create_search_context(&ctxt, src, dst, uuid, flags);
-> +       /* The resulting service class ID doesn't have to match uuid */
-> +       err = create_search_context_full(&ctxt, src, dst, uuid, flags,
-> +                                       user_data, cb, destroy, FALSE);
->         if (err < 0)
->                 return err;
->
-> -       ctxt->cb        = cb;
-> -       ctxt->destroy   = destroy;
-> -       ctxt->user_data = user_data;
-> +       context_list = g_slist_append(context_list, ctxt);
-> +
-> +       return 0;
-> +}
-> +
-> +int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
-> +                       uuid_t *uuid, bt_callback_t cb, void *user_data,
-> +                       bt_destroy_t destroy, uint16_t flags)
-> +{
-> +       struct search_context *ctxt = NULL;
-> +       int err;
-> +
-> +       if (!cb)
-> +               return -EINVAL;
-> +
-> +       /* The resulting service class ID need to match uuid */
-> +       err = create_search_context_full(&ctxt, src, dst, uuid, flags,
-> +                                       user_data, cb, destroy, TRUE);
-> +       if (err < 0)
-> +               return err;
->
->         context_list = g_slist_append(context_list, ctxt);
->
-> diff --git a/src/sdp-client.h b/src/sdp-client.h
-> index 9aa5a4d98..3a7212fd2 100644
-> --- a/src/sdp-client.h
-> +++ b/src/sdp-client.h
-> @@ -24,6 +24,9 @@
->  typedef void (*bt_callback_t) (sdp_list_t *recs, int err, gpointer user_data);
->  typedef void (*bt_destroy_t) (gpointer user_data);
->
-> +int bt_search(const bdaddr_t *src, const bdaddr_t *dst,
-> +                       uuid_t *uuid, bt_callback_t cb, void *user_data,
-> +                       bt_destroy_t destroy, uint16_t flags);
->  int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
->                         uuid_t *uuid, bt_callback_t cb, void *user_data,
->                         bt_destroy_t destroy, uint16_t flags);
-> --
-> 2.25.1.481.gfbce0eb801-goog
-
-Other than that it looks pretty good.
-
--- 
-Luiz Augusto von Dentz
+UGF0Y2ggc2V0IGFwcGxpZWQNCk9uIFR1ZSwgMjAyMC0wMi0yNSBhdCAxMDo0NCAtMDgwMCwgSW5n
+YSBTdG90bGFuZCB3cm90ZToNCj4gdjM6IEZpeGVkIHN1YnNjcmlwdGlvbiBsaXN0IGdlbmVyYXRp
+b24gdG8gaW5jbHVkZSB2aXJ0dWFsDQo+ICAgICBzdWJzY3JpcHRpb24gYWRkcmVzc2VzDQo+IA0K
+PiAqKioqKioqKioqKioqKioqKioqKioqKioqKioqKg0KPiB2MjogRml4ZWQgYSAgYmFja3dhcmRz
+IGNvbXBhdGliaWxpdHkgaXNzdWUgcmVwb3J0ZWQgYnkgQnJpYW47DQo+ICAgICBGaXhlZCBQeXRo
+b24gdGVzdCB0byBjb3JyZWN0bHkgZGlzcGxheSB1cGRhdGVkIGNvbmZpZ3VyYXRpb24NCj4gDQo+
+IA0KPiAqKioqKioqKioqKioqKioqKioqKioqKioqKioqKg0KPiBUaGlzIHBhdGNoIHNldCBhZGRz
+IGEgY2FwYWJpbGl0eSB0byBtZXNoLWNmZ2NsaWVudCB0byBnZW5lcmF0ZQ0KPiBhbmQgc3RvcmUg
+dmlydHVhbCBsYWJlbHMgYW5kIHVzZSB0aGVtIGluIGNvbmZpZ3VyaW5nIHJlbW90ZQ0KPiBub2Rl
+J3MgcHVibGljYXRpb25zIGFuZCBzdWJzY3JpcHRpb25zLg0KPiBSZWd1bGFyIGdyb3VwIGFkZHJl
+c3NlcyBhcmUgcHJlZXNlcnZlZCBhcyB3ZWxsLiBUaGlzIGlzIGRvbmUNCj4gZHluYW1pY2FsbHk6
+IGFzIGEgbmV3IGdyb3VwIGFkZHJlc3MgaXMgZGV0ZWN0ZWQgaW4gZWl0aGVyDQo+IHN1YnNjcmlw
+dGlvbiBvciBwdWJsaWNhdGlvbiBjb25maWd1cmF0aW9uIGNvbW1hbmRzLg0KPiANCj4gVGhpcyBu
+ZXcgY2FwYWJpbGl0eSBvZiBtZXNoLWNmZ2NsaWVudCBhbGxvd2VkIGZvciBpbXByb3ZlZA0KPiB0
+ZXN0aW5nIG9mIHZpcnR1YWwgcHViL3N1YiBpbXBsZW1lbnRhdGlvbiBpbiBibHVldG9vdGgtbWVz
+aGQNCj4gZGFlbW9uLiBBcyBhIHJlc3VsdCwgc29tZSBkZWZpY2llbmNpZXMgYW5kIGxlZ2FjeSBl
+bnRhZ2xlbWVudHMNCj4gd2VyZSBleHBvc2VkLCBhbmQgY29uc2VxdWVudGx5IHJlc29sdmVkIGFu
+ZCBjbGVhbmVkIHVwLg0KPiANCj4gDQo+IEluZ2EgU3RvdGxhbmQgKDYpOg0KPiAgIHRvb2xzL21l
+c2gtY2ZnY2xpZW50OiBBZGQgc3VwcG9ydCBmb3IgdmlydHVhbCBsYWJlbHMNCj4gICB0b29scy9t
+ZXNoLWNmZ2NsaWVudDogQ2xlYW4gdXAgc3Vic2NyaXB0aW9uIGxpc3Qgb3V0cHV0DQo+ICAgdG9v
+bHMvbWVzaC1jZmdjbGllbnQ6IFNhdmUgYW5kIHJlc3RvcmUgZ3JvdXAgYWRkcmVzc2VzDQo+ICAg
+bWVzaDogU2ltcGxpZnkgbW9kZWwgdmlydHVhbCBwdWIvc3ViIGxvZ2ljDQo+ICAgbWVzaDogQ2xl
+YW4gdXAgaGFuZGxpbmcgY29uZmlnIG1vZGVsIHB1YmxpY2F0aW9uIG1lc3NhZ2UNCj4gICB0ZXN0
+L3Rlc3QtbWVzaDogRml4IG91dHB1dCBvZyBVcGRhdGVNb2RlbENvbmZpZyBtZXRob2QNCj4gDQo+
+ICBNYWtlZmlsZS50b29scyAgICAgICB8ICAgMyArLQ0KPiAgbWVzaC9jZmdtb2Qtc2VydmVyLmMg
+fCAxMzEgKysrKysrKy0tLS0tLS0tLS0tLS0tDQo+ICBtZXNoL21vZGVsLmMgICAgICAgICB8IDI3
+MSArKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICBtZXNoL21v
+ZGVsLmggICAgICAgICB8ICAgOSArLQ0KPiAgdGVzdC90ZXN0LW1lc2ggICAgICAgfCAgMTEgKy0N
+Cj4gIHRvb2xzL21lc2gvY2ZnY2xpLmMgIHwgMjQyICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrLS0tLS0tDQo+ICB0b29scy9tZXNoL2NmZ2NsaS5oICB8ICAgNSArDQo+ICB0b29scy9t
+ZXNoL21lc2gtZGIuYyB8IDEyOCArKysrKysrKysrKysrKysrKysrKw0KPiAgdG9vbHMvbWVzaC9t
+ZXNoLWRiLmggfCAgIDQgKw0KPiAgOSBmaWxlcyBjaGFuZ2VkLCA1MTQgaW5zZXJ0aW9ucygrKSwg
+MjkwIGRlbGV0aW9ucygtKQ0KPiANCg==
