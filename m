@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C47C11D3D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Feb 2020 18:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E61C11D3D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Feb 2020 18:30:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E2B020726
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Feb 2020 18:30:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AA8420726
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Feb 2020 18:30:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ih9QGM2F"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hnDL3MkY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729964AbgB0SaC (ORCPT
+        id S1729891AbgB0SaO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Feb 2020 13:30:02 -0500
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:45807 "EHLO
+        Thu, 27 Feb 2020 13:30:14 -0500
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:41515 "EHLO
         mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729258AbgB0SaC (ORCPT
+        with ESMTP id S1729258AbgB0SaN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Feb 2020 13:30:02 -0500
-Received: by mail-vs1-f68.google.com with SMTP id m4so246505vsa.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2020 10:30:01 -0800 (PST)
+        Thu, 27 Feb 2020 13:30:13 -0500
+Received: by mail-vs1-f68.google.com with SMTP id k188so266997vsc.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Feb 2020 10:30:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=/QIyRz6v+UoGMZU6EYkJIHqTD4uHhyA6XinXW9UAfaY=;
-        b=ih9QGM2FIvDGgSPTU0u2UppQVz3ZzgZl6dPLrV6a9V4fAi7rEcrjn7Qg7Z9jnncm/a
-         1jyEIbs5hMMJ4FQ+E2YqQGqbjB4cs62gl4E0wzRoL70F7OmfxvS2fkgH7tCmxrIpkBVg
-         XZ5l7hBV9R0ltR23qCJXnzH4mkgdsIzaxQvAU=
+        bh=4K6fKAA2/aD8JgveCrJlSP+eb307VQ5m4PPzf152bng=;
+        b=hnDL3MkY1s2vZCu+YAqLlDcNJ7X8ZsnWguGo1B0rzijZCfnfilUJtR1VY4OR0hVT0f
+         rZZbVWUyJyb8OiFFV/Y4HNcW1JTjn3CNmjHkHWE4UvLeJnouFJ6GNcdXPm33pUbp9UaG
+         aoH3pLW8R67qlrZSq1tlVxhdgPhrO6jfhFCzo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/QIyRz6v+UoGMZU6EYkJIHqTD4uHhyA6XinXW9UAfaY=;
-        b=iFoAxIgbKanHkwieK2HQzKhJ0yK3QCq2gRG4aERtX5VBgflp6kON5wZab42DpudBaq
-         /WJsjYKpOFU5X+8IIghLRX/34zWAulywtb85D/2Q368tJdhSaJJhTEoGOmMn8kkDq7wB
-         fjqlxA/jikHeN91ykDOjbsmreeUbHo0Yn30ozALxr0mHhA8qMmfuACrdVhXRqRANHKvU
-         qPf8wAlnjRAjlPbuvE4ae+0Ohvm81hM6mYuCF0NoDiUq1GO2TP0TQKt1hnPQCK7n5ZQX
-         v/FUOedpcIznu9tByMNO80rNryIOPC+S4Iw3a2d5gnudhNzfEnn3KCUNrxwjVc17/LcE
-         jnFQ==
-X-Gm-Message-State: ANhLgQ3bCjvV4XFRKd1VSWY1QoFgGwIHlg0B7x7XFHjuT5oedHqg1UpM
-        H7bBGkAtp2NfOaYHCnbZsdNKnByV4+Ss5w==
-X-Google-Smtp-Source: ADFU+vtwjQSKGLpAAoS9GX2NWttAJT4I1CkFLu4VQNVjK6hdaj13M0rXpB9wBd2l04mu9vnDUuNrvQ==
-X-Received: by 2002:a67:31d8:: with SMTP id x207mr429604vsx.192.1582828201070;
-        Thu, 27 Feb 2020 10:30:01 -0800 (PST)
+        bh=4K6fKAA2/aD8JgveCrJlSP+eb307VQ5m4PPzf152bng=;
+        b=U9or070WhnbnR51foLwnKjXgy9h0B6hnC5lRPfwD0w0sIxkSsgJprNVtz8RT/iz9w/
+         RyMZbdGlEm9642Qk+TId/k4wgO1f/luWsffk0h8kfsqPJNBNpZB6hwxT/ZyAQsN8MRPU
+         KMsTZ8c7btJAu1NIRWj0k4REYNx2mcL7UGRMkxcXOzqrsRou+t4Byk2LDHSBACyGBPnC
+         ZCYYzuxf8u4RlUG5I1beeco1B46dm7HtCJOTVawI/zQdouPX59HI5hehZBosyrqiRbG2
+         pgeEN4TArshBAjBRP13X1Z1ci/8dR3SzP8VxchNGbAuqLZU9WJmUY7TdsnNak+U5N8vJ
+         SHMQ==
+X-Gm-Message-State: ANhLgQ1Yw+TbK6k5q95+yY+t0zxjy+Gh4pbHtLn63qm4xl1GH3JL+9bw
+        h8Jk2qVNiauho+4rsrenVw6xmTzT+FeidQ==
+X-Google-Smtp-Source: ADFU+vsI/QXwl+f1oC0mNhidfeORJRJOqz5KhPBFCPwq/ZtkFQfaom1W78EEkJ6YHLl+7HRGADVqhA==
+X-Received: by 2002:a67:8c7:: with SMTP id 190mr392027vsi.163.1582828211800;
+        Thu, 27 Feb 2020 10:30:11 -0800 (PST)
 Received: from alain.c.googlers.com.com (39.119.74.34.bc.googleusercontent.com. [34.74.119.39])
-        by smtp.gmail.com with ESMTPSA id v21sm2274464vkd.54.2020.02.27.10.30.00
+        by smtp.gmail.com with ESMTPSA id v21sm2274464vkd.54.2020.02.27.10.30.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2020 10:30:00 -0800 (PST)
+        Thu, 27 Feb 2020 10:30:11 -0800 (PST)
 From:   Alain Michaud <alainm@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Alain Michaud <alainm@chromium.org>
-Subject: [PATCH v1 1/3] bluetooth: Add flag to define wideband speech capability
-Date:   Thu, 27 Feb 2020 18:29:37 +0000
-Message-Id: <20200227182938.110670-2-alainm@chromium.org>
+Subject: [PATCH v1 2/3] bluetooth: Support querying for WBS support through MGMT
+Date:   Thu, 27 Feb 2020 18:29:39 +0000
+Message-Id: <20200227182938.110670-3-alainm@chromium.org>
 X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
 In-Reply-To: <20200227182938.110670-1-alainm@chromium.org>
 References: <20200227182938.110670-1-alainm@chromium.org>
@@ -69,57 +69,79 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change adds a new flag to define a controller's wideband speech
-capability.  This is required since no reliable over HCI mechanism
-exists to query the controller and driver's compatibility with
-wideband speech.
+This patch provides a mechanism for MGMT interface client to query the
+capability of the controller to support WBS.
 
 Signed-off-by: Alain Michaud <alainm@chromium.org>
 ---
 
- drivers/bluetooth/btusb.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ drivers/bluetooth/btusb.c    | 3 +++
+ include/net/bluetooth/hci.h  | 9 +++++++++
+ include/net/bluetooth/mgmt.h | 1 +
+ net/bluetooth/mgmt.c         | 4 ++++
+ 4 files changed, 17 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f5924f3e8b8d..1b175ba3085c 100644
+index 1b175ba3085c..95613f103d17 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -57,6 +57,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_IFNUM_2		0x80000
- #define BTUSB_CW6622		0x100000
- #define BTUSB_MEDIATEK		0x200000
-+#define BTUSB_WIDEBAND_SPEECH	0x400000
+@@ -3866,6 +3866,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_BROKEN_ISOC)
+ 		data->isoc = NULL;
  
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -333,15 +334,21 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x1286, 0x204e), .driver_info = BTUSB_MARVELL },
++	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
++		set_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED, &hdev->quirks);
++
+ 	if (id->driver_info & BTUSB_DIGIANSWER) {
+ 		data->cmdreq_type = USB_TYPE_VENDOR;
+ 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 6293bdd7d862..b214c4358d1c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -205,6 +205,15 @@ enum {
+ 	 *
+ 	 */
+ 	HCI_QUIRK_NON_PERSISTENT_SETUP,
++
++	/* When this quirt is set, wide band speech is supported by
++	 * the driver since no reliable mechanism exist to report
++	 * this from the hardware, a driver flag is use to convey
++	 * this support
++	 *
++	 * This quirk must be set before hci_register_dev is called.
++	 */
++	HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
+ };
  
- 	/* Intel Bluetooth devices */
--	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW },
--	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW },
--	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW },
-+	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW |
-+						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW |
-+						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
- 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
- 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
--	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW },
--	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL },
--	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW },
-+	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW |
-+						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL |
-+						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
-+						     BTUSB_WIDEBAND_SPEECH },
+ /* HCI device flags */
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index a90666af05bd..51339584c3a9 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -102,6 +102,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_CONFIGURATION	0x00004000
+ #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
+ #define MGMT_SETTING_PHY_CONFIGURATION  0x00010000
++#define MGMT_SETTING_WIDE_BAND_SPEECH	0x00020000
  
- 	/* Other Intel Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0dc610faab70..a08691d679a8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -762,6 +762,10 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 
+ 		if (lmp_sc_capable(hdev))
+ 			settings |= MGMT_SETTING_SECURE_CONN;
++
++		if (test_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
++			     &hdev->quirks))
++			settings |= MGMT_SETTING_WIDE_BAND_SPEECH;
+ 	}
+ 
+ 	if (lmp_le_capable(hdev)) {
 -- 
 2.25.1.481.gfbce0eb801-goog
 
