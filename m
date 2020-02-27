@@ -1,155 +1,294 @@
-Return-Path: <SRS0=9bU/=4O=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=rxlX=4P=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A87EC4BA2D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Feb 2020 23:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B918C4BA06
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Feb 2020 03:32:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE689222C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Feb 2020 23:18:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C02DC222C2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Feb 2020 03:32:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="EOGrQkgW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gge03KAJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727887AbgBZXSK (ORCPT
+        id S1728253AbgB0Dcl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Feb 2020 18:18:10 -0500
-Received: from gateway36.websitewelcome.com ([192.185.186.5]:13749 "EHLO
-        gateway36.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726413AbgBZXSK (ORCPT
+        Wed, 26 Feb 2020 22:32:41 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35556 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728238AbgB0Dcl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Feb 2020 18:18:10 -0500
-X-Greylist: delayed 1302 seconds by postgrey-1.27 at vger.kernel.org; Wed, 26 Feb 2020 18:18:09 EST
-Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
-        by gateway36.websitewelcome.com (Postfix) with ESMTP id 477CF402F4FCB
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2020 16:11:10 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 75bHjCJniSl8q75bHjqlxG; Wed, 26 Feb 2020 16:56:19 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=6OsKS4Pggvge6Qv8uJBkrcDoGo57Sxfgw1/kh2kNtM8=; b=EOGrQkgWsiBWTzRH3oCXrK2pu8
-        IajlBozL1h9IirXVs9H4+X4qJT7QE1stKrOFqmDUsovfH2YDMZsuayvuWR7htos8u/hcTM0A1sF5h
-        Bin03MT6318lWVkKWTLLAMKD+V8XzNMaR+5SLaPObjSO7AFo78xf5Sp/cZbW6l00mXJeke/uVuzgU
-        XAlJjmy4jiI0J5yjZq1KtTYgqvRpB/LwnCnrvPy/TWCVM//flXO+zvxHR78+aL+zCU/Dy9qn4gPJK
-        9YYgvsQ4hWZs5AJR6b6VHP9jIrMPfm9f6+N3xrcolwAKmuj/uk3VySvc9uIYfzGRcLs36dPAU+kBk
-        qOUfWGVA==;
-Received: from [201.162.161.188] (port=41090 helo=[192.168.43.132])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1j75bH-001Yz3-I4; Wed, 26 Feb 2020 16:56:19 -0600
-Subject: Re: [PATCH] Bluetooth: btintel: Replace zero-length array with
- flexible-array member
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-References: <20200212192807.GA25300@embeddedor>
- <CEB64C73-3868-4D26-A610-560F2ABDAF9D@holtmann.org>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Message-ID: <69f110cb-f5e4-4312-c204-274a505780ba@embeddedor.com>
-Date:   Wed, 26 Feb 2020 16:59:07 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Wed, 26 Feb 2020 22:32:41 -0500
+Received: by mail-wm1-f66.google.com with SMTP id m3so1758723wmi.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Feb 2020 19:32:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hJz8lwTUJGKfIW2DU0BMJu536JYhyGaakRgkbk9QwRE=;
+        b=gge03KAJPLIjC35uGFVmYgsGG4Yc/s+ZMdYDlhjOsTel7Qt9AEFGszZr7t3leEpCdW
+         p0d9clktPQ9yPrMhxCaBVWiKmiuS8CNr625Aiahn7pkVq/EWZn9cpprAhx0onxGkVyas
+         vuPka91jE7aRD+pZPV0OO+lDnKYmiStMNMcaGEMs/6tBY0y1X+lI71rbdDI8ox4X5+kB
+         o8kz6Sz9+eC08wYMwp82NcjYrJZ5R6xfUFgAK8J/smYOQVqkcORw7vYenkpDjz9KPw3m
+         nQFunTdZLKrMq67tJB/hLDLuYWiMDplyl+YMf0G0Ngd++Y2NvKRbIpEp4ydx83TVNbUA
+         MyDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hJz8lwTUJGKfIW2DU0BMJu536JYhyGaakRgkbk9QwRE=;
+        b=c70FT2qd8Jg8ScUTajiGj04guFs9dwGi1cgQ/SG+60taslnEN9cuIwBOjK1ZhZMyl2
+         A3FGLAEKej+AcNqZT8lSGm5ViuVQVjU3EAcPf4WPLApzs9D/jsYujfs2/yzYrJttxcGF
+         bf9x3xz+PTOJ8fiKn37GFgTjYqx02ei6B7R95vObdpDDlE3FQ1vS5D5kiuSeaESIrcxO
+         nsD4+0no1D5CIzLm3u+oaU4NTGsp/2CC48WvWfwt2XwZwC1bW0fZRAqQe8ZKZhuwwfk9
+         L6tz8h5YtGkVAMoNr3dVZzVRYYcxIi/Awp4xsuw20GJYWBKBA8hp6bNRKt0DSGjnei/X
+         3LZw==
+X-Gm-Message-State: APjAAAUifvppiziVnqQ39zs3fcpI4fI4lQf4/hjfc4ZM6YszvV7JMGUY
+        IV9xhcnsDKNfzN4ZlBg3EPsZbu6l/Uan+vQvwrfLHjsAGsxoBQ==
+X-Google-Smtp-Source: APXvYqyLm4ISPpEVYPSmNvDRnFDG3DGFFHkrA7859RZDsDVjRXX+p7StsnRARMN+4wu73moX6hIqw+fa3MYTz5EfLRA=
+X-Received: by 2002:a7b:c249:: with SMTP id b9mr2285323wmj.61.1582774358002;
+ Wed, 26 Feb 2020 19:32:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CEB64C73-3868-4D26-A610-560F2ABDAF9D@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.162.161.188
-X-Source-L: No
-X-Exim-ID: 1j75bH-001Yz3-I4
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.43.132]) [201.162.161.188]:41090
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 32
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+References: <20200226161257.Bluez.v2.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
+ <CABBYNZLK3Ct9kyikQiC4-QPC+xmg8cN30wN=fK8tm6STpmvDGA@mail.gmail.com>
+In-Reply-To: <CABBYNZLK3Ct9kyikQiC4-QPC+xmg8cN30wN=fK8tm6STpmvDGA@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Thu, 27 Feb 2020 11:32:26 +0800
+Message-ID: <CAJQfnxFaQ2cJBVyktoBCA95TN9dhZf90R0G_DEWgsBvU=1uu9w@mail.gmail.com>
+Subject: Re: [Bluez PATCH v2] src/profile: Ensure class UUID matches before
+ connecting profile
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Luiz,
 
+On Thu, 27 Feb 2020 at 01:55, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Wed, Feb 26, 2020 at 12:14 AM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
+> > might be multiple service records returned in a SDP Service Search
+> > Attribute Response. Also, according to 2.5.2, the service pattern
+> > can match any UUID contained within the service record, it doesn't
+> > have to match only some specific attributes of the record.
+> >
+> > Therefore, before using the service record to connect to any
+> > profile, first we must check that the service class ID of the
+> > service record matches with whatever UUID specified in the service
+> > pattern we are looking for.
+> >
+> > This patch checks the service class ID of the records against the
+> > requested UUID whenever bt_search_service() is called and filter
+> > out the ones that don't match. For the alternative where filtering
+> > is not applied, use the method bt_search().
+> > ---
+> >
+> > Changes in v2:
+> > - Move service class matching from profile.c to sdp_client.c
+> > - Create function bt_search for searching without matching uuid
+> > - Update device.c to use bt_search for L2CAP
+> >
+> >  src/device.c     | 17 ++++---------
+> >  src/sdp-client.c | 62 ++++++++++++++++++++++++++++++++++++++++++++----
+> >  src/sdp-client.h |  3 +++
+> >  3 files changed, 64 insertions(+), 18 deletions(-)
+> >
+> > diff --git a/src/device.c b/src/device.c
+> > index a8f4c22f3..5ff381959 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -4590,17 +4590,8 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+> >                 if (!rec)
+> >                         break;
+> >
+> > -               if (sdp_get_service_classes(rec, &svcclass) < 0)
+> > -                       continue;
+> > -
+> > -               /* Check for empty service classes list */
+> > -               if (svcclass == NULL) {
+> > -                       DBG("Skipping record with no service classes");
+> > -                       continue;
+> > -               }
+>
+> This actually still need to be checked since there could be malformed
+> records which don't set a service class, that said perhaps we could
+> deal with that in sdp-client.c but it doesn't seem you have added
+> these checks there.
+>
 
-On 2/13/20 01:30, Marcel Holtmann wrote:
-> Hi Gustavo,
-> 
+Those malformed records which did not set a service class will have
+the uuid stored in rec->svclass to be filled with all zeroes. This
+will be NULL when converted into string, so we will skip that
+effectively. But it would be better if I document this behaviour in
+a comment.
 
->>
->> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
->> [2] https://github.com/KSPP/linux/issues/21
->> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
->>
->> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->> ---
->> drivers/bluetooth/btintel.c | 4 ++--
->> 1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> patch has been applied to bluetooth-next tree.
-> 
+> > +               profile_uuid = bt_uuid2string(&rec->svclass);
+> >
+> > -               /* Extract the first element and skip the remainning */
+> > -               profile_uuid = bt_uuid2string(svcclass->data);
+> >                 if (!profile_uuid) {
+> >                         sdp_list_free(svcclass, free);
 
-Thank you, Marcel.
---
-Gustavo
+Actually I can just remove svcclass here (and everywhere else)
+
+> >                         continue;
+> > @@ -5352,9 +5343,9 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
+> >
+> >         req->sdp_flags = get_sdp_flags(device);
+> >
+> > -       err = bt_search_service(btd_adapter_get_address(adapter),
+> > -                               &device->bdaddr, &uuid, browse_cb, req, NULL,
+> > -                               req->sdp_flags);
+> > +       err = bt_search(btd_adapter_get_address(adapter),
+> > +                       &device->bdaddr, &uuid, browse_cb, req, NULL,
+> > +                       req->sdp_flags);
+> >         if (err < 0) {
+> >                 browse_request_free(req);
+> >                 return err;
+> > diff --git a/src/sdp-client.c b/src/sdp-client.c
+> > index 413cf30ec..fc8e9ec10 100644
+> > --- a/src/sdp-client.c
+> > +++ b/src/sdp-client.c
+> > @@ -143,6 +143,7 @@ struct search_context {
+> >         gpointer                user_data;
+> >         uuid_t                  uuid;
+> >         guint                   io_id;
+> > +       gboolean                filter_svc_class;
+> >  };
+> >
+> >  static GSList *context_list = NULL;
+> > @@ -157,6 +158,11 @@ static void search_context_cleanup(struct search_context *ctxt)
+> >         g_free(ctxt);
+> >  }
+> >
+> > +static gboolean check_record_uuid(sdp_record_t *rec, uuid_t *uuid)
+> > +{
+> > +       return sdp_uuid_cmp(uuid, &rec->svclass) == 0;
+> > +}
+>
+> I wouldn't bother adding this function, instead just use sdp_uuid_cmp directly.
+
+Yeah, not super useful. Will compare directly in the next patch.
+
+>
+> >  static void search_completed_cb(uint8_t type, uint16_t status,
+> >                         uint8_t *rsp, size_t size, void *user_data)
+> >  {
+> > @@ -195,6 +201,12 @@ static void search_completed_cb(uint8_t type, uint16_t status,
+> >                 rsp += recsize;
+> >                 bytesleft -= recsize;
+> >
+> > +               if (ctxt->filter_svc_class &&
+> > +                                       !check_record_uuid(rec, &ctxt->uuid)) {
+> > +                       sdp_record_free(rec);
+> > +                       continue;
+> > +               }
+> > +
+> >                 recs = sdp_list_append(recs, rec);
+> >         } while (scanned < (ssize_t) size && bytesleft > 0);
+> >
+> > @@ -338,7 +350,28 @@ static int create_search_context(struct search_context **ctxt,
+> >         return 0;
+> >  }
+> >
+> > -int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+> > +static int create_search_context_full(struct search_context **ctxt,
+> > +                                       const bdaddr_t *src,
+> > +                                       const bdaddr_t *dst,
+> > +                                       uuid_t *uuid, uint16_t flags,
+> > +                                       void *user_data, bt_callback_t cb,
+> > +                                       bt_destroy_t destroy,
+> > +                                       gboolean filter_svc_class)
+> > +{
+> > +       int err = create_search_context(ctxt, src, dst, uuid, flags);
+> > +
+> > +       if (err < 0)
+> > +               return err;
+> > +
+> > +       (*ctxt)->cb = cb;
+> > +       (*ctxt)->destroy = destroy;
+> > +       (*ctxt)->user_data = user_data;
+> > +       (*ctxt)->filter_svc_class = filter_svc_class;
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +int bt_search(const bdaddr_t *src, const bdaddr_t *dst,
+> >                         uuid_t *uuid, bt_callback_t cb, void *user_data,
+> >                         bt_destroy_t destroy, uint16_t flags)
+> >  {
+> > @@ -348,13 +381,32 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+> >         if (!cb)
+> >                 return -EINVAL;
+> >
+> > -       err = create_search_context(&ctxt, src, dst, uuid, flags);
+> > +       /* The resulting service class ID doesn't have to match uuid */
+> > +       err = create_search_context_full(&ctxt, src, dst, uuid, flags,
+> > +                                       user_data, cb, destroy, FALSE);
+> >         if (err < 0)
+> >                 return err;
+> >
+> > -       ctxt->cb        = cb;
+> > -       ctxt->destroy   = destroy;
+> > -       ctxt->user_data = user_data;
+> > +       context_list = g_slist_append(context_list, ctxt);
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+> > +                       uuid_t *uuid, bt_callback_t cb, void *user_data,
+> > +                       bt_destroy_t destroy, uint16_t flags)
+> > +{
+> > +       struct search_context *ctxt = NULL;
+> > +       int err;
+> > +
+> > +       if (!cb)
+> > +               return -EINVAL;
+> > +
+> > +       /* The resulting service class ID need to match uuid */
+> > +       err = create_search_context_full(&ctxt, src, dst, uuid, flags,
+> > +                                       user_data, cb, destroy, TRUE);
+> > +       if (err < 0)
+> > +               return err;
+> >
+> >         context_list = g_slist_append(context_list, ctxt);
+> >
+> > diff --git a/src/sdp-client.h b/src/sdp-client.h
+> > index 9aa5a4d98..3a7212fd2 100644
+> > --- a/src/sdp-client.h
+> > +++ b/src/sdp-client.h
+> > @@ -24,6 +24,9 @@
+> >  typedef void (*bt_callback_t) (sdp_list_t *recs, int err, gpointer user_data);
+> >  typedef void (*bt_destroy_t) (gpointer user_data);
+> >
+> > +int bt_search(const bdaddr_t *src, const bdaddr_t *dst,
+> > +                       uuid_t *uuid, bt_callback_t cb, void *user_data,
+> > +                       bt_destroy_t destroy, uint16_t flags);
+> >  int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+> >                         uuid_t *uuid, bt_callback_t cb, void *user_data,
+> >                         bt_destroy_t destroy, uint16_t flags);
+> > --
+> > 2.25.1.481.gfbce0eb801-goog
+>
+> Other than that it looks pretty good.
+>
+> --
+> Luiz Augusto von Dentz
+
+Thanks,
+Archie
