@@ -2,161 +2,134 @@ Return-Path: <SRS0=e/tT=4Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB1EC3F2D0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 08:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D98AC3F2D2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 13:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F57E246A3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 08:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4118246AE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 13:45:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="ezaOkChQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726525AbgB1IwV (ORCPT
+        id S1726987AbgB1NpI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Feb 2020 03:52:21 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:53174 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726005AbgB1IwV (ORCPT
+        Fri, 28 Feb 2020 08:45:08 -0500
+Received: from gateway21.websitewelcome.com ([192.185.45.38]:27349 "EHLO
+        gateway21.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726894AbgB1NpI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 03:52:21 -0500
-X-Greylist: delayed 348 seconds by postgrey-1.27 at vger.kernel.org; Fri, 28 Feb 2020 03:52:19 EST
-Received: from localhost.localdomain (p200300E9D71B9939E2C0865DB6B8C4EC.dip0.t-ipconnect.de [IPv6:2003:e9:d71b:9939:e2c0:865d:b6b8:c4ec])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 53688C3201;
-        Fri, 28 Feb 2020 09:46:30 +0100 (CET)
-Subject: Re: [PATCH 02/28] docs: networking: convert 6lowpan.txt to ReST
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Alexander Aring <alex.aring@gmail.com>,
+        Fri, 28 Feb 2020 08:45:08 -0500
+Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
+        by gateway21.websitewelcome.com (Postfix) with ESMTP id 839B9400CDAA1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 07:45:07 -0600 (CST)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id 7fwxjIjVJRP4z7fwxjh8Xj; Fri, 28 Feb 2020 07:45:07 -0600
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
+        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=dp7OH8A4KnczyYJovH59Zksat//ZZyGW27TssWDaCwU=; b=ezaOkChQzVs7vsAT/2k7fCErdV
+        HTx/3dG3u0qkOqddA1n/Z9+SpTSmpto04B7IvkemtDFzEOZICZXOiyDPL0WE1QCn+XdqO0CNOMR6m
+        oz+5p6Db+i4pKSIb8tCzT3UAvjW10RupagVTAUvLBsmJe/jweCMYXVo8I72avmwnMmV+XxPis7fS3
+        88lEXQ1hL1eoBCN+llyqJLcTSc7anMZHwIncI7ZnhnDOtn9DNIGypQgHn1TrGx49vwIh+6lJO5Pu6
+        k5eVzONUrWFuETjhEl4NSmm1QSv7W6e3T4P24X0SNjloblgMikDkxsftpSVI3r88q1Z1XGY8uFx74
+        6bI5h8Xg==;
+Received: from [201.162.240.44] (port=21260 helo=embeddedor)
+        by gator4166.hostgator.com with esmtpa (Exim 4.92)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1j7fwv-001U2f-DG; Fri, 28 Feb 2020 07:45:05 -0600
+Date:   Fri, 28 Feb 2020 07:47:58 -0600
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
         Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-References: <cover.1581002062.git.mchehab+huawei@kernel.org>
- <bfa773f25584a3939e0a3e1fc6bc0e91f415cd91.1581002063.git.mchehab+huawei@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <f81edab9-3ca8-5421-5bf8-029cefc96ad6@datenfreihafen.org>
-Date:   Fri, 28 Feb 2020 09:46:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH][next] 6lowpan: Replace zero-length array with flexible-array
+ member
+Message-ID: <20200228134758.GA29760@embeddedor>
 MIME-Version: 1.0
-In-Reply-To: <bfa773f25584a3939e0a3e1fc6bc0e91f415cd91.1581002063.git.mchehab+huawei@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.162.240.44
+X-Source-L: No
+X-Exim-ID: 1j7fwv-001U2f-DG
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: (embeddedor) [201.162.240.44]:21260
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 58
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello.
+The current codebase makes use of the zero-length array language
+extension to the C90 standard, but the preferred mechanism to declare
+variable-length types such as these ones is a flexible array member[1][2],
+introduced in C99:
 
-On 06.02.20 16:17, Mauro Carvalho Chehab wrote:
-> - add SPDX header;
-> - use document title markup;
-> - mark code blocks and literals as such;
-> - adjust identation, whitespaces and blank lines;
-> - add to networking/index.rst.
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->   .../networking/{6lowpan.txt => 6lowpan.rst}   | 29 ++++++++++---------
->   Documentation/networking/index.rst            |  1 +
->   2 files changed, 17 insertions(+), 13 deletions(-)
->   rename Documentation/networking/{6lowpan.txt => 6lowpan.rst} (64%)
-> 
-> diff --git a/Documentation/networking/6lowpan.txt b/Documentation/networking/6lowpan.rst
-> similarity index 64%
-> rename from Documentation/networking/6lowpan.txt
-> rename to Documentation/networking/6lowpan.rst
-> index 2e5a939d7e6f..e70a6520cc33 100644
-> --- a/Documentation/networking/6lowpan.txt
-> +++ b/Documentation/networking/6lowpan.rst
-> @@ -1,37 +1,40 @@
-> +.. SPDX-License-Identifier: GPL-2.0
->   
-> -Netdev private dataroom for 6lowpan interfaces:
-> +==============================================
-> +Netdev private dataroom for 6lowpan interfaces
-> +==============================================
->   
->   All 6lowpan able net devices, means all interfaces with ARPHRD_6LOWPAN,
->   must have "struct lowpan_priv" placed at beginning of netdev_priv.
->   
-> -The priv_size of each interface should be calculate by:
-> +The priv_size of each interface should be calculate by::
->   
->    dev->priv_size = LOWPAN_PRIV_SIZE(LL_6LOWPAN_PRIV_DATA);
->   
->   Where LL_PRIV_6LOWPAN_DATA is sizeof linklayer 6lowpan private data struct.
-> -To access the LL_PRIV_6LOWPAN_DATA structure you can cast:
-> +To access the LL_PRIV_6LOWPAN_DATA structure you can cast::
->   
->    lowpan_priv(dev)-priv;
->   
->   to your LL_6LOWPAN_PRIV_DATA structure.
->   
-> -Before registering the lowpan netdev interface you must run:
-> +Before registering the lowpan netdev interface you must run::
->   
->    lowpan_netdev_setup(dev, LOWPAN_LLTYPE_FOOBAR);
->   
->   wheres LOWPAN_LLTYPE_FOOBAR is a define for your 6LoWPAN linklayer type of
->   enum lowpan_lltypes.
->   
-> -Example to evaluate the private usually you can do:
-> +Example to evaluate the private usually you can do::
->   
-> -static inline struct lowpan_priv_foobar *
-> -lowpan_foobar_priv(struct net_device *dev)
-> -{
-> + static inline struct lowpan_priv_foobar *
-> + lowpan_foobar_priv(struct net_device *dev)
-> + {
->   	return (struct lowpan_priv_foobar *)lowpan_priv(dev)->priv;
-> -}
-> + }
->   
-> -switch (dev->type) {
-> -case ARPHRD_6LOWPAN:
-> + switch (dev->type) {
-> + case ARPHRD_6LOWPAN:
->   	lowpan_priv = lowpan_priv(dev);
->   	/* do great stuff which is ARPHRD_6LOWPAN related */
->   	switch (lowpan_priv->lltype) {
-> @@ -42,8 +45,8 @@ case ARPHRD_6LOWPAN:
->   	...
->   	}
->   	break;
-> -...
-> -}
-> + ...
-> + }
->   
->   In case of generic 6lowpan branch ("net/6lowpan") you can remove the check
->   on ARPHRD_6LOWPAN, because you can be sure that these function are called
-> diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-> index 3ccb89bf5585..cc34c06477eb 100644
-> --- a/Documentation/networking/index.rst
-> +++ b/Documentation/networking/index.rst
-> @@ -34,6 +34,7 @@ Contents:
->      tls
->      tls-offload
->      nfc
-> +   6lowpan
->   
->   .. only::  subproject and html
->   
-> 
+struct foo {
+        int stuff;
+        struct boo array[];
+};
 
-Reviewed-by: Stefan Schmidt <stefan@datenfreihafen.org>
+By making use of the mechanism above, we will get a compiler warning
+in case the flexible array does not occur last in the structure, which
+will help us prevent some kind of undefined behavior bugs from being
+inadvertently introduced[3] to the codebase from now on.
 
-regards
-Stefan Schmidt
+Also, notice that, dynamic memory allocations won't be affected by
+this change:
+
+"Flexible array members have incomplete type, and so the sizeof operator
+may not be applied. As a quirk of the original implementation of
+zero-length arrays, sizeof evaluates to zero."[1]
+
+This issue was found with the help of Coccinelle.
+
+[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+[2] https://github.com/KSPP/linux/issues/21
+[3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
+
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+---
+ include/net/6lowpan.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index a71378007e61..c80539be1542 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -138,7 +138,7 @@ struct lowpan_dev {
+ 	struct lowpan_iphc_ctx_table ctx;
+ 
+ 	/* must be last */
+-	u8 priv[0] __aligned(sizeof(void *));
++	u8 priv[] __aligned(sizeof(void *));
+ };
+ 
+ struct lowpan_802154_neigh {
+-- 
+2.25.0
+
