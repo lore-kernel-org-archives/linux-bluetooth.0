@@ -2,71 +2,161 @@ Return-Path: <SRS0=e/tT=4Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63ACC3F2D0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 08:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB1EC3F2D0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 08:52:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8095F24691
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 08:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F57E246A3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 08:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726631AbgB1IUr convert rfc822-to-8bit (ORCPT
+        id S1726525AbgB1IwV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Feb 2020 03:20:47 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:39634 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726490AbgB1IUq (ORCPT
+        Fri, 28 Feb 2020 03:52:21 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:53174 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726005AbgB1IwV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 03:20:46 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id AD57DCECF6;
-        Fri, 28 Feb 2020 09:30:11 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [RFC 1/5] Bluetooth: Add BT_MODE socket option
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200225073437.11212-1-luiz.dentz@gmail.com>
-Date:   Fri, 28 Feb 2020 09:20:45 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6F27945C-88B1-4F11-BE40-57125E0A8DAC@holtmann.org>
-References: <20200225073437.11212-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Fri, 28 Feb 2020 03:52:21 -0500
+X-Greylist: delayed 348 seconds by postgrey-1.27 at vger.kernel.org; Fri, 28 Feb 2020 03:52:19 EST
+Received: from localhost.localdomain (p200300E9D71B9939E2C0865DB6B8C4EC.dip0.t-ipconnect.de [IPv6:2003:e9:d71b:9939:e2c0:865d:b6b8:c4ec])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 53688C3201;
+        Fri, 28 Feb 2020 09:46:30 +0100 (CET)
+Subject: Re: [PATCH 02/28] docs: networking: convert 6lowpan.txt to ReST
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab@infradead.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+References: <cover.1581002062.git.mchehab+huawei@kernel.org>
+ <bfa773f25584a3939e0a3e1fc6bc0e91f415cd91.1581002063.git.mchehab+huawei@kernel.org>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <f81edab9-3ca8-5421-5bf8-029cefc96ad6@datenfreihafen.org>
+Date:   Fri, 28 Feb 2020 09:46:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <bfa773f25584a3939e0a3e1fc6bc0e91f415cd91.1581002063.git.mchehab+huawei@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hello.
 
-> This adds BT_MODE socket option which can be used to set L2CAP modes,
-> including modes only supported over LE which were not supported using
-> the L2CAP_OPTIONS.
+On 06.02.20 16:17, Mauro Carvalho Chehab wrote:
+> - add SPDX header;
+> - use document title markup;
+> - mark code blocks and literals as such;
+> - adjust identation, whitespaces and blank lines;
+> - add to networking/index.rst.
 > 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 > ---
-> include/net/bluetooth/bluetooth.h |  2 +
-> net/bluetooth/l2cap_sock.c        | 64 ++++++++++++++++++++++++-------
-> 2 files changed, 53 insertions(+), 13 deletions(-)
+>   .../networking/{6lowpan.txt => 6lowpan.rst}   | 29 ++++++++++---------
+>   Documentation/networking/index.rst            |  1 +
+>   2 files changed, 17 insertions(+), 13 deletions(-)
+>   rename Documentation/networking/{6lowpan.txt => 6lowpan.rst} (64%)
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 1576353a2773..c361ec7b06aa 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -139,6 +139,8 @@ struct bt_voice {
-> #define BT_PHY_LE_CODED_TX	0x00002000
-> #define BT_PHY_LE_CODED_RX	0x00004000
+> diff --git a/Documentation/networking/6lowpan.txt b/Documentation/networking/6lowpan.rst
+> similarity index 64%
+> rename from Documentation/networking/6lowpan.txt
+> rename to Documentation/networking/6lowpan.rst
+> index 2e5a939d7e6f..e70a6520cc33 100644
+> --- a/Documentation/networking/6lowpan.txt
+> +++ b/Documentation/networking/6lowpan.rst
+> @@ -1,37 +1,40 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+>   
+> -Netdev private dataroom for 6lowpan interfaces:
+> +==============================================
+> +Netdev private dataroom for 6lowpan interfaces
+> +==============================================
+>   
+>   All 6lowpan able net devices, means all interfaces with ARPHRD_6LOWPAN,
+>   must have "struct lowpan_priv" placed at beginning of netdev_priv.
+>   
+> -The priv_size of each interface should be calculate by:
+> +The priv_size of each interface should be calculate by::
+>   
+>    dev->priv_size = LOWPAN_PRIV_SIZE(LL_6LOWPAN_PRIV_DATA);
+>   
+>   Where LL_PRIV_6LOWPAN_DATA is sizeof linklayer 6lowpan private data struct.
+> -To access the LL_PRIV_6LOWPAN_DATA structure you can cast:
+> +To access the LL_PRIV_6LOWPAN_DATA structure you can cast::
+>   
+>    lowpan_priv(dev)-priv;
+>   
+>   to your LL_6LOWPAN_PRIV_DATA structure.
+>   
+> -Before registering the lowpan netdev interface you must run:
+> +Before registering the lowpan netdev interface you must run::
+>   
+>    lowpan_netdev_setup(dev, LOWPAN_LLTYPE_FOOBAR);
+>   
+>   wheres LOWPAN_LLTYPE_FOOBAR is a define for your 6LoWPAN linklayer type of
+>   enum lowpan_lltypes.
+>   
+> -Example to evaluate the private usually you can do:
+> +Example to evaluate the private usually you can do::
+>   
+> -static inline struct lowpan_priv_foobar *
+> -lowpan_foobar_priv(struct net_device *dev)
+> -{
+> + static inline struct lowpan_priv_foobar *
+> + lowpan_foobar_priv(struct net_device *dev)
+> + {
+>   	return (struct lowpan_priv_foobar *)lowpan_priv(dev)->priv;
+> -}
+> + }
+>   
+> -switch (dev->type) {
+> -case ARPHRD_6LOWPAN:
+> + switch (dev->type) {
+> + case ARPHRD_6LOWPAN:
+>   	lowpan_priv = lowpan_priv(dev);
+>   	/* do great stuff which is ARPHRD_6LOWPAN related */
+>   	switch (lowpan_priv->lltype) {
+> @@ -42,8 +45,8 @@ case ARPHRD_6LOWPAN:
+>   	...
+>   	}
+>   	break;
+> -...
+> -}
+> + ...
+> + }
+>   
+>   In case of generic 6lowpan branch ("net/6lowpan") you can remove the check
+>   on ARPHRD_6LOWPAN, because you can be sure that these function are called
+> diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+> index 3ccb89bf5585..cc34c06477eb 100644
+> --- a/Documentation/networking/index.rst
+> +++ b/Documentation/networking/index.rst
+> @@ -34,6 +34,7 @@ Contents:
+>      tls
+>      tls-offload
+>      nfc
+> +   6lowpan
+>   
+>   .. only::  subproject and html
+>   
 > 
-> +#define BT_MODE			15
-> +
 
-can we postpone this change. I like to get your patches 2, 3 and 4 merged first. That way we can do some initial testing here.
+Reviewed-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-Regards
-
-Marcel
-
+regards
+Stefan Schmidt
