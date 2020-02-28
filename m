@@ -2,70 +2,67 @@ Return-Path: <SRS0=e/tT=4Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1FDDC3F2D2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D53C3F2D3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78C6A246B7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23DC1246B5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAE41cfz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O2b4J8ry"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbgB1XrG (ORCPT
+        id S1726642AbgB1XrG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 28 Feb 2020 18:47:06 -0500
-Received: from mail-pj1-f45.google.com ([209.85.216.45]:33922 "EHLO
-        mail-pj1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726525AbgB1XrF (ORCPT
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:36567 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726525AbgB1XrG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 18:47:05 -0500
-Received: by mail-pj1-f45.google.com with SMTP id f2so4702733pjq.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 15:47:05 -0800 (PST)
+        Fri, 28 Feb 2020 18:47:06 -0500
+Received: by mail-pj1-f54.google.com with SMTP id gv17so1921537pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 15:47:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=a4mt3tuBEtrcFQaO04FkgRzkU5NWsbNKqrXQXndd3Lo=;
-        b=JAE41cfzDEddUoF89z01cmKJCa1ICMR9riB04GVa9TLtSknXNHkpIhyyppzRG53vzz
-         oDDlUJSbi00CAGUrQYi6DafximPtDrQ1fWeMxJK8vCs4CY8jk8qHkt8J4XWnaJOUu251
-         8GtmkHypZ1exTEl3lYL9KVrymahP1MJI2ePCtuIXsOAcxZfeBB2wgNUPk+wAqRb9uztF
-         BHwqk6++kEmceWxEyDaGrxTF2kFefVKSExvVLIf0RK63Qd7QRLDc7xClGDrmaUCWw9aq
-         3kam9VAO5+FAoO5VjIiEAhLyXuyaBSbg6Tjt8T4jIg9hl5yPoYew9qdMFDduvaaq1zx0
-         WNSQ==
+        bh=vGeJvn5f/TortUIRqyBMZXkJuSujmHw43Jjf8CfXFrs=;
+        b=O2b4J8ryDahyS7lpY8162t3HFqXeCp0CXxcNxL/8YSXZd+jYAj3ZeWDLe/AkVbDFQD
+         BDRMjxlRFkpkFDD7MmoaVM4skqhRKyxHIullb8DIgkUF5udY53w8eFSbvMm74viRioX/
+         Z9NwUZCMgFQJ6vVfbGL0DDTu4twyKP7ZbwicJseqfJGRhYLQYd0CtpokdqD20h1Hx4FR
+         HLH/S2HBRkS2J+zM9pB9gH4XEnpwIaB/YU5+9XqjZymNlnSHxrV5YLxbE2cH7RDfUcfi
+         476A/cCYwJnse0N4nX/JdOthimp/WQqnRjePJmsVnu8JyTKmPfYU6NJwyH7uOVjejjSK
+         nVMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=a4mt3tuBEtrcFQaO04FkgRzkU5NWsbNKqrXQXndd3Lo=;
-        b=HbGTZ4yrGL0yPwPbwcBfuZfiDz0++fZeHgM2k1y55RYmj6cmfS0cxITModReyGvh5j
-         JAFQ9dVNCFKF82N7BRKtYQbVrfesRVwIDBod7Ymoa0vQajO+3NxV8XpyPc7Ca4qJoSw9
-         mK4msGW74E/AIfqCC2MOjibRspowaFcCv+IyMLPASxNdw/6pf6neIW/3IF2ijNJrTVhA
-         aCam9+Bi+kp9MapQEEkHScS5YbZ9Wc5Ya/wD4BohEyy6S1OJHe/5GznQkYTWDZqPlk6U
-         2FGn0q8SlnJyW1VKeR+VTwwaHPG67shQE4wlZontk5siw6ZaKSv1x8b6DPSnX2eEghcA
-         c4SA==
-X-Gm-Message-State: APjAAAVOH2dOk50cmmjkjoWIcB7GkGyyWRjxT1jxxWap9ou8jqctC9Pk
-        GY5FIXX+cwrMTg2hFome8ppxVUaRAkk=
-X-Google-Smtp-Source: APXvYqwblYvciv7f7kHmDiW0jcNlt2mK1qRYN2plv6ZAr9Rs3xy9LrI88P8X2YIIRAdtYLuJZPMc4Q==
-X-Received: by 2002:a17:90a:17e5:: with SMTP id q92mr7484160pja.28.1582933624183;
-        Fri, 28 Feb 2020 15:47:04 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vGeJvn5f/TortUIRqyBMZXkJuSujmHw43Jjf8CfXFrs=;
+        b=LbKaiBpEESWaYwgARGJslJnfYdYWvAxB45IEw3PYTLZrssI4u+fsCZee/BTuDS6lrT
+         +mmVbq80ZyUgxajpFcC3z/BBqPs77XqS5eUXTRrvYIGeENvve7RLiGL3wnftB9XHVF6Q
+         cD6cKlWGjgqvsHSi2aWNvtN3jkfH0s1YMg1oOGOAABiuBAP2pKjVJq2Nh0KD0BILsEej
+         WEwvbD1O0ptzB9zZpyWBFEE4K7JzIthZeknXLucncjc3sde+GcxOvougpr1mC54VtKgx
+         5PmsjhU8BgC+O3GyDD5rOSegsco3QhF5BfYcUuXONi8a/FE6Ie9jr93dSXLTe5OwbJMP
+         gikw==
+X-Gm-Message-State: APjAAAWPI332+LXDzzuuB+juITkTbQPIl2a1G+NSrXsAHM8aSPJksDOr
+        Iu/O6x0LnTjadMTMyHKhv8qAaap7XC8=
+X-Google-Smtp-Source: APXvYqz7o4tEOhiX/UEouRTs8Mpl2TR2tej2rEwpTfGwMtn+U8eUwtBzsW2X3TImABtjejKcQzmGTw==
+X-Received: by 2002:a17:902:7797:: with SMTP id o23mr5940809pll.298.1582933623334;
+        Fri, 28 Feb 2020 15:47:03 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id q13sm13643954pfn.162.2020.02.28.15.47.03
+        by smtp.gmail.com with ESMTPSA id q13sm13643954pfn.162.2020.02.28.15.47.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2020 15:47:03 -0800 (PST)
+        Fri, 28 Feb 2020 15:47:02 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/12] lib: Add definitions for Enhanced Credits Based Mode
-Date:   Fri, 28 Feb 2020 15:46:50 -0800
-Message-Id: <20200228234701.14614-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 00/12] Userspace Bluetooth 5.2 initial support
+Date:   Fri, 28 Feb 2020 15:46:49 -0800
+Message-Id: <20200228234701.14614-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200228234701.14614-1-luiz.dentz@gmail.com>
-References: <20200228234701.14614-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -75,36 +72,64 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
----
- lib/bluetooth.h | 2 ++
- lib/l2cap.h     | 1 +
- 2 files changed, 3 insertions(+)
+This introduces the initial support for Bluetooth 5.2 features:
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index d14217eac..47521d50e 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -141,6 +141,8 @@ struct bt_voice {
- #define BT_PHY_LE_CODED_TX	0x00002000
- #define BT_PHY_LE_CODED_RX	0x00004000
- 
-+#define BT_MODE			15
-+
- /* Connection and socket states */
- enum {
- 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
-diff --git a/lib/l2cap.h b/lib/l2cap.h
-index 5ce94c4ee..f9ceb2f33 100644
---- a/lib/l2cap.h
-+++ b/lib/l2cap.h
-@@ -197,6 +197,7 @@ typedef struct {
- #define L2CAP_MODE_FLOWCTL	0x02
- #define L2CAP_MODE_ERTM		0x03
- #define L2CAP_MODE_STREAMING	0x04
-+#define L2CAP_MODE_EXT_FLOWCTL	0x81
- 
- #define L2CAP_SERVTYPE_NOTRAFFIC	0x00
- #define L2CAP_SERVTYPE_BESTEFFORT	0x01
+* ISO channels:
+        + tools/isotest command line tool to run validation tests
+
+* L2CAP Enhanced Credit Based Flow Control Mode
+        + tools/l2test has been update to include the new mode
+
+* Enhanced ATT Bearer:
+        + Client and Server support
+        + Include all new procedures
+        + Automaticlly detects and enables channels
+        + Number of channels configurable via main.conf
+
+v2: Dropped ISO changes since there still under discussions how it will be
+supported, change ECRED to EXT_FLOWCTL and use BT_MODE to set it.
+
+Luiz Augusto von Dentz (12):
+  lib: Add definitions for Enhanced Credits Based Mode
+  btio: Add mode to for Enhanced Credit Mode
+  l2test: Add support for L2CAP_EXT_FLOWCTL_MODE
+  share/att: Add EATT support
+  shared/gatt-client: Add support for EATT features
+  gatt: Enable EATT bearer support
+  shared/gatt-server: Add support for Read Multiple Variable Length
+  shared/gatt-client: Add support for Read Multiple Variable Length
+  shared/gatt: Add support for Handle Value Multiple Notifications
+  gatt: Add support for Notify Multiple
+  core: Add support for setting the number of GATT bearers
+  monitor: Add support for decoding EATT
+
+ attrib/gattrib.c         |   5 +-
+ btio/btio.c              |  53 ++-
+ btio/btio.h              |   3 +-
+ lib/bluetooth.h          |   2 +
+ lib/l2cap.h              |   1 +
+ lib/uuid.h               |   3 +
+ monitor/l2cap.c          |  39 ++
+ peripheral/gatt.c        |   2 +-
+ src/device.c             |  18 +-
+ src/gatt-client.c        |  85 +++++
+ src/gatt-database.c      | 125 +++++--
+ src/hcid.h               |   1 +
+ src/main.c               |  14 +
+ src/main.conf            |   5 +
+ src/shared/att-types.h   |  25 +-
+ src/shared/att.c         | 780 ++++++++++++++++++++++++++-------------
+ src/shared/att.h         |  18 +-
+ src/shared/gatt-client.c | 287 +++++++++++---
+ src/shared/gatt-client.h |   5 +-
+ src/shared/gatt-server.c | 389 ++++++++++++-------
+ src/shared/gatt-server.h |   2 +-
+ tools/btgatt-client.c    |   2 +-
+ tools/btgatt-server.c    |   4 +-
+ tools/l2test.c           |  10 +-
+ unit/test-gatt.c         |  25 +-
+ 25 files changed, 1407 insertions(+), 496 deletions(-)
+
 -- 
 2.21.1
 
