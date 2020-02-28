@@ -2,67 +2,67 @@ Return-Path: <SRS0=e/tT=4Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BC5C3F2D2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44BBEC3F2D3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92867246B6
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 103C8246BA
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 23:47:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1MPxMf/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9YE6H/v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbgB1XrR (ORCPT
+        id S1726860AbgB1XrR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 28 Feb 2020 18:47:17 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41301 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726845AbgB1XrQ (ORCPT
+Received: from mail-pj1-f53.google.com ([209.85.216.53]:52738 "EHLO
+        mail-pj1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbgB1XrR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 18:47:16 -0500
-Received: by mail-pg1-f196.google.com with SMTP id b1so2291721pgm.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 15:47:16 -0800 (PST)
+        Fri, 28 Feb 2020 18:47:17 -0500
+Received: by mail-pj1-f53.google.com with SMTP id ep11so1910637pjb.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 15:47:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=71j6KIh4O1bMSaDqDl28Qe8IFycvbdYvPA383k/CA+I=;
-        b=e1MPxMf/ShhmI4JzT0UYt3+mUh0qpkuHA4nqMhnSFZ6WlSIj3DGK/v69QPw/6J4/KJ
-         2i7QjCk1R57r+/bZDZcwnqhpHGHEBqByq2FChrD0Ehi7WOUW56Me5OlJ8mL1nZhPhFyV
-         7y16OBR75snJapXp7KwZRdibMvFDV488bOUk4wy1ARpltuB+/af1kEL/WOwg5MrBM9eT
-         1L7EQszOdP4LuJPytFeYt4zpUqIU5TWPepYKBQG1okRjtZjfoRiVEtjkHQRdGsvKCFqD
-         TXoMizG947axpiBI7qvanEfCuJLaAxU7X+MayvSGRlsmg9gI7NtnZHKu6bLEz+12ZYMX
-         529A==
+        bh=9MeUOiYNiKf6MLQmBNl/ygbA8CVOmtoSr1PMVUY3JEs=;
+        b=d9YE6H/v/l/C1sK5nneHEp60x/ifEApV+tzj4vjjmiz2eu3kay8oe0dOU00tF37Qkt
+         fWXkJGDJrE+sV78q3EwfhupUxyJK7MU2Zdhs2vi8k2tdQSi9SJ0Gnw7NClRs5iRrGUls
+         a1qv6k6iZ98mnV3kC4/epNgN6gO6QFuCU8yXB1312YVDfp9CsFIlzY/9p1lPBfMwHyXs
+         BkCpLMoRC3I6ONZhp1OcTKoN3JnkPU53fs0qvlpEODW0gN6uP1+wC3JblU2/qtagcJTK
+         4si8hw56wuVqpuM6kF6rpgDqh5nxPgaxN9ew7KsoeY3Z3rIan9IWim2fYKPt2hb+Pk3K
+         MgEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=71j6KIh4O1bMSaDqDl28Qe8IFycvbdYvPA383k/CA+I=;
-        b=eYKGRFY+dVrVDr6TgYxxP4GFl4GothxShUP72GaK4ZxRWgjiVpp3Gjk4M3C8sB/oar
-         0ao9vJdywZ4VRNM9K7nhqE5GcOH+G/Wp73dpGn2jIsHJnvk0zw0wtAQyirBQdvqzrnex
-         D5rVe9kLloEzyZeolBHusJDPb3PVorkuPFPjLtwyWzPkrP0kobt3MB8LPi30VmV+zCjr
-         eTsI3Sm0dK2mDhZKitc8fTsLbpS5sX+uP+ayvTGXnj8rIyNW6Hi+Q7N4aGUpBpjxNNfz
-         xyuemfOLjNZ0DAYeAfvOl0EGC5iGgOD6K/FfW2xxSXTbMFsSHpGcbX2s8hTn1v6LUhxh
-         AFMA==
-X-Gm-Message-State: APjAAAVkgJSLfVCUDTEaO36QpTd7Ipy/JZRMhhwtpcDoZaKPEqqQNqct
-        QRyGD+UXFbb4l7QTofeAmjrs6GEErt4=
-X-Google-Smtp-Source: APXvYqy3JCtxwvKMG1akJpnWwJCfitFbk23IBwhatCcu0SyP6sI/a9XoymcAWZCNa6sb6UFLcoL1VQ==
-X-Received: by 2002:a62:3808:: with SMTP id f8mr6868661pfa.30.1582933635323;
-        Fri, 28 Feb 2020 15:47:15 -0800 (PST)
+        bh=9MeUOiYNiKf6MLQmBNl/ygbA8CVOmtoSr1PMVUY3JEs=;
+        b=o54I69hwOUGMGikud7cYaR8HoreMQz7ODR2HlqTsO48525WGCUYMYWwS/YFByYrl4j
+         RxMQPpppgWg6PDoRWuTNKROO07+GLk9fO8B4drBJOj1QRdunXoPsnf/gOX7vwMFSvsia
+         WaaoiQ+nnx6PW0sKatUBcUudKT9swU75vL7gE2iQ6mr/fzPaOi/0ni6ClAGWrQlwR6E/
+         EM++yl3XeI7HnF9OOYWSQl7MgKUYFf0e8AbwLZjxUuRPpMu2wbxToNsp93uo6ZwXGyja
+         xxWH2D19xRka3k3t3lzo2QsD5BuYoC2Ic4FS3Ghz0OBQZ8bkr3U5I2gg3sV96G5PgGDN
+         rT+A==
+X-Gm-Message-State: APjAAAXj98ze6pWyzIXmyoKwhhuuJhuhQWyJ2t3kHVf7+JHisgRivhi/
+        zaLAV39YDDsyq7z3iYNPJzfdaRZriv8=
+X-Google-Smtp-Source: APXvYqwK3x3btGe2qQmUeWAVC7CuXBmRWM2gyJOMl+7hxT/8qj2GYwfcQ/sBcS0FequPAE18+Bk3LA==
+X-Received: by 2002:a17:90a:a617:: with SMTP id c23mr7485620pjq.32.1582933634471;
+        Fri, 28 Feb 2020 15:47:14 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id q13sm13643954pfn.162.2020.02.28.15.47.14
+        by smtp.gmail.com with ESMTPSA id q13sm13643954pfn.162.2020.02.28.15.47.13
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2020 15:47:14 -0800 (PST)
+        Fri, 28 Feb 2020 15:47:13 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 11/12] core: Add support for setting the number of GATT bearers
-Date:   Fri, 28 Feb 2020 15:47:00 -0800
-Message-Id: <20200228234701.14614-12-luiz.dentz@gmail.com>
+Subject: [PATCH v2 10/12] gatt: Add support for Notify Multiple
+Date:   Fri, 28 Feb 2020 15:46:59 -0800
+Message-Id: <20200228234701.14614-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200228234701.14614-1-luiz.dentz@gmail.com>
 References: <20200228234701.14614-1-luiz.dentz@gmail.com>
@@ -75,176 +75,259 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds option to set the numbers of GATT Channels/Bearers to be
-connected in main.conf.
+This adds support for Notify Multiple procedure marking its bit as
+supported in the Client Features.
 ---
- src/device.c        |  5 +++++
- src/gatt-client.c   |  8 +++++---
- src/gatt-database.c | 12 ++++++++++--
- src/hcid.h          |  1 +
- src/main.c          | 14 ++++++++++++++
- src/main.conf       |  5 +++++
- 6 files changed, 40 insertions(+), 5 deletions(-)
+ src/gatt-database.c      |  8 +++--
+ src/shared/att.c         |  3 +-
+ src/shared/gatt-client.c |  2 ++
+ src/shared/gatt-server.c | 77 +++++++++++++++++++++++++++++++++-------
+ src/shared/gatt-server.h |  2 +-
+ tools/btgatt-server.c    |  4 +--
+ unit/test-gatt.c         |  2 +-
+ 7 files changed, 78 insertions(+), 20 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index c86e9a64d..7e3c2b215 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5049,6 +5049,11 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 	}
- 
- 	if (dev->att) {
-+		if (main_opts.gatt_channels == bt_att_get_channels(dev->att)) {
-+			DBG("EATT channel limit reached");
-+			return false;
-+		}
-+
- 		if (!bt_att_attach_fd(dev->att, g_io_channel_unix_get_fd(io))) {
- 			DBG("EATT channel connected");
- 			g_io_channel_set_close_on_unref(io, FALSE);
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index aa77661ad..958ce5f9b 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -59,8 +59,6 @@
- #define GATT_CHARACTERISTIC_IFACE	"org.bluez.GattCharacteristic1"
- #define GATT_DESCRIPTOR_IFACE		"org.bluez.GattDescriptor1"
- 
--#define EATT_MAX_BEARERS 2
--
- struct btd_gatt_client {
- 	struct btd_device *device;
- 	uint8_t features;
-@@ -2171,6 +2169,7 @@ static void eatt_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 
- static void eatt_connect(struct btd_gatt_client *client)
- {
-+	struct bt_att *att = bt_gatt_client_get_att(client->gatt);
- 	struct btd_device *dev = client->device;
- 	struct btd_adapter *adapter = device_get_adapter(dev);
- 	GIOChannel *io;
-@@ -2178,11 +2177,14 @@ static void eatt_connect(struct btd_gatt_client *client)
- 	char addr[18];
- 	int i;
- 
-+	if (bt_att_get_channels(att) == main_opts.gatt_channels)
-+		return;
-+
- 	ba2str(device_get_address(dev), addr);
- 
- 	DBG("Connection attempt to: %s", addr);
- 
--	for (i = 0; i < EATT_MAX_BEARERS; i++) {
-+	for (i = bt_att_get_channels(att); i < main_opts.gatt_channels; i++) {
- 		io = bt_io_connect(eatt_connect_cb, client, NULL, NULL,
- 				BT_IO_OPT_SOURCE_BDADDR,
- 				btd_adapter_get_address(adapter),
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 1b514aa4f..d0ab4da99 100644
+index 2445d1fa5..1b514aa4f 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
-@@ -1215,10 +1215,13 @@ static void populate_gatt_service(struct btd_gatt_database *database)
- 				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
- 				db_hash_read_cb, NULL, database);
+@@ -1011,7 +1011,7 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+ 	if (ccc_cb->callback) {
+ 		struct pending_op *op;
  
--	bt_uuid16_create(&uuid, GATT_CHARAC_SERVER_FEAT);
--	database->eatt = gatt_db_service_add_characteristic(service,
-+	/* Only enable EATT if there is a socket listening */
-+	if (database->eatt_io) {
-+		bt_uuid16_create(&uuid, GATT_CHARAC_SERVER_FEAT);
-+		database->eatt = gatt_db_service_add_characteristic(service,
- 				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
- 				server_feat_read_cb, NULL, database);
-+	}
+-		op = pending_ccc_new(att, attrib, get_le16(value),
++		op = pending_ccc_new(att, attrib, val,
+ 					bt_att_get_link_type(att));
+ 		if (!op) {
+ 			ecode = BT_ATT_ERROR_UNLIKELY;
+@@ -1098,7 +1098,8 @@ static void cli_feat_write_cb(struct gatt_db_attribute *attrib,
+ 	struct btd_gatt_database *database = user_data;
+ 	struct device_state *state;
+ 	uint8_t bits[] = { BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING,
+-				BT_GATT_CHRC_CLI_FEAT_EATT };
++				BT_GATT_CHRC_CLI_FEAT_EATT,
++				BT_GATT_CHRC_CLI_FEAT_NFY_MULTI };
+ 	uint8_t ecode = 0;
+ 	unsigned int i;
  
- 	gatt_db_service_set_active(service, true);
- 
-@@ -3564,6 +3567,10 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
- 		goto fail;
+@@ -1330,7 +1331,8 @@ static void send_notification_to_device(void *data, void *user_data)
+ 		DBG("GATT server sending notification");
+ 		bt_gatt_server_send_notification(server,
+ 					notify->handle, notify->value,
+-					notify->len);
++					notify->len, device_state->cli_feat[0] &
++					BT_GATT_CHRC_CLI_FEAT_NFY_MULTI);
+ 		return;
  	}
  
-+	/* If just just 1 channel is enabled EATT is not required */
-+	if (main_opts.gatt_channels == 1)
-+		goto bredr;
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 6fa16e422..948a5548b 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -145,6 +145,7 @@ static const struct {
+ 	{ BT_ATT_OP_EXEC_WRITE_REQ,		ATT_OP_TYPE_REQ },
+ 	{ BT_ATT_OP_EXEC_WRITE_RSP,		ATT_OP_TYPE_RSP },
+ 	{ BT_ATT_OP_HANDLE_NFY,			ATT_OP_TYPE_NFY },
++	{ BT_ATT_OP_HANDLE_NFY_MULT,		ATT_OP_TYPE_NFY },
+ 	{ BT_ATT_OP_HANDLE_IND,			ATT_OP_TYPE_IND },
+ 	{ BT_ATT_OP_HANDLE_CONF,		ATT_OP_TYPE_CONF },
+ 	{ }
+@@ -842,7 +843,7 @@ static void handle_conf(struct bt_att_chan *chan, uint8_t *pdu, ssize_t pdu_len)
+ 	}
+ 
+ 	if (op->callback)
+-		op->callback(BT_ATT_OP_HANDLE_NFY, NULL, 0, op->user_data);
++		op->callback(BT_ATT_OP_HANDLE_CONF, NULL, 0, op->user_data);
+ 
+ 	destroy_att_send_op(op);
+ 	chan->pending_ind = NULL;
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 7381f96e0..963ad619f 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1968,6 +1968,8 @@ static void write_client_features(struct bt_gatt_client *client)
+ 			client->features |= BT_GATT_CHRC_CLI_FEAT_EATT;
+ 	}
+ 
++	client->features |= BT_GATT_CHRC_CLI_FEAT_NFY_MULTI;
 +
- 	/* EATT socket */
- 	database->eatt_io = bt_io_listen(connect_cb, NULL, NULL, NULL, NULL,
- 					BT_IO_OPT_SOURCE_BDADDR, addr,
-@@ -3591,6 +3598,7 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
- 		}
- 	}
+ 	util_debug(client->debug_callback, client->debug_data,
+ 			"Writing Client Features 0x%02x", client->features);
  
-+bredr:
- 	/* BR/EDR socket */
- 	database->bredr_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &gerr,
- 					BT_IO_OPT_SOURCE_BDADDR, addr,
-diff --git a/src/hcid.h b/src/hcid.h
-index ca405fde4..1bf93784d 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -62,6 +62,7 @@ struct main_opts {
- 	bt_mode_t	mode;
- 	bt_gatt_cache_t gatt_cache;
- 	uint16_t	gatt_mtu;
-+	uint8_t		gatt_channels;
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 8e81d6e0e..7e5d652e4 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -36,6 +36,7 @@
+ #include "src/shared/gatt-server.h"
+ #include "src/shared/gatt-helpers.h"
+ #include "src/shared/util.h"
++#include "src/shared/timeout.h"
  
- 	uint8_t		key_size;
+ #ifndef MAX
+ #define MAX(a, b) ((a) > (b) ? (a) : (b))
+@@ -51,6 +52,8 @@
+  */
+ #define DEFAULT_MAX_PREP_QUEUE_LEN 30
  
-diff --git a/src/main.c b/src/main.c
-index fc8c869fc..7b927ac79 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -109,6 +109,7 @@ static const char *gatt_options[] = {
- 	"Cache",
- 	"KeySize",
- 	"ExchangeMTU",
-+	"EATTChannels",
- 	NULL
++#define NFY_MULT_TIMEOUT 10
++
+ struct async_read_op {
+ 	struct bt_att_chan *chan;
+ 	struct bt_gatt_server *server;
+@@ -86,6 +89,13 @@ static void prep_write_data_destroy(void *user_data)
+ 	free(data);
+ }
+ 
++struct nfy_mult_data {
++	unsigned int id;
++	uint8_t *pdu;
++	uint16_t offset;
++	uint16_t len;
++};
++
+ struct bt_gatt_server {
+ 	struct gatt_db *db;
+ 	struct bt_att *att;
+@@ -120,6 +130,8 @@ struct bt_gatt_server {
+ 
+ 	bt_gatt_server_authorize_cb_t authorize;
+ 	void *authorize_data;
++
++	struct nfy_mult_data *nfy_mult;
  };
  
-@@ -471,6 +472,18 @@ static void parse_config(GKeyFile *config)
- 		DBG("ExchangeMTU=%d", val);
- 		main_opts.gatt_mtu = val;
- 	}
+ static void bt_gatt_server_free(struct bt_gatt_server *server)
+@@ -1726,28 +1738,69 @@ bool bt_gatt_server_set_debug(struct bt_gatt_server *server,
+ 	return true;
+ }
+ 
++static bool notify_multiple(void *user_data)
++{
++	struct bt_gatt_server *server = user_data;
 +
-+	val = g_key_file_get_integer(config, "GATT", "Channels", &err);
-+	if (err) {
-+		DBG("%s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		DBG("Channels=%d", val);
-+		/* Ensure the channels is within a valid range. */
-+		val = MIN(val, 5);
-+		val = MAX(val, 1);
-+		main_opts.gatt_channels = val;
++	bt_att_send(server->att, BT_ATT_OP_HANDLE_NFY_MULT,
++			server->nfy_mult->pdu, server->nfy_mult->offset, NULL,
++			NULL, NULL);
++
++	free(server->nfy_mult->pdu);
++	free(server->nfy_mult);
++	server->nfy_mult = NULL;
++
++	return false;
++}
++
+ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+ 					uint16_t handle, const uint8_t *value,
+-					uint16_t length)
++					uint16_t length, bool multiple)
+ {
+-	uint16_t pdu_len;
+-	uint8_t *pdu;
++	struct nfy_mult_data *data = NULL;
+ 	bool result;
+ 
+ 	if (!server || (length && !value))
+ 		return false;
+ 
+-	pdu_len = MIN(bt_att_get_mtu(server->att) - 1, length + 2);
+-	pdu = malloc(pdu_len);
+-	if (!pdu)
+-		return false;
++	if (multiple)
++		data = server->nfy_mult;
+ 
+-	put_le16(handle, pdu);
+-	memcpy(pdu + 2, value, pdu_len - 2);
++	if (!data) {
++		data = new0(struct nfy_mult_data, 1);
++		data->len = bt_att_get_mtu(server->att) - 1;
++		data->pdu = malloc(data->len);
 +	}
- }
  
- static void init_defaults(void)
-@@ -497,6 +510,7 @@ static void init_defaults(void)
- 
- 	main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
- 	main_opts.gatt_mtu = BT_ATT_MAX_LE_MTU;
-+	main_opts.gatt_channels = 3;
- }
- 
- static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
-diff --git a/src/main.conf b/src/main.conf
-index bb5ff5b15..16701ebe4 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -99,6 +99,11 @@
- # Defaults to 517
- #ExchangeMTU = 517
- 
-+# Number of ATT channels
-+# Possible values: 1-5 (1 disables EATT)
-+# Default to 3
-+#Channels = 3
+-	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_NFY, pdu,
+-						pdu_len, NULL, NULL, NULL);
+-	free(pdu);
++	put_le16(handle, data->pdu + data->offset);
++	data->offset += 2;
 +
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
++	length = MIN(data->len - data->offset, length);
++
++	if (multiple) {
++		put_le16(length, data->pdu + data->offset);
++		data->offset += 2;
++	}
++
++	memcpy(data->pdu + data->offset, value, length);
++	data->offset += length;
++
++	if (multiple) {
++		if (!server->nfy_mult)
++			server->nfy_mult = data;
++
++		if (!server->nfy_mult->id)
++			server->nfy_mult->id = timeout_add(NFY_MULT_TIMEOUT,
++						   notify_multiple, server,
++						   NULL);
++
++		return true;
++	}
++
++	result = !!bt_att_send(server->att, BT_ATT_OP_HANDLE_NFY,
++				data->pdu, data->offset, NULL, NULL, NULL);
++	free(data->pdu);
++	free(data);
+ 
+ 	return result;
+ }
+diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+index c3d83f225..a2492d275 100644
+--- a/src/shared/gatt-server.h
++++ b/src/shared/gatt-server.h
+@@ -52,7 +52,7 @@ bool bt_gatt_server_set_authorize(struct bt_gatt_server *server,
+ 
+ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+ 					uint16_t handle, const uint8_t *value,
+-					uint16_t length);
++					uint16_t length, bool multiple);
+ 
+ bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
+ 					uint16_t handle, const uint8_t *value,
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index d9d96e691..5b7857b00 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -305,7 +305,7 @@ static bool hr_msrmt_cb(void *user_data)
+ 
+ 	bt_gatt_server_send_notification(server->gatt,
+ 						server->hr_msrmt_handle,
+-						pdu, len);
++						pdu, len, false);
+ 
+ 
+ 	cur_ee = server->hr_energy_expended;
+@@ -831,7 +831,7 @@ static void cmd_notify(struct server *server, char *cmd_str)
+ 							conf_cb, NULL, NULL))
+ 			printf("Failed to initiate indication\n");
+ 	} else if (!bt_gatt_server_send_notification(server->gatt, handle,
+-								value, length))
++							value, length, false))
+ 		printf("Failed to initiate notification\n");
+ 
+ done:
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index d94993b9c..36dd2847c 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2271,7 +2271,7 @@ static void test_server_notification(struct context *context)
+ 	const struct test_step *step = context->data->step;
+ 
+ 	bt_gatt_server_send_notification(context->server, step->handle,
+-						step->value, step->length);
++					step->value, step->length, false);
+ }
+ 
+ static const struct test_step test_notification_server_1 = {
 -- 
 2.21.1
 
