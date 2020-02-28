@@ -2,134 +2,89 @@ Return-Path: <SRS0=e/tT=4Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D98AC3F2D2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 13:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FE68C3F2D2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 13:52:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D4118246AE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 13:45:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="ezaOkChQ"
+	by mail.kernel.org (Postfix) with ESMTP id 7182F246B0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 13:52:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726987AbgB1NpI (ORCPT
+        id S1727078AbgB1NwI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Feb 2020 08:45:08 -0500
-Received: from gateway21.websitewelcome.com ([192.185.45.38]:27349 "EHLO
-        gateway21.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726894AbgB1NpI (ORCPT
+        Fri, 28 Feb 2020 08:52:08 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:59831 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725943AbgB1NwI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 08:45:08 -0500
-Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
-        by gateway21.websitewelcome.com (Postfix) with ESMTP id 839B9400CDAA1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 07:45:07 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 7fwxjIjVJRP4z7fwxjh8Xj; Fri, 28 Feb 2020 07:45:07 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
-        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=dp7OH8A4KnczyYJovH59Zksat//ZZyGW27TssWDaCwU=; b=ezaOkChQzVs7vsAT/2k7fCErdV
-        HTx/3dG3u0qkOqddA1n/Z9+SpTSmpto04B7IvkemtDFzEOZICZXOiyDPL0WE1QCn+XdqO0CNOMR6m
-        oz+5p6Db+i4pKSIb8tCzT3UAvjW10RupagVTAUvLBsmJe/jweCMYXVo8I72avmwnMmV+XxPis7fS3
-        88lEXQ1hL1eoBCN+llyqJLcTSc7anMZHwIncI7ZnhnDOtn9DNIGypQgHn1TrGx49vwIh+6lJO5Pu6
-        k5eVzONUrWFuETjhEl4NSmm1QSv7W6e3T4P24X0SNjloblgMikDkxsftpSVI3r88q1Z1XGY8uFx74
-        6bI5h8Xg==;
-Received: from [201.162.240.44] (port=21260 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1j7fwv-001U2f-DG; Fri, 28 Feb 2020 07:45:05 -0600
-Date:   Fri, 28 Feb 2020 07:47:58 -0600
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
+        Fri, 28 Feb 2020 08:52:08 -0500
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9149CCECF9;
+        Fri, 28 Feb 2020 15:01:32 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH][next] 6lowpan: Replace zero-length array with
+ flexible-array member
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200228134758.GA29760@embeddedor>
+Date:   Fri, 28 Feb 2020 14:52:05 +0100
+Cc:     Alexander Aring <alex.aring@gmail.com>,
         Jukka Rissanen <jukka.rissanen@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH][next] 6lowpan: Replace zero-length array with flexible-array
- member
-Message-ID: <20200228134758.GA29760@embeddedor>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.162.240.44
-X-Source-L: No
-X-Exim-ID: 1j7fwv-001U2f-DG
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [201.162.240.44]:21260
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 58
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <170C625F-CF47-4474-970B-EB31FA49E9A4@holtmann.org>
+References: <20200228134758.GA29760@embeddedor>
+To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The current codebase makes use of the zero-length array language
-extension to the C90 standard, but the preferred mechanism to declare
-variable-length types such as these ones is a flexible array member[1][2],
-introduced in C99:
+Hi Gustavo,
 
-struct foo {
-        int stuff;
-        struct boo array[];
-};
+> The current codebase makes use of the zero-length array language
+> extension to the C90 standard, but the preferred mechanism to declare
+> variable-length types such as these ones is a flexible array member[1][2],
+> introduced in C99:
+> 
+> struct foo {
+>        int stuff;
+>        struct boo array[];
+> };
+> 
+> By making use of the mechanism above, we will get a compiler warning
+> in case the flexible array does not occur last in the structure, which
+> will help us prevent some kind of undefined behavior bugs from being
+> inadvertently introduced[3] to the codebase from now on.
+> 
+> Also, notice that, dynamic memory allocations won't be affected by
+> this change:
+> 
+> "Flexible array members have incomplete type, and so the sizeof operator
+> may not be applied. As a quirk of the original implementation of
+> zero-length arrays, sizeof evaluates to zero."[1]
+> 
+> This issue was found with the help of Coccinelle.
+> 
+> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+> [2] https://github.com/KSPP/linux/issues/21
+> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> ---
+> include/net/6lowpan.h | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-By making use of the mechanism above, we will get a compiler warning
-in case the flexible array does not occur last in the structure, which
-will help us prevent some kind of undefined behavior bugs from being
-inadvertently introduced[3] to the codebase from now on.
+patch has been applied to bluetooth-next tree.
 
-Also, notice that, dynamic memory allocations won't be affected by
-this change:
+Regards
 
-"Flexible array members have incomplete type, and so the sizeof operator
-may not be applied. As a quirk of the original implementation of
-zero-length arrays, sizeof evaluates to zero."[1]
-
-This issue was found with the help of Coccinelle.
-
-[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-[2] https://github.com/KSPP/linux/issues/21
-[3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- include/net/6lowpan.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index a71378007e61..c80539be1542 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -138,7 +138,7 @@ struct lowpan_dev {
- 	struct lowpan_iphc_ctx_table ctx;
- 
- 	/* must be last */
--	u8 priv[0] __aligned(sizeof(void *));
-+	u8 priv[] __aligned(sizeof(void *));
- };
- 
- struct lowpan_802154_neigh {
--- 
-2.25.0
+Marcel
 
