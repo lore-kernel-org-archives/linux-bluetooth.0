@@ -6,36 +6,36 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D06C3F2CF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 07:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DB7C3F2D0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 07:56:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39000246A8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 07:56:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87BD42467B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 07:56:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbgB1H4J convert rfc822-to-8bit (ORCPT
+        id S1726151AbgB1H4L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Feb 2020 02:56:09 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:42531 "EHLO
+        Fri, 28 Feb 2020 02:56:11 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:57057 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725928AbgB1H4J (ORCPT
+        with ESMTP id S1725928AbgB1H4L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 02:56:09 -0500
+        Fri, 28 Feb 2020 02:56:11 -0500
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 91431CECF5;
-        Fri, 28 Feb 2020 09:05:34 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1B699CECF6;
+        Fri, 28 Feb 2020 09:05:36 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v1 2/3] bluetooth: Support querying for WBS support
- through MGMT
+Subject: Re: [PATCH v1 1/3] bluetooth: Add flag to define wideband speech
+ capability
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200227182938.110670-3-alainm@chromium.org>
-Date:   Fri, 28 Feb 2020 08:56:07 +0100
+In-Reply-To: <20200227182938.110670-2-alainm@chromium.org>
+Date:   Fri, 28 Feb 2020 08:56:09 +0100
 Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <2F226B27-7F8F-4E70-AA80-24BE2DC89DA3@holtmann.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <09CC6D4B-3A22-4D41-831F-C7F62FC92C15@holtmann.org>
 References: <20200227182938.110670-1-alainm@chromium.org>
- <20200227182938.110670-3-alainm@chromium.org>
+ <20200227182938.110670-2-alainm@chromium.org>
 To:     Alain Michaud <alainm@chromium.org>
 X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -45,36 +45,18 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Alain,
 
-> This patch provides a mechanism for MGMT interface client to query the
-> capability of the controller to support WBS.
+> This change adds a new flag to define a controller's wideband speech
+> capability.  This is required since no reliable over HCI mechanism
+> exists to query the controller and driver's compatibility with
+> wideband speech.
 > 
 > Signed-off-by: Alain Michaud <alainm@chromium.org>
 > ---
 > 
-> drivers/bluetooth/btusb.c    | 3 +++
-> include/net/bluetooth/hci.h  | 9 +++++++++
-> include/net/bluetooth/mgmt.h | 1 +
-> net/bluetooth/mgmt.c         | 4 ++++
-> 4 files changed, 17 insertions(+)
+> drivers/bluetooth/btusb.c | 19 +++++++++++++------
+> 1 file changed, 13 insertions(+), 6 deletions(-)
 
 patch has been applied to bluetooth-next tree.
-
-However ..
-
-> +
-> +	/* When this quirt is set, wide band speech is supported by
-> +	 * the driver since no reliable mechanism exist to report
-> +	 * this from the hardware, a driver flag is use to convey
-> +	 * this support
-> +	 *
-> +	 * This quirk must be set before hci_register_dev is called.
-> +	 */
-> +	HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
-> };
-
-quirt - a short-handled riding whip with a braided leather lash.
-
-.. this totally made my day and I was tempted to leave this typo in the code, but I fixed it up in the end ;)
 
 Regards
 
