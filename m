@@ -2,154 +2,222 @@ Return-Path: <SRS0=e/tT=4Q=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E89FC3F2D2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 14:00:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48424C3F2D2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 16:39:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12AD0246AE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 14:00:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EC722469C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Feb 2020 16:39:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="PVjndL8k"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="m5jcmZEy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727031AbgB1OAD (ORCPT
+        id S1726016AbgB1Qjc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Feb 2020 09:00:03 -0500
-Received: from gateway24.websitewelcome.com ([192.185.51.202]:34451 "EHLO
-        gateway24.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725796AbgB1OAC (ORCPT
+        Fri, 28 Feb 2020 11:39:32 -0500
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:43275 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725877AbgB1Qjc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 09:00:02 -0500
-Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
-        by gateway24.websitewelcome.com (Postfix) with ESMTP id 054DEE9ADD
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 08:00:01 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 7gBMjIzT1RP4z7gBMjhOOr; Fri, 28 Feb 2020 08:00:01 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=hPUB0Hv9KkxOfCm6nps2dC6eT79tAWk7PpBYyMqbzmo=; b=PVjndL8kgJ0gWCecbZxmOOLc2k
-        jh5dgMXTGJfBNT8ZHTRy5M6z69U1jfgpbfsVPRRn64dDxXg7BDnW6W7uAGhc8EYAykSbSS8BL8fIK
-        vcZRujXrAJ57JVkeXtP+l3WvcxzufSXKpLiu2iNmePSGyFTnZu0ltXolJagzLjVYcxXlV7ML59xyK
-        UxMp+LO+b8u6XZb6V6DS8PykGX0TWP98Y495+WrcRP5caJ2HKR509jIsV9WG3a/p+KfWdL5U+zrPw
-        TtWqya9k/lVWXLjZKNKzdi+iJfpOHvIuimMMqGiy4l6LGv/OYnwqFLc0DJ2HIz0nNjclAZqAlBuek
-        QG6BBQNQ==;
-Received: from [201.162.240.44] (port=6772 helo=[192.168.43.132])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1j7gBM-001c0g-6H; Fri, 28 Feb 2020 08:00:00 -0600
-Subject: Re: [PATCH][next] 6lowpan: Replace zero-length array with
- flexible-array member
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200228134758.GA29760@embeddedor>
- <170C625F-CF47-4474-970B-EB31FA49E9A4@holtmann.org>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Message-ID: <001bafa1-d102-ab0e-1d23-72792d02c65e@embeddedor.com>
-Date:   Fri, 28 Feb 2020 08:02:49 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        Fri, 28 Feb 2020 11:39:32 -0500
+Received: by mail-vs1-f68.google.com with SMTP id 7so2306299vsr.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Feb 2020 08:39:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Oxkss/h+D8tGHimDL1H8L67MCauGwi6R90+QYCsqKTU=;
+        b=m5jcmZEyLWSnRF4Y1xmCri8+y+LR/mlnh0l8Idp+Tx3kbLpsKKxAsQ5SvXuxpgs8lM
+         WEoao5gMhWMriPKXYIyGzu/98sN2oho2vB6+o89UAxI6VrPQbVuF4wtghx8VdcoIhuVa
+         QY7VSdIRTMch3lizn2fMN+al7UfXCYnn5nThE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Oxkss/h+D8tGHimDL1H8L67MCauGwi6R90+QYCsqKTU=;
+        b=XSYN4mxcImfYX2sRe9Qs10obJO6spfHGFQ+PHAJDgh/kSW7W91WjYpLLx7pygBsd+F
+         yAiIOLVHWG/wD2Zg4R3ogaBbsRJjPnmn5xSrjYkMG/5K1ib24Bwh0+QLEJahkaad4I/1
+         eBROu68Gp2RbDHx6TJYbgMoSa5RMx+baUOUxc1m2/8gWj6ye0y2ndmUZoRBlFGY5Gqa9
+         /t7mC7YFtj2Zx/3Aa2lUkliAWMBMrMTUVqD1Pv9bq7FuQtgDEB4ZtLhao8UCf7jXEa5e
+         xWcWI6yS+B2pDbsmLOHUy7ZAtfI04xSsT2L3jWLG8+3KQAkERG8r0ipIemyuK7+FeG6+
+         S68A==
+X-Gm-Message-State: ANhLgQ1qth1QWU1LzjNdkOMJN8g0jpmgWDjzrF9y0m1wr6daa8/vn4x+
+        jakbhZaeijBzO6OAbEQPJaeER7IhrK4=
+X-Google-Smtp-Source: ADFU+vtWE5expFhV7tmSanBvbrwgDfLq+LN93Em6LJYJ0k6U1Oalm0bxZvkB9Vt9D7TYQYJevE2ZqA==
+X-Received: by 2002:a67:ff14:: with SMTP id v20mr3024733vsp.114.1582907969088;
+        Fri, 28 Feb 2020 08:39:29 -0800 (PST)
+Received: from alain.c.googlers.com.com (39.119.74.34.bc.googleusercontent.com. [34.74.119.39])
+        by smtp.gmail.com with ESMTPSA id m82sm3054133vke.30.2020.02.28.08.39.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2020 08:39:28 -0800 (PST)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v2] bluetooth: Enable erroneous data reporting if wbs is supported
+Date:   Fri, 28 Feb 2020 16:39:22 +0000
+Message-Id: <20200228163922.87031-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
 MIME-Version: 1.0
-In-Reply-To: <170C625F-CF47-4474-970B-EB31FA49E9A4@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.162.240.44
-X-Source-L: No
-X-Exim-ID: 1j7gBM-001c0g-6H
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.43.132]) [201.162.240.44]:6772
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 6
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This change will enable erroneous data reporting if wide band speech is
+supported by the controller as indicated by the
+HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED quirk.
 
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
 
-On 2/28/20 07:52, Marcel Holtmann wrote:
+ include/net/bluetooth/hci.h      | 13 ++++++++
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         |  3 ++
+ net/bluetooth/hci_event.c        | 55 ++++++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c             |  3 +-
+ 5 files changed, 74 insertions(+), 1 deletion(-)
 
->>
->> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
->> [2] https://github.com/KSPP/linux/issues/21
->> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
->>
->> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->> ---
->> include/net/6lowpan.h | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> patch has been applied to bluetooth-next tree.
-> 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 0b3ebd35681d..aa1654f9b579 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1095,6 +1095,19 @@ struct hci_rp_read_inq_rsp_tx_power {
+ 	__s8     tx_power;
+ } __packed;
+ 
++#define HCI_OP_READ_DEF_ERR_DATA_REPORTING	0x0c5a
++	#define ERR_DATA_REPORTING_DISABLED	0x00
++	#define ERR_DATA_REPORTING_ENABLED	0x01
++struct hci_rp_read_def_err_data_reporting {
++	__u8     status;
++	__u8     err_data_reporting;
++} __packed;
++
++#define HCI_OP_WRITE_DEF_ERR_DATA_REPORTING	0x0c5b
++struct hci_cp_write_def_err_data_reporting {
++	__u8     err_data_reporting;
++} __packed;
++
+ #define HCI_OP_SET_EVENT_MASK_PAGE_2	0x0c63
+ 
+ #define HCI_OP_READ_LOCATION_DATA	0x0c64
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dcc0dc6e2624..c498ac113930 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -260,6 +260,7 @@ struct hci_dev {
+ 	__u8		stored_num_keys;
+ 	__u8		io_capability;
+ 	__s8		inq_tx_power;
++	__u8		err_data_reporting;
+ 	__u16		page_scan_interval;
+ 	__u16		page_scan_window;
+ 	__u8		page_scan_type;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4e6d61a95b20..3becdce5457a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -603,6 +603,9 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ 	if (hdev->commands[8] & 0x01)
+ 		hci_req_add(req, HCI_OP_READ_PAGE_SCAN_ACTIVITY, 0, NULL);
+ 
++	if (hdev->commands[18] & 0x02)
++		hci_req_add(req, HCI_OP_READ_DEF_ERR_DATA_REPORTING, 0, NULL);
++
+ 	/* Some older Broadcom based Bluetooth 1.2 controllers do not
+ 	 * support the Read Page Scan Type command. Check support for
+ 	 * this command in the bit mask of supported commands.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 591e7477e925..21fd1ebd9c6a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -901,6 +901,53 @@ static void hci_cc_read_inq_rsp_tx_power(struct hci_dev *hdev,
+ 	hdev->inq_tx_power = rp->tx_power;
+ }
+ 
++static void hci_cc_read_def_err_data_reporting(struct hci_dev *hdev,
++					       struct sk_buff *skb)
++{
++	struct hci_rp_read_def_err_data_reporting *rp = (void *)skb->data;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++
++	if (rp->status)
++		return;
++
++	hdev->err_data_reporting = rp->err_data_reporting;
++
++	/* If the controller supports wide_band_speech, enable erroneous
++	 * data reporting.
++	 */
++	if (hdev->err_data_reporting != ERR_DATA_REPORTING_ENABLED &&
++	    (hdev->commands[18] & 0x04) &&
++	    test_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED, &hdev->quirks)) {
++		struct hci_request req;
++		struct hci_cp_write_def_err_data_reporting cp = {};
++
++		hci_req_init(&req, hdev);
++		cp.err_data_reporting = ERR_DATA_REPORTING_ENABLED;
++
++		hci_req_add(&req, HCI_OP_WRITE_DEF_ERR_DATA_REPORTING,
++			    sizeof(cp), &cp);
++	}
++}
++
++static void hci_cc_write_def_err_data_reporting(struct hci_dev *hdev,
++						struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *)skb->data);
++	struct hci_cp_write_def_err_data_reporting *cp;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_WRITE_DEF_ERR_DATA_REPORTING);
++	if (!cp)
++		return;
++
++	hdev->err_data_reporting = cp->err_data_reporting;
++}
++
+ static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_rp_pin_code_reply *rp = (void *) skb->data;
+@@ -3302,6 +3349,14 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_read_inq_rsp_tx_power(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_READ_DEF_ERR_DATA_REPORTING:
++		hci_cc_read_def_err_data_reporting(hdev, skb);
++		break;
++
++	case HCI_OP_WRITE_DEF_ERR_DATA_REPORTING:
++		hci_cc_write_def_err_data_reporting(hdev, skb);
++		break;
++
+ 	case HCI_OP_PIN_CODE_REPLY:
+ 		hci_cc_pin_code_reply(hdev, skb);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1002c657768a..8827d942b2d9 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -764,7 +764,8 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 			settings |= MGMT_SETTING_SECURE_CONN;
+ 
+ 		if (test_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
+-			     &hdev->quirks))
++			     &hdev->quirks) &&
++		    hdev->err_data_reporting == ERR_DATA_REPORTING_ENABLED)
+ 			settings |= MGMT_SETTING_WIDE_BAND_SPEECH;
+ 	}
+ 
+-- 
+2.25.1.481.gfbce0eb801-goog
 
-Thanks, Marcel.
---
-Gustavo
