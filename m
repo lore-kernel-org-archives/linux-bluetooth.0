@@ -2,71 +2,88 @@ Return-Path: <SRS0=KJgL=4R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28121C3F2CE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 10:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D9FC3F2CE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 12:21:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECDA12468E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 10:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5A432469C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 12:21:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gg2OBZg3"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="GoAZCXb4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgB2KKx (ORCPT
+        id S1726980AbgB2MVe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Feb 2020 05:10:53 -0500
-Received: from mail-oi1-f174.google.com ([209.85.167.174]:45610 "EHLO
-        mail-oi1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726764AbgB2KKx (ORCPT
+        Sat, 29 Feb 2020 07:21:34 -0500
+Received: from mail26.static.mailgun.info ([104.130.122.26]:32512 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726944AbgB2MVd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Feb 2020 05:10:53 -0500
-Received: by mail-oi1-f174.google.com with SMTP id v19so5425324oic.12
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Feb 2020 02:10:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=jP8OxWxaQkmAMcRo+puFYl5A+Q7X0BEWO/BCn5sqSL0=;
-        b=gg2OBZg3RS53kHD5CdJfw1kjNIZYgVhVry3r4t5L743CJo+p38KVNAxG27NZOeBZGt
-         b2sy2v5L1jL21VecVpm0DDoNfuyyienuhYgVrHhfhIAGMRBXEujN3X55nOPz493EI2E5
-         3KkBtg7pzeIve6J49LfnyhhqRZlcSejUcgvwvSwKXLweQkUBM6SZSgZN1M4qjiykQVGz
-         j+RMxiZCUufK1ukj4Fujf6YLyM0y9ncLysCfif1fOd493VhPi8g4DJfSz113EUB/LNFb
-         xACf6NOPBCp4Jnv0n9C+ec9wwwibcb0PCU8xwg1erRLsLTeO9vMkYLCoU6iU7L6RyXN4
-         Brng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=jP8OxWxaQkmAMcRo+puFYl5A+Q7X0BEWO/BCn5sqSL0=;
-        b=C6YtTCFf0/SMkLVHSWcXlUJFXTuVDMszAf3tVqJ4Gli424CkqnId3et+fkfKNnqjgF
-         +t8NDgnFifEr6WGgHSpSjB3yilKcOCCjgr7aOMoQvKRNmXcnuOzgOTmmimHIhUnHq/ro
-         3zu9je2LPl6ebyWgYUyAUvrpotQ2bVlkCPj79eiODnZdO/ytvSnsngFMyQz/c0wfzTJJ
-         fYtRjUHtyVt11U4tDQ8Qbi4cq2GDAjOgdOZ35+5RhFHdUcKDG2buYd9ahTmBkWAeMiPh
-         r86YcvHphT2yGoPg4t7aFTCoI/b/0CsW/2kfeLC8usQlIC+M2WzBmRRnPk5B6CtSPWS5
-         ZlLw==
-X-Gm-Message-State: APjAAAX4OReGFyz7JIFY5A+bbYOR76xGqGngEZQmTZJFrq5dK3G6NQUg
-        ZBhpA+l/5uf4/kA/LPO4O2rIxGqEUd8bCT+1Zfvp3g==
-X-Google-Smtp-Source: APXvYqxvG4i7hx0ZvfcwjTXD4xAPjZFOwpt8t/ruU8BzgE+bVcHjyV9VpTKqXKx5HeQuk+c8/wVSOxKyVql8sV60zQM=
-X-Received: by 2002:aca:4e02:: with SMTP id c2mr6055452oib.142.1582971050861;
- Sat, 29 Feb 2020 02:10:50 -0800 (PST)
-MIME-Version: 1.0
-From:   Emil Lenngren <emil.lenngren@gmail.com>
-Date:   Sat, 29 Feb 2020 11:10:40 +0100
-Message-ID: <CAO1O6sdGJeAKTHBVyDSUa7-Hp_ULYmfOHJEbb6=-B6xuPHvffQ@mail.gmail.com>
-Subject: Get negotiated ATT MTU?
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 29 Feb 2020 07:21:33 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1582978893; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=F+eBibJf30Bv3cARm/2DH87+INk27P5oe4prBrGPe0c=; b=GoAZCXb4j8VmiRcO1CsFCrn/mIqB5QoG4wRp6u6chtii5a57iXDqZZxYF820TLBQfbnF7iev
+ rAA1qawQ1nwiCysXgJD72XawmJ/eNo1bTFoD7F9g1BcSjUWCy2UpnpXEeq1/rjBR/4kjuy10
+ uPnJj1bP0SZ9Mmj5qUO8gmteBWY=
+X-Mailgun-Sending-Ip: 104.130.122.26
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e5a5746.7fabc861f6c0-smtp-out-n01;
+ Sat, 29 Feb 2020 12:21:26 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 45AF3C4479F; Sat, 29 Feb 2020 12:21:26 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 925E2C43383;
+        Sat, 29 Feb 2020 12:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 925E2C43383
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Not send vendor pre-shutdown command for QCA Rome
+Date:   Sat, 29 Feb 2020 20:21:18 +0800
+Message-Id: <20200229122118.26662-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi. I have a feature request that the negotiated ATT MTU should be
-exposed as a property in the org.bluez.Device1 interface.
+QCA Rome doesn't support the pre-shutdown vendor hci command, this patch
+will check the soc type in qca_power_off() and only send this command
+for wcn399x.
 
-For some applications it's good to know or required how much data that
-can be written / read / notified in each packet, and it's not always
-desired or possible to use AcquireNotify / AcquireWrite.
+Fixes: ae563183b647 ("Bluetooth: hci_qca: Enable power off/on support during hci down/up for QCA Rome")
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-/Emil
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1e4d6118d9bf..bf436d6e638e 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1759,9 +1759,11 @@ static int qca_power_off(struct hci_dev *hdev)
+ {
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 
+ 	/* Stop sending shutdown command if soc crashes. */
+-	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
++	if (qca_is_wcn399x(soc_type)
++		&& qca->memdump_state == QCA_MEMDUMP_IDLE) {
+ 		qca_send_pre_shutdown_cmd(hdev);
+ 		usleep_range(8000, 10000);
+ 	}
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
