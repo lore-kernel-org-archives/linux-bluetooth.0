@@ -2,93 +2,79 @@ Return-Path: <SRS0=KJgL=4R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B1FC3F2D1
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 03:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C4FC3F2D7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 07:10:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF811246B5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 03:01:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="AFGcDu0K"
+	by mail.kernel.org (Postfix) with ESMTP id C1E8224699
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 07:10:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbgB2DBj (ORCPT
+        id S1726525AbgB2HK6 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Feb 2020 22:01:39 -0500
-Received: from mail27.static.mailgun.info ([104.130.122.27]:63944 "EHLO
-        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726046AbgB2DBi (ORCPT
+        Sat, 29 Feb 2020 02:10:58 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:34944 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbgB2HK5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Feb 2020 22:01:38 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1582945298; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=u2OpUr2umrKtDJgafiYKpCymL4SAGgM/B3m17xtMXTU=; b=AFGcDu0KMbO/KKq8K9TxtkFVfmYkIVg/EAJ4MNSUhx5H4MIMyviHyEEAdUTF4pVV+vh7igPp
- PyztSgUpRmkyHXA7Og3JV5SP10ptMhdSnQLG06nd23T2txiZdPo3+hBx9lgPFkUSqei3jDX6
- o5dMkGd2NwE43pzWE9PETjKq4WI=
-X-Mailgun-Sending-Ip: 104.130.122.27
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
- by mxa.mailgun.org with ESMTP id 5e59d408.7fafa40ffe30-smtp-out-n01;
- Sat, 29 Feb 2020 03:01:28 -0000 (UTC)
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 43CBBC433A2; Sat, 29 Feb 2020 03:01:28 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: rjliao)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id B2A24C43383;
-        Sat, 29 Feb 2020 03:01:26 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Sat, 29 Feb 2020 11:01:26 +0800
-From:   Rocky Liao <rjliao@codeaurora.org>
-List-Id: <linux-firmware.lore.kernel.org>
-To:     linux-firmware@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Subject: [PULL] btqca firmware 20200229
-Message-ID: <87e4fd88a5a72fe40fe83d31a0762c95@codeaurora.org>
-X-Sender: rjliao@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        Sat, 29 Feb 2020 02:10:57 -0500
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id AFE4ECED04;
+        Sat, 29 Feb 2020 08:20:22 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [RFC 1/5] Bluetooth: Add BT_MODE socket option
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZKKkVqg9h_dXDeYC50YDfKNjd+R0fg0-ojCZy_+Fcfznw@mail.gmail.com>
+Date:   Sat, 29 Feb 2020 08:10:55 +0100
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A51E69DB-AE03-4750-B2B8-174F2C6BBEA1@holtmann.org>
+References: <20200225073437.11212-1-luiz.dentz@gmail.com>
+ <6F27945C-88B1-4F11-BE40-57125E0A8DAC@holtmann.org>
+ <CABBYNZKKkVqg9h_dXDeYC50YDfKNjd+R0fg0-ojCZy_+Fcfznw@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi linux-firmware maintainers,
+Hi Luiz,
 
-Here's a pull request for btqca bluetooth driver. Please let me know if 
-you have any problems.
+>>> This adds BT_MODE socket option which can be used to set L2CAP modes,
+>>> including modes only supported over LE which were not supported using
+>>> the L2CAP_OPTIONS.
+>>> 
+>>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> ---
+>>> include/net/bluetooth/bluetooth.h |  2 +
+>>> net/bluetooth/l2cap_sock.c        | 64 ++++++++++++++++++++++++-------
+>>> 2 files changed, 53 insertions(+), 13 deletions(-)
+>>> 
+>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>> index 1576353a2773..c361ec7b06aa 100644
+>>> --- a/include/net/bluetooth/bluetooth.h
+>>> +++ b/include/net/bluetooth/bluetooth.h
+>>> @@ -139,6 +139,8 @@ struct bt_voice {
+>>> #define BT_PHY_LE_CODED_TX    0x00002000
+>>> #define BT_PHY_LE_CODED_RX    0x00004000
+>>> 
+>>> +#define BT_MODE                      15
+>>> +
+>> 
+>> can we postpone this change. I like to get your patches 2, 3 and 4 merged first. That way we can do some initial testing here.
+> 
+> Sure, but without this there is no way to use the new mode from
+> userspace, I could perhaps make it condition to enabled_ecred, how
+> about that?
 
-The following changes since commit
-efcfa03ae6100dfe523ebf612e03c3a90fc4c794:
+that is what I am thinking. Use the module option to enable the mode for testing purposes.
 
-    linux-firmware: Update firmware file for Intel Bluetooth AX201 
-(2020-02-24 16:54:19 +0530)
+Regards
 
-are available in the Git repository at:
-
-    https://github.com/rjliao-qca/qca-btfw.git
-
-for you to fetch changes up to 2db3978ce4a0c5b8ab04a81701b4eb010c721b2d:
-----------------------------------------------------------------
-Rocky Liao (1):
-        qca: Fix blueooth firmware name for QCA6174 (2020-02-29 09:20:06 
-+0800)
-
-  WHENCE                        |   2 --
-  qca/rampatch_00440302.bin     | Bin 64940 -> 66332 bytes
-  qca/rampatch_00440302.tlv     | Bin 66332 -> 0 bytes
-  qca/rampatch_usb_00000302.bin | Bin 64168 -> 66964 bytes
-  qca/rampatch_usb_00000302.tlv | Bin 66964 -> 0 bytes
-  5 files changed, 2 deletions(-)
-  delete mode 100644 qca/rampatch_00440302.tlv
-  delete mode 100644 qca/rampatch_usb_00000302.tlv
-
-
+Marcel
 
