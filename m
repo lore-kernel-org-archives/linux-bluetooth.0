@@ -2,188 +2,142 @@ Return-Path: <SRS0=CJlv=4S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26742C3F2D1
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 19:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D46C3F2CD
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 19:16:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E9996246B9
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 19:13:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E5E5246BA
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 19:16:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dlBuD5no"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgCATNU (ORCPT
+        id S1726621AbgCATQQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 1 Mar 2020 14:13:20 -0500
-Received: from mail-io1-f69.google.com ([209.85.166.69]:51011 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726751AbgCATNS (ORCPT
+        Sun, 1 Mar 2020 14:16:16 -0500
+Received: from mail-ot1-f52.google.com ([209.85.210.52]:33680 "EHLO
+        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726188AbgCATQQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 1 Mar 2020 14:13:18 -0500
-Received: by mail-io1-f69.google.com with SMTP id d16so4652439iop.17
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Mar 2020 11:13:16 -0800 (PST)
+        Sun, 1 Mar 2020 14:16:16 -0500
+Received: by mail-ot1-f52.google.com with SMTP id w6so7593294otk.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Mar 2020 11:16:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=7BtwWmGqlMfLRFx10LsAlrYvxOig9qCTrlkBwPALNEY=;
+        b=dlBuD5norKFYCrB+04LYP78AFoST6eVnBdxrdKubyUVyVbOhXVuDe6PEejoyZwvFiC
+         Gx+nPF5vRlUF8EEQmlhK7L4l/YhYuW682brNWDcDeyDfkhYP6g5526o+ygBjpM9oyI3N
+         8yEpGdVIduQW9MEIRUVjHgSfR9MwR+4Zge1Xbax3gG3nDcapkRzmVP4ZaXT9tesnqB+O
+         BQlOMOziaRCwHRYCBNehYpJNbR2qhjtNXJwM+Y2Tjz/6MMifV1G/u19p9ZiOo1wG3Itk
+         LjoHaY/Cc4gEeia2aoYjF/fK+751kNH1mwObiJ3dfW70hohT/xXWG3ABfyWwpxv7Z3Qf
+         EhbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=+hocJy3Djvzm+AC/AMDQI2B713JAwjXco/Pm4CAYZIg=;
-        b=j3/IicBCKh7A4U/O+Ic7tLEHVaSyzkgBApPVuCYbKsNlviCBwJcbWwaUDG/YvBDQCh
-         tRVycea9xGczwF2yWdD7JV7qKA6wTDsxaek+ANq0XAddfj9BWXvfe097dRojFlrP5Gab
-         gOqtAOl1WK7s2bUE8n8IhsyQsjkUoIe95oxzB5Nlgbi+saSRSgBGtpj9UXW12XcDhWFZ
-         W7LQp+UwBbaWruRpJYu6Pe7MYWh4V9YpS+6aKG2VMMSKDzHeh4kXpkPEk64PzjiaJO4N
-         ZuG5kFCKv5iFlhYiOPNGaMKHjNCbUevvfnKkNNDovePzFpnlsjgxCMLVqKvZhrmVeFuF
-         5U7w==
-X-Gm-Message-State: ANhLgQ33tU80Nz6+EHmrw3lp7ey7j6ngYi0EUEJf9hTKEICAHF7Jasof
-        H+STchYzzJiwm+1n8KId8YZhOdYh6mem380Fq1LGRGMdKyAC
-X-Google-Smtp-Source: ADFU+vsoYgtQeW5DywQIWtvquyes8I6k0R/lSRXPBH1Say5Gy+frw6R18r60p+p0KdWkGCZgJ5c/kVdvYa+xI0el3jcLnLldqYJv
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=7BtwWmGqlMfLRFx10LsAlrYvxOig9qCTrlkBwPALNEY=;
+        b=r26Convy7T+nc8jdF/IKNrkkP56z0iyzwg3ABpCNPhHuQ0LbPAZucfus1SFZBHNo73
+         ncP4BYAx3k8bfKcUU6EFckUNuoH2q6kMrdrtzV6N8VImt9SyxdSFPLrILgC7H+KSu9lk
+         JlcHBPTidVHqj/TC8ZwqTuDKep9zQd/Os9VN5FDFZpDO5avOrfWcL2if+pbiry7Q0jzv
+         xQtfB9qWbcfN9DyyBVBF6b4aVVN3lYiD7clgmd7iWfOpHaa0DoWfx/hJYmjOmKtEAYJ0
+         F1JtCJqLTsVQlWk9GzDJRMp5GTEUHHgrGD6G0OYa2ZTBRQlsJ/YHxd/Ndvsh3xxwRdUY
+         /bxA==
+X-Gm-Message-State: APjAAAWhr+nJIz9Al17NG16Q7U2cv1/49y4DRDsdrKIEytHviVWskPbb
+        SvPcu6FHCKkIHL+Aty03OmPejArC+p1mbpYW8qVegJ08
+X-Google-Smtp-Source: APXvYqxMZX01lkkg8z16TJ4qXCumUXrtGBhaZkju1Bq+sPRp0SexGmtJJYjEdfJ32rdSAmOn0rGE7P5pBIRodDwWyTc=
+X-Received: by 2002:a9d:6c01:: with SMTP id f1mr10289689otq.133.1583090175538;
+ Sun, 01 Mar 2020 11:16:15 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:34c:: with SMTP id x12mr1482598jap.80.1583089995896;
- Sun, 01 Mar 2020 11:13:15 -0800 (PST)
-Date:   Sun, 01 Mar 2020 11:13:15 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000da6059059fcfdcf9@google.com>
-Subject: KASAN: use-after-free Read in skb_release_data (2)
-From:   syzbot <syzbot+a66a7c2e996797bb4acb@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
+References: <CAO1O6sdGJeAKTHBVyDSUa7-Hp_ULYmfOHJEbb6=-B6xuPHvffQ@mail.gmail.com>
+ <CABBYNZKtxPmTUn2fw9-dy1V9M_Pb996O6VmHkg4NrAr-=t+-4A@mail.gmail.com>
+In-Reply-To: <CABBYNZKtxPmTUn2fw9-dy1V9M_Pb996O6VmHkg4NrAr-=t+-4A@mail.gmail.com>
+From:   Emil Lenngren <emil.lenngren@gmail.com>
+Date:   Sun, 1 Mar 2020 20:16:04 +0100
+Message-ID: <CAO1O6sdke-2J=eYHS2SoG83v-hMJDBu-gasufJYDyHK+1R+w5g@mail.gmail.com>
+Subject: Re: Get negotiated ATT MTU?
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Luiz,
 
-syzbot found the following crash on:
+Den s=C3=B6n 1 mars 2020 kl 07:46 skrev Luiz Augusto von Dentz
+<luiz.dentz@gmail.com>:
+>
+> Hi Emil,
+>
+> On Sat, Feb 29, 2020 at 2:13 AM Emil Lenngren <emil.lenngren@gmail.com> w=
+rote:
+> >
+> > Hi. I have a feature request that the negotiated ATT MTU should be
+> > exposed as a property in the org.bluez.Device1 interface.
+> >
+> > For some applications it's good to know or required how much data that
+> > can be written / read / notified in each packet, and it's not always
+> > desired or possible to use AcquireNotify / AcquireWrite.
+>
+> We already negotiate a fairly big MTU maximum by default, and you can
+> just use AcquireWrite/AcquireNotify just to discover it and the close
+> the fd immediately, so I suppose we cover much of what the feature is,
 
-HEAD commit:    63623fd4 Merge tag 'for-linus' of git://git.kernel.org/pub..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16a1d8f9e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5d2e033af114153f
-dashboard link: https://syzkaller.appspot.com/bug?extid=a66a7c2e996797bb4acb
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c25a81e00000
+I was considering having a solution implementable by for example
+Web-Bluetooth. This "workaround" wouldn't always work since it's not
+guaranteed to exist a characteristic with the 'write-without-response'
+or 'notify' property. I think there could also be a "race condition"
+here if two apps do the same thing (although the time window is pretty
+small): one app might get that the acquire operation returned "busy".
+And is it even possible to use AcquireNotify/AcquiceWrite if the d-bus
+runs over tcp or the programming language doesn't support d-bus file
+descriptors? An ATT MTU property would be so much simpler and
+straight-forward.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+a66a7c2e996797bb4acb@syzkaller.appspotmail.com
+> except perhaps if the application requires something bellow the
+> default MTU bluetoothd but that can be a problem if other application
+> would start requiring their own MTU as well, so even if we introduce a
+> Property that would have to be read-only
 
-Bluetooth: Invalid header checksum
-==================================================================
-BUG: KASAN: use-after-free in skb_release_data+0x7bf/0x8c0 net/core/skbuff.c:603
-Read of size 1 at addr ffff8880a3a31ec2 by task syz-executor.4/12769
+Yes! The idea was to have it read-only. It's sane to let the BT stack
+negotiate (a big value on non-embedded systems like Linux/BlueZ)
+immediately after the connection has been established. There should be
+no reason for an application using BlueZ to negotiate a smaller MTU
+than a "big" one, which BlueZ already selects.
 
-CPU: 0 PID: 12769 Comm: syz-executor.4 Not tainted 5.6.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1fb/0x318 lib/dump_stack.c:118
- print_address_description+0x74/0x5c0 mm/kasan/report.c:374
- __kasan_report+0x149/0x1c0 mm/kasan/report.c:506
- kasan_report+0x26/0x50 mm/kasan/common.c:641
- __asan_report_load1_noabort+0x14/0x20 mm/kasan/generic_report.c:132
- skb_release_data+0x7bf/0x8c0 net/core/skbuff.c:603
- skb_release_all net/core/skbuff.c:664 [inline]
- __kfree_skb+0x59/0x1c0 net/core/skbuff.c:678
- kfree_skb+0x76/0x110 net/core/skbuff.c:696
- h5_reset_rx drivers/bluetooth/hci_h5.c:531 [inline]
- h5_rx_3wire_hdr+0x18d/0x5f0 drivers/bluetooth/hci_h5.c:441
- h5_recv+0x207/0x650 drivers/bluetooth/hci_h5.c:564
- hci_uart_tty_receive+0x16b/0x470 drivers/bluetooth/hci_ldisc.c:613
- tiocsti drivers/tty/tty_io.c:2200 [inline]
- tty_ioctl+0xd5d/0x15c0 drivers/tty/tty_io.c:2576
- vfs_ioctl fs/ioctl.c:47 [inline]
- ksys_ioctl fs/ioctl.c:763 [inline]
- __do_sys_ioctl fs/ioctl.c:772 [inline]
- __se_sys_ioctl+0x113/0x190 fs/ioctl.c:770
- __x64_sys_ioctl+0x7b/0x90 fs/ioctl.c:770
- do_syscall_64+0xf7/0x1c0 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x45c479
-Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007fff8bad55f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000001d7b914 RCX: 000000000045c479
-RDX: 00000000200000c0 RSI: 0000000000005412 RDI: 0000000000000003
-RBP: 000000000076bf20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-R13: 0000000000000583 R14: 00000000004c7d91 R15: 000000000076bf2c
+> but there may be races if the
+> application start writing/reading too fast or the remote end do
+> trigger its own exchange for some reason.
 
-Allocated by task 21:
- save_stack mm/kasan/common.c:72 [inline]
- set_track mm/kasan/common.c:80 [inline]
- __kasan_kmalloc+0x118/0x1c0 mm/kasan/common.c:515
- kasan_kmalloc+0x9/0x10 mm/kasan/common.c:529
- __do_kmalloc_node mm/slab.c:3616 [inline]
- __kmalloc_node_track_caller+0x4d/0x60 mm/slab.c:3630
- __kmalloc_reserve net/core/skbuff.c:142 [inline]
- __alloc_skb+0xe8/0x500 net/core/skbuff.c:210
- alloc_skb include/linux/skbuff.h:1081 [inline]
- bt_skb_alloc include/net/bluetooth/bluetooth.h:341 [inline]
- h5_rx_pkt_start+0xda/0x2d0 drivers/bluetooth/hci_h5.c:475
- h5_recv+0x207/0x650 drivers/bluetooth/hci_h5.c:564
- hci_uart_tty_receive+0x16b/0x470 drivers/bluetooth/hci_ldisc.c:613
- tty_ldisc_receive_buf+0x12f/0x170 drivers/tty/tty_buffer.c:465
- tty_port_default_receive_buf+0x82/0xb0 drivers/tty/tty_port.c:38
- receive_buf drivers/tty/tty_buffer.c:481 [inline]
- flush_to_ldisc+0x328/0x550 drivers/tty/tty_buffer.c:533
- process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
- worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
- kthread+0x332/0x350 kernel/kthread.c:255
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+It's already not possible to write anything after "Connected" has
+become true but before "ServicesResolved" becomes true (I get
+"org.bluez.Error.Failed: Not connected" in that case). I assume MTU is
+guaranteed to have been exchanged at this point, so there shouldn't be
+any problem for this case. Another possibility would also be to add a
+boolean "ATT MTU exchanged" property which is set to true when the MTU
+property becomes valid, if waiting for "ServicesResolved" wouldn't be
+enough.
 
-Freed by task 21:
- save_stack mm/kasan/common.c:72 [inline]
- set_track mm/kasan/common.c:80 [inline]
- kasan_set_free_info mm/kasan/common.c:337 [inline]
- __kasan_slab_free+0x12e/0x1e0 mm/kasan/common.c:476
- kasan_slab_free+0xe/0x10 mm/kasan/common.c:485
- __cache_free mm/slab.c:3426 [inline]
- kfree+0x10d/0x220 mm/slab.c:3757
- skb_free_head net/core/skbuff.c:590 [inline]
- skb_release_data+0x72f/0x8c0 net/core/skbuff.c:610
- skb_release_all net/core/skbuff.c:664 [inline]
- __kfree_skb+0x59/0x1c0 net/core/skbuff.c:678
- kfree_skb+0x76/0x110 net/core/skbuff.c:696
- h5_reset_rx drivers/bluetooth/hci_h5.c:531 [inline]
- h5_rx_3wire_hdr+0x18d/0x5f0 drivers/bluetooth/hci_h5.c:441
- h5_recv+0x207/0x650 drivers/bluetooth/hci_h5.c:564
- hci_uart_tty_receive+0x16b/0x470 drivers/bluetooth/hci_ldisc.c:613
- tty_ldisc_receive_buf+0x12f/0x170 drivers/tty/tty_buffer.c:465
- tty_port_default_receive_buf+0x82/0xb0 drivers/tty/tty_port.c:38
- receive_buf drivers/tty/tty_buffer.c:481 [inline]
- flush_to_ldisc+0x328/0x550 drivers/tty/tty_buffer.c:533
- process_one_work+0x7f5/0x10f0 kernel/workqueue.c:2264
- worker_thread+0xbbc/0x1630 kernel/workqueue.c:2410
- kthread+0x332/0x350 kernel/kthread.c:255
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+It should be fine also if the remote end sends an Exchange MTU request
+at the beginning of the connection since we can then immediately send
+a response and assign the MTU property without waiting for the
+Exchange MTU response (that corresponds to our request).
 
-The buggy address belongs to the object at ffff8880a3a30000
- which belongs to the cache kmalloc-8k of size 8192
-The buggy address is located 7874 bytes inside of
- 8192-byte region [ffff8880a3a30000, ffff8880a3a32000)
-The buggy address belongs to the page:
-page:ffffea00028e8c00 refcount:1 mapcount:0 mapping:ffff8880aa4021c0 index:0x0 compound_mapcount: 0
-flags: 0xfffe0000010200(slab|head)
-raw: 00fffe0000010200 ffffea0001f4e908 ffffea0001f10108 ffff8880aa4021c0
-raw: 0000000000000000 ffff8880a3a30000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
+In the case when the remote end sends a notification before it
+receives our Exchange MTU request, then the MTU property would
+correctly be 23 since the MTU Exchange hasn't finished yet.
 
-Memory state around the buggy address:
- ffff8880a3a31d80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880a3a31e00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff8880a3a31e80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                           ^
- ffff8880a3a31f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880a3a31f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+The list of five rules in Bluetooth Core specification Vol 3 Part F
+3.4.2.2 (ATT_EXCHANGE_MTU_RSP) should also prevent most "race
+conditions".
 
+Let me know if you think I've missed some edge case...
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+/Emil
