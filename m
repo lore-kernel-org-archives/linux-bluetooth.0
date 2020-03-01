@@ -1,79 +1,66 @@
-Return-Path: <SRS0=KJgL=4R=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=CJlv=4S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2596C3F2C6
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 23:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B50C3F2D3
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 02:32:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A048222C2
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Feb 2020 23:25:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=konsulko.com header.i=@konsulko.com header.b="Gaf1Bhl8"
+	by mail.kernel.org (Postfix) with ESMTP id D0F1B24649
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 02:32:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727307AbgB2XZe (ORCPT
+        id S1727291AbgCACca convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Feb 2020 18:25:34 -0500
-Received: from mail-io1-f44.google.com ([209.85.166.44]:45898 "EHLO
-        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726786AbgB2XZe (ORCPT
+        Sat, 29 Feb 2020 21:32:30 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:60322 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727162AbgCACca (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Feb 2020 18:25:34 -0500
-Received: by mail-io1-f44.google.com with SMTP id w9so7572599iob.12
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Feb 2020 15:25:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=konsulko.com; s=google;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=E1TA8XMS+MCxYIS9zYVTV9kJtZj5TRj6cnr+rrj/Uz4=;
-        b=Gaf1Bhl8avevHFdr2HA7Dltui3smf/09iKJx3sTXPSI8sP7xbXceyaTxNHTnawPAfQ
-         WNKvdKMFZ0sfbpkJ8ha9C69SeKhRFSh6QEuwqFss4SEQvRS+nVGSOAcZELpRQcwaVmqt
-         3o8pKJsuNimknHYxfgWMa4byx4Wz3UMY+owIg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=E1TA8XMS+MCxYIS9zYVTV9kJtZj5TRj6cnr+rrj/Uz4=;
-        b=QrETKkDhdbzYKWabm3hNTSkQFKyydBvkY5AYNCBAWHUrR3qxos++m4iXiW0mJAw3Vd
-         qbiBXPTkW0hYlW10yfvrisUFH5bFXBQfm2xMK+JsFhUNUhVFKjZAqo3NJNYTMsc6QMhd
-         GD+hWfMrb2qm/zrVjl9sGpuaJX4gLr808UwIwGg62CMSE2kKAtbZNFCLZ7KvaN0OjvWo
-         JwtnMfAQ1Fwr0KG8BqGkpCO2oCluLgf55NPq/SpuSJMeALxztmJDGEKPPvfFg9kBVMm7
-         SAq7arxphlzaDyaNKV/CM17al38GIAMgIGKpHjkJlAbBtkVu66lv1FHyP6uTgi2UpxAB
-         yj5A==
-X-Gm-Message-State: APjAAAWofw4dhK+31+PTihkWvr3X0OSfUkskF4aQCJR5miNtcgExmBTd
-        OVq4cDFOr67F9QYPZjQNZUMfcAzEIe0bdglV8mnGMk9ihlFRBw==
-X-Google-Smtp-Source: APXvYqwa6O4J3YVTb3aQF4NAGItcINPe9e+2xaeH2m3pqKW6YRf4xkX+ngsB38wb+j85qENNxhR4S87xeMzrZYWWHXU=
-X-Received: by 2002:a02:9203:: with SMTP id x3mr8367367jag.62.1583018732497;
- Sat, 29 Feb 2020 15:25:32 -0800 (PST)
-MIME-Version: 1.0
-From:   Matt Ranostay <matt.ranostay@konsulko.com>
-Date:   Sat, 29 Feb 2020 15:25:20 -0800
-Message-ID: <CAJCx=gmje04sxBAeK+xcEpf7vZ5tbWxkrrd-_ZbgOA72PPXzFw@mail.gmail.com>
-Subject: OBEX PBAP + iOS timeout
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 29 Feb 2020 21:32:30 -0500
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 81F8CCED13;
+        Sun,  1 Mar 2020 03:41:54 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Not send vendor pre-shutdown
+ command for QCA Rome
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200229122118.26662-1-rjliao@codeaurora.org>
+Date:   Sun, 1 Mar 2020 03:32:27 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>, bgodavar@codeaurora.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <87989A6A-373B-46C3-A06C-01FCFF5593C0@holtmann.org>
+References: <20200229122118.26662-1-rjliao@codeaurora.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Currently having some issues with OBEX + iOS transferring the entire
-contacts list via PBAP.
-Looking at btmon output with Wireshark, and noticed the iOS device
-timeouts out the data transfer before it completes. However on a Pixel
-it transfers completely and without the timeout issue.
+Hi Rocky,
 
-Note this is rather large transfer since all the contacts have base64
-contact image data.
+> QCA Rome doesn't support the pre-shutdown vendor hci command, this patch
+> will check the soc type in qca_power_off() and only send this command
+> for wcn399x.
+> 
+> Fixes: ae563183b647 ("Bluetooth: hci_qca: Enable power off/on support during hci down/up for QCA Rome")
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+> ---
+> drivers/bluetooth/hci_qca.c | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
 
-However we have a workaround/hack that increases the ACL MTU to 930
-versus 310 and the data transfers complete every single time. But is
-there some known issue with iOS + PBAP, and some better long term
-solution possible?
+patch has been applied to bluetooth-next tree.
 
-Ref: https://gerrit.automotivelinux.org/gerrit/c/AGL/meta-agl/+/24130
+Regards
 
-Thanks,
+Marcel
 
-Matt
