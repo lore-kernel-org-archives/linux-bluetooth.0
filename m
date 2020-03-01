@@ -2,97 +2,111 @@ Return-Path: <SRS0=CJlv=4S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B342C3F2D4
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 08:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F901C3F2D1
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 10:11:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7328921D56
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 08:38:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12E0B214DB
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 10:11:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZOs+3+Mk"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="RI13ihQA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725884AbgCAIi0 (ORCPT
+        id S1725887AbgCAKLb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 1 Mar 2020 03:38:26 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:40112 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725861AbgCAIi0 (ORCPT
+        Sun, 1 Mar 2020 05:11:31 -0500
+Received: from mail27.static.mailgun.info ([104.130.122.27]:57049 "EHLO
+        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725877AbgCAKLb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 1 Mar 2020 03:38:26 -0500
-Received: by mail-pg1-f195.google.com with SMTP id t24so3833148pgj.7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Mar 2020 00:38:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=j7Icc8H9OXIphKDSZkaFmOOa+8mh1h1QtKYjalo4FjU=;
-        b=ZOs+3+MkXYMpGjKMeuiy6fEGYW66CIRrndJBPokf4m0fm2ap96cCcnSgjYMmmHeuiC
-         B7Z/kWR0EfRMMW/NJ9mc5++CPcZbqUau6wtWpzLH5L/X7Dc4lq365e3sTpck7aLjbRzZ
-         cEyFbxJHPK9n7ialr3DNnh672sdjyOhlz3IZSqNdQj8eeRpSZibZienjud1i3H0a3tlO
-         HxCr3TIGFWHglSMIlKB/ilj7B3+lDx1evWnxjA5C6fzdErnUPK1nwd+O7srw+X7Tc1GN
-         ze7t0qgMhkhUzV0BXyfT0ZaK/T+Aa+wAxFcpnX6IXEQKriDUyUBETYEonZs9ulmIahUT
-         9W8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=j7Icc8H9OXIphKDSZkaFmOOa+8mh1h1QtKYjalo4FjU=;
-        b=fPywHU9ZqpprhJyOC76b+WhCsC3K/dRgFVlmL6+4S8c9lHDikeXZGWRTQ+SusCWXmN
-         eiFOIAuBN5rJouX+ECOk6PdCdwS7cyCnktyQP0ZxJm7queUIBONdlOoFlqTXmAvLQLfC
-         G0Y8FPLERRc8PrX37u5o7+LBPnQNqapopttJhpoTV8CGV43iq6lc9CmMHTjMWf1KPR+m
-         iyt/XtrcnWEVSH8i23/UheMA3E7gKpQnmwihnjeQwEFSaC8goc4GF23Z1dtq6ByCa5xK
-         Ne6TzNnogyzFGsqUqWbabjcY9wv7reszStgOrLS6saSzWxLuTBrELo56gO6JWy/s8Zsi
-         hBFg==
-X-Gm-Message-State: APjAAAVIxHn7aF1e01Jhf1sKyIjtNrOsowjizuQ9OG0VUnxWBM/ThSIg
-        K1YUglBQ/AOx9/oF9Oe2bJ0R7Y1vlC71rA==
-X-Google-Smtp-Source: APXvYqxrGjSjVi/iM3uvj5cO6QARqSgCO94D8tVu7WND6k8rcvBlz5+nywVODp6hjP5bQp3mi+GFig==
-X-Received: by 2002:a63:d0b:: with SMTP id c11mr12950911pgl.296.1583051905148;
-        Sun, 01 Mar 2020 00:38:25 -0800 (PST)
-Received: from agalan1-mobl.ger.corp.intel.com ([192.55.55.45])
-        by smtp.gmail.com with ESMTPSA id a9sm16447929pfo.35.2020.03.01.00.38.23
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 01 Mar 2020 00:38:24 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v1] bluetooth: guard against controllers sending zero'd
- events
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-In-Reply-To: <14FD24FA-1455-4FE4-832B-9851D9E22780@holtmann.org>
-Date:   Sun, 1 Mar 2020 10:38:20 +0200
-Cc:     Alain Michaud <alainm@chromium.org>,
-        linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A417E313-0ABE-46D6-92CD-434DDCC2D573@gmail.com>
-References: <20200228205146.161229-1-alainm@chromium.org>
- <788439D3-E0CC-4CBA-99C2-0B9C3703B23D@holtmann.org>
- <C59D3CDE-0EA8-4839-A34E-5ADA1BDE4949@gmail.com>
- <14FD24FA-1455-4FE4-832B-9851D9E22780@holtmann.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Sun, 1 Mar 2020 05:11:31 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1583057491; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=TSnT8ymBeOGKKOS4ov8wXtM4tWGQw5Wy3vUWOVysF9M=; b=RI13ihQAoanK/n1oYIgKtN0x/95MSjQskW2cxIhqsZsFhs6F62ezvMx2tOZKdAN7KFa/qzax
+ 7DZL7b6KOOufijsxXvj/YjT+bGb7dxs2Fd5rYc1xgl2WR+WC5kgU2THCcMkF2FYcRByJ8g1Y
+ LXBeMEDUJwEyEl2cwsfROWkC2vw=
+X-Mailgun-Sending-Ip: 104.130.122.27
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e5b8a4d.7f7ab4dd1260-smtp-out-n02;
+ Sun, 01 Mar 2020 10:11:25 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id D1215C4479F; Sun,  1 Mar 2020 10:11:25 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 70016C43383;
+        Sun,  1 Mar 2020 10:11:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 70016C43383
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: btqca: Fix the NVM baudrate tag offcet for wcn3991
+Date:   Sun,  1 Mar 2020 18:11:19 +0800
+Message-Id: <20200301101119.5867-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+The baudrate set byte of wcn3991 in the NVM tag is byte 1, not byte 2.
+This patch will set correct byte for wcn3991.
 
-On 1. Mar 2020, at 4.44, Marcel Holtmann <marcel@holtmann.org> wrote:
->>> Why are you bothering to check for event here. Do we have requests =
-set with hci_req.event =3D=3D 0?
->>=20
->> If I remember right, most requests are like that. req.event is only =
-used then the request completes in something else than a command =
-complete/status.
->=20
-> so what do we do then if we get an event =3D=3D 0 from the controller? =
-Just bail out early? It seems kind pointless to keep processing it.
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
+ drivers/bluetooth/btqca.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Yeah, that=E2=80=99s what I=E2=80=99d do. Bail out early, but log a =
-warning.
-
-Johan=
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index ec69e5dd7bd3..a16845c0751d 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -139,7 +139,7 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
+ 
+ static void qca_tlv_check_data(struct qca_fw_config *config,
+-				const struct firmware *fw)
++		const struct firmware *fw, enum qca_btsoc_type soc_type)
+ {
+ 	const u8 *data;
+ 	u32 type_len;
+@@ -148,6 +148,7 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
+ 	struct tlv_type_hdr *tlv;
+ 	struct tlv_type_patch *tlv_patch;
+ 	struct tlv_type_nvm *tlv_nvm;
++	uint8_t nvm_baud_rate = config->user_baud_rate;
+ 
+ 	tlv = (struct tlv_type_hdr *)fw->data;
+ 
+@@ -216,7 +217,10 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
+ 				tlv_nvm->data[0] |= 0x80;
+ 
+ 				/* UART Baud Rate */
+-				tlv_nvm->data[2] = config->user_baud_rate;
++				if (soc_type == QCA_WCN3991)
++					tlv_nvm->data[1] = nvm_baud_rate;
++				else
++					tlv_nvm->data[2] = nvm_baud_rate;
+ 
+ 				break;
+ 
+@@ -354,7 +358,7 @@ static int qca_download_firmware(struct hci_dev *hdev,
+ 		return ret;
+ 	}
+ 
+-	qca_tlv_check_data(config, fw);
++	qca_tlv_check_data(config, fw, soc_type);
+ 
+ 	segment = fw->data;
+ 	remain = fw->size;
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
