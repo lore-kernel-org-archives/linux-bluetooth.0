@@ -7,86 +7,92 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC836C3F2D1
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 06:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B342C3F2D4
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 08:38:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9319521D56
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 06:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7328921D56
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 08:38:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5Y/JdSk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZOs+3+Mk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726194AbgCAGq7 (ORCPT
+        id S1725884AbgCAIi0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 1 Mar 2020 01:46:59 -0500
-Received: from mail-ot1-f43.google.com ([209.85.210.43]:40377 "EHLO
-        mail-ot1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725767AbgCAGq6 (ORCPT
+        Sun, 1 Mar 2020 03:38:26 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40112 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725861AbgCAIi0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 1 Mar 2020 01:46:58 -0500
-Received: by mail-ot1-f43.google.com with SMTP id x19so1826280otp.7
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Feb 2020 22:46:58 -0800 (PST)
+        Sun, 1 Mar 2020 03:38:26 -0500
+Received: by mail-pg1-f195.google.com with SMTP id t24so3833148pgj.7
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Mar 2020 00:38:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4Hm9tjczIkXblNXcfENkvYBm7CmOG6HZ6SgO4DUwYWk=;
-        b=O5Y/JdSkiUVQUHrI0vYClmp+i2ge0PrfHtXW4ESWqXcO/PfvOJvrXBnZ2z4Rcj9B90
-         4cfi9swG1+ga7vf3sLVa877FxZwW3ZRR5oGKAOLe+Io7Uk4gi4wLC5U6n+5y6uABtP6k
-         EE676rluZw4oNzIpOKInAoJ9c21Wht/BYOZULzZf8KAn3mbVnFiw1OgVXzPj8x/mgwFf
-         zESAB1CG5B/rkzNV5o6L4Ky5D07MoGtdoWM7Gp+FzHvL9YN89mJhGPLH4BOcOjRQ2d5n
-         OnD/wjjJWEB93Hhog659l8dLYTDOOuKLARQhj5k+06oeOGatJP2XiJLbJJPQh2ErwES/
-         IejQ==
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=j7Icc8H9OXIphKDSZkaFmOOa+8mh1h1QtKYjalo4FjU=;
+        b=ZOs+3+MkXYMpGjKMeuiy6fEGYW66CIRrndJBPokf4m0fm2ap96cCcnSgjYMmmHeuiC
+         B7Z/kWR0EfRMMW/NJ9mc5++CPcZbqUau6wtWpzLH5L/X7Dc4lq365e3sTpck7aLjbRzZ
+         cEyFbxJHPK9n7ialr3DNnh672sdjyOhlz3IZSqNdQj8eeRpSZibZienjud1i3H0a3tlO
+         HxCr3TIGFWHglSMIlKB/ilj7B3+lDx1evWnxjA5C6fzdErnUPK1nwd+O7srw+X7Tc1GN
+         ze7t0qgMhkhUzV0BXyfT0ZaK/T+Aa+wAxFcpnX6IXEQKriDUyUBETYEonZs9ulmIahUT
+         9W8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4Hm9tjczIkXblNXcfENkvYBm7CmOG6HZ6SgO4DUwYWk=;
-        b=olqQXwEQo9DwPsyaQVvGnP2MgyE8sINVIi0PoBvX0m3lGc6OPmwdBXPnt2TckbuQJe
-         nFugsjiI6s+0AhAomz65dXaOUrrJeTvCMKVEYTAEoDowTq+5C5KXs9mJWRoq/IRAtg/X
-         hpVIYxmmp6noodI0QxZLO9WmhdYFuwzv2+/mzegCKMQLnKCzzae/vSybxdZbs9DUkeym
-         xnmt5O8Bx7IlktO9lup7yNDMz3kn1X6gRvg6qqZE2VvyXaA4wwLyWgeIUVQaVjl3J6ta
-         NnGwR2yV/0k20sWTFFKjVP1+6mQ4wZSfMkcvl4YpNYgtIN1LcUZpaBbQMEMTLY9XOe9D
-         gkfg==
-X-Gm-Message-State: APjAAAWDvrv0Amo7BvpxpCKzj6MRDFi4jPRjNF82ybN383ivQXCaKBFD
-        xGYctcTy3QHVeNzvC1NJvOZn6P3Hmd9WUTp2pFs=
-X-Google-Smtp-Source: APXvYqywRp5NNuke/PqcvluS2Moup3IvEyYpGgxXJ8s3FZ+fCqlQLap2t5yFAKUz2e5azttrYnGve/FqdJ3sqGie0yA=
-X-Received: by 2002:a05:6830:1690:: with SMTP id k16mr9610608otr.79.1583045218091;
- Sat, 29 Feb 2020 22:46:58 -0800 (PST)
-MIME-Version: 1.0
-References: <CAO1O6sdGJeAKTHBVyDSUa7-Hp_ULYmfOHJEbb6=-B6xuPHvffQ@mail.gmail.com>
-In-Reply-To: <CAO1O6sdGJeAKTHBVyDSUa7-Hp_ULYmfOHJEbb6=-B6xuPHvffQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sat, 29 Feb 2020 22:46:46 -0800
-Message-ID: <CABBYNZKtxPmTUn2fw9-dy1V9M_Pb996O6VmHkg4NrAr-=t+-4A@mail.gmail.com>
-Subject: Re: Get negotiated ATT MTU?
-To:     Emil Lenngren <emil.lenngren@gmail.com>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=j7Icc8H9OXIphKDSZkaFmOOa+8mh1h1QtKYjalo4FjU=;
+        b=fPywHU9ZqpprhJyOC76b+WhCsC3K/dRgFVlmL6+4S8c9lHDikeXZGWRTQ+SusCWXmN
+         eiFOIAuBN5rJouX+ECOk6PdCdwS7cyCnktyQP0ZxJm7queUIBONdlOoFlqTXmAvLQLfC
+         G0Y8FPLERRc8PrX37u5o7+LBPnQNqapopttJhpoTV8CGV43iq6lc9CmMHTjMWf1KPR+m
+         iyt/XtrcnWEVSH8i23/UheMA3E7gKpQnmwihnjeQwEFSaC8goc4GF23Z1dtq6ByCa5xK
+         Ne6TzNnogyzFGsqUqWbabjcY9wv7reszStgOrLS6saSzWxLuTBrELo56gO6JWy/s8Zsi
+         hBFg==
+X-Gm-Message-State: APjAAAVIxHn7aF1e01Jhf1sKyIjtNrOsowjizuQ9OG0VUnxWBM/ThSIg
+        K1YUglBQ/AOx9/oF9Oe2bJ0R7Y1vlC71rA==
+X-Google-Smtp-Source: APXvYqxrGjSjVi/iM3uvj5cO6QARqSgCO94D8tVu7WND6k8rcvBlz5+nywVODp6hjP5bQp3mi+GFig==
+X-Received: by 2002:a63:d0b:: with SMTP id c11mr12950911pgl.296.1583051905148;
+        Sun, 01 Mar 2020 00:38:25 -0800 (PST)
+Received: from agalan1-mobl.ger.corp.intel.com ([192.55.55.45])
+        by smtp.gmail.com with ESMTPSA id a9sm16447929pfo.35.2020.03.01.00.38.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 01 Mar 2020 00:38:24 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH v1] bluetooth: guard against controllers sending zero'd
+ events
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <14FD24FA-1455-4FE4-832B-9851D9E22780@holtmann.org>
+Date:   Sun, 1 Mar 2020 10:38:20 +0200
+Cc:     Alain Michaud <alainm@chromium.org>,
+        linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A417E313-0ABE-46D6-92CD-434DDCC2D573@gmail.com>
+References: <20200228205146.161229-1-alainm@chromium.org>
+ <788439D3-E0CC-4CBA-99C2-0B9C3703B23D@holtmann.org>
+ <C59D3CDE-0EA8-4839-A34E-5ADA1BDE4949@gmail.com>
+ <14FD24FA-1455-4FE4-832B-9851D9E22780@holtmann.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Emil,
+Hi Marcel,
 
-On Sat, Feb 29, 2020 at 2:13 AM Emil Lenngren <emil.lenngren@gmail.com> wrote:
->
-> Hi. I have a feature request that the negotiated ATT MTU should be
-> exposed as a property in the org.bluez.Device1 interface.
->
-> For some applications it's good to know or required how much data that
-> can be written / read / notified in each packet, and it's not always
-> desired or possible to use AcquireNotify / AcquireWrite.
+On 1. Mar 2020, at 4.44, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>> Why are you bothering to check for event here. Do we have requests =
+set with hci_req.event =3D=3D 0?
+>>=20
+>> If I remember right, most requests are like that. req.event is only =
+used then the request completes in something else than a command =
+complete/status.
+>=20
+> so what do we do then if we get an event =3D=3D 0 from the controller? =
+Just bail out early? It seems kind pointless to keep processing it.
 
-We already negotiate a fairly big MTU maximum by default, and you can
-just use AcquireWrite/AcquireNotify just to discover it and the close
-the fd immediately, so I suppose we cover much of what the feature is,
-except perhaps if the application requires something bellow the
-default MTU bluetoothd but that can be a problem if other application
-would start requiring their own MTU as well, so even if we introduce a
-Property that would have to be read-only but there may be races if the
-application start writing/reading too fast or the remote end do
-trigger its own exchange for some reason.
+Yeah, that=E2=80=99s what I=E2=80=99d do. Bail out early, but log a =
+warning.
 
--- 
-Luiz Augusto von Dentz
+Johan=
