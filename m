@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C98BC3F2CD
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 21:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E314BC3F2D1
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 21:32:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F97B214DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 21:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5A72214DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 21:32:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TuGDoORD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHY0hnln"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgCBVcm (ORCPT
+        id S1726831AbgCBVco (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Mar 2020 16:32:42 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46722 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726720AbgCBVcl (ORCPT
+        Mon, 2 Mar 2020 16:32:44 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:39568 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726773AbgCBVco (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Mar 2020 16:32:41 -0500
-Received: by mail-pg1-f195.google.com with SMTP id y30so429970pga.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2020 13:32:41 -0800 (PST)
+        Mon, 2 Mar 2020 16:32:44 -0500
+Received: by mail-pl1-f193.google.com with SMTP id g6so316031plp.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2020 13:32:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=Yc9twyfo2ofnnZ2ALGcCp/mhrgMLu+tyCCMaRloUOOY=;
-        b=TuGDoORDgdYpEUZkmoa6yL29eO0sz1Lj4DPT7WTpAA9Nx3rZdaA/GO0DVBFrZ1D0mW
-         e8W/EL6eZwLWyU6g2iP55baan6ECAJSmbUTPOKj39QpfftyQ9Z1LPDzDllwLysxq1sbp
-         pzeoR1zXTbAJ5dEFsylCgsKEh4mtilaZ79SbPjL86BGWilPQMc/gKdgAk3aQVGQBQGDo
-         SDdcVI3w3UJGlY5ke1CU4e29iiAgcg/gIsbgFnMm+6xugN7Vj8lEsVTW4IG03ZLfpsDy
-         Iv7qfCit6jhaov6UnGqkX7ykmSrqkBcvjGW3GY5XHPFCtyXigujsEQoSUvIrdTfnM9GT
-         25JQ==
+        bh=iiBww5T0liLTQo9idkZdPdBXUSr8GhdCY90/l+BLa+Q=;
+        b=kHY0hnlnB9hvsgsiQbMoC9IxhvXEHruv1ZLgzFCtBtAYum1XEEo3xwjmE6GwzwCYHV
+         hrxSeBuOI7jplANKQfsP/C+/KLUsWQQmi9j5HXnibVzV6BT94ym0oyhid37XcaVLwzxl
+         6mX3Yt83LcC1JHGAtdG0d/yTV6V9H+2KM4zrzLrPtoIzMci/qbhe6HkPZ4fYtPPe24oD
+         hraly7794AJgYu7DjwE0Tc+KgV0UxUlt6lATWpZi9DLBkuUUhe80//s7v19KyKeHruGK
+         HIG1Lbo2k3r6Q7e5DeWSGRIsoiA7M0AfTULFXk+EwUbHsKH1vGfr9cDPcXXCo/cBuW05
+         yqVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Yc9twyfo2ofnnZ2ALGcCp/mhrgMLu+tyCCMaRloUOOY=;
-        b=S9rEgeRCqvtWpr+M4fYUAX80aGRc64ElcYlUqb5lmfrZS8hGIDhGxS/UKLeFZnyZjW
-         rYlX5VmVBzt6qNxTeSZzgen2E425NgEO6gp5UVwFjWLbF5vR1duQ5Nb3DefnfKLhq5/f
-         R8YYIVSXlhEhvsSvmGR0GJtwzY2HQZbmXJ/6+7RzZCyArat+p7nmDsdLDhaSj4v+YiNy
-         9YuW10J02S8+LbmOIUD08C8KwjeI8i8FnSnnMlVpZWpRjELMtyO8rBNNZwC1A+Vr85gi
-         MVMgVhyxmfY9k3Q6YxErXL0yrOGePbGyntSrq6XEtjeU5qzuXdzDL2VudQP4h3lm9ous
-         rtTw==
-X-Gm-Message-State: ANhLgQ1cu88nkZsNLMYIm3laT/ZP2mAjtq/abA0zittVN1bwLrH8TB0e
-        DNGbxMvgE4karPJh6n7wxIFlzO0nCu0=
-X-Google-Smtp-Source: ADFU+vs+tCi+BednGzslt1wC7A2BoVdFIFUvLyjJNUaOojFIgXRo0eZ8IguSOSL0zjhfpkI9Bn4mcQ==
-X-Received: by 2002:a63:1e06:: with SMTP id e6mr894213pge.134.1583184760374;
-        Mon, 02 Mar 2020 13:32:40 -0800 (PST)
+        bh=iiBww5T0liLTQo9idkZdPdBXUSr8GhdCY90/l+BLa+Q=;
+        b=lDVKQrqp3hvU8rAVBq77VlwWfrS5mmPmnhwHP1VcoB33lDqhU+sG6JgqD7XQ6UKCpc
+         zoWQW7uk4VOK0x7OfxYxPf56iq3wvqwHBc79xnhPZzLpaZKRGHYY0DdzcQl51/nI0ETU
+         fz8wTg3G5H04xPMjUMV3dtvGkxOMJFZEHk+GLSdTQh14lHlbxv/kWDppwhWdizEqarXu
+         2//T0prh3ydnnf4DDP2aBnun8TuVRf0OtmfQRNDIAMG2e4zQCdpsuFLnmhBUIEKkdfAP
+         rDDfv5whlfEPjfODaTDqd+e1TpUudb2Fu5M3TeOXXay+CE5O6IWX1BYP7Isi29+DrYoh
+         G+Rg==
+X-Gm-Message-State: ANhLgQ177avmrrnssG16cZrld8Q+PVhfdJ/B7xNXGey5veC8hxsQaad+
+        YQaQDqHTCISoOSQBkwqvrbRZSH94E44=
+X-Google-Smtp-Source: ADFU+vs5Lj5nbz/4j3/oliajS5Ov32GvEeIRV+ohKL0d3mmH0sEKnFRUFyUD0YZeuuZag4sXDqaGuA==
+X-Received: by 2002:a17:90b:3612:: with SMTP id ml18mr488215pjb.148.1583184762451;
+        Mon, 02 Mar 2020 13:32:42 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id i22sm22183749pgi.69.2020.03.02.13.32.39
+        by smtp.gmail.com with ESMTPSA id i22sm22183749pgi.69.2020.03.02.13.32.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2020 13:32:39 -0800 (PST)
+        Mon, 02 Mar 2020 13:32:41 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/5] Bluetooth: L2CAP: Add definitions for Enhanced Credit Based Mode
-Date:   Mon,  2 Mar 2020 13:32:34 -0800
-Message-Id: <20200302213237.19540-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/5] Bluetooth: L2CAP: Add module option to enable ECRED mode
+Date:   Mon,  2 Mar 2020 13:32:36 -0800
+Message-Id: <20200302213237.19540-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200302213237.19540-1-luiz.dentz@gmail.com>
 References: <20200302213237.19540-1-luiz.dentz@gmail.com>
@@ -75,85 +75,110 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces the definitions for the new L2CAP mode called Enhanced
-Credit Based Mode.
+This should make it safe to have the code upstream without affecting
+stable systems since there are a few details not sort out with ECRED
+mode e.g: how to initiate multiple connections at once.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/l2cap.h | 39 +++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 15 +++++++++++++++
+ net/bluetooth/l2cap_sock.c    | 10 ++++++++++
+ 3 files changed, 26 insertions(+)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 093aedebdf0c..3e6544e53516 100644
+index dbe68b06d4bb..1644c9651a35 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -119,6 +119,10 @@ struct l2cap_conninfo {
- #define L2CAP_LE_CONN_REQ	0x14
- #define L2CAP_LE_CONN_RSP	0x15
- #define L2CAP_LE_CREDITS	0x16
-+#define L2CAP_ECRED_CONN_REQ	0x17
-+#define L2CAP_ECRED_CONN_RSP	0x18
-+#define L2CAP_ECRED_RECONF_REQ	0x19
-+#define L2CAP_ECRED_RECONF_RSP	0x1a
+@@ -958,6 +958,7 @@ static inline long l2cap_chan_no_get_sndtimeo(struct l2cap_chan *chan)
+ }
  
- /* L2CAP extended feature mask */
- #define L2CAP_FEAT_FLOWCTL	0x00000001
-@@ -359,6 +363,7 @@ struct l2cap_conf_rfc {
-  * ever be used in the BR/EDR configuration phase.
-  */
- #define L2CAP_MODE_LE_FLOWCTL	0x80
-+#define L2CAP_MODE_EXT_FLOWCTL	0x81
+ extern bool disable_ertm;
++extern bool enable_ecred;
  
- struct l2cap_conf_efs {
- 	__u8	id;
-@@ -483,6 +488,39 @@ struct l2cap_le_credits {
- 	__le16     credits;
- } __packed;
+ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 5c03baffc82c..badfbbcc0de4 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -45,6 +45,7 @@
+ #define LE_FLOWCTL_MAX_CREDITS 65535
  
-+#define L2CAP_ECRED_MIN_MTU		64
-+#define L2CAP_ECRED_MIN_MPS		64
+ bool disable_ertm;
++bool enable_ecred;
+ 
+ static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN | L2CAP_FEAT_UCD;
+ 
+@@ -5849,6 +5850,9 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
+ 	int i, num_scid;
+ 	bool defer = false;
+ 
++	if (!enable_ecred)
++		return -EINVAL;
 +
-+struct l2cap_ecred_conn_req {
-+	__le16 psm;
-+	__le16 mtu;
-+	__le16 mps;
-+	__le16 credits;
-+	__le16 scid[0];
-+} __packed;
+ 	if (cmd_len < sizeof(*req) || cmd_len - sizeof(*req) % sizeof(u16)) {
+ 		result = L2CAP_CR_LE_INVALID_PARAMS;
+ 		goto response;
+@@ -6092,6 +6096,9 @@ static inline int l2cap_ecred_reconf_req(struct l2cap_conn *conn,
+ 	struct l2cap_chan *chan;
+ 	int i, num_scid;
+ 
++	if (!enable_ecred)
++		return -EINVAL;
 +
-+struct l2cap_ecred_conn_rsp {
-+	__le16 mtu;
-+	__le16 mps;
-+	__le16 credits;
-+	__le16 result;
-+	__le16 dcid[0];
-+};
+ 	if (cmd_len < sizeof(*req) || cmd_len - sizeof(*req) % sizeof(u16)) {
+ 		result = L2CAP_CR_LE_INVALID_PARAMS;
+ 		goto respond;
+@@ -7726,7 +7733,12 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 	case L2CAP_MODE_BASIC:
+ 		break;
+ 	case L2CAP_MODE_LE_FLOWCTL:
++		break;
+ 	case L2CAP_MODE_EXT_FLOWCTL:
++		if (!enable_ecred) {
++			err = -EOPNOTSUPP;
++			goto done;
++		}
+ 		break;
+ 	case L2CAP_MODE_ERTM:
+ 	case L2CAP_MODE_STREAMING:
+@@ -8304,3 +8316,6 @@ void l2cap_exit(void)
+ 
+ module_param(disable_ertm, bool, 0644);
+ MODULE_PARM_DESC(disable_ertm, "Disable enhanced retransmission mode");
 +
-+struct l2cap_ecred_reconf_req {
-+	__le16 mtu;
-+	__le16 mps;
-+	__le16 scid[0];
-+} __packed;
++module_param(enable_ecred, bool, 0644);
++MODULE_PARM_DESC(enable_ecred, "Enable enhanced credit flow control mode");
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 19123c268ce3..2a9fa588e554 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -273,7 +273,12 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
+ 	switch (chan->mode) {
+ 	case L2CAP_MODE_BASIC:
+ 	case L2CAP_MODE_LE_FLOWCTL:
++		break;
+ 	case L2CAP_MODE_EXT_FLOWCTL:
++		if (!enable_ecred) {
++			err = -EOPNOTSUPP;
++			goto done;
++		}
+ 		break;
+ 	case L2CAP_MODE_ERTM:
+ 	case L2CAP_MODE_STREAMING:
+@@ -985,6 +990,11 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 		break;
+ 
+ 	case BT_MODE:
++		if (!enable_ecred) {
++			err = -ENOPROTOOPT;
++			break;
++		}
 +
-+#define L2CAP_RECONF_SUCCESS		0x0000
-+#define L2CAP_RECONF_INVALID_MTU	0x0001
-+#define L2CAP_RECONF_INVALID_MPS	0x0002
-+
-+struct l2cap_ecred_reconf_rsp {
-+	__le16 result;
-+} __packed;
-+
- /* ----- L2CAP channels and connections ----- */
- struct l2cap_seq_list {
- 	__u16	head;
-@@ -724,6 +762,7 @@ enum {
- 	FLAG_EFS_ENABLE,
- 	FLAG_DEFER_SETUP,
- 	FLAG_LE_CONN_REQ_SENT,
-+	FLAG_ECRED_CONN_REQ_SENT,
- 	FLAG_PENDING_SECURITY,
- 	FLAG_HOLD_HCI_CONN,
- };
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+ 			err = -EINVAL;
+ 			break;
 -- 
 2.21.1
 
