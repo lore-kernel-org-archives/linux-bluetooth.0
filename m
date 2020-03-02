@@ -2,184 +2,100 @@ Return-Path: <SRS0=RPtH=4T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AEDFC3F2D2
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 05:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CA5C3F2D7
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 12:54:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E85D324677
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 05:14:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 399F622B48
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 12:54:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="f0qnsr6v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbgCBFOM (ORCPT
+        id S1727949AbgCBMy3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Mar 2020 00:14:12 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:36879 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726087AbgCBFOM (ORCPT
+        Mon, 2 Mar 2020 07:54:29 -0500
+Received: from mailout4.samsung.com ([203.254.224.34]:40457 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727745AbgCBMy3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Mar 2020 00:14:12 -0500
-Received: by mail-il1-f197.google.com with SMTP id e70so2383745ill.4
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Mar 2020 21:14:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=d5TDYiCB8FCnmpfMdQVEeihvaw8+/3NOIOW0zOPd9cU=;
-        b=N7LcUxxLsQOsacygUfPOH4GbepceBOMSWw2KxtgvTDJ+VJL62jmOYXp4AwESDa/wRM
-         do3j2GKaObetGUzYl2Gba1ySZgBLt1eW8yB63FmcGwvFUrBAyWOgn3g6kSeuX15ejMdX
-         s65QAdy7T6mv6pQ2jxJPI/K5gfT9IdWSYnp9q2zVZDS7S3vU/9+d1Cl0JCWGMrwqGNhf
-         Q+/nhhhnDMHTVVh9TL3ZLBEB3m5qqRcm5VUkDZ5icaYrx4uqdJ6KLloqgzCcV5TDkjsC
-         Gx0NdG/mi0islJiHhnpLz18ssmQy36fj9erL7Cn5ay+Ae/wuBhG8GMKCam6LXMdyhGtQ
-         mJRA==
-X-Gm-Message-State: APjAAAUlfj5M+Gp6DDPw/jaJ5BpbFk4M3fAEV6vkI/GPeuYF54+l4BaL
-        +FO8W+DW0VBd/slkYQ4owhcHfNFEEn2eYyqV7HeQuQVqTqVK
-X-Google-Smtp-Source: APXvYqxkvW+UUE04fne78UhhAYQRMY24tE3YewHFQ/mZ4hM3iN2h3W/Rm0T1M9+9yfXfjMvuwSGHYMZLjeRb/9kd5cEwpm3dOyuN
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:18c:: with SMTP id a12mr10545128jaq.84.1583126051151;
- Sun, 01 Mar 2020 21:14:11 -0800 (PST)
-Date:   Sun, 01 Mar 2020 21:14:11 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e9e518059fd84189@google.com>
-Subject: KASAN: use-after-free Write in hci_sock_bind (2)
-From:   syzbot <syzbot+04e804c8c2224b6a9497@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 2 Mar 2020 07:54:29 -0500
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20200302125423epoutp043dfa0ed1f723205d666a778bc7a2b2e6~4fd6QEutc2993929939epoutp04t
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Mar 2020 12:54:23 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20200302125423epoutp043dfa0ed1f723205d666a778bc7a2b2e6~4fd6QEutc2993929939epoutp04t
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1583153663;
+        bh=yc2Jy54D36WaqiistaUeieTfIgy8H5fccjt9Y75F0KA=;
+        h=Subject:Reply-To:From:To:CC:Date:References:From;
+        b=f0qnsr6vO2MeA0yE+ux9EybId4780vx2xKO4wDbFyahol5TDa9BU62YjlU9vbf6Wj
+         m4pp7Y4BYzuDSX9k2mtTwN9bFywWTsvUSSzGYN200qgBEGDfKPNVOM6vGihP4V07xi
+         B6ZQNvNUtGtBtJ0j+q6BwlImaA+ZxCFGNSpji48I=
+Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20200302125423epcas5p3d000a22b07c08e0b5b19db948df2dc1e~4fd50FxKN2313223132epcas5p3w;
+        Mon,  2 Mar 2020 12:54:23 +0000 (GMT)
+X-AuditID: b6c32a4b-32dff70000014cad-5b-5e5d01ff7bb9
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        24.85.19629.FF10D5E5; Mon,  2 Mar 2020 21:54:23 +0900 (KST)
+Mime-Version: 1.0
+Subject: Regarding OOB authentication method & action for Mesh provisioner
+Reply-To: anupam.r@samsung.com
+From:   Anupam Roy <anupam.r@samsung.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     Semun Lee <semun.lee@samsung.com>,
+        Dohyun Pyun <dh79.pyun@samsung.com>,
+        Nitin Jhanwar <nitin.j@samsung.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20200302125344epcms5p3e31d97ef6263e0513b94f6306536269b@epcms5p3>
+Date:   Mon, 02 Mar 2020 18:23:44 +0530
+X-CMS-MailID: 20200302125344epcms5p3e31d97ef6263e0513b94f6306536269b
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsWy7bCmlu5/xtg4g/PbhS2WfP/IZjHnWh+z
+        xbZ17cwWxzY9ZXJg8ejbsorR4/MmuQCmKC6blNSczLLUIn27BK6MmzsmMxUcY684s2oXewPj
+        JLYuRk4OCQETiZvHrrJ3MXJxCAnsZpS43/qKuYuRg4NXQFDi7w5hkBphAS+J+zf6WUBsIQE5
+        icVT17KBlAgLaErc3JgCEmYTUJf49XAHWImIgLvEnv23GUFsZoFCidWL1jFDrOKVmNH+lAXC
+        lpbYvnwrI4QtKnFz9Vt2GPv9sflQcRGJ1ntnoXoFJR783M0I07t1wVNmkJMlBLoZJV7vWM8E
+        4UxhlPh48S0TRJW5xP/ut2AdvAK+EvOuLgKLswioSrzpXwI1yUXi+KPbLBCXyktsfzsH7Hdm
+        oMfW79KHKJGVmHpqHRNECZ9E7+8nTDDP7JgHYytJbL0+nxXClpDo27wLKu4h8fXELmi4BUqs
+        +NfGPoFRfhYidGchWTwLYfECRuZVjJKpBcW56anFpgXGeanlesWJucWleel6yfm5mxjBKUHL
+        ewfjpnM+hxgFOBiVeHh/MMTGCbEmlhVX5h5ilOBgVhLh9eWMjhPiTUmsrEotyo8vKs1JLT7E
+        KM3BoiTOO4n1aoyQQHpiSWp2ampBahFMlomDU6qB0dNR+Y5ky6SnnrsCpj488qxQb2M770fv
+        5T2Zh5p8TweLZ1gkCS9MvPg+//stoWvn7xZ+WJf74PyreANpmSfeG+YWsLBHbmz+tmLycSXp
+        WQEPbyp90D93aaFIuejpJ2XX1GolHiZK+5+3XD/3LP/iPzvfHei4u2mm5Wce1hNaXwNLRJxv
+        77hUHaDEUpyRaKjFXFScCAA/1h6MBQMAAA==
+X-CMS-RootMailID: 20200302125344epcms5p3e31d97ef6263e0513b94f6306536269b
+References: <CGME20200302125344epcms5p3e31d97ef6263e0513b94f6306536269b@epcms5p3>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello,
+  Regarding remote node provisioning, currently, it seems 'meshd' is choosing Provisioning method & actions internally, based on remote node's capabilities.
+  
+  - Choosing Method :-  /* Parse OOB Options, prefer static, then out, then in */
+  - Choosing Action:-  Based on high bit set in the action octet:  u16_high_bit(l_get_be16(data + 6)), in case of OUT OOB or  u16_high_bit(l_get_be16(data + 9)) in case of IN OOB
 
-syzbot found the following crash on:
+Is the above preference for choosing Authentication Method, based on some pre-defined security level? If yes, can such security levels can be made available to application for configuration?
 
-HEAD commit:    f8788d86 Linux 5.6-rc3
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=120cfd29e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9833e26bab355358
-dashboard link: https://syzkaller.appspot.com/bug?extid=04e804c8c2224b6a9497
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+Also, I would like to know, whether there is any plan to Request external provisioning Agent to choose Provisioning method & specific action?
+The reason being, some *application* may be interested in a particular Security level & Authentication action, depending on its own I/O capabilities.
+ 
 
-Unfortunately, I don't have any reproducer for this crash yet.
+BR,
+-Anupam Roy
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+04e804c8c2224b6a9497@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: use-after-free in atomic_inc include/asm-generic/atomic-instrumented.h:239 [inline]
-BUG: KASAN: use-after-free in hci_sock_bind+0x642/0x12d0 net/bluetooth/hci_sock.c:1250
-Write of size 4 at addr ffff888040ed9078 by task syz-executor.2/21693
-
-CPU: 1 PID: 21693 Comm: syz-executor.2 Not tainted 5.6.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x197/0x210 lib/dump_stack.c:118
- print_address_description.constprop.0.cold+0xd4/0x30b mm/kasan/report.c:374
- __kasan_report.cold+0x1b/0x32 mm/kasan/report.c:506
- kasan_report+0x12/0x20 mm/kasan/common.c:641
- check_memory_region_inline mm/kasan/generic.c:185 [inline]
- check_memory_region+0x134/0x1a0 mm/kasan/generic.c:192
- __kasan_check_write+0x14/0x20 mm/kasan/common.c:101
- atomic_inc include/asm-generic/atomic-instrumented.h:239 [inline]
- hci_sock_bind+0x642/0x12d0 net/bluetooth/hci_sock.c:1250
- __sys_bind+0x239/0x290 net/socket.c:1662
- __do_sys_bind net/socket.c:1673 [inline]
- __se_sys_bind net/socket.c:1671 [inline]
- __x64_sys_bind+0x73/0xb0 net/socket.c:1671
- do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x45c449
-Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007fef96e6bc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00007fef96e6c6d4 RCX: 000000000045c449
-RDX: 0000000000000006 RSI: 00000000200007c0 RDI: 0000000000000006
-RBP: 000000000076bf20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-R13: 000000000000002c R14: 00000000004c28c9 R15: 000000000076bf2c
-
-Allocated by task 21692:
- save_stack+0x23/0x90 mm/kasan/common.c:72
- set_track mm/kasan/common.c:80 [inline]
- __kasan_kmalloc mm/kasan/common.c:515 [inline]
- __kasan_kmalloc.constprop.0+0xcf/0xe0 mm/kasan/common.c:488
- kasan_kmalloc+0x9/0x10 mm/kasan/common.c:529
- kmem_cache_alloc_trace+0x158/0x790 mm/slab.c:3551
- kmalloc include/linux/slab.h:555 [inline]
- kzalloc include/linux/slab.h:669 [inline]
- hci_alloc_dev+0x43/0x1e20 net/bluetooth/hci_core.c:3249
- __vhci_create_device+0x101/0x5d0 drivers/bluetooth/hci_vhci.c:99
- vhci_create_device drivers/bluetooth/hci_vhci.c:148 [inline]
- vhci_get_user drivers/bluetooth/hci_vhci.c:205 [inline]
- vhci_write+0x2d0/0x470 drivers/bluetooth/hci_vhci.c:285
- call_write_iter include/linux/fs.h:1901 [inline]
- new_sync_write+0x4d3/0x770 fs/read_write.c:483
- __vfs_write+0xe1/0x110 fs/read_write.c:496
- vfs_write+0x268/0x5d0 fs/read_write.c:558
- ksys_write+0x14f/0x290 fs/read_write.c:611
- __do_sys_write fs/read_write.c:623 [inline]
- __se_sys_write fs/read_write.c:620 [inline]
- __x64_sys_write+0x73/0xb0 fs/read_write.c:620
- do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 21688:
- save_stack+0x23/0x90 mm/kasan/common.c:72
- set_track mm/kasan/common.c:80 [inline]
- kasan_set_free_info mm/kasan/common.c:337 [inline]
- __kasan_slab_free+0x102/0x150 mm/kasan/common.c:476
- kasan_slab_free+0xe/0x10 mm/kasan/common.c:485
- __cache_free mm/slab.c:3426 [inline]
- kfree+0x10a/0x2c0 mm/slab.c:3757
- bt_host_release+0x19/0x30 net/bluetooth/hci_sysfs.c:86
- device_release+0x7a/0x210 drivers/base/core.c:1358
- kobject_cleanup lib/kobject.c:693 [inline]
- kobject_release lib/kobject.c:722 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1ff/0x2e0 lib/kobject.c:739
- put_device+0x20/0x30 drivers/base/core.c:2586
- hci_free_dev+0x19/0x20 net/bluetooth/hci_core.c:3345
- vhci_release+0x7e/0xf0 drivers/bluetooth/hci_vhci.c:341
- __fput+0x2ff/0x890 fs/file_table.c:280
- ____fput+0x16/0x20 fs/file_table.c:313
- task_work_run+0x145/0x1c0 kernel/task_work.c:113
- tracehook_notify_resume include/linux/tracehook.h:188 [inline]
- exit_to_usermode_loop+0x316/0x380 arch/x86/entry/common.c:164
- prepare_exit_to_usermode arch/x86/entry/common.c:195 [inline]
- syscall_return_slowpath arch/x86/entry/common.c:278 [inline]
- do_syscall_64+0x676/0x790 arch/x86/entry/common.c:304
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff888040ed8000
- which belongs to the cache kmalloc-8k of size 8192
-The buggy address is located 4216 bytes inside of
- 8192-byte region [ffff888040ed8000, ffff888040eda000)
-The buggy address belongs to the page:
-page:ffffea000103b600 refcount:1 mapcount:0 mapping:ffff8880aa4021c0 index:0x0 compound_mapcount: 0
-flags: 0xfffe0000010200(slab|head)
-raw: 00fffe0000010200 ffffea0000fe6b08 ffffea0000fb5408 ffff8880aa4021c0
-raw: 0000000000000000 ffff888040ed8000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff888040ed8f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888040ed8f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888040ed9000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                                ^
- ffff888040ed9080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888040ed9100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+BR,
+-Anupam Roy
