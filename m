@@ -1,143 +1,276 @@
-Return-Path: <SRS0=CJlv=4S=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=RPtH=4T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D46C3F2CD
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 19:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C45C3F2D1
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 04:07:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E5E5246BA
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  1 Mar 2020 19:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 365F224697
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 04:07:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dlBuD5no"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Be7gAvBO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726621AbgCATQQ (ORCPT
+        id S1726805AbgCBEHn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 1 Mar 2020 14:16:16 -0500
-Received: from mail-ot1-f52.google.com ([209.85.210.52]:33680 "EHLO
-        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726188AbgCATQQ (ORCPT
+        Sun, 1 Mar 2020 23:07:43 -0500
+Received: from mail-qt1-f201.google.com ([209.85.160.201]:51770 "EHLO
+        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726758AbgCBEHn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 1 Mar 2020 14:16:16 -0500
-Received: by mail-ot1-f52.google.com with SMTP id w6so7593294otk.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Mar 2020 11:16:16 -0800 (PST)
+        Sun, 1 Mar 2020 23:07:43 -0500
+Received: by mail-qt1-f201.google.com with SMTP id r13so8079330qtn.18
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Mar 2020 20:07:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7BtwWmGqlMfLRFx10LsAlrYvxOig9qCTrlkBwPALNEY=;
-        b=dlBuD5norKFYCrB+04LYP78AFoST6eVnBdxrdKubyUVyVbOhXVuDe6PEejoyZwvFiC
-         Gx+nPF5vRlUF8EEQmlhK7L4l/YhYuW682brNWDcDeyDfkhYP6g5526o+ygBjpM9oyI3N
-         8yEpGdVIduQW9MEIRUVjHgSfR9MwR+4Zge1Xbax3gG3nDcapkRzmVP4ZaXT9tesnqB+O
-         BQlOMOziaRCwHRYCBNehYpJNbR2qhjtNXJwM+Y2Tjz/6MMifV1G/u19p9ZiOo1wG3Itk
-         LjoHaY/Cc4gEeia2aoYjF/fK+751kNH1mwObiJ3dfW70hohT/xXWG3ABfyWwpxv7Z3Qf
-         EhbQ==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=qcUMHKerzd/T0TYatrRS/5D74xgSdIRuJePQMA8NwE4=;
+        b=Be7gAvBOIY8kL1pOwQ587G0gqZtsQSpYnk0HrKye3FIDdmNUGUzO0ACogNMLX56qS8
+         BUhf+QOTPN/QQBCmxqoHwaJUcsW4tv214gWP6NwaRq+5Jo2IM7drt2VnWgBrpSHnxzj/
+         fh/rQmOMHj4a5T03rCFoTgMdQa7p8kYvVCGTCZxBuMUr7PsxUguUwZchtsCvoovzWZ8e
+         Q8STDHqPH8kf40eODG3BNXAtsid+eBKdtoxpD6jt5rFjXz7tIi6CJBNPdk1Ap+CM7rKl
+         BAsCWfxZUqLMmj2BYbbiijirzkK0f/G5vVbmR874EeBXLgGNctJ+gq5QShcjwczFdXPm
+         TM4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7BtwWmGqlMfLRFx10LsAlrYvxOig9qCTrlkBwPALNEY=;
-        b=r26Convy7T+nc8jdF/IKNrkkP56z0iyzwg3ABpCNPhHuQ0LbPAZucfus1SFZBHNo73
-         ncP4BYAx3k8bfKcUU6EFckUNuoH2q6kMrdrtzV6N8VImt9SyxdSFPLrILgC7H+KSu9lk
-         JlcHBPTidVHqj/TC8ZwqTuDKep9zQd/Os9VN5FDFZpDO5avOrfWcL2if+pbiry7Q0jzv
-         xQtfB9qWbcfN9DyyBVBF6b4aVVN3lYiD7clgmd7iWfOpHaa0DoWfx/hJYmjOmKtEAYJ0
-         F1JtCJqLTsVQlWk9GzDJRMp5GTEUHHgrGD6G0OYa2ZTBRQlsJ/YHxd/Ndvsh3xxwRdUY
-         /bxA==
-X-Gm-Message-State: APjAAAWhr+nJIz9Al17NG16Q7U2cv1/49y4DRDsdrKIEytHviVWskPbb
-        SvPcu6FHCKkIHL+Aty03OmPejArC+p1mbpYW8qVegJ08
-X-Google-Smtp-Source: APXvYqxMZX01lkkg8z16TJ4qXCumUXrtGBhaZkju1Bq+sPRp0SexGmtJJYjEdfJ32rdSAmOn0rGE7P5pBIRodDwWyTc=
-X-Received: by 2002:a9d:6c01:: with SMTP id f1mr10289689otq.133.1583090175538;
- Sun, 01 Mar 2020 11:16:15 -0800 (PST)
-MIME-Version: 1.0
-References: <CAO1O6sdGJeAKTHBVyDSUa7-Hp_ULYmfOHJEbb6=-B6xuPHvffQ@mail.gmail.com>
- <CABBYNZKtxPmTUn2fw9-dy1V9M_Pb996O6VmHkg4NrAr-=t+-4A@mail.gmail.com>
-In-Reply-To: <CABBYNZKtxPmTUn2fw9-dy1V9M_Pb996O6VmHkg4NrAr-=t+-4A@mail.gmail.com>
-From:   Emil Lenngren <emil.lenngren@gmail.com>
-Date:   Sun, 1 Mar 2020 20:16:04 +0100
-Message-ID: <CAO1O6sdke-2J=eYHS2SoG83v-hMJDBu-gasufJYDyHK+1R+w5g@mail.gmail.com>
-Subject: Re: Get negotiated ATT MTU?
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=qcUMHKerzd/T0TYatrRS/5D74xgSdIRuJePQMA8NwE4=;
+        b=SacJdixA5sjXdkozRu0eQgarkUDBHQjzV2gnSlV3jO4wNll3buosFEAhCdPTmYa8Yj
+         +n4fEVI5sUknJumPPdHr9vG3Vcc36KeMPeQUF5gV2Q8R96BSA5Rb4lIHEVqIjzFiYmnO
+         X+XuPupoBBfskTm4KPoNsY6gT7MvhJXjdsXoNH6Ki4L/Yqrp6k5Tbx8TZUaAMU7oX8hF
+         XvtaiYwiS08MtsBab2VnPrfIRv+JLlnwEwXJU6Kh/GydNg6fUgOdANeg1arNgw2Vspnl
+         A1iROGn+IYxuKn9lpTnNw/pFPdDLkY7m5lJJWm7x5RoA5Ny2OcgpEGvjj6hx/1jLNZHv
+         jL0A==
+X-Gm-Message-State: ANhLgQ20fjvWC3ECz8Y/E0taw33uKfzLDTvmY8YRpwOLc1M5zEFN7MOx
+        9ygTIDyexLZFwHy6F141gHa61JjaQjbIEMuWJm2NR3SLabBrwkIJRG5FtVdWnNurQFNGw9Ro7CJ
+        2dI0f3mT+XZGWvGt8Kvi9nnv5ibJ4NhFfXLneonCt0/Nu236Q5CCdqEfyU7sSx56l4/pQd0vLjH
+        O3
+X-Google-Smtp-Source: ADFU+vuU12oLdERIo2nu0hNrhzkjOASxY6WIsaN5sjPFtY/GGnU/eR8lbRDQt/19DTsd9mdE00P5E/KpLBSN
+X-Received: by 2002:a0c:f602:: with SMTP id r2mr6143620qvm.193.1583122061974;
+ Sun, 01 Mar 2020 20:07:41 -0800 (PST)
+Date:   Mon,  2 Mar 2020 12:07:31 +0800
+Message-Id: <20200302120658.Bluez.v3.1.I3c505b4307094eb7a6f2c5949125a17c89b2e099@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [Bluez PATCH v3] src/profile: Ensure class UUID matches before
+ connecting profile
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Archie Pusaka <apusaka@chromium.org>
 
-Den s=C3=B6n 1 mars 2020 kl 07:46 skrev Luiz Augusto von Dentz
-<luiz.dentz@gmail.com>:
->
-> Hi Emil,
->
-> On Sat, Feb 29, 2020 at 2:13 AM Emil Lenngren <emil.lenngren@gmail.com> w=
-rote:
-> >
-> > Hi. I have a feature request that the negotiated ATT MTU should be
-> > exposed as a property in the org.bluez.Device1 interface.
-> >
-> > For some applications it's good to know or required how much data that
-> > can be written / read / notified in each packet, and it's not always
-> > desired or possible to use AcquireNotify / AcquireWrite.
->
-> We already negotiate a fairly big MTU maximum by default, and you can
-> just use AcquireWrite/AcquireNotify just to discover it and the close
-> the fd immediately, so I suppose we cover much of what the feature is,
+According to bluetooth spec Ver 5.1, Vol 3, Part B, 4.7.2, there
+might be multiple service records returned in a SDP Service Search
+Attribute Response. Also, according to 2.5.2, the service pattern
+can match any UUID contained within the service record, it doesn't
+have to match only some specific attributes of the record.
 
-I was considering having a solution implementable by for example
-Web-Bluetooth. This "workaround" wouldn't always work since it's not
-guaranteed to exist a characteristic with the 'write-without-response'
-or 'notify' property. I think there could also be a "race condition"
-here if two apps do the same thing (although the time window is pretty
-small): one app might get that the acquire operation returned "busy".
-And is it even possible to use AcquireNotify/AcquiceWrite if the d-bus
-runs over tcp or the programming language doesn't support d-bus file
-descriptors? An ATT MTU property would be so much simpler and
-straight-forward.
+Therefore, before using the service record to connect to any
+profile, first we must check that the service class ID of the
+service record matches with whatever UUID specified in the service
+pattern we are looking for.
 
-> except perhaps if the application requires something bellow the
-> default MTU bluetoothd but that can be a problem if other application
-> would start requiring their own MTU as well, so even if we introduce a
-> Property that would have to be read-only
+This patch checks the service class ID of the records against the
+requested UUID whenever bt_search_service() is called and filter
+out the ones that don't match. For the alternative where filtering
+is not applied, use the method bt_search().
 
-Yes! The idea was to have it read-only. It's sane to let the BT stack
-negotiate (a big value on non-embedded systems like Linux/BlueZ)
-immediately after the connection has been established. There should be
-no reason for an application using BlueZ to negotiate a smaller MTU
-than a "big" one, which BlueZ already selects.
+---
 
-> but there may be races if the
-> application start writing/reading too fast or the remote end do
-> trigger its own exchange for some reason.
+Changes in v3:
+- Simplify sdp_client.c
+- Add comment for the behavior when SDP record is missing the
+  service class ID
 
-It's already not possible to write anything after "Connected" has
-become true but before "ServicesResolved" becomes true (I get
-"org.bluez.Error.Failed: Not connected" in that case). I assume MTU is
-guaranteed to have been exchanged at this point, so there shouldn't be
-any problem for this case. Another possibility would also be to add a
-boolean "ATT MTU exchanged" property which is set to true when the MTU
-property becomes valid, if waiting for "ServicesResolved" wouldn't be
-enough.
+Changes in v2:
+- Move service class matching from profile.c to sdp_client.c
+- Create function bt_search for searching without matching uuid
+- Update device.c to use bt_search for L2CAP
 
-It should be fine also if the remote end sends an Exchange MTU request
-at the beginning of the connection since we can then immediately send
-a response and assign the MTU property without waiting for the
-Exchange MTU response (that corresponds to our request).
+ src/device.c     | 26 +++++++--------------
+ src/sdp-client.c | 61 ++++++++++++++++++++++++++++++++++++++++++++----
+ src/sdp-client.h |  3 +++
+ 3 files changed, 67 insertions(+), 23 deletions(-)
 
-In the case when the remote end sends a notification before it
-receives our Exchange MTU request, then the MTU property would
-correctly be 23 since the MTU Exchange hasn't finished yet.
+diff --git a/src/device.c b/src/device.c
+index a8f4c22f3..c351a1562 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4584,27 +4584,18 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+ 
+ 	for (seq = recs; seq; seq = seq->next) {
+ 		sdp_record_t *rec = (sdp_record_t *) seq->data;
+-		sdp_list_t *svcclass = NULL;
+ 		char *profile_uuid;
+ 
+ 		if (!rec)
+ 			break;
+ 
+-		if (sdp_get_service_classes(rec, &svcclass) < 0)
+-			continue;
+-
+-		/* Check for empty service classes list */
+-		if (svcclass == NULL) {
+-			DBG("Skipping record with no service classes");
+-			continue;
+-		}
++		/* If service class attribute is missing, svclass will be all
++		 * zero and the resulting uuid string will be NULL.
++		 */
++		profile_uuid = bt_uuid2string(&rec->svclass);
+ 
+-		/* Extract the first element and skip the remainning */
+-		profile_uuid = bt_uuid2string(svcclass->data);
+-		if (!profile_uuid) {
+-			sdp_list_free(svcclass, free);
++		if (!profile_uuid)
+ 			continue;
+-		}
+ 
+ 		if (bt_uuid_strcmp(profile_uuid, PNP_UUID) == 0) {
+ 			uint16_t source, vendor, product, version;
+@@ -4638,7 +4629,6 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+ 
+ next:
+ 		free(profile_uuid);
+-		sdp_list_free(svcclass, free);
+ 	}
+ 
+ 	if (sdp_key_file) {
+@@ -5352,9 +5342,9 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
+ 
+ 	req->sdp_flags = get_sdp_flags(device);
+ 
+-	err = bt_search_service(btd_adapter_get_address(adapter),
+-				&device->bdaddr, &uuid, browse_cb, req, NULL,
+-				req->sdp_flags);
++	err = bt_search(btd_adapter_get_address(adapter),
++			&device->bdaddr, &uuid, browse_cb, req, NULL,
++			req->sdp_flags);
+ 	if (err < 0) {
+ 		browse_request_free(req);
+ 		return err;
+diff --git a/src/sdp-client.c b/src/sdp-client.c
+index 413cf30ec..b92a083af 100644
+--- a/src/sdp-client.c
++++ b/src/sdp-client.c
+@@ -143,6 +143,7 @@ struct search_context {
+ 	gpointer		user_data;
+ 	uuid_t			uuid;
+ 	guint			io_id;
++	gboolean		filter_svc_class;
+ };
+ 
+ static GSList *context_list = NULL;
+@@ -195,6 +196,16 @@ static void search_completed_cb(uint8_t type, uint16_t status,
+ 		rsp += recsize;
+ 		bytesleft -= recsize;
+ 
++		/* Check whether service class ID matches some specified uuid.
++		 * If the record is missing service class ID, svclass will be
++		 * all zero, and thus will be unequal to the requested uuid.
++		 */
++		if (ctxt->filter_svc_class &&
++				sdp_uuid_cmp(&ctxt->uuid, &rec->svclass) != 0) {
++			sdp_record_free(rec);
++			continue;
++		}
++
+ 		recs = sdp_list_append(recs, rec);
+ 	} while (scanned < (ssize_t) size && bytesleft > 0);
+ 
+@@ -338,7 +349,28 @@ static int create_search_context(struct search_context **ctxt,
+ 	return 0;
+ }
+ 
+-int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
++static int create_search_context_full(struct search_context **ctxt,
++					const bdaddr_t *src,
++					const bdaddr_t *dst,
++					uuid_t *uuid, uint16_t flags,
++					void *user_data, bt_callback_t cb,
++					bt_destroy_t destroy,
++					gboolean filter_svc_class)
++{
++	int err = create_search_context(ctxt, src, dst, uuid, flags);
++
++	if (err < 0)
++		return err;
++
++	(*ctxt)->cb = cb;
++	(*ctxt)->destroy = destroy;
++	(*ctxt)->user_data = user_data;
++	(*ctxt)->filter_svc_class = filter_svc_class;
++
++	return 0;
++}
++
++int bt_search(const bdaddr_t *src, const bdaddr_t *dst,
+ 			uuid_t *uuid, bt_callback_t cb, void *user_data,
+ 			bt_destroy_t destroy, uint16_t flags)
+ {
+@@ -348,13 +380,32 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+ 	if (!cb)
+ 		return -EINVAL;
+ 
+-	err = create_search_context(&ctxt, src, dst, uuid, flags);
++	/* The resulting service class ID doesn't have to match uuid */
++	err = create_search_context_full(&ctxt, src, dst, uuid, flags,
++					user_data, cb, destroy, FALSE);
+ 	if (err < 0)
+ 		return err;
+ 
+-	ctxt->cb	= cb;
+-	ctxt->destroy	= destroy;
+-	ctxt->user_data	= user_data;
++	context_list = g_slist_append(context_list, ctxt);
++
++	return 0;
++}
++
++int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
++			uuid_t *uuid, bt_callback_t cb, void *user_data,
++			bt_destroy_t destroy, uint16_t flags)
++{
++	struct search_context *ctxt = NULL;
++	int err;
++
++	if (!cb)
++		return -EINVAL;
++
++	/* The resulting service class ID need to match uuid */
++	err = create_search_context_full(&ctxt, src, dst, uuid, flags,
++					user_data, cb, destroy, TRUE);
++	if (err < 0)
++		return err;
+ 
+ 	context_list = g_slist_append(context_list, ctxt);
+ 
+diff --git a/src/sdp-client.h b/src/sdp-client.h
+index 9aa5a4d98..3a7212fd2 100644
+--- a/src/sdp-client.h
++++ b/src/sdp-client.h
+@@ -24,6 +24,9 @@
+ typedef void (*bt_callback_t) (sdp_list_t *recs, int err, gpointer user_data);
+ typedef void (*bt_destroy_t) (gpointer user_data);
+ 
++int bt_search(const bdaddr_t *src, const bdaddr_t *dst,
++			uuid_t *uuid, bt_callback_t cb, void *user_data,
++			bt_destroy_t destroy, uint16_t flags);
+ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+ 			uuid_t *uuid, bt_callback_t cb, void *user_data,
+ 			bt_destroy_t destroy, uint16_t flags);
+-- 
+2.25.0.265.gbab2e86ba0-goog
 
-The list of five rules in Bluetooth Core specification Vol 3 Part F
-3.4.2.2 (ATT_EXCHANGE_MTU_RSP) should also prevent most "race
-conditions".
-
-Let me know if you think I've missed some edge case...
-
-/Emil
