@@ -2,100 +2,249 @@ Return-Path: <SRS0=RPtH=4T=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22413C3F2D7
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 20:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E219C3F2D1
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 20:40:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F38A622B48
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 20:23:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1157F21556
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Mar 2020 20:40:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726720AbgCBUXO (ORCPT
+        id S1726561AbgCBUkc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Mar 2020 15:23:14 -0500
-Received: from mail-il1-f200.google.com ([209.85.166.200]:43796 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbgCBUXO (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Mar 2020 15:23:14 -0500
-Received: by mail-il1-f200.google.com with SMTP id o13so655942ilf.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Mar 2020 12:23:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=WgWux6Y22/63Va8zB2o6y1zbKUKSo3kEDrn0Gx4Q1oY=;
-        b=sliO779oUSH+QNk3hqxPYvdIIgJIoIJc1I57hs08RQUZeE+xUMoN7XRP7gjWMcuWLQ
-         zJls6CN/sYmMniszaOUM685kET9ezTHoexAbD54qL5SV7SeWnH0uheguXQgCZDHUfhuz
-         rEpTikUaFtZwH6S/eqVzjeIDW23itgC5Y9fOPtn2/M0NS1Aws+Hf8hBpGC5MxSVrPVM3
-         8lB/TZ2nStIrhI1A22A7dtEof+sDVc2G5XBVi5EUPI8mSDaiB8dSjBg7x5eU1glFs8JO
-         4pVng9+jjqfpELN/E3Pokxp5iKqnJFFOnhT8arMK4t6FKKopQBn7s9QahpaDa4aNuUEu
-         bXxg==
-X-Gm-Message-State: ANhLgQ3hej2vLNZTQ70Gjau+x+SwzTAMFZ8k46S4glXmyJ/5kJvOYVDr
-        uDBtWk7cq2m1lUYQUkun5UwsHn2+08mlS6dGcrIRRQqdir5P
-X-Google-Smtp-Source: ADFU+vssJmeocxKl18N+nskM7AkXm5bZTLYslg7KmkLnvGLoTMNQlMzdSKxO6MlSw7c9hYqUwmzO0asq8b42varm7xVPLUAEQtht
+        Mon, 2 Mar 2020 15:40:32 -0500
+Received: from mga09.intel.com ([134.134.136.24]:54730 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725883AbgCBUkc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 2 Mar 2020 15:40:32 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Mar 2020 12:40:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,508,1574150400"; 
+   d="scan'208";a="351630459"
+Received: from ingas-nuc1.sea.intel.com ([10.255.230.43])
+  by fmsmga001.fm.intel.com with ESMTP; 02 Mar 2020 12:40:31 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] tools/mesh-cfgclient: Add address checks for pub/sub commands
+Date:   Mon,  2 Mar 2020 12:40:29 -0800
+Message-Id: <20200302204030.9150-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-X-Received: by 2002:a02:7111:: with SMTP id n17mr772283jac.129.1583180593791;
- Mon, 02 Mar 2020 12:23:13 -0800 (PST)
-Date:   Mon, 02 Mar 2020 12:23:13 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e88a52059fe4f4ab@google.com>
-Subject: INFO: trying to register non-static key in hci_uart_send_frame (2)
-From:   syzbot <syzbot+28071e627252004acc02@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+This addrs verification of subscriptpion address value entered on
+the command line: unassigned address, unicast address, and
+all-nodes address are not allowed. Publication address check verifies
+that the entered value falls into mesh address space.
 
-syzbot found the following crash on:
-
-HEAD commit:    f8788d86 Linux 5.6-rc3
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11b3d22de00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9833e26bab355358
-dashboard link: https://syzkaller.appspot.com/bug?extid=28071e627252004acc02
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+28071e627252004acc02@syzkaller.appspotmail.com
-
-INFO: trying to register non-static key.
-the code is fine but needs lockdep annotation.
-turning off the locking correctness validator.
-CPU: 1 PID: 3061 Comm: kworker/u5:0 Not tainted 5.6.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: hci1 hci_cmd_work
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x197/0x210 lib/dump_stack.c:118
- assign_lock_key kernel/locking/lockdep.c:880 [inline]
- register_lock_class+0x179e/0x1850 kernel/locking/lockdep.c:1189
- __lock_acquire+0xf4/0x4a00 kernel/locking/lockdep.c:3836
- lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4484
- percpu_down_read include/linux/percpu-rwsem.h:40 [inline]
- hci_uart_send_frame+0x85/0x620 drivers/bluetooth/hci_ldisc.c:280
- hci_send_frame+0x1bd/0x2d0 net/bluetooth/hci_core.c:3677
- hci_cmd_work+0x162/0x2d0 net/bluetooth/hci_core.c:4598
- process_one_work+0xa05/0x17a0 kernel/workqueue.c:2264
- worker_thread+0x98/0xe40 kernel/workqueue.c:2410
- kthread+0x361/0x430 kernel/kthread.c:255
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-
+Also, change the type of parameter count in comaand processing routines
+from int to uint32_t to match the retrun type of the parameter parsing
+routine.
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ tools/mesh/cfgcli.c | 47 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 29 insertions(+), 18 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index 5c990d2e8..0aea7e553 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -802,7 +802,7 @@ static struct mesh_group *add_group(uint16_t addr)
+ {
+ 	struct mesh_group *grp;
+ 
+-	if (!IS_GROUP(addr))
++	if (!IS_GROUP(addr) || addr >= FIXED_GROUP_LOW)
+ 		return NULL;
+ 
+ 	grp = l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(addr));
+@@ -1064,7 +1064,7 @@ static void cmd_bind(uint32_t opcode, int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	parm_cnt = read_input_parameters(argc, argv);
+ 	if (parm_cnt != 3 && parm_cnt != 4) {
+@@ -1101,7 +1101,7 @@ static void cmd_beacon_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 1];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_BEACON_SET, msg);
+ 
+@@ -1128,7 +1128,7 @@ static void cmd_ident_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 3 + 4];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_NODE_IDENTITY_SET, msg);
+ 
+@@ -1152,7 +1152,7 @@ static void cmd_ident_get(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 2 + 4];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_NODE_IDENTITY_GET, msg);
+ 
+@@ -1175,7 +1175,7 @@ static void cmd_proxy_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 1];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_PROXY_SET, msg);
+ 
+@@ -1202,7 +1202,7 @@ static void cmd_relay_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 2 + 4];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_RELAY_SET, msg);
+ 
+@@ -1230,7 +1230,7 @@ static void cmd_ttl_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	parm_cnt = read_input_parameters(argc, argv);
+ 	if (!parm_cnt || parms[0] > TTL_MASK) {
+@@ -1251,7 +1251,7 @@ static void cmd_pub_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[48];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 	struct mesh_group *grp;
+ 	uint32_t opcode;
+ 	uint16_t pub_addr;
+@@ -1263,6 +1263,11 @@ static void cmd_pub_set(int argc, char *argv[])
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
++	if (parms[1] > ALL_NODES_ADDRESS) {
++		bt_shell_printf("Bad publication address %x\n", parms[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
+ 	pub_addr = parms[1];
+ 
+ 	grp = l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(pub_addr));
+@@ -1314,7 +1319,7 @@ static void cmd_pub_get(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_GET, msg);
+ 
+@@ -1341,7 +1346,7 @@ static void subscription_cmd(int argc, char *argv[], uint32_t opcode)
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 	struct mesh_group *grp;
+ 	uint16_t sub_addr;
+ 
+@@ -1351,6 +1356,12 @@ static void subscription_cmd(int argc, char *argv[], uint32_t opcode)
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
++	if ((!IS_GROUP(parms[1]) || IS_ALL_NODES(parms[1])) &&
++							!IS_VIRTUAL(parms[1])) {
++		bt_shell_printf("Bad subscription address %x\n", parms[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
+ 	sub_addr = parms[1];
+ 
+ 	grp = l_queue_find(groups, match_group_addr, L_UINT_TO_PTR(sub_addr));
+@@ -1416,7 +1427,7 @@ static void cmd_sub_del_all(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_MODEL_SUB_DELETE_ALL, msg);
+ 
+@@ -1443,7 +1454,7 @@ static void cmd_sub_get(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 	bool vendor;
+ 	uint32_t opcode;
+ 
+@@ -1474,7 +1485,7 @@ static void cmd_mod_appidx_get(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 	bool vendor;
+ 	uint32_t opcode;
+ 
+@@ -1504,7 +1515,7 @@ static void cmd_hb_pub_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_HEARTBEAT_PUB_SET, msg);
+ 
+@@ -1549,7 +1560,7 @@ static void cmd_hb_sub_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_HEARTBEAT_SUB_SET, msg);
+ 
+@@ -1597,7 +1608,7 @@ static void cmd_network_transmit_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 1];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_NETWORK_TRANSMIT_SET, msg);
+ 
+@@ -1619,7 +1630,7 @@ static void cmd_friend_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 1];
+-	int parm_cnt;
++	uint32_t parm_cnt;
+ 
+ 	n = mesh_opcode_set(OP_CONFIG_FRIEND_SET, msg);
+ 
+-- 
+2.21.1
+
