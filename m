@@ -2,80 +2,134 @@ Return-Path: <SRS0=QCqs=4V=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE634C3F2CE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 18:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1B6C3F2CE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 20:18:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8047820870
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 18:50:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B3A520870
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 20:18:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UeuRNCHk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HgXJ2QsJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730068AbgCDSuL (ORCPT
+        id S1727528AbgCDUSZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Mar 2020 13:50:11 -0500
-Received: from mail-oi1-f170.google.com ([209.85.167.170]:36264 "EHLO
-        mail-oi1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729600AbgCDSuL (ORCPT
+        Wed, 4 Mar 2020 15:18:25 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:44168 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726440AbgCDUSZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Mar 2020 13:50:11 -0500
-Received: by mail-oi1-f170.google.com with SMTP id t24so3192254oij.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Mar 2020 10:50:10 -0800 (PST)
+        Wed, 4 Mar 2020 15:18:25 -0500
+Received: by mail-lj1-f195.google.com with SMTP id a10so3468139ljp.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Mar 2020 12:18:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cBD0U3iz4JM38a2ZoQ5M+qZRNjxUdu5mGHJw43sHqdY=;
-        b=UeuRNCHk/9RVSEAYO2LYay0iuDGAjEw2S6EVGBx3sSXc1MyEBSptyymJbtZkGzd6DW
-         ozmAOyNHoE4Qxqe3/PtS6p76DXlvR9PSddXCLxVuwri7Bztxv24b/l1jkaysoYiwCSA5
-         o6gshLW1o7DwpVbU7iItGybjf5RrVXgoqVZZ23Z4vETP08MuZSm9HVuHQODknsN/F7PQ
-         OTkmLf8603RxIOdRpfzqJJTzNFTn1q8G/vuwUy4LsCNFbybbKpDQMwcd/gD2/+vM6eOh
-         aOD0yAUP+t9PYeEqicKI/Re0xjPa9uStHA/gzNdzucjkwG452mfzxm84kFUJOy872RZA
-         or/A==
+        bh=AJXrs3w8JO8ditzAAzBc2CkmebwXQhk9UOKlej90UCY=;
+        b=HgXJ2QsJICJ8V48CQN7yNfOoZxC6/9HLEQfNen+KwUV1tcrVzO5vCTJlo1B20kxUeE
+         sR5CIKiTULV3k7VWyR9SqrPcAComKFx3/+i0WAR2F6BrHXSn04a9QevI3JS1H6seaAJd
+         XdWPMp3h6lEXM4ah5j8hqULqsNeSXYtoiEd2v7vh/cGWVzOj/NjmytSdhIwtTWKxPhbl
+         nXCop3gaGRDV0G+lY4PpUJKST4EQN0RlKd++GiSgLbY75UNhwB4H311anROsz2mUDhSX
+         73pgeWUEo8yoF4aReyYw7Eujd4OxsK4Ynq6D7Fw1nQLS5bPsgxDUxwcvDlbAmF7rnJ3X
+         GT9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cBD0U3iz4JM38a2ZoQ5M+qZRNjxUdu5mGHJw43sHqdY=;
-        b=I84vH0idHkmDPc8jNuRqoiMaC4vjQCvojTLTVZI4/FfTbPVCs0bUEMAXh1+sfwUsse
-         b9XrG87Il9jclx6iSwCenZZixs4gv8zERMO2bUqRaUjQpGkVE57JRzps4D0qMPxnK3Dw
-         SCi5SCxaBxrXSp93TlF4g1MZLefXGs650E+Kbc9EKJz0M9tVBq3u6QOxPOruqIGrmhjl
-         gypwmJdoQIWKtgyD0oxOM+rQ3V/qPX2J9C3g3j3JYM8jL4q4t5mvnn2VDWooBFmA6DR/
-         GXd7JX4Aw4K6x3iqkteoqU/ZNE7f6ZNcyA5nVx1QZkoyG1HiXY+xPY323O/BakxkoT0F
-         tZFw==
-X-Gm-Message-State: ANhLgQ1rkSpECIdIwfO7MuDxhwEKakS/ZUUKQgj1/yKL7796tnIbdhpY
-        Q5kBQBmXNxadUDwKsOYyoP+434qQddeAFwnkgwq99Q==
-X-Google-Smtp-Source: ADFU+vu2dXsZUDCEXxN9CgQDuydAMi7FDoP3k02X40O94aM8z3z085wdiqiV8neG9YL0Rd416lxm0ZkuOn5v5eJXvFs=
-X-Received: by 2002:aca:56ca:: with SMTP id k193mr2851183oib.133.1583347810186;
- Wed, 04 Mar 2020 10:50:10 -0800 (PST)
+        bh=AJXrs3w8JO8ditzAAzBc2CkmebwXQhk9UOKlej90UCY=;
+        b=UqWCr7G+A0tlbjsWGlzmyHJLbN18BeDQZF0wcJJb3GJEuKebiC91ghFHaZJKOfNZY6
+         tYsMjN4Z7wBPZukYcmzcSFDFJkCjE9X2rjjJE1R4XzkVJu80HOjGzxrdL32gdncOsnpV
+         vFBFuT0dPRmrHXltc3QmCnoeqPVrJixBqiipiNsNLoHnH757zau5JOmxKnmHf4jSg3gz
+         7gJzNIQ1yhdS8YLfsalFiepxGIWlcpgjAaJZ5z6r/wCGX384dAvY4F2E7lxFvDd52N6H
+         ETnJb8N3VRcLYvqELGYkAPqJ9MZyC8yIGsaPgnRSkjc6QFz78pK2aiyZPDkbKt73pVBh
+         KDww==
+X-Gm-Message-State: ANhLgQ15oFvZT8/aDJufNp2yfNhGaD1vR3fbYfYzBoP3Htri9QhoIZkA
+        HOBiTfFeQSh7t0tFD5zfhyMc51ATaPmcqfKb9dFFFJyw
+X-Google-Smtp-Source: ADFU+vs+/M9ehgRvJUwr1hkAe9gPB5qrB6EeSX587p+S95NG9rSgU9tBdDv0z2zCcldXb3VojhCuzn3eL9rPTIPLQew=
+X-Received: by 2002:a2e:890b:: with SMTP id d11mr3151304lji.79.1583353102578;
+ Wed, 04 Mar 2020 12:18:22 -0800 (PST)
 MIME-Version: 1.0
-References: <CAO1O6sdGJeAKTHBVyDSUa7-Hp_ULYmfOHJEbb6=-B6xuPHvffQ@mail.gmail.com>
- <CABBYNZKtxPmTUn2fw9-dy1V9M_Pb996O6VmHkg4NrAr-=t+-4A@mail.gmail.com>
- <CAO1O6sdke-2J=eYHS2SoG83v-hMJDBu-gasufJYDyHK+1R+w5g@mail.gmail.com>
- <CH2PR14MB3658759A2701FB52A2D6573BE6E50@CH2PR14MB3658.namprd14.prod.outlook.com>
- <CAO1O6sfwcEswTkuuntoBM_S5oFkQv7mCP1GH8Z0S0vgHk2Bp5A@mail.gmail.com>
- <CABBYNZ+2v5Z05dSD+TrzioGYVWugZJGpBnq+2M=MO-smuVgXbA@mail.gmail.com> <CAO1O6sfWgqnduM8_UuO_1W8KjnEvoetbk6bcaA_ATFUaXLtB0w@mail.gmail.com>
-In-Reply-To: <CAO1O6sfWgqnduM8_UuO_1W8KjnEvoetbk6bcaA_ATFUaXLtB0w@mail.gmail.com>
-From:   Emil Lenngren <emil.lenngren@gmail.com>
-Date:   Wed, 4 Mar 2020 18:50:00 +0000
-Message-ID: <CAO1O6scSRkpToMRbNwGHSzmPcm=Vqg2mBEsZz+TUM4bPLZZmRA@mail.gmail.com>
-Subject: Re: Get negotiated ATT MTU?
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+References: <20200304173249.66324-1-alainm@chromium.org> <1990C7E4-CB11-48A5-B07D-A06A94FB73EC@holtmann.org>
+In-Reply-To: <1990C7E4-CB11-48A5-B07D-A06A94FB73EC@holtmann.org>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Wed, 4 Mar 2020 15:18:11 -0500
+Message-ID: <CALWDO_XDw9TPWiW3K8F6_e8u2P4Hv_94-mKq+d82HQaLuqA+dA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v1] Adding definitions for Wide Band Speech configuration
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Den ons 4 mars 2020 kl 18:47 skrev Emil Lenngren <emil.lenngren@gmail.com>:
+Hi Marcel
 
-> So if the peripheral sets its receive MTU to 48 and the central sets
-> its receive MTU to 517, then 48 will be used in both directions.
+Thanks, I will rebase and send a v2 with just the header changes.
 
-Or 64 here, since 64 apparently is the minimum allowed.
+Thanks,
+Alain
+
+On Wed, Mar 4, 2020 at 1:37 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Alain,
+>
+> > This change adds the corresponding user space definition for wide band
+> > speech.
+> >
+> > ---
+> >
+> > doc/mgmt-api.txt | 30 ++++++++++++++++++++++++++++++
+> > lib/mgmt.h       |  5 ++++-
+> > 2 files changed, 34 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 5c23268a1..ecdfd9b95 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -3052,6 +3052,36 @@ Load Blocked Keys Command
+> >       Possible errors:        Invalid Parameters
+> >                               Invalid Index
+> >
+> > +Set Wide Band Speech Command
+> > +======================
+> > +
+> > +     Command Code:           0x0047
+> > +     Controller Index:       <controller id>
+> > +     Command Parameters:     wide_band_speech_enabled (1 Octet)
+> > +     Return Parameters:      Current_Settings (4 Octets)
+> > +
+> > +     This command is used to enable/disable Wide Band Speech support for a
+> > +     controller. The allowed values of the wide_band_speech_enabled command
+> > +     parameter are 0x00 and 0x01. All other values will return
+> > +     Invalid Parameters.
+> > +
+> > +     This command is only available for Wide Band Speech capable controllers and
+> > +     will yield in a Not Supported error otherwise.
+> > +
+> > +     This command can be used when the controller is not powered and
+> > +     all settings will be programmed once powered.
+> > +
+> > +     In case the kernel subsystem does not support Wide Band Speech or the
+> > +     controller does not either, the command will fail regardless.
+> > +
+> > +     This command generates a Command Complete event on success or
+> > +     a Command Status event on failure.
+> > +
+> > +     Possible errors:        Busy
+> > +                             Not Supported
+> > +                             Invalid Parameters
+> > +                             Invalid Index
+> > +
+>
+> I already committed the mgmt-api.txt change since I was fixing a few things in the document.
+>
+> Regards
+>
+> Marcel
+>
