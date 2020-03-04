@@ -2,148 +2,110 @@ Return-Path: <SRS0=QCqs=4V=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8919C3F2CD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 08:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC9EC3F2D9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 10:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C270B21744
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 08:53:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583312032;
-	bh=Ru4Pzde+8HgzouRWC8l/xExemayC50GC9qCPd1jTeVc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=oq00rXGR0B/byfncTfq4P/afwxxx/WM3uCLM90GJ0lVFru6dHEP9oB1TWKbEzU0hY
-	 KUym13R1kKjemBqPoOloc1lgdpUehm6zwyoIBmIYaTp31mMkWevPv1nFETkYK9xPjI
-	 hETEDVbOLB3+4kA/XfkIjFaU9YfkmDN1rYRKXJBs=
+	by mail.kernel.org (Postfix) with ESMTP id B88C720732
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 10:47:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="drTJ2zTM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387624AbgCDIxt (ORCPT
+        id S2387746AbgCDKr2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Mar 2020 03:53:49 -0500
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:45556 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728744AbgCDIxt (ORCPT
+        Wed, 4 Mar 2020 05:47:28 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:38535 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387488AbgCDKr1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Mar 2020 03:53:49 -0500
-Received: by mail-lf1-f67.google.com with SMTP id b13so804683lfb.12;
-        Wed, 04 Mar 2020 00:53:47 -0800 (PST)
+        Wed, 4 Mar 2020 05:47:27 -0500
+Received: by mail-ed1-f66.google.com with SMTP id e25so1751036edq.5;
+        Wed, 04 Mar 2020 02:47:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=b6DQCUS0+Ug7UlNm5mZo2LZjk1wdwZ8PPHxJgscamZg=;
+        b=drTJ2zTMj0NNTZz8bc6a7Qn9zT9Qkuo5l8l38x7+6y1beHr0FBGlK/Re5BDWKyeD+l
+         kdVh3Jxm2m3t5SCQl24C/QuaCD9kjRZZ9oRTRI2tXAB+3DmjU4lQT6woIGKyDe8Dg1s2
+         cjUAzathkzY7gd5/KxgEgwp8PmO/dHTFtkfE8NxeBhas24s+4DYimHvDe7KCCtfDHxE3
+         6iYEXmG61vBibkXmvkAs8G7MoGCsS81jLRsF8joiK1TsFxb98cCO1H3X/FbnWzyRSx/R
+         kXPKyoNnMfSowRHQBe2CMXfsNsjKSCIlHJ5L+eXmz1gUYIjqNlB3Bi/2uucf22iNzSmF
+         Nbjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=I9+aL780TGa2bAdTy5D8onwjF2cwdZt5A8dBDQnrtx4=;
-        b=mSgSnSYsc7j1ch2rUpzF9UFNMOmmVqKtde4IPZ/1oNLhqWVVnU2B4qEULNO17WtRPu
-         U1Bh5gwC8LqGoXDuI+sIgF44+ul/xxEzvXVazuL/CFh86shGevWKB7gqn9lg02WbdoIp
-         uNhx6wK0yd6ERqaYg06NMBZnDoUU3thC77w7on35KbWjpJkX32thRvVuY517SYk8V7oU
-         k8oXaO21xuam/GJ6lZO0uhIiTSxktCNAJl0WhQsbq1EtBJPthcKLiJPB/rwsqSv5VZCT
-         B/MlMuDBBYjWzfy2GN6AFm7lPMkG52k+UdqQfSl9MDs5X9ot267QS5odFjh6KkhUvxn8
-         fKFQ==
-X-Gm-Message-State: ANhLgQ03iCNl9jSQJahGLotAzfoiBGf8yDHJfVDY84b7FwaWGQwsRo8X
-        YU/oPBdMVIdMky5zQco42nATdNyw
-X-Google-Smtp-Source: ADFU+vuc36aEPaMkEB93k8MtGuOq9qmShZI1iyvTJWtxbGwjDSf14rSMM1iYeTB2d/6kBLQKyhCdVg==
-X-Received: by 2002:a19:c20b:: with SMTP id l11mr1363543lfc.135.1583312026813;
-        Wed, 04 Mar 2020 00:53:46 -0800 (PST)
-Received: from xi.terra (c-12aae455.07-184-6d6c6d4.bbcust.telenor.se. [85.228.170.18])
-        by smtp.gmail.com with ESMTPSA id b20sm13664470ljp.20.2020.03.04.00.53.45
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=b6DQCUS0+Ug7UlNm5mZo2LZjk1wdwZ8PPHxJgscamZg=;
+        b=KNkB39CYXDpio5YDiNTIA+yBXmtSCWsD2STl6HT/J1WWFQUaJq44dwoCyGe/0S3gA8
+         PMhmGzALCf+FeqP/nN4hkwYsltrJjaW714CmpPwGNYSPy4fEqef8EImnKrjisA2eXYxl
+         EUvLNelCgg93Hp/kt9chAtz2ZxJC1IMkYRCHHo7wvlUAr7s8sLT6FkfUELa5n8jeJoNK
+         oK+J1LDpreVloWMj3nzLzAvJebs++vCTuXNUfq7vl0TsWJGK0Kc4ebluuI8M4TV5uhNI
+         LbVVyD0rEVvPz9oUUHbR35IgM90pLbtalMdqYks3x/sDY5c21GJR6n9d51PwHAcmByPZ
+         Pygg==
+X-Gm-Message-State: ANhLgQ3j/+njcs0+xgI5YH6BzqffLbCLS38l41fFxh+TTgARqlkxp+CR
+        iNqZZSvcjXXO57VDkT53t3A4BJyC4x4=
+X-Google-Smtp-Source: ADFU+vseIgFS3ZIL+3zyZq5qbs5LEoXF3Ie+FFY6418MPbDsbyXXQiJ4InDXicWMqYfHwlHZx0Rpxw==
+X-Received: by 2002:a50:d0d0:: with SMTP id g16mr2114242edf.187.1583318845457;
+        Wed, 04 Mar 2020 02:47:25 -0800 (PST)
+Received: from felia.fritz.box ([2001:16b8:2d16:4100:3093:39f0:d3ca:23c6])
+        by smtp.gmail.com with ESMTPSA id 29sm1122854ejb.4.2020.03.04.02.47.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Mar 2020 00:53:45 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.92.3)
-        (envelope-from <johan@kernel.org>)
-        id 1j9Pmf-0003KL-Ol; Wed, 04 Mar 2020 09:53:41 +0100
-Date:   Wed, 4 Mar 2020 09:53:41 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Rocky Liao <rjliao@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Make bt_en and susclk not
- mandatory for QCA Rome
-Message-ID: <20200304085341.GF32540@localhost>
-References: <20200304015429.20615-1-rjliao@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200304015429.20615-1-rjliao@codeaurora.org>
+        Wed, 04 Mar 2020 02:47:24 -0800 (PST)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     linux-doc@vger.kernel.org,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-bluetooth@vger.kernel.org,
+        Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        linux-wpan@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Joe Perches <joe@perches.com>, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] MAINTAINERS: adjust to 6lowpan doc ReST conversion
+Date:   Wed,  4 Mar 2020 11:47:17 +0100
+Message-Id: <20200304104717.5841-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Mar 04, 2020 at 09:54:29AM +0800, Rocky Liao wrote:
-> On some platforms the bt_en pin and susclk are default on and there
-> is no exposed resource to control them. This patch makes the bt_en
-> and susclk not mandatory to have BT work. It also will not set the
-> HCI_QUIRK_NON_PERSISTENT_SETUP and shutdown() callback if bt_en is
-> not available.
-> 
-> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 47 ++++++++++++++++++++-----------------
->  1 file changed, 26 insertions(+), 21 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index bf436d6e638e..325baa046c3a 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1562,9 +1562,11 @@ static int qca_power_on(struct hci_dev *hdev)
->  		ret = qca_wcn3990_init(hu);
->  	} else {
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
-> -		gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> -		/* Controller needs time to bootup. */
-> -		msleep(150);
-> +		if (!IS_ERR(qcadev->bt_en)) {
-> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> +			/* Controller needs time to bootup. */
-> +			msleep(150);
-> +		}
->  	}
->  
->  	return ret;
-> @@ -1750,7 +1752,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
->  		host_set_baudrate(hu, 2400);
->  		qca_send_power_pulse(hu, false);
->  		qca_regulator_disable(qcadev);
-> -	} else {
-> +	} else if (!IS_ERR(qcadev->bt_en)) {
->  		gpiod_set_value_cansleep(qcadev->bt_en, 0);
->  	}
->  }
-> @@ -1852,6 +1854,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  	struct hci_dev *hdev;
->  	const struct qca_vreg_data *data;
->  	int err;
-> +	bool power_ctrl_enabled = true;
->  
->  	qcadev = devm_kzalloc(&serdev->dev, sizeof(*qcadev), GFP_KERNEL);
->  	if (!qcadev)
-> @@ -1901,35 +1904,37 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  		qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
->  					       GPIOD_OUT_LOW);
+Commit 107db7ec7838 ("docs: networking: convert 6lowpan.txt to ReST")
+renamed 6lowpan.txt to 6lowpan.rst for the ReST conversion.
 
-Shouldn't you use devm_gpiod_get_optional()?
+Since then, ./scripts/get_maintainer.pl --self-test complains:
 
->  		if (IS_ERR(qcadev->bt_en)) {
-> -			dev_err(&serdev->dev, "failed to acquire enable gpio\n");
-> -			return PTR_ERR(qcadev->bt_en);
-> +			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
-> +			power_ctrl_enabled = false;
+  warning: no file matches F: Documentation/networking/6lowpan.txt
 
-And bail out on errors, but treat NULL as !port_ctrl_enabled?
+Adjust 6LOWPAN GENERIC (BTLE/IEEE 802.15.4) entry in MAINTAINERS.
 
->  		}
->  
->  		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+Mauro, please ack.
+Marcel, please pick for bluetooth-next.
 
-And devm_clk_get_optional() here.
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Etc.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e19b275f2ac2..d064049aad1b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -176,7 +176,7 @@ L:	linux-wpan@vger.kernel.org
+ S:	Maintained
+ F:	net/6lowpan/
+ F:	include/net/6lowpan.h
+-F:	Documentation/networking/6lowpan.txt
++F:	Documentation/networking/6lowpan.rst
+ 
+ 6PACK NETWORK DRIVER FOR AX.25
+ M:	Andreas Koensgen <ajk@comnets.uni-bremen.de>
+-- 
+2.17.1
 
-Also does the devicetree binding need to be updated to reflect this
-change?
-
-Johan
