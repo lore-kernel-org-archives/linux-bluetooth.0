@@ -2,141 +2,133 @@ Return-Path: <SRS0=QCqs=4V=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1776FC3F2D1
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 13:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B83C3F2D1
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 13:16:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E37D120870
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 13:05:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D37A420838
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Mar 2020 13:16:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="X6aNIugG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388048AbgCDNFN (ORCPT
+        id S2387776AbgCDNQ4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Mar 2020 08:05:13 -0500
-Received: from mail-io1-f70.google.com ([209.85.166.70]:48765 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388022AbgCDNFN (ORCPT
+        Wed, 4 Mar 2020 08:16:56 -0500
+Received: from mail27.static.mailgun.info ([104.130.122.27]:43051 "EHLO
+        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728969AbgCDNQ4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Mar 2020 08:05:13 -0500
-Received: by mail-io1-f70.google.com with SMTP id z12so1362013iom.15
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Mar 2020 05:05:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=Czz7rgum7/L7+4HMs+7TnQ38o1eJc5E8CEn7vJGv6Vs=;
-        b=aXZg5VaBbUtR1mgn0TIU9UgFgk9o3STbzymHHd7n4CF6Osq4u+qe7j8RB7wot/yQEF
-         4mtzHdAEgm3lQbwQLGNVNwIGPKYe58ZcNQX7nCziHgDj2dcrCgOHWXsGvbW+sjCaz/gx
-         Qu2Jzjy6Mx7WaKKZfMRRkKyH5zV/xAbBBRtvIFyq9pQHGPEhJavAAXB+FswveMhGMsAx
-         X4JZxTqa+dWvJ38phdMBWUdqUt3/dVjw7w9icBBXyI+4ZFFmGtqWICz13sdUCgkChc0g
-         dnE2cyZCQHfmSZ1wrHjJoLO+EQn2B1C6llY5N7veW4uHY7bAS9HrKrA8eVIoDkOnhLgR
-         BlNg==
-X-Gm-Message-State: ANhLgQ2kfqu3wULmc7iAZ8zdzx5/HWPXcjzVz9Ox1iVNQD90K+a+CoEC
-        5eXn3kXF2J5Go+KiztPCr42hc3GBgE+Q/01qPIMNh5kKDdDE
-X-Google-Smtp-Source: ADFU+vu1NPRP/5ciJYIv3k8/c9GsV9hKRSP0DJON+1fkuNyPCMjgPXFsBOyeaDit6IfVKBAWiEJQKV6eXl7BsEl3Lw5EHGlgE7WI
-MIME-Version: 1.0
-X-Received: by 2002:a02:90d0:: with SMTP id c16mr2663415jag.22.1583327112844;
- Wed, 04 Mar 2020 05:05:12 -0800 (PST)
-Date:   Wed, 04 Mar 2020 05:05:12 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001fdbd605a00712b1@google.com>
-Subject: WARNING: locking bug in finish_lock_switch
-From:   syzbot <syzbot+91e3de3393c461e632ee@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 4 Mar 2020 08:16:56 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1583327815; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=K4q6i2AGe0LtekAkSNRrYuh3u8TmdkdQFpM4sYuSA1Y=; b=X6aNIugGTc2F3LsH05rYd3uAVcqTMEkZNoXxlzWi5xguYbm4wnRY71uwKuZZzBBtmVg8G4qV
+ djQh1wNK/o2dNToLC/G88SFEoCkIsO8EggZEqN7iVXFJspRi4w3sKWq03jYyuctmkfRxg1IA
+ tYMSxQ9jxpPacMh+S1sCrC5dLdU=
+X-Mailgun-Sending-Ip: 104.130.122.27
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e5faa47.7f935e333c38-smtp-out-n03;
+ Wed, 04 Mar 2020 13:16:55 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 04780C4479F; Wed,  4 Mar 2020 13:16:54 +0000 (UTC)
+Received: from rocky-Inspiron-7590.qca.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id A1294C43383;
+        Wed,  4 Mar 2020 13:16:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org A1294C43383
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Replace devm_gpiod_get() with devm_gpiod_get_optional()
+Date:   Wed,  4 Mar 2020 21:16:45 +0800
+Message-Id: <20200304131645.22057-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+This patch replaces devm_gpiod_get() with devm_gpiod_get_optional() to get
+bt_en and replaces devm_clk_get() with devm_clk_get_optional() to get
+susclk. It also uses NULL check to determine whether the resource is
+available or not.
 
-syzbot found the following crash on:
-
-HEAD commit:    f8788d86 Linux 5.6-rc3
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15cc8331e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5d2e033af114153f
-dashboard link: https://syzkaller.appspot.com/bug?extid=91e3de3393c461e632ee
-compiler:       clang version 10.0.0 (https://github.com/llvm/llvm-project/ c2443155a0fb245c8f17f2c1c72b6ea391e86e81)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=158b72c3e00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+91e3de3393c461e632ee@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(1)
-WARNING: CPU: 1 PID: 10050 at kernel/locking/lockdep.c:167 hlock_class kernel/locking/lockdep.c:167 [inline]
-WARNING: CPU: 1 PID: 10050 at kernel/locking/lockdep.c:167 __lock_acquire+0x18b8/0x1bc0 kernel/locking/lockdep.c:3950
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 10050 Comm: syz-executor.0 Not tainted 5.6.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1fb/0x318 lib/dump_stack.c:118
- panic+0x264/0x7a9 kernel/panic.c:221
- __warn+0x209/0x210 kernel/panic.c:582
- report_bug+0x1b6/0x2f0 lib/bug.c:195
- fixup_bug arch/x86/kernel/traps.c:174 [inline]
- do_error_trap+0xcf/0x1c0 arch/x86/kernel/traps.c:267
- do_invalid_op+0x36/0x40 arch/x86/kernel/traps.c:286
- invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
-RIP: 0010:hlock_class kernel/locking/lockdep.c:167 [inline]
-RIP: 0010:__lock_acquire+0x18b8/0x1bc0 kernel/locking/lockdep.c:3950
-Code: 08 00 0f 85 f5 f0 ff ff 45 31 f6 48 c7 c7 bd aa e3 88 48 c7 c6 76 6b e8 88 31 c0 e8 72 e8 ec ff 48 bf 00 00 00 00 00 fc ff df <0f> 0b e9 a4 f2 ff ff 45 31 f6 e9 92 f2 ff ff 48 c7 c1 c4 ea 69 89
-RSP: 0018:ffffc900052a77b0 EFLAGS: 00010046
-RAX: 6d156fc8d8732800 RBX: 00000000000008fb RCX: ffff88808d76c240
-RDX: 0000000040000000 RSI: 0000000000000001 RDI: dffffc0000000000
-RBP: ffffc900052a7910 R08: ffffffff817cb4ba R09: fffffbfff125af8f
-R10: fffffbfff125af8f R11: 0000000000000000 R12: 3476ca37373763a9
-R13: ffff88808d76cad0 R14: 0000000000000000 R15: ffff88808d76c240
- lock_acquire+0x154/0x250 kernel/locking/lockdep.c:4484
- finish_lock_switch+0x25/0x40 kernel/sched/core.c:3118
- finish_task_switch+0x24f/0x550 kernel/sched/core.c:3219
- context_switch kernel/sched/core.c:3383 [inline]
- __schedule+0x887/0xcd0 kernel/sched/core.c:4080
- preempt_schedule_irq+0xca/0x150 kernel/sched/core.c:4337
- retint_kernel+0x1b/0x2b
-RIP: 0010:arch_local_irq_restore arch/x86/include/asm/paravirt.h:752 [inline]
-RIP: 0010:lock_acquire+0x1ae/0x250 kernel/locking/lockdep.c:4487
-Code: c1 e8 03 42 80 3c 30 00 74 0c 48 c7 c7 10 d3 2a 89 e8 56 67 58 00 48 83 3d 6e 07 cf 07 00 0f 84 9c 00 00 00 48 8b 7d c0 57 9d <0f> 1f 44 00 00 48 83 c4 30 5b 41 5c 41 5d 41 5e 41 5f 5d c3 44 89
-RSP: 0018:ffffc900052a7ba8 EFLAGS: 00000282 ORIG_RAX: ffffffffffffff13
-RAX: 1ffffffff1255a62 RBX: 0000000000000000 RCX: ffffffff815cb150
-RDX: dffffc0000000000 RSI: 0000000000000004 RDI: 0000000000000282
-RBP: ffffc900052a7c00 R08: dffffc0000000000 R09: fffffbfff1384111
-R10: fffffbfff1384111 R11: 0000000000000000 R12: 0000000000000001
-R13: 0000000000000000 R14: dffffc0000000000 R15: ffff8880a3fd1928
- flush_workqueue+0x10a/0x1820 kernel/workqueue.c:2775
- hci_dev_open+0x21d/0x2e0 net/bluetooth/hci_core.c:1626
- hci_sock_bind+0x1620/0x1b10 net/bluetooth/hci_sock.c:1200
- __sys_bind+0x2bd/0x3a0 net/socket.c:1662
- __do_sys_bind net/socket.c:1673 [inline]
- __se_sys_bind net/socket.c:1671 [inline]
- __x64_sys_bind+0x7a/0x90 net/socket.c:1671
- do_syscall_64+0xf7/0x1c0 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x45c449
-Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f46d8bebc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00007f46d8bec6d4 RCX: 000000000045c449
-RDX: 0000000000000006 RSI: 00000000200007c0 RDI: 0000000000000005
-RBP: 000000000076c060 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
-R13: 000000000000002c R14: 00000000004c28c9 R15: 000000000076c06c
-
-
+Fixes: 8a208b24d770 ("Bluetooth: hci_qca: Make bt_en and susclk not mandatory for QCA Rome")
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/bluetooth/hci_qca.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 325baa046c3a..439392b1c043 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1562,7 +1562,7 @@ static int qca_power_on(struct hci_dev *hdev)
+ 		ret = qca_wcn3990_init(hu);
+ 	} else {
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		if (!IS_ERR(qcadev->bt_en)) {
++		if (qcadev->bt_en) {
+ 			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+ 			/* Controller needs time to bootup. */
+ 			msleep(150);
+@@ -1752,7 +1752,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 		host_set_baudrate(hu, 2400);
+ 		qca_send_power_pulse(hu, false);
+ 		qca_regulator_disable(qcadev);
+-	} else if (!IS_ERR(qcadev->bt_en)) {
++	} else if (qcadev->bt_en) {
+ 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 	}
+ }
+@@ -1901,15 +1901,15 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 		}
+ 	} else {
+ 		qcadev->btsoc_type = QCA_ROME;
+-		qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
++		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+ 					       GPIOD_OUT_LOW);
+-		if (IS_ERR(qcadev->bt_en)) {
++		if (!qcadev->bt_en) {
+ 			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
+ 			power_ctrl_enabled = false;
+ 		}
+ 
+-		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+-		if (IS_ERR(qcadev->susclk)) {
++		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
++		if (!qcadev->susclk) {
+ 			dev_warn(&serdev->dev, "failed to acquire clk\n");
+ 		} else {
+ 			err = clk_set_rate(qcadev->susclk, SUSCLK_RATE_32KHZ);
+@@ -1924,7 +1924,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
+ 		if (err) {
+ 			BT_ERR("Rome serdev registration failed");
+-			if (!IS_ERR(qcadev->susclk))
++			if (qcadev->susclk)
+ 				clk_disable_unprepare(qcadev->susclk);
+ 			return err;
+ 		}
+@@ -1945,7 +1945,7 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 
+ 	if (qca_is_wcn399x(qcadev->btsoc_type))
+ 		qca_power_shutdown(&qcadev->serdev_hu);
+-	else if (!IS_ERR(qcadev->susclk))
++	else if (qcadev->susclk)
+ 		clk_disable_unprepare(qcadev->susclk);
+ 
+ 	hci_uart_unregister_device(&qcadev->serdev_hu);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
