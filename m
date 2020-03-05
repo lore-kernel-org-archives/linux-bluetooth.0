@@ -2,276 +2,382 @@ Return-Path: <SRS0=x0qO=4W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4F3C3F2D2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 16:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61114C3F2D1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 16:15:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D7042072D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 16:04:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AD562146E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 16:15:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="qBynvhlK"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="l/rchry3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726099AbgCEQEk (ORCPT
+        id S1725990AbgCEQPI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Mar 2020 11:04:40 -0500
-Received: from mga07.intel.com ([134.134.136.100]:26023 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726094AbgCEQEj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Mar 2020 11:04:39 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Mar 2020 08:04:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,518,1574150400"; 
-   d="scan'208";a="232980071"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by fmsmga007.fm.intel.com with ESMTP; 05 Mar 2020 08:04:30 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 5 Mar 2020 08:04:30 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 5 Mar 2020 08:04:30 -0800
-Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 5 Mar 2020 08:04:30 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Thu, 5 Mar 2020 08:04:27 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B0/CzRN+9urek3izjTEwPR9gA8pUtRC4c2tjoAiA/tODJHElmZJ1ZP4OeiLKaWgKB+XeYIUnQiqMINOpVsJ+cJajK4CCmCoRgG6ECnjJsq4dsyZJq6+NWiEYVgwDhwLCkq93Bdt/ZEIvxFfFGvPJhjwM/CGaSwV+wD/+QEQjxPQ/tCuwuFVucHGLEkHXzjj2QnWIgAk9eRGIpU0BT31tgnsX4XM6p/0pGJkqgz2JHIJwEcPe5So3UstRn2s0TKTGlifbKbXqQcyx/buhVyphPGrbnDw62hHLryOwF2svQIRRvc7Y64o0j/+AJ6JCf4HQqERbT3FYU+MoSZp4aIdoQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1ynIdZu6L/ku36lrNGTk+OmDNWdJ+vmAuK22XoBok1E=;
- b=nTMrqyryMowJJziM+X2js6XzAj5vCGTkQjZZW0aJrXSRcC6MzNMTG7kCegbFvh0ZjRnyupAphwH2hq4Nw33XsnGFcOQAphCIQ872K37DyUQsL69CyUGEqT+WbbYZI2twBtrprnBq7FsRuxx8aZlYlK9MNvOCixqmgH6lt+8olVyljMSYJ7YIJX5exSLF4Cp9u83j0dFan2hm9eCSYprZuGdMtnEQWokMqMVqbDkXWqGRW8HmQmaruPuA3PAGv/LAPuAn51YKEDCUxg5BwXhcL138X9seBJ94HJhGockCvJ2X8C3BWh9llA9GHSVhHBtaKyvYR4wk10IEqZwRpwlrDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1ynIdZu6L/ku36lrNGTk+OmDNWdJ+vmAuK22XoBok1E=;
- b=qBynvhlKcuHu56NSoIinfJYlMvrHJ72e6fMktizR5BdnAZFIySXSEZ07nO0pJgYusoBCkOMP8y15ur3Ee0gWCS39shUAPSk/Ssp/xAyl/c8cg3y8PDQbH3XHaDGsa5QvOMnjCJYRlOGffwlheErUi/yDyjrstRh3eBACKxIOIGk=
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
- by MW3PR11MB4553.namprd11.prod.outlook.com (2603:10b6:303:2c::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.16; Thu, 5 Mar
- 2020 16:04:26 +0000
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::39a4:4e3:2bb2:dd3a]) by MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::39a4:4e3:2bb2:dd3a%3]) with mapi id 15.20.2793.013; Thu, 5 Mar 2020
- 16:04:26 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ] mesh: Remove unused parameters from internal rx
- functions
-Thread-Topic: [PATCH BlueZ] mesh: Remove unused parameters from internal rx
- functions
-Thread-Index: AQHV7TsRmbYUX26MXkeACRov8KEl+6g6NQWA
-Date:   Thu, 5 Mar 2020 16:04:26 +0000
-Message-ID: <c3dd84359c5c3b620a459736ee2514f6fd8d521a.camel@intel.com>
-References: <20200227065607.21081-1-inga.stotland@intel.com>
-In-Reply-To: <20200227065607.21081-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [192.55.54.38]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 049c0738-561d-48fd-c3cd-08d7c11ee0ee
-x-ms-traffictypediagnostic: MW3PR11MB4553:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW3PR11MB4553C908BE15289E46B2C5F6E1E20@MW3PR11MB4553.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 03333C607F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(39860400002)(376002)(136003)(396003)(346002)(199004)(189003)(110136005)(71200400001)(6506007)(2906002)(86362001)(81156014)(8936002)(81166006)(6636002)(8676002)(316002)(91956017)(186003)(66476007)(5660300002)(66556008)(66446008)(66946007)(36756003)(2616005)(64756008)(76116006)(26005)(6486002)(478600001)(6512007);DIR:OUT;SFP:1102;SCL:1;SRVR:MW3PR11MB4553;H:MW3PR11MB4539.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: mN77qoSmOS45lYR9LnS1YUoyhWz47M9djknjXPmSSLdvpZcg1GsVii06A8iEmoaWhz9BvTo8YDlYS/YCy2r2V3qjnMZiC6HbGJ90kS/MKtS2EskoP3c1ny3ji4v+UWWFngABmGFohBRbOVkbj6S4ODgDO8R18iHcHM6etWvOrSbTMjJJMM7uKtct+/263U86ySsU2+g5Ax0aprIWsxe4bkNixgD0ZeIPWP2QYCcDg4XaZ4yJiENaVIA5bm8KHOfEAW2/uYK8yIZ4n/mhb+CsHY5i0FqjUDG+n4+uUcQv+0Kq+K/+G9efIzqcnI83iBvze0AhXtcMv7qtPWDS2wDNILBJqMgosTRiZ6HWWZru4D51x5dZOMN8cD8i8+lxlgm5VBCAmdtuTmwBFkXpG+XoE0tDjechWuh1Plk7kHNSPhE4wYFEPAp5nyz6sg3N3VNw
-x-ms-exchange-antispam-messagedata: UbsooldDBjy6uKWXij9ZZLpuh48WJE8s/nW7A796YMR38h7teYjOZR+SgQEBaT1krQR0w72WGLjxIQ9BiGUeg+Pm6nhz/htThJIrAlWPhdhiCqRv9JcG2MYvRdNtPtNllwPcEmzWT6MqW5Y/Mvyskg==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6875C892B1264645AD21A51FCFD0F2B2@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Thu, 5 Mar 2020 11:15:08 -0500
+Received: from mail-vk1-f196.google.com ([209.85.221.196]:38476 "EHLO
+        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725963AbgCEQPI (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 5 Mar 2020 11:15:08 -0500
+Received: by mail-vk1-f196.google.com with SMTP id w4so1762609vkd.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Mar 2020 08:15:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xnFU4BY+mZDVhRyVdVMT2r6aT1KbZfe60GV9PTmkkpU=;
+        b=l/rchry32cloXBCyfUNlTqZYX8MRQbqPpZ8l5ee3qUcdp2u23cJoTo07dfFxq9iVal
+         A5PU9+M9x2Z0QQS9w2pIa7HyRjVNDhn8gwPrll9OTOiu2E4EtrKcbUP40Yb8S8trjfx1
+         9Yy6gBgKkk7j3Yqc+IWzF7SH+bwdYx+NGl410=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xnFU4BY+mZDVhRyVdVMT2r6aT1KbZfe60GV9PTmkkpU=;
+        b=PtwuGr8laEEceYOual1CEqfAgcNFmm0+RD6K/+04TBcm2dk1sebCw3EAwy+WrBw7pW
+         L4dBZBQuTHtDJY+KqBCVznTJQDg2JiX7WQevoXTXxKBVCWIreGnKHcQrkkpQa4VXiWMb
+         kGlJG79a8Zr0526fwCO7a3Nmb2B5X4tpWguReXfLB4GTtcpOX0iMoJeY8mHDannAjeqQ
+         KN2+yd7A+sCzK93lRscFF2noZnpCuMOXnDIq9AUJBba4umUrc0VjU4FhyxU+1xKPA6v4
+         9dvwj1K84yef06imC8RWHA/7V+qZZLtiTk/dLzUIk0I3j4dn1yaFhGaVHK5kHWG+W6uy
+         UJQQ==
+X-Gm-Message-State: ANhLgQ0zeyLeoAV5m8dFrDm1HggEjRIuxMUjAXBlSTDMKQhXT16ZXQYL
+        +WoKVscKtCvEsHp8nX5YRFt6sQPXkCvExw==
+X-Google-Smtp-Source: ADFU+vvDcVL8hMPfid9DD9pSR3Jkgr2zDzYhFym7lRu1Ih74SOPtlWmEFL/BC8mToFlARwgDPET3kw==
+X-Received: by 2002:a05:6122:489:: with SMTP id o9mr1242155vkn.9.1583424904469;
+        Thu, 05 Mar 2020 08:15:04 -0800 (PST)
+Received: from alain.c.googlers.com.com (57.152.190.35.bc.googleusercontent.com. [35.190.152.57])
+        by smtp.gmail.com with ESMTPSA id c44sm6014006uad.16.2020.03.05.08.15.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Mar 2020 08:15:03 -0800 (PST)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v4] bluetooth: Enable erroneous data reporting if wbs is supported
+Date:   Thu,  5 Mar 2020 16:14:59 +0000
+Message-Id: <20200305161459.153606-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 049c0738-561d-48fd-c3cd-08d7c11ee0ee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Mar 2020 16:04:26.2212
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jKAsthF7SdP9CWLz+ecW926dBF2tvRcIb7JZotGx91ZHX7sqEBebMIsGujdGdx4W00VU9xaERJW82m17yi3yCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4553
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KT24gV2VkLCAyMDIwLTAyLTI2IGF0IDIyOjU2IC0wODAwLCBJbmdhIFN0b3RsYW5k
-IHdyb3RlOg0KPiBUaGlzIHJlbW92ZXMgdW51c2VkIHR0bCBwYXJhbWV0ZXIgZnJvbSBtZXNoX21v
-ZGVsX3J4KCkuIFRoZSBUVEwgdmFsdWUNCj4gaXMgbm90IHByb2Nlc3NlZCBhdCB0aGUgYWNjZXNz
-IGxheWVyLCBzbyB0aGVyZSBpcyBubyBuZWVkIHRvIHBhc3MgaXQNCj4gdG8gYSBtb2RlbC4NCj4g
-QWxzbywgcmVtb3ZlICJ1aW50MzJfdCBkc3QiIHBhcmFtZXRlciBmcm9tIHRoZSB0eXBlZGVmIG9m
-DQo+IG1lc2hfbW9kZWxfcmVjdl9jYjogcHJvdmlkaW5nIGEganVzdCBkZXN0aW5hdGlvbiBhZGRy
-ZXNzIGlzIHN1ZmZpY2llbnQNCj4gZm9yIGludGVybmFsbHkgaW1wbGVtZW50ZWQgbW9kZWxzIChj
-dXJyZW50bHksIGl0J3Mgb25seSBDb25maWcgU2VydmVyKQ0KPiAtLS0NCj4gIG1lc2gvY2ZnbW9k
-LXNlcnZlci5jIHwgMjkgKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0NCj4gIG1lc2gvbW9k
-ZWwuYyAgICAgICAgIHwgMTcgKysrKysrKy0tLS0tLS0tLS0NCj4gIG1lc2gvbW9kZWwuaCAgICAg
-ICAgIHwgMTEgKysrKystLS0tLS0NCj4gIG1lc2gvbmV0LmMgICAgICAgICAgIHwgIDQgKystLQ0K
-PiAgNCBmaWxlcyBjaGFuZ2VkLCAyOCBpbnNlcnRpb25zKCspLCAzMyBkZWxldGlvbnMoLSkNCj4g
-DQo+IGRpZmYgLS1naXQgYS9tZXNoL2NmZ21vZC1zZXJ2ZXIuYyBiL21lc2gvY2ZnbW9kLXNlcnZl
-ci5jDQo+IGluZGV4IDNlYjczMTZmYy4uYTFmNjgyNzY1IDEwMDY0NA0KPiAtLS0gYS9tZXNoL2Nm
-Z21vZC1zZXJ2ZXIuYw0KPiArKysgYi9tZXNoL2NmZ21vZC1zZXJ2ZXIuYw0KPiBAQCAtNzA0LDEw
-ICs3MDQsOSBAQCBzdGF0aWMgdm9pZCBub2RlX3Jlc2V0KHN0cnVjdCBsX3RpbWVvdXQgKnRpbWVv
-dXQsIHZvaWQgKnVzZXJfZGF0YSkNCj4gIAlub2RlX3JlbW92ZShub2RlKTsNCj4gIH0NCj4gIA0K
-PiAtc3RhdGljIGJvb2wgY2ZnX3Nydl9wa3QodWludDE2X3Qgc3JjLCB1aW50MzJfdCBkc3QsIHVp
-bnQxNl90IHVuaWNhc3QsDQo+IC0JCQkJdWludDE2X3QgYXBwX2lkeCwgdWludDE2X3QgbmV0X2lk
-eCwNCj4gLQkJCQljb25zdCB1aW50OF90ICpkYXRhLCB1aW50MTZfdCBzaXplLA0KPiAtCQkJCXVp
-bnQ4X3QgdHRsLCBjb25zdCB2b2lkICp1c2VyX2RhdGEpDQo+ICtzdGF0aWMgYm9vbCBjZmdfc3J2
-X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQxNl90IGRzdCwgdWludDE2X3QgYXBwX2lkeCwNCj4gKwkJ
-CQl1aW50MTZfdCBuZXRfaWR4LCBjb25zdCB1aW50OF90ICpkYXRhLA0KPiArCQkJCXVpbnQxNl90
-IHNpemUsIGNvbnN0IHZvaWQgKnVzZXJfZGF0YSkNCj4gIHsNCj4gIAlzdHJ1Y3QgbWVzaF9ub2Rl
-ICpub2RlID0gKHN0cnVjdCBtZXNoX25vZGUgKikgdXNlcl9kYXRhOw0KPiAgCXN0cnVjdCBtZXNo
-X25ldCAqbmV0Ow0KPiBAQCAtNzgyLDcgKzc4MSw3IEBAIHN0YXRpYyBib29sIGNmZ19zcnZfcGt0
-KHVpbnQxNl90IHNyYywgdWludDMyX3QgZHN0LCB1aW50MTZfdCB1bmljYXN0LA0KPiAgCQlpZiAo
-c2l6ZSAhPSAyNSAmJiBzaXplICE9IDI3KQ0KPiAgCQkJcmV0dXJuIHRydWU7DQo+ICANCj4gLQkJ
-Y29uZmlnX3B1Yl9zZXQobm9kZSwgbmV0X2lkeCwgc3JjLCB1bmljYXN0LCBwa3QsIDE0LCBzaXpl
-ID09IDI3LA0KPiArCQljb25maWdfcHViX3NldChub2RlLCBuZXRfaWR4LCBzcmMsIGRzdCwgcGt0
-LCAxNCwgc2l6ZSA9PSAyNywNCj4gIAkJCQkhIShvcGNvZGUgJiBPUF9VTlJFTElBQkxFKSk7DQo+
-ICAJCWJyZWFrOw0KPiAgDQo+IEBAIC03OTAsMjYgKzc4OSwyNiBAQCBzdGF0aWMgYm9vbCBjZmdf
-c3J2X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQzMl90IGRzdCwgdWludDE2X3QgdW5pY2FzdCwNCj4g
-IAkJaWYgKHNpemUgIT0gMTEgJiYgc2l6ZSAhPSAxMykNCj4gIAkJCXJldHVybiB0cnVlOw0KPiAg
-DQo+IC0JCWNvbmZpZ19wdWJfc2V0KG5vZGUsIG5ldF9pZHgsIHNyYywgdW5pY2FzdCwgcGt0LCAw
-LCBzaXplID09IDEzLA0KPiArCQljb25maWdfcHViX3NldChub2RlLCBuZXRfaWR4LCBzcmMsIGRz
-dCwgcGt0LCAwLCBzaXplID09IDEzLA0KPiAgCQkJCSEhKG9wY29kZSAmIE9QX1VOUkVMSUFCTEUp
-KTsNCj4gIAkJYnJlYWs7DQo+ICANCj4gIAljYXNlIE9QX0NPTkZJR19NT0RFTF9QVUJfR0VUOg0K
-PiAtCQljb25maWdfcHViX2dldChub2RlLCBuZXRfaWR4LCBzcmMsIHVuaWNhc3QsIHBrdCwgc2l6
-ZSk7DQo+ICsJCWNvbmZpZ19wdWJfZ2V0KG5vZGUsIG5ldF9pZHgsIHNyYywgZHN0LCBwa3QsIHNp
-emUpOw0KPiAgCQlicmVhazsNCj4gIA0KPiAgCWNhc2UgT1BfQ09ORklHX1ZFTkRfTU9ERUxfU1VC
-X0dFVDoNCj4gIAkJaWYgKHNpemUgIT0gNikNCj4gIAkJCXJldHVybiB0cnVlOw0KPiAgDQo+IC0J
-CWNvbmZpZ19zdWJfZ2V0KG5vZGUsIG5ldF9pZHgsIHNyYywgdW5pY2FzdCwgcGt0LCBzaXplKTsN
-Cj4gKwkJY29uZmlnX3N1Yl9nZXQobm9kZSwgbmV0X2lkeCwgc3JjLCBkc3QsIHBrdCwgc2l6ZSk7
-DQo+ICAJCWJyZWFrOw0KPiAgDQo+ICAJY2FzZSBPUF9DT05GSUdfTU9ERUxfU1VCX0dFVDoNCj4g
-IAkJaWYgKHNpemUgIT0gNCkNCj4gIAkJCXJldHVybiB0cnVlOw0KPiAgDQo+IC0JCWNvbmZpZ19z
-dWJfZ2V0KG5vZGUsIG5ldF9pZHgsIHNyYywgdW5pY2FzdCwgcGt0LCBzaXplKTsNCj4gKwkJY29u
-ZmlnX3N1Yl9nZXQobm9kZSwgbmV0X2lkeCwgc3JjLCBkc3QsIHBrdCwgc2l6ZSk7DQo+ICAJCWJy
-ZWFrOw0KPiAgDQo+ICAJY2FzZSBPUF9DT05GSUdfTU9ERUxfU1VCX1ZJUlRfT1ZFUldSSVRFOg0K
-PiBAQCAtODIxLDcgKzgyMCw3IEBAIHN0YXRpYyBib29sIGNmZ19zcnZfcGt0KHVpbnQxNl90IHNy
-YywgdWludDMyX3QgZHN0LCB1aW50MTZfdCB1bmljYXN0LA0KPiAgCWNhc2UgT1BfQ09ORklHX01P
-REVMX1NVQl9ERUxFVEU6DQo+ICAJY2FzZSBPUF9DT05GSUdfTU9ERUxfU1VCX0FERDoNCj4gIAlj
-YXNlIE9QX0NPTkZJR19NT0RFTF9TVUJfREVMRVRFX0FMTDoNCj4gLQkJY29uZmlnX3N1Yl9zZXQo
-bm9kZSwgbmV0X2lkeCwgc3JjLCB1bmljYXN0LCBwa3QsIHNpemUsIHZpcnQsDQo+ICsJCWNvbmZp
-Z19zdWJfc2V0KG5vZGUsIG5ldF9pZHgsIHNyYywgZHN0LCBwa3QsIHNpemUsIHZpcnQsDQo+ICAJ
-CQkJCQkJCQlvcGNvZGUpOw0KPiAgCQlicmVhazsNCj4gIA0KPiBAQCAtMTA4NywyMCArMTA4Niwy
-MCBAQCBzdGF0aWMgYm9vbCBjZmdfc3J2X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQzMl90IGRzdCwg
-dWludDE2X3QgdW5pY2FzdCwNCj4gIA0KPiAgCWNhc2UgT1BfTU9ERUxfQVBQX0JJTkQ6DQo+ICAJ
-Y2FzZSBPUF9NT0RFTF9BUFBfVU5CSU5EOg0KPiAtCQltb2RlbF9hcHBfYmluZChub2RlLCBuZXRf
-aWR4LCBzcmMsIHVuaWNhc3QsIHBrdCwgc2l6ZSwNCj4gKwkJbW9kZWxfYXBwX2JpbmQobm9kZSwg
-bmV0X2lkeCwgc3JjLCBkc3QsIHBrdCwgc2l6ZSwNCj4gIAkJCQlvcGNvZGUgIT0gT1BfTU9ERUxf
-QVBQX0JJTkQpOw0KPiAgCQlicmVhazsNCj4gIA0KPiAgCWNhc2UgT1BfVkVORF9NT0RFTF9BUFBf
-R0VUOg0KPiAgCQlpZiAoc2l6ZSAhPSA2KQ0KPiAgCQkJcmV0dXJuIHRydWU7DQo+IC0JCW1vZGVs
-X2FwcF9saXN0KG5vZGUsIG5ldF9pZHgsIHNyYywgdW5pY2FzdCwgcGt0LCBzaXplKTsNCj4gKwkJ
-bW9kZWxfYXBwX2xpc3Qobm9kZSwgbmV0X2lkeCwgc3JjLCBkc3QsIHBrdCwgc2l6ZSk7DQo+ICAJ
-CWJyZWFrOw0KPiAgDQo+ICAJY2FzZSBPUF9NT0RFTF9BUFBfR0VUOg0KPiAgCQlpZiAoc2l6ZSAh
-PSA0KQ0KPiAgCQkJcmV0dXJuIHRydWU7DQo+IC0JCW1vZGVsX2FwcF9saXN0KG5vZGUsIG5ldF9p
-ZHgsIHNyYywgdW5pY2FzdCwgcGt0LCBzaXplKTsNCj4gKwkJbW9kZWxfYXBwX2xpc3Qobm9kZSwg
-bmV0X2lkeCwgc3JjLCBkc3QsIHBrdCwgc2l6ZSk7DQo+ICAJCWJyZWFrOw0KPiAgDQo+ICAJY2Fz
-ZSBPUF9DT05GSUdfSEVBUlRCRUFUX1BVQl9TRVQ6DQo+IEBAIC0xMjI1LDcgKzEyMjQsNyBAQCBz
-dGF0aWMgYm9vbCBjZmdfc3J2X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQzMl90IGRzdCwgdWludDE2
-X3QgdW5pY2FzdCwNCj4gIAljYXNlIE9QX05PREVfUkVTRVQ6DQo+ICAJCW4gPSBtZXNoX21vZGVs
-X29wY29kZV9zZXQoT1BfTk9ERV9SRVNFVF9TVEFUVVMsIG1zZyk7DQo+ICAJCS8qDQo+IC0JCSAq
-IGRlbGF5IG5vZGUgcmVtb3ZhbCB0byBnaXZlIGl0IGEgY2hhbmNlIHRvIHNlbmQgYmFjayB0aGUN
-Cj4gKwkJICogRGVsYXkgbm9kZSByZW1vdmFsIHRvIGdpdmUgaXQgYSBjaGFuY2UgdG8gc2VuZCBi
-YWNrIHRoZQ0KPiAgCQkgKiBzdGF0dXMNCj4gIAkJICovDQo+ICAJCWxfdGltZW91dF9jcmVhdGUo
-MSwgbm9kZV9yZXNldCwgbm9kZSwgTlVMTCk7DQo+IEBAIC0xMjM0LDcgKzEyMzMsNyBAQCBzdGF0
-aWMgYm9vbCBjZmdfc3J2X3BrdCh1aW50MTZfdCBzcmMsIHVpbnQzMl90IGRzdCwgdWludDE2X3Qg
-dW5pY2FzdCwNCj4gIA0KPiAgCWlmIChuKSB7DQo+ICAJCS8qIHByaW50X3BhY2tldCgiQXBwIFR4
-IiwgbG9uZ19tc2cgPyBsb25nX21zZyA6IG1zZywgbik7ICovDQo+IC0JCW1lc2hfbW9kZWxfc2Vu
-ZChub2RlLCB1bmljYXN0LCBzcmMsDQo+ICsJCW1lc2hfbW9kZWxfc2VuZChub2RlLCBkc3QsIHNy
-YywNCj4gIAkJCQlBUFBfSURYX0RFVl9MT0NBTCwgbmV0X2lkeCwgREVGQVVMVF9UVEwsDQo+ICAJ
-CQkJbG9uZ19tc2cgPyBsb25nX21zZyA6IG1zZywgbik7DQo+ICAJfQ0KPiBkaWZmIC0tZ2l0IGEv
-bWVzaC9tb2RlbC5jIGIvbWVzaC9tb2RlbC5jDQo+IGluZGV4IGUwMjY1ODM2My4uZDExYzk1YWI5
-IDEwMDY0NA0KPiAtLS0gYS9tZXNoL21vZGVsLmMNCj4gKysrIGIvbWVzaC9tb2RlbC5jDQo+IEBA
-IC03MSw3ICs3MSw2IEBAIHN0cnVjdCBtb2RfZm9yd2FyZCB7DQo+ICAJdWludDE2X3QgYXBwX2lk
-eDsNCj4gIAl1aW50MTZfdCBuZXRfaWR4Ow0KPiAgCXVpbnQxNl90IHNpemU7DQo+IC0JdWludDhf
-dCB0dGw7DQo+ICAJaW50OF90IHJzc2k7DQo+ICAJYm9vbCBzem1pY3Q7DQo+ICAJYm9vbCBoYXNf
-ZHN0Ow0KPiBAQCAtMzU5LDE3ICszNTgsMTYgQEAgc3RhdGljIHZvaWQgZm9yd2FyZF9tb2RlbCh2
-b2lkICphLCB2b2lkICpiKQ0KPiAgCXVpbnQxNl90IGRzdDsNCj4gIAlib29sIHJlc3VsdDsNCj4g
-IA0KPiAtCWxfZGVidWcoIm1vZGVsICU4Ljh4IHdpdGggaWR4ICUzLjN4IiwgbW9kLT5pZCwgZndk
-LT5hcHBfaWR4KTsNCj4gLQ0KPiAgCWlmIChmd2QtPmFwcF9pZHggIT0gQVBQX0lEWF9ERVZfTE9D
-QUwgJiYNCj4gIAkJCQlmd2QtPmFwcF9pZHggIT0gQVBQX0lEWF9ERVZfUkVNT1RFICYmDQo+ICAJ
-CQkJIWhhc19iaW5kaW5nKG1vZC0+YmluZGluZ3MsIGZ3ZC0+YXBwX2lkeCkpDQo+ICAJCXJldHVy
-bjsNCj4gIA0KPiAgCWRzdCA9IGZ3ZC0+ZHN0Ow0KPiAtCWlmIChkc3QgPT0gZndkLT51bmljYXN0
-IHx8IElTX0ZJWEVEX0dST1VQX0FERFJFU1MoZHN0KSkNCj4gKw0KPiArCWlmIChkc3QgPT0gZndk
-LT51bmljYXN0IHx8IElTX0ZJWEVEX0dST1VQX0FERFJFU1MoZHN0KSkgew0KPiAgCQlmd2QtPmhh
-c19kc3QgPSB0cnVlOw0KPiAtCWVsc2UgaWYgKGZ3ZC0+dmlydCkgew0KPiArCX0gZWxzZSBpZiAo
-ZndkLT52aXJ0KSB7DQo+ICAJCXZpcnQgPSBsX3F1ZXVlX2ZpbmQobW9kLT52aXJ0dWFscywgc2lt
-cGxlX21hdGNoLCBmd2QtPnZpcnQpOw0KPiAgCQlpZiAodmlydCkgew0KPiAgCQkJZndkLT5oYXNf
-ZHN0ID0gdHJ1ZTsNCj4gQEAgLTM5MCw5ICszODgsOSBAQCBzdGF0aWMgdm9pZCBmb3J3YXJkX21v
-ZGVsKHZvaWQgKmEsIHZvaWQgKmIpDQo+ICAJcmVzdWx0ID0gZmFsc2U7DQo+ICANCj4gIAlpZiAo
-bW9kLT5jYnMtPnJlY3YpDQo+IC0JCXJlc3VsdCA9IG1vZC0+Y2JzLT5yZWN2KGZ3ZC0+c3JjLCBk
-c3QsIGZ3ZC0+dW5pY2FzdCwNCj4gLQkJCQlmd2QtPmFwcF9pZHgsIGZ3ZC0+bmV0X2lkeCwNCj4g
-LQkJCQlmd2QtPmRhdGEsIGZ3ZC0+c2l6ZSwgZndkLT50dGwsIG1vZC0+dXNlcl9kYXRhKTsNCj4g
-KwkJcmVzdWx0ID0gbW9kLT5jYnMtPnJlY3YoZndkLT5zcmMsIGRzdCwgZndkLT5hcHBfaWR4LA0K
-PiArCQkJCWZ3ZC0+bmV0X2lkeCwNCj4gKwkJCQlmd2QtPmRhdGEsIGZ3ZC0+c2l6ZSwgbW9kLT51
-c2VyX2RhdGEpOw0KPiAgDQo+ICAJaWYgKGRzdCA9PSBmd2QtPnVuaWNhc3QgJiYgcmVzdWx0KQ0K
-PiAgCQlmd2QtPmRvbmUgPSB0cnVlOw0KPiBAQCAtODk5LDcgKzg5Nyw3IEBAIHN0YXRpYyB2b2lk
-IHNlbmRfbXNnX3JjdmQoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDhfdCBlbGVfaWR4LA0K
-PiAgfQ0KPiAgDQo+ICBib29sIG1lc2hfbW9kZWxfcngoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwg
-Ym9vbCBzem1pY3QsIHVpbnQzMl90IHNlcTAsDQo+IC0JCQl1aW50MzJfdCBzZXEsIHVpbnQzMl90
-IGl2X2luZGV4LCB1aW50OF90IHR0bCwNCj4gKwkJCXVpbnQzMl90IHNlcSwgdWludDMyX3QgaXZf
-aW5kZXgsDQo+ICAJCQl1aW50MTZfdCBuZXRfaWR4LCB1aW50MTZfdCBzcmMsIHVpbnQxNl90IGRz
-dCwNCj4gIAkJCXVpbnQ4X3Qga2V5X2FpZCwgY29uc3QgdWludDhfdCAqZGF0YSwgdWludDE2X3Qg
-c2l6ZSkNCj4gIHsNCj4gQEAgLTkwOSw3ICs5MDcsNiBAQCBib29sIG1lc2hfbW9kZWxfcngoc3Ry
-dWN0IG1lc2hfbm9kZSAqbm9kZSwgYm9vbCBzem1pY3QsIHVpbnQzMl90IHNlcTAsDQo+ICAJCS5k
-c3QgPSBkc3QsDQo+ICAJCS5kYXRhID0gTlVMTCwNCj4gIAkJLnNpemUgPSBzaXplIC0gKHN6bWlj
-dCA/IDggOiA0KSwNCj4gLQkJLnR0bCA9IHR0bCwNCj4gIAkJLnZpcnQgPSBOVUxMLA0KPiAgCX07
-DQo+ICAJc3RydWN0IG1lc2hfbmV0ICpuZXQgPSBub2RlX2dldF9uZXQobm9kZSk7DQo+IGRpZmYg
-LS1naXQgYS9tZXNoL21vZGVsLmggYi9tZXNoL21vZGVsLmgNCj4gaW5kZXggMDYxM2M5Y2NhLi4x
-NTNhYjliZmQgMTAwNjQ0DQo+IC0tLSBhL21lc2gvbW9kZWwuaA0KPiArKysgYi9tZXNoL21vZGVs
-LmgNCj4gQEAgLTQ2LDEwICs0Niw5IEBAIHN0cnVjdCBtZXNoX21vZGVsX3B1YiB7DQo+ICB9Ow0K
-PiAgDQo+ICB0eXBlZGVmIHZvaWQgKCptZXNoX21vZGVsX3VucmVnaXN0ZXIpKHZvaWQgKnVzZXJf
-ZGF0YSk7DQo+IC10eXBlZGVmIGJvb2wgKCptZXNoX21vZGVsX3JlY3ZfY2IpKHVpbnQxNl90IHNy
-YywgdWludDMyX3QgZHN0LCB1aW50MTZfdCB1bmljYXN0LA0KPiArdHlwZWRlZiBib29sICgqbWVz
-aF9tb2RlbF9yZWN2X2NiKSh1aW50MTZfdCBzcmMsIHVpbnQxNl90IHVuaWNhc3QsDQo+ICAJCQkJ
-CXVpbnQxNl90IGFwcF9pZHgsIHVpbnQxNl90IG5ldF9pZHgsDQo+IC0JCQkJCWNvbnN0IHVpbnQ4
-X3QgKmRhdGEsDQo+IC0JCQkJCXVpbnQxNl90IGxlbiwgdWludDhfdCB0dGwsDQo+ICsJCQkJCWNv
-bnN0IHVpbnQ4X3QgKmRhdGEsIHVpbnQxNl90IGxlbiwNCj4gIAkJCQkJY29uc3Qgdm9pZCAqdXNl
-cl9kYXRhKTsNCj4gIHR5cGVkZWYgaW50ICgqbWVzaF9tb2RlbF9iaW5kX2NiKSh1aW50MTZfdCBh
-cHBfaWR4LCBpbnQgYWN0aW9uKTsNCj4gIHR5cGVkZWYgaW50ICgqbWVzaF9tb2RlbF9wdWJfY2Ip
-KHN0cnVjdCBtZXNoX21vZGVsX3B1YiAqcHViKTsNCj4gQEAgLTEwMSw5ICsxMDAsOSBAQCBib29s
-IG1lc2hfbW9kZWxfc2VuZChzdHJ1Y3QgbWVzaF9ub2RlICpub2RlLCB1aW50MTZfdCBzcmMsIHVp
-bnQxNl90IGRzdCwNCj4gIGludCBtZXNoX21vZGVsX3B1Ymxpc2goc3RydWN0IG1lc2hfbm9kZSAq
-bm9kZSwgdWludDMyX3QgbW9kX2lkLCB1aW50MTZfdCBzcmMsDQo+ICAJCQkJdWludDhfdCB0dGws
-IGNvbnN0IHZvaWQgKm1zZywgdWludDE2X3QgbXNnX2xlbik7DQo+ICBib29sIG1lc2hfbW9kZWxf
-cngoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgYm9vbCBzem1pY3QsIHVpbnQzMl90IHNlcTAsDQo+
-IC0JCQl1aW50MzJfdCBzZXEsIHVpbnQzMl90IGl2X2luZGV4LCB1aW50OF90IHR0bCwNCj4gLQkJ
-CXVpbnQxNl90IG5ldF9pZHgsIHVpbnQxNl90IHNyYywgdWludDE2X3QgZHN0LA0KPiAtCQkJdWlu
-dDhfdCBrZXlfYWlkLCBjb25zdCB1aW50OF90ICpkYXRhLCB1aW50MTZfdCBzaXplKTsNCj4gKwkJ
-CXVpbnQzMl90IHNlcSwgdWludDMyX3QgaXZfaW5kZXgsIHVpbnQxNl90IG5ldF9pZHgsDQo+ICsJ
-CQl1aW50MTZfdCBzcmMsIHVpbnQxNl90IGRzdCwgdWludDhfdCBrZXlfYWlkLA0KPiArCQkJY29u
-c3QgdWludDhfdCAqZGF0YSwgdWludDE2X3Qgc2l6ZSk7DQo+ICB2b2lkIG1lc2hfbW9kZWxfYXBw
-X2tleV9nZW5lcmF0ZV9uZXcoc3RydWN0IG1lc2hfbm9kZSAqbm9kZSwgdWludDE2X3QgbmV0X2lk
-eCk7DQo+ICB2b2lkIG1lc2hfbW9kZWxfYXBwX2tleV9kZWxldGUoc3RydWN0IG1lc2hfbm9kZSAq
-bm9kZSwgc3RydWN0IGxfcXVldWUgKm1vZGVscywNCj4gIAkJCQkJCQkJdWludDE2X3QgaWR4KTsN
-Cj4gZGlmZiAtLWdpdCBhL21lc2gvbmV0LmMgYi9tZXNoL25ldC5jDQo+IGluZGV4IDVjZjM1OGZi
-ZC4uZDMzMjVlMDczIDEwMDY0NA0KPiAtLS0gYS9tZXNoL25ldC5jDQo+ICsrKyBiL21lc2gvbmV0
-LmMNCj4gQEAgLTE3NzgsOCArMTc3OCw4IEBAIHN0YXRpYyBib29sIG1zZ19yeGVkKHN0cnVjdCBt
-ZXNoX25ldCAqbmV0LCBib29sIGZybmQsIHVpbnQzMl90IGl2X2luZGV4LA0KPiAgCX0NCj4gIA0K
-PiAgbm90X2Zvcl9mcmllbmQ6DQo+IC0JcmV0dXJuIG1lc2hfbW9kZWxfcngobmV0LT5ub2RlLCBz
-em1pYywgc2VxQXV0aCwgc2VxLCBpdl9pbmRleCwgdHRsLA0KPiAtCQkJCQluZXRfaWR4LCBzcmMs
-IGRzdCwga2V5X2FpZCwgZGF0YSwgc2l6ZSk7DQo+ICsJcmV0dXJuIG1lc2hfbW9kZWxfcngobmV0
-LT5ub2RlLCBzem1pYywgc2VxQXV0aCwgc2VxLCBpdl9pbmRleCwgbmV0X2lkeCwNCj4gKwkJCQkJ
-CXNyYywgZHN0LCBrZXlfYWlkLCBkYXRhLCBzaXplKTsNCj4gIH0NCj4gIA0KPiAgc3RhdGljIHVp
-bnQxNl90IGtleV9pZF90b19uZXRfaWR4KHN0cnVjdCBtZXNoX25ldCAqbmV0LCB1aW50MzJfdCBr
-ZXlfaWQpDQo=
+This change introduces a wide band speech setting which allows higher
+level clients to query the local controller support for wide band speech
+as well as set the setting state when the radio is powered off.
+Internally, this setting controls if erroneous data reporting is enabled
+on the controller.
+
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
+
+ drivers/bluetooth/btusb.c        |  2 +-
+ include/net/bluetooth/hci.h      | 16 +++++++-
+ include/net/bluetooth/hci_core.h |  1 +
+ include/net/bluetooth/mgmt.h     |  4 +-
+ net/bluetooth/hci_core.c         | 24 ++++++++++++
+ net/bluetooth/hci_event.c        | 39 +++++++++++++++++++
+ net/bluetooth/mgmt.c             | 66 +++++++++++++++++++++++++++++++-
+ 7 files changed, 147 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 48e78fdc8e83..4b12c34f0b22 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3868,7 +3868,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		data->isoc = NULL;
+ 
+ 	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+-		set_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED, &hdev->quirks);
++		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 
+ 	if (id->driver_info & BTUSB_DIGIANSWER) {
+ 		data->cmdreq_type = USB_TYPE_VENDOR;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 0b3ebd35681d..4e86f1bb7a87 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -213,7 +213,7 @@ enum {
+ 	 *
+ 	 * This quirk must be set before hci_register_dev is called.
+ 	 */
+-	HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
++	HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ };
+ 
+ /* HCI device flags */
+@@ -286,6 +286,7 @@ enum {
+ 	HCI_FAST_CONNECTABLE,
+ 	HCI_BREDR_ENABLED,
+ 	HCI_LE_SCAN_INTERRUPTED,
++	HCI_WIDEBAND_SPEECH_ENABLED,
+ 
+ 	HCI_DUT_MODE,
+ 	HCI_VENDOR_DIAG,
+@@ -1095,6 +1096,19 @@ struct hci_rp_read_inq_rsp_tx_power {
+ 	__s8     tx_power;
+ } __packed;
+ 
++#define HCI_OP_READ_DEF_ERR_DATA_REPORTING	0x0c5a
++	#define ERR_DATA_REPORTING_DISABLED	0x00
++	#define ERR_DATA_REPORTING_ENABLED	0x01
++struct hci_rp_read_def_err_data_reporting {
++	__u8     status;
++	__u8     err_data_reporting;
++} __packed;
++
++#define HCI_OP_WRITE_DEF_ERR_DATA_REPORTING	0x0c5b
++struct hci_cp_write_def_err_data_reporting {
++	__u8     err_data_reporting;
++} __packed;
++
+ #define HCI_OP_SET_EVENT_MASK_PAGE_2	0x0c63
+ 
+ #define HCI_OP_READ_LOCATION_DATA	0x0c64
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dcc0dc6e2624..c498ac113930 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -260,6 +260,7 @@ struct hci_dev {
+ 	__u8		stored_num_keys;
+ 	__u8		io_capability;
+ 	__s8		inq_tx_power;
++	__u8		err_data_reporting;
+ 	__u16		page_scan_interval;
+ 	__u16		page_scan_window;
+ 	__u8		page_scan_type;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index f69f88e8e109..f41cd87550dc 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -102,7 +102,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_CONFIGURATION	0x00004000
+ #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
+ #define MGMT_SETTING_PHY_CONFIGURATION	0x00010000
+-#define MGMT_SETTING_WIDE_BAND_SPEECH	0x00020000
++#define MGMT_SETTING_WIDEBAND_SPEECH	0x00020000
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+@@ -672,6 +672,8 @@ struct mgmt_cp_set_blocked_keys {
+ } __packed;
+ #define MGMT_OP_SET_BLOCKED_KEYS_SIZE 2
+ 
++#define MGMT_OP_SET_WIDEBAND_SPEECH	0x0047
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4e6d61a95b20..ef1160c1f9d0 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -603,6 +603,9 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ 	if (hdev->commands[8] & 0x01)
+ 		hci_req_add(req, HCI_OP_READ_PAGE_SCAN_ACTIVITY, 0, NULL);
+ 
++	if (hdev->commands[18] & 0x02)
++		hci_req_add(req, HCI_OP_READ_DEF_ERR_DATA_REPORTING, 0, NULL);
++
+ 	/* Some older Broadcom based Bluetooth 1.2 controllers do not
+ 	 * support the Read Page Scan Type command. Check support for
+ 	 * this command in the bit mask of supported commands.
+@@ -838,6 +841,27 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
+ 			    sizeof(support), &support);
+ 	}
+ 
++	/* Set erroneous data reporting if supported to the wideband speech
++	 * setting value
++	 */
++	if (hdev->commands[18] & 0x04) {
++		bool enabled = hci_dev_test_flag(hdev,
++						 HCI_WIDEBAND_SPEECH_ENABLED);
++
++		if (enabled !=
++		    (hdev->err_data_reporting == ERR_DATA_REPORTING_ENABLED)) {
++			struct hci_cp_write_def_err_data_reporting cp = {};
++
++			cp.err_data_reporting =
++				enabled ?
++				ERR_DATA_REPORTING_ENABLED :
++				ERR_DATA_REPORTING_DISABLED;
++
++			hci_req_add(req, HCI_OP_WRITE_DEF_ERR_DATA_REPORTING,
++				    sizeof(cp), &cp);
++		}
++	}
++
+ 	/* Set Suggested Default Data Length to maximum if supported */
+ 	if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) {
+ 		struct hci_cp_le_write_def_data_len cp;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 591e7477e925..3772acddda93 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -901,6 +901,37 @@ static void hci_cc_read_inq_rsp_tx_power(struct hci_dev *hdev,
+ 	hdev->inq_tx_power = rp->tx_power;
+ }
+ 
++static void hci_cc_read_def_err_data_reporting(struct hci_dev *hdev,
++					       struct sk_buff *skb)
++{
++	struct hci_rp_read_def_err_data_reporting *rp = (void *)skb->data;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++
++	if (rp->status)
++		return;
++
++	hdev->err_data_reporting = rp->err_data_reporting;
++}
++
++static void hci_cc_write_def_err_data_reporting(struct hci_dev *hdev,
++						struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *)skb->data);
++	struct hci_cp_write_def_err_data_reporting *cp;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_WRITE_DEF_ERR_DATA_REPORTING);
++	if (!cp)
++		return;
++
++	hdev->err_data_reporting = cp->err_data_reporting;
++}
++
+ static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_rp_pin_code_reply *rp = (void *) skb->data;
+@@ -3302,6 +3333,14 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_read_inq_rsp_tx_power(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_READ_DEF_ERR_DATA_REPORTING:
++		hci_cc_read_def_err_data_reporting(hdev, skb);
++		break;
++
++	case HCI_OP_WRITE_DEF_ERR_DATA_REPORTING:
++		hci_cc_write_def_err_data_reporting(hdev, skb);
++		break;
++
+ 	case HCI_OP_PIN_CODE_REPLY:
+ 		hci_cc_pin_code_reply(hdev, skb);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1002c657768a..8fbbb225caf8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -107,6 +107,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_EXT_INFO,
+ 	MGMT_OP_SET_APPEARANCE,
+ 	MGMT_OP_SET_BLOCKED_KEYS,
++	MGMT_OP_SET_WIDEBAND_SPEECH,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -763,9 +764,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 		if (lmp_sc_capable(hdev))
+ 			settings |= MGMT_SETTING_SECURE_CONN;
+ 
+-		if (test_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
++		if (test_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 			     &hdev->quirks))
+-			settings |= MGMT_SETTING_WIDE_BAND_SPEECH;
++			settings |= MGMT_SETTING_WIDEBAND_SPEECH;
+ 	}
+ 
+ 	if (lmp_le_capable(hdev)) {
+@@ -850,6 +851,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 			settings |= MGMT_SETTING_STATIC_ADDRESS;
+ 	}
+ 
++	if (hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED))
++		settings |= MGMT_SETTING_WIDEBAND_SPEECH;
++
+ 	return settings;
+ }
+ 
+@@ -3593,6 +3597,63 @@ static int set_blocked_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				err, NULL, 0);
+ }
+ 
++static int set_wideband_speech(struct sock *sk, struct hci_dev *hdev,
++			       void *data, u16 len)
++{
++	struct mgmt_mode *cp = data;
++	int err;
++	bool changed = false;
++
++	BT_DBG("request for %s", hdev->name);
++
++	if (!test_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks))
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_WIDEBAND_SPEECH,
++				       MGMT_STATUS_NOT_SUPPORTED);
++
++	if (cp->val != 0x00 && cp->val != 0x01)
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_WIDEBAND_SPEECH,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	hci_dev_lock(hdev);
++
++	if (pending_find(MGMT_OP_SET_WIDEBAND_SPEECH, hdev)) {
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_SET_WIDEBAND_SPEECH,
++				      MGMT_STATUS_BUSY);
++		goto unlock;
++	}
++
++	if (hdev_is_powered(hdev) &&
++	    !!cp->val != hci_dev_test_flag(hdev,
++					   HCI_WIDEBAND_SPEECH_ENABLED)) {
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_SET_WIDEBAND_SPEECH,
++				      MGMT_STATUS_REJECTED);
++		goto unlock;
++	}
++
++	if (cp->val)
++		changed = !hci_dev_test_and_set_flag(hdev,
++						   HCI_WIDEBAND_SPEECH_ENABLED);
++	else
++		changed = hci_dev_test_and_clear_flag(hdev,
++						   HCI_WIDEBAND_SPEECH_ENABLED);
++
++	err = send_settings_rsp(sk, MGMT_OP_SET_WIDEBAND_SPEECH, hdev);
++	if (err < 0)
++		goto unlock;
++
++	if (changed)
++		err = new_settings(hdev, sk);
++
++unlock:
++
++	hci_dev_unlock(hdev);
++	return err;
++}
++
+ static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
+ 				         u16 opcode, struct sk_buff *skb)
+ {
+@@ -6994,6 +7055,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
+ 	{ set_blocked_keys,	   MGMT_OP_SET_BLOCKED_KEYS_SIZE,
+ 						HCI_MGMT_VAR_LEN },
++	{ set_wideband_speech,	   MGMT_SETTING_SIZE },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
+-- 
+2.25.1.481.gfbce0eb801-goog
+
