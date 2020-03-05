@@ -2,78 +2,98 @@ Return-Path: <SRS0=x0qO=4W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D21F4C3F2D1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 10:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 405AAC3F2CD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 11:03:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8AB8F2073D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 10:25:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11FD22073B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 11:03:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DfXIgglA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gz/16O9L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbgCEKZX (ORCPT
+        id S1727152AbgCELDx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Mar 2020 05:25:23 -0500
-Received: from mail-lj1-f178.google.com ([209.85.208.178]:37574 "EHLO
-        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726048AbgCEKZX (ORCPT
+        Thu, 5 Mar 2020 06:03:53 -0500
+Received: from mail-pf1-f201.google.com ([209.85.210.201]:51198 "EHLO
+        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725903AbgCELDx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Mar 2020 05:25:23 -0500
-Received: by mail-lj1-f178.google.com with SMTP id q23so5448108ljm.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Mar 2020 02:25:22 -0800 (PST)
+        Thu, 5 Mar 2020 06:03:53 -0500
+Received: by mail-pf1-f201.google.com with SMTP id r13so3458929pfr.17
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Mar 2020 03:03:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=7v2qakqZLXTnR2+lwRs7AvWKSbDWJBDIvfkxAASUMSY=;
-        b=DfXIgglAOKC4B/icphXgNJsSQuiEkt/2sj7J1lqgrv+St/5FX7/VNm90UCWVwGrpb7
-         5o0VPiDMGUsSCXLYMVrTOD9XjDWPvL4BjZyXCkF1vZX9U+VWokvkqOAxZv/ZyHZI3McI
-         2GgXd8aoPv5nj2JfXx/4L5gaVm1TaW+MZ63q/2vuTVC2usSh0IohUs8AotOK6lX79cGQ
-         4rIj3445hvEr3mUoLpz/0wF0xy1RWf0VddmWq93q/SWPhGnFSjGcmQifSVANN59HPZC1
-         cKTMZFY0GXdrTciQgTFyR/lHI3zTFat3MOuOPNN4viD1LrFp8dZDKbcKHo/m2qAR64s8
-         SOgA==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=40RegrjQ0uhIkykj0kL7AG4CRI+gslX64W+LbXlWAC4=;
+        b=Gz/16O9LMGROHAYLhiswzkjw3HaQRoPNcGravZIPSkNsv+laaxK4dHhCmyLHDkEa6c
+         A5vaIjif7fe8hc9hcFv68hoIL3DIT/bWUql3Bb1AovsPcw68Q6SbnrfUjZPEidnbHh4G
+         U3f3ktyCGhojtiNxxyR3KwdL0CFNqP0vewWknAEZ6IVIlL3EAWgCbFnWlPuT4YtUGPrT
+         eoak1Jx23jy+LQHyX82XswphVD7682W9FrH+j7mPb9dcDJ7OQmck/aXPx7WKHQQK4uL2
+         0DHTdKqIa87ubEwEv7Mp/h1y1KPeZWA0Nm1UBrIWcLbDiOVS4WP6qY85wgM/c24aJa6Q
+         diQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=7v2qakqZLXTnR2+lwRs7AvWKSbDWJBDIvfkxAASUMSY=;
-        b=DahmOTCP7D0YzJkqPj+2DOOjARNUvac9afuCrEQjdT/s3fQxGHWrt7C2DfsJGog3v5
-         ezpNIKFsUjnRqv/JC6wAC1MRxaiBX3nqAHAxoYyUJt0uoEvvxqfTjCM78JTidfNcET52
-         AHgcM3kROhWlFTsqhwTo3kzmq/7rFFzF6K+8v+UYMxus7snTti9l0QkTS5ofrTDObcMG
-         kys2V8oROpeIePe16OFV32Wq6hFxqVAmhZB4H0CSW1TSWOpRKlW/2X6WE9z9J1B+UDVC
-         W+kjHr6WF0H9ocIJulh3wUaewh00AlO/uc3UgOvV5ZAD+6O7wBWwzzPgw/XInkiYLcmn
-         m/6A==
-X-Gm-Message-State: ANhLgQ0W6o9ya4tXecPxIHAOQaeiVjhPaEHbfDEtI3GoeM5L0gor1DI4
-        tfT9lemon+CVs8cz+gmzzg5s51mTcR6Q+wTvEqxR7nZiH2w=
-X-Google-Smtp-Source: ADFU+vuAoyto8poC2X5y7qxwwa84dslxDFgqlTP7dbn2NKoMI3jROSkRakZ3WlzIu3PdqcG1K/rkHTR810to4TTEPnU=
-X-Received: by 2002:a2e:9dc8:: with SMTP id x8mr4843455ljj.38.1583403921103;
- Thu, 05 Mar 2020 02:25:21 -0800 (PST)
-MIME-Version: 1.0
-From:   Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
-Date:   Thu, 5 Mar 2020 13:25:10 +0300
-Message-ID: <CAE5jQCeQfyPu7T4mHutYwUjK04P8MyYS8NmTC8pm4sZkHQRRNA@mail.gmail.com>
-Subject: On reporting issues with potential security implications
-To:     linux-bluetooth@vger.kernel.org
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=40RegrjQ0uhIkykj0kL7AG4CRI+gslX64W+LbXlWAC4=;
+        b=MfkbFG6pYz2odHZevjE/lsnbTGv8IITsYWYRhp/s4x2ZeHJqk4Be2nqZI9GHV6gbGg
+         qxwDdPofo87c6qRB/tvgKWkzy50dOH7r2QZQlpY/UUieuGJZ+hoNqP04LUMjyf/uq7uN
+         cv4Ht9+oeKRVOsokPEwCsdAKZLLMMfObH1IF08SDR7JZ3PqVMxY6vok0+VIBzsBGBjzg
+         Xsyg4cc8KTqtsafofuUmCao5k0QCXvwdpiGlcRKhlQzCWgGGhMC0tf0NWSr0gwKdgrF1
+         EDFSY385jnWNrsv87eaGLJBJDGJHrHoIOC8sIgk5GTTl7Dn4Jfxd0bm/wFU+5HuDe7NW
+         T0Bg==
+X-Gm-Message-State: ANhLgQ3AQ+a7Ny7C9lIW7vOY9cuvUXgLHSEK2JRoRQKI6stpedQlesgz
+        bHWssPRBt2/jUgqG0KFLUj9A9PU40B/Z4QJ1ffCPVZkYNOZ880sZjiIWQWv0+RpVE2brCY1W77G
+        xh43L7TBMewMk8mn3kbEWaiecVT+bs5U3n6K05zFVpAsl9T8S1PNCePwWgEfievvfHitLMxb9Zj
+        /3NKO3i/O7+Kw=
+X-Google-Smtp-Source: ADFU+vu+LnKX88jndq92ncTWsKuc7AZVrmBP0UalyNXA+qyczk7DCKO85NrKR/RHuh+neHjepA/+0w5XkJnX5ChF1Q==
+X-Received: by 2002:a63:4707:: with SMTP id u7mr7265196pga.221.1583406230475;
+ Thu, 05 Mar 2020 03:03:50 -0800 (PST)
+Date:   Thu,  5 Mar 2020 19:03:40 +0800
+Message-Id: <20200305185904.Bluez.v1.1.I6c78c0eb9826eb17c944c4903132ee75c1324136@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+Subject: [Bluez PATCH v1] avdtp: Fix crashes in avdtp_abort
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Howard Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Initialized avdtp_local_sep later since stream could be NULL.
+---
 
-Many projects have some private mail list or some other policies for
-reporting issues with possible security implications. I mean some bugs
-that the reporter cannot qualify for sure as a "safe to publicly
-disclose" (still, they can turn out to be not security-related after
-review).
+ profiles/audio/avdtp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-BlueZ, on the other hand, has a policy of "never write to them
-[developers] directly" and no easily grep-able guidelines on reporting
-possibly security-related issues. So, what is the preferred way for
-reporting such things?
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 0e075f9ff..12d984866 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -3566,7 +3566,7 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
+ {
+ 	struct seid_req req;
+ 	int ret;
+-	struct avdtp_local_sep *sep = stream->lsep;
++	struct avdtp_local_sep *sep;
+ 
+ 	if (!stream && session->discover) {
+ 		/* Don't call cb since it being aborted */
+@@ -3581,6 +3581,7 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
+ 	if (stream->lsep->state == AVDTP_STATE_ABORTING)
+ 		return -EINVAL;
+ 
++	sep = stream->lsep;
+ 	avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
+ 
+ 	if (session->req && stream == session->req->stream)
+-- 
+2.25.0.265.gbab2e86ba0-goog
 
-Best regards
-Anatoly
