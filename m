@@ -2,112 +2,173 @@ Return-Path: <SRS0=x0qO=4W=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A06EC3F2D1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 19:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A72C3F2D2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 19:53:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0F8D2072A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 19:17:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16FBD2072A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Mar 2020 19:53:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GDTH30fn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mzo+Z9kt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725963AbgCETRv (ORCPT
+        id S1725963AbgCETx3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Mar 2020 14:17:51 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:34993 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725944AbgCETRv (ORCPT
+        Thu, 5 Mar 2020 14:53:29 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:37572 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725944AbgCETx3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Mar 2020 14:17:51 -0500
-Received: by mail-ot1-f66.google.com with SMTP id v10so6874010otp.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Mar 2020 11:17:50 -0800 (PST)
+        Thu, 5 Mar 2020 14:53:29 -0500
+Received: by mail-ot1-f65.google.com with SMTP id b3so93344otp.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Mar 2020 11:53:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=sBkOD1ktynya5oOu7pXkdyqP/qG94Cqwvx9AYETXInw=;
-        b=GDTH30fnSwDUkdQp8RhBnbYLUvU3+XqZyteLW9jxlNEBvCj09yB2MedZuRGD819U7Z
-         BKl/Nu25FdlBg+JLNUqFOMDteyDqjMYxryDiYqUGOwFRqjmJHDZ7Qm61ibqX+auA4bVF
-         kbUQE4RVQt7Zb3oBlhsatxD8ICqCnwSdHBkFupYxs6FkVtL0guMf9ysu29+WKajZtj4+
-         QCsl4cDuyu9djXlhewElB4y+HTdavKzaHDW+aKZ3W9sB2RPvZNMTfcIA4yowPAY0kJ9S
-         +3BIGLo3jcahSAEoIqYY/yqJjZbXAlkab2CqrwsrFgTLOB40QxfW/GxbFDTR1mjo9Kij
-         4Y0Q==
+        bh=rO7gpdouzEadijwOIOJCnHkimDQ32X9H1EfGtMe2aQs=;
+        b=Mzo+Z9ktnuI9fEQbTxkvx9oI+2vpVZ9wRkqSY57/lkX7ggW2YD7AwaclWfDJUPQmst
+         oAnMfShkP7OUiOBpu03DDXnJmLVhYJJyl6abd+BIHhVahXtz6X9aDFG3arxLAWR8wnDv
+         ROXVVs+4R0s2RL0WIQ+vW/ZrXt62PZyVssmT+sgbwRnpF5Z22neCpejxdgi23esfPWcB
+         atVXZXq9zm5oRTCwnMmR0K7pXaD9hlGYvSKDkH3uMDwJlaXrpq6gZjpQgud8amEvLM9r
+         tV+xDlyvfO1AKzzzP48S5piRQ7xsNEkc0OdAnDD3nocd9W/SJpnzMCPMqoNYNoXG/A11
+         Mmtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=sBkOD1ktynya5oOu7pXkdyqP/qG94Cqwvx9AYETXInw=;
-        b=TapTDnoKT6aaxzQsVPuyCkRsEd3xGr3HYWOUtUFDuN0IrXu3b52i93MvcuNJb1a+AU
-         bk/J/P+eOOeugVc2H6IJSdqwTVL/y8ev6PMuu45A09g5ik1akl3RTvAQDG3uBir/16zx
-         LxdQJoms3hzj6lQhc8vUDrjF83hqvO0tjBy0i3l17reXwzEEExfIisPj/FnzVecHZqtv
-         DLpm/sq4TLIcfM/le6LftcbpP9NuCCiRp1TsM24G2QbBLQR4n6lhs7UbePD721Eids+z
-         VKAOVBxDoa/3XGDJYM0bgzxoyoamDjQ3Synl0vZZIfhyYbU3QmR2OXKejbeiecOss6WP
-         BsRw==
-X-Gm-Message-State: ANhLgQ0ufSNMQ5uu/aDy/92QWrj8KeCsm+VLu2rYHI+EWjoFfTcG/Gkz
-        emkT3oSsdidpcmJEDcy4q7SfBLhPw1stezBASiRwscUf
-X-Google-Smtp-Source: ADFU+vu23dLna+DdPkrOu0fYRgD+QxXyNEius6cHOK/I2AU60TBUFyIsvojJ1XEG9FlEvxYuXaPOSoN4glpiFR3asQY=
-X-Received: by 2002:a05:6830:1e34:: with SMTP id t20mr8356322otr.79.1583435870253;
- Thu, 05 Mar 2020 11:17:50 -0800 (PST)
+        bh=rO7gpdouzEadijwOIOJCnHkimDQ32X9H1EfGtMe2aQs=;
+        b=I3ZIomcPVXctpTFpEMEKkNEZVsAGB+dYLNyilGS4YThMsWobbcXLJVQ17XJK2iSb0Q
+         66q+0FFM46xgTLwczAkmmBGdvwmhj4oTMcZLYGT7EpmUqgPMkFint9wBgG4GP4IaUu8v
+         AIlpIJhreZ6bLw1VgBo4n3aTQrvLz93SMgw6FJqv0Ty1ptfmecDqUKDx2vmz62WmMQIj
+         y3vYWHLZmlG2jTY08N3UwEfxOpLkl48UC/TdDCMc7eRMOO5Q/B/VA4mNCZUOOzv8fURj
+         a1z5A8JI0NokI96Ago78E7zyibaYj3ECMOw7X+9PEnEkRgV694cmkHpL2ZIXLYfLto91
+         gETA==
+X-Gm-Message-State: ANhLgQ3VRB9TguswcU1nVEi4DJXPICgjTUAce7NgWTxzP8DR11WcHj0Q
+        71xW1yL3gAQMNsZJjspRpHNJ15s6+2WwQ+wuZ7BVInxeRcM=
+X-Google-Smtp-Source: ADFU+vtpxM/1KPJsFzRThmp6a9naaPXhE/b/GjMIkolu1r8zBp1+b2+WvvzQL37luXbUpwcVWLNgnOzMOzeXn5f3pF8=
+X-Received: by 2002:a05:6830:1503:: with SMTP id k3mr143333otp.28.1583438008510;
+ Thu, 05 Mar 2020 11:53:28 -0800 (PST)
 MIME-Version: 1.0
-References: <20200305185904.Bluez.v1.1.I6c78c0eb9826eb17c944c4903132ee75c1324136@changeid>
-In-Reply-To: <20200305185904.Bluez.v1.1.I6c78c0eb9826eb17c944c4903132ee75c1324136@changeid>
+References: <1583398524-18749-1-git-send-email-ajay.kishore@intel.com> <1583398524-18749-6-git-send-email-ajay.kishore@intel.com>
+In-Reply-To: <1583398524-18749-6-git-send-email-ajay.kishore@intel.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 5 Mar 2020 11:17:38 -0800
-Message-ID: <CABBYNZLPDqsoPSPKz=X9LEDJvq9Lb0r7jXDS_BCi5d57dNXi5A@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] avdtp: Fix crashes in avdtp_abort
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>
+Date:   Thu, 5 Mar 2020 11:53:17 -0800
+Message-ID: <CABBYNZKUnVWpZxBVW12JnoY1ZV+_jwsO90+M8-kJNYjaA0kBDw@mail.gmail.com>
+Subject: Re: [PATCH v3 6/6] doc/obex-api: Update documentation
+To:     Ajay Kishore <ajay.kishore@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Ajay,
 
-On Thu, Mar 5, 2020 at 3:06 AM Howard Chung <howardchung@google.com> wrote:
+On Thu, Mar 5, 2020 at 1:21 AM Ajay Kishore <ajay.kishore@intel.com> wrote:
 >
-> Initialized avdtp_local_sep later since stream could be NULL.
+> This adds documentation with the conversation listing feature
 > ---
+>  doc/obex-api.txt | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
 >
->  profiles/audio/avdtp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+> index f39355a..ef81460 100644
+> --- a/doc/obex-api.txt
+> +++ b/doc/obex-api.txt
+> @@ -712,6 +712,44 @@ Methods            void SetFolder(string name)
+>                         Possible errors: org.bluez.obex.Error.InvalidArguments
+>                                          org.bluez.obex.Error.Failed
 >
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 0e075f9ff..12d984866 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -3566,7 +3566,7 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
->  {
->         struct seid_req req;
->         int ret;
-> -       struct avdtp_local_sep *sep = stream->lsep;
-> +       struct avdtp_local_sep *sep;
->
->         if (!stream && session->discover) {
->                 /* Don't call cb since it being aborted */
-> @@ -3581,6 +3581,7 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
->         if (stream->lsep->state == AVDTP_STATE_ABORTING)
->                 return -EINVAL;
+> +               array{object, dict} ListConversations(string folder, dict filter)
 
-I suspect there i something else going on then just the lsep being
-NULL since we do check it on the line above it would have crashed
-anyway, is this perhaps the result of lsep being unregistered before
-the avdtp_abort is called?
+If we are going to return Message1 objects this should reuse
+ListMessages and then use the Type filter to specify the types of
+message to list, if that is not present then it should list
+everything.
 
-> +       sep = stream->lsep;
->         avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
+> +                       Returns an array containing the conversations found in the
+> +                       given subfolder of the current folder, or in the current
+> +                       folder if folder is empty.
+> +
+> +                       Possible Filters: MaxListCount, LastActivityBegin, LastActivityEnd,
+> +                       ReadStatus, Recipient
+> +
+> +                       Each message is represented by an object path followed
+> +                       by a dictionary of the properties.
+> +
+> +                       Properties:
+> +
+> +                               string id:
+
+Properties should use the same format as methods in D-Bus, ID might be better.
+
+> +
+> +                                       Conversation unique identification
+> +
+> +                               string last_activity:
+
+LastActivity
+
+> +                                       Conversation timestamp for the last activity
+> +
+> +                               string chat_state:
+> +
+> +                                       Conversation current chat state of the participants
+
+ChatState
+
+> +                               string presence_availability:
+> +
+> +                                       Conversation  participants availability
+
+Presence
+
+> +                               string presence_text:
+
+We could reuse Subject here.
+
+> +                                       User defined status of the conversation
+> +
+> +                       Possible errors: org.bluez.obex.Error.InvalidArguments
+> +                                        org.bluez.obex.Error.Failed
+> +
+> +
+
+I though we discussed about this but it seems that the properties here
+have no relation to Message1 which appears to be the objects you are
+creating so you will have to introduce these properties also in
+Message1, besides we need to include a new possible value for Type
+e.g. "Conversation"
+
+>                 void UpdateInbox(void)
 >
->         if (session->req && stream == session->req->stream)
+>                         Request remote to update its inbox.
+> @@ -799,6 +837,18 @@ Filter:            uint16 Offset:
+>                         Possible values: True for high priority or False for
+>                         non-high priority
+>
+> +               string LastActivityBegin:
+> +
+> +                       Filter conversations by starting period.
+> +
+> +                       Possible values: Date in "YYYYMMDDTHHMMSS" format.
+> +
+> +               string LastActivityEnd:
+> +
+> +                       Filter conversations by ending period.
+> +
+> +                       Possible values: Date in "YYYYMMDDTHHMMSS" format.
+> +
+>  Message hierarchy
+>  =================
+>
 > --
-> 2.25.0.265.gbab2e86ba0-goog
+> 2.7.4
 >
 
 
