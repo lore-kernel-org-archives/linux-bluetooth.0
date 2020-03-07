@@ -6,23 +6,23 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F5CC10F00
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 20:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4F3C10F00
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 21:36:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 973682064A
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 20:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08ED320684
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 21:36:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726199AbgCGUZy convert rfc822-to-8bit (ORCPT
+        id S1726168AbgCGVgn convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Mar 2020 15:25:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40932 "EHLO mail.kernel.org"
+        Sat, 7 Mar 2020 16:36:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58514 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726174AbgCGUZy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Mar 2020 15:25:54 -0500
+        id S1726138AbgCGVgn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 7 Mar 2020 16:36:43 -0500
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 206235] kernel BUG at mm/slub.c:294
-Date:   Sat, 07 Mar 2020 20:25:53 +0000
+Date:   Sat, 07 Mar 2020 21:36:42 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -37,8 +37,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-206235-62941-feQOzuXvfJ@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cf_kernel_version
+Message-ID: <bug-206235-62941-FxTPjZ4tFs@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-206235-62941@https.bugzilla.kernel.org/>
 References: <bug-206235-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -53,21 +53,32 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=206235
 
---- Comment #2 from Steffen Nurpmeso (steffen@sdaoden.eu) ---
-P.S.: that zzz.sh has also
+Steffen Nurpmeso (steffen@sdaoden.eu) changed:
 
-   command -v rfkill >/dev/null 2>&1 &&
-      act '( rfkill block all ) </dev/null & sleep 2'
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+     Kernel Version|4.19.94                     |4.19.107
 
-which should be the "rfkill".
+--- Comment #3 from Steffen Nurpmeso (steffen@sdaoden.eu) ---
+And one more addition, because whereas r8822be for Wifi is in staging in 4.19,
+the bluetooth one is not, i think.  (No idea of kernel, actually.)  And the
+rfkill(1) did only act on bluetooth here, since Wifi was gone before:
 
-I know the r8822be module (the only one, i cannot link it in) is in staging on
-4.19.  (It seems to have been integrated in 5.4, yet i have had not time to
-update to that one.)  It works just fine, how ever large it is, but i want to
-remark that Wifi can get down to ISDN speed and less if i hear music via
-bluetooth.  Not always, but in such situations, if i stop listening to music
-via bluetooth, Wifi speed goes up to 3.6 Mbit per second (the maximum here)
-immediately.
+Mar  7 01:56:37 kent rfkill: block set for type wlan
+..
+Mar  7 01:56:37 kent dhcpcd[516]: script_runreason:
+/lib/dhcpcd/dhcpcd-run-hooks: WEXITSTATUS 1
+Mar  7 02:14:16 kent root/acpid[2549]: 3: button/lid LID close
+...
+Mar  7 02:14:37 kent root/zzz[2585]: ( rfkill block all ) </dev/null & sleep 2
+...
+Mar  7 02:14:41 kent root/zzz[2608]: sync
+Mar  7 02:14:41 kent root/zzz[2610]: echo mem > /sys/power/state
+Mar  7 02:15:02 kent root/zzz[2615]: echo mem > /sys/power/state
+Mar  7 02:15:23 kent root/zzz[2618]: echo mem > /sys/power/state
+..in a loop until i realized it..
+
+Ciao, and a nice Sunday i wish from Germany
 
 -- 
 You are receiving this mail because:
