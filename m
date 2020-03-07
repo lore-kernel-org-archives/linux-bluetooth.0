@@ -2,94 +2,94 @@ Return-Path: <SRS0=2pC7=4Y=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C32C10F00
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 07:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1918C3F2C6
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 13:59:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54059206D5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 07:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F08D2073C
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Mar 2020 13:59:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZVxbIUwd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zo5SiZ1A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726157AbgCGHvU (ORCPT
+        id S1726134AbgCGN6P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Mar 2020 02:51:20 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:40545 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725907AbgCGHvU (ORCPT
+        Sat, 7 Mar 2020 08:58:15 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:46935 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726073AbgCGN6P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Mar 2020 02:51:20 -0500
-Received: by mail-pg1-f195.google.com with SMTP id t24so2195278pgj.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Mar 2020 23:51:19 -0800 (PST)
+        Sat, 7 Mar 2020 08:58:15 -0500
+Received: by mail-pl1-f194.google.com with SMTP id w12so2055534pll.13;
+        Sat, 07 Mar 2020 05:58:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=0T2PM8hYmpC+cTcDMNtIQRfi+KfzETyRuSQJNUxBWRw=;
-        b=ZVxbIUwdJL+jBCTRNypo0vOUuuq4tJZC6P7LP0+H1nTnbTWDfQ87oFR1C3Qo4PM4+2
-         bHCVeAi5Fs4Qr4vvr6U7hJR0E5ofJ0JHPBEdVLpdJEvRIeRHq0/fIFtOvikylxviX4aa
-         CIs5BsjE4ZuXDsImW1G+OjnAt7IlsBFrCxGlTy1qbh16CcB9q1ziKz0HcaEmHs1rTJ7V
-         xsu8Auz6CCftUE+uJqIKwN3WETCHN3cYphp8HrdGn7iY0jkrROFc/Wt6VqDN+IPYFYBN
-         A6Mk0JqYH3UY8nDbR+yDvwAwDGfCXWKVBhiXoOrfx4O8bPpZ7TLyF/9MuWLmnoDjDrlr
-         ltFQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=YttYJY2hEu0o9ieZzIqW+Sf4nL0+gX4KSVXdg9N5DNU=;
+        b=Zo5SiZ1APLQC++VQvG/MZYrhXfyqAhqKEHXuVf2gdx4xLkNQGvwi1/UiuiRXzi/RXn
+         JXr9fhDCARuBH7pAZycvrKCz+HFxV7CwLiNb1m5d9dXgU90mGSETx2F4Y95QEGS/Wcy4
+         XEh5P5KF7phVHqe1YoR+KlvB/ycvu6wD7vqkMhAYxQPPKTi0CfAsvhc0eChBrWVOGAFw
+         Pq5D6uc3mncsYQW/tUACTQl5InajSaf0m227B3dZqQHH8VK1t4utEvHeaItIGy/eNepF
+         WAtE5r9R8E3ls/Rkfqq9RtdHncM6YOxTawI3ltdG313PJYEPBBnLAB8nEk65+NItn2uU
+         QjNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=0T2PM8hYmpC+cTcDMNtIQRfi+KfzETyRuSQJNUxBWRw=;
-        b=YLauO6lajSoOs+uYB4vo9IKBuEuoiQGFU04DzrrdMiii+SRb6g+ySWaVr57LmyabXI
-         VOPReihTCmIaJiNhdGZPZEAJSrSQ+X1dsGIRgpPA40bd8ctKFIcruGjZdWjaWXZwoilS
-         xu7LR8RzURA3XkTa1B6s8T6vyRsJhIX1QS+8vbL8owP910pZc8ERo3EJqT9UkjyYQDTp
-         N8p8YKV4/a9i+Z/5s4YfaTzVRXDOBk7VxpyO4lm4qf5HwKEk2AFyvGQ9l8oFnv1+49ln
-         UFXse5LSaxmMgqgvC/vCL3UiMaawZG8NGpnKn5WCYXPCzD7IdeN0UMVatDb9A7TUxKgV
-         gV2A==
-X-Gm-Message-State: ANhLgQ1shxQPpZUVnkJBcpYhKcQIAJgugUEcUdUhNz/51VPCaDY00/7Q
-        fKflaPre72FVdJ38LSABPis916rUdemnEQ==
-X-Google-Smtp-Source: ADFU+vuNyyIitGWKgJ6temBR9wJamCBlDEfQRsLRqzAYEQ+sKdDmGJtkJs9LrmX08IsVwlihHNqK6Q==
-X-Received: by 2002:aa7:8089:: with SMTP id v9mr7877046pff.182.1583567479157;
-        Fri, 06 Mar 2020 23:51:19 -0800 (PST)
-Received: from localhost ([192.55.54.42])
-        by smtp.gmail.com with ESMTPSA id f20sm11134745pfk.69.2020.03.06.23.51.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Mar 2020 23:51:18 -0800 (PST)
-Date:   Sat, 7 Mar 2020 09:51:14 +0200
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix calculation of SCO handle for packet
- processing
-Message-ID: <20200307075114.GA20667@kennedyj-mobl1.ger.corp.intel.com>
-Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-References: <20200305152839.92437-1-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200305152839.92437-1-marcel@holtmann.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=YttYJY2hEu0o9ieZzIqW+Sf4nL0+gX4KSVXdg9N5DNU=;
+        b=UP+h9X9hUyVT1gOe5fwD7SFyN6duBR7sAufNORoFEFBUMDQ0cOVsQdBE5P9cuFnzW+
+         VgAGtoXAGp/p+hMTy8iDGTkVdxg8cYPPb3d4C0m2gFGNHKkeEOwk835QV+6wcLod2ynf
+         1lVl9L1ncPT8NnCsinTN2z6LtQYON4gGFRIMoMd51y7p4RQAZNN4FarHR+X2NV810kmv
+         C4rme7CzWsfMo3wN4QmMqoWVVfD82H4Zxjr6LGx123Xtx4fG+x3xxI6BhDQR+D5RmvA7
+         n6jJI53T7jaq/ciY4hkq8oOvr2M70BbulS8LQrJAJBjTOSndVj8KH1DMKU0s86TjVqfB
+         ELug==
+X-Gm-Message-State: ANhLgQ0OmGGqffaaGdlV/4z9iLz1N/+i+FqUvkaklYAjkxQaZg/kII4q
+        qta4xbIQNY8G8UekiP6aeEk=
+X-Google-Smtp-Source: ADFU+vs4CKXfeoUiFDnFoMUD4Yhp6hvzZsVFA01ru2dnM86QFvbm5rhxncjWPzQFEZPxKZW0qt8guw==
+X-Received: by 2002:a17:902:694b:: with SMTP id k11mr7718361plt.334.1583589493848;
+        Sat, 07 Mar 2020 05:58:13 -0800 (PST)
+Received: from VM_0_35_centos.localdomain ([150.109.62.251])
+        by smtp.gmail.com with ESMTPSA id y28sm14694177pgc.69.2020.03.07.05.58.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 07 Mar 2020 05:58:13 -0800 (PST)
+From:   Qiujun Huang <hqjagain@gmail.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Qiujun Huang <hqjagain@gmail.com>
+Subject: [PATCH] bluetooth/rfcomm: fix ODEBUG bug in rfcomm_dev_ioctl
+Date:   Sat,  7 Mar 2020 21:58:08 +0800
+Message-Id: <1583589488-22450-1-git-send-email-hqjagain@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Needn't call 'rfcomm_dlc_put' here, because 'rfcomm_dlc_exists' didn't
+increase dlc->refcnt.
 
-On Thu, Mar 05, 2020, Marcel Holtmann wrote:
-> When processing SCO packets, the handle is wrongly assumed as 16-bit
-> value. The actual size is 12-bits and the other 4-bits are used for
-> packet flags.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+Reported-by: syzbot+4496e82090657320efc6@syzkaller.appspotmail.com
+Signed-off-by: Qiujun Huang <hqjagain@gmail.com>
+---
+ net/bluetooth/rfcomm/tty.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 0c7d31c..ea2a1df0 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -414,7 +414,6 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
+ 		if (IS_ERR(dlc))
+ 			return PTR_ERR(dlc);
+ 		else if (dlc) {
+-			rfcomm_dlc_put(dlc);
+ 			return -EBUSY;
+ 		}
+ 		dlc = rfcomm_dlc_alloc(GFP_KERNEL);
+-- 
+1.8.3.1
 
-Johan
