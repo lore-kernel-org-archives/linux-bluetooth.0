@@ -2,71 +2,61 @@ Return-Path: <SRS0=rf5u=4Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB32FC18E5B
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 07:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 900EBC18E5B
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 08:12:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A198220663
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 07:53:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C03D2072A
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 08:12:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725992AbgCHHxn (ORCPT
+        id S1726156AbgCHIM4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 Mar 2020 03:53:43 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:55701 "EHLO
+        Sun, 8 Mar 2020 04:12:56 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:44744 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgCHHxm (ORCPT
+        with ESMTP id S1725854AbgCHIM4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 Mar 2020 03:53:42 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id ED7A2CED15;
-        Sun,  8 Mar 2020 09:03:08 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v4] bluetooth: Enable erroneous data reporting if wbs is
- supported
+        Sun, 8 Mar 2020 04:12:56 -0400
+Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id BFB9ECED15
+        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2020 09:22:22 +0100 (CET)
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200305161459.153606-1-alainm@chromium.org>
-Date:   Sun, 8 Mar 2020 08:53:40 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <761DAC5E-74A6-429A-8CE6-AB105340DC75@holtmann.org>
-References: <20200305161459.153606-1-alainm@chromium.org>
-To:     Alain Michaud <alainm@chromium.org>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Increment management interface revision
+Date:   Sun,  8 Mar 2020 09:12:50 +0100
+Message-Id: <20200308081250.126797-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.24.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Increment the mgmt revision due to the recently added setting and
+command.
 
-> This change introduces a wide band speech setting which allows higher
-> level clients to query the local controller support for wide band speech
-> as well as set the setting state when the radio is powered off.
-> Internally, this setting controls if erroneous data reporting is enabled
-> on the controller.
-> 
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> ---
-> 
-> drivers/bluetooth/btusb.c        |  2 +-
-> include/net/bluetooth/hci.h      | 16 +++++++-
-> include/net/bluetooth/hci_core.h |  1 +
-> include/net/bluetooth/mgmt.h     |  4 +-
-> net/bluetooth/hci_core.c         | 24 ++++++++++++
-> net/bluetooth/hci_event.c        | 39 +++++++++++++++++++
-> net/bluetooth/mgmt.c             | 66 +++++++++++++++++++++++++++++++-
-> 7 files changed, 147 insertions(+), 5 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next tree.
-
-However I fixed a few minor style issues as well.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4abb5daeeca8..4da48618b271 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -38,7 +38,7 @@
+ #include "mgmt_util.h"
+ 
+ #define MGMT_VERSION	1
+-#define MGMT_REVISION	15
++#define MGMT_REVISION	16
+ 
+ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_INDEX_LIST,
+-- 
+2.24.1
 
