@@ -2,61 +2,81 @@ Return-Path: <SRS0=rf5u=4Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900EBC18E5B
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 08:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD9FC18E5B
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 08:18:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C03D2072A
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 08:12:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B04262084E
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 08:18:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726156AbgCHIM4 (ORCPT
+        id S1726133AbgCHISm convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 Mar 2020 04:12:56 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44744 "EHLO
+        Sun, 8 Mar 2020 04:18:42 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:35823 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbgCHIM4 (ORCPT
+        with ESMTP id S1725306AbgCHISm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 Mar 2020 04:12:56 -0400
-Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id BFB9ECED15
-        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Mar 2020 09:22:22 +0100 (CET)
+        Sun, 8 Mar 2020 04:18:42 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 29982CED15;
+        Sun,  8 Mar 2020 09:28:08 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH] bluetooth/rfcomm: fix ODEBUG bug in rfcomm_dev_ioctl
 From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Increment management interface revision
-Date:   Sun,  8 Mar 2020 09:12:50 +0100
-Message-Id: <20200308081250.126797-1-marcel@holtmann.org>
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1583589488-22450-1-git-send-email-hqjagain@gmail.com>
+Date:   Sun, 8 Mar 2020 09:18:39 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <449B4F83-8BCD-413C-823B-C7A5554801FB@holtmann.org>
+References: <1583589488-22450-1-git-send-email-hqjagain@gmail.com>
+To:     Qiujun Huang <hqjagain@gmail.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Increment the mgmt revision due to the recently added setting and
-command.
+Hi Qiujun,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Needn't call 'rfcomm_dlc_put' here, because 'rfcomm_dlc_exists' didn't
+> increase dlc->refcnt.
+> 
+> Reported-by: syzbot+4496e82090657320efc6@syzkaller.appspotmail.com
+> Signed-off-by: Qiujun Huang <hqjagain@gmail.com>
+> ---
+> net/bluetooth/rfcomm/tty.c | 1 -
+> 1 file changed, 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+> index 0c7d31c..ea2a1df0 100644
+> --- a/net/bluetooth/rfcomm/tty.c
+> +++ b/net/bluetooth/rfcomm/tty.c
+> @@ -414,7 +414,6 @@ static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
+> 		if (IS_ERR(dlc))
+> 			return PTR_ERR(dlc);
+> 		else if (dlc) {
+> -			rfcomm_dlc_put(dlc);
+> 			return -EBUSY;
+> 		}
+> 		dlc = rfcomm_dlc_alloc(GFP_KERNEL);
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4abb5daeeca8..4da48618b271 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -38,7 +38,7 @@
- #include "mgmt_util.h"
- 
- #define MGMT_VERSION	1
--#define MGMT_REVISION	15
-+#define MGMT_REVISION	16
- 
- static const u16 mgmt_commands[] = {
- 	MGMT_OP_READ_INDEX_LIST,
--- 
-2.24.1
+Please see the proposed change from Hillf.
+
+It is better to not bother with the else if here since the if statement will already leave the function.
+
+	if (dlc)
+		return -EBUSY;
+
+Regards
+
+Marcel
 
