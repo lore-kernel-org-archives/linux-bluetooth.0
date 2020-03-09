@@ -1,71 +1,34 @@
-Return-Path: <SRS0=rf5u=4Z=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=gSSv=42=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4797C10F28
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 21:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F77C10F25
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Mar 2020 21:28:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B3D320848
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 Mar 2020 21:24:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bsR7I29s"
+	by mail.kernel.org (Postfix) with ESMTP id 8888524649
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Mar 2020 21:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726382AbgCHVXv (ORCPT
+        id S1726266AbgCIV2u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 Mar 2020 17:23:51 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:44277 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726346AbgCHVXv (ORCPT
+        Mon, 9 Mar 2020 17:28:50 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56142 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726118AbgCIV2t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 Mar 2020 17:23:51 -0400
-Received: by mail-pl1-f194.google.com with SMTP id d9so3144577plo.11
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Mar 2020 14:23:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1tzW7HssZBtY3SvxCb22E4ke3jvHNoIbFs14WY4NcNA=;
-        b=bsR7I29sZ7HfQSRCAWI51eV06TbZfLHVY993eC6fVQqxIVQt1NptdMVXm/LrxLBCbl
-         Tlz0S0zWxgO+UynwKVdIWh9nCHZxu74LqYXv2XWjUiTkt1XmFmUl9JG4kgka3YKjBTqL
-         bzm6pFJdujJETyNaI9EGQk1oSgV0oqBlguB9s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1tzW7HssZBtY3SvxCb22E4ke3jvHNoIbFs14WY4NcNA=;
-        b=FNiD/LsWFFfypDsn10uppPnJ9MOqybhEEgqVKzFP7fv89N6YqFXwNgooOeYTamp8Xs
-         pSMnC2zSu365lwA64ZOovsU5DFSsHUqbK8k1wbnRd0Beff+0iCvYrlhS/r7kKvruTYEm
-         Cb09KobuzQqIzoEqdPsz8lJYqcuygKka9vRH22jRZ90/sNec3q90/gjEggIGluDs/hxD
-         cUao+S1ByQhdBj0NOH6gsa1oKf8iS/VmAB/38PZE0kvEqjMy+kPmUYqT9SVKDy+SGO0c
-         KzInFRsRkifkvWovMq/LqBskC2ESf3TsfowFhpSlwqXTNbvY3WVrbaiGSXnnljF7UgDt
-         I5LQ==
-X-Gm-Message-State: ANhLgQ2CroYsGEVgQXZCJ27+bRKju/7IufhZf33PGG6mcSjPpvvBRrph
-        +EpQrhZ2cwgFO3MKmS5+poz3QA==
-X-Google-Smtp-Source: ADFU+vvelZvzMJOKHIDQCA76OpDS1N/lyb9dlkT4CLYv3R+PMp59C7h2DOAkY1Yx0ZU74tx7JibdGQ==
-X-Received: by 2002:a17:902:6b48:: with SMTP id g8mr12825346plt.149.1583702630315;
-        Sun, 08 Mar 2020 14:23:50 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id k1sm39509228pgt.70.2020.03.08.14.23.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Mar 2020 14:23:49 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com, alainm@chromium.org
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC PATCH v5 0/5] Bluetooth: Handle system suspend gracefully
-Date:   Sun,  8 Mar 2020 14:23:29 -0700
-Message-Id: <20200308212334.213841-1-abhishekpandit@chromium.org>
-X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
+        Mon, 9 Mar 2020 17:28:49 -0400
+Received: from localhost.localdomain (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9400FCECC4
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Mar 2020 22:38:16 +0100 (CET)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC] doc: Add commands and event for global debug configuration
+Date:   Mon,  9 Mar 2020 22:28:43 +0100
+Message-Id: <20200309212843.430786-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -73,87 +36,98 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+---
+ doc/mgmt-api.txt | 73 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-Hi linux-bluetooth,
-
-This patch series prepares the Bluetooth controller for system suspend
-by disconnecting all devices and preparing the event filter and LE
-whitelist with devices that can wake the system from suspend.
-
-The main motivation for doing this is so we can enable Bluetooth as
-a wake up source during suspend without it being noisy. Bluetooth should
-wake the system when a HID device receives user input but otherwise not
-send any events to the host.
-
-This patch series was tested on several Chromebooks with both btusb and
-hci_serdev on kernel 4.19. The set of tests was basically the following:
-* Reconnects after suspend succeed
-* HID devices can wake the system from suspend (needs some related bluez
-  changes to call the Set Wake Capable management command)
-* System properly pauses and unpauses discovery + advertising around
-  suspend
-* System does not wake from any events from non wakeable devices
-
-Series 2 has refactored the change into multiple smaller commits as
-requested. I tried to simplify some of the whitelist filtering edge
-cases but unfortunately it remains quite complex.
-
-Series 3 has refactored it further and should have resolved the
-whitelisting complexity in series 2.
-
-Series 4 adds a fix to check for powered down and powering down adapters.
-
-Series 5 moves set_wake_capable to the last patch in the series and
-changes BT_DBG to bt_dev_dbg.
-
-Please review and provide any feedback.
-
-Thanks
-Abhishek
-
-
-Changes in v5:
-* Convert BT_DBG to bt_dev_dbg
-* Added wakeable list and changed BT_DBG to bt_dev_dbg
-* Add wakeable to hci_conn_params and change BT_DBG to bt_dev_dbg
-* Changed BT_DBG to bt_dev_dbg
-* Wakeable entries moved to other commits
-* Patch moved to end of series
-
-Changes in v4:
-* Added check for mgmt_powering_down and hdev_is_powered in notifier
-
-Changes in v3:
-* Refactored to only handle BR/EDR devices
-* Split LE changes into its own commit
-* Added wakeable property to le_conn_param
-* Use wakeable list for BR/EDR and wakeable property for LE
-
-Changes in v2:
-* Moved pm notifier registration into its own patch and moved params out
-  of separate suspend_state
-* Refactored filters and whitelist settings to its own patch
-* Refactored update_white_list to have clearer edge cases
-* Add connected devices to whitelist (previously missing corner case)
-* Refactored pause discovery + advertising into its own patch
-
-Abhishek Pandit-Subedi (5):
-  Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND
-  Bluetooth: Handle BR/EDR devices during suspend
-  Bluetooth: Handle LE devices during suspend
-  Bluetooth: Pause discovery and advertising during suspend
-  Bluetooth: Add mgmt op set_wake_capable
-
- include/net/bluetooth/hci.h      |  17 +-
- include/net/bluetooth/hci_core.h |  43 ++++
- include/net/bluetooth/mgmt.h     |   7 +
- net/bluetooth/hci_core.c         | 102 ++++++++++
- net/bluetooth/hci_event.c        |  24 +++
- net/bluetooth/hci_request.c      | 331 ++++++++++++++++++++++++++-----
- net/bluetooth/hci_request.h      |   2 +
- net/bluetooth/mgmt.c             |  92 +++++++++
- 8 files changed, 558 insertions(+), 60 deletions(-)
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 27a41f334d63..bdc83758456d 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -3094,6 +3094,62 @@ Set Wideband Speech Command
+ 				Invalid Index
+ 
+ 
++Get Debug Configuration Command
++===============================
++
++	Command Code:		0x0048
++	Controller Index:	<non-controller>
++	Command Parameters:
++	Return Parameters:	Layers (4 Octets)
++				Flags (4 Octets)
++
++	This command is used to read the current global debug setting of
++	the stack.
++
++	The Layers parameter is a bitmask with following defined bits:
++
++		0	Kernel messages
++		1	Daemon messages
++		2	Tools messages
++
++	If the bit is set, then the corresponding debug messages are
++	enabled. The kernel only acts on the Kernel messages bit and
++	all other bits are just passed back to userspace.
++
++	The Flags parameter is a bitmask with following defined bits:
++
++		0	Include function name
++		1	Include line number
++		2	Include module name
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++
++
++Set Debug Configuration Command
++===============================
++
++	Command Code:		0x0049
++	Controller Index:	<non-controller>
++	Command Parameters:	Layers (4 Octets)
++				Flags (4 Octets)
++	Return Parameters:
++
++	This command is used to set the current global debug setting of
++	the stack.
++
++	Refer Get Debug Configuration command for parameter description.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+@@ -3976,3 +4032,20 @@ PHY Configuration Changed Event
+ 	one through which the change was triggered.
+ 
+ 	Refer Get PHY Configuration command for PHYs parameter.
++
++
++Debug Configuration Changed Event
++=================================
++
++	Event Code:		0x0027
++	Controller Index:	<non-controller>
++	Event Parameters:	Layers (4 Octets)
++				Flags (4 Octets)
++
++	This event indicates that the current global debug setting of
++	the stack has been changed.
++
++	The event will only be sent to management sockets other than the
++	one through which the change was triggered.
++
++	Refer Get Debug Configuration command for parameter description.
 -- 
-2.25.1.481.gfbce0eb801-goog
+2.24.1
 
