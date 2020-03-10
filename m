@@ -2,101 +2,128 @@ Return-Path: <SRS0=NTC4=43=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D2FC18E5C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 10:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9CCC10F27
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 12:30:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8F21222D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 10:09:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D3A524655
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 12:30:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QQbeqMhe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H7UoZT8v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726390AbgCJKJC (ORCPT
+        id S1726353AbgCJMa0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Mar 2020 06:09:02 -0400
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:41474 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726271AbgCJKJC (ORCPT
+        Tue, 10 Mar 2020 08:30:26 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:38036 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726252AbgCJMa0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Mar 2020 06:09:02 -0400
-Received: by mail-pg1-f202.google.com with SMTP id t3so8314593pgo.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 03:09:02 -0700 (PDT)
+        Tue, 10 Mar 2020 08:30:26 -0400
+Received: by mail-lj1-f194.google.com with SMTP id w1so13898394ljh.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 05:30:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=qgIz8ZXqxR+qL3nvVcdKU+rwgX72c7Lhu1jYDVFQ+gU=;
-        b=QQbeqMhejQGLjzt6M3ysCxg/Kr0sB595VzRhzxXl1Qyg5zKnJoZVhIlwh37+vavyil
-         83/8JvZT0fqzcjkaWOByFkuvWlIzxNDAUYUwvmlbNKoYUmavJoJJNvyyZjFscJ5KXAjo
-         75irtwgv8v8foPo0mFf0/EjXqruZYB/MJFvg6aFl1s6bqF615/TI7e8njU1uYqrdfZ99
-         ZMJGSgtji0wRcNyeB4kj7VHuDvUPYY6MkYZWsjPZ2rgYYmjMG5uocsW+go0mZ6asoKAC
-         AjFfFRvJjIf2cKvyFzM4M2p8QS04LdABCKklWIWhC+WgsXJUxyyM0x+v2kG0Pkq9imDz
-         qUfQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gNdHB2eRgC38Rm6QBGIuzob7mej0xH2j8kwhYctFfZU=;
+        b=H7UoZT8vFrRJ2xWjG8UWP5YQM8kc8XBjRovD1rszXyrjfuGXdkSlVf/NSwx/UBDDEY
+         rO4LBQ8YWxg1cDIhxEh1qjt0kK3m1VzROe02ovlk1nifu0uK3+DZxvuyBPfye6zfuHNV
+         qkg25/mqUM0C59SxY9rfdSDIEda6HVg6vi0288oJCeozZmIQVMaT5MIzJPFX9wp1epu1
+         Lzdt9zp168/djQH615iH1F/B6LQPM8+WgtOaTB4i814eE7KbDgyZvS/wJ4YGTKOkHuDZ
+         g+D4TIOSFZ15+ffOfRNj7OW6+vc6XVF9dWX+W+h/a1EEgWuPr/3TOYqF27SE+bA01WgG
+         xDqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=qgIz8ZXqxR+qL3nvVcdKU+rwgX72c7Lhu1jYDVFQ+gU=;
-        b=hMaWGyy/98yCh+0gfToD8vof6xhukafEUyhflPbzBYhcHAzAuuV+IPU3bUte30ndC3
-         ylicymXtmCCYSuWSQHwZlUgq/HR1sjG+UF+1J7y9FgbTNNobE/ng3Z6JyDE5aoLmba4r
-         ZSFSHxVKN/wc6ElNH83KM7as1JxRt5ljv/sNAricD02KVDtO0xeJLlsg4Ht6wHE8KlNh
-         jDwslO7cJfRTAx0Q6Om/nwiiltGSSEl2ahIJUFOtVwjU6ePx8mGMhIZWdAkS4DtBi8Cv
-         XVJdz3DYsEebsKW2nNOGiWQ3EmMXMIt+gTC73hkaPe/2r7252+KZjWdcIcpWUfcXTNGh
-         GNLg==
-X-Gm-Message-State: ANhLgQ10Xey8uKXEnZAKXTb3yQbE2bz25W6LzM87Mp7emKLaBxQZcX03
-        fvxKm7yNf/hSm+/kn/xXXu2xHgCY4pSpCWzEf9FDCu6VvzKjhdx3I7egYOSDTR+wwosnq76BPdI
-        DrF7HdgsGZlxMvDlWmxwUAR7ejZTnGCrNYEAcgPIVlmIz1yHGVag1m4pVWe6cAQ2/m8WKt9ljQW
-        D7k1CIHLIonM0=
-X-Google-Smtp-Source: ADFU+vuz3HaWYBXcTimqnRcUDBF9dxFd4pjU5MyI1k3cXJJvIdcUkEfxqolA1dijJ5VKuTOLdcG8w5W6+bmEbeBoEg==
-X-Received: by 2002:a17:90a:9908:: with SMTP id b8mr912701pjp.93.1583834941368;
- Tue, 10 Mar 2020 03:09:01 -0700 (PDT)
-Date:   Tue, 10 Mar 2020 18:08:52 +0800
-Message-Id: <20200310180642.Bluez.v1.1.I50b301a0464eb68e3d62721bf59e11ed2617c415@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-Subject: [Bluez PATCH v1] Bluetooth: L2CAP: handle l2cap config request during
- open state
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Howard Chung <howardchung@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gNdHB2eRgC38Rm6QBGIuzob7mej0xH2j8kwhYctFfZU=;
+        b=BtqdxoLbhEOgU8yc+ZhE9iXkL8AJ0cmSiW5U2MndHVXsvYuqhS5NfRaauI572ZQd7Z
+         wlp70/ffLIQj0zLX0IChlE1FbmGMCdsaBTg7pYp2snDJGHzQm19jdqjvFQMeuuVpOd3F
+         Ai1763OmUQEbaenZPCnJ6uzoEpQy+2DkGqglUtW1LC9zuk3l1BscZCs+lBBhM88EtYK3
+         Tm9C5s8PplrEfzNUT6NnoUgIRuJ1fKN1piqlcDfIcwQOyOWdS+8MocjVppG+MiU6LvSm
+         oPsjH93DVFWKECnWzuPqr/1C/sMDho8CITAtev6fI02YcumQF91+ErdVzr0dQtwXhU1y
+         woTQ==
+X-Gm-Message-State: ANhLgQ1ShV84HXS1WvrD+6rIIOzS3K5TsFhgW1QEvhAXNhO8e+l6IJZT
+        +wzEP3IzCDbdGs9QJ2euqXum8gG1pPbgFzS0X5YY6w==
+X-Google-Smtp-Source: ADFU+vszxBZ5PU/s3oGLcqFUB8vx/ETa1PVL1NXDP8YU02hKaKh/3pSN8MLRtXdZWbgWToboUuEMqCueCvNqflRarJI=
+X-Received: by 2002:a2e:3511:: with SMTP id z17mr10198568ljz.81.1583843424111;
+ Tue, 10 Mar 2020 05:30:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200310023516.209146-1-alainm@chromium.org> <87A4E633-63CF-4C71-9BF6-916894790EED@holtmann.org>
+ <CABBYNZKbc71WvOA34cFcKXVRcG-hYedJBT5LeTK9c3+H5Trjwg@mail.gmail.com>
+In-Reply-To: <CABBYNZKbc71WvOA34cFcKXVRcG-hYedJBT5LeTK9c3+H5Trjwg@mail.gmail.com>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Tue, 10 Mar 2020 08:30:12 -0400
+Message-ID: <CALWDO_VNPFJm+je4N1u1bW=+n8WTCoe+xwzrOo=UZi4ymuwdsg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH 0/2] HID and HOGP connections from non-bonded devices.
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-According to Core Spec Version 5.2 | Vol 3, Part A 6.1.5,
-the incoming L2CAP_ConfigReq should be handled during
-OPEN state.
+Hi Luiz,
 
-Signed-off-by: Howard Chung <howardchung@google.com>
-
----
-
- net/bluetooth/l2cap_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 697c0f7f2c1a..5e6e35ab44dd 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4300,7 +4300,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 		return 0;
- 	}
- 
--	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
-+	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2 &&
-+	    chan->state != BT_CONNECTED) {
- 		cmd_reject_invalid_cid(conn, cmd->ident, chan->scid,
- 				       chan->dcid);
- 		goto unlock;
--- 
-2.25.1.481.gfbce0eb801-goog
-
+On Tue, Mar 10, 2020 at 2:27 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Marcel,
+>
+> On Mon, Mar 9, 2020 at 10:26 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+> >
+> > Hi Alain,
+> >
+> > > It was discovered that BlueZ's HID and HOGP profiles implementations
+> > > don't specifically require bonding between the device and the host.
+> > >
+> > > This creates an opportunity for an malicious device to connect to a
+> > > target host to either impersonate an existing HID device without
+> > > security or to cause an SDP or GATT service discovery to take place
+> > > which would allow HID reports to be injected to the input subsystem from
+> > > a non-bonded source.
+> > >
+> > > This patch series addresses the issue by ensuring that only connections
+> > > from devices that are bonded are accepted by the HID and HOGP profile
+> > > implementation.
+> > >
+> > > More information about the vulnerability is available here:
+> > > https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00352.html
+> > >
+> > > Alain Michaud (2):
+> > >  HOGP must only accept data from bonded devices.
+> > >  HID accepts bonded device connections only.
+> > >
+> > > profiles/input/device.c   | 23 ++++++++++++++++++++++-
+> > > profiles/input/device.h   |  1 +
+> > > profiles/input/hog.c      |  4 ++++
+> > > profiles/input/input.conf |  8 ++++++++
+> > > profiles/input/manager.c  | 13 ++++++++++++-
+> > > 5 files changed, 47 insertions(+), 2 deletions(-)
+> >
+> > both patches have been applied.
+> >
+> > However I changed BrBondedOnly configuration name into ClassicBondedOnly since that name seemed more obvious to me. The prefix Br has never been used and the Bluetooth SIG started calling it Classic a while back.
+>
+> Looks like you were quicker than me, anyway I do fill like we should
+> attempt to bump to security instead of just refuse to connection in
+> case of HoG since we are the central and the peripheral is not
+> mandated to started it either it may be just the client application is
+> attempting to connect to trigger pairing on demand, that would usually
+> kick latter when reading the characteristics but with this changes it
+> doesn't even get to that point if the devices was not bonded already.
+The specification for HoG is that the device is bonded.  If client or
+server attempts to access the service before it is bonded, it would
+violate the specification.  For this reason, I believe it is both
+safer and simpler to just reject any attempts to access the service
+without first being bonded.
+>
+> --
+> Luiz Augusto von Dentz
