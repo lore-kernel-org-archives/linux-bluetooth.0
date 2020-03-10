@@ -2,73 +2,67 @@ Return-Path: <SRS0=NTC4=43=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12941C10DCE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 22:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B66FCC10F27
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 23:10:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD0C52051A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 22:29:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57DC222525
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 23:10:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tN63+Q7H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TdLYM/lk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726325AbgCJW3m (ORCPT
+        id S1727837AbgCJXKV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Mar 2020 18:29:42 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:35532 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726307AbgCJW3m (ORCPT
+        Tue, 10 Mar 2020 19:10:21 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:40582 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726325AbgCJXKU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Mar 2020 18:29:42 -0400
-Received: by mail-ot1-f65.google.com with SMTP id k26so7604759otr.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 15:29:40 -0700 (PDT)
+        Tue, 10 Mar 2020 19:10:20 -0400
+Received: by mail-oi1-f196.google.com with SMTP id y71so10372246oia.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 16:10:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=XejOvauJ9IU9KT5jPA+2U9DhC1ziZ+kVzeu+yxfALq0=;
-        b=tN63+Q7HXZ4e+DFePUaunmkj6kfn6vjefhOuiZe9BTDors0PV+xZA9HiKMhM6Zq3RN
-         UKAy6xHouX2jDCJNSM8T7MbXARY8IrgxYfrS/KkFTGd5IieY/xKuIxzPvHsrw1ZaLt1+
-         1GjpcQGCOorrMAM48nMLcRF9U4OQaMR4splAS0dGwjJWJSc6o+mGqTf9Q68FWS+45676
-         5v3w/0Odh29dCvO73c/vHoR2+FpLpgXj8QYxCZkSKxivfszfQkUw8G0oVRSK7SY356TP
-         LgZNvcA8+OHqw3pRwshP4sPfKGZjiVDbPDkoy0oAbnIIT411ziNv44O3l8vtT60wsrKk
-         uhCg==
+         :cc;
+        bh=4+RGR+9DDwgarcByz8bVdSiGzSXurJPu70Rbss3JPVk=;
+        b=TdLYM/lkYjdT4zmBX83qPTtB+9bTnn0Bl6ldLerr2/jE/HN1VbTLfPr3bVmluKHZzn
+         ACF77hBZh7YDJjPCGjMSQTEH4G6t2sQ5FI9g0qRMHrSSqHbdFY4XMhVbA2SjfgMFGRDz
+         gV2sYVHo9pT6cN3vfYOsueKRbywnKqw6UApkkA4wJRSB7+GnwSsT2CKvbdhahXnyL7iq
+         w8zNtThO0miupkmGUjE8xCcpPPyY2SP2/q4X05rVlCipGSPZc/NQ5l2srXER9RRgukWX
+         lc90aCvhBpepuNWNYBggwAA1XUOJAyinXYGV+zeid7Qm8SMqoBnFVGFTf6WrY6cLWc2y
+         mTiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=XejOvauJ9IU9KT5jPA+2U9DhC1ziZ+kVzeu+yxfALq0=;
-        b=gpy0DIZ36miWc69Zp/Sygab3oiiTQbS5t6hx8QmjmXa7sN7yGA15bEWuxvIseb0yJs
-         E6AsXWL3wIcU7ByegRf7SoMO7HdR4triT0IzrqCL5/Ssy7XM1zYkoIm2fL349r56raea
-         bBc1B3+t4QI8VoflIKl2yAKxoXsDkYa7o73dUs0Yr1VN23acwUUn5uCloygVNoVvROj+
-         AZIXG9CmE9xoy/NKq+/jQ+FK0r6MtvU9O3YdFyyiwlit221i/D5mAeTYXk6z5vWD38cE
-         TznQWL2LNN81bd8onXu32Z/bci9IiDdFr7sXUHEwLEEEblk/CsKq1TDkPzkBfqa3zYKH
-         9tPg==
-X-Gm-Message-State: ANhLgQ0ZI9zCg1atWfqzNDdijxOowOLpBddaIKhsdUTik5Gk+t8vR+Y+
-        PPLxlGOyXwuRpVI7Xf/m5IFLoK7GDvGfXBkivFM=
-X-Google-Smtp-Source: ADFU+vt5sirN9Xp4MbyZHwRA+1RKL5jGk+KjnvkdlayL3H0GniUKY6aiPgUeICsTJPAsOP5mpE8lOrImQQU6XPGaQQs=
-X-Received: by 2002:a9d:53cc:: with SMTP id i12mr14221965oth.11.1583879380361;
- Tue, 10 Mar 2020 15:29:40 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=4+RGR+9DDwgarcByz8bVdSiGzSXurJPu70Rbss3JPVk=;
+        b=fBgW8cRla4M+CSLAJ91R4KroVae2JuSo9tlUzkwpNiJsUCJGq1sMfikSMzuwCAbscE
+         3o7YjA7UrwaiK2eUV3y++Ta8+9IEvEea5ngG/I1FigxC87RdSQ9NPlT7Ia2j8C7Konh7
+         VGFXSCWdxcY3DECkjUZIDT8n9E5xc42texL1xsQF5hPsVm0gOoUmr8NO7lfDsjuE5VY1
+         Z9XK3tdMyg1NwnkKKtIPgnxDd/8So9OdKDCpvaVQ3szYabbbbkZpT5VAIJJrz70oC5H6
+         if1b1x+cM4G1sH8KHuuKAbjdhFgkR7w9QLB20S9phHPX+5T1kB7FE+dI12UEBsUy7I0Q
+         9bNw==
+X-Gm-Message-State: ANhLgQ20KtnLerNkjEkorEvXUiazF6mY/Ab3IXgCgOtZoEVOU2U4nJuU
+        fNkZpYxkgW/u3ZpURV6KDZ28q8SBBsaYCEOl4mA=
+X-Google-Smtp-Source: ADFU+vv7mWBB+xoiJeclBm6jb7CoHNRUd52zdp44nX8Ur3KHQzGgEI/RQEM3u5RKTgIxJ3Rpi2uE6AW2Nbftrm1VZEM=
+X-Received: by 2002:aca:b1d5:: with SMTP id a204mr45376oif.82.1583881817728;
+ Tue, 10 Mar 2020 16:10:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200310173649.32722-1-luiz.dentz@gmail.com> <CALWDO_U+J1mCf1TzeWM=tSvy-NCsxnyoMeHppFsLKkaaYTiwug@mail.gmail.com>
- <CABBYNZ+6NDnuErRSiUkVacOViCBz1Bieda_KYD_0c3VrveER-A@mail.gmail.com>
- <CALWDO_Ws7=aEuhUU7GiGJ1=x4WREO8K1V=D4iGOABo0_ik9eRA@mail.gmail.com>
- <CABBYNZ+pbPswfY4AGpvL8XQL3JVPPi9srO5qt-8KbKzMDi+W9g@mail.gmail.com>
- <CALWDO_UBgHxtaO8U8kLpAdXaL7B1HMXVhbGANKf3Fnk9G9Hwcw@mail.gmail.com>
- <CABBYNZ+H6Tv--z-u9Lr=M_XJ1RUXrRS6nwqxkSpjKpSPMSzK5w@mail.gmail.com> <CALWDO_W1G9H5YbBG0v4s94NxN5Jh=mJ2ZJZMhEuvUVSYwt-h9g@mail.gmail.com>
-In-Reply-To: <CALWDO_W1G9H5YbBG0v4s94NxN5Jh=mJ2ZJZMhEuvUVSYwt-h9g@mail.gmail.com>
+References: <20200305161459.153606-1-alainm@chromium.org>
+In-Reply-To: <20200305161459.153606-1-alainm@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 10 Mar 2020 15:29:28 -0700
-Message-ID: <CABBYNZLewocbWMyJCqNYP+7RtbBXirGUFbCxF9ckscHURHcrSA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] input: hog: Attempt to set security level if not bonded
-To:     Alain Michaud <alainmichaud@google.com>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Date:   Tue, 10 Mar 2020 16:10:06 -0700
+Message-ID: <CABBYNZLJYUG75cX3X-JKe+MMb33ub1oy6MQnygpEfDm65+Bvsg@mail.gmail.com>
+Subject: Re: [PATCH v4] bluetooth: Enable erroneous data reporting if wbs is supported
+To:     Alain Michaud <alainm@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -76,245 +70,343 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Alain,
 
-On Tue, Mar 10, 2020 at 2:07 PM Alain Michaud <alainmichaud@google.com> wro=
-te:
+On Thu, Mar 5, 2020 at 8:16 AM Alain Michaud <alainm@chromium.org> wrote:
 >
-> Hi Luiz
+> This change introduces a wide band speech setting which allows higher
+> level clients to query the local controller support for wide band speech
+> as well as set the setting state when the radio is powered off.
+> Internally, this setting controls if erroneous data reporting is enabled
+> on the controller.
 >
-> On Tue, Mar 10, 2020 at 4:39 PM Luiz Augusto von Dentz <luiz.dentz@gmail.=
-com> wrote:
->>
->> Hi Alain,
->>
->> On Tue, Mar 10, 2020 at 11:53 AM Alain Michaud <alainmichaud@google.com>=
- wrote:
->> >
->> > Hi Luiz,
->> >
->> > On Tue, Mar 10, 2020 at 2:46 PM Luiz Augusto von Dentz
->> > <luiz.dentz@gmail.com> wrote:
->> > >
->> > > Hi Alain,
->> > >
->> > > On Tue, Mar 10, 2020 at 11:37 AM Alain Michaud <alainmichaud@google.=
-com> wrote:
->> > > >
->> > > > Hi Luiz,
->> > > >
->> > > > On Tue, Mar 10, 2020 at 2:27 PM Luiz Augusto von Dentz
->> > > > <luiz.dentz@gmail.com> wrote:
->> > > > >
->> > > > > Hi Alain,
->> > > > >
->> > > > > On Tue, Mar 10, 2020 at 11:04 AM Alain Michaud <alainmichaud@goo=
-gle.com> wrote:
->> > > > > >
->> > > > > > Hi Luiz,
->> > > > > >
->> > > > > > On Tue, Mar 10, 2020 at 1:36 PM Luiz Augusto von Dentz
->> > > > > > <luiz.dentz@gmail.com> wrote:
->> > > > > > >
->> > > > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> > > > > > >
->> > > > > > > This attempts to set the security if the device is not bonde=
-d, the
->> > > > > > > kernel will block any communication on the ATT socket while =
-bumping
->> > > > > > > the security and if that fails the device will be disconnect=
-ed which
->> > > > > > > is better than having the device dangling around without bei=
-ng able to
->> > > > > > > communicate with it until it is properly bonded.
->> > > > > > > ---
->> > > > > > >  profiles/input/hog.c | 13 +++++++++++--
->> > > > > > >  1 file changed, 11 insertions(+), 2 deletions(-)
->> > > > > > >
->> > > > > > > diff --git a/profiles/input/hog.c b/profiles/input/hog.c
->> > > > > > > index dfac68921..f0226ebbd 100644
->> > > > > > > --- a/profiles/input/hog.c
->> > > > > > > +++ b/profiles/input/hog.c
->> > > > > > > @@ -49,6 +49,8 @@
->> > > > > > >  #include "src/shared/util.h"
->> > > > > > >  #include "src/shared/uhid.h"
->> > > > > > >  #include "src/shared/queue.h"
->> > > > > > > +#include "src/shared/att.h"
->> > > > > > > +#include "src/shared/gatt-client.h"
->> > > > > > >  #include "src/plugin.h"
->> > > > > > >
->> > > > > > >  #include "suspend.h"
->> > > > > > > @@ -187,8 +189,15 @@ static int hog_accept(struct btd_servic=
-e *service)
->> > > > > > >         }
->> > > > > > >
->> > > > > > >         /* HOGP 1.0 Section 6.1 requires bonding */
->> > > > > > > -       if (!device_is_bonded(device, btd_device_get_bdaddr_=
-type(device)))
->> > > > > > > -               return -ECONNREFUSED;
->> > > > > > > +       if (!device_is_bonded(device, btd_device_get_bdaddr_=
-type(device))) {
->> > > > > > > +               struct bt_gatt_client *client;
->> > > > > > > +
->> > > > > > > +               client =3D btd_device_get_gatt_client(device=
-);
->> > > > > > > +               if (!bt_gatt_client_set_security(client,
->> > > > > > > +                                               BT_ATT_SECUR=
-ITY_MEDIUM)) {
->> > > > > > > +                       return -ECONNREFUSED;
->> > > > > > > +               }
->> > > > > > > +       }
->> > > > > > I wonder if this is really necessary.  For example, this may c=
-ause a
->> > > > > > device the user has not deliberately bonded to suddenly expose=
- a HOG
->> > > > > > Service which will trigger the user to pair (most users are kn=
-own to
->> > > > > > blindly accept the pairing).  I believe the previous posture i=
-s more
->> > > > > > secure by having the user deliberately pair HID devices as opp=
-osed to
->> > > > > > on demand.
->> > > > >
->> > > > > There are dedicated APIs to connect specific profiles, so if
->> > > > > hog_accept is reached it means the user/application does want to
->> > > > > connect HoG and in that case it should trigger bonding, so this =
-only
->> > > > > automate the process, like Ive commented for legacy HID we alrea=
-dy
->> > > > > attempt to bump the security in a similar way. Having the user
->> > > > > deliberately pair may cause breakage since in most cases the GAT=
-T
->> > > > > services do that on demand, in fact HoG is possibly the only exc=
-eption
->> > > > > to that since it appear to mandate encryption at connection leve=
-l
->> > > > > rather than on attribute level, so if the user had a peripheral =
-that
->> > > > > used to not require bonding it will suddenly stop working but if=
- we do
->> > > > > have this change it would possible still work after the pairing
->> > > > > procedure is complete.
->> > > > The outgoing contract where the user somehow asked for the profile=
- to
->> > > > be connected and would result in pairing, I'm ok with.  However, t=
-his
->> > > > being in the accept path, it doesn't seem to always be client side
->> > > > initiated, so that still seems like a concern to me.
->> > >
->> > > Since this is a profile so we are always acting as GATT client here,
->> > > so it is either initiated by the client when setting up a new
->> > > peripheral or it has been previously setup with Add Device and is
->> > > marked to auto connect, the later is exactly the problem I described
->> > > that there could be existing peripheral not requiring bonding that
->> > > suddenly stop working.
->> > My understanding is that the HOG service can get added to any other
->> > device through a service change notification or other means, so I
->> > don't think it is a safe assumption that this code will only execute
->> > if a user explicitly requested it.
->>
->> I would assume the users would expect that this would trigger pairing
->> procedure since silently ignoring the change would make this go
->> completely unnoticed.
+> Signed-off-by: Alain Michaud <alainm@chromium.org>
+> ---
 >
-> In this case it may be a device impersonating a device you were just comm=
-unicating with without bonding, manages to connect and expose an HOG Servic=
-e and all of the suddent requests a pairing confirmation.  Data suggests us=
-ers pay little attention to these sorts of notification and tend to blindly=
- accept them leading them to a compromised state.  HOGP is unique in the se=
-nse that the consequences are higher since it can lead to executing code in=
- the user's context by injecting keystrokes.
-
-Sure but this is true regardless of doing pairing automatically or
-requiring the user to pair it manually, or you are suggesting this is
-safer because it would have the go over the setting to start the
-pairing? Im afraid not all user interface would react the same in this
-regard,  or at all,also at this state even if the user pair the device
-it would have to reconnect before it start working again since the
-driver would not be probed again.
-
->>
->>
->> > You are correct that the change may cause a device to stop working if
->> > it was using HOGP without bonding, but this would also be a non
->> > compliant device and one that compromises the system's security.  I'm
->> > ok if we make this a configuration in case you believe the
->> > compatibility with these sorts of scenarios must be maintained.
->>
->> This gets a bit tricky since the HOGP mandates security but HIDS does no=
-t:
->>
->> Security Permissions of =E2=80=9CNone=E2=80=9D means that this service d=
-oes not impose
->> any requirements.
->>
->> So my understanding is that a peripheral implementing HIDS does _not_
->> require bonding and to make matters more confusing none of the
->> attributes requires security etiher which is perhaps the very reason
->> HOGP mandates bonding, also afaik peripherals are not mandate to
->> initiate pairing procedures so it looks like peripherals can in fact
->> not require bonding and still be compliant.
+>  drivers/bluetooth/btusb.c        |  2 +-
+>  include/net/bluetooth/hci.h      | 16 +++++++-
+>  include/net/bluetooth/hci_core.h |  1 +
+>  include/net/bluetooth/mgmt.h     |  4 +-
+>  net/bluetooth/hci_core.c         | 24 ++++++++++++
+>  net/bluetooth/hci_event.c        | 39 +++++++++++++++++++
+>  net/bluetooth/mgmt.c             | 66 +++++++++++++++++++++++++++++++-
+>  7 files changed, 147 insertions(+), 5 deletions(-)
 >
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 48e78fdc8e83..4b12c34f0b22 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3868,7 +3868,7 @@ static int btusb_probe(struct usb_interface *intf,
+>                 data->isoc = NULL;
 >
-> The peripheral yes, but HOGP would not so I'd assert if the device is req=
-uired to work without bonding, it likely didn't pass the profile qualificat=
-ion.
+>         if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+> -               set_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED, &hdev->quirks);
+> +               set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+>
+>         if (id->driver_info & BTUSB_DIGIANSWER) {
+>                 data->cmdreq_type = USB_TYPE_VENDOR;
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 0b3ebd35681d..4e86f1bb7a87 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -213,7 +213,7 @@ enum {
+>          *
+>          * This quirk must be set before hci_register_dev is called.
+>          */
+> -       HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
+> +       HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+>  };
+>
+>  /* HCI device flags */
+> @@ -286,6 +286,7 @@ enum {
+>         HCI_FAST_CONNECTABLE,
+>         HCI_BREDR_ENABLED,
+>         HCI_LE_SCAN_INTERRUPTED,
+> +       HCI_WIDEBAND_SPEECH_ENABLED,
+>
+>         HCI_DUT_MODE,
+>         HCI_VENDOR_DIAG,
+> @@ -1095,6 +1096,19 @@ struct hci_rp_read_inq_rsp_tx_power {
+>         __s8     tx_power;
+>  } __packed;
+>
+> +#define HCI_OP_READ_DEF_ERR_DATA_REPORTING     0x0c5a
+> +       #define ERR_DATA_REPORTING_DISABLED     0x00
+> +       #define ERR_DATA_REPORTING_ENABLED      0x01
+> +struct hci_rp_read_def_err_data_reporting {
+> +       __u8     status;
+> +       __u8     err_data_reporting;
+> +} __packed;
+> +
+> +#define HCI_OP_WRITE_DEF_ERR_DATA_REPORTING    0x0c5b
+> +struct hci_cp_write_def_err_data_reporting {
+> +       __u8     err_data_reporting;
+> +} __packed;
+> +
+>  #define HCI_OP_SET_EVENT_MASK_PAGE_2   0x0c63
+>
+>  #define HCI_OP_READ_LOCATION_DATA      0x0c64
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index dcc0dc6e2624..c498ac113930 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -260,6 +260,7 @@ struct hci_dev {
+>         __u8            stored_num_keys;
+>         __u8            io_capability;
+>         __s8            inq_tx_power;
+> +       __u8            err_data_reporting;
+>         __u16           page_scan_interval;
+>         __u16           page_scan_window;
+>         __u8            page_scan_type;
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index f69f88e8e109..f41cd87550dc 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -102,7 +102,7 @@ struct mgmt_rp_read_index_list {
+>  #define MGMT_SETTING_CONFIGURATION     0x00004000
+>  #define MGMT_SETTING_STATIC_ADDRESS    0x00008000
+>  #define MGMT_SETTING_PHY_CONFIGURATION 0x00010000
+> -#define MGMT_SETTING_WIDE_BAND_SPEECH  0x00020000
+> +#define MGMT_SETTING_WIDEBAND_SPEECH   0x00020000
+>
+>  #define MGMT_OP_READ_INFO              0x0004
+>  #define MGMT_READ_INFO_SIZE            0
+> @@ -672,6 +672,8 @@ struct mgmt_cp_set_blocked_keys {
+>  } __packed;
+>  #define MGMT_OP_SET_BLOCKED_KEYS_SIZE 2
+>
+> +#define MGMT_OP_SET_WIDEBAND_SPEECH    0x0047
+> +
+>  #define MGMT_EV_CMD_COMPLETE           0x0001
+>  struct mgmt_ev_cmd_complete {
+>         __le16  opcode;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 4e6d61a95b20..ef1160c1f9d0 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -603,6 +603,9 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+>         if (hdev->commands[8] & 0x01)
+>                 hci_req_add(req, HCI_OP_READ_PAGE_SCAN_ACTIVITY, 0, NULL);
+>
+> +       if (hdev->commands[18] & 0x02)
+> +               hci_req_add(req, HCI_OP_READ_DEF_ERR_DATA_REPORTING, 0, NULL);
 
-It would have pass it alright, its the PTS side that would exercise
-this requirement of HOGP not the peripheral, the peripheral just have
-to respond to the pairing procedure but it may never inititate it by
-itself. Like I said none of HIDS attributes require any security and
-the TS don't seem to even test authentication errors as it only
-mentions something like:
+Is bit above correct? It looks like this is causing a problem on the emulator:
 
-If the IUT requires a bonding procedure then perform a bonding procedure.
+Basic L2CAP Socket - Success - init
+  Read Index List callback
+    Status: 0x00
+  New hciemu instance created
+Unsupported command 0x0c5a
 
-Take for example zephyr hids example:
+On the emulator we have:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/emulator/btdev.c#n409
 
-https://github.com/zephyrproject-rtos/zephyr/blob/master/samples/bluetooth/=
-peripheral_hids/src/hog.c
+btdev->commands[18] |= 0x02; /* Write Inquiry Response TX Power */
 
-It never checks for bonding nor it requires any security, so if I attempt:
+I assume the above is correct, I guess it would be the bit at 0x04 like bellow.
 
-#bluetoothctl> connect
+> +
+>         /* Some older Broadcom based Bluetooth 1.2 controllers do not
+>          * support the Read Page Scan Type command. Check support for
+>          * this command in the bit mask of supported commands.
+> @@ -838,6 +841,27 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
+>                             sizeof(support), &support);
+>         }
+>
+> +       /* Set erroneous data reporting if supported to the wideband speech
+> +        * setting value
+> +        */
+> +       if (hdev->commands[18] & 0x04) {
+> +               bool enabled = hci_dev_test_flag(hdev,
+> +                                                HCI_WIDEBAND_SPEECH_ENABLED);
+> +
+> +               if (enabled !=
+> +                   (hdev->err_data_reporting == ERR_DATA_REPORTING_ENABLED)) {
+> +                       struct hci_cp_write_def_err_data_reporting cp = {};
+> +
+> +                       cp.err_data_reporting =
+> +                               enabled ?
+> +                               ERR_DATA_REPORTING_ENABLED :
+> +                               ERR_DATA_REPORTING_DISABLED;
+> +
+> +                       hci_req_add(req, HCI_OP_WRITE_DEF_ERR_DATA_REPORTING,
+> +                                   sizeof(cp), &cp);
 
-HoG no longer connects.
+This would be adding it again? Or the first instance was not suppose
+to be there?
 
-> As stated before,  it seems acceptable to me if BlueZ would want a more c=
-ompatible posture here, I would however like to request that a configuratio=
-n be available so that HOGP can simply reject as the original patch did.
+> +               }
+> +       }
+> +
+>         /* Set Suggested Default Data Length to maximum if supported */
+>         if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) {
+>                 struct hci_cp_le_write_def_data_len cp;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 591e7477e925..3772acddda93 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -901,6 +901,37 @@ static void hci_cc_read_inq_rsp_tx_power(struct hci_dev *hdev,
+>         hdev->inq_tx_power = rp->tx_power;
+>  }
+>
+> +static void hci_cc_read_def_err_data_reporting(struct hci_dev *hdev,
+> +                                              struct sk_buff *skb)
+> +{
+> +       struct hci_rp_read_def_err_data_reporting *rp = (void *)skb->data;
+> +
+> +       BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+> +
+> +       if (rp->status)
+> +               return;
+> +
+> +       hdev->err_data_reporting = rp->err_data_reporting;
+> +}
+> +
+> +static void hci_cc_write_def_err_data_reporting(struct hci_dev *hdev,
+> +                                               struct sk_buff *skb)
+> +{
+> +       __u8 status = *((__u8 *)skb->data);
+> +       struct hci_cp_write_def_err_data_reporting *cp;
+> +
+> +       BT_DBG("%s status 0x%2.2x", hdev->name, status);
+> +
+> +       if (status)
+> +               return;
+> +
+> +       cp = hci_sent_cmd_data(hdev, HCI_OP_WRITE_DEF_ERR_DATA_REPORTING);
+> +       if (!cp)
+> +               return;
+> +
+> +       hdev->err_data_reporting = cp->err_data_reporting;
+> +}
+> +
+>  static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+>         struct hci_rp_pin_code_reply *rp = (void *) skb->data;
+> @@ -3302,6 +3333,14 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+>                 hci_cc_read_inq_rsp_tx_power(hdev, skb);
+>                 break;
+>
+> +       case HCI_OP_READ_DEF_ERR_DATA_REPORTING:
+> +               hci_cc_read_def_err_data_reporting(hdev, skb);
+> +               break;
+> +
+> +       case HCI_OP_WRITE_DEF_ERR_DATA_REPORTING:
+> +               hci_cc_write_def_err_data_reporting(hdev, skb);
+> +               break;
+> +
+>         case HCI_OP_PIN_CODE_REPLY:
+>                 hci_cc_pin_code_reply(hdev, skb);
+>                 break;
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 1002c657768a..8fbbb225caf8 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -107,6 +107,7 @@ static const u16 mgmt_commands[] = {
+>         MGMT_OP_READ_EXT_INFO,
+>         MGMT_OP_SET_APPEARANCE,
+>         MGMT_OP_SET_BLOCKED_KEYS,
+> +       MGMT_OP_SET_WIDEBAND_SPEECH,
+>  };
+>
+>  static const u16 mgmt_events[] = {
+> @@ -763,9 +764,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+>                 if (lmp_sc_capable(hdev))
+>                         settings |= MGMT_SETTING_SECURE_CONN;
+>
+> -               if (test_bit(HCI_QUIRK_WIDE_BAND_SPEECH_SUPPORTED,
+> +               if (test_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+>                              &hdev->quirks))
+> -                       settings |= MGMT_SETTING_WIDE_BAND_SPEECH;
+> +                       settings |= MGMT_SETTING_WIDEBAND_SPEECH;
+>         }
+>
+>         if (lmp_le_capable(hdev)) {
+> @@ -850,6 +851,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+>                         settings |= MGMT_SETTING_STATIC_ADDRESS;
+>         }
+>
+> +       if (hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED))
+> +               settings |= MGMT_SETTING_WIDEBAND_SPEECH;
+> +
+>         return settings;
+>  }
+>
+> @@ -3593,6 +3597,63 @@ static int set_blocked_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+>                                 err, NULL, 0);
+>  }
+>
+> +static int set_wideband_speech(struct sock *sk, struct hci_dev *hdev,
+> +                              void *data, u16 len)
+> +{
+> +       struct mgmt_mode *cp = data;
+> +       int err;
+> +       bool changed = false;
+> +
+> +       BT_DBG("request for %s", hdev->name);
+> +
+> +       if (!test_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks))
+> +               return mgmt_cmd_status(sk, hdev->id,
+> +                                      MGMT_OP_SET_WIDEBAND_SPEECH,
+> +                                      MGMT_STATUS_NOT_SUPPORTED);
+> +
+> +       if (cp->val != 0x00 && cp->val != 0x01)
+> +               return mgmt_cmd_status(sk, hdev->id,
+> +                                      MGMT_OP_SET_WIDEBAND_SPEECH,
+> +                                      MGMT_STATUS_INVALID_PARAMS);
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       if (pending_find(MGMT_OP_SET_WIDEBAND_SPEECH, hdev)) {
+> +               err = mgmt_cmd_status(sk, hdev->id,
+> +                                     MGMT_OP_SET_WIDEBAND_SPEECH,
+> +                                     MGMT_STATUS_BUSY);
+> +               goto unlock;
+> +       }
+> +
+> +       if (hdev_is_powered(hdev) &&
+> +           !!cp->val != hci_dev_test_flag(hdev,
+> +                                          HCI_WIDEBAND_SPEECH_ENABLED)) {
+> +               err = mgmt_cmd_status(sk, hdev->id,
+> +                                     MGMT_OP_SET_WIDEBAND_SPEECH,
+> +                                     MGMT_STATUS_REJECTED);
+> +               goto unlock;
+> +       }
+> +
+> +       if (cp->val)
+> +               changed = !hci_dev_test_and_set_flag(hdev,
+> +                                                  HCI_WIDEBAND_SPEECH_ENABLED);
+> +       else
+> +               changed = hci_dev_test_and_clear_flag(hdev,
+> +                                                  HCI_WIDEBAND_SPEECH_ENABLED);
+> +
+> +       err = send_settings_rsp(sk, MGMT_OP_SET_WIDEBAND_SPEECH, hdev);
+> +       if (err < 0)
+> +               goto unlock;
+> +
+> +       if (changed)
+> +               err = new_settings(hdev, sk);
+> +
+> +unlock:
+> +
+> +       hci_dev_unlock(hdev);
+> +       return err;
+> +}
+> +
+>  static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
+>                                          u16 opcode, struct sk_buff *skb)
+>  {
+> @@ -6994,6 +7055,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+>         { set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
+>         { set_blocked_keys,        MGMT_OP_SET_BLOCKED_KEYS_SIZE,
+>                                                 HCI_MGMT_VAR_LEN },
+> +       { set_wideband_speech,     MGMT_SETTING_SIZE },
+>  };
+>
+>  void mgmt_index_added(struct hci_dev *hdev)
+> --
+> 2.25.1.481.gfbce0eb801-goog
+>
 
-Well in that case we would have to implement reprobing logic so that
-if the device gets paired hog_accept should be called once again, imo
-triggering bonding seems a better alternative in the sort term until
-we verify all use cases are attended.
 
->>
->>
->> > >
->> > > > >
->> > > > > >
->> > > > > > >
->> > > > > > >         /* TODO: Replace GAttrib with bt_gatt_client */
->> > > > > > >         bt_hog_attach(dev->hog, attrib);
->> > > > > > > --
->> > > > > > > 2.21.1
->> > > > > > >
->> > > > >
->> > > > >
->> > > > >
->> > > > > --
->> > > > > Luiz Augusto von Dentz
->> > >
->> > >
->> > >
->> > > --
->> > > Luiz Augusto von Dentz
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
-
-
-
---=20
+-- 
 Luiz Augusto von Dentz
