@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9665C10DCE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 06:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E472C10DCE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 06:22:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E7B7222D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 06:05:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE98F24677
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 06:22:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQd0lRce"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y9/vCB6l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726382AbgCJGFM (ORCPT
+        id S1726252AbgCJGWv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Mar 2020 02:05:12 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:34012 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbgCJGFL (ORCPT
+        Tue, 10 Mar 2020 02:22:51 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:42487 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725919AbgCJGWv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Mar 2020 02:05:11 -0400
-Received: by mail-ot1-f68.google.com with SMTP id j16so12096896otl.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Mar 2020 23:05:11 -0700 (PDT)
+        Tue, 10 Mar 2020 02:22:51 -0400
+Received: by mail-oi1-f196.google.com with SMTP id l12so12730384oil.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Mar 2020 23:22:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kMsB7ODugHJLMK1rCXKFSOq1ym/jlDUVx64dEEGLh6c=;
-        b=RQd0lRceslnJ5JSuvUPDB8/P+V2tBKhEkhTk7+HJSj+DkEmbc0BaXHcup+NaqSiy2i
-         MSxc2jog/5yhtQP+Iz1ofHZc981Dc9mcaZutR5pMWtPiEkNAXAjjXjWKgbvJiQ3zncEo
-         3oEaBGRblD4uGPZ37TB/A/iYBCQB7avtxTno2BBlg3bV54VTzlC8EgN7JbWcpfBJXRI6
-         UAgTTqVXGfOXYzpiTv+/AghDuO23XOrRjMLAJi8S9CdZjOhNsyJNa5USPiZD1ZCv+w+l
-         +RnA/xQeJl0afAxRPu4v7t0uLA78UgKlQjSN/6jPaq7MvKQGdF7bXn/UDOaULl6JieiU
-         71MA==
+        bh=bpECiT6QvSelD1QxqToVqeQP+DDP15UpMCjgF3yk7d4=;
+        b=Y9/vCB6lKa04SWlandI2/zCtLLIso+8dX7E7/UKQ1Kc5+QXkTMULodRJ+k+k2wsLPI
+         xLX7EjGE/TqQ5JhA4+OM2IZvYLQOAQr+TdoiHk/yzub9ZPK6+bWK/4EJKl6yPVWY661d
+         cU3GWpx33bjGwBrm1y+fgPjY3wPNZ9wz+1dhyF75i2J4OhxOghgZduanMcKOVDnWZoAV
+         GuOToM2lCqfZDNtrO9Yk/7Ya9xxOoUFbc8HpH24OWQ+YqemONe7mkeJ1Q2pR17PDUr/A
+         kQ3MrtfzteSuj9LViD42z8k54RVColiOo6ZNzLQqaaAsA7u2iJMVkh3EY3h1/H0OhEn/
+         PkGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kMsB7ODugHJLMK1rCXKFSOq1ym/jlDUVx64dEEGLh6c=;
-        b=lJEsRDc9yREVnSRqB+WrgUChSF+5ScbKyGmdf98v2K0DHB56tE38f06e5+xF0e9kA0
-         uzhIsy/OAk0Yc4bt3vBelcrcRvlDwn8avkQDjTnKkGi+W1g2ymfm5L0aOUKyREbBekx1
-         Gozt5ox68wbShcfX+j9xDA8iwurtKXqafwdCU6SDuAafs743vGa74EEbpzQOK8s9bU0B
-         F905jXJzakzGRM370n+TMpqFjWz2yaloV2F0x1VBfiz38MLod450AxQsmrlPpf6arFZV
-         l4bklsi3sdwCZqADNUlF3TEO58mmsmvphUsJIsf4iKqhpGf3lPLijv7IKMT5UMKQgx7R
-         q8LA==
-X-Gm-Message-State: ANhLgQ0JuJBFY9Kl1iQvfbEZl5xxTwAvstI0w2s1oO8uzDEU4xOmM2fj
-        LMS1bvCrxlEi3uWHzWBOPJeBMK8AO4RF08v7D2Y=
-X-Google-Smtp-Source: ADFU+vs+BiRvGMesbpbDl1X6EoUsWDwza3eVXLC/bBBXxO4y8ZIRyLWAph8CV03YQh82qSmTXIfV68z+5Lbx73KbNec=
-X-Received: by 2002:a9d:3f4b:: with SMTP id m69mr14691388otc.146.1583820310905;
- Mon, 09 Mar 2020 23:05:10 -0700 (PDT)
+        bh=bpECiT6QvSelD1QxqToVqeQP+DDP15UpMCjgF3yk7d4=;
+        b=JT7e7SxeNMFZRhkyPaOCNFAjYhVpQcI+hPNs9KwelmzFjKz5SLohL8xATgPn1J2Nc4
+         Lcuq1rN3cMRmqOjWkhnBMky5m5gYBoH9IIW4r7icV+fIoxWLQN33+PWSwzal1hQcH8pg
+         Id08qmG8wVF4JDY/ZRySA/XrRkn29WCsig91qpaE3slyM9LB2XWTNjhcXvCuOp7Vf+6h
+         xdIGIPXCfnTUY+J5dFT6busKnwZlKRFKxHQP/4ufN1Npp3DQwM081phW/uPxONKnvhuO
+         VFUJv7bHiVGbbIoThHfD3Rwaz+nBuLSZzoSyBKePPRmfJabV7LMUAm/9IfXmdP7eIx4S
+         C2TA==
+X-Gm-Message-State: ANhLgQ05fGIhIs90RlPuFnPnXG3/SMH6f805AnQTbu2AWiZRKI1XpJCA
+        R7fhMb2e+UlmVW4yI8+jqLidDCVDXMnzb2NwhYz5R7CM
+X-Google-Smtp-Source: ADFU+vsNiD2t5yiVVrZjVUT1TCioJx7zasBn9jLNG6jeYjtFiGbWZbfq39L4oVwWGdiGE04hMNhQ1Q58Xl3MQujaDlc=
+X-Received: by 2002:aca:bfc6:: with SMTP id p189mr67660oif.21.1583821369760;
+ Mon, 09 Mar 2020 23:22:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200310023516.209146-1-alainm@chromium.org> <20200310023516.209146-2-alainm@chromium.org>
-In-Reply-To: <20200310023516.209146-2-alainm@chromium.org>
+References: <20200310023516.209146-1-alainm@chromium.org> <20200310023516.209146-3-alainm@chromium.org>
+In-Reply-To: <20200310023516.209146-3-alainm@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 9 Mar 2020 23:04:58 -0700
-Message-ID: <CABBYNZKWQRw+W8f_ethSbcaS+4MgJgsjBYx2BAx_XGRNWnz+WA@mail.gmail.com>
-Subject: Re: [BlueZ PATCH 1/2] HOGP must only accept data from bonded devices.
+Date:   Mon, 9 Mar 2020 23:22:38 -0700
+Message-ID: <CABBYNZJtO=3_KjT1wW-uJbiMaOHmCJcBmhsKTo78QOKHFkpm3g@mail.gmail.com>
+Subject: Re: [BlueZ PATCH 2/2] HID accepts bonded device connections only.
 To:     Alain Michaud <alainm@chromium.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,37 +69,157 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Alain,
 
-On Mon, Mar 9, 2020 at 7:37 PM Alain Michaud <alainm@chromium.org> wrote:
+On Mon, Mar 9, 2020 at 7:39 PM Alain Michaud <alainm@chromium.org> wrote:
 >
-> HOGP 1.0 Section 6.1 establishes that the HOGP must require bonding.
+> This change adds a configuration for platforms to choose a more secure
+> posture for the HID profile.  While some older mice are known to not
+> support pairing or encryption, some platform may choose a more secure
+> posture by requiring the device to be bonded  and require the
+> connection to be encrypted when bonding is required.
 >
 > Reference:
-> https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00352.htm
+> https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00352.html
+
+Weird I cannot access this link.
+
 > ---
 >
->  profiles/input/hog.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  profiles/input/device.c   | 23 ++++++++++++++++++++++-
+>  profiles/input/device.h   |  1 +
+>  profiles/input/input.conf |  8 ++++++++
+>  profiles/input/manager.c  | 13 ++++++++++++-
+>  4 files changed, 43 insertions(+), 2 deletions(-)
 >
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> index 83c017dcb..dfac68921 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -186,6 +186,10 @@ static int hog_accept(struct btd_service *service)
->                         return -EINVAL;
+> diff --git a/profiles/input/device.c b/profiles/input/device.c
+> index 2cb3811c8..7fb22b18f 100644
+> --- a/profiles/input/device.c
+> +++ b/profiles/input/device.c
+> @@ -92,6 +92,7 @@ struct input_device {
+>
+>  static int idle_timeout = 0;
+>  static bool uhid_enabled = false;
+> +static bool br_bonded_only = false;
+>
+>  void input_set_idle_timeout(int timeout)
+>  {
+> @@ -103,6 +104,11 @@ void input_enable_userspace_hid(bool state)
+>         uhid_enabled = state;
+>  }
+>
+> +void input_set_br_bonded_only(bool state)
+> +{
+> +       br_bonded_only = state;
+> +}
+> +
+>  static void input_device_enter_reconnect_mode(struct input_device *idev);
+>  static int connection_disconnect(struct input_device *idev, uint32_t flags);
+>
+> @@ -970,8 +976,18 @@ static int hidp_add_connection(struct input_device *idev)
+>         if (device_name_known(idev->device))
+>                 device_get_name(idev->device, req->name, sizeof(req->name));
+>
+> +       /* Make sure the device is bonded if required */
+> +       if (br_bonded_only && !device_is_bonded(idev->device,
+> +                               btd_device_get_bdaddr_type(idev->device))) {
+> +               error("Rejected connection from !bonded device %s", dst_addr);
+> +               goto cleanup;
+> +       }
+> +
+>         /* Encryption is mandatory for keyboards */
+> -       if (req->subclass & 0x40) {
+> +       /* Some platforms may choose to require encryption for all devices */
+> +       /* Note that this only matters for pre 2.1 devices as otherwise the */
+> +       /* device is encrypted by default by the lower layers */
+
+You should use multiline comments above.
+
+> +       if (br_bonded_only || req->subclass & 0x40) {
+>                 if (!bt_io_set(idev->intr_io, &gerr,
+>                                         BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+>                                         BT_IO_OPT_INVALID)) {
+
+This one seems to be doing what I suggested for HoG, it attempt to
+bump the security so we might as well do the same for HoG.
+
+> @@ -1203,6 +1219,11 @@ static void input_device_enter_reconnect_mode(struct input_device *idev)
+>         DBG("path=%s reconnect_mode=%s", idev->path,
+>                                 reconnect_mode_to_string(idev->reconnect_mode));
+>
+> +       /* Make sure the device is bonded if required */
+> +       if (br_bonded_only && !device_is_bonded(idev->device,
+> +                               btd_device_get_bdaddr_type(idev->device)))
+> +               return;
+> +
+>         /* Only attempt an auto-reconnect when the device is required to
+>          * accept reconnections from the host.
+>          */
+> diff --git a/profiles/input/device.h b/profiles/input/device.h
+> index 51a9aee18..aaf312f0e 100644
+> --- a/profiles/input/device.h
+> +++ b/profiles/input/device.h
+> @@ -29,6 +29,7 @@ struct input_conn;
+>
+>  void input_set_idle_timeout(int timeout);
+>  void input_enable_userspace_hid(bool state);
+> +void input_set_br_bonded_only(bool state);
+>
+>  int input_device_register(struct btd_service *service);
+>  void input_device_unregister(struct btd_service *service);
+> diff --git a/profiles/input/input.conf b/profiles/input/input.conf
+> index 3e1d65aae..58791b7e6 100644
+> --- a/profiles/input/input.conf
+> +++ b/profiles/input/input.conf
+> @@ -11,3 +11,11 @@
+>  # Enable HID protocol handling in userspace input profile
+>  # Defaults to false (HIDP handled in HIDP kernel module)
+>  #UserspaceHID=true
+> +
+> +# Limit HID connections to bonded devices
+> +# The HID Profile does not specify that devices must be bonded, however some
+> +# platforms may want to make sure that input connections only come from bonded
+> +# device connections. Several older mice have been known for not supporting
+> +# pairing/encryption.
+> +# Defaults to false to maximize device compatibility.
+> +#BrBondedOnly=true
+
+Id make this more generic e.g. RequireEncryption and use it for both
+HoG and legacy HID, that way nobody will be caugh by surprise if we
+starting doing this for HoG since there may be devices already
+connecting that haven't been previously bonded, if we automatically
+trigger bonding that should still work but it kind hard to know in
+advance how broken peripherals are in this respect.
+
+> diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+> index 1d31b0652..ec45e1649 100644
+> --- a/profiles/input/manager.c
+> +++ b/profiles/input/manager.c
+> @@ -96,7 +96,7 @@ static int input_init(void)
+>         config = load_config_file(CONFIGDIR "/input.conf");
+>         if (config) {
+>                 int idle_timeout;
+> -               gboolean uhid_enabled;
+> +               gboolean uhid_enabled, br_bonded_only;
+>
+>                 idle_timeout = g_key_file_get_integer(config, "General",
+>                                                         "IdleTimeout", &err);
+> @@ -114,6 +114,17 @@ static int input_init(void)
+>                         input_enable_userspace_hid(uhid_enabled);
+>                 } else
+>                         g_clear_error(&err);
+> +
+> +               br_bonded_only = g_key_file_get_boolean(config, "General",
+> +                                                       "BrBondedOnly", &err);
+> +
+> +               if (!err) {
+> +                       DBG("input.conf: BrBondedOnly=%s", br_bonded_only ?
+> +                                                       "true" : "false");
+> +                       input_set_br_bonded_only(br_bonded_only);
+> +               } else
+> +                       g_clear_error(&err);
+> +
 >         }
 >
-> +       /* HOGP 1.0 Section 6.1 requires bonding */
-> +       if (!device_is_bonded(device, btd_device_get_bdaddr_type(device)))
-> +               return -ECONNREFUSED;
-
-Perhaps attempting to elevate the security level would be better than
-just refuse to attach the instance since otherwise we may end up with
-connecting services like battery, etc, leaving the device half
-working.
-
->         /* TODO: Replace GAttrib with bt_gatt_client */
->         bt_hog_attach(dev->hog, attrib);
->
+>         btd_profile_register(&input_profile);
 > --
 > 2.25.1.481.gfbce0eb801-goog
 >
