@@ -2,64 +2,64 @@ Return-Path: <SRS0=NTC4=43=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FDEC10F27
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2F7C18E5B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:27:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3843E222C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8B7521D56
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:27:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nl+JfdfU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UaLSVwS8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726636AbgCJSEq (ORCPT
+        id S1726466AbgCJS1A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Mar 2020 14:04:46 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:40230 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbgCJSEq (ORCPT
+        Tue, 10 Mar 2020 14:27:00 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:45789 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726283AbgCJS1A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Mar 2020 14:04:46 -0400
-Received: by mail-lf1-f68.google.com with SMTP id j17so7150944lfe.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 11:04:44 -0700 (PDT)
+        Tue, 10 Mar 2020 14:27:00 -0400
+Received: by mail-ot1-f67.google.com with SMTP id f21so14112249otp.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 11:27:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=3fudmkkEvf4B9+rOYdbkWDvtuUoA45GUsiPjLXXO74g=;
-        b=nl+JfdfU365M1mIb+Wp4SwFoVGSKcyLhesZ5XofUST8l2knckmJ7x01DHp4P6WGbry
-         FtaFfxorZlB+EYsYk6gCo5j4HLsnWjePhiLNdOmAahrrdQYveg25IlVV/SceTnKuXD/z
-         oCrnas9ijFsRdoPvresVoEZI6oH9Oys4+mNlCgf+SteWQKzZ31QRd/fQku5/aN+t84wp
-         NFyPt76j3r1PpPxvhCu+C06PEq0mjw0FlttHV8fR+yXD4YZUU1pclOh3HDerI0zPYpAy
-         qA7JhmAREbwmuoLtIthp0qoOsyNg1Fy78DT2QYmmIE2HlPmEbWJVwjxI7U9/1FAX0iOC
-         MsVA==
+        bh=kYcwCOrsXB1F7HlVWxD6tTRn4jhXioACIQXu62kUgfY=;
+        b=UaLSVwS8bbvNtbVPDsG0mSjIXSm0IPTdEbTyJaNJl+msW0H0wk6h+edk1NDNVDahqS
+         3TRZsa1DIf6XchwhySpddTG/wEhiXbfRbW1FmbkzZEkvdQNoKldCgmbIWQ1+1ZJPCD7i
+         7zvl1pmSXXOeCDW1kUl2a0avP5h3OMQiZA5KnnrCHnK4rSkl/y/M9IRN27dD2Z1r7Dqm
+         LHK/ypQlf0WDMt645JW7j84CCaZL3Soo7FI07YiUpND07L20fsLh0KEe/V+40ZbWL52E
+         YM5QBWklT2JkEvq9D66WZ0M5tBdBcsVmM6CnR+mOegmsBlPVndz/6r29G1F6W2FPlXwl
+         dsvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3fudmkkEvf4B9+rOYdbkWDvtuUoA45GUsiPjLXXO74g=;
-        b=tT5yUSauHgfahcq/Ra33wYZdftsTs4y6L6+fXcKoDoE5ga+46GqEB0qvbWlDLxbbkp
-         FxaB5gPhqzQ+BVvQzrCqToFq7bB7u9umxUi1pVKDV3TRjE8+vP570xZwY9rXqSERMWpx
-         2EoqKcp1V1iByxY/2FEbyc8PDVLWp+6GxfyuX7ugdPf6FyzgJAT3B1OME7qKQE+NcRMv
-         Puw9MgkltJdl3apf+S68XJLgy/rd/NZbb5F6dd5irL5rPIRyGXYaaF420SME9LBpnnuz
-         /cs83E9o8OsVoSjStJFoCD/CfkWhAFtXyeHIAerETsN1OAQ7MNhpz9Q3I1nTMPzhFHBT
-         jmWw==
-X-Gm-Message-State: ANhLgQ1YfbOxPQfAr7/TC4D0YL7l7zoNM0CY/Pf+DLeLLpzv+7Z+V9bp
-        0W+QLMrVkgLV/uX0wvdwj2My2S3wVYp7XhSVwcA5uA==
-X-Google-Smtp-Source: ADFU+vtKYuyuVQVSGR57h7Ue1hzokPgyw6qeVM3q+QlY8gdDoqrJLscthPNP+NXegLW5lulTjTRZMLganzx95bCyq5w=
-X-Received: by 2002:a05:6512:49e:: with SMTP id v30mr4201433lfq.158.1583863483872;
- Tue, 10 Mar 2020 11:04:43 -0700 (PDT)
+        bh=kYcwCOrsXB1F7HlVWxD6tTRn4jhXioACIQXu62kUgfY=;
+        b=YF+5rNzMJgd73l8UO5JaI10nw8SvlqnJ7xtFTdMZ5A+htmbeHOYiktU54w9CtMA5/C
+         3GqShyc8suw5TKPujXrhiqZ3I+6kT7IfrXhnFPJ3a2nJ75G4/8G364c3Mvn/uHQ44J61
+         zRk5k6hsaH0sGS8lYQljOD+PrJkZs63ihCku5sEQnYp24gg6WNrEEg4PTWpjWwvc4WlY
+         3gKy2Z0VNCpmPxbERN5+uyTmYOel3lN5hnDLem0dMkKlapDdGha601geUVQHGqXvncr/
+         GouNml/O6EfiKZFRKuO1FmVNOK2aYADx5x3oJwf7SVFRDmDwpLg507sFCRALo1SFpA9S
+         eeEg==
+X-Gm-Message-State: ANhLgQ2QYg2haNKBp1FCRyf3vJyuI55r87xuAS8986umPEAAh85dyLAK
+        JjjreGs6bg3GGTpJEPBywgu7krJr2wBYWyRL/0BoE83p
+X-Google-Smtp-Source: ADFU+vtSOiXHxwFHHjoRy/+MC5N8vG1Cs35whs3NkRQtHPlnj7OjDsSM8vIDVfoNleaz4P1bb2dvPXHuWRCGfhxjj5Q=
+X-Received: by 2002:a05:6830:19c7:: with SMTP id p7mr5740297otp.79.1583864819663;
+ Tue, 10 Mar 2020 11:26:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200310173649.32722-1-luiz.dentz@gmail.com>
-In-Reply-To: <20200310173649.32722-1-luiz.dentz@gmail.com>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 10 Mar 2020 14:04:31 -0400
-Message-ID: <CALWDO_U+J1mCf1TzeWM=tSvy-NCsxnyoMeHppFsLKkaaYTiwug@mail.gmail.com>
+References: <20200310173649.32722-1-luiz.dentz@gmail.com> <CALWDO_U+J1mCf1TzeWM=tSvy-NCsxnyoMeHppFsLKkaaYTiwug@mail.gmail.com>
+In-Reply-To: <CALWDO_U+J1mCf1TzeWM=tSvy-NCsxnyoMeHppFsLKkaaYTiwug@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 10 Mar 2020 11:26:48 -0700
+Message-ID: <CABBYNZ+6NDnuErRSiUkVacOViCBz1Bieda_KYD_0c3VrveER-A@mail.gmail.com>
 Subject: Re: [PATCH BlueZ] input: hog: Attempt to set security level if not bonded
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     Alain Michaud <alainmichaud@google.com>
 Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -67,60 +67,83 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Alain,
 
-On Tue, Mar 10, 2020 at 1:36 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Tue, Mar 10, 2020 at 11:04 AM Alain Michaud <alainmichaud@google.com> wrote:
 >
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Hi Luiz,
 >
-> This attempts to set the security if the device is not bonded, the
-> kernel will block any communication on the ATT socket while bumping
-> the security and if that fails the device will be disconnected which
-> is better than having the device dangling around without being able to
-> communicate with it until it is properly bonded.
-> ---
->  profiles/input/hog.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> index dfac68921..f0226ebbd 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -49,6 +49,8 @@
->  #include "src/shared/util.h"
->  #include "src/shared/uhid.h"
->  #include "src/shared/queue.h"
-> +#include "src/shared/att.h"
-> +#include "src/shared/gatt-client.h"
->  #include "src/plugin.h"
->
->  #include "suspend.h"
-> @@ -187,8 +189,15 @@ static int hog_accept(struct btd_service *service)
->         }
->
->         /* HOGP 1.0 Section 6.1 requires bonding */
-> -       if (!device_is_bonded(device, btd_device_get_bdaddr_type(device)))
-> -               return -ECONNREFUSED;
-> +       if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))) {
-> +               struct bt_gatt_client *client;
-> +
-> +               client = btd_device_get_gatt_client(device);
-> +               if (!bt_gatt_client_set_security(client,
-> +                                               BT_ATT_SECURITY_MEDIUM)) {
-> +                       return -ECONNREFUSED;
-> +               }
-> +       }
-I wonder if this is really necessary.  For example, this may cause a
-device the user has not deliberately bonded to suddenly expose a HOG
-Service which will trigger the user to pair (most users are known to
-blindly accept the pairing).  I believe the previous posture is more
-secure by having the user deliberately pair HID devices as opposed to
-on demand.
+> On Tue, Mar 10, 2020 at 1:36 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This attempts to set the security if the device is not bonded, the
+> > kernel will block any communication on the ATT socket while bumping
+> > the security and if that fails the device will be disconnected which
+> > is better than having the device dangling around without being able to
+> > communicate with it until it is properly bonded.
+> > ---
+> >  profiles/input/hog.c | 13 +++++++++++--
+> >  1 file changed, 11 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> > index dfac68921..f0226ebbd 100644
+> > --- a/profiles/input/hog.c
+> > +++ b/profiles/input/hog.c
+> > @@ -49,6 +49,8 @@
+> >  #include "src/shared/util.h"
+> >  #include "src/shared/uhid.h"
+> >  #include "src/shared/queue.h"
+> > +#include "src/shared/att.h"
+> > +#include "src/shared/gatt-client.h"
+> >  #include "src/plugin.h"
+> >
+> >  #include "suspend.h"
+> > @@ -187,8 +189,15 @@ static int hog_accept(struct btd_service *service)
+> >         }
+> >
+> >         /* HOGP 1.0 Section 6.1 requires bonding */
+> > -       if (!device_is_bonded(device, btd_device_get_bdaddr_type(device)))
+> > -               return -ECONNREFUSED;
+> > +       if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))) {
+> > +               struct bt_gatt_client *client;
+> > +
+> > +               client = btd_device_get_gatt_client(device);
+> > +               if (!bt_gatt_client_set_security(client,
+> > +                                               BT_ATT_SECURITY_MEDIUM)) {
+> > +                       return -ECONNREFUSED;
+> > +               }
+> > +       }
+> I wonder if this is really necessary.  For example, this may cause a
+> device the user has not deliberately bonded to suddenly expose a HOG
+> Service which will trigger the user to pair (most users are known to
+> blindly accept the pairing).  I believe the previous posture is more
+> secure by having the user deliberately pair HID devices as opposed to
+> on demand.
+
+There are dedicated APIs to connect specific profiles, so if
+hog_accept is reached it means the user/application does want to
+connect HoG and in that case it should trigger bonding, so this only
+automate the process, like Ive commented for legacy HID we already
+attempt to bump the security in a similar way. Having the user
+deliberately pair may cause breakage since in most cases the GATT
+services do that on demand, in fact HoG is possibly the only exception
+to that since it appear to mandate encryption at connection level
+rather than on attribute level, so if the user had a peripheral that
+used to not require bonding it will suddenly stop working but if we do
+have this change it would possible still work after the pairing
+procedure is complete.
 
 >
->         /* TODO: Replace GAttrib with bt_gatt_client */
->         bt_hog_attach(dev->hog, attrib);
-> --
-> 2.21.1
->
+> >
+> >         /* TODO: Replace GAttrib with bt_gatt_client */
+> >         bt_hog_attach(dev->hog, attrib);
+> > --
+> > 2.21.1
+> >
+
+
+
+-- 
+Luiz Augusto von Dentz
