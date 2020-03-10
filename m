@@ -2,128 +2,142 @@ Return-Path: <SRS0=NTC4=43=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D9CCC10F27
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 12:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D024EC10F27
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 15:11:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D3A524655
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 12:30:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A325121927
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 15:11:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H7UoZT8v"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VnkJlHEg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726353AbgCJMa0 (ORCPT
+        id S1726444AbgCJPLK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Mar 2020 08:30:26 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:38036 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726252AbgCJMa0 (ORCPT
+        Tue, 10 Mar 2020 11:11:10 -0400
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:46347 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726426AbgCJPLJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Mar 2020 08:30:26 -0400
-Received: by mail-lj1-f194.google.com with SMTP id w1so13898394ljh.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 05:30:25 -0700 (PDT)
+        Tue, 10 Mar 2020 11:11:09 -0400
+Received: by mail-vs1-f66.google.com with SMTP id z125so4706809vsb.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 08:11:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gNdHB2eRgC38Rm6QBGIuzob7mej0xH2j8kwhYctFfZU=;
-        b=H7UoZT8vFrRJ2xWjG8UWP5YQM8kc8XBjRovD1rszXyrjfuGXdkSlVf/NSwx/UBDDEY
-         rO4LBQ8YWxg1cDIhxEh1qjt0kK3m1VzROe02ovlk1nifu0uK3+DZxvuyBPfye6zfuHNV
-         qkg25/mqUM0C59SxY9rfdSDIEda6HVg6vi0288oJCeozZmIQVMaT5MIzJPFX9wp1epu1
-         Lzdt9zp168/djQH615iH1F/B6LQPM8+WgtOaTB4i814eE7KbDgyZvS/wJ4YGTKOkHuDZ
-         g+D4TIOSFZ15+ffOfRNj7OW6+vc6XVF9dWX+W+h/a1EEgWuPr/3TOYqF27SE+bA01WgG
-         xDqA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xNXEQGaNpkibSZ5F8FBJ0o64fecKUpZIKYmckFLpYj4=;
+        b=VnkJlHEgNofWwp/YlNuD5hkCNoL5FFtXCfw7tNSg9tJE/jIeq71ziLQkbxU4H2Mo3G
+         UEi+wmQ+MpHhvU5i1UBwg0KANGH4YJKJA8U/rv9e+0Rkh+gw3pyX/DmjVXTCW7x/VSi2
+         fa1Qr/3TQfWIr/bbKge7l8qfGg+H5UgfMWlt0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gNdHB2eRgC38Rm6QBGIuzob7mej0xH2j8kwhYctFfZU=;
-        b=BtqdxoLbhEOgU8yc+ZhE9iXkL8AJ0cmSiW5U2MndHVXsvYuqhS5NfRaauI572ZQd7Z
-         wlp70/ffLIQj0zLX0IChlE1FbmGMCdsaBTg7pYp2snDJGHzQm19jdqjvFQMeuuVpOd3F
-         Ai1763OmUQEbaenZPCnJ6uzoEpQy+2DkGqglUtW1LC9zuk3l1BscZCs+lBBhM88EtYK3
-         Tm9C5s8PplrEfzNUT6NnoUgIRuJ1fKN1piqlcDfIcwQOyOWdS+8MocjVppG+MiU6LvSm
-         oPsjH93DVFWKECnWzuPqr/1C/sMDho8CITAtev6fI02YcumQF91+ErdVzr0dQtwXhU1y
-         woTQ==
-X-Gm-Message-State: ANhLgQ1ShV84HXS1WvrD+6rIIOzS3K5TsFhgW1QEvhAXNhO8e+l6IJZT
-        +wzEP3IzCDbdGs9QJ2euqXum8gG1pPbgFzS0X5YY6w==
-X-Google-Smtp-Source: ADFU+vszxBZ5PU/s3oGLcqFUB8vx/ETa1PVL1NXDP8YU02hKaKh/3pSN8MLRtXdZWbgWToboUuEMqCueCvNqflRarJI=
-X-Received: by 2002:a2e:3511:: with SMTP id z17mr10198568ljz.81.1583843424111;
- Tue, 10 Mar 2020 05:30:24 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xNXEQGaNpkibSZ5F8FBJ0o64fecKUpZIKYmckFLpYj4=;
+        b=lDCs9D/52Bh8/iMJHqyxF+I0cQ/BktN788pR8V2xnfRZieImV3HonSuh8ayNxGqTPv
+         ScLXHPSzPf5zT9ZTuHq+p28Eyx/62B8Sst+qhNFM5MDycmmm2e8UyaYT45b9XRfosGv1
+         9x3aHkSezbiqFxRqFqUoPjIBBAY3QQ1DeDs79vh580P3f9pE+wl9m4ykvnCYfwI6sUT+
+         BV82MyYE0ha9JddOmk1uY8aWjGYysj8RPT/2L3hAj3OomCemx6e6o+GORHk5BAirwRuv
+         iTYZWtVFleyN3leGdgLI6GblEQ0NfN7n+mSj4/u76RlMyZiSc+thMCGHQ03r63CWJxxq
+         qfzA==
+X-Gm-Message-State: ANhLgQ2Bf1TR5yq6ejJQcKxr5YxcoFkgzjVm5OKgWNpsPvBg1xf18O5c
+        HeBso5Y+gIdoxsnWX+ra0CCM2BS7bI0=
+X-Google-Smtp-Source: ADFU+vuGkUZIBo2LHwqYp6wcYharXaTZZhWLBSiB2jOHZ/ovf/7WNKRNw7xilkgzFIrCHRsqYgBEMQ==
+X-Received: by 2002:a67:e99a:: with SMTP id b26mr13298055vso.27.1583853066464;
+        Tue, 10 Mar 2020 08:11:06 -0700 (PDT)
+Received: from alain.c.googlers.com.com (57.152.190.35.bc.googleusercontent.com. [35.190.152.57])
+        by smtp.gmail.com with ESMTPSA id q25sm7710397uam.19.2020.03.10.08.11.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2020 08:11:05 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v1] bluetooth: Enforce classic key size verification.
+Date:   Tue, 10 Mar 2020 15:10:59 +0000
+Message-Id: <20200310151100.134881-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
 MIME-Version: 1.0
-References: <20200310023516.209146-1-alainm@chromium.org> <87A4E633-63CF-4C71-9BF6-916894790EED@holtmann.org>
- <CABBYNZKbc71WvOA34cFcKXVRcG-hYedJBT5LeTK9c3+H5Trjwg@mail.gmail.com>
-In-Reply-To: <CABBYNZKbc71WvOA34cFcKXVRcG-hYedJBT5LeTK9c3+H5Trjwg@mail.gmail.com>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 10 Mar 2020 08:30:12 -0400
-Message-ID: <CALWDO_VNPFJm+je4N1u1bW=+n8WTCoe+xwzrOo=UZi4ymuwdsg@mail.gmail.com>
-Subject: Re: [BlueZ PATCH 0/2] HID and HOGP connections from non-bonded devices.
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+This change introduces a new configuration to strictly enforce key size
+checks.  This ensures that systems are in a secured configuration by
+default while allowing for a compatible posture via a Kconfig option to
+support controllers who may not support the read encryption key size
+command.
 
-On Tue, Mar 10, 2020 at 2:27 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Marcel,
->
-> On Mon, Mar 9, 2020 at 10:26 PM Marcel Holtmann <marcel@holtmann.org> wrote:
-> >
-> > Hi Alain,
-> >
-> > > It was discovered that BlueZ's HID and HOGP profiles implementations
-> > > don't specifically require bonding between the device and the host.
-> > >
-> > > This creates an opportunity for an malicious device to connect to a
-> > > target host to either impersonate an existing HID device without
-> > > security or to cause an SDP or GATT service discovery to take place
-> > > which would allow HID reports to be injected to the input subsystem from
-> > > a non-bonded source.
-> > >
-> > > This patch series addresses the issue by ensuring that only connections
-> > > from devices that are bonded are accepted by the HID and HOGP profile
-> > > implementation.
-> > >
-> > > More information about the vulnerability is available here:
-> > > https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00352.html
-> > >
-> > > Alain Michaud (2):
-> > >  HOGP must only accept data from bonded devices.
-> > >  HID accepts bonded device connections only.
-> > >
-> > > profiles/input/device.c   | 23 ++++++++++++++++++++++-
-> > > profiles/input/device.h   |  1 +
-> > > profiles/input/hog.c      |  4 ++++
-> > > profiles/input/input.conf |  8 ++++++++
-> > > profiles/input/manager.c  | 13 ++++++++++++-
-> > > 5 files changed, 47 insertions(+), 2 deletions(-)
-> >
-> > both patches have been applied.
-> >
-> > However I changed BrBondedOnly configuration name into ClassicBondedOnly since that name seemed more obvious to me. The prefix Br has never been used and the Bluetooth SIG started calling it Classic a while back.
->
-> Looks like you were quicker than me, anyway I do fill like we should
-> attempt to bump to security instead of just refuse to connection in
-> case of HoG since we are the central and the peripheral is not
-> mandated to started it either it may be just the client application is
-> attempting to connect to trigger pairing on demand, that would usually
-> kick latter when reading the characteristics but with this changes it
-> doesn't even get to that point if the devices was not bonded already.
-The specification for HoG is that the device is bonded.  If client or
-server attempts to access the service before it is bonded, it would
-violate the specification.  For this reason, I believe it is both
-safer and simpler to just reject any attempts to access the service
-without first being bonded.
->
-> --
-> Luiz Augusto von Dentz
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
+
+ net/bluetooth/Kconfig     | 10 ++++++++++
+ net/bluetooth/hci_core.c  | 10 ++++++++++
+ net/bluetooth/hci_event.c |  5 +++++
+ 3 files changed, 25 insertions(+)
+
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 165148c7c4ce..6a155b7b6fb2 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -128,4 +128,14 @@ config BT_DEBUGFS
+ 	  Provide extensive information about internal Bluetooth states
+ 	  in debugfs.
+ 
++config BT_ENFORCE_CLASSIC_KEY_SIZES
++	bool "Enforces security requirements for Bluetooth classic"
++	depends on BT
++	default y
++	help
++	  Enforces Bluetooth classic security requirements by disallowing use of
++	  insecure Bluetooth chips, i.e. that doesn't support Read Encryption
++	  Key Size command to prevent BT classic connection with very short
++	  encryption key.
++
+ source "drivers/bluetooth/Kconfig"
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4e6d61a95b20..142130d4b66b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1540,6 +1540,16 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 
+ 	clear_bit(HCI_INIT, &hdev->flags);
+ 
++#ifdef BT_ENFORCE_CLASSIC_KEY_SIZES
++	/* Don't allow usage of Bluetooth if the chip doesn't support */
++	/* Read Encryption Key Size command */
++	if (!ret && !(hdev->commands[20] & 0x10)) {
++		bt_dev_err(hdev,
++			   "Disabling BT, Read Encryption Key Size !supported");
++		ret = -EIO;
++	}
++#endif
++
+ 	if (!ret) {
+ 		hci_dev_hold(hdev);
+ 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a40ed31f6eb8..6605da7ec72e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2902,7 +2902,12 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+ 	if (rp->status) {
+ 		bt_dev_err(hdev, "failed to read key size for handle %u",
+ 			   handle);
++#ifdef BT_ENFORCE_CLASSIC_KEY_SIZES
++		hci_disconnect(conn, HCI_ERROR_REMOTE_USER_TERM);
++		hci_conn_drop(conn);
++#else
+ 		conn->enc_key_size = HCI_LINK_KEY_SIZE;
++#endif
+ 	} else {
+ 		conn->enc_key_size = rp->key_size;
+ 	}
+-- 
+2.25.1.481.gfbce0eb801-goog
+
