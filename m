@@ -2,163 +2,175 @@ Return-Path: <SRS0=NTC4=43=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC31BC10F27
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD12C10F27
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:46:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C191621D7E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C76B20873
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Mar 2020 18:46:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IOTPbncC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZsG/Mg5a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbgCJSie (ORCPT
+        id S1726466AbgCJSqc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Mar 2020 14:38:34 -0400
-Received: from mail-qt1-f202.google.com ([209.85.160.202]:55560 "EHLO
-        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbgCJSid (ORCPT
+        Tue, 10 Mar 2020 14:46:32 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:33005 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726391AbgCJSqb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Mar 2020 14:38:33 -0400
-Received: by mail-qt1-f202.google.com with SMTP id o10so9700084qtk.22
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 11:38:33 -0700 (PDT)
+        Tue, 10 Mar 2020 14:46:31 -0400
+Received: by mail-ot1-f66.google.com with SMTP id g15so8109523otr.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Mar 2020 11:46:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=DVW9btlrE9WxdPGCCpJUK2ALvJluBH0kWl1F121tkv8=;
-        b=IOTPbncCEhJ6Tlz1Iw6Gu+n2Ojfh6tB5pWO5AS2+hXov1EUWbLSoF7wSBUH20ovyt7
-         zxQlcZcCR/aX7jbuBwKpop15IyvI5jXWDoBQ2bMeD5UarniqqgyoP6g8a2UCA3SFd7l4
-         gs8EqISUW8RauHWE3mWMnRQFsk3kB4EQwyss7hkvcD7jGfOyr0mD4ZNXbVPzmQRKa4XG
-         3tMuVRUC351yCD4XC9LcUIumBkpJFggMJpk22rPpdmmjpx6mHT5dKqudgULcsj8HzLh5
-         5KFvUzlCPS1HyTGUrmGKaEuGzu9Xo/yq+rY1aul7UuhME44YuhNJueGBdclGJrLKxXPt
-         W5eA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MXHbLXjDIYQTcYz+S6fQJu2XAM6vU2g6LFoyeuas4Bk=;
+        b=ZsG/Mg5amJ5eN4oz7Gs1+47req+YVfu2OcWM/b5XhRvKIZHyFA/cZ3btXKQ7Vm4bpB
+         aPbarJzT7a2RNCJhFhsXBmVGjjsZWFpWEYG4OtCtSQNntLExHhgcE5zksXXVdW/ai8dY
+         4iv0AigNVojumLQCOq4ictnbA5RwuQPMEex4Waj2LmZEyXphHxXbEhN0sMgVU8vx2S2U
+         H5DXvT3sDUqWaFSMko2NaoHMdVF02xt+Sl8kkEx/zLRmaV8mQkN3vo8ORmL1Tgsau0iY
+         eczzSPT+E1YRH4K9W+ncGjTnebfq0COuBMJIYGuPIY05bS4Mut3U/uudCNccQRAhZ07e
+         ZpBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=DVW9btlrE9WxdPGCCpJUK2ALvJluBH0kWl1F121tkv8=;
-        b=kGB8Dn43KBJlTJESA9H81PqcooUYdiOfJyQEkooOlYBGL5mUq0VQ0OWNrEz4RXHGbm
-         Fn8LAy1quRW91l2dkcr2UTqnkKPZQdSeis1zr5ah2RLFZPP9WDv8+aHv9YiApvjTZ6N8
-         zfwo7avEBMO6Wxb1TdoFqBodFOVAOedA3iiJZfFVTbmWiFaP3hadgYNfIAmNJ35xDz9d
-         eQ8gbZ3bixfMBTBq3/dW3XMRNMmcKp/vKdQm5ZLgsmU5/XRZIkiGN7ZphBsurmgRqmRA
-         u4rrlxgZfyK5z4xoohmYU3hWFx4iQJDTvnzuwT0KRB30PIFsf9hCElXcvx1CniC4c1xJ
-         1igQ==
-X-Gm-Message-State: ANhLgQ00p3V1RScTiMxm5bGktszv5g6+QmbjVLvCvO9kwRiOiypzxKCO
-        tHDYQJg1oNAj1MYTQ/R0U+CU8zAXCXXEfQ==
-X-Google-Smtp-Source: ADFU+vt3hko+Smop5fTqoBl8hrviV1maP8B16CI24CvOJMBylSgDWKjoTPwri0v8rrhRtvBjU7JPuD+4NG8I7Q==
-X-Received: by 2002:a0c:90a2:: with SMTP id p31mr11609515qvp.2.1583865512672;
- Tue, 10 Mar 2020 11:38:32 -0700 (PDT)
-Date:   Tue, 10 Mar 2020 11:38:27 -0700
-Message-Id: <20200310113816.1.I12c0712e93f74506385b67c6df287658c8fdad04@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.25.1.481.gfbce0eb801-goog
-Subject: [PATCH] Bluetooth: clean up connection in hci_cs_disconnect
-From:   Manish Mandlik <mmandlik@google.com>
-To:     marcel@holtmann.org
-Cc:     Alain Michaud <alainm@chromium.org>,
-        linux-bluetooth@vger.kernel.org,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Joseph Hwang <josephsih@chromium.org>,
-        Yoni Shavit <yshavit@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MXHbLXjDIYQTcYz+S6fQJu2XAM6vU2g6LFoyeuas4Bk=;
+        b=annOWvV+2b5x0eD7DEigjGra5cD7LK9UJqlUhEe+JIM3kLrDPc5Qx99DLMv0fMG6cg
+         zA/zKs+nhh89BMd7iT4mmHsD6clB49pbU0Yu/+qMH8SjsUEaLSenVitq2h8W4IaXgjsA
+         p5GqOJEEGibWM4s9Y5Zh0lQxNL4f4nEWnBl8X2GvQBeauoVEOnT4KaihZIPIR6xNwOa9
+         op9JB7LS7N4KQDF8b1tRNJ4uvySROGyCYdnHUUjT4CGxg4iT5ZMKFctk5dGN4zP8h4lr
+         uMl9uEkO/aFi2jrYlfW8bdETztMBUo46PvipKByQfYNg9Tx+cWKFG5Ce1VaOfkqmYZ6q
+         x+jA==
+X-Gm-Message-State: ANhLgQ2/HHj7h/g1ChSuZdywcr1NO1cCuZvkCgQ1fU+2ZX3TfA7CCJuL
+        isBJVdM2KW33LvrHJdwJTt3DdVRndJaea0cZo6ziQfm0
+X-Google-Smtp-Source: ADFU+vtJpnBCWNXeuVqVErqKqRkIsAMsYmWFHByuYFkMhXsP4+ugj93Ap6gGMJSsxYzxpsWGmFUAYMwUpj010aWcecY=
+X-Received: by 2002:a9d:720a:: with SMTP id u10mr6142000otj.177.1583865989081;
+ Tue, 10 Mar 2020 11:46:29 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200310173649.32722-1-luiz.dentz@gmail.com> <CALWDO_U+J1mCf1TzeWM=tSvy-NCsxnyoMeHppFsLKkaaYTiwug@mail.gmail.com>
+ <CABBYNZ+6NDnuErRSiUkVacOViCBz1Bieda_KYD_0c3VrveER-A@mail.gmail.com> <CALWDO_Ws7=aEuhUU7GiGJ1=x4WREO8K1V=D4iGOABo0_ik9eRA@mail.gmail.com>
+In-Reply-To: <CALWDO_Ws7=aEuhUU7GiGJ1=x4WREO8K1V=D4iGOABo0_ik9eRA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 10 Mar 2020 11:46:17 -0700
+Message-ID: <CABBYNZ+pbPswfY4AGpvL8XQL3JVPPi9srO5qt-8KbKzMDi+W9g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] input: hog: Attempt to set security level if not bonded
+To:     Alain Michaud <alainmichaud@google.com>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Joseph Hwang <josephsih@chromium.org>
+Hi Alain,
 
-In bluetooth core specification 4.2,
-Vol 2, Part E, 7.8.9 LE Set Advertise Enable Command, it says
+On Tue, Mar 10, 2020 at 11:37 AM Alain Michaud <alainmichaud@google.com> wrote:
+>
+> Hi Luiz,
+>
+> On Tue, Mar 10, 2020 at 2:27 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Alain,
+> >
+> > On Tue, Mar 10, 2020 at 11:04 AM Alain Michaud <alainmichaud@google.com> wrote:
+> > >
+> > > Hi Luiz,
+> > >
+> > > On Tue, Mar 10, 2020 at 1:36 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > >
+> > > > This attempts to set the security if the device is not bonded, the
+> > > > kernel will block any communication on the ATT socket while bumping
+> > > > the security and if that fails the device will be disconnected which
+> > > > is better than having the device dangling around without being able to
+> > > > communicate with it until it is properly bonded.
+> > > > ---
+> > > >  profiles/input/hog.c | 13 +++++++++++--
+> > > >  1 file changed, 11 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> > > > index dfac68921..f0226ebbd 100644
+> > > > --- a/profiles/input/hog.c
+> > > > +++ b/profiles/input/hog.c
+> > > > @@ -49,6 +49,8 @@
+> > > >  #include "src/shared/util.h"
+> > > >  #include "src/shared/uhid.h"
+> > > >  #include "src/shared/queue.h"
+> > > > +#include "src/shared/att.h"
+> > > > +#include "src/shared/gatt-client.h"
+> > > >  #include "src/plugin.h"
+> > > >
+> > > >  #include "suspend.h"
+> > > > @@ -187,8 +189,15 @@ static int hog_accept(struct btd_service *service)
+> > > >         }
+> > > >
+> > > >         /* HOGP 1.0 Section 6.1 requires bonding */
+> > > > -       if (!device_is_bonded(device, btd_device_get_bdaddr_type(device)))
+> > > > -               return -ECONNREFUSED;
+> > > > +       if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))) {
+> > > > +               struct bt_gatt_client *client;
+> > > > +
+> > > > +               client = btd_device_get_gatt_client(device);
+> > > > +               if (!bt_gatt_client_set_security(client,
+> > > > +                                               BT_ATT_SECURITY_MEDIUM)) {
+> > > > +                       return -ECONNREFUSED;
+> > > > +               }
+> > > > +       }
+> > > I wonder if this is really necessary.  For example, this may cause a
+> > > device the user has not deliberately bonded to suddenly expose a HOG
+> > > Service which will trigger the user to pair (most users are known to
+> > > blindly accept the pairing).  I believe the previous posture is more
+> > > secure by having the user deliberately pair HID devices as opposed to
+> > > on demand.
+> >
+> > There are dedicated APIs to connect specific profiles, so if
+> > hog_accept is reached it means the user/application does want to
+> > connect HoG and in that case it should trigger bonding, so this only
+> > automate the process, like Ive commented for legacy HID we already
+> > attempt to bump the security in a similar way. Having the user
+> > deliberately pair may cause breakage since in most cases the GATT
+> > services do that on demand, in fact HoG is possibly the only exception
+> > to that since it appear to mandate encryption at connection level
+> > rather than on attribute level, so if the user had a peripheral that
+> > used to not require bonding it will suddenly stop working but if we do
+> > have this change it would possible still work after the pairing
+> > procedure is complete.
+> The outgoing contract where the user somehow asked for the profile to
+> be connected and would result in pairing, I'm ok with.  However, this
+> being in the accept path, it doesn't seem to always be client side
+> initiated, so that still seems like a concern to me.
 
-    The Controller shall continue advertising until ...
-    or until a connection is created or ...
-    In these cases, advertising is then disabled.
+Since this is a profile so we are always acting as GATT client here,
+so it is either initiated by the client when setting up a new
+peripheral or it has been previously setup with Add Device and is
+marked to auto connect, the later is exactly the problem I described
+that there could be existing peripheral not requiring bonding that
+suddenly stop working.
 
-Hence, advertising would be disabled before a connection is
-established. In current kernel implementation, advertising would
-be re-enabled when all connections are terminated.
+> >
+> > >
+> > > >
+> > > >         /* TODO: Replace GAttrib with bt_gatt_client */
+> > > >         bt_hog_attach(dev->hog, attrib);
+> > > > --
+> > > > 2.21.1
+> > > >
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
 
-The correct disconnection flow looks like
 
-  < HCI Command: Disconnect
 
-  > HCI Event: Command Status
-      Status: Success
-
-  > HCI Event: Disconnect Complete
-      Status: Success
-
-Specifically, the last Disconnect Complete Event would trigger a
-callback function hci_event.c:hci_disconn_complete_evt() to
-cleanup the connection and re-enable advertising when proper.
-
-However, sometimes, there might occur an exception in the controller
-when disconnection is being executed. The disconnection flow might
-then look like
-
-  < HCI Command: Disconnect
-
-  > HCI Event: Command Status
-      Status: Unknown Connection Identifier
-
-  Note that "> HCI Event: Disconnect Complete" is missing when such an
-exception occurs. This would result in advertising staying disabled
-forever since the connection in question is not cleaned up correctly.
-
-To fix the controller exception issue, we need to do some connection
-cleanup when the disconnect command status indicates an error.
-
-Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
----
-
- net/bluetooth/hci_event.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a40ed31f6eb8f..7f7e5ba3974a8 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2191,6 +2191,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
- {
- 	struct hci_cp_disconnect *cp;
- 	struct hci_conn *conn;
-+	u8 type;
- 
- 	if (!status)
- 		return;
-@@ -2202,10 +2203,21 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
- 	hci_dev_lock(hdev);
- 
- 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
--	if (conn)
-+	if (conn) {
- 		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
- 				       conn->dst_type, status);
- 
-+		/* If the disconnection failed for any reason, the upper layer
-+		 * does not retry to disconnect in current implementation.
-+		 * Hence, we need to do some basic cleanup here and re-enable
-+		 * advertising if necessary.
-+		 */
-+		type = conn->type;
-+		hci_conn_del(conn);
-+		if (type == LE_LINK)
-+			hci_req_reenable_advertising(hdev);
-+	}
-+
- 	hci_dev_unlock(hdev);
- }
- 
 -- 
-2.25.1.481.gfbce0eb801-goog
-
+Luiz Augusto von Dentz
