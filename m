@@ -6,43 +6,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF37C10F27
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 14:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D9F6C10F29
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 14:33:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F0F9720575
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 14:31:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E65D20575
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 14:33:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729853AbgCKOba convert rfc822-to-8bit (ORCPT
+        id S1729738AbgCKOdC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Mar 2020 10:31:30 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:53401 "EHLO
+        Wed, 11 Mar 2020 10:33:02 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50336 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729309AbgCKOb3 (ORCPT
+        with ESMTP id S1729309AbgCKOdC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Mar 2020 10:31:29 -0400
+        Wed, 11 Mar 2020 10:33:02 -0400
 Received: from [172.20.10.2] (x59cc8a78.dyn.telefonica.de [89.204.138.120])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D1D5CCECDF;
-        Wed, 11 Mar 2020 15:40:55 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id A6AF1CECDF;
+        Wed, 11 Mar 2020 15:42:28 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH] Bluetooth: clean up connection in hci_cs_disconnect
+Subject: Re: [PATCH] Bluetooth: include file and function names in logs
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200310113816.1.I12c0712e93f74506385b67c6df287658c8fdad04@changeid>
-Date:   Wed, 11 Mar 2020 15:31:26 +0100
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Joseph Hwang <josephsih@chromium.org>,
+In-Reply-To: <20200310095959.1.I864ded253b57454e732ab5acb1cae5b22c67cfae@changeid>
+Date:   Wed, 11 Mar 2020 15:32:59 +0100
+Cc:     Joseph Hwang <josephsih@chromium.org>,
         Yoni Shavit <yshavit@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        linux-bluetooth@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jakub Kicinski <kuba@kernel.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C60D1463-5B04-4C25-B4A2-0A9DD25A67B9@holtmann.org>
-References: <20200310113816.1.I12c0712e93f74506385b67c6df287658c8fdad04@changeid>
+Message-Id: <017831DA-9E5C-438A-A094-2826255076EC@holtmann.org>
+References: <20200310095959.1.I864ded253b57454e732ab5acb1cae5b22c67cfae@changeid>
 To:     Manish Mandlik <mmandlik@google.com>
 X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -52,101 +51,48 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Manish,
 
-> In bluetooth core specification 4.2,
-> Vol 2, Part E, 7.8.9 LE Set Advertise Enable Command, it says
-> 
->    The Controller shall continue advertising until ...
->    or until a connection is created or ...
->    In these cases, advertising is then disabled.
-> 
-> Hence, advertising would be disabled before a connection is
-> established. In current kernel implementation, advertising would
-> be re-enabled when all connections are terminated.
-> 
-> The correct disconnection flow looks like
-> 
->  < HCI Command: Disconnect
-> 
->> HCI Event: Command Status
->      Status: Success
-> 
->> HCI Event: Disconnect Complete
->      Status: Success
-> 
-> Specifically, the last Disconnect Complete Event would trigger a
-> callback function hci_event.c:hci_disconn_complete_evt() to
-> cleanup the connection and re-enable advertising when proper.
-> 
-> However, sometimes, there might occur an exception in the controller
-> when disconnection is being executed. The disconnection flow might
-> then look like
-> 
->  < HCI Command: Disconnect
-> 
->> HCI Event: Command Status
->      Status: Unknown Connection Identifier
-> 
->  Note that "> HCI Event: Disconnect Complete" is missing when such an
-> exception occurs. This would result in advertising staying disabled
-> forever since the connection in question is not cleaned up correctly.
-> 
-> To fix the controller exception issue, we need to do some connection
-> cleanup when the disconnect command status indicates an error.
+> Include file and function names in bluetooth kernel logs to
+> help debugging.
 > 
 > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 > Signed-off-by: Manish Mandlik <mmandlik@google.com>
 > ---
 > 
-> net/bluetooth/hci_event.c | 14 +++++++++++++-
-> 1 file changed, 13 insertions(+), 1 deletion(-)
+> include/net/bluetooth/bluetooth.h | 19 +++++++++++++++----
+> 1 file changed, 15 insertions(+), 4 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index a40ed31f6eb8f..7f7e5ba3974a8 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2191,6 +2191,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
-> {
-> 	struct hci_cp_disconnect *cp;
-> 	struct hci_conn *conn;
-> +	u8 type;
-
-remove this please.
-
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 1576353a27732..2024d9c53d687 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -150,10 +150,21 @@ void bt_warn_ratelimited(const char *fmt, ...);
+> __printf(1, 2)
+> void bt_err_ratelimited(const char *fmt, ...);
 > 
-> 	if (!status)
-> 		return;
-> @@ -2202,10 +2203,21 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
-> 	hci_dev_lock(hdev);
-> 
-> 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-> -	if (conn)
-> +	if (conn) {
-
-And add this.
-
-		u8 type = conn->type;
-
-> 		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
-> 				       conn->dst_type, status);
-> 
-> +		/* If the disconnection failed for any reason, the upper layer
-> +		 * does not retry to disconnect in current implementation.
-> +		 * Hence, we need to do some basic cleanup here and re-enable
-> +		 * advertising if necessary.
-> +		 */
-> +		type = conn->type;
-
-And then remove this.
-
-> +		hci_conn_del(conn);
-> +		if (type == LE_LINK)
-> +			hci_req_reenable_advertising(hdev);
-> +	}
+> -#define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
+> -#define BT_WARN(fmt, ...)	bt_warn(fmt "\n", ##__VA_ARGS__)
+> -#define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
+> -#define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
+> +static inline const char *basename(const char *path)
+> +{
+> +	const char *str = strrchr(path, '/');
 > +
-> 	hci_dev_unlock(hdev);
-> }
+> +	return str ? (str + 1) : path;
+> +}
+> +
+> +#define BT_INFO(fmt, ...)	bt_info("%s:%s() " fmt "\n",		\
+> +				basename(__FILE__), __func__, ##__VA_ARGS__)
+> +#define BT_WARN(fmt, ...)	bt_warn("%s:%s() " fmt "\n",		\
+> +				basename(__FILE__), __func__, ##__VA_ARGS__)
+> +#define BT_ERR(fmt, ...)	bt_err("%s:%s() " fmt "\n",		\
+> +				basename(__FILE__), __func__, ##__VA_ARGS__)
+> +#define BT_DBG(fmt, ...)	pr_debug("%s:%s() " fmt "\n",		\
+> +				basename(__FILE__), __func__, ##__VA_ARGS__)
+> 
+> #define bt_dev_info(hdev, fmt, ...)				\
+> 	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
 
-Otherwise this looks good.
+this is NAK from my side. We don’t want to include __FILE__ and __func__ names in the standard messages. I am however working in revamping the whole printk and debug of the Bluetooth subsystem. I will send around the initial pieces of my work as a RFC soon.
 
 Regards
 
