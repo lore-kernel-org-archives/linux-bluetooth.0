@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E10F8C0044D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A34C0044D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0FC2205ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 547AD2074D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lzO753Xc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uEvEANjH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730973AbgCKS7R (ORCPT
+        id S1730984AbgCKS7l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Mar 2020 14:59:17 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:34440 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730734AbgCKS7R (ORCPT
+        Wed, 11 Mar 2020 14:59:41 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:54919 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730734AbgCKS7k (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Mar 2020 14:59:17 -0400
-Received: by mail-pg1-f196.google.com with SMTP id t3so1697968pgn.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2020 11:59:16 -0700 (PDT)
+        Wed, 11 Mar 2020 14:59:40 -0400
+Received: by mail-pj1-f66.google.com with SMTP id np16so1409306pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2020 11:59:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=2xM90dffTvLukV9Gy+9eaM+lQj47FbJNZsqqzLKTSQU=;
-        b=lzO753XctsfcZ0zmrUEIB0hI9K5H6MKzslXKnE9ucyux0XrNBLLIq9M8zeawLxT8VN
-         6r4NzfDDwq/oYT1QD+EFnmkC6dDMTOMOQRoEw3Ghx9qNJk4bmtjrSNFra/nVubQu9ZPx
-         S5HxjqL+Lw83tQsDc8MMKnNKCT1giXUAFvYOX2HYUniX6uF+VLajjO+OMVsXXVBpXLeZ
-         H0Aw9VlTKVdiH0ZnDgs4bPTZldLlka77FxAP3T4mnZLpNGEPt4deQYujvPdCrdERscZC
-         t0h6qzTGy0P4u9fmmovz9YLkUtsWdYuzn8tprhIqhHDgVFN4jHx1quWMuN0rfqfiMnWM
-         C5pw==
+        b=uEvEANjHkyzpp/8eH3dcISUMBMskPgSf2TWZN1/diarZU15LoRvVDhB0+EKyCO3kka
+         UPaxht0YgzHZSZO3d8EdkmevF4V5lV2KsgqAc6Gz+bOoUQaUNQxkhWUKIFlTLz2gTxzC
+         vWZV+oABb8GufZnBaPJ7o0HfVWZ/LALxZ0lxGNH3FpN2n7t5fcd4KuFxQlqaZEjUfs4K
+         3wEBMKP8LbxWxaonhPluGaGe3p6GBUop/ROZ3V3p3eJZTjecEkyWQVY9ixNEEMlcP0jC
+         LEfEZ7xiesMBWoq4i2BbV4Vi9re0bhn796XBHaUMoCYJSd/WKhpAamTmy3nh5LVk+TMM
+         Hibw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=2xM90dffTvLukV9Gy+9eaM+lQj47FbJNZsqqzLKTSQU=;
-        b=mvJUE5G2F93PMkiXvhAYxgOt1Mnf4TxPClOvyx0V+qhfVDc6h/mZzOwydN+sCOPBtF
-         1hGoCmxZEjrOKq8g3ljH3+pigmCSg/+X0AlKKghhJOwYBgMtDcA88wDgYFGJRB+oDdSz
-         WHo1MFyw/o/+4ZjkuPjcUlmlgr233TgTOGa7LTnEmYhsseFIX0QuaRMJD9wXICwSwVhI
-         fOYziWxSi9fC6aydSzLRkfIHsWXTq2qAfEqAKlBRMGfSsnMeCLTo2qmvr5levXCFpxY8
-         R/rEk4rXRnPtQPD0NGBeGvZ28pk3x5gmAkvqz8fwnZdp5wd6jkUmSY3hVrkgKIUN3wgd
-         PLUQ==
-X-Gm-Message-State: ANhLgQ3xGBbT3Tn4JZ3jiXhaVrjLdaKyutQ7u07vxgplkcrX41fcAEgJ
-        vq9R5chxEruYR9AkVtsAAHk8VTRJjPw=
-X-Google-Smtp-Source: ADFU+vtnzca7ev71glKhOx7IM0T058KrXNu8b/LKSIG5LpecpB/zPdRFXJOGCQv3NWmmvwpWIj5VFA==
-X-Received: by 2002:a63:68a:: with SMTP id 132mr4202411pgg.12.1583953155383;
-        Wed, 11 Mar 2020 11:59:15 -0700 (PDT)
+        b=Q7gP0r2Xq82RRo0/dnwha8IzehJXLo5vdobx6JkD4KBiF8ogMgWNtRLkJoJNisJ/kG
+         Tc/MLIwhYBOl5nKnaEa9MzcKIwURwB7ovFOozanL5EHgTML0wg/FJW5SMWslMP9VtVB3
+         LUlFm9k5ceWnlovTN8JLDeVEebcNg16nq7Jl6+Bjvo0dVznw6EJoq/FnBOZ/ej0h1xRB
+         Ok5PMzrw8IQvFbFLX7ZV/WQWOyy73ATTkKMNAAg552yTRSSXbPosSrUeoqHZ381Dt4M6
+         XR/lRwhAhhhmF2S3C9I5p8dkoM/qQ0xMNFlv90QmmJft42oDPr41mOIaakVnim0RDRPs
+         9hRQ==
+X-Gm-Message-State: ANhLgQ3SBbkVa6AzPCKVYNDR70pew7sCnJyB/vlwTkgfSMkKCT2BMlN1
+        g/ioADMR+nYG8V5+IXIHZgTBiIIdW8Q=
+X-Google-Smtp-Source: ADFU+vsC8NjdCuEvyGUN7dbKWEGh3Ac9IsY66FJRezBs0OwCCN4vTJof/kKFgZhUcQRyQtprEx7NrQ==
+X-Received: by 2002:a17:90b:1991:: with SMTP id mv17mr172284pjb.148.1583953179443;
+        Wed, 11 Mar 2020 11:59:39 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id mp5sm6169252pjb.48.2020.03.11.11.59.14
+        by smtp.gmail.com with ESMTPSA id o2sm45693327pfh.26.2020.03.11.11.59.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2020 11:59:14 -0700 (PDT)
+        Wed, 11 Mar 2020 11:59:38 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Subject: [PATCH v2 1/2] input: hog: Attempt to set security level if not bonded
-Date:   Wed, 11 Mar 2020 11:59:07 -0700
-Message-Id: <20200311185913.8785-1-luiz.dentz@gmail.com>
+Date:   Wed, 11 Mar 2020 11:59:36 -0700
+Message-Id: <20200311185937.9032-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
