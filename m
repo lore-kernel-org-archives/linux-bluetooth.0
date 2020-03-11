@@ -5,64 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A34C0044D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37805C4CC9E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 547AD2074D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08D9D2074E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uEvEANjH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VA9hBLVz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730984AbgCKS7l (ORCPT
+        id S1731003AbgCKS7o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Mar 2020 14:59:41 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:54919 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730734AbgCKS7k (ORCPT
+        Wed, 11 Mar 2020 14:59:44 -0400
+Received: from mail-pg1-f177.google.com ([209.85.215.177]:41213 "EHLO
+        mail-pg1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730944AbgCKS7n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Mar 2020 14:59:40 -0400
-Received: by mail-pj1-f66.google.com with SMTP id np16so1409306pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2020 11:59:40 -0700 (PDT)
+        Wed, 11 Mar 2020 14:59:43 -0400
+Received: by mail-pg1-f177.google.com with SMTP id b1so1684235pgm.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2020 11:59:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=2xM90dffTvLukV9Gy+9eaM+lQj47FbJNZsqqzLKTSQU=;
-        b=uEvEANjHkyzpp/8eH3dcISUMBMskPgSf2TWZN1/diarZU15LoRvVDhB0+EKyCO3kka
-         UPaxht0YgzHZSZO3d8EdkmevF4V5lV2KsgqAc6Gz+bOoUQaUNQxkhWUKIFlTLz2gTxzC
-         vWZV+oABb8GufZnBaPJ7o0HfVWZ/LALxZ0lxGNH3FpN2n7t5fcd4KuFxQlqaZEjUfs4K
-         3wEBMKP8LbxWxaonhPluGaGe3p6GBUop/ROZ3V3p3eJZTjecEkyWQVY9ixNEEMlcP0jC
-         LEfEZ7xiesMBWoq4i2BbV4Vi9re0bhn796XBHaUMoCYJSd/WKhpAamTmy3nh5LVk+TMM
-         Hibw==
+        bh=N3+B3zeEeavgCNkSKoeHw6qkZDgzNb8+BRA4fkGVCkY=;
+        b=VA9hBLVzluOOyXPnJKXhyCYLblWAA2AVLv875fM/So1fXSqKxPe1eZo7ao7iNUcdlI
+         P1e+rGGmPnFteD46qAx8Hi5YrgUDVgtUzkFFCC1xOCdyFlFcr6xXREz/950nWei1JAZB
+         nwooYydYEQSJFUHjjj5NkMjigKZ4lLW4qWDiZv+4+MFgIyJR8AoirvNwHogpyZ4skMyE
+         1XAE1EDyCPOADZzxl/a2vlrJcanfzhctWNpPiGbNiLtAvwaM/S6//06Y7nCWHHX8/x7a
+         E8mnJ7KoWrNi7+0RoG6+8uNXd5xsmnT4o1bsA7OR6j63EAUSDut1EOcgVGQZ9MqTp1F6
+         8bWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2xM90dffTvLukV9Gy+9eaM+lQj47FbJNZsqqzLKTSQU=;
-        b=Q7gP0r2Xq82RRo0/dnwha8IzehJXLo5vdobx6JkD4KBiF8ogMgWNtRLkJoJNisJ/kG
-         Tc/MLIwhYBOl5nKnaEa9MzcKIwURwB7ovFOozanL5EHgTML0wg/FJW5SMWslMP9VtVB3
-         LUlFm9k5ceWnlovTN8JLDeVEebcNg16nq7Jl6+Bjvo0dVznw6EJoq/FnBOZ/ej0h1xRB
-         Ok5PMzrw8IQvFbFLX7ZV/WQWOyy73ATTkKMNAAg552yTRSSXbPosSrUeoqHZ381Dt4M6
-         XR/lRwhAhhhmF2S3C9I5p8dkoM/qQ0xMNFlv90QmmJft42oDPr41mOIaakVnim0RDRPs
-         9hRQ==
-X-Gm-Message-State: ANhLgQ3SBbkVa6AzPCKVYNDR70pew7sCnJyB/vlwTkgfSMkKCT2BMlN1
-        g/ioADMR+nYG8V5+IXIHZgTBiIIdW8Q=
-X-Google-Smtp-Source: ADFU+vsC8NjdCuEvyGUN7dbKWEGh3Ac9IsY66FJRezBs0OwCCN4vTJof/kKFgZhUcQRyQtprEx7NrQ==
-X-Received: by 2002:a17:90b:1991:: with SMTP id mv17mr172284pjb.148.1583953179443;
-        Wed, 11 Mar 2020 11:59:39 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=N3+B3zeEeavgCNkSKoeHw6qkZDgzNb8+BRA4fkGVCkY=;
+        b=FyLfPv3aZhU3G3z0/3r9UOwbf3GOyPrZm+aNSEKEtePGYGLVtbbkmN2p977B3NDdW+
+         B+H7gxDTBQXg4wMU/sLnmhIZljj8jEtzYF6SqquiFcOPF9cso0xh92n3fUVCEePLx0+L
+         WFUp3b8IyIEIKLuPQJhfnEj8Fx+D2RIorqv5xdl/XGfhcIyYCTWon/hdYfr84xtLuE+J
+         cW7UXszkPQGVrX2NZt17nM+6w1DcArBixz0B+QtSx2vCt7v99dIDf3EoUkBKmCstggQw
+         IsQ5GxS+oZaTXT2maNvdATviyjQDy5bDGAxat9n/CYHNCYX7J6AcRxCdfkFhRf/tyKaS
+         OWkA==
+X-Gm-Message-State: ANhLgQ3Ynysoaxgf2V8brQVWOB8n9L/BnKl0moNZMeDqFoE64Cv47d7S
+        u3x5LeiRLvwuO0eZ9QKNcZhIxbGBXgA=
+X-Google-Smtp-Source: ADFU+vtB/yMZ13p7H1EUhOjZBWyjBBB2nRRJbbns28oiCE5ojJvajjHpqq4IVFB5qBzQDzZWMKjjPg==
+X-Received: by 2002:a63:544:: with SMTP id 65mr4041597pgf.72.1583953180659;
+        Wed, 11 Mar 2020 11:59:40 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id o2sm45693327pfh.26.2020.03.11.11.59.38
+        by smtp.gmail.com with ESMTPSA id o2sm45693327pfh.26.2020.03.11.11.59.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2020 11:59:38 -0700 (PDT)
+        Wed, 11 Mar 2020 11:59:40 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] input: hog: Attempt to set security level if not bonded
-Date:   Wed, 11 Mar 2020 11:59:36 -0700
-Message-Id: <20200311185937.9032-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/2] input: Add LEAudioSecurity setting to input.conf
+Date:   Wed, 11 Mar 2020 11:59:37 -0700
+Message-Id: <20200311185937.9032-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200311185937.9032-1-luiz.dentz@gmail.com>
+References: <20200311185937.9032-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,46 +75,119 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This attempts to set the security if the device is not bonded, the
-kernel will block any communication on the ATT socket while bumping
-the security and if that fails the device will be disconnected which
-is better than having the device dangling around without being able to
-communicate with it until it is properly bonded.
----
- profiles/input/hog.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+LEAudioSecurity can be used to enable/disable automatic upgrades of
+security for LE devices, by default it is enabled so existing devices
+that did not require security and were not bonded will automatically
+upgrade the security.
 
+Note: Platforms disabling this setting would require users to manually
+bond the device which may require changes to the user interface to
+always force bonding for input devices ad APIs such as Device.Connect
+directly will no longer work which maybe perceived as a regression.
+---
+ profiles/input/device.h   |  1 +
+ profiles/input/hog.c      | 13 +++++++++++--
+ profiles/input/input.conf |  5 +++++
+ profiles/input/manager.c  | 11 ++++++++++-
+ 4 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/profiles/input/device.h b/profiles/input/device.h
+index 3044db673..5a077f92a 100644
+--- a/profiles/input/device.h
++++ b/profiles/input/device.h
+@@ -30,6 +30,7 @@ struct input_conn;
+ void input_set_idle_timeout(int timeout);
+ void input_enable_userspace_hid(bool state);
+ void input_set_classic_bonded_only(bool state);
++void input_set_auto_sec(bool state);
+ 
+ int input_device_register(struct btd_service *service);
+ void input_device_unregister(struct btd_service *service);
 diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index dfac68921..f0226ebbd 100644
+index f0226ebbd..327a1d1c3 100644
 --- a/profiles/input/hog.c
 +++ b/profiles/input/hog.c
-@@ -49,6 +49,8 @@
- #include "src/shared/util.h"
- #include "src/shared/uhid.h"
- #include "src/shared/queue.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-client.h"
+@@ -53,6 +53,7 @@
+ #include "src/shared/gatt-client.h"
  #include "src/plugin.h"
  
++#include "device.h"
  #include "suspend.h"
-@@ -187,8 +189,15 @@ static int hog_accept(struct btd_service *service)
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+@@ -67,8 +68,14 @@ struct hog_device {
+ };
+ 
+ static gboolean suspend_supported = FALSE;
++static bool auto_sec = true;
+ static struct queue *devices = NULL;
+ 
++void input_set_auto_sec(bool state)
++{
++	auto_sec = state;
++}
++
+ static void hog_device_accept(struct hog_device *dev, struct gatt_db *db)
+ {
+ 	char name[248];
+@@ -192,11 +199,13 @@ static int hog_accept(struct btd_service *service)
+ 	if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))) {
+ 		struct bt_gatt_client *client;
+ 
++		if (!auto_sec)
++			return -ECONNREFUSED;
++
+ 		client = btd_device_get_gatt_client(device);
+ 		if (!bt_gatt_client_set_security(client,
+-						BT_ATT_SECURITY_MEDIUM)) {
++						BT_ATT_SECURITY_MEDIUM))
+ 			return -ECONNREFUSED;
+-		}
  	}
  
- 	/* HOGP 1.0 Section 6.1 requires bonding */
--	if (!device_is_bonded(device, btd_device_get_bdaddr_type(device)))
--		return -ECONNREFUSED;
-+	if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))) {
-+		struct bt_gatt_client *client;
-+
-+		client = btd_device_get_gatt_client(device);
-+		if (!bt_gatt_client_set_security(client,
-+						BT_ATT_SECURITY_MEDIUM)) {
-+			return -ECONNREFUSED;
-+		}
-+	}
- 
  	/* TODO: Replace GAttrib with bt_gatt_client */
- 	bt_hog_attach(dev->hog, attrib);
+diff --git a/profiles/input/input.conf b/profiles/input/input.conf
+index 166aff4a4..4c70bc561 100644
+--- a/profiles/input/input.conf
++++ b/profiles/input/input.conf
+@@ -19,3 +19,8 @@
+ # pairing/encryption.
+ # Defaults to false to maximize device compatibility.
+ #ClassicBondedOnly=true
++
++# LE upgrade security
++# Enables upgrades of security automatically if required.
++# Defaults to true to maximize device compatibility.
++#LEAutoSecurity=true
+diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+index 5cd27b839..bf4acb4ed 100644
+--- a/profiles/input/manager.c
++++ b/profiles/input/manager.c
+@@ -96,7 +96,7 @@ static int input_init(void)
+ 	config = load_config_file(CONFIGDIR "/input.conf");
+ 	if (config) {
+ 		int idle_timeout;
+-		gboolean uhid_enabled, classic_bonded_only;
++		gboolean uhid_enabled, classic_bonded_only, auto_sec;
+ 
+ 		idle_timeout = g_key_file_get_integer(config, "General",
+ 							"IdleTimeout", &err);
+@@ -125,6 +125,15 @@ static int input_init(void)
+ 		} else
+ 			g_clear_error(&err);
+ 
++		auto_sec = g_key_file_get_boolean(config, "General",
++						"LEAutoSecurity", &err);
++		if (!err) {
++			DBG("input.conf: LEAutoSecurity=%s",
++					auto_sec ? "true" : "false");
++			input_set_auto_sec(auto_sec);
++		} else
++			g_clear_error(&err);
++
+ 	}
+ 
+ 	btd_profile_register(&input_profile);
 -- 
 2.21.1
 
