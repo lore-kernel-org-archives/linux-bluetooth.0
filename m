@@ -2,92 +2,140 @@ Return-Path: <SRS0=o7la=44=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FE3C10F27
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 08:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2625BC10F29
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 09:24:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E08A208E4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 08:08:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/6H03UV"
+	by mail.kernel.org (Postfix) with ESMTP id F160A20828
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 09:24:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583918671;
+	bh=rrlZpoQvhREhLmdMclb1adRCxmBTNBjsqdG0JIe+Srs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Ymfa7Hho6ZyYeZyF5tniAVVNbQdwShNS7eph/uaeMHso/eS/7FICdYjb7Mo0XKga9
+	 ONVT2icmihLWRQ2QMO+i2ze+mi5Oza/TP+q2a0tH+mFvvD6K36hvh/m+BypER3V7ux
+	 bpZBcQCIu/0dyFXDwKcdwRWpgEw9CTugsU4+t+PA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728581AbgCKIIX (ORCPT
+        id S1728606AbgCKJY1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Mar 2020 04:08:23 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:45056 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728578AbgCKIIX (ORCPT
+        Wed, 11 Mar 2020 05:24:27 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:42209 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726097AbgCKJY1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Mar 2020 04:08:23 -0400
-Received: by mail-pl1-f193.google.com with SMTP id b22so707049pls.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2020 01:08:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=gBBVFcz129ATYUp3xFoU+B3Q1NnkLaOTSFjTnDqkX0c=;
-        b=F/6H03UVyZDuVDLkubEs8bXNusqoG3eexC/p2zhS4y98hUBxaFXE3rr5cFL5vBnvCE
-         TCppwO7bbFCPO2mki8k69B/1ONf64X1xjNUBtb99tOudCUn2IdsacSBYAtfl4LTJIVeo
-         BLmh32CqgMmhj+iH+REzAaoMbtnn7QUg1BKfNP7u5u4pe+dLPuW2ZEO8gg8bihkS82yf
-         b9wBnCXuGBrWRsC25XsfOIBsCuBYeO0ve5zVDsQXJXPJDMctO4Sfkoe6eM0sK4+8jHpO
-         jjr+gtwvgkkzFrNFdb8liAPnCR7vzpkCAO9Y8rJsJsVecna7tjKkoSwpd/Mor0hhVmIS
-         MIGQ==
+        Wed, 11 Mar 2020 05:24:27 -0400
+Received: by mail-lj1-f193.google.com with SMTP id q19so1456590ljp.9;
+        Wed, 11 Mar 2020 02:24:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=gBBVFcz129ATYUp3xFoU+B3Q1NnkLaOTSFjTnDqkX0c=;
-        b=do20z85bkX4zQ0WHJsNUTl+l0d4P7SwZZMQ8YL7M3Lbd3e5SxJpTq/whWIpQoGNve+
-         fvcuxUwVB+BQywS878sfb0RTzA9Ap7bVnHTYaTF8KRO7YCySWz3lg6QdqI2bkx9qik0j
-         Nu7E4C+7C28X74apTUp56gojIyfn2ZpUrJPTvvpna2z1Oye5J5bSBpqZ5ZB7ruqI0o1k
-         P3U1Cosw9JN8j9MBH9YLonuckKCTnhueXA03VCWK2kZEejIzMc8e88/i+ODr6SbUO5MP
-         XIdoqJOCFLflgBnVXBuBn7NJRgGrj9NnrDwhbDgrdDWS+CVJ5ZalOCyTEPG9TQBENl2Q
-         96Bg==
-X-Gm-Message-State: ANhLgQ1acwiDFiAwur/0p1Gp0vW+xc6CaTlNSaKfOhLTXh+vPf+HCjAz
-        IhbWZ28+UJdAa0sjrSFsmeb8fp2BfWCR9A==
-X-Google-Smtp-Source: ADFU+vtsugpC0G+BsjorK/Z1Af6UuMfTf/I3NmbRT5KPX6w+y1p1PIdB/GYYYyRLBNhF/JbPN8ZDiQ==
-X-Received: by 2002:a17:90a:34c6:: with SMTP id m6mr2247267pjf.13.1583914102104;
-        Wed, 11 Mar 2020 01:08:22 -0700 (PDT)
-Received: from localhost ([192.55.54.40])
-        by smtp.gmail.com with ESMTPSA id w206sm7902894pfc.54.2020.03.11.01.08.20
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=oTEgx+0q+wWx+G15t9Th6GjnGh/fBTDFvpJM0EhSSqg=;
+        b=fwxu2w7MMtm/x0hf3Cffk7yAO5eCmJidEVDf7cUyikp7L+Of/ZryD6H873cV9fR4lx
+         a0UWKNzkamTKmkOTh+xfwNH6iP50GbpJwDhVww3NWe8aS9HGQbHgQpKJFGIJJdZH8Osc
+         9cauMHySd8mtWNKj8k6Q3gb3i/DFIdl2NhF4anpTiNRF/ZljOcYib50hWk9Wi813R+KL
+         TajokvhN+1M/4Xok3Serw40kRx0E/0lwBUOUBccNYKasvLcvUynJXF74bFCT6aOkumsS
+         kp/1eHP40hus1keHPX71IrUYM5CXifL6m6yPVEYwqmSXDktAW9OIYLbdxyrgOzLZnzf1
+         aKaA==
+X-Gm-Message-State: ANhLgQ096Y2DDBdIwrOQs7fWcRW5Y3hNZB2gGWJzF6aDFMReezeEkD/e
+        HEcPrgmb1LINnU7+6049OZ8=
+X-Google-Smtp-Source: ADFU+vvQvYAE4SLupfEd5gDlFgHDl8iVN8OI49a+BbJLpOrASXqS8Bxt0ncyKf6hhI+pJzBAPHKQdQ==
+X-Received: by 2002:a2e:801a:: with SMTP id j26mr1519598ljg.249.1583918665226;
+        Wed, 11 Mar 2020 02:24:25 -0700 (PDT)
+Received: from xi.terra (c-12aae455.07-184-6d6c6d4.bbcust.telenor.se. [85.228.170.18])
+        by smtp.gmail.com with ESMTPSA id t3sm14614706lfp.81.2020.03.11.02.24.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Mar 2020 01:08:21 -0700 (PDT)
-Date:   Wed, 11 Mar 2020 10:08:18 +0200
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: bfusb: Switch from BT_ERR to bt_dev_err where
- possible
-Message-ID: <20200311080818.GC3293@rboyd-mobl.ger.corp.intel.com>
-Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-References: <20200309214456.431153-1-marcel@holtmann.org>
+        Wed, 11 Mar 2020 02:24:24 -0700 (PDT)
+Received: from johan by xi.terra with local (Exim 4.92.3)
+        (envelope-from <johan@kernel.org>)
+        id 1jBxb2-0004UZ-7N; Wed, 11 Mar 2020 10:24:12 +0100
+Date:   Wed, 11 Mar 2020 10:24:12 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Rocky Liao <rjliao@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Replace devm_gpiod_get() with
+ devm_gpiod_get_optional()
+Message-ID: <20200311092412.GH14211@localhost>
+References: <20200304131645.22057-1-rjliao@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200309214456.431153-1-marcel@holtmann.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <20200304131645.22057-1-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
-
-On Mon, Mar 09, 2020, Marcel Holtmann wrote:
-> All HCI device specific error messages shall use bt_dev_err to indicate
-> the device name in the message.
+On Wed, Mar 04, 2020 at 09:16:45PM +0800, Rocky Liao wrote:
+> This patch replaces devm_gpiod_get() with devm_gpiod_get_optional() to get
+> bt_en and replaces devm_clk_get() with devm_clk_get_optional() to get
+> susclk. It also uses NULL check to determine whether the resource is
+> available or not.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Fixes: 8a208b24d770 ("Bluetooth: hci_qca: Make bt_en and susclk not mandatory for QCA Rome")
+> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
 > ---
->  drivers/bluetooth/bfusb.c | 33 ++++++++++++++++-----------------
->  1 file changed, 16 insertions(+), 17 deletions(-)
+>  drivers/bluetooth/hci_qca.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+> @@ -1901,15 +1901,15 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  		}
+>  	} else {
+>  		qcadev->btsoc_type = QCA_ROME;
+> -		qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
+> +		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+>  					       GPIOD_OUT_LOW);
+> -		if (IS_ERR(qcadev->bt_en)) {
+> +		if (!qcadev->bt_en) {
+>  			dev_warn(&serdev->dev, "failed to acquire enable gpio\n");
+
+Shouldn't this be dev_dbg() if the gpio is indeed optional?
+
+>  			power_ctrl_enabled = false;
+>  		}
+>  
+> -		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+> -		if (IS_ERR(qcadev->susclk)) {
+> +		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
+> +		if (!qcadev->susclk) {
+>  			dev_warn(&serdev->dev, "failed to acquire clk\n");
+
+Same here.
+
+>  		} else {
+>  			err = clk_set_rate(qcadev->susclk, SUSCLK_RATE_32KHZ);
+> @@ -1924,7 +1924,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
+>  		if (err) {
+>  			BT_ERR("Rome serdev registration failed");
+> -			if (!IS_ERR(qcadev->susclk))
+> +			if (qcadev->susclk)
+>  				clk_disable_unprepare(qcadev->susclk);
+
+The clock framework allows you to pass in NULL precisely to be able to
+handle optional resources without sprinkling conditionals all over (the
+gpio subsystem does not however).
+
+Applies to clk_set_rate() etc. above as well.
+
+>  			return err;
+>  		}
+> @@ -1945,7 +1945,7 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+>  
+>  	if (qca_is_wcn399x(qcadev->btsoc_type))
+>  		qca_power_shutdown(&qcadev->serdev_hu);
+> -	else if (!IS_ERR(qcadev->susclk))
+> +	else if (qcadev->susclk)
+>  		clk_disable_unprepare(qcadev->susclk);
+
+Same here.
+
+>  	hci_uart_unregister_device(&qcadev->serdev_hu);
 
 Johan
