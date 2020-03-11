@@ -2,177 +2,116 @@ Return-Path: <SRS0=o7la=44=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C58FC4CC9E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 17:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E10F8C0044D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ABF742074F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 17:20:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0FC2205ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Mar 2020 18:59:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DxkJwdYB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lzO753Xc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730457AbgCKRUd (ORCPT
+        id S1730973AbgCKS7R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Mar 2020 13:20:33 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:43743 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730211AbgCKRU2 (ORCPT
+        Wed, 11 Mar 2020 14:59:17 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:34440 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730734AbgCKS7R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Mar 2020 13:20:28 -0400
-Received: by mail-vs1-f66.google.com with SMTP id 7so1833296vsr.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2020 10:20:27 -0700 (PDT)
+        Wed, 11 Mar 2020 14:59:17 -0400
+Received: by mail-pg1-f196.google.com with SMTP id t3so1697968pgn.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Mar 2020 11:59:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MEkaiHQZMx1UJA9RPgEM4Gg2VNhyN6paaXR7j/Fo1Hs=;
-        b=DxkJwdYB2pE55yk2uohYiCIxvUd2RfSY0xgbwxZSRdlVNQXspPc65ZzAEqaVwDUvvw
-         HQvs8uHNlP3u+/LIioDnxGa26S8ZMPqF/OJv3pA2r5z5GqhGONIrzSHeT5rt/OumVHTY
-         efB2XSO4fgf1K5Rft2dfoGNnenwPrk5roFVOE=
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2xM90dffTvLukV9Gy+9eaM+lQj47FbJNZsqqzLKTSQU=;
+        b=lzO753XctsfcZ0zmrUEIB0hI9K5H6MKzslXKnE9ucyux0XrNBLLIq9M8zeawLxT8VN
+         6r4NzfDDwq/oYT1QD+EFnmkC6dDMTOMOQRoEw3Ghx9qNJk4bmtjrSNFra/nVubQu9ZPx
+         S5HxjqL+Lw83tQsDc8MMKnNKCT1giXUAFvYOX2HYUniX6uF+VLajjO+OMVsXXVBpXLeZ
+         H0Aw9VlTKVdiH0ZnDgs4bPTZldLlka77FxAP3T4mnZLpNGEPt4deQYujvPdCrdERscZC
+         t0h6qzTGy0P4u9fmmovz9YLkUtsWdYuzn8tprhIqhHDgVFN4jHx1quWMuN0rfqfiMnWM
+         C5pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MEkaiHQZMx1UJA9RPgEM4Gg2VNhyN6paaXR7j/Fo1Hs=;
-        b=hFiQ0JYdNx/h34gtmKkXU79q+mrPkywi5ySRoSPrJ8HXKqoQtKBa8ncAQRBBI3Gx1y
-         R29Fuu+8G9DIBRf/i6G6BNb2l3HBltrTUjVQ4mPNnRojHcHDTD9n17o9VgLSFxoAjNZW
-         0LcoDKHycKNgNtRP23CL0QN/A+8slVSUerVkZ+2q8ZP9ndX2SVzm8dvYAyTPZ7NhsWC+
-         Ms0d6WYkWnbC1hccFL0vH/atj+JssvqRxcpHE4uVrRjCkzx6P112EYCK+yIEtfxzm00E
-         Mefg4urSHsI0WEnoUIJnzc8Dwk2g8/Kq5co23/bjVp0fjhylDGNuMUbbd4ih+3XL5l4f
-         ARyg==
-X-Gm-Message-State: ANhLgQ2fsELaADJRCrLWPSfwYEipMwvEjFqyyKClhFTtOKl/38FilO0N
-        Uqmg3JLDUTv1o3F18fI5dKLQa2B5oZHNQJlfnIDVIA==
-X-Google-Smtp-Source: ADFU+vsm48zQXYAH+XHZSsly3C3Iz0YrevywINbpKGf7IJNsROsnavS2KVQwpDvPZmQWsJ2sHnsknN2/rlM5sI4a2dk=
-X-Received: by 2002:a67:f641:: with SMTP id u1mr2714335vso.86.1583947226874;
- Wed, 11 Mar 2020 10:20:26 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2xM90dffTvLukV9Gy+9eaM+lQj47FbJNZsqqzLKTSQU=;
+        b=mvJUE5G2F93PMkiXvhAYxgOt1Mnf4TxPClOvyx0V+qhfVDc6h/mZzOwydN+sCOPBtF
+         1hGoCmxZEjrOKq8g3ljH3+pigmCSg/+X0AlKKghhJOwYBgMtDcA88wDgYFGJRB+oDdSz
+         WHo1MFyw/o/+4ZjkuPjcUlmlgr233TgTOGa7LTnEmYhsseFIX0QuaRMJD9wXICwSwVhI
+         fOYziWxSi9fC6aydSzLRkfIHsWXTq2qAfEqAKlBRMGfSsnMeCLTo2qmvr5levXCFpxY8
+         R/rEk4rXRnPtQPD0NGBeGvZ28pk3x5gmAkvqz8fwnZdp5wd6jkUmSY3hVrkgKIUN3wgd
+         PLUQ==
+X-Gm-Message-State: ANhLgQ3xGBbT3Tn4JZ3jiXhaVrjLdaKyutQ7u07vxgplkcrX41fcAEgJ
+        vq9R5chxEruYR9AkVtsAAHk8VTRJjPw=
+X-Google-Smtp-Source: ADFU+vtnzca7ev71glKhOx7IM0T058KrXNu8b/LKSIG5LpecpB/zPdRFXJOGCQv3NWmmvwpWIj5VFA==
+X-Received: by 2002:a63:68a:: with SMTP id 132mr4202411pgg.12.1583953155383;
+        Wed, 11 Mar 2020 11:59:15 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id mp5sm6169252pjb.48.2020.03.11.11.59.14
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Mar 2020 11:59:14 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/2] input: hog: Attempt to set security level if not bonded
+Date:   Wed, 11 Mar 2020 11:59:07 -0700
+Message-Id: <20200311185913.8785-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200311155404.209990-1-abhishekpandit@chromium.org> <99C097F2-FD84-49B8-B3D7-F03C34C4F563@holtmann.org>
-In-Reply-To: <99C097F2-FD84-49B8-B3D7-F03C34C4F563@holtmann.org>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Wed, 11 Mar 2020 10:20:16 -0700
-Message-ID: <CANFp7mV-0HjEzYwh4LacMPOJCqgF1=1zwQ66e+8Hd6pODa3dMQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v6 0/5] Bluetooth: Handle system suspend gracefully
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Alain Michaud <alainm@chromium.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Let's continue the discussion on the bluez list.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I will update the patch series so that the "set_wake_capable"
-management change is last in the series there as well and send out an
-update today.
+This attempts to set the security if the device is not bonded, the
+kernel will block any communication on the ATT socket while bumping
+the security and if that fails the device will be disconnected which
+is better than having the device dangling around without being able to
+communicate with it until it is properly bonded.
+---
+ profiles/input/hog.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-Thanks
-Abhishek
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index dfac68921..f0226ebbd 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -49,6 +49,8 @@
+ #include "src/shared/util.h"
+ #include "src/shared/uhid.h"
+ #include "src/shared/queue.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-client.h"
+ #include "src/plugin.h"
+ 
+ #include "suspend.h"
+@@ -187,8 +189,15 @@ static int hog_accept(struct btd_service *service)
+ 	}
+ 
+ 	/* HOGP 1.0 Section 6.1 requires bonding */
+-	if (!device_is_bonded(device, btd_device_get_bdaddr_type(device)))
+-		return -ECONNREFUSED;
++	if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))) {
++		struct bt_gatt_client *client;
++
++		client = btd_device_get_gatt_client(device);
++		if (!bt_gatt_client_set_security(client,
++						BT_ATT_SECURITY_MEDIUM)) {
++			return -ECONNREFUSED;
++		}
++	}
+ 
+ 	/* TODO: Replace GAttrib with bt_gatt_client */
+ 	bt_hog_attach(dev->hog, attrib);
+-- 
+2.21.1
 
-On Wed, Mar 11, 2020 at 10:05 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Abhishek,
->
-> > This patch series prepares the Bluetooth controller for system suspend
-> > by disconnecting all devices and preparing the event filter and LE
-> > whitelist with devices that can wake the system from suspend.
-> >
-> > The main motivation for doing this is so we can enable Bluetooth as
-> > a wake up source during suspend without it being noisy. Bluetooth should
-> > wake the system when a HID device receives user input but otherwise not
-> > send any events to the host.
-> >
-> > This patch series was tested on several Chromebooks with both btusb and
-> > hci_serdev on kernel 4.19. The set of tests was basically the following:
-> > * Reconnects after suspend succeed
-> > * HID devices can wake the system from suspend (needs some related bluez
-> >  changes to call the Set Wake Capable management command)
-> > * System properly pauses and unpauses discovery + advertising around
-> >  suspend
-> > * System does not wake from any events from non wakeable devices
-> >
-> > Series 2 has refactored the change into multiple smaller commits as
-> > requested. I tried to simplify some of the whitelist filtering edge
-> > cases but unfortunately it remains quite complex.
-> >
-> > Series 3 has refactored it further and should have resolved the
-> > whitelisting complexity in series 2.
-> >
-> > Series 4 adds a fix to check for powered down and powering down adapters.
-> >
-> > Series 5 moves set_wake_capable to the last patch in the series and
-> > changes BT_DBG to bt_dev_dbg.
-> >
-> > Please review and provide any feedback.
-> >
-> > Thanks
-> > Abhishek
-> >
-> >
-> > Changes in v6:
-> > * Removed unused variables in hci_req_prepare_suspend
-> > * Add int old_state to this patch
-> >
-> > Changes in v5:
-> > * Convert BT_DBG to bt_dev_dbg
-> > * Added wakeable list and changed BT_DBG to bt_dev_dbg
-> > * Add wakeable to hci_conn_params and change BT_DBG to bt_dev_dbg
-> > * Changed BT_DBG to bt_dev_dbg
-> > * Wakeable entries moved to other commits
-> > * Patch moved to end of series
-> >
-> > Changes in v4:
-> > * Added check for mgmt_powering_down and hdev_is_powered in notifier
-> >
-> > Changes in v3:
-> > * Refactored to only handle BR/EDR devices
-> > * Split LE changes into its own commit
-> > * Added wakeable property to le_conn_param
-> > * Use wakeable list for BR/EDR and wakeable property for LE
-> >
-> > Changes in v2:
-> > * Moved pm notifier registration into its own patch and moved params out
-> >  of separate suspend_state
-> > * Refactored filters and whitelist settings to its own patch
-> > * Refactored update_white_list to have clearer edge cases
-> > * Add connected devices to whitelist (previously missing corner case)
-> > * Refactored pause discovery + advertising into its own patch
-> >
-> > Abhishek Pandit-Subedi (5):
-> >  Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND
-> >  Bluetooth: Handle BR/EDR devices during suspend
-> >  Bluetooth: Handle LE devices during suspend
-> >  Bluetooth: Pause discovery and advertising during suspend
-> >  Bluetooth: Add mgmt op set_wake_capable
-> >
-> > include/net/bluetooth/hci.h      |  17 +-
-> > include/net/bluetooth/hci_core.h |  43 ++++
-> > include/net/bluetooth/mgmt.h     |   7 +
-> > net/bluetooth/hci_core.c         | 102 ++++++++++
-> > net/bluetooth/hci_event.c        |  24 +++
-> > net/bluetooth/hci_request.c      | 331 ++++++++++++++++++++++++++-----
-> > net/bluetooth/hci_request.h      |   2 +
-> > net/bluetooth/mgmt.c             |  92 +++++++++
-> > 8 files changed, 558 insertions(+), 60 deletions(-)
->
-> patches 1-4 have been applied to bluetooth-next tree.
->
-> I skipped patch 5 since now we have to discuss how best the API for setting the wakeable devices will be. Care to start up a discussion thread for that?
->
-> Regards
->
-> Marcel
->
