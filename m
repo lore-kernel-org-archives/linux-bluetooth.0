@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7865BC2BB1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B5DC4CECE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4789F206CD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51C32206CD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEkwMykM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YiwjsbFU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726799AbgCLWZA (ORCPT
+        id S1726802AbgCLWZA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 12 Mar 2020 18:25:00 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34999 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726715AbgCLWY7 (ORCPT
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:51245 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726715AbgCLWZA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Mar 2020 18:24:59 -0400
-Received: by mail-pf1-f193.google.com with SMTP id u68so3974802pfb.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 15:24:58 -0700 (PDT)
+        Thu, 12 Mar 2020 18:25:00 -0400
+Received: by mail-pj1-f65.google.com with SMTP id y7so3129197pjn.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 15:25:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=UfpKScryq+b+Dq0jYYgZlZOtV9tXDIHCtot1ZFAOB4k=;
-        b=VEkwMykMtYGLrJgiVqC4TF/d8F3aGKZyqy2mO7ZNM+1K4Ybx65O5F1y9rPAijEvHdo
-         43qX5jYkH52rJqr31+N6td11moCRq29SwjVUsDCM9J9ZKF8Wn/fi5HI5j83bvfCYw/xC
-         oDbRGQRoKPlInHpR/rXZtgMfvmg3A7V2RMinQLYalpX7Afy15M5K3WBbUxTwe3nF4B8y
-         18Qee7aW8O91aA+ZBRO+HeLwnKq431Lk5ZP1pFEamQFZs3vNLeGsh9nNmUm7DSupWCnI
-         nVJDUUnlV8T9oXJ6wk/l0zWVoffaUn2pfW0XNoLhtmGjPj38aWBKRjiGk4SJN9oV4mcy
-         hbIg==
+        bh=Kg0x0dz+SacJF75cgIcqz+u2Ra2gW+cK0VSXXQAL0Lk=;
+        b=YiwjsbFU2pLvMcUkatMu+bJL0gUSWG61w8Jo/qqpFKI0tDMQrGhceO0rUFNUeDujE+
+         8VUIexjG96eqSjWWhN8QS6hMD/wjk89hJGUhkKxqio9xIb2gBG5ydujGaIxdCEoj3eyx
+         L9Y3axrgv1Cpa8qcIQyBWv4ZP5DnE30e9k/J3dU2Not10bCBwEATwX/4cDh7sa8b4xT0
+         wdBaWr1qJUF27B1lWx+EjuBdtUljQiFV3ncIIyApSvpotU4KNIUZqvYLlr/jHPRUXoTC
+         l3gHCJNYOtfgz38ZunUA3yRr8LpP4uo2elqrJEzv+DlMzIDjPAY+KZWgOeG6+gi6FFEP
+         yINA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=UfpKScryq+b+Dq0jYYgZlZOtV9tXDIHCtot1ZFAOB4k=;
-        b=kFw06axDvI5krdtmpC93Mzzx1HIjCCrOR4KNKaxlZPtXyU4yT8kpU74UUEVMmsWYKF
-         Dv6Glfu5l45pm9h0xO76PqsWTNXRgGNb6gnCYRDcCYNJ1Vx2DdXfSOrguqomgaitiVjJ
-         mBPZGsJxOoJ4oVtv6FdHvzovWZuaVKCK2ZVRCakcnh0Bjb7c5MCQM4O8BQwx4a8OKdP7
-         l6N0yVB6YidxDBQRvLcDeKMotWZDwBd8+xI9UcVZNpLfb+OMCe7Xo5n0kZ03QqD/WS61
-         7ktdUjARFSstXvwKU2Jze31uQ8kTeiV6vNmqjGvLibzsE53LCRVZiUPBeq/dUn0Ivxjc
-         i4Hw==
-X-Gm-Message-State: ANhLgQ0+jMqycqUj/eBeCTS2v9NSbZH7y4nAN8wm064wSsHllDHdM+9z
-        +EVSVpTrrhs8QwBwsH8zTrMII+ErHS8=
-X-Google-Smtp-Source: ADFU+vvjxHzXANGPhTHYqrfimidAE7wjQcJxr54mPYeD8d7XxaU7hEGOK8ZCtEZk0jvJ7ti9LysFlQ==
-X-Received: by 2002:aa7:9811:: with SMTP id e17mr10003281pfl.33.1584051897861;
-        Thu, 12 Mar 2020 15:24:57 -0700 (PDT)
+        bh=Kg0x0dz+SacJF75cgIcqz+u2Ra2gW+cK0VSXXQAL0Lk=;
+        b=jZ8+X1rIdYMmG1Z+LuSICUvGKl5xTm5uu7Pjb8KptfaSvx2Mzez3ZHegRs5yhRHM6l
+         NfGD3PFljxiSFBUXFI3oNkXoYlrNIR/Pz+ZX5wxV/IHTS5XZerx5hD5uGYXt4fEkNOVm
+         4Lzu0z/uFukxSPuVKdIYZsmWhwKrS5iZpRcSA6dZhjAwOltM28/mnDgj57p071RZzN/M
+         ljhH9E/W8ju02YDmOC3dbLj+ih0LQTHPzM0RjjZW8ltdTX7KHn8oxWA0FaFUEE1PfiaL
+         C6YN1R5yk6gygMbR4p/m7G/CV/TtJl9KuKnqB0WiomxHyncuJ2TZEt7JFUiBF3eIJ+PC
+         L9sg==
+X-Gm-Message-State: ANhLgQ0kawfZi3JUE6wUzkfGSMWHUN5txwAtOXPHrK8BYwK6yXJY3H99
+        Qo3G8gzWD6f7E7+ZmOVrrfTFovGvdH4=
+X-Google-Smtp-Source: ADFU+vv3c3IliduJ8vvaK1GFSHbqSQ35k82hKnKw45dqjKRnJscv8yuNkSnd87r1A7EnvBfXDX+vfg==
+X-Received: by 2002:a17:902:8608:: with SMTP id f8mr10172515plo.110.1584051899170;
+        Thu, 12 Mar 2020 15:24:59 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x190sm56827659pfb.96.2020.03.12.15.24.56
+        by smtp.gmail.com with ESMTPSA id x190sm56827659pfb.96.2020.03.12.15.24.57
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2020 15:24:56 -0700 (PDT)
+        Thu, 12 Mar 2020 15:24:58 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections
-Date:   Thu, 12 Mar 2020 15:24:53 -0700
-Message-Id: <20200312222454.5079-2-luiz.dentz@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Add BT_MODE socket option
+Date:   Thu, 12 Mar 2020 15:24:54 -0700
+Message-Id: <20200312222454.5079-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200312222454.5079-1-luiz.dentz@gmail.com>
 References: <20200312222454.5079-1-luiz.dentz@gmail.com>
@@ -75,259 +75,141 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses the DEFER_SETUP flag to group channels with
-L2CAP_CREDIT_BASED_CONNECTION_REQ.
+This adds BT_MODE socket option which can be used to set L2CAP modes,
+including modes only supported over LE which were not supported using
+the L2CAP_OPTIONS.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/l2cap.h |   5 ++
- net/bluetooth/l2cap_core.c    | 130 +++++++++++++++++++++++++++++++---
- net/bluetooth/l2cap_sock.c    |  13 ++--
- 3 files changed, 133 insertions(+), 15 deletions(-)
+ include/net/bluetooth/bluetooth.h |  2 +
+ net/bluetooth/l2cap_sock.c        | 79 +++++++++++++++++++++++++------
+ 2 files changed, 66 insertions(+), 15 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 537aaead259f..dada14d0622c 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -47,6 +47,7 @@
- #define L2CAP_DEFAULT_ACC_LAT		0xFFFFFFFF
- #define L2CAP_BREDR_MAX_PAYLOAD		1019    /* 3-DH5 packet */
- #define L2CAP_LE_MIN_MTU		23
-+#define L2CAP_ECRED_CONN_SCID_MAX	5
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 1576353a2773..c361ec7b06aa 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -139,6 +139,8 @@ struct bt_voice {
+ #define BT_PHY_LE_CODED_TX	0x00002000
+ #define BT_PHY_LE_CODED_RX	0x00004000
  
- #define L2CAP_DISC_TIMEOUT		msecs_to_jiffies(100)
- #define L2CAP_DISC_REJ_TIMEOUT		msecs_to_jiffies(5000)
-@@ -660,6 +661,7 @@ struct l2cap_ops {
- 	void			(*suspend) (struct l2cap_chan *chan);
- 	void			(*set_shutdown) (struct l2cap_chan *chan);
- 	long			(*get_sndtimeo) (struct l2cap_chan *chan);
-+	struct pid		*(*get_peer_pid) (struct l2cap_chan *chan);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long hdr_len,
- 					       unsigned long len, int nb);
-@@ -983,6 +985,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-+typedef void (*l2cap_chan_func_t)(struct l2cap_chan *chan, void *data);
-+void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-+		     void *data);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
- void l2cap_send_conn_req(struct l2cap_chan *chan);
- void l2cap_move_start(struct l2cap_chan *chan);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5e6e35ab44dd..20c1d5f9c238 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -678,6 +678,29 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- }
- EXPORT_SYMBOL_GPL(l2cap_chan_del);
- 
-+static void __l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-+			      void *data)
-+{
-+	struct l2cap_chan *chan;
++#define BT_MODE			15
 +
-+	list_for_each_entry(chan, &conn->chan_l, list) {
-+		func(chan, data);
-+	}
-+}
-+
-+void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-+		     void *data)
-+{
-+	if (!conn)
-+		return;
-+
-+	mutex_lock(&conn->chan_lock);
-+	__l2cap_chan_list(conn, func, data);
-+	mutex_unlock(&conn->chan_lock);
-+}
-+
-+EXPORT_SYMBOL_GPL(l2cap_chan_list);
-+
- static void l2cap_conn_update_id_addr(struct work_struct *work)
- {
- 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
-@@ -1356,29 +1379,77 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
- 		       sizeof(req), &req);
- }
- 
--static void l2cap_ecred_connect(struct l2cap_chan *chan)
--{
--	struct l2cap_conn *conn = chan->conn;
-+struct l2cap_ecred_conn_data {
- 	struct {
- 		struct l2cap_ecred_conn_req req;
--		__le16 scid;
-+		__le16 scid[5];
- 	} __packed pdu;
-+	struct l2cap_chan *chan;
-+	struct pid *pid;
-+	int count;
-+};
-+
-+static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
-+{
-+	struct l2cap_ecred_conn_data *conn = data;
-+	struct pid *pid;
-+
-+	if (chan == conn->chan)
-+		return;
-+
-+	if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
-+		return;
-+
-+	pid = chan->ops->get_peer_pid(chan);
-+
-+	/* Only add deferred channels with the same PID/PSM */
-+	if (conn->pid != pid || chan->psm != conn->chan->psm || chan->ident ||
-+	    chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
-+		return;
-+
-+	if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
-+		return;
-+
-+	/* Set the same ident so we can match on the rsp */
-+	chan->ident = conn->chan->ident;
-+
-+	/* Include all channels deferred */
-+	conn->pdu.scid[conn->count] = cpu_to_le16(chan->scid);
-+
-+	conn->count++;
-+}
-+
-+static void l2cap_ecred_connect(struct l2cap_chan *chan)
-+{
-+	struct l2cap_conn *conn = chan->conn;
-+	struct l2cap_ecred_conn_data data;
-+
-+	if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
-+		return;
- 
- 	if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
- 		return;
- 
- 	l2cap_ecred_init(chan, 0);
- 
--	pdu.req.psm     = chan->psm;
--	pdu.req.mtu     = cpu_to_le16(chan->imtu);
--	pdu.req.mps     = cpu_to_le16(chan->mps);
--	pdu.req.credits = cpu_to_le16(chan->rx_credits);
--	pdu.scid        = cpu_to_le16(chan->scid);
-+	data.pdu.req.psm     = chan->psm;
-+	data.pdu.req.mtu     = cpu_to_le16(chan->imtu);
-+	data.pdu.req.mps     = cpu_to_le16(chan->mps);
-+	data.pdu.req.credits = cpu_to_le16(chan->rx_credits);
-+	data.pdu.scid[0]     = cpu_to_le16(chan->scid);
- 
- 	chan->ident = l2cap_get_ident(conn);
-+	data.pid = chan->ops->get_peer_pid(chan);
-+
-+	data.count = 1;
-+	data.chan = chan;
-+	data.pid = chan->ops->get_peer_pid(chan);
-+
-+	__l2cap_chan_list(conn, l2cap_ecred_defer_connect, &data);
- 
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_CONN_REQ,
--		       sizeof(pdu), &pdu);
-+		       sizeof(data.pdu.req) + data.count * sizeof(__le16),
-+		       &data.pdu);
- }
- 
- static void l2cap_le_start(struct l2cap_chan *chan)
-@@ -7694,6 +7765,29 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
- 	return ((psm & 0x0101) == 0x0001);
- }
- 
-+struct l2cap_chan_data {
-+	struct l2cap_chan *chan;
-+	struct pid *pid;
-+	int count;
-+};
-+
-+static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
-+{
-+	struct l2cap_chan_data *d = data;
-+
-+	if (chan == d->chan)
-+		return;
-+
-+	/* Only count deferred channels with the same PID/PSM */
-+	if (d->pid != chan->ops->get_peer_pid(chan) ||
-+	    !test_bit(FLAG_DEFER_SETUP, &chan->flags) ||
-+	    chan->psm != d->chan->psm || chan->ident ||
-+	    chan->state != BT_CONNECT)
-+		return;
-+
-+	d->count++;
-+}
-+
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		       bdaddr_t *dst, u8 dst_type)
- {
-@@ -7813,6 +7907,22 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		goto done;
- 	}
- 
-+	if (chan->mode == L2CAP_MODE_EXT_FLOWCTL) {
-+		struct l2cap_chan_data data;
-+
-+		data.chan = chan;
-+		data.pid = chan->ops->get_peer_pid(chan);
-+		data.count = 0;
-+
-+		l2cap_chan_list(conn, l2cap_chan_by_pid, &data);
-+		/* Check if there isn't too many channels being connected */
-+		if (!(data.count < L2CAP_ECRED_CONN_SCID_MAX - 1)) {
-+			hci_conn_drop(hcon);
-+			err = -EPROTO;
-+			goto done;
-+		}
-+	}
-+
- 	mutex_lock(&conn->chan_lock);
- 	l2cap_chan_lock(chan);
- 
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 40fb10b591bd..e43a90e05972 100644
+index e43a90e05972..7a8a199c373d 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -549,11 +549,6 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+@@ -619,6 +619,21 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			err = -EFAULT;
  		break;
  
- 	case BT_DEFER_SETUP:
--		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
--			err = -EINVAL;
--			break;
--		}
--
- 		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
- 			     (u32 __user *) optval))
- 			err = -EFAULT;
-@@ -1504,6 +1499,13 @@ static long l2cap_sock_get_sndtimeo_cb(struct l2cap_chan *chan)
- 	return sk->sk_sndtimeo;
++	case BT_MODE:
++		if (!enable_ecred) {
++			err = -ENOPROTOOPT;
++			break;
++		}
++
++		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (put_user(chan->mode, (u8 __user *) optval))
++			err = -EFAULT;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -644,6 +659,29 @@ static bool l2cap_valid_mtu(struct l2cap_chan *chan, u16 mtu)
+ 	return true;
  }
  
-+static struct pid *l2cap_sock_get_peer_pid_cb(struct l2cap_chan *chan)
++static int l2cap_set_mode(struct l2cap_chan *chan, u8 mode)
 +{
-+	struct sock *sk = chan->data;
++	switch (chan->mode) {
++	case L2CAP_MODE_LE_FLOWCTL:
++	case L2CAP_MODE_EXT_FLOWCTL:
++		break;
++	case L2CAP_MODE_BASIC:
++		clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
++		break;
++	case L2CAP_MODE_ERTM:
++	case L2CAP_MODE_STREAMING:
++		if (!disable_ertm)
++			break;
++		/* fall through */
++	default:
++		return -EINVAL;
++	}
 +
-+	return sk->sk_peer_pid;
++	chan->mode = mode;
++
++	return 0;
 +}
 +
- static void l2cap_sock_suspend_cb(struct l2cap_chan *chan)
+ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 				     char __user *optval, unsigned int optlen)
  {
- 	struct sock *sk = chan->data;
-@@ -1525,6 +1527,7 @@ static const struct l2cap_ops l2cap_chan_ops = {
- 	.suspend		= l2cap_sock_suspend_cb,
- 	.set_shutdown		= l2cap_sock_set_shutdown_cb,
- 	.get_sndtimeo		= l2cap_sock_get_sndtimeo_cb,
-+	.get_peer_pid		= l2cap_sock_get_peer_pid_cb,
- 	.alloc_skb		= l2cap_sock_alloc_skb_cb,
- };
+@@ -693,22 +731,9 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 			break;
+ 		}
  
+-		chan->mode = opts.mode;
+-		switch (chan->mode) {
+-		case L2CAP_MODE_LE_FLOWCTL:
+-			break;
+-		case L2CAP_MODE_BASIC:
+-			clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
+-			break;
+-		case L2CAP_MODE_ERTM:
+-		case L2CAP_MODE_STREAMING:
+-			if (!disable_ertm)
+-				break;
+-			/* fall through */
+-		default:
+-			err = -EINVAL;
++		err = l2cap_set_mode(chan, opts.mode);
++		if (err)
+ 			break;
+-		}
+ 
+ 		BT_DBG("mode 0x%2.2x", chan->mode);
+ 
+@@ -963,6 +988,30 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		break;
+ 
++	case BT_MODE:
++		if (!enable_ecred) {
++			err = -ENOPROTOOPT;
++			break;
++		}
++
++		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (get_user(opt, (u8 __user *) optval)) {
++			err = -EFAULT;
++			break;
++		}
++
++		err = l2cap_set_mode(chan, opt);
++		if (err)
++			break;
++
++		BT_DBG("mode 0x%2.2x", chan->mode);
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
 -- 
 2.21.1
 
