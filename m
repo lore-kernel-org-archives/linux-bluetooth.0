@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5564BC4CECE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DF8C10DCE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29F6E206CD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86E7B206CD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:25:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oZBq41fA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OBbVpnMb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbgCLWZV (ORCPT
+        id S1726964AbgCLWZY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Mar 2020 18:25:21 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:41980 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgCLWZV (ORCPT
+        Thu, 12 Mar 2020 18:25:24 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:42217 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726956AbgCLWZX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Mar 2020 18:25:21 -0400
-Received: by mail-pg1-f193.google.com with SMTP id b1so3763898pgm.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 15:25:21 -0700 (PDT)
+        Thu, 12 Mar 2020 18:25:23 -0400
+Received: by mail-pl1-f194.google.com with SMTP id t3so3227886plz.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 15:25:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=FXwvTnQykoPpkweMgQAgCKJtBtzeHaiXypRA5dAMTdI=;
-        b=oZBq41fA/zrwcnpUi3haKsA0TFGctP8QNZT/vfjNSR84/9Do3arIqqF2/20X3av5fJ
-         JAq7nQpPw9azjwuLf+Jqx30i1rhAEHXPAmk7AZq9LObIhl93Qr+rMy+n5kwLFO3LFj8P
-         IL6m3KKBLmh3pWFhv92Poj1BnLaacxuz8sfUi0GrOAVz64jvJWw74rY/VekLaHLAOwgx
-         mposaTB54s5EirTIAvdq7DuJb2IE9TrvdoMRER5T38R+Nhh21nfLHbuOsExcnPXrLscy
-         2vNuXzF5NEUYANApcAjzAhlNQsj347tze0KAhIuRsdX+nhx6Vx7TApq2qMMl6aOUqf8+
-         AWag==
+        bh=redNRYVw53Y2nCzF8YK8qJRWg+E/jmn8Yib4eOsg8Yw=;
+        b=OBbVpnMb2HPvPHhQABwQu6xDslhdR6jAtJmMcrZxWGkeZwHJ0lZWzZOIDMCUQ0gCZf
+         OnS99jIU35PLROsHOa6rHWzWswk5gIkgqY5IAndXOfy29FcVnZ/ACSnYJ4GigQqKtYMy
+         cmYSapfpjcXlcO/DLmdBdTAnrxYqvb9RoJZurvRea9LYv3OlJEmv5QFvdNf5WZA/wK6+
+         qxyYR45d2yVrzebnc92kO/nrlvkTOsbNdmB/nno4pvy7dzGvzg557E2uvd1GE/IvKKdT
+         gNcQgIUoMQwuksg8MKnMGZHvgR6dJljYgwPrrbJIMnAQ3IRmWJ5J6DriB/Yas9jpkIHr
+         MMlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FXwvTnQykoPpkweMgQAgCKJtBtzeHaiXypRA5dAMTdI=;
-        b=QTL6oq1w74r+tlYWpbHZ6gpae25ybDKYI/iy/abISj9dw9u2l3Lt9g/PGE0d83J0oH
-         IGriwKaz4MGDFE5o8uPeTc/4hSYq3nbSeY6W0KqdVuAUSJSkCObwHkH2iOJSCwC22Uvw
-         5PPJa+sqFzSfr4cmvJm8X3Ak4479fvWK0ccE/0mdBFwgSCBFxbmbGAC/dJSswJBKPvOr
-         w6aPB+TrDJNHHEJ9Bh5rtcXA96BT1L1KWSmjTEMqGeDa9SqVE1rxTQJidFViEo4FIG+T
-         j3Ct0/NqB7HclbFfLoPI5VERqUhABDS0C5jn8idyjx1/KRMniwe2sMfDYIk4GI6xNvgu
-         /xSQ==
-X-Gm-Message-State: ANhLgQ2sL72kcAE2fKmNRMYl9lEjKRfNmx1YdyTGvR4RUcKinM4+PaPi
-        7pB9/eKQta9KxfxkkQJaH76GcYRdKEU=
-X-Google-Smtp-Source: ADFU+vvN3tzLsppfwbf0fMR1iemModEvkw8BSLn4GvJvUbclWG3ddqHJaKwf1qhgM9ymr09q1TMVAQ==
-X-Received: by 2002:a62:be04:: with SMTP id l4mr10482810pff.234.1584051920485;
-        Thu, 12 Mar 2020 15:25:20 -0700 (PDT)
+        bh=redNRYVw53Y2nCzF8YK8qJRWg+E/jmn8Yib4eOsg8Yw=;
+        b=lcKJmMT8eBY+FY6KZU4c5srUQvCyRKohryE7cD2weCCxpqs4f2cv5a9CX3Pbb4Royn
+         7MLtuQ20lL47Jnt0Dsue7YHlVhm8JzPqPuwAJjQJJzMK5D2m9qTqLqiKI2ekz8+82xDB
+         K3hEtDIa8mXYs+spPsva5U9dsfqwuQl/+BK50fLIMkTJ+OyVeFS8VyMQLE5H7a91WiHD
+         Wk7kZ1xtbbImDwozpZdHN7Z72O/eyEmwkNHf7sdtFGhXDSq+r/EogKs0OlpSUv+NhVDw
+         Y6ELtv4euqK3bxerP+IdZs4TFw/+g4+5BrlsFj2LGRCy37aG0qp7qK4IFmE29Jv8OSDk
+         G3og==
+X-Gm-Message-State: ANhLgQ1NF7ltjH00R905vGSo55WO7u3zWQYmVr8vbuqNLpehNEwpUf2B
+        hjlZupyb3IEnokiysbDu8jinRygK30I=
+X-Google-Smtp-Source: ADFU+vsGutQTr6vJAyYgoNBawM6k+5LMVrl+yes98SkkEWkcoMze9vEkyXKeIK4MpV68fD5azjJRIQ==
+X-Received: by 2002:a17:902:b711:: with SMTP id d17mr9817680pls.316.1584051921699;
+        Thu, 12 Mar 2020 15:25:21 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id i13sm4296468pfd.180.2020.03.12.15.25.19
+        by smtp.gmail.com with ESMTPSA id i13sm4296468pfd.180.2020.03.12.15.25.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2020 15:25:19 -0700 (PDT)
+        Thu, 12 Mar 2020 15:25:20 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/5] l2test: Add support for L2CAP_EXT_FLOWCTL_MODE
-Date:   Thu, 12 Mar 2020 15:25:14 -0700
-Message-Id: <20200312222516.5179-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/5] emulator/bthost: Add support for ECRED Connection request/response
+Date:   Thu, 12 Mar 2020 15:25:15 -0700
+Message-Id: <20200312222516.5179-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200312222516.5179-1-luiz.dentz@gmail.com>
 References: <20200312222516.5179-1-luiz.dentz@gmail.com>
@@ -74,47 +74,102 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables using l2test to connect or listen with
-L2CAP_EXT_FLOWCTL_MODE.
+This adds support for ECRED Connection request/response which will be
+used by l2cap-runner to test L2CAP_MODE_EXT_FLOWCTL mode.
 ---
- tools/l2test.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ emulator/bthost.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 8c6e08646..ee3637699 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -150,6 +150,7 @@ static struct lookup_table l2cap_modes[] = {
- 	*/
- 	{ "ertm",	L2CAP_MODE_ERTM		},
- 	{ "streaming",	L2CAP_MODE_STREAMING	},
-+	{ "ext-flowctl",L2CAP_MODE_EXT_FLOWCTL	},
- 	{ 0 }
- };
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 6482bbecc..0fa283464 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -1773,6 +1773,69 @@ static bool l2cap_le_conn_rsp(struct bthost *bthost, struct btconn *conn,
+ 	return true;
+ }
  
-@@ -283,7 +284,7 @@ static int getopts(int sk, struct l2cap_options *opts, bool connected)
- 
- 	memset(opts, 0, sizeof(*opts));
- 
--	if (bdaddr_type == BDADDR_BREDR) {
-+	if (bdaddr_type == BDADDR_BREDR || rfcmode) {
- 		optlen = sizeof(*opts);
- 		return getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts, &optlen);
- 	}
-@@ -303,6 +304,13 @@ static int setopts(int sk, struct l2cap_options *opts)
- 		return setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts,
- 								sizeof(*opts));
- 
-+	if (opts->mode) {
-+		if (setsockopt(sk, SOL_BLUETOOTH, BT_MODE, &opts->mode,
-+						sizeof(opts->mode)) < 0) {
-+			return -errno;
-+		}
++static bool l2cap_ecred_conn_req(struct bthost *bthost, struct btconn *conn,
++				uint8_t ident, const void *data, uint16_t len)
++{
++	const struct bt_l2cap_pdu_ecred_conn_req *req = data;
++	struct {
++		struct bt_l2cap_pdu_ecred_conn_rsp pdu;
++		uint16_t dcid[5];
++	} __attribute__ ((packed)) rsp;
++	uint16_t psm;
++	int num_scid, i = 0;
++
++	if (len < sizeof(*req))
++		return false;
++
++	psm = le16_to_cpu(req->psm);
++
++	memset(&rsp, 0, sizeof(rsp));
++
++	rsp.pdu.mtu = 64;
++	rsp.pdu.mps = 64;
++	rsp.pdu.credits = 1;
++
++	if (!bthost_find_l2cap_cb_by_psm(bthost, psm)) {
++		rsp.pdu.result = cpu_to_le16(0x0002); /* PSM Not Supported */
++		goto respond;
 +	}
 +
- 	return setsockopt(sk, SOL_BLUETOOTH, BT_RCVMTU, &opts->imtu,
- 							sizeof(opts->imtu));
- }
++	len -= sizeof(rsp.pdu);
++	num_scid = len / sizeof(*req->scid);
++
++	for (; i < num_scid; i++)
++		rsp.dcid[i] = cpu_to_le16(conn->next_cid++);
++
++respond:
++	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_ECRED_CONN_RSP, ident, &rsp,
++			sizeof(rsp.pdu) + i * sizeof(*rsp.dcid));
++
++	return true;
++}
++
++static bool l2cap_ecred_conn_rsp(struct bthost *bthost, struct btconn *conn,
++				uint8_t ident, const void *data, uint16_t len)
++{
++	const struct  {
++		const struct bt_l2cap_pdu_ecred_conn_rsp *pdu;
++		uint16_t scid[5];
++	} __attribute__ ((packed)) *rsp = data;
++	int num_scid, i;
++
++	if (len < sizeof(*rsp))
++		return false;
++
++	num_scid = len / sizeof(*rsp->scid);
++
++	for (i = 0; i < num_scid; i++)
++		/* TODO add L2CAP connection before with proper PSM */
++		bthost_add_l2cap_conn(bthost, conn, 0,
++				      le16_to_cpu(rsp->scid[i]), 0);
++
++
++	return true;
++}
++
+ static void l2cap_le_sig(struct bthost *bthost, struct btconn *conn,
+ 						const void *data, uint16_t len)
+ {
+@@ -1819,6 +1882,15 @@ static void l2cap_le_sig(struct bthost *bthost, struct btconn *conn,
+ 		ret = l2cap_le_conn_rsp(bthost, conn, hdr->ident,
+ 						data + sizeof(*hdr), hdr_len);
+ 		break;
++	case BT_L2CAP_PDU_ECRED_CONN_REQ:
++		ret = l2cap_ecred_conn_req(bthost, conn, hdr->ident,
++						data + sizeof(*hdr), hdr_len);
++		break;
++
++	case BT_L2CAP_PDU_ECRED_CONN_RSP:
++		ret = l2cap_ecred_conn_rsp(bthost, conn, hdr->ident,
++						data + sizeof(*hdr), hdr_len);
++		break;
+ 
+ 	default:
+ 		printf("Unknown L2CAP code 0x%02x\n", hdr->code);
 -- 
 2.21.1
 
