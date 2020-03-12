@@ -2,191 +2,145 @@ Return-Path: <SRS0=41cZ=45=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 941B1C2BB1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE693C10DCE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 23:26:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6DD5920738
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 22:38:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84A06206F1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 23:26:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXmLDGl0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTTLjpoP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726749AbgCLWin (ORCPT
+        id S1726802AbgCLX0D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Mar 2020 18:38:43 -0400
-Received: from mail-pg1-f182.google.com ([209.85.215.182]:44005 "EHLO
-        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726608AbgCLWin (ORCPT
+        Thu, 12 Mar 2020 19:26:03 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:38802 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726608AbgCLX0C (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Mar 2020 18:38:43 -0400
-Received: by mail-pg1-f182.google.com with SMTP id u12so3777834pgb.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 15:38:42 -0700 (PDT)
+        Thu, 12 Mar 2020 19:26:02 -0400
+Received: by mail-oi1-f196.google.com with SMTP id k21so7431873oij.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 16:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=3PftGFsHVrEBOelKu9QhVpR8NGkGeU9Y8TSH94dQmMI=;
-        b=bXmLDGl0KS9Sisq7Xz2h4P7O1FyhZ70gCb6ZTwmnctdEm01IvQkX/orWiUiR004rm8
-         eXLgNQ3GXv99p3a/H4EaliUbcXosotF5uH2MPp+qNWW3qbV+hhIYTKqFAikxl7XfV8sn
-         GQZG5wO0XCFUV/MqoEhR5VRB7q+gaYdx8nsNtO8vNaCYe7RMzmp9BeGFV1GR3Pxu/v1V
-         EASTpe1aW+z8B1lOY6jzDepqglAYzBMpLMwjeAoplSYYmudtxPSOt4oWi9QXHwpH4hdQ
-         L1ufNGbS9H6fz1CjTs5wuRrOw5Rwaj7v8lOvcY1HMVNc1e8enyXvbEAfH6yb47AthVBt
-         j8Gg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xFO91KX8Jhr6GKUhaE8mfxaaa5fDkLfqETUEih9egqQ=;
+        b=WTTLjpoPAaYF+CigYNMmVpFXFgc1JdhnsSv8Q7iu6pbLMGmowjTe66iRyM0IOU0wVp
+         8HDHQhHhaNmHHy2I7FQS+BBWcjdBP/HtQpSl328c1kR5IWsVXoyalFHsj3PO5d9QLFov
+         e2jZqVa1FMDSh1mSLfGTgBE8ffAz7uOXoCkHTT3UTRmpJkcwxjUSehfUCqZzHMLVlDdu
+         y9jIFrwFQKG1acjNFFNB5BF1RwdpKf8IfUM43+jPRExmD51C1AYfY1hJdiSZ0JRexqNH
+         QAxIkCGymTd1egUZ5RozrRLyM4wUM9hpgTFSXsrIQaAfI3EAIxPwkx0czL+Ajh/DlJH4
+         8Xgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3PftGFsHVrEBOelKu9QhVpR8NGkGeU9Y8TSH94dQmMI=;
-        b=QJR3RapGYAVpBGNYr3rJ/zXn4a/hW+t816N5JTh6VG78u4uFNxPWlQNhagcAcMdyKz
-         a4/8HWxkLF8Y2FH6BDSgGGG5cw2sCfh3Sky2IcEZXfEamxCirN/WnHMFeSEyIIWo8joM
-         UtfeQYpD2978kKfHSzKaH9BOJZXsIko5jnGv6cuULrz5gVnWekVXDz20uKs0NLlcgDSf
-         tGM1o5UH68+y2+bjUDtX/rD7Da+oCE4nK8wtViI2KW0wqhidjid7ZPCM7R+OczhST6sr
-         VHWs3mtooV6TkDFL5JAvWyNT3RfN/ONgpa6mZwAeJK0tAB1sfJMFiCj2n14ThadW9l6W
-         yZug==
-X-Gm-Message-State: ANhLgQ28s7e358LnOiI5dtJ80fTXuF83ynONbkGQUqVc5qHUoFs3QhZd
-        H9KBrs8yFQMC3MpsspcRWyACivbxR6M=
-X-Google-Smtp-Source: ADFU+vv61KaMeKBqvlxiUKaOLwK73onjurWFyOvt6lqLbKrxFI2/LwguF0HDCkEAvYNf189hmYYF9A==
-X-Received: by 2002:a65:68d4:: with SMTP id k20mr10034981pgt.69.1584052722012;
-        Thu, 12 Mar 2020 15:38:42 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g5sm5118190pfo.192.2020.03.12.15.38.41
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2020 15:38:41 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/2] input: Add LEAutoSecurity setting to input.conf
-Date:   Thu, 12 Mar 2020 15:38:39 -0700
-Message-Id: <20200312223839.6236-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200312223839.6236-1-luiz.dentz@gmail.com>
-References: <20200312223839.6236-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xFO91KX8Jhr6GKUhaE8mfxaaa5fDkLfqETUEih9egqQ=;
+        b=EspdoU6bV7Mz5+ljBurwSdA3cZRy8t7GvcWsL8GbinU/WLVALSaF7ymQQe8a6PWTdl
+         WaTtiPawL3VmnSVzhaU3shYQA7qRbpA35k9k+uRGtclHZvSAXdHZTetfca7coabZULYW
+         1/4770etERhaTHTfOz24QoEuYDlJ2lyVxtN3NLMDCM0EnKWqeHH/jS6RsPZMRPW3dWrp
+         RqImiUGUVY5knVf/GcMpC+w2ZT8Zkzx7EgnUD3E/OOTpgmr/HB3bA+wyNpndd8l1nfHi
+         OoIkywvajfpkO3ljKeg7YZImg1/lssbkQ44tY42DEPNkmMhphhDyLQ/Nfc7p4K8+w/jL
+         mEug==
+X-Gm-Message-State: ANhLgQ1x7YLAzVDUuwIFxjWhxhmUTujuAYsz2l0fU6/SqMMlU85LPbOk
+        kKFJ6TXIrUNh2kZgeau6gYD7GZNEj91JXj3m5Khxf+AP
+X-Google-Smtp-Source: ADFU+vtlbKGHePMzfu7zqEVnDicYyJTWwsXj6eiDBODDq9nkMow/N+IRkYsI64AN0Qs4BZmcO+GIpeyXko98Sf7IFtw=
+X-Received: by 2002:aca:5345:: with SMTP id h66mr2919252oib.110.1584055561849;
+ Thu, 12 Mar 2020 16:26:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200312135409.Bluez.v1.1.I24708f815f78397d51e263f5c68fc47ec0b76acd@changeid>
+In-Reply-To: <20200312135409.Bluez.v1.1.I24708f815f78397d51e263f5c68fc47ec0b76acd@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 12 Mar 2020 16:25:50 -0700
+Message-ID: <CABBYNZJiB706ghUVR57MVQ_J4hBswsh9Nwd1x-XVJaDQA+f47Q@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] a2dp: Fix race when connecting and being
+ connected at the same time
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Archie,
 
-LEAutoSecurity can be used to enable/disable automatic upgrades of
-security for LE devices, by default it is enabled so existing devices
-that did not require security and were not bonded will automatically
-upgrade the security.
+On Wed, Mar 11, 2020 at 10:55 PM Archie Pusaka <apusaka@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> There is a possibility where BlueZ initiate an A2DP connection just
+> around the same time as the peripheral also initiate it.
+>
+> One scenario is the peripheral initiate the connection first, so
+> confirm_cb() on /profiles/audio/a2dp.c is called. However, while we
+> are waiting for the authentication step, BlueZ initiate a connection
+> to the peripheral, therefore a2dp_sink_connect() is called, which
+> from there a2dp_avdtp_get() is called.
+>
+> If this happens: When calling confirm_cb(), chan for the
+> corresponding device is created.
+>
+> Then when calling a2dp_avdtp_get(), chan will be found as it is
+> created in confirm_cb(), and the value of chan->io is not NULL.
+> However, a NULL is supplied instead to create a new session and
+> assigned to chan->session.
+>
+> Then when calling connect_cb(), chan->session will NOT be NULL, as
+> it is assigned in a2dp_avdtp_get(). Nevertheless, chan->session is
+> always assigned a new value.
+>
+> These cause failure in connection.
+>
+> Therefore, fixing this by supplying the value of chan->io inside
+> a2dp_avdtp_get() (it's going to be NULL on the normal case so it is
+> fine), and check whether chan->session already assigned inside
+> connect_cb().
+> ---
+>
+>  profiles/audio/a2dp.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index e8262cdfe..a5590b24c 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -2118,7 +2118,7 @@ struct avdtp *a2dp_avdtp_get(struct btd_device *device)
+>         return NULL;
+>
+>  found:
+> -       chan->session = avdtp_new(NULL, device, server->seps);
+> +       chan->session = avdtp_new(chan->io, device, server->seps);
+>         if (!chan->session) {
+>                 channel_remove(chan);
+>                 return NULL;
+> @@ -2136,10 +2136,13 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+>                 goto fail;
+>         }
+>
+> -       chan->session = avdtp_new(chan->io, chan->device, chan->server->seps);
+>         if (!chan->session) {
+> -               error("Unable to create AVDTP session");
+> -               goto fail;
+> +               chan->session = avdtp_new(chan->io, chan->device,
+> +                                                       chan->server->seps);
+> +               if (!chan->session) {
+> +                       error("Unable to create AVDTP session");
+> +                       goto fail;
+> +               }
+>         }
+>
+>         g_io_channel_unref(chan->io);
+> --
+> 2.25.1.481.gfbce0eb801-goog
 
-Note: Platforms disabling this setting would require users to manually
-bond the device which may require changes to the user interface to
-always force bonding for input devices as APIs such as Device.Connect
-will no longer work which maybe perceived as a regression.
----
- profiles/input/device.h   |  1 +
- profiles/input/hog.c      | 13 +++++++++++--
- profiles/input/input.conf |  5 +++++
- profiles/input/manager.c  | 11 ++++++++++-
- 4 files changed, 27 insertions(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index 3044db673..5a077f92a 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -30,6 +30,7 @@ struct input_conn;
- void input_set_idle_timeout(int timeout);
- void input_enable_userspace_hid(bool state);
- void input_set_classic_bonded_only(bool state);
-+void input_set_auto_sec(bool state);
- 
- int input_device_register(struct btd_service *service);
- void input_device_unregister(struct btd_service *service);
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index f0226ebbd..327a1d1c3 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -53,6 +53,7 @@
- #include "src/shared/gatt-client.h"
- #include "src/plugin.h"
- 
-+#include "device.h"
- #include "suspend.h"
- #include "attrib/att.h"
- #include "attrib/gattrib.h"
-@@ -67,8 +68,14 @@ struct hog_device {
- };
- 
- static gboolean suspend_supported = FALSE;
-+static bool auto_sec = true;
- static struct queue *devices = NULL;
- 
-+void input_set_auto_sec(bool state)
-+{
-+	auto_sec = state;
-+}
-+
- static void hog_device_accept(struct hog_device *dev, struct gatt_db *db)
- {
- 	char name[248];
-@@ -192,11 +199,13 @@ static int hog_accept(struct btd_service *service)
- 	if (!device_is_bonded(device, btd_device_get_bdaddr_type(device))) {
- 		struct bt_gatt_client *client;
- 
-+		if (!auto_sec)
-+			return -ECONNREFUSED;
-+
- 		client = btd_device_get_gatt_client(device);
- 		if (!bt_gatt_client_set_security(client,
--						BT_ATT_SECURITY_MEDIUM)) {
-+						BT_ATT_SECURITY_MEDIUM))
- 			return -ECONNREFUSED;
--		}
- 	}
- 
- 	/* TODO: Replace GAttrib with bt_gatt_client */
-diff --git a/profiles/input/input.conf b/profiles/input/input.conf
-index 166aff4a4..4c70bc561 100644
---- a/profiles/input/input.conf
-+++ b/profiles/input/input.conf
-@@ -19,3 +19,8 @@
- # pairing/encryption.
- # Defaults to false to maximize device compatibility.
- #ClassicBondedOnly=true
-+
-+# LE upgrade security
-+# Enables upgrades of security automatically if required.
-+# Defaults to true to maximize device compatibility.
-+#LEAutoSecurity=true
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index 5cd27b839..bf4acb4ed 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -96,7 +96,7 @@ static int input_init(void)
- 	config = load_config_file(CONFIGDIR "/input.conf");
- 	if (config) {
- 		int idle_timeout;
--		gboolean uhid_enabled, classic_bonded_only;
-+		gboolean uhid_enabled, classic_bonded_only, auto_sec;
- 
- 		idle_timeout = g_key_file_get_integer(config, "General",
- 							"IdleTimeout", &err);
-@@ -125,6 +125,15 @@ static int input_init(void)
- 		} else
- 			g_clear_error(&err);
- 
-+		auto_sec = g_key_file_get_boolean(config, "General",
-+						"LEAutoSecurity", &err);
-+		if (!err) {
-+			DBG("input.conf: LEAutoSecurity=%s",
-+					auto_sec ? "true" : "false");
-+			input_set_auto_sec(auto_sec);
-+		} else
-+			g_clear_error(&err);
-+
- 	}
- 
- 	btd_profile_register(&input_profile);
 -- 
-2.21.1
-
+Luiz Augusto von Dentz
