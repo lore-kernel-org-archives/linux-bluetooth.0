@@ -2,102 +2,106 @@ Return-Path: <SRS0=41cZ=45=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C7EC10DCE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 07:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C4FC10DCE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 10:06:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 08A1E20716
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 07:31:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE7B2206FA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 10:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="08IuF7hB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YfiO2Fmt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387958AbgCLHbK (ORCPT
+        id S1726705AbgCLKGf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Mar 2020 03:31:10 -0400
-Received: from mail-lj1-f179.google.com ([209.85.208.179]:35697 "EHLO
-        mail-lj1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387930AbgCLHbK (ORCPT
+        Thu, 12 Mar 2020 06:06:35 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:45159 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726487AbgCLKGf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Mar 2020 03:31:10 -0400
-Received: by mail-lj1-f179.google.com with SMTP id u12so5255580ljo.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 00:31:09 -0700 (PDT)
+        Thu, 12 Mar 2020 06:06:35 -0400
+Received: by mail-pg1-f196.google.com with SMTP id m15so2817991pgv.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 03:06:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lj8KYrAkhY4lhanvarZ7MbZFz58IFU5eW5iOkRBUsjo=;
-        b=08IuF7hBEuUC5NR5pux0nxUgJFnoEE6BdNZ33hAFgR3Z3dRlrG2VkZbtLzEmVB0Fs/
-         ZWy/VfSnycuroAmBdriv74hdSRBHS93HhaySJ7v78c6ugphp+oImewrb5old4ro81R13
-         OUCq0SiXahpQsnLSqs+E5NPeDA8pM/a+sGMEcr0jzwA5+PReVmhO34R10GWl7V1fKAkS
-         xOxpUDjn/TI7PQMahu9PwUu2J8CSTf24UkTdt0q6S5jInhluE2ErnjcgHg12DWSa/7dR
-         /35QBGoHddP5Hr19UkWp14mAeq2palvF4QvyVGoaDEMyvoTFuY6gWDZWeGnjqLBziW24
-         bnhw==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=27oyMvKKiaAWsWXeWpc+V3ciGi01660vPlxNUTCdChs=;
+        b=YfiO2FmtxsYqyxKfCxmblNB/wNYxB0NALzLaMisbLjnXqMAEKCuhjEm559fKB1zNKe
+         aC9t6ZVFKAFU4HxxaIDpjA/ETK6l9JPgdgpeYGqS0+LsutuUkAZnWHL33kKQnqbsyyZP
+         WFEgo5ybZRV5iFZSvI4WNPPhdWYDKPDlbq1L7yh0LUCbX6AStFvFON437Rb+ol3fwNPb
+         kwGSNeG+HFH2qIZisbeFRjw6fbdGdKJP9LHDpIC++qtdQLgZru0UbckZAMA231Sky6JL
+         iTtigMFihfPhWYK9fYGRGuqoQQz+Ab0mOqSvNa2tDkFkJuWpxOrCT+8MD3bXJrRjabyz
+         YRrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lj8KYrAkhY4lhanvarZ7MbZFz58IFU5eW5iOkRBUsjo=;
-        b=tna8uXKHX4d/m/m4fnJMVZVDtMBkra0DFiLOmF599eopQ/As1/yvldS+Mri4uOa0Y6
-         sFmEgXUOsnfBc9cOKDO7GEjjFyjgtcgmtJO8O3BTDsA9QJsXamKE8hZskJY1AcWTjkwp
-         MVWuI1jPn6ybsJPPl77V41/nxAShwcuS7xgAJFO1nVmZ6DdZhwqcWLAFQw84imaCp7pP
-         Lmov5SanfRoMTzymrhNerxjDky/ulHSd9+e5Rt5229YqBqR/vtjOh0DwwZfV3OEjPF9z
-         F8gu9pzlvnUrahRqaxdibgtsTqWBjvGH4Dc6Ejdza/G7PJfFrFmp9bgPDa6l9okl26eg
-         cgSQ==
-X-Gm-Message-State: ANhLgQ3JLKj2G7WEP0e92fPfWQZh57c3wm3ln+9HNdZQyICeKt3wDyBz
-        22JGLRc3zUxiGxujrfxvv/q8wckiES4=
-X-Google-Smtp-Source: ADFU+vvIsg7k5/YGqxxHyhGL6PwoETGk7/ExH4a9QQGZKJn4IlEY8G6H/jgoSYhNkpVE9b9dg3iGHA==
-X-Received: by 2002:a2e:7018:: with SMTP id l24mr4370621ljc.128.1583998267860;
-        Thu, 12 Mar 2020 00:31:07 -0700 (PDT)
-Received: from rymek.int.codecoup.pl ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id t78sm10311829lff.27.2020.03.12.00.31.06
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=27oyMvKKiaAWsWXeWpc+V3ciGi01660vPlxNUTCdChs=;
+        b=M6TYXrxd+j8KBylt7gD8j/7eDD1QIF6sVIUUIya+s6ETQ5MG28pvlLyirkIvzCHJ2b
+         qKT90jsDdftFgQUQ1Rh+Fe/zNevkOlCdAiXYhzdjqCq7c+TvuOHTgjJTCQCoq/XqqF9G
+         kNYAboZktRdjb9PcmbALlWBjQFW2zfqOwi7wBr48UEw2tO1PQgebXwi96w1J9gM+KY64
+         DFnnal1w+huM6xo2rvLRlzRxzkIv79OSfj4PEVsQn43eLn5zD8lN8qp0eyRaErlWQfpw
+         LmlJx7kzP+Ds4qbwY5fOUzRsjHtE2cqif4kEq2AJs1vWYmGpKKZ1X+USs+Ae6A8za/9U
+         wJgQ==
+X-Gm-Message-State: ANhLgQ0NTE3hqA25xw/UVxJzkxj944yynJS8KSbx0ygD1+Pc/q88o9Z2
+        wy6DZyU5gVrxuyVZAtmgfxAYcG8HzYY=
+X-Google-Smtp-Source: ADFU+vtdmgBTiL74xkm7eY0eGRE/rHXCkG9H2fc+Td8A6pwlvAfkcc+ELr6VZN+sc/EZXVKjK4/aNQ==
+X-Received: by 2002:a63:82c2:: with SMTP id w185mr7223990pgd.382.1584007594147;
+        Thu, 12 Mar 2020 03:06:34 -0700 (PDT)
+Received: from nsathish-Latitude-7480.iind.intel.com ([192.55.55.45])
+        by smtp.gmail.com with ESMTPSA id e9sm10578295pfl.179.2020.03.12.03.06.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Mar 2020 00:31:07 -0700 (PDT)
-From:   =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
-        <lukasz.rymanowski@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
-        <lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH BlueZ] monitor: Fix for incorrect len in L2CAP Enhanced Reconfigure
-Date:   Thu, 12 Mar 2020 08:30:45 +0100
-Message-Id: <20200312073045.26416-1-lukasz.rymanowski@codecoup.pl>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 12 Mar 2020 03:06:33 -0700 (PDT)
+From:   Sathish Narsimman <nsathish41@gmail.com>
+X-Google-Original-From: Sathish Narsimman <sathish.narasimman@intel.com>
+To:     linux-bluetooth@vger.kernel.org, nsathish41@gmail.com
+Cc:     chethan.tumkur.narayan@intel.com,
+        Sathish Narsimman <sathish.narasimman@intel.com>
+Subject: [PATCH 0/7] LE LL Priavcy support enabled
+Date:   Thu, 12 Mar 2020 15:37:47 +0530
+Message-Id: <20200312100754.3445-1-sathish.narasimman@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- monitor/l2cap.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+With this LE LL Priavcy feature available if BT controller supports
+LL Privacy when privacy is enabled.
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 9409604c3..41c766863 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -1408,7 +1408,7 @@ static void sig_ecred_conn_rsp(const struct l2cap_frame *frame)
- 	const struct bt_l2cap_pdu_ecred_conn_rsp *pdu = frame->data;
- 	uint16_t dcid;
- 
--	l2cap_frame_pull((void *)frame, frame, sizeof(pdu));
-+	l2cap_frame_pull((void *)frame, frame, sizeof(*pdu));
- 
- 	print_field("MTU: %u", le16_to_cpu(pdu->mtu));
- 	print_field("MPS: %u", le16_to_cpu(pdu->mps));
-@@ -1426,7 +1426,7 @@ static void sig_ecred_reconf_req(const struct l2cap_frame *frame)
- 	const struct bt_l2cap_pdu_ecred_reconf_req *pdu = frame->data;
- 	uint16_t scid;
- 
--	l2cap_frame_pull((void *)frame, frame, sizeof(pdu));
-+	l2cap_frame_pull((void *)frame, frame, sizeof(*pdu));
- 
- 	print_field("MTU: %u", le16_to_cpu(pdu->mtu));
- 	print_field("MPS: %u", le16_to_cpu(pdu->mps));
+The patches are verified in below case.
+Pairing - where the IRK is added to device Resolving List after 
+identity info & IRK is shared in SMP.
+Unpair - Delete the resolving entry from the Device resolving list
+Local IRK change - Whenever there is change in local IRK (privacy) the
+resolving list entries in the device is updated.
+Whitelist - filter policies for whitelist is updated based on LL_adress
+resolution support.
+Reload Resolving list - device reset/sysmte reboot the Resolving list
+reloaded in to the device.
+
+Sathish Narsimman (7):
+  Bluetooth: LL Privacy Delete Store Resolving list
+  Bluetooth: Add device to Resolving List
+  Bluetooth: Update the Resolving list when Local IRK changed
+  Bluetooth: LL_PRIVACY re-load resolving list
+  Bluetooth: LL Privacy Check and Update the Resolving List
+  Bluetooth: Enable LL Privacy
+  Bluetooth LL Privacy update White list
+
+ include/net/bluetooth/hci.h      |   3 +
+ include/net/bluetooth/hci_core.h |   7 +
+ net/bluetooth/hci_conn.c         |  32 ++++
+ net/bluetooth/hci_core.c         |  20 ++-
+ net/bluetooth/hci_event.c        |  32 +++-
+ net/bluetooth/hci_request.c      | 251 ++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_request.h      |   2 +
+ net/bluetooth/mgmt.c             |  10 +-
+ net/bluetooth/smp.c              |  11 ++
+ 9 files changed, 354 insertions(+), 14 deletions(-)
+
 -- 
-2.20.1
+2.17.1
 
