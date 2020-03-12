@@ -2,145 +2,109 @@ Return-Path: <SRS0=41cZ=45=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE693C10DCE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 23:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FCFC10DCE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 23:30:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84A06206F1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 23:26:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E02C5206B1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 23:30:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTTLjpoP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJk5DZ8/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726802AbgCLX0D (ORCPT
+        id S1726910AbgCLXaA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Mar 2020 19:26:03 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:38802 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726608AbgCLX0C (ORCPT
+        Thu, 12 Mar 2020 19:30:00 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:37085 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726710AbgCLXaA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Mar 2020 19:26:02 -0400
-Received: by mail-oi1-f196.google.com with SMTP id k21so7431873oij.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 16:26:02 -0700 (PDT)
+        Thu, 12 Mar 2020 19:30:00 -0400
+Received: by mail-ot1-f66.google.com with SMTP id i12so2947234otp.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Mar 2020 16:29:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xFO91KX8Jhr6GKUhaE8mfxaaa5fDkLfqETUEih9egqQ=;
-        b=WTTLjpoPAaYF+CigYNMmVpFXFgc1JdhnsSv8Q7iu6pbLMGmowjTe66iRyM0IOU0wVp
-         8HDHQhHhaNmHHy2I7FQS+BBWcjdBP/HtQpSl328c1kR5IWsVXoyalFHsj3PO5d9QLFov
-         e2jZqVa1FMDSh1mSLfGTgBE8ffAz7uOXoCkHTT3UTRmpJkcwxjUSehfUCqZzHMLVlDdu
-         y9jIFrwFQKG1acjNFFNB5BF1RwdpKf8IfUM43+jPRExmD51C1AYfY1hJdiSZ0JRexqNH
-         QAxIkCGymTd1egUZ5RozrRLyM4wUM9hpgTFSXsrIQaAfI3EAIxPwkx0czL+Ajh/DlJH4
-         8Xgw==
+         :cc:content-transfer-encoding;
+        bh=WGWnlBzJ1++4eE6BpPyY5NxIR90Kk+UTouezIUddjNk=;
+        b=lJk5DZ8/MTKBy6N1iLReKSkGyBWtS6ym2ptoS9+3IWu3WcDo3OCdwJIGo0LxoTCuRL
+         5BpcpZOlRlBzZ6SNwX0AJTIly8pHXNr1bpiskSshUXGZHwCgXxVs8jAvt1lVUfSB4+DX
+         c4NCWX1EdSoa3T8beMcPCfPMRHOZ4wYASIXFbp0/gUeP2yyL4s7gLTRXuYSqTwzmyXkj
+         1ljTtx0v7wt3ksT9o/NNiKqJ4qUntDYdYm7YABBE6sVXWJuNDwOyF32Cz1IUxv7Feh5P
+         S9b7tPEKSdQCgQAEPlMqp03lK2qF2WO7jm51kdnNvcCf5w+TUYjMk5TeB6oFLA5VNk6y
+         dVwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xFO91KX8Jhr6GKUhaE8mfxaaa5fDkLfqETUEih9egqQ=;
-        b=EspdoU6bV7Mz5+ljBurwSdA3cZRy8t7GvcWsL8GbinU/WLVALSaF7ymQQe8a6PWTdl
-         WaTtiPawL3VmnSVzhaU3shYQA7qRbpA35k9k+uRGtclHZvSAXdHZTetfca7coabZULYW
-         1/4770etERhaTHTfOz24QoEuYDlJ2lyVxtN3NLMDCM0EnKWqeHH/jS6RsPZMRPW3dWrp
-         RqImiUGUVY5knVf/GcMpC+w2ZT8Zkzx7EgnUD3E/OOTpgmr/HB3bA+wyNpndd8l1nfHi
-         OoIkywvajfpkO3ljKeg7YZImg1/lssbkQ44tY42DEPNkmMhphhDyLQ/Nfc7p4K8+w/jL
-         mEug==
-X-Gm-Message-State: ANhLgQ1x7YLAzVDUuwIFxjWhxhmUTujuAYsz2l0fU6/SqMMlU85LPbOk
-        kKFJ6TXIrUNh2kZgeau6gYD7GZNEj91JXj3m5Khxf+AP
-X-Google-Smtp-Source: ADFU+vtlbKGHePMzfu7zqEVnDicYyJTWwsXj6eiDBODDq9nkMow/N+IRkYsI64AN0Qs4BZmcO+GIpeyXko98Sf7IFtw=
-X-Received: by 2002:aca:5345:: with SMTP id h66mr2919252oib.110.1584055561849;
- Thu, 12 Mar 2020 16:26:01 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WGWnlBzJ1++4eE6BpPyY5NxIR90Kk+UTouezIUddjNk=;
+        b=pFDagt5DfufFmh3czuwoc3dI7PxlPrqzl0XpvHDdl3ppeURKCZ7DPOs51i3KnASEGE
+         gs0e0cfk1T0z2iBhsiky72G/ruDo2qr+PAXNCN1uTcveHpGxn8VxvCEIRP4dbVFq5wCq
+         lQYhmdk9Zo6Oai8q59FHBXjlscebCNlMykIVdh3FXs0grF04/L9rCRBEDws2AlKZp7aL
+         ZzfIP9AatCosequ3GSUmlLwOinoxw5DVysks+OdgGbVNQIs25TtNpAaLJVTHyE5BWwP2
+         BL5gIw0pXiYdIq95STGp1c3iyUwEP+rcb2AMN28CCZS4IMd83yxXtgQmB6Uj+MCmY+CR
+         DMeQ==
+X-Gm-Message-State: ANhLgQ3FcIy8qro1MAfsuoi5t349i4Fb0NQkcx/ZYe0sTTQ+ryVHa7n6
+        KGVyFiiUHNXM+zPUdky8wWvkUO3A5+dXbDW3LBE3Ri97
+X-Google-Smtp-Source: ADFU+vt2jhvizbJ6vqmQTytgOCXlhHemMWmIc7LGpXIntv5MKZvxu9vd/wnY/1nPHrB82Lp6pMM5PNBbv8+eW2KPMaE=
+X-Received: by 2002:a9d:3f4b:: with SMTP id m69mr7949038otc.146.1584055797828;
+ Thu, 12 Mar 2020 16:29:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200312135409.Bluez.v1.1.I24708f815f78397d51e263f5c68fc47ec0b76acd@changeid>
-In-Reply-To: <20200312135409.Bluez.v1.1.I24708f815f78397d51e263f5c68fc47ec0b76acd@changeid>
+References: <20200312073045.26416-1-lukasz.rymanowski@codecoup.pl>
+In-Reply-To: <20200312073045.26416-1-lukasz.rymanowski@codecoup.pl>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 12 Mar 2020 16:25:50 -0700
-Message-ID: <CABBYNZJiB706ghUVR57MVQ_J4hBswsh9Nwd1x-XVJaDQA+f47Q@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] a2dp: Fix race when connecting and being
- connected at the same time
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>
+Date:   Thu, 12 Mar 2020 16:29:46 -0700
+Message-ID: <CABBYNZLdsqBGUUxyv_TSggqEKvzYT-gFEK_abAii4q3BfdadHg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] monitor: Fix for incorrect len in L2CAP Enhanced Reconfigure
+To:     =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi =C5=81ukasz,
 
-On Wed, Mar 11, 2020 at 10:55 PM Archie Pusaka <apusaka@google.com> wrote:
+On Thu, Mar 12, 2020 at 12:32 AM =C5=81ukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
->
-> There is a possibility where BlueZ initiate an A2DP connection just
-> around the same time as the peripheral also initiate it.
->
-> One scenario is the peripheral initiate the connection first, so
-> confirm_cb() on /profiles/audio/a2dp.c is called. However, while we
-> are waiting for the authentication step, BlueZ initiate a connection
-> to the peripheral, therefore a2dp_sink_connect() is called, which
-> from there a2dp_avdtp_get() is called.
->
-> If this happens: When calling confirm_cb(), chan for the
-> corresponding device is created.
->
-> Then when calling a2dp_avdtp_get(), chan will be found as it is
-> created in confirm_cb(), and the value of chan->io is not NULL.
-> However, a NULL is supplied instead to create a new session and
-> assigned to chan->session.
->
-> Then when calling connect_cb(), chan->session will NOT be NULL, as
-> it is assigned in a2dp_avdtp_get(). Nevertheless, chan->session is
-> always assigned a new value.
->
-> These cause failure in connection.
->
-> Therefore, fixing this by supplying the value of chan->io inside
-> a2dp_avdtp_get() (it's going to be NULL on the normal case so it is
-> fine), and check whether chan->session already assigned inside
-> connect_cb().
 > ---
+>  monitor/l2cap.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
->  profiles/audio/a2dp.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+> diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+> index 9409604c3..41c766863 100644
+> --- a/monitor/l2cap.c
+> +++ b/monitor/l2cap.c
+> @@ -1408,7 +1408,7 @@ static void sig_ecred_conn_rsp(const struct l2cap_f=
+rame *frame)
+>         const struct bt_l2cap_pdu_ecred_conn_rsp *pdu =3D frame->data;
+>         uint16_t dcid;
 >
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index e8262cdfe..a5590b24c 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -2118,7 +2118,7 @@ struct avdtp *a2dp_avdtp_get(struct btd_device *device)
->         return NULL;
+> -       l2cap_frame_pull((void *)frame, frame, sizeof(pdu));
+> +       l2cap_frame_pull((void *)frame, frame, sizeof(*pdu));
 >
->  found:
-> -       chan->session = avdtp_new(NULL, device, server->seps);
-> +       chan->session = avdtp_new(chan->io, device, server->seps);
->         if (!chan->session) {
->                 channel_remove(chan);
->                 return NULL;
-> @@ -2136,10 +2136,13 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
->                 goto fail;
->         }
+>         print_field("MTU: %u", le16_to_cpu(pdu->mtu));
+>         print_field("MPS: %u", le16_to_cpu(pdu->mps));
+> @@ -1426,7 +1426,7 @@ static void sig_ecred_reconf_req(const struct l2cap=
+_frame *frame)
+>         const struct bt_l2cap_pdu_ecred_reconf_req *pdu =3D frame->data;
+>         uint16_t scid;
 >
-> -       chan->session = avdtp_new(chan->io, chan->device, chan->server->seps);
->         if (!chan->session) {
-> -               error("Unable to create AVDTP session");
-> -               goto fail;
-> +               chan->session = avdtp_new(chan->io, chan->device,
-> +                                                       chan->server->seps);
-> +               if (!chan->session) {
-> +                       error("Unable to create AVDTP session");
-> +                       goto fail;
-> +               }
->         }
+> -       l2cap_frame_pull((void *)frame, frame, sizeof(pdu));
+> +       l2cap_frame_pull((void *)frame, frame, sizeof(*pdu));
 >
->         g_io_channel_unref(chan->io);
+>         print_field("MTU: %u", le16_to_cpu(pdu->mtu));
+>         print_field("MPS: %u", le16_to_cpu(pdu->mps));
 > --
-> 2.25.1.481.gfbce0eb801-goog
+> 2.20.1
 
 Applied, thanks.
 
--- 
+--=20
 Luiz Augusto von Dentz
