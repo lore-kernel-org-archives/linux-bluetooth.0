@@ -2,111 +2,78 @@ Return-Path: <SRS0=41cZ=45=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C21C10DCE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 11:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC1DC1975A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 14:08:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BEBF820724
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 11:35:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YDP/T43n"
+	by mail.kernel.org (Postfix) with ESMTP id 5D80C20716
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Mar 2020 14:08:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726044AbgCLLfk (ORCPT
+        id S1727514AbgCLOI5 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Mar 2020 07:35:40 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:45128 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725268AbgCLLfk (ORCPT
+        Thu, 12 Mar 2020 10:08:57 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:36155 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727255AbgCLOI4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Mar 2020 07:35:40 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CBXPSM022597;
-        Thu, 12 Mar 2020 11:35:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=PFcggQ2GdpiPnoadp9TQXX5vTwn/txxElsai+FshgBQ=;
- b=YDP/T43nU57b9bXALsVuNnfK+kxkLtVgFQtVJBrQFQTY7s57vrSjaw8M+wIeBjIQwq0k
- kH3ZI8lErodokB36wq/MzJhdZ/5iYuCoCL21pvwOM0Y7+p4Scqm4crSYIpR1me4Up5xP
- AhTHMdjTMM5xMSlBE6hFltblWt7ZFKXCz3qRdqUGTLZY4L1JXvfm/hPgC8d9wLJwCcoL
- Q4NHIbL+bolQbqT716pBx1MNHTtQxs6A+UfcfbBA7PCIachBSCFQJLHnohUSUCmHsY+N
- BGNThYtLvqqj9MCVrW1eCaa876pxomY/c0AWaK9FpNeKrNSi3gBvUqJxSFMMCaC5SqnL dw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2yqkg887mm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Mar 2020 11:35:32 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 02CBXVOA067549;
-        Thu, 12 Mar 2020 11:33:31 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2yp8p720wn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Mar 2020 11:33:30 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 02CBXGCW003057;
-        Thu, 12 Mar 2020 11:33:16 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 12 Mar 2020 04:33:16 -0700
-Date:   Thu, 12 Mar 2020 14:33:09 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix a condition in l2cap_sock_recvmsg()
-Message-ID: <20200312113309.GE20562@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9557 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003120063
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9557 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 lowpriorityscore=0
- mlxlogscore=999 spamscore=0 phishscore=0 adultscore=0 impostorscore=0
- malwarescore=0 priorityscore=1501 suspectscore=0 bulkscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003120063
+        Thu, 12 Mar 2020 10:08:56 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 444DFCECF4;
+        Thu, 12 Mar 2020 15:18:24 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH] Bluetooth: print fw build version in power-on boot
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20200312102142.26538-1-amit.k.bag@intel.com>
+Date:   Thu, 12 Mar 2020 15:08:54 +0100
+List-Id: <linux-firmware.lore.kernel.org>
+Cc:     linux-firmware@kernel.org, linux-bluetooth@vger.kernel.org,
+        ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        Sukumar Ghorai <sukumar.ghorai@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <63E6C606-A941-4FA4-B21D-DCC564DB41F3@holtmann.org>
+References: <20200312102142.26538-1-amit.k.bag@intel.com>
+To:     Amit K Bag <amit.k.bag@intel.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Smatch complains about the indenting:
+Hi Amit,
 
-    net/bluetooth/l2cap_sock.c:1027 l2cap_sock_recvmsg()
-    warn: inconsistent indenting
+> To determine the build version of Bluetooth firmware to ensure reported
+> issue related to a particular release. This is very helpful for every fw
+> downloaded to BT controller and issue reported from field test.
+> 
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+> ---
+> drivers/bluetooth/btusb.c | 7 ++++++-
+> 1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index f5924f3e8b8d..d4328008a714 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1930,7 +1930,12 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+> 	if (err)
+> 		return err;
+> 
+> -	bt_dev_info(hdev, "Intel firmware patch completed and activated");
+> +       /* Need build number for downloaded fw patches in every power-on boot */
+> +       err = btintel_read_version(hdev, &ver);
+> +       if (err)
+> +               return err;
+> +       BT_INFO("%s: Intel Bluetooth fw patch 0x%02x completed and activated",
+> +               hdev->name, ver.fw_patch_num);
 
-It looks like this is supposed to be an "else if" condition.
+don’t re-introduce the usage of BT_INFO, we have bt_dev_info.
 
-Fixes: 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- net/bluetooth/l2cap_sock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 0c636be3469e..40fb10b591bd 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1024,7 +1024,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 			sk->sk_state = BT_CONNECTED;
- 			pi->chan->state = BT_CONNECTED;
- 			__l2cap_ecred_conn_rsp_defer(pi->chan);
--		} if (bdaddr_type_is_le(pi->chan->src_type)) {
-+		} else if (bdaddr_type_is_le(pi->chan->src_type)) {
- 			sk->sk_state = BT_CONNECTED;
- 			pi->chan->state = BT_CONNECTED;
- 			__l2cap_le_connect_rsp_defer(pi->chan);
--- 
-2.20.1
+Marcel
 
