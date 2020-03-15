@@ -2,67 +2,69 @@ Return-Path: <SRS0=4xDg=5A=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA2CAC0044D
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Mar 2020 01:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45649C2BB1D
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Mar 2020 05:23:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98BA32076F
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Mar 2020 01:58:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24E4520722
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Mar 2020 05:23:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727601AbgCOB6F convert rfc822-to-8bit (ORCPT
+        id S1727897AbgCOFXv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Mar 2020 21:58:05 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34600 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726853AbgCOB6F (ORCPT
+        Sun, 15 Mar 2020 01:23:51 -0400
+Received: from Chamillionaire.breakpoint.cc ([193.142.43.52]:41332 "EHLO
+        Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727875AbgCOFXv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Mar 2020 21:58:05 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 95D57CED19;
-        Sat, 14 Mar 2020 19:59:44 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH -next] Bluetooth: L2CAP: remove set but not used variable
- 'credits'
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200314100606.41532-1-yuehaibing@huawei.com>
-Date:   Sat, 14 Mar 2020 19:50:14 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>, kuba@kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <DB8D6DBD-7FE3-4BF3-A284-4A0DF78F2A98@holtmann.org>
-References: <20200314100606.41532-1-yuehaibing@huawei.com>
-To:     YueHaibing <yuehaibing@huawei.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Sun, 15 Mar 2020 01:23:51 -0400
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+        (envelope-from <fw@strlen.de>)
+        id 1jDGyy-0003hV-Vn; Sun, 15 Mar 2020 01:18:21 +0100
+Date:   Sun, 15 Mar 2020 01:18:20 +0100
+From:   Florian Westphal <fw@strlen.de>
+To:     syzbot <syzbot+437bf61d165c87bd40fb@syzkaller.appspotmail.com>
+Cc:     coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de,
+        johan.hedberg@gmail.com, kadlec@netfilter.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, max.chou@realtek.com, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, pablo@netfilter.org,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: BUG: corrupted list in __nf_tables_abort
+Message-ID: <20200315001820.GD979@breakpoint.cc>
+References: <0000000000001ba488059c65d352@google.com>
+ <0000000000007f2c5b05a0d8f312@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0000000000007f2c5b05a0d8f312@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Yue,
-
-> net/bluetooth/l2cap_core.c: In function l2cap_ecred_conn_req:
-> net/bluetooth/l2cap_core.c:5848:6: warning: variable credits set but not used [-Wunused-but-set-variable]
+syzbot <syzbot+437bf61d165c87bd40fb@syzkaller.appspotmail.com> wrote:
+> syzbot suspects this bug was fixed by commit:
 > 
-> commit 15f02b910562 ("Bluetooth: L2CAP: Add initial code for Enhanced Credit Based Mode")
-> involved this unused variable, remove it.
+> commit 34682110abc50ffea7e002b0c2fd7ea9e0000ccc
+> Author: Max Chou <max.chou@realtek.com>
+> Date:   Wed Nov 27 03:01:07 2019 +0000
 > 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
-> net/bluetooth/l2cap_core.c | 3 +--
-> 1 file changed, 1 insertion(+), 2 deletions(-)
+>     Bluetooth: btusb: Edit the logical value for Realtek Bluetooth reset
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=113e9919e00000
+> start commit:   d5d359b0 Merge branch 'for-linus' of git://git.kernel.org/..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=83c00afca9cf5153
+> dashboard link: https://syzkaller.appspot.com/bug?extid=437bf61d165c87bd40fb
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=168a1611e00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=162f0376e00000
+> 
+> If the result looks correct, please mark the bug fixed by replying with:
 
-patch has been applied to bluetooth-next tree.
+Looks wrong, better candidate:
 
-Regards
-
-Marcel
-
+#syz fix: netfilter: nf_tables: autoload modules from the abort path
