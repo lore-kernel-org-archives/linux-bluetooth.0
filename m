@@ -2,159 +2,335 @@ Return-Path: <SRS0=BuFd=5C=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 643EFC10F29
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Mar 2020 06:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BA9C1975A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Mar 2020 19:14:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3275420724
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Mar 2020 06:53:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I0WfZGFo"
+	by mail.kernel.org (Postfix) with ESMTP id 0E56E20735
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Mar 2020 19:14:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725870AbgCQGxI (ORCPT
+        id S1726530AbgCQTOz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Mar 2020 02:53:08 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37804 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbgCQGxI (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Mar 2020 02:53:08 -0400
-Received: by mail-wm1-f66.google.com with SMTP id a141so20601930wme.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Mar 2020 23:53:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DQJFThQABfvaCXGRaom/ZTc/xTYIP6obwBzxYLhhNQ0=;
-        b=I0WfZGFoApAUjGvD6N6OPpsoRlcuYsIKcHG9jN0rQjwYCpKonPhs4M2+9cFR1igT0m
-         qXiZjQtDUQAl8zNm9x0gfsVlt524WRYGNp4ONWKIjeuoikmftO+7HvxRR1MmEzh/+4lr
-         5+jixtrqoK1SZWqm2zypUkXlxAoXPPz7wjJAVKNZ4odpnLLG4UZfLCX5j7bWFpDqltOM
-         +09t4pDOTE4y6AEJal4c7qhmMDB5s8j4eBEjA2Y9yhyb8WHjBr/cA8IceAv1EODm303h
-         Hx2GOmN2oEczjJzzzWPVQuwHAiF2oDvhOwzgtqSTBBpkOFv4T9Dvi56PIQJGd1icOwPV
-         xUhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DQJFThQABfvaCXGRaom/ZTc/xTYIP6obwBzxYLhhNQ0=;
-        b=cd+8yIYOELFtNxUPBJ0dLKqEKAkU8Q02vzztDqee4KjXMTVjz8uhqzlCDNvyMSwf4G
-         ZRYQv7m/cTc+A4hz/tvkwJlBitr8067xg6LWlFs8lLjZWZcms4m8dKbyFlpyMmCebRoI
-         t/xMzpa/F/JTEgOhwpa/Lpq43vTT/z2p0HDy6bzlkXpVHz7Cx4GzFfszXt+x5hncQ1j/
-         eUN2vfXJN9kVhq4M0e9iFW7MGAK+/LvJmkQ/6ysAFJwPXJbzG0Zua6C3txudBWTi+at4
-         9dpFPC3tNDMXsIksQlt5ke54wl5unwNKcDL4MhPboeX5TbJbNc+CSW+arbzj7G0DLi23
-         RhVA==
-X-Gm-Message-State: ANhLgQ0tF8T7b0ac/Gu+9Tc0gNeUqE0rjrJAn4IOAvLltMVdIQP2PJrT
-        sehS2e7ueUAxNGc28X3r27ALdfNeIjz4FX+cWuiadE6xvSZFhQ==
-X-Google-Smtp-Source: ADFU+vssGEKeVK6wNocQtEMxDmM4PpzMSah9tMTCHShJaCRvUCW+4A/4a7aDToAkuK0OgAbqj3T2l7iRybi2duAtPeg=
-X-Received: by 2002:a7b:c391:: with SMTP id s17mr3491567wmj.55.1584427985365;
- Mon, 16 Mar 2020 23:53:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200316123914.Bluez.v1.1.I2c83372de789a015c1ee506690bb795ee0b0b0d9@changeid>
- <CABBYNZL1D44M4z2c+4zbjLgZ=PMHsTwy1VpYZpsJbpFJ9POZug@mail.gmail.com>
-In-Reply-To: <CABBYNZL1D44M4z2c+4zbjLgZ=PMHsTwy1VpYZpsJbpFJ9POZug@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Tue, 17 Mar 2020 14:52:54 +0800
-Message-ID: <CAJQfnxEFM81DSvZb+ULG7+nwQuy-GWj26GWn4OP+Bp--24N1CQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] input: disconnect intr channel before ctrl channel
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+        Tue, 17 Mar 2020 15:14:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35618 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726388AbgCQTOz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 17 Mar 2020 15:14:55 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 206515] Bluetooth drivers crashes the system randomly
+Date:   Tue, 17 Mar 2020 19:14:53 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: warxcell@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-206515-62941-TFlwC3W6wa@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-206515-62941@https.bugzilla.kernel.org/>
+References: <bug-206515-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=206515
 
-Luckily you asked, because I found out that actually the patch didn't
-wait for the disconnection response for any case. It does delay the
-disconnection of the ctrl channel slightly though, but that doesn't
-guarantee a proper order of disconnection. Therefore, as of now, this
-patch is not fixing anything.
+--- Comment #2 from Bozhidar Hristov (warxcell@gmail.com) ---
+Another log from today:
 
-Digging more into this matter, I found out by removing this condition
-(sk->sk_shutdown == SHUTDOWN_MASK) in [1], it makes intr_watch_cb()
-called after truly receiving the interrupt disconnection response.
-However, I haven't checked whether removal of such condition will
-break other things.
-Do you have any suggestions?
+мар 17 18:45:41 bhasus kernel: general protection fault: 0000 [#1] PREEMPT SMP
+NOPTI
+мар 17 18:45:41 bhasus kernel: CPU: 2 PID: 949947 Comm: kworker/u25:1 Not
+tainted 5.5.8-zen1-1-zen #1
+мар 17 18:45:41 bhasus kernel: Hardware name: ASUSTeK COMPUTER INC. ROG Strix
+G531GT_G531GT/G531GT, BIOS G531GT.305 09/24/2019
+мар 17 18:45:41 bhasus kernel: Workqueue: hci0 hci_rx_work [bluetooth]
+мар 17 18:45:41 bhasus kernel: RIP: 0010:__wake_up_common+0xf5/0x1b0
+мар 17 18:45:41 bhasus kernel: Code: 24 48 89 50 08 48 8d 78 e8 48 89 02 49 89
+71 18 48 83 c6 22 49 89 71 20 41 c7 01 00 00 00 00 48 39 c3 0f 85 58 ff ff ff
+eb aa <49> 8b 47 18 4c 89 ff 49 8d 57 18 48 83 e8 18 48 39 14 24 74 95 49
+мар 17 18:45:41 bhasus kernel: RSP: 0018:ffffb20ec81b3c20 EFLAGS: 00010083
+мар 17 18:45:41 bhasus kernel: Code: 24 48 89 50 08 48 8d 78 e8 48 89 02 49 89
+71 18 48 83 c6 22 49 89 71 20 41 c7 01 00 00 00 00 48 39 c3 0f 85 58 ff ff ff
+eb aa <49> 8b 47 18 4c 89 ff 49 8d 57 18 48 83 e8 18 48 39 14 24 74 95 49
+мар 17 18:45:41 bhasus kernel: RSP: 0018:ffffb20ec81b3c20 EFLAGS: 00010083
+мар 17 18:45:41 bhasus kernel: RAX: 0000000000000000 RBX: 0000000000000000 RCX:
+0000000000000000
+мар 17 18:45:41 bhasus kernel: RDX: 0000000000000002 RSI: 0000000000000046 RDI:
+00000000ffffffff
+мар 17 18:45:41 bhasus kernel: RBP: 0000000000000001 R08: 0000000000000000 R09:
+ffffb20ec81b3bb8
+мар 17 18:45:41 bhasus kernel: R10: 0000000000002b34 R11: 0000000000000000 R12:
+0000000000000002
+мар 17 18:45:41 bhasus kernel: R13: 0000000000000000 R14: 0000000000000000 R15:
+dead0000000000e8
+мар 17 18:45:41 bhasus kernel: FS:  0000000000000000(0000)
+GS:ffff99eb1da80000(0000) knlGS:0000000000000000
+мар 17 18:45:41 bhasus kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+мар 17 18:45:41 bhasus kernel: CR2: 000055dd86b86f80 CR3: 000000079247a002 CR4:
+00000000003606e0
+мар 17 18:45:41 bhasus kernel: Call Trace:
+мар 17 18:45:41 bhasus kernel:  __wake_up+0x7e/0xc0
+мар 17 18:45:41 bhasus kernel:  sock_def_wakeup+0x3b/0x50
+мар 17 18:45:41 bhasus kernel:  l2cap_sock_teardown_cb+0x19d/0x210 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  l2cap_chan_del+0x43/0x2d0 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  l2cap_conn_del+0x10d/0x250 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  hci_event_packet+0x81e/0x2a30 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  ? __switch_to_asm+0x40/0x70
+мар 17 18:45:41 bhasus kernel:  ? __kprobes_text_end+0x111c50/0x111c50
+мар 17 18:45:41 bhasus kernel:  ? __switch_to_asm+0x34/0x70
+мар 17 18:45:41 bhasus kernel:  ? __switch_to_asm+0x40/0x70
+мар 17 18:45:41 bhasus kernel:  ? preempt_count_add+0x68/0xa0
+мар 17 18:45:41 bhasus kernel:  hci_rx_work+0x19f/0x380 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  ? __schedule+0x422/0xbf0
+мар 17 18:45:41 bhasus kernel:  process_one_work+0x1e1/0x3c0
+мар 17 18:45:41 bhasus kernel:  worker_thread+0x5d/0x490
+мар 17 18:45:41 bhasus kernel:  kthread+0x131/0x170
+мар 17 18:45:41 bhasus kernel:  ? process_one_work+0x3c0/0x3c0
+мар 17 18:45:41 bhasus kernel:  ? kthread_park+0x90/0x90
+мар 17 18:45:41 bhasus kernel:  ret_from_fork+0x1f/0x40
+мар 17 18:45:41 bhasus kernel: Modules linked in: fuse hidp rfcomm ccm veth
+xt_nat nf_conntrack_netlink nfnetlink xt_addrtype br_netfilter overlay
+xfrm_user xfrm_algo cmac algif_hash algif_skcipher af_alg xt_CHECKSUM
+xt_MASQUERADE xt_conntrack ipt_REJECT nf_reject_ipv4 >
+мар 17 18:45:41 bhasus kernel:  intel_powerclamp snd_hda_core coretemp
+snd_hwdep libarc4 iwlwifi snd_pcm kvm_intel snd_timer kvm joydev mousedev snd
+irqbypass r8169 wmi_bmof hid_multitouch mei_hdcp intel_rapl_msr iTCO_wdt
+iTCO_vendor_support asus_nb_wmi asus_wmi sparse_>
+мар 17 18:45:41 bhasus kernel:  scsi_mod i8042 serio i915 i2c_algo_bit
+drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops drm intel_agp
+intel_gtt agpgart
+мар 17 18:45:41 bhasus kernel: ---[ end trace eea9128a365b4677 ]---
+мар 17 18:45:41 bhasus kernel: RIP: 0010:__wake_up_common+0xf5/0x1b0
+мар 17 18:45:41 bhasus kernel: Code: 24 48 89 50 08 48 8d 78 e8 48 89 02 49 89
+71 18 48 83 c6 22 49 89 71 20 41 c7 01 00 00 00 00 48 39 c3 0f 85 58 ff ff ff
+eb aa <49> 8b 47 18 4c 89 ff 49 8d 57 18 48 83 e8 18 48 39 14 24 74 95 49
+мар 17 18:45:41 bhasus kernel: RSP: 0018:ffffb20ec81b3c20 EFLAGS: 00010083
+мар 17 18:45:41 bhasus kernel: RAX: 0000000000000000 RBX: 0000000000000000 RCX:
+0000000000000000
+мар 17 18:45:41 bhasus kernel: RDX: 0000000000000002 RSI: 0000000000000046 RDI:
+00000000ffffffff
+мар 17 18:45:41 bhasus kernel: RBP: 0000000000000001 R08: 0000000000000000 R09:
+ffffb20ec81b3bb8
+мар 17 18:45:41 bhasus kernel: R10: 0000000000002b34 R11: 0000000000000000 R12:
+0000000000000002
+мар 17 18:45:41 bhasus kernel: R13: 0000000000000000 R14: 0000000000000000 R15:
+dead0000000000e8
+мар 17 18:45:41 bhasus kernel: FS:  0000000000000000(0000)
+GS:ffff99eb1da80000(0000) knlGS:0000000000000000
+мар 17 18:45:41 bhasus kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+мар 17 18:45:41 bhasus kernel: CR2: 000055dd86b86f80 CR3: 000000079247a002 CR4:
+00000000003606e0
+мар 17 18:45:41 bhasus kernel: note: kworker/u25:1[949947] exited with
+preempt_count 1
+мар 17 18:45:43 bhasus dockerd[1241]:
+time="2020-03-17T18:45:43.201866331+02:00" level=error msg="stream copy error:
+reading from a closed fifo"
+мар 17 18:45:43 bhasus dockerd[1241]:
+time="2020-03-17T18:45:43.201866321+02:00" level=error msg="stream copy error:
+reading from a closed fifo"
+мар 17 18:45:43 bhasus kmail[956410]: kf5.kxmlgui: Index  23  is not within
+range (0 -  21 )
+мар 17 18:45:44 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Executing search "akonadi_newmailnotifier_agent-SearchSession"
+мар 17 18:45:44 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Search  "akonadi_newmailnotifier_agent-SearchSession" done (without remote
+search)
+мар 17 18:45:44 bhasus ksmserver[3647]: CreateNotify: 33558999
+мар 17 18:45:44 bhasus ksmserver[3647]: CreateNotify: 49927478
+мар 17 18:45:44 bhasus ksmserver[3647]: MapNotify: 49927478
+мар 17 18:45:44 bhasus ksmserver[3647]: CreateNotify: 33559002
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Error sending
+STATISTICS_CMD: time out after 2000ms.
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Current CMD queue read_ptr
+243 write_ptr 244
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Start IWL Error Log Dump:
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Status: 0x00000040, count:
+6
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Loaded firmware version:
+46.6bf1df06.0
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x00000084 |
+NMI_INTERRUPT_UNKNOWN       
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x0080A210 |
+trm_hw_status0
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x00000000 |
+trm_hw_status1
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x004882DA | branchlink2
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x0047932A |
+interruptlink1
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x0047932A |
+interruptlink2
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x0000CA1A | data1
+мар 17 18:45:41 bhasus kernel: RBP: 0000000000000001 R08: 0000000000000000 R09:
+ffffb20ec81b3bb8
+мар 17 18:45:36 bhasus systemd[2917]:
+run-docker-runtime\x2drunc-moby-5bfb7c6892e98cbf8d3d848292da836b1bbc0c1ab1b9520135ccbeb51ff2c8c4-runc.72olL0.mount:
+Succeeded.
+мар 17 18:45:36 bhasus systemd[1]:
+run-docker-runtime\x2drunc-moby-5bfb7c6892e98cbf8d3d848292da836b1bbc0c1ab1b9520135ccbeb51ff2c8c4-runc.72olL0.mount:
+Succeeded.
+мар 17 18:45:39 bhasus kscreenlocker_greet[975691]: Could not create AF_NETLINK
+socket (Действието не е позволено)
+мар 17 18:45:39 bhasus kscreenlocker_greet[975691]: Could not create AF_NETLINK
+socket (Действието не е позволено)
+мар 17 18:45:39 bhasus kscreenlocker_greet[975691]: Could not create AF_NETLINK
+socket (Действието не е позволено)
+мар 17 18:45:39 bhasus kscreenlocker_greet[975691]: Could not create AF_NETLINK
+socket (Действието не е позволено)
+мар 17 18:45:39 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Executing search "searchUpdate-1584463539"
+мар 17 18:45:39 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Search  "searchUpdate-1584463539" done (without remote search)
+мар 17 18:45:39 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Search update for collection "DeclinedInvitations" ( 16 ) finished: all
+results:  0 , removed results: 0
+мар 17 18:45:39 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Executing search "searchUpdate-1584463539"
+мар 17 18:45:39 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Search  "searchUpdate-1584463539" done (without remote search)
+мар 17 18:45:39 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Search update for collection "OpenInvitations" ( 15 ) finished: all results:  0
+, removed results: 0
+мар 17 18:45:41 bhasus charon[1247]: 12[NET] forecast intercepted packet:
+192.168.135.1 to 255.255.255.255
+мар 17 18:45:41 bhasus kernel: general protection fault: 0000 [#1] PREEMPT SMP
+NOPTI
+мар 17 18:45:41 bhasus kernel: CPU: 2 PID: 949947 Comm: kworker/u25:1 Not
+tainted 5.5.8-zen1-1-zen #1
+мар 17 18:45:41 bhasus kernel: Hardware name: ASUSTeK COMPUTER INC. ROG Strix
+G531GT_G531GT/G531GT, BIOS G531GT.305 09/24/2019
+мар 17 18:45:41 bhasus kernel: Workqueue: hci0 hci_rx_work [bluetooth]
+мар 17 18:45:41 bhasus kernel: RIP: 0010:__wake_up_common+0xf5/0x1b0
+мар 17 18:45:41 bhasus kernel: Code: 24 48 89 50 08 48 8d 78 e8 48 89 02 49 89
+71 18 48 83 c6 22 49 89 71 20 41 c7 01 00 00 00 00 48 39 c3 0f 85 58 ff ff ff
+eb aa <49> 8b 47 18 4c 89 ff 49 8d 57 18 48 83 e8 18 48 39 14 24 74 95 49
+мар 17 18:45:41 bhasus kernel: RSP: 0018:ffffb20ec81b3c20 EFLAGS: 00010083
+мар 17 18:45:41 bhasus kernel: RAX: 0000000000000000 RBX: 0000000000000000 RCX:
+0000000000000000
+мар 17 18:45:41 bhasus kernel: RDX: 0000000000000002 RSI: 0000000000000046 RDI:
+00000000ffffffff
+мар 17 18:45:41 bhasus kernel: RBP: 0000000000000001 R08: 0000000000000000 R09:
+ffffb20ec81b3bb8
+мар 17 18:45:41 bhasus kernel: R10: 0000000000002b34 R11: 0000000000000000 R12:
+0000000000000002
+мар 17 18:45:41 bhasus kernel: R13: 0000000000000000 R14: 0000000000000000 R15:
+dead0000000000e8
+мар 17 18:45:41 bhasus kernel: FS:  0000000000000000(0000)
+GS:ffff99eb1da80000(0000) knlGS:0000000000000000
+мар 17 18:45:41 bhasus kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+мар 17 18:45:41 bhasus kernel: CR2: 000055dd86b86f80 CR3: 000000079247a002 CR4:
+00000000003606e0
+мар 17 18:45:41 bhasus kernel: Call Trace:
+мар 17 18:45:41 bhasus kernel:  __wake_up+0x7e/0xc0
+мар 17 18:45:41 bhasus kernel:  sock_def_wakeup+0x3b/0x50
+мар 17 18:45:41 bhasus kernel:  l2cap_sock_teardown_cb+0x19d/0x210 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  l2cap_chan_del+0x43/0x2d0 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  l2cap_conn_del+0x10d/0x250 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  hci_event_packet+0x81e/0x2a30 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  ? __switch_to_asm+0x40/0x70
+мар 17 18:45:41 bhasus kernel:  ? __kprobes_text_end+0x111c50/0x111c50
+мар 17 18:45:41 bhasus kernel:  ? __switch_to_asm+0x34/0x70
+мар 17 18:45:41 bhasus kernel:  ? __switch_to_asm+0x40/0x70
+мар 17 18:45:41 bhasus kernel:  ? preempt_count_add+0x68/0xa0
+мар 17 18:45:41 bhasus kernel:  hci_rx_work+0x19f/0x380 [bluetooth]
+мар 17 18:45:41 bhasus kernel:  ? __schedule+0x422/0xbf0
+мар 17 18:45:41 bhasus kernel:  process_one_work+0x1e1/0x3c0
+мар 17 18:45:41 bhasus kernel:  worker_thread+0x5d/0x490
+мар 17 18:45:41 bhasus kernel:  kthread+0x131/0x170
+мар 17 18:45:41 bhasus kernel:  ? process_one_work+0x3c0/0x3c0
+мар 17 18:45:41 bhasus kernel:  ? kthread_park+0x90/0x90
+мар 17 18:45:41 bhasus kernel:  ret_from_fork+0x1f/0x40
+мар 17 18:45:41 bhasus kernel: Modules linked in: fuse hidp rfcomm ccm veth
+xt_nat nf_conntrack_netlink nfnetlink xt_addrtype br_netfilter overlay
+xfrm_user xfrm_algo cmac algif_hash algif_skcipher af_alg xt_CHECKSUM
+xt_MASQUERADE xt_conntrack ipt_REJECT nf_reject_ipv4 >
+мар 17 18:45:41 bhasus kernel:  intel_powerclamp snd_hda_core coretemp
+snd_hwdep libarc4 iwlwifi snd_pcm kvm_intel snd_timer kvm joydev mousedev snd
+irqbypass r8169 wmi_bmof hid_multitouch mei_hdcp intel_rapl_msr iTCO_wdt
+iTCO_vendor_support asus_nb_wmi asus_wmi sparse_>
+мар 17 18:45:41 bhasus kernel:  scsi_mod i8042 serio i915 i2c_algo_bit
+drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops drm intel_agp
+intel_gtt agpgart
+мар 17 18:45:41 bhasus kernel: ---[ end trace eea9128a365b4677 ]---
+мар 17 18:45:41 bhasus kernel: RIP: 0010:__wake_up_common+0xf5/0x1b0
+мар 17 18:45:41 bhasus kernel: Code: 24 48 89 50 08 48 8d 78 e8 48 89 02 49 89
+71 18 48 83 c6 22 49 89 71 20 41 c7 01 00 00 00 00 48 39 c3 0f 85 58 ff ff ff
+eb aa <49> 8b 47 18 4c 89 ff 49 8d 57 18 48 83 e8 18 48 39 14 24 74 95 49
+мар 17 18:45:41 bhasus kernel: RSP: 0018:ffffb20ec81b3c20 EFLAGS: 00010083
+мар 17 18:45:41 bhasus kernel: RAX: 0000000000000000 RBX: 0000000000000000 RCX:
+0000000000000000
+мар 17 18:45:41 bhasus kernel: RDX: 0000000000000002 RSI: 0000000000000046 RDI:
+00000000ffffffff
+мар 17 18:45:41 bhasus kernel: RBP: 0000000000000001 R08: 0000000000000000 R09:
+ffffb20ec81b3bb8
+мар 17 18:45:41 bhasus kernel: R10: 0000000000002b34 R11: 0000000000000000 R12:
+0000000000000002
+мар 17 18:45:41 bhasus kernel: R13: 0000000000000000 R14: 0000000000000000 R15:
+dead0000000000e8
+мар 17 18:45:41 bhasus kernel: FS:  0000000000000000(0000)
+GS:ffff99eb1da80000(0000) knlGS:0000000000000000
+мар 17 18:45:41 bhasus kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+мар 17 18:45:41 bhasus kernel: CR2: 000055dd86b86f80 CR3: 000000079247a002 CR4:
+00000000003606e0
+мар 17 18:45:41 bhasus kernel: note: kworker/u25:1[949947] exited with
+preempt_count 1
+мар 17 18:45:43 bhasus dockerd[1241]:
+time="2020-03-17T18:45:43.201866331+02:00" level=error msg="stream copy error:
+reading from a closed fifo"
+мар 17 18:45:43 bhasus dockerd[1241]:
+time="2020-03-17T18:45:43.201866321+02:00" level=error msg="stream copy error:
+reading from a closed fifo"
+мар 17 18:45:43 bhasus kmail[956410]: kf5.kxmlgui: Index  23  is not within
+range (0 -  21 )
+мар 17 18:45:44 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Executing search "akonadi_newmailnotifier_agent-SearchSession"
+мар 17 18:45:44 bhasus akonadiserver[4670]: org.kde.pim.akonadiserver.search:
+Search  "akonadi_newmailnotifier_agent-SearchSession" done (without remote
+search)
+мар 17 18:45:44 bhasus ksmserver[3647]: CreateNotify: 33558999
+мар 17 18:45:44 bhasus ksmserver[3647]: CreateNotify: 49927478
+мар 17 18:45:44 bhasus ksmserver[3647]: MapNotify: 49927478
+мар 17 18:45:44 bhasus ksmserver[3647]: CreateNotify: 33559002
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Error sending
+STATISTICS_CMD: time out after 2000ms.
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Current CMD queue read_ptr
+243 write_ptr 244
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Start IWL Error Log Dump:
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Status: 0x00000040, count:
+6
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: Loaded firmware version:
+46.6bf1df06.0
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x00000084 |
+NMI_INTERRUPT_UNKNOWN       
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x0080A210 |
+trm_hw_status0
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x00000000 |
+trm_hw_status1
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x004882DA | branchlink2
+мар 17 18:45:46 bhasus kernel: iwlwifi 0000:00:14.3: 0x0047932A |
+interruptlink1
 
-With this patch and removal of that condition, I confirm that it works
-with situations where the device is being removed and/or just being
-disconnected. It also works with virtual cable unplug when UHID is
-used.
-* Virtual cable unplug has another problem which doesn't adhere to the
-specs, but it is unrelated to disconnection.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/af_bluetooth.c#n470
-
-Thanks,
-Archie
-
-On Tue, 17 Mar 2020 at 04:58, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Archie,
->
-> On Sun, Mar 15, 2020 at 9:40 PM Archie Pusaka <apusaka@google.com> wrote:
-> >
-> > From: Archie Pusaka <apusaka@chromium.org>
-> >
-> > According to bluetooth HID Profile spec Ver 1.0, section 7.2.2, A
-> > host or device shall always complete the disconnection of the
-> > interrupt channel before disconnecting the control channel.
-> > However, the current implementation disconnects them both
-> > simultaneously.
-> >
-> > This patch postpone the disconnection of control channel to the
-> > callback of interrupt watch, which shall be called upon receiving
-> > interrupt channel disconnection response.
-> > ---
-> >
-> >  profiles/input/device.c | 15 ++++++++++-----
-> >  1 file changed, 10 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/profiles/input/device.c b/profiles/input/device.c
-> > index 8ada1b4ff..8ef3714c9 100644
-> > --- a/profiles/input/device.c
-> > +++ b/profiles/input/device.c
-> > @@ -1010,14 +1010,19 @@ static bool is_connected(struct input_device *idev)
-> >
-> >  static int connection_disconnect(struct input_device *idev, uint32_t flags)
-> >  {
-> > +       int sock;
-> > +
-> >         if (!is_connected(idev))
-> >                 return -ENOTCONN;
-> >
-> > -       /* Standard HID disconnect */
-> > -       if (idev->intr_io)
-> > -               g_io_channel_shutdown(idev->intr_io, TRUE, NULL);
-> > -       if (idev->ctrl_io)
-> > -               g_io_channel_shutdown(idev->ctrl_io, TRUE, NULL);
-> > +       /* Standard HID disconnect
-> > +        * Intr channel must be disconnected before ctrl channel, so only
-> > +        * disconnect intr here, ctrl is disconnected in intr_watch_cb.
-> > +        */
-> > +       if (idev->intr_io) {
-> > +               sock = g_io_channel_unix_get_fd(idev->intr_io);
-> > +               shutdown(sock, SHUT_RDWR);
-> > +       }
-> >
-> >         if (idev->uhid)
-> >                 return 0;
-> > --
-> > 2.25.1.481.gfbce0eb801-goog
->
-> Just to confirm, have you checked if this works with both situation
-> where the device is being removed or just being disconnected,
-> specially the case of HIDP_CTRL_VIRTUAL_CABLE_UNPLUG which perhaps was
-> not working before as well since we disconnect the ctrl channel before
-> transmitting it.
->
-> --
-> Luiz Augusto von Dentz
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
