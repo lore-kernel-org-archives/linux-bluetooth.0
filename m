@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3BBC0044D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD00C2BB1D
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Mar 2020 02:11:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 37AFA20674
+	by mail.kernel.org (Postfix) with ESMTP id C1BF620674
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Mar 2020 02:11:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oECzbNFL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j71QDGsx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726278AbgCQCLs (ORCPT
+        id S1726294AbgCQCLt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Mar 2020 22:11:48 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:37135 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726222AbgCQCLs (ORCPT
+        Mon, 16 Mar 2020 22:11:49 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:38990 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726121AbgCQCLs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 16 Mar 2020 22:11:48 -0400
-Received: by mail-pf1-f196.google.com with SMTP id 3so3190933pff.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Mar 2020 19:11:46 -0700 (PDT)
+Received: by mail-pl1-f196.google.com with SMTP id m1so695512pll.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Mar 2020 19:11:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=FXwvTnQykoPpkweMgQAgCKJtBtzeHaiXypRA5dAMTdI=;
-        b=oECzbNFL2wZjA4/QxQNiiz+IsEY71cRAkDvWEVTJ7grftxAUs/Vsi3w2rWukao7JTi
-         cawWI2IlqgYbz/uATG4HfmBm1G+C//dK6+uQTq2/hffrXO32k7R5SIR+7r1xc/8tjBvG
-         jxyXVNZ//mL+xDKe7w1uX2mGKTwsiHWSyCe4cyxHRh9i9vyh6GJZuuKCN8f9Bp+2Huug
-         sqGCNQCb0HaNIgRYbxZM8Sd+rBh2P0O6Q53sAqyCZQHD+LnI0jGbjwemOGZ2xGdkZwIC
-         LJ3DdVIp1LnkkppZbEHDkpBlbLn/mo+wNkLgoT9Y5QtvwWARBWIaGV0JtKjj3pe1fvuo
-         oKRg==
+        bh=redNRYVw53Y2nCzF8YK8qJRWg+E/jmn8Yib4eOsg8Yw=;
+        b=j71QDGsxOk8PPbwL2LjXMMNgIdP/17xyFCirvyYwdUmg2t0jbGh0VyxXRgpWhocUjx
+         HQ9TK3w2naT6AawVsAHJV2aJLVNBeXBnIgw7AYdQ1HNQ6cm6H7h1HLnyFczo5q6/DTRy
+         AgSd4B6JzNvOqPS/a0du/cW3kUBDxJyG6X4/aT9YknAkSrWorL57fAoxXvYO2rcLrJIv
+         StA2Mw7xdgaOjW6d0uoS1nbNAvCMewiP2zafQjBosqbg5x8cOZDQl9bW1KGStPFEkqI5
+         w3w3y7PrYQNXKlhOyB4VELLUgWCkma8Ival77L39BZZvSLpXz+e7oTD93b+C5Bcx4k+a
+         9LrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FXwvTnQykoPpkweMgQAgCKJtBtzeHaiXypRA5dAMTdI=;
-        b=ar6K1gCXzTHHt7Mxaf6dcimlTI0CP2mObTGXdBE8KD74zifBA0CCqbum1+UuEU+OJT
-         u/d7WEVLCY4h3RWL5TjkzrGCoorJ6O9vFeFWECaSmuJtXNMv/ZZJvEvQewjYDSIeyGLO
-         Yt1hqKmglNCA4OTwvxmmO9W4hj54xchxI7XuHQ9fmREyGNcHWO0lvUp88+tyRoUpfLNK
-         6cJInIkJhcwdxVBD+cLwfI8Q0G61cpSm46wbTC3hAY4yezVvUXDNDrOD78+QB8Ny8iJ/
-         ftvNVvhImHuO7L4C0l52gtenIjZwEl80Hx8cPC1qtnIXikjj9ZuGUd11pX0dvyDzalcb
-         QSdA==
-X-Gm-Message-State: ANhLgQ0Me90slaDVlbTCd0Xi8esodLg1YTWYoZ/AT3cyl5gkUIvuYsBK
-        8JiYagtJcV5vOO9QMNPM+3AE9/6pW5A=
-X-Google-Smtp-Source: ADFU+vvlA88umWs1OEdPwlZNx8gPMgoamDKl/13v9booWJGHutTh+O0aQzJ8hTMZpgPc7QNcnb84Jw==
-X-Received: by 2002:aa7:87c1:: with SMTP id i1mr2760084pfo.297.1584411105793;
-        Mon, 16 Mar 2020 19:11:45 -0700 (PDT)
+        bh=redNRYVw53Y2nCzF8YK8qJRWg+E/jmn8Yib4eOsg8Yw=;
+        b=pn2dn8vTBy6U/rUQ9GwRmzsLtMPNxgcRCMM4s5qgLe+l1pmLSLIfs5db+hHoUtdJlN
+         q89RZExCpMR8BJ7762j6oDJRBYoifUWAc8oaEIq+vV1svpZEpCEC0lEDa6QvPHMvIB5S
+         t+rxQ9tdIJujqac2onidsc/m5i/eeH9WJQkVyDnb/2/D9b8NSiiGd2D94ciQzEQbaSCQ
+         c02Z59BDxyr9+JQEGXQ4MVrnXkMJGLE1n6JUlf2LTiwsDZDuRMEx1hAfXB871PEUjVhe
+         9Z8ug76RUI5C8TUIe0RqDtk73dOUNpN3JT9RP9S6DXwu/mYm16iwjQzkol5qoqcyyMhc
+         KXsw==
+X-Gm-Message-State: ANhLgQ3pwZVLp1Mp/Id8cN437ufmxfo4iJfh4/CMfp2URr+o3evEcF/w
+        qO8a5SS9zLclOrtXGMHNXQWhs8/hAk4=
+X-Google-Smtp-Source: ADFU+vtfs/mSVwrgtKVSz1aBTp3k9L/SM3OenmZD3A7c2UEIFMKinl8Yg5/MIa0uxSVS0lg8XfV5RQ==
+X-Received: by 2002:a17:902:b286:: with SMTP id u6mr2097444plr.280.1584411106868;
+        Mon, 16 Mar 2020 19:11:46 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f19sm700769pgf.33.2020.03.16.19.11.44
+        by smtp.gmail.com with ESMTPSA id f19sm700769pgf.33.2020.03.16.19.11.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2020 19:11:44 -0700 (PDT)
+        Mon, 16 Mar 2020 19:11:46 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/6] l2test: Add support for L2CAP_EXT_FLOWCTL_MODE
-Date:   Mon, 16 Mar 2020 19:11:38 -0700
-Message-Id: <20200317021141.16398-3-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/6] emulator/bthost: Add support for ECRED Connection request/response
+Date:   Mon, 16 Mar 2020 19:11:39 -0700
+Message-Id: <20200317021141.16398-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200317021141.16398-1-luiz.dentz@gmail.com>
 References: <20200317021141.16398-1-luiz.dentz@gmail.com>
@@ -74,47 +74,102 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables using l2test to connect or listen with
-L2CAP_EXT_FLOWCTL_MODE.
+This adds support for ECRED Connection request/response which will be
+used by l2cap-runner to test L2CAP_MODE_EXT_FLOWCTL mode.
 ---
- tools/l2test.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ emulator/bthost.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 8c6e08646..ee3637699 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -150,6 +150,7 @@ static struct lookup_table l2cap_modes[] = {
- 	*/
- 	{ "ertm",	L2CAP_MODE_ERTM		},
- 	{ "streaming",	L2CAP_MODE_STREAMING	},
-+	{ "ext-flowctl",L2CAP_MODE_EXT_FLOWCTL	},
- 	{ 0 }
- };
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 6482bbecc..0fa283464 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -1773,6 +1773,69 @@ static bool l2cap_le_conn_rsp(struct bthost *bthost, struct btconn *conn,
+ 	return true;
+ }
  
-@@ -283,7 +284,7 @@ static int getopts(int sk, struct l2cap_options *opts, bool connected)
- 
- 	memset(opts, 0, sizeof(*opts));
- 
--	if (bdaddr_type == BDADDR_BREDR) {
-+	if (bdaddr_type == BDADDR_BREDR || rfcmode) {
- 		optlen = sizeof(*opts);
- 		return getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts, &optlen);
- 	}
-@@ -303,6 +304,13 @@ static int setopts(int sk, struct l2cap_options *opts)
- 		return setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts,
- 								sizeof(*opts));
- 
-+	if (opts->mode) {
-+		if (setsockopt(sk, SOL_BLUETOOTH, BT_MODE, &opts->mode,
-+						sizeof(opts->mode)) < 0) {
-+			return -errno;
-+		}
++static bool l2cap_ecred_conn_req(struct bthost *bthost, struct btconn *conn,
++				uint8_t ident, const void *data, uint16_t len)
++{
++	const struct bt_l2cap_pdu_ecred_conn_req *req = data;
++	struct {
++		struct bt_l2cap_pdu_ecred_conn_rsp pdu;
++		uint16_t dcid[5];
++	} __attribute__ ((packed)) rsp;
++	uint16_t psm;
++	int num_scid, i = 0;
++
++	if (len < sizeof(*req))
++		return false;
++
++	psm = le16_to_cpu(req->psm);
++
++	memset(&rsp, 0, sizeof(rsp));
++
++	rsp.pdu.mtu = 64;
++	rsp.pdu.mps = 64;
++	rsp.pdu.credits = 1;
++
++	if (!bthost_find_l2cap_cb_by_psm(bthost, psm)) {
++		rsp.pdu.result = cpu_to_le16(0x0002); /* PSM Not Supported */
++		goto respond;
 +	}
 +
- 	return setsockopt(sk, SOL_BLUETOOTH, BT_RCVMTU, &opts->imtu,
- 							sizeof(opts->imtu));
- }
++	len -= sizeof(rsp.pdu);
++	num_scid = len / sizeof(*req->scid);
++
++	for (; i < num_scid; i++)
++		rsp.dcid[i] = cpu_to_le16(conn->next_cid++);
++
++respond:
++	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_ECRED_CONN_RSP, ident, &rsp,
++			sizeof(rsp.pdu) + i * sizeof(*rsp.dcid));
++
++	return true;
++}
++
++static bool l2cap_ecred_conn_rsp(struct bthost *bthost, struct btconn *conn,
++				uint8_t ident, const void *data, uint16_t len)
++{
++	const struct  {
++		const struct bt_l2cap_pdu_ecred_conn_rsp *pdu;
++		uint16_t scid[5];
++	} __attribute__ ((packed)) *rsp = data;
++	int num_scid, i;
++
++	if (len < sizeof(*rsp))
++		return false;
++
++	num_scid = len / sizeof(*rsp->scid);
++
++	for (i = 0; i < num_scid; i++)
++		/* TODO add L2CAP connection before with proper PSM */
++		bthost_add_l2cap_conn(bthost, conn, 0,
++				      le16_to_cpu(rsp->scid[i]), 0);
++
++
++	return true;
++}
++
+ static void l2cap_le_sig(struct bthost *bthost, struct btconn *conn,
+ 						const void *data, uint16_t len)
+ {
+@@ -1819,6 +1882,15 @@ static void l2cap_le_sig(struct bthost *bthost, struct btconn *conn,
+ 		ret = l2cap_le_conn_rsp(bthost, conn, hdr->ident,
+ 						data + sizeof(*hdr), hdr_len);
+ 		break;
++	case BT_L2CAP_PDU_ECRED_CONN_REQ:
++		ret = l2cap_ecred_conn_req(bthost, conn, hdr->ident,
++						data + sizeof(*hdr), hdr_len);
++		break;
++
++	case BT_L2CAP_PDU_ECRED_CONN_RSP:
++		ret = l2cap_ecred_conn_rsp(bthost, conn, hdr->ident,
++						data + sizeof(*hdr), hdr_len);
++		break;
+ 
+ 	default:
+ 		printf("Unknown L2CAP code 0x%02x\n", hdr->code);
 -- 
 2.21.1
 
