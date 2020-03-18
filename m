@@ -2,85 +2,92 @@ Return-Path: <SRS0=jOg2=5D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BAB8C5ACD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 11:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4E3C5ACDA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 12:41:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BA672076D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 11:55:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 618EB2076D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 12:41:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jmMiRfPr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727180AbgCRLz0 convert rfc822-to-8bit (ORCPT
+        id S1726881AbgCRMlx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Mar 2020 07:55:26 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:57313 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726638AbgCRLz0 (ORCPT
+        Wed, 18 Mar 2020 08:41:53 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52873 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726892AbgCRMlw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Mar 2020 07:55:26 -0400
-Received: from [192.168.1.91] (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B5C2FCECF3;
-        Wed, 18 Mar 2020 13:04:54 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH] Bluetooth: Do not cancel advertising when starting a scan
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAO1O6sdfdVavo9U0UKewbS9YAjCVzdXDYms-OJZNEJVzMmkgMg@mail.gmail.com>
-Date:   Wed, 18 Mar 2020 12:54:54 +0100
-Cc:     Manish Mandlik <mmandlik@google.com>,
-        Yoni Shavit <yshavit@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Dmitry Grinberg <dmitrygr@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <F5E108DF-2004-4C52-8A5B-12A392D2416D@holtmann.org>
-References: <20200316224023.1.I002569822232363cfbb5af1f33a293ea390c24c7@changeid>
- <4DF7C709-1AD3-42FF-A0C2-EF488D82F083@holtmann.org>
- <CAO1O6sdfdVavo9U0UKewbS9YAjCVzdXDYms-OJZNEJVzMmkgMg@mail.gmail.com>
-To:     Emil Lenngren <emil.lenngren@gmail.com>
-X-Mailer: Apple Mail (2.3608.60.0.2.5)
+        Wed, 18 Mar 2020 08:41:52 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 11so3174772wmo.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2020 05:41:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QyuIk5ru+vxMQ+luek8J7yWtiEyJHc8Og658+Ky+1FU=;
+        b=jmMiRfPrn0mWadSDoBmcsi2cKioTKejLUjsdXCnYjD60bCmPM8D1p4zhyk1PFnrYLz
+         enBPJ5VYHVx2JQ74Uptgt9zxdbWxhmi581vkG12yHAEAdcdOZExWhOOt3AVvwsxA8RhB
+         tOs3A5HsPEfmVzrb9Oe4XFQ2HeBhGLAnZXf5/1muLQtzVjdJjpe+z74aZhH702T4wN1v
+         cV03bQh0x3Qvq53r6+4+wqLEzdICsx4RgH/qMYfUmIsFhA6pPQ34VJgmz0avJK6QDkTo
+         IPywcJ0YACrIpiIWEzg+2J3wnie1QZzZD0wpeynf0SNtpV2u93nfRR7zFfX+MALf6441
+         hXOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QyuIk5ru+vxMQ+luek8J7yWtiEyJHc8Og658+Ky+1FU=;
+        b=MuwG3kmo1JfrqWefR0uujWHJ+gWPoqyrnSI0Z7RgXsvdXDzIm5tlqU0iasNm1zk4EZ
+         ka/UFDk7U7xJTwg1EBgU/0+LpHLMDW9LC9I4oA5wVvJKW7fq0Vxwc5kbq+ivkKPKfBW7
+         yBe37EGqDm7LntFWGV3Kp6icQEeoxFohr+Oo623ENHLj0usoHDFYMq1ZSOqxVKOlMq9F
+         Wat0YFwVAK3xsAcbPdxsKtMgtAss1fYXFjV5pYSU0AJyZBWHj0P3cO+Avp2AujRRwaPQ
+         u+TsT9I/gZ0aUICy9XpBPYi9Cooqakep++CrZtQY9Xa6WLOc3wfBaNPRXhsoMdNLzhRW
+         YPOQ==
+X-Gm-Message-State: ANhLgQ1J1pnbuxThcVugvviG8E7VfQXfcAwkyFsxQTc5uUKmvYZy4cMj
+        1JcQTJGvoktK0We1teciCaCKjhorV+inFwJrAezIhg==
+X-Google-Smtp-Source: ADFU+vspu/C6Avt/tND+kap7M/lZ/oTSqRK+EaaP9XgfYPMKJVlAwBXEjr0+crvlEzYdwMP39lnTgbOZ2iROy36Yc1w=
+X-Received: by 2002:a1c:456:: with SMTP id 83mr5135955wme.54.1584535310089;
+ Wed, 18 Mar 2020 05:41:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200316123914.Bluez.v1.1.I2c83372de789a015c1ee506690bb795ee0b0b0d9@changeid>
+ <CABBYNZL1D44M4z2c+4zbjLgZ=PMHsTwy1VpYZpsJbpFJ9POZug@mail.gmail.com>
+ <CAJQfnxEFM81DSvZb+ULG7+nwQuy-GWj26GWn4OP+Bp--24N1CQ@mail.gmail.com>
+ <CABBYNZ+=wMNuvjJ5VK2zpd6euqeEZ8JXbd67RmPgxDfdCgce9w@mail.gmail.com> <14E46BF4-0688-4A0B-AE84-46C4426C5E9A@holtmann.org>
+In-Reply-To: <14E46BF4-0688-4A0B-AE84-46C4426C5E9A@holtmann.org>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Wed, 18 Mar 2020 20:41:38 +0800
+Message-ID: <CAJQfnxELMMDa6nbxRUrW46VjEBj6Txfeym62PKi+R3iXHKU0CQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] input: disconnect intr channel before ctrl channel
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Emil,
+> > I see, we shutdown the socket immediately since the socket API itself
+> > don't seem to have a concept of disconnect syscall not sure if other
+> > values could be passed to shutdown second parameter to indicate we
+> > want to actually wait it to be disconnected.
 
->>> BlueZ cancels adv when starting a scan, but does not cancel a scan when
->>> starting to adv. Neither is required, so this brings both to a
->>> consistent state (of not affecting each other). Some very rare (I've
->>> never seen one) BT 4.0 chips will fail to do both at once. Even this is
->>> ok since the command that will fail will be the second one, and thus the
->>> common sense logic of first-come-first-served is preserved for BLE
->>> requests.
->>> 
->>> Signed-off-by: Dmitry Grinberg <dmitrygr@google.com>
->>> Signed-off-by: Manish Mandlik <mmandlik@google.com>
->>> ---
->>> 
->>> net/bluetooth/hci_request.c | 17 -----------------
->>> 1 file changed, 17 deletions(-)
->> 
->> patch has been applied to bluetooth-next tree.
->> 
->> If you know the controller that doesn’t support this, can we blacklist that one and just disable advertising (peripheral mode) for that controller.
-> 
-> Can't the "LE Supported States" be inspected instead to figure out
-> what simultaneous capabilities are supported? It seems a bit rough to
-> always assume the worst.
+I don't think the second parameter matters, I tried every possible
+valid values and intr_watch_cb is still called without waiting for the
+response.
 
-if there are not false-positives, then yes, by all means. However my statement still applies. If a controller can do scanning and advertising at the same time, we should just not indicate support for peripheral mode.
+>
+> in a blocking synchronous system call world we have SO_LINGER for that. In the world of asynchronous IO handling (what we do), we need to check what is the right way of handling this.
+>
 
-Regards
+I spot this piece of code [1] which utilizes getsockopt to query
+socket connection information from the kernel space to the user space.
+We can use a similar method to query whether (sk->sk_state ==
+BT_CLOSED), which is only true when we get the response.
+What do you think?
 
-Marcel
-
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/l2cap_sock.c#n476
