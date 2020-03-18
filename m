@@ -2,380 +2,529 @@ Return-Path: <SRS0=jOg2=5D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C4BC5ACD6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 16:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4696EC10DCE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 17:00:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C776720753
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 16:58:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QrDakjx9"
+	by mail.kernel.org (Postfix) with ESMTP id 0768D20753
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 17:00:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727024AbgCRQ64 (ORCPT
+        id S1726994AbgCRRAa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Mar 2020 12:58:56 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:37416 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726680AbgCRQ6z (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Mar 2020 12:58:55 -0400
-Received: by mail-oi1-f195.google.com with SMTP id w13so26532565oih.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2020 09:58:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zedymcLfm2GxMe6xzaR2P2G74am7Xc/JSeGLtXW7ruI=;
-        b=QrDakjx9hp4QpmcjNlWmv22kKE1VxFJexd2V071vPVGT52qW/cqHs2T2xUhi055uSs
-         6xjEkjcJZ45EEJJ4Xt1fhdMuzgNSVGScWDrmrKf8HNQxg1HPJwfXFV4Oz5BpdP2uCR2P
-         /q3byBthkSZ2RJJVm9QQcllqVnhkUy0ZoT9Ywm2oM7IqgXf2ftTlKIcYyxEJIP5uOwNR
-         YDb8tTY1q4N1QxKee1pIruK0qzpf6qVy1i8G5vKibFZgcZ2Os5D7hAkkh7/kn2T1TGOl
-         RHIpWP32LK1k9PKb74vwf7NpdGC5r81UifiLdX4wsxPSvXILLq0ySyr5z9EbV3A3agkE
-         tfKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zedymcLfm2GxMe6xzaR2P2G74am7Xc/JSeGLtXW7ruI=;
-        b=V45Klt8oR7FigNk1lBbZjhZ3FYOlfVQW7ca02Q7/wVwR+wo+CnhFcd4nVlkUckSaHU
-         v3Yf/UYHwXgRDHLubghB9ITYeesxFzbzvSjUzLU4tpOhaKj3/BF4tzPBd50YbfGNpNVc
-         KjrhcYQidNfwKXH+40kGgQelgH5lsjm0SHuxd9+stn2GH03LyDz67xqITUjin8J7s+rj
-         k2DFmBLO/y6GF9OpjR9oUSUnaczGbwuMgQ5LdRUYfOf7YVhQUXfRe/jGt7q7TreGJ3G2
-         NH9DWwAKU8W+5ccn3J+YwkuhZ26RnBWwDE3B4QcsL6p/FGX20O1gwHm9elZmI+7bnw/x
-         VfeA==
-X-Gm-Message-State: ANhLgQ24P8YLJKVul8+1E03Az2vBEpoQ++cHpgv/UmCklKIruD0jBCnl
-        J6sGrmvJdZ838aPEOAGltfA2pJvTfVurnQHKyoFw8Q==
-X-Google-Smtp-Source: ADFU+vvvD++BzGY3VqvKbXzobxndeumNZ1Ri+y0eiVnXGlLKF78iDNlscX4CYjHk94Xif8iWpTYJXw0aex3BqCUwBx0=
-X-Received: by 2002:aca:b1d5:: with SMTP id a204mr3883578oif.82.1584550734390;
- Wed, 18 Mar 2020 09:58:54 -0700 (PDT)
+        Wed, 18 Mar 2020 13:00:30 -0400
+Received: from mga07.intel.com ([134.134.136.100]:62526 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726506AbgCRRAa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Mar 2020 13:00:30 -0400
+IronPort-SDR: OVhqEavpMupclAajWWcRTxc1kVG3ZUkU0NILEOTcJqD3opoQST3UdvLCJOl4opFSts3Dy2R54n
+ zSaUmQ63tI/w==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2020 10:00:28 -0700
+IronPort-SDR: wDfI3mbgscaQ7qvIjNLLeJCQTVvZ5TMGpNQqKF0mLF/CzrSm/3p5qDr+vzh5qb98L9ysNLSUy6
+ ktp6kHFF83bg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,568,1574150400"; 
+   d="scan'208";a="244884477"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.5.204])
+  by orsmga003.jf.intel.com with ESMTP; 18 Mar 2020 10:00:27 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com
+Subject: [PATCH BlueZ v2] mesh: Allow short messages to be segmented
+Date:   Wed, 18 Mar 2020 10:00:20 -0700
+Message-Id: <20200318170020.1474-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200312222454.5079-1-luiz.dentz@gmail.com> <20200312222454.5079-2-luiz.dentz@gmail.com>
- <F140112C-C0CA-4894-9CD9-48EA67705879@holtmann.org>
-In-Reply-To: <F140112C-C0CA-4894-9CD9-48EA67705879@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 18 Mar 2020 09:58:42 -0700
-Message-ID: <CABBYNZ+bx1O6E9GR+fVPfhEfrOLA=DFT9nGjaauwDDwoV1uBwA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+For added reliability, it is legal to send short messages as "single
+segment" segmented messages, which require transport layer
+acknowledgement. This feature is intended for heavy usage in the future
+so I am adding it now.
 
-On Wed, Mar 18, 2020 at 4:13 AM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
->
-> Hi Luiz,
->
-> > This uses the DEFER_SETUP flag to group channels with
-> > L2CAP_CREDIT_BASED_CONNECTION_REQ.
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> > include/net/bluetooth/l2cap.h |   5 ++
-> > net/bluetooth/l2cap_core.c    | 130 +++++++++++++++++++++++++++++++---
-> > net/bluetooth/l2cap_sock.c    |  13 ++--
-> > 3 files changed, 133 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2ca=
-p.h
-> > index 537aaead259f..dada14d0622c 100644
-> > --- a/include/net/bluetooth/l2cap.h
-> > +++ b/include/net/bluetooth/l2cap.h
-> > @@ -47,6 +47,7 @@
-> > #define L2CAP_DEFAULT_ACC_LAT         0xFFFFFFFF
-> > #define L2CAP_BREDR_MAX_PAYLOAD               1019    /* 3-DH5 packet *=
-/
-> > #define L2CAP_LE_MIN_MTU              23
-> > +#define L2CAP_ECRED_CONN_SCID_MAX    5
-> >
-> > #define L2CAP_DISC_TIMEOUT            msecs_to_jiffies(100)
-> > #define L2CAP_DISC_REJ_TIMEOUT                msecs_to_jiffies(5000)
-> > @@ -660,6 +661,7 @@ struct l2cap_ops {
-> >       void                    (*suspend) (struct l2cap_chan *chan);
-> >       void                    (*set_shutdown) (struct l2cap_chan *chan)=
-;
-> >       long                    (*get_sndtimeo) (struct l2cap_chan *chan)=
-;
-> > +     struct pid              *(*get_peer_pid) (struct l2cap_chan *chan=
-);
->
-> I would move this support into a separate patch. I think that can be appl=
-ied independently.
+Further, to support this functionality, an additional queue has been
+added to allow multiple SAR messages to the same DST to be queued and
+sent serially.
+---
+ mesh/cfgmod-server.c    | 14 +++----
+ mesh/model.c            | 12 +++---
+ mesh/model.h            |  2 +-
+ mesh/net.c              | 90 ++++++++++++++++++++++++++++-------------
+ mesh/net.h              |  6 ++-
+ mesh/node.c             |  8 ++--
+ unit/test-mesh-crypto.c |  4 +-
+ 7 files changed, 86 insertions(+), 50 deletions(-)
 
-Will do.
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index 6499c3f2f..1aecab4b5 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -67,7 +67,7 @@ static void send_pub_status(struct mesh_node *node, uint16_t net_idx,
+ 	}
+ 
+ 	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
+-								msg, n);
++								false, msg, n);
+ }
+ 
+ static bool config_pub_get(struct mesh_node *node, uint16_t net_idx,
+@@ -211,8 +211,8 @@ static void send_sub_status(struct mesh_node *node, uint16_t net_idx,
+ 		n += 2;
+ 	}
+ 
+-	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
+-							DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
++								false, msg, n);
+ }
+ 
+ static bool config_sub_get(struct mesh_node *node, uint16_t net_idx,
+@@ -272,7 +272,7 @@ static bool config_sub_get(struct mesh_node *node, uint16_t net_idx,
+ 	*msg_status = (uint8_t) status;
+ 
+ 	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
+-									msg, n);
++								false, msg, n);
+ 	return true;
+ }
+ 
+@@ -450,7 +450,7 @@ static void send_model_app_status(struct mesh_node *node, uint16_t net_idx,
+ 	n += 2;
+ 
+ 	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
+-									msg, n);
++								false, msg, n);
+ }
+ 
+ static void model_app_list(struct mesh_node *node, uint16_t net_idx,
+@@ -505,7 +505,7 @@ static void model_app_list(struct mesh_node *node, uint16_t net_idx,
+ 	if (result >= 0) {
+ 		*status = result;
+ 		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
+-							DEFAULT_TTL, msg, n);
++						DEFAULT_TTL, false, msg, n);
+ 	}
+ 
+ 	l_free(msg);
+@@ -1234,7 +1234,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 
+ 	if (n)
+ 		mesh_model_send(node, dst, src,
+-				APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
++				APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL, false,
+ 				long_msg ? long_msg : msg, n);
+ 
+ 	l_free(long_msg);
+diff --git a/mesh/model.c b/mesh/model.c
+index d11c95ab9..945583324 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -540,7 +540,7 @@ static void cmplt(uint16_t remote, uint8_t status,
+ 
+ static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
+ 		uint32_t dst, uint16_t app_idx, uint16_t net_idx,
+-		uint8_t *label, uint8_t ttl,
++		uint8_t *label, uint8_t ttl, bool segmented,
+ 		const void *msg, uint16_t msg_len)
+ {
+ 	uint8_t dev_key[16];
+@@ -597,8 +597,8 @@ static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
+ 	/* print_packet("Encrypted with", key, 16); */
+ 
+ 	ret = mesh_net_app_send(net, credential, src, dst, key_aid, net_idx,
+-					ttl, seq_num, iv_index, szmic, out,
+-					out_len, cmplt, NULL);
++					ttl, seq_num, iv_index, segmented,
++					szmic, out, out_len, cmplt, NULL);
+ done:
+ 	l_free(out);
+ 	return ret;
+@@ -1098,14 +1098,14 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
+ 
+ 	result = msg_send(node, mod->pub->credential != 0, src,
+ 				mod->pub->addr, mod->pub->idx, net_idx,
+-				label, ttl, msg, msg_len);
++				label, ttl, false, msg, msg_len);
+ 
+ 	return result ? MESH_ERROR_NONE : MESH_ERROR_FAILED;
+ }
+ 
+ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					uint16_t app_idx, uint16_t net_idx,
+-					uint8_t ttl,
++					uint8_t ttl, bool segmented,
+ 					const void *msg, uint16_t msg_len)
+ {
+ 	/* print_packet("Mod Tx", msg, msg_len); */
+@@ -1120,7 +1120,7 @@ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 		return false;
+ 
+ 	return msg_send(node, false, src, dst, app_idx, net_idx,
+-						NULL, ttl, msg, msg_len);
++					NULL, ttl, segmented, msg, msg_len);
+ }
+ 
+ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
+diff --git a/mesh/model.h b/mesh/model.h
+index 153ab9bfd..f8e0f9d37 100644
+--- a/mesh/model.h
++++ b/mesh/model.h
+@@ -95,7 +95,7 @@ int mesh_model_sub_get(struct mesh_node *node, uint16_t addr, uint32_t id,
+ uint16_t mesh_model_cfg_blk(uint8_t *pkt);
+ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					uint16_t app_idx, uint16_t net_idx,
+-					uint8_t ttl,
++					uint8_t ttl, bool segmented,
+ 					const void *msg, uint16_t msg_len);
+ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id, uint16_t src,
+ 				uint8_t ttl, const void *msg, uint16_t msg_len);
+diff --git a/mesh/net.c b/mesh/net.c
+index d3325e073..55b1330cc 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -139,6 +139,7 @@ struct mesh_net {
+ 	struct l_queue *replay_cache;
+ 	struct l_queue *sar_in;
+ 	struct l_queue *sar_out;
++	struct l_queue *sar_queue;
+ 	struct l_queue *frnd_msgs;
+ 	struct l_queue *friends;
+ 	struct l_queue *negotiations;
+@@ -182,6 +183,7 @@ struct mesh_sar {
+ 	uint16_t remote;
+ 	uint16_t len;
+ 	bool szmic;
++	bool segmented;
+ 	bool frnd;
+ 	bool frnd_cred;
+ 	uint8_t ttl;
+@@ -662,6 +664,7 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
+ 	net->msg_cache = l_queue_new();
+ 	net->sar_in = l_queue_new();
+ 	net->sar_out = l_queue_new();
++	net->sar_queue = l_queue_new();
+ 	net->frnd_msgs = l_queue_new();
+ 	net->destinations = l_queue_new();
+ 	net->app_keys = l_queue_new();
+@@ -687,6 +690,7 @@ void mesh_net_free(struct mesh_net *net)
+ 	l_queue_destroy(net->replay_cache, l_free);
+ 	l_queue_destroy(net->sar_in, mesh_sar_free);
+ 	l_queue_destroy(net->sar_out, mesh_sar_free);
++	l_queue_destroy(net->sar_queue, mesh_sar_free);
+ 	l_queue_destroy(net->frnd_msgs, l_free);
+ 	l_queue_destroy(net->friends, mesh_friend_free);
+ 	l_queue_destroy(net->negotiations, mesh_friend_free);
+@@ -1657,6 +1661,22 @@ static void outmsg_to(struct l_timeout *msg_timeout, void *user_data)
+ }
+ 
+ static void outseg_to(struct l_timeout *seg_timeout, void *user_data);
++
++static void send_queued_sar(struct mesh_net *net, uint16_t dst)
++{
++	struct mesh_sar *sar = l_queue_remove_if(net->sar_queue,
++			match_sar_remote, L_UINT_TO_PTR(dst));
++
++	if (!sar)
++		return;
++
++	/* Out to current outgoing, and immediate expire Seg TO */
++	l_queue_push_head(net->sar_out, sar);
++	sar->seg_timeout = NULL;
++	sar->msg_timeout = l_timeout_create(MSG_TO, outmsg_to, net, NULL);
++	outseg_to(NULL, net);
++}
++
+ static void ack_received(struct mesh_net *net, bool timeout,
+ 				uint16_t src, uint16_t dst,
+ 				uint16_t seq0, uint32_t ack_flag)
+@@ -1692,6 +1712,7 @@ static void ack_received(struct mesh_net *net, bool timeout,
+ 					outgoing->len - 4, outgoing->user_data);
+ 
+ 		l_queue_remove(net->sar_out, outgoing);
++		send_queued_sar(net, outgoing->remote);
+ 		mesh_sar_free(outgoing);
+ 
+ 		return;
+@@ -1701,10 +1722,10 @@ static void ack_received(struct mesh_net *net, bool timeout,
+ 
+ 	ack_copy &= outgoing->flags;
+ 
+-	for (i = 0; i <= SEG_MAX(outgoing->len); i++, seg_flag <<= 1) {
++	for (i = 0; i <= SEG_MAX(true, outgoing->len); i++, seg_flag <<= 1) {
+ 		if (seg_flag & ack_flag) {
+ 			l_debug("Skipping Seg %d of %d",
+-					i, SEG_MAX(outgoing->len));
++					i, SEG_MAX(true, outgoing->len));
+ 			continue;
+ 		}
+ 
+@@ -1741,7 +1762,7 @@ static bool msg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
+ 					uint8_t ttl, uint32_t seq,
+ 					uint16_t net_idx,
+ 					uint16_t src, uint16_t dst,
+-					uint8_t key_aid,
++					uint8_t key_aid, bool segmented,
+ 					bool szmic, uint16_t seqZero,
+ 					const uint8_t *data, uint16_t size)
+ {
+@@ -1768,7 +1789,7 @@ static bool msg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
+ 			hdr |= true << SEG_HDR_SHIFT;
+ 			hdr |= szmic << SZMIC_HDR_SHIFT;
+ 			hdr |= (seqZero & SEQ_ZERO_MASK) << SEQ_ZERO_HDR_SHIFT;
+-			hdr |= SEG_MAX(size) << SEGN_HDR_SHIFT;
++			hdr |= SEG_MAX(true, size) << SEGN_HDR_SHIFT;
+ 		}
+ 
+ 		if (friend_packet_queue(net, iv_index, false, frnd_ttl,
+@@ -1967,7 +1988,7 @@ static bool seg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
+ 		l_info("RXed (old: %04x %06x size:%d) %d of %d",
+ 					seqZero, seq, size, segO, segN);
+ 		/* Sanity Check--> certain things must match */
+-		if (SEG_MAX(sar_in->len) != segN ||
++		if (SEG_MAX(true, sar_in->len) != segN ||
+ 				sar_in->key_aid != key_aid)
+ 			return false;
+ 
+@@ -2022,8 +2043,8 @@ static bool seg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
+ 
+ 		msg_rxed(net, frnd, iv_index, ttl, seq, net_idx,
+ 				sar_in->remote, dst,
+-				key_aid,
+-				szmic, sar_in->seqZero,
++				key_aid, true, szmic,
++				sar_in->seqZero,
+ 				sar_in->buf, sar_in->len);
+ 
+ 		/* Kill Inter-Seg timeout */
+@@ -2426,7 +2447,8 @@ static enum _relay_advice packet_received(void *user_data,
+ 						net_idx,
+ 						net_src, net_dst,
+ 						net_key_id,
+-						false, net_seq & SEQ_ZERO_MASK,
++						false, false,
++						net_seq & SEQ_ZERO_MASK,
+ 						msg, app_msg_len);
+ 		}
+ 
+@@ -2539,7 +2561,8 @@ static void iv_upd_to(struct l_timeout *upd_timeout, void *user_data)
+ 
+ 	switch (net->iv_upd_state) {
+ 	case IV_UPD_UPDATING:
+-		if (l_queue_length(net->sar_out)) {
++		if (l_queue_length(net->sar_out) ||
++					l_queue_length(net->sar_queue)) {
+ 			l_info("don't leave IV Update until sar_out empty");
+ 			l_timeout_modify(net->iv_update_timeout, 10);
+ 			break;
+@@ -3043,12 +3066,12 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
+ 	uint8_t gatt_data[30];
+ 	uint8_t *packet = gatt_data;
+ 	uint8_t packet_len;
+-	uint8_t segN = SEG_MAX(msg->len);
++	uint8_t segN = SEG_MAX(msg->segmented, msg->len);
+ 	uint16_t seg_off = SEG_OFF(segO);
+ 	uint32_t key_id = 0;
+ 	uint32_t seq_num;
+ 
+-	if (segN) {
++	if (msg->segmented) {
+ 		/* Send each segment on unique seq_num */
+ 		seq_num = mesh_net_next_seq_num(net);
+ 
+@@ -3075,7 +3098,7 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
+ 					seq_num,
+ 					msg->src, msg->remote,
+ 					0,
+-					segN ? true : false, msg->key_aid,
++					msg->segmented, msg->key_aid,
+ 					msg->szmic, false, msg->seqZero,
+ 					segO, segN,
+ 					msg->buf + seg_off, seg_len,
+@@ -3169,7 +3192,8 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
+ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 				uint16_t dst, uint8_t key_aid, uint16_t net_idx,
+ 				uint8_t ttl, uint32_t seq, uint32_t iv_index,
+-				bool szmic, const void *msg, uint16_t msg_len,
++				bool segmented, bool szmic,
++				const void *msg, uint16_t msg_len,
+ 				mesh_net_status_func_t status_func,
+ 				void *user_data)
+ {
+@@ -3189,14 +3213,17 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 	if (ttl == DEFAULT_TTL)
+ 		ttl = net->default_ttl;
+ 
+-	seg_max = SEG_MAX(msg_len);
++	/* Long and sizmic messages *require* segmenting */
++	segmented |= szmic;
++	seg_max = SEG_MAX(segmented, msg_len);
++	segmented |= !!(seg_max);
+ 
+ 	/* First enqueue to any Friends and internal models */
+ 	result = msg_rxed(net, false, iv_index, ttl,
+ 				seq,
+ 				net_idx,
+ 				src, dst,
+-				key_aid,
++				key_aid, segmented,
+ 				szmic, seq & SEQ_ZERO_MASK,
+ 				msg, msg_len);
+ 
+@@ -3207,13 +3234,6 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 			(dst >= net->src_addr && dst <= net->last_addr))
+ 		return true;
+ 
+-	/* If Segmented, Cancel any OB segmented message to same DST */
+-	if (seg_max) {
+-		payload = l_queue_remove_if(net->sar_out, match_sar_remote,
+-							L_UINT_TO_PTR(dst));
+-		mesh_sar_free(payload);
+-	}
+-
+ 	/* Setup OTA Network send */
+ 	payload = mesh_sar_new(msg_len);
+ 	memcpy(payload->buf, msg, msg_len);
+@@ -3224,16 +3244,30 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 	payload->szmic = szmic;
+ 	payload->frnd_cred = frnd_cred;
+ 	payload->key_aid = key_aid;
+-	if (seg_max) {
++	payload->iv_index = mesh_net_get_iv_index(net);
++	payload->seqAuth = seq;
++	payload->segmented = segmented;
++	if (segmented) {
+ 		payload->flags = 0xffffffff >> (31 - seg_max);
+ 		payload->seqZero = seq & SEQ_ZERO_MASK;
+-	}
++		payload->status_func = status_func;
++		payload->user_data = user_data;
++		payload->id = ++net->sar_id_next;
+ 
+-	payload->iv_index = mesh_net_get_iv_index(net);
+-	payload->seqAuth = seq;
++		/* Single thread SAR messages to same Unicast DST */
++		if (NULL != l_queue_find(net->sar_out, match_sar_remote,
++							L_UINT_TO_PTR(dst))) {
++			/* Delay sending Outbound SAR unless prior
++			 * SAR to same DST has completed */
++
++			l_info("OB-Queued SeqZero: %4.4x", payload->seqZero);
++			l_queue_push_tail(net->sar_queue, payload);
++			return true;
++		}
++	}
+ 
+ 	result = true;
+-	if (!IS_UNICAST(dst) && seg_max) {
++	if (!IS_UNICAST(dst) && segmented) {
+ 		int i;
+ 
+ 		for (i = 0; i < 4; i++) {
+@@ -3246,7 +3280,7 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 	}
+ 
+ 	/* Reliable: Cache; Unreliable: Flush*/
+-	if (result && seg_max && IS_UNICAST(dst)) {
++	if (result && segmented && IS_UNICAST(dst)) {
+ 		l_queue_push_head(net->sar_out, payload);
+ 		payload->seg_timeout =
+ 			l_timeout_create(SEG_TO, outseg_to, net, NULL);
+diff --git a/mesh/net.h b/mesh/net.h
+index 6fedd69d7..cb90c1d92 100644
+--- a/mesh/net.h
++++ b/mesh/net.h
+@@ -40,8 +40,9 @@ struct mesh_node;
+ 
+ #define MAX_UNSEG_LEN	15 /* msg_len == 11 + sizeof(MIC) */
+ #define MAX_SEG_LEN	12 /* UnSeg length - 3 octets overhead */
+-#define SEG_MAX(len)	(((len) <= MAX_UNSEG_LEN) ? 0 : \
++#define SEG_MAX(seg, len) ((!seg && len <= MAX_UNSEG_LEN) ? 0 : \
+ 						(((len) - 1) / MAX_SEG_LEN))
++
+ #define SEG_OFF(seg)	((seg) * MAX_SEG_LEN)
+ #define MAX_SEG_TO_LEN(seg)	((seg) ? SEG_OFF((seg) + 1) : MAX_UNSEG_LEN)
+ 
+@@ -311,7 +312,8 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
+ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 				uint16_t dst, uint8_t key_id, uint16_t net_idx,
+ 				uint8_t ttl, uint32_t seq, uint32_t iv_index,
+-				bool szmic, const void *msg, uint16_t msg_len,
++				bool segmented, bool szmic,
++				const void *msg, uint16_t msg_len,
+ 				mesh_net_status_func_t status_func,
+ 				void *user_data);
+ void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
+diff --git a/mesh/node.c b/mesh/node.c
+index d4be070fa..acda6d472 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -1830,7 +1830,7 @@ static struct l_dbus_message *send_call(struct l_dbus *dbus,
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 						"Invalid key_index");
+ 
+-	if (!mesh_model_send(node, src, dst, app_idx, 0, DEFAULT_TTL,
++	if (!mesh_model_send(node, src, dst, app_idx, 0, DEFAULT_TTL, false,
+ 								data, len))
+ 		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
+ 
+@@ -1879,7 +1879,7 @@ static struct l_dbus_message *dev_key_send_call(struct l_dbus *dbus,
+ 
+ 	app_idx = remote ? APP_IDX_DEV_REMOTE : APP_IDX_DEV_LOCAL;
+ 	if (!mesh_model_send(node, src, dst, app_idx, net_idx, DEFAULT_TTL,
+-								data, len))
++							false, data, len))
+ 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
+ 
+ 	return l_dbus_message_new_method_return(msg);
+@@ -1937,7 +1937,7 @@ static struct l_dbus_message *add_netkey_call(struct l_dbus *dbus,
+ 	l_put_le16(sub_idx, &data[2]);
+ 
+ 	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
+-							DEFAULT_TTL, data, 20))
++						DEFAULT_TTL, false, data, 20))
+ 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
+ 
+ 	return l_dbus_message_new_method_return(msg);
+@@ -2003,7 +2003,7 @@ static struct l_dbus_message *add_appkey_call(struct l_dbus *dbus,
+ 	data[3] = app_idx >> 4;
+ 
+ 	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
+-							DEFAULT_TTL, data, 20))
++						DEFAULT_TTL, false, data, 20))
+ 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
+ 
+ 	return l_dbus_message_new_method_return(msg);
+diff --git a/unit/test-mesh-crypto.c b/unit/test-mesh-crypto.c
+index 32c46a54e..0043b0b10 100644
+--- a/unit/test-mesh-crypto.c
++++ b/unit/test-mesh-crypto.c
+@@ -1017,7 +1017,7 @@ static void check_encrypt(const struct mesh_crypto_test *keys)
+ 		app_msg = l_util_from_hexstring(keys->app_msg, &app_msg_len);
+ 
+ 		if (keys->szmic) {
+-			seg_max = SEG_MAX(app_msg_len + 8);
++			seg_max = SEG_MAX(keys->segmented, app_msg_len + 8);
+ 			enc_msg = l_malloc(app_msg_len + 8);
+ 			mesh_crypto_application_encrypt(key_aid, keys->app_seq,
+ 					keys->net_src, keys->net_dst,
+@@ -1028,7 +1028,7 @@ static void check_encrypt(const struct mesh_crypto_test *keys)
+ 					enc_msg, &app_mic64, sizeof(app_mic64));
+ 			l_put_be64(app_mic64, enc_msg + app_msg_len);
+ 		} else {
+-			seg_max = SEG_MAX(app_msg_len + 4);
++			seg_max = SEG_MAX(keys->segmented, app_msg_len + 4);
+ 			enc_msg = l_malloc(app_msg_len + 4);
+ 			mesh_crypto_application_encrypt(key_aid, keys->app_seq,
+ 					keys->net_src, keys->net_dst,
+-- 
+2.21.1
 
-> >       struct sk_buff          *(*alloc_skb) (struct l2cap_chan *chan,
-> >                                              unsigned long hdr_len,
-> >                                              unsigned long len, int nb)=
-;
-> > @@ -983,6 +985,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *cha=
-n);
-> > int l2cap_ertm_init(struct l2cap_chan *chan);
-> > void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> > void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)=
-;
-> > +typedef void (*l2cap_chan_func_t)(struct l2cap_chan *chan, void *data)=
-;
-> > +void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-> > +                  void *data);
-> > void l2cap_chan_del(struct l2cap_chan *chan, int err);
-> > void l2cap_send_conn_req(struct l2cap_chan *chan);
-> > void l2cap_move_start(struct l2cap_chan *chan);
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 5e6e35ab44dd..20c1d5f9c238 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -678,6 +678,29 @@ void l2cap_chan_del(struct l2cap_chan *chan, int e=
-rr)
-> > }
-> > EXPORT_SYMBOL_GPL(l2cap_chan_del);
-> >
-> > +static void __l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func=
-_t func,
-> > +                           void *data)
-> > +{
-> > +     struct l2cap_chan *chan;
-> > +
-> > +     list_for_each_entry(chan, &conn->chan_l, list) {
-> > +             func(chan, data);
-> > +     }
-> > +}
-> > +
-> > +void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-> > +                  void *data)
-> > +{
-> > +     if (!conn)
-> > +             return;
-> > +
-> > +     mutex_lock(&conn->chan_lock);
-> > +     __l2cap_chan_list(conn, func, data);
-> > +     mutex_unlock(&conn->chan_lock);
-> > +}
-> > +
-> > +EXPORT_SYMBOL_GPL(l2cap_chan_list);
-> > +
-> > static void l2cap_conn_update_id_addr(struct work_struct *work)
-> > {
-> >       struct l2cap_conn *conn =3D container_of(work, struct l2cap_conn,
-> > @@ -1356,29 +1379,77 @@ static void l2cap_le_connect(struct l2cap_chan =
-*chan)
-> >                      sizeof(req), &req);
-> > }
-> >
-> > -static void l2cap_ecred_connect(struct l2cap_chan *chan)
-> > -{
-> > -     struct l2cap_conn *conn =3D chan->conn;
-> > +struct l2cap_ecred_conn_data {
-> >       struct {
-> >               struct l2cap_ecred_conn_req req;
-> > -             __le16 scid;
-> > +             __le16 scid[5];
-> >       } __packed pdu;
-> > +     struct l2cap_chan *chan;
-> > +     struct pid *pid;
-> > +     int count;
-> > +};
-> > +
-> > +static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *d=
-ata)
-> > +{
-> > +     struct l2cap_ecred_conn_data *conn =3D data;
-> > +     struct pid *pid;
-> > +
-> > +     if (chan =3D=3D conn->chan)
-> > +             return;
-> > +
-> > +     if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
-> > +             return;
-> > +
-> > +     pid =3D chan->ops->get_peer_pid(chan);
-> > +
-> > +     /* Only add deferred channels with the same PID/PSM */
-> > +     if (conn->pid !=3D pid || chan->psm !=3D conn->chan->psm || chan-=
->ident ||
-> > +         chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL || chan->state !=3D BT=
-_CONNECT)
-> > +             return;
-> > +
-> > +     if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
-> > +             return;
-> > +
-> > +     /* Set the same ident so we can match on the rsp */
-> > +     chan->ident =3D conn->chan->ident;
-> > +
-> > +     /* Include all channels deferred */
-> > +     conn->pdu.scid[conn->count] =3D cpu_to_le16(chan->scid);
-> > +
-> > +     conn->count++;
-> > +}
-> > +
-> > +static void l2cap_ecred_connect(struct l2cap_chan *chan)
-> > +{
-> > +     struct l2cap_conn *conn =3D chan->conn;
-> > +     struct l2cap_ecred_conn_data data;
-> > +
-> > +     if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
-> > +             return;
-> >
-> >       if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
-> >               return;
-> >
-> >       l2cap_ecred_init(chan, 0);
-> >
-> > -     pdu.req.psm     =3D chan->psm;
-> > -     pdu.req.mtu     =3D cpu_to_le16(chan->imtu);
-> > -     pdu.req.mps     =3D cpu_to_le16(chan->mps);
-> > -     pdu.req.credits =3D cpu_to_le16(chan->rx_credits);
-> > -     pdu.scid        =3D cpu_to_le16(chan->scid);
-> > +     data.pdu.req.psm     =3D chan->psm;
-> > +     data.pdu.req.mtu     =3D cpu_to_le16(chan->imtu);
-> > +     data.pdu.req.mps     =3D cpu_to_le16(chan->mps);
-> > +     data.pdu.req.credits =3D cpu_to_le16(chan->rx_credits);
-> > +     data.pdu.scid[0]     =3D cpu_to_le16(chan->scid);
-> >
-> >       chan->ident =3D l2cap_get_ident(conn);
-> > +     data.pid =3D chan->ops->get_peer_pid(chan);
-> > +
-> > +     data.count =3D 1;
-> > +     data.chan =3D chan;
-> > +     data.pid =3D chan->ops->get_peer_pid(chan);
-> > +
-> > +     __l2cap_chan_list(conn, l2cap_ecred_defer_connect, &data);
-> >
-> >       l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_CONN_REQ,
-> > -                    sizeof(pdu), &pdu);
-> > +                    sizeof(data.pdu.req) + data.count * sizeof(__le16)=
-,
-> > +                    &data.pdu);
-> > }
-> >
-> > static void l2cap_le_start(struct l2cap_chan *chan)
-> > @@ -7694,6 +7765,29 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
-> >       return ((psm & 0x0101) =3D=3D 0x0001);
-> > }
-> >
-> > +struct l2cap_chan_data {
-> > +     struct l2cap_chan *chan;
-> > +     struct pid *pid;
-> > +     int count;
-> > +};
-> > +
-> > +static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
-> > +{
-> > +     struct l2cap_chan_data *d =3D data;
-> > +
-> > +     if (chan =3D=3D d->chan)
-> > +             return;
-> > +
-> > +     /* Only count deferred channels with the same PID/PSM */
-> > +     if (d->pid !=3D chan->ops->get_peer_pid(chan) ||
-> > +         !test_bit(FLAG_DEFER_SETUP, &chan->flags) ||
-> > +         chan->psm !=3D d->chan->psm || chan->ident ||
-> > +         chan->state !=3D BT_CONNECT)
-> > +             return;
-> > +
-> > +     d->count++;
-> > +}
-> > +
-> > int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-> >                      bdaddr_t *dst, u8 dst_type)
-> > {
-> > @@ -7813,6 +7907,22 @@ int l2cap_chan_connect(struct l2cap_chan *chan, =
-__le16 psm, u16 cid,
-> >               goto done;
-> >       }
-> >
-> > +     if (chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) {
-> > +             struct l2cap_chan_data data;
-> > +
-> > +             data.chan =3D chan;
-> > +             data.pid =3D chan->ops->get_peer_pid(chan);
-> > +             data.count =3D 0;
-> > +
-> > +             l2cap_chan_list(conn, l2cap_chan_by_pid, &data);
-> > +             /* Check if there isn't too many channels being connected=
- */
-> > +             if (!(data.count < L2CAP_ECRED_CONN_SCID_MAX - 1)) {
-> > +                     hci_conn_drop(hcon);
-> > +                     err =3D -EPROTO;
-> > +                     goto done;
-> > +             }
-> > +     }
-> > +
-> >       mutex_lock(&conn->chan_lock);
-> >       l2cap_chan_lock(chan);
-> >
-> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > index 40fb10b591bd..e43a90e05972 100644
-> > --- a/net/bluetooth/l2cap_sock.c
-> > +++ b/net/bluetooth/l2cap_sock.c
-> > @@ -549,11 +549,6 @@ static int l2cap_sock_getsockopt(struct socket *so=
-ck, int level, int optname,
-> >               break;
-> >
-> >       case BT_DEFER_SETUP:
-> > -             if (sk->sk_state !=3D BT_BOUND && sk->sk_state !=3D BT_LI=
-STEN) {
-> > -                     err =3D -EINVAL;
-> > -                     break;
-> > -             }
-> > -
->
-> I removing this really a good idea. I think it is not really so bad to fo=
-rce at least BT_BOUND so that a local controller has been at least somehow =
-selected. Just doing setsockopt(DEFER_SETUP) and then connect() seems weird=
-. Let us force the application to at least bind the local controller for th=
-is specific usage. They can still bind with BDADDR_ANY, but that gives us a=
- bit cleaner state handling.
-
-Right, for some odd reason I remember this check being specific for
-listen only but in fact it should work with l2cap-tester as it does
-bind before doing BT_DEFER_SETUP.
-
->
-> >               if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flag=
-s),
-> >                            (u32 __user *) optval))
-> >                       err =3D -EFAULT;
-> > @@ -1504,6 +1499,13 @@ static long l2cap_sock_get_sndtimeo_cb(struct l2=
-cap_chan *chan)
-> >       return sk->sk_sndtimeo;
-> > }
-> >
-> > +static struct pid *l2cap_sock_get_peer_pid_cb(struct l2cap_chan *chan)
-> > +{
-> > +     struct sock *sk =3D chan->data;
-> > +
-> > +     return sk->sk_peer_pid;
-> > +}
-> > +
-> > static void l2cap_sock_suspend_cb(struct l2cap_chan *chan)
-> > {
-> >       struct sock *sk =3D chan->data;
-> > @@ -1525,6 +1527,7 @@ static const struct l2cap_ops l2cap_chan_ops =3D =
-{
-> >       .suspend                =3D l2cap_sock_suspend_cb,
-> >       .set_shutdown           =3D l2cap_sock_set_shutdown_cb,
-> >       .get_sndtimeo           =3D l2cap_sock_get_sndtimeo_cb,
-> > +     .get_peer_pid           =3D l2cap_sock_get_peer_pid_cb,
-> >       .alloc_skb              =3D l2cap_sock_alloc_skb_cb,
-> > };
->
-> Regards
->
-> Marcel
->
-
-
---=20
-Luiz Augusto von Dentz
