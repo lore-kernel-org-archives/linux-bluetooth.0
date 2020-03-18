@@ -3,528 +3,361 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4696EC10DCE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 17:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09665C5ACD7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 17:11:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0768D20753
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 17:00:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE69B2076C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 17:11:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726994AbgCRRAa (ORCPT
+        id S1726897AbgCRRLz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Mar 2020 13:00:30 -0400
-Received: from mga07.intel.com ([134.134.136.100]:62526 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726506AbgCRRAa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Mar 2020 13:00:30 -0400
-IronPort-SDR: OVhqEavpMupclAajWWcRTxc1kVG3ZUkU0NILEOTcJqD3opoQST3UdvLCJOl4opFSts3Dy2R54n
- zSaUmQ63tI/w==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2020 10:00:28 -0700
-IronPort-SDR: wDfI3mbgscaQ7qvIjNLLeJCQTVvZ5TMGpNQqKF0mLF/CzrSm/3p5qDr+vzh5qb98L9ysNLSUy6
- ktp6kHFF83bg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,568,1574150400"; 
-   d="scan'208";a="244884477"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.254.5.204])
-  by orsmga003.jf.intel.com with ESMTP; 18 Mar 2020 10:00:27 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ v2] mesh: Allow short messages to be segmented
-Date:   Wed, 18 Mar 2020 10:00:20 -0700
-Message-Id: <20200318170020.1474-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.21.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 18 Mar 2020 13:11:55 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60770 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726619AbgCRRLz (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Mar 2020 13:11:55 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 85B23CECF8;
+        Wed, 18 Mar 2020 18:21:22 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH 1/1] Bluetooth: Prioritize SCO traffic on slow interfaces
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CANFp7mXwWGZF80EBqEmacc5uQWkaC0pL1rp+x5Qa40kkAcod-Q@mail.gmail.com>
+Date:   Wed, 18 Mar 2020 18:11:51 +0100
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <FFDE30C9-EE74-436D-8628-9FFC79114D3B@holtmann.org>
+References: <20200312181055.94038-1-abhishekpandit@chromium.org>
+ <20200312111036.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
+ <A79B48D3-D342-473C-B94A-A2E0AA83B505@holtmann.org>
+ <CANFp7mXwWGZF80EBqEmacc5uQWkaC0pL1rp+x5Qa40kkAcod-Q@mail.gmail.com>
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-For added reliability, it is legal to send short messages as "single
-segment" segmented messages, which require transport layer
-acknowledgement. This feature is intended for heavy usage in the future
-so I am adding it now.
+Hi Abhishek,
 
-Further, to support this functionality, an additional queue has been
-added to allow multiple SAR messages to the same DST to be queued and
-sent serially.
----
- mesh/cfgmod-server.c    | 14 +++----
- mesh/model.c            | 12 +++---
- mesh/model.h            |  2 +-
- mesh/net.c              | 90 ++++++++++++++++++++++++++++-------------
- mesh/net.h              |  6 ++-
- mesh/node.c             |  8 ++--
- unit/test-mesh-crypto.c |  4 +-
- 7 files changed, 86 insertions(+), 50 deletions(-)
+>>> When scheduling TX packets, send all SCO/eSCO packets first and then
+>>> send only 1 ACL/LE packet in a loop while checking that there are no SCO
+>>> packets pending. This is done to make sure that we can meet SCO
+>>> deadlines on slow interfaces like UART. If we were to queue up multiple
+>>> ACL packets without checking for a SCO packet, we might miss the SCO
+>>> timing. For example:
+>>> 
+>>> The time it takes to send a maximum size ACL packet (1024 bytes):
+>>> t = 10/8 * 1024 bytes * 8 bits/byte * 1 packet / baudrate
+>>>       where 10/8 is uart overhead due to start/stop bits per byte
+>>> 
+>>> Replace t = 3.75ms (SCO deadline), which gives us a baudrate of 2730666
+>>> and is pretty close to a common baudrate of 3000000 used for BT. At this
+>>> baudrate, if we sent two 1024 byte ACL packets, we would miss the 3.75ms
+>>> timing window.
+>>> 
+>>> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>>> ---
+>>> 
+>>> include/net/bluetooth/hci_core.h |  1 +
+>>> net/bluetooth/hci_core.c         | 91 +++++++++++++++++++++++++-------
+>>> 2 files changed, 73 insertions(+), 19 deletions(-)
+>>> 
+>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>> index d4e28773d378..f636c89f1fe1 100644
+>>> --- a/include/net/bluetooth/hci_core.h
+>>> +++ b/include/net/bluetooth/hci_core.h
+>>> @@ -315,6 +315,7 @@ struct hci_dev {
+>>>      __u8            ssp_debug_mode;
+>>>      __u8            hw_error_code;
+>>>      __u32           clock;
+>>> +     __u8            sched_limit;
+>> 
+>> why do you need this parameter?
+> 
+> This is really only necessary on systems where the data transfer rate
+> to the controller is low. I want the driver to set whether we should
+> aggressively schedule SCO packets. A quirk might actually be better
+> than a variable (wasn't sure what is preferable).
 
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 6499c3f2f..1aecab4b5 100644
---- a/mesh/cfgmod-server.c
-+++ b/mesh/cfgmod-server.c
-@@ -67,7 +67,7 @@ static void send_pub_status(struct mesh_node *node, uint16_t net_idx,
- 	}
- 
- 	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
--								msg, n);
-+								false, msg, n);
- }
- 
- static bool config_pub_get(struct mesh_node *node, uint16_t net_idx,
-@@ -211,8 +211,8 @@ static void send_sub_status(struct mesh_node *node, uint16_t net_idx,
- 		n += 2;
- 	}
- 
--	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
--							DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
-+								false, msg, n);
- }
- 
- static bool config_sub_get(struct mesh_node *node, uint16_t net_idx,
-@@ -272,7 +272,7 @@ static bool config_sub_get(struct mesh_node *node, uint16_t net_idx,
- 	*msg_status = (uint8_t) status;
- 
- 	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
--									msg, n);
-+								false, msg, n);
- 	return true;
- }
- 
-@@ -450,7 +450,7 @@ static void send_model_app_status(struct mesh_node *node, uint16_t net_idx,
- 	n += 2;
- 
- 	mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
--									msg, n);
-+								false, msg, n);
- }
- 
- static void model_app_list(struct mesh_node *node, uint16_t net_idx,
-@@ -505,7 +505,7 @@ static void model_app_list(struct mesh_node *node, uint16_t net_idx,
- 	if (result >= 0) {
- 		*status = result;
- 		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
--							DEFAULT_TTL, msg, n);
-+						DEFAULT_TTL, false, msg, n);
- 	}
- 
- 	l_free(msg);
-@@ -1234,7 +1234,7 @@ static bool cfg_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 
- 	if (n)
- 		mesh_model_send(node, dst, src,
--				APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL,
-+				APP_IDX_DEV_LOCAL, net_idx, DEFAULT_TTL, false,
- 				long_msg ? long_msg : msg, n);
- 
- 	l_free(long_msg);
-diff --git a/mesh/model.c b/mesh/model.c
-index d11c95ab9..945583324 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -540,7 +540,7 @@ static void cmplt(uint16_t remote, uint8_t status,
- 
- static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
- 		uint32_t dst, uint16_t app_idx, uint16_t net_idx,
--		uint8_t *label, uint8_t ttl,
-+		uint8_t *label, uint8_t ttl, bool segmented,
- 		const void *msg, uint16_t msg_len)
- {
- 	uint8_t dev_key[16];
-@@ -597,8 +597,8 @@ static bool msg_send(struct mesh_node *node, bool credential, uint16_t src,
- 	/* print_packet("Encrypted with", key, 16); */
- 
- 	ret = mesh_net_app_send(net, credential, src, dst, key_aid, net_idx,
--					ttl, seq_num, iv_index, szmic, out,
--					out_len, cmplt, NULL);
-+					ttl, seq_num, iv_index, segmented,
-+					szmic, out, out_len, cmplt, NULL);
- done:
- 	l_free(out);
- 	return ret;
-@@ -1098,14 +1098,14 @@ int mesh_model_publish(struct mesh_node *node, uint32_t mod_id,
- 
- 	result = msg_send(node, mod->pub->credential != 0, src,
- 				mod->pub->addr, mod->pub->idx, net_idx,
--				label, ttl, msg, msg_len);
-+				label, ttl, false, msg, msg_len);
- 
- 	return result ? MESH_ERROR_NONE : MESH_ERROR_FAILED;
- }
- 
- bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					uint16_t app_idx, uint16_t net_idx,
--					uint8_t ttl,
-+					uint8_t ttl, bool segmented,
- 					const void *msg, uint16_t msg_len)
- {
- 	/* print_packet("Mod Tx", msg, msg_len); */
-@@ -1120,7 +1120,7 @@ bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
- 		return false;
- 
- 	return msg_send(node, false, src, dst, app_idx, net_idx,
--						NULL, ttl, msg, msg_len);
-+					NULL, ttl, segmented, msg, msg_len);
- }
- 
- int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
-diff --git a/mesh/model.h b/mesh/model.h
-index 153ab9bfd..f8e0f9d37 100644
---- a/mesh/model.h
-+++ b/mesh/model.h
-@@ -95,7 +95,7 @@ int mesh_model_sub_get(struct mesh_node *node, uint16_t addr, uint32_t id,
- uint16_t mesh_model_cfg_blk(uint8_t *pkt);
- bool mesh_model_send(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					uint16_t app_idx, uint16_t net_idx,
--					uint8_t ttl,
-+					uint8_t ttl, bool segmented,
- 					const void *msg, uint16_t msg_len);
- int mesh_model_publish(struct mesh_node *node, uint32_t mod_id, uint16_t src,
- 				uint8_t ttl, const void *msg, uint16_t msg_len);
-diff --git a/mesh/net.c b/mesh/net.c
-index d3325e073..55b1330cc 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -139,6 +139,7 @@ struct mesh_net {
- 	struct l_queue *replay_cache;
- 	struct l_queue *sar_in;
- 	struct l_queue *sar_out;
-+	struct l_queue *sar_queue;
- 	struct l_queue *frnd_msgs;
- 	struct l_queue *friends;
- 	struct l_queue *negotiations;
-@@ -182,6 +183,7 @@ struct mesh_sar {
- 	uint16_t remote;
- 	uint16_t len;
- 	bool szmic;
-+	bool segmented;
- 	bool frnd;
- 	bool frnd_cred;
- 	uint8_t ttl;
-@@ -662,6 +664,7 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
- 	net->msg_cache = l_queue_new();
- 	net->sar_in = l_queue_new();
- 	net->sar_out = l_queue_new();
-+	net->sar_queue = l_queue_new();
- 	net->frnd_msgs = l_queue_new();
- 	net->destinations = l_queue_new();
- 	net->app_keys = l_queue_new();
-@@ -687,6 +690,7 @@ void mesh_net_free(struct mesh_net *net)
- 	l_queue_destroy(net->replay_cache, l_free);
- 	l_queue_destroy(net->sar_in, mesh_sar_free);
- 	l_queue_destroy(net->sar_out, mesh_sar_free);
-+	l_queue_destroy(net->sar_queue, mesh_sar_free);
- 	l_queue_destroy(net->frnd_msgs, l_free);
- 	l_queue_destroy(net->friends, mesh_friend_free);
- 	l_queue_destroy(net->negotiations, mesh_friend_free);
-@@ -1657,6 +1661,22 @@ static void outmsg_to(struct l_timeout *msg_timeout, void *user_data)
- }
- 
- static void outseg_to(struct l_timeout *seg_timeout, void *user_data);
-+
-+static void send_queued_sar(struct mesh_net *net, uint16_t dst)
-+{
-+	struct mesh_sar *sar = l_queue_remove_if(net->sar_queue,
-+			match_sar_remote, L_UINT_TO_PTR(dst));
-+
-+	if (!sar)
-+		return;
-+
-+	/* Out to current outgoing, and immediate expire Seg TO */
-+	l_queue_push_head(net->sar_out, sar);
-+	sar->seg_timeout = NULL;
-+	sar->msg_timeout = l_timeout_create(MSG_TO, outmsg_to, net, NULL);
-+	outseg_to(NULL, net);
-+}
-+
- static void ack_received(struct mesh_net *net, bool timeout,
- 				uint16_t src, uint16_t dst,
- 				uint16_t seq0, uint32_t ack_flag)
-@@ -1692,6 +1712,7 @@ static void ack_received(struct mesh_net *net, bool timeout,
- 					outgoing->len - 4, outgoing->user_data);
- 
- 		l_queue_remove(net->sar_out, outgoing);
-+		send_queued_sar(net, outgoing->remote);
- 		mesh_sar_free(outgoing);
- 
- 		return;
-@@ -1701,10 +1722,10 @@ static void ack_received(struct mesh_net *net, bool timeout,
- 
- 	ack_copy &= outgoing->flags;
- 
--	for (i = 0; i <= SEG_MAX(outgoing->len); i++, seg_flag <<= 1) {
-+	for (i = 0; i <= SEG_MAX(true, outgoing->len); i++, seg_flag <<= 1) {
- 		if (seg_flag & ack_flag) {
- 			l_debug("Skipping Seg %d of %d",
--					i, SEG_MAX(outgoing->len));
-+					i, SEG_MAX(true, outgoing->len));
- 			continue;
- 		}
- 
-@@ -1741,7 +1762,7 @@ static bool msg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
- 					uint8_t ttl, uint32_t seq,
- 					uint16_t net_idx,
- 					uint16_t src, uint16_t dst,
--					uint8_t key_aid,
-+					uint8_t key_aid, bool segmented,
- 					bool szmic, uint16_t seqZero,
- 					const uint8_t *data, uint16_t size)
- {
-@@ -1768,7 +1789,7 @@ static bool msg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
- 			hdr |= true << SEG_HDR_SHIFT;
- 			hdr |= szmic << SZMIC_HDR_SHIFT;
- 			hdr |= (seqZero & SEQ_ZERO_MASK) << SEQ_ZERO_HDR_SHIFT;
--			hdr |= SEG_MAX(size) << SEGN_HDR_SHIFT;
-+			hdr |= SEG_MAX(true, size) << SEGN_HDR_SHIFT;
- 		}
- 
- 		if (friend_packet_queue(net, iv_index, false, frnd_ttl,
-@@ -1967,7 +1988,7 @@ static bool seg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
- 		l_info("RXed (old: %04x %06x size:%d) %d of %d",
- 					seqZero, seq, size, segO, segN);
- 		/* Sanity Check--> certain things must match */
--		if (SEG_MAX(sar_in->len) != segN ||
-+		if (SEG_MAX(true, sar_in->len) != segN ||
- 				sar_in->key_aid != key_aid)
- 			return false;
- 
-@@ -2022,8 +2043,8 @@ static bool seg_rxed(struct mesh_net *net, bool frnd, uint32_t iv_index,
- 
- 		msg_rxed(net, frnd, iv_index, ttl, seq, net_idx,
- 				sar_in->remote, dst,
--				key_aid,
--				szmic, sar_in->seqZero,
-+				key_aid, true, szmic,
-+				sar_in->seqZero,
- 				sar_in->buf, sar_in->len);
- 
- 		/* Kill Inter-Seg timeout */
-@@ -2426,7 +2447,8 @@ static enum _relay_advice packet_received(void *user_data,
- 						net_idx,
- 						net_src, net_dst,
- 						net_key_id,
--						false, net_seq & SEQ_ZERO_MASK,
-+						false, false,
-+						net_seq & SEQ_ZERO_MASK,
- 						msg, app_msg_len);
- 		}
- 
-@@ -2539,7 +2561,8 @@ static void iv_upd_to(struct l_timeout *upd_timeout, void *user_data)
- 
- 	switch (net->iv_upd_state) {
- 	case IV_UPD_UPDATING:
--		if (l_queue_length(net->sar_out)) {
-+		if (l_queue_length(net->sar_out) ||
-+					l_queue_length(net->sar_queue)) {
- 			l_info("don't leave IV Update until sar_out empty");
- 			l_timeout_modify(net->iv_update_timeout, 10);
- 			break;
-@@ -3043,12 +3066,12 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
- 	uint8_t gatt_data[30];
- 	uint8_t *packet = gatt_data;
- 	uint8_t packet_len;
--	uint8_t segN = SEG_MAX(msg->len);
-+	uint8_t segN = SEG_MAX(msg->segmented, msg->len);
- 	uint16_t seg_off = SEG_OFF(segO);
- 	uint32_t key_id = 0;
- 	uint32_t seq_num;
- 
--	if (segN) {
-+	if (msg->segmented) {
- 		/* Send each segment on unique seq_num */
- 		seq_num = mesh_net_next_seq_num(net);
- 
-@@ -3075,7 +3098,7 @@ static bool send_seg(struct mesh_net *net, struct mesh_sar *msg, uint8_t segO)
- 					seq_num,
- 					msg->src, msg->remote,
- 					0,
--					segN ? true : false, msg->key_aid,
-+					msg->segmented, msg->key_aid,
- 					msg->szmic, false, msg->seqZero,
- 					segO, segN,
- 					msg->buf + seg_off, seg_len,
-@@ -3169,7 +3192,8 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
- bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
- 				uint16_t dst, uint8_t key_aid, uint16_t net_idx,
- 				uint8_t ttl, uint32_t seq, uint32_t iv_index,
--				bool szmic, const void *msg, uint16_t msg_len,
-+				bool segmented, bool szmic,
-+				const void *msg, uint16_t msg_len,
- 				mesh_net_status_func_t status_func,
- 				void *user_data)
- {
-@@ -3189,14 +3213,17 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
- 	if (ttl == DEFAULT_TTL)
- 		ttl = net->default_ttl;
- 
--	seg_max = SEG_MAX(msg_len);
-+	/* Long and sizmic messages *require* segmenting */
-+	segmented |= szmic;
-+	seg_max = SEG_MAX(segmented, msg_len);
-+	segmented |= !!(seg_max);
- 
- 	/* First enqueue to any Friends and internal models */
- 	result = msg_rxed(net, false, iv_index, ttl,
- 				seq,
- 				net_idx,
- 				src, dst,
--				key_aid,
-+				key_aid, segmented,
- 				szmic, seq & SEQ_ZERO_MASK,
- 				msg, msg_len);
- 
-@@ -3207,13 +3234,6 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
- 			(dst >= net->src_addr && dst <= net->last_addr))
- 		return true;
- 
--	/* If Segmented, Cancel any OB segmented message to same DST */
--	if (seg_max) {
--		payload = l_queue_remove_if(net->sar_out, match_sar_remote,
--							L_UINT_TO_PTR(dst));
--		mesh_sar_free(payload);
--	}
--
- 	/* Setup OTA Network send */
- 	payload = mesh_sar_new(msg_len);
- 	memcpy(payload->buf, msg, msg_len);
-@@ -3224,16 +3244,30 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
- 	payload->szmic = szmic;
- 	payload->frnd_cred = frnd_cred;
- 	payload->key_aid = key_aid;
--	if (seg_max) {
-+	payload->iv_index = mesh_net_get_iv_index(net);
-+	payload->seqAuth = seq;
-+	payload->segmented = segmented;
-+	if (segmented) {
- 		payload->flags = 0xffffffff >> (31 - seg_max);
- 		payload->seqZero = seq & SEQ_ZERO_MASK;
--	}
-+		payload->status_func = status_func;
-+		payload->user_data = user_data;
-+		payload->id = ++net->sar_id_next;
- 
--	payload->iv_index = mesh_net_get_iv_index(net);
--	payload->seqAuth = seq;
-+		/* Single thread SAR messages to same Unicast DST */
-+		if (NULL != l_queue_find(net->sar_out, match_sar_remote,
-+							L_UINT_TO_PTR(dst))) {
-+			/* Delay sending Outbound SAR unless prior
-+			 * SAR to same DST has completed */
-+
-+			l_info("OB-Queued SeqZero: %4.4x", payload->seqZero);
-+			l_queue_push_tail(net->sar_queue, payload);
-+			return true;
-+		}
-+	}
- 
- 	result = true;
--	if (!IS_UNICAST(dst) && seg_max) {
-+	if (!IS_UNICAST(dst) && segmented) {
- 		int i;
- 
- 		for (i = 0; i < 4; i++) {
-@@ -3246,7 +3280,7 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
- 	}
- 
- 	/* Reliable: Cache; Unreliable: Flush*/
--	if (result && seg_max && IS_UNICAST(dst)) {
-+	if (result && segmented && IS_UNICAST(dst)) {
- 		l_queue_push_head(net->sar_out, payload);
- 		payload->seg_timeout =
- 			l_timeout_create(SEG_TO, outseg_to, net, NULL);
-diff --git a/mesh/net.h b/mesh/net.h
-index 6fedd69d7..cb90c1d92 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -40,8 +40,9 @@ struct mesh_node;
- 
- #define MAX_UNSEG_LEN	15 /* msg_len == 11 + sizeof(MIC) */
- #define MAX_SEG_LEN	12 /* UnSeg length - 3 octets overhead */
--#define SEG_MAX(len)	(((len) <= MAX_UNSEG_LEN) ? 0 : \
-+#define SEG_MAX(seg, len) ((!seg && len <= MAX_UNSEG_LEN) ? 0 : \
- 						(((len) - 1) / MAX_SEG_LEN))
-+
- #define SEG_OFF(seg)	((seg) * MAX_SEG_LEN)
- #define MAX_SEG_TO_LEN(seg)	((seg) ? SEG_OFF((seg) + 1) : MAX_UNSEG_LEN)
- 
-@@ -311,7 +312,8 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
- bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
- 				uint16_t dst, uint8_t key_id, uint16_t net_idx,
- 				uint8_t ttl, uint32_t seq, uint32_t iv_index,
--				bool szmic, const void *msg, uint16_t msg_len,
-+				bool segmented, bool szmic,
-+				const void *msg, uint16_t msg_len,
- 				mesh_net_status_func_t status_func,
- 				void *user_data);
- void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
-diff --git a/mesh/node.c b/mesh/node.c
-index d4be070fa..acda6d472 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -1830,7 +1830,7 @@ static struct l_dbus_message *send_call(struct l_dbus *dbus,
- 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
- 						"Invalid key_index");
- 
--	if (!mesh_model_send(node, src, dst, app_idx, 0, DEFAULT_TTL,
-+	if (!mesh_model_send(node, src, dst, app_idx, 0, DEFAULT_TTL, false,
- 								data, len))
- 		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
- 
-@@ -1879,7 +1879,7 @@ static struct l_dbus_message *dev_key_send_call(struct l_dbus *dbus,
- 
- 	app_idx = remote ? APP_IDX_DEV_REMOTE : APP_IDX_DEV_LOCAL;
- 	if (!mesh_model_send(node, src, dst, app_idx, net_idx, DEFAULT_TTL,
--								data, len))
-+							false, data, len))
- 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
- 
- 	return l_dbus_message_new_method_return(msg);
-@@ -1937,7 +1937,7 @@ static struct l_dbus_message *add_netkey_call(struct l_dbus *dbus,
- 	l_put_le16(sub_idx, &data[2]);
- 
- 	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
--							DEFAULT_TTL, data, 20))
-+						DEFAULT_TTL, false, data, 20))
- 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
- 
- 	return l_dbus_message_new_method_return(msg);
-@@ -2003,7 +2003,7 @@ static struct l_dbus_message *add_appkey_call(struct l_dbus *dbus,
- 	data[3] = app_idx >> 4;
- 
- 	if (!mesh_model_send(node, src, dst, APP_IDX_DEV_REMOTE, net_idx,
--							DEFAULT_TTL, data, 20))
-+						DEFAULT_TTL, false, data, 20))
- 		return dbus_error(msg, MESH_ERROR_NOT_FOUND, NULL);
- 
- 	return l_dbus_message_new_method_return(msg);
-diff --git a/unit/test-mesh-crypto.c b/unit/test-mesh-crypto.c
-index 32c46a54e..0043b0b10 100644
---- a/unit/test-mesh-crypto.c
-+++ b/unit/test-mesh-crypto.c
-@@ -1017,7 +1017,7 @@ static void check_encrypt(const struct mesh_crypto_test *keys)
- 		app_msg = l_util_from_hexstring(keys->app_msg, &app_msg_len);
- 
- 		if (keys->szmic) {
--			seg_max = SEG_MAX(app_msg_len + 8);
-+			seg_max = SEG_MAX(keys->segmented, app_msg_len + 8);
- 			enc_msg = l_malloc(app_msg_len + 8);
- 			mesh_crypto_application_encrypt(key_aid, keys->app_seq,
- 					keys->net_src, keys->net_dst,
-@@ -1028,7 +1028,7 @@ static void check_encrypt(const struct mesh_crypto_test *keys)
- 					enc_msg, &app_mic64, sizeof(app_mic64));
- 			l_put_be64(app_mic64, enc_msg + app_msg_len);
- 		} else {
--			seg_max = SEG_MAX(app_msg_len + 4);
-+			seg_max = SEG_MAX(keys->segmented, app_msg_len + 4);
- 			enc_msg = l_malloc(app_msg_len + 4);
- 			mesh_crypto_application_encrypt(key_aid, keys->app_seq,
- 					keys->net_src, keys->net_dst,
--- 
-2.21.1
+or maybe we try without driver choice first. I would assume what is required for UART, will not harm USB or SDIO transports either.
+
+>>>      __u16           devid_source;
+>>>      __u16           devid_vendor;
+>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>>> index dbd2ad3a26ed..00a72265cd96 100644
+>>> --- a/net/bluetooth/hci_core.c
+>>> +++ b/net/bluetooth/hci_core.c
+>>> @@ -4239,18 +4239,32 @@ static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
+>>>      }
+>>> }
+>>> 
+>>> -static void hci_sched_acl_pkt(struct hci_dev *hdev)
+>>> +/* Limit packets in flight when SCO/eSCO links are active. */
+>>> +static bool hci_sched_limit(struct hci_dev *hdev)
+>>> +{
+>>> +     return hdev->sched_limit && hci_conn_num(hdev, SCO_LINK);
+>>> +}
+>>> +
+>>> +static bool hci_sched_acl_pkt(struct hci_dev *hdev)
+>>> {
+>>>      unsigned int cnt = hdev->acl_cnt;
+>>>      struct hci_chan *chan;
+>>>      struct sk_buff *skb;
+>>>      int quote;
+>>> +     bool sched_limit = hci_sched_limit(hdev);
+>>> +     bool resched = false;
+>>> 
+>>>      __check_timeout(hdev, cnt);
+>>> 
+>>>      while (hdev->acl_cnt &&
+>>>             (chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
+>>>              u32 priority = (skb_peek(&chan->data_q))->priority;
+>>> +
+>>> +             if (sched_limit && quote > 0) {
+>>> +                     resched = true;
+>>> +                     quote = 1;
+>>> +             }
+>>> +
+>>>              while (quote-- && (skb = skb_peek(&chan->data_q))) {
+>>>                      BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+>>>                             skb->len, skb->priority);
+>>> @@ -4271,19 +4285,26 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
+>>>                      chan->sent++;
+>>>                      chan->conn->sent++;
+>>>              }
+>>> +
+>>> +             if (resched && cnt != hdev->acl_cnt)
+>>> +                     break;
+>>>      }
+>>> 
+>>> -     if (cnt != hdev->acl_cnt)
+>>> +     if (hdev->acl_cnt == 0 && cnt != hdev->acl_cnt)
+>>>              hci_prio_recalculate(hdev, ACL_LINK);
+>>> +
+>>> +     return resched;
+>>> }
+>>> 
+>>> -static void hci_sched_acl_blk(struct hci_dev *hdev)
+>>> +static bool hci_sched_acl_blk(struct hci_dev *hdev)
+>>> {
+>>>      unsigned int cnt = hdev->block_cnt;
+>>>      struct hci_chan *chan;
+>>>      struct sk_buff *skb;
+>>>      int quote;
+>>>      u8 type;
+>>> +     bool sched_limit = hci_sched_limit(hdev);
+>>> +     bool resched = false;
+>>> 
+>>>      __check_timeout(hdev, cnt);
+>>> 
+>>> @@ -4297,6 +4318,12 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
+>>>      while (hdev->block_cnt > 0 &&
+>>>             (chan = hci_chan_sent(hdev, type, &quote))) {
+>>>              u32 priority = (skb_peek(&chan->data_q))->priority;
+>>> +
+>>> +             if (sched_limit && quote > 0) {
+>>> +                     resched = true;
+>>> +                     quote = 1;
+>>> +             }
+>>> +
+>>>              while (quote > 0 && (skb = skb_peek(&chan->data_q))) {
+>>>                      int blocks;
+>>> 
+>>> @@ -4311,7 +4338,7 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
+>>> 
+>>>                      blocks = __get_blocks(hdev, skb);
+>>>                      if (blocks > hdev->block_cnt)
+>>> -                             return;
+>>> +                             return false;
+>>> 
+>>>                      hci_conn_enter_active_mode(chan->conn,
+>>>                                                 bt_cb(skb)->force_active);
+>>> @@ -4325,33 +4352,39 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
+>>>                      chan->sent += blocks;
+>>>                      chan->conn->sent += blocks;
+>>>              }
+>>> +
+>>> +             if (resched && cnt != hdev->block_cnt)
+>>> +                     break;
+>>>      }
+>>> 
+>>> -     if (cnt != hdev->block_cnt)
+>>> +     if (hdev->block_cnt == 0 && cnt != hdev->block_cnt)
+>>>              hci_prio_recalculate(hdev, type);
+>>> +
+>>> +     return resched;
+>>> }
+>>> 
+>>> -static void hci_sched_acl(struct hci_dev *hdev)
+>>> +static bool hci_sched_acl(struct hci_dev *hdev)
+>>> {
+>>>      BT_DBG("%s", hdev->name);
+>>> 
+>>>      /* No ACL link over BR/EDR controller */
+>>>      if (!hci_conn_num(hdev, ACL_LINK) && hdev->dev_type == HCI_PRIMARY)
+>>> -             return;
+>>> +             goto done;
+>> 
+>> Style wise the goto done is overkill. Just return false.
+> 
+> Will do.
+> 
+>> 
+>>> 
+>>>      /* No AMP link over AMP controller */
+>>>      if (!hci_conn_num(hdev, AMP_LINK) && hdev->dev_type == HCI_AMP)
+>>> -             return;
+>>> +             goto done;
+>>> 
+>>>      switch (hdev->flow_ctl_mode) {
+>>>      case HCI_FLOW_CTL_MODE_PACKET_BASED:
+>>> -             hci_sched_acl_pkt(hdev);
+>>> -             break;
+>>> +             return hci_sched_acl_pkt(hdev);
+>>> 
+>>>      case HCI_FLOW_CTL_MODE_BLOCK_BASED:
+>>> -             hci_sched_acl_blk(hdev);
+>>> -             break;
+>>> +             return hci_sched_acl_blk(hdev);
+>> 
+>> So the block based mode is for AMP controllers and not used on BR/EDR controllers. Since AMP controllers only transport ACL packet and no SCO/eSCO packets, we can ignore this here.
+> 
+> Ok, I'll remove it there.
+> 
+>> 
+>>>      }
+>>> +
+>>> +done:
+>>> +     return false;
+>>> }
+>>> 
+>>> /* Schedule SCO */
+>>> @@ -4402,16 +4435,18 @@ static void hci_sched_esco(struct hci_dev *hdev)
+>>>      }
+>>> }
+>>> 
+>>> -static void hci_sched_le(struct hci_dev *hdev)
+>>> +static bool hci_sched_le(struct hci_dev *hdev)
+>>> {
+>>>      struct hci_chan *chan;
+>>>      struct sk_buff *skb;
+>>>      int quote, cnt, tmp;
+>>> +     bool sched_limit = hci_sched_limit(hdev);
+>>> +     bool resched = false;
+>>> 
+>>>      BT_DBG("%s", hdev->name);
+>>> 
+>>>      if (!hci_conn_num(hdev, LE_LINK))
+>>> -             return;
+>>> +             return resched;
+>>> 
+>>>      cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
+>>> 
+>>> @@ -4420,6 +4455,12 @@ static void hci_sched_le(struct hci_dev *hdev)
+>>>      tmp = cnt;
+>>>      while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+>>>              u32 priority = (skb_peek(&chan->data_q))->priority;
+>>> +
+>>> +             if (sched_limit && quote > 0) {
+>>> +                     resched = true;
+>>> +                     quote = 1;
+>>> +             }
+>>> +
+>>>              while (quote-- && (skb = skb_peek(&chan->data_q))) {
+>>>                      BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+>>>                             skb->len, skb->priority);
+>>> @@ -4437,6 +4478,9 @@ static void hci_sched_le(struct hci_dev *hdev)
+>>>                      chan->sent++;
+>>>                      chan->conn->sent++;
+>>>              }
+>>> +
+>>> +             if (resched && cnt != tmp)
+>>> +                     break;
+>>>      }
+>>> 
+>>>      if (hdev->le_pkts)
+>>> @@ -4444,24 +4488,33 @@ static void hci_sched_le(struct hci_dev *hdev)
+>>>      else
+>>>              hdev->acl_cnt = cnt;
+>>> 
+>>> -     if (cnt != tmp)
+>>> +     if (cnt == 0 && cnt != tmp)
+>>>              hci_prio_recalculate(hdev, LE_LINK);
+>>> +
+>>> +     return resched;
+>>> }
+>>> 
+>>> static void hci_tx_work(struct work_struct *work)
+>>> {
+>>>      struct hci_dev *hdev = container_of(work, struct hci_dev, tx_work);
+>>>      struct sk_buff *skb;
+>>> +     bool resched;
+>>> 
+>>>      BT_DBG("%s acl %d sco %d le %d", hdev->name, hdev->acl_cnt,
+>>>             hdev->sco_cnt, hdev->le_cnt);
+>>> 
+>>>      if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+>>>              /* Schedule queues and send stuff to HCI driver */
+>>> -             hci_sched_acl(hdev);
+>>> -             hci_sched_sco(hdev);
+>>> -             hci_sched_esco(hdev);
+>>> -             hci_sched_le(hdev);
+>>> +             do {
+>>> +                     /* SCO and eSCO send all packets until emptied */
+>>> +                     hci_sched_sco(hdev);
+>>> +                     hci_sched_esco(hdev);
+>>> +
+>>> +                     /* Acl and Le send based on quota (priority on ACL per
+>>> +                      * loop)
+>>> +                      */
+>>> +                     resched = hci_sched_acl(hdev) || hci_sched_le(hdev);
+>>> +             } while (resched);
+>>>      }
+>> 
+>> I am not in favor of this busy loop. We might want to re-think the whole scheduling by connection type and really only focus on scheduling ACL (BR/EDR and LE) and audio packets (SCO/eSCO and ISO).
+> 
+> I think the busy loop is the simplest solution if we want to solve the
+> problem: don't send 2 ACL packets without checking if there is a SCO
+> packet scheduled (which is the worst case I'm worried about on UART
+> interfaces).
+> 
+> If we get rid of the connection type scheduling and only do audio and
+> ACL, we would still need some mechanism to guarantee that you don't
+> send >~1100 bytes without checking if SCO is queued (assuming 3000000
+> baudrate and 3.75ms latency requirement).
+
+Why don’t we just say that if SCO is queued up, then after each ACL packet we should send a SCO packet.
+
+> 
+>> 
+>> In addition, we also need to check that SCO scheduling and A2DP media channel ACL packets do work together. I think that generally it would be best to have a clear rate at which SCO packets are require to pushed down to the hardware. So you really reserve bandwidth and not blindly prioritize them via a busy loop.
+>> 
+> I am less worried about bandwidth and more about latency. If I start
+> sending really large ACL packets through UART, it could take multiple
+> milliseconds. It really has to be reserved bandwidth per small
+> timeslice (like 3.75ms) so I can guarantee that if a SCO packet is
+> seen within that time slice, it will be transferred. There will still
+> have to be a busy loop though because the amount of data you can send
+> in the time slice will probably be less than the data that can be
+> in-flight to the controller (i.e. acl_max_pkts).
+
+Right now we kinda let the SCO socket application provide the correct timing. I was thinking that the kernel might need to enforce this.
+
+Regards
+
+Marcel
 
