@@ -2,313 +2,380 @@ Return-Path: <SRS0=jOg2=5D=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B038C5ACD6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 16:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C4BC5ACD6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 16:58:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0392920752
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 16:38:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C776720753
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Mar 2020 16:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="KOZWKDZC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QrDakjx9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727228AbgCRQi0 (ORCPT
+        id S1727024AbgCRQ64 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Mar 2020 12:38:26 -0400
-Received: from mga17.intel.com ([192.55.52.151]:44623 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727310AbgCRQiX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Mar 2020 12:38:23 -0400
-IronPort-SDR: C2dyol+IYwlRzKN0ohQc/FFe1+hqhgFol0TzLImxISmu2jS4fDOE0qHyqJGcsOBWkB4pZcRdjy
- YeM60h0YIrzg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2020 09:38:21 -0700
-IronPort-SDR: bmaD/tX2WXAlmp3+/T8Zr+RuAXG1MlgC57iYr+WLklgz1aLjUUzwKLSPTQDm5WOBGCf6s4kOO5
- tctpWQrkvzcA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,568,1574150400"; 
-   d="scan'208";a="355759302"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Mar 2020 09:38:20 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 18 Mar 2020 09:38:19 -0700
-Received: from orsmsx609.amr.corp.intel.com (10.22.229.22) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 18 Mar 2020 09:38:19 -0700
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- orsmsx609.amr.corp.intel.com (10.22.229.22) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 18 Mar 2020 09:38:19 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 18 Mar 2020 09:38:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UPEJl0oniCEcrhWs0C6ehEfswexJRtH5DXBfqDWQjacmcvsfSLpeirBekoO2jTEpU4HOxqIgGbLqWE2tIB+3S7tWoe/oGOf3BHfFEU4NwOHTPUSfe2N2kkMi4ylssPiVhhArE5xywi9/TPCNO6Mc6oJYFnBlotlrSJRWBy2O7xQ60ZcapNspKA7nF6K9PHJORCts8Sl5DxrM6/j7dUBsi0whzba6ZmaVKQ7BTLh1BkLWpIsz606b5wc8AYXC8iiD+hPcHQuulLriFj/FlSZugmvFdmUQzqkUyPjjtkutDV6teUSTOjEaApi1xxd/1ZMZrXULxi9yr6GOqqKb2EP5gQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vWqyjzmsgdzqeLseAJKYoU9tUI697YVqJijdieRs9RE=;
- b=TcP4CwPpiz1sOQW9KbUfYbn2zxomMR33azvWXTOQ1L6jQ+NTHgJWDw8wf2Nwf7nwXV5iCjOprZwxwlhJg/MFiPHXfgHvmgX2qEUbBivzo/ZP9DKQnyLksUKcNWH7kyQZO2IdbFDJyM9sEzf4GEeFun/FXYZLgDi5KzsfXoqkPyz3cXxpfOKrKtxdNdNV+nWich5yZe9ruFe/ESSo2AIiis3MS/LCgKT9AK0AbivPKBsiyprv7vpLyzZxOFkCYRMuGCncySkqQOgHeGHzsQOnnV3pFa2z1iWonWcIi1e74SzwxzExiT1P8PpLbt18f9o/B7oLSqCPJOANZVgzPVoFrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vWqyjzmsgdzqeLseAJKYoU9tUI697YVqJijdieRs9RE=;
- b=KOZWKDZCUFjWyoEDtWc2+07rNsJl6sQoEWZ0LuX3cSQQifEv4MC8KbLrw8A1f/F5FyGJFcpAWXiQ1sHSqL6dwIuIjV7En/pvA1U+vIe/Pap9TjGSRjQqZcWa5fKQJiuj2oxWQWXFI+RQJtepE28OFNM6xJomOSjgsL4m9ZL5Qdo=
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
- by MW3PR11MB4634.namprd11.prod.outlook.com (2603:10b6:303:54::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.22; Wed, 18 Mar
- 2020 16:38:15 +0000
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::39a4:4e3:2bb2:dd3a]) by MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::39a4:4e3:2bb2:dd3a%3]) with mapi id 15.20.2814.021; Wed, 18 Mar 2020
- 16:38:15 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v2 1/2] tools/mesh-cfgclient: Implement node-reset
- command
-Thread-Topic: [PATCH BlueZ v2 1/2] tools/mesh-cfgclient: Implement node-reset
- command
-Thread-Index: AQHV/KmywBzDc6C9RE2D+HCDYbzN/ahOjekA
-Date:   Wed, 18 Mar 2020 16:38:15 +0000
-Message-ID: <56682dd41f1b64f32395e0b6569e1033f4dfd5b4.camel@intel.com>
-References: <20200317221546.22440-1-inga.stotland@intel.com>
-In-Reply-To: <20200317221546.22440-1-inga.stotland@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brian.gix@intel.com; 
-x-originating-ip: [192.55.54.38]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 14e4f345-a99a-473e-5c6e-08d7cb5ac199
-x-ms-traffictypediagnostic: MW3PR11MB4634:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW3PR11MB4634DCE893AA5BF2BD161CB7E1F70@MW3PR11MB4634.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:159;
-x-forefront-prvs: 03468CBA43
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(346002)(366004)(136003)(396003)(39860400002)(199004)(2616005)(6506007)(186003)(26005)(36756003)(110136005)(71200400001)(5660300002)(316002)(6512007)(6486002)(81166006)(8676002)(8936002)(6636002)(81156014)(66476007)(76116006)(91956017)(66946007)(64756008)(86362001)(30864003)(66446008)(2906002)(478600001)(66556008);DIR:OUT;SFP:1102;SCL:1;SRVR:MW3PR11MB4634;H:MW3PR11MB4539.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5SiyNwN09B4IiX6szrE4HOqe65zR/3lwUcs5qXE2tAJyq0F0LYJ/HnPwvOi5a3RlVEkAckNhfSFWeDWKm69Veoi0/+0bD7qh95C2FgzlpjRG8YWjPszifX2F35N+Lr5yt2qz1Wc36WXwG36x2wIiuRcVZloxO/Jn9eW0RS3/yFKeUpQvO1JvbqAMVnudveOhDpKACeQYPGP+paVIh8wCoaPWHmQoDh40xBgOymxYuBiGmBiV4FFBEtuYINFyKyc1LGBOGZTug6Rz4hlsZxiePfZDkrYXjBHJFCIJE8oGqe2a5jrb3zZcMdtYGXmHDpruM5+QlrGHV2VlRkFGpHq6V2ajpf7VpteVvtYr3+hPBlpIHDksOToSLWhMwV+diSJ8aWpT+CwTsOC0SuON7Ubyo78ayIqwX3IJ3BgH6PD9JmtqNLQ64tNbxrclduRfSQ1k
-x-ms-exchange-antispam-messagedata: Ww0flOcXnaVDk/hdEwUBwjyu8u/iQBtteQv8XhYUlHnbuY9o4jG95ivryjX3BM2RCzpAHaHWORG1yICz7WvTNqubJs4t7B2wFW61ozNTaVDaBclhhd+UxZSdyleBctnU2BeIIOwlmAWHaxjPMoXMUg==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B6F66BE1D3F63C4B94C82797FF8FA096@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 18 Mar 2020 12:58:56 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:37416 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726680AbgCRQ6z (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Mar 2020 12:58:55 -0400
+Received: by mail-oi1-f195.google.com with SMTP id w13so26532565oih.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Mar 2020 09:58:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=zedymcLfm2GxMe6xzaR2P2G74am7Xc/JSeGLtXW7ruI=;
+        b=QrDakjx9hp4QpmcjNlWmv22kKE1VxFJexd2V071vPVGT52qW/cqHs2T2xUhi055uSs
+         6xjEkjcJZ45EEJJ4Xt1fhdMuzgNSVGScWDrmrKf8HNQxg1HPJwfXFV4Oz5BpdP2uCR2P
+         /q3byBthkSZ2RJJVm9QQcllqVnhkUy0ZoT9Ywm2oM7IqgXf2ftTlKIcYyxEJIP5uOwNR
+         YDb8tTY1q4N1QxKee1pIruK0qzpf6qVy1i8G5vKibFZgcZ2Os5D7hAkkh7/kn2T1TGOl
+         RHIpWP32LK1k9PKb74vwf7NpdGC5r81UifiLdX4wsxPSvXILLq0ySyr5z9EbV3A3agkE
+         tfKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=zedymcLfm2GxMe6xzaR2P2G74am7Xc/JSeGLtXW7ruI=;
+        b=V45Klt8oR7FigNk1lBbZjhZ3FYOlfVQW7ca02Q7/wVwR+wo+CnhFcd4nVlkUckSaHU
+         v3Yf/UYHwXgRDHLubghB9ITYeesxFzbzvSjUzLU4tpOhaKj3/BF4tzPBd50YbfGNpNVc
+         KjrhcYQidNfwKXH+40kGgQelgH5lsjm0SHuxd9+stn2GH03LyDz67xqITUjin8J7s+rj
+         k2DFmBLO/y6GF9OpjR9oUSUnaczGbwuMgQ5LdRUYfOf7YVhQUXfRe/jGt7q7TreGJ3G2
+         NH9DWwAKU8W+5ccn3J+YwkuhZ26RnBWwDE3B4QcsL6p/FGX20O1gwHm9elZmI+7bnw/x
+         VfeA==
+X-Gm-Message-State: ANhLgQ24P8YLJKVul8+1E03Az2vBEpoQ++cHpgv/UmCklKIruD0jBCnl
+        J6sGrmvJdZ838aPEOAGltfA2pJvTfVurnQHKyoFw8Q==
+X-Google-Smtp-Source: ADFU+vvvD++BzGY3VqvKbXzobxndeumNZ1Ri+y0eiVnXGlLKF78iDNlscX4CYjHk94Xif8iWpTYJXw0aex3BqCUwBx0=
+X-Received: by 2002:aca:b1d5:: with SMTP id a204mr3883578oif.82.1584550734390;
+ Wed, 18 Mar 2020 09:58:54 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14e4f345-a99a-473e-5c6e-08d7cb5ac199
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2020 16:38:15.0906
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: c7lqb1ln0iFexavWFHZJ8IoxYn/y/iRJuCiSukR9KlYZ8c2umkBZpx+SfHPd+OU9sHBJRgVkpoyXkNG3WkhXWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4634
-X-OriginatorOrg: intel.com
+References: <20200312222454.5079-1-luiz.dentz@gmail.com> <20200312222454.5079-2-luiz.dentz@gmail.com>
+ <F140112C-C0CA-4894-9CD9-48EA67705879@holtmann.org>
+In-Reply-To: <F140112C-C0CA-4894-9CD9-48EA67705879@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 18 Mar 2020 09:58:42 -0700
+Message-ID: <CABBYNZ+bx1O6E9GR+fVPfhEfrOLA=DFT9nGjaauwDDwoV1uBwA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-UGF0Y2hzZXQgQXBwbGllZA0KDQpPbiBUdWUsIDIwMjAtMDMtMTcgYXQgMTU6MTUgLTA3MDAsIElu
-Z2EgU3RvdGxhbmQgd3JvdGU6DQo+IFRoaXMgaW1wbGVtZW50cyBvbmUtcGFzcyByZW1vdmFsIG9h
-IGEgcmVtb3RlIG5vZGUgZnJvbSBhIG1lc2ggbmV0d29yaw0KPiBieSBpc3N1aW5nIGEgbm9kZS1y
-ZXNldCBjb21tYW5kIGZyb20gY29uZmlnIG1lbnUuIFRoZSBmb2xsb3dpbmcgYWN0aW9ucw0KPiBh
-cmUgcGVyZm9ybWVkOg0KPiAtIENvbmZpZyBOb2RlIFJlc2V0IG1lc3NhZ2UgaXMgc2VudCB0byBh
-IHJlbW90ZSBub2RlDQo+IC0gVXBvbiBlaXRoZXIgcmVjZWl2aW5nIENvbmZpZyBOb2RlIFJlc2V0
-IFN0YXR1cyBvciByZXNwb25zZSB0aW1lb3V0LA0KPiAgIG5vZGUgcmVjb3JkIGlzIHJlbW92ZWQg
-ZnJvbSBjb25maWd1cmF0aW9uIGNsaWVudCdzIGRhdGFiYXNlIGFuZCwNCj4gICBieSBjYWxsaW5n
-IERlbGV0ZVJlbW90ZU5vZGUoKSBtZXRob2Qgb24gbWVzaC5NYW5hZ2VtZW50IGludGVyZmFjZQ0K
-PiANCj4gbm9kZS1kZWxldGUgY29tbWFuZCBmcm9tIHRoZSBtYWluIG1lbnUgaXMgcmVtb3ZlZC4N
-Cj4gLS0tDQo+ICB0b29scy9tZXNoLWNmZ2NsaWVudC5jIHwgNzcgKysrKysrKysrKysrKysrKy0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICB0b29scy9tZXNoL2NmZ2NsaS5jICAgIHwgNjAg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0NCj4gIHRvb2xzL21lc2gvY2ZnY2xpLmgg
-ICAgfCAgNCArKy0NCj4gIHRvb2xzL21lc2gvbWVzaC1kYi5jICAgfCAzOSArKysrKysrKysrKysr
-KysrKysrKysNCj4gIHRvb2xzL21lc2gvcmVtb3RlLmMgICAgfCAyMCArKysrKysrKysrKw0KPiAg
-dG9vbHMvbWVzaC9yZW1vdGUuaCAgICB8ICAxICsNCj4gIDYgZmlsZXMgY2hhbmdlZCwgMTQ3IGlu
-c2VydGlvbnMoKyksIDU0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL3Rvb2xzL21l
-c2gtY2ZnY2xpZW50LmMgYi90b29scy9tZXNoLWNmZ2NsaWVudC5jDQo+IGluZGV4IDRiN2JkMjIw
-MC4uZTQ1MjNlNWZjIDEwMDY0NA0KPiAtLS0gYS90b29scy9tZXNoLWNmZ2NsaWVudC5jDQo+ICsr
-KyBiL3Rvb2xzL21lc2gtY2ZnY2xpZW50LmMNCj4gQEAgLTM0Miw5ICszNDIsMzggQEAgc3RhdGlj
-IGJvb2wgc2VuZF9rZXkodm9pZCAqdXNlcl9kYXRhLCB1aW50MTZfdCBkc3QsIHVpbnQxNl90IGtl
-eV9pZHgsDQo+ICAJCQkJc2VuZF9rZXlfc2V0dXAsIE5VTEwsIHJlcSwgbF9mcmVlKSAhPSAwOw0K
-PiAgfQ0KPiAgDQo+ICtzdGF0aWMgdm9pZCBkZWxldGVfbm9kZV9zZXR1cChzdHJ1Y3QgbF9kYnVz
-X21lc3NhZ2UgKm1zZywgdm9pZCAqdXNlcl9kYXRhKQ0KPiArew0KPiArCXN0cnVjdCBnZW5lcmlj
-X3JlcXVlc3QgKnJlcSA9IHVzZXJfZGF0YTsNCj4gKwl1aW50MTZfdCBwcmltYXJ5Ow0KPiArCXVp
-bnQ4X3QgZWxlX2NudDsNCj4gKw0KPiArCXByaW1hcnkgPSAodWludDE2X3QpIHJlcS0+YXJnMTsN
-Cj4gKwllbGVfY250ID0gKHVpbnQ4X3QpIHJlcS0+YXJnMjsNCj4gKw0KPiArCWxfZGJ1c19tZXNz
-YWdlX3NldF9hcmd1bWVudHMobXNnLCAicXkiLCBwcmltYXJ5LCBlbGVfY250KTsNCj4gK30NCj4g
-Kw0KPiArc3RhdGljIHZvaWQgZGVsZXRlX25vZGUodWludDE2X3QgcHJpbWFyeSwgdWludDhfdCBl
-bGVfY250KQ0KPiArew0KPiArCXN0cnVjdCBnZW5lcmljX3JlcXVlc3QgKnJlcTsNCj4gKw0KPiAr
-CWlmICghbG9jYWwgfHwgIWxvY2FsLT5wcm94eSB8fCAhbG9jYWwtPm1nbXRfcHJveHkpIHsNCj4g
-KwkJYnRfc2hlbGxfcHJpbnRmKCJOb2RlIGlzIG5vdCBhdHRhY2hlZFxuIik7DQo+ICsJCXJldHVy
-bjsNCj4gKwl9DQo+ICsNCj4gKwlyZXEgPSBsX25ldyhzdHJ1Y3QgZ2VuZXJpY19yZXF1ZXN0LCAx
-KTsNCj4gKwlyZXEtPmFyZzEgPSBwcmltYXJ5Ow0KPiArCXJlcS0+YXJnMiA9IGVsZV9jbnQ7DQo+
-ICsNCj4gKwlsX2RidXNfcHJveHlfbWV0aG9kX2NhbGwobG9jYWwtPm1nbXRfcHJveHksICJEZWxl
-dGVSZW1vdGVOb2RlIiwNCj4gKwkJCQlkZWxldGVfbm9kZV9zZXR1cCwgTlVMTCwgcmVxLCBsX2Zy
-ZWUpOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgdm9pZCBjbGllbnRfaW5pdCh2b2lkKQ0KPiAgew0K
-PiAtCWNmZ2NsaSA9IGNmZ2NsaV9pbml0KHNlbmRfa2V5LCAodm9pZCAqKSBhcHAuZWxlLnBhdGgp
-Ow0KPiArCWNmZ2NsaSA9IGNmZ2NsaV9pbml0KHNlbmRfa2V5LCBkZWxldGVfbm9kZSwgKHZvaWQg
-KikgYXBwLmVsZS5wYXRoKTsNCj4gIAljZmdjbGktPm9wcy5zZXRfc2VuZF9mdW5jKHNlbmRfbXNn
-LCAodm9pZCAqKSBhcHAuZWxlLnBhdGgpOw0KPiAgfQ0KPiAgDQo+IEBAIC04MDEsNTAgKzgzMCw2
-IEBAIHN0YXRpYyB2b2lkIGZyZWVfZ2VuZXJpY19yZXF1ZXN0KHZvaWQgKmRhdGEpDQo+ICAJbF9m
-cmVlKHJlcSk7DQo+ICB9DQo+ICANCj4gLXN0YXRpYyB2b2lkIGRlbGV0ZV9ub2RlX3NldHVwKHN0
-cnVjdCBsX2RidXNfbWVzc2FnZSAqbXNnLCB2b2lkICp1c2VyX2RhdGEpDQo+IC17DQo+IC0Jc3Ry
-dWN0IGdlbmVyaWNfcmVxdWVzdCAqcmVxID0gdXNlcl9kYXRhOw0KPiAtCXVpbnQxNl90IHByaW1h
-cnk7DQo+IC0JdWludDhfdCBlbGVfY250Ow0KPiAtDQo+IC0JcHJpbWFyeSA9ICh1aW50MTZfdCkg
-cmVxLT5hcmcxOw0KPiAtCWVsZV9jbnQgPSAodWludDhfdCkgcmVxLT5hcmcyOw0KPiAtDQo+IC0J
-bF9kYnVzX21lc3NhZ2Vfc2V0X2FyZ3VtZW50cyhtc2csICJxeSIsIHByaW1hcnksIGVsZV9jbnQp
-Ow0KPiAtfQ0KPiAtDQo+IC1zdGF0aWMgdm9pZCBjbWRfZGVsZXRlX25vZGUoaW50IGFyZ2MsIGNo
-YXIgKmFyZ3ZbXSkNCj4gLXsNCj4gLQlzdHJ1Y3QgZ2VuZXJpY19yZXF1ZXN0ICpyZXE7DQo+IC0N
-Cj4gLQlpZiAoIWxvY2FsIHx8ICFsb2NhbC0+cHJveHkgfHwgIWxvY2FsLT5tZ210X3Byb3h5KSB7
-DQo+IC0JCWJ0X3NoZWxsX3ByaW50ZigiTm9kZSBpcyBub3QgYXR0YWNoZWRcbiIpOw0KPiAtCQly
-ZXR1cm47DQo+IC0JfQ0KPiAtDQo+IC0JaWYgKGFyZ2MgPCAzKSB7DQo+IC0JCWJ0X3NoZWxsX3By
-aW50ZigiVW5pY2FzdCBhbmQgZWxlbWVudCBjb3VudCBhcmUgcmVxdWlyZWRcbiIpOw0KPiAtCQly
-ZXR1cm47DQo+IC0JfQ0KPiAtDQo+IC0JcmVxID0gbF9uZXcoc3RydWN0IGdlbmVyaWNfcmVxdWVz
-dCwgMSk7DQo+IC0NCj4gLQlpZiAoc3NjYW5mKGFyZ3ZbMV0sICIlMDR4IiwgJnJlcS0+YXJnMSkg
-IT0gMSkNCj4gLQkJZ290byBmYWlsOw0KPiAtDQo+IC0JaWYgKHNzY2FuZihhcmd2WzJdLCAiJXUi
-LCAmcmVxLT5hcmcyKSAhPSAxKQ0KPiAtCQlnb3RvIGZhaWw7DQo+IC0NCj4gLQlsX2RidXNfcHJv
-eHlfbWV0aG9kX2NhbGwobG9jYWwtPm1nbXRfcHJveHksICJEZWxldGVSZW1vdGVOb2RlIiwNCj4g
-LQkJCQlkZWxldGVfbm9kZV9zZXR1cCwgTlVMTCwgcmVxLCBsX2ZyZWUpOw0KPiAtDQo+IC0JLyog
-VE9ETzo6IERlbGV0ZSBub2RlIGZyb20gY29uZmlndXJhdGlvbiAqLw0KPiAtCXJldHVybjsNCj4g
-LQ0KPiAtZmFpbDoNCj4gLQlsX2ZyZWUocmVxKTsNCj4gLX0NCj4gLQ0KPiAgc3RhdGljIHZvaWQg
-aW1wb3J0X25vZGVfcmVwbHkoc3RydWN0IGxfZGJ1c19wcm94eSAqcHJveHksDQo+ICAJCQkJc3Ry
-dWN0IGxfZGJ1c19tZXNzYWdlICptc2csIHZvaWQgKnVzZXJfZGF0YSkNCj4gIHsNCj4gQEAgLTEz
-NTksOCArMTM0NCw2IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgYnRfc2hlbGxfbWVudSBtYWluX21l
-bnUgPSB7DQo+ICAJeyAibm9kZS1pbXBvcnQiLCAiPHV1aWQ+IDxuZXRfaWR4PiA8cHJpbWFyeT4g
-PGVsZV9jb3VudD4gPGRldl9rZXk+IiwNCj4gIAkJCWNtZF9pbXBvcnRfbm9kZSwNCj4gIAkJCSJJ
-bXBvcnQgYW4gZXh0ZXJuYWxseSBwcm92aXNpb25lZCByZW1vdGUgbm9kZSJ9LA0KPiAtCXsgIm5v
-ZGUtZGVsZXRlIiwgIjxwcmltYXJ5PiA8ZWxlX2NvdW50PiIsIGNtZF9kZWxldGVfbm9kZSwNCj4g
-LQkJCSJEZWxldGUgYSByZW1vdGUgbm9kZSJ9LA0KPiAgCXsgImxpc3Qtbm9kZXMiLCBOVUxMLCBj
-bWRfbGlzdF9ub2RlcywNCj4gIAkJCSJMaXN0IHJlbW90ZSBtZXNoIG5vZGVzIn0sDQo+ICAJeyAi
-a2V5cyIsIE5VTEwsIGNtZF9rZXlzLA0KPiBkaWZmIC0tZ2l0IGEvdG9vbHMvbWVzaC9jZmdjbGku
-YyBiL3Rvb2xzL21lc2gvY2ZnY2xpLmMNCj4gaW5kZXggMzNlNzdkODc4Li4wYzgyZDlmODIgMTAw
-NjQ0DQo+IC0tLSBhL3Rvb2xzL21lc2gvY2ZnY2xpLmMNCj4gKysrIGIvdG9vbHMvbWVzaC9jZmdj
-bGkuYw0KPiBAQCAtNjUsNiArNjUsNyBAQCBzdGF0aWMgc3RydWN0IGxfcXVldWUgKmdyb3VwczsN
-Cj4gIA0KPiAgc3RhdGljIHZvaWQgKnNlbmRfZGF0YTsNCj4gIHN0YXRpYyBtb2RlbF9zZW5kX21z
-Z19mdW5jX3Qgc2VuZF9tc2c7DQo+ICtzdGF0aWMgZGVsZXRlX3JlbW90ZV9mdW5jX3QgbWdyX2Rl
-bF9yZW1vdGU7DQo+ICANCj4gIHN0YXRpYyB2b2lkICprZXlfZGF0YTsNCj4gIHN0YXRpYyBrZXlf
-c2VuZF9mdW5jX3Qgc2VuZF9rZXlfbXNnOw0KPiBAQCAtMTkxLDYgKzE5MiwxNSBAQCBzdGF0aWMg
-Y29uc3QgY2hhciAqb3Bjb2RlX3N0cih1aW50MzJfdCBvcGNvZGUpDQo+ICAJcmV0dXJuIGNtZC0+
-ZGVzYzsNCj4gIH0NCj4gIA0KPiArc3RhdGljIHZvaWQgcmVzZXRfcmVtb3RlX25vZGUodWludDE2
-X3QgYWRkcikNCj4gK3sNCj4gKwl1aW50OF90IGVsZV9jbnQgPSByZW1vdGVfZGVsX25vZGUoYWRk
-cik7DQo+ICsNCj4gKwlidF9zaGVsbF9wcmludGYoIlJlbW90ZSByZW1vdmVkIChwcmltYXJ5ICU0
-LjR4KVxuIiwgYWRkcik7DQo+ICsJaWYgKGVsZV9jbnQgJiYgbWdyX2RlbF9yZW1vdGUpDQo+ICsJ
-CW1ncl9kZWxfcmVtb3RlKGFkZHIsIGVsZV9jbnQpOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgdm9p
-ZCBmcmVlX3JlcXVlc3Qodm9pZCAqYSkNCj4gIHsNCj4gIAlzdHJ1Y3QgcGVuZGluZ19yZXEgKnJl
-cSA9IGE7DQo+IEBAIC0yMjIsNiArMjMyLDEwIEBAIHN0YXRpYyB2b2lkIHdhaXRfcnNwX3RpbWVv
-dXQoc3RydWN0IGxfdGltZW91dCAqdGltZW91dCwgdm9pZCAqdXNlcl9kYXRhKQ0KPiAgCWJ0X3No
-ZWxsX3ByaW50ZigiTm8gcmVzcG9uc2UgZm9yIFwiJXNcIiBmcm9tICU0LjR4XG4iLA0KPiAgCQkJ
-CQkJcmVxLT5jbWQtPmRlc2MsIHJlcS0+YWRkcik7DQo+ICANCj4gKwkvKiBOb2RlIHJlc2V0IGNh
-c2U6IGRlbGV0ZSB0aGUgcmVtb3RlIGV2ZW4gaWYgdGhlcmUgaXMgbm8gcmVzcG9uc2UgKi8NCj4g
-KwlpZiAocmVxLT5jbWQtPm9wY29kZSA9PSBPUF9OT0RFX1JFU0VUKQ0KPiArCQlyZXNldF9yZW1v
-dGVfbm9kZShyZXEtPmFkZHIpOw0KPiArDQo+ICAJbF9xdWV1ZV9yZW1vdmUocmVxdWVzdHMsIHJl
-cSk7DQo+ICAJZnJlZV9yZXF1ZXN0KHJlcSk7DQo+ICB9DQo+IEBAIC03MTMsMTEgKzcyNyw5IEBA
-IHN0YXRpYyBib29sIG1zZ19yZWN2ZCh1aW50MTZfdCBzcmMsIHVpbnQxNl90IGlkeCwgdWludDhf
-dCAqZGF0YSwNCj4gIA0KPiAgCS8qIFBlciBNZXNoIFByb2ZpbGUgNC4zLjIuNTQgKi8NCj4gIAlj
-YXNlIE9QX05PREVfUkVTRVRfU1RBVFVTOg0KPiAtCQlpZiAobGVuICE9IDEpDQo+IC0JCQlyZXR1
-cm4gdHJ1ZTsNCj4gIA0KPiAtCQlidF9zaGVsbF9wcmludGYoIk5vZGUgJTQuNHggcmVzZXQgc3Rh
-dHVzICVzXG4iLA0KPiAtCQkJCXNyYywgbWVzaF9zdGF0dXNfc3RyKGRhdGFbMF0pKTsNCj4gKwkJ
-YnRfc2hlbGxfcHJpbnRmKCJOb2RlICU0LjR4IGlzIHJlc2V0XG4iLCBzcmMpOw0KPiArCQlyZXNl
-dF9yZW1vdGVfbm9kZShzcmMpOw0KPiAgDQo+ICAJCWJyZWFrOw0KPiAgDQo+IEBAIC0xNjU2LDcg
-KzE2NjgsNDEgQEAgc3RhdGljIHZvaWQgY21kX2ZyaWVuZF9nZXQoaW50IGFyZ2MsIGNoYXIgKmFy
-Z3ZbXSkNCj4gIA0KPiAgc3RhdGljIHZvaWQgY21kX25vZGVfcmVzZXQoaW50IGFyZ2MsIGNoYXIg
-KmFyZ3ZbXSkNCj4gIHsNCj4gLQljbWRfZGVmYXVsdChPUF9OT0RFX1JFU0VUKTsNCj4gKwl1aW50
-MTZfdCBuLCBpOw0KPiArCXVpbnQ4X3QgbXNnWzhdOw0KPiArCXN0cnVjdCBwZW5kaW5nX3JlcSAq
-cmVxOw0KPiArDQo+ICsJaWYgKElTX1VOQVNTSUdORUQodGFyZ2V0KSkgew0KPiArCQlidF9zaGVs
-bF9wcmludGYoIkRlc3RpbmF0aW9uIG5vdCBzZXRcbiIpOw0KPiArCQlyZXR1cm4gYnRfc2hlbGxf
-bm9uaW50ZXJhY3RpdmVfcXVpdChFWElUX0ZBSUxVUkUpOw0KPiArCX0NCj4gKw0KPiArCS8qIENh
-bm5vdCByZW1ldCBzZWxmICovDQo+ICsJaWYgKHRhcmdldCA9PSAweDAwMDEpIHsNCj4gKwkJYnRf
-c2hlbGxfcHJpbnRmKCJSZXNldHRpbmcgc2VsZiBub3QgYWxsb3dlZFxuIik7DQo+ICsJCXJldHVy
-biBidF9zaGVsbF9ub25pbnRlcmFjdGl2ZV9xdWl0KEVYSVRfRkFJTFVSRSk7DQo+ICsJfQ0KPiAr
-DQo+ICsJbiA9IG1lc2hfb3Bjb2RlX3NldChPUF9OT0RFX1JFU0VULCBtc2cpOw0KPiArDQo+ICsJ
-cmVxID0gbF9uZXcoc3RydWN0IHBlbmRpbmdfcmVxLCAxKTsNCj4gKwlyZXEtPmFkZHIgPSB0YXJn
-ZXQ7DQo+ICsJcmVxLT5jbWQgPSBnZXRfY21kKE9QX05PREVfUkVTRVQpOw0KPiArDQo+ICsJLyoN
-Cj4gKwkgKiBBcyBhIGNvdXJ0ZXN5IHRvIHRoZSByZW1vdGUgbm9kZSwgc2VuZCB0aGUgcmVzZXQg
-Y29tbWFuZA0KPiArCSAqIHNldmVyYWwgdGltZXMuIFRyZWF0IHRoaXMgYXMgYSBzaW5nbGUgcmVx
-dWVzdCB3aXRoIGEgbG9uZ2VyDQo+ICsJICogcmVzcG9uc2UgdGltZW91dC4NCj4gKwkgKi8NCj4g
-KwlyZXEtPnRpbWVyID0gbF90aW1lb3V0X2NyZWF0ZShyc3BfdGltZW91dCAqIDIsDQo+ICsJCQkJ
-d2FpdF9yc3BfdGltZW91dCwgcmVxLCBOVUxMKTsNCj4gKw0KPiArCWxfcXVldWVfcHVzaF90YWls
-KHJlcXVlc3RzLCByZXEpOw0KPiArDQo+ICsJZm9yIChpID0gMDsgaSA8IDU7IGkrKykNCj4gKwkJ
-c2VuZF9tc2coc2VuZF9kYXRhLCB0YXJnZXQsIEFQUF9JRFhfREVWX1JFTU9URSwgbXNnLCBuKTsN
-Cj4gKw0KPiArCXJldHVybiBidF9zaGVsbF9ub25pbnRlcmFjdGl2ZV9xdWl0KEVYSVRfU1VDQ0VT
-Uyk7DQo+ICB9DQo+ICANCj4gIHN0YXRpYyB2b2lkIGNtZF9uZXRrZXlfZ2V0KGludCBhcmdjLCBj
-aGFyICphcmd2W10pDQo+IEBAIC0xODMxLDEzICsxODc3LDE1IEBAIHN0YXRpYyBzdHJ1Y3QgbW9k
-ZWxfaW5mbyBjbGlfaW5mbyA9IHsNCj4gIAkudmVuZG9yX2lkID0gVkVORE9SX0lEX0lOVkFMSUQN
-Cj4gIH07DQo+ICANCj4gLXN0cnVjdCBtb2RlbF9pbmZvICpjZmdjbGlfaW5pdChrZXlfc2VuZF9m
-dW5jX3Qga2V5X3NlbmQsIHZvaWQgKnVzZXJfZGF0YSkNCj4gK3N0cnVjdCBtb2RlbF9pbmZvICpj
-ZmdjbGlfaW5pdChrZXlfc2VuZF9mdW5jX3Qga2V5X3NlbmQsDQo+ICsJCQkJZGVsZXRlX3JlbW90
-ZV9mdW5jX3QgZGVsX25vZGUsIHZvaWQgKnVzZXJfZGF0YSkNCj4gIHsNCj4gIAlpZiAoIWtleV9z
-ZW5kKQ0KPiAgCQlyZXR1cm4gTlVMTDsNCj4gIA0KPiAgCXNlbmRfa2V5X21zZyA9IGtleV9zZW5k
-Ow0KPiAgCWtleV9kYXRhID0gdXNlcl9kYXRhOw0KPiArCW1ncl9kZWxfcmVtb3RlID0gZGVsX25v
-ZGU7DQo+ICAJcmVxdWVzdHMgPSBsX3F1ZXVlX25ldygpOw0KPiAgCWdyb3VwcyA9IG1lc2hfZGJf
-bG9hZF9ncm91cHMoKTsNCj4gIAlidF9zaGVsbF9hZGRfc3VibWVudSgmY2ZnX21lbnUpOw0KPiBk
-aWZmIC0tZ2l0IGEvdG9vbHMvbWVzaC9jZmdjbGkuaCBiL3Rvb2xzL21lc2gvY2ZnY2xpLmgNCj4g
-aW5kZXggOWIyODNkOWQ1Li44OWE2N2Y1ZGUgMTAwNjQ0DQo+IC0tLSBhL3Rvb2xzL21lc2gvY2Zn
-Y2xpLmgNCj4gKysrIGIvdG9vbHMvbWVzaC9jZmdjbGkuaA0KPiBAQCAtMjUsNiArMjUsOCBAQCBz
-dHJ1Y3QgbWVzaF9ncm91cCB7DQo+ICANCj4gIHR5cGVkZWYgYm9vbCAoKmtleV9zZW5kX2Z1bmNf
-dCkgKHZvaWQgKnVzZXJfZGF0YSwgdWludDE2X3QgZHN0LA0KPiAgCQkJCSB1aW50MTZfdCBpZHgs
-IGJvb2wgaXNfYXBwa2V5LCBib29sIHVwZGF0ZSk7DQo+ICt0eXBlZGVmIHZvaWQgKCpkZWxldGVf
-cmVtb3RlX2Z1bmNfdCkgKHVpbnQxNl90IHByaW1hcnksIHVpbnQ4X3QgZWxlX2NudCk7DQo+ICAN
-Cj4gLXN0cnVjdCBtb2RlbF9pbmZvICpjZmdjbGlfaW5pdChrZXlfc2VuZF9mdW5jX3Qga2V5X2Z1
-bmMsIHZvaWQgKnVzZXJfZGF0YSk7DQo+ICtzdHJ1Y3QgbW9kZWxfaW5mbyAqY2ZnY2xpX2luaXQo
-a2V5X3NlbmRfZnVuY190IGtleV9mdW5jLA0KPiArCQkJCWRlbGV0ZV9yZW1vdGVfZnVuY190IGRl
-bF9ub2RlLCB2b2lkICp1c2VyX2RhdGEpOw0KPiAgdm9pZCBjZmdjbGlfY2xlYW51cCh2b2lkKTsN
-Cj4gZGlmZiAtLWdpdCBhL3Rvb2xzL21lc2gvbWVzaC1kYi5jIGIvdG9vbHMvbWVzaC9tZXNoLWRi
-LmMNCj4gaW5kZXggNGEyNmE2NjdlLi5lOTM4ZWU3MzMgMTAwNjQ0DQo+IC0tLSBhL3Rvb2xzL21l
-c2gvbWVzaC1kYi5jDQo+ICsrKyBiL3Rvb2xzL21lc2gvbWVzaC1kYi5jDQo+IEBAIC04NDUsNiAr
-ODQ1LDQ1IEBAIGZhaWw6DQo+ICAJcmV0dXJuIGZhbHNlOw0KPiAgfQ0KPiAgDQo+ICtib29sIG1l
-c2hfZGJfZGVsX25vZGUodWludDE2X3QgdW5pY2FzdCkNCj4gK3sNCj4gKwlqc29uX29iamVjdCAq
-amFycmF5Ow0KPiArCWludCBpLCBzejsNCj4gKw0KPiArCWlmICghanNvbl9vYmplY3Rfb2JqZWN0
-X2dldF9leChjZmctPmpjZmcsICJub2RlcyIsICZqYXJyYXkpKQ0KPiArCQlyZXR1cm4gZmFsc2U7
-DQo+ICsNCj4gKwlpZiAoIWphcnJheSB8fCBqc29uX29iamVjdF9nZXRfdHlwZShqYXJyYXkpICE9
-IGpzb25fdHlwZV9hcnJheSkNCj4gKwkJcmV0dXJuIGZhbHNlOw0KPiArDQo+ICsJc3ogPSBqc29u
-X29iamVjdF9hcnJheV9sZW5ndGgoamFycmF5KTsNCj4gKw0KPiArCWZvciAoaSA9IDA7IGkgPCBz
-ejsgKytpKSB7DQo+ICsJCWpzb25fb2JqZWN0ICpqZW50cnksICpqdmFsOw0KPiArCQl1aW50MTZf
-dCBhZGRyOw0KPiArCQljb25zdCBjaGFyICpzdHI7DQo+ICsNCj4gKwkJamVudHJ5ID0ganNvbl9v
-YmplY3RfYXJyYXlfZ2V0X2lkeChqYXJyYXksIGkpOw0KPiArCQlpZiAoIWpzb25fb2JqZWN0X29i
-amVjdF9nZXRfZXgoamVudHJ5LCAidW5pY2FzdEFkZHJlc3MiLA0KPiArCQkJCQkJCQkmanZhbCkp
-DQo+ICsJCQljb250aW51ZTsNCj4gKw0KPiArCQlzdHIgPSBqc29uX29iamVjdF9nZXRfc3RyaW5n
-KGp2YWwpOw0KPiArCQlpZiAoc3NjYW5mKHN0ciwgIiUwNGh4IiwgJmFkZHIpICE9IDEpDQo+ICsJ
-CQljb250aW51ZTsNCj4gKw0KPiArCQlpZiAoYWRkciA9PSB1bmljYXN0KQ0KPiArCQkJYnJlYWs7
-DQo+ICsJfQ0KPiArDQo+ICsJaWYgKGkgPT0gc3opDQo+ICsJCXJldHVybiB0cnVlOw0KPiArDQo+
-ICsJanNvbl9vYmplY3RfYXJyYXlfZGVsX2lkeChqYXJyYXksIGksIDEpOw0KPiArDQo+ICsJcmV0
-dXJuIG1lc2hfY29uZmlnX3NhdmUoKHN0cnVjdCBtZXNoX2NvbmZpZyAqKSBjZmcsIHRydWUsIE5V
-TEwsIE5VTEwpOw0KPiArfQ0KPiArDQo+ICBib29sIG1lc2hfZGJfZ2V0X3Rva2VuKHVpbnQ4X3Qg
-dG9rZW5bOF0pDQo+ICB7DQo+ICAJaWYgKCFjZmcgfHwgIWNmZy0+amNmZykNCj4gZGlmZiAtLWdp
-dCBhL3Rvb2xzL21lc2gvcmVtb3RlLmMgYi90b29scy9tZXNoL3JlbW90ZS5jDQo+IGluZGV4IDUz
-M2Q1OWIyOC4uYjliYzZiNWMwIDEwMDY0NA0KPiAtLS0gYS90b29scy9tZXNoL3JlbW90ZS5jDQo+
-ICsrKyBiL3Rvb2xzL21lc2gvcmVtb3RlLmMNCj4gQEAgLTg5LDYgKzg5LDI2IEBAIHN0YXRpYyBi
-b29sIG1hdGNoX2JvdW5kX2tleShjb25zdCB2b2lkICphLCBjb25zdCB2b2lkICpiKQ0KPiAgCXJl
-dHVybiAobmV0X2lkeCA9PSBrZXlzX2dldF9ib3VuZF9rZXkoYXBwX2lkeCkpOw0KPiAgfQ0KPiAg
-DQo+ICt1aW50OF90IHJlbW90ZV9kZWxfbm9kZSh1aW50MTZfdCB1bmljYXN0KQ0KPiArew0KPiAr
-CXN0cnVjdCByZW1vdGVfbm9kZSAqcm10Ow0KPiArCXVpbnQ4X3QgbnVtX2VsZTsNCj4gKw0KPiAr
-CXJtdCA9IGxfcXVldWVfcmVtb3ZlX2lmKG5vZGVzLCBtYXRjaF9ub2RlX2FkZHIsIExfVUlOVF9U
-T19QVFIodW5pY2FzdCkpOw0KPiArCWlmICghcm10KQ0KPiArCQlyZXR1cm4gMDsNCj4gKw0KPiAr
-CW51bV9lbGUgPSBybXQtPm51bV9lbGU7DQo+ICsNCj4gKwlsX3F1ZXVlX2Rlc3Ryb3kocm10LT5u
-ZXRfa2V5cywgTlVMTCk7DQo+ICsJbF9xdWV1ZV9kZXN0cm95KHJtdC0+YXBwX2tleXMsIE5VTEwp
-Ow0KPiArCWxfZnJlZShybXQpOw0KPiArDQo+ICsJbWVzaF9kYl9kZWxfbm9kZSh1bmljYXN0KTsN
-Cj4gKw0KPiArCXJldHVybiBudW1fZWxlOw0KPiArfQ0KPiArDQo+ICBib29sIHJlbW90ZV9hZGRf
-bm9kZShjb25zdCB1aW50OF90IHV1aWRbMTZdLCB1aW50MTZfdCB1bmljYXN0LA0KPiAgCQkJCQl1
-aW50OF90IGVsZV9jbnQsIHVpbnQxNl90IG5ldF9pZHgpDQo+ICB7DQo+IGRpZmYgLS1naXQgYS90
-b29scy9tZXNoL3JlbW90ZS5oIGIvdG9vbHMvbWVzaC9yZW1vdGUuaA0KPiBpbmRleCBmMmE2ZjQ4
-ZGQuLjYzMzgyZWQ5MCAxMDA2NDQNCj4gLS0tIGEvdG9vbHMvbWVzaC9yZW1vdGUuaA0KPiArKysg
-Yi90b29scy9tZXNoL3JlbW90ZS5oDQo+IEBAIC0xOSw2ICsxOSw3IEBADQo+ICANCj4gIGJvb2wg
-cmVtb3RlX2FkZF9ub2RlKGNvbnN0IHVpbnQ4X3QgdXVpZFsxNl0sIHVpbnQxNl90IHVuaWNhc3Qs
-DQo+ICAJCQkJCXVpbnQ4X3QgZWxlX2NudCwgdWludDE2X3QgbmV0X2lkeCk7DQo+ICt1aW50OF90
-IHJlbW90ZV9kZWxfbm9kZSh1aW50MTZfdCB1bmljYXN0KTsNCj4gIHVpbnQxNl90IHJlbW90ZV9n
-ZXRfbmV4dF91bmljYXN0KHVpbnQxNl90IGxvdywgdWludDE2X3QgaGlnaCwgdWludDhfdCBlbGVf
-Y250KTsNCj4gIGJvb2wgcmVtb3RlX2FkZF9uZXRfa2V5KHVpbnQxNl90IGFkZHIsIHVpbnQxNl90
-IG5ldF9pZHgpOw0KPiAgYm9vbCByZW1vdGVfZGVsX25ldF9rZXkodWludDE2X3QgYWRkciwgdWlu
-dDE2X3QgbmV0X2lkeCk7DQo=
+Hi Marcel,
+
+On Wed, Mar 18, 2020 at 4:13 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Luiz,
+>
+> > This uses the DEFER_SETUP flag to group channels with
+> > L2CAP_CREDIT_BASED_CONNECTION_REQ.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > include/net/bluetooth/l2cap.h |   5 ++
+> > net/bluetooth/l2cap_core.c    | 130 +++++++++++++++++++++++++++++++---
+> > net/bluetooth/l2cap_sock.c    |  13 ++--
+> > 3 files changed, 133 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2ca=
+p.h
+> > index 537aaead259f..dada14d0622c 100644
+> > --- a/include/net/bluetooth/l2cap.h
+> > +++ b/include/net/bluetooth/l2cap.h
+> > @@ -47,6 +47,7 @@
+> > #define L2CAP_DEFAULT_ACC_LAT         0xFFFFFFFF
+> > #define L2CAP_BREDR_MAX_PAYLOAD               1019    /* 3-DH5 packet *=
+/
+> > #define L2CAP_LE_MIN_MTU              23
+> > +#define L2CAP_ECRED_CONN_SCID_MAX    5
+> >
+> > #define L2CAP_DISC_TIMEOUT            msecs_to_jiffies(100)
+> > #define L2CAP_DISC_REJ_TIMEOUT                msecs_to_jiffies(5000)
+> > @@ -660,6 +661,7 @@ struct l2cap_ops {
+> >       void                    (*suspend) (struct l2cap_chan *chan);
+> >       void                    (*set_shutdown) (struct l2cap_chan *chan)=
+;
+> >       long                    (*get_sndtimeo) (struct l2cap_chan *chan)=
+;
+> > +     struct pid              *(*get_peer_pid) (struct l2cap_chan *chan=
+);
+>
+> I would move this support into a separate patch. I think that can be appl=
+ied independently.
+
+Will do.
+
+> >       struct sk_buff          *(*alloc_skb) (struct l2cap_chan *chan,
+> >                                              unsigned long hdr_len,
+> >                                              unsigned long len, int nb)=
+;
+> > @@ -983,6 +985,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *cha=
+n);
+> > int l2cap_ertm_init(struct l2cap_chan *chan);
+> > void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+> > void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)=
+;
+> > +typedef void (*l2cap_chan_func_t)(struct l2cap_chan *chan, void *data)=
+;
+> > +void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
+> > +                  void *data);
+> > void l2cap_chan_del(struct l2cap_chan *chan, int err);
+> > void l2cap_send_conn_req(struct l2cap_chan *chan);
+> > void l2cap_move_start(struct l2cap_chan *chan);
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 5e6e35ab44dd..20c1d5f9c238 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -678,6 +678,29 @@ void l2cap_chan_del(struct l2cap_chan *chan, int e=
+rr)
+> > }
+> > EXPORT_SYMBOL_GPL(l2cap_chan_del);
+> >
+> > +static void __l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func=
+_t func,
+> > +                           void *data)
+> > +{
+> > +     struct l2cap_chan *chan;
+> > +
+> > +     list_for_each_entry(chan, &conn->chan_l, list) {
+> > +             func(chan, data);
+> > +     }
+> > +}
+> > +
+> > +void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
+> > +                  void *data)
+> > +{
+> > +     if (!conn)
+> > +             return;
+> > +
+> > +     mutex_lock(&conn->chan_lock);
+> > +     __l2cap_chan_list(conn, func, data);
+> > +     mutex_unlock(&conn->chan_lock);
+> > +}
+> > +
+> > +EXPORT_SYMBOL_GPL(l2cap_chan_list);
+> > +
+> > static void l2cap_conn_update_id_addr(struct work_struct *work)
+> > {
+> >       struct l2cap_conn *conn =3D container_of(work, struct l2cap_conn,
+> > @@ -1356,29 +1379,77 @@ static void l2cap_le_connect(struct l2cap_chan =
+*chan)
+> >                      sizeof(req), &req);
+> > }
+> >
+> > -static void l2cap_ecred_connect(struct l2cap_chan *chan)
+> > -{
+> > -     struct l2cap_conn *conn =3D chan->conn;
+> > +struct l2cap_ecred_conn_data {
+> >       struct {
+> >               struct l2cap_ecred_conn_req req;
+> > -             __le16 scid;
+> > +             __le16 scid[5];
+> >       } __packed pdu;
+> > +     struct l2cap_chan *chan;
+> > +     struct pid *pid;
+> > +     int count;
+> > +};
+> > +
+> > +static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *d=
+ata)
+> > +{
+> > +     struct l2cap_ecred_conn_data *conn =3D data;
+> > +     struct pid *pid;
+> > +
+> > +     if (chan =3D=3D conn->chan)
+> > +             return;
+> > +
+> > +     if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
+> > +             return;
+> > +
+> > +     pid =3D chan->ops->get_peer_pid(chan);
+> > +
+> > +     /* Only add deferred channels with the same PID/PSM */
+> > +     if (conn->pid !=3D pid || chan->psm !=3D conn->chan->psm || chan-=
+>ident ||
+> > +         chan->mode !=3D L2CAP_MODE_EXT_FLOWCTL || chan->state !=3D BT=
+_CONNECT)
+> > +             return;
+> > +
+> > +     if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
+> > +             return;
+> > +
+> > +     /* Set the same ident so we can match on the rsp */
+> > +     chan->ident =3D conn->chan->ident;
+> > +
+> > +     /* Include all channels deferred */
+> > +     conn->pdu.scid[conn->count] =3D cpu_to_le16(chan->scid);
+> > +
+> > +     conn->count++;
+> > +}
+> > +
+> > +static void l2cap_ecred_connect(struct l2cap_chan *chan)
+> > +{
+> > +     struct l2cap_conn *conn =3D chan->conn;
+> > +     struct l2cap_ecred_conn_data data;
+> > +
+> > +     if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
+> > +             return;
+> >
+> >       if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
+> >               return;
+> >
+> >       l2cap_ecred_init(chan, 0);
+> >
+> > -     pdu.req.psm     =3D chan->psm;
+> > -     pdu.req.mtu     =3D cpu_to_le16(chan->imtu);
+> > -     pdu.req.mps     =3D cpu_to_le16(chan->mps);
+> > -     pdu.req.credits =3D cpu_to_le16(chan->rx_credits);
+> > -     pdu.scid        =3D cpu_to_le16(chan->scid);
+> > +     data.pdu.req.psm     =3D chan->psm;
+> > +     data.pdu.req.mtu     =3D cpu_to_le16(chan->imtu);
+> > +     data.pdu.req.mps     =3D cpu_to_le16(chan->mps);
+> > +     data.pdu.req.credits =3D cpu_to_le16(chan->rx_credits);
+> > +     data.pdu.scid[0]     =3D cpu_to_le16(chan->scid);
+> >
+> >       chan->ident =3D l2cap_get_ident(conn);
+> > +     data.pid =3D chan->ops->get_peer_pid(chan);
+> > +
+> > +     data.count =3D 1;
+> > +     data.chan =3D chan;
+> > +     data.pid =3D chan->ops->get_peer_pid(chan);
+> > +
+> > +     __l2cap_chan_list(conn, l2cap_ecred_defer_connect, &data);
+> >
+> >       l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_CONN_REQ,
+> > -                    sizeof(pdu), &pdu);
+> > +                    sizeof(data.pdu.req) + data.count * sizeof(__le16)=
+,
+> > +                    &data.pdu);
+> > }
+> >
+> > static void l2cap_le_start(struct l2cap_chan *chan)
+> > @@ -7694,6 +7765,29 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
+> >       return ((psm & 0x0101) =3D=3D 0x0001);
+> > }
+> >
+> > +struct l2cap_chan_data {
+> > +     struct l2cap_chan *chan;
+> > +     struct pid *pid;
+> > +     int count;
+> > +};
+> > +
+> > +static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
+> > +{
+> > +     struct l2cap_chan_data *d =3D data;
+> > +
+> > +     if (chan =3D=3D d->chan)
+> > +             return;
+> > +
+> > +     /* Only count deferred channels with the same PID/PSM */
+> > +     if (d->pid !=3D chan->ops->get_peer_pid(chan) ||
+> > +         !test_bit(FLAG_DEFER_SETUP, &chan->flags) ||
+> > +         chan->psm !=3D d->chan->psm || chan->ident ||
+> > +         chan->state !=3D BT_CONNECT)
+> > +             return;
+> > +
+> > +     d->count++;
+> > +}
+> > +
+> > int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+> >                      bdaddr_t *dst, u8 dst_type)
+> > {
+> > @@ -7813,6 +7907,22 @@ int l2cap_chan_connect(struct l2cap_chan *chan, =
+__le16 psm, u16 cid,
+> >               goto done;
+> >       }
+> >
+> > +     if (chan->mode =3D=3D L2CAP_MODE_EXT_FLOWCTL) {
+> > +             struct l2cap_chan_data data;
+> > +
+> > +             data.chan =3D chan;
+> > +             data.pid =3D chan->ops->get_peer_pid(chan);
+> > +             data.count =3D 0;
+> > +
+> > +             l2cap_chan_list(conn, l2cap_chan_by_pid, &data);
+> > +             /* Check if there isn't too many channels being connected=
+ */
+> > +             if (!(data.count < L2CAP_ECRED_CONN_SCID_MAX - 1)) {
+> > +                     hci_conn_drop(hcon);
+> > +                     err =3D -EPROTO;
+> > +                     goto done;
+> > +             }
+> > +     }
+> > +
+> >       mutex_lock(&conn->chan_lock);
+> >       l2cap_chan_lock(chan);
+> >
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index 40fb10b591bd..e43a90e05972 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -549,11 +549,6 @@ static int l2cap_sock_getsockopt(struct socket *so=
+ck, int level, int optname,
+> >               break;
+> >
+> >       case BT_DEFER_SETUP:
+> > -             if (sk->sk_state !=3D BT_BOUND && sk->sk_state !=3D BT_LI=
+STEN) {
+> > -                     err =3D -EINVAL;
+> > -                     break;
+> > -             }
+> > -
+>
+> I removing this really a good idea. I think it is not really so bad to fo=
+rce at least BT_BOUND so that a local controller has been at least somehow =
+selected. Just doing setsockopt(DEFER_SETUP) and then connect() seems weird=
+. Let us force the application to at least bind the local controller for th=
+is specific usage. They can still bind with BDADDR_ANY, but that gives us a=
+ bit cleaner state handling.
+
+Right, for some odd reason I remember this check being specific for
+listen only but in fact it should work with l2cap-tester as it does
+bind before doing BT_DEFER_SETUP.
+
+>
+> >               if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flag=
+s),
+> >                            (u32 __user *) optval))
+> >                       err =3D -EFAULT;
+> > @@ -1504,6 +1499,13 @@ static long l2cap_sock_get_sndtimeo_cb(struct l2=
+cap_chan *chan)
+> >       return sk->sk_sndtimeo;
+> > }
+> >
+> > +static struct pid *l2cap_sock_get_peer_pid_cb(struct l2cap_chan *chan)
+> > +{
+> > +     struct sock *sk =3D chan->data;
+> > +
+> > +     return sk->sk_peer_pid;
+> > +}
+> > +
+> > static void l2cap_sock_suspend_cb(struct l2cap_chan *chan)
+> > {
+> >       struct sock *sk =3D chan->data;
+> > @@ -1525,6 +1527,7 @@ static const struct l2cap_ops l2cap_chan_ops =3D =
+{
+> >       .suspend                =3D l2cap_sock_suspend_cb,
+> >       .set_shutdown           =3D l2cap_sock_set_shutdown_cb,
+> >       .get_sndtimeo           =3D l2cap_sock_get_sndtimeo_cb,
+> > +     .get_peer_pid           =3D l2cap_sock_get_peer_pid_cb,
+> >       .alloc_skb              =3D l2cap_sock_alloc_skb_cb,
+> > };
+>
+> Regards
+>
+> Marcel
+>
+
+
+--=20
+Luiz Augusto von Dentz
