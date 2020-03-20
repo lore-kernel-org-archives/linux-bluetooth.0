@@ -2,150 +2,110 @@ Return-Path: <SRS0=7F+K=5F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A856CC4332B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3118C4332D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 23:19:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D5D920777
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:56:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7F2220757
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 23:19:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gcT/fSxv"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kC2u4h6U"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727479AbgCTU4h (ORCPT
+        id S1727319AbgCTXTf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Mar 2020 16:56:37 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:41810 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727453AbgCTU4g (ORCPT
+        Fri, 20 Mar 2020 19:19:35 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:36933 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726738AbgCTXTf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Mar 2020 16:56:36 -0400
-Received: by mail-vs1-f65.google.com with SMTP id a63so4904896vsa.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 13:56:35 -0700 (PDT)
+        Fri, 20 Mar 2020 19:19:35 -0400
+Received: by mail-pl1-f196.google.com with SMTP id f16so3150896plj.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 16:19:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OYdG2hZZXDgzoLuLkSsYKB717kSEQmaZ6NuxIAkbkRI=;
-        b=gcT/fSxvwm997aNwLBz/zCmRcQu7nWKXDJpT0PIDSQR8ASPqr6q7+iYrqwNI9OOzx5
-         HHoQ5CvwCFDFgIo3RDlaOMxpWDiYkob13WZ1XDH5c0lg54kPSz9RBhPZ9UN6Qh7jhU5U
-         MUILZ0Echiv7Ns1i1d7cKl6S/BY1KfmH59RFQ=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zlj4H6PNTWeANW8zGP3DY9GXf41GKsAbZW2FrRkC5dU=;
+        b=kC2u4h6UKOQRE0wpk1ph+jQDfvMfBZNVQX2ORwMdLx6nIsHZvK7XxtazYyl5kxCo44
+         JQRUcB3J4cgo9GGYUDku2TzGo1lgY//USauc1eSub8Y6WEOUCK8Tjoou7qCt3C1u9khG
+         WnroqIH4FVghQ1+4D+GrAtp/JFBVvYHMLOUsM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OYdG2hZZXDgzoLuLkSsYKB717kSEQmaZ6NuxIAkbkRI=;
-        b=J2tCiMfvIgzsYJEtzxwGbPis+GrnfHGgBJGJm+5oO/vDM8seuYqjLnZYu1WUaBqJ94
-         KD4rw09YzsBwYU2G02ah5ztdZDWOJTMYSxRZyp1/erJArgj3Vswi9F1HX5RgOroeqZf0
-         CYNsFj35m/ThMGiarexoAqjuRk0E5HtVJlKgXEepSpztqbkIenOd4/s/AO7pZGv9+gwx
-         IZ4QgtM0+KELjkBzLa/A+58EYqUxdl1ZCg10DK1yJe61oeLq74jlWvQvgrUhH4Hj6+uu
-         AB+51TA/RNsEKB6A584/Kle5fsseOIjEqLbbb6x3D3DyexVTVZB9mFxQZJmYVD+4VEq6
-         aR9g==
-X-Gm-Message-State: ANhLgQ1JJYdK8VdzCKxGGULsWzvFByYk4Pzh9Ofrv/txddpTPPBdpV/i
-        Ta/Mr8+YDquGFwTckOUJuZcrhHCnjxVBu6dGo4EZvA==
-X-Google-Smtp-Source: ADFU+vtcGXL3fhlGGMllbHl+g02q56snlZV+onuaMun/wEuC1hbpQwMm+tjNvRXzZoBInnt9/mzSWyrRn3dNAiDI9JE=
-X-Received: by 2002:a67:ec81:: with SMTP id h1mr6782268vsp.96.1584737794701;
- Fri, 20 Mar 2020 13:56:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200320020153.98280-1-abhishekpandit@chromium.org>
- <20200319190144.1.I40cc9b3d5de04f0631c931d94757fb0f462b24bd@changeid> <CAD=FV=XT=NTyPag9wNCotATBzT4v9pg=OOa8X6=xWkMH2AFiLQ@mail.gmail.com>
-In-Reply-To: <CAD=FV=XT=NTyPag9wNCotATBzT4v9pg=OOa8X6=xWkMH2AFiLQ@mail.gmail.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zlj4H6PNTWeANW8zGP3DY9GXf41GKsAbZW2FrRkC5dU=;
+        b=moceA8+EC0zWbJsy+3/zNNlwmanai45T85cqu4POCIAmkkD+8wx45clhJ4rLr/wW9N
+         gI1sIODg8xSpNTarnArb48lorelJ84FFiMkiBwJMFVd5BZvhzEdcmTAJpMbV2H8AP++E
+         32bytIP9/M+XK09gU58CETJdurumKYenT2ScGZo7YI/+R9JtVpR914gdVQ5LO1U+3fYS
+         sNGcsLRIFXCSuKkQyeKHaBFpATDgwkY06Bwkw//WzIBpL7O71g6NURn/cp/2TeC6ztfC
+         vc7dvZi7k1qIUuRnJH+59r3/nfYC4XEiWDIB3tBZ+ywnl26kuLIz+0AzTK0lVboqOqN3
+         HsHQ==
+X-Gm-Message-State: ANhLgQ3KLPQufeQwrY9snngNdkyWZLTY2pRYvefznT/pkK6ecSvxB0p7
+        2yH/WfOMFZbwY/PtUUWWktvCkA==
+X-Google-Smtp-Source: ADFU+vtqlO03MAwFL0RA6W0l8wZiylq3Hvg6xJBLX6zYxNiF2ITbkvPBELRZAqmbNDtArlCiLm4fFA==
+X-Received: by 2002:a17:902:7c15:: with SMTP id x21mr10727044pll.67.1584746374565;
+        Fri, 20 Mar 2020 16:19:34 -0700 (PDT)
+Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
+        by smtp.gmail.com with ESMTPSA id q26sm6530773pff.63.2020.03.20.16.19.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Mar 2020 16:19:34 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Fri, 20 Mar 2020 13:56:23 -0700
-Message-ID: <CANFp7mUKRRQT0m9jRB4aeE3GeSW8UM6d-NVJ3CZmHibhSny3+g@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Bluetooth: btmrvl: Detect hangs and force a reset of
- the SDIO card
-To:     Doug Anderson <dianders@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
+To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH v2 0/1] Bluetooth: Prioritize sco traffic on slow interfaces
+Date:   Fri, 20 Mar 2020 16:19:27 -0700
+Message-Id: <20200320231928.137720-1-abhishekpandit@chromium.org>
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks for the heads up Doug. I'll resend the patch once I handle the
-case where the reset is immediate and not a full unplug/replug.
 
-In the meantime, please do not merge this patch.
+Hi Marcel,
+
+While investigating supporting Voice over HCI/UART, we discovered that
+it is possible for SCO packet deadlines to be missed in some conditions
+where large ACL packets are being transferred. For UART, at a baudrate
+of 3000000, a single 1024 byte packet will take ~3.4ms to transfer.
+Sending two ACL packets of max size would cause us to miss the timing
+for SCO (which is 3.75ms) in the worst case.
+
+To mitigate this, we change hci_tx_work to prefer scheduling SCO/eSCO
+over ACL/LE and modify the hci_sched_{acl,le} routines so that they will
+only send one packet before checking whether a SCO packet is queued. ACL
+packets should still get sent at a similar rate (depending on number of
+ACL packets supported by controller) since the loop will continue until
+there is no more quota left for ACL and LE packets.
+
+To test this patch, I played some music over SCO (open youtube and
+a video conference page at the same time) while using an LE keyboard and
+mouse.  There were no discernible slowdowns caused by this change.
 
 Thanks
 Abhishek
 
-On Fri, Mar 20, 2020 at 1:00 PM Doug Anderson <dianders@chromium.org> wrote:
->
-> Hi,
->
-> On Thu, Mar 19, 2020 at 7:02 PM Abhishek Pandit-Subedi
-> <abhishekpandit@chromium.org> wrote:
-> >
-> > From: Matthias Kaehlcke <mka@chromium.org>
-> >
-> > When scanning for BLE devices for a longer period (e.g. because a
-> > BLE device is paired, but not connected) the Marvell 8997 often
-> > ends up in a borked state, which manifests through failures on
-> > certain SDIO transactions.
-> >
-> > When such a SDIO failure is detected force a reset of the SDIO
-> > card to initialize it from scratch. Since the SDIO bus is shared
-> > with the WiFi part of the chip this also involves a reset of WiFi.
-> >
-> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > ---
-> >
-> >  drivers/bluetooth/btmrvl_sdio.c | 24 ++++++++++++++++++++++++
-> >  drivers/bluetooth/btmrvl_sdio.h |  1 +
-> >  2 files changed, 25 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-> > index 0f3a020703ab..69a8b6b3c11c 100644
-> > --- a/drivers/bluetooth/btmrvl_sdio.c
-> > +++ b/drivers/bluetooth/btmrvl_sdio.c
-> > @@ -22,6 +22,8 @@
-> >  #include <linux/slab.h>
-> >  #include <linux/suspend.h>
-> >
-> > +#include <linux/mmc/core.h>
-> > +#include <linux/mmc/card.h>
-> >  #include <linux/mmc/sdio_ids.h>
-> >  #include <linux/mmc/sdio_func.h>
-> >  #include <linux/module.h>
-> > @@ -59,6 +61,23 @@ static const struct of_device_id btmrvl_sdio_of_match_table[] = {
-> >         { }
-> >  };
-> >
-> > +static void btmrvl_sdio_card_reset_work(struct work_struct *work)
-> > +{
-> > +       struct btmrvl_sdio_card *card =
-> > +               container_of(work, struct btmrvl_sdio_card, reset_work);
-> > +       struct sdio_func *func = card->func;
-> > +
-> > +       sdio_claim_host(func);
-> > +       mmc_hw_reset(func->card->host);
->
-> The fact that you don't check the return value here seems like a
-> problem.  See specifically how commit cdb2256f795e ("mwifiex: Re-work
-> support for SDIO HW reset") handles it.
->
-> This is a distinct difference between the solution that we landed in
-> Chrome OS 4.19 and what landed upstream.  In Chrome OS 4.19 we went
-> the simple approach and said that there was only one way to reset the
-> card: treat it as a full unplug / replug of the card.  ...but upstream
-> adopted a different solution.  For upstream if there is only a single
-> function on the SD card it will not trigger a full unplug/replug and
-> it's up to the function driver to re-init itself.  This wasn't such a
-> big deal for the WiFi driver since it already had a way to re-init
-> itself (mwifiex_reinit_sw).  I don't know how hard it will be for
-> Bluetooth, but that needs to be part of this patch I think?
->
-> -Doug
+Changes in v2:
+* Refactor to check for SCO/eSCO after each ACL/LE packet sent
+* Enabled SCO priority all the time and removed the sched_limit variable
+
+Abhishek Pandit-Subedi (1):
+  Bluetooth: Prioritize SCO traffic
+
+ net/bluetooth/hci_core.c | 111 +++++++++++++++++++++------------------
+ 1 file changed, 61 insertions(+), 50 deletions(-)
+
+-- 
+2.25.1.696.g5e7596f4ac-goog
+
