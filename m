@@ -2,139 +2,151 @@ Return-Path: <SRS0=7F+K=5F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C41C4332B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 13:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A03AC4332D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 13:37:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3CCDC20754
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 13:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2998A20754
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 13:37:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="itCQwaGI"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AJwaXk1M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbgCTNCE (ORCPT
+        id S1727197AbgCTNhz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Mar 2020 09:02:04 -0400
-Received: from mail-wm1-f44.google.com ([209.85.128.44]:36192 "EHLO
-        mail-wm1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726814AbgCTNCE (ORCPT
+        Fri, 20 Mar 2020 09:37:55 -0400
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:44762 "EHLO
+        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727151AbgCTNhz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Mar 2020 09:02:04 -0400
-Received: by mail-wm1-f44.google.com with SMTP id g62so6231065wme.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 06:02:02 -0700 (PDT)
+        Fri, 20 Mar 2020 09:37:55 -0400
+Received: by mail-ua1-f68.google.com with SMTP id r47so2147479uad.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 06:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=Q0ftB85Jx6aGt+1mPXwJgjIaSB2cWkfI0dQ+W6Udl4U=;
-        b=itCQwaGI2b+KWkmaJQBEgn25VzjZyzKe2y0v7YXEo4h5qnD9eWr0bgg4ein0ITVAgx
-         /UFnlPoiBMORzFtY7P+MmDJ4//hLE3CmTRFTwV17td8S5nlC/iqyMccE5A2tqoV9blyF
-         2AzXJroAOQfCtKSMJYKVYuEQYqG1DTOG1es0OjoBO0yqNOmD0zbtwWJDUj4GVDVV0lyr
-         kUYqe2M/xo1ZD3nxRpZteaNWqcHLNV6PNttinAtJRxpAbnDT1s2/D6xS/83r/6IQyGu0
-         Let/Sh8J8QdbMVyQvIZkvabgqCVB5lMuCem3aggVuLzW7yPRaTJZF98Ogtaw4Me/3g5e
-         H78A==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=7CLvgyomUpZlEO8BYtl3NgAehP7kguvsxyM5/iRNobE=;
+        b=AJwaXk1MPGBy//iozCfMiqD/OUCmgrWvWdx6/PmGfzsENDKVnBQ7Rufvs5PwriwVIr
+         htOcRzPlLNzTgY6DuDOXewm3Nq9f23UM8ACXb9gz6c7ZGtH1bpWlTtw9DBOoDDwHopEJ
+         UEOhPbU444EyzA1wHcA0p6rfT87VSz5sowXdE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=Q0ftB85Jx6aGt+1mPXwJgjIaSB2cWkfI0dQ+W6Udl4U=;
-        b=SsfyKa/1VD0O8RqJEl5JwIBnGL+0VK7f0DkCEu9Jnr1/ZsTgNvbFG8n5KddhN0asgM
-         TaEFzspNCZyvqdUtCocIdiDf4qd77XtLqqcV7wsM8T7Q814nKKaI/XD5uKKq4BNJB3ug
-         S4grhI1h1UbPh5h0lKyJqnKgWJyLh5BSx9rxdxPvHjlnt5w6dnm6ERPxRzSf5MsCBnoM
-         vsR1f3JZWr3Vxsjrqw/aqb7s0kbDUHoh6RYoBiG9UXkoVxaaVBZucnz9nX9HGnEr8TGy
-         j+iivDJHKafO8EiYEDa9THhaZol0Gmb+nN1rT4Rw4Chb21FGwtmSeFgig8XD0zGHzS9D
-         dT2w==
-X-Gm-Message-State: ANhLgQ1SzbzfBgb8heTp0KkvTwUp06FD/f969ANmf5/F1WcA7f3qWPwN
-        NEu4sW4CcEcJhIF2ymY5ORI=
-X-Google-Smtp-Source: ADFU+vsyveOie/hJBObHpBOJ8oPGVsgj2tF41udAZZ3g76idGYIuU3tuscAVv7qlNd0vw19gJ+cgeg==
-X-Received: by 2002:a1c:1d15:: with SMTP id d21mr10034013wmd.101.1584709321395;
-        Fri, 20 Mar 2020 06:02:01 -0700 (PDT)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id z12sm8737064wrt.27.2020.03.20.06.01.59
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=7CLvgyomUpZlEO8BYtl3NgAehP7kguvsxyM5/iRNobE=;
+        b=ah6aFdjAtkeeNdn0TOCF/wa2T1ajqGS9n/+3CmZ41SAIG4fKYJsK/yk761g9Odwd6H
+         xfJLEgUvCi4Q+SGHg22JzFBIhofH0EuU1mw6kKQWX3heXNOBbCYodb059rRbhCyq622m
+         9XHBTHmmz6z7Ynm1I96PoU0xjVVTR7IMcKCu5l03bvn6OF9+ynM4D+3CLQnU5JalaIHO
+         yBV+U2erlGxeWXQ27B8MeiTLE5kIg5c20TR7SoxchZaSiYdGRniOzsZpcV9Il0SBCImJ
+         auZ17J1pj6JYA2Co5B969rvCijf4rq28dg1xQgtxun5NKs9MSW1Q6fyOD0MsrIq9SCA2
+         2DPQ==
+X-Gm-Message-State: ANhLgQ31t4E9sfV29z6RgW9Ac+0MQQ1BY5mC3ZRmIVA4+m8d3mK8Brr1
+        Acp5d74QAqbFI95InMFQZoLzQJ0i1vo=
+X-Google-Smtp-Source: ADFU+vsRS+j3a87aMNBMQoDeudweCOymPdOQM3ESMUDyUEzGiovSgeZ64W5TRrSbycPs4T0gjK6jGw==
+X-Received: by 2002:ab0:65d3:: with SMTP id n19mr5668910uaq.48.1584711474020;
+        Fri, 20 Mar 2020 06:37:54 -0700 (PDT)
+Received: from alain.c.googlers.com.com (57.152.190.35.bc.googleusercontent.com. [35.190.152.57])
+        by smtp.gmail.com with ESMTPSA id i26sm3422491uak.17.2020.03.20.06.37.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 06:02:00 -0700 (PDT)
-Date:   Fri, 20 Mar 2020 14:01:59 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        David Heidelberg <david@ixit.cz>
-Subject: Re: bluez: Export SDP "Remote audio volume control" item for HSP
- profile
-Message-ID: <20200320130159.cm2shncjg5qo6xgh@pali>
-References: <20191212172944.hgt6se2qz2hpsbo2@pali>
- <CABBYNZKCovNDcAaMMeYZgKAAq-8oz+pcs6xmS3A_Qt-28aoEbQ@mail.gmail.com>
- <20191212230314.g5gt6rxkphzpwucd@pali>
- <20200209130243.u4kpbj3cwhbdqa56@pali>
+        Fri, 20 Mar 2020 06:37:53 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v2] bluetooth: Enforce classic key size verification.
+Date:   Fri, 20 Mar 2020 13:37:48 +0000
+Message-Id: <20200320133748.154926-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200209130243.u4kpbj3cwhbdqa56@pali>
-User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sunday 09 February 2020 14:02:43 Pali Rohár wrote:
-> On Friday 13 December 2019 00:03:14 Pali Rohár wrote:
-> > On Thursday 12 December 2019 21:42:27 Luiz Augusto von Dentz wrote:
-> > > Hi Pali,
-> > > 
-> > > On Thu, Dec 12, 2019 at 7:31 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> > > >
-> > > > Hello!
-> > > >
-> > > > According to HSP 1.2 specification, section 4.7 Remote Audio Volume
-> > > > Control, Support for remote audio volume control is optional, so an
-> > > > implementation may support none, either, or both of the controls for
-> > > > microphone volume and speaker volume.
-> > > >
-> > > > According to HSP 1.2 specification, section 5.3 SDP Interoperability
-> > > > Requirements, bluetooth device with HSP profile announce via SDP "Remote
-> > > > audio volume control" field information if device itself supports volume
-> > > > control.
-> > > >
-> > > > But currently I did not found any way how to access "Remote audio volume
-> > > > control" SDP field in (pulseaudio) application as bluez does not export
-> > > > it.
-> > > >
-> > > > Can you please export this field? E.g. for HFP profile all optional
-> > > > features from SDP are passed to NewConnection() DBus method via
-> > > > fd_properties dictionary under Features key. Could you export that
-> > > > "Remote audio volume control" bit for HSP profile in Features key?
-> > > >
-> > > > And in same way, this needs to be handled also in RegisterProfile() DBus
-> > > > method.
-> > > 
-> > > Do you have a use case in mind?
-> > 
-> > Yes, checking in pulseaudio if remote side announce that supports remote
-> > volume control or not. And based on this switch to software volume
-> > level.
-> 
-> Hello Luiz! Is it is possible to export this field?
+This change introduces a new configuration to strictly enforce key size
+checks.  This ensures that systems are in a secured configuration by
+default while allowing for a compatible posture via a Kconfig option to
+support controllers who may not support the read encryption key size
+command.
 
-Hello, I have not got any answer to my question.
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+---
 
-So may I ask again how to retrieve SDP attribute 0x0302 "Remote audio
-volume control" for a remote bluetooth headset with HSP profile?
+ net/bluetooth/Kconfig     | 20 ++++++++++++++++++++
+ net/bluetooth/hci_core.c  | 10 ++++++++++
+ net/bluetooth/hci_event.c |  4 ++++
+ 3 files changed, 34 insertions(+)
 
-It is really important as this attribute says if remote bluetooth
-headset supports volume control or not. In case it does not support, we
-need to switch to software volume control on host side.
-
-There is open pulseaudio bug that on some headsets it is not possible to
-control volume level and therefore pulseaudio needs to switch to
-software volume control.
-
-But without checking this SDP attribute 0x0302 this is not possible.
-
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 165148c7c4ce..8e177d4f3f02 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -128,4 +128,24 @@ config BT_DEBUGFS
+ 	  Provide extensive information about internal Bluetooth states
+ 	  in debugfs.
+ 
++config BT_EXPERT
++	bool "Expert Bluetooth options"
++	depends on BT
++	default n
++	help
++	  Provides a set of expert options and configurations that should
++	  only be used deliberately by BT experts.  This is considered a
++	  global switch to ensure these advanced features or options that
++	  depends on BT_EXPERT are only used in expert mode.
++
++config BT_ENFORCE_CLASSIC_KEY_SIZES
++	bool "Enforces security requirements for Bluetooth classic"
++	depends on BT && BT_EXPERT
++	default y
++	help
++	  Enforces Bluetooth classic security requirements by disallowing
++	  use of insecure Bluetooth controllers, i.e. that doesn't support
++	  Read Encryption Key Size command to prevent BT classic connection
++	  with very short encryption key.
++
+ source "drivers/bluetooth/Kconfig"
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4e6d61a95b20..142130d4b66b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1540,6 +1540,16 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 
+ 	clear_bit(HCI_INIT, &hdev->flags);
+ 
++#ifdef BT_ENFORCE_CLASSIC_KEY_SIZES
++	/* Don't allow usage of Bluetooth if the chip doesn't support */
++	/* Read Encryption Key Size command */
++	if (!ret && !(hdev->commands[20] & 0x10)) {
++		bt_dev_err(hdev,
++			   "Disabling BT, Read Encryption Key Size !supported");
++		ret = -EIO;
++	}
++#endif
++
+ 	if (!ret) {
+ 		hci_dev_hold(hdev);
+ 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a40ed31f6eb8..54f90799a088 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2902,7 +2902,11 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+ 	if (rp->status) {
+ 		bt_dev_err(hdev, "failed to read key size for handle %u",
+ 			   handle);
++#ifdef BT_ENFORCE_CLASSIC_KEY_SIZES
++		conn->enc_key_size = 0;
++#else
+ 		conn->enc_key_size = HCI_LINK_KEY_SIZE;
++#endif
+ 	} else {
+ 		conn->enc_key_size = rp->key_size;
+ 	}
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+2.25.1.696.g5e7596f4ac-goog
+
