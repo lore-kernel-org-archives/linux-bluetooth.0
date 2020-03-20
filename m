@@ -2,67 +2,70 @@ Return-Path: <SRS0=7F+K=5F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 120EAC4332E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A41E1C4332D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA7D120775
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E3ED20775
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nB4Z/PdZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TcUwwa1Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbgCTUka (ORCPT
+        id S1727175AbgCTUkc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Mar 2020 16:40:30 -0400
-Received: from mail-pl1-f173.google.com ([209.85.214.173]:38408 "EHLO
-        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726829AbgCTUka (ORCPT
+        Fri, 20 Mar 2020 16:40:32 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:46360 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726983AbgCTUkb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Mar 2020 16:40:30 -0400
-Received: by mail-pl1-f173.google.com with SMTP id w3so3001563plz.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 13:40:28 -0700 (PDT)
+        Fri, 20 Mar 2020 16:40:31 -0400
+Received: by mail-pl1-f196.google.com with SMTP id r3so2984227pls.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 13:40:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=kEeva5iJkpOYpQkRMHSLqHPg11Y9EzOHlIoY9qJTLII=;
-        b=nB4Z/PdZmWdEJPF4XrDLJrvLAwUsaZRysezrHi8ij6jgZDbDm3Msqqmg26mULXJx71
-         kYQGZmvx2+qAcbp+zK6odhZROvnfvKTlIlkM1qvx1Vr6BlXmAkuGUS0c7emZaRI4ry1z
-         MnpujicWJk498zu0lSAFvcEO2iWg4z6J4pYQyZOwrYUvc61jbu+GCMti2ELrRnCe7Cuf
-         +aUdNq4MY5W0P0/WwYbWxutQv4FVhg4xV7v+UTzn0EH9MVy6rkQpLfLX7gi7xedlPP9X
-         j6jFtYYQadF8wEkb5tOTX5OF3ZmJ+BMl8bLAo2o+Q/UOxCOxVQ/Zd597QerHHa8nE3Yp
-         lUxw==
+        bh=ax6LJvZifxs+Jz4PFhlO8B8liSrqW0rQiTisJ5Q7W3U=;
+        b=TcUwwa1Znb7bXLElra4QUed/8QCtlUHGCippcD3EBdxJzWmqlmN2dne4IGl/XHRj3t
+         mvykCC3IkDZzrIrhW8DxrcED+hIdzApS/WIP8+ViYLBlJMzFPQ/iBbYyR3EUxffkCUIE
+         27Q9lDqNbTNt1lF18jzeFsLZ4x24PvUDK5DgxB705QXcP9sOiMI9MDzqNR3K+XooSXvz
+         qNGazZH2yPzaG8//TiaKHvuDbYlJtV9PK7LOQUxIPVBCNvXOXKKVbGeWjlBmy4xUIZ/N
+         PmIOekOvFA4xi0OhjJo8XwnIOWnp1tZqinBviCR2gxmnxSw27Fov7hXIyWA20ZV/Yikr
+         ZKEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=kEeva5iJkpOYpQkRMHSLqHPg11Y9EzOHlIoY9qJTLII=;
-        b=TwhpD2uatsuLLp7TcotWk6tzGKA3T3bbCpNOhM1ZeqPKZBbPQftEs4yaZ0VpJYpv8F
-         R3QRp9xnXhj5B48fT/SLfCdf9TvwJYpaBmu3DAfiqsVtIm/+n/lRxf6ekai/Xba7mGCT
-         Nw/PBxsRtfc9LbGsU85JhyWEsgpyZh7weaUq2MJ8uvkr/Xw028ya/9A812nAw4hsuFdm
-         vE31LL+PmIOPJA0abeSnv2Vil4AaAThxwCavQMeoXiqhaQFFPUc3RzclLOq4lVozpnmy
-         Yqc5HJkaezc6kzBoHnu1dw9ryRJ7/KDrzAzePOcN9jihi51MPFdxW7SgRBB5tSeiUuPC
-         v0Iw==
-X-Gm-Message-State: ANhLgQ2QnZsBxn277TEoxvZD/KOprbiR1gtgZVf8T96coTrqz1cJn/vA
-        3EphyOirTl/K+K9yV7alfwwiRl2I
-X-Google-Smtp-Source: ADFU+vs52A3h8L6WbZJOUkOoayl/rpN0KDPVs8qZW809rrMxLyxk6GIH8H98R6S3EiFS7nZ5rMI6og==
-X-Received: by 2002:a17:90a:357:: with SMTP id 23mr11768038pjf.192.1584736827656;
-        Fri, 20 Mar 2020 13:40:27 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ax6LJvZifxs+Jz4PFhlO8B8liSrqW0rQiTisJ5Q7W3U=;
+        b=f4vBkJHi51XCOmSVRpFZiscxWx4Z4Ega8tDLj7RmggPiOgzaUC9C16SL70zfsVd2V4
+         o4o7DAXYhl+S1xLr8hywT3dRzUYDYUZKzctMXKNDA/4H8m+hEQDyPauRtNvadQ0tq4In
+         fOf8A7KK3eV/STqHqIcOuTBVqrcrA3/Xny1FFRSJ4SNt/J6Yv3Nd9vQVsqorb6aY/Nq/
+         kmpSTJEPaD64VHrqH9FVnJT6CkcuG9oxN8+H04xlb1d3aktP0p8sbmI4A/JAnu9kwiZ6
+         ky9Q/QpBxQbRPGxz1xuhc/Xo04k5T7LxXH8qNFNKbX3liGt6nDGM4Kzw9V5qfpOHiofP
+         XZ1w==
+X-Gm-Message-State: ANhLgQ2iS/bGmC2CUzOviiCPNs7AEkFdqmO+m6j08OUvoxACDTvU+aTv
+        2UEBdVkEjZ3gvIMPpi+jht+OjX2D
+X-Google-Smtp-Source: ADFU+vvgWqHxGFwKJ7gELI8IwmjMNAa+laf1jJguhBhNKqcoIiAVx2TsMNkgpKlG5n1hWXoHmcA4SA==
+X-Received: by 2002:a17:902:7c0c:: with SMTP id x12mr7831116pll.196.1584736829592;
+        Fri, 20 Mar 2020 13:40:29 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id e187sm6048744pfe.143.2020.03.20.13.40.26
+        by smtp.gmail.com with ESMTPSA id e187sm6048744pfe.143.2020.03.20.13.40.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 13:40:26 -0700 (PDT)
+        Fri, 20 Mar 2020 13:40:28 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 0/3] Enable use of L2CAP_MODE_EXT_FLOWCTL
-Date:   Fri, 20 Mar 2020 13:40:23 -0700
-Message-Id: <20200320204026.11680-1-luiz.dentz@gmail.com>
+Subject: [PATCH v4 2/3] Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections
+Date:   Fri, 20 Mar 2020 13:40:25 -0700
+Message-Id: <20200320204026.11680-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200320204026.11680-1-luiz.dentz@gmail.com>
+References: <20200320204026.11680-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,241 +75,218 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables use of BT_MODE_EXT_FLOWCTL with BT_MODE socketopt, in
-addition to that add support for DEFER_SETUP to be used with client
-sockets so they can be grouped and sent together.
+This uses the DEFER_SETUP flag to group channels with
+L2CAP_CREDIT_BASED_CONNECTION_REQ.
 
-This has been tested by introducing support for L2CAP_MODE_EXT_FLOWCTL
-into l2cap-tester which now produces the following trace:
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/l2cap.h |   4 +
+ net/bluetooth/l2cap_core.c    | 136 +++++++++++++++++++++++++++++++---
+ 2 files changed, 130 insertions(+), 10 deletions(-)
 
-Enable ecred PDUs:
-#echo 1 > /sys/module/bluetooth/parameters/enable_ecred
-
-#sudo tools/l2cap-tester -p "L2CAP Ext-Flowctl"
-L2CAP Ext-Flowctl Client - Success - init
-  Read Index List callback
-    Status: 0x00
-  New hciemu instance created
-  Index Added callback
-    Index: 0x0000
-  Read Info callback
-    Status: 0x00
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x003f
-    Supported settings: 0x0001be1b
-    Current settings: 0x00000200
-    Class: 0x000000
-    Name:
-    Short name:
-L2CAP Ext-Flowctl Client - Success - setup
-  Powering on controller
-  Controller powered on
-  Client set connectable status 0x00
-L2CAP Ext-Flowctl Client - Success - setup complete
-L2CAP Ext-Flowctl Client - Success - run
-  Connect in progress
-  Successfully connected
-L2CAP Ext-Flowctl Client - Success - test passed
-L2CAP Ext-Flowctl Client - Success - teardown
-  Index Removed callback
-    Index: 0x0000
-L2CAP Ext-Flowctl Client - Success - teardown complete
-L2CAP Ext-Flowctl Client - Success - done
-
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - init
-  Read Index List callback
-    Status: 0x00
-  New hciemu instance created
-  Index Added callback
-    Index: 0x0000
-  Read Info callback
-    Status: 0x00
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x003f
-    Supported settings: 0x0001be1b
-    Current settings: 0x00000200
-    Class: 0x000000
-    Name:
-    Short name:
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - setup
-  Powering on controller
-  Controller powered on
-  Client set connectable status 0x00
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - setup complete
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - run
-  Connect in progress
-  Received advertising parameters HCI command
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - test passed
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - teardown
-  Index Removed callback
-    Index: 0x0000
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - teardown complete
-L2CAP Ext-Flowctl Client, Direct Advertising - Success - done
-
-L2CAP Ext-Flowctl Client SMP - Success - init
-  Read Index List callback
-    Status: 0x00
-  New hciemu instance created
-  Index Added callback
-    Index: 0x0000
-  Read Info callback
-    Status: 0x00
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x003f
-    Supported settings: 0x0001be1b
-    Current settings: 0x00000200
-    Class: 0x000000
-    Name:
-    Short name:
-L2CAP Ext-Flowctl Client SMP - Success - setup
-  Powering on controller
-  Controller powered on
-  Client set connectable status 0x00
-L2CAP Ext-Flowctl Client SMP - Success - setup complete
-L2CAP Ext-Flowctl Client SMP - Success - run
-  Connect in progress
-  Successfully connected
-L2CAP Ext-Flowctl Client SMP - Success - test passed
-L2CAP Ext-Flowctl Client SMP - Success - teardown
-  Index Removed callback
-    Index: 0x0000
-L2CAP Ext-Flowctl Client SMP - Success - teardown complete
-L2CAP Ext-Flowctl Client SMP - Success - done
-
-L2CAP Ext-Flowctl Client - Command Reject - init
-  Read Index List callback
-    Status: 0x00
-  New hciemu instance created
-  Index Added callback
-    Index: 0x0000
-  Read Info callback
-    Status: 0x00
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x003f
-    Supported settings: 0x0001be1b
-    Current settings: 0x00000200
-    Class: 0x000000
-    Name:
-    Short name:
-L2CAP Ext-Flowctl Client - Command Reject - setup
-  Powering on controller
-  Controller powered on
-  Client set connectable status 0x00
-L2CAP Ext-Flowctl Client - Command Reject - setup complete
-L2CAP Ext-Flowctl Client - Command Reject - run
-  Connect in progress
-  New connection with handle 0x002a
-  Connect failed: Connection refused (111)
-L2CAP Ext-Flowctl Client - Command Reject - test passed
-L2CAP Ext-Flowctl Client - Command Reject - teardown
-  Index Removed callback
-    Index: 0x0000
-L2CAP Ext-Flowctl Client - Command Reject - teardown complete
-L2CAP Ext-Flowctl Client - Command Reject - done
-
-L2CAP Ext-Flowctl Client - Open two sockets - init
-  Read Index List callback
-    Status: 0x00
-  New hciemu instance created
-  Index Added callback
-    Index: 0x0000
-  Read Info callback
-    Status: 0x00
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x003f
-    Supported settings: 0x0001be1b
-    Current settings: 0x00000200
-    Class: 0x000000
-    Name:
-    Short name:
-L2CAP Ext-Flowctl Client - Open two sockets - setup
-  Powering on controller
-  Controller powered on
-L2CAP Ext-Flowctl Client - Open two sockets - setup complete
-L2CAP Ext-Flowctl Client - Open two sockets - run
-  Connect in progress, sk = 19 (deferred)
-  HCI Command 0x200b length 7
-  HCI Command 0x200c length 2
-  Connect in progress, sk = 20
-  Client set connectable status 0x00
-  HCI Command 0x200c length 2
-  HCI Command 0x200d length 25
-  HCI Command 0x2016 length 2
-  Successfully connected
-  Successfully connected
-L2CAP Ext-Flowctl Client - Open two sockets - test passed
-L2CAP Ext-Flowctl Client - Open two sockets - teardown
-  Index Removed callback
-    Index: 0x0000
-L2CAP Ext-Flowctl Client - Open two sockets - teardown complete
-L2CAP Ext-Flowctl Client - Open two sockets - done
-
-L2CAP Ext-Flowctl Client - Open two sockets close one - init
-  Read Index List callback
-    Status: 0x00
-  New hciemu instance created
-  Index Added callback
-    Index: 0x0000
-  Read Info callback
-    Status: 0x00
-    Address: 00:AA:01:00:00:00
-    Version: 0x09
-    Manufacturer: 0x003f
-    Supported settings: 0x0001be1b
-    Current settings: 0x00000200
-    Class: 0x000000
-    Name:
-    Short name:
-L2CAP Ext-Flowctl Client - Open two sockets close one - setup
-  Powering on controller
-  Controller powered on
-L2CAP Ext-Flowctl Client - Open two sockets close one - setup complete
-L2CAP Ext-Flowctl Client - Open two sockets close one - run
-  Connect in progress, sk = 19 (deferred)
-  HCI Command 0x200b length 7
-  HCI Command 0x200c length 2
-  Connect in progress, sk = 20
-  Closing first socket! -1
-  Client set connectable status 0x00
-  HCI Command 0x200c length 2
-  HCI Command 0x200d length 25
-  HCI Command 0x2016 length 2
-  Successfully connected
-L2CAP Ext-Flowctl Client - Open two sockets close one - test passed
-L2CAP Ext-Flowctl Client - Open two sockets close one - teardown
-  Index Removed callback
-    Index: 0x0000
-L2CAP Ext-Flowctl Client - Open two sockets close one - teardown complete
-L2CAP Ext-Flowctl Client - Open two sockets close one - done
-
-
-Test Summary
-------------
-L2CAP Ext-Flowctl Client - Success                   Passed       0.068 seconds
-L2CAP Ext-Flowctl Client, Direct Advertising - Success Passed       0.023 seconds
-L2CAP Ext-Flowctl Client SMP - Success               Passed       0.027 seconds
-L2CAP Ext-Flowctl Client - Command Reject            Passed       0.046 seconds
-L2CAP Ext-Flowctl Client - Open two sockets          Passed       0.014 seconds
-L2CAP Ext-Flowctl Client - Open two sockets close one Passed       0.066 seconds
-Total: 6, Passed: 6 (100.0%), Failed: 0, Not Run: 0
-Overall execution time: 0.247 seconds
-
-Luiz Augusto von Dentz (3):
-  Bluetooth: L2CAP: Add get_peer_pid callback
-  Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections
-  Bluetooth: Add BT_MODE socket option
-
- include/net/bluetooth/bluetooth.h |  11 +++
- include/net/bluetooth/l2cap.h     |   5 ++
- net/bluetooth/l2cap_core.c        | 136 +++++++++++++++++++++++++++---
- net/bluetooth/l2cap_sock.c        | 104 +++++++++++++++++++++++
- 4 files changed, 246 insertions(+), 10 deletions(-)
-
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 2d7d28474d34..dada14d0622c 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -47,6 +47,7 @@
+ #define L2CAP_DEFAULT_ACC_LAT		0xFFFFFFFF
+ #define L2CAP_BREDR_MAX_PAYLOAD		1019    /* 3-DH5 packet */
+ #define L2CAP_LE_MIN_MTU		23
++#define L2CAP_ECRED_CONN_SCID_MAX	5
+ 
+ #define L2CAP_DISC_TIMEOUT		msecs_to_jiffies(100)
+ #define L2CAP_DISC_REJ_TIMEOUT		msecs_to_jiffies(5000)
+@@ -984,6 +985,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
++typedef void (*l2cap_chan_func_t)(struct l2cap_chan *chan, void *data);
++void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
++		     void *data);
+ void l2cap_chan_del(struct l2cap_chan *chan, int err);
+ void l2cap_send_conn_req(struct l2cap_chan *chan);
+ void l2cap_move_start(struct l2cap_chan *chan);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 5e6e35ab44dd..9f699d09d973 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -678,6 +678,29 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ }
+ EXPORT_SYMBOL_GPL(l2cap_chan_del);
+ 
++static void __l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
++			      void *data)
++{
++	struct l2cap_chan *chan;
++
++	list_for_each_entry(chan, &conn->chan_l, list) {
++		func(chan, data);
++	}
++}
++
++void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
++		     void *data)
++{
++	if (!conn)
++		return;
++
++	mutex_lock(&conn->chan_lock);
++	__l2cap_chan_list(conn, func, data);
++	mutex_unlock(&conn->chan_lock);
++}
++
++EXPORT_SYMBOL_GPL(l2cap_chan_list);
++
+ static void l2cap_conn_update_id_addr(struct work_struct *work)
+ {
+ 	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+@@ -1356,29 +1379,79 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
+ 		       sizeof(req), &req);
+ }
+ 
+-static void l2cap_ecred_connect(struct l2cap_chan *chan)
+-{
+-	struct l2cap_conn *conn = chan->conn;
++struct l2cap_ecred_conn_data {
+ 	struct {
+ 		struct l2cap_ecred_conn_req req;
+-		__le16 scid;
++		__le16 scid[5];
+ 	} __packed pdu;
++	struct l2cap_chan *chan;
++	struct pid *pid;
++	int count;
++};
++
++static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
++{
++	struct l2cap_ecred_conn_data *conn = data;
++	struct pid *pid;
++
++	if (chan == conn->chan)
++		return;
++
++	if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
++		return;
++
++	pid = chan->ops->get_peer_pid(chan);
++
++	/* Only add deferred channels with the same PID/PSM */
++	if (conn->pid != pid || chan->psm != conn->chan->psm || chan->ident ||
++	    chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
++		return;
++
++	if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
++		return;
++
++	l2cap_ecred_init(chan, 0);
++
++	/* Set the same ident so we can match on the rsp */
++	chan->ident = conn->chan->ident;
++
++	/* Include all channels deferred */
++	conn->pdu.scid[conn->count] = cpu_to_le16(chan->scid);
++
++	conn->count++;
++}
++
++static void l2cap_ecred_connect(struct l2cap_chan *chan)
++{
++	struct l2cap_conn *conn = chan->conn;
++	struct l2cap_ecred_conn_data data;
++
++	if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
++		return;
+ 
+ 	if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
+ 		return;
+ 
+ 	l2cap_ecred_init(chan, 0);
+ 
+-	pdu.req.psm     = chan->psm;
+-	pdu.req.mtu     = cpu_to_le16(chan->imtu);
+-	pdu.req.mps     = cpu_to_le16(chan->mps);
+-	pdu.req.credits = cpu_to_le16(chan->rx_credits);
+-	pdu.scid        = cpu_to_le16(chan->scid);
++	data.pdu.req.psm     = chan->psm;
++	data.pdu.req.mtu     = cpu_to_le16(chan->imtu);
++	data.pdu.req.mps     = cpu_to_le16(chan->mps);
++	data.pdu.req.credits = cpu_to_le16(chan->rx_credits);
++	data.pdu.scid[0]     = cpu_to_le16(chan->scid);
+ 
+ 	chan->ident = l2cap_get_ident(conn);
++	data.pid = chan->ops->get_peer_pid(chan);
++
++	data.count = 1;
++	data.chan = chan;
++	data.pid = chan->ops->get_peer_pid(chan);
++
++	__l2cap_chan_list(conn, l2cap_ecred_defer_connect, &data);
+ 
+ 	l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_CONN_REQ,
+-		       sizeof(pdu), &pdu);
++		       sizeof(data.pdu.req) + data.count * sizeof(__le16),
++		       &data.pdu);
+ }
+ 
+ static void l2cap_le_start(struct l2cap_chan *chan)
+@@ -7694,6 +7767,33 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
+ 	return ((psm & 0x0101) == 0x0001);
+ }
+ 
++struct l2cap_chan_data {
++	struct l2cap_chan *chan;
++	struct pid *pid;
++	int count;
++};
++
++static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
++{
++	struct l2cap_chan_data *d = data;
++	struct pid *pid;
++
++	if (chan == d->chan)
++		return;
++
++	if (!test_bit(FLAG_DEFER_SETUP, &chan->flags))
++		return;
++
++	pid = chan->ops->get_peer_pid(chan);
++
++	/* Only count deferred channels with the same PID/PSM */
++	if (d->pid != pid || chan->psm != d->chan->psm || chan->ident ||
++	    chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
++		return;
++
++	d->count++;
++}
++
+ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		       bdaddr_t *dst, u8 dst_type)
+ {
+@@ -7813,6 +7913,22 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		goto done;
+ 	}
+ 
++	if (chan->mode == L2CAP_MODE_EXT_FLOWCTL) {
++		struct l2cap_chan_data data;
++
++		data.chan = chan;
++		data.pid = chan->ops->get_peer_pid(chan);
++		data.count = 0;
++
++		l2cap_chan_list(conn, l2cap_chan_by_pid, &data);
++		/* Check if there isn't too many channels being connected */
++		if (!(data.count < L2CAP_ECRED_CONN_SCID_MAX - 1)) {
++			hci_conn_drop(hcon);
++			err = -EPROTO;
++			goto done;
++		}
++	}
++
+ 	mutex_lock(&conn->chan_lock);
+ 	l2cap_chan_lock(chan);
+ 
 -- 
 2.21.1
 
