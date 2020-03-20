@@ -7,64 +7,60 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC67C4332B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 01:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C0BC4332B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 01:50:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81B222076C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 01:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C558420753
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 01:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="m4sQ4Ar/"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="htsh1BsI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727297AbgCTBt7 (ORCPT
+        id S1727297AbgCTBu2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Mar 2020 21:49:59 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:42196 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727207AbgCTBt6 (ORCPT
+        Thu, 19 Mar 2020 21:50:28 -0400
+Received: from mail-pg1-f179.google.com ([209.85.215.179]:33616 "EHLO
+        mail-pg1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727192AbgCTBu1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Mar 2020 21:49:58 -0400
-Received: by mail-pf1-f196.google.com with SMTP id x2so2408646pfn.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2020 18:49:58 -0700 (PDT)
+        Thu, 19 Mar 2020 21:50:27 -0400
+Received: by mail-pg1-f179.google.com with SMTP id d17so1696274pgo.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2020 18:50:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=ETiO7XhZXke6GDuUI6KgWzLWxeC6pDtcPaOKYiXplXI=;
-        b=m4sQ4Ar/8AeFnghpsJxl9gzWUZo4dkOoUwggHTi6im5WlyMNlukpG8VR0Q2/aUzlme
-         02l5QGH1Xrq+7tg/kjZPFQHGm7wKWT3JWEVQlGcCjcWqtMDhhJahpUJPnJ5E0aDmdeuK
-         swdqraUeWGR9It54oI3HvYrX+c4TDyHbXzs9Q=
+        bh=PU9kgEpwwuugzuBur1kbsdnAZUff4cZ6r30c+t/EDPo=;
+        b=htsh1BsIw/p7dOlQFwSVIjtvBlNnQQBXdQHQTuQF3StdBMVFSVUxzIfacwg2jrIsJ+
+         eB2DXlJPRxuCzrGfnlxhGp2iyaekqTuAbvOvl8ZqRI0IgVhWsN9IRznxLnVgpcZDMxdN
+         qGSTjoR+PG5aRIB8b5DYDkOmAa+mdOR/bKVb0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=ETiO7XhZXke6GDuUI6KgWzLWxeC6pDtcPaOKYiXplXI=;
-        b=uOjAk4gHZP63zVWUmpHJ3/6aJwEvzmugvvjdDuU938e6o5u4eaqkgQE7u6HsYzABBl
-         c2tsQ9HSAVjhHg1QwnXHKtT5ZVhZPnxgsb8eFhFagXWAIty0GgDxP7/qXoVoJB4s9oKp
-         BF+Y3pk8eaoEcBxYaLOf0/USdewEyJnk28L5C538v8f44jGFGUXOtlp/29DhXJMkMCEv
-         GHyiQbHhSvwctOkD5Rfx5Zge5/dif/vqXPM/HKV0mTIyAnSG8Zwy8kcq/mWZj9t9pf0c
-         m6NRnn/o0HxnWDIxEMk8jToMR7yJDtRKVGhSiE1o+Fsy3d7QTodWhbaYlWT9YKJDoexz
-         +ecg==
-X-Gm-Message-State: ANhLgQ2aVnovP5nnHTcSC/+XbLXkOQONURf8qRu8DIqDBkXBpmEsf1iQ
-        PDbHZLW9LGTB9paPmNj5W0z0nw==
-X-Google-Smtp-Source: ADFU+vvuzGeaFQfV3LmVCl2fYFHJkCPG3vQj22hjOiMNGRgRkQ8YWCLc+24CB5sgyp+JeL/7tHgiqQ==
-X-Received: by 2002:a62:1946:: with SMTP id 67mr7337219pfz.0.1584668997488;
-        Thu, 19 Mar 2020 18:49:57 -0700 (PDT)
+        bh=PU9kgEpwwuugzuBur1kbsdnAZUff4cZ6r30c+t/EDPo=;
+        b=AEeB/Wy8+A7yNBdOhoV3Ki/YAiHlAwH1N9vIgNgriHv8oLrMponh8kiW/ZTdqMxcQg
+         xIDn4z1SMSxr1ypz2Iro3EjmTzwd0fO+9GFbv9bLq4RjqB62gh30NCruL7VO5hqgVUaF
+         y0ZKqNmQN8pDn558yUuXdxiw9RsPxOdv9w1q7jQG2C9YoFJdc3OC3bR5ZgGFIcgSdh80
+         vSJ6ONkZpjYT1pHy8Kh3irFCWyHssP9+mg8D2w9RaU8EX+7DNKCnzIFfroem2rQEsubp
+         8jrzNejXKn2Fyy7Z/GrMg+BKia0QqMOptmpU6kw9waHQA8t/wltwiJKp6//S1JB8F1in
+         k69Q==
+X-Gm-Message-State: ANhLgQ1FdUdo4S4Hl/Wql/jyggeQilysiKDgFUZ7W8EpWuYwfC2HtVbD
+        L/ezMxCV6GjiDftBuXGu4hiQxQ==
+X-Google-Smtp-Source: ADFU+vuNGk1q3voL+KRzq2IxinBDyIMJGrndR83ZhF17Nmqo01Y7Zbj4XJ57TmhpoNgRNpN0lf+bWA==
+X-Received: by 2002:a63:c550:: with SMTP id g16mr6481154pgd.9.1584669026690;
+        Thu, 19 Mar 2020 18:50:26 -0700 (PDT)
 Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id y9sm3450235pgo.80.2020.03.19.18.49.56
+        by smtp.gmail.com with ESMTPSA id 136sm3410485pgh.26.2020.03.19.18.50.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Mar 2020 18:49:57 -0700 (PDT)
+        Thu, 19 Mar 2020 18:50:26 -0700 (PDT)
 From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC PATCH 0/1] Bluetooth: Set wakeable flag via add_device
-Date:   Thu, 19 Mar 2020 18:49:48 -0700
-Message-Id: <20200320014950.85018-1-abhishekpandit@chromium.org>
+To:     luiz.dentz@gmail.com, marcel@holtmann.org
+Cc:     alainm@chromium.org, chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Subject: [BlueZ PATCH v4 0/5] device: Allow devices to be marked as wake capable
+Date:   Thu, 19 Mar 2020 18:50:18 -0700
+Message-Id: <20200320015023.85896-1-abhishekpandit@chromium.org>
 X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -74,30 +70,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 
-Hi Marcel and Luiz,
+Hi Luiz and Marcel,
 
-As suggested, I've updated the add_device mgmt op to accept flags on the
-device and added support for the wakeable flag. I've prototyped an
-implementation in Bluez as well that will send the mask + value on any
-add_device and then clear it on the add_device completion.
+Please do not merge this until the accompanying kernel change is
+accepted. I am sending this series to show how I plan on using the
+changes to the Add Device management operation.
 
-This seems to work fairly well and allows updating flags during runtime
-as well (for example, via dbus property setting).
+Pending questions I have for this series:
+* Do I need to distinguish whether the kernel supports the updated Add
+  Device structure? (It will probably reject it if the size isn't
+  correct)
+* Can we allow HID devices to default to Wake Allowed? I think its
+  preferable to allow newly paired HID devices to wake the system from
+  sleep without any additional changes.
 
-Please take a look. I will also send up the Bluez changes so you can
-look at how userspace would use this.
+--
+
+This change accompanies a change in the kernel to allow marking devices
+as wakeable so they can wake the system from suspend. Currently, only
+HID devices support this and will be configured to allow this setting to
+be changed via the WakeAllowed property.
+
+In order to set this flag, Bluez must call the Add Device management
+operation with the DEVICE_FLAG_WAKEABLE flag mask and value set. This
+call can be made multiple times with the same address (the kernel will
+add the device the first time but only update the action or flags on
+subsequent calls).
+
+This change was tested with appropriate kernel changes on v4.19
+(verified that HID devices were being marked as wake capable in the
+kernel).
 
 Thanks
 Abhishek
 
+Changes in v4:
+* Newly added support in Add Device for flags
+* Renamed wake_capable to wake_allowed
+* Removed set_wake_capable mgmt op and updated add_device to accept
+  flags to set whether a device is wakeable
+* Refactored adapter_whitelist_add and adapter_auto_connect_add to call
+  adapter_add_device
+* Renamed WakeCapable to WakeAllowed
+* Renamed WakeCapable to WakeAllowed
+* Renamed device_set_profile_wake_support to just
+  device_set_wake_support
 
+Changes in v3:
+* Added profile_wake_support and made wake_capable dependent on it
+* Added documentation for WakeCapable
+* Mark HID device to support wake from suspend
 
-Abhishek Pandit-Subedi (1):
-  Bluetooth: Update add_device to accept flags
+Changes in v2:
+* Added dbus api "WakeCapable" to set value
+* Update device_set_wake_capable to be called by
+  adapter_set_wake_capable_complete so we can emit property changed
+* Newly added to show whether device is wake capable
+* Removed automatically setting wake capable for HID devices
 
- include/net/bluetooth/mgmt.h |  5 ++++-
- net/bluetooth/mgmt.c         | 42 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 45 insertions(+), 2 deletions(-)
+Abhishek Pandit-Subedi (5):
+  mgmt: Update docs for Add Device
+  device: Support marking a device with wake allowed
+  client: Display wake allowed property with info
+  doc/device-api: Add WakeAllowed
+  input: Make HID devices support wake
+
+ client/main.c           |   1 +
+ doc/device-api.txt      |   5 ++
+ doc/mgmt-api.txt        |  12 ++++
+ lib/mgmt.h              |   3 +
+ profiles/input/device.c |   1 +
+ profiles/input/hog.c    |   1 +
+ src/adapter.c           | 112 +++++++++++++----------------------
+ src/adapter.h           |   1 +
+ src/device.c            | 125 ++++++++++++++++++++++++++++++++++++++++
+ src/device.h            |   8 +++
+ 10 files changed, 197 insertions(+), 72 deletions(-)
 
 -- 
 2.25.1.696.g5e7596f4ac-goog
