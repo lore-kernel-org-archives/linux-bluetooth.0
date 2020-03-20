@@ -2,67 +2,68 @@ Return-Path: <SRS0=7F+K=5F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AACAC4332B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 13:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4112C4332D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 17:45:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1ADE120739
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 13:42:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92B5F2072C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 17:45:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qBiQFmIz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDmGK175"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727197AbgCTNmI (ORCPT
+        id S1726951AbgCTRpH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Mar 2020 09:42:08 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:35427 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726843AbgCTNmI (ORCPT
+        Fri, 20 Mar 2020 13:45:07 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:34894 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726801AbgCTRpG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Mar 2020 09:42:08 -0400
-Received: by mail-lf1-f65.google.com with SMTP id m15so4585940lfp.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 06:42:06 -0700 (PDT)
+        Fri, 20 Mar 2020 13:45:06 -0400
+Received: by mail-oi1-f195.google.com with SMTP id k8so7429622oik.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 10:45:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=eueK1RelaTKtQTskeoZt6YVdGRqiAzaN29k7LII+LmU=;
-        b=qBiQFmIzx4dIZ9z3un/4jzFSKPL3QvS+rj9LCmBhm3JwobYI5BEEObAOUwVbpQiURl
-         Iv0FdchSpwwl3GNwfTgCTialyUIpnQCCcZEMKeqQGXGGCvWKOo+e5AstvXV/lvKPpqBM
-         4zjVT+PojPWpztxyRsAP9NuNGuWyovhTSJrv4jQXvrwQT8RbZyowOz1o/4FNddlDn5PL
-         j+YHpHqx5DF2WqLwNhbmWwFVsgJ6byO+WNHs8gQSranMP1kkykX3UV6IHRF/POMM1TFZ
-         p5ODFgEB467Ycb4au5lHLmqa/kJQQYXXjU+fVnLvvRARgrd39uM2qSJ4gBAq517hrPQN
-         54NA==
+         :cc:content-transfer-encoding;
+        bh=JvbyjlNpLdX8PWd126R+QY0cIcys7iVW9BmKK1H1+gI=;
+        b=rDmGK175EMB9NoARxYF7GXJ/yVRD97OWs2HnH1zhRc/+cl4P4QScWTkCqlnmmcSSG8
+         tNvqSavI3Dm06un03ieo0qlag0xlEFNTvU02IerWBau6h8thVZg3fjZ/XZoVFk7HEJka
+         4d2aHQw7fH1t3mk0LQoZToVkyedv/sEgvG6GcPf/VO8jiiFWnqgunMxt/P3/DZ+3SrYL
+         oWxXmTrEaGTBUWoWHeD64JbojR/TTVBDMR8b9xvkA9p939c4n+7Xp0WatRMg0bAkt7WT
+         jjIp94fp0ZI0vg2G79wAvLTJJTPXZ8ZO+trB2az5NsRRCvsn9zDAmH/abhCeg+kkeYZg
+         d2fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eueK1RelaTKtQTskeoZt6YVdGRqiAzaN29k7LII+LmU=;
-        b=UKhW9GguI7+psfrnpkmEh9Np8OSF0gToAeK21M7TvxXGPePPz7THGof9/EkoYhXCjr
-         fsILmZABB9JIETQ69AolN2+58yqsXJyde/VhuPvVssJlzg8oPhlbF/237r3mgN3/a2d1
-         mtQWjbaVrEIm+4FHNhcXcuerI3KaljQcG8N5JCFXUzKCJgc0UQTW5ipJsmSRm07vt94+
-         0vQMHvdH7ol70QyywWsy66LoFZYa/wkKcGUFUEO3CwTT1OYoXdsCTq++G0nEoSwWd9R9
-         uPzeLStCXXDBUG6/bhd0caB4rruUP7/Y4uhHQtej2yDBUtjprFYMuxWyFbvXZ9/bTVd7
-         SJkQ==
-X-Gm-Message-State: ANhLgQ0cU+DPmG8Bk2A0idTvsFHsrQo7YQu9/7r4KQPb7LUTj3Txfayi
-        L3+OM3XAB4rBL0cibqKR23hUP19peyE1CaFU/ADMnw==
-X-Google-Smtp-Source: ADFU+vubwJtJKm9IrNBGH/GTmLVxyPFceqoJe5UwQE5v3NFWqDbbZD6xpyAY97w+KHni9wWuSWUtY/5/mIC9r736CEQ=
-X-Received: by 2002:a05:6512:49e:: with SMTP id v30mr5351792lfq.158.1584711725360;
- Fri, 20 Mar 2020 06:42:05 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JvbyjlNpLdX8PWd126R+QY0cIcys7iVW9BmKK1H1+gI=;
+        b=exGLI/VXKoZVMZdGpedjJDtfB165mo8OYyd381i3Ykk7ZMqStaXJztvZsS9Yr6K1sL
+         OvAL+OP4tEJ10fhXuu/F//+XkRff2I0lFm0HPnLN0ZKN+pAaupYM2uVSUMjuldhLPAyB
+         OnuHj6eA68g8flYkUsiuDFx03vjYu+D8bizlgr2Lw02Em+PiBDwZ43e+eSfpVc80rL/9
+         As3z+rqRZ/6L7ODa6g8YTwcF9QXIbZQZZsOVesedhUMcjjNfRHvyvwoVE4Srh+Vr9Q/I
+         VpmZD7yF482mjORB1eUXJ22Xk+sXq8Ju1nqLK8aHHsxzjttyWc70GPiDHTgmmkoRLWLY
+         27Kg==
+X-Gm-Message-State: ANhLgQ0YCD6AASqI6BntpubHtF/9QcuZ9TBqQPQ0HodmmjINiYNPrxpn
+        VS3gdzWf5YvYa+Qn8LeZ8E24E/SYB9fekCucIx58tg==
+X-Google-Smtp-Source: ADFU+vuuYCSRERU2cjaJtUzVm9Xclsk9uNOSAmb4pa7zg/VLbDV6eh2luN1EjAfoB6kPNdieNUMTSLQJxx9BFgTBTGo=
+X-Received: by 2002:a54:4e13:: with SMTP id a19mr7682104oiy.108.1584726305756;
+ Fri, 20 Mar 2020 10:45:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200320133748.154926-1-alainm@chromium.org>
-In-Reply-To: <20200320133748.154926-1-alainm@chromium.org>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Fri, 20 Mar 2020 09:41:53 -0400
-Message-ID: <CALWDO_WSHiNw+uwcZzufJ7rjHr=zpMs6f3ry=rdLMGLz2gJZ=w@mail.gmail.com>
-Subject: Re: [PATCH v2] bluetooth: Enforce classic key size verification.
-To:     Alain Michaud <alainm@chromium.org>,
-        "Holtmann, Marcel" <marcel.holtmann@intel.com>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+References: <20200318215019.21494-1-luiz.dentz@gmail.com> <20200318215019.21494-4-luiz.dentz@gmail.com>
+ <DDA058C0-9DF5-43F4-9A41-001595A95573@holtmann.org>
+In-Reply-To: <DDA058C0-9DF5-43F4-9A41-001595A95573@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 20 Mar 2020 10:44:54 -0700
+Message-ID: <CABBYNZ++Kr+y7QX-2ah0CtaC5W+3A66a=Ppu71i0DeyvZW-CjA@mail.gmail.com>
+Subject: Re: [PATCH v3 3/3] Bluetooth: Add BT_MODE socket option
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -70,91 +71,107 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marcel,
 
+On Thu, Mar 19, 2020 at 5:58 PM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Luiz,
+>
+> > This adds BT_MODE socket option which can be used to set L2CAP modes,
+> > including modes only supported over LE which were not supported using
+> > the L2CAP_OPTIONS.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > include/net/bluetooth/bluetooth.h | 11 ++++
+> > net/bluetooth/l2cap_sock.c        | 96 +++++++++++++++++++++++++++++++
+> > 2 files changed, 107 insertions(+)
+> >
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/=
+bluetooth.h
+> > index 1576353a2773..34191e34bfdc 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -139,6 +139,17 @@ struct bt_voice {
+> > #define BT_PHY_LE_CODED_TX    0x00002000
+> > #define BT_PHY_LE_CODED_RX    0x00004000
+> >
+> > +#define BT_MODE                      15
+> > +
+> > +#define BT_MODE_BASIC                0x00
+> > +#define BT_MODE_RETRANS              0x01
+> > +#define BT_MODE_FLOWCTL              0x02
+> > +#define BT_MODE_ERTM         0x03
+> > +#define BT_MODE_STREAMING    0x04
+> > +#define BT_MODE_EXT_FLOWCTL  0x05
+> > +
+> > +#define BT_MODE_LE_FLOWCTL   0x80
+> > +
+>
+> what I would do is just this:
+>
+>         BASIC           0x00
+>         ERTM            0x01
+>         STREAMING       0x02
+>         LE_FLOWCTL      0x03
+>         EXT_FLOWCTL     0x04
+>
+> Trying to cling onto some old L2CAP definition from the 2.1 days is not h=
+elpful. I would really make a clean cut here.
 
-On Fri, Mar 20, 2020 at 9:37 AM Alain Michaud <alainm@chromium.org> wrote:
+Just to confirm, that means we will not going to support the old
+flowctl and retransmit modes from BR/EDR with BT_MODE?
+
+> This way we can also cleanly check the available modes per selected socke=
+t and have either setsockopt or connect fail appropriately.
 >
-> This change introduces a new configuration to strictly enforce key size
-> checks.  This ensures that systems are in a secured configuration by
-> default while allowing for a compatible posture via a Kconfig option to
-> support controllers who may not support the read encryption key size
-> command.
+> > __printf(1, 2)
+> > void bt_info(const char *fmt, ...);
+> > __printf(1, 2)
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index 117ba20ea194..f2bb376c699f 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -500,6 +500,25 @@ static int l2cap_sock_getsockopt_old(struct socket=
+ *sock, int optname,
+> >       return err;
+> > }
+> >
+> > +static u8 l2cap_get_mode(struct l2cap_chan *chan)
+> > +{
+> > +     switch (chan->mode) {
+> > +     case L2CAP_MODE_BASIC:
+> > +     case L2CAP_MODE_RETRANS:
+> > +     case L2CAP_MODE_FLOWCTL:
+> > +     case L2CAP_MODE_ERTM:
+> > +     case L2CAP_MODE_STREAMING:
+> > +             /* Mode above are the same on both old and new sockopt */
+> > +             return chan->mode;
+> > +     case L2CAP_MODE_LE_FLOWCTL:
+> > +             return BT_MODE_FLOWCTL;
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> > +             return BT_MODE_EXT_FLOWCTL;
+> > +     }
+> > +
+> > +     return chan->mode;
+> > +}
+> > +
 >
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> ---
+> Don=E2=80=99t bother with this. Keep the old socket and new socket indepe=
+ndent code. I also want to add Kconfig option later that will allow us to d=
+isable the old socket options once we have SOL_L2CAP requirement eradicated=
+.
+
+The reason I had the defines intermixed was that application would be
+able to use the old sockopt to set it and then use BT_MODE to read it,
+in which case I may need to store the actual socket mode separately
+from the chan->mode and then perhaps fail if application attempt to
+read it with BT_MODE if was not set using it.
+
+> Regards
 >
->  net/bluetooth/Kconfig     | 20 ++++++++++++++++++++
->  net/bluetooth/hci_core.c  | 10 ++++++++++
->  net/bluetooth/hci_event.c |  4 ++++
->  3 files changed, 34 insertions(+)
+> Marcel
 >
-> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> index 165148c7c4ce..8e177d4f3f02 100644
-> --- a/net/bluetooth/Kconfig
-> +++ b/net/bluetooth/Kconfig
-> @@ -128,4 +128,24 @@ config BT_DEBUGFS
->           Provide extensive information about internal Bluetooth states
->           in debugfs.
->
-> +config BT_EXPERT
-> +       bool "Expert Bluetooth options"
-> +       depends on BT
-> +       default n
-> +       help
-> +         Provides a set of expert options and configurations that should
-> +         only be used deliberately by BT experts.  This is considered a
-> +         global switch to ensure these advanced features or options that
-> +         depends on BT_EXPERT are only used in expert mode.
-> +
-> +config BT_ENFORCE_CLASSIC_KEY_SIZES
-> +       bool "Enforces security requirements for Bluetooth classic"
-> +       depends on BT && BT_EXPERT
-> +       default y
-> +       help
-> +         Enforces Bluetooth classic security requirements by disallowing
-> +         use of insecure Bluetooth controllers, i.e. that doesn't support
-> +         Read Encryption Key Size command to prevent BT classic connection
-> +         with very short encryption key.
-> +
->  source "drivers/bluetooth/Kconfig"
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 4e6d61a95b20..142130d4b66b 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1540,6 +1540,16 @@ static int hci_dev_do_open(struct hci_dev *hdev)
->
->         clear_bit(HCI_INIT, &hdev->flags);
->
-> +#ifdef BT_ENFORCE_CLASSIC_KEY_SIZES
-> +       /* Don't allow usage of Bluetooth if the chip doesn't support */
-> +       /* Read Encryption Key Size command */
-> +       if (!ret && !(hdev->commands[20] & 0x10)) {
-> +               bt_dev_err(hdev,
-> +                          "Disabling BT, Read Encryption Key Size !supported");
-> +               ret = -EIO;
-> +       }
-> +#endif
-Just FYI, I haven't changed this bit yet.  I'll wait for your guidance
-on where best to put this to leave the controller in the right state.
-> +
->         if (!ret) {
->                 hci_dev_hold(hdev);
->                 hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index a40ed31f6eb8..54f90799a088 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2902,7 +2902,11 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
->         if (rp->status) {
->                 bt_dev_err(hdev, "failed to read key size for handle %u",
->                            handle);
-> +#ifdef BT_ENFORCE_CLASSIC_KEY_SIZES
-> +               conn->enc_key_size = 0;
-> +#else
->                 conn->enc_key_size = HCI_LINK_KEY_SIZE;
-> +#endif
->         } else {
->                 conn->enc_key_size = rp->key_size;
->         }
-> --
-> 2.25.1.696.g5e7596f4ac-goog
->
+
+
+--=20
+Luiz Augusto von Dentz
