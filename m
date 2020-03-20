@@ -2,64 +2,95 @@ Return-Path: <SRS0=7F+K=5F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0F9C4332B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 04:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8AF2C4332D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 05:14:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CC4920722
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 04:33:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8774C20722
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 05:14:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rgHqsJtR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727066AbgCTEd5 (ORCPT
+        id S1726791AbgCTFOg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Mar 2020 00:33:57 -0400
-Received: from shards.monkeyblade.net ([23.128.96.9]:46850 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725996AbgCTEd4 (ORCPT
+        Fri, 20 Mar 2020 01:14:36 -0400
+Received: from mail-yb1-f201.google.com ([209.85.219.201]:39545 "EHLO
+        mail-yb1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbgCTFOg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Mar 2020 00:33:56 -0400
-Received: from localhost (unknown [IPv6:2601:601:9f00:477::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 399E71590C684;
-        Thu, 19 Mar 2020 21:33:56 -0700 (PDT)
-Date:   Thu, 19 Mar 2020 21:33:55 -0700 (PDT)
-Message-Id: <20200319.213355.948621670202695571.davem@davemloft.net>
-To:     johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2020-03-19
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20200319192841.GA11720@aleibman-mobl1.ger.corp.intel.com>
-References: <20200319192841.GA11720@aleibman-mobl1.ger.corp.intel.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
+        Fri, 20 Mar 2020 01:14:36 -0400
+Received: by mail-yb1-f201.google.com with SMTP id h66so3354712yba.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Mar 2020 22:14:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=PVj+7SjNlIU45zNg0OacwKeLCyTTe1IlcmItJ3ZLdsI=;
+        b=rgHqsJtRCh7da2whEJ++sdjjuCw+liyyEiwPCV+Rw0Eoc+wm+RAVxIViw7zxMfZI2I
+         ITIlhJn0iV3U5huV7OWuJpRvXMQxWfp1ouxYuxsgqUjwhr27y0l9CoToQrjhZJ2NgTxP
+         gELcNcpau8Jo3xXUj4I2v3p/3hbw/qJZe9tMdfsqBkwd7qLBbfGEc5PVOmOwYOEsN9hn
+         wRRRIThK7lWuS4NrZ0Sq+pk5gjC1FNQ2shI4yPBvZ7tANtsUdCqev/nxSstM0qW8gT+r
+         Xm1clmyYnwQZNWYoJMumOzBw4nLJYeA2rTzUFeaxxmctoUwpRR8SNfXZ+UVWy4YNF413
+         PiIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=PVj+7SjNlIU45zNg0OacwKeLCyTTe1IlcmItJ3ZLdsI=;
+        b=G/ZM3+jS5n8slOtvXh+sCfvjGKTEGTVHKEXZc9b7VtsPe/fyEjjuKCt0bLOBzfvZWe
+         9JLdPlRN2KJl6PaXY3Tp8pxBucq8SuSEKZc7RtEWn1hyLzW69xA8d23ol1wMJpKI8Znr
+         VLoNgWOIXRqFpccdsV4DqSFfxq7mPdizKnlFNrrD0QPrxlBparcT0WU6hn01kvJeUQ4x
+         OWbEol0gxZfhGRe4aw+XAGkqARKSSF567Lf4u4nqQDWTvLB+HafBFza+sSCEqpqmqr4d
+         ZvJ+nY+xeWeBpfvtU5ckU+pXSxt7nBtavuitEMuISMIRWpELVfKeelAvnBXLZIyeuHXM
+         v0wg==
+X-Gm-Message-State: ANhLgQ1Ody+WWEQq/F890aX9NJYrsLYqYEZYRm9lf735T49sNph7PRt2
+        ZaeVWOpTFkrwJEKTVyyylN4LHqytqK0Puvl7wEgB41c0MA6f3CLjo5Wk1a5DSy11NajA10qSldM
+        5eDPycAtEIxNc7wYI+Y/fhMAoPyVl6JQfqCD68jTVuTKFmNUAOk4fGnTh1h1a+FXCsiBlQv3fIP
+        FQ
+X-Google-Smtp-Source: ADFU+vtFtuSTUtoIvDQMqYGyBCsInycFOftfioMRMyo9J2X1AVdPe5ITproPFtHtBOyZHOYzBwm13rr0a8xL
+X-Received: by 2002:a25:ba8b:: with SMTP id s11mr9610113ybg.343.1584681274855;
+ Thu, 19 Mar 2020 22:14:34 -0700 (PDT)
+Date:   Fri, 20 Mar 2020 13:14:25 +0800
+Message-Id: <20200320131356.Bluez.v1.1.Ia3d21e293d18f903fa6e54918856e1dd5ffc904f@changeid>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Thu, 19 Mar 2020 21:33:56 -0700 (PDT)
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
+Subject: [Bluez PATCH v1] avdtp: fix delay report valid states
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 19 Mar 2020 21:28:41 +0200
+From: Archie Pusaka <apusaka@chromium.org>
 
-> Here's the main bluetooth-next pull request for the 5.7 kernel.
-> 
->  - Added wideband speech support to mgmt and the ability for HCI drivers
->    to declare support for it.
->  - Added initial support for L2CAP Enhanced Credit Based Mode
->  - Fixed suspend handling for several use cases
->  - Fixed Extended Advertising related issues
->  - Added support for Realtek 8822CE device
->  - Added DT bindings for QTI chip WCN3991
->  - Cleanups to replace zero-length arrays with flexible-array members
->  - Several other smaller cleanups & fixes
-> 
-> Please let me know if there are any issues pulling. Thanks.
+According to AVDTP specification section 6.19,
+avdtp_delayreport_cmd could also be received when the state of SEP
+is open.
 
-Pulled, thanks Johan.
+Therefore, updating to accommodate such condition.
+---
+
+ profiles/audio/avdtp.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 0e075f9ff..4b0e63384 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1936,6 +1936,7 @@ static gboolean avdtp_delayreport_cmd(struct avdtp *session,
+ 	stream = sep->stream;
+ 
+ 	if (sep->state != AVDTP_STATE_CONFIGURED &&
++					sep->state != AVDTP_STATE_OPEN &&
+ 					sep->state != AVDTP_STATE_STREAMING) {
+ 		err = AVDTP_BAD_STATE;
+ 		goto failed;
+-- 
+2.25.1.696.g5e7596f4ac-goog
 
