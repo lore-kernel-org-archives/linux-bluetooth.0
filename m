@@ -2,461 +2,150 @@ Return-Path: <SRS0=7F+K=5F=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F445C4332D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A856CC4332B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:56:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E00F320724
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D5D920777
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:56:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DL5l9EiK"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gcT/fSxv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727244AbgCTUkr (ORCPT
+        id S1727479AbgCTU4h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Mar 2020 16:40:47 -0400
-Received: from mail-pj1-f53.google.com ([209.85.216.53]:33200 "EHLO
-        mail-pj1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgCTUkr (ORCPT
+        Fri, 20 Mar 2020 16:56:37 -0400
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:41810 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727453AbgCTU4g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Mar 2020 16:40:47 -0400
-Received: by mail-pj1-f53.google.com with SMTP id dw20so3810624pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 13:40:45 -0700 (PDT)
+        Fri, 20 Mar 2020 16:56:36 -0400
+Received: by mail-vs1-f65.google.com with SMTP id a63so4904896vsa.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 13:56:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=SPtZQZoHH1qWeINarZdm7D/9wA67EdiU96Um/PCrOyA=;
-        b=DL5l9EiKp6UfR3q516DsC14JYaovy3UzvzPjiV9aF1z8bkuC/hGSUvPOWxp+j8GfGL
-         tsJG1kOVhq2Dy7nG7kgo2T3uz4jn6DqqONHUN4a2J8WwR1attKWKPC4QkgCUlqF1sWlv
-         mTEdo7FyfpnyJJIHoaH3XzhpKr6gQ4+UW31yXTiA09Gn5d9XvPDBXl/vttkjgi2ccdLr
-         HROj3YnjxQmRDHFJ/f1BK5KP92Bc7RFJgSNg0sQipgyvylntgR/FCk104ouT+AFGURva
-         UVYHJ3WzXLPQNCcSxQPy0q7eXKHu5QQCwPjNqNMR44KYODIgQbu8DGds39EDZtJLFYmq
-         ovZQ==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OYdG2hZZXDgzoLuLkSsYKB717kSEQmaZ6NuxIAkbkRI=;
+        b=gcT/fSxvwm997aNwLBz/zCmRcQu7nWKXDJpT0PIDSQR8ASPqr6q7+iYrqwNI9OOzx5
+         HHoQ5CvwCFDFgIo3RDlaOMxpWDiYkob13WZ1XDH5c0lg54kPSz9RBhPZ9UN6Qh7jhU5U
+         MUILZ0Echiv7Ns1i1d7cKl6S/BY1KfmH59RFQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=SPtZQZoHH1qWeINarZdm7D/9wA67EdiU96Um/PCrOyA=;
-        b=onJP4NdxvqnAe6WVCplxRErv2EUv+XMUfPuOSpMufoljij5bk4QvpUfxl4Wnq16J/b
-         ajQjpsNOl3haGskNbVJIPRi7Xf8TKB50UskbOwCo94yehwZCMe0R/MS3cs3t4iqwwoNO
-         IlP6CKqYN0+auqDjVrWz1jKskoeLc4pvNEx4L3/IH6RP9JJHDFs0ueakD1FY3YT7Uset
-         9spIc1nVipJbcYWywuiBy3eP30bdeGXdP8nLuxVU/pPWJDtxIlb88lq9GPfQfWbFMILp
-         wU5iaFn+00ImsTCHaUkwX9GlL6UpbSsUIvhaljda+zLqAsYlEHYOLu/CbITsFSMTquXB
-         bBow==
-X-Gm-Message-State: ANhLgQ0wIVhzBAhdCHnkI81eC9Eju4k5K2RTSi1yAN3KJe97Qag0MbsZ
-        s3fJRg1kRLmQ7C9DrCUX2BuZCD9g
-X-Google-Smtp-Source: ADFU+vuLm+ra7KMu8J9pCWFVLmoOHXMZW+EZ9cQyOoab13mpFIDOb/MhvAZwQX0rQIT9g5UGgpySYg==
-X-Received: by 2002:a17:90a:aa0c:: with SMTP id k12mr11749811pjq.193.1584736844036;
-        Fri, 20 Mar 2020 13:40:44 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id d5sm6219522pga.36.2020.03.20.13.40.42
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 13:40:43 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 5/6] tools/l2cap-tester: Add test for Ext-Flowctl mode
-Date:   Fri, 20 Mar 2020 13:40:37 -0700
-Message-Id: <20200320204038.11799-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200320204038.11799-1-luiz.dentz@gmail.com>
-References: <20200320204038.11799-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OYdG2hZZXDgzoLuLkSsYKB717kSEQmaZ6NuxIAkbkRI=;
+        b=J2tCiMfvIgzsYJEtzxwGbPis+GrnfHGgBJGJm+5oO/vDM8seuYqjLnZYu1WUaBqJ94
+         KD4rw09YzsBwYU2G02ah5ztdZDWOJTMYSxRZyp1/erJArgj3Vswi9F1HX5RgOroeqZf0
+         CYNsFj35m/ThMGiarexoAqjuRk0E5HtVJlKgXEepSpztqbkIenOd4/s/AO7pZGv9+gwx
+         IZ4QgtM0+KELjkBzLa/A+58EYqUxdl1ZCg10DK1yJe61oeLq74jlWvQvgrUhH4Hj6+uu
+         AB+51TA/RNsEKB6A584/Kle5fsseOIjEqLbbb6x3D3DyexVTVZB9mFxQZJmYVD+4VEq6
+         aR9g==
+X-Gm-Message-State: ANhLgQ1JJYdK8VdzCKxGGULsWzvFByYk4Pzh9Ofrv/txddpTPPBdpV/i
+        Ta/Mr8+YDquGFwTckOUJuZcrhHCnjxVBu6dGo4EZvA==
+X-Google-Smtp-Source: ADFU+vtcGXL3fhlGGMllbHl+g02q56snlZV+onuaMun/wEuC1hbpQwMm+tjNvRXzZoBInnt9/mzSWyrRn3dNAiDI9JE=
+X-Received: by 2002:a67:ec81:: with SMTP id h1mr6782268vsp.96.1584737794701;
+ Fri, 20 Mar 2020 13:56:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200320020153.98280-1-abhishekpandit@chromium.org>
+ <20200319190144.1.I40cc9b3d5de04f0631c931d94757fb0f462b24bd@changeid> <CAD=FV=XT=NTyPag9wNCotATBzT4v9pg=OOa8X6=xWkMH2AFiLQ@mail.gmail.com>
+In-Reply-To: <CAD=FV=XT=NTyPag9wNCotATBzT4v9pg=OOa8X6=xWkMH2AFiLQ@mail.gmail.com>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Fri, 20 Mar 2020 13:56:23 -0700
+Message-ID: <CANFp7mUKRRQT0m9jRB4aeE3GeSW8UM6d-NVJ3CZmHibhSny3+g@mail.gmail.com>
+Subject: Re: [PATCH 1/1] Bluetooth: btmrvl: Detect hangs and force a reset of
+ the SDIO card
+To:     Doug Anderson <dianders@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Thanks for the heads up Doug. I'll resend the patch once I handle the
+case where the reset is immediate and not a full unplug/replug.
 
-This adds tests for Ext-Flowctl which uses ECRED PDUs.
----
- tools/l2cap-tester.c | 174 +++++++++++++++++++++++++++++++++----------
- 1 file changed, 136 insertions(+), 38 deletions(-)
+In the meantime, please do not merge this patch.
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 945f82caf..329bf65c8 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -61,6 +61,7 @@ struct l2cap_data {
- 	uint16_t client_psm;
- 	uint16_t server_psm;
- 	uint16_t cid;
-+	uint8_t mode;
- 	int expect_err;
- 
- 	uint8_t send_cmd_code;
-@@ -91,7 +92,7 @@ struct l2cap_data {
- 	uint8_t *client_bdaddr;
- 	bool server_not_advertising;
- 	bool direct_advertising;
--	bool close_one_socket;
-+	bool close_1;
- };
- 
- static void mgmt_debug(const char *str, void *user_data)
-@@ -474,17 +475,17 @@ static const struct l2cap_data le_client_close_socket_test_2 = {
- 	.server_not_advertising = true,
- };
- 
--static const struct l2cap_data le_client_two_sockets_same_client = {
-+static const struct l2cap_data le_client_2_same_client = {
- 	.client_psm = 0x0080,
- 	.server_psm = 0x0080,
- 	.server_not_advertising = true,
- };
- 
--static const struct l2cap_data le_client_two_sockets_close_one = {
-+static const struct l2cap_data le_client_2_close_1 = {
- 	.client_psm = 0x0080,
- 	.server_psm = 0x0080,
- 	.server_not_advertising = true,
--	.close_one_socket = true,
-+	.close_1 = true,
- };
- 
- static const struct l2cap_data le_client_connect_nval_psm_test = {
-@@ -549,6 +550,49 @@ static const struct l2cap_data le_att_server_success_test_1 = {
- 	.cid = 0x0004,
- };
- 
-+static const struct l2cap_data ext_flowctl_client_connect_success_test_1 = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.mode = BT_MODE_EXT_FLOWCTL,
-+};
-+
-+static const struct l2cap_data ext_flowctl_client_connect_adv_success_test_1 = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.mode = BT_MODE_EXT_FLOWCTL,
-+	.direct_advertising = true,
-+};
-+
-+static const struct l2cap_data ext_flowctl_client_connect_success_test_2 = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.mode = BT_MODE_EXT_FLOWCTL,
-+	.sec_level  = BT_SECURITY_MEDIUM,
-+};
-+
-+static const struct l2cap_data ext_flowctl_client_connect_reject_test_1 = {
-+	.client_psm = 0x0080,
-+	.mode = BT_MODE_EXT_FLOWCTL,
-+	.send_cmd = cmd_reject_rsp,
-+	.send_cmd_len = sizeof(cmd_reject_rsp),
-+	.expect_err = ECONNREFUSED,
-+};
-+
-+static const struct l2cap_data ext_flowctl_client_2 = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.mode = BT_MODE_EXT_FLOWCTL,
-+	.server_not_advertising = true,
-+};
-+
-+static const struct l2cap_data ext_flowctl_client_2_close_1 = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.mode = BT_MODE_EXT_FLOWCTL,
-+	.server_not_advertising = true,
-+	.close_1 = true,
-+};
-+
- static void client_cmd_complete(uint16_t opcode, uint8_t status,
- 					const void *param, uint8_t len,
- 					void *user_data)
-@@ -1031,7 +1075,7 @@ failed:
- }
- 
- static int create_l2cap_sock(struct test_data *data, uint16_t psm,
--						uint16_t cid, int sec_level)
-+				uint16_t cid, int sec_level, uint8_t mode)
- {
- 	const struct l2cap_data *l2data = data->test_data;
- 	const uint8_t *master_bdaddr;
-@@ -1091,6 +1135,17 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm,
- 		}
- 	}
- 
-+	if (mode) {
-+		if (setsockopt(sk, SOL_BLUETOOTH, BT_MODE, &mode,
-+							sizeof(mode)) < 0) {
-+			err = -errno;
-+			tester_warn("Can't set mode: %s (%d)", strerror(errno),
-+									errno);
-+			close(sk);
-+			return err;
-+		}
-+	}
-+
- 	return sk;
- }
- 
-@@ -1212,7 +1267,8 @@ static void test_connect(const void *test_data)
- 		hciemu_add_master_post_command_hook(data->hciemu,
- 						direct_adv_cmd_complete, NULL);
- 
--	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level);
-+	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level,
-+							l2data->mode);
- 	if (sk < 0) {
- 		tester_test_failed();
- 		return;
-@@ -1241,7 +1297,8 @@ static void test_connect_reject(const void *test_data)
- 	const struct l2cap_data *l2data = data->test_data;
- 	int sk;
- 
--	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level);
-+	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level,
-+							l2data->mode);
- 	if (sk < 0) {
- 		tester_test_failed();
- 		return;
-@@ -1256,29 +1313,40 @@ static void test_connect_reject(const void *test_data)
- 	close(sk);
- }
- 
--static void connect_socket(const uint8_t *client_bdaddr, int *sk_holder,
--							GIOFunc connect_cb)
-+static int connect_socket(const uint8_t *client_bdaddr, GIOFunc connect_cb,
-+								bool defer)
- {
- 	struct test_data *data = tester_get_data();
- 	const struct l2cap_data *l2data = data->test_data;
- 	GIOChannel *io;
- 	int sk;
- 
--	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level);
-+	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level,
-+							l2data->mode);
- 	if (sk < 0) {
- 		tester_print("Error in create_l2cap_sock");
- 		tester_test_failed();
--		return;
-+		return -1;
- 	}
- 
--	*sk_holder = sk;
-+	if (defer) {
-+		int opt = 1;
-+
-+		if (setsockopt(sk, SOL_BLUETOOTH, BT_DEFER_SETUP, &opt,
-+							sizeof(opt)) < 0) {
-+			tester_print("Can't enable deferred setup: %s (%d)",
-+						strerror(errno), errno);
-+			tester_test_failed();
-+			return -1;
-+		}
-+	}
- 
- 	if (connect_l2cap_impl(sk, client_bdaddr, BDADDR_LE_PUBLIC,
- 			l2data->client_psm, l2data->cid) < 0) {
- 		tester_print("Error in connect_l2cap_sock");
- 		close(sk);
- 		tester_test_failed();
--		return;
-+		return -1;
- 	}
- 
- 	if (connect_cb) {
-@@ -1290,7 +1358,10 @@ static void connect_socket(const uint8_t *client_bdaddr, int *sk_holder,
- 		g_io_channel_unref(io);
- 	}
- 
--	tester_print("Connect in progress, sk = %d", sk);
-+	tester_print("Connect in progress, sk = %d %s", sk,
-+				defer ? "(deferred)" : "");
-+
-+	return sk;
- }
- 
- static gboolean test_close_socket_1_part_3(gpointer arg)
-@@ -1457,11 +1528,11 @@ static void test_close_socket(const void *test_data)
- 	else
- 		client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
- 
--	connect_socket(client_bdaddr, &data->sk, NULL);
-+	data->sk = connect_socket(client_bdaddr, NULL, false);
- }
- 
--static uint8_t test_two_sockets_connect_cb_cnt;
--static gboolean test_two_sockets_connect_cb(GIOChannel *io, GIOCondition cond,
-+static uint8_t test_2_connect_cb_cnt;
-+static gboolean test_2_connect_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1485,15 +1556,15 @@ static gboolean test_two_sockets_connect_cb(GIOChannel *io, GIOCondition cond,
- 	}
- 
- 	tester_print("Successfully connected");
--	test_two_sockets_connect_cb_cnt++;
-+	test_2_connect_cb_cnt++;
- 
--	if (test_two_sockets_connect_cb_cnt == 2) {
-+	if (test_2_connect_cb_cnt == 2) {
- 		close(data->sk);
- 		close(data->sk2);
- 		tester_test_passed();
- 	}
- 
--	if (l2data->close_one_socket && test_two_sockets_connect_cb_cnt == 1) {
-+	if (l2data->close_1 && test_2_connect_cb_cnt == 1) {
- 		close(data->sk2);
- 		tester_test_passed();
- 	}
-@@ -1510,16 +1581,16 @@ static gboolean enable_advertising(gpointer args)
- 	return FALSE;
- }
- 
--static void test_connect_two_sockets_part_2(void)
-+static void test_connect_2_part_2(void)
- {
- 	struct test_data *data = tester_get_data();
- 	const struct l2cap_data *l2data = data->test_data;
- 	const uint8_t *client_bdaddr;
- 
- 	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
--	connect_socket(client_bdaddr, &data->sk2, test_two_sockets_connect_cb);
-+	data->sk2 = connect_socket(client_bdaddr, test_2_connect_cb, false);
- 
--	if (l2data->close_one_socket) {
-+	if (l2data->close_1) {
- 		tester_print("Closing first socket! %d", data->sk);
- 		close(data->sk);
- 	}
-@@ -1528,7 +1599,7 @@ static void test_connect_two_sockets_part_2(void)
- }
- 
- static uint8_t test_scan_enable_counter;
--static void test_connect_two_sockets_router(uint16_t opcode, const void *param,
-+static void test_connect_2_router(uint16_t opcode, const void *param,
- 					uint8_t length, void *user_data)
- {
- 	const struct bt_hci_cmd_le_set_scan_enable *scan_params = param;
-@@ -1538,23 +1609,24 @@ static void test_connect_two_sockets_router(uint16_t opcode, const void *param,
- 						scan_params->enable == true) {
- 		test_scan_enable_counter++;
- 		if (test_scan_enable_counter == 1)
--			test_connect_two_sockets_part_2();
-+			test_connect_2_part_2();
- 		else if (test_scan_enable_counter == 2)
- 			g_idle_add(enable_advertising, NULL);
- 	}
- }
- 
--static void test_connect_two_sockets(const void *test_data)
-+static void test_connect_2(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
- 	const struct l2cap_data *l2data = data->test_data;
- 	const uint8_t *client_bdaddr;
-+	bool defer;
- 
--	test_two_sockets_connect_cb_cnt = 0;
-+	test_2_connect_cb_cnt = 0;
- 	test_scan_enable_counter = 0;
- 
- 	hciemu_add_master_post_command_hook(data->hciemu,
--				test_connect_two_sockets_router, data);
-+				test_connect_2_router, data);
- 
- 	if (l2data->server_psm) {
- 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-@@ -1564,12 +1636,14 @@ static void test_connect_two_sockets(const void *test_data)
- 						NULL, NULL);
- 	}
- 
-+	defer = (l2data->mode == BT_MODE_EXT_FLOWCTL);
-+
- 	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
--	if (l2data->close_one_socket)
--		connect_socket(client_bdaddr, &data->sk, NULL);
-+	if (l2data->close_1)
-+		data->sk = connect_socket(client_bdaddr, NULL, defer);
- 	else
--		connect_socket(client_bdaddr, &data->sk,
--						test_two_sockets_connect_cb);
-+		data->sk = connect_socket(client_bdaddr, test_2_connect_cb,
-+								defer);
- }
- 
- static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
-@@ -1727,7 +1801,8 @@ static void test_server(const void *test_data)
- 
- 	if (l2data->server_psm || l2data->cid) {
- 		sk = create_l2cap_sock(data, l2data->server_psm,
--					l2data->cid, l2data->sec_level);
-+					l2data->cid, l2data->sec_level,
-+					l2data->mode);
- 		if (sk < 0) {
- 			tester_test_failed();
- 			return;
-@@ -1776,7 +1851,7 @@ static void test_getpeername_not_connected(const void *test_data)
- 	socklen_t len;
- 	int sk;
- 
--	sk = create_l2cap_sock(data, 0, 0, 0);
-+	sk = create_l2cap_sock(data, 0, 0, 0, 0);
- 	if (sk < 0) {
- 		tester_test_failed();
- 		return;
-@@ -1902,14 +1977,14 @@ int main(int argc, char *argv[])
- 				test_close_socket);
- 
- 	test_l2cap_le("L2CAP LE Client - Open two sockets",
--				&le_client_two_sockets_same_client,
-+				&le_client_2_same_client,
- 				setup_powered_client,
--				test_connect_two_sockets);
-+				test_connect_2);
- 
- 	test_l2cap_le("L2CAP LE Client - Open two sockets close one",
--				&le_client_two_sockets_close_one,
-+				&le_client_2_close_1,
- 				setup_powered_client,
--				test_connect_two_sockets);
-+				test_connect_2);
- 
- 	test_l2cap_le("L2CAP LE Client - Invalid PSM",
- 					&le_client_connect_nval_psm_test,
-@@ -1920,6 +1995,29 @@ int main(int argc, char *argv[])
- 					setup_powered_server, test_server);
- 
- 
-+	test_l2cap_le("L2CAP Ext-Flowctl Client - Success",
-+				&ext_flowctl_client_connect_success_test_1,
-+				setup_powered_client, test_connect);
-+	test_l2cap_le("L2CAP Ext-Flowctl Client, Direct Advertising - Success",
-+				&ext_flowctl_client_connect_adv_success_test_1,
-+				setup_powered_client, test_connect);
-+	test_l2cap_le("L2CAP Ext-Flowctl Client SMP - Success",
-+				&ext_flowctl_client_connect_success_test_2,
-+				setup_powered_client, test_connect);
-+	test_l2cap_le("L2CAP Ext-Flowctl Client - Command Reject",
-+				&ext_flowctl_client_connect_reject_test_1,
-+				setup_powered_client, test_connect);
-+
-+	test_l2cap_le("L2CAP Ext-Flowctl Client - Open two sockets",
-+				&ext_flowctl_client_2,
-+				setup_powered_client,
-+				test_connect_2);
-+
-+	test_l2cap_le("L2CAP Ext-Flowctl Client - Open two sockets close one",
-+				&ext_flowctl_client_2_close_1,
-+				setup_powered_client,
-+				test_connect_2);
-+
- 	test_l2cap_le("L2CAP LE ATT Client - Success",
- 				&le_att_client_connect_success_test_1,
- 				setup_powered_client, test_connect);
--- 
-2.21.1
+Thanks
+Abhishek
 
+On Fri, Mar 20, 2020 at 1:00 PM Doug Anderson <dianders@chromium.org> wrote:
+>
+> Hi,
+>
+> On Thu, Mar 19, 2020 at 7:02 PM Abhishek Pandit-Subedi
+> <abhishekpandit@chromium.org> wrote:
+> >
+> > From: Matthias Kaehlcke <mka@chromium.org>
+> >
+> > When scanning for BLE devices for a longer period (e.g. because a
+> > BLE device is paired, but not connected) the Marvell 8997 often
+> > ends up in a borked state, which manifests through failures on
+> > certain SDIO transactions.
+> >
+> > When such a SDIO failure is detected force a reset of the SDIO
+> > card to initialize it from scratch. Since the SDIO bus is shared
+> > with the WiFi part of the chip this also involves a reset of WiFi.
+> >
+> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > ---
+> >
+> >  drivers/bluetooth/btmrvl_sdio.c | 24 ++++++++++++++++++++++++
+> >  drivers/bluetooth/btmrvl_sdio.h |  1 +
+> >  2 files changed, 25 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> > index 0f3a020703ab..69a8b6b3c11c 100644
+> > --- a/drivers/bluetooth/btmrvl_sdio.c
+> > +++ b/drivers/bluetooth/btmrvl_sdio.c
+> > @@ -22,6 +22,8 @@
+> >  #include <linux/slab.h>
+> >  #include <linux/suspend.h>
+> >
+> > +#include <linux/mmc/core.h>
+> > +#include <linux/mmc/card.h>
+> >  #include <linux/mmc/sdio_ids.h>
+> >  #include <linux/mmc/sdio_func.h>
+> >  #include <linux/module.h>
+> > @@ -59,6 +61,23 @@ static const struct of_device_id btmrvl_sdio_of_match_table[] = {
+> >         { }
+> >  };
+> >
+> > +static void btmrvl_sdio_card_reset_work(struct work_struct *work)
+> > +{
+> > +       struct btmrvl_sdio_card *card =
+> > +               container_of(work, struct btmrvl_sdio_card, reset_work);
+> > +       struct sdio_func *func = card->func;
+> > +
+> > +       sdio_claim_host(func);
+> > +       mmc_hw_reset(func->card->host);
+>
+> The fact that you don't check the return value here seems like a
+> problem.  See specifically how commit cdb2256f795e ("mwifiex: Re-work
+> support for SDIO HW reset") handles it.
+>
+> This is a distinct difference between the solution that we landed in
+> Chrome OS 4.19 and what landed upstream.  In Chrome OS 4.19 we went
+> the simple approach and said that there was only one way to reset the
+> card: treat it as a full unplug / replug of the card.  ...but upstream
+> adopted a different solution.  For upstream if there is only a single
+> function on the SD card it will not trigger a full unplug/replug and
+> it's up to the function driver to re-init itself.  This wasn't such a
+> big deal for the WiFi driver since it already had a way to re-init
+> itself (mwifiex_reinit_sw).  I don't know how hard it will be for
+> Bluetooth, but that needs to be part of this patch I think?
+>
+> -Doug
