@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D9BC4332E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF33C4332D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E484F20775
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3036220775
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Mar 2020 20:40:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xb4jyRwN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWnuFkkl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727175AbgCTUkm (ORCPT
+        id S1727191AbgCTUkn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Mar 2020 16:40:42 -0400
-Received: from mail-pg1-f175.google.com ([209.85.215.175]:36748 "EHLO
-        mail-pg1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbgCTUkm (ORCPT
+        Fri, 20 Mar 2020 16:40:43 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:35898 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726829AbgCTUkn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Mar 2020 16:40:42 -0400
-Received: by mail-pg1-f175.google.com with SMTP id z72so3669994pgz.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 13:40:41 -0700 (PDT)
+        Fri, 20 Mar 2020 16:40:43 -0400
+Received: by mail-pg1-f194.google.com with SMTP id z72so3670015pgz.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Mar 2020 13:40:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=J0gRxRXyxfA2V4DkT12cYVAYJsKd5h2szCe6R/5EH1M=;
-        b=Xb4jyRwN4wKuLxMYT1/XKZBSHORuNMRDBRfQ5XCi8DDBP17eoQm6EfmN9P9P3zlIKQ
-         swnCL7z8hc7inR0DRg2oCNQ0hf3oI2F8Hl67kkhIpgvK5ETP9mF3vHG9A7ZldPp/5dfD
-         agcbyW2um8O7ldQvuNOKEKFeOjfHFeWAWpNomrw2zmshnldjFq/YI8Xq6bTI0hIe6HOI
-         85wLytVWaNGQFJWC1Y+GQmz0ttcpxzVd5BIrPN/WxlD0ltZ/lgamzR7DwVt6g0r+z8JC
-         FVEHAo3U7z24+To6FGnogEqmeGS5eBMvqmJPXVT7YoEaG9oSIbPIPmVAS6+x/4HpZPT0
-         otHw==
+        bh=IBv8hQNbmpTa0AIoocboT1khiHc/5SGjGyL7viltjm4=;
+        b=nWnuFkklLsg2Tli+aftXj4c4QxFJ7m5zwdhvGAFhnk7EpPhsQxBHaW8Uqlj+kK5fiT
+         JrPvWL4RW3HjHLgdm6LaaF3c/SZCdMXklhQNJ6+d/6fjApuLdlfItgB4bP9NpeObs5J2
+         uargoKaalo8ZB3dciPS4egmbFM3Vi0eENgtht0aLUT984SQsBaPbw4DOL2ImVdYqq780
+         w/7cnvOyr1IBE0XEh5DTk3yUCe18NAeoeZUEiYrrDRK778haf3TQnZMaShvEvo2P+9VZ
+         fdYxOwDsUgqrzcUJ9o966QckYXfEBMR8rRddH/qqUBocf87WKU5LGXXYaxlQRaORztbm
+         AGKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=J0gRxRXyxfA2V4DkT12cYVAYJsKd5h2szCe6R/5EH1M=;
-        b=Tu4LgusK7nrQzXmvNlytEUOIzNo1y/N95RZcaL2i5Hay/54IW+w67Iv1kDXhMNQ3u3
-         NCaG9OhIp1mLjbJKI8nyu8UD7hP+swflImJLLTxCSmCtc3VkN/naGfH8+WRNxSo0EKta
-         3OggBi9vXFAGM8+FhiocoHJELHWSP/BvHOMxEUYoceTwCNNm9V7YWXuI/6HNi5BGqy+l
-         FlqqD5ZewAXkgpRcQ76I9IvHGSzb3lGXRCNfNZ5qy0VRMR0qpM0uJBCM0YlrCzwngfOK
-         Dkko1OWcggcKCRTSUBKU9ycM2ZMYP6Kach631vha45XZHhqD6Y1EGWMAHGRy+kR7j6hm
-         v7CQ==
-X-Gm-Message-State: ANhLgQ3Ttlk4rt/QLZtKM+t1Cn+bGEjfLIn/OlMdWkdNmDSSpKe4KIrp
-        bimnw8Sc0szSsSRA6ATwV/SRxZYr
-X-Google-Smtp-Source: ADFU+vuQTtfHoIydPozPscwUtF8scqXiOI8kOH1rkT1Z2xtC4TF/IBPEwzlTLEDMvH+Ot6LnTP7qyw==
-X-Received: by 2002:a63:ba5d:: with SMTP id l29mr10200784pgu.67.1584736840679;
-        Fri, 20 Mar 2020 13:40:40 -0700 (PDT)
+        bh=IBv8hQNbmpTa0AIoocboT1khiHc/5SGjGyL7viltjm4=;
+        b=NO4o5jezoXRe0dN1YFMxD8PbKp4wnB/xfpUN9drAf1B/wwGPEysXJzH+aZt28eQA/W
+         V+9YGOY1JIClALEvDZsZLHPTvUxGpnigF6b+cVyg0OuTsZoxA8oqKgTToAzoE663m+qt
+         UiW35MY/QDukNIDzYDf/LXFRA6I6PNM9MXapJYgaDWs+W+/RiejI4zWyeASBewk4M7ot
+         hZ9PiDzRyv0kBt//4Stafy6hUXvLM8HYlqPKmICoyW5u5l8jL82CdfAJu5rLIO/WqXa3
+         KfRzj8Z7LVfIPIKZxSIh8xMOdTJG8d/LA8+iYB0hAISz2BpAajLAkNT5+cPr7CdvSaor
+         Td2w==
+X-Gm-Message-State: ANhLgQ03P6fqrxG65tUjQnHYLDU8xnVJ4758Xso6WEsWP75NXYTpDmAW
+        X225txyN852W1A8LZbHU6Ad9+mru
+X-Google-Smtp-Source: ADFU+vvMqlU+leHcscU8s7wbh9pvIBzVyy5M/KfW1TXLkjAcAS81zw1icg2IyJXhnaCnsBvFZCb6pA==
+X-Received: by 2002:a63:a06e:: with SMTP id u46mr10277458pgn.140.1584736841788;
+        Fri, 20 Mar 2020 13:40:41 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id d5sm6219522pga.36.2020.03.20.13.40.39
+        by smtp.gmail.com with ESMTPSA id d5sm6219522pga.36.2020.03.20.13.40.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Mar 2020 13:40:39 -0700 (PDT)
+        Fri, 20 Mar 2020 13:40:40 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 2/6] btio: Add mode to for Enhanced Credit Mode
-Date:   Fri, 20 Mar 2020 13:40:34 -0700
-Message-Id: <20200320204038.11799-2-luiz.dentz@gmail.com>
+Subject: [PATCH v4 3/6] l2test: Add support for BT_MODE_EXT_FLOWCTL
+Date:   Fri, 20 Mar 2020 13:40:35 -0700
+Message-Id: <20200320204038.11799-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200320204038.11799-1-luiz.dentz@gmail.com>
 References: <20200320204038.11799-1-luiz.dentz@gmail.com>
@@ -74,132 +74,59 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds BT_IO_MODE_EXT_FLOWCTL which directly maps to
+This enables using l2test to connect or listen with
 BT_MODE_EXT_FLOWCTL.
 ---
- btio/btio.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++------
- btio/btio.h |  6 +++---
- 2 files changed, 56 insertions(+), 9 deletions(-)
+ tools/l2test.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index db37b99da..e7b4db16b 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -630,18 +630,34 @@ static gboolean set_le_imtu(int sock, uint16_t imtu, GError **err)
- 	return TRUE;
- }
+diff --git a/tools/l2test.c b/tools/l2test.c
+index 8c6e08646..0d846ed93 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -143,13 +143,14 @@ struct lookup_table {
+ };
  
-+static gboolean set_le_mode(int sock, uint8_t mode, GError **err)
-+{
-+	if (setsockopt(sock, SOL_BLUETOOTH, BT_MODE, &mode,
-+						sizeof(mode)) < 0) {
-+		ERROR_FAILED(err, "setsockopt(BT_MODE)", errno);
-+		return FALSE;
+ static struct lookup_table l2cap_modes[] = {
+-	{ "basic",	L2CAP_MODE_BASIC	},
++	{ "basic",	BT_MODE_BASIC		},
+ 	/* Not implemented
+-	{ "flowctl",	L2CAP_MODE_FLOWCTL	},
+-	{ "retrans",	L2CAP_MODE_RETRANS	},
++	{ "flowctl",	BT_MODE_FLOWCTL		},
++	{ "retrans",	BT_MODE_RETRANS		},
+ 	*/
+-	{ "ertm",	L2CAP_MODE_ERTM		},
+-	{ "streaming",	L2CAP_MODE_STREAMING	},
++	{ "ertm",	BT_MODE_ERTM		},
++	{ "streaming",	BT_MODE_STREAMING	},
++	{ "ext-flowctl",BT_MODE_EXT_FLOWCTL	},
+ 	{ 0 }
+ };
+ 
+@@ -283,7 +284,7 @@ static int getopts(int sk, struct l2cap_options *opts, bool connected)
+ 
+ 	memset(opts, 0, sizeof(*opts));
+ 
+-	if (bdaddr_type == BDADDR_BREDR) {
++	if (bdaddr_type == BDADDR_BREDR || rfcmode) {
+ 		optlen = sizeof(*opts);
+ 		return getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts, &optlen);
+ 	}
+@@ -303,6 +304,13 @@ static int setopts(int sk, struct l2cap_options *opts)
+ 		return setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts,
+ 								sizeof(*opts));
+ 
++	if (opts->mode) {
++		if (setsockopt(sk, SOL_BLUETOOTH, BT_MODE, &opts->mode,
++						sizeof(opts->mode)) < 0) {
++			return -errno;
++		}
 +	}
 +
-+	return TRUE;
-+}
-+
- static gboolean l2cap_set(int sock, uint8_t src_type, int sec_level,
- 				uint16_t imtu, uint16_t omtu, uint8_t mode,
- 				int master, int flushable, uint32_t priority,
- 				GError **err)
- {
- 	if (imtu || omtu || mode) {
--		gboolean ret;
-+		gboolean ret = FALSE;
- 
- 		if (src_type == BDADDR_BREDR)
- 			ret = set_l2opts(sock, imtu, omtu, mode, err);
--		else
--			ret = set_le_imtu(sock, imtu, err);
-+		else {
-+			if (imtu)
-+				ret = set_le_imtu(sock, imtu, err);
-+
-+			if (ret && mode)
-+				ret = set_le_mode(sock, mode, err);
-+		}
- 
- 		if (!ret)
- 			return ret;
-@@ -980,6 +996,30 @@ static int get_phy(int sock, uint32_t *phy)
- 	return 0;
+ 	return setsockopt(sk, SOL_BLUETOOTH, BT_RCVMTU, &opts->imtu,
+ 							sizeof(opts->imtu));
  }
- 
-+static int get_le_imtu(int sock, uint16_t *mtu)
-+{
-+	socklen_t len;
-+
-+	len = sizeof(*mtu);
-+
-+	if (getsockopt(sock, SOL_BLUETOOTH, BT_RCVMTU, mtu, &len) < 0)
-+		return -errno;
-+
-+	return 0;
-+}
-+
-+static int get_le_mode(int sock, uint8_t *mode)
-+{
-+	socklen_t len;
-+
-+	len = sizeof(*mode);
-+
-+	if (getsockopt(sock, SOL_BLUETOOTH, BT_MODE, mode, &len) < 0)
-+		return -errno;
-+
-+	return 0;
-+}
-+
- static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
- 								va_list args)
- {
-@@ -999,10 +1039,11 @@ static gboolean l2cap_get(int sock, GError **err, BtIOOption opt1,
- 	memset(&l2o, 0, sizeof(l2o));
- 
- 	if (src.l2_bdaddr_type != BDADDR_BREDR) {
--		len = sizeof(l2o.imtu);
--		if (getsockopt(sock, SOL_BLUETOOTH, BT_RCVMTU,
--						&l2o.imtu, &len) == 0)
-+		if (get_le_imtu(sock, &l2o.imtu) == 0) {
-+			/* Older kernels may not support BT_MODE */
-+			get_le_mode(sock, &l2o.mode);
- 			goto parse_opts;
-+		}
- 
- 		/* Non-LE CoC enabled kernels will return one of these
- 		 * in which case we need to fall back to L2CAP_OPTIONS.
-@@ -1644,6 +1685,12 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gpointer user_data,
- 
- 	sock = g_io_channel_unix_get_fd(io);
- 
-+	/* Use DEFER_SETUP when connecting using Ext-Flowctl */
-+	if (opts.mode == BT_IO_MODE_EXT_FLOWCTL && opts.defer) {
-+		setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP, &opts.defer,
-+							sizeof(opts.defer));
-+	}
-+
- 	switch (opts.type) {
- 	case BT_IO_L2CAP:
- 		err = l2cap_connect(sock, &opts.dst, opts.dst_type,
-diff --git a/btio/btio.h b/btio/btio.h
-index 41a017acb..23e0ef72b 100644
---- a/btio/btio.h
-+++ b/btio/btio.h
-@@ -68,10 +68,10 @@ typedef enum {
- 
- typedef enum {
- 	BT_IO_MODE_BASIC = 0,
--	BT_IO_MODE_RETRANS,
--	BT_IO_MODE_FLOWCTL,
- 	BT_IO_MODE_ERTM,
--	BT_IO_MODE_STREAMING
-+	BT_IO_MODE_STREAMING,
-+	BT_IO_MODE_LE_FLOWCTL,
-+	BT_IO_MODE_EXT_FLOWCTL
- } BtIOMode;
- 
- typedef void (*BtIOConfirm)(GIOChannel *io, gpointer user_data);
 -- 
 2.21.1
 
