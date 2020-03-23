@@ -1,171 +1,251 @@
-Return-Path: <SRS0=Z+ax=5H=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=apyX=5I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12219C1975A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Mar 2020 22:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADCCBC1975A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 01:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB90020722
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Mar 2020 22:10:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77D4420722
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 01:51:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="oeXXi7HJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbgCVWKP (ORCPT
+        id S1727005AbgCWBvh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 Mar 2020 18:10:15 -0400
-Received: from mail-il1-f200.google.com ([209.85.166.200]:46156 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726814AbgCVWKO (ORCPT
+        Sun, 22 Mar 2020 21:51:37 -0400
+Received: from mail27.static.mailgun.info ([104.130.122.27]:47707 "EHLO
+        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726955AbgCWBvh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 Mar 2020 18:10:14 -0400
-Received: by mail-il1-f200.google.com with SMTP id a2so10949754ill.13
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Mar 2020 15:10:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=B9V+9G16l/n/I5DhGTuXZFS/jqwZ2Fhm405AxG9r1pg=;
-        b=GGTVVukJgckHv5so6HRS7y4t/RR/9gufa+aPxMk5C6Cbj/WZ9Y8gYY4GUJQj3PrsXr
-         Z6UNLoP00bhI2FACp5MbHH1x7v0e3a+a4RUppOuyxtCA8B1QWDfQ8M/omxohyhZICy/m
-         ugJutWqRfUQS8/OZEJMvI6oFGzpSuSQSw/C1P33WnO9w7bK1oSu49CNVf/1T/XNHfnTW
-         tqy/9MEqnieDsxfIjcWHNRIesUFl7jnGgi5htEbb6HzmSsCDa2tJcWcaqr6PJOIuwp6g
-         lusH7qmplTmY2B5p1d76mo+lEFwdHhiJFKOiBUsSS/PUvFjxXbYbQrVVjhHSLnSFOk/y
-         0P4g==
-X-Gm-Message-State: ANhLgQ26WpNd1+f3RioIAGINxZT5zESmAQf6/GexWlNGOdgbSXJpFUk6
-        QKmLQdonshcVvmwLPgYQw94EUuLchFJNb4cl687GbaqFN4hh
-X-Google-Smtp-Source: ADFU+vuVzjeEae7o1I+HmgNwpk7n+z9OFE7PjR4XzqQ7rReEZvT7Bk7TowM0Ye8DlHwyauMrZFI30PW97b+EynOafYnyNSP79YIR
+        Sun, 22 Mar 2020 21:51:37 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1584928297; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=rVs4UhZfq5ySydb0Mkp7e5H5eaz7AWJc5B+WJxcd6OA=;
+ b=oeXXi7HJAdAjRFRsaDWEuaayd8gRaII5+76Nyvyy349dSO4m+QHZdEUB32tFink+IeTdYxuf
+ KipznAjn701kjhg0OAt0LCVvZdYL8+rAB73cql1C0v6yvxMZy8s8JYIUNFLZ3Fat5gF9opbn
+ OqtbJJA09xfH0q21CW4tvS4JQqE=
+X-Mailgun-Sending-Ip: 104.130.122.27
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e78161f.7f05264692d0-smtp-out-n03;
+ Mon, 23 Mar 2020 01:51:27 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id C2B99C43636; Mon, 23 Mar 2020 01:51:27 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id CF9E2C433D2;
+        Mon, 23 Mar 2020 01:51:26 +0000 (UTC)
 MIME-Version: 1.0
-X-Received: by 2002:a92:6b0f:: with SMTP id g15mr12326695ilc.69.1584915013914;
- Sun, 22 Mar 2020 15:10:13 -0700 (PDT)
-Date:   Sun, 22 Mar 2020 15:10:13 -0700
-In-Reply-To: <000000000000e9e518059fd84189@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006758f505a178c84f@google.com>
-Subject: Re: KASAN: use-after-free Write in hci_sock_bind (2)
-From:   syzbot <syzbot+04e804c8c2224b6a9497@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Mon, 23 Mar 2020 09:51:26 +0800
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
+        linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v1 1/2] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC QCA6390
+In-Reply-To: <20200316174615.GP144492@google.com>
+References: <20200314094328.3331-1-rjliao@codeaurora.org>
+ <20200316174615.GP144492@google.com>
+Message-ID: <1aff039c60da7e1d188bd5ef8750eefd@codeaurora.org>
+X-Sender: rjliao@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+在 2020-03-17 01:46，Matthias Kaehlcke 写道：
+> On Sat, Mar 14, 2020 at 05:43:27PM +0800, Rocky Liao wrote:
+>> This patch adds support for QCA6390, including the devicetree and acpi
+>> compatible hwid matching, and patch/nvm downloading.
+>> 
+>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+>> ---
+>>  drivers/bluetooth/btqca.c   | 44 +++++++++++++++++++++++++++++++----
+>>  drivers/bluetooth/btqca.h   |  8 +++++++
+>>  drivers/bluetooth/hci_qca.c | 46 
+>> +++++++++++++++++++++++++++++++------
+>>  3 files changed, 86 insertions(+), 12 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> index a16845c0751d..ca126e499c58 100644
+>> --- a/drivers/bluetooth/btqca.c
+>> +++ b/drivers/bluetooth/btqca.c
+>> @@ -14,6 +14,9 @@
+>> 
+>>  #define VERSION "0.1"
+>> 
+>> +#define QCA_IS_3991_6390(soc_type)    \
+>> +	(soc_type == QCA_WCN3991 || soc_type == QCA_QCA6390)
+> 
+> This macro style is 3991 or 6390 is pretty ugly, IMO it's worse than 
+> the
+> problem it intends to solve.
+> 
+> I would either just spell out what the macro does, or if that becomes 
+> to
+> cumbersome (especially when more types are added) have a macro that 
+> checks
+> a bitmask like:
+> 
+> qca_soc_type_matches(soc_type, QCA_WCN3991 | QCA6390)
+> 
+> For this the SoC types read from FW would have to be mapped to a bit 
+> for
+> each SoC type, which could be done during initialization.
+> 
+> Another alternative could be to have a set of flags that indicate if a 
+> SoC
+> has certain characteristics (e.g. enhanced logging needs to be 
+> enabled),
+> these flags could be set during initialization.
+> 
 
-HEAD commit:    770fbb32 Add linux-next specific files for 20200228
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=108618ade00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=576314276bce4ad5
-dashboard link: https://syzkaller.appspot.com/bug?extid=04e804c8c2224b6a9497
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11fc5e75e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10707013e00000
+I prefer to adopt Bala's suggestion to use soc_type >= QCA_WCN3991
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+04e804c8c2224b6a9497@syzkaller.appspotmail.com
+>> +
+>>  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+>>  			 enum qca_btsoc_type soc_type)
+>>  {
+>> @@ -32,7 +35,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 
+>> *soc_version,
+>>  	 * VSE event. WCN3991 sends version command response as a payload to
+>>  	 * command complete event.
+>>  	 */
+>> -	if (soc_type == QCA_WCN3991) {
+>> +	if (QCA_IS_3991_6390(soc_type)) {
+>>  		event_type = 0;
+>>  		rlen += 1;
+>>  		rtype = EDL_PATCH_VER_REQ_CMD;
+>> @@ -69,7 +72,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 
+>> *soc_version,
+>>  		goto out;
+>>  	}
+>> 
+>> -	if (soc_type == QCA_WCN3991)
+>> +	if (QCA_IS_3991_6390(soc_type))
+>>  		memmove(&edl->data, &edl->data[1], sizeof(*ver));
+>> 
+>>  	ver = (struct qca_btsoc_version *)(edl->data);
+>> @@ -138,6 +141,29 @@ int qca_send_pre_shutdown_cmd(struct hci_dev 
+>> *hdev)
+>>  }
+>>  EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
+>> 
+>> +int qca_send_enhancelog_enable_cmd(struct hci_dev *hdev)
+>> +{
+>> +	struct sk_buff *skb;
+>> +	int err;
+>> +	const u8 param[2] = {0x14, 0x01};
+>> +
+>> +	bt_dev_dbg(hdev, "QCA enhanced log enable cmd");
+>> +
+>> +	skb = __hci_cmd_sync_ev(hdev, QCA_ENHANCED_LOG_ENABLE_CMD, 2,
+>> +				param, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
+>> +
+>> +	if (IS_ERR(skb)) {
+>> +		err = PTR_ERR(skb);
+>> +		bt_dev_err(hdev, "Enhanced log enable cmd failed (%d)", err);
+>> +		return err;
+>> +	}
+>> +
+>> +	kfree_skb(skb);
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(qca_send_enhancelog_enable_cmd);
+>> +
+>>  static void qca_tlv_check_data(struct qca_fw_config *config,
+>>  		const struct firmware *fw, enum qca_btsoc_type soc_type)
+>>  {
+>> @@ -217,7 +243,7 @@ static void qca_tlv_check_data(struct 
+>> qca_fw_config *config,
+>>  				tlv_nvm->data[0] |= 0x80;
+>> 
+>>  				/* UART Baud Rate */
+>> -				if (soc_type == QCA_WCN3991)
+>> +				if (QCA_IS_3991_6390(soc_type))
+>>  					tlv_nvm->data[1] = nvm_baud_rate;
+>>  				else
+>>  					tlv_nvm->data[2] = nvm_baud_rate;
+>> @@ -268,7 +294,7 @@ static int qca_tlv_send_segment(struct hci_dev 
+>> *hdev, int seg_size,
+>>  	 * VSE event. WCN3991 sends version command response as a payload to
+>>  	 * command complete event.
+>>  	 */
+>> -	if (soc_type == QCA_WCN3991) {
+>> +	if (QCA_IS_3991_6390(soc_type)) {
+>>  		event_type = 0;
+>>  		rlen = sizeof(*edl);
+>>  		rtype = EDL_PATCH_TLV_REQ_CMD;
+>> @@ -301,7 +327,7 @@ static int qca_tlv_send_segment(struct hci_dev 
+>> *hdev, int seg_size,
+>>  		err = -EIO;
+>>  	}
+>> 
+>> -	if (soc_type == QCA_WCN3991)
+>> +	if (QCA_IS_3991_6390(soc_type))
+>>  		goto out;
+>> 
+>>  	tlv_resp = (struct tlv_seg_resp *)(edl->data);
+>> @@ -442,6 +468,11 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate,
+>>  			    (soc_ver & 0x0000000f);
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/crbtfw%02x.tlv", rom_ver);
+>> +	} else if (soc_type == QCA_QCA6390) {
+>> +		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
+>> +			    (soc_ver & 0x0000000f);
+>> +		snprintf(config.fwname, sizeof(config.fwname),
+>> +			 "qca/htbtfw%02x.tlv", rom_ver);
+>>  	} else {
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/rampatch_%08x.bin", soc_ver);
+>> @@ -464,6 +495,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate,
+>>  	else if (qca_is_wcn399x(soc_type))
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/crnv%02x.bin", rom_ver);
+>> +	else if (soc_type == QCA_QCA6390)
+>> +		snprintf(config.fwname, sizeof(config.fwname),
+>> +			 "qca/htnv%02x.bin", rom_ver);
+>>  	else
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/nvm_%08x.bin", soc_ver);
+>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> index e16a4d650597..bc703817c3d7 100644
+>> --- a/drivers/bluetooth/btqca.h
+>> +++ b/drivers/bluetooth/btqca.h
+>> @@ -14,6 +14,7 @@
+>>  #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+>>  #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+>>  #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+>> +#define QCA_ENHANCED_LOG_ENABLE_CMD     (0xFC17)
+>> 
+>>  #define EDL_CMD_REQ_RES_EVT		(0x00)
+>>  #define EDL_PATCH_VER_RES_EVT		(0x19)
+>> @@ -127,6 +128,7 @@ enum qca_btsoc_type {
+>>  	QCA_WCN3990,
+>>  	QCA_WCN3991,
+>>  	QCA_WCN3998,
+>> +	QCA_QCA6390,
+> 
+> QCA_QCAxxxx seems a bit redundant, why not call it QCA_6390 or QCA6390?
+> I also wouldn't be opposed to scrap the QCA_ prefixes from the WCN399x
+> types, this is the QCA Bluetooth driver, so it's pretty evident that
+> these are Qualcomm chips.
 
-==================================================================
-BUG: KASAN: use-after-free in instrument_atomic_write include/linux/instrumented.h:71 [inline]
-BUG: KASAN: use-after-free in atomic_inc include/asm-generic/atomic-instrumented.h:240 [inline]
-BUG: KASAN: use-after-free in hci_sock_bind+0x591/0x1140 net/bluetooth/hci_sock.c:1250
-Write of size 4 at addr ffff888089679078 by task syz-executor918/10028
-
-CPU: 1 PID: 10028 Comm: syz-executor918 Not tainted 5.6.0-rc3-next-20200228-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x188/0x20d lib/dump_stack.c:118
- print_address_description.constprop.0.cold+0xd3/0x315 mm/kasan/report.c:374
- __kasan_report.cold+0x1a/0x32 mm/kasan/report.c:506
- kasan_report+0xe/0x20 mm/kasan/common.c:618
- check_memory_region_inline mm/kasan/generic.c:185 [inline]
- check_memory_region+0x128/0x190 mm/kasan/generic.c:192
- instrument_atomic_write include/linux/instrumented.h:71 [inline]
- atomic_inc include/asm-generic/atomic-instrumented.h:240 [inline]
- hci_sock_bind+0x591/0x1140 net/bluetooth/hci_sock.c:1250
- __sys_bind+0x20e/0x250 net/socket.c:1662
- __do_sys_bind net/socket.c:1673 [inline]
- __se_sys_bind net/socket.c:1671 [inline]
- __x64_sys_bind+0x6f/0xb0 net/socket.c:1671
- do_syscall_64+0xf6/0x790 arch/x86/entry/common.c:295
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x4435a9
-Code: e8 1c e7 ff ff 48 83 c4 18 c3 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 ab 06 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffd328c7b48 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 0000000000000006 RCX: 00000000004435a9
-RDX: 0000000000000006 RSI: 0000000020000080 RDI: 0000000000000006
-RBP: 0000000000000005 R08: 00000000000003e8 R09: 00000000000003e8
-R10: 00000000000003e8 R11: 0000000000000246 R12: 0000000000dc6914
-R13: 000000000000000b R14: 0000000000000000 R15: 0000000000000000
-
-Allocated by task 10029:
- save_stack+0x1b/0x40 mm/kasan/common.c:49
- set_track mm/kasan/common.c:57 [inline]
- __kasan_kmalloc mm/kasan/common.c:492 [inline]
- __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:465
- kmem_cache_alloc_trace+0x153/0x7d0 mm/slab.c:3551
- kmalloc include/linux/slab.h:555 [inline]
- kzalloc include/linux/slab.h:669 [inline]
- hci_alloc_dev+0x3e/0x1e20 net/bluetooth/hci_core.c:3249
- __vhci_create_device+0x100/0x5b0 drivers/bluetooth/hci_vhci.c:99
- vhci_create_device drivers/bluetooth/hci_vhci.c:148 [inline]
- vhci_get_user drivers/bluetooth/hci_vhci.c:205 [inline]
- vhci_write+0x2bf/0x450 drivers/bluetooth/hci_vhci.c:285
- call_write_iter include/linux/fs.h:1901 [inline]
- new_sync_write+0x49c/0x700 fs/read_write.c:483
- __vfs_write+0xc9/0x100 fs/read_write.c:496
- vfs_write+0x262/0x5c0 fs/read_write.c:558
- ksys_write+0x127/0x250 fs/read_write.c:611
- do_syscall_64+0xf6/0x790 arch/x86/entry/common.c:295
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 10029:
- save_stack+0x1b/0x40 mm/kasan/common.c:49
- set_track mm/kasan/common.c:57 [inline]
- kasan_set_free_info mm/kasan/common.c:314 [inline]
- __kasan_slab_free+0xf7/0x140 mm/kasan/common.c:453
- __cache_free mm/slab.c:3426 [inline]
- kfree+0x109/0x2b0 mm/slab.c:3757
- bt_host_release+0x15/0x20 net/bluetooth/hci_sysfs.c:86
- device_release+0x71/0x200 drivers/base/core.c:1358
- kobject_cleanup lib/kobject.c:693 [inline]
- kobject_release lib/kobject.c:722 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1e7/0x2e0 lib/kobject.c:739
- put_device+0x1b/0x30 drivers/base/core.c:2586
- vhci_release+0x78/0xe0 drivers/bluetooth/hci_vhci.c:341
- __fput+0x2da/0x850 fs/file_table.c:280
- task_work_run+0x13f/0x1b0 kernel/task_work.c:113
- tracehook_notify_resume include/linux/tracehook.h:188 [inline]
- exit_to_usermode_loop+0x2fa/0x360 arch/x86/entry/common.c:165
- prepare_exit_to_usermode arch/x86/entry/common.c:196 [inline]
- syscall_return_slowpath arch/x86/entry/common.c:279 [inline]
- do_syscall_64+0x672/0x790 arch/x86/entry/common.c:305
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff888089678000
- which belongs to the cache kmalloc-8k of size 8192
-The buggy address is located 4216 bytes inside of
- 8192-byte region [ffff888089678000, ffff88808967a000)
-The buggy address belongs to the page:
-page:ffffea0002259e00 refcount:1 mapcount:0 mapping:00000000baf255d8 index:0x0 head:ffffea0002259e00 order:2 compound_mapcount:0 compound_pincount:0
-flags: 0xfffe0000010200(slab|head)
-raw: 00fffe0000010200 ffffea0002a19608 ffffea0002500e08 ffff8880aa0021c0
-raw: 0000000000000000 ffff888089678000 0000000100000001 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff888089678f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888089678f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888089679000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                                ^
- ffff888089679080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888089679100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
+I would like to do this in a separate patch.
