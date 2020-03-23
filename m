@@ -2,255 +2,103 @@ Return-Path: <SRS0=apyX=5I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B88C4332E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 19:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBBEC43331
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 20:11:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20C962070A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 19:45:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="FQCzKzSn"
+	by mail.kernel.org (Postfix) with ESMTP id 7B9DA2073C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 20:11:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727117AbgCWTpR (ORCPT
+        id S1725912AbgCWULm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Mar 2020 15:45:17 -0400
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:55622 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbgCWTpQ (ORCPT
+        Mon, 23 Mar 2020 16:11:42 -0400
+Received: from smtprelay0085.hostedemail.com ([216.40.44.85]:44634 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725830AbgCWULm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Mar 2020 15:45:16 -0400
-Received: by mail-pj1-f65.google.com with SMTP id mj6so327682pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Mar 2020 12:45:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Gz4rDOjXchjqPi1nEVVmXK3+btJI8g3SNGoz9O5jtbU=;
-        b=FQCzKzSnrYYmQWC2CSbKEn/Y+a4mEjYl0yrAbXpAW6bEpGUFofnjCIVRVNdfJ6grza
-         6NQAXeuDPyK+Lgcqz9xjCE+OjQeoi/IKhLMIn8k369vrvYlj3lEoYjsp7iQnSDAYAbwk
-         qgOBdQop3YcOTsD60DA2yneHrqsE2QnNHNaJs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Gz4rDOjXchjqPi1nEVVmXK3+btJI8g3SNGoz9O5jtbU=;
-        b=CiLJb2raiDEIsoLS+WZFyez4Gj15uwWqT+ta9UIxYcisbZ3xc7Zea2q+TbD0NVqpR5
-         dcBwsKDCWPFVwocWBdbxdcFptQmlNWZisf7zRZB1dYwdLxTxjLDU7Cq8XD1tFJBf7JEO
-         YfVpGIn8b6hEs/KVWySkEgZcW09H80Lx4RfLanG1MOuBBFQfg/WES3dcJlgailZqeWdi
-         K7mz51rgcMmWDNMjS+u1yMIbnf7QmoYzALLAitgEye3YONFr/kTuiayExAzazzoW6P12
-         e4JDnJytP8OvJcbMONQQPtVC9Gp9H8KWFoV8Qwic6i1wPPrIQr1HBgBzUDasZtaKc8jl
-         zLng==
-X-Gm-Message-State: ANhLgQ2I+FektSMCWcdZ3mGk+v9avaHKVxFnftdgxP7I+zWXffdMSyOC
-        MKJsHXVnHg5v3n1RCArsmut8Zw==
-X-Google-Smtp-Source: ADFU+vtgxL11HS2OubBV8XWWkYQpV6F4ZBoCjXnruDl0thaI8CAUmp203GJx1kAPo9hxrSPL2dkAyw==
-X-Received: by 2002:a17:90a:3188:: with SMTP id j8mr1058249pjb.82.1584992714874;
-        Mon, 23 Mar 2020 12:45:14 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id s98sm344857pjb.46.2020.03.23.12.45.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Mar 2020 12:45:14 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Mon, 23 Mar 2020 16:11:42 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay03.hostedemail.com (Postfix) with ESMTP id B46D3837F24D;
+        Mon, 23 Mar 2020 20:11:40 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: blood13_2b83efc501e40
+X-Filterd-Recvd-Size: 3004
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf05.hostedemail.com (Postfix) with ESMTPA;
+        Mon, 23 Mar 2020 20:11:38 +0000 (UTC)
+Message-ID: <03547be94c4944ca672c7aef2dd38b0fb1eedc84.camel@perches.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: btusb: Indicate Microsoft vendor
+ extension for Intel 9460/9560 and 9160/9260
+From:   Joe Perches <joe@perches.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Miao-chen Chou <mcchou@chromium.org>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Alain Michaud <alainm@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH v3 1/1] Bluetooth: Prioritize SCO traffic
-Date:   Mon, 23 Mar 2020 12:45:07 -0700
-Message-Id: <20200323124503.v3.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
-X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
-In-Reply-To: <20200323194507.90944-1-abhishekpandit@chromium.org>
-References: <20200323194507.90944-1-abhishekpandit@chromium.org>
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Date:   Mon, 23 Mar 2020 13:09:50 -0700
+In-Reply-To: <57C56801-7F3B-478A-83E9-1D2376C60666@holtmann.org>
+References: <20200323072824.254495-1-mcchou@chromium.org>
+         <20200323002820.v1.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
+         <04021BE3-63F7-4B19-9F0E-145785594E8C@holtmann.org>
+         <421d27670f2736c88e8c0693e3ff7c0dcfceb40b.camel@perches.com>
+         <57C56801-7F3B-478A-83E9-1D2376C60666@holtmann.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.34.1-2 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When scheduling TX packets, send all SCO/eSCO packets first, check for
-pending SCO/eSCO packets after every ACL/LE packet and send them if any
-are pending.  This is done to make sure that we can meet SCO deadlines
-on slow interfaces like UART.
+On Mon, 2020-03-23 at 19:48 +0100, Marcel Holtmann wrote:
+> Hi Joe,
 
-If we were to queue up multiple ACL packets without checking for a SCO
-packet, we might miss the SCO timing. For example:
+Hello Marcel.
 
-The time it takes to send a maximum size ACL packet (1024 bytes):
-t = 10/8 * 1024 bytes * 8 bits/byte * 1 packet / baudrate
-        where 10/8 is uart overhead due to start/stop bits per byte
+> > > > This adds a bit mask of driver_info for Microsoft vendor extension and
+> > > > indicates the support for Intel 9460/9560 and 9160/9260. See
+> > > > https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
+> > > > microsoft-defined-bluetooth-hci-commands-and-events for more information
+> > > > about the extension. This was verified with Intel ThunderPeak BT controller
+> > > > where msft_vnd_ext_opcode is 0xFC1E.
+> > []
+> > > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > []
+> > > > @@ -315,6 +315,10 @@ struct hci_dev {
+> > > > 	__u8		ssp_debug_mode;
+> > > > 	__u8		hw_error_code;
+> > > > 	__u32		clock;
+> > > > +	__u16		msft_vnd_ext_opcode;
+> > > > +	__u64		msft_vnd_ext_features;
+> > > > +	__u8		msft_vnd_ext_evt_prefix_len;
+> > > > +	void		*msft_vnd_ext_evt_prefix;
+> > 
+> > msft is just another vendor.
+> > 
+> > If there are to be vendor extensions, this should
+> > likely use a blank line above and below and not
+> > be prefixed with msft_
+> 
+> there are other vendors, but all of them are different. So this needs to be prefixed with msft_ actually. But I agree that having empty lines above and below makes it more readable.
 
-Replace t = 3.75ms (SCO deadline), which gives us a baudrate of 2730666.
+So struct hci_dev should become a clutter
+of random vendor extensions?
 
-At a baudrate of 3000000, if we didn't check for SCO packets within 1024
-bytes, we would miss the 3.75ms timing window.
+Perhaps there should instead be something like
+an array of char at the end of the struct and
+various vendor specific extensions could be
+overlaid on that array or just add a void *
+to whatever info that vendors require.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
 
-Changes in v3:
-* Removed hci_sched_sync
-
-Changes in v2:
-* Refactor to check for SCO/eSCO after each ACL/LE packet sent
-* Enabled SCO priority all the time and removed the sched_limit variable
-
- net/bluetooth/hci_core.c | 106 +++++++++++++++++++++------------------
- 1 file changed, 57 insertions(+), 49 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index dbd2ad3a26ed..9e5d7662a047 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4239,6 +4239,54 @@ static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
- 	}
- }
- 
-+/* Schedule SCO */
-+static void hci_sched_sco(struct hci_dev *hdev)
-+{
-+	struct hci_conn *conn;
-+	struct sk_buff *skb;
-+	int quote;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	if (!hci_conn_num(hdev, SCO_LINK))
-+		return;
-+
-+	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
-+		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-+			BT_DBG("skb %p len %d", skb, skb->len);
-+			hci_send_frame(hdev, skb);
-+
-+			conn->sent++;
-+			if (conn->sent == ~0)
-+				conn->sent = 0;
-+		}
-+	}
-+}
-+
-+static void hci_sched_esco(struct hci_dev *hdev)
-+{
-+	struct hci_conn *conn;
-+	struct sk_buff *skb;
-+	int quote;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	if (!hci_conn_num(hdev, ESCO_LINK))
-+		return;
-+
-+	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
-+						     &quote))) {
-+		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-+			BT_DBG("skb %p len %d", skb, skb->len);
-+			hci_send_frame(hdev, skb);
-+
-+			conn->sent++;
-+			if (conn->sent == ~0)
-+				conn->sent = 0;
-+		}
-+	}
-+}
-+
- static void hci_sched_acl_pkt(struct hci_dev *hdev)
- {
- 	unsigned int cnt = hdev->acl_cnt;
-@@ -4270,6 +4318,10 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
- 			hdev->acl_cnt--;
- 			chan->sent++;
- 			chan->conn->sent++;
-+
-+			/* Send pending SCO packets right away */
-+			hci_sched_sco(hdev);
-+			hci_sched_esco(hdev);
- 		}
- 	}
- 
-@@ -4354,54 +4406,6 @@ static void hci_sched_acl(struct hci_dev *hdev)
- 	}
- }
- 
--/* Schedule SCO */
--static void hci_sched_sco(struct hci_dev *hdev)
--{
--	struct hci_conn *conn;
--	struct sk_buff *skb;
--	int quote;
--
--	BT_DBG("%s", hdev->name);
--
--	if (!hci_conn_num(hdev, SCO_LINK))
--		return;
--
--	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
--		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
--			hci_send_frame(hdev, skb);
--
--			conn->sent++;
--			if (conn->sent == ~0)
--				conn->sent = 0;
--		}
--	}
--}
--
--static void hci_sched_esco(struct hci_dev *hdev)
--{
--	struct hci_conn *conn;
--	struct sk_buff *skb;
--	int quote;
--
--	BT_DBG("%s", hdev->name);
--
--	if (!hci_conn_num(hdev, ESCO_LINK))
--		return;
--
--	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
--						     &quote))) {
--		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
--			BT_DBG("skb %p len %d", skb, skb->len);
--			hci_send_frame(hdev, skb);
--
--			conn->sent++;
--			if (conn->sent == ~0)
--				conn->sent = 0;
--		}
--	}
--}
--
- static void hci_sched_le(struct hci_dev *hdev)
- {
- 	struct hci_chan *chan;
-@@ -4436,6 +4440,10 @@ static void hci_sched_le(struct hci_dev *hdev)
- 			cnt--;
- 			chan->sent++;
- 			chan->conn->sent++;
-+
-+			/* Send pending SCO packets right away */
-+			hci_sched_sco(hdev);
-+			hci_sched_esco(hdev);
- 		}
- 	}
- 
-@@ -4458,9 +4466,9 @@ static void hci_tx_work(struct work_struct *work)
- 
- 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
- 		/* Schedule queues and send stuff to HCI driver */
--		hci_sched_acl(hdev);
- 		hci_sched_sco(hdev);
- 		hci_sched_esco(hdev);
-+		hci_sched_acl(hdev);
- 		hci_sched_le(hdev);
- 	}
- 
--- 
-2.25.1.696.g5e7596f4ac-goog
 
