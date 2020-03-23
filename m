@@ -2,81 +2,387 @@ Return-Path: <SRS0=apyX=5I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F4BC54EEB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 07:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56228C54FCE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 09:12:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB37020736
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 07:37:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18C412072D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 09:12:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="TCNwxEXO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727464AbgCWHhG (ORCPT
+        id S1727685AbgCWJMa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Mar 2020 03:37:06 -0400
-Received: from mail-il1-f199.google.com ([209.85.166.199]:56497 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727459AbgCWHhF (ORCPT
+        Mon, 23 Mar 2020 05:12:30 -0400
+Received: from mail27.static.mailgun.info ([104.130.122.27]:13634 "EHLO
+        mail27.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727658AbgCWJM3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Mar 2020 03:37:05 -0400
-Received: by mail-il1-f199.google.com with SMTP id 191so11876860ilb.23
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Mar 2020 00:37:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=xI0usRcGed/whdLZrrsYIFzz4drUK13ORfQnfasIJ14=;
-        b=hFgolnui5FissCXGWDm2nBGExOlMQ5q4frJ5owhtWDHj6+rWN4aIHESwHYeJMZhSs9
-         KTgUyqRi/lm442yj2SOUGY0sSNOkwx/Q8lZnKUXrcjrm6RnoWnBbE3dyt2b4Fp8eNf4C
-         ZaLojM389FPW6S3IBvmGJlM48l8FUlLbWq8UzGpiW3uAyoXeUaowQ3qGuF75GiN+bqSk
-         H9N/ZcBm5IV9gvujW/90yZ9wMMB9eCC+Tqhv4F89fYYvcQCjiWvbXxEE4lstHhsdb6E+
-         ooUjHnn9yFWvldtN1EMXIsRVqSDF0k3G3Tc+cQ3FG3CcavTSrPc5nuwM/aOv2tw4r1Lk
-         rMqg==
-X-Gm-Message-State: ANhLgQ3nLw5BERmm5fSvhBuLYPxjcQwkVZQ3laRDBkSV9cBEJIQeI0JS
-        r7/68bbdC6IRBiOMYOXNeWCyvLr0AV1T87gJSFuAZkzjyKkx
-X-Google-Smtp-Source: ADFU+vufWP1ZmfhWge9JYASUxfhkELaTlcETnEuwcsBoeOODucklUQVC3o7tld/u7Pwx7D1VAa9UfQDBlJdJnT2pfzm7+QwL09Wo
+        Mon, 23 Mar 2020 05:12:29 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1584954748; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=SoK1G4xKcKDpUeUvLPp2R79L97dcvrVTXnYs55SSTm8=;
+ b=TCNwxEXO+16qO8Z9SWfwDi4r1XU8LvD1mV+S4/b95sesbsx4eauYNZsIh9053tH6DLIAIjvo
+ KtoU/BsrKsKz2YrYGUDmaEATq15KFCHCOo+PmkcOVt3xMdCtQMQ6wqbQmvB6H4DA2+48p+UP
+ EttAAWmE9Udr95zSP4xIHMXaHa4=
+X-Mailgun-Sending-Ip: 104.130.122.27
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e787d76.7f87b1b51fb8-smtp-out-n03;
+ Mon, 23 Mar 2020 09:12:22 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id DE840C43637; Mon, 23 Mar 2020 09:12:21 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id AE0ABC433CB;
+        Mon, 23 Mar 2020 09:12:20 +0000 (UTC)
 MIME-Version: 1.0
-X-Received: by 2002:a6b:f60d:: with SMTP id n13mr17817597ioh.147.1584949022600;
- Mon, 23 Mar 2020 00:37:02 -0700 (PDT)
-Date:   Mon, 23 Mar 2020 00:37:02 -0700
-In-Reply-To: <000000000000e9e518059fd84189@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007ab36905a180b328@google.com>
-Subject: Re: KASAN: use-after-free Write in hci_sock_bind (2)
-From:   syzbot <syzbot+04e804c8c2224b6a9497@syzkaller.appspotmail.com>
-To:     a@unstable.cc, andrew@lunn.ch, b.a.t.m.a.n@lists.open-mesh.org,
-        davem@davemloft.net, f.fainelli@gmail.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        mareklindner@neomailbox.ch, netdev@vger.kernel.org,
-        sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Mon, 23 Mar 2020 17:12:20 +0800
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     bgodavar@codeaurora.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, c-hbandi@codeaurora.org,
+        hemantg@codeaurora.org, mka@chromium.org
+Subject: Re: [PATCH v1 1/2] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC QCA6390
+In-Reply-To: <77f651b52dbaae4d30aabfa361915eda@codeaurora.org>
+References: <20200314094328.3331-1-rjliao@codeaurora.org>
+ <77f651b52dbaae4d30aabfa361915eda@codeaurora.org>
+Message-ID: <5a2b7eea5d4755d06605dc0ba2e8e802@codeaurora.org>
+X-Sender: rjliao@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this bug to:
+在 2020-03-16 23:04，bgodavar@codeaurora.org 写道：
+> On 2020-03-14 15:13, Rocky Liao wrote:
+>> This patch adds support for QCA6390, including the devicetree and acpi
+>> compatible hwid matching, and patch/nvm downloading.
+>> 
+>> Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+>> ---
+>>  drivers/bluetooth/btqca.c   | 44 +++++++++++++++++++++++++++++++----
+>>  drivers/bluetooth/btqca.h   |  8 +++++++
+>>  drivers/bluetooth/hci_qca.c | 46 
+>> +++++++++++++++++++++++++++++++------
+>>  3 files changed, 86 insertions(+), 12 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> index a16845c0751d..ca126e499c58 100644
+>> --- a/drivers/bluetooth/btqca.c
+>> +++ b/drivers/bluetooth/btqca.c
+>> @@ -14,6 +14,9 @@
+>> 
+>>  #define VERSION "0.1"
+>> 
+>> +#define QCA_IS_3991_6390(soc_type)    \
+>> +	(soc_type == QCA_WCN3991 || soc_type == QCA_QCA6390)
+>> +
+> 
+> [Bala]: Why don't we do >= QCA_WCN3991 (mostly both the devices
+> support same features)
+> 
+OK
 
-commit 7d13eca09ed5e477f6ecfd97a35058762228b5e4
-Author: Florian Fainelli <f.fainelli@gmail.com>
-Date:   Sat Aug 27 22:34:20 2016 +0000
-
-    Documentation: networking: dsa: Remove platform device TODO
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1746f3f9e00000
-start commit:   770fbb32 Add linux-next specific files for 20200228
-git tree:       linux-next
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=14c6f3f9e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10c6f3f9e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=576314276bce4ad5
-dashboard link: https://syzkaller.appspot.com/bug?extid=04e804c8c2224b6a9497
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11fc5e75e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10707013e00000
-
-Reported-by: syzbot+04e804c8c2224b6a9497@syzkaller.appspotmail.com
-Fixes: 7d13eca09ed5 ("Documentation: networking: dsa: Remove platform device TODO")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+>>  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+>>  			 enum qca_btsoc_type soc_type)
+>>  {
+>> @@ -32,7 +35,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32
+>> *soc_version,
+>>  	 * VSE event. WCN3991 sends version command response as a payload to
+>>  	 * command complete event.
+>>  	 */
+>> -	if (soc_type == QCA_WCN3991) {
+>> +	if (QCA_IS_3991_6390(soc_type)) {
+>>  		event_type = 0;
+>>  		rlen += 1;
+>>  		rtype = EDL_PATCH_VER_REQ_CMD;
+>> @@ -69,7 +72,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32
+>> *soc_version,
+>>  		goto out;
+>>  	}
+>> 
+>> -	if (soc_type == QCA_WCN3991)
+>> +	if (QCA_IS_3991_6390(soc_type))
+>>  		memmove(&edl->data, &edl->data[1], sizeof(*ver));
+>> 
+>>  	ver = (struct qca_btsoc_version *)(edl->data);
+>> @@ -138,6 +141,29 @@ int qca_send_pre_shutdown_cmd(struct hci_dev 
+>> *hdev)
+>>  }
+>>  EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
+>> 
+>> +int qca_send_enhancelog_enable_cmd(struct hci_dev *hdev)
+>> +{
+>> +	struct sk_buff *skb;
+>> +	int err;
+>> +	const u8 param[2] = {0x14, 0x01};
+> 
+> [Bala]: advisable to use MACRO's
+> 
+This func will be removed, we don't need to enable enhanced log by 
+default. It can be done by hcitool whenever needed.
+>> +
+>> +	bt_dev_dbg(hdev, "QCA enhanced log enable cmd");
+>> +
+>> +	skb = __hci_cmd_sync_ev(hdev, QCA_ENHANCED_LOG_ENABLE_CMD, 2,
+>> +				param, HCI_EV_CMD_COMPLETE, HCI_INIT_TIMEOUT);
+>> +
+>> +	if (IS_ERR(skb)) {
+>> +		err = PTR_ERR(skb);
+>> +		bt_dev_err(hdev, "Enhanced log enable cmd failed (%d)", err);
+>> +		return err;
+>> +	}
+>> +
+>> +	kfree_skb(skb);
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(qca_send_enhancelog_enable_cmd);
+>> +
+>>  static void qca_tlv_check_data(struct qca_fw_config *config,
+>>  		const struct firmware *fw, enum qca_btsoc_type soc_type)
+>>  {
+>> @@ -217,7 +243,7 @@ static void qca_tlv_check_data(struct 
+>> qca_fw_config *config,
+>>  				tlv_nvm->data[0] |= 0x80;
+>> 
+>>  				/* UART Baud Rate */
+>> -				if (soc_type == QCA_WCN3991)
+>> +				if (QCA_IS_3991_6390(soc_type))
+>>  					tlv_nvm->data[1] = nvm_baud_rate;
+>>  				else
+>>  					tlv_nvm->data[2] = nvm_baud_rate;
+>> @@ -268,7 +294,7 @@ static int qca_tlv_send_segment(struct hci_dev
+>> *hdev, int seg_size,
+>>  	 * VSE event. WCN3991 sends version command response as a payload to
+>>  	 * command complete event.
+>>  	 */
+>> -	if (soc_type == QCA_WCN3991) {
+>> +	if (QCA_IS_3991_6390(soc_type)) {
+>>  		event_type = 0;
+>>  		rlen = sizeof(*edl);
+>>  		rtype = EDL_PATCH_TLV_REQ_CMD;
+>> @@ -301,7 +327,7 @@ static int qca_tlv_send_segment(struct hci_dev
+>> *hdev, int seg_size,
+>>  		err = -EIO;
+>>  	}
+>> 
+>> -	if (soc_type == QCA_WCN3991)
+>> +	if (QCA_IS_3991_6390(soc_type))
+>>  		goto out;
+>> 
+>>  	tlv_resp = (struct tlv_seg_resp *)(edl->data);
+>> @@ -442,6 +468,11 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate,
+>>  			    (soc_ver & 0x0000000f);
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/crbtfw%02x.tlv", rom_ver);
+>> +	} else if (soc_type == QCA_QCA6390) {
+>> +		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
+>> +			    (soc_ver & 0x0000000f);
+>> +		snprintf(config.fwname, sizeof(config.fwname),
+>> +			 "qca/htbtfw%02x.tlv", rom_ver);
+> 
+> [Bala]: This part we need to rethink to having to optimize.
+> 
+> ROME use: rampatch<>.tlv
+> WCN399x: uses cr<>.tlv
+> QCA6390: uses ht
+> tomorrow if some new chipset comes, it uses different name again a we
+> need to handle this part.
+> i would suggest add this prefix to  "qca_bluetooth_of_match"
+> which can be passed as argument
+> 
+I would like to do this in a separate patch.
+>>  	} else {
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/rampatch_%08x.bin", soc_ver);
+>> @@ -464,6 +495,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate,
+>>  	else if (qca_is_wcn399x(soc_type))
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/crnv%02x.bin", rom_ver);
+>> +	else if (soc_type == QCA_QCA6390)
+>> +		snprintf(config.fwname, sizeof(config.fwname),
+>> +			 "qca/htnv%02x.bin", rom_ver);
+>>  	else
+>>  		snprintf(config.fwname, sizeof(config.fwname),
+>>  			 "qca/nvm_%08x.bin", soc_ver);
+>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> index e16a4d650597..bc703817c3d7 100644
+>> --- a/drivers/bluetooth/btqca.h
+>> +++ b/drivers/bluetooth/btqca.h
+>> @@ -14,6 +14,7 @@
+>>  #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+>>  #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+>>  #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+>> +#define QCA_ENHANCED_LOG_ENABLE_CMD     (0xFC17)
+>> 
+>>  #define EDL_CMD_REQ_RES_EVT		(0x00)
+>>  #define EDL_PATCH_VER_RES_EVT		(0x19)
+>> @@ -127,6 +128,7 @@ enum qca_btsoc_type {
+>>  	QCA_WCN3990,
+>>  	QCA_WCN3991,
+>>  	QCA_WCN3998,
+>> +	QCA_QCA6390,
+>>  };
+>> 
+>>  #if IS_ENABLED(CONFIG_BT_QCA)
+>> @@ -139,6 +141,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32
+>> *soc_version,
+>>  			 enum qca_btsoc_type);
+>>  int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+>>  int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
+>> +int qca_send_enhancelog_enable_cmd(struct hci_dev *hdev);
+>>  static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+>>  {
+>>  	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
+>> @@ -178,4 +181,9 @@ static inline int qca_send_pre_shutdown_cmd(struct
+>> hci_dev *hdev)
+>>  {
+>>  	return -EOPNOTSUPP;
+>>  }
+>> +
+>> +static inline int qca_send_enhancelog_enable_cmd(struct hci_dev 
+>> *hdev)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+>>  #endif
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 439392b1c043..0176264b0828 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -26,6 +26,7 @@
+>>  #include <linux/mod_devicetable.h>
+>>  #include <linux/module.h>
+>>  #include <linux/of_device.h>
+>> +#include <linux/acpi.h>
+>>  #include <linux/platform_device.h>
+>>  #include <linux/regulator/consumer.h>
+>>  #include <linux/serdev.h>
+>> @@ -1596,7 +1597,7 @@ static int qca_setup(struct hci_uart *hu)
+>>  	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+>> 
+>>  	bt_dev_info(hdev, "setting up %s",
+>> -		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME");
+>> +		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME/QCA6390");
+>> 
+>>  retry:
+>>  	ret = qca_power_on(hdev);
+>> @@ -1639,6 +1640,12 @@ static int qca_setup(struct hci_uart *hu)
+>>  		qca_debugfs_init(hdev);
+>>  		hu->hdev->hw_error = qca_hw_error;
+>>  		hu->hdev->cmd_timeout = qca_cmd_timeout;
+>> +
+>> +		/* QCA6390 FW doesn't enable enhanced log by default
+>> +		 * need to send VSC to enable it
+>> +		 */
+>> +		if (soc_type == QCA_QCA6390)
+>> +			qca_send_enhancelog_enable_cmd(hdev);
+>>  	} else if (ret == -ENOENT) {
+>>  		/* No patch/nvm-config found, run with original fw/config */
+>>  		ret = 0;
+>> @@ -1665,10 +1672,10 @@ static int qca_setup(struct hci_uart *hu)
+>>  	}
+>> 
+>>  	/* Setup bdaddr */
+>> -	if (qca_is_wcn399x(soc_type))
+>> -		hu->hdev->set_bdaddr = qca_set_bdaddr;
+>> -	else
+>> +	if (soc_type == QCA_ROME)
+>>  		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+>> +	else
+>> +		hu->hdev->set_bdaddr = qca_set_bdaddr;
+>> 
+>>  	return ret;
+>>  }
+>> @@ -1721,6 +1728,11 @@ static const struct qca_vreg_data
+>> qca_soc_data_wcn3998 = {
+>>  	.num_vregs = 4,
+>>  };
+>> 
+>> +static const struct qca_vreg_data qca_soc_data_qca6390 = {
+>> +	.soc_type = QCA_QCA6390,
+>> +	.num_vregs = 0,
+>> +};
+>> +
+>>  static void qca_power_shutdown(struct hci_uart *hu)
+>>  {
+>>  	struct qca_serdev *qcadev;
+>> @@ -1764,7 +1776,7 @@ static int qca_power_off(struct hci_dev *hdev)
+>>  	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+>> 
+>>  	/* Stop sending shutdown command if soc crashes. */
+>> -	if (qca_is_wcn399x(soc_type)
+>> +	if (soc_type != QCA_ROME
+>>  		&& qca->memdump_state == QCA_MEMDUMP_IDLE) {
+>>  		qca_send_pre_shutdown_cmd(hdev);
+>>  		usleep_range(8000, 10000);
+>> @@ -1900,7 +1912,11 @@ static int qca_serdev_probe(struct 
+>> serdev_device *serdev)
+>>  			return err;
+>>  		}
+>>  	} else {
+>> -		qcadev->btsoc_type = QCA_ROME;
+>> +		if (data)
+>> +			qcadev->btsoc_type = data->soc_type;
+>> +		else
+>> +			qcadev->btsoc_type = QCA_ROME;
+>> +
+>>  		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+>>  					       GPIOD_OUT_LOW);
+>>  		if (!qcadev->bt_en) {
+>> @@ -2044,21 +2060,37 @@ static int __maybe_unused qca_resume(struct 
+>> device *dev)
+>> 
+>>  static SIMPLE_DEV_PM_OPS(qca_pm_ops, qca_suspend, qca_resume);
+>> 
+>> +#ifdef CONFIG_OF
+>>  static const struct of_device_id qca_bluetooth_of_match[] = {
+>>  	{ .compatible = "qcom,qca6174-bt" },
+>> +	{ .compatible = "qcom,qca6390-bt", .data = &qca_soc_data_qca6390},
+>>  	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
+>>  	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
+>>  	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+>>  	{ /* sentinel */ }
+>>  };
+>>  MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+>> +#endif
+>> +
+>> +#ifdef CONFIG_ACPI
+>> +static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
+>> +	{ "QCOM6390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+>> +	{ "DLA16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+>> +	{ "DLB16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+>> +	{ "DLB26390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+>> +	{ },
+>> +};
+>> +MODULE_DEVICE_TABLE(acpi, qca_bluetooth_acpi_match);
+>> +#endif
+>> +
+>> 
+>>  static struct serdev_device_driver qca_serdev_driver = {
+>>  	.probe = qca_serdev_probe,
+>>  	.remove = qca_serdev_remove,
+>>  	.driver = {
+>>  		.name = "hci_uart_qca",
+>> -		.of_match_table = qca_bluetooth_of_match,
+>> +		.of_match_table = of_match_ptr(qca_bluetooth_of_match),
+>> +		.acpi_match_table = ACPI_PTR(qca_bluetooth_acpi_match),
+>>  		.pm = &qca_pm_ops,
+>>  	},
+>>  };
