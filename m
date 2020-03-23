@@ -2,102 +2,184 @@ Return-Path: <SRS0=apyX=5I=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F32C54EEB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 15:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891BCC54FCE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 16:39:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6D1C20753
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 15:02:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A96220722
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Mar 2020 16:39:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xen3z2sW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727231AbgCWPCT (ORCPT
+        id S1727461AbgCWQjJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Mar 2020 11:02:19 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:37168 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbgCWPCS (ORCPT
+        Mon, 23 Mar 2020 12:39:09 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:38029 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727234AbgCWQjI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Mar 2020 11:02:18 -0400
-Received: by mail-lj1-f193.google.com with SMTP id r24so14986125ljd.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Mar 2020 08:02:17 -0700 (PDT)
+        Mon, 23 Mar 2020 12:39:08 -0400
+Received: by mail-oi1-f196.google.com with SMTP id w2so4377383oic.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Mar 2020 09:39:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=g0eg5t3GBi8KtBnXG2IsYdEe2EPR+paREKVnwwhDlPk=;
+        b=Xen3z2sWGBycoS8ZpUCyi3AmQ6K9gsD7bXb+BK3jFdCQo5rXOXHf31YapcYfesJwwm
+         W1x754WmQGNxugjPYJOp52SuE6ZlQA0r3Q5VnZRdy0j2zHRgi5cxITz3YnhCP2NE0a1Y
+         CuAOgkL/KMiVPqkQV6UKh7GPaA/VIDhR/FnBy3TYdWuaMragkPvCjfQVdDR4wzFXb0KZ
+         9kh4XM1iWo54GVus9u50ORIttxpdgCDhZtolS6OBU4o9t3XWvqPUwMimK4gdGlBU20aG
+         XowuG/fooDwE6a2Ajlqew4qnrt7owwA2RbZSjcMF8i9QJUlQtqdNsJrjGGLnbLnX5Pci
+         uOHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TOVNgV2XL7No0fBNblL3Wi4RvNnDh+Ky/HUEgDMyr78=;
-        b=pA4YV1C2TlM8uYsz8IRjE7MQ15f+U8glTeSaz55H9vNlk6QVEz29Elf3AJdV3oDIMh
-         nCk1AolUbqo/G073O66F9cPojWzZ52Kqepdt5M0rfblv8mwBgecMB8iv24KUoqZugNw0
-         z6CtpeqGC89V1HHzvcJrTlbGxTd3VDlkY/0fI9Odv3SopAT125bGXGgDhQvhnl/kJ5zY
-         7dPAC+xglh3yNugj3vUcv6oS5FPQqoqZy7J5iXPK0R1i+FD55ZJlLo3Cg2zLvFE1Vojs
-         yCQjF/v8Esu67yyKZ84QDw1FVegKhYrRmrc3ScMWxIGf7oe67a0To23Ir9ffr6JrMPtt
-         fD1w==
-X-Gm-Message-State: ANhLgQ0eZQF5Hpnow7Bfm4re614SnmXVn8xWTKZaGjrZE6iYWMTpZ0Qz
-        96rPiRrGOcWdHpOPQFFqeOoA2UMHipCgoQ9oROg=
-X-Google-Smtp-Source: ADFU+vtSGIIucNPepkbMWFbunL7u1hOTIHaALvZtRIrmIYkPpiOVOqpuXNKfVvgJhMUmDUO6+pBi+ij2RHNHAoahE5Y=
-X-Received: by 2002:a2e:7e0a:: with SMTP id z10mr13887116ljc.42.1584975735908;
- Mon, 23 Mar 2020 08:02:15 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=g0eg5t3GBi8KtBnXG2IsYdEe2EPR+paREKVnwwhDlPk=;
+        b=gSL0C9DXSJR2AoD5AWk7zuefrU+4ICB3tmCNJa/eVHyZ9CYmSwejSvKc9iBZ6qTAOU
+         lwjcPZaHbfDAg/Pqbwe8OkKZQkvkFhZadQniCzaO2EZ+4+BzQAKngYjaPXCAmuUEJtfG
+         SFY3SKN8xVbFtYpuCcWRnJDGI5kqHdnY4EE7Hwaw8mvXEBBRZ+IdVjsPbNZRyckt9hgq
+         WQ/Msd3CwfIV3KXkGyFv/3EEccQ68OVbpxtKgQQryE6MO4j5zuQ/5k7/Dxsh2/Yz14OW
+         T98Rv59Wbj+yEMzPuH2bRVaf2lQ1M0IAdAYkIt2EHLxliDorUO4yyrsvXx6Efl8rgD1L
+         BD/Q==
+X-Gm-Message-State: ANhLgQ1mR4au8Sbim03+l2o+YPtz3U7Gkk9byysu4ZvZsKBSd7UnIBNp
+        QSApbnoWhRoBRmqyES0AWvkhHcJiYjXg6q9lgWA=
+X-Google-Smtp-Source: ADFU+vuR+gfeV4OivuCS5TmnkiNTfTp18NXmVpphlMHdjiJddRoWsY30cZo2YZ/h1emUhkppHt3TuJm3EGdQH496MR8=
+X-Received: by 2002:aca:b602:: with SMTP id g2mr161513oif.82.1584981547784;
+ Mon, 23 Mar 2020 09:39:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <F7B49142-FD11-4512-B2D4-0840556FC0D3@holtmann.org> <20200321165551.11928-1-smarter@ubuntu.com>
-In-Reply-To: <20200321165551.11928-1-smarter@ubuntu.com>
-From:   Guillaume Martres <smarter@ubuntu.com>
-Date:   Mon, 23 Mar 2020 16:01:39 +0100
-Message-ID: <CAMM3rS01a6UH=atXGUL6gqAvS9Mit4hqhzhBrEtVX7-nWP92Pg@mail.gmail.com>
-Subject: Re: [PATCH v6 2/2] bluetooth:btusb: handle msbc audio over USB Endpoints
-To:     sathish.narasimman@intel.com, marcel@holtmann.org
-Cc:     linux-bluetooth@vger.kernel.org
+References: <20200305185904.Bluez.v1.1.I6c78c0eb9826eb17c944c4903132ee75c1324136@changeid>
+ <CABBYNZLPDqsoPSPKz=X9LEDJvq9Lb0r7jXDS_BCi5d57dNXi5A@mail.gmail.com> <CAPHZWUcg1p=WQ=Py6WWNSsOX6cFLT6X1uCk_Wy=v7_4hqG0+WA@mail.gmail.com>
+In-Reply-To: <CAPHZWUcg1p=WQ=Py6WWNSsOX6cFLT6X1uCk_Wy=v7_4hqG0+WA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 23 Mar 2020 09:38:56 -0700
+Message-ID: <CABBYNZLcZmg7tNH11F+8a4At_W-XQMZci1AJy8TjU_xTrA7yTA@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] avdtp: Fix crashes in avdtp_abort
+To:     Yun-hao Chung <howardchung@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, 21 Mar 2020 at 17:55, Guillaume Martres <smarter@ubuntu.com> wrote:
-> Since then, I was made aware of the existence of this patchset, after applying
-> this patch (and [3] which apparently only exists as v5 and not v6), my
-> headphones stopped sending zero-filled packets, but:
-> - the recorded audio quality is again extremely bad and robotic.
-> - when audio is being played, the headphones do not emit any sound.
+Hi Howard,
 
-I figured out what the problem was: pulseaudio assumes an MTU of 48
-but with this
-patch it now ends up being 60, I've left a comment on the pulseaudio MR [1].
-After fixing this, audio input and output seem to be working correctly, however
-from time to time pulseaudio fails to decode an mSBC packet, but I don't know
-whose fault that is.
+On Mon, Mar 23, 2020 at 2:43 AM Yun-hao Chung <howardchung@google.com> wrot=
+e:
+>
+> Hi Luiz,
+>
+> I can trigger the crash by running a connect disconnect loop. What I've f=
+ound is that crashes always happened when sep is assigned to stream->lsep b=
+ut stream is NULL. If I apply the change above, there are no such crashes a=
+nymore. So I'm still believing it is caused by stream being NULL instead of=
+ stream->lsep being NULL. Do I miss something?
+>
+> One thing to add:
+> Perhaps it would be more clear if we use stream->lsep directly when calli=
+ng avdtp_sep_set_state.
+>
+> Here is the stack trace:
+>
+> Crash reason:  SIGSEGV /0x00000000
+> Crash address: 0x18
+> Process uptime: not available
+>
+> Thread 0 (crashed)
+>  0  bluetoothd!avdtp_abort [avdtp.c : 3487 + 0x0]
+>  1  bluetoothd!a2dp_cancel [a2dp.c : 2180 + 0x5]
+>  2  bluetoothd!sink_disconnect [sink.c : 404 + 0x5]
+>  3  bluetoothd!btd_service_disconnect [service.c : 293 + 0x5]
+>  4  libglib-2.0.so.0!g_list_foreach [glist.c : 1013 + 0x6]
+>  5  bluetoothd!device_request_disconnect [device.c : 1500 + 0xe]
+>  6  bluetoothd!dev_disconnect [device.c : 1652 + 0xb]
+>  7  bluetoothd!generic_message [object.c : 259 + 0x8]
+>  8  libdbus-1.so.3!_dbus_object_tree_dispatch_and_unlock [dbus-object-tre=
+e.c : 1020 + 0x5]
+>  9  libdbus-1.so.3!dbus_connection_dispatch [dbus-connection.c : 4750 + 0=
+x8]
+> 10  bluetoothd!message_dispatch [mainloop.c : 72 + 0x8]
+> 11  libglib-2.0.so.0!g_main_context_dispatch [gmain.c : 3182 + 0x2]
+> 12  libglib-2.0.so.0!g_main_context_iterate [gmain.c : 3920 + 0x8]
+> 13  libglib-2.0.so.0!g_main_loop_run [gmain.c : 4116 + 0xf]
+> 14  bluetoothd!main [main.c : 800 + 0x5]
+> 15  libc.so.6!__libc_start_main [libc-start.c : 308 + 0x1a]
+> 16  bluetoothd!_start + 0x2a
 
-[1]: https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/254#note_444249
+I see so the setup->stream is stil NULL in this case so trying to
+access stream->lsep will fail.
 
-On Sat, 21 Mar 2020 at 17:55, Guillaume Martres <smarter@ubuntu.com> wrote:
 >
-> From: Guillaume Martres <smarter3@gmail.com>
+> Thanks,
+> Howard
 >
-> Hi Sathish, Marcel,
->
-> > I would really prefer to have some Tested-by lines from people that can verify that this patch works.
->
-> Here's my experience: a recent pulseaudio MR [1] added support for mSBC. When I
-> tried it using my laptop (Intel AX200) and headphones (Bose Headphone 700), the
-> voice quality was extremely bad. I eventually realized that this could be fixed
-> by ignoring all zero-filled packets sent by the headphones when decoding
-> mSBC [2], after that everything worked fine.
->
-> Since then, I was made aware of the existence of this patchset, after applying
-> this patch (and [3] which apparently only exists as v5 and not v6), my
-> headphones stopped sending zero-filled packets, but:
-> - the recorded audio quality is again extremely bad and robotic.
-> - when audio is being played, the headphones do not emit any sound.
->
-> Note that I applied this patchset on top of the current Ubuntu 20.04 kernel [4],
-> let me know if it's worth retesting on top of the mainline kernel, or if there
-> is something else I could try.
->
-> Hope this helps,
-> Guillaume
->
->
-> [1]: https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/254
-> [2]: https://gitlab.freedesktop.org/smarter/pulseaudio/-/commit/bb716b03002841e1092b4200935566d5c1a951fe
-> [3]: https://www.spinics.net/lists/linux-bluetooth/msg82149.html
-> [4]: https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/focal/commit/?h=Ubuntu-5.4.0-18.22&id=93dfa5b8e12fed29933f3451db44d88c0e4b5aed
+> On Fri, Mar 6, 2020 at 3:17 AM Luiz Augusto von Dentz <luiz.dentz@gmail.c=
+om> wrote:
+>>
+>> Hi Howard,
+>>
+>> On Thu, Mar 5, 2020 at 3:06 AM Howard Chung <howardchung@google.com> wro=
+te:
+>> >
+>> > Initialized avdtp_local_sep later since stream could be NULL.
+>> > ---
+>> >
+>> >  profiles/audio/avdtp.c | 3 ++-
+>> >  1 file changed, 2 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+>> > index 0e075f9ff..12d984866 100644
+>> > --- a/profiles/audio/avdtp.c
+>> > +++ b/profiles/audio/avdtp.c
+>> > @@ -3566,7 +3566,7 @@ int avdtp_abort(struct avdtp *session, struct av=
+dtp_stream *stream)
+>> >  {
+>> >         struct seid_req req;
+>> >         int ret;
+>> > -       struct avdtp_local_sep *sep =3D stream->lsep;
+>> > +       struct avdtp_local_sep *sep;
+
+Lets just remove this variable for here.
+
+>> >         if (!stream && session->discover) {
+>> >                 /* Don't call cb since it being aborted */
+>> > @@ -3581,6 +3581,7 @@ int avdtp_abort(struct avdtp *session, struct av=
+dtp_stream *stream)
+>> >         if (stream->lsep->state =3D=3D AVDTP_STATE_ABORTING)
+>> >                 return -EINVAL;
+>>
+>> I suspect there i something else going on then just the lsep being
+>> NULL since we do check it on the line above it would have crashed
+>> anyway, is this perhaps the result of lsep being unregistered before
+>> the avdtp_abort is called?
+>>
+>> > +       sep =3D stream->lsep;
+>> >         avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
+
+Just use stream->lsep here since at this point we already verified
+that stream !=3D NULL and even attempted to read its state.
+
+>> >
+>> >         if (session->req && stream =3D=3D session->req->stream)
+>> > --
+>> > 2.25.0.265.gbab2e86ba0-goog
+>> >
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+
+
+
+--=20
+Luiz Augusto von Dentz
