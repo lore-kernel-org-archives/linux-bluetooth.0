@@ -2,120 +2,115 @@ Return-Path: <SRS0=2tab=5J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8279C54EEB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 18:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E24D9C43331
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 18:37:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF75D2080C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 18:35:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C45182076F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 18:37:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727665AbgCXSfU convert rfc822-to-8bit (ORCPT
+        id S1727772AbgCXSh2 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Mar 2020 14:35:20 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42502 "EHLO
+        Tue, 24 Mar 2020 14:37:28 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:40575 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727398AbgCXSfU (ORCPT
+        with ESMTP id S1727821AbgCXSh2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Mar 2020 14:35:20 -0400
+        Tue, 24 Mar 2020 14:37:28 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C8009CECBE;
-        Tue, 24 Mar 2020 19:44:49 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 45085CECBE;
+        Tue, 24 Mar 2020 19:46:58 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v1 1/2] Bluetooth: btusb: Indicate Microsoft vendor
- extension for Intel 9460/9560 and 9160/9260
+Subject: Re: [PATCH v5 3/3] Bluetooth: Add BT_MODE socket option
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CALWDO_U5Cnt3_Ss2QQNhtuKS_8qq7oyNH4d97J68pmbmQMe=3w@mail.gmail.com>
-Date:   Tue, 24 Mar 2020 19:35:17 +0100
-Cc:     Joe Perches <joe@perches.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
+In-Reply-To: <CABBYNZJefwjHOJdLHe_pj6g_sZzSdAqWgprfAs3bgQOY8=ESHA@mail.gmail.com>
+Date:   Tue, 24 Mar 2020 19:37:25 +0100
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <643C6020-2FC5-4EEA-8F64-5D4B7F9258A4@holtmann.org>
-References: <20200323072824.254495-1-mcchou@chromium.org>
- <20200323002820.v1.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
- <04021BE3-63F7-4B19-9F0E-145785594E8C@holtmann.org>
- <421d27670f2736c88e8c0693e3ff7c0dcfceb40b.camel@perches.com>
- <57C56801-7F3B-478A-83E9-1D2376C60666@holtmann.org>
- <03547be94c4944ca672c7aef2dd38b0fb1eedc84.camel@perches.com>
- <CALWDO_U5Cnt3_Ss2QQNhtuKS_8qq7oyNH4d97J68pmbmQMe=3w@mail.gmail.com>
-To:     Alain Michaud <alainmichaud@google.com>
+Message-Id: <BE08FB57-ED55-486F-85F9-180025895569@holtmann.org>
+References: <20200323203458.24733-1-luiz.dentz@gmail.com>
+ <20200323203458.24733-4-luiz.dentz@gmail.com>
+ <90C51C98-B30D-44A6-9E87-321A4758C684@holtmann.org>
+ <CABBYNZJefwjHOJdLHe_pj6g_sZzSdAqWgprfAs3bgQOY8=ESHA@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Luiz,
 
->>>>>> This adds a bit mask of driver_info for Microsoft vendor extension and
->>>>>> indicates the support for Intel 9460/9560 and 9160/9260. See
->>>>>> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
->>>>>> microsoft-defined-bluetooth-hci-commands-and-events for more information
->>>>>> about the extension. This was verified with Intel ThunderPeak BT controller
->>>>>> where msft_vnd_ext_opcode is 0xFC1E.
->>>> []
->>>>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>>> []
->>>>>> @@ -315,6 +315,10 @@ struct hci_dev {
->>>>>>        __u8            ssp_debug_mode;
->>>>>>        __u8            hw_error_code;
->>>>>>        __u32           clock;
->>>>>> +       __u16           msft_vnd_ext_opcode;
->>>>>> +       __u64           msft_vnd_ext_features;
->>>>>> +       __u8            msft_vnd_ext_evt_prefix_len;
->>>>>> +       void            *msft_vnd_ext_evt_prefix;
->>>> 
->>>> msft is just another vendor.
->>>> 
->>>> If there are to be vendor extensions, this should
->>>> likely use a blank line above and below and not
->>>> be prefixed with msft_
+>>> This adds BT_MODE socket option which can be used to set L2CAP modes,
+>>> including modes only supported over LE which were not supported using
+>>> the L2CAP_OPTIONS.
 >>> 
->>> there are other vendors, but all of them are different. So this needs to be prefixed with msft_ actually. But I agree that having empty lines above and below makes it more readable.
+>>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> ---
+>>> include/net/bluetooth/bluetooth.h |   8 ++
+>>> include/net/bluetooth/l2cap.h     |   6 ++
+>>> net/bluetooth/l2cap_sock.c        | 124 ++++++++++++++++++++++++++++++
+>>> 3 files changed, 138 insertions(+)
+>>> 
+>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>> index 1576353a2773..3fa7b1e3c5d9 100644
+>>> --- a/include/net/bluetooth/bluetooth.h
+>>> +++ b/include/net/bluetooth/bluetooth.h
+>>> @@ -139,6 +139,14 @@ struct bt_voice {
+>>> #define BT_PHY_LE_CODED_TX    0x00002000
+>>> #define BT_PHY_LE_CODED_RX    0x00004000
+>>> 
+>>> +#define BT_MODE                      15
+>>> +
+>>> +#define BT_MODE_BASIC                0x00
+>>> +#define BT_MODE_ERTM         0x01
+>>> +#define BT_MODE_STREAMING    0x02
+>>> +#define BT_MODE_LE_FLOWCTL   0x03
+>>> +#define BT_MODE_EXT_FLOWCTL  0x04
+>>> +
+>>> __printf(1, 2)
+>>> void bt_info(const char *fmt, ...);
+>>> __printf(1, 2)
+>>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>>> index dada14d0622c..56f727ba23bd 100644
+>>> --- a/include/net/bluetooth/l2cap.h
+>>> +++ b/include/net/bluetooth/l2cap.h
+>>> @@ -720,9 +720,15 @@ struct l2cap_user {
+>>> /* ----- L2CAP socket info ----- */
+>>> #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
+>>> 
+>>> +#define L2CAP_PI_OPTION_UNSET                0x00
+>>> +#define L2CAP_PI_OPTION_LEGACY               0x01
+>>> +#define L2CAP_PI_OPTION_BT_MODE              0x02
+>>> +
+>>> struct l2cap_pinfo {
+>>>      struct bt_sock          bt;
+>>>      struct l2cap_chan       *chan;
+>>> +     u8                      option;
+>>> +     u8                      bt_mode;
+>>>      struct sk_buff          *rx_busy_skb;
+>>> };
 >> 
->> So struct hci_dev should become a clutter
->> of random vendor extensions?
+>> why do you want to store bt_mode here. Whatever we have in l2cap_chan should be plenty.
+> 
+> Ive thought it would be cleaner to mess with types that comes from the
+> spec itself so l2cap_chan would continue to use them.
+
+Actually the LE_FLOWCTL and EXT_FLOWCTL are not spec values either. Frankly I don’t care which ones we store right now. I am fine keeping the spec one for now and just translate it to BT_MODE.
+
+>> I also looked at l2cap_sock_setsockopt_old and if you use L2CAP_OPTIONS and want to read BT_MODE, then everything should be fine. Same as setting BT_MODE (except EXT_FLOWCTL) and then reading L2CAP_OPTIONS is fine as well. We can all translate this properly and with have EINVAL return errors for not supported / disabled modes.
 >> 
->> Perhaps there should instead be something like
->> an array of char at the end of the struct and
->> various vendor specific extensions could be
->> overlaid on that array or just add a void *
->> to whatever info that vendors require.
-> I don't particularly like trailing buffers, but I agree we could
-> possibly organize this a little better by with a struct.  something
-> like:
+>> So the only time L2CAP_OPTIONS read should fail is if you use BT_MODE with EXT_FLOWCTL as mode. So you can just check the mode set in l2cap_chan. And we start using our new mode definition there and then convert it for L2CAP_OPTIONS.
 > 
-> struct msft_vnd_ext {
->    bool              supported; // <-- Clearly calls out if the
-> extension is supported.
->    __u16           msft_vnd_ext_opcode; // <-- Note that this also
-> needs to be provided by the driver.  I don't recommend we have this
-> read from the hardware since we just cause an extra redirection that
-> isn't necessary.  Ideally, this should come from the usb_table const.
+> Sure, I thought it would be more efficient to not have conversions
+> back and forth but Im fine either way.
 
-Actually supported == false is the same as opcode == 0x0000. And supported == true is opcode != 0x0000.
-
->    __u64           msft_vnd_ext_features;
->    __u8             msft_vnd_ext_evt_prefix_len;
->    void             *msft_vnd_ext_evt_prefix;
-> };
-> 
-> And then simply add the struct msft_vnd_ext (and any others) to hci_dev.
-
-Anyway, Lets keep these for now as hci_dev->msft_vnd_ext_*. We can fix this up later without any impact.
+In the end it makes the code simpler to just do the conversion. And once we add a kernel option to disable setsockopt_old, we have less code.
 
 Regards
 
