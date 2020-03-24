@@ -7,101 +7,101 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A222EC43331
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C81EAC41621
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:28:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 702C82076E
+	by mail.kernel.org (Postfix) with ESMTP id A0AB52074D
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:28:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="jb9rq18e"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="anRSu+v4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727099AbgCXT2c (ORCPT
+        id S1727100AbgCXT2d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Mar 2020 15:28:32 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:55757 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727061AbgCXT2b (ORCPT
+        Tue, 24 Mar 2020 15:28:33 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:37938 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727070AbgCXT2b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 24 Mar 2020 15:28:31 -0400
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200324192828epoutp029ab3618b1f3a6c400591057767e4f450~-VCRSaFFa3092430924epoutp027
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 19:28:28 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200324192828epoutp029ab3618b1f3a6c400591057767e4f450~-VCRSaFFa3092430924epoutp027
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20200324192829epoutp042f6b97d1de7cf88423bb49222fda9ea1~-VCSKo60_0411104111epoutp04S
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 19:28:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20200324192829epoutp042f6b97d1de7cf88423bb49222fda9ea1~-VCSKo60_0411104111epoutp04S
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1585078108;
-        bh=nFNU8zNcGvxrZdjkWuzYbWqpgyGol9IijeP4XKZ7BxE=;
+        s=mail20170921; t=1585078109;
+        bh=TBPPkHs4BrAC5rcQRKVwe6avbPthA1l8jMhLQvgJNbE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jb9rq18eoyepNDUXwsfhL2+d7aVbRefUvbWTL2AWqvnhCmL0m6MhrCVzydls/6lHG
-         fgWYIHg9448nDJ0ifo9Me5L2DdWA1PpkxiHVo2Aqv0zvC/8pmMxuaNSqu2Y/OydwQw
-         HLEDWJniDlodyDhC6Z530er6eBwqAsJCaGVMgBbo=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20200324192824epcas5p38adf62d092bf9e1d1d634290796a0f71~-VCNAE0jo0868108681epcas5p3O;
-        Tue, 24 Mar 2020 19:28:24 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.40.192]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 48n1WB6jvxzMqYkV; Tue, 24 Mar
-        2020 19:28:22 +0000 (GMT)
+        b=anRSu+v4wf/RstUv8fEm0r7kkIIfXGoLNddt3MZXIf0N0uiGYmzY6J6CUqtxvYg0+
+         bVE4KVRC9HNI3YS4Ksl7hEUjC1ngcR0w7g8Avu0xet0Os6hDpXExnawEgwvSkp40Dh
+         saMSN+FLGD5n3eM+j4M9/yExUNEOCoX0/i66l/tc=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20200324192828epcas5p47ccb547898e194ea646e08c91d711a24~-VCRYjznV2607026070epcas5p4w;
+        Tue, 24 Mar 2020 19:28:28 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.40.197]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 48n1WH4lkPzMqYkY; Tue, 24 Mar
+        2020 19:28:27 +0000 (GMT)
 Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        E5.DD.04778.65F5A7E5; Wed, 25 Mar 2020 04:28:22 +0900 (KST)
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DA.62.04782.B5F5A7E5; Wed, 25 Mar 2020 04:28:27 +0900 (KST)
 Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20200324192821epcas5p1cc8182aac6ed0b096c76e3ccbd269688~-VCKqhna81650916509epcas5p16;
-        Tue, 24 Mar 2020 19:28:21 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20200324192827epcas5p3f70d5e24d6042786ffea8bdbd5ddc8e8~-VCPvFNC40624506245epcas5p3M;
+        Tue, 24 Mar 2020 19:28:27 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
         epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20200324192821epsmtrp1055a46801ab02050ca75f543bf1f752a~-VCKpwdrN3078230782epsmtrp1J;
-        Tue, 24 Mar 2020 19:28:21 +0000 (GMT)
-X-AuditID: b6c32a4a-353ff700000012aa-bb-5e7a5f563587
+        20200324192827epsmtrp185c785f58164cd9c4918040cf36ad1f8~-VCPp5PNS3078230782epsmtrp1M;
+        Tue, 24 Mar 2020 19:28:27 +0000 (GMT)
+X-AuditID: b6c32a49-8b3ff700000012ae-69-5e7a5f5b6a31
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        24.F8.04024.55F5A7E5; Wed, 25 Mar 2020 04:28:21 +0900 (KST)
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        59.2A.04158.A5F5A7E5; Wed, 25 Mar 2020 04:28:27 +0900 (KST)
 Received: from SyamLinux.sa.corp.samsungelectronics.net (unknown
         [107.109.107.247]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20200324192821epsmtip1fbf6555a6e9660bba7c17ef547ed42e4~-VCKCxZjk1049610496epsmtip1G;
-        Tue, 24 Mar 2020 19:28:20 +0000 (GMT)
+        20200324192826epsmtip12ee8c704ad95daf3e05d5051674c4642~-VCPEltpu0279802798epsmtip1T;
+        Tue, 24 Mar 2020 19:28:26 +0000 (GMT)
 From:   Prathyusha Nelluri <prathyusha.n@samsung.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     s.syam@samsung.com, Prathyusha N <prathyusha.n@samsung.com>
-Subject: [PATCH 1/1] mesh: Handle close for Acceptor
-Date:   Wed, 25 Mar 2020 00:57:17 +0530
-Message-Id: <1585078044-14974-3-git-send-email-prathyusha.n@samsung.com>
+Subject: [PATCH 1/1] mesh: Validate Provisioning Start PDU values
+Date:   Wed, 25 Mar 2020 00:57:24 +0530
+Message-Id: <1585078044-14974-10-git-send-email-prathyusha.n@samsung.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1585078044-14974-1-git-send-email-prathyusha.n@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNKsWRmVeSWpSXmKPExsWy7bCmum5YfFWcwZaXJhZzrvUxW/xfeovd
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrLKsWRmVeSWpSXmKPExsWy7bCmum50fFWcwdU3KhZzrvUxW/xfeovd
         YtK+DywOzB59W1YxenzeJBfAFJVjk5GamJJapJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6k
         kJeYm2qr5OIToOuWmQO0Q0mhLDGnFCgUkFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYGhUoFec
-        mFtcmpeul5yfa2VoYGBkClSZkJPx6OlG5oKT/BV3P75jbWB8ydPFyMEhIWAiceqwaRcjF4eQ
-        wG5GiXnvXjNBOJ8YJa58vMYC4XxjlHj2dT57FyMnWMfU9XvAbCGBvYwSX5plIewOJomlv2VA
-        bDYBY4nzN18xgdgiAsoSz/YdBrOZBewljvz4zgJiCwPN+ftjKZjNIqAqse1/DzPIRbwCHhIH
-        b3lDrJKTuHmukxnE5hTwlFh75RgjyD0SAi9ZJf493c0IUeQisXLhDyYIW1ji1fEtUHdKSbzs
-        b4Oyuxkldr9xhWiewihx7wXIQSDv20tMeMEPYjILaEqs36UPcSafRO/vJ1AVvBIdbUIQUxQk
-        Vk2dCLVJTGLd9C9Q0z0kth7oY4ME1RxGie6vU9gmMMrOQpi6gJFxFaNkakFxbnpqsWmBUV5q
-        OXIsbWIEJxwtrx2My875HGIU4GBU4uHVeFgZJ8SaWFZcmXuIUYKDWUmEd3NqRZwQb0piZVVq
-        UX58UWlOavEhRlNg+E1klhJNzgcmw7ySeENTIzMzA0sDU2MLM0Mlcd5JrFdjhATSE0tSs1NT
-        C1KLYPqYODilGhhXhixW/75rrvPZtXd/f94meN5i1YRW07Lma8/meV4KyA7rMrodEcN018nH
-        QFGwqa+UIejUDo3ns/g9Hx27UZ2uVrdtktiWnJRPBlMVf3Zes5uz9bJd9FNFF7vniVIX/a0v
-        THfT2Og3U6NGI29PiPoS+4UTCy7+Zzn123tK04QlRjn5Qf7fKnYrsRRnJBpqMRcVJwIAYHmk
-        zE4DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgluLIzCtJLcpLzFFi42LZdlhJTjc0virO4PYENYs51/qYLf4vvcVu
-        MWnfBxYHZo++LasYPT5vkgtgiuKySUnNySxLLdK3S+DKePR0I3PBSf6Kux/fsTYwvuTpYuTk
-        kBAwkZi6fg97FyMXh5DAbkaJB81b2CESYhJvVpyAsoUlVv57DlXUxiTxbclfFpAEm4CxxPmb
-        r5hAbBEBZYln+w6D2cwCjhKfrsxjA7GFgTb8/bEUrJ5FQFVi2/8e5i5GDg5eAQ+Jg7e8IebL
-        Sdw818kMYnMKeEqsvXKMEcQWAir50zmTbQIj3wJGhlWMkqkFxbnpucWGBYZ5qeV6xYm5xaV5
-        6XrJ+bmbGMHhoqW5g/HykvhDjAIcjEo8vFoPK+OEWBPLiitzDzFKcDArifBuTq2IE+JNSays
-        Si3Kjy8qzUktPsQozcGiJM77NO9YpJBAemJJanZqakFqEUyWiYNTqoExaVEby9We2Md6Sz4U
-        zFPfWPTwzVxraTOenV/3BbEYzpHprzF4cuKlmmS/w5x728tPKi6O/v+A5TjP1hJR6Q7dxo3F
-        ctV2Xl1Oj9hesS+Zti0w+cGL8jmt9zKe+hy3ilbvvlj6popHO6pUJMH6lpKn0dqzimFFlyay
-        JMrw3flkz/dsPfPRHmMlluKMREMt5qLiRAAJBWYrEwIAAA==
-X-CMS-MailID: 20200324192821epcas5p1cc8182aac6ed0b096c76e3ccbd269688
+        mFtcmpeul5yfa2VoYGBkClSZkJOxc8c79oIrnBWTZ+xgbGD8yN7FyMkhIWAisarxD1sXIxeH
+        kMBuRoktx6azQjifGCWur3rADOF8Y5SY9WweXMve5efAbCGBvYwSN56bQhR1MEksW7qKESTB
+        JmAscf7mKyYQW0RAWeLZvsNgNrOAvcSRH99ZQGxhAUeJPytfgNksAqoSd58dAOvlFfCU+Hvy
+        NyvEMjmJm+c6mUFsTqD42ivHGCHiD1klFi4zh7BdJJrb9zND2MISr45vgTpUSuJlfxuU3c0o
+        sfuNK8ihEgJTGCXuvQA5iAPIsZeY8IIfxGQW0JRYv0sf4kw+id7fT6AqeCU62oQgpihIrJo6
+        kQnCFpNYN/0L1HQPiS9nNrJAgmEOo8TZ64/YJzDKzkKYuoCRcRWjZGpBcW56arFpgWFeajly
+        PG1iBCcdLc8djLPO+RxiFOBgVOLhbXhcGSfEmlhWXJl7iFGCg1lJhHdzakWcEG9KYmVValF+
+        fFFpTmrxIUZTYPhNZJYSTc4HJsS8knhDUyMzMwNLA1NjCzNDJXHeSaxXY4QE0hNLUrNTUwtS
+        i2D6mDg4pRoY2ZkWGfitUOoo9AzZZbyH/VJ3D6f2o067cp6LP5/OvLbT/bXFga+vH080uzst
+        lNH25P+Lfvv3KmbM0ctYU1rC63cieyfb9gyenT1falbOOXnewWf9i6r9VlN7F0WF9bLc+JAT
+        3mls69qlwmI65572h3uuck2+S/POtGwTXDWld+oFRq1TtudXKbEUZyQaajEXFScCAHbtwYVQ
+        AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpkluLIzCtJLcpLzFFi42LZdlhJTjc6virO4E0bo8Wca33MFv+X3mK3
+        mLTvA4sDs0ffllWMHp83yQUwRXHZpKTmZJalFunbJXBl7Nzxjr3gCmfF5Bk7GBsYP7J3MXJy
+        SAiYSOxdfg7I5uIQEtjNKDFzw1OohJjEmxUnoGxhiZX/nkMVtTFJfNt/lgUkwSZgLHH+5ism
+        EFtEQFni2b7DYDazgKPEpyvz2EBsYSD7z8oXYPUsAqoSd58dYASxeQU8Jf6e/M0KsUBO4ua5
+        TmYQmxMovvbKMbAaIQEPiT+dM9kmMPItYGRYxSiZWlCcm55bbFhglJdarlecmFtcmpeul5yf
+        u4kRHDBaWjsYT5yIP8QowMGoxMOr8bAyTog1say4MvcQowQHs5II7+bUijgh3pTEyqrUovz4
+        otKc1OJDjNIcLErivPL5xyKFBNITS1KzU1MLUotgskwcnFINjOVaNTX6Xhoxz1kmJbIq6i7l
+        n/vl9oeINRMaX+fqPz73o+i+iZzERu9fp96evaW/cfVy0St/pbTK9O6IyzEnZjPFLNmpfJLb
+        Ye2P5rmvJE562Gt/1J5Wv8es8KJJ2czXqharrVsMrHdprA7/fO6VdpqOwJ3Zn94fsBC3si+S
+        s/HaX8QTeuhsuxJLcUaioRZzUXEiAGbrFyYUAgAA
+X-CMS-MailID: 20200324192827epcas5p3f70d5e24d6042786ffea8bdbd5ddc8e8
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20200324192821epcas5p1cc8182aac6ed0b096c76e3ccbd269688
+X-CMS-RootMailID: 20200324192827epcas5p3f70d5e24d6042786ffea8bdbd5ddc8e8
 References: <1585078044-14974-1-git-send-email-prathyusha.n@samsung.com>
-        <CGME20200324192821epcas5p1cc8182aac6ed0b096c76e3ccbd269688@epcas5p1.samsung.com>
+        <CGME20200324192827epcas5p3f70d5e24d6042786ffea8bdbd5ddc8e8@epcas5p3.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -109,65 +109,40 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Prathyusha N <prathyusha.n@samsung.com>
 
-Provision complete callback is handled in provision failure case.
-If link closed received abruptly with reason success, triggered
-provision complete callback. Removed session timeout and session
-free as they are handled in pb_adv_unreg.
+Check for inconsistent Authentication method versus Authentication
+Action and Authentication Size fields before proceeding for
+exchanging public keys. Check for Public Key OOB in Capabilities
+and Start PDU.
 ---
- mesh/pb-adv.c        | 7 -------
- mesh/prov-acceptor.c | 9 ++++++++-
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ mesh/prov-acceptor.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
-index 6ef45b8b0..649816fc6 100644
---- a/mesh/pb-adv.c
-+++ b/mesh/pb-adv.c
-@@ -223,9 +223,6 @@ static void tx_timeout(struct l_timeout *timeout, void *user_data)
- 	if (!l_queue_find(pb_sessions, session_match, session))
- 		return;
- 
--	l_timeout_remove(session->tx_timeout);
--	session->tx_timeout = NULL;
--
- 	mesh_send_cancel(filter, sizeof(filter));
- 
- 	l_info("TX timeout");
-@@ -392,15 +389,11 @@ static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
- 		break;
- 
- 	case PB_ADV_CLOSE:
--		l_timeout_remove(session->tx_timeout);
- 		l_debug("Link closed notification: %2.2x", pkt[0]);
- 		/* Wrap callback for pre-cleaning */
- 		if (true) {
- 			mesh_prov_close_func_t cb = session->close_cb;
- 			void *user_data = session->user_data;
--
--			l_queue_remove(pb_sessions, session);
--			l_free(session);
- 			cb(user_data, pkt[0]);
- 		}
- 		break;
 diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-index 03972c227..b6da67cf0 100644
+index 03972c227..d0ae77322 100644
 --- a/mesh/prov-acceptor.c
 +++ b/mesh/prov-acceptor.c
-@@ -120,7 +120,14 @@ static void acceptor_free(void)
+@@ -393,6 +393,21 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
+ 			goto failure;
+ 		}
  
- static void acp_prov_close(void *user_data, uint8_t reason)
- {
--	/* TODO: Handle Close */
-+	struct mesh_prov_acceptor *prov = user_data;
++		if (prov->conf_inputs.start.auth_method < 2 &&
++				(prov->conf_inputs.start.auth_action ||
++					prov->conf_inputs.start.auth_size)) {
++			l_debug("inconsistent auth method and action");
++			fail.reason = PROV_ERR_INVALID_FORMAT;
++			goto failure;
++		}
 +
-+	if (reason != PROV_ERR_SUCCESS && prov->cmplt)
-+		prov->cmplt(prov->caller_data, reason, NULL);
-+	else if (reason == PROV_ERR_SUCCESS && prov->cmplt)
-+		prov->cmplt(prov->caller_data, PROV_ERR_UNEXPECTED_ERR, NULL);
++		if (prov->conf_inputs.caps.pub_type !=
++				prov->conf_inputs.start.pub_key) {
++			l_debug("inconsistent pubkey type");
++			fail.reason = PROV_ERR_INVALID_FORMAT;
++			goto failure;
++		}
 +
-+	prov->cmplt = NULL;
- 	acceptor_free();
- }
- 
+ 		if (prov->conf_inputs.start.pub_key) {
+ 			if (prov->conf_inputs.caps.pub_type) {
+ 				/* Prompt Agent for Private Key of OOB */
 -- 
 2.17.1
 
