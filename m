@@ -2,210 +2,153 @@ Return-Path: <SRS0=2tab=5J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07197C43331
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5E5C2BAEE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:32:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C038220714
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B39820836
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:32:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dy6jWN5F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tcJKHfPK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727144AbgCXTaE (ORCPT
+        id S1727154AbgCXTc1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Mar 2020 15:30:04 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:41690 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727105AbgCXTaE (ORCPT
+        Tue, 24 Mar 2020 15:32:27 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:33587 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726618AbgCXTc1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Mar 2020 15:30:04 -0400
-Received: by mail-io1-f65.google.com with SMTP id y24so19331460ioa.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 12:30:03 -0700 (PDT)
+        Tue, 24 Mar 2020 15:32:27 -0400
+Received: by mail-io1-f68.google.com with SMTP id o127so19391650iof.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 12:32:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=I1Lp5ErzQY7aQfom99TDhDfGZD38/iC3dvfnr1eRNlw=;
-        b=Dy6jWN5FKI6d2urMmVBGmEPv5vMJCRzLjtBUBHlpNpDVkDRs+UKHr5vpoPnnxMrhZT
-         1gXFl8MRl7hSy1Ht8DAKLxJrzZVpG7GXArsTucBIUdSfTfqFR/Y4HNFU96cfNzZ3m4A8
-         T0NAs/e5M55wEzCijFO/C/GbcSCDtxqXUtS9gOuDPoIMbPz3MUWv4MM58KmWrN6/VlJk
-         2Feu6GyXWy4NnyOZu6kzd15tiVarbuOeGA/5VfNBOBbsAiqzh8fAdQfGuwKtVQsV10jM
-         H/IH/Nr5/jGgOexiWt/1lWrwvR1MVpyam6uATtBI8hriU37bRrZ8hRuPN6ddlG14Vc5z
-         s0zQ==
+         :cc;
+        bh=UBZU0spNRefMxT7GtEmfGVi6VUQoaXSy7zyWgYJQoQw=;
+        b=tcJKHfPKAN7KqwRwJ/ZqUKWGH5+CnmbAmzSaLzcdJh3ke1Ex4rBOsJ2hf/4zHZYOl4
+         pLRKSp0HLJl7+fPvbpqbMrKfvJD06jMw3Q5fhy+PKX8oMuLyUtq22FnMdmfCP3RZUHiL
+         7cD5KS8PN0HmI9Q0nZSD1rAkginEANx6menzKTCAmXklc9SiuWBdB2tatKQJrout95OE
+         DJLYR3RmSTIgIaAc/5oUxIvywtB5IA54o1wOZ82lQojCfngo/2PUanZjkwnDAO3E6XtO
+         egB2opjETgZnQOKD4OZJ/i08J/GKyNzsqMvw2Cg2y7YWbSIOEigCVuOhM31GkfNk/Zbn
+         hcCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=I1Lp5ErzQY7aQfom99TDhDfGZD38/iC3dvfnr1eRNlw=;
-        b=HtLhl611vYmDtrGn/gLuSuBAnC1AP3cZWawvFG8BsOIOV1L1tykFHZZ+2Q244p6C/6
-         pIE6ai3Ufn9lZeIj7AVYnBpj38u/4IgjpriaBJN7VZUUoAA2soYEfxaf1SRei32+FF2o
-         uTI53BDng01hLav7yVeTpDO1QrR/wU+CXr17QjbOgGLtAFVObaMGBm769x4yE5Ef6wuU
-         3PhRp8uvrR02tTu9MIA8/c2ReLOTSiJiT6BmOjecnsm7HkKKJehAgj+KUZkc3DiQKzy+
-         /k0SVdfViHRXtmWUMV551G1m5uSx67cYnQhP4oeZdNWda5RNr4gfGqivRhDTFmvaE1wz
-         Pe3A==
-X-Gm-Message-State: ANhLgQ3AFhMYzYUzOr1TrdFO/XFPn7dk8bLMV9ONrvBm8NFsv/2c8c9U
-        KMVMLgOcV3icJAZchcj9o5p2eyDIHfOmTvfljpMOqz+T
-X-Google-Smtp-Source: ADFU+vshU5Mw4ft9k0npR5q8eWCNkhTclXDjmygG4LzTBDLRyAwHdme40QjLD6pKlE5BVuhGojuQY1qsfxh5NZUstcY=
-X-Received: by 2002:a02:cc37:: with SMTP id o23mr14980162jap.106.1585078202414;
- Tue, 24 Mar 2020 12:30:02 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=UBZU0spNRefMxT7GtEmfGVi6VUQoaXSy7zyWgYJQoQw=;
+        b=dyLdXpnxMCjZt4rav2tHa0pwmbR0wiCpViX7f7o5rz4SM9ZL0q60nzgnKe15ThS3Lf
+         FNXZUFKb71bdHY0j20Y4s2ys7Es5UayuZBqiXU8TeKUEQUz6S0LOWQ4WB7hgTw/7pLud
+         xzBGpGkNEwyKezMwmmsDghXNShsIvyH2QXz6rQ7uMOhRFuxmj/2ZsPWTnB5vLWdCxHhM
+         WDpoxLWct+xfxSsrBtAEt7NCs6xnLhv52IFOqn366TE3GYPfjgabrqMAlp+ei4MiRgpy
+         S7hspAjyubvaqY5znS52eb4NtqeahU9VOH1lTbX5xbL32hn3ma3rkfpGLGwjskCH5i2g
+         bDSg==
+X-Gm-Message-State: ANhLgQ1KfCGpW3F2agPg0h6cfH3bxOsegh9QcSMIBuohuzqAxwj4Yzi+
+        MoUKIZ+w/67/neZz9g4grKTNQ6u34Vh39HIX4WVLBw==
+X-Google-Smtp-Source: ADFU+vspMIThkZMvjN0TV9g8qWucprIzlJD/MqLtia/5hebL3EdoCu3I0ExyZmVQrAAG4KUeUzMuzJbkEbPomPy6epI=
+X-Received: by 2002:a02:3842:: with SMTP id v2mr6539922jae.9.1585078345721;
+ Tue, 24 Mar 2020 12:32:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200320133748.154926-1-alainm@chromium.org> <CALWDO_WSHiNw+uwcZzufJ7rjHr=zpMs6f3ry=rdLMGLz2gJZ=w@mail.gmail.com>
- <1ACCF17B-90EB-4DE1-BD8C-A927ABEC3913@holtmann.org> <CALWDO_V=6NXLTZ=XTc+uAe3YUVkUfe88c4beWWoqWK7+vK4+8g@mail.gmail.com>
- <992DB845-DB7F-41B9-93E0-538B08BDF910@holtmann.org>
-In-Reply-To: <992DB845-DB7F-41B9-93E0-538B08BDF910@holtmann.org>
+References: <20200323072824.254495-1-mcchou@chromium.org> <20200323002820.v1.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
+ <04021BE3-63F7-4B19-9F0E-145785594E8C@holtmann.org> <421d27670f2736c88e8c0693e3ff7c0dcfceb40b.camel@perches.com>
+ <57C56801-7F3B-478A-83E9-1D2376C60666@holtmann.org> <03547be94c4944ca672c7aef2dd38b0fb1eedc84.camel@perches.com>
+ <CALWDO_U5Cnt3_Ss2QQNhtuKS_8qq7oyNH4d97J68pmbmQMe=3w@mail.gmail.com> <643C6020-2FC5-4EEA-8F64-5D4B7F9258A4@holtmann.org>
+In-Reply-To: <643C6020-2FC5-4EEA-8F64-5D4B7F9258A4@holtmann.org>
 From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 24 Mar 2020 15:29:51 -0400
-Message-ID: <CALWDO_WF4n_Ta-fYoxTv4OF_guZy=d8urEyrosUPgWdHXo8Pag@mail.gmail.com>
-Subject: Re: [PATCH v2] bluetooth: Enforce classic key size verification.
+Date:   Tue, 24 Mar 2020 15:32:14 -0400
+Message-ID: <CALWDO_Uc6brpXmVfoUd+jgyy_F0-WSrYb1+hXtXm498dGzCOSg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: btusb: Indicate Microsoft vendor
+ extension for Intel 9460/9560 and 9160/9260
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Marcel Holtmann <marcel.holtmann@intel.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
+Cc:     Joe Perches <joe@perches.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Alain Michaud <alainm@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 2:33 PM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+On Tue, Mar 24, 2020 at 2:35 PM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Hi Alain,
 >
-> >>>> This change introduces a new configuration to strictly enforce key s=
-ize
-> >>>> checks.  This ensures that systems are in a secured configuration by
-> >>>> default while allowing for a compatible posture via a Kconfig option=
- to
-> >>>> support controllers who may not support the read encryption key size
-> >>>> command.
+> >>>>>> This adds a bit mask of driver_info for Microsoft vendor extension and
+> >>>>>> indicates the support for Intel 9460/9560 and 9160/9260. See
+> >>>>>> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
+> >>>>>> microsoft-defined-bluetooth-hci-commands-and-events for more information
+> >>>>>> about the extension. This was verified with Intel ThunderPeak BT controller
+> >>>>>> where msft_vnd_ext_opcode is 0xFC1E.
+> >>>> []
+> >>>>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> >>>> []
+> >>>>>> @@ -315,6 +315,10 @@ struct hci_dev {
+> >>>>>>        __u8            ssp_debug_mode;
+> >>>>>>        __u8            hw_error_code;
+> >>>>>>        __u32           clock;
+> >>>>>> +       __u16           msft_vnd_ext_opcode;
+> >>>>>> +       __u64           msft_vnd_ext_features;
+> >>>>>> +       __u8            msft_vnd_ext_evt_prefix_len;
+> >>>>>> +       void            *msft_vnd_ext_evt_prefix;
 > >>>>
-> >>>> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> >>>> ---
+> >>>> msft is just another vendor.
 > >>>>
-> >>>> net/bluetooth/Kconfig     | 20 ++++++++++++++++++++
-> >>>> net/bluetooth/hci_core.c  | 10 ++++++++++
-> >>>> net/bluetooth/hci_event.c |  4 ++++
-> >>>> 3 files changed, 34 insertions(+)
-> >>>>
-> >>>> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> >>>> index 165148c7c4ce..8e177d4f3f02 100644
-> >>>> --- a/net/bluetooth/Kconfig
-> >>>> +++ b/net/bluetooth/Kconfig
-> >>>> @@ -128,4 +128,24 @@ config BT_DEBUGFS
-> >>>>         Provide extensive information about internal Bluetooth state=
-s
-> >>>>         in debugfs.
-> >>>>
-> >>>> +config BT_EXPERT
-> >>>> +       bool "Expert Bluetooth options"
-> >>>> +       depends on BT
-> >>>> +       default n
-> >>>> +       help
-> >>>> +         Provides a set of expert options and configurations that s=
-hould
-> >>>> +         only be used deliberately by BT experts.  This is consider=
-ed a
-> >>>> +         global switch to ensure these advanced features or options=
- that
-> >>>> +         depends on BT_EXPERT are only used in expert mode.
-> >>>> +
-> >>>> +config BT_ENFORCE_CLASSIC_KEY_SIZES
-> >>>> +       bool "Enforces security requirements for Bluetooth classic"
-> >>>> +       depends on BT && BT_EXPERT
-> >>>> +       default y
-> >>>> +       help
-> >>>> +         Enforces Bluetooth classic security requirements by disall=
-owing
-> >>>> +         use of insecure Bluetooth controllers, i.e. that doesn't s=
-upport
-> >>>> +         Read Encryption Key Size command to prevent BT classic con=
-nection
-> >>>> +         with very short encryption key.
-> >>>> +
-> >>>> source "drivers/bluetooth/Kconfig"
-> >>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> >>>> index 4e6d61a95b20..142130d4b66b 100644
-> >>>> --- a/net/bluetooth/hci_core.c
-> >>>> +++ b/net/bluetooth/hci_core.c
-> >>>> @@ -1540,6 +1540,16 @@ static int hci_dev_do_open(struct hci_dev *hd=
-ev)
-> >>>>
-> >>>>       clear_bit(HCI_INIT, &hdev->flags);
-> >>>>
-> >>>> +#ifdef BT_ENFORCE_CLASSIC_KEY_SIZES
-> >>>> +       /* Don't allow usage of Bluetooth if the chip doesn't suppor=
-t */
-> >>>> +       /* Read Encryption Key Size command */
-> >>>> +       if (!ret && !(hdev->commands[20] & 0x10)) {
-> >>>> +               bt_dev_err(hdev,
-> >>>> +                          "Disabling BT, Read Encryption Key Size !=
-supported");
-> >>>> +               ret =3D -EIO;
-> >>>> +       }
-> >>>> +#endif
-> >>> Just FYI, I haven't changed this bit yet.  I'll wait for your guidanc=
-e
-> >>> on where best to put this to leave the controller in the right state.
+> >>>> If there are to be vendor extensions, this should
+> >>>> likely use a blank line above and below and not
+> >>>> be prefixed with msft_
+> >>>
+> >>> there are other vendors, but all of them are different. So this needs to be prefixed with msft_ actually. But I agree that having empty lines above and below makes it more readable.
 > >>
-> >> while I was writing a patch to show how to use unconfigured state for =
-controllers that don=E2=80=99t support the Read Encryption Key Size command=
-, I was wonder why put this into the kernel in the first place.
+> >> So struct hci_dev should become a clutter
+> >> of random vendor extensions?
 > >>
-> >> I was thinking that essentially userspace can just make the decision t=
-o use a controller, or use it in LE only mode or not use a controller at al=
-l. So all we need is to collect the security information of the controller =
-and kernel and expose them to bluetoothd.
-> >>
-> >> +Read Security Features Command
-> >> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-> >> +
-> >> +       Command Code:           0x0048
-> >> +       Controller Index:       <controller id>
-> >> +       Command Parameters:
-> >> +       Return Parameters:      Security_Features (4 Octets)
-> >> +
-> >> +       This command is used to retrieve the supported security featur=
-es
-> >> +       by the controller or the kernel.
-> >> +
-> >> +       The Security_Features parameter is a bitmask with currently th=
-e
-> >> +       following available bits:
-> >> +
-> >> +               0       Encryption Key Size enforcement (BR/EDR)
-> >> +               1       Encryption Key Size enforcement (LE)
-> >> +
-> >> +       This command generates a Command Complete event on success or
-> >> +       a Command Status event on failure.
-> >> +
-> >> +       Possible errors:        Invalid Parameters
-> >> +                               Invalid Index
-> >> +
-> >> +
-> >>
-> >> I was also considering that we additionally add the ECDH Public Key va=
-lidation here as supported bits. And in the future even more security relat=
-ed information that we want to enforce. However the enforcement to power on=
- or not use a controller is left to bluetoothd and its main.conf configurat=
-ion. Thoughts?
-> > I like the idea.  However, I feel we will still need to guard against
-> > the Read Encryption Key Size failing.  Perhaps we can just do this
-> > unconditionally (where it is reported as supported but fails, we
-> > simply set the encryption key size to 0 and move on).
+> >> Perhaps there should instead be something like
+> >> an array of char at the end of the struct and
+> >> various vendor specific extensions could be
+> >> overlaid on that array or just add a void *
+> >> to whatever info that vendors require.
+> > I don't particularly like trailing buffers, but I agree we could
+> > possibly organize this a little better by with a struct.  something
+> > like:
+> >
+> > struct msft_vnd_ext {
+> >    bool              supported; // <-- Clearly calls out if the
+> > extension is supported.
+> >    __u16           msft_vnd_ext_opcode; // <-- Note that this also
+> > needs to be provided by the driver.  I don't recommend we have this
+> > read from the hardware since we just cause an extra redirection that
+> > isn't necessary.  Ideally, this should come from the usb_table const.
 >
-> I was thinking the same thing. Lets just set the encryption size to zero =
-and report the error. Care to send a patch for it or should I send one?
-I'll do it shortly.
-
-Would you want to send patch you suggested (eg: Read Security Features
-Command) or should I?
+> Actually supported == false is the same as opcode == 0x0000. And supported == true is opcode != 0x0000.
+I was thinking of a more generic way to check if the extension is
+supported so the higher level doesn't need to understand that
+opcode==0 means it's not supported.  For the android extension for
+example, this would be a simple boolean (there isn't any opcodes).
+>
+> >    __u64           msft_vnd_ext_features;
+> >    __u8             msft_vnd_ext_evt_prefix_len;
+> >    void             *msft_vnd_ext_evt_prefix;
+> > };
+> >
+> > And then simply add the struct msft_vnd_ext (and any others) to hci_dev.
+>
+> Anyway, Lets keep these for now as hci_dev->msft_vnd_ext_*. We can fix this up later without any impact.
+I agree, this doesn't have a whole lot of long term consequences,
+although some will want to cherry-pick this to older kernels so if
+there is something we can do now, it will reduce burden on some
+products.
 
 >
 > Regards
