@@ -7,101 +7,101 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41743C54EEB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDAFC2BAEE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:28:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B2AB2074D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:28:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75BBF2076F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:28:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="bkBazCkt"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="BesH4yst"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727101AbgCXT2d (ORCPT
+        id S1727105AbgCXT2d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 24 Mar 2020 15:28:33 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:55756 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727040AbgCXT2b (ORCPT
+Received: from mailout3.samsung.com ([203.254.224.33]:15032 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726971AbgCXT2a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Mar 2020 15:28:31 -0400
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20200324192828epoutp021af599c319d4abcbe0c6a3f12fe59087~-VCREc0Hw3137231372epoutp02q
+        Tue, 24 Mar 2020 15:28:30 -0400
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20200324192828epoutp03ac76bfa28615e95590cafb69c9539f30~-VCRXG8KK0335903359epoutp03_
         for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 19:28:28 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20200324192828epoutp021af599c319d4abcbe0c6a3f12fe59087~-VCREc0Hw3137231372epoutp02q
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20200324192828epoutp03ac76bfa28615e95590cafb69c9539f30~-VCRXG8KK0335903359epoutp03_
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
         s=mail20170921; t=1585078108;
-        bh=3IdF/WGVzLCSQrGDErvZ/0YpckBw0tnpR0jqdfvTVRw=;
+        bh=wx0C0C3fFCZ3eGmioDklDPTyveNr3B/1zKlgUVwwVvo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bkBazCkt6wCXur7I0cZHz0VfwPAf99Y6/dzO1R86tTRoIEYHdbri7M68ydnnmKo3p
-         cmdMF/mTMhTnASX5a0Bm6upuNbpYid7ouskiqecnMA6Y0B7WCAcliEM55CzkxlIg71
-         jgvmF2phb6x2oVu+ONTPRPuspJWBeDi1FsnAIsHo=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20200324192827epcas5p19a70c10048e2504738e9b5811bcc20f0~-VCQFqFzu1650916509epcas5p1_;
-        Tue, 24 Mar 2020 19:28:27 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.40.198]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 48n1WG2Z2hzMqYkY; Tue, 24 Mar
+        b=BesH4ystJmV6Wsnb9LmKGEg35VFzS3Db9+1sS56IkvuV3o5riYNgYctE55TOTeZos
+         zCPA+wxhDQ9zbVVUncdadir2ooefGDFOBHZOSWk1wKgZ3fSgY3jGgnZLlYfwPEsawM
+         avp6cutwLcBZOGjonDu5+497t4auQZDsK2lGs6hw=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20200324192828epcas5p297613c2687dcf37ca19779f4bb6c8320~-VCQmk_FT0057600576epcas5p2a;
+        Tue, 24 Mar 2020 19:28:28 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.40.197]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 48n1WG6Pq3zMqYkV; Tue, 24 Mar
         2020 19:28:26 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        63.E6.04736.95F5A7E5; Wed, 25 Mar 2020 04:28:26 +0900 (KST)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A6.DD.04778.A5F5A7E5; Wed, 25 Mar 2020 04:28:26 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20200324192823epcas5p3b25363353b98e206a50d7fd4572c9552~-VCMuPbs22547825478epcas5p3y;
-        Tue, 24 Mar 2020 19:28:23 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20200324192826epcas5p2eb80e44ac061329faf5421ba3b76e5f8~-VCO8r6s_0057600576epcas5p2Z;
+        Tue, 24 Mar 2020 19:28:26 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20200324192823epsmtrp22960e7d823c8983694bac810c504ca3c~-VCMHacRc2919629196epsmtrp2i;
-        Tue, 24 Mar 2020 19:28:23 +0000 (GMT)
-X-AuditID: b6c32a4b-acbff70000001280-b8-5e7a5f5993f7
+        20200324192826epsmtrp2fabcaba7c7288d7e609397d5c318fced~-VCO8Ideh0076200762epsmtrp2C;
+        Tue, 24 Mar 2020 19:28:26 +0000 (GMT)
+X-AuditID: b6c32a4a-33bff700000012aa-c2-5e7a5f5a797b
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D8.2A.04158.75F5A7E5; Wed, 25 Mar 2020 04:28:23 +0900 (KST)
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        35.F8.04024.A5F5A7E5; Wed, 25 Mar 2020 04:28:26 +0900 (KST)
 Received: from SyamLinux.sa.corp.samsungelectronics.net (unknown
         [107.109.107.247]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20200324192822epsmtip1816c0a85d8f58163caecdb829b8b3cec~-VCLflhrk1049610496epsmtip1H;
-        Tue, 24 Mar 2020 19:28:22 +0000 (GMT)
+        20200324192825epsmtip1961dd9675a73e40ea169135d97c8a7c7~-VCOWyfnC2936029360epsmtip15;
+        Tue, 24 Mar 2020 19:28:25 +0000 (GMT)
 From:   Prathyusha Nelluri <prathyusha.n@samsung.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     s.syam@samsung.com, Prathyusha N <prathyusha.n@samsung.com>
-Subject: [PATCH 1/1] mesh: Handle KeyRefresh phase 1 to phase 3
-Date:   Wed, 25 Mar 2020 00:57:19 +0530
-Message-Id: <1585078044-14974-5-git-send-email-prathyusha.n@samsung.com>
+Subject: [PATCH 1/1] mesh: Send input complete for input OOB Authentication
+Date:   Wed, 25 Mar 2020 00:57:23 +0530
+Message-Id: <1585078044-14974-9-git-send-email-prathyusha.n@samsung.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1585078044-14974-1-git-send-email-prathyusha.n@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHKsWRmVeSWpSXmKPExsWy7bCmhm5UfFWcwfzpTBZzrvUxW/xfeovd
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHKsWRmVeSWpSXmKPExsWy7bCmlm5UfFWcwdelBhZzrvUxW/xfeovd
         YtK+DywOzB59W1YxenzeJBfAFJVjk5GamJJapJCal5yfkpmXbqvkHRzvHG9qZmCoa2hpYa6k
         kJeYm2qr5OIToOuWmQO0Q0mhLDGnFCgUkFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYGhUoFec
-        mFtcmpeul5yfa2VoYGBkClSZkJMxZcck1oJNfBUrfqxnbGB8z93FyMkhIWAice3iReYuRi4O
-        IYHdjBKPpu9ghHA+MUqcfr+ZBcL5xijxtXcbO0zL5iMT2CASexklvh35AeV0MEksWzCPEaSK
-        TcBY4vzNV0wgtoiAssSzfYfBbGYBe4kjP76zgNjCQHZfyxZmEJtFQFXiw4Y3YHFeAQ+J5onT
-        mCG2yUncPNcJZnMKeEqsvXIM7D4JgZesEt2PmqGKXCSmn17PBmELS7w6vgXqVCmJz+/2QsW7
-        GSV2v3GFaJ7CKHHvBchFHECOvcSEF/wgJrOApsT6XfoQd/JJ9P5+AlXBK9HRJgQxRUFi1dSJ
-        TBC2mMS66V+gNnlIvD29Aex8IYE5jBJvf2tNYJSdhTB0ASPjKkbJ1ILi3PTUYtMC47zUcuSI
-        2sQITjta3jsYN53zOcQowMGoxMPb8LgyTog1say4MvcQowQHs5II7+bUijgh3pTEyqrUovz4
-        otKc1OJDjKbA8JvILCWanA9MiXkl8YamRmZmBpYGpsYWZoZK4ryTWK/GCAmkJ5akZqemFqQW
-        wfQxcXBKNTBOS1/whnXe1lfHgvcGvBet3fDA8sC6EuuFy9zmXxM5+94/1FeVueBFRKz7lH3P
-        WgpCBa5GKmissY5d/GqbRiurVQp7netF1wX3hRn2bOF+cPFMUcBhNl7ZVt36xRkLQqYudl+4
-        tqsjN86k/sR0pXfTH4meOuF7XyixVEh9/ddAK96vIgxnpzUrsRRnJBpqMRcVJwIAlkmLYFED
-        AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpkluLIzCtJLcpLzFFi42LZdlhJTjc8virOYOoZLos51/qYLf4vvcVu
-        MWnfBxYHZo++LasYPT5vkgtgiuKySUnNySxLLdK3S+DKmLJjEmvBJr6KFT/WMzYwvufuYuTk
-        kBAwkdh8ZAJbFyMXh5DAbkaJtuMnmCESYhJvVpxgh7CFJVb+e84OUdTGJLHj13UmkASbgLHE
-        +ZuvwGwRAWWJZ/sOg9nMAo4Sn67MYwOxhQXsJfpatoANZRFQlfiw4Q0LiM0r4CHRPHEa1DI5
-        iZvnOsFsTgFPibVXjjGC2EJANX86Z7JNYORbwMiwilEytaA4Nz232LDAKC+1XK84Mbe4NC9d
-        Lzk/dxMjOGC0tHYwnjgRf4hRgINRiYdX42FlnBBrYllxZe4hRgkOZiUR3s2pFXFCvCmJlVWp
-        RfnxRaU5qcWHGKU5WJTEeeXzj0UKCaQnlqRmp6YWpBbBZJk4OKUaGJ2t2hOzt1xW7T4fGLku
-        4rXLJDvpn/677p5R+VnpN3eHzSq+T9tlTRx9yiVv6TWaib3Y/rnP4vrZ1F1NSzklXwfseBDh
-        6rL/+6riR8+kdBQbf+3cbBDL8pZ/ybK836cvCmyJU/Kf89hx8mFGvbmLuGUyLF5K7dVZJrZ1
-        SzXv8qVpn2d9WaOpdlaJpTgj0VCLuag4EQDXUmc6FAIAAA==
-X-CMS-MailID: 20200324192823epcas5p3b25363353b98e206a50d7fd4572c9552
+        mFtcmpeul5yfa2VoYGBkClSZkJOx5vAf1oKzbBW33l9ibGDcz9rFyMkhIWAiseHVVOYuRi4O
+        IYHdjBLTlrxhgnA+MUq87N3ODuF8Y5TY/uoEE0zLvd+P2EFsIYG9jBKfmkMhijqYJF7+/cgG
+        kmATMJY4f/MVWIOIgLLEs32HwWxmAXuJIz++s4DYwgLeEp3vV4HFWQRUJRas+sQIYvMKeEhc
+        /L8KapmcxM1zncwgNqeAp8TaK8cYQZZJCLxklbh74BM7RJGLxKZ1P6FsYYlXx7dA2VISn9/t
+        ZYOwuxkldr9xhWiewihx7wXIRRxAjr3EhBf8ICazgKbE+l36EHfySfT+fgJVwSvR0SYEMUVB
+        YtXUiVCniUmsm/4FapOHxLwPS9gg4TCHUWLv5mtMExhlZyFMXcDIuIpRMrWgODc9tdi0wCgv
+        tRw5ojYxgtOOltcOxmXnfA4xCnAwKvHwajysjBNiTSwrrsw9xCjBwawkwrs5tSJOiDclsbIq
+        tSg/vqg0J7X4EKMpMAAnMkuJJucDU2JeSbyhqZGZmYGlgamxhZmhkjjvJNarMUIC6Yklqdmp
+        qQWpRTB9TBycUg2MG3leVn0S45BbfTxs8ZnQRYunemw5lHRFsUpwo82aJZ05ttHuOkc+/jLT
+        kPovxGRwYtaquxfSg/6djJxWFOn7XC9fI+f4vOrTXLOmv3JKW6q9R9MyRW051+Fc+9nB3Gus
+        FpdvOyi5/v6OnQKexWettzVZ7/lV72G/PsI8/8Tz59t/fIiqd/b8p8RSnJFoqMVcVJwIAPEy
+        UFZRAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpkluLIzCtJLcpLzFFi42LZdlhJTjcqvirOYMMufos51/qYLf4vvcVu
+        MWnfBxYHZo++LasYPT5vkgtgiuKySUnNySxLLdK3S+DKWHP4D2vBWbaKW+8vMTYw7mftYuTk
+        kBAwkbj3+xF7FyMXh5DAbkaJ9h8r2SASYhJvVpxgh7CFJVb+ew5V1MYkceFDPwtIgk3AWOL8
+        zVdMILaIgLLEs32HwWxmAUeJT1fmgQ0SFvCW6Hy/CizOIqAqsWDVJ0YQm1fAQ+Lif4i4hICc
+        xM1zncwgNqeAp8TaK8fAaoSAav50zmSbwMi3gJFhFaNkakFxbnpusWGBYV5quV5xYm5xaV66
+        XnJ+7iZGcMBoae5gvLwk/hCjAAejEg+v1sPKOCHWxLLiytxDjBIczEoivJtTK+KEeFMSK6tS
+        i/Lji0pzUosPMUpzsCiJ8z7NOxYpJJCeWJKanZpakFoEk2Xi4JRqYCxntvEz+MkVPW2G/GqV
+        GYvZ917/1BsnfzqTsbPrw5mHr5d21df2S+ysyjU9/LLztf2hqQ7GR3ZeOfsnjnfy8z2Hyu9m
+        20smqWjZPfA0WvdzY+qWfx1TA0JLK4t3Hnu12PZOYvv8l0u3Lv7dt+xI183SHarmjEdOHj7F
+        PEl0Qsa+LXFRqnxy9zSVWIozEg21mIuKEwGhv2pzFAIAAA==
+X-CMS-MailID: 20200324192826epcas5p2eb80e44ac061329faf5421ba3b76e5f8
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20200324192823epcas5p3b25363353b98e206a50d7fd4572c9552
+X-CMS-RootMailID: 20200324192826epcas5p2eb80e44ac061329faf5421ba3b76e5f8
 References: <1585078044-14974-1-git-send-email-prathyusha.n@samsung.com>
-        <CGME20200324192823epcas5p3b25363353b98e206a50d7fd4572c9552@epcas5p3.samsung.com>
+        <CGME20200324192826epcas5p2eb80e44ac061329faf5421ba3b76e5f8@epcas5p2.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -109,55 +109,28 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Prathyusha N <prathyusha.n@samsung.com>
 
-Switch to phase 3 when updated net key index is same as
-beacon key id. Switch beaconing key in phase 2 and phase 3.
+Send input complete when user completes input operation.
 ---
- mesh/net.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ mesh/prov-acceptor.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/mesh/net.c b/mesh/net.c
-index ec05b6be9..3b6c8365f 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -2598,6 +2598,14 @@ static int key_refresh_phase_two(struct mesh_net *net, uint16_t idx)
- 	 */
- 	subnet->kr_phase = KEY_REFRESH_PHASE_TWO;
- 	refresh_beacon(subnet, net);
+diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+index 03972c227..20a2ce4be 100644
+--- a/mesh/prov-acceptor.c
++++ b/mesh/prov-acceptor.c
+@@ -272,6 +272,12 @@ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
+ 	memcpy(prov->rand_auth_workspace + 16, key, 16);
+ 	memcpy(prov->rand_auth_workspace + 32, key, 16);
+ 	prov->material |= MAT_RAND_AUTH;
 +
-+	/* send snb with updated net key id in phase 2 */
-+	if (net->beacon_enable) {
-+		/* Switch beaconing key */
-+		net_key_beacon_disable(subnet->net_key_cur);
-+		net_key_beacon_enable(subnet->net_key_upd);
++	if (prov->conf_inputs.start.auth_action ==
++							PROV_ACTION_IN_ALPHA) {
++		msg.opcode = PROV_INP_CMPLT;
++		prov->trans_tx(prov->trans_data, &msg.opcode, 1);
 +	}
-+
- 	queue_friend_update(net);
+ }
  
- 	l_queue_foreach(net->friends, frnd_kr_phase2, net);
-@@ -2625,6 +2633,13 @@ static int key_refresh_finish(struct mesh_net *net, uint16_t idx)
- 
- 	l_info("Key refresh phase 3: use new keys only, discard old ones");
- 
-+	/* required when skipping phase 2 */
-+	if (net->beacon_enable) {
-+		/* Switch beaconing key */
-+		net_key_beacon_disable(subnet->net_key_cur);
-+		net_key_beacon_enable(subnet->net_key_upd);
-+	}
-+
- 	/* Switch to using new keys, discard old ones */
- 	net_key_unref(subnet->net_key_cur);
- 	subnet->net_key_tx = subnet->net_key_cur = subnet->net_key_upd;
-@@ -2755,7 +2770,8 @@ static void process_beacon(void *net_ptr, void *user_data)
- 				ivi != net->iv_index || ivu != net->iv_update)
- 		update_iv_ivu_state(net, ivi, ivu);
- 
--	if (kr != local_kr)
-+	if (kr != local_kr || (subnet->kr_phase == KEY_REFRESH_PHASE_ONE &&
-+				subnet->net_key_upd == beacon_data->key_id))
- 		update_kr_state(subnet, kr, beacon_data->key_id);
- 
- 	net_key_beacon_refresh(beacon_data->key_id, net->iv_index,
+ static void priv_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
 -- 
 2.17.1
 
