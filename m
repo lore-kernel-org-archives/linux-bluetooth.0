@@ -2,113 +2,277 @@ Return-Path: <SRS0=2tab=5J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B14AC2BAEE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 06:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEDFC41621
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 06:27:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B2BF2074D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 06:05:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MaQWbVZj"
+	by mail.kernel.org (Postfix) with ESMTP id 8453B2076A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 06:27:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727253AbgCXGFA (ORCPT
+        id S1727380AbgCXG1i convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Mar 2020 02:05:00 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:40949 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727050AbgCXGFA (ORCPT
+        Tue, 24 Mar 2020 02:27:38 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:38241 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725922AbgCXG1h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Mar 2020 02:05:00 -0400
-Received: by mail-ot1-f66.google.com with SMTP id e19so15981223otj.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Mar 2020 23:04:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Vc2PCHKZB1JY/EQw3WjMqKCNYwRxM0w2FAoFej563Wc=;
-        b=MaQWbVZjsAF18y4zTbp3+MQg2i9/sjJjOrLsnJ1rKEjiYcQtemr19xu48gmCXWcQoQ
-         RvwJrOKyrEiuLi8Na40ixcmBE1Gxr+fArGZQOBcFztUE+KsRfR7r0k68Hk2LCukpu9QK
-         us05jQZRztiIgitoDs0ULFVKS7dp1XwOFjRGMD0Y9otr8lQLbcrIPWuu3VBjPfMI1oMT
-         9GFo3G9IUPW74DVGtXl76hvJarpTfFXq9An7f/cZ7N+FU/9iCXWDZCyBIYh/LzpPi8dk
-         rv6H/vZBAEGwubEV6b4k9MAgYRHCxsa2tJWlQ+5qBqJe1phmBdHvAORjVH3qmqqD9pFF
-         pubg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vc2PCHKZB1JY/EQw3WjMqKCNYwRxM0w2FAoFej563Wc=;
-        b=t2D64xX2yy43M6ZgJsZn5VlvNtL96UN8n/ckTv5BRo1u/kQkTvbnFrsCxxqhQhvIKK
-         WZ63G9pYJEo8TbnChN5UoN0RxukcGy/eTV29GrMXM/ID7OMJbnXUk7nUZxiKpuImJzuc
-         rp4ypqsPMqvYdziT20/qAKvAMwz1uBBAMr8pvVJdHlW2qaY1OTcZ6+XZVPtdSvLKaZLH
-         CdkefH6c70O13H+zbXqXkn8QYVbYmW9NpulvlMD7+OqHXLPACZpaU4+eKpxrtTcxbNUM
-         k8yXGsZPBuXGlvRXf+qAZyemT/e2HD8HT6HpjrhsV7IplhGGCVgBkDmL/RrQ85EqwEVv
-         hm9w==
-X-Gm-Message-State: ANhLgQ3l0TasvvSHGoWgn9/HKmIylGuOqwsKj7x8VBJJkEbzALHAdzrw
-        Af/09kwg5ckUNd6atudgbBiwh+1dZtZZIT1oSfw=
-X-Google-Smtp-Source: ADFU+vtfmQyqFY9INrcAdfiODz62vaMUDfGrA+a0hgZ7AN8i5esQs8uOFEQy9EfEmL2dIKq8s198WoazruyS09kv4rM=
-X-Received: by 2002:a9d:67c6:: with SMTP id c6mr533834otn.11.1585029899539;
- Mon, 23 Mar 2020 23:04:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200324112129.Bluez.v2.1.I6c78c0eb9826eb17c944c4903132ee75c1324136@changeid>
-In-Reply-To: <20200324112129.Bluez.v2.1.I6c78c0eb9826eb17c944c4903132ee75c1324136@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 23 Mar 2020 23:04:48 -0700
-Message-ID: <CABBYNZL+trgHt2V_iKGSyZhUoOxht_Z2jdzD8jJwo1ki-exP0A@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2] avdtp: Fix crashes in avdtp_abort
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        Tue, 24 Mar 2020 02:27:37 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5FE72CED06;
+        Tue, 24 Mar 2020 07:37:07 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
+Subject: Re: [PATCH v2 1/1] Bluetooth: Prioritize SCO traffic
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLBvyjDnLpH40u1Vq9DftyC0dty2NMf9QEsazas9Ktwvw@mail.gmail.com>
+Date:   Tue, 24 Mar 2020 07:27:35 +0100
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
         ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <97B27CBF-B4F7-48E2-8512-CFF5481221EC@holtmann.org>
+References: <20200320231928.137720-1-abhishekpandit@chromium.org>
+ <20200320161922.v2.1.I17e2220fd0c0822c76a15ef89b882fb4cfe3fe89@changeid>
+ <C09DCA09-A2C9-4675-B17B-05CE0B5DE172@holtmann.org>
+ <CANFp7mXG1HXKNQKn2YTsEOX6puNz=8WY6AHWac4UOiVMVQyEkg@mail.gmail.com>
+ <CABBYNZLBvyjDnLpH40u1Vq9DftyC0dty2NMf9QEsazas9Ktwvw@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Luiz,
 
-On Mon, Mar 23, 2020 at 8:28 PM Howard Chung <howardchung@google.com> wrote:
->
-> In avdtp_abort, if setup->stream is NULL, trying to access
-> stream->lsep will crash.
-> ---
->
-> Changes in v2:
-> - Remove variable 'sep'
->
->  profiles/audio/avdtp.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 0e075f9ff..aabc5ce51 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -3566,7 +3566,6 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
->  {
->         struct seid_req req;
->         int ret;
-> -       struct avdtp_local_sep *sep = stream->lsep;
->
->         if (!stream && session->discover) {
->                 /* Don't call cb since it being aborted */
-> @@ -3581,7 +3580,7 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
->         if (stream->lsep->state == AVDTP_STATE_ABORTING)
->                 return -EINVAL;
->
-> -       avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
-> +       avdtp_sep_set_state(session, stream->lsep, AVDTP_STATE_ABORTING);
->
->         if (session->req && stream == session->req->stream)
->                 return cancel_request(session, ECANCELED);
-> --
-> 2.25.1.696.g5e7596f4ac-goog
+>>>> When scheduling TX packets, send all SCO/eSCO packets first, check for
+>>>> pending SCO/eSCO packets after every ACL/LE packet and send them if any
+>>>> are pending.  This is done to make sure that we can meet SCO deadlines
+>>>> on slow interfaces like UART.
+>>>> 
+>>>> If we were to queue up multiple ACL packets without checking for a SCO
+>>>> packet, we might miss the SCO timing. For example:
+>>>> 
+>>>> The time it takes to send a maximum size ACL packet (1024 bytes):
+>>>> t = 10/8 * 1024 bytes * 8 bits/byte * 1 packet / baudrate
+>>>>       where 10/8 is uart overhead due to start/stop bits per byte
+>>>> 
+>>>> Replace t = 3.75ms (SCO deadline), which gives us a baudrate of 2730666.
+>>>> 
+>>>> At a baudrate of 3000000, if we didn't check for SCO packets within 1024
+>>>> bytes, we would miss the 3.75ms timing window.
+>>>> 
+>>>> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>>>> ---
+>>>> 
+>>>> Changes in v2:
+>>>> * Refactor to check for SCO/eSCO after each ACL/LE packet sent
+>>>> * Enabled SCO priority all the time and removed the sched_limit variable
+>>>> 
+>>>> net/bluetooth/hci_core.c | 111 +++++++++++++++++++++------------------
+>>>> 1 file changed, 61 insertions(+), 50 deletions(-)
+>>>> 
+>>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>>>> index dbd2ad3a26ed..a29177e1a9d0 100644
+>>>> --- a/net/bluetooth/hci_core.c
+>>>> +++ b/net/bluetooth/hci_core.c
+>>>> @@ -4239,6 +4239,60 @@ static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
+>>>>      }
+>>>> }
+>>>> 
+>>>> +/* Schedule SCO */
+>>>> +static void hci_sched_sco(struct hci_dev *hdev)
+>>>> +{
+>>>> +     struct hci_conn *conn;
+>>>> +     struct sk_buff *skb;
+>>>> +     int quote;
+>>>> +
+>>>> +     BT_DBG("%s", hdev->name);
+>>>> +
+>>>> +     if (!hci_conn_num(hdev, SCO_LINK))
+>>>> +             return;
+>>>> +
+>>>> +     while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
+>>>> +             while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+>>>> +                     BT_DBG("skb %p len %d", skb, skb->len);
+>>>> +                     hci_send_frame(hdev, skb);
+>>>> +
+>>>> +                     conn->sent++;
+>>>> +                     if (conn->sent == ~0)
+>>>> +                             conn->sent = 0;
+>>>> +             }
+>>>> +     }
+>>>> +}
+>>>> +
+>>>> +static void hci_sched_esco(struct hci_dev *hdev)
+>>>> +{
+>>>> +     struct hci_conn *conn;
+>>>> +     struct sk_buff *skb;
+>>>> +     int quote;
+>>>> +
+>>>> +     BT_DBG("%s", hdev->name);
+>>>> +
+>>>> +     if (!hci_conn_num(hdev, ESCO_LINK))
+>>>> +             return;
+>>>> +
+>>>> +     while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
+>>>> +                                                  &quote))) {
+>>>> +             while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+>>>> +                     BT_DBG("skb %p len %d", skb, skb->len);
+>>>> +                     hci_send_frame(hdev, skb);
+>>>> +
+>>>> +                     conn->sent++;
+>>>> +                     if (conn->sent == ~0)
+>>>> +                             conn->sent = 0;
+>>>> +             }
+>>>> +     }
+>>>> +}
+>>>> +
+>>>> +static void hci_sched_sync(struct hci_dev *hdev)
+>>>> +{
+>>>> +     hci_sched_sco(hdev);
+>>>> +     hci_sched_esco(hdev);
+>>>> +}
+>>>> +
+>>> 
+>>> scrap this function. It has almost zero benefit.
+>> 
+>> Done.
+>> 
+>>> 
+>>>> static void hci_sched_acl_pkt(struct hci_dev *hdev)
+>>>> {
+>>>>      unsigned int cnt = hdev->acl_cnt;
+>>>> @@ -4270,6 +4324,9 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
+>>>>                      hdev->acl_cnt--;
+>>>>                      chan->sent++;
+>>>>                      chan->conn->sent++;
+>>>> +
+>>>> +                     /* Send pending SCO packets right away */
+>>>> +                     hci_sched_sync(hdev);
+>>> 
+>>>                        hci_sched_esco();
+>>>                        hci_sched_sco();
+>>> 
+>>>>              }
+>>>>      }
+>>>> 
+>>>> @@ -4354,54 +4411,6 @@ static void hci_sched_acl(struct hci_dev *hdev)
+>>>>      }
+>>>> }
+>>>> 
+>>>> -/* Schedule SCO */
+>>>> -static void hci_sched_sco(struct hci_dev *hdev)
+>>>> -{
+>>>> -     struct hci_conn *conn;
+>>>> -     struct sk_buff *skb;
+>>>> -     int quote;
+>>>> -
+>>>> -     BT_DBG("%s", hdev->name);
+>>>> -
+>>>> -     if (!hci_conn_num(hdev, SCO_LINK))
+>>>> -             return;
+>>>> -
+>>>> -     while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
+>>>> -             while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+>>>> -                     BT_DBG("skb %p len %d", skb, skb->len);
+>>>> -                     hci_send_frame(hdev, skb);
+>>>> -
+>>>> -                     conn->sent++;
+>>>> -                     if (conn->sent == ~0)
+>>>> -                             conn->sent = 0;
+>>>> -             }
+>>>> -     }
+>>>> -}
+>>>> -
+>>>> -static void hci_sched_esco(struct hci_dev *hdev)
+>>>> -{
+>>>> -     struct hci_conn *conn;
+>>>> -     struct sk_buff *skb;
+>>>> -     int quote;
+>>>> -
+>>>> -     BT_DBG("%s", hdev->name);
+>>>> -
+>>>> -     if (!hci_conn_num(hdev, ESCO_LINK))
+>>>> -             return;
+>>>> -
+>>>> -     while (hdev->sco_cnt && (conn = hci_low_sent(hdev, ESCO_LINK,
+>>>> -                                                  &quote))) {
+>>>> -             while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
+>>>> -                     BT_DBG("skb %p len %d", skb, skb->len);
+>>>> -                     hci_send_frame(hdev, skb);
+>>>> -
+>>>> -                     conn->sent++;
+>>>> -                     if (conn->sent == ~0)
+>>>> -                             conn->sent = 0;
+>>>> -             }
+>>>> -     }
+>>>> -}
+>>>> -
+>>>> static void hci_sched_le(struct hci_dev *hdev)
+>>>> {
+>>>>      struct hci_chan *chan;
+>>>> @@ -4436,6 +4445,9 @@ static void hci_sched_le(struct hci_dev *hdev)
+>>>>                      cnt--;
+>>>>                      chan->sent++;
+>>>>                      chan->conn->sent++;
+>>>> +
+>>>> +                     /* Send pending SCO packets right away */
+>>>> +                     hci_sched_sync(hdev);
+>>> 
+>>> Same as above. Just call the two functions.
+>> 
+>> Done
+>> 
+>>> 
+>>>>              }
+>>>>      }
+>>>> 
+>>>> @@ -4458,9 +4470,8 @@ static void hci_tx_work(struct work_struct *work)
+>>>> 
+>>>>      if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+>>>>              /* Schedule queues and send stuff to HCI driver */
+>>>> +             hci_sched_sync(hdev);
+>>>>              hci_sched_acl(hdev);
+>>>> -             hci_sched_sco(hdev);
+>>>> -             hci_sched_esco(hdev);
+>>>>              hci_sched_le(hdev);
+>>> 
+>>> I would actually just move _le up after _acl and then keep _sco and _esco at the bottom. The calls here are just for the case there are no ACL nor LE packets.
+>> 
+>> Then we would send at least 1 ACL/LE packet before SCO even if there
+>> were SCO pending when we entered this function. I think it is still
+>> better to keep SCO/eSCO at the top.
+> 
+> I wonder it wouldn't be better to have such prioritization done by the
+> driver though, since this might just be spending extra cpu cycles in
+> case there is enough bandwidth at the transport chances are the
+> reordering here just doesn't make any difference in the end, you
+> probably don't even need any changes to the core in order for the
+> driver to detect what type of frame it is based on the skb, I recall
+> we do already have such information in the driver so it just a matter
+> to reorder the frames as needed there.
 
-Applied, thanks.
+We could hide the extra _acl and _le calls inside _sco and _esco behind a QUIRK that the UART driver just sets. However I am not sure that will be actually much different. Even for USB transports it would be good to get the ISCO URBs on the way as quickly as possible.
 
--- 
-Luiz Augusto von Dentz
+What I was wondering why we actually do scheduling per connection type. In the original code base it was ACL and SCO. We only had two connection types and two packet types. So that kind made sense. However I wonder if we were misguided by doing this per connection type and not focusing on keeping this per packet type.
+
+To that extend we introduced priority handling for the ACL and LE links. So no matter what the ACL and LE links will reorder their packets as needed. And the driver just executes this. So the core already reorders it.
+
+I wonder really why we just not make the core insert the SCO packets accordingly into the ACL/LE stream so that the driver really only just has to transport them. What is good for an UART transport, will not be bad for an USB transport.
+
+Regards
+
+Marcel
+
