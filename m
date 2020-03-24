@@ -2,156 +2,97 @@ Return-Path: <SRS0=2tab=5J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5E5C2BAEE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D742C54EEB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:48:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B39820836
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:32:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42BE4206F6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 19:48:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tcJKHfPK"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Pz3712hd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727154AbgCXTc1 (ORCPT
+        id S1725927AbgCXTs5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Mar 2020 15:32:27 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:33587 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726618AbgCXTc1 (ORCPT
+        Tue, 24 Mar 2020 15:48:57 -0400
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:45212 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725877AbgCXTs4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Mar 2020 15:32:27 -0400
-Received: by mail-io1-f68.google.com with SMTP id o127so19391650iof.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 12:32:26 -0700 (PDT)
+        Tue, 24 Mar 2020 15:48:56 -0400
+Received: by mail-vs1-f65.google.com with SMTP id x82so25457vsc.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 12:48:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UBZU0spNRefMxT7GtEmfGVi6VUQoaXSy7zyWgYJQoQw=;
-        b=tcJKHfPKAN7KqwRwJ/ZqUKWGH5+CnmbAmzSaLzcdJh3ke1Ex4rBOsJ2hf/4zHZYOl4
-         pLRKSp0HLJl7+fPvbpqbMrKfvJD06jMw3Q5fhy+PKX8oMuLyUtq22FnMdmfCP3RZUHiL
-         7cD5KS8PN0HmI9Q0nZSD1rAkginEANx6menzKTCAmXklc9SiuWBdB2tatKQJrout95OE
-         DJLYR3RmSTIgIaAc/5oUxIvywtB5IA54o1wOZ82lQojCfngo/2PUanZjkwnDAO3E6XtO
-         egB2opjETgZnQOKD4OZJ/i08J/GKyNzsqMvw2Cg2y7YWbSIOEigCVuOhM31GkfNk/Zbn
-         hcCA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zj/kubDeaOKk7jPAD2N4BH8hUZPMzmvbaNoa/07GPr8=;
+        b=Pz3712hdF6puiwzUy9h7Cg7iGrjnhgat/ncuxIBJiYEwkQjmXKz8IlujSaSB6JiBnX
+         WvfNcKPZKdKllr02IBQjLNryY1EcPoubeIwMzrEXu34cvkilTNiOV6Flro7BLhNkwitC
+         HltyuaOWDEuPGeGpaZHJwTLVFWVjAOIdeyEPc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UBZU0spNRefMxT7GtEmfGVi6VUQoaXSy7zyWgYJQoQw=;
-        b=dyLdXpnxMCjZt4rav2tHa0pwmbR0wiCpViX7f7o5rz4SM9ZL0q60nzgnKe15ThS3Lf
-         FNXZUFKb71bdHY0j20Y4s2ys7Es5UayuZBqiXU8TeKUEQUz6S0LOWQ4WB7hgTw/7pLud
-         xzBGpGkNEwyKezMwmmsDghXNShsIvyH2QXz6rQ7uMOhRFuxmj/2ZsPWTnB5vLWdCxHhM
-         WDpoxLWct+xfxSsrBtAEt7NCs6xnLhv52IFOqn366TE3GYPfjgabrqMAlp+ei4MiRgpy
-         S7hspAjyubvaqY5znS52eb4NtqeahU9VOH1lTbX5xbL32hn3ma3rkfpGLGwjskCH5i2g
-         bDSg==
-X-Gm-Message-State: ANhLgQ1KfCGpW3F2agPg0h6cfH3bxOsegh9QcSMIBuohuzqAxwj4Yzi+
-        MoUKIZ+w/67/neZz9g4grKTNQ6u34Vh39HIX4WVLBw==
-X-Google-Smtp-Source: ADFU+vspMIThkZMvjN0TV9g8qWucprIzlJD/MqLtia/5hebL3EdoCu3I0ExyZmVQrAAG4KUeUzMuzJbkEbPomPy6epI=
-X-Received: by 2002:a02:3842:: with SMTP id v2mr6539922jae.9.1585078345721;
- Tue, 24 Mar 2020 12:32:25 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zj/kubDeaOKk7jPAD2N4BH8hUZPMzmvbaNoa/07GPr8=;
+        b=laC0YKV+/U8vAHUH78x2yVfChbWtszScpQsvl8DsJOvetyb+OgnoiM5M9rheUBg78j
+         PtTs8fSfYlrocy7rJKRBamzJb34cu095ef/hzMNe7wS9RbLGknZXDEeEWqztx2AeqfKb
+         orKbATrgJX+SUaMHKOrd0rtQNYSlTFCc4GhuxL0MqpvpNL1bmHItWc9kmGQot6+nkb/V
+         Q2AEIxEl2kjLi6b/qZXMDf+gdDHBV1RSaypkqcbpC72RUTMPdRRAl6QjjXqwGj4Omnsb
+         2PHZjGcs4YK3JHe7wE01wA3HDPTbGsRY7VL18lr9DJiFFWIJa7a4lo2sk50WxpH4bvZS
+         9B8w==
+X-Gm-Message-State: ANhLgQ24L7NzmljFOky3whLvJ2L7ooTZUqo+ZTOvvwpKytK+9lssGjmm
+        NiEiwkQHULs0cks9BrMhPr5R5y20O6s=
+X-Google-Smtp-Source: ADFU+vtZrmmdcyAB2IZZJfKa0nnE38BmEumenjq0zjrNVyo/fIT2JWOpAhA0m5Aklm51SYC55RqDaw==
+X-Received: by 2002:a67:2786:: with SMTP id n128mr21790663vsn.21.1585079333439;
+        Tue, 24 Mar 2020 12:48:53 -0700 (PDT)
+Received: from alain.c.googlers.com.com (57.152.190.35.bc.googleusercontent.com. [35.190.152.57])
+        by smtp.gmail.com with ESMTPSA id x78sm9351572vsc.17.2020.03.24.12.48.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2020 12:48:52 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v1] bluetooth: don't assume key size is 16 when the command fails.
+Date:   Tue, 24 Mar 2020 19:48:49 +0000
+Message-Id: <20200324194849.10084-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
 MIME-Version: 1.0
-References: <20200323072824.254495-1-mcchou@chromium.org> <20200323002820.v1.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
- <04021BE3-63F7-4B19-9F0E-145785594E8C@holtmann.org> <421d27670f2736c88e8c0693e3ff7c0dcfceb40b.camel@perches.com>
- <57C56801-7F3B-478A-83E9-1D2376C60666@holtmann.org> <03547be94c4944ca672c7aef2dd38b0fb1eedc84.camel@perches.com>
- <CALWDO_U5Cnt3_Ss2QQNhtuKS_8qq7oyNH4d97J68pmbmQMe=3w@mail.gmail.com> <643C6020-2FC5-4EEA-8F64-5D4B7F9258A4@holtmann.org>
-In-Reply-To: <643C6020-2FC5-4EEA-8F64-5D4B7F9258A4@holtmann.org>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 24 Mar 2020 15:32:14 -0400
-Message-ID: <CALWDO_Uc6brpXmVfoUd+jgyy_F0-WSrYb1+hXtXm498dGzCOSg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] Bluetooth: btusb: Indicate Microsoft vendor
- extension for Intel 9460/9560 and 9160/9260
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Joe Perches <joe@perches.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 2:35 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Alain,
->
-> >>>>>> This adds a bit mask of driver_info for Microsoft vendor extension and
-> >>>>>> indicates the support for Intel 9460/9560 and 9160/9260. See
-> >>>>>> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
-> >>>>>> microsoft-defined-bluetooth-hci-commands-and-events for more information
-> >>>>>> about the extension. This was verified with Intel ThunderPeak BT controller
-> >>>>>> where msft_vnd_ext_opcode is 0xFC1E.
-> >>>> []
-> >>>>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> >>>> []
-> >>>>>> @@ -315,6 +315,10 @@ struct hci_dev {
-> >>>>>>        __u8            ssp_debug_mode;
-> >>>>>>        __u8            hw_error_code;
-> >>>>>>        __u32           clock;
-> >>>>>> +       __u16           msft_vnd_ext_opcode;
-> >>>>>> +       __u64           msft_vnd_ext_features;
-> >>>>>> +       __u8            msft_vnd_ext_evt_prefix_len;
-> >>>>>> +       void            *msft_vnd_ext_evt_prefix;
-> >>>>
-> >>>> msft is just another vendor.
-> >>>>
-> >>>> If there are to be vendor extensions, this should
-> >>>> likely use a blank line above and below and not
-> >>>> be prefixed with msft_
-> >>>
-> >>> there are other vendors, but all of them are different. So this needs to be prefixed with msft_ actually. But I agree that having empty lines above and below makes it more readable.
-> >>
-> >> So struct hci_dev should become a clutter
-> >> of random vendor extensions?
-> >>
-> >> Perhaps there should instead be something like
-> >> an array of char at the end of the struct and
-> >> various vendor specific extensions could be
-> >> overlaid on that array or just add a void *
-> >> to whatever info that vendors require.
-> > I don't particularly like trailing buffers, but I agree we could
-> > possibly organize this a little better by with a struct.  something
-> > like:
-> >
-> > struct msft_vnd_ext {
-> >    bool              supported; // <-- Clearly calls out if the
-> > extension is supported.
-> >    __u16           msft_vnd_ext_opcode; // <-- Note that this also
-> > needs to be provided by the driver.  I don't recommend we have this
-> > read from the hardware since we just cause an extra redirection that
-> > isn't necessary.  Ideally, this should come from the usb_table const.
->
-> Actually supported == false is the same as opcode == 0x0000. And supported == true is opcode != 0x0000.
-I was thinking of a more generic way to check if the extension is
-supported so the higher level doesn't need to understand that
-opcode==0 means it's not supported.  For the android extension for
-example, this would be a simple boolean (there isn't any opcodes).
->
-> >    __u64           msft_vnd_ext_features;
-> >    __u8             msft_vnd_ext_evt_prefix_len;
-> >    void             *msft_vnd_ext_evt_prefix;
-> > };
-> >
-> > And then simply add the struct msft_vnd_ext (and any others) to hci_dev.
->
-> Anyway, Lets keep these for now as hci_dev->msft_vnd_ext_*. We can fix this up later without any impact.
-I agree, this doesn't have a whole lot of long term consequences,
-although some will want to cherry-pick this to older kernels so if
-there is something we can do now, it will reduce burden on some
-products.
+With this change, the encryption key size is not assumed to be 16 if the
+read_encryption_key_size command fails for any reason.  This ensures
+that if the controller fails the command for any reason that the
+encryption key size isn't implicitely set to 16 and instead take a more
+concervative posture to assume it is 0.
 
->
-> Regards
->
-> Marcel
->
+Signed-off-by: Alain Michaud <alainm@chromium.org>
+
+---
+
+ net/bluetooth/hci_event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cd3d7d90029b..10703c4b7347 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2970,7 +2970,7 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+ 	if (rp->status) {
+ 		bt_dev_err(hdev, "failed to read key size for handle %u",
+ 			   handle);
+-		conn->enc_key_size = HCI_LINK_KEY_SIZE;
++		conn->enc_key_size = 0;
+ 	} else {
+ 		conn->enc_key_size = rp->key_size;
+ 	}
+-- 
+2.25.1.696.g5e7596f4ac-goog
+
