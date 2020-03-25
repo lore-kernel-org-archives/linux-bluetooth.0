@@ -2,215 +2,288 @@ Return-Path: <SRS0=+pQP=5K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EEAC43331
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 22:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAF3C43331
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 23:39:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0FFF20719
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 22:02:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63D392076A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 23:39:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dHdysE/S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hpf0+F7l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727540AbgCYWCq (ORCPT
+        id S1727451AbgCYXjs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Mar 2020 18:02:46 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:34686 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727389AbgCYWCn (ORCPT
+        Wed, 25 Mar 2020 19:39:48 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:42317 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726970AbgCYXjs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Mar 2020 18:02:43 -0400
-Received: by mail-lf1-f65.google.com with SMTP id e7so3160714lfq.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2020 15:02:41 -0700 (PDT)
+        Wed, 25 Mar 2020 19:39:48 -0400
+Received: by mail-ot1-f66.google.com with SMTP id z5so3706423oth.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2020 16:39:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=kMrdIcSekVyYpSUHbdn6aie/98pCO+vQsLQWmECU324=;
-        b=dHdysE/SayM8kJkixhAFnl2T8s+GCoCy/QiD8wY91rB93D75s7yeO3ECQ/Q9l0EYlU
-         UrA7ZXq61ksQ23EPDGiaXzoY3BcPTUuCZPI1jpU3rt/D1frfyvfylGMHY4nza8LF9CC1
-         lhZjfgQkw5ctJ4wnBEhMYfyax+49IHetbc0UA=
+         :cc;
+        bh=3hh2ZM3mV1GSFYZWNvYvsqK6bwrLTfVTsGrHoiQvlIk=;
+        b=Hpf0+F7lbp5QAMICoj1sBT1Ng/ItjE1EvSmFEK314qGE//zDFG6Je/1c9O8989LtPp
+         bLzbXbeuAXwd0vlYRrcJDmnTFDDr6dw1Mzmlvg6KOz0kqCwk2MufMQ6b5jPFpK6HvpRd
+         0iThb2yvpYYC3x+XT4h54RatmQmE0HT0oLN8Ido9FKSgOsCWKeghkwkFTJaPQWHAyDlf
+         CswdiCAZ+tQsZ6Isy352VlhRlGePh6awOAf8QiJlKKxO193EuAbKgZ2JQuK8RZ1bGaus
+         D2enZD4BeJGvBBw+ll5rxawXL2DEqvK39nv39F76aCM81xIIT8ayEHoYhpup27YTKqjI
+         bnKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=kMrdIcSekVyYpSUHbdn6aie/98pCO+vQsLQWmECU324=;
-        b=ER8I4h+O2EetPSZmlZgGNhYebYlD28EkJ7IDE0lNuNm/EyWi9/EjknCcMtpdmwhkm3
-         PnEBB/E7e/jVl0LHYyvG52jZ08hOXGfjr2+HcYLuciRMobuZxTXqKdxND4rR6pD9p4nr
-         kTSffVD/SsMn/JhtvSsdFDMSDa/g0ynOetv6JwbhWJReZTNW9Jq0l6sbkUA0rqOkVEiX
-         cJUpfGdcGVtCcjp1OFTYZ5peC66kGqy1k8GX6SrANhsThQs4+Z7XOdEqLVpr6pPPG8ay
-         Fq1mojSffkHobg9f3Tvzeg0iSaRqA5DcpUSBjsvef0iZ7Q/cdols2a9uYZk7lX2SpVBQ
-         gg/A==
-X-Gm-Message-State: ANhLgQ0uTs22rHoiR1EeL7Pmrp+H/MTjrYm09oKyACBKjlRoSvqdnmsj
-        rWRfPPnz9CCit4+Z4j5oaG2/GvVY0wOIiSwDFkkG6g==
-X-Google-Smtp-Source: ADFU+vsg1qBWTCMyzYGdubeKJoXICpju2ZdEGKqP6lEFbMFIxAckyAFCowoTtdWPZKlEjRQLBIIrKmGxlGZ2d5NALH4=
-X-Received: by 2002:a19:4f0c:: with SMTP id d12mr3632373lfb.117.1585173760630;
- Wed, 25 Mar 2020 15:02:40 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=3hh2ZM3mV1GSFYZWNvYvsqK6bwrLTfVTsGrHoiQvlIk=;
+        b=rWHHJRD1JRD5oG3EMmCbxIUy/gJRqGjD5YKUiOvalSN3kO3yuPSjulAuk/54AQncyz
+         EiHcaVJj0K96jt4dvVGv0hYN4R0KBBT2LqtnBWX8MzXS2i07AxFC+T3W30pOTNS52nPS
+         o4QLYdw1MnjHTPsNFl5eMDIT/UorsNek1h3472qtIctaT6Q9lSwuqd8i7UAUZhVGdvzD
+         UrwUaU68PZrqOX/1Z9AruOEfs/4A0cbdohoy2wfTNgK70WplPyyAElRwp4nTNl14txQu
+         s/+gkUd6eqACiUI8W8l8v2Xyts+6GAsSBrmZy1B9YTxeBAGaMB1hXaV7CuJRZRZar04q
+         wrhQ==
+X-Gm-Message-State: ANhLgQ1tmKdbeYDPPcUlwQVCkDObu425vQi4IFHsQocdHcAeelbtfo/e
+        1kI4wJh+9l7FPVqYSv1cAlF8yfMVMhwGNiURw1DysA==
+X-Google-Smtp-Source: ADFU+vsVjIdlDxuM64pRVOUrAc/ek0JADnfTGkasSecyUmzc1ILdaok4kZxtR4ggVklIE5fEXZaO53iq/ig1trBSLO0=
+X-Received: by 2002:a9d:67c6:: with SMTP id c6mr4390009otn.11.1585179585543;
+ Wed, 25 Mar 2020 16:39:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200325070336.1097-1-mcchou@chromium.org> <20200325000332.v2.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
- <72699110-843A-4382-8FF1-20C5D4D557A2@holtmann.org> <CABmPvSFL_bkrZQJkAzUMck_bAY5aBZkL=5HGV_Syv2QRYfRLfw@mail.gmail.com>
- <B2A2CFFE-8FC1-462B-9C7F-1CD584B6EB24@holtmann.org>
-In-Reply-To: <B2A2CFFE-8FC1-462B-9C7F-1CD584B6EB24@holtmann.org>
-From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Wed, 25 Mar 2020 15:02:29 -0700
-Message-ID: <CABmPvSFwb1zu33fUog9hVK6y2R=PmKeGyOwkP3+=ZzE_qkX9yQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: Indicate Microsoft vendor
- extension for Intel 9460/9560 and 9160/9260
+References: <20200325193754.13950-1-luiz.dentz@gmail.com> <20200325193754.13950-2-luiz.dentz@gmail.com>
+ <0C7A165A-3C33-4E7D-949C-8DABB2E1DF05@holtmann.org>
+In-Reply-To: <0C7A165A-3C33-4E7D-949C-8DABB2E1DF05@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 25 Mar 2020 16:39:29 -0700
+Message-ID: <CABBYNZLLUiC5KuYyiqxAhJDM78yQKy3REM8bNnr-ARtj9OWr4g@mail.gmail.com>
+Subject: Re: [PATCH v5 2/2] Bluetooth: Add BT_MODE socket option
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 2:37 PM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+Hi Marcel,
+
+On Wed, Mar 25, 2020 at 2:15 PM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> Hi Miao-chen,
+> Hi Luiz,
 >
-> >>> This adds a bit mask of driver_info for Microsoft vendor extension an=
-d
-> >>> indicates the support for Intel 9460/9560 and 9160/9260. See
-> >>> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
-> >>> microsoft-defined-bluetooth-hci-commands-and-events for more informat=
-ion
-> >>> about the extension. This was verified with Intel ThunderPeak BT cont=
-roller
-> >>> where msft_vnd_ext_opcode is 0xFC1E.
-> >>>
-> >>> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
-> >>> ---
-> >>>
-> >>> Changes in v2:
-> >>> - Define struct msft_vnd_ext and add a field of this type to struct
-> >>> hci_dev to facilitate the support of Microsoft vendor extension.
-> >>>
-> >>> drivers/bluetooth/btusb.c        | 14 ++++++++++++--
-> >>> include/net/bluetooth/hci_core.h |  6 ++++++
-> >>> 2 files changed, 18 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> >>> index 3bdec42c9612..4c49f394f174 100644
-> >>> --- a/drivers/bluetooth/btusb.c
-> >>> +++ b/drivers/bluetooth/btusb.c
-> >>> @@ -58,6 +58,7 @@ static struct usb_driver btusb_driver;
-> >>> #define BTUSB_CW6622          0x100000
-> >>> #define BTUSB_MEDIATEK                0x200000
-> >>> #define BTUSB_WIDEBAND_SPEECH 0x400000
-> >>> +#define BTUSB_MSFT_VND_EXT   0x800000
-> >>>
-> >>> static const struct usb_device_id btusb_table[] =3D {
-> >>>      /* Generic Bluetooth USB device */
-> >>> @@ -335,7 +336,8 @@ static const struct usb_device_id blacklist_table=
-[] =3D {
-> >>>
-> >>>      /* Intel Bluetooth devices */
-> >>>      { USB_DEVICE(0x8087, 0x0025), .driver_info =3D BTUSB_INTEL_NEW |
-> >>> -                                                  BTUSB_WIDEBAND_SPE=
-ECH },
-> >>> +                                                  BTUSB_WIDEBAND_SPE=
-ECH |
-> >>> +                                                  BTUSB_MSFT_VND_EXT=
- },
-> >>>      { USB_DEVICE(0x8087, 0x0026), .driver_info =3D BTUSB_INTEL_NEW |
-> >>>                                                   BTUSB_WIDEBAND_SPEE=
-CH },
-> >>>      { USB_DEVICE(0x8087, 0x0029), .driver_info =3D BTUSB_INTEL_NEW |
-> >>> @@ -348,7 +350,8 @@ static const struct usb_device_id blacklist_table=
-[] =3D {
-> >>>      { USB_DEVICE(0x8087, 0x0aa7), .driver_info =3D BTUSB_INTEL |
-> >>>                                                   BTUSB_WIDEBAND_SPEE=
-CH },
-> >>>      { USB_DEVICE(0x8087, 0x0aaa), .driver_info =3D BTUSB_INTEL_NEW |
-> >>> -                                                  BTUSB_WIDEBAND_SPE=
-ECH },
-> >>> +                                                  BTUSB_WIDEBAND_SPE=
-ECH |
-> >>> +                                                  BTUSB_MSFT_VND_EXT=
- },
-> >>>
-> >>>      /* Other Intel Bluetooth devices */
-> >>>      { USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
-> >>> @@ -3734,6 +3737,8 @@ static int btusb_probe(struct usb_interface *in=
-tf,
-> >>>      hdev->send   =3D btusb_send_frame;
-> >>>      hdev->notify =3D btusb_notify;
-> >>>
-> >>> +     hdev->msft_ext.opcode =3D HCI_OP_NOP;
-> >>> +
-> >>
-> >> do this in the hci_alloc_dev procedure for every driver. This doesn=E2=
-=80=99t belong in the driver.
-> > Thanks for the note, I will address this.
-> >>
-> >>> #ifdef CONFIG_PM
-> >>>      err =3D btusb_config_oob_wake(hdev);
-> >>>      if (err)
-> >>> @@ -3800,6 +3805,11 @@ static int btusb_probe(struct usb_interface *i=
-ntf,
-> >>>              set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks=
-);
-> >>>              set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks)=
-;
-> >>>              set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> >>> +
-> >>> +             if (id->driver_info & BTUSB_MSFT_VND_EXT &&
-> >>> +                     (id->idProduct =3D=3D 0x0025 || id->idProduct =
-=3D=3D 0x0aaa)) {
-> >>
-> >> Please scrap this extra check. You already selected out the PID with t=
-he blacklist_table. In addition, I do not want to add a PID in two places i=
-n the driver.
-> > If we scrap the check around idProduct, how do we tell two controllers
-> > apart if they use different opcode for Microsoft vendor extension?
+> > This adds BT_MODE socket option which can be used to set L2CAP modes,
+> > including modes only supported over LE which were not supported using
+> > the L2CAP_OPTIONS.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > include/net/bluetooth/bluetooth.h |   8 ++
+> > net/bluetooth/l2cap_sock.c        | 120 +++++++++++++++++++++++++++++-
+> > 2 files changed, 127 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> > index 1576353a2773..3fa7b1e3c5d9 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -139,6 +139,14 @@ struct bt_voice {
+> > #define BT_PHY_LE_CODED_TX    0x00002000
+> > #define BT_PHY_LE_CODED_RX    0x00004000
+> >
+> > +#define BT_MODE                      15
+> > +
+> > +#define BT_MODE_BASIC                0x00
+> > +#define BT_MODE_ERTM         0x01
+> > +#define BT_MODE_STREAMING    0x02
+> > +#define BT_MODE_LE_FLOWCTL   0x03
+> > +#define BT_MODE_EXT_FLOWCTL  0x04
+> > +
+> > __printf(1, 2)
+> > void bt_info(const char *fmt, ...);
+> > __printf(1, 2)
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index 117ba20ea194..07f8d60953f2 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -395,6 +395,24 @@ static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr,
+> >       return sizeof(struct sockaddr_l2);
+> > }
+> >
+> > +static int l2cap_get_mode(struct l2cap_chan *chan)
+> > +{
+> > +     switch (chan->mode) {
+> > +     case L2CAP_MODE_BASIC:
+> > +             return BT_MODE_BASIC;
+> > +     case L2CAP_MODE_ERTM:
+> > +             return BT_MODE_ERTM;
+> > +     case L2CAP_MODE_STREAMING:
+> > +             return BT_MODE_STREAMING;
+> > +     case L2CAP_MODE_LE_FLOWCTL:
+> > +             return BT_MODE_LE_FLOWCTL;
+> > +     case L2CAP_MODE_EXT_FLOWCTL:
+> > +             return BT_MODE_EXT_FLOWCTL;
+> > +     }
+> > +
+> > +     return -EINVAL;
+> > +}
+> > +
+> > static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
+> >                                    char __user *optval, int __user *optlen)
+> > {
+> > @@ -424,6 +442,13 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
+> >                       break;
+> >               }
+> >
+> > +             /* L2CAP_MODE_LE_FLOWCTL and L2CAP_MODE_EXT_FLOWCTL are not
+> > +              * supported by L2CAP_OPTIONS.
+> > +              */
+> > +             if (chan->mode == L2CAP_MODE_LE_FLOWCTL ||
+> > +                             chan->mode == L2CAP_MODE_EXT_FLOWCTL)
 >
-> for Intel controllers this is highly unlikely. If we really decide to cha=
-nge the opcode in newer firmware versions, we then deal with it at that poi=
-nt.
+> this is the wrong kernel indentation.
+
+Fixed
+
+> > +                     return -EINVAL;
+> > +
+> >               memset(&opts, 0, sizeof(opts));
+> >               opts.imtu     = chan->imtu;
+> >               opts.omtu     = chan->omtu;
+> > @@ -508,7 +533,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+> >       struct bt_security sec;
+> >       struct bt_power pwr;
+> >       u32 phys;
+> > -     int len, err = 0;
+> > +     int len, mode, err = 0;
+> >
+> >       BT_DBG("sk %p", sk);
+> >
+> > @@ -624,6 +649,27 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+> >                       err = -EFAULT;
+> >               break;
+> >
+> > +     case BT_MODE:
+> > +             if (!enable_ecred) {
+> > +                     err = -ENOPROTOOPT;
+> > +                     break;
+> > +             }
+> > +
+> > +             if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+> > +                     err = -EINVAL;
+> > +                     break;
+> > +             }
+> > +
+> > +             mode = l2cap_get_mode(chan);
+> > +             if (mode < 0) {
+> > +                     err = mode;
+> > +                     break;
+> > +             }
+> > +
+> > +             if (put_user(mode, (u8 __user *) optval))
+> > +                     err = -EFAULT;
+> > +             break;
+> > +
+> >       default:
+> >               err = -ENOPROTOOPT;
+> >               break;
+> > @@ -763,6 +809,45 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+> >       return err;
+> > }
+> >
+> > +static int l2cap_set_mode(struct l2cap_chan *chan, u8 mode)
+> > +{
+> > +     switch (mode) {
+> > +     case BT_MODE_BASIC:
+> > +             if (bdaddr_type_is_le(chan->src_type))
+> > +                     return -EINVAL;
+> > +             mode = L2CAP_MODE_BASIC;
+> > +             clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
+> > +             break;
+> > +     case BT_MODE_ERTM:
+> > +             if (!disable_ertm || bdaddr_type_is_le(chan->src_type))
+> > +                     return -EINVAL;
+> > +             mode = L2CAP_MODE_ERTM;
+> > +             break;
+> > +     case BT_MODE_STREAMING:
+> > +             if (!disable_ertm || bdaddr_type_is_le(chan->src_type))
+> > +                     return -EINVAL;
+> > +             mode = L2CAP_MODE_STREAMING;
+> > +             break;
+> > +     case BT_MODE_LE_FLOWCTL:
+> > +             if (!bdaddr_type_is_le(chan->src_type))
+> > +                     return -EINVAL;
+> > +             mode = L2CAP_MODE_LE_FLOWCTL;
+> > +             break;
+> > +     case BT_MODE_EXT_FLOWCTL:
+> > +             /* TODO: Add support for ECRED PDUs to BR/EDR */
+> > +             if (!bdaddr_type_is_le(chan->src_type))
+> > +                     return -EINVAL;
+> > +             mode = L2CAP_MODE_EXT_FLOWCTL;
+> > +             break;
+> > +     default:
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     chan->mode = mode;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+> >                                char __user *optval, unsigned int optlen)
+> > {
+> > @@ -968,6 +1053,39 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+> >
+> >               break;
+> >
+> > +     case BT_MODE:
+> > +             if (!enable_ecred) {
+> > +                     err = -ENOPROTOOPT;
+> > +                     break;
+> > +             }
+> > +
+> > +             BT_DBG("sk->sk_state %u", sk->sk_state);
+> > +
+> > +             if (sk->sk_state != BT_BOUND) {
+> > +                     err = -EINVAL;
+> > +                     break;
+> > +             }
+> > +
+> > +             if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
+> > +                     err = -EINVAL;
+> > +                     break;
+> > +             }
+> > +
+> > +             if (get_user(opt, (u8 __user *) optval)) {
+> > +                     err = -EFAULT;
+> > +                     break;
+> > +             }
+> > +
+> > +             BT_DBG("opt %u", opt);
+> > +
+> > +             err = l2cap_set_mode(chan, opt);
+> > +             if (err)
+> > +                     break;
+> > +
+> > +             BT_DBG("mode 0x%2.2x", chan->mode);
+> > +
+> > +             break;
+> > +
 >
-> However for Intel controllers I have the feeling that we better do it aft=
-er the Read the Intel version information and then do it based on hardware =
-revision and firmware version.
-I would agree with you given that the FW loaded for the same HW can
-differ, and different FW version may have different configuration in
-terms of the use of extensions. But it's not clear to me how we can
-tell whether an extension is supported based on a version number. Is
-there any implication on the support of an extension given a FW
-version (e.g. any FW version greater than 10 would support MSFT
-extension)?
+> So do we want BT_MODE as u8 or just simply as int?
+
+For the mode alone I guess it would be fine, the question is if we
+want to leave space to add other fields later but I guess we could do
+that with use of new options instead.
+
+> Regards
 >
-> >> An alternative is to not use BTUSB_MSFT_VND_EXT and let the Intel code=
- set it based on the hardware / firmware revision it finds. We might need t=
-o discuss which is the better approach for the Intel hardware since not all=
- PIDs are unique.
-> > We are expecting to indicate the vendor extension for non-Intel
-> > controllers as well, and having BTUSB_MSFT_VND_EXT seems to be more
-> > generic. What do you think?
+> Marcel
 >
-> We don=E2=80=99t have to have one specific way of doing it. As I said, if=
- we ever have Zephyr based controller with MSFT extension, we have a vendor=
- command to determine the support and the opcode. So that will not require =
-any extra quirks or alike.
->
-> Anyhow, maybe we introduce BTUSB_MSFT_VND_EXT_FC1E that just says set the=
- opcode to FC1E. For all other opcodes we will introduce similar constants.=
- At most I assume we end up with 5-6 constants.
->
-> >>
-> >>> +                     hdev->msft_ext.opcode =3D 0xFC1E;
-> >>> +             }
-> >>>      }
-Regards,
-Miao
+
+
+-- 
+Luiz Augusto von Dentz
