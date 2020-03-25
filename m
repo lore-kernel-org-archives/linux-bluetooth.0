@@ -2,106 +2,175 @@ Return-Path: <SRS0=+pQP=5K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1A2C1975A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 05:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66468C54FDA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 07:14:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D72820714
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 05:59:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FCC820A8B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 07:03:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="Wi5kgFLB"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="X+6oGftg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726072AbgCYF7B (ORCPT
+        id S1727380AbgCYHDx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Mar 2020 01:59:01 -0400
-Received: from mout.web.de ([217.72.192.78]:40259 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725832AbgCYF7A (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Mar 2020 01:59:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1585115939;
-        bh=aKZdMuu02dgCWIUwE7ox7pBEw0Hhv5T6B3WvcFmPNz0=;
-        h=X-UI-Sender-Class:From:Date:Subject:To;
-        b=Wi5kgFLBkp3FuJ54ZOZZH1rKwa3oHGwG1hwUwGR4plmx6i6x4+ZwPEaqMaK1q2P3F
-         K+ikKu4siHPFz7V9WlHKOvz7iR2Jhp8pwYSMweegVl2xSD9LGikb5E8L2kqEChhwXQ
-         gluWb4g4GDwzw8RH7es8CL1z7DXhOj9rmHqiRRyM=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.188.43] ([79.251.37.20]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lh6QF-1jdcV21djz-00oUnS for
- <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2020 06:58:59 +0100
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-From:   Christian Fischer <panig291088@web.de>
-Mime-Version: 1.0 (1.0)
-Date:   Wed, 25 Mar 2020 06:58:58 +0100
-Subject: a2dp stream delayed if playback started immediately after connect
-Message-Id: <9ADFBCB6-94B9-49D1-92AD-2211B8F7A9C6@web.de>
-To:     linux-bluetooth@vger.kernel.org
-X-Mailer: iPhone Mail (17D50)
-X-Provags-ID: V03:K1:865bGIVVZ9kIf6E6wgxwKO/fwFT0IBajl6dV1gst7RJYVQk9Y0t
- uQi/FXATQBN8Iz40V+jANag/qktUE0Dywcc9eawCbq0b4dkaxiX9QRGOcbY21/zLEyLgMXl
- 7XUIdfiv521DRlX7wzZ22OdAvAmE2hhQVmHjnFzUQAflAvJEYH3IE7tecqHIqIHWJuYKAFc
- R7EGlbtra7l/VK21jlyCQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ypbCyxrG+Co=:60l8aXjdGkVB9vLEvnDlxu
- +qQZbRVlEuIFz+ghCCi2d0k9WK9MENgRM3iGnr9/ltmoA1AXG8rDHhnjtwTH+G6cqNRQN7i9i
- FUVy5qANp5K7Dnen6qnQTULAFfCuDxj3/ay5US2T3dfxgX6qkERa9qtxpN9n4OqBpXauxWm9p
- hCaEOeSM2FEwY7Ex9cjgzr5mR3+pBfHx0156YiwSBjQhZn1v0RhpdaDucueBKYRSPMpB3Ph7P
- 5UZ1Fc1C2RtMIwnOtU7g170iD0CYKcrTbwDaLJ1Y2ivAbcrhtKtamuyMoZ4VGd2sEo9rbMHqE
- ddRvMCHgEnAJDTtMq1PiCvjPA/Cya+KdsNAaAnRizFFD9HlBmqh9HWUdwzHXYwGreeP2jUSvA
- IMwS8ZZL4MCgPj9SgCEH4QVPrw0AP+Ek37ES0tAPX+FP20zWy/Pvf2MF8f/2MYkjgJuV/lVGV
- C8VXpX1uM2VcUt5Gc6aQjtjID0XfkdPTVX9x1plf1+gtbaRfsLbRaglYuF8jUuQxHyvGSJ479
- /MageBXByEDRbTNMFIG0krb5S4IqboEzjicKNkxfJBkYBB2Q1oJKkw5pZEw9GqdvbLXc5tOGD
- CTbmUVVjzz11EBKhXViPI4agFVXRUpTvLVa8X7Gb2omXn8UKFL3f1JxMizI/kMAzwWauJZcub
- vuu6HrAtUSd9PY+GNJrM1/L6nnzZYw6RdC8Y3mk0rWWRYqS5j7qlVOUFqd7wX+AcSCejZhg4g
- 1EnK3RlfYQ+7P5xpPr0gB3c5Fimc2uwDG95+pqxvdko4ZIUx9FYelYsZsv3MfXsLBqLx/0EeO
- jZTzrpNLcmWAZ9et0oNaI+dPrSCa/6NdUuJ3GQ2YwEGIy0rTLzfW77UGriCljujqGh4rc768l
- HN78tGRrDZ9kLcXMpHqE0lJq34ilBXF3VYAXnR4YnDQPCt/MzzFkEBPRv9QXvoCprv+BVVNZP
- zUhmAYmpcM3btbYwdvQ49nT5k9bt5UatXhY3WR3Z/DJPMp4+X+SMVXLJP9p+Jk1hr//0x+IKj
- xbb69aKrymxLdTkz38scPMyZI/oZZwH9dCBRcIfKNj2EqCiUuOftw2vdY/5Pwj0NWj2DlG/7s
- QnaX4VqVsxbwRdsnQTA2MaJdL3g199emzjsPeUaiEs/cvm4foHmktnJX9oLEVyJdCUlh7l4Xp
- a+dDm7JK5ZoqXdUj5OA3HdmGce6tFGPZG/cQCPgmoWTe5ZhnOPcM6lbozGVL62O6YaTDmOVXF
- WkpXh6YkUP7mz3zbB
+        Wed, 25 Mar 2020 03:03:53 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:43521 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725815AbgCYHDo (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 25 Mar 2020 03:03:44 -0400
+Received: by mail-pf1-f195.google.com with SMTP id f206so585958pfa.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2020 00:03:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=baRu5nsVbDxJSO3oJpwwpT6CsHgG9dJlSyie1x1BQxg=;
+        b=X+6oGftgVS9JAs653mjzV4NYBb/WT5sFCMBMu0y+14I2F3DgVsomaBXkL1FET6FMCa
+         7JmnihsNxZAXKzxrm5PfIWHMXpOrnX2wLLwX5VQnpXH6RKp2TigiY47CsUXAVZ+QdRMf
+         3fos8ickYKt4OUGwh/oGGHrWFI+kpSn64Kfmg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=baRu5nsVbDxJSO3oJpwwpT6CsHgG9dJlSyie1x1BQxg=;
+        b=ncN0JjRzJ04Bvz677XDZWM9XmFSnYu43uN/nKtlLhWSIPWxpwMpXHrDkwGw4qtm9kO
+         Ays6rteRYlbQSvysSxVD4XDDOhjF8wJdbhubOCkFnqpioI0hInKkOXIvnsLJvdXbqxD5
+         +MMLCKiTbpK0CAtehyedbqagPLxCLDn0ZQ4HwNjyvQpWM3IGhH1aHZSi3pbqrkgEnVeW
+         l48TNhONCd3Ol49meFB1MHRJSr8YujAgstaapISjw8gsouFHVJj0FoPHSeBbMJBsvPdh
+         wAe99UjRw9L9EuI8Z8pSi2GhIiepKK3bceqsRCm8VmLfR0yJcM4LVAyNCfKAwlWJJZpJ
+         7JTQ==
+X-Gm-Message-State: ANhLgQ1Z9OTxTii9TnZ+ed9NbqiCMV571yINRy87RmL50gr4bsObn/i2
+        7sL0wGU3ItORxIVEtmk2WieT0gMpcbI=
+X-Google-Smtp-Source: ADFU+vuNT9INJ2iEvMa3zIO7zdhHTcpkfnNUr9luK/PfllzQPPC6EssZTNehgCDtbkATdvNjqh7yBQ==
+X-Received: by 2002:a63:a54:: with SMTP id z20mr1774834pgk.372.1585119822183;
+        Wed, 25 Mar 2020 00:03:42 -0700 (PDT)
+Received: from mcchou0.mtv.corp.google.com ([2620:15c:202:201:b46:ac84:1014:9555])
+        by smtp.gmail.com with ESMTPSA id i34sm566240pgm.83.2020.03.25.00.03.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 25 Mar 2020 00:03:41 -0700 (PDT)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2 1/2] Bluetooth: btusb: Indicate Microsoft vendor extension for Intel 9460/9560 and 9160/9260
+Date:   Wed, 25 Mar 2020 00:03:35 -0700
+Message-Id: <20200325000332.v2.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200325070336.1097-1-mcchou@chromium.org>
+References: <20200325070336.1097-1-mcchou@chromium.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello guys, i have a little problem a2dp related.
-I've written a mono c# application which will wait for a specific device (ph=
-one) is connected and will then start the music playback immediatly.
-Pulseaudio is playing the music on its connected usb-soundcard. So at the mo=
-ment when my phone gets connected the stream starts playing.
-So when i press forward at the phone its command is delayed by approx. 2 sec=
-onds, so in the bluetoothd debug output i can see that AVRCP command is rece=
-ived immediatly. But the stream got a delay.
-When i press pause and wait till this:
-bluetoothd[20399]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream state=
- changed: STREAMING -> OPEN
-bluetoothd[20399]: profiles/audio/source.c:source_set_state() State changed /=
-org/bluez/hci0/dev_F0_98_9D_D8_46_19: SOURCE_STATE_PLAYING -> SOURCE_STATE_C=
-ONNECTED
-bluetoothd[20399]: profiles/audio/transport.c:transport_update_playing() /or=
-g/bluez/hci0/dev_F0_98_9D_D8_46_19/sep1/fd1 State=3DTRANSPORT_STATE_ACTIVE P=
-laying=3D0
-bluetoothd[20399]: profiles/audio/transport.c:media_transport_remove_owner()=
- Transport /org/bluez/hci0/dev_F0_98_9D_D8_46_19/sep1/fd1 Owner :1.56
-bluetoothd[20399]: profiles/audio/transport.c:media_owner_free() Owner :1.56=
+This adds a bit mask of driver_info for Microsoft vendor extension and
+indicates the support for Intel 9460/9560 and 9160/9260. See
+https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
+microsoft-defined-bluetooth-hci-commands-and-events for more information
+about the extension. This was verified with Intel ThunderPeak BT controller
+where msft_vnd_ext_opcode is 0xFC1E.
 
-bluetoothd[20399]: profiles/audio/transport.c:transport_set_state() State ch=
-anged /org/bluez/hci0/dev_F0_98_9D_D8_46_19/sep1/fd1: TRANSPORT_STATE_ACTIVE=
- -> TRANSPORT_STATE_IDLE
-bluetoothd[20399]: profiles/audio/a2dp.c:a2dp_sep_unlock() SEP 0x114f798 unl=
-ocked
-bluetoothd[20399]: src/device.c:connect_profiles() /org/bluez/hci0/dev_F0_98=
-_9D_D8_46_19 (all), client :1.73
-=20
-And start again, all commands and streams are back in sync.
-Any tips? Is that Maybe pulseaudio related?
-=20
-Thanks in advice,
-chris=
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+---
+
+Changes in v2:
+- Define struct msft_vnd_ext and add a field of this type to struct
+hci_dev to facilitate the support of Microsoft vendor extension.
+
+ drivers/bluetooth/btusb.c        | 14 ++++++++++++--
+ include/net/bluetooth/hci_core.h |  6 ++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3bdec42c9612..4c49f394f174 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -58,6 +58,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_CW6622		0x100000
+ #define BTUSB_MEDIATEK		0x200000
+ #define BTUSB_WIDEBAND_SPEECH	0x400000
++#define BTUSB_MSFT_VND_EXT	0x800000
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -335,7 +336,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Intel Bluetooth devices */
+ 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_MSFT_VND_EXT },
+ 	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
+@@ -348,7 +350,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
+-						     BTUSB_WIDEBAND_SPEECH },
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_MSFT_VND_EXT },
+ 
+ 	/* Other Intel Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+@@ -3734,6 +3737,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	hdev->send   = btusb_send_frame;
+ 	hdev->notify = btusb_notify;
+ 
++	hdev->msft_ext.opcode = HCI_OP_NOP;
++
+ #ifdef CONFIG_PM
+ 	err = btusb_config_oob_wake(hdev);
+ 	if (err)
+@@ -3800,6 +3805,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
++
++		if (id->driver_info & BTUSB_MSFT_VND_EXT &&
++			(id->idProduct == 0x0025 || id->idProduct == 0x0aaa)) {
++			hdev->msft_ext.opcode = 0xFC1E;
++		}
+ 	}
+ 
+ 	if (id->driver_info & BTUSB_MARVELL)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d4e28773d378..0ec3d9b41d81 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -244,6 +244,10 @@ struct amp_assoc {
+ 
+ #define HCI_MAX_PAGES	3
+ 
++struct msft_vnd_ext {
++	__u16	opcode;
++};
++
+ struct hci_dev {
+ 	struct list_head list;
+ 	struct mutex	lock;
+@@ -343,6 +347,8 @@ struct hci_dev {
+ 
+ 	struct amp_assoc	loc_assoc;
+ 
++	struct msft_vnd_ext	msft_ext;
++
+ 	__u8		flow_ctl_mode;
+ 
+ 	unsigned int	auto_accept_delay;
+-- 
+2.24.1
 
