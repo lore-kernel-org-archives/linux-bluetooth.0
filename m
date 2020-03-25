@@ -2,64 +2,119 @@ Return-Path: <SRS0=+pQP=5K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A9DC1975A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 14:52:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BC7C2D0E5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 17:54:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C41E0208CA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 14:52:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E519206F6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 17:54:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727554AbgCYOw1 (ORCPT
+        id S1727491AbgCYRyr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Mar 2020 10:52:27 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44948 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727123AbgCYOw1 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Mar 2020 10:52:27 -0400
-Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 29F18CECCF;
-        Wed, 25 Mar 2020 16:01:56 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v4] bluetooth: don't assume key size is 16 when the
- command fails.
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200325144834.207572-1-alainm@chromium.org>
-Date:   Wed, 25 Mar 2020 15:52:24 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <53AACEE6-56A0-4D14-AF46-D9AFFF984B2E@holtmann.org>
-References: <20200325144834.207572-1-alainm@chromium.org>
-To:     Alain Michaud <alainm@chromium.org>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Wed, 25 Mar 2020 13:54:47 -0400
+Received: from mga05.intel.com ([192.55.52.43]:14239 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727006AbgCYRyr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 25 Mar 2020 13:54:47 -0400
+IronPort-SDR: J9L4UcPBgX12KyKL4OxMe9iBMc0BZ1EyO4OhpjzIyVdqdJUcCH+mpvvL+K6HxuGgrXO87eTQnE
+ ae3XNdxIejUg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 10:54:46 -0700
+IronPort-SDR: 7sFdqCh6kA15nLIJ8B9BSFcM8zh/cVfplr/Ml6iixtSZLAiudvsTbsuSBwOmw6PvqmU8qQS0eh
+ UwsQBfCOA3gA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,305,1580803200"; 
+   d="scan'208";a="270886572"
+Received: from bgi1-mobl2.amr.corp.intel.com ([10.212.164.143])
+  by fmsmga004.fm.intel.com with ESMTP; 25 Mar 2020 10:54:46 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, inga.stotland@intel.com,
+        prathyusha.n@samsung.com
+Subject: [PATCH BlueZ v2] mesh: Handle close for Acceptor
+Date:   Wed, 25 Mar 2020 10:54:40 -0700
+Message-Id: <20200325175440.19925-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.21.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+From: Prathyusha N <prathyusha.n@samsung.com>
 
-> With this change, the encryption key size is not assumed to be 16 if the
-> read_encryption_key_size command fails for any reason.  This ensures
-> that if the controller fails the command for any reason that the
-> encryption key size isn't implicitely set to 16 and instead take a more
-> concervative posture to assume it is 0.
-> 
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> 
-> ---
-> 
-> net/bluetooth/hci_event.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+Provision complete callback is handled in provision failure case.
+If link closed received abruptly with reason success, triggered
+provision complete callback. Removed session timeout and session
+free as they are handled in pb_adv_unreg.
+---
+ mesh/pb-adv.c        | 14 +-------------
+ mesh/prov-acceptor.c | 13 ++++++++++++-
+ 2 files changed, 13 insertions(+), 14 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
+index 6ef45b8b0..291d92651 100644
+--- a/mesh/pb-adv.c
++++ b/mesh/pb-adv.c
+@@ -223,9 +223,6 @@ static void tx_timeout(struct l_timeout *timeout, void *user_data)
+ 	if (!l_queue_find(pb_sessions, session_match, session))
+ 		return;
+ 
+-	l_timeout_remove(session->tx_timeout);
+-	session->tx_timeout = NULL;
+-
+ 	mesh_send_cancel(filter, sizeof(filter));
+ 
+ 	l_info("TX timeout");
+@@ -392,17 +389,8 @@ static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
+ 		break;
+ 
+ 	case PB_ADV_CLOSE:
+-		l_timeout_remove(session->tx_timeout);
+ 		l_debug("Link closed notification: %2.2x", pkt[0]);
+-		/* Wrap callback for pre-cleaning */
+-		if (true) {
+-			mesh_prov_close_func_t cb = session->close_cb;
+-			void *user_data = session->user_data;
+-
+-			l_queue_remove(pb_sessions, session);
+-			l_free(session);
+-			cb(user_data, pkt[0]);
+-		}
++		session->close_cb(session->user_data, pkt[0]);
+ 		break;
+ 
+ 	case PB_ADV_ACK:
+diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+index 903abc2ff..5231616ee 100644
+--- a/mesh/prov-acceptor.c
++++ b/mesh/prov-acceptor.c
+@@ -120,7 +120,18 @@ static void acceptor_free(void)
+ 
+ static void acp_prov_close(void *user_data, uint8_t reason)
+ {
+-	/* TODO: Handle Close */
++	struct mesh_prov_acceptor *rx_prov = user_data;
++
++	if (rx_prov != prov)
++		return;
++
++	if (reason == PROV_ERR_SUCCESS)
++		reason = PROV_ERR_UNEXPECTED_ERR;
++
++	if (prov->cmplt)
++		prov->cmplt(prov->caller_data, reason, NULL);
++
++	prov->cmplt = NULL;
+ 	acceptor_free();
+ }
+ 
+-- 
+2.21.1
 
