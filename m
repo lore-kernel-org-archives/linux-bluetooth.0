@@ -2,41 +2,45 @@ Return-Path: <SRS0=+pQP=5K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8E8BC43331
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 21:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60673C43331
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 21:27:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A8472082D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 21:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36F8A2082E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 21:27:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727386AbgCYVZK convert rfc822-to-8bit (ORCPT
+        id S1727540AbgCYV1T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Mar 2020 17:25:10 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:40174 "EHLO
+        Wed, 25 Mar 2020 17:27:19 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:54800 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727351AbgCYVZK (ORCPT
+        with ESMTP id S1727358AbgCYV1S (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Mar 2020 17:25:10 -0400
+        Wed, 25 Mar 2020 17:27:18 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0BEE0CECD6;
-        Wed, 25 Mar 2020 22:34:40 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 45775CECD7;
+        Wed, 25 Mar 2020 22:36:48 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [BlueZ PATCH v4 1/5] mgmt: Update docs for Add Device
+Subject: Re: [RFC PATCH 1/1] Bluetooth: Update add_device to accept flags
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200319185000.BlueZ.v4.1.Idb4f0444e40064a861ee73b098264abd30114aaa@changeid>
-Date:   Wed, 25 Mar 2020 22:25:07 +0100
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>, alainm@chromium.org,
+In-Reply-To: <20200319184913.RFC.1.I4657d5566e8562d9813915e16a1a38a27195671d@changeid>
+Date:   Wed, 25 Mar 2020 22:27:15 +0100
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
         chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <E2FD0076-97EC-4CF6-B8D6-D7E4087459F6@holtmann.org>
-References: <20200320015023.85896-1-abhishekpandit@chromium.org>
- <20200319185000.BlueZ.v4.1.Idb4f0444e40064a861ee73b098264abd30114aaa@changeid>
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <75E407EB-397F-459C-A346-255307D92AC1@holtmann.org>
+References: <20200320014950.85018-1-abhishekpandit@chromium.org>
+ <20200319184913.RFC.1.I4657d5566e8562d9813915e16a1a38a27195671d@changeid>
 To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -46,34 +50,32 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Abhishek,
 
-> Update the docs for Add Device with information on flags mask and value.
-> Add information on the Wakeable flag that can be set to allow the device
+> Add the capability to set flags on devices being added via add_device.
+> The first flag being used is the wakeable flag which allows the device
 > to wake the system from suspend.
+> 
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
 > 
-> Changes in v4:
-> * Newly added support in Add Device for flags
+> include/net/bluetooth/mgmt.h |  5 ++++-
+> net/bluetooth/mgmt.c         | 42 +++++++++++++++++++++++++++++++++++-
+> 2 files changed, 45 insertions(+), 2 deletions(-)
 > 
-> Changes in v3: None
-> Changes in v2: None
-> 
-> doc/mgmt-api.txt | 12 ++++++++++++
-> 1 file changed, 12 insertions(+)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 27a41f334..e99c23710 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -1997,6 +1997,8 @@ Add Device Command
-> 	Command Parameters:	Address (6 Octets)
-> 				Address_Type (1 Octet)
-> 				Action (1 Octet)
-> +				Flags Mask (1 Octet)
-> +				Flags Value (1 Octet)
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index f41cd87550dc..e9db9b1a4436 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -445,8 +445,11 @@ struct mgmt_rp_get_clock_info {
+> struct mgmt_cp_add_device {
+> 	struct mgmt_addr_info addr;
+> 	__u8	action;
+> +	__u8	flags_mask;
+> +	__u8	flags_value;
+> } __packed;
+> -#define MGMT_ADD_DEVICE_SIZE		(MGMT_ADDR_INFO_SIZE + 1)
+> +#define MGMT_ADD_DEVICE_SIZE		(MGMT_ADDR_INFO_SIZE + 3)
 
-so we can actually not do that. This is not backwards compatible since the current kernel version have a strict size check for the command parameter size of Add Device.
-
-Is there a problem to just introduce action 3 as I mentioned before?
+as I mentioned in the other review. This is not backwards compatible.
 
 Regards
 
