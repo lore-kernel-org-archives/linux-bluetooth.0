@@ -3,34 +3,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03EEBC1975A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 08:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E56C1975A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 08:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA6192070A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 08:10:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 345782070A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 08:25:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726139AbgCYIK1 convert rfc822-to-8bit (ORCPT
+        id S1726264AbgCYIZP convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Mar 2020 04:10:27 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60677 "EHLO
+        Wed, 25 Mar 2020 04:25:15 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50636 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725907AbgCYIK1 (ORCPT
+        with ESMTP id S1726105AbgCYIZP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Mar 2020 04:10:27 -0400
+        Wed, 25 Mar 2020 04:25:15 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A34E9CECCA;
-        Wed, 25 Mar 2020 09:19:56 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7398FCECCA;
+        Wed, 25 Mar 2020 09:34:45 +0100 (CET)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.60.0.2.5\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: Indicate Microsoft vendor
- extension for Intel 9460/9560 and 9160/9260
+Subject: Re: [PATCH v2 2/2] Bluetooth: btusb: Read the supported features of
+ Microsoft vendor extension
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20200325000332.v2.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
-Date:   Wed, 25 Mar 2020 09:10:24 +0100
+In-Reply-To: <20200325000332.v2.2.I4e01733fa5b818028dc9188ca91438fc54aa5028@changeid>
+Date:   Wed, 25 Mar 2020 09:25:13 +0100
 Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Alain Michaud <alainm@chromium.org>,
@@ -39,9 +39,9 @@ Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <72699110-843A-4382-8FF1-20C5D4D557A2@holtmann.org>
+Message-Id: <32026740-96FE-4377-B5A1-2AEE324880D0@holtmann.org>
 References: <20200325070336.1097-1-mcchou@chromium.org>
- <20200325000332.v2.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
+ <20200325000332.v2.2.I4e01733fa5b818028dc9188ca91438fc54aa5028@changeid>
 To:     Miao-chen Chou <mcchou@chromium.org>
 X-Mailer: Apple Mail (2.3608.60.0.2.5)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -51,109 +51,263 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Miao-chen,
 
-> This adds a bit mask of driver_info for Microsoft vendor extension and
-> indicates the support for Intel 9460/9560 and 9160/9260. See
-> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
-> microsoft-defined-bluetooth-hci-commands-and-events for more information
-> about the extension. This was verified with Intel ThunderPeak BT controller
-> where msft_vnd_ext_opcode is 0xFC1E.
+> This adds a new header to facilitate the opcode and packet structures of
+> vendor extension(s). For now, we add only the
+> HCI_VS_MSFT_Read_Supported_Features command from Microsoft vendor
+> extension. See https://docs.microsoft.com/en-us/windows-hardware/drivers/
+> bluetooth/microsoft-defined-bluetooth-hci-commands-and-events#
+> microsoft-defined-bluetooth-hci-events for more details.
+> Upon initialization of a hci_dev, we issue a
+> HCI_VS_MSFT_Read_Supported_Features command to read the supported features
+> of Microsoft vendor extension if the opcode of Microsoft vendor extension
+> is valid. See https://docs.microsoft.com/en-us/windows-hardware/drivers/
+> bluetooth/microsoft-defined-bluetooth-hci-commands-and-events#
+> hci_vs_msft_read_supported_features for more details.
+> This was verified on a device with Intel ThhunderPeak BT controller where
+> the Microsoft vendor extension features are 0x000000000000003f.
 > 
 > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
 > ---
 > 
 > Changes in v2:
-> - Define struct msft_vnd_ext and add a field of this type to struct
-> hci_dev to facilitate the support of Microsoft vendor extension.
+> - Issue a HCI_VS_MSFT_Read_Supported_Features command with
+> __hci_cmd_sync() instead of constructing a request.
 > 
-> drivers/bluetooth/btusb.c        | 14 ++++++++++++--
-> include/net/bluetooth/hci_core.h |  6 ++++++
-> 2 files changed, 18 insertions(+), 2 deletions(-)
+> drivers/bluetooth/btusb.c          |  3 ++
+> include/net/bluetooth/hci_core.h   |  4 ++
+> include/net/bluetooth/vendor_hci.h | 51 +++++++++++++++++++
+> net/bluetooth/hci_core.c           | 78 ++++++++++++++++++++++++++++++
+> 4 files changed, 136 insertions(+)
+> create mode 100644 include/net/bluetooth/vendor_hci.h
 > 
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 3bdec42c9612..4c49f394f174 100644
+> index 4c49f394f174..410d50dbd4e2 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -58,6 +58,7 @@ static struct usb_driver btusb_driver;
-> #define BTUSB_CW6622		0x100000
-> #define BTUSB_MEDIATEK		0x200000
-> #define BTUSB_WIDEBAND_SPEECH	0x400000
-> +#define BTUSB_MSFT_VND_EXT	0x800000
-> 
-> static const struct usb_device_id btusb_table[] = {
-> 	/* Generic Bluetooth USB device */
-> @@ -335,7 +336,8 @@ static const struct usb_device_id blacklist_table[] = {
-> 
-> 	/* Intel Bluetooth devices */
-> 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW |
-> -						     BTUSB_WIDEBAND_SPEECH },
-> +						     BTUSB_WIDEBAND_SPEECH |
-> +						     BTUSB_MSFT_VND_EXT },
-> 	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW |
-> 						     BTUSB_WIDEBAND_SPEECH },
-> 	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
-> @@ -348,7 +350,8 @@ static const struct usb_device_id blacklist_table[] = {
-> 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL |
-> 						     BTUSB_WIDEBAND_SPEECH },
-> 	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
-> -						     BTUSB_WIDEBAND_SPEECH },
-> +						     BTUSB_WIDEBAND_SPEECH |
-> +						     BTUSB_MSFT_VND_EXT },
-> 
-> 	/* Other Intel Bluetooth devices */
-> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
-> @@ -3734,6 +3737,8 @@ static int btusb_probe(struct usb_interface *intf,
-> 	hdev->send   = btusb_send_frame;
+> @@ -3738,6 +3738,9 @@ static int btusb_probe(struct usb_interface *intf,
 > 	hdev->notify = btusb_notify;
 > 
-> +	hdev->msft_ext.opcode = HCI_OP_NOP;
-> +
+> 	hdev->msft_ext.opcode = HCI_OP_NOP;
+> +	hdev->msft_ext.features = 0;
+> +	hdev->msft_ext.evt_prefix_len = 0;
+> +	hdev->msft_ext.evt_prefix = NULL;
 
-do this in the hci_alloc_dev procedure for every driver. This doesn’t belong in the driver.
+as noted in the other review, let hci_alloc_dev and hci_free_dev deal with this.
 
+> 
 > #ifdef CONFIG_PM
 > 	err = btusb_config_oob_wake(hdev);
-> 	if (err)
-> @@ -3800,6 +3805,11 @@ static int btusb_probe(struct usb_interface *intf,
-> 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-> 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> +
-> +		if (id->driver_info & BTUSB_MSFT_VND_EXT &&
-> +			(id->idProduct == 0x0025 || id->idProduct == 0x0aaa)) {
-
-Please scrap this extra check. You already selected out the PID with the blacklist_table. In addition, I do not want to add a PID in two places in the driver.
-
-An alternative is to not use BTUSB_MSFT_VND_EXT and let the Intel code set it based on the hardware / firmware revision it finds. We might need to discuss which is the better approach for the Intel hardware since not all PIDs are unique.
-
-> +			hdev->msft_ext.opcode = 0xFC1E;
-> +		}
-> 	}
-> 
-> 	if (id->driver_info & BTUSB_MARVELL)
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index d4e28773d378..0ec3d9b41d81 100644
+> index 0ec3d9b41d81..f2876c5067a4 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -244,6 +244,10 @@ struct amp_assoc {
+> @@ -30,6 +30,7 @@
 > 
-> #define HCI_MAX_PAGES	3
+> #include <net/bluetooth/hci.h>
+> #include <net/bluetooth/hci_sock.h>
+> +#include <net/bluetooth/vendor_hci.h>
 > 
-> +struct msft_vnd_ext {
-> +	__u16	opcode;
-> +};
-> +
+> /* HCI priority */
+> #define HCI_PRIO_MAX	7
+> @@ -246,6 +247,9 @@ struct amp_assoc {
+> 
+> struct msft_vnd_ext {
+> 	__u16	opcode;
+> +	__u64	features;
+> +	__u8	evt_prefix_len;
+> +	void	*evt_prefix;
+> };
+> 
 > struct hci_dev {
-> 	struct list_head list;
-> 	struct mutex	lock;
-> @@ -343,6 +347,8 @@ struct hci_dev {
-> 
-> 	struct amp_assoc	loc_assoc;
-> 
-> +	struct msft_vnd_ext	msft_ext;
+> diff --git a/include/net/bluetooth/vendor_hci.h b/include/net/bluetooth/vendor_hci.h
+> new file mode 100644
+> index 000000000000..89a6795e672c
+> --- /dev/null
+> +++ b/include/net/bluetooth/vendor_hci.h
+> @@ -0,0 +1,51 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * BlueZ - Bluetooth protocol stack for Linux
+> + * Copyright (C) 2020 Google Corporation
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation;
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+> + * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
+> + * IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
+> + * CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
+> + * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+> + * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+> + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+> + *
+> + * ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
+> + * COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
+> + * SOFTWARE IS DISCLAIMED.
+> + */
 > +
-> 	__u8		flow_ctl_mode;
+> +#ifndef __VENDOR_HCI_H
+> +#define __VENDOR_HCI_H
+> +
+> +#define MSFT_EVT_PREFIX_MAX_LEN			255
+> +
+> +struct msft_cmd_cmp_info {
+> +	__u8 status;
+> +	__u8 sub_opcode;
+> +} __packed;
+> +
+> +/* Microsoft Vendor HCI subcommands */
+> +#define MSFT_OP_READ_SUPPORTED_FEATURES		0x00
+> +#define MSFT_FEATURE_MASK_RSSI_MONITOR_BREDR_CONN	0x0000000000000001
+> +#define MSFT_FEATURE_MASK_RSSI_MONITOR_LE_CONN		0x0000000000000002
+> +#define MSFT_FEATURE_MASK_RSSI_MONITOR_LE_ADV		0x0000000000000004
+> +#define MSFT_FEATURE_MASK_ADV_MONITOR_LE_ADV		0x0000000000000008
+> +#define MSFT_FEATURE_MASK_VERIFY_CURVE			0x0000000000000010
+> +#define MSFT_FEATURE_MASK_CONCURRENT_ADV_MONITOR	0x0000000000000020
+> +struct msft_cp_read_supported_features {
+> +	__u8 sub_opcode;
+> +} __packed;
+> +struct msft_rp_read_supported_features {
+> +	__u64 features;
+> +	__u8  evt_prefix_len;
+> +	__u8  evt_prefix[0];
+> +} __packed;
+> +
+> +#endif /* __VENDOR_HCI_H */
+
+Lets put this all in net/bluetooth/msft.c for now.
+
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index dbd2ad3a26ed..1ea32d10ed08 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1407,6 +1407,76 @@ static void hci_dev_get_bd_addr_from_property(struct hci_dev *hdev)
+> 	bacpy(&hdev->public_addr, &ba);
+> }
 > 
-> 	unsigned int	auto_accept_delay;
+> +static void process_msft_vnd_ext_cmd_complete(struct hci_dev *hdev,
+> +					      struct sk_buff *skb)
+> +{
+> +	struct msft_cmd_cmp_info *info = (void *)skb->data;
+> +	const u8 status = info->status;
+> +	const u16 sub_opcode = __le16_to_cpu(info->sub_opcode);
+> +
+> +	skb_pull(skb, sizeof(*info));
+> +
+> +	if (IS_ERR(skb)) {
+> +		BT_WARN("%s: Microsoft extension response packet invalid",
+> +			hdev->name);
+> +		return;
+> +	}
+> +
+> +	if (status) {
+> +		BT_WARN("%s: Microsoft extension sub command 0x%2.2x failed",
+> +			hdev->name, sub_opcode);
+> +		return;
+> +	}
+> +
+> +	BT_DBG("%s: status 0x%2.2x sub opcode 0x%2.2x", hdev->name, status,
+> +	       sub_opcode);
+> +
+> +	switch (sub_opcode) {
+> +	case MSFT_OP_READ_SUPPORTED_FEATURES: {
+> +		struct msft_rp_read_supported_features *rp = (void *)skb->data;
+> +		u8 prefix_len = rp->evt_prefix_len;
+> +
+> +		hdev->msft_ext.features = __le64_to_cpu(rp->features);
+> +		hdev->msft_ext.evt_prefix_len = prefix_len;
+> +		hdev->msft_ext.evt_prefix = kmalloc(prefix_len, GFP_ATOMIC);
+
+Are we really in interrupt context here? I don’t think there is a need for GFP_ATOMIC.
+
+> +		if (!hdev->msft_ext.evt_prefix) {
+> +			BT_WARN("%s: Microsoft extension invalid event prefix",
+> +				hdev->name);
+
+Please start using bt_dev_warn etc.
+
+> +			return;
+> +		}
+> +
+> +		memcpy(hdev->msft_ext.evt_prefix, rp->evt_prefix, prefix_len);
+> +		BT_INFO("%s: Microsoft extension features 0x%016llx",
+> +			hdev->name, hdev->msft_ext.features);
+> +		break;
+> +	}
+> +	default:
+> +		BT_WARN("%s: Microsoft extension unknown sub opcode 0x%2.2x",
+> +			hdev->name, sub_opcode);
+> +		break;
+> +	}
+> +}
+> +
+> +static void read_vendor_extension_features(struct hci_dev *hdev)
+> +{
+> +	struct sk_buff *skb;
+> +	const u16 msft_opcode = hdev->msft_ext.opcode;
+> +
+> +	if (msft_opcode !=  HCI_OP_NOP) {
+
+I really prefer it this way
+
+	if (!something_supported)
+		return;
+
+> +		struct msft_cp_read_supported_features cp;
+> +
+> +		cp.sub_opcode = MSFT_OP_READ_SUPPORTED_FEATURES;
+> +		skb = __hci_cmd_sync(hdev, msft_opcode, sizeof(cp), &cp,
+> +				     HCI_CMD_TIMEOUT);
+> +
+> +		process_msft_vnd_ext_cmd_complete(hdev, skb);
+> +		if (skb) {
+> +			kfree_skb(skb);
+> +			skb = NULL;
+> +		}
+> +	}
+> +}
+> +
+> static int hci_dev_do_open(struct hci_dev *hdev)
+> {
+> 	int ret = 0;
+> @@ -1554,6 +1624,11 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+> 		}
+> 	}
+> 
+> +	/* Check features supported by HCI extensions after the init procedure
+> +	 * completed.
+> +	 */
+> +	read_vendor_extension_features(hdev);
+> +
+
+	msft_do_open(hdev);
+
+
+> 	/* If the HCI Reset command is clearing all diagnostic settings,
+> 	 * then they need to be reprogrammed after the init procedure
+> 	 * completed.
+> @@ -1733,6 +1808,9 @@ int hci_dev_do_close(struct hci_dev *hdev)
+> 			cancel_delayed_work_sync(&adv_instance->rpa_expired_cb);
+> 	}
+> 
+> +	kfree(hdev->msft_ext.evt_prefix);
+> +	hdev->msft_ext.evt_prefix = NULL;
+> +
+
+	msft_do_close(hdev);
+
+
+And let these two function clear, init, free etc. everything except hdev->msft_ext.opcode
+
+That said, I would actually also introduce a wrapper msft_set_opcode(hdev, opcode); so that the driver doesn’t have to know the internal on how that opcode is stored.
+
+We can also keep the struct msft_ext internal to msft.c and don’t have to expose the internal details. So all stay confined in net/bluetooth/msft.c.
+
+> 	/* Avoid potential lockdep warnings from the *_flush() calls by
+> 	 * ensuring the workqueue is empty up front.
+> 	 */
 
 Regards
 
