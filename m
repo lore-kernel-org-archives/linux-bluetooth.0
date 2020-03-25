@@ -1,306 +1,277 @@
-Return-Path: <SRS0=2tab=5J=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=+pQP=5K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 254D3C10DCE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 23:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2660C54FD3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 02:27:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC71820870
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Mar 2020 23:10:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C68D420722
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 02:27:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mDUgtaqQ"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.codeaurora.org header.i=@mg.codeaurora.org header.b="cMxf/24m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727064AbgCXXKP (ORCPT
+        id S1727384AbgCYC1B (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Mar 2020 19:10:15 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:42568 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726618AbgCXXKP (ORCPT
+        Tue, 24 Mar 2020 22:27:01 -0400
+Received: from mail26.static.mailgun.info ([104.130.122.26]:21039 "EHLO
+        mail26.static.mailgun.info" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727313AbgCYC1B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Mar 2020 19:10:15 -0400
-Received: by mail-oi1-f194.google.com with SMTP id e4so327476oig.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Mar 2020 16:10:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UsQ0ShxzQxcustTXRyFI+CqaQiHbkHnUBCFYg+jAkH0=;
-        b=mDUgtaqQ2iZbf2BAaVzKfmcNFHYBhVyKo0F8oy20aF+p9RXYfklD0xllPAWdqqb1LV
-         lxjpfpz72YJ/Myx5s5BxdojYpJlF6IzIF3rrZSupa1eb89PUBp5QJVormv0auYEXrNW3
-         mUN+Ny0dIj0NyrwxaGQ4vnl/1eS12ZgeUnSz6Wq7w5cDRd4U4qVn8hJTOyzwWxcEGkY2
-         uLeyDI/s7qAlnnDJNlWoSFcsq0nb3JKYBAqVgqhboiLpRt1bCI5V1GfxXuw/ZmMr2/wK
-         zRCGBu3wzJIkhIGt4Ec9aNu0B1BoxNanV6K/BgzPOI309TGyIMY73o4nWiikHaSAqhpS
-         XvrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UsQ0ShxzQxcustTXRyFI+CqaQiHbkHnUBCFYg+jAkH0=;
-        b=ai4Rx27lckI4YOorUm6XkK1CVuzJWTEILuDYuFq6GLM8FoN1TPwC1YFyPQzfpEW7+w
-         IqrDtWE6aZnFqTGKc3GUfAP5TU/4WwKwjSil6BFwjUZ1qrPBr9qk2+1QcLHsmSCZkRAn
-         X9IJFhpJKUpwQ2ZidphKIl+5NlHecCCOxewv7pohQz7ouyo3ri+yaw0rEl/SwqUyRAhI
-         VwFbAUTg1gAqgOsV9eKQjAoneSZmcP3x0RpJaoj4V0r709iyAi2LWXGFlaVEc++WRwD/
-         1xjiF3cyNWHpirfcZ4feK1IniKAgAKqkQy78XnqtehWpE6OFJXnCikoqgwC2gPTxTOlr
-         0lwg==
-X-Gm-Message-State: ANhLgQ1k43vVfOW8CjBNkuZGf1EB78Pd1+pboUtVizRU6aLseaCl0rbC
-        txjb5tRZX/IA97kEwWYuvl7TxHC4RE4hgaQlvCT9cQ==
-X-Google-Smtp-Source: ADFU+vvWXyhb3diMmQjPvZoY8Pk9gxp971lxO1XrKyIe3R2TQJK6DTikncFW+3cGT9moltWtdfz2MMf9itlm524uGbs=
-X-Received: by 2002:a54:4e13:: with SMTP id a19mr521077oiy.108.1585091413788;
- Tue, 24 Mar 2020 16:10:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200323203458.24733-1-luiz.dentz@gmail.com> <20200323203458.24733-3-luiz.dentz@gmail.com>
- <8BD7396B-9BEA-48DA-92A6-4863B72EBEEB@holtmann.org>
-In-Reply-To: <8BD7396B-9BEA-48DA-92A6-4863B72EBEEB@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 24 Mar 2020 16:10:02 -0700
-Message-ID: <CABBYNZLuZeEV_URWCTAvcJ=d-a-e5LTR2CkuvfEtkWqsJkikOA@mail.gmail.com>
-Subject: Re: [PATCH v5 2/3] Bluetooth: L2CAP: Use DEFER_SETUP to group ECRED connections
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 24 Mar 2020 22:27:01 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1585103220; h=References: In-Reply-To: Message-Id: Date:
+ Subject: Cc: To: From: Sender;
+ bh=LtUW2dSiumEZN9/M65XSzpI2Mn57XCbv/ZGSeI+eZ5U=; b=cMxf/24mxJEQtdgZ7Q32k2/5blQi09qzWTJAASj8d0X1cPZZETjHhFxHdhPJRbFMbXibOTgK
+ WZOyPq47KcgXjAYRA/+xmcc5vKUtk7Nr4TKZdr5bugWTomy45V/2SHikPID8JGBpmWyaOM14
+ /CpZpd/CPQKh9Gi5q/1nYx6QpkA=
+X-Mailgun-Sending-Ip: 104.130.122.26
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171])
+ by mxa.mailgun.org with ESMTP id 5e7ac173.7fed6b955ce0-smtp-out-n04;
+ Wed, 25 Mar 2020 02:26:59 -0000 (UTC)
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 15175C433D2; Wed, 25 Mar 2020 02:26:58 +0000 (UTC)
+Received: from localhost.localdomain (unknown [112.64.2.157])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: rjliao)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id E9037C433CB;
+        Wed, 25 Mar 2020 02:26:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org E9037C433CB
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=none smtp.mailfrom=rjliao@codeaurora.org
+From:   Rocky Liao <rjliao@codeaurora.org>
+To:     robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, thierry.escande@linaro.org
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        Rocky Liao <rjliao@codeaurora.org>
+Subject: [PATCH v2 1/2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA6390
+Date:   Wed, 25 Mar 2020 10:26:37 +0800
+Message-Id: <20200325022638.14325-1-rjliao@codeaurora.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200314094328.3331-1-rjliao@codeaurora.org>
+References: <20200314094328.3331-1-rjliao@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+This patch adds support for QCA6390, including the devicetree and acpi
+compatible hwid matching, and patch/nvm downloading.
 
-On Tue, Mar 24, 2020 at 1:47 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Luiz,
->
-> > This uses the DEFER_SETUP flag to group channels with
-> > L2CAP_CREDIT_BASED_CONNECTION_REQ.
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> > include/net/bluetooth/l2cap.h |   4 +
-> > net/bluetooth/l2cap_core.c    | 136 +++++++++++++++++++++++++++++++---
-> > 2 files changed, 130 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> > index 2d7d28474d34..dada14d0622c 100644
-> > --- a/include/net/bluetooth/l2cap.h
-> > +++ b/include/net/bluetooth/l2cap.h
-> > @@ -47,6 +47,7 @@
-> > #define L2CAP_DEFAULT_ACC_LAT         0xFFFFFFFF
-> > #define L2CAP_BREDR_MAX_PAYLOAD               1019    /* 3-DH5 packet */
-> > #define L2CAP_LE_MIN_MTU              23
-> > +#define L2CAP_ECRED_CONN_SCID_MAX    5
-> >
-> > #define L2CAP_DISC_TIMEOUT            msecs_to_jiffies(100)
-> > #define L2CAP_DISC_REJ_TIMEOUT                msecs_to_jiffies(5000)
-> > @@ -984,6 +985,9 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
-> > int l2cap_ertm_init(struct l2cap_chan *chan);
-> > void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> > void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> > +typedef void (*l2cap_chan_func_t)(struct l2cap_chan *chan, void *data);
-> > +void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-> > +                  void *data);
-> > void l2cap_chan_del(struct l2cap_chan *chan, int err);
-> > void l2cap_send_conn_req(struct l2cap_chan *chan);
-> > void l2cap_move_start(struct l2cap_chan *chan);
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 5e6e35ab44dd..9f699d09d973 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -678,6 +678,29 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
-> > }
-> > EXPORT_SYMBOL_GPL(l2cap_chan_del);
-> >
-> > +static void __l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-> > +                           void *data)
-> > +{
-> > +     struct l2cap_chan *chan;
-> > +
-> > +     list_for_each_entry(chan, &conn->chan_l, list) {
-> > +             func(chan, data);
-> > +     }
-> > +}
-> > +
-> > +void l2cap_chan_list(struct l2cap_conn *conn, l2cap_chan_func_t func,
-> > +                  void *data)
-> > +{
-> > +     if (!conn)
-> > +             return;
-> > +
-> > +     mutex_lock(&conn->chan_lock);
-> > +     __l2cap_chan_list(conn, func, data);
-> > +     mutex_unlock(&conn->chan_lock);
-> > +}
-> > +
-> > +EXPORT_SYMBOL_GPL(l2cap_chan_list);
-> > +
-> > static void l2cap_conn_update_id_addr(struct work_struct *work)
-> > {
-> >       struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
-> > @@ -1356,29 +1379,79 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
-> >                      sizeof(req), &req);
-> > }
-> >
-> > -static void l2cap_ecred_connect(struct l2cap_chan *chan)
-> > -{
-> > -     struct l2cap_conn *conn = chan->conn;
-> > +struct l2cap_ecred_conn_data {
-> >       struct {
-> >               struct l2cap_ecred_conn_req req;
-> > -             __le16 scid;
-> > +             __le16 scid[5];
-> >       } __packed pdu;
-> > +     struct l2cap_chan *chan;
-> > +     struct pid *pid;
-> > +     int count;
-> > +};
-> > +
-> > +static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
-> > +{
-> > +     struct l2cap_ecred_conn_data *conn = data;
-> > +     struct pid *pid;
-> > +
-> > +     if (chan == conn->chan)
-> > +             return;
-> > +
-> > +     if (!test_and_clear_bit(FLAG_DEFER_SETUP, &chan->flags))
-> > +             return;
-> > +
-> > +     pid = chan->ops->get_peer_pid(chan);
-> > +
-> > +     /* Only add deferred channels with the same PID/PSM */
-> > +     if (conn->pid != pid || chan->psm != conn->chan->psm || chan->ident ||
-> > +         chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
-> > +             return;
-> > +
-> > +     if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
-> > +             return;
-> > +
-> > +     l2cap_ecred_init(chan, 0);
-> > +
-> > +     /* Set the same ident so we can match on the rsp */
-> > +     chan->ident = conn->chan->ident;
-> > +
-> > +     /* Include all channels deferred */
-> > +     conn->pdu.scid[conn->count] = cpu_to_le16(chan->scid);
-> > +
-> > +     conn->count++;
-> > +}
-> > +
-> > +static void l2cap_ecred_connect(struct l2cap_chan *chan)
-> > +{
-> > +     struct l2cap_conn *conn = chan->conn;
-> > +     struct l2cap_ecred_conn_data data;
-> > +
-> > +     if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
-> > +             return;
-> >
-> >       if (test_and_set_bit(FLAG_ECRED_CONN_REQ_SENT, &chan->flags))
-> >               return;
-> >
-> >       l2cap_ecred_init(chan, 0);
-> >
-> > -     pdu.req.psm     = chan->psm;
-> > -     pdu.req.mtu     = cpu_to_le16(chan->imtu);
-> > -     pdu.req.mps     = cpu_to_le16(chan->mps);
-> > -     pdu.req.credits = cpu_to_le16(chan->rx_credits);
-> > -     pdu.scid        = cpu_to_le16(chan->scid);
-> > +     data.pdu.req.psm     = chan->psm;
-> > +     data.pdu.req.mtu     = cpu_to_le16(chan->imtu);
-> > +     data.pdu.req.mps     = cpu_to_le16(chan->mps);
-> > +     data.pdu.req.credits = cpu_to_le16(chan->rx_credits);
-> > +     data.pdu.scid[0]     = cpu_to_le16(chan->scid);
-> >
-> >       chan->ident = l2cap_get_ident(conn);
-> > +     data.pid = chan->ops->get_peer_pid(chan);
-> > +
-> > +     data.count = 1;
-> > +     data.chan = chan;
-> > +     data.pid = chan->ops->get_peer_pid(chan);
-> > +
-> > +     __l2cap_chan_list(conn, l2cap_ecred_defer_connect, &data);
-> >
-> >       l2cap_send_cmd(conn, chan->ident, L2CAP_ECRED_CONN_REQ,
-> > -                    sizeof(pdu), &pdu);
-> > +                    sizeof(data.pdu.req) + data.count * sizeof(__le16),
-> > +                    &data.pdu);
-> > }
-> >
-> > static void l2cap_le_start(struct l2cap_chan *chan)
-> > @@ -7694,6 +7767,33 @@ static bool is_valid_psm(u16 psm, u8 dst_type) {
-> >       return ((psm & 0x0101) == 0x0001);
-> > }
-> >
-> > +struct l2cap_chan_data {
-> > +     struct l2cap_chan *chan;
-> > +     struct pid *pid;
-> > +     int count;
-> > +};
-> > +
-> > +static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
-> > +{
-> > +     struct l2cap_chan_data *d = data;
-> > +     struct pid *pid;
-> > +
-> > +     if (chan == d->chan)
-> > +             return;
-> > +
-> > +     if (!test_bit(FLAG_DEFER_SETUP, &chan->flags))
-> > +             return;
-> > +
-> > +     pid = chan->ops->get_peer_pid(chan);
-> > +
-> > +     /* Only count deferred channels with the same PID/PSM */
-> > +     if (d->pid != pid || chan->psm != d->chan->psm || chan->ident ||
-> > +         chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
-> > +             return;
-> > +
-> > +     d->count++;
-> > +}
-> > +
-> > int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-> >                      bdaddr_t *dst, u8 dst_type)
-> > {
-> > @@ -7813,6 +7913,22 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-> >               goto done;
-> >       }
-> >
-> > +     if (chan->mode == L2CAP_MODE_EXT_FLOWCTL) {
-> > +             struct l2cap_chan_data data;
-> > +
-> > +             data.chan = chan;
-> > +             data.pid = chan->ops->get_peer_pid(chan);
-> > +             data.count = 0;
-> > +
-> > +             l2cap_chan_list(conn, l2cap_chan_by_pid, &data);
->
-> Put an empty line after this. It gives emphasis to the comment.
->
-> > +             /* Check if there isn't too many channels being connected */
-> > +             if (!(data.count < L2CAP_ECRED_CONN_SCID_MAX - 1)) {
->
-> If (data.count > L2CAP_ECRED_CONN_SCID_MIX) ???
+Signed-off-by: Rocky Liao <rjliao@codeaurora.org>
+---
 
-We need to take into account the chan itself is not part of the list
-yet, so that means data.count + 1 or we initialize the it as 1 a
-couple lines before, I will change the logic to use > operation.
+Changes in v2:
+  -removed the use of macro QCA_IS_3991_6390
+  -removed the qca_send_enhancelog_enable_cmd()
 
-> > +                     hci_conn_drop(hcon);
-> > +                     err = -EPROTO;
-> > +                     goto done;
-> > +             }
-> > +     }
-> > +
-> >       mutex_lock(&conn->chan_lock);
-> >       l2cap_chan_lock(chan);
->
-> Regards
->
-> Marcel
->
+ drivers/bluetooth/btqca.c   | 18 ++++++++++++-----
+ drivers/bluetooth/btqca.h   |  3 ++-
+ drivers/bluetooth/hci_qca.c | 40 ++++++++++++++++++++++++++++++-------
+ 3 files changed, 48 insertions(+), 13 deletions(-)
 
-
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index a16845c0751d..3ea866d44568 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -32,7 +32,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+ 	 * VSE event. WCN3991 sends version command response as a payload to
+ 	 * command complete event.
+ 	 */
+-	if (soc_type == QCA_WCN3991) {
++	if (soc_type >= QCA_WCN3991) {
+ 		event_type = 0;
+ 		rlen += 1;
+ 		rtype = EDL_PATCH_VER_REQ_CMD;
+@@ -69,7 +69,7 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version,
+ 		goto out;
+ 	}
+ 
+-	if (soc_type == QCA_WCN3991)
++	if (soc_type >= QCA_WCN3991)
+ 		memmove(&edl->data, &edl->data[1], sizeof(*ver));
+ 
+ 	ver = (struct qca_btsoc_version *)(edl->data);
+@@ -217,7 +217,7 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
+ 				tlv_nvm->data[0] |= 0x80;
+ 
+ 				/* UART Baud Rate */
+-				if (soc_type == QCA_WCN3991)
++				if (soc_type >= QCA_WCN3991)
+ 					tlv_nvm->data[1] = nvm_baud_rate;
+ 				else
+ 					tlv_nvm->data[2] = nvm_baud_rate;
+@@ -268,7 +268,7 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
+ 	 * VSE event. WCN3991 sends version command response as a payload to
+ 	 * command complete event.
+ 	 */
+-	if (soc_type == QCA_WCN3991) {
++	if (soc_type >= QCA_WCN3991) {
+ 		event_type = 0;
+ 		rlen = sizeof(*edl);
+ 		rtype = EDL_PATCH_TLV_REQ_CMD;
+@@ -301,7 +301,7 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
+ 		err = -EIO;
+ 	}
+ 
+-	if (soc_type == QCA_WCN3991)
++	if (soc_type >= QCA_WCN3991)
+ 		goto out;
+ 
+ 	tlv_resp = (struct tlv_seg_resp *)(edl->data);
+@@ -442,6 +442,11 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 			    (soc_ver & 0x0000000f);
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crbtfw%02x.tlv", rom_ver);
++	} else if (soc_type == QCA_QCA6390) {
++		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
++			    (soc_ver & 0x0000000f);
++		snprintf(config.fwname, sizeof(config.fwname),
++			 "qca/htbtfw%02x.tlv", rom_ver);
+ 	} else {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/rampatch_%08x.bin", soc_ver);
+@@ -464,6 +469,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	else if (qca_is_wcn399x(soc_type))
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crnv%02x.bin", rom_ver);
++	else if (soc_type == QCA_QCA6390)
++		snprintf(config.fwname, sizeof(config.fwname),
++			 "qca/htnv%02x.bin", rom_ver);
+ 	else
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/nvm_%08x.bin", soc_ver);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index e16a4d650597..6e1e62dd4b95 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -125,8 +125,9 @@ enum qca_btsoc_type {
+ 	QCA_AR3002,
+ 	QCA_ROME,
+ 	QCA_WCN3990,
+-	QCA_WCN3991,
+ 	QCA_WCN3998,
++	QCA_WCN3991,
++	QCA_QCA6390,
+ };
+ 
+ #if IS_ENABLED(CONFIG_BT_QCA)
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 439392b1c043..d0ac554584a4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -26,6 +26,7 @@
+ #include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+ #include <linux/of_device.h>
++#include <linux/acpi.h>
+ #include <linux/platform_device.h>
+ #include <linux/regulator/consumer.h>
+ #include <linux/serdev.h>
+@@ -1596,7 +1597,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 
+ 	bt_dev_info(hdev, "setting up %s",
+-		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME");
++		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME/QCA6390");
+ 
+ retry:
+ 	ret = qca_power_on(hdev);
+@@ -1665,10 +1666,10 @@ static int qca_setup(struct hci_uart *hu)
+ 	}
+ 
+ 	/* Setup bdaddr */
+-	if (qca_is_wcn399x(soc_type))
+-		hu->hdev->set_bdaddr = qca_set_bdaddr;
+-	else
++	if (soc_type == QCA_ROME)
+ 		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
++	else
++		hu->hdev->set_bdaddr = qca_set_bdaddr;
+ 
+ 	return ret;
+ }
+@@ -1721,6 +1722,11 @@ static const struct qca_vreg_data qca_soc_data_wcn3998 = {
+ 	.num_vregs = 4,
+ };
+ 
++static const struct qca_vreg_data qca_soc_data_qca6390 = {
++	.soc_type = QCA_QCA6390,
++	.num_vregs = 0,
++};
++
+ static void qca_power_shutdown(struct hci_uart *hu)
+ {
+ 	struct qca_serdev *qcadev;
+@@ -1764,7 +1770,7 @@ static int qca_power_off(struct hci_dev *hdev)
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 
+ 	/* Stop sending shutdown command if soc crashes. */
+-	if (qca_is_wcn399x(soc_type)
++	if (soc_type != QCA_ROME
+ 		&& qca->memdump_state == QCA_MEMDUMP_IDLE) {
+ 		qca_send_pre_shutdown_cmd(hdev);
+ 		usleep_range(8000, 10000);
+@@ -1900,7 +1906,11 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 			return err;
+ 		}
+ 	} else {
+-		qcadev->btsoc_type = QCA_ROME;
++		if (data)
++			qcadev->btsoc_type = data->soc_type;
++		else
++			qcadev->btsoc_type = QCA_ROME;
++
+ 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+ 					       GPIOD_OUT_LOW);
+ 		if (!qcadev->bt_en) {
+@@ -2044,21 +2054,37 @@ static int __maybe_unused qca_resume(struct device *dev)
+ 
+ static SIMPLE_DEV_PM_OPS(qca_pm_ops, qca_suspend, qca_resume);
+ 
++#ifdef CONFIG_OF
+ static const struct of_device_id qca_bluetooth_of_match[] = {
+ 	{ .compatible = "qcom,qca6174-bt" },
++	{ .compatible = "qcom,qca6390-bt", .data = &qca_soc_data_qca6390},
+ 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
+ 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
+ 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
++#endif
++
++#ifdef CONFIG_ACPI
++static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
++	{ "QCOM6390", (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ "DLA16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ "DLB16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ "DLB26390", (kernel_ulong_t)&qca_soc_data_qca6390 },
++	{ },
++};
++MODULE_DEVICE_TABLE(acpi, qca_bluetooth_acpi_match);
++#endif
++
+ 
+ static struct serdev_device_driver qca_serdev_driver = {
+ 	.probe = qca_serdev_probe,
+ 	.remove = qca_serdev_remove,
+ 	.driver = {
+ 		.name = "hci_uart_qca",
+-		.of_match_table = qca_bluetooth_of_match,
++		.of_match_table = of_match_ptr(qca_bluetooth_of_match),
++		.acpi_match_table = ACPI_PTR(qca_bluetooth_acpi_match),
+ 		.pm = &qca_pm_ops,
+ 	},
+ };
 -- 
-Luiz Augusto von Dentz
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
