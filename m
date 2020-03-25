@@ -2,65 +2,107 @@ Return-Path: <SRS0=+pQP=5K=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE110C54FCF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 14:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6E3C1975A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 14:45:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5E96208E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 14:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B32420775
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Mar 2020 14:45:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dnJRgQfj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727682AbgCYOnf convert rfc822-to-8bit (ORCPT
+        id S1727774AbgCYOpp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Mar 2020 10:43:35 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44773 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727236AbgCYOnf (ORCPT
+        Wed, 25 Mar 2020 10:45:45 -0400
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:39956 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727123AbgCYOpp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Mar 2020 10:43:35 -0400
-Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C695BCECCF;
-        Wed, 25 Mar 2020 15:53:05 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH v2] bluetooth: Enforce classic key size verification.
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CALWDO_XjO9=2Y_W-uAXxb+myh1nLvF7_CxrprtLZ=pAj-FrVaQ@mail.gmail.com>
-Date:   Wed, 25 Mar 2020 15:43:33 +0100
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Marcel Holtmann <marcel.holtmann@intel.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <1AFDC1E2-8875-4EFC-8A75-DAB89DA9FFB5@holtmann.org>
-References: <20200320133748.154926-1-alainm@chromium.org>
- <CALWDO_WSHiNw+uwcZzufJ7rjHr=zpMs6f3ry=rdLMGLz2gJZ=w@mail.gmail.com>
- <1ACCF17B-90EB-4DE1-BD8C-A927ABEC3913@holtmann.org>
- <CALWDO_V=6NXLTZ=XTc+uAe3YUVkUfe88c4beWWoqWK7+vK4+8g@mail.gmail.com>
- <992DB845-DB7F-41B9-93E0-538B08BDF910@holtmann.org>
- <CALWDO_WF4n_Ta-fYoxTv4OF_guZy=d8urEyrosUPgWdHXo8Pag@mail.gmail.com>
- <C35897C0-9924-4598-859B-0ADD1EF2FB94@holtmann.org>
- <CALWDO_XjO9=2Y_W-uAXxb+myh1nLvF7_CxrprtLZ=pAj-FrVaQ@mail.gmail.com>
-To:     Alain Michaud <alainmichaud@google.com>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
+        Wed, 25 Mar 2020 10:45:45 -0400
+Received: by mail-ua1-f67.google.com with SMTP id t20so813726uao.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2020 07:45:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SfhyuSXT4SCQ4COQg/Q/ZZmgacUcKu21DcrYrYtj610=;
+        b=dnJRgQfjpnz8EmTcFM9Iq0Po+j8+nN60b8kMNUH20Wq0RBImLQ9JI79SqFyq+zS7J/
+         mcu7YXriZ289Lx9ZuWgCHIUbVRRQJUTh0RCjQzLB4S8b359kJzDep9Ktf97CsuqZFDTt
+         xgHd5lKCJI7QPIXuVrrX5s9yi1l/6lqz/hHG4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SfhyuSXT4SCQ4COQg/Q/ZZmgacUcKu21DcrYrYtj610=;
+        b=kNZbvkjk9n2IqZwDF6eBqBymHRfednoq+jftjtN7UhY80gCoXee4dYoc6CHr9NS6X7
+         jBYt7a5e4c9+BYv3gYbYGYyRDM0Jgfw9AiWnG/855KihPY4xIFZjmOd6Hm27YuVZY5jL
+         ZD+z15syROGO1dB9MbH/VwpLnVxNIwNXkCub8CwM3O0WxsrW4D1r1dsHSFNortagwRjx
+         tXsS8GSNVoqeabsMFTVhN8j+RlhAWju7pwkynKPOmxFKn0Zog8XmSah2sseroPiTSHAK
+         GgMY/6ez001uyNmwOM5p/0Wcg3cW6tCm+pL+3b0dQ+Ye7abuCBoDX89QYZiXpZqYgqqE
+         hXfA==
+X-Gm-Message-State: ANhLgQ2leToojATxLmvForaCh0V1cMAn8zbQYUYCaAlbNc1nyVEK1gAV
+        wjPSrPxUL1F6k6dd0xv0wWZt3Or6fFB7dA==
+X-Google-Smtp-Source: ADFU+vvJg2d0zM2+NOY1QBEeYPi203skIv1A/c+gftiJGTukG55ZB3v7BA4sePV1stY5DPQpvm/Ipw==
+X-Received: by 2002:ab0:604f:: with SMTP id o15mr2630375ual.120.1585147543488;
+        Wed, 25 Mar 2020 07:45:43 -0700 (PDT)
+Received: from alain.c.googlers.com.com (57.152.190.35.bc.googleusercontent.com. [35.190.152.57])
+        by smtp.gmail.com with ESMTPSA id d20sm10629579vsc.6.2020.03.25.07.45.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2020 07:45:42 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [PATCH v3] bluetooth: don't assume key size is 16 when the command fails.
+Date:   Wed, 25 Mar 2020 14:45:40 +0000
+Message-Id: <20200325144540.206658-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+With this change, the encryption key size is not assumed to be 16 if the
+read_encryption_key_size command fails for any reason.  This ensures
+that if the controller fails the command for any reason that the
+encryption key size isn't implicitely set to 16 and instead take a more
+concervative posture to assume it is 0.
 
-> I suspect we'd want bluetoothd to have a configuration that can enforce a more secure posture.
-> 
-> Unfortunately when the command isn't supported, the platform is left between a rock and hard place... There isn't much we can do but to block the use of Bluetooth if the platform requires a more secure posture.
+Signed-off-by: Alain Michaud <alainm@chromium.org>
 
-so if the BR/EDR part is not up to the policy that the host requires, we could still configure the LE part. BlueZ is set up in this way that you can run a dual-mode controller as just a LE controller.
+---
 
-I would also opt for the kernel just tells us what options it have. Then at least we can provide some feedback to the end-user on why Bluetooth is not available or why only selected features are available.
+ net/bluetooth/hci_event.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cd3d7d90029b..baad7efdc508 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2963,14 +2963,14 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+ 	if (!conn)
+ 		goto unlock;
+ 
+-	/* If we fail to read the encryption key size, assume maximum
+-	 * (which is the same we do also when this HCI command isn't
+-	 * supported.
++	/* While unexpected, the failure of the read_enc_key_size command may
++	 * fail. The most secure approach is to then assume the key size is 0 to
++	 * force a disconnection.
+ 	 */
+ 	if (rp->status) {
+ 		bt_dev_err(hdev, "failed to read key size for handle %u",
+ 			   handle);
+-		conn->enc_key_size = HCI_LINK_KEY_SIZE;
++		conn->enc_key_size = 0;
+ 	} else {
+ 		conn->enc_key_size = rp->key_size;
+ 	}
+-- 
+2.25.1.696.g5e7596f4ac-goog
 
