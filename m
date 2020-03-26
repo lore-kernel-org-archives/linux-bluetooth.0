@@ -2,91 +2,272 @@ Return-Path: <SRS0=EGLw=5L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C6D0C43331
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 17:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C14EC43331
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 20:22:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 450E02073E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 17:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 048CE20775
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 20:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="knAjWFig"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ST9dT7sF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726363AbgCZRVD (ORCPT
+        id S1728638AbgCZUWI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Mar 2020 13:21:03 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:38294 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbgCZRVD (ORCPT
+        Thu, 26 Mar 2020 16:22:08 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:39998 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728587AbgCZUWI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Mar 2020 13:21:03 -0400
-Received: by mail-ot1-f68.google.com with SMTP id t28so6683756ott.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 10:21:01 -0700 (PDT)
+        Thu, 26 Mar 2020 16:22:08 -0400
+Received: by mail-pj1-f65.google.com with SMTP id kx8so2879494pjb.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 13:22:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Dp8AfGEc4pG6IDCBSgLmlAKmq788PjytsmDxUXbv+RQ=;
-        b=knAjWFigiD1eKn0q0cRkCcuMdCXdwW+HGRf2n/xFfbWSII2nKsQGLTzQ4K1Kp/NmAW
-         TFAq8taWOyMrELrd110wrnV2b3KlRcC645r962vPWHvdT91+laWQqvwriSHtLg/G/QFU
-         zkY0QeqWmnpgWPhbuQFBTSdJjBi8mLWPdCu5Y=
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=R9TlusWVcZn2L9hX+mfQCzeDFS8UOCkgUkV8/salwRs=;
+        b=ST9dT7sFPUULhPqP6aJ1OUaWUq0tl+jRQEOu+w45KgXpkQH5N/hns6kaBhmeQbntal
+         iSh//DodhFy8eX04sMt5EmM6+vJGnEWbNsh6hLmhgE4JANIIAmri11o8TJO7K4WcdoRM
+         bT2SILR7QVlXhAsk1DqFbI4EvgdEzh1LXtDdyzMaSZX17LfDilTOMbRXiyqPCZTCuG3O
+         utHSWo8SOThiid4IEKiwiFkikpablQKj75du3kGtRefCRte7WdzvJJsL1H/eGKmHUpva
+         7ra0NKKf3hvhDaxoRdkK1c7dk41MwccIM/ITVd/D58Jkf9J7ZpxMGIPQyOmEF6m7OnJv
+         Qesg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Dp8AfGEc4pG6IDCBSgLmlAKmq788PjytsmDxUXbv+RQ=;
-        b=uAq6hX2JG6a1XU8fCnZZPGtIpMqDYNSiZ9tisKItKJrfICLewSpTkGmMaItm5GAS3L
-         2hzHUM0E4G7aCGxnBOASBhsQyLQCJKqaGAbDMQx5GASq4eSrlfig2d9EeRTp0ppzHFDQ
-         4OYNWB1yZJG3M+sKudoyLPWYxMXGMjvlGEiadJJqTI1f/Q/TBkQJv5dfqYdbXnNIX0Dx
-         CsQFVQ+d2PqLwKRU7capnOovzxZSEXhHpvOz+W39Zqs8UYfN6mmDDKBcyz2IBfKTcsgO
-         fUacTibTJdH0l7nB94ExHUlwDuNHGiVzFWAd/dKSAQTyfSpFqpx1DWNQ+QPJ2ltlTgNx
-         S3Lw==
-X-Gm-Message-State: ANhLgQ124p8CmpZbrU2d4DCaFt4oPVtp0lWDIE+ARnZwKu1T07Nb3pXi
-        Rt2IAfNEPj8+NnRRg7l7GJrd6ZyQhAv1CyL/frLNKSvC
-X-Google-Smtp-Source: ADFU+vvY5TnIaN1zUlcyaN4iampRF7UgmPqmGv9NAhu58r+850BmINIkdCsYG4JS8H5X8MqFSYf+5uo12F3jzXNaQyY=
-X-Received: by 2002:a9d:1b6d:: with SMTP id l100mr3538363otl.70.1585243260969;
- Thu, 26 Mar 2020 10:21:00 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=R9TlusWVcZn2L9hX+mfQCzeDFS8UOCkgUkV8/salwRs=;
+        b=SEo1maQZvKpYh6Uo6OVW8xIBZMXOMMgGBcG6gCadNkcdbG247FWLXsUeqJCnOygJBE
+         4kM28uIqfQIKFFA2/8O/BBynhTS23tVtKuLxVFZOtxcVgpsGtreTogz4jBBKRHfDjKnn
+         X2fFB0Ilwwx9b1kvdsGqmIDw1S9FzLPpMCWt2n1hVcn6cKA/t99gJDL5sgeGt8DiqNYS
+         6LfdZCOzIdZgd8/Qt8UV6iyu5hn7avwSqH5rK2z95Bc08ttZpBPrPgpXjVu2dFjhvbmv
+         NjEUysxKe+bhWZGILoj6vh4axaebmwrnJmjJuXT9FG4lW1QUmqY7N5gWvNhL6DDfpCHt
+         hMww==
+X-Gm-Message-State: ANhLgQ2UBpSbcXXKILmYpbukWX0PUO8+CXhPgYZmW1GNb+UmFhE4Y5W5
+        7RGUbcjnPcx0/XGvr8SppmavmCJW
+X-Google-Smtp-Source: ADFU+vstubJJyS9EUvt7hYHnIu9nl+6f5LyF3NhTmMbBjqnNPztjVHlgK6HydeBoDXLUJXd6+5J2DA==
+X-Received: by 2002:a17:902:b48b:: with SMTP id y11mr8075465plr.131.1585254124439;
+        Thu, 26 Mar 2020 13:22:04 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id u14sm2370377pfh.220.2020.03.26.13.22.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2020 13:22:03 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add BT_MODE socket option
+Date:   Thu, 26 Mar 2020 13:22:02 -0700
+Message-Id: <20200326202202.17244-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <CAOxioNmHcCTkc1MA6Zw8WTPBHCTpE9XZyzfOeuj97EP2NeBw=A@mail.gmail.com>
-In-Reply-To: <CAOxioNmHcCTkc1MA6Zw8WTPBHCTpE9XZyzfOeuj97EP2NeBw=A@mail.gmail.com>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Thu, 26 Mar 2020 10:20:48 -0700
-Message-ID: <CAOxioN=7jGXxp+=c674Ai3bU5N3f-qRpd3zHDuOdSO93W3dnwQ@mail.gmail.com>
-Subject: Re: [PATCH] autopair: Fix compiler warning
-To:     BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi BlueZ maintainers,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Could you take a look at this fix? Thank you!
+This adds BT_MODE socket option which can be used to set L2CAP modes,
+including modes only supported over LE which were not supported using
+the L2CAP_OPTIONS.
 
-On Tue, Mar 24, 2020 at 12:49 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
->
-> With clang, comparing an array with NULL generates a warning because the
-> value is always non-NULL. With maintainer mode enabled, this becomes a
-> compilation error.
-> ---
->  plugins/autopair.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/plugins/autopair.c b/plugins/autopair.c
-> index 043bd9b9d..3089430a8 100644
-> --- a/plugins/autopair.c
-> +++ b/plugins/autopair.c
-> @@ -75,7 +75,7 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
->          btd_device_get_product (device));
->
->      /* The iCade shouldn't use random PINs like normal keyboards */
-> -    if (name != NULL && strstr(name, "iCade") != NULL)
-> +    if (strstr(name, "iCade") != NULL)
->          return 0;
->
->      /* This is a class-based pincode guesser. Ignore devices with an
-> --
-> 2.17.1
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/bluetooth.h |   8 ++
+ net/bluetooth/l2cap_sock.c        | 120 +++++++++++++++++++++++++++++-
+ 2 files changed, 127 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 1576353a2773..3fa7b1e3c5d9 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -139,6 +139,14 @@ struct bt_voice {
+ #define BT_PHY_LE_CODED_TX	0x00002000
+ #define BT_PHY_LE_CODED_RX	0x00004000
+ 
++#define BT_MODE			15
++
++#define BT_MODE_BASIC		0x00
++#define BT_MODE_ERTM		0x01
++#define BT_MODE_STREAMING	0x02
++#define BT_MODE_LE_FLOWCTL	0x03
++#define BT_MODE_EXT_FLOWCTL	0x04
++
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 117ba20ea194..7c863dc8fe6d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -395,6 +395,24 @@ static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr,
+ 	return sizeof(struct sockaddr_l2);
+ }
+ 
++static int l2cap_get_mode(struct l2cap_chan *chan)
++{
++	switch (chan->mode) {
++	case L2CAP_MODE_BASIC:
++		return BT_MODE_BASIC;
++	case L2CAP_MODE_ERTM:
++		return BT_MODE_ERTM;
++	case L2CAP_MODE_STREAMING:
++		return BT_MODE_STREAMING;
++	case L2CAP_MODE_LE_FLOWCTL:
++		return BT_MODE_LE_FLOWCTL;
++	case L2CAP_MODE_EXT_FLOWCTL:
++		return BT_MODE_EXT_FLOWCTL;
++	}
++
++	return -EINVAL;
++}
++
+ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
+ 				     char __user *optval, int __user *optlen)
+ {
+@@ -424,6 +442,13 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
+ 			break;
+ 		}
+ 
++		/* L2CAP_MODE_LE_FLOWCTL and L2CAP_MODE_EXT_FLOWCTL are not
++		 * supported by L2CAP_OPTIONS.
++		 */
++		if (chan->mode == L2CAP_MODE_LE_FLOWCTL ||
++		    chan->mode == L2CAP_MODE_EXT_FLOWCTL)
++			return -EINVAL;
++
+ 		memset(&opts, 0, sizeof(opts));
+ 		opts.imtu     = chan->imtu;
+ 		opts.omtu     = chan->omtu;
+@@ -508,7 +533,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	struct bt_security sec;
+ 	struct bt_power pwr;
+ 	u32 phys;
+-	int len, err = 0;
++	int len, mode, err = 0;
+ 
+ 	BT_DBG("sk %p", sk);
+ 
+@@ -624,6 +649,27 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			err = -EFAULT;
+ 		break;
+ 
++	case BT_MODE:
++		if (!enable_ecred) {
++			err = -ENOPROTOOPT;
++			break;
++		}
++
++		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		mode = l2cap_get_mode(chan);
++		if (mode < 0) {
++			err = mode;
++			break;
++		}
++
++		if (put_user(mode, (u8 __user *) optval))
++			err = -EFAULT;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -763,6 +809,45 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 	return err;
+ }
+ 
++static int l2cap_set_mode(struct l2cap_chan *chan, u8 mode)
++{
++	switch (mode) {
++	case BT_MODE_BASIC:
++		if (bdaddr_type_is_le(chan->src_type))
++			return -EINVAL;
++		mode = L2CAP_MODE_BASIC;
++		clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
++		break;
++	case BT_MODE_ERTM:
++		if (!disable_ertm || bdaddr_type_is_le(chan->src_type))
++			return -EINVAL;
++		mode = L2CAP_MODE_ERTM;
++		break;
++	case BT_MODE_STREAMING:
++		if (!disable_ertm || bdaddr_type_is_le(chan->src_type))
++			return -EINVAL;
++		mode = L2CAP_MODE_STREAMING;
++		break;
++	case BT_MODE_LE_FLOWCTL:
++		if (!bdaddr_type_is_le(chan->src_type))
++			return -EINVAL;
++		mode = L2CAP_MODE_LE_FLOWCTL;
++		break;
++	case BT_MODE_EXT_FLOWCTL:
++		/* TODO: Add support for ECRED PDUs to BR/EDR */
++		if (!bdaddr_type_is_le(chan->src_type))
++			return -EINVAL;
++		mode = L2CAP_MODE_EXT_FLOWCTL;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	chan->mode = mode;
++
++	return 0;
++}
++
+ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 				 char __user *optval, unsigned int optlen)
+ {
+@@ -968,6 +1053,39 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		break;
+ 
++	case BT_MODE:
++		if (!enable_ecred) {
++			err = -ENOPROTOOPT;
++			break;
++		}
++
++		BT_DBG("sk->sk_state %u", sk->sk_state);
++
++		if (sk->sk_state != BT_BOUND) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (get_user(opt, (u8 __user *) optval)) {
++			err = -EFAULT;
++			break;
++		}
++
++		BT_DBG("opt %u", opt);
++
++		err = l2cap_set_mode(chan, opt);
++		if (err)
++			break;
++
++		BT_DBG("mode 0x%2.2x", chan->mode);
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+-- 
+2.21.1
+
