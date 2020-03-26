@@ -2,189 +2,149 @@ Return-Path: <SRS0=EGLw=5L=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6517C43331
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 05:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A5BC43331
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 06:12:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 851002070A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 05:45:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="i+w8pe4i"
+	by mail.kernel.org (Postfix) with ESMTP id 07B1820772
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Mar 2020 06:12:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbgCZFpb (ORCPT
+        id S1726363AbgCZGMy convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Mar 2020 01:45:31 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:39686 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726354AbgCZFpZ (ORCPT
+        Thu, 26 Mar 2020 02:12:54 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:57475 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725854AbgCZGMy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Mar 2020 01:45:25 -0400
-Received: by mail-pf1-f196.google.com with SMTP id d25so2230471pfn.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Mar 2020 22:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Gj5gA3T2046detFgpaRzX1gpdaCMHsoqR5CDuNT7U/U=;
-        b=i+w8pe4isMbYIcvhm9pHUk6A7TMoqqnVLGnLaPq17Fd/yK4bwHvXfykBbX5oFBKkFB
-         qZ/ihFxifMLWvRJIUef3SE9A/fRZ+5KPjxg2G8zOpWIZyo9whRLOJXygR+rYyayuywci
-         Rfp1mEm7rNzmffmZFT9W/TOmy3eo1qpPvurbg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Gj5gA3T2046detFgpaRzX1gpdaCMHsoqR5CDuNT7U/U=;
-        b=GCr8lbnfJ05UNamV1jgri6s+2T9TRtW0NmTUTFcHQhvO9k5WVV+aXZCl/Z1fFlu1pD
-         xVKE9bxkyFOn3SdlLGLAQzjPsX4afXM6FpyOifGSLLtgRC+F5xIU9+nVIMs/bK9iXang
-         HTQoHiJ56tPaCI90C2oI4XYVFmdrgcVZ7/7scIbrbZxr2dWLkEEeRJToSfey6jgzY4e+
-         wJXd8RE5D85NftKcWAYMIbehItX1FUsUGbIdQEZC/IJa2OPQYxS2pw7/lK+/g6FEWolZ
-         OaHBFMx+HE2y4KHR3ZeGK89/WBXFBU1PWbtoPq3/Opo+4epWdwlSjhpRBVYJ9e5RMRr7
-         D28g==
-X-Gm-Message-State: ANhLgQ3fPjoTqqm29+rraAX0B0M4Spc7MLgIawCsR3ua37Hivu76ZxaY
-        00gLj/Uz4C/FxOFurXkLp8MMaQ==
-X-Google-Smtp-Source: ADFU+vtQ7QDI/m9me2BsixnCCLZBImKuzbFcg9Epi89olgvg/Y5NE+Rg1Qs2S2J7lAj4lQCVnmzDPg==
-X-Received: by 2002:a65:5a4f:: with SMTP id z15mr6873211pgs.103.1585201523086;
-        Wed, 25 Mar 2020 22:45:23 -0700 (PDT)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:e09a:8d06:a338:aafb])
-        by smtp.gmail.com with ESMTPSA id d1sm727302pfc.3.2020.03.25.22.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2020 22:45:22 -0700 (PDT)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Thu, 26 Mar 2020 02:12:54 -0400
+Received: from marcel-macpro.fritz.box (p4FEFC5A7.dip0.t-ipconnect.de [79.239.197.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 42F18CECDA;
+        Thu, 26 Mar 2020 07:22:24 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: Indicate Microsoft vendor
+ extension for Intel 9460/9560 and 9160/9260
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABmPvSFwb1zu33fUog9hVK6y2R=PmKeGyOwkP3+=ZzE_qkX9yQ@mail.gmail.com>
+Date:   Thu, 26 Mar 2020 07:12:52 +0100
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Alain Michaud <alainm@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH v2 1/1] Bluetooth: Update add_device with wakeable actions
-Date:   Wed, 25 Mar 2020 22:45:17 -0700
-Message-Id: <20200325224500.v2.1.I196e4af9cde6c6e6aa7102906722cb9df8c80a7b@changeid>
-X-Mailer: git-send-email 2.25.1.696.g5e7596f4ac-goog
-In-Reply-To: <20200326054517.71462-1-abhishekpandit@chromium.org>
-References: <20200326054517.71462-1-abhishekpandit@chromium.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <B8FE9D19-4589-47C6-9C1F-2DC1146F53DA@holtmann.org>
+References: <20200325070336.1097-1-mcchou@chromium.org>
+ <20200325000332.v2.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
+ <72699110-843A-4382-8FF1-20C5D4D557A2@holtmann.org>
+ <CABmPvSFL_bkrZQJkAzUMck_bAY5aBZkL=5HGV_Syv2QRYfRLfw@mail.gmail.com>
+ <B2A2CFFE-8FC1-462B-9C7F-1CD584B6EB24@holtmann.org>
+ <CABmPvSFwb1zu33fUog9hVK6y2R=PmKeGyOwkP3+=ZzE_qkX9yQ@mail.gmail.com>
+To:     Miao-chen Chou <mcchou@chromium.org>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add new actions to add_device to allow it to set or unset a device as
-wakeable. When the set wakeable and unset wakeable actions are used, the
-autoconnect property is not updated and the device is not added to the
-whitelist (if BR/EDR).
+Hi Miao-chen,
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
+>>>>> This adds a bit mask of driver_info for Microsoft vendor extension and
+>>>>> indicates the support for Intel 9460/9560 and 9160/9260. See
+>>>>> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
+>>>>> microsoft-defined-bluetooth-hci-commands-and-events for more information
+>>>>> about the extension. This was verified with Intel ThunderPeak BT controller
+>>>>> where msft_vnd_ext_opcode is 0xFC1E.
+>>>>> 
+>>>>> Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+>>>>> ---
+>>>>> 
+>>>>> Changes in v2:
+>>>>> - Define struct msft_vnd_ext and add a field of this type to struct
+>>>>> hci_dev to facilitate the support of Microsoft vendor extension.
+>>>>> 
+>>>>> drivers/bluetooth/btusb.c        | 14 ++++++++++++--
+>>>>> include/net/bluetooth/hci_core.h |  6 ++++++
+>>>>> 2 files changed, 18 insertions(+), 2 deletions(-)
+>>>>> 
+>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>>> index 3bdec42c9612..4c49f394f174 100644
+>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>> @@ -58,6 +58,7 @@ static struct usb_driver btusb_driver;
+>>>>> #define BTUSB_CW6622          0x100000
+>>>>> #define BTUSB_MEDIATEK                0x200000
+>>>>> #define BTUSB_WIDEBAND_SPEECH 0x400000
+>>>>> +#define BTUSB_MSFT_VND_EXT   0x800000
+>>>>> 
+>>>>> static const struct usb_device_id btusb_table[] = {
+>>>>>     /* Generic Bluetooth USB device */
+>>>>> @@ -335,7 +336,8 @@ static const struct usb_device_id blacklist_table[] = {
+>>>>> 
+>>>>>     /* Intel Bluetooth devices */
+>>>>>     { USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW |
+>>>>> -                                                  BTUSB_WIDEBAND_SPEECH },
+>>>>> +                                                  BTUSB_WIDEBAND_SPEECH |
+>>>>> +                                                  BTUSB_MSFT_VND_EXT },
+>>>>>     { USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW |
+>>>>>                                                  BTUSB_WIDEBAND_SPEECH },
+>>>>>     { USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
+>>>>> @@ -348,7 +350,8 @@ static const struct usb_device_id blacklist_table[] = {
+>>>>>     { USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL |
+>>>>>                                                  BTUSB_WIDEBAND_SPEECH },
+>>>>>     { USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
+>>>>> -                                                  BTUSB_WIDEBAND_SPEECH },
+>>>>> +                                                  BTUSB_WIDEBAND_SPEECH |
+>>>>> +                                                  BTUSB_MSFT_VND_EXT },
+>>>>> 
+>>>>>     /* Other Intel Bluetooth devices */
+>>>>>     { USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+>>>>> @@ -3734,6 +3737,8 @@ static int btusb_probe(struct usb_interface *intf,
+>>>>>     hdev->send   = btusb_send_frame;
+>>>>>     hdev->notify = btusb_notify;
+>>>>> 
+>>>>> +     hdev->msft_ext.opcode = HCI_OP_NOP;
+>>>>> +
+>>>> 
+>>>> do this in the hci_alloc_dev procedure for every driver. This doesn’t belong in the driver.
+>>> Thanks for the note, I will address this.
+>>>> 
+>>>>> #ifdef CONFIG_PM
+>>>>>     err = btusb_config_oob_wake(hdev);
+>>>>>     if (err)
+>>>>> @@ -3800,6 +3805,11 @@ static int btusb_probe(struct usb_interface *intf,
+>>>>>             set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+>>>>>             set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+>>>>>             set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+>>>>> +
+>>>>> +             if (id->driver_info & BTUSB_MSFT_VND_EXT &&
+>>>>> +                     (id->idProduct == 0x0025 || id->idProduct == 0x0aaa)) {
+>>>> 
+>>>> Please scrap this extra check. You already selected out the PID with the blacklist_table. In addition, I do not want to add a PID in two places in the driver.
+>>> If we scrap the check around idProduct, how do we tell two controllers
+>>> apart if they use different opcode for Microsoft vendor extension?
+>> 
+>> for Intel controllers this is highly unlikely. If we really decide to change the opcode in newer firmware versions, we then deal with it at that point.
+>> 
+>> However for Intel controllers I have the feeling that we better do it after the Read the Intel version information and then do it based on hardware revision and firmware version.
+> I would agree with you given that the FW loaded for the same HW can
+> differ, and different FW version may have different configuration in
+> terms of the use of extensions. But it's not clear to me how we can
+> tell whether an extension is supported based on a version number. Is
+> there any implication on the support of an extension given a FW
+> version (e.g. any FW version greater than 10 would support MSFT
+> extension)?
 
-Changes in v2:
-* Added missing goto unlock
+that is for us to figure out. I will get back to you on that.
 
- net/bluetooth/mgmt.c | 57 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 47 insertions(+), 10 deletions(-)
+Regards
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6552003a170e..8643089e758f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5775,6 +5775,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 		      void *data, u16 len)
- {
- 	struct mgmt_cp_add_device *cp = data;
-+	struct hci_conn_params *params;
- 	u8 auto_conn, addr_type;
- 	int err;
- 
-@@ -5786,7 +5787,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 					 MGMT_STATUS_INVALID_PARAMS,
- 					 &cp->addr, sizeof(cp->addr));
- 
--	if (cp->action != 0x00 && cp->action != 0x01 && cp->action != 0x02)
-+	if (cp->action > 0x04)
- 		return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
- 					 MGMT_STATUS_INVALID_PARAMS,
- 					 &cp->addr, sizeof(cp->addr));
-@@ -5794,8 +5795,35 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
- 
- 	if (cp->addr.type == BDADDR_BREDR) {
--		/* Only incoming connections action is supported for now */
--		if (cp->action != 0x01) {
-+		switch (cp->action) {
-+		case 0x3:
-+			/* Set wakeable */
-+			err = hci_bdaddr_list_add(&hdev->wakeable,
-+						  &cp->addr.bdaddr,
-+						  cp->addr.type);
-+			if (err && err != -EEXIST)
-+				goto unlock;
-+			break;
-+		case 0x4:
-+			/* Remove wakeable */
-+			err = hci_bdaddr_list_del(&hdev->wakeable,
-+						  &cp->addr.bdaddr,
-+						  cp->addr.type);
-+			if (err)
-+				goto unlock;
-+
-+			break;
-+		case 0x1:
-+			/* Allow incoming connection */
-+			err = hci_bdaddr_list_add(&hdev->whitelist,
-+						  &cp->addr.bdaddr,
-+						  cp->addr.type);
-+			if (err && err != -EEXIST)
-+				goto unlock;
-+
-+			hci_req_update_scan(hdev);
-+			break;
-+		default:
- 			err = mgmt_cmd_complete(sk, hdev->id,
- 						MGMT_OP_ADD_DEVICE,
- 						MGMT_STATUS_INVALID_PARAMS,
-@@ -5803,13 +5831,6 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 			goto unlock;
- 		}
- 
--		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
--					  cp->addr.type);
--		if (err)
--			goto unlock;
--
--		hci_req_update_scan(hdev);
--
- 		goto added;
- 	}
- 
-@@ -5834,6 +5855,22 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
- 
-+	/* Only allow wakeable property to be set/unset on existing device */
-+	if (cp->action == 0x03 || cp->action == 0x04) {
-+		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
-+						addr_type);
-+		if (!params) {
-+			err = mgmt_cmd_complete(sk, hdev->id,
-+						MGMT_OP_ADD_DEVICE,
-+						MGMT_STATUS_FAILED, &cp->addr,
-+						sizeof(cp->addr));
-+			goto unlock;
-+		}
-+
-+		params->wakeable = cp->action == 0x03;
-+		goto added;
-+	}
-+
- 	/* If the connection parameters don't exist for this device,
- 	 * they will be created and configured with defaults.
- 	 */
--- 
-2.25.1.696.g5e7596f4ac-goog
+Marcel
 
