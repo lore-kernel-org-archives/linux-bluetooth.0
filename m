@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB50EC2D0ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A5BFC2D0F0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 914BE20716
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BEBF20716
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 18:43:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727423AbgC0SnB (ORCPT
+        id S1727473AbgC0SnB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 27 Mar 2020 14:43:01 -0400
 Received: from mga14.intel.com ([192.55.52.115]:39636 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727185AbgC0SnA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Mar 2020 14:43:00 -0400
-IronPort-SDR: 1f00v4qcTVXBQtrts7dFNfrrZHW6Hc/ApR6kcMCUlA3Yl01upcZp0a3mrwUMPBAbHEmN6EvXqX
- 9l256ifMvyDA==
+        id S1727185AbgC0SnB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 27 Mar 2020 14:43:01 -0400
+IronPort-SDR: m2GmDPr7Z9yifqMzS8V+8KqdHbXXkfPY499jlbjpe9/T0Lwxr23oHP5nHtsXT5TscbMNfVjayJ
+ r/vH/VfS8dCg==
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 11:43:00 -0700
-IronPort-SDR: tNvglQU9+VsBd02VFUQouPzmOaMmyE8vIXGSh5E5q52lMIiKr8ulvAJ8/xFXhkWI19C2cGURcI
- WuNV3S7T90yQ==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2020 11:43:01 -0700
+IronPort-SDR: Y/sNGXA3qX4gP7EAdkWB32b3rAnxm6cPznpI2Aj+viidfPrS7PUClWzrj/cZAqbtJQVd3eLLlT
+ wfYTfuVu+tpA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.72,313,1580803200"; 
-   d="scan'208";a="421193651"
+   d="scan'208";a="421193655"
 Received: from ingas-nuc1.sea.intel.com ([10.251.8.23])
   by orsmga005.jf.intel.com with ESMTP; 27 Mar 2020 11:43:00 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 3/4] test/test-mesh: Update to match modified APIs
-Date:   Fri, 27 Mar 2020 11:42:56 -0700
-Message-Id: <20200327184257.15042-4-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 4/4] tools/mesh-cfgclient: Update to match modified APIs
+Date:   Fri, 27 Mar 2020 11:42:57 -0700
+Message-Id: <20200327184257.15042-5-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200327184257.15042-1-inga.stotland@intel.com>
 References: <20200327184257.15042-1-inga.stotland@intel.com>
@@ -51,85 +51,93 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 This handles updated parameter list in UnprovisionedScan(),
 AddNode() and ScanResult() D-Bus methods
 ---
- test/test-mesh | 39 +++++++++++++++++++++++++--------------
- 1 file changed, 25 insertions(+), 14 deletions(-)
+ tools/mesh-cfgclient.c | 36 ++++++++++++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 6 deletions(-)
 
-diff --git a/test/test-mesh b/test/test-mesh
-index 6a5ddbd17..5db1d6d1a 100755
---- a/test/test-mesh
-+++ b/test/test-mesh
-@@ -474,13 +474,22 @@ class Application(dbus.service.Object):
- 	def JoinFailed(self, value):
- 		print(set_error('JoinFailed '), value)
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index ae13c4409..d1c673182 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -232,6 +232,21 @@ struct key_data {
+ 	bool update;
+ };
  
--	@dbus.service.method(MESH_PROV_IFACE,
--					in_signature="nay", out_signature="")
--	def ScanResult(self, rssi, uuid):
--		uuid_str = array_to_string(uuid)
--		print(set_yellow('ScanResult RSSI ')
--					+ set_green(format(rssi, 'd'))
--					+ ' ' + uuid_str)
-+	@dbus.service.method(MESH_PROV_IFACE, in_signature="naya{sv}",
-+							out_signature="")
-+	def ScanResult(self, rssi, data, options):
-+		global remote_uuid
-+		remote_uuid = data[:16]
-+		uuid_str = array_to_string(remote_uuid)
-+		data_str = array_to_string(data[16:])
-+		if len(data_str) == 0:
-+			data_str = 'Not Present'
++static void append_dict_entry_basic(struct l_dbus_message_builder *builder,
++					const char *key, const char *signature,
++					const void *data)
++{
++	if (!builder)
++		return;
 +
-+		print(set_yellow('ScanResult >> RSSI: ') +
-+					set_green(format(rssi, 'd')) +
-+					set_yellow(format(' UUID: ')) +
-+					set_green(format(uuid_str, 's')) +
-+					set_yellow(format(' OOB Data: ')) +
-+					set_green(format(data_str, 's')))
- 
- 	@dbus.service.method(MESH_PROV_IFACE,
- 					in_signature="y", out_signature="qq")
-@@ -946,8 +955,6 @@ class MainMenu(Menu):
- 		uuid = bytearray.fromhex("0a0102030405060708090A0B0C0D0E0F")
- 		random.shuffle(uuid)
- 		uuid_str = array_to_string(uuid)
--		caps = ["out-numeric"]
--		oob = ["other"]
- 
- 		print(set_yellow('Joining with UUID ') + set_green(uuid_str))
- 		mesh_net.Join(app.get_path(), uuid,
-@@ -955,23 +962,27 @@ class MainMenu(Menu):
- 			error_handler=join_error_cb)
- 
- 	def __cmd_scan(self):
-+		options = {}
-+		options['Seconds'] = dbus.UInt16(0)
- 
- 		print(set_yellow('Scanning...'))
--		node_mgr.UnprovisionedScan(0, reply_handler=add_cb,
--						error_handler=add_error_cb)
-+		node_mgr.UnprovisionedScan(options,
-+						reply_handler=scan_cb,
-+						error_handler=scan_error_cb)
- 
- 	def __cmd_add(self):
- 		global user_input
-+		global remote_uuid
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', key);
++	l_dbus_message_builder_enter_variant(builder, signature);
++	l_dbus_message_builder_append_basic(builder, signature[0], data);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++}
 +
- 		if agent == None:
- 			print(set_error('Provisioning agent not found'))
- 			return
+ static void append_byte_array(struct l_dbus_message_builder *builder,
+ 					unsigned char *data, unsigned int len)
+ {
+@@ -769,9 +784,15 @@ static void scan_reply(struct l_dbus_proxy *proxy, struct l_dbus_message *msg,
  
- 		uuid_str = array_to_string(remote_uuid)
--		caps = ["in-numeric"]
--		oob = ["other"]
-+		options = {}
+ static void scan_setup(struct l_dbus_message *msg, void *user_data)
+ {
+-	int32_t secs = L_PTR_TO_UINT(user_data);
++	uint16_t secs = (uint16_t) L_PTR_TO_UINT(user_data);
++	struct l_dbus_message_builder *builder;
  
- 		print(set_yellow('Adding dev UUID ') + set_green(uuid_str))
--		node_mgr.AddNode(remote_uuid, reply_handler=add_cb,
-+		node_mgr.AddNode(remote_uuid, options, reply_handler=add_cb,
- 						error_handler=add_error_cb)
+-	l_dbus_message_set_arguments(msg, "q", (uint16_t) secs);
++	builder = l_dbus_message_builder_new(msg);
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++	append_dict_entry_basic(builder, "Seconds", "q", &secs);
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
+ }
  
- 	def __cmd_attach(self):
+ static void cmd_scan_unprov(int argc, char *argv[])
+@@ -1284,6 +1305,9 @@ static void add_node_setup(struct l_dbus_message *msg, void *user_data)
+ 
+ 	builder = l_dbus_message_builder_new(msg);
+ 	append_byte_array(builder, uuid, 16);
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++	/* TODO: populate with options when defined */
++	l_dbus_message_builder_leave_array(builder);
+ 	l_dbus_message_builder_finalize(builder);
+ 	l_dbus_message_builder_destroy(builder);
+ 
+@@ -1508,17 +1532,17 @@ static struct l_dbus_message *scan_result_call(struct l_dbus *dbus,
+ 						struct l_dbus_message *msg,
+ 						void *user_data)
+ {
+-	struct l_dbus_message_iter iter;
++	struct l_dbus_message_iter iter, opts;
+ 	int16_t rssi;
+ 	uint32_t n;
+ 	uint8_t *prov_data;
+ 	char *str;
+ 	struct unprov_device *dev;
++	const char *sig = "naya{sv}";
+ 
+-	if (!l_dbus_message_get_arguments(msg, "nay", &rssi, &iter)) {
++	if (!l_dbus_message_get_arguments(msg, sig, &rssi, &iter, &opts)) {
+ 		l_error("Cannot parse scan results");
+ 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
+-
+ 	}
+ 
+ 	if (!l_dbus_message_iter_get_fixed_array(&iter, &prov_data, &n) ||
+@@ -1669,7 +1693,7 @@ static struct l_dbus_message *add_node_fail_call(struct l_dbus *dbus,
+ static void setup_prov_iface(struct l_dbus_interface *iface)
+ {
+ 	l_dbus_interface_method(iface, "ScanResult", 0, scan_result_call, "",
+-							"nay", "rssi", "data");
++						"naya{sv}", "rssi", "data");
+ 
+ 	l_dbus_interface_method(iface, "RequestProvData", 0, req_prov_call,
+ 				"qq", "y", "net_index", "unicast", "count");
 -- 
 2.21.1
 
