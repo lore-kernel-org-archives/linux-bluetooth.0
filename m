@@ -3,64 +3,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D11C2D0E8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 00:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E2FC43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 00:13:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9EDCB206E6
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 00:11:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C10F206E6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 00:13:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bdxLoqgs"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NF52MK0P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727650AbgC0ALe (ORCPT
+        id S1727674AbgC0ANt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Mar 2020 20:11:34 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:45910 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726067AbgC0ALe (ORCPT
+        Thu, 26 Mar 2020 20:13:49 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:38102 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726359AbgC0ANt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Mar 2020 20:11:34 -0400
-Received: by mail-lj1-f193.google.com with SMTP id t17so8398112ljc.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 17:11:32 -0700 (PDT)
+        Thu, 26 Mar 2020 20:13:49 -0400
+Received: by mail-lj1-f196.google.com with SMTP id w1so8401662ljh.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 17:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Om0czkdlZ/W7CWzm10Sp8n/DnGjyBb+31UnGPUf/8ao=;
-        b=bdxLoqgsqXEsawKrEEQCjxEEU4SVqGM7oftF1iV9Uv3/ABxpystWJhynlOqOLrU4Hi
-         hx6k8DReGKF6ijQ3b+bSrJfho9k8R8jP3/0xDRIAzQzUadL9wUHkv+yI5J5m8czH9knK
-         d8NtmT64PYlpoxQR0zgJLnadnFbDL9hsxNndQ=
+        bh=VWL8ZSPmJAiTPJ9JjQW1j0bE8X/JpNZikw6inrx3YQI=;
+        b=NF52MK0PSlUZLDII9gyz0ifyNpp+j4BfKlYt4/XYvcsq/F4CYzlG/eu4r9j94+PpNJ
+         hs97iUKCE+zNoq9ZfdDg26kpdiiEk3q5ik+SmcihoAeyK88CnY534dCGxNjVD5tyECex
+         HKTILpbONOMGNIOIYyRDBDM7Fd7DDehT6OnDk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Om0czkdlZ/W7CWzm10Sp8n/DnGjyBb+31UnGPUf/8ao=;
-        b=iW9TMMbhaqZQJO/QfJxYEWHkufY6MYcM7Iyd2ZN+/OF6mtP9SCKDqqdr9QIZUTp4TG
-         iUxj7cbwH2Yi/aGzB01K54yZRkeL8yOe5d2xibBlLeJH4elO2InVz7MerX9A+vD4q3GQ
-         odQXy44F6DVJ7VTcWUem1nE4qJRJUK3Qhxbiq+9KeNtTGLDLiLjVlHFBc9Zj/Pfe7rUJ
-         spuX2lNbfaRvNmqUX39wqJaKwrGWnxo1QWDIw8bImEs+Che9vgQ4wXBOE25JDoCvIJUB
-         ta07g0u+JH1CVTvT8KKktfdeR086QPMnY8q7Jqcc8qr8JxXUb34XbiumB/cmktnpe4nS
-         alHg==
-X-Gm-Message-State: ANhLgQ13583/2AaV4C4JyH0S1UQEU7/+GMUPuk6kfDp+1Npm8gB1iEpy
-        /fopgHnADeMoKdJIL9OFLwUXzwXd8clXRHgg0BVVDg==
-X-Google-Smtp-Source: ADFU+vsUOMh8Po1kt6T0m/lsy5OkGbexpu112fy3gnBAGNzZ5mv6hf9SyERLmZOD9NOtJV13YX15ZgAmSTIvz0Xi+fg=
-X-Received: by 2002:a2e:9ad2:: with SMTP id p18mr6574780ljj.15.1585267892097;
- Thu, 26 Mar 2020 17:11:32 -0700 (PDT)
+        bh=VWL8ZSPmJAiTPJ9JjQW1j0bE8X/JpNZikw6inrx3YQI=;
+        b=oFNzFnhTcEyOiq5kdbAS1TKIHzOJHW5kL+E3QitIQ2ApLlkhSxFrhvweCOg+fTc7/Y
+         HqZseu1Io43kbTzI1yxXM7NrHUwbEiWY0lxbyxChAZxTWhPBVP5S98uIftr26S+wXOa/
+         DfjdJqwGgFQIxXPSy7RIx838KRaHnVNS5Xulf+3ofj1nWfX6MFMVpKDyqXQ0+3K6O3cZ
+         H2m32gb3tsngjOugcpbHMQlOFa5M7XlpAwGcjXO9dL1oxE6+dW1gQwstexpW8z61HVC5
+         ylDH+R8EHZ+P1tN5rAxM1PycxxyHWaNcNCy6d5R4er3Ghq/GnAFfoOwoObz4AqMta7pY
+         DL5A==
+X-Gm-Message-State: ANhLgQ21A/JwV+hRgXnEfSHzApVsQe+aoXh90k54jhUx+YBpqE5bUCi+
+        jb0JrLw9KcDvZYwi1UsNgzSK7QetVFJGkKHFiNsWSA==
+X-Google-Smtp-Source: APiQypLZZN1Wtl3gwV5mELpsM2qhhqZ5leW/rlMatp78zM7+LnJ5TdE1codyNmtsIAOipZ4iyk3U+CiOz4xZhRZZUog=
+X-Received: by 2002:a2e:83cf:: with SMTP id s15mr6529050ljh.36.1585268027186;
+ Thu, 26 Mar 2020 17:13:47 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200326075938.65053-1-mcchou@chromium.org> <20200326005931.v3.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
- <0cb96a93000c02e4c4816c64492afef10bc76fd9.camel@perches.com>
-In-Reply-To: <0cb96a93000c02e4c4816c64492afef10bc76fd9.camel@perches.com>
+ <ADF19483-721C-4263-8CA8-CF4587E79BA4@holtmann.org>
+In-Reply-To: <ADF19483-721C-4263-8CA8-CF4587E79BA4@holtmann.org>
 From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Thu, 26 Mar 2020 17:11:21 -0700
-Message-ID: <CABmPvSGbVqnE82Se=ZfTM=h=WTJaibRfP+0Prvz2yxsDLK7Ukw@mail.gmail.com>
+Date:   Thu, 26 Mar 2020 17:13:36 -0700
+Message-ID: <CABmPvSG3ML=GDHbM-k1g9-K3rxAYewNwfPrYA96aZE+MQ-KVVg@mail.gmail.com>
 Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: Indicate Microsoft vendor
  extension for Intel 9460/9560 and 9160/9260
-To:     Joe Perches <joe@perches.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
         Alain Michaud <alainm@chromium.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -74,23 +73,29 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 26, 2020 at 1:16 AM Joe Perches <joe@perches.com> wrote:
+On Thu, Mar 26, 2020 at 2:01 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> On Thu, 2020-03-26 at 00:59 -0700, Miao-chen Chou wrote:
+> Hi Miao-chen,
+>
 > > This adds a bit mask of driver_info for Microsoft vendor extension and
 > > indicates the support for Intel 9460/9560 and 9160/9260. See
 > > https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
 > > microsoft-defined-bluetooth-hci-commands-and-events for more information
 > > about the extension. This was verified with Intel ThunderPeak BT controller
 > > where msft_vnd_ext_opcode is 0xFC1E.
-> []
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> []
-> > @@ -414,6 +414,8 @@ struct hci_dev {
-> >       void                    *smp_data;
-> >       void                    *smp_bredr_data;
 > >
-> > +     void                    *msft_ext;
+> > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+> > ---
+> >
+> > Changes in v3:
+> > - Create net/bluetooth/msft.c with struct msft_vnd_ext defined internally
+> > and change the hdev->msft_ext field to void*.
+> > - Define and expose msft_vnd_ext_set_opcode() for btusb use.
+> > - Init hdev->msft_ext in hci_alloc_dev() and deinit it in hci_free_dev().
 >
-> Why should this be a void * and not a msft_vnd_ext * ?
-The intention is to hide msft_vnd_ext from the driver.
+> so I spent some cycles on thinking about on how we can have this nice and cleanly without putting too much into the core stack or hci_dev. I took your patches and converted them a little bit into how I would do it. Please have a look.
+Thanks for brainstorming the framework. I will address your suggestion
+in v4 shortly.
+
+Regards,
+Miao
