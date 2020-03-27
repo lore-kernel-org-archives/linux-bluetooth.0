@@ -2,106 +2,105 @@ Return-Path: <SRS0=n6SA=5M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 402CCC43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 02:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08353C43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 02:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02F3C20774
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 02:14:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4D1120774
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 02:59:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vMN3xdc3"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PN5kNO2Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727122AbgC0COs (ORCPT
+        id S1727607AbgC0C71 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Mar 2020 22:14:48 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55969 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726363AbgC0COs (ORCPT
+        Thu, 26 Mar 2020 22:59:27 -0400
+Received: from mail-vk1-f194.google.com ([209.85.221.194]:33599 "EHLO
+        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726496AbgC0C70 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Mar 2020 22:14:48 -0400
-Received: by mail-wm1-f66.google.com with SMTP id z5so9948200wml.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 19:14:46 -0700 (PDT)
+        Thu, 26 Mar 2020 22:59:26 -0400
+Received: by mail-vk1-f194.google.com with SMTP id f63so2326956vkh.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 19:59:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=OLXsFjAt3oyjjpAK/1V/0bvb/EVhlf8iGpvOucwTKQs=;
-        b=vMN3xdc3MPeb7YrAWaigcnQdNCc+9/EIu5L4upY6HYmCKRfmf4RmYgp85MgXGFcBLw
-         6HatK2ybGRrJiqMqcAMz/slXSY7z8SEbuG2PF2tjB5hQjBjAD3eRQsVN1ldDaexX0Ydv
-         o88BYWOOkjOyLeq9wQJ3WTqwXcDEIb5IpxcDuOkD6wql4sv3DFlKg4ina1CajKnKVXZj
-         fx7psS1t86Z+DcwXsR6UNkQW7q+ysZMjFZJ9BQqzNaXyXEAsL78FlZC+n4c7+a9nXnO1
-         CwsxVeqxIpEWhNaFjSJVfmlZggrst/y41uYB2b1pA/fgajOnD3ODIL7eyFviYEGB/ezh
-         QrYw==
+        bh=efTQZuBY/BdGfCfIti/x+eiTAFDqkj9PxcQRTVTmyvU=;
+        b=PN5kNO2Y7Hatz8rIRcoPnXIU8mrZax4gEuaM4gYGUvAR0T+yaNwxlUB4HxBPh8/tJD
+         QlaJ57p+hjcFxR3Hce0XwoA+X/KiThWplYxgAGee7iJHAFxDwY2d0ahgVf7D6aC4uXWd
+         8u7hA7WRnVXCv44NGJxiFFZWUulBbnxQe1yXk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=OLXsFjAt3oyjjpAK/1V/0bvb/EVhlf8iGpvOucwTKQs=;
-        b=FllWga6wmex9pKF4SrGzw8ZbqTsBuj6cjCRaPIn2xHdCiR6A8IyeXVoYLvwzBtONQu
-         iHOuOXuPB8PSZQSsYzvaB2iqVD1OhiqdfSmIH45x7VV+O9mJYXgPw2wo3CncSSYyF0NI
-         8PcjkgBCpiLUmng3ts54347I5ktQXdTZU6gpAIC96HvpWla5k3+bOQ88KCbLmzWrjPgW
-         QYtFKtMXIDmmkmmwPeGmZRXYT6N65zFF3cDLAfKPUbLBnYeaOIWKpVMGc9qxw+a3ZYOE
-         51q+j504QdasYdHIZdTsi/X1MhKrHU99qT49MVg9D9kZzSJDuViaxda/0uW5gMEIAOVU
-         s6wg==
-X-Gm-Message-State: ANhLgQ1PX0tcm8joUH9EE3m32uSXpawIMlQNmrCrpC00qyI6x+dzD9Q3
-        JN9znxLXohjhcOcx3hE0ZmNCeES7J6fwaVIPlvuLvWaidUFQbA==
-X-Google-Smtp-Source: ADFU+vtavwSN+ak2yaOUMwfoe7cJv3YIrqeORSPDSniyzvWUyIZe14hoPmeBFLhNCngeEpsJouo/doGvxCO2Mm+RBiU=
-X-Received: by 2002:a1c:456:: with SMTP id 83mr2949618wme.54.1585275285167;
- Thu, 26 Mar 2020 19:14:45 -0700 (PDT)
+        bh=efTQZuBY/BdGfCfIti/x+eiTAFDqkj9PxcQRTVTmyvU=;
+        b=EJ3rP6JzprcysMMDpZ6gziTyWuOpor92+kSRlRTZfGTTDX+qTwpeaAcGR1n7S9zDlj
+         4NO4HyvBZwlH192oxoHm6E1oXKVBqdZUOYLPulwAJXi3y1NC4OlbOEXGhSt9XWw5/wFP
+         KXUn5N0LtXOuUScVHAHfjJbC+TxwOZFkuOLMgXujymtsKuIhLzMPqNDOBybaQwBuxIXF
+         Q/UnWseopU2VmMg/7c2KAviuisbgTO0l29OPBl4Xkx+eSXZ+GoxhDxjZarPiaA1JqBUc
+         5nDSaywJr1PU2pNuMjAcMG78Qki28Sta6HkLAQcRBybxSHtQS/h1VBbwuRRcA9H0muUd
+         3Mqw==
+X-Gm-Message-State: ANhLgQ2dLcyby5K4g22QaWHtmeYjsQW7nszPcKMqf9O+3X/nKAEnpfW7
+        ++HDMKeiovN5yvb+G6HXrVKdWUT1+asP1TV8JU1Ziw==
+X-Google-Smtp-Source: ADFU+vuZLKGOnsm6OEMlUxXQh1lnoHRPEGsoLXro6EVkvPJIkztcCUU1ETtAxDELD2TaI4PY1Ozcxx+NYyavz8ak7SI=
+X-Received: by 2002:a1f:2706:: with SMTP id n6mr4191470vkn.88.1585277964583;
+ Thu, 26 Mar 2020 19:59:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200320131356.Bluez.v1.1.Ia3d21e293d18f903fa6e54918856e1dd5ffc904f@changeid>
-In-Reply-To: <20200320131356.Bluez.v1.1.Ia3d21e293d18f903fa6e54918856e1dd5ffc904f@changeid>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 27 Mar 2020 10:14:33 +0800
-Message-ID: <CAJQfnxENfZnXq4e-kaeKF2ByhJ089JXZumWc9ydBJBWGQgTiGw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] avdtp: fix delay report valid states
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Archie Pusaka <apusaka@chromium.org>
+References: <20200326054517.71462-1-abhishekpandit@chromium.org>
+In-Reply-To: <20200326054517.71462-1-abhishekpandit@chromium.org>
+From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Date:   Thu, 26 Mar 2020 19:59:11 -0700
+Message-ID: <CANFp7mX3VhgbqSixv9BtWU5C4xy0RGqyPfV5SmruyngkkjM-VA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/1] Bluetooth: Add actions to set wakeable in add device
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[re-sending as plain text]
-Hi Bluez Maintainers,
+Hi Marcel,
 
-Could you take a look at this proposal?
+Does this look ok? I'm working on the accompanying Bluez changes as
+well and will send a new patch if the mgmt changes look ok.
 
-Thank you!
+Thanks
+Abhishek
 
-
-On Fri, 20 Mar 2020 at 13:14, Archie Pusaka <apusaka@google.com> wrote:
+On Wed, Mar 25, 2020 at 10:45 PM Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
 >
-> According to AVDTP specification section 6.19,
-> avdtp_delayreport_cmd could also be received when the state of SEP
-> is open.
+> Hi Marcel,
 >
-> Therefore, updating to accommodate such condition.
-> ---
+> As suggested, I've updated add device to accept action 0x3 and 0x4 to
+> set and remove the wakeable property.
 >
->  profiles/audio/avdtp.c | 1 +
->  1 file changed, 1 insertion(+)
+> Thanks
+> Abhishek
 >
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 0e075f9ff..4b0e63384 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -1936,6 +1936,7 @@ static gboolean avdtp_delayreport_cmd(struct avdtp *session,
->         stream = sep->stream;
 >
->         if (sep->state != AVDTP_STATE_CONFIGURED &&
-> +                                       sep->state != AVDTP_STATE_OPEN &&
->                                         sep->state != AVDTP_STATE_STREAMING) {
->                 err = AVDTP_BAD_STATE;
->                 goto failed;
+> Changes in v2:
+> * Added missing goto unlock
+>
+> Abhishek Pandit-Subedi (1):
+>   Bluetooth: Update add_device with wakeable actions
+>
+>  net/bluetooth/mgmt.c | 57 ++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 47 insertions(+), 10 deletions(-)
+>
 > --
 > 2.25.1.696.g5e7596f4ac-goog
 >
