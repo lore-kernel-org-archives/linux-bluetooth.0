@@ -2,100 +2,106 @@ Return-Path: <SRS0=n6SA=5M=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E2FC43331
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 00:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 402CCC43331
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 02:14:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C10F206E6
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 00:13:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02F3C20774
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Mar 2020 02:14:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NF52MK0P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vMN3xdc3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727674AbgC0ANt (ORCPT
+        id S1727122AbgC0COs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Mar 2020 20:13:49 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:38102 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726359AbgC0ANt (ORCPT
+        Thu, 26 Mar 2020 22:14:48 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:55969 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726363AbgC0COs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Mar 2020 20:13:49 -0400
-Received: by mail-lj1-f196.google.com with SMTP id w1so8401662ljh.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 17:13:48 -0700 (PDT)
+        Thu, 26 Mar 2020 22:14:48 -0400
+Received: by mail-wm1-f66.google.com with SMTP id z5so9948200wml.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Mar 2020 19:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=VWL8ZSPmJAiTPJ9JjQW1j0bE8X/JpNZikw6inrx3YQI=;
-        b=NF52MK0PSlUZLDII9gyz0ifyNpp+j4BfKlYt4/XYvcsq/F4CYzlG/eu4r9j94+PpNJ
-         hs97iUKCE+zNoq9ZfdDg26kpdiiEk3q5ik+SmcihoAeyK88CnY534dCGxNjVD5tyECex
-         HKTILpbONOMGNIOIYyRDBDM7Fd7DDehT6OnDk=
+        bh=OLXsFjAt3oyjjpAK/1V/0bvb/EVhlf8iGpvOucwTKQs=;
+        b=vMN3xdc3MPeb7YrAWaigcnQdNCc+9/EIu5L4upY6HYmCKRfmf4RmYgp85MgXGFcBLw
+         6HatK2ybGRrJiqMqcAMz/slXSY7z8SEbuG2PF2tjB5hQjBjAD3eRQsVN1ldDaexX0Ydv
+         o88BYWOOkjOyLeq9wQJ3WTqwXcDEIb5IpxcDuOkD6wql4sv3DFlKg4ina1CajKnKVXZj
+         fx7psS1t86Z+DcwXsR6UNkQW7q+ysZMjFZJ9BQqzNaXyXEAsL78FlZC+n4c7+a9nXnO1
+         CwsxVeqxIpEWhNaFjSJVfmlZggrst/y41uYB2b1pA/fgajOnD3ODIL7eyFviYEGB/ezh
+         QrYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=VWL8ZSPmJAiTPJ9JjQW1j0bE8X/JpNZikw6inrx3YQI=;
-        b=oFNzFnhTcEyOiq5kdbAS1TKIHzOJHW5kL+E3QitIQ2ApLlkhSxFrhvweCOg+fTc7/Y
-         HqZseu1Io43kbTzI1yxXM7NrHUwbEiWY0lxbyxChAZxTWhPBVP5S98uIftr26S+wXOa/
-         DfjdJqwGgFQIxXPSy7RIx838KRaHnVNS5Xulf+3ofj1nWfX6MFMVpKDyqXQ0+3K6O3cZ
-         H2m32gb3tsngjOugcpbHMQlOFa5M7XlpAwGcjXO9dL1oxE6+dW1gQwstexpW8z61HVC5
-         ylDH+R8EHZ+P1tN5rAxM1PycxxyHWaNcNCy6d5R4er3Ghq/GnAFfoOwoObz4AqMta7pY
-         DL5A==
-X-Gm-Message-State: ANhLgQ21A/JwV+hRgXnEfSHzApVsQe+aoXh90k54jhUx+YBpqE5bUCi+
-        jb0JrLw9KcDvZYwi1UsNgzSK7QetVFJGkKHFiNsWSA==
-X-Google-Smtp-Source: APiQypLZZN1Wtl3gwV5mELpsM2qhhqZ5leW/rlMatp78zM7+LnJ5TdE1codyNmtsIAOipZ4iyk3U+CiOz4xZhRZZUog=
-X-Received: by 2002:a2e:83cf:: with SMTP id s15mr6529050ljh.36.1585268027186;
- Thu, 26 Mar 2020 17:13:47 -0700 (PDT)
+        bh=OLXsFjAt3oyjjpAK/1V/0bvb/EVhlf8iGpvOucwTKQs=;
+        b=FllWga6wmex9pKF4SrGzw8ZbqTsBuj6cjCRaPIn2xHdCiR6A8IyeXVoYLvwzBtONQu
+         iHOuOXuPB8PSZQSsYzvaB2iqVD1OhiqdfSmIH45x7VV+O9mJYXgPw2wo3CncSSYyF0NI
+         8PcjkgBCpiLUmng3ts54347I5ktQXdTZU6gpAIC96HvpWla5k3+bOQ88KCbLmzWrjPgW
+         QYtFKtMXIDmmkmmwPeGmZRXYT6N65zFF3cDLAfKPUbLBnYeaOIWKpVMGc9qxw+a3ZYOE
+         51q+j504QdasYdHIZdTsi/X1MhKrHU99qT49MVg9D9kZzSJDuViaxda/0uW5gMEIAOVU
+         s6wg==
+X-Gm-Message-State: ANhLgQ1PX0tcm8joUH9EE3m32uSXpawIMlQNmrCrpC00qyI6x+dzD9Q3
+        JN9znxLXohjhcOcx3hE0ZmNCeES7J6fwaVIPlvuLvWaidUFQbA==
+X-Google-Smtp-Source: ADFU+vtavwSN+ak2yaOUMwfoe7cJv3YIrqeORSPDSniyzvWUyIZe14hoPmeBFLhNCngeEpsJouo/doGvxCO2Mm+RBiU=
+X-Received: by 2002:a1c:456:: with SMTP id 83mr2949618wme.54.1585275285167;
+ Thu, 26 Mar 2020 19:14:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200326075938.65053-1-mcchou@chromium.org> <20200326005931.v3.1.I0e975833a6789e8acc74be7756cd54afde6ba98c@changeid>
- <ADF19483-721C-4263-8CA8-CF4587E79BA4@holtmann.org>
-In-Reply-To: <ADF19483-721C-4263-8CA8-CF4587E79BA4@holtmann.org>
-From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Thu, 26 Mar 2020 17:13:36 -0700
-Message-ID: <CABmPvSG3ML=GDHbM-k1g9-K3rxAYewNwfPrYA96aZE+MQ-KVVg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: Indicate Microsoft vendor
- extension for Intel 9460/9560 and 9160/9260
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
+References: <20200320131356.Bluez.v1.1.Ia3d21e293d18f903fa6e54918856e1dd5ffc904f@changeid>
+In-Reply-To: <20200320131356.Bluez.v1.1.Ia3d21e293d18f903fa6e54918856e1dd5ffc904f@changeid>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Fri, 27 Mar 2020 10:14:33 +0800
+Message-ID: <CAJQfnxENfZnXq4e-kaeKF2ByhJ089JXZumWc9ydBJBWGQgTiGw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] avdtp: fix delay report valid states
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 26, 2020 at 2:01 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Miao-chen,
->
-> > This adds a bit mask of driver_info for Microsoft vendor extension and
-> > indicates the support for Intel 9460/9560 and 9160/9260. See
-> > https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/
-> > microsoft-defined-bluetooth-hci-commands-and-events for more information
-> > about the extension. This was verified with Intel ThunderPeak BT controller
-> > where msft_vnd_ext_opcode is 0xFC1E.
-> >
-> > Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
-> > ---
-> >
-> > Changes in v3:
-> > - Create net/bluetooth/msft.c with struct msft_vnd_ext defined internally
-> > and change the hdev->msft_ext field to void*.
-> > - Define and expose msft_vnd_ext_set_opcode() for btusb use.
-> > - Init hdev->msft_ext in hci_alloc_dev() and deinit it in hci_free_dev().
->
-> so I spent some cycles on thinking about on how we can have this nice and cleanly without putting too much into the core stack or hci_dev. I took your patches and converted them a little bit into how I would do it. Please have a look.
-Thanks for brainstorming the framework. I will address your suggestion
-in v4 shortly.
+[re-sending as plain text]
+Hi Bluez Maintainers,
 
-Regards,
-Miao
+Could you take a look at this proposal?
+
+Thank you!
+
+
+On Fri, 20 Mar 2020 at 13:14, Archie Pusaka <apusaka@google.com> wrote:
+>
+> From: Archie Pusaka <apusaka@chromium.org>
+>
+> According to AVDTP specification section 6.19,
+> avdtp_delayreport_cmd could also be received when the state of SEP
+> is open.
+>
+> Therefore, updating to accommodate such condition.
+> ---
+>
+>  profiles/audio/avdtp.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 0e075f9ff..4b0e63384 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -1936,6 +1936,7 @@ static gboolean avdtp_delayreport_cmd(struct avdtp *session,
+>         stream = sep->stream;
+>
+>         if (sep->state != AVDTP_STATE_CONFIGURED &&
+> +                                       sep->state != AVDTP_STATE_OPEN &&
+>                                         sep->state != AVDTP_STATE_STREAMING) {
+>                 err = AVDTP_BAD_STATE;
+>                 goto failed;
+> --
+> 2.25.1.696.g5e7596f4ac-goog
+>
